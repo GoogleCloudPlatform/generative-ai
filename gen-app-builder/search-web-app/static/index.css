@@ -1,0 +1,130 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Google Sans', sans-serif;
+    margin: 0;
+    padding-top: 0.1px;
+}
+
+.header,
+.footer {
+    text-align: center;
+}
+
+.gen-app-builder-logo, .ekg-logo {
+    height: 100px;
+    padding-top: 80px;
+    fill: currentColor;
+}
+
+.query-field,
+.schema-info,
+.types-field {
+    display: block;
+    width: 300px;
+    margin: 20px auto;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 300px;
+    margin: auto;
+}
+
+.button-container button {
+    margin: 3px;
+}
+
+.entity-checkboxes {
+    display: flex;
+    width: 300px;
+    margin: auto;
+}
+
+.language-selection {
+    display: flex;
+    width: 300px;
+    margin: auto;
+}
+
+footer {
+    margin: auto;
+}
+
+.tab-content {
+    margin: auto;
+}
+
+.tab-hidden {
+    visibility: hidden;
+}
+
+.tab-visible {
+    visibility: visible;
+}
+
+.error-message {
+    width: 500px;
+    margin: auto;
+}
+
+pre code {
+    max-height: 30rem;
+    overflow-y: scroll;
+    white-space: pre-wrap;
+}
+
+.entity-primary-action {
+    display: flex;
+    flex-direction: row;
+}
+
+.entity-image {
+    width: 25%;
+    height: auto;
+    background-size: contain;
+}
+
+.entity-primary-action .entity-card-primary {
+    padding: 1rem;
+    width: 60%;
+}
+
+.entity-detailed-description {
+    padding: 1rem;
+}
+
+#searchWidgetTrigger {
+    margin: auto;
+    display: block;
+}
+
+#main-nav-bar {
+    width: 100%;
+    text-align: center;
+    margin: auto;
+    display: block;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+
+a:visited {
+    text-decoration: none;
+}
+
+
+a:hover {
+    text-decoration: none;
+}
+
+
+a:active {
+    text-decoration: none;
+}
