@@ -40,7 +40,7 @@ You will need a Google Cloud project to use this project.
 3. [Enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com). 
 
 ## Setting up your Python or Jupyter environment
-Please see the README in the [setup-env/](https://github.com/GoogleCloudPlatform/generative-ai/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
+Please see the README in the [setup-env](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
 
 ## Contributing
 Contributions welcome! See the [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/CONTRIBUTING.md).
