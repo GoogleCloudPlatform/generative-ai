@@ -9,10 +9,10 @@ This repository contains notebooks and content that demonstrate how to use, deve
 ```
 generative-ai/
 ├── language/
-    ├── examples/             
-        ├── prompt-design/   - examples for prompts
-        ├── tuning/           - examples of tuning models
-├── setup-env/                - setup instructions
+|   └── examples/             
+|       ├── prompt-design/   - examples for prompts
+|       └── tuning/          - examples of tuning models
+└── setup-env/               - setup instructions
 ```
 
 ## Table of Contents
