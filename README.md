@@ -42,6 +42,9 @@ You will need a Google Cloud project to use this project.
 ## Setting up your Python or Jupyter environment
 Please see the README in the [setup-env](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
 
+## Google Generative AI Resources
+Check out a list of [Google Generative AI Resources](RESOURCES.md) like official product pages, documentation, videos, courses and more. 
+
 ## Contributing
 Contributions welcome! See the [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/CONTRIBUTING.md).
 
