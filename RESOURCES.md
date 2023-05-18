@@ -9,22 +9,9 @@ Please submit additional resources via a PR.
 # Products
 - Generative AI support on Vertex AI ([Your Guide](https://cloud.google.com/blog/products/ai-machine-learning/vertex-ai-model-garden-and-generative-ai-studio), [Demo](https://youtube.com/watch?v=pN-RTBq6i3I))
   - [Vertex AI](https://cloud.google.com/vertex-ai)
-  - [Model Garden](https://cloud.google.com/model-garden)
   - [Generative AI Studio](https://cloud.google.com/generative-ai-studio) 
-- Generative AI App Builder ([Blog](https://cloud.google.com/blog/products/ai-machine-learning/create-generative-apps-in-minutes-with-gen-app-builder), [Video 1](https://youtube.com/watch?v=0vM5UWC5crs), [Video 2](https://youtube.com/watch?v=kOmG83wGfTs))
-  - [Available to Trusted Testers - Join the waitlist](https://cloud.google.com/ai/earlyaccess/join)
-- Duet AI for Google Workspace ([Blog](https://workspace.google.com/blog/product-announcements/generative-ai), [Video](https://www.youtube.com/watch?v=6DaJVZBXETE))
-  - [Available to Trusted Testers - Join the waitlist](https://cloud.google.com/ai/earlyaccess/join)
-- Duet AI for Google Cloud ([Blog](https://cloud.google.com/blog/products/application-modernization/introducing-duet-ai-for-google-cloud), [Video](https://www.youtube.com/watch?v=g5TwQx60NXs))
-  - [Available to Trusted Testers - Join the waitlist](https://cloud.google.com/ai/earlyaccess/join)
-- Generative AI for Developers
-  - [Palm API for Developers](https://developers.generativeai.google/products/palm)
-  - [MakerSuite](https://developers.generativeai.google/products/makersuite)
-  - [Guide](https://developers.generativeai.google/guide)
-  - [Prompt Gallery](https://developers.generativeai.google/prompt-gallery)
-  - [Sample Apps](https://developers.generativeai.google/develop/sample-apps)
-  - [API Reference](https://developers.generativeai.google/api)  
- 
+  - Duet AI for Google Cloud ([Blog](https://cloud.google.com/blog/products/application-modernization/introducing-duet-ai-for-google-cloud), [Video](https://www.youtube.com/watch?v=g5TwQx60NXs))
+   
 # Videos
 - [Introduction to Large Language Models](https://www.youtube.com/watch?v=zizonToFXDs)
 - [Introduction to Generative AI](https://www.youtube.com/watch?v=G2fqAlgmoPo)
@@ -42,8 +29,6 @@ Please submit additional resources via a PR.
 - Video: [Recap of Generative AI Announcements](https://www.youtube.com/shorts/EWLfMw-mfRs)
 - Blog : [At Google I/O Generative AI gets to work](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-at-io-2023)
 - Blog : [Google Cloud advances generative AI at I/O: new foundation models, embeddings, and tuning tools in Vertex AI](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-launches-new-ai-models-opens-generative-ai-studio)
-- Blog : [Introducing Duet AI for Google Cloud – an AI-powered collaborator](https://cloud.google.com/blog/products/application-modernization/introducing-duet-ai-for-google-cloud)
-- Blog : [Bringing Google Cloud generative AI to popular workplace apps](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-generative-ai-partners-at-io-2023)
 - Video : [10 Ways to use Machine Learning with Google Cloud](https://www.youtube.com/watch?v=oQMgqMRR-io)
 - Video : [Utilizing LLMs for Search](https://www.youtube.com/watch?v=AtyCqaOGoj4)
 - Video : [Generative AI for conversational experiences](https://www.youtube.com/watch?v=50EJft0ILUI)
