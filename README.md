@@ -9,10 +9,10 @@ This repository contains notebooks and content that demonstrate how to use, deve
 ```
 generative-ai/
 ├── language/
-    ├── examples/             
-        ├── prompt-design/   - examples for prompts
-        ├── tuning/           - examples of tuning models
-├── setup-env/                - setup instructions
+|   └── examples/             
+|       ├── prompt-design/   - examples for prompts
+|       └── tuning/          - examples of tuning models
+└── setup-env/               - setup instructions
 ```
 
 ## Table of Contents
@@ -40,10 +40,13 @@ You will need a Google Cloud project to use this project.
 3. [Enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com). 
 
 ## Setting up your Python or Jupyter environment
-Please see the README in the [setup-env/](https://github.com/GoogleCloudPlatform/generative-ai/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
+Please see the README in the [setup-env](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
+
+## Google Generative AI Resources
+Check out a list of [Google Generative AI Resources](RESOURCES.md) like official product pages, documentation, videos, courses and more. 
 
 ## Contributing
-Contributions welcome! See the [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/CONTRIBUTING.md).
+Contributions welcome! See the [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/CONTRIBUTING.md).
 
 ## Getting help
 Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-ai/issues) to provide feedback or submit a bug report.
