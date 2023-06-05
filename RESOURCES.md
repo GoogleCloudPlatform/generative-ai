@@ -19,11 +19,19 @@ Please submit additional resources via a PR.
 - [Which AI/ML solution on Vertex AI](https://www.youtube.com/watch?v=AtyCqaOGoj4)
 
 # Cloud Skills Boost
-- Course : [Introduction to Generative AI](https://www.cloudskillsboost.google/course_templates/536)
-- Quest: [Generative AI Explorer](https://www.cloudskillsboost.google/quests/299)
-- Lab : [Generative AI with Vertex AI: Getting Started](https://www.cloudskillsboost.google/focuses/62984?parent=catalog)
-- Lab : [Generative AI with Vertex AI: Prompt Design](https://www.cloudskillsboost.google/focuses/63006?parent=catalog)
-- Lab : [Generative AI with Vertex AI: Model Tuning](https://www.cloudskillsboost.google/focuses/62985?parent=catalog)
+- [Generative AI Learning Path](https://www.cloudskillsboost.google/journeys/118) : This learning path guides you through a curated collection of content on Generative AI products and technologies, from the fundamentals of Large Language Models to how to create and deploy generative AI solutions on Google Cloud. 
+
+  This learning path currently has several courses listed below:
+  -  [Introduction to Generative AI](https://www.cloudskillsboost.google/course_templates/536)
+  -  [Introduction to Large Language Models](https://www.cloudskillsboost.google/course_templates/539)
+  -  [Attention Mechanism](https://www.cloudskillsboost.google/course_templates/537)
+  -  [Transformer Models and BERT Model](https://www.cloudskillsboost.google/course_templates/538)
+  -  [Introduction to Image Generation](https://www.cloudskillsboost.google/course_templates/541)
+  -  [Create Image Captioning Models](https://www.cloudskillsboost.google/course_templates/542)
+  -  [Encoder-Decoder Architecture](https://www.cloudskillsboost.google/course_templates/543)
+  -  [Introduction to Responsible AI](https://www.cloudskillsboost.google/course_templates/554)
+  -  [Introduction to Generative AI Studio](https://www.cloudskillsboost.google/course_templates/552)
+  -  [Generative AI Explorer - Vertex AI](https://www.cloudskillsboost.google/quests/299)
 
 # Google I/O 2023 Announcements + Videos
 - Video: [Recap of Generative AI Announcements](https://www.youtube.com/shorts/EWLfMw-mfRs)
