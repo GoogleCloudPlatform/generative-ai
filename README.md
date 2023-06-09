@@ -30,18 +30,19 @@ generative-ai/
       - [Text Classifiction](language/examples/prompt-design/text_classification.ipynb)
       - [Text Extraction](language/examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](language/examples/prompt-design/text_summarization.ipynb)
+    - [Reference-architectures/](language/examples/reference-architectures/) \***NEW**\*
+      - [Product_description_generator](language/examples/reference-architectures/Product_description_generator.ipynb)
     - [Document Q&A/](language/examples/document-qa/) \***NEW**\*
       - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
       - [Question Answering with Large Documents (without LangChain)](language/examples/document-qa/question_answering_large_documents.ipynb)
     - [Document Summarization/](language/examples/document-summarization/) \***NEW**\*
-      - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
-      - [Text Summarization with Large Documents (without LangChain)](language/examples/document-summarization/summarization_large_documents.ipynb)
+      - [Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
+      - [Summarization with Large Documents (without LangChain)](language/examples/document-summarization/summarization_large_documents.ipynb)
     - [LangChain-intro/](language/examples/langchain-intro/) \***NEW**\*
       - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain-intro/intro_langchain_palm_api.ipynb)
-      - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
-      - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
     - [Tuning/](language/examples/tuning/)
       - [Tuning a Foundational Model, Deploying, and Making Predictions](language/examples/tuning/getting_started_tuning.ipynb)
+      
 
 ## Setting up your Google Cloud project
 You will need a Google Cloud project to use this project.
