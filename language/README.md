@@ -7,16 +7,29 @@ Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generati
 generative-ai/
 ├── language/
     ├── examples/             
-        ├── prompt-design/   - examples for prompts
-        ├── tuning/           - examples of tuning models
+        ├── document-qa/             - examples for doc Q&A
+        ├── document-summarization/  - examples for doc summarization
+        ├── langchain/               - examples for langchain
+        ├── prompt-design/           - examples for prompts
+        └── tuning/                  - examples of tuning models
 ```
 
 ## Table of Contents
-- Language/
+- Language
   - [Getting Started with Generative AI Studio without code](intro_generative_ai_studio.md)
   - [Intro to Vertex AI PaLM API](intro_palm_api.ipynb)
   - [Intro to Prompt Design](intro_prompt_design.ipynb)
   - [Examples/](examples/)
+    - [Document Q&A/](examples/document-qa/) \***NEW**\*
+      - [Question Answering with Large Documents with LangChain](examples/document-qa/question_answering_large_documents_langchain.ipynb)
+      - [Question Answering with Large Documents (without LangChain)](examples/document-qa/question_answering_large_documents.ipynb)
+    - [Document Summarization/](examples/document-summarization/) \***NEW**\*
+      - [Text Summarization with Large Documents with LangChain](examples/document-summarization/summarization_large_documents_langchain.ipynb)
+      - [Text Summarization with Large Documents (without LangChain)](examples/document-summarization/summarization_large_documents.ipynb)
+    - [LangChain/](examples/langchain/) \***NEW**\*
+      - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](examples/langchain/intro_langchain_palm_api.ipynb)
+      - [Question Answering with Large Documents with LangChain](examples/document-qa/question_answering_large_documents_langchain.ipynb)
+      - [Text Summarization with Large Documents with LangChain](examples/document-summarization/summarization_large_documents_langchain.ipynb)
     - [Prompt Design/](examples/prompt-design/)
       - [Ideation](examples/prompt-design/ideation.ipynb)
       - [Question & Answering](examples/prompt-design/question_answering.ipynb)
