@@ -27,7 +27,7 @@ generative-ai/
       - [Text Extraction](language/examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](language/examples/prompt-design/text_summarization.ipynb)
     - [Reference-architectures/](language/examples/reference-architectures/) \***NEW**\*
-      - [Product_description_generator](language/examples/reference-architectures/product_description_generator_image.ipynb)
+      - [Product Description Generator from Image](language/examples/reference-architectures/product_description_generator_image.ipynb)
     - [Document Q&A/](language/examples/document-qa/) \***NEW**\*
       - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
       - [Question Answering with Large Documents (without LangChain)](language/examples/document-qa/question_answering_large_documents.ipynb)
