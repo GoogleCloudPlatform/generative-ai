@@ -12,7 +12,7 @@ generative-ai/
     ├── examples/             
         ├── document-qa/             - examples for doc Q&A
         ├── document-summarization/  - examples for doc summarization
-        ├── langchain/               - examples for langchain
+        ├── langchain-intro/         - examples for langchain
         ├── prompt-design/           - examples for prompts
         └── tuning/                  - examples of tuning models
 └── setup-env/                       - setup instructions
@@ -36,8 +36,8 @@ generative-ai/
     - [Document Summarization/](language/examples/document-summarization/) \***NEW**\*
       - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
       - [Text Summarization with Large Documents (without LangChain)](language/examples/document-summarization/summarization_large_documents.ipynb)
-    - [LangChain/](language/examples/langchain/) \***NEW**\*
-      - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain/intro_langchain_palm_api.ipynb)
+    - [LangChain-intro/](language/examples/langchain-intro/) \***NEW**\*
+      - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain-intro/intro_langchain_palm_api.ipynb)
       - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
       - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
     - [Tuning/](language/examples/tuning/)
