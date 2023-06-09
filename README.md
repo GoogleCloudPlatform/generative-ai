@@ -41,14 +41,6 @@ generative-ai/
       - [Summarization with Large Documents (without LangChain)](language/examples/document-summarization/summarization_large_documents.ipynb)
     - [LangChain-intro/](language/examples/langchain-intro/) \***NEW**\*
       - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain-intro/intro_langchain_palm_api.ipynb)
-=======
-      - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
-      - [Text Summarization with Large Documents (without LangChain)](language/examples/document-summarization/summarization_large_documents.ipynb)
-    - [LangChain-intro/](language/examples/langchain-intro/) \***NEW**\*
-      - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain-intro/intro_langchain_palm_api.ipynb)
-      - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
-      - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
->>>>>>> 7f678064240afe4c0a64438879ce5093b70d595c
     - [Tuning/](language/examples/tuning/)
       - [Tuning a Foundational Model, Deploying, and Making Predictions](language/examples/tuning/getting_started_tuning.ipynb)
       
