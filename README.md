@@ -30,6 +30,8 @@ generative-ai/
       - [Text Classifiction](language/examples/prompt-design/text_classification.ipynb)
       - [Text Extraction](language/examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](language/examples/prompt-design/text_summarization.ipynb)
+    - [reference-architectures/](language/examples/reference-architectures/) \***NEW**\*
+      - [Product_description_generator](language/examples/reference-architectures/Product_description_generator.ipynb)
     - [Document Q&A/](language/examples/document-qa/) \***NEW**\*
       - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
       - [Question Answering with Large Documents (without LangChain)](language/examples/document-qa/question_answering_large_documents.ipynb)
@@ -42,6 +44,7 @@ generative-ai/
       - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
     - [Tuning/](language/examples/tuning/)
       - [Tuning a Foundational Model, Deploying, and Making Predictions](language/examples/tuning/getting_started_tuning.ipynb)
+      
 
 ## Setting up your Google Cloud project
 You will need a Google Cloud project to use this project.
