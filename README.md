@@ -36,7 +36,6 @@ generative-ai/
       - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
       - [Question Answering with Large Documents (without LangChain)](language/examples/document-qa/question_answering_large_documents.ipynb)
     - [Document Summarization/](language/examples/document-summarization/) \***NEW**\*
-<<<<<<< HEAD
       - [Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
       - [Summarization with Large Documents (without LangChain)](language/examples/document-summarization/summarization_large_documents.ipynb)
     - [LangChain-intro/](language/examples/langchain-intro/) \***NEW**\*
