@@ -9,10 +9,13 @@ This repository contains notebooks and content that demonstrate how to use, deve
 ```
 generative-ai/
 ├── language/
-|   └── examples/             
-|       ├── prompt-design/   - examples for prompts
-|       └── tuning/          - examples of tuning models
-└── setup-env/               - setup instructions
+    ├── examples/             
+        ├── document-qa/             - examples for doc Q&A
+        ├── document-summarization/  - examples for doc summarization
+        ├── langchain/               - examples for langchain
+        ├── prompt-design/           - examples for prompts
+        └── tuning/                  - examples of tuning models
+└── setup-env/                       - setup instructions
 ```
 
 ## Table of Contents
@@ -27,13 +30,13 @@ generative-ai/
       - [Text Classifiction](language/examples/prompt-design/text_classification.ipynb)
       - [Text Extraction](language/examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](language/examples/prompt-design/text_summarization.ipynb)
-    - [Document Q&A](language/examples/document-qa/) \***NEW**\*
+    - [Document Q&A/](language/examples/document-qa/) \***NEW**\*
       - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
       - [Question Answering with Large Documents (without LangChain)](language/examples/document-qa/question_answering_large_documents.ipynb)
-    - [Document Summarization](language/examples/document-summarization/) \***NEW**\*
+    - [Document Summarization/](language/examples/document-summarization/) \***NEW**\*
       - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
       - [Text Summarization with Large Documents (without LangChain)](language/examples/document-summarization/summarization_large_documents.ipynb)
-    - [LangChain](language/examples/langchain/) \***NEW**\*
+    - [LangChain/](language/examples/langchain/) \***NEW**\*
       - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain/intro_langchain_palm_api.ipynb)
       - [Question Answering with Large Documents with LangChain](language/examples/document-qa/question_answering_large_documents_langchain.ipynb)
       - [Text Summarization with Large Documents with LangChain](language/examples/document-summarization/summarization_large_documents_langchain.ipynb)
