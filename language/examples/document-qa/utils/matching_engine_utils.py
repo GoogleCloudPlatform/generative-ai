@@ -118,7 +118,7 @@ class MatchingEngineUtils:
 
             r = self.index_client.create_index(parent=self.PARENT,
                                                index=index_request)
-            logger.info(f'Creating index with long running operation {r.name}')
+            logger.info(f'Creating index with long running operation {r._operation.name}')
 
             # Poll the operation until it's done successfullly.
             logging.info("Poll the operation to create index ...")
@@ -163,7 +163,7 @@ class MatchingEngineUtils:
                 r = self.index_endpoint_client.create_index_endpoint(
                     parent=self.PARENT,
                     index_endpoint=index_endpoint_request)
-                logger.info(f'Deploying index to endpoint with long running operation {r.name}')
+                logger.info(f'Deploying index to endpoint with long running operation {r._operation.name}')
 
                 logger.info("Poll the operation to create index endpoint ...")
                 while True:
