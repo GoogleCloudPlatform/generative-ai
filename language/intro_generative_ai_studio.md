@@ -132,7 +132,7 @@ The saved prompt will appear at the **MY PROMPTS** tab.
 
 ---
 
-### Create Chat Prompt
+### Create Chat Prompt 
 Go back to the **Language** page and click on the **+ TEXT CHAT** button to create a new chat prompt.
 
 ![Text Prompt](images/create-chat-prompt.png)
