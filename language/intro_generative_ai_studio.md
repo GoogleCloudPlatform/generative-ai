@@ -21,7 +21,7 @@ There are two ways to access the Language offerings from Generative AI Studio on
 
 Upon clicking, the following page will be presented.
 
-![Language page of Generative AI](images/landing.png)
+![Language page of Generative AI](img/landing.png)
 
 ---
 
@@ -136,7 +136,7 @@ The saved prompt will appear at the **MY PROMPTS** tab.
 ### Create Chat Prompt
 Go back to the **Language** page and click on the **+ TEXT CHAT** button to create a new chat prompt.
 
-![Text Prompt](images/create-chat-prompt.png)
+![Text Prompt](img/create-chat-prompt.png)
 
 You will see the new chat prompt page. It's relatively similar to the [new prompt page](#new-prompt) that you went through earlier.
 
@@ -160,4 +160,4 @@ The model would consider the provided additional context and answer the question
 
 Prompt Gallery lets you explore how generative AI models can work for a variety of use cases. There are a variety of topics: Summarization, Classification, Extraction, Writing, and Ideation for you to explore. Head back to the **Get Started** page and explore them at your own pace.
 
-![Language page of Generative AI](images/landing.png)
+![Language page of Generative AI](img/landing.png)
