@@ -82,7 +82,7 @@ def get_results(response: genappbuilder.SearchResponse) -> List:
             {
                 "title": data["title"],
                 "htmlTitle": data["htmlTitle"],
-                "formattedUrl": data["formattedUrl"],
+                "link": data["link"],
                 "htmlFormattedUrl": data["htmlFormattedUrl"],
                 "displayLink": data["displayLink"],
                 "snippets": [s["htmlSnippet"] for s in data["snippets"]],

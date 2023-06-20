@@ -120,8 +120,8 @@
                                     <div class="entity-card-primary">
                                         <h2 class="mdc-typography mdc-typography--headline6">{{result["title"]}}</h2>
                                         <h3 class="mdc-typography mdc-typography--subtitle2">
-                                            {% set resultUrl = result["formattedUrl"] %}
-                                            URL: <a href="{{resultUrl}}">{{result["htmlFormattedUrl"]|safe}}</a>
+                                            {% set resultUrl = result["link"] %}
+                                            URL: <a href="{{link}}">{{result["htmlFormattedUrl"]|safe}}</a>
                                         </h3>
                                     </div>
                                     {% for snippet in result["snippets"] %}
