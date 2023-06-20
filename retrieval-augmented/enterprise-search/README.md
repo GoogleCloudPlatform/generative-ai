@@ -14,9 +14,10 @@ _**TL;DR**: Large language models (LLMs) are most useful when we combine them wi
 
 To use it, upload documents, websites and databases and then users can retrieve the most relevant document chunks using natural language. The API is provided with specific configuration options which are designed to work well in conjunction with LLMs, such as customising the token length of retrieved document chunks.
 
-**Gaining access to Enterprise Search**
+**Using Enterprise Search**
 
 Enterprise Search is generally available on an allowlist basis (customers need to be approved for access) as of June 6, 2023. Contact your Google Cloud sales team for access and pricing details. 
+
 
 **Combining Enterprise Search with LLMs**
 
@@ -62,15 +63,14 @@ response = chain.run({"query": query, "context": search_results})
 
 ## Table of Contents
 
-**Please note that these examples make use of several paid Google APIs:**
-* **Vertex AI**
-* **Enterprise Search**
-* 
-- [Enterprise Search/](../enterprise_search)
-  - [Utils/](../enterprise-search/utils/)
-    - [Enterprise Search Retriever Class](../enterprise-search/utils/retriever.py)
-  - [Questioning & Answering](../enterprise-search/question_answering.ipynb)
-  - [Document Summarization](../enterprise-search/summarization.ipynb)
+**Please note that these examples make use of the Vertex AI and Enterprise Search APIs, which are paid services**
+
+
+- [Enterprise Search/](/)
+  - [Utilities](utils/)
+    - [Enterprise Search Retriever Class](/utils/retriever.py)
+  - [Questioning & Answering](/examples/question_answering)
+  - [Document Summarization](/examples/summarization)
 
 
 For guidelines on contributing, environment setup and general contextual information on Generative AI and Google tools, please see the main [README](../README.md) in the repository root directory.
@@ -80,7 +80,8 @@ For guidelines on contributing, environment setup and general contextual informa
 enterprise-search/                  - this directory
 ├── utils/
     ├── retriever/                  - definition of the retriever class used in the examples
-├── question_answering/             - examples for question answering over documents
-├── summarization/                  - examples for document summarization
+├── examples/                       - examples for question answering over documents
+    ├── question_answering/         - examples for question answering over documents
+    ├── summarization/              - examples for document summarization
 ```
 

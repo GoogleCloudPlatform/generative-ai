@@ -8,15 +8,21 @@ This repository contains notebooks and content that demonstrate how to use, deve
 ## Folder structure
 ```
 generative-ai/
+├── retrieval-augmented/
+    ├── enterprise-search/               - RAG using Enterprise Search
+        ├── utils/                       - utility classes for Enterprise Search
+        ├── examples/
+            ├── document-qa/             - examples for doc Q&A with RAG
+            ├── document-summarization/  - examples for doc summarization with RAG
 ├── language/
     ├── examples/             
-        ├── document-qa/             - examples for doc Q&A
-        ├── document-summarization/  - examples for doc summarization
-        ├── langchain-intro/         - examples for langchain
-        ├── prompt-design/           - examples for prompts
-        ├── reference-architectures/ - examples for use-cases architectures
-        └── tuning/                  - examples of tuning models
-└── setup-env/                       - setup instructions
+        ├── document-qa/                 - examples for doc Q&A
+        ├── document-summarization/      - examples for doc summarization
+        ├── langchain-intro/             - examples for langchain
+        ├── prompt-design/               - examples for prompts
+        ├── reference-architectures/     - examples for use-cases architectures
+        └── tuning/                      - examples of tuning models
+└── setup-env/                           - setup instructions
 ```
 
 ## Table of Contents
