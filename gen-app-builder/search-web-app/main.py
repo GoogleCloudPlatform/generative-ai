@@ -17,13 +17,9 @@
 import os
 import re
 
-from consts import LOCATION
-from consts import PROJECT_ID
-from consts import VALID_LANGUAGES
+from consts import LOCATION, PROJECT_ID, VALID_LANGUAGES
 from ekg_utils import search_public_kg
-from flask import Flask
-from flask import render_template
-from flask import request
+from flask import Flask, render_template, request
 from genappbuilder_utils import search_enterprise_search
 from google.api_core.exceptions import ResourceExhausted
 from werkzeug.exceptions import HTTPException
