@@ -37,7 +37,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 3. Install the prerequisites:
    - `pip install -r requirements.txt`
 4. Run `gcloud init`, create a new project, and
-    [enable billing](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project)
+   [enable billing](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project)
 5. Enable the Generative AI App Builder API:
    - `gcloud services enable discoveryengine.googleapis.com`
 6. Enable the Enterprise Knowledge Graph API:
@@ -50,6 +50,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 1. Update the `consts.py` file with your own `PROJECT_ID` and `LOCATION`.
 
 1. Deploy the Cloud Run app in your project.
+
    - `gcloud run deploy genappbuilder-demo --source .`
 
 1. Visit the deployed web page
@@ -64,7 +65,7 @@ Try example queries with each search engine:
 - [Web Search - Custom UI][websearch] - `Document AI`
 - [Enterprise Knowledge Graph][ekg] - `Google`
 
------
+---
 
 > Copyright 2023 Google LLC
 > Author: Holt Skinner @holtskinner
