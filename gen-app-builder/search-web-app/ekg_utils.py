@@ -14,7 +14,7 @@
 
 """Enterprise Knowledge Graph Utilities"""
 import json
-from typing import List, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 from google.cloud import enterpriseknowledgegraph as ekg
 
@@ -26,9 +26,9 @@ def search_public_kg(
     project_id: str,
     location: str,
     search_query: str,
-    languages: Sequence[str] = None,
-    types: Sequence[str] = None,
-    limit: int = None,
+    languages: Optional[Sequence[str]] = None,
+    types: Optional[Sequence[str]] = None,
+    limit: Optional[int] = None,
 ) -> Tuple:
     """
     Make API Request to Public Knowledge Graph.
@@ -44,7 +44,7 @@ def search_public_kg(
 
     response = client.search_public_kg(request=request)
 
-    request_url = f"https://enterpriseknowledgegraph.googleapis.com/v1/{parent}/publicKnowledgeGraphEntities:Search?query={search_query}"
+    request_url = f"https://enterpriseknowledgegraph.googleapis.com/v1/{parent}/publicKnowledgeGraphEntities:Search?query={search_query}"  # noqa: E501
 
     request_json = ekg.SearchPublicKgRequest.to_json(
         request, including_default_value_fields=False, indent=JSON_INDENT
