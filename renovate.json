@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "prConcurrentLimit": 0,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "lockFileMaintenance",
+        "bump"
+      ],
+      "automerge": true
+    }
+  ],
+  "pip_requirements": {
+    "fileMatch": [
+      "requirements.txt",
+      "requirements-test.txt",
+      "constraints.txt",
+      "constraints-test.txt"
+    ]
+  }
+}
