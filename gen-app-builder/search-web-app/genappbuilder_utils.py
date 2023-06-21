@@ -13,10 +13,9 @@
 # limitations under the License.
 
 """Generative AI App Builder Utilities"""
-import json
-from typing import List, Sequence, Tuple
+from typing import List, Tuple
 
-from google.cloud import discoveryengine_v1beta as genappbuilder
+from google.cloud import discoveryengine_v1 as genappbuilder
 
 JSON_INDENT = 2
 
