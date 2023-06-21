@@ -99,6 +99,7 @@ pre code {
   padding: 1rem;
 }
 
+/* stylelint-disable-next-line selector-id-pattern */
 #searchWidgetTrigger {
   margin: auto;
   display: block;
