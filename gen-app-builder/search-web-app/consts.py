@@ -17,9 +17,20 @@
 PROJECT_ID = "YOUR-PROJECT-ID"
 LOCATION = "global"
 
-CONTRACT_SEARCH_CONFIG_ID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-FINANCE_SEARCH_CONFIG_ID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-WEBSITE_SEARCH_ENGINE_ID = "website-search-engine_xxxxxxxx"
+WIDGET_CONFIGS = [
+    {"name": "Contracts", "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"},
+    {
+        "name": "Finance - Earnings Reports",
+        "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    },
+]
+
+CUSTOM_UI_DATASTORE_IDS = [
+    {
+        "name": "Google Cloud Website",
+        "datastore_id": "website-search-engine_xxxxxxxx",
+    },
+]
 
 # iso639-1 code
 # First Index will be default selection
