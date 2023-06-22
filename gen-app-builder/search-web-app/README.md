@@ -19,6 +19,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 ## Setup
 
 - Follow steps in [Get started with Enterprise Search](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search) for Unstructured Data
+
   - Sample Data Sources used in the deployed demo:
     - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
       - `gs://cloud-samples-data/gen-app-builder/search/CUAD_v1`
@@ -28,6 +29,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
     - ![configId](img/configId.png)
 
 - Follow steps in [Get started with Enterprise Search](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search) for Websites
+
   - [Google Cloud site](https://cloud.google.com)
     - `https://cloud.google.com`
 
@@ -51,6 +53,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 ### Demo Deployment
 
 1. Update the `consts.py` file with your own `PROJECT_ID` and `LOCATION`.
+
    - Add the `configId` for your own Contract Search Engine to `CONTRACT_SEARCH_CONFIG_ID`
    - Add the `configId` for your own Finance Search Engine to `FINANCE_SEARCH_CONFIG_ID`
    - Add the `datastore_id` for your Website Search Engine to `WEBSITE_SEARCH_ENGINE_ID`
