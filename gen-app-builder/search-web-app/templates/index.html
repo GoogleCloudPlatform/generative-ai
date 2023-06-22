@@ -64,15 +64,13 @@
       <h1>Enterprise Search Demo - {{page_title}}</h1>
     </section>
     <main>
-      <!-- Search widget script bundle -->
-      <script src="https://gen-ai-app-builder.appspot.com/preview/client"></script>
+      <!-- Gen App Builder widget bundle -->
+      <script src="https://cloud.google.com/ai/gen-app-builder/client"></script>
 
       <!-- Search widget element is not visible by default -->
       <gen-search-widget
-        widgetConfigName="projects/YOUR-PROJECT-ID/locations/global/collections/default_collection/dataStores/{{datastore_id}}/widgetConfigs/default_search_widget_config"
-        apiKey="YOUR-API-KEY"
-        triggerId="searchWidgetTrigger"
-      >
+        configId="{{config_id}}"
+        triggerId="searchWidgetTrigger">
       </gen-search-widget>
 
       <!-- Element that opens the widget on click. It does not have to be an input -->
