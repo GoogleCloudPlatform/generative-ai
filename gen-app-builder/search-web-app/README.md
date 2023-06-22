@@ -19,15 +19,18 @@ Additional features include how to search the public Cloud Knowledge Graph using
 ## Setup
 
 - Follow steps in [Get started with Enterprise Search](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search) for Unstructured Data
-- Sample Data Sources:
-  - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
-    - `gs://cloud-samples-data/gen-app-builder/search/CUAD_v1`
-  - [Alphabet Earnings Reports](https://abc.xyz/investor/)
-    - `gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs`
+  - Sample Data Sources used in the deployed demo:
+    - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
+      - `gs://cloud-samples-data/gen-app-builder/search/CUAD_v1`
+    - [Alphabet Earnings Reports](https://abc.xyz/investor/)
+      - `gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs`
+  - Copy the `configId` from the `<gen-search-widget>` in the `Integration > Widget` tab in the Cloud Console.
+    - ![configId](img/configId.png)
+
+- Follow steps in [Get started with Enterprise Search](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search) for Websites
   - [Google Cloud site](https://cloud.google.com)
     - `https://cloud.google.com`
-- Copy HTML code from the `Integration > Widget` tab in the Cloud Console.
-  - Make sure the API Key has been generated.
+
 - Deploy using Cloud Run
 
 ### Dependencies
@@ -48,6 +51,9 @@ Additional features include how to search the public Cloud Knowledge Graph using
 ### Demo Deployment
 
 1. Update the `consts.py` file with your own `PROJECT_ID` and `LOCATION`.
+   - Add the `configId` for your own Contract Search Engine to `CONTRACT_SEARCH_CONFIG_ID`
+   - Add the `configId` for your own Finance Search Engine to `FINANCE_SEARCH_CONFIG_ID`
+   - Add the `datastore_id` for your Website Search Engine to `WEBSITE_SEARCH_ENGINE_ID`
 
 1. Deploy the Cloud Run app in your project.
 
@@ -61,7 +67,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 Try example queries with each search engine:
 
 - [Contract][contract] - `What is the SLA?`
-- [Finance][finance] - `What was Google's earnings in 2021?`
+- [Finance][finance] - `What was Google's revenue in 2021?`
 - [Web Search - Custom UI][websearch] - `Document AI`
 - [Enterprise Knowledge Graph][ekg] - `Google`
 

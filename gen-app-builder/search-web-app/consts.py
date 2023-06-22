@@ -17,6 +17,10 @@
 PROJECT_ID = "YOUR-PROJECT-ID"
 LOCATION = "global"
 
+CONTRACT_SEARCH_CONFIG_ID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+FINANCE_SEARCH_CONFIG_ID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+WEBSITE_SEARCH_ENGINE_ID = "website-search-engine_xxxxxxxx"
+
 # iso639-1 code
 # First Index will be default selection
 VALID_LANGUAGES = [
