@@ -23,8 +23,15 @@ s.move(templated_files / "noxfile.py")
 # Update BLACK_PATHS in order to run black on all files
 s.replace(
     "noxfile.py",
-    r"""BLACK_PATHS = \["docs", "google", "tests", "noxfile.py", "setup.py"\]""",
-    r"""BLACK_PATHS = ["."]""",
+    r"""LINT_PATHS = \["docs", "google", "tests", "noxfile.py", "setup.py"\]""",
+    r"""LINT_PATHS = ["."]""",
+)
+
+# TODO: Remove once https://github.com/googleapis/synthtool/pull/1811 is merged.
+s.replace(
+    "noxfile.py",
+    r"""BLACK_VERSION = "black==22.3.0"\nISORT_VERSION = "isort==5.10.1""",
+    r"""BLACK_VERSION = "black[jupyter]==23.3.0"\nISORT_VERSION = "isort==5.11.0""",
 )
 
 # ----------------------------------------------------------------------------
