@@ -1,6 +1,6 @@
 # Generative AI App Builder - Enterprise Search Demo
 
-This demo illustrates how to search through a corpus of unstructrued contract documents using [Generative AI App Builder: Enterprise Search][1].
+This demo illustrates how to search through a corpus of documents using Enterprise Search on[Generative AI App Builder][1].
 
 Additional features include how to search the public Cloud Knowledge Graph using the [Enterprise Knowledge Graph][3] API.
 
@@ -25,15 +25,11 @@ Additional features include how to search the public Cloud Knowledge Graph using
       - `gs://cloud-samples-data/gen-app-builder/search/CUAD_v1`
     - [Alphabet Earnings Reports](https://abc.xyz/investor/)
       - `gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs`
-  - Copy the `configId` from the `<gen-search-widget>` in the `Integration > Widget` tab in the Cloud Console.
-    - ![configId](img/configId.png)
 
 - Follow steps in [Get started with Enterprise Search](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search) for Websites
 
   - [Google Cloud site](https://cloud.google.com)
     - `https://cloud.google.com`
-
-- Deploy using Cloud Run
 
 ### Dependencies
 
@@ -54,24 +50,29 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
 1. Update the `consts.py` file with your own `PROJECT_ID` and `LOCATION`.
 
-   - Add the `configId` for your own Contract Search Engine to `CONTRACT_SEARCH_CONFIG_ID`
-   - Add the `configId` for your own Finance Search Engine to `FINANCE_SEARCH_CONFIG_ID`
-   - Add the `datastore_id` for your Website Search Engine to `WEBSITE_SEARCH_ENGINE_ID`
+   - To use the prebuilt widget provided in the Cloud Console, Copy the `configId` from the `<gen-search-widget>` in the `Integration > Widget` tab.
+     - ![configId](img/configId.png)
+     - Be sure to set authorization type as `Public Access` and add your web application url to the `Allowed Domains` once it's deployed.
+     - Add the `configId` for your Search Engines to `WIDGET_CONFIGS` in `consts.py`
+   - To use the Custom UI, add the datastore id for your search engine to `CUSTOM_UI_DATASTORE_IDS` in `consts.py`
+     - This is the string after `/engines/` in the Cloud Console URL.
+       - `https://console.cloud.google.com/gen-app-builder/engines/website-search-engine_1681248733152/...`
+       - Datastore ID is `website-search-engine_1681248733152`
 
-1. Deploy the Cloud Run app in your project.
+2. Deploy the Cloud Run app in your project.
 
    - `gcloud run deploy genappbuilder-demo --source .`
 
-1. Visit the deployed web page
+3. Visit the deployed web page
    - Example: [`https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app`](https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app)
 
 ## Usage
 
 Try example queries with each search engine:
 
-- [Contract][contract] - `What is the SLA?`
-- [Finance][finance] - `What was Google's revenue in 2021?`
-- [Web Search - Custom UI][websearch] - `Document AI`
+- [Contracts][contract] - `What is the SLA?`
+- [Finance - Earnings Reports][finance] - `What was Google's revenue in 2021?`
+- [Google Cloud Website Search][websearch] - `Document AI`
 - [Enterprise Knowledge Graph][ekg] - `Google`
 
 ---
@@ -80,6 +81,6 @@ Try example queries with each search engine:
 > Author: Holt Skinner @holtskinner
 
 [contract]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/
-[finance]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/finance
+[finance]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/
 [websearch]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/search
 [ekg]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/ekg
