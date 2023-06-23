@@ -1,6 +1,6 @@
 # Generative AI App Builder - Enterprise Search Demo
 
-This demo illustrates how to search through a corpus of documents using Enterprise Search on[Generative AI App Builder][1].
+This demo illustrates how to search through a corpus of documents using [Enterprise Search][4] on [Generative AI App Builder][1].
 
 Additional features include how to search the public Cloud Knowledge Graph using the [Enterprise Knowledge Graph][3] API.
 
@@ -15,6 +15,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 [1]: https://cloud.google.com/generative-ai-app-builder/docs/overview
 [2]: https://cloud.google.com/run
 [3]: https://cloud.google.com/enterprise-knowledge-graph/docs/overview
+[4]: https://cloud.google.com/enterprise-search
 
 ## Setup
 
