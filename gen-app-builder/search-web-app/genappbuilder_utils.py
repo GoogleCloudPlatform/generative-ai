@@ -14,11 +14,9 @@
 
 """Generative AI App Builder Utilities"""
 from os.path import basename
-from typing import List, Tuple, Optional
-import uuid
+from typing import List, Optional, Tuple
 
-from google.cloud import discoveryengine
-from google.cloud import discoveryengine_v1beta
+from google.cloud import discoveryengine, discoveryengine_v1beta
 
 JSON_INDENT = 2
 

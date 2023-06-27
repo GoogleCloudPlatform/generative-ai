@@ -19,18 +19,18 @@ import re
 
 from consts import (
     CUSTOM_UI_DATASTORE_IDS,
-    PERSONALIZE_DATASTORE_IDs,
     LOCATION,
     PROJECT_ID,
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
+    PERSONALIZE_DATASTORE_IDs,
 )
 from ekg_utils import search_public_kg
 from flask import Flask, render_template, request
 from genappbuilder_utils import (
-    search_enterprise_search,
-    recommend_personalize,
     list_documents,
+    recommend_personalize,
+    search_enterprise_search,
 )
 from google.api_core.exceptions import ResourceExhausted
 from werkzeug.exceptions import HTTPException
