@@ -61,7 +61,7 @@ body {
   margin: auto;
 }
 
-.language-selection {
+.language-selection, .document-selection {
   display: flex;
   width: 300px;
   margin: auto;
@@ -141,4 +141,13 @@ a:hover {
 
 a:active {
   text-decoration: none;
+}
+
+.document-list-item {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.empty-results-message {
+  text-align: center;
 }
