@@ -21,7 +21,7 @@ There are two ways to access the Language offerings from Generative AI Studio on
 
 Upon clicking, the following page will be presented.
 
-![Language page of Generative AI](img/landing.png)
+![Language page of Generative AI](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/landing.jpg)
 
 ---
 
