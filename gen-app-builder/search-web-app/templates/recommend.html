@@ -29,7 +29,7 @@
       type="image/x-icon"
       href="{{url_for('static', filename='favicon.ico')}}"
     />
-    <title>Enterprise Search Demo</title>
+    <title>Personalize Demo</title>
   </head>
 
   <body>
@@ -65,26 +65,59 @@
           alt="Generative AI App Builder"
         />
       </a>
-      <h1>Enterprise Search Demo - Custom UI</h1>
+      <h1>Personalize Demo - Custom UI</h1>
     </section>
     <main id="active-area">
-      <form class="search-form" action="/search_genappbuilder" method="post">
-        <!-- Search Box -->
-        <div class="mdc-text-field mdc-text-field--outlined query-field">
-          <input
-            class="mdc-text-field__input"
-            id="query-input"
-            name="search_query"
-            required
-          />
-          <div class="mdc-notched-outline">
-            <div class="mdc-notched-outline__leading"></div>
-            <div class="mdc-notched-outline__notch">
-              <label for="text-field-hero-input" class="mdc-floating-label"
-                >Search the Google Cloud Website</label
-              >
-            </div>
-            <div class="mdc-notched-outline__trailing"></div>
+      <form class="search-form" action="/recommend_genappbuilder" method="post">
+        <!-- Attribution Token -->
+        <input type="hidden" name="attribution_token" value="{{ attribution_token }}">
+        <!-- Document Selection Menu -->
+        <div class="mdc-select mdc-select--filled document-selection">
+          <input type="hidden" name="document_id">
+          <div class="mdc-select__anchor"
+              role="button"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-labelledby="document-label document-selected-text">
+            <span class="mdc-select__ripple"></span>
+            <span id="document-label" class="mdc-floating-label">Get recommendations for a Document</span>
+            <span class="mdc-select__selected-text-container">
+              <span id="document-selected-text" class="mdc-select__selected-text"></span>
+            </span>
+            <span class="mdc-select__dropdown-icon">
+              <svg
+                  class="mdc-select__dropdown-icon-graphic"
+                  viewBox="7 10 10 5" focusable="false">
+                <polygon
+                    class="mdc-select__dropdown-icon-inactive"
+                    stroke="none"
+                    fill-rule="evenodd"
+                    points="7 10 12 15 17 10">
+                </polygon>
+                <polygon
+                    class="mdc-select__dropdown-icon-active"
+                    stroke="none"
+                    fill-rule="evenodd"
+                    points="7 15 12 10 17 15">
+                </polygon>
+              </svg>
+            </span>
+            <span class="mdc-line-ripple"></span>
+          </div>
+          <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
+            <ul class="mdc-list" role="listbox" aria-label="Document picker listbox">
+              <li class="mdc-list-item mdc-list-item--selected" aria-selected="true" data-value="" role="option">
+                <span class="mdc-list-item__ripple"></span>
+              </li>
+              {% for d in documents %}
+              <li class="mdc-list-item document-list-item" aria-selected="false" data-value="{{ d.id }}" role="option">
+                <span class="mdc-list-item__ripple"></span>
+                <span class="mdc-list-item__text">
+                  {{ d.title }}
+                </span>
+              </li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
         <!-- Search Button -->
@@ -165,6 +198,9 @@
       </div>
       <div class="tab-content">
         <div id="entities-tab" class="tab-visible">
+          {% if results|length == 0 %}
+          <p class="empty-results-message">No recommendations were found for this document.</p>
+          {% endif %}
           {% for result in results %}
           <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
@@ -174,29 +210,20 @@
                     class="mdc-card__primary-action entity-primary-action"
                     tabindex="0"
                   >
-                    {% set imageUrl = result["thumbnailImage"] %}
-                    <div
-                      class="mdc-card__media mdc-card__media--square entity-image"
-                      style="background-image: url('{{imageUrl}}');"
-                    ></div>
                     <div class="entity-card-primary">
-                      <h2 class="mdc-typography mdc-typography--headline6">
-                        {{result["title"]}}
-                      </h2>
+                      {% set resultUrl = result["link"] %}
+                      <a href="{{resultUrl}}" target="_blank">
+                        <h2 class="mdc-typography mdc-typography--headline6">
+                          {{result["title"]|safe}}
+                        </h2>
+                      </a>
                       <h3 class="mdc-typography mdc-typography--subtitle2">
-                        {% set resultUrl = result["link"] %} URL:
-                        <a href="{{resultUrl}}" target="_blank"
-                          >{{result["htmlFormattedUrl"]|safe}}</a
-                        >
+                        Document ID: <code>{{result["id"]|safe}}</code>
+                      </h3>
+                      <h3 class="mdc-typography mdc-typography--subtitle2">
+                        MIME Type: <code>{{result["mimeType"]|safe}}</code>
                       </h3>
                     </div>
-                    {% for snippet in result["snippets"] %}
-                    <div
-                      class="mdc-typography mdc-typography--body2 entity-detailed-description"
-                    >
-                      {{snippet|safe}}
-                    </div>
-                    {% endfor %}
                   </div>
                 </div>
               </div>
@@ -265,5 +292,5 @@
 
   <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
   <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
-  <script src="{{url_for('static', filename='search.js')}}"></script>
+  <script src="{{url_for('static', filename='recommend.js')}}"></script>
 </html>
