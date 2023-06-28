@@ -100,6 +100,12 @@ def get_enterprise_search_results(response: discoveryengine.SearchResponse) -> L
     results = []
     for result in response.results:
         data = result.document.derived_struct_data
+
+        cse_thumbnail = data["pagemap"].get("cse_thumbnail")
+        if cse_thumbnail:
+            image = cse_thumbnail[0]["src"]
+        else:
+            image = "https://www.google.com/images/errors/robot.png"
         results.append(
             {
                 "title": data["title"],
@@ -108,7 +114,7 @@ def get_enterprise_search_results(response: discoveryengine.SearchResponse) -> L
                 "htmlFormattedUrl": data["htmlFormattedUrl"],
                 "displayLink": data["displayLink"],
                 "snippets": [s["htmlSnippet"] for s in data["snippets"]],
-                "thumbnailImage": data["pagemap"]["cse_thumbnail"][0]["src"],
+                "thumbnailImage": image,
                 "resultJson": discoveryengine.SearchResponse.SearchResult.to_json(
                     result, including_default_value_fields=True, indent=JSON_INDENT
                 ),

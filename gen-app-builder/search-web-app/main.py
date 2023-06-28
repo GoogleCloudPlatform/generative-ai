@@ -247,7 +247,7 @@ def handle_exception(ex: Exception):
         message_error = str(ex)
 
     return render_template(
-        "ekg.html",
+        "search.html",
         form_options=FORM_OPTIONS,
         nav_links=NAV_LINKS,
         message_error=message_error,

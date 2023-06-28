@@ -1,5 +1,7 @@
 # Generative AI App Builder - Enterprise Search Demo
 
+> NOTE: Some of the links in this file require allowlist access to Generative AI App Builder in order to view. If you would like early access to the product, apply to become a [Trusted Tester for Google Cloud Generative AI][trustedtester].
+
 This demo illustrates how to search through a corpus of documents using [Enterprise Search][enterprisesearch] on [Generative AI App Builder][genappbuilder].
 
 Additional features include how to search the public Cloud Knowledge Graph using the [Enterprise Knowledge Graph][enterpriseknowledgegraph] API.
@@ -9,13 +11,13 @@ Additional features include how to search the public Cloud Knowledge Graph using
 ### Google Cloud Products Used
 
 - [Generative AI App Builder: Enterprise Search][enterprisesearch]
-- [Generative AI App Builder: Personalize][genapp_personalize]
+- [Generative AI App Builder: Personalize][try_personalize]
 - [Cloud Run][cloudrun]
 - [Enterprise Knowledge Graph][enterpriseknowledgegraph]
 
 ## Setup
 
-- Follow steps in [Get started with Enterprise Search](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search) for Unstructured Data.
+- Follow steps in [Get started with Enterprise Search][try_search] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
     - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
@@ -23,12 +25,12 @@ Additional features include how to search the public Cloud Knowledge Graph using
     - [Alphabet Earnings Reports](https://abc.xyz/investor/)
       - `gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs`
 
-- Follow steps in [Get started with Enterprise Search](https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search) for Websites
+- Follow steps in [Get started with Enterprise Search][try_search] for Websites
 
   - [Google Cloud site](https://cloud.google.com)
     - `https://cloud.google.com`
 
-- Follow steps in [Get started with Personalize][genapp_personalize] for Unstructured Data.
+- Follow steps in [Get started with Personalize][try_personalize] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
     - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
@@ -46,7 +48,9 @@ Additional features include how to search the public Cloud Knowledge Graph using
    - `gcloud services enable discoveryengine.googleapis.com`
 6. Enable the Enterprise Knowledge Graph API:
    - `gcloud services enable enterpriseknowledgegraph.googleapis.com`
-7. Setup application default authentication, run:
+7. Enable Cloud Run:
+   - `gcloud services enable run.googleapis.com`
+8. Setup application default authentication, run:
    - `gcloud auth application-default login`
 
 ### Demo Deployment
@@ -92,14 +96,16 @@ Try example queries with each search engine:
 > Copyright 2023 Google LLC
 > Author: Holt Skinner @holtskinner
 
-[genappbuilder]: https://cloud.google.com/generative-ai-app-builder/docs/overview
-[genapp_personalize]: https://cloud.google.com/generative-ai-app-builder/docs/try-personalize
+[genappbuilder]: https://cloud.google.com/generative-ai-app-builder/
 [cloudrun]: https://cloud.google.com/run
 [enterpriseknowledgegraph]: https://cloud.google.com/enterprise-knowledge-graph/docs/overview
 [enterprisesearch]: https://cloud.google.com/enterprise-search
+[try_personalize]: https://cloud.google.com/generative-ai-app-builder/docs/try-personalize
+[try_search]: https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search
 
 [contract]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/
 [finance]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/
 [websearch]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/search
 [personalize]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/personalize
 [ekg]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/ekg
+[trustedtester]: https://cloud.google.com/ai/earlyaccess/join?hl=en
