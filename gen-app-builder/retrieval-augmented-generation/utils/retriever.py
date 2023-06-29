@@ -33,7 +33,7 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
         arbitrary_types_allowed = True
 
     @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
+    def validate_environment(cls, values: Dict) -> Dict:  # pylint: no-self-argument
         try:
             from google.cloud import discoveryengine_v1beta
         except ImportError:
