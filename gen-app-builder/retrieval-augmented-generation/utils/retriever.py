@@ -5,20 +5,19 @@ from typing import Any, Dict, List
 
 from google.cloud import discoveryengine_v1beta
 from google.cloud.discoveryengine_v1beta.services.search_service import pagers
-
-from pydantic import BaseModel, Extra, root_validator
-
 from langchain.schema import BaseRetriever, Document
 from langchain.utils import get_from_dict_or_env
+from pydantic import BaseModel, Extra, root_validator
+
 
 class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
     """Wrapper around Google Cloud Enterprise Search."""
 
-    client: Any = None #: :meta private:
-    serving_config: Any = None #: :meta private:Any
-    content_search_spec: Any = None #: :meta private:Any
-    project_id: str = None
-    search_engine_id: str = None
+    client: Any = None  #: :meta private:
+    serving_config: Any = None  #: :meta private:Any
+    content_search_spec: Any = None  #: :meta private:Any
+    project_id: str = ""
+    search_engine_id: str = ""
     serving_config_id: str = "default_config"
     location_id: str = "global"
     max_snippet_count: int = 3
@@ -26,7 +25,6 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
     "The default custom credentials (google.auth.credentials.Credentials) to use "
     "when making API calls. If not provided, credentials will be ascertained from "
     "the environment."
-
 
     class Config:
         """Configuration for this pydantic object."""
@@ -57,7 +55,9 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
         )
         values["max_snippet_count"] = max_snippet_count
 
-        client = discoveryengine_v1beta.SearchServiceClient(credentials=values["credentials"])
+        client = discoveryengine_v1beta.SearchServiceClient(
+            credentials=values["credentials"]
+        )
         values["client"] = client
 
         serving_config = client.serving_config_path(
@@ -77,7 +77,9 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
 
         return values
 
-    def _convert_search_response(self, search_results: pagers.SearchPager) -> List[Document]:
+    def _convert_search_response(
+        self, search_results: pagers.SearchPager
+    ) -> List[Document]:
         """Converts search response to a list of LangChain documents."""
         documents = []
         for result in search_results:
@@ -86,12 +88,13 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
                 for snippet in doc_data.get("snippets", []):
                     documents.append(
                         Document(
-                        page_content=snippet.get("snippet", ""),
-                        metadata={
-                            "source": f"{doc_data.get('link', '')}:{snippet.get('pageNumber', '')}",
-                            "id": result.document.id
-                            }
-                    ))
+                            page_content=snippet.get("snippet", ""),
+                            metadata={
+                                "source": f"{doc_data.get('link', '')}:{snippet.get('pageNumber', '')}",
+                                "id": result.document.id,
+                            },
+                        )
+                    )
         return documents
 
     def get_relevant_documents(self, query: str) -> List[Document]:
