@@ -16,7 +16,6 @@ generative-ai/
 ```
 
 ## Table of Contents
-
 - `language/`
   - [Getting Started with Generative AI Studio without code](intro_generative_ai_studio.md)
   - [Intro to Vertex AI PaLM API](intro_palm_api.ipynb)
