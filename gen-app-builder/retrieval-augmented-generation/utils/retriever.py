@@ -1,4 +1,5 @@
 """Retriever wrapper for Google Cloud Enterprise Search."""
+# pylint: disable=no-self-argument
 from __future__ import annotations
 
 from typing import Any, Dict, List
@@ -33,9 +34,7 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
         arbitrary_types_allowed = True
 
     @root_validator()
-    def validate_environment(
-        cls, values: Dict  # pylint: disable=no-self-argument
-    ) -> Dict:
+    def validate_environment(cls, values: Dict) -> Dict:
         try:
             from google.cloud import discoveryengine_v1beta
         except ImportError:
