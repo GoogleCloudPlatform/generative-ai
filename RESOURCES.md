@@ -1,7 +1,7 @@
 # Google Generative AI resources
 A collection of videos, codelabs, courses, repositories, articles that help everyone learn more about Google Generative AI offerings.
 
-Please submit additional resources via a PR. 
+Please submit additional resources via a PR.
 
 # Official Documentation
 - [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai)
@@ -9,9 +9,9 @@ Please submit additional resources via a PR.
 # Products
 - Generative AI support on Vertex AI ([Your Guide](https://cloud.google.com/blog/products/ai-machine-learning/vertex-ai-model-garden-and-generative-ai-studio), [Demo](https://youtube.com/watch?v=pN-RTBq6i3I))
   - [Vertex AI](https://cloud.google.com/vertex-ai)
-  - [Generative AI Studio](https://cloud.google.com/generative-ai-studio) 
+  - [Generative AI Studio](https://cloud.google.com/generative-ai-studio)
   - Duet AI for Google Cloud ([Blog](https://cloud.google.com/blog/products/application-modernization/introducing-duet-ai-for-google-cloud), [Video](https://www.youtube.com/watch?v=g5TwQx60NXs))
-   
+
 # Videos
 - [Introduction to Large Language Models](https://www.youtube.com/watch?v=zizonToFXDs)
 - [Introduction to Generative AI](https://www.youtube.com/watch?v=G2fqAlgmoPo)
@@ -19,7 +19,7 @@ Please submit additional resources via a PR.
 - [Which AI/ML solution on Vertex AI](https://www.youtube.com/watch?v=AtyCqaOGoj4)
 
 # Cloud Skills Boost
-- [Generative AI Learning Path](https://www.cloudskillsboost.google/journeys/118) : This learning path guides you through a curated collection of content on Generative AI products and technologies, from the fundamentals of Large Language Models to how to create and deploy generative AI solutions on Google Cloud. 
+- [Generative AI Learning Path](https://www.cloudskillsboost.google/journeys/118) : This learning path guides you through a curated collection of content on Generative AI products and technologies, from the fundamentals of Large Language Models to how to create and deploy generative AI solutions on Google Cloud.
 
   This learning path currently has several courses listed below:
   -  [Introduction to Generative AI](https://www.cloudskillsboost.google/course_templates/536)

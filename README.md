@@ -6,13 +6,11 @@ This repository contains notebooks and content that demonstrate how to use, deve
 
 
 ## Folder structure
-```
+```text
 generative-ai/
-├── enterprise-search/                     - RAG using Enterprise Search
-    ├── utils/
-        └── retriever.py                   - utility classes for Enterprise Search
-    ├── examples/
-        ├── question_answering.ipynb       - examples for doc Q&A with RAG
+├── gen-app-builder/
+    ├── search-web-app/                    - Demo of searching through document corpus using Enterprise Search
+    └── retrieval-augmented-generation/    - RAG using Enterprise Search
 ├── language/
     ├── examples/
         ├── document-qa/                   - examples for doc Q&A
