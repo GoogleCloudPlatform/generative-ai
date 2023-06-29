@@ -64,7 +64,7 @@ Guidelines](https:git//opensource.google/conduct/).
 
 ## Contributor Guide
 
-If you are new to contributing to open source, you can find helpful information in this contributor guide. 
+If you are new to contributing to open source, you can find helpful information in this contributor guide.
 
 You may follow these steps to contribute:
 

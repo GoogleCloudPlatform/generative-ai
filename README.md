@@ -6,17 +6,20 @@ This repository contains notebooks and content that demonstrate how to use, deve
 
 
 ## Folder structure
-```
+```text
 generative-ai/
+├── gen-app-builder/
+    ├── search-web-app/                    - Demo of searching through document corpus using Enterprise Search
+    └── retrieval-augmented-generation/    - RAG using Enterprise Search
 ├── language/
-    ├── examples/             
-        ├── document-qa/             - examples for doc Q&A
-        ├── document-summarization/  - examples for doc summarization
-        ├── langchain-intro/         - examples for langchain
-        ├── prompt-design/           - examples for prompts
-        ├── reference-architectures/ - examples for use-cases architectures
-        └── tuning/                  - examples of tuning models
-└── setup-env/                       - setup instructions
+    ├── examples/
+        ├── document-qa/                   - examples for doc Q&A
+        ├── document-summarization/        - examples for doc summarization
+        ├── langchain-intro/               - examples for langchain
+        ├── prompt-design/                 - examples for prompts
+        ├── reference-architectures/       - examples for use-cases architectures
+        └── tuning/                        - examples of tuning models
+└── setup-env/                             - setup instructions
 ```
 
 ## Table of Contents
@@ -43,7 +46,7 @@ generative-ai/
       - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain-intro/intro_langchain_palm_api.ipynb)
     - [Tuning/](language/examples/tuning/)
       - [Tuning a Foundational Model, Deploying, and Making Predictions](language/examples/tuning/getting_started_tuning.ipynb)
-      
+
 
 ## Setting up your Google Cloud project
 You will need a Google Cloud project to use this project.
@@ -52,13 +55,13 @@ You will need a Google Cloud project to use this project.
 
 2. [Make sure that billing is enabled for your project](https://cloud.google.com/billing/docs/how-to/modify-project).
 
-3. [Enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com). 
+3. [Enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com).
 
 ## Setting up your Python or Jupyter environment
 Please see the README in the [setup-env](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
 
 ## Google Generative AI Resources
-Check out a list of [Google Generative AI Resources](RESOURCES.md) like official product pages, documentation, videos, courses and more. 
+Check out a list of [Google Generative AI Resources](RESOURCES.md) like official product pages, documentation, videos, courses and more.
 
 ## Contributing
 Contributions welcome! See the [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/CONTRIBUTING.md).

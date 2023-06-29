@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Google+Sans:300,400,500,700"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    />
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{url_for('static', filename='favicon.ico')}}"
+    />
+    <title>Generative AI App Builder - Enterprise Search Demo</title>
+  </head>
+
+  <body>
+    <div id="main-nav-bar" class="mdc-tab-bar" role="tablist">
+      <div class="mdc-tab-scroller">
+        <div class="mdc-tab-scroller__scroll-area">
+          <div class="mdc-tab-scroller__scroll-content">
+            {% for n in nav_links %}
+            <a class="tab-nav" href="{{n.link}}">
+              <button
+                class="mdc-tab mdc-tab--active nav-button"
+                role="tab"
+                tabindex="0"
+              >
+                <span class="mdc-tab__content">
+                  <span class="mdc-tab__icon material-icons" aria-hidden="true"
+                    >{{n.icon}}</span
+                  >
+                  <span class="mdc-tab__text-label">{{n.name}}</span>
+                </span>
+              </button>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <section class="header">
+      <a href="/">
+        <img
+          class="gen-app-builder-logo"
+          src="{{url_for('static', filename='gen-app-builder-logo.svg')}}"
+          alt="Generative AI App Builder"
+        />
+      </a>
+      <h1>Enterprise Search Demo - Widgets</h1>
+    </section>
+    <main>
+      <!-- Gen App Builder widget bundle -->
+      <script src="https://cloud.google.com/ai/gen-app-builder/client"></script>
+
+      {% for s in search_engine_options %}
+      <!-- Search widget element is not visible by default -->
+      <gen-search-widget
+        configId="{{s.config_id}}"
+        triggerId="{{s.name|lower|replace(' ', '-')}}"
+      >
+      </gen-search-widget>
+
+      <!-- Element that opens the widget on click. It does not have to be an input -->
+      <div class="mdc-text-field mdc-text-field--outlined query-field">
+        <input
+          class="mdc-text-field__input"
+          id="{{s.name|lower|replace(' ', '-')}}"
+        />
+        <div class="mdc-notched-outline">
+          <div class="mdc-notched-outline__leading"></div>
+          <div class="mdc-notched-outline__notch">
+            <label for="text-field-hero-input" class="mdc-floating-label"
+              >{{s.name}}</label
+            >
+          </div>
+          <div class="mdc-notched-outline__trailing"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </main>
+    <section class="footer">
+      <p>
+        Made by <a href="https://github.com/holtskinner">holtskinner@</a> -
+        Source on
+        <a
+          href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gen-app-builder/search-web-app"
+          >GitHub</a
+        >
+      </p>
+      <p>
+        Powered by <a
+          href="https://cloud.google.com/generative-ai-app-builder"
+          >Generative AI App Builder</a
+        > on <a href="https://cloud.google.com/">Google Cloud</a>
+      </p>
+    </section>
+  </body>
+
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
+  <script src="{{url_for('static', filename='index.js')}}"></script>
+</html>
