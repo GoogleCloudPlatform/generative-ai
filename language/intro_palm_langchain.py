@@ -19,7 +19,7 @@
 # - Create credentials json (Ref https://www.youtube.com/watch?v=rWcLDax-VmM)
 # - Set Environment variable GOOGLE_APPLICATION_CREDENTIALS as the above created json
 # - Create conda environment with python=3.10 (?)
-# - Activating that environment, pip install google-cloud-aiplatform==1.26
+# - Activating that environment, pip install google-cloud-aiplatform==1.27
 # - Install langchain
 
 # ----------------------------------------
