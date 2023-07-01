@@ -19,15 +19,12 @@ mdc.autoInit();
 
 const MDCRipple = mdc.ripple.MDCRipple;
 const MDCTextField = mdc.textField.MDCTextField;
+const MDCSelect = mdc.select.MDCSelect;
 const MDCTabBar = mdc.tabBar.MDCTabBar;
 
 MDCRipple.attachTo(document.querySelector(".search-button"));
 
-const queryTextField = new MDCTextField(document.querySelector(".query-field"));
-
-// const documentTypesField = document.querySelector('.mdc-text-field.types-field');
-
-// const select = new MDCSelect(document.querySelector('.mdc-select'));
+const select = new MDCSelect(document.querySelector(".mdc-select"));
 
 const jsonTabSelector = document.querySelector("#json-tab-selector");
 const entitiesTabSelector = document.querySelector("#entities-tab-selector");

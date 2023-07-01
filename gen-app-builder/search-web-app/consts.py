@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" EKG Search Demo Constant Definitions"""
+""" Gen App Builder Demo Constant Definitions"""
 
 PROJECT_ID = "YOUR-PROJECT-ID"
 LOCATION = "global"
@@ -30,6 +30,14 @@ CUSTOM_UI_DATASTORE_IDS = [
         "name": "Google Cloud Website",
         "datastore_id": "website-search-engine_xxxxxxxx",
     },
+]
+
+PERSONALIZE_DATASTORE_IDs = [
+    {
+        "name": "Contracts",
+        "datastore_id": "contracts-personalize-data_xxxxxxxxx",
+        "engine_id": "contracts-personalize_xxxxxxxxx",
+    }
 ]
 
 # iso639-1 code
