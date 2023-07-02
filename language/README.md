@@ -1,12 +1,13 @@
 # Generative AI - Language
 
-Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/)  - Language repository.
+Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Language repository.
 
 ## Folder structure
-```
+
+```text
 generative-ai/
 ├── language/
-    ├── examples/             
+    ├── examples/
         ├── document-qa/             - examples for doc Q&A
         ├── document-summarization/  - examples for doc summarization
         ├── langchain/               - examples for langchain
@@ -15,7 +16,7 @@ generative-ai/
 ```
 
 ## Table of Contents
-- [Language/]()
+- `language/`
   - [Getting Started with Generative AI Studio without code](intro_generative_ai_studio.md)
   - [Intro to Vertex AI PaLM API](intro_palm_api.ipynb)
   - [Intro to Prompt Design](intro_prompt_design.ipynb)
@@ -38,4 +39,3 @@ generative-ai/
       - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](examples/langchain-intro/intro_langchain_palm_api.ipynb)
     - [Tuning/](examples/tuning/)
       - [Tuning a Foundational Model, Deploying, and Making Predictions](examples/tuning/getting_started_tuning.ipynb)
-      
