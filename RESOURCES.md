@@ -21,6 +21,8 @@ Please submit additional resources via a PR.
 - [Introduction to Generative AI](https://www.youtube.com/watch?v=G2fqAlgmoPo)
 - [Generative AI Playlist for Developers](https://www.youtube.com/playlist?list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn)
 - [Which AI/ML solution on Vertex AI](https://www.youtube.com/watch?v=AtyCqaOGoj4)
+- [Introduction to Responsible AI](https://www.youtube.com/watch?v=3-xhMXeYIcg)
+- [Introduction to Generative AI Studio](https://www.youtube.com/watch?v=-7nf5EJ2Fsc)
 
 ## Cloud Skills Boost
 
@@ -37,8 +39,9 @@ Please submit additional resources via a PR.
   - [Encoder-Decoder Architecture](https://www.cloudskillsboost.google/course_templates/543)
   - [Introduction to Responsible AI](https://www.cloudskillsboost.google/course_templates/554)
   - [Introduction to Generative AI Studio](https://www.cloudskillsboost.google/course_templates/552)
-  - [Generative AI Explorer - Vertex AI](https://www.cloudskillsboost.google/quests/299)
   - [Generative AI Fundamentals](https://www.cloudskillsboost.google/journeys/118)
+ 
+- [Generative AI Explorer - Vertex AI](https://www.cloudskillsboost.google/quests/299)
 
 ## Google I/O 2023 Announcements + Videos
 
