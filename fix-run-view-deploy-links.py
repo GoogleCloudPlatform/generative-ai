@@ -61,7 +61,7 @@ def populate_new_cell_content(notebook_path: str, header: str) -> str:
     )
 
     html_code = f"""
-        <table>
+        <table align="left">
             <td style="text-align: center">
                 <a href="{colab_link}">
                     <img src="{colab_logo}" alt="Google Colaboratory logo"><br> Run on Google Colab
