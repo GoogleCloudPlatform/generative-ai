@@ -40,7 +40,6 @@ Please submit additional resources via a PR.
   - [Introduction to Responsible AI](https://www.cloudskillsboost.google/course_templates/554)
   - [Introduction to Generative AI Studio](https://www.cloudskillsboost.google/course_templates/552)
   - [Generative AI Fundamentals](https://www.cloudskillsboost.google/journeys/118)
- 
   - [Generative AI Explorer - Vertex AI](https://www.cloudskillsboost.google/quests/299)
 
 ## Google I/O 2023 Announcements + Videos
