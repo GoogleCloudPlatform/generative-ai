@@ -23,10 +23,15 @@ from consts import (
     PROJECT_ID,
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
+    PERSONALIZE_DATASTORE_IDs,
 )
 from ekg_utils import search_public_kg
 from flask import Flask, render_template, request
-from genappbuilder_utils import search_enterprise_search
+from genappbuilder_utils import (
+    list_documents,
+    recommend_personalize,
+    search_enterprise_search,
+)
 from google.api_core.exceptions import ResourceExhausted
 from werkzeug.exceptions import HTTPException
 
@@ -41,11 +46,22 @@ NAV_LINKS = [
     {"link": "/", "name": "Gen App Builder - Widgets", "icon": "widgets"},
     {
         "link": "/search",
-        "name": "Gen App Builder - Custom UI",
+        "name": "Enterprise Search - Custom UI",
         "icon": "build",
+    },
+    {
+        "link": "/recommend",
+        "name": "Personalize - Custom UI",
+        "icon": "recommend",
     },
     {"link": "/ekg", "name": "Enterprise Knowledge Graph", "icon": "scatter_plot"},
 ]
+
+PERSONALIZE_DOCUMENTS = list_documents(
+    project_id=PROJECT_ID,
+    location=LOCATION,
+    datastore_id=PERSONALIZE_DATASTORE_IDs[0]["datastore_id"],
+)
 
 
 @app.route("/", methods=["GET"])
@@ -97,10 +113,68 @@ def search_genappbuilder() -> str:
 
     return render_template(
         "search.html",
-        page_title="Website Search",
         nav_links=NAV_LINKS,
         message_success=search_query,
         results=results,
+        request_url=request_url,
+        raw_request=raw_request,
+        raw_response=raw_response,
+    )
+
+
+@app.route("/recommend", methods=["GET"])
+def recommend() -> str:
+    """
+    Web Server, Homepage for Personalize - Custom UI
+    """
+    return render_template(
+        "recommend.html",
+        nav_links=NAV_LINKS,
+        documents=PERSONALIZE_DOCUMENTS,
+        attribution_token="",
+    )
+
+
+@app.route("/recommend_genappbuilder", methods=["POST"])
+def recommend_genappbuilder() -> str:
+    """
+    Handle Recommend Gen App Builder Request
+    """
+    document_id = request.form.get("document_id", "")
+    attribution_token = request.form.get("attribution_token", "")
+
+    # Check if POST Request includes document id
+    if not document_id:
+        return render_template(
+            "recommend.html",
+            nav_links=NAV_LINKS,
+            documents=PERSONALIZE_DOCUMENTS,
+            attribution_token=attribution_token,
+            message_error="No document provided",
+        )
+
+    (
+        results,
+        attribution_token,
+        request_url,
+        raw_request,
+        raw_response,
+    ) = recommend_personalize(
+        project_id=PROJECT_ID,
+        location=LOCATION,
+        datastore_id=PERSONALIZE_DATASTORE_IDs[0]["datastore_id"],
+        serving_config_id=PERSONALIZE_DATASTORE_IDs[0]["engine_id"],
+        document_id=document_id,
+        attribution_token=attribution_token,
+    )
+
+    return render_template(
+        "recommend.html",
+        nav_links=NAV_LINKS,
+        documents=PERSONALIZE_DOCUMENTS,
+        message_success=document_id,
+        results=results,
+        attribution_token=attribution_token,
         request_url=request_url,
         raw_request=raw_request,
         raw_response=raw_response,
@@ -173,7 +247,7 @@ def handle_exception(ex: Exception):
         message_error = str(ex)
 
     return render_template(
-        "ekg.html",
+        "search.html",
         form_options=FORM_OPTIONS,
         nav_links=NAV_LINKS,
         message_error=message_error,
