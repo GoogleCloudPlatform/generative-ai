@@ -89,10 +89,9 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
                     else:
                         metadata["source"] = f"{doc_data.get('link', '')}"
                     metadata["id"] = result.document.id
-                    document = Document(
+                    documents.append(Document(
                         page_content=chunk.get("content", ""), metadata=metadata
-                    )
-                    documents.append(document)
+                    ))
 
         return documents
 
