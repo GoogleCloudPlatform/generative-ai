@@ -33,14 +33,18 @@ const tabContent = document.querySelector(".tab-content");
 const jsonTab = document.querySelector("#json-tab");
 const entitiesTab = document.querySelector("#entities-tab");
 
-jsonTabSelector.onclick = () => {
-  jsonTab.classList.replace("tab-hidden", "tab-visible");
-  entitiesTab.classList.replace("tab-visible", "tab-hidden");
-  entitiesTab.replaceWith(jsonTab);
-};
+if (jsonTabSelector) {
+  jsonTabSelector.onclick = () => {
+    jsonTab.classList.replace("tab-hidden", "tab-visible");
+    entitiesTab.classList.replace("tab-visible", "tab-hidden");
+    entitiesTab.replaceWith(jsonTab);
+  };
+}
 
-entitiesTabSelector.onclick = () => {
-  entitiesTab.classList.replace("tab-hidden", "tab-visible");
-  jsonTab.classList.replace("tab-visible", "tab-hidden");
-  jsonTab.replaceWith(entitiesTab);
-};
+if (entitiesTabSelector) {
+  entitiesTabSelector.onclick = () => {
+    entitiesTab.classList.replace("tab-hidden", "tab-visible");
+    jsonTab.classList.replace("tab-visible", "tab-hidden");
+    jsonTab.replaceWith(entitiesTab);
+  };
+}
