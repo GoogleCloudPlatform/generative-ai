@@ -2,13 +2,13 @@
 # pylint: disable=no-self-argument
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from google.cloud import discoveryengine_v1beta
 from google.cloud.discoveryengine_v1beta.services.search_service import pagers
 from langchain.schema import BaseRetriever, Document
 from langchain.utils import get_from_dict_or_env
-from pydantic import BaseModel, Extra, root_validator, Field
+from pydantic import BaseModel, Extra, Field, root_validator
 
 
 class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
@@ -20,7 +20,7 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
     search_engine_id: str
     serving_config_id: str = "default_config"
     location_id: str = "global"
-    filter: str = None
+    filter: Optional[str] = None
     get_extractive_answers: bool = False
     max_documents: int = Field(default=5, ge=1, le=100)
     max_extractive_answer_count: int = Field(default=1, ge=1, le=5)
@@ -41,7 +41,7 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
         try:
-            from google.cloud import discoveryengine_v1beta
+            from google.cloud import discoveryengine_v1beta  # noqa: F401
         except ImportError:
             raise ImportError(
                 "google.cloud.discoveryengine is not installed. "
@@ -89,9 +89,11 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
                     else:
                         metadata["source"] = f"{doc_data.get('link', '')}"
                     metadata["id"] = result.document.id
-                    documents.append(Document(
-                        page_content=chunk.get("content", ""), metadata=metadata
-                    ))
+                    documents.append(
+                        Document(
+                            page_content=chunk.get("content", ""), metadata=metadata
+                        )
+                    )
 
         return documents
 
