@@ -22,13 +22,14 @@ import os
 import pathlib
 import re
 import shutil
+from typing import Dict, List
 import warnings
 
 import nox
 
 BLACK_VERSION = "black[jupyter]==23.3.0"
 ISORT_VERSION = "isort==5.11.0"
-LINT_PATHS = ["."]
+LINT_PATHS = ["docs", "google", "tests", "noxfile.py", "setup.py"]
 
 DEFAULT_PYTHON_VERSION = "3.8"
 
@@ -40,11 +41,11 @@ UNIT_TEST_STANDARD_DEPENDENCIES = [
     "pytest-cov",
     "pytest-asyncio",
 ]
-UNIT_TEST_EXTERNAL_DEPENDENCIES = []
-UNIT_TEST_LOCAL_DEPENDENCIES = []
-UNIT_TEST_DEPENDENCIES = []
-UNIT_TEST_EXTRAS = []
-UNIT_TEST_EXTRAS_BY_PYTHON = {}
+UNIT_TEST_EXTERNAL_DEPENDENCIES: List[str] = []
+UNIT_TEST_LOCAL_DEPENDENCIES: List[str] = []
+UNIT_TEST_DEPENDENCIES: List[str] = []
+UNIT_TEST_EXTRAS: List[str] = []
+UNIT_TEST_EXTRAS_BY_PYTHON: Dict[str, List[str]] = {}
 
 SYSTEM_TEST_PYTHON_VERSIONS = ["3.8"]
 SYSTEM_TEST_STANDARD_DEPENDENCIES = [
@@ -52,11 +53,11 @@ SYSTEM_TEST_STANDARD_DEPENDENCIES = [
     "pytest",
     "google-cloud-testutils",
 ]
-SYSTEM_TEST_EXTERNAL_DEPENDENCIES = []
-SYSTEM_TEST_LOCAL_DEPENDENCIES = []
-SYSTEM_TEST_DEPENDENCIES = []
-SYSTEM_TEST_EXTRAS = []
-SYSTEM_TEST_EXTRAS_BY_PYTHON = {}
+SYSTEM_TEST_EXTERNAL_DEPENDENCIES: List[str] = []
+SYSTEM_TEST_LOCAL_DEPENDENCIES: List[str] = []
+SYSTEM_TEST_DEPENDENCIES: List[str] = []
+SYSTEM_TEST_EXTRAS: List[str] = []
+SYSTEM_TEST_EXTRAS_BY_PYTHON: Dict[str, List[str]] = {}
 
 CURRENT_DIRECTORY = pathlib.Path(__file__).parent.absolute()
 
@@ -112,7 +113,7 @@ def format(session):
     # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
     session.run(
         "isort",
-        "--profile=google",
+        "--profile=black",
         "--fss",
         "--known-local-folder=main",
         *LINT_PATHS,

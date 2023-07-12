@@ -4,20 +4,18 @@ from __future__ import annotations
 import json
 import logging
 import time
-import uuid
 from typing import TYPE_CHECKING, Any, Iterable, List, Optional, Type
+import uuid
 
+import google.auth
+import google.auth.transport.requests
+from google.cloud import aiplatform_v1, storage
+from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
+from google.oauth2.service_account import Credentials
 from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
-
-from google.cloud import storage
-from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
-from google.cloud import aiplatform_v1
-from google.oauth2.service_account import Credentials
-import google.auth
-import google.auth.transport.requests
 
 logger = logging.getLogger()
 
@@ -126,27 +124,29 @@ class MatchingEngine(VectorStore):
         ids = []
 
         # Streaming index update
-        for idx, (embedding, text, metadata) in enumerate(zip(embeddings, texts, metadatas)):
+        for idx, (embedding, text, metadata) in enumerate(
+            zip(embeddings, texts, metadatas)
+        ):
             id = uuid.uuid4()
             ids.append(id)
             self._upload_to_gcs(text, f"documents/{id}")
             metadatas[idx]
-            insert_datapoints_payload.append(aiplatform_v1.IndexDatapoint(
-                datapoint_id=str(id),
-                feature_vector=embedding,
-                restricts=metadata if metadata else []
-            ))
+            insert_datapoints_payload.append(
+                aiplatform_v1.IndexDatapoint(
+                    datapoint_id=str(id),
+                    feature_vector=embedding,
+                    restricts=metadata if metadata else [],
+                )
+            )
             if idx % 100 == 0:
                 upsert_request = aiplatform_v1.UpsertDatapointsRequest(
-                    index=self.index.name,
-                    datapoints=insert_datapoints_payload
+                    index=self.index.name, datapoints=insert_datapoints_payload
                 )
                 response = self.index_client.upsert_datapoints(request=upsert_request)
                 insert_datapoints_payload = []
         if len(insert_datapoints_payload) > 0:
             upsert_request = aiplatform_v1.UpsertDatapointsRequest(
-                index=self.index.name,
-                datapoints=insert_datapoints_payload
+                index=self.index.name, datapoints=insert_datapoints_payload
             )
             response = self.index_client.upsert_datapoints(request=upsert_request)
 
@@ -166,41 +166,41 @@ class MatchingEngine(VectorStore):
         blob = bucket.blob(gcs_location)
         blob.upload_from_string(data)
 
-
     def get_matches(
-            self,
-            embeddings: List[str],
-            n_matches: int,
-            index_endpoint: MatchingEngineIndexEndpoint) -> str:
-        '''
+        self,
+        embeddings: List[str],
+        n_matches: int,
+        index_endpoint: MatchingEngineIndexEndpoint,
+    ) -> str:
+        """
         get matches from matching engine given a vector query
         Uses public endpoint
 
-        '''
-        import requests
+        """
         import json
         from typing import List
 
-        request_data = {"deployed_index_id": index_endpoint.deployed_indexes[0].id,
-                        "return_full_datapoint": True,
-                        "queries": [
-                            {
-                                "datapoint": {
-                                    "datapoint_id": f"{i}",
-                                    "feature_vector": emb
-                                },
-                                "neighbor_count": n_matches
-                            }
-                            for i, emb in enumerate(embeddings)]
-                        }
+        import requests
+
+        request_data = {
+            "deployed_index_id": index_endpoint.deployed_indexes[0].id,
+            "return_full_datapoint": True,
+            "queries": [
+                {
+                    "datapoint": {"datapoint_id": f"{i}", "feature_vector": emb},
+                    "neighbor_count": n_matches,
+                }
+                for i, emb in enumerate(embeddings)
+            ],
+        }
 
         endpoint_address = self.endpoint.public_endpoint_domain_name
-        rpc_address = f'https://{endpoint_address}/v1beta1/{index_endpoint.resource_name}:findNeighbors'
+        rpc_address = f"https://{endpoint_address}/v1beta1/{index_endpoint.resource_name}:findNeighbors"
         endpoint_json_data = json.dumps(request_data)
 
         logger.debug(f"Querying Matching Engine Index Endpoint {rpc_address}")
 
-        header = {'Authorization': 'Bearer ' + self.credentials.token}
+        header = {"Authorization": "Bearer " + self.credentials.token}
 
         return requests.post(rpc_address, data=endpoint_json_data, headers=header)
 
@@ -230,9 +230,7 @@ class MatchingEngine(VectorStore):
         #     num_neighbors=k,
         # )
 
-        response = self.get_matches(embedding_query,
-                                    k,
-                                    self.endpoint)
+        response = self.get_matches(embedding_query, k, self.endpoint)
 
         if response.status_code == 200:
             response = response.json()["nearestNeighbors"]
@@ -251,14 +249,21 @@ class MatchingEngine(VectorStore):
         # means that the match method will always return an array with only
         # one element.
         for doc in response[0]["neighbors"]:
-            page_content = self._download_from_gcs(f"documents/{doc['datapoint']['datapointId']}")
+            page_content = self._download_from_gcs(
+                f"documents/{doc['datapoint']['datapointId']}"
+            )
             metadata = {}
-            if 'restricts' in doc['datapoint']:
-                metadata = {item['namespace']: item['allowList'][0] for item in doc['datapoint']['restricts']}
-            if 'distance' in doc:
-                metadata["score"] = doc['distance']
-                if doc['distance'] >= search_distance:
-                    results.append(Document(page_content=page_content, metadata=metadata))
+            if "restricts" in doc["datapoint"]:
+                metadata = {
+                    item["namespace"]: item["allowList"][0]
+                    for item in doc["datapoint"]["restricts"]
+                }
+            if "distance" in doc:
+                metadata["score"] = doc["distance"]
+                if doc["distance"] >= search_distance:
+                    results.append(
+                        Document(page_content=page_content, metadata=metadata)
+                    )
             else:
                 results.append(Document(page_content=page_content, metadata=metadata))
 
@@ -297,7 +302,7 @@ class MatchingEngine(VectorStore):
             blob = bucket.blob(gcs_location)
             return blob.download_as_string()
         except Exception as e:
-            return ''
+            return ""
 
     @classmethod
     def from_texts(
@@ -375,7 +380,9 @@ class MatchingEngine(VectorStore):
 
         gcs_client = cls._get_gcs_client(credentials, project_id)
         index_client = cls._get_index_client(project_id, region, credentials)
-        index_endpoint_client = cls._get_index_endpoint_client(project_id, region, credentials)
+        index_endpoint_client = cls._get_index_endpoint_client(
+            project_id, region, credentials
+        )
         cls._init_aiplatform(project_id, region, gcs_bucket_name, credentials)
 
         return cls(
@@ -455,7 +462,6 @@ class MatchingEngine(VectorStore):
         request = aiplatform_v1.GetIndexRequest(name=index_id)
         return index_client.get_index(request=request)
 
-
     @classmethod
     def _create_endpoint_by_id(
         cls, endpoint_id: str, project_id: str, region: str, credentials: "Credentials"
@@ -481,7 +487,6 @@ class MatchingEngine(VectorStore):
             location=region,
             credentials=credentials,
         )
-
 
     @classmethod
     def _get_gcs_client(
@@ -512,8 +517,7 @@ class MatchingEngine(VectorStore):
         PARENT = f"projects/{project_id}/locations/{region}"
         ENDPOINT = f"{region}-aiplatform.googleapis.com"
         return aiplatform_v1.IndexServiceClient(
-            client_options=dict(api_endpoint=ENDPOINT),
-            credentials=credentials
+            client_options=dict(api_endpoint=ENDPOINT), credentials=credentials
         )
 
     @classmethod
@@ -531,10 +535,8 @@ class MatchingEngine(VectorStore):
         PARENT = f"projects/{project_id}/locations/{region}"
         ENDPOINT = f"{region}-aiplatform.googleapis.com"
         return aiplatform_v1.IndexEndpointServiceClient(
-            client_options=dict(api_endpoint=ENDPOINT),
-            credentials=credentials
+            client_options=dict(api_endpoint=ENDPOINT), credentials=credentials
         )
-
 
     @classmethod
     def _init_aiplatform(
