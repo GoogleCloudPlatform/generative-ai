@@ -33,8 +33,8 @@ Additional features include how to search the public Cloud Knowledge Graph using
 - Follow steps in [Get started with Personalize][try_personalize] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
-    - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
-      - `gs://cloud-samples-data/gen-app-builder/search/CUAD_v1`
+    - [Natural language papers from ArXiv](https://arxiv.org)
+      - `gs://cloud-samples-data/gen-app-builder/search/arxiv`
 
 ### Dependencies
 
