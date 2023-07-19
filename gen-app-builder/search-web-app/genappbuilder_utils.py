@@ -64,7 +64,14 @@ def search_enterprise_search(
     )
 
     request = discoveryengine.SearchRequest(
-        serving_config=serving_config, query=search_query, page_size=50
+        serving_config=serving_config,
+        query=search_query,
+        page_size=50,
+        content_search_spec=discoveryengine.SearchRequest.ContentSearchSpec(
+            snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
+                max_snippet_count=1
+            )
+        ),
     )
     response_pager = client.search(request)
 
@@ -85,7 +92,9 @@ def search_enterprise_search(
         request, including_default_value_fields=True, indent=JSON_INDENT
     )
     response_json = discoveryengine.SearchResponse.to_json(
-        response, including_default_value_fields=False, indent=JSON_INDENT
+        response,
+        including_default_value_fields=True,
+        indent=JSON_INDENT,
     )
 
     results = get_enterprise_search_results(response)
@@ -116,7 +125,9 @@ def get_enterprise_search_results(response: discoveryengine.SearchResponse) -> L
                 "snippets": [s["htmlSnippet"] for s in data["snippets"]],
                 "thumbnailImage": image,
                 "resultJson": discoveryengine.SearchResponse.SearchResult.to_json(
-                    result, including_default_value_fields=True, indent=JSON_INDENT
+                    result,
+                    including_default_value_fields=True,
+                    indent=JSON_INDENT,
                 ),
             }
         )
@@ -168,7 +179,7 @@ def recommend_personalize(
         request, including_default_value_fields=True, indent=JSON_INDENT
     )
     response_json = discoveryengine_v1beta.RecommendResponse.to_json(
-        response, including_default_value_fields=False, indent=JSON_INDENT
+        response, including_default_value_fields=True, indent=JSON_INDENT
     )
 
     results = get_personalize_results(response)
