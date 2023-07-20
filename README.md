@@ -34,7 +34,7 @@ generative-ai/
       - [Text Classifiction](language/examples/prompt-design/text_classification.ipynb)
       - [Text Extraction](language/examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](language/examples/prompt-design/text_summarization.ipynb)
-    - [Reference-architectures/](language/examples/reference-architectures/) 
+    - [Reference-architectures/](language/examples/reference-architectures/)
       - [Product Description Generator from Image](language/examples/reference-architectures/product_description_generator_image.ipynb)
       - [Product Description Generator from Product Attributes to Text](language/examples/reference-architectures/product_description_generator_attributes_to_text.ipynb) \***NEW**\*
       - [GroceryBot: a sample grocery and recipe assistant - RAG + ReAct](language/examples/reference-architectures/grocerybot_assistant.ipynb) \***NEW**\*
