@@ -17,8 +17,8 @@ generative-ai/
 ```
 
 ## Table of Contents
+
 - `language/`
-## Table of Contents
   - [Getting Started with Generative AI Studio without code](intro_generative_ai_studio.md)
   - [Intro to Vertex AI PaLM API](intro_palm_api.ipynb)
   - [Intro to Prompt Design](intro_prompt_design.ipynb)
@@ -29,13 +29,13 @@ generative-ai/
       - [Text Classifiction](examples/prompt-design/text_classification.ipynb)
       - [Text Extraction](examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](examples/prompt-design/text_summarization.ipynb)
-    - [Reference-architectures/](examples/reference-architectures/) 
+    - [Reference-architectures/](examples/reference-architectures/)
       - [Product Description Generator from Image](examples/reference-architectures/product_description_generator_image.ipynb)
       - [Product Description Generator from Product Attributes to Text](examples/reference-architectures/product_description_generator_attributes_to_text.ipynb) \***NEW**\*
       - [GroceryBot: a sample grocery and recipe assistant - RAG + ReAct](examples/reference-architectures/grocerybot_assistant.ipynb) \***NEW**\*
     - [Document Q&A/](examples/document-qa/)
       - [Question Answering with Large Documents with LangChain](examples/document-qa/question_answering_large_documents_langchain.ipynb)
-      - [Question Answering with Large Documents with LangChain and Vertex AI Matching Engine](examples/document-qa/question_answering_documents_langchain_matching_engine.ipynb)  \***NEW**\*
+      - [Question Answering with Large Documents with LangChain and Vertex AI Matching Engine](examples/document-qa/question_answering_documents_langchain_matching_engine.ipynb) \***NEW**\*
       - [Question Answering with Large Documents (without LangChain)](examples/document-qa/question_answering_large_documents.ipynb)
     - [Document Summarization/](examples/document-summarization/)
       - [Summarization with Large Documents with LangChain](examples/document-summarization/summarization_large_documents_langchain.ipynb)
