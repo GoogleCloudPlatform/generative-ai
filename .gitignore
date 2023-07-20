@@ -134,3 +134,6 @@ dmypy.json
 
 # PyCharm
 .idea
+
+# User-specific files
+language/examples/prompt-design/train.csv
