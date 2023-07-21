@@ -64,7 +64,7 @@ def populate_new_cell_content(notebook_path: str, header: str) -> str:
         <table align="left">
             <td style="text-align: center">
                 <a href="{colab_link}">
-                    <img src="{colab_logo}" alt="Google Colaboratory logo"><br> Run on Google Colab
+                    <img src="{colab_logo}" alt="Google Colaboratory logo"><br> Run in Colab
                 </a>
             </td>
             <td style="text-align: center">
@@ -74,7 +74,7 @@ def populate_new_cell_content(notebook_path: str, header: str) -> str:
             </td>
             <td style="text-align: center">
                 <a href="{vertex_link}">
-                    <img src="{vertex_logo}" alt="Vertex AI logo"><br> Deploy to Vertex AI Workbench
+                    <img src="{vertex_logo}" alt="Vertex AI logo"><br> Open in Vertex AI Workbench
                 </a>
             </td>
         </table>
