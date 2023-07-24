@@ -74,7 +74,7 @@ class EnterpriseSearchRetriever(BaseRetriever, BaseModel):
         documents = []
         for result in search_results:
             if hasattr(result.document, "derived_struct_data"):
-                metadata = getattr(result.document, "struct_data", {})
+                metadata = getattr(result.document, "struct_value", {})
                 doc_data = result.document.derived_struct_data
                 chunk_type = (
                     "extractive_answers"
