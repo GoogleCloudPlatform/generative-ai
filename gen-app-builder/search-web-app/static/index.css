@@ -32,13 +32,14 @@ body {
 .gen-app-builder-logo,
 .ekg-logo {
   height: 100px;
-  padding-top: 80px;
+  padding-top: 30px;
   fill: currentcolor;
 }
 
 .query-field,
 .schema-info,
-.types-field {
+.types-field,
+.search-engine-name {
   display: block;
   width: 300px;
   margin: 20px auto;
@@ -150,4 +151,8 @@ a:active {
 
 .empty-results-message {
   text-align: center;
+}
+
+.footer {
+  padding-bottom: 1rem;
 }

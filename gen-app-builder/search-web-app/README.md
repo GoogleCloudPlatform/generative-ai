@@ -81,16 +81,6 @@ Additional features include how to search the public Cloud Knowledge Graph using
 5. Visit the deployed web page
    - Example: [`https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app`](https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app)
 
-## Usage
-
-Try example queries with each search engine:
-
-- [Contracts][contract] - `What is the SLA?`
-- [Finance - Earnings Reports][finance] - `What was Google's revenue in 2021?`
-- [Google Cloud Website Search][websearch] - `Document AI`
-- [Personalize - Contracts][personalize] - `CENTRACKINTERNATIONALINC_10_29_1999-EX-10.3-WEB SITE HOSTING AGREEMENT.pdf`
-- [Enterprise Knowledge Graph][ekg] - `Google`
-
 ---
 
 > Copyright 2023 Google LLC
@@ -102,10 +92,4 @@ Try example queries with each search engine:
 [enterprisesearch]: https://cloud.google.com/enterprise-search
 [try_personalize]: https://cloud.google.com/generative-ai-app-builder/docs/try-personalize
 [try_search]: https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search
-
-[contract]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/
-[finance]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/
-[websearch]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/search
-[personalize]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/personalize
-[ekg]: https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app/ekg
 [trustedtester]: https://cloud.google.com/ai/earlyaccess/join?hl=en

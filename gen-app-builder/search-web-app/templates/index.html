@@ -74,6 +74,7 @@
         triggerId="{{s.name|lower|replace(' ', '-')}}"
       >
       </gen-search-widget>
+      <div class="search-engine-name"><b>{{s.name}}</b></div>
 
       <!-- Element that opens the widget on click. It does not have to be an input -->
       <div class="mdc-text-field mdc-text-field--outlined query-field">
@@ -85,7 +86,7 @@
           <div class="mdc-notched-outline__leading"></div>
           <div class="mdc-notched-outline__notch">
             <label for="text-field-hero-input" class="mdc-floating-label"
-              >{{s.name}}</label
+              >{{s.placeholder}}</label
             >
           </div>
           <div class="mdc-notched-outline__trailing"></div>
