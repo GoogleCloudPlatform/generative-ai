@@ -49,8 +49,13 @@ def search_enterprise_search(
     project_id: str,
     location: str,
     search_engine_id: str,
-    search_query: str,
+    page_size: int = 50,
+    search_query: Optional[str] = None,
+    image_bytes: Optional[bytes] = None,
 ) -> Tuple:
+    if bool(search_query) == bool(image_bytes):
+        return tuple()
+
     # Create a client
     client = discoveryengine.SearchServiceClient()
 
@@ -63,9 +68,34 @@ def search_enterprise_search(
         serving_config="default_config",
     )
 
-    request = discoveryengine.SearchRequest(
-        serving_config=serving_config, query=search_query, page_size=50
+    # Configuration options for search
+    content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
+        snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
+            max_snippet_count=5,
+            # return_snippet=True
+        ),
+        summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
+            summary_result_count=5,
+            # include_citations=True,
+            # ignore_adversarial_query=True,
+            # ignore_non_summary_seeking_query=True,
+        ),
+        extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
+            max_extractive_answer_count=1, max_extractive_segment_count=1
+        ),
     )
+
+    request = discoveryengine.SearchRequest(
+        serving_config=serving_config,
+        page_size=page_size,
+        content_search_spec=content_search_spec,
+    )
+
+    if search_query:
+        request.query = search_query
+    else:
+        request.image_query = discoveryengine.ImageQuery(image_bytes=image_bytes)
+
     response_pager = client.search(request)
 
     response = discoveryengine.SearchResponse(
