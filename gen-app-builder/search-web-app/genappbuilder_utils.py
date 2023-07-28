@@ -120,7 +120,9 @@ def search_enterprise_search(
         request, including_default_value_fields=True, indent=JSON_INDENT
     )
     response_json = discoveryengine.SearchResponse.to_json(
-        response, including_default_value_fields=False, indent=JSON_INDENT
+        response,
+        including_default_value_fields=True,
+        indent=JSON_INDENT,
     )
 
     results = get_enterprise_search_results(response)
@@ -215,7 +217,7 @@ def recommend_personalize(
         request, including_default_value_fields=True, indent=JSON_INDENT
     )
     response_json = discoveryengine.RecommendResponse.to_json(
-        response, including_default_value_fields=False, indent=JSON_INDENT
+        response, including_default_value_fields=True, indent=JSON_INDENT
     )
 
     results = get_personalize_results(response)

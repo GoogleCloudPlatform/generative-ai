@@ -20,7 +20,7 @@ Enterprise Search lets organizations quickly build generative AI powered search 
 
 Enterprise Search is generally available on an allowlist basis (customers need to be approved for access) as of June 6, 2023. Contact your Google Cloud sales team for access and pricing details.
 
-Once you have been granted access, upload data in the form of documents, web sites or relational databases and then users can retrieve the most relevant document chunks using natural language queries. The API is provided with specific configuration options which are designed to work well in conjunction with LLMs, such as such as choosing different document chunk types.
+Once you have been granted access, upload data in the form of documents, web sites or relational databases and then users can retrieve the most relevant document chunks using natural language queries. The API is provided with specific configuration options which are designed to work well in conjunction with LLMs, such as choosing different document chunk types.
 
 ### Combining Enterprise Search with LLMs
 
