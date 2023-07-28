@@ -52,16 +52,16 @@ if (entitiesTabSelector) {
   };
 }
 
-const imageInput = document.getElementById('image-input');
+const imageInput = document.getElementById("image-input");
 
 if (imageInput) {
-  imageInput.addEventListener('change', function (e) {
+  imageInput.addEventListener("change", function (e) {
     const fileInput = e.target;
-    const fileUploadLabel = document.getElementById('file-upload-label');
+    const fileUploadLabel = document.getElementById("file-upload-label");
     if (fileInput.files.length > 0) {
       fileUploadLabel.textContent = fileInput.files[0].name;
     } else {
-      fileUploadLabel.textContent = 'No file selected';
+      fileUploadLabel.textContent = "No file selected";
     }
   });
 }

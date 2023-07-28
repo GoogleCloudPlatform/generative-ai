@@ -63,7 +63,8 @@ body {
   margin: auto;
 }
 
-.language-selection, .document-selection {
+.language-selection,
+.document-selection {
   display: flex;
   width: 350px;
   margin: auto;
@@ -178,7 +179,7 @@ a:active {
   display: none;
 }
 
-.file-upload__label {
+.file-upload-label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -186,14 +187,13 @@ a:active {
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  font-family: "Roboto", sans-serif;
   font-size: 16px;
 }
 
-.file-upload__icon {
+.file-upload-icon {
   margin-right: 8px;
 }
 
-.file-upload__input {
+.file-upload-input {
   display: none;
 }

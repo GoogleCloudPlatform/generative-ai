@@ -17,9 +17,12 @@
 import base64
 import os
 import re
-import requests
-
 from urllib.parse import urlparse
+
+import requests
+from flask import Flask, render_template, request
+from google.api_core.exceptions import ResourceExhausted
+from werkzeug.exceptions import HTTPException
 
 from consts import (
     CUSTOM_UI_DATASTORE_IDS,
@@ -27,18 +30,15 @@ from consts import (
     PROJECT_ID,
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
-    RECOMMENDATIONS_DATASTORE_IDs,
     IMAGE_SEARCH_DATASTORE_IDs,
+    RECOMMENDATIONS_DATASTORE_IDs,
 )
 from ekg_utils import search_public_kg
-from flask import Flask, render_template, request
 from genappbuilder_utils import (
     list_documents,
     recommend_personalize,
     search_enterprise_search,
 )
-from google.api_core.exceptions import ResourceExhausted
-from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 

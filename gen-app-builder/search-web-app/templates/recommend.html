@@ -67,57 +67,85 @@
       </a>
       <h1>Recommendations Demo - Custom UI</h1>
       <p>
-        Select a document from the list to view recommendations of similar documents in the dataset.
+        Select a document from the list to view recommendations of similar
+        documents in the dataset.
       </p>
     </section>
     <main id="active-area">
       <form class="search-form" action="/recommend_genappbuilder" method="post">
         <!-- Attribution Token -->
-        <input type="hidden" name="attribution_token" value="{{ attribution_token }}">
+        <input
+          type="hidden"
+          name="attribution_token"
+          value="{{ attribution_token }}"
+        />
         <!-- Document Selection Menu -->
         <div class="mdc-select mdc-select--filled document-selection">
-          <input type="hidden" name="document_id">
-          <div class="mdc-select__anchor"
-              role="button"
-              aria-haspopup="listbox"
-              aria-expanded="false"
-              aria-labelledby="document-label document-selected-text">
+          <input type="hidden" name="document_id" />
+          <div
+            class="mdc-select__anchor"
+            role="button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-labelledby="document-label document-selected-text"
+          >
             <span class="mdc-select__ripple"></span>
-            <span id="document-label" class="mdc-floating-label">Get recommendations for a Document</span>
+            <span id="document-label" class="mdc-floating-label"
+              >Get recommendations for a Document</span
+            >
             <span class="mdc-select__selected-text-container">
-              <span id="document-selected-text" class="mdc-select__selected-text"></span>
+              <span
+                id="document-selected-text"
+                class="mdc-select__selected-text"
+              ></span>
             </span>
             <span class="mdc-select__dropdown-icon">
               <svg
-                  class="mdc-select__dropdown-icon-graphic"
-                  viewBox="7 10 10 5" focusable="false">
+                class="mdc-select__dropdown-icon-graphic"
+                viewBox="7 10 10 5"
+                focusable="false"
+              >
                 <polygon
-                    class="mdc-select__dropdown-icon-inactive"
-                    stroke="none"
-                    fill-rule="evenodd"
-                    points="7 10 12 15 17 10">
-                </polygon>
+                  class="mdc-select__dropdown-icon-inactive"
+                  stroke="none"
+                  fill-rule="evenodd"
+                  points="7 10 12 15 17 10"
+                ></polygon>
                 <polygon
-                    class="mdc-select__dropdown-icon-active"
-                    stroke="none"
-                    fill-rule="evenodd"
-                    points="7 15 12 10 17 15">
-                </polygon>
+                  class="mdc-select__dropdown-icon-active"
+                  stroke="none"
+                  fill-rule="evenodd"
+                  points="7 15 12 10 17 15"
+                ></polygon>
               </svg>
             </span>
             <span class="mdc-line-ripple"></span>
           </div>
-          <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
-            <ul class="mdc-list" role="listbox" aria-label="Document picker listbox">
-              <li class="mdc-list-item mdc-list-item--selected" aria-selected="true" data-value="" role="option">
+          <div
+            class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth"
+          >
+            <ul
+              class="mdc-list"
+              role="listbox"
+              aria-label="Document picker listbox"
+            >
+              <li
+                class="mdc-list-item mdc-list-item--selected"
+                aria-selected="true"
+                data-value=""
+                role="option"
+              >
                 <span class="mdc-list-item__ripple"></span>
               </li>
               {% for d in documents %}
-              <li class="mdc-list-item document-list-item" aria-selected="false" data-value="{{ d.id }}" role="option">
+              <li
+                class="mdc-list-item document-list-item"
+                aria-selected="false"
+                data-value="{{ d.id }}"
+                role="option"
+              >
                 <span class="mdc-list-item__ripple"></span>
-                <span class="mdc-list-item__text">
-                  {{ d.title }}
-                </span>
+                <span class="mdc-list-item__text"> {{ d.title }} </span>
               </li>
               {% endfor %}
             </ul>
@@ -202,9 +230,10 @@
       <div class="tab-content">
         <div id="entities-tab" class="tab-visible">
           {% if results|length == 0 %}
-          <p class="empty-results-message">No recommendations were found for this document.</p>
-          {% endif %}
-          {% for result in results %}
+          <p class="empty-results-message">
+            No recommendations were found for this document.
+          </p>
+          {% endif %} {% for result in results %}
           <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
               <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
@@ -285,10 +314,16 @@
         >
       </p>
       <p>
-        Powered by <a href="https://cloud.google.com/generative-ai-app-builder/docs/try-personalize">Personalize</a> with <a
-          href="https://cloud.google.com/generative-ai-app-builder"
+        Powered by
+        <a
+          href="https://cloud.google.com/generative-ai-app-builder/docs/try-personalize"
+          >Personalize</a
+        >
+        with
+        <a href="https://cloud.google.com/generative-ai-app-builder"
           >Generative AI App Builder</a
-        > on <a href="https://cloud.google.com/">Google Cloud</a>
+        >
+        on <a href="https://cloud.google.com/">Google Cloud</a>
       </p>
     </section>
   </body>
