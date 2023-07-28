@@ -39,9 +39,10 @@ body {
 .query-field,
 .schema-info,
 .types-field,
-.search-engine-name {
+.search-engine-name,
+.file-upload {
   display: block;
-  width: 300px;
+  width: 350px;
   margin: 20px auto;
 }
 
@@ -64,7 +65,7 @@ body {
 
 .language-selection, .document-selection {
   display: flex;
-  width: 300px;
+  width: 350px;
   margin: auto;
 }
 
@@ -155,4 +156,40 @@ a:active {
 
 .footer {
   padding-bottom: 1rem;
+}
+
+.image-result .entity-image {
+  width: 100%;
+}
+
+.image-result .entity-card-primary {
+  width: 30%;
+}
+
+.image-result .entity-detailed-description {
+  width: 80%;
+}
+
+#image-input {
+  display: none;
+}
+
+.file-upload__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+}
+
+.file-upload__icon {
+  margin-right: 8px;
+}
+
+.file-upload__input {
+  display: none;
 }

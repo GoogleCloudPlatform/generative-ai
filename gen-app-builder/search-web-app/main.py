@@ -14,8 +14,12 @@
 
 """Flask Web Server"""
 
+import base64
 import os
 import re
+import requests
+
+from urllib.parse import urlparse
 
 from consts import (
     CUSTOM_UI_DATASTORE_IDS,
@@ -38,21 +42,28 @@ from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # Set maximum upload size to 16MB
+
 FORM_OPTIONS = {
     "language_list": VALID_LANGUAGES,
     "default_language": VALID_LANGUAGES[0],
 }
 
 NAV_LINKS = [
-    {"link": "/", "name": "Gen App Builder - Widgets", "icon": "widgets"},
+    {"link": "/", "name": "Enterprise Search - Widgets", "icon": "widgets"},
     {
         "link": "/search",
         "name": "Enterprise Search - Custom UI",
         "icon": "build",
     },
     {
+        "link": "/image-search",
+        "name": "Image Search",
+        "icon": "image",
+    },
+    {
         "link": "/recommend",
-        "name": "Recommendations - Custom UI",
+        "name": "Recommendations",
         "icon": "recommend",
     },
     {"link": "/ekg", "name": "Enterprise Knowledge Graph", "icon": "scatter_plot"},
@@ -63,6 +74,8 @@ RECOMMENDATIONS_DOCUMENTS = list_documents(
     location=LOCATION,
     datastore_id=RECOMMENDATIONS_DATASTORE_IDs[0]["datastore_id"],
 )
+
+VALID_IMAGE_MIMETYPES = {"image/jpeg", "image/png", "image/bmp"}
 
 
 @app.route("/", methods=["GET"])
@@ -140,15 +153,33 @@ def imagesearch_genappbuilder() -> str:
     Handle Image Search Gen App Builder Request
     """
     search_query = request.form.get("search_query", "")
-    image_bytes = request.form.get("image_bytes", "")
+    image_file = request.files["image"]
 
     # Check if POST Request includes search query
-    if not search_query and not image_bytes:
+    if not search_query and not image_file:
         return render_template(
             "image-search.html",
             nav_links=NAV_LINKS,
             message_error="No query provided",
         )
+
+    if image_file:
+        image_content = image_file.read()
+    elif search_query:
+        # Check if text is a url
+        image_url = urlparse(search_query)
+        if all([image_url.scheme, image_url.netloc, image_url.path]):
+            image_response = requests.get(image_url.geturl(), allow_redirects=True)
+            mime_type = image_response.headers["Content-Type"]
+            if mime_type not in VALID_IMAGE_MIMETYPES:
+                raise Exception(
+                    f"Invalid image format - {mime_type}. Valid types {VALID_IMAGE_MIMETYPES}"
+                )
+            search_query = None
+            image_content = image_response.content
+
+    if image_content:
+        image_bytes = base64.b64encode(image_content)
 
     results, request_url, raw_request, raw_response = search_enterprise_search(
         project_id=PROJECT_ID,
