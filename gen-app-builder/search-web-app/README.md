@@ -11,7 +11,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 ### Google Cloud Products Used
 
 - [Generative AI App Builder: Enterprise Search][enterprisesearch]
-- [Generative AI App Builder: Personalize][try_personalize]
+- [Generative AI App Builder: Recommendations][try_recommendations]
 - [Cloud Run][cloudrun]
 - [Enterprise Knowledge Graph][enterpriseknowledgegraph]
 
@@ -30,7 +30,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
   - [Google Cloud site](https://cloud.google.com)
     - `https://cloud.google.com`
 
-- Follow steps in [Get started with Personalize][try_personalize] for Unstructured Data.
+- Follow steps in [Get started with v][try_recommendations] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
     - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
@@ -67,8 +67,8 @@ Additional features include how to search the public Cloud Knowledge Graph using
        - `https://console.cloud.google.com/gen-app-builder/engines/website-search-engine_1681248733152/...`
        - Datastore ID is `website-search-engine_1681248733152`
 
-3. Configure Personalize
-   - Add the datastore id and engine id for your personalize engine to `PERSONALIZE_DATASTORE_IDs` in `consts.py`.
+3. Configure Recommendations
+   - Add the datastore id and engine id for your recommendations engine to `RECOMMENDATIONS_DATASTORE_IDs` in `consts.py`.
    - The datastore id is visible on the `Data > Details` page.
    - The engine id is the string after `/engines/` in the Cloud Console URL.
        - `https://console.cloud.google.com/gen-app-builder/engines/contracts-personalize_1687884886933/data/records`
@@ -90,6 +90,6 @@ Additional features include how to search the public Cloud Knowledge Graph using
 [cloudrun]: https://cloud.google.com/run
 [enterpriseknowledgegraph]: https://cloud.google.com/enterprise-knowledge-graph/docs/overview
 [enterprisesearch]: https://cloud.google.com/enterprise-search
-[try_personalize]: https://cloud.google.com/generative-ai-app-builder/docs/try-personalize
+[try_recommendations]: https://cloud.google.com/generative-ai-app-builder/docs/try-personalize
 [try_search]: https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search
 [trustedtester]: https://cloud.google.com/ai/earlyaccess/join?hl=en

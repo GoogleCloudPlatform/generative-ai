@@ -37,7 +37,7 @@ CUSTOM_UI_DATASTORE_IDS = [
     },
 ]
 
-PERSONALIZE_DATASTORE_IDs = [
+RECOMMENDATIONS_DATASTORE_IDs = [
     {
         "name": "ArXiv Natural Language Papers",
         "datastore_id": "arxiv_xxxxxxxxxx",

@@ -23,7 +23,7 @@ from consts import (
     PROJECT_ID,
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
-    PERSONALIZE_DATASTORE_IDs,
+    RECOMMENDATIONS_DATASTORE_IDs,
 )
 from ekg_utils import search_public_kg
 from flask import Flask, render_template, request
@@ -51,16 +51,16 @@ NAV_LINKS = [
     },
     {
         "link": "/recommend",
-        "name": "Personalize - Custom UI",
+        "name": "Recommendations - Custom UI",
         "icon": "recommend",
     },
     {"link": "/ekg", "name": "Enterprise Knowledge Graph", "icon": "scatter_plot"},
 ]
 
-PERSONALIZE_DOCUMENTS = list_documents(
+RECOMMENDATIONS_DOCUMENTS = list_documents(
     project_id=PROJECT_ID,
     location=LOCATION,
-    datastore_id=PERSONALIZE_DATASTORE_IDs[0]["datastore_id"],
+    datastore_id=RECOMMENDATIONS_DATASTORE_IDs[0]["datastore_id"],
 )
 
 
@@ -125,12 +125,12 @@ def search_genappbuilder() -> str:
 @app.route("/recommend", methods=["GET"])
 def recommend() -> str:
     """
-    Web Server, Homepage for Personalize - Custom UI
+    Web Server, Homepage for Recommendations - Custom UI
     """
     return render_template(
         "recommend.html",
         nav_links=NAV_LINKS,
-        documents=PERSONALIZE_DOCUMENTS,
+        documents=RECOMMENDATIONS_DOCUMENTS,
         attribution_token="",
     )
 
@@ -148,7 +148,7 @@ def recommend_genappbuilder() -> str:
         return render_template(
             "recommend.html",
             nav_links=NAV_LINKS,
-            documents=PERSONALIZE_DOCUMENTS,
+            documents=RECOMMENDATIONS_DOCUMENTS,
             attribution_token=attribution_token,
             message_error="No document provided",
         )
@@ -162,8 +162,8 @@ def recommend_genappbuilder() -> str:
     ) = recommend_personalize(
         project_id=PROJECT_ID,
         location=LOCATION,
-        datastore_id=PERSONALIZE_DATASTORE_IDs[0]["datastore_id"],
-        serving_config_id=PERSONALIZE_DATASTORE_IDs[0]["engine_id"],
+        datastore_id=RECOMMENDATIONS_DATASTORE_IDs[0]["datastore_id"],
+        serving_config_id=RECOMMENDATIONS_DATASTORE_IDs[0]["engine_id"],
         document_id=document_id,
         attribution_token=attribution_token,
     )
@@ -171,7 +171,7 @@ def recommend_genappbuilder() -> str:
     return render_template(
         "recommend.html",
         nav_links=NAV_LINKS,
-        documents=PERSONALIZE_DOCUMENTS,
+        documents=RECOMMENDATIONS_DOCUMENTS,
         message_success=document_id,
         results=results,
         attribution_token=attribution_token,
