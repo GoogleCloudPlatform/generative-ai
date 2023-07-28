@@ -37,6 +37,14 @@ CUSTOM_UI_DATASTORE_IDS = [
     },
 ]
 
+
+IMAGE_SEARCH_DATASTORE_IDs = [
+    {
+        "name": "Google Merchandise Store",
+        "datastore_id": "google-merch-store_xxxxxxx",
+    }
+]
+
 RECOMMENDATIONS_DATASTORE_IDs = [
     {
         "name": "ArXiv Natural Language Papers",

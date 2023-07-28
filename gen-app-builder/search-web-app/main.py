@@ -24,6 +24,7 @@ from consts import (
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
     RECOMMENDATIONS_DATASTORE_IDs,
+    IMAGE_SEARCH_DATASTORE_IDs,
 )
 from ekg_utils import search_public_kg
 from flask import Flask, render_template, request
@@ -115,6 +116,53 @@ def search_genappbuilder() -> str:
         "search.html",
         nav_links=NAV_LINKS,
         message_success=search_query,
+        results=results,
+        request_url=request_url,
+        raw_request=raw_request,
+        raw_response=raw_response,
+    )
+
+
+@app.route("/image-search", methods=["GET"])
+def image_search() -> str:
+    """
+    Web Server, Homepage for Image Search - Custom UI
+    """
+    return render_template(
+        "image-search.html",
+        nav_links=NAV_LINKS,
+    )
+
+
+@app.route("/imagesearch_genappbuilder", methods=["POST"])
+def imagesearch_genappbuilder() -> str:
+    """
+    Handle Image Search Gen App Builder Request
+    """
+    search_query = request.form.get("search_query", "")
+    image_bytes = request.form.get("image_bytes", "")
+
+    # Check if POST Request includes search query
+    if not search_query and not image_bytes:
+        return render_template(
+            "image-search.html",
+            nav_links=NAV_LINKS,
+            message_error="No query provided",
+        )
+
+    results, request_url, raw_request, raw_response = search_enterprise_search(
+        project_id=PROJECT_ID,
+        location=LOCATION,
+        search_engine_id=IMAGE_SEARCH_DATASTORE_IDs[0]["datastore_id"],
+        search_query=search_query,
+        image_bytes=image_bytes,
+        params={"search_type": 1},
+    )
+
+    return render_template(
+        "image-search.html",
+        nav_links=NAV_LINKS,
+        message_success="Success",
         results=results,
         request_url=request_url,
         raw_request=raw_request,

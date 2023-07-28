@@ -52,6 +52,7 @@ def search_enterprise_search(
     page_size: int = 50,
     search_query: Optional[str] = None,
     image_bytes: Optional[bytes] = None,
+    params: Optional[Dict] = None,
 ) -> Tuple:
     if bool(search_query) == bool(image_bytes):
         return tuple()
@@ -71,14 +72,13 @@ def search_enterprise_search(
     # Configuration options for search
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
         snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
-            max_snippet_count=5,
-            # return_snippet=True
+            max_snippet_count=5, return_snippet=True
         ),
         summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
             summary_result_count=5,
-            # include_citations=True,
-            # ignore_adversarial_query=True,
-            # ignore_non_summary_seeking_query=True,
+            include_citations=True,
+            ignore_adversarial_query=True,
+            ignore_non_summary_seeking_query=True,
         ),
         extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
             max_extractive_answer_count=1, max_extractive_segment_count=1
@@ -89,12 +89,15 @@ def search_enterprise_search(
         serving_config=serving_config,
         page_size=page_size,
         content_search_spec=content_search_spec,
+        params=params,
     )
 
     if search_query:
         request.query = search_query
-    else:
-        request.image_query = discoveryengine.ImageQuery(image_bytes=image_bytes)
+    elif image_bytes:
+        request.image_query = discoveryengine.SearchRequest.ImageQuery(
+            image_bytes=image_bytes
+        )
 
     response_pager = client.search(request)
 
@@ -129,24 +132,35 @@ def get_enterprise_search_results(response: discoveryengine.SearchResponse) -> L
     Extract Results from Enterprise Search Response
     """
 
-    def get_thumbnail_image(data):
+    ROBOT = "https://www.google.com/images/errors/robot.png"
+
+    def get_thumbnail_image(data: Dict) -> str:
         cse_thumbnail = data.get("pagemap", {}).get("cse_thumbnail")
-        return (
-            cse_thumbnail[0]["src"]
-            if cse_thumbnail
-            else "https://www.google.com/images/errors/robot.png"
-        )
+        image_link = data.get("image", {}).get("thumbnailLink")
+
+        if cse_thumbnail:
+            return cse_thumbnail[0]["src"]
+        elif image_link:
+            return image_link
+        else:
+            return ROBOT
+
+    def get_formatted_link(data: Dict) -> str:
+        html_formatted_url = data.get("htmlFormattedUrl")
+        image_context_link = data.get("image", {}).get("contextLink")
+        return html_formatted_url or image_context_link or ROBOT
 
     return [
         {
             "title": result.document.derived_struct_data["title"],
-            "htmlTitle": result.document.derived_struct_data["htmlTitle"],
+            "htmlTitle": result.document.derived_struct_data.get(
+                "htmlTitle", result.document.derived_struct_data["title"]
+            ),
             "link": result.document.derived_struct_data["link"],
-            "htmlFormattedUrl": result.document.derived_struct_data["htmlFormattedUrl"],
+            "htmlFormattedUrl": get_formatted_link(result.document.derived_struct_data),
             "displayLink": result.document.derived_struct_data["displayLink"],
             "snippets": [
-                s["htmlSnippet"]
-                for s in result.document.derived_struct_data["snippets"]
+                s["snippet"] for s in result.document.derived_struct_data["snippets"]
             ],
             "thumbnailImage": get_thumbnail_image(result.document.derived_struct_data),
             "resultJson": discoveryengine.SearchResponse.SearchResult.to_json(
