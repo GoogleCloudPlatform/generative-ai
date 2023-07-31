@@ -30,7 +30,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
   - [Google Cloud site](https://cloud.google.com)
     - `https://cloud.google.com`
 
-- Follow steps in [Get started with v][try_recommendations] for Unstructured Data.
+- Follow steps in [Get started with Recommendations][try_recommendations] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
     - [Natural language papers from ArXiv](https://arxiv.org)
@@ -76,11 +76,17 @@ Additional features include how to search the public Cloud Knowledge Graph using
      - `https://console.cloud.google.com/gen-app-builder/engines/contracts-personalize_1687884886933/data/records`
      - Engine ID is `contracts-personalize_1687884886933`
 
-4. Deploy the Cloud Run app in your project.
+4. Configure Image Search
+
+   - Follow the instructions in the documentation to [enable image search](https://cloud.google.com/generative-ai-app-builder/docs/image-search#enable-advanced) for a search engine.
+   - This feature is in early access and requires separate allowlisting from the rest of Enterprise Search in order to use.
+   - Add the datastore id for your search engine to `IMAGE_SEARCH_DATASTORE_IDs` in `consts.py`.
+
+5. Deploy the Cloud Run app in your project.
 
    - `gcloud run deploy genappbuilder-demo --source .`
 
-5. Visit the deployed web page
+6. Visit the deployed web page
    - Example: [`https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app`](https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app)
 
 ---
