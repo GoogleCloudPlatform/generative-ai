@@ -154,6 +154,8 @@ def imagesearch_genappbuilder() -> str:
     """
     search_query = request.form.get("search_query", "")
     image_file = request.files["image"]
+    image_content = None
+    image_bytes = None
 
     # Check if POST Request includes search query
     if not search_query and not image_file:
@@ -175,10 +177,10 @@ def imagesearch_genappbuilder() -> str:
                 raise Exception(
                     f"Invalid image format - {mime_type}. Valid types {VALID_IMAGE_MIMETYPES}"
                 )
-            search_query = None
             image_content = image_response.content
 
     if image_content:
+        search_query = None
         image_bytes = base64.b64encode(image_content)
 
     results, request_url, raw_request, raw_response = search_enterprise_search(
@@ -189,6 +191,13 @@ def imagesearch_genappbuilder() -> str:
         image_bytes=image_bytes,
         params={"search_type": 1},
     )
+
+    if not results:
+        return render_template(
+            "image-search.html",
+            nav_links=NAV_LINKS,
+            message_error="An Internal Error Occured, please try again.",
+        )
 
     return render_template(
         "image-search.html",

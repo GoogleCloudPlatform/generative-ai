@@ -55,7 +55,7 @@ def search_enterprise_search(
     params: Optional[Dict] = None,
 ) -> Tuple:
     if bool(search_query) == bool(image_bytes):
-        return tuple()
+        return ("", "", "", "")
 
     # Create a client
     client = discoveryengine.SearchServiceClient()
@@ -99,7 +99,10 @@ def search_enterprise_search(
             image_bytes=image_bytes
         )
 
-    response_pager = client.search(request)
+    try:
+        response_pager = client.search(request)
+    except Exception:
+        return ("", "", "", "")
 
     response = discoveryengine.SearchResponse(
         results=response_pager.results,
