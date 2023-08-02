@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "target": "gen-app-builder-chat",
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

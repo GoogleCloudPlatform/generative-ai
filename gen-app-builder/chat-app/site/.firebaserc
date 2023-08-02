@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "koverholt-devrel-355716"
+  },
+  "targets": {
+    "koverholt-devrel-355716": {
+      "hosting": {
+        "gen-app-builder-chat": [
+          "gen-app-builder-chat"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
