@@ -1,16 +1,7 @@
-<script>
+<script lang="ts">
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
-	import { Heading, P, A } from 'flowbite-svelte';
 	import { Card } from 'flowbite-svelte';
 	import { Tabs, TabItem } from 'flowbite-svelte';
-	import {
-		Footer,
-		FooterBrand,
-		FooterCopyright,
-		FooterIcon,
-		FooterLink,
-		FooterLinkGroup
-	} from 'flowbite-svelte';
 </script>
 
 <Navbar let:hidden let:toggle rounded color="form">
