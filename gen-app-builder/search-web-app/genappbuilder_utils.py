@@ -25,7 +25,7 @@ def list_documents(
     project_id: str,
     location: str,
     datastore_id: str,
-) -> List[discoveryengine.Document]:
+) -> List[Dict[str, str]]:
     client = discoveryengine.DocumentServiceClient()
 
     parent = client.branch_path(
@@ -53,9 +53,9 @@ def search_enterprise_search(
     search_query: Optional[str] = None,
     image_bytes: Optional[bytes] = None,
     params: Optional[Dict] = None,
-) -> Tuple:
+) -> Tuple[List[Dict[str, str | List]], str, str, str]:
     if bool(search_query) == bool(image_bytes):
-        return ("", "", "", "")
+        return ([], "", "", "")
 
     # Create a client
     client = discoveryengine.SearchServiceClient()
@@ -89,6 +89,12 @@ def search_enterprise_search(
         serving_config=serving_config,
         page_size=page_size,
         content_search_spec=content_search_spec,
+        query_expansion_spec=discoveryengine.SearchRequest.QueryExpansionSpec(
+            condition=discoveryengine.SearchRequest.QueryExpansionSpec.Condition.AUTO,
+        ),
+        spell_correction_spec=discoveryengine.SearchRequest.SpellCorrectionSpec(
+            mode=discoveryengine.SearchRequest.SpellCorrectionSpec.Mode.AUTO
+        ),
         params=params,
     )
 
@@ -102,7 +108,7 @@ def search_enterprise_search(
     try:
         response_pager = client.search(request)
     except Exception:
-        return ("", "", "", "")
+        return ([], "", "", "")
 
     response = discoveryengine.SearchResponse(
         results=response_pager.results,
@@ -120,11 +126,15 @@ def search_enterprise_search(
     )
 
     request_json = discoveryengine.SearchRequest.to_json(
-        request, including_default_value_fields=True, indent=JSON_INDENT
+        request,
+        including_default_value_fields=True,
+        use_integers_for_enums=False,
+        indent=JSON_INDENT,
     )
     response_json = discoveryengine.SearchResponse.to_json(
         response,
         including_default_value_fields=True,
+        use_integers_for_enums=False,
         indent=JSON_INDENT,
     )
 
@@ -132,7 +142,9 @@ def search_enterprise_search(
     return results, request_url, request_json, response_json
 
 
-def get_enterprise_search_results(response: discoveryengine.SearchResponse) -> List:
+def get_enterprise_search_results(
+    response: discoveryengine.SearchResponse,
+) -> List[Dict[str, str | List]]:
     """
     Extract Results from Enterprise Search Response
     """
