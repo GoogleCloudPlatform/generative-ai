@@ -9,6 +9,7 @@ This repository contains notebooks and content that demonstrate how to use, deve
 ```text
 generative-ai/
 ├── gen-app-builder/
+    ├── chat-app/                          - Demo of a chatbot answering questions about a website using Dialogflow CX
     ├── search-web-app/                    - Demo of searching through document corpus using Enterprise Search
     └── retrieval-augmented-generation/    - RAG using Enterprise Search
 ├── language/
@@ -31,7 +32,7 @@ generative-ai/
     - [Prompt Design/](language/examples/prompt-design/)
       - [Ideation](language/examples/prompt-design/ideation.ipynb)
       - [Question & Answering](language/examples/prompt-design/question_answering.ipynb)
-      - [Text Classifiction](language/examples/prompt-design/text_classification.ipynb)
+      - [Text Classification](language/examples/prompt-design/text_classification.ipynb)
       - [Text Extraction](language/examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](language/examples/prompt-design/text_summarization.ipynb)
     - [Reference-architectures/](language/examples/reference-architectures/)
@@ -74,4 +75,3 @@ Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-a
 
 ## Disclaimer
 This repository itself is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
-
