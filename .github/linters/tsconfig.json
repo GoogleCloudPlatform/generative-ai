@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strictNullChecks": true
+  },
+  "include": [
+    "src",
+    "tests",
+    "tools",
+    "/tmp/lint/.automation/test"
+  ],
+  "overrides": [
+    {
+      "extends": ["plugin:@typescript-eslint/disable-type-checked"],
+      "files": ["./**/*.{ts,tsx}"]
+    }
+  ]
+}
