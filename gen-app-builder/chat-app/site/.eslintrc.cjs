@@ -23,7 +23,6 @@ module.exports = {
     "prettier",
   ],
   parser: "@typescript-eslint/parser",
-  project: './tsconfig.json',
   plugins: ["@typescript-eslint"],
   parserOptions: {
     sourceType: "module",
