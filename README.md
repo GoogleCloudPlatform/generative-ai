@@ -9,7 +9,7 @@ This repository contains notebooks and content that demonstrate how to use, deve
 ```text
 generative-ai/
 ├── gen-app-builder/
-    ├── chat-app/                          - Demo of a chatbot answering questions about a website using Dialogflow CX
+    ├── chat-app/                          - Demo of a chatbot answering questions based on website content
     ├── search-web-app/                    - Demo of searching through document corpus using Enterprise Search
     └── retrieval-augmented-generation/    - RAG using Enterprise Search
 ├── language/
