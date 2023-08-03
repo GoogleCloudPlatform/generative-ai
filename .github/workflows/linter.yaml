@@ -40,9 +40,8 @@ jobs:
       ##########################
       - name: Checkout Code
         uses: actions/checkout@v3
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
+          ref: ${{ github.ref }}
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
