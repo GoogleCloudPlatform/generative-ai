@@ -23,9 +23,9 @@ module.exports = {
     "prettier",
   ],
   parser: "@typescript-eslint/parser",
-  project: './tsconfig.json',
   plugins: ["@typescript-eslint"],
   parserOptions: {
+    project: './tsconfig.json',
     sourceType: "module",
     ecmaVersion: 2020,
     extraFileExtensions: [".svelte"],
