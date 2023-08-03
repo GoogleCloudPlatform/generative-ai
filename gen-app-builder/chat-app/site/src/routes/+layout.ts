@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export const prerender = true
+export const prerender = true;
