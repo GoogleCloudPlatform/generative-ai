@@ -31,7 +31,6 @@
     />
     <title>Enterprise Search Demo</title>
   </head>
-
   <body>
     <div id="main-nav-bar" class="mdc-tab-bar" role="tablist">
       <div class="mdc-tab-scroller">
@@ -65,27 +64,53 @@
           alt="Generative AI App Builder"
         />
       </a>
-      <h1>Enterprise Search Demo - Custom UI</h1>
+      <h1>Enterprise Search Demo - Images</h1>
+      <h3></h3>
+      <p>
+        Search the <a href="https://shop.googlemerchandisestore.com/">Google Merchandise Store</a> by providing an image URL or file to find similar matches.
+      </p>
     </section>
     <main id="active-area">
-      <form class="search-form" action="/search_genappbuilder" method="post">
+      <form
+        class="search-form"
+        action="/imagesearch_genappbuilder"
+        method="post"
+        enctype="multipart/form-data"
+      >
         <!-- Search Box -->
         <div class="mdc-text-field mdc-text-field--outlined query-field">
           <input
             class="mdc-text-field__input"
             id="query-input"
             name="search_query"
-            required
           />
           <div class="mdc-notched-outline">
             <div class="mdc-notched-outline__leading"></div>
             <div class="mdc-notched-outline__notch">
-              <label for="text-field-hero-input" class="mdc-floating-label"
-                >Search the Google Cloud Website</label
+              <label for="query-input" class="mdc-floating-label"
+                >Search by Image URL</label
               >
             </div>
             <div class="mdc-notched-outline__trailing"></div>
           </div>
+        </div>
+        <!-- Image Box -->
+        <div class="file-upload">
+          <label
+            id="file-upload-label"
+            class="file-upload-label"
+            for="image-input"
+          >
+            <span class="file-upload-icon material-icons">cloud_upload</span>
+            Upload Image
+          </label>
+          <input
+            id="image-input"
+            class="file-upload__input"
+            name="image"
+            type="file"
+            accept="image/jpeg, image/png, image/bmp"
+          />
         </div>
         <!-- Search Button -->
         <div class="button-container">
@@ -165,28 +190,32 @@
       </div>
       <div class="tab-content">
         <div id="entities-tab" class="tab-visible">
-          {% for result in results %}
+          {% if results|length == 0 %}
+          <div>No results</div>
+          {% endif %} {% for result in results %}
           <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
               <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
                 <div class="mdc-card mdc-card--outlined">
                   <div
-                    class="mdc-card__primary-action entity-primary-action"
+                    class="mdc-card__primary-action entity-primary-action image-result"
                     tabindex="0"
                   >
-                    {% set imageUrl = result["thumbnailImage"] %}
-                    <div
+                    {% set imageUrl = result["thumbnailImage"] %} {% set
+                    imageFullSize = result["link"] %}
+                    <a
+                      href="{{imageFullSize}}"
                       class="mdc-card__media mdc-card__media--square entity-image"
                       style="background-image: url('{{imageUrl}}');"
-                    ></div>
+                    ></a>
                     <div class="entity-card-primary">
                       <h2 class="mdc-typography mdc-typography--headline6">
                         {{result["title"]}}
                       </h2>
                       <h3 class="mdc-typography mdc-typography--subtitle2">
-                        {% set resultUrl = result["link"] %} URL:
+                        {% set resultUrl = result["htmlFormattedUrl"] %} URL:
                         <a href="{{resultUrl}}" target="_blank"
-                          >{{result["htmlFormattedUrl"]|safe}}</a
+                          >{{result["displayLink"]|safe}}</a
                         >
                       </h3>
                     </div>

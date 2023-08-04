@@ -18,25 +18,38 @@ PROJECT_ID = "YOUR-PROJECT-ID"
 LOCATION = "global"
 
 WIDGET_CONFIGS = [
-    {"name": "Contracts", "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"},
+    {
+        "name": "Contracts",
+        "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "placeholder": "What is the SLA?",
+    },
     {
         "name": "Finance - Earnings Reports",
         "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "placeholder": "What was Google's revenue in 2021?",
     },
 ]
 
 CUSTOM_UI_DATASTORE_IDS = [
     {
         "name": "Google Cloud Website",
-        "datastore_id": "website-search-engine_xxxxxxxx",
+        "datastore_id": "google-cloud-site-search_xxxxxxxx",
     },
 ]
 
-PERSONALIZE_DATASTORE_IDs = [
+
+IMAGE_SEARCH_DATASTORE_IDs = [
     {
-        "name": "Contracts",
-        "datastore_id": "contracts-personalize-data_xxxxxxxxx",
-        "engine_id": "contracts-personalize_xxxxxxxxx",
+        "name": "Google Merchandise Store",
+        "datastore_id": "google-merch-store_xxxxxxx",
+    }
+]
+
+RECOMMENDATIONS_DATASTORE_IDs = [
+    {
+        "name": "ArXiv Natural Language Papers",
+        "datastore_id": "arxiv_xxxxxxxxxx",
+        "engine_id": "arxiv-personalize_xxxxxxxx",
     }
 ]
 
