@@ -2,10 +2,10 @@
 
 Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai) repository.
 
-This repository contains notebooks and content that demonstrate how to use, develop and manage generative AI workflows using [Generative AI](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai) on Google Cloud.
-
+This repository contains notebooks and content that demonstrate how to use, develop and manage generative AI workflows using [Generative AI](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai) and [Generative AI App Builder](https://cloud.google.com/generative-ai-app-builder) on Google Cloud.
 
 ## Folder structure
+
 ```text
 generative-ai/
 ├── gen-app-builder/
@@ -24,6 +24,7 @@ generative-ai/
 ```
 
 ## Table of Contents
+
 - [Language/](language/)
   - [Getting Started with Generative AI Studio without code](language/intro_generative_ai_studio.md)
   - [Intro to Vertex AI PaLM API](language/intro_palm_api.ipynb)
@@ -50,9 +51,12 @@ generative-ai/
       - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](language/examples/langchain-intro/intro_langchain_palm_api.ipynb)
     - [Tuning/](language/examples/tuning/)
       - [Tuning a Foundational Model, Deploying, and Making Predictions](language/examples/tuning/getting_started_tuning.ipynb)
-
+- [Gen App Builder/](gen-app-builder/)
+  - [Retrieval Augmented Generation](gen-app-builder/retrieval-augmented-generation/)
+  - [Search Web App](gen-app-builder/search-web-app)
 
 ## Setting up your Google Cloud project
+
 You will need a Google Cloud project to use this project.
 
 1. [Select or create a Google Cloud project](https://console.cloud.google.com/cloud-resource-manager). When you first create an account, you get a $300 free credit towards your compute/storage costs.
@@ -62,16 +66,21 @@ You will need a Google Cloud project to use this project.
 3. [Enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com).
 
 ## Setting up your Python or Jupyter environment
+
 Please see the README in the [setup-env](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
 
 ## Google Generative AI Resources
+
 Check out a list of [Google Generative AI Resources](RESOURCES.md) like official product pages, documentation, videos, courses and more.
 
 ## Contributing
+
 Contributions welcome! See the [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/CONTRIBUTING.md).
 
 ## Getting help
+
 Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-ai/issues) to provide feedback or submit a bug report.
 
 ## Disclaimer
+
 This repository itself is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
