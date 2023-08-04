@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "your-project-id"
+  },
+  "targets": {
+    "your-project-id": {
+      "hosting": {
+        "your-firebase-app-name": [
+          "your-firebase-app-name"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
