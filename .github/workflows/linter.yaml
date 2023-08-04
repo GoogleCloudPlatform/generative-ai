@@ -17,7 +17,7 @@ name: Lint Code Base
 on:
   push:
     branches-ignore: [main]
-    # Remove the line above to run when pushing to master
+    # Remove the line above to run when pushing to main
   pull_request:
     branches: [main]
 
@@ -57,3 +57,4 @@ jobs:
           SHELLCHECK_OPTS: -e SC1091 -e 2086
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_TYPESCRIPT_STANDARD: false  # super-linter/super-linter#4445
