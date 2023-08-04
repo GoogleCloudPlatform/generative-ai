@@ -55,7 +55,7 @@ def search_enterprise_search(
     params: Optional[Dict] = None,
 ) -> Tuple[List[Dict[str, str | List]], str, str, str]:
     if bool(search_query) == bool(image_bytes):
-        return ([], "", "", "")
+        raise Exception("Cannot provide both search_query and image_bytes")
 
     # Create a client
     client = discoveryengine.SearchServiceClient()
@@ -108,7 +108,7 @@ def search_enterprise_search(
     try:
         response_pager = client.search(request)
     except Exception:
-        return ([], "", "", "")
+        raise Exception("An internal error occured")
 
     response = discoveryengine.SearchResponse(
         results=response_pager.results,
