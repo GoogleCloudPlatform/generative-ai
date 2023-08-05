@@ -14,8 +14,15 @@
 
 """Flask Web Server"""
 
+import base64
 import os
 import re
+from urllib.parse import urlparse
+
+import requests
+from flask import Flask, render_template, request
+from google.api_core.exceptions import ResourceExhausted
+from werkzeug.exceptions import HTTPException
 
 from consts import (
     CUSTOM_UI_DATASTORE_IDS,
@@ -23,19 +30,19 @@ from consts import (
     PROJECT_ID,
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
-    PERSONALIZE_DATASTORE_IDs,
+    IMAGE_SEARCH_DATASTORE_IDs,
+    RECOMMENDATIONS_DATASTORE_IDs,
 )
 from ekg_utils import search_public_kg
-from flask import Flask, render_template, request
 from genappbuilder_utils import (
     list_documents,
     recommend_personalize,
     search_enterprise_search,
 )
-from google.api_core.exceptions import ResourceExhausted
-from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
+
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # Set maximum upload size to 16MB
 
 FORM_OPTIONS = {
     "language_list": VALID_LANGUAGES,
@@ -43,25 +50,32 @@ FORM_OPTIONS = {
 }
 
 NAV_LINKS = [
-    {"link": "/", "name": "Gen App Builder - Widgets", "icon": "widgets"},
+    {"link": "/", "name": "Enterprise Search - Widgets", "icon": "widgets"},
     {
         "link": "/search",
         "name": "Enterprise Search - Custom UI",
         "icon": "build",
     },
     {
+        "link": "/image-search",
+        "name": "Image Search",
+        "icon": "image",
+    },
+    {
         "link": "/recommend",
-        "name": "Personalize - Custom UI",
+        "name": "Recommendations",
         "icon": "recommend",
     },
     {"link": "/ekg", "name": "Enterprise Knowledge Graph", "icon": "scatter_plot"},
 ]
 
-PERSONALIZE_DOCUMENTS = list_documents(
+RECOMMENDATIONS_DOCUMENTS = list_documents(
     project_id=PROJECT_ID,
     location=LOCATION,
-    datastore_id=PERSONALIZE_DATASTORE_IDs[0]["datastore_id"],
+    datastore_id=RECOMMENDATIONS_DATASTORE_IDs[0]["datastore_id"],
 )
+
+VALID_IMAGE_MIMETYPES = {"image/jpeg", "image/png", "image/bmp"}
 
 
 @app.route("/", methods=["GET"])
@@ -122,15 +136,91 @@ def search_genappbuilder() -> str:
     )
 
 
+@app.route("/image-search", methods=["GET"])
+def image_search() -> str:
+    """
+    Web Server, Homepage for Image Search - Custom UI
+    """
+    return render_template(
+        "image-search.html",
+        nav_links=NAV_LINKS,
+    )
+
+
+@app.route("/imagesearch_genappbuilder", methods=["POST"])
+def imagesearch_genappbuilder() -> str:
+    """
+    Handle Image Search Gen App Builder Request
+    """
+    search_query = request.form.get("search_query", "")
+    image_file = request.files["image"]
+    image_content = None
+    image_bytes = None
+
+    # Check if POST Request includes search query
+    if not search_query and not image_file:
+        return render_template(
+            "image-search.html",
+            nav_links=NAV_LINKS,
+            message_error="No query provided",
+        )
+
+    if image_file:
+        image_content = image_file.read()
+    elif search_query:
+        # Check if text is a url
+        image_url = urlparse(search_query)
+        if all([image_url.scheme, image_url.netloc, image_url.path]):
+            image_response = requests.get(image_url.geturl(), allow_redirects=True)
+            mime_type = image_response.headers["Content-Type"]
+            if mime_type not in VALID_IMAGE_MIMETYPES:
+                return render_template(
+                    "image-search.html",
+                    nav_links=NAV_LINKS,
+                    message_error=f"Invalid image format - {mime_type}. Valid types {VALID_IMAGE_MIMETYPES}",
+                )
+            image_content = image_response.content
+
+    if image_content:
+        search_query = None
+        image_bytes = base64.b64encode(image_content)
+
+    try:
+        results, request_url, raw_request, raw_response = search_enterprise_search(
+            project_id=PROJECT_ID,
+            location=LOCATION,
+            search_engine_id=IMAGE_SEARCH_DATASTORE_IDs[0]["datastore_id"],
+            search_query=search_query,
+            image_bytes=image_bytes,
+            params={"search_type": 1},
+        )
+    except Exception as e:
+        return render_template(
+            "image-search.html",
+            nav_links=NAV_LINKS,
+            message_error=e.args[0],
+        )
+
+    return render_template(
+        "image-search.html",
+        nav_links=NAV_LINKS,
+        message_success="Success",
+        results=results,
+        request_url=request_url,
+        raw_request=raw_request,
+        raw_response=raw_response,
+    )
+
+
 @app.route("/recommend", methods=["GET"])
 def recommend() -> str:
     """
-    Web Server, Homepage for Personalize - Custom UI
+    Web Server, Homepage for Recommendations - Custom UI
     """
     return render_template(
         "recommend.html",
         nav_links=NAV_LINKS,
-        documents=PERSONALIZE_DOCUMENTS,
+        documents=RECOMMENDATIONS_DOCUMENTS,
         attribution_token="",
     )
 
@@ -148,7 +238,7 @@ def recommend_genappbuilder() -> str:
         return render_template(
             "recommend.html",
             nav_links=NAV_LINKS,
-            documents=PERSONALIZE_DOCUMENTS,
+            documents=RECOMMENDATIONS_DOCUMENTS,
             attribution_token=attribution_token,
             message_error="No document provided",
         )
@@ -162,8 +252,8 @@ def recommend_genappbuilder() -> str:
     ) = recommend_personalize(
         project_id=PROJECT_ID,
         location=LOCATION,
-        datastore_id=PERSONALIZE_DATASTORE_IDs[0]["datastore_id"],
-        serving_config_id=PERSONALIZE_DATASTORE_IDs[0]["engine_id"],
+        datastore_id=RECOMMENDATIONS_DATASTORE_IDs[0]["datastore_id"],
+        serving_config_id=RECOMMENDATIONS_DATASTORE_IDs[0]["engine_id"],
         document_id=document_id,
         attribution_token=attribution_token,
     )
@@ -171,7 +261,7 @@ def recommend_genappbuilder() -> str:
     return render_template(
         "recommend.html",
         nav_links=NAV_LINKS,
-        documents=PERSONALIZE_DOCUMENTS,
+        documents=RECOMMENDATIONS_DOCUMENTS,
         message_success=document_id,
         results=results,
         attribution_token=attribution_token,

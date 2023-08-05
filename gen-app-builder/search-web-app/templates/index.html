@@ -62,6 +62,9 @@
         />
       </a>
       <h1>Enterprise Search Demo - Widgets</h1>
+      <p>
+        Click on one of the text boxes to open up a full-page widget for the search engine.
+      </p>
     </section>
     <main>
       <!-- Gen App Builder widget bundle -->
@@ -74,6 +77,7 @@
         triggerId="{{s.name|lower|replace(' ', '-')}}"
       >
       </gen-search-widget>
+      <div class="search-engine-name"><b>{{s.name}}</b></div>
 
       <!-- Element that opens the widget on click. It does not have to be an input -->
       <div class="mdc-text-field mdc-text-field--outlined query-field">
@@ -85,7 +89,7 @@
           <div class="mdc-notched-outline__leading"></div>
           <div class="mdc-notched-outline__notch">
             <label for="text-field-hero-input" class="mdc-floating-label"
-              >{{s.name}}</label
+              >{{s.placeholder}}</label
             >
           </div>
           <div class="mdc-notched-outline__trailing"></div>
@@ -103,10 +107,11 @@
         >
       </p>
       <p>
-        Powered by <a
-          href="https://cloud.google.com/generative-ai-app-builder"
+        Powered by
+        <a href="https://cloud.google.com/generative-ai-app-builder"
           >Generative AI App Builder</a
-        > on <a href="https://cloud.google.com/">Google Cloud</a>
+        >
+        on <a href="https://cloud.google.com/">Google Cloud</a>
       </p>
     </section>
   </body>
