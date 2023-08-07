@@ -14,9 +14,9 @@
 
 """Generative AI App Builder Utilities"""
 from os.path import basename
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
-from google.cloud import discoveryengine, discoveryengine_v1beta
+from google.cloud import discoveryengine_v1beta as discoveryengine
 
 JSON_INDENT = 2
 
@@ -25,7 +25,7 @@ def list_documents(
     project_id: str,
     location: str,
     datastore_id: str,
-) -> List[discoveryengine.Document]:
+) -> List[Dict[str, str]]:
     client = discoveryengine.DocumentServiceClient()
 
     parent = client.branch_path(
@@ -49,8 +49,14 @@ def search_enterprise_search(
     project_id: str,
     location: str,
     search_engine_id: str,
-    search_query: str,
-) -> Tuple:
+    page_size: int = 50,
+    search_query: Optional[str] = None,
+    image_bytes: Optional[bytes] = None,
+    params: Optional[Dict] = None,
+) -> Tuple[List[Dict[str, str | List]], str, str, str]:
+    if bool(search_query) == bool(image_bytes):
+        raise Exception("Cannot provide both search_query and image_bytes")
+
     # Create a client
     client = discoveryengine.SearchServiceClient()
 
@@ -63,17 +69,46 @@ def search_enterprise_search(
         serving_config="default_config",
     )
 
-    request = discoveryengine.SearchRequest(
-        serving_config=serving_config,
-        query=search_query,
-        page_size=50,
-        content_search_spec=discoveryengine.SearchRequest.ContentSearchSpec(
-            snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
-                max_snippet_count=1
-            )
+    # Configuration options for search
+    content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
+        snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
+            max_snippet_count=5, return_snippet=True
+        ),
+        summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
+            summary_result_count=5,
+            include_citations=True,
+            ignore_adversarial_query=True,
+            ignore_non_summary_seeking_query=True,
+        ),
+        extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
+            max_extractive_answer_count=1, max_extractive_segment_count=1
         ),
     )
-    response_pager = client.search(request)
+
+    request = discoveryengine.SearchRequest(
+        serving_config=serving_config,
+        page_size=page_size,
+        content_search_spec=content_search_spec,
+        query_expansion_spec=discoveryengine.SearchRequest.QueryExpansionSpec(
+            condition=discoveryengine.SearchRequest.QueryExpansionSpec.Condition.AUTO,
+        ),
+        spell_correction_spec=discoveryengine.SearchRequest.SpellCorrectionSpec(
+            mode=discoveryengine.SearchRequest.SpellCorrectionSpec.Mode.AUTO
+        ),
+        params=params,
+    )
+
+    if search_query:
+        request.query = search_query
+    elif image_bytes:
+        request.image_query = discoveryengine.SearchRequest.ImageQuery(
+            image_bytes=image_bytes
+        )
+
+    try:
+        response_pager = client.search(request)
+    except Exception:
+        raise Exception("An internal error occured")
 
     response = discoveryengine.SearchResponse(
         results=response_pager.results,
@@ -86,14 +121,20 @@ def search_enterprise_search(
         summary=response_pager.summary,
     )
 
-    request_url = f"https://discoveryengine.googleapis.com/v1/{serving_config}:search"
+    request_url = (
+        f"https://discoveryengine.googleapis.com/v1beta/{serving_config}:search"
+    )
 
     request_json = discoveryengine.SearchRequest.to_json(
-        request, including_default_value_fields=True, indent=JSON_INDENT
+        request,
+        including_default_value_fields=True,
+        use_integers_for_enums=False,
+        indent=JSON_INDENT,
     )
     response_json = discoveryengine.SearchResponse.to_json(
         response,
         including_default_value_fields=True,
+        use_integers_for_enums=False,
         indent=JSON_INDENT,
     )
 
@@ -101,38 +142,50 @@ def search_enterprise_search(
     return results, request_url, request_json, response_json
 
 
-def get_enterprise_search_results(response: discoveryengine.SearchResponse) -> List:
+def get_enterprise_search_results(
+    response: discoveryengine.SearchResponse,
+) -> List[Dict[str, str | List]]:
     """
     Extract Results from Enterprise Search Response
     """
 
-    results = []
-    for result in response.results:
-        data = result.document.derived_struct_data
+    ROBOT = "https://www.google.com/images/errors/robot.png"
 
-        cse_thumbnail = data["pagemap"].get("cse_thumbnail")
+    def get_thumbnail_image(data: Dict) -> str:
+        cse_thumbnail = data.get("pagemap", {}).get("cse_thumbnail")
+        image_link = data.get("image", {}).get("thumbnailLink")
+
         if cse_thumbnail:
-            image = cse_thumbnail[0]["src"]
+            return cse_thumbnail[0]["src"]
+        elif image_link:
+            return image_link
         else:
-            image = "https://www.google.com/images/errors/robot.png"
-        results.append(
-            {
-                "title": data["title"],
-                "htmlTitle": data["htmlTitle"],
-                "link": data["link"],
-                "htmlFormattedUrl": data["htmlFormattedUrl"],
-                "displayLink": data["displayLink"],
-                "snippets": [s["htmlSnippet"] for s in data["snippets"]],
-                "thumbnailImage": image,
-                "resultJson": discoveryengine.SearchResponse.SearchResult.to_json(
-                    result,
-                    including_default_value_fields=True,
-                    indent=JSON_INDENT,
-                ),
-            }
-        )
+            return ROBOT
 
-    return results
+    def get_formatted_link(data: Dict) -> str:
+        html_formatted_url = data.get("htmlFormattedUrl")
+        image_context_link = data.get("image", {}).get("contextLink")
+        return html_formatted_url or image_context_link or ROBOT
+
+    return [
+        {
+            "title": result.document.derived_struct_data["title"],
+            "htmlTitle": result.document.derived_struct_data.get(
+                "htmlTitle", result.document.derived_struct_data["title"]
+            ),
+            "link": result.document.derived_struct_data["link"],
+            "htmlFormattedUrl": get_formatted_link(result.document.derived_struct_data),
+            "displayLink": result.document.derived_struct_data["displayLink"],
+            "snippets": [
+                s["snippet"] for s in result.document.derived_struct_data["snippets"]
+            ],
+            "thumbnailImage": get_thumbnail_image(result.document.derived_struct_data),
+            "resultJson": discoveryengine.SearchResponse.SearchResult.to_json(
+                result, including_default_value_fields=True, indent=JSON_INDENT
+            ),
+        }
+        for result in response.results
+    ]
 
 
 def recommend_personalize(
@@ -145,7 +198,7 @@ def recommend_personalize(
     attribution_token: Optional[str] = None,
 ) -> Tuple:
     # Create a client
-    client = discoveryengine_v1beta.RecommendationServiceClient()
+    client = discoveryengine.RecommendationServiceClient()
 
     # The full resource name of the search engine serving config
     # e.g. projects/{project_id}/locations/{location}
@@ -156,14 +209,14 @@ def recommend_personalize(
         serving_config=serving_config_id,
     )
 
-    user_event = discoveryengine_v1beta.UserEvent(
+    user_event = discoveryengine.UserEvent(
         event_type="view-item",
         user_pseudo_id=user_pseudo_id,
         attribution_token=attribution_token,
-        documents=[discoveryengine_v1beta.DocumentInfo(id=document_id)],
+        documents=[discoveryengine.DocumentInfo(id=document_id)],
     )
 
-    request = discoveryengine_v1beta.RecommendRequest(
+    request = discoveryengine.RecommendRequest(
         serving_config=serving_config,
         user_event=user_event,
         params={"returnDocument": True, "returnScore": True},
@@ -175,10 +228,10 @@ def recommend_personalize(
         f"https://discoveryengine.googleapis.com/v1beta/{serving_config}:recommend"
     )
 
-    request_json = discoveryengine_v1beta.RecommendRequest.to_json(
+    request_json = discoveryengine.RecommendRequest.to_json(
         request, including_default_value_fields=True, indent=JSON_INDENT
     )
-    response_json = discoveryengine_v1beta.RecommendResponse.to_json(
+    response_json = discoveryengine.RecommendResponse.to_json(
         response, including_default_value_fields=True, indent=JSON_INDENT
     )
 
@@ -186,26 +239,26 @@ def recommend_personalize(
     return results, response.attribution_token, request_url, request_json, response_json
 
 
-def get_personalize_results(response: discoveryengine_v1beta.RecommendResponse) -> List:
+def get_storage_link(uri: str) -> str:
+    return uri.replace("gs://", "https://storage.googleapis.com/")
+
+
+def get_personalize_results(
+    response: discoveryengine.RecommendResponse,
+) -> List[Dict]:
     """
     Extract Results from Personalize Response
     """
-
-    results = []
-    for result in response.results:
-        results.append(
-            {
-                "id": result.id,
-                "title": basename(result.document.content.uri),
-                "htmlFormattedUrl": result.document.content.uri,
-                "link": result.document.content.uri.replace(
-                    "gs://", "https://storage.googleapis.com/"
-                ),
-                "mimeType": result.document.content.mime_type,
-                "resultJson": discoveryengine_v1beta.RecommendResponse.RecommendationResult.to_json(
-                    result, including_default_value_fields=True, indent=JSON_INDENT
-                ),
-            }
-        )
-
-    return results
+    return [
+        {
+            "id": result.id,
+            "title": basename(result.document.content.uri),
+            "htmlFormattedUrl": result.document.content.uri,
+            "link": get_storage_link(result.document.content.uri),
+            "mimeType": result.document.content.mime_type,
+            "resultJson": discoveryengine.RecommendResponse.RecommendationResult.to_json(
+                result, including_default_value_fields=True, indent=JSON_INDENT
+            ),
+        }
+        for result in response.results
+    ]

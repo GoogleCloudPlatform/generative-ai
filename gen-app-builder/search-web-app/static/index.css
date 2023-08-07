@@ -32,15 +32,17 @@ body {
 .gen-app-builder-logo,
 .ekg-logo {
   height: 100px;
-  padding-top: 80px;
+  padding-top: 30px;
   fill: currentcolor;
 }
 
 .query-field,
 .schema-info,
-.types-field {
+.types-field,
+.search-engine-name,
+.file-upload {
   display: block;
-  width: 300px;
+  width: 350px;
   margin: 20px auto;
 }
 
@@ -61,9 +63,10 @@ body {
   margin: auto;
 }
 
-.language-selection, .document-selection {
+.language-selection,
+.document-selection {
   display: flex;
-  width: 300px;
+  width: 350px;
   margin: auto;
 }
 
@@ -154,4 +157,43 @@ a:active {
 
 .empty-results-message {
   text-align: center;
+}
+
+.footer {
+  padding-bottom: 1rem;
+}
+
+.image-result .entity-image {
+  width: 100%;
+}
+
+.image-result .entity-card-primary {
+  width: 30%;
+}
+
+.image-result .entity-detailed-description {
+  width: 80%;
+}
+
+#image-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.file-upload-icon {
+  margin-right: 8px;
+}
+
+.file-upload-input {
+  display: none;
 }
