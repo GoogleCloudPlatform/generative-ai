@@ -47,7 +47,7 @@
         .shadowRoot.querySelector("df-messenger-user-input")
         .shadowRoot.querySelector(".textarea-wrapper > textarea").value =
         "How does the Pixel Watch track sleep?";
-    }, 10000);
+    }, 11000);
 
     setTimeout(function () {
       document
@@ -56,7 +56,7 @@
         .shadowRoot.querySelector("df-messenger-user-input")
         .shadowRoot.querySelector(".send-icon-button-wrapper > button")
         .click();
-    }, 11000);
+    }, 12000);
   });
 </script>
 
