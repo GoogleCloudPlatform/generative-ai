@@ -93,9 +93,9 @@
     </df-messenger>
   </div>
 
-  <div class="px-6 m-6">
+  <div class="m-6 px-6">
     <Heading tag="h5" class="my-2">What is Generative AI Agent?</Heading>
-    <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+    <p class="font-normal leading-tight text-gray-700 dark:text-gray-400">
       <A
         href="https://cloud.google.com/generative-ai-app-builder/docs/agent-intro"
         class="font-medium hover:underline">Generative AI Agent</A> is a feature within <A
@@ -107,13 +107,13 @@
     </p>
   </div>
 
-  <div class="px-6 m-6">
+  <div class="m-6 px-6">
     <Heading tag="h5" class="my-2">Try it yourself!</Heading>
     Ask the chatbot on the right about products in the Google Store, such as the Pixel Phone, Pixel Watch,
     or Pixel Tablet
   </div>
 
-  <div class="px-6 m-6">
+  <div class="m-6 px-6">
     <Heading tag="h5" class="my-2">How it works</Heading>
 
     You provide a website or structured/unstructured data, then Generative AI Agent parses your
@@ -135,8 +135,8 @@
     }
   </style>
 
-  <div class="absolute inset-x-0 bottom-0 h-16 mx-6">
-    <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+  <div class="absolute inset-x-0 bottom-0 mx-6 h-16">
+    <p class="font-normal leading-tight text-gray-700 dark:text-gray-400">
       Powered by <A
         class="font-medium hover:underline"
         href="https://cloud.google.com/generative-ai-app-builder">Gen App Builder</A> and
