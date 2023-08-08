@@ -1,112 +1,146 @@
 <script lang="ts">
-  import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from "flowbite-svelte";
-  import { Card } from "flowbite-svelte";
-  import { Tabs, TabItem } from "flowbite-svelte";
+  import { Navbar, NavBrand, NavLi, NavUl } from "flowbite-svelte";
+  import { A } from "flowbite-svelte";
+  import { Heading } from "flowbite-svelte";
+  import { onMount } from "svelte";
+
+  onMount(() => {
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector(".textarea-wrapper > textarea").value = "Hello";
+    }, 1000);
+
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector(".send-icon-button-wrapper > button")
+        .click();
+    }, 2000);
+
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector(".textarea-wrapper > textarea").value =
+        "Does the Pixel 7 Pro support fast charging?";
+    }, 5000);
+
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector(".send-icon-button-wrapper > button")
+        .click();
+    }, 6000);
+
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector(".textarea-wrapper > textarea").value =
+        "How does the Pixel Watch track sleep?";
+    }, 9000);
+
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector(".send-icon-button-wrapper > button")
+        .click();
+    }, 10000);
+  });
 </script>
 
-<Navbar let:hidden let:toggle rounded color="form">
-  <NavBrand href="/">
-    <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white"
-      >Google Cloud - Gen App Builder (Chat App)</span
-    >
+<Navbar let:hidden let:toggle class="bg-[#B1D6FC]">
+  <NavBrand href="/" class="-ml-20">
+    <img src="gen-app-builder-logo.png" class="mr-3 h-6 sm:h-9" alt="Gen App Builder" />
+    <span class="self-center whitespace-nowrap text-xl font-semibold text-black dark:text-white"
+      >Gen App Builder - Chat App Demo</span>
   </NavBrand>
-  <NavHamburger on:click={toggle} />
-  <NavUl {hidden}>
+  <NavUl {hidden} class="-mr-20">
     <NavLi href="/" active={true}>Home</NavLi>
+    <NavLi href="https://cloud.google.com/generative-ai-app-builder/docs/introduction"
+      >Gen App Builder</NavLi>
     <NavLi
       href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gen-app-builder/chat-app"
-      >GitHub</NavLi
-    >
-    <NavLi href="#">Feedback</NavLi>
+      >Source code</NavLi>
   </NavUl>
 </Navbar>
 
-<div id="sidebar" class="m-6">
-  <script
-    src="https://www.gstatic.com/dialogflow-console/fast/messenger-cx/prod/df-messenger.min.js?v=1"
-  ></script>
-  <df-messenger agent-id="b42e8b15-64ef-45be-bdaf-cbf78541873b" language-code="en">
-    <df-messenger-chat
-      chat-title="Google Store"
-      bot-writing-text="..."
-      placeholder-text="Ask me something..."
-    />
-  </df-messenger>
-</div>
+<div class="container max-h-full max-w-full bg-[#E2ECF3]">
+  <div id="sidebar" class="mx-20">
+    <script
+      src="https://www.gstatic.com/dialogflow-console/fast/messenger-cx/prod/df-messenger.min.js?v=1"></script>
+    <df-messenger
+      agent-id="b42e8b15-64ef-45be-bdaf-cbf78541873b"
+      language-code="en"
+      class="drop-shadow-lg">
+      <df-messenger-chat
+        chat-title="Google Store - Generative AI Agent"
+        bot-writing-text="..."
+        placeholder-text="Ask me about the Google Store..." />
+    </df-messenger>
+  </div>
 
-<Tabs
-  style="full"
-  defaultClass="flex rounded-lg divide-x divide-gray-200 shadow dark:divide-gray-700"
->
-  <TabItem class="w-full" open>
-    <span slot="title">How it works</span>
-    <Card padding="none" size="full" class="grid md:grid-cols-2 m-6">
-      <figure
-        class="flex flex-col justify-center items-center p-8 text-center bg-white rounded-t-lg border-b border-gray-200 md:rounded-t-none md:rounded-tl-lg md:border-r dark:bg-gray-800 dark:border-gray-700"
-      >
-        <blockquote class="mx-auto mb-4 max-w-2xl text-gray-500 dark:text-gray-400">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Easily ingest data</h3>
-          <p class="my-4 font-light">
-            Including public website data, unstructured data (PDF files), structured data (JSON,
-            BigQuery)
-          </p>
-        </blockquote>
-      </figure>
-      <figure
-        class="flex flex-col justify-center items-center p-8 text-center bg-white rounded-tr-lg border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700"
-      >
-        <blockquote class="mx-auto mb-4 max-w-2xl text-gray-500 dark:text-gray-400">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Generative AI answers</h3>
-          <p class="my-4 font-light">
-            Retrives indexed documents, then uses large language models to provide natural answers
-            grounded in your data
-          </p>
-        </blockquote>
-      </figure>
-      <figure
-        class="flex flex-col justify-center items-center p-8 text-center bg-white rounded-bl-lg border-b border-gray-200 md:border-b-0 md:border-r dark:bg-gray-800 dark:border-gray-700"
-      >
-        <blockquote class="mx-auto mb-4 max-w-2xl text-gray-500 dark:text-gray-400">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Multi-channel integrations
-          </h3>
-          <p class="my-4 font-light">
-            Embed a chat widget on your website, connect to a phone gateway or telephony provider,
-            or integrate with other chat and CRM tools
-          </p>
-        </blockquote>
-      </figure>
-      <figure
-        class="flex flex-col justify-center items-center p-8 text-center bg-white rounded-b-lg border-gray-200 md:rounded-br-lg dark:bg-gray-800 dark:border-gray-700"
-      >
-        <blockquote class="mx-auto mb-4 max-w-2xl text-gray-500 dark:text-gray-400">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Try it yourself</h3>
-          <p class="my-4 font-light">
-            Ask the chatbot on the right questions about products in the Google Store, such as Pixel
-            Phone, Pixel Watch, or Pixel Tablet
-          </p>
-        </blockquote>
-      </figure>
-    </Card>
-  </TabItem>
-  <TabItem class="w-full">
-    <span slot="title">How we built it</span>
-    <p class="text-lg">
-      <b>Step 1:</b> Create a chat app and associated data store in Gen App Builder <br /><br />
-      <b>Step 2:</b> Select the website data type and input your website URLs <br /><br />
-      <b>Step 3:</b> Embed a chat widget into your website and delight your customers!
+  <div class="px-6 m-6">
+    <Heading tag="h5" class="my-2">What is Generative AI Agent?</Heading>
+    <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+      <A
+        href="https://cloud.google.com/generative-ai-app-builder/docs/agent-intro"
+        class="font-medium hover:underline">Generative AI Agent</A> is a feature within <A
+        href="https://cloud.google.com/generative-ai-app-builder"
+        class="font-medium hover:underline">Generative AI App Builder</A> that is built on top of <A
+        href="https://cloud.google.com/dialogflow"
+        class="font-medium hover:underline">Dialogflow CX</A
+      >.
     </p>
-  </TabItem>
-</Tabs>
+  </div>
 
-Powered by <a href="https://cloud.google.com/generative-ai-app-builder">Gen App Builder</a> and
-<a href="https://cloud.google.com/dialogflow">Dialogflow CX</a>
-in <a href="https://cloud.google.com/">Google Cloud</a>
+  <div class="px-6 m-6">
+    <Heading tag="h5" class="my-2">Try it yourself!</Heading>
+    Ask the chatbot on the right about products in the Google Store, such as the Pixel Phone, Pixel Watch,
+    or Pixel Tablet
+  </div>
 
-<style>
-  #sidebar {
-    height: 90vh;
-    width: 30vw;
-    float: right;
-  }
-</style>
+  <div class="px-6 m-6">
+    <Heading tag="h5" class="my-2">How it works</Heading>
+
+    You provide a website or structured/unstructured data, then Generative AI Agent parses your
+    content and creates a virtual agent that is powered by large language models. Users can then
+    chat and ask questions about the content.
+
+    <img
+      src="how-chat-works.png"
+      alt="Lifecycle of a Generative AI Agent Question"
+      width="800px"
+      class="mx-auto mt-2" />
+  </div>
+
+  <style>
+    #sidebar {
+      height: 80vh;
+      width: 30vw;
+      float: right;
+    }
+  </style>
+
+  <div class="absolute inset-x-0 bottom-0 h-16 mx-6">
+    <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+      Powered by <A
+        class="font-medium hover:underline"
+        href="https://cloud.google.com/generative-ai-app-builder">Gen App Builder</A> and
+      <A class="font-medium hover:underline" href="https://cloud.google.com/dialogflow"
+        >Dialogflow CX</A>
+      in <A class="font-medium hover:underline" href="https://cloud.google.com/">Google Cloud</A>
+    </p>
+  </div>
+</div>
