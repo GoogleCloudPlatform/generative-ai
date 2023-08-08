@@ -1,12 +1,12 @@
 {
   "projects": {
-    "default": "your-project-id"
+    "default": "koverholt-devrel-355716"
   },
   "targets": {
-    "your-project-id": {
+    "koverholt-devrel-355716": {
       "hosting": {
-        "your-firebase-app-name": [
-          "your-firebase-app-name"
+        "gen-app-builder-chat": [
+          "gen-app-builder-chat"
         ]
       }
     }
