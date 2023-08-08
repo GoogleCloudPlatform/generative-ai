@@ -69,7 +69,9 @@
   <NavUl {hidden} class="-mr-20">
     <NavLi href="/" active={true}>Home</NavLi>
     <NavLi href="https://cloud.google.com/generative-ai-app-builder/docs/introduction"
-      >Gen App Builder</NavLi>
+      >Documentation</NavLi>
+    <NavLi href="https://codelabs.developers.google.com/codelabs/gen-app-builder-chat"
+      >Codelab</NavLi>
     <NavLi
       href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gen-app-builder/chat-app"
       >Source code</NavLi>
