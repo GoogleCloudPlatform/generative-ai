@@ -89,7 +89,7 @@
       <df-messenger-chat
         chat-title="Google Store - Generative AI Agent"
         bot-writing-text="..."
-        placeholder-text="Ask me about the Google Store..." />
+        placeholder-text="Ask me anything about the Google Store..." />
     </df-messenger>
   </div>
 
