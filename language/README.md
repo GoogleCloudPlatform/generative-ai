@@ -6,14 +6,24 @@ Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generati
 
 ```text
 generative-ai/
-├── language/
-    ├── examples/
-        ├── document-qa/             - examples for doc Q&A
-        ├── document-summarization/  - examples for doc summarization
-        ├── langchain/               - examples for langchain
-        ├── prompt-design/           - examples for prompts
-        ├── reference-architectures/ - examples of architectures
-        └── tuning/                  - examples of tuning models
+├── gen-app-builder
+│   ├── chat-app
+│   ├── data-store-status-checker
+│   ├── retrieval-augmented-generation
+│   └── search-web-app
+├── language
+│   ├── hello-world
+│   ├── prompts
+│   │   └── examples
+│   ├── third-party
+│   │   └── langchain
+│   ├── tuning
+│   └── use-cases
+│       ├── chatbots
+│       ├── description-generation
+│       ├── document-qa
+│       └── document-summarization
+└── setup-env
 ```
 
 ## Table of Contents
