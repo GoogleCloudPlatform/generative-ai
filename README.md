@@ -2,71 +2,20 @@
 
 Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai) repository.
 
-This repository contains notebooks and content that demonstrate how to use, develop and manage generative AI workflows using [Generative AI](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai) and [Generative AI App Builder](https://cloud.google.com/generative-ai-app-builder) on Google Cloud.
+This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai) and [Generative AI App Builder](https://cloud.google.com/generative-ai-app-builder).
 
-## Table of Contents  
-<pre>  
-generative-ai/
-├── <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>
-├── <a href="RESOURCES.md">RESOURCES.md</a>
-├── <a href="gen-app-builder">gen-app-builder/</a>
-│   ├── <a href="gen-app-builder/chat-app">chat-app/</a>
-│   ├── <a href="gen-app-builder/data-store-status-checker">data-store-status-checker/</a>
-│   │   └── <a href="gen-app-builder/data-store-status-checker/data_store_checker.ipynb">[Notebook] Gen App Builder Data Store Status Checker</a>
-│   ├── <a href="gen-app-builder/retrieval-augmented-generation">retrieval-augmented-generation/</a>
-│   │   └── <a href="gen-app-builder/retrieval-augmented-generation/examples">examples/</a>
-│   │       └── <a href="gen-app-builder/retrieval-augmented-generation/examples/question_answering.ipynb">[Notebook] Question Answering with Generative Models on Vertex AI</a>
-│   └── <a href="gen-app-builder/search-web-app">search-web-app/</a>
-├── <a href="language">language/</a>
-│   ├── <a href="language/hello-world">hello-world/</a>
-│   │   ├── <a href="language/hello-world/intro_generative_ai_studio.md">intro_generative_ai_studio.md</a>
-│   │   └── <a href="language/hello-world/intro_palm_api.ipynb">[Notebook] Getting Started with the Vertex AI PaLM API & Python SDK</a>
-│   ├── <a href="language/prompts">prompts/</a>
-│   │   ├── <a href="language/prompts/examples">examples/</a>
-│   │   │   ├── <a href="language/prompts/examples/ideation.ipynb">[Notebook] Ideation with Generative Models on Vertex AI</a>
-│   │   │   ├── <a href="language/prompts/examples/question_answering.ipynb">[Notebook] Question Answering with Generative Models on Vertex AI</a>
-│   │   │   ├── <a href="language/prompts/examples/text_classification.ipynb">[Notebook] Text Classification with Generative Models on Vertex AI</a>
-│   │   │   ├── <a href="language/prompts/examples/text_extraction.ipynb">[Notebook] Text Extraction with Generative Models on Vertex AI</a>
-│   │   │   └── <a href="language/prompts/examples/text_summarization.ipynb">[Notebook] Text Summarization with Generative Models on Vertex AI</a>
-│   │   └── <a href="language/prompts/intro_prompt_design.ipynb">[Notebook] Prompt Design - Best Practices</a>
-│   ├── <a href="language/third-party">third-party/</a>
-│   │   └── <a href="language/third-party/langchain">langchain/</a>
-│   │       └── <a href="language/third-party/langchain/intro_langchain_palm_api.ipynb">[Notebook] Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API</a>
-│   ├── <a href="language/tuning">tuning/</a>
-│   │   └── <a href="language/tuning/getting_started_tuning.ipynb">[Notebook] Tuning and deploy a foundation model</a>
-│   └── <a href="language/use-cases">use-cases/</a>
-│       ├── <a href="language/use-cases/chatbots">chatbots/</a>
-│       │   └── <a href="language/use-cases/chatbots/grocerybot_assistant.ipynb">[Notebook] GroceryBot, a sample grocery and recipe assistant - RAG + ReAct</a>
-│       ├── <a href="language/use-cases/description-generation">description-generation/</a>
-│       │   ├── <a href="language/use-cases/description-generation/product_description_generator_attributes_to_text.ipynb">[Notebook] DescriptionGen: SEO-optimized product decription generation for retail using LangChain 🦜🔗</a>
-│       │   └── <a href="language/use-cases/description-generation/product_description_generator_image.ipynb">[Notebook] Product Description Generator From Image</a>
-│       ├── <a href="language/use-cases/document-qa">document-qa/</a>
-│       │   ├── <a href="language/use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb">[Notebook] Question Answering with Documents using LangChain 🦜️🔗 and Vertex AI Matching Engine</a>
-│       │   ├── <a href="language/use-cases/document-qa/question_answering_large_documents.ipynb">[Notebook] Question Answering with Large Documents</a>
-│       │   └── <a href="language/use-cases/document-qa/question_answering_large_documents_langchain.ipynb">[Notebook] Question Answering with Large Documents using LangChain 🦜🔗</a>
-│       └── <a href="language/use-cases/document-summarization">document-summarization/</a>
-│           ├── <a href="language/use-cases/document-summarization/summarization_large_documents.ipynb">[Notebook] Text Summarization of Large Documents</a>
-│           └── <a href="language/use-cases/document-summarization/summarization_large_documents_langchain.ipynb">[Notebook] Text Summarization of Large Documents using LangChain 🦜🔗</a>
-└── <a href="setup-env">setup-env/</a>
-</pre>
+For more Vertex AI samples, please visit the [Vertex AI samples Github repository](https://github.com/GoogleCloudPlatform/vertex-ai-samples/).
 
-## Setting up your Google Cloud project
+## Using this repository
 
-You will need a Google Cloud project to use this project.
-
-1. [Select or create a Google Cloud project](https://console.cloud.google.com/cloud-resource-manager). When you first create an account, you get a $300 free credit towards your compute/storage costs.
-
-2. [Make sure that billing is enabled for your project](https://cloud.google.com/billing/docs/how-to/modify-project).
-
-3. [Enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com).
-
-## Setting up your Python or Jupyter environment
-
-Please see the README in the [setup-env](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env) folder for information on using Colab notebooks and Vertex AI Workbench.
-
-## Google Generative AI Resources
-
-Check out a list of [Google Generative AI Resources](RESOURCES.md) like official product pages, documentation, videos, courses and more.
+|   | <center>Description | Contents |
+|:-:|:------------|:--------:|
+|[<img src="https://storage.googleapis.com/github-repo/gen-app-builder/gen-app-builder.png" width="40px"><br>gen-app-builder/](gen-app-builder/)| Use the [gen-app-builder/](gen-app-builder) folder if you're interested in using [Generative AI App Builder](https://cloud.google.com/generative-ai-app-builder), a Google-managed solution to help you rapidly build chatbots and search engines for websites and across enterprise data. | [Sample apps, <br>use cases](gen-app-builder)|
+|[![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_note/default/40px.svg)<br>language/](language)| Use the [language/](language) folder if you're interested in building your own solutions from scratch using Google's language foundation models (Vertex AI PaLM API).<br><div style='text-align:left'><li> <a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api">text-bison</a> model</li><li> <a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api">chat-bison</a> model</li><li> <a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api">textembedding-gecko</a> model</li><li> prompt design</li><li> deploying apps</li><li> tuning models</li><li> <a href="https://www.langchain.com/">langchain</a> with Google's foundation models</li></div> | [Sample notebooks,<br>apps,<br>use cases](language)|
+|[![](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/image/default/40px.svg)](#)<br>vision | Coming soon! | |
+|[![](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/mic/default/40px.svg)](#)<br>speech | Coming soon! | |
+|[![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/code_blocks/default/40px.svg)<br>setup-env/](setup-env)| Instructions on how to set up Google Cloud, the Vertex AI Python SDK, and notebook environments on Google Colab and Vertex AI Workbench. | [Setup instructions](setup-env)|
+|[![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg)<br>RESOURCES.md](RESOURCES.md) | Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud | [Resources (e.g. videos, blogposts, learning paths)](RESOURCES.md) |
 
 ## Contributing
 
@@ -74,8 +23,10 @@ Contributions welcome! See the [Contributing Guide](https://github.com/GoogleClo
 
 ## Getting help
 
-Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-ai/issues) to provide feedback or submit a bug report.
+Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-ai/issues) to provide suggestions, feedback or submit a bug report.
 
 ## Disclaimer
 
 This repository itself is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
+
+
