@@ -15,7 +15,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
 |![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/image/default/40px.svg)<br>vision | Coming soon! | |
 |![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/mic/default/40px.svg)<br>speech | Coming soon! | |
 |[![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/code_blocks/default/40px.svg)<br>setup-env/](setup-env)| Instructions on how to set up Google Cloud, the Vertex AI Python SDK, and notebook environments on Google Colab and Vertex AI Workbench. | [Setup instructions](setup-env)|
-|[![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg)<br>RESOURCES.md](RESOURCES.md) | Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud | [Resources (e.g. videos, blogposts, learning paths)](setup-env) |
+|[![img](https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg)<br>RESOURCES.md](RESOURCES.md) | Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud | [Resources (e.g. videos, blogposts, learning paths)](RESOURCES.md) |
 
 ## Contributing
 
