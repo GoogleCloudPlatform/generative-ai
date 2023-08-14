@@ -8,7 +8,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
 
 ## Using this repository
 
-<table style='text-align:center;vertical-align:middle' width="100%" cellpadding="1" cellspacing="0">
+<table style="text-align:center;vertical-align:middle" width="100%" cellpadding="1" cellspacing="0">
     <tr>
         <th colspan='5'>generative-ai/</th>
     </tr>
@@ -77,24 +77,24 @@ https://cloud.google.com/generative-ai-app-builder
     </tr>
     <tr>
         <td>
-            <a href="setup_env"><img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/code_blocks/default/40px.svg"><br>setup_env/</a>
+            <a href="setup-env"><img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/code_blocks/default/40px.svg"><br>setup_env/</a>
         </td>
         <td colspan='3'>
             <p> Instructions on how to set up Google Cloud, the Vertex AI Python SDK, and notebook environments on Google Colab and Vertex AI Workbench. </p>
         </td>
         <td>
-            <a href="setup_env">Setup Instructions</a>
+            <a href="setup-env">Setup Instructions</a>
         </td>
     </tr>
     <tr>
         <td>
-            <a href="resources"><img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg"><br>RESOURCES.md</a>
+            <a href="RESOURCES.md"><img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg"><br>RESOURCES.md</a>
         </td>
         <td colspan='3'>
             <p> A collection of learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud </p>
         </td>
         <td>
-            <a href="resources">Resources (e.g. videos, blogposts, learning paths)</a>
+            <a href="RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a>
         </td>
     </tr>
 </table>
