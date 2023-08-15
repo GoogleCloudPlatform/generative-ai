@@ -26,7 +26,7 @@ generative-ai/
     - [Prompt Design/](examples/prompt-design/)
       - [Ideation](examples/prompt-design/ideation.ipynb)
       - [Question & Answering](examples/prompt-design/question_answering.ipynb)
-      - [Text Classifiction](examples/prompt-design/text_classification.ipynb)
+      - [Text Classification](examples/prompt-design/text_classification.ipynb)
       - [Text Extraction](examples/prompt-design/text_extraction.ipynb)
       - [Text Summarization](examples/prompt-design/text_summarization.ipynb)
     - [Reference-architectures/](examples/reference-architectures/)
