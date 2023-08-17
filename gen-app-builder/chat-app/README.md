@@ -43,6 +43,7 @@ for more information.
    you created in an earlier step
 1. To configure the default deploy target, add a line to your `firebase.json`
    with the name of your Firebase Hosting site, such as:
+
    ```json
    {
      "hosting": {
@@ -56,6 +57,7 @@ for more information.
      }
    }
    ```
+
 1. Run `firebase deploy`
 
 ## Access the app
