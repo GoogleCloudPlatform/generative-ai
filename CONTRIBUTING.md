@@ -68,17 +68,16 @@ If you are new to contributing to open source, you can find helpful information 
 
 You may follow these steps to contribute:
 
-1. <b>Fork the official repository.</b> This will create a copy of the official repository in your own account.
-2. <b>Sync the branches.</b> This will ensure that your copy of the repository is up-to-date with the latest changes from the official repository.
-3. <b>Work on your forked repository's dev branch.</b> This is where you will make your changes to the code.
-4. <b>Commit your updates on your forked repository's dev branch.</b> This will save your changes to your copy of the repository.
-5. <b>Submit a pull request to the official repository's dev branch.</b> This will request that your changes be merged into the official repository.
+1. **Fork the official repository.** This will create a copy of the official repository in your own account.
+2. **Sync the branches.** This will ensure that your copy of the repository is up-to-date with the latest changes from the official repository.
+3. **Work on your forked repository's dev branch.** This is where you will make your changes to the code.
+4. **Commit your updates on your forked repository's dev branch.** This will save your changes to your copy of the repository.
+5. **Submit a pull request to the official repository's dev branch.** This will request that your changes be merged into the official repository.
 
 ![image](https://storage.googleapis.com/github-repo/img/contributing/contributor-guide-diagram.jpg)
 
 Here are some additional things to keep in mind during the process:
 
-- <b>Read the [Google's Open Source Community
-Guidelines](https://opensource.google/conduct/).</b> The contribution guidelines will provide you with more information about the project and how to contribute.
-- <b>Test your changes.</b> Before you submit a pull request, make sure that your changes work as expected.
-- <b>Be patient.</b> It may take some time for your pull request to be reviewed and merged.
+- **Read the [Google's Open Source Community Guidelines](https://opensource.google/conduct/).** The contribution guidelines will provide you with more information about the project and how to contribute.
+- **Test your changes.** Before you submit a pull request, make sure that your changes work as expected.
+- **Be patient.** It may take some time for your pull request to be reviewed and merged.
