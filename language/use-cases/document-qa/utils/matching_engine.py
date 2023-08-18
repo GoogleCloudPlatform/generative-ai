@@ -201,6 +201,8 @@ class MatchingEngine(VectorStore):
 
         logger.debug(f"Querying Matching Engine Index Endpoint {rpc_address}")
 
+        request = google.auth.transport.requests.Request()
+        self.credentials.refresh(request)
         header = {"Authorization": "Bearer " + self.credentials.token}
 
         return requests.post(rpc_address, data=endpoint_json_data, headers=header)
