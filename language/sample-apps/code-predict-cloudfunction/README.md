@@ -1,4 +1,4 @@
-# Application 1 : Cloud Function that wraps the PaLM Code Bison Models
+# Cloud Function that wraps the PaLM Code Bison Models
 
 This application demonstrates a Cloud Function written in Python that initializes the Vertex AI module and then provides an endpoint to invoke PaLM Code Bison model.
 
