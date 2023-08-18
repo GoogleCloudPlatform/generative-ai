@@ -1,0 +1,2 @@
+google-cloud-aiplatform==1.27.1
+flask
