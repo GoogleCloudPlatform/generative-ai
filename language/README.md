@@ -24,7 +24,7 @@ language/
 │   └── <a href="sample-apps/chat-gradio/">Chat Application in Gradio on Cloud Run</a>
 │   └── <a href="sample-apps/chat-streamlit/">Chat Application in Streamlit on Cloud Run</a>
 │   └── <a href="sample-apps/code-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Code Model</a>
-│   └── <a href="sample-apps/summarization-gcs-function/">Cloud Function that does summarization using Vertex AI PaLM Text Model</a>
+│   └── <a href="sample-apps/summarization-gcs-cloudfunction/">Cloud Function that does summarization using Vertex AI PaLM Text Model</a>
 │   └── <a href="sample-apps/text-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Text Model</a>
 ├── <a href="tuning">tuning/</a>
 │   └── <a href="tuning/getting_started_tuning.ipynb">[Notebook] Tuning and deploy a foundation model</a>
