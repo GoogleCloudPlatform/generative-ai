@@ -16,12 +16,20 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
     <th style="text-align: center;">Contents</th>
   </tr>
   <tr>
-    <td><img src="https://storage.googleapis.com/github-repo/gen-app-builder/gen-app-builder.png" width="40px"><br><a href="gen-app-builder/"><code>gen-app-builder/</code> </a></td>
+    <td>
+      <img src="https://storage.googleapis.com/github-repo/gen-app-builder/gen-app-builder.png" width="40px">
+      <br>
+      <a href="gen-app-builder/"><code>gen-app-builder/</code></a>
+    </td>
     <td>Use this folder if you're interested in using <a href="https://cloud.google.com/generative-ai-app-builder">Generative AI App Builder</a>, a Google-managed solution to help you rapidly build chatbots and search engines for websites and across enterprise data.</td>
     <td><a href="gen-app-builder">Sample apps, use cases</a></td>
   </tr>
   <tr>
-    <td><img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_note/default/40px.svg"><br><a href="language/"><code>language/</code></a></td>
+    <td>
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_note/default/40px.svg">
+      <br>
+      <a href="language/"><code>language/</code></a>
+    </td>
     <td>
       Use this folder if you're interested in building your own solutions from scratch using Google's language foundation models (Vertex AI PaLM API).
       <ul>
@@ -64,7 +72,11 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
     <td><a href="setup-env">Setup instructions</a></td>
   </tr>
   <tr>
-    <td><img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg"><br><a href="RESOURCES.md"><code>RESOURCES.md</code></a></td>
+    <td>
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg">
+      <br>
+      <a href="RESOURCES.md"><code>RESOURCES.md</code></a>
+    </td>
     <td>Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud</td>
     <td><a href="RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
   </tr>
