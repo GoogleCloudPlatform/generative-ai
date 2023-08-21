@@ -11,11 +11,11 @@ logger = logging.getLogger()
 
 
 class MatchingEngineUtils:
-    def __init__(self, project_id: str, region: str, index_name: str):
+    def __init__(self, project_id: str, region: str, index_name: str, index_endpoint_name: str):
         self.project_id = project_id
         self.region = region
         self.index_name = index_name
-        self.index_endpoint_name = f"{self.index_name}-endpoint"
+        self.index_endpoint_name = index_endpoint_name
         self.PARENT = f"projects/{self.project_id}/locations/{self.region}"
 
         ENDPOINT = f"{self.region}-aiplatform.googleapis.com"
@@ -72,6 +72,9 @@ class MatchingEngineUtils:
         dimensions: int,
         index_update_method: str = "streaming",
         index_algorithm: str = "tree-ah",
+        shard_size: str = "SHARD_SIZE_SMALL",
+        distance_measure_type: str = "DOT_PRODUCT_DISTANCE",
+        description: str = "description"
     ):
         # Get index
         index = self.get_index()
@@ -109,10 +112,10 @@ class MatchingEngineUtils:
                     "dimensions": struct_pb2.Value(number_value=dimensions),
                     "approximateNeighborsCount": struct_pb2.Value(number_value=150),
                     "distanceMeasureType": struct_pb2.Value(
-                        string_value="DOT_PRODUCT_DISTANCE"
+                        string_value=distance_measure_type
                     ),
                     "algorithmConfig": struct_pb2.Value(struct_value=algorithmConfig),
-                    "shardSize": struct_pb2.Value(string_value="SHARD_SIZE_SMALL"),
+                    "shardSize": struct_pb2.Value(string_value=shard_size),
                 }
             )
             metadata = struct_pb2.Struct(
@@ -126,7 +129,7 @@ class MatchingEngineUtils:
 
             index_request = {
                 "display_name": self.index_name,
-                "description": "Index for LangChain demo",
+                "description": description,
                 "metadata": struct_pb2.Value(struct_value=metadata),
                 "index_update_method": index_update_method,
             }
@@ -156,6 +159,7 @@ class MatchingEngineUtils:
         machine_type: str = "e2-standard-2",
         min_replica_count: int = 2,
         max_replica_count: int = 10,
+        public_endpoint_enabled: bool = True,
         network: str = None,
     ):
         try:
@@ -184,7 +188,7 @@ class MatchingEngineUtils:
                 if network:
                     index_endpoint_request["network"] = network
                 else:
-                    index_endpoint_request["public_endpoint_enabled"] = True
+                    index_endpoint_request["public_endpoint_enabled"] = public_endpoint_enabled
 
                 r = self.index_endpoint_client.create_index_endpoint(
                     parent=self.PARENT, index_endpoint=index_endpoint_request
