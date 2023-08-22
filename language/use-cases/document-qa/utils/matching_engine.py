@@ -1,11 +1,9 @@
 """Vertex Matching Engine implementation of the vector store."""
 from __future__ import annotations
 
-import json
 import logging
-import time
 import uuid
-from typing import TYPE_CHECKING, Any, Iterable, List, Optional, Type
+from typing import Any, Iterable, List, Optional, Type
 
 from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
@@ -150,7 +148,7 @@ class MatchingEngine(VectorStore):
             upsert_request = aiplatform_v1.UpsertDatapointsRequest(
                 index=self.index.name, datapoints=insert_datapoints_payload
             )
-            response = self.index_client.upsert_datapoints(request=upsert_request)
+            _ = self.index_client.upsert_datapoints(request=upsert_request)
 
         logger.debug("Updated index with new configuration.")
         logger.info(f"Indexed {len(ids)} documents to Matching Engine.")
@@ -181,7 +179,6 @@ class MatchingEngine(VectorStore):
         """
         import requests
         import json
-        from typing import List
 
         request_data = {
             "deployed_index_id": index_endpoint.deployed_indexes[0].id,
@@ -201,6 +198,8 @@ class MatchingEngine(VectorStore):
 
         logger.debug(f"Querying Matching Engine Index Endpoint {rpc_address}")
 
+        request = google.auth.transport.requests.Request()
+        self.credentials.refresh(request)
         header = {"Authorization": "Bearer " + self.credentials.token}
 
         return requests.post(rpc_address, data=endpoint_json_data, headers=header)
@@ -302,7 +301,7 @@ class MatchingEngine(VectorStore):
         try:
             blob = bucket.blob(gcs_location)
             return blob.download_as_string()
-        except Exception as e:
+        except Exception:
             return ""
 
     @classmethod
@@ -515,7 +514,7 @@ class MatchingEngine(VectorStore):
 
         from google.cloud import aiplatform_v1
 
-        PARENT = f"projects/{project_id}/locations/{region}"
+        # PARENT = f"projects/{project_id}/locations/{region}"
         ENDPOINT = f"{region}-aiplatform.googleapis.com"
         return aiplatform_v1.IndexServiceClient(
             client_options=dict(api_endpoint=ENDPOINT), credentials=credentials
@@ -533,7 +532,7 @@ class MatchingEngine(VectorStore):
 
         from google.cloud import aiplatform_v1
 
-        PARENT = f"projects/{project_id}/locations/{region}"
+        # PARENT = f"projects/{project_id}/locations/{region}"
         ENDPOINT = f"{region}-aiplatform.googleapis.com"
         return aiplatform_v1.IndexEndpointServiceClient(
             client_options=dict(api_endpoint=ENDPOINT), credentials=credentials
