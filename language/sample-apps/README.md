@@ -14,12 +14,12 @@ We provide instructions for setting up your environment in [Cloud Shell](https:/
 
 | Requirement | Application Name | Technologies Used |
 |---|---|---|
-|Develop a chat application using Python Flask framework and Vertex AI PaLM API model |[chat-flask-cloudrun](chat-flask-cloudrun)|Cloud Run, Python Flask|
-|Develop a chat application using [Gradio](https://www.gradio.app/) framework and Vertex AI PaLM API model|[chat-gradio](chat-gradio)|Cloud Run, Gradio, Python|
-|Develop a chat application using [Streamlit](https://streamlit.io/) framework and Vertex AI PaLM API model|[chat-streamlit](chat-streamlit)|Cloud Run, Streamlit, Python|
+|Develop a chat application using Python Flask framework and Vertex AI PaLM API model. |[chat-flask-cloudrun](chat-flask-cloudrun)|Cloud Run, Python Flask|
+|Develop a chat application using [Gradio](https://www.gradio.app/) framework and Vertex AI PaLM API model.|[chat-gradio](chat-gradio)|Cloud Run, Gradio, Python|
+|Develop a chat application using [Streamlit](https://streamlit.io/) framework and Vertex AI PaLM API model.|[chat-streamlit](chat-streamlit)|Cloud Run, Streamlit, Python|
 |Provide an API for the Vertex AI PaLM Code Model for your client applications.|[code-predict-cloudfunction](code-predict-cloudfunction)|Cloud Functions v2, Python|
 |Provide an API for the Vertex AI PaLM Text Model for your client applications.|[text-predict-cloudfunction](text-predict-cloudfunction)|Cloud Functions v2, Python|
-|Develop an Event-Driven application that processes uploaded files and summarizes their content|[summarization-gcs-cloudfunction](summarization-gcs-cloudfunction) |Cloud Functions v2, Cloud Storage, Python|
+|Develop an Event-Driven application that processes uploaded files and summarizes their content. If you are looking for a detailed summarization solution with reference architecture, refer to our [Jump Start Solution - Generative AI Document Summarization](https://cloud.google.com/architecture/ai-ml/generative-ai-document-summarization).|[summarization-gcs-cloudfunction](summarization-gcs-cloudfunction) |Cloud Functions v2, Cloud Storage, Python|
 
 ## (Optional) Using the Custom Samples via Cloud Code for VS Code plugin
 
