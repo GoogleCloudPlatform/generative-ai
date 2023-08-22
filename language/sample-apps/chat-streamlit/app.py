@@ -9,8 +9,6 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://www.extremelycoolapp.com/help',
-        'Report a bug': "https://www.extremelycoolapp.com/bug",
         'About': "# This app shows you how to use Vertex PaLM Text Generator API"
     }
 )
