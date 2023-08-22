@@ -48,10 +48,19 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/image/default/40px.svg">
       <br>
-      <code>vision/</code>
+      <a href="vision/"><code>vision/</code></a>
     </td>
-    <td>Coming soon!</td>
-    <td></td>
+    <td>
+      Use this folder if you're interested in building your own solutions from scratch using featuers from Imagen on Vertex AI (Vertex AI Imagen API).
+      These are the features that Imagen on Vertex AI offers:
+      <ul>
+        <li>Image generation</li>
+        <li>Image editing</li>
+        <li>Visual captioning</li>
+        <li>Visual question answering</li>
+      </ul>
+    </td>
+    <td><a href="vision/">Sample notebooks, apps, use cases</a></td>
   </tr>
   <tr>
     <td>
