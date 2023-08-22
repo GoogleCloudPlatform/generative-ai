@@ -51,7 +51,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
       <a href="vision/"><code>vision/</code></a>
     </td>
     <td>
-      Use this folder if you're interested in building your own solutions from scratch using featuers from Imagen on Vertex AI (Vertex AI Imagen API). 
+      Use this folder if you're interested in building your own solutions from scratch using featuers from Imagen on Vertex AI (Vertex AI Imagen API).
       These are the features that Imagen on Vertex AI offers:
       <ul>
         <li>Image generation</li>
