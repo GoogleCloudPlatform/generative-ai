@@ -2,7 +2,7 @@
 
 This application demonstrates a Cloud Run application that uses the [Streamlit](https://streamlit.io/) framework. 
 
-![Streamlit Chat App Screen](../images/streamlitapp-screen.png "Streamlit Chat App")
+![Streamlit Chat App Screen](../assets/streamlitapp-screen.png "Streamlit Chat App")
 
 ## Build and Deploy the Application to Cloud Run
 
