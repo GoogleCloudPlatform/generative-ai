@@ -1,6 +1,6 @@
 # Retrieval Augmented Generation
 
-_Using Google Cloud Enterprise Search, PaLM and Langchain_
+Using Google Cloud Enterprise Search, PaLM and Langchain
 
 ---
 
@@ -32,7 +32,7 @@ A python [retriever](https://python.langchain.com/docs/modules/data_connection/r
 
 ## Table of Contents
 
-**Please note that these examples make use of the Vertex AI and Generative AI App Builder APIs, which are paid services**
+NOTE: These examples make use of the Vertex AI and Vertex AI Search APIs, which are paid services.
 
 - [Gen App Builder/](/)
   - [Utilities](utils/)
@@ -43,7 +43,7 @@ A python [retriever](https://python.langchain.com/docs/modules/data_connection/r
 For guidelines on contributing, environment setup and general contextual information on Generative AI and Google tools, please see the main [README](../README.md) in the repository root directory.
 
 ```text
-gen-app-builder/                    - this directory
+search/                             - this directory
 ├── utils/
     ├── retriever.py                - definition of the retriever class used in the examples
 ├── examples/                       - examples for question answering over documents

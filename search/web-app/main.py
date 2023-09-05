@@ -50,10 +50,10 @@ FORM_OPTIONS = {
 }
 
 NAV_LINKS = [
-    {"link": "/", "name": "Enterprise Search - Widgets", "icon": "widgets"},
+    {"link": "/", "name": "Widgets", "icon": "widgets"},
     {
         "link": "/search",
-        "name": "Enterprise Search - Custom UI",
+        "name": "Custom UI",
         "icon": "build",
     },
     {

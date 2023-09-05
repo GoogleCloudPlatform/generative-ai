@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Generative AI App Builder Utilities"""
+"""Vertex AI Search Utilities"""
 from os.path import basename
 from typing import Dict, List, Optional, Tuple
 

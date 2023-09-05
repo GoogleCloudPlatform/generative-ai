@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Gen App Builder Demo Constant Definitions"""
+"""Vertex AI Search Demo Constant Definitions"""
 
-PROJECT_ID = "YOUR-PROJECT-ID"
+PROJECT_ID = "YOUR_PROJECT_ID"
 LOCATION = "global"
 
 WIDGET_CONFIGS = [
     {
-        "name": "Contracts",
+        "name": "Contracts (Unstructured)",
         "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         "placeholder": "What is the SLA?",
     },
     {
-        "name": "Finance - Earnings Reports",
+        "name": "Alphabet Earnings Reports (Unstructured)",
         "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         "placeholder": "What was Google's revenue in 2021?",
     },
