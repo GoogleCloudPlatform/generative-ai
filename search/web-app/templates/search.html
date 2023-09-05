@@ -137,7 +137,7 @@
                       <h2 class="mdc-typography mdc-typography--headline6">{{result["title"]}}</h2>
                       <h3 class="mdc-typography mdc-typography--subtitle2">
                         {% set resultUrl = result["link"] %} URL:
-                        <a href="{{resultUrl}}" target="_blank"
+                        <a href="{{resultUrl}}" target="_blank" rel="noopener noreferrer"
                           >{{result["htmlFormattedUrl"]|safe}}</a
                         >
                       </h3>

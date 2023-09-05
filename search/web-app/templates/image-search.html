@@ -163,7 +163,9 @@
                       <h2 class="mdc-typography mdc-typography--headline6">{{result["title"]}}</h2>
                       <h3 class="mdc-typography mdc-typography--subtitle2">
                         {% set resultUrl = result["htmlFormattedUrl"] %} URL:
-                        <a href="{{resultUrl}}" target="_blank">{{result["displayLink"]|safe}}</a>
+                        <a href="{{resultUrl}}" target="_blank" rel="noopener noreferrer"
+                          >{{result["displayLink"]|safe}}</a
+                        >
                       </h3>
                     </div>
                     {% for snippet in result["snippets"] %}

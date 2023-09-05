@@ -87,7 +87,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
    - `gcloud run deploy vertex-ai-search-demo --source .`
 
 6. Visit the deployed web page
-   - Example: [`https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app`](https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app)
+   - Example: [`https://vertex-ai-search-demo-lnppzg3rxa-uc.a.run.app`](https://vertex-ai-search-demo-lnppzg3rxa-uc.a.run.app)
 
 ---
 
