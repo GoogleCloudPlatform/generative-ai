@@ -2,7 +2,7 @@
 
 Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai) repository.
 
-This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai) and [Generative AI App Builder](https://cloud.google.com/generative-ai-app-builder).
+This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai).
 
 For more Vertex AI samples, please visit the [Vertex AI samples Github repository](https://github.com/GoogleCloudPlatform/vertex-ai-samples/).
 
@@ -17,12 +17,21 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
   </tr>
   <tr>
     <td>
-      <img src="https://storage.googleapis.com/github-repo/gen-app-builder/gen-app-builder.png" width="40px">
+      <img src="https://www.gstatic.com/images/branding/gcpiconscolors/service_discovery/v1/24px.svg" width="40px">
       <br>
-      <a href="gen-app-builder/"><code>gen-app-builder/</code></a>
+      <a href="search/"><code>search/</code></a>
     </td>
-    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/generative-ai-app-builder">Generative AI App Builder</a>, a Google-managed solution to help you rapidly build chatbots and search engines for websites and across enterprise data.</td>
-    <td><a href="gen-app-builder">Sample apps, use cases</a></td>
+    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/enterprise-search">Vertex AI Search</a>, a Google-managed solution to help you rapidly build search engines for websites and across enterprise data. (Formerly known as Enterprise Search on Generative AI App Builder)</td>
+    <td><a href="search">Sample apps, use cases</a></td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://www.gstatic.com/images/branding/gcpiconscolors/dialogflow_cx/v1/24px.svg" width="40px">
+      <br>
+      <a href="conversation/"><code>conversation/</code></a>
+    </td>
+    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Conversation</a>, a Google-managed solution to help you rapidly build chat bots for websites and across enterprise data. (Formerly known as Chat Apps on Generative AI App Builder)</td>
+    <td><a href="conversation">Sample apps, use cases</a></td>
   </tr>
   <tr>
     <td>

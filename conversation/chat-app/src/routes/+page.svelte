@@ -73,7 +73,7 @@
     <NavLi href="https://codelabs.developers.google.com/codelabs/gen-app-builder-chat"
       >Codelab</NavLi>
     <NavLi
-      href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gen-app-builder/chat-app"
+      href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/conversation/chat-app"
       >Source code</NavLi>
   </NavUl>
 </Navbar>
