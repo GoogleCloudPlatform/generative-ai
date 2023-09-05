@@ -5,30 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Google+Sans:300,400,500,700"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
+      href="https://fonts.googleapis.com/css?family=Google+Sans:300,400,500,700" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link
       href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"
-      rel="stylesheet"
-    />
+      rel="stylesheet" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-    />
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
-    />
+      href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css" />
     <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}" />
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="{{url_for('static', filename='favicon.ico')}}"
-    />
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='favicon.ico')}}" />
     <title>Personalize Demo</title>
   </head>
 
@@ -39,15 +28,9 @@
           <div class="mdc-tab-scroller__scroll-content">
             {% for n in nav_links %}
             <a class="tab-nav" href="{{n.link}}">
-              <button
-                class="mdc-tab mdc-tab--active nav-button"
-                role="tab"
-                tabindex="0"
-              >
+              <button class="mdc-tab mdc-tab--active nav-button" role="tab" tabindex="0">
                 <span class="mdc-tab__content">
-                  <span class="mdc-tab__icon material-icons" aria-hidden="true"
-                    >{{n.icon}}</span
-                  >
+                  <span class="mdc-tab__icon material-icons" aria-hidden="true">{{n.icon}}</span>
                   <span class="mdc-tab__text-label">{{n.name}}</span>
                 </span>
               </button>
@@ -62,23 +45,17 @@
         <img
           class="gen-app-builder-logo"
           src="{{url_for('static', filename='gen-app-builder-logo.svg')}}"
-          alt="Generative AI App Builder"
-        />
+          alt="Vertex AI Search" />
       </a>
       <h1>Recommendations Demo - Custom UI</h1>
       <p>
-        Select a document from the list to view recommendations of similar
-        documents in the dataset.
+        Select a document from the list to view recommendations of similar documents in the dataset.
       </p>
     </section>
     <main id="active-area">
       <form class="search-form" action="/recommend_genappbuilder" method="post">
         <!-- Attribution Token -->
-        <input
-          type="hidden"
-          name="attribution_token"
-          value="{{ attribution_token }}"
-        />
+        <input type="hidden" name="attribution_token" value="{{ attribution_token }}" />
         <!-- Document Selection Menu -->
         <div class="mdc-select mdc-select--filled document-selection">
           <input type="hidden" name="document_id" />
@@ -87,54 +64,37 @@
             role="button"
             aria-haspopup="listbox"
             aria-expanded="false"
-            aria-labelledby="document-label document-selected-text"
-          >
+            aria-labelledby="document-label document-selected-text">
             <span class="mdc-select__ripple"></span>
             <span id="document-label" class="mdc-floating-label"
               >Get recommendations for a Document</span
             >
             <span class="mdc-select__selected-text-container">
-              <span
-                id="document-selected-text"
-                class="mdc-select__selected-text"
-              ></span>
+              <span id="document-selected-text" class="mdc-select__selected-text"></span>
             </span>
             <span class="mdc-select__dropdown-icon">
-              <svg
-                class="mdc-select__dropdown-icon-graphic"
-                viewBox="7 10 10 5"
-                focusable="false"
-              >
+              <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
                 <polygon
                   class="mdc-select__dropdown-icon-inactive"
                   stroke="none"
                   fill-rule="evenodd"
-                  points="7 10 12 15 17 10"
-                ></polygon>
+                  points="7 10 12 15 17 10"></polygon>
                 <polygon
                   class="mdc-select__dropdown-icon-active"
                   stroke="none"
                   fill-rule="evenodd"
-                  points="7 15 12 10 17 15"
-                ></polygon>
+                  points="7 15 12 10 17 15"></polygon>
               </svg>
             </span>
             <span class="mdc-line-ripple"></span>
           </div>
-          <div
-            class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth"
-          >
-            <ul
-              class="mdc-list"
-              role="listbox"
-              aria-label="Document picker listbox"
-            >
+          <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
+            <ul class="mdc-list" role="listbox" aria-label="Document picker listbox">
               <li
                 class="mdc-list-item mdc-list-item--selected"
                 aria-selected="true"
                 data-value=""
-                role="option"
-              >
+                role="option">
                 <span class="mdc-list-item__ripple"></span>
               </li>
               {% for d in documents %}
@@ -142,8 +102,7 @@
                 class="mdc-list-item document-list-item"
                 aria-selected="false"
                 data-value="{{ d.id }}"
-                role="option"
-              >
+                role="option">
                 <span class="mdc-list-item__ripple"></span>
                 <span class="mdc-list-item__text"> {{ d.title }} </span>
               </li>
@@ -155,12 +114,9 @@
         <div class="button-container">
           <button
             type="submit"
-            class="search-button mdc-button mdc-button--outlined mdc-button--icon-leading"
-          >
+            class="search-button mdc-button mdc-button--outlined mdc-button--icon-leading">
             <span class="mdc-button__ripple"></span>
-            <i class="material-icons mdc-button__icon" aria-hidden="true"
-              >search</i
-            >
+            <i class="material-icons mdc-button__icon" aria-hidden="true">search</i>
             <span class="mdc-button__label">Search</span>
           </button>
         </div>
@@ -168,15 +124,11 @@
       {% if message_error %}
       <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner">
-          <div
-            class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"
-          ></div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
           <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
             <pre>{{message_error}}</pre>
           </div>
-          <div
-            class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"
-          ></div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
         </div>
       </div>
       {% elif message_success %}
@@ -189,37 +141,25 @@
                 class="mdc-tab mdc-tab--active"
                 role="tab"
                 aria-selected="true"
-                tabindex="0"
-              >
+                tabindex="0">
                 <span class="mdc-tab__content">
-                  <span class="mdc-tab__icon material-icons" aria-hidden="true"
-                    >dataset</span
-                  >
+                  <span class="mdc-tab__icon material-icons" aria-hidden="true">dataset</span>
                   <span class="mdc-tab__text-label">Results</span>
                 </span>
                 <span class="mdc-tab-indicator mdc-tab-indicator--active">
                   <span
-                    class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"
-                  ></span>
+                    class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
                 </span>
                 <span class="mdc-tab__ripple"></span>
               </button>
-              <button
-                id="json-tab-selector"
-                class="mdc-tab mdc-tab"
-                role="tab"
-                tabindex="1"
-              >
+              <button id="json-tab-selector" class="mdc-tab mdc-tab" role="tab" tabindex="1">
                 <span class="mdc-tab__content">
-                  <span class="mdc-tab__icon material-icons" aria-hidden="true"
-                    >code</span
-                  >
+                  <span class="mdc-tab__icon material-icons" aria-hidden="true">code</span>
                   <span class="mdc-tab__text-label">JSON</span>
                 </span>
                 <span class="mdc-tab-indicator">
                   <span
-                    class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"
-                  ></span>
+                    class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
                 </span>
                 <span class="mdc-tab__ripple"></span>
               </button>
@@ -230,18 +170,13 @@
       <div class="tab-content">
         <div id="entities-tab" class="tab-visible">
           {% if results|length == 0 %}
-          <p class="empty-results-message">
-            No recommendations were found for this document.
-          </p>
+          <p class="empty-results-message">No recommendations were found for this document.</p>
           {% endif %} {% for result in results %}
           <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
               <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
                 <div class="mdc-card mdc-card--outlined">
-                  <div
-                    class="mdc-card__primary-action entity-primary-action"
-                    tabindex="0"
-                  >
+                  <div class="mdc-card__primary-action entity-primary-action" tabindex="0">
                     <div class="entity-card-primary">
                       {% set resultUrl = result["link"] %}
                       <a href="{{resultUrl}}" target="_blank">
@@ -272,16 +207,12 @@
           {% if request_url %}
           <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
-              <div
-                class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"
-              ></div>
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
               <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
                 <b>Request URL:</b>
                 <pre><code class="language-shell" lang="shell">{{request_url}}</code></pre>
               </div>
-              <div
-                class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"
-              ></div>
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
             </div>
           </div>
           {% endif %}
@@ -306,23 +237,18 @@
     </main>
     <section class="footer">
       <p>
-        Made by <a href="https://github.com/holtskinner">holtskinner@</a> -
-        Source on
-        <a
-          href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gen-app-builder/search-web-app"
+        Made by <a href="https://github.com/holtskinner">holtskinner@</a> - Source on
+        <a href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/search/web-app"
           >GitHub</a
         >
       </p>
       <p>
         Powered by
-        <a
-          href="https://cloud.google.com/generative-ai-app-builder/docs/try-personalize"
+        <a href="https://cloud.google.com/generative-ai-app-builder/docs/try-personalize"
           >Personalize</a
         >
         with
-        <a href="https://cloud.google.com/generative-ai-app-builder"
-          >Generative AI App Builder</a
-        >
+        <a href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Search</a>
         on <a href="https://cloud.google.com/">Google Cloud</a>
       </p>
     </section>
