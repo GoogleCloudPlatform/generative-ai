@@ -32,7 +32,7 @@ A python [retriever](https://python.langchain.com/docs/modules/data_connection/r
 
 ## Table of Contents
 
-**NOTE:** Please note that these examples make use of the Vertex AI and Generative AI App Builder APIs, which are paid services.
+NOTE: These examples make use of the Vertex AI and Vertex AI Search APIs, which are paid services.
 
 - [Gen App Builder/](/)
   - [Utilities](utils/)
