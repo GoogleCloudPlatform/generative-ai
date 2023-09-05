@@ -14,7 +14,7 @@
 
 """Vertex AI Search Demo Constant Definitions"""
 
-PROJECT_ID = "document-ai-test-337818"
+PROJECT_ID = "YOUR_PROJECT_ID"
 LOCATION = "global"
 
 WIDGET_CONFIGS = [

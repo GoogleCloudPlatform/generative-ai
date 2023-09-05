@@ -1,6 +1,6 @@
 # Retrieval Augmented Generation
 
-_Using Google Cloud Enterprise Search, PaLM and Langchain_
+Using Google Cloud Enterprise Search, PaLM and Langchain
 
 ---
 
