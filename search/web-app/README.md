@@ -1,8 +1,8 @@
-# Generative AI App Builder - Enterprise Search Demo
+# Vertex AI Search Demo
 
-> NOTE: Some of the links in this file require allowlist access to Generative AI App Builder in order to view. If you would like early access to the product, apply to become a [Trusted Tester for Google Cloud Generative AI][trustedtester].
+> NOTE: Some of the features in this demo require allowlist access. If you would like early access, apply to become a [Trusted Tester for Google Cloud Generative AI][trustedtester].
 
-This demo illustrates how to search through a corpus of documents using [Enterprise Search][enterprisesearch] on [Generative AI App Builder][genappbuilder].
+This demo illustrates how to search through a corpus of documents using [Vertex AI Search][enterprisesearch] (formerly known as Enterprise Search).
 
 Additional features include how to search the public Cloud Knowledge Graph using the [Enterprise Knowledge Graph][enterpriseknowledgegraph] API.
 
@@ -10,8 +10,8 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
 ### Google Cloud Products Used
 
-- [Generative AI App Builder: Enterprise Search][enterprisesearch]
-- [Generative AI App Builder: Recommendations][try_recommendations]
+- [Vertex AI Search][enterprisesearch]
+- [Vertex AI Search: Recommendations][try_recommendations]
 - [Cloud Run][cloudrun]
 - [Enterprise Knowledge Graph][enterpriseknowledgegraph]
 
@@ -44,7 +44,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
    - `pip install -r requirements.txt`
 4. Run `gcloud init`, create a new project, and
    [enable billing](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project)
-5. Enable the Generative AI App Builder API:
+5. Enable the Vertex AI Search API:
    - `gcloud services enable discoveryengine.googleapis.com`
 6. Enable the Enterprise Knowledge Graph API:
    - `gcloud services enable enterpriseknowledgegraph.googleapis.com`
@@ -57,7 +57,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
 1. Update the `consts.py` file with your own `PROJECT_ID` and `LOCATION`.
 
-2. Configure Enterprise Search
+2. Configure Vertex AI Search
 
    - To use the prebuilt widget provided in the Cloud Console for Enterprise, Copy the `configId` from the `<gen-search-widget>` in the `Integration > Widget` tab.
      - ![configId](img/configId.png)
@@ -79,25 +79,24 @@ Additional features include how to search the public Cloud Knowledge Graph using
 4. Configure Image Search
 
    - Follow the instructions in the documentation to [enable image search](https://cloud.google.com/generative-ai-app-builder/docs/image-search#enable-advanced) for a search engine.
-   - This feature is in early access and requires separate allowlisting from the rest of Enterprise Search in order to use.
+   - This feature is in early access and requires separate allowlisting from the rest of Vertex AI Search in order to use.
    - Add the datastore id for your search engine to `IMAGE_SEARCH_DATASTORE_IDs` in `consts.py`.
 
 5. Deploy the Cloud Run app in your project.
 
-   - `gcloud run deploy genappbuilder-demo --source .`
+   - `gcloud run deploy vertex-ai-search-demo --source .`
 
 6. Visit the deployed web page
-   - Example: [`https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app`](https://genappbuilder-demo-lnppzg3rxa-uc.a.run.app)
+   - Example: [`https://vertex-ai-search-demo-lnppzg3rxa-uc.a.run.app`](https://vertex-ai-search-demo-lnppzg3rxa-uc.a.run.app)
 
 ---
 
 > Copyright 2023 Google LLC
 > Author: Holt Skinner @holtskinner
 
-[genappbuilder]: https://cloud.google.com/generative-ai-app-builder/
 [cloudrun]: https://cloud.google.com/run
 [enterpriseknowledgegraph]: https://cloud.google.com/enterprise-knowledge-graph/docs/overview
 [enterprisesearch]: https://cloud.google.com/enterprise-search
 [try_recommendations]: https://cloud.google.com/generative-ai-app-builder/docs/try-personalize
 [try_search]: https://cloud.google.com/generative-ai-app-builder/docs/try-enterprise-search
-[trustedtester]: https://cloud.google.com/ai/earlyaccess/join?hl=en
+[trustedtester]: https://cloud.google.com/ai/earlyaccess/join
