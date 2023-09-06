@@ -62,9 +62,9 @@
 
 <Navbar let:hidden let:toggle class="bg-[#B1D6FC]">
   <NavBrand href="/">
-    <img src="gen-app-builder-logo.png" class="mr-3 h-6 sm:h-9" alt="Gen App Builder" />
+    <img src="gen-app-builder-logo.png" class="mr-3 h-6 sm:h-9" alt="Vertex AI Conversation" />
     <span class="self-center whitespace-nowrap text-xl font-semibold text-black dark:text-white"
-      >Gen App Builder - Chat App Demo</span>
+      >Vertex AI Conversation Demo</span>
   </NavBrand>
   <NavUl {hidden}>
     <NavLi href="/" active={true}>Home</NavLi>
@@ -88,7 +88,7 @@
             href="https://cloud.google.com/generative-ai-app-builder/docs/agent-intro"
             class="font-medium hover:underline">Generative AI Agent</A> is a feature within <A
             href="https://cloud.google.com/generative-ai-app-builder"
-            class="font-medium hover:underline">Generative AI App Builder</A> that is built on top of
+            class="font-medium hover:underline">Vertex AI Conversation</A> that is built on top of
           <A href="https://cloud.google.com/dialogflow" class="font-medium hover:underline"
             >Dialogflow CX</A
           >.
@@ -111,7 +111,7 @@
         <p class="mt-6 align-bottom font-normal text-gray-700 dark:text-gray-400">
           Powered by <A
             class="font-medium hover:underline"
-            href="https://cloud.google.com/generative-ai-app-builder">Gen App Builder</A> and
+            href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Conversation</A> and
           <A class="font-medium hover:underline" href="https://cloud.google.com/dialogflow"
             >Dialogflow CX</A>
           in <A class="font-medium hover:underline" href="https://cloud.google.com/"
@@ -127,7 +127,7 @@
           storage-option="none"
           class="drop-shadow-lg">
           <df-messenger-chat
-            chat-title="Google Store - Generative AI Agent"
+            chat-title="Google Store - Vertex AI Conversation"
             bot-writing-text="..."
             placeholder-text="Ask me anything about the Google Store..." />
         </df-messenger>
