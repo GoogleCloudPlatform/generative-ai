@@ -4,11 +4,11 @@
 
 [Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
 is a feature within
-[Generative AI App Builder](https://cloud.google.com/generative-ai-app-builder)
+[Vertex AI Conversation](https://cloud.google.com/generative-ai-app-builder)
 that is built on top of functionality in
 [Dialogflow CX](https://cloud.google.com/dialogflow).
 
-![Gen App Builder - Chat App Demo](static/gen-app-builder-chat.png)
+![Vertex AI Conversation Demo](static/gen-app-builder-chat.png)
 
 With Generative AI Agent, you can provide a website domain, structured data, or
 unstructured data, then Generative AI Agent parses your content and creates a
@@ -17,7 +17,7 @@ customers and end users can then have conversations with the agent and ask
 questions about the content. Refer to the
 [Generative AI Agent documentation](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
 and codelab to
-[Create a Generative Chat App with Gen App Builder](https://codelabs.developers.google.com/codelabs/gen-app-builder-chat)
+[Create a Generative Chat App with Vertex AI Conversation](https://codelabs.developers.google.com/codelabs/gen-app-builder-chat)
 for more information.
 
 ## Steps to build the web app
@@ -66,8 +66,7 @@ In your browser, navigate to your deployed app using a URL similar to:
 
 [https://gen-app-builder-chat.web.app/](https://gen-app-builder-chat.web.app/)
 
-Congratulations, you've successfully deployed the Gen App Builder - Chat App
-Demo!
+Congratulations, you've successfully deployed the Vertex AI Conversation Demo!
 
 ## Additional resources
 
@@ -77,5 +76,5 @@ these guides and resources:
 - [Documentation for Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs)
 - [Overview of Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
 - [Documentation for Generative AI Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
-- [Documentation for Gen App Builder](https://cloud.google.com/generative-ai-app-builder/docs/introduction)
+- [Documentation for Vertex AI Conversation](https://cloud.google.com/generative-ai-app-builder/docs/introduction)
 - [Generative AI in Google Cloud](https://cloud.google.com/ai/generative-ai)
