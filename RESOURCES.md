@@ -12,7 +12,7 @@ Please submit additional resources via a PR.
 
 - Generative AI support on [Vertex AI](https://cloud.google.com/vertex-ai)
   - [Overview](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview)
-  - [Generative AI Studio](https://cloud.google.com/generative-ai-studio) 
+  - [Generative AI Studio](https://cloud.google.com/generative-ai-studio)
   - [Available Models](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/generative-ai-studio)
     - Language Models ([Text](https://cloud.google.com/vertex-ai/docs/generative-ai/text/text-overview), [Code](https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview), [Chat](https://cloud.google.com/vertex-ai/docs/generative-ai/chat/chat-prompts))
     - Image Models ([link](https://cloud.google.com/vertex-ai/docs/generative-ai/image/overview))
@@ -28,7 +28,7 @@ Please submit additional resources via a PR.
   - [Prototyping Language Apps with Generative AI Studio](https://www.youtube.com/watch?v=9_zwIyutN7o&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=2&t=1s&pp=iAQB)
   - [How to tune LLMs in Generative AI Studio](https://www.youtube.com/watch?v=4A4W03qUTsw&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=3&pp=iAQB)
   - [Introduction to foundational models on Google Cloud](https://www.youtube.com/watch?v=YCZ6nwGnL4o&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=4&pp=iAQB)
-  - [Enterprise Search via Generative AI App Builder](https://www.youtube.com/watch?v=fY8aOe6H2nw&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=5&pp=iAQB) 
+  - [Enterprise Search via Generative AI App Builder](https://www.youtube.com/watch?v=fY8aOe6H2nw&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=5&pp=iAQB)
   - [Generate and edit images with Generative AI Studio](https://www.youtube.com/watch?v=6n5ngB88DHU&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn)
   - [Introduction to Vertex AI Model Garden](https://www.youtube.com/watch?v=I7UiSU96CLc&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=8)
   - [Which AI/ML solution on Vertex AI](https://www.youtube.com/watch?v=AtyCqaOGoj4)
