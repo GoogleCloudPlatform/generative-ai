@@ -14,6 +14,7 @@
  */
 
 hljs.highlightAll();
+hljs.addPlugin(new CopyButtonPlugin());
 
 mdc.autoInit();
 
