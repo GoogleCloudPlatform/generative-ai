@@ -55,7 +55,7 @@ def search_enterprise_search(
     params: Optional[Dict] = None,
 ) -> Tuple[List[Dict[str, str | List]], str, str, str]:
     if bool(search_query) == bool(image_bytes):
-        raise Exception("Cannot provide both search_query and image_bytes")
+        raise ValueError("Cannot provide both search_query and image_bytes")
 
     # Create a client
     client = discoveryengine.SearchServiceClient()
@@ -72,7 +72,7 @@ def search_enterprise_search(
     # Configuration options for search
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
         snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
-            max_snippet_count=5, return_snippet=True
+            return_snippet=True
         ),
         summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
             summary_result_count=5,
@@ -107,8 +107,8 @@ def search_enterprise_search(
 
     try:
         response_pager = client.search(request)
-    except Exception:
-        raise Exception("An internal error occured")
+    except Exception as exc:
+        raise exc
 
     response = discoveryengine.SearchResponse(
         results=response_pager.results,
@@ -127,7 +127,7 @@ def search_enterprise_search(
 
     request_json = discoveryengine.SearchRequest.to_json(
         request,
-        including_default_value_fields=True,
+        including_default_value_fields=False,
         use_integers_for_enums=False,
         indent=JSON_INDENT,
     )
@@ -229,7 +229,7 @@ def recommend_personalize(
     )
 
     request_json = discoveryengine.RecommendRequest.to_json(
-        request, including_default_value_fields=True, indent=JSON_INDENT
+        request, including_default_value_fields=False, indent=JSON_INDENT
     )
     response_json = discoveryengine.RecommendResponse.to_json(
         response, including_default_value_fields=True, indent=JSON_INDENT
