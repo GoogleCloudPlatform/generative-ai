@@ -38,7 +38,7 @@ language/
     │   └── <a href="use-cases/description-generation/product_description_generator_image.ipynb">[Notebook] Product Description Generator From Image</a>
     ├── <a href="use-cases/document-qa">document-qa/</a>
     │   ├── <a href="use-cases/document-qa/question_answering_documentai_matching_engine_palm.ipynb">[Notebook] Question answering with Documents using Document AI, Matching Engine, and PaLM</a>
-    │   ├── <a href="use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb">[Notebook] Question Answering with Documents using LangChain 🦜️🔗 and Vertex AI Matching Engine</a>
+    │   ├── <a href="use-cases/document-qa/question_answering_documentai_vector_store_palm.ipynb">[Notebook] Question Answering with Documents using LangChain 🦜️🔗 and Vertex AI Matching Engine</a>
     │   ├── <a href="use-cases/document-qa/question_answering_documents.ipynb">[Notebook] Question Answering with Large Documents</a>
     │   └── <a href="use-cases/document-qa/question_answering_documents_langchain.ipynb">[Notebook] Question Answering with Large Documents using LangChain 🦜🔗</a>
     └── <a href="use-cases/document-summarization">document-summarization/</a>
