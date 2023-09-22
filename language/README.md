@@ -21,6 +21,13 @@ language/
 ├── <a href="orchestration">orchestration/</a>
 │   └── <a href="orchestration/langchain">langchain/</a>
 │       └── <a href="orchestration/langchain/intro_langchain_palm_api.ipynb">[Notebook] Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API</a>
+├── <a href="sample-apps">sample-apps/</a>
+│   └── <a href="sample-apps/chat-flask-cloudrun/">Chat Application in Python Flask on Cloud Run</a>
+│   └── <a href="sample-apps/chat-gradio/">Chat Application in Gradio on Cloud Run</a>
+│   └── <a href="sample-apps/chat-streamlit/">Chat Application in Streamlit on Cloud Run</a>
+│   └── <a href="sample-apps/code-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Code Model</a>
+│   └── <a href="sample-apps/summarization-gcs-cloudfunction/">Cloud Function that does summarization using Vertex AI PaLM Text Model</a>
+│   └── <a href="sample-apps/text-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Text Model</a>
 ├── <a href="tuning">tuning/</a>
 │   └── <a href="tuning/getting_started_tuning.ipynb">[Notebook] Tuning and deploy a foundation model</a>
 └── <a href="use-cases">use-cases/</a>
@@ -31,7 +38,7 @@ language/
     │   └── <a href="use-cases/description-generation/product_description_generator_image.ipynb">[Notebook] Product Description Generator From Image</a>
     ├── <a href="use-cases/document-qa">document-qa/</a>
     │   ├── <a href="use-cases/document-qa/question_answering_documentai_matching_engine_palm.ipynb">[Notebook] Question answering with Documents using Document AI, Matching Engine, and PaLM</a>
-    │   ├── <a href="use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb">[Notebook] Question Answering with Documents using LangChain 🦜️🔗 and Vertex AI Matching Engine</a>
+    │   ├── <a href="use-cases/document-qa/question_answering_documentai_vector_store_palm.ipynb">[Notebook] Question Answering with Documents using LangChain 🦜️🔗 and Vertex AI Matching Engine</a>
     │   ├── <a href="use-cases/document-qa/question_answering_documents.ipynb">[Notebook] Question Answering with Large Documents</a>
     │   └── <a href="use-cases/document-qa/question_answering_documents_langchain.ipynb">[Notebook] Question Answering with Large Documents using LangChain 🦜🔗</a>
     └── <a href="use-cases/document-summarization">document-summarization/</a>

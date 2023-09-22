@@ -1,9 +1,0 @@
-typing
-requests
-
-google-api-core
-google-cloud-enterpriseknowledgegraph
-google-cloud-discoveryengine>=0.10.0
-
-Flask
-gunicorn
