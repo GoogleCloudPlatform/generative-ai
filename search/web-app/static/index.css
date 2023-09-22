@@ -31,8 +31,8 @@ body {
 
 .gen-app-builder-logo,
 .ekg-logo {
-  height: 100px;
-  padding-top: 30px;
+  height: 3rem;
+  padding-top: 1rem;
   fill: currentcolor;
 }
 
@@ -43,7 +43,20 @@ body {
 .file-upload {
   display: block;
   width: 350px;
+}
+
+.schema-info,
+.types-field,
+.file-upload {
   margin: 20px auto;
+}
+
+.query-field {
+  margin: 1rem auto 2rem;
+}
+
+.search-engine-name {
+  margin: 1.5rem auto 1rem;
 }
 
 .button-container {
@@ -196,4 +209,16 @@ a:active {
 
 .file-upload-input {
   display: none;
+}
+
+.sample-image-text {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.sample-images {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
