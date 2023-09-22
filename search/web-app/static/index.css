@@ -210,3 +210,15 @@ a:active {
 .file-upload-input {
   display: none;
 }
+
+.sample-image-text {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.sample-images {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

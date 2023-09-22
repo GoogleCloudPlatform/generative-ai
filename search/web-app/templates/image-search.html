@@ -98,6 +98,30 @@
           </button>
         </div>
       </form>
+      {% if not message_success %}
+      <div class="mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+            <p class="sample-image-text">Here are some sample images to try:</p>
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+        </div>
+        <div class="mdc-layout-grid__inner">
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+            <img src="{{url_for('static', filename='blue_pack.jpeg')}}" alt="Blue Pack" width="150">
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+            <img src="{{url_for('static', filename='lego_cloud.png')}}" alt="Lego Cloud" width="150">
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+            <img src="{{url_for('static', filename='socks.jpg')}}" alt="Purple Socks" width="150">
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+        </div>
+      </div>
+      {% endif %}
       {% if message_error %}
       <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner">
