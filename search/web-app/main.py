@@ -67,6 +67,11 @@ NAV_LINKS = [
         "icon": "recommend",
     },
     {"link": "/ekg", "name": "Enterprise Knowledge Graph", "icon": "scatter_plot"},
+    {
+        "link": "https://github.com/GoogleCloudPlatform/generative-ai/tree/main/search/web-app",
+        "name": "Source Code",
+        "icon": "code",
+    },
 ]
 
 RECOMMENDATIONS_DOCUMENTS = list_documents(
