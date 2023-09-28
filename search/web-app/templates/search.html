@@ -67,25 +67,18 @@
         </div>
         <!-- Radio Buttons for Search Engine -->
         <div class="search-engine-radio">
-          <label class="mdc-radio">
-            <input type="radio" class="mdc-radio__native-control" name="search_engine" value="0" checked />
+        {% for engine_name in search_engines %}
+        <label class="mdc-radio">
+            <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}"
+                {% if loop.index0 == 0 %} checked {% endif %} />
             <div class="mdc-radio__background">
-              <div class="mdc-radio__outer-circle"></div>
-              <div class="mdc-radio__inner-circle"></div>
+                <div class="mdc-radio__outer-circle"></div>
+                <div class="mdc-radio__inner-circle"></div>
             </div>
             <div class="mdc-radio__ripple"></div>
-            <span class="mdc-radio__label">Google Cloud Website</span>
-          </label>
-
-          <label class="mdc-radio">
-            <input type="radio" class="mdc-radio__native-control" name="search_engine" value="1" />
-            <div class="mdc-radio__background">
-              <div class="mdc-radio__outer-circle"></div>
-              <div class="mdc-radio__inner-circle"></div>
-            </div>
-            <div class="mdc-radio__ripple"></div>
-            <span class="mdc-radio__label">Google Merchandise Store (Advanced Indexing)</span>
-          </label>
+            <span class="mdc-radio__label">{{ engine_name }}</span>
+        </label>
+        {% endfor %}
         </div>
         <!-- Search Button -->
         <div class="button-container">

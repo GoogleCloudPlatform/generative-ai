@@ -102,9 +102,9 @@ def search() -> str:
     """
     Web Server, Homepage for Search - Custom UI
     """
+    search_engines = [d["name"] for d in CUSTOM_UI_DATASTORE_IDS]
     return render_template(
-        "search.html",
-        nav_links=NAV_LINKS,
+        "search.html", nav_links=NAV_LINKS, search_engines=search_engines
     )
 
 
