@@ -60,7 +60,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
       <a href="vision/"><code>vision/</code></a>
     </td>
     <td>
-      Use this folder if you're interested in building your own solutions from scratch using featuers from Imagen on Vertex AI (Vertex AI Imagen API).
+      Use this folder if you're interested in building your own solutions from scratch using features from Imagen on Vertex AI (Vertex AI Imagen API).
       These are the features that Imagen on Vertex AI offers:
       <ul>
         <li>Image generation</li>
@@ -75,10 +75,12 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/mic/default/40px.svg">
       <br>
-      <code>speech/</code>
+      <a href="speech/"><code>speech/</code></a>
     </td>
-    <td>Coming soon!</td>
-    <td></td>
+    <td>
+      Use this folder if you're interested in building your own solutions from scratch using features from Chirp, a version of Google's Universal Speech Model (USM) on Vertex AI (Vertex AI Chirp API).
+    </td>
+    <td><a href="speech/">Sample notebooks, apps, use cases</a></td>
   </tr>
   <tr>
     <td>
