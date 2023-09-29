@@ -222,3 +222,14 @@ a:active {
   align-items: center;
   justify-content: center;
 }
+
+.search-form .search-engine-radio {
+  text-align: center;
+  margin: 1rem auto;
+  height: 8rem;
+}
+
+.search-form .mdc-radio {
+  margin-right: 3rem;
+  vertical-align: top;
+}

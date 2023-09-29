@@ -35,6 +35,10 @@ CUSTOM_UI_DATASTORE_IDS = [
         "name": "Google Cloud Website",
         "datastore_id": "google-cloud-site-search_xxxxxxxx",
     },
+    {
+        "name": "Google Merchandise Store (Advanced Indexing)",
+        "datastore_id": "google-merch-store_xxxxxxxx",
+    },
 ]
 
 
