@@ -46,7 +46,7 @@
         .querySelector("df-messenger-chat")
         .shadowRoot.querySelector("df-messenger-user-input")
         .shadowRoot.querySelector(".textarea-wrapper > textarea").value =
-        "How does the Pixel Watch track sleep?";
+        "Which colors is the Pixel Watch available in?";
     }, 11000);
 
     setTimeout(function () {
@@ -62,7 +62,7 @@
 
 <Navbar let:hidden let:toggle class="bg-[#B1D6FC]">
   <NavBrand href="/">
-    <img src="gen-app-builder-logo.png" class="mr-3 h-6 sm:h-9" alt="Vertex AI Conversation" />
+    <img src="vertex-ai-conversation-logo.png" class="mr-3 h-6 sm:h-9" alt="Vertex AI Conversation" />
     <span class="self-center whitespace-nowrap text-xl font-semibold text-black dark:text-white"
       >Vertex AI Conversation Demo</span>
   </NavBrand>
@@ -70,7 +70,7 @@
     <NavLi href="/" active={true}>Home</NavLi>
     <NavLi href="https://cloud.google.com/generative-ai-app-builder/docs/introduction"
       >Documentation</NavLi>
-    <NavLi href="https://codelabs.developers.google.com/codelabs/gen-app-builder-chat"
+    <NavLi href="https://codelabs.developers.google.com/codelabs/vertex-ai-conversation"
       >Codelab</NavLi>
     <NavLi
       href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/conversation/chat-app"
@@ -80,28 +80,27 @@
 
 <div class="container mx-auto bg-[#E2ECF3]">
   <div class="max-h-full max-w-full bg-[#E2ECF3]">
-    <div class="flex">
+    <div class="flex max-h-[90vh]">
       <div class="m-6 w-3/5">
         <Heading tag="h5" class="my-2">What is Generative AI Agent?</Heading>
         <p class="font-normal text-gray-700 dark:text-gray-400">
-          <A
-            href="https://cloud.google.com/generative-ai-app-builder/docs/agent-intro"
-            class="font-medium hover:underline">Generative AI Agent</A> is a feature within <A
+            A generative + conversational AI feature within <A
             href="https://cloud.google.com/generative-ai-app-builder"
-            class="font-medium hover:underline">Vertex AI Conversation</A> that is built on top of
+            class="font-medium hover:underline">Vertex AI Conversation</A> and
           <A href="https://cloud.google.com/dialogflow" class="font-medium hover:underline"
             >Dialogflow CX</A
           >.
         </p>
 
+        <Heading tag="h5" class="my-2 mt-6">How it works</Heading> You provide a
+        website, unstructured data, or structured data, then Generative AI Agent
+        indexes your content and creates a virtual agent that is powered by
+        large language models. Users can then chat, ask questions, and have a
+        conversation about the content.
+
         <Heading tag="h5" class="my-2 mt-6">Try it yourself!</Heading>
         Ask the chatbot on the right about products in the Google Store, such as the Pixel Phone, Pixel
-        Watch, or Pixel Tablet
-
-        <Heading tag="h5" class="my-2 mt-6">How it works</Heading>
-        You provide a website or structured/unstructured data, then Generative AI Agent parses your content
-        and creates a virtual agent that is powered by large language models. Users can then chat and
-        ask questions about the content.
+        Watch, or Pixel Tablet.
 
         <img
           src="how-chat-works.png"
