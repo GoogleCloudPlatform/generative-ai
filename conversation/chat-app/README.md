@@ -8,7 +8,7 @@ is a feature within
 that is built on top of functionality in
 [Dialogflow CX](https://cloud.google.com/dialogflow).
 
-![Vertex AI Conversation Demo](static/gen-app-builder-chat.png)
+![Vertex AI Conversation Demo](static/vertex-ai-conversation.png)
 
 With Generative AI Agent, you can provide a website domain, structured data, or
 unstructured data, then Generative AI Agent parses your content and creates a
@@ -17,7 +17,7 @@ customers and end users can then have conversations with the agent and ask
 questions about the content. Refer to the
 [Generative AI Agent documentation](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
 and codelab to
-[Create a Generative Chat App with Vertex AI Conversation](https://codelabs.developers.google.com/codelabs/gen-app-builder-chat)
+[Create a Generative Chat App with Vertex AI Conversation](https://codelabs.developers.google.com/codelabs/vertex-ai-conversation)
 for more information.
 
 ## Steps to build the web app
@@ -64,7 +64,7 @@ for more information.
 
 In your browser, navigate to your deployed app using a URL similar to:
 
-[https://gen-app-builder-chat.web.app/](https://gen-app-builder-chat.web.app/)
+[https://vertex-ai-conversation-demo.web.app/](https://vertex-ai-conversation-demo.web.app/)
 
 Congratulations, you've successfully deployed the Vertex AI Conversation Demo!
 
