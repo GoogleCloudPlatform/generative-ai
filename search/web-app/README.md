@@ -89,7 +89,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
    - To test locally: `flask --app main run`
 
 6. Visit the deployed web page
-   - Example: [`https://vertex-ai-search-demo-lnppzg3rxa-uc.a.run.app`](https://vertex-ai-search-demo-lnppzg3rxa-uc.a.run.app)
+   - Example: [`https://vertex-ai-search-demo-lnppzg3rxa-uc.a.run.app`](https://vertex-ai-search.web.app/)
 
 ---
 
