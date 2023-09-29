@@ -21,7 +21,7 @@
       href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
     <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}" />
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='favicon.ico')}}" />
-    <title>Vertex AI Search Demo</title>
+    <title>Vertex AI Search Demo - Custom UI</title>
   </head>
 
   <body>
@@ -60,12 +60,25 @@
           <div class="mdc-notched-outline">
             <div class="mdc-notched-outline__leading"></div>
             <div class="mdc-notched-outline__notch">
-              <label for="text-field-hero-input" class="mdc-floating-label"
-                >Search the Google Cloud Website</label
-              >
+              <label for="text-field-hero-input" class="mdc-floating-label">Search Query</label>
             </div>
             <div class="mdc-notched-outline__trailing"></div>
           </div>
+        </div>
+        <!-- Radio Buttons for Search Engine -->
+        <div class="search-engine-radio">
+        {% for engine_name in search_engines %}
+        <label class="mdc-radio">
+            <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}"
+                {% if loop.index0 == 0 %} checked {% endif %} />
+            <div class="mdc-radio__background">
+                <div class="mdc-radio__outer-circle"></div>
+                <div class="mdc-radio__inner-circle"></div>
+            </div>
+            <div class="mdc-radio__ripple"></div>
+            <span class="mdc-radio__label">{{ engine_name }}</span>
+        </label>
+        {% endfor %}
         </div>
         <!-- Search Button -->
         <div class="button-container">
@@ -126,6 +139,17 @@
       </div>
       <div class="tab-content">
         <div id="entities-tab" class="tab-visible">
+          {% if summary %}
+          <div class="mdc-layout-grid">
+            <div class="mdc-layout-grid__inner">
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+                <b>Generative AI Summary:</b> {{summary}}
+              </div>
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+            </div>
+          </div>
+          {% endif %}
           {% for result in results %}
           <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
@@ -145,11 +169,21 @@
                         >
                       </h3>
                     </div>
-                    {% for snippet in result["snippets"] %}
                     <div class="mdc-typography mdc-typography--body2 entity-detailed-description">
-                      {{snippet|safe}}
+                      {% if result["snippets"] %}
+                      <h3 class="mdc-typography mdc-typography--subtitle2">Snippet:</h3>
+                      {{result["snippets"][0]|safe}}
+                      {% endif %}
+                      <br>
+                      {% if result["extractiveAnswers"] %}
+                      <h3 class="mdc-typography mdc-typography--subtitle2">Extractive Answer:</h3>
+                      {{result["extractiveAnswers"][0]|safe}}
+                      {% endif %}
+                      {% if result["extractiveSegments"] %}
+                      <h3 class="mdc-typography mdc-typography--subtitle2">Extractive Segments:</h3>
+                      {{result["extractiveSegments"][0]|safe}}
+                      {% endif %}
                     </div>
-                    {% endfor %}
                   </div>
                 </div>
               </div>
