@@ -48,12 +48,12 @@ def list_documents(
 def search_enterprise_search(
     project_id: str,
     location: str,
-    search_engine_id: str,
+    data_store_id: str,
     page_size: int = 50,
     search_query: Optional[str] = None,
     image_bytes: Optional[bytes] = None,
     params: Optional[Dict] = None,
-) -> Tuple[List[Dict[str, str | List]], str, str, str]:
+) -> Tuple[List[Dict[str, str | List]], str, str, str, str]:
     if bool(search_query) == bool(image_bytes):
         raise ValueError("Cannot provide both search_query and image_bytes")
 
@@ -65,7 +65,7 @@ def search_enterprise_search(
     serving_config = client.serving_config_path(
         project=project_id,
         location=location,
-        data_store=search_engine_id,
+        data_store=data_store_id,
         serving_config="default_config",
     )
 
@@ -139,7 +139,8 @@ def search_enterprise_search(
     )
 
     results = get_enterprise_search_results(response)
-    return results, request_url, request_json, response_json
+    summary = getattr(response.summary, "summary_text", "")
+    return results, summary, request_url, request_json, response_json
 
 
 def get_enterprise_search_results(
@@ -157,15 +158,15 @@ def get_enterprise_search_results(
 
         if cse_thumbnail:
             return cse_thumbnail[0]["src"]
-        elif image_link:
+        if image_link:
             return image_link
-        else:
-            return ROBOT
+        return ROBOT
 
     def get_formatted_link(data: Dict) -> str:
         html_formatted_url = data.get("htmlFormattedUrl")
         image_context_link = data.get("image", {}).get("contextLink")
-        return html_formatted_url or image_context_link or ROBOT
+        link = data.get("link")
+        return html_formatted_url or image_context_link or link or ROBOT
 
     return [
         {
@@ -177,7 +178,20 @@ def get_enterprise_search_results(
             "htmlFormattedUrl": get_formatted_link(result.document.derived_struct_data),
             "displayLink": result.document.derived_struct_data["displayLink"],
             "snippets": [
-                s["snippet"] for s in result.document.derived_struct_data["snippets"]
+                s.get("htmlSnippet", s.get("snippet", ""))
+                for s in result.document.derived_struct_data.get("snippets", [])
+            ],
+            "extractiveAnswers": [
+                e["content"]
+                for e in result.document.derived_struct_data.get(
+                    "extractive_answers", []
+                )
+            ],
+            "extractiveSegments": [
+                e["content"]
+                for e in result.document.derived_struct_data.get(
+                    "extractive_segments", []
+                )
             ],
             "thumbnailImage": get_thumbnail_image(result.document.derived_struct_data),
             "resultJson": discoveryengine.SearchResponse.SearchResult.to_json(

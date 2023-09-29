@@ -102,9 +102,9 @@ def search() -> str:
     """
     Web Server, Homepage for Search - Custom UI
     """
+    search_engines = [d["name"] for d in CUSTOM_UI_DATASTORE_IDS]
     return render_template(
-        "search.html",
-        nav_links=NAV_LINKS,
+        "search.html", nav_links=NAV_LINKS, search_engines=search_engines
     )
 
 
@@ -123,10 +123,20 @@ def search_genappbuilder() -> str:
             message_error="No query provided",
         )
 
-    results, request_url, raw_request, raw_response = search_enterprise_search(
+    search_engine = request.form.get("search_engine", "")
+
+    if not search_engine:
+        return render_template(
+            "search.html",
+            nav_links=NAV_LINKS,
+            message_error="No search engine selected",
+        )
+
+    search_engine_index = int(search_engine)
+    results, summary, request_url, raw_request, raw_response = search_enterprise_search(
         project_id=PROJECT_ID,
         location=LOCATION,
-        search_engine_id=CUSTOM_UI_DATASTORE_IDS[0]["datastore_id"],
+        data_store_id=CUSTOM_UI_DATASTORE_IDS[search_engine_index]["datastore_id"],
         search_query=search_query,
     )
 
@@ -135,6 +145,7 @@ def search_genappbuilder() -> str:
         nav_links=NAV_LINKS,
         message_success=search_query,
         results=results,
+        summary=summary,
         request_url=request_url,
         raw_request=raw_request,
         raw_response=raw_response,
@@ -176,7 +187,9 @@ def imagesearch_genappbuilder() -> str:
         # Check if text is a url
         image_url = urlparse(search_query)
         if all([image_url.scheme, image_url.netloc, image_url.path]):
-            image_response = requests.get(image_url.geturl(), allow_redirects=True)
+            image_response = requests.get(
+                image_url.geturl(), allow_redirects=True, timeout=5
+            )
             mime_type = image_response.headers["Content-Type"]
             if mime_type not in VALID_IMAGE_MIMETYPES:
                 return render_template(
@@ -191,10 +204,10 @@ def imagesearch_genappbuilder() -> str:
         image_bytes = base64.b64encode(image_content)
 
     try:
-        results, request_url, raw_request, raw_response = search_enterprise_search(
+        results, _, request_url, raw_request, raw_response = search_enterprise_search(
             project_id=PROJECT_ID,
             location=LOCATION,
-            search_engine_id=IMAGE_SEARCH_DATASTORE_IDs[0]["datastore_id"],
+            data_store_id=IMAGE_SEARCH_DATASTORE_IDs[0]["datastore_id"],
             search_query=search_query,
             image_bytes=image_bytes,
             params={"search_type": 1},
