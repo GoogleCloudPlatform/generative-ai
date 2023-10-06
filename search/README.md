@@ -8,7 +8,7 @@ Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generati
 <pre>
 search/
 ├── <a href="retrieval-augmented-generation">retrieval-augmented-generation/</a>
-│   └──  <a href="retrieval-augmented-generation/examples/question_answering.ipynb">[Notebook] Question Answering Over Documents with Enterprise Search and LangChain 🦜🔗</a>
+│   └──  <a href="retrieval-augmented-generation/examples/question_answering.ipynb">[Notebook] Question Answering Over Documents with Vertex AI Search and LangChain 🦜🔗</a>
 └── <a href="search-web-app">search-web-app/</a>
     └──  <a href="search-web-app">[Demo] Vertex AI Search Web Application</a>
 </pre>

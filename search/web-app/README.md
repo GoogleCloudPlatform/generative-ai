@@ -17,7 +17,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
 ## Setup
 
-- Follow steps in [Get started with Enterprise Search][try_search] for Unstructured Data.
+- Follow steps in [Get started with Vertex AI Search][try_search] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
     - [Contract Understanding Atticus Dataset (CUAD)](https://www.atticusprojectai.org/cuad)
@@ -25,7 +25,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
     - [Alphabet Earnings Reports](https://abc.xyz/investor/)
       - `gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs`
 
-- Follow steps in [Get started with Enterprise Search][try_search] for Websites
+- Follow steps in [Get started with Vertex AI Search][try_search] for Websites
 
   - [Google Cloud site](https://cloud.google.com)
     - `https://cloud.google.com`

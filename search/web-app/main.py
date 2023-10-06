@@ -111,7 +111,7 @@ def search() -> str:
 @app.route("/search_genappbuilder", methods=["POST"])
 def search_genappbuilder() -> str:
     """
-    Handle Search Gen App Builder Request
+    Handle Search Vertex AI Search Request
     """
     search_query = request.form.get("search_query", "")
 
@@ -166,7 +166,7 @@ def image_search() -> str:
 @app.route("/imagesearch_genappbuilder", methods=["POST"])
 def imagesearch_genappbuilder() -> str:
     """
-    Handle Image Search Gen App Builder Request
+    Handle Image Search Vertex AI Search Request
     """
     search_query = request.form.get("search_query", "")
     image_file = request.files["image"]
@@ -246,7 +246,7 @@ def recommend() -> str:
 @app.route("/recommend_genappbuilder", methods=["POST"])
 def recommend_genappbuilder() -> str:
     """
-    Handle Recommend Gen App Builder Request
+    Handle Recommend Vertex AI Search Request
     """
     document_id = request.form.get("document_id", "")
     attribution_token = request.form.get("attribution_token", "")
