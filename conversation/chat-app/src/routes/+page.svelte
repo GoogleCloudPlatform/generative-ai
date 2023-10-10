@@ -82,7 +82,7 @@
   <div class="max-h-full max-w-full bg-[#E2ECF3]">
     <div class="flex max-h-[90vh]">
       <div class="m-6 w-3/5">
-        <Heading tag="h5" class="my-2">What is Generative AI Agent?</Heading>
+        <Heading tag="h5" class="my-2">What is a Data Store Agent?</Heading>
         <p class="font-normal text-gray-700 dark:text-gray-400">
             A generative + conversational AI feature within <A
             href="https://cloud.google.com/generative-ai-app-builder"
@@ -93,7 +93,7 @@
         </p>
 
         <Heading tag="h5" class="my-2 mt-6">How it works</Heading> You provide a
-        website, unstructured data, or structured data, then Generative AI Agent
+        website, unstructured data, or structured data, then Data Store Agent
         indexes your content and creates a virtual agent that is powered by
         large language models. Users can then chat, ask questions, and have a
         conversation about the content.
@@ -104,7 +104,7 @@
 
         <img
           src="how-chat-works.png"
-          alt="Lifecycle of a Generative AI Agent Question"
+          alt="Lifecycle of a Data Store Agent Question"
           class="mx-auto mt-4" />
 
         <p class="mt-6 align-bottom font-normal text-gray-700 dark:text-gray-400">
