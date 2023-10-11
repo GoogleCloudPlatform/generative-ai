@@ -2,18 +2,20 @@
 
 ## Overview
 
-[Vertex AI Conversation](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
-is built on top of functionality in
+[Data Store Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
+is a feature within
+[Vertex AI Conversation](https://cloud.google.com/generative-ai-app-builder)
+that is built on top of functionality in
 [Dialogflow CX](https://cloud.google.com/dialogflow).
 
 ![Vertex AI Conversation Demo](static/vertex-ai-conversation.png)
 
-With Vertex AI Conversation, you can provide a website domain, structured data, or
-unstructured data, then it parses your content and creates a
+With a Data Store Agent, you can provide a website domain, structured data, or
+unstructured data, then the Data Store Agent parses your content and creates a
 virtual agent that is powered by data stores and large language models. Your
 customers and end users can then have conversations with the agent and ask
 questions about the content. Refer to the
-[Vertex AI Conversation documentation](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
+[Data Store Agent documentation](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
 and codelab to
 [Create a Generative Chat App with Vertex AI Conversation](https://codelabs.developers.google.com/codelabs/vertex-ai-conversation)
 for more information.
@@ -62,7 +64,7 @@ for more information.
 
 In your browser, navigate to your deployed app using a URL similar to:
 
-[https://vertex-ai-conversation-demo.web.app/](https://vertex-ai-conversation-demo.web.app/)
+[https://vertex-ai-conversation.web.app/](https://vertex-ai-conversation.web.app/)
 
 Congratulations, you've successfully deployed the Vertex AI Conversation Demo!
 
@@ -71,7 +73,8 @@ Congratulations, you've successfully deployed the Vertex AI Conversation Demo!
 You can continue learning about conversational AI and generative AI with
 these guides and resources:
 
-- [Documentation for Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs)
 - [Overview of Vertex AI Conversation](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)
-- [Documentation for Vertex AI Conversation](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
+- [Create and use Data Store Agents](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
+- [Documentation for Dialogflow CX](https://cloud.google.com/dialogflow/cx/docs)
+- [Documentation for Data Store Agents](https://cloud.google.com/dialogflow/cx/docs/concept/data-store-agent)
 - [Generative AI in Google Cloud](https://cloud.google.com/ai/generative-ai)
