@@ -29,7 +29,7 @@ language/
 │   └── <a href="sample-apps/summarization-gcs-cloudfunction/">Cloud Function that does summarization using Vertex AI PaLM Text Model</a>
 │   └── <a href="sample-apps/text-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Text Model</a>
 ├── <a href="tuning">tuning/</a>
-│   └── <a href="tuning/getting_started_tuning.ipynb">[Notebook] Tuning and deploy a foundation model</a>
+│   └── <a href="tuning_text_bison.ipynb">[Notebook] Tuning and deploy a foundation model</a>
 └── <a href="use-cases">use-cases/</a>
     ├── <a href="use-cases/chatbots">chatbots/</a>
     │   └── <a href="use-cases/chatbots/grocerybot_assistant.ipynb">[Notebook] GroceryBot, a sample grocery and recipe assistant - RAG + ReAct</a>
