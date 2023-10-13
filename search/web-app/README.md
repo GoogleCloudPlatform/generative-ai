@@ -78,8 +78,8 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
 4. Configure Image Search
 
-   - Follow the instructions in the documentation to [enable image search](https://cloud.google.com/generative-ai-app-builder/docs/image-search#enable-advanced) for a search engine.
-   - This feature is in early access and requires separate allowlisting from the rest of Vertex AI Search in order to use.
+   - Follow the instructions in the documentation to [enable image search](https://cloud.google.com/generative-ai-app-builder/docs/image-search#enable-advanced) for a website search engine.
+      - NOTE: You must enable [Advanced Website Indexing](https://cloud.google.com/generative-ai-app-builder/docs/about-advanced-features#advanced-website-indexing) which requires [domain verification](https://cloud.google.com/generative-ai-app-builder/docs/domain-verification).
    - Add the datastore id for your search engine to `IMAGE_SEARCH_DATASTORE_IDs` in `consts.py`.
 
 5. Deploy the Cloud Run app in your project.
