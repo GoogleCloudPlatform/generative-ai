@@ -53,8 +53,8 @@
       <h3></h3>
       <p>
         Search the
-        <a href="https://shop.googlemerchandisestore.com/">Google Merchandise Store</a> by providing
-        an image URL or file to find similar matches.
+        <a href="https://shop.googlemerchandisestore.com/">Google Merchandise Store</a> by providing a text query,
+        an image URL, or image file to find similar matches.
       </p>
     </section>
     <main id="active-area">
@@ -69,7 +69,7 @@
           <div class="mdc-notched-outline">
             <div class="mdc-notched-outline__leading"></div>
             <div class="mdc-notched-outline__notch">
-              <label for="query-input" class="mdc-floating-label">Search by Image URL</label>
+              <label for="query-input" class="mdc-floating-label">Search by Text Query or Image URL</label>
             </div>
             <div class="mdc-notched-outline__trailing"></div>
           </div>
@@ -98,6 +98,30 @@
           </button>
         </div>
       </form>
+      {% if not message_success %}
+      <div class="mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+            <p class="sample-image-text">Here are some sample images to try:</p>
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+        </div>
+        <div class="mdc-layout-grid__inner">
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+            <img src="{{url_for('static', filename='blue_pack.jpeg')}}" alt="Blue Pack" width="150">
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+            <img src="{{url_for('static', filename='lego_cloud.png')}}" alt="Lego Cloud" width="150">
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+            <img src="{{url_for('static', filename='socks.jpg')}}" alt="Purple Socks" width="150">
+          </div>
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+        </div>
+      </div>
+      {% endif %}
       {% if message_error %}
       <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner">
@@ -222,13 +246,7 @@
     </main>
     <section class="footer">
       <p>
-        Made by <a href="https://github.com/holtskinner">holtskinner@</a> - Source on
-        <a href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/search/web-app"
-          >GitHub</a
-        >
-      </p>
-      <p>
-        Powered by
+        Made by <a href="https://github.com/holtskinner">holtskinner@</a> - Powered by
         <a href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Search</a>
         on <a href="https://cloud.google.com/">Google Cloud</a>
       </p>

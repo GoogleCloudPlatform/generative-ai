@@ -15,7 +15,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
     <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}" />
     <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='favicon.ico')}}" />
-    <title>Vertex AI Search Demo</title>
+    <title>Vertex AI Search Demo - Widgets</title>
   </head>
 
   <body>
@@ -48,7 +48,7 @@
       <p>Click on one of the text boxes to open up a full-page widget for the search engine.</p>
     </section>
     <main>
-      <!-- Gen App Builder widget bundle -->
+      <!-- Vertex AI Search widget bundle -->
       <script src="https://cloud.google.com/ai/gen-app-builder/client"></script>
 
       {% for s in search_engine_options %}
@@ -72,13 +72,7 @@
     </main>
     <section class="footer">
       <p>
-        Made by <a href="https://github.com/holtskinner">holtskinner@</a> - Source on
-        <a href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/search/web-app"
-          >GitHub</a
-        >
-      </p>
-      <p>
-        Powered by
+        Made by <a href="https://github.com/holtskinner">holtskinner@</a> - Powered by
         <a href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Search</a>
         on <a href="https://cloud.google.com/">Google Cloud</a>
       </p>
