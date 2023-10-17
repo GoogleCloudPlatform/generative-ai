@@ -49,6 +49,8 @@ FORM_OPTIONS = {
     "default_language": VALID_LANGUAGES[0],
 }
 
+CUSTOM_UI_SEARCH_ENGINES = [d["name"] for d in CUSTOM_UI_DATASTORE_IDS]
+
 NAV_LINKS = [
     {"link": "/", "name": "Widgets", "icon": "widgets"},
     {
@@ -67,6 +69,10 @@ NAV_LINKS = [
         "icon": "recommend",
     },
     {"link": "/ekg", "name": "Enterprise Knowledge Graph", "icon": "scatter_plot"},
+    {
+        "link": "https://github.com/GoogleCloudPlatform/generative-ai/blob/main/search/retrieval-augmented-generation/examples/question_answering.ipynb",  # noqa: E501
+        "name": "🦜️🔗 Retrieval Augmented Generation (RAG)",
+    },
     {
         "link": "https://github.com/GoogleCloudPlatform/generative-ai/tree/main/search/web-app",
         "name": "Source Code",
@@ -92,6 +98,7 @@ def index() -> str:
 
     return render_template(
         "index.html",
+        title=NAV_LINKS[0]["name"],
         nav_links=NAV_LINKS,
         search_engine_options=WIDGET_CONFIGS,
     )
@@ -102,16 +109,19 @@ def search() -> str:
     """
     Web Server, Homepage for Search - Custom UI
     """
-    search_engines = [d["name"] for d in CUSTOM_UI_DATASTORE_IDS]
+
     return render_template(
-        "search.html", nav_links=NAV_LINKS, search_engines=search_engines
+        "search.html",
+        title=NAV_LINKS[1]["name"],
+        nav_links=NAV_LINKS,
+        search_engines=CUSTOM_UI_SEARCH_ENGINES,
     )
 
 
 @app.route("/search_genappbuilder", methods=["POST"])
 def search_genappbuilder() -> str:
     """
-    Handle Search Gen App Builder Request
+    Handle Search Vertex AI Search Request
     """
     search_query = request.form.get("search_query", "")
 
@@ -119,7 +129,9 @@ def search_genappbuilder() -> str:
     if not search_query:
         return render_template(
             "search.html",
+            title=NAV_LINKS[1]["name"],
             nav_links=NAV_LINKS,
+            search_engines=CUSTOM_UI_SEARCH_ENGINES,
             message_error="No query provided",
         )
 
@@ -128,7 +140,9 @@ def search_genappbuilder() -> str:
     if not search_engine:
         return render_template(
             "search.html",
+            title=NAV_LINKS[1]["name"],
             nav_links=NAV_LINKS,
+            search_engines=CUSTOM_UI_SEARCH_ENGINES,
             message_error="No search engine selected",
         )
 
@@ -142,7 +156,9 @@ def search_genappbuilder() -> str:
 
     return render_template(
         "search.html",
+        title=NAV_LINKS[1]["name"],
         nav_links=NAV_LINKS,
+        search_engines=CUSTOM_UI_SEARCH_ENGINES,
         message_success=search_query,
         results=results,
         summary=summary,
@@ -159,6 +175,7 @@ def image_search() -> str:
     """
     return render_template(
         "image-search.html",
+        title=NAV_LINKS[2]["name"],
         nav_links=NAV_LINKS,
     )
 
@@ -166,7 +183,7 @@ def image_search() -> str:
 @app.route("/imagesearch_genappbuilder", methods=["POST"])
 def imagesearch_genappbuilder() -> str:
     """
-    Handle Image Search Gen App Builder Request
+    Handle Image Search Vertex AI Search Request
     """
     search_query = request.form.get("search_query", "")
     image_file = request.files["image"]
@@ -221,6 +238,7 @@ def imagesearch_genappbuilder() -> str:
 
     return render_template(
         "image-search.html",
+        title=NAV_LINKS[2]["name"],
         nav_links=NAV_LINKS,
         message_success="Success",
         results=results,
@@ -238,6 +256,7 @@ def recommend() -> str:
     return render_template(
         "recommend.html",
         nav_links=NAV_LINKS,
+        title=NAV_LINKS[3]["name"],
         documents=RECOMMENDATIONS_DOCUMENTS,
         attribution_token="",
     )
@@ -246,7 +265,7 @@ def recommend() -> str:
 @app.route("/recommend_genappbuilder", methods=["POST"])
 def recommend_genappbuilder() -> str:
     """
-    Handle Recommend Gen App Builder Request
+    Handle Recommend Vertex AI Search Request
     """
     document_id = request.form.get("document_id", "")
     attribution_token = request.form.get("attribution_token", "")
@@ -255,6 +274,7 @@ def recommend_genappbuilder() -> str:
     if not document_id:
         return render_template(
             "recommend.html",
+            title=NAV_LINKS[3]["name"],
             nav_links=NAV_LINKS,
             documents=RECOMMENDATIONS_DOCUMENTS,
             attribution_token=attribution_token,
@@ -278,6 +298,7 @@ def recommend_genappbuilder() -> str:
 
     return render_template(
         "recommend.html",
+        title=NAV_LINKS[3]["name"],
         nav_links=NAV_LINKS,
         documents=RECOMMENDATIONS_DOCUMENTS,
         message_success=document_id,
@@ -295,7 +316,12 @@ def ekg() -> str:
     Web Server, Homepage for EKG
     """
 
-    return render_template("ekg.html", nav_links=NAV_LINKS, form_options=FORM_OPTIONS)
+    return render_template(
+        "ekg.html",
+        title=NAV_LINKS[4]["name"],
+        nav_links=NAV_LINKS,
+        form_options=FORM_OPTIONS,
+    )
 
 
 @app.route("/search_ekg", methods=["POST"])
@@ -309,6 +335,7 @@ def search_ekg() -> str:
     if not search_query:
         return render_template(
             "ekg.html",
+            title=NAV_LINKS[4]["name"],
             nav_links=NAV_LINKS,
             form_options=FORM_OPTIONS,
             message_error="No query provided",
@@ -329,6 +356,7 @@ def search_ekg() -> str:
 
     return render_template(
         "ekg.html",
+        title=NAV_LINKS[4]["name"],
         nav_links=NAV_LINKS,
         form_options=FORM_OPTIONS,
         message_success=search_query,
@@ -356,6 +384,7 @@ def handle_exception(ex: Exception):
 
     return render_template(
         "search.html",
+        title=NAV_LINKS[1]["name"],
         form_options=FORM_OPTIONS,
         nav_links=NAV_LINKS,
         message_error=message_error,
