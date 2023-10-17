@@ -70,7 +70,7 @@ NAV_LINKS = [
     },
     {"link": "/ekg", "name": "Enterprise Knowledge Graph", "icon": "scatter_plot"},
     {
-        "link": "https://github.com/GoogleCloudPlatform/generative-ai/blob/main/search/retrieval-augmented-generation/examples/question_answering.ipynb",
+        "link": "https://github.com/GoogleCloudPlatform/generative-ai/blob/main/search/retrieval-augmented-generation/examples/question_answering.ipynb",  # noqa: E501
         "name": "🦜️🔗 Retrieval Augmented Generation (RAG)",
     },
     {
