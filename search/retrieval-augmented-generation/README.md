@@ -1,6 +1,6 @@
 # Retrieval Augmented Generation
 
-Using Google Cloud Vertex AI Search, PaLM and Langchain
+Using Google Cloud Vertex AI Search, PaLM and LangChain
 
 ---
 
