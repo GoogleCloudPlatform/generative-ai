@@ -123,7 +123,7 @@
         <script
           src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
         <df-messenger
-          project-id="koverholt-devrel-355716"
+          project-id="your-project-id"
           agent-id="b42e8b15-64ef-45be-bdaf-cbf78541873b"
           language-code="en"
           storage-option="none"
