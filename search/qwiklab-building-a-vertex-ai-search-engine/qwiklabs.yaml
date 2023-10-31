@@ -1,0 +1,50 @@
+schema_version: 2
+default_locale: en
+title: Building a Vertex AI Search Engine
+description: Introductory lab for building a Generative AI-powered enterprise search
+  engine using Vertex AI Search and unstructured documents; Fitbit product manuals.
+instruction:
+  type: md
+  uri: instructions/en.md
+duration: 180
+max_duration: 180
+credits: 0
+level: introductory
+tags:
+- GenAI
+- Vertex AI
+- Search
+product_tags:
+- Cloud AI
+role_tags:
+- cloud architect
+- developers frontend
+- developers backend
+- data engineer
+- business intelligence analyst
+- application developer
+domain_tags:
+- application development
+- data
+- machine learning
+resources: []
+environment:
+  resources:
+  - type: gcp_project
+    id: project_0
+    ssh_key_user: user_0
+  - type: gcp_user
+    id: user_0
+    permissions:
+    - project: project_0
+      roles:
+      - roles/owner
+  student_visible_outputs:
+  - label: Open Console
+    reference: project_0.console_url
+  - label: Username
+    reference: user_0.username
+  - label: Password
+    reference: user_0.password
+  - label: Project ID
+    reference: project_0.project_id

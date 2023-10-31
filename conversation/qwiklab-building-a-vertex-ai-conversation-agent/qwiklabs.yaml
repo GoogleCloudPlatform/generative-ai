@@ -1,0 +1,45 @@
+schema_version: 2
+default_locale: en
+title: Building a Vertex AI Conversation Agent
+description: Using Vertex AI Conversation to create a Generative AI-powered agent
+  using unstructured data; Fitbit product manuals, and then uses DialogFlow CX to
+  customise Generative Fallback.
+instruction:
+  type: md
+  uri: instructions/en.md
+duration: 180
+max_duration: 180
+credits: 0
+level: Intermediate
+tags:
+- GenAI
+- Vertex AI
+- Conversation
+product_tags:
+- Cloud AI
+role_tags:
+- application developer
+domain_tags:
+- data
+- machine learning
+resources: []
+environment:
+  resources:
+  - type: gcp_project
+    id: project_0
+    ssh_key_user: user_0
+  - type: gcp_user
+    id: user_0
+    permissions:
+    - project: project_0
+      roles:
+      - roles/owner
+  student_visible_outputs:
+  - label: Open Console
+    reference: project_0.console_url
+  - label: Username
+    reference: user_0.username
+  - label: Password
+    reference: user_0.password
+  - label: Project ID
+    reference: project_0.project_id
