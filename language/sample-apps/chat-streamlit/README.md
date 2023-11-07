@@ -6,6 +6,9 @@ This application demonstrates a Cloud Run application that uses the [Streamlit](
 
 ## Build and Deploy the Application to Cloud Run
 
+> NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
+Additionally, ensure that you have cloned this repository and are currently in the ```chat-streamlit``` folder for the rest of the commands.
+
 To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/docs/quickstarts/deploy-container), we need to perform the following steps:
 
 1. Your Cloud Function requires access to two environment variables:
