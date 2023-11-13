@@ -7,6 +7,10 @@ The notebooks in this folder show examples using [LangChain](www.langchain.com).
 ## Table of Contents
 
 - [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](intro_langchain_palm_api.ipynb)
+- [How to use the LangChain 🦜️🔗 BigQuery Data Loader](langchain_bigquery_data_loader.ipynb)
+
+## Related
+
 - [Text Summarization of Large Documents using LangChain 🦜🔗](../../use-cases/document-summarization/summarization_large_documents_langchain.ipynb)
 - [Question Answering with Large Documents using LangChain 🦜🔗](../../use-cases/document-qa/question_answering_documents_langchain.ipynb)
 - [Question Answering with Documents using LangChain 🦜️🔗 and Vertex AI Matching Engine](../../use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb)
