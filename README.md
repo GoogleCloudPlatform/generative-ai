@@ -45,6 +45,9 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
         <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api"><code>text-bison</code></a> model</li>
         <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api"><code>chat-bison</code></a> model</li>
         <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api"><code>textembedding-gecko</code></a> model</li>
+        <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview"><code>code-bison</code></a> model</li>
+        <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview"><code>code-gecko</code></a> model</li>
+        <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview"><code>codechat-bison</code></a> model</li>
         <li>prompt design</li>
         <li>deploying apps</li>
         <li>tuning models</li>
