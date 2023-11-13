@@ -15,4 +15,5 @@ The notebooks in this folder show examples using [BigQuery DataFrames](https://c
 - [How to use the LangChain 🦜️🔗 BigQuery Data Loader](../../orchestration/langchain/langchain_bigquery_data_loader.ipynb)
 
 ## Resources
+
 - [More BigQuery DataFrames notebooks samples](https://github.com/googleapis/python-bigquery-dataframes/tree/main/notebooks)
