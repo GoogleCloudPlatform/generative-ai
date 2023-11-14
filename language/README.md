@@ -7,6 +7,11 @@ Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generati
 <!-- markdownlint-disable MD033 -->
 <pre>
 language/
+├── <a href="code">code/</a>
+│   ├── <a href="code/code_chat.ipynb">[Notebook] Introduction to Code Chat</a>
+│   ├── <a href="code/code_completion.ipynb">[Notebook] Introduction to Code Completion</a>
+│   ├── <a href="code/code_generation.ipynb">[Notebook] Introduction to Code Generation</a>
+│   └── <a href="code/code_retrieval_augmented_generation.ipynb">[Notebook] Retrieval Augmented Generation (RAG) with Codey</a>
 ├── <a href="getting-started">getting-started/</a>
 │   ├── <a href="getting-started/intro_generative_ai_studio.md">intro_generative_ai_studio.md</a>
 │   └── <a href="getting-started/intro_palm_api.ipynb">[Notebook] Getting Started with the Vertex AI PaLM API & Python SDK</a>
