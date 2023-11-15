@@ -7,7 +7,7 @@ This application demonstrates a Cloud Run application that has a simple Form-bas
 ## Build and Deploy the application to Cloud Run
 
 > NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
-Additionally, ensure that you have cloned this repository and are currently in the ```chat-flask-cloudrun``` folder for the rest of the commands.
+Additionally, ensure that you have cloned this repository and are currently in the ```chat-flask-cloudrun``` folder. This should be your active working directory for the rest of the commands.
 
 To deploy the Flask Application in [Cloud Run](https://cloud.google.com/run/docs/quickstarts/deploy-container), we need to perform the following steps:
 
