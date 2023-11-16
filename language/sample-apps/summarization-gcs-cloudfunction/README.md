@@ -42,9 +42,10 @@ We will need to create 2 GCS buckets:
 ```bash
 export BUCKET_NAME='Your GCS Bucket Name'
 ```
-- The second bucket will having a prefix `-summaries`. 
 
-You can create a bucket either from Google Cloud Console or from the command line via the `gsutil` command. Execute the commands below in Cloud Shell. 
+- The second bucket will having a prefix `-summaries`.
+
+You can create a bucket either from Google Cloud Console or from the command line via the `gsutil` command. Execute the commands below in Cloud Shell.
 
 ```bash
 gsutil mb -l $GCP_REGION gs://"$BUCKET_NAME"

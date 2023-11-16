@@ -16,6 +16,7 @@ These variables are needed since the Vertex AI initialization needs the Google C
 `vertexai.init(project=PROJECT_ID, location=LOCATION)`
 
 In Cloud Shell, execute the following commands:
+
 ```bash
 export GCP_PROJECT='<Your GCP Project Id>'  # Change this
 export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
@@ -67,4 +68,3 @@ curl -m 70 -X POST https://$GCP_REGION-$GCP_PROJECT.cloudfunctions.net/predictCo
 "prompt": "Write a Python function to make a call to a URL?"
 }'  | sed -e 's/\\n/\n/g'
 ```
-
