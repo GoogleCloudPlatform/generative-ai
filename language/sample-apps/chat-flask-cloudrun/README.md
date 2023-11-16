@@ -6,6 +6,9 @@ This application demonstrates a Cloud Run application that has a simple Form-bas
 
 ## Build and Deploy the application to Cloud Run
 
+> NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
+Additionally, ensure that you have cloned this repository and are currently in the ```chat-flask-cloudrun``` folder. This should be your active working directory for the rest of the commands.
+
 To deploy the Flask Application in [Cloud Run](https://cloud.google.com/run/docs/quickstarts/deploy-container), we need to perform the following steps:
 
 1. Your Cloud Function requires access to two environment variables:
@@ -17,13 +20,16 @@ To deploy the Flask Application in [Cloud Run](https://cloud.google.com/run/docs
     `vertexai.init(project=PROJECT_ID, location=LOCATION)`
 
     In Cloud Shell, execute the following commands:
+
     ```bash
     export GCP_PROJECT='<Your GCP Project Id>'  # Change this
     export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
     ```
+
 2. We are now going to build the Docker image for the application and push it to Artifact Registry. To do this, we will need one environment variable set that will point to the Artifact Registry name. We have a command that will create this repository for you.
 
    In Cloud Shell, execute the following commands:
+
    ```bash
    export AR_REPO='<REPLACE_WITH_YOUR_AR_REPO_NAME>'  # Change this
    export SERVICE_NAME='chat-flask-app' # This is the name of our Application and Cloud Run service. Change it if you'd like. 
@@ -31,9 +37,11 @@ To deploy the Flask Application in [Cloud Run](https://cloud.google.com/run/docs
    gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev"
    gcloud builds submit --tag "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPO/$SERVICE_NAME"
    ```
- 3. The final step is to deploy the service in Cloud Run with the image that we built and pushed to the Artifact Registry in the previous step:
+
+3. The final step is to deploy the service in Cloud Run with the image that we built and pushed to the Artifact Registry in the previous step:
 
     In Cloud Shell, execute the following command:
+
     ```bash
     gcloud run deploy "$SERVICE_NAME" \
       --port=8080 \
@@ -44,5 +52,5 @@ To deploy the Flask Application in [Cloud Run](https://cloud.google.com/run/docs
       --project=$GCP_PROJECT \
       --set-env-vars=GCP_PROJECT=$GCP_PROJECT,GCP_REGION=$GCP_REGION
     ```
-On successfully deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the application that you just deployed. Give it a few queries of your choice and the application will query the Vertex AI Chat Model and provide you with the response. 
 
+On successfully deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the application that you just deployed. Give it a few queries of your choice and the application will query the Vertex AI Chat Model and provide you with the response.
