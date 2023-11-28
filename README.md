@@ -51,6 +51,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
         <li>prompt design</li>
         <li>deploying apps</li>
         <li>tuning models</li>
+        <li>grounded responses</li>
         <li><a href="https://www.langchain.com/">langchain</a> with Google's foundation models</li>
       </ul>
     </td>
