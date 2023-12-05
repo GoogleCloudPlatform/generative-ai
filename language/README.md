@@ -21,7 +21,8 @@ language/
 │   │   ├── <a href="prompts/examples/question_answering.ipynb">[Notebook] Question Answering with Generative Models on Vertex AI</a>
 │   │   ├── <a href="prompts/examples/text_classification.ipynb">[Notebook] Text Classification with Generative Models on Vertex AI</a>
 │   │   ├── <a href="prompts/examples/text_extraction.ipynb">[Notebook] Text Extraction with Generative Models on Vertex AI</a>
-│   │   └── <a href="prompts/examples/text_summarization.ipynb">[Notebook] Text Summarization with Generative Models on Vertex AI</a>
+│   │   ├── <a href="prompts/examples/text_summarization.ipynb">[Notebook] Text Summarization with Generative Models on Vertex AI</a>
+│   │   └── <a href="prompts/examples/sql_code_generation.ipynb">[Notebook] SQL Generation with Generative Models on Vertex AI</a>
 │   └── <a href="prompts/intro_prompt_design.ipynb">[Notebook] Prompt Design - Best Practices</a>
 ├── <a href="orchestration">orchestration/</a>
 │   └── <a href="orchestration/langchain">langchain/</a>
