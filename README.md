@@ -27,7 +27,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
     <td>
       Discover Gemini through starter notebooks, use cases, function calling, sample apps, and more.
     </td>
-    <td><a href="vision/">Sample notebooks, apps, use cases</a></td>
+    <td><a href="gemini/">Sample notebooks, apps, use cases</a></td>
   </tr>
   <tr>
     <td>
