@@ -87,7 +87,7 @@ Operation "operations/acf.5c5ef4f6-f734-455d-b2f0-ee70b5a17322" finished success
 
 ## Clone the Repository
 
-We've put all the samples you need for this project into a Git repo in the `sample_apps` folder. Clone the repo in Cloud Shell using the following command:
+We've put all the samples you need for this project into a Git repo in the `sample-apps` folder. Clone the repo in Cloud Shell using the following command:
 
 ```bash
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
