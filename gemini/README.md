@@ -38,7 +38,7 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
         <li><code>gemini-pro-vision</code> model</li>
     </ul>
 </td>
-    <td><a href="search">Starter notebooks</a></td>
+    <td><a href="getting-started/">Starter notebooks</a></td>
   </tr>
   <tr>
     <td>
@@ -78,7 +78,7 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
       <a href="responsible-ai/"><code>responsible-ai/</code></a>
     </td>
     <td>Learn how to use safety ratings and thresholds with the Vertex AI Gemini API.</td>
-    <td><a href="responsible-ai">Sample notebooks</a></td>
+    <td><a href="responsible-ai/">Sample notebooks</a></td>
   </tr>
   <tr>
     <td>
