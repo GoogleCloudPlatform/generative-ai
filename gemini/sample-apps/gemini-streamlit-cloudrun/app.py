@@ -19,14 +19,6 @@ def load_models():
     multimodal_model_pro = GenerativeModel("gemini-pro-vision")
     return text_model_pro, multimodal_model_pro
 
-def get_image_path(img):
-    folder_name = str(uuid.uuid4())
-    file_path = working_dir+"/temp/"+folder_name+f"/{img.name}"
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, "wb") as img_file:
-        img_file.write(img.getbuffer())
-    return file_path
-
 def get_gemini_pro_text_response( model: GenerativeModel,
                                   contents: str, 
                                   generation_config: GenerationConfig,
@@ -285,7 +277,7 @@ If instructions include buttons, also explain where those buttons are physically
         er_diag_uri = "gs://github-repo/img/gemini/multimodality_usecases_overview/er.png"
         er_diag_url = "https://storage.googleapis.com/"+er_diag_uri.split("gs://")[1]
         
-        st.write("Gemini's multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram, grasp the relationships between tables, identify requirements for optimization in a specific environment like BigQuery, and even generate corresponding code.")
+        st.write("Gemini's multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram")
         er_diag_img = Part.from_uri(er_diag_uri,mime_type="image/jpeg")
         st.image(er_diag_url,width=350, caption="Image of a ER diagram")
         st.write("Our Expectation: Provide the guidance on converting tables to BigQuery tables.")
@@ -295,7 +287,7 @@ If instructions include buttons, also explain where those buttons are physically
         er_diag_img_description = st.button("Generate!", key="er_diag_img_description")
         with tab1:
             if er_diag_img_description and prompt: 
-                with st.spinner("Generating instructions, guidance and code for ER using Gemini..."):
+                with st.spinner("Generating..."):
                     response = get_gemini_pro_vision_response(multimodal_model_pro,[er_diag_img,prompt])
                     st.markdown(response)
         with tab2:

@@ -8,9 +8,6 @@ Sample screenshots and video demos of the application are shown below:
 
 <img src="https://storage.googleapis.com/github-repo/img/gemini/sample-apps/gemini-streamlit-cloudrun/assets/gemini_pro_text.png" width="50%"/>
 
-## Application video demos
-
-<img src="https://storage.googleapis.com/github-repo/img/gemini/sample-apps/gemini-streamlit-cloudrun/assets/gemini_pro_vision.gif" width="50%"/>
 
 ## Run the Application locally (on Cloud Shell)
 
