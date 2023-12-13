@@ -84,19 +84,19 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg">
       <br>
-      <a href="setup-env/"><code>setup-env/</code></a>
+      <a href="../setup-env/"><code>setup-env/</code></a>
     </td>
     <td>Instructions on how to set up Google Cloud, the Vertex AI Python SDK, and notebook environments on Google Colab and Vertex AI Workbench.</td>
-    <td><a href="setup-env">Setup instructions</a></td>
+    <td><a href="../setup-env">Setup instructions</a></td>
   </tr>
   <tr>
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg">
       <br>
-      <a href="RESOURCES.md"><code>RESOURCES.md</code></a>
+      <a href="../RESOURCES.md"><code>RESOURCES.md</code></a>
     </td>
     <td>Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud</td>
-    <td><a href="RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
+    <td><a href="../RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
   </tr>
 </table>
 <!-- markdownlint-enable MD033 -->
