@@ -8,9 +8,6 @@ Sample screenshots and video demos of the application are shown below:
 
 <img src="https://storage.googleapis.com/github-repo/img/gemini/sample-apps/gemini-streamlit-cloudrun/assets/gemini_pro_text.png" width="50%"/>
 
-## Application video demos
-
-<img src="https://storage.googleapis.com/github-repo/img/gemini/sample-apps/gemini-streamlit-cloudrun/assets/gemini_pro_vision.gif" width="50%"/>
 
 ## Run the Application locally (on Cloud Shell)
 
@@ -49,7 +46,7 @@ To run the Streamlit Application locally (on cloud shell), we need to perform th
     In Cloud Shell, execute the following command:
 
     ```bash
-    streamlit run app.py
+    streamlit run app.py --browser.serverAddress=localhost --server.enableCORS=false --server.enableXsrfProtection=false
     ```
 
 The application will startup and you will be provided a URL to the application. You can visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.

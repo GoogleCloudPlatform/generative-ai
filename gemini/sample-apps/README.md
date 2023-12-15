@@ -12,4 +12,4 @@ We provide instructions for setting up your environment in [Cloud Shell](https:/
 
 | Requirement | Application Name | Technologies Used |
 |---|---|---|
-|Develop a chat application using [Streamlit](https://streamlit.io/) framework and Vertex AI Gemini API model.|[gemini-streamlit-cloudrun](gemini-streamlit-cloudrun)|Cloud Run, Streamlit, Python|
+|Develop a Gemini application using [Streamlit](https://streamlit.io/) framework and Vertex AI Gemini API model.|[gemini-streamlit-cloudrun](gemini-streamlit-cloudrun)|Cloud Run, Streamlit, Python|
