@@ -14,7 +14,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
 
 <!-- markdownlint-disable MD033 -->
 <table>
-    
+
   <tr>
     <th></th>
     <th style="text-align: center;">Description</th>
