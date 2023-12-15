@@ -19,14 +19,6 @@ def load_models():
     multimodal_model_pro = GenerativeModel("gemini-pro-vision")
     return text_model_pro, multimodal_model_pro
 
-def get_image_path(img):
-    folder_name = str(uuid.uuid4())
-    file_path = working_dir+"/temp/"+folder_name+f"/{img.name}"
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, "wb") as img_file:
-        img_file.write(img.getbuffer())
-    return file_path
-
 def get_gemini_pro_text_response( model: GenerativeModel,
                                   contents: str, 
                                   generation_config: GenerationConfig,
@@ -236,7 +228,7 @@ with tab3:
         st.image(room_image_urls,width=350, caption="Image of a living room")
         st.image([chair_1_image_urls,chair_2_image_urls,chair_3_image_urls,chair_4_image_urls],width=200, caption=["Chair 1","Chair 2","Chair 3","Chair 4"])
  
-        st.write("Our Expectation: Recommend a chair that would complement the given image of a living room.")
+        st.write("Our expectation: Recommend a chair that would complement the given image of a living room.")
         content = ["Consider the following chairs:",
                         "chair 1:", chair_1_image,
                         "chair 2:", chair_2_image,
@@ -266,7 +258,7 @@ with tab3:
         # cooking_what = st.radio("What are you cooking?",["Turkey","Pizza","Cake","Bread"],key="cooking_what",horizontal=True)
         stove_screen_img = Part.from_uri(stove_screen_uri,mime_type="image/jpeg")
         st.image(stove_screen_url,width=350, caption="Image of a oven")
-        st.write("Our Expectation: Provide instructions for resetting the clock on this appliance in English")
+        st.write("Our expectation: Provide instructions for resetting the clock on this appliance in English")
         prompt = """How can I reset the clock on this appliance? Provide the instructions in English.
 If instructions include buttons, also explain where those buttons are physically located.
 """
@@ -285,17 +277,17 @@ If instructions include buttons, also explain where those buttons are physically
         er_diag_uri = "gs://github-repo/img/gemini/multimodality_usecases_overview/er.png"
         er_diag_url = "https://storage.googleapis.com/"+er_diag_uri.split("gs://")[1]
         
-        st.write("Gemini's multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram, grasp the relationships between tables, identify requirements for optimization in a specific environment like BigQuery, and even generate corresponding code.")
+        st.write("Gemini's multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram.")
         er_diag_img = Part.from_uri(er_diag_uri,mime_type="image/jpeg")
         st.image(er_diag_url,width=350, caption="Image of a ER diagram")
-        st.write("Our Expectation: Provide the guidance on converting tables to BigQuery tables.")
+        st.write("Our expectation: Document the entities and relationships in this ER diagram.")
         prompt = """Document the entities and relationships in this ER diagram.
                 """
         tab1, tab2 = st.tabs(["Response", "Prompt"])
         er_diag_img_description = st.button("Generate!", key="er_diag_img_description")
         with tab1:
             if er_diag_img_description and prompt: 
-                with st.spinner("Generating instructions, guidance and code for ER using Gemini..."):
+                with st.spinner("Generating..."):
                     response = get_gemini_pro_vision_response(multimodal_model_pro,[er_diag_img,prompt])
                     st.markdown(response)
         with tab2:
@@ -316,7 +308,7 @@ If instructions include buttons, also explain where those buttons are physically
         face_type = st.radio("What is your face shape?",["Oval","Round","Square","Heart","Diamond"],key="face_type",horizontal=True)
         output_type = st.radio("Select the output type",["text","table","json"],key="output_type",horizontal=True)
         st.image([compare_img_1_url,compare_img_2_url],width=350, caption=["Glasses type 1","Glasses type 2"])
-        st.write(f"Our Expectation: Suggest which glasses type is better for the {face_type} face shape")
+        st.write(f"Our expectation: Suggest which glasses type is better for the {face_type} face shape")
         content = [f"""Which of these glasses you recommend for me based on the shape of my face:{face_type}?
            I have an {face_type} shape face.
            Glasses 1: """,
@@ -347,7 +339,7 @@ If instructions include buttons, also explain where those buttons are physically
         math_image_img = Part.from_uri(math_image_uri,mime_type="image/jpeg")
         st.image(math_image_url,width=350, caption="Image of a math equation")
         st.markdown(f"""
-                Our Expectation: Ask questions about the math equation as follows: 
+                Our expectation: Ask questions about the math equation as follows: 
                 - Extract the formula.
                 - What is the symbol right before Pi? What does it mean?
                 - Is this a famous formula? Does it have a name?
@@ -386,7 +378,7 @@ with tab4:
         if vide_desc_uri:
             vide_desc_img = Part.from_uri(vide_desc_uri, mime_type="video/mp4")
             st.video(video_desc_url)
-            st.write("Our Expectation: Generate the description of the video")
+            st.write("Our expectation: Generate the description of the video")
             prompt = """Describe what is happening in the video and answer the following questions: \n
             - What am I looking at? \n
             - Where should I go to see it? \n
@@ -411,7 +403,7 @@ with tab4:
         if video_tags_url:
             video_tags_img = Part.from_uri(video_tags_uri, mime_type="video/mp4")
             st.video(video_tags_url)
-            st.write("Our Expectation: Generate the tags for the video")
+            st.write("Our expectation: Generate the tags for the video")
             prompt = """Answer the following questions using the video only:
                         1. What is in the video?
                         2. What objects are in the video?
@@ -437,7 +429,7 @@ with tab4:
         if video_highlights_url:
             video_highlights_img = Part.from_uri(video_highlights_uri, mime_type="video/mp4")
             st.video(video_highlights_url)
-            st.write("Our Expectation: Generate the highlights for the video")
+            st.write("Our expectation: Generate the highlights for the video")
             prompt = """Answer the following questions using the video only:
 What is the profession of the girl in this video?
 Which all features of the phone are highlighted here?
@@ -463,7 +455,7 @@ Provide the answer in table format.
         if video_geoloaction_url:
             video_geoloaction_img = Part.from_uri(video_geoloaction_uri, mime_type="video/mp4")
             st.video(video_geoloaction_url)
-            st.markdown("""Our Expectation: \n
+            st.markdown("""Our expectation: \n
             Answer the following questions from the video:
                 - What is this video about?
                 - How do you know which city it is?
