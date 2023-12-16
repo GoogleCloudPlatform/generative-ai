@@ -24,7 +24,7 @@ To run the Streamlit Application locally (on cloud shell), we need to perform th
     source gemini-streamlit/bin/activate
     pip install -r requirements.txt
     ```
-    
+
 2. Your application requires access to two environment variables:
 
    - `GCP_PROJECT` : This the Google Cloud project ID.
