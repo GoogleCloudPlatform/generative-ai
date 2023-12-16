@@ -8,7 +8,6 @@ Sample screenshots and video demos of the application are shown below:
 
 <img src="https://storage.googleapis.com/github-repo/img/gemini/sample-apps/gemini-streamlit-cloudrun/assets/gemini_pro_text.png" width="50%"/>
 
-
 ## Run the Application locally (on Cloud Shell)
 
 > NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
@@ -25,6 +24,7 @@ To run the Streamlit Application locally (on cloud shell), we need to perform th
     source gemini-streamlit/bin/activate
     pip install -r requirements.txt
     ```
+    
 2. Your application requires access to two environment variables:
 
    - `GCP_PROJECT` : This the Google Cloud project ID.
