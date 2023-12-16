@@ -92,7 +92,7 @@ class MatchingEngineUtils:
                     "leafNodesToSearchPercent": struct_pb2.Value(number_value=7),
                 }
             )
-            if index_algorithm == "treeah":
+            if index_algorithm == "tree-ah":
                 algorithmConfig = struct_pb2.Struct(
                     fields={"treeAhConfig": struct_pb2.Value(struct_value=treeAhConfig)}
                 )
