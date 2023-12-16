@@ -1,0 +1,3 @@
+google-generativeai
+gradio=4.1.1
+gradio_multimodalchatbot
