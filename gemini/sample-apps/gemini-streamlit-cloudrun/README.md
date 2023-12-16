@@ -46,10 +46,14 @@ To run the Streamlit Application locally (on cloud shell), we need to perform th
     In Cloud Shell, execute the following command:
 
     ```bash
-    streamlit run app.py --browser.serverAddress=localhost --server.enableCORS=false --server.enableXsrfProtection=false
+    streamlit run app.py \
+      --browser.serverAddress=localhost \
+      --server.enableCORS=false \
+      --server.enableXsrfProtection=false \
+      --server.port 8080
     ```
 
-The application will startup and you will be provided a URL to the application. You can visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.
+The application will startup and you will be provided a URL to the application. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) function to launch the preview page. You may also visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.
 
 ## Build and Deploy the Application to Cloud Run
 
