@@ -26,8 +26,7 @@ language/
 │   │   ├── <a href="prompts/examples/question_answering.ipynb">[Notebook] Question Answering with Generative Models on Vertex AI</a>
 │   │   ├── <a href="prompts/examples/text_classification.ipynb">[Notebook] Text Classification with Generative Models on Vertex AI</a>
 │   │   ├── <a href="prompts/examples/text_extraction.ipynb">[Notebook] Text Extraction with Generative Models on Vertex AI</a>
-│   │   ├── <a href="prompts/examples/text_summarization.ipynb">[Notebook] Text Summarization with Generative Models on Vertex AI</a>
-│   │   └── <a href="prompts/examples/sql_code_generation.ipynb">[Notebook] SQL Generation with Generative Models on Vertex AI</a>
+│   │   └── <a href="prompts/examples/text_summarization.ipynb">[Notebook] Text Summarization with Generative Models on Vertex AI</a>
 │   └── <a href="prompts/intro_prompt_design.ipynb">[Notebook] Prompt Design - Best Practices</a>
 ├── <a href="sample-apps">sample-apps/</a>
 │   └── <a href="sample-apps/chat-flask-cloudrun/">Chat Application in Python Flask on Cloud Run</a>
@@ -41,6 +40,8 @@ language/
 └── <a href="use-cases">use-cases/</a>
     ├── <a href="use-cases/chatbots">chatbots/</a>
     │   └── <a href="use-cases/chatbots/grocerybot_assistant.ipynb">[Notebook] GroceryBot, a sample grocery and recipe assistant - RAG + ReAct</a>
+    ├── <a href="use-cases/sql-code-generation">sql-code-generation/</a>
+    │   └── <a href="use-cases/sql-code-generation/sql_code_generation.ipynb">[Notebook] SQL Generation for Log Analysis using Vertex AI</a>
     ├── <a href="use-cases/description-generation">description-generation/</a>
     │   ├── <a href="use-cases/description-generation/product_description_generator_attributes_to_text.ipynb">[Notebook] DescriptionGen: SEO-optimized product decription generation for retail using LangChain 🦜🔗</a>
     │   └── <a href="use-cases/description-generation/product_description_generator_image.ipynb">[Notebook] Product Description Generator From Image</a>
