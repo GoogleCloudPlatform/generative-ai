@@ -1,0 +1,5 @@
+.envrc
+private/
+t.*
+.tmp*json
+index.html
