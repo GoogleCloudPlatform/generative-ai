@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block css_imports %}
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/stackoverflow-dark.min.css" />
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
+{% endblock %}
+
+{% block title %}Vertex AI Search Demo - {{title}}{% endblock %}
+{% block content %}
+<form class="search-form" action="/search_genappbuilder" method="post">
+  <!-- Search Box -->
+  <div class="mdc-text-field mdc-text-field--outlined query-field">
+    <input class="mdc-text-field__input" id="query-input" name="search_query" required />
+    <div class="mdc-notched-outline">
+      <div class="mdc-notched-outline__leading"></div>
+      <div class="mdc-notched-outline__notch">
+        <label for="text-field-hero-input" class="mdc-floating-label">Search Query</label>
+      </div>
+      <div class="mdc-notched-outline__trailing"></div>
+    </div>
+  </div>
+  <!-- Radio Buttons for Search Engine -->
+  <div class="search-engine-radio">
+  {% for engine_name in search_engines %}
+  <label class="mdc-radio">
+      <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}"
+          {% if loop.index0 == 0 %} checked {% endif %} />
+      <div class="mdc-radio__background">
+          <div class="mdc-radio__outer-circle"></div>
+          <div class="mdc-radio__inner-circle"></div>
+      </div>
+      <div class="mdc-radio__ripple"></div>
+      <span class="mdc-radio__label">{{ engine_name }}</span>
+  </label>
+  {% endfor %}
+  </div>
+  <!-- Search Button -->
+  <div class="button-container">
+    <button
+      type="submit"
+      class="search-button mdc-button mdc-button--outlined mdc-button--icon-leading">
+      <span class="mdc-button__ripple"></span>
+      <i class="material-icons mdc-button__icon" aria-hidden="true">search</i>
+      <span class="mdc-button__label">Search</span>
+    </button>
+  </div>
+</form>
+{% if message_error %}
+<div class="mdc-layout-grid">
+  <div class="mdc-layout-grid__inner">
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+      <pre>{{message_error}}</pre>
+    </div>
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+  </div>
+</div>
+{% elif message_success %}
+<div class="mdc-tab-bar" role="tablist">
+  <div class="mdc-tab-scroller">
+    <div class="mdc-tab-scroller__scroll-area">
+      <div class="mdc-tab-scroller__scroll-content">
+        <button
+          id="entities-tab-selector"
+          class="mdc-tab mdc-tab--active"
+          role="tab"
+          aria-selected="true"
+          tabindex="0">
+          <span class="mdc-tab__content">
+            <span class="mdc-tab__icon material-icons" aria-hidden="true">dataset</span>
+            <span class="mdc-tab__text-label">Results</span>
+          </span>
+          <span class="mdc-tab-indicator mdc-tab-indicator--active">
+            <span
+              class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+          </span>
+          <span class="mdc-tab__ripple"></span>
+        </button>
+        <button id="json-tab-selector" class="mdc-tab mdc-tab" role="tab" tabindex="1">
+          <span class="mdc-tab__content">
+            <span class="mdc-tab__icon material-icons" aria-hidden="true">code</span>
+            <span class="mdc-tab__text-label">JSON</span>
+          </span>
+          <span class="mdc-tab-indicator">
+            <span
+              class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+          </span>
+          <span class="mdc-tab__ripple"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tab-content">
+  <div id="entities-tab" class="tab-visible">
+    {% if summary %}
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+          <b>Generative AI Summary:</b> {{summary}}
+        </div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+      </div>
+    </div>
+    {% endif %}
+    {% for result in results %}
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <div class="mdc-card mdc-card--outlined">
+            <div class="mdc-card__primary-action entity-primary-action" tabindex="0">
+              {% set imageUrl = result["thumbnailImage"] %}
+              <div
+                class="mdc-card__media mdc-card__media--square entity-image"
+                style="background-image: url('{{imageUrl}}');"></div>
+              <div class="entity-card-primary">
+                <h2 class="mdc-typography mdc-typography--headline6">{{result["title"]}}</h2>
+                <h3 class="mdc-typography mdc-typography--subtitle2">
+                  {% set resultUrl = result["link"] %} URL:
+                  <a href="{{resultUrl}}" target="_blank" rel="noopener noreferrer"
+                    >{{result["htmlFormattedUrl"]|safe}}</a
+                  >
+                </h3>
+              </div>
+              <div class="mdc-typography mdc-typography--body2 entity-detailed-description">
+                {% if result["snippets"] %}
+                <h3 class="mdc-typography mdc-typography--subtitle2">Snippet:</h3>
+                {{result["snippets"][0]|safe}}
+                {% endif %}
+                <br>
+                {% if result["extractiveAnswers"] %}
+                <h3 class="mdc-typography mdc-typography--subtitle2">Extractive Answer:</h3>
+                {{result["extractiveAnswers"][0]|safe}}
+                {% endif %}
+                {% if result["extractiveSegments"] %}
+                <h3 class="mdc-typography mdc-typography--subtitle2">Extractive Segments:</h3>
+                {{result["extractiveSegments"][0]|safe}}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <div class="mdc-card mdc-card--outlined">
+            <pre><code class="language-json" lang="json">{{result["resultJson"]}}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div id="json-tab" class="tab-hidden">
+    {% if request_url %}
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+          <b>Request URL:</b>
+          <pre><code class="language-shell" lang="shell">{{request_url}}</code></pre>
+        </div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        {% if raw_request %}
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <b>Request Body:</b>
+          <pre><code class="language-json" lang="json">{{raw_request}}</code></pre>
+        </div>
+        {% endif %} {% if raw_response %}
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <b>Response Body:</b>
+          <pre><code class="language-json" lang="json">{{raw_response}}</code></pre>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block js_imports %}
+<script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
+<script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+<script src="{{url_for('static', filename='search.js')}}"></script>
+{% endblock %}

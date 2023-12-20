@@ -1,0 +1,9 @@
+typing
+requests
+
+google-api-core
+google-cloud-enterpriseknowledgegraph
+google-cloud-discoveryengine>=0.11.1
+
+Flask
+gunicorn

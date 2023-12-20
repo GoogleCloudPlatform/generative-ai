@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Google+Sans:300,400,500,700" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link
+      href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+    {% block css_imports %}{% endblock %}
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}" />
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='favicon.ico')}}" />
+    <title>{{title}}</title>
+  </head>
+
+  <body>
+    <div id="main-nav-bar" class="mdc-tab-bar" role="tablist">
+      <div class="mdc-tab-scroller">
+        <div class="mdc-tab-scroller__scroll-area">
+          <div class="mdc-tab-scroller__scroll-content">
+            {% for n in nav_links %}
+            <a class="tab-nav" href="{{n.link}}">
+              <button class="mdc-tab mdc-tab--active nav-button" role="tab" tabindex="0">
+                <span class="mdc-tab__content">
+                  {% if n.icon %}
+                  <span class="mdc-tab__icon material-icons" aria-hidden="true">{{n.icon}}</span>
+                  {% endif %}
+                  <span class="mdc-tab__text-label">{{n.name}}</span>
+                </span>
+              </button>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <section class="header">
+      {% block product_logo %}
+        <img
+        class="product-logo"
+        src="{{url_for('static', filename='vertexai_32dp.svg')}}"
+        alt="Vertex AI Search" />
+      {% endblock %}
+      <h1>{% block title %}{% endblock %}</h1>
+      <p>{% block description %}{% endblock %}</p>
+    </section>
+    <main id="active-area">
+      {% block content %}{% endblock %}
+    </main>
+    <section class="footer">
+      <p>
+        {% block footer %}
+        Made by <a href="https://github.com/holtskinner">holtskinner@</a> - Powered by
+        <a href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Search</a>
+        on <a href="https://cloud.google.com/">Google Cloud</a>
+        {% endblock %}
+      </p>
+    </section>
+  </body>
+
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+  {% block js_imports %}{% endblock %}
+</html>
