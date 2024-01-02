@@ -40,6 +40,8 @@ language/
 └── <a href="use-cases">use-cases/</a>
     ├── <a href="use-cases/chatbots">chatbots/</a>
     │   └── <a href="use-cases/chatbots/grocerybot_assistant.ipynb">[Notebook] GroceryBot, a sample grocery and recipe assistant - RAG + ReAct</a>
+    ├── <a href="use-cases/sql-code-generation">sql-code-generation/</a>
+    │   └── <a href="use-cases/sql-code-generation/sql_code_generation.ipynb">[Notebook] SQL Generation for Log Analysis using Vertex AI</a>
     ├── <a href="use-cases/description-generation">description-generation/</a>
     │   ├── <a href="use-cases/description-generation/product_description_generator_attributes_to_text.ipynb">[Notebook] DescriptionGen: SEO-optimized product decription generation for retail using LangChain 🦜🔗</a>
     │   └── <a href="use-cases/description-generation/product_description_generator_image.ipynb">[Notebook] Product Description Generator From Image</a>
