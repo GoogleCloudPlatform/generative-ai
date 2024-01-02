@@ -40,7 +40,7 @@ from proto import Message
 # Your Vertex AI Search config
 project_id = "YOUR_PROJECT_ID"  # alphanumeric
 location = "global"  # or an alternate location
-data_store_id = "ENTER_YOUR_DATA_STORE_ID_HERE"  # not the app id, alphanumeric
+data_store_id = "YOUR_DATA_STORE_ID"  # not the app id, alphanumeric
 
 
 def get_document_info(search_result_dict):
