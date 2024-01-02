@@ -38,7 +38,7 @@ from proto import Message
 # https://cloud.google.com/generative-ai-app-builder/docs/libraries
 
 # Your Vertex AI Search config
-project_id = "ENTER_YOUR_PROJECT_NAME_HERE"  # alphanumeric
+project_id = "YOUR_PROJECT_ID"  # alphanumeric
 location = "global"  # or an alternate location
 data_store_id = "ENTER_YOUR_DATA_STORE_ID_HERE"  # not the app id, alphanumeric
 
