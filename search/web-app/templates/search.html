@@ -18,13 +18,14 @@
     <div class="mdc-notched-outline">
       <div class="mdc-notched-outline__leading"></div>
       <div class="mdc-notched-outline__notch">
-        <label for="text-field-hero-input" class="mdc-floating-label">Search Query</label>
+        <label for="query-input" class="mdc-floating-label">Search Query</label>
       </div>
       <div class="mdc-notched-outline__trailing"></div>
     </div>
   </div>
   <!-- Radio Buttons for Search Engine -->
   <div class="search-engine-radio">
+  <div>Search engine</div>
   {% for engine_name in search_engines %}
   <label class="mdc-radio">
       <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}"
@@ -38,6 +39,7 @@
   </label>
   {% endfor %}
   </div>
+  <br>
   <!-- Radio Buttons for Summary Model Version -->
   <div class="summary-model-radio">
   <div><a href="https://cloud.google.com/generative-ai-app-builder/docs/get-search-summaries#summary-model">Summary model</a></div>
@@ -55,12 +57,12 @@
   {% endfor %}
   </div>
   <!-- Summary Preamble -->
-  <div class="mdc-text-field mdc-text-field--outlined query-field">
+  <div class="mdc-text-field mdc-text-field--outlined summary-preamble-field">
     <input class="mdc-text-field__input" id="summary-preamble" name="summary_preamble" />
     <div class="mdc-notched-outline">
       <div class="mdc-notched-outline__leading"></div>
       <div class="mdc-notched-outline__notch">
-        <label for="text-field-hero-input" class="mdc-floating-label">Summary Preamble</label>
+        <label for="summary-preamble" class="mdc-floating-label">Summary Preamble</label>
       </div>
       <div class="mdc-notched-outline__trailing"></div>
     </div>
@@ -146,7 +148,7 @@
                 class="mdc-card__media mdc-card__media--square entity-image"
                 style="background-image: url('{{imageUrl}}');"></div>
               <div class="entity-card-primary">
-                <h2 class="mdc-typography mdc-typography--headline6">{{result["title"]}}</h2>
+                <h2 class="mdc-typography mdc-typography--headline6">[{{loop.index}}] {{result["title"]}}</h2>
                 <h3 class="mdc-typography mdc-typography--subtitle2">
                   {% set resultUrl = result["link"] %} URL:
                   <a href="{{resultUrl}}" target="_blank" rel="noopener noreferrer"

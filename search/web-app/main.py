@@ -150,17 +150,15 @@ def search_genappbuilder() -> str:
             message_error="No search engine selected",
         )
 
-    search_engine_index = int(search_engine)
-
     summary_model = request.form.get("summary_model")
     summary_preamble = request.form.get("summary_preamble")
 
     results, summary, request_url, raw_request, raw_response = search_enterprise_search(
         project_id=PROJECT_ID,
         location=LOCATION,
-        data_store_id=CUSTOM_UI_DATASTORE_IDS[search_engine_index]["datastore_id"],
+        data_store_id=CUSTOM_UI_DATASTORE_IDS[int(search_engine)]["datastore_id"],
         search_query=search_query,
-        summary_model=summary_model,
+        summary_model=SUMMARY_MODELS[int(summary_model)],
         summary_preamble=summary_preamble,
     )
 
@@ -169,6 +167,7 @@ def search_genappbuilder() -> str:
         title=NAV_LINKS[1]["name"],
         nav_links=NAV_LINKS,
         search_engines=CUSTOM_UI_SEARCH_ENGINES,
+        summary_models=SUMMARY_MODELS,
         message_success=search_query,
         results=results,
         summary=summary,
@@ -397,6 +396,8 @@ def handle_exception(ex: Exception):
         title=NAV_LINKS[1]["name"],
         form_options=FORM_OPTIONS,
         nav_links=NAV_LINKS,
+        search_engines=CUSTOM_UI_SEARCH_ENGINES,
+        summary_models=SUMMARY_MODELS,
         message_error=message_error,
     )
 

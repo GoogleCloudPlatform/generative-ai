@@ -37,6 +37,7 @@ body {
 }
 
 .query-field,
+.summary-preamble-field,
 .schema-info,
 .types-field,
 .search-engine-name,
@@ -51,7 +52,7 @@ body {
   margin: 20px auto;
 }
 
-.query-field {
+.query-field, .summary-preamble-field {
   margin: 1rem auto 2rem;
 }
 

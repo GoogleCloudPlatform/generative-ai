@@ -3,7 +3,7 @@ requests
 
 google-api-core
 google-cloud-enterpriseknowledgegraph
-google-cloud-discoveryengine>=0.11.1
+google-cloud-discoveryengine>=0.11.5
 
 Flask
 gunicorn

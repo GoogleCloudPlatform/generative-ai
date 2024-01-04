@@ -25,7 +25,7 @@ const MDCTabBar = mdc.tabBar.MDCTabBar;
 MDCRipple.attachTo(document.querySelector(".search-button"));
 
 const queryTextField = new MDCTextField(document.querySelector(".query-field"));
-
+const summaryPreambleTextField = new MDCTextField(document.querySelector(".summary-preamble-field"));
 // const documentTypesField = document.querySelector('.mdc-text-field.types-field');
 
 // const select = new MDCSelect(document.querySelector('.mdc-select'));
