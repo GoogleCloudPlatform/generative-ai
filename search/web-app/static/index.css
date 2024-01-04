@@ -223,7 +223,7 @@ a:active {
   justify-content: center;
 }
 
-.search-form .search-engine-radio {
+.search-form .search-engine-radio, .search-form .summary-model-radio {
   text-align: center;
   margin: 1rem auto;
   height: 8rem;
