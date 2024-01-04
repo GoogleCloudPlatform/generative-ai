@@ -75,24 +75,24 @@ const summaryModelRadioSelector = document.querySelector(".summary-model-radio")
 const summaryPreambleSelector = document.querySelector(".summary-preamble-field");
 
 function toggleElement(element, show) {
-    if (show) {
-        element.style.display = 'block';
-    } else {
-        element.style.display = 'none';
-    }
+  if (show) {
+    element.style.display = "block";
+  } else {
+    element.style.display = "none";
+  }
 }
 
 // Add event listeners to radio buttons
-searchEngine0Radio.addEventListener('change', function() {
+searchEngine0Radio.addEventListener("change", function () {
   if (searchEngine0Radio.checked) {
     toggleElement(summaryModelRadioSelector, false);
     toggleElement(summaryPreambleSelector, false);
-    }
+  }
 });
 
-searchEngine1Radio.addEventListener('change', function() {
+searchEngine1Radio.addEventListener("change", function () {
   if (searchEngine1Radio.checked) {
     toggleElement(summaryModelRadioSelector, true);
     toggleElement(summaryPreambleSelector, true);
-    }
+  }
 });
