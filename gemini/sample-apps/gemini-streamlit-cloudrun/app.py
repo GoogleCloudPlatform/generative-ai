@@ -364,7 +364,7 @@ INSTRUCTIONS:
                     st.markdown("\n\n\n")
         with tab2:
             st.write("Prompt used:")
-            st.text(content)
+            st.text(prompt)
             
 with tab4:
     st.write("Using Gemini Pro Vision - Multimodal model")
