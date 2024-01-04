@@ -158,7 +158,7 @@ def search_genappbuilder() -> str:
         location=LOCATION,
         data_store_id=CUSTOM_UI_DATASTORE_IDS[int(search_engine)]["datastore_id"],
         search_query=search_query,
-        summary_model=SUMMARY_MODELS[int(summary_model)],
+        summary_model=summary_model,
         summary_preamble=summary_preamble,
     )
 

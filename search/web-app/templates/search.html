@@ -28,8 +28,8 @@
   <div>Search engine</div>
   {% for engine_name in search_engines %}
   <label class="mdc-radio">
-      <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}"
-          {% if loop.index0 == 0 %} checked {% endif %} />
+      <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}" id="search-engine-{{ loop.index0 }}"
+          {% if loop.index0 == 1 %} checked {% endif %} />
       <div class="mdc-radio__background">
           <div class="mdc-radio__outer-circle"></div>
           <div class="mdc-radio__inner-circle"></div>
@@ -45,7 +45,7 @@
   <div><a href="https://cloud.google.com/generative-ai-app-builder/docs/get-search-summaries#summary-model">Summary model</a></div>
   {% for summary_model in summary_models %}
   <label class="mdc-radio">
-      <input type="radio" class="mdc-radio__native-control" name="summary_model" value="{{ loop.index0 }}"
+      <input type="radio" class="mdc-radio__native-control" name="summary_model" value="{{ summary_model }}"
           {% if loop.index0 == 0 %} checked {% endif %} />
       <div class="mdc-radio__background">
           <div class="mdc-radio__outer-circle"></div>
