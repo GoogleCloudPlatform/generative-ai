@@ -138,7 +138,7 @@ with tab1:
     character_persona: {character_persona} \n
     character_location: {character_location} \n
     story_premise: {",".join(story_premise)} \n
-    If the story is "short", then make sure to have 5 chapters or else if it is "long" then 10 chapters. 
+    If the story is "short", then make sure to have 5 chapters or else if it is "long" then 10 chapters.
     Important point is that each chapters should be generated based on the premise given above.
     First start by giving the book introduction, chapter introductions and then each chapter. It should also have a proper ending.
     The book should have prologue and epilogue.
@@ -524,7 +524,7 @@ If instructions include buttons, also explain where those buttons are physically
         st.image(math_image_url, width=350, caption="Image of a math equation")
         st.markdown(
             """
-                Our expectation: Ask questions about the math equation as follows: 
+                Our expectation: Ask questions about the math equation as follows:
                 - Extract the formula.
                 - What is the symbol right before Pi? What does it mean?
                 - Is this a famous formula? Does it have a name?
@@ -578,7 +578,7 @@ with tab4:
             prompt = """Describe what is happening in the video and answer the following questions: \n
             - What am I looking at? \n
             - Where should I go to see it? \n
-            - What are other top 5 places in the world that look like this? 
+            - What are other top 5 places in the world that look like this?
             """
             tab1, tab2 = st.tabs(["Response", "Prompt"])
             vide_desc_description = st.button(
@@ -697,7 +697,7 @@ Provide the answer in table format.
             How do you know which city it is?
             What street is this?
             What is the nearest intersection?
-            Answer the following questions in a table format with question and answer as columns. 
+            Answer the following questions in a table format with question and answer as columns.
             """
             tab1, tab2 = st.tabs(["Response", "Prompt"])
             video_geoloaction_description = st.button(
