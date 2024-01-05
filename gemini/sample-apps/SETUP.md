@@ -47,7 +47,7 @@ Credentialed accounts:
 gcloud config list project
 ```
 
-Command output: 
+Command output:
 
 ```bash
 [core]
