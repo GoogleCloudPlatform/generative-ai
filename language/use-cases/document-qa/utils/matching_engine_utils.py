@@ -1,8 +1,10 @@
 # Utility functions to create Index and deploy the index to an Endpoint
 from datetime import datetime
-import time
 import logging
+import time
+from typing import Optional
 
+from google.api_core.client_options import ClientOptions
 from google.cloud import aiplatform_v1 as aipv1
 from google.protobuf import struct_pb2
 
@@ -11,27 +13,34 @@ logger = logging.getLogger()
 
 
 class MatchingEngineUtils:
-    def __init__(self, project_id: str, region: str, index_name: str):
+    def __init__(
+        self,
+        project_id: str,
+        region: str,
+        index_name: str,
+        index_endpoint_name: Optional[str] = None,
+    ):
         self.project_id = project_id
         self.region = region
         self.index_name = index_name
-        self.index_endpoint_name = f"{self.index_name}-endpoint"
+        self.index_endpoint_name = index_endpoint_name or f"{self.index_name}-endpoint"
         self.PARENT = f"projects/{self.project_id}/locations/{self.region}"
 
         ENDPOINT = f"{self.region}-aiplatform.googleapis.com"
         # set index client
         self.index_client = aipv1.IndexServiceClient(
-            client_options=dict(api_endpoint=ENDPOINT)
+            client_options=ClientOptions(api_endpoint=ENDPOINT)
         )
         # set index endpoint client
         self.index_endpoint_client = aipv1.IndexEndpointServiceClient(
-            client_options=dict(api_endpoint=ENDPOINT)
+            client_options=ClientOptions(api_endpoint=ENDPOINT)
         )
 
     def get_index(self):
         # Check if index exists
-        request = aipv1.ListIndexesRequest(parent=self.PARENT)
-        page_result = self.index_client.list_indexes(request=request)
+        page_result = self.index_client.list_indexes(
+            request=aipv1.ListIndexesRequest(parent=self.PARENT)
+        )
         indexes = [
             response.name
             for response in page_result
@@ -40,16 +49,15 @@ class MatchingEngineUtils:
 
         if len(indexes) == 0:
             return None
-        else:
-            index_id = indexes[0]
-            request = aipv1.GetIndexRequest(name=index_id)
-            index = self.index_client.get_index(request=request)
-            return index
+
+        index_id = indexes[0]
+        return self.index_client.get_index(request=aipv1.GetIndexRequest(name=index_id))
 
     def get_index_endpoint(self):
         # Check if index endpoint exists
-        request = aipv1.ListIndexEndpointsRequest(parent=self.PARENT)
-        page_result = self.index_endpoint_client.list_index_endpoints(request=request)
+        page_result = self.index_endpoint_client.list_index_endpoints(
+            request=aipv1.ListIndexEndpointsRequest(parent=self.PARENT)
+        )
         index_endpoints = [
             response.name
             for response in page_result
@@ -58,13 +66,11 @@ class MatchingEngineUtils:
 
         if len(index_endpoints) == 0:
             return None
-        else:
-            index_endpoint_id = index_endpoints[0]
-            request = aipv1.GetIndexEndpointRequest(name=index_endpoint_id)
-            index_endpoint = self.index_endpoint_client.get_index_endpoint(
-                request=request
-            )
-            return index_endpoint
+
+        index_endpoint_id = index_endpoints[0]
+        return self.index_endpoint_client.get_index_endpoint(
+            request=aipv1.GetIndexEndpointRequest(name=index_endpoint_id)
+        )
 
     def create_index(
         self,
@@ -72,6 +78,9 @@ class MatchingEngineUtils:
         dimensions: int,
         index_update_method: str = "streaming",
         index_algorithm: str = "tree-ah",
+        shard_size: str = "SHARD_SIZE_SMALL",
+        distance_measure_type: str = "DOT_PRODUCT_DISTANCE",
+        description: str = "Index for LangChain demo",
     ):
         # Get index
         index = self.get_index()
@@ -81,18 +90,19 @@ class MatchingEngineUtils:
         else:
             logger.info(f"Index {self.index_name} does not exists. Creating index ...")
 
-            if index_update_method == "streaming":
-                index_update_method = aipv1.Index.IndexUpdateMethod.STREAM_UPDATE
-            else:
-                index_update_method = aipv1.Index.IndexUpdateMethod.BATCH_UPDATE
-
-            treeAhConfig = struct_pb2.Struct(
-                fields={
-                    "leafNodeEmbeddingCount": struct_pb2.Value(number_value=500),
-                    "leafNodesToSearchPercent": struct_pb2.Value(number_value=7),
-                }
+            index_update_method_enum = (
+                aipv1.Index.IndexUpdateMethod.STREAM_UPDATE
+                if index_update_method == "streaming"
+                else aipv1.Index.IndexUpdateMethod.BATCH_UPDATE
             )
-            if index_algorithm == "treeah":
+
+            if index_algorithm == "tree-ah":
+                treeAhConfig = struct_pb2.Struct(
+                    fields={
+                        "leafNodeEmbeddingCount": struct_pb2.Value(number_value=500),
+                        "leafNodesToSearchPercent": struct_pb2.Value(number_value=7),
+                    }
+                )
                 algorithmConfig = struct_pb2.Struct(
                     fields={"treeAhConfig": struct_pb2.Value(struct_value=treeAhConfig)}
                 )
@@ -109,10 +119,10 @@ class MatchingEngineUtils:
                     "dimensions": struct_pb2.Value(number_value=dimensions),
                     "approximateNeighborsCount": struct_pb2.Value(number_value=150),
                     "distanceMeasureType": struct_pb2.Value(
-                        string_value="DOT_PRODUCT_DISTANCE"
+                        string_value=distance_measure_type
                     ),
                     "algorithmConfig": struct_pb2.Value(struct_value=algorithmConfig),
-                    "shardSize": struct_pb2.Value(string_value="SHARD_SIZE_SMALL"),
+                    "shardSize": struct_pb2.Value(string_value=shard_size),
                 }
             )
             metadata = struct_pb2.Struct(
@@ -124,12 +134,12 @@ class MatchingEngineUtils:
                 }
             )
 
-            index_request = {
-                "display_name": self.index_name,
-                "description": "Index for LangChain demo",
-                "metadata": struct_pb2.Value(struct_value=metadata),
-                "index_update_method": index_update_method,
-            }
+            index_request = aipv1.Index(
+                display_name=self.index_name,
+                description=description,
+                metadata=struct_pb2.Value(struct_value=metadata),
+                index_update_method=index_update_method_enum,
+            )
 
             r = self.index_client.create_index(parent=self.PARENT, index=index_request)
             logger.info(
@@ -156,7 +166,8 @@ class MatchingEngineUtils:
         machine_type: str = "e2-standard-2",
         min_replica_count: int = 2,
         max_replica_count: int = 10,
-        network: str = None,
+        public_endpoint_enabled: bool = True,
+        network: Optional[str] = None,
     ):
         try:
             # Get index if exists
@@ -179,13 +190,16 @@ class MatchingEngineUtils:
                 logger.info(
                     f"Index endpoint {self.index_endpoint_name} does not exists. Creating index endpoint..."
                 )
-                index_endpoint_request = {"display_name": self.index_endpoint_name}
+                index_endpoint_request = aipv1.IndexEndpoint(
+                    display_name=self.index_endpoint_name
+                )
 
                 if network:
-                    index_endpoint_request["network"] = network
+                    index_endpoint_request.network = network
                 else:
-                    index_endpoint_request["public_endpoint_enabled"] = True
-
+                    index_endpoint_request.public_endpoint_enabled = (
+                        public_endpoint_enabled
+                    )
                 r = self.index_endpoint_client.create_index_endpoint(
                     parent=self.PARENT, index_endpoint=index_endpoint_request
                 )
@@ -223,21 +237,20 @@ class MatchingEngineUtils:
 
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             deployed_index_id = f"{self.index_name.replace('-', '_')}_{timestamp}"
-            deploy_index = {
-                "id": deployed_index_id,
-                "display_name": deployed_index_id,
-                "index": index.name,
-                "dedicated_resources": {
-                    "machine_spec": {
-                        "machine_type": machine_type,
-                    },
-                    "min_replica_count": min_replica_count,
-                    "max_replica_count": max_replica_count,
-                },
-            }
-            logger.info(f"Deploying index with request = {deploy_index}")
+            deployed_index = aipv1.DeployedIndex(
+                id=deployed_index_id,
+                display_name=deployed_index_id,
+                index=index.name,
+                dedicated_resources=aipv1.DedicatedResources(
+                    machine_spec=aipv1.MachineSpec(machine_type=machine_type),
+                    min_replica_count=min_replica_count,
+                    max_replica_count=max_replica_count,
+                ),
+            )
+
+            logger.info(f"Deploying index with request = {deployed_index}")
             r = self.index_endpoint_client.deploy_index(
-                index_endpoint=index_endpoint.name, deployed_index=deploy_index
+                index_endpoint=index_endpoint.name, deployed_index=deployed_index
             )
 
             # Poll the operation until it's done successfullly.
