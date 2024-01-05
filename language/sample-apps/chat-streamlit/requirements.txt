@@ -1,0 +1,4 @@
+google-cloud-aiplatform >= 1.31.0
+google-cloud-logging
+streamlit
+streamlit-chat

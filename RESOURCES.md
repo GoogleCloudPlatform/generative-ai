@@ -10,17 +10,38 @@ Please submit additional resources via a PR.
 
 ## Products
 
-- Generative AI support on Vertex AI ([Your Guide](https://cloud.google.com/blog/products/ai-machine-learning/vertex-ai-model-garden-and-generative-ai-studio), [Demo](https://youtube.com/watch?v=pN-RTBq6i3I))
-  - [Vertex AI](https://cloud.google.com/vertex-ai)
+- Generative AI support on [Vertex AI](https://cloud.google.com/vertex-ai)
+  - [Overview](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview)
   - [Generative AI Studio](https://cloud.google.com/generative-ai-studio)
-  - Duet AI for Google Cloud ([Blog](https://cloud.google.com/blog/products/application-modernization/introducing-duet-ai-for-google-cloud), [Video](https://www.youtube.com/watch?v=g5TwQx60NXs))
+  - [Available Models](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/generative-ai-studio)
+    - Language Models ([Text](https://cloud.google.com/vertex-ai/docs/generative-ai/text/text-overview), [Code](https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview), [Chat](https://cloud.google.com/vertex-ai/docs/generative-ai/chat/chat-prompts))
+    - Image Models ([link](https://cloud.google.com/vertex-ai/docs/generative-ai/image/overview))
+    - Speech Models ([Text-to-Speech](https://cloud.google.com/vertex-ai/docs/generative-ai/speech/text-to-speech) , [Speech-To-Text](https://cloud.google.com/vertex-ai/docs/generative-ai/speech/speech-to-text))
+  - [Model Garden](https://cloud.google.com/model-garden)
+  - [Pricing](https://cloud.google.com/vertex-ai/pricing#generative_ai_models)
+- Generative AI App Builder ([Blog](https://cloud.google.com/blog/products/ai-machine-learning/create-generative-apps-in-minutes-with-gen-app-builder), [Video 1](https://youtube.com/watch?v=0vM5UWC5crs), [Video 2](https://youtube.com/watch?v=kOmG83wGfTs))
 
 ## Videos
 
-- [Introduction to Large Language Models](https://www.youtube.com/watch?v=zizonToFXDs)
-- [Introduction to Generative AI](https://www.youtube.com/watch?v=G2fqAlgmoPo)
-- [Generative AI Playlist for Developers](https://www.youtube.com/playlist?list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn)
-- [Which AI/ML solution on Vertex AI](https://www.youtube.com/watch?v=AtyCqaOGoj4)
+- [Generative AI for Developers - Playlist](https://www.youtube.com/playlist?list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn)
+  - [Introduction to Machine Learning on Vertex AI](https://www.youtube.com/watch?v=-3Olw-C4FN4&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=1&pp=iAQB)
+  - [Prototyping Language Apps with Generative AI Studio](https://www.youtube.com/watch?v=9_zwIyutN7o&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=2&t=1s&pp=iAQB)
+  - [How to tune LLMs in Generative AI Studio](https://www.youtube.com/watch?v=4A4W03qUTsw&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=3&pp=iAQB)
+  - [Introduction to foundational models on Google Cloud](https://www.youtube.com/watch?v=YCZ6nwGnL4o&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=4&pp=iAQB)
+  - [Enterprise Search via Generative AI App Builder](https://www.youtube.com/watch?v=fY8aOe6H2nw&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=5&pp=iAQB)
+  - [Generate and edit images with Generative AI Studio](https://www.youtube.com/watch?v=6n5ngB88DHU&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn)
+  - [Introduction to Vertex AI Model Garden](https://www.youtube.com/watch?v=I7UiSU96CLc&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=8)
+  - [Which AI/ML solution on Vertex AI](https://www.youtube.com/watch?v=AtyCqaOGoj4)
+- Google LLM Foundations
+  - [Transformers, explained: Understand the model behind GPT, BERT, and T5](https://www.youtube.com/watch?v=SZorAJ4I-sA)
+  - [What are Large Language Models (LLMs)?](https://www.youtube.com/watch?v=iR2O2GPbB0E)
+  - [Connecting LLMs to Tools](https://www.youtube.com/watch?v=P3buv6P_u7c)
+- Generative AI Learning Path
+  - [Introduction to Large Language Models](https://www.youtube.com/watch?v=zizonToFXDs)
+  - [Introduction to Generative AI](https://www.youtube.com/watch?v=G2fqAlgmoPo)
+  - [Introduction to Responsible AI](https://www.youtube.com/watch?v=3-xhMXeYIcg)
+  - [Introduction to Generative AI Studio](https://www.youtube.com/watch?v=-7nf5EJ2Fsc)
+  - [Transformer Models and BERT Overview](https://www.youtube.com/watch?v=t45S_MwAcOw)
 
 ## Cloud Skills Boost
 
@@ -37,8 +58,19 @@ Please submit additional resources via a PR.
   - [Encoder-Decoder Architecture](https://www.cloudskillsboost.google/course_templates/543)
   - [Introduction to Responsible AI](https://www.cloudskillsboost.google/course_templates/554)
   - [Introduction to Generative AI Studio](https://www.cloudskillsboost.google/course_templates/552)
-  - [Generative AI Explorer - Vertex AI](https://www.cloudskillsboost.google/quests/299)
   - [Generative AI Fundamentals](https://www.cloudskillsboost.google/journeys/118)
+  
+- [Generative AI Explorer - Vertex AI](https://www.cloudskillsboost.google/quests/299): The Generative AI Explorer - Vertex Quest is a collection of labs for partners on how to use Generative AI on Google Cloud. Through the labs, you will learn about how to use the models in the Vertex AI PaLM API family, including text-bison, chat-bison, and textembedding-gecko.
+
+## Google Cloud Next 2023 Announcements + Videos
+
+- Video: [What's new with generative AI at Google Cloud](https://cloud.withgoogle.com/next/generative-ai?session=SPTL200)
+- Video: [Imagination to creation: Build a differentiated generative AI application on Google Cloud](https://cloud.withgoogle.com/next/session-library?session=AIML202)
+- Video: [Build extensions and extension-powered applications with Vertex AI](https://cloud.withgoogle.com/next/session-library?session=AIML209)
+- Video: [Generative AI and search: Better together to unlock enterprise data](https://cloud.withgoogle.com/next/session-library?session=AIML105)
+- Video: [Transform search experiences for customers and employees](https://cloud.withgoogle.com/next/session-library?session=AIML111)
+- Video: [Conversational AI experiences](https://cloud.withgoogle.com/next/session-library?session=AIML115)
+- Video: [Common business use cases for generative AI](https://cloud.withgoogle.com/next/session-library?session=AIML110)
 
 ## Google I/O 2023 Announcements + Videos
 

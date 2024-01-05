@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block css_imports %}
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/stackoverflow-dark.min.css" />
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
+{% endblock %}
+
+{% block title %}{{title}}: Search Demo{% endblock %}
+
+{% block product_logo %}
+<img
+  class="ekg-logo"
+  src="{{url_for('static', filename='ekg-logo.svg')}}"
+  alt="Enterprise Knowledge Graph" />
+{% endblock %}
+
+{% block content %}
+<form class="search-form" action="/search_ekg" method="post">
+  <!-- Search Box -->
+  <div class="mdc-text-field mdc-text-field--outlined query-field">
+    <input class="mdc-text-field__input" id="query-input" name="search_query" required />
+    <div class="mdc-notched-outline">
+      <div class="mdc-notched-outline__leading"></div>
+      <div class="mdc-notched-outline__notch">
+        <label for="text-field-hero-input" class="mdc-floating-label"
+          >Search for a data entity (e.g. Google)</label
+        >
+      </div>
+      <div class="mdc-notched-outline__trailing"></div>
+    </div>
+  </div>
+  <!-- Language Selection Menu -->
+  <div class="mdc-select mdc-select--filled language-selection">
+    <input type="hidden" name="languages" />
+    <div class="mdc-select__anchor">
+      <span class="mdc-select__ripple"></span>
+      <span class="mdc-floating-label mdc-floating-label--float-above">Language</span>
+      <span class="mdc-select__selected-text-container">
+        <span class="mdc-select__selected-text">
+          {% if form_options["default_language"] %} {{ form_options["default_language"].name
+          }} {% endif %}
+        </span>
+      </span>
+      <span class="mdc-select__dropdown-icon">
+        <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+          <polygon
+            class="mdc-select__dropdown-icon-inactive"
+            stroke="none"
+            fill-rule="evenodd"
+            points="7 10 12 15 17 10"></polygon>
+          <polygon
+            class="mdc-select__dropdown-icon-active"
+            stroke="none"
+            fill-rule="evenodd"
+            points="7 15 12 10 17 15"></polygon>
+        </svg>
+      </span>
+      <span class="mdc-line-ripple"></span>
+    </div>
+    <div class="mdc-select__menu mdc-menu mdc-menu-surface">
+      <ul class="mdc-list">
+        <li class="mdc-list-item" data-value="">
+          <span class="mdc-list-item__ripple"></span>
+        </li>
+        {% if form_options["default_language"] %}
+        <li
+          class="mdc-list-item mdc-list-item--selected"
+          data-value="{{ form_options['default_language'].code }}"
+          aria-selected="true">
+          <span class="mdc-list-item__ripple"></span>
+          <span class="mdc-list-item__text">{{ form_options["default_language"].name }}</span>
+        </li>
+        {% endif %} {% for l in form_options["language_list"] %}
+        <li class="mdc-list-item" data-value="{{ l.code }}">
+          <span class="mdc-list-item__ripple"></span>
+          <span class="mdc-list-item__text">{{ l.name }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <!-- Type Filter -->
+  <div class="schema-info">
+    Refer to the
+    <a href="https://schema.org/docs/full.html">Schema.org full heirarchy</a>
+    for supported types.
+  </div>
+  <div class="mdc-text-field mdc-text-field--outlined types-field">
+    <input class="mdc-text-field__input" id="type-input" name="types" />
+    <div class="mdc-notched-outline">
+      <div class="mdc-notched-outline__leading"></div>
+      <div class="mdc-notched-outline__notch">
+        <label for="text-field-hero-input" class="mdc-floating-label">Types</label>
+      </div>
+      <div class="mdc-notched-outline__trailing"></div>
+    </div>
+  </div>
+  <!-- Search Button -->
+  <div class="button-container">
+    <button
+      type="submit"
+      class="search-button mdc-button mdc-button--outlined mdc-button--icon-leading">
+      <span class="mdc-button__ripple"></span>
+      <i class="material-icons mdc-button__icon" aria-hidden="true">search</i>
+      <span class="mdc-button__label">Search</span>
+    </button>
+  </div>
+</form>
+{% if message_error %}
+<div class="mdc-layout-grid">
+  <div class="mdc-layout-grid__inner">
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+      <pre>{{message_error}}</pre>
+    </div>
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3"></div>
+  </div>
+</div>
+{% elif message_success %}
+<div class="mdc-tab-bar" role="tablist">
+  <div class="mdc-tab-scroller">
+    <div class="mdc-tab-scroller__scroll-area">
+      <div class="mdc-tab-scroller__scroll-content">
+        <button
+          id="entities-tab-selector"
+          class="mdc-tab mdc-tab--active"
+          role="tab"
+          aria-selected="true"
+          tabindex="0">
+          <span class="mdc-tab__content">
+            <span class="mdc-tab__icon material-icons" aria-hidden="true">dataset</span>
+            <span class="mdc-tab__text-label">Entities</span>
+          </span>
+          <span class="mdc-tab-indicator mdc-tab-indicator--active">
+            <span
+              class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+          </span>
+          <span class="mdc-tab__ripple"></span>
+        </button>
+        <button id="json-tab-selector" class="mdc-tab mdc-tab" role="tab" tabindex="1">
+          <span class="mdc-tab__content">
+            <span class="mdc-tab__icon material-icons" aria-hidden="true">code</span>
+            <span class="mdc-tab__text-label">JSON</span>
+          </span>
+          <span class="mdc-tab-indicator">
+            <span
+              class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+          </span>
+          <span class="mdc-tab__ripple"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tab-content">
+  <div id="entities-tab" class="tab-visible">
+    {% for entity in entities %}
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <div class="mdc-card mdc-card--outlined">
+            <div class="mdc-card__primary-action entity-primary-action" tabindex="0">
+              {% if entity.get("image") %} {% set imageUrl = entity["image"]["contentUrl"] %}
+              <div
+                class="mdc-card__media mdc-card__media--square entity-image"
+                style="background-image: url('{{imageUrl}}');"></div>
+              {% endif %}
+              <div class="entity-card-primary">
+                <h2 class="mdc-typography mdc-typography--headline6">{{entity["name"]}}</h2>
+                {% if entity.get("@type") %}
+                <span class="mdc-chip-set" role="grid">
+                  <span class="mdc-chip-set__chips" role="presentation">
+                    {% for type in entity["@type"] %}
+                    <span class="mdc-chip" role="row" id="c{{loop.index}}">
+                      <span class="mdc-chip__cell mdc-chip__cell--primary" role="gridcell">
+                        <span class="mdc-chip__text-label">{{type}}</span>
+                      </span>
+                    </span>
+                    {% endfor %}
+                  </span>
+                </span>
+                {% endif %}
+                <h3 class="mdc-typography mdc-typography--subtitle2">
+                  MID: <code>{{entity["@id"]}}</code>
+                  <br />
+                  GOOGLE KG MID:
+                  <code>{{entity["identifier"][0]["value"]}}</code>
+                  <br />
+                  {% if entity.get("detailedDescription") %} {% set entityUrl =
+                  entity["detailedDescription"]["url"] %} URL:
+                  <a href="{{entityUrl}}">{{entityUrl}}</a>
+                  {% endif %}
+                </h3>
+              </div>
+              {% if entity.get("detailedDescription") %}
+              <div class="mdc-typography mdc-typography--body2 entity-detailed-description">
+                <h3 class="mdc-typography mdc-typography--subtitle2">Detailed Description</h3>
+                {{entity["detailedDescription"]["articleBody"]}}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <div class="mdc-card mdc-card--outlined">
+            <pre><code class="language-json" lang="json">{{entity["resultJson"]}}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div id="json-tab" class="tab-hidden">
+    {% if request_url %}
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+          <b>Request URL:</b>
+          <pre><code class="language-shell" lang="shell">{{request_url}}</code></pre>
+        </div>
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2"></div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        {% if raw_request %}
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <b>Request Body:</b>
+          <pre><code class="language-json" lang="json">{{raw_request}}</code></pre>
+        </div>
+        {% endif %} {% if raw_response %}
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+          <b>Response Body:</b>
+          <pre><code class="language-json" lang="json">{{raw_response}}</code></pre>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block footer %}
+Made by <a href="https://github.com/holtskinner">holtskinner@</a> - Powered by
+<a href="https://cloud.google.com/enterprise-knowledge-graph/docs/overview">Enterprise Knowledge Graph</a>
+on <a href="https://cloud.google.com/">Google Cloud</a>
+{% endblock %}
+
+{% block js_imports %}
+<script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
+<script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+<script src="{{url_for('static', filename='ekg.js')}}"></script>
+{% endblock %}
