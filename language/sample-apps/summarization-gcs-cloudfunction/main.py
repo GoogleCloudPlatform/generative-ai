@@ -18,7 +18,7 @@ logger = client.logger(LOG_NAME)
 
 def predict_text(prompt, **parameters):
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    model = TextGenerationModel.from_pretrained("text-bison@001")
+    model = TextGenerationModel.from_pretrained("text-bison@002")
     prompt_response = model.predict(prompt,**parameters)
     return prompt_response.text
 

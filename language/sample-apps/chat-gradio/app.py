@@ -17,7 +17,7 @@ logger = client.logger(log_name)
 
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
-model = TextGenerationModel.from_pretrained("text-bison@001")
+model = TextGenerationModel.from_pretrained("text-bison@002")
 
 def predict(prompt, max_output_tokens, temperature, top_p, top_k):
     logger.log_text(prompt)
@@ -27,7 +27,7 @@ def predict(prompt, max_output_tokens, temperature, top_p, top_k):
         temperature=temperature, # default 0
         top_p=top_p, # default 1
         top_k=top_k) # default 40
-    return answer
+    return answer.text
 
 examples = [
     ["What are some generative AI services on Google Cloud in Public Preview?"],

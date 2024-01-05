@@ -29,7 +29,7 @@ def predictCode(request):
             "temperature": 0.2,
             "max_output_tokens": 1024
         }
-        model = CodeGenerationModel.from_pretrained("code-bison@001")
+        model = CodeGenerationModel.from_pretrained("code-bison@002")
         prompt_response = model.predict(prompt,**parameters)
         logger.log(f"PaLM Code Bison Model response: {prompt_response.text}")
     else:

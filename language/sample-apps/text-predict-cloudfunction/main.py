@@ -25,7 +25,7 @@ def predictText(request):
         prompt = request_json['prompt']
         logger.log(f"Received request for prompt: {prompt}")
         vertexai.init(project=PROJECT_ID, location=LOCATION)
-        model = TextGenerationModel.from_pretrained("text-bison@001")
+        model = TextGenerationModel.from_pretrained("text-bison@002")
         parameters = {
             "temperature": 0.2,
             "max_output_tokens": 256,
