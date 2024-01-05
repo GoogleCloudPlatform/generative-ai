@@ -1,1 +1,2 @@
+[flake8]
 extend-ignore = E501
