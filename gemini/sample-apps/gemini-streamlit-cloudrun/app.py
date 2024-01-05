@@ -1,11 +1,8 @@
 import os
 import streamlit as st
 from vertexai.preview.generative_models import (
-    Content,
     GenerationConfig,
     GenerativeModel,
-    GenerationResponse,
-    Image,
     HarmCategory,
     HarmBlockThreshold,
     Part,
@@ -228,11 +225,11 @@ with tab2:
         horizontal=True,
     )
 
-    prompt = f"""Generate a marketing campaign for {product_name}, a {product_category} designed for the age group: {target_audience_age}. 
+    prompt = f"""Generate a marketing campaign for {product_name}, a {product_category} designed for the age group: {target_audience_age}.
     The target location is this: {target_audience_location}.
-    Aim to primarily achieve {campaign_goal}. 
-    Emphasize the product's unique selling proposition while using a {brand_voice} tone of voice. 
-    Allocate the total budget of {estimated_budget}.  
+    Aim to primarily achieve {campaign_goal}.
+    Emphasize the product's unique selling proposition while using a {brand_voice} tone of voice.
+    Allocate the total budget of {estimated_budget}.
     With these inputs, make sure to follow following guidelines and generate the marketing campaign with proper headlines: \n
     - Briefly describe company, its values, mission, and target audience.
     - Highlight any relevant brand guidelines or messaging frameworks.
@@ -526,7 +523,7 @@ If instructions include buttons, also explain where those buttons are physically
         math_image_img = Part.from_uri(math_image_uri, mime_type="image/jpeg")
         st.image(math_image_url, width=350, caption="Image of a math equation")
         st.markdown(
-            f"""
+            """
                 Our expectation: Ask questions about the math equation as follows: 
                 - Extract the formula.
                 - What is the symbol right before Pi? What does it mean?
@@ -653,7 +650,7 @@ with tab4:
 What is the profession of the girl in this video?
 Which all features of the phone are highlighted here?
 Summarize the video in one paragraph.
-Provide the answer in table format. 
+Provide the answer in table format.
             """
             tab1, tab2 = st.tabs(["Response", "Prompt"])
             video_highlights_description = st.button(
