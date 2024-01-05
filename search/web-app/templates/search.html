@@ -18,17 +18,18 @@
     <div class="mdc-notched-outline">
       <div class="mdc-notched-outline__leading"></div>
       <div class="mdc-notched-outline__notch">
-        <label for="text-field-hero-input" class="mdc-floating-label">Search Query</label>
+        <label for="query-input" class="mdc-floating-label">Search Query</label>
       </div>
       <div class="mdc-notched-outline__trailing"></div>
     </div>
   </div>
   <!-- Radio Buttons for Search Engine -->
   <div class="search-engine-radio">
+  <div>Search engine</div>
   {% for engine_name in search_engines %}
   <label class="mdc-radio">
-      <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}"
-          {% if loop.index0 == 0 %} checked {% endif %} />
+      <input type="radio" class="mdc-radio__native-control" name="search_engine" value="{{ loop.index0 }}" id="search-engine-{{ loop.index0 }}"
+          {% if loop.index0 == 1 %} checked {% endif %} />
       <div class="mdc-radio__background">
           <div class="mdc-radio__outer-circle"></div>
           <div class="mdc-radio__inner-circle"></div>
@@ -37,6 +38,34 @@
       <span class="mdc-radio__label">{{ engine_name }}</span>
   </label>
   {% endfor %}
+  </div>
+  <br>
+  <!-- Radio Buttons for Summary Model Version -->
+  <div class="summary-model-radio">
+  <div><a href="https://cloud.google.com/generative-ai-app-builder/docs/get-search-summaries#summary-model">Summary model</a></div>
+  {% for summary_model in summary_models %}
+  <label class="mdc-radio">
+      <input type="radio" class="mdc-radio__native-control" name="summary_model" value="{{ summary_model }}"
+          {% if loop.index0 == 0 %} checked {% endif %} />
+      <div class="mdc-radio__background">
+          <div class="mdc-radio__outer-circle"></div>
+          <div class="mdc-radio__inner-circle"></div>
+      </div>
+      <div class="mdc-radio__ripple"></div>
+      <span class="mdc-radio__label">{{ summary_model }}</span>
+  </label>
+  {% endfor %}
+  </div>
+  <!-- Summary Preamble -->
+  <div class="mdc-text-field mdc-text-field--outlined summary-preamble-field">
+    <input class="mdc-text-field__input" id="summary-preamble" name="summary_preamble" />
+    <div class="mdc-notched-outline">
+      <div class="mdc-notched-outline__leading"></div>
+      <div class="mdc-notched-outline__notch">
+        <label for="summary-preamble" class="mdc-floating-label">Summary Preamble</label>
+      </div>
+      <div class="mdc-notched-outline__trailing"></div>
+    </div>
   </div>
   <!-- Search Button -->
   <div class="button-container">
@@ -119,7 +148,7 @@
                 class="mdc-card__media mdc-card__media--square entity-image"
                 style="background-image: url('{{imageUrl}}');"></div>
               <div class="entity-card-primary">
-                <h2 class="mdc-typography mdc-typography--headline6">{{result["title"]}}</h2>
+                <h2 class="mdc-typography mdc-typography--headline6">[{{loop.index}}] {{result["title"]}}</h2>
                 <h3 class="mdc-typography mdc-typography--subtitle2">
                   {% set resultUrl = result["link"] %} URL:
                   <a href="{{resultUrl}}" target="_blank" rel="noopener noreferrer"
