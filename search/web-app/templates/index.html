@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Vertex AI Search Demo - {{title}}{% endblock %}
+{% block description %}Click on one of the text boxes to open up a full-page widget for the search engine.{% endblock %}
+
+{% block content %}
+<!-- Vertex AI Search widget bundle -->
+<script src="https://cloud.google.com/ai/gen-app-builder/client"></script>
+
+{% for s in search_engine_options %}
+<!-- Search widget element is not visible by default -->
+<gen-search-widget configId="{{s.config_id}}" triggerId="{{s.name|lower|replace(' ', '-')}}">
+</gen-search-widget>
+<div class="search-engine-name"><b>{{s.name}}</b></div>
+
+<!-- Element that opens the widget on click. It does not have to be an input -->
+<div class="mdc-text-field mdc-text-field--outlined query-field">
+  <input class="mdc-text-field__input" id="{{s.name|lower|replace(' ', '-')}}" />
+  <div class="mdc-notched-outline">
+    <div class="mdc-notched-outline__leading"></div>
+    <div class="mdc-notched-outline__notch">
+      <label for="text-field-hero-input" class="mdc-floating-label">{{s.placeholder}}</label>
+    </div>
+    <div class="mdc-notched-outline__trailing"></div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+{% block js_imports %}
+<script src="{{url_for('static', filename='index.js')}}"></script>
+{% endblock %}
