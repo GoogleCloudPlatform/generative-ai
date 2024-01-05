@@ -25,7 +25,7 @@ const MDCTabBar = mdc.tabBar.MDCTabBar;
 MDCRipple.attachTo(document.querySelector(".search-button"));
 
 const queryTextField = new MDCTextField(document.querySelector(".query-field"));
-
+const summaryPreambleTextField = new MDCTextField(document.querySelector(".summary-preamble-field"));
 // const documentTypesField = document.querySelector('.mdc-text-field.types-field');
 
 // const select = new MDCSelect(document.querySelector('.mdc-select'));
@@ -66,3 +66,33 @@ if (imageInput) {
     }
   });
 }
+
+const searchEngine0Radio = document.getElementById("search-engine-0");
+// Default - Uses Advanced Indexing
+const searchEngine1Radio = document.getElementById("search-engine-1");
+
+const summaryModelRadioSelector = document.querySelector(".summary-model-radio");
+const summaryPreambleSelector = document.querySelector(".summary-preamble-field");
+
+function toggleElement(element, show) {
+  if (show) {
+    element.style.display = "block";
+  } else {
+    element.style.display = "none";
+  }
+}
+
+// Add event listeners to radio buttons
+searchEngine0Radio.addEventListener("change", function () {
+  if (searchEngine0Radio.checked) {
+    toggleElement(summaryModelRadioSelector, false);
+    toggleElement(summaryPreambleSelector, false);
+  }
+});
+
+searchEngine1Radio.addEventListener("change", function () {
+  if (searchEngine1Radio.checked) {
+    toggleElement(summaryModelRadioSelector, true);
+    toggleElement(summaryPreambleSelector, true);
+  }
+});

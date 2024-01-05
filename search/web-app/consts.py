@@ -108,3 +108,5 @@ VALID_LANGUAGES = [
     {"code": "uk", "name": "Ukrainian"},
     {"code": "vi", "name": "Vietnamese"},
 ]
+
+SUMMARY_MODELS = ["stable", "preview"]
