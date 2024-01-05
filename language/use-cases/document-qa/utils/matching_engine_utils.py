@@ -1,7 +1,8 @@
 # Utility functions to create Index and deploy the index to an Endpoint
 from datetime import datetime
-import time
 import logging
+import time
+from typing import Optional
 
 from google.cloud import aiplatform_v1 as aipv1
 from google.protobuf import struct_pb2
@@ -81,18 +82,19 @@ class MatchingEngineUtils:
         else:
             logger.info(f"Index {self.index_name} does not exists. Creating index ...")
 
-            if index_update_method == "streaming":
-                index_update_method = aipv1.Index.IndexUpdateMethod.STREAM_UPDATE
-            else:
-                index_update_method = aipv1.Index.IndexUpdateMethod.BATCH_UPDATE
-
-            treeAhConfig = struct_pb2.Struct(
-                fields={
-                    "leafNodeEmbeddingCount": struct_pb2.Value(number_value=500),
-                    "leafNodesToSearchPercent": struct_pb2.Value(number_value=7),
-                }
+            index_update_method_enum = (
+                aipv1.Index.IndexUpdateMethod.STREAM_UPDATE
+                if index_update_method == "streaming"
+                else aipv1.Index.IndexUpdateMethod.BATCH_UPDATE
             )
+
             if index_algorithm == "tree-ah":
+                treeAhConfig = struct_pb2.Struct(
+                    fields={
+                        "leafNodeEmbeddingCount": struct_pb2.Value(number_value=500),
+                        "leafNodesToSearchPercent": struct_pb2.Value(number_value=7),
+                    }
+                )
                 algorithmConfig = struct_pb2.Struct(
                     fields={"treeAhConfig": struct_pb2.Value(struct_value=treeAhConfig)}
                 )
@@ -124,12 +126,12 @@ class MatchingEngineUtils:
                 }
             )
 
-            index_request = {
-                "display_name": self.index_name,
-                "description": "Index for LangChain demo",
-                "metadata": struct_pb2.Value(struct_value=metadata),
-                "index_update_method": index_update_method,
-            }
+            index_request = aipv1.Index(
+                display_name=self.index_name,
+                description="Index for LangChain demo",
+                metadata=struct_pb2.Value(struct_value=metadata),
+                index_update_method=index_update_method_enum,
+            )
 
             r = self.index_client.create_index(parent=self.PARENT, index=index_request)
             logger.info(
@@ -156,7 +158,7 @@ class MatchingEngineUtils:
         machine_type: str = "e2-standard-2",
         min_replica_count: int = 2,
         max_replica_count: int = 10,
-        network: str = None,
+        network: Optional[str] = None,
     ):
         try:
             # Get index if exists
@@ -179,12 +181,11 @@ class MatchingEngineUtils:
                 logger.info(
                     f"Index endpoint {self.index_endpoint_name} does not exists. Creating index endpoint..."
                 )
-                index_endpoint_request = {"display_name": self.index_endpoint_name}
-
-                if network:
-                    index_endpoint_request["network"] = network
-                else:
-                    index_endpoint_request["public_endpoint_enabled"] = True
+                index_endpoint_request = aipv1.IndexEndpoint(
+                    display_name=self.index_endpoint_name,
+                    network=network,
+                    public_endpoint_enabled=bool(not network),
+                )
 
                 r = self.index_endpoint_client.create_index_endpoint(
                     parent=self.PARENT, index_endpoint=index_endpoint_request
@@ -223,21 +224,20 @@ class MatchingEngineUtils:
 
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             deployed_index_id = f"{self.index_name.replace('-', '_')}_{timestamp}"
-            deploy_index = {
-                "id": deployed_index_id,
-                "display_name": deployed_index_id,
-                "index": index.name,
-                "dedicated_resources": {
-                    "machine_spec": {
-                        "machine_type": machine_type,
-                    },
-                    "min_replica_count": min_replica_count,
-                    "max_replica_count": max_replica_count,
-                },
-            }
-            logger.info(f"Deploying index with request = {deploy_index}")
+            deployed_index = aipv1.DeployedIndex(
+                id=deployed_index_id,
+                display_name=deployed_index_id,
+                index=index.name,
+                dedicated_resources=aipv1.DedicatedResources(
+                    machine_spec=aipv1.MachineSpec(machine_type=machine_type),
+                    min_replica_count=min_replica_count,
+                    max_replica_count=max_replica_count,
+                ),
+            )
+
+            logger.info(f"Deploying index with request = {deployed_index}")
             r = self.index_endpoint_client.deploy_index(
-                index_endpoint=index_endpoint.name, deployed_index=deploy_index
+                index_endpoint=index_endpoint.name, deployed_index=deployed_index
             )
 
             # Poll the operation until it's done successfullly.
