@@ -25,7 +25,7 @@ def get_gemini_pro_text_response(
     model: GenerativeModel,
     contents: str,
     generation_config: GenerationConfig,
-    stream=True,
+    stream: bool = True,
 ):
     safety_settings = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
@@ -38,7 +38,7 @@ def get_gemini_pro_text_response(
         prompt,
         generation_config=generation_config,
         safety_settings=safety_settings,
-        stream=True,
+        stream=stream,
     )
 
     final_response = []
@@ -54,11 +54,11 @@ def get_gemini_pro_text_response(
 
 
 def get_gemini_pro_vision_response(
-    model, prompt_list, generation_config={}, stream=True
+    model, prompt_list, generation_config={}, stream: bool = True
 ):
     generation_config = {"temperature": 0.1, "max_output_tokens": 2048}
     responses = model.generate_content(
-        prompt_list, generation_config=generation_config, stream=True
+        prompt_list, generation_config=generation_config, stream=stream
     )
     final_response = []
     for response in responses:
