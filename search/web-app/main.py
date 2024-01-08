@@ -19,27 +19,26 @@ import os
 import re
 from urllib.parse import urlparse
 
-import requests
-from flask import Flask, render_template, request
-from google.api_core.exceptions import ResourceExhausted
-from werkzeug.exceptions import HTTPException
-
 from consts import (
     CUSTOM_UI_DATASTORE_IDS,
     LOCATION,
     PROJECT_ID,
+    SUMMARY_MODELS,
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
     IMAGE_SEARCH_DATASTORE_IDs,
     RECOMMENDATIONS_DATASTORE_IDs,
-    SUMMARY_MODELS,
 )
 from ekg_utils import search_public_kg
+from flask import Flask, render_template, request
 from genappbuilder_utils import (
     list_documents,
     recommend_personalize,
     search_enterprise_search,
 )
+from google.api_core.exceptions import ResourceExhausted
+import requests
+from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 
