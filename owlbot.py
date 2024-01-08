@@ -27,13 +27,6 @@ s.replace(
     r"""LINT_PATHS = ["."]""",
 )
 
-# TODO: Remove once https://github.com/googleapis/synthtool/pull/1811 is merged.
-s.replace(
-    "noxfile.py",
-    r"""BLACK_VERSION = "black==22.3.0"\nISORT_VERSION = "isort==5.10.1""",
-    r"""BLACK_VERSION = "black[jupyter]==23.3.0"\nISORT_VERSION = "isort==5.11.0""",
-)
-
 # ----------------------------------------------------------------------------
 # Run blacken session
 # ----------------------------------------------------------------------------
