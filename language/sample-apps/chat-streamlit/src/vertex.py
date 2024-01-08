@@ -1,7 +1,8 @@
-from vertexai.preview.language_models import TextGenerationModel
-import vertexai
-import streamlit as st
 import os
+
+import streamlit as st
+import vertexai
+from vertexai.preview.language_models import TextGenerationModel
 
 PROJECT_ID = os.environ.get("GCP_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GCP_REGION")  # Your Google Cloud Project Region
