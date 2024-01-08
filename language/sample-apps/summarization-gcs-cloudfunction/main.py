@@ -1,16 +1,14 @@
 import os
-import functions_framework
-from google.cloud import storage
 
+import functions_framework
+from google.cloud import logging, storage
 import vertexai
 from vertexai.language_models import TextGenerationModel
-import google.cloud.logging
-
 
 PROJECT_ID = os.environ.get("GCP_PROJECT", "-")
 LOCATION = os.environ.get("GCP_REGION", "-")
 
-client = google.cloud.logging.Client(project=PROJECT_ID)
+client = logging.Client(project=PROJECT_ID)
 client.setup_logging()
 
 LOG_NAME = "summarize-cloudfunction-log"
