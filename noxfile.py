@@ -26,7 +26,7 @@ import warnings
 
 import nox
 
-BLACK_VERSION = "black[jupyter]==23.3.0"
+BLACK_VERSION = "black[jupyter]==23.7.0"
 ISORT_VERSION = "isort==5.11.0"
 LINT_PATHS = ["."]
 
