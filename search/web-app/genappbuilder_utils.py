@@ -16,7 +16,7 @@
 from os.path import basename
 from typing import Dict, List, Optional, Tuple
 
-from google.cloud import discoveryengine_v1beta as discoveryengine
+from google.cloud import discoveryengine_v1alpha as discoveryengine
 
 JSON_INDENT = 2
 
@@ -53,6 +53,8 @@ def search_enterprise_search(
     search_query: Optional[str] = None,
     image_bytes: Optional[bytes] = None,
     params: Optional[Dict] = None,
+    summary_model: Optional[str] = None,
+    summary_preamble: Optional[str] = None,
 ) -> Tuple[List[Dict[str, str | List]], str, str, str, str]:
     if bool(search_query) == bool(image_bytes):
         raise ValueError("Cannot provide both search_query and image_bytes")
@@ -79,6 +81,12 @@ def search_enterprise_search(
             include_citations=True,
             ignore_adversarial_query=True,
             ignore_non_summary_seeking_query=True,
+            model_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelSpec(
+                version=summary_model
+            ),
+            model_prompt_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelPromptSpec(
+                preamble=summary_preamble
+            ),
         ),
         extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
             max_extractive_answer_count=1, max_extractive_segment_count=1
