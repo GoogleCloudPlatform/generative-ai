@@ -143,18 +143,17 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
 - Duet AI
   - [Cymbal Superstore](https://github.com/GoogleCloudPlatform/cymbal-superstore)
 - Other
-  - https://github.com/GoogleCloudPlatform/ai-on-gke
-  - https://github.com/GoogleCloudPlatform/ai-on-gke
-  - https://github.com/GoogleCloudPlatform/ai-infra-cluster-provisioning
-  - https://github.com/GoogleCloudPlatform/solutions-genai-llm-workshop
-  - https://github.com/GoogleCloudPlatform/terraform-genai-doc-summarization
-  - https://github.com/GoogleCloudPlatform/terraform-genai-knowledge-base
-  - https://github.com/GoogleCloudPlatform/genai-databases-retrieval-app
-  - https://github.com/GoogleCloudPlatform/genai-product-catalog
-  - https://github.com/GoogleCloudPlatform/solutionbuilder-terraform-genai-doc-summarization
-  - https://github.com/GoogleCloudPlatform/solutions-viai-edge-provisioning-configuration
-  - https://github.com/GoogleCloudPlatform/mis-ai-accelerator
-  - https://github.com/GoogleCloudPlatform/dataflow-opinion-analysis
+  - [ai-on-gke](https://github.com/GoogleCloudPlatform/ai-on-gke)
+  - [ai-infra-cluster-provisioning](https://github.com/GoogleCloudPlatform/ai-infra-cluster-provisioning)
+  - [solutions-genai-llm-workshop](https://github.com/GoogleCloudPlatform/solutions-genai-llm-workshop)
+  - [terraform-genai-doc-summarization](https://github.com/GoogleCloudPlatform/terraform-genai-doc-summarization)
+  - [terraform-genai-knowledge-base](https://github.com/GoogleCloudPlatform/terraform-genai-knowledge-base)
+  - [genai-databases-retrieval-app](https://github.com/GoogleCloudPlatform/genai-databases-retrieval-app)
+  - [genai-product-catalog](https://github.com/GoogleCloudPlatform/genai-product-catalog)
+  - [solutionbuilder-terraform-genai-doc-summarization](https://github.com/GoogleCloudPlatform/solutionbuilder-terraform-genai-doc-summarization)
+  - [solutions-viai-edge-provisioning-configuration](https://github.com/GoogleCloudPlatform/solutions-viai-edge-provisioning-configuration)
+  - [mis-ai-accelerator](https://github.com/GoogleCloudPlatform/mis-ai-accelerator)
+  - [dataflow-opinion-analysis](https://github.com/GoogleCloudPlatform/dataflow-opinion-analysis)
 
 ## Contributing
 
