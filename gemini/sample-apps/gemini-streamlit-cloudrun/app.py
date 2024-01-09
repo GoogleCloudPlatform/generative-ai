@@ -1,13 +1,14 @@
 import os
+
 import streamlit as st
+import vertexai
 from vertexai.preview.generative_models import (
     GenerationConfig,
     GenerativeModel,
-    HarmCategory,
     HarmBlockThreshold,
+    HarmCategory,
     Part,
 )
-import vertexai
 
 PROJECT_ID = os.environ.get("GCP_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GCP_REGION")  # Your Google Cloud Project Region
