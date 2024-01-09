@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, jsonify
+import os
+
+from flask import Flask, jsonify, render_template, request
 import vertexai
 from vertexai.preview.language_models import ChatModel
-import os
 
 app = Flask(__name__)
 PROJECT_ID = os.environ.get("GCP_PROJECT")  # Your Google Cloud Project ID
