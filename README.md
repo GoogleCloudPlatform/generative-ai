@@ -2,18 +2,34 @@
 
 Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai) repository.
 
+<a href="gemini"><img src="https://lh3.googleusercontent.com/eDr6pYKs1tT0iK0nt3pPhvVlP2Wn96fbGqbWgBAARRZ7isej037g_tWobjV8zQkxOsWzJuEH8p-fksczXUOeqxGZZIo_HUCdkn8q-a4fuwATD7Q9Xrs=w2456-l100-sg-rj-c0xffffff" style="width:35em"></a>
+
 This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai).
 
 For more Vertex AI samples, please visit the [Vertex AI samples Github repository](https://github.com/GoogleCloudPlatform/vertex-ai-samples/).
 
 ## Using this repository
 
+[![Applied AI Summit: The cloud toolkit for generative AI](https://img.youtube.com/vi/xT7WW2SKLfE/hqdefault.jpg)](https://www.youtube.com/watch?v=xT7WW2SKLfE)
+
 <!-- markdownlint-disable MD033 -->
 <table>
+
   <tr>
     <th></th>
     <th style="text-align: center;">Description</th>
     <th style="text-align: center;">Contents</th>
+  </tr>
+    <tr>
+    <td>
+      <img src="https://storage.googleapis.com/github-repo/img/gemini/Spark__Gradient_Alpha_100px.gif" width="45px">
+      <br>
+      <a href="gemini/"><code>gemini/</code></a>
+    </td>
+    <td>
+      Discover Gemini through starter notebooks, use cases, function calling, sample apps, and more.
+    </td>
+    <td><a href="gemini/">Sample notebooks, apps, use cases</a></td>
   </tr>
   <tr>
     <td>
@@ -45,9 +61,13 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
         <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api"><code>text-bison</code></a> model</li>
         <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api"><code>chat-bison</code></a> model</li>
         <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/language-model-overview#palm-api"><code>textembedding-gecko</code></a> model</li>
+        <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview"><code>code-bison</code></a> model</li>
+        <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview"><code>code-gecko</code></a> model</li>
+        <li><a href="https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview"><code>codechat-bison</code></a> model</li>
         <li>prompt design</li>
         <li>deploying apps</li>
         <li>tuning models</li>
+        <li>grounded responses</li>
         <li><a href="https://www.langchain.com/">langchain</a> with Google's foundation models</li>
       </ul>
     </td>
@@ -84,7 +104,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/code_blocks/default/40px.svg">
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg">
       <br>
       <a href="setup-env/"><code>setup-env/</code></a>
     </td>

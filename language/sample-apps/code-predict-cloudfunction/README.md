@@ -2,6 +2,9 @@
 
 This application demonstrates a Cloud Function written in Python that initializes the Vertex AI module and then provides an endpoint to invoke PaLM Code Bison model.
 
+> NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
+Additionally, ensure that you have cloned this repository and are currently in the ```code-predict-cloudfunction``` folder. This should be your active working directory for the rest of the commands.
+
 ## Environment variables required
 
 Your Cloud Function requires access to two environment variables:
@@ -13,6 +16,7 @@ These variables are needed since the Vertex AI initialization needs the Google C
 `vertexai.init(project=PROJECT_ID, location=LOCATION)`
 
 In Cloud Shell, execute the following commands:
+
 ```bash
 export GCP_PROJECT='<Your GCP Project Id>'  # Change this
 export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
@@ -64,4 +68,3 @@ curl -m 70 -X POST https://$GCP_REGION-$GCP_PROJECT.cloudfunctions.net/predictCo
 "prompt": "Write a Python function to make a call to a URL?"
 }'  | sed -e 's/\\n/\n/g'
 ```
-
