@@ -1,16 +1,15 @@
-import os
 import json
+import os
+
 import functions_framework
-
-import google.cloud.logging
-
+from google.cloud import logging
 import vertexai
 from vertexai.preview.language_models import CodeGenerationModel
 
 PROJECT_ID = os.environ.get("GCP_PROJECT", "-")
 LOCATION = os.environ.get("GCP_REGION", "-")
 
-client = google.cloud.logging.Client(project=PROJECT_ID)
+client = logging.Client(project=PROJECT_ID)
 client.setup_logging()
 
 LOG_NAME = "predictCode-cloudfunction-log"
