@@ -1,15 +1,14 @@
 import os
-import google.cloud.logging
 
+from google.cloud import logging
+import gradio as gr
 import vertexai
 from vertexai.language_models import TextGenerationModel
-
-import gradio as gr
 
 PROJECT_ID = os.environ.get("GCP_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GCP_REGION")  # Your Google Cloud Project Region
 
-client = google.cloud.logging.Client(project=PROJECT_ID)
+client = logging.Client(project=PROJECT_ID)
 client.setup_logging()
 
 log_name = "genai-vertex-text-log"
