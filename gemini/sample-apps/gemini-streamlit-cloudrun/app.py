@@ -1,13 +1,14 @@
 import os
+
 import streamlit as st
+import vertexai
 from vertexai.preview.generative_models import (
     GenerationConfig,
     GenerativeModel,
-    HarmCategory,
     HarmBlockThreshold,
+    HarmCategory,
     Part,
 )
-import vertexai
 
 PROJECT_ID = os.environ.get("GCP_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GCP_REGION")  # Your Google Cloud Project Region
@@ -559,7 +560,7 @@ INSTRUCTIONS:
 with tab4:
     st.write("Using Gemini Pro Vision - Multimodal model")
 
-    vide_desc, video_tags, video_highlights, video_geoloaction = st.tabs(
+    vide_desc, video_tags, video_highlights, video_geolocation = st.tabs(
         ["Video description", "Video tags", "Video highlights", "Video geolocation"]
     )
 
@@ -668,21 +669,21 @@ Provide the answer in table format.
                 st.write("Prompt used:")
                 st.write(prompt, "\n", "{video_data}")
 
-    with video_geoloaction:
+    with video_geolocation:
         st.markdown(
             """Even in short, detail-packed videos, Gemini can identify the locations."""
         )
-        video_geoloaction_uri = (
+        video_geolocation_uri = (
             "gs://github-repo/img/gemini/multimodality_usecases_overview/bus.mp4"
         )
-        video_geoloaction_url = (
-            "https://storage.googleapis.com/" + video_geoloaction_uri.split("gs://")[1]
+        video_geolocation_url = (
+            "https://storage.googleapis.com/" + video_geolocation_uri.split("gs://")[1]
         )
-        if video_geoloaction_url:
-            video_geoloaction_img = Part.from_uri(
-                video_geoloaction_uri, mime_type="video/mp4"
+        if video_geolocation_url:
+            video_geolocation_img = Part.from_uri(
+                video_geolocation_uri, mime_type="video/mp4"
             )
-            st.video(video_geoloaction_url)
+            st.video(video_geolocation_url)
             st.markdown(
                 """Our expectation: \n
             Answer the following questions from the video:
@@ -700,14 +701,14 @@ Provide the answer in table format.
             Answer the following questions in a table format with question and answer as columns.
             """
             tab1, tab2 = st.tabs(["Response", "Prompt"])
-            video_geoloaction_description = st.button(
-                "Generate", key="video_geoloaction_description"
+            video_geolocation_description = st.button(
+                "Generate", key="video_geolocation_description"
             )
             with tab1:
-                if video_geoloaction_description and prompt:
+                if video_geolocation_description and prompt:
                     with st.spinner("Generating location tags using Gemini..."):
                         response = get_gemini_pro_vision_response(
-                            multimodal_model_pro, [prompt, video_geoloaction_img]
+                            multimodal_model_pro, [prompt, video_geolocation_img]
                         )
                         st.markdown(response)
                         st.markdown("\n\n\n")
