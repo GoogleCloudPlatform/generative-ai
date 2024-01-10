@@ -33,7 +33,7 @@ terraform {
       version = ">= 0.9.1"
     }
     http = {
-      source = "hasicorp/http"
+      source = "hashicorp/http"
       version = ">= 3.4.1"
     }
   }

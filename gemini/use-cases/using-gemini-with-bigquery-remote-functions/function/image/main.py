@@ -24,7 +24,7 @@ def list_url(request):
     print(request)
     try:
         request_json = request.get_json()
-        calls = request_json['calls']
+        calls = request_json["calls"]
         for call in calls:
             image_url = str(call[0])
             print(image_url)

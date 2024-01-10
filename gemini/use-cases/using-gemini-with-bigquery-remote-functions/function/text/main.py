@@ -24,7 +24,7 @@ def list_text_input(request):
     print(request)
     try:
         request_json = request.get_json()
-        calls = request_json['calls']
+        calls = request_json["calls"]
         for call in calls:
             text_prompt = str(call[0])
             print(text_prompt)
