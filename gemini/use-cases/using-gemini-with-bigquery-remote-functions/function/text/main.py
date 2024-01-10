@@ -36,12 +36,12 @@ def list_text_input(request):
 def generate_text_from_prompt(text_string):
     # this is the text-to-text model
     text_model = GenerativeModel("gemini-pro")
-    responses = text_model.generate_content(text_string,
-                                            stream=False
-                                            )
+    responses = text_model.generate_content(text_string, stream=False)
+    print(responses)
     output = responses.text
     output = output.strip()
-    output = " ".join(l for l in output.splitlines() if l)
+    output = output.split("\n")
+    output = " ".join(output)
     print(output)
     return output
 

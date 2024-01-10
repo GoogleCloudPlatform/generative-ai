@@ -75,8 +75,8 @@ resource "google_cloudfunctions2_function" "image_remote_function" {
     all_traffic_on_latest_revision   = true
     service_account_email            = google_service_account.cloud_function_manage_sa.email
     environment_variables = {
-      "PROJECT_ID" : "${module.project-services.project_id}",
-    "REGION" : "${var.region}" }
+      "PROJECT_ID" : module.project-services.project_id,
+    "REGION" : var.region }
   }
   depends_on = [time_sleep.wait_after_apis]
 }
@@ -112,8 +112,8 @@ resource "google_cloudfunctions2_function" "text_remote_function" {
     all_traffic_on_latest_revision   = true
     service_account_email            = google_service_account.cloud_function_manage_sa.email
     environment_variables = {
-      "PROJECT_ID" : "${module.project-services.project_id}",
-    "REGION" : "${var.region}" }
+      "PROJECT_ID" : module.project-services.project_id,
+    "REGION" : var.region }
   }
   depends_on = [time_sleep.wait_after_apis]
 }

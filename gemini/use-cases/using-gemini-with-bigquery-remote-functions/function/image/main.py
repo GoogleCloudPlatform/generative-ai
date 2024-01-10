@@ -36,11 +36,10 @@ def list_url(request):
 def analyze_image(image_file):
     gemini_pro_vision_model = GenerativeModel("gemini-pro-vision")
     print(gemini_pro_vision_model)
-    image = Part.from_uri(
-        image_file, mime_type="image/jpeg")
+    image = Part.from_uri(image_file, mime_type="image/jpeg")
     print(image)
-    context = '''Describe and summarize this image.
-      Use no more than 5 sentences to do so'''
+    context = """Describe and summarize this image.
+      Use no more than 5 sentences to do so"""
     prompt = [context, image]
     print(prompt)
     response = gemini_pro_vision_model.generate_content(prompt, stream=False)
