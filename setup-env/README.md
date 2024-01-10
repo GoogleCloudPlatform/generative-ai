@@ -58,6 +58,16 @@ After launching the notebook instance, you can clone this repository in your Jup
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 ```
 
+#### Local development
+
+- Install the [Google Cloud SDK](https://cloud.google.com/sdk).
+
+- Obtain authentication credentials. Create local credentials by running the following command and following the oauth2 flow (read more about the command [here](https://cloud.google.com/sdk/gcloud/reference/beta/auth/application-default/login)):
+
+  ```bash
+  gcloud auth application-default login
+  ```
+
 ## Python library
 
 Install the latest Python SDK:
