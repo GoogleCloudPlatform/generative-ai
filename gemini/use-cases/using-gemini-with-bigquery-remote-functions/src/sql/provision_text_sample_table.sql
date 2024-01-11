@@ -30,7 +30,7 @@ SELECT
 UNION ALL
 SELECT
   "USS Texas" AS landmark_name,
-   """Describe the historic landmark
+  """Describe the historic landmark
    USS Texas in 5 sentences or less""" AS text_prompt,
   "000952662701bc5d.jpg" AS image_file
 UNION ALL
