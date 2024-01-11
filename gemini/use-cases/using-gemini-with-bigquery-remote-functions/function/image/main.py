@@ -44,10 +44,7 @@ def analyze_image(image_file):
     print(prompt)
     response = gemini_pro_vision_model.generate_content(prompt, stream=False)
     print(response)
-    output = response.text
-    output = output.strip()
-    output = output.split("\n")
-    output = " ".join(output)
+    output = " ".join(response.text.strip().split("\n"))
     print(output)
     return output
 
