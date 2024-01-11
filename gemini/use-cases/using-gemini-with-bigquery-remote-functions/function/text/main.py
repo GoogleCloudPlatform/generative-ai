@@ -33,7 +33,7 @@ def list_text_input(request) -> str:
         return json.dumps({"errorMessage": str(e)}), 400
 
 
-def generate_text_from_prompt(text_string) -> str | None:
+def generate_text_from_prompt(text_string) -> tuple[str, int] | None:
     # this is the text-to-text model
     text_model = GenerativeModel("gemini-pro")
     responses = text_model.generate_content(text_string, stream=False)
@@ -43,7 +43,7 @@ def generate_text_from_prompt(text_string) -> str | None:
     return output
 
 
-def run_it(request) -> str:
+def run_it(request) -> tuple[str, int]:
     try:
         project_id = os.environ.get("PROJECT_ID")
         region = os.environ.get("REGION")
