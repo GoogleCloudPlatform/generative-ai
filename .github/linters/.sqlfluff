@@ -8,3 +8,6 @@ param_style = question_mark
 
 [sqlfluff:indentation]
 tab_space_size = 2
+
+[sqlfluff:convention:terminator]
+require_final_semicolon = False
