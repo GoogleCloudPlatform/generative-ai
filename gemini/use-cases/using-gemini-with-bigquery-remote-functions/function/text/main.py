@@ -20,7 +20,7 @@ from vertexai.preview.generative_models import GenerativeModel
 
 
 @functions_framework.http
-def list_text_input(request):
+def list_text_input(request) -> str:
     print(request)
     try:
         request_json = request.get_json()
@@ -33,7 +33,7 @@ def list_text_input(request):
         return json.dumps({"errorMessage": str(e)}), 400
 
 
-def generate_text_from_prompt(text_string):
+def generate_text_from_prompt(text_string) -> str | None:
     # this is the text-to-text model
     text_model = GenerativeModel("gemini-pro")
     responses = text_model.generate_content(text_string, stream=False)
@@ -43,13 +43,7 @@ def generate_text_from_prompt(text_string):
     return output
 
 
-def check_string(input_string):
-    if not input_string:
-        return "Unable to generate description"
-    return input_string
-
-
-def run_it(request):
+def run_it(request) -> str:
     try:
         project_id = os.environ.get("PROJECT_ID")
         region = os.environ.get("REGION")
