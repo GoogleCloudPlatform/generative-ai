@@ -54,7 +54,7 @@ resource "google_workflows_workflow" "workflow" {
 
   source_contents = templatefile("${path.module}/templates/workflow.tftpl", {
     sample_bucket = google_storage_bucket.demo_images,
-    dataset_id = google_bigquery_dataset.demo_dataset.dataset_id
+    dataset_id    = google_bigquery_dataset.demo_dataset.dataset_id
   })
 
   depends_on = [

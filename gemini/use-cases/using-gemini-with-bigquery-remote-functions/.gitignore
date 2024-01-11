@@ -1,0 +1,11 @@
+.terraform*
+.Terraform*
+
+.Python
+
+.venv*
+
+tmp*
+
+.DS_Store
+src/.DS_Store
