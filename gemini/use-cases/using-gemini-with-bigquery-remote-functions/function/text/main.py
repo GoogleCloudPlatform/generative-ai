@@ -20,7 +20,7 @@ from vertexai.preview.generative_models import GenerativeModel
 
 
 @functions_framework.http
-def list_text_input(request) -> tuple[str, int]:
+def list_text_input(request) -> str:
     print(request)
     try:
         request_json = request.get_json()
@@ -43,7 +43,7 @@ def generate_text_from_prompt(text_string) -> str | None:
     return output
 
 
-def run_it(request) -> str:
+def run_it(request) -> tuple[str, int]:
     try:
         project_id = os.environ.get("PROJECT_ID")
         region = os.environ.get("REGION")
