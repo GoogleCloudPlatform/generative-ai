@@ -13,7 +13,7 @@
 # limitations under the License.
 
 CREATE OR REPLACE TABLE
-`${project_id}.${dataset_id}.sample_text_prompts` -- noqa: RF05
+`${project_id}.${dataset_id}.sample_text_prompts`
 
 (
   landmark_name STRING,
