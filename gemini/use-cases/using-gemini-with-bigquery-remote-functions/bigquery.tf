@@ -77,10 +77,10 @@ resource "google_bigquery_routine" "image_create_remote_function_sp" {
   language     = "SQL"
   definition_body = templatefile("${path.module}/src/sql/image/provision_remote_function.sql", {
     project_id          = module.project-services.project_id,
-    dataset_id          = google_bigquery_dataset.demo_dataset.dataset_id
-    bq_function_name    = var.image_function_name
-    region              = var.region
-    bq_connection_id    = var.connection_id
+    dataset_id          = google_bigquery_dataset.demo_dataset.dataset_id,
+    bq_function_name    = var.image_function_name,
+    region              = var.region,
+    bq_connection_id    = var.connection_id,
     remote_function_url = google_cloudfunctions2_function.image_remote_function.url
     }
   )
@@ -95,8 +95,8 @@ resource "google_bigquery_routine" "image_query_remote_function_sp" {
   language     = "SQL"
   definition_body = templatefile("${path.module}/src/sql/image/query_remote_function.sql", {
     project_id       = module.project-services.project_id,
-    dataset_id       = google_bigquery_dataset.demo_dataset.dataset_id
-    bq_function_name = var.image_function_name
+    dataset_id       = google_bigquery_dataset.demo_dataset.dataset_id,
+    bq_function_name = var.image_function_name,
     object_table_id  = google_bigquery_table.object_table.table_id
     }
   )
@@ -128,10 +128,10 @@ resource "google_bigquery_routine" "text_create_remote_function_sp" {
   language     = "SQL"
   definition_body = templatefile("${path.module}/src/sql/text/provision_remote_function.sql", {
     project_id          = module.project-services.project_id,
-    dataset_id          = google_bigquery_dataset.demo_dataset.dataset_id
-    bq_function_name    = var.text_function_name
-    region              = var.region
-    bq_connection_id    = var.connection_id
+    dataset_id          = google_bigquery_dataset.demo_dataset.dataset_id,
+    bq_function_name    = var.text_function_name,
+    region              = var.region,
+    bq_connection_id    = var.connection_id,
     remote_function_url = google_cloudfunctions2_function.text_remote_function.url
     }
   )
@@ -146,8 +146,8 @@ resource "google_bigquery_routine" "text_query_remote_function_sp" {
   language     = "SQL"
   definition_body = templatefile("${path.module}/src/sql/text/query_remote_function.sql", {
     project_id       = module.project-services.project_id,
-    dataset_id       = google_bigquery_dataset.demo_dataset.dataset_id
-    bq_function_name = var.text_function_name
+    dataset_id       = google_bigquery_dataset.demo_dataset.dataset_id,
+    bq_function_name = var.text_function_name,
     sample_prompt_table  = "sample_text_prompts"
     }
   )
