@@ -148,7 +148,7 @@ resource "google_bigquery_routine" "text_query_remote_function_sp" {
     project_id       = module.project-services.project_id,
     dataset_id       = google_bigquery_dataset.demo_dataset.dataset_id
     bq_function_name = var.text_function_name
-    object_table_id  = google_bigquery_table.object_table.table_id
+    sample_prompt_table  = "sample_text_prompts"
     }
   )
   depends_on = [
