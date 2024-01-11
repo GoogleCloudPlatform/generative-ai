@@ -38,7 +38,7 @@ copy_objects:
             call: googleapis.storage.v1.objects.list
             args:
                 bucket: $${source_bucket}
-                prefix: "bigquery-remote-functions/images"
+                prefix: "bigquery-remote-functions"
             result: list_result
         - start_counter:
             assign:
