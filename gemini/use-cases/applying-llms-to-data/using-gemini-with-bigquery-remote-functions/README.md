@@ -8,9 +8,9 @@ This repo provides an example of how to use [Gemini](https://blog.google/technol
 
 This repo allows you to pass requests to Gemini using SQL and get the results back like you would for any other BigQuery query. This approach has several advantages:
 
-  - It allows users who are familiar with SQL to leverage the power of Gemini without needing to write additional code
-  - You can more easily analyze a large batch of data rather than having to make individual requests for each image or text prompt
-  - You don't need to export your data from BigQuery before you can analyze it with Gemini
+- It allows users who are familiar with SQL to leverage the power of Gemini without needing to write additional code
+- You can more easily analyze a large batch of data rather than having to make individual requests for each image or text prompt
+- You don't need to export your data from BigQuery before you can analyze it with Gemini
 
 ## About this demo
 
@@ -18,13 +18,13 @@ We've created a Terraform module that deploys all the necessary resources to cal
 
 After the module is deployed, you will have access to two [BigQuery Remote Functions](https://cloud.google.com/bigquery/docs/remote-functions):
 
-  - Analyze images and text (multimodal input) using `gemini_bq_demo_image`: This remote function takes an image from GCS as an input and prompts the Gemini Pro Vision model to create a brief description of the image
-  - Analyze text using `gemini_bq_demo_text`: This remote function takes text in a BigQuery table and uses the text directly as prompts for the Gemini Pro model to return a response
+- Analyze images and text (multimodal input) using `gemini_bq_demo_image`: This remote function takes an image from GCS as an input and prompts the Gemini Pro Vision model to create a brief description of the image
+- Analyze text using `gemini_bq_demo_text`: This remote function takes text in a BigQuery table and uses the text directly as prompts for the Gemini Pro model to return a response
 
 You will also have access to two BigQuery stored procedures which allow you to easy test each remote function using real image and text data:
 
-  - `image_query_remote_function_sp`: This SQL query uses the `gemini_bq_demo_image` remote function to send a list of image URIs stored in an object table (deployed as part of the module) along with a prompt to Gemini
-  - `text_query_remote_function_sp`: This SQL query uses the `gemini_bq_demo_text` remote function to send a sample BigQuery table with pre-written text prompts (deployed as part of the module) to Gemini
+- `image_query_remote_function_sp`: This SQL query uses the `gemini_bq_demo_image` remote function to send a list of image URIs stored in an object table (deployed as part of the module) along with a prompt to Gemini
+- `text_query_remote_function_sp`: This SQL query uses the `gemini_bq_demo_text` remote function to send a sample BigQuery table with pre-written text prompts (deployed as part of the module) to Gemini
 
 ## Getting Started
 
@@ -37,9 +37,9 @@ You will also have access to two BigQuery stored procedures which allow you to e
   You'll need to set your Google Cloud project in Cloud Shell, clone this repo locally first, and set the working directory to this folder using the following commands.
 
   ```shell
-      gcloud config set project <PROJECT ID>
-      git clone  https://github.com/GoogleCloudPlatform/generative-ai/
-      cd ./generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions
+  gcloud config set project <PROJECT ID>
+  git clone  https://github.com/GoogleCloudPlatform/generative-ai/
+  cd ./generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions
   ```
 
 #### 2. Enable the Cloud Resource Manager API
@@ -51,7 +51,7 @@ Check to make sure the [Cloud Resource Manager API](https://console.cloud.google
 First, initialize Terraform by running
 
   ```shell
-      terraform init
+  terraform init
   ```
 
 #### 4. Review resources
@@ -78,8 +78,8 @@ Review the resources that are defined in the configuration:
 
 The Terraform output also lists the following additional information that you'll need:
 
-  - The link to open the BigQuery editor to invoke the `image_query_remote_function_sp` stored procedure that analyzes the sample images provided
-  - The link to open the BigQuery editor to invoke the `text_query_remote_function_sp` stored procedure that analyzes the sample text prompts provided
+- The link to open the BigQuery editor to invoke the `image_query_remote_function_sp` stored procedure that analyzes the sample images provided
+- The link to open the BigQuery editor to invoke the `text_query_remote_function_sp` stored procedure that analyzes the sample text prompts provided
 
 If you need to see your Terraform outputs again, simply enter `terraform output` into your command line.
 
@@ -172,6 +172,7 @@ You can get started analyzing any images you have uploaded to Cloud Storage by:
 You can get started by analyzing your own text inputs without having to modify the existing Cloud Function. Simply replace the `text_prompt` in line 3 of the `text_query_remote_function_sp` stored procedure with whatever text you want to analyze. You can enter a single string of text or you can reference a column of text prompts from a BigQuery table. If you are using a column from a BigQuery table, be sure to update the table reference on line 5 of the stored procedure.
 
 ## Clean up
+
 After you are finished with the demo, you can delete all the resources you created with the following steps:
 
 1. Update the `variables.tf` file
