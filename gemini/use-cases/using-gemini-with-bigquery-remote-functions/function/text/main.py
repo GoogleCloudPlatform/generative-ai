@@ -38,10 +38,7 @@ def generate_text_from_prompt(text_string):
     text_model = GenerativeModel("gemini-pro")
     responses = text_model.generate_content(text_string, stream=False)
     print(responses)
-    output = responses.text
-    output = output.strip()
-    output = output.split("\n")
-    output = " ".join(output)
+    output = " ".join(responses.text.strip().split("\n"))
     print(output)
     return output
 
@@ -59,10 +56,7 @@ def run_it(request):
         vertexai.init(project=project_id, location=region)
         text_to_analyze = list_text_input(request)
         text_output = generate_text_from_prompt(text_to_analyze)
-        return_value = []
-        result = check_string(text_output)
-        return_value.append(result)
-        return_json = json.dumps({"replies": return_value})
-        return return_json
+        result = text_output or "Unable to generate description"
+        return json.dumps({"replies": [result]})
     except Exception as e:
         return json.dumps({"errorMessage": str(e)}), 400
