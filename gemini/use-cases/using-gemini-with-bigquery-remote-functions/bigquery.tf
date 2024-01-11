@@ -145,10 +145,10 @@ resource "google_bigquery_routine" "text_query_remote_function_sp" {
   routine_type = "PROCEDURE"
   language     = "SQL"
   definition_body = templatefile("${path.module}/src/sql/text/query_remote_function.sql", {
-    project_id       = module.project-services.project_id,
-    dataset_id       = google_bigquery_dataset.demo_dataset.dataset_id,
-    bq_function_name = var.text_function_name,
-    sample_prompt_table  = "sample_text_prompts"
+    project_id          = module.project-services.project_id,
+    dataset_id          = google_bigquery_dataset.demo_dataset.dataset_id,
+    bq_function_name    = var.text_function_name,
+    sample_prompt_table = "sample_text_prompts"
     }
   )
   depends_on = [
