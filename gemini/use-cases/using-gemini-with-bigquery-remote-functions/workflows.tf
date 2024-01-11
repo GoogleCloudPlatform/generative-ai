@@ -53,6 +53,7 @@ resource "google_workflows_workflow" "workflow" {
   service_account = google_service_account.workflow_service_account.id
 
   source_contents = templatefile("${path.module}/templates/workflow.tftpl", {
+    sample_bucket = google_storage_bucket.demo_images,
     dataset_id = google_bigquery_dataset.demo_dataset.dataset_id
   })
 
@@ -67,7 +68,7 @@ resource "google_workflows_workflow" "workflow" {
     google_bigquery_table.object_table,
     google_cloudfunctions2_function.image_remote_function,
     google_cloudfunctions2_function.text_remote_function,
-    google_storage_bucket_object.image_upload,
+    google_storage_bucket.demo_images,
     google_project_iam_member.functions_invoke_roles,
     time_sleep.wait_after_functions,
   ]
@@ -91,7 +92,7 @@ data "http" "call_workflows_setup" {
     google_bigquery_table.object_table,
     google_cloudfunctions2_function.image_remote_function,
     google_cloudfunctions2_function.text_remote_function,
-    google_storage_bucket_object.image_upload,
+    google_storage_bucket.demo_images,
     google_project_iam_member.functions_invoke_roles,
     time_sleep.wait_after_functions,
   ]
