@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+-- noqa: disable=PRS
 CREATE OR REPLACE FUNCTION
   `${project_id}.${dataset_id}.${bq_function_name}`(gcs_uri STRING) RETURNS STRING
   REMOTE WITH CONNECTION `${project_id}.${region}.${bq_connection_id}`
