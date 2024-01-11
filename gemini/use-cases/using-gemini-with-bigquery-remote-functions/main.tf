@@ -91,7 +91,7 @@ data "google_client_config" "current" {
 
 # Wait until the Cloud Workflow has finished to complete setup
 resource "time_sleep" "wait_after_workflow" {
-  create_duration = "60s"
+  create_duration = "30s"
   depends_on = [
     data.http.call_workflows_setup
   ]
