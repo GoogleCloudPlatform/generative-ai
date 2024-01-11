@@ -64,7 +64,7 @@ resource "google_bigquery_table" "object_table" {
     object_metadata = "Simple"
   }
 
-  depends_on = [google_project_iam_member.functions_invoke_roles, google_storage_bucket.demo_images, time_sleep.wait_after_workflow]
+  depends_on = [google_project_iam_member.functions_invoke_roles, google_storage_bucket.demo_images]
 }
 
 # Create a series of stored procedures to connect to the remote function and call it
