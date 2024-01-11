@@ -1,9 +1,10 @@
 [sqlfluff]
 
 dialect = bigquery
+templater = placeholder
+
+[sqlfluff:templater:placeholder]
+param_style = question_mark
 
 [sqlfluff:indentation]
 tab_space_size = 2
-
-[sqlfluff:rules:references.special_chars]
-additional_allowed_characters = ['$']

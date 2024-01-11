@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CREATE OR REPLACE TABLE `${project_id}.${dataset_id}.sample_text_prompts`
+CREATE OR REPLACE TABLE
+`${project_id}.${dataset_id}.sample_text_prompts` -- noqa: RF05
 
 (
   landmark_name STRING,

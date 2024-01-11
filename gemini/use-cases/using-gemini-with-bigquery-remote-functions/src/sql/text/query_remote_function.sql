@@ -17,4 +17,4 @@ SELECT
   `${project_id}.${dataset_id}.${bq_function_name}`(text_prompt)
     AS landmark_description
 FROM
-  `${project_id}.${dataset_id}.sample_text_prompts`;
+  `${project_id}.${dataset_id}.sample_text_prompts`; -- noqa: RF05
