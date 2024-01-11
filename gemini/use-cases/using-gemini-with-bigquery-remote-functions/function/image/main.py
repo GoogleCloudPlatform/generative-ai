@@ -20,7 +20,7 @@ from vertexai.preview.generative_models import GenerativeModel, Part
 
 
 @functions_framework.http
-def list_url(request) -> str:
+def list_url(request) -> tuple[str, int]:
     print(request)
     try:
         request_json = request.get_json()
@@ -33,7 +33,7 @@ def list_url(request) -> str:
         return json.dumps({"errorMessage": str(e)}), 400
 
 
-def analyze_image(image_file) -> tuple[str, int] | None:
+def analyze_image(image_file) -> str | None:
     gemini_pro_vision_model = GenerativeModel("gemini-pro-vision")
     print(gemini_pro_vision_model)
     image = Part.from_uri(image_file, mime_type="image/jpeg")
@@ -49,7 +49,7 @@ def analyze_image(image_file) -> tuple[str, int] | None:
     return output
 
 
-def run_it(request) -> tuple[str, int]:
+def run_it(request) -> str:
     try:
         project_id = os.environ.get("PROJECT_ID")
         region = os.environ.get("REGION")
