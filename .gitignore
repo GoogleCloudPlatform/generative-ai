@@ -105,6 +105,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv*
 env/
 venv/
 ENV/
@@ -138,3 +139,8 @@ dmypy.json
 # User-specific files
 language/examples/prompt-design/train.csv
 README-TOC*.md
+
+.terraform*
+.Terraform*
+
+tmp*
