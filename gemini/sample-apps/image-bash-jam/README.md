@@ -209,9 +209,9 @@ Gemini to the rescue!
 2. Since Gemini doesn't read PDFs (yet) from UI, here's the PNG: <a href="images/instruction-manuals/Acrux-User-Manual-4700503.png?raw=true" >images/instruction-manuals/Acrux-User-Manual-4700503.png</a>.
 3. This was the hard part. Let's now ask questions. There are three as I used the UI:
 
-![Alt text](images/instruction-manuals/cloudconsole-screenshot.png?raw=true "Riccardo using DevConsole to ask Gemini with a click")
+![Alt text](cloudconsole-screenshot.png?raw=true "Riccardo using DevConsole to ask Gemini with a click")
 
-4. Let's do the same from CLI:
+1. Let's do the same from CLI:
 
 ```
 $ make read-instruction-manual-for-me
