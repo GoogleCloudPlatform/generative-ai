@@ -251,7 +251,7 @@ $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize th
  said by the character Tyrion Lannister.
 ```
 
-* MP3: <a href='images/ricc-logo.png.mp3' >images/ricc-logo.png.mp3</a> (I don't think
+* MP3: <a href='https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/ricc-logo.png.mp3' >images/mp3/ricc-logo.png.mp3</a> (I don't think
   GitHub supports playing this audio - but you can download it and hear it).
 
 * <audio controls="controls">
