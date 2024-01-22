@@ -10,7 +10,10 @@
 #
 ##############################################################################
 
+. .envrc
+
 set -euo pipefail
+
 #PROJECT_ID=$(gcloud config get-value project)
 #SENTENCE="$(echo "$@" | sed "s/'/\\\\'/g")" # c'e' l'uomo => "c e l uomo"
 SENTENCE="${*//\'/\\\'}"        # c'e' l'uomo => "c\' e l\'uomo"
