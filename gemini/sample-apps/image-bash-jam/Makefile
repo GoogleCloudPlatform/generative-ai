@@ -46,6 +46,16 @@ vertexai-images/sky.jpg:
 test-ricc-mac:
 	PATH=/bin/:/usr/bin/:/opt/homebrew/bin/:"/Users/ricc/Library/Application Support/cloud-code/installer/google-cloud-sdk/bin/" make age-test
 
-images-download:
-	mkdir images-download
-	gsutil ls -alR gs://github-repo/use-cases/image-bash-jam/
+.PHONY: images-download
+images:
+#	echo "target is $@"
+	false
+	mkdir -p "$@"
+	gsutil -m rsync -r gs://github-repo/use-cases/image-bash-jam/ $@/
+# moves images to above dir:
+	mv $@/img/* $@/
+
+# images-upload:
+# 	gsutil rsync -r images gs://github-repo/use-cases/image-bash-jam/
+clean:
+	rm -rf images-download/ .tmp.*.json t
