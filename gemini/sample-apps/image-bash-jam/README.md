@@ -60,7 +60,7 @@ Let's start asking Gemini about images!
 
 Let's start with one of my favouritest albums of all time: **Selling England by the pound**.
 
-![Alt text](images/genesis-selling-england.jpg?raw=true "Genesis - Selling England by the pound")
+![Alt text](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/genesis-selling-england.jpg "Genesis - Selling England by the pound (one of the best albums of all time!)")
 
 ```bash
 ./gemini-generic.sh images/genesis-selling-england.jpg Describe what you see
