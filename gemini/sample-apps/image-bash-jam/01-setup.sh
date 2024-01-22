@@ -33,8 +33,12 @@ else
 	gcloud auth login
 fi
 
+
 gcloud auth application-default set-quota-project "$PROJECT_ID"
 gcloud auth application-default login
+# Seems like you need it before AND after the login
+gcloud auth application-default set-quota-project "$PROJECT_ID"
+
 #	gcloud auth login
 gcloud config set project "$PROJECT_ID"
 
@@ -43,6 +47,7 @@ gcloud config set project "$PROJECT_ID"
 echo '💡 2. Enabling APIs..'
 gcloud services enable \
 	cloudresourcemanager.googleapis.com \
+	texttospeech.googleapis.com \
 	aiplatform.googleapis.com
 
 echo "💡 3. Now I will download images from GCS bucket:"

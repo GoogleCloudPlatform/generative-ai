@@ -23,6 +23,9 @@ git checkout ricc-gemini-bash
 # TODO(ricc): Also un-commnent the GoogleCloudPlatform line
 # DELETEME END
 cd gemini/sample-apps/image-bash-jam/
+
+# [optional] If you like a colored shell, do this. If not, scripts will detect its absence and will just print in shell default color (see `_lolcat` in `_common.sh`).
+gem install lolcat
 ```
 
 2. First check authentication. Make sure you login with gcloud (or whatever login you want to do) and set up the project_id correctly.
@@ -95,6 +98,8 @@ The cover of Genesis' album Selling England by the Pound features a painting by 
 ```
 
 A quick googling confirms that <https://en.wikipedia.org/wiki/Paul_Whitehead> actually covered one of my favourite album of all times. If you love Genesis too and want to see me play Firth of Fifth, please check <https://www.youtube.com/watch?v=4VBxd9n1dSU>.
+
+**Note**: should the script fail, make sure that `images/genesis-selling-england.jpg` exists (or re-issue `make images`) and that authentication worked (check `.tmp*` files for more verbose output).
 
 ## Let's compare TWO images
 
