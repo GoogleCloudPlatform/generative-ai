@@ -19,7 +19,7 @@ supports local keys, check the docs on top of the file):
 ```bash
 cp .envrc.dist .envrc
 vim .envrc # add your project id
-./01-setup.sh
+./01-setup.sh # sets up authentication, and includes `make images` to download resources locally.
 ```
 
 1. Run the simplest script as a test:
@@ -88,9 +88,12 @@ Since we're celebrating Gemini launch and I'm a huge fan of the Saint Seiya mang
   <tr  valign=top >
     <td valign=top >
         <img src="images/gemini-constellation.png?raw=true"  alt="1" width=360px >
+        <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/gemini-constellation.png"  alt="1" width=360px >
     </td>
     <td  valign=top>
         <img src="images/saga-blue-hair.jpg?raw=true" alt="2" width=360px >
+        <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/saga-blue-hair.jpg" alt="2" width=360px >
+
     </td>
    </tr>
 </table>

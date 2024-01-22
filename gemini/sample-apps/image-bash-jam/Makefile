@@ -33,7 +33,7 @@ read-instruction-manual-for-me:
 compare-ale-seby:
 	./gemini-generic-two-pics.sh images/ale*.jpg
 clean:
-	rm t .tmp* t.audio* t.*.mp3 t.mp3
+	rm t .tmp* t.audio* t.*.mp3 t.mp3 images-download/ images/ .tmp.*.json t
 clean-all:
 	rm images/*.mp3 images/*.explain.txt
 	make clean
@@ -46,10 +46,9 @@ vertexai-images/sky.jpg:
 test-ricc-mac:
 	PATH=/bin/:/usr/bin/:/opt/homebrew/bin/:"/Users/ricc/Library/Application Support/cloud-code/installer/google-cloud-sdk/bin/" make age-test
 
-.PHONY: images-download
+.PHONY: images
 images:
 #	echo "target is $@"
-	false
 	mkdir -p "$@"
 	gsutil -m rsync -r gs://github-repo/use-cases/image-bash-jam/ $@/
 # moves images to above dir:
@@ -57,5 +56,3 @@ images:
 
 # images-upload:
 # 	gsutil rsync -r images gs://github-repo/use-cases/image-bash-jam/
-clean:
-	rm -rf images-download/ .tmp.*.json t
