@@ -7,20 +7,43 @@ Link: <https://medium.com/@palladiusbonton/hey-gemini-explain-me-these-pictures-
 Note: this code has been tested both locally and on Cloud Shell. For an easier authentication experience,
 consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell).
 
-## A simple test
+## Setup
 
-1. First check authentication. Make sure you login with gcloud (or whatever login you want to do) and set up the project_id correctly.
+1. First lets download the repo and position ourself in the right directory:
 
-`gcloud auth login`
+```bash
+cd
+#git clone  https://github.com/GoogleCloudPlatform/generative-ai
+#cd generative-ai/
+# DELETEME START
+# [deleteme before ] While reviewing Riccardo's code, this is the real command:
+git clone https://github.com/palladius/generative-ai
+cd generative-ai
+git checkout ricc-gemini-bash
+# TODO(ricc): Also un-commnent the GoogleCloudPlatform line
+# DELETEME END
+cd gemini/sample-apps/image-bash-jam/
+```
+
+2. First check authentication. Make sure you login with gcloud (or whatever login you want to do) and set up the project_id correctly.
+
+```bash
+# If you're on Cloud Shell, you can skip this. You will authenticate with just a click.
+gcloud auth login
+```
 
 If you have trouble with loggin in, you can use the following command to set the project_id (it also
 supports local keys, check the docs on top of the file):
 
 ```bash
 cp .envrc.dist .envrc
-vim .envrc # add your project id
+vim .envrc # Change PROJECT_ID and ACCOUNT with your project and email.
 ./01-setup.sh # sets up authentication, and includes `make images` to download resources locally.
 ```
+
+
+## A simple test
+
 
 1. Run the simplest script as a test:
 

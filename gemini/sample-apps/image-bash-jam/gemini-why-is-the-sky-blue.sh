@@ -11,9 +11,11 @@ LOCATION="us-central1"
 TMP_OUTPUT_FILE=".tmp.why-sky-blue.json"
 JQ_PATH_PLURAL=".[].candidates[0].content.parts[0].text" # PROD_URL_SELECTOR all answers from StreamGenerateContent
 
+. .envrc
+
 set -euo pipefail
 
-gcloud config set project $PROJECT_ID
+gcloud config set project "$PROJECT_ID"
 
 # PROD_URL="https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/$MODEL_ID:streamGenerateContent"
 
