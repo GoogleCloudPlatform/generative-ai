@@ -28,7 +28,7 @@ cd gemini/sample-apps/image-bash-jam/
 gem install lolcat
 ```
 
-2. First check authentication. Make sure you login with gcloud (or whatever login you want to do) and set up the project_id correctly.
+1. First check authentication. Make sure you login with gcloud (or whatever login you want to do) and set up the project_id correctly.
 
 ```bash
 # If you're on Cloud Shell, you can skip this. You will authenticate with just a click.
@@ -44,9 +44,7 @@ vim .envrc # Change PROJECT_ID and ACCOUNT with your project and email.
 ./01-setup.sh # sets up authentication, and includes `make images` to download resources locally.
 ```
 
-
 ## A simple test
-
 
 1. Run the simplest script as a test:
 
@@ -113,15 +111,15 @@ Since we're celebrating Gemini launch and I'm a huge fan of the Saint Seiya mang
     <td  valign=top>
         Gemini Saint (Saga) from Saint Seiya
     </td>
+  </tr>
   <tr  valign=top >
     <td valign=top >
         <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/gemini-constellation.png"  alt="Gemini constellation" width=360px >
     </td>
     <td  valign=top>
         <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/saga-blue-hair.jpg" alt="Gemini no-saga with blue hair" width=360px >
-
     </td>
-   </tr>
+  </tr>
 </table>
 
 ```bash
@@ -212,7 +210,7 @@ t.mp3: MPEG ADTS, layer III, v2,  32 kbps, 24 kHz, Monaural
 All good. MP3 created: 't.La foto mostra una loggia con delle colonne in pie.mp3'
 ```
 
-As you see, italian is more verbose and it knows more about Trento, but it's not aware of the _Buonconsiglio Palace_.
+As you see, italian is more verbose and it knows more about Trento, but it's not aware of the *Buonconsiglio Palace*.
 Interesting! I presume the Italian model has less training material to learn from than the English one. Makes sense.
 
 Btw, I highly recommend Trento, I was cycling around there: great views and great wines!
