@@ -13,14 +13,8 @@ set -euo pipefail
 #PROJECT_ID=$(gcloud config get-value project)
 #SENTENCE="$(echo "$@" | sed "s/'/\\\\'/g")" # c'e' l'uomo => "c e l uomo"
 SENTENCE="${*//\'/\\\'}"        # c'e' l'uomo => "c\' e l\'uomo"
-
-echo "ORIGINAL:        $*"
-echo "SENTENCE:        $SENTENCE"
-echo "SENTENCE_GITHUB: $SENTENCE_GITHUB"
-exit 42
-
-TMP_OUTPUT_FILE=.tmp.tts-output.json
-JQ_PATH=".audioContent"
+TMP_OUTPUT_FILE='.tmp.tts-output.json'
+JQ_PATH='.audioContent'
 DEFAULT_LANG="en-US"
 TTS_LANG="${TTS_LANG:-$DEFAULT_LANG}"
 #DEFAULT_GENDER='MALE' doesnt work in italian -> dflt is it-IT-Neural2-A
