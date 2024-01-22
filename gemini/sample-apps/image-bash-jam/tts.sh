@@ -8,9 +8,6 @@
 # 	gcloud auth application-default login
 # 	gcloud auth application-default set-quota-project "$PROJECT_ID"
 #
-# Note that this API requires different kind of authentication. I was able to enable it
-# with a service account, but I wasn't able to make it work via Cloud Shell: the
-# two commands above didn't suffice.
 ##############################################################################
 
 set -euo pipefail
@@ -23,32 +20,31 @@ DEFAULT_LANG="en-US"
 TTS_LANG="${TTS_LANG:-$DEFAULT_LANG}"
 #DEFAULT_GENDER='MALE' doesnt work in italian -> dflt is it-IT-Neural2-A
 DEFAULT_GENDER='FEMALE'
-PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")"
+#PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")"
 
 # common functions
 source _common.sh
 
 echo "# PROJECT_ID: $(_yellow $PROJECT_ID)"
-echo "# PROJECT_NUMBER: $(_yellow $PROJECT_NUMBER)"
 echo "# TTS_LANG: $(_yellow $TTS_LANG)"
 echo "# Cleaned up SENTENCE: $(_yellow $SENTENCE)"
 
 curl -X POST \
--H "Authorization: Bearer $(gcloud --project "$PROJECT_ID" auth print-access-token)" \
--H "X-Goog-Quota-User: $PROJECT_NUMBER" \
--H "Content-Type: application/json" \
--d "{
-  'input': {
-    'text': '$SENTENCE'
-  },
-  'voice': {
-    'languageCode': '$TTS_LANG',
-    'ssmlGender': '$DEFAULT_GENDER'
-  },
-  'audioConfig': {
-    'audioEncoding': 'MP3'
-  }
-}" "https://texttospeech.googleapis.com/v1/text:synthesize" \
+  -H "Authorization: Bearer $(gcloud --project "$PROJECT_ID" auth print-access-token)" \
+  -H "X-Goog-User-Project: $PROJECT_ID" \
+  -H "Content-Type: application/json" \
+  -d "{
+    'input': {
+      'text': '$SENTENCE'
+    },
+    'voice': {
+      'languageCode': '$TTS_LANG',
+      'ssmlGender': '$DEFAULT_GENDER'
+    },
+    'audioConfig': {
+      'audioEncoding': 'MP3'
+    }
+  }" "https://texttospeech.googleapis.com/v1/text:synthesize" \
     > $TMP_OUTPUT_FILE 2>t ||
         show_errors_and_exit
 
