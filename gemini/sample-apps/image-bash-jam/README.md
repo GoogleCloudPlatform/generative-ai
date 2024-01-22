@@ -2,7 +2,7 @@
 
 Note: I wrote an article on Medium which is very similar to this README :)
 
-Link: https://medium.com/@palladiusbonton/hey-gemini-explain-me-these-pictures-in-bash-06c03d0d0512
+Link: <https://medium.com/@palladiusbonton/hey-gemini-explain-me-these-pictures-in-bash-06c03d0d0512>
 
 Note: this code has been tested both locally and on Cloud Shell. For an easier authentication experience,
 consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell).
@@ -16,7 +16,7 @@ consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/
 If you have trouble with loggin in, you can use the following command to set the project_id (it also
 supports local keys, check the docs on top of the file):
 
-```
+```bash
 cp .envrc.dist .envrc
 vim .envrc # add your project id
 ./01-setup.sh
@@ -54,14 +54,13 @@ Bingo! It tells you about Raileigh Scattering and also how much did you spend (4
 
 If this works, great, we can move into more interesting stuff!
 
-## Hey Gemini, describe what you see..
+## Hey Gemini, describe what you see
 
 Let's start asking Gemini about images!
 
 Let's start with one of my favouritest albums of all time: **Selling England by the pound**.
 
 ![Alt text](images/genesis-selling-england.jpg?raw=true "Genesis - Selling England by the pound")
-
 
 ```bash
 ./gemini-generic.sh images/genesis-selling-england.jpg Describe what you see
@@ -72,14 +71,11 @@ Let's start with one of my favouritest albums of all time: **Selling England by 
 The cover of Genesis' album Selling England by the Pound features a painting by British artist Paul Whitehead. The painting depicts a group of people in a park, with a man sleeping on a bench in the foreground. The people are all wearing clothes from the 1920s or 1930s, and the painting has a nostalgic, almost surreal feel to it. The colors are muted and the figures are slightly blurred, which gives the painting a dreamlike quality. The painting is also full of symbolism, with the sleeping man representing England and the people around him representing the different aspects of English society. The painting has been interpreted in many different ways, but it is generally seen as a commentary on the state of England in the 1970s.
 ```
 
-A quick googling confirms that https://en.wikipedia.org/wiki/Paul_Whitehead actually covered one of my favourite album of all times. If you love Genesis too and want to see me play Firth of Fifth, please check https://www.youtube.com/watch?v=4VBxd9n1dSU
+A quick googling confirms that <https://en.wikipedia.org/wiki/Paul_Whitehead> actually covered one of my favourite album of all times. If you love Genesis too and want to see me play Firth of Fifth, please check <https://www.youtube.com/watch?v=4VBxd9n1dSU>.
 
+## Let's compare TWO images
 
-## Let's compare TWO images!
-
-Since we're celebrating Gemini launch and I'm a huge fan of the Saint Seiya manga/anime, I've asked Gemini to compare
-two things close to him:
-
+Since we're celebrating Gemini launch and I'm a huge fan of the Saint Seiya manga/anime, I've asked Gemini to compare two things close to him:
 
 <table align=center >
   <tr  valign=top >
@@ -112,7 +108,7 @@ $ ./gemini-generic-two-pics.sh  images/gemini-constellation.png   images/saga-bl
 Well done Gemini! *Know thyself*, Socrates would say.
 Note that the images are a PNG and a JPG - nothing can stop Gemini from comparing them!
 
-## Introducing Audio!
+## Introducing Audio
 
 Why don't we throw some audio in the mix?
 
@@ -151,8 +147,7 @@ gcloud auth application-default set-quota-project "$PROJECT_ID"
 Another way is to download a key and put it under `private/PROJECT_ID.json`.
 My magic script `01-setup.sh` will pick it up automagically and log in through it :)
 
-More info here: https://cloud.google.com/docs/authentication/troubleshoot-adc#user-creds-client-based
-
+More info here: <https://cloud.google.com/docs/authentication/troubleshoot-adc#user-creds-client-based>
 
 ## An italian image, explained in Italian
 
@@ -199,7 +194,7 @@ to adapt seamlessly to your favorite language. TextToSpeech API supports nearly 
 
 The MP3 result is conveniently copied under `images/italian-town.jpg.mp3`.
 
-## Something useful now: understand a diagram!
+## Something useful now: understand a diagram
 
 I have a headset at work which is amazing, but I'm never sure how to turn it on or off; if I get it from charge its automatically on for me, but what if I forgot it non charging last night? This is what happened to me this morning.
 
@@ -256,6 +251,7 @@ $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize th
 ```
 
 * MP3: <a href='images/ricc-logo.png.mp3' >images/ricc-logo.png.mp3</a> (I don't think GitHub supports playing this audio - but you can download it and hear it).
+
 * <audio controls="controls">
   <source type="audio/mp3" src="images/ricc-logo.png.mp3"></source>
   <p>🔇 Sorry, Your browser or GitHub markdown does not support the audio element.</p>
