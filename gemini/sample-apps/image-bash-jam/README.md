@@ -159,20 +159,22 @@ All good. MP3 created [..]
 ```
 
 Now, interestingly it also creates an MP3 of the answer. Not super interesting with all thes enumbers, but might be
-nice to see it for longer verbose answers. You can hear it under `output/` folder.
+nice to see it for longer verbose answers. You can hear it by opening the file under `output/` folder.
 (<a href="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/ricc-family-with-santa.jpg.mp3" >images/mp3/ricc-family-with-santa.jpg.mp3</a>).
 
 ### Troubleshooting
 
-Sometimes the TTS script gives me auth warning. You can fix it by re-authenticating through ADC:
+Sometimes you might have authentication warnings (partiocularly with the text-to-speech API).
+You can fix it by re-authenticating through ADC:
 
 ```bash
 gcloud auth application-default login
 gcloud auth application-default set-quota-project "$PROJECT_ID"
 ```
 
-Another way is to download a key and put it under `private/PROJECT_ID.json`.
-My magic script `01-setup.sh` will pick it up automagically and log in through it :)
+Another way is to download a key and put it under `private/YOUR_PROJECT_ID.json`.
+
+The script `01-setup.sh` has some magic built in, and will pick it up automagically and log in through it :)
 
 More info here: <https://cloud.google.com/docs/authentication/troubleshoot-adc#user-creds-client-based>
 
@@ -219,7 +221,7 @@ Now, to create the Italian MP3, I had to hardcode the type of audio I wanted int
 This is the only added value to the `./gemini-explain-image-italian.sh` script so you should be able
 to adapt seamlessly to your favorite language. TextToSpeech API supports nearly 200 of them!
 
-The MP3 result is conveniently copied under [images/mp3/italian-town.jpg.mp3](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/italian-town.jpg.mp3).
+The MP3 result is conveniently copied under [🇮🇹 images/mp3/italian-town.jpg.mp3](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/italian-town.jpg.mp3).
 
 ## Something useful now: understand a diagram
 
