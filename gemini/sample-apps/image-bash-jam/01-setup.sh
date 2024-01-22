@@ -17,6 +17,8 @@ fi
 
 export STD_SA_LOCATION="private/$PROJECT_ID.json"
 
+echo '💡 1. Setting up gcloud authentication..'
+
 gcloud config configurations create "$CONFIG_NAME" --activate || \
 	gcloud config configurations activate "$CONFIG_NAME"
 
@@ -36,7 +38,14 @@ gcloud auth application-default login
 #	gcloud auth login
 gcloud config set project "$PROJECT_ID"
 
-echo "Now I will download images from GCS bucket:"
+# ENABLE APIs
+#https://console.cloud.google.com/apis/library/aiplatform.googleapis.com?project=rk-testing-gemini
+echo '💡 2. Enabling APIs..'
+gcloud services enable \
+	cloudresourcemanager.googleapis.com \
+	aiplatform.googleapis.com
+
+echo "💡 3. Now I will download images from GCS bucket:"
 make images
 
-echo "Done. You should be able to enjoy these scripts now! See README.md for some examples."
+echo "🟢 Done. You should be able to enjoy these scripts now! See README.md for some examples."
