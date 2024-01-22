@@ -104,19 +104,19 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token)" \
     > $TMP_OUTPUT_FILE 2>t ||
         show_errors_and_exit
 
-OUTPUT="$(cat "$TMP_OUTPUT_FILE" | jq "$JQ_PATH" || echo jq-error)"
+OUTPUT="$(jq "$JQ_PATH" < "$TMP_OUTPUT_FILE" || echo jq-error)"
 
 #if [ "$OUTPUT" = '""' -o "$OUTPUT" = 'null' -o "$OUTPUT" = 'jq-error' ]; then # empty answer
 #   ^-- SC2166 (warning): Prefer [ p ] || [ q ] as [ p -o q ] is not well defined.
 if [ "$OUTPUT" = '""' ] || [ "$OUTPUT" = 'null' ] || [ "$OUTPUT" = 'jq-error' ]; then # empty answer
     echo "#😥 Sorry, some error here. Dig into the JSON file more: $TMP_OUTPUT_FILE" >&2
-    cat "$TMP_OUTPUT_FILE" | jq >&2
+    jq < "$TMP_OUTPUT_FILE" >&2
 else
     N_CANDIDATES=$(cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | wc -l)
     echo -e "# ♊ Gemini no Saga answer for you ($N_CANDIDATES candidates):"
     cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | xargs -0 | _lolcat
     if [ "true" = "$GENERATE_MP3" ]; then
-        ./tts.sh `cat $TMP_OUTPUT_FILE | jq "$JQ_PATH" -r`
+        ./tts.sh "$(jq "$JQ_PATH" -r < $TMP_OUTPUT_FILE )"
         cp t.mp3 "$IMAGE".mp3
     else
         echo "# Note: No mp3 file generated (use GENERATE_MP3=true to generate one)"
