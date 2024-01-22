@@ -36,8 +36,6 @@ fi
 
 gcloud auth application-default set-quota-project "$PROJECT_ID"
 gcloud auth application-default login
-# Seems like you need it before AND after the login
-gcloud auth application-default set-quota-project "$PROJECT_ID"
 
 #	gcloud auth login
 gcloud config set project "$PROJECT_ID"
