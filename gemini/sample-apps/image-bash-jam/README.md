@@ -219,7 +219,7 @@ Now, to create the Italian MP3, I had to hardcode the type of audio I wanted int
 This is the only added value to the `./gemini-explain-image-italian.sh` script so you should be able
 to adapt seamlessly to your favorite language. TextToSpeech API supports nearly 200 of them!
 
-The MP3 result is conveniently copied under `[images/mp3/italian-town.jpg.mp3](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/italian-town.jpg.mp3)`.
+The MP3 result is conveniently copied under [images/mp3/italian-town.jpg.mp3](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/italian-town.jpg.mp3).
 
 ## Something useful now: understand a diagram
 
