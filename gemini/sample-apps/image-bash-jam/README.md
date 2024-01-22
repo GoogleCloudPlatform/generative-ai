@@ -87,12 +87,10 @@ Since we're celebrating Gemini launch and I'm a huge fan of the Saint Seiya mang
     </td>
   <tr  valign=top >
     <td valign=top >
-        <img src="images/gemini-constellation.png?raw=true"  alt="1" width=360px >
-        <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/gemini-constellation.png"  alt="1" width=360px >
+        <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/gemini-constellation.png"  alt="Gemini constellation" width=360px >
     </td>
     <td  valign=top>
-        <img src="images/saga-blue-hair.jpg?raw=true" alt="2" width=360px >
-        <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/saga-blue-hair.jpg" alt="2" width=360px >
+        <img src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/saga-blue-hair.jpg" alt="Gemini no-saga with blue hair" width=360px >
 
     </td>
    </tr>
@@ -136,7 +134,7 @@ All good. MP3 created [..]
 
 Now, interestingly it also creates an MP3 of the answer. Not super interesting with all thes enumbers, but might be
 nice to see it for longer verbose answers. You can hear it under `output/` folder.
-(<a href="images/ricc-family-with-santa.jpg.mp3" >images/ricc-family-with-santa.jpg.mp3</a>).
+(<a href="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/ricc-family-with-santa.jpg.mp3" >images/mp3/ricc-family-with-santa.jpg.mp3</a>).
 
 ### Troubleshooting
 
@@ -156,7 +154,7 @@ More info here: <https://cloud.google.com/docs/authentication/troubleshoot-adc#u
 
 How about we do the same, but spice it up a bit with italian text and sound?
 
-![Alt text](images/italian-town.jpg?raw=true "Photo of Trento City")
+![Alt text](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/italian-town.jpg "Photo of Trento City")
 
 ```bash
 ./gemini-explain-image.sh images/italian-town.jpg
@@ -186,7 +184,7 @@ t.mp3: MPEG ADTS, layer III, v2,  32 kbps, 24 kHz, Monaural
 All good. MP3 created: 't.La foto mostra una loggia con delle colonne in pie.mp3'
 ```
 
-As you see, italian is more verbose and it knows more about Trento, but it's not aware of the Buonconsiglio Palace.
+As you see, italian is more verbose and it knows more about Trento, but it's not aware of the _Buonconsiglio Palace_.
 Interesting! I presume the Italian model has less training material to learn from than the English one. Makes sense.
 
 Btw, I highly recommend Trento, I was cycling around there: great views and great wines!
@@ -195,7 +193,7 @@ Now, to create the Italian MP3, I had to hardcode the type of audio I wanted int
 This is the only added value to the `./gemini-explain-image-italian.sh` script so you should be able
 to adapt seamlessly to your favorite language. TextToSpeech API supports nearly 200 of them!
 
-The MP3 result is conveniently copied under `images/italian-town.jpg.mp3`.
+The MP3 result is conveniently copied under `images/mp3/italian-town.jpg.mp3`.
 
 ## Something useful now: understand a diagram
 
@@ -204,7 +202,7 @@ I have a headset at work which is amazing, but I'm never sure how to turn it on 
 Gemini to the rescue!
 
 1. Google "Accrux ear phone user manual and get PDF". => `images/instruction-manuals/Acrux-User-Manual-4700503.pdf`
-2. Since Gemini doesn't read PDFs (yet) from UI, here's the PNG: <a href="images/instruction-manuals/Acrux-User-Manual-4700503.png?raw=true" >images/instruction-manuals/Acrux-User-Manual-4700503.png</a>.
+2. Since Gemini doesn't read PDFs (yet) from UI, here's the PNG: <a href="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/instruction-manuals/Acrux-User-Manual-4700503.png" >images/instruction-manuals/Acrux-User-Manual-4700503.png</a>.
 3. This was the hard part. Let's now ask questions. There are three as I used the UI:
 
 ![Alt text](cloudconsole-screenshot.png?raw=true "Riccardo using DevConsole to ask Gemini with a click")
@@ -231,7 +229,7 @@ There you go, the button IS the ANC button, I thought so! Thanks Gemini!
 
 This is the avatar I use in Google. I randomly asked this:
 
-![Alt text](images/ricc-logo.png?raw=true "Riccardo logo - taken in the Amsterdam office")
+![Alt text](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/ricc-logo.png "Riccardo GCP logo - taken in the Amsterdam office")
 
 ```bash
 $ ./gemini-explain-image.sh images/ricc-logo.png
@@ -257,7 +255,7 @@ $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize th
   GitHub supports playing this audio - but you can download it and hear it).
 
 * <audio controls="controls">
-  <source type="audio/mp3" src="images/ricc-logo.png.mp3"></source>
+  <source type="audio/mp3" src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/ricc-logo.png.mp3"></source>
   <p>🔇 Sorry, Your browser or GitHub markdown does not support the audio element.</p>
   </audio>
 
