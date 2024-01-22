@@ -7,7 +7,7 @@ Link: https://medium.com/@palladiusbonton/hey-gemini-explain-me-these-pictures-i
 Note: this code has been tested both locally and on Cloud Shell. For an easier authentication experience,
 consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell).
 
-# A simple test
+## A simple test
 
 1. First check authentication. Make sure you login with gcloud (or whatever login you want to do) and set up the project_id correctly.
 
@@ -17,18 +17,18 @@ If you have trouble with loggin in, you can use the following command to set the
 supports local keys, check the docs on top of the file):
 
 ```
-$ cp .envrc.dist .envrc
-$ vim .envrc # add your project id
-$ ./01-setup.sh
+cp .envrc.dist .envrc
+vim .envrc # add your project id
+./01-setup.sh
 ```
 
-2. Run the simplest script as a test:
+1. Run the simplest script as a test:
 
 `./gemini-why-is-the-sky-blue.sh`
 
 Response:
 
-```
+```JSON
 {
   "candidates": [
     {
@@ -63,7 +63,7 @@ Let's start with one of my favouritest albums of all time: **Selling England by 
 ![Alt text](images/genesis-selling-england.jpg?raw=true "Genesis - Selling England by the pound")
 
 
-```
+```bash
 ./gemini-generic.sh images/genesis-selling-england.jpg Describe what you see
 # 🤌  QUESTION: Describe what you see
 # 🌡️ TEMPERATURE: 0.2
@@ -99,9 +99,9 @@ two things close to him:
    </tr>
 </table>
 
-```
-make compare-two-geminis
-./gemini-generic-two-pics.sh  images/gemini-constellation.png   images/saga-blue-hair.jpg
+```bash
+$ make compare-two-geminis
+$ ./gemini-generic-two-pics.sh  images/gemini-constellation.png   images/saga-blue-hair.jpg
 ♊️ Question: Can you highlight similarity and differences between the two? Also, do you recognize the same person in both of them?
  👀 Examining image1 images/gemini-constellation.png: images/gemini-constellation.png: PNG image data, 1675 x 1302, 8-bit/color RGBA, non-interlaced.
  👀 Examining image2 images/saga-blue-hair.jpg: images/saga-blue-hair.jpg: JPEG image data, JFIF standard 1.01, aspect ratio, density 1x1, segment length 16, baseline, precision 8, 193x261, components 3.
@@ -118,9 +118,9 @@ Why don't we throw some audio in the mix?
 
 My `./tts.sh` creates an MP3 out of an english (or Italian!) text given in ARGV. Convenient uh?
 
-```
+```bash
 $ make age-test
-=> equivalent to:
+# => equivalent to:
 $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-family-with-santa.jpg Tell me the age of the people you see, from left to right.
 # 🤌  QUESTION: Tell me the age of the people you see, from left to right.
 # 🌡️  TEMPERATURE: 0.2
@@ -143,9 +143,9 @@ nice to see it for longer verbose answers. You can hear it under `output/` folde
 
 Sometimes the TTS script gives me auth warning. You can fix it by re-authenticating through ADC:
 
-```
- $ gcloud auth application-default login
- $ gcloud auth application-default set-quota-project "$PROJECT_ID"
+```bash
+gcloud auth application-default login
+gcloud auth application-default set-quota-project "$PROJECT_ID"
 ```
 
 Another way is to download a key and put it under `private/PROJECT_ID.json`.
@@ -160,7 +160,7 @@ How about we do the same, but spice it up a bit with italian text and sound?
 
 ![Alt text](images/italian-town.jpg?raw=true "Photo of Trento City")
 
-```
+```bash
 ./gemini-explain-image.sh images/italian-town.jpg
 # 🤌  QUESTION: Describe what you see
 # 🌡️  TEMPERATURE: 0.2
@@ -171,7 +171,7 @@ How about we do the same, but spice it up a bit with italian text and sound?
 
 This is good! I didn't know the photographer was shooting from the Buonconsiglio Castle. Awesome. But it's in English.
 
-```
+```bash
 $ GENERATE_MP3=true ./gemini-explain-image-italian.sh images/italian-town.jpg
 # 🤌  QUESTION: Descrivimi cosa vedi in questa immagine
 # 🌡️  TEMPERATURE: 0.2
@@ -213,7 +213,7 @@ Gemini to the rescue!
 
 1. Let's do the same from CLI:
 
-```
+```bash
 $ make read-instruction-manual-for-me
 [..]
 ./gemini-generic.sh images/instruction-manuals/Acrux-User-Manual-4700503.png '1. How do i TURN it on? 2. Where is the power button located? 3. Is this the one called ANC?'
@@ -235,8 +235,7 @@ This is the avatar I use in Google. I randomly asked this:
 
 ![Alt text](images/ricc-logo.png?raw=true "Riccardo logo - taken in the Amsterdam office")
 
-
-```
+```bash
 $ ./gemini-explain-image.sh images/ricc-logo.png
 [..]
 This is a photo of a man standing behind a Google Cloud Platform cutout.
@@ -249,7 +248,7 @@ And I thought! Of course, this is my favourite Games of Thrones tshirt.
 
 Let’s ask Gemini:
 
-```
+```bash
 $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize the quote in this person tshirt
 [..]
  "That's what I do, I drink and I know things" is a quote from the TV show Game of Thrones,

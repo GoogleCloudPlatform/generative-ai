@@ -28,7 +28,7 @@ curl -X POST \
       }
     }'  1>"$TMP_OUTPUT_FILE" 2>/dev/null
 
-CLEANED_OUTPUT="$(cat "$TMP_OUTPUT_FILE" | jq -r "$JQ_PATH_PLURAL" | xargs -0 )"
+CLEANED_OUTPUT="$(jq -r "$JQ_PATH_PLURAL" < "$TMP_OUTPUT_FILE" | xargs -0 )"
 
 echo "# ♊ Input: 'Why is the sky blue?'"
 echo "# ♊ Output: '$CLEANED_OUTPUT'"

@@ -4,19 +4,24 @@
 # Give it an image in input and ask a question after it :)
 #
 
-set -euo pipefail
 
 # common functions
 source _common.sh
 
 if [ -f .envrc ]; then
-    source .envrc
+    # if direnv exists, better allow it.
+    which direnv 2>/dev/null && direnv allow
+    . .envrc
 else
     _red "Warning: PROJECT_ID might not be set, make sure you put it in .envrc:"
     echo '1. cp .envrc.dist .envrc # copy from template'
     echo '2. vim .envrc            # edit away'
     echo "PROJECT_ID: $PROJECT_ID"
 fi
+
+# https://stackoverflow.com/questions/45626610/getting-unbound-variable-error-in-shell-script
+set -euo pipefail
+
 
 #PROJECT_ID='...' # Needs to be provided from ``.envrc` or in some other way
 MODEL_ID="gemini-pro-vision"
@@ -45,12 +50,13 @@ fi
 export IMAGE="$1"
 data=$(_base64_encode_mac_or_linux "$IMAGE") # Mac or Linux should both work!
 shift
-export ORIGINAL_QUESTION="$@" # should default to "what do you see here?"
-export QUESTION="$(echo "$@" | sed "s/'/ /g")" # cleaned up
+export ORIGINAL_QUESTION="$*" # should default to "what do you see here?"
+#export QUESTION="$(echo "$@" | sed "s/'/ /g")" # cleaned up
+export QUESTION="${ORIGINAL_QUESTION//\'/ }" # cleaned up
 
 echo "# 🤌  QUESTION: $(_yellow $QUESTION)"
 echo "# 🌡️  TEMPERATURE: $TEMPERATURE "
-echo "# 👀 Examining image $(_white $(file "$IMAGE")). "
+echo "# 👀 Examining image $(_white "$(file "$IMAGE")"). "
 
 
 #echo "💾 Find any errors in: $TMP_OUTPUT_FILE"
@@ -87,7 +93,8 @@ cat > "$REQUEST_FILE" <<EOF
 }
 EOF
 # "stopSequences": [".", "?", "!"]
-STAGING_URL="https://${LOCATION}-autopush-aiplatform.sandbox.googleapis.com/v1beta1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/$MODEL_ID:generateContent"
+# This was the old pre-prod URL, leaving it just for documentation.
+#STAGING_URL="https://${LOCATION}-autopush-aiplatform.sandbox.googleapis.com/v1beta1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/$MODEL_ID:generateContent"
 PROD_URL="https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/$MODEL_ID:streamGenerateContent"
 
 curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token)" \
@@ -97,11 +104,13 @@ curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token)" \
     > $TMP_OUTPUT_FILE 2>t ||
         show_errors_and_exit
 
-OUTPUT=$(cat $TMP_OUTPUT_FILE | jq "$JQ_PATH" || echo jq-error) # this
+OUTPUT="$(cat "$TMP_OUTPUT_FILE" | jq "$JQ_PATH" || echo jq-error)"
 
-if [ "$OUTPUT" = '""' -o "$OUTPUT" = 'null' -o "$OUTPUT" = 'jq-error' ]; then # empty answer
+#if [ "$OUTPUT" = '""' -o "$OUTPUT" = 'null' -o "$OUTPUT" = 'jq-error' ]; then # empty answer
+#   ^-- SC2166 (warning): Prefer [ p ] || [ q ] as [ p -o q ] is not well defined.
+if [ "$OUTPUT" = '""' ] || [ "$OUTPUT" = 'null' ] || [ "$OUTPUT" = 'jq-error' ]; then # empty answer
     echo "#😥 Sorry, some error here. Dig into the JSON file more: $TMP_OUTPUT_FILE" >&2
-    cat $TMP_OUTPUT_FILE | jq >&2
+    cat "$TMP_OUTPUT_FILE" | jq >&2
 else
     N_CANDIDATES=$(cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | wc -l)
     echo -e "# ♊ Gemini no Saga answer for you ($N_CANDIDATES candidates):"

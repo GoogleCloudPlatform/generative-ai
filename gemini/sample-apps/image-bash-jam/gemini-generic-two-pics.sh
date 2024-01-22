@@ -11,11 +11,11 @@ if [ -f .envrc ]; then
 fi
 
 #PROJECT_ID='provided in .envrc'
-MODEL_ID="gemini-pro-vision"
+#MODEL_ID="gemini-pro-vision" # TODO parametrize into model :)
 LOCATION=us-central1
 TMP_OUTPUT_FILE=.tmp.lastresponse-generic-2pix.json
 REQUEST_FILE=.tmp.request-generic-2pix.json
-JQ_PATH=".[0].candidates[0].content.parts[0].text" # PROD_URL_SELECTOR
+#JQ_PATH=".[0].candidates[0].content.parts[0].text" # PROD_URL_SELECTOR
 #STAGING_JQ_PATH=".candidates[0].content.parts[0].text" # STAGING_URL_SELECTOR (changed! Why?)
 JQ_PATH_PLURAL=".[].candidates[0].content.parts[0].text" # PROD_URL_SELECTOR all answers
 
@@ -26,11 +26,11 @@ function _usage() {
     exit 1
 }
 
-function show_errors_and_exit() {
-    echo Woops. Some Errors found. See error in t:
-    cat t | _redden
-    exit 42
-}
+# function show_errors_and_exit() {
+#     echo Woops. Some Errors found. See error in t:
+#     cat t | _redden
+#     exit 42
+# }
 
 if [ $# -lt 2 ] ; then
     _usage "Provide at least 2 arguments (TODO just 1)"
@@ -48,8 +48,8 @@ data2=$(_base64_encode_mac_or_linux "$IMAGE2")
 export QUESTION="Can you highlight similarity and differences between the two? Also, do you recognize the same person in both of them?"
 
 echo "♊️ Question: $(_yellow "$QUESTION")"
-echo " 👀 Examining image1 $IMAGE1: $(_white $(file "$IMAGE1")). "
-echo " 👀 Examining image2 $IMAGE2: $(_white $(file "$IMAGE2")). "
+echo " 👀 Examining image1 $IMAGE1: $(_white "$(file "$IMAGE1")"). "
+echo " 👀 Examining image2 $IMAGE2: $(_white "$(file "$IMAGE2")"). "
 #echo "Find any errors in: $TMP_OUTPUT_FILE"
 
 cat > "$REQUEST_FILE" <<EOF
@@ -102,6 +102,6 @@ if [ "$OUTPUT" = '""' ]; then # empty answer
     cat $TMP_OUTPUT_FILE | jq >&2
 else
     N_CANDIDATES=$(cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | wc -l)
-    echo '# ♊️ Describing attached image ($N_CANDIDATES candidates):'
+    echo "# ♊️ Describing attached image ($N_CANDIDATES candidates):"
     cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | xargs -0 | _lolcat
 fi

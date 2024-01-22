@@ -73,7 +73,6 @@ if file t.mp3 | grep 'MPEG ADTS, layer III' ; then
   _green "All good. MP3 created: 't.${SENTENCE:0:50}.mp3'"
 else
   _red "# OOps, some errors, I couldnt create a proper MP3 file. Check the encoding and the quotes in the input."
-  cat $TMP_OUTPUT_FILE
-  exit -1
+  cat "$TMP_OUTPUT_FILE"
+  exit 255
 fi
-

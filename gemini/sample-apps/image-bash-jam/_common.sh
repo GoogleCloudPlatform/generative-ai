@@ -1,7 +1,7 @@
-
-
-
-
+#!/bin/bash
+#
+# Note: this is a shell script to be included in all other scripts. It subsumes common functionality
+#       across shell scripts in most other shell scripts.
 # Encode (used to encode image to give to Gemini)
 function _base64_encode_mac_or_linux() {
     IMAGE="$1"
@@ -28,16 +28,16 @@ function _base64_decode_mac_or_linux() {
 # assumes you have the output in file 't'
 function show_errors_and_exit() {
     echo Woops. Some Errors found. See error in t:
-    cat t | _redden
+    _redden < t # cat t | _redden
     exit 42
 }
 
 function _red() {
     echo -en "\033[1;31m$*\033[0m\n"
 }
-# make the STD in RED :)
+# make the STD in RED :) (proper bash filter)
 function _redden() {
-    while read row; do echo -en "\033[0;31m$row\033[0m\n"; done
+    while read -r row; do echo -en "\033[0;31m$row\033[0m\n"; done
 }
 function _green() {
     echo -en "\033[1;32m$*\033[0m\n"

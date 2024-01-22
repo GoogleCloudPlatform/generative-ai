@@ -4,7 +4,7 @@ DEFAULT_INPUT_DIR="images/"
 INPUT_DIR="${1:-$DEFAULT_INPUT_DIR}"
 
 echo "I'm going to annotate with images and audio all image files in DIR: $INPUT_DIR"
-for F in $INPUT_DIR/*.{jpeg,png,gif,jpg}  ; do
+for F in "$INPUT_DIR"/*.{jpeg,png,gif,jpg}  ; do
     if [ -f $F ] ; then
         ANNOTATION_FILE="$F.explain.txt"
         echo $F
