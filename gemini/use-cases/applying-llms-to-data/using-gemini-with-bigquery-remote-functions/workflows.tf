@@ -46,8 +46,6 @@ resource "google_project_iam_member" "workflow_service_account_roles" {
   depends_on = [google_project_iam_member.functions_invoke_roles]
 }
 
-
-
 ## Create the workflow
 resource "google_workflows_workflow" "workflow" {
   name            = "initial-workflow"
@@ -101,5 +99,3 @@ data "http" "call_workflows_setup" {
     time_sleep.wait_after_functions,
   ]
 }
-
-
