@@ -33,21 +33,23 @@ resource "google_bigquery_connection" "function_connection" {
   depends_on = [time_sleep.wait_after_apis]
 }
 
-#Grant the connection service account necessary permissions
-resource "google_project_iam_member" "functions_invoke_roles" {
-  for_each = toset([
+locals {
+  bq_roles = [
     "roles/run.invoker",            // Service account role to invoke the remote function
     "roles/cloudfunctions.invoker", // Service account role to invoke the remote function
     "roles/storage.objectViewer",   // View GCS objects to create object tables
     "roles/iam.serviceAccountUser"
-    ]
-  )
+  ]
+}
 
+#Grant the connection service account necessary permissions
+resource "google_project_iam_member" "functions_invoke_roles" {
+  count   = length(local.bq_roles)
   project = module.project-services.project_id
-  role    = each.key
+  role    = local.bq_roles[count.index]
   member  = format("serviceAccount:%s", google_bigquery_connection.function_connection.cloud_resource[0].service_account_id)
 
-  depends_on = [google_bigquery_connection.function_connection]
+  depends_on = [google_bigquery_connection.function_connection, google_project_iam_member.function_manage_roles]
 }
 
 #Create GCS object table for your images. This will be the input table for the remote function
