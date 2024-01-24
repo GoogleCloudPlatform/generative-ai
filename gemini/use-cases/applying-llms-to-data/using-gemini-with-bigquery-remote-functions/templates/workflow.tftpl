@@ -85,6 +85,7 @@ create_remote_functions:
                     1: $${"CALL `"+project_id+"."+dataset_id+".image_remote_function_sp`();"}
                     2: $${"CALL `"+project_id+"."+dataset_id+".text_remote_function_sp`();"}
                     3: $${"CALL `"+project_id+"."+dataset_id+".provision_text_sample_table_sp`();"}
+                    4: $${"CALL BQ.REFRESH_EXTERNAL_METADATA_CACHE(`"+project_id+"."+dataset_id+".image_object_table`();")}
         - loopStepTables:
             for:
                 value: key
