@@ -9,21 +9,35 @@
 # 	gcloud auth application-default set-quota-project "$PROJECT_ID"
 #
 ##############################################################################
+# # https://cloud.google.com/text-to-speech/docs/create-audio-text-command-line
+# Sample JSON for TTS to help understand the script:
+# {
+#   "input": {
+#     "text": "ciao mamma, butta la pasta"
+#   },
+#   "voice": {
+#     "languageCode": "en-US",
+#     "ssmlGender": "FEMALE"
+#   },
+#   "audioConfig": {
+#     "audioEncoding": "MP3"
+#   }
+# }
+##############################################################################
 
 . .envrc
 
 set -euo pipefail
 
-#PROJECT_ID=$(gcloud config get-value project)
-#SENTENCE="$(echo "$@" | sed "s/'/\\\\'/g")" # c'e' l'uomo => "c e l uomo"
 SENTENCE="${*//\'/\\\'}"        # c'e' l'uomo => "c\' e l\'uomo"
 TMP_OUTPUT_FILE='.tmp.tts-output.json'
 JQ_PATH='.audioContent'
-DEFAULT_LANG="en-US"
+# Latest model: https://cloud.google.com/text-to-speech/docs/voices
+DEFAULT_LANG="en-US"          # safe choice
+#DEFAULT_LANG="en-US-Journey-D" # Latest voice
 TTS_LANG="${TTS_LANG:-$DEFAULT_LANG}"
 #DEFAULT_GENDER='MALE' doesnt work in italian -> dflt is it-IT-Neural2-A
 DEFAULT_GENDER='FEMALE'
-#PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")"
 
 # common functions
 source _common.sh
@@ -58,20 +72,7 @@ _base64_decode_mac_or_linux t.audio.encoded > t.mp3
 # i need te LAST so i can copy it deterministically from other script :)
 cp t.mp3 "t.${SENTENCE:0:50}.mp3"
 
-# # https://cloud.google.com/text-to-speech/docs/create-audio-text-command-line
-# from web it works: see here a sample JSON
-# {
-#   "input": {
-#     "text": "ciao mamma, butta la pasta"
-#   },
-#   "voice": {
-#     "languageCode": "en-US",
-#     "ssmlGender": "FEMALE"
-#   },
-#   "audioConfig": {
-#     "audioEncoding": "MP3"
-#   }
-# }
+
 
 
 file t.audio* t.mp3

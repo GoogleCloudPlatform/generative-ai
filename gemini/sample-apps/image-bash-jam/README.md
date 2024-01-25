@@ -13,23 +13,8 @@ consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/
 
 ```bash
 cd
-##################################
-# UNDELETEME premerge START
-# This will only work when we merge with `main`.
-#git clone  https://github.com/GoogleCloudPlatform/generative-ai
-#cd generative-ai/
-# UNDELETEME premerge END
-##################################
-# DELETEME START
-# [deleteme before ] While reviewing Riccardo's code, this is the real command:
-# This works now for review.
-git clone https://github.com/palladius/generative-ai
-cd generative-ai
-git checkout ricc-gemini-bash
-# TODO(ricc): Also un-commnent the GoogleCloudPlatform line
-# DELETEME END
-##################################
-cd gemini/sample-apps/image-bash-jam/
+git clone  https://github.com/GoogleCloudPlatform/generative-ai
+cd generative-ai/gemini/sample-apps/image-bash-jam/
 
 # [optional] If you like a colored shell, do this. If not, scripts will detect its absence and will just print in shell default color (see `_lolcat` in `_common.sh`).
 gem install lolcat
