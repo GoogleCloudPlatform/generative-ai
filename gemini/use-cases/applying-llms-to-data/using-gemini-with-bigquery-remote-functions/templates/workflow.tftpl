@@ -1,0 +1,107 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Runs the setup steps for the data warehouse setup:
+# 1. Copies data from the public bucket into the staging buckets
+# 2. Executes a set of stored procedures to stage the remaining data needed
+
+main:
+    params: []
+    steps:
+    - sub_copy_objects:
+        call: copy_objects
+        result: output
+    - sub_create_tables:
+        call: create_remote_functions
+        result: output1
+
+# Subworkflow to copy initial objects
+copy_objects:
+    steps:
+        - init:
+            assign:
+                - source_bucket: "github-repo"
+                - dest_bucket: ${sample_bucket}
+                - copied_objects: []
+        - list_objects:
+            call: googleapis.storage.v1.objects.list
+            args:
+                bucket: $${source_bucket}
+                prefix: "bigquery-remote-functions"
+            result: list_result
+        - start_counter:
+            assign:
+                - copied_objects: 0
+        - copy_objects:
+                for:
+                    value: object
+                    index: i
+                    in: $${list_result.items}
+                    steps:
+                      - step1:
+                            try:
+                                steps:
+                                  - copy_object:
+                                      call: googleapis.storage.v1.objects.copy
+                                      args:
+                                          sourceBucket: $${source_bucket}
+                                          sourceObject: $${text.url_encode(object.name)}
+                                          destinationBucket: $${dest_bucket}
+                                          destinationObject: $${text.url_encode(object.name)}
+                                      result: copy_result
+                                  - save_result:
+                                      assign:
+                                          - copied_objects: $${copied_objects + 1}
+                            except:
+                                as: e
+                                raise:
+                                    exception: $${e}
+                                    sourceBucket: $${source_bucket}
+                                    sourceObject: $${object.name}
+                                    destinationBucket: $${dest_bucket}
+        - finish:
+            return: $${copied_objects + " objects copied"}
+
+# Subworkflow to create BigQuery remote functions
+create_remote_functions:
+    steps:
+        - assignStepTables:
+            assign:
+                - results: {}
+                - dataset_id: ${dataset_id}
+                - project_id: $${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+                - map:
+                    1: $${"CALL `"+project_id+"."+dataset_id+".image_remote_function_sp`();"}
+                    2: $${"CALL `"+project_id+"."+dataset_id+".text_remote_function_sp`();"}
+                    3: $${"CALL `"+project_id+"."+dataset_id+".provision_text_sample_table_sp`();"}
+                    4: $${"CALL BQ.REFRESH_EXTERNAL_METADATA_CACHE(`"+project_id+"."+dataset_id+".image_object_table`();")}
+        - loopStepTables:
+            for:
+                value: key
+                in: $${keys(map)}
+                steps:
+                    - runQuery:
+                        call: googleapis.bigquery.v2.jobs.query
+                        args:
+                            projectId: $${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+                            body:
+                                useLegacySql: false
+                                useQueryCache: false
+                                location: $${sys.get_env("GOOGLE_CLOUD_LOCATION")}
+                                timeoutMs: 600000
+                                query: $${map[key]}
+                        result: queryResult
+                    - sumStep:
+                        assign:
+                            - results[key]: $${queryResult}
