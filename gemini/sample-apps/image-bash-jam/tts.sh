@@ -34,7 +34,6 @@ TMP_OUTPUT_FILE='.tmp.tts-output.json'
 JQ_PATH='.audioContent'
 # Latest model: https://cloud.google.com/text-to-speech/docs/voices
 DEFAULT_LANG="en-US"          # safe choice
-#DEFAULT_LANG="en-US-Journey-D" # Latest voice
 TTS_LANG="${TTS_LANG:-$DEFAULT_LANG}"
 #DEFAULT_GENDER='MALE' doesnt work in italian -> dflt is it-IT-Neural2-A
 DEFAULT_GENDER='FEMALE'
