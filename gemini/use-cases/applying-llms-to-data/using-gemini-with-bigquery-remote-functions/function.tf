@@ -26,8 +26,8 @@ resource "google_service_account" "cloud_function_manage_sa" {
   ]
 }
 
-resource "google_project_iam_member" "function_manage_roles" {
-  for_each = toset([
+locals {
+  cloud_function_roles = [
     "roles/cloudfunctions.admin",    // Service account role to manage access to the remote function
     "roles/run.invoker",             // Service account role to invoke the remote function
     "roles/storage.objectAdmin",     // Read/write GCS files
@@ -35,10 +35,13 @@ resource "google_project_iam_member" "function_manage_roles" {
     "roles/aiplatform.user",         // Needs to predict from endpoints
     "roles/aiplatform.serviceAgent", // Service account role
     "roles/iam.serviceAccountUser"
-    ]
-  )
+  ]
+}
+
+resource "google_project_iam_member" "function_manage_roles" {
+  count   = length(local.cloud_function_roles)
   project = module.project-services.project_id
-  role    = each.key
+  role    = local.cloud_function_roles[count.index]
   member  = "serviceAccount:${google_service_account.cloud_function_manage_sa.email}"
 
   depends_on = [google_service_account.cloud_function_manage_sa]

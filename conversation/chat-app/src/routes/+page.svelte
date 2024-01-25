@@ -4,59 +4,41 @@
   import { Heading } from "flowbite-svelte";
   import { onMount } from "svelte";
 
+  var text = ""
+  var time = 0
+
+  function send_input(text, time) {
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector("textarea").value = text;
+    }, time);
+
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector("textarea").dispatchEvent(new Event("input"));
+    }, time + 100);
+
+    setTimeout(function () {
+      document
+        .querySelector("df-messenger")
+        .querySelector("df-messenger-chat")
+        .shadowRoot.querySelector("df-messenger-user-input")
+        .shadowRoot.querySelector("button")
+        .click();
+    }, time + 1000);
+  }
+
   onMount(() => {
-    setTimeout(function () {
-      document
-        .querySelector("df-messenger")
-        .querySelector("df-messenger-chat")
-        .shadowRoot.querySelector("df-messenger-user-input")
-        .shadowRoot.querySelector(".textarea-wrapper > textarea").value = "Hello";
-    }, 1000);
-
-    setTimeout(function () {
-      document
-        .querySelector("df-messenger")
-        .querySelector("df-messenger-chat")
-        .shadowRoot.querySelector("df-messenger-user-input")
-        .shadowRoot.querySelector(".send-icon-button-wrapper > button")
-        .click();
-    }, 2000);
-
-    setTimeout(function () {
-      document
-        .querySelector("df-messenger")
-        .querySelector("df-messenger-chat")
-        .shadowRoot.querySelector("df-messenger-user-input")
-        .shadowRoot.querySelector(".textarea-wrapper > textarea").value =
-        "Does the Pixel 7 Pro support fast charging?";
-    }, 6000);
-
-    setTimeout(function () {
-      document
-        .querySelector("df-messenger")
-        .querySelector("df-messenger-chat")
-        .shadowRoot.querySelector("df-messenger-user-input")
-        .shadowRoot.querySelector(".send-icon-button-wrapper > button")
-        .click();
-    }, 7000);
-
-    setTimeout(function () {
-      document
-        .querySelector("df-messenger")
-        .querySelector("df-messenger-chat")
-        .shadowRoot.querySelector("df-messenger-user-input")
-        .shadowRoot.querySelector(".textarea-wrapper > textarea").value =
-        "Which colors is the Pixel Watch available in?";
-    }, 11000);
-
-    setTimeout(function () {
-      document
-        .querySelector("df-messenger")
-        .querySelector("df-messenger-chat")
-        .shadowRoot.querySelector("df-messenger-user-input")
-        .shadowRoot.querySelector(".send-icon-button-wrapper > button")
-        .click();
-    }, 12000);
+    // Write and send sample questions to chatbot
+    send_input("Hello", 2000)
+    send_input("Does the Pixel 7 Pro support fast charging?", 6000)
+    send_input("Which colors is the Pixel Watch available in?", 11000)
   });
 </script>
 
@@ -121,10 +103,11 @@
           src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
         <df-messenger
           project-id="your-project-id"
-          agent-id="001c3b48-8bc8-481b-adb1-cfa2e604d367"
+          agent-id="4e166055-7ed3-4ffb-abf6-ee0d75abf823"
           language-code="en"
           storage-option="none"
-          class="drop-shadow-lg">
+          class="drop-shadow-lg"
+          max-query-length=-1>
           <df-messenger-chat
             chat-title="Google Store - Vertex AI Conversation"
             bot-writing-text="..."
