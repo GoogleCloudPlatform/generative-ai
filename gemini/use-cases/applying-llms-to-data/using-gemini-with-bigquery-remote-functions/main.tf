@@ -39,7 +39,6 @@ module "project-services" {
     "storage.googleapis.com",
     "storage-api.googleapis.com",
     "workflows.googleapis.com",
-    "visionai.googleapis.com",
   ]
 
   activate_api_identities = [
