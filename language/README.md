@@ -35,6 +35,8 @@ language/
 │   └── <a href="sample-apps/code-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Code Model</a>
 │   └── <a href="sample-apps/summarization-gcs-cloudfunction/">Cloud Function that does summarization using Vertex AI PaLM Text Model</a>
 │   └── <a href="sample-apps/text-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Text Model</a>
+├── <a href="translation">translation/</a>
+│   └── <a href="intro_translation.ipynb">[Notebook] Intro to Translation</a>
 ├── <a href="tuning">tuning/</a>
 │   └── <a href="tuning_text_bison.ipynb">[Notebook] Tuning and deploy a foundation model</a>
 └── <a href="use-cases">use-cases/</a>
