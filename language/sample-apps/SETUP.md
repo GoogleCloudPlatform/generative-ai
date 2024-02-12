@@ -36,7 +36,7 @@ Once connected to Cloud Shell, you should see that you are already authenticated
 gcloud auth list
 ```
 
-#### Command Output
+Command Output
 
 ```bash
 Credentialed accounts:
@@ -47,7 +47,7 @@ Credentialed accounts:
 gcloud config list project
 ```
 
-#### Command Output
+Command Output
 
 ```bash
 [core]
@@ -66,7 +66,7 @@ Cloud Shell also sets some environment variables by default, which may be useful
 echo $GOOGLE_CLOUD_PROJECT
 ```
 
-#### Command output
+Command Output
 
 ```bash
 <PROJECT_ID>
@@ -79,6 +79,7 @@ In order to use the various services we will need throughout this project, we wi
 ```bash
 gcloud services enable cloudbuild.googleapis.com cloudfunctions.googleapis.com run.googleapis.com logging.googleapis.com storage-component.googleapis.com aiplatform.googleapis.com
 ```
+
 After some time, you should see the operation finish successfully:
 
 ```bash
@@ -92,4 +93,3 @@ We've put all the samples you need for this project into a Git repo in the `samp
 ```bash
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 ```
-
