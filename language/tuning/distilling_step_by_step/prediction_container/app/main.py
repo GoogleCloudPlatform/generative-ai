@@ -12,22 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.cloud import storage
+import logging
+import os
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.logger import logger
-
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
-import logging
-import os
+from google.cloud import storage
 import torch
-
-from pathlib import Path
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 app = FastAPI()
 
-gunicorn_logger = logging.getLogger('gunicorn.error')
+gunicorn_logger = logging.getLogger("gunicorn.error")
 logger.handlers = gunicorn_logger.handlers
 
 if __name__ != "main":
@@ -48,17 +45,19 @@ model_dir = Path("distilled-t5")
 model_dir.mkdir(exist_ok=True)
 
 for blob in blobs:
-    filename = blob.name.split('/')[-1] 
+    filename = blob.name.split("/")[-1]
     blob.download_to_filename(model_dir / filename)
 
-model =  AutoModelForSeq2SeqLM.from_pretrained(model_dir, device_map="auto")
+model = AutoModelForSeq2SeqLM.from_pretrained(model_dir, device_map="auto")
 tokenizer = AutoTokenizer.from_pretrained(model_dir)
 
-@app.get(os.environ['AIP_HEALTH_ROUTE'], status_code=200)
+
+@app.get(os.environ["AIP_HEALTH_ROUTE"], status_code=200)
 def health():
     return {"status": "healthy"}
 
-@app.post(os.environ['AIP_PREDICT_ROUTE'])
+
+@app.post(os.environ["AIP_PREDICT_ROUTE"])
 async def predict(request: Request):
     body = await request.json()
 
@@ -70,6 +69,5 @@ async def predict(request: Request):
         output = model.generate(input_ids)
         prediction = tokenizer.decode(output[0], skip_special_tokens=True)
         outputs.append(prediction)
-
 
     return {"predictions": [outputs]}
