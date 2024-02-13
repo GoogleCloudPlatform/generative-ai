@@ -21,11 +21,12 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
 
-RUN python3 -m pip install --upgrade pip
+# hadolint ignore=DL3013
+RUN python3 -m pip install --upgrade --no-cache-dir pip
 
 COPY ./app /app
-RUN pip3 --timeout=300 --no-cache-dir install -r /app/requirements-torch.txt
-RUN pip3 --timeout=300 --no-cache-dir install -r /app/requirements.txt
+RUN pip3 --timeout=300 --no-cache-dir install -r /app/requirements-torch.txt \
+ && pip3 --timeout=300 --no-cache-dir install -r /app/requirements.txt
 
 EXPOSE 7080
 
