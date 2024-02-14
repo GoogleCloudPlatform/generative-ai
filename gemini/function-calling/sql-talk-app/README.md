@@ -13,7 +13,7 @@ their code, then pass that description to a language model in a request. The
 response from the model includes the name of a function that matches the
 description and the arguments to call it with.
 
-Try using the demo app now! https://sql-talk-r5gdynozbq-uc.a.run.app/
+Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://sql-talk-r5gdynozbq-uc.a.run.app/)
 
 ![SQL Talk Demo App](sql-talk.png)
 
@@ -39,7 +39,7 @@ To deploy this app to Cloud Run, run the following command to have the app built
 with Cloud Build and deployed to Cloud Run, replacing the `service-account` and
 `project` values with your own values, similar to:
 
-```
+```shell
 gcloud run deploy sql-talk --allow-unauthenticated --region us-central1 --service-account sql-talk@koverholt-devrel-355716.iam.gserviceaccount.com --source .
 ```
 
@@ -48,7 +48,7 @@ gcloud run deploy sql-talk --allow-unauthenticated --region us-central1 --servic
 After deploying your app, you should can visit the app URL, which should be
 similar to:
 
-https://sql-talk-r5gdynozbq-uc.a.run.app/
+[https://sql-talk-r5gdynozbq-uc.a.run.app/](https://sql-talk-r5gdynozbq-uc.a.run.app/)
 
 Congratulations, you've successfully deployed the SQL Talk demo app!
 
