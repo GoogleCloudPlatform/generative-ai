@@ -119,7 +119,7 @@ for message in st.session_state.messages:
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["backend_details"])
-        except ValueError:
+        except KeyError:
             pass
 
 if prompt := st.chat_input("Ask me about information in the database..."):
