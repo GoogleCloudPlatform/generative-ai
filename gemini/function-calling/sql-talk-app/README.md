@@ -1,7 +1,5 @@
 # SQL Talk: Natural Language to BigQuery with Gemini's Function Calling
 
-# Vertex AI Conversation
-
 ## Overview
 
 This app demonstrates the power of
