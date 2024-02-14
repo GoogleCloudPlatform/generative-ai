@@ -12,61 +12,60 @@ sql_query_func = FunctionDeclaration(
     name="sql_query",
     description="Get information from data in BigQuery using SQL queries",
     parameters={
-    "type": "object",
-    "properties": {
-        "query": {
-            "type": "string",
-            "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names."
-        }
-    },
-         "required": [
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names.",
+            }
+        },
+        "required": [
             "query",
-      ]
-  },
+        ],
+    },
 )
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
     description="Get a list of datasets that will help answer the user's question",
     parameters={
-    "type": "object",
-    "properties": {
-  },
-},
+        "type": "object",
+        "properties": {},
+    },
 )
 
 list_tables_func = FunctionDeclaration(
     name="list_tables",
     description="List tables in a dataset that will help answer the user's question",
     parameters={
-    "type": "object",
-    "properties": {
-        "dataset_id": {
-            "type": "string",
-            "description": "Fully qualified ID of the dataset to fetch tables from"
-        }
-    },
-         "required": [
+        "type": "object",
+        "properties": {
+            "dataset_id": {
+                "type": "string",
+                "description": "Fully qualified ID of the dataset to fetch tables from",
+            }
+        },
+        "required": [
             "dataset_id",
-      ]
-  },
+        ],
+    },
 )
 
 get_table_func = FunctionDeclaration(
     name="get_table",
     description="Get information about a table, including the description, schema, and number of rows that will help answer the user's question.",
     parameters={
-    "type": "object",
-    "properties": {
-        "table_id": {
-            "type": "string",
-            "description": "Fully qualified ID of the table to get information about"
-        }
-    },
-         "required": [
+        "type": "object",
+        "properties": {
+            "table_id": {
+                "type": "string",
+                "description": "Fully qualified ID of the table to get information about",
+            }
+        },
+        "required": [
             "query",
-      ]
-  },
+        ],
+    },
 )
 
 sql_query_tool = Tool(
@@ -90,20 +89,22 @@ st.set_page_config(
 
 col1, col2 = st.columns([8, 1])
 with col1:
-   st.title("SQL Talk with BigQuery")
+    st.title("SQL Talk with BigQuery")
 with col2:
-   st.image("vertex-ai.png")
+    st.image("vertex-ai.png")
 
 st.subheader("Powered by Function Calling in Gemini")
 
 with st.expander("Sample prompts"):
-    st.write("""
+    st.write(
+        """
         - What kind of data is in this database?
         - How many distribution centers are there?
         - What's the average number of orders per day?
         - What is the average price and number of items that customers order?
         - Which product categories have the highest profit margins?
-    """)
+    """
+    )
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -156,25 +157,47 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                 if response.function_call.name == "list_datasets":
                     api_response = client.list_datasets()
                     api_response = str([dataset.dataset_id for dataset in api_response])
-                    api_requests_and_responses.append([response.function_call.name, params, api_response])
+                    api_requests_and_responses.append(
+                        [response.function_call.name, params, api_response]
+                    )
 
                 if response.function_call.name == "list_tables":
                     api_response = client.list_tables(params["dataset_id"])
                     api_response = str([table.table_id for table in api_response])
-                    api_requests_and_responses.append([response.function_call.name, params, api_response])
+                    api_requests_and_responses.append(
+                        [response.function_call.name, params, api_response]
+                    )
 
                 if response.function_call.name == "get_table":
                     api_response = client.get_table(params["table_id"])
                     api_response = api_response.to_api_repr()
-                    api_requests_and_responses.append([response.function_call.name, params, [str(api_response["description"]), str([column["name"] for column in api_response["schema"]["fields"]]) ]])
+                    api_requests_and_responses.append(
+                        [
+                            response.function_call.name,
+                            params,
+                            [
+                                str(api_response["description"]),
+                                str(
+                                    [
+                                        column["name"]
+                                        for column in api_response["schema"]["fields"]
+                                    ]
+                                ),
+                            ],
+                        ]
+                    )
                     api_response = str(api_response)
 
                 if response.function_call.name == "sql_query":
-                    job_config = bigquery.QueryJobConfig(maximum_bytes_billed=100000000)  # Data limit per query job
+                    job_config = bigquery.QueryJobConfig(
+                        maximum_bytes_billed=100000000
+                    )  # Data limit per query job
                     query_job = client.query(params["query"], job_config=job_config)
                     api_response = query_job.result()
                     api_response = str([row for row in api_response])
-                    api_requests_and_responses.append([response.function_call.name, params, api_response])
+                    api_requests_and_responses.append(
+                        [response.function_call.name, params, api_response]
+                    )
 
                 print(api_response)
 
@@ -189,11 +212,23 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                 response = response.candidates[0].content.parts[0]
 
                 backend_details += "- Function call:\n"
-                backend_details += "   - Function name: ```" + str(api_requests_and_responses[-1][0]) + "```"
+                backend_details += (
+                    "   - Function name: ```"
+                    + str(api_requests_and_responses[-1][0])
+                    + "```"
+                )
                 backend_details += "\n\n"
-                backend_details += "   - Function parameters: ```" + str(api_requests_and_responses[-1][1]) + "```"
+                backend_details += (
+                    "   - Function parameters: ```"
+                    + str(api_requests_and_responses[-1][1])
+                    + "```"
+                )
                 backend_details += "\n\n"
-                backend_details += "   - API response: ```" + str(api_requests_and_responses[-1][2]) + "```"
+                backend_details += (
+                    "   - API response: ```"
+                    + str(api_requests_and_responses[-1][2])
+                    + "```"
+                )
                 backend_details += "\n\n"
                 with message_placeholder.container():
                     st.markdown(backend_details)
@@ -203,7 +238,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
         time.sleep(3)
 
-        full_response = (response.text)
+        full_response = response.text
         with message_placeholder.container():
             st.markdown(full_response)
             with st.expander("Function calls, parameters, and responses:"):
@@ -214,5 +249,5 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                 "role": "assistant",
                 "content": full_response,
                 "backend_details": backend_details,
-                }
+            }
         )
