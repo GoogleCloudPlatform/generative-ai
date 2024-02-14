@@ -63,8 +63,8 @@ Consider adding tools to perform:
 
 ## Additional resources
 
-You can continue learning about conversational AI and generative AI with
-these guides and resources:
+You can learn more about function calling in Gemini with these guides and
+resources:
 
 - [Documentation on function calling in Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
 - [Codelab on How to Interact with APIs Using Function Calling in Gemini](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
