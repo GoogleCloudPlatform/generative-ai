@@ -21,11 +21,13 @@ Try using the demo app now! https://sql-talk-r5gdynozbq-uc.a.run.app/
 
 **Ask Questions:** Type questions about your data in a natural language format
 such as:
-- "How many different brands do we have in stock?"
-- "Show me the price range of products in the swimwear category."
-- "Which distribution centers have the least available inventory?"
+- What kind of data is in this database?
+- How many distribution centers are there?
+- What's the average number of orders per day?
+- What is the average price and number of items that customers order?
+- Which product categories have the highest profit margins?
 
-**Receive Answers:** Gemini will process your inquiries, generate appropriate SQL
+**Get Answers:** Gemini will process your inquiries, generate appropriate SQL
 queries, execute them on BigQuery, and return results in plain language.
 
 ## Key Features
