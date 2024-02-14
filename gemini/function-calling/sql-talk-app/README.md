@@ -8,29 +8,32 @@ capabilities, enabling users to query and understand their BigQuery databases
 using natural language. Forget complex SQL syntax – interact with your data
 conversationally.
 
-![SQL Talk Demo App](sql-talk.png)
-
 Function calling in Gemini lets developers create a description of a function in
 their code, then pass that description to a language model in a request. The
 response from the model includes the name of a function that matches the
 description and the arguments to call it with.
 
+![SQL Talk Demo App](sql-talk.png)
+
 ## Usage
 
-Start Chat: Initialize a conversation with the model.
-Ask Questions: Type questions about your data in a natural language format.
-Examples:
-"How many different brands do we have in stock?"
-"Show me the price range of products in the swimwear category."
-"Which distribution centers have the least available inventory?"
+**Ask Questions:** Type questions about your data in a natural language format
+such as:
+- "How many different brands do we have in stock?"
+- "Show me the price range of products in the swimwear category."
+- "Which distribution centers have the least available inventory?"
 
-Receive Answers: Gemini will process your inquiries, generate appropriate SQL queries, execute them on BigQuery, and return results in plain language.
+**Receive Answers:** Gemini will process your inquiries, generate appropriate SQL
+queries, execute them on BigQuery, and return results in plain language.
 
 ## Key Features
 
-- Natural Language Interface: Ask questions in plain language; the app handles SQL generation
-- Function Calling: Gemini uses tools you define to make real-time queries to the database
-- Multi-Turn Conversations: Maintains context for in-depth explorations of the data
+- Natural Language Interface: Ask questions in plain language; the app handles
+  SQL generation
+- Function Calling: Gemini uses tools you define to make real-time queries to
+  the database
+- Multi-Turn Conversations: Maintains context for in-depth explorations of the
+  data
 - BigQuery Integration: Uses the BigQuery Python SDK
 
 ## Technical Components
