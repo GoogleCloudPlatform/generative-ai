@@ -33,7 +33,7 @@ Try using the demo app now! https://sql-talk-r5gdynozbq-uc.a.run.app/
 4. Run the app with `streamlit run app.py`
 5. Navigate to the app in your browser at a URL similar to `http://localhost:8501`
 
-## Steps to deploy the web app to Cloud Run
+## Deploy the app to Cloud Run
 
 To deploy this app to Cloud Run, run the following command to have the app built
 with Cloud Build and deployed to Cloud Run, replacing the `service-account` and
