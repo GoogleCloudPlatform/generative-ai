@@ -42,7 +42,7 @@ list_tables_func = FunctionDeclaration(
         "properties": {
             "dataset_id": {
                 "type": "string",
-                "description": "Fully qualified ID of the dataset to fetch tables from",
+                "description": "Fully qualified ID of the dataset to fetch tables from. Always use the fully qualified dataset and table names.",
             }
         },
         "required": [
@@ -53,7 +53,7 @@ list_tables_func = FunctionDeclaration(
 
 get_table_func = FunctionDeclaration(
     name="get_table",
-    description="Get information about a table, including the description, schema, and number of rows that will help answer the user's question.",
+    description="Get information about a table, including the description, schema, and number of rows that will help answer the user's question. Always use the fully qualified dataset and table names.",
     parameters={
         "type": "object",
         "properties": {
@@ -115,7 +115,7 @@ for message in st.session_state.messages:
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["backend_details"])
-        except:
+        except ValueError:
             pass
 
 if prompt := st.chat_input("Ask me about information in the database..."):
