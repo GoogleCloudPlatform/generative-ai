@@ -13,6 +13,8 @@ their code, then pass that description to a language model in a request. The
 response from the model includes the name of a function that matches the
 description and the arguments to call it with.
 
+Try using the demo app now! https://sql-talk-r5gdynozbq-uc.a.run.app/
+
 ![SQL Talk Demo App](sql-talk.png)
 
 ## Usage
