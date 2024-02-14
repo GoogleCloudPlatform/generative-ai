@@ -19,7 +19,7 @@ Try using the demo app now! https://sql-talk-r5gdynozbq-uc.a.run.app/
 
 ## Prerequisites
 
-- A Google Cloud Platform (GCP) project with billing enabled
+- A Google Cloud project with billing enabled
 - A BigQuery dataset (we used the
   [`thelook_ecommerce` public dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce))
 - APIs for Vertex AI and BigQuery enabled
