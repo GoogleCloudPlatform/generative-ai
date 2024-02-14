@@ -27,8 +27,9 @@ such as:
 - What is the average price and number of items that customers order?
 - Which product categories have the highest profit margins?
 
-**Get Answers:** Gemini will process your inquiries, generate appropriate SQL
-queries, execute them on BigQuery, and return results in plain language.
+**Get Answers:** Gemini will process your prompt, generate appropriate SQL
+queries and/or BigQuery commands, execute them on BigQuery, and return results
+in plain language.
 
 ## Key Features
 
