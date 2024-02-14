@@ -52,9 +52,9 @@ https://sql-talk-r5gdynozbq-uc.a.run.app/
 
 Congratulations, you've successfully deployed the SQL Talk demo app!
 
-## Extending Functionality
+## Extending the app
 
-You can also rewrite the functions and application code to try new things!
+Try rewrite the function definitions and application code to try new things!
 Consider adding tools to perform:
 
 - Data visualization: Create charts/graphs to summarize the findings
