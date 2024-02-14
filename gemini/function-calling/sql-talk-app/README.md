@@ -17,37 +17,6 @@ Try using the demo app now! https://sql-talk-r5gdynozbq-uc.a.run.app/
 
 ![SQL Talk Demo App](sql-talk.png)
 
-## Usage
-
-**Ask Questions:** Type questions about your data in a natural language format
-such as:
-- What kind of data is in this database?
-- How many distribution centers are there?
-- What's the average number of orders per day?
-- What is the average price and number of items that customers order?
-- Which product categories have the highest profit margins?
-
-**Get Answers:** Gemini will process your prompt, generate appropriate SQL
-queries and/or BigQuery commands, execute them on BigQuery, and return results
-in plain language.
-
-## Key Features
-
-- Natural Language Interface: Ask questions in plain language; the app handles
-  SQL generation
-- Function Calling: Gemini uses tools you define to make real-time queries to
-  the database
-- Multi-Turn Conversations: Maintains context for in-depth explorations of the
-  data
-- BigQuery Integration: Uses the BigQuery Python SDK
-
-## Technical Components
-
-- Vertex AI
-- Gemini Pro model, incl. function calling
-- BigQuery Python Client
-- Streamlit
-
 ## Prerequisites
 
 - A Google Cloud Platform (GCP) project with billing enabled
