@@ -17,7 +17,7 @@ from google.cloud import aiplatform
 from google.protobuf import struct_pb2
 from IPython.display import Markdown, display
 from vertexai.language_models import TextEmbeddingModel
-from vertexai.preview.generative_models import (
+from vertexai.generative_models import (
     GenerativeModel,
     GenerationConfig,
     Image,
@@ -698,7 +698,7 @@ def print_text_to_image_citation(
         # Print the citation header
         print(
             color.RED + f"Citation {imageno + 1}:",
-            "Mached image path, page number and page text: \n" + color.END,
+            "Matched image path, page number and page text: \n" + color.END,
         )
 
         # Print the cosine similarity score
