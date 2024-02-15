@@ -105,9 +105,9 @@ with st.expander("Sample prompts", expanded=True):
     st.write(
         """
         - What kind of data is in this database?
-        - How many distribution centers are there?
-        - What's the average number of orders per day?
-        - What is the average price and number of items that customers order?
+        - What percentage of customers return their order?
+        - How is inventory distributed across our regional distribution centers?
+        - Do customers typically place more than one order?
         - Which product categories have the highest profit margins?
     """
     )
