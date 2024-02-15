@@ -104,7 +104,7 @@ st.markdown(
 with st.expander("Sample prompts", expanded=True):
     st.write(
         """
-        - What kind of data is in this database?
+        - What kind of information is in this database?
         - What percentage of customers return their order?
         - How is inventory distributed across our regional distribution centers?
         - Do customers typically place more than one order?
