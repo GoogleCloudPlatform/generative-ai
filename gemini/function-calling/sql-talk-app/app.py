@@ -8,23 +8,6 @@ from vertexai.preview.generative_models import (
     Tool,
 )
 
-sql_query_func = FunctionDeclaration(
-    name="sql_query",
-    description="Get information from data in BigQuery using SQL queries",
-    parameters={
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names.",
-            }
-        },
-        "required": [
-            "query",
-        ],
-    },
-)
-
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
     description="Get a list of datasets that will help answer the user's question",
@@ -68,17 +51,36 @@ get_table_func = FunctionDeclaration(
     },
 )
 
+sql_query_func = FunctionDeclaration(
+    name="sql_query",
+    description="Get information from data in BigQuery using SQL queries",
+    parameters={
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names.",
+            }
+        },
+        "required": [
+            "query",
+        ],
+    },
+)
+
 sql_query_tool = Tool(
     function_declarations=[
-        sql_query_func,
         list_datasets_func,
         list_tables_func,
         get_table_func,
+        sql_query_func,
     ],
 )
 
 model = GenerativeModel(
-    "gemini-pro", generation_config={"temperature": 0}, tools=[sql_query_tool]
+    "gemini-pro",
+    generation_config={"temperature": 0},
+    tools=[sql_query_tool],
 )
 
 st.set_page_config(
