@@ -16,7 +16,7 @@ import functions_framework
 import json
 import os
 import vertexai
-from vertexai.preview.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel
 
 
 @functions_framework.http
@@ -35,7 +35,7 @@ def list_text_input(request) -> str | tuple[str, int]:
 
 def generate_text_from_prompt(text_string) -> str | None:
     # this is the text-to-text model
-    text_model = GenerativeModel("gemini-pro")
+    text_model = GenerativeModel("gemini-1.0-pro")
     responses = text_model.generate_content(text_string, stream=False)
     print(responses)
     output = " ".join(responses.text.strip().split("\n"))
