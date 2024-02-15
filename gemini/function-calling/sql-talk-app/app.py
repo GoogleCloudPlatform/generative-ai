@@ -1,7 +1,7 @@
 import time
 import streamlit as st
 from google.cloud import bigquery
-from vertexai.preview.generative_models import (
+from vertexai.generative_models import (
     FunctionDeclaration,
     GenerativeModel,
     Part,
@@ -78,7 +78,7 @@ sql_query_tool = Tool(
 )
 
 model = GenerativeModel(
-    "gemini-pro",
+    "gemini-1.0-pro",
     generation_config={"temperature": 0},
     tools=[sql_query_tool],
 )
