@@ -1,28 +1,11 @@
 import time
 import streamlit as st
 from google.cloud import bigquery
-from vertexai.preview.generative_models import (
+from vertexai.generative_models import (
     FunctionDeclaration,
     GenerativeModel,
     Part,
     Tool,
-)
-
-sql_query_func = FunctionDeclaration(
-    name="sql_query",
-    description="Get information from data in BigQuery using SQL queries",
-    parameters={
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names.",
-            }
-        },
-        "required": [
-            "query",
-        ],
-    },
 )
 
 list_datasets_func = FunctionDeclaration(
@@ -68,17 +51,36 @@ get_table_func = FunctionDeclaration(
     },
 )
 
+sql_query_func = FunctionDeclaration(
+    name="sql_query",
+    description="Get information from data in BigQuery using SQL queries",
+    parameters={
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names.",
+            }
+        },
+        "required": [
+            "query",
+        ],
+    },
+)
+
 sql_query_tool = Tool(
     function_declarations=[
-        sql_query_func,
         list_datasets_func,
         list_tables_func,
         get_table_func,
+        sql_query_func,
     ],
 )
 
 model = GenerativeModel(
-    "gemini-pro", generation_config={"temperature": 0}, tools=[sql_query_tool]
+    "gemini-1.0-pro",
+    generation_config={"temperature": 0},
+    tools=[sql_query_tool],
 )
 
 st.set_page_config(
@@ -102,10 +104,10 @@ st.markdown(
 with st.expander("Sample prompts", expanded=True):
     st.write(
         """
-        - What kind of data is in this database?
-        - How many distribution centers are there?
-        - What's the average number of orders per day?
-        - What is the average price and number of items that customers order?
+        - What kind of information is in this database?
+        - What percentage of customers return their order?
+        - How is inventory distributed across our regional distribution centers?
+        - Do customers typically place more than one order?
         - Which product categories have the highest profit margins?
     """
     )
@@ -115,7 +117,7 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["backend_details"])
@@ -244,7 +246,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
         full_response = response.text
         with message_placeholder.container():
-            st.markdown(full_response)
+            st.markdown(full_response.replace("$", "\$"))  # noqa: W605
             with st.expander("Function calls, parameters, and responses:"):
                 st.markdown(backend_details)
 
