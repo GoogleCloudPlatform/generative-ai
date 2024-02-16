@@ -4,9 +4,9 @@
 
 This app demonstrates the power of
 [Gemini's function calling](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
-capabilities, enabling users to query and understand their BigQuery databases
-using natural language. Forget complex SQL syntax – interact with your data
-conversationally.
+capabilities, enabling users to query and understand their
+[BigQuery](https://cloud.google.com/bigquery) databases using natural language.
+Forget complex SQL syntax – interact with your data conversationally.
 
 Function calling in Gemini lets developers create a description of a function in
 their code, then pass that description to a language model in a request. The
@@ -23,7 +23,7 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 - A BigQuery dataset (we used the
   [`thelook_ecommerce` public dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce))
 - APIs for Vertex AI and BigQuery enabled
-- Familiarity with Python and basic SQL concepts
+- Familiarity with Python and SQL concepts
 
 ## Run the app locally
 
@@ -33,14 +33,27 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 4. Run the app with `streamlit run app.py`
 5. Navigate to the app in your browser at a URL similar to `http://localhost:8501`
 
+## Configuring a service account
+
+When deploying this app to Cloud Run, a best practice is to [create a service
+account](https://cloud.google.com/iam/docs/service-accounts-create) to attach
+the following roles to, which are the permissions required for the app to read
+data from BigQuery, run BigQuery jobs, and use resources in Vertex AI:
+
+- [BigQuery Data Viewer](https://cloud.google.com/bigquery/docs/access-control#bigquery.dataViewer) (`roles/bigquery.dataViewer`)
+- [BigQuery Job User](https://cloud.google.com/bigquery/docs/access-control#bigquery.jobUser) (`roles/bigquery.jobUser`)
+- [Vertex AI User](https://cloud.google.com/vertex-ai/docs/general/access-control#aiplatform.user) (`roles/aiplatform.user`)
+
 ## Deploy the app to Cloud Run
 
-To deploy this app to Cloud Run, run the following command to have the app built
-with Cloud Build and deployed to Cloud Run, replacing the `service-account` and
-`project` values with your own values, similar to:
+To deploy this app to
+[Cloud Run](https://cloud.google.com/run/docs/deploying-source-code), run the
+following command to have the app built with Cloud Build and deployed to Cloud
+Run, replacing the `service-account` and `project` values with your own values,
+similar to:
 
 ```shell
-gcloud run deploy sql-talk --allow-unauthenticated --region us-central1 --service-account sql-talk@koverholt-devrel-355716.iam.gserviceaccount.com --source .
+gcloud run deploy sql-talk --allow-unauthenticated --region us-central1 --service-account SERVICE_ACCOUNT_NAME@PROJECT_ID.iam.gserviceaccount.com --source .
 ```
 
 ## Access the deployed app
