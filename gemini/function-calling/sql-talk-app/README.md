@@ -53,7 +53,7 @@ Run, replacing the `service-account` and `project` values with your own values,
 similar to:
 
 ```shell
-gcloud run deploy sql-talk --allow-unauthenticated --region us-central1 --service-account sql-talk@koverholt-devrel-355716.iam.gserviceaccount.com --source .
+gcloud run deploy sql-talk --allow-unauthenticated --region us-central1 --service-account SERVICE_ACCOUNT_NAME@PROJECT_ID.iam.gserviceaccount.com --source .
 ```
 
 ## Access the deployed app
