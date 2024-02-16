@@ -35,10 +35,10 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 
 ## Configuring a service account
 
-When deploying this app to Cloud Run, it is recommended that you [create a
-service account](https://cloud.google.com/iam/docs/service-accounts-create) to
-attach the following roles to, which are the permissions required for the app to
-read data from BigQuery, run BigQuery jobs, and use resources in Vertex AI:
+When deploying this app to Cloud Run, a best practice is to [create a service
+account](https://cloud.google.com/iam/docs/service-accounts-create) to attach
+the following roles to, which are the permissions required for the app to read
+data from BigQuery, run BigQuery jobs, and use resources in Vertex AI:
 
 - [BigQuery Data Viewer](https://cloud.google.com/bigquery/docs/access-control#bigquery.dataViewer) (`roles/bigquery.dataViewer`)
 - [BigQuery Job User](https://cloud.google.com/bigquery/docs/access-control#bigquery.jobUser) (`roles/bigquery.jobUser`)
