@@ -70,9 +70,9 @@ resource "google_cloudfunctions2_function" "image_remote_function" {
     max_instance_count = 10
     # min_instance_count can be set to 1 to improve performance and responsiveness
     min_instance_count               = 0
-    available_memory                 = "512Mi"
+    available_memory                 = "2Gi"
     timeout_seconds                  = 300
-    max_instance_request_concurrency = 5
+    max_instance_request_concurrency = 1
     available_cpu                    = "2"
     ingress_settings                 = "ALLOW_ALL"
     all_traffic_on_latest_revision   = true
@@ -109,7 +109,7 @@ resource "google_cloudfunctions2_function" "text_remote_function" {
     min_instance_count               = 0
     available_memory                 = "512Mi"
     timeout_seconds                  = 300
-    max_instance_request_concurrency = 5
+    max_instance_request_concurrency = 1
     available_cpu                    = "2"
     ingress_settings                 = "ALLOW_ALL"
     all_traffic_on_latest_revision   = true
