@@ -171,6 +171,7 @@ class MatchingEngine(VectorStore):
         embeddings: List[str],
         n_matches: int,
         index_endpoint: MatchingEngineIndexEndpoint,
+        filters: dict
     ) -> str:
         """
         get matches from matching engine given a vector query
@@ -185,8 +186,8 @@ class MatchingEngine(VectorStore):
             "return_full_datapoint": True,
             "queries": [
                 {
-                    "datapoint": {"datapoint_id": f"{i}", "feature_vector": emb},
-                    "neighbor_count": n_matches,
+                    "datapoint": {"datapoint_id": f"{i}", "feature_vector": emb, "restricts": filters},
+                    "neighbor_count": n_matches
                 }
                 for i, emb in enumerate(embeddings)
             ],
@@ -205,7 +206,7 @@ class MatchingEngine(VectorStore):
         return requests.post(rpc_address, data=endpoint_json_data, headers=header)
 
     def similarity_search(
-        self, query: str, k: int = 4, search_distance: float = 0.65, **kwargs: Any
+        self, query: str, k: int = 4, search_distance: float = 0.65, filters={}, **kwargs: Any
     ) -> List[Document]:
         """Return docs most similar to query.
 
@@ -230,7 +231,7 @@ class MatchingEngine(VectorStore):
         #     num_neighbors=k,
         # )
 
-        response = self.get_matches(embedding_query, k, self.endpoint)
+        response = self.get_matches(embedding_query, k, self.endpoint, filters)
 
         if response.status_code == 200:
             response = response.json()["nearestNeighbors"]
