@@ -128,9 +128,9 @@ class MatchingEngine(VectorStore):
             zip(embeddings, texts, metadatas)
         ):
             id = uuid.uuid4()
-            ids.append(id)
+            ids.append(str(id))
             self._upload_to_gcs(text, f"documents/{id}")
-            metadatas[idx]
+
             insert_datapoints_payload.append(
                 aiplatform_v1.IndexDatapoint(
                     datapoint_id=str(id),
@@ -142,7 +142,7 @@ class MatchingEngine(VectorStore):
                 upsert_request = aiplatform_v1.UpsertDatapointsRequest(
                     index=self.index.name, datapoints=insert_datapoints_payload
                 )
-                response = self.index_client.upsert_datapoints(request=upsert_request)
+                self.index_client.upsert_datapoints(request=upsert_request)
                 insert_datapoints_payload = []
         if len(insert_datapoints_payload) > 0:
             upsert_request = aiplatform_v1.UpsertDatapointsRequest(
@@ -172,7 +172,7 @@ class MatchingEngine(VectorStore):
         n_matches: int,
         index_endpoint: MatchingEngineIndexEndpoint,
         filters: dict
-    ) -> str:
+    ):
         """
         get matches from matching engine given a vector query
         Uses public endpoint
