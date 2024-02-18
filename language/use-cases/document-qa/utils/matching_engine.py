@@ -125,7 +125,7 @@ class MatchingEngine(VectorStore):
 
         # Streaming index update
         for idx, (embedding, text, metadata) in enumerate(
-            zip(embeddings, texts, metadatas)
+            zip(embeddings, texts, metadatas or [])
         ):
             id = uuid.uuid4()
             ids.append(str(id))
