@@ -2,7 +2,7 @@ import os
 
 import streamlit as st
 import vertexai
-from vertexai.preview.generative_models import (
+from vertexaigenerative_models import (
     GenerationConfig,
     GenerativeModel,
     HarmBlockThreshold,
@@ -17,8 +17,8 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 @st.cache_resource
 def load_models():
-    text_model_pro = GenerativeModel("gemini-pro")
-    multimodal_model_pro = GenerativeModel("gemini-pro-vision")
+    text_model_pro = GenerativeModel("gemini-1.0-pro")
+    multimodal_model_pro = GenerativeModel("gemini-1.0-pro-vision")
     return text_model_pro, multimodal_model_pro
 
 
@@ -70,7 +70,7 @@ def get_gemini_pro_vision_response(
     return "".join(final_response)
 
 
-st.header("Vertex AI Gemini API", divider="rainbow")
+st.header("Vertex AI Gemini 1.0 API", divider="rainbow")
 text_model_pro, multimodal_model_pro = load_models()
 
 tab1, tab2, tab3, tab4 = st.tabs(
@@ -78,7 +78,7 @@ tab1, tab2, tab3, tab4 = st.tabs(
 )
 
 with tab1:
-    st.write("Using Gemini Pro - Text only model")
+    st.write("Using Gemini 1.0 Pro - Text only model")
     st.subheader("Generate a story")
 
     # Story premise
@@ -144,12 +144,6 @@ with tab1:
     First start by giving the book introduction, chapter introductions and then each chapter. It should also have a proper ending.
     The book should have prologue and epilogue.
     """
-    # config = GenerationConfig(
-    #     temperature=temperature,
-    #     candidate_count=1,
-    #     max_output_tokens=max_output_tokens,
-    # )
-
     config = {
         "temperature": 0.8,
         "max_output_tokens": 2048,
@@ -158,7 +152,7 @@ with tab1:
     generate_t2t = st.button("Generate my story", key="generate_t2t")
     if generate_t2t and prompt:
         # st.write(prompt)
-        with st.spinner("Generating your story using Gemini..."):
+        with st.spinner("Generating your story using Gemini 1.0 Pro ..."):
             first_tab1, first_tab2 = st.tabs(["Story", "Prompt"])
             with first_tab1:
                 response = get_gemini_pro_text_response(
@@ -173,7 +167,7 @@ with tab1:
                 st.text(prompt)
 
 with tab2:
-    st.write("Using Gemini Pro - Text only model")
+    st.write("Using Gemini 1.0 Pro - Text only model")
     st.subheader("Generate your marketing campaign")
 
     product_name = st.text_input(
@@ -264,7 +258,7 @@ with tab2:
     generate_t2t = st.button("Generate my campaign", key="generate_campaign")
     if generate_t2t and prompt:
         second_tab1, second_tab2 = st.tabs(["Campaign", "Prompt"])
-        with st.spinner("Generating your marketing campaign using Gemini..."):
+        with st.spinner("Generating your marketing campaign using Gemini 1.0 Pro ..."):
             with second_tab1:
                 response = get_gemini_pro_text_response(
                     text_model_pro,
@@ -278,7 +272,7 @@ with tab2:
                 st.text(prompt)
 
 with tab3:
-    st.write("Using Gemini Pro Vision - Multimodal model")
+    st.write("Using Gemini 1.0 Pro Vision - Multimodal model")
     image_undst, screens_undst, diagrams_undst, recommendations, sim_diff = st.tabs(
         [
             "Furniture recommendation",
@@ -291,7 +285,7 @@ with tab3:
 
     with image_undst:
         st.markdown(
-            """In this demo, you will be presented with a scene (e.g., a living room) and will use the Gemini model to perform visual understanding. You will see how Gemini can be used to recommend an item (e.g., a chair) from a list of furniture options as input. You can use Gemini to recommend a chair that would complement the given scene and will be provided with its rationale for such selections from the provided list.
+            """In this demo, you will be presented with a scene (e.g., a living room) and will use the Gemini 1.0 Pro Vision model to perform visual understanding. You will see how Gemini 1.0 can be used to recommend an item (e.g., a chair) from a list of furniture options as input. You can use Gemini 1.0 Pro Vision to recommend a chair that would complement the given scene and will be provided with its rationale for such selections from the provided list.
                     """
         )
 
@@ -371,7 +365,7 @@ with tab3:
         )
         with tab1:
             if generate_image_description and content:
-                with st.spinner("Generating recommendation using Gemini..."):
+                with st.spinner("Generating recommendation using Gemini 1.0 Pro Vision ..."):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, content
                     )
@@ -389,7 +383,7 @@ with tab3:
         )
 
         st.write(
-            "Equipped with the ability to extract information from visual elements on screens, Gemini can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
+            "Equipped with the ability to extract information from visual elements on screens, Gemini 1.0 Pro Vision can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
         )
         # cooking_what = st.radio("What are you cooking?",["Turkey","Pizza","Cake","Bread"],key="cooking_what",horizontal=True)
         stove_screen_img = Part.from_uri(stove_screen_uri, mime_type="image/jpeg")
@@ -406,7 +400,7 @@ If instructions include buttons, also explain where those buttons are physically
         )
         with tab1:
             if generate_instructions_description and prompt:
-                with st.spinner("Generating instructions using Gemini..."):
+                with st.spinner("Generating instructions using Gemini 1.0 Pro Vision..."):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, [stove_screen_img, prompt]
                     )
@@ -422,7 +416,7 @@ If instructions include buttons, also explain where those buttons are physically
         er_diag_url = "https://storage.googleapis.com/" + er_diag_uri.split("gs://")[1]
 
         st.write(
-            "Gemini's multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram."
+            "Gemini 1.0 Pro Vision multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini 1.0 can decipher an Entity Relationship (ER) diagram."
         )
         er_diag_img = Part.from_uri(er_diag_uri, mime_type="image/jpeg")
         st.image(er_diag_url, width=350, caption="Image of a ER diagram")
@@ -460,7 +454,7 @@ If instructions include buttons, also explain where those buttons are physically
         )
 
         st.write(
-            """Gemini is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail.
+            """Gemini 1.0 Pro Vision is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail.
                     Below is an example of choosing which pair of glasses would be better suited to various face types:"""
         )
         compare_img_1_img = Part.from_uri(compare_img_1_uri, mime_type="image/jpeg")
@@ -504,7 +498,7 @@ If instructions include buttons, also explain where those buttons are physically
         )
         with tab1:
             if compare_img_description and content:
-                with st.spinner("Generating recommendations using Gemini..."):
+                with st.spinner("Generating recommendations using Gemini 1.0 Pro Vision..."):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, content
                     )
@@ -519,7 +513,7 @@ If instructions include buttons, also explain where those buttons are physically
             "https://storage.googleapis.com/" + math_image_uri.split("gs://")[1]
         )
         st.write(
-            "Gemini can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
+            "Gemini 1.0 Pro Vision can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
         )
         math_image_img = Part.from_uri(math_image_uri, mime_type="image/jpeg")
         st.image(math_image_url, width=350, caption="Image of a math equation")
@@ -547,7 +541,7 @@ INSTRUCTIONS:
         )
         with tab1:
             if math_image_description and prompt:
-                with st.spinner("Generating answers for formula using Gemini..."):
+                with st.spinner("Generating answers for formula using Gemini 1.0 Pro Vision..."):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, [math_image_img, prompt]
                     )
@@ -558,7 +552,7 @@ INSTRUCTIONS:
             st.text(prompt)
 
 with tab4:
-    st.write("Using Gemini Pro Vision - Multimodal model")
+    st.write("Using Gemini 1.0 Pro Vision - Multimodal model")
 
     vide_desc, video_tags, video_highlights, video_geolocation = st.tabs(
         ["Video description", "Video tags", "Video highlights", "Video geolocation"]
@@ -566,7 +560,7 @@ with tab4:
 
     with vide_desc:
         st.markdown(
-            """Gemini can also provide the description of what is going on in the video:"""
+            """Gemini 1.0 Pro Vision can also provide the description of what is going on in the video:"""
         )
         vide_desc_uri = "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
         video_desc_url = (
@@ -587,7 +581,7 @@ with tab4:
             )
             with tab1:
                 if vide_desc_description and prompt:
-                    with st.spinner("Generating video description using Gemini..."):
+                    with st.spinner("Generating video description using Gemini 1.0 Pro Vision ..."):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, vide_desc_img]
                         )
@@ -599,7 +593,7 @@ with tab4:
 
     with video_tags:
         st.markdown(
-            """Gemini can also extract tags throughout a video, as shown below:."""
+            """Gemini 1.0 Pro Vision can also extract tags throughout a video, as shown below:."""
         )
         video_tags_uri = "gs://github-repo/img/gemini/multimodality_usecases_overview/photography.mp4"
         video_tags_url = (
@@ -622,7 +616,7 @@ with tab4:
             )
             with tab1:
                 if video_tags_description and prompt:
-                    with st.spinner("Generating video description using Gemini..."):
+                    with st.spinner("Generating video description using Gemini 1.0 Pro Vision ..."):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, video_tags_img]
                         )
@@ -633,7 +627,7 @@ with tab4:
                 st.write(prompt, "\n", "{video_data}")
     with video_highlights:
         st.markdown(
-            """Below is another example of using Gemini to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"""
+            """Below is another example of using Gemini 1.0 Pro Vision to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"""
         )
         video_highlights_uri = (
             "gs://github-repo/img/gemini/multimodality_usecases_overview/pixel8.mp4"
@@ -659,7 +653,7 @@ Provide the answer in table format.
             )
             with tab1:
                 if video_highlights_description and prompt:
-                    with st.spinner("Generating video highlights using Gemini..."):
+                    with st.spinner("Generating video highlights using Gemini 1.0 Pro Vision ..."):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, video_highlights_img]
                         )
@@ -671,7 +665,7 @@ Provide the answer in table format.
 
     with video_geolocation:
         st.markdown(
-            """Even in short, detail-packed videos, Gemini can identify the locations."""
+            """Even in short, detail-packed videos, Gemini 1.0 Pro Vision can identify the locations."""
         )
         video_geolocation_uri = (
             "gs://github-repo/img/gemini/multimodality_usecases_overview/bus.mp4"
@@ -706,7 +700,7 @@ Provide the answer in table format.
             )
             with tab1:
                 if video_geolocation_description and prompt:
-                    with st.spinner("Generating location tags using Gemini..."):
+                    with st.spinner("Generating location tags using Gemini 1.0 Pro Vision ..."):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, video_geolocation_img]
                         )

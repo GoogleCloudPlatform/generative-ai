@@ -18,7 +18,7 @@ from google.cloud import aiplatform
 from google.protobuf import struct_pb2
 from IPython.display import Markdown, display
 from vertexai.language_models import TextEmbeddingModel
-from vertexai.generative_models import (
+from vertexai.preview.generative_models import (
     GenerativeModel,
     GenerationConfig,
     Image,
@@ -372,11 +372,12 @@ def get_gemini_response(
     generative_multimodal_model,
     model_input: List[str],
     stream: bool = True,
-    generation_config: Optional[dict] = {"max_output_tokens": 2048, "temperature": 0.2},
-    safety_settings: Optional[dict] = {HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-                  HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-                  HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-                  HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    generation_config: Optional[dict] = {"max_output_tokens": 2048, "temperature": 0.1},
+    safety_settings: Optional[dict] = {
+                                        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
                                     },
     
 ) -> str:
