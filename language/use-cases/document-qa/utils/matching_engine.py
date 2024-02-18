@@ -1,21 +1,22 @@
 """Vertex Matching Engine implementation of the vector store."""
+
 from __future__ import annotations
 
+import json
 import logging
 import uuid
 from typing import Any, Iterable, List, Optional, Type
 
+import google.auth
+import google.auth.transport.requests
+import requests
+from google.cloud import aiplatform_v1, storage
+from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
+from google.oauth2.service_account import Credentials
 from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
-
-from google.cloud import storage
-from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
-from google.cloud import aiplatform_v1
-from google.oauth2.service_account import Credentials
-import google.auth
-import google.auth.transport.requests
 
 logger = logging.getLogger()
 
@@ -171,23 +172,24 @@ class MatchingEngine(VectorStore):
         embeddings: List[str],
         n_matches: int,
         index_endpoint: MatchingEngineIndexEndpoint,
-        filters: dict
+        filters: dict,
     ):
         """
         get matches from matching engine given a vector query
         Uses public endpoint
 
         """
-        import requests
-        import json
-
         request_data = {
             "deployed_index_id": index_endpoint.deployed_indexes[0].id,
             "return_full_datapoint": True,
             "queries": [
                 {
-                    "datapoint": {"datapoint_id": f"{i}", "feature_vector": emb, "restricts": filters},
-                    "neighbor_count": n_matches
+                    "datapoint": {
+                        "datapoint_id": f"{i}",
+                        "feature_vector": emb,
+                        "restricts": filters,
+                    },
+                    "neighbor_count": n_matches,
                 }
                 for i, emb in enumerate(embeddings)
             ],
@@ -206,7 +208,12 @@ class MatchingEngine(VectorStore):
         return requests.post(rpc_address, data=endpoint_json_data, headers=header)
 
     def similarity_search(
-        self, query: str, k: int = 4, search_distance: float = 0.65, filters={}, **kwargs: Any
+        self,
+        query: str,
+        k: int = 4,
+        search_distance: float = 0.65,
+        filters={},
+        **kwargs: Any,
     ) -> List[Document]:
         """Return docs most similar to query.
 
