@@ -1,8 +1,9 @@
+""" Module to import documents into the datastore and search """
 
-from google.cloud import discoveryengine_v1alpha as discoveryengine
-from google.api_core.client_options import ClientOptions
 import json
 import sys
+from google.cloud import discoveryengine_v1alpha as discoveryengine
+from google.api_core.client_options import ClientOptions
 
 
 def import_documents(
@@ -11,13 +12,16 @@ def import_documents(
     data_store_id: str,
     gcs_uri: str,
 ):
+    """Module to import documents into the datastore."""
     # Create a client
     client_options = (
-        ClientOptions(api_endpoint=f"{location}-discoveryengine.googleapis.com")
+        ClientOptions(
+            api_endpoint=f"{location}-discoveryengine.googleapis.com")
         if location != "global"
         else None
     )
-    client = discoveryengine.DocumentServiceClient(client_options=client_options)
+    client = discoveryengine.DocumentServiceClient(
+        client_options=client_options)
 
     print(" clien is ", client)
     # The full resource name of the search engine branch.
@@ -42,7 +46,7 @@ def import_documents(
     # Make the request
     operation = client.import_documents(request=request)
     response = operation.result()
-    print(reponse)
+    print(response)
     # Once the operation is complete,
     # get information from operation metadata
     metadata = discoveryengine.ImportDocumentsMetadata(operation.metadata)
@@ -57,10 +61,12 @@ def search_data_store(
     data_store_id: str,
     search_query: str,
 ) -> discoveryengine.SearchResponse:
+    """Module to search the datastore."""
     #  For more information, refer to:
     # https://cloud.google.com/generative-ai-app-builder/docs/locations#specify_a_multi-region_for_your_data_store
     client_options = (
-        ClientOptions(api_endpoint=f"{location}-discoveryengine.googleapis.com")
+        ClientOptions(
+            api_endpoint=f"{location}-discoveryengine.googleapis.com")
         if location != "global"
         else None
     )
@@ -68,8 +74,6 @@ def search_data_store(
     # Create a client
     client = discoveryengine.SearchServiceClient(client_options=client_options)
 
-    # The full resource name of the search engine serving config
-    # e.g. projects/{project_id}/locations/{location}/dataStores/{data_store_id}/servingConfigs/{serving_config_id}
     serving_config = client.serving_config_path(
         project=project_id,
         location=location,
@@ -86,9 +90,10 @@ def search_data_store(
         snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
             return_snippet=True
         ),
-        extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
-            max_extractive_answer_count=5,
-            max_extractive_segment_count=1,
+        extractive_content_spec=discoveryengine.SearchRequest.
+            ContentSearchSpec.ExtractiveContentSpec(
+                max_extractive_answer_count=5,
+                max_extractive_segment_count=1,
         ),
         # For information about search summaries, refer to:
         # https://cloud.google.com/generative-ai-app-builder/docs/get-search-summaries
@@ -118,38 +123,36 @@ def search_data_store(
     response = client.search(request)
     return response
 
+
 # Add main to call python directly
 if __name__ == "__main__":
-    
-    action = sys.argv[1]
-    gcs_uri = "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs"
-    search_query = "Who is the CEO of Google?"
 
-    with open('./tfvars/tfvars.json') as f: 
+    action = sys.argv[1]
+    GCS_URI = "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs"
+    SEARCH_QUERY = "Who is the CEO of Google?"
+
+    with open('./tfvars/tfvars.json', encoding="utf-8") as f:
         s = f.read()
 
     s = json.loads(s)
 
-    project_id = s["project_id"]
-    location = s["location"]
-    data_store_id = s["data_store_id"]
-    
-    
+    PROJECT_ID = s["project_id"]
+    LOCATION = s["location"]
+    DATA_STORE_ID = s["data_store_id"]
+
     if action == "import":
         import_documents(
-            project_id=project_id,
-            location=location,
-            data_store_id=data_store_id,
-            gcs_uri=gcs_uri,
+            project_id=PROJECT_ID,
+            location=LOCATION,
+            data_store_id=DATA_STORE_ID,
+            gcs_uri=GCS_URI,
         )
     else:
-        response = search_data_store(
-            project_id=project_id,
-            location=location,
-            data_store_id=data_store_id,
-            search_query=search_query,
+        search_response = search_data_store(
+            project_id=PROJECT_ID,
+            location=LOCATION,
+            data_store_id=DATA_STORE_ID,
+            search_query=SEARCH_QUERY,
         )
 
-        print(response)
-
-
+        print(search_response)
