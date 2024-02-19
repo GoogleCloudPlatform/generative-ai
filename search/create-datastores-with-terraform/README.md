@@ -1,17 +1,4 @@
-<!-- BEGIN_TF_DOCS -->
-Copyright 2024 Google LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+# Create datastore and Search Engine with terraform
 
 ## Purpose
 
@@ -58,8 +45,3 @@ python main.py search - it searches the data store for the specified search_quer
 | <a name="input_outputs_location"></a> [outputs\_location](#input\_outputs\_location) | Locaton of tfvars file where outputs will be stored | `string` | `null` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | DevOps Project ID | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Region where the resources will be created | `string` | `"us-central1"` | no |
-
-## Outputs
-
-No outputs.
-<!-- END_TF_DOCS -->
