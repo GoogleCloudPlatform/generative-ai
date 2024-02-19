@@ -25,12 +25,12 @@ terraform {
       version = "5.16.0"
     }
     local = {
-      source = "hashicorp/local"
+      source  = "hashicorp/local"
       version = "~> 2.0.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.1.0" 
+      version = "~> 3.1.0"
     }
   }
 }
