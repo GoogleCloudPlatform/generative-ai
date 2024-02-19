@@ -125,8 +125,8 @@ if __name__ == "__main__":
     gcs_uri = "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs"
     search_query = "Who is the CEO of Google?"
 
-    with open('./tfvars/tfvars.json') 
-        as f: s = f.read()
+    with open('./tfvars/tfvars.json') as f: 
+        s = f.read()
 
     s = json.loads(s)
 
