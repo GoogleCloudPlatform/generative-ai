@@ -3,8 +3,7 @@ from google.cloud import discoveryengine_v1alpha as discoveryengine
 from google.api_core.client_options import ClientOptions
 import json
 import sys
-from google.api_core.client_options import ClientOptions
-from google.cloud import discoveryengine_v1beta as discoveryengine
+
 
 def import_documents(
     project_id: str,
@@ -43,10 +42,11 @@ def import_documents(
     # Make the request
     operation = client.import_documents(request=request)
     response = operation.result()
+    print(reponse)
     # Once the operation is complete,
     # get information from operation metadata
     metadata = discoveryengine.ImportDocumentsMetadata(operation.metadata)
-
+    print(metadata)
     # Handle the response
     return operation.operation.name
 
@@ -125,7 +125,8 @@ if __name__ == "__main__":
     gcs_uri = "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs"
     search_query = "Who is the CEO of Google?"
 
-    with open('./tfvars/tfvars.json') as f: s = f.read()
+    with open('./tfvars/tfvars.json') 
+        as f: s = f.read()
 
     s = json.loads(s)
 
