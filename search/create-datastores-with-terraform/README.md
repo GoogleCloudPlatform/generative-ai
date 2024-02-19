@@ -8,9 +8,9 @@ Import data into the datastore created by terraform and run a search query.
 
 ## Implementation
 
-Update terraform.tfvars and run 
+Update terraform.tfvars and run
 
-```
+```terraform
 terraform init
 terraform plan
 terraform apply
@@ -22,7 +22,6 @@ Once you have created the tfvars.json file, you can run the python code.
 
 python main.py import - imports the specified documents from the given gcs_uri to the specified data store
 python main.py search - it searches the data store for the specified search_query and prints the response.
-
 
 
 ## Resources
