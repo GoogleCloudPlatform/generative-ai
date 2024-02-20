@@ -37,15 +37,14 @@ def get_text_embedding_from_text_embedding_model(
 
     Args:
         text: The input text string to be embedded.
-        return_array: If True, returns the embedding as a NumPy array. 
+        return_array: If True, returns the embedding as a NumPy array.
                       If False, returns the embedding as a list. (Default: False)
 
     Returns:
-        list or numpy.ndarray: A 768-dimensional vector representation of the input text. 
-                               The format (list or NumPy array) depends on the 
-                               value of the 'return_array' parameter. 
+        list or numpy.ndarray: A 768-dimensional vector representation of the input text.
+                               The format (list or NumPy array) depends on the
+                               value of the 'return_array' parameter.
     """
-    
     embeddings = text_embedding_model.get_embeddings([text])
     text_embedding = [embedding.values for embedding in embeddings][0]
 
@@ -59,7 +58,7 @@ def get_text_embedding_from_text_embedding_model(
 def get_image_embedding_from_multimodal_embedding_model(
     project_id: str,
     image_uri: str,
-    text: str = None,
+    text: str = "",
     embedding_size: int = 512,
     return_array: Optional[bool] = False,
 ) -> list:
@@ -443,7 +442,7 @@ def get_text_metadata_df(
         for chunk_number, chunk_text in values["chunked_text_dict"].items():
             data: Dict = {}
             data["file_name"] = filename
-            data["page_num"] = key + 1
+            data["page_num"] = int(key) + 1
             data["text"] = values["text"]
             data["text_embedding_page"] = values["page_text_embeddings"][
                 "text_embedding"
@@ -481,7 +480,7 @@ def get_image_metadata_df(
     for key, values in image_metadata.items():
         data: Dict = {}
         data["file_name"] = filename
-        data["page_num"] = key + 1
+        data["page_num"] = int(key) + 1
 
         for image_number, image_values in values.items():
             data["img_num"] = int(image_values["img_num"])
@@ -511,8 +510,13 @@ def get_document_metadata(
     image_description_prompt: str,
     embedding_size: int = 128,
     text_emb_text_limit: int = 1000,
-    generation_config: dict = None,
-    safety_settings: dict = None,
+    generation_config: Optional[dict] = {"max_output_tokens": 2048, "temperature": 0.2},
+    safety_settings: Optional[dict] = {
+        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    },
     add_sleep_after_page: bool = False,
     sleep_time_after_page: int = 2,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -865,7 +869,8 @@ def get_similar_image_from_query(
     top_n_cosine_values = cosine_scores.nlargest(top_n).values.tolist()
 
     # Create a dictionary to store matched images and their information
-    final_images = {}
+    # final_images = {}
+    final_images: Dict[int, Dict[str, Any]] = {} 
 
     for matched_imageno, indexvalue in enumerate(top_n_cosine_scores):
         # Create a sub-dictionary for each matched image
