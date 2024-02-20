@@ -26,7 +26,7 @@ from vertexai.generative_models import (
     Part,
     GenerationResponse,
     HarmCategory,
-    HarmBlockThreshold
+    HarmBlockThreshold,
 )
 import PIL
 
@@ -40,22 +40,26 @@ text_embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko@l
 
 
 def get_text_embedding_from_text_embedding_model(
-  text: str,
-  return_array: Optional[bool] = False,
+    text: str,
+    return_array: Optional[bool] = False,
 ) -> list:
 
-  embeddings = text_embedding_model.get_embeddings([text])
-  text_embedding = [embedding.values for embedding in embeddings][0]
+    embeddings = text_embedding_model.get_embeddings([text])
+    text_embedding = [embedding.values for embedding in embeddings][0]
 
-  if return_array:
-    text_embedding = np.fromiter(text_embedding,dtype=float)
+    if return_array:
+        text_embedding = np.fromiter(text_embedding, dtype=float)
 
-  # returns 768 dimmensional array
-  return text_embedding
+    # returns 768 dimmensional array
+    return text_embedding
 
 
 def get_image_embedding_from_multimodal_embedding_model(
-    project_id: str, image_uri: str, text: str = None, embedding_size: int = 512, return_array: Optional[bool] = False,
+    project_id: str,
+    image_uri: str,
+    text: str = None,
+    embedding_size: int = 512,
+    return_array: Optional[bool] = False,
 ) -> list:
     """
     Returns an embedding (as a list) based on an image and optionally text, using a multimodal embedding modal:
@@ -111,7 +115,7 @@ def get_image_embedding_from_multimodal_embedding_model(
     image_embedding = [v for v in response.predictions[0].get("imageEmbedding", [])]
 
     if return_array:
-      image_embedding = np.fromiter(image_embedding,dtype=float)
+        image_embedding = np.fromiter(image_embedding, dtype=float)
 
     return image_embedding
 
@@ -230,9 +234,7 @@ def get_text_overlapping_chunk(
     return chunked_text_dict
 
 
-def get_page_text_embedding(
-    text_data: typing.Union[dict, str]
-) -> dict:
+def get_page_text_embedding(text_data: typing.Union[dict, str]) -> dict:
     """
     * Generates embeddings for each text chunk using a specified embedding model.
     * Takes a dictionary of text chunks and an embedding size as input.
@@ -253,15 +255,11 @@ def get_page_text_embedding(
         # Process each chunk
         # print(text_data)
         for chunk_number, chunk_value in text_data.items():
-            text_embd = get_text_embedding_from_text_embedding_model(
-                text=chunk_value
-            )
+            text_embd = get_text_embedding_from_text_embedding_model(text=chunk_value)
             embeddings_dict[chunk_number] = text_embd
     else:
         # Process the first 1000 characters of the page text
-        text_embd = get_text_embedding_from_text_embedding_model(
-            text=text_data
-        )
+        text_embd = get_text_embedding_from_text_embedding_model(text=text_data)
         embeddings_dict["text_embedding"] = text_embd
 
     return embeddings_dict
@@ -304,18 +302,14 @@ def get_chunk_text_metadata(
     text: str = page.get_text().encode("ascii", "ignore").decode("utf-8", "ignore")
 
     # Get whole-page text embeddings
-    page_text_embeddings_dict: dict = get_page_text_embedding(
-        text
-    )
+    page_text_embeddings_dict: dict = get_page_text_embedding(text)
 
     # Chunk the text with the given limit and overlap
     chunked_text_dict: dict = get_text_overlapping_chunk(text, character_limit, overlap)
     # print(chunked_text_dict)
 
     # Get embeddings for the chunks
-    chunk_embeddings_dict: dict = get_page_text_embedding(
-        chunked_text_dict
-    )
+    chunk_embeddings_dict: dict = get_page_text_embedding(chunked_text_dict)
     # print(chunk_embeddings_dict)
 
     # Return all extracted data
@@ -373,12 +367,12 @@ def get_gemini_response(
     model_input: List[str],
     stream: bool = True,
     generation_config: Optional[dict] = {"max_output_tokens": 2048, "temperature": 0.2},
-    safety_settings: Optional[dict] = {HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-                  HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-                  HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-                  HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-                                    },
-    
+    safety_settings: Optional[dict] = {
+        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    },
 ) -> str:
     """
     This function generates text in response to a list of model inputs.
@@ -406,11 +400,14 @@ def get_gemini_response(
 
         for chunk in response:
             try:
-              response_list.append(chunk.text)
+                response_list.append(chunk.text)
             except Exception as e:
-              print("Exception occured while calling gemini. Something is wrong. Lower the safety thresholds [safety_settings: BLOCK_NONE ] if not already done. -----", e)
-              response_list.append("Exception occured")
-              continue
+                print(
+                    "Exception occured while calling gemini. Something is wrong. Lower the safety thresholds [safety_settings: BLOCK_NONE ] if not already done. -----",
+                    e,
+                )
+                response_list.append("Exception occured")
+                continue
         response = "".join(response_list)
     else:
         response = generative_multimodal_model.generate_content(
@@ -512,10 +509,10 @@ def get_document_metadata(
     image_description_prompt: str,
     embedding_size: int = 128,
     text_emb_text_limit: int = 1000,
-    generation_config: dict = None, 
+    generation_config: dict = None,
     safety_settings: dict = None,
     add_sleep_after_page: bool = False,
-    sleep_time_after_page: int = 2
+    sleep_time_after_page: int = 2,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     This function takes a PDF path, an image save directory, an image description prompt, an embedding size, and a text embedding text limit as input.
@@ -537,7 +534,12 @@ def get_document_metadata(
 
     for pdf_path in glob.glob(pdf_folder_path + "/*.pdf"):
 
-        print("\n\n", "Processing the file: ---------------------------------", pdf_path, "\n\n")
+        print(
+            "\n\n",
+            "Processing the file: ---------------------------------",
+            pdf_path,
+            "\n\n",
+        )
 
         doc, num_pages = get_pdf_doc_object(pdf_path)
 
@@ -578,13 +580,15 @@ def get_document_metadata(
                     doc, image, image_no, image_save_dir, file_name, page_num
                 )
 
-                print(f"Extracting image from page: {page_num + 1}, saved as: {image_name}")
+                print(
+                    f"Extracting image from page: {page_num + 1}, saved as: {image_name}"
+                )
 
                 response = get_gemini_response(
                     generative_multimodal_model,
                     model_input=[image_description_prompt, image_for_gemini],
-                    generation_config = generation_config, 
-                    safety_settings = safety_settings,
+                    generation_config=generation_config,
+                    safety_settings=safety_settings,
                     stream=True,
                 )
 
@@ -603,10 +607,9 @@ def get_document_metadata(
                     embedding_size=embedding_size,
                 )
 
-                image_description_text_embedding = get_text_embedding_from_text_embedding_model(
-                        text=response
+                image_description_text_embedding = (
+                    get_text_embedding_from_text_embedding_model(text=response)
                 )
-
 
                 image_metadata[page_num][image_number] = {
                     "img_num": image_number,
@@ -620,14 +623,25 @@ def get_document_metadata(
             # Add sleep to reduce issues with Quota error on API
             if add_sleep_after_page:
                 time.sleep(sleep_time_after_page)
-                print("Sleeping for ", sleep_time_after_page, """ sec before processing the next page to avoid quota issues. You can disable it: "add_sleep_after_page = False"  """)
+                print(
+                    "Sleeping for ",
+                    sleep_time_after_page,
+                    """ sec before processing the next page to avoid quota issues. You can disable it: "add_sleep_after_page = False"  """,
+                )
 
         text_metadata_df = get_text_metadata_df(file_name, text_metadata)
         image_metadata_df = get_image_metadata_df(file_name, image_metadata)
 
-        text_metadata_df_final = pd.concat([text_metadata_df_final, text_metadata_df], axis=0)
-        image_metadata_df_final = pd.concat([image_metadata_df_final,
-                                         image_metadata_df.drop_duplicates(subset=['img_desc'])], axis=0)
+        text_metadata_df_final = pd.concat(
+            [text_metadata_df_final, text_metadata_df], axis=0
+        )
+        image_metadata_df_final = pd.concat(
+            [
+                image_metadata_df_final,
+                image_metadata_df.drop_duplicates(subset=["img_desc"]),
+            ],
+            axis=0,
+        )
 
         text_metadata_df_final = text_metadata_df_final.reset_index(drop=True)
         image_metadata_df_final = image_metadata_df_final.reset_index(drop=True)
@@ -635,12 +649,10 @@ def get_document_metadata(
     return text_metadata_df_final, image_metadata_df_final
 
 
-
 # Helper Functions
 
-def get_user_query_text_embeddings(
-    user_query: str
-) -> np.ndarray:
+
+def get_user_query_text_embeddings(user_query: str) -> np.ndarray:
     """
     Extracts text embeddings for the user query using a text embedding model.
 
@@ -653,9 +665,7 @@ def get_user_query_text_embeddings(
         A NumPy array representing the user query text embedding.
     """
 
-    return get_text_embedding_from_text_embedding_model(
-        user_query
-    )
+    return get_text_embedding_from_text_embedding_model(user_query)
 
 
 def get_user_query_image_embeddings(
@@ -800,6 +810,7 @@ def print_text_to_text_citation(
         if print_top and textno == 0:
             break
 
+
 def get_similar_image_from_query(
     project_id: str,
     text_metadata_df: pd.DataFrame,
@@ -831,19 +842,20 @@ def get_similar_image_from_query(
     # Check if image embedding is used
     if image_emb:
         # Calculate cosine similarity between query image and metadata images
-        user_query_image_embedding = get_user_query_image_embeddings(project_id,image_query_path, embedding_size)
+        user_query_image_embedding = get_user_query_image_embeddings(
+            project_id, image_query_path, embedding_size
+        )
         cosine_scores = image_metadata_df.apply(
-            lambda x: get_cosine_score(x, column_name,
-                                        user_query_image_embedding),
-            axis=1)
+            lambda x: get_cosine_score(x, column_name, user_query_image_embedding),
+            axis=1,
+        )
     else:
         # Calculate cosine similarity between query text and metadata image captions
         user_query_text_embedding = get_user_query_text_embeddings(query)
         cosine_scores = image_metadata_df.apply(
-            lambda x: get_cosine_score(x, column_name,
-                                        user_query_text_embedding
-                                       ),
-            axis=1)
+            lambda x: get_cosine_score(x, column_name, user_query_text_embedding),
+            axis=1,
+        )
 
     # Remove same image comparison score when user image is matched exactly with metadata image
     cosine_scores = cosine_scores[cosine_scores < 1.0]
@@ -860,32 +872,56 @@ def get_similar_image_from_query(
         final_images[matched_imageno] = {}
 
         # Store cosine score
-        final_images[matched_imageno]['cosine_score'] = top_n_cosine_values[matched_imageno]
+        final_images[matched_imageno]["cosine_score"] = top_n_cosine_values[
+            matched_imageno
+        ]
 
         # Load image from file
-        final_images[matched_imageno]['image_object'] = Image.load_from_file(
-            image_metadata_df.iloc[indexvalue]['img_path'])
+        final_images[matched_imageno]["image_object"] = Image.load_from_file(
+            image_metadata_df.iloc[indexvalue]["img_path"]
+        )
 
         # Add file name
-        final_images[matched_imageno]['file_name'] = image_metadata_df.iloc[indexvalue]['file_name']
+        final_images[matched_imageno]["file_name"] = image_metadata_df.iloc[indexvalue][
+            "file_name"
+        ]
 
         # Store image path
-        final_images[matched_imageno]['img_path'] = image_metadata_df.iloc[indexvalue]['img_path']
+        final_images[matched_imageno]["img_path"] = image_metadata_df.iloc[indexvalue][
+            "img_path"
+        ]
 
         # Store page number
-        final_images[matched_imageno]['page_num'] = image_metadata_df.iloc[indexvalue]['page_num']
+        final_images[matched_imageno]["page_num"] = image_metadata_df.iloc[indexvalue][
+            "page_num"
+        ]
 
         # Extract page text from text metadata dataframe
         # final_images[matched_imageno]['page_text'] = text_metadata_df[
         #     text_metadata_df['page_num'].isin([final_images[matched_imageno]['page_num']])]['text'].values
 
-        final_images[matched_imageno]['page_text'] = np.unique(text_metadata_df[(text_metadata_df['page_num'].isin([final_images[matched_imageno]['page_num']]) )
-            & (text_metadata_df['file_name'].isin([final_images[matched_imageno]['file_name']])) ]['text'].values)
+        final_images[matched_imageno]["page_text"] = np.unique(
+            text_metadata_df[
+                (
+                    text_metadata_df["page_num"].isin(
+                        [final_images[matched_imageno]["page_num"]]
+                    )
+                )
+                & (
+                    text_metadata_df["file_name"].isin(
+                        [final_images[matched_imageno]["file_name"]]
+                    )
+                )
+            ]["text"].values
+        )
 
         # Store image description
-        final_images[matched_imageno]['image_description'] = image_metadata_df.iloc[indexvalue]['img_desc']
+        final_images[matched_imageno]["image_description"] = image_metadata_df.iloc[
+            indexvalue
+        ]["img_desc"]
 
     return final_images
+
 
 def get_similar_text_from_query(
     project_id: str,
@@ -920,9 +956,7 @@ def get_similar_text_from_query(
     if column_name not in text_metadata_df.columns:
         raise KeyError(f"Column '{column_name}' not found in the 'text_metadata_df'")
 
-    query_vector = get_user_query_text_embeddings(
-                query
-            )
+    query_vector = get_user_query_text_embeddings(query)
 
     # Calculate cosine similarity between query text and metadata text
     cosine_scores = text_metadata_df.apply(

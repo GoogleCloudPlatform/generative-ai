@@ -1,5 +1,4 @@
 import os
-
 import streamlit as st
 import vertexai
 from vertexai.generative_models import (
@@ -365,7 +364,9 @@ with tab3:
         )
         with tab1:
             if generate_image_description and content:
-                with st.spinner("Generating recommendation using Gemini 1.0 Pro Vision ..."):
+                with st.spinner(
+                    "Generating recommendation using Gemini 1.0 Pro Vision ..."
+                ):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, content
                     )
@@ -400,7 +401,9 @@ If instructions include buttons, also explain where those buttons are physically
         )
         with tab1:
             if generate_instructions_description and prompt:
-                with st.spinner("Generating instructions using Gemini 1.0 Pro Vision..."):
+                with st.spinner(
+                    "Generating instructions using Gemini 1.0 Pro Vision..."
+                ):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, [stove_screen_img, prompt]
                     )
@@ -498,7 +501,9 @@ If instructions include buttons, also explain where those buttons are physically
         )
         with tab1:
             if compare_img_description and content:
-                with st.spinner("Generating recommendations using Gemini 1.0 Pro Vision..."):
+                with st.spinner(
+                    "Generating recommendations using Gemini 1.0 Pro Vision..."
+                ):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, content
                     )
@@ -541,7 +546,9 @@ INSTRUCTIONS:
         )
         with tab1:
             if math_image_description and prompt:
-                with st.spinner("Generating answers for formula using Gemini 1.0 Pro Vision..."):
+                with st.spinner(
+                    "Generating answers for formula using Gemini 1.0 Pro Vision..."
+                ):
                     response = get_gemini_pro_vision_response(
                         multimodal_model_pro, [math_image_img, prompt]
                     )
@@ -581,7 +588,9 @@ with tab4:
             )
             with tab1:
                 if vide_desc_description and prompt:
-                    with st.spinner("Generating video description using Gemini 1.0 Pro Vision ..."):
+                    with st.spinner(
+                        "Generating video description using Gemini 1.0 Pro Vision ..."
+                    ):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, vide_desc_img]
                         )
@@ -616,7 +625,9 @@ with tab4:
             )
             with tab1:
                 if video_tags_description and prompt:
-                    with st.spinner("Generating video description using Gemini 1.0 Pro Vision ..."):
+                    with st.spinner(
+                        "Generating video description using Gemini 1.0 Pro Vision ..."
+                    ):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, video_tags_img]
                         )
@@ -653,7 +664,9 @@ Provide the answer in table format.
             )
             with tab1:
                 if video_highlights_description and prompt:
-                    with st.spinner("Generating video highlights using Gemini 1.0 Pro Vision ..."):
+                    with st.spinner(
+                        "Generating video highlights using Gemini 1.0 Pro Vision ..."
+                    ):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, video_highlights_img]
                         )
@@ -700,7 +713,9 @@ Provide the answer in table format.
             )
             with tab1:
                 if video_geolocation_description and prompt:
-                    with st.spinner("Generating location tags using Gemini 1.0 Pro Vision ..."):
+                    with st.spinner(
+                        "Generating location tags using Gemini 1.0 Pro Vision ..."
+                    ):
                         response = get_gemini_pro_vision_response(
                             multimodal_model_pro, [prompt, video_geolocation_img]
                         )
