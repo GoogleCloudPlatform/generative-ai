@@ -870,7 +870,7 @@ def get_similar_image_from_query(
 
     # Create a dictionary to store matched images and their information
     # final_images = {}
-    final_images: Dict[int, Dict[str, Any]] = {} 
+    final_images: Dict[int, Dict[str, Any]] = {}
 
     for matched_imageno, indexvalue in enumerate(top_n_cosine_scores):
         # Create a sub-dictionary for each matched image
@@ -978,7 +978,8 @@ def get_similar_text_from_query(
     top_n_scores = cosine_scores.nlargest(top_n).values.tolist()
 
     # Create a dictionary to store matched text and their information
-    final_text = {}
+    # final_text = {}
+    final_text: Dict[int, Dict[str, Any]] = {}
 
     for matched_textno, index in enumerate(top_n_indices):
         # Create a sub-dictionary for each matched text
