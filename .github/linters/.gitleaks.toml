@@ -4,3 +4,12 @@ title = "gitleaks config"
 # useDefault will extend the base configuration with the default gitleaks config:
 # https://github.com/zricethezav/gitleaks/blob/master/config/gitleaks.toml
 useDefault = true
+
+[[rules]]
+  # Define the rule to ignore
+  name = "aws-access-token"
+  
+  # Specify the secret to ignore for this rule
+  [[rules.exclusions]]
+    secret = "AIDAQEAAAAAAAAAARESA"
+  
