@@ -16,6 +16,12 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 @st.cache_resource
 def load_models():
+    """
+    Load the generative models for text and multimodal generation.
+
+    Returns:
+        Tuple: A tuple containing the text model and multimodal model.
+    """
     text_model_pro = GenerativeModel("gemini-1.0-pro")
     multimodal_model_pro = GenerativeModel("gemini-1.0-pro-vision")
     return text_model_pro, multimodal_model_pro

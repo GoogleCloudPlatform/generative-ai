@@ -1,30 +1,19 @@
 import os
+from typing import Optional, Dict, Tuple, List, Union, Any, Iterable
 import time
 import glob
-import fitz
-import errno
 import typing
+from base64 import b64encode
 import requests
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import networkx as nx
-from typing import Optional
-from base64 import b64encode
-from typing import Tuple, List
-from typing import Dict, List, Union, Any, Iterable
-import matplotlib.pyplot as plt
+import fitz
 from google.cloud import aiplatform
 from google.protobuf import struct_pb2
-from IPython.display import Markdown, display
+from IPython.display import display
 from vertexai.language_models import TextEmbeddingModel
 from vertexai.generative_models import (
-    GenerativeModel,
-    GenerationConfig,
     Image,
-    Content,
-    Part,
-    GenerationResponse,
     HarmCategory,
     HarmBlockThreshold,
 )
@@ -43,14 +32,27 @@ def get_text_embedding_from_text_embedding_model(
     text: str,
     return_array: Optional[bool] = False,
 ) -> list:
+    """
+    Generates a numerical text embedding from a provided text input using a text embedding model.
 
+    Args:
+        text: The input text string to be embedded.
+        return_array: If True, returns the embedding as a NumPy array. 
+                      If False, returns the embedding as a list. (Default: False)
+
+    Returns:
+        list or numpy.ndarray: A 768-dimensional vector representation of the input text. 
+                               The format (list or NumPy array) depends on the 
+                               value of the 'return_array' parameter. 
+    """
+    
     embeddings = text_embedding_model.get_embeddings([text])
     text_embedding = [embedding.values for embedding in embeddings][0]
 
     if return_array:
         text_embedding = np.fromiter(text_embedding, dtype=float)
 
-    # returns 768 dimmensional array
+    # returns 768 dimensional array
     return text_embedding
 
 
@@ -345,7 +347,7 @@ def get_image_for_gemini(
     pix = fitz.Pixmap(doc, xref)
 
     # Convert the image to JPEG format
-    data = pix.tobytes("jpeg")
+    pix.tobytes("jpeg")
 
     # Create the image file name
     image_name = f"{image_save_dir}/{file_name}_image_{page_num}_{image_no}_{xref}.jpeg"
@@ -403,10 +405,10 @@ def get_gemini_response(
                 response_list.append(chunk.text)
             except Exception as e:
                 print(
-                    "Exception occured while calling gemini. Something is wrong. Lower the safety thresholds [safety_settings: BLOCK_NONE ] if not already done. -----",
+                    "Exception occurred while calling gemini. Something is wrong. Lower the safety thresholds [safety_settings: BLOCK_NONE ] if not already done. -----",
                     e,
                 )
-                response_list.append("Exception occured")
+                response_list.append("Exception occurred")
                 continue
         response = "".join(response_list)
     else:
@@ -533,7 +535,6 @@ def get_document_metadata(
     text_metadata_df_final, image_metadata_df_final = pd.DataFrame(), pd.DataFrame()
 
     for pdf_path in glob.glob(pdf_folder_path + "/*.pdf"):
-
         print(
             "\n\n",
             "Processing the file: ---------------------------------",
@@ -549,7 +550,6 @@ def get_document_metadata(
         image_metadata: Dict[Union[int, str], Dict] = {}
 
         for page_num in range(num_pages):
-
             print(f"Processing page: {page_num + 1}")
 
             page = doc[page_num]
@@ -730,29 +730,29 @@ def print_text_to_image_citation(
         # Print the citation header
         print(
             color.RED + f"Citation {imageno + 1}:",
-            "Mached image path, page number and page text: \n" + color.END,
+            "Matched image path, page number and page text: \n" + color.END,
         )
 
         # Print the cosine similarity score
-        print(color.BLUE + f"score: " + color.END, image_dict["cosine_score"])
+        print(color.BLUE + "score: " + color.END, image_dict["cosine_score"])
 
         # Print the file_name
-        print(color.BLUE + f"file_name: " + color.END, image_dict["file_name"])
+        print(color.BLUE + "file_name: " + color.END, image_dict["file_name"])
 
         # Print the image path
-        print(color.BLUE + f"path: " + color.END, image_dict["img_path"])
+        print(color.BLUE + "path: " + color.END, image_dict["img_path"])
 
         # Print the page number
-        print(color.BLUE + f"page number: " + color.END, image_dict["page_num"])
+        print(color.BLUE + "page number: " + color.END, image_dict["page_num"])
 
         # Print the page text
         print(
-            color.BLUE + f"page text: " + color.END, "\n".join(image_dict["page_text"])
+            color.BLUE + "page text: " + color.END, "\n".join(image_dict["page_text"])
         )
 
         # Print the image description
         print(
-            color.BLUE + f"image description: " + color.END,
+            color.BLUE + "image description: " + color.END,
             image_dict["image_description"],
         )
 
@@ -789,22 +789,22 @@ def print_text_to_text_citation(
         print(color.RED + f"Citation {textno + 1}:", "Matched text: \n" + color.END)
 
         # Print the cosine similarity score
-        print(color.BLUE + f"score: " + color.END, text_dict["cosine_score"])
+        print(color.BLUE + "score: " + color.END, text_dict["cosine_score"])
 
         # Print the file_name
-        print(color.BLUE + f"file_name: " + color.END, text_dict["file_name"])
+        print(color.BLUE + "file_name: " + color.END, text_dict["file_name"])
 
         # Print the page number
-        print(color.BLUE + f"page_number: " + color.END, text_dict["page_num"])
+        print(color.BLUE + "page_number: " + color.END, text_dict["page_num"])
 
         # Print the matched text based on the chunk_text argument
         if chunk_text:
             # Print chunk number and chunk text
-            print(color.BLUE + f"chunk_number: " + color.END, text_dict["chunk_number"])
-            print(color.BLUE + f"chunk_text: " + color.END, text_dict["chunk_text"])
+            print(color.BLUE + "chunk_number: " + color.END, text_dict["chunk_number"])
+            print(color.BLUE + "chunk_text: " + color.END, text_dict["chunk_text"])
         else:
             # Print page text
-            print(color.BLUE + f"page text: " + color.END, text_dict["page_text"])
+            print(color.BLUE + "page text: " + color.END, text_dict["page_text"])
 
         # Only print the first citation if print_top is True
         if print_top and textno == 0:
