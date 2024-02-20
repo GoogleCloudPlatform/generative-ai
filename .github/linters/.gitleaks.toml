@@ -8,4 +8,4 @@ useDefault = true
 [rules]
 [[rules.ignore]]
   pattern = 'aws-access-token'
-  files = ['/github/workspace/gemini/use-cases/education/use_cases_for_education.ipynb']
+  files = ['gemini/use-cases/education/use_cases_for_education.ipynb']
