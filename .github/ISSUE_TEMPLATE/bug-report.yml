@@ -1,0 +1,51 @@
+name: 🐞 Bug Report
+description: File a bug report
+title: "[Bug]: "
+assignees:
+  - GoogleCloudPlatform/generative-ai-devrel
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for stopping by to let us know something could be better!
+        **PLEASE READ**:
+        - This repository is for [Generative AI with Vertex AI on Google Cloud](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview), not the [Google AI Gemini/PaLM APIs](https://ai.google.dev/)
+          - For issues with the Google AI Gemini API, refer to one of [these repositories](https://github.com/orgs/google/repositories?q=generative-ai) or the [Google Developers Community Discord `#gemini-api` channel](https://ai.google.dev/docs/discord).
+        - If you have a support contract with Google, please create an issue in the [support console](https://cloud.google.com/support/) instead of filing on GitHub. This will ensure a timely response.
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+  - type: input
+    id: file-name
+    attributes:
+      label: File Name
+      description: Which notebook/code sample is the issue occuring in?
+      placeholder: ex. `gemini/getting-started/intro_gemini_python.ipynb`
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us what you expected to happen and how to reproduce the issue.
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/GoogleCloudPlatform/generative-ai?tab=coc-ov-file)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
