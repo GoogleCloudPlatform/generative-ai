@@ -10,12 +10,8 @@
 /generative-ai/conversation                                 @koverholt @kmaphoenix @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/embeddings                                   @kazunori279 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/embeddings/use-cases/outlier-detection       @rarsan @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/embeddings/embedding-similarity-visualization.ipynb @grivescorbett @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/embeddings/intro-textemb-vectorsearch.ipynb  @smitha-google @kazunori279 @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/embeddings/vector-search-quickstart.ipynb    @smitha-google @kazunori279 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini                                       @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/function-calling                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/use-cases                             @saeedaghabozorgi @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions @shanecglass @GoogleCloudPlatform/generative-ai-devrel
@@ -30,24 +26,15 @@
 /generative-ai/language/sample-apps                         @rominirani @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/translation                         @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/tuning                              @erwinh85 @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/tuning/distilling_step_by_step      @anihm136 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases                           @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/applying-llms-to-data     @ashleyxuu @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/use-cases/applying-llms-to-data/bigquery_ml_llm.ipynb     @rachael-ds @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/use-cases/chatbots                  @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/use-cases/description-generation    @lavinigam-gcp @anantnawal @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/document-qa               @RajeshThallam @lavinigam-gcp @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/document-summarization    @polong-lin @iamthuya @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/prod-catalog-enrichment   @slatawa @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/use-cases/sensitive-data-detection  @jegadesh-google @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/sql-code-generation       @rarsan @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/search                                       @holtskinner @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/search/bulk-question-answering               @rasalt @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/search/retrieval-augmented-generation        @holtskinner @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/search/create_datastore_and_search.ipynb     @kgreenfield2 @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/search/search_filters_metadata.ipynb         @rasalt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/getting-started                       @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/use-cases/storytelling                @holtskinner @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/vision/gradio                                @jbrache @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases                             @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/getting-started                       @iamthuya @GoogleCloudPlatform/generative-ai-devrel
