@@ -1,5 +1,9 @@
 # Vertex AI Conversation
 
+| | |
+|-|-|
+|Author(s) | [Kristopher Overholt](https://github.com/koverholt) |
+
 ## Overview
 
 [Data Store Agent](https://cloud.google.com/generative-ai-app-builder/docs/agent-intro)

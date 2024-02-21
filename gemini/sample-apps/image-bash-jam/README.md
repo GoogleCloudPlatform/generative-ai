@@ -1,6 +1,10 @@
 # Testing Gemini from Bash
 
-Note: I wrote an article on Medium which is very similar to this README :)
+| | |
+|-|-|
+|Author(s) | [Riccardo Carlesso](https://github.com/palladius) |
+
+Note: I wrote an article on Medium which is very similar to this README 😊
 
 Link: <https://medium.com/@palladiusbonton/hey-gemini-explain-me-these-pictures-in-bash-06c03d0d0512>
 
