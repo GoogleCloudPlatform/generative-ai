@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Google Cloud Support
+    url: https://cloud.google.com/support/
+    about: If you have a support contract with Google, please create a case in the support console instead of filing on GitHub. This will ensure a timely response.
+  - name: Stack Overflow - Google Cloud Collective
+    url: https://stackoverflow.com/collectives/google-cloud
+    about: A collective for developers who utilize Google Cloud’s infrastructure and platform capabilities. This collective is organized and managed by the Stack Overflow community.

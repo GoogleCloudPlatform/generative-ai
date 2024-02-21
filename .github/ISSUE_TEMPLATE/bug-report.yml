@@ -18,15 +18,12 @@ body:
       label: Contact Details
       description: How can we get in touch with you if we need more info?
       placeholder: ex. email@example.com
-    validations:
-      required: false
   - type: input
     id: file-name
     attributes:
       label: File Name
       description: Which notebook/code sample is the issue occuring in?
       placeholder: ex. `gemini/getting-started/intro_gemini_python.ipynb`
-      render: none
     validations:
       required: true
   - type: textarea
