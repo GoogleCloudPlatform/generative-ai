@@ -98,5 +98,14 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
     <td>Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud</td>
     <td><a href="../RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
   </tr>
+  <tr>
+    <td>
+      <img src="">
+      <br>
+      <a href="evaluation/"><code>RESOURCES.md</code></a>
+    </td>
+    <td>Learn how to evaluate Gemini with Vertex AI Model Evaluation for GenAI</td>
+    <td><a href="evaluation/">Sample notebooks</a></td>
+  </tr>
 </table>
 <!-- markdownlint-enable MD033 -->

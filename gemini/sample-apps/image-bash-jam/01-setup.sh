@@ -41,7 +41,6 @@ gcloud auth application-default login
 gcloud config set project "$PROJECT_ID"
 
 # ENABLE APIs
-#https://console.cloud.google.com/apis/library/aiplatform.googleapis.com?project=rk-testing-gemini
 echo '💡 2. Enabling APIs..'
 gcloud services enable \
 	cloudresourcemanager.googleapis.com \

@@ -52,6 +52,15 @@ Additional features include how to search the public Cloud Knowledge Graph using
    - `gcloud services enable run.googleapis.com`
 8. Setup application default authentication, run:
    - `gcloud auth application-default login`
+9. Give the Cloud Run service account required permissions:
+
+   ```sh
+   gcloud projects add-iam-policy-binding [PROJECT_ID] \
+      --member='serviceAccount:[PROJECT_ID]-compute@developer.gserviceaccount.com' \ 
+      --role='roles/discoveryengine.viewer'
+   ```
+
+10. (Optional) If your Google Cloud organization has polices to [restrict sharing by domain](https://cloud.google.com/resource-manager/docs/organization-policy/restricting-domains), then you'll need to change this to allow all domains for the Cloud Run application to be open to the public Internet.
 
 ### Demo Deployment
 

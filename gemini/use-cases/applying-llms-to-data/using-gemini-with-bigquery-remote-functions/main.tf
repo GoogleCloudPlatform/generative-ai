@@ -39,7 +39,6 @@ module "project-services" {
     "storage.googleapis.com",
     "storage-api.googleapis.com",
     "workflows.googleapis.com",
-    "visionai.googleapis.com",
   ]
 
   activate_api_identities = [
@@ -81,7 +80,7 @@ data "archive_file" "create_text_function_zip" {
 
 # Wait until after the APIs are activated to being setting up infrastructure
 resource "time_sleep" "wait_after_apis" {
-  create_duration = "90s"
+  create_duration = "30s"
   depends_on      = [module.project-services]
 }
 
