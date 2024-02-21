@@ -15,6 +15,10 @@ You generally only need to submit a CLA once, so if you've already submitted one
 (even if it was for a different project), you probably don't need to do it
 again.
 
+## Notebook Template
+
+If you're creating a Jupyter Notebook, use `/gemini/getting-started/intro_gemini_python.ipynb` as a template.
+
 ## Code Quality Checks
 
 All notebooks in this project are checked for formatting and style, to ensure a
