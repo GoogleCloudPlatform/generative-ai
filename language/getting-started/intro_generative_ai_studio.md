@@ -148,7 +148,7 @@ Go back to the **Language** page and click on the **+ TEXT CHAT** button to crea
 
 ![Text Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click-create-chat-prompt.jpg)
 
-You will see the new chat prompt page. It's relatively similar to the [new prompt page](#new-prompt) that you went through earlier.
+You will see the new chat prompt page. It's relatively similar to the new prompt page that you went through earlier.
 
 ![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-chat-prompt.jpg)
 
