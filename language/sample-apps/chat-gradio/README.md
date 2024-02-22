@@ -1,5 +1,9 @@
 # Cloud Run application utilizing Gradio Framework that demonstrates working with Vertex AI API
 
+| | |
+|-|-|
+|Author(s) | [Romin Irani](https://github.com/rominirani) |
+
 This application demonstrates a Cloud Run application that uses the [Gradio](https://www.gradio.app/) framework.
 
 ![Gradio Chat App Screen](../assets/gradio-app-screen.png "Gradio Chat App")
