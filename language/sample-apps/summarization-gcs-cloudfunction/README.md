@@ -1,5 +1,9 @@
 # Cloud Function that demonstrates how to process an uploaded file in Google Cloud Storage and perform summarization using PaLM Vertex AI API on the contents
 
+| | |
+|-|-|
+|Author(s) | [Romin Irani](https://github.com/rominirani) |
+
 This application demonstrates a Cloud Function written in Python that gets triggered when a file is uploaded to a specific Google Cloud Storage bucket that is configured with. It does the following:
 
 - Reads the content of the file.
