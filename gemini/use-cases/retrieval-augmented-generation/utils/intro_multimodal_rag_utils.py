@@ -76,20 +76,16 @@ def get_image_embedding_from_multimodal_embedding_model(
     """
     # image = Image.load_from_file(image_uri)
     image = vision_model_Image.load_from_file(image_uri)
-    if text:
-        embeddings = multimodal_embedding_model.get_embeddings(
-            image=image, contextual_text=text, dimension=embedding_size
-        )  # 128, 256, 512, 1408
-    else:
-        embeddings = multimodal_embedding_model.get_embeddings(
-            image=image, dimension=embedding_size
-        )  # 128, 256, 512, 1408
-
+    embeddings = multimodal_embedding_model.get_embeddings(
+        image=image, contextual_text=text, dimension=embedding_size
+    )  # 128, 256, 512, 1408
     image_embedding = embeddings.image_embedding
+    
     if return_array:
         image_embedding = np.fromiter(image_embedding, dtype=float)
 
     return image_embedding
+
 
 def load_image_bytes(image_path):
     """Loads an image from a URL or local file path.
@@ -354,7 +350,6 @@ def get_gemini_response(
     Returns:
         The generated text as a string.
     """
-    # if stream:
     response = generative_multimodal_model.generate_content(
         model_input,
         generation_config=generation_config,
@@ -374,12 +369,6 @@ def get_gemini_response(
             response_list.append("Exception occurred")
             continue
     response = "".join(response_list)
-    # else:
-    #     response = generative_multimodal_model.generate_content(
-    #         model_input, generation_config=generation_config,
-    #         safety_settings=safety_settings,
-    #     )
-    #     response = response.candidates[0].content.parts[0].text
 
     return response
 
