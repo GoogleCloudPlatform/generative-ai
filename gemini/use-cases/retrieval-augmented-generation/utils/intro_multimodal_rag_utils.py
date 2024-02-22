@@ -1,32 +1,32 @@
-import os
-from typing import Optional, Dict, Tuple, List, Union, Any, Iterable
-import time
 import glob
-import typing
-from base64 import b64encode
-import requests
+import os
+import time
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+
+from IPython.display import display
+import PIL
+import fitz
 import numpy as np
 import pandas as pd
-import fitz
-from google.cloud import aiplatform
-from google.protobuf import struct_pb2
-from IPython.display import display
-from vertexai.language_models import TextEmbeddingModel
-from vertexai.vision_models import MultiModalEmbeddingModel, Image as vision_model_Image
+import requests
 from vertexai.generative_models import (
-    Image,
-    HarmCategory,
+    GenerationConfig,
     HarmBlockThreshold,
-    GenerationConfig
+    HarmCategory,
+    Image,
 )
-import PIL
-
+from vertexai.language_models import TextEmbeddingModel
+from vertexai.vision_models import Image as vision_model_Image
+from vertexai.vision_models import MultiModalEmbeddingModel
 
 text_embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko@latest")
-multimodal_embedding_model = MultiModalEmbeddingModel.from_pretrained("multimodalembedding@001")
+multimodal_embedding_model = MultiModalEmbeddingModel.from_pretrained(
+    "multimodalembedding@001"
+)
 
 
 # Functions for getting text and image embeddings
+
 
 def get_text_embedding_from_text_embedding_model(
     text: str,
@@ -80,7 +80,7 @@ def get_image_embedding_from_multimodal_embedding_model(
         image=image, contextual_text=text, dimension=embedding_size
     )  # 128, 256, 512, 1408
     image_embedding = embeddings.image_embedding
-    
+
     if return_array:
         image_embedding = np.fromiter(image_embedding, dtype=float)
 
@@ -201,7 +201,7 @@ def get_text_overlapping_chunk(
     return chunked_text_dict
 
 
-def get_page_text_embedding(text_data: typing.Union[dict, str]) -> dict:
+def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
     """
     * Generates embeddings for each text chunk using a specified embedding model.
     * Takes a dictionary of text chunks and an embedding size as input.
@@ -332,7 +332,9 @@ def get_gemini_response(
     generative_multimodal_model,
     model_input: List[str],
     stream: bool = True,
-    generation_config: Optional[GenerationConfig] = GenerationConfig(temperature=0.2, max_output_tokens=2048),
+    generation_config: Optional[GenerationConfig] = GenerationConfig(
+        temperature=0.2, max_output_tokens=2048
+    ),
     safety_settings: Optional[dict] = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
@@ -411,6 +413,7 @@ def get_text_metadata_df(
     return_df = return_df.reset_index(drop=True)
     return return_df
 
+
 def get_image_metadata_df(
     filename: str, image_metadata: Dict[Union[int, str], Dict]
 ) -> pd.DataFrame:
@@ -430,10 +433,10 @@ def get_image_metadata_df(
 
     final_data_image: List[Dict] = []
     for key, values in image_metadata.items():
-        for image_number, image_values in values.items():
+        for _, image_values in values.items():
             data: Dict = {}
             data["file_name"] = filename
-            data["page_num"] = key + 1
+            data["page_num"] = int(key) + 1
             data["img_num"] = int(image_values["img_num"])
             data["img_path"] = image_values["img_path"]
             data["img_desc"] = image_values["img_desc"]
@@ -459,8 +462,9 @@ def get_document_metadata(
     image_save_dir: str,
     image_description_prompt: str,
     embedding_size: int = 128,
-    text_emb_text_limit: int = 1000,
-     generation_config: Optional[GenerationConfig] = GenerationConfig(temperature=0.2, max_output_tokens=2048),
+    generation_config: Optional[GenerationConfig] = GenerationConfig(
+        temperature=0.2, max_output_tokens=2048
+    ),
     safety_settings: Optional[dict] = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
@@ -625,8 +629,8 @@ def get_user_query_image_embeddings(
         A NumPy array representing the user query image embedding.
     """
 
-    return get_image_embedding_from_multimodal_embedding_model(image_uri=image_query_path, 
-                                                               embedding_size=embedding_size
+    return get_image_embedding_from_multimodal_embedding_model(
+        image_uri=image_query_path, embedding_size=embedding_size
     )
 
 
@@ -864,7 +868,6 @@ def get_similar_text_from_query(
     text_metadata_df: pd.DataFrame,
     column_name: str = "",
     top_n: int = 3,
-    embedding_size: int = 128,
     chunk_text: bool = True,
     print_citation: bool = False,
 ) -> Dict[int, Dict[str, Any]]:
