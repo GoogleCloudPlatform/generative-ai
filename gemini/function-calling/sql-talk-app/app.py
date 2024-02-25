@@ -182,7 +182,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                             response.function_call.name,
                             params,
                             [
-                                str(api_response["description"]),
+                                str(api_response.get("description",'')),
                                 str(
                                     [
                                         column["name"]
