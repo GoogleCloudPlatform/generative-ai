@@ -1,5 +1,9 @@
 # Cloud Run application utilizing Streamlit Framework that demonstrates working with Vertex AI API
 
+| | |
+|-|-|
+|Author(s) | [Romin Irani](https://github.com/rominirani) |
+
 This application demonstrates a Cloud Run application that uses the [Streamlit](https://streamlit.io/) framework.
 
 ![Streamlit Chat App Screen](../assets/streamlitapp-screen.png "Streamlit Chat App")
