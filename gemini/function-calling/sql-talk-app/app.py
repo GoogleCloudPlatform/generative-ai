@@ -1,12 +1,8 @@
 import time
-import streamlit as st
+
 from google.cloud import bigquery
-from vertexai.generative_models import (
-    FunctionDeclaration,
-    GenerativeModel,
-    Part,
-    Tool,
-)
+import streamlit as st
+from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
@@ -105,7 +101,7 @@ with st.expander("Sample prompts", expanded=True):
     st.write(
         """
         - What kind of information is in this database?
-        - What percentage of customers return their order?
+        - What percentage of orders are returned?
         - How is inventory distributed across our regional distribution centers?
         - Do customers typically place more than one order?
         - Which product categories have the highest profit margins?
@@ -182,7 +178,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                             response.function_call.name,
                             params,
                             [
-                                str(api_response["description"]),
+                                str(api_response.get("description", "")),
                                 str(
                                     [
                                         column["name"]
