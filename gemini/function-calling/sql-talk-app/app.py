@@ -1,12 +1,8 @@
 import time
-import streamlit as st
+
 from google.cloud import bigquery
-from vertexai.generative_models import (
-    FunctionDeclaration,
-    GenerativeModel,
-    Part,
-    Tool,
-)
+import streamlit as st
+from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
@@ -182,7 +178,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                             response.function_call.name,
                             params,
                             [
-                                str(api_response.get("description",'')),
+                                str(api_response.get("description", "")),
                                 str(
                                     [
                                         column["name"]
