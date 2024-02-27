@@ -9,7 +9,6 @@ import PIL
 import fitz
 import numpy as np
 import pandas as pd
-import requests
 from vertexai.generative_models import (
     GenerationConfig,
     HarmBlockThreshold,
@@ -50,7 +49,7 @@ def get_text_embedding_from_text_embedding_model(
     text_embedding = [embedding.values for embedding in embeddings][0]
 
     if return_array:
-        text_embedding = np.fromiter(text_embedding, dtype=float)
+        return np.fromiter(text_embedding, dtype=float)
 
     # returns 768 dimensional array
     return text_embedding
@@ -75,68 +74,15 @@ def get_image_embedding_from_multimodal_embedding_model(
     Returns:
         list: A list containing the image embedding values. If `return_array` is True, returns a NumPy array instead.
     """
-    # image = Image.load_from_file(image_uri)
     image = vision_model_Image.load_from_file(image_uri)
     embeddings = multimodal_embedding_model.get_embeddings(
         image=image, contextual_text=text, dimension=embedding_size
     )  # 128, 256, 512, 1408
-    image_embedding = embeddings.image_embedding
 
     if return_array:
-        image_embedding = np.fromiter(image_embedding, dtype=float)
+        return np.fromiter(embeddings.image_embedding, dtype=float)
 
-    return image_embedding
-
-
-def load_image_bytes(image_path):
-    """Loads an image from a URL or local file path.
-
-    Args:
-        image_uri (str): URL or local file path to the image.
-
-    Raises:
-        ValueError: If `image_uri` is not provided.
-
-    Returns:
-        bytes: Image bytes.
-    """
-    # Check if the image_uri is provided
-    if not image_path:
-        raise ValueError("image_uri must be provided.")
-
-    # Load the image from a weblink
-    if image_path.startswith("http://") or image_path.startswith("https://"):
-        response = requests.get(image_path, stream=True)
-        if response.status_code == 200:
-            return response.content
-
-    # Load the image from a local path
-    else:
-        return open(image_path, "rb").read()
-
-
-def get_pdf_doc_object(pdf_path: str) -> tuple[fitz.Document, int]:
-    """
-    Opens a PDF file using fitz.open() and returns the PDF document object and the number of pages.
-
-    Args:
-        pdf_path: The path to the PDF file.
-
-    Returns:
-        A tuple containing the `fitz.Document` object and the number of pages in the PDF.
-
-    Raises:
-        FileNotFoundError: If the provided PDF path is invalid.
-
-    """
-
-    # Open the PDF file
-    doc: fitz.Document = fitz.open(pdf_path)
-
-    # Get the number of pages in the PDF file
-    num_pages: int = len(doc)
-
-    return doc, num_pages
+    return embeddings.image_embedding
 
 
 def get_text_overlapping_chunk(
@@ -205,14 +151,15 @@ def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
 
     if isinstance(text_data, dict):
         # Process each chunk
-        # print(text_data)
         for chunk_number, chunk_value in text_data.items():
-            text_embed = get_text_embedding_from_text_embedding_model(text=chunk_value)
-            embeddings_dict[chunk_number] = text_embed
+            embeddings_dict[chunk_number] = (
+                get_text_embedding_from_text_embedding_model(text=chunk_value)
+            )
     else:
         # Process the first 1000 characters of the page text
-        text_embed = get_text_embedding_from_text_embedding_model(text=text_data)
-        embeddings_dict["text_embedding"] = text_embed
+        embeddings_dict["text_embedding"] = (
+            get_text_embedding_from_text_embedding_model(text=text_data)
+        )
 
     return embeddings_dict
 
@@ -257,11 +204,9 @@ def get_chunk_text_metadata(
 
     # Chunk the text with the given limit and overlap
     chunked_text_dict: dict = get_text_overlapping_chunk(text, character_limit, overlap)
-    # print(chunked_text_dict)
 
     # Get embeddings for the chunks
     chunk_embeddings_dict: dict = get_page_text_embedding(chunked_text_dict)
-    # print(chunk_embeddings_dict)
 
     # Return all extracted data
     return text, page_text_embeddings_dict, chunked_text_dict, chunk_embeddings_dict
@@ -485,17 +430,16 @@ def get_document_metadata(
             "\n\n",
         )
 
-        doc, num_pages = get_pdf_doc_object(pdf_path)
+        # Open the PDF file
+        doc: fitz.Document = fitz.open(pdf_path)
 
         file_name = pdf_path.split("/")[-1]
 
         text_metadata: Dict[Union[int, str], Dict] = {}
         image_metadata: Dict[Union[int, str], Dict] = {}
 
-        for page_num in range(num_pages):
+        for page_num, page in enumerate(doc):
             print(f"Processing page: {page_num + 1}")
-
-            page = doc[page_num]
 
             text = page.get_text()
             (
@@ -634,8 +578,7 @@ def get_cosine_score(
         The cosine similarity score (rounded to two decimal places) between the user query embedding and the dataframe embedding.
     """
 
-    text_cosine_score = round(np.dot(dataframe[column_name], input_text_embed), 2)
-    return text_cosine_score
+    return round(np.dot(dataframe[column_name], input_text_embd), 2)
 
 
 def print_text_to_image_citation(
