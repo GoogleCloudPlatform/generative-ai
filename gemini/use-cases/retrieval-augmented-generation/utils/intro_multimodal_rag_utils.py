@@ -3,6 +3,7 @@ import os
 import time
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
+from colorama import Fore, Style
 from IPython.display import display
 import PIL
 import fitz
@@ -136,25 +137,6 @@ def get_pdf_doc_object(pdf_path: str) -> tuple[fitz.Document, int]:
     num_pages: int = len(doc)
 
     return doc, num_pages
-
-
-# Add colors to the print
-class Color:
-    """
-    This class defines a set of color codes that can be used to print text in different colors.
-    This will be used later to print citations and results to make outputs more readable.
-    """
-
-    PURPLE: str = "\033[95m"
-    CYAN: str = "\033[96m"
-    DARKCYAN: str = "\033[36m"
-    BLUE: str = "\033[94m"
-    GREEN: str = "\033[92m"
-    YELLOW: str = "\033[93m"
-    RED: str = "\033[91m"
-    BOLD: str = "\033[1m"
-    UNDERLINE: str = "\033[4m"
-    END: str = "\033[0m"
 
 
 def get_text_overlapping_chunk(
@@ -672,36 +654,33 @@ def print_text_to_image_citation(
         None (prints formatted citations to the console).
     """
 
-    color = Color()
-
     # Iterate through the matched image citations
     for imageno, image_dict in final_images.items():
         # Print the citation header
-        print(
-            color.RED + f"Citation {imageno + 1}:",
-            "Matched image path, page number and page text: \n" + color.END,
-        )
+        print(f"{Fore.RED}Citation {imageno + 1}:{Style.RESET_ALL}")
+        print("Matched image path, page number, and page text:")
 
         # Print the cosine similarity score
-        print(color.BLUE + "score: " + color.END, image_dict["cosine_score"])
+        print(f"{Fore.BLUE}Score:{Style.RESET_ALL}", image_dict["cosine_score"])
 
         # Print the file_name
-        print(color.BLUE + "file_name: " + color.END, image_dict["file_name"])
+        print(f"{Fore.BLUE}File name:{Style.RESET_ALL}", image_dict["file_name"])
 
         # Print the image path
-        print(color.BLUE + "path: " + color.END, image_dict["img_path"])
+        print(f"{Fore.BLUE}Path:{Style.RESET_ALL}", image_dict["img_path"])
 
         # Print the page number
-        print(color.BLUE + "page number: " + color.END, image_dict["page_num"])
+        print(f"{Fore.BLUE}Page number:{Style.RESET_ALL}", image_dict["page_num"])
 
         # Print the page text
         print(
-            color.BLUE + "page text: " + color.END, "\n".join(image_dict["page_text"])
+            f"{Fore.BLUE}Page text:{Style.RESET_ALL}",
+            "\n".join(image_dict["page_text"]),
         )
 
         # Print the image description
         print(
-            color.BLUE + "image description: " + color.END,
+            f"{Fore.BLUE}Image description:{Style.RESET_ALL}",
             image_dict["image_description"],
         )
 
@@ -730,30 +709,33 @@ def print_text_to_text_citation(
         None (prints formatted citations to the console).
     """
 
-    color = Color()
-
     # Iterate through the matched text citations
     for textno, text_dict in final_text.items():
         # Print the citation header
-        print(color.RED + f"Citation {textno + 1}:", "Matched text: \n" + color.END)
+        print(f"{Fore.RED}Citation {textno + 1}: Matched text:{Style.RESET_ALL}")
 
         # Print the cosine similarity score
-        print(color.BLUE + "score: " + color.END, text_dict["cosine_score"])
+        print(f"{Fore.BLUE}Score:{Style.RESET_ALL}", text_dict["cosine_score"])
 
         # Print the file_name
-        print(color.BLUE + "file_name: " + color.END, text_dict["file_name"])
+        print(f"{Fore.BLUE}File name:{Style.RESET_ALL}", text_dict["file_name"])
 
         # Print the page number
-        print(color.BLUE + "page_number: " + color.END, text_dict["page_num"])
+        print(f"{Fore.BLUE}Page:{Style.RESET_ALL}", text_dict["page_num"])
+
+        # Print the page number
+        print(f"{Fore.BLUE}Page number:{Style.RESET_ALL}", text_dict["page_num"])
 
         # Print the matched text based on the chunk_text argument
         if chunk_text:
             # Print chunk number and chunk text
-            print(color.BLUE + "chunk_number: " + color.END, text_dict["chunk_number"])
-            print(color.BLUE + "chunk_text: " + color.END, text_dict["chunk_text"])
+            print(
+                f"{Fore.BLUE}Chunk number:{Style.RESET_ALL}", text_dict["chunk_number"]
+            )
+            print(f"{Fore.BLUE}Chunk text:{Style.RESET_ALL}", text_dict["chunk_text"])
         else:
             # Print page text
-            print(color.BLUE + "page text: " + color.END, text_dict["page_text"])
+            print(f"{Fore.BLUE}Page text:{Style.RESET_ALL}", text_dict["page_text"])
 
         # Only print the first citation if print_top is True
         if print_top and textno == 0:
