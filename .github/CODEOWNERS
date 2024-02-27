@@ -11,13 +11,14 @@
 /generative-ai/embeddings                                   @kazunori279 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/embeddings/use-cases/outlier-detection       @rarsan @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini                                       @polong-lin @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/evaluation                            @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/function-calling                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions @shanecglass @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/evaluation                            @inardini @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language                                     @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/getting-started                     @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/grounding                           @koverholt @holtskinner @GoogleCloudPlatform/generative-ai-devrel
