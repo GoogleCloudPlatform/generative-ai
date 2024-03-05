@@ -2,7 +2,7 @@
 
 | | |
 |-|-|
-|Author(s) | [Polong Lin](https://github.com/polong-lin) |
+|Author(s) | [Thu Ya Kyaw](https://github.com/iamthuya) |
 
 This guide provides instructions on how to use Vertex AI Studio through the Google Cloud console, without using the API or Python SDK.
 
