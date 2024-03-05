@@ -2,7 +2,7 @@
 
 | | |
 |-|-|
-|Author(s) | [Polong Lin](https://github.com/polong-lin) |
+|Author(s) | [Thu Ya Kyaw](https://github.com/iamthuya) |
 
 This guide provides instructions on how to use Vertex AI Studio through the Google Cloud console, without using the API or Python SDK.
 
@@ -10,7 +10,7 @@ This guide provides instructions on how to use Vertex AI Studio through the Goog
 
 [Vertex AI Studio](https://cloud.google.com/generative-ai-studio) is a cloud-based platform that allows users to create and experiment with generative AI models. The platform provides a variety of tools and resources that make it easy to get started with generative AI, even if you don't have a background in machine learning.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/overview.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/overview_one.jpg)
 
 ---
 
@@ -19,13 +19,10 @@ This guide provides instructions on how to use Vertex AI Studio through the Goog
 There are two ways to access the Language offerings from Vertex AI Studio on Google Cloud:
 
 - Click the **OPEN** button at the bottom of the **Language** box on the Vertex AI Studio Overview page.
-- Click **Language** from the menu on the left under Vertex AI Studio tab.
-
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/open-language.jpg)
 
 Upon clicking, the following page will be presented.
 
-![Language page of Generative AI](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/landing.jpg)
+![Language page of Generative AI](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/landing_one.jpg)
 
 ---
 
@@ -35,11 +32,11 @@ Upon clicking, the following page will be presented.
 
 Create Prompt lets you designs prompts for tasks relevant to your business use case including code generation. To get started, click on the **+ TEXT PROMPT** button as shown in the image below
 
-![Create Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click-create-prompt.jpg)
+![Create Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_prompt.jpg)
 
 Upon clicking, you will be redirected to the following page. You can hover or click on **?** buttons to find out more about each field and parameter. Also, the following image has been annotated to provide a quick overview of the interface.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-prompt-annotated.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_prompt_annotated.jpg)
 
 You can feed your desired input text, e.g. a question, to the model. The model will then provide a response based on how you structured your prompt. The process of figuring out and designing the best input text (prompt) to get the desired response back from the model is called **Prompt Design**.
 
@@ -65,7 +62,7 @@ You will try zero-shot prompting in **FREE-FORM** mode. To start,
 
 The model will respond a comprehensive definition of the term prompt gallery.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-prompt-freeform.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_prompt_freeform.jpg)
 
 Here are a few exploratory exercises for you to explore.
 
@@ -90,7 +87,7 @@ In this section, you will ask the model to complete a sentence. Go back to the *
 
 You would see a similar result as shown in the image below.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-prompt-structured-zero-shot.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_prompt_structured_zero_shot.jpg)
 
 Instead of completing the sentence, the model gave a full sentence as a response which is not what we wanted. You can try to influence the model's response with one-shot prompting. This time around you will add an example for the model to based its output from.
 
@@ -103,7 +100,7 @@ Under **Examples** field,
 Now the model will respond to complete the sentence instead.
 The response should be something similar to this.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-prompt-structured-one-shot.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_prompt_structured_one_shot.jpg)
 
 Congrats! You have successfully influenced the way the model produces response.
 
@@ -114,7 +111,7 @@ For the next task, you will use the model to perform sentiment analysis on a sen
 - copy the prompt "It was a time well spent!" over to the **INPUT** field
 - click on the **SUBMIT** button on the right side of the page
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-prompt-structured-sentiment-zero-shot.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_prompt_structured_sentiment_zero_shot.jpg)
 
 As you can see, the model did not have enough information to know whether you were asking it to do sentiment analysis. This can be improved by providing the model with a few examples of what you are looking for.
 
@@ -128,17 +125,17 @@ Try adding these examples as shown in the image below:
 
 and click on the **SUBMIT** button on the right side of the page
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-prompt-structured-sentiment-few-shot.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_prompt_structured_sentiment_few_shot.jpg)
 
 The model will now responds the way you wanted. It should respond as **positive**.
 
 You can also save the newly designed prompt. To save the prompt, click on **SAVE** button and name it anyway you like.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-prompt-save-prompt.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_prompt_save_prompt.jpg)
 
 The saved prompt will appear at the **MY PROMPTS** tab.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/my-prompts-saved.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/my_prompts_saved.jpg)
 
 ---
 
@@ -146,11 +143,11 @@ The saved prompt will appear at the **MY PROMPTS** tab.
 
 Go back to the **Language** page and click on the **+ TEXT CHAT** button to create a new chat prompt.
 
-![Text Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click-create-chat-prompt.jpg)
+![Text Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_chat_prompt.jpg)
 
 You will see the new chat prompt page. It's relatively similar to the new prompt page that you went through earlier.
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-chat-prompt.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_chat_prompt.jpg)
 
 For this section, you will add context to the chat and let the model respond based on the context provided. Let's add these contexts to the **Context** field.
 
@@ -163,7 +160,7 @@ For this section, you will add context to the chat and let the model respond bas
 - copy "my computer is so slow" to the chatbox and
 - press **Enter** key or click the send message button (the right arrow-head button)
 
-![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new-chat-prompt-with-context.jpg)
+![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_chat_prompt_with_context.jpg)
 
 The model would consider the provided additional context and answer the questions within the constraints.
 
@@ -171,4 +168,4 @@ The model would consider the provided additional context and answer the question
 
 Prompt Gallery lets you explore how generative AI models can work for a variety of use cases. There are a variety of topics: Summarization, Classification, Extraction, Writing, and Ideation for you to explore. Head back to the **Get Started** page and explore them at your own pace.
 
-![Language page of Generative AI](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/landing.jpg)
+![Language page of Generative AI](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/landing_one.jpg)
