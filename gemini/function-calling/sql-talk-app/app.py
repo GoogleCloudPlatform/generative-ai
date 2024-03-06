@@ -39,6 +39,8 @@ get_table_func = FunctionDeclaration(
             "table_id": {
                 "type": "string",
                 "description": "Fully qualified ID of the table to get information about",
+                "type": "int",
+                "description": "Fully qualified ID 2 of the table to get information about"
             }
         },
         "required": [
