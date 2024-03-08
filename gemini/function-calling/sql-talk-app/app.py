@@ -9,6 +9,7 @@ list_datasets_func = FunctionDeclaration(
     description="Get a list of datasets that will help answer the user's question",
     parameters={
         "type": "object",
+        "type": "",
         "properties": {},
     },
 )
