@@ -196,7 +196,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                     )  # Data limit per query job
                     query_job = client.query(params["query"], job_config=job_config)
                     api_response = query_job.result()
-                    api_response = str([row for row in api_response])
+                    api_response = str([dict(row) for row in api_response])
                     api_requests_and_responses.append(
                         [response.function_call.name, params, api_response]
                     )
