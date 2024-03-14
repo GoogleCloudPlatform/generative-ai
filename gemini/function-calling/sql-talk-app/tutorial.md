@@ -36,12 +36,7 @@ to:
 st.title("Hello from SQL Talk with BigQuery")
 ```
 
-### Explore another dataset
-
-Try rewriting the function definitions and application code to try new things!
-
-Try changing the `BIGQUERY_DATASET_ID` to another dataset in the BigQuery Public
-Datasets such as `stackoverflow` or `github_repos`.
+Then refresh the web app, and you should see the new title in place.
 
 ### Extending the app
 
@@ -50,6 +45,14 @@ Consider adding and modifying the available tools to perform:
 - Data visualization: Create charts/graphs to summarize the findings
 - Other database integrations: Support for PostgreSQL, MySQL, etc.
 - APIs: Connect to weather APIs, translation services, and more.
+
+## Cleanup
+
+When you are done
+
+- Delete the sample dataset in BigQuery
+- Delete the data transfer job in BigQuery
+- Disable the Vertex AI and BigQuery APIs
 
 ## Conclusion
 
