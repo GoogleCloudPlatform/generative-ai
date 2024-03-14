@@ -1,8 +1,6 @@
-# SQL Talk App - Cloud Shell Tutorial
+# Welcome to the SQL Talk app tutorial
 
-## Welcome to the SQL Talk app tutorial
-
-### Overview
+## Overview
 
 This app demonstrates the power of Gemini's function calling capabilities,
 enabling users to query and understand their BigQuery databases using natural
