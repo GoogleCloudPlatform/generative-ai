@@ -26,10 +26,12 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 - A Google Cloud project with billing enabled
 - A BigQuery dataset (we used the
   [`thelook_ecommerce` public dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce))
-- APIs for Vertex AI and BigQuery enabled
+- APIs for Vertex AI, BigQuery, and Cloud Run enabled
 - Familiarity with Python and SQL concepts
 
-## Run the app locally
+## Option 1: Run and edit the app in Cloud Shell
+
+Open this repository in [Google Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&ephemeral=true&cloudshell_workspace=gemini/function-calling/sql-talk-app/)
 
 1. Clone this repository
 2. `cd` into the `gemini/function-calling/sql-talk-app` directory
@@ -37,7 +39,7 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 4. Run the app with `streamlit run app.py`
 5. Navigate to the app in your browser at a URL similar to `http://localhost:8501`
 
-## Configuring a service account
+## Option 2: Deploy the app to Cloud Run
 
 When deploying this app to Cloud Run, a best practice is to [create a service
 account](https://cloud.google.com/iam/docs/service-accounts-create) to attach
@@ -48,8 +50,6 @@ data from BigQuery, run BigQuery jobs, and use resources in Vertex AI:
 - [BigQuery Job User](https://cloud.google.com/bigquery/docs/access-control#bigquery.jobUser) (`roles/bigquery.jobUser`)
 - [Vertex AI User](https://cloud.google.com/vertex-ai/docs/general/access-control#aiplatform.user) (`roles/aiplatform.user`)
 
-## Deploy the app to Cloud Run
-
 To deploy this app to
 [Cloud Run](https://cloud.google.com/run/docs/deploying-source-code), run the
 following command to have the app built with Cloud Build and deployed to Cloud
@@ -59,8 +59,6 @@ similar to:
 ```shell
 gcloud run deploy sql-talk --allow-unauthenticated --region us-central1 --service-account SERVICE_ACCOUNT_NAME@PROJECT_ID.iam.gserviceaccount.com --source .
 ```
-
-## Access the deployed app
 
 After deploying your app, you should can visit the app URL, which should be
 similar to:
