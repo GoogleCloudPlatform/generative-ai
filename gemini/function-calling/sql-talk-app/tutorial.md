@@ -22,7 +22,7 @@ Let's get started!
 
 Run the following command in the Cloud Shell:
 
-```
+```bash
 bash setup.sh
 ```
 
@@ -37,7 +37,7 @@ This script will:
 Once the app is running, you'll see output in the terminal window similar to the
 following:
 
-```
+```bash
   You can now view your Streamlit app in your browser.
 
   Network URL: http://10.88.0.3:8080
