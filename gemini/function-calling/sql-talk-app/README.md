@@ -29,11 +29,14 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 - APIs for Vertex AI, BigQuery, and Cloud Run enabled
 - Familiarity with Python and SQL concepts
 
-## Run and edit the app in Cloud Shell Editor
+## Run and modify the app in Cloud Shell Editor
+
+After you've tried out the live demo app, you can also run and modify the app
+using the Cloud Shell editor.
 
 [Open this repository and the sample app](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&cloudshell_workspace=gemini/function-calling/sql-talk-app/&cloudshell_tutorial=tutorial.md&cloudshell_git_branch=sql-talk-tutorials&cloudshell_open_in_editor=app.py)
-in the Google Cloud Shell Editor, then follow the steps displayed in the
-tutorial in the sidebar.
+in the Cloud Shell Editor, then follow the steps displayed in the tutorial in
+the sidebar.
 
 ## Additional resources
 
