@@ -20,8 +20,8 @@ bq mk \
 
 # Install Python
 export PYTHON_PREFIX=~/miniconda
-curl -LO https://repo.anaconda.com/miniconda/Miniconda3-py311_24.1.2-0-Linux-x86_64.sh
-bash Miniconda3-py311_24.1.2-0-Linux-x86_64.sh -fbp ${PYTHON_PREFIX}
+curl -LO https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+bash Miniforge3-Linux-x86_64.sh -fbp ${PYTHON_PREFIX}
 
 # Install packages
 ${PYTHON_PREFIX}/bin/pip install -r requirements.txt

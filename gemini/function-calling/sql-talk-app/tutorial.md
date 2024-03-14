@@ -2,7 +2,14 @@
 
 ## Running the SQL Talk app
 
-### Run the setup script
+This app demonstrates the power of Gemini's function calling capabilities,
+enabling users to query and understand their BigQuery databases using natural
+language. Forget complex SQL syntax – interact with your data conversationally.
+
+Use the steps in this tutorial to run your own copy of the SQL Talk app using
+Cloud Shell in your own Google Cloud project.
+
+## Run the setup script
 
 Run the following command in the Cloud Shell:
 
