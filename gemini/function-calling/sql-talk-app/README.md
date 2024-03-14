@@ -7,12 +7,12 @@
 ## Overview
 
 This app demonstrates the power of
-[Gemini's function calling](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
+[Gemini's Function Calling](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
 capabilities, enabling users to query and understand their
 [BigQuery](https://cloud.google.com/bigquery) databases using natural language.
 Forget complex SQL syntax – interact with your data conversationally.
 
-Function calling in Gemini lets developers create a description of a function in
+Function Calling in Gemini lets developers create a description of a function in
 their code, then pass that description to a language model in a request. The
 response from the model includes the name of a function that matches the
 description and the arguments to call it with.
@@ -34,6 +34,15 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 [Open this repository and the sample app](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&cloudshell_workspace=gemini/function-calling/sql-talk-app/&cloudshell_tutorial=tutorial.md&cloudshell_git_branch=sql-talk-tutorials&cloudshell_open_in_editor=app.py)
 in the Google Cloud Shell Editor, then follow the steps displayed in the
 tutorial in the sidebar.
+
+## Additional resources
+
+You can learn more about Function Calling in Gemini with these guides and
+resources:
+
+- [Documentation on Function Calling in Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
+- [Codelab on How to Interact with APIs Using Function Calling in Gemini](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
+- [Sample notebook for Function Calling with the Gemini API](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)
 
 ## (Optional) Deploy the app to Cloud Run
 
@@ -62,12 +71,3 @@ similar to:
 [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://sql-talk-r5gdynozbq-uc.a.run.app/)
 
 Congratulations, you've successfully deployed the SQL Talk demo app!
-
-## Additional resources
-
-You can learn more about function calling in Gemini with these guides and
-resources:
-
-- [Documentation on function calling in Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
-- [Codelab on How to Interact with APIs Using Function Calling in Gemini](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
-- [Sample notebook for Function Calling with the Gemini API](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)
