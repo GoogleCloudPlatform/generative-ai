@@ -21,8 +21,9 @@ bq mk \
 
 # Install Python
 export PYTHON_PREFIX=~/miniforge
-curl -LO https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
-bash Miniforge3-Linux-x86_64.sh -fbp ${PYTHON_PREFIX}
+curl -LO https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh ~/miniforge.sh
+bash miniforge.sh -fbp ${PYTHON_PREFIX}
+rm -rf ~/miniforge.sh
 
 # Install packages
 ${PYTHON_PREFIX}/bin/pip install -r requirements.txt
