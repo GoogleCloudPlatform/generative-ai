@@ -8,7 +8,7 @@ This app demonstrates the power of Gemini's function calling capabilities,
 enabling users to query and understand their BigQuery databases using natural
 language.
 
-## Tutorial
+### Tutorial
 
 You can follow the steps in this tutorial to run your own version of the SQL
 Talk app and make changes to the live app using the Cloud Shell Editor in your
