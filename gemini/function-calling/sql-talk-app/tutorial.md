@@ -14,6 +14,8 @@ You can follow the steps in this tutorial to run your own version of the SQL
 Talk app and make changes to the live app using the Cloud Shell Editor in your
 own Google Cloud project.
 
+### Ready?
+
 Let's get started!
 
 ## Setup
