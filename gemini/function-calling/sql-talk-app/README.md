@@ -31,8 +31,8 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 
 ## Run and edit the app in Cloud Shell Editor
 
-Open this repository and the sample app in
-[Google Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&cloudshell_workspace=gemini/function-calling/sql-talk-app/&cloudshell_tutorial=tutorial.md&cloudshell_git_branch=sql-talk-tutorials&cloudshell_open_in_editor=app.py),
+Open this repository and the sample app in the
+[Google Cloud Shell Editor](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&cloudshell_workspace=gemini/function-calling/sql-talk-app/&cloudshell_tutorial=tutorial.md&cloudshell_git_branch=sql-talk-tutorials&cloudshell_open_in_editor=app.py),
 then follow the steps displayed in the tutorial in the sidebar.
 
 ## (Optional) Deploy the app to Cloud Run
