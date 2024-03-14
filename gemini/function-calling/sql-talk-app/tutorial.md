@@ -54,10 +54,10 @@ Once the app is running, you'll see output in the terminal window similar to the
 following:
 
 ```markdown
-  You can now view your Streamlit app in your browser.
+You can now view your Streamlit app in your browser.
 
-  Network URL: http://10.88.0.3:8080
-  External URL: http://34.69.5.212:8080
+Network URL: http://10.88.0.3:8080
+External URL: http://34.69.5.212:8080
 ```
 
 ### Access the app
