@@ -4,10 +4,13 @@
 
 This app demonstrates the power of Gemini's function calling capabilities,
 enabling users to query and understand their BigQuery databases using natural
-language. Forget complex SQL syntax – interact with your data conversationally.
+language.
 
-Use the steps in this tutorial to run your own copy of the SQL Talk app using
-Cloud Shell in your own Google Cloud project.
+You can follow the steps in this tutorial to run your own version of the SQL
+Talk app and make changes to the live app using the Cloud Shell Editor in your
+own Google Cloud project.
+
+Let's get started!
 
 ## Run the setup script
 
