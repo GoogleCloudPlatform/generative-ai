@@ -5,14 +5,14 @@ gcloud services enable aiplatform.googleapis.com
 gcloud services enable bigquery.googleapis.com
 
 # Copy public dataset
-bq mk --dataset thelook_ecommerce --force true
+bq mk --force true --dataset thelook_ecommerce
 bq mk \
+  --force true \
   --transfer_config \
   --data_source=cross_region_copy \
   --target_dataset=thelook_ecommerce \
   --display_name='SQL Talk Sample Data' \
   --schedule_end_time=$(date -u -d '5 mins' +%Y-%m-%dT%H:%M:%SZ) \
-  --force true \
   --params='{
       "source_project_id":"bigquery-public-data",
       "source_dataset_id":"thelook_ecommerce",
