@@ -18,9 +18,23 @@ Let's get started!
 
 ## Setup
 
+### Configure your project
+
+To configure your Google Cloud project to use with this sample app, run the
+following command and replace `YOUR_PROJECT_ID` with your own Google Cloud
+project ID.:
+
+```bash
+gcloud config set project YOUR_PROJECT_ID
+```
+
+ You can locate your project ID by visiting the
+ [Dashboard in the Google Cloud Console](https://console.cloud.google.com/home/dashboard).
+
 ### Running the app
 
-Run the following command in the Cloud Shell:
+To set up your Cloud Shell environment and start the sample app, run the
+following command:
 
 ```bash
 bash setup.sh
