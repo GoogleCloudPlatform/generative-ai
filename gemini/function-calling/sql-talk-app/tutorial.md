@@ -23,11 +23,23 @@ This script will:
 - Install Python and packages
 - Start the SQL Talk app
 
+### Wait for the app to run
+
+Once the app is running, you'll see output in the terminal window similar to the
+following:
+
+```
+  You can now view your Streamlit app in your browser.
+
+  Network URL: http://10.88.0.3:8080
+  External URL: http://34.69.5.212:8080
+```
+
 ### Access the app
 
-In the Cloud Shell toolbar, click the `Web Preview` icon, then select the option
-to `Preview on port 8080`. You should see a running version of the app and
-interact with it as usual.
+In the Cloud Shell Editor toolbar, click the `Web Preview` icon, then select the
+option to `Preview on port 8080`. You should see a running version of the app
+and interact with it as usual.
 
 ## Make a change
 
@@ -43,24 +55,40 @@ to:
 st.title("Hello from SQL Talk with BigQuery")
 ```
 
-Then refresh the web app, and you should see the new title in place.
+Then refresh the web app, and you should see the new title displayed.
 
 ### Extending the app
 
-Consider adding and modifying the available tools to perform:
+Consider adding and modifying the available functions to perform:
 
 - Data visualization: Create charts/graphs to summarize the findings
 - Other database integrations: Support for PostgreSQL, MySQL, etc.
 - APIs: Connect to weather APIs, translation services, and more.
 
-## Cleanup
+## Conclusion
 
-When you are done
+Congratulations! You've successfully ran and edited the SQL Talk app.
+
+### Cleaning up
+
+You can perform the following cleanup to avoid incurring charges to your Google
+Cloud account for the resources used in this tutorial:
 
 - Delete the sample dataset in BigQuery
 - Delete the data transfer job in BigQuery
-- Disable the Vertex AI and BigQuery APIs
+- Disable the
+  [Vertex AI API](https://console.cloud.google.com/apis/library/aiplatform.googleapis.com)
+  and
+  [BigQuery API](https://console.cloud.google.com/apis/library/bigquery.googleapis.com)
 
-## Conclusion
+To avoid unnecessary Google Cloud charges, use the
+[Google Cloud console](https://console.cloud.google.com/) to delete your project
+if you do not need it.
 
-Done!
+### Additional resources
+
+You can learn more about function calling in Gemini with these guides and resources:
+
+- [Documentation on function calling in Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
+- [Codelab on How to Interact with APIs Using Function Calling in Gemini](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
+- [Sample notebook for Function Calling with the Gemini API](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)

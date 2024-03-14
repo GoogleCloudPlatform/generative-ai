@@ -22,7 +22,7 @@ list_tables_func = FunctionDeclaration(
         "properties": {
             "dataset_id": {
                 "type": "string",
-                "description": "Fully qualified ID of the dataset to fetch tables from. Always use the fully qualified dataset and table names.",
+                "description": "Dataset ID to fetch tables from.",
             }
         },
         "required": [
