@@ -18,7 +18,7 @@ Let's get started!
 
 ## Setup
 
-## Running the app
+### Running the app
 
 Run the following command in the Cloud Shell:
 
