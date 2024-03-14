@@ -1,10 +1,14 @@
 # SQL Talk App - Cloud Shell Tutorial
 
-## Running the SQL Talk app
+## Welcome to the SQL Talk app tutorial
+
+### Overview
 
 This app demonstrates the power of Gemini's function calling capabilities,
 enabling users to query and understand their BigQuery databases using natural
 language.
+
+## Tutorial
 
 You can follow the steps in this tutorial to run your own version of the SQL
 Talk app and make changes to the live app using the Cloud Shell Editor in your
@@ -12,7 +16,9 @@ own Google Cloud project.
 
 Let's get started!
 
-## Run the setup script
+## Setup
+
+## Running the app
 
 Run the following command in the Cloud Shell:
 
@@ -26,7 +32,7 @@ This script will:
 - Install Python and packages
 - Start the SQL Talk app
 
-### Wait for the app to run
+### App is ready
 
 Once the app is running, you'll see output in the terminal window similar to the
 following:
@@ -44,9 +50,12 @@ In the Cloud Shell Editor toolbar, click the `Web Preview` icon, then select the
 option to `Preview on port 8080`. You should see a running version of the app
 and interact with it as usual.
 
-## Make a change
+## Modify the app
 
-Make a simple change to the app such as changing the app title from:
+### Testing changes
+
+Now that you have the app running, let's make a simple change to the app such as
+changing the app title from:
 
 ```python
 st.title("SQL Talk with BigQuery")
