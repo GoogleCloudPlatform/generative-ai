@@ -29,17 +29,11 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 - APIs for Vertex AI, BigQuery, and Cloud Run enabled
 - Familiarity with Python and SQL concepts
 
-## Option 1: Run and edit the app in Cloud Shell
+## Run and edit the app in Cloud Shell Editor
 
-Open this repository in [Google Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&ephemeral=true&cloudshell_workspace=gemini/function-calling/sql-talk-app/)
+Open this repository in [Google Cloud Shell](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&cloudshell_workspace=gemini/function-calling/sql-talk-app/&cloudshell_tutorial=tutorial.md&cloudshell_git_branch=sql-talk-tutorials&cloudshell_open_in_editor=app.py)
 
-1. Clone this repository
-2. `cd` into the `gemini/function-calling/sql-talk-app` directory
-3. Install dependencies with `pip install -r requirements.txt`
-4. Run the app with `streamlit run app.py`
-5. Navigate to the app in your browser at a URL similar to `http://localhost:8501`
-
-## Option 2: Deploy the app to Cloud Run
+## (Optional) Deploy the app to Cloud Run
 
 When deploying this app to Cloud Run, a best practice is to [create a service
 account](https://cloud.google.com/iam/docs/service-accounts-create) to attach
