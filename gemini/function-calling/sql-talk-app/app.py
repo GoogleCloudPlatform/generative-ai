@@ -38,6 +38,7 @@ get_table_func = FunctionDeclaration(
         "properties": {
             "table_id": {
                 "type": "string",
+                "type":"int",
                 "description": "Fully qualified ID of the table to get information about",
             }
         },
