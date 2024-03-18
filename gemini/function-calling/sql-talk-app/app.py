@@ -42,7 +42,7 @@ get_table_func = FunctionDeclaration(
             }
         },
         "required": [
-            "query",
+            "table_id",
         ],
     },
 )
