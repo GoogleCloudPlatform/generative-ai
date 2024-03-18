@@ -1,4 +1,5 @@
 import os
+
 import streamlit as st
 import vertexai
 from vertexai.generative_models import (

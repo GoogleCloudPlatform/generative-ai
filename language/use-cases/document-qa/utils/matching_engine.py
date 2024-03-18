@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import json
 import logging
-import uuid
 from typing import Any, Iterable, List, Optional, Type
+import uuid
 
 import google.auth
 import google.auth.transport.requests
-import requests
 from google.cloud import aiplatform_v1, storage
 from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
 from google.oauth2.service_account import Credentials
@@ -17,6 +16,7 @@ from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
+import requests
 
 logger = logging.getLogger()
 
