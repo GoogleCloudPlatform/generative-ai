@@ -4,6 +4,8 @@ from google.cloud import bigquery
 import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
+BIGQUERY_DATASET_ID = "thelook_ecommerce"
+
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
     description="Get a list of datasets that will help answer the user's question",
@@ -21,7 +23,7 @@ list_tables_func = FunctionDeclaration(
         "properties": {
             "dataset_id": {
                 "type": "string",
-                "description": "Fully qualified ID of the dataset to fetch tables from. Always use the fully qualified dataset and table names.",
+                "description": "Dataset ID to fetch tables from.",
             }
         },
         "required": [
@@ -158,7 +160,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
                 if response.function_call.name == "list_datasets":
                     api_response = client.list_datasets()
-                    api_response = str([dataset.dataset_id for dataset in api_response])
+                    api_response = BIGQUERY_DATASET_ID
                     api_requests_and_responses.append(
                         [response.function_call.name, params, api_response]
                     )
