@@ -195,7 +195,12 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                         maximum_bytes_billed=100000000
                     )  # Data limit per query job
                     try:
-                        cleaned_query = params["query"].replace("\\n", " ").replace("\n", "").replace("\\", "")
+                        cleaned_query = (
+                            params["query"]
+                            .replace("\\n", " ")
+                            .replace("\n", "")
+                            .replace("\\", "")
+                        )
                         query_job = client.query(cleaned_query, job_config=job_config)
                         api_response = query_job.result()
                         api_response = str([dict(row) for row in api_response])
