@@ -48,7 +48,8 @@ def list_documents(
 def search_enterprise_search(
     project_id: str,
     location: str,
-    data_store_id: str,
+    data_store_id: Optional[str] = None,
+    engine_id: Optional[str] = None,
     page_size: int = 50,
     search_query: Optional[str] = None,
     image_bytes: Optional[bytes] = None,
@@ -62,14 +63,17 @@ def search_enterprise_search(
     # Create a client
     client = discoveryengine.SearchServiceClient()
 
-    # The full resource name of the search engine serving config
-    # e.g. projects/{project_id}/locations/{location}
-    serving_config = client.serving_config_path(
-        project=project_id,
-        location=location,
-        data_store=data_store_id,
-        serving_config="default_config",
-    )
+    if data_store_id:
+        serving_config = client.serving_config_path(
+            project=project_id,
+            location=location,
+            data_store=data_store_id,
+            serving_config="default_config",
+        )
+    elif engine_id:
+        serving_config = f"projects/{project_id}/locations/{location}/collections/default_collection/engines/{engine_id}/servingConfigs/default_config"
+    else:
+        raise ValueError("Either `data_store_id` or `engine_id` must be provided.")
 
     # Configuration options for search
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
@@ -130,7 +134,7 @@ def search_enterprise_search(
     )
 
     request_url = (
-        f"https://discoveryengine.googleapis.com/v1beta/{serving_config}:search"
+        f"https://discoveryengine.googleapis.com/v1alpha/{serving_config}:search"
     )
 
     request_json = discoveryengine.SearchRequest.to_json(
