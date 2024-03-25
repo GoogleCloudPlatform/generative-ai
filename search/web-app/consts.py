@@ -33,11 +33,11 @@ WIDGET_CONFIGS = [
 CUSTOM_UI_DATASTORE_IDS = [
     {
         "name": "Google Cloud Website",
-        "datastore_id": "google-cloud-site-search_xxxxxxxx",
+        "engine_id": "google-cloud-site-search_xxxxxxxx",
     },
     {
         "name": "Google Merchandise Store (Advanced Indexing)",
-        "datastore_id": "google-merch-store_xxxxxxxx",
+        "engine_id": "google-merch-store_xxxxxxxx",
     },
 ]
 
@@ -45,7 +45,7 @@ CUSTOM_UI_DATASTORE_IDS = [
 IMAGE_SEARCH_DATASTORE_IDs = [
     {
         "name": "Google Merchandise Store",
-        "datastore_id": "google-merch-store_xxxxxxx",
+        "engine_id": "google-merch-store_xxxxxxx",
     }
 ]
 
