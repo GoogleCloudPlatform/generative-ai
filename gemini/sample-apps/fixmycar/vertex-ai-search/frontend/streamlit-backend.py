@@ -1,6 +1,7 @@
-import streamlit as st
-import requests
 import os
+
+import requests
+import streamlit as st
 
 backend_url = os.environ.get("BACKEND_URL", "http://localhost:8080")
 
