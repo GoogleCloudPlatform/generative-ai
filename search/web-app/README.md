@@ -72,10 +72,10 @@ Additional features include how to search the public Cloud Knowledge Graph using
      - ![configId](img/configId.png)
      - Be sure to set authorization type as `Public Access` and add your web application url to the `Allowed Domains` once it's deployed.
      - Add the `configId` for your Search Engines to `WIDGET_CONFIGS` in `consts.py`
-   - To use the Custom UI, add the datastore id for your search engine to `CUSTOM_UI_DATASTORE_IDS` in `consts.py`
+   - To use the Custom UI, add the engine id for your search engine to `CUSTOM_UI_DATASTORE_IDS` in `consts.py`
      - This is the string after `/engines/` in the Cloud Console URL.
        - `https://console.cloud.google.com/gen-app-builder/engines/website-search-engine_1681248733152/...`
-       - Datastore ID is `website-search-engine_1681248733152`
+       - Engine ID is `website-search-engine_1681248733152`
 
 3. Configure Recommendations
 
@@ -89,7 +89,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
    - Follow the instructions in the documentation to [enable image search](https://cloud.google.com/generative-ai-app-builder/docs/image-search#enable-advanced) for a website search engine.
       - NOTE: You must enable [Advanced Website Indexing](https://cloud.google.com/generative-ai-app-builder/docs/about-advanced-features#advanced-website-indexing) which requires [domain verification](https://cloud.google.com/generative-ai-app-builder/docs/domain-verification).
-   - Add the datastore id for your search engine to `IMAGE_SEARCH_DATASTORE_IDs` in `consts.py`.
+   - Add the engine id for your search engine to `IMAGE_SEARCH_DATASTORE_IDs` in `consts.py`.
 
 5. Deploy the Cloud Run app in your project.
 

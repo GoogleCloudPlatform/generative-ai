@@ -155,7 +155,7 @@ def search_genappbuilder() -> str:
     results, summary, request_url, raw_request, raw_response = search_enterprise_search(
         project_id=PROJECT_ID,
         location=LOCATION,
-        data_store_id=CUSTOM_UI_DATASTORE_IDS[int(search_engine)]["datastore_id"],
+        engine_id=CUSTOM_UI_DATASTORE_IDS[int(search_engine)]["engine_id"],
         search_query=search_query,
         summary_model=summary_model,
         summary_preamble=summary_preamble,
@@ -232,7 +232,7 @@ def imagesearch_genappbuilder() -> str:
         results, _, request_url, raw_request, raw_response = search_enterprise_search(
             project_id=PROJECT_ID,
             location=LOCATION,
-            data_store_id=IMAGE_SEARCH_DATASTORE_IDs[0]["datastore_id"],
+            engine_id=IMAGE_SEARCH_DATASTORE_IDs[0]["engine_id"],
             search_query=search_query,
             image_bytes=image_bytes,
             params={"search_type": 1},
