@@ -124,9 +124,15 @@ To initialize your vector database, we'll install the `pgvector` extension to Cl
 
 We've pre-generated a set of test vector embeddings to a CSV file located in `pgvector/cymbal-starlight-2024.csv`. These were generated through the Vertex AI `text-embeddings-gecko:003` model. Optionally, you can see how we did this by viewing `pgvector/generate-embeddings.ipynb`. Here, we used [pdfplumber](https://github.com/jsvine/pdfplumber) to scan the PDF into raw text, then we used the [Langchain RecursiveCharacterTextSplitter](https://python.langchain.com/docs/modules/data_connection/document_transformers/recursive_text_splitter) to chunk the raw text, while keeping sentences and words together.
 
-1. Enable the **SQL Admin API**: https://console.developers.google.com/apis/api/sqladmin.googleapis.com
+1. Download the CSV with the sample embeddings.
 
-2. Open a terminal and install the `psql` client, by following the instructions [here](https://www.postgresql.org/download/). If you're on MacOS, [you can install the `psql` tool with `brew`](https://stackoverflow.com/questions/44654216/correct-way-to-install-psql-without-full-postgres-on-macos):
+```bash
+gsutil cp gs://github-repo/generative-ai/sample-apps/fixmycar/cymbal-starlight-2024.csv .
+```
+
+2. Enable the **SQL Admin API**: https://console.developers.google.com/apis/api/sqladmin.googleapis.com
+
+3. Open a terminal and install the `psql` client, by following the instructions [here](https://www.postgresql.org/download/). If you're on MacOS, [you can install the `psql` tool with `brew`](https://stackoverflow.com/questions/44654216/correct-way-to-install-psql-without-full-postgres-on-macos):
 
 ```
 brew install libpq

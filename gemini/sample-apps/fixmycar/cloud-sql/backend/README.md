@@ -21,6 +21,6 @@ Test RAG:
 curl --location 'localhost:8080/chat' \
 --header 'Content-Type: application/json' \
 --data '{
-    "prompt": "What is the correct tire pressure PSI for a Subaru Impreza 2016?"
+    "prompt": "What is the fuel capacity of a 2024 Cymbal Starlight?"
 }'
 ```

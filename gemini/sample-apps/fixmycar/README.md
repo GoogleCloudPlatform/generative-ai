@@ -40,5 +40,6 @@ To learn more about Retrieval-Augmented Generation on Google Cloud, see:
 - [Getting Started with Gen AI on Google Cloud - Grounding](https://cloud.google.com/docs/ai-ml/generative-ai#grounding)
 - [Databases Retrieval App (SFO Airport Helper)](https://github.com/GoogleCloudPlatform/genai-databases-retrieval-app) (Cloud SQL or AlloyDB)
 - [RAG Reference Architecture on Google Cloud with Vertex AI and AlloyDB](https://cloud.google.com/architecture/rag-capable-gen-ai-app-using-vertex-ai) + [Codelab](https://codelabs.developers.google.com/codelabs/genai-db-retrieval-app)
-- [Blog post: Your RAGs powered by Google Search technology, part 1](https://cloud.google.com/blog/products/ai-machine-learning/rags-powered-by-google-search-technology-part-1)
+- [Blog post: Your RAGs powered by Google Search technology, part 1](https://cloud.google.com/blog/products/ai-machine-learning/rags-powered-by-google-search-technology-part-1), [part 2](https://cloud.google.com/blog/products/ai-machine-learning/rags-powered-by-google-search-technology-part-2)
 - [On-demand webinar: Building RAG Applications with Google's AI Powered Databases](https://cloudonair.withgoogle.com/events/building-rag-applications-with-an-alloydb-database)
+- [On-demand webinar: Accelerate Your Gen AI Journey: Build Gen AI applications in minutes with Google AI](https://cloudonair.withgoogle.com/events/accelerate-your-gen-ai-journey-build-gen-ai-applications-in-minutes-with-google-ai)
