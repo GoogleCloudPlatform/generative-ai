@@ -4,6 +4,8 @@ from google.cloud import bigquery
 import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
+BIGQUERY_DATASET_ID = "thelook_ecommerce"
+
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
     description="Get a list of datasets that will help answer the user's question",
@@ -21,7 +23,7 @@ list_tables_func = FunctionDeclaration(
         "properties": {
             "dataset_id": {
                 "type": "string",
-                "description": "Fully qualified ID of the dataset to fetch tables from. Always use the fully qualified dataset and table names.",
+                "description": "Dataset ID to fetch tables from.",
             }
         },
         "required": [
@@ -42,7 +44,7 @@ get_table_func = FunctionDeclaration(
             }
         },
         "required": [
-            "query",
+            "table_id",
         ],
     },
 )
@@ -158,7 +160,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
                 if response.function_call.name == "list_datasets":
                     api_response = client.list_datasets()
-                    api_response = str([dataset.dataset_id for dataset in api_response])
+                    api_response = BIGQUERY_DATASET_ID
                     api_requests_and_responses.append(
                         [response.function_call.name, params, api_response]
                     )
@@ -194,12 +196,25 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                     job_config = bigquery.QueryJobConfig(
                         maximum_bytes_billed=100000000
                     )  # Data limit per query job
-                    query_job = client.query(params["query"], job_config=job_config)
-                    api_response = query_job.result()
-                    api_response = str([row for row in api_response])
-                    api_requests_and_responses.append(
-                        [response.function_call.name, params, api_response]
-                    )
+                    try:
+                        cleaned_query = (
+                            params["query"]
+                            .replace("\\n", " ")
+                            .replace("\n", "")
+                            .replace("\\", "")
+                        )
+                        query_job = client.query(cleaned_query, job_config=job_config)
+                        api_response = query_job.result()
+                        api_response = str([dict(row) for row in api_response])
+                        api_response = api_response.replace("\\", "").replace("\n", "")
+                        api_requests_and_responses.append(
+                            [response.function_call.name, params, api_response]
+                        )
+                    except Exception as e:
+                        api_response = f"{str(e)}"
+                        api_requests_and_responses.append(
+                            [response.function_call.name, params, api_response]
+                        )
 
                 print(api_response)
 

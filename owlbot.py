@@ -31,4 +31,4 @@ s.replace(
 # Run blacken session
 # ----------------------------------------------------------------------------
 
-s.shell.run(["nox", "-s", "blacken"], hide_output=False)
+s.shell.run(["nox", "-s", "format"], hide_output=False)
