@@ -1,0 +1,14 @@
+name: Add labels to PRs
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  add_label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
