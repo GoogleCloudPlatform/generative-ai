@@ -4,15 +4,11 @@ on:
   pull_request:
     types:
       - opened
-      - edited # Temporary for testing
 
 jobs:
   add_label:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: action-label-owlbot-run
       - uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
