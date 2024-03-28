@@ -3,6 +3,9 @@ name: Add labels to new pull requests
 on:
   pull_request:
     types: opened
+  push:
+    branches:
+      - action-label-owlbot-run  # Temporary for testing
 
 jobs:
   add_label:
