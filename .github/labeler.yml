@@ -1,0 +1,3 @@
+"owlbot:run":
+- changed-files:
+  - any-glob-to-any-file: '*'

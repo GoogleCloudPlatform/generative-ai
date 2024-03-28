@@ -1,4 +1,4 @@
-name: Add labels to new pull requests
+name: Add labels to PRs
 
 on:
   pull_request:
@@ -14,4 +14,3 @@ jobs:
       - uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          labels: "owlbot:run"
