@@ -2,10 +2,9 @@ name: Add labels to PRs
 
 on:
   pull_request:
-    types: opened
-  push:
-    branches:
-      - action-label-owlbot-run  # Temporary for testing
+    types:
+      - opened
+      - edited # Temporary for testing
 
 jobs:
   add_label:
