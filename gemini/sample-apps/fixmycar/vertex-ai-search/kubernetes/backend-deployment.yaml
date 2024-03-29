@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fixmycar-backend
+  labels:
+    app: fixmycar-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fixmycar-backend
+  template:
+    metadata:
+      labels:
+        app: fixmycar-backend
+    spec:
+      containers:
+        - name: fixmycar-backend
+          image: us-central1-docker.pkg.dev/PROJECT-ID/fixmycar/backend-vertex-ai-search:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3100
+          resources:
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          env:
+            - name: LOG_LEVEL
+              value: "debug"
+            - name: GCP_PROJECT_ID
+              value: "PROJECT-ID"
+            - name: VERTEX_AI_DATASTORE_ID
+              value: "YOUR-DATASTORE-ID"
+      serviceAccountName: fixmycar
