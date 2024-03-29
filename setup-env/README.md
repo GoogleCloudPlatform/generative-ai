@@ -15,7 +15,7 @@ When you first create an account, you get a $300 free credit towards your comput
 
 2. [Make sure that billing is enabled for your project](https://cloud.google.com/billing/docs/how-to/modify-project).
 
-3. [Enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com).
+3. [Enable the Vertex AI API and Google Cloud Storage API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com,storage.googleapis.com).
 
 ## Notebook environments
 
