@@ -10,7 +10,8 @@ We provide instructions for setting up your environment in [Cloud Shell](https:/
 
 ## Sample Applications
 
-| Requirement | Application Name | Technologies Used |
-|---|---|---|
-|Develop a Gemini application using [Streamlit](https://streamlit.io/) framework and Vertex AI Gemini API model.|[gemini-streamlit-cloudrun](gemini-streamlit-cloudrun)|Cloud Run, Streamlit, Python|
-|Try Gemini image recognition in `bash` and see Text-to-Speech read the description to you in ~any language. All from CLI!|[image-bash-jam/](image-bash-jam/)|Text-to-Speech, Bash|
+| Requirement                                                                                                               | Application Name                                       | Technologies Used                     |
+| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------- |
+| Develop a Gemini application using [Streamlit](https://streamlit.io/) framework and Vertex AI Gemini API model.           | [gemini-streamlit-cloudrun](gemini-streamlit-cloudrun) | Cloud Run, Streamlit, Python          |
+| Deploy a RAG + Gemini sample application to troubleshoot your car using the owner's manual.                               | [fixmycar/](fixmycar/)                                 | Chat, Grounding, RAG, Java, Streamlit |
+| Try Gemini image recognition in `bash` and see Text-to-Speech read the description to you in ~any language. All from CLI! | [image-bash-jam/](image-bash-jam/)                     | Text-to-Speech, Bash                  |
