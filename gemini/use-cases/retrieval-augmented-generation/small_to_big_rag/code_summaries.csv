@@ -1,0 +1,2014 @@
+filename,content,summary
+checkoutservice.go,"// Copyright 2018 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the ""License"");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an ""AS IS"" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package main
+
+import (
+	""context""
+	""fmt""
+	""net""
+	""os""
+	""time""
+
+	""cloud.google.com/go/profiler""
+	""github.com/google/uuid""
+	""github.com/pkg/errors""
+	""github.com/sirupsen/logrus""
+	""google.golang.org/grpc""
+	""google.golang.org/grpc/codes""
+	""google.golang.org/grpc/status""
+
+	pb ""github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/genproto""
+	money ""github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/money""
+	healthpb ""google.golang.org/grpc/health/grpc_health_v1""
+
+	""go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc""
+	""go.opentelemetry.io/otel""
+	""go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc""
+	""go.opentelemetry.io/otel/propagation""
+	sdktrace ""go.opentelemetry.io/otel/sdk/trace""
+)
+
+const (
+	listenPort  = ""5050""
+	usdCurrency = ""USD""
+)
+
+var log *logrus.Logger
+
+func init() {
+	log = logrus.New()
+	log.Level = logrus.DebugLevel
+	log.Formatter = &logrus.JSONFormatter{
+		FieldMap: logrus.FieldMap{
+			logrus.FieldKeyTime:  ""timestamp"",
+			logrus.FieldKeyLevel: ""severity"",
+			logrus.FieldKeyMsg:   ""message"",
+		},
+		TimestampFormat: time.RFC3339Nano,
+	}
+	log.Out = os.Stdout
+}
+
+type checkoutService struct {
+	productCatalogSvcAddr string
+	productCatalogSvcConn *grpc.ClientConn
+
+	cartSvcAddr string
+	cartSvcConn *grpc.ClientConn
+
+	currencySvcAddr string
+	currencySvcConn *grpc.ClientConn
+
+	shippingSvcAddr string
+	shippingSvcConn *grpc.ClientConn
+
+	emailSvcAddr string
+	emailSvcConn *grpc.ClientConn
+
+	paymentSvcAddr string
+	paymentSvcConn *grpc.ClientConn
+}
+
+func main() {
+	ctx := context.Background()
+	if os.Getenv(""ENABLE_TRACING"") == ""1"" {
+		log.Info(""Tracing enabled."")
+		initTracing()
+
+	} else {
+		log.Info(""Tracing disabled."")
+	}
+
+	if os.Getenv(""ENABLE_PROFILER"") == ""1"" {
+		log.Info(""Profiling enabled."")
+		go initProfiling(""checkoutservice"", ""1.0.0"")
+	} else {
+		log.Info(""Profiling disabled."")
+	}
+
+	port := listenPort
+	if os.Getenv(""PORT"") != """" {
+		port = os.Getenv(""PORT"")
+	}
+
+	svc := new(checkoutService)
+	mustMapEnv(&svc.shippingSvcAddr, ""SHIPPING_SERVICE_ADDR"")
+	mustMapEnv(&svc.productCatalogSvcAddr, ""PRODUCT_CATALOG_SERVICE_ADDR"")
+	mustMapEnv(&svc.cartSvcAddr, ""CART_SERVICE_ADDR"")
+	mustMapEnv(&svc.currencySvcAddr, ""CURRENCY_SERVICE_ADDR"")
+	mustMapEnv(&svc.emailSvcAddr, ""EMAIL_SERVICE_ADDR"")
+	mustMapEnv(&svc.paymentSvcAddr, ""PAYMENT_SERVICE_ADDR"")
+
+	mustConnGRPC(ctx, &svc.shippingSvcConn, svc.shippingSvcAddr)
+	mustConnGRPC(ctx, &svc.productCatalogSvcConn, svc.productCatalogSvcAddr)
+	mustConnGRPC(ctx, &svc.cartSvcConn, svc.cartSvcAddr)
+	mustConnGRPC(ctx, &svc.currencySvcConn, svc.currencySvcAddr)
+	mustConnGRPC(ctx, &svc.emailSvcConn, svc.emailSvcAddr)
+	mustConnGRPC(ctx, &svc.paymentSvcConn, svc.paymentSvcAddr)
+
+	log.Infof(""service config: %+v"", svc)
+
+	lis, err := net.Listen(""tcp"", fmt.Sprintf("":%s"", port))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var srv *grpc.Server
+
+	// Propagate trace context always
+	otel.SetTextMapPropagator(
+		propagation.NewCompositeTextMapPropagator(
+			propagation.TraceContext{}, propagation.Baggage{}))
+	srv = grpc.NewServer(
+		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+	)
+
+	pb.RegisterCheckoutServiceServer(srv, svc)
+	healthpb.RegisterHealthServer(srv, svc)
+	log.Infof(""starting to listen on tcp: %q"", lis.Addr().String())
+	err = srv.Serve(lis)
+	log.Fatal(err)
+}
+
+func initStats() {
+	//TODO(arbrown) Implement OpenTelemetry stats
+}
+
+func initTracing() {
+	var (
+		collectorAddr string
+		collectorConn *grpc.ClientConn
+	)
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second*3)
+	defer cancel()
+
+	mustMapEnv(&collectorAddr, ""COLLECTOR_SERVICE_ADDR"")
+	mustConnGRPC(ctx, &collectorConn, collectorAddr)
+
+	exporter, err := otlptracegrpc.New(
+		ctx,
+		otlptracegrpc.WithGRPCConn(collectorConn))
+	if err != nil {
+		log.Warnf(""warn: Failed to create trace exporter: %v"", err)
+	}
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exporter),
+		sdktrace.WithSampler(sdktrace.AlwaysSample()))
+	otel.SetTracerProvider(tp)
+
+}
+
+func initProfiling(service, version string) {
+	// TODO(ahmetb) this method is duplicated in other microservices using Go
+	// since they are not sharing packages.
+	for i := 1; i <= 3; i++ {
+		if err := profiler.Start(profiler.Config{
+			Service:        service,
+			ServiceVersion: version,
+			// ProjectID must be set if not running on GCP.
+			// ProjectID: ""my-project"",
+		}); err != nil {
+			log.Warnf(""failed to start profiler: %+v"", err)
+		} else {
+			log.Info(""started Stackdriver profiler"")
+			return
+		}
+		d := time.Second * 10 * time.Duration(i)
+		log.Infof(""sleeping %v to retry initializing Stackdriver profiler"", d)
+		time.Sleep(d)
+	}
+	log.Warn(""could not initialize Stackdriver profiler after retrying, giving up"")
+}
+
+func mustMapEnv(target *string, envKey string) {
+	v := os.Getenv(envKey)
+	if v == """" {
+		panic(fmt.Sprintf(""environment variable %q not set"", envKey))
+	}
+	*target = v
+}
+
+func mustConnGRPC(ctx context.Context, conn **grpc.ClientConn, addr string) {
+	var err error
+	ctx, cancel := context.WithTimeout(ctx, time.Second*3)
+	defer cancel()
+	*conn, err = grpc.DialContext(ctx, addr,
+		grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
+	if err != nil {
+		panic(errors.Wrapf(err, ""grpc: failed to connect %s"", addr))
+	}
+}
+
+func (cs *checkoutService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
+}
+
+func (cs *checkoutService) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_WatchServer) error {
+	return status.Errorf(codes.Unimplemented, ""health check via Watch not implemented"")
+}
+
+func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error) {
+	log.Infof(""[PlaceOrder] user_id=%q user_currency=%q"", req.UserId, req.UserCurrency)
+
+	orderID, err := uuid.NewUUID()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, ""failed to generate order uuid"")
+	}
+
+	prep, err := cs.prepareOrderItemsAndShippingQuoteFromCart(ctx, req.UserId, req.UserCurrency, req.Address)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	total := pb.Money{CurrencyCode: req.UserCurrency,
+		Units: 0,
+		Nanos: 0}
+	total = money.Must(money.Sum(total, *prep.shippingCostLocalized))
+	for _, it := range prep.orderItems {
+		multPrice := money.MultiplySlow(*it.Cost, uint32(it.GetItem().GetQuantity()))
+		total = money.Must(money.Sum(total, multPrice))
+	}
+
+	txID, err := cs.chargeCard(ctx, &total, req.CreditCard)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, ""failed to charge card: %+v"", err)
+	}
+	log.Infof(""payment went through (transaction_id: %s)"", txID)
+
+	shippingTrackingID, err := cs.shipOrder(ctx, req.Address, prep.cartItems)
+	if err != nil {
+		return nil, status.Errorf(codes.Unavailable, ""shipping error: %+v"", err)
+	}
+
+	_ = cs.emptyUserCart(ctx, req.UserId)
+
+	orderResult := &pb.OrderResult{
+		OrderId:            orderID.String(),
+		ShippingTrackingId: shippingTrackingID,
+		ShippingCost:       prep.shippingCostLocalized,
+		ShippingAddress:    req.Address,
+		Items:              prep.orderItems,
+	}
+
+	if err := cs.sendOrderConfirmation(ctx, req.Email, orderResult); err != nil {
+		log.Warnf(""failed to send order confirmation to %q: %+v"", req.Email, err)
+	} else {
+		log.Infof(""order confirmation email sent to %q"", req.Email)
+	}
+	resp := &pb.PlaceOrderResponse{Order: orderResult}
+	return resp, nil
+}
+
+type orderPrep struct {
+	orderItems            []*pb.OrderItem
+	cartItems             []*pb.CartItem
+	shippingCostLocalized *pb.Money
+}
+
+func (cs *checkoutService) prepareOrderItemsAndShippingQuoteFromCart(ctx context.Context, userID, userCurrency string, address *pb.Address) (orderPrep, error) {
+	var out orderPrep
+	cartItems, err := cs.getUserCart(ctx, userID)
+	if err != nil {
+		return out, fmt.Errorf(""cart failure: %+v"", err)
+	}
+	orderItems, err := cs.prepOrderItems(ctx, cartItems, userCurrency)
+	if err != nil {
+		return out, fmt.Errorf(""failed to prepare order: %+v"", err)
+	}
+	shippingUSD, err := cs.quoteShipping(ctx, address, cartItems)
+	if err != nil {
+		return out, fmt.Errorf(""shipping quote failure: %+v"", err)
+	}
+	shippingPrice, err := cs.convertCurrency(ctx, shippingUSD, userCurrency)
+	if err != nil {
+		return out, fmt.Errorf(""failed to convert shipping cost to currency: %+v"", err)
+	}
+
+	out.shippingCostLocalized = shippingPrice
+	out.cartItems = cartItems
+	out.orderItems = orderItems
+	return out, nil
+}
+
+func (cs *checkoutService) quoteShipping(ctx context.Context, address *pb.Address, items []*pb.CartItem) (*pb.Money, error) {
+	shippingQuote, err := pb.NewShippingServiceClient(cs.shippingSvcConn).
+		GetQuote(ctx, &pb.GetQuoteRequest{
+			Address: address,
+			Items:   items})
+	if err != nil {
+		return nil, fmt.Errorf(""failed to get shipping quote: %+v"", err)
+	}
+	return shippingQuote.GetCostUsd(), nil
+}
+
+func (cs *checkoutService) getUserCart(ctx context.Context, userID string) ([]*pb.CartItem, error) {
+	cart, err := pb.NewCartServiceClient(cs.cartSvcConn).GetCart(ctx, &pb.GetCartRequest{UserId: userID})
+	if err != nil {
+		return nil, fmt.Errorf(""failed to get user cart during checkout: %+v"", err)
+	}
+	return cart.GetItems(), nil
+}
+
+func (cs *checkoutService) emptyUserCart(ctx context.Context, userID string) error {
+	if _, err := pb.NewCartServiceClient(cs.cartSvcConn).EmptyCart(ctx, &pb.EmptyCartRequest{UserId: userID}); err != nil {
+		return fmt.Errorf(""failed to empty user cart during checkout: %+v"", err)
+	}
+	return nil
+}
+
+func (cs *checkoutService) prepOrderItems(ctx context.Context, items []*pb.CartItem, userCurrency string) ([]*pb.OrderItem, error) {
+	out := make([]*pb.OrderItem, len(items))
+	cl := pb.NewProductCatalogServiceClient(cs.productCatalogSvcConn)
+
+	for i, item := range items {
+		product, err := cl.GetProduct(ctx, &pb.GetProductRequest{Id: item.GetProductId()})
+		if err != nil {
+			return nil, fmt.Errorf(""failed to get product #%q"", item.GetProductId())
+		}
+		price, err := cs.convertCurrency(ctx, product.GetPriceUsd(), userCurrency)
+		if err != nil {
+			return nil, fmt.Errorf(""failed to convert price of %q to %s"", item.GetProductId(), userCurrency)
+		}
+		out[i] = &pb.OrderItem{
+			Item: item,
+			Cost: price}
+	}
+	return out, nil
+}
+
+func (cs *checkoutService) convertCurrency(ctx context.Context, from *pb.Money, toCurrency string) (*pb.Money, error) {
+	result, err := pb.NewCurrencyServiceClient(cs.currencySvcConn).Convert(context.TODO(), &pb.CurrencyConversionRequest{
+		From:   from,
+		ToCode: toCurrency})
+	if err != nil {
+		return nil, fmt.Errorf(""failed to convert currency: %+v"", err)
+	}
+	return result, err
+}
+
+func (cs *checkoutService) chargeCard(ctx context.Context, amount *pb.Money, paymentInfo *pb.CreditCardInfo) (string, error) {
+	paymentResp, err := pb.NewPaymentServiceClient(cs.paymentSvcConn).Charge(ctx, &pb.ChargeRequest{
+		Amount:     amount,
+		CreditCard: paymentInfo})
+	if err != nil {
+		return """", fmt.Errorf(""could not charge the card: %+v"", err)
+	}
+	return paymentResp.GetTransactionId(), nil
+}
+
+func (cs *checkoutService) sendOrderConfirmation(ctx context.Context, email string, order *pb.OrderResult) error {
+	_, err := pb.NewEmailServiceClient(cs.emailSvcConn).SendOrderConfirmation(ctx, &pb.SendOrderConfirmationRequest{
+		Email: email,
+		Order: order})
+	return err
+}
+
+func (cs *checkoutService) shipOrder(ctx context.Context, address *pb.Address, items []*pb.CartItem) (string, error) {
+	resp, err := pb.NewShippingServiceClient(cs.shippingSvcConn).ShipOrder(ctx, &pb.ShipOrderRequest{
+		Address: address,
+		Items:   items})
+	if err != nil {
+		return """", fmt.Errorf(""shipment failed: %+v"", err)
+	}
+	return resp.GetTrackingId(), nil
+}
+","This Go program implements an order checkout microservice that uses gRPC and OpenTelemetry for tracing and logging. It demonstrates how a client can interact with multiple dependent services, such as product catalog, cart management, shipping, currency conversion, payment, and email services, to complete a checkout process for a user. The code includes functions for:
+- Initializing the microservice with logging, OpenTelemetry tracing, and profiler (if enabled).
+
+- Setting up clients for gRPC connections to other dependent services using secure connections and tracing interceptors.
+
+- Implementing the checkout flow, which involves preparing and validating order details, charging the customer's credit card for payment, shipping the order, sending an order confirmation via email, and finally returning the order details and tracking information to the client.
+
+- Handling interactions with dependent services, such as obtaining a shipping quote, converting currency, charging the card, and sending emails."
+shippingservice.go,"// Copyright 2018 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the ""License"");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an ""AS IS"" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package main
+
+import (
+	""fmt""
+	""net""
+	""os""
+	""time""
+
+	""cloud.google.com/go/profiler""
+	""github.com/sirupsen/logrus""
+	""golang.org/x/net/context""
+	""google.golang.org/grpc""
+	""google.golang.org/grpc/codes""
+	""google.golang.org/grpc/reflection""
+	""google.golang.org/grpc/status""
+
+	pb ""github.com/GoogleCloudPlatform/microservices-demo/src/shippingservice/genproto""
+	healthpb ""google.golang.org/grpc/health/grpc_health_v1""
+)
+
+const (
+	defaultPort = ""50051""
+)
+
+var log *logrus.Logger
+
+func init() {
+	log = logrus.New()
+	log.Level = logrus.DebugLevel
+	log.Formatter = &logrus.JSONFormatter{
+		FieldMap: logrus.FieldMap{
+			logrus.FieldKeyTime:  ""timestamp"",
+			logrus.FieldKeyLevel: ""severity"",
+			logrus.FieldKeyMsg:   ""message"",
+		},
+		TimestampFormat: time.RFC3339Nano,
+	}
+	log.Out = os.Stdout
+}
+
+func main() {
+	if os.Getenv(""DISABLE_TRACING"") == """" {
+		log.Info(""Tracing enabled, but temporarily unavailable"")
+		log.Info(""See https://github.com/GoogleCloudPlatform/microservices-demo/issues/422 for more info."")
+		go initTracing()
+	} else {
+		log.Info(""Tracing disabled."")
+	}
+
+	if os.Getenv(""DISABLE_PROFILER"") == """" {
+		log.Info(""Profiling enabled."")
+		go initProfiling(""shippingservice"", ""1.0.0"")
+	} else {
+		log.Info(""Profiling disabled."")
+	}
+
+	port := defaultPort
+	if value, ok := os.LookupEnv(""PORT""); ok {
+		port = value
+	}
+	port = fmt.Sprintf("":%s"", port)
+
+	lis, err := net.Listen(""tcp"", port)
+	if err != nil {
+		log.Fatalf(""failed to listen: %v"", err)
+	}
+
+	var srv *grpc.Server
+	if os.Getenv(""DISABLE_STATS"") == """" {
+		log.Info(""Stats enabled, but temporarily unavailable"")
+		srv = grpc.NewServer()
+	} else {
+		log.Info(""Stats disabled."")
+		srv = grpc.NewServer()
+	}
+	svc := &server{}
+	pb.RegisterShippingServiceServer(srv, svc)
+	healthpb.RegisterHealthServer(srv, svc)
+	log.Infof(""Shipping Service listening on port %s"", port)
+
+	// Register reflection service on gRPC server.
+	reflection.Register(srv)
+	if err := srv.Serve(lis); err != nil {
+		log.Fatalf(""failed to serve: %v"", err)
+	}
+}
+
+// server controls RPC service responses.
+type server struct{}
+
+// Check is for health checking.
+func (s *server) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
+}
+
+func (s *server) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_WatchServer) error {
+	return status.Errorf(codes.Unimplemented, ""health check via Watch not implemented"")
+}
+
+// GetQuote produces a shipping quote (cost) in USD.
+func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
+	log.Info(""[GetQuote] received request"")
+	defer log.Info(""[GetQuote] completed request"")
+
+	// 1. Generate a quote based on the total number of items to be shipped.
+	quote := CreateQuoteFromCount(0)
+
+	// 2. Generate a response.
+	return &pb.GetQuoteResponse{
+		CostUsd: &pb.Money{
+			CurrencyCode: ""USD"",
+			Units:        int64(quote.Dollars),
+			Nanos:        int32(quote.Cents * 10000000)},
+	}, nil
+
+}
+
+// ShipOrder mocks that the requested items will be shipped.
+// It supplies a tracking ID for notional lookup of shipment delivery status.
+func (s *server) ShipOrder(ctx context.Context, in *pb.ShipOrderRequest) (*pb.ShipOrderResponse, error) {
+	log.Info(""[ShipOrder] received request"")
+	defer log.Info(""[ShipOrder] completed request"")
+	// 1. Create a Tracking ID
+	baseAddress := fmt.Sprintf(""%s, %s, %s"", in.Address.StreetAddress, in.Address.City, in.Address.State)
+	id := CreateTrackingId(baseAddress)
+
+	// 2. Generate a response.
+	return &pb.ShipOrderResponse{
+		TrackingId: id,
+	}, nil
+}
+
+func initStats() {
+	//TODO(arbrown) Implement OpenTelemetry stats
+}
+
+func initTracing() {
+	// TODO(arbrown) Implement OpenTelemetry tracing
+}
+
+func initProfiling(service, version string) {
+	// TODO(ahmetb) this method is duplicated in other microservices using Go
+	// since they are not sharing packages.
+	for i := 1; i <= 3; i++ {
+		if err := profiler.Start(profiler.Config{
+			Service:        service,
+			ServiceVersion: version,
+			// ProjectID must be set if not running on GCP.
+			// ProjectID: ""my-project"",
+		}); err != nil {
+			log.Warnf(""failed to start profiler: %+v"", err)
+		} else {
+			log.Info(""started Stackdriver profiler"")
+			return
+		}
+		d := time.Second * 10 * time.Duration(i)
+		log.Infof(""sleeping %v to retry initializing Stackdriver profiler"", d)
+		time.Sleep(d)
+	}
+	log.Warn(""could not initialize Stackdriver profiler after retrying, giving up"")
+}
+","This Go program implements a shipping service that uses gRPC and OpenTelemetry for logging and tracing. It provides two main functionalities:
+- Getting a shipping quote based on the number of items to be shipped, returning the cost in USD.
+- Creating a shipment with a tracking ID, which simulates the shipment process.
+
+The code includes functions for:
+- Initializing the microservice with logging and OpenTelemetry tracing and profiling (if enabled).
+- Setting up a gRPC server to handle requests and responses.
+- Implementing the `GetQuote` method to generate a shipping quote and the `ShipOrder` method to create a shipment and return a tracking ID."
+adservice.java,"/*
+ * Copyright 2018, Google LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package hipstershop;
+
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import hipstershop.Demo.Ad;
+import hipstershop.Demo.AdRequest;
+import hipstershop.Demo.AdResponse;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.StatusRuntimeException;
+import io.grpc.health.v1.HealthCheckResponse.ServingStatus;
+import io.grpc.services.*;
+import io.grpc.stub.StreamObserver;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public final class AdService {
+
+  private static final Logger logger = LogManager.getLogger(AdService.class);
+
+  @SuppressWarnings(""FieldCanBeLocal"")
+  private static int MAX_ADS_TO_SERVE = 2;
+
+  private Server server;
+  private HealthStatusManager healthMgr;
+
+  private static final AdService service = new AdService();
+
+  private void start() throws IOException {
+    int port = Integer.parseInt(System.getenv().getOrDefault(""PORT"", ""9555""));
+    healthMgr = new HealthStatusManager();
+
+    server =
+        ServerBuilder.forPort(port)
+            .addService(new AdServiceImpl())
+            .addService(healthMgr.getHealthService())
+            .build()
+            .start();
+    logger.info(""Ad Service started, listening on "" + port);
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+                  System.err.println(
+                      ""*** shutting down gRPC ads server since JVM is shutting down"");
+                  AdService.this.stop();
+                  System.err.println(""*** server shut down"");
+                }));
+    healthMgr.setStatus("""", ServingStatus.SERVING);
+  }
+
+  private void stop() {
+    if (server != null) {
+      healthMgr.clearStatus("""");
+      server.shutdown();
+    }
+  }
+
+  private static class AdServiceImpl extends hipstershop.AdServiceGrpc.AdServiceImplBase {
+
+    /**
+     * Retrieves ads based on context provided in the request {@code AdRequest}.
+     *
+     * @param req the request containing context.
+     * @param responseObserver the stream observer which gets notified with the value of {@code
+     *     AdResponse}
+     */
+    @Override
+    public void getAds(AdRequest req, StreamObserver<AdResponse> responseObserver) {
+      AdService service = AdService.getInstance();
+      try {
+        List<Ad> allAds = new ArrayList<>();
+        logger.info(""received ad request (context_words="" + req.getContextKeysList() + "")"");
+        if (req.getContextKeysCount() > 0) {
+          for (int i = 0; i < req.getContextKeysCount(); i++) {
+            Collection<Ad> ads = service.getAdsByCategory(req.getContextKeys(i));
+            allAds.addAll(ads);
+          }
+        } else {
+          allAds = service.getRandomAds();
+        }
+        if (allAds.isEmpty()) {
+          // Serve random ads.
+          allAds = service.getRandomAds();
+        }
+        AdResponse reply = AdResponse.newBuilder().addAllAds(allAds).build();
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+      } catch (StatusRuntimeException e) {
+        logger.log(Level.WARN, ""GetAds Failed with status {}"", e.getStatus());
+        responseObserver.onError(e);
+      }
+    }
+  }
+
+  private static final ImmutableListMultimap<String, Ad> adsMap = createAdsMap();
+
+  private Collection<Ad> getAdsByCategory(String category) {
+    return adsMap.get(category);
+  }
+
+  private static final Random random = new Random();
+
+  private List<Ad> getRandomAds() {
+    List<Ad> ads = new ArrayList<>(MAX_ADS_TO_SERVE);
+    Collection<Ad> allAds = adsMap.values();
+    for (int i = 0; i < MAX_ADS_TO_SERVE; i++) {
+      ads.add(Iterables.get(allAds, random.nextInt(allAds.size())));
+    }
+    return ads;
+  }
+
+  private static AdService getInstance() {
+    return service;
+  }
+
+  /** Await termination on the main thread since the grpc library uses daemon threads. */
+  private void blockUntilShutdown() throws InterruptedException {
+    if (server != null) {
+      server.awaitTermination();
+    }
+  }
+
+  private static ImmutableListMultimap<String, Ad> createAdsMap() {
+    Ad hairdryer =
+        Ad.newBuilder()
+            .setRedirectUrl(""/product/2ZYFJ3GM2N"")
+            .setText(""Hairdryer for sale. 50% off."")
+            .build();
+    Ad tankTop =
+        Ad.newBuilder()
+            .setRedirectUrl(""/product/66VCHSJNUP"")
+            .setText(""Tank top for sale. 20% off."")
+            .build();
+    Ad candleHolder =
+        Ad.newBuilder()
+            .setRedirectUrl(""/product/0PUK6V6EV0"")
+            .setText(""Candle holder for sale. 30% off."")
+            .build();
+    Ad bambooGlassJar =
+        Ad.newBuilder()
+            .setRedirectUrl(""/product/9SIQT8TOJO"")
+            .setText(""Bamboo glass jar for sale. 10% off."")
+            .build();
+    Ad watch =
+        Ad.newBuilder()
+            .setRedirectUrl(""/product/1YMWWN1N4O"")
+            .setText(""Watch for sale. Buy one, get second kit for free"")
+            .build();
+    Ad mug =
+        Ad.newBuilder()
+            .setRedirectUrl(""/product/6E92ZMYYFZ"")
+            .setText(""Mug for sale. Buy two, get third one for free"")
+            .build();
+    Ad loafers =
+        Ad.newBuilder()
+            .setRedirectUrl(""/product/L9ECAV7KIM"")
+            .setText(""Loafers for sale. Buy one, get second one for free"")
+            .build();
+    return ImmutableListMultimap.<String, Ad>builder()
+        .putAll(""clothing"", tankTop)
+        .putAll(""accessories"", watch)
+        .putAll(""footwear"", loafers)
+        .putAll(""hair"", hairdryer)
+        .putAll(""decor"", candleHolder)
+        .putAll(""kitchen"", bambooGlassJar, mug)
+        .build();
+  }
+
+  private static void initStats() {
+    if (System.getenv(""DISABLE_STATS"") != null) {
+      logger.info(""Stats disabled."");
+      return;
+    }
+    logger.info(""Stats enabled, but temporarily unavailable"");
+
+    long sleepTime = 10; /* seconds */
+    int maxAttempts = 5;
+
+    // TODO(arbrown) Implement OpenTelemetry stats
+
+  }
+
+  private static void initTracing() {
+    if (System.getenv(""DISABLE_TRACING"") != null) {
+      logger.info(""Tracing disabled."");
+      return;
+    }
+    logger.info(""Tracing enabled but temporarily unavailable"");
+    logger.info(""See https://github.com/GoogleCloudPlatform/microservices-demo/issues/422 for more info."");
+
+    // TODO(arbrown) Implement OpenTelemetry tracing
+    
+    logger.info(""Tracing enabled - Stackdriver exporter initialized."");
+  }
+
+  /** Main launches the server from the command line. */
+  public static void main(String[] args) throws IOException, InterruptedException {
+
+    new Thread(
+            () -> {
+              initStats();
+              initTracing();
+            })
+        .start();
+
+    // Start the RPC server. You shouldn't see any output from gRPC before this.
+    logger.info(""AdService starting."");
+    final AdService service = AdService.getInstance();
+    service.start();
+    service.blockUntilShutdown();
+  }
+}
+","This Java program implements an ad service using gRPC. It serves ads based on the context provided in the request, either by matching categories or serving random ads if no context is provided. The program uses the Guava library for data structures and collections.
+
+The main class `AdService` includes methods for:
+- Starting and stopping the gRPC server.
+- Blocking the main thread until server shutdown to prevent daemon threads from terminating the program prematurely.
+- Retrieving ads by category or serving random ads if no category is specified.
+- Initializing OpenTelemetry stats and tracing (if enabled).
+
+The `AdServiceImpl` class implements the `AdServiceGrpc.AdServiceImplBase` interface, which defines the `getAds` method that processes ad requests and returns an `AdResponse` with a list of ads.
+
+The code also defines static maps and lists for managing ads and generating random ads."
+paymentservice.js,"// Copyright 2018 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the ""License"");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an ""AS IS"" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+const path = require('path');
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+const charge = require('./charge');
+
+const logger = require('./logger')
+
+class HipsterShopServer {
+  constructor(protoRoot, port = HipsterShopServer.PORT) {
+    this.port = port;
+
+    this.packages = {
+      hipsterShop: this.loadProto(path.join(protoRoot, 'demo.proto')),
+      health: this.loadProto(path.join(protoRoot, 'grpc/health/v1/health.proto'))
+    };
+
+    this.server = new grpc.Server();
+    this.loadAllProtos(protoRoot);
+  }
+
+  /**
+   * Handler for PaymentService.Charge.
+   * @param {*} call  { ChargeRequest }
+   * @param {*} callback  fn(err, ChargeResponse)
+   */
+  static ChargeServiceHandler(call, callback) {
+    try {
+      logger.info(`PaymentService#Charge invoked with request ${JSON.stringify(call.request)}`);
+      const response = charge(call.request);
+      callback(null, response);
+    } catch (err) {
+      console.warn(err);
+      callback(err);
+    }
+  }
+
+  static CheckHandler(call, callback) {
+    callback(null, { status: 'SERVING' });
+  }
+
+
+  listen() {
+    const server = this.server 
+    const port = this.port
+    server.bindAsync(
+      `[::]:${port}`,
+      grpc.ServerCredentials.createInsecure(),
+      function () {
+        logger.info(`PaymentService gRPC server started on port ${port}`);
+        server.start();
+      }
+    );
+  }
+
+  loadProto(path) {
+    const packageDefinition = protoLoader.loadSync(
+      path,
+      {
+        keepCase: true,
+        longs: String,
+        enums: String,
+        defaults: true,
+        oneofs: true
+      }
+    );
+    return grpc.loadPackageDefinition(packageDefinition);
+  }
+
+  loadAllProtos(protoRoot) {
+    const hipsterShopPackage = this.packages.hipsterShop.hipstershop;
+    const healthPackage = this.packages.health.grpc.health.v1;
+
+    this.server.addService(
+      hipsterShopPackage.PaymentService.service,
+      {
+        charge: HipsterShopServer.ChargeServiceHandler.bind(this)
+      }
+    );
+
+    this.server.addService(
+      healthPackage.Health.service,
+      {
+        check: HipsterShopServer.CheckHandler.bind(this)
+      }
+    );
+  }
+}
+
+HipsterShopServer.PORT = process.env.PORT;
+
+module.exports = HipsterShopServer;
+","This JavaScript code defines a class `HipsterShopServer` that sets up a gRPC server using the `@grpc/grpc-js` library. The server handles requests for two services:
+- `PaymentService.Charge`: This method processes payment charges and returns a response.
+- `Health.Check`: This health check method returns a `SERVING` status.
+
+The server loads protocol buffer definitions (`.proto` files) from a specified directory and adds the corresponding service definitions to the gRPC server. It then starts the server on a specified port, which defaults to the value of the `PORT` environment variable."
+recommendationservice.py,"#!/usr/bin/python
+#
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the ""License"");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an ""AS IS"" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import random
+import time
+import traceback
+from concurrent import futures
+
+import googlecloudprofiler
+from google.auth.exceptions import DefaultCredentialsError
+import grpc
+
+import demo_pb2
+import demo_pb2_grpc
+from grpc_health.v1 import health_pb2
+from grpc_health.v1 import health_pb2_grpc
+
+from opentelemetry import trace
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorClient, GrpcInstrumentorServer
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
+from logger import getJSONLogger
+logger = getJSONLogger('recommendationservice-server')
+
+def initStackdriverProfiling():
+  project_id = None
+  try:
+    project_id = os.environ[""GCP_PROJECT_ID""]
+  except KeyError:
+    # Environment variable not set
+    pass
+
+  for retry in range(1,4):
+    try:
+      if project_id:
+        googlecloudprofiler.start(service='recommendation_server', service_version='1.0.0', verbose=0, project_id=project_id)
+      else:
+        googlecloudprofiler.start(service='recommendation_server', service_version='1.0.0', verbose=0)
+      logger.info(""Successfully started Stackdriver Profiler."")
+      return
+    except (BaseException) as exc:
+      logger.info(""Unable to start Stackdriver Profiler Python agent. "" + str(exc))
+      if (retry < 4):
+        logger.info(""Sleeping %d seconds to retry Stackdriver Profiler agent initialization""%(retry*10))
+        time.sleep (1)
+      else:
+        logger.warning(""Could not initialize Stackdriver Profiler after retrying, giving up"")
+  return
+
+class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
+    def ListRecommendations(self, request, context):
+        max_responses = 5
+        # fetch list of products from product catalog stub
+        cat_response = product_catalog_stub.ListProducts(demo_pb2.Empty())
+        product_ids = [x.id for x in cat_response.products]
+        filtered_products = list(set(product_ids)-set(request.product_ids))
+        num_products = len(filtered_products)
+        num_return = min(max_responses, num_products)
+        # sample list of indicies to return
+        indices = random.sample(range(num_products), num_return)
+        # fetch product ids from indices
+        prod_list = [filtered_products[i] for i in indices]
+        logger.info(""[Recv ListRecommendations] product_ids={}"".format(prod_list))
+        # build and return response
+        response = demo_pb2.ListRecommendationsResponse()
+        response.product_ids.extend(prod_list)
+        return response
+
+    def Check(self, request, context):
+        return health_pb2.HealthCheckResponse(
+            status=health_pb2.HealthCheckResponse.SERVING)
+
+    def Watch(self, request, context):
+        return health_pb2.HealthCheckResponse(
+            status=health_pb2.HealthCheckResponse.UNIMPLEMENTED)
+
+
+if __name__ == ""__main__"":
+    logger.info(""initializing recommendationservice"")
+
+    try:
+      if ""DISABLE_PROFILER"" in os.environ:
+        raise KeyError()
+      else:
+        logger.info(""Profiler enabled."")
+        initStackdriverProfiling()
+    except KeyError:
+        logger.info(""Profiler disabled."")
+
+    try:
+      grpc_client_instrumentor = GrpcInstrumentorClient()
+      grpc_client_instrumentor.instrument()
+      grpc_server_instrumentor = GrpcInstrumentorServer()
+      grpc_server_instrumentor.instrument()
+      if os.environ[""ENABLE_TRACING""] == ""1"":
+        trace.set_tracer_provider(TracerProvider())
+        otel_endpoint = os.getenv(""COLLECTOR_SERVICE_ADDR"", ""localhost:4317"")
+        trace.get_tracer_provider().add_span_processor(
+          BatchSpanProcessor(
+              OTLPSpanExporter(
+              endpoint = otel_endpoint,
+              insecure = True
+            )
+          )
+        )
+    except (KeyError, DefaultCredentialsError):
+        logger.info(""Tracing disabled."")
+    except Exception as e:
+        logger.warn(f""Exception on Cloud Trace setup: {traceback.format_exc()}, tracing disabled."") 
+
+    port = os.environ.get('PORT', ""8080"")
+    catalog_addr = os.environ.get('PRODUCT_CATALOG_SERVICE_ADDR', '')
+    if catalog_addr == """":
+        raise Exception('PRODUCT_CATALOG_SERVICE_ADDR environment variable not set')
+    logger.info(""product catalog address: "" + catalog_addr)
+    channel = grpc.insecure_channel(catalog_addr)
+    product_catalog_stub = demo_pb2_grpc.ProductCatalogServiceStub(channel)
+
+    # create gRPC server
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+
+    # add class to gRPC server
+    service = RecommendationService()
+    demo_pb2_grpc.add_RecommendationServiceServicer_to_server(service, server)
+    health_pb2_grpc.add_HealthServicer_to_server(service, server)
+
+    # start server
+    logger.info(""listening on port: "" + port)
+    server.add_insecure_port('[::]:'+port)
+    server.start()
+
+    # keep alive
+    try:
+         while True:
+            time.sleep(10000)
+    except KeyboardInterrupt:
+            server.stop(0)
+","This Python code implements a gRPC server for a recommendation service. It uses the `grpc-server` library to create a server and add a `RecommendationService` class to it. The service provides a `ListRecommendations` method that fetches a list of product IDs from a product catalog service and returns a subset of them as recommendations.
+
+The code includes functions for:
+- Setting up Stackdriver Profiler (if enabled) to profile the server's performance.
+- Initializing OpenTelemetry tracing (if enabled) to collect trace data.
+- Starting the gRPC server on a specified port, listening for requests.
+- Handling `ListRecommendations` requests by fetching product IDs from the product catalog service and returning a subset of them as recommendations.
+- Handling health checks by returning a `SERVING` status."
+emailservice.py,"#!/usr/bin/python
+#
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the ""License"");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an ""AS IS"" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from concurrent import futures
+import argparse
+import os
+import sys
+import time
+import grpc
+import traceback
+from jinja2 import Environment, FileSystemLoader, select_autoescape, TemplateError
+from google.api_core.exceptions import GoogleAPICallError
+from google.auth.exceptions import DefaultCredentialsError
+
+import demo_pb2
+import demo_pb2_grpc
+from grpc_health.v1 import health_pb2
+from grpc_health.v1 import health_pb2_grpc
+
+from opentelemetry import trace
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
+import googlecloudprofiler
+
+from logger import getJSONLogger
+logger = getJSONLogger('emailservice-server')
+
+# Loads confirmation email template from file
+env = Environment(
+    loader=FileSystemLoader('templates'),
+    autoescape=select_autoescape(['html', 'xml'])
+)
+template = env.get_template('confirmation.html')
+
+class BaseEmailService(demo_pb2_grpc.EmailServiceServicer):
+  def Check(self, request, context):
+    return health_pb2.HealthCheckResponse(
+      status=health_pb2.HealthCheckResponse.SERVING)
+  
+  def Watch(self, request, context):
+    return health_pb2.HealthCheckResponse(
+      status=health_pb2.HealthCheckResponse.UNIMPLEMENTED)
+
+class EmailService(BaseEmailService):
+  def __init__(self):
+    raise Exception('cloud mail client not implemented')
+    super().__init__()
+
+  @staticmethod
+  def send_email(client, email_address, content):
+    response = client.send_message(
+      sender = client.sender_path(project_id, region, sender_id),
+      envelope_from_authority = '',
+      header_from_authority = '',
+      envelope_from_address = from_address,
+      simple_message = {
+        ""from"": {
+          ""address_spec"": from_address,
+        },
+        ""to"": [{
+          ""address_spec"": email_address
+        }],
+        ""subject"": ""Your Confirmation Email"",
+        ""html_body"": content
+      }
+    )
+    logger.info(""Message sent: {}"".format(response.rfc822_message_id))
+
+  def SendOrderConfirmation(self, request, context):
+    email = request.email
+    order = request.order
+
+    try:
+      confirmation = template.render(order = order)
+    except TemplateError as err:
+      context.set_details(""An error occurred when preparing the confirmation mail."")
+      logger.error(err.message)
+      context.set_code(grpc.StatusCode.INTERNAL)
+      return demo_pb2.Empty()
+
+    try:
+      EmailService.send_email(self.client, email, confirmation)
+    except GoogleAPICallError as err:
+      context.set_details(""An error occurred when sending the email."")
+      print(err.message)
+      context.set_code(grpc.StatusCode.INTERNAL)
+      return demo_pb2.Empty()
+
+    return demo_pb2.Empty()
+
+class DummyEmailService(BaseEmailService):
+  def SendOrderConfirmation(self, request, context):
+    logger.info('A request to send order confirmation email to {} has been received.'.format(request.email))
+    return demo_pb2.Empty()
+
+class HealthCheck():
+  def Check(self, request, context):
+    return health_pb2.HealthCheckResponse(
+      status=health_pb2.HealthCheckResponse.SERVING)
+
+def start(dummy_mode):
+  server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),)
+  service = None
+  if dummy_mode:
+    service = DummyEmailService()
+  else:
+    raise Exception('non-dummy mode not implemented yet')
+
+  demo_pb2_grpc.add_EmailServiceServicer_to_server(service, server)
+  health_pb2_grpc.add_HealthServicer_to_server(service, server)
+
+  port = os.environ.get('PORT', ""8080"")
+  logger.info(""listening on port: ""+port)
+  server.add_insecure_port('[::]:'+port)
+  server.start()
+  try:
+    while True:
+      time.sleep(3600)
+  except KeyboardInterrupt:
+    server.stop(0)
+
+def initStackdriverProfiling():
+  project_id = None
+  try:
+    project_id = os.environ[""GCP_PROJECT_ID""]
+  except KeyError:
+    # Environment variable not set
+    pass
+
+  for retry in range(1,4):
+    try:
+      if project_id:
+        googlecloudprofiler.start(service='email_server', service_version='1.0.0', verbose=0, project_id=project_id)
+      else:
+        googlecloudprofiler.start(service='email_server', service_version='1.0.0', verbose=0)
+      logger.info(""Successfully started Stackdriver Profiler."")
+      return
+    except (BaseException) as exc:
+      logger.info(""Unable to start Stackdriver Profiler Python agent. "" + str(exc))
+      if (retry < 4):
+        logger.info(""Sleeping %d to retry initializing Stackdriver Profiler""%(retry*10))
+        time.sleep (1)
+      else:
+        logger.warning(""Could not initialize Stackdriver Profiler after retrying, giving up"")
+  return
+
+
+if __name__ == '__main__':
+  logger.info('starting the email service in dummy mode.')
+
+  # Profiler
+  try:
+    if ""DISABLE_PROFILER"" in os.environ:
+      raise KeyError()
+    else:
+      logger.info(""Profiler enabled."")
+      initStackdriverProfiling()
+  except KeyError:
+      logger.info(""Profiler disabled."")
+
+  # Tracing
+  try:
+    if os.environ[""ENABLE_TRACING""] == ""1"":
+      otel_endpoint = os.getenv(""COLLECTOR_SERVICE_ADDR"", ""localhost:4317"")
+      trace.set_tracer_provider(TracerProvider())
+      trace.get_tracer_provider().add_span_processor(
+        BatchSpanProcessor(
+            OTLPSpanExporter(
+            endpoint = otel_endpoint,
+            insecure = True
+          )
+        )
+      )
+    grpc_server_instrumentor = GrpcInstrumentorServer()
+    grpc_server_instrumentor.instrument()
+
+  except (KeyError, DefaultCredentialsError):
+      logger.info(""Tracing disabled."")
+  except Exception as e:
+      logger.warn(f""Exception on Cloud Trace setup: {traceback.format_exc()}, tracing disabled."") 
+  
+  start(dummy_mode = True)
+","This Python code implements a dummy email service using gRPC. It uses the `grpc-server` library to create a server and add a `EmailService` class to it. The service provides a `SendOrderConfirmation` method that simulates sending an email confirmation by logging the request.
+
+The code includes functions for:
+- Initializing Stackdriver Profiler (if enabled) to profile the server's performance.
+- Initializing OpenTelemetry tracing (if enabled) to collect trace data.
+- Starting the gRPC server on a specified port, listening for requests.
+- Handling `SendOrderConfirmation` requests by logging the request and returning an empty response.
+- Handling health checks by returning a `SERVING` status.
+
+Note that the `send_email` method in the `EmailService` class is not implemented and will raise an exception."
+frontend.go,"// Copyright 2018 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the ""License"");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an ""AS IS"" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package main
+
+import (
+	""context""
+	""fmt""
+	""net/http""
+	""os""
+	""time""
+
+	""cloud.google.com/go/profiler""
+	""github.com/gorilla/mux""
+	""github.com/pkg/errors""
+	""github.com/sirupsen/logrus""
+	""go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc""
+	""go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp""
+	""go.opentelemetry.io/otel""
+	""go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc""
+	""go.opentelemetry.io/otel/propagation""
+	sdktrace ""go.opentelemetry.io/otel/sdk/trace""
+	""google.golang.org/grpc""
+)
+
+const (
+	port            = ""8080""
+	defaultCurrency = ""USD""
+	cookieMaxAge    = 60 * 60 * 48
+
+	cookiePrefix    = ""shop_""
+	cookieSessionID = cookiePrefix + ""session-id""
+	cookieCurrency  = cookiePrefix + ""currency""
+)
+
+var (
+	whitelistedCurrencies = map[string]bool{
+		""USD"": true,
+		""EUR"": true,
+		""CAD"": true,
+		""JPY"": true,
+		""GBP"": true,
+		""TRY"": true}
+)
+
+type ctxKeySessionID struct{}
+
+type frontendServer struct {
+	productCatalogSvcAddr string
+	productCatalogSvcConn *grpc.ClientConn
+
+	currencySvcAddr string
+	currencySvcConn *grpc.ClientConn
+
+	cartSvcAddr string
+	cartSvcConn *grpc.ClientConn
+
+	recommendationSvcAddr string
+	recommendationSvcConn *grpc.ClientConn
+
+	checkoutSvcAddr string
+	checkoutSvcConn *grpc.ClientConn
+
+	shippingSvcAddr string
+	shippingSvcConn *grpc.ClientConn
+
+	adSvcAddr string
+	adSvcConn *grpc.ClientConn
+
+	collectorAddr string
+	collectorConn *grpc.ClientConn
+}
+
+func main() {
+	ctx := context.Background()
+	log := logrus.New()
+	log.Level = logrus.DebugLevel
+	log.Formatter = &logrus.JSONFormatter{
+		FieldMap: logrus.FieldMap{
+			logrus.FieldKeyTime:  ""timestamp"",
+			logrus.FieldKeyLevel: ""severity"",
+			logrus.FieldKeyMsg:   ""message"",
+		},
+		TimestampFormat: time.RFC3339Nano,
+	}
+	log.Out = os.Stdout
+
+	svc := new(frontendServer)
+
+	otel.SetTextMapPropagator(
+		propagation.NewCompositeTextMapPropagator(
+			propagation.TraceContext{}, propagation.Baggage{}))
+
+	if os.Getenv(""ENABLE_TRACING"") == ""1"" {
+		log.Info(""Tracing enabled."")
+		initTracing(log, ctx, svc)
+	} else {
+		log.Info(""Tracing disabled."")
+	}
+
+	if os.Getenv(""ENABLE_PROFILER"") == ""1"" {
+		log.Info(""Profiling enabled."")
+		go initProfiling(log, ""frontend"", ""1.0.0"")
+	} else {
+		log.Info(""Profiling disabled."")
+	}
+
+	srvPort := port
+	if os.Getenv(""PORT"") != """" {
+		srvPort = os.Getenv(""PORT"")
+	}
+	addr := os.Getenv(""LISTEN_ADDR"")
+	mustMapEnv(&svc.productCatalogSvcAddr, ""PRODUCT_CATALOG_SERVICE_ADDR"")
+	mustMapEnv(&svc.currencySvcAddr, ""CURRENCY_SERVICE_ADDR"")
+	mustMapEnv(&svc.cartSvcAddr, ""CART_SERVICE_ADDR"")
+	mustMapEnv(&svc.recommendationSvcAddr, ""RECOMMENDATION_SERVICE_ADDR"")
+	mustMapEnv(&svc.checkoutSvcAddr, ""CHECKOUT_SERVICE_ADDR"")
+	mustMapEnv(&svc.shippingSvcAddr, ""SHIPPING_SERVICE_ADDR"")
+	mustMapEnv(&svc.adSvcAddr, ""AD_SERVICE_ADDR"")
+
+	mustConnGRPC(ctx, &svc.currencySvcConn, svc.currencySvcAddr)
+	mustConnGRPC(ctx, &svc.productCatalogSvcConn, svc.productCatalogSvcAddr)
+	mustConnGRPC(ctx, &svc.cartSvcConn, svc.cartSvcAddr)
+	mustConnGRPC(ctx, &svc.recommendationSvcConn, svc.recommendationSvcAddr)
+	mustConnGRPC(ctx, &svc.shippingSvcConn, svc.shippingSvcAddr)
+	mustConnGRPC(ctx, &svc.checkoutSvcConn, svc.checkoutSvcAddr)
+	mustConnGRPC(ctx, &svc.adSvcConn, svc.adSvcAddr)
+
+	r := mux.NewRouter()
+	r.HandleFunc(""/"", svc.homeHandler).Methods(http.MethodGet, http.MethodHead)
+	r.HandleFunc(""/product/{id}"", svc.productHandler).Methods(http.MethodGet, http.MethodHead)
+	r.HandleFunc(""/cart"", svc.viewCartHandler).Methods(http.MethodGet, http.MethodHead)
+	r.HandleFunc(""/cart"", svc.addToCartHandler).Methods(http.MethodPost)
+	r.HandleFunc(""/cart/empty"", svc.emptyCartHandler).Methods(http.MethodPost)
+	r.HandleFunc(""/setCurrency"", svc.setCurrencyHandler).Methods(http.MethodPost)
+	r.HandleFunc(""/logout"", svc.logoutHandler).Methods(http.MethodGet)
+	r.HandleFunc(""/cart/checkout"", svc.placeOrderHandler).Methods(http.MethodPost)
+	r.PathPrefix(""/static/"").Handler(http.StripPrefix(""/static/"", http.FileServer(http.Dir(""./static/""))))
+	r.HandleFunc(""/robots.txt"", func(w http.ResponseWriter, _ *http.Request) { fmt.Fprint(w, ""User-agent: *\nDisallow: /"") })
+	r.HandleFunc(""/_healthz"", func(w http.ResponseWriter, _ *http.Request) { fmt.Fprint(w, ""ok"") })
+
+	var handler http.Handler = r
+	handler = &logHandler{log: log, next: handler}     // add logging
+	handler = ensureSessionID(handler)                 // add session ID
+	handler = otelhttp.NewHandler(handler, ""frontend"") // add OTel tracing
+
+	log.Infof(""starting server on "" + addr + "":"" + srvPort)
+	log.Fatal(http.ListenAndServe(addr+"":""+srvPort, handler))
+}
+func initStats(log logrus.FieldLogger) {
+	// TODO(arbrown) Implement OpenTelemtry stats
+}
+
+func initTracing(log logrus.FieldLogger, ctx context.Context, svc *frontendServer) (*sdktrace.TracerProvider, error) {
+	mustMapEnv(&svc.collectorAddr, ""COLLECTOR_SERVICE_ADDR"")
+	mustConnGRPC(ctx, &svc.collectorConn, svc.collectorAddr)
+	exporter, err := otlptracegrpc.New(
+		ctx,
+		otlptracegrpc.WithGRPCConn(svc.collectorConn))
+	if err != nil {
+		log.Warnf(""warn: Failed to create trace exporter: %v"", err)
+	}
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exporter),
+		sdktrace.WithSampler(sdktrace.AlwaysSample()))
+	otel.SetTracerProvider(tp)
+
+	return tp, err
+}
+
+func initProfiling(log logrus.FieldLogger, service, version string) {
+	// TODO(ahmetb) this method is duplicated in other microservices using Go
+	// since they are not sharing packages.
+	for i := 1; i <= 3; i++ {
+		log = log.WithField(""retry"", i)
+		if err := profiler.Start(profiler.Config{
+			Service:        service,
+			ServiceVersion: version,
+			// ProjectID must be set if not running on GCP.
+			// ProjectID: ""my-project"",
+		}); err != nil {
+			log.Warnf(""warn: failed to start profiler: %+v"", err)
+		} else {
+			log.Info(""started Stackdriver profiler"")
+			return
+		}
+		d := time.Second * 10 * time.Duration(i)
+		log.Debugf(""sleeping %v to retry initializing Stackdriver profiler"", d)
+		time.Sleep(d)
+	}
+	log.Warn(""warning: could not initialize Stackdriver profiler after retrying, giving up"")
+}
+
+func mustMapEnv(target *string, envKey string) {
+	v := os.Getenv(envKey)
+	if v == """" {
+		panic(fmt.Sprintf(""environment variable %q not set"", envKey))
+	}
+	*target = v
+}
+
+func mustConnGRPC(ctx context.Context, conn **grpc.ClientConn, addr string) {
+	var err error
+	ctx, cancel := context.WithTimeout(ctx, time.Second*3)
+	defer cancel()
+	*conn, err = grpc.DialContext(ctx, addr,
+		grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
+	if err != nil {
+		panic(errors.Wrapf(err, ""grpc: failed to connect %s"", addr))
+	}
+}
+","This Go code sets up a frontend server for an online shopping application. It uses the Gorilla Mux library for routing and the `http` package for serving HTTP requests.
+
+The code includes functions for:
+- Initializing the server with logging, OpenTelemetry tracing (if enabled), and Stackdriver profiling (if enabled).
+- Establishing gRPC connections to dependent services such as product catalog, currency, cart, recommendation, checkout, shipping, and ad services.
+- Defining HTTP handlers for various frontend operations, including:
+  - Displaying the homepage and product details.
+  - Adding items to the cart and viewing the cart.
+  - Handling currency selection and session management.
+  - Placing orders and logging out."
+productcatalog.go,"// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the ""License"");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an ""AS IS"" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package main
+
+import (
+	""context""
+	""strings""
+	""time""
+
+	pb ""github.com/GoogleCloudPlatform/microservices-demo/src/productcatalogservice/genproto""
+	""google.golang.org/grpc/codes""
+	healthpb ""google.golang.org/grpc/health/grpc_health_v1""
+	""google.golang.org/grpc/status""
+)
+
+type productCatalog struct {
+	catalog pb.ListProductsResponse
+}
+
+func (p *productCatalog) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
+}
+
+func (p *productCatalog) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_WatchServer) error {
+	return status.Errorf(codes.Unimplemented, ""health check via Watch not implemented"")
+}
+
+func (p *productCatalog) ListProducts(context.Context, *pb.Empty) (*pb.ListProductsResponse, error) {
+	time.Sleep(extraLatency)
+
+	return &pb.ListProductsResponse{Products: p.parseCatalog()}, nil
+}
+
+func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.Product, error) {
+	time.Sleep(extraLatency)
+
+	var found *pb.Product
+	for i := 0; i < len(p.parseCatalog()); i++ {
+		if req.Id == p.parseCatalog()[i].Id {
+			found = p.parseCatalog()[i]
+		}
+	}
+
+	if found == nil {
+		return nil, status.Errorf(codes.NotFound, ""no product with ID %s"", req.Id)
+	}
+	return found, nil
+}
+
+func (p *productCatalog) SearchProducts(ctx context.Context, req *pb.SearchProductsRequest) (*pb.SearchProductsResponse, error) {
+	time.Sleep(extraLatency)
+
+	var ps []*pb.Product
+	for _, product := range p.parseCatalog() {
+		if strings.Contains(strings.ToLower(product.Name), strings.ToLower(req.Query)) ||
+			strings.Contains(strings.ToLower(product.Description), strings.ToLower(req.Query)) {
+			ps = append(ps, product)
+		}
+	}
+
+	return &pb.SearchProductsResponse{Results: ps}, nil
+}
+
+func (p *productCatalog) parseCatalog() []*pb.Product {
+	if reloadCatalog || len(p.catalog.Products) == 0 {
+		err := readCatalogFile(&p.catalog)
+		if err != nil {
+			return []*pb.Product{}
+		}
+	}
+
+	return p.catalog.Products
+}
+","This Go code defines a `productCatalog` struct that implements the gRPC service for a product catalog service. It provides methods for:
+- Performing health checks.
+- Listing all products in the catalog.
+- Fetching a product by its ID.
+- Searching for products based on a query string.
+
+The `parseCatalog` method parses the product catalog from a file and stores it in the `productCatalog` struct."
+cartservice.cs,"// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the ""License"");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an ""AS IS"" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using Grpc.Core;
+using Npgsql;
+using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+using Google.Api.Gax.ResourceNames;
+using Google.Cloud.SecretManager.V1;
+ 
+namespace cartservice.cartstore
+{
+    public class AlloyDBCartStore : ICartStore
+    {
+        private readonly string tableName;
+        private readonly string connectionString;
+
+        public AlloyDBCartStore(IConfiguration configuration)
+        {
+            // Create a Cloud Secrets client.
+            SecretManagerServiceClient client = SecretManagerServiceClient.Create();
+            var projectId = configuration[""PROJECT_ID""];
+            var secretId = configuration[""ALLOYDB_SECRET_NAME""];
+            SecretVersionName secretVersionName = new SecretVersionName(projectId, secretId, ""latest"");
+
+            AccessSecretVersionResponse result = client.AccessSecretVersion(secretVersionName);
+            // Convert the payload to a string. Payloads are bytes by default.
+            string alloyDBPassword = result.Payload.Data.ToStringUtf8().TrimEnd('\r', '\n');
+        
+            // TODO: Create a separate user for connecting within the application
+            // rather than using our superuser
+            string alloyDBUser = ""postgres"";
+            string databaseName = configuration[""ALLOYDB_DATABASE_NAME""];
+            // TODO: Consider splitting workloads into read vs. write and take
+            // advantage of the AlloyDB read pools
+            string primaryIPAddress = configuration[""ALLOYDB_PRIMARY_IP""];
+            connectionString = ""Host=""          +
+                               primaryIPAddress +
+                               "";Username=""     +
+                               alloyDBUser      +
+                               "";Password=""     +
+                               alloyDBPassword  +
+                               "";Database=""     +
+                               databaseName;
+
+            tableName = configuration[""ALLOYDB_TABLE_NAME""];
+        }
+
+
+        public async Task AddItemAsync(string userId, string productId, int quantity)
+        {
+            Console.WriteLine($""AddItemAsync for {userId} called"");
+            try
+            {
+                await using var dataSource = NpgsqlDataSource.Create(connectionString);
+
+                // Fetch the current quantity for our userId/productId tuple
+                var fetchCmd = $""SELECT quantity FROM {tableName} WHERE userID='{userId}' AND productID='{productId}'"";
+                var currentQuantity = 0;
+                var cmdRead = dataSource.CreateCommand(fetchCmd);
+                await using (var reader = await cmdRead.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                        currentQuantity += reader.GetInt32(0);
+                }
+                var totalQuantity = quantity + currentQuantity;
+
+                var insertCmd = $""INSERT INTO {tableName} (userId, productId, quantity) VALUES ('{userId}', '{productId}', {totalQuantity})"";
+                await using (var cmdInsert = dataSource.CreateCommand(insertCmd))
+                {
+                    await Task.Run(() =>
+                    {
+                        return cmdInsert.ExecuteNonQueryAsync();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(
+                    new Status(StatusCode.FailedPrecondition, $""Can't access cart storage at {connectionString}. {ex}""));
+            }
+        }
+
+
+        public async Task<Hipstershop.Cart> GetCartAsync(string userId)
+        {
+            Console.WriteLine($""GetCartAsync called for userId={userId}"");
+            Hipstershop.Cart cart = new();
+            cart.UserId = userId;
+            try
+            {
+                await using var dataSource = NpgsqlDataSource.Create(connectionString);
+
+                var cartFetchCmd = $""SELECT productId, quantity FROM {tableName} WHERE userId = '{userId}'"";
+                var cmd = dataSource.CreateCommand(cartFetchCmd);
+                await using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        Hipstershop.CartItem item = new()
+                        {
+                            ProductId = reader.GetString(0),
+                            Quantity = reader.GetInt32(1)
+                        };
+                        cart.Items.Add(item);
+                    }
+                }
+                await Task.Run(() =>
+                {
+                    return cart;
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(
+                    new Status(StatusCode.FailedPrecondition, $""Can't access cart storage at {connectionString}. {ex}""));
+            }
+            return cart;
+        }
+
+
+        public async Task EmptyCartAsync(string userId)
+        {
+            Console.WriteLine($""EmptyCartAsync called for userId={userId}"");
+
+            try
+            {
+                await using var dataSource = NpgsqlDataSource.Create(connectionString);
+                var deleteCmd = $""DELETE FROM {tableName} WHERE userID = '{userId}'"";
+                await using (var cmd = dataSource.CreateCommand(deleteCmd))
+                {
+                    await Task.Run(() =>
+                    {
+                        return cmd.ExecuteNonQueryAsync();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new RpcException(
+                    new Status(StatusCode.FailedPrecondition, $""Can't access cart storage at {connectionString}. {ex}""));
+            }
+        }
+
+        public bool Ping()
+        {
+            try
+            {
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+    }
+}
+
+","This C# code defines a class `AlloyDBCartStore` that implements the `ICartStore` interface for storing carts in a AlloyDB database. It uses the `Npgsql` library to connect to the database and perform CRUD operations. The code includes methods for:
+- Adding an item to the cart, updating the quantity if the item already exists.
+- Fetching the cart for a given user ID.
+- Emptying the cart for a given user ID.
+- Pinging the database to check if it is accessible."
+currencyservice.js,"/*
+ * Copyright 2018 Google LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+const pino = require('pino');
+const logger = pino({
+  name: 'currencyservice-server',
+  messageKey: 'message',
+  formatters: {
+    level (logLevelString, logLevelNum) {
+      return { severity: logLevelString }
+    }
+  }
+});
+
+if(process.env.DISABLE_PROFILER) {
+  logger.info(""Profiler disabled."")
+}
+else {
+  logger.info(""Profiler enabled."")
+  require('@google-cloud/profiler').start({
+    serviceContext: {
+      service: 'currencyservice',
+      version: '1.0.0'
+    }
+  });
+}
+
+// Register GRPC OTel Instrumentation for trace propagation
+// regardless of whether tracing is emitted.
+const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+
+registerInstrumentations({
+  instrumentations: [new GrpcInstrumentation()]
+});
+
+if(process.env.ENABLE_TRACING == ""1"") {
+  logger.info(""Tracing enabled."")
+  const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+  const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+  const { OTLPTraceExporter } = require(""@opentelemetry/exporter-otlp-grpc"");
+  const { Resource } = require('@opentelemetry/resources');
+  const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+
+  const provider = new NodeTracerProvider({
+    resource: new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'currencyservice',
+    }),
+  });
+
+  const collectorUrl = process.env.COLLECTOR_SERVICE_ADDR
+
+  provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter({url: collectorUrl})));
+  provider.register();
+}
+else {
+  logger.info(""Tracing disabled."")
+}
+
+const path = require('path');
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+const MAIN_PROTO_PATH = path.join(__dirname, './proto/demo.proto');
+const HEALTH_PROTO_PATH = path.join(__dirname, './proto/grpc/health/v1/health.proto');
+
+const PORT = process.env.PORT;
+
+const shopProto = _loadProto(MAIN_PROTO_PATH).hipstershop;
+const healthProto = _loadProto(HEALTH_PROTO_PATH).grpc.health.v1;
+
+/**
+ * Helper function that loads a protobuf file.
+ */
+function _loadProto (path) {
+  const packageDefinition = protoLoader.loadSync(
+    path,
+    {
+      keepCase: true,
+      longs: String,
+      enums: String,
+      defaults: true,
+      oneofs: true
+    }
+  );
+  return grpc.loadPackageDefinition(packageDefinition);
+}
+
+/**
+ * Helper function that gets currency data from a stored JSON file
+ * Uses public data from European Central Bank
+ */
+function _getCurrencyData (callback) {
+  const data = require('./data/currency_conversion.json');
+  callback(data);
+}
+
+/**
+ * Helper function that handles decimal/fractional carrying
+ */
+function _carry (amount) {
+  const fractionSize = Math.pow(10, 9);
+  amount.nanos += (amount.units % 1) * fractionSize;
+  amount.units = Math.floor(amount.units) + Math.floor(amount.nanos / fractionSize);
+  amount.nanos = amount.nanos % fractionSize;
+  return amount;
+}
+
+/**
+ * Lists the supported currencies
+ */
+function getSupportedCurrencies (call, callback) {
+  logger.info('Getting supported currencies...');
+  _getCurrencyData((data) => {
+    callback(null, {currency_codes: Object.keys(data)});
+  });
+}
+
+/**
+ * Converts between currencies
+ */
+function convert (call, callback) {
+  try {
+    _getCurrencyData((data) => {
+      const request = call.request;
+
+      // Convert: from_currency --> EUR
+      const from = request.from;
+      const euros = _carry({
+        units: from.units / data[from.currency_code],
+        nanos: from.nanos / data[from.currency_code]
+      });
+
+      euros.nanos = Math.round(euros.nanos);
+
+      // Convert: EUR --> to_currency
+      const result = _carry({
+        units: euros.units * data[request.to_code],
+        nanos: euros.nanos * data[request.to_code]
+      });
+
+      result.units = Math.floor(result.units);
+      result.nanos = Math.floor(result.nanos);
+      result.currency_code = request.to_code;
+
+      logger.info(`conversion request successful`);
+      callback(null, result);
+    });
+  } catch (err) {
+    logger.error(`conversion request failed: ${err}`);
+    callback(err.message);
+  }
+}
+
+/**
+ * Endpoint for health checks
+ */
+function check (call, callback) {
+  callback(null, { status: 'SERVING' });
+}
+
+/**
+ * Starts an RPC server that receives requests for the
+ * CurrencyConverter service at the sample server port
+ */
+function main () {
+  logger.info(`Starting gRPC server on port ${PORT}...`);
+  const server = new grpc.Server();
+  server.addService(shopProto.CurrencyService.service, {getSupportedCurrencies, convert});
+  server.addService(healthProto.Health.service, {check});
+
+  server.bindAsync(
+    `[::]:${PORT}`,
+    grpc.ServerCredentials.createInsecure(),
+    function() {
+      logger.info(`CurrencyService gRPC server started on port ${PORT}`);
+      server.start();
+    },
+   );
+}
+
+main();
+","This JavaScript code sets up a gRPC server for a currency conversion service using the `@grpc/grpc-js` library. It includes functions for:
+- Initializing OpenTelemetry tracing (if enabled) and Stackdriver Profiler (if enabled).
+- Loading protocol buffer definitions and adding corresponding service definitions to the gRPC server.
+- Handling requests for supported currencies and currency conversions.
+- Handling health checks.
+- Starting the gRPC server on a specified port."
