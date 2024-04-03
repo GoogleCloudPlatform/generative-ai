@@ -55,7 +55,7 @@ def analyze_prospectus(cloud_event):
 
     # Prep model and template
     model = VertexAI(
-        model_name="text-bison@002", max_output_tokens=1024, temperature=0.0
+        model_name="gemini-pro", max_output_tokens=1024, temperature=0.0
     )
     template = """
 <MISSION>
