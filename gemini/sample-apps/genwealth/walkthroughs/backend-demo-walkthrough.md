@@ -31,7 +31,7 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
     > NOTE: Use http, not https. Our test environment has not been configured for SSL/TLS.
 
-    ![pgAdmin Login Interface](../images/pgadmin/1-login.png "pgAdmin Login Interface")
+    ![pgAdmin Login Interface](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/1-login.png "pgAdmin Login Interface")
 
 1. Login to pgAdmin. The user name is `demouser@genwealth.com`. The password is the pgAdmin password you chose when you setup the environment. If you forgot the password, you can retrieve it from Secret Manager by running the following command in Cloud Shell.
 
@@ -44,19 +44,19 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
 1. You should now see an interface like the one below.
 
-    ![pgAdmin Interface](../images/pgadmin/2-interface.png "pgAdmin Interface")
+    ![pgAdmin Interface](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/2-interface.png "pgAdmin Interface")
 
 ### Connect to AlloyDB
 
 1. Right-click on Servers under Object Explorer, and select Register > Server.
 
-    ![Register Connection](../images/pgadmin/3-register.png "Register Connection")
+    ![Register Connection](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/3-register.png "Register Connection")
 
 1. Enter a friendly name like “AlloyDB” in the Name field, then switch to the Connection tab.
 
     > NOTE: You can ignore the warning that says “Either Host name or Service must be specified”. We will enter that information next.
 
-    ![Register Server](../images/pgadmin/4-general.png "Register Server")
+    ![Register Server](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/4-general.png "Register Server")
 
 1. In the Connection tab:
     - Enter the AlloyDB Private IP address you wrote down earlier in Step 3.1.
@@ -74,17 +74,17 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
     Your Connection tab should look like the screenshot below.
 
-    ![Connection](../images/pgadmin/5-connection.png "Connection")
+    ![Connection](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/5-connection.png "Connection")
 
 ### Explore the pgAdmin Interface
 
 1. Click the drop-down arrow next to Servers, then do the same for AlloyDB, Databases, and ragdemos.
 
-    ![Object Explorer](../images/pgadmin/6-tree.png "Object Explorer")
+    ![Object Explorer](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/6-tree.png "Object Explorer")
 
 1. Right-click the ragdemos database, then click Query Tool.
 
-    ![Query Tool](../images/pgadmin/7-querytool.png "Query Tool")
+    ![Query Tool](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/7-querytool.png "Query Tool")
 
 1. Enter the SQL query below in the Query Tool and then click the Execute button to run it.
 
@@ -99,7 +99,7 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
     - The results of your query show up in the Data Output grid at the bottom of the interface.
     - There is a Scratch Pad on the right side of the interface that you can use to keep notes. This will be a useful space to copy and paste the enriched prompts and LLM responses we will generate later, because it provides more room to explore the output.
 
-    ![Query Interface](../images/pgadmin/8-queryinterface.png "Query Interface")
+    ![Query Interface](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/8-queryinterface.png "Query Interface")
 
 ### Configure pgAdmin Preferences
 
@@ -107,13 +107,13 @@ We will be working with lots of text data in this demo, so it is useful to limit
 
 1. Click File > Preferences.
 
-    ![Preferences](../images/pgadmin/9-preferences.png "Preferences")
+    ![Preferences](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/9-preferences.png "Preferences")
 
 1. Scroll down in the Preferences pane and select Results grid.
 
 1. Set Maximum column width to 200 as shown in the screenshot below, then click Save.
 
-    ![Grid Preferences](../images/pgadmin/10-grid.png "Grid Preferences")
+    ![Grid Preferences](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/10-grid.png "Grid Preferences")
 
 The pgAdmin setup is complete! You will now start building your Gen AI features for the Advisory Services software.
 
@@ -160,7 +160,7 @@ Today, Financial Analysts use a simple Query Builder interface like the one show
 
 You will leverage AlloyDB AI’s vector similarity search capabilities to enhance this experience with semantic search powered by the Google PaLM Gen AI [textembedding-gecko](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) model in Vertex AI.
 
-![Query Builder](../images/pgadmin/11-querybuilder.png "Query Builder")
+![Query Builder](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/11-querybuilder.png "Query Builder")
 
 Follow the steps below to build the new Gen AI feature.
 
@@ -183,7 +183,7 @@ Follow the steps below to build the new Gen AI feature.
 
     > NOTE: It may be useful to double-click on the result and copy/paste it into the Scratch Pad for easier viewing, as shown in the screenshot below.
 
-    ![INN_B](../images/pgadmin/12-inflation.png "INN_B")
+    ![INN_B](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/12-inflation.png "INN_B")
 
 1. Notice that this is an investment that tracks an economy that is currently experiencing high inflation, and investors may want to hedge against that risk. Our query returned the result because the analysis contains the words “hedge” and “high inflation”, even though this is not an investment we would want to recommend to a client specifically looking for investments that perform well in high-inflation markets.
 
@@ -209,7 +209,7 @@ You will leverage AlloyDB AI’s vector similarity search capabilities to identi
 
 Users will access the customer segmentation feature using a UI similar to the one below. The application will generate a SQL query based on the user’s inputs, and the database will do the rest.
 
-![Prospect Finder](../images/pgadmin/13-prospectfinder.png "Prospect Finder")
+![Prospect Finder](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/13-prospectfinder.png "Prospect Finder")
 
 Follow the steps below to build the new Gen AI feature.
 
@@ -261,7 +261,7 @@ You will write a PostgreSQL function that takes a user’s prompt and enriches i
 
 Users will interact with the chatbot using a UI similar to the one below. The application will generate a SQL query based on the user’s prompt, and the database will do the rest.
 
-![Chatbot](../images/pgadmin/14-chat.png "Chatbot")
+![Chatbot](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/14-chat.png "Chatbot")
 
 Follow the steps below to build the new Gen AI feature.
 
@@ -278,7 +278,7 @@ Follow the steps below to build the new Gen AI feature.
 
 1. Notice that the function takes in a set of parameters, which it uses to enrich the user’s prompt. At the end of the function, it makes a call to the text-bison LLM in Vertex AI using the [ml_predict_row() function](https://cloud.google.com/alloydb/docs/ai/invoke-predictions).
 
-    ![Predict](../images/pgadmin/15-predict.png "Predict")
+    ![Predict](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/15-predict.png "Predict")
 
 1. Run the query below to execute a basic llm() call.
 
@@ -290,13 +290,13 @@ Follow the steps below to build the new Gen AI feature.
 
 1. Take a look at the llm_prompt column, and notice that we’ve added a few things to the user’s prompt with our function. We gave the AI and User a role, gave the model specific instructions, passed in the user’s prompt, and added an empty <CONTEXT> block and a generic <RESPONSE_RESTRICTIONS> block. We’ll add context and restrictions into these blocks in the next few examples.
 
-    ![Enriched Prompt](../images/pgadmin/16-enriched.png "Enriched Prompt")
+    ![Enriched Prompt](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/16-enriched.png "Enriched Prompt")
 
 1. Now take a look at the llm_output column. Our prompt is still somewhat generic, so the output is unsurprisingly a bit generic as well.
 
     > NOTE: Your specific output may differ due to the dynamic nature of LLMs.
 
-    ![Text Completion](../images/pgadmin/17-textcompletion.png "Text Completion")
+    ![Text Completion](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/17-textcompletion.png "Text Completion")
 
     > NOTE: If you work in Financial Services, you probably know that chatbots aren’t actually allowed to give financial advice, and this output sounds really close to giving financial advice. Don’t worry - We’ll address that in Step 5.
 
@@ -417,7 +417,7 @@ Uh oh! You reviewed your new chatbot functionality with GenWealth’s business s
 
 1. Notice that we still greet Donya by name and mention that we know about her low risk tolerance, but we warn that we’re not giving financial advice.
 
-    ![Guardrails](../images/pgadmin/18-safeguards.png "Guardrails")
+    ![Guardrails](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/18-safeguards.png "Guardrails")
 
 1. Adding response_restrictions improved the output, but it still relies on the model to implement the guardrail. Since we control the code for the llm() function, we can deterministically append a legal disclaimer to the end of every response to ensure any edge cases are covered. Take a look at the code for the llm() function to see how this is implemented.
 
@@ -461,7 +461,7 @@ Congratulations! You’ve built three trustworthy Gen AI features using the data
 
 1. This is a custom function that was created specifically for this lab. Notice that it accepts several input parameters that we haven’t used yet. You can use these parameters to further tune and personalize your LLM output.
 
-    ![LLM Function](../images/pgadmin/19-llm.png "LLM Function")
+    ![LLM Function](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/19-llm.png "LLM Function")
 
 1. Experiment with different combinations of input parameters and notice the impact that spcific changes to the enriched prompt can produce. Here are a few examples to get you started.
 

@@ -40,19 +40,19 @@ The data for the `RDYE` prospectus and related tables looks something like this 
 
 1. Document chunks in the `langchain_vector_store` table:
 
-    ![Document Chunks](../images/genwealth-ui/2-document-chunks.png "Document Chunks")
+    ![Document Chunks](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/2-document-chunks.png "Document Chunks")
 
 1. Generated `overview` and embeddings in the `investments` table:
 
-    ![Overview](../images/genwealth-ui/3-overview.png "Overview")
+    ![Overview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/3-overview.png "Overview")
 
 1. Summary of buy ratings for > 8500 tickers in `investments` table:
 
-    ![Investments](../images/genwealth-ui/4-investment-table-summary.png "Investments")
+    ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
 
 1. User profile data, including bios and embedings.
 
-    ![User Profiles](../images/genwealth-ui/5-user-profiles.png "User Profiles")
+    ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
 
 So now that you've extracted all of this useful data from your prospectus, how can you use it to improve your existing Advisory Services software? Let's explore a few use cases in the GenWealth UI.
 
@@ -68,7 +68,7 @@ gcloud run services describe genwealth --platform managed --region $REGION --for
 
 You should see an Investment Search UI like the one shown below.
 
-![GenWealth Interface](../images/genwealth-ui/1-genwealth-interface.png "GenWealth Interface")
+![GenWealth Interface](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/1-genwealth-interface.png "GenWealth Interface")
 
 ### Semantic Search for Investments
 
@@ -76,17 +76,17 @@ Imagine you're a Financial Advisor, and you're searching for investments that ca
 
 Previously, you would log into the GenWealth Advisory Services UI and perform a keyword search. Try it out by executing a query like the one below.
 
-![Keyword Search](../images/genwealth-ui/6-keyword.png "Keyword Search")
+![Keyword Search](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/6-keyword.png "Keyword Search")
 
 Notice that your result set is pretty limited and gives you mixed results. One result recommends a TIPS product that guarantees a real return, but your other result is an ETF that tracks an economy that is currently facing high inflation that investors may want to hedge against.
 
 Click **See Query** to view the simple SQL query used to retrieve these results. Just because the keywords I was looking for exist in the `analysis` field, it doesn't mean that those are the results I'm actually looking for. This highlights the deficiencies of a simple keyword-based search approach.
 
-![Keyword Query](../images/genwealth-ui/7-keyword-query.png "Keyword Query")
+![Keyword Query](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/7-keyword-query.png "Keyword Query")
 
 Now click the **Semantic Search** radio button and run the same query, as shown in the screenshot below. Notice that the SQL query changes, and it's now using Gen AI embeddings to run a semantic search on the `analysis` field.
 
-![Semantic Search](../images/genwealth-ui/8-semantic-search.png "Semantic Search")
+![Semantic Search](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/8-semantic-search.png "Semantic Search")
 
 Notice that your result set is much better - your first result is an ETF that is specifically built to benefit from high inflation! Semantic search in AlloyDB AI is powered by Gen AI embeddings models in Vertex AI, and it understands not just what you ask, but also what you **mean** by what you ask.
 
@@ -100,17 +100,17 @@ You can leverage the data you already have about your users (bio data in the `us
 
 Navigate to the **Prospects** tab in the GenWealth UI, and run a query like the one shown below.
 
-![Prospect Search](../images/genwealth-ui/9-prospect-search.png "Prospect Search")
+![Prospect Search](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/9-prospect-search.png "Prospect Search")
 
 You immediately get a pretty good result set of prospective clients that you should reach out to about your new product.
 
 Click **See Query** to view the SQL query that generates this result. Notice that you're using the embeddings() function once again to leverage Gen AI embeddings in Vertex AI and vector similarity search in AlloyDB AI to run a semantic query against your relational database.
 
-![Embeddings Query](../images/genwealth-ui/10-query.png "Embeddings Query")
+![Embeddings Query](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/10-query.png "Embeddings Query")
 
 Click the drop-down arrow next to your first result (Geoffrey Folmer) to read his bio. He's a young entrepreneur with a high risk appetite, and he already invests in a small amount of cryptocurrency.
 
-![Bio](../images/genwealth-ui/11-folmer.png "Bio")
+![Bio](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/11-folmer.png "Bio")
 
 Notice that your query didn't say anything about "Bitcoin" or "cryptocurrency", but the query semantically understood the type of investor you were looking for.
 
@@ -118,11 +118,11 @@ These results are pretty good, but if you scroll down, you'll notice that there 
 
 Click the **Filters** toggle to refine your search to only return results with a high risk profile and a specific age range.
 
-![Hybrid Search](../images/genwealth-ui/12-hybrid-search.png "Hybrid Search")
+![Hybrid Search](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/12-hybrid-search.png "Hybrid Search")
 
 Notice the query was updated to combine semantic similarity search with keyword search.
 
-![Hybrid Query](../images/genwealth-ui/13-hybrid-query.png "Hybrid Query")
+![Hybrid Query](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/13-hybrid-query.png "Hybrid Query")
 
 With that, you have created your second Gen AI feature, and you now have a tailored result set of prospects that you can reach out to regarding our new Bitcoin ETF.
 
@@ -134,7 +134,7 @@ For example, let’s say that you got an email from Donya Bartle asking a questi
 
 Refresh your screen and search for Donya Bartle in the Prospects interface to view her profile.
 
-![Donya Bartle](../images/genwealth-ui/14-bartle.png "Donya Bartle")
+![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/14-bartle.png "Donya Bartle")
 
 Notice that she has a low risk profile, and she has a goal of saving for a down payment on a home within 7 years.
 
@@ -144,13 +144,13 @@ You could manually draft a response to the emails and all 200+ other emails like
 
 Navigate to the **Ask** interface and click the **Advanced** toggle. Click the arrows in each field shown below to auto-populate the prompt and a few parameters, as shown in the screenshot below.
 
-![Donya Bartle](../images/genwealth-ui/16-email.png "Donya Bartle")
+![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/16-email.png "Donya Bartle")
 
 Click **Ask** and review the result. It should look similar to the output below.
 
 > NOTE: Your results may vary slightly due to the dyanamic nature of Gen AI text completion models.
 
-![Donya Bartle](../images/genwealth-ui/17-emailresult.png "Donya Bartle")
+![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/17-emailresult.png "Donya Bartle")
 
 How did we get such a personalized result? Click **View Query** to see how we injected Donya's user bio into the input of our [llm() function](../database-files/genwealth-demo_llm.sql), and click **See Prompt** to view the enriched prompt that our llm() function generated on the user's behalf before sending it to the Vertex AI LLM for text completion. Here we are using the data we already have about our users to ground the prompt, and we are inferencing an LLM directly from the database using a simple SQL function.
 
@@ -167,7 +167,7 @@ Thanks,
 Geoffrey Follmer
 ```
 
-![Geoffrey Folmer](../images/genwealth-ui/19-second-email.png "Geoffrey Folmer")
+![Geoffrey Folmer](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/19-second-email.png "Geoffrey Folmer")
 
 ### Grounded Gen AI Chatbot with Guardrails
 
@@ -181,7 +181,7 @@ If you work in financial services, you know that chatbots aren't allowed to prov
 
 Update your inputs as shown in the screenshot below, and review the results.
 
-![Guardrails](../images/genwealth-ui/20-guardrails.png "Guardrails")
+![Guardrails](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/20-guardrails.png "Guardrails")
 
 Notice that the response is still personalized to Donya (it knows her name and mentions her low risk tolerance), but it now warns that it can't give financial advice, offers general information, and appends a legal disclaimer to the end of the response.
 
