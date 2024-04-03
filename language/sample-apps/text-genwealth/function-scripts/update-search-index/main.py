@@ -1,8 +1,10 @@
+"""Function to update the Vertex AI Search and Conversion index"""
+
+import os
 from typing import Optional
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine
 import functions_framework
-import os
 
 def import_documents_sample(
     project_id: str,
@@ -12,6 +14,7 @@ def import_documents_sample(
     bigquery_dataset: Optional[str] = None,
     bigquery_table: Optional[str] = None,
 ) -> str:
+    """Function to import documents"""
     #  For more information, refer to:
     # https://cloud.google.com/generative-ai-app-builder/docs/locations#specify_a_multi-region_for_your_data_store
     client_options = (
@@ -72,6 +75,7 @@ def import_documents_sample(
 
 @functions_framework.cloud_event
 def update_search_index(cloud_event):
+    """Main function"""
     # Set event vars
     data = cloud_event.data
     event_id = cloud_event["id"]

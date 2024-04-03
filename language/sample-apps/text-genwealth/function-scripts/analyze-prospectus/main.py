@@ -1,15 +1,17 @@
+"""Cloud Function code to analyze a prospectus"""
+
 import base64
+import os
 import functions_framework
-from pathlib import Path
 from langchain_google_vertexai import VertexAI
 from langchain_core.prompts import PromptTemplate
 from google.cloud.alloydb.connector import Connector
 import sqlalchemy
-import os
 
 # Triggered from a message on a Cloud Pub/Sub topic.
 @functions_framework.cloud_event
 def analyze_prospectus(cloud_event):
+    """Function to analyze prospectus"""   
     # Print out the data from Pub/Sub, to prove that it worked
     ticker = base64.b64decode(cloud_event.data["message"]["data"])
     ticker = ticker.decode("utf-8")
@@ -17,9 +19,7 @@ def analyze_prospectus(cloud_event):
 
     # Environment Vars
     region = os.environ['REGION']
-    zone = os.environ['ZONE']
     project_id = os.environ['PROJECT_ID']
-    debug = 0
 
     # AlloyDB Vars
     cluster = 'alloydb-cluster'

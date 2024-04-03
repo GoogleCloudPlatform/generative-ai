@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Update env variables here
 export REGION="us-central1"
 export ZONE="us-central1-a"

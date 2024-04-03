@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Load env variables
 source ./env.sh
 
@@ -17,7 +19,7 @@ constraint: $policy
 listPolicy:
  allValues: ALLOW
 EOF
-gcloud resource-manager org-policies set-policy new_policy.yaml --project=$PROJECT_ID
+gcloud resource-manager org-policies set-policy new_policy.yaml --project="$PROJECT_ID"
 done
 
 echo "Waiting 90 seconds for org policies to take effect"
@@ -29,8 +31,8 @@ sleep 90
 echo "Creating the Artifact Registry repository"
 gcloud artifacts repositories create genwealth \
 --repository-format=docker \
---location=$REGION \
---project=$PROJECT_ID 
+--location="$REGION" \
+--project="$PROJECT_ID" 
 
 # Make PDFs publically viewable
 gcloud storage buckets add-iam-policy-binding gs://${PROJECT_ID}-docs \

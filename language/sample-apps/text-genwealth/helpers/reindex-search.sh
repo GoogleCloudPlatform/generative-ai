@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Load env variables
 source ./env.sh
 

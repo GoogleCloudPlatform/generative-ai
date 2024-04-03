@@ -1,34 +1,36 @@
+#!/usr/bin/env bash
+
 # Load env variables
 source ./env.sh
 
 # pubsub access for Cloud Function GCS trigger
 echo "Adding function permissions"
-SERVICE_ACCOUNT="$(gsutil kms serviceaccount -p $PROJECT_ID)"
-gcloud projects add-iam-policy-binding $PROJECT_ID \
+SERVICE_ACCOUNT="$(gsutil kms serviceaccount -p "$PROJECT_ID")"
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
     --member="serviceAccount:${SERVICE_ACCOUNT}" \
     --role='roles/pubsub.publisher'
 
 # Create GCS buckets
 echo "Creating GCS buckets"
-gcloud storage buckets create gs://${PROJECT_ID}-docs --location=${REGION} \
-    --project=${PROJECT_ID} --uniform-bucket-level-access
+gcloud storage buckets create gs://"${PROJECT_ID}"-docs --location="${REGION}" \
+    --project="${PROJECT_ID}" --uniform-bucket-level-access
 
-gcloud storage buckets create gs://${PROJECT_ID}-docs-metadata --location=${REGION} \
-    --project=${PROJECT_ID} --uniform-bucket-level-access
+gcloud storage buckets create gs://"${PROJECT_ID}"-docs-metadata --location="${REGION}" \
+    --project="${PROJECT_ID}" --uniform-bucket-level-access
 
-gcloud storage buckets create gs://${PROJECT_ID}-doc-ai --location=${REGION} \
-    --project=${PROJECT_ID} --uniform-bucket-level-access
+gcloud storage buckets create gs://"${PROJECT_ID}"-doc-ai --location="${REGION}" \
+    --project="${PROJECT_ID}" --uniform-bucket-level-access
 
 # Create pubsub topic
 echo "Creating pubsub topic"
-gcloud pubsub topics create ${PROJECT_ID}-doc-ready --project=${PROJECT_ID}
+gcloud pubsub topics create "${PROJECT_ID}"-doc-ready --project="${PROJECT_ID}"
 
 # Create VPC connector for cloud function
 echo "Creating VPC connector for cloud functions"
-gcloud compute networks vpc-access connectors create vpc-connector --region=${REGION} \
+gcloud compute networks vpc-access connectors create vpc-connector --region="${REGION}" \
     --network=demo-vpc \
     --range=10.8.0.0/28 \
-    --project=${PROJECT_ID} \
+    --project="${PROJECT_ID}" \
     --machine-type=e2-micro 
 
 # Create Document AI processor
@@ -80,7 +82,7 @@ sleep 10
 echo "Creating Cloud Function: write-metadata"
 gcloud functions deploy write-metadata \
 --gen2 \
---region=${REGION} \
+--region="${REGION}" \
 --runtime=python311 \
 --source="./function-scripts/write-metadata" \
 --entry-point="write_metadata" \
@@ -101,7 +103,7 @@ sleep 10
 echo "Creating Cloud Function: process-pdf"
 gcloud functions deploy process-pdf \
 --gen2 \
---region=${REGION} \
+--region="${REGION}" \
 --runtime=python311 \
 --source="./function-scripts/process-pdf" \
 --entry-point="process_pdf" \

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # VPC Network database is on
 export VPC_NETWORK=
 export VPC_SUBNET=$VPC_NETWORK

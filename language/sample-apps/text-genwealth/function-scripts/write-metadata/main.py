@@ -1,11 +1,14 @@
-import functions_framework
+"""Function to write metadata for new pdf documents"""
+
+import os
 import uuid
+import functions_framework
 from google.cloud import storage
 from pathlib import Path
-import os
 
 @functions_framework.cloud_event
 def write_metadata(cloud_event):
+    """Main function"""
     # Set event vars
     data = cloud_event.data
     event_id = cloud_event["id"]
@@ -28,12 +31,12 @@ def write_metadata(cloud_event):
     # Set local vars
     project_id = os.environ['PROJECT_ID']
     metadata_bucket = "{}-docs-metadata".format(project_id)
-    id = str(uuid.uuid4())
+    uid = str(uuid.uuid4())
     ticker = Path(name).stem
     target_file_name = "{}.jsonl".format(ticker)
 
     # Build metadata jsonl
-    metadata = '{"id":"' + id + '","structData":{"ticker":"' + ticker + '"},"content":{"mimeType":"application/pdf","uri":"gs://' + bucket + '/' + name + '"}}'
+    metadata = '{"id":"' + uid + '","structData":{"ticker":"' + ticker + '"},"content":{"mimeType":"application/pdf","uri":"gs://' + bucket + '/' + name + '"}}'
     
     # Write jsonl to metadata bucket
     storage_client = storage.Client()
@@ -46,9 +49,3 @@ def write_metadata(cloud_event):
     print("Metadata for {} written to {}".format(ticker, metadata_bucket))
     print("Metadata object: {}".format(metadata))
     storage_client.close()
-
-
-
-
-
-

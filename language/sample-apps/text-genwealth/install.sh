@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ###
 ### Deploys the genwealth app 
 ###

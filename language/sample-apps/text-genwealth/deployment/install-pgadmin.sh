@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Install jq
 echo "Installing jq"
 sudo apt-get -y install jq
@@ -28,7 +30,7 @@ sql=$(cat << EOF
 CREATE DATABASE ragdemos;
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d postgres
+echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d postgres
 
 sleep 3
 
@@ -39,14 +41,14 @@ CREATE EXTENSION IF NOT EXISTS google_ml_integration VERSION '1.1' CASCADE;
 GRANT EXECUTE ON FUNCTION embedding TO postgres;
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Install pgvector extension
 sql=$(cat << EOF
 CREATE EXTENSION IF NOT EXISTS vector CASCADE;
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create investments table and indexes
 echo "Creating tables"
@@ -74,7 +76,7 @@ ON investments USING hnsw (analysis_embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create the user_profiles table
 sql=$(cat << EOF
@@ -100,7 +102,7 @@ WITH (m = 16, ef_construction = 64);
 
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create the conversation_history table and indexes
 sql=$(cat << EOF
@@ -126,7 +128,7 @@ WITH (m = 16, ef_construction = 64);
 
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create the langchain_vector_store table and index
 sql=$(cat << EOF
@@ -163,7 +165,7 @@ CREATE INDEX IF NOT EXISTS idx_hnsw_co_langchain_vector_store_embedding
 
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 
 # Download test data
@@ -187,7 +189,7 @@ ESCAPE "'"
 )
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Load the user_profiles table
 echo "Loading the user_profiles table"
@@ -200,11 +202,11 @@ ESCAPE "'"
 )
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create the llm() function
 echo "Creating the llm() function"
-cat llm.sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+cat llm.sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create embeddings triggers for investments table
 echo "Creating embeddings triggers"
@@ -236,9 +238,9 @@ EXECUTE PROCEDURE update_analysis_embedding();
 
 EOF
 )
-echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h ${ALLOYDB_IP} -U postgres -d ragdemos
+echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 echo "Access the pgadmin interface using the URL below:"
 echo "http://$(curl -s ifconfig.me)/pgadmin4"
 echo "Connect to AlloyDB using the following IP:"
-echo $ALLOYDB_IP
+echo "$ALLOYDB_IP"

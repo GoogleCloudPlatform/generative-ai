@@ -8,7 +8,7 @@ You have been tasked with building the following Generative AI features into Gen
 
 1. Create a Customer Segmentation feature using Gen AI embeddings and Vector Similarity Search to help Gen Wealth's Marketing Analysts identify target customers for new product campaigns.
 
-1. Build the backend for a RAG-powered AI Chatbot that uses existing customer and product data to provide personalized financial advice. 
+1. Build the backend for a RAG-powered AI Chatbot that uses existing customer and product data to provide personalized financial advice.
 
 The Advisory Services application was recently migrated to GCP, with the front end and middleware services running on Cloud Run, and the PostgreSQL database running on AlloyDB - a fully managed PostgreSQL-compatible database service that combines the best of Open Source with the best of Google to provide 4x OLTP performance, 10x vector search performance, 100x OLAP performance, and AI-powered engine autotuning.  
 
@@ -18,11 +18,11 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
 ### Login to pgAdmin
 
-1. Run the command below in Cloud Shell to get the url for the pgAdmin interface. 
+1. Run the command below in Cloud Shell to get the url for the pgAdmin interface.
 
     ```bash
     # Get the URL for the pgAdmin web server
-    cd && cd genwealth/
+    cd && cd language/sample-apps/text-genwealth/
     source ./env.sh
     echo "http://$(gcloud compute instances describe pgadmin --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone=$ZONE)/pgadmin4"
     ```
@@ -33,10 +33,10 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
     ![pgAdmin Login Interface](../images/pgadmin/1-login.png "pgAdmin Login Interface")
 
-1. Login to pgAdmin. The user name is `demouser@genwealth.com`. The password is the pgAdmin password you chose when you setup the environment. If you forgot the password, you can retrieve it from Secret Manager by running the following command in Cloud Shell. 
+1. Login to pgAdmin. The user name is `demouser@genwealth.com`. The password is the pgAdmin password you chose when you setup the environment. If you forgot the password, you can retrieve it from Secret Manager by running the following command in Cloud Shell.
 
     ```bash
-    cd && cd genwealth/
+    cd && cd language/sample-apps/text-genwealth/
     source ./env.sh
     gcloud secrets versions access latest --secret="pgadmin-password-${PROJECT_ID}"
     echo ""
@@ -52,7 +52,7 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
     ![Register Connection](../images/pgadmin/3-register.png "Register Connection")
 
-1. Enter a friendly name like “AlloyDB” in the Name field, then switch to the Connection tab. 
+1. Enter a friendly name like “AlloyDB” in the Name field, then switch to the Connection tab.
 
     > NOTE: You can ignore the warning that says “Either Host name or Service must be specified”. We will enter that information next.
 
@@ -61,12 +61,14 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 1. In the Connection tab:
     - Enter the AlloyDB Private IP address you wrote down earlier in Step 3.1.
     - Update the Username to `postgres` and enter the password you set for the AlloyDB cluster when you provisioned the environment. If you forgot the password, you can retrieve it by running the following command in Cloud Shell:
+
     ```bash
-    cd && cd genwealth/
+    cd && cd language/sample-apps/text-genwealth/
     source ./env.sh
     gcloud secrets versions access latest --secret="alloydb-password-${PROJECT_ID}"
     echo ""
     ```
+
     - Enable the Save password toggle.
     - Click Save.
 
@@ -80,11 +82,11 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
     ![Object Explorer](../images/pgadmin/6-tree.png "Object Explorer")
 
-1. Right-click the ragdemos database, then click Query Tool. 
+1. Right-click the ragdemos database, then click Query Tool.
 
     ![Query Tool](../images/pgadmin/7-querytool.png "Query Tool")
 
-1. Enter the SQL query below in the Query Tool and then click the Execute button to run it. 
+1. Enter the SQL query below in the Query Tool and then click the Execute button to run it.
 
     ```SQL
     SELECT COUNT(*) FROM investments;
@@ -93,17 +95,17 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 1. This Query Tool interface is where you will run all of the SQL queries provided in the rest of this demo. Notice a few things about the interface:
 
     - There is a connection drop-down list that shows you which database you’re connected to. In this case, we’re connected to the ragdemos database as the postgres user on the AlloyDB instance.
-    - When you click Execute (), the Query Tool will execute everything in the query by default. To only run one block of code at a time, you can select the text you want to execute before clicking the Execute button. 
+    - When you click Execute (), the Query Tool will execute everything in the query by default. To only run one block of code at a time, you can select the text you want to execute before clicking the Execute button.
     - The results of your query show up in the Data Output grid at the bottom of the interface.
-    - There is a Scratch Pad on the right side of the interface that you can use to keep notes. This will be a useful space to copy and paste the enriched prompts and LLM responses we will generate later, because it provides more room to explore the output. 
-    
+    - There is a Scratch Pad on the right side of the interface that you can use to keep notes. This will be a useful space to copy and paste the enriched prompts and LLM responses we will generate later, because it provides more room to explore the output.
+
     ![Query Interface](../images/pgadmin/8-queryinterface.png "Query Interface")
 
 ### Configure pgAdmin Preferences
 
 We will be working with lots of text data in this demo, so it is useful to limit the width of output columns in the results grid for readability.
 
-1. Click File > Preferences. 
+1. Click File > Preferences.
 
     ![Preferences](../images/pgadmin/9-preferences.png "Preferences")
 
@@ -127,7 +129,7 @@ It’s time to build your Gen AI Features! As a reminder, you are a SQL Develope
 
 1. Return to your pgAdmin interface and open a new query window connected to the ragdemos database.
 
-1. Run the following SQL queries one at a time in pgAdmin to explore the data in your investments and user_profiles tables. 
+1. Run the following SQL queries one at a time in pgAdmin to explore the data in your investments and user_profiles tables.
 
     > NOTE: The data in the investments and user_profiles tables is all synthetic and was generated by the text-bison PaLM model via AlloyDB AI’s integration with Vertex AI.
 
@@ -150,11 +152,11 @@ It’s time to build your Gen AI Features! As a reminder, you are a SQL Develope
 
 1. Notice that the investments table contains overview and analysis data for over 8500 stock tickers. The user_profiles table contains basic user information, including names, ages, risk profiles, and bios.
 
-1. Notice that the investments table has embeddings for the overview and analysis columns, and the user_profiles table has embeddings for the bio column. These embeddings were generated by the Google PaLM textembeddings-gecko model via AlloyDB AI’s integration with Vertex AI, and we will use them later to perform semantic search with pgvector similarity search. 
+1. Notice that the investments table has embeddings for the overview and analysis columns, and the user_profiles table has embeddings for the bio column. These embeddings were generated by the Google PaLM textembeddings-gecko model via AlloyDB AI’s integration with Vertex AI, and we will use them later to perform semantic search with pgvector similarity search.
 
 ### Improve the Investment Search Experience
 
-Today, Financial Analysts use a simple Query Builder interface like the one shown below to search through investments using basic keywords. The interface sends a SQL query to the database and returns basic and sometimes unreliable results. 
+Today, Financial Analysts use a simple Query Builder interface like the one shown below to search through investments using basic keywords. The interface sends a SQL query to the database and returns basic and sometimes unreliable results.
 
 You will leverage AlloyDB AI’s vector similarity search capabilities to enhance this experience with semantic search powered by the Google PaLM Gen AI [textembedding-gecko](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) model in Vertex AI.
 
@@ -162,11 +164,11 @@ You will leverage AlloyDB AI’s vector similarity search capabilities to enhanc
 
 Follow the steps below to build the new Gen AI feature.
 
-1. Imagine you are a Financial Analyst who is trying to find investments for your client that are expected to perform well in a high-inflation environment. You would go into the UI and use the query builder, which would generate a basic SQL query like the one below, using naive keyword search with SQL’s LIKE syntax. 
+1. Imagine you are a Financial Analyst who is trying to find investments for your client that are expected to perform well in a high-inflation environment. You would go into the UI and use the query builder, which would generate a basic SQL query like the one below, using naive keyword search with SQL’s LIKE syntax.
 
     Run the SQL query below to see the results users get with basic keyword search today.
 
-    ```SQL 
+    ```SQL
     -- Search for stocks that might perform well in a high inflation environment
     -- using naive keyword search with LIKE:
 
@@ -177,7 +179,7 @@ Follow the steps below to build the new Gen AI feature.
     LIMIT 5;
     ```
 
-1. Take a closer look at the analysis column in your first result, ticker INN_B. 
+1. Take a closer look at the analysis column in your first result, ticker INN_B.
 
     > NOTE: It may be useful to double-click on the result and copy/paste it into the Scratch Pad for easier viewing, as shown in the screenshot below.
 
@@ -196,15 +198,16 @@ Follow the steps below to build the new Gen AI feature.
     ORDER BY distance
     LIMIT 5;
     ```
+
 1. Take a look at the analysis column, and notice that this time you get much better results. The semantic query used Gen AI embeddings to understand what you meant, not just what you said. Your first result, HZN, is an investment that is designed specifically to benefit from high inflation, and the rest of the results would also be good recommendations that you could provide to your client.
 
 ### Add a Customer Segmentation Feature
 
 GenWealth’s Marketing Analysts have requested a better way to identify target customers for their new products and services. They want to conduct targeted advertising campaigns to increase conversion rates and to avoid annoying customers that they know are unlikely to be interested in a particular product. GenWealth’s customers pay a premium for personalized, boutique service, and a mass email wouldn’t be effective or well-received.
 
-You will leverage AlloyDB AI’s vector similarity search capabilities to identify target customers using semantic search powered by the Google PaLM Gen AI textembeddings-gecko model in Vertex AI. You will also enable hybrid search by allowing analysts to narrow their semantic search results with metadata filters. 
+You will leverage AlloyDB AI’s vector similarity search capabilities to identify target customers using semantic search powered by the Google PaLM Gen AI textembeddings-gecko model in Vertex AI. You will also enable hybrid search by allowing analysts to narrow their semantic search results with metadata filters.
 
-Users will access the customer segmentation feature using a UI similar to the one below. The application will generate a SQL query based on the user’s inputs, and the database will do the rest. 
+Users will access the customer segmentation feature using a UI similar to the one below. The application will generate a SQL query based on the user’s inputs, and the database will do the rest.
 
 ![Prospect Finder](../images/pgadmin/13-prospectfinder.png "Prospect Finder")
 
@@ -231,9 +234,9 @@ Follow the steps below to build the new Gen AI feature.
 
 #### Hybrid Search (Semantic Search + Keyword Filtering)
 
-1. While the semantic query gave you pretty good results with minimal effort, you would like to refine your results by filtering out clients with medium and low risk tolerances, as well as clients who are close to retirement age. This technique is called Hybrid Search, and it combines the power of semantic search with the ability to limit results based on metadata and tags. 
+1. While the semantic query gave you pretty good results with minimal effort, you would like to refine your results by filtering out clients with medium and low risk tolerances, as well as clients who are close to retirement age. This technique is called Hybrid Search, and it combines the power of semantic search with the ability to limit results based on metadata and tags.
 
-1. Hybrid Search can be complex to implement in some vector databases, but since you’re building this feature using SQL in AlloyDB, all it takes to enable Hybrid Search is a simple WHERE clause. 
+1. Hybrid Search can be complex to implement in some vector databases, but since you’re building this feature using SQL in AlloyDB, all it takes to enable Hybrid Search is a simple WHERE clause.
 
 1. Run the query below to see your new list of potential customers for your new product.
 
@@ -254,7 +257,7 @@ You have now built your first two Gen AI features using just SQL!
 
 GenWealth would like to build a new Gen AI chatbot to provide clients with 24/7 access to financial education, account details, and basic information related to budgeting, saving, and different types of investments. GenWealth guards their brand and reputation very carefully, and they don’t want to risk deploying a chatbot that might give their customers factually incorrect information (i.e. “hallucinate”).
 
-You will write a PostgreSQL function that takes a user’s prompt and enriches it with data from your application database to improve the accuracy and trustworthiness of the chatbot’s output. The function will send the enriched prompt to the Google PaLM text-bison model using AlloyDB AI’s integration with Vertex AI, and it will return the LLM response to the user. 
+You will write a PostgreSQL function that takes a user’s prompt and enriches it with data from your application database to improve the accuracy and trustworthiness of the chatbot’s output. The function will send the enriched prompt to the Google PaLM text-bison model using AlloyDB AI’s integration with Vertex AI, and it will return the LLM response to the user.
 
 Users will interact with the chatbot using a UI similar to the one below. The application will generate a SQL query based on the user’s prompt, and the database will do the rest.
 
@@ -273,7 +276,7 @@ Follow the steps below to build the new Gen AI feature.
     WHERE proname = 'llm';
     ```
 
-1. Notice that the function takes in a set of parameters, which it uses to enrich the user’s prompt. At the end of the function, it makes a call to the text-bison LLM in Vertex AI using the [ml_predict_row() function](https://cloud.google.com/alloydb/docs/ai/invoke-predictions). 
+1. Notice that the function takes in a set of parameters, which it uses to enrich the user’s prompt. At the end of the function, it makes a call to the text-bison LLM in Vertex AI using the [ml_predict_row() function](https://cloud.google.com/alloydb/docs/ai/invoke-predictions).
 
     ![Predict](../images/pgadmin/15-predict.png "Predict")
 
@@ -289,9 +292,9 @@ Follow the steps below to build the new Gen AI feature.
 
     ![Enriched Prompt](../images/pgadmin/16-enriched.png "Enriched Prompt")
 
-1. Now take a look at the llm_output column. Our prompt is still somewhat generic, so the output is unsurprisingly a bit generic as well. 
+1. Now take a look at the llm_output column. Our prompt is still somewhat generic, so the output is unsurprisingly a bit generic as well.
 
-    > NOTE: Your specific output may differ due to the dynamic nature of LLMs. 
+    > NOTE: Your specific output may differ due to the dynamic nature of LLMs.
 
     ![Text Completion](../images/pgadmin/17-textcompletion.png "Text Completion")
 
@@ -301,7 +304,7 @@ Follow the steps below to build the new Gen AI feature.
 
 1. Now we’ll do a bit of prompt engineering to improve our output. The user is still only responsible for entering the prompt into the UI, but we’ll do some additional prompt enrichment by clarifying the AI’s role and adding a mission and output branding instructions.
 
-1. Read through the llm_role, mission, and output_instructions parameters in the query below to understand the instructions we’re passing to the model, then run the query and view the llm_response output. 
+1. Read through the llm_role, mission, and output_instructions parameters in the query below to understand the instructions we’re passing to the model, then run the query and view the llm_response output.
 
     ```SQL
     -- Give the AI a role, a mission, and output branding instructions
@@ -321,7 +324,7 @@ Follow the steps below to build the new Gen AI feature.
 
 #### Change the Mission
 
-1. Every parameter matters! Read through the query below, and notice that everything is the same as the last query, except that we changed the mission. Run the query and take a look at the llm_output. 
+1. Every parameter matters! Read through the query below, and notice that everything is the same as the last query, except that we changed the mission. Run the query and take a look at the llm_output.
 
     ```SQL
     -- Every parameter matters! Change the mission to see the impact.
@@ -456,7 +459,7 @@ Congratulations! You’ve built three trustworthy Gen AI features using the data
     WHERE proname = 'llm';
     ```
 
-1. This is a custom function that was created specifically for this lab. Notice that it accepts several input parameters that we haven’t used yet. You can use these parameters to further tune and personalize your LLM output. 
+1. This is a custom function that was created specifically for this lab. Notice that it accepts several input parameters that we haven’t used yet. You can use these parameters to further tune and personalize your LLM output.
 
     ![LLM Function](../images/pgadmin/19-llm.png "LLM Function")
 
@@ -535,7 +538,7 @@ Congratulations! You’ve built three trustworthy Gen AI features using the data
 
 ## Clean Up
 
-Be sure to delete the resources you no longer need when you’re done with the lab and demo. If you created a new project for the lab as recommended, you can delete the whole project using the command below in your Cloud Shell session (NOT the pgadmin VM). 
+Be sure to delete the resources you no longer need when you’re done with the lab and demo. If you created a new project for the lab as recommended, you can delete the whole project using the command below in your Cloud Shell session (NOT the pgadmin VM).
 
 > DANGER: Be sure to set PROJECT_ID to the correct project, and run this command ONLY if you are SURE there is nothing in the project that you might still need.
 
@@ -547,6 +550,6 @@ gcloud projects delete ${PROJECT_ID}
 
 ## Summary
 
-In this demo, you built new Gen AI features into your existing application using just SQL, including semantic search, customer segmentation, and a Gen AI chatbot. You also learned how to query your relational database using natural semantic query concepts. 
+In this demo, you built new Gen AI features into your existing application using just SQL, including semantic search, customer segmentation, and a Gen AI chatbot. You also learned how to query your relational database using natural semantic query concepts.
 
-If you'd like to see how this back end implementation could be leveraged on the front end, take a look at the [Front End Demo Walkthrough guide](./frontend-demo-walkthrough.md) to see GenWealth's Advisory Services UI in action. 
+If you'd like to see how this back end implementation could be leveraged on the front end, take a look at the [Front End Demo Walkthrough guide](./frontend-demo-walkthrough.md) to see GenWealth's Advisory Services UI in action.

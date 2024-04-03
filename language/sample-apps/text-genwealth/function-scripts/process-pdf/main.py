@@ -1,5 +1,9 @@
-import functions_framework
+"""Cloud Function code to process a pdf dropped in GCS"""
+
+import os
+import uuid
 import re
+import functions_framework
 from typing import Optional
 from google.api_core.client_options import ClientOptions
 from google.api_core.exceptions import InternalServerError
@@ -12,9 +16,7 @@ from pathlib import Path
 from langchain_google_vertexai import VertexAIEmbeddings
 from langchain_google_alloydb_pg import AlloyDBEngine, AlloyDBVectorStore, Column
 from langchain_core.prompts import PromptTemplate
-import uuid
 from google.cloud import pubsub_v1
-import os
 
 # Source: https://cloud.google.com/document-ai/docs/samples/documentai-batch-process-document#documentai_batch_process_document-python
 def batch_process_documents(
@@ -29,6 +31,7 @@ def batch_process_documents(
     field_mask: Optional[str] = None,
     timeout: int = 400,
 ) -> None:
+    """Function to batch process documents"""
     # You must set the `api_endpoint` if you use a location other than "us".
     opts = ClientOptions(api_endpoint=f"{location}-documentai.googleapis.com")
 
@@ -121,8 +124,7 @@ def batch_process_documents(
     return list(output_blobs)
 
 def split_document(_doc):
-    """Splits a LangChain Document into smaller chunks."""
-    
+    """Splits a LangChain Document into smaller chunks."""    
     # Use a recursive splitter for better semantic chunking
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=9216, 
@@ -130,8 +132,7 @@ def split_document(_doc):
     )
 
     new_docs = []
-    for page in _doc:
-        
+    for page in _doc:        
         # Create smaller documents
         new_chunks = splitter.create_documents([page.page_content],[page.metadata])
 
@@ -146,6 +147,7 @@ def split_document(_doc):
 # Triggered by a change in a storage bucket
 @functions_framework.cloud_event
 def process_pdf(cloud_event):
+    """Main function"""
     data = cloud_event.data
 
     event_id = cloud_event["id"]
@@ -171,18 +173,15 @@ def process_pdf(cloud_event):
         return
 
     # Project vars
-    
     region = os.environ['REGION']
-    zone = os.environ['ZONE']
     project_id = os.environ['PROJECT_ID']
-    debug = 0
 
     # Doc AI Vars
     source_file = "gs://{}/{}".format(bucket, name)
     gcs_output_uri = "gs://{}-doc-ai/doc-ai-output/".format(project_id) # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
     location = "us" # Format is "us" or "eu"
     processor_id = os.environ['PROCESSOR_ID'] # Create processor before running sample
-    
+
     # AlloyDB Vars
     cluster = 'alloydb-cluster'
     instance = 'alloydb-instance'
@@ -209,7 +208,6 @@ def process_pdf(cloud_event):
 
 
     # Document AI may output multiple JSON files per source file
-    doc_text = []
     lc_doc = []
     for blob in blobs:
         # Document AI should only output JSON files to GCS
@@ -244,8 +242,6 @@ def process_pdf(cloud_event):
                         "doc_ai_chunk_size": blob._CHUNK_SIZE_MULTIPLE,
                         "doc_ai_chunk_uri": blob.public_url})
         lc_doc.append(page)
-
-        #doc_text.append({'Page': document.shard_info.shard_index + 1, 'Text': document.text})
 
     # Split docs into smaller chunks (max 3072 tokens, 9216 characters)
     lc_doc_chunks = split_document(lc_doc)

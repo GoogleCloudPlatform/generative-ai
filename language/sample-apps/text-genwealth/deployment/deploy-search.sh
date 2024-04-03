@@ -1,9 +1,11 @@
+#!/usr/bin/env bash
+
 # Load env variables
 source ./env.sh
 
 # Enable APIs
 echo "Enabling discovery engine API"
-gcloud services enable discoveryengine.googleapis.com --project ${PROJECT_ID}
+gcloud services enable discoveryengine.googleapis.com --project "${PROJECT_ID}"
 
 # Call the first API with yes to enable to second necessary API (can't do this directly today)
 
