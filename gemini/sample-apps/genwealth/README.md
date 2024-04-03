@@ -51,7 +51,7 @@ The GenWealth demo application was built using:
     ```bash
     cd
     git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-    cd gemini/sample-apps/genwealth
+    cd generative-ai/gemini/sample-apps/genwealth/
     ```
 
 1. In a separate tab, navigate to <https://ipv4.icanhazip.com/> and write down your device's public IP. You will need this in the next step.
@@ -97,7 +97,7 @@ The GenWealth demo application was built using:
     --member=allUsers --role=roles/storage.objectViewer
     ```
 
-1. If you get an error saying, `Configuration is not authorized on "genwealth-xxxxxxxxx-uc.a.run.app".` when trying to use the search widget in the Research interface, ensure the domain is allowed to access the widget in the Vertex AI Search and Conversation Integrations page, and ensure you have accepted the usage terms and activated the API (see steps 10 and 11).
+1. If you get an error saying, `Configuration is not authorized on "genwealth-xxxxxxxxx-uc.a.run.app".` when trying to use the search widget in the Research interface, ensure the domain is allowed to access the widget in the Vertex AI Search and Conversation Integrations page, and ensure you have accepted the usage terms and activated the API (see steps 11 and 12).
 
 ## Architecture
 
