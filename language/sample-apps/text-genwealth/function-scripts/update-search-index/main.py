@@ -2,9 +2,11 @@
 
 import os
 from typing import Optional
+
+import functions_framework
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine
-import functions_framework
+
 
 def import_documents_sample(
     project_id: str,
@@ -73,6 +75,7 @@ def import_documents_sample(
 
     return operation.operation.name
 
+
 @functions_framework.cloud_event
 def update_search_index(cloud_event):
     """Main function"""
@@ -94,17 +97,16 @@ def update_search_index(cloud_event):
     print(f"Metageneration: {metageneration}")
     print(f"Created: {timeCreated}")
     print(f"Updated: {updated}")
-    
-    project_id = os.environ['PROJECT_ID']
-    location = 'global'
-    data_store_id = os.environ['DATASTORE_ID']
-    docs_metadata_bucket = os.environ['DOCS_METADATA_BUCKET']
+
+    project_id = os.environ["PROJECT_ID"]
+    location = "global"
+    data_store_id = os.environ["DATASTORE_ID"]
+    docs_metadata_bucket = os.environ["DOCS_METADATA_BUCKET"]
     gcs_uri = "gs://{}/*.jsonl".format(docs_metadata_bucket)
 
     import_documents_sample(
-        project_id = project_id,
-        location = location,
-        data_store_id = data_store_id,
-        gcs_uri = gcs_uri
-    ) 
-
+        project_id=project_id,
+        location=location,
+        data_store_id=data_store_id,
+        gcs_uri=gcs_uri,
+    )
