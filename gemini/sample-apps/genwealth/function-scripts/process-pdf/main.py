@@ -87,13 +87,6 @@ def batch_process_documents(
     except (RetryError, InternalServerError) as e:
         print(e.message)
 
-    # NOTE: Can also use callbacks for asynchronous processing
-    #
-    # def my_callback(future):
-    #   result = future.result()
-    #
-    # operation.add_done_callback(my_callback)
-
     # Once the operation is complete,
     # get output document information from operation metadata
     metadata = documentai.BatchProcessMetadata(operation.metadata)
@@ -183,34 +176,18 @@ def process_pdf(cloud_event):
     project_id = os.environ["PROJECT_ID"]
 
     # Doc AI Vars
-    source_file = "gs://{}/{}".format(bucket, name)
-    gcs_output_uri = "gs://{}-doc-ai/doc-ai-output/".format(
-        project_id
-    )  # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
+    source_file = f"gs://{bucket}/{name}"
+    gcs_output_uri = f"gs://{project_id}-doc-ai/doc-ai-output/"  # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
     location = "us"  # Format is "us" or "eu"
     processor_id = os.environ["PROCESSOR_ID"]  # Create processor before running sample
-
-    # AlloyDB Vars
-    cluster = "alloydb-cluster"
-    instance = "alloydb-instance"
-    database = "ragdemos"
-    table_name = "langchain_vector_store"
-    user = "postgres"
-    password = os.environ["ALLOYDB_PASSWORD"]
-    initialize_vector_store = False
-    ip_type = os.environ["IP_TYPE"]
 
     blobs = batch_process_documents(
         project_id=project_id,
         location=location,
         processor_id=processor_id,
         gcs_output_uri=gcs_output_uri,
-        # processor_version_id = processor_version_id,
-        # TODO(developer): You must specify either `gcs_input_uri` and `mime_type` or `gcs_input_prefix`
         gcs_input_uri=source_file,  # Format: gs://bucket/directory/file.pdf
-        input_mime_type="application/pdf",
-        # gcs_input_prefix = "gs://genwealth-doc-ai/doc-ai-input/" # Format: gs://bucket/directory/
-        # field_mask = "text,entities,pages.pageNumber"  # Optional. The fields to return in the Document object.
+        input_mime_type="application/pdf"
     )
 
     # Document AI may output multiple JSON files per source file
@@ -228,13 +205,6 @@ def process_pdf(cloud_event):
         document = documentai.Document.from_json(
             blob.download_as_bytes(), ignore_unknown_fields=True
         )
-
-        # For a full list of Document object attributes, please reference this page:
-        # https://cloud.google.com/python/docs/reference/documentai/latest/google.cloud.documentai_v1.types.Document
-
-        # Read the text recognition output from the processor
-        # print("The document contains the following text:")
-        # print(document.text)
 
         # Create LangChain doc
         page = Document(
@@ -259,6 +229,16 @@ def process_pdf(cloud_event):
     embedding = VertexAIEmbeddings(
         model_name="textembedding-gecko@003", project=project_id
     )
+
+    # AlloyDB Vars
+    cluster = "alloydb-cluster"
+    instance = "alloydb-instance"
+    database = "ragdemos"
+    table_name = "langchain_vector_store"
+    user = "postgres"
+    password = os.environ["ALLOYDB_PASSWORD"]
+    initialize_vector_store = False
+    ip_type = os.environ["IP_TYPE"]
 
     # Create vector store
     engine = AlloyDBEngine.from_instance(
@@ -291,8 +271,6 @@ def process_pdf(cloud_event):
             overwrite_existing=True,
         )
 
-    # TO DO: Create vector index
-
     store = AlloyDBVectorStore.create_sync(
         engine=engine,
         table_name=table_name,
@@ -319,10 +297,9 @@ def process_pdf(cloud_event):
     # Send message to pubsub topic to kick off next step
     ticker = Path(source_file).stem
     publisher = pubsub_v1.PublisherClient()
-    topic_name = "projects/{}/topics/{}-doc-ready".format(project_id, project_id)
-    # publisher.create_topic(name=topic_name)
+    topic_name = f"projects/{project_id}/topics/{project_id}-doc-ready"
     future = publisher.publish(
-        topic_name, bytes("{}".format(ticker).encode("utf-8")), spam="done"
+        topic_name, bytes(f"{ticker}".encode("utf-8")), spam="done"
     )
     future.result()
     print("Sent message to pubsub")

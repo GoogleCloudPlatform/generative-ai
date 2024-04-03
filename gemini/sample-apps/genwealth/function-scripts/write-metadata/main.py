@@ -32,10 +32,10 @@ def write_metadata(cloud_event):
 
     # Set local vars
     project_id = os.environ["PROJECT_ID"]
-    metadata_bucket = "{}-docs-metadata".format(project_id)
+    metadata_bucket = f"{project_id}-docs-metadata"
     uid = str(uuid.uuid4())
     ticker = Path(name).stem
-    target_file_name = "{}.jsonl".format(ticker)
+    target_file_name = f"{ticker}.jsonl"
 
     # Build metadata jsonl
     metadata = (
@@ -58,6 +58,6 @@ def write_metadata(cloud_event):
     with blob.open("w") as f:
         f.write(metadata)
 
-    print("Metadata for {} written to {}".format(ticker, metadata_bucket))
-    print("Metadata object: {}".format(metadata))
+    print(f"Metadata for {ticker} written to {metadata_bucket}")
+    print(f"Metadata object: {metadata}")
     storage_client.close()

@@ -59,7 +59,7 @@ def analyze_prospectus(cloud_event):
     )
     template = """
 <MISSION>
- You are an experiences financial analyst. Your task is to create a detailed
+ You are an experienced financial analyst. Your task is to create a detailed
  company overview for {ticker} using their latest prospectus. I will be
  sending you the prospectus one chunk at a time. There are a total of
  {total_chunk_count} chunks, and I am sending you chunk number
@@ -96,9 +96,9 @@ def analyze_prospectus(cloud_event):
         overview = "None"
 
         for i in range(len(result)):
-            # print(result[i])
+            current_chunk = i+1
             print(
-                "Adding chunk {} of {} to overview...".format(i + 1, total_chunk_count)
+                f"Adding chunk {current_chunk} of {total_chunk_count} to overview..."
             )
             fmt_prompt = prompt.format(
                 total_chunk_count=total_chunk_count,
