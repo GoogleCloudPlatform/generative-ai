@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+**/dist
+/tmp
+/out-tsc
+/bazel-out
 
 # C extensions
 *.so
@@ -145,11 +149,39 @@ README-TOC*.md
 
 tmp*
 
-# VS Code
+# Node
+**/node_modules
+npm-debug.log
+yarn-error.log
+
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
 .vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
 
-# Local History for Visual Studio Code
-.history/
+# Miscellaneous
+**/.angular/*
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
 
-# Built Visual Studio Code Extensions
-*.vsix
+# System files
+.DS_Store
+Thumbs.db
