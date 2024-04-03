@@ -156,7 +156,7 @@ The `investment` and `user_profiles` tables are pre-populated with synthetic tes
 
 ### Document Ingestion Pipeline
 
-In addition to the synthetic data provided for the demo, you can use the document ingestion pipeline to extract data from PDFs, like the ones provided in the [sample-prospectus](./sample-prospectus/) folder.
+In addition to the synthetic data provided for the demo, you can use the document ingestion pipeline to extract data from PDFs, like the [RYDE prospectus](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/sample-prospectus/RYDE.pdf).
 
 Simply drop a PDF into the `$PROJECT_ID-docs` bucket to start analyzing it (we recommend using prospectuses, 10K's, or 10Q's that are named with the investment ticker like `GOOG.pdf` for this specific use case). That will kick off a pipeline of Cloud Functions that will ingest document chunks and metadata into the `langchain_vector_store` table, and it will write generated `overview` and `analysis` data and metadata to the `investments` table.
 

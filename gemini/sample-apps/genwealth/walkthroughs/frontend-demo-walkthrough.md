@@ -16,13 +16,13 @@ In this scenario, we’ll be adding 3 new Gen AI features to GenWealth’s exist
 
 ### Pre-Work
 
-Imagine you are a Financial Analyst, and you need to analyze a Prospectus [like this](../sample-prospectus/RYDE.pdf) for an upcoming IPO.
+Imagine you are a Financial Analyst, and you need to analyze a Prospectus [like this](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/sample-prospectus/RYDE.pdf) for an upcoming IPO.
 
 You're expected to create a company overview, a stock analysis, and determine a buy/sell/ or hold rating for this new security. You could comb through the 191-page prospectus and draft something from scratch, or you can use Gen AI to jumpstart your effort.
 
 You can simply drop that file into the `$PROJECT_ID-docs` bucket in GCS to kick off a pipeline of Cloud Functions that perform the steps listed below.
 
-> NOTE: This pipeline was already executed on the sample files in the [sample-prospectus](../sample-prospectus/) folder when you ran `install.sh`. You can drop another PDF document like this into the `$PROJECT_ID-docs` bucket to see the pipeline in action.
+> NOTE: This pipeline was already executed on a few sample files when you ran `install.sh`. You can drop another PDF document like this into the `$PROJECT_ID-docs` bucket to see the pipeline in action.
 
 1. Extract text from the PDF using Document AI.
 
