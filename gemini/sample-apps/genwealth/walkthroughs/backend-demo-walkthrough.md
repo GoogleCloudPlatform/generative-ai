@@ -22,7 +22,7 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
     ```bash
     # Get the URL for the pgAdmin web server
-    cd && cd language/sample-apps/text-genwealth/
+    cd && cd gemini/sample-apps/genwealth/
     source ./env.sh
     echo "http://$(gcloud compute instances describe pgadmin --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone=$ZONE)/pgadmin4"
     ```
@@ -36,7 +36,7 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 1. Login to pgAdmin. The user name is `demouser@genwealth.com`. The password is the pgAdmin password you chose when you setup the environment. If you forgot the password, you can retrieve it from Secret Manager by running the following command in Cloud Shell.
 
     ```bash
-    cd && cd language/sample-apps/text-genwealth/
+    cd && cd gemini/sample-apps/genwealth/
     source ./env.sh
     gcloud secrets versions access latest --secret="pgadmin-password-${PROJECT_ID}"
     echo ""
@@ -63,7 +63,7 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
     - Update the Username to `postgres` and enter the password you set for the AlloyDB cluster when you provisioned the environment. If you forgot the password, you can retrieve it by running the following command in Cloud Shell:
 
     ```bash
-    cd && cd language/sample-apps/text-genwealth/
+    cd && cd gemini/sample-apps/genwealth/
     source ./env.sh
     gcloud secrets versions access latest --secret="alloydb-password-${PROJECT_ID}"
     echo ""

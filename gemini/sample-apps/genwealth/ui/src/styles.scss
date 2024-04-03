@@ -1,15 +1,11 @@
+/* stylelint-disable */
 @use '@angular/material' as mat;
 
 @include mat.core();
 
-/* stylelint-disable */
-// Define the palettes for your theme using the Material Design palettes available in palette.scss
-// (imported above). For each palette, you can optionally specify a default, lighter, and darker
-// hue. Available color palettes: https://material.io/design/color/
 $cymbal-primary: mat.define-palette(mat.$green-palette, 700); 
 $cymbal-accent:  mat.define-palette(mat.$blue-palette, 500);
 $cymbal-warn:    mat.define-palette(mat.$red-palette);
-/* stylelint-enable */
 
 // Theme creation
 $cymbal-theme: mat.define-light-theme((
@@ -47,3 +43,5 @@ mat-card-title {
 }
 
 @include mat.all-component-themes($cymbal-theme);
+
+/* stylelint-enable */

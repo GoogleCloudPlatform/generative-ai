@@ -51,7 +51,7 @@ The GenWealth demo application was built using:
     ```bash
     cd
     git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-    cd language/sample-apps/text-genwealth
+    cd gemini/sample-apps/genwealth
     ```
 
 1. In a separate tab, navigate to <https://ipv4.icanhazip.com/> and write down your device's public IP. You will need this in the next step.

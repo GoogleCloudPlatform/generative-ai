@@ -40,4 +40,4 @@
 /generative-ai/speech/use-cases/storytelling                @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases                             @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/getting-started                       @iamthuya @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/sample-apps/text-genwealth          @paulramsey @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/genwealth                 @paulramsey @GoogleCloudPlatform/generative-ai-devrel
