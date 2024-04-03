@@ -1,0 +1,3 @@
+[sqlfluff]
+
+dialect = postgres
