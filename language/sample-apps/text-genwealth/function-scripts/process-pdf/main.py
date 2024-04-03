@@ -1,22 +1,21 @@
 """Cloud Function code to process a pdf dropped in GCS"""
 
 import os
-import uuid
+from pathlib import Path
 import re
-import functions_framework
 from typing import Optional
+import uuid
+
+import functions_framework
 from google.api_core.client_options import ClientOptions
-from google.api_core.exceptions import InternalServerError
-from google.api_core.exceptions import RetryError
+from google.api_core.exceptions import InternalServerError, RetryError
 from google.cloud import documentai  # type: ignore
-from google.cloud import storage
+from google.cloud import pubsub_v1, storage
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from pathlib import Path
-from langchain_google_vertexai import VertexAIEmbeddings
-from langchain_google_alloydb_pg import AlloyDBEngine, AlloyDBVectorStore, Column
 from langchain_core.prompts import PromptTemplate
-from google.cloud import pubsub_v1
+from langchain_google_alloydb_pg import AlloyDBEngine, AlloyDBVectorStore, Column
+from langchain_google_vertexai import VertexAIEmbeddings
 
 
 # Source: https://cloud.google.com/document-ai/docs/samples/documentai-batch-process-document#documentai_batch_process_document-python
@@ -210,7 +209,7 @@ def process_pdf(cloud_event):
         # processor_version_id = processor_version_id,
         # TODO(developer): You must specify either `gcs_input_uri` and `mime_type` or `gcs_input_prefix`
         gcs_input_uri=source_file,  # Format: gs://bucket/directory/file.pdf
-        input_mime_type="application/pdf",
+        input_mime_type="application/pdf"
         # gcs_input_prefix = "gs://genwealth-doc-ai/doc-ai-input/" # Format: gs://bucket/directory/
         # field_mask = "text,entities,pages.pageNumber"  # Optional. The fields to return in the Document object.
     )
