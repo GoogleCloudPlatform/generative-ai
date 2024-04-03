@@ -1,10 +1,12 @@
 """Function to write metadata for new pdf documents"""
 
 import os
+from pathlib import Path
 import uuid
+
 import functions_framework
 from google.cloud import storage
-from pathlib import Path
+
 
 
 @functions_framework.cloud_event

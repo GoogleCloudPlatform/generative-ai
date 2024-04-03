@@ -2,9 +2,11 @@
 
 import os
 from typing import Optional
+
+import functions_framework
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine
-import functions_framework
+
 
 
 def import_documents_sample(

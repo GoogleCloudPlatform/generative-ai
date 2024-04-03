@@ -2,10 +2,11 @@
 
 import base64
 import os
+
 import functions_framework
-from langchain_google_vertexai import VertexAI
-from langchain_core.prompts import PromptTemplate
 from google.cloud.alloydb.connector import Connector
+from langchain_core.prompts import PromptTemplate
+from langchain_google_vertexai import VertexAI
 import sqlalchemy
 
 
