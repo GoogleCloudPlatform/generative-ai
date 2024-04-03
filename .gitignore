@@ -144,3 +144,12 @@ README-TOC*.md
 .Terraform*
 
 tmp*
+
+# VS Code
+.vscode/*
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
