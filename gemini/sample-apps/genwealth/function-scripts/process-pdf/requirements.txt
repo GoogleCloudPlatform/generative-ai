@@ -37,7 +37,7 @@ jsonpatch==1.33
 jsonpointer==2.4
 langchain==0.1.12
 langchain-community==0.0.28
-langchain-core==0.1.32
+langchain-core==0.1.35
 langchain-google-vertexai==0.1.1
 langchain-text-splitters==0.0.1
 langchain-google-alloydb-pg==0.1.0
