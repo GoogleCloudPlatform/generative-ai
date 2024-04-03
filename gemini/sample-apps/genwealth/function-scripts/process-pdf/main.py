@@ -187,7 +187,7 @@ def process_pdf(cloud_event):
         processor_id=processor_id,
         gcs_output_uri=gcs_output_uri,
         gcs_input_uri=source_file,  # Format: gs://bucket/directory/file.pdf
-        input_mime_type="application/pdf"
+        input_mime_type="application/pdf",
     )
 
     # Document AI may output multiple JSON files per source file

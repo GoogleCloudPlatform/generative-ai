@@ -54,9 +54,7 @@ def analyze_prospectus(cloud_event):
     sql = f"SELECT content FROM {table_name} WHERE ticker = '{ticker}' ORDER BY page, page_chunk"
 
     # Prep model and template
-    model = VertexAI(
-        model_name="gemini-pro", max_output_tokens=1024, temperature=0.0
-    )
+    model = VertexAI(model_name="gemini-pro", max_output_tokens=1024, temperature=0.0)
     template = """
 <MISSION>
  You are an experienced financial analyst. Your task is to create a detailed
@@ -96,10 +94,8 @@ def analyze_prospectus(cloud_event):
         overview = "None"
 
         for i in range(len(result)):
-            current_chunk = i+1
-            print(
-                f"Adding chunk {current_chunk} of {total_chunk_count} to overview..."
-            )
+            current_chunk = i + 1
+            print(f"Adding chunk {current_chunk} of {total_chunk_count} to overview...")
             fmt_prompt = prompt.format(
                 total_chunk_count=total_chunk_count,
                 current_chunk_count=i,
