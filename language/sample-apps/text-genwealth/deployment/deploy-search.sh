@@ -40,7 +40,7 @@ DATA_STORE_ID=$(curl -X GET \
 DATA_STORE_ID=${DATA_STORE_ID##*/}
 
 # Upload samples to gcs
-gsutil cp sample-prospectus/*.pdf gs://${DOCS_BUCKET}
+gsutil cp sample-prospectus/*.pdf gs://"${DOCS_BUCKET}"
 
 sleep 10
 
@@ -53,7 +53,7 @@ curl -X POST \
   "https://discoveryengine.googleapis.com/v1/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATA_STORE_ID}/branches/0/documents:import" \
   -d '{
     "gcsSource": {
-      "inputUris": ["gs://'${DOCS_METADATA_BUCKET}'/*.jsonl"],
+      "inputUris": ["gs://'"${DOCS_METADATA_BUCKET}"'/*.jsonl"],
       "dataSchema": "document",
     }
   }'
@@ -68,7 +68,7 @@ curl -X POST \
 "https://discoveryengine.googleapis.com/v1/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines?engineId=search-prospectus-${PROJECT_ID}" \
 -d '{
   "displayName": "search-prospectus",
-  "dataStoreIds": ["'${DATA_STORE_ID}'"],
+  "dataStoreIds": ["'"${DATA_STORE_ID}"'"],
   "solutionType": "SOLUTION_TYPE_SEARCH",
   "searchEngineConfig": {
      "searchTier": "SEARCH_TIER_ENTERPRISE",
@@ -79,11 +79,11 @@ curl -X POST \
 echo "Deploying function: update-search-index"
 gcloud functions deploy update-search-index \
 --gen2 \
---region=${REGION} \
+--region="${REGION}" \
 --runtime=python311 \
 --source="./function-scripts/update-search-index" \
 --entry-point="update_search_index" \
---set-env-vars="PROJECT_ID=${PROJECT_ID},DATASTORE_ID=${DATASTORE_ID},DOCS_METADATA_BUCKET=${DOCS_METADATA_BUCKET}" \
+--set-env-vars="PROJECT_ID=${PROJECT_ID},DATASTORE_ID=${DATA_STORE_ID},DOCS_METADATA_BUCKET=${DOCS_METADATA_BUCKET}" \
 --timeout=540s \
 --run-service-account="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
 --service-account="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \

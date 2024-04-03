@@ -13,6 +13,7 @@ export PGDATABASE=ragdemos
 export PGUSER=postgres
 export PGHOST=${ALLOYDB_IP}
 export PGPASSWORD=${ALLOYDB_PASSWORD}
+# shellcheck disable=SC2155
 export PROJECT_ID=$(gcloud config get-value project)
 # GCS Bucket for storing prospectus PDFs
 export PROSPECTUS_BUCKET= 

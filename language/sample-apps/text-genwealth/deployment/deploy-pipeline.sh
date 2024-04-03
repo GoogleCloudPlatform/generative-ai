@@ -58,7 +58,7 @@ sleep 90
 echo "Creating Cloud Function: analyze-prospectus"
 gcloud functions deploy analyze-prospectus \
 --gen2 \
---region=${REGION} \
+--region="${REGION}" \
 --runtime=python311 \
 --source="./function-scripts/analyze-prospectus" \
 --entry-point="analyze_prospectus" \

@@ -18,6 +18,7 @@ from langchain_google_alloydb_pg import AlloyDBEngine, AlloyDBVectorStore, Colum
 from langchain_core.prompts import PromptTemplate
 from google.cloud import pubsub_v1
 
+
 # Source: https://cloud.google.com/document-ai/docs/samples/documentai-batch-process-document#documentai_batch_process_document-python
 def batch_process_documents(
     project_id: str,
@@ -101,7 +102,7 @@ def batch_process_documents(
 
     if metadata.state != documentai.BatchProcessMetadata.State.SUCCEEDED:
         raise ValueError(f"Batch Process Failed: {metadata.state_message}")
-    
+
     storage_client = storage.Client()
 
     # One process per Input Document
@@ -123,26 +124,33 @@ def batch_process_documents(
 
     return list(output_blobs)
 
+
 def split_document(_doc):
-    """Splits a LangChain Document into smaller chunks."""    
+    """Splits a LangChain Document into smaller chunks."""
     # Use a recursive splitter for better semantic chunking
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=9216, 
+        chunk_size=9216,
         chunk_overlap=200,  # Add overlap for context
     )
 
     new_docs = []
-    for page in _doc:        
+    for page in _doc:
         # Create smaller documents
-        new_chunks = splitter.create_documents([page.page_content],[page.metadata])
+        new_chunks = splitter.create_documents([page.page_content], [page.metadata])
 
         # Reconstruct documents with the same metadata
         for i in range(len(new_chunks)):
-            new_chunks[i].metadata['page_chunk'] = i
-            new_chunks[i].metadata['chunk_size'] = len(new_chunks[i].page_content)
-            new_docs.append(Document(page_content=new_chunks[i].page_content, metadata=new_chunks[i].metadata))
+            new_chunks[i].metadata["page_chunk"] = i
+            new_chunks[i].metadata["chunk_size"] = len(new_chunks[i].page_content)
+            new_docs.append(
+                Document(
+                    page_content=new_chunks[i].page_content,
+                    metadata=new_chunks[i].metadata,
+                )
+            )
 
     return new_docs
+
 
 # Triggered by a change in a storage bucket
 @functions_framework.cloud_event
@@ -168,44 +176,44 @@ def process_pdf(cloud_event):
     print(f"Updated: {updated}")
 
     file_name, extension = os.path.splitext(name)
-    if extension != '.pdf':
+    if extension != ".pdf":
         print("File is not a PDF. Please submit a PDF for processing instead.")
         return
 
     # Project vars
-    region = os.environ['REGION']
-    project_id = os.environ['PROJECT_ID']
+    region = os.environ["REGION"]
+    project_id = os.environ["PROJECT_ID"]
 
     # Doc AI Vars
     source_file = "gs://{}/{}".format(bucket, name)
-    gcs_output_uri = "gs://{}-doc-ai/doc-ai-output/".format(project_id) # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
-    location = "us" # Format is "us" or "eu"
-    processor_id = os.environ['PROCESSOR_ID'] # Create processor before running sample
+    gcs_output_uri = "gs://{}-doc-ai/doc-ai-output/".format(
+        project_id
+    )  # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
+    location = "us"  # Format is "us" or "eu"
+    processor_id = os.environ["PROCESSOR_ID"]  # Create processor before running sample
 
     # AlloyDB Vars
-    cluster = 'alloydb-cluster'
-    instance = 'alloydb-instance'
-    database = 'ragdemos'
-    table_name = 'langchain_vector_store'
-    user = 'postgres'
-    password = os.environ['ALLOYDB_PASSWORD']
+    cluster = "alloydb-cluster"
+    instance = "alloydb-instance"
+    database = "ragdemos"
+    table_name = "langchain_vector_store"
+    user = "postgres"
+    password = os.environ["ALLOYDB_PASSWORD"]
     initialize_vector_store = False
-    ip_type = os.environ['IP_TYPE']
+    ip_type = os.environ["IP_TYPE"]
 
     blobs = batch_process_documents(
-        project_id = project_id,
-        location = location, 
-        processor_id = processor_id, 
-        gcs_output_uri = gcs_output_uri, 
-        #processor_version_id = processor_version_id, 
-
+        project_id=project_id,
+        location=location,
+        processor_id=processor_id,
+        gcs_output_uri=gcs_output_uri,
+        # processor_version_id = processor_version_id,
         # TODO(developer): You must specify either `gcs_input_uri` and `mime_type` or `gcs_input_prefix`
-        gcs_input_uri = source_file, # Format: gs://bucket/directory/file.pdf
-        input_mime_type = "application/pdf"
-        #gcs_input_prefix = "gs://genwealth-doc-ai/doc-ai-input/" # Format: gs://bucket/directory/
+        gcs_input_uri=source_file,  # Format: gs://bucket/directory/file.pdf
+        input_mime_type="application/pdf",
+        # gcs_input_prefix = "gs://genwealth-doc-ai/doc-ai-input/" # Format: gs://bucket/directory/
         # field_mask = "text,entities,pages.pageNumber"  # Optional. The fields to return in the Document object.
     )
-
 
     # Document AI may output multiple JSON files per source file
     lc_doc = []
@@ -227,26 +235,29 @@ def process_pdf(cloud_event):
         # https://cloud.google.com/python/docs/reference/documentai/latest/google.cloud.documentai_v1.types.Document
 
         # Read the text recognition output from the processor
-        #print("The document contains the following text:")
-        #print(document.text)
+        # print("The document contains the following text:")
+        # print(document.text)
 
         # Create LangChain doc
         page = Document(
             page_content=document.text,
-            metadata = {"source": source_file,
-                        "page": document.shard_info.shard_index + 1,
-                        "ticker": Path(source_file).stem,
-                        "page_size": len(document.text),
-                        "doc_ai_shard_count": document.shard_info.shard_count,
-                        "doc_ai_shard_index": document.shard_info.shard_index,
-                        "doc_ai_chunk_size": blob._CHUNK_SIZE_MULTIPLE,
-                        "doc_ai_chunk_uri": blob.public_url})
+            metadata={
+                "source": source_file,
+                "page": document.shard_info.shard_index + 1,
+                "ticker": Path(source_file).stem,
+                "page_size": len(document.text),
+                "doc_ai_shard_count": document.shard_info.shard_count,
+                "doc_ai_shard_index": document.shard_info.shard_index,
+                "doc_ai_chunk_size": blob._CHUNK_SIZE_MULTIPLE,
+                "doc_ai_chunk_uri": blob.public_url,
+            },
+        )
         lc_doc.append(page)
 
     # Split docs into smaller chunks (max 3072 tokens, 9216 characters)
     lc_doc_chunks = split_document(lc_doc)
 
-    # Setup embeddings 
+    # Setup embeddings
     embedding = VertexAIEmbeddings(
         model_name="textembedding-gecko@003", project=project_id
     )
@@ -260,7 +271,8 @@ def process_pdf(cloud_event):
         database=database,
         user=user,
         password=password,
-        ip_type=ip_type)
+        ip_type=ip_type,
+    )
 
     if initialize_vector_store:
         engine.init_vectorstore_table(
@@ -278,11 +290,11 @@ def process_pdf(cloud_event):
                 Column("page_chunk", "INTEGER", nullable=True),
                 Column("chunk_size", "INTEGER", nullable=True),
             ],
-            overwrite_existing=True
-            )
+            overwrite_existing=True,
+        )
 
     # TO DO: Create vector index
-    
+
     store = AlloyDBVectorStore.create_sync(
         engine=engine,
         table_name=table_name,
@@ -296,22 +308,23 @@ def process_pdf(cloud_event):
             "doc_ai_shard_index",
             "doc_ai_chunk_size",
             "doc_ai_chunk_uri",
-            "page_chunk", 
-            "chunk_size", 
-        ]
+            "page_chunk",
+            "chunk_size",
+        ],
     )
 
     ids = [str(uuid.uuid4()) for i in range(len(lc_doc_chunks))]
     store.add_documents(lc_doc_chunks, ids)
-    
-   
+
     print("Finished processing pdf")
 
     # Send message to pubsub topic to kick off next step
     ticker = Path(source_file).stem
     publisher = pubsub_v1.PublisherClient()
-    topic_name = 'projects/{}/topics/{}-doc-ready'.format(project_id, project_id)
-    #publisher.create_topic(name=topic_name)
-    future = publisher.publish(topic_name, bytes("{}".format(ticker).encode('utf-8')), spam='done')
+    topic_name = "projects/{}/topics/{}-doc-ready".format(project_id, project_id)
+    # publisher.create_topic(name=topic_name)
+    future = publisher.publish(
+        topic_name, bytes("{}".format(ticker).encode("utf-8")), spam="done"
+    )
     future.result()
     print("Sent message to pubsub")

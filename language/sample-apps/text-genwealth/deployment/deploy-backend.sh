@@ -5,11 +5,11 @@
 ###
 
 # Prompt user to create the AlloyDB password
-read -s -p "Enter a password for the AlloyDB cluster: " ALLOYDB_PASSWORD
+read -r -s -p "Enter a password for the AlloyDB cluster: " ALLOYDB_PASSWORD
 echo ""
 
 # Prompt user to create the pgAdmin password
-read -s -p "Enter a password for pgAdmin: " PGADMIN_PASSWORD
+read -r -s -p "Enter a password for pgAdmin: " PGADMIN_PASSWORD
 echo ""
 
 # Enable Backend APIs

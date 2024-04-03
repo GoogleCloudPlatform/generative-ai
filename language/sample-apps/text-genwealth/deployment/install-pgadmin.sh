@@ -170,8 +170,9 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 
 # Download test data
 echo "Downloading data"
-cd
-mkdir -p /tmp/demo-data && cd /tmp/demo-data
+cd || echo "Could not cd into user profile root"
+mkdir -p /tmp/demo-data
+cd /tmp/demo-data || echo "Could not cd into user profile root"
 gsutil -m cp \
   "gs://pr-public-demo-data/genwealth-demo/investments" \
   "gs://pr-public-demo-data/genwealth-demo/user_profiles" \
@@ -206,7 +207,7 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 
 # Create the llm() function
 echo "Creating the llm() function"
-cat llm.sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
+PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos < llm.sql
 
 # Create embeddings triggers for investments table
 echo "Creating embeddings triggers"
