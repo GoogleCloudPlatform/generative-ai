@@ -28,11 +28,11 @@ CREATE FUNCTION llm(
 	enable_history BOOLEAN DEFAULT false,
 	enable_stock_lookup BOOLEAN DEFAULT false,
 	uid INT DEFAULT 2147483647,
-	model TEXT DEFAULT 'text-bison@002', 
-    user_role TEXT DEFAULT 'I am a generic user', 
-    llm_role TEXT DEFAULT ' You are a helpful AI Assistant', 
+	model TEXT DEFAULT 'text-bison@002',
+    user_role TEXT DEFAULT 'I am a generic user',
+    llm_role TEXT DEFAULT ' You are a helpful AI Assistant',
     mission TEXT DEFAULT NULL,
-    additional_context TEXT DEFAULT NULL, 
+    additional_context TEXT DEFAULT NULL,
     output_format TEXT DEFAULT NULL,
     examples TEXT DEFAULT NULL,
 	prompt TEXT DEFAULT 'Tell me I need to pass in a prompt parameter.',
@@ -43,7 +43,7 @@ CREATE FUNCTION llm(
 	temperature DECIMAL DEFAULT 0.0,
 	top_p DECIMAL DEFAULT 0.95,
 	top_k DECIMAL DEFAULT 40
-) 
+)
 RETURNS TABLE (
 	llm_prompt TEXT,
 	llm_prompt_len INT,
@@ -56,7 +56,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-	llm_prompt TEXT := ''; 
+	llm_prompt TEXT := '';
 	llm_prompt_len INT := NULL;
 	llm_response TEXT := NULL;
 	interaction_history_count INT := 0;
@@ -79,13 +79,13 @@ BEGIN
 	SELECT CONCAT(llm_prompt, E'<CONTEXT>\n\n') INTO llm_prompt;
 	
 	-- Add conversation history
-	IF enable_history is true THEN 
+	IF enable_history is true THEN
 		-- Check if this is the first interaction from this user
 		SELECT COUNT(*) FROM conversation_history WHERE user_id = uid INTO interaction_history_count;
 		
 		-- Add last interaction to prompt
 		SELECT CONCAT(llm_prompt, E'<LATEST_INTERACTION>\n==========\n',
-			CASE 
+			CASE
 				WHEN interaction_history_count = 0 THEN E' First interaction\n'
 				ELSE (SELECT CONCAT(E'**TIME**\n', datetime, E'\n\n**USER**\n', user_prompt, E'\n\n**AI**\n', ai_response, E'\n') FROM conversation_history WHERE user_id = uid ORDER BY datetime DESC LIMIT 1)
 			END,
@@ -108,7 +108,6 @@ BEGIN
 	-- Add additional_context and examples
 	IF additional_context IS NOT NULL THEN SELECT CONCAT(llm_prompt, E'<ADDITIONAL_CONTEXT> Use the following CONTEXT to respond to the PROMPT, and tell me specifically which pieces of CONTEXT you used to improve your response:\n\n ', additional_context, E' </ADDITIONAL_CONTEXT>\n\n') INTO llm_prompt; END IF;
 	IF examples IS NOT NULL THEN SELECT CONCAT(llm_prompt, E'<EXAMPLES> Use the following EXAMPLES to improve your OUTPUT.\n==========\n', examples, E' \n==========\n</EXAMPLES>\n\n') INTO llm_prompt; END IF;
-		
 	
 	-- Add output instructions, format, and length constraints
 	IF output_instructions IS NOT NULL THEN SELECT CONCAT(llm_prompt, E'<OUTPUT_INSTRUCTIONS> \nRe-write your OUTPUT using the following instructions:\n', output_instructions, E' \n</OUTPUT_INSTRUCTIONS>\n\n') INTO llm_prompt; END IF;
@@ -119,10 +118,10 @@ BEGIN
 		SELECT CONCAT(E'List 3 words that best describe the type of investment this person is looking for based on their QUESTION, RISK_PROFILE, and BIO. \n\nQUESTION:\n', prompt, E'\n\nRISK_PROFILE: \n', risk_profile, E'\n\nBIO: \n', bio) INTO extractive_prompt FROM user_profiles WHERE id = uid;
 		SELECT public.ml_predict_row(
 			FORMAT('publishers/google/models/%s', model),
-				json_build_object('instances', 
+				json_build_object('instances',
 					json_build_object(
 					  'prompt', extractive_prompt),
-					  'parameters', 
+					  'parameters',
 							 json_build_object(
 								'maxOutputTokens', max_output_tokens,
 								'temperature', temperature,
@@ -138,24 +137,24 @@ BEGIN
 			ORDER BY analysis_embedding <=> embedding('textembedding-gecko@003',extractive_response)
 			LIMIT 3
 		)
-		SELECT 
+		SELECT
 			CONCAT(llm_prompt, E'<SUGGESTED_STOCKS> Recommend these specific stock tickers to me, and tell me why they are a good fit for me based on my BIO and personal details: ', STRING_AGG(ticker, ', '), E'\n\nTicker Details: ', STRING_AGG(CONCAT(E'\n========\n**STOCK TICKER**: ', ticker, E'\n\n', analysis), E'\n'), E'\n========\n</SUGGESTED_STOCKS>\n\n'),
 			CONCAT('Tickers: ', STRING_AGG(ticker, ', '))
 		FROM inv
 		INTO llm_prompt, recommended_tickers;
 	END IF;
 	
-	-- Close the context tag					  		  
+	-- Close the context tag
 	SELECT CONCAT(llm_prompt, E'</CONTEXT>\n\n') INTO llm_prompt;
 	
 	-- Send enriched prompt to LLM
 	IF set_debug is false THEN
 		SELECT public.ml_predict_row(
 			FORMAT('publishers/google/models/%s', model),
-				json_build_object('instances', 
+				json_build_object('instances',
 					json_build_object(
 					  'prompt', llm_prompt),
-					  'parameters', 
+					  'parameters',
 							 json_build_object(
 								'maxOutputTokens', max_output_tokens,
 								'temperature', temperature,

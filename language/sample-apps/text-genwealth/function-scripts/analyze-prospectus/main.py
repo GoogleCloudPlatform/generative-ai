@@ -31,15 +31,12 @@ def analyze_prospectus(cloud_event):
     user = "postgres"
     password = os.environ["ALLOYDB_PASSWORD"]
 
-    ## Split this into a separate function
     # Setup sync connector
     connector = Connector()
 
     def getconn():
         conn = connector.connect(
-            "projects/{}/locations/{}/clusters/{}/instances/{}".format(
-                project_id, region, cluster, instance
-            ),
+            f"projects/{project_id}/locations/{region}/clusters/{cluster}/instances/{instance}",
             "pg8000",
             user=user,
             password=password,
@@ -54,44 +51,40 @@ def analyze_prospectus(cloud_event):
     )
 
     # Prep SQL statement
-    sql = "SELECT content FROM {} WHERE ticker = '{}' ORDER BY page, page_chunk".format(
-        table_name, ticker
-    )
+    sql = f"SELECT content FROM {table_name} WHERE ticker = '{ticker}' ORDER BY page, page_chunk"
 
     # Prep model and template
     model = VertexAI(
         model_name="text-bison@002", max_output_tokens=1024, temperature=0.0
     )
     template = """
-    <MISSION> 
-    You are an experiences financial analyst. Your task is to create a detailed company overview for {ticker} using 
-    their latest prospectus. I will be sending you the prospectus one chunk at a time. There are a total of {total_chunk_count} 
-    chunks, and I am sending you chunk number {current_chunk_count} as part of this request. You should include details from 
-    every chunk in your final overview.
-    </MISSION>
-    
-    <TASK>
-    Without losing any detail from <PREVIOUS_OVERVIEW>, use <NEXT_CHUNK> below to improve the summary in <PREVIOUS_OVERVIEW>. 
-    You must respond using less than 4000 characters, including whitespace.
-    </TASK>
+<MISSION>
+ You are an experiences financial analyst. Your task is to create a detailed
+ company overview for {ticker} using their latest prospectus. I will be
+ sending you the prospectus one chunk at a time. There are a total of
+ {total_chunk_count} chunks, and I am sending you chunk number
+ {current_chunk_count} as part of this request. You should include details
+ from every chunk in your final overview.
+</MISSION>
 
-    <PREVIOUS_OVERVIEW>
-    {previous_overview}
-    </PREVIOUS_OVERVIEW>
+<TASK>
+ Without losing any detail from <PREVIOUS_OVERVIEW>, use <NEXT_CHUNK> below
+ to improve the summary in <PREVIOUS_OVERVIEW>. You must respond using less
+ than 4000 characters, including whitespace.
+</TASK>
 
+<PREVIOUS_OVERVIEW>
+{previous_overview}
+</PREVIOUS_OVERVIEW>
 
-    <NEXT_CHUNK>
-    {chunk_text}
-    </NEXT_CHUNK>
-    """
+<NEXT_CHUNK>
+{chunk_text}
+</NEXT_CHUNK>"""
 
     prompt = PromptTemplate.from_template(template)
 
     # Create overview of full document by iterating through chunks
     with pool.connect() as db_conn:
-        # insert into database
-        # db_conn.execute(insert_stmt, parameters={"id": "book1", "title": "Book One"})
-
         # query database
         result = db_conn.execute(sqlalchemy.text(sql)).fetchall()
 
@@ -114,21 +107,13 @@ def analyze_prospectus(cloud_event):
                 chunk_text=result[i].content,
                 ticker=ticker,
             )
-
-            # print(fmt_prompt)
-
             overview = model.invoke(fmt_prompt)
-            # print(overview)
 
     analysis = model.invoke(
-        "You are an experienced financial analyst. Write a financial analysis for ticker {} that includes an Investment Rating (buy, sell, or hold), Investment Risk (high, medium, low), Target Investor (conservative, neutral, aggressive) and a two-paragraph analysis. Use the following company overview as context for the analysis: \n\n{}".format(
-            ticker, overview
-        )
+        f"You are an experienced financial analyst. Write a financial analysis for ticker {ticker} that includes an Investment Rating (buy, sell, or hold), Investment Risk (high, medium, low), Target Investor (conservative, neutral, aggressive) and a two-paragraph analysis. Use the following company overview as context for the analysis: \n\n{overview}"
     )
     rating = model.invoke(
-        "Answering with only 1 word, classify ticker {} as one of [BUY, SELL, HOLD] based on the following analysis: {}".format(
-            ticker, analysis
-        )
+        f"Answering with only 1 word, classify ticker {ticker} as one of [BUY, SELL, HOLD] based on the following analysis: {analysis}"
     )
     rating = rating.strip()
 

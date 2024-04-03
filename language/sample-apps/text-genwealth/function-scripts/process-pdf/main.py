@@ -13,7 +13,6 @@ from google.cloud import documentai  # type: ignore
 from google.cloud import pubsub_v1, storage
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_core.prompts import PromptTemplate
 from langchain_google_alloydb_pg import AlloyDBEngine, AlloyDBVectorStore, Column
 from langchain_google_vertexai import VertexAIEmbeddings
 
@@ -209,7 +208,7 @@ def process_pdf(cloud_event):
         # processor_version_id = processor_version_id,
         # TODO(developer): You must specify either `gcs_input_uri` and `mime_type` or `gcs_input_prefix`
         gcs_input_uri=source_file,  # Format: gs://bucket/directory/file.pdf
-        input_mime_type="application/pdf"
+        input_mime_type="application/pdf",
         # gcs_input_prefix = "gs://genwealth-doc-ai/doc-ai-input/" # Format: gs://bucket/directory/
         # field_mask = "text,entities,pages.pageNumber"  # Optional. The fields to return in the Document object.
     )

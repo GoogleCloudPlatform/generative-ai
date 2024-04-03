@@ -8,7 +8,6 @@ from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine
 
 
-
 def import_documents_sample(
     project_id: str,
     location: str,

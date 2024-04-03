@@ -8,7 +8,6 @@ import functions_framework
 from google.cloud import storage
 
 
-
 @functions_framework.cloud_event
 def write_metadata(cloud_event):
     """Main function"""

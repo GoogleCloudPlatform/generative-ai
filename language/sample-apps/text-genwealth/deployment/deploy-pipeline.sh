@@ -55,6 +55,7 @@ sleep 90
 
 
 # Create functions
+# jscpd:ignore-start
 echo "Creating Cloud Function: analyze-prospectus"
 gcloud functions deploy analyze-prospectus \
 --gen2 \
@@ -121,3 +122,5 @@ gcloud functions deploy process-pdf \
 --memory=2gi \
 --cpu=2000m \
 --trigger-bucket="${PROJECT_ID}-docs"
+
+# jscpd:ignore-end
