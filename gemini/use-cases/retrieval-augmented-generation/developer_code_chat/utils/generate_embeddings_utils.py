@@ -6,9 +6,10 @@
 
 import time
 from typing import List
-from pydantic import BaseModel
+
 from langchain.embeddings import VertexAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from pydantic import BaseModel
 
 
 def split_documents(documents, split_document_flag="PAGES"):
@@ -50,7 +51,7 @@ def rate_limit(max_per_minute):
 
 class CustomVertexAIEmbeddings(VertexAIEmbeddings):
     """Custom Vertex AI Embeddings"""
-    
+
     requests_per_minute: int
     num_instances_per_batch: int
 

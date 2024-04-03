@@ -3,19 +3,18 @@
 # agreement with Google.
 """Modified Langchain PDF Wrappers"""
 
+from abc import ABC
 import os
 import tempfile
-from abc import ABC
 from typing import Iterator, List, Optional, Union
 from urllib.parse import urlparse
-import requests
-import pypdf
 
-from langchain.document_loaders.base import BaseBlobParser
-from langchain.document_loaders.base import BaseLoader
+from langchain.docstore.document import Document as Document_doc
+from langchain.document_loaders.base import BaseBlobParser, BaseLoader
 from langchain.document_loaders.blob_loaders import Blob
 from langchain.schema import Document
-from langchain.docstore.document import Document as Document_doc
+import pypdf
+import requests
 
 
 class PyPDFParser(BaseBlobParser):
@@ -44,9 +43,8 @@ class PyPDFParser(BaseBlobParser):
                 else:
                     page_content_list.append(
                         Document(
-                            page_content=page_content_text, \
-                              metadata={"source": blob.source, \
-                                "page": page_number},
+                            page_content=page_content_text,
+                            metadata={"source": blob.source, "page": page_number},
                         )
                     )
 
@@ -69,9 +67,8 @@ class BasePDFLoader(BaseLoader, ABC):
 
         # If the file is a web path or S3, download it to a temporary file,
         # and use that
-        if not os.path.isfile(self.file_path) and \
-          self._is_valid_url(self.file_path):
-            self.temp_dir = tempfile.TemporaryDirectory() #pylint:disable=R1732
+        if not os.path.isfile(self.file_path) and self._is_valid_url(self.file_path):
+            self.temp_dir = tempfile.TemporaryDirectory()  # pylint:disable=R1732
             _, suffix = os.path.splitext(self.file_path)
             temp_pdf = os.path.join(self.temp_dir.name, f"tmp{suffix}")
             if self._is_s3_url(self.file_path):

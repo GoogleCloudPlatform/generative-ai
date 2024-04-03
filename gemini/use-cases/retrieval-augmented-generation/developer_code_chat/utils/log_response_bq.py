@@ -4,6 +4,7 @@
 """Log response to BigQuery table"""
 
 import configparser
+
 from google.cloud import bigquery
 
 
@@ -16,9 +17,7 @@ class LogDetailsInBQ:
         self.project_id = self.config["default"]["project_id"]
         self.bq_table_id = self.config["log_response_in_bq"]["bq_table_id"]
 
-    def save_response(
-        self, question, intent, response, session_state
-    ):
+    def save_response(self, question, intent, response, session_state):
         """Save user question and response"""
         try:
             client = bigquery.Client(project=self.project_id)

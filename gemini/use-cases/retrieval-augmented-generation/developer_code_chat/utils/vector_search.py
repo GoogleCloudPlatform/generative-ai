@@ -5,24 +5,22 @@
 
 from __future__ import annotations
 
-import logging
-import uuid
-from typing import Any, Iterable, List, Optional, Type
-import requests
 import json
+import logging
+from typing import Any, Iterable, List, Optional, Type
+import uuid
 
+import google.auth
+import google.auth.transport.requests
+from google.cloud import aiplatform, aiplatform_v1, storage
+from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
+from google.oauth2 import service_account
+from google.oauth2.service_account import Credentials
 from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
-
-from google.cloud import storage, aiplatform
-from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
-from google.cloud import aiplatform_v1
-from google.oauth2 import service_account
-from google.oauth2.service_account import Credentials
-import google.auth
-import google.auth.transport.requests
+import requests
 
 logger = logging.getLogger()
 
@@ -206,8 +204,7 @@ class VectorSearch(VectorStore):
             "return_full_datapoint": True,
             "queries": [
                 {
-                    "datapoint": {"datapoint_id": f"{i}", \
-                      "feature_vector": emb},
+                    "datapoint": {"datapoint_id": f"{i}", "feature_vector": emb},
                     "neighbor_count": n_matches,
                 }
                 for i, emb in enumerate(embeddings)
@@ -218,7 +215,7 @@ class VectorSearch(VectorStore):
         rpc_address = f"https://{endpoint_address}/v1beta1/{index_endpoint.resource_name}:findNeighbors"  # pylint: disable=line-too-long
         endpoint_json_data = json.dumps(request_data)
 
-        logger.debug("Querying Matching Engine Index Endpoint %s",rpc_address)
+        logger.debug("Querying Matching Engine Index Endpoint %s", rpc_address)
 
         request = google.auth.transport.requests.Request()
         self.credentials.refresh(request)
@@ -265,8 +262,7 @@ class VectorSearch(VectorStore):
         if len(response) == 0:
             return []
 
-        logger.debug("Found %s matches for the query %s.", \
-          len(response), query)
+        logger.debug("Found %s matches for the query %s.", len(response), query)
 
         results = []
 
@@ -291,8 +287,7 @@ class VectorSearch(VectorStore):
                         Document(page_content=page_content, metadata=metadata)
                     )
             else:
-                results.append(Document(page_content=page_content, \
-                  metadata=metadata))
+                results.append(Document(page_content=page_content, metadata=metadata))
 
         logger.debug("Downloaded documents for query.")
 
@@ -409,8 +404,7 @@ class VectorSearch(VectorStore):
 
         gcs_client = cls._get_gcs_client(credentials, project_id)
         index_client = cls._get_index_client(region, credentials)
-        index_endpoint_client = cls._get_index_endpoint_client(region, \
-          credentials)
+        index_endpoint_client = cls._get_index_endpoint_client(region, credentials)
         cls._init_aiplatform(project_id, region, gcs_bucket_name, credentials)
 
         return cls(
@@ -488,8 +482,7 @@ class VectorSearch(VectorStore):
 
     @classmethod
     def _create_endpoint_by_id(
-        cls, endpoint_id: str, project_id: str, region: str,
-        credentials: "Credentials"
+        cls, endpoint_id: str, project_id: str, region: str, credentials: "Credentials"
     ) -> MatchingEngineIndexEndpoint:
         """Creates a MatchingEngineIndexEndpoint object by id.
 
@@ -534,7 +527,7 @@ class VectorSearch(VectorStore):
         """
         endpoint = f"{region}-aiplatform.googleapis.com"
         return aiplatform_v1.IndexServiceClient(
-            client_options={"api_endpoint":endpoint}, credentials=credentials
+            client_options={"api_endpoint": endpoint}, credentials=credentials
         )
 
     @classmethod
@@ -548,7 +541,7 @@ class VectorSearch(VectorStore):
         """
         endpoint = f"{region}-aiplatform.googleapis.com"
         return aiplatform_v1.IndexEndpointServiceClient(
-            client_options={"api_endpoint":endpoint}, credentials=credentials
+            client_options={"api_endpoint": endpoint}, credentials=credentials
         )
 
     @classmethod
@@ -569,9 +562,12 @@ class VectorSearch(VectorStore):
             credentials: The GCS Credentials object.
         """
 
-        logger.debug(\
-          "Initializing AI Platform for project %s on %s and for %s.", \
-            project_id, region, gcs_bucket_name)
+        logger.debug(
+            "Initializing AI Platform for project %s on %s and for %s.",
+            project_id,
+            region,
+            gcs_bucket_name,
+        )
         aiplatform.init(
             project=project_id,
             location=region,

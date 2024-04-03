@@ -5,10 +5,12 @@
 import os
 import tempfile
 from typing import Callable, List, Optional
+
 from google.cloud import storage
-from langchain.document_loaders.base import BaseLoader
 from langchain.docstore.document import Document
+from langchain.document_loaders.base import BaseLoader
 from utils.py_pdf_loader import PyPDFLoader
+
 
 class GCSFileLoader(BaseLoader):
     """Load from GCS file."""
@@ -49,7 +51,6 @@ class GCSFileLoader(BaseLoader):
             # return UnstructuredFileLoader(file_path)
 
         self._loader_func = loader_func if loader_func else default_loader_func
-
 
     def load(self) -> List[Document]:
         """Load documents."""

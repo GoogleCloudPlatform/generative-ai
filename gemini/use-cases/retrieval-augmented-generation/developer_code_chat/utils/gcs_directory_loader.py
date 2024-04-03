@@ -4,11 +4,12 @@
 """Load directory from GCS Bucket"""
 
 from typing import Callable, List, Optional
+
 from google.cloud import storage
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
-from utils.py_pdf_loader import PyPDFLoader
 from utils.gcs_file_loader import GCSFileLoader
+from utils.py_pdf_loader import PyPDFLoader
 
 
 class GCSDirectoryLoader(BaseLoader):
@@ -41,12 +42,11 @@ class GCSDirectoryLoader(BaseLoader):
 
         self._loader_func = loader_func if loader_func else default_loader_func
 
-
     def load(self) -> List[Document]:
         """Load documents."""
         client = storage.Client(project=self.project_name)
         docs = []
-        blob_doc=""
+        blob_doc = ""
         for blob in client.list_blobs(self.bucket, prefix=self.prefix):
             # we shall just skip directories since GCSFileLoader creates
             # intermediate directories on the fly
@@ -54,16 +54,20 @@ class GCSDirectoryLoader(BaseLoader):
                 if blob.name.endswith("/"):
                     continue
                 if not blob.name.endswith(".pdf"):
-                    print("Not a PDF :", self.bucket+"/"+blob.name)
+                    print("Not a PDF :", self.bucket + "/" + blob.name)
                     continue
                 print("Loading file :", blob.name)
-                loader = GCSFileLoader(self.project_name, self.bucket, \
-                                       blob.name, loader_func=self._loader_func)
+                loader = GCSFileLoader(
+                    self.project_name,
+                    self.bucket,
+                    blob.name,
+                    loader_func=self._loader_func,
+                )
                 blob_doc = loader.load()
-            except Exception as e: # pylint: disable=W0718,W0703
+            except Exception as e:  # pylint: disable=W0718,W0703
                 print(f"Error while loading document :{e}", blob.name)
             else:
                 docs.extend(blob_doc)
-                blob_doc=""
+                blob_doc = ""
         print("Loaded all valid documents successfully..")
         return docs

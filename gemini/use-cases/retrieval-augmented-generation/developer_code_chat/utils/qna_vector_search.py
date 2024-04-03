@@ -5,22 +5,21 @@
 
 # Utils
 import configparser
-import subprocess
 import json
 import logging
+import subprocess
+
 import grpc
-import numpy as np
-
-import vertexai
-from vertexai.generative_models import GenerativeModel, ChatSession
-
 from langchain.chains import RetrievalQA
 from langchain.llms import VertexAI
 from langchain.prompts import PromptTemplate
-from utils.vector_search_utils import VectorSearchUtils
+import numpy as np
 from utils.generate_embeddings_utils import CustomVertexAIEmbeddings
-from utils.vector_search import VectorSearch
 from utils.llm_error_codes import get_llm_error_and_category
+from utils.vector_search import VectorSearch
+from utils.vector_search_utils import VectorSearchUtils
+import vertexai
+from vertexai.generative_models import ChatSession, GenerativeModel
 
 
 class QnAVectorSearch:
@@ -105,8 +104,7 @@ class QnAVectorSearch:
         qa.combine_documents_chain.llm_chain.llm.verbose = True
 
         ## setting threshold limits
-        qa.retriever.search_kwargs["search_distance"] = \
-          search_distance_threshould
+        qa.retriever.search_kwargs["search_distance"] = search_distance_threshould
         qa.retriever.search_kwargs["k"] = number_of_references_to_summarise
 
         return qa
@@ -133,14 +131,12 @@ class QnAVectorSearch:
         # Text model instance integrated with langChain
         ## Default model
         model_name = self.config["genai_qna"]["model_name"]
-        max_output_tokens = int(
-            self.config["genai_qna"]["max_output_tokens"]
-        )
+        max_output_tokens = int(self.config["genai_qna"]["max_output_tokens"])
 
         ## Check token length of input message
         # input_token_len = self.get_token_length(self.project_id, \
-          # model_name, query)
-        
+        # model_name, query)
+
         model = GenerativeModel(self.config["genai_qna"]["model_name"])
         input_token_len = model.count_tokens(query).total_tokens
         self.logger.info("QnA: Input_token_len for QnA: %s", input_token_len)
@@ -163,9 +159,7 @@ class QnAVectorSearch:
             ),
         )
 
-        mengine = VectorSearchUtils(
-            self.project_id, self.me_region, self.me_index_name
-        )
+        mengine = VectorSearchUtils(self.project_id, self.me_region, self.me_index_name)
         me_index_id, me_index_endpoint_id = mengine.get_index_and_endpoint()
 
         # initialize vector store
@@ -219,9 +213,10 @@ class QnAVectorSearch:
             )
             result = qa({"query": query})
         except grpc.RpcError as e:  # pylint:disable=C0103
-            self.logger.error(\
-              "QnA: Token limit exceeded, reducing the reference contexts \
-                and retying again..")
+            self.logger.error(
+                "QnA: Token limit exceeded, reducing the reference contexts \
+                and retying again.."
+            )
             self.logger.info(e)
             try:
                 qa = self.configure_retrievalqa_chain(
@@ -238,13 +233,11 @@ class QnAVectorSearch:
                     "llm_model": model_name,
                 }
         except Exception as e:  # pylint: disable=W0718,W0703,C0103
-            self.logger.error(\
-              "QnA: Exception while generating responce in QnA. %s", e)
+            self.logger.error("QnA: Exception while generating responce in QnA. %s", e)
 
         self.logger.info("QnA: raw response:\n %s", result)
         if result:
-            result["result"] = result["result"].replace("\n", " ").\
-              replace("  ", " ")
+            result["result"] = result["result"].replace("\n", " ").replace("  ", " ")
 
             if "I cannot determine the answer to that." in result["result"]:
                 return {
@@ -260,8 +253,7 @@ class QnAVectorSearch:
 
                 ## Checking LLM error codes when No response from QnA
                 llm_error_msg = self.get_llm_safety_error_code(result, query)
-                self.logger.info(\
-                  "QnA: No response from QnA due to LLM safety checks.")
+                self.logger.info("QnA: No response from QnA due to LLM safety checks.")
                 self.logger.info("LLM error code: %s", llm_error_msg)
 
                 return {
@@ -295,19 +287,20 @@ class QnAVectorSearch:
         """Get LLM safety error codes"""
         vertexai.init(project=self.project_id, location=self.region)
         context = ""
-        for ref in result["source_documents"][\
-          : int(self.config["genai_qna"]["number_of_references_to_show"])]:
+        for ref in result["source_documents"][
+            : int(self.config["genai_qna"]["number_of_references_to_show"])
+        ]:
             context += ref.page_content + "\n"
 
         # vertexai.init(project="genai-genai-prod", location="us-central1")
         model = TextGenerationModel.from_pretrained("text-bison@001")
 
-        parameters = {\
-          "temperature": float(self.config["genai_qna"]["temperature"]),\
-            "top_p": float(self.config["genai_qna"]["top_p"]),\
-              "top_k": int(self.config["genai_qna"]["top_k"]),\
-                "max_output_tokens": int(\
-                  self.config["genai_qna"]["max_output_tokens"]),}
+        parameters = {
+            "temperature": float(self.config["genai_qna"]["temperature"]),
+            "top_p": float(self.config["genai_qna"]["top_p"]),
+            "top_k": int(self.config["genai_qna"]["top_k"]),
+            "max_output_tokens": int(self.config["genai_qna"]["max_output_tokens"]),
+        }
 
         template = f"""
         SYSTEM: You are genai Programming Language Learning Assistant helping the students answer their questions based on following context. Explain the answers in detail for students.
@@ -331,10 +324,10 @@ class QnAVectorSearch:
         error_codes = None
         llm_error_msgs = None
         if response.is_blocked:
-            error_codes = response.raw_prediction_response[0][0]\
-              ["safetyAttributes"]["errors"]
-            llm_error_msgs = get_llm_error_and_category(error_codes, \
-              self.config)
+            error_codes = response.raw_prediction_response[0][0]["safetyAttributes"][
+                "errors"
+            ]
+            llm_error_msgs = get_llm_error_and_category(error_codes, self.config)
         return llm_error_msgs
 
 

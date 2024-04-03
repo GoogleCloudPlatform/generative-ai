@@ -5,10 +5,12 @@
 # Imports
 import configparser
 import copy
-import logging
 import json
+import logging
+
+from vertexai.generative_models import GenerationConfig, GenerativeModel
 from vertexai.preview.language_models import ChatMessage
-from vertexai.generative_models import GenerativeModel, GenerationConfig
+
 
 class IntentRouting:
     """genai Assistant"""
@@ -19,7 +21,7 @@ class IntentRouting:
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
         self.logger = logger
-        
+
         # self.genai_qna_parameters = {
         #     "temperature": float(
         #         self.config["genai_qna"]["temperature"]
@@ -41,20 +43,20 @@ class IntentRouting:
         #     ),
         # }
         self.genai_qna_parameters = GenerationConfig(
-            temperature = float(self.config["genai_qna"]["temperature"]),
-            max_output_tokens = int(self.config["genai_qna"]["max_output_tokens"]),
-            top_p = float(self.config["genai_qna"]["top_p"]),
-            top_k = int(self.config["genai_qna"]["top_k"])
+            temperature=float(self.config["genai_qna"]["temperature"]),
+            max_output_tokens=int(self.config["genai_qna"]["max_output_tokens"]),
+            top_p=float(self.config["genai_qna"]["top_p"]),
+            top_k=int(self.config["genai_qna"]["top_k"]),
         )
         self.genai_chat_parameters = GenerationConfig(
-            temperature = float(self.config["genai_chat"]["temperature"]),
-            max_output_tokens = int(self.config["genai_chat"]["max_output_tokens"])
+            temperature=float(self.config["genai_chat"]["temperature"]),
+            max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
 
     def get_chat_user_history(self, chat_history):
         """Get Chat User History"""
         if chat_history:
-            message_list = []    
+            message_list = []
             for chat_msg in chat_history[-1:]:  # last user message
                 # print(chat_msg)
                 if chat_msg[0] and len(chat_msg[0]):
@@ -77,8 +79,9 @@ class IntentRouting:
                 if chat_msg[0] and len(chat_msg[1]):
                     # remove references from chat history.
                     chat_msg = chat_msg[1].split("Reference:")[0]
-                    message_list.append(ChatMessage(content=str(chat_msg), \
-                      author="bot"))
+                    message_list.append(
+                        ChatMessage(content=str(chat_msg), author="bot")
+                    )
             if len(message_list) == 0:
                 return None
             return message_list
@@ -90,7 +93,9 @@ class IntentRouting:
         chat = chat_model.start_chat(
             # history=chat_history
         )
-        response = chat.send_message(f"""{text}""", generation_config=self.genai_chat_parameters)
+        response = chat.send_message(
+            f"""{text}""", generation_config=self.genai_chat_parameters
+        )
         message = response.text
         return message
 
@@ -109,7 +114,7 @@ class IntentRouting:
             [lang.title() for lang in enabled_qna_programming_language]
         )
         chat_history = self.get_chat_history(chat_history)
-        
+
         chat = chat_model.start_chat(history=chat_history)
         response = chat.send_message(
             f"""You are Generative AI powered genai Learning Assistant.
@@ -121,10 +126,10 @@ class IntentRouting:
         # parameters_local = copy.deepcopy(self.genai_chat_parameters)
         # parameters_local["temperature"] = 1
         parameters_local = GenerationConfig(
-            temperature = 0.7,
-            max_output_tokens = int(self.config["genai_chat"]["max_output_tokens"])
+            temperature=0.7,
+            max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
-        
+
         response = chat.send_message(f"""{text}""", generation_config=parameters_local)
         message = response.text
         return message
@@ -132,11 +137,11 @@ class IntentRouting:
     def closing(self, chat_model, chat_history, text):
         """Respond for Closing Intent"""
         parameters_local = GenerationConfig(
-            temperature = 0.7,
-            max_output_tokens = int(self.config["genai_chat"]["max_output_tokens"])
+            temperature=0.7,
+            max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
         chat_history = self.get_chat_history(chat_history)
-        chat = chat_model.start_chat()#history=chat_history)
+        chat = chat_model.start_chat()  # history=chat_history)
         response = chat.send_message(
             """You are Generative AI powered genai Learning Assistant.
                 Write a brief closing thank you message:"""
@@ -148,7 +153,7 @@ class IntentRouting:
     def elaborate_qna(self, text, chat_model, chat_history, question):
         """Explain the answer of a question in detail."""
         chat_history = self.get_chat_history(chat_history)
-        chat = chat_model.start_chat()#history=chat_history)
+        chat = chat_model.start_chat()  # history=chat_history)
         response = chat.send_message(
             """
         You are genai Programming Language Learning Assistant. Your task is to explain following text in detail:
@@ -194,16 +199,16 @@ class IntentRouting:
 
             What is the intent of the below message?
             MESSAGE:{text}
-            INTENT:"""  # pylint: disable=C0301:line-too-long
-            , generation_config=self.genai_qna_parameters
+            INTENT:""",  # pylint: disable=C0301:line-too-long
+            generation_config=self.genai_qna_parameters,
         )
-        
+
         # if response.is_blocked:
-        if response.to_dict()['candidates'][0]["finish_reason"]!=1:
-            self.logger.info(\
-              "classify_intent: No response from QnA due to LLM safety checks.")
-            self.logger.info("LLM error code: %s\n", \
-              response.raw_prediction_response)
+        if response.to_dict()["candidates"][0]["finish_reason"] != 1:
+            self.logger.info(
+                "classify_intent: No response from QnA due to LLM safety checks."
+            )
+            self.logger.info("LLM error code: %s\n", response.raw_prediction_response)
 
         intent = response.text
         return str(intent).strip()
@@ -222,8 +227,8 @@ class IntentRouting:
         default_language = self.config["default"]["default_language"]
         chat_history = self.get_chat_history(chat_history)
         # print("chat_history", chat_history)
-        
-        chat = chat_model.start_chat()#history=chat_history)
+
+        chat = chat_model.start_chat()  # history=chat_history)
         response = chat.send_message(
             f"""
         You are genai Programming Language Learning Assistant.
@@ -236,15 +241,18 @@ class IntentRouting:
         4. Strictly answer the question if only {enabled_programming_language} is mentioned in question.
 
         If the question is about other programming language then DO NOT provide any answer, just say "{non_programming_question_error_msg}"
-        """)
+        """
+        )
 
-        response = chat.send_message(f"""{text}""", generation_config=self.genai_chat_parameters)
+        response = chat.send_message(
+            f"""{text}""", generation_config=self.genai_chat_parameters
+        )
         # if response.is_blocked:
-        if response.to_dict()['candidates'][0]["finish_reason"] != 1:
-            self.logger.info(\
-              "ask_codey: No response from QnA due to LLM safety checks.")
-            self.logger.info("LLM error code: %s\n", \
-              response.raw_prediction_response)
+        if response.to_dict()["candidates"][0]["finish_reason"] != 1:
+            self.logger.info(
+                "ask_codey: No response from QnA due to LLM safety checks."
+            )
+            self.logger.info("LLM error code: %s\n", response.raw_prediction_response)
         response = response.text
         response = response.replace("```", "\n\n```")
         response = response.replace("```java", "``` java")
@@ -267,7 +275,7 @@ class IntentRouting:
             "enabled_programming_language"
         ]
         default_language = self.config["default"]["default_language"]
-        chat = chat_model.start_chat()#history=chat_history)
+        chat = chat_model.start_chat()  # history=chat_history)
         response = chat.send_message(
             f"""
         You are genai Programming Language Learning Assistant.
@@ -281,15 +289,18 @@ class IntentRouting:
 
         If the question is about other programming language then DO NOT provide any answer, just say "{non_programming_question_error_msg}"
 
-        """)
+        """
+        )
 
-        response = chat.send_message(f"""{text}""", generation_config=self.genai_chat_parameters)
+        response = chat.send_message(
+            f"""{text}""", generation_config=self.genai_chat_parameters
+        )
         # if response.is_blocked:
-        if response.to_dict()['candidates'][0]["finish_reason"] != 1:
-            self.logger.info(\
-              "ask_codey: No response from QnA due to LLM safety checks.")
-            self.logger.info("LLM error code: %s\n", \
-              response.raw_prediction_response)
+        if response.to_dict()["candidates"][0]["finish_reason"] != 1:
+            self.logger.info(
+                "ask_codey: No response from QnA due to LLM safety checks."
+            )
+            self.logger.info("LLM error code: %s\n", response.raw_prediction_response)
         response = response.text
         response = response.replace("```", "\n\n```")
         response = response.replace("```java", "``` java")
@@ -320,10 +331,10 @@ class IntentRouting:
 
             What are the programming languages mentioned in below message?
             MESSAGE:{text}
-            programming languages:"""  # pylint: disable=C0301:line-too-long
-            , generation_config=self.genai_qna_parameters
+            programming languages:""",  # pylint: disable=C0301:line-too-long
+            generation_config=self.genai_qna_parameters,
         )
-        
+
         programming_lang = response.text
         program_lang_in_query = []
         if programming_lang:
@@ -350,14 +361,14 @@ class IntentRouting:
             ]
         enabled_programming_language = enabled_programming_language.split(",")
         enabled_programming_language_list = [
-            x.lower().replace(" ", "").strip() \
-              for x in enabled_programming_language
+            x.lower().replace(" ", "").strip() for x in enabled_programming_language
         ]
         program_lang_in_query = self.get_programming_lanuage_from_query(
             model, text, enabled_programming_language
         )
-        allowed_language_in_query = set(enabled_programming_language_list).\
-          intersection(set(program_lang_in_query))
+        allowed_language_in_query = set(enabled_programming_language_list).intersection(
+            set(program_lang_in_query)
+        )
 
         return program_lang_in_query, allowed_language_in_query
 
@@ -377,11 +388,11 @@ class IntentRouting:
                 (
                     program_lang_in_query,
                     allowed_language_in_query,
-                )=self.check_programming_language_in_query(model, text, intent)
-                self.logger.info("program_lang_in_query: %s", \
-                  program_lang_in_query)
-                self.logger.info("allowed_language_in_query: %s", \
-                  allowed_language_in_query)
+                ) = self.check_programming_language_in_query(model, text, intent)
+                self.logger.info("program_lang_in_query: %s", program_lang_in_query)
+                self.logger.info(
+                    "allowed_language_in_query: %s", allowed_language_in_query
+                )
                 if (
                     len(program_lang_in_query) > 0
                     and len(allowed_language_in_query) == 0
@@ -395,8 +406,7 @@ class IntentRouting:
                 (
                     program_lang_in_query,
                     allowed_language_in_query,
-                ) = self.check_programming_language_in_query(model, \
-                  text, intent)
+                ) = self.check_programming_language_in_query(model, text, intent)
                 # print(f"\nprogram_lang_in_query: {program_lang_in_query}")
                 # print(f"allowed_language_in_query: {allowed_language_in_query}")
                 if (
@@ -410,19 +420,16 @@ class IntentRouting:
                     qna_answer_dict = genai_qna.ask_qna(text)
                     json_response_str = json.dumps(qna_answer_dict)
 
-                    self.logger.info("Document Retrival : %s", \
-                      json_response_str)
+                    self.logger.info("Document Retrival : %s", json_response_str)
                     if (
                         qna_answer_dict["is_answer"] is True
                         and qna_answer_dict["answer"] != ""
                         and len(qna_answer_dict["reference_logs"]) != 0
                     ):
                         response = self.elaborate_qna(
-                            qna_answer_dict["answer"], chat_model,
-                            chat_history, text
+                            qna_answer_dict["answer"], chat_model, chat_history, text
                         )
-                        answer_reference = "\n\n" + \
-                          qna_answer_dict["answer_reference"]
+                        answer_reference = "\n\n" + qna_answer_dict["answer_reference"]
                     else:
                         self.logger.info("inside codey")
                         response = self.ask_question_and_answer_codey(
@@ -430,8 +437,7 @@ class IntentRouting:
                         )
             elif intent == "FOLLOWUP":
                 response = self.ask_question_and_answer_codey(
-                    text + " based on previous message",
-                    chat_model, chat_history
+                    text + " based on previous message", chat_model, chat_history
                 )
             elif intent == "CLOSE":
                 response = self.closing(chat_model, chat_history, text)
@@ -440,10 +446,11 @@ class IntentRouting:
         except Exception as e:  # pylint: disable=W0718,W0703,C0103
             self.logger.error("Session : %s", session_state)
             self.logger.error("Error : %s", e)
-            
+
             import traceback
+
             print(traceback.format_exc())
-            
+
             return (
                 "We're sorry, but we encountered a problem. Please try again.",
                 "ERROR",

@@ -3,24 +3,25 @@
 # agreement with Google.
 """Generate Embeddings of PDF Documents"""
 
+import configparser
+
 # Utils
 import json
-import uuid
 import logging
-import configparser
-import numpy as np
-import vertexai
-from google.cloud import aiplatform, storage
+import uuid
 
-from utils.vector_search_utils import VectorSearchUtils
-from utils.vector_search import VectorSearch
+from google.cloud import aiplatform, storage
+import numpy as np
 from utils.gcs_directory_loader import GCSDirectoryLoader
 from utils.gcs_file_loader import GCSFileLoader
 from utils.generate_embeddings_utils import (
-    split_documents,
-    check_if_doc_needs_fix,
     CustomVertexAIEmbeddings,
+    check_if_doc_needs_fix,
+    split_documents,
 )
+from utils.vector_search import VectorSearch
+from utils.vector_search_utils import VectorSearchUtils
+import vertexai
 
 logging.basicConfig(level=logging.INFO)
 
@@ -46,8 +47,10 @@ class GenerateEmbeddings:
     def create_dummy_embeddings(self):
         """Create Dummy Embedding"""
 
-        init_embedding = {"id": str(uuid.uuid4()), "embedding": \
-          list(np.zeros(int(self.config["embedding"]["me_dimensions"]))),}
+        init_embedding = {
+            "id": str(uuid.uuid4()),
+            "embedding": list(np.zeros(int(self.config["embedding"]["me_dimensions"]))),
+        }
 
         # dump embedding to a local file
         with open(file="embeddings_0.json", mode="w", encoding="utf-8") as f:
@@ -59,16 +62,17 @@ class GenerateEmbeddings:
         storage_client = storage.Client()
         self.bucket = storage_client.bucket(self.me_embedding_dir)
         if self.bucket.exists():
-            self.logger.info("GenEmb: GCS bucket already exists: %s", \
-              self.me_embedding_dir)
+            self.logger.info(
+                "GenEmb: GCS bucket already exists: %s", self.me_embedding_dir
+            )
         else:
             ## create new GCS bucket
-            self.bucket = storage_client.create_bucket( \
-              bucket_or_name=self.me_embedding_dir, \
-                project=self.project_id, \
-                  location=self.config["embedding"]["me_embedding_region"],)
-            self.logger.info("GenEmb: New storage bucket: %s", \
-                  self.me_embedding_dir)
+            self.bucket = storage_client.create_bucket(
+                bucket_or_name=self.me_embedding_dir,
+                project=self.project_id,
+                location=self.config["embedding"]["me_embedding_region"],
+            )
+            self.logger.info("GenEmb: New storage bucket: %s", self.me_embedding_dir)
 
             # dummy_embeddings
             self.create_dummy_embeddings()
@@ -76,15 +80,14 @@ class GenerateEmbeddings:
             ## move dummy embeddings file
             blob = self.bucket.blob("init_index/embeddings_0.json")
             blob.upload_from_filename("embeddings_0.json")
-            self.logger.info(\
-              "GenEmb: Moved dummy embeddings file to the storage bucket"
+            self.logger.info(
+                "GenEmb: Moved dummy embeddings file to the storage bucket"
             )
 
     def create_index(self):
         """Create Index to vector search"""
 
-        mengine = VectorSearchUtils(
-            self.project_id, self.me_region, self.me_index_name)
+        mengine = VectorSearchUtils(self.project_id, self.me_region, self.me_index_name)
 
         list_indexes = aiplatform.MatchingEngineIndex.list(
             filter=f"display_name={self.me_index_name}"
@@ -112,17 +115,18 @@ class GenerateEmbeddings:
         )
         if list_endpoints:
             endpoint = list_endpoints[0]
-            self.logger.info("GenEmb: Found Endpoint from previous run %s", \
-              endpoint)
+            self.logger.info("GenEmb: Found Endpoint from previous run %s", endpoint)
         else:
             self.logger.info("Creating new endpoint.")
             index_endpoint = m_engine.deploy_index()
             if index_endpoint:
-                self.logger.info("GenEmb: Index endpoint resource : %s", \
-                  index_endpoint.name)
-                self.logger.info(\
-                  "GenEmb: Index endpoint public domain name : %s", \
-                      index_endpoint.public_endpoint_domain_name)
+                self.logger.info(
+                    "GenEmb: Index endpoint resource : %s", index_endpoint.name
+                )
+                self.logger.info(
+                    "GenEmb: Index endpoint public domain name : %s",
+                    index_endpoint.public_endpoint_domain_name,
+                )
                 self.logger.info("GenEmb: Deployed indexes to endpoint:")
                 for d in index_endpoint.deployed_indexes:
                     self.logger.info(d.id)
@@ -142,8 +146,11 @@ class GenerateEmbeddings:
     def ingest_single_pdf_document(self):
         """Ingest single PDF file directly"""
 
-        loader = GCSFileLoader(self.project_id, self.gcs_bucket_docs, \
-            self.config["embedding"]["index_single_file_path"],)
+        loader = GCSFileLoader(
+            self.project_id,
+            self.gcs_bucket_docs,
+            self.config["embedding"]["index_single_file_path"],
+        )
         documents = loader.load()
 
         return documents
@@ -158,15 +165,15 @@ class GenerateEmbeddings:
             empty_content_idx.append(documents[doc_index])
             documents.pop(doc_index)
             doc_index = check_if_doc_needs_fix(documents)
-        self.logger.info("GenEmb: # docs with empty content : %s", \
-        len(empty_content_idx))
+        self.logger.info(
+            "GenEmb: # docs with empty content : %s", len(empty_content_idx)
+        )
 
         # Add document name and source to the metadata
         no_document_name = []
 
         for doc_index, document in enumerate(documents):
-            documents[doc_index].page_content = \
-              document.page_content.replace("\t", " ")
+            documents[doc_index].page_content = document.page_content.replace("\t", " ")
 
             doc_md = document.metadata
 
@@ -183,10 +190,8 @@ class GenerateEmbeddings:
                     source = "/".join(doc_md["source"].split("/")[:-1])
                 else:
                     # derive doc source from Document loader
-                    doc_source_prefix = "/".join(\
-                      self.gcs_bucket_docs.split("/")[:3])
-                    doc_source_suffix = "/".join(\
-                      doc_md["source"].split("/")[3:-1])
+                    doc_source_prefix = "/".join(self.gcs_bucket_docs.split("/")[:3])
+                    doc_source_suffix = "/".join(doc_md["source"].split("/")[3:-1])
                     source = f"{doc_source_prefix}/{doc_source_suffix}"
             else:
                 self.logger.info("GenEmb: source not in metadata %s", doc_md)
@@ -194,8 +199,7 @@ class GenerateEmbeddings:
 
             if "page" in doc_md.keys() or "page_number" in doc_md.keys():
                 page_number = (
-                    doc_md["page"] if "page" in doc_md.keys() \
-                      else doc_md["page_number"]
+                    doc_md["page"] if "page" in doc_md.keys() else doc_md["page_number"]
                 )
             else:
                 self.logger.info("GenEmb: No page in metadata %s", doc_md)
@@ -205,12 +209,15 @@ class GenerateEmbeddings:
             documents[doc_index].metadata["document_name"] = document_name
             documents[doc_index].metadata["page_number"] = page_number + 1
 
-        self.logger.info("GenEmb: # docs without proper filename were : %s", \
-          len(no_document_name))
+        self.logger.info(
+            "GenEmb: # docs without proper filename were : %s", len(no_document_name)
+        )
 
         self.logger.info("\nGenEmb: Splitting the documents..")
-        self.logger.info("GenEmb: split_document_flag : %s", \
-              self.config["embedding"]["split_document_flag"])
+        self.logger.info(
+            "GenEmb: split_document_flag : %s",
+            self.config["embedding"]["split_document_flag"],
+        )
         doc_splits = split_documents(
             documents, self.config["embedding"]["split_document_flag"]
         )
@@ -240,18 +247,18 @@ class GenerateEmbeddings:
             [
                 {"namespace": "source", "allow_list": [doc.metadata["source"]]},
                 {
-                    "namespace": "document_name", \
-                      "allow_list": [doc.metadata["document_name"]],
+                    "namespace": "document_name",
+                    "allow_list": [doc.metadata["document_name"]],
                 },
                 {
-                    "namespace": "chunk", \
-                      "allow_list": [str(doc.metadata["chunk"])],
+                    "namespace": "chunk",
+                    "allow_list": [str(doc.metadata["chunk"])],
                 },
                 {
-                    "namespace": "page_number", \
-                      "allow_list": [str(doc.metadata["page"])] \
-                        if "page" in doc.metadata.keys() \
-                          else [str(doc.metadata["page_number"])],
+                    "namespace": "page_number",
+                    "allow_list": [str(doc.metadata["page"])]
+                    if "page" in doc.metadata.keys()
+                    else [str(doc.metadata["page_number"])],
                 },
             ]
             for doc in doc_splits
@@ -265,8 +272,7 @@ class GenerateEmbeddings:
         """Generate new embeddings and save them in vector search"""
         ## Initialize Vertex AI SDK
         vertexai.init(
-            project=self.project_id,
-            location=self.config["default"]["region"]
+            project=self.project_id, location=self.config["default"]["region"]
         )
 
         # Embeddings API integrated with langChain
@@ -289,7 +295,7 @@ class GenerateEmbeddings:
         else:
             documents = self.ingest_multiple_pdf_documents()
 
-        self.logger.info("GenEmb: Processing the documents..:%s",len(documents))
+        self.logger.info("GenEmb: Processing the documents..:%s", len(documents))
         doc_splits = self.process_documents(documents)
 
         ## Configure Matching Engine as Vector Store
