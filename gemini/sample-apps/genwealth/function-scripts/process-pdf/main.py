@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 import re
-from typing import Optional
+from typing import List, Optional
 import uuid
 
 import functions_framework
@@ -29,7 +29,7 @@ def batch_process_documents(
     gcs_input_prefix: Optional[str] = None,
     field_mask: Optional[str] = None,
     timeout: int = 400,
-) -> None:
+) -> List[storage.Blob]:
     """Function to batch process documents"""
     # You must set the `api_endpoint` if you use a location other than "us".
     opts = ClientOptions(api_endpoint=f"{location}-documentai.googleapis.com")
