@@ -40,10 +40,7 @@ DATA_STORE_ID=$(curl -X GET \
 DATA_STORE_ID=${DATA_STORE_ID##*/}
 
 # Upload samples to gcs
-gsutil -m cp -r \
-  "gs://github-repo/generative-ai/sample-apps/genwealth/sample-prospectus" \
-  .
-gsutil cp sample-prospectus/*.pdf gs://"${DOCS_BUCKET}"
+gsutil -m cp gs://github-repo/generative-ai/sample-apps/genwealth/sample-prospectus/*.pdf gs://"${DOCS_BUCKET}"
 
 sleep 10
 
