@@ -58,6 +58,7 @@ class GenerateEmbeddings:
 
     def storage_bucket_setup(self):
         """Setup storage bucket if not already done"""
+        
         self.logger.info("GenEmb: Checking storage bucket setup")
         storage_client = storage.Client()
         self.bucket = storage_client.bucket(self.me_embedding_dir)
@@ -151,6 +152,7 @@ class GenerateEmbeddings:
             self.gcs_bucket_docs,
             self.config["embedding"]["index_single_file_path"],
         )
+        
         documents = loader.load()
 
         return documents

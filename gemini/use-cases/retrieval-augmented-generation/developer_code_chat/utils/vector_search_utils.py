@@ -168,7 +168,7 @@ class VectorSearchUtils:
         machine_type: str = "e2-standard-2",
         min_replica_count: int = 2,
         max_replica_count: int = 10,
-        network: str = None,
+        network: str = "",
     ):
         """Deploy New Index to Endpoint"""
         try:
@@ -192,13 +192,12 @@ class VectorSearchUtils:
                     index_endpoint.public_endpoint_domain_name,
                 )
             else:
-                logger.info(
-                    "Index endpoint %s doesn't exists.\
-                  Creating new index endpoint...",
-                    self.index_endpoint_name,
-                )
-                index_endpoint_request = {"display_name": self.index_endpoint_name}
-
+                logger.info("Index endpoint %s doesn't exists.\
+                  Creating new index endpoint...", self.index_endpoint_name)
+                index_endpoint_request = Dict[str, Union[str, bool]]
+                index_endpoint_request = {"display_name": \
+                  self.index_endpoint_name}
+                
                 if network:
                     index_endpoint_request["network"] = network
                 else:
