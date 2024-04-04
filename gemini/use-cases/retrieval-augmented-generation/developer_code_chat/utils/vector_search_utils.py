@@ -193,7 +193,7 @@ class VectorSearchUtils:
             else:
                 logger.info("Index endpoint %s doesn't exists.\
                   Creating new index endpoint...", self.index_endpoint_name)
-                index_endpoint_request = Dict[str, Union[str, bool]]
+                
                 index_endpoint_request = {"display_name": \
                   self.index_endpoint_name}
                 
