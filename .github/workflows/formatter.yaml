@@ -13,6 +13,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: isort Python Formatter
+        uses: isort/isort-action@master
+        with:
+          configuration: --fss
+
+      - name: Black Python Formatter
+        uses: psf/black@stable
+        with:
+          jupyter: true
+          options: null
 
       - name: Format Markdown files
         run: |
@@ -28,8 +40,8 @@ jobs:
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-bot-owl-bot@google.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.event.pull_request.head.repo.full_name }}
           git commit -am "Auto-format files"
 
       - name: Push changes
-        run: git push
+        run: git push origin ${{ github.head_ref }}:${{ github.event.pull_request.head.ref }}
