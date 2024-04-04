@@ -150,7 +150,6 @@ class GenerateEmbeddings:
             self.gcs_bucket_docs,
             self.config["embedding"]["index_single_file_path"],
         )
-        
         documents = loader.load()
         return documents
 

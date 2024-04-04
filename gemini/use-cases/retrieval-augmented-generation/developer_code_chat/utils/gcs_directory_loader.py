@@ -47,7 +47,7 @@ class GCSDirectoryLoader(BaseLoader):
         client = storage.Client(project=self.project_name)
         # docs = []
         docs: List[str] = []
-        blob_doc = ""
+        blob_doc = None
         for blob in client.list_blobs(self.bucket, prefix=self.prefix):
             # we shall just skip directories since GCSFileLoader creates
             # intermediate directories on the fly
@@ -69,6 +69,6 @@ class GCSDirectoryLoader(BaseLoader):
                 print(f"Error while loading document :{e}", blob.name)
             else:
                 docs.extend(blob_doc)
-                blob_doc = ""
+                blob_doc = None
         print("Loaded all valid documents successfully..")
         return docs

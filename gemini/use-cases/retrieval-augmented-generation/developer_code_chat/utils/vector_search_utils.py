@@ -197,7 +197,6 @@ class VectorSearchUtils:
                     self.index_endpoint_name,
                 )
                 index_endpoint_request = {"display_name": self.index_endpoint_name}
-                
                 if network:
                     index_endpoint_request["network"] = network
                 else:
