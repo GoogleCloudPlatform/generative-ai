@@ -12,12 +12,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-
 # Introduction
 
 This repository demonstrates how Gemini can be leveraged as a Snowfakery plugin for generating synthetic data based on a set of predefined schemas and data generation strategies. The framework is based on [Snowfakery](https://snowfakery.readthedocs.io/) which is itself based on [Faker](https://faker.readthedocs.io/). It requires the expected outputs to be codified in a YAML file per Snowfakery specs, detailing all the required fields and their respective data generation strategies. The framework currently supports 3 such strategies:
 
-1. Static Values - can be  included in the YAML file itself.
+1. Static Values - can be included in the YAML file itself.
 2. Faker based values - Leverages the Faker library to generate fake data.
 3. LLM based values - Leverages an LLM (Gemini) call and a predefined prompt template to generate data
 
@@ -40,14 +39,23 @@ While the primary purpose of the synthetic data generation pipeline is to genera
 ## Codebase Walkthrough
 
 ### Recipe
+
 In order to generate synthetic data, the schema of the synthetic data must be defined first. This is done by creating a `recipe` in a YAML format as demonstrated below, more details on writing recipes can be found [here](https://snowfakery.readthedocs.io/en/latest/#central-concepts).
+
 #### Few central concepts to know when building a recipe:
+
 ##### Objects:
+
 The core concept of Snowfakery is an object template. The object template represents instructions on how to create a row (or multiple rows) in a database. Rows, also known as records, in turn represent real-world entities such as people, places, or things, which is why we use the keyword “object”.
+
 ##### Fake Data:
+
 To generate fake data use a fake function. You can fake all sorts of data: names, addresses, Latin text, English sentences, URLs, and so much more. To see the complete list, along with other related features, see the [fake data tutorial](https://snowfakery.readthedocs.io/en/docs/fakedata.html)
+
 ##### Friends:
+
 To create a rule such as "For every Person created, create two Animals", use the friends feature. Eg:
+
 ```
 - object: Person
   count: 3
@@ -66,8 +74,8 @@ To create a rule such as "For every Person created, create two Animals", use the
           fake: FirstName
 ```
 
-
 ### Directory Structure
+
 ```
 .
 ├── main.ipynb
