@@ -114,8 +114,9 @@ class VectorSearch(VectorStore):
         insert_datapoints_payload = []
         ids = []
 
+        # Default empty metadata
         if metadatas is None:
-            metadatas = [{} for _ in range(len(texts))]  # Default empty metadata
+            metadatas = [{} for _ in texts]
 
         # Streaming index update
         for idx, (embedding, text, metadata) in enumerate(
