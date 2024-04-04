@@ -7,8 +7,11 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Iterable, List, Optional, Type
 import uuid
+from typing import Any, Iterable, List, Optional, Type
+
+import requests
+from requests import Response
 
 import google.auth
 import google.auth.transport.requests
@@ -16,12 +19,9 @@ from google.cloud import aiplatform, aiplatform_v1, storage
 from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
 from google.oauth2 import service_account
 from google.oauth2.service_account import Credentials
-from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
-import requests
-from requests import Response
 
 logger = logging.getLogger()
 
@@ -121,12 +121,6 @@ class VectorSearch(VectorStore):
         for idx, (embedding, text, metadata) in enumerate(
             zip(embeddings, texts, metadatas)
         ):
-            # id_ = uuid.uuid4()
-            # id_ = str(metadata[1]['allow_list'])[2:-2]
-            # +'_'+str(metadata[2]['allow_list'])[2:-2]\
-            # +'_'+str(metadata[3]['allow_list'])[2:-2]
-            # id_ = metadata[-1].get('unique_id')
-
             if isinstance(metadata, dict):
                 id_ = str(
                     str(metadata[0].get("allow_list"))[2:-2].replace(" ", "")
