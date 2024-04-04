@@ -35,7 +35,7 @@ class IntentRouting:
         """Get Chat History"""
 
         chat_history = chat.history
-        
+
         if len(chat_history) == 0:
             return []
         return chat_history[-6:]
@@ -65,7 +65,7 @@ class IntentRouting:
         enabled_qna_programming_language = ", ".join(
             [lang.title() for lang in enabled_qna_programming_language]
         )
-        
+
         chat = chat_model.start_chat()
         response = chat.send_message(
             f"""You are Generative AI powered genai Learning Assistant.

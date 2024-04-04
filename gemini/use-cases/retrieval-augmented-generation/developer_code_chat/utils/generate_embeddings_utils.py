@@ -52,16 +52,17 @@ def rate_limit(max_per_minute):
 
 class CustomVertexAIEmbeddings(VertexAIEmbeddings):
     """Custom Vertex AI Embeddings"""
+
     # embedding_model_name: str
     # location: str
     requests_per_minute: int
     num_instances_per_batch: int
 
-#     def __init__(self, embedding_model_name: str, location: str, requests_per_minute: int, num_instances_per_batch: int):
-#         print("## debug: initialising parameters to :", embedding_model_name, location, requests_per_minute, num_instances_per_batch)
-#         super().__init__(model_name=embedding_model_name, location=location)
-#         self.requests_per_minute = requests_per_minute
-#         self.num_instances_per_batch = num_instances_per_batch
+    # def __init__(self, embedding_model_name: str, location: str, requests_per_minute: int, num_instances_per_batch: int):
+    #     print("## debug: initialising parameters to :", embedding_model_name, location, requests_per_minute, num_instances_per_batch)
+    #     super().__init__(model_name=embedding_model_name, location=location)
+    #     self.requests_per_minute = requests_per_minute
+    #     self.num_instances_per_batch = num_instances_per_batch
 
     def embed_documents(self, texts: List[str]):
         """Overriding embed_documents method"""
@@ -76,7 +77,7 @@ class CustomVertexAIEmbeddings(VertexAIEmbeddings):
             head, docs = (
                 docs[: self.num_instances_per_batch],
                 docs[self.num_instances_per_batch :],
-            )
+            ) # noqa: E203
             chunk = self.client.get_embeddings(head)
             results.extend(chunk)
             next(limiter)

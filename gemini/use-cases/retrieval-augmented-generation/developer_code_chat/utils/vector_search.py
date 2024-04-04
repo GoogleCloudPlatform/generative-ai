@@ -257,7 +257,6 @@ class VectorSearch(VectorStore):
             # response = response_json["nearestNeighbors"]
         else:
             logger.info("Failed to query index %s", str(response))
-            response = json.dumps({})
 
         if len(response) == 0:
             return []
@@ -280,9 +279,8 @@ class VectorSearch(VectorStore):
                     for item in doc["datapoint"]["restricts"]
                 }
             if "distance" in doc:
-                # metadata["score"] = doc["distance"]
-                metadata["score"] = float(doc["distance"])
-                if doc["distance"] >= search_distance:
+                metadata["score"] = str(doc["distance"])
+                if float(doc["distance"]) >= search_distance:
                     results.append(
                         Document(page_content=page_content, metadata=metadata)
                     )
