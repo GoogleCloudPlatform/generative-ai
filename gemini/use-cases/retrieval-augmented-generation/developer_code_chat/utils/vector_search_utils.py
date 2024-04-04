@@ -191,11 +191,12 @@ class VectorSearchUtils:
                     index_endpoint.public_endpoint_domain_name,
                 )
             else:
-                logger.info("Index endpoint %s doesn't exists.\
-                  Creating new index endpoint...", self.index_endpoint_name)
-                
-                index_endpoint_request = {"display_name": \
-                  self.index_endpoint_name}
+                logger.info(
+                    "Index endpoint %s doesn't exists.\
+                  Creating new index endpoint...",
+                    self.index_endpoint_name,
+                )
+                index_endpoint_request = {"display_name": self.index_endpoint_name}
                 
                 if network:
                     index_endpoint_request["network"] = network

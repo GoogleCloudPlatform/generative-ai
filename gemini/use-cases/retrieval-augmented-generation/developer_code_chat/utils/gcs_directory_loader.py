@@ -46,7 +46,7 @@ class GCSDirectoryLoader(BaseLoader):
         """Load documents."""
         client = storage.Client(project=self.project_name)
         # docs = []
-        docs: List[<type>] = []
+        docs: List[str] = []
         blob_doc = ""
         for blob in client.list_blobs(self.bucket, prefix=self.prefix):
             # we shall just skip directories since GCSFileLoader creates

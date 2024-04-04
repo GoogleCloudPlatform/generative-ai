@@ -65,7 +65,7 @@ class CustomVertexAIEmbeddings(VertexAIEmbeddings):
             # documents per request to get embeddings
             head, docs = (
                 docs[: self.num_instances_per_batch],
-                docs[self.num_instances_per_batch:],
+                docs[self.num_instances_per_batch :],
             )
             chunk = self.client.get_embeddings(head)
             results.extend(chunk)
