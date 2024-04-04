@@ -3,6 +3,7 @@
 Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Vertex AI Conversation repository.
 
 ## Table of Contents
+
 <!-- markdownlint-disable MD033 -->
 <pre>
 conversation/
