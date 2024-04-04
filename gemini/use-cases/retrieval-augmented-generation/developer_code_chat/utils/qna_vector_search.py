@@ -11,9 +11,8 @@ import subprocess
 import grpc
 import numpy as np
 
-from langchain.chains import RetrievalQA
-# from langchain.llms import VertexAI
 from langchain_google_vertexai import VertexAI
+from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 import vertexai
@@ -113,6 +112,7 @@ class QnAVectorSearch:
 
     def get_token_length(self, project, model, message):
         """Get Token Length using curl command"""
+
         # The python sdk is not available at the time of development
         # Using curl command for the same.
         if len(message.split(" ")) < 20:
@@ -127,17 +127,16 @@ class QnAVectorSearch:
 
     def ask_qna(self, query="what is java"):
         """Get relevent responce from intra-documents"""
+
         # Initialize Vertex AI SDK
         vertexai.init(project=self.project_id, location=self.region)
 
         # Text model instance integrated with langChain
         # Default model
         model_name = self.config["genai_qna"]["model_name"]
-        max_output_tokens = int(self.config["genai_qna"]["max_output_tokens"])
 
         # Check token length of input message
-        # input_token_len = self.get_token_length(self.project_id, \
-        # model_name, query)
+        max_output_tokens = int(self.config["genai_qna"]["max_output_tokens"])
 
         model = GenerativeModel(self.config["genai_qna"]["model_name"])
         input_token_len = model.count_tokens(query).total_tokens
@@ -162,7 +161,7 @@ class QnAVectorSearch:
                 self.config["embedding"]["embedding_num_batch"]
             ),
         )
-        
+
         mengine = VectorSearchUtils(self.project_id, self.me_region, self.me_index_name)
         me_index_id, me_index_endpoint_id = mengine.get_index_and_endpoint()
 

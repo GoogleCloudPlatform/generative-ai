@@ -58,6 +58,7 @@ class GenerateEmbeddings:
 
     def storage_bucket_setup(self):
         """Setup storage bucket if not already done"""
+
         self.logger.info("GenEmb: Checking storage bucket setup")
         storage_client = storage.Client()
         self.bucket = storage_client.bucket(self.me_embedding_dir)
@@ -239,6 +240,7 @@ class GenerateEmbeddings:
 
     def add_embeddings_to_vector_store(self, me, doc_splits):
         """Store docs as embeddings in Matching Engine index"""
+
         # It may take a while since API is rate limited
         texts = [doc.page_content for doc in doc_splits]
         metadatas = [
@@ -268,6 +270,7 @@ class GenerateEmbeddings:
 
     def generate_embeddings(self):
         """Generate new embeddings and save them in vector search"""
+
         # Initialize Vertex AI SDK
         vertexai.init(
             project=self.project_id, location=self.config["default"]["region"]
@@ -282,7 +285,7 @@ class GenerateEmbeddings:
                 self.config["embedding"]["embedding_num_batch"]
             ),
         )
-        
+
         # STEP 1: Create Matching Engine Index and Endpoint for Retrieval
         mengine = self.create_index()
         self.deploy_index(mengine)

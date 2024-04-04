@@ -13,6 +13,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 def split_documents(documents, split_document_flag="PAGES"):
     """Split documents either by Pages or by the chunks"""
+
     # by default documents are split by pages using PyPDFLoader
     # in GCSDirectoryLoader_modified class
     doc_splits = documents
@@ -35,6 +36,7 @@ def split_documents(documents, split_document_flag="PAGES"):
 
 def rate_limit(max_per_minute):
     """Utility functions for Embeddings API with rate limiting"""
+
     period = 60 / max_per_minute
     # print("Waiting")
     while True:
@@ -54,20 +56,16 @@ class CustomVertexAIEmbeddings(VertexAIEmbeddings):
     # location: str
     requests_per_minute: int
     num_instances_per_batch: int
-    
-    # print("## debug: initialising parameters to :", embedding_model_name, location, requests_per_minute, num_instances_per_batch)
-    # super().__init__(model_name=embedding_model_name, location=location)
-    
+
 #     def __init__(self, embedding_model_name: str, location: str, requests_per_minute: int, num_instances_per_batch: int):
 #         print("## debug: initialising parameters to :", embedding_model_name, location, requests_per_minute, num_instances_per_batch)
-        
 #         super().__init__(model_name=embedding_model_name, location=location)
 #         self.requests_per_minute = requests_per_minute
 #         self.num_instances_per_batch = num_instances_per_batch
 
-
     def embed_documents(self, texts: List[str]):
         """Overriding embed_documents method"""
+
         limiter = rate_limit(self.requests_per_minute)
         results = []
         docs = list(texts)
@@ -88,6 +86,7 @@ class CustomVertexAIEmbeddings(VertexAIEmbeddings):
 
 def check_if_doc_needs_fix(documents):
     """Check if doument needs fix if page content is empty"""
+
     for doc_index, doc in enumerate(documents):
         if doc.page_content == "" or len(doc.page_content) == 0:
             return doc_index

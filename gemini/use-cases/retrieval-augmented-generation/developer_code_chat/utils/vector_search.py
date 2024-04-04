@@ -261,7 +261,7 @@ class VectorSearch(VectorStore):
 
         if len(response) == 0:
             return []
-        
+
         logger.debug("Found %s matches for the query %s.", len(response.json()), query)
 
         results = []
@@ -386,6 +386,7 @@ class VectorSearch(VectorStore):
         Returns:
             A configured VectorSearch with the texts added to the index.
         """
+
         gcs_bucket_name = cls._validate_gcs_bucket(gcs_bucket_name)
 
         # Set credentials

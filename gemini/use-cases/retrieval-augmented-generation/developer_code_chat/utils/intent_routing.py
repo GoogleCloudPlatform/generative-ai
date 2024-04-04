@@ -30,9 +30,10 @@ class IntentRouting:
             temperature=float(self.config["genai_chat"]["temperature"]),
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
-    
+
     def get_chat_history(self, chat):
         """Get Chat History"""
+
         chat_history = chat.history
         
         if len(chat_history) == 0:
@@ -41,6 +42,7 @@ class IntentRouting:
 
     def other_intent(self, text, chat_model):
         """Respond for Other type of Intent"""
+
         chat = chat_model.start_chat()
         response = chat.send_message(
             f"""{text}""", generation_config=self.genai_chat_parameters
@@ -50,6 +52,7 @@ class IntentRouting:
 
     def greetings(self, chat_model, text):
         """Respond for Greetings or Welcome Intent"""
+
         enabled_programming_language = self.config["default"][
             "enabled_programming_language"
         ].split(",")
@@ -84,6 +87,7 @@ class IntentRouting:
 
     def closing(self, chat_model, text):
         """Respond for Closing Intent"""
+
         parameters_local = GenerationConfig(
             temperature=0.7,
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
@@ -99,6 +103,7 @@ class IntentRouting:
 
     def elaborate_qna(self, text, chat_model, question):
         """Explain the answer of a question in detail."""
+
         chat = chat_model.start_chat()
         response = chat.send_message(
             """
@@ -122,7 +127,7 @@ class IntentRouting:
 
     def genai_classify_intent(self, text, model):
         """Classify the intent of incoming message"""
-        # response = model.predict(
+
         response = model.generate_content(
             f"""
             You are strict intent classifier , Classify intent of messages into 5 categories
@@ -149,7 +154,6 @@ class IntentRouting:
             generation_config=self.genai_qna_parameters,
         )
 
-        # if response.is_blocked:
         if response.to_dict()["candidates"][0]["finish_reason"] != 1:
             self.logger.info(
                 "classify_intent: No response from QnA due to LLM safety checks."
@@ -161,6 +165,7 @@ class IntentRouting:
 
     def ask_question_and_answer_codey(self, text, chat_model):
         """Respond question and answer related questions."""
+
         unable_to_understand_question = self.config["error_msg"][
             "unable_to_understand_question"
         ]
@@ -203,6 +208,7 @@ class IntentRouting:
 
     def ask_codey(self, text, chat_model):
         """Respond code related questions."""
+
         unable_to_understand_question = self.config["error_msg"][
             "unable_to_understand_question"
         ]
@@ -248,7 +254,7 @@ class IntentRouting:
         self, model, text, enabled_programming_language
     ):
         """Extract Programming lanuages of incoming message"""
-        # response = model.predict(
+
         response = model.generate_content(
             f"""
             You are strict programming languages extractor.
@@ -289,6 +295,7 @@ class IntentRouting:
 
     def check_programming_language_in_query(self, model, text, intent):
         """Check if which programming language is mentioned in the use query"""
+
         if intent == "WRITE_CODE":
             enabled_programming_language = self.config["default"][
                 "enabled_programming_language"
@@ -310,10 +317,9 @@ class IntentRouting:
 
         return program_lang_in_query, allowed_language_in_query
 
-    def classify_intent(
-        self, text, session_state, model, chat_model, genai_qna
-    ):
+    def classify_intent(self, text, session_state, model, chat_model, genai_qna):
         """Classify intent of incoming query"""
+
         try:
             response = ""
             answer_reference = ""
@@ -370,9 +376,7 @@ class IntentRouting:
                         answer_reference = "\n\n" + qna_answer_dict["answer_reference"]
                     else:
                         self.logger.info("Asking codey when no answer from QnA")
-                        response = self.ask_question_and_answer_codey(
-                            text, chat_model
-                        )
+                        response = self.ask_question_and_answer_codey(text, chat_model)
             elif intent == "FOLLOWUP":
                 response = self.ask_question_and_answer_codey(
                     text + " based on previous message", chat_model
