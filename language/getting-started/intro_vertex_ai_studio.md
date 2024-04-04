@@ -1,8 +1,8 @@
 # Getting started with Vertex AI Studio
 
-|           |                                            |
-| --------- | ------------------------------------------ |
-| Author(s) | [Thu Ya Kyaw](https://github.com/iamthuya) |
+| | |
+|-|-|
+|Author(s) | [Thu Ya Kyaw](https://github.com/iamthuya) |
 
 This guide provides instructions on how to use Vertex AI Studio through the Google Cloud console, without using the API or Python SDK.
 
@@ -43,7 +43,7 @@ You can feed your desired input text, e.g. a question, to the model. The model w
 Currently, there is no best way to design the prompts yet. Generally, there are 3 methods that you can use to shape the model's response in a way that you desired.
 
 - **Zero-shot prompting** - This is a method where the LLM is given no additional data on the specific task that it is being asked to perform. Instead, it is only given a prompt that describes the task. For example, if you want the LLM to answer a question, you just prompt "what is prompt design?".
-- **One-shot prompting** - This is a method where the LLM is given a single example of the task that it is being asked to perform. For example, if you want the LLM to write a poem, you might give it a single example poem.
+- **One-shot prompting** - This is a method where the LLM is given a single example of the task that it is being asked to perform.  For example, if you want the LLM to write a poem, you might give it a single example poem.
 - **Few-shot prompting** - This is a method where the LLM is given a small number of examples of the task that it is being asked to perform. For example, if you want the LLM to write a news article, you might give it few news articles to read.
 
 You may also notice the **FREE-FORM** and **STRUCTURED** tabs in the image above. Those are the two modes that you can use while designing your prompt.
@@ -118,7 +118,7 @@ As you can see, the model did not have enough information to know whether you we
 Try adding these examples as shown in the image below:
 
 | **INPUT**                         | **OUTPUT** |
-| --------------------------------- | ---------- |
+|-----------------------------------|------------|
 | A well-made and entertaining film | positive   |
 | I fell asleep after 10 minutes    | negative   |
 | The movie was ok                  | neutral    |
@@ -153,9 +153,9 @@ For this section, you will add context to the chat and let the model respond bas
 
 - copy these context to **Context** field
 
-> > Your name is Roy. <br/>
-> > You are a support technician for an IT department. <br/>
-> > You only respond with "Have you tried turning it off and on again?" to any queries.
+>> Your name is Roy. <br/>
+>> You are a support technician for an IT department. <br/>
+>> You only respond with "Have you tried turning it off and on again?" to any queries.
 
 - copy "my computer is so slow" to the chatbox and
 - press **Enter** key or click the send message button (the right arrow-head button)

@@ -1,13 +1,13 @@
 # Cloud Function that wraps the PaLM Code Bison Models
 
-|           |                                              |
-| --------- | -------------------------------------------- |
-| Author(s) | [Romin Irani](https://github.com/rominirani) |
+| | |
+|-|-|
+|Author(s) | [Romin Irani](https://github.com/rominirani) |
 
 This application demonstrates a Cloud Function written in Python that initializes the Vertex AI module and then provides an endpoint to invoke PaLM Code Bison model.
 
 > NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
-> Additionally, ensure that you have cloned this repository and are currently in the `code-predict-cloudfunction` folder. This should be your active working directory for the rest of the commands.
+Additionally, ensure that you have cloned this repository and are currently in the ```code-predict-cloudfunction``` folder. This should be your active working directory for the rest of the commands.
 
 ## Environment variables required
 

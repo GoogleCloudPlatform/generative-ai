@@ -1,8 +1,8 @@
 # Testing Gemini from Bash
 
-|           |                                                   |
-| --------- | ------------------------------------------------- |
-| Author(s) | [Riccardo Carlesso](https://github.com/palladius) |
+| | |
+|-|-|
+|Author(s) | [Riccardo Carlesso](https://github.com/palladius) |
 
 Note: I wrote an article on Medium which is very similar to this README 😊
 
@@ -128,7 +128,7 @@ $ ./gemini-generic-two-pics.sh  images/gemini-constellation.png   images/saga-bl
  The two images are of the constellation Gemini and the anime character Gemini Saga. The constellation is said to represent the twins Castor and Pollux, while the character Gemini Saga is a Gemini Saint in the anime series Saint Seiya. Both images depict two figures that are connected to each other. The constellation is made up of stars, while the character is a human.
 ```
 
-Well done Gemini! _Know thyself_, Socrates would say.
+Well done Gemini! *Know thyself*, Socrates would say.
 Note that the images are a PNG and a JPG - nothing can stop Gemini from comparing them!
 
 ## Introducing Audio
@@ -208,7 +208,7 @@ t.mp3: MPEG ADTS, layer III, v2,  32 kbps, 24 kHz, Monaural
 All good. MP3 created: 't.La foto mostra una loggia con delle colonne in pie.mp3'
 ```
 
-As you see, italian is more verbose and it knows more about Trento, but it's not aware of the _Buonconsiglio Palace_.
+As you see, italian is more verbose and it knows more about Trento, but it's not aware of the *Buonconsiglio Palace*.
 Interesting! I presume the Italian model has less training material to learn from than the English one. Makes sense.
 
 Btw, I highly recommend Trento, I was cycling around there: great views and great wines!
@@ -275,15 +275,15 @@ $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize th
  said by the character Tyrion Lannister.
 ```
 
-- MP3: <a href='https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/ricc-logo.png.mp3' >images/mp3/ricc-logo.png.mp3</a> (I don't think
+* MP3: <a href='https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/ricc-logo.png.mp3' >images/mp3/ricc-logo.png.mp3</a> (I don't think
   GitHub supports playing this audio - but you can download it and hear it).
 
-- <audio controls="controls">
+* <audio controls="controls">
   <source type="audio/mp3" src="https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/mp3/ricc-logo.png.mp3"></source>
   <p>🔇 Sorry, Your browser or GitHub markdown does not support the audio element.</p>
   </audio>
 
-- Response: “ "That's what I do, I drink and I know things" is a quote from the TV show
+* Response: “ "That's what I do, I drink and I know things" is a quote from the TV show
   Game of Thrones, said by the character Tyrion Lannister.”
 
-Wow: _Chapeau_, Gemini!
+Wow: *Chapeau*, Gemini!

@@ -1,8 +1,8 @@
 # Vertex AI Conversation
 
-|           |                                                     |
-| --------- | --------------------------------------------------- |
-| Author(s) | [Kristopher Overholt](https://github.com/koverholt) |
+| | |
+|-|-|
+|Author(s) | [Kristopher Overholt](https://github.com/koverholt) |
 
 ## Overview
 
