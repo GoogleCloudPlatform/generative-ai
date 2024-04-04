@@ -7,11 +7,8 @@ from __future__ import annotations
 
 import json
 import logging
-import uuid
 from typing import Any, Iterable, List, Optional, Type
-
-import requests
-from requests import Response
+import uuid
 
 import google.auth
 import google.auth.transport.requests
@@ -23,6 +20,8 @@ from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
+import requests
+from requests import Response
 
 logger = logging.getLogger()
 
@@ -117,7 +116,6 @@ class VectorSearch(VectorStore):
 
         if metadatas is None:
             metadatas = [{} for _ in range(len(texts))]  # Default empty metadata
-
 
         # Streaming index update
         for idx, (embedding, text, metadata) in enumerate(

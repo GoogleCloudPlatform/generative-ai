@@ -8,19 +8,17 @@ import configparser
 import json
 import logging
 import subprocess
-import grpc
-import numpy as np
 
-from langchain_google_vertexai import VertexAI
+import grpc
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-
-import vertexai
-from vertexai.generative_models import GenerativeModel
-
+from langchain_google_vertexai import VertexAI
+import numpy as np
 from utils.generate_embeddings_utils import CustomVertexAIEmbeddings
 from utils.vector_search import VectorSearch
 from utils.vector_search_utils import VectorSearchUtils
+import vertexai
+from vertexai.generative_models import GenerativeModel
 
 
 class QnAVectorSearch:
