@@ -1,0 +1,46 @@
+name: Formatting
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: isort Python Formatter
+        uses: isort/isort-action@master
+        with:
+          configuration: --fss
+
+      - name: Black Python Formatter
+        uses: psf/black@stable
+        with:
+          jupyter: true
+          options:
+
+      - name: Format Markdown files
+        run: |
+          npm install -g prettier
+          prettier --write '**/*.md'
+
+      - name: Check for modified files
+        id: git-check
+        run: echo "modified=$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)" >> $GITHUB_OUTPUT
+
+      - name: Commit changes
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-bot-owl-bot@google.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -am "Auto-format files"
+
+      - name: Push changes
+        run: git push
