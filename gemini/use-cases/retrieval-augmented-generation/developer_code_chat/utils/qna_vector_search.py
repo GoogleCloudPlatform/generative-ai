@@ -8,18 +8,19 @@ import configparser
 import json
 import logging
 import subprocess
-
 import grpc
+import numpy as np
+
 from langchain.chains import RetrievalQA
 from langchain.llms import VertexAI
 from langchain.prompts import PromptTemplate
-import numpy as np
+
+import vertexai
+from vertexai.generative_models import GenerativeModel
+
 from utils.generate_embeddings_utils import CustomVertexAIEmbeddings
-from utils.llm_error_codes import get_llm_error_and_category
 from utils.vector_search import VectorSearch
 from utils.vector_search_utils import VectorSearchUtils
-import vertexai
-from vertexai.generative_models import ChatSession, GenerativeModel
 
 
 class QnAVectorSearch:
@@ -98,12 +99,12 @@ class QnAVectorSearch:
             },
         )
 
-        ## Enable for troubleshooting
+        # Enable for troubleshooting
         qa.combine_documents_chain.verbose = True
         qa.combine_documents_chain.llm_chain.verbose = True
         qa.combine_documents_chain.llm_chain.llm.verbose = True
 
-        ## setting threshold limits
+        # setting threshold limits
         qa.retriever.search_kwargs["search_distance"] = search_distance_threshould
         qa.retriever.search_kwargs["k"] = number_of_references_to_summarise
 
@@ -129,11 +130,11 @@ class QnAVectorSearch:
         vertexai.init(project=self.project_id, location=self.region)
 
         # Text model instance integrated with langChain
-        ## Default model
+        # Default model
         model_name = self.config["genai_qna"]["model_name"]
         max_output_tokens = int(self.config["genai_qna"]["max_output_tokens"])
 
-        ## Check token length of input message
+        # Check token length of input message
         # input_token_len = self.get_token_length(self.project_id, \
         # model_name, query)
 
@@ -172,7 +173,7 @@ class QnAVectorSearch:
             endpoint_id=me_index_endpoint_id,
         )
 
-        ## STEP 1: Retrieval based Question/Answering Chain
+        # STEP 1: Retrieval based Question/Answering Chain
         # Expose index to the retriever
         retriever = me.as_retriever(
             search_type="similarity",
@@ -182,7 +183,7 @@ class QnAVectorSearch:
             },
         )
 
-        ## Customize the default retrieval prompt template
+        # Customize the default retrieval prompt template
         template = """
         SYSTEM: You are genai Programming Language Learning Assistant helping the students answer their questions based on following context. Explain the answers in detail for students.
 
@@ -201,7 +202,7 @@ class QnAVectorSearch:
         Question: {question}
         Detailed explanation of Answer:"""  # pylint: disable=line-too-long
 
-        ## Configure RetrievalQA chain
+        # Configure RetrievalQA chain
         result = None
         try:
             qa = self.configure_retrievalqa_chain(
@@ -248,22 +249,6 @@ class QnAVectorSearch:
                     "llm_model": model_name,
                     "llm_error_msg": None,
                 }
-            elif result["result"] == "":
-                ref_text, reference_logs = self.get_reference_details(result)
-
-                ## Checking LLM error codes when No response from QnA
-                llm_error_msg = self.get_llm_safety_error_code(result, query)
-                self.logger.info("QnA: No response from QnA due to LLM safety checks.")
-                self.logger.info("LLM error code: %s", llm_error_msg)
-
-                return {
-                    "is_answer": False,
-                    "answer": "",
-                    "answer_reference": ref_text,
-                    "reference_logs": reference_logs,
-                    "llm_model": model_name,
-                    "llm_error_msg": llm_error_msg,
-                }
             else:
                 ref_text, reference_logs = self.get_reference_details(result)
                 return {
@@ -282,53 +267,6 @@ class QnAVectorSearch:
             "llm_model": model_name,
             "llm_error_msg": None,
         }
-
-    def get_llm_safety_error_code(self, result, query):
-        """Get LLM safety error codes"""
-        vertexai.init(project=self.project_id, location=self.region)
-        context = ""
-        for ref in result["source_documents"][
-            : int(self.config["genai_qna"]["number_of_references_to_show"])
-        ]:
-            context += ref.page_content + "\n"
-
-        # vertexai.init(project="genai-genai-prod", location="us-central1")
-        model = TextGenerationModel.from_pretrained("text-bison@001")
-
-        parameters = {
-            "temperature": float(self.config["genai_qna"]["temperature"]),
-            "top_p": float(self.config["genai_qna"]["top_p"]),
-            "top_k": int(self.config["genai_qna"]["top_k"]),
-            "max_output_tokens": int(self.config["genai_qna"]["max_output_tokens"]),
-        }
-
-        template = f"""
-        SYSTEM: You are genai Programming Language Learning Assistant helping the students answer their questions based on following context. Explain the answers in detail for students.
-
-        Instructions:
-        1. Think step-by-step and then answer.
-        2. Explain the answer in detail.
-        3. If the answer to the question cannot be determined from the context alone, say "I cannot determine the answer to that."
-        4. If the context is empty, just say "I could not find any references that are directly related to your question."
-
-        Context:
-        =============
-        {context}
-        =============
-
-        What is the Detailed explanation of answer of following question?
-        Question: {query}
-        Detailed explanation of Answer:"""  # pylint:disable=line-too-long
-
-        response = model.predict(template, **parameters)
-        error_codes = None
-        llm_error_msgs = None
-        if response.is_blocked:
-            error_codes = response.raw_prediction_response[0][0]["safetyAttributes"][
-                "errors"
-            ]
-            llm_error_msgs = get_llm_error_and_category(error_codes, self.config)
-        return llm_error_msgs
 
 
 if __name__ == "__main__":

@@ -3,7 +3,6 @@
 # agreement with Google.
 """Vector Search Utils"""
 
-import configparser
 from datetime import datetime
 import logging
 import time

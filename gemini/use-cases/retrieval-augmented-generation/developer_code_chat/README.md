@@ -24,7 +24,6 @@ This solution showcases the development of an AI-powered learning assistant. Thi
     - py_pdf_loader.py : Load PDF Files.
     - py_pdf_parser.py : Modified Langchain PDF Wrappers.
     - qna_vector_search.py : Answer QnA Type Questions using indexed documents.
-    - llm_error_codes.py : Contains methods to extract the error name corresponding to the LLM error code.
     - vector_search_utils.py :  Utility functions to create Index and deploy the index to an Endpoint.
 
 3. images/

@@ -4,11 +4,10 @@
 """Generative AI Models based functions to respond questions"""
 # Imports
 import configparser
-import copy
 import json
 import logging
 
-from vertexai.generative_models import GenerationConfig, GenerativeModel
+from vertexai.generative_models import GenerationConfig
 from vertexai.preview.language_models import ChatMessage
 
 

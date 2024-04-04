@@ -67,7 +67,7 @@ class GenerateEmbeddings:
                 "GenEmb: GCS bucket already exists: %s", self.me_embedding_dir
             )
         else:
-            ## create new GCS bucket
+            # create new GCS bucket
             self.bucket = storage_client.create_bucket(
                 bucket_or_name=self.me_embedding_dir,
                 project=self.project_id,
@@ -78,7 +78,7 @@ class GenerateEmbeddings:
             # dummy_embeddings
             self.create_dummy_embeddings()
 
-            ## move dummy embeddings file
+            # move dummy embeddings file
             blob = self.bucket.blob("init_index/embeddings_0.json")
             blob.upload_from_filename("embeddings_0.json")
             self.logger.info(
@@ -272,7 +272,7 @@ class GenerateEmbeddings:
 
     def generate_embeddings(self):
         """Generate new embeddings and save them in vector search"""
-        ## Initialize Vertex AI SDK
+        # Initialize Vertex AI SDK
         vertexai.init(
             project=self.project_id, location=self.config["default"]["region"]
         )
@@ -285,11 +285,11 @@ class GenerateEmbeddings:
             ),
         )
 
-        ## STEP 1: Create Matching Engine Index and Endpoint for Retrieval
+        # STEP 1: Create Matching Engine Index and Endpoint for Retrieval
         mengine = self.create_index()
         self.deploy_index(mengine)
 
-        ## STEP 2: Add Document Embeddings to Matching Engine - Vector Store
+        # STEP 2: Add Document Embeddings to Matching Engine - Vector Store
         self.logger.info("GenEmb: Loading the document(s)..")
         documents = []
         if self.config["embedding"]["index_single_file_flag"] == "True":
@@ -300,7 +300,7 @@ class GenerateEmbeddings:
         self.logger.info("GenEmb: Processing the documents..:%s", len(documents))
         doc_splits = self.process_documents(documents)
 
-        ## Configure Matching Engine as Vector Store
+        # Configure Matching Engine as Vector Store
         me = self.configure_matching_engine(mengine, embeddings)
 
         _ = self.add_embeddings_to_vector_store(me, doc_splits)

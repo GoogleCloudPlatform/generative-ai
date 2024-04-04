@@ -9,7 +9,6 @@ from typing import List
 
 from langchain.embeddings import VertexAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from pydantic import BaseModel
 
 
 def split_documents(documents, split_document_flag="PAGES"):
@@ -66,7 +65,7 @@ class CustomVertexAIEmbeddings(VertexAIEmbeddings):
             # documents per request to get embeddings
             head, docs = (
                 docs[: self.num_instances_per_batch],
-                docs[self.num_instances_per_batch :],
+                docs[self.num_instances_per_batch:],
             )
             chunk = self.client.get_embeddings(head)
             results.extend(chunk)
