@@ -61,7 +61,7 @@ So now that you've extracted all of this useful data from your prospectus, how c
 Access the GenWealth Advisory Services UI by navigating to the Cloud Run endpoint you provisioned earlier with the [`install.sh`](../install.sh) script. You can retrieve the URL by running the following command in Cloud Shell.
 
 ```bash
-cd && cd gemini/sample-apps/genwealth/
+cd && cd generative-ai/gemini/sample-apps/genwealth/
 source ./env.sh
 gcloud run services describe genwealth --platform managed --region $REGION --format 'value(status.url)' --project $PROJECT_ID
 ```
