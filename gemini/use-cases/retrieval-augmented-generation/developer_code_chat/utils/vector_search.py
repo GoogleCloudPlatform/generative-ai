@@ -115,6 +115,10 @@ class VectorSearch(VectorStore):
         insert_datapoints_payload = []
         ids = []
 
+        if metadatas is None:
+            metadatas = [{} for _ in range(len(texts))]  # Default empty metadata
+
+
         # Streaming index update
         for idx, (embedding, text, metadata) in enumerate(
             zip(embeddings, texts, metadatas)
@@ -228,67 +232,6 @@ class VectorSearch(VectorStore):
         return requests.post(
             rpc_address, data=endpoint_json_data, headers=header, timeout=60
         )
-
-    def similarity_search(
-        self, query: str, k: int = 4, search_distance: float = 0.65
-    ) -> List[Document]:
-        """Return docs most similar to query.
-
-        Args:
-            query: The string that will be used to search for similar documents.
-            k: The amount of neighbors that will be retrieved.
-            search_distance: filter search results by  search distance
-            by adding a threshold value
-
-        Returns:
-            A list of k matching documents.
-        """
-
-        logger.debug("Embedding query %s", query)
-        embedding_query = self.embedding.embed_documents([query])
-        deployed_index_id = self._get_index_id()
-        logger.debug("Deployed Index ID = %s", deployed_index_id)
-
-        response = self.get_matches(embedding_query, k, self.endpoint)
-
-        if response.status_code == 200:
-            response = response.json()["nearestNeighbors"]
-            # response_json = response.json()
-            # response = response_json["nearestNeighbors"]
-        else:
-            logger.info("Failed to query index %s", str(response))
-
-        if len(response) == 0:
-            return []
-
-        logger.debug("Found %s matches for the query %s.", len(response.json()), query)
-
-        results = []
-        for doc in response[0]["neighbors"]:
-            # page_content = self._download_from_gcs(
-            #     f"documents/{doc['datapoint']['datapointId']}"
-            # )
-            page_content = self._download_from_gcs(
-                f"documents/{str(doc['datapoint']['datapointId'])}"
-            )
-            metadata = {}
-            if "restricts" in doc["datapoint"]:
-                metadata = {
-                    # item["namespace"]: item["allowList"][0]
-                    str(item["namespace"]): str(item["allowList"][0])
-                    for item in doc["datapoint"]["restricts"]
-                }
-            if "distance" in doc:
-                metadata["score"] = str(doc["distance"])
-                if float(doc["distance"]) >= search_distance:
-                    results.append(
-                        Document(page_content=page_content, metadata=metadata)
-                    )
-            else:
-                results.append(Document(page_content=page_content, metadata=metadata))
-        logger.debug("Downloaded documents for query.")
-
-        return results
 
     def _get_index_id(self) -> str:
         """Gets the correct index id for the endpoint.
