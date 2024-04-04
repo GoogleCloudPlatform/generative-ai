@@ -200,7 +200,8 @@ class VectorSearchUtils:
                 if network:
                     index_endpoint_request["network"] = network
                 else:
-                    index_endpoint_request["public_endpoint_enabled"] = True
+                    # index_endpoint_request["public_endpoint_enabled"] = True
+                    index_endpoint_request["public_endpoint_enabled"] = "True"
 
                 r = self.index_endpoint_client.create_index_endpoint(
                     parent=self.parent, index_endpoint=index_endpoint_request

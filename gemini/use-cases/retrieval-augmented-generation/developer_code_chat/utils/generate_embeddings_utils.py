@@ -53,6 +53,9 @@ class CustomVertexAIEmbeddings(VertexAIEmbeddings):
 
     requests_per_minute: int
     num_instances_per_batch: int
+    
+    def __init__(self):
+        super().__init__(model_name=self.)
 
     def embed_documents(self, texts: List[str]):
         """Overriding embed_documents method"""
@@ -64,8 +67,8 @@ class CustomVertexAIEmbeddings(VertexAIEmbeddings):
             # Working in batches because the API accepts maximum 5
             # documents per request to get embeddings
             head, docs = (
-                docs[:self.num_instances_per_batch],
-                docs[self.num_instances_per_batch:],
+                docs[: self.num_instances_per_batch],
+                docs[self.num_instances_per_batch :],
             )
             chunk = self.client.get_embeddings(head)
             results.extend(chunk)

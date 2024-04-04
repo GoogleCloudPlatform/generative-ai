@@ -29,3 +29,7 @@ This solution showcases the development of an AI-powered learning assistant. Thi
 
 3. images/
     - This folder contains images used in the notebook.
+
+4. sample document/
+    - This folder includes a PDF file named "Learning_Python.pdf" which can be utilized as a sample document.
+    - Store this document in a GCP bucket folder to be used in vector search indexing. In this demo, the PDF file was saved to a GCP folder path, as specified in the setting in the config.ini file using `index_folder_prefix`.

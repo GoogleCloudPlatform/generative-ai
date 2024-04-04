@@ -7,8 +7,11 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Iterable, List, Optional, Type
 import uuid
+from typing import Any, Iterable, List, Optional, Type
+
+import requests
+from requests import Response
 
 import google.auth
 import google.auth.transport.requests
@@ -20,13 +23,13 @@ from langchain.docstore.document import Document
 from langchain.embeddings import TensorflowHubEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
-import requests
 
 logger = logging.getLogger()
 
 
 class VectorSearch(VectorStore):
-    """Vertex Matching Engine implementation of the vector store.
+    """
+    Vertex Matching Engine implementation of the vector store.
 
     While the embeddings are stored in the Matching Engine, the embedded
     documents will be stored in GCS.
@@ -38,7 +41,8 @@ class VectorSearch(VectorStore):
 
     Note that this implementation is mostly meant for reading if you are
     planning to do a real time implementation. While reading is a real time
-    operation, updating the index takes close to one hour."""
+    operation, updating the index takes close to one hour.
+    """
 
     def __init__(
         self,
@@ -95,7 +99,7 @@ class VectorSearch(VectorStore):
         self.gcs_bucket_name = gcs_bucket_name
 
     def add_texts(
-        self, texts: Iterable[str], metadatas: Optional[List[dict]] = None
+        self, texts: Iterable[str], metadatas: Optional[List[dict]]
     ) -> List[str]:
         """Run more texts through the embeddings and add to the vectorstore.
 
@@ -192,7 +196,7 @@ class VectorSearch(VectorStore):
         embeddings: List[str],
         n_matches: int,
         index_endpoint: MatchingEngineIndexEndpoint,
-    ) -> str:
+    ) -> Response:
         """
         get matches from matching engine given a vector query
         Uses public endpoint
@@ -245,17 +249,12 @@ class VectorSearch(VectorStore):
         deployed_index_id = self._get_index_id()
         logger.debug("Deployed Index ID = %s", deployed_index_id)
 
-        # TO-DO: Pending query sdk integration
-        # response = self.endpoint.match(
-        #     deployed_index_id=self._get_index_id(),
-        #     queries=embedding_query,
-        #     num_neighbors=k,
-        # )
-
         response = self.get_matches(embedding_query, k, self.endpoint)
 
         if response.status_code == 200:
-            response = response.json()["nearestNeighbors"]
+            # response = response.json()["nearestNeighbors"]
+            response_json = response.json()
+            response = response_json["nearestNeighbors"]
         else:
             logger.info("Failed to query index %s", str(response))
 
@@ -265,30 +264,29 @@ class VectorSearch(VectorStore):
         logger.debug("Found %s matches for the query %s.", len(response), query)
 
         results = []
-
-        # I'm only getting the first one because queries receives an array
-        # and the similarity_search method only recevies one query. This
-        # means that the match method will always return an array with only
-        # one element.
         for doc in response[0]["neighbors"]:
+            # page_content = self._download_from_gcs(
+            #     f"documents/{doc['datapoint']['datapointId']}"
+            # )
             page_content = self._download_from_gcs(
-                f"documents/{doc['datapoint']['datapointId']}"
+                f"documents/{str(doc['datapoint']['datapointId'])}"
             )
             metadata = {}
             if "restricts" in doc["datapoint"]:
                 metadata = {
-                    item["namespace"]: item["allowList"][0]
+                    # item["namespace"]: item["allowList"][0]
+                    str(item["namespace"]): str(item["allowList"][0])
                     for item in doc["datapoint"]["restricts"]
                 }
             if "distance" in doc:
-                metadata["score"] = doc["distance"]
+                # metadata["score"] = doc["distance"]
+                metadata["score"] = float(doc["distance"])
                 if doc["distance"] >= search_distance:
                     results.append(
                         Document(page_content=page_content, metadata=metadata)
                     )
             else:
                 results.append(Document(page_content=page_content, metadata=metadata))
-
         logger.debug("Downloaded documents for query.")
 
         return results
