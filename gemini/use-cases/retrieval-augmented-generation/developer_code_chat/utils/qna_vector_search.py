@@ -12,7 +12,8 @@ import grpc
 import numpy as np
 
 from langchain.chains import RetrievalQA
-from langchain.llms import VertexAI
+# from langchain.llms import VertexAI
+from langchain_google_vertexai import VertexAI
 from langchain.prompts import PromptTemplate
 
 import vertexai
@@ -154,12 +155,14 @@ class QnAVectorSearch:
 
         # Embeddings API integrated with langChain
         embeddings = CustomVertexAIEmbeddings(
+            # embedding_model_name=str(self.config["embedding"]["embedding_model_name"]),
+            # location=str(self.config["default"]["region"]),
             requests_per_minute=int(self.config["embedding"]["embedding_qpm"]),
             num_instances_per_batch=int(
                 self.config["embedding"]["embedding_num_batch"]
             ),
         )
-
+        
         mengine = VectorSearchUtils(self.project_id, self.me_region, self.me_index_name)
         me_index_id, me_index_endpoint_id = mengine.get_index_and_endpoint()
 

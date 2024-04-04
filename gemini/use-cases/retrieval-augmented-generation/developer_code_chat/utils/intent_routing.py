@@ -8,7 +8,6 @@ import json
 import logging
 
 from vertexai.generative_models import GenerationConfig
-from vertexai.preview.language_models import ChatMessage
 
 
 class IntentRouting:
@@ -21,26 +20,6 @@ class IntentRouting:
         self.config.read(config_file)
         self.logger = logger
 
-        # self.genai_qna_parameters = {
-        #     "temperature": float(
-        #         self.config["genai_qna"]["temperature"]
-        #     ),
-        #     "max_output_tokens": int(
-        #         self.config["genai_qna"]\
-        #           ["max_output_tokens"]
-        #     ),
-        #     "top_p": float(\
-        #       self.config["genai_qna"]["top_p"]),
-        #     "top_k": int(self.config["genai_qna"]["top_k"]),
-        # }
-        # self.genai_chat_parameters = {
-        #     "temperature": float(
-        #         self.config["genai_chat"]["temperature"]
-        #     ),
-        #     "max_output_tokens": int(
-        #         self.config["genai_chat"]["max_output_tokens"]
-        #     ),
-        # }
         self.genai_qna_parameters = GenerationConfig(
             temperature=float(self.config["genai_qna"]["temperature"]),
             max_output_tokens=int(self.config["genai_qna"]["max_output_tokens"]),
@@ -51,54 +30,25 @@ class IntentRouting:
             temperature=float(self.config["genai_chat"]["temperature"]),
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
-
-    def get_chat_user_history(self, chat_history):
-        """Get Chat User History"""
-        if chat_history:
-            message_list = []
-            for chat_msg in chat_history[-1:]:  # last user message
-                # print(chat_msg)
-                if chat_msg[0] and len(chat_msg[0]):
-                    message_list.append(chat_msg[0])
-            if len(message_list) == 0:
-                return None
-            return message_list
-        return None
-
-    def get_chat_history(self, chat_history):
+    
+    def get_chat_history(self, chat):
         """Get Chat History"""
-        if chat_history:
-            message_list = []
-            for chat_msg in chat_history[-3:]:
-                # print(chat_msg)
-                if chat_msg[0] and len(chat_msg[0]):
-                    message_list.append(
-                        ChatMessage(content=str(chat_msg[0]), author="user")
-                    )
-                if chat_msg[0] and len(chat_msg[1]):
-                    # remove references from chat history.
-                    chat_msg = chat_msg[1].split("Reference:")[0]
-                    message_list.append(
-                        ChatMessage(content=str(chat_msg), author="bot")
-                    )
-            if len(message_list) == 0:
-                return None
-            return message_list
-        return None
+        chat_history = chat.history
+        
+        if len(chat_history) == 0:
+            return []
+        return chat_history[-6:]
 
-    def other_intent(self, text, chat_model, chat_history):
+    def other_intent(self, text, chat_model):
         """Respond for Other type of Intent"""
-        chat_history = self.get_chat_history(chat_history)
-        chat = chat_model.start_chat(
-            # history=chat_history
-        )
+        chat = chat_model.start_chat()
         response = chat.send_message(
             f"""{text}""", generation_config=self.genai_chat_parameters
         )
         message = response.text
         return message
 
-    def greetings(self, chat_model, chat_history, text):
+    def greetings(self, chat_model, text):
         """Respond for Greetings or Welcome Intent"""
         enabled_programming_language = self.config["default"][
             "enabled_programming_language"
@@ -112,9 +62,8 @@ class IntentRouting:
         enabled_qna_programming_language = ", ".join(
             [lang.title() for lang in enabled_qna_programming_language]
         )
-        chat_history = self.get_chat_history(chat_history)
-
-        chat = chat_model.start_chat(history=chat_history)
+        
+        chat = chat_model.start_chat()
         response = chat.send_message(
             f"""You are Generative AI powered genai Learning Assistant.
 
@@ -133,14 +82,13 @@ class IntentRouting:
         message = response.text
         return message
 
-    def closing(self, chat_model, chat_history, text):
+    def closing(self, chat_model, text):
         """Respond for Closing Intent"""
         parameters_local = GenerationConfig(
             temperature=0.7,
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
-        chat_history = self.get_chat_history(chat_history)
-        chat = chat_model.start_chat()  # history=chat_history)
+        chat = chat_model.start_chat()
         response = chat.send_message(
             """You are Generative AI powered genai Learning Assistant.
                 Write a brief closing thank you message:"""
@@ -149,10 +97,9 @@ class IntentRouting:
         message = response.text
         return message
 
-    def elaborate_qna(self, text, chat_model, chat_history, question):
+    def elaborate_qna(self, text, chat_model, question):
         """Explain the answer of a question in detail."""
-        chat_history = self.get_chat_history(chat_history)
-        chat = chat_model.start_chat()  # history=chat_history)
+        chat = chat_model.start_chat()
         response = chat.send_message(
             """
         You are genai Programming Language Learning Assistant. Your task is to explain following text in detail:
@@ -212,7 +159,7 @@ class IntentRouting:
         intent = response.text
         return str(intent).strip()
 
-    def ask_question_and_answer_codey(self, text, chat_model, chat_history):
+    def ask_question_and_answer_codey(self, text, chat_model):
         """Respond question and answer related questions."""
         unable_to_understand_question = self.config["error_msg"][
             "unable_to_understand_question"
@@ -224,10 +171,7 @@ class IntentRouting:
             "enabled_programming_language"
         ]
         default_language = self.config["default"]["default_language"]
-        chat_history = self.get_chat_history(chat_history)
-        # print("chat_history", chat_history)
-
-        chat = chat_model.start_chat()  # history=chat_history)
+        chat = chat_model.start_chat()
         response = chat.send_message(
             f"""
         You are genai Programming Language Learning Assistant.
@@ -257,13 +201,8 @@ class IntentRouting:
         response = response.replace("```java", "``` java")
         return response
 
-    def ask_codey(self, text, chat_model, chat_history):
+    def ask_codey(self, text, chat_model):
         """Respond code related questions."""
-        chat_history = self.get_chat_history(chat_history)
-        print("------------")
-        print("chat history")
-        print(chat_history)
-        print("------------")
         unable_to_understand_question = self.config["error_msg"][
             "unable_to_understand_question"
         ]
@@ -274,7 +213,7 @@ class IntentRouting:
             "enabled_programming_language"
         ]
         default_language = self.config["default"]["default_language"]
-        chat = chat_model.start_chat()  # history=chat_history)
+        chat = chat_model.start_chat()
         response = chat.send_message(
             f"""
         You are genai Programming Language Learning Assistant.
@@ -372,7 +311,7 @@ class IntentRouting:
         return program_lang_in_query, allowed_language_in_query
 
     def classify_intent(
-        self, text, session_state, model, chat_model, chat_history, genai_qna
+        self, text, session_state, model, chat_model, genai_qna
     ):
         """Classify intent of incoming query"""
         try:
@@ -382,7 +321,7 @@ class IntentRouting:
             intent = self.genai_classify_intent(text, model)
             self.logger.info("Classified intent: %s", intent)
             if intent == "WELCOME":
-                response = self.greetings(chat_model, chat_history, text)
+                response = self.greetings(chat_model, text)
             elif intent == "WRITE_CODE":
                 (
                     program_lang_in_query,
@@ -400,7 +339,7 @@ class IntentRouting:
                         "non_programming_question_error_msg"
                     ]
                 else:
-                    response = self.ask_codey(text, chat_model, chat_history)
+                    response = self.ask_codey(text, chat_model)
             elif intent == "PROGRAMMING_QUESTION_AND_ANSWER":
                 (
                     program_lang_in_query,
@@ -426,20 +365,20 @@ class IntentRouting:
                         and len(qna_answer_dict["reference_logs"]) != 0
                     ):
                         response = self.elaborate_qna(
-                            qna_answer_dict["answer"], chat_model, chat_history, text
+                            qna_answer_dict["answer"], chat_model, text
                         )
                         answer_reference = "\n\n" + qna_answer_dict["answer_reference"]
                     else:
-                        self.logger.info("inside codey")
+                        self.logger.info("Asking codey when no answer from QnA")
                         response = self.ask_question_and_answer_codey(
-                            text, chat_model, chat_history
+                            text, chat_model
                         )
             elif intent == "FOLLOWUP":
                 response = self.ask_question_and_answer_codey(
-                    text + " based on previous message", chat_model, chat_history
+                    text + " based on previous message", chat_model
                 )
             elif intent == "CLOSE":
-                response = self.closing(chat_model, chat_history, text)
+                response = self.closing(chat_model, text)
             else:
                 response = self.config["error_msg"]["other_intent_error_msg"]
         except Exception as e:  # pylint: disable=W0718,W0703,C0103

@@ -252,16 +252,17 @@ class VectorSearch(VectorStore):
         response = self.get_matches(embedding_query, k, self.endpoint)
 
         if response.status_code == 200:
-            # response = response.json()["nearestNeighbors"]
-            response_json = response.json()
-            response = response_json["nearestNeighbors"]
+            response = response.json()["nearestNeighbors"]
+            # response_json = response.json()
+            # response = response_json["nearestNeighbors"]
         else:
             logger.info("Failed to query index %s", str(response))
+            response = json.dumps({})
 
         if len(response) == 0:
             return []
-
-        logger.debug("Found %s matches for the query %s.", len(response), query)
+        
+        logger.debug("Found %s matches for the query %s.", len(response.json()), query)
 
         results = []
         for doc in response[0]["neighbors"]:

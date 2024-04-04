@@ -275,12 +275,14 @@ class GenerateEmbeddings:
 
         # Embeddings API integrated with langChain
         embeddings = CustomVertexAIEmbeddings(
+            # embedding_model_name=str(self.config["embedding"]["embedding_model_name"]),
+            # location=str(self.config["default"]["region"]),
             requests_per_minute=int(self.config["embedding"]["embedding_qpm"]),
             num_instances_per_batch=int(
                 self.config["embedding"]["embedding_num_batch"]
             ),
         )
-
+        
         # STEP 1: Create Matching Engine Index and Endpoint for Retrieval
         mengine = self.create_index()
         self.deploy_index(mengine)
