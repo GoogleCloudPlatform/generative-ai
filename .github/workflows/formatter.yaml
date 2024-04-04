@@ -33,7 +33,12 @@ jobs:
 
       - name: Check for modified files
         id: git-check
-        run: echo "modified=$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)" >> $GITHUB_OUTPUT
+        run: |
+          if git diff-index --quiet HEAD --; then
+            echo "::set-output name=modified::false"
+          else
+            echo "::set-output name=modified::true"
+          fi
 
       - name: Commit changes
         if: steps.git-check.outputs.modified == 'true'
@@ -44,4 +49,5 @@ jobs:
           git commit -am "Auto-format files"
 
       - name: Push changes
+        if: steps.git-check.outputs.modified == 'true'
         run: git push origin ${{ github.head_ref }}:${{ github.event.pull_request.head.ref }}
