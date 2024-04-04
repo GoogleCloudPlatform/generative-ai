@@ -28,8 +28,8 @@ project ID.:
 gcloud config set project YOUR_PROJECT_ID
 ```
 
- You can locate your project ID by visiting the
- [Dashboard in the Google Cloud Console](https://console.cloud.google.com/home/dashboard).
+You can locate your project ID by visiting the
+[Dashboard in the Google Cloud Console](https://console.cloud.google.com/home/dashboard).
 
 ## Setup
 

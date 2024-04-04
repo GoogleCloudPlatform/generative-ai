@@ -56,7 +56,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
    ```sh
    gcloud projects add-iam-policy-binding [PROJECT_ID] \
-      --member='serviceAccount:[PROJECT_ID]-compute@developer.gserviceaccount.com' \ 
+      --member='serviceAccount:[PROJECT_ID]-compute@developer.gserviceaccount.com' \
       --role='roles/discoveryengine.viewer'
    ```
 
@@ -88,7 +88,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 4. Configure Image Search
 
    - Follow the instructions in the documentation to [enable image search](https://cloud.google.com/generative-ai-app-builder/docs/image-search#enable-advanced) for a website search engine.
-      - NOTE: You must enable [Advanced Website Indexing](https://cloud.google.com/generative-ai-app-builder/docs/about-advanced-features#advanced-website-indexing) which requires [domain verification](https://cloud.google.com/generative-ai-app-builder/docs/domain-verification).
+     - NOTE: You must enable [Advanced Website Indexing](https://cloud.google.com/generative-ai-app-builder/docs/about-advanced-features#advanced-website-indexing) which requires [domain verification](https://cloud.google.com/generative-ai-app-builder/docs/domain-verification).
    - Add the engine id for your search engine to `IMAGE_SEARCH_DATASTORE_IDs` in `consts.py`.
 
 5. Deploy the Cloud Run app in your project.

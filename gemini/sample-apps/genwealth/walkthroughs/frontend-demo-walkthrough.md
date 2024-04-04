@@ -40,19 +40,19 @@ The data for the `RDYE` prospectus and related tables looks something like this 
 
 1. Document chunks in the `langchain_vector_store` table:
 
-    ![Document Chunks](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/2-document-chunks.png "Document Chunks")
+   ![Document Chunks](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/2-document-chunks.png "Document Chunks")
 
 1. Generated `overview` and embeddings in the `investments` table:
 
-    ![Overview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/3-overview.png "Overview")
+   ![Overview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/3-overview.png "Overview")
 
 1. Summary of buy ratings for > 8500 tickers in `investments` table:
 
-    ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
+   ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
 
 1. User profile data, including bios and embedings.
 
-    ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
+   ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
 
 So now that you've extracted all of this useful data from your prospectus, how can you use it to improve your existing Advisory Services software? Let's explore a few use cases in the GenWealth UI.
 
@@ -161,7 +161,7 @@ Copy/paste the following email into the prompt, and update the User ID to `638`.
 ```text
 Hi Paul,
 
-I just heard about your new Bitcoin ETF. Do you think I should move some money out of my index funds and into that ETF? 
+I just heard about your new Bitcoin ETF. Do you think I should move some money out of my index funds and into that ETF?
 
 Thanks,
 Geoffrey Follmer
