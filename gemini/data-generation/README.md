@@ -42,21 +42,21 @@ While the primary purpose of the synthetic data generation pipeline is to genera
 
 In order to generate synthetic data, the schema of the synthetic data must be defined first. This is done by creating a `recipe` in a YAML format as demonstrated below, more details on writing recipes can be found [here](https://snowfakery.readthedocs.io/en/latest/#central-concepts).
 
-#### Few central concepts to know when building a recipe:
+#### Few central concepts to know when building a recipe
 
-##### Objects:
+##### Objects
 
 The core concept of Snowfakery is an object template. The object template represents instructions on how to create a row (or multiple rows) in a database. Rows, also known as records, in turn represent real-world entities such as people, places, or things, which is why we use the keyword “object”.
 
-##### Fake Data:
+##### Fake Data
 
 To generate fake data use a fake function. You can fake all sorts of data: names, addresses, Latin text, English sentences, URLs, and so much more. To see the complete list, along with other related features, see the [fake data tutorial](https://snowfakery.readthedocs.io/en/docs/fakedata.html)
 
-##### Friends:
+##### Friends
 
 To create a rule such as "For every Person created, create two Animals", use the friends feature. Eg:
 
-```
+```yml
 - object: Person
   count: 3
   fields:
@@ -76,19 +76,17 @@ To create a rule such as "For every Person created, create two Animals", use the
 
 ### Directory Structure
 
-```
-.
-├── main.ipynb
-├── pyproject.toml
-├── README.md
-└── synthetic_data_generation
-    ├── plugins
-    │   ├── Gemini.py
-    │   └── Wikipedia.py
-    └── prompts
-        ├── blog_generator.jinja
-        └── comment_generator.jinja
-```
+    .
+    ├── main.ipynb
+    ├── pyproject.toml
+    ├── README.md
+    └── synthetic_data_generation
+        ├── plugins
+        │   ├── Gemini.py
+        │   └── Wikipedia.py
+        └── prompts
+            ├── blog_generator.jinja
+            └── comment_generator.jinja
 
 `main.ipynb` - The main notebook to run the data generation pipeline. Contains the data generation recipe and the execution code.
 
@@ -105,6 +103,12 @@ To create a rule such as "For every Person created, create two Animals", use the
 - `top_p` : explained [here](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini#request_body)
 
 `synthetic_data_generation/plugins/Wikipedia.py` - The wikipedia plugin provides functionality for Snowfakery to extract information for a given Wikipedia page. It implements a `get_page` method which expects a Wikipedia title as an input.
+
+`synthetic_data_generation/prompts` - Contains custom prompt templates in the form of .jinja files.
+
+`synthetic_data_generation/prompts/blog_generator.jinja` - The prompt used to generate blog posts.
+
+`synthetic_data_generation/prompts/comment_generator.jinja` - The prompt used to generate comments.
 
 ## Cleaning up
 
