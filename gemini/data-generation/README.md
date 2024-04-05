@@ -1,17 +1,3 @@
-Copyright 2024 Google LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
 # Introduction
 
 This repository demonstrates how Gemini can be leveraged as a Snowfakery plugin for generating synthetic data based on a set of predefined schemas and data generation strategies. The framework is based on [Snowfakery](https://snowfakery.readthedocs.io/) which is itself based on [Faker](https://faker.readthedocs.io/). It requires the expected outputs to be codified in a YAML file per Snowfakery specs, detailing all the required fields and their respective data generation strategies. The framework currently supports 3 such strategies:
@@ -56,23 +42,21 @@ To generate fake data use a fake function. You can fake all sorts of data: names
 
 To create a rule such as "For every Person created, create two Animals", use the friends feature. Eg:
 
-```yml
-- object: Person
-  count: 3
-  fields:
-    name:
-      fake: name
-    age:
-      random_number:
-        min: 12
-        max: 95
-  friends: # I get by with a little help from my...
-    - object: Animal
-      count: 2
+    - object: Person
+      count: 3
       fields:
         name:
-          fake: FirstName
-```
+          fake: name
+        age:
+          random_number:
+            min: 12
+            max: 95
+      friends: # I get by with a little help from my...
+        - object: Animal
+          count: 2
+          fields:
+            name:
+              fake: FirstName
 
 ### Directory Structure
 
