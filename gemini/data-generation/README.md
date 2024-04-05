@@ -1,4 +1,6 @@
-# Introduction
+# Synthetic Data Generation using Gemini
+
+## Introduction
 
 This repository demonstrates how Gemini can be leveraged as a Snowfakery plugin for generating synthetic data based on a set of predefined schemas and data generation strategies. The framework is based on [Snowfakery](https://snowfakery.readthedocs.io/) which is itself based on [Faker](https://faker.readthedocs.io/). It requires the expected outputs to be codified in a YAML file per Snowfakery specs, detailing all the required fields and their respective data generation strategies. The framework currently supports 3 such strategies:
 
@@ -10,9 +12,9 @@ It is also possible to use arbitrary python functions to generate data and augme
 
 While the primary purpose of the synthetic data generation pipeline is to generate data for testing, this can also be used to support tangential use-cases like running prompt experiments and comparisons at scale, building few-shot examples, evaluating fine-tuned models, etc.
 
-# Getting started
+## Getting started
 
-## Codebase Setup
+### Environment Setup
 
 1. Clone the repo
 
@@ -22,13 +24,11 @@ While the primary purpose of the synthetic data generation pipeline is to genera
 
    `pip install .`
 
-## Codebase Walkthrough
+### Codebase Walkthrough
 
-### Recipe
+#### Recipe
 
-In order to generate synthetic data, the schema of the synthetic data must be defined first. This is done by creating a `recipe` in a YAML format as demonstrated below, more details on writing recipes can be found [here](https://snowfakery.readthedocs.io/en/latest/#central-concepts).
-
-#### Few central concepts to know when building a recipe
+In order to generate synthetic data, the schema of the synthetic data must be defined first. This is done by creating a `recipe` in a YAML format as demonstrated below, more details on writing recipes can be found [here](https://snowfakery.readthedocs.io/en/latest/#central-concepts). Here are some central concepts around building recipes
 
 ##### Objects
 
@@ -58,7 +58,7 @@ To create a rule such as "For every Person created, create two Animals", use the
             name:
               fake: FirstName
 
-### Directory Structure
+#### Directory Structure
 
     .
     ├── main.ipynb
