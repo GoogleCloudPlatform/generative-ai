@@ -3,9 +3,10 @@ Implements the plugin for interacting with Wikipedia.
 """
 
 import logging
-import wikipediaapi
+
 from slugify import slugify
-from snowfakery.plugins import SnowfakeryPlugin, PluginResult
+from snowfakery.plugins import PluginResult, SnowfakeryPlugin
+import wikipediaapi
 
 
 class WikiCore(PluginResult):

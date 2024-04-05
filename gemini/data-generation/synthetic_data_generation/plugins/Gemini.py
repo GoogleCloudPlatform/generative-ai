@@ -3,6 +3,7 @@ Implements the plugin for interacting with Gemini.
 """
 
 import logging
+
 import jinja2
 from snowfakery.plugins import SnowfakeryPlugin
 from vertexai.generative_models import GenerativeModel
