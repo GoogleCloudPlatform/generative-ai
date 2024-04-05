@@ -29,8 +29,13 @@ yes | curl -X POST \
   }
 }'
 
-echo "Waiting 60 seconds for environment to settle."
-sleep 60
+echo "Waiting 70 seconds for environment to solidify."
+sleep 70
+
+# Upload samples to gcs
+gsutil -m cp gs://github-repo/generative-ai/sample-apps/genwealth/sample-prospectus/*.pdf gs://"${DOCS_BUCKET}"
+
+sleep 30
 
 # Get the data store id
 DATA_STORE_ID=$(curl -X GET \
@@ -38,9 +43,6 @@ DATA_STORE_ID=$(curl -X GET \
 -H "X-Goog-User-Project: ${PROJECT_ID}" \
 "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores" | jq -r '.dataStores | .[] | select(.displayName=="search-prospectus").name')
 DATA_STORE_ID=${DATA_STORE_ID##*/}
-
-# Upload samples to gcs
-gsutil -m cp gs://github-repo/generative-ai/sample-apps/genwealth/sample-prospectus/*.pdf gs://"${DOCS_BUCKET}"
 
 sleep 10
 

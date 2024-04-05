@@ -1,6 +1,6 @@
 # Generative AI - Language - Apply LLMs to Data
 
-Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/)  - Language repository.
+Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Language repository.
 
 The notebooks in this folder show examples using [BigQuery DataFrames](https://cloud.google.com/python/docs/reference/bigframes/latest) and [BigQuery ML](https://cloud.google.com/bigquery/docs/bqml-introduction) to apply LLMs to data.
 

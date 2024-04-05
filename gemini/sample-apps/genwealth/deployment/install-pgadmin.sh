@@ -182,12 +182,7 @@ gsutil -m cp \
 # Load the investments table
 echo "Loading the investments table"
 sql=$(cat << EOF
-\copy investments FROM '/tmp/demo-data/investments' WITH (
-FORMAT csv,
-DELIMITER '|',
-QUOTE "'",
-ESCAPE "'"
-)
+\copy investments FROM '/tmp/demo-data/investments' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
 EOF
 )
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
@@ -195,12 +190,7 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 # Load the user_profiles table
 echo "Loading the user_profiles table"
 sql=$(cat << EOF
-\copy user_profiles FROM '/tmp/demo-data/user_profiles' WITH (
-FORMAT csv,
-DELIMITER '|',
-QUOTE "'",
-ESCAPE "'"
-)
+\copy user_profiles FROM '/tmp/demo-data/user_profiles' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
 EOF
 )
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
