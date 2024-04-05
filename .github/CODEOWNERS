@@ -41,3 +41,4 @@
 /generative-ai/vision/use-cases                             @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/getting-started                       @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/genwealth                 @paulramsey @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/applying-llms-to-data/analyze-poster-images-in-bigquery @aliciawilliams @GoogleCloudPlatform/generative-ai-devrel
