@@ -33,7 +33,9 @@ class Gemini(SnowfakeryPlugin):
                 .render(**kwargs)
             )
 
-        def generate(self, prompt_name: str | jinja2.Template, temperature=0.9, top_p=1, **kwargs) -> str | None:
+        def generate(
+            self, prompt_name: str | jinja2.Template, temperature=0.9, top_p=1, **kwargs
+        ) -> str | None:
             """
             A wrapper around Gemini plugin
             """
