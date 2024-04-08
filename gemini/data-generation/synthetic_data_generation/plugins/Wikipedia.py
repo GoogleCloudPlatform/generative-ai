@@ -42,7 +42,7 @@ class WikiCore(PluginResult):
         logging.info("Parsing Wikipedia Page %s Complete", title)
         super().__init__(None)
 
-    def simplify(self):
+    def simplify(self) -> str:
         """
         Returns the URL of the current Page. Used as __repr__ by snowfakery
         """
@@ -59,7 +59,7 @@ class Wikipedia(SnowfakeryPlugin):
         Functions to implement field / object level data generation
         """
 
-        def get_page(self, title):
+        def get_page(self, title: str) -> WikiCore:
             """
             A wrapper around Wikipedia plugin
             """

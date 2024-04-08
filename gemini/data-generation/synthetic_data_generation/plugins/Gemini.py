@@ -19,7 +19,7 @@ class Gemini(SnowfakeryPlugin):
         Functions to implement field / object level data generation
         """
 
-        def fill_prompt(self, prompt_name, **kwargs):
+        def fill_prompt(self, prompt_name: str | jinja2.Template, **kwargs) -> str:
             """
             Returns a formatted prompt
             """
@@ -33,7 +33,7 @@ class Gemini(SnowfakeryPlugin):
                 .render(**kwargs)
             )
 
-        def generate(self, prompt_name, temperature=0.9, top_p=1, **kwargs):
+        def generate(self, prompt_name: str | jinja2.Template, temperature=0.9, top_p=1, **kwargs) -> str | None:
             """
             A wrapper around Gemini plugin
             """
