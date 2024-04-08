@@ -63,7 +63,7 @@ class Gemini(SnowfakeryPlugin):
                 return None
 
             try:
-                return response.candidates[0].text
+                return response.text
             except Exception as e:
                 logging.error(
                     (
