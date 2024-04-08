@@ -35,7 +35,7 @@ class WikiCore(PluginResult):
                 "See also",
                 "Further reading",
             ]:
-                if len(sec_obj.text):
+                if sec_obj.text:
                     self.sections[sec_title] = sec_obj.text
                 for sub_sec in sec_obj.sections:
                     results.append((f"{sec_title} - {sub_sec.title}", sub_sec))
