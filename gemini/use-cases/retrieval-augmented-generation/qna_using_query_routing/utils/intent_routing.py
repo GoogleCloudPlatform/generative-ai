@@ -10,11 +10,8 @@ import logging
 import pandas as pd
 from typing import List
 
-from vertexai.generative_models import GenerativeModel
-from vertexai.generative_models import GenerationConfig
+from vertexai.generative_models import GenerativeModel, GenerationConfig
 from vertexai.language_models import TextEmbeddingModel
-
-from langchain_google_vertexai import VertexAI
 
 from utils import qna_using_query_routing_utils
 from utils.qna_vector_search import QnAVectorSearch
@@ -42,12 +39,13 @@ class IntentRouting:
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
 
-        self.index_endpoint, self.deployed_index_id = (
-            qna_using_query_routing_utils.get_deployed_index_id(
-                self.config["vector_search"]["me_index_name"],
-                self.config["vector_search"]["me_region"],
-            )
-        )
+        (
+            self.index_endpoint,
+            self.deployed_index_id,
+        ) = qna_using_query_routing_utils.get_deployed_index_id(
+            self.config["vector_search"]["me_index_name"],
+            self.config["vector_search"]["me_region"],
+         )
 
         # Initalizing embedding model
         self.text_embedding_model = TextEmbeddingModel.from_pretrained(

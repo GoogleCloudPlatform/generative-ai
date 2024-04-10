@@ -4,21 +4,18 @@
 """Utility file with more generic fuctions"""
 
 # Utils
-import uuid
 import os
 import time
 import configparser
-import json
 import pandas as pd
 from typing import List
 from datetime import datetime
 
-from google.cloud import storage, aiplatform
+from google.cloud import aiplatform
 from vertexai.language_models import TextEmbeddingModel
 
 from langchain.document_loaders import TextLoader, UnstructuredPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_google_vertexai import VertexAI, VertexAIEmbeddings
 
 config_file = "config.ini"
 config = configparser.ConfigParser()
@@ -178,7 +175,6 @@ def generate_embeddings(
     id_list = []
     page_source_list = []
     for doc in doc_splits:
-        # id = uuid.uuid4()
         embeddings = text_embedding_model.get_embeddings([doc.page_content])
         vector = embeddings[0].values
         text_embeddings_list.append(vector)
