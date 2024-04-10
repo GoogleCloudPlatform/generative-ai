@@ -45,7 +45,7 @@ class IntentRouting:
         ) = qna_using_query_routing_utils.get_deployed_index_id(
             self.config["vector_search"]["me_index_name"],
             self.config["vector_search"]["me_region"],
-         )
+        )
 
         # Initalizing embedding model
         self.text_embedding_model = TextEmbeddingModel.from_pretrained(
@@ -70,19 +70,13 @@ class IntentRouting:
             str: The generated greeting message.
         """
 
-        enabled_programming_language = self.config["default"][
+        enabled_programming_language_list = self.config["default"][
             "enabled_programming_language"
         ].split(",")
         enabled_programming_language = ", ".join(
-            [lang.title() for lang in enabled_programming_language]
+            [lang.title() for lang in enabled_programming_language_list]
         )
-        enabled_qna_programming_language = self.config["default"][
-            "enabled_qna_programming_language"
-        ].split(",")
-        enabled_qna_programming_language = ", ".join(
-            [lang.title() for lang in enabled_qna_programming_language]
-        )
-
+        
         chat = chat_model.start_chat()
         response = chat.send_message(
             f"""You are Generative AI powered genai Learning Assistant.
@@ -240,7 +234,7 @@ class IntentRouting:
         return response
 
     def get_programming_lanuage_from_query(
-        self, model: GenerativeModel, text: str, enabled_programming_language: str
+        self, model: GenerativeModel, text: str, enabled_programming_language: List
     ) -> List[str]:
         """
         Extracts programming languages mentioned in a user's query.
@@ -248,7 +242,7 @@ class IntentRouting:
         Args:
             model:  A model used for programming language extraction.
             text (str): The user's query.
-            enabled_programming_language (str): Comma-separated list of supported languages.
+            enabled_programming_language (List): List of supported languages.
 
         Returns:
             list: A list of programming languages extracted from the query (potentially empty).
@@ -308,20 +302,15 @@ class IntentRouting:
                 * set: Programming languages in the query that are supported by the assistant.
         """
 
-        if intent == "WRITE_CODE":
-            enabled_programming_language = self.config["default"][
-                "enabled_programming_language"
-            ]
-        else:
-            enabled_programming_language = self.config["default"][
-                "enabled_qna_programming_language"
-            ]
-        enabled_programming_language = enabled_programming_language.split(",")
+        enabled_programming_language = self.config["default"][
+            "enabled_programming_language"
+        ]
+        enabled_programming_language_list = enabled_programming_language.split(",")
         enabled_programming_language_list = [
-            x.lower().replace(" ", "").strip() for x in enabled_programming_language
+            x.lower().replace(" ", "").strip() for x in enabled_programming_language_list
         ]
         program_lang_in_query = self.get_programming_lanuage_from_query(
-            model, text, enabled_programming_language
+            model, text, enabled_programming_language_list
         )
         allowed_language_in_query = set(enabled_programming_language_list).intersection(
             set(program_lang_in_query)

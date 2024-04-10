@@ -90,6 +90,7 @@ def find_relavent_context(
         str: The concatenated text of relevant documents found in the index.
     """
 
+    # Generate the embeddings for user question
     vector = text_embedding_model.get_embeddings([query])
     user_query_embedding = [vector[0].values]
 

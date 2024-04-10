@@ -10,11 +10,11 @@ import pandas as pd
 
 from google.cloud import aiplatform
 
-import vertexai
 from vertexai.generative_models import GenerativeModel
 from vertexai.language_models import TextEmbeddingModel
 
 from utils import qna_using_query_routing_utils
+
 
 class QnAVectorSearch:
     """genai Generate Answer From genai Content"""
@@ -78,9 +78,6 @@ class QnAVectorSearch:
             str: The generated answer from the QnA model, or None if no valid answer could be determined.
         """
 
-        # Generate the embeddings for user question
-        embeddings = text_embedding_model.get_embeddings([question])
-
         # Get the vector search index details
         (
             index_endpoint,
@@ -88,7 +85,7 @@ class QnAVectorSearch:
         ) = qna_using_query_routing_utils.get_deployed_index_id(
             self.config["vector_search"]["me_index_name"],
             self.config["vector_search"]["me_region"],
-         )
+        )
 
         self.logger.info("index_endpoint %s:", index_endpoint)
         self.logger.info("deployed_index_id %s:", deployed_index_id)
