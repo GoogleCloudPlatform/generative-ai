@@ -82,31 +82,30 @@ model = GenerativeModel(
 )
 
 st.set_page_config(
-    page_title="SQL Talk with BigQuery",
-    page_icon="vertex-ai.png",
+    page_title="AskDST",
+    page_icon="dst_logo_black.png",
     layout="wide",
 )
 
 col1, col2 = st.columns([8, 1])
 with col1:
-    st.title("SQL Talk with BigQuery")
+    st.title("AskDST")
 with col2:
-    st.image("vertex-ai.png")
+    st.image("dst_logo_black.png")
 
-st.subheader("Powered by Function Calling in Gemini")
+st.subheader("Datasinights powered by DST Performance Overview & Gemini")
 
 st.markdown(
-    "[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)   •   [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)   •   [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)   •   [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"
+    "[DST](https://sites.google.com/corp/google.com/sellside-datasolutions/home)"
 )
 
 with st.expander("Sample prompts", expanded=True):
     st.write(
         """
         - What kind of information is in this database?
-        - What percentage of orders are returned?
-        - How is inventory distributed across our regional distribution centers?
-        - Do customers typically place more than one order?
-        - Which product categories have the highest profit margins?
+        - How many tables are there in this dataset?
+        - Whats the total revenue for publisher xxx?
+        - Whats the lowest performing ad format for publisher xxx?
     """
     )
 

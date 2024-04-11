@@ -1,8 +1,5 @@
 # SQL Talk: Natural Language to BigQuery with Gemini's Function Calling
 
-|           |                                                     |
-| --------- | --------------------------------------------------- |
-| Author(s) | [Kristopher Overholt](https://github.com/koverholt) |
 
 ## Overview
 
