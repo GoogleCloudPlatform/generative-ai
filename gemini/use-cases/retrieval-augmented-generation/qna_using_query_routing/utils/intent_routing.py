@@ -7,14 +7,13 @@
 import configparser
 import json
 import logging
-import pandas as pd
 from typing import List
 
-from vertexai.generative_models import GenerativeModel, GenerationConfig
-from vertexai.language_models import TextEmbeddingModel
-
+import pandas as pd
 from utils import qna_using_query_routing_utils
 from utils.qna_vector_search import QnAVectorSearch
+from vertexai.generative_models import GenerationConfig, GenerativeModel
+from vertexai.language_models import TextEmbeddingModel
 
 
 class IntentRouting:
@@ -76,7 +75,7 @@ class IntentRouting:
         enabled_programming_language = ", ".join(
             [lang.title() for lang in enabled_programming_language_list]
         )
-        
+
         chat = chat_model.start_chat()
         response = chat.send_message(
             f"""You are Generative AI powered genai Learning Assistant.
@@ -307,7 +306,8 @@ class IntentRouting:
         ]
         enabled_programming_language_list = enabled_programming_language.split(",")
         enabled_programming_language_list = [
-            x.lower().replace(" ", "").strip() for x in enabled_programming_language_list
+            x.lower().replace(" ", "").strip()
+            for x in enabled_programming_language_list
         ]
         program_lang_in_query = self.get_programming_lanuage_from_query(
             model, text, enabled_programming_language_list

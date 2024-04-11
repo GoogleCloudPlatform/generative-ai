@@ -6,14 +6,12 @@
 # Utils
 import configparser
 import logging
-import pandas as pd
 
 from google.cloud import aiplatform
-
+import pandas as pd
+from utils import qna_using_query_routing_utils
 from vertexai.generative_models import GenerativeModel
 from vertexai.language_models import TextEmbeddingModel
-
-from utils import qna_using_query_routing_utils
 
 
 class QnAVectorSearch:
