@@ -421,10 +421,6 @@ class IntentRouting:
             self.logger.error("Session : %s", session_state)
             self.logger.error("Error : %s", e)
 
-            import traceback
-
-            print(traceback.format_exc())
-
             return (
                 "We're sorry, but we encountered a problem. Please try again.",
                 "ERROR",
