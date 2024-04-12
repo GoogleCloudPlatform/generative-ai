@@ -1,6 +1,6 @@
 # Overview
 
-This solution showcases the use of query routing techniques to improve retrieval performance in an AI-powered learning assistant for a computer training institute. This assistant is designed to use LLM to classify the intent of the user query, which in turn determines the appropriate source(s) to answer the query. The solution has been built using the custom RAG approach and Gemini model (Gemini Pro 1.0). It stores the responses in BigQuery. This allows for the caching of more common queries and analytics.
+This notebook showcases the use of query routing techniques to improve retrieval performance in an AI-powered learning assistant for a computer training institute. This assistant is designed to use LLM to classify the intent of the user query, which in turn determines the appropriate source(s) to answer the query. The solution has been built using the custom RAG approach and Gemini model (Gemini Pro 1.0).
 
 ## Please follow the notebook <i>qna_using_query_routing.ipynb</i>
 

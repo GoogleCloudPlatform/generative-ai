@@ -3,19 +3,20 @@
 # agreement with Google.
 """Utility file with more generic fuctions"""
 
-import configparser
-from datetime import datetime
-
 # Utils
 import os
 import time
+import configparser
+import pandas as pd
 from typing import List
+from datetime import datetime
 
 from google.cloud import aiplatform
+from vertexai.language_models import TextEmbeddingModel
+
 from langchain.document_loaders import TextLoader, UnstructuredPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
-import pandas as pd
-from vertexai.language_models import TextEmbeddingModel
+from langchain_core.documents.base import Document
 
 config_file = "config.ini"
 config = configparser.ConfigParser()
@@ -113,7 +114,7 @@ def find_relavent_context(
     return context
 
 
-def get_split_documents(index_path: str) -> List[str]:
+def get_split_documents(index_path: str) -> List[Document]:
     """
     Loads documents from a folder and splits them into manageable chunks.
 
