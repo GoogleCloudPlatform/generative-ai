@@ -21,6 +21,8 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 
 ![SQL Talk Demo App](sql-talk.png)
 
+[![AI Data Agent with Gemini API | Build with Google AI](https://img.youtube.com/vi/pj5mRDy9lG8/0.jpg)](https://www.youtube.com/watch?v=pj5mRDy9lG8)
+
 ## Prerequisites
 
 - A Google Cloud project with billing enabled
