@@ -1,0 +1,13 @@
+ The table shows the rates to be charged for different periods of insurance coverage.
+
+- For a period not exceeding 15 days, the rate to be charged is 10% of the annual rate.
+- For a period not exceeding 1 month, the rate to be charged is 15% of the annual rate.
+- For a period not exceeding 2 months, the rate to be charged is 30% of the annual rate.
+- For a period not exceeding 3 months, the rate to be charged is 40% of the annual rate.
+- For a period not exceeding 4 months, the rate to be charged is 50% of the annual rate.
+- For a period not exceeding 5 months, the rate to be charged is 60% of the annual rate.
+- For a period not exceeding 6 months, the rate to be charged is 70% of the annual rate.
+- For a period not exceeding 7 months, the rate to be charged is 75% of the annual rate.
+- For a period not exceeding 8 months, the rate to be charged is 80% of the annual rate.
+- For a period not exceeding 9 months, the rate to be charged is 85% of the annual rate.
+- For a period exceeding 9 months, the rate to be charged is the full annual rate.

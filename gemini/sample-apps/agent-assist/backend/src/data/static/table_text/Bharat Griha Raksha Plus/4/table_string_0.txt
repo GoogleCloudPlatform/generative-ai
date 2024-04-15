@@ -1,0 +1,19 @@
+ The table has two columns, Column A and Column B.
+
+Column A contains the policy conditions, while Column B contains the exclusions.
+
+**Policy conditions:**
+
+1. Smoke Damage:
+   - The policy covers repainting of the insured building directly caused by sudden and accidental smoke, whether generated from within or outside the insured premises.
+   - Smoke from fireplaces is excluded.
+   - The coverage is up to 1% of the sum insured.
+   - In the event of loss, a reinstatement premium must be paid on a pro rata basis to reinstate the cover.
+
+2. Commercial space within Society:
+   - The policy coverage is extended to commercial spaces within society premises, such as shops, clubhouses, restaurants, cafes, food joints, clinics, hospitals, schools, malls, gymnasiums, and offices where it is not feasible to provide a separate sum insured for each item individually.
+   - The insurer's liability is limited to the sum insured specified for the building in the policy schedule.
+
+**Exclusions:**
+
+- Any contents or stocks that are part of the commercial space covered in the policy.

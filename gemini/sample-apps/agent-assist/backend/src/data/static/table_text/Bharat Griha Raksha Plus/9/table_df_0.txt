@@ -1,0 +1,13 @@
+                           0                       1
+0   For period not exceeding      Rate to be charged
+1                    15 days  10% of the Annual rate
+2                    1 month  15% of the Annual rate
+3                   2 months  30% of the Annual rate
+4                   3 months  40% of the Annual rate
+5                   4 months  50% of the Annual rate
+6                   5 months  60% of the Annual rate
+7                   6 months  70% of the Annual rate
+8                   7 months  75% of the Annual rate
+9                   8 months  80% of the Annual rate
+10                  9 months  85% of the Annual rate
+11                > 9 months    The full Annual rate

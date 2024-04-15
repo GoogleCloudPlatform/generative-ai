@@ -1,0 +1,11 @@
+.DS_Store
+backend/.venv/
+.venv
+/node_modules
+.vscode
+backend/src/my_config.py
+linter_helper.ipynb
+logs.md
+logs.json
+run_linter.sh
+wrapper.sh

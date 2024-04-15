@@ -1,0 +1,9 @@
+ The table shows the premium discount rates for different policy durations.
+
+- For a policy duration of 4 months, the premium discount is 50%.
+- For a policy duration of 5 months, the premium discount is 60%.
+- For a policy duration of 6 months, the premium discount is 70%.
+- For a policy duration of 7 months, the premium discount is 75%.
+- For a policy duration of 8 months, the premium discount is 80%.
+- For a policy duration of 9 months, the premium discount is 85%.
+- For a policy duration exceeding 9 months, there is no discount and the full annual premium is charged.

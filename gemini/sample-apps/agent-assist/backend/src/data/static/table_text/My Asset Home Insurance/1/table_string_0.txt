@@ -1,0 +1,13 @@
+ The table shows the percentage of the annual rate that is charged for short-term insurance policies, based on the length of the policy period.
+
+- For a policy period not exceeding 15 days, the premium is 10% of the annual rate.
+- For a policy period not exceeding 1 month, the premium is 15% of the annual rate.
+- For a policy period not exceeding 2 months, the premium is 30% of the annual rate.
+- For a policy period not exceeding 3 months, the premium is 40% of the annual rate.
+- For a policy period not exceeding 4 months, the premium is 50% of the annual rate.
+- For a policy period not exceeding 5 months, the premium is 60% of the annual rate.
+- For a policy period not exceeding 6 months, the premium is 70% of the annual rate.
+- For a policy period not exceeding 7 months, the premium is 75% of the annual rate.
+- For a policy period not exceeding 8 months, the premium is 80% of the annual rate.
+- For a policy period not exceeding 9 months, the premium is 85% of the annual rate.
+- For a policy period exceeding 9 months, the full annual rate is charged.

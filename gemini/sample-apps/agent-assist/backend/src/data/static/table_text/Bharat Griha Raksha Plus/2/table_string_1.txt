@@ -1,0 +1,13 @@
+ The table is about insurance coverage for physical loss or damage to property.
+
+Column A lists the perils that are covered under the insurance policy. These perils include:
+
+1. Fire caused by burning of Insured Property by order of any Public Authority
+2. Explosion or Implosion
+3. Lightning
+4. Earthquake, volcanic eruption, or other convulsions of nature
+5. Storm, Cyclone, Typhoon, Tempest, Hurricane, Tornado, Tsunami, Flood and Inundation
+
+Column B lists the perils that are not covered under the insurance policy. These perils include:
+
+1. Any loss or damage, or destruction caused to the Insured Property by physical loss or damage, or destruction caused to the Insured Property

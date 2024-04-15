@@ -1,0 +1,85 @@
+import vertexai
+from vertexai.preview.generative_models import GenerativeModel
+
+from config import config
+
+parameters = {
+    "max_output_tokens": 1024,
+    "temperature": 0,
+    "top_p": 0.7,
+    "top_k": 20,
+}
+
+
+class GeminiText:
+    """
+    A class to interact with the Gemini text generation model from Vertex AI.
+
+    Args:
+        PROJECT_ID (str): The Google Cloud project ID.
+        LOCATION (str): The Google Cloud region where the model
+        is deployed.
+        max_output_tokens (int): The maximum number of tokens to generate.
+        temperature (float): The temperature to use for sampling.
+        top_p(float): The top-p value to use for sampling.
+        top_k (int): The top-k value to use for sampling.
+
+    """
+
+    def __init__(
+        self,
+        PROJECT_ID=config["PROJECT_ID"],
+        LOCATION=config["LOCATION"],
+        max_output_tokens=2048,
+        temperature=0,
+        top_p=0.8,
+        top_k=40,
+    ):
+        """
+        Initializes the class.
+
+        Args:
+            PROJECT_ID (str): The Google Cloud project ID.
+            LOCATION (str): The Google Cloud region where the model
+            is deployed.
+            max_output_tokens (int): The maximum number of tokens to generate.
+            temperature (float): The temperature to use for sampling.
+            top_p(float): The top-p value to use for sampling.
+            top_k (int): The top-k value to use for sampling.
+
+
+        """
+        self.PROJECT_ID = PROJECT_ID
+        self.LOCATION = LOCATION
+        self.parameters = {
+            "max_output_tokens": max_output_tokens,
+            "temperature": temperature,
+            "top_p": top_p,
+            "top_k": top_k,
+        }
+
+        vertexai.init(project=self.PROJECT_ID, location=self.LOCATION)
+
+        self.model = GenerativeModel(config["gemini_model"])
+        self.chat = self.model.start_chat()
+
+    def generate_response(self, prompt: str) -> str:
+        """
+        Generates a response to a given prompt.
+
+        Args:
+            rompt (str): The prompt to generate a response for.
+
+        Returns:
+            str: The generated response.
+
+        """
+        print("running tb.generate_response")
+        parameters = self.parameters
+        # response =self.model.predict(prompt,**parameters)
+        response = self.chat.send_message(prompt, generation_config=parameters)
+        return response.text
+
+
+if __name__ == "__main__":
+    gemini = GeminiText()

@@ -1,0 +1,30 @@
+.loader {
+  height: 20px;
+  background: linear-gradient(90deg, transparent, #0000, #1976d2, transparent)
+    left -50px top 0/150px 20px no-repeat #f2f2f5;
+  animation: ct2 1s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.loader1 {
+  width: 80%;
+}
+
+.loader2 {
+  width: 50%;
+}
+
+@keyframes ct2 {
+  0% {
+    background-position: left -50px top 0;
+  }
+
+  0.1% {
+    background-position: left -50px top 0;
+  }
+
+  100% {
+    background-position: right -50px top 0;
+  }
+}
