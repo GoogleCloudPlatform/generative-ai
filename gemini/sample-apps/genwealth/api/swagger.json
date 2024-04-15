@@ -1,0 +1,227 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "GenWealth Advisor API",
+    "description": "An API for financial advisors to use to help their clients.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/investments/search": {
+      "get": {
+        "summary": "Find investments by search terms",
+        "parameters": [
+          {
+            "name": "terms",
+            "in": "query",
+            "description": "The search terms to use",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of investments that match the search terms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Investment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/semantic_search": {
+      "get": {
+        "summary": "Find investments with natural language prompts",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "description": "The natural language prompt to use",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of investments that match the natural language prompt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Investment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prospects/search": {
+      "get": {
+        "summary": "Find prospects with natural language prompt and optional filters",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "description": "The natural language prompt to use",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "risk_profile",
+            "in": "query",
+            "description": "The risk profile of the prospect",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "min_age",
+            "in": "query",
+            "description": "The minimum age of the prospect",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "max_age",
+            "in": "query",
+            "description": "The maximum age of the prospect",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of prospects that match the natural language prompt and optional filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Prospect"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat": {
+      "get": {
+        "summary": "Chat with a financial advisor",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "description": "The natural language prompt to use",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "The ID of the user",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A response from the financial advisor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Investment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "risk_level": {
+            "type": "string"
+          },
+          "return_rate": {
+            "type": "number"
+          }
+        }
+      },
+      "Prospect": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "risk_profile": {
+            "type": "string"
+          },
+          "age": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

@@ -39,7 +39,7 @@ jobs:
       # Checkout the code base #
       ##########################
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
@@ -58,4 +58,4 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_NATURAL_LANGUAGE: false
           VALIDATE_PYTHON_ISORT: false
-          VALIDATE_TYPESCRIPT_STANDARD: false  # super-linter/super-linter#4445
+          VALIDATE_TYPESCRIPT_STANDARD: false # super-linter/super-linter#4445

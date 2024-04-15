@@ -16,7 +16,7 @@
 from os.path import basename
 from typing import Dict, List, Optional, Tuple
 
-from google.cloud import discoveryengine_v1beta as discoveryengine
+from google.cloud import discoveryengine_v1alpha as discoveryengine
 
 JSON_INDENT = 2
 
@@ -48,11 +48,14 @@ def list_documents(
 def search_enterprise_search(
     project_id: str,
     location: str,
-    data_store_id: str,
+    data_store_id: Optional[str] = None,
+    engine_id: Optional[str] = None,
     page_size: int = 50,
     search_query: Optional[str] = None,
     image_bytes: Optional[bytes] = None,
     params: Optional[Dict] = None,
+    summary_model: Optional[str] = None,
+    summary_preamble: Optional[str] = None,
 ) -> Tuple[List[Dict[str, str | List]], str, str, str, str]:
     if bool(search_query) == bool(image_bytes):
         raise ValueError("Cannot provide both search_query and image_bytes")
@@ -60,14 +63,17 @@ def search_enterprise_search(
     # Create a client
     client = discoveryengine.SearchServiceClient()
 
-    # The full resource name of the search engine serving config
-    # e.g. projects/{project_id}/locations/{location}
-    serving_config = client.serving_config_path(
-        project=project_id,
-        location=location,
-        data_store=data_store_id,
-        serving_config="default_config",
-    )
+    if data_store_id:
+        serving_config = client.serving_config_path(
+            project=project_id,
+            location=location,
+            data_store=data_store_id,
+            serving_config="default_config",
+        )
+    elif engine_id:
+        serving_config = f"projects/{project_id}/locations/{location}/collections/default_collection/engines/{engine_id}/servingConfigs/default_config"
+    else:
+        raise ValueError("Either `data_store_id` or `engine_id` must be provided.")
 
     # Configuration options for search
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
@@ -79,6 +85,12 @@ def search_enterprise_search(
             include_citations=True,
             ignore_adversarial_query=True,
             ignore_non_summary_seeking_query=True,
+            model_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelSpec(
+                version=summary_model
+            ),
+            model_prompt_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelPromptSpec(
+                preamble=summary_preamble
+            ),
         ),
         extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
             max_extractive_answer_count=1, max_extractive_segment_count=1
@@ -122,7 +134,7 @@ def search_enterprise_search(
     )
 
     request_url = (
-        f"https://discoveryengine.googleapis.com/v1beta/{serving_config}:search"
+        f"https://discoveryengine.googleapis.com/v1alpha/{serving_config}:search"
     )
 
     request_json = discoveryengine.SearchRequest.to_json(

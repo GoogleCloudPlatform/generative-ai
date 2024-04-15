@@ -1,0 +1,4 @@
+torch
+transformers[torch]
+datasets
+google-cloud-aiplatform

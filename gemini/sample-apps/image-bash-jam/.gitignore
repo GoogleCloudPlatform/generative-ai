@@ -1,0 +1,9 @@
+.envrc
+private/
+t.*
+.tmp*json
+index.html
+image
+imagez
+.echodo_history
+images/
