@@ -19,10 +19,7 @@ from utils.get_email_threads import get_email_threads_summary
 from utils.get_users import get_users
 
 app = Flask(
-    __name__,
-    static_url_path="",
-    static_folder="build",
-    template_folder="build",
+    __name__, static_url_path="", static_folder="build", template_folder="build"
 )
 app.secret_key = secrets.token_hex(24)
 CORS(app, resources=r"/*")
@@ -90,11 +87,7 @@ def create_calendar_event():
         start_time.minute,
     ).isoformat()
     endDateTime = datetime(
-        meet_date.year,
-        meet_date.month,
-        meet_date.day,
-        end_time.hour,
-        end_time.minute,
+        meet_date.year, meet_date.month, meet_date.day, end_time.hour, end_time.minute
     ).isoformat()
 
     print(startDateTime, endDateTime)
@@ -106,9 +99,7 @@ def create_calendar_event():
 
 
 app.add_url_rule(
-    "/workbench/performance",
-    methods=["GET"],
-    view_func=performance.getPerformanceData,
+    "/workbench/performance", methods=["GET"], view_func=performance.getPerformanceData
 )
 app.add_url_rule(
     "/workbench/leadsandsales",
@@ -125,7 +116,7 @@ app.add_url_rule(
     methods=["GET"],
     view_func=marketingandoutreach.getMarketingAndOutreachData,
 )
-app.add_url_rule("/chatbot", methods=["POST"], view_func=chatbot.chatbot)
+app.add_url_rule("/chatbot", methods=["POST"], view_func=chatbot.chatbot_entry)
 app.add_url_rule(
     "/users/get_calendar_events",
     methods=["GET"],
@@ -146,9 +137,7 @@ app.add_url_rule(
     "/agent-assist/kanban", methods=["get"], view_func=kanban.get_kanban_data
 )
 app.add_url_rule(
-    "/agent-assist/kanban/update",
-    methods=["post"],
-    view_func=kanban.update_kanban_data,
+    "/agent-assist/kanban/update", methods=["post"], view_func=kanban.update_kanban_data
 )
 
 

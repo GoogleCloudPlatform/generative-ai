@@ -4,15 +4,13 @@ from langchain.vectorstores import FAISS
 
 
 def make_embeddings(POLICY_NAME):
-    """
-    Creates embeddings for the given policy.
+    """Creates embeddings for the given policy.
 
     Args:
-        POLICY_NAME: The name of the policy to create embeddings for.
+    POLICY_NAME: The name of the policy to create embeddings for.
 
     Returns:
-        None
-
+    None
     """
     EMBEDDINGS_PATH = f"data/static/embeddings/{POLICY_NAME}.rt"
 
@@ -24,5 +22,4 @@ def make_embeddings(POLICY_NAME):
 
 
 if __name__ == "__main__":
-
     make_embeddings("Arogyasanjeevani")

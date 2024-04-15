@@ -21,19 +21,15 @@ class TextBison:
         top_p=0.8,
         top_k=40,
     ):
-        """
-        Initializes the TextBison class.
+        """Initializes the TextBison class.
 
         Args:
             PROJECT_ID (str): The Google Cloud project ID.
-            LOCATION (str): The Google Cloud region where the model
-            is deployed.
-            max_output_tokens (int): The maximum number of t
-            okens to generate.
+            LOCATION (str): The Google Cloud region where the model is deployed.
+            max_output_tokens (int): The maximum number of tokens to generate.
             temperature (float): The temperature to use for sampling.
-            top_p(float): The top-p value to use for sampling.
+            top_p (float): The top-p value to use for sampling.
             top_k (int): The top-k value to use for sampling.
-
         """
         self.PROJECT_ID = PROJECT_ID
         self.LOCATION = LOCATION
@@ -46,20 +42,16 @@ class TextBison:
 
         vertexai.init(project=self.PROJECT_ID, location=self.LOCATION)
 
-        self.model = TextGenerationModel.from_pretrained(
-            config["text_bison_model"]
-        )
+        self.model = TextGenerationModel.from_pretrained(config["text_bison_model"])
 
     def generate_response(self, prompt):
-        """
-        Generates a response to a given prompt.
+        """Generates a response to a given prompt.
 
         Args:
             prompt (str): The prompt to generate a response for.
 
         Returns:
             str: The generated response.
-
         """
         parameters = self.parameters
         response = self.model.predict(prompt, **parameters)

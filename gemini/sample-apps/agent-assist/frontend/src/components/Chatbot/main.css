@@ -58,7 +58,7 @@
 }
 
 .react-chatbot-kit-chat-bot-avatar-container {
-  background-image: url(./google-bard-icon.png);
+  background-image: url("./google-bard-icon.png");
   background-repeat: no-repeat;
   background-size: auto;
   width: 40px;
@@ -144,7 +144,7 @@
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   background-color: #efefef;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   display: flex;
   align-items: center;
   font-size: 0.85rem;
@@ -164,7 +164,7 @@
 }
 
 .react-chatbot-kit-chat-message-container {
-  padding: 0 17.5px 60px 17.5px;
+  padding: 0 17.5px 60px;
   overflow: scroll;
   height: calc(100vh - 140px);
 }
@@ -193,18 +193,14 @@
   width: 100px;
   border: none;
   color: #fff;
-  border-bottom-right-radius: 0px;
+  background-image: url("./send-button.png");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
 }
 
 .react-chatbot-kit-chat-btn-send svg {
   display: none;
-}
-
-.react-chatbot-kit-chat-btn-send {
-  background-image: url(./send-button.png);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center;
 }
 
 .react-chatbot-kit-chat-btn-send-icon {
@@ -232,9 +228,9 @@
 .react-chatbot-kit-error-docs {
   display: block;
   margin: 25px auto;
-  color: rgb(56, 104, 139);
+  color: rgb(56 104 139);
   padding: 8px;
-  border: 1px solid rgb(40, 152, 236);
+  border: 1px solid rgb(40 152 236);
   width: 130px;
   text-align: center;
   text-decoration: none;

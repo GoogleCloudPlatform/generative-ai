@@ -12,10 +12,14 @@ from config import config
 
 
 class Calendar:
-    """A class to interact with the Google Calendar API."""
+    """
+    A class to interact with the Google Calendar API.
+    """
 
     def __init__(self):
-        """Initializes the Calendar class."""
+        """
+        Initializes the Calendar class.
+        """
         self.self_email = config["company_email"]
         self.SCOPES = [config["CALENDAR_SCOPE"]]
         self.creds = None
@@ -45,16 +49,12 @@ class Calendar:
         Creates an event on the user's calendar.
 
         Args:
-            email (list[str]): A list of email addresses of the
-            attendees.
-            startDateTime (str): The start date and time of the
-            event in ISO 8601 format.
-            endDateTime (str): The end date and time
-            of the event in ISO 8601 format.
+            email (list[str]): A list of email addresses of the attendees.
+            startDateTime (str): The start date and time of the event in ISO 8601 format.
+            endDateTime (str): The end date and time of the event in ISO 8601 format.
 
         Returns:
             dict: The event created.
-
         """
         participants = [{"email": participant} for participant in email]
         participants.append({"email": self.self_email})
@@ -99,33 +99,24 @@ class Calendar:
         # print(event)
         return event
 
-    def get_events_by_date(self, event_date: str) -> list[dict]:
+    def get_events_by_date(self, event_date: datetime) -> list[dict]:
         """
         Gets all events on the user's calendar for a given date.
 
         Args:
-            event_date (str): The date to get events for in YYYY-MM-DD
-            format.
+            event_date (datetime): The date to get events for in YYYY-MM-DD format.
 
         Returns:
-            list[dict]: A list of events on the user's calendar for
-            the given date.
-
+            list[dict]: A list of events on the user's calendar for the given date.
         """
 
         split_date = event_date.split("/")
         event_date = datetime(
-            int(split_date[2]),
-            int(split_date[1]),
-            int(split_date[0]),
-            00,
-            00,
-            00,
-            0,
+            int(split_date[2]), int(split_date[1]), int(split_date[0]), 00, 00, 00, 0
         )
         event_date = pytz.UTC.localize(event_date).isoformat()
 
-        end = datetime(
+        end: datetime = datetime(
             int(split_date[2]),
             int(split_date[1]),
             int(split_date[0]),
@@ -134,23 +125,11 @@ class Calendar:
             59,
             999999,
         )
-        end = pytz.UTC.localize(end).isoformat()
+        end_string = pytz.UTC.localize(end).isoformat()
 
         events_result = (
             self.service.events()
-            .list(calendarId="primary", timeMin=event_date, timeMax=end)
+            .list(calendarId="primary", timeMin=event_date, timeMax=end_string)
             .execute()
         )
         return events_result.get("items", [])
-
-
-if __name__ == "__main__":
-    calendar = Calendar()
-
-    all_events = calendar.get_events_by_date("2024-01-18")
-    for event in all_events:
-        print(event["summary"])
-        print(event["start"]["dateTime"])
-        print(event["end"]["dateTime"])
-        print(event["attendees"])
-        print(event["conferenceData"]["entryPoints"][0]["uri"])

@@ -10,14 +10,11 @@ from config import config
 
 
 def show_chatty_threads():
-
     SCOPES = [config["MAIL_TRIAL_SCOPE"]]
     creds = None
 
     if os.path.exists("mail_token.json"):
-        creds = Credentials.from_authorized_user_file(
-            "mail_token.json", SCOPES
-        )
+        creds = Credentials.from_authorized_user_file("mail_token.json", SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -34,11 +31,7 @@ def show_chatty_threads():
         # pylint: disable=maybe-no-member
         # pylint: disable:R1710
         threads = (
-            service.users()
-            .threads()
-            .list(userId="me")
-            .execute()
-            .get("threads", [])
+            service.users().threads().list(userId="me").execute().get("threads", [])
         )
         return threads, service
 

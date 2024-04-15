@@ -1,10 +1,11 @@
 import json
 from datetime import datetime
+from typing import Any, Dict, List
 
 from flask import jsonify, request
 
 
-def get_kanban_data() -> json:
+def get_kanban_data() -> tuple[dict, int]:
     """
     Get the current state of the kanban board.
 
@@ -13,20 +14,17 @@ def get_kanban_data() -> json:
 
     Returns:
         JSON response with the current state of the kanban board.
-
     """
 
     filePath = "data/real_users_db.json"
     with open(filePath) as json_file:
         data = json.load(json_file)
 
-    # Create a dictionary of users, where the key is the
-    # user ID and the value is the user data.
-    userData = {str(user["userid"]): user for user in data}
+    # Create a dictionary of users, where the key is the user ID and the value is the user data.
+    userData: Dict[str, Any] = {str(user["userid"]): user for user in data}
 
-    # Create a dictionary of the kanban board, where the key is
-    # the column name and the value is a list of user IDs.
-    finalData = {
+    # Create a dictionary of the kanban board, where the key is the column name and the value is a list of user IDs.
+    finalData: Dict[str, List[str]] = {
         "initial-contact": [],
         "needs-analysis": [],
         "proposal-sent": [],
@@ -35,8 +33,7 @@ def get_kanban_data() -> json:
         "users": userData,
     }
 
-    # Iterate over the users and add them to
-    # the appropriate column in the kanban board.
+    # Iterate over the users and add them to the appropriate column in the kanban board.
     for user in data:
         if not user["LastContacted"]:
             finalData["initial-contact"].append(str(user["userid"]))
@@ -53,15 +50,13 @@ def get_kanban_data() -> json:
     return jsonify(finalData), 200
 
 
-def update_kanban_data() -> json:
+def update_kanban_data() -> tuple[dict, int]:
     """
-    This function updates the kanban board by moving a user from one column to
-    another. It reads the data from a JSON file, updates the user's column, and
-    writes the updated data to the JSON file.
+    This function updates the kanban board by moving a user from one column to another.
+    It reads the data from a JSON file, updates the user's column, and writes the updated data to the JSON file.
 
     Args:
         None
-
     Returns:
         JSON response with a success message.
 
@@ -81,9 +76,7 @@ def update_kanban_data() -> json:
     for user in data:
         if str(user["userid"]) == userid:
             if fromCol == "initial-contact":
-                user["LastContacted"] = datetime.now().strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
+                user["LastContacted"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             if toCol == "initial-contact":
                 user["LastContacted"] = None

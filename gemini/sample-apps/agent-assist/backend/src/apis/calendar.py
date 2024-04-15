@@ -6,14 +6,10 @@ from utils.cal import Calendar
 
 
 def get_calendar_events() -> tuple[jsonify, int]:
-    """
-    Gets a list of events for today's date and returns them as a JSON response
-    with a status code of 200.
+    """Gets a list of events for today's date and returns them as a JSON response with a status code of 200.
 
     Returns:
-        tuple[jsonify, int]: A tuple containing the JSON response and
-        the status code.
-
+        tuple[jsonify, int]: A tuple containing the JSON response and the status code.
     """
     calendar = Calendar()
 

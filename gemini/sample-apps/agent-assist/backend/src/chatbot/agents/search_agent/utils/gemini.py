@@ -21,18 +21,15 @@ class GeminiText:
         top_p=0.8,
         top_k=40,
     ):
-        """
-        Initializes the GeminiText class.
+        """Initializes the GeminiText class.
 
         Args:
             PROJECT_ID (str): The Google Cloud project ID.
-            LOCATION (str): The Google Cloud region where the model is
-            deployed.
+            LOCATION (str): The Google Cloud region where the model is deployed.
             max_output_tokens (int): The maximum number of tokens to generate.
             temperature (float): The temperature to use for sampling.
-            top_p(float): The top-p value to use for sampling.
+            top_p (float): The top-p value to use for sampling.
             top_k (int): The top-k value to use for sampling.
-
         """
         self.PROJECT_ID = PROJECT_ID
         self.LOCATION = LOCATION
@@ -49,15 +46,13 @@ class GeminiText:
         self.chat = self.model.start_chat()
 
     def generate_response(self, prompt):
-        """
-        Generates a response to a prompt.
+        """Generates a response to a prompt.
 
         Args:
             prompt (str): The prompt to generate a response to.
 
         Returns:
             str: The generated response.
-
         """
         parameters = self.parameters
         response = self.chat.send_message(prompt, generation_config=parameters)

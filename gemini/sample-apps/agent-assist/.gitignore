@@ -3,9 +3,13 @@ backend/.venv/
 .venv
 /node_modules
 .vscode
-backend/src/my_config.py
+black_logs.json
+black_logs.md
+errors_mypy
 linter_helper.ipynb
-logs.md
 logs.json
-run_linter.sh
+logs.md
+pylint_logs.json
+pylint_logs.md
 wrapper.sh
+backend/src/my_config.py

@@ -1,6 +1,6 @@
 config = {
-    "PROJECT_ID": "<GCP PROJECT ID>",
-    "LOCATION": "<GCP LOCATION",
+    "PROJECT_ID": "teamindrdhanush",
+    "LOCATION": "us-central1",
     "gemini_parameters": {
         "max_output_tokens": 1024,
         "temperature": 0.05,
@@ -15,8 +15,8 @@ config = {
         "top_p": 0.8,
         "top_k": 40,
     },
-    "company_email": "<COMPANY EMAIL ID>",
-    "mail_password": "<COMPANY APP PASSWORD>",
+    "company_email": "teamkavachinsurance@gmail.com",
+    "mail_password": "frpx qtau sxfg gjyn",
     "CALENDAR_SCOPE": "https://www.googleapis.com/auth/calendar",
     "EMAIL_SCOPE": "https://www.googleapis.com/auth/script.projects",
     "MAIL_TRIAL_SCOPE": "https://mail.google.com/",

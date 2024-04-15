@@ -9,15 +9,11 @@ from utils.text_bison import TextBison
 # SQL_PROMPT is a string template that is used to generate the SQL query.
 # It takes two arguments: question and date_today.
 SQL_PROMPT = """
-You are an SQL Expert. Given an input question, use sqlite syntax to generate \
-a sql query by choosing
+You are an SQL Expert. Given an input question, use sqlite syntax to generate a sql query by choosing
 one or multiple of the following tables. Write query in between <SQL></SQL>.
 
-The table is a Insurance Database Table whose name is df where each row \
-represents a single customer.
-The column keys are : username, agentname, converted, satisfaction_score, \
-current_policy, policy_start_date, policy_end_date, old_policy, \
-policy_amount, platform and last_contacted
+The table is a Insurance Database Table whose name is df where each row represents a single customer.
+The column keys are : username, agentname, converted, satisfaction_score, current_policy, policy_start_date, policy_end_date, old_policy, policy_amount, platform and last_contacted
 Today's date is {date_today}. Use this for date/time related queries.
 
 Please provide the SQL query for this question:
@@ -26,17 +22,13 @@ Query:
 
 """
 
-# FINAL_ANSWER_PROMPT is a string template that is used to generate
-# the final answer.
+# FINAL_ANSWER_PROMPT is a string template that is used to generate the final answer.
 # It takes two arguments: question and df.
 FINAL_ANSWER_PROMPT = """
 
-You are an experienced programmer and also good at English Language. You \
-need to understand the output answer of a question.
-The output has been returned as a dataframe in pandas which would be given \
-to you as a string.
-Based on the question and the dataframe, you need re-frame the answer \
-given in the dataframe into natural language.
+You are an experienced programmer and also good at English Language. You need to understand the output answer of a question.
+The output has been returned as a dataframe in pandas which would be given to you as a string.
+Based on the question and the dataframe, you need re-frame the answer given in the dataframe into natural language.
 QUESTION: {question}
 DATAFRAME: {df}
 ANSWER:
@@ -45,18 +37,16 @@ ANSWER:
 
 
 def generate_answer(question: str) -> str:
-    """
-    Generates an answer to a question using a database.
+    """Generates an answer to a question using a database.
 
     Args:
         question (str): The question to answer.
 
     Returns:
         str: The answer to the question.
-
     """
     tb = TextBison()
-    with open("data/policy.json", "r") as f:
+    with open("data/policy.json") as f:
         policy_json = json.load(f)
 
     today = date.today()

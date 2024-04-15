@@ -17,13 +17,11 @@ class GeminiText:
 
     Args:
         PROJECT_ID (str): The Google Cloud project ID.
-        LOCATION (str): The Google Cloud region where the model
-        is deployed.
+        LOCATION (str): The Google Cloud region where the model is deployed.
         max_output_tokens (int): The maximum number of tokens to generate.
         temperature (float): The temperature to use for sampling.
-        top_p(float): The top-p value to use for sampling.
+        top_p (float): The top-p value to use for sampling.
         top_k (int): The top-k value to use for sampling.
-
     """
 
     def __init__(
@@ -40,14 +38,11 @@ class GeminiText:
 
         Args:
             PROJECT_ID (str): The Google Cloud project ID.
-            LOCATION (str): The Google Cloud region where the model
-            is deployed.
+            LOCATION (str): The Google Cloud region where the model is deployed.
             max_output_tokens (int): The maximum number of tokens to generate.
             temperature (float): The temperature to use for sampling.
-            top_p(float): The top-p value to use for sampling.
+            top_p (float): The top-p value to use for sampling.
             top_k (int): The top-k value to use for sampling.
-
-
         """
         self.PROJECT_ID = PROJECT_ID
         self.LOCATION = LOCATION
@@ -68,11 +63,10 @@ class GeminiText:
         Generates a response to a given prompt.
 
         Args:
-            rompt (str): The prompt to generate a response for.
+            prompt (str): The prompt to generate a response for.
 
         Returns:
             str: The generated response.
-
         """
         print("running tb.generate_response")
         parameters = self.parameters

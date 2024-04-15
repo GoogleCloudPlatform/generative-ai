@@ -15,10 +15,8 @@ Given a query, output all the insurance policies which the query is about.
 
 Some important instructions:
 1. The output should be a python list of policy indices.
-2. In case the question asks for the best policy, output all insurance \
-policies.
-3. If the query has a policy which is not in the list, output "I do not know \
-about <Policy Name>".
+2. In case the question asks for the best policy, output all insurance policies.
+3. If the query has a policy which is not in the list, output "I do not know about <Policy Name>".
 4. Do not use your own knowledge.
 
 ----------
@@ -28,8 +26,7 @@ Output: [1, 2]
 Query: What is covered in VidalTPA for cataract?
 Output: I do not know about VidalTPA.
 ----------
-Query: Is New India Insurance better than Arogyasanjeevni for a 40 year old \
-diabetic?
+Query: Is New India Insurance better than Arogyasanjeevni for a 40 year old diabetic?
 Output: [0,3]
 ----------
 Query: Which the best policy for a cancer patient?
@@ -42,17 +39,14 @@ Query: {}
 Output: """
 
 
-def get_policies(query: str) -> list | str:
-    """
-    Given a query, output all the insurance policies which the query is about.
+def get_policies(query: str):
+    """Given a query, output all the insurance policies which the query is about.
 
     Args:
         query (str): The query to process.
 
     Returns:
-        list| str: A list of policy indices or a string indicating
-        that the policy is not known.
-
+        list| str: A list of policy indices or a string indicating that the policy is not known.
     """
     tb = TextBison()
 
@@ -60,19 +54,12 @@ def get_policies(query: str) -> list | str:
 
     if "[" in response:
         response = response.strip("[] ")
-        response = response.split(",")
+        response_list = response.split(",")
 
-        response = [int(x.strip()) for x in response]
-        response = [POLICIES[x] for x in response]
-    print("policies names:", response)
+        response_list_int = [int(x.strip()) for x in response_list]
+        response_policies = [POLICIES[x] for x in response_list_int]
+    print("policies names:", response_policies)
 
     if type(response) is str:
         raise Exception("Policy not found")
     return response
-
-
-if __name__ == "__main__":
-    get_policies("What is covered in ergo for diabetes?")
-    get_policies("What is covered in NewIndia for diabetes?")
-    get_policies("What is covered in NewIndia for OPD for family members?")
-    get_policies("What is covered in ABDLife for OPD for family members?")

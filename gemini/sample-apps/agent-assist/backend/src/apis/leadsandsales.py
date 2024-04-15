@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from typing import Any, Dict
 
 from flask import jsonify, request
 
@@ -13,7 +14,6 @@ def formatINR(number) -> str:
 
     Returns:
         str: The formatted number in Indian Rupee format.
-
     """
     if number > 10000000:
         return "₹" + "{:.4}".format(number / 10000000) + "Cr"
@@ -25,13 +25,12 @@ def formatINR(number) -> str:
         return "₹" + str(number)
 
 
-def getLeadsAndSalesData() -> json:
+def getLeadsAndSalesData() -> tuple[dict, int]:
     """
     Gets the leads and sales data from the JSON file.
 
     Returns:
         json: The leads and sales data in JSON format.
-
     """
     filePath = "data/policy.json"
     with open(filePath) as json_file:
@@ -53,14 +52,16 @@ def getLeadsAndSalesData() -> json:
     topPerformingPolicy = getTopPerformingPolicy(data, startDate, endDate)
 
     return (
-        jsonify({
-            "leadsGenerated": leadsGenerated,
-            "conversionRate": conversionRate,
-            "revenueGenerated": revenueGenerated,
-            "platformData": platformData,
-            "topPerformingPlatform": topPerformingPlatform,
-            "topPerformingPolicy": topPerformingPolicy,
-        }),
+        jsonify(
+            {
+                "leadsGenerated": leadsGenerated,
+                "conversionRate": conversionRate,
+                "revenueGenerated": revenueGenerated,
+                "platformData": platformData,
+                "topPerformingPlatform": topPerformingPlatform,
+                "topPerformingPolicy": topPerformingPolicy,
+            }
+        ),
         200,
     )
 
@@ -75,9 +76,7 @@ def getConversionRate(data: list, startDate: str, endDate: str) -> tuple:
         endDate (str): The end date.
 
     Returns:
-        tuple: The conversion rate, leads generated, and revenue
-        generated.
-
+        tuple: The conversion rate, leads generated, and revenue generated.
     """
     totalCount = 0
     count = 0
@@ -98,9 +97,7 @@ def getConversionRate(data: list, startDate: str, endDate: str) -> tuple:
     )
 
 
-def getDifferentPlatformData(
-    data: list, startDate: str, endDate: str
-) -> tuple:
+def getDifferentPlatformData(data: list, startDate: str, endDate: str) -> tuple:
     """
     Gets the data for different platforms.
 
@@ -111,9 +108,8 @@ def getDifferentPlatformData(
 
     Returns:
         tuple: The chart data and the top performing platform.
-
     """
-    finalData = {}
+    finalData: Dict[str, Any] = {}
     for policy in data:
         last_contacted_data = policy["last_contacted"]
         if last_contacted_data is None:
@@ -127,15 +123,11 @@ def getDifferentPlatformData(
             else:
                 finalData[policy["platform"]] = {"count": 0, "revenue": 0}
     chartData = []
-    topPerformingPlatform = max(
-        finalData, key=lambda x: finalData[x]["revenue"]
-    )
+    topPerformingPlatform = max(finalData, key=lambda x: finalData[x]["revenue"])
     for key in finalData.keys():
-        chartData.append({
-            "x": key,
-            "y1": finalData[key]["count"],
-            "y2": finalData[key]["revenue"],
-        })
+        chartData.append(
+            {"x": key, "y1": finalData[key]["count"], "y2": finalData[key]["revenue"]}
+        )
 
     return chartData, topPerformingPlatform
 
@@ -151,7 +143,6 @@ def getTopPerformingPolicy(data: list, startDate: str, endDate: str) -> str:
 
     Returns:
         str: The top performing policy.
-
     """
     finalData = {}
     for policy in data:

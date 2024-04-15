@@ -11,23 +11,19 @@ parameters = {
     "top_k": 20,  # Top-k parameter for sampling
 }
 
-# Define the TextBison class for text generation
-
 
 class TextBison:
     def __init__(
         self,
-        PROJECT_ID: str = config["PROJECT_ID"],  # GCP Project ID
-        LOCATION: str = config["LOCATION"],  # GCP Region
+        PROJECT_ID=config["PROJECT_ID"],  # GCP Project ID
+        LOCATION=config["LOCATION"],  # GCP Region
     ):
         """
         Initializes the TextBison class for text generation.
 
         Args:
-            PROJECT_ID (str): GCP Project ID.
-            LOCATION (str): GCP Region.
-            Defaults to "us-central1".
-
+            PROJECT_ID: GCP Project ID.
+            LOCATION: GCP Region. Defaults to "us-central1".
         """
         self.PROJECT_ID = PROJECT_ID
         self.LOCATION = LOCATION
@@ -47,7 +43,6 @@ class TextBison:
 
         Returns:
             str: The generated text response.
-
         """
         print("running tb.generate_response")
         parameters = self.parameters

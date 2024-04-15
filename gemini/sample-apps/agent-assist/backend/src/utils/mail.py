@@ -8,6 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from os.path import basename
+from typing import Any
 
 import markdown
 
@@ -15,7 +16,9 @@ from config import config
 
 
 class Mail:
-    """Class to send and receive emails."""
+    """
+    Class to send and receive emails.
+    """
 
     def __init__(
         self, sender=config["company_email"], password=config["mail_password"]
@@ -25,15 +28,12 @@ class Mail:
 
         Args:
             sender (str): The email address of the sender.
-            password(str): The password of the sender.
-
+            password (str): The password of the sender.
         """
         self.sender = sender
         self.password = password
 
-    def send_email(
-        self, to_mail: str, subject: str, body: str, filepath: str = None
-    ) -> None:
+    def send_email(self, to_mail, subject, body, filepath: Any = None) -> None:
         """
         Sends an email.
 
@@ -41,10 +41,7 @@ class Mail:
             to_mail (str): The email address of the recipient.
             subject (str): The subject of the email.
             body (str): The body of the email.
-            filepath (str, optional): The path to a file to attach
-            to the email.
-            Defaults to None.
-
+            filepath (str): The path to a file to attach to the email
         """
         try:
             body = markdown.markdown(body)
@@ -54,14 +51,13 @@ class Mail:
             msg["Date"] = formatdate(localtime=True)
             msg["Subject"] = subject
             msg.attach(MIMEText(body, "html"))
-            msg.isBodyHtml = True
 
             if filepath is not None:
                 with open(filepath, "rb") as fil:
                     part = MIMEApplication(fil.read(), Name=basename(filepath))
                 # After the file is closed
-                part["Content-Disposition"] = (
-                    'attachment; filename="%s"' % basename(filepath)
+                part["Content-Disposition"] = 'attachment; filename="%s"' % basename(
+                    filepath
                 )
                 msg.attach(part)
 
@@ -77,16 +73,14 @@ class Mail:
 
     def send_calendar_event(self, param: dict) -> None:
         """
-        Function to send an ics file of the event to the email account of the
-        receipient.
+        Function to send an ics file of the event to the email account of the receipient
 
-        INPUT:
-            param (dict):
-            -receiver (list):  mail ids of receiver
-            -startDate (dateTime): start date of the event
-            -endDate (dateTime): end date of the event
-            -location (str): meet link
-            -subject(str): subject of the event
+            INPUT: param (dict):
+                -receiver (list):  mail ids of receiver
+                -startDate (dateTime): start date of the event
+                -endDate (dateTime): end date of the event
+                -location (str): meet link
+                -subject (str): subject of the event
 
         """
 
@@ -101,8 +95,7 @@ class Mail:
         try:
             for att in param["receiver"]:
                 attendees += (
-                    "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT"
-                    + ";PARTSTAT=NEEDS-ACTION;RSVP=FALSE;CN="
+                    "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=FALSE;CN="
                     + att
                     + ";X-NUM-GUESTS=0:mailto:"
                     + att
@@ -134,19 +127,13 @@ class Mail:
             print(e)
 
         replaced_contents = replaced_contents.replace("attend", attendees)
-        replaced_contents = replaced_contents.replace(
-            "subject", param["subject"]
-        )
-        replaced_contents = replaced_contents.replace(
-            "describe", param["subject"]
-        )
+        replaced_contents = replaced_contents.replace("subject", param["subject"])
+        replaced_contents = replaced_contents.replace("describe", param["subject"])
 
         part_email = MIMEText(replaced_contents, "calendar;method=REQUEST")
         ical_atch = MIMEBase("text/calendar", ' ;name="%s"' % "invitation.ics")
         ical_atch.set_payload(replaced_contents)
-        ical_atch.add_header(
-            "Content-Disposition", 'attachment; filename="%s"' % f
-        )
+        ical_atch.add_header("Content-Disposition", 'attachment; filename="%s"' % f)
 
         msgAlternative = MIMEMultipart("alternative")
         msgAlternative.attach(part_email)
@@ -168,7 +155,9 @@ class Mail:
         print("Email sent successfully")
 
     def read_email(self):
-        """Reads emails from the inbox."""
+        """
+        Reads emails from the inbox.
+        """
         user = config["company_email"]
         password = config["mail_password"]
         imap_url = "imap.gmail.com"
@@ -203,34 +192,20 @@ class Mail:
         # calling function to check for email under this label
         con.select("Inbox")
 
-        # print(get_emails(search("FROM",'*',con)))
         msgs = get_emails(search("FROM", "*", con))
 
         print("Messages: ", msgs)
         for msg in msgs[::-1]:
             for sent in msg:
                 if type(sent) is tuple:
-
                     content = str(sent[1], "utf-8")
                     data = str(content)
 
                     try:
                         indexstart = data.find("ltr")
-                        data2 = data[indexstart + 5: len(data)]
+                        data2 = data[indexstart + 5 : len(data)]
                         indexend = data2.find("</div>")
                         print(data2[0:indexend])
 
                     except UnicodeEncodeError as e:
                         print(e)
-                        pass
-
-
-if __name__ == "__main__":
-    mail = Mail()
-    param = {
-        "receiver": ["channitdak@gmail.com"],
-        "startDate": datetime.datetime(2023, 12, 26, 15, 0),
-        "endDate": datetime.datetime(2023, 12, 26, 16, 0),
-        "subject": "Meeting invitation new NEW",
-    }
-    mail.read_email()

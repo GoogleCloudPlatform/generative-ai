@@ -11,7 +11,7 @@
 .course {
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 10px rgba(0 0 0 / 20%);
   display: flex;
   max-width: 100%;
   margin: 20px;
@@ -100,7 +100,7 @@
   background-color: #2a265f;
   border: 0;
   border-radius: 50px;
-  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 10px rgba(0 0 0 / 20%);
   color: #fff;
   font-size: 16px;
   padding: 12px 25px;
@@ -108,6 +108,50 @@
   bottom: 30px;
   right: 30px;
   letter-spacing: 1px;
+}
+
+.floating-btn {
+  border-radius: 26.5px;
+  background-color: #001f61;
+  border: 1px solid #001f61;
+  box-shadow: 0 16px 22px -17px #03153b;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 20px;
+  padding: 12px 20px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+}
+
+.floating-btn:hover {
+  background-color: #fff;
+  color: #001f61;
+}
+
+.floating-btn:focus {
+  outline: none;
+}
+
+.floating-text {
+  background-color: #001f61;
+  border-radius: 10px 10px 0 0;
+  color: #fff;
+  font-family: Muli, sans-serif;
+  padding: 7px 15px;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 998;
+}
+
+.floating-text a {
+  color: #ff7500;
+  text-decoration: none;
 }
 
 .social-panel-container {
@@ -125,13 +169,13 @@
 .social-panel {
   background-color: #fff;
   border-radius: 16px;
-  box-shadow: 0 16px 31px -17px rgba(0, 31, 97, 0.6);
+  box-shadow: 0 16px 31px -17px rgba(0 31 97 / 60%);
   border: 5px solid #001f61;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-family: "Muli";
+  font-family: "Muli", sans-serif;
   position: relative;
   height: 169px;
   width: 370px;
@@ -180,7 +224,7 @@
 .social-panel h4 {
   margin: 20px 0;
   color: #97a5ce;
-  font-family: "Muli";
+  font-family: Muli, sans-serif;
   font-size: 14px;
   line-height: 18px;
   text-transform: uppercase;
@@ -215,56 +259,8 @@
   box-shadow: 0 9px 12px -9px #ff6a00;
 }
 
-.floating-btn {
-  border-radius: 26.5px;
-  background-color: #001f61;
-  border: 1px solid #001f61;
-  box-shadow: 0 16px 22px -17px #03153b;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 20px;
-  padding: 12px 20px;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 999;
-}
-
-.floating-btn:hover {
-  background-color: #ffffff;
-  color: #001f61;
-}
-
-.floating-btn:focus {
-  outline: none;
-}
-
-.floating-text {
-  background-color: #001f61;
-  border-radius: 10px 10px 0 0;
-  color: #fff;
-  font-family: "Muli";
-  padding: 7px 15px;
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  z-index: 998;
-}
-
-.floating-text a {
-  color: #ff7500;
-  text-decoration: none;
-}
-
-@media screen and (max-width: 480px) {
+@media screen and (width <= 480px) {
   .social-panel-container.visible {
     transform: translateX(0px);
-  }
-
-  .floating-btn {
-    right: 10px;
   }
 }

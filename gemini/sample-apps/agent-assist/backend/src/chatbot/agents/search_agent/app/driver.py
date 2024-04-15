@@ -9,8 +9,7 @@ from .keywords import get_keywords
 from .sub_question import get_reformed_subquestion
 
 PROMPT_RESULT = """
-Given a query relating to Home insurance policies, you need to answer based \
-on the CHUNKS given below.
+Given a query relating to Home insurance policies, you need to answer based on the CHUNKS given below.
 
 ----
 CHUNKS:
@@ -24,8 +23,7 @@ When comparing policies, consider the following points:
 Lets think step by step before answering.
 
 -------
-Answer strictly from the policy chunks given. Do not answer anything from \
-your own knowledge.
+Answer strictly from the policy chunks given. Do not answer anything from your own knowledge.
 
 -------
 
@@ -37,29 +35,28 @@ OUTPUT: """
 
 class Driver:
     def __init__(self):
-        """
-        Initializes the Driver class.
+        """Initializes the Driver class.
 
-        This function initializes the Driver class with the following
-        attributes:
+        This function initializes the Driver class with the following attributes:
 
-        * `chat_chain`: A list of chat messages. * `tb`: A TextBison object.
-
+        * `chat_chain`: A list of chat messages.
+        * `tb`: A TextBison object.
         """
         self.chat_chain = get_chat_chain()
         self.tb = TextBison()
 
-    def run(self, query: str, policies: list = None) -> str:
+    def run(self, query, policies) -> str:
         """
         Runs the driver.
 
         This function runs the driver and returns the answer to the query.
 
-        Args:     query(str): The query to be answered.     policies(str): The
-        list of policies to be compared.
+        Args:
+            query(str): The query to be answered.
+            policies(str): The list of policies to be compared.
 
-        Returns:     (str)The answer to the query.
-
+        Returns:
+            (str)The answer to the query.
         """
         try:
             single_policy_flag = len(policies) == 1
@@ -71,17 +68,11 @@ class Driver:
 
             if single_policy_flag:
                 reformed_question = query
-                answer = self.get_answer_one_policy(
-                    chunk_list[0], reformed_question
-                )
+                answer = self.get_answer_one_policy(chunk_list[0], reformed_question)
 
                 emit("chat", ["Generating..."])
                 emit(
-                    "chat",
-                    [{
-                        "intent": "Search Result ",
-                        "data": {"response": answer},
-                    }],
+                    "chat", [{"intent": "Search Result ", "data": {"response": answer}}]
                 )
             else:
                 reformed_question = get_reformed_subquestion(self.tb, query)
@@ -89,16 +80,18 @@ class Driver:
                 emit("chat", ["Generating..."])
                 emit(
                     "chat",
-                    [{
-                        "intent": "Intermediate Response - Search",
-                        "data": {
-                            "response": (
-                                "Reformulated question: "
-                                + reformed_question
-                                + "\n\n"
-                            )
-                        },
-                    }],
+                    [
+                        {
+                            "intent": "Intermediate Response - Search",
+                            "data": {
+                                "response": (
+                                    "Reformulated question: "
+                                    + reformed_question
+                                    + "\n\n"
+                                )
+                            },
+                        }
+                    ],
                 )
                 emit("chat", ["Generating..."])
                 individual_policy_answers = [
@@ -115,21 +108,18 @@ class Driver:
 
                 context_for_final_answer = ""
                 for policy, answer in zip(policies, individual_policy_answers):
-                    context_for_final_answer += f"POLICY:{policy}\n{answer}\n \
-                    --------------------------\n"
+                    context_for_final_answer += (
+                        f"POLICY:{policy}\n{answer}\n--------------------------\n"
+                    )
                 answer = comparison(self.tb, context_for_final_answer)
 
                 emit("chat", ["Generating..."])
                 emit(
                     "chat",
-                    [{
-                        "intent": "Recommended Policy",
-                        "data": {"response": answer},
-                    }],
+                    [{"intent": "Recommended Policy", "data": {"response": answer}}],
                 )
 
         except Exception as e:
-
             if e.args[0] == "Policy not found":
                 answer = "Policy not in database"
             else:
@@ -137,19 +127,17 @@ class Driver:
 
         return answer
 
-    def get_answer_one_policy(
-        self, chunk_str: str, reformed_question: str
-    ) -> str:
-        """
-        Gets the answer to the query for one policy.
+    def get_answer_one_policy(self, chunk_str: str, reformed_question: str) -> str:
+        """Gets the answer to the query for one policy.
 
         This function gets the answer to the query for one policy.
 
-        Args:     chunk_str(str): The string of chunks for the policy.
-        reformed_question(str): The reformed question.
+        Args:
+            chunk_str(str): The string of chunks for the policy.
+            reformed_question(str): The reformed question.
 
-        Returns:     (str) The answer to the query.
-
+        Returns:
+            (str) The answer to the query.
         """
         tb = TextBison()
         response = tb.generate_response(
@@ -158,19 +146,19 @@ class Driver:
         return response
 
     def get_chunks_str(
-        self, policies: list, keywords_lexical: list, keywords_semantic: list
+        self, policies: list, keywords_lexical: str, keywords_semantic: str
     ) -> list:
-        """
-        Gets the string of chunks for the policies.
+        """Gets the string of chunks for the policies.
 
         This function gets the string of chunks for the policies.
 
-        Args:     policies(list): The list of policies. keywords_lexical(list):
-        The list of lexical keywords. keywords_semantic(list): The list of
-        semantic keywords.
+        Args:
+            policies(list): The list of policies.
+            keywords_lexical(str): The list of lexical keywords.
+            keywords_semantic(str): The list of semantic keywords.
 
-        Returns:     (str) The string of chunks for the policies.
-
+        Returns:
+            (str) The string of chunks for the policies.
         """
         chunk_str = ""
         chunks = get_chunks(policies, keywords_lexical, keywords_semantic)
@@ -181,27 +169,3 @@ class Driver:
             chunk_list.append(chunk_str)
 
         return chunk_list
-
-
-if __name__ == "__main__":
-    driver = Driver()
-
-    q1 = "What is the coverage for earthquake damage in Homeshield?"
-    q2 = "Which is the best policy for accidental fire damage?"
-    q3 = "Compare Bharat Griha Raksha Plus and My Asset?"
-
-    print(driver.run(q1, ["Home Shield"]))
-    print(
-        driver.run(
-            q2,
-            [
-                "Home Shield",
-                "Bharat Griha Raksha Plus",
-                "My Asset Home Insurance",
-                "Micro Insurance - Home Insurance",
-            ],
-        )
-    )
-    print(
-        driver.run(q3, ["Bharat Griha Raksha Plus", "My Asset Home Insurance"])
-    )

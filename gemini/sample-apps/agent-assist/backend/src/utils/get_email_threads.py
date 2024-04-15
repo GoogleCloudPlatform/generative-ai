@@ -14,32 +14,22 @@ OUTPUT:
 """
 
 
-def get_data_from_threads(
-    service: object, emailid: str, threads: list
-) -> tuple:
-    """
-    Gets the data from the email threads.
+def get_data_from_threads(service, emailid, threads) -> tuple:
+    """Gets the data from the email threads.
 
     Args:
-        (object) service: The service object.
-        (str) emailid: The email id of the user.
-        (list) threads: The list of threads.
+        service: The service object.
+        emailid: The email id of the user.
+        threads: The list of threads.
 
     Returns:
-        (tuple)(str, datetime): A tuple containing the email thread
-        content and the last contacted date.
-
+        (tuple)(str, datetime): A tuple containing the email thread content and the last contacted date.
     """
     returnStr = ""
-    date = None
+    date = {"value": None}
     for thread in threads:
-        tdata = (
-            service.users()
-            .threads()
-            .get(userId="me", id=thread["id"])
-            .execute()
-        )
-        date = None
+        tdata = service.users().threads().get(userId="me", id=thread["id"]).execute()
+        date = {"value": None}
         mailids = [
             x["value"]
             for x in tdata["messages"][0]["payload"]["headers"]
@@ -71,7 +61,7 @@ def get_data_from_threads(
                         subject = ""
 
                     try:
-                        if date is None:
+                        if date["value"] is None:
                             date = [
                                 x
                                 for x in data["payload"]["headers"]
@@ -83,7 +73,7 @@ def get_data_from_threads(
                             if x["name"] == "From" or x["name"] == "To"
                         ]
                     except Exception as e:
-                        print(e)
+                        print("Error: " + str(e))
                         date = {"value": datetime.now().date()}
                         temp = [
                             {"value": "teamkavaachinsurance@gmail.com"},
@@ -111,19 +101,14 @@ def get_data_from_threads(
     return returnStr, date["value"]
 
 
-def get_email_threads_summary(
-    userEmailId: str = "channitdak@gmail.com",
-) -> tuple:
-    """
-    Gets the email threads summary.
+def get_email_threads_summary(userEmailId: str = "channitdak@gmail.com") -> tuple:
+    """Gets the email threads summary.
 
     Args:
         (str) userEmailId: The email id of the user.
 
     Returns:
-        (tuple) (str, datetime): A tuple containing the email thread
-        summary and the last contacted date.
-
+        (tuple) (str, datetime): A tuple containing the email thread summary and the last contacted date.
     """
     threads, service = show_chatty_threads()
     tb = TextBison()
@@ -131,9 +116,7 @@ def get_email_threads_summary(
         service, userEmailId, threads
     )
     print(email_thread_content, lastContactedDate)
-    email_thread_summary = tb.generate_response(
-        PROMPT.format(email_thread_content)
-    )
+    email_thread_summary = tb.generate_response(PROMPT.format(email_thread_content))
     print(email_thread_summary)
     return email_thread_summary, lastContactedDate
 

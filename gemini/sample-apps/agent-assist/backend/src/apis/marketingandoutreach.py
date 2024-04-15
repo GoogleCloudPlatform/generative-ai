@@ -4,18 +4,15 @@ from datetime import datetime, timedelta
 from flask import jsonify, request
 
 
-def getMarketingAndOutreachData() -> json:
+def getMarketingAndOutreachData() -> tuple[dict, int]:
     """
-    This function gets the marketing and outreach data from a JSON file and
-    returns it in a JSON format.
+    This function gets the marketing and outreach data from a JSON file and returns it in a JSON format.
 
     Args:
         None
 
     Returns:
-        JSON: A JSON object containing the marketing and outreach
-        data.
-
+        JSON: A JSON object containing the marketing and outreach data.
     """
     filePath = "data/likes.json"
     with open(filePath) as json_file:
@@ -40,16 +37,18 @@ def getMarketingAndOutreachData() -> json:
     ) = getMetricsData(data, startDate, endDate)
 
     return (
-        jsonify({
-            "websiteTraffic": websiteTraffic,
-            "likes": likes,
-            "comments": comments,
-            "shares": shares,
-            "emailsent": emailsent,
-            "openrate": openrate,
-            "topPerformaingPlatform": topPerformaingPlatform,
-            "chartData": chartData,
-        }),
+        jsonify(
+            {
+                "websiteTraffic": websiteTraffic,
+                "likes": likes,
+                "comments": comments,
+                "shares": shares,
+                "emailsent": emailsent,
+                "openrate": openrate,
+                "topPerformaingPlatform": topPerformaingPlatform,
+                "chartData": chartData,
+            }
+        ),
         200,
     )
 
@@ -58,20 +57,15 @@ def getMetricsData(
     data: list, startDate: str, endDate: str
 ) -> tuple[int, int, int, int, int, float, str, list]:
     """
-    This function gets the metrics data from a list of dictionaries and returns
-    it in a tuple.
+    This function gets the metrics data from a list of dictionaries and returns it in a tuple.
 
     Args:
-        data (list): A list of dictionaries containing the marketing and
-        outreach data.
+        data (list): A list of dictionaries containing the marketing and outreach data.
         startDate (str): The start date of the data to be retrieved.
         endDate (str): The end date of the data to be retrieved.
 
     Returns:
-        tuple: A tuple containing the website traffic, likes,
-        comments, shares, emails sent, open rate, top performing platform, and
-        chart data.
-
+        tuple: A tuple containing the website traffic, likes, comments, shares, emails sent, open rate, top performing platform, and chart data.
     """
     websiteTraffic = 0
     likes = 0
@@ -111,7 +105,7 @@ def getMetricsData(
             maxSales = sumSales[platform]
             topPerformaingPlatform = platform
 
-    openrate = 0
+    openrate = 0.0
     if emailsent != 0:
         openrate = (mailopened * 100) / emailsent
     openrate = round(openrate, 2)

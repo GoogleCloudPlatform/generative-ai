@@ -13,7 +13,6 @@ def getCustomerManagementData():
 
     Returns:
         json: A JSON object containing the customer management data.
-
     """
     filePath = "data/policy.json"
     with open(filePath) as json_file:
@@ -33,14 +32,16 @@ def getCustomerManagementData():
     chartData = getChartData(data, startDate, endDate)
 
     return (
-        jsonify({
-            "totalActiveCustomers": totalActiveCustomers,
-            "averageSatisfactionScore": float(
-                "{:.3}".format(averageSatisfactionScore)
-            ),
-            "totalLapsedCustomers": totalLapsedCustomers,
-            "chartData": chartData,
-        }),
+        jsonify(
+            {
+                "totalActiveCustomers": totalActiveCustomers,
+                "averageSatisfactionScore": float(
+                    "{:.3}".format(averageSatisfactionScore)
+                ),
+                "totalLapsedCustomers": totalLapsedCustomers,
+                "chartData": chartData,
+            }
+        ),
         200,
     )
 
@@ -51,18 +52,14 @@ def getMetricsData(data: list, startDate: str, endDate: str):
 
     Args:
         data (list): A list of dictionaries containing the policy data.
-        startDate (str): The start date of the period for
-        which the data is to be retrieved.
-        endDate (str): The end date of the period for which the data
-        is to be retrieved.
+        startDate (str): The start date of the period for which the data is to be retrieved.
+        endDate (str): The end date of the period for which the data is to be retrieved.
 
     Returns:
-        tuple: A tuple containing the total number of active customers
-        and the average satisfaction score.
-
+        tuple: A tuple containing the total number of active customers and the average satisfaction score.
     """
     totalActiveCustomers = 0
-    averageSatisfactionScore = 0
+    averageSatisfactionScore = 0.0
     totalratings = 0
     for policy in data:
         policy_start_date = policy["policy_start_date"]
@@ -92,14 +89,11 @@ def getLapsedCustomers(data: list, startDate: str, endDate: str):
 
     Args:
         data (list): A list of dictionaries containing the policy data.
-        startDate (str): The start date of the period for which the data
-        is to be retrieved.
-        endDate (str): The end date of the period for which the data
-        is to be retrieved.
+        startDate (str): The start date of the period for which the data is to be retrieved.
+        endDate (str): The end date of the period for which the data is to be retrieved.
 
     Returns:
         int: The total number of lapsed customers.
-
     """
     totalLapsedCustomers = 0
     for policy in data:
@@ -122,21 +116,16 @@ def getChartData(data: list, startDate: str, endDate: str):
 
     Args:
         data (list): A list of dictionaries containing the policy data.
-        startDate (str): The start date of the period for which the data
-        is to be retrieved.
-        endDate (str): The end date of the period for which the data
-        is to be retrieved.
+        startDate (str): The start date of the period for which the data is to be retrieved.
+        endDate (str): The end date of the period for which the data is to be retrieved.
 
     Returns:
         list: A list of dictionaries containing the chart data.
-
     """
     start_date = datetime.strptime(startDate, "%Y-%m-%d")
     end_date = datetime.strptime(endDate, "%Y-%m-%d")
     month_list = [
-        datetime.strptime("%2.2d-%2.2d" % (year, month), "%Y-%m").strftime(
-            "%b-%y"
-        )
+        datetime.strptime("%2.2d-%2.2d" % (year, month), "%Y-%m").strftime("%b-%y")
         for year in range(start_date.year, end_date.year + 1)
         for month in range(
             start_date.month if year == start_date.year else 1,
@@ -146,23 +135,15 @@ def getChartData(data: list, startDate: str, endDate: str):
 
     monthData = {}
     for month in month_list:
-        monthData[month] = {
-            "satisfaction_score": 0,
-            "active_customers": 0,
-            "count": 0,
-        }
+        monthData[month] = {"satisfaction_score": 0, "active_customers": 0, "count": 0}
     for policy in data:
         policy_start_date = policy["policy_start_date"]
         if policy_start_date is None:
             continue
-        month = datetime.strptime(policy_start_date, "%Y-%m-%d").strftime(
-            "%b-%y"
-        )
+        month = datetime.strptime(policy_start_date, "%Y-%m-%d").strftime("%b-%y")
         if policy["satisfaction_score"]:
             if month in monthData:
-                monthData[month]["satisfaction_score"] += policy[
-                    "satisfaction_score"
-                ]
+                monthData[month]["satisfaction_score"] += policy["satisfaction_score"]
                 monthData[month]["count"] += 1
             else:
                 monthData[month] = {
@@ -181,14 +162,15 @@ def getChartData(data: list, startDate: str, endDate: str):
 
     chartData = []
     for month in month_list:
-        chartData.append({
-            "x": month,
-            "y1": monthData[month]["active_customers"],
-            "y2": (
-                monthData[month]["satisfaction_score"]
-                / monthData[month]["count"]
-                if monthData[month]["count"] != 0
-                else 0
-            ),
-        })
+        chartData.append(
+            {
+                "x": month,
+                "y1": monthData[month]["active_customers"],
+                "y2": (
+                    monthData[month]["satisfaction_score"] / monthData[month]["count"]
+                    if monthData[month]["count"] != 0
+                    else 0
+                ),
+            }
+        )
     return chartData

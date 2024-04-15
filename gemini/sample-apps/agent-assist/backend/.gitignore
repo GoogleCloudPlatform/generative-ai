@@ -16,3 +16,7 @@ flask_session/
 
 notebooks/sales_pitch.ipynb
 src/notebooks/sales_pitch.ipynb
+
+cal_token.json
+mail_token.json
+src/keys/*
