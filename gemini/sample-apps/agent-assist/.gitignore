@@ -13,3 +13,5 @@ pylint_logs.json
 pylint_logs.md
 wrapper.sh
 backend/src/my_config.py
+package.json
+package-lock.json

@@ -16,7 +16,7 @@ const Performance = (props) => {
   function fetchData() {
     axios
       .get(
-        `${BACKENDURL}/workbench/performance?startDate=${performanceStartDate}&endDate=${performanceEndDate}`,
+        `${BACKENDURL}/workbench/performance?startDate=${performanceStartDate}&endDate=${performanceEndDate}`
       )
       .then((res) => {
         setPerformanceData(res.data);

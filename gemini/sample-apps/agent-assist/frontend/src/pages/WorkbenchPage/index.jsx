@@ -9,10 +9,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import * as React from "react";
-import CustomerManagement from "./CustomerManagement";
-import LeadsSales from "./LeadsSales";
-import Marketing from "./Marketing";
-import Performance from "./Performance";
+import WorkbenchTabs from "./WorkbenchTabs";
 
 export default function WorkBenchPage() {
   // State for the current tab
@@ -21,7 +18,7 @@ export default function WorkBenchPage() {
   const [endDate, setEndDate] = React.useState(dayjs("2023-12-31"));
   // State for the start date
   const [startDate, setStartDate] = React.useState(
-    endDate.subtract(12, "month"),
+    endDate.subtract(12, "month")
   );
   // Calculate the period based on the start and end dates
   let period = "";
@@ -89,35 +86,12 @@ export default function WorkBenchPage() {
           </Box>
         </Box>
       </Box>
-      {/* Render the appropriate component based on the current tab */}
-      {value === 0 && (
-        <Performance
-          performanceStartDate={startDate.format("YYYY-MM-DD")}
-          performanceEndDate={endDate.format("YYYY-MM-DD")}
-          period={period}
-        />
-      )}
-      {value === 1 && (
-        <LeadsSales
-          leadsSalesStartDate={startDate.format("YYYY-MM-DD")}
-          leadsSalesEndDate={endDate.format("YYYY-MM-DD")}
-          period={period}
-        />
-      )}
-      {value === 2 && (
-        <CustomerManagement
-          customerManagementStartDate={startDate.format("YYYY-MM-DD")}
-          customerManagementEndDate={endDate.format("YYYY-MM-DD")}
-          period={period}
-        />
-      )}
-      {value === 3 && (
-        <Marketing
-          marketingStartDate={startDate.format("YYYY-MM-DD")}
-          marketingEndDate={endDate.format("YYYY-MM-DD")}
-          period={period}
-        />
-      )}
+      <WorkbenchTabs
+        value={value}
+        startDate={startDate}
+        endDate={endDate}
+        period={period}
+      />
     </>
   );
 }
