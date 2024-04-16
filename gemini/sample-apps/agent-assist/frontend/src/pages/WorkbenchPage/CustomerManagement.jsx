@@ -6,13 +6,13 @@ import DisplayCard from "../../components/DisplayCard";
 
 // CustomerManagement component displays customer management metrics and a chart
 const CustomerManagement = (props) => {
-  const { startDate, endDate, period } = props;
+  const { customerManagementStartDate, customerManagementEndDate, period } = props;
   const BACKENDURL = process.env.REACT_APP_API_URL;
   const [customerManagementData, setCustomerManagementData] = useState({});
   function fetchData() {
     axios
       .get(
-        `${BACKENDURL}/workbench/customermanagement?startDate=${startDate}&endDate=${endDate}`,
+        `${BACKENDURL}/workbench/customermanagement?startDate=${customerManagementStartDate}&endDate=${customerManagementEndDate}`,
       )
       .then((res) => {
         setCustomerManagementData(res.data);
@@ -24,7 +24,7 @@ const CustomerManagement = (props) => {
   // useEffect to fetch data when startDate or endDate changes
   useEffect(() => {
     fetchData();
-  }, [startDate, endDate]);
+  }, [customerManagementStartDate, customerManagementEndDate]);
 
   return (
     <>

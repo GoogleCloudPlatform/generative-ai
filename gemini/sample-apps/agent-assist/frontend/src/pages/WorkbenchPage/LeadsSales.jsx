@@ -5,13 +5,13 @@ import LeadsChart from "../../components/Chart/LeadsChart";
 import DisplayCard from "../../components/DisplayCard";
 
 const LeadsSales = (props) => {
-  const { startDate, endDate, period } = props;
+  const { leadsSalesStartDate, leadsSalesEndDate, period } = props;
   const BACKENDURL = process.env.REACT_APP_API_URL;
   const [leadsAndSalesData, setLeadsAndSalesData] = useState({});
   function fetchData() {
     axios
       .get(
-        `${BACKENDURL}/workbench/leadsandsales?startDate=${startDate}&endDate=${endDate}`,
+        `${BACKENDURL}/workbench/leadsandsales?startDate=${leadsSalesStartDate}&endDate=${leadsSalesEndDate}`,
       )
       .then((res) => {
         setLeadsAndSalesData(res.data);
@@ -24,7 +24,7 @@ const LeadsSales = (props) => {
   // Use useEffect to fetch data when startDate or endDate changes
   useEffect(() => {
     fetchData();
-  }, [startDate, endDate]);
+  }, [leadsSalesStartDate, leadsSalesEndDate]);
 
   return (
     <>

@@ -6,7 +6,7 @@ import DisplayCard from "../../components/DisplayCard";
 
 // Performance component displays performance metrics and a chart
 const Performance = (props) => {
-  const { startDate, endDate, period } = props;
+  const { performanceStartDate, performanceEndDate, period } = props;
   const [performanceData, setPerformanceData] = useState({});
 
   // API endpoint URL
@@ -16,7 +16,7 @@ const Performance = (props) => {
   function fetchData() {
     axios
       .get(
-        `${BACKENDURL}/workbench/performance?startDate=${startDate}&endDate=${endDate}`,
+        `${BACKENDURL}/workbench/performance?startDate=${performanceStartDate}&endDate=${performanceEndDate}`,
       )
       .then((res) => {
         setPerformanceData(res.data);
@@ -29,7 +29,7 @@ const Performance = (props) => {
   // Fetch data when startDate or endDate changes
   useEffect(() => {
     fetchData();
-  }, [startDate, endDate]);
+  }, [performanceStartDate, performanceEndDate]);
 
   return (
     <>
