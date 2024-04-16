@@ -1,6 +1,5 @@
 import os.path
 from datetime import datetime
-from typing import Any, Dict, List
 
 import pytz
 from config import config
