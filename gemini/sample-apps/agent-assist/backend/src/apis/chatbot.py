@@ -3,7 +3,6 @@ from datetime import datetime
 
 from chatbot_dir.orchestration_engine import run_orchestrator
 
-
 def chatbot_entry(data: dict = {}) -> dict:
     """
     This function is the main entry point for the chatbot. It takes a dictionary of data as input and returns a dictionary of data as output.
