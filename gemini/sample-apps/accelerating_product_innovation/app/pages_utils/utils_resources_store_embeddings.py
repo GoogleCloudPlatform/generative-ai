@@ -86,8 +86,8 @@ def create_data_packet(
 
     data_packet = {}
     data_packet["file_name"] = file_name
-    data_packet["page_number"] = page_number
-    data_packet["chunk_number"] = chunk_number
+    data_packet["page_number"] = str(page_number)
+    data_packet["chunk_number"] = str(chunk_number)
     data_packet["content"] = file_content
     return data_packet
 

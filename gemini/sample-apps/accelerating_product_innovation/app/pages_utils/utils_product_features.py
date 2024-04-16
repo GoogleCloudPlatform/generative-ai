@@ -178,7 +178,7 @@ def generate_formatted_response(prompt):
         return formatted_response
 
 
-def render_features(features: list) -> None:
+def render_features(features: st.delta_generator.DeltaGenerator) -> None:
     """Renders draft ideas in a grid format, allowing for selection.
 
     Args:

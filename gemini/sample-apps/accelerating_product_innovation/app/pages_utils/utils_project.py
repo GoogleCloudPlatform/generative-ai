@@ -77,7 +77,7 @@ def list_pdf_files_gcs() -> list[tuple[str, str]]:
     It then returns a list of tuples of the blob name and the file extension.
 
     Returns:
-        list[list[Any]]: A list of tuples of the blob name and the file extension.
+        list[tuple[str, str]]: A list of tuples of the blob name and the file extension.
     """
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)

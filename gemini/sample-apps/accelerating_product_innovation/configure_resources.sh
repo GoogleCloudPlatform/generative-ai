@@ -54,7 +54,7 @@ gcloud functions deploy imagen-call \
 --source=./cloud_functions/imagen_call \
 --entry-point=hello_http \
 --trigger-http \
---set-env-vars location="$REGION" \
+--set-env-vars location="$LOCATION" \
 --set-env-vars project_id="$PROJECT_ID" \
 --set-env-vars MEMORY=512MB  > cloud_fn_1
 file="cloud_fn_1"
@@ -79,7 +79,7 @@ gcloud functions deploy gemini-call \
 --source=./cloud_functions/gemini-call \
 --entry-point=generate_text_http \
 --trigger-http \
---set-env-vars location="$REGION" \
+--set-env-vars location="$LOCATION" \
 --set-env-vars project_id="$PROJECT_ID" \
 --set-env-vars MEMORY=512MB  > cloud_fn_1
 while read -r line; do
@@ -103,7 +103,7 @@ gcloud functions deploy text-embedding \
 --source=./cloud_functions/text-embedding \
 --entry-point=hello_http \
 --trigger-http \
---set-env-vars location="$REGION" \
+--set-env-vars location="$LOCATION" \
 --set-env-vars project_id="$PROJECT_ID" \
 --set-env-vars MEMORY=512MB  > cloud_fn_1
 while read -r line; do
@@ -119,11 +119,8 @@ rm cloud_fn_1
 
 
 # Set project ID, region, and service name (modify as needed)
-REGION="us-central1"  # Choose a region close to you
 SERVICE_NAME="accelerating-product-innovation"
 
-
-PYTHON_VERSION="python3.11"
 
 # Build the container image (Cloud Buildpacks will detect Python)
 gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE_NAME  .
@@ -132,6 +129,6 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE_NAME  .
 gcloud run deploy $SERVICE_NAME \
   --image gcr.io/$PROJECT_ID/$SERVICE_NAME \
   --platform managed \
-  --port 8080
+  --port 8080 \
   --region $REGION \
   --allow-unauthenticated
