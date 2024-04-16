@@ -129,7 +129,7 @@ def calendar_component(query: str, chat_history: str = "[]") -> dict:
 
             response_dict["event"] = event
 
-    return response_dict
+    return response
 
 
 if __name__ == "__main__":

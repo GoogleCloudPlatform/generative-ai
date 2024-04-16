@@ -144,7 +144,7 @@ def getTopPerformingPolicy(data: list, startDate: str, endDate: str) -> str:
     Returns:
         str: The top performing policy.
     """
-    finalData: Dict[str, Any] = {}
+    finalData:Dict[str,Any] = {}
     for policy in data:
         last_contacted_data = policy["last_contacted"]
         if last_contacted_data is None:

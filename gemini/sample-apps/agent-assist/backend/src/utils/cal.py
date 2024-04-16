@@ -1,14 +1,14 @@
 import os.path
 from datetime import datetime
+from typing import Any, Dict, List
 
 import pytz
+from config import config
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
-from config import config
 
 
 class Calendar:
@@ -99,7 +99,7 @@ class Calendar:
         # print(event)
         return event
 
-    def get_events_by_date(self, event_date: any) -> list[dict]:
+    def get_events_by_date(self, event_date: str) -> List[Dict[str, Any]]:
         """
         Gets all events on the user's calendar for a given date.
 

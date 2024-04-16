@@ -14,7 +14,7 @@ OUTPUT:
 """
 
 
-def get_data_from_threads(service, emailid, threads) -> tuple:
+def get_data_from_threads(service, emailid, threads) -> tuple[str, datetime]:
     """Gets the data from the email threads.
 
     Args:
@@ -23,25 +23,21 @@ def get_data_from_threads(service, emailid, threads) -> tuple:
         threads: The list of threads.
 
     Returns:
-        (tuple)(str, datetime): A tuple containing the email thread content and the last contacted date.
+        tuple[str, datetime]: A tuple containing the email thread content and the last contacted date.
     """
-    returnStr = ""
+    return_str = ""
     date_value = datetime(1666, 10, 10)
     date = {"value": date_value}
     for thread in threads:
         tdata = service.users().threads().get(userId="me", id=thread["id"]).execute()
-        date = {"value": date_value}
-        mailids = [
+        mail_ids = {
             x["value"]
             for x in tdata["messages"][0]["payload"]["headers"]
             if x["name"] == "From" or x["name"] == "To"
-        ]
-        mailpresent = False
-        for mail in set(mailids):
-            if emailid in mail:
-                mailpresent = True
+        }
+        mail_present = any(emailid in mail for mail in mail_ids)
 
-        if mailpresent:
+        if mail_present:
             for data in tdata["messages"]:
                 labels = data["labelIds"]
                 if "INBOX" in labels or "SENT" in labels:
@@ -52,74 +48,62 @@ def get_data_from_threads(service, emailid, threads) -> tuple:
                         print("Error: " + str(e))
                         message = ""
                     try:
-                        subject = [
-                            x
-                            for x in data["payload"]["headers"]
-                            if x["name"] == "Subject"
-                        ][0]["value"]
+                        subject = next(
+                            (
+                                x["value"]
+                                for x in data["payload"]["headers"]
+                                if x["name"] == "Subject"
+                            ),
+                            "",
+                        )
                     except Exception as e:
                         print("Error: " + str(e))
                         subject = ""
 
                     try:
-                        if date["value"] == date_value:
-                            date = [
+                        date = next(
+                            (
                                 x
                                 for x in data["payload"]["headers"]
                                 if x["name"] == "Date"
-                            ][0]
-                        temp = [
-                            x
-                            for x in data["payload"]["headers"]
-                            if x["name"] == "From" or x["name"] == "To"
-                        ]
+                            ),
+                            {"value": datetime.now().date()},
+                        )
                     except Exception as e:
                         print("Error: " + str(e))
-                        date = {"value": str(datetime.now().date())}
-                        temp = [
-                            {"value": "teamkavaachinsurance@gmail.com"},
-                            {"value": "channitdak@gmail.com"},
-                        ]
-                    returnStr += (
-                        "FROM: "
-                        + str(temp[0]["value"])
-                        + "\n---------\n"
-                        + "TO: "
-                        + str(temp[1]["value"])
-                        + "\n---------\n"
-                        + "MESSAGE: "
-                        + str(subject)
-                        + "\n"
-                        + str(message)
-                        + "\n---------\n"
+                        date = {"value": datetime.now().date()}
+
+                    return_str += (
+                        f"FROM: {data['payload']['headers'][0]['value']}\n---------\n"
+                        f"TO: {data['payload']['headers'][1]['value']}\n---------\n"
+                        f"MESSAGE: {subject}\n{message}\n---------\n"
                     )
-            if returnStr:
+            if return_str:
                 break
 
-        else:
-            continue
-
-    return returnStr, date["value"]
+    return return_str, date["value"]
 
 
-def get_email_threads_summary(userEmailId: str = "channitdak@gmail.com") -> tuple:
+def get_email_threads_summary(
+    user_email_id: str = "channitdak@gmail.com",
+) -> tuple[str, datetime]:
     """Gets the email threads summary.
 
     Args:
-        (str) userEmailId: The email id of the user.
+        user_email_id (str): The email id of the user.
 
     Returns:
-        (tuple) (str, datetime): A tuple containing the email thread summary and the last contacted date.
+        tuple[str, datetime]: A tuple containing the email thread summary and the last contacted date.
     """
     threads, service = show_chatty_threads()
     tb = TextBison()
-    email_thread_content, lastContactedDate = get_data_from_threads(
-        service, userEmailId, threads
+    email_thread_content, last_contacted_date = get_data_from_threads(
+        service, user_email_id, threads
     )
-    print(email_thread_content, lastContactedDate)
+    print(email_thread_content, last_contacted_date)
     email_thread_summary = tb.generate_response(PROMPT.format(email_thread_content))
     print(email_thread_summary)
-    return email_thread_summary, lastContactedDate
+    return email_thread_summary, last_contacted_date
 
 
 if __name__ == "__main__":

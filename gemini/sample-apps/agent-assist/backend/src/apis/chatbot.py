@@ -1,8 +1,7 @@
 import json
 from datetime import datetime
-from typing import Any, List
 
-from ..chatbot.orchestration_engine import run_orchestrator
+from chatbot_dir.orchestration_engine import run_orchestrator
 
 
 def chatbot_entry(data: dict = {}) -> dict:
@@ -16,10 +15,15 @@ def chatbot_entry(data: dict = {}) -> dict:
         dict: A dictionary of data representing the output from the chatbot.
     """
     if type(data.get("query")) is not list:
-        chat_history: Any | None = [""]
+        chat_history: list[str] = [""]
 
     query = data.get("query")
-    chat_history = data.get("chat_history")
+    chat_history_from_data = data.get("chat_history")
+
+    if type(chat_history_from_data) is str:
+        chat_history: list[str] = [chat_history_from_data,]
+    else:
+        chat_history: list[str] = chat_history_from_data
 
     chat_history_string = process_history(chat_history)
     with open("data/static/oe_examples/logs.json") as f:

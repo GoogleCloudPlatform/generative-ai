@@ -1,9 +1,8 @@
 from datetime import date, datetime
 from typing import List
 
-import dateutil
+from dateutil.parser import parse
 from flask_socketio import emit
-
 from utils.cal import Calendar
 from utils.get_email_threads import get_email_threads_summary
 from utils.text_bison import TextBison
@@ -144,9 +143,9 @@ def schedule_calendar_event(date, start_time, end_time, participants) -> None:
         }
 
     else:
-        start_time = dateutil.parser.parse(start_time).time()
-        end_time = dateutil.parser.parse(end_time).time()
-        meet_date = dateutil.parser.parse(date, dayfirst=True).date()
+        start_time = parse(start_time).time()
+        end_time = parse(end_time).time()
+        meet_date = parse(date, dayfirst=True).date()
 
         startDateTime = datetime(
             meet_date.year,
