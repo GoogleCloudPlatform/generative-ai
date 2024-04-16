@@ -1,0 +1,8 @@
+customer_id,account_id,product,account_open_date,avg_monthly_bal,min_balance,default_status,account_close_date,last_payment_date,last_payment_amount,maturity_date,banking_partner_acc_flag,Banking_Partner_Name,Last_Due,current_balance
+592783,5927831234,Savings A/C ,2019-04-02,10000,,,,,,,,,,10000.0
+342345,8159823347,Vehicle Loan,2017-04-29,,,,2025-4-29,2023-09-27,,,,,,
+235813,1426853725,Home Loan,1997-10-10,,,,2027-10-10,2023-09-17,,,,,,
+235813,1100027689,Fixed Deposit,2002-02-03,5000000,0,,,,,2028-12-28,,,,
+342345,5634523468,Savings A/C ,2019-04-02,50000,0,,,2023-09-09,56,,,CymBank,,50000.0
+235813,1100023468,Premium Current A/C ,1999-04-02,3500000,0,,,2022-09-09,1000018,,,CymBank,,3500000.0
+235813,90347869012,Medical Insurance,2021-09-09,,,,,2022-09-09,72000,2031-09-09,Y ,India General Insurance,,

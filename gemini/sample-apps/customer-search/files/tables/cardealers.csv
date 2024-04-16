@@ -1,0 +1,31 @@
+brand,dealer_name,address,category
+, ,,
+BMW,BMW Deutsche Motoren,"222, 220, Whitefield Main Rd, Whitefield, Vinayaka Layout, Bengaluru, Karnataka 560066, India",Premium
+BMW,BMW KUN Exclusive Bengaluru I Hosur Road,"No.4, Konappanna Agrahara Near Electronic City, Hosur Road, Uttarahalli Hobli, Lavakusha Nagar, Konappanna Agrahara, Begur, Bengaluru, Karnataka 560100, India",Premium
+BMW,BMW KUN Exclusive Bengaluru,"Prestige Emerald, Ground Floor, Madras Bank Road, Lavelle Road, Bengaluru, Karnataka 560001, India",Premium
+Audi,Audi Service Bengaluru,"No 61, 62 & 65/A, NH 7, Hosur Rd, near Elevated Expressway Toll Gate, BTM Phase 1, Phase 2, Electronic City, Bengaluru, Karnataka 560100, India",Premium
+Audi,Audi Approved Plus Bengaluru,"Hosur Rd, BTM Phase 1, Phase 2, Electronic City, Bengaluru, Karnataka 560100, India",Premium
+Audi,Audi Bengaluru Central,"No 1 & 2, UB Plaza, Vittal Mallya Rd, Bengaluru, Karnataka 560001, India",Premium
+Audi,Audi Approved Plus,"XMWR+R87, Whitefield Rd, Maheswari Nagar, B Narayanapura, Mahadevapura, Bengaluru, Karnataka 560048, India",Premium
+Porsche,Porsche Centre Bengaluru,"Opp: BDA Head Office, 22, Sankey Rd, Military Compound, Seshadripuram, Bengaluru, Karnataka 560020, India",Premium
+Porsche,VST Supercars,"12/1, Sri Thyagi M Palanivelu Rd, Officers Colony, Agram, Bengaluru, Karnataka 560047, India",Premium
+Mercedes-Benz,Akshaya Motors Mercedes-Benz,"Valagerehalli Village, 77/1, Mysore Rd, opp. R V College of Engineering, Bengaluru, Karnataka 560059, India",Premium
+Mercedes-Benz,Advaith Motors Private Limited Mercedes Benz,"115, Srinivagilu Main Road, 4-C Block, Koramangala, Bangalore, Karnataka 560034, India",Premium
+Mercedes-Benz,Mercedes-Benz Sundaram Motors,"107, Kasturba Rd, opp. Venkatappa Art Gallery, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560001, India",Premium
+Tata,"Tata Motors Cars Showroom - KHT Motors, Domlur","100 Feet Rd, opposite Dell Exclusive Store, Krishna Reddy Layout, Amarjyoti Layout, Domlur, Bengaluru, Karnataka 560071, India",Standard
+Tata,"Tata Motors Cars Showroom - KHT Motors, Whitefield","No 736, Vijayalakshmi Square, Kundalahalli Main Rd, AECS Layout, Brookefield, Bengaluru, Karnataka 560066, India",Standard
+Tata,"Tata Motors Cars Showroom - Prerana Motors, Rajajinagar","No 46 2nd Stage, 10th Cross, near Navarang Under Pass, West of Chord Road 2nd Stage, West of Chord Road, Stage 2, Rajajinagar, Bengaluru, Karnataka 560079, India",Standard
+Tata,"Tata Motors Cars Showroom - Adishakti Cars, Hebbal","56 Hebbal Opposite Lumbini Gardens, Jogappa Layout, Nagavara, Bengaluru, Karnataka 560045, India",Standard
+Hyundai,Trident Hyundai Whitefield,"No.111, 124 & 125, Taluk, Whitefield, Kamadhenu Nagar, B Narayanapura, Mahadevapura, Bengaluru, Karnataka 560016, India",Standard
+Hyundai,Advaith Hyundai Car Showroom Residency Road,"32, Residency Rd, opp. Hotel Gateway, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560025, India",Standard
+Hyundai,Advaith Hyundai Car Showroom Avalahalli,"No. 58/1, Avalahalli Virgo Nagar Post, Old Madras Road, near Whitefield Main Road, Virgonagar Industrial Estate, Aavalahalli, Bengaluru, Karnataka 560049, India",Standard
+Hyundai,"Trident Hyundai Car Showroom, Indiranagar","No.9, HAL Old Airport, Main, Road, next to Carlton Towers, HAL 2nd Stage, Kodihalli, Bengaluru, Karnataka 560038, India",Standard
+Hyundai,"Advaith Hyundai Car Showroom, Vasanth Nagar","16, Millers Rd, Kaverappa Layout, Vasanth Nagar, Bengaluru, Karnataka 560052, India",Standard
+Mahindra,"Mahindra Anant Cars Showroom, Marathahalli","60, R.J Garden, Outer Ring Road, Opp To E-Zone Club Anandnagar ChinapanahalliMarathahalli Land Mark:, next to Domino's Pizza, R.J.Gardens, Anand Nagar, Sanjay Nagar, Chinnapanna Halli, Bengaluru, Karnataka 560037, India",Standard
+Mahindra,"Mahindra Sireesh Auto, Yelahanka","5 & 6, Bypass Road, opposite to Vidya Shilp Academy, Yelahanka, Bengaluru, Karnataka 56006 ",Standard
+Mahindra,"Mahindra Sireesh Auto, Silk Board","33/11, Sri Hari Towers, Silk Board, Hosur Rd, near Madiwala, Roopena Agrahara, Bommanahalli, Bengaluru, Karnataka 560068, India",Standard
+Maruti Suzuki,"Maruti Suzuki ARENA (Kalyani Motors, Bengaluru, Kalyannagar)","No.89/1, next to Royal Concorde School, Chellikere, Chelekare, Kalyan Nagar, Bengaluru, Karnataka 560043, India",Standard
+Maruti Suzuki,"Maruti Suzuki ARENA (Bimal Auto Agency, Bengalore, Domlur)","Bimal Auto Agency, No. 371 & 372, Sy nos 57, to, 82 of, Amarjyothi HBCS Layout, Domlur Village, Domlur, Bengaluru, Karnataka 560071, India",Standard
+Maruti Suzuki,Maruti Suzuki Car Showroom,"सर्विस मार्ग, Kariyammana Agrahara, Bellandur, Bengaluru, Karnataka 560103, India",Standard
+Maruti Suzuki,"NEXA (Bimal Auto Agency, Bengaluru, Marathalli)","62, Outer Ring Rd, Opposite EMC, Mahadevapura, Bengaluru, Karnataka 560048, India",Standard
+Maruti Suzuki,"Maruti Suzuki ARENA (Pratham Motors, Bengaluru, HSR Layout)","90/85/02, VRR Royal Commercial Complex, 21st A Main Road, 17th Cross Rd, Vanganahalli, 1st Sector, HSR Layout, Bengaluru, Karnataka 560102, India",Standard
