@@ -3,6 +3,7 @@ Utility module to work with app config.
 """
 
 from os.path import isfile
+
 import pytomlpp
 
 APP_TOML = "./app/app_config.toml"

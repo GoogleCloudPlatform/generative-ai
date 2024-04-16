@@ -16,12 +16,11 @@ It provides the following functionality:
 
 import base64
 
-import streamlit as st
 import app.pages_utils.utils as utils
-
+from app.pages_utils.utils_config import PAGES_CFG
 import app.pages_utils.utils_insights as utils_insights
 import app.pages_utils.utils_styles as utils_styles
-from app.pages_utils.utils_config import PAGES_CFG
+import streamlit as st
 
 # Initialize session state if not already
 if "initialize_session_state" not in st.session_state:
@@ -116,9 +115,9 @@ def display_suggestion_box(key, suggestion_num):
         key=key,
     ):
         # Update session state with selected suggestion
-        st.session_state.insights_placeholder = (
-            st.session_state.insights_suggestion[suggestion_num]
-        )
+        st.session_state.insights_placeholder = st.session_state.insights_suggestion[
+            suggestion_num
+        ]
         # Set flag to generate RAG answers
         st.session_state.rag_answers_gen = True
 
@@ -217,9 +216,7 @@ if st.session_state.rag_answers_gen is True:
     if st.session_state.dff.empty:
         # Display error message
         st.error(
-            "Add files in "
-            + st.session_state.product_category
-            + " file storage",
+            "Add files in " + st.session_state.product_category + " file storage",
             icon="🚨",
         )
     # Check if search term is empty

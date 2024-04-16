@@ -12,15 +12,10 @@ import asyncio
 import logging
 import os
 
-import streamlit as st
+from app.pages_utils.utils_get_llm_response import parallel_generate_search_results
+from app.pages_utils.utils_imagen import parallel_image_generation
 from dotenv import load_dotenv
-
-from app.pages_utils.utils_get_llm_response import (
-    parallel_generate_search_results,
-)
-from app.pages_utils.utils_imagen import (
-    parallel_image_generation,
-)
+import streamlit as st
 
 logging.basicConfig(
     format="%(levelname)s:%(message)s",
@@ -64,14 +59,10 @@ async def parallel_call(title_arr):
         # Parallel calls to generate new content.
         if st.session_state.content_generated is False:
             text_processes.append(
-                asyncio.create_task(
-                    parallel_generate_search_results(text_prompt)
-                )
+                asyncio.create_task(parallel_generate_search_results(text_prompt))
             )
             img_processes.append(
-                asyncio.create_task(
-                    parallel_image_generation(img_prompt, index)
-                )
+                asyncio.create_task(parallel_image_generation(img_prompt, index))
             )
 
     # Append the generated content to final resul arrays.
@@ -116,14 +107,11 @@ async def generate_product_content():
     """
 
     if st.session_state.product_content is None:
-        st.session_state.product_content = (
-            []
-        )  # Initialize product content storage
+        st.session_state.product_content = []  # Initialize product content storage
 
     elements = []
 
     with st.spinner("Generating Product Ideas.."):
-
         # Fetch appropriate titles for processing
         title_arr = await prepare_titles()
 
@@ -149,30 +137,20 @@ async def generate_product_content():
 
             # Generate content only if not already generated
             if st.session_state.content_generated is False:
-
                 if i < len(st.session_state.selected_titles):
                     current_content.append(text_result_arr[i])
-                    st.session_state.product_content.append(
-                        current_content
-                    )
+                    st.session_state.product_content.append(current_content)
                 else:
-                    st.session_state.assorted_prod_content.append(
-                        text_result_arr[i]
-                    )
+                    st.session_state.assorted_prod_content.append(text_result_arr[i])
 
                 # Build data for display elements
                 elements[i].append(
                     dict(
                         title=f"{title.strip()}",
                         text=(
-                            st.session_state.product_content[i][
-                                0
-                            ].strip()
-                            if i
-                            < len(st.session_state.product_content)
-                            else st.session_state.assorted_prod_content[
-                                0
-                            ]
+                            st.session_state.product_content[i][0].strip()
+                            if i < len(st.session_state.product_content)
+                            else st.session_state.assorted_prod_content[0]
                         ),
                         interval=None,
                         img=f"./gen_image{st.session_state.num_drafts*i+1}.png",
@@ -205,9 +183,7 @@ async def handle_content_generation(features):
     """
 
     if not st.session_state.selected_titles:
-        st.error(
-            "Please Select at least one Draft for Content Generation"
-        )
+        st.error("Please Select at least one Draft for Content Generation")
         return  # Stop execution if no titles are selected
 
     # features' is a UI element to be cleared
@@ -223,10 +199,6 @@ async def handle_content_generation(features):
     )
 
     # Prepare titles for processing.
-    st.session_state.chosen_titles = (
-        st.session_state.selected_titles.copy()
-    )
+    st.session_state.chosen_titles = st.session_state.selected_titles.copy()
     if len(st.session_state.selected_titles) > 1:
-        st.session_state.chosen_titles.append(
-            st.session_state.assorted_prod_title
-        )
+        st.session_state.chosen_titles.append(st.session_state.assorted_prod_title)

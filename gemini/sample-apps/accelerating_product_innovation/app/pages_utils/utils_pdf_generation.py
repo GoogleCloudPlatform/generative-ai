@@ -57,10 +57,7 @@ def check_add_page(pdf, text):
 
         for word in words:
             # Check if adding the word would exceed the line limit
-            if (
-                len(current_line + word)
-                > pdf.w - pdf.l_margin - pdf.r_margin
-            ):
+            if len(current_line + word) > pdf.w - pdf.l_margin - pdf.r_margin:
                 lines.append(current_line)
                 page_content += current_line + "\n"
                 current_line = ""  # Reset for the next line
@@ -70,9 +67,7 @@ def check_add_page(pdf, text):
             lines.append(current_line)
             # Check if adding the line would overflow the page
             if y + 10 > pdf.h - (80 if len(pages) == 0 else 0):
-                pages.append(
-                    page_content
-                )  # Add the new page to the PDF
+                pages.append(page_content)  # Add the new page to the PDF
                 page_content = current_line + "\n"  # Start a new page
                 y = 10
             else:

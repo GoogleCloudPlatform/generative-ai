@@ -5,10 +5,9 @@ the appearance of the product generation page.
 
 import base64
 
-import streamlit as st
 import app.pages_utils.utils as utils
-
 import app.pages_utils.utils_styles as utils_styles
+import streamlit as st
 
 
 def prod_gen_styles():
@@ -79,11 +78,17 @@ def initialize_prod_gen():
         utils.initialize_all_session_state()
         st.session_state.initialize_session_state = True
 
-    st.session_state.image_file_prefix = "gen_image"  # All images generated on this page have prefix 'gen_image'
+    st.session_state.image_file_prefix = (
+        "gen_image"  # All images generated on this page have prefix 'gen_image'
+    )
     st.session_state.image_to_edit = -1  # No image is being edited.
     st.session_state.text_to_edit = -1  # Text is not being edited
-    st.session_state.suggested_images = None  # Tracks whether image suggestions have been generated (on edit image).
-    st.session_state.generate_images = False  # Tracks whetehr images for product ideas have been generated.
+    st.session_state.suggested_images = (
+        None  # Tracks whether image suggestions have been generated (on edit image).
+    )
+    st.session_state.generate_images = (
+        False  # Tracks whetehr images for product ideas have been generated.
+    )
 
 
 def initialize_page(page_cfg):

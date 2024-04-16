@@ -4,12 +4,11 @@ Entry page of the streamlit application.
 
 import base64
 
-import streamlit as st
-from st_pages import show_pages_from_config
-
 import app.pages_utils.utils as utils
-import app.pages_utils.utils_styles as utils_styles
 from app.pages_utils.utils_config import PAGES_CFG
+import app.pages_utils.utils_styles as utils_styles
+from st_pages import show_pages_from_config
+import streamlit as st
 
 # Initialize session state if not already initialized
 if "initialize_session_state" not in st.session_state:

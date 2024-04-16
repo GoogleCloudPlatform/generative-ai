@@ -16,9 +16,7 @@ with a focus on guiding users through product generation. This module:
 import asyncio
 import logging
 
-import streamlit as st
 import app.pages_utils.utils as utils
-
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_downloads import (
     download_content,
@@ -40,6 +38,7 @@ from app.pages_utils.utils_product_features import (
     render_features,
 )
 from app.pages_utils.utils_product_gen import render_content
+import streamlit as st
 
 # Set product generation states
 initialize_prod_gen()
@@ -115,7 +114,6 @@ if (
             modify_selection(content)
 
     if st.session_state.create_product is True:
-
         # Email download Button
         with content_gen_btns[4]:
             email_dl_btn = st.button(

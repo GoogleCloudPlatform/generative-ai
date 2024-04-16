@@ -12,13 +12,9 @@ responsible for generating a PDF containing email content and an image.
 import logging
 import os
 
-import streamlit as st
-
-from app.pages_utils.utils_pdf_generation import (
-    add_formatted_page,
-    check_add_page,
-)
+from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
 from app.pages_utils.utils_pdf_template import PDFRounded as FPDF
+import streamlit as st
 
 logging.basicConfig(
     format="%(levelname)s:%(message)s", level=logging.DEBUG

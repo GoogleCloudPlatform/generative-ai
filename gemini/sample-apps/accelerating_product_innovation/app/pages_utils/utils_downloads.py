@@ -7,13 +7,10 @@ import base64
 import io
 import zipfile
 
+from app.pages_utils.utils_content_gen import generate_email
+from app.pages_utils.utils_export_content_pdf import create_content_pdf
 import streamlit as st
 import streamlit.components.v1 as components
-
-from app.pages_utils.utils_content_gen import generate_email
-from app.pages_utils.utils_export_content_pdf import (
-    create_content_pdf,
-)
 
 
 def download_button(object_to_download, download_filename):
@@ -29,17 +26,13 @@ def download_button(object_to_download, download_filename):
     # Create a BytesIO object to hold the zip file content
     zip_buffer = io.BytesIO()
 
-    with zipfile.ZipFile(
-        zip_buffer, "a", zipfile.ZIP_DEFLATED
-    ) as zip_file:
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED) as zip_file:
         if isinstance(object_to_download, bytes):
             # If it's already bytes (e.g., binary data), add it to the zip file
             zip_file.writestr(download_filename, object_to_download)
         else:
             # If it's not bytes, handle accordingly (modify as needed)
-            raise ValueError(
-                "Unsupported type for object_to_download"
-            )
+            raise ValueError("Unsupported type for object_to_download")
 
     # Get the BytesIO object's content as bytes
     zip_content = zip_buffer.getvalue()
@@ -75,9 +68,7 @@ def download_file():
 
             # Handle the case of multiple titles including assorted content
             if len(st.session_state.selected_titles) > 1:
-                prod_content.append(
-                    st.session_state.assorted_prod_content
-                )
+                prod_content.append(st.session_state.assorted_prod_content)
                 titles.append(st.session_state.assorted_prod_title)
 
             # Prepare file lists for the zip file
@@ -99,18 +90,14 @@ def download_file():
 
             # Create the zip file in memoryz
             buffer1 = io.BytesIO()
-            with zipfile.ZipFile(
-                buffer1, "a", zipfile.ZIP_DEFLATED
-            ) as zip_file:
+            with zipfile.ZipFile(buffer1, "a", zipfile.ZIP_DEFLATED) as zip_file:
                 for pdf_path, filename in zip(pdf_paths, filenames):
                     with open(pdf_path, "rb") as pdf_file:
                         zip_file.writestr(filename, pdf_file.read())
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(
-            buffer1.getvalue(), f"email_{email_file_title}.zip"
-        ),
+        download_button(buffer1.getvalue(), f"email_{email_file_title}.zip"),
         height=0,
     )
     st.success("Email Copies Downloaded")
@@ -127,9 +114,7 @@ def download_content():
         # Handle the case where assorted content is included
         if len(st.session_state.selected_titles) > 1:
             titles.append(st.session_state.assorted_prod_title)
-            prod_content.append(
-                st.session_state.assorted_prod_content
-            )
+            prod_content.append(st.session_state.assorted_prod_content)
         else:
             prod_content.append("")
 
@@ -155,18 +140,14 @@ def download_content():
         st.session_state.buffer = buffer
         buffer1 = io.BytesIO()
 
-        with zipfile.ZipFile(
-            buffer1, "a", zipfile.ZIP_DEFLATED
-        ) as zip_file:
+        with zipfile.ZipFile(buffer1, "a", zipfile.ZIP_DEFLATED) as zip_file:
             for pdf_path, filename in zip(pdf_paths, filenames):
                 with open(pdf_path, "rb") as pdf_file:
                     zip_file.writestr(filename, pdf_file.read())
 
     # Prepare download button with a dynamic filename
     components.html(
-        download_button(
-            buffer1.getvalue(), f"content_{titles[i]}.zip"
-        ),
+        download_button(buffer1.getvalue(), f"content_{titles[i]}.zip"),
         height=0,
     )
     st.success("Downloaded Content Zip.")

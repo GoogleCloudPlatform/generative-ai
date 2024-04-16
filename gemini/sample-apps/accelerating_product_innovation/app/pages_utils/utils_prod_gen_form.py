@@ -5,10 +5,8 @@ Functions include:
     * Facilitate the generation of product feature suggestions.
 """
 
+from app.pages_utils.utils_get_llm_response import generate_gemini
 import streamlit as st
-from app.pages_utils.utils_get_llm_response import (
-    generate_gemini,
-)
 
 
 def update_generation_state():
@@ -16,14 +14,10 @@ def update_generation_state():
 
     # Check whether custom prompt has been given.
     if st.session_state.custom_prompt != "":
-        st.session_state.selected_prompt = (
-            st.session_state.custom_prompt
-        )
+        st.session_state.selected_prompt = st.session_state.custom_prompt
         st.session_state.custom_prompt = ""
 
-    st.session_state.features_generated = (
-        True  # Initate feature generation
-    )
+    st.session_state.features_generated = True  # Initate feature generation
     st.session_state.generated_response = (
         None  # store the response by llm for features.
     )
@@ -35,12 +29,8 @@ def update_generation_state():
     st.session_state.selected_titles = (
         []
     )  # Stores selected titles for new product generation.
-    st.session_state.product_content = (
-        []
-    )  # Content corresponding to each feature.
-    st.session_state.content_edited = (
-        False  # Tracks whether content is being edited.
-    )
+    st.session_state.product_content = []  # Content corresponding to each feature.
+    st.session_state.content_edited = False  # Tracks whether content is being edited.
 
 
 def generate_product_suggestions_for_feature_generation():
@@ -58,9 +48,7 @@ def generate_product_suggestions_for_feature_generation():
             Give answer as a numbered list. Each point should strictly be only
             a category without any description."""
         )
-        st.session_state.feature_suggestions = create_suggestion_list(
-            feature_prompts
-        )
+        st.session_state.feature_suggestions = create_suggestion_list(feature_prompts)
 
 
 def build_prompt_form():

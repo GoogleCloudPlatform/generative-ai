@@ -15,10 +15,9 @@ import io
 import logging
 
 import PIL
-import streamlit as st
 from PIL import Image
-
 import app.pages_utils.utils as utils
+import streamlit as st
 
 logging.basicConfig(
     format="%(levelname)s:%(message)s", level=logging.DEBUG

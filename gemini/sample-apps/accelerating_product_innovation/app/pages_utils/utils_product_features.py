@@ -9,14 +9,11 @@ This module:
 import logging
 import os
 
-import streamlit as st
-from dotenv import load_dotenv
-
 from app.pages_utils.utils_get_llm_response import generate_gemini
+from dotenv import load_dotenv
+import streamlit as st
 
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 load_dotenv()
 
@@ -62,9 +59,7 @@ def _remove_title_from_selection(title: str) -> None:
         st.session_state.selected_titles.remove(title)
 
 
-def _render_box(
-    box_id: str, title: str, parts: list, style: str
-) -> None:
+def _render_box(box_id: str, title: str, parts: list, style: str) -> None:
     """Renders a box with the given title, parts, and style.
 
     Args:
@@ -223,9 +218,7 @@ def render_features(features: list) -> None:
 
                 # Rendering with appropriate styles
                 if title in st.session_state.selected_titles:
-                    _render_box(
-                        box_id, title, parts, CLICKED_BOX_STYLE
-                    )
+                    _render_box(box_id, title, parts, CLICKED_BOX_STYLE)
                 else:
                     _render_box(box_id, title, parts, BOX_STYLE)
 
