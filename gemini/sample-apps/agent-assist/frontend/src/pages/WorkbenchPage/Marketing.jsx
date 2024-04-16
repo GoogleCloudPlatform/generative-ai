@@ -6,12 +6,12 @@ import DisplayCard from "../../components/DisplayCard";
 const BACKENDURL = process.env.REACT_APP_API_URL;
 
 const Marketing = (props) => {
-  const { startDate, endDate, period } = props;
+  const { marketingStartDate, marketingEndDate, period } = props;
   const [marketingAndOutreachData, setMarketingAndOutreachData] = useState({});
   function fetchData() {
     axios
       .get(
-        `${BACKENDURL}/workbench/marketingandoutreach?startDate=${startDate}&endDate=${endDate}`,
+        `${BACKENDURL}/workbench/marketingandoutreach?startDate=${marketingStartDate}&endDate=${marketingEndDate}`,
       )
       .then((res) => {
         setMarketingAndOutreachData(res.data);
@@ -24,7 +24,7 @@ const Marketing = (props) => {
   // Use useEffect to fetch data when startDate or endDate changes
   useEffect(() => {
     fetchData();
-  }, [startDate, endDate]);
+  }, [marketingStartDate, marketingEndDate]);
 
   return (
     <>

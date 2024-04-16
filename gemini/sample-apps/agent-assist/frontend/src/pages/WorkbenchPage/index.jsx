@@ -92,29 +92,29 @@ export default function WorkBenchPage() {
       {/* Render the appropriate component based on the current tab */}
       {value === 0 && (
         <Performance
-          startDate={startDate.format("YYYY-MM-DD")}
-          endDate={endDate.format("YYYY-MM-DD")}
+          performanceStartDate={startDate.format("YYYY-MM-DD")}
+          performanceEndDate={endDate.format("YYYY-MM-DD")}
           period={period}
         />
       )}
       {value === 1 && (
         <LeadsSales
-          startDate={startDate.format("YYYY-MM-DD")}
-          endDate={endDate.format("YYYY-MM-DD")}
+          leadsSalesStartDate={startDate.format("YYYY-MM-DD")}
+          leadsSalesEndDate={endDate.format("YYYY-MM-DD")}
           period={period}
         />
       )}
       {value === 2 && (
         <CustomerManagement
-          startDate={startDate.format("YYYY-MM-DD")}
-          endDate={endDate.format("YYYY-MM-DD")}
+          customerManagementStartDate={startDate.format("YYYY-MM-DD")}
+          customerManagementEndDate={endDate.format("YYYY-MM-DD")}
           period={period}
         />
       )}
       {value === 3 && (
         <Marketing
-          startDate={startDate.format("YYYY-MM-DD")}
-          endDate={endDate.format("YYYY-MM-DD")}
+          marketingStartDate={startDate.format("YYYY-MM-DD")}
+          marketingEndDate={endDate.format("YYYY-MM-DD")}
           period={period}
         />
       )}

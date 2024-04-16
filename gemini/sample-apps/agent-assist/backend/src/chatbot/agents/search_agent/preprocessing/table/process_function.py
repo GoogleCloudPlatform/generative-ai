@@ -1,5 +1,5 @@
 from src.chatbot.agents.search_agent.preprocessing.table.one_shot.prompt import (
-    PROMPT_FOR_TABLE, 
+    PROMPT_FOR_TABLE,
 )
 from src.chatbot.agents.search_agent.preprocessing.table.text_bison import TextBison
 
