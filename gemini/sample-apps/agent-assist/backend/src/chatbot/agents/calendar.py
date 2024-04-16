@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import dateutil
+from dateutil.parser import parse
 
 from utils.cal import Calendar
 from utils.gemini_text import GeminiText
@@ -87,7 +87,7 @@ def calendar_component(query: str, chat_history: str = "[]") -> dict:
     gemini = GeminiText()
     response = gemini.generate_response(PROMPT.format(query=query))
 
-    response = response[response.find("OUTPUT:") + 7 :]
+    response = response[response.find("OUTPUT:") + 7:]
     response = response.strip()
     if response != "INVALID":
         response_dict = eval(response)
@@ -97,9 +97,9 @@ def calendar_component(query: str, chat_history: str = "[]") -> dict:
             end_time = response_dict["end_time"]
             meet_date_str = response_dict["date"]
 
-            start_time = dateutil.parser.parse(start_time).time()
-            end_time = dateutil.parser.parse(end_time).time()
-            meet_date = dateutil.parser.parse(meet_date_str, dayfirst=True).date()
+            start_time = parse(start_time).time()
+            end_time = parse(end_time).time()
+            meet_date = parse(meet_date_str, dayfirst=True).date()
 
             startDateTime = datetime(
                 meet_date.year,
@@ -127,9 +127,9 @@ def calendar_component(query: str, chat_history: str = "[]") -> dict:
                 endDateTime,
             )
 
-            response["event"] = event
+            response_dict["event"] = event
 
-    return response
+    return response_dict
 
 
 if __name__ == "__main__":

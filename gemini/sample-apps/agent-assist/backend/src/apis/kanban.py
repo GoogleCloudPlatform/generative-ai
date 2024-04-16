@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from flask import jsonify, request
 
@@ -24,7 +24,7 @@ def get_kanban_data() -> tuple[dict, int]:
     userData: Dict[str, Any] = {str(user["userid"]): user for user in data}
 
     # Create a dictionary of the kanban board, where the key is the column name and the value is a list of user IDs.
-    finalData: Dict[str, List[str]] = {
+    finalData: Dict[str, Any] = {
         "initial-contact": [],
         "needs-analysis": [],
         "proposal-sent": [],

@@ -1,7 +1,8 @@
 import json
 from datetime import datetime
+from typing import Any, List
 
-from chatbot import orchestration_engine
+from chatbot.orchestration_engine import run_orchestrator
 
 
 def chatbot_entry(data: dict = {}) -> dict:
@@ -15,12 +16,12 @@ def chatbot_entry(data: dict = {}) -> dict:
         dict: A dictionary of data representing the output from the chatbot.
     """
     if type(data.get("query")) is not list:
-        chat_history = []
+        chat_history: List[Any] = [""]
 
     query = data.get("query")
     chat_history = data.get("chat_history")
 
-    chat_history = process_history(chat_history)
+    chat_history_string = process_history(chat_history)
     with open("data/static/oe_examples/logs.json") as f:
         logs = json.load(f)
 
@@ -28,13 +29,13 @@ def chatbot_entry(data: dict = {}) -> dict:
         {
             "datetime": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             "query": query,
-            "chat_history": chat_history,
+            "chat_history": chat_history_string,
         }
     )
     with open("data/static/oe_examples/logs.json", "w") as f:
         json.dump(logs, f)
 
-    result = orchestration_engine.run(query, chat_history)
+    result = run_orchestrator(query, chat_history_string)
     return result
 
 

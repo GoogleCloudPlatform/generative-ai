@@ -117,8 +117,8 @@ function Bot({ open, setOpen }) {
         },
       }}
     >
-      <div className="App">
-        <header className="App-header">
+      <div className="app">
+        <header className="app-header">
           {/* Render the Chatbot component with the appropriate props */}
           <Chatbot
             config={getConfig()}

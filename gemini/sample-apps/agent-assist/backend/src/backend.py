@@ -145,7 +145,7 @@ app.add_url_rule(
 def handle_chatbot(data):
     print(data)
     emit("chat", ["Generating..."])
-    chatbot_response = chatbot.chatbot(data)
+    chatbot_response = chatbot.chatbot_entry(data)
     print(chatbot_response)
     emit("chat", ["Done"])
 

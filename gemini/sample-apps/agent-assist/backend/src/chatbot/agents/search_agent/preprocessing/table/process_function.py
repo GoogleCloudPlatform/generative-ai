@@ -1,5 +1,5 @@
-from .one_shot.prompt import PROMPT_FOR_TABLE
-from .text_bison import TextBison
+from src.chatbot.agents.search_agent.preprocessing.table.one_shot.prompt import PROMPT_FOR_TABLE
+from src.chatbot.agents.search_agent.preprocessing.table.text_bison import TextBison
 
 
 def processTable(table_df_string: str) -> str:

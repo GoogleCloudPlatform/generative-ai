@@ -99,12 +99,12 @@ class Calendar:
         # print(event)
         return event
 
-    def get_events_by_date(self, event_date: datetime) -> list[dict]:
+    def get_events_by_date(self, event_date: str) -> list[dict]:
         """
         Gets all events on the user's calendar for a given date.
 
         Args:
-            event_date (datetime): The date to get events for in YYYY-MM-DD format.
+            event_date (str): The date to get events for in YYYY-MM-DD format.
 
         Returns:
             list[dict]: A list of events on the user's calendar for the given date.

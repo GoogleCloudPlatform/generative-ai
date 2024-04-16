@@ -26,10 +26,11 @@ def get_data_from_threads(service, emailid, threads) -> tuple:
         (tuple)(str, datetime): A tuple containing the email thread content and the last contacted date.
     """
     returnStr = ""
-    date = {"value": None}
+    date_value = datetime(1666, 10, 10)
+    date = {"value": date_value}
     for thread in threads:
         tdata = service.users().threads().get(userId="me", id=thread["id"]).execute()
-        date = {"value": None}
+        date = {"value": date_value}
         mailids = [
             x["value"]
             for x in tdata["messages"][0]["payload"]["headers"]
@@ -61,7 +62,7 @@ def get_data_from_threads(service, emailid, threads) -> tuple:
                         subject = ""
 
                     try:
-                        if date["value"] is None:
+                        if date["value"] == date_value:
                             date = [
                                 x
                                 for x in data["payload"]["headers"]

@@ -307,7 +307,7 @@ Step 1:
 """
 
 
-def run(query, chat_history):
+def run_orchestrator(query, chat_history):
     """Run function to execute the plan and generate the response.
 
     Args:
@@ -335,7 +335,7 @@ def run(query, chat_history):
     end_index = actions.find("ACTION:")
     plan = "Step 1: \n " + actions[:end_index]
 
-    actions = actions[actions.find("ACTION:") + 7 :]
+    actions = actions[actions.find("ACTION:") + 7:]
     actions = actions.strip("[] ")
     actions = actions.split("<PYTHON>")[1:]
     actions = [action[: action.find("</PYTHON>")].strip() for action in actions]
@@ -361,4 +361,4 @@ def run(query, chat_history):
 
 
 if __name__ == "__main__":
-    run("Compare Homeshield and Bharat Griha Raksha Plus and send this to channit", [])
+    run_orchestrator("Compare Homeshield and Bharat Griha Raksha Plus and send this to channit", [])

@@ -139,7 +139,7 @@
   background-color: #001f61;
   border-radius: 10px 10px 0 0;
   color: #fff;
-  font-family: Muli, sans-serif;
+  font-family: "Muli", "sans-serif";
   padding: 7px 15px;
   position: fixed;
   bottom: 0;
@@ -175,7 +175,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-family: "Muli", sans-serif;
+  font-family: "Muli", "sans-serif";
   position: relative;
   height: 169px;
   width: 370px;
@@ -224,7 +224,7 @@
 .social-panel h4 {
   margin: 20px 0;
   color: #97a5ce;
-  font-family: Muli, sans-serif;
+  font-family: "Muli", "sans-serif";
   font-size: 14px;
   line-height: 18px;
   text-transform: uppercase;
