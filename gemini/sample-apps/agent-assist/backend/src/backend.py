@@ -1,19 +1,18 @@
+from datetime import datetime
 import pathlib
 import secrets
 import time
-from datetime import datetime
 
-import dateutil
-from flask import Flask, jsonify, render_template, request
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-
+from apis import calendar, chatbot, email, generateMail, kanban
 import apis.customermanagement as customermanagement
 import apis.leadsandsales as leadsandsales
 import apis.marketingandoutreach as marketingandoutreach
 import apis.performance as performance
-from apis import calendar, chatbot, email, generateMail, kanban
+import dateutil
+from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
 from flask_session import Session
+from flask_socketio import SocketIO, emit
 from utils.cal import Calendar
 from utils.get_email_threads import get_email_threads_summary
 from utils.get_users import get_users

@@ -1,7 +1,6 @@
+from config import config
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel
-
-from config import config
 
 parameters = {
     "max_output_tokens": 1024,

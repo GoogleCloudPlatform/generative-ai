@@ -1,18 +1,17 @@
 import datetime
-import imaplib
-import os
-import smtplib
 from email.mime.application import MIMEApplication
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+import imaplib
+import os
 from os.path import basename
+import smtplib
 from typing import Any
 
-import markdown
-
 from config import config
+import markdown
 
 
 class Mail:

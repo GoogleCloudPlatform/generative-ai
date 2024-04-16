@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from flask import jsonify
-
 from utils.cal import Calendar
 
 

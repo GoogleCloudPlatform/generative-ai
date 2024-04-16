@@ -1,9 +1,8 @@
-import vertexai
+from config import config
 from langchain.chains import ConversationChain
 from langchain.chat_models import ChatVertexAI
 from langchain.memory import ConversationBufferMemory
-
-from config import config
+import vertexai
 
 PROMPT = """
 You are an expert in English Language.
