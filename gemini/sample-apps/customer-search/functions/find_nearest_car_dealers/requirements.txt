@@ -1,0 +1,7 @@
+functions-framework==3.*
+google-cloud-bigquery
+google-cloud-aiplatform
+pillow==9.5.0; python_version < '3.8'
+pillow==10.0.0; python_version >= '3.8'
+google-cloud-storage
+ghostscript
