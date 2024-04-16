@@ -1,5 +1,6 @@
-import functions_framework
 import re
+
+import functions_framework
 
 
 def get_number_of_days(fd_tenure: str) -> int:

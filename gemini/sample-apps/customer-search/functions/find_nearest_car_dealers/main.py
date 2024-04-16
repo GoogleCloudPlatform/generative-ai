@@ -1,9 +1,10 @@
+from os import environ
+
 import functions_framework
-import requests
 from google.cloud import bigquery
+import requests
 import vertexai
 from vertexai.language_models import TextGenerationModel
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 api_key = environ.get("API_KEY")
@@ -11,7 +12,6 @@ api_key = environ.get("API_KEY")
 
 @functions_framework.http
 def hello_http(request):
-
     headers = {"Content-Type": "application/json"}
 
     request_json = request.get_json(silent=True)

@@ -1,8 +1,9 @@
-import functions_framework
 import json
-import requests
-from google.cloud import translate
 from os import environ
+
+import functions_framework
+from google.cloud import translate
+import requests
 
 project_id = environ.get("PROJECT_ID")
 
@@ -171,7 +172,6 @@ def hello_http(request):
                 return (res, 200, headers)
 
         elif tag == "set-default-params":
-
             set_default_param_url = environ.get("SET_DEFAULT_PARAM_URL")
             todo = {}
             set_default_param_headers = {"Content-Type": "application/json"}
@@ -198,7 +198,6 @@ def hello_http(request):
             return (set_default_param_json, 200, headers)
 
         elif tag == "account-summary":
-
             url = environ.get("ACCOUNT_SUMMARY_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -207,21 +206,18 @@ def hello_http(request):
             headers = {"Access-Control-Allow-Origin": "*"}
 
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
 
             return (res_json, 200, headers)
 
         elif tag == "account-balance":
-
             url = environ.get("ACCOUNT_BALANCE_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -246,7 +242,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "account-tips":
-
             url = environ.get("ACCOUNT_TIPS_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -256,21 +251,18 @@ def hello_http(request):
             headers = {"Access-Control-Allow-Origin": "*"}
 
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
 
             return (res_json, 200, headers)
 
         elif tag == "category-wise-expenditure":
-
             url = environ.get("CATEGORIZE_EXPENSE_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -278,15 +270,13 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
                 for i in range(
                     len(
@@ -308,7 +298,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "credit-card-recommendation":
-
             url = environ.get("CREDIT_CARD_RECOMM_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -330,7 +319,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "create-credit-card":
-
             url = environ.get("CREDIT_CARD_CREATE_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -352,7 +340,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "debt_fund_webhook":
-
             url = environ.get("DEBT_FUND_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -375,7 +362,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "event":
-
             url = environ.get("EVENT_RECOMM_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -383,20 +369,17 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
             return (res_json, 200, headers)
 
         elif tag == "expense-prediction":
-
             url = environ.get("EXPENSE_PREDICT_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -419,7 +402,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "fd-recommendation":
-
             url = environ.get("FD_RECOMM_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -441,7 +423,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "fd_confirmation":
-
             url = environ.get("FD_CONFIRM_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -449,20 +430,17 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
             return (res_json, 200, headers)
 
         elif tag == "fd_tenure":
-
             url = environ.get("FD_TENURE_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -484,7 +462,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "high-risk-mutual-fund":
-
             url = environ.get("HIGH_RISK_MF_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -492,20 +469,17 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
             return (res_json, 200, headers)
 
         elif tag == "recommend-mutual-fund":
-
             url = environ.get("MF_RECOMM_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -513,20 +487,17 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
             return (res_json, 200, headers)
 
         elif tag == "create-fd":
-
             url = environ.get("FD_CREATE_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -548,7 +519,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "recommend-debt-fund":
-
             url = environ.get("DEBT_FUND_RECOMM_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -571,7 +541,6 @@ def hello_http(request):
             return (res_json, 200, headers)
 
         elif tag == "unusual-expense":
-
             url = environ.get("UNUSUAL_EXPENSE_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -579,20 +548,17 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
             return (res_json, 200, headers)
 
         elif tag == "find_nearest_dealer":
-
             url = environ.get("FIND_NEAREST_DEALER_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}
@@ -600,20 +566,17 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_text(
-                        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                            0
-                        ],
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_text(
+                    res_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
+                    project_id,
+                    "en-US",
+                    source_language_code,
                 )
             return (res_json, 200, headers)
 
         elif tag == "travel":
-
             url = environ.get("TRAVEL_EVENT_RECOMM_URL")
             todo = {}
             headers = {"Content-Type": "application/json"}

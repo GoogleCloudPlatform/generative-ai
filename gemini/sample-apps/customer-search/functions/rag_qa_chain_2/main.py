@@ -1,37 +1,33 @@
-import functions_framework
-
-import os
-import urllib.request
-
 import json
+import os
+from os import environ
 import textwrap
 
 # Utils
 import time
 from typing import List
+import urllib.request
 
-import vertexai
+import functions_framework
 
+# from langchain.agents import AgentType, initialize_agent
+from langchain.agents import tool
+from langchain.chains import RetrievalQA
+from langchain.document_loaders import WebBaseLoader
+from langchain.embeddings import VertexAIEmbeddings
+from langchain.llms import VertexAI
+from langchain.prompts import PromptTemplate
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 import nest_asyncio
-
+from utils.matching_engine import MatchingEngine
+from utils.matching_engine_utils import MatchingEngineUtils
+import vertexai
+from vertexai.language_models import TextGenerationModel
 
 # Vertex AI
 
 # LangChain
 
-from langchain.chains import RetrievalQA
-from langchain.embeddings import VertexAIEmbeddings
-from langchain.llms import VertexAI
-
-# from langchain.agents import AgentType, initialize_agent
-from langchain.agents import tool
-from langchain.prompts import PromptTemplate
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import WebBaseLoader
-from vertexai.language_models import TextGenerationModel
-from os import environ
-from utils.matching_engine import MatchingEngine
-from utils.matching_engine_utils import MatchingEngineUtils
 
 project_id = environ.get("PROJECT_ID")
 
@@ -224,7 +220,7 @@ class BaseModelMixin:
             # documents per request to get embeddings
             head, docs = (
                 docs[: self.num_instances_per_batch],
-                docs[self.num_instances_per_batch:],
+                docs[self.num_instances_per_batch :],
             )
             chunk = self.client.get_embeddings(head)
             results.extend(chunk)

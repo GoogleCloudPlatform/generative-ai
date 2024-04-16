@@ -1,12 +1,13 @@
+import datetime
+from datetime import date
+from os import environ
+import random
+import re
+
 import functions_framework
 from google.cloud import bigquery
 import vertexai
 from vertexai.language_models import TextGenerationModel
-import datetime
-from datetime import date
-import re
-import random
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 

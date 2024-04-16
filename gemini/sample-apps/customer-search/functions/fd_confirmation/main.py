@@ -1,7 +1,8 @@
+from os import environ
+
 import functions_framework
 import vertexai
 from vertexai.language_models import TextGenerationModel
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 PUBLIC_BUCKET = environ.get("PUBLIC_BUCKET")

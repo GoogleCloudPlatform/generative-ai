@@ -1,11 +1,11 @@
-import functions_framework
-from google.cloud import bigquery
-import plotly.graph_objects as go
-from google.cloud import storage
+from os import environ
 import uuid
+
+import functions_framework
+from google.cloud import bigquery, storage
+import plotly.graph_objects as go
 import vertexai
 from vertexai.language_models import TextGenerationModel
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 
