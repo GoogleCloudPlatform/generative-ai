@@ -1,6 +1,7 @@
+from os import environ
+
 import functions_framework
 import requests
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 

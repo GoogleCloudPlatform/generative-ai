@@ -1,15 +1,15 @@
+from os import environ
+
 import functions_framework
 from google.cloud import bigquery
 import vertexai
 from vertexai.language_models import TextGenerationModel
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
 def hello_http(request):
-
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

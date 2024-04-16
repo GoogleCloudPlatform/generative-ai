@@ -1,14 +1,14 @@
+import os
+from os import environ
+import tempfile
+
 import functions_framework
-from google.cloud import storage
-from google.cloud import bigquery
+from google.cloud import bigquery, storage
+import pandas as pd
+import plotly.express as px
+import plotly.io as pio
 import vertexai
 from vertexai.language_models import TextGenerationModel
-import plotly.express as px
-import pandas as pd
-import os
-import tempfile
-import plotly.io as pio
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 public_bucket = environ.get("PUBLIC_BUCKET")
@@ -141,7 +141,6 @@ def create_predicted_expense_table(customer_id):
 
 @functions_framework.http
 def hello_http(request):
-
     request_json = request.get_json(silent=True)
 
     print(request_json)
@@ -299,7 +298,6 @@ def hello_http(request):
 
     print(len(payment_list))
     if len(payment_list) > 1:
-
         custom_payload = [
             {
                 "payload": {

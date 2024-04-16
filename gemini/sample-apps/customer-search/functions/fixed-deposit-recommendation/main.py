@@ -1,9 +1,10 @@
+import datetime
+from os import environ
+
 import functions_framework
 from google.cloud import bigquery
 import vertexai
 from vertexai.language_models import TextGenerationModel
-import datetime
-from os import environ
 
 project_id = environ.get("PROJECT_ID")
 

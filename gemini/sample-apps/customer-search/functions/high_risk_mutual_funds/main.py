@@ -1,10 +1,10 @@
+from concurrent.futures import ThreadPoolExecutor
+from typing import Dict
+
 import functions_framework
-from google.cloud import bigquery
+from google.cloud import bigquery, storage
 import vertexai
 from vertexai.language_models import TextGenerationModel
-from google.cloud import storage
-from typing import Dict
-from concurrent.futures import ThreadPoolExecutor
 
 client: bigquery.Client = bigquery.Client()
 

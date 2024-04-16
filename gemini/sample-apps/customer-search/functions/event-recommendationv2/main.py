@@ -1,14 +1,14 @@
-import functions_framework
-from google.cloud import bigquery
-from google.cloud import storage
-import vertexai
-from vertexai.preview.vision_models import ImageGenerationModel
-from vertexai.language_models import TextGenerationModel
 import os
-import tempfile
-import string
-import random
 from os import environ
+import random
+import string
+import tempfile
+
+import functions_framework
+from google.cloud import bigquery, storage
+import vertexai
+from vertexai.language_models import TextGenerationModel
+from vertexai.preview.vision_models import ImageGenerationModel
 
 project_id = environ.get("PROJECT_ID")
 # customer_id = 342345

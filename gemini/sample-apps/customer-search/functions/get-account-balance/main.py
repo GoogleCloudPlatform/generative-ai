@@ -1,8 +1,9 @@
+from os import environ
+
 import functions_framework
 from google.cloud import bigquery
-from vertexai.language_models import TextGenerationModel
 import vertexai
-from os import environ
+from vertexai.language_models import TextGenerationModel
 
 project_id = environ.get("PROJECT_ID")
 

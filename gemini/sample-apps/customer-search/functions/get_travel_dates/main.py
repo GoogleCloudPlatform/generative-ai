@@ -18,7 +18,6 @@ def is_date_later_than(start_date, end_date):
 
 @functions_framework.http
 def hello_http(request):
-
     request_json = request.get_json(silent=True)
 
     print(request_json["sessionInfo"]["parameters"])
