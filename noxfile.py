@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,17 +22,19 @@ import os
 import pathlib
 import re
 import shutil
+from typing import Dict, List
 import warnings
 
 import nox
 
-BLACK_VERSION = "black[jupyter]==23.3.0"
+FLAKE8_VERSION = "flake8==6.1.0"
+BLACK_VERSION = "black[jupyter]==23.7.0"
 ISORT_VERSION = "isort==5.11.0"
 LINT_PATHS = ["."]
 
 DEFAULT_PYTHON_VERSION = "3.8"
 
-UNIT_TEST_PYTHON_VERSIONS = ["3.7", "3.8", "3.9", "3.10", "3.11"]
+UNIT_TEST_PYTHON_VERSIONS: List[str] = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
 UNIT_TEST_STANDARD_DEPENDENCIES = [
     "mock",
     "asyncmock",
@@ -40,23 +42,23 @@ UNIT_TEST_STANDARD_DEPENDENCIES = [
     "pytest-cov",
     "pytest-asyncio",
 ]
-UNIT_TEST_EXTERNAL_DEPENDENCIES = []
-UNIT_TEST_LOCAL_DEPENDENCIES = []
-UNIT_TEST_DEPENDENCIES = []
-UNIT_TEST_EXTRAS = []
-UNIT_TEST_EXTRAS_BY_PYTHON = {}
+UNIT_TEST_EXTERNAL_DEPENDENCIES: List[str] = []
+UNIT_TEST_LOCAL_DEPENDENCIES: List[str] = []
+UNIT_TEST_DEPENDENCIES: List[str] = []
+UNIT_TEST_EXTRAS: List[str] = []
+UNIT_TEST_EXTRAS_BY_PYTHON: Dict[str, List[str]] = {}
 
-SYSTEM_TEST_PYTHON_VERSIONS = ["3.8"]
-SYSTEM_TEST_STANDARD_DEPENDENCIES = [
+SYSTEM_TEST_PYTHON_VERSIONS: List[str] = ["3.8"]
+SYSTEM_TEST_STANDARD_DEPENDENCIES: List[str] = [
     "mock",
     "pytest",
     "google-cloud-testutils",
 ]
-SYSTEM_TEST_EXTERNAL_DEPENDENCIES = []
-SYSTEM_TEST_LOCAL_DEPENDENCIES = []
-SYSTEM_TEST_DEPENDENCIES = []
-SYSTEM_TEST_EXTRAS = []
-SYSTEM_TEST_EXTRAS_BY_PYTHON = {}
+SYSTEM_TEST_EXTERNAL_DEPENDENCIES: List[str] = []
+SYSTEM_TEST_LOCAL_DEPENDENCIES: List[str] = []
+SYSTEM_TEST_DEPENDENCIES: List[str] = []
+SYSTEM_TEST_EXTRAS: List[str] = []
+SYSTEM_TEST_EXTRAS_BY_PYTHON: Dict[str, List[str]] = {}
 
 CURRENT_DIRECTORY = pathlib.Path(__file__).parent.absolute()
 
@@ -69,6 +71,7 @@ nox.options.sessions = [
     "lint_setup_py",
     "blacken",
     "docs",
+    "format",
 ]
 
 # Error if a python version is missing
@@ -82,7 +85,7 @@ def lint(session):
     Returns a failure if the linters find linting errors or sufficiently
     serious code quality issues.
     """
-    session.install("flake8", BLACK_VERSION)
+    session.install(FLAKE8_VERSION, BLACK_VERSION)
     session.run(
         "black",
         "--check",
@@ -112,9 +115,7 @@ def format(session):
     # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
     session.run(
         "isort",
-        "--profile=google",
         "--fss",
-        "--known-local-folder=main",
         *LINT_PATHS,
     )
     session.run(
@@ -280,7 +281,16 @@ def docs(session):
 
     session.install("-e", ".")
     session.install(
-        "sphinx==4.0.1",
+        # We need to pin to specific versions of the `sphinxcontrib-*` packages
+        # which still support sphinx 4.x.
+        # See https://github.com/googleapis/sphinx-docfx-yaml/issues/344
+        # and https://github.com/googleapis/sphinx-docfx-yaml/issues/345.
+        "sphinxcontrib-applehelp==1.0.4",
+        "sphinxcontrib-devhelp==1.0.2",
+        "sphinxcontrib-htmlhelp==2.0.1",
+        "sphinxcontrib-qthelp==1.0.3",
+        "sphinxcontrib-serializinghtml==1.1.5",
+        "sphinx==4.5.0",
         "alabaster",
         "recommonmark",
     )
@@ -300,16 +310,24 @@ def docs(session):
     )
 
 
-@nox.session(python="3.9")
+@nox.session(python="3.10")
 def docfx(session):
     """Build the docfx yaml files for this library."""
 
     session.install("-e", ".")
     session.install(
-        "sphinx==4.0.1",
+        # We need to pin to specific versions of the `sphinxcontrib-*` packages
+        # which still support sphinx 4.x.
+        # See https://github.com/googleapis/sphinx-docfx-yaml/issues/344
+        # and https://github.com/googleapis/sphinx-docfx-yaml/issues/345.
+        "sphinxcontrib-applehelp==1.0.4",
+        "sphinxcontrib-devhelp==1.0.2",
+        "sphinxcontrib-htmlhelp==2.0.1",
+        "sphinxcontrib-qthelp==1.0.3",
+        "sphinxcontrib-serializinghtml==1.1.5",
+        "gcp-sphinx-docfx-yaml",
         "alabaster",
         "recommonmark",
-        "gcp-sphinx-docfx-yaml",
     )
 
     shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
@@ -381,6 +399,7 @@ def prerelease_deps(session):
         "grpcio!=1.52.0rc1",
         "grpcio-status",
         "google-api-core",
+        "google-auth",
         "proto-plus",
         "google-cloud-testutils",
         # dependencies of google-cloud-testutils"
@@ -393,7 +412,6 @@ def prerelease_deps(session):
     # Remaining dependencies
     other_deps = [
         "requests",
-        "google-auth",
     ]
     session.install(*other_deps)
 
@@ -402,6 +420,7 @@ def prerelease_deps(session):
         "python", "-c", "import google.protobuf; print(google.protobuf.__version__)"
     )
     session.run("python", "-c", "import grpc; print(grpc.__version__)")
+    session.run("python", "-c", "import google.auth; print(google.auth.__version__)")
 
     session.run("py.test", "tests/unit")
 

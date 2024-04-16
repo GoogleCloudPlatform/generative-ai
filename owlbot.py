@@ -15,7 +15,7 @@
 import synthtool as s
 import synthtool.gcp as gcp
 
-templated_files = gcp.CommonTemplates().py_library()
+templated_files = gcp.CommonTemplates().python_notebooks()
 
 # Copy the standard noxfile from templated_files
 s.move(templated_files / "noxfile.py")
@@ -27,15 +27,8 @@ s.replace(
     r"""LINT_PATHS = ["."]""",
 )
 
-# TODO: Remove once https://github.com/googleapis/synthtool/pull/1811 is merged.
-s.replace(
-    "noxfile.py",
-    r"""BLACK_VERSION = "black==22.3.0"\nISORT_VERSION = "isort==5.10.1""",
-    r"""BLACK_VERSION = "black[jupyter]==23.3.0"\nISORT_VERSION = "isort==5.11.0""",
-)
-
 # ----------------------------------------------------------------------------
 # Run blacken session
 # ----------------------------------------------------------------------------
 
-s.shell.run(["nox", "-s", "blacken"], hide_output=False)
+s.shell.run(["nox", "-s", "format"], hide_output=False)

@@ -1,0 +1,7 @@
+{
+  "extends": "stylelint-config-standard",
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "customSyntax": "scss"
+}

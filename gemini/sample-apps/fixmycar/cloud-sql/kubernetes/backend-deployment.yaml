@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fixmycar-backend
+  labels:
+    app: fixmycar-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fixmycar-backend
+  template:
+    metadata:
+      labels:
+        app: fixmycar-backend
+    spec:
+      serviceAccountName: fixmycar
+      containers:
+        - name: fixmycar-backend
+          image: us-central1-docker.pkg.dev/PROJECT-ID/fixmycar/backend-cloud-sql:latest
+          imagePullPolicy: Always
+          env:
+            - name: CLOUDSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cloudsql-instance-credentials
+                  key: username
+            - name: CLOUDSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudsql-instance-credentials
+                  key: password
+            - name: GCP_PROJECT_ID
+              value: "PROJECT-ID"
+            - name: LOG_LEVEL
+              value: "debug"
+          ports:
+            - containerPort: 3100
+          resources:
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+          env:
+            - name: INSTANCE_CONNECTION_NAME
+              value: "PROJECT-ID:us-central1:fixmycar"
+          args:
+            - "--port=5432"
+            - "$(INSTANCE_CONNECTION_NAME)"
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "3Gi"
+              cpu: "2"
