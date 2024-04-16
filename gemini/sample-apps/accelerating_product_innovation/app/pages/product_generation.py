@@ -18,10 +18,7 @@ import logging
 
 import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
-from app.pages_utils.utils_downloads import (
-    download_content,
-    download_file,
-)
+from app.pages_utils.utils_downloads import download_content, download_file
 from app.pages_utils.utils_draft_generation import ProductDrafts
 from app.pages_utils.utils_prod_gen_form import (
     build_prompt_form,
@@ -51,9 +48,7 @@ initialize_page(page_cfg)
 prod_gen_styles()
 
 # logging initialization
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 # page title
 st.write(
@@ -71,10 +66,8 @@ if generate_btn:
 # After form submission, generate product features
 if st.session_state.features_generated is True:
     if st.session_state.generated_response is None:
-        st.session_state.generated_response = (
-            generate_formatted_response(
-                st.session_state.selected_prompt
-            )
+        st.session_state.generated_response = generate_formatted_response(
+            st.session_state.selected_prompt
         )
         st.session_state.generated_points = None
 
@@ -133,8 +126,5 @@ if (
                 )
 
     # If user clicks edit image, redirect to edit page
-    if (
-        st.session_state.image_to_edit != -1
-        or st.session_state.generate_images is True
-    ):
+    if st.session_state.image_to_edit != -1 or st.session_state.generate_images is True:
         st.switch_page("pages/edit_image.py")

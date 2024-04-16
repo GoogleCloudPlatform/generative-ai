@@ -75,17 +75,11 @@ def create_content_pdf(product_content, selected_titles):
         images = []
 
         # Build content and image lists for the current product
-        content.append(
-            product_content[product_index][0]["text"].replace(
-                "**", ""
-            )
-        )
+        content.append(product_content[product_index][0]["text"].replace("**", ""))
         images.append(st.session_state.num_drafts * product_index + 1)
 
         # Generate the PDF layout
-        create_pdf_layout(
-            pdf, content, selected_titles[product_index], images
-        )
+        create_pdf_layout(pdf, content, selected_titles[product_index], images)
 
         # Save the PDF with an appropriate filename
         print("SAVING")

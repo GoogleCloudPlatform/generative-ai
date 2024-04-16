@@ -20,9 +20,7 @@ import numpy as np
 import streamlit as st
 
 load_dotenv()
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 st.session_state.image_file_prefix = "email_image"
 
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -61,15 +59,11 @@ def generate_email(prompt, title):
 
         # Read Byte data of the image.
         image_data = io.BytesIO(
-            base64.b64decode(
-                st.session_state.email_image[0]["bytesBase64Encoded"]
-            )
+            base64.b64decode(st.session_state.email_image[0]["bytesBase64Encoded"])
         )
 
         # Save image to display on pdf file.
-        image_array = cv2.imdecode(
-            np.frombuffer(image_data.read(), dtype=np.uint8), 1
-        )
+        image_array = cv2.imdecode(np.frombuffer(image_data.read(), dtype=np.uint8), 1)
         cv2.imwrite("email_image1.png", image_array)
 
         # Generate pdf containing the email content and image.
@@ -79,6 +73,4 @@ def generate_email(prompt, title):
             f"email_copy_0_{title}",
             "email_image1.png",
         )
-        st.session_state.email_files.append(
-            f"email_copy_0_{title}.pdf"
-        )
+        st.session_state.email_files.append(f"email_copy_0_{title}.pdf")

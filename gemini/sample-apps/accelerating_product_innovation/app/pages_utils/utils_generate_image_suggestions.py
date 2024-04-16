@@ -18,9 +18,7 @@ import logging
 from app.pages_utils.utils_imagen import edit_image_generation
 import streamlit as st
 
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
 def download_image(image_data, image_name):
@@ -54,9 +52,7 @@ def render_suggested_images(suggested_images, generated_images):
     num_suggestions_per_row = 3
 
     # Iterate over image rows.
-    for row_start in range(
-        0, len(suggested_images), num_suggestions_per_row
-    ):
+    for row_start in range(0, len(suggested_images), num_suggestions_per_row):
         # Create columns to display each image.
         suggestion_cols = st.columns(num_suggestions_per_row)
         for col_index, col in enumerate(suggestion_cols):
@@ -75,14 +71,10 @@ def render_suggested_images(suggested_images, generated_images):
                 # Add download button for current suggestion.
                 image_data = io.BytesIO(
                     base64.b64decode(
-                        generated_images[image_index][
-                            "bytesBase64Encoded"
-                        ]
+                        generated_images[image_index]["bytesBase64Encoded"]
                     )
                 )
-                download_image(
-                    image_data, f"suggestion_{image_index}.png"
-                )
+                download_image(image_data, f"suggestion_{image_index}.png")
 
 
 def _handle_edit_suggestion(image_index):
@@ -90,9 +82,7 @@ def _handle_edit_suggestion(image_index):
     # Get Byte data of the image.
     image_data = io.BytesIO(
         base64.b64decode(
-            st.session_state.generated_image[image_index][
-                "bytesBase64Encoded"
-            ]
+            st.session_state.generated_image[image_index]["bytesBase64Encoded"]
         )
     )
     # Save image.
@@ -103,10 +93,10 @@ def _handle_edit_suggestion(image_index):
     st.session_state.edit_suggestion = (
         True  # Track whether a suggestion is being edited.
     )
-    st.session_state.image_file_prefix = "suggestion"  # Image saved with prefix suggestion is beig edited.
-    st.session_state.image_to_edit = (
-        0  # Track which image is being edited
+    st.session_state.image_file_prefix = (
+        "suggestion"  # Image saved with prefix suggestion is beig edited.
     )
+    st.session_state.image_to_edit = 0  # Track which image is being edited
     st.session_state.mask_image = None  # Reset Mask
     st.rerun()
 
@@ -122,9 +112,7 @@ def generate_suggested_images(image_prompt, image_bytes, mask_image):
         mask_image (BytesIO or None): Mask defining the region to edit (optional).
     """
 
-    st.session_state.suggested_images = (
-        []
-    )  # Clear previous suggestions
+    st.session_state.suggested_images = []  # Clear previous suggestions
     with st.spinner("Generating suggested images"):
         edit_image_completed = edit_image_generation(
             image_prompt,
@@ -137,15 +125,9 @@ def generate_suggested_images(image_prompt, image_bytes, mask_image):
     # Append newly generated suggestions to suggested images state key.
     if edit_image_completed:
         for image_data in st.session_state.generated_image:
-            encoded_image = base64.b64decode(
-                image_data["bytesBase64Encoded"]
-            )
-            st.session_state.suggested_images.append(
-                io.BytesIO(encoded_image)
-            )
+            encoded_image = base64.b64decode(image_data["bytesBase64Encoded"])
+            st.session_state.suggested_images.append(io.BytesIO(encoded_image))
     else:
         st.session_state.suggested_images = None
     # End image generation.
-    st.session_state.generate_images = (
-        False  # Update generation state
-    )
+    st.session_state.generate_images = False  # Update generation state

@@ -37,9 +37,7 @@ initialize_edit_page_state()
 page_cfg = PAGES_CFG["Editor"]
 
 # Set the page configuration
-st.set_page_config(
-    page_title=page_cfg["page_title"], page_icon=page_cfg["page_icon"]
-)
+st.set_page_config(page_title=page_cfg["page_title"], page_icon=page_cfg["page_icon"])
 
 # Apply the sidebar style
 utils_styles.sidebar_apply_style(
@@ -48,19 +46,14 @@ utils_styles.sidebar_apply_style(
 )
 
 # Set up logging
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 # Check if the user has uploaded an image
 if st.session_state.uploaded_img is True:
     handle_image_upload()
 
 # Check if the user has started editing the image
-if (
-    st.session_state.start_editing is None
-    or st.session_state.start_editing is True
-):
+if st.session_state.start_editing is None or st.session_state.start_editing is True:
     # Initialize Editor
     image_editor = ImageEditor()
 
@@ -80,10 +73,7 @@ if (
             save_draft_image(row, col, image, drafts)
 
     # Check if drawing exists on the canvas (i.e., not blank)
-    if (
-        canvas_result.image_data is not None
-        and canvas_result.image_data.any()
-    ):
+    if canvas_result.image_data is not None and canvas_result.image_data.any():
         # Convert canvas data to a PIL Image object
         foreground = Image.fromarray(canvas_result.image_data)
 

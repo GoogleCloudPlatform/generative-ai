@@ -78,9 +78,7 @@ def get_suggestions(state_key):
     print("CONTEXT")
     print(context)
     gen_suggestions = generate_gemini(prompt)
-    st.session_state[state_key] = extract_bullet_points(
-        gen_suggestions
-    )
+    st.session_state[state_key] = extract_bullet_points(gen_suggestions)
 
 
 def check_if_file_uploaded():
@@ -92,14 +90,10 @@ def check_if_file_uploaded():
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)
     bucket = storage_client.bucket("product_innovation_bucket")
-    blob = bucket.blob(
-        st.session_state.product_category + "/embeddings.json"
-    )
+    blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
     if blob.exists():
         stored_embedding_data = blob.download_as_string()
-        dff = pd.DataFrame.from_dict(
-            json.loads(stored_embedding_data)
-        )
+        dff = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
         st.session_state["processed_data_list"] = dff
     else:
         dff = pd.DataFrame()
@@ -115,9 +109,7 @@ def split_text(row):
     Returns:
         generator: A generator of chunks.
     """
-    chunk_iter = utils_resources_store_embeddings.get_chunks_iter(
-        row, 2000
-    )
+    chunk_iter = utils_resources_store_embeddings.get_chunks_iter(row, 2000)
     return chunk_iter
 
 
@@ -135,9 +127,7 @@ def get_dot_product(row):
     return np.dot(row, st.session_state["query_vectors"])
 
 
-def get_filter_context_from_vectordb(
-    question: str = "", sort_index_value: int = 3
-):
+def get_filter_context_from_vectordb(question: str = "", sort_index_value: int = 3):
     """Gets the filter context from the vector database.
 
     Args:
@@ -158,23 +148,17 @@ def get_filter_context_from_vectordb(
     )
 
     top_matched_df = st.session_state["processed_data_list"][
-        st.session_state["processed_data_list"].index.isin(
-            top_matched_score.index
-        )
+        st.session_state["processed_data_list"].index.isin(top_matched_score.index)
     ]
     top_matched_df = top_matched_df[
         ["file_name", "page_number", "chunk_number", "content"]
     ]
     top_matched_df["confidence_score"] = top_matched_score
-    top_matched_df.sort_values(
-        by=["confidence_score"], ascending=False, inplace=True
-    )
+    top_matched_df.sort_values(by=["confidence_score"], ascending=False, inplace=True)
 
     context = "\n".join(
         st.session_state["processed_data_list"][
-            st.session_state["processed_data_list"].index.isin(
-                top_matched_score.index
-            )
+            st.session_state["processed_data_list"].index.isin(top_matched_score.index)
         ]["content"].values
     )
     return (context, top_matched_df)
