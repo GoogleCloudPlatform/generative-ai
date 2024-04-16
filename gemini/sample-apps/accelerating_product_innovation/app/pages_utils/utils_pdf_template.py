@@ -122,7 +122,7 @@ class PDFRounded(fpdf.FPDF):
         h = self.h
         self._out(
             f"""{x1 * self.k:.2f}
-             {(h - y1) * self.k:.2f} {x2 * self.k:.2f} 
-            {(h - y2) * self.k:.2f} {x3 * self.k:.2f} 
+             {(h - y1) * self.k:.2f} {x2 * self.k:.2f}
+            {(h - y2) * self.k:.2f} {x3 * self.k:.2f}
             {(h - y3) * self.k:.2f} c"""
         )

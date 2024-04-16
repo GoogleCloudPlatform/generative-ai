@@ -1,12 +1,12 @@
 """
-This module provides the 'create_email_pdf' function, 
+This module provides the 'create_email_pdf' function,
 responsible for generating a PDF containing email content and an image.
 
 * PDF Structure:
     * Includes the email's subject as a heading.
     * Incorporates the email body text.
-    * Embeds a specified image. 
-* Formatting:  Applies layout and styling to the PDF content. 
+    * Embeds a specified image.
+* Formatting:  Applies layout and styling to the PDF content.
 """
 
 import logging
@@ -14,10 +14,15 @@ import os
 
 import streamlit as st
 
-from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
+from app.pages_utils.utils_pdf_generation import (
+    add_formatted_page,
+    check_add_page,
+)
 from app.pages_utils.utils_pdf_template import PDFRounded as FPDF
 
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(
+    format="%(levelname)s:%(message)s", level=logging.DEBUG
+)
 
 
 def create_email_pdf(title, email_text, filename, image_name):
@@ -41,7 +46,13 @@ def create_email_pdf(title, email_text, filename, image_name):
     pdf.set_xy(15, 15)
     pdf.set_text_color(106, 144, 226)
     pdf.set_font("Arial", "B", 11)
-    pdf.multi_cell(180, 5, f"{title} {st.session_state.product_category}", 0, align="C")
+    pdf.multi_cell(
+        180,
+        5,
+        f"{title} {st.session_state.product_category}",
+        0,
+        align="C",
+    )
 
     pdf.set_text_color(0, 0, 0)
 

@@ -1,5 +1,5 @@
 """
-This module provides functions for initializing and customizing 
+This module provides functions for initializing and customizing
 the appearance of the product generation page.
 """
 

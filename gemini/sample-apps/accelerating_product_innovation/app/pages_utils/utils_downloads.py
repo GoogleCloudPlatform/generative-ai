@@ -1,5 +1,5 @@
 """
-This module provides functions for downloading generated content (emails, product content) 
+This module provides functions for downloading generated content (emails, product content)
 as zip archives.
 """
 

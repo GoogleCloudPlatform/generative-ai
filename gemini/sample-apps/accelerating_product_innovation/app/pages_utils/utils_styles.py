@@ -15,7 +15,7 @@ STYLE_SIDEBAR = """
             margin-top: 10%;
             background-size: 80% ;
         }}
-        
+
         [data-testid="stDecoration"] {{
             background-image: linear-gradient(90deg, rgb(51 103 214), rgb(93 135 222));
         }}
@@ -28,7 +28,7 @@ STYLE_SIDEBAR = """
         .rounded-button {{
             font-family: "Source Sans Pro", sans-serif;
             display: inline-block; /* Allows for padding and other block properties on the <a> element */
-            border: 1px solid #d6d6d9ff; 
+            border: 1px solid #d6d6d9ff;
             background-color: transparent; /* Transparent background */
             padding: 6px 13px; /* Spacing inside the button */
             border-radius: 7px; /* Rounded corners */

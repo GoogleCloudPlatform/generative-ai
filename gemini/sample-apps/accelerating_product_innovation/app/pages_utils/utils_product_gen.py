@@ -1,10 +1,10 @@
 """
-This module  provides functions for generating and managing product 
-content based on selected features. 
+This module  provides functions for generating and managing product
+content based on selected features.
 Functions include:
-  
+
     * Initiate text and image generation with user-provided features.
-    * Store the generated content for display.  
+    * Store the generated content for display.
     * Support content generation with asynchronous calls.
 """
 
@@ -53,12 +53,12 @@ async def parallel_call(title_arr):
         # Create image generation and text generation prompts.
         img_prompt = f"{st.session_state.product_category} with {title} packaging."
         text_prompt = f"""Generate an innovative and original idea for a
-        {st.session_state.product_category} that is {title} for 
-        {st.session_state.selected_prompt}. List ingredients of the suggested product. 
-        List benefits for different demographics of consumers of the product. 
-        The answer should strictly be very long and detailed and capture all features of 
-        the suggested product. Separately give the utility of the product for any 
-        three example consumer segments. Strictly demonstrate how the suggested product is 
+        {st.session_state.product_category} that is {title} for
+        {st.session_state.selected_prompt}. List ingredients of the suggested product.
+        List benefits for different demographics of consumers of the product.
+        The answer should strictly be very long and detailed and capture all features of
+        the suggested product. Separately give the utility of the product for any
+        three example consumer segments. Strictly demonstrate how the suggested product is
         an improvement over existing products."""
 
         # Parallel calls to generate new content.

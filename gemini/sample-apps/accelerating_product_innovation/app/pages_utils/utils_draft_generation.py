@@ -1,5 +1,5 @@
 """
-This module defines the 'ProductDrafts' class, responsible 
+This module defines the 'ProductDrafts' class, responsible
 for managing and displaying product content drafts.
 """
 
@@ -104,9 +104,9 @@ class ProductDrafts:
                     # Update content
                     with st.spinner("Updating Content..."):
                         new_text_prompt = f"""Prompt: Based on the given query
-                                            change the given context and give only the revised 
-                                            context. 
-                                            Query: {st.session_state.text_edit_prompt} 
+                                            change the given context and give only the revised
+                                            context.
+                                            Query: {st.session_state.text_edit_prompt}
                                             Context:{st.session_state.text_to_edit} """
                         # Generate new text.
                         text = generate_gemini(new_text_prompt)

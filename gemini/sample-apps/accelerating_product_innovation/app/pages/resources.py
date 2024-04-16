@@ -8,7 +8,7 @@ This module manages the "Resources" page of the Streamlit application. Key funct
     * Enables file uploads (txt, docx, pdf, csv).
     * Handles conversion and storage of uploaded files.
     * Lists stored project files.
-    * Provides download and delete options for stored files. 
+    * Provides download and delete options for stored files.
 """
 
 import base64
@@ -191,10 +191,10 @@ if st.session_state.project_form_submitted is True:
                     BACKGROUND_COLOR = "white"
                 st.write(
                     f"""<div style=
-                        'background-color: {BACKGROUND_COLOR}; 
-                        padding: 10px; 
-                        margin-bottom: 0px; 
-                        margin-top: 0px; 
+                        'background-color: {BACKGROUND_COLOR};
+                        padding: 10px;
+                        margin-bottom: 0px;
+                        margin-top: 0px;
                         border-radius:10px;'>{file[0][len_prod_cat:]}</div>""",
                     unsafe_allow_html=True,
                 )

@@ -1,10 +1,10 @@
 """
 This module provides functions for interacting with the Google Cloud Storage (GCS)
-bucket, specifically for managing projects and their associated files.  
+bucket, specifically for managing projects and their associated files.
 This module:
-    * Retrieves a list of existing projects from the GCS bucket. 
+    * Retrieves a list of existing projects from the GCS bucket.
     * Updates the project list stored in the GCS bucket.
-    * Lists PDF, text, and other supported file types in the current project's GCS bucket. 
+    * Lists PDF, text, and other supported file types in the current project's GCS bucket.
     * Deletes an entire project and its contents from the GCS bucket.
     * Deletes a specific file from the GCS project.
 """
@@ -79,7 +79,7 @@ def list_pdf_files_gcs() -> list[tuple[str, str]]:
     It then returns a list of tuples of the blob name and the file extension.
 
     Returns:
-        list[tuple[str, str]]: A list of tuples of the blob name and the file extension.
+        list[list[Any]]: A list of tuples of the blob name and the file extension.
     """
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)

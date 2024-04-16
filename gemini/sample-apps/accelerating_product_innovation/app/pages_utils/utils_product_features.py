@@ -3,7 +3,7 @@ This module provides functions for rendering product feature drafts and managing
 This module:
     * Fetches a product feature response from the LLM, ensuring a specific format.
     * Displays draft features in a grid layout with checkboxes for selection.
-    * Facilitates the modification of selected features, updating the UI accordingly. 
+    * Facilitates the modification of selected features, updating the UI accordingly.
 """
 
 import logging
@@ -169,13 +169,13 @@ def generate_formatted_response(prompt):
     """
     with st.spinner("Fetching Response..."):
         generated_response = generate_gemini(
-            f""" {prompt} in 12 points. The answer should strictly 
-            be a numbered list. Every bullet point should be strictly 
-            less than 150 characters. Each point should strictly have 
-            the format of title followed by description separated by ':'. 
-            Every bullet point should strictly have exactly one title. 
-            Use of bold text should be avoided strictly. 
-            Each title should strictly be a combination of 2 or 
+            f""" {prompt} in 12 points. The answer should strictly
+            be a numbered list. Every bullet point should be strictly
+            less than 150 characters. Each point should strictly have
+            the format of title followed by description separated by ':'.
+            Every bullet point should strictly have exactly one title.
+            Use of bold text should be avoided strictly.
+            Each title should strictly be a combination of 2 or
             more features."""
         )
         formatted_response = generated_response.replace("**", "")

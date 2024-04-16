@@ -36,7 +36,7 @@ Follow the below steps to deploy the solution to Cloud Run environment.
    - `generated_products`: Stores output images, descriptions, etc.
    - `image_edits`: Stores intermediate/modified images during the regenerative process.
 
-   #### Using the GCP Console (Web Interface):
+   **Using the GCP Console (Web Interface):**
 
    - Navigate to the [Google Cloud Storage section](https://console.cloud.google.com/storage/browser) of your GCP console.
    - Click on the "Create Bucket" button.
@@ -47,15 +47,16 @@ Follow the below steps to deploy the solution to Cloud Run environment.
      - **Advanced Settings**: Adjust encryption, access control, etc., if necessary.
    - Click "Create".
 
-   #### Using the 'gsutil' Command-Line Tool:
+   **Using the 'gsutil' Command-Line Tool:**
 
    - Ensure you have the gcloud SDK installed and 'gsutil' configured.
    - Run the following command in your terminal, replacing `<region>` with your desired bucket location:
+
      ```bash
      gsutil mb -l <region> gs://product_innovation_bucket
      ```
 
-### Environment Setup:
+### Environment Setup
 
 1. Ensure that the `configure_resources` script is in the directory containing the solution's code.
 2. Edit the file named `env.txt` within the same directory and populate it with the same values as mentioned above.
@@ -65,20 +66,23 @@ Follow the below steps to deploy the solution to Cloud Run environment.
    - gemini-call/main.py
    - text-embedding/main.py
 
-4. **Execute the Script**:
-   - Open a terminal and navigate to the directory containing the script and `env.txt` file.
-   - Run the script `configure-resources.sh` using the command:
-     ```bash
-     sh configure-resources.sh
-     ```
-   - The script will:
-     - Parse `env.txt` to obtain project details.
-     - Initialize gcloud and set project configuration.
-     - Set up a service account with necessary IAM roles.
-     - Deploy Cloud Functions (`imagen-call`, `gemini-call`, `text-embedding`).
-     - Capture URLs for deployed Cloud Functions.
-     - Deploy the main application to Cloud Run.
-   - Ensure that the service account has been created and manually grant the following roles to the created service account `retail-accelerating-prod-i-982@[PROJECT_ID].iam.gserviceaccount.com`:
-     - Service account user
-     - Cloud Run Admin
-     - Cloud Storage Admin
+### Execute the Script
+
+- Open a terminal and navigate to the directory containing the script and `env.txt` file.
+- Run the script `configure-resources.sh` using the command:
+
+  ```bash
+  sh configure-resources.sh
+  ```
+
+- The script will:
+  - Parse `env.txt` to obtain project details.
+  - Initialize gcloud and set project configuration.
+  - Set up a service account with necessary IAM roles.
+  - Deploy Cloud Functions (`imagen-call`, `gemini-call`, `text-embedding`).
+  - Capture URLs for deployed Cloud Functions.
+  - Deploy the main application to Cloud Run.
+- Ensure that the service account has been created and manually grant the following roles to the created service account `retail-accelerating-prod-i-982@[PROJECT_ID].iam.gserviceaccount.com`:
+  - Service account user
+  - Cloud Run Admin
+  - Cloud Storage Admin

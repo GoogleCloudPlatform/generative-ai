@@ -18,7 +18,9 @@ import cv2
 import numpy as np
 import aiohttp
 
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(
+    format="%(levelname)s:%(message)s", level=logging.DEBUG
+)
 
 # Set project parameters
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -34,11 +36,15 @@ IMAGE_UPLOAD_BYTES_LIMIT = 4096
 # The AI Platform services require regional API endpoints.
 client_options = {"api_endpoint": IMAGEN_API_ENDPOINT}
 # Initialize client that will be used to create and send requests.
-imagen_client = aiplatform.gapic.PredictionServiceClient(client_options=client_options)
+imagen_client = aiplatform.gapic.PredictionServiceClient(
+    client_options=client_options
+)
 
 
 def predict_image(
-    instance_dict: dict, parameters: dict, endpoint_name: str = IMAGEN_ENDPOINT
+    instance_dict: dict,
+    parameters: dict,
+    endpoint_name: str = IMAGEN_ENDPOINT,
 ):
     """Predicts the output of imagen on a given instance dict.
     Args:
@@ -58,7 +64,9 @@ def predict_image(
     instances = [instance]
     parameters_client = json_format.ParseDict(parameters, Value())
     response = imagen_client.predict(
-        endpoint=endpoint_name, instances=instances, parameters=parameters_client
+        endpoint=endpoint_name,
+        instances=instances,
+        parameters=parameters_client,
     )
     return response.predictions
 
@@ -124,13 +132,19 @@ def edit_image_generation(
     """
     input_dict = {
         "prompt": prompt,
-        "image": {"bytesBase64Encoded": base64.b64encode(bytes_data).decode("utf-8")},
+        "image": {
+            "bytesBase64Encoded": base64.b64encode(bytes_data).decode(
+                "utf-8"
+            )
+        },
     }
 
     if mask_bytes_data:
         input_dict["mask"] = {
             "image": {
-                "bytesBase64Encoded": base64.b64encode(mask_bytes_data).decode("utf-8")
+                "bytesBase64Encoded": base64.b64encode(
+                    mask_bytes_data
+                ).decode("utf-8")
             }
         }
 
@@ -151,20 +165,29 @@ async def parallel_image_generation(prompt: str, col: int):
         col (int): A pointer to the draft number of the image.
     """
     data = {"img_prompt": prompt}
-    data = json.dumps(data)
+    data_json = json.dumps(data)
     logging.debug("Image call start")
     headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
         url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
         async with session.post(
-            url, data=data, headers=headers, verify_ssl=False
+            url, data=data_json, headers=headers, verify_ssl=False
         ) as response:
             logging.debug("Inside IF else of session")
             if response.status == 200:
                 response = await response.read()
-                response = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
-                cv2.imwrite(f"gen_image{st.session_state.num_drafts+col}.png", response)
+                response = cv2.imdecode(
+                    np.frombuffer(response, dtype=np.uint8), 1
+                )
+                cv2.imwrite(
+                    f"gen_image{st.session_state.num_drafts+col}.png",
+                    response,
+                )
                 return response
             else:
-                print("Request failed:", response.status, await response.text())
+                print(
+                    "Request failed:",
+                    response.status,
+                    await response.text(),
+                )
     logging.debug("Image call end")

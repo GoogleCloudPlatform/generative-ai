@@ -1,13 +1,13 @@
 """
-This module provides functions for processing uploaded files, generating text embeddings, 
+This module provides functions for processing uploaded files, generating text embeddings,
 and managing data within the Google Cloud Storage (GCS) bucket.
 
 This module:
-    * Parses different file formats (CSV, text, Word, PDF), extracts 
+    * Parses different file formats (CSV, text, Word, PDF), extracts
     text, splits it into chunks, and creates data packets.
     * Leverages `embedding_model_with_backoff` to embed text chunks.
     * Uploads processed data packets to a GCS bucket.
-    * Stores embeddings alongside their associated metadata. 
+    * Stores embeddings alongside their associated metadata.
 """
 
 import asyncio
@@ -154,7 +154,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
     # Make request data payload
     json_data = pdf_data["content"].to_json()
     data = {"pdf_data": json_data}
-    data = json.dumps(data)
+    data_json = json.dumps(data)
     # Make request headers
     headers = {"Content-Type": "application/json"}
 
@@ -164,7 +164,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
 
         # Call cloud function to generate embeddings with data and headers.
         async with session.post(
-            url, data=data, headers=headers, verify_ssl=False
+            url, data=data_json, headers=headers, verify_ssl=False
         ) as response:
             logging.debug("Inside IF else of session")
 

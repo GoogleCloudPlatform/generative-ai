@@ -1,11 +1,14 @@
 """
-This module provides functions for creating content PDFs with specific 
+This module provides functions for creating content PDFs with specific
 layouts and formatting.
 """
 
 import streamlit as st
 
-from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
+from app.pages_utils.utils_pdf_generation import (
+    add_formatted_page,
+    check_add_page,
+)
 from app.pages_utils.utils_pdf_template import PDFRounded as FPDF
 
 
@@ -28,7 +31,11 @@ def create_pdf_layout(pdf, content, title, images):
         pdf.set_text_color(106, 144, 226)
         pdf.set_font("Arial", "B", 11)
         pdf.multi_cell(
-            180, 5, f"{title} {st.session_state.product_category}", 0, align="C"
+            180,
+            5,
+            f"{title} {st.session_state.product_category}",
+            0,
+            align="C",
         )
 
         # Reset text color
@@ -72,11 +79,17 @@ def create_content_pdf(product_content, selected_titles):
         images = []
 
         # Build content and image lists for the current product
-        content.append(product_content[product_index][0]["text"].replace("**", ""))
+        content.append(
+            product_content[product_index][0]["text"].replace(
+                "**", ""
+            )
+        )
         images.append(st.session_state.num_drafts * product_index + 1)
 
         # Generate the PDF layout
-        create_pdf_layout(pdf, content, selected_titles[product_index], images)
+        create_pdf_layout(
+            pdf, content, selected_titles[product_index], images
+        )
 
         # Save the PDF with an appropriate filename
         print("SAVING")

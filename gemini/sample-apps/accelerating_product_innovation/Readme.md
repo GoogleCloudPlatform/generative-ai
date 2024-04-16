@@ -38,7 +38,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
        - Remove Files: Delete documents that are outdated or no longer relevant to the project goals.
        - Delete Project: Entirely remove the project and all the resources associated with it.
 
-#### 1. Document Upload
+### 1. Document Upload
 
 <p align="center">
   <img src="./readme_images/resource_upload.gif" alt="Image Description" width="600"/>
@@ -51,7 +51,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
   - Spreadsheets: .xlsx, .csv
   - Text Files: .txt, .md
 
-#### 2. Product Insights
+### 2. Product Insights
 
 - **Dynamic Suggestions**
 
@@ -84,7 +84,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **Benefits**
   - **Document Compatibility**: The AI-Powered Question Answering functionality is optimized for document types including: Market Research Reports, Consumer Feedback Surveys, Internal Trend Analyses.
 
-#### 3. Product Generation
+### 3. Product Generation
 
 - **Dynamic Sample Queries**
 
@@ -121,7 +121,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
      <img src="./readme_images/product.png" alt="Image Description" width="600"/>
   </p>
 
-#### 4. Selective Regeneration
+### 4. Selective Regeneration
 
 - **Objective**: Enables users to zero in on specific areas of the product concept that they wish to modify without re-generating the whole concept from scratch.
 - **Functionality**: Text Modification, Image Modification, Whole Product Regeneration.
@@ -130,7 +130,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
         <img src="./readme_images/text_regen.gif" alt="Image Description" width="600"/>
     </p>
 
-#### 5. Export Content
+### 5. Export Content
 
 - **Objective**: Once you've refined your product concept through the iterative process, the solution provides seamless ways to share your work and integrate it into your broader product development workflows.
 - **Functionalities**: PDF Export, Export/Download, Email Export.

@@ -1,5 +1,5 @@
 """
-Cloud Function for getting text response from Gemini API. 
+Cloud Function for getting text response from Gemini API.
 (Required for parallel image generation)
 """
 

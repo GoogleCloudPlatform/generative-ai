@@ -1,13 +1,13 @@
 """
-This module manages the 'Insights' page of the Streamlit application. 
+This module manages the 'Insights' page of the Streamlit application.
 It provides the following functionality:
 
 * Project Management: Displays currently selected project.
-* Data Handling:  
+* Data Handling:
     * Checks for uploaded files in the specified project category.
     * Loads File Data (if uploaded files exist).
 * Question & Answer (QA):
-    * Offers suggested questions for insights (requires uploaded data) 
+    * Offers suggested questions for insights (requires uploaded data)
       through Retreival Augmented Generation.
     * Enables users to input their own questions.
     * Generates answers to questions based on uploaded data, including references.
@@ -148,7 +148,10 @@ else:
         with st.spinner("Loading suggestion..."):
             utils_insights.get_suggestions("insights_suggestion")
             # Check if number of suggestions is less than 4
-            if len(st.session_state.insights_suggestion) < 4:
+            if (
+                st.session_state.insights_suggestion is not None
+                and len(st.session_state.insights_suggestion) < 4
+            ):
                 utils_insights.get_suggestions("insights_suggestion")
 
     # Check if suggestions are loaded
@@ -220,7 +223,7 @@ if st.session_state.rag_answers_gen is True:
             icon="🚨",
         )
     # Check if search term is empty
-    elif search_term is "":
+    elif search_term == "":
         # Display error message
         st.error(
             "Write the query to get the answer",

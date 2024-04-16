@@ -1,16 +1,16 @@
 """
-This module manages the 'Generations' page in the Streamlit application, 
+This module manages the 'Generations' page in the Streamlit application,
 with a focus on guiding users through product generation. This module:
 
 * Project Management: Displays the project selected by the user.
-* Prompt-Based Generation: 
+* Prompt-Based Generation:
    * Provides a form for users to specify product characteristics.
-   * Generates product features based on the provided input. 
-* Content Drafts: 
+   * Generates product features based on the provided input.
+* Content Drafts:
    * Creates and displays new product ideas based on generated features.
    * Allows users to modify their selected features and content drafts.
 * Export Options:  Enables downloading generated content and creating email copies.
-* Image Editing:  Facilitates redirection to an image editing page. 
+* Image Editing:  Facilitates redirection to an image editing page.
 """
 
 import asyncio
@@ -20,7 +20,10 @@ import streamlit as st
 import app.pages_utils.utils as utils
 
 from app.pages_utils.utils_config import PAGES_CFG
-from app.pages_utils.utils_downloads import download_content, download_file
+from app.pages_utils.utils_downloads import (
+    download_content,
+    download_file,
+)
 from app.pages_utils.utils_draft_generation import ProductDrafts
 from app.pages_utils.utils_prod_gen_form import (
     build_prompt_form,
@@ -49,7 +52,9 @@ initialize_page(page_cfg)
 prod_gen_styles()
 
 # logging initialization
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(
+    format="%(levelname)s:%(message)s", level=logging.DEBUG
+)
 
 # page title
 st.write(
@@ -67,8 +72,10 @@ if generate_btn:
 # After form submission, generate product features
 if st.session_state.features_generated is True:
     if st.session_state.generated_response is None:
-        st.session_state.generated_response = generate_formatted_response(
-            st.session_state.selected_prompt
+        st.session_state.generated_response = (
+            generate_formatted_response(
+                st.session_state.selected_prompt
+            )
         )
         st.session_state.generated_points = None
 
@@ -112,7 +119,9 @@ if (
         # Email download Button
         with content_gen_btns[4]:
             email_dl_btn = st.button(
-                "Generate Email Copy", on_click=download_file, type="primary"
+                "Generate Email Copy",
+                on_click=download_file,
+                type="primary",
             )
 
     if st.session_state.create_product is True:
@@ -120,9 +129,14 @@ if (
         with content_gen_btns[6]:
             if st.session_state.product_content is not None:
                 export_btn = st.button(
-                    "Export Content", on_click=download_content, type="primary"
+                    "Export Content",
+                    on_click=download_content,
+                    type="primary",
                 )
 
     # If user clicks edit image, redirect to edit page
-    if st.session_state.image_to_edit != -1 or st.session_state.generate_images is True:
+    if (
+        st.session_state.image_to_edit != -1
+        or st.session_state.generate_images is True
+    ):
         st.switch_page("pages/edit_image.py")

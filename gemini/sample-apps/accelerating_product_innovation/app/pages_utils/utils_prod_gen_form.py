@@ -1,7 +1,7 @@
 """
-This module provides functions for managing the product feature generation process. 
+This module provides functions for managing the product feature generation process.
 Functions include:
-    * Render a form for selecting pre-defined prompts or entering custom queries. 
+    * Render a form for selecting pre-defined prompts or entering custom queries.
     * Facilitate the generation of product feature suggestions.
 """
 
@@ -54,8 +54,8 @@ def generate_product_suggestions_for_feature_generation():
     """
     with st.spinner("Fetching Suggestions..."):
         feature_prompts = generate_gemini(
-            f"""5 broad categories of {st.session_state.product_category} buyers. 
-            Give answer as a numbered list. Each point should strictly be only 
+            f"""5 broad categories of {st.session_state.product_category} buyers.
+            Give answer as a numbered list. Each point should strictly be only
             a category without any description."""
         )
         st.session_state.feature_suggestions = create_suggestion_list(

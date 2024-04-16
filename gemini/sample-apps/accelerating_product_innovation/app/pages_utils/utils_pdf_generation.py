@@ -5,7 +5,7 @@ This module provides functions for adding and formatting content within PDF docu
     * Adds a standard-format page with a light gray background and a centered white rectangle.
 
 * check_add_page(pdf, text):
-    * Handles potential text overflow onto subsequent pages. 
+    * Handles potential text overflow onto subsequent pages.
 """
 
 

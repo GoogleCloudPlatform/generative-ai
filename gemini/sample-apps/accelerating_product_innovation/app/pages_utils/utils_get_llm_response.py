@@ -8,7 +8,7 @@ This module provides functions for interacting with Vertex AI text generation mo
 
 * parallel_generate_search_results():
     * Employs asynchronous requests to Gemini for search result generation.
-    * Handles potential errors during communication with the model.  
+    * Handles potential errors during communication with the model.
 """
 
 import json
