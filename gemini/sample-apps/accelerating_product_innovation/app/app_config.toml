@@ -1,0 +1,80 @@
+# -----------------------------------------------------------------------------
+# Translation options
+# -----------------------------------------------------------------------------
+[translate_api]
+
+# Include or remove languages as needed. Use the this documentation as
+# reference: https://cloud.google.com/translate/docs/languages
+Spanish = "es"
+Chinese = "zh"
+German = "de"
+Japanese = "ja"
+Portuguese = "pt"
+
+
+# -----------------------------------------------------------------------------
+# Model names for Vertex AI
+# -----------------------------------------------------------------------------
+[models]
+
+# If needed, replace with a specific version of the model. Check the Vertex AI 
+# documentation for more information.
+text.text_model_name = "gemini-pro"
+image.image_model_name = "ImageGenerationModel"
+code.code_model_name = "code-bison"
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: Home.py
+# -----------------------------------------------------------------------------
+[pages.home]
+
+page_title = "Gen AI for Product Innovation"
+page_icon = "app/images/favicon.png"
+sidebar_image_path = "app/images/main_logo.png"
+file_name_1 = "app/images/intro_home_1.png"
+file_name_2 = "app/images/intro_home_2.png"
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: 1_Resources.py
+# -----------------------------------------------------------------------------
+[pages.1_Resources]
+
+page_title = "Resources"
+page_icon = "app/images/favicon.png"
+sidebar_image_path = "app/images/main_logo.png"
+resources_img="app/images/resources_img.png"
+
+# -----------------------------------------------------------------------------
+# Configurations for page: 2_ Marketing_Insights.py
+# -----------------------------------------------------------------------------
+
+[pages.2_Marketing_Insights]
+page_title = "Marketing Insights"
+page_icon = "./images/favicon.png"
+sidebar_image_path = "app/images/main_logo.png"
+prod_insights_1="app/images/prod_insights_1.png"
+prod_insights_2="app/images/prod_insights_2.png"
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: 3_Generations.py
+# -----------------------------------------------------------------------------
+
+[pages.3_Generations]
+page_title = "Generations"
+page_icon = "app/images/favicon.png"
+sidebar_image_path = "app/images/main_logo.png"
+prod_gen_img="app/images/prod_gen_img.png"
+
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: Editor.py
+# -----------------------------------------------------------------------------
+
+[pages.Editor]
+page_title = "Editor"
+page_icon = "app/images/favicon.png"
+sidebar_image_path = "app/images/main_logo.png"
