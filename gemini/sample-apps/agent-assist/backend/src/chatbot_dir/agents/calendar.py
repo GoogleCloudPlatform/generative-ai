@@ -87,7 +87,7 @@ def calendar_component(query: str, chat_history: str = "[]") -> dict:
     gemini = GeminiText()
     response = gemini.generate_response(PROMPT.format(query=query))
 
-    response = response[response.find("OUTPUT:") + 7 :]
+    response = response[response.find("OUTPUT:") + 7:]
     response = response.strip()
     if response != "INVALID":
         response_dict = eval(response)

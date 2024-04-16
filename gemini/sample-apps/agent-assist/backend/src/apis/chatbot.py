@@ -3,6 +3,7 @@ from datetime import datetime
 
 from chatbot_dir.orchestration_engine import run_orchestrator
 
+
 def chatbot_entry(data: dict = {}) -> dict:
     """
     This function is the main entry point for the chatbot. It takes a dictionary of data as input and returns a dictionary of data as output.
@@ -20,7 +21,9 @@ def chatbot_entry(data: dict = {}) -> dict:
     chat_history_from_data = data.get("chat_history")
 
     if type(chat_history_from_data) is str:
-        chat_history: list[str] = [chat_history_from_data,]
+        chat_history: list[str] = [
+            chat_history_from_data,
+        ]
     else:
         chat_history: list[str] = chat_history_from_data
 

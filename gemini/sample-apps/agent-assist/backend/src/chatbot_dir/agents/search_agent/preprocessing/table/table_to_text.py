@@ -3,7 +3,9 @@ import os
 from img2table.document import PDF
 from img2table.ocr import TesseractOCR
 
-from src.chatbot_dir.agents.search_agent.preprocessing.table.process_function import processTable
+from src.chatbot_dir.agents.search_agent.preprocessing.table.process_function import (
+    processTable,
+)
 
 # Function to process the PDF tables and save the extracted text to files.
 

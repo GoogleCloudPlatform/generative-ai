@@ -334,7 +334,7 @@ def run_orchestrator(query, chat_history):
     end_index = actions.find("ACTION:")
     plan = "Step 1: \n " + actions[:end_index]
 
-    actions = actions[actions.find("ACTION:") + 7 :]
+    actions = actions[actions.find("ACTION:") + 7:]
     actions = actions.strip("[] ")
     actions = actions.split("<PYTHON>")[1:]
     actions = [action[: action.find("</PYTHON>")].strip() for action in actions]
