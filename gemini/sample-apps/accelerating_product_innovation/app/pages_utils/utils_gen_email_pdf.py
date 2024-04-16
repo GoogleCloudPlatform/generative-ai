@@ -16,9 +16,7 @@ from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_p
 from app.pages_utils.utils_pdf_template import PDFRounded as FPDF
 import streamlit as st
 
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
 def create_email_pdf(title, email_text, filename, image_name):

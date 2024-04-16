@@ -19,9 +19,7 @@ from google.protobuf.struct_pb2 import Value
 import numpy as np
 import streamlit as st
 
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 # Set project parameters
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -37,9 +35,7 @@ IMAGE_UPLOAD_BYTES_LIMIT = 4096
 # The AI Platform services require regional API endpoints.
 client_options = {"api_endpoint": IMAGEN_API_ENDPOINT}
 # Initialize client that will be used to create and send requests.
-imagen_client = aiplatform.gapic.PredictionServiceClient(
-    client_options=client_options
-)
+imagen_client = aiplatform.gapic.PredictionServiceClient(client_options=client_options)
 
 
 def predict_image(
@@ -133,19 +129,13 @@ def edit_image_generation(
     """
     input_dict = {
         "prompt": prompt,
-        "image": {
-            "bytesBase64Encoded": base64.b64encode(bytes_data).decode(
-                "utf-8"
-            )
-        },
+        "image": {"bytesBase64Encoded": base64.b64encode(bytes_data).decode("utf-8")},
     }
 
     if mask_bytes_data:
         input_dict["mask"] = {
             "image": {
-                "bytesBase64Encoded": base64.b64encode(
-                    mask_bytes_data
-                ).decode("utf-8")
+                "bytesBase64Encoded": base64.b64encode(mask_bytes_data).decode("utf-8")
             }
         }
 
@@ -177,9 +167,7 @@ async def parallel_image_generation(prompt: str, col: int):
             logging.debug("Inside IF else of session")
             if response.status == 200:
                 response = await response.read()
-                response = cv2.imdecode(
-                    np.frombuffer(response, dtype=np.uint8), 1
-                )
+                response = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
                 cv2.imwrite(
                     f"gen_image{st.session_state.num_drafts+col}.png",
                     response,

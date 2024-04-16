@@ -19,14 +19,10 @@ from PIL import Image
 import app.pages_utils.utils as utils
 import streamlit as st
 
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
-def process_foreground_image(
-    foreground_image, background_image, bg_editing=False
-):
+def process_foreground_image(foreground_image, background_image, bg_editing=False):
     """
     Processes a foreground image, optionally removing white regions,
     and prepares it for merging with a background image.
@@ -56,9 +52,7 @@ def process_foreground_image(
         foreground_image.putdata(new_bytes)
 
     # Resize and merge foreground with background
-    resized_foreground = foreground_image.resize(
-        background_image.size
-    )
+    resized_foreground = foreground_image.resize(background_image.size)
     merged_image = background_image.copy()
     merged_image.paste(resized_foreground, (0, 0), resized_foreground)
 
@@ -87,24 +81,17 @@ def initialize_edit_page_state():
         st.session_state.initialize_session_state = True
 
     # Check which image file prefix points to the image to be edited
-    if (
-        "image_to_edit" not in st.session_state
-        or st.session_state.image_to_edit == -1
-    ):
+    if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
         st.session_state.image_to_edit = (
             -1
         )  # No image from generations is being edited.
-        st.session_state.image_file_prefix = "./uploaded_image"  # image prefix for editing uploaded image.
-        st.session_state.uploaded_img = (
-            True  # Set image uploaded to true.
+        st.session_state.image_file_prefix = (
+            "./uploaded_image"  # image prefix for editing uploaded image.
         )
+        st.session_state.uploaded_img = True  # Set image uploaded to true.
     else:
-        st.session_state.uploaded_img = (
-            False  # Generated image being edited.
-        )
-        st.session_state.start_editing = (
-            True  # Display canvas for editing.
-        )
+        st.session_state.uploaded_img = False  # Generated image being edited.
+        st.session_state.start_editing = True  # Display canvas for editing.
 
 
 def handle_image_upload():
@@ -135,9 +122,7 @@ def save_draft_image(row, col, image, draft_elements):
         draft_elements (dict): Dictionary holding the draft image elements.
     """
 
-    st.session_state.content_edited = (
-        True  # Track whether image has been edited.
-    )
+    st.session_state.content_edited = True  # Track whether image has been edited.
     draft_elements[row][col][
         "img"
     ] = image  # Update the drafts to display updated image.
