@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Website</title>
+  <!-- Include the Google Translate API -->
+  <script type="text/javascript">
+    // Function to translate content
+    function translateToHindi() {
+    //   const contentToTranslate = document.querySelectorAll('[data-translate]');
+    const contentToTranslate = document.querySelectorAll('body *:not(script):not(noscript):not(style)');
+      const apiKey = 'AIzaSyCNnRFPu5SGudahEQ8MtKsN-paSQCq0iGw'; // Replace with your Google Translate API key
+
+      contentToTranslate.forEach(element => {
+        const text = element.innerText;
+        const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${text}&target=hi`;
+
+        fetch(url, {
+          method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+          const translatedText = data.data.translations[0].translatedText;
+          element.innerText = translatedText;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    }
+
+    // Translate content when the page finishes loading
+    window.addEventListener('load', () => {
+      translateToHindi();
+    });
+  </script>
+</head>
+<body>
+  <!-- Your website content -->
+  <h1 data-translate>Welcome to Your Website</h1>
+  <p data-translate>This is a sample content in English.</p>
+  <p>This is a sample content in English.</p>
+
+  <!-- Other content to be translated should also have the data-translate attribute -->
+</body>
+</html>

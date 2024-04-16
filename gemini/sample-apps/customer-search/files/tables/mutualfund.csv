@@ -1,0 +1,11 @@
+mutual_fund_id,name,risk_category,type_of_fund,size,one_month,six_month,one_year,three_year,five_year,all_time,NAV,min_sip_amount,fund_size,expense_ratio,exit_load,stamp_duty
+2,ICICI Prudential Commodities Fund Direct Growth,High Risk,Equity,Sectoral/Thematic,-0.86,17.48,29.46,45.59,,35.11,33.27,100,1325,1.03,1% if redeemed within 3 months,0.005
+8,Nippon India Strategic Debt Fund Direct Growth,Moderate Risk,Debt,,0.52,2.41,7.22,9.26,-0.47,4.07,14.6,100,120,1.44,1% if redeemede within 12 months,0.005
+9,Axis Corporate Debt Fund Direct Growth,Moderate Risk,Debt,,0.53,2.99,7.19,5.31,7.09,7.31,15.73,100,4827,0.29,Nil,0.005
+6,HDFC Short Term Debt Fund,Moderate Risk,Debt,,0.55,3.16,7.3,5.2,7.4,8.0,28.91,100,12285,0.37,Nil,0.005
+7,SBI Short Term Debt Fund Direct Growth,Moderate Risk,Debt,,0.5,2.92,6.97,4.76,6.96,7.74,29.9,500,13478,0.35,Nil,0.005
+3,Parag Parikh Flexi Cap Fund Direct Growth,Very High Risk,Equity,Flexi Cap,0.77,17.18,26.2,23.84,21.64,19.53,63.69,1000,42784,0.66,"for units above 10% of the investment, exit load of 2% if redeemed within 365 days and 1% if redeemed after 365 days but on or before 730 days.",0.005
+5,SBI Bluechip Direct Plan Growth,Very High Risk,Equity,Large Cap,-0.36,14.05,19.71,22.64,16.3,15.43,79.04,500,39650,0.87,1% if redeemed within 1 year,0.005
+1,Quant Small Cap Fund Direct Plan Growth,Very High Risk,Equity,Small Cap,2.11,30.64,40.43,47.15,31.04,17.72,197.65,1000,9089,0.77,1% if redeemed within 1 year,0.005
+4,Nippon India Small Cap Fund Direct Growth,Very High Risk,Equity,Small Cap,1.87,33.62,37.1,45.8,27.32,26.37,137.37,100,37374,0.71,1% if redeemed within one month.,0.005
+10,Kotak Emerging Equity Fund Direct Growth,Very High Risk,Equity,Mid Cap,5.04,20.63,26.15,27.84,23.74,20.8,111.72,100,36527,0.38,"For units in excess of 10% of the investment,1% will be charged for redemption within 365 days",0.005

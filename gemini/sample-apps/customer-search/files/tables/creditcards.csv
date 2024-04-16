@@ -1,0 +1,4 @@
+customer_id,credit_card_number,credit_card_expiration_month,credit_card_expiration_year,credit_card_name,credit_card_last_updated,transaction_limit,international_transaction_enabled
+342345,550331209574,10,2027,Cymbal No-annual-fee Rewards Card,2023-12-07,10000.0,true
+235813,752572545751,10,2027,Cymbal Luxury Lifestyle Card,2023-11-23,10000.0,true
+235813,665475160739,10,2027,Platinum Travel Credit Card,2023-10-18,10000.0,true
