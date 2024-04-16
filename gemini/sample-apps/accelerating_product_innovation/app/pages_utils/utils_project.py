@@ -13,16 +13,14 @@ import json
 import logging
 import os
 
-import pandas as pd
-import streamlit as st
 from dotenv import load_dotenv
 from google.cloud import storage
+import pandas as pd
+import streamlit as st
 
 load_dotenv()
 
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
@@ -84,9 +82,7 @@ def list_pdf_files_gcs() -> list[tuple[str, str]]:
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)
     bucket = storage_client.bucket("product_innovation_bucket")
-    blob = bucket.blob(
-        f"{st.session_state.product_category}/embeddings.json"
-    )
+    blob = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
     files = []
     if blob.exists():
         blobs = storage_client.list_blobs(
@@ -119,18 +115,12 @@ def delete_project_from_gcs() -> None:
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)
     bucket = storage_client.bucket("product_innovation_bucket")
-    blobs = bucket.list_blobs(
-        prefix=f"{st.session_state.product_category}/"
-    )
+    blobs = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
     for blob in blobs:
         blob.delete()
-    st.session_state.product_categories.remove(
-        st.session_state.product_category
-    )
+    st.session_state.product_categories.remove(st.session_state.product_category)
     if len(st.session_state.product_categories) >= 1:
-        st.session_state.product_category = (
-            st.session_state.product_categories[0]
-        )
+        st.session_state.product_category = st.session_state.product_categories[0]
     update_projects(st.session_state.product_categories)
     st.rerun()
 
@@ -148,13 +138,9 @@ def delete_file_from_gcs(file_name: str) -> None:
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)
     bucket = storage_client.bucket("product_innovation_bucket")
-    file_blob = bucket.blob(
-        f"{st.session_state.product_category}/{file_name}"
-    )
+    file_blob = bucket.blob(f"{st.session_state.product_category}/{file_name}")
     file_blob.delete()
-    blob = bucket.blob(
-        st.session_state.product_category + "/embeddings.json"
-    )
+    blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
     stored_embedding_data = blob.download_as_string()
     dff = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
     dff = dff.drop(dff[dff["file_name"] == file_name].index)
@@ -180,7 +166,5 @@ def get_file_contents(file_name: str) -> bytes:
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)
     bucket = storage_client.bucket("product_innovation_bucket")
-    blob = bucket.blob(
-        f"{st.session_state.product_category}/{file_name}"
-    )
+    blob = bucket.blob(f"{st.session_state.product_category}/{file_name}")
     return blob.download_as_string()

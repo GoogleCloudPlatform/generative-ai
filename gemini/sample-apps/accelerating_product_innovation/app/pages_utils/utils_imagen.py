@@ -8,15 +8,16 @@ Utility module to:
 
 import base64
 import json
-import os
 import logging
+import os
+
+import aiohttp
+import cv2
 from google.cloud import aiplatform
 from google.protobuf import json_format
 from google.protobuf.struct_pb2 import Value
-import streamlit as st
-import cv2
 import numpy as np
-import aiohttp
+import streamlit as st
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 

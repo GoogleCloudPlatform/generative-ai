@@ -16,10 +16,10 @@ import logging
 import os
 
 import aiohttp
+from dotenv import load_dotenv
 import streamlit as st
 import vertexai
 import vertexai.generative_models as generative_models
-from dotenv import load_dotenv
 from vertexai.generative_models import GenerativeModel
 
 load_dotenv()
@@ -29,9 +29,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 vertexai.init(project=PROJECT_ID, location=LOCATION)
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
 def generate_gemini(text_prompt):

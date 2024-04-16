@@ -4,8 +4,8 @@ This module defines the 'ImageEditor' class, providing an interactive image edit
 
 import io
 
-import streamlit as st
 from PIL import Image
+import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 
 

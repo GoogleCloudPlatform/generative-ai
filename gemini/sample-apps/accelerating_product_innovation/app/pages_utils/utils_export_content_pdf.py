@@ -3,10 +3,9 @@ This module provides functions for creating content PDFs with specific
 layouts and formatting.
 """
 
-import streamlit as st
-
 from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
 from app.pages_utils.utils_pdf_template import PDFRounded as FPDF
+import streamlit as st
 
 
 def create_pdf_layout(pdf, content, title, images):

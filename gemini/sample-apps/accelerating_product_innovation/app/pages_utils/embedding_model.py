@@ -2,11 +2,11 @@
 Defines functions for generating text embeddings using a Vertex AI TextEmbeddingModel.
 """
 
-from vertexai.preview.language_models import TextEmbeddingModel
 import backoff
 from google.api_core.exceptions import ResourceExhausted
 import numpy as np
 import streamlit as st
+from vertexai.preview.language_models import TextEmbeddingModel
 
 
 @st.cache_resource

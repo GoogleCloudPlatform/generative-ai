@@ -3,8 +3,8 @@ Defines common styles to be used within the application
 """
 
 import base64
-import streamlit as st
 
+import streamlit as st
 
 STYLE_SIDEBAR = """
     <style>

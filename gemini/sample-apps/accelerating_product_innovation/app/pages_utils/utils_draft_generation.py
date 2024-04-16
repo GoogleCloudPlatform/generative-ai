@@ -3,8 +3,8 @@ This module defines the 'ProductDrafts' class, responsible
 for managing and displaying product content drafts.
 """
 
-import streamlit as st
 from app.pages_utils.utils_get_llm_response import generate_gemini
+import streamlit as st
 
 
 class ProductDrafts:
@@ -28,12 +28,9 @@ class ProductDrafts:
         """
 
         if st.session_state.create_product:
-            for i, chosen_title in enumerate(
-                st.session_state.chosen_titles
-            ):
+            for i, chosen_title in enumerate(st.session_state.chosen_titles):
                 # Create an expandable section for each product title
                 with st.expander(chosen_title):
-
                     # Display a centered title heading
                     st.markdown(
                         f"<h5 style = 'text-align: center; color: #6a90e2;'>{chosen_title}</h5>",
@@ -53,32 +50,20 @@ class ProductDrafts:
         """
 
         for j in range(st.session_state.num_drafts):
-            img_col, text_col = st.columns(
-                2
-            )  # Create two equal-width columns
+            img_col, text_col = st.columns(2)  # Create two equal-width columns
 
             with img_col:
                 # Display the image for the current draft
-                st.image(
-                    st.session_state.draft_elements[title_index][j][
-                        "img"
-                    ]
-                )
+                st.image(st.session_state.draft_elements[title_index][j]["img"])
 
                 # Call the function to handle image editing interactions
                 self._handle_image_edit(title_index, j)
 
             with text_col:
                 # Display the text for the current draft
-                st.write(
-                    st.session_state.draft_elements[title_index][j][
-                        "text"
-                    ]
-                )
+                st.write(st.session_state.draft_elements[title_index][j]["text"])
                 st.session_state.text_edit_prompt = st.text_input(
-                    key="edit_text_prompt"
-                    + str(title_index)
-                    + str(j),
+                    key="edit_text_prompt" + str(title_index) + str(j),
                     placeholder="Write a query to edit the text",
                     label="Write prompt to edit text",
                 )
@@ -90,16 +75,14 @@ class ProductDrafts:
                 ):
                     # On button click begin content regeneration.
                     st.session_state.regenerate_btn = True
-                    st.session_state.row = (
-                        title_index  # Title number being edited.
-                    )
+                    st.session_state.row = title_index  # Title number being edited.
                     # In case of multiple drafts, track the draft number being edited.
                     st.session_state.col = j
-                    st.session_state.text_to_edit = (
-                        st.session_state.draft_elements[title_index][
-                            j
-                        ]["text"]
-                    )  # Text content being edited.
+                    st.session_state.text_to_edit = st.session_state.draft_elements[
+                        title_index
+                    ][j][
+                        "text"
+                    ]  # Text content being edited.
 
                     # Update content
                     with st.spinner("Updating Content..."):
@@ -111,9 +94,9 @@ class ProductDrafts:
                         # Generate new text.
                         text = generate_gemini(new_text_prompt)
                         # Update text post text regeneration.
-                        st.session_state.draft_elements[
-                            st.session_state.row
-                        ][st.session_state.col][
+                        st.session_state.draft_elements[st.session_state.row][
+                            st.session_state.col
+                        ][
                             "text"
                         ] = text  # Update draft contents.
                         # Reset Text edit status to default.
@@ -142,6 +125,5 @@ class ProductDrafts:
 
             # Calculate a unique index for the image and update the session state.
             st.session_state.image_to_edit = (
-                st.session_state.num_drafts * title_index
-                + draft_index
+                st.session_state.num_drafts * title_index + draft_index
             )

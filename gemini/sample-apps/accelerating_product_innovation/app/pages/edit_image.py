@@ -14,10 +14,7 @@ It provides the following features:
 
 import logging
 
-import streamlit as st
 from PIL import Image
-
-import app.pages_utils.utils_styles as utils_styles
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_edit_image import (
     handle_image_upload,
@@ -30,6 +27,8 @@ from app.pages_utils.utils_generate_image_suggestions import (
     generate_suggested_images,
     render_suggested_images,
 )
+import app.pages_utils.utils_styles as utils_styles
+import streamlit as st
 
 # Initialize the state of the edit page
 initialize_edit_page_state()

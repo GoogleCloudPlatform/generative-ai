@@ -4,8 +4,8 @@ Common utilities for the project. This includes:
     * project selection.
 """
 
-import streamlit as st
 import app.pages_utils.utils_project as utils_project
+import streamlit as st
 
 
 def display_projects():
@@ -20,20 +20,11 @@ def display_projects():
     st.session_state.product_category = st.selectbox(
         "Select a project", st.session_state.product_categories
     )
-    st.session_state.product_categories.remove(
-        st.session_state.product_category
-    )
-    st.session_state.product_categories.insert(
-        0, st.session_state.product_category
-    )
-    if (
-        st.session_state.previous_product_category
-        != st.session_state.product_category
-    ):
+    st.session_state.product_categories.remove(st.session_state.product_category)
+    st.session_state.product_categories.insert(0, st.session_state.product_category)
+    if st.session_state.previous_product_category != st.session_state.product_category:
         reinitialize_session_states()
-        st.session_state.previous_product_category = (
-            st.session_state.product_category
-        )
+        st.session_state.previous_product_category = st.session_state.product_category
         st.rerun()
 
 
@@ -47,13 +38,9 @@ def initialize_all_session_state():
         None
     """
     if "product_categories" not in st.session_state:
-        st.session_state.product_categories = (
-            utils_project.get_projects_list()
-        )
+        st.session_state.product_categories = utils_project.get_projects_list()
     if "product_category" not in st.session_state:
-        st.session_state.product_category = (
-            st.session_state.product_categories[0]
-        )
+        st.session_state.product_category = st.session_state.product_categories[0]
     if "input_csv_file_to_pd" not in st.session_state:
         st.session_state.input_csv_file_to_pd = None
     if "st.session_state.current_filename" not in st.session_state:
@@ -177,10 +164,7 @@ def initialize_all_session_state():
         st.session_state.image_prompt = None
     if "text_to_edit" not in st.session_state:
         st.session_state.text_to_edit = None
-    if (
-        "image_to_edit" not in st.session_state
-        or st.session_state.image_to_edit == -1
-    ):
+    if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
         st.session_state.image_to_edit = -1
         st.session_state.image_file_prefix = "./uploaded_image"
         st.session_state.uploaded_img = True
@@ -296,10 +280,7 @@ def reinitialize_session_states():
     st.session_state.generate_images = False
     st.session_state.image_prompt = None
     st.session_state.text_to_edit = None
-    if (
-        "image_to_edit" not in st.session_state
-        or st.session_state.image_to_edit == -1
-    ):
+    if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
         st.session_state.image_to_edit = -1
         st.session_state.image_file_prefix = "./uploaded_image"
         st.session_state.uploaded_img = True

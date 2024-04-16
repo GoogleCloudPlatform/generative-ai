@@ -15,25 +15,20 @@ import json
 import logging
 import os
 
+from PyPDF2 import PdfReader
 import aiohttp
+from app.pages_utils.embedding_model import embedding_model_with_backoff
 import docx
+from dotenv import load_dotenv
+from google.cloud import storage
 import numpy as np
 import pandas as pd
 import streamlit as st
-from dotenv import load_dotenv
-from google.cloud import storage
-from PyPDF2 import PdfReader
-
-from app.pages_utils.embedding_model import (
-    embedding_model_with_backoff,
-)
 
 load_dotenv()
 
 
-logging.basicConfig(
-    format="%(levelname)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -129,10 +124,7 @@ async def generate_embeddings(pdf_data: pd.DataFrame) -> np.array:
     Returns:
         np.array: The embeddings for the PDF data.
     """
-    tasks = [
-        asyncio.create_task(process_embedding(x))
-        for x in pdf_data["content"]
-    ]
+    tasks = [asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]]
     embeddings = await asyncio.gather(*tasks)
     return np.array(embeddings)
 
@@ -210,9 +202,7 @@ async def process_rows(
     for i in range(last_index):
         chunk_content = ""
         for j, head in enumerate(header):
-            chunk_content += (
-                f"{head} is {df.iloc[[i], [j]].squeeze()}. "
-            )
+            chunk_content += f"{head} is {df.iloc[[i], [j]].squeeze()}. "
         packet = create_data_packet(
             filename,
             page_number=page_num,
@@ -257,34 +247,24 @@ async def csv_pocessing(
     parallel_task_array = []
     for i in range(split_num):
         parallel_task_array.append(
-            asyncio.create_task(
-                process_rows(df_split[i], file, header, i)
-            )
+            asyncio.create_task(process_rows(df_split[i], file, header, i))
         )
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(
-            asyncio.create_task(add_type_col(parallel_task_array[i]))
-        )
+        temp_arr.append(asyncio.create_task(add_type_col(parallel_task_array[i])))
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(
-            asyncio.create_task(
-                add_embedding_col(parallel_task_array[i])
-            )
-        )
+        temp_arr.append(asyncio.create_task(add_embedding_col(parallel_task_array[i])))
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     for i in range(split_num):
         pdf_data = pd.concat([parallel_task_array[i], pdf_data])
 
     pdf_data = pd.concat([dff, pdf_data])
-    pdf_data = pdf_data.drop_duplicates(
-        subset=["content"], keep="first"
-    )
+    pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
     pdf_data.reset_index(inplace=True, drop=True)
     bucket.blob(
         f"{st.session_state.product_category}/embeddings.json"
@@ -306,18 +286,12 @@ def convert_file_to_data_packets(filename):
         project_id = PROJECT_ID
         storage_client = storage.Client(project=project_id)
         bucket = storage_client.bucket("product_innovation_bucket")
-        blob = bucket.blob(
-            f"{st.session_state.product_category}/embeddings.json"
-        )
-        blob2 = bucket.blob(
-            f"{st.session_state.product_category}/{filename.name}"
-        )
+        blob = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
+        blob2 = bucket.blob(f"{st.session_state.product_category}/{filename.name}")
 
         if blob.exists():
             stored_embedding_data = blob.download_as_string()
-            dff = pd.DataFrame.from_dict(
-                json.loads(stored_embedding_data)
-            )
+            dff = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
         else:
             dff = pd.DataFrame()
         final_data = []
@@ -335,12 +309,8 @@ def convert_file_to_data_packets(filename):
                 return
             for col in df.columns:
                 header.append(col)
-            with st.spinner(
-                "Processing csv...this might take some time..."
-            ):
-                asyncio.run(
-                    csv_pocessing(df, header, dff, bucket, file)
-                )
+            with st.spinner("Processing csv...this might take some time..."):
+                asyncio.run(csv_pocessing(df, header, dff, bucket, file))
             return
 
         elif filename.type == "text/plain":
@@ -353,9 +323,7 @@ def convert_file_to_data_packets(filename):
 
             file_content = filename.read().decode("utf-8")
             file_content = file_content.replace("\n", " ")
-            blob2.upload_from_string(
-                file_content, content_type=filename.type
-            )
+            blob2.upload_from_string(file_content, content_type=filename.type)
             if file_content == "":
                 return
             text_chunks = get_chunks_iter(file_content, 2000)
@@ -376,9 +344,7 @@ def convert_file_to_data_packets(filename):
             for para in doc.paragraphs:
                 file_content += para.text
             "\n".join(file_content)
-            blob2.upload_from_string(
-                file_content, content_type=filename.type
-            )
+            blob2.upload_from_string(file_content, content_type=filename.type)
             if file_content == "":
                 return
             text_chunks = get_chunks_iter(file_content, 2000)
@@ -398,9 +364,7 @@ def convert_file_to_data_packets(filename):
             print("I AM HERE!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
             file_content = filename.read()
-            blob2.upload_from_string(
-                file_content, content_type=filename.type
-            )
+            blob2.upload_from_string(file_content, content_type=filename.type)
             if file_content == "":
                 return
             reader = PdfReader(filename)
@@ -412,9 +376,7 @@ def convert_file_to_data_packets(filename):
                 pg = page.extract_text()
                 if pg:
                     text_chunks = get_chunks_iter(pg, 2000)
-                    for chunk_number, chunk_content in enumerate(
-                        text_chunks
-                    ):
+                    for chunk_number, chunk_content in enumerate(text_chunks):
                         packet = create_data_packet(
                             filename.name,
                             page_number=int(page_num + 1),
@@ -427,25 +389,17 @@ def convert_file_to_data_packets(filename):
             with st.spinner("Storing Embeddings"):
                 pdf_data = pd.DataFrame.from_dict(final_data)
                 pdf_data.reset_index(inplace=True, drop=True)
-                pdf_data["types"] = pdf_data["content"].apply(
-                    lambda x: type(x)
-                )
+                pdf_data["types"] = pdf_data["content"].apply(lambda x: type(x))
                 pdf_data["embedding"] = pdf_data["content"].apply(
                     lambda x: embedding_model_with_backoff([x])
                 )
-                pdf_data["embedding"] = pdf_data.embedding.apply(
-                    np.array
-                )
+                pdf_data["embedding"] = pdf_data.embedding.apply(np.array)
                 pdf_data = pd.concat([dff, pdf_data])
-                pdf_data = pdf_data.drop_duplicates(
-                    subset=["content"], keep="first"
-                )
+                pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
                 pdf_data.reset_index(inplace=True, drop=True)
                 bucket.blob(
                     f"{st.session_state.product_category}/embeddings.json"
-                ).upload_from_string(
-                    pdf_data.to_json(), "application/json"
-                )
+                ).upload_from_string(pdf_data.to_json(), "application/json")
         except Exception:
             # Handles any exceptions that occur during the embedding process.
             st.error(f"Unable to load the file {filename}!")

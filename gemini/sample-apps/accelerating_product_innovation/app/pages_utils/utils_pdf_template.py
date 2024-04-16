@@ -62,9 +62,7 @@ class PDFRounded(fpdf.FPDF):
         yc = y + h - r
         self._out("%.2F %.2F l" % ((x + w) * k, (hp - yc) * k))
         if "3" not in corners:
-            self._out(
-                "%.2F %.2F l" % ((x + w) * k, (hp - (y + h)) * k)
-            )
+            self._out("%.2F %.2F l" % ((x + w) * k, (hp - (y + h)) * k))
         else:
             self._arc(
                 xc + r,

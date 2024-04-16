@@ -4,8 +4,8 @@ Cloud Function for getting text response from Gemini API.
 """
 
 import functions_framework
-from vertexai.preview.generative_models import GenerativeModel
 import vertexai.preview.generative_models as generative_models
+from vertexai.preview.generative_models import GenerativeModel
 
 PROJECT_ID = "<YOUR_PROJECT_ID>"
 LOCATION = "<YOUR_LOCATION>"
@@ -61,9 +61,7 @@ def generate_text_http(request):
     """
     request_json = request.get_json(silent=True)
     if not request_json or "text_prompt" not in request_json:
-        return {
-            "error": "Request body must contain 'text_prompt' field."
-        }, 400
+        return {"error": "Request body must contain 'text_prompt' field."}, 400
 
     text_prompt = request_json["text_prompt"]
     generated_text = generate_text(text_prompt)
