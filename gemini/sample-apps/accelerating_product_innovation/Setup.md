@@ -34,14 +34,14 @@ Follow the below steps to deploy the solution to Cloud Run environment.
 
    - `document_uploads`: Stores market research, surveys, trend reports, etc.
    - `generated_products`: Stores output images, descriptions, etc.
-   - `image_edits`: Stores intermediate/modified images during the regenerative process.
+   - `image_edits`: Stores intermediate/modified images during the regeneration process.
 
    **Using the GCP Console (Web Interface):**
 
    - Navigate to the [Google Cloud Storage section](https://console.cloud.google.com/storage/browser) of your GCP console.
    - Click on the "Create Bucket" button.
    - Provide the following details:
-     - **Name**: Enter 'product_innovation_bucket' following GCP bucket naming conventions (lowercase, underscores, etc.).
+     - **Name**: Enter 'product_innovation_bucket' as bucket name.
      - **Location**: Choose a region closest to where your solution will operate for best performance.
      - **Storage Class**: Select the class based on frequency of access and cost considerations.
      - **Advanced Settings**: Adjust encryption, access control, etc., if necessary.
@@ -49,7 +49,7 @@ Follow the below steps to deploy the solution to Cloud Run environment.
 
    **Using the 'gsutil' Command-Line Tool:**
 
-   - Ensure you have the gcloud SDK installed and 'gsutil' configured.
+   - Ensure that you have the gcloud SDK installed and 'gsutil' configured.
    - Run the following command in your terminal, replacing `<region>` with your desired bucket location:
 
      ```bash

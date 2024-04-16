@@ -2,7 +2,7 @@
 
 ## Introduction
 
-he consumer goods companies need to assimilate various sources of information including competitive insights, consumer sentiments from reviews/feedback, emerging trends, reasons why certain products are bestsellers and why certain products don't sell, what customers like or dislike about etc. to draft new product ideas which can then be reviewed, prototypes, tested, manufactured, market, and sell. The journey from idea to product on a shelf can take anywhere from a couple months to a couple years! In fast and dynamic markets there is a need to,
+The consumer goods companies need to assimilate various sources of information including competitive insights, consumer sentiments from reviews/feedback, emerging trends, reasons why certain products are bestsellers and why certain products don't sell, what customers like or dislike about etc. to draft new product ideas which can then be reviewed, prototypes, tested, manufactured, market, and sell. The journey from idea to product on a shelf can take anywhere from a couple months to a couple years! In fast and dynamic markets there is a need to,
 
 - shorten lead time for new product development; and
 - achieve draft ideas in bulk with minimal or without human-in-the-loop
@@ -19,19 +19,19 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **For Q&A on uploaded files, navigate to 'Product Insights' page**
   - **Insight Generation**: Ask questions to extract critical information from your data.
 - **For Product Idea generation, navigate to 'Product Generation' page**
-  - **Concept Creation**: Initiate product generation using sample queries or tailor your own.
+  - **Concept Creation**: Initiate product generation using sample queries or creater your own custom query.
   - **Refinement**: Select features, experiment with combinations, and regenerate results until the desired product concept is achieved.
 
 ## Application Workflow
 
 1. **Project Setup**
-   You have the option to either create a new project in the resources page of the application for generating product insights or select an existing project. Choose one of the following steps:
+   You have the option to either create a new project or select an existing project in the resources page of the application for generating product insights. Choose one of the following steps:
 
    - **New Project Creation**:
      - Initiate a new project within the application by giving it a descriptive name (e.g., "2024 Sunscreen Innovation" or "Haircare Line Extension").
      - Once a project is created, the document upload process is mandatory before proceeding to analysis features.
    - **Existing Project Modification**:
-     - Select an existing project from a list or search option.
+     - Select an existing project from a list.
      - View previously uploaded documents associated with the project.
      - Use the following actions:
        - Add Files: Upload new documents relevant to the project.
