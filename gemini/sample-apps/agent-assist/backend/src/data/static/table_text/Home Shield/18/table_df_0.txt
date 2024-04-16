@@ -1,0 +1,8 @@
+                    0                    1
+0            4 Months                  50%
+1            5 Months                  60%
+2            6 Months                  70%
+3            7 Months                  75%
+4            8 Months                  80%
+5            9 Months                  85%
+6  Exceeding 9 Months  Full Annual Premium

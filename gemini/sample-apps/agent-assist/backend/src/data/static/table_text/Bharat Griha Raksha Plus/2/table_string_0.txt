@@ -1,0 +1,33 @@
+ The table provides definitions for various terms used in the insurance policy. Here's a summary of the definitions:
+
+**General Contents**: All the contents of household use in the insured's home, such as furniture, electronic items, antennae, solar panels, water storage equipment, kitchen equipment, electrical equipment, clothing, and similar items.
+
+**Valuable Contents**: Items such as jewelry, silverware, paintings, works of art, antique items, curios, and similar items.
+
+**Insured**: The person or persons who have purchased insurance coverage under the policy.
+
+**Insured Property**: The insured's home building and home contents, or any item of property covered by the policy.
+
+**Kutcha Construction**: Buildings with walls and/or roofs made of wooden planks, thatched leaves, grass/hay, bamboo, plastic cloth, asphalt, canvas, tarpaulin, or similar materials.
+
+**Policy Period**: The period commencing from the effective date and time shown in the policy schedule and terminating at midnight on the expiry date or upon termination or cancellation of insurance as per the policy's terms.
+
+**Policy Schedule**: The document accompanying the policy that provides details about the insured and the insurance coverage.
+
+**Premium**: The amount paid by the insured to the insurance company for the insurance coverage.
+
+**Pucca Construction**: Construction other than Kutcha Construction.
+
+**Saleable Value**: The purchase cost of a flat or apartment or the value that can be realized if the flat or apartment is sold on the date of the insurance proposal.
+
+**Spouse**: The insured's wife or husband.
+
+**Sum Insured**: The amount shown in the policy schedule as the maximum liability of the insurance company for each cover or part of the cover and for each loss.
+
+**Total Loss**: A situation where the insured property or item is completely destroyed, lost, or damaged beyond retrieval or repair, or the cost of repairing it exceeds the sum insured for that item or in total.
+
+**We, Us, Our, Insurer**: HDFC ERGO General Insurance Company, the insurance company providing coverage under the policy.
+
+**You, Your, Insured**: The insured person or persons who have purchased insurance coverage under the policy.
+
+**Your Home Building**: A building consisting of a residential unit with an enclosed structure and a roof, basement (if any), and used as a dwelling place, as described in detail in the policy.

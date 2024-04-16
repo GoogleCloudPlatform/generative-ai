@@ -1,0 +1,60 @@
+ The table contains the contact details of various Insurance Ombudsman offices in India. Each row represents an office, and the columns provide information such as the address, phone numbers, email address, and jurisdiction of each office. Here's the extracted information:
+
+**1. Guwahati:**
+- Address: Jeevan Nivesh, 5th Floor, Nr. Panbazar overbridge, S.S. Road, Guwahati – 781001 (Assam).
+- Phone: 0361 - 2632204 / 2602205
+- Email: bimalokpal.guwahati@ecoi.co.in
+- Jurisdiction: Assam, Meghalaya, Manipur, Mizoram, Arunachal Pradesh, Nagaland, and Tripura.
+
+**2. Bhopal:**
+- Address: Janak Vihar Complex, 2nd Floor, 6, Malviya Nagar, Opp. Airtel Office, Near New Market, Bhopal – 462 003.
+- Phone: 0755 - 2769201 / 2769202
+- Fax: 0755 - 2769203
+- Email: bimalokpal.bhopal@ecoi.co.in
+- Jurisdiction: Madhya Pradesh, Chattisgarh.
+
+**3. Chandigarh:**
+- Address: S.C.O. No. 101, 102 & 103, 2nd Floor, Batra Building, Sector 17 – D, Chandigarh – 160 017.
+- Phone: 0172 - 2706196 / 2706468
+- Fax: 0172 - 2708274
+- Email: bimalokpal.chandigarh@ecoi.co.in
+- Jurisdiction: Punjab, Haryana, Himachal Pradesh, Jammu & Kashmir, Chandigarh.
+
+**4. Delhi:**
+- Address: 2/2 A, Universal Insurance Building, Asaf Ali Road, New Delhi – 110 002.
+- Phone: 011 - 23232481/23213504
+- Email: bimalokpal.delhi@ecoi.co.in
+- Jurisdiction: Delhi
+
+**5. Hyderabad:**
+- Address: 6-2-46, 1st floor, "Moin Court", Lane Opp. Saleem Function Palace, A. C. Guards, Lakdi-Ka-Pool, Hyderabad - 500 004.
+- Phone: 040 - 67504123 / 23312122
+- Fax: 040 - 23376599
+- Email: bimalokpal.hyderabad@ecoi.co.in
+- Jurisdiction: Andhra Pradesh, Telangana, Yanam, and part of Territory of Pondicherry.
+
+**6. Ernakulam:**
+- Address: 2nd Floor, Pulinat Bldg., Opp. Cochin Shipyard, M. G. Road, Ernakulam - 682 015.
+- Phone: 0484 - 2358759 / 2359338
+- Fax: 0484 - 2359336
+- Email: bimalokpal.ernakulam@ecoi.co.in
+- Jurisdiction: Kerala, Lakshadweep, Mahe-a part of Pondicherry.
+
+**7. Lucknow:**
+- Address: 6th Floor, Jeevan Bhawan, Phase-II, Nawal Kishore Road, Hazratganj, Lucknow - 226 001.
+- Phone: 0522 - 2231330 / 2231331
+- Fax: 0522 - 2231310
+- Email: bimalokpal.lucknow@ecoi.co.in
+- Jurisdiction: Districts of Uttar Pradesh: Laitpur, Jhansi, Mahoba, Hamirpur, Banda, Chitrakoot, Allahabad, Mirzapur, Sonbhabdra, Fatehpur, Pratapgarh, Jaunpur, Varanasi, Gazipur, Jalaun, Kanpur, Lucknow, Unnao, Sitapur, Lakhimpur, Bahraich, Barabanki, Raebareli, Sravasti, Gonda, Faizabad, Amethi, Kaushambi, Balrampur, Basti, Ambedkarnagar, Sultanpur, Maharajgang, Santkabirnagar, Azamgarh, Kushinagar, Gorkhpur, Deoria, Mau, Ghazipur, Chandauli, Ballia, Sidharathnagar.
+
+**8. Jaipur:**
+- Address: Jeevan Nidhi – II Bldg., Gr. Floor, Bhawani Singh Marg, Jaipur - 302 005.
+- Phone: 0141 - 2740363
+- Email: Bimalokpal.jaipur@ecoi.co.in
+- Jurisdiction: Rajasthan
+
+**9. Bengaluru:**
+- Address: Jeevan Soudha Building, PID No.57-27-N-19 Ground Floor, 19/19, 24th Main Road, JP Nagar, Ist Phase, Bengaluru – 560 078.
+- Phone: 080 - 26652048 / 26652049
+- Email: bimalokpal.bengaluru@ecoi.co.in
+- Jurisdiction: Karnataka

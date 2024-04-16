@@ -1,0 +1,6 @@
+ The table shows the premium to be retained based on the period of risk.
+
+- For a period of risk not exceeding 15 days, the premium to be retained is 10% of the annual rate.
+- For a period of risk not exceeding 1 month, the premium to be retained is 15% of the annual rate.
+- For a period of risk not exceeding 2 months, the premium to be retained is 30% of the annual rate.
+- For a period of risk not exceeding 3 months, the premium to be retained is 40% of the annual rate.

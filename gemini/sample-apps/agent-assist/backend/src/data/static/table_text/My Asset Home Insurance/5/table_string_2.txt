@@ -1,0 +1,27 @@
+ The table provides the names and addresses of the Insurance Ombudsman Centres in India, along with their respective jurisdictions.
+
+- **Ahmedabad:**
+  - Ombudsman: Shri Kuldip Singh
+  - Address: Jeevan Prakash Building, 6th floor, Tilak Marg, Relief Road, Ahmedabad – 380 001.
+  - Jurisdiction: Gujarat, Dadra & Nagar Haveli, Daman and Diu.
+  - Contact:
+    - Tel.: 079 - 25501201/02/05/06
+    - Email: bimalokpal.ahmedabad@ecoi.co.in
+
+- **Bhubaneshwar:**
+  - Ombudsman: Shri Suresh Chandra Panda
+  - Address: 62, Forest park, Bhubneshwar - 751 009.
+  - Jurisdiction: Orissa
+  - Contact:
+    - Tel.: 0674 - 2596461 / 2596455
+    - Fax: 0674 - 2596429
+    - Email: bimalokpal.bhubaneswar@ecoi.co.in
+
+- **Chennai:**
+  - Ombudsman: Shri M. Vasantha Krishna
+  - Address: Fatima Akhtar Court, 4th Floor, 453, Anna Salai, Teynampet, CHENNAI - 600 018
+  - Jurisdiction: Tamil Nadu, Pondicherry Town and Karaikal (which are part of Pondicherry).
+  - Contact:
+    - Tel.: 044 - 24333668 / 24335284
+    - Fax: 044 - 24333664
+    - Email: bimalokpal.chennai@ecoi.co.in

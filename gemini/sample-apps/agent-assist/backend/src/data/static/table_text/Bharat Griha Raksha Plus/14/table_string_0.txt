@@ -1,0 +1,40 @@
+ The table provides the contact information for various Insurance Ombudsman offices in India. Each row represents an office, and the columns provide details such as the office address, jurisdiction, telephone numbers, fax numbers, and email addresses. Here's the information extracted from the table:
+
+**Office 1: DELHI**
+- Jurisdiction: Delhi and the following districts of Haryana - Gurugram, Faridabad, Sonepat, and Bahadurgarh.
+- Address: 2/2 A, Universal Insurance Building, Asaf Ali Road, New Delhi - 110 002.
+- Telephone: 011 - 23232481/23213504
+- Email: bimalokpal.delhi@cioins.co.in
+
+**Office 2: GUWAHATI**
+- Jurisdiction: Assam, Meghalaya, Manipur, Mizoram, Arunachal Pradesh, Nagaland, and Tripura.
+- Address: Jeevan Nivesh, 5th Floor, Nr. Panbazar over bridge, S.S. Road, Guwahati - 781001 (ASSAM).
+- Telephone: 0361 - 2632204 / 2602205
+- Email: bimalokpal.guwahati@cioins.co.in
+
+**Office 3: HYDERABAD**
+- Jurisdiction: Andhra Pradesh, Telangana, Yanam, and part of the Union Territory of Puducherry.
+- Address: 6-2-46, 1st floor, "Moin Court", Lane Opp. Saleem Function Palace, A. C. Guards, Lakdi-Ka-Pool, Hyderabad - 500 004.
+- Telephone: 040 - 23312122
+- Fax: 040 - 23376599
+- Email: bimalokpal.hyderabad@cioins.co.in
+
+**Office 4: JAIPUR**
+- Jurisdiction: Rajasthan.
+- Address: Jeevan Nidhi – II Bldg., Gr. Floor, Bhawani Singh Marg, Jaipur - 302 005.
+- Telephone: 0141 - 2740363
+- Email: bimalokpal.jaipur@cioins.co.in
+
+**Office 5: ERNAKULAM**
+- Jurisdiction: Kerala, Lakshadweep, and Mahe (a part of the Union Territory of Puducherry).
+- Address: 2nd Floor, Pulinat Bldg., Opp. Cochin Shipyard, M. G. Road, Ernakulam - 682 015.
+- Telephone: 0484 - 2358759 / 2359338
+- Fax: 0484 - 2359336
+- Email: bimalokpal.ernakulam@cioins.co.in
+
+**Office 6: KOLKATA**
+- Jurisdiction: West Bengal, Sikkim, and Andaman & Nicobar Islands.
+- Address: Hindustan Bldg. Annexe, 4th Floor, 4, C.R. Avenue, Kolkata - 700 072.
+- Telephone: 033 - 22124339 / 22124340
+- Fax: 033 - 22124341
+- Email: bimalokpal.kolkata@cioins.co.in

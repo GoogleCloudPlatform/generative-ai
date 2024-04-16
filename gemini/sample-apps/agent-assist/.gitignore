@@ -1,0 +1,15 @@
+.DS_Store
+backend/.venv/
+.venv
+/node_modules
+.vscode
+black_logs.json
+black_logs.md
+errors_mypy
+linter_helper.ipynb
+logs.json
+logs.md
+pylint_logs.json
+pylint_logs.md
+wrapper.sh
+backend/src/my_config.py

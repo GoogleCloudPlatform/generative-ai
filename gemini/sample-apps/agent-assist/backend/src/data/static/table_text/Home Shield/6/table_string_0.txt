@@ -1,0 +1,6 @@
+ The table shows the discounts in premium for different policy periods.
+
+For a policy period of 2 years, the discount in premium is 3%.
+For a policy period of 3 years, the discount in premium is 6%.
+For a policy period of 4 years, the discount in premium is 9%.
+For a policy period of 5 years, the discount in premium is 12%.

@@ -1,0 +1,9 @@
+ The table shows the percentage of depreciation for items based on their age.
+
+- For items up to 6 months old, the depreciation is 10%.
+- For items up to 1 year old, the depreciation is 20%.
+- For items up to 2 years old, the depreciation is 40%.
+- For items up to 3 years old, the depreciation is 50%.
+- For items up to 4 years old, the depreciation is 60%.
+- For items up to 5 years old, the depreciation is 70%.
+- For items older than 5 years, the depreciation is 75%.
