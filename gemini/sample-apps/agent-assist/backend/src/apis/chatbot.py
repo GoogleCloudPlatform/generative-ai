@@ -14,18 +14,9 @@ def chatbot_entry(data: dict = {}) -> dict:
     Returns:
         dict: A dictionary of data representing the output from the chatbot.
     """
-    if type(data.get("query")) is not list:
-        chat_history: list[str] = [""]
 
+    chat_history = data.get("chat_history")
     query = data.get("query")
-    chat_history_from_data = data.get("chat_history")
-
-    if type(chat_history_from_data) is str:
-        chat_history: list[str] = [
-            chat_history_from_data,
-        ]
-    else:
-        chat_history: list[str] = chat_history_from_data
 
     chat_history_string = process_history(chat_history)
     with open("data/static/oe_examples/logs.json") as f:
@@ -45,7 +36,7 @@ def chatbot_entry(data: dict = {}) -> dict:
     return result
 
 
-def process_history(chat_history: list) -> str:
+def process_history(chat_history):
     """
     This function processes the chat history and returns a string that can be used to display the chat history.
 

@@ -99,7 +99,7 @@ class Calendar:
         # print(event)
         return event
 
-    def get_events_by_date(self, event_date: str) -> List[Dict[str, Any]]:
+    def get_events_by_date(self, event_date):
         """
         Gets all events on the user's calendar for a given date.
 
@@ -114,7 +114,7 @@ class Calendar:
         event_date = datetime(
             int(split_date[2]), int(split_date[1]), int(split_date[0]), 00, 00, 00, 0
         )
-        event_date = pytz.UTC.localize(event_date).isoformat()
+        event_date_str = pytz.UTC.localize(event_date).isoformat()
 
         end: datetime = datetime(
             int(split_date[2]),
@@ -129,7 +129,7 @@ class Calendar:
 
         events_result = (
             self.service.events()
-            .list(calendarId="primary", timeMin=event_date, timeMax=end_string)
+            .list(calendarId="primary", timeMin=event_date_str, timeMax=end_string)
             .execute()
         )
         return events_result.get("items", [])

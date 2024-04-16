@@ -65,7 +65,7 @@ EXPLANATION:
 """
 
 
-def calendar_component(query: str, chat_history: str = "[]") -> dict:
+def calendar_component(query, chat_history = "[]"):
     """
     This function takes a query and a chat history as input and returns a dictionary with the following keys:
     - task: The task to be performed. This can be either "schedule" or "get_appointments".
@@ -86,7 +86,6 @@ def calendar_component(query: str, chat_history: str = "[]") -> dict:
     """
     gemini = GeminiText()
     response = gemini.generate_response(PROMPT.format(query=query))
-
     response = response.split("OUTPUT:")[1]
     response = response.strip()
     if response != "INVALID":

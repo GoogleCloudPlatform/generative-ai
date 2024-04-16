@@ -14,7 +14,7 @@ OUTPUT:
 """
 
 
-def get_data_from_threads(service, emailid, threads) -> tuple[str, datetime]:
+def get_data_from_threads(service, emailid, threads):
     """Gets the data from the email threads.
 
     Args:
