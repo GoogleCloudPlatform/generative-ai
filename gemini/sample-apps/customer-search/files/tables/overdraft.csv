@@ -1,0 +1,2 @@
+customer_id,amount,interest_rate,min_interest_rate,processing_fee,min_processing_fee
+592783,30000.0,16.0,16.0,1500.0,1000.0

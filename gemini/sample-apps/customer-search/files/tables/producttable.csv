@@ -1,0 +1,16 @@
+product_name,product,Partner_Product,rate_of_interest,partner_description,webpage,product_code,Partner_Type
+Cymbal Bank,Savings Salary A/C ,N,,,,70001,Banking
+Cymbal Bank,Fixed Deposit,N,,,,70002,Banking
+Cymbal Bank,Flexi Deposit,N,7,,,70003,Banking
+Cymbal Bank,Gold Card,N,,,,70004,Banking
+Cymbal Bank,Medical Insurance,N,,,,70005,Banking
+Cymbal Bank,Premium Travel Card,N,,,,70006,Banking
+Cymbal Bank,Platinum Card,N,,,,70007,Banking
+Cymbal Bank,Personal Loan ,N,,,,70008,Banking
+Cymbal Bank,Vehicle Loan,N,,,,70009,Banking
+Cymbal Bank,Consumer Durables Loan ,N,,,,70010,Banking
+Cymbal Investments ,Broking A/C ,10004,,Cymbal Investment offers low brokerage investment account for shares and mutual funds,www.cymbalinvest.com,70011,Investment 
+Cymbal Wealth Advisors,Broking A/C ,10005,,"Cymbal Wealth Advisors offers complete wealth management solutions covering shares, mutual funds, international investments , commodities and AIFs",www.cwealthadvisors.com,70012,Investment 
+India Money Advisors,Broking A/C ,10006,,"India Wealth Advisors offers robo advisory shares, mutual funds, international investments , commodities and AIFs",www.indiamoneyadvisors.com,70013,Investment 
+ProInvestments ,Broking A/C ,10006,,ProInvestments is a Mutual Fund investment platform,,70014,Investment 
+Platinum Mutual Funds ,Mutual Fund,10007,,"Platinum mutual funds is a direct mutual fund that provides schemes for debt, equity and hybrid investments in India market ",,70015,Investment 
