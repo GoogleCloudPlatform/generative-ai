@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from google.cloud import storage
 import pandas as pd
 import streamlit as st
+from typing import Any
 
 load_dotenv()
 
@@ -68,7 +69,7 @@ def update_projects(my_list: list[str]) -> None:
     blob.upload_from_string(list_string)
 
 
-def list_pdf_files_gcs() -> list[tuple[str, str]]:
+def list_pdf_files_gcs() -> list[list[Any]]:
     """Lists the PDF files in the current project's GCS bucket.
 
     This function lists the PDF files in the current project's GCS bucket.
@@ -77,7 +78,7 @@ def list_pdf_files_gcs() -> list[tuple[str, str]]:
     It then returns a list of tuples of the blob name and the file extension.
 
     Returns:
-        list[tuple[str, str]]: A list of tuples of the blob name and the file extension.
+        list[list[Any]]: A list of tuples of the blob name and the file extension.
     """
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)
