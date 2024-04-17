@@ -30,10 +30,10 @@ code.code_model_name = "code-bison"
 [pages.home]
 
 page_title = "Gen AI for Product Innovation"
-page_icon = "app/images/favicon.png"
-sidebar_image_path = "app/images/main_logo.png"
-file_name_1 = "app/images/intro_home_1.png"
-file_name_2 = "app/images/intro_home_2.png"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+file_name_1 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_1.png"
+file_name_2 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_2.png"
 
 
 # -----------------------------------------------------------------------------
@@ -42,9 +42,9 @@ file_name_2 = "app/images/intro_home_2.png"
 [pages.1_Resources]
 
 page_title = "Resources"
-page_icon = "app/images/favicon.png"
-sidebar_image_path = "app/images/main_logo.png"
-resources_img="app/images/resources_img.png"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+resources_img="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/resources_img.png"
 
 # -----------------------------------------------------------------------------
 # Configurations for page: 2_ Marketing_Insights.py
@@ -53,9 +53,9 @@ resources_img="app/images/resources_img.png"
 [pages.2_Marketing_Insights]
 page_title = "Marketing Insights"
 page_icon = "./images/favicon.png"
-sidebar_image_path = "app/images/main_logo.png"
-prod_insights_1="app/images/prod_insights_1.png"
-prod_insights_2="app/images/prod_insights_2.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+prod_insights_1="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/prod_insights_1.png"
+prod_insights_2="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/prod_insights_2.png"
 
 
 # -----------------------------------------------------------------------------
@@ -64,9 +64,9 @@ prod_insights_2="app/images/prod_insights_2.png"
 
 [pages.3_Generations]
 page_title = "Generations"
-page_icon = "app/images/favicon.png"
-sidebar_image_path = "app/images/main_logo.png"
-prod_gen_img="app/images/prod_gen_img.png"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+prod_gen_img="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/prod_gen_img.png"
 
 
 
@@ -76,5 +76,5 @@ prod_gen_img="app/images/prod_gen_img.png"
 
 [pages.Editor]
 page_title = "Editor"
-page_icon = "app/images/favicon.png"
-sidebar_image_path = "app/images/main_logo.png"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
