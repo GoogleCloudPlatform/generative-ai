@@ -41,7 +41,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 ### 1. Document Upload
 
 <p align="center">
-  <img src="./readme_images/resource_upload.gif" alt="Image Description" width="600"/>
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/resource_upload.gif" alt="Image Description" width="600"/>
 </p>
 
 - **Objective**: Integrate your critical project data for analysis with the solution.
@@ -56,7 +56,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **Dynamic Suggestions**
 
   <p align="center">
-    <img src="./readme_images/suggestions.png" alt="Image Description" width="600"/>
+    <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/suggestions.png" alt="Image Description" width="600"/>
   </p>
 
 - **Objective**: This feature generates contextually relevant suggestions designed to extract essential product insights and attributes companies deem important.
@@ -74,11 +74,11 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
       - Comparisons
 
 <p align="center">
-    <img src="./readme_images/insights.png" alt="Image Description" width="600"/>
+    <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/insights.png" alt="Image Description" width="600"/>
   </p>
 
 <p align="center">
-    <img src="./readme_images/follow_up_qs.png" alt="Image Description" width="600"/>
+    <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/follow_up_qs.png" alt="Image Description" width="600"/>
   </p>
 
 - **Benefits**
@@ -89,7 +89,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **Dynamic Sample Queries**
 
   <p align="center">
-     <img src="./readme_images/queries.png" alt="Image Description" width="600"/>
+     <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/queries.png" alt="Image Description" width="600"/>
    </p>
 
   - **Objective**: This feature generates contextually relevant questions designed to extract essential product attributes consumers deem important within your chosen category.
@@ -105,7 +105,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **Feature Selection**
 
    <p align="center">
-     <img src="./readme_images/features.png" alt="Image Description" width="600"/>
+    <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/features.png" alt="Image Description" width="600"/>
    </p>
 
   - **Objective**: Gives you direct control in constructing your ideal product concept.
@@ -118,7 +118,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
   - **Output**: Presents a series of product ideas featuring the AI-generated concepts, helping to visualize the creative possibilities.
 
   <p align="center">
-     <img src="./readme_images/product.png" alt="Image Description" width="600"/>
+     <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/product.png" alt="Image Description" width="600"/>
   </p>
 
 ### 4. Selective Regeneration
@@ -127,7 +127,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **Functionality**: Text Modification, Image Modification, Whole Product Regeneration.
 
    <p align="center">
-        <img src="./readme_images/text_regen.gif" alt="Image Description" width="600"/>
+      <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/readme_images/text_regen.gif" alt="Image Description" width="600"/>
     </p>
 
 ### 5. Export Content
