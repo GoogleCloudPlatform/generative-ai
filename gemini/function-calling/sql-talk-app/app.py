@@ -66,6 +66,7 @@ sql_query_func = FunctionDeclaration(
     },
 )
 
+
 sql_query_tool = Tool(
     function_declarations=[
         list_datasets_func,
