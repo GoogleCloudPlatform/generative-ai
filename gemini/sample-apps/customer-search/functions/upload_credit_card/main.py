@@ -74,8 +74,8 @@ def hello_http(
     # Get the current date
     present_date = date.today()
     # Format the date as a string
-    present_date = present_date.isoformat()
-    print("present_date = ", present_date)
+    present_date_str = present_date.isoformat()
+    print("present_date = ", present_date_str)
     print("Card Number = ", card_number)
 
     # Query BigQuery to check if the credit card already exists for the customer
@@ -104,14 +104,14 @@ def hello_http(
                 "credit_card_expiration_year": 2027,
                 "credit_card_name": credit_card,
                 "international_transaction_enabled": True,
-                "credit_card_last_updated": present_date,
+                "credit_card_last_updated": present_date_str,
             }
         ]
         client.insert_rows_json(table_id, row)
     # If the credit card already exists, update it with the new information
     else:
         query_update_credit_card = f"""UPDATE `{project_id}.DummyBankDataset.CreditCards`
-            SET credit_card_number = {card_number}, credit_card_last_updated = '{present_date}'
+            SET credit_card_number = {card_number}, credit_card_last_updated = '{present_date_str}'
             WHERE customer_id = {customer_id} and credit_card_name = '{credit_card}'
             """
         client.query(query_update_credit_card)
