@@ -2,13 +2,13 @@
 
 ## **Meet Ishan:** **Juggling Expenses and Chasing Dreams**
 
-* Mid-income Individual in his 30s
+- Mid-income Individual in his 30s
 
-* Hustled to obtain a decent career but still faces tight finances
+- Hustled to obtain a decent career but still faces tight finances
 
-* Interested in understanding investmentsIshaan wants a banking partner who can offer the tools, resources, and guidance he needs to not only overcome his current challenges but also lay the foundation for a more secure and fulfilling financial tomorrow
+- Interested in understanding investmentsIshaan wants a banking partner who can offer the tools, resources, and guidance he needs to not only overcome his current challenges but also lay the foundation for a more secure and fulfilling financial tomorrow
 
-***
+---
 
 **User - Hi**\
 **Bot** - Hi Ishan, what can I help you with today?\
@@ -16,7 +16,8 @@
 **Bot** - Your account balance is ₹10,000.00And, scheduled expenses for rest of month are:\
 ₹1,500.00 - Wifi Bill on Oct 19, 2023\
 ₹1,567.50 - Electricity Bill on Oct 29, 2023\
-₹18,500.00 - House Rent on Oct 5, 2023\ Your funds are on vacation, but your bills never take one.**User - can i get an loan or overdraft of 50k?**\
+₹18,500.00 - House Rent on Oct 5, 2023\ Your funds are on vacation, but your bills never take one.\
+**User - can i get an loan or overdraft of 50k?**\
 **Bot** - Based on our relationship, you are pre-approved for a ₹30,000 overdraft at an interest rate of 16% and a one-time processing fee of ₹1,500. Would you like to proceed?\
 **User - how does overdraft work?**\
 **Bot** - \<Enterprise Search>\

@@ -180,16 +180,6 @@ def ask_react(query, react_agent):
     return formatter(result)
 
 
-@tool
-def enterprise_search(query: str):
-    """
-    Use this tool to find information in documents.
-    Args:
-    query: Analyse the conversation to come up with the parameter. This is the current problem the user is trying to solve.
-    """
-    return ask(query)
-
-
 # Utility functions for Embeddings API with rate limiting
 def rate_limit(max_per_minute):
     period = 60 / max_per_minute
@@ -206,8 +196,6 @@ def rate_limit(max_per_minute):
 
 
 class BaseModelMixin:
-    requests_per_minute: int
-    num_instances_per_batch: int
 
     # Overriding embed_documents method
     def embed_documents(self, texts: List[str]):
@@ -385,14 +373,6 @@ def hello_http(request):
     qa.combine_documents_chain.llm_chain.llm.verbose = True
 
     response, ref = ask(query, qa, NUMBER_OF_RESULTS, SEARCH_DISTANCE_THRESHOLD)
-
-    # react_agent = initialize_agent(
-    #     llm=llm,
-    #     tools=[enterprise_search],
-    #     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    #     verbose=True,
-    # )
-    # response, ref = ask_react(query, react_agent)
 
     # remove duplicates from references
     references = []

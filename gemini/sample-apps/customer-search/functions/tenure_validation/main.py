@@ -18,12 +18,16 @@ def get_number_of_days(fd_tenure: str) -> int:
     months = 0
     days = 0
 
-    if re.search(r"(\d+) year", fd_tenure) is not None:
-        years = re.search(r"(\d+) year", fd_tenure).group(1)
-    if re.search(r"(\d+) month", fd_tenure) is not None:
-        months = re.search(r"(\d+) month", fd_tenure).group(1)
-    if re.search(r"(\d+) day", fd_tenure) is not None:
-        days = re.search(r"(\d+) day", fd_tenure).group(1)
+    year_re = re.search(r"(\d+) year", fd_tenure)
+    month_re = re.search(r"(\d+) month", fd_tenure)
+    day_re = re.search(r"(\d+) day", fd_tenure)
+
+    if year_re is not None:
+        years = int(year_re.group(1))
+    if month_re is not None:
+        months = int(month_re.group(1))
+    if day_re is not None:
+        days = int(day_re.group(1))
 
     # Convert the years, months, and days to integers.
     years = int(years)
