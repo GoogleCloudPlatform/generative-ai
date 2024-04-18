@@ -196,7 +196,6 @@ def rate_limit(max_per_minute):
 
 
 class BaseModelMixin:
-
     # Overriding embed_documents method
     def embed_documents(self, texts: List[str]):
         limiter = rate_limit(self.requests_per_minute)
