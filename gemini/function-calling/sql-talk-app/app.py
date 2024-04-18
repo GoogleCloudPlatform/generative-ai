@@ -4,7 +4,7 @@ from google.cloud import bigquery
 import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
-BIGQUERY_DATASET_ID = "google.com:lps-global-sales-engine-243309"
+BIGQUERY_DATASET_ID = "dst-master.product_adoption.p0_totalStats"
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
