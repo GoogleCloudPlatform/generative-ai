@@ -14,10 +14,10 @@ import logging
 import os
 from typing import Any
 
-import pandas as pd
-import streamlit as st
 from dotenv import load_dotenv
 from google.cloud import storage
+import pandas as pd
+import streamlit as st
 
 load_dotenv()
 
