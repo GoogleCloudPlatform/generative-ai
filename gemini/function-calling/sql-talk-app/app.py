@@ -4,7 +4,7 @@ from google.cloud import bigquery
 import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
-BIGQUERY_DATASET_ID = "thelook_ecommerce"
+BIGQUERY_DATASET_ID = "dst-master.performanceoverview"
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
@@ -82,31 +82,30 @@ model = GenerativeModel(
 )
 
 st.set_page_config(
-    page_title="SQL Talk with BigQuery",
-    page_icon="vertex-ai.png",
+    page_title="AskDST",
+    page_icon="dst_logo.png",
     layout="wide",
 )
 
 col1, col2 = st.columns([8, 1])
 with col1:
-    st.title("SQL Talk with BigQuery")
+    st.title("AskDST")
 with col2:
-    st.image("vertex-ai.png")
+    st.image("dst_logo.png")
 
-st.subheader("Powered by Function Calling in Gemini")
+st.subheader("Powered by Gemini & DST PerformanceOverview Table")
 
 st.markdown(
-    "[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)   •   [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)   •   [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)   •   [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"
+    "[go/dst-site](https://sites.google.com/corp/google.com/sellside-datasolutions/home)"
 )
 
 with st.expander("Sample prompts", expanded=True):
     st.write(
         """
-        - What kind of information is in this database?
-        - What percentage of orders are returned?
-        - How is inventory distributed across our regional distribution centers?
-        - Do customers typically place more than one order?
-        - Which product categories have the highest profit margins?
+        - Whats the best performing ad format for company name XXX?
+        - Whats last quarter revenue for company xxx on their web inventory?
+        - Whats the avg revenue in vertical xxx?
+        - How much muted inventory does my publisher have this month?
     """
     )
 
