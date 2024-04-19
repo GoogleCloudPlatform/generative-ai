@@ -46,7 +46,7 @@ class Articles:
 
         faiss_retriever = local_vectorstore.as_retriever(search_kwargs={"k": 3})
 
-        # initialize the ensemble retriever
+        # initializing the ensemble retriever
         p = 0.6
         self.ensemble_retriever = EnsembleRetriever(
             retrievers=[bm25_retriever, faiss_retriever], weights=[p, 1 - p]
