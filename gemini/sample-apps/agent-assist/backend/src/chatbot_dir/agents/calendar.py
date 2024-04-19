@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from dateutil.parser import parse
-
 from utils.cal import Calendar
 from utils.gemini_text import GeminiText
 

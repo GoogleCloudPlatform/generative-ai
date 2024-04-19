@@ -1,7 +1,6 @@
+from config import config
 import vertexai
 from vertexai.preview.language_models import TextGenerationModel
-
-from config import config
 
 # Define the default parameters for text generation
 parameters = {

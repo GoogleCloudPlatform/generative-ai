@@ -1,5 +1,4 @@
 from flask import jsonify, request
-
 from utils.mail import Mail
 
 

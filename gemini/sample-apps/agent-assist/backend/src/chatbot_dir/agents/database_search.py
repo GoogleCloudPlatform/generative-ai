@@ -1,9 +1,8 @@
-import json
 from datetime import date
+import json
 
 import pandas as pd
 import pandasql as ps
-
 from utils.text_bison import TextBison
 
 # SQL_PROMPT is a string template that is used to generate the SQL query.
