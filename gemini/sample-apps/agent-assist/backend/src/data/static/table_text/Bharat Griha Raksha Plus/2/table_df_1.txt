@@ -1,8 +1,0 @@
-      0                                                                                     1                                                                                   2
-0  None                                                                              Column A                                                                            Column B
-1  None   physical loss or damage, or destruction caused cover We\nto the Insured Property by  any loss or damage, or destruction caused We do not cover\nto the Insured Property
-2     1                                                                                  Fire             caused by burning of Insured Property by order of any\nPublic Authority
-3     2                                                                Explosion or Implosion                                                                                   -
-4     3                                                                             Lightning                                                                                   -
-5     4                         Earthquake, volcanic eruption, or other convulsions of nature                                                                                   -
-6     5  Storm, Cyclone, Typhoon, Tempest, Hurricane, Tornado,\nTsunami, Flood and Inundation                                                                                   -

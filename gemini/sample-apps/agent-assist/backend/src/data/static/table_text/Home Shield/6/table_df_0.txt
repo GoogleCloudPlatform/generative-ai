@@ -1,6 +1,0 @@
-                        0                     1
-0  Policy Period (in Yrs)  Discounts in Premium
-1                       2                    3%
-2                       3                    6%
-3                       4                    9%
-4                       5                   12%

@@ -1,7 +1,0 @@
-* Koustav Sen : koustavsen@google.com
-* Shashwat Saxena : shashwatsaxena@google.com
-* Kartikey Gupta : kartikeygupta@google.com
-* Nitin Chandak : nitinchandak@google.com
-* Channit Dak : channitdak@gmail.com
-* Sanhitha Seerapu : sanhitha@google.com
-* Ravi Manjunatha : ravimanjunatha@google.com

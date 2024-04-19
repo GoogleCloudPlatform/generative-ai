@@ -1,9 +1,0 @@
-                0                  1
-0     Age of Item  % of Depreciation
-1  Up to 6 months                10%
-2    Up to 1 Year                20%
-3    Up to 2 Year                40%
-4    Up to 3 Year                50%
-5    Up to 4 Year                60%
-6    Up to 5 year                70%
-7   Above 5 Years                75%

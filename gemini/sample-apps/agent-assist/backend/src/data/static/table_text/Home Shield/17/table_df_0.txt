@@ -1,6 +1,0 @@
-                                0                                               1
-0  Period of Risk (Not exceeding)  Premium to be retained (% of the Annual\nRate)
-1                         15 Days                                             10%
-2                         1 Month                                             15%
-3                        2 Months                                             30%
-4                        3 Months                                             40%
