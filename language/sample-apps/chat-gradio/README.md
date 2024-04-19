@@ -6,7 +6,7 @@
 
 This application demonstrates a Cloud Run application that uses the [Gradio](https://www.gradio.app/) framework.
 
-![Gradio Chat App Screen](../assets/gradio-app-screen.png "Gradio Chat App")
+![Gradio Chat App Screen](https://storage.googleapis.com/github-repo/assets/gradio-app-screen.png "Gradio Chat App")
 
 ## Build and Deploy the application to Cloud Run
 
