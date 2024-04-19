@@ -12,6 +12,42 @@ logs.md
 pylint_logs.json
 pylint_logs.md
 wrapper.sh
+
+# Backend Files
 backend/src/my_config.py
-package.json
-package-lock.json
+backend/.venv/
+backend/*.pyc
+backend/__pycache__/
+backend/instance/
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/dist/
+backend/*.egg-info/
+backend/flask_session/
+backend/notebooks/sales_pitch.ipynb
+backend/src/notebooks/sales_pitch.ipynb
+cal_token.json
+mail_token.json
+backend/src/keys/*
+
+
+# Frontend Files
+
+# dependencies
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.js
+# testing
+frontend/coverage
+# production
+frontend/build
+# misc
+frontend/.DS_Store
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
