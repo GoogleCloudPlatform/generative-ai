@@ -1,4 +1,9 @@
-config = {
+from typing_extensions import TypedDict
+
+Config = TypedDict('Config', {"PROJECT_ID": str, "LOCATION": str, "parameters": dict, "username": str,
+                   "password": str, "Images": dict, "Data": dict, "countryList": list, "links": dict, "postid": int, "mode": int})
+
+config: Config = {
     "PROJECT_ID": "<YOUR_GCP_PROJECT_ID>",
     "LOCATION": "us-central1",
     "parameters": {

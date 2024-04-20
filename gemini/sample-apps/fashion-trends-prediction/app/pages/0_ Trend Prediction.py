@@ -146,7 +146,7 @@ def change_button_colour(widget_label, prsd_status):
         widget_label (str): The label of the button.
         prsd_status (bool): True if the button is pressed, False otherwise.
     """
-    btn_bg_colour = pressed_colour if prsd_status == True else unpressed_colour
+    btn_bg_colour = pressed_colour if prsd_status is True else unpressed_colour
     htmlstr = f"""
         <script>
             var elements = window.parent.document.querySelectorAll('button');
@@ -216,7 +216,7 @@ if submit or key in st.session_state:
                 start_index = resp.find("{")
                 end_index = resp.rfind("}")
 
-                resp = resp[start_index : end_index + 1]
+                resp = resp[slice(start_index, end_index + 1)]
 
                 response = json.loads(resp)
                 state["summary"] = response
@@ -227,7 +227,7 @@ if submit or key in st.session_state:
 
         state["items"] = [i.capitalize() for i in state["items"]]
         state["additional_outfits"] = [
-            [i.capitalize() for i in l] for l in state["additional_outfits"]
+            [i.capitalize() for i in list_var] for list_var in state["additional_outfits"]
         ]
 
         print(state["items"])

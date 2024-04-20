@@ -71,8 +71,8 @@ To run the Streamlit Application locally (on cloud shell), we need to perform th
 
 2. Your application requires access to two variables:
 
-   - `PROJECT_ID` : This the Google Cloud project ID.
-   - `LOCATION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
+   * `PROJECT_ID` : This the Google Cloud project ID.
+   * `LOCATION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
 
    These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region - `vertexai.init(project=PROJECT_ID, location=LOCATION)`.
 
@@ -102,8 +102,8 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
 
 1. Your Cloud Run app requires access to two environment variables:
 
-   - `PROJECT_ID` : This the Google Cloud project ID.
-   - `LOCATION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
+   * `PROJECT_ID` : This the Google Cloud project ID.
+   * `LOCATION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
 
    These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region -
    `vertexai.init(project=PROJECT_ID, location=LOCATION)`

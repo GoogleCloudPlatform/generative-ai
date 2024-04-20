@@ -361,7 +361,9 @@ output: {
 \"jewellery\": \"dainty kundan jhumkas\"
 }
 
-input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - """ + article_summary + """output:
+input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - """ 
+        + article_summary
+        + """output:
 """,
         **parameters,
     )
