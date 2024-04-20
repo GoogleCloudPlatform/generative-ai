@@ -30,7 +30,6 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-
 def update_generation_state():
     """Updates the generation state post generate button click."""
 
