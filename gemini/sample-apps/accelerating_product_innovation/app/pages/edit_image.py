@@ -21,12 +21,10 @@ from app.pages_utils.utils_edit_image import (
     initialize_edit_page_state,
     process_foreground_image,
     save_draft_image,
+    generate_suggested_images,
+    render_suggested_images
 )
 from app.pages_utils.utils_editor_ui import ImageEditor
-from app.pages_utils.utils_generate_image_suggestions import (
-    generate_suggested_images,
-    render_suggested_images,
-)
 import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
 
