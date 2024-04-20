@@ -4,7 +4,8 @@ Config = TypedDict('Config', {"PROJECT_ID": str, "LOCATION": str, "parameters": 
                    "password": str, "Images": dict, "Data": dict, "countryList": list, "links": dict, "postid": int, "mode": int})
 
 config: Config = {
-    "PROJECT_ID": "<YOUR_GCP_PROJECT_ID>",
+    # "PROJECT_ID": "<YOUR_GCP_PROJECT_ID>",
+    "PROJECT_ID": "aurora-cohort-2",
     "LOCATION": "us-central1",
     "parameters": {
         "standard": {

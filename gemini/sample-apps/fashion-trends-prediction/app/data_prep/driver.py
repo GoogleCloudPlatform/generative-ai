@@ -311,7 +311,6 @@ def instaScrape():
         saved = json.load(f)
 
     create_final_data(scrape_size)
-    # merge_keys()
 
     with open(data_path, "r") as f:
         saved = json.load(f)
