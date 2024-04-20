@@ -2,7 +2,7 @@
 
 | | | |
 |-|-|-|
-|Author(s) | [Devika Mittal](https://github.com/devikamittal19) | Shubham Saurav |
+|Author(s) | [Devika Mittal](https://github.com/devikamittal19) | [Shubham Saurav](https://github.com/shubhgoogle) |
 
 This Cloud Run application helps fashion retailers to stay ahead of the fashion curve and predict upcoming trends by analyzing fashion trends that are popular on Instagram among celebrities and influencers, because these trends are likely to become popular in the mainstream soon.
 
