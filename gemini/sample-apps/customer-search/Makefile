@@ -6,6 +6,7 @@ deploy_resources:
 	terraform init 
 	terraform apply -auto-approve
 	terraform output > output_urls.txt
+	gcloud storage cp gs://public_bucket_fintech_app/CymBuddy_DF_template/CymBuddy.json files/
 	python3 dialogflow.py
 
 deploy_website:
