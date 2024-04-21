@@ -11,7 +11,6 @@ import urllib.request
 import functions_framework
 
 # from langchain.agents import AgentType, initialize_agent
-from langchain.agents import tool
 from langchain.chains import RetrievalQA
 from langchain.document_loaders import WebBaseLoader
 from langchain.embeddings import VertexAIEmbeddings
