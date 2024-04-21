@@ -11,7 +11,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script defer type="module" src="scripts/script_new.js"></script>
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
-    <!-- <script defer src="script-private.js"></script> -->
     <style>
         df-messenger {
             z-index: 999;
@@ -33,8 +32,6 @@
 
         var query = document.getElementById("search-query-input").value;
         var searchResultsPage = '/search';
-
-        // var url = siteSearchUrl + query
 
         const uri = '{{rag_qa_chain_url_translate}}';
         const body = JSON.stringify({ query: query })
@@ -200,19 +197,6 @@
                             <li><a class="nav-link" href="loans">Fixed Deposit Overdraft</a></li>
                             <li><a class="nav-link" href="loans">Overdraft Against Securities</a></li>
                             <li><a class="nav-link" href="loans">Home Loan</a></li>
-                            <!-- <li class="loans">
-                                <span><a class="nav-link" href="#">Loans</a>
-                                    <i class='bx bxs-chevron-right arrow loans-arrow'></i>
-                                </span>
-                                <ul class="loans-sub-menu sub-menu">
-                                    <li><a class="nav-link" href="#">Personal Loan</a></li>
-                                    <li><a class="nav-link" href="#">Home Loan</a></li>
-                                    <li><a class="nav-link" href="#">Business Loan</a></li>
-                                    <li><a class="nav-link" href="#">Car Loan</a></li>
-                                    <li><a class="nav-link" href="#">Two Wheeler Loan</a></li>
-                                    <li><a class="nav-link" href="#">Education Loan</a></li>
-                                </ul>
-                            </li> -->
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -413,16 +397,6 @@
                 </form>
             </div>
         </div>
-        <!-- <form class="modal-form">
-                <label>First Name</label>
-                <input type="text" />
-                <label>Last Name</label>
-                <input type="text" />
-                <label>Email Address</label>
-                <input type="email" />
-                <button class="btn">Next step &rarr;</button>
-            </form> -->
-        <!-- <div class="loader"></div> -->
     </div>
     <div class="overlay hidden"></div>
 </body>

@@ -310,8 +310,6 @@
 
             var query = document.getElementById("search-query-input").value;
 
-            // var url = siteSearchUrl + query
-
             const uri = '{{rag_qa_chain_url_translate}}';
             const body = JSON.stringify({ query: query })
             const initDetails = {
@@ -346,18 +344,6 @@
                     var i = 0;
                     var count = 0
 
-                    // var txt = obj.fulfillment_response.messages[0].text.text[0];
-                    // document.getElementById('search-result').innerHTML = txt;
-                    // var speed = 50;
-
-                    // function typeWriter() {
-                    //     if (i < txt.length) {
-                    //         document.getElementById('search-result').innerHTML += txt.charAt(i);
-                    //         i++;
-                    //         setTimeout(typeWriter, speed);
-                    //     }
-                    // }
-
                     references.forEach(function (reference) {
                         var s = reference.page_content
                         if (!/^[a-zA-Z]+$/.test(s[0])) {
@@ -370,7 +356,6 @@
                         str += '<p class="search-result-snippet">' + s + '</p>';
                         str += '</li>';
                     });
-                    // document.getElementById('search-result').innerHTML = '<p>' + obj.fulfillment_response.messages[0].text.text[0] + '</p>' + '</br><h2> Showing ' + count + " results </h>";
                     document.getElementById('search-result').innerHTML = '<p>' + obj.fulfillment_response.messages[0].text.text[0] + '</p>';
                     document.getElementById("slide-container").innerHTML = str;
                 })
@@ -407,8 +392,6 @@
 
     </script>
 
-    <!-- <link rel="stylesheet" type="text/css" href="https://ssl.gstatic.com/docs/script/css/add-ons.css" /> -->
-
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
 
 </head>
@@ -420,11 +403,6 @@
             </df-messenger-chat-bubble>
         </df-messenger>
     </div>
-    <!-- 
-    <input type="text" id="query" />
-
-        <button id="search" onclick="submitSearch()">Search</button>
- -->
     <header class="header">
         <nav>
             <div class="navbar">
@@ -514,19 +492,6 @@
                                 <li><a class="nav-link" href="loans">Fixed Deposit Overdraft</a></li>
                                 <li><a class="nav-link" href="loans">Overdraft Against Securities</a></li>
                                 <li><a class="nav-link" href="loans">Home Loan</a></li>
-                                <!-- <li class="loans">
-                                    <span><a class="nav-link" href="#">Loans</a>
-                                        <i class='bx bxs-chevron-right arrow loans-arrow'></i>
-                                    </span>
-                                    <ul class="loans-sub-menu sub-menu">
-                                        <li><a class="nav-link" href="#">Personal Loan</a></li>
-                                        <li><a class="nav-link" href="#">Home Loan</a></li>
-                                        <li><a class="nav-link" href="#">Business Loan</a></li>
-                                        <li><a class="nav-link" href="#">Car Loan</a></li>
-                                        <li><a class="nav-link" href="#">Two Wheeler Loan</a></li>
-                                        <li><a class="nav-link" href="#">Education Loan</a></li>
-                                    </ul>
-                                </li> -->
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -639,16 +604,6 @@
             </li>
         </ul>
         <img src="assets/cymbal_logo.png" alt="Logo" class="footer-logo" />
-        <!-- <p class="footer-copyright">
-            &copy; Copyright by
-            <a
-                class="footer-link twitter-link"
-                target="_blank"
-                href="https://twitter.com/jonasschmedtman"
-                >Jonas Schmedtmann</a
-            >. Use for learning or your portfolio. Don't use to teach. Don't
-            claim as your own product.
-        </p> -->
     </footer>
 
     <div class="modal hidden">
@@ -690,16 +645,6 @@
                 </form>
             </div>
         </div>
-        <!-- <form class="modal-form">
-            <label>First Name</label>
-            <input type="text" />
-            <label>Last Name</label>
-            <input type="text" />
-            <label>Email Address</label>
-            <input type="email" />
-            <button class="btn">Next step &rarr;</button>
-        </form> -->
-        <!-- <div class="loader"></div> -->
     </div>
     <div class="overlay hidden"></div>
 

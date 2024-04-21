@@ -494,24 +494,6 @@ app.get("/loans/terms_and_condition", async (req, res) => {
   }
 });
 
-app.get("/loans/agreement", async (req, res) => {
-  if (!template_loan_agreement) {
-    try {
-      template_loan_agreement = handlebars.compile(
-        readFileSync("public/loan_agreement.html.hbs", "utf8"),
-      );
-    } catch (e) {
-      handleError(e);
-    }
-  }
-  try {
-    const output = template_loan_agreement(data);
-    res.status(200).send(output);
-  } catch (e) {
-    handleError(e);
-  }
-});
-
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(

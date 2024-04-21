@@ -5,7 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <!-- <link rel="shortcut icon" type="image/png" href="img/icon.png" /> -->
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style/style_new.css" />
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
@@ -13,7 +12,6 @@
     <title>Loans</title>
     <script defer type="module" src="scripts/script_new.js"></script>
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
-    <!-- <script defer src="script-private.js"></script> -->
     <style>
         df-messenger {
             z-index: 999;
@@ -159,8 +157,6 @@
             var query = document.getElementById("search-query-input").value;
             var searchResultsPage = './search.html';
 
-            // var url = siteSearchUrl + query
-
             const uri = '{{rag_qa_chain_url_translate}}';
             const body = JSON.stringify({ query: query })
             const initDetails = {
@@ -197,38 +193,6 @@
                     var str = '';
                     var i = 0;
                     var count = 0
-
-                    // var txt = obj.fulfillment_response.messages[0].text.text[0];
-                    // document.getElementById('search-result').innerHTML = txt;
-                    // var speed = 50;
-
-                    // function typeWriter() {
-                    //     if (i < txt.length) {
-                    //         document.getElementById('search-result').innerHTML += txt.charAt(i);
-                    //         i++;
-                    //         setTimeout(typeWriter, speed);
-                    //     }
-                    // }
-
-                    // references.forEach(function (reference) {
-                    //     var s = reference.page_content
-                    //     if (!/^[a-zA-Z]+$/.test(s[0])) {
-                    //         s = s.slice(1);
-                    //     }
-                    //     count++;
-                    //     str += '<li class="search-result-list">';
-                    //     str += '<h3 class="search-result-title">' + reference.document_name + '</h3>';
-                    //     str += '<a href="" class="search-result-url">' + reference.document_source + '</a>';
-                    //     str += '<p class="search-result-snippet">' + s + '</p>';
-                    //     str += '</li>';
-                    // });
-                    // // console.log(str);
-                    // window.location.href = searchResultsPage;
-
-                    // document.getElementById('search-result').innerHTML = '<p>' + obj.fulfillment_response.messages[0].text.text[0] + '</p>' + '</br><h2> Showing ' + count + " results </h>";
-                    // document.getElementById("slide-container").innerHTML = str;
-
-
                 })
                 .catch(err => {
                     console.log('Fetch Error :-S', err);
@@ -343,19 +307,6 @@
                                 <li><a class="nav-link" href="loans">Fixed Deposit Overdraft</a></li>
                                 <li><a class="nav-link" href="loans">Overdraft Against Securities</a></li>
                                 <li><a class="nav-link" href="loans">Home Loan</a></li>
-                                <!-- <li class="loans">
-                                    <span><a class="nav-link" href="#">Loans</a>
-                                        <i class='bx bxs-chevron-right arrow loans-arrow'></i>
-                                    </span>
-                                    <ul class="loans-sub-menu sub-menu">
-                                        <li><a class="nav-link" href="#">Personal Loan</a></li>
-                                        <li><a class="nav-link" href="#">Home Loan</a></li>
-                                        <li><a class="nav-link" href="#">Business Loan</a></li>
-                                        <li><a class="nav-link" href="#">Car Loan</a></li>
-                                        <li><a class="nav-link" href="#">Two Wheeler Loan</a></li>
-                                        <li><a class="nav-link" href="#">Education Loan</a></li>
-                                    </ul>
-                                </li> -->
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -383,58 +334,6 @@
 
         <div id="loader"></div>
 
-
-        <!-- <nav>
-                <div class="navbar">
-                  <i class='bx bx-menu'></i>
-                  <div class="logo"><a href="#">Cymbal Bank</a></div>
-                  <div class="nav-links">
-                    <div class="sidebar-logo">
-                      <span class="logo-name">CymbalBank</span>
-                      <i class='bx bx-x' ></i>
-                    </div>
-                    <ul class="links">
-                      <li><a href="#">HOME</a></li>
-                      <li>
-                        <a href="#">HTML & CSS</a>
-                        <i class='bx bxs-chevron-down htmlcss-arrow arrow  '></i>
-                        <ul class="html-css-sub-menu sub-menu">
-                          <li><a href="#">Web Design</a></li>
-                          <li><a href="#">Login Forms</a></li>
-                          <li><a href="#">Card Design</a></li>
-                          <li class="more">
-                            <span><a href="#">More</a>
-                            <i class='bx bxs-chevron-right arrow more-arrow'></i>
-                          </span>
-                            <ul class="more-sub-menu sub-menu">
-                              <li><a href="#">Neumorphism</a></li>
-                              <li><a href="#">Pre-loader</a></li>
-                              <li><a href="#">Glassmorphism</a></li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
-                        <a href="#">JAVASCRIPT</a>
-                        <i class='bx bxs-chevron-down js-arrow arrow '></i>
-                        <ul class="js-sub-menu sub-menu">
-                          <li><a href="#">Dynamic Clock</a></li>
-                          <li><a href="#">Form Validation</a></li>
-                          <li><a href="#">Card Slider</a></li>
-                          <li><a href="#">Complete Website</a></li>
-                        </ul>
-                      </li>
-                      <li><a href="#">ABOUT US</a></li>
-                      <li><a href="#">CONTACT US</a></li>
-                    </ul>
-                  </div>
-                  <div class="search-box">
-                    <i class='bx bx-search'></i>
-                    <div class="input-box">
-                      <input type="text" placeholder="Search...">
-                    </div>
-                  </div>
-              </nav> -->
     </header>
 
     <div class="card-container">
@@ -1042,7 +941,7 @@
     </section>
 
     <section>
-        <p class="savingp" style="text-align: center;"><a href="/loans/agreement">Loan Agreement</a></p>
+        <p class="savingp" style="text-align: center;"><a href="https://storage.googleapis.com/hackathon_102/Loan%20Agreement%20Cymbal%20Bank.pdf">Loan Agreement</a></p>
     </section>
 
     <section class="section section-sign-up">
@@ -1117,16 +1016,6 @@
                 </form>
             </div>
         </div>
-        <!-- <form class="modal-form">
-                <label>First Name</label>
-                <input type="text" />
-                <label>Last Name</label>
-                <input type="text" />
-                <label>Email Address</label>
-                <input type="email" />
-                <button class="btn">Next step &rarr;</button>
-            </form> -->
-        <!-- <div class="loader"></div> -->
     </div>
     <div class="overlay hidden"></div>
 
