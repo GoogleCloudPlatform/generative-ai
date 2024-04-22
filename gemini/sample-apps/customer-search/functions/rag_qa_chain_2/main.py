@@ -13,12 +13,14 @@ from langchain.chains import RetrievalQA
 from langchain.document_loaders import WebBaseLoader
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_google_vertexai import (
+    VectorSearchVectorStore,
+    VertexAI,
+    VertexAIEmbeddings,
+)
 import nest_asyncio
 import vertexai
 from vertexai.language_models import TextGenerationModel
-from langchain_google_vertexai import VertexAI
-from langchain_google_vertexai import VertexAIEmbeddings
-from langchain_google_vertexai import VectorSearchVectorStore
 
 project_id = environ.get("PROJECT_ID")
 
