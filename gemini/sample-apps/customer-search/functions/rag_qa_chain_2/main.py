@@ -4,8 +4,6 @@ from os import environ
 import textwrap
 
 # Utils
-import time
-from typing import List
 import urllib.request
 
 import functions_framework
@@ -18,23 +16,13 @@ from langchain.llms import VertexAI
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import nest_asyncio
-from utils.matching_engine import MatchingEngine
-from utils.matching_engine_utils import MatchingEngineUtils
 import vertexai
 from vertexai.language_models import TextGenerationModel
-
-# Vertex AI
-
-# LangChain
-
+from langchain_google_vertexai import VertexAI
+from langchain_google_vertexai import VertexAIEmbeddings
+from langchain_google_vertexai import VectorSearchVectorStore
 
 project_id = environ.get("PROJECT_ID")
-
-# Import custom Matching Engine packages
-# with httpimport.remote_repo('https://github.com/GoogleCloudPlatform/generative-ai/tree/main/language/use-cases/document-qa'):
-#     import utils
-#     from utils.matching_engine import MatchingEngine
-#     from utils.matching_engine_utils import MatchingEngineUtils
 
 
 def init_me_libs():
@@ -179,49 +167,8 @@ def ask_react(query, react_agent):
     return formatter(result)
 
 
-# Utility functions for Embeddings API with rate limiting
-def rate_limit(max_per_minute):
-    period = 60 / max_per_minute
-    print("Waiting")
-    while True:
-        before = time.time()
-        yield
-        after = time.time()
-        elapsed = after - before
-        sleep_time = max(0, period - elapsed)
-        if sleep_time > 0:
-            print(".", end="")
-            time.sleep(sleep_time)
-
-
-class BaseModelMixin:
-    # Overriding embed_documents method
-    def embed_documents(self, texts: List[str]):
-        limiter = rate_limit(self.requests_per_minute)
-        results = []
-        docs = list(texts)
-
-        while docs:
-            # Working in batches because the API accepts maximum 5
-            # documents per request to get embeddings
-            head, docs = (
-                docs[: self.num_instances_per_batch],
-                docs[self.num_instances_per_batch :],
-            )
-            chunk = self.client.get_embeddings(head)
-            results.extend(chunk)
-            next(limiter)
-
-        return [r.values for r in results]
-
-
-class CustomVertexAIEmbeddings(VertexAIEmbeddings, BaseModelMixin):
-    pass
-
-
 @functions_framework.http
 def hello_http(request):
-    # init_me_libs()
 
     request_json = request.get_json(silent=True)
     request_args = request.args
@@ -257,7 +204,7 @@ def hello_http(request):
     # Initialize Vertex AI SDK
     vertexai.init(project=PROJECT_ID, location=REGION)
 
-    LLM_MODEL = "text-bison"  # @param {type: "string"}
+    LLM_MODEL = "text-bison@002"  # @param {type: "string"}
     MAX_OUTPUT_TOKENS = 1024  # @param {type: "integer"}
     TEMPERATURE = 0.2  # @param {type: "number"}
     TOP_P = 0.8  # @param {type: "number"}
@@ -275,32 +222,27 @@ def hello_http(request):
     llm = VertexAI(**llm_params)
 
     # Embeddings API integrated with langChain
-    EMBEDDING_QPM = 100
-    EMBEDDING_NUM_BATCH = 5
-    embeddings = CustomVertexAIEmbeddings(
-        requests_per_minute=EMBEDDING_QPM,
-        num_instances_per_batch=EMBEDDING_NUM_BATCH,
-    )
+    embeddings = VertexAIEmbeddings(model_name="textembedding-gecko@003")
 
     ME_REGION = "us-central1"
-    ME_INDEX_NAME = f"{PROJECT_ID}-me-index"  # @param {type:"string"}
-    ME_EMBEDDING_DIR = f"{PROJECT_ID}-me-bucket"  # @param {type:"string"}
+    # ME_INDEX_NAME = f"{PROJECT_ID}-me-index-3"  # @param {type:"string"}
+    ME_EMBEDDING_DIR = f"{PROJECT_ID}-me-bucket-3"  # @param {type:"string"}
     # ME_DIMENSIONS = 768  # when using Vertex PaLM Embedding
 
-    mengine = MatchingEngineUtils(PROJECT_ID, ME_REGION, ME_INDEX_NAME)
-
-    ME_INDEX_ID, ME_INDEX_ENDPOINT_ID = mengine.get_index_and_endpoint()
+    ME_INDEX_ID = '354891567120515072'
+    ME_INDEX_ENDPOINT_ID = '7646923051275124736'
     print(f"ME_INDEX_ID={ME_INDEX_ID}")
     print(f"ME_INDEX_ENDPOINT_ID={ME_INDEX_ENDPOINT_ID}")
 
     # initialize vector store
-    me = MatchingEngine.from_components(
+    me = VectorSearchVectorStore.from_components(
         project_id=PROJECT_ID,
         region=ME_REGION,
         gcs_bucket_name=f"gs://{ME_EMBEDDING_DIR}".split("/")[2],
         embedding=embeddings,
         index_id=ME_INDEX_ID,
         endpoint_id=ME_INDEX_ENDPOINT_ID,
+        stream_update=True,
     )
 
     # UNCOMMENT IF THIS TO UPDATE THE INDEX I.E. WHEN WEBPAGES ARE UPDATED OR NEW WEBPAGES ARE ADDED
@@ -310,14 +252,7 @@ def hello_http(request):
     # Store docs as embeddings in Matching Engine index
     # It may take a while since API is rate limited
     # texts = [doc.page_content for doc in doc_splits]
-    # metadatas = [
-    #     [
-    #         {"namespace": "source", "allow_list": [doc.metadata["source"]]},
-    #         {"namespace": "title", "allow_list": [doc.metadata["title"]]},
-    #         {"namespace": "chunk", "allow_list": [str(doc.metadata["chunk"])]},
-    #     ]
-    #     for doc in doc_splits
-    # ]
+    # metadatas = [doc.metadata for doc in doc_splits]
 
     # doc_ids = me.add_texts(texts=texts, metadatas=metadatas)
 
