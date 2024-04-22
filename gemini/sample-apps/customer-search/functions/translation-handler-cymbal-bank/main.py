@@ -31,17 +31,11 @@ def post_request(url, headers, data):
 
 
 def translate_fulfilment_response(
-    json_data,
-    project_id,
-    source_language_code,
-    destination_language_code,
-    i=0
+    json_data, project_id, source_language_code, destination_language_code, i=0
 ):
     """Translates the text of DialogFlow CX Webhook Fulfilment Response."""
     return translate_text(
-        json_data["fulfillment_response"]["messages"][i]["text"]["text"][
-            0
-        ],
+        json_data["fulfillment_response"]["messages"][i]["text"]["text"][0],
         project_id,
         source_language_code,
         destination_language_code,
@@ -138,17 +132,16 @@ def hello_http(request):
                 print(rag_qa_chain_json)
 
                 response = translate_fulfilment_response(
-                    rag_qa_chain_json,
-                    project_id,
-                    "en-US",
-                    source_language_code
+                    rag_qa_chain_json, project_id, "en-US", source_language_code
                 )
 
                 reference_list = []
 
                 for ref in json.loads(
-                        rag_qa_chain_json["fulfillment_response"][
-                            "messages"][0]["text"]["text"][1]):
+                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"][
+                        "text"
+                    ][1]
+                ):
                     reference = {}
                     reference["matching_score"] = ref["matching_score"]
                     reference["document_source"] = ref["document_source"]
@@ -192,7 +185,7 @@ def hello_http(request):
             "high-risk-mutual-fund",
             "recommend-mutual-fund",
             "unusual-expense",
-            "find_nearest_dealer"
+            "find_nearest_dealer",
         ]:
 
             if tag == "account-summary":
@@ -215,24 +208,26 @@ def hello_http(request):
                 url = environ.get("SET_DEFAULT_PARAM_URL")
 
             res = post_request(
-                url=url, data=request_json, headers={
-                    "Content-Type": "application/json"})
+                url=url, data=request_json, headers={"Content-Type": "application/json"}
+            )
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
 
             if "en" not in source_language_code:
-                res_json["fulfillment_response"][
-                    "messages"][0]["text"]["text"][0] = (
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
                     translate_fulfilment_response(
-                        res_json, project_id, "en-US", source_language_code))
+                        res_json, project_id, "en-US", source_language_code
+                    )
+                )
 
-        elif tag in ["account-balance",
-                     "credit-card-recommendation",
-                     "create-credit-card",
-                     "fd-recommendation",
-                     "fd_tenure",
-                     "create-fd"
-                     ]:
+        elif tag in [
+            "account-balance",
+            "credit-card-recommendation",
+            "create-credit-card",
+            "fd-recommendation",
+            "fd_tenure",
+            "create-fd",
+        ]:
 
             if tag == "account-balance":
                 url = environ.get("ACCOUNT_BALANCE_URL")
@@ -248,66 +243,58 @@ def hello_http(request):
                 url = environ.get("FD_CREATE_URL")
 
             res = post_request(
-                url=url,
-                data=request_json,
-                headers={"Content-Type": "application/json"}
+                url=url, data=request_json, headers={"Content-Type": "application/json"}
             )
             print(res)
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
 
             if "en" not in source_language_code:
-                for i in range(
-                        len(res_json["fulfillment_response"]["messages"])):
-                    res_json["fulfillment_response"]["messages"][
-                        i]["text"]["text"][
+                for i in range(len(res_json["fulfillment_response"]["messages"])):
+                    res_json["fulfillment_response"]["messages"][i]["text"]["text"][
                         0
                     ] = translate_fulfilment_response(
-                        res_json,
-                        project_id,
-                        "en-US",
-                        source_language_code,
-                        i
+                        res_json, project_id, "en-US", source_language_code, i
                     )
 
         elif tag == "category-wise-expenditure":
 
             url = environ.get("CATEGORIZE_EXPENSE_URL")
             res = post_request(
-                url=url,
-                data=request_json,
-                headers={"Content-Type": "application/json"}
+                url=url, data=request_json, headers={"Content-Type": "application/json"}
             )
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][
-                    0]["text"]["text"][0] = (
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
                     translate_fulfilment_response(
-                        res_json, project_id, "en-US", source_language_code))
+                        res_json, project_id, "en-US", source_language_code
+                    )
+                )
                 for i in range(
                     len(
-                        res_json["fulfillment_response"
-                                 ]["messages"][1][
-                            "payload"]["richContent"][0][0]["text"]
+                        res_json["fulfillment_response"]["messages"][1]["payload"][
+                            "richContent"
+                        ][0][0]["text"]
                     )
                 ):
                     res_json["fulfillment_response"]["messages"][1]["payload"][
                         "richContent"
                     ][0][0]["text"][i] = translate_text(
-                        res_json["fulfillment_response"]["messages"][
-                            1]["payload"]["richContent"
-                                          ][0][0]["text"][i],
+                        res_json["fulfillment_response"]["messages"][1]["payload"][
+                            "richContent"
+                        ][0][0]["text"][i],
                         project_id,
                         "en-US",
                         source_language_code,
                     )
 
-        elif tag in ["debt_fund_webhook",
-                     "expense-prediction",
-                     "recommend-debt-fund",
-                     "travel"
-                     ]:
+        elif tag in [
+            "debt_fund_webhook",
+            "expense-prediction",
+            "recommend-debt-fund",
+            "travel",
+        ]:
 
             if tag == "debt_fund_webhook":
                 url = environ.get("DEBT_FUND_URL")
@@ -319,21 +306,19 @@ def hello_http(request):
                 url = environ.get("TRAVEL_EVENT_RECOMM_URL")
 
             res = post_request(
-                url=url,
-                data=request_json,
-                headers={"Content-Type": "application/json"}
+                url=url, data=request_json, headers={"Content-Type": "application/json"}
             )
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                for i in range(len(res_json["fulfillment_response"]["messages"
-                                                                    ])):
-                    if "text" in res_json["fulfillment_response"]["messages"][
-                            i]:
-                        res_json["fulfillment_response"]["messages"][
-                            i]["text"]["text"][0] = translate_text(
-                            res_json["fulfillment_response"]["messages"][
-                                i]["text"]["text"][0],
+                for i in range(len(res_json["fulfillment_response"]["messages"])):
+                    if "text" in res_json["fulfillment_response"]["messages"][i]:
+                        res_json["fulfillment_response"]["messages"][i]["text"]["text"][
+                            0
+                        ] = translate_text(
+                            res_json["fulfillment_response"]["messages"][i]["text"][
+                                "text"
+                            ][0],
                             project_id,
                             "en-US",
                             source_language_code,
@@ -341,17 +326,14 @@ def hello_http(request):
 
         elif tag == "tenure-validation":
             url = environ.get("FD_TENURE_VAL_URL")
-            request_json["sessionInfo"]["parameters"][
-                "fd_tenure"] = translate_text(
+            request_json["sessionInfo"]["parameters"]["fd_tenure"] = translate_text(
                 request_json["sessionInfo"]["parameters"]["fd_tenure"],
                 project_id,
                 source_language_code,
                 "en-US",
             )
             res = post_request(
-                url=url,
-                data=request_json,
-                headers={"Content-Type": "application/json"}
+                url=url, data=request_json, headers={"Content-Type": "application/json"}
             )
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
@@ -387,31 +369,23 @@ def hello_http(request):
         rag_qa_chain_res = post_request(
             url=rag_qa_chain_url,
             data=data,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
         rag_qa_chain_json = rag_qa_chain_res.json()
         headers = {"Access-Control-Allow-Origin": "*"}
         return (rag_qa_chain_json, 200, headers)
 
-    translated_text = translate_text(
-        text,
-        project_id,
-        source_language_code,
-        "en-US"
-    )
+    translated_text = translate_text(text, project_id, source_language_code, "en-US")
 
     data = {"query": translated_text}
     rag_qa_chain_res = post_request(
-        url=rag_qa_chain_url,
-        data=data,
-        headers={"Content-Type": "application/json"}
+        url=rag_qa_chain_url, data=data, headers={"Content-Type": "application/json"}
     )
     rag_qa_chain_json = rag_qa_chain_res.json()
     print(rag_qa_chain_json)
 
     response = translate_text(
-        rag_qa_chain_json["fulfillment_response"]["messages"][
-            0]["text"]["text"][0],
+        rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
         "fintech-app-gcp",
         "en-US",
         source_language_code,
@@ -419,8 +393,7 @@ def hello_http(request):
     reference_list = []
 
     for ref in json.loads(
-        rag_qa_chain_json["fulfillment_response"]["messages"][
-            0]["text"]["text"][1]
+        rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][1]
     ):
         reference = {}
         print(ref)
@@ -443,18 +416,7 @@ def hello_http(request):
     print(reference_list)
     res_json = {
         "fulfillment_response": {
-            "messages": [
-                {
-                    "text":
-                    {
-                        "text":
-                        [
-                            response,
-                            json.dumps(reference_list)
-                        ]
-                    }
-                }
-            ]
+            "messages": [{"text": {"text": [response, json.dumps(reference_list)]}}]
         }
     }
     # Set CORS headers for the main request
