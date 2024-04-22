@@ -122,7 +122,7 @@ Kubernetes control plane is running at https://34.69.121.152
 
 To initialize your vector database, we'll install the `pgvector` extension to Cloud SQL, then create a table to store the vector embeddings.
 
-We've pre-generated a set of test vector embeddings to a CSV file located in `pgvector/cymbal-starlight-2024.csv`. These were generated through the Vertex AI `text-embeddings-gecko:003` model. Optionally, you can see how we did this by viewing `pgvector/generate-embeddings.ipynb`. Here, we used [pdfplumber](https://github.com/jsvine/pdfplumber) to scan the PDF into raw text, then we used the [Langchain RecursiveCharacterTextSplitter](https://python.langchain.com/docs/modules/data_connection/document_transformers/recursive_text_splitter) to chunk the raw text, while keeping sentences and words together.
+We've pre-generated a set of test vector embeddings to a CSV file located in `gs://github-repo/generative-ai/sample-apps/fixmycar/cymbal-starlight-2024.csv`. These were generated through the Vertex AI `text-embeddings-gecko:003` model. Optionally, you can see how we did this by viewing `pgvector/generate-embeddings.ipynb`. Here, we used [pdfplumber](https://github.com/jsvine/pdfplumber) to scan the PDF into raw text, then we used the [Langchain RecursiveCharacterTextSplitter](https://python.langchain.com/docs/modules/data_connection/document_transformers/recursive_text_splitter) to chunk the raw text, while keeping sentences and words together.
 
 1. Download the CSV with the sample embeddings.
 

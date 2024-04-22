@@ -15,6 +15,7 @@
 /generative-ai/gemini/function-calling                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/reasoning-engine                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
@@ -29,7 +30,7 @@
 /generative-ai/language/tuning                              @erwinh85 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases                           @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/applying-llms-to-data     @ashleyxuu @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/use-cases/document-qa               @RajeshThallam @lavinigam-gcp @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/use-cases/document-qa               @RajeshThallam @lavinigam-gcp @GoogleCloudPlatform/generative-ai-devrel @Adi8885
 /generative-ai/language/use-cases/document-summarization    @polong-lin @iamthuya @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/prod-catalog-enrichment   @slatawa @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/sql-code-generation       @rarsan @GoogleCloudPlatform/generative-ai-devrel
