@@ -187,7 +187,6 @@ def hello_http(request):
             "unusual-expense",
             "find_nearest_dealer",
         ]:
-
             if tag == "account-summary":
                 url = environ.get("ACCOUNT_SUMMARY_URL")
             elif tag == "account-tips":
@@ -214,10 +213,10 @@ def hello_http(request):
             headers = {"Access-Control-Allow-Origin": "*"}
 
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_fulfilment_response(
-                        res_json, project_id, "en-US", source_language_code
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_fulfilment_response(
+                    res_json, project_id, "en-US", source_language_code
                 )
 
         elif tag in [
@@ -228,7 +227,6 @@ def hello_http(request):
             "fd_tenure",
             "create-fd",
         ]:
-
             if tag == "account-balance":
                 url = environ.get("ACCOUNT_BALANCE_URL")
             elif tag == "credit-card-recommendation":
@@ -258,7 +256,6 @@ def hello_http(request):
                     )
 
         elif tag == "category-wise-expenditure":
-
             url = environ.get("CATEGORIZE_EXPENSE_URL")
             res = post_request(
                 url=url, data=request_json, headers={"Content-Type": "application/json"}
@@ -266,10 +263,10 @@ def hello_http(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_fulfilment_response(
-                        res_json, project_id, "en-US", source_language_code
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_fulfilment_response(
+                    res_json, project_id, "en-US", source_language_code
                 )
                 for i in range(
                     len(
@@ -295,7 +292,6 @@ def hello_http(request):
             "recommend-debt-fund",
             "travel",
         ]:
-
             if tag == "debt_fund_webhook":
                 url = environ.get("DEBT_FUND_URL")
             elif tag == "expense-prediction":
