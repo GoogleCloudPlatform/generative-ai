@@ -1,9 +1,9 @@
 import base64
 import urllib.request
 
-import streamlit as st
 from PIL import Image as ImagePIL
 from rembg import remove
+import streamlit as st
 from streamlit.components.v1 import html
 
 

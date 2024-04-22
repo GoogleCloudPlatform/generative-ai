@@ -1,9 +1,9 @@
 import json
 from uuid import uuid4
 
-import requests
 from bs4 import BeautifulSoup
 from config import config
+import requests
 
 # Get the entire list of country names
 

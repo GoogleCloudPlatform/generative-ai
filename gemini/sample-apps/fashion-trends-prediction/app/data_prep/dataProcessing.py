@@ -3,11 +3,11 @@ import json
 import os
 import urllib.request
 
-import requests
-import vertexai.preview.generative_models as generative_models
 from config import config
 from genAIprompts import qList, qList2
 from helper_functions_insta import getId
+import requests
+import vertexai.preview.generative_models as generative_models
 from vertexai.preview.generative_models import GenerativeModel, Part
 from vertexai.preview.language_models import TextGenerationModel
 from vertexai.preview.vision_models import Image, ImageQnAModel
@@ -361,7 +361,7 @@ output: {
 \"jewellery\": \"dainty kundan jhumkas\"
 }
 
-input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - """ 
+input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - """
         + article_summary
         + """output:
 """,

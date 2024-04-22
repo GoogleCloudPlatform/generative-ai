@@ -1,18 +1,18 @@
 import base64
 import io
-import json
 from io import StringIO
+import json
 
-import streamlit as st
-import streamlit.components.v1 as components
-import vertexai
-import vertexai.preview.generative_models as generative_models
 from articles import Articles
 from config import config
 from genAIprompts import image_prompt, trends_prompt
 from prediction import Prediction
+import streamlit as st
+import streamlit.components.v1 as components
 from utilities import add_logo, stImg
 from utils_standalone_image_gen import predict_image
+import vertexai
+import vertexai.preview.generative_models as generative_models
 from vertexai.preview.generative_models import GenerativeModel
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
@@ -23,8 +23,7 @@ print("DATA_PATH: ", DATA_PATH)
 
 if "gemini_model" not in st.session_state:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    st.session_state["gemini_model"] = GenerativeModel(
-        "gemini-1.0-pro-vision-001")
+    st.session_state["gemini_model"] = GenerativeModel("gemini-1.0-pro-vision-001")
 
 if "source" not in st.session_state:
     st.session_state["source"] = "Insta"
@@ -50,8 +49,7 @@ if uploaded_file is not None and st.session_state["source"] != uploaded_file.nam
     st.session_state["source"] = uploaded_file.name
     st.session_state["JSONdata"] = json.loads(string_data)
 
-    st.session_state["predictionModel"] = Prediction(
-        st.session_state["JSONdata"])
+    st.session_state["predictionModel"] = Prediction(st.session_state["JSONdata"])
 
     st.session_state["articleModel"] = Articles(
         st.session_state["JSONdata2"]["articles"]
@@ -78,8 +76,7 @@ if "JSONdata" in st.session_state:
 
 
 if "predictionModel" not in st.session_state:
-    st.session_state["predictionModel"] = Prediction(
-        st.session_state["JSONdata"])
+    st.session_state["predictionModel"] = Prediction(st.session_state["JSONdata"])
 prediction_model = st.session_state["predictionModel"]
 
 if "articleModel" not in st.session_state:
@@ -162,15 +159,19 @@ if submit or key in st.session_state:
                 data=st.session_state["JSONdata"]["finaldata"][country][category],
                 category=category,
             )
-            resp = st.session_state["gemini_model"].generate_content(
-                prompt_for_generic_trends,
-                generation_config={
-                    "max_output_tokens": 2048,
-                    "temperature": 0.4,
-                    "top_p": 0.4,
-                    "top_k": 32,
-                },
-            ).text
+            resp = (
+                st.session_state["gemini_model"]
+                .generate_content(
+                    prompt_for_generic_trends,
+                    generation_config={
+                        "max_output_tokens": 2048,
+                        "temperature": 0.4,
+                        "top_p": 0.4,
+                        "top_k": 32,
+                    },
+                )
+                .text
+            )
 
             try:
                 start_index = resp.find("{")
@@ -187,7 +188,8 @@ if submit or key in st.session_state:
 
         state["items"] = [i.capitalize() for i in state["items"]]
         state["additional_outfits"] = [
-            [i.capitalize() for i in list_var] for list_var in state["additional_outfits"]
+            [i.capitalize() for i in list_var]
+            for list_var in state["additional_outfits"]
         ]
 
         print(state["items"])
@@ -232,7 +234,8 @@ if submit or key in st.session_state:
                         if state[outfit] == {}:
                             _imgs = predict_image(
                                 instance_dict={
-                                    "prompt": st.session_state["gemini_model"].generate_content(
+                                    "prompt": st.session_state["gemini_model"]
+                                    .generate_content(
                                         image_prompt.format(outfit=outfit),
                                         generation_config={
                                             "max_output_tokens": 2048,
@@ -247,7 +250,8 @@ if submit or key in st.session_state:
                                             generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
                                         },
                                         stream=False,
-                                    ).text
+                                    )
+                                    .text
                                 },
                                 parameters={
                                     "sampleCount": 1,
@@ -257,14 +261,12 @@ if submit or key in st.session_state:
                             )
 
                             state[outfit]["imgs"] = [
-                                io.BytesIO(base64.b64decode(
-                                    _img["bytesBase64Encoded"]))
+                                io.BytesIO(base64.b64decode(_img["bytesBase64Encoded"]))
                                 for _img in _imgs
                             ]
 
                         if len(state[outfit]["imgs"]) > 0:
-                            st.image(state[outfit]["imgs"][0],
-                                     use_column_width=True)
+                            st.image(state[outfit]["imgs"][0], use_column_width=True)
 
                             st.download_button(
                                 label="Download",
@@ -358,8 +360,7 @@ if submit or key in st.session_state:
             values = [v.capitalize() for v in values]
             print("values: ", values)
             values_str = ",&nbsp;&nbsp;&nbsp;".join(
-                [f"{idx}. {value}" for idx,
-                    value in enumerate(values, start=1)]
+                [f"{idx}. {value}" for idx, value in enumerate(values, start=1)]
             )
             print("values_str: ", values_str)
             if index != len(response) - 1:

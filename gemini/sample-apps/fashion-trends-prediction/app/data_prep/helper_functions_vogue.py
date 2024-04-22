@@ -1,8 +1,8 @@
 import time
 
-import requests
 from bs4 import BeautifulSoup
 from dataProcessing import create_attributes, summarize_article
+import requests
 
 # Get news articles content
 
