@@ -1,8 +1,9 @@
-import functions_framework
 import json
-import requests
-from google.cloud import translate
 from os import environ
+
+import functions_framework
+from google.cloud import translate
+import requests
 
 project_id = environ.get("PROJECT_ID")
 
