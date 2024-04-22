@@ -14,12 +14,9 @@ with a focus on guiding users through product generation. This module:
 """
 
 import asyncio
+import base64
 import logging
 
-import base64
-
-import app.pages_utils.utils as utils
-import app.pages_utils.utils_styles as utils_styles
 import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_downloads import download_content, download_file
@@ -29,8 +26,14 @@ from app.pages_utils.utils_product_features import (
     modify_selection,
     render_features,
 )
-from app.pages_utils.utils_product_gen import render_content, build_prompt_form, update_generation_state
+from app.pages_utils.utils_product_gen import (
+    build_prompt_form,
+    render_content,
+    update_generation_state,
+)
+import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
+
 
 # Define functions for initializing the page.
 def prod_gen_styles():
@@ -135,6 +138,7 @@ def initialize_page():
     )
     top_img = get_prod_gen_img()
     st.image(top_img)
+
 
 # Set product generation states
 initialize_prod_gen()

@@ -14,8 +14,10 @@ import asyncio
 import logging
 import os
 
-from app.pages_utils.utils_get_llm_response import generate_gemini
-from app.pages_utils.utils_get_llm_response import parallel_generate_search_results
+from app.pages_utils.utils_get_llm_response import (
+    generate_gemini,
+    parallel_generate_search_results,
+)
 from app.pages_utils.utils_imagen import parallel_image_generation
 from dotenv import load_dotenv
 import streamlit as st
@@ -287,5 +289,3 @@ async def handle_content_generation(features):
     st.session_state.chosen_titles = st.session_state.selected_titles.copy()
     if len(st.session_state.selected_titles) > 1:
         st.session_state.chosen_titles.append(st.session_state.assorted_prod_title)
-
-

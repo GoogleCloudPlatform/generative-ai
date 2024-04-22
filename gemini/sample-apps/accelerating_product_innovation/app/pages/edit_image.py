@@ -17,12 +17,12 @@ import logging
 from PIL import Image
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_edit_image import (
+    generate_suggested_images,
     handle_image_upload,
     initialize_edit_page_state,
     process_foreground_image,
+    render_suggested_images,
     save_draft_image,
-    generate_suggested_images,
-    render_suggested_images
 )
 from app.pages_utils.utils_editor_ui import ImageEditor
 import app.pages_utils.utils_styles as utils_styles
