@@ -11,8 +11,6 @@ import functions_framework
 # from langchain.agents import AgentType, initialize_agent
 from langchain.chains import RetrievalQA
 from langchain.document_loaders import WebBaseLoader
-from langchain.embeddings import VertexAIEmbeddings
-from langchain.llms import VertexAI
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import nest_asyncio
@@ -169,7 +167,6 @@ def ask_react(query, react_agent):
 
 @functions_framework.http
 def hello_http(request):
-
     request_json = request.get_json(silent=True)
     request_args = request.args
 
@@ -229,8 +226,8 @@ def hello_http(request):
     ME_EMBEDDING_DIR = f"{PROJECT_ID}-me-bucket-3"  # @param {type:"string"}
     # ME_DIMENSIONS = 768  # when using Vertex PaLM Embedding
 
-    ME_INDEX_ID = '354891567120515072'
-    ME_INDEX_ENDPOINT_ID = '7646923051275124736'
+    ME_INDEX_ID = "354891567120515072"
+    ME_INDEX_ENDPOINT_ID = "7646923051275124736"
     print(f"ME_INDEX_ID={ME_INDEX_ID}")
     print(f"ME_INDEX_ENDPOINT_ID={ME_INDEX_ENDPOINT_ID}")
 
