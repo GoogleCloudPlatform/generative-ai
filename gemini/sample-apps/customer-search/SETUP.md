@@ -30,34 +30,34 @@ This deployment guide assumes existence of three users for demonstrating the var
 [Open dialogflow cx](https://dialogflow.cloud.google.com/cx/projects) and create a custom agent.
 
 - Choose build your own
-  ![df init](files/images/image16.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image16.png)
 - Click on import flow and add `CymBuddy_new.json` file present in `cymbuddy_search_setup/files`
-  ![df init](files/images/image9.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image9.png)
 - From the Default Start Flow add a transition to the Default Start Flow of the imported flow using the **Default Welcome intent**
-  ![df init](files/images/image14.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image14.png)
 - Copy the agent id after enabling unauthenticated API
-  ![df init](files/images/image3.png)
-  ![df init](files/images/image11.png)
-  ![df init](files/images/image13.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image3.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image11.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image13.png)
 
 ## Configure Firebase
 
 Open the [Firebase console](https://console.firebase.google.com/). A firebase project would be present with the same project name as the GCP project created.
 
 - Open the Authentication page.
-  ![df init](files/images/image1.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image1.png)
 - Choose Email/Password as the sign-in method
-  ![df init](files/images/image17.png)
-  ![df init](files/images/image6.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image17.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image6.png)
 - Add the following users
   > email:password
   > <ayushisharma.cb@gmail.com> : 123456.cb
   > <ishanjoshi.cb@gmail.com> : 123456.cb
   > <pandeychulbul.cb@gmail.com> : 123456.cb
-  > ![df init](files/images/image12.png)
+  > ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image12.png)
 - Copy the firebase config under web app in Project Setting
-  ![df init](files/images/image15.png)
-  ![df init](files/images/image10.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image15.png)
+  ![df init](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/image10.png)
 
 Now we need to add the UIDs created to the DummyBankDataset.Customer table.
 
