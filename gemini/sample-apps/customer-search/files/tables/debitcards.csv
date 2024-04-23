@@ -1,4 +1,0 @@
-ac_id,debit_card_no,expiration_month,expiration_year,debit_card_name,transaction_limit,international_transaction_enabled
-1100023468,5892298261534781,10,2030,Platinum Debit Card,10000.0,false
-5634523468,3290417032506014,10,2028,Visa Debit Card,10000.0,false
-5927831234,2014413115301720,4,2028,Visa Debit Card,10000.0,false
