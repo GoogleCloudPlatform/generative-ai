@@ -5,7 +5,7 @@ import json
 
 from articles import Articles
 from config import config
-from genAIprompts import image_prompt, trends_prompt
+from genai_prompts import image_prompt, trends_prompt
 from prediction import Prediction
 import streamlit as st
 import streamlit.components.v1 as components
@@ -32,7 +32,7 @@ if "JSONdata" not in st.session_state:
         st.session_state["JSONdata"] = json.load(f)
 
     with open(DATA_PATH, "r") as f:
-        st.session_state["JSONdata2"] = json.load(f)
+        st.session_state["JSONdata_for_articles"] = json.load(f)
 
 
 add_logo(config["Images"]["logo"])
@@ -52,7 +52,7 @@ if uploaded_file is not None and st.session_state["source"] != uploaded_file.nam
         st.session_state["JSONdata"])
 
     st.session_state["articleModel"] = Articles(
-        st.session_state["JSONdata2"]["articles"]
+        st.session_state["JSONdata_for_articles"]["articles"]
     )
 
 
@@ -82,7 +82,7 @@ prediction_model = st.session_state["predictionModel"]
 
 if "articleModel" not in st.session_state:
     st.session_state["articleModel"] = Articles(
-        st.session_state["JSONdata2"]["articles"]
+        st.session_state["JSONdata_for_articles"]["articles"]
     )
 articles = st.session_state["articleModel"]
 

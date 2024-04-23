@@ -6,7 +6,7 @@ import urllib.request
 import requests
 import vertexai.preview.generative_models as generative_models
 from config import config
-from genAIprompts import qList, qList2
+from genai_prompts import qList, qList2
 from helper_functions_insta import get_id
 from vertexai.preview.generative_models import GenerativeModel, Part, GenerationConfig
 from vertexai.preview.language_models import TextGenerationModel

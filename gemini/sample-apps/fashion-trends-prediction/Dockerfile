@@ -23,5 +23,3 @@ EXPOSE 8501
 # Run the web service on container startup
 
 ENTRYPOINT ["streamlit", "run", "Home.py", "--server.port=8501", "--server.address=0.0.0.0"]
-
-#this if for prod

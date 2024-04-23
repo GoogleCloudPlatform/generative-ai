@@ -12,16 +12,6 @@ country_names = config["countryList"]
 data_path = config["Data"]["current_data"]
 
 
-def isRoot(word):
-    if word.strip() == word and word.lower() == word:
-        return True
-    return False
-
-
-def cmpf(item):
-    return -len(item[1])
-
-
 def extract_json_influencer_wise(scrape_size, first_scrape, saved):
     """Extracts data from Instagram and saves it in a JSON file.
 
@@ -32,6 +22,27 @@ def extract_json_influencer_wise(scrape_size, first_scrape, saved):
 
     """
 
+    
+
+
+def periodic_extraction(scrape_size, first_period):
+    """Extracts data from Instagram periodically and saves it in a JSON file.
+
+    Args:
+            scrape_size (dict): A dictionary containing the number of countries, influencers, and posts to scrape.
+            first_period (bool): A boolean indicating whether this is the first period.
+
+    """
+
+    if first_period:
+        saved = {}
+        saved["global"] = {}
+    else:
+        with open(data_path, "r") as f:
+            saved = json.load(f)
+
+    # first scrape is set to True when you are running for the first time in an extraction period
+    first_scrape = True
     if first_scrape:
         temp_map = {}
         scraped_influencers = set()
@@ -40,13 +51,13 @@ def extract_json_influencer_wise(scrape_size, first_scrape, saved):
             temp_map = json.load(f)
         scraped_influencers = set(temp_map.keys())
 
-    cookies = instalogin()
+    cookies = insta_login()
 
     for country_name in country_names[: scrape_size["num_countries"]]:
         print(country_name)
 
         # the top influencers of that country right now
-        influencers = getInfluencers(country_name)
+        influencers = get_influencers(country_name)
 
         for influencer in influencers[: scrape_size["num_influencers"]]:
             print(influencer)
@@ -88,28 +99,6 @@ def extract_json_influencer_wise(scrape_size, first_scrape, saved):
         json.dump(saved, outfile)
 
 
-def periodic_extraction(scrape_size, first_period):
-    """Extracts data from Instagram periodically and saves it in a JSON file.
-
-    Args:
-            scrape_size (dict): A dictionary containing the number of countries, influencers, and posts to scrape.
-            first_period (bool): A boolean indicating whether this is the first period.
-
-    """
-
-    if first_period:
-        saved = {}
-        saved["global"] = {}
-    else:
-        with open(data_path, "r") as f:
-            saved = json.load(f)
-
-    # first scrape is set to True when you are running for the first time in an extraction period
-    extract_json_influencer_wise(
-        scrape_size=scrape_size, first_scrape=True, saved=saved
-    )
-
-
 def create_final_data(scrape_size):
     """Creates a final data file by combining data from Instagram and Vogue.
 
@@ -127,7 +116,7 @@ def create_final_data(scrape_size):
         saved["finaldata"][country_name] = {}
 
         # the top influencers of that country right now
-        influencers = getInfluencers(country_name)
+        influencers = get_influencers(country_name)
 
         for influencer in influencers[: scrape_size["num_influencers"]]:
             print(influencer)
@@ -166,16 +155,11 @@ def merge_keys():
         finaldata_new[country] = {}
 
         for key in finaldata[country]:
-            if isRoot(key):
-                finaldata_new[country][key] = finaldata[country][key].copy()
-
-        for key in finaldata[country]:
-            if not isRoot(key):
-                newkey = (key.strip()).lower()
-                if newkey in finaldata_new[country]:
-                    finaldata_new[country][newkey] += finaldata[country][key].copy()
-                else:
-                    finaldata_new[country][newkey] = finaldata[country][key].copy()
+            newkey = key.strip().lower() if not (key.strip() == key and key.lower() == key) else key
+            if newkey in finaldata_new[country]:
+                finaldata_new[country][newkey] += finaldata[country][key].copy()
+            else:
+                finaldata_new[country][newkey] = finaldata[country][key].copy()
 
     saved["finaldata"] = finaldata_new
 
@@ -290,7 +274,7 @@ def get_top_categories(saved):
     for country in saved["finaldata"]:
         allcategories = saved["finaldata"][country]
 
-        sorted_a = sorted(allcategories.items(), key=cmpf)
+        sorted_a = sorted(allcategories.items(), key=lambda item: -len(item[1]))
         item_categories = [cat for cat, values in sorted_a[: min(15, len(sorted_a))]]
 
         saved["top_categories"][country] = item_categories

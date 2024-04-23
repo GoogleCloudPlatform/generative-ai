@@ -2,7 +2,6 @@ import base64
 import urllib.request
 
 from PIL import Image as ImagePIL
-from rembg import remove
 import streamlit as st
 from streamlit.components.v1 import html
 
@@ -23,19 +22,6 @@ def stImg(file):
         img = "data:image/png;base64," + img
 
     return img
-
-
-def unique(sentence):
-    """Removes duplicate words from a sentence.
-
-    Args:
-        sentence (str): The sentence to remove duplicate words from.
-
-    Returns:
-        str: The sentence with duplicate words removed.
-
-    """
-    return " ".join(dict.fromkeys(sentence.split()))
 
 
 def nav_page(page_name, timeout_secs=3):
