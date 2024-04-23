@@ -12,6 +12,8 @@ import streamlit.components.v1 as components
 from utilities import add_logo, stImg
 from utils_standalone_image_gen import predict_image
 from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
+import vertexai.preview.generative_models as generative_models
+
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}

@@ -5,8 +5,9 @@ import time
 
 from config import config
 import streamlit as st
-from utilities import *
-from utils_standalone_image_gen import *
+from utilities import add_logo, stImg
+from utils_standalone_image_gen import render_image_edit_prompt, predict_image
+import vertexai
 from vertexai.generative_models import GenerativeModel, Part, GenerationConfig
 
 add_logo(config["Images"]["logo"])

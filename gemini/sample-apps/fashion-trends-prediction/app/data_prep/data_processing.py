@@ -279,8 +279,7 @@ def get_posts(user, previous, cnt=10, cookies={}, model="Gemini"):
             print(response)
             break
 
-        profile_data_json = response.text
-        parsed_data = json.loads(profile_data_json)
+        parsed_data = json.loads(response.text)
 
         media = parsed_data["data"]["user"]["edge_owner_to_timeline_media"]
 

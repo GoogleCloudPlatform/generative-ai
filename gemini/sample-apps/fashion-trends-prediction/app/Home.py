@@ -13,14 +13,14 @@ add_logo(config["Images"]["logo"])
 
 
 # Set the path to the local image file
-image_path1 = config["Images"]["slide1"]
-image_path2 = config["Images"]["slide2"]
+slide1_image_path = config["Images"]["slide1"]
+slide2_image_path = config["Images"]["slide2"]
 
 
 # Read the SVG image as a string
-with open(image_path1, "r") as f:
+with open(slide1_image_path, "r") as f:
     svg1 = f.read()
-with open(image_path2, "r") as f:
+with open(slide2_image_path, "r") as f:
     svg2 = f.read()
 
 

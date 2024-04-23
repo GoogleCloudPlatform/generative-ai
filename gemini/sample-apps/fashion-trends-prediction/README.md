@@ -6,7 +6,7 @@
 
 This Cloud Run application helps fashion retailers to stay ahead of the fashion curve and predict upcoming trends by analyzing fashion trends that are popular on Instagram among celebrities and influencers, because these trends are likely to become popular in the mainstream soon.
 
-It uses the Streamlit Framework and Generative AI models from Vertex AI to predict fashion trends.
+It uses the [Streamlit Framework](https://streamlit.io/) and Generative AI models from Vertex AI to predict fashion trends.
 
 ## Application Screenshots
 

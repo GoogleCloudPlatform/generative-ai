@@ -100,7 +100,7 @@ def periodic_extraction(scrape_size, first_period):
 
 
 def create_final_data(scrape_size):
-    """Creates a final data file by combining data from Instagram and Vogue.
+    """Creates the summarized final data from the results of image captioning.
 
     Args:
             scrape_size (dict): A dictionary containing the number of countries, influencers, and posts to scrape.
