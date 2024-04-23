@@ -1,8 +1,0 @@
-bucket_start_days,bucket_end_days,rate_of_interest,rate_of_interest_sr_citizen,latest_record_indicator
-7,45,3.0,3.5,true
-180,210,5.25,5.75,true
-365,730,6.8,7.3,true
-730,1460,6.5,7.0,true
-210,365,5.75,6.25,true
-1460,3650,6.4,6.9,true
-45,180,4.5,5.0,true

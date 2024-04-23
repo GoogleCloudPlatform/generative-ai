@@ -1,5 +1,0 @@
-account_no,Scheme_Name,Scheme_Code,AMC_Name,AMC_Code,Number_of_Units,Latest_NAV,one_month_return,six_month_return,TTM_Return,XIRR,Long_Term_Status,risk_category,amount_invested
-1100023468,Nippon India Nifty 50 ETF,NINI000001,Nippon India Mutual Fund,NINIMF,400,130,0.18,0.36,0.54,0.72,true,6,3200000.0
-1100023468,SBI Bluechip Fund,SBIN001122,SBI Mutual Fund,SBINMF,100,100,0.1,0.2,0.3,0.4,true,2,1300000.0
-1100023468,HDFC Sensex ETF,HDFC000001,HDFC Mutual Fund,HDFCMF,300,120,0.15,0.3,0.45,0.6,true,5,2400000.0
-1100023468,ICICI Prudential Bluechip Fund,ICIC000111,ICICI Prudential Mutual Fund,ICICIMF,200,110,0.12,0.24,0.36,0.48,true,3,1100000.0
