@@ -11,13 +11,13 @@ import io
 import math
 from typing import List
 
-import streamlit as st
-import utils_edit_image
+from PIL import Image
 from config import config
 from google.cloud import aiplatform
 from google.protobuf import json_format
 from google.protobuf.struct_pb2 import Value
-from PIL import Image
+import streamlit as st
+import utils_edit_image
 
 # Set project parameters
 PROJECT_ID = config["PROJECT_ID"]

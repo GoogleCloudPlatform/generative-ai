@@ -1,6 +1,5 @@
 import time
 
-import requests
 from bs4 import BeautifulSoup
 from data_processing import create_attributes, summarize_article
 

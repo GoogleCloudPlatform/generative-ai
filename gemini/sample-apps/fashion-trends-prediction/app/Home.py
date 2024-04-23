@@ -1,5 +1,5 @@
-import streamlit as st
 from config import config
+import streamlit as st
 from utilities import add_logo, render_svg
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}

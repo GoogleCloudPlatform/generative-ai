@@ -1,7 +1,21 @@
 from typing_extensions import TypedDict
 
-Config = TypedDict('Config', {"PROJECT_ID": str, "LOCATION": str, "parameters": dict, "username": str,
-                   "password": str, "Images": dict, "Data": dict, "countryList": list, "links": dict, "postid": int, "mode": int})
+Config = TypedDict(
+    "Config",
+    {
+        "PROJECT_ID": str,
+        "LOCATION": str,
+        "parameters": dict,
+        "username": str,
+        "password": str,
+        "Images": dict,
+        "Data": dict,
+        "countryList": list,
+        "links": dict,
+        "postid": int,
+        "mode": int,
+    },
+)
 
 config: Config = {
     # "PROJECT_ID": "<YOUR_GCP_PROJECT_ID>",
@@ -31,17 +45,17 @@ config: Config = {
     "username": "<YOUR_INSTAGRAM_USERNAME>",
     "password": "<YOUR_INSTAGRAM_PASSWORD>",
     "Images": {
-        "logo": "images/logo.png",
-        "home": "images/home.png",
-        "trend": "images/trend-page-img.avif",
-        "chat": "images/chat.png",
-        "imagen": "images/canvas.png",
-        "slide1": "images/slide1.svg",
-        "slide2": "images/slide2.svg",
-        "additional_tools": "images/additional_tools.svg",
+        "logo": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/logo.png",
+        "home": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/home.png",
+        "trend": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/trend-page-img.avif",
+        "chat": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/chat.png",
+        "imagen": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/canvas.png",
+        "slide1": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/slide1.svg",
+        "slide2": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/slide2.svg",
+        "additional_tools": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/additional_tools.svg",
     },
     "Data": {
-        "current_data": "data/instagram_data.json",
+        "current_data": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data/instagram_data.json",
     },
     "countryList": [
         "All countries",

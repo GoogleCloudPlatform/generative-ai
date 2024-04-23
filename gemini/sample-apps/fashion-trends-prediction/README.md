@@ -13,28 +13,28 @@ It uses the Streamlit Framework and Generative AI models from Vertex AI to predi
 Choose a file if you want to run on your own JSON data or skip this option if you want to run on the default data.
 Choose the country and category of outfit for which you need to get the predicted fashion trends.
 
-<img src="app_screenshots/image1.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image1.png" width="70%" >
 
 Click on any of the predicted item to see a generated image with some similar outfits.
 
-<img src="app_screenshots/image2.png" width="70%" >
-<img src="app_screenshots/image3.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image2.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image3.png" width="70%" >
 
 Go to the "Overall trends across attributes" tab to see the trends in the order of their predicted popularity across different features of the outfit category.
 
-<img src="app_screenshots/image4.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image4.png" width="70%" >
 
 For the selected country: 'India', one gets relevant fashion news articles.
 
-<img src="app_screenshots/image5.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image5.png" width="70%" >
 
 Finally, there's a chatbot that has the predicted fashion trends data as context and can be used to answer queries related to that. It can also be used to generate and edit images of different outfits.
 
-<img src="app_screenshots/image6.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image6.png" width="70%" >
 
 ## Technical Implementation
 
-<img src="app_screenshots/image7.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image7.png" width="70%" >
 
 ### Broad Implementation Steps
 
@@ -154,7 +154,7 @@ On successful deployment, you will be provided a URL to the Cloud Run service. Y
 
 ### How to create and run on your own data
 
-The current data is created by scraping posts from Instagram influencers and celebrities. It is stored in the app/data directory and the exact path is specified in the app/config.py file as `config['Data']['current_data']`. The code uses the file stored in this location to generate trend predictions.
+The current data is created by scraping posts from Instagram influencers and celebrities. It is stored in Google Cloud Storage and the exact path is specified in the app/config.py file as `config['Data']['current_data']`. The code uses the file stored in this location to generate trend predictions.
 
 If you want to create your own data (a different source from Instagram or a different set of accounts and posts), then replace the file at the location specified in `config['Data']['current_data']` or upload your file on the UI itself.
 

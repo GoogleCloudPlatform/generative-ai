@@ -1,12 +1,12 @@
 import json
 import pickle
 
-import vertexai
 from config import config
 from langchain.docstore.document import Document
 from langchain.retrievers import BM25Retriever, EnsembleRetriever
 from langchain.vectorstores import VectorStore
 from sentence_transformers import SentenceTransformer
+import vertexai
 from vertexai.language_models import ChatModel, InputOutputTextPair
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}

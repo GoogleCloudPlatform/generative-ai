@@ -1,16 +1,14 @@
 import base64
 import io
-import json
 from io import StringIO
+import json
 
-import streamlit as st
-import streamlit.components.v1 as components
-import vertexai
-import vertexai.preview.generative_models as generative_models
 from articles import Articles
 from config import config
 from genAIprompts import image_prompt, trends_prompt
 from prediction import Prediction
+import streamlit as st
+import streamlit.components.v1 as components
 from utilities import add_logo, stImg
 from utils_standalone_image_gen import predict_image
 from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
@@ -187,7 +185,8 @@ if submit or key in st.session_state:
 
         state["items"] = [i.capitalize() for i in state["items"]]
         state["additional_outfits"] = [
-            [i.capitalize() for i in list_var] for list_var in state["additional_outfits"]
+            [i.capitalize() for i in list_var]
+            for list_var in state["additional_outfits"]
         ]
 
         print(state["items"])
