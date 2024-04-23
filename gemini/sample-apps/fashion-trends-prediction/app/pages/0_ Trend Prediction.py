@@ -13,7 +13,7 @@ from genAIprompts import image_prompt, trends_prompt
 from prediction import Prediction
 from utilities import add_logo, stImg
 from utils_standalone_image_gen import predict_image
-from vertexai.preview.generative_models import GenerativeModel
+from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
@@ -164,12 +164,12 @@ if submit or key in st.session_state:
             )
             resp = st.session_state["gemini_model"].generate_content(
                 prompt_for_generic_trends,
-                generation_config={
-                    "max_output_tokens": 2048,
-                    "temperature": 0.4,
-                    "top_p": 0.4,
-                    "top_k": 32,
-                },
+                generation_config=GenerationConfig(
+                    max_output_tokens=2048,
+                    temperature=0.4,
+                    top_p=0.4,
+                    top_k=32,
+                ),
             ).text
 
             try:
@@ -234,12 +234,12 @@ if submit or key in st.session_state:
                                 instance_dict={
                                     "prompt": st.session_state["gemini_model"].generate_content(
                                         image_prompt.format(outfit=outfit),
-                                        generation_config={
-                                            "max_output_tokens": 2048,
-                                            "temperature": 0.2,
-                                            "top_p": 1,
-                                            "top_k": 32,
-                                        },
+                                        generation_config=GenerationConfig(
+                                            max_output_tokens=2048,
+                                            temperature=0.2,
+                                            top_p=1,
+                                            top_k=32,
+                                        ),
                                         safety_settings={
                                             generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
                                             generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
@@ -324,7 +324,7 @@ if submit or key in st.session_state:
                     if "relevant_articles" not in state[outfit]:
                         with st.spinner("Fetching relevant articles..."):
                             print(state["items"][selected_button])
-                            state[outfit]["relevant_articles"] = articles.getArticles(
+                            state[outfit]["relevant_articles"] = articles.get_articles(
                                 state["items"][selected_button][0].lower()
                             )
 

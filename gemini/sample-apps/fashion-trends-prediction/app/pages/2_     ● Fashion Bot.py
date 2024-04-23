@@ -9,7 +9,7 @@ import vertexai.preview.generative_models as generative_models
 from config import config
 from utilities import *
 from utils_standalone_image_gen import *
-from vertexai.generative_models import GenerativeModel, Part
+from vertexai.generative_models import GenerativeModel, Part, GenerationConfig
 
 add_logo(config['Images']['logo'])
 
@@ -18,7 +18,9 @@ PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
 data_path = config["Data"]['current_data']
 
-generation_config = config['parameters']['fashion_bot']
+params = config['parameters']['fashion_bot']
+generation_config = GenerationConfig(
+    max_output_tokens=params['max_output_tokens'], temperature=params['temperature'], top_p=params['top_p'], top_k=params['top_k'])
 safety_settings = {
     generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
     generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,

@@ -80,7 +80,7 @@ class Articles:
             ],
         )
 
-    def getArticles(self, outfit):
+    def get_articles(self, outfit):
         """Gets articles related to a given outfit.
 
         Args:

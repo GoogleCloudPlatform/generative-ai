@@ -2,21 +2,24 @@ import json
 import os
 
 from config import config
-from dataProcessing import generateCaption
+from data_processing import generate_caption
 from driver import get_top_categories
 
 data_path = config["Data"]["current_data"]
 
 
-def imagesScrape(saved):
+def images_scrape(saved):
     """
 
     Write code here to extract/ scrape images from your data source.
     For each image, store it in your local directory (same path as this file)
-    Then, for each image, call generateCaption() function written in dataProcessing.py which returns a dictionary
+    Then, for each image, call generateCaption() function written in data_processing.py which returns a dictionary
     Store the results in an array to finally get an array of dictionaries
 
-    Dummy code for two locally stored images -
+    Dummy code for two locally stored images is given in this function definition
+
+    Args:
+                    saved (dict): The current data in dictionary format
     """
 
     answers = []
@@ -44,16 +47,9 @@ def imagesScrape(saved):
     get_top_categories(saved)
 
 
-def articlesScrape():
-    pass
-
-
 if __name__ == "__main__":
     with open(data_path, "r") as f:
         saved = json.load(f)
 
-    # call either one or both functions to replace the current data
-    # first function is for images scrape and second is for articles scrape
-
-    imagesScrape(saved)
-    # articlesScrape()
+    # the below function is called to replace the current images data
+    images_scrape(saved)

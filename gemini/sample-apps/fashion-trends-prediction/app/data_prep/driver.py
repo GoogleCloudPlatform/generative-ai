@@ -2,8 +2,8 @@ import json
 import time
 
 from config import config
-from dataProcessing import getPosts
-from helper_functions_insta import getInfluencers, instalogin
+from data_processing import get_posts
+from helper_functions_insta import get_influencers, insta_login
 from helper_functions_vogue import get_articles
 from prepare_data_for_retriever import prepare_data_for_retriever
 
@@ -57,7 +57,7 @@ def extract_json_influencer_wise(scrape_size, first_scrape, saved):
                 scraped_influencers.add(influencer)
                 # the influencer was there in the previous run
                 if influencer in saved["global"]:
-                    posts = getPosts(
+                    posts = get_posts(
                         influencer,
                         saved["global"][influencer],
                         scrape_size["num_posts"],
@@ -65,7 +65,7 @@ def extract_json_influencer_wise(scrape_size, first_scrape, saved):
                         model="Gemini",
                     )
                 else:
-                    posts = getPosts(
+                    posts = get_posts(
                         influencer,
                         [],
                         scrape_size["num_posts"],
@@ -299,7 +299,7 @@ def get_top_categories(saved):
         json.dump(saved, outfile)
 
 
-def instaScrape():
+def insta_scrape():
     """Scrapes data from Instagram and saves it in a JSON file."""
 
     scrape_size = {"num_countries": 10, "num_influencers": 20, "num_posts": 50}
@@ -318,7 +318,7 @@ def instaScrape():
     get_top_categories(saved)
 
 
-def vogueScrape():
+def vogue_scrape():
     """Scrapes data from Vogue and saves it in a JSON file."""
 
     create_news_articles_data()
@@ -327,5 +327,5 @@ def vogueScrape():
 
 
 if __name__ == "__main__":
-    instaScrape()
-    vogueScrape()
+    insta_scrape()
+    vogue_scrape()

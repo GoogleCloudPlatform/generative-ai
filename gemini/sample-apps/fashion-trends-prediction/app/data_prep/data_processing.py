@@ -7,8 +7,8 @@ import requests
 import vertexai.preview.generative_models as generative_models
 from config import config
 from genAIprompts import qList, qList2
-from helper_functions_insta import getId
-from vertexai.preview.generative_models import GenerativeModel, Part
+from helper_functions_insta import get_id
+from vertexai.preview.generative_models import GenerativeModel, Part, GenerationConfig
 from vertexai.preview.language_models import TextGenerationModel
 from vertexai.preview.vision_models import Image, ImageQnAModel
 
@@ -34,7 +34,7 @@ for filename in sorted_files:
         )
 
 
-def generateCaptionGemini(image_path):
+def generate_caption_gemini(image_path):
     """Generates a caption for an image using the Gemini model.
 
     Args:
@@ -101,12 +101,12 @@ def generateCaptionGemini(image_path):
 
     response = gemini_model.generate_content(
         prompt,
-        generation_config={
-            "max_output_tokens": 2048,
-            "temperature": 0.4,
-            "top_p": 1,
-            "top_k": 32,
-        },
+        generation_config=GenerationConfig(
+            max_output_tokens=2048,
+            temperature=0.4,
+            top_p=1,
+            top_k=32,
+        ),
         safety_settings={
             generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
             generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
@@ -132,7 +132,7 @@ def generateCaptionGemini(image_path):
     return answer
 
 
-def generateCaptionImageQnA(image_path):
+def generate_caption_imageQnA(image_path):
     """Generates a caption for an image using the ImageQnA model.
 
     Args:
@@ -217,7 +217,7 @@ def generateCaptionImageQnA(image_path):
     return answer
 
 
-def generateCaption(image_path, model):
+def generate_caption(image_path, model):
     """Generates a caption for an image using the specified model.
 
     Args:
@@ -229,13 +229,13 @@ def generateCaption(image_path, model):
     """
 
     if model == "Gemini":
-        return generateCaptionGemini(image_path)
+        return generate_caption_gemini(image_path)
 
     elif model == "ImageQnA":
-        return generateCaptionImageQnA(image_path)
+        return generate_caption_imageQnA(image_path)
 
 
-def getPosts(user, previous, cnt=10, cookies={}, model="Gemini"):
+def get_posts(user, previous, cnt=10, cookies={}, model="Gemini"):
     """Gets a list of posts from an Instagram user.
 
     Args:
@@ -250,7 +250,7 @@ def getPosts(user, previous, cnt=10, cookies={}, model="Gemini"):
     """
 
     org_cnt = cnt
-    userId = getId(user, cookies)
+    userId = get_id(user, cookies)
     if userId is None:
         return previous
     params = {
@@ -300,11 +300,12 @@ def getPosts(user, previous, cnt=10, cookies={}, model="Gemini"):
             urllib.request.urlretrieve(postlink, actual_img_path)
 
             try:
-                caption = generateCaption(actual_img_path, "Gemini")
+                caption = generate_caption(actual_img_path, "Gemini")
             except Exception as e:
                 print(e)
             else:
-                posts = [(postid, postlink, caption)] + posts  # newest post stays first
+                posts = [(postid, postlink, caption)] + \
+                    posts  # newest post stays first
                 cnt -= 1
             finally:
                 os.remove(actual_img_path)
@@ -361,7 +362,7 @@ output: {
 \"jewellery\": \"dainty kundan jhumkas\"
 }
 
-input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - """ 
+input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - """
         + article_summary
         + """output:
 """,

@@ -8,7 +8,7 @@ from config import config
 # Get the entire list of country names
 
 
-def getCountries():
+def get_countries():
     URL = "https://hypeauditor.com/top-instagram/"
     response = requests.get(URL)
     page = BeautifulSoup(response.content, "html.parser")
@@ -23,7 +23,7 @@ def getCountries():
 
 
 # Get list of top 50 influencers country wise
-def getInfluencers(country):
+def get_influencers(country):
     if country == "All countries":
         url = "https://hypeauditor.com/top-instagram-fashion"
     else:
@@ -45,7 +45,7 @@ def getInfluencers(country):
     return influencers
 
 
-def instalogin():
+def insta_login():
     # Creating a session
     # reference: https://github.com/KEAGTORB/grab-insta/blob/main/grab.py
     username = config["username"]
@@ -80,7 +80,7 @@ def instalogin():
     return cookies
 
 
-def getId(user, cookies):
+def get_id(user, cookies):
     link = "https://www.instagram.com/web/search/topsearch/?query={}".format(user)
     response = requests.get(link, cookies=cookies)
 

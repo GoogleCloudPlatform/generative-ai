@@ -2,7 +2,7 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from dataProcessing import create_attributes, summarize_article
+from data_processing import create_attributes, summarize_article
 
 # Get news articles content
 

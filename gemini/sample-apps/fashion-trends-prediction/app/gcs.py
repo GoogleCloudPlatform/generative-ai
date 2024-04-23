@@ -62,7 +62,7 @@ def upload_file(path, filename, bucket_name, folder):
     blob.upload_from_filename(path)
 
 
-def filesFromFolder(bucket_name, folder):
+def files_from_folder(bucket_name, folder):
     """Lists all the files in a folder in Google Cloud Storage.
 
     Args:
@@ -113,57 +113,3 @@ def get_json(bucket_name, filename):
     # load blob using json
     file_data = json.loads(blob.download_as_string())
     return file_data
-
-
-def list_jpg_files_in_bucket(bucket_name, folder_path):
-    """Lists all the JPG files in a folder in Google Cloud Storage.
-
-    Args:
-        bucket_name (str): The name of the bucket to list the files in.
-        folder_path (str): The path to the folder to list the files in.
-
-    Returns:
-        list: A list of the JPG files in the folder.
-    """
-    # Initialize GCS client
-    client = storage.Client()
-
-    # Get bucket object
-    bucket = client.get_bucket(bucket_name)
-
-    # List files in the given folder_path
-    blobs = bucket.list_blobs(prefix=folder_path)
-
-    # Filter .jpg files
-    jpg_files = [
-        blob.name.split("/")[-1] for blob in blobs if blob.name.endswith(".jpg")
-    ]
-
-    return jpg_files
-
-
-def list_txt_files_in_bucket(bucket_name, folder_path):
-    """Lists all the TXT files in a folder in Google Cloud Storage.
-
-    Args:
-        bucket_name (str): The name of the bucket to list the files in.
-        folder_path (str): The path to the folder to list the files in.
-
-    Returns:
-        list: A list of the TXT files in the folder.
-    """
-    # Initialize GCS client
-    client = storage.Client()
-
-    # Get bucket object
-    bucket = client.get_bucket(bucket_name)
-
-    # List files in the given folder_path
-    blobs = bucket.list_blobs(prefix=folder_path)
-
-    # Filter .txt files
-    txt_files = [
-        blob.name.split("/")[-1] for blob in blobs if blob.name.endswith(".txt")
-    ]
-
-    return txt_files

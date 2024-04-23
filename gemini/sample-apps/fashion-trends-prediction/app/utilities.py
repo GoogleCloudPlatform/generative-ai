@@ -74,37 +74,6 @@ def nav_page(page_name, timeout_secs=3):
     html(nav_script)
 
 
-# To remove background from an image
-def removeBg(url, userName):
-    """Removes the background from an image.
-
-    Args:
-        url (str): The URL of the image to remove the background from.
-        userName (str): The name of the user who uploaded the image.
-
-    Returns:
-        str: The path to the image with the background removed.
-
-    """
-    input_path = url
-    actual_img_path = "" + userName + "$.png"
-    urllib.request.urlretrieve(input_path, actual_img_path)
-
-    # Store path of the output image in the variable output_path
-    output_path = "" + userName + "#.png"
-
-    # Processing the image
-    input = ImagePIL.open(actual_img_path)
-
-    # Removing the background from the given Image
-    output = remove(input)
-
-    # Saving the image in the given path
-    output.save(output_path)
-
-    return actual_img_path, output_path
-
-
 def get_base64_of_bin_file(png_file):
     """Converts a binary file to a base64 encoded string.
 
