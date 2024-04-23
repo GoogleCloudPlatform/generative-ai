@@ -6,7 +6,6 @@ langchain==0.0.348
 numpy==1.26.2
 pandas==2.1.4
 Pillow==10.1.0
-Pillow==10.1.0
 protobuf==4.25.1
 rembg==2.0.52
 Requests==2.31.0
