@@ -26,7 +26,7 @@ This repository contains the code for the Cymbal Bank demo website, a cutting-ed
 
    **NOTE:** Website is available in English, Hindi and Kannada and the chatbot is supported in English and Hindi.
 
-   ![Website Homepage](files/images/cymbal_bank_homepage.png)
+   ![Website Homepage](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/cymbal_bank_homepage.png)
 
 2. **Login using the provided user details for the persona you wish to explore and Interact with the chatbot** using natural language to explore features and functionalities. **Review the investment summaries, market outlook, and personalized recommendations.**
 
@@ -43,11 +43,11 @@ This repository contains the code for the Cymbal Bank demo website, a cutting-ed
      Password: 123456.cb\
      [Sample Chat](files/sample_chat_scripts/genz_persona_chulbul.md)
 
-   ![Login](files/images/cymbal_bank_login.png)
+   ![Login](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/cymbal_bank_login.png)
 
 3. **Interact with the RAG powered Search functionality to get information about Cymbal Bank products and services**
 
-   ![Search](files/images/cymbal_bank_search.png)
+   ![Search](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/customer-search/images/cymbal_bank_search.png)
 
 ## **Additional Information:**
 
