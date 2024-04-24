@@ -20,34 +20,15 @@ import app.pages_utils.utils_resources_store_embeddings as utils_resources_store
 import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
 
-# Initialize session state if not already initialized
-if "initialize_session_state" not in st.session_state:
-    st.session_state.initialize_session_state = False
 
-# Initialize session state if not already initialized
-if st.session_state.initialize_session_state is False:
-    utils.initialize_all_session_state()
-    st.session_state.initialize_session_state = True
+
+# Get the page configuration from the config file
+page_cfg = PAGES_CFG["1_Resources"]
+utils.page_setup(page_cfg)
 
 # Initialize project form submission state if not already initialized
 if "project_form_submitted" not in st.session_state:
     st.session_state.project_form_submitted = False
-
-# Get the page configuration from the config file
-page_cfg = PAGES_CFG["1_Resources"]
-
-# Set the page configuration
-st.set_page_config(
-    page_title=page_cfg["page_title"],
-    page_icon=page_cfg["page_icon"],
-)
-
-# Apply the sidebar style
-utils_styles.sidebar_apply_style(
-    style=utils_styles.STYLE_SIDEBAR,
-    image_path=page_cfg["sidebar_image_path"],
-)
-
 
 def get_resources_img():
     """
@@ -58,22 +39,17 @@ def get_resources_img():
     Return Value: The resources image as a base64 encoded string.
     """
     # Get the file path of the resources image
-    file_name_1 = page_cfg["resources_img"]
+    page_images = [page_cfg["resources_img"]]
 
-    # Read the image file and encode it as base64
-    with open(file_name_1, "rb") as fp:
-        contents = fp.read()
-        main_image_1 = base64.b64encode(contents).decode("utf-8")
-        main_image_1 = "data:image/png;base64," + main_image_1
     # Return the base64 encoded image
-    return main_image_1
+    return utils.diaplay_page_images(page_images)
 
 
 # Get the resources image
-resources_img = get_resources_img()
+# resources_img = get_resources_img()
 
-# Display the resources image
-st.image(resources_img)
+# # Display the resources image
+# st.image(resources_img)
 
 # Create a container for the screen
 screen = st.container()

@@ -22,34 +22,14 @@ import app.pages_utils.utils_insights as utils_insights
 import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
 
-# Initialize session state if not already
-if "initialize_session_state" not in st.session_state:
-    st.session_state.initialize_session_state = False
 
-if st.session_state.initialize_session_state is False:
-    utils.initialize_all_session_state()
-    st.session_state.initialize_session_state = True
+# Get page configuration from config file
+page_cfg = PAGES_CFG["2_Marketing_Insights"]
+utils.page_setup(page_cfg)
 
 # Initialize temporary suggestions if not already initialized
 if "temp_suggestions" not in st.session_state:
     st.session_state.temp_suggestions = None
-
-# Get page configuration from config file
-page_cfg = PAGES_CFG["2_Marketing_Insights"]
-
-# Set page configuration
-st.set_page_config(
-    page_title=page_cfg["page_title"],
-    page_icon=page_cfg["page_icon"],
-    layout="wide",
-)
-
-# Apply custom styling to sidebar
-utils_styles.sidebar_apply_style(
-    style=utils_styles.STYLE_SIDEBAR,
-    image_path=page_cfg["sidebar_image_path"],
-)
-
 
 # Cache the function to get insights images
 @st.cache_data
@@ -57,29 +37,17 @@ def get_insights_img():
     """
     Loads header image for insights page.
     """
-    file_name_1 = page_cfg["prod_insights_1"]
-    file_name_2 = page_cfg["prod_insights_2"]
-
-    with open(file_name_1, "rb") as fp:
-        contents = fp.read()
-        main_image_1 = base64.b64encode(contents).decode("utf-8")
-        main_image_1 = "data:image/png;base64," + main_image_1
-
-    with open(file_name_2, "rb") as fp:
-        contents = fp.read()
-        main_image_2 = base64.b64encode(contents).decode("utf-8")
-        main_image_2 = "data:image/png;base64," + main_image_2
-
-    return main_image_1, main_image_2
+    page_images = [page_cfg["prod_insights_1"], page_cfg["prod_insights_2"]]
+    return utils.diaplay_page_images(page_images)
 
 
 # Get insights images
-prod_insights_1, prod_insights_2 = get_insights_img()
+# prod_insights_1, prod_insights_2 = get_insights_img()
 
-# Display insights images
-st.image(prod_insights_1)
-st.divider()
-st.image(prod_insights_2)
+# # Display insights images
+# st.image(prod_insights_1)
+# st.divider()
+# st.image(prod_insights_2)
 
 # Display projects
 utils.display_projects()

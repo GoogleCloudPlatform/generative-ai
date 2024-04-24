@@ -24,7 +24,6 @@ import logging
 
 import PIL
 from PIL import Image
-import app.pages_utils.utils as utils
 from app.pages_utils.utils_imagen import edit_image_generation
 
 import streamlit as st
@@ -81,14 +80,6 @@ def initialize_edit_page_state():
     This function checks if the session state has been initialized, and if not, it initializes it.
     It also checks if an image has been uploaded, and if so, it sets the session state accordingly.
     """
-
-    # Initialize session state for the project if it does not exist.
-    if (
-        "initialize_session_state" not in st.session_state
-        or st.session_state.initialize_session_state is False
-    ):
-        utils.initialize_all_session_state()
-        st.session_state.initialize_session_state = True
 
     # Check which image file prefix points to the image to be edited
     if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:

@@ -25,23 +25,17 @@ from app.pages_utils.utils_edit_image import (
     render_suggested_images
 )
 from app.pages_utils.utils_editor_ui import ImageEditor
-import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
-
-# Initialize the state of the edit page
-initialize_edit_page_state()
+import app.pages_utils.utils as utils
 
 # Get the configuration for the edit page
 page_cfg = PAGES_CFG["Editor"]
 
-# Set the page configuration
-st.set_page_config(page_title=page_cfg["page_title"], page_icon=page_cfg["page_icon"])
+# Setup the general state of the app if uninitialized.
+utils.page_setup(page_cfg)
 
-# Apply the sidebar style
-utils_styles.sidebar_apply_style(
-    style=utils_styles.STYLE_SIDEBAR,
-    image_path=page_cfg["sidebar_image_path"],
-)
+# Initialize the state of the edit page
+initialize_edit_page_state()
 
 # Set up logging
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)

@@ -3,9 +3,11 @@ Common utilities for the project. This includes:
     * session state initialization.
     * project selection.
 """
+import base64
 
 import app.pages_utils.utils_project as utils_project
 import streamlit as st
+import app.pages_utils.utils_styles as utils_styles
 
 
 def display_projects():
@@ -299,3 +301,51 @@ def reinitialize_session_states():
     st.session_state.image_edit_col = None
     st.session_state.image_edit_row = None
     st.session_state.bg_editing = False
+
+
+def page_setup(page_cfg):
+    """
+        This function initializes the page configuration and applies custom styles.
+
+        Args:
+            page_cfg (dict): A dictionary containing the configuration for the page.
+
+        Returns:
+            None
+    """
+
+    # Set the page configuration
+    st.set_page_config(page_title=page_cfg["page_title"], page_icon=page_cfg["page_icon"])
+
+     # Initialize session state for the project if it does not exist.
+    if (
+        "initialize_session_state" not in st.session_state
+        or st.session_state.initialize_session_state is False
+    ):
+        initialize_all_session_state()
+        st.session_state.initialize_session_state = True
+    # Apply the sidebar style
+    # utils_styles.sidebar_apply_style(
+    #     style=utils_styles.STYLE_SIDEBAR,
+    #     image_path=page_cfg["sidebar_image_path"],
+    # )
+
+def diaplay_page_images(page_images):
+    """
+    Displays the images for the current page.
+
+    Args:
+        images(list): List of images to display.
+
+    Returns:
+        List of base64 encoded images.
+    """
+    encoded_images = []
+    for page_image in page_images:
+        with open(page_image, "rb") as fp:
+            contents = fp.read()
+            encoded_image = base64.b64encode(contents).decode("utf-8")
+            encoded_image = "data:image/png;base64," + encoded_image
+        encoded_images.append(encoded_image)
+
+    return encoded_images

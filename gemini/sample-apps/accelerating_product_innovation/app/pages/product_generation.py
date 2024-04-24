@@ -19,8 +19,6 @@ import logging
 import base64
 
 import app.pages_utils.utils as utils
-import app.pages_utils.utils_styles as utils_styles
-import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_downloads import download_content, download_file
 from app.pages_utils.utils_draft_generation import ProductDrafts
@@ -73,14 +71,8 @@ def get_prod_gen_img():
     Returns:
         str: The base64 encoded image.
     """
-    file_name = page_cfg["prod_gen_img"]
-
-    with open(file_name, "rb") as fp:
-        contents = fp.read()
-        main_image_1 = base64.b64encode(contents).decode("utf-8")
-        main_image_1 = "data:image/png;base64," + main_image_1
-
-    return main_image_1
+    page_images = [page_cfg["prod_gen_img"]]
+    return utils.diaplay_page_images(page_images)
 
 
 def initialize_prod_gen():
@@ -93,13 +85,6 @@ def initialize_prod_gen():
     Returns:
         None
     """
-    # Check and initialize sessions state for the project.
-    if (
-        "initialize_session_state" not in st.session_state
-        or st.session_state.initialize_session_state is False
-    ):
-        utils.initialize_all_session_state()
-        st.session_state.initialize_session_state = True
 
     st.session_state.image_file_prefix = (
         "gen_image"  # All images generated on this page have prefix 'gen_image'
@@ -112,36 +97,17 @@ def initialize_prod_gen():
     st.session_state.generate_images = (
         False  # Tracks whetehr images for product ideas have been generated.
     )
+    # page_images = get_prod_gen_img()
+    # for page_image in page_images:
+    #     st.image(page_image)
 
-
-def initialize_page():
-    """
-    This function initializes the page configuration and applies custom styles.
-
-    Args:
-        page_cfg (dict): A dictionary containing the configuration for the page.
-
-    Returns:
-        None
-    """
-    st.set_page_config(
-        page_title=page_cfg["page_title"],
-        page_icon=page_cfg["page_icon"],
-    )
-
-    utils_styles.sidebar_apply_style(
-        style=utils_styles.STYLE_SIDEBAR,
-        image_path=page_cfg["sidebar_image_path"],
-    )
-    top_img = get_prod_gen_img()
-    st.image(top_img)
-
-# Set product generation states
-initialize_prod_gen()
-
-# Initialize page config
+# Initialize page config.
 page_cfg = PAGES_CFG["3_Generations"]
-initialize_page()
+
+utils.page_setup(page_cfg)
+
+# Set product generation states.
+initialize_prod_gen()
 
 # Page styles
 prod_gen_styles()
