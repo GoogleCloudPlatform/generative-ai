@@ -36,4 +36,5 @@ Assuming that you have Visual Studio Code and the Cloud Code plugin setup, click
 - Complete the rest of the steps to import the projects into Visual Studio Code.
 
 Check the screencast below:
-<img src="assets/import-apps-into-cloudcode.gif" alt="Importing Custom Applications into Cloud Code"/>
+
+<img src="https://storage.googleapis.com/github-repo/assets/import-apps-into-cloudcode.gif" alt="Importing Custom Applications into Cloud Code"/>
