@@ -20,7 +20,6 @@ import logging
 import pandas as pd
 
 from google.cloud import aiplatform
-from utils import qna_using_query_routing_utils
 from vertexai.generative_models import GenerativeModel
 from vertexai.language_models import TextEmbeddingModel
 
@@ -29,7 +28,12 @@ class QnAVectorSearch:
     """genai Generate Answer From genai Content"""
 
     def __init__(
-        self, model: GenerativeModel, index_endpoint: aiplatform.MatchingEngineIndexEndpoint, deployed_index_id: str, config_file: str, logger=logging.getLogger()
+        self,
+        model: GenerativeModel,
+        index_endpoint: aiplatform.MatchingEngineIndexEndpoint,
+        deployed_index_id: str,
+        config_file: str,
+        logger=logging.getLogger(),
     ) -> None:
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
@@ -45,11 +49,12 @@ class QnAVectorSearch:
         )
 
         self.embedding_df = pd.read_csv(
-            self.config["vector_search"]["embedding_csv_file"])
+            self.config["vector_search"]["embedding_csv_file"]
+        )
 
-        self.num_neighbors=int(
-                self.config["genai_qna"]["number_of_references_to_summarise"]
-            )
+        self.num_neighbors = int(
+            self.config["genai_qna"]["number_of_references_to_summarise"]
+        )
 
         # Default retrieval prompt template
         self.prompt_template = """You are a programming language learning assistant, helping the students answer their questions based on the following context. Explain the answer in detail for students.
@@ -82,7 +87,7 @@ class QnAVectorSearch:
 
         # Generate the embeddings for user question
         vector = self.text_embedding_model.get_embeddings([query])
-        
+
         queries = [vector[0].values]
 
         response = self.index_endpoint.find_neighbors(
@@ -104,10 +109,7 @@ class QnAVectorSearch:
 
         return context
 
-    def ask_qna(
-        self,
-        question: str
-    ) -> str:
+    def ask_qna(self, question: str) -> str:
         """Retrieves relevant context using vector search and generates an answer using a QnA model.
         Args:
             question (str): The user's question.
@@ -123,7 +125,7 @@ class QnAVectorSearch:
         # self.logger.info("QnA: context: %s", context)
 
         # Get response
-        if len(context)>0:
+        if len(context) > 0:
             response = self.model.generate_content(
                 self.prompt_template.format(context=context, question=question)
             )

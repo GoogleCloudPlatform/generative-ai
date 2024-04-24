@@ -16,15 +16,11 @@
 
 # Utils
 import os
-import time
-import json
 import configparser
-import pandas as pd
 from typing import List
 from datetime import datetime
 
 from google.cloud import aiplatform
-from vertexai.language_models import TextEmbeddingModel
 from langchain.document_loaders import TextLoader, UnstructuredPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_core.documents.base import Document
@@ -76,7 +72,6 @@ def get_deployed_index_id(
 
     return index_endpoint, deployed_index_id
 
-
 def get_split_documents(index_path: str) -> List[Document]:
     """
     Loads documents from a folder and splits them into manageable chunks.
@@ -111,7 +106,6 @@ def get_split_documents(index_path: str) -> List[Document]:
         split_docs.extend(text_splitter.split_documents(loader.load()))
 
     return split_docs
-
 
 def create_vector_search_index(
     bucket_uri: str,

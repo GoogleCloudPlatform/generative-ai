@@ -19,20 +19,22 @@ import json
 import logging
 import configparser
 from typing import List
-import pandas as pd
 
 from google.cloud import aiplatform
-from utils import qna_using_query_routing_utils
 from utils.qna_vector_search import QnAVectorSearch
 from vertexai.generative_models import GenerationConfig, GenerativeModel
-from vertexai.language_models import TextEmbeddingModel
 
 
 class IntentRouting:
     """genai Assistant"""
 
     def __init__(
-        self, model: GenerativeModel, index_endpoint: aiplatform.MatchingEngineIndexEndpoint, deployed_index_id: str, config_file: str = "config.ini", logger=logging.getLogger()
+        self,
+        model: GenerativeModel,
+        index_endpoint: aiplatform.MatchingEngineIndexEndpoint,
+        deployed_index_id: str,
+        config_file: str = "config.ini",
+        logger=logging.getLogger(),
     ) -> None:
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
@@ -42,7 +44,13 @@ class IntentRouting:
         self.index_endpoint = index_endpoint
         self.deployed_index_id = deployed_index_id
 
-        self.genai_qna = QnAVectorSearch(model=model, index_endpoint=index_endpoint, deployed_index_id=deployed_index_id, config_file=config_file, logger=logger)
+        self.genai_qna = QnAVectorSearch(
+            model=model,
+            index_endpoint=index_endpoint,
+            deployed_index_id=deployed_index_id,
+            config_file=config_file,
+            logger=logger,
+        )
 
         self.genai_qna_parameters = GenerationConfig(
             temperature=float(self.config["genai_qna"]["temperature"]),
@@ -55,7 +63,6 @@ class IntentRouting:
             temperature=float(self.config["genai_chat"]["temperature"]),
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
-
 
     def greetings(self, text: str) -> str:
         """
@@ -183,7 +190,9 @@ class IntentRouting:
             self.logger.info("LLM error code: %s\n", response.raw_prediction_response)
 
         intent = response.text
-        return str(intent).replace('"', '').replace("'", "").replace("INTENT:", "").strip()
+        return (
+            str(intent).replace('"', "").replace("'", "").replace("INTENT:", "").strip()
+        )
 
     def ask_codey(self, text: str) -> str:
         """
@@ -321,11 +330,7 @@ class IntentRouting:
 
         return program_lang_in_query, allowed_language_in_query
 
-    def classify_intent(
-        self,
-        text: str,
-        session_state: str
-    ) -> tuple[str, str]:
+    def classify_intent(self, text: str, session_state: str) -> tuple[str, str]:
         """
         Orchestrates intent classification, response generation, and error handling.
 
