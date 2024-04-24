@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Enable Backend APIs
-echo "Enabling APIs"
 PROJECT_ID=$(gcloud config get-value project 2> /dev/null)
 gcloud services enable iam.googleapis.com --project "${PROJECT_ID}"
 gcloud services enable compute.googleapis.com --project "${PROJECT_ID}"
