@@ -21,6 +21,7 @@
 html {
   font-size: 62.5%;
   box-sizing: border-box;
+  overflow-y: scroll;
 }
 
 body {
@@ -29,6 +30,24 @@ body {
   color: #444;
   line-height: 1.9;
   background-color: #f3f3f3;
+  background-size: cover;
+}
+
+#loader {
+  display: none;
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 10px solid #232323;
+  border-radius: 10%;
+  border-top: 10px solid #7ec379;
+  width: 40px;
+  height: 40px;
+
+  /* Safari */
+  animation: spin 1s linear infinite;
+  z-index: 999;
 }
 
 /* GENERAL ELEMENTS */
@@ -114,6 +133,145 @@ img {
   filter: blur(20px);
 }
 
+/* Loading Animation */
+.loader {
+  animation: rotate 1s infinite;
+  height: 50px;
+  width: 50px;
+}
+
+.loader::before,
+.loader::after {
+  border-radius: 50%;
+  content: "";
+  display: block;
+  height: 20px;
+  width: 20px;
+}
+
+.loader::before {
+  animation: ball1 1s infinite;
+  background-color: #cb2025;
+  box-shadow: 30px 0 0 #f8b334;
+  margin-bottom: 10px;
+}
+
+.loader::after {
+  animation: ball2 1s infinite;
+  background-color: #00a096;
+  box-shadow: 30px 0 0 #97bf0d;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg) scale(0.8);
+  }
+
+  50% {
+    transform: rotate(360deg) scale(1.2);
+  }
+
+  100% {
+    transform: rotate(720deg) scale(0.8);
+  }
+}
+
+@keyframes ball1 {
+  0% {
+    box-shadow: 30px 0 0 #f8b334;
+  }
+
+  50% {
+    box-shadow: 0 0 0 #f8b334;
+    margin-bottom: 0;
+    transform: translate(15px, 15px);
+  }
+
+  100% {
+    box-shadow: 30px 0 0 #f8b334;
+    margin-bottom: 10px;
+  }
+}
+
+@keyframes ball2 {
+  0% {
+    box-shadow: 30px 0 0 #97bf0d;
+  }
+
+  50% {
+    box-shadow: 0 0 0 #97bf0d;
+    margin-top: -20px;
+    transform: translate(15px, 15px);
+  }
+
+  100% {
+    box-shadow: 30px 0 0 #97bf0d;
+    margin-top: 0;
+  }
+}
+
+/* Style for the card container */
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+
+  /* Adjust as needed */
+
+  gap: 20px;
+
+  /* Adjust the gap between cards */
+
+  padding: 20px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Common styles for the card */
+
+.card {
+  width: calc(33% - 20px);
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.card-img {
+  width: calc(100%);
+}
+
+/* Style for the title */
+
+.card h2 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Style for the list */
+
+.card ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+/* Style for list items */
+
+.card li {
+  margin-bottom: 10px;
+}
+
+/* Hover effect */
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
 /* NAVIGATION */
 
 nav {
@@ -122,11 +280,23 @@ nav {
   left: 0;
   width: 100%;
   height: 100%;
-  height: 70px;
+  height: 90px;
   background: var(--color-primary-darker);
 
   /* box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2); */
   z-index: 99;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  /* display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 9rem;
+  width: 100%;
+  padding: 0 6rem;
+  z-index: 100;
+  background: var(--color-primary-darker); */
 }
 
 nav .navbar {
@@ -139,7 +309,8 @@ nav .navbar {
   margin: auto;
 
   /* background: red; */
-  padding: 0 50px;
+
+  /* padding: 0 50px; */
 }
 
 .navbar .logo a {
@@ -183,7 +354,12 @@ nav .navbar .links li a {
 }
 
 .links li:hover .htmlcss-arrow,
-.links li:hover .js-arrow {
+.links li:hover .js-arrow,
+.links li:hover .pay-arrow,
+.links li:hover .save-arrow,
+.links li:hover .invest-arrow,
+.links li:hover .insure-arrow,
+.links li:hover .borrow-arrow {
   transform: rotate(180deg);
 }
 
@@ -211,7 +387,12 @@ nav .navbar .links li .sub-menu {
 }
 
 nav .navbar .links li:hover .html-css-sub-menu,
-nav .navbar .links li:hover .js-sub-menu {
+nav .navbar .links li:hover .js-sub-menu,
+nav .navbar .links li:hover .pay-sub-menu,
+nav .navbar .links li:hover .save-sub-menu,
+nav .navbar .links li:hover .invest-sub-menu,
+nav .navbar .links li:hover .insure-sub-menu,
+nav .navbar .links li:hover .borrow-sub-menu {
   display: block;
 }
 
@@ -226,11 +407,45 @@ nav .navbar .links li:hover .js-sub-menu {
   font-weight: 500;
 }
 
-.navbar .links li .sub-menu .more-arrow {
+.navbar .links li .sub-menu .more-arrow,
+.navbar .links li .sub-menu .moneytransfer-arrow,
+.navbar .links li .sub-menu .cards-arrow,
+.navbar .links li .sub-menu .bills-arrow,
+.navbar .links li .sub-menu .accounts-arrow,
+.navbar .links li .sub-menu .deposits-arrow,
+.navbar .links li .sub-menu .bonds-arrow,
+.navbar .links li .sub-menu .lifeinsurance-arrow,
+.navbar .links li .sub-menu .healthandaccident-arrow,
+.navbar .links li .sub-menu .vehicle-arrow,
+.navbar .links li .sub-menu .loans-arrow {
   line-height: 40px;
 }
 
-.navbar .links li .sub-menu .more-sub-menu {
+.navbar .links li .html-css-more-sub-menu,
+.navbar .links li .pay-moneytransfer-sub-menu,
+.navbar .links li .pay-cards-sub-menu,
+.navbar .links li .pay-bills-sub-menu,
+.navbar .links li .save-accounts-sub-menu,
+.navbar .links li .save-deposits-sub-menu,
+.navbar .links li .invest-bonds-sub-menu,
+.navbar .links li .insure-lifeinsurance-sub-menu,
+.navbar .links li .insure-healthandaccident-sub-menu,
+.navbar .links li .insure-vehicle-sub-menu,
+.navbar .links li .borrow-loans-sub-menu {
+  /* line-height: 40px; */
+}
+
+.navbar .links li .sub-menu .more-sub-menu,
+.navbar .links li .sub-menu .moneytransfer-sub-menu,
+.navbar .links li .sub-menu .cards-sub-menu,
+.navbar .links li .sub-menu .bills-sub-menu,
+.navbar .links li .sub-menu .accounts-sub-menu,
+.navbar .links li .sub-menu .deposits-sub-menu,
+.navbar .links li .sub-menu .bonds-sub-menu,
+.navbar .links li .sub-menu .lifeinsurance-sub-menu,
+.navbar .links li .sub-menu .healthandaccident-sub-menu,
+.navbar .links li .sub-menu .vehicle-sub-menu,
+.navbar .links li .sub-menu .loans-sub-menu {
   position: absolute;
   top: 0;
   left: 100%;
@@ -239,34 +454,57 @@ nav .navbar .links li:hover .js-sub-menu {
   display: none;
 }
 
-.links li .sub-menu .more:hover .more-sub-menu {
+.links li .sub-menu .more:hover .more-sub-menu,
+.links li .sub-menu .moneytransfer:hover .moneytransfer-sub-menu,
+.links li .sub-menu .cards:hover .cards-sub-menu,
+.links li .sub-menu .bills:hover .bills-sub-menu,
+.links li .sub-menu .accounts:hover .accounts-sub-menu,
+.links li .sub-menu .deposits:hover .deposits-sub-menu,
+.links li .sub-menu .bonds:hover .bonds-sub-menu,
+.links li .sub-menu .lifeinsurance:hover .lifeinsurance-sub-menu,
+.links li .sub-menu .healthandaccident:hover .healthandaccident-sub-menu,
+.links li .sub-menu .vehicle:hover .vehicle-sub-menu,
+.links li .sub-menu .loans:hover .loans-sub-menu {
   display: block;
 }
 
-/* MODAL WINDOW */
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 60rem;
-  background-color: #f3f3f3;
-  padding: 5rem 6rem;
-  box-shadow: 0 4rem 6rem rgb(0 0 0 / 30%);
-  z-index: 1000;
-  transition: all 0.5s;
+.navbar .search-box {
+  position: relative;
+  height: 40px;
+  width: 40px;
 }
 
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+.navbar .search-box i {
+  position: absolute;
   height: 100%;
-  background-color: rgb(0 0 0 / 50%);
-  backdrop-filter: blur(4px);
-  z-index: 100;
-  transition: all 0.5s;
+  width: 100%;
+  line-height: 40px;
+  text-align: center;
+  font-size: 22px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navbar .search-box .input-box {
+  position: absolute;
+  right: calc(100% - 40px);
+  top: 80px;
+  height: 60px;
+  width: 300px;
+  background: var(--color-primary-darker);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.navbar.show-input .search-box .input-box {
+  top: 65px;
+  opacity: 1;
+  pointer-events: auto;
+  background: var(--color-primary-darker);
 }
 
 .modal-header {
@@ -311,50 +549,6 @@ nav .navbar .links li:hover .js-sub-menu {
   cursor: pointer;
   border: none;
   background: none;
-}
-
-.hidden {
-  visibility: hidden;
-  opacity: 0;
-}
-
-.navbar .search-box {
-  position: relative;
-  height: 40px;
-  width: 40px;
-}
-
-.navbar .search-box i {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  line-height: 40px;
-  text-align: center;
-  font-size: 22px;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.navbar .search-box .input-box {
-  position: absolute;
-  right: calc(100% - 40px);
-  top: 80px;
-  height: 60px;
-  width: 300px;
-  background: var(--color-primary-darker);
-  border-radius: 6px;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.4s ease;
-}
-
-.navbar.show-input .search-box .input-box {
-  top: 65px;
-  opacity: 1;
-  pointer-events: auto;
-  background: var(--color-primary-darker);
 }
 
 .search-box .input-box::before {
@@ -475,13 +669,33 @@ nav .navbar .links li:hover .js-sub-menu {
     border-bottom: none;
   }
 
-  .navbar .links li .sub-menu .more-sub-menu {
+  .navbar .links li .sub-menu .more-sub-menu,
+  .navbar .links li .sub-menu .moneytransfer-sub-menu,
+  .navbar .links li .sub-menu .cards-sub-menu,
+  .navbar .links li .sub-menu .bills-sub-menu,
+  .navbar .links li .sub-menu .accounts-sub-menu,
+  .navbar .links li .sub-menu .deposits-sub-menu,
+  .navbar .links li .sub-menu .bonds-sub-menu,
+  .navbar .links li .sub-menu .lifeinsurance-sub-menu,
+  .navbar .links li .sub-menu .healthandaccident-sub-menu,
+  .navbar .links li .sub-menu .vehicle-sub-menu,
+  .navbar .links li .sub-menu .loans-sub-menu {
     display: none;
     position: relative;
     left: 0;
   }
 
-  .navbar .links li .sub-menu .more-sub-menu li {
+  .navbar .links li .sub-menu .more-sub-menu li,
+  .navbar .links li .sub-menu .moneytransfer-sub-menu li,
+  .navbar .links li .sub-menu .cards-sub-menu li,
+  .navbar .links li .sub-menu .bills-sub-menu li,
+  .navbar .links li .sub-menu .accounts-sub-menu li,
+  .navbar .links li .sub-menu .deposits-sub-menu li,
+  .navbar .links li .sub-menu .bonds-sub-menu li,
+  .navbar .links li .sub-menu .lifeinsurance-sub-menu li,
+  .navbar .links li .sub-menu .healthandaccident-sub-menu li,
+  .navbar .links li .sub-menu .vehicle-sub-menu li,
+  .navbar .links li .sub-menu .loans-sub-menu li {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -492,7 +706,31 @@ nav .navbar .links li:hover .js-sub-menu {
     transform: rotate(0deg);
   }
 
-  .navbar .links li .sub-menu .more span {
+  /* .navbar .links li .sub-menu .more-sub-menu,
+  .navbar .links li .sub-menu .moneytransfer-sub-menu,
+  .navbar .links li .sub-menu .cards-sub-menu,
+  .navbar .links li .sub-menu .bills-sub-menu,
+  .navbar .links li .sub-menu .accounts-sub-menu,
+  .navbar .links li .sub-menu .deposits-sub-menu,
+  .navbar .links li .sub-menu .bonds-sub-menu,
+  .navbar .links li .sub-menu .lifeinsurance-sub-menu,
+  .navbar .links li .sub-menu .healthandaccident-sub-menu,
+  .navbar .links li .sub-menu .vehicle-sub-menu,
+  .navbar .links li .sub-menu .loans-sub-menu {
+    display: none;
+  } */
+
+  .navbar .links li .sub-menu .more span,
+  .navbar .links li .sub-menu .moneytransfer span,
+  .navbar .links li .sub-menu .cards span,
+  .navbar .links li .sub-menu .bills span,
+  .navbar .links li .sub-menu .accounts span,
+  .navbar .links li .sub-menu .deposits span,
+  .navbar .links li .sub-menu .bonds span,
+  .navbar .links li .sub-menu .lifeinsurance span,
+  .navbar .links li .sub-menu .healthandaccident span,
+  .navbar .links li .sub-menu .vehicle span,
+  .navbar .links li .sub-menu .loans span {
     /* background: red; */
     display: flex;
     align-items: center;
@@ -500,27 +738,76 @@ nav .navbar .links li:hover .js-sub-menu {
     /* justify-content: space-between; */
   }
 
-  .links li .sub-menu .more:hover .more-sub-menu {
+  .links li .sub-menu .more:hover .more-sub-menu,
+  .links li .sub-menu .moneytransfer:hover .moneytransfer-sub-menu,
+  .links li .sub-menu .cards:hover .cards-sub-menu,
+  .links li .sub-menu .bills:hover .bills-sub-menu,
+  .links li .sub-menu .accounts:hover .accounts-sub-menu,
+  .links li .sub-menu .deposits:hover .deposits-sub-menu,
+  .links li .sub-menu .bonds:hover .bonds-sub-menu,
+  .links li .sub-menu .lifeinsurance:hover .lifeinsurance-sub-menu,
+  .links li .sub-menu .healthandaccident:hover .healthandaccident-sub-menu,
+  .links li .sub-menu .vehicle:hover .vehicle-sub-menu,
+  .links li .sub-menu .loans:hover .loans-sub-menu {
     display: none;
   }
 
   nav .navbar .links li:hover .html-css-sub-menu,
-  nav .navbar .links li:hover .js-sub-menu {
+  nav .navbar .links li:hover .js-sub-menu,
+  nav .navbar .links li:hover .pay-sub-menu,
+  nav .navbar .links li:hover .save-sub-menu,
+  nav .navbar .links li:hover .invest-sub-menu,
+  nav .navbar .links li:hover .insure-sub-menu,
+  nav .navbar .links li:hover .borrow-sub-menu {
     display: none;
   }
 
   .navbar .nav-links.show1 .links .html-css-sub-menu,
   .navbar .nav-links.show3 .links .js-sub-menu,
-  .navbar .nav-links.show2 .links .more .more-sub-menu {
+  .navbar .nav-links.show4 .links .pay-sub-menu,
+  .navbar .nav-links.show5 .links .save-sub-menu,
+  .navbar .nav-links.show6 .links .invest-sub-menu,
+  .navbar .nav-links.show7 .links .insure-sub-menu,
+  .navbar .nav-links.show8 .links .borrow-sub-menu,
+  .navbar .nav-links.show2 .links .more .more-sub-menu,
+  .navbar .nav-links.show9 .links .moneytransfer .moneytransfer-sub-menu,
+  .navbar .nav-links.show10 .links .cards .cards-sub-menu,
+  .navbar .nav-links.show11 .links .bills .bills-sub-menu,
+  .navbar .nav-links.show12 .links .accounts .accounts-sub-menu,
+  .navbar .nav-links.show13 .links .deposits .deposits-sub-menu,
+  .navbar .nav-links.show14 .links .bonds .bonds-sub-menu,
+  .navbar .nav-links.show15 .links .lifeinsurance .lifeinsurance-sub-menu,
+  .navbar
+    .nav-links.show16
+    .links
+    .healthandaccident
+    .healthandaccident-sub-menu,
+  .navbar .nav-links.show17 .links .vehicle .vehicle-sub-menu,
+  .navbar .nav-links.show18 .links .loans .loans-sub-menu {
     display: block;
   }
 
   .navbar .nav-links.show1 .links .htmlcss-arrow,
-  .navbar .nav-links.show3 .links .js-arrow {
+  .navbar .nav-links.show3 .links .js-arrow,
+  .navbar .nav-links.show4 .links .pay-arrow,
+  .navbar .nav-links.show5 .links .save-arrow,
+  .navbar .nav-links.show6 .links .invest-arrow,
+  .navbar .nav-links.show7 .links .insure-arrow,
+  .navbar .nav-links.show8 .links .borrow-arrow {
     transform: rotate(180deg);
   }
 
-  .navbar .nav-links.show2 .links .more-arrow {
+  .navbar .nav-links.show2 .links .more-arrow,
+  .navbar .nav-links.show9 .links .moneytransfer-arrow,
+  .navbar .nav-links.show10 .links .cards-arrow,
+  .navbar .nav-links.show11 .links .bills-arrow,
+  .navbar .nav-links.show12 .links .accounts-arrow,
+  .navbar .nav-links.show13 .links .deposits-arrow,
+  .navbar .nav-links.show14 .links .bonds-arrow,
+  .navbar .nav-links.show15 .links .lifeinsurance-arrow,
+  .navbar .nav-links.show16 .links .healthandaccident-arrow,
+  .navbar .nav-links.show17 .links .vehicle-arrow,
+  .navbar .nav-links.show18 .links .loans-arrow {
     transform: rotate(90deg);
   }
 }
@@ -568,7 +855,7 @@ nav .navbar .links li:hover .js-sub-menu {
 
 .nav-link-btn:link,
 .nav-link-btn:visited {
-  padding: 0.8rem 2.5rem;
+  padding: 0.4rem 2.5rem;
   border-radius: 3rem;
   background-color: var(--color-primary);
   color: #222;
@@ -591,6 +878,7 @@ nav .navbar .links li:hover .js-sub-menu {
 
 .header-title {
   flex: 1;
+  margin-top: 10rem;
   max-width: 115rem;
   display: grid;
   grid-template-columns: 3fr 2fr;
@@ -644,6 +932,7 @@ h4 {
 
 .features-img {
   width: 100%;
+  object-fit: contain;
 }
 
 .features-feature {
@@ -765,6 +1054,113 @@ h4 {
 }
 
 .operations-icon-3 {
+  background-color: var(--color-tertiary-opacity);
+}
+
+/* .operations-icon-1 svg {
+  fill: var(--color-secondary-darker);
+}
+.operations-icon-2 svg {
+  fill: var(--color-primary);
+}
+.operations-icon-3 svg {
+  fill: var(--color-tertiary);
+} */
+
+/* AUTHENTICATION */
+.authenticate {
+  max-width: 100rem;
+  margin: 12rem auto 0;
+  background-color: #fff;
+}
+
+.authenticate-tab-container {
+  display: flex;
+  justify-content: center;
+
+  /* width: auto; */
+}
+
+.authenticate-tab {
+  margin-right: 2.5rem;
+  transform: translateY(-50%);
+  width: 200rem;
+}
+
+.authenticate-tab span {
+  margin-right: 1rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.authenticate-tab-1 {
+  background-color: var(--color-secondary);
+}
+
+.authenticate-tab-1:hover {
+  background-color: var(--color-secondary-darker);
+}
+
+.authenticate-tab-3 {
+  background-color: var(--color-tertiary);
+  margin: 0;
+}
+
+.authenticate-tab-3:hover {
+  background-color: var(--color-tertiary-darker);
+}
+
+.authenticate-tab-active {
+  transform: translateY(-66%);
+}
+
+.authenticate-content {
+  display: none;
+
+  /* JUST PRESENTATIONAL */
+  font-size: 1.7rem;
+  padding: 2.5rem 7rem 6.5rem;
+}
+
+.authenticate-content-active {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.5rem 3rem;
+}
+
+.authenticate-header {
+  font-size: 2.25rem;
+  font-weight: 500;
+  align-self: center;
+}
+
+.authenticate-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 7rem;
+  width: 7rem;
+  border-radius: 50%;
+}
+
+.authenticate-icon svg {
+  height: 2.75rem;
+  width: 2.75rem;
+}
+
+.authenticate-content p {
+  grid-column: 2;
+}
+
+.authenticate-icon-1 {
+  background-color: var(--color-secondary-opacity);
+}
+
+.authenticate-icon-2 {
+  background-color: var(--color-primary-opacity);
+}
+
+.authenticate-icon-3 {
   background-color: var(--color-tertiary-opacity);
 }
 
@@ -968,6 +1364,17 @@ h4 {
   display: block;
   margin: 0 auto;
   margin-bottom: 5rem;
+  background-color: #f3f3f3;
+  border-radius: 10px;
+
+  /* Adjust the value for the roundness of the corners */
+  padding: 5px 10px;
+
+  /* Add padding as needed */
+
+  /* Add padding as needed */
+
+  /* Add padding as needed */
 }
 
 .footer-copyright {
@@ -980,6 +1387,39 @@ h4 {
   font-size: 1.4rem;
 }
 
+/* MODAL WINDOW */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 60rem;
+  max-height: 80rem;
+  overflow: scroll;
+  background-color: #f3f3f3;
+  padding: 5rem 6rem;
+  box-shadow: 0 4rem 6rem rgb(0 0 0 / 30%);
+  z-index: 1000;
+  transition: all 0.5s;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0 0 0 / 50%);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  transition: all 0.5s;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+
 /* COOKIE MESSAGE */
 .cookie-message {
   display: flex;
@@ -990,4 +1430,345 @@ h4 {
   color: #bbb;
   font-size: 1.5rem;
   font-weight: 400;
+}
+
+@media screen and (width <= 1000px) {
+  .card {
+    width: calc(50% - 20px);
+
+    /* Adjust width for smaller screens */
+  }
+}
+
+@media screen and (width <= 600px) {
+  .card {
+    width: calc(100% - 20px);
+
+    /* Adjust width for smaller screens */
+  }
+}
+
+.learn-more-btn {
+  display: inline-block;
+  margin-top: auto;
+  margin-left: auto;
+  margin-bottom: 10px;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  transition: background-color 0.3s ease;
+}
+
+.learn-more-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.custom-body {
+  font-family: Poppins, sans-serif;
+  font-weight: 300;
+  color: #444;
+  line-height: 1.9;
+  background-color: #f3f3f3;
+  padding-left: 4%;
+  padding-right: 4%;
+}
+
+.savingh1 {
+  font-size: 5.5rem;
+  line-height: 1.35;
+}
+
+.savingh2 {
+  font-size: 4.5rem;
+  line-height: 1.35;
+  text-align: center;
+  padding-top: 16rem;
+  padding-bottom: 40px;
+}
+
+.savingh3 {
+  font-size: 3rem;
+  line-height: 1.35;
+  padding-top: 40px;
+  padding-bottom: 10px;
+}
+
+.savingh4 {
+  font-size: 2.4rem;
+  font-weight: 500;
+}
+
+.savingh5 {
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.savingp {
+  color: #666;
+  font-size: 1.5rem;
+}
+
+.savingul {
+  color: #666;
+  font-size: 1.5rem;
+  padding-left: 2%;
+}
+
+.savingol {
+  color: #666;
+  font-size: 1.5rem;
+  padding-left: 2%;
+}
+
+#search-icon {
+  padding: 0;
+  height: 25px;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+#clear-icon {
+  visibility: hidden;
+}
+
+#search-container {
+  position: absolute;
+  top: 94px;
+
+  /* Adjust as needed for spacing from the top */
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 20px;
+
+  /* Adjust as needed for padding */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+
+  /* Set a high z-index to ensure it appears above other content */
+  width: 100%;
+
+  /* Ensure it spans the full width of the viewport */
+  box-sizing: border-box;
+
+  /* Include padding and border in width calculation */
+}
+
+#search-query {
+  width: 70%;
+  min-width: 280px;
+
+  /* Adjust the min-width as needed */
+  max-width: 720px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #dfe1e5;
+
+  /* Light border color similar to Google */
+  border-radius: 24px;
+
+  /* Larger border-radius for rounded corners */
+  background-color: #f1f3f4;
+
+  /* Light gray background similar to Google */
+  padding: 10px;
+
+  /* Adjust padding as needed */
+  box-shadow: 0 2px 2px 0 rgb(0 0 0 / 10%);
+
+  /* Box shadow for a subtle lift */
+  font-size: 16px;
+  line-height: 24px;
+  display: flex;
+
+  /* Make it a flex container */
+}
+
+#search-query-input {
+  min-width: 104px;
+  width: 90%;
+  height: 24px;
+  font-size: 16px;
+  font-stretch: normal;
+  letter-spacing: normal;
+  line-height: 24px;
+  border: 0;
+  color: #000;
+  background-color: transparent;
+  cursor: text;
+  text-align: start;
+  vertical-align: middle;
+}
+
+#search-query-input:focus {
+  outline: none;
+}
+
+@media all and (width <= 480px) {
+  #search-query {
+    min-width: 200px;
+    width: 100%;
+  }
+}
+
+/* .search-result-list {
+  list-style: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #f3f3f3;
+  border-radius: 5px;
+  list-style-type: none;
+  background-color: #f3f3f3;
+} */
+
+.search-result {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #f3f3f3;
+  border-radius: 5px;
+  list-style-type: none;
+  background-color: #f3f3f3;
+}
+
+.search-result-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.search-result-snippet {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 0;
+}
+
+.slide-container {
+  margin: 0 auto;
+}
+
+.search-result-list {
+  list-style: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #fff;
+  border-radius: 0;
+  list-style-type: none;
+  background: #fff;
+  backdrop-filter: saturate(180%) blur(10px);
+
+  /* background-color: #88ca98; */
+  box-shadow: 5px 5px 10px 0 rgb(0 0 0 / 20%);
+  font-size: 13.5px;
+  overflow: hidden;
+}
+
+#search-result {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #fff;
+  border-radius: 0;
+  list-style-type: none;
+
+  /* background-color: #88ca98; */
+  background: #fff;
+  backdrop-filter: saturate(120%) blur(10px);
+  box-shadow: 5px 5px 10px 0 rgb(0 0 0 / 20%);
+
+  /* font-family: 'Roboto', sans-serif; */
+  font-size: 15px;
+
+  /* Adjust as needed */
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+.search-result-url {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.search-result-url:hover {
+  text-decoration: underline;
+}
+
+.half-width {
+  width: 50vw;
+  min-width: 480px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.df-messenger {
+  z-index: 999;
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+
+  --df-messenger-primary-color: #4bbb7d;
+  --df-messenger-chat-window-height: 500px;
+  --df-messenger-chat-window-width: 700px;
+}
+
+/* html {
+  overflow-y: scroll;
+} */
+
+.slide-button-container {
+  position: fixed;
+  top: 50%;
+  right: 0.5rem;
+  transform: translate(0, -50%);
+}
+
+.slide-button {
+  background: var(--color-primary);
+  color: #f3f3f3;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  vertical-align: middle;
+  text-decoration: none;
+  border: 2px solid #f3f3f3;
+  z-index: 999;
+}
+
+.slide-button img {
+  width: 24px;
+}
+
+.slide-button-info {
+  width: 0;
+  color: #f3f3f3;
+  line-height: 55px;
+  height: 55px;
+  right: 45px;
+  font-size: 14px;
+  font-family: inherit;
+  position: absolute;
+  background: var(--color-primary);
+  border-radius: 20px;
+  border: 2px solid #f3f3f3;
+  z-index: -1;
+
+  /*   transition: width 1s, height 1s;
+  -webkit-transition: width 1s, height 1s; */
+}
+
+.slide-button:hover .slide-button-info {
+  width: 150px;
+}
+
+.sidebar-logo-container {
+  background-color: #f3f3f3;
+  border-radius: 10px; /* Adjust the value for the roundness of the corners */
+  padding: 5px 10px; /* Add padding as needed */ /* Add padding as needed */ /* Add padding as needed */ /* Add padding as needed */
+
+  /* Other styles as required */
 }
