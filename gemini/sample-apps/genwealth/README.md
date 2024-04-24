@@ -66,6 +66,8 @@ The GenWealth demo application was built using:
 
 1. Run the `./install.sh` script.
 
+   > NOTE: The script updates a few organization policies that may or may not apply to your organization. You can ignore errors related to policies that don't exist in your environment, or you can skip all org policy updates by running `./install.sh --skip-org-policy-updates`.
+
 1. When prompted, enter a password you will remember for the AlloyDB postgres user and the pgAdmin demo user. **Remember these passwords - you will need them later**.
 
 1. Grab some coffee or tea. The script will provision all the necessary back-end resources, which usually takes about 30-35 minutes.
@@ -74,6 +76,7 @@ The GenWealth demo application was built using:
 
    - Navigate to Vertex AI Agent Builder in the console.
    - **IMPORTANT:** Click to accept terms and activate the API.
+   - Click `Apps` in the left hand navigation to view the list of apps.
    - Click into the `search-prospectus` app.
    - Select `Integration` from the left-hand menu.
    - Scroll down until you see the `configId` for the gen-search-widget.

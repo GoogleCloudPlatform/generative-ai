@@ -29,7 +29,7 @@ yes | curl -X POST \
   }
 }'
 
-echo "Waiting 70 seconds for environment to solidify."
+echo "Waiting 70 seconds for data store."
 sleep 70
 
 # Upload samples to gcs
