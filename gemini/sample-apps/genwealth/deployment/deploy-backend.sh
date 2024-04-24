@@ -4,8 +4,6 @@
 ### Deploys the genwealth database to AlloyDB
 ###
 
-# Load env variables
-source ./env.sh
 
 # Prompt user to create the AlloyDB password
 read -r -s -p "Enter a password for the AlloyDB cluster: " ALLOYDB_PASSWORD
@@ -30,6 +28,9 @@ echo -n "$PGADMIN_PASSWORD" | \
     gcloud secrets versions add pgadmin-password-"${PROJECT_ID}" --data-file=-
 
 sleep 5
+
+# Load env variables
+source ./env.sh
 
 # Install necessary packages
 sudo apt-get -y install jq
