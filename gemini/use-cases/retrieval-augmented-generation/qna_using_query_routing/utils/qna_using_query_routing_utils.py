@@ -72,6 +72,7 @@ def get_deployed_index_id(
 
     return index_endpoint, deployed_index_id
 
+
 def get_split_documents(index_path: str) -> List[Document]:
     """
     Loads documents from a folder and splits them into manageable chunks.
@@ -106,6 +107,7 @@ def get_split_documents(index_path: str) -> List[Document]:
         split_docs.extend(text_splitter.split_documents(loader.load()))
 
     return split_docs
+
 
 def create_vector_search_index(
     bucket_uri: str,

@@ -154,7 +154,7 @@ class IntentRouting:
             1. Classify the intents into one of these categories only: 'WELCOME', 'WRITE_CODE', 'PROGRAMMING_QUESTION_AND_ANSWER', 'CLOSE', 'OTHER', 'FOLLOWUP'.
             2. Messages can be read as case-insensitive.
             3. Reply ONLY with category of intent. Don't generate additional intent outside of this list.
-            
+
             Definition of Intents:
             1. WELCOME : is the category with greeting message and to know about the assistant for example hi, hey there, Hello, Good morning, good afternoon, good evening, who are you?, what prgramming languesges do you know?, what do you do?, how can you help me?.
             2. WRITE_CODE : is the category with code writing , debugging, explain code message. user wants you to write a code.
@@ -162,14 +162,14 @@ class IntentRouting:
             4. CLOSE : is the category for closing the chat with messages like okay THANKS!, bye, Thanks, thank you, goodbye.
             5. OTHER : is the category where user is asking non information technology related quesiontion. for example Who is PM of india, what happended in G20 summit.
             6. FOLLOWUP : is the category with user is asking the followup questions like, such as write a code for same, give me the code for above, give me example, explain in detail, what above method is doing etc..
-            
+
             Examples:
             MESSAGE: Hi 
             INTENT: WELCOME
-            
+
             MESSAGE: What is the difference between list and set? 
             INTENT: PROGRAMMING_QUESTION_AND_ANSWER
-            
+
             MESSAGE: Fix the error in below code:
             def create_dataset(id: str): -> None
             ...
