@@ -29,6 +29,10 @@ done
 echo "Enabling APIs."
 source ./deployment/enable-apis.sh
 
+# Deploy secrets
+echo "Creating secrets."
+source ./deployment/deploy-secrets.sh
+
 # Update org policies unless skipped
 if [[ $skip_org_policies == false ]]; then
   echo "Running organizational policy updates."
