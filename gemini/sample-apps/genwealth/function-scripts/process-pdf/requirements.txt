@@ -30,7 +30,7 @@ google-resumable-media==2.7.0
 googleapis-common-protos==1.63.0
 greenlet==3.0.3
 grpc-google-iam-v1==0.13.0
-grpcio==1.62.1
+grpcio==1.62.2
 grpcio-status==1.62.1
 idna==3.7
 jsonpatch==1.33
