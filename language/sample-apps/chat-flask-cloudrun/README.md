@@ -6,7 +6,7 @@
 
 This application demonstrates a Cloud Run application that has a simple Form-based UI that represents a Chat widget. You can put in your query and it will invoke the PaLM Chat Bison model in the background and get back the response. It is a simple example but something that you can look to embed into your larger web application.
 
-![Flask Chat App Screen](../assets/flaskapp-screen.png "Flask Chat App")
+![Flask Chat App Screen](https://storage.googleapis.com/github-repo/assets/flaskapp-screen.png "Flask Chat App")
 
 ## Build and Deploy the application to Cloud Run
 
