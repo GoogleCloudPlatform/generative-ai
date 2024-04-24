@@ -46,7 +46,7 @@ multidict==6.0.5
 mypy-extensions==1.0.0
 numpy==1.26.4
 orjson==3.9.15
-packaging==23.2
+packaging==24.0
 pg8000==1.30.5
 pgvector==0.2.5
 proto-plus==1.23.0
