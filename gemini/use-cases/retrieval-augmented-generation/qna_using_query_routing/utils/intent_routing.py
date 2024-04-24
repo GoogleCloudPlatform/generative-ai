@@ -164,17 +164,17 @@ class IntentRouting:
             6. FOLLOWUP : is the category with user is asking the followup questions like, such as write a code for same, give me the code for above, give me example, explain in detail, what above method is doing etc..
 
             Examples:
-            MESSAGE: Hi 
+            MESSAGE: Hi
             INTENT: WELCOME
 
-            MESSAGE: What is the difference between list and set? 
+            MESSAGE: What is the difference between list and set?
             INTENT: PROGRAMMING_QUESTION_AND_ANSWER
 
             MESSAGE: Fix the error in below code:
             def create_dataset(id: str): -> None
             ...
 
-            SyntaxError: invalid syntax 
+            SyntaxError: invalid syntax
             INTENT: WRITE_CODE
 
             What is the intent of the below message?
