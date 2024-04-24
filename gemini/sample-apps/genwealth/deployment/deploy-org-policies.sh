@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Load env variables
+source ./env.sh
+
 # Create policy document to allow External IP for GCE Instance
 echo "Creating necessary policy"
 tee -a policy.json <<EOF
