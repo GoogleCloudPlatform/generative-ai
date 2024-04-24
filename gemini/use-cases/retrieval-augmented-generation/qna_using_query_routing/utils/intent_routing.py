@@ -1,15 +1,27 @@
-# Copyright 2023 Google LLC. This software is provided as-is, without warranty
-# or representation for any use or purpose. Your use of it is subject to your
-# agreement with Google.
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Generative AI Models based functions to respond questions"""
 
-# Imports
-import configparser
+# Utils
 import json
 import logging
+import configparser
 from typing import List
-
 import pandas as pd
+
+from google.cloud import aiplatform
 from utils import qna_using_query_routing_utils
 from utils.qna_vector_search import QnAVectorSearch
 from vertexai.generative_models import GenerationConfig, GenerativeModel
@@ -20,11 +32,17 @@ class IntentRouting:
     """genai Assistant"""
 
     def __init__(
-        self, config_file: str = "config.ini", logger=logging.getLogger()
+        self, model: GenerativeModel, index_endpoint: aiplatform.MatchingEngineIndexEndpoint, deployed_index_id: str, config_file: str = "config.ini", logger=logging.getLogger()
     ) -> None:
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
+
         self.logger = logger
+        self.model = model
+        self.index_endpoint = index_endpoint
+        self.deployed_index_id = deployed_index_id
+
+        self.genai_qna = QnAVectorSearch(model=model, index_endpoint=index_endpoint, deployed_index_id=deployed_index_id, config_file=config_file, logger=logger)
 
         self.genai_qna_parameters = GenerationConfig(
             temperature=float(self.config["genai_qna"]["temperature"]),
@@ -38,31 +56,14 @@ class IntentRouting:
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
 
-        (
-            self.index_endpoint,
-            self.deployed_index_id,
-        ) = qna_using_query_routing_utils.get_deployed_index_id(
-            self.config["vector_search"]["me_index_name"],
-            self.config["vector_search"]["me_region"],
-        )
 
-        # Initalizing embedding model
-        self.text_embedding_model = TextEmbeddingModel.from_pretrained(
-            self.config["vector_search"]["embedding_model_name"]
-        )
-
-        self.embedding_df = pd.read_csv(
-            self.config["vector_search"]["embedding_csv_file"]
-        )
-
-    def greetings(self, chat_model: GenerativeModel, text: str) -> str:
+    def greetings(self, text: str) -> str:
         """
         Generates a friendly greeting message in response to a 'WELCOME' intent.
 
         Leverages the provided chat model to generate a greeting tailored to the enabled programming languages.
 
         Args:
-            chat_model: The chat model used for text generation.
             text (str): The user's original message.
 
         Returns:
@@ -76,7 +77,7 @@ class IntentRouting:
             [lang.title() for lang in enabled_programming_language_list]
         )
 
-        chat = chat_model.start_chat()
+        chat = self.model.start_chat()
         response = chat.send_message(
             f"""You are Generative AI powered genai Learning Assistant.
 
@@ -84,8 +85,6 @@ class IntentRouting:
 
         Write a brief greeting message:"""
         )
-        # parameters_local = copy.deepcopy(self.genai_chat_parameters)
-        # parameters_local["temperature"] = 1
         parameters_local = GenerationConfig(
             temperature=0.7,
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
@@ -95,14 +94,13 @@ class IntentRouting:
         message = response.text
         return message
 
-    def closing(self, chat_model: GenerativeModel, text: str) -> str:
+    def closing(self, text: str) -> str:
         """
         Generates a closing/thank you message in response to a 'CLOSE' intent.
 
         Leverages the provided chat model to generate a closing message.
 
         Args:
-            chat_model: The chat model used for text generation.
             text (str): The user's original message.
 
         Returns:
@@ -113,7 +111,7 @@ class IntentRouting:
             temperature=0.7,
             max_output_tokens=int(self.config["genai_chat"]["max_output_tokens"]),
         )
-        chat = chat_model.start_chat()
+        chat = self.model.start_chat()
         response = chat.send_message(
             """You are Generative AI powered genai Learning Assistant.
                 Write a brief closing thank you message:"""
@@ -122,7 +120,7 @@ class IntentRouting:
         message = response.text
         return message
 
-    def genai_classify_intent(self, text: str, model: GenerativeModel) -> str:
+    def genai_classify_intent(self, text: str) -> str:
         """
         Classifies the intent of an incoming message using a strict intent classifier model.
 
@@ -136,31 +134,41 @@ class IntentRouting:
 
         Args:
             text (str): The user's message.
-            model: The intent classification model.
 
         Returns:
             str: The classified intent.
         """
 
-        response = model.generate_content(
+        response = self.model.generate_content(
             f"""
             You are strict intent classifier , Classify intent of messages into 5 categories
 
             Instructions:
-            1. Only use WELCOME , WRITE_CODE , PROGRAMMING_QUESTION_AND_ANSWER , CLOSE , OTHER , FOLLOWUP intents.
+            1. Classify the intents into one of these categories only: 'WELCOME', 'WRITE_CODE', 'PROGRAMMING_QUESTION_AND_ANSWER', 'CLOSE', 'OTHER', 'FOLLOWUP'.
             2. Messages can be read as case-insensitive.
-            3. Reply ONLY with category of intent. Don't generate extra examples.
-            4. All other messages that don't belong to WRITE_CODE or PROGRAMMING_QUESTION_AND_ANSWER will be classified as OTHER
-
-            Intents:
+            3. Reply ONLY with category of intent. Don't generate additional intent outside of this list.
+            
+            Definition of Intents:
             1. WELCOME : is the category with greeting message and to know about the assistant for example hi, hey there, Hello, Good morning, good afternoon, good evening, who are you?, what prgramming languesges do you know?, what do you do?, how can you help me?.
             2. WRITE_CODE : is the category with code writing , debugging, explain code message. user wants you to write a code.
             3. PROGRAMMING_QUESTION_AND_ANSWER: is the category with strictly programming language related descriptive or theoretical questions. Any other question non related to programming should go into others.
             4. CLOSE : is the category for closing the chat with messages like okay THANKS!, bye, Thanks, thank you, goodbye.
             5. OTHER : is the category where user is asking non information technology related quesiontion. for example Who is PM of india, what happended in G20 summit.
-            6. FOLLOWUP : is the category with user is asking the followup question, such as write a code for same , give me the code for above, give me example, explain in detail, what above method is doing.
+            6. FOLLOWUP : is the category with user is asking the followup questions like, such as write a code for same, give me the code for above, give me example, explain in detail, what above method is doing etc..
+            
+            Examples:
+            MESSAGE: Hi 
+            INTENT: WELCOME
+            
+            MESSAGE: What is the difference between list and set? 
+            INTENT: PROGRAMMING_QUESTION_AND_ANSWER
+            
+            MESSAGE: Fix the error in below code:
+            def create_dataset(id: str): -> None
+            ...
 
-            Strictly If you do not know the answer, classify as OTHER.
+            SyntaxError: invalid syntax 
+            INTENT: WRITE_CODE
 
             What is the intent of the below message?
             MESSAGE:{text}
@@ -175,9 +183,9 @@ class IntentRouting:
             self.logger.info("LLM error code: %s\n", response.raw_prediction_response)
 
         intent = response.text
-        return str(intent).strip()
+        return str(intent).replace('"', '').replace("'", "").replace("INTENT:", "").strip()
 
-    def ask_codey(self, text: str, chat_model: GenerativeModel) -> str:
+    def ask_codey(self, text: str) -> str:
         """
         Generates code in response to code-related questions ('WRITE_CODE' intent).
 
@@ -185,7 +193,6 @@ class IntentRouting:
 
         Args:
             text (str): The user's code-related query.
-            chat_model: The chat model used for code generation.
 
         Returns:
             str: The generated code (or an error message if applicable).
@@ -201,7 +208,7 @@ class IntentRouting:
             "enabled_programming_language"
         ]
         default_language = self.config["default"]["default_language"]
-        chat = chat_model.start_chat()
+        chat = self.model.start_chat()
         response = chat.send_message(
             f"""
         You are genai Programming Language Learning Assistant.
@@ -221,7 +228,6 @@ class IntentRouting:
         response = chat.send_message(
             f"""{text}""", generation_config=self.genai_chat_parameters
         )
-        # if response.is_blocked:
         if response.to_dict()["candidates"][0]["finish_reason"] != 1:
             self.logger.info(
                 "ask_codey: No response from QnA due to LLM safety checks."
@@ -233,13 +239,12 @@ class IntentRouting:
         return response
 
     def get_programming_lanuage_from_query(
-        self, model: GenerativeModel, text: str, enabled_programming_language: List
+        self, text: str, enabled_programming_language: List
     ) -> List[str]:
         """
         Extracts programming languages mentioned in a user's query.
 
         Args:
-            model:  A model used for programming language extraction.
             text (str): The user's query.
             enabled_programming_language (List): List of supported languages.
 
@@ -247,7 +252,7 @@ class IntentRouting:
             list: A list of programming languages extracted from the query (potentially empty).
         """
 
-        response = model.generate_content(
+        response = self.model.generate_content(
             f"""
             You are strict programming languages extractor.
 
@@ -285,15 +290,13 @@ class IntentRouting:
         return program_lang_in_query
 
     def check_programming_language_in_query(
-        self, model: GenerativeModel, text: str, intent: str
+        self, text: str
     ) -> tuple[List[str], set[str]]:
         """
         Identifies supported programming languages mentioned in a user's query.
 
         Args:
-            model: A model for programming language extraction (likely the same as in `get_programming_lanuage_from_query`).
             text (str): The user's query.
-            intent (str):  The classified intent of the query.
 
         Returns:
             tuple:
@@ -310,7 +313,7 @@ class IntentRouting:
             for x in enabled_programming_language_list
         ]
         program_lang_in_query = self.get_programming_lanuage_from_query(
-            model, text, enabled_programming_language_list
+            text, enabled_programming_language_list
         )
         allowed_language_in_query = set(enabled_programming_language_list).intersection(
             set(program_lang_in_query)
@@ -321,10 +324,7 @@ class IntentRouting:
     def classify_intent(
         self,
         text: str,
-        session_state: str,
-        model: GenerativeModel,
-        chat_model: GenerativeModel,
-        genai_qna: QnAVectorSearch,
+        session_state: str
     ) -> tuple[str, str]:
         """
         Orchestrates intent classification, response generation, and error handling.
@@ -340,9 +340,6 @@ class IntentRouting:
         Args:
             text (str): User's message.
             session_state (str): Unique ID for tracking the conversation.
-            model: Intent classification model.
-            chat_model: Model used for code and general text generation.
-            genai_qna: A component for retrieving relevant answers from a vector index.
 
         Returns:
             tuple:
@@ -353,15 +350,16 @@ class IntentRouting:
         try:
             response = ""
 
-            intent = self.genai_classify_intent(text, model)
+            intent = self.genai_classify_intent(text)
             self.logger.info("Classified intent: %s", intent)
+
             if intent == "WELCOME":
-                response = self.greetings(chat_model, text)
+                response = self.greetings(text)
             elif intent == "WRITE_CODE":
                 (
                     program_lang_in_query,
                     allowed_language_in_query,
-                ) = self.check_programming_language_in_query(model, text, intent)
+                ) = self.check_programming_language_in_query(text)
                 self.logger.info("program_lang_in_query: %s", program_lang_in_query)
                 self.logger.info(
                     "allowed_language_in_query: %s", allowed_language_in_query
@@ -374,47 +372,28 @@ class IntentRouting:
                         "non_programming_question_error_msg"
                     ]
                 else:
-                    response = self.ask_codey(text, chat_model)
+                    response = self.ask_codey(text)
             elif intent == "PROGRAMMING_QUESTION_AND_ANSWER":
-                (
-                    program_lang_in_query,
-                    allowed_language_in_query,
-                ) = self.check_programming_language_in_query(model, text, intent)
-                if (
-                    len(program_lang_in_query) > 0
-                    and len(allowed_language_in_query) == 0
-                ):
-                    response = self.config["error_msg"][
-                        "non_qna_programming_question_error_msg"
-                    ]
-                else:
-                    if self.index_endpoint and self.deployed_index_id:
-                        input_token_len = model.count_tokens(text).total_tokens
-                        self.logger.info("Input_token_len for QnA: %s", input_token_len)
-                        qna_answer = genai_qna.ask_qna(
-                            text,
-                            model,
-                            self.text_embedding_model,
-                            self.index_endpoint,
-                            self.deployed_index_id,
-                            self.embedding_df,
-                        )
-                        if qna_answer:
-                            response = qna_answer
-                        else:
-                            self.logger.info("Asking codey when no answer from QnA")
-                            response = self.ask_codey(text, chat_model)
+                if self.index_endpoint and self.deployed_index_id:
+                    input_token_len = self.model.count_tokens(text).total_tokens
+                    self.logger.info("Input_token_len for QnA: %s", input_token_len)
+
+                    qna_answer = self.genai_qna.ask_qna(text)
+
+                    if qna_answer:
+                        response = qna_answer
                     else:
-                        self.logger.info(
-                            "Asking codey as Index or Endpoint is not available"
-                        )
-                        response = self.ask_codey(text, chat_model)
+                        self.logger.info("Asking codey when no answer from QnA")
+                        response = self.ask_codey(text)
+                else:
+                    self.logger.info(
+                        "Asking codey as Index or Endpoint is not available"
+                    )
+                    response = self.ask_codey(text)
             elif intent == "FOLLOWUP":
-                response = self.ask_codey(
-                    text + " based on previous message", chat_model
-                )
+                response = self.ask_codey(text + " based on previous message")
             elif intent == "CLOSE":
-                response = self.closing(chat_model, text)
+                response = self.closing(text)
             else:
                 response = self.config["error_msg"]["other_intent_error_msg"]
         except Exception as e:  # pylint: disable=W0718,W0703,C0103

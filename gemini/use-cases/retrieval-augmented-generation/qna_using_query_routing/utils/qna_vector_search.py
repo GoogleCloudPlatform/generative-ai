@@ -1,14 +1,25 @@
-# Copyright 2023 Google LLC. This software is provided as-is, without warranty
-# or representation for any use or purpose. Your use of it is subject to your
-# agreement with Google.
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Answer QnA Type Questions using genai Content"""
 
 # Utils
 import configparser
 import logging
+import pandas as pd
 
 from google.cloud import aiplatform
-import pandas as pd
 from utils import qna_using_query_routing_utils
 from vertexai.generative_models import GenerativeModel
 from vertexai.language_models import TextEmbeddingModel
@@ -18,26 +29,30 @@ class QnAVectorSearch:
     """genai Generate Answer From genai Content"""
 
     def __init__(
-        self, config_file: str = "config.ini", logger=logging.getLogger()
+        self, model: GenerativeModel, index_endpoint: aiplatform.MatchingEngineIndexEndpoint, deployed_index_id: str, config_file: str, logger=logging.getLogger()
     ) -> None:
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
-        self.project_id = self.config["default"]["project_id"]
-        self.region = self.config["default"]["region"]
-        self.me_region = self.config["vector_search"]["me_region"]
-        self.me_index_name = self.config["vector_search"]["me_index_name"]
-        self.me_gcs_bucket = self.config["vector_search"]["me_gcs_bucket"]
-        self.number_of_references_to_summarise = int(
-            self.config["genai_qna"]["number_of_references_to_summarise"]
-        )
-        self.search_distance_threshould = float(
-            self.config["genai_qna"]["search_distance_threshould"]
-        )
+
         self.logger = logger
+        self.model = model
+        self.index_endpoint = index_endpoint
+        self.deployed_index_id = deployed_index_id
+
+        # Initalizing embedding model
+        self.text_embedding_model = TextEmbeddingModel.from_pretrained(
+            self.config["vector_search"]["embedding_model_name"]
+        )
+
+        self.embedding_df = pd.read_csv(
+            self.config["vector_search"]["embedding_csv_file"])
+
+        self.num_neighbors=int(
+                self.config["genai_qna"]["number_of_references_to_summarise"]
+            )
 
         # Default retrieval prompt template
-        self.prompt_template = """
-        SYSTEM: You are genai Programming Language Learning Assistant helping the students answer their questions based on following context. Explain the answers in detail for students.
+        self.prompt_template = """You are a programming language learning assistant, helping the students answer their questions based on the following context. Explain the answer in detail for students.
 
         Instructions:
         1. Think step-by-step and then answer.
@@ -50,67 +65,72 @@ class QnAVectorSearch:
         {context}
         =============
 
-        What is the Detailed explanation of answer of following question?
+        What is the Detailed explanation of the answer to the following question?
         Question: {question}
         Detailed explanation of Answer:"""  # pylint: disable=line-too-long
 
+    def find_relevant_context(self, query: str) -> str:
+        """
+        Searches the vector index to retrieve relevant context based on a query embedding.
+
+        Args:
+            query (str, optional): The query text.
+
+        Returns:
+            str: The concatenated text of relevant documents found in the index.
+        """
+
+        # Generate the embeddings for user question
+        vector = self.text_embedding_model.get_embeddings([query])
+        
+        queries = [vector[0].values]
+
+        response = self.index_endpoint.find_neighbors(
+            deployed_index_id=self.deployed_index_id,
+            queries=queries,
+            num_neighbors=self.num_neighbors,
+        )
+
+        context = ""
+        for neighbor_index in range(len(response[0])):
+            context = (
+                context
+                + self.embedding_df[
+                    (self.embedding_df["id"] == response[0][neighbor_index].id)
+                    | (self.embedding_df["id"] == int(response[0][neighbor_index].id))
+                ].text.values[0]
+                + " \n"
+            )
+
+        return context
+
     def ask_qna(
         self,
-        question: str,
-        qna_model: GenerativeModel,
-        text_embedding_model: TextEmbeddingModel,
-        index_endpoint: aiplatform.MatchingEngineIndexEndpoint,
-        deployed_index_id: str,
-        embedding_df: pd.DataFrame,
+        question: str
     ) -> str:
         """Retrieves relevant context using vector search and generates an answer using a QnA model.
         Args:
             question (str): The user's question.
-            qna_model: The Question Answering model used to generate answers.
-            text_embedding_model:  A text embedding model used for similarity search.
-            index_endpoint (aiplatform.MatchingEngineIndexEndpoint, optional): The Vertex AI index endpoint.
-            deployed_index_id (str, optional): The ID of the deployed index.
-            embedding_df (pd.DataFrame): Dataframe containing stored embeddings and document metadata.
 
         Returns:
             str: The generated answer from the QnA model, or None if no valid answer could be determined.
         """
 
-        # Get the vector search index details
-        (
-            index_endpoint,
-            deployed_index_id,
-        ) = qna_using_query_routing_utils.get_deployed_index_id(
-            self.config["vector_search"]["me_index_name"],
-            self.config["vector_search"]["me_region"],
-        )
-
-        self.logger.info("index_endpoint %s:", index_endpoint)
-        self.logger.info("deployed_index_id %s:", deployed_index_id)
-
         # Read context from relavent documents
-        context = qna_using_query_routing_utils.find_relavent_context(
-            text_embedding_model,
-            embedding_df,
-            question,
-            index_endpoint=index_endpoint,
-            deployed_index_id=deployed_index_id,
-            num_neighbours=int(
-                self.config["genai_qna"]["number_of_references_to_summarise"]
-            ),
-            similarity_score_threshold=float(
-                self.config["genai_qna"]["search_distance_threshould"]
-            ),
-        )
+        self.logger.info("QnA: question: %s", question)
+
+        context = self.find_relevant_context(question)
+        # self.logger.info("QnA: context: %s", context)
 
         # Get response
-        response = qna_model.generate_content(
-            self.prompt_template.format(context=context, question=question)
-        )
+        if len(context)>0:
+            response = self.model.generate_content(
+                self.prompt_template.format(context=context, question=question)
+            )
 
-        if int(response.candidates[0].finish_reason) == 1:
-            answer = response.text
-            if answer:
+            if response and int(response.candidates[0].finish_reason) == 1:
+                answer = response.text
+                self.logger.info("QnA: response: %s", answer)
                 if (
                     "I cannot determine the answer to that." in answer
                     or "I could not find any references that are directly related to your question."
