@@ -11,7 +11,7 @@ echo "Deploying the back end."
 source ./deployment/deploy-backend.sh
 echo "Deploying the document ingestion pipeline."
 source ./deployment/deploy-pipeline.sh
-echo "Deploying Vertex AI Search and Conversation."
+echo "Deploying Vertex AI Agent Builder."
 source ./deployment/deploy-search.sh
 echo "Deploying front end dependencies."
 source ./deployment/deploy-registry.sh
