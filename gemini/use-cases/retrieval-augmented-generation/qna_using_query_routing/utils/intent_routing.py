@@ -14,10 +14,11 @@
 
 """Generative AI Models based functions to respond questions"""
 
+import configparser
+
 # Utils
 import json
 import logging
-import configparser
 from typing import List
 
 from google.cloud import aiplatform

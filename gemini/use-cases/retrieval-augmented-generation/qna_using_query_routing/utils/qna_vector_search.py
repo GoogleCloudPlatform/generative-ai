@@ -17,9 +17,9 @@
 # Utils
 import configparser
 import logging
-import pandas as pd
 
 from google.cloud import aiplatform
+import pandas as pd
 from vertexai.generative_models import GenerativeModel
 from vertexai.language_models import TextEmbeddingModel
 

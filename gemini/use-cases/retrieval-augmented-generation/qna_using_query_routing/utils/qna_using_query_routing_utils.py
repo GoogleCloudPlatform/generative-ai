@@ -14,11 +14,12 @@
 
 """Utility file with more generic fuctions"""
 
+import configparser
+from datetime import datetime
+
 # Utils
 import os
-import configparser
 from typing import List
-from datetime import datetime
 
 from google.cloud import aiplatform
 from langchain.document_loaders import TextLoader, UnstructuredPDFLoader
