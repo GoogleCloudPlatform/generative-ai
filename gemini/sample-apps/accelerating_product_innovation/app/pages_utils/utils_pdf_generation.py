@@ -202,4 +202,3 @@ def check_add_page(pdf, text):
     # Add any remaining text to the final page
     pages.append(page_content)
     return pages
-
