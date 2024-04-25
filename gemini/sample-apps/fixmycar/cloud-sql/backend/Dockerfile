@@ -1,5 +1,5 @@
 # Base image with Java 17 (using a lightweight Alpine variant for efficiency)
-FROM eclipse-temurin:17-jdk-alpine as builder
+FROM eclipse-temurin:22-jdk-alpine as builder
 
 # Set working directory
 WORKDIR /workspace/app
@@ -17,7 +17,7 @@ COPY src src
 RUN ./mvnw package -DskipTests
 
 # Create a lightweight runtime image
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:22-jdk-alpine
 
 # Set working directory
 WORKDIR /app
