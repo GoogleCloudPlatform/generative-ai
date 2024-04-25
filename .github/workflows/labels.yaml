@@ -5,23 +5,19 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
-  label_forked_pr:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check if PR is from a fork
-        id: fork_check
-        run: echo "name=is_fork::$(jq -r '.pull_request.head.repo.fork' "$GITHUB_EVENT_PATH")" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Label PR if from fork
-        if: steps.fork_check.outputs.is_fork == 'true'
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['owlbot:run']
-            })
+    label_pr:
+        runs-on: ubuntu-latest
+    
+        steps:
+        - name: Check if PR is from a fork
+            id: check_fork
+            if: github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+            run: echo "name=is_fork::true" >> $GITHUB_OUTPUT
+        
+        - name: Add label if from a fork
+            if: steps.check_fork.outputs.is_fork == 'true'
+            uses: actions/labeler@v3
+            with:
+            repo: ${{ github.repository }}
+            pr_number: ${{ github.event.pull_request.number }}
+            labels: owlbot:run
