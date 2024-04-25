@@ -11,13 +11,11 @@ This module manages the "Resources" page of the Streamlit application. Key funct
     * Provides download and delete options for stored files.
 """
 
-
 import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
 import app.pages_utils.utils_project as utils_project
 import app.pages_utils.utils_resources_store_embeddings as utils_resources_store_embeddings
 import streamlit as st
-
 
 
 # Get the page configuration from the config file
@@ -27,6 +25,7 @@ utils.page_setup(page_cfg)
 # Initialize project form submission state if not already initialized
 if "project_form_submitted" not in st.session_state:
     st.session_state.project_form_submitted = False
+
 
 @st.cache_data
 def get_resources_img() -> None:
@@ -42,7 +41,8 @@ def get_resources_img() -> None:
     for page_image in page_images:
         st.image(page_image)
 
-#Display header image.
+
+# Display header image.
 get_resources_img()
 
 # Create a container for the screen

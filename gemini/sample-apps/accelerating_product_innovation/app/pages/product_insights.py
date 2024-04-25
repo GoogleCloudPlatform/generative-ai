@@ -28,6 +28,7 @@ utils.page_setup(page_cfg)
 if "temp_suggestions" not in st.session_state:
     st.session_state.temp_suggestions = None
 
+
 # Cache the function to get insights images
 @st.cache_data
 def get_insights_img() -> None:
@@ -65,7 +66,7 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
         suggestion_num: Current suggestion number.
     """
     # Apply custom styling to suggestion box
-    utils.load_css('app/css/prod_insights_styles.css')
+    utils.load_css("app/css/prod_insights_styles.css")
     # Display suggestion button
     if st.button(
         st.session_state.insights_suggestion[suggestion_num],
@@ -145,10 +146,10 @@ st.divider()
 
 # Get search term from text area
 search_term = st.text_area(
-        "",
-        key="2",
-        value=st.session_state.insights_placeholder,
-        placeholder="Select a suggestion or type your question here",
+    "",
+    key="2",
+    value=st.session_state.insights_placeholder,
+    placeholder="Select a suggestion or type your question here",
 )
 
 # Display search button

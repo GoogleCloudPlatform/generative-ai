@@ -9,6 +9,7 @@ This module provides functions for adding and formatting content within PDF docu
 
 * Provides class for generating a pdf template for exporting content and emails.
 """
+
 from math import sqrt
 
 import fpdf

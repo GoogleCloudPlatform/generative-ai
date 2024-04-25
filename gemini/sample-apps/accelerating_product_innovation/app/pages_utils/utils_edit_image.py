@@ -30,7 +30,11 @@ import streamlit as st
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
-def process_foreground_image(foreground_image: Image.Image, background_image: Image.Image, bg_editing: bool = False) -> bytes:
+def process_foreground_image(
+    foreground_image: Image.Image,
+    background_image: Image.Image,
+    bg_editing: bool = False,
+) -> bytes:
     """
     Processes a foreground image, optionally removing white regions,
     and prepares it for merging with a background image.
@@ -112,7 +116,9 @@ def handle_image_upload() -> None:
             st.error(f"Error opening image: {e}")
 
 
-def save_draft_image(row: int, col: int, image: Image.Image, draft_elements: dict) -> None:
+def save_draft_image(
+    row: int, col: int, image: Image.Image, draft_elements: dict
+) -> None:
     """Saves the draft image and updates session state for content editing.
 
     Args:
@@ -135,7 +141,9 @@ def save_draft_image(row: int, col: int, image: Image.Image, draft_elements: dic
     st.switch_page("pages/product_generation.py")
 
 
-def render_suggested_images(suggested_images: list[str], generated_images: list[dict]) -> None:
+def render_suggested_images(
+    suggested_images: list[str], generated_images: list[dict]
+) -> None:
     """
     Renders suggested images in a grid layout with "Edit" and "Download" buttons.
 
@@ -204,7 +212,9 @@ def _handle_edit_suggestion(image_index: int) -> None:
     st.rerun()
 
 
-def generate_suggested_images(image_prompt: str, image_bytes: io.BytesIO, mask_image: io.BytesIO) -> None:
+def generate_suggested_images(
+    image_prompt: str, image_bytes: io.BytesIO, mask_image: io.BytesIO
+) -> None:
     """
     Generates suggested images based on the provided prompt, image, and mask.
     Updates Streamlit session state with the generated images.

@@ -2,7 +2,8 @@
 This module provides functions for downloading generated content (emails, product content)
 as zip archives.
 """
-from typing import Any, List
+
+from typing import List
 import base64
 import io
 import logging
@@ -132,9 +133,10 @@ def create_zip_buffer(filenames: List[str]) -> io.BytesIO:
 
     with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED) as zip_file:
         for filename in filenames:
-            with open(f'./{filename}', "rb") as pdf_file:
+            with open(f"./{filename}", "rb") as pdf_file:
                 zip_file.writestr(filename, pdf_file.read())
     return zip_buffer
+
 
 def load_product_lists():
     """
@@ -152,6 +154,7 @@ def load_product_lists():
         prod_content.append("")
 
     return prod_content, titles
+
 
 def download_file() -> None:
     """Downloads the generated email files as a zip archive."""

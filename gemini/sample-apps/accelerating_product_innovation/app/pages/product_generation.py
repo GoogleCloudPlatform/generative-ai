@@ -72,6 +72,7 @@ def initialize_prod_gen() -> None:
     # Display header images
     get_prod_gen_img()
 
+
 # Initialize page config.
 page_cfg = PAGES_CFG["3_Generations"]
 
@@ -81,7 +82,7 @@ utils.page_setup(page_cfg)
 initialize_prod_gen()
 
 # Page styles
-utils.load_css('app/css/prod_gen_styles')
+utils.load_css("app/css/prod_gen_styles")
 # logging initialization
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 

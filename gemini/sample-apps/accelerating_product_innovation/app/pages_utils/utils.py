@@ -304,19 +304,21 @@ def reinitialize_session_states():
 
 def page_setup(page_cfg):
     """
-        This function initializes the page configuration and applies custom styles.
+    This function initializes the page configuration and applies custom styles.
 
-        Args:
-            page_cfg (dict): A dictionary containing the configuration for the page.
+    Args:
+        page_cfg (dict): A dictionary containing the configuration for the page.
 
-        Returns:
-            None
+    Returns:
+        None
     """
 
     # Set the page configuration
-    st.set_page_config(page_title=page_cfg["page_title"], page_icon=page_cfg["page_icon"])
+    st.set_page_config(
+        page_title=page_cfg["page_title"], page_icon=page_cfg["page_icon"]
+    )
 
-     # Initialize session state for the project if it does not exist.
+    # Initialize session state for the project if it does not exist.
     if (
         "initialize_session_state" not in st.session_state
         or st.session_state.initialize_session_state is False
@@ -332,4 +334,4 @@ def page_setup(page_cfg):
 
 def load_css(css_file_path: str) -> None:
     with open(css_file_path) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
