@@ -15,6 +15,7 @@
 /generative-ai/gemini/function-calling                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/reasoning-engine                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
@@ -29,7 +30,7 @@
 /generative-ai/language/tuning                              @erwinh85 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases                           @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/applying-llms-to-data     @ashleyxuu @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/use-cases/document-qa               @RajeshThallam @lavinigam-gcp @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/use-cases/document-qa               @RajeshThallam @lavinigam-gcp @GoogleCloudPlatform/generative-ai-devrel @Adi8885
 /generative-ai/language/use-cases/document-summarization    @polong-lin @iamthuya @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/prod-catalog-enrichment   @slatawa @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/sql-code-generation       @rarsan @GoogleCloudPlatform/generative-ai-devrel
@@ -40,5 +41,17 @@
 /generative-ai/speech/use-cases/storytelling                @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases                             @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/getting-started                       @iamthuya @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/sample-apps/genwealth                 @paulramsey @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/use-cases/applying-llms-to-data/analyze-poster-images-in-bigquery @aliciawilliams @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb        @saeedaghabozorgi @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/applying-llms-to-data/analyze-poster-images-in-bigquery/poster_image_analysis.ipynb     @aliciawilliams @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/RAG_Based_on_Sensitive_Data_Protection_using_Faker.ipynb @ainaomotayo @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/data-generation/synthetic_data_generation_using_gemini.ipynb    @vagrantism @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/prompts/examples/chain_of_thought_react.ipynb     @ChrisHanna @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/tuning/supervised_finetuning_using_gemini.ipynb   @dmoonat @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/responsible-ai/gemini_safety_ratings.ipynb        @ghchinoy @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/use-cases/sensitive-data-detection/context_aware_sensitive_data_detection.ipynb @jegadesh-google @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/use-cases/marketing-image-overlay/marketing_image_overlay.ipynb @rohitnaiduG @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/use-cases/description-generation/product_description_generator_attributes_to_text.ipynb @anantnawal @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/use-cases/chatbots/grocerybot_assistant.ipynb   @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/tuning/distilling_step_by_step/distilling_step_by_step.ipynb    @anihm136 @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/vision/gradio/gradio_image_generation_sdk.ipynb  @jbrache @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb   @guruvittal @GoogleCloudPlatform/generative-ai-devrel
