@@ -50,10 +50,6 @@ DOC_AI_PROCESSOR_NAME=$(curl -X GET \
 DOC_AI_PROCESSOR_ID=${DOC_AI_PROCESSOR_NAME##*/}
 DOC_AI_PROCESSOR_ID=${DOC_AI_PROCESSOR_ID: 0:-1}
 
-echo "Waiting for permissions to take effect"
-sleep 90
-
-
 # Create functions
 # jscpd:ignore-start
 echo "Creating Cloud Function: analyze-prospectus"
