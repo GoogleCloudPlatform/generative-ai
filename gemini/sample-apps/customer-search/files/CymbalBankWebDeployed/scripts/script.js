@@ -25,16 +25,16 @@ const section1 = document.querySelector("#section--1");
 
 const operationsTabs = document.querySelectorAll(".operations__tab");
 const operationsTabsContainer = document.querySelector(
-  ".operations__tab-container"
+  ".operations__tab-container",
 );
 const operationsTabsContent = document.querySelectorAll(".operations__content");
 
 const authenticateTabs = document.querySelectorAll(".authenticate__tab");
 const authenticateTabsContainer = document.querySelector(
-  ".authenticate__tab-container"
+  ".authenticate__tab-container",
 );
 const authenticateTabsContent = document.querySelectorAll(
-  ".authenticate__content"
+  ".authenticate__content",
 );
 
 const nav = document.querySelector("nav");
@@ -42,16 +42,6 @@ const nav = document.querySelector("nav");
 const navHeight = nav.getBoundingClientRect().height;
 
 let navbar = document.querySelector(".navbar");
-// let searchBox = document.querySelector(".search-box .bx-search");
-// // let searchBoxCancel = document.querySelector(".search-box .bx-x");
-// searchBox.addEventListener("click", ()=>{
-//   navbar.classList.toggle("showInput");
-//   if(navbar.classList.contains("showInput")){
-//     searchBox.classList.replace("bx-search" ,"bx-x");
-//   }else {
-//     searchBox.classList.replace("bx-x" ,"bx-search");
-//   }
-// });
 // sidebar open close js code
 let navLinks = document.querySelector(".nav-links");
 let menuOpenBtn = document.querySelector(".navbar .bx-menu");
@@ -119,7 +109,7 @@ const openModalCreateAccount = function (e) {
 
   // Find the content with matching data-tab and activate it
   const createAccountContent = document.querySelector(
-    ".authenticate__content--2"
+    ".authenticate__content--2",
   );
   createAccountContent.classList.add("authenticate__content--active");
 
@@ -129,7 +119,7 @@ const openModalCreateAccount = function (e) {
     activeTab.classList.remove("authenticate__tab--active");
   }
   const activeContent = document.querySelector(
-    ".authenticate__content--active"
+    ".authenticate__content--active",
   );
   if (activeContent !== createAccountContent) {
     activeContent.classList.remove("authenticate__content--active");
@@ -209,10 +199,10 @@ if (operationsTabsContainer != null) {
 
     // Remove active classes
     operationsTabs.forEach((t) =>
-      t.classList.remove("operations__tab--active")
+      t.classList.remove("operations__tab--active"),
     );
     operationsTabsContent.forEach((t) =>
-      t.classList.remove("operations__content--active")
+      t.classList.remove("operations__content--active"),
     );
 
     // Active tab
@@ -234,10 +224,10 @@ if (authenticateTabsContainer != null) {
 
     // Remove active classes
     authenticateTabs.forEach((t) =>
-      t.classList.remove("authenticate__tab--active")
+      t.classList.remove("authenticate__tab--active"),
     );
     authenticateTabsContent.forEach((t) =>
-      t.classList.remove("authenticate__content--active")
+      t.classList.remove("authenticate__content--active"),
     );
 
     // Active tab
@@ -350,7 +340,7 @@ const slider = function () {
   // Functions
   const goToSlide = function (slide) {
     slides.forEach(
-      (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`)
+      (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`),
     );
   };
   // goToSlide(0);
@@ -382,7 +372,7 @@ const slider = function () {
     slides.forEach(function (_, i) {
       dotContainer.insertAdjacentHTML(
         "beforeend",
-        `<button class="dots__dot" data-slide="${i}"></button>`
+        `<button class="dots__dot" data-slide="${i}"></button>`,
       );
     });
   };
@@ -498,7 +488,7 @@ onAuthStateChanged(auth, (user) => {
       .then((response) => {
         if (response.status !== 200) {
           console.log(
-            "Looks like there was a problem. Status Code: " + response.status
+            "Looks like there was a problem. Status Code: " + response.status,
           );
           return;
         }
@@ -560,7 +550,7 @@ function submitSearch() {
     .then((response) => {
       if (response.status !== 200) {
         console.log(
-          "Looks like there was a problem. Status Code: " + response.status
+          "Looks like there was a problem. Status Code: " + response.status,
         );
         return;
       }
@@ -575,7 +565,7 @@ function submitSearch() {
       window.location.href = "/search";
 
       references = JSON.parse(
-        obj.fulfillment_response.messages[0].text.text[1]
+        obj.fulfillment_response.messages[0].text.text[1],
       );
       console.log(references);
       var str = "";
