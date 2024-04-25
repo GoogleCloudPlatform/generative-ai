@@ -22,8 +22,6 @@ def extract_json_influencer_wise(scrape_size, first_scrape, saved):
 
     """
 
-    
-
 
 def periodic_extraction(scrape_size, first_period):
     """Extracts data from Instagram periodically and saves it in a JSON file.
@@ -155,7 +153,11 @@ def merge_keys():
         finaldata_new[country] = {}
 
         for key in finaldata[country]:
-            newkey = key.strip().lower() if not (key.strip() == key and key.lower() == key) else key
+            newkey = (
+                key.strip().lower()
+                if not (key.strip() == key and key.lower() == key)
+                else key
+            )
             if newkey in finaldata_new[country]:
                 finaldata_new[country][newkey] += finaldata[country][key].copy()
             else:

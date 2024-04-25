@@ -6,9 +6,9 @@ import time
 from config import config
 import streamlit as st
 from utilities import add_logo, stImg
-from utils_standalone_image_gen import render_image_edit_prompt, predict_image
+from utils_standalone_image_gen import predict_image, render_image_edit_prompt
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, GenerationConfig
+from vertexai.generative_models import GenerationConfig, GenerativeModel, Part
 
 add_logo(config["Images"]["logo"])
 
@@ -17,9 +17,13 @@ PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
 data_path = config["Data"]["current_data"]
 
-params = config['parameters']['fashion_bot']
+params = config["parameters"]["fashion_bot"]
 generation_config = GenerationConfig(
-    max_output_tokens=params['max_output_tokens'], temperature=params['temperature'], top_p=params['top_p'], top_k=params['top_k'])
+    max_output_tokens=params["max_output_tokens"],
+    temperature=params["temperature"],
+    top_p=params["top_p"],
+    top_k=params["top_k"],
+)
 safety_settings = {
     generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
     generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
