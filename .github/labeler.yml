@@ -1,4 +1,3 @@
 source:
 - all:
   - base-branch: ['main']
-  - head-branch: [':']
