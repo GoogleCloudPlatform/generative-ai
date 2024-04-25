@@ -50,7 +50,7 @@ packaging==24.0
 pg8000==1.30.5
 pgvector==0.2.5
 proto-plus==1.23.0
-protobuf==4.25.3
+protobuf==5.26.1
 pyasn1==0.5.1
 pyasn1-modules==0.3.0
 pycparser==2.21
