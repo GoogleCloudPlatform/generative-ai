@@ -19,7 +19,7 @@ dataclasses-json==0.6.4
 frozenlist==1.4.1
 google-api-core==2.17.1
 google-auth==2.28.2
-google-cloud-aiplatform==1.44.0
+google-cloud-aiplatform==1.47.0
 google-cloud-bigquery==3.19.0
 google-cloud-core==2.4.1
 google-cloud-documentai==2.24.1
