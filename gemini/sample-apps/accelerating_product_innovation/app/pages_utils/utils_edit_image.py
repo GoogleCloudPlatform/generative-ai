@@ -135,23 +135,6 @@ def save_draft_image(row, col, image, draft_elements):
     st.switch_page("pages/product_generation.py")
 
 
-def download_image(image_data, image_name):
-    """
-    Creates download button for given image.
-
-    Args:
-        image_data: Byte data of the image to be downloaded.
-        image_name: Name of the image file.
-    """
-    st.download_button(
-        label="Download",
-        data=image_data,
-        file_name=image_name,
-        mime="image/png",
-        type="primary",
-    )
-
-
 def render_suggested_images(suggested_images, generated_images):
     """
     Renders suggested images in a grid layout with "Edit" and "Download" buttons.
@@ -188,7 +171,13 @@ def render_suggested_images(suggested_images, generated_images):
                         generated_images[image_index]["bytesBase64Encoded"]
                     )
                 )
-                download_image(image_data, f"suggestion_{image_index}.png")
+                st.download_button(
+                    label="Download",
+                    data=image_data,
+                    file_name=f"suggestion_{image_index}.png",
+                    mime="image/png",
+                    type="primary",
+                )
 
 
 def _handle_edit_suggestion(image_index):

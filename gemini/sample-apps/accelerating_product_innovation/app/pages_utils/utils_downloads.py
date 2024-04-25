@@ -119,6 +119,29 @@ def download_button(object_to_download, download_filename):
     return dl_link
 
 
+def create_zip_buffer(filenames):
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED) as zip_file:
+        for filename in filenames:
+            with open(f'./{filename}', "rb") as pdf_file:
+                zip_file.writestr(filename, pdf_file.read())
+    return zip_buffer
+
+def load_product_lists():
+    # Create copies to avoid modifying session data
+    prod_content = st.session_state.draft_elements.copy()
+    titles = st.session_state.selected_titles.copy()
+
+    # Handle the case of multiple titles including assorted content
+    if len(st.session_state.selected_titles) > 1:
+        prod_content.append(st.session_state.assorted_prod_content)
+        titles.append(st.session_state.assorted_prod_title)
+    else:
+        prod_content.append("")
+
+    return prod_content, titles
+
 def download_file():
     """Downloads the generated email files as a zip archive."""
 
@@ -126,43 +149,29 @@ def download_file():
         st.session_state.email_gen = True
 
         if st.session_state.draft_elements is not None:
-            # Create copies to avoid modifying session data
-            prod_content = st.session_state.draft_elements.copy()
-            titles = st.session_state.selected_titles.copy()
-
-            # Handle the case of multiple titles including assorted content
-            if len(st.session_state.selected_titles) > 1:
-                prod_content.append(st.session_state.assorted_prod_content)
-                titles.append(st.session_state.assorted_prod_title)
-
-            # Prepare file lists for the zip file
-            pdf_paths = []
+            prod_content, titles = load_product_lists()
+            # Prepare file list for the zip file
             filenames = []
 
             # Variable to store the name of email_file
             email_file_title = st.session_state.assorted_prod_title
 
+            # Logic to generate content for email files.
             for i, title in enumerate(titles):
                 st.session_state.email_files = []
                 if st.session_state.email_gen:
                     generate_email(prod_content[i], title)
 
                 # Generate a single file for each title
-                pdf_path = f"./{st.session_state.email_files[0]}"
                 filename = f"{st.session_state.email_files[0]}"
-                pdf_paths.append(pdf_path)
                 filenames.append(filename)
 
-            # Create the zip file in memoryz
-            buffer1 = io.BytesIO()
-            with zipfile.ZipFile(buffer1, "a", zipfile.ZIP_DEFLATED) as zip_file:
-                for pdf_path, filename in zip(pdf_paths, filenames):
-                    with open(pdf_path, "rb") as pdf_file:
-                        zip_file.writestr(filename, pdf_file.read())
+            # Create the zip file in memory.
+            zip_buffer = create_zip_buffer(filenames)
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(buffer1.getvalue(), f"email_{email_file_title}.zip"),
+        download_button(zip_buffer.getvalue(), f"email_{email_file_title}.zip"),
         height=0,
     )
     st.success("Email Copies Downloaded")
@@ -172,47 +181,23 @@ def download_content():
     """Downloads the generated content as a zip archive."""
 
     with st.spinner("Creating Content pdf"):
-        # Create copies of session data to avoid modification
-        prod_content = st.session_state.draft_elements.copy()
-        titles = st.session_state.selected_titles.copy()
-
-        # Handle the case where assorted content is included
-        if len(st.session_state.selected_titles) > 1:
-            titles.append(st.session_state.assorted_prod_title)
-            prod_content.append(st.session_state.assorted_prod_content)
-        else:
-            prod_content.append("")
+        prod_content, titles = load_product_lists()
 
         # Call the function to generate content PDFs
         create_content_pdf(prod_content, titles)
 
         # Create the zip archive
-        pdf_paths = []
         filenames = []
 
-        # Generate file paths and filenames
+        # Generate filenames
         for i in range(len(titles)):
-            pdf_paths.append(f"./content_{i}.pdf")
             filenames.append(f"content_{i}.pdf")
 
-        # Create an in-memory buffer for the zip file
-        buffer = io.BytesIO()
-        with zipfile.ZipFile(buffer, "w") as zip_file:
-            # Write each PDF file to the zip archive
-            for j, path in enumerate(pdf_paths):
-                zip_file.write(path, filenames[j])
-
-        st.session_state.buffer = buffer
-        buffer1 = io.BytesIO()
-
-        with zipfile.ZipFile(buffer1, "a", zipfile.ZIP_DEFLATED) as zip_file:
-            for pdf_path, filename in zip(pdf_paths, filenames):
-                with open(pdf_path, "rb") as pdf_file:
-                    zip_file.writestr(filename, pdf_file.read())
+    zip_buffer = create_zip_buffer(filenames)
 
     # Prepare download button with a dynamic filename
     components.html(
-        download_button(buffer1.getvalue(), f"content_{titles[i]}.zip"),
+        download_button(zip_buffer.getvalue(), f"content_{titles[i]}.zip"),
         height=0,
     )
     st.success("Downloaded Content Zip.")
