@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="style/style.css" />
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script defer type="module" src="scripts/script_new.js"></script>
+    <script defer type="module" src="scripts/script.js"></script>
     <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
     <style>
         df-messenger {
@@ -105,18 +105,17 @@
 </head>
 
 <body>
-    <df-messenger location="us-central1" project-id="{{project_id}}"
-            agent-id="{{df_agent_id}}" language-code="en">
-            <df-messenger-chat-bubble chat-title="CymBuddy">
-            </df-messenger-chat-bubble>
-        </df-messenger>
+    <df-messenger location="us-central1" project-id="{{project_id}}" agent-id="{{df_agent_id}}" language-code="en">
+        <df-messenger-chat-bubble chat-title="CymBuddy">
+        </df-messenger-chat-bubble>
+    </df-messenger>
     <nav>
         <div class="navbar">
             <i class='bx bx-menu'></i>
             <div class="sidebar-logo-container">
                 <a href="/" target="_self"> <img src="assets/cymbal_logo.png" alt="Cymbal Bank logo" class="nav-logo"
                         id="logo" data-version-number="3.0" /></a>
-                </div>
+            </div>
             <div class="nav-links">
                 <div class="sidebar-logo">
                     <span class="logo-name">Cymbal Bank</span>
