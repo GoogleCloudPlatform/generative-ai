@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Check if PR is from a fork
         id: fork_check
-        run: echo "::set-output name=is_fork::$(jq -r '.pull_request.head.repo.fork' "$GITHUB_EVENT_PATH")"
+        run: echo "name=is_fork::$(jq -r '.pull_request.head.repo.fork' "$GITHUB_EVENT_PATH")" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Label PR if from fork
