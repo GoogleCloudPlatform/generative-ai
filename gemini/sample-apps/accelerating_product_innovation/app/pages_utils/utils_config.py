@@ -45,10 +45,8 @@ if isfile(OVERRIDE_TOML):
             raise
 
 assert "translate_api" in data, "No translation options in the config"
-assert "models" in data, "No model names in the config"
 assert "pages" in data, "No page configurations found in the config"
 
 
 TRANSLATE_CFG = data["translate_api"]
-MODEL_CFG = data["models"]
 PAGES_CFG = data["pages"]

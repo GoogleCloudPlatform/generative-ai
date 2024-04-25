@@ -1,0 +1,7 @@
+div.stButton > button:first-child {
+    border-radius: 25px;
+}
+
+[class = "st-emotion-cache-1e9n592 ef3psqc11"] {
+    border-radius: 25px !important;
+}

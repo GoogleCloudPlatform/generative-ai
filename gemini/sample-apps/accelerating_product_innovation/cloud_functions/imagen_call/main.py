@@ -5,14 +5,19 @@ Cloud Function for calling Imagen API
 import base64
 import io
 import logging
+import os
 
 import functions_framework
 from google.cloud import aiplatform
 from google.protobuf import json_format
 from google.protobuf.struct_pb2 import Value
+from dotenv import load_dotenv
+load_dotenv()
 
-PROJECT_ID = "<YOUR_PROJECT_ID>"
-LOCATION = "<YOUR_LOCATION>"
+
+PROJECT_ID = os.getenv("PROJECT_ID")
+LOCATION = os.getenv("LOCATION")
+
 
 IMAGE_MODEL_NAME = "imagegeneration@005"
 IMAGEN_API_ENDPOINT = f"{LOCATION}-aiplatform.googleapis.com"

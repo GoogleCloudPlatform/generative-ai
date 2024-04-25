@@ -9,11 +9,11 @@ The solution supports both local execution and deployment to Cloud Run environme
 3. **Set Environment Variables**: Create a `.env` file in the project directory and populate it with necessary environment variables:
 
    ```plaintext
-   PROJECT_ID=<Your_GCP_Project_ID>
+   PROJECT_ID=<Your_Google_Cloud_Project_ID>
    LOCATION=<Desired_Location>
-   REGION=<Desired_GCP_Region>
-   YOUR_EMAIL=<Your_Email_Address_Associated_With_GCP>
-   PROJECT_NUMBER=<Your_Project_Number>
+   REGION=<Desired_Google_Cloud_Project_Region>
+   YOUR_EMAIL=<Your_Email_Address_Associated_With_Google_Cloud_Project>
+   PROJECT_NUMBER=<Your_Google_Cloud_Project_Number>
    ```
 
 4. **Run the Application**: Execute the following command to run the application locally:
@@ -60,11 +60,7 @@ Follow the below steps to deploy the solution to Cloud Run environment.
 
 1. Ensure that the `configure_resources` script is in the directory containing the solution's code.
 2. Edit the file named `env.txt` within the same directory and populate it with the same values as mentioned above.
-3. Open the following files in the directory 'cloud_functions' and populate `PROJECT_ID` and `LOCATION` with your credentials:
-
-   - imagen-call/main.py
-   - gemini-call/main.py
-   - text-embedding/main.py
+3. Create a `.env` file in the 'cloud_functions' directory and populate it with necessary environment variables as mentioned above.
 
 ### Execute the Script
 
@@ -82,7 +78,7 @@ Follow the below steps to deploy the solution to Cloud Run environment.
   - Deploy Cloud Functions (`imagen-call`, `gemini-call`, `text-embedding`).
   - Capture URLs for deployed Cloud Functions.
   - Deploy the main application to Cloud Run.
-- Ensure that the service account has been created and manually grant the following roles to the created service account `retail-accelerating-prod-i-982@[PROJECT_ID].iam.gserviceaccount.com`:
-  - Service account user
-  - Cloud Run Admin
-  - Cloud Storage Admin
+  - Ensure that the service account has been created and manually grant the following roles to the created service account `retail-accelerating-prod-i-982@[PROJECT_ID].iam.gserviceaccount.com`:
+    - Service account user
+    - Cloud Run Admin
+    - Cloud Storage Admin

@@ -2,12 +2,14 @@
 
 ## Introduction
 
-The consumer goods companies need to assimilate various sources of information including competitive insights, consumer sentiments from reviews/feedback, emerging trends, reasons why certain products are bestsellers and why certain products don't sell, what customers like or dislike about etc. to draft new product ideas which can then be reviewed, prototypes, tested, manufactured, market, and sell. The journey from idea to product on a shelf can take anywhere from a couple months to a couple years! In fast and dynamic markets there is a need to,
+This solution is for product category and brand owners, product R&D analysts, marketers, and any personas owning the development of new products, in CPG, or any other vertical, where there is a need for a rapid and adaptive pace of new product and new product variant innovation. The solution enables users to leverage Generative AI’s purely creative capabilities to new ideas and new concepts for new products.
+
+In fast and dynamic markets there is a need to,
 
 - shorten lead time for new product development; and
 - achieve draft ideas in bulk with minimal or without human-in-the-loop
 
-This Streamlit-based solution empowers product managers, R&D specialists, and marketers to harness the power of Generative AI for accelerated product development. Discover how to rapidly generate new product concepts, address market trends, and ensure regulatory compliance within the CPG sector and beyond.
+This Streamlit-based solution empowers product managers, R&D specialists, and marketers to harness the power of Generative AI for accelerated product development, discover how to rapidly generate new product concepts, address market trends, and ensure regulatory compliance within the CPG sector and beyond.
 
 ## Getting Started
 
@@ -63,7 +65,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **Functionality**: The system leverages information embedded in the documents you've uploaded (market research, surveys, etc.) to tailor sample queries.
 - **Usage**: Choose to utilize a suggested sample query for immediate results. Customize the sample query or input your own questions to drive a more focused analysis.
 
-- **GenAI Powered Product Insights**
+- **Generative AI Powered Product Insights**
   - **Objective**: This feature unlocks insights hidden within your uploaded documents. You pose questions in natural language, and the system retrieves contextually relevant answers.
   - **Functionality**: Rapid insight extraction: Obtain actionable answers directly from your data without time-consuming manual analysis.
   - **Usage**: Type your question in natural language as if you were asking a domain expert.

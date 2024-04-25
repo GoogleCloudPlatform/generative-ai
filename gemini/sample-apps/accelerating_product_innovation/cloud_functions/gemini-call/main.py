@@ -2,13 +2,15 @@
 Cloud Function for getting text response from Gemini API.
 (Required for parallel image generation)
 """
-
+import os
 import functions_framework
 import vertexai.preview.generative_models as generative_models
 from vertexai.preview.generative_models import GenerativeModel
+from dotenv import load_dotenv
+load_dotenv()
 
-PROJECT_ID = "<YOUR_PROJECT_ID>"
-LOCATION = "<YOUR_LOCATION>"
+PROJECT_ID = os.getenv("PROJECT_ID")
+LOCATION = os.getenv("LOCATION")
 
 
 def generate_text(prompt: str):

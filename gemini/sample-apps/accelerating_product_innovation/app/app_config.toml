@@ -13,18 +13,6 @@ Portuguese = "pt"
 
 
 # -----------------------------------------------------------------------------
-# Model names for Vertex AI
-# -----------------------------------------------------------------------------
-[models]
-
-# If needed, replace with a specific version of the model. Check the Vertex AI
-# documentation for more information.
-text.text_model_name = "gemini-pro"
-image.image_model_name = "ImageGenerationModel"
-code.code_model_name = "code-bison"
-
-
-# -----------------------------------------------------------------------------
 # Configurations for page: Home.py
 # -----------------------------------------------------------------------------
 [pages.home]

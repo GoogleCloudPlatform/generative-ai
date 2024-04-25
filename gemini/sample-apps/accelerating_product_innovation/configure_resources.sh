@@ -29,7 +29,7 @@ while read -r line; do
         fi
         previous_data="$word"
     done
-done <$file 
+done <$file
 
 echo "se: $YOUR_EMAIL"
 echo "pn : $PROJECT_NUMBER"
@@ -40,11 +40,10 @@ gcloud init --account "$YOUR_EMAIL" --project "$PROJECT"
 gcloud auth application-default set-quota-project "$PROJECT"
 gcloud config set project "$PROJECT"
 
-
 SERVICE_ACCOUNT="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com"
 gcloud iam service-accounts add-iam-policy-binding "$SERVICE_ACCOUNT" --member "user:$YOUR_EMAIL" --role roles/iam.serviceAccountUser
 
-gcloud functions deploy imagen-call \
+gcloud functions deploy imagen-call2 \
 --allow-unauthenticated \
 --service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
 --run-service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
@@ -66,10 +65,10 @@ while read -r line; do
         fi
         previous_data="$word"
     done
-done <$file 
+done <$file
 echo "Imagen Call URL: $imagen_call_url" > cloud_functions_urls
 
-gcloud functions deploy gemini-call \
+gcloud functions deploy gemini-call2 \
 --allow-unauthenticated \
 --service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
 --run-service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
@@ -89,11 +88,11 @@ while read -r line; do
         fi
         previous_data="$word"
     done
-done <$file 
+done <$file
 echo "Text Bison Call URL: $text_bison_url" >> cloud_functions_urls
 
 
-gcloud functions deploy text-embedding \
+gcloud functions deploy text-embedding2 \
 --allow-unauthenticated \
 --service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
 --run-service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
@@ -113,7 +112,7 @@ while read -r line; do
         fi
         previous_data="$word"
     done
-done <$file 
+done <$file
 echo "Text Embedding URL: $text_embedding_url" >> cloud_functions_urls
 rm cloud_fn_1
 

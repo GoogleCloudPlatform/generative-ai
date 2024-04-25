@@ -1,4 +1,5 @@
 functions-framework==3.*
 google-cloud-aiplatform
 pillow
+dotenv
 

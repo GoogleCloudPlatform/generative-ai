@@ -65,15 +65,7 @@ def display_suggestion_box(key, suggestion_num):
         suggestion_num: Current suggestion number.
     """
     # Apply custom styling to suggestion box
-    st.markdown(
-        "<style>.element-container:has(#button-after) + div button {{min-height: 100px; max-width:500px;min-width:500px; border-radius: 25px;}}</style>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        '<span id="button-after"></span>',
-        unsafe_allow_html=True,
-    )
-
+    utils.load_css('app/css/prod_insights_styles.css')
     # Display suggestion button
     if st.button(
         st.session_state.insights_suggestion[suggestion_num],

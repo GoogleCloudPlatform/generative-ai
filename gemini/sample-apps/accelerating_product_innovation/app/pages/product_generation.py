@@ -30,38 +30,7 @@ from app.pages_utils.utils_product_gen import (
     render_content,
     update_generation_state,
 )
-import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
-
-
-# Define functions for initializing the page.
-def prod_gen_styles():
-    """
-    This function applies custom styles to the page.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    st.markdown(
-        """<style>
-                div.stButton > button:first-child {
-                border-radius:25px;
-    }
-                </style>""",
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        """<style>
-        [class = "st-emotion-cache-1e9n592 ef3psqc11"] {
-            border-radius: 25px !important;
-        }
-    </style>""",
-        unsafe_allow_html=True,
-    )
 
 
 @st.cache_data
@@ -112,8 +81,7 @@ utils.page_setup(page_cfg)
 initialize_prod_gen()
 
 # Page styles
-prod_gen_styles()
-
+utils.load_css('app/css/prod_gen_styles')
 # logging initialization
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
