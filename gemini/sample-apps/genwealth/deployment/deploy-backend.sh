@@ -4,61 +4,6 @@
 ### Deploys the genwealth database to AlloyDB
 ###
 
-# Prompt user to create the AlloyDB password
-read -r -s -p "Enter a password for the AlloyDB cluster: " ALLOYDB_PASSWORD
-echo ""
-
-# Prompt user to create the pgAdmin password
-read -r -s -p "Enter a password for pgAdmin: " PGADMIN_PASSWORD
-echo ""
-
-# Enable Backend APIs
-echo "Enabling APIs"
-PROJECT_ID=$(gcloud config get-value project 2> /dev/null)
-gcloud services enable iam.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable compute.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable storage-component.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable pubsub.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable cloudkms.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable logging.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable alloydb.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable servicedirectory.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable serviceusage.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable networkmanagement.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable cloudresourcemanager.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable servicenetworking.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable dns.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable orgpolicy.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable aiplatform.googleapis.com --project "${PROJECT_ID}"
-
-# Enable pipeline APIs
-gcloud services enable cloudfunctions.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable eventarc.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable secretmanager.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable vpcaccess.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable documentai.googleapis.com --project "${PROJECT_ID}"
-
-# Enable front end APIs
-gcloud services enable run.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable artifactregistry.googleapis.com --project "${PROJECT_ID}"
-gcloud services enable cloudbuild.googleapis.com --project "${PROJECT_ID}"
-
-# Create AlloyDB password secret
-gcloud secrets create alloydb-password-"${PROJECT_ID}" \
-    --replication-policy="automatic"
-
-echo -n "$ALLOYDB_PASSWORD" | \
-    gcloud secrets versions add alloydb-password-"${PROJECT_ID}" --data-file=-
-
-# Create pgAdmin password secret
-gcloud secrets create pgadmin-password-"${PROJECT_ID}" \
-    --replication-policy="automatic"
-
-echo -n "$PGADMIN_PASSWORD" | \
-    gcloud secrets versions add pgadmin-password-"${PROJECT_ID}" --data-file=-
-
-sleep 5
-
 # Load env variables
 source ./env.sh
 
@@ -103,33 +48,6 @@ gcloud alloydb instances create "${ALLOYDB_INSTANCE}" \
     --cluster="${ALLOYDB_CLUSTER}" \
     --project="${PROJECT_ID}" \
     --ssl-mode="ALLOW_UNENCRYPTED_AND_ENCRYPTED"
-
-# Create policy document to allow External IP for GCE Instance
-echo "Creating necessary policy"
-tee -a policy.json <<EOF
-{
-  "name": "projects/${PROJECT_NUMBER}/policies/compute.vmExternalIpAccess",
-  "spec": {
-    "rules": [
-      {
-        "values": {
-          "allowedValues": [
-            "projects/${PROJECT_ID}/zones/${ZONE}/instances/${GCE_INSTANCE}"
-          ]
-        }
-      }
-    ]
-  }
-}
-EOF
-
-# Set policy and cleanup file.
-gcloud org-policies set-policy --project "${PROJECT_ID}" ./policy.json
-rm ./policy.json
-
-# Wait for policy to apply
-echo "Waiting 90 seconds for Org policy to apply..."
-sleep 90
 
 # Create GCE Instance for pgadmin
 echo "Creating GCE instance for pgAdmin"
