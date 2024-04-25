@@ -10,11 +10,11 @@ from vertexai.language_models import TextGenerationModel
 client: bigquery.Client = bigquery.Client()
 
 
-def run(name, statement):
+def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
     return name, client.query(statement).result()  # blocks the thread
 
 
-def run_all(statements: Dict[str, str]):
+def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
     with ThreadPoolExecutor() as executor:
         jobs = []
         for name, statement in statements.items():
@@ -23,19 +23,18 @@ def run_all(statements: Dict[str, str]):
     return result
 
 
-def upload_blob(bucket_name, source_file_name, destination_blob_name):
+def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: str) -> str:
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
     blob = bucket.blob(destination_blob_name)
-    # blob.make_public()
     blob.upload_from_string(source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
     return blob.public_url
 
 
-def get_financial_details(query_str, value_str, res):
+def get_financial_details(query_str: str, value_str: str, res: Dict[str, bigquery.table.RowIterator]) -> int:
     for row in res[query_str]:
         if row[value_str] is not None:
             return int(row[value_str])
@@ -186,7 +185,9 @@ def hello_http(request):
         res=res,
     )
     last_month_expense = get_financial_details(
-        query_str="query_last_month_expense", value_str="last_month_expense", res=res
+        query_str="query_last_month_expense",
+        value_str="last_month_expense",
+        res=res,
     )
     user_accounts = []
 
