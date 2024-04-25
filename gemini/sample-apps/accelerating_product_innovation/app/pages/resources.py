@@ -11,13 +11,11 @@ This module manages the "Resources" page of the Streamlit application. Key funct
     * Provides download and delete options for stored files.
 """
 
-import base64
 
 import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
 import app.pages_utils.utils_project as utils_project
 import app.pages_utils.utils_resources_store_embeddings as utils_resources_store_embeddings
-import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
 
 
@@ -30,26 +28,22 @@ utils.page_setup(page_cfg)
 if "project_form_submitted" not in st.session_state:
     st.session_state.project_form_submitted = False
 
+@st.cache_data
 def get_resources_img():
     """
-    Description: Gets the resources image
+    Loads, displays and caches the resources header image.
 
     Arguments: None
 
-    Return Value: The resources image as a base64 encoded string.
+    Returns: None.
     """
     # Get the file path of the resources image
     page_images = [page_cfg["resources_img"]]
+    for page_image in page_images:
+        st.image(page_image)
 
-    # Return the base64 encoded image
-    return utils.diaplay_page_images(page_images)
-
-
-# Get the resources image
-# resources_img = get_resources_img()
-
-# # Display the resources image
-# st.image(resources_img)
+#Display header image.
+get_resources_img()
 
 # Create a container for the screen
 screen = st.container()
@@ -142,7 +136,7 @@ if st.session_state.project_form_submitted is True:
     # Display the files in a spinner
     with st.spinner("Fetching Files"):
         # Set a color counter to alternate the background color of the file list items
-        COLOR_COUNTER = 0
+        color_counter = 0
 
         # Set the border style for the file list items
         BORDER_STYLE = "border: 2px solid black; padding: 10px;"
@@ -154,7 +148,7 @@ if st.session_state.project_form_submitted is True:
 
             # Display the file name
             with list_files_columns[0]:
-                if COLOR_COUNTER % 2 == 0:
+                if color_counter % 2 == 0:
                     BACKGROUND_COLOR = "#e6f2ff"
                 else:
                     BACKGROUND_COLOR = "white"
@@ -167,7 +161,7 @@ if st.session_state.project_form_submitted is True:
                         border-radius:10px;'>{file[0][len_prod_cat:]}</div>""",
                     unsafe_allow_html=True,
                 )
-                COLOR_COUNTER += 1
+                color_counter += 1
 
             # Add a download button for the file
             with list_files_columns[1]:

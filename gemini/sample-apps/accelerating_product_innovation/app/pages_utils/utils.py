@@ -3,7 +3,6 @@ Common utilities for the project. This includes:
     * session state initialization.
     * project selection.
 """
-import base64
 
 import app.pages_utils.utils_project as utils_project
 import streamlit as st
@@ -325,27 +324,8 @@ def page_setup(page_cfg):
         initialize_all_session_state()
         st.session_state.initialize_session_state = True
     # Apply the sidebar style
-    # utils_styles.sidebar_apply_style(
-    #     style=utils_styles.STYLE_SIDEBAR,
-    #     image_path=page_cfg["sidebar_image_path"],
-    # )
+    utils_styles.sidebar_apply_style(
+        style=utils_styles.STYLE_SIDEBAR,
+        image_path=page_cfg["sidebar_image_path"],
+    )
 
-def diaplay_page_images(page_images):
-    """
-    Displays the images for the current page.
-
-    Args:
-        images(list): List of images to display.
-
-    Returns:
-        List of base64 encoded images.
-    """
-    encoded_images = []
-    for page_image in page_images:
-        with open(page_image, "rb") as fp:
-            contents = fp.read()
-            encoded_image = base64.b64encode(contents).decode("utf-8")
-            encoded_image = "data:image/png;base64," + encoded_image
-        encoded_images.append(encoded_image)
-
-    return encoded_images

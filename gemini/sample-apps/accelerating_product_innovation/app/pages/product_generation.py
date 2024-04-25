@@ -14,10 +14,7 @@ with a focus on guiding users through product generation. This module:
 """
 
 import asyncio
-import base64
 import logging
-
-import base64
 
 import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
@@ -70,16 +67,15 @@ def prod_gen_styles():
 @st.cache_data
 def get_prod_gen_img():
     """
-    This function loads an image from a file and encodes it in base64 format.
-
-    Args:
-        page_cfg (dict): A dictionary containing the configuration for the page.
+    This function loads an image from a file, displays, and caches it.
 
     Returns:
-        str: The base64 encoded image.
+       None.
     """
+    # Display the top image for this page.
     page_images = [page_cfg["prod_gen_img"]]
-    return utils.diaplay_page_images(page_images)
+    for page_image in page_images:
+        st.image(page_image)
 
 
 def initialize_prod_gen():
@@ -104,9 +100,8 @@ def initialize_prod_gen():
     st.session_state.generate_images = (
         False  # Tracks whetehr images for product ideas have been generated.
     )
-    # page_images = get_prod_gen_img()
-    # for page_image in page_images:
-    #     st.image(page_image)
+    # Display header images
+    get_prod_gen_img()
 
 # Initialize page config.
 page_cfg = PAGES_CFG["3_Generations"]
@@ -178,7 +173,6 @@ if (
         if modify_btn:
             modify_selection(content)
 
-    if st.session_state.create_product is True:
         # Email download Button
         with content_gen_btns[4]:
             email_dl_btn = st.button(
@@ -187,7 +181,6 @@ if (
                 type="primary",
             )
 
-    if st.session_state.create_product is True:
         # Download Content Button
         with content_gen_btns[6]:
             if st.session_state.product_content is not None:

@@ -14,12 +14,9 @@ It provides the following functionality:
 * Follow-up Questions: Suggests follow-up questions based on previous queries.
 """
 
-import base64
-
 import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
 import app.pages_utils.utils_insights as utils_insights
-import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
 
 
@@ -35,19 +32,19 @@ if "temp_suggestions" not in st.session_state:
 @st.cache_data
 def get_insights_img():
     """
-    Loads header image for insights page.
+    Loads, displays and cache header image for insights page.
+
+    Returns:
+        None
     """
     page_images = [page_cfg["prod_insights_1"], page_cfg["prod_insights_2"]]
-    return utils.diaplay_page_images(page_images)
+    for page_image in page_images:
+        st.image(page_image)
+        st.divider()
 
 
-# Get insights images
-# prod_insights_1, prod_insights_2 = get_insights_img()
-
-# # Display insights images
-# st.image(prod_insights_1)
-# st.divider()
-# st.image(prod_insights_2)
+# Display header images
+get_insights_img()
 
 # Display projects
 utils.display_projects()
@@ -105,13 +102,13 @@ if st.session_state.dff.empty:
     )
 else:
     # Loop until suggestions are loaded or try limit is reached
-    TRY_VAR = 0
+    try_var = 0
     while (
         st.session_state.suggestion_first_time
         and st.session_state.insights_suggestion is None
-        and TRY_VAR < 3
+        and try_var < 3
     ):
-        TRY_VAR += 1
+        try_var += 1
         with st.spinner("Loading suggestion..."):
             utils_insights.get_suggestions("insights_suggestion")
             # Check if number of suggestions is less than 4
@@ -154,32 +151,21 @@ else:
 # Display divider
 st.divider()
 
-# Create columns for query and search button
-query_column = st.columns([4, 1])
-
 # Get search term from text area
-with query_column[0]:
-    search_term = st.text_area(
+search_term = st.text_area(
         "",
         key="2",
         value=st.session_state.insights_placeholder,
         placeholder="Select a suggestion or type your question here",
-    )
+)
 
-# Create empty space in second column
-with query_column[1]:
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
-
-    # Display search button
-    if st.button("Search", type="primary"):
-        # Set flag to generate RAG answers
-        st.session_state.rag_answers_gen = True
+# Display search button
+if st.button("Search", type="primary"):
+    # Set flag to generate RAG answers
+    st.session_state.rag_answers_gen = True
 
 # Check if RAG answers should be generated
-if st.session_state.rag_answers_gen is True:
+if st.session_state.rag_answers_gen:
     # Check if data frame is empty
     if st.session_state.dff.empty:
         # Display error message

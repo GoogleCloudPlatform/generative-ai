@@ -17,7 +17,7 @@ Portuguese = "pt"
 # -----------------------------------------------------------------------------
 [models]
 
-# If needed, replace with a specific version of the model. Check the Vertex AI 
+# If needed, replace with a specific version of the model. Check the Vertex AI
 # documentation for more information.
 text.text_model_name = "gemini-pro"
 image.image_model_name = "ImageGenerationModel"
