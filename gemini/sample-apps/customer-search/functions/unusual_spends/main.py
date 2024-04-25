@@ -7,7 +7,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def hello_http(
+def detect_unusual_transactions(
     request: functions_framework.HttpRequest,
 ) -> functions_framework.HttpResponse:
     """HTTP Cloud Function that handles user requests to get their unusual transactions.

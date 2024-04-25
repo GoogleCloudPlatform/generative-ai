@@ -7,7 +7,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def hello_http(request):
+def check_customer_id(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -15,7 +15,6 @@ def hello_http(request):
     print(request_json["sessionInfo"]["parameters"])
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
     # 342345, 592783
 
     if customer_id is not None:
@@ -51,7 +50,8 @@ def hello_http(request):
     res = {
         "fulfillment_response": {
             "messages": [
-                {"text": {"text": ["That's great! What can I help you with today?"]}}
+                {"text": {
+                    "text": ["That's great! What can I help you with today?"]}}
             ]
         }
     }

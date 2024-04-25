@@ -11,11 +11,11 @@ project_id = environ.get("PROJECT_ID")
 client: bigquery.Client = bigquery.Client()
 
 
-def run(name, statement):
+def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
     return name, client.query(statement).result()  # blocks the thread
 
 
-def run_all(statements: Dict[str, str]):
+def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
     with ThreadPoolExecutor() as executor:
         jobs = []
         for name, statement in statements.items():
@@ -25,7 +25,7 @@ def run_all(statements: Dict[str, str]):
 
 
 @functions_framework.http
-def hello_http(request):
+def travel_card_recommendation(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

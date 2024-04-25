@@ -11,7 +11,7 @@ FD_TNC_DOC = environ.get("FD_TNC_DOC")
 
 
 @functions_framework.http
-def hello_http(request):
+def generate_fd_confirmation_message(request):
     request_json = request.get_json(silent=True)
 
     print(request_json["sessionInfo"]["parameters"])
@@ -23,8 +23,6 @@ def hello_http(request):
     print(customer_id)
     print(fd_amount)
     print(fd_tenure)
-
-    # customer_id = 235813
 
     vertexai.init(project=project_id, location="us-central1")
     parameters = {

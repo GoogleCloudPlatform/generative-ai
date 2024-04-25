@@ -9,16 +9,12 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def hello_http(request):
+def find_nearest_bike_dealer(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
 
-    # print(request_json['sessionInfo']['parameters'])
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
-    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)

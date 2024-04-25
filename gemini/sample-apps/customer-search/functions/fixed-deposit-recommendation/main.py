@@ -70,7 +70,7 @@ def check_senior_citizen(dob):
 
 
 @functions_framework.http
-def hello_http(request):
+def fixed_deposit_recommendation(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -78,8 +78,6 @@ def hello_http(request):
     print(request_json["sessionInfo"]["parameters"])
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
-    # 342345, 592783
 
     # get account balance of the user
     query_account_balance = f"""

@@ -78,7 +78,7 @@ def translate_text(
 
 
 @functions_framework.http
-def hello_http(request):
+def translation_handler(request):
     """HTTP Cloud Function.
     Args:
         request (flask.Request): The request object.

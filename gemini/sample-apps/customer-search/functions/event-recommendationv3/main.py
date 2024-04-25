@@ -13,11 +13,9 @@ from vertexai.preview.vision_models import ImageGenerationModel
 
 project_id = environ.get("PROJECT_ID")
 
-# customer_id = 342345
-
 
 @functions_framework.http
-def hello_http(request):
+def event_recommendation_v3(request):
     request_json = request.get_json(silent=True)
     # customer_id = request_json['customer_id']
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]

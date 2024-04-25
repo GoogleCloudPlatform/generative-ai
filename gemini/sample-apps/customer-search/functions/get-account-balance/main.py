@@ -9,7 +9,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def hello_http(request):
+def account_balance(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -128,7 +128,6 @@ def hello_http(request):
                         "transition_code": 1,
                     }
                 },
-                # "targetPage": "projects/{project_id}/locations/us-central1/agents/de6b2b88-afd4-49fb-b118-d6457d9d6847/flows/00000000-0000-0000-0000-000000000000/pages/Home_Page"
             }
             return res
         else:
@@ -146,7 +145,6 @@ def hello_http(request):
                         },
                     ]
                 },
-                # "targetPage": "projects/{project_id}/locations/us-central1/agents/de6b2b88-afd4-49fb-b118-d6457d9d6847/flows/00000000-0000-0000-0000-000000000000/pages/Home_Page"
             }
             return res
 

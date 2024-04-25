@@ -2,7 +2,7 @@ import functions_framework
 
 
 @functions_framework.http
-def hello_http(request):
+def set_destination(request):
     request_json = request.get_json(silent=True)
 
     destination = request_json["sessionInfo"]["parameters"]["Destination"]

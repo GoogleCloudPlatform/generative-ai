@@ -42,7 +42,7 @@ def get_financial_details(query_str: str, value_str: str, res: Dict[str, bigquer
 
 
 @functions_framework.http
-def hello_http(request):
+def account_health_summary(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

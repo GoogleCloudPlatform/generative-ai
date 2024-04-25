@@ -156,7 +156,7 @@ def ask_react(query, react_agent):
 
 
 @functions_framework.http
-def hello_http(request):
+def qa_over_website(request):
     request_json = request.get_json(silent=True)
     request_args = request.args
 

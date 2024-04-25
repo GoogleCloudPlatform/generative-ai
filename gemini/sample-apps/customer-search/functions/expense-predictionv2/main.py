@@ -140,13 +140,12 @@ def create_predicted_expense_table(customer_id):
 
 
 @functions_framework.http
-def hello_http(request):
+def expense_prediction(request):
     request_json = request.get_json(silent=True)
 
     print(request_json)
     client = bigquery.Client()
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
 
     """
     1. Aggregate the transaction data
@@ -160,8 +159,6 @@ def hello_http(request):
     # create_aggregate_transaction_table()
     # train_model()
     result_predicted_expenses = create_predicted_expense_table(customer_id)
-
-    # result_predicted_expenses = client.query(query_expense_prediction)
 
     amount = []
     category = []

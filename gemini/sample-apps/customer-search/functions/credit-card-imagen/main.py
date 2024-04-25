@@ -35,7 +35,7 @@ def generate_base64_image(user_prompt):
 
 
 @functions_framework.http
-def hello_http(request):
+def generate_credit_card_image(request):
     if request.method == "OPTIONS":
         headers = {
             "Access-Control-Allow-Origin": "*",

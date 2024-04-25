@@ -7,7 +7,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def hello_http(request):
+def check_is_city_in_india(request):
     """HTTP Cloud Function.
     Args:
         request (flask.Request): The request object.

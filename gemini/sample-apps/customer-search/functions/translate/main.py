@@ -83,7 +83,7 @@ def translate_text(
 
 
 @functions_framework.http
-def hello_http(request):
+def translate(request):
     """HTTP Cloud Function.
 
     Args:

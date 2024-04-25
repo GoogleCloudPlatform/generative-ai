@@ -42,7 +42,7 @@ def get_number_of_days(fd_tenure: str) -> int:
 
 
 @functions_framework.http
-def hello_http(
+def validate_fd_tenure(
     request: functions_framework.HttpRequest,
 ) -> functions_framework.HttpResponse:
     """HTTP Cloud Function.

@@ -53,7 +53,7 @@ def check_senior_citizen(dob):
 
 
 @functions_framework.http
-def hello_http(request):
+def ask_fd_tenure(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -61,7 +61,6 @@ def hello_http(request):
     print(request_json["sessionInfo"]["parameters"])
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
 
     # verifying that the customer is valid and exists in our database or not
     if customer_id is not None:

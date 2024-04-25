@@ -17,7 +17,7 @@ def is_date_later_than(start_date, end_date):
 
 
 @functions_framework.http
-def hello_http(request):
+def ask_travel_dates(request):
     request_json = request.get_json(silent=True)
 
     print(request_json["sessionInfo"]["parameters"])
@@ -68,7 +68,6 @@ def hello_http(request):
 
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [""]}}]},
-        # "targetPage": "/projects/fintech-app-gcp/locations/us-central1/agents/ba85d3e8-3197-4938-baec-5f6dd65e7320/flows/00000000-0000-0000-0000-000000000000/pages/Get_Date",
         "sessionInfo": {
             "parameters": {
                 "start_date": (

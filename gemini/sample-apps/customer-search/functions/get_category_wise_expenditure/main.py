@@ -10,20 +10,19 @@ from vertexai.language_models import TextGenerationModel
 project_id = environ.get("PROJECT_ID")
 
 
-def upload_blob(bucket_name, source_file_name, destination_blob_name):
+def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: str) -> str:
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
     blob = bucket.blob(destination_blob_name)
-    # blob.make_public()
     blob.upload_from_string(source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
     return blob.public_url
 
 
 @functions_framework.http
-def hello_http(request):
+def category_wise_expenditure(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -48,7 +47,6 @@ def hello_http(request):
     amount = []
     category = []
     transaction_list_str = ""
-    # transaction_list = []
     total_expenditure = 0
     for row in result_categories:
         amount.append(round(row["amount"], 2))
@@ -56,10 +54,7 @@ def hello_http(request):
         transaction_list_str = (
             transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
         )
-        # transaction_list.append(f"{row['sub_category']}: ₹{row['amount']}\n")
         total_expenditure = total_expenditure + row["amount"]
-
-    # transaction_list_str = transaction_list_str[1:]
 
     vertexai.init(project=project_id, location="us-central1")
     parameters = {
@@ -138,11 +133,6 @@ def hello_http(request):
                                     "title": "Last Month Expenditure",
                                     "text": transaction_list,
                                 }
-                                # {
-                                #     "type": "image",
-                                #     "rawUrl": url,
-                                #     "accessibilityText": "Example logo"
-                                # }
                             ],
                             [
                                 {
@@ -158,5 +148,4 @@ def hello_http(request):
         }
     }
     print(res)
-    # res = {"fulfillment_response": {"messages": [{"text": {"text": transaction_list_str}}]}}
     return res

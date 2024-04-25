@@ -33,7 +33,8 @@ def check_senior_citizen(dob):
     """
 
     today = datetime.date.today()
-    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+    age = today.year - dob.year - \
+        ((today.month, today.day) < (dob.month, dob.day))
     print("Today = ", today)
     print("age = ", age)
     return age >= 60
@@ -87,7 +88,7 @@ def get_interest_rate(is_sr_citizen, number_of_days):
 
 
 @functions_framework.http
-def hello_http(request):
+def create_fixed_deposit(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -103,8 +104,6 @@ def hello_http(request):
     print(fd_amount)
     print(fd_tenure)
     print(user_name)
-
-    # customer_id = 235813
 
     # verifying that the customer is valid and exists in our database or not
     if customer_id is not None:

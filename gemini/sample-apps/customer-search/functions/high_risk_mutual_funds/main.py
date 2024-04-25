@@ -9,11 +9,11 @@ from vertexai.language_models import TextGenerationModel
 client: bigquery.Client = bigquery.Client()
 
 
-def run(name, statement):
+def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
     return name, client.query(statement).result()  # blocks the thread
 
 
-def run_all(statements: Dict[str, str]):
+def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
     with ThreadPoolExecutor() as executor:
         jobs = []
         for name, statement in statements.items():
@@ -22,29 +22,24 @@ def run_all(statements: Dict[str, str]):
     return result
 
 
-def upload_blob(bucket_name, source_file_name, destination_blob_name):
+def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: str) -> str:
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
     blob = bucket.blob(destination_blob_name)
-    # blob.make_public()
     blob.upload_from_string(source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
     return blob.public_url
 
 
 @functions_framework.http
-def hello_http(request):
+def high_risk_mutual_funds(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
 
-    # print(request_json['sessionInfo']['parameters'])
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
-    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)
@@ -122,7 +117,6 @@ def hello_http(request):
         amount_invested.append(row["amount_invested"])
 
     total_investment = 0
-    # total_mf_investment = 0
     total_high_risk_investment = 0
 
     for row in res["query_fd"]:
@@ -206,33 +200,10 @@ def hello_http(request):
     url = "https://storage.cloud.google.com/public_bucket_fintech_app/Market%20Summary.pdf"
     print(url)
 
-    # res = {"fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]}}
     res = {
         "fulfillment_response": {
             "messages": [
-                {"text": {"text": [response.text]}},
-                # {
-                #     "payload":{
-                #         "richContent": [
-                #           [
-                #             {
-                #               "type": "chips",
-                #               "options": [
-                #                 {
-                #                   "text": "Market Summary",
-                #                   "image": {
-                #                     "rawUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/391px-PDF_file_icon.svg.png"
-                #                   },
-                #                   "anchor": {
-                #                     "href": url
-                #                   }
-                #                 },
-                #               ]
-                #             }
-                #           ]
-                #         ]
-                #     }
-                # }
+                {"text": {"text": [response.text]}}
             ]
         }
     }
