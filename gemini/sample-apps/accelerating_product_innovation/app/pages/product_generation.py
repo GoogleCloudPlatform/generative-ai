@@ -34,7 +34,7 @@ import streamlit as st
 
 
 @st.cache_data
-def get_prod_gen_img():
+def get_prod_gen_img() -> None:
     """
     This function loads an image from a file, displays, and caches it.
 
@@ -47,7 +47,7 @@ def get_prod_gen_img():
         st.image(page_image)
 
 
-def initialize_prod_gen():
+def initialize_prod_gen() -> None:
     """
     This function initializes the session state for the product generation page.
 

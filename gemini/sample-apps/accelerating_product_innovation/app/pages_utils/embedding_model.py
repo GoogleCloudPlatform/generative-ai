@@ -10,7 +10,7 @@ from vertexai.preview.language_models import TextEmbeddingModel
 
 
 @st.cache_resource
-def get_embedding_model():
+def get_embedding_model() -> TextEmbeddingModel:
     """
     Loads embedding model (to be cached).
     """
@@ -19,9 +19,14 @@ def get_embedding_model():
 
 
 @backoff.on_exception(backoff.expo, ResourceExhausted, max_time=10)
-def embedding_model_with_backoff(text=[]):
+def embedding_model_with_backoff(text: list[str]) -> np.ndarray:
     """
     Process embeddings for uploaded files.
+    Args:
+        text: A list of text strings to process.
+
+    Returns:
+        A NumPy array containing the processed embeddings.
     """
     embeddings = get_embedding_model().get_embeddings(text)
     return np.array([each.values for each in embeddings][0])

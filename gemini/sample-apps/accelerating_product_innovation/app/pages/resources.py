@@ -29,7 +29,7 @@ if "project_form_submitted" not in st.session_state:
     st.session_state.project_form_submitted = False
 
 @st.cache_data
-def get_resources_img():
+def get_resources_img() -> None:
     """
     Loads, displays and caches the resources header image.
 

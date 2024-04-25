@@ -10,6 +10,7 @@ Functions include:
     * Facilitate the generation of product feature suggestions.
 """
 
+from typing import Any
 import asyncio
 import logging
 import os
@@ -32,7 +33,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-def update_generation_state():
+def update_generation_state() -> None:
     """Updates the generation state post generate button click."""
 
     # Check whether custom prompt has been given.
@@ -56,7 +57,7 @@ def update_generation_state():
     st.session_state.content_edited = False  # Tracks whether content is being edited.
 
 
-def generate_product_suggestions_for_feature_generation():
+def generate_product_suggestions_for_feature_generation() -> None:
     """Generates suggestions for a given product category for feature generation.
 
     Args:
@@ -74,7 +75,7 @@ def generate_product_suggestions_for_feature_generation():
         st.session_state.feature_suggestions = create_suggestion_list(feature_prompts)
 
 
-def build_prompt_form():
+def build_prompt_form() -> bool:
     """Creates the form for selecting prompts and entering custom queries."""
     if st.session_state.feature_suggestions is None:
         generate_product_suggestions_for_feature_generation()
@@ -95,7 +96,7 @@ def build_prompt_form():
         return st.form_submit_button("Generate", type="primary")
 
 
-def create_suggestion_list(gen_suggestions):
+def create_suggestion_list(gen_suggestions: str) -> list[str]:
     """Creates a list of suggestions from the generated suggestions.
 
     Args:
@@ -114,7 +115,7 @@ def create_suggestion_list(gen_suggestions):
     return suggestions
 
 
-async def parallel_call(title_arr):
+async def parallel_call(title_arr: list[str]) -> list[Any]:
     """
     Performs parallel calls to the text and image generation APIs.
 
@@ -159,7 +160,7 @@ async def parallel_call(title_arr):
     return [text_result_arr, image_result_arr]
 
 
-async def prepare_titles():
+async def prepare_titles() -> list[str]:
     """Processes selected titles, handling edge cases.
 
     Returns:
@@ -188,7 +189,7 @@ async def prepare_titles():
     return title_arr
 
 
-async def generate_product_content():
+async def generate_product_content() -> None:
     """
     Generates product content based on the selected titles and prompts.
     """
@@ -249,7 +250,7 @@ async def generate_product_content():
     st.session_state.draft_elements = elements
 
 
-async def render_content(features):
+async def render_content(features: st.container) -> None:
     """
     Handles button clicks and content generation logic.
 
@@ -261,7 +262,7 @@ async def render_content(features):
         await handle_content_generation(features)
 
 
-async def handle_content_generation(features):
+async def handle_content_generation(features: st.container) -> None:
     """
     Encapsulates the core content generation process.
 

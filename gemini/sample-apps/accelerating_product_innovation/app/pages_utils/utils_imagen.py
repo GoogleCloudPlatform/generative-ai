@@ -42,7 +42,7 @@ def predict_image(
     instance_dict: dict,
     parameters: dict,
     endpoint_name: str = IMAGEN_ENDPOINT,
-):
+) -> list[str]:
     """Predicts the output of imagen on a given instance dict.
     Args:
         instance_dict:
@@ -74,7 +74,7 @@ def image_generation(
     sample_image_size: int,
     aspect_ratio: str,
     state_key: str,
-):
+) -> None:
     """Generates an image from a prompt.
 
     Args:
@@ -109,7 +109,7 @@ def edit_image_generation(
     bytes_data: bytes,
     state_key: str,
     mask_bytes_data: bytes = b"",
-):
+) -> bool:
     """Generates an edited image from a prompt and a base image.
 
     Args:
@@ -125,7 +125,7 @@ def edit_image_generation(
             The mask data in bytes.
 
     Returns:
-        None.
+        Boolean value indicating if editing was completed.
     """
     input_dict = {
         "prompt": prompt,
@@ -147,7 +147,7 @@ def edit_image_generation(
     return True
 
 
-async def parallel_image_generation(prompt: str, col: int):
+async def parallel_image_generation(prompt: str, col: int) -> None:
     """
     Executes parallel generation of images through Imagen.
 

@@ -20,8 +20,8 @@ Portuguese = "pt"
 page_title = "Gen AI for Product Innovation"
 page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
 sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
-file_name_1 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_1.png"
-file_name_2 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_2.png"
+home_img_1 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_1.png"
+home_img_2 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_2.png"
 
 
 # -----------------------------------------------------------------------------

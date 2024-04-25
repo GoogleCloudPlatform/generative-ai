@@ -83,7 +83,7 @@ def _render_box(box_id: str, title: str, parts: list, style: str) -> None:
         )
 
 
-def get_points(text):
+def get_points(text: str) -> list[str]:
     """Gets a list of points from the given text.
 
     Args:
@@ -137,7 +137,7 @@ def split_sentence(sentence: str) -> list[str]:
         return [sentence]
 
 
-def trim_title(title):
+def trim_title(title: str) -> str:
     """Trims the title to remove the leading number and period.
 
     Args:
@@ -153,7 +153,7 @@ def trim_title(title):
         return title
 
 
-def generate_formatted_response(prompt):
+def generate_formatted_response(prompt: str) -> str:
     """Generates a formatted response based on the given prompt.
 
     Args:
@@ -223,11 +223,11 @@ def render_features(features: st.delta_generator.DeltaGenerator) -> None:
                     _render_box(box_id, title, parts, BOX_STYLE)
 
 
-def modify_selection(content):
+def modify_selection(content: st.container) -> None:
     """Modifies the selection of features.
 
     Args:
-        content: The content to modify.
+        content: The streamlit widget to modify.
     """
     st.session_state.modifying = True
     new_features = st.empty()

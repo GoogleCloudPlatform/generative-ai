@@ -27,7 +27,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-def parse_and_format_text(text):
+def parse_and_format_text(text: str) -> str:
     """Utility funtion to parse and format the LLM generated response.
 
     Args:
@@ -41,7 +41,7 @@ def parse_and_format_text(text):
     return formatted_text
 
 
-def extract_bullet_points(text):
+def extract_bullet_points(text: str) -> list[str]:
     """Extracts bullet points from the LLM generated text.
 
     Args:
@@ -57,7 +57,7 @@ def extract_bullet_points(text):
     return bullet_points
 
 
-def get_suggestions(state_key):
+def get_suggestions(state_key: str) -> None:
     """Gets suggestions for the given state key.
 
     Args:
@@ -81,7 +81,7 @@ def get_suggestions(state_key):
     st.session_state[state_key] = extract_bullet_points(gen_suggestions)
 
 
-def check_if_file_uploaded():
+def check_if_file_uploaded() -> pd.DataFrame:
     """Checks if a file has been uploaded.
 
     Returns:
@@ -100,7 +100,7 @@ def check_if_file_uploaded():
     return dff
 
 
-def split_text(row):
+def split_text(row: pd.Series):
     """Splits the given text into chunks.
 
     Args:
@@ -113,7 +113,7 @@ def split_text(row):
     return chunk_iter
 
 
-def get_dot_product(row):
+def get_dot_product(row: pd.Series) -> float:
     """Gets the dot product of the given row and the query vectors.
 
     Args:

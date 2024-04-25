@@ -2,11 +2,9 @@
 Entry page of the streamlit application.
 """
 
-import base64
 
 import app.pages_utils.utils as utils
 from app.pages_utils.utils_config import PAGES_CFG
-import app.pages_utils.utils_styles as utils_styles
 from st_pages import show_pages_from_config
 import streamlit as st
 
@@ -26,22 +24,7 @@ utils.page_setup(page_cfg)
 
 show_pages_from_config()
 
-# file_name_1 = page_cfg["file_name_1"]
-# file_name_2 = page_cfg["file_name_2"]
 
-# # read the image from the file
-# # main_image_1: The main image to be displayed on the home page.
-# # main_image_2: The second main image to be displayed on the home page.
-# with open(file_name_1, "rb") as fp:
-#     contents = fp.read()
-#     main_image_1 = base64.b64encode(contents).decode("utf-8")
-#     main_image_1 = "data:image/png;base64," + main_image_1
-
-# with open(file_name_2, "rb") as fp:
-#     contents = fp.read()
-#     main_image_2 = base64.b64encode(contents).decode("utf-8")
-#     main_image_2 = "data:image/png;base64," + main_image_2
-
-# st.image(image=main_image_1)
-# st.divider()
-# st.image(image=main_image_2)
+st.image(page_cfg["home_img_1"])
+st.divider()
+st.image(page_cfg["home_img_2"])

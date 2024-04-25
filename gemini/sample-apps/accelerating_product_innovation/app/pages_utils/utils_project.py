@@ -27,7 +27,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-def get_projects_list():
+def get_projects_list() -> list[str]:
     """Gets the list of projects from the 'project_list.txt' file in the
     'product_innovation_bucket' GCS bucket.
 

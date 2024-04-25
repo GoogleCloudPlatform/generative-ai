@@ -133,7 +133,7 @@ class PDFRounded(fpdf.FPDF):
         )
 
 
-def add_formatted_page(pdf):
+def add_formatted_page(pdf: fpdf) -> None:
     """Adds a formatted page to the PDF document.
 
     The page is filled with a light gray color and has a white rectangle in the center.
@@ -150,7 +150,7 @@ def add_formatted_page(pdf):
     pdf.rect(10, 10, 190, 277, "F")
 
 
-def check_add_page(pdf, text):
+def check_add_page(pdf: fpdf, text: str) -> list[str]:
     """Checks if the text overflows onto a new page and adds a new page if necessary.
 
     The text is split into lines based on the available page width.
@@ -160,10 +160,9 @@ def check_add_page(pdf, text):
     Args:
         pdf: The PDF document to which the text is added.
         text: The text to be added to the PDF document.
-        lim: The maximum number of characters that can fit on a single page.
 
     Returns:
-        A list of pages, where each page is a string containing the text that fits on that page.
+        A list of strings, where each page is a string containing the text that fits on that page.
     """
 
     pages = []  # Store the text content for each page

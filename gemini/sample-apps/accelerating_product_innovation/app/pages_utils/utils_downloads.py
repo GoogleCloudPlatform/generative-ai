@@ -2,7 +2,7 @@
 This module provides functions for downloading generated content (emails, product content)
 as zip archives.
 """
-
+from typing import Any, List
 import base64
 import io
 import logging
@@ -29,7 +29,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-def generate_email(prompt, title):
+def generate_email(prompt: str, title: str) -> None:
     """Generates an email PDF with the given prompt and title.
 
     Args:
@@ -77,7 +77,7 @@ def generate_email(prompt, title):
     st.session_state.email_files.append(f"email_copy_0_{title}.pdf")
 
 
-def download_button(object_to_download, download_filename):
+def download_button(object_to_download: bytes, download_filename: str) -> str:
     """Generates a download link for the given object.
 
     Args:
@@ -119,7 +119,15 @@ def download_button(object_to_download, download_filename):
     return dl_link
 
 
-def create_zip_buffer(filenames):
+def create_zip_buffer(filenames: List[str]) -> io.BytesIO:
+    """Creates a BytesIO object containing a zip file of the specified files.
+
+    Args:
+        filenames: A list of filenames to include in the zip archive.
+
+    Returns:
+        An io.BytesIO object representing the zip file in memory.
+    """
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED) as zip_file:
@@ -129,6 +137,9 @@ def create_zip_buffer(filenames):
     return zip_buffer
 
 def load_product_lists():
+    """
+    Creates copies of Product titles and content to be imported.
+    """
     # Create copies to avoid modifying session data
     prod_content = st.session_state.draft_elements.copy()
     titles = st.session_state.selected_titles.copy()
@@ -142,7 +153,7 @@ def load_product_lists():
 
     return prod_content, titles
 
-def download_file():
+def download_file() -> None:
     """Downloads the generated email files as a zip archive."""
 
     with st.spinner("Downloading Email files ..."):
@@ -177,7 +188,7 @@ def download_file():
     st.success("Email Copies Downloaded")
 
 
-def download_content():
+def download_content() -> None:
     """Downloads the generated content as a zip archive."""
 
     with st.spinner("Creating Content pdf"):

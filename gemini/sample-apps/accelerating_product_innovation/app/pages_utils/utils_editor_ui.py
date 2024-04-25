@@ -24,7 +24,7 @@ class ImageEditor:
         self.drawing_mode = "rect"  # Default drawing mode
         self.realtime_update = True
 
-    def load_image(self, image_file):
+    def load_image(self, image_file: str) -> io.BytesIO:
         """Load an image from a local file as BytesIO."""
         with open(image_file, "rb") as f:
             image_data = f.read()

@@ -22,7 +22,7 @@ class ProductDrafts:
         if "create_product" not in st.session_state:
             st.session_state.create_product = False
 
-    def display_drafts(self):
+    def display_drafts(self) -> None:
         """
         Displays all product drafts if the 'create_product' flag is True in session state.
         """
@@ -40,7 +40,7 @@ class ProductDrafts:
                     # Call the helper function to display drafts for this title
                     self._display_draft_row(i)
 
-    def _display_draft_row(self, title_index: int):
+    def _display_draft_row(self, title_index: int) -> None:
         """
         Displays a single row of drafts for a given product title.
 
@@ -106,7 +106,7 @@ class ProductDrafts:
                         # Reload page to display updated content
                         st.rerun()
 
-    def _handle_image_edit(self, title_index: int, draft_index: int):
+    def _handle_image_edit(self, title_index: int, draft_index: int) -> None:
         """
         Handles image edit button interactions for a specific draft.
 

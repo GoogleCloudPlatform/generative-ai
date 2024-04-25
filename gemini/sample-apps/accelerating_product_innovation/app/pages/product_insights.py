@@ -30,7 +30,7 @@ if "temp_suggestions" not in st.session_state:
 
 # Cache the function to get insights images
 @st.cache_data
-def get_insights_img():
+def get_insights_img() -> None:
     """
     Loads, displays and cache header image for insights page.
 
@@ -57,7 +57,7 @@ if st.session_state.dff is None or st.session_state.dff.empty:
 
 
 # Function to display suggestion box
-def display_suggestion_box(key, suggestion_num):
+def display_suggestion_box(key: str, suggestion_num: int) -> None:
     """
     Styles and displays the suggestion for insight generation.
     Args:

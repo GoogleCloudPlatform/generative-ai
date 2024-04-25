@@ -330,6 +330,6 @@ def page_setup(page_cfg):
     # )
 
 
-def load_css(css_file_path):
+def load_css(css_file_path: str) -> None:
     with open(css_file_path) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)

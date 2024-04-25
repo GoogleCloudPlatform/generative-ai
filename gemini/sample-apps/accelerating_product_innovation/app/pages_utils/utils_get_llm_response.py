@@ -32,7 +32,7 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
-def generate_gemini(text_prompt):
+def generate_gemini(text_prompt: str) -> str:
     """Generates text using the Gemini-Pro model.
 
     Args:
@@ -69,7 +69,7 @@ def generate_gemini(text_prompt):
         st.stop()
 
 
-async def parallel_generate_search_results(query):
+async def parallel_generate_search_results(query: str) -> str:
     """Generates search results using the Text-Bison model in a parallel fashion.
 
     Args:
