@@ -31,7 +31,7 @@
   "type": "module",
   "dependencies": {
     "@floating-ui/dom": "^1.5.1",
-    "flowbite": "^1.8.1",
+    "flowbite": "^2.0.0",
     "flowbite-svelte": "^0.40.2",
     "tailwind-merge": "^1.14.0"
   }
