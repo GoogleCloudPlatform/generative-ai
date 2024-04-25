@@ -25,16 +25,16 @@ const section1 = document.querySelector("#section--1");
 
 const operationsTabs = document.querySelectorAll(".operations__tab");
 const operationsTabsContainer = document.querySelector(
-  ".operations__tab-container",
+  ".operations__tab-container"
 );
 const operationsTabsContent = document.querySelectorAll(".operations__content");
 
 const authenticateTabs = document.querySelectorAll(".authenticate__tab");
 const authenticateTabsContainer = document.querySelector(
-  ".authenticate__tab-container",
+  ".authenticate__tab-container"
 );
 const authenticateTabsContent = document.querySelectorAll(
-  ".authenticate__content",
+  ".authenticate__content"
 );
 
 const nav = document.querySelector("nav");
@@ -71,10 +71,6 @@ let moneytransferArrow = document.querySelector(".moneytransfer-arrow");
 moneytransferArrow.onclick = function () {
   navLinks.classList.toggle("show9");
 };
-// let cardsArrow = document.querySelector(".cards-arrow");
-// cardsArrow.onclick = function() {
-//  navLinks.classList.toggle("show10");
-// }
 let billssArrow = document.querySelector(".bills-arrow");
 billssArrow.onclick = function () {
   navLinks.classList.toggle("show11");
@@ -97,40 +93,11 @@ let investArrow = document.querySelector(".invest-arrow");
 investArrow.onclick = function () {
   navLinks.classList.toggle("show6");
 };
-// let bondsArrow = document.querySelector(".bonds-arrow");
-// bondsArrow.onclick = function () {
-//     navLinks.classList.toggle("show14");
-// }
-
-// let insureArrow = document.querySelector(".insure-arrow");
-// insureArrow.onclick = function() {
-//  navLinks.classList.toggle("show7");
-// }
-// let lifeinsuranceArrow = document.querySelector(".lifeinsurance-arrow");
-// lifeinsuranceArrow.onclick = function() {
-//  navLinks.classList.toggle("show15");
-// }
-// let healthandaccidentArrow = document.querySelector(".healthandaccident-arrow");
-// healthandaccidentArrow.onclick = function() {
-//  navLinks.classList.toggle("show16");
-// }
-// let vehicleArrow = document.querySelector(".vehicle-arrow");
-// vehicleArrow.onclick = function() {
-//  navLinks.classList.toggle("show17");
-// }
 
 let borrowArrow = document.querySelector(".borrow-arrow");
 borrowArrow.onclick = function () {
   navLinks.classList.toggle("show8");
 };
-// let loansArrow = document.querySelector(".loans-arrow");
-// loansArrow.onclick = function() {
-//  navLinks.classList.toggle("show18");
-// }
-// let jsArrow = document.querySelector(".js-arrow");
-// jsArrow.onclick = function() {
-//  navLinks.classList.toggle("show3");
-// }
 
 // Modal window
 const openModal = function (e) {
@@ -152,7 +119,7 @@ const openModalCreateAccount = function (e) {
 
   // Find the content with matching data-tab and activate it
   const createAccountContent = document.querySelector(
-    ".authenticate__content--2",
+    ".authenticate__content--2"
   );
   createAccountContent.classList.add("authenticate__content--active");
 
@@ -162,7 +129,7 @@ const openModalCreateAccount = function (e) {
     activeTab.classList.remove("authenticate__tab--active");
   }
   const activeContent = document.querySelector(
-    ".authenticate__content--active",
+    ".authenticate__content--active"
   );
   if (activeContent !== createAccountContent) {
     activeContent.classList.remove("authenticate__content--active");
@@ -174,7 +141,6 @@ const closeModal = function () {
   overlay.classList.add("hidden");
 };
 
-// btnsOpenModal.forEach(btn => btn.addEventListener('click', openModal));
 loginBtn.addEventListener("click", openModal);
 
 if (btnCreateAcc) {
@@ -200,14 +166,6 @@ document.addEventListener("keydown", function (e) {
 message.classList.add("cookie-message");
 message.innerHTML =
   'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie"> Got it!</button>';
-// header.append(message);
-
-// document
-//     .querySelector('.btn--close-cookie')
-//     .addEventListener('click', function () {
-//         message.remove();
-//     });
-
 message.style.backgroundColor = "#37383d";
 message.style.width = "120%";
 message.style.height =
@@ -251,10 +209,10 @@ if (operationsTabsContainer != null) {
 
     // Remove active classes
     operationsTabs.forEach((t) =>
-      t.classList.remove("operations__tab--active"),
+      t.classList.remove("operations__tab--active")
     );
     operationsTabsContent.forEach((t) =>
-      t.classList.remove("operations__content--active"),
+      t.classList.remove("operations__content--active")
     );
 
     // Active tab
@@ -276,10 +234,10 @@ if (authenticateTabsContainer != null) {
 
     // Remove active classes
     authenticateTabs.forEach((t) =>
-      t.classList.remove("authenticate__tab--active"),
+      t.classList.remove("authenticate__tab--active")
     );
     authenticateTabsContent.forEach((t) =>
-      t.classList.remove("authenticate__content--active"),
+      t.classList.remove("authenticate__content--active")
     );
 
     // Active tab
@@ -392,7 +350,7 @@ const slider = function () {
   // Functions
   const goToSlide = function (slide) {
     slides.forEach(
-      (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`),
+      (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`)
     );
   };
   // goToSlide(0);
@@ -424,7 +382,7 @@ const slider = function () {
     slides.forEach(function (_, i) {
       dotContainer.insertAdjacentHTML(
         "beforeend",
-        `<button class="dots__dot" data-slide="${i}"></button>`,
+        `<button class="dots__dot" data-slide="${i}"></button>`
       );
     });
   };
@@ -472,12 +430,6 @@ if (document.querySelector(".slide") != null) {
   slider(); // could pass in an options object to have the slider container work with options
 }
 
-// const loginButton = document.querySelector('.btn');
-// const login = function() {
-//     console.log('login button pressed')
-// }
-// loginButton.addEventListener('click', login);
-// const loadingAnimation = document.querySelector('.loading-animation');
 const signinForm = document.querySelector(".modal__form");
 const signinBtn = signinForm.querySelector(".btn");
 const signupForm = document.getElementById("signup_form");
@@ -530,8 +482,7 @@ onAuthStateChanged(auth, (user) => {
     logoutBtn.style.display = "block";
     footer_signup.style.display = "none";
 
-    const uri =
-      "https://us-central1-fintech-app-gcp.cloudfunctions.net/user_login";
+    const uri = "{{user_login_url}}";
     const body = JSON.stringify({ uid: uid.toString() });
     const initDetails = {
       method: "POST",
@@ -547,7 +498,7 @@ onAuthStateChanged(auth, (user) => {
       .then((response) => {
         if (response.status !== 200) {
           console.log(
-            "Looks like there was a problem. Status Code: " + response.status,
+            "Looks like there was a problem. Status Code: " + response.status
           );
           return;
         }
@@ -591,16 +542,9 @@ function submitSearch() {
   console.log("search");
   document.getElementById("loader").style.display = "block";
 
-  var siteSearchUrl =
-    "https://sites.google.com/corp/search/pranshusingh.altostrat.com/cymbalbank?query=";
-
   var query = document.getElementById("search-query-input").value;
-  var searchResultsPage = "/search";
 
-  // var url = siteSearchUrl + query
-
-  const uri =
-    "https://us-central1-fintech-app-gcp.cloudfunctions.net/translate";
+  const uri = "{{rag_qa_chain_url_translate}}";
   const body = JSON.stringify({ query: query });
   const initDetails = {
     method: "POST",
@@ -616,7 +560,7 @@ function submitSearch() {
     .then((response) => {
       if (response.status !== 200) {
         console.log(
-          "Looks like there was a problem. Status Code: " + response.status,
+          "Looks like there was a problem. Status Code: " + response.status
         );
         return;
       }
@@ -631,7 +575,7 @@ function submitSearch() {
       window.location.href = "/search";
 
       references = JSON.parse(
-        obj.fulfillment_response.messages[0].text.text[1],
+        obj.fulfillment_response.messages[0].text.text[1]
       );
       console.log(references);
       var str = "";
@@ -649,7 +593,6 @@ function submitSearch() {
 
 function searchKeyPress(e) {
   // look for window.event in case event isn't passed in
-
   e = e || window.event;
 
   if (e.keyCode == 13) {

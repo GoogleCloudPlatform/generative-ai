@@ -35,17 +35,20 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     return blob.public_url
 
 
+def get_financial_details(query_str, value_str, res):
+    for row in res[query_str]:
+        if row[value_str] is not None:
+            return int(row[value_str])
+    return 0
+
+
 @functions_framework.http
 def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
 
-    # print(request_json['sessionInfo']['parameters'])
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
-    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)
@@ -119,7 +122,7 @@ def hello_http(request):
         WHERE customer_id = {customer_id}
     """
 
-    query_average_mothly_expense = f"""SELECT AVG(total_amount) as average_mothly_expense from (
+    query_average_monthly_expense = f"""SELECT AVG(total_amount) as average_monthly_expense from (
         SELECT EXTRACT(MONTH FROM 	date) AS month,
         SUM(transaction_amount) AS total_amount FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id})
         GROUP BY month
@@ -147,7 +150,7 @@ def hello_http(request):
             "query_total_mf": query_total_mf,
             "query_high_risk_mf": query_high_risk_mf,
             "query_avg_monthly_balance": query_avg_monthly_balance,
-            "query_average_mothly_expense": query_average_mothly_expense,
+            "query_average_monthly_expense": query_average_monthly_expense,
             "query_last_month_expense": query_last_month_expense,
             "query_investment_returns": query_investment_returns,
         }
@@ -161,39 +164,31 @@ def hello_http(request):
         one_month_return.append(row["one_month_return"])
         ttm_return.append(row["TTM_Return"])
 
-    asset_amount = 0
-    debt_amount = 0
+    asset_amount = get_financial_details(
+        query_str="query_assets", value_str="asset", res=res
+    )
+    debt_amount = get_financial_details(
+        query_str="query_debts", value_str="debt", res=res
+    )
     total_income = 0
     total_expenditure = 0
     first_name = ""
     total_investment = 0
     total_high_risk_investment = 0
-    avg_monthly_balance = 0
+    avg_monthly_balance = get_financial_details(
+        query_str="query_avg_monthly_balance", value_str="avg_monthly_balance", res=res
+    )
     amount_transfered = ""
     account_status = ""
-    average_mothly_expense = 0
-    last_month_expense = 0
+    average_monthly_expense = get_financial_details(
+        query_str="query_average_monthly_expense",
+        value_str="average_monthly_expense",
+        res=res,
+    )
+    last_month_expense = get_financial_details(
+        query_str="query_last_month_expense", value_str="last_month_expense", res=res
+    )
     user_accounts = []
-
-    for row in res["query_average_mothly_expense"]:
-        if row["average_mothly_expense"] is not None:
-            average_mothly_expense = int(row["average_mothly_expense"])
-
-    for row in res["query_last_month_expense"]:
-        if row["last_month_expense"] is not None:
-            last_month_expense = int(row["last_month_expense"])
-
-    for row in res["query_avg_monthly_balance"]:
-        if row["avg_monthly_balance"] is not None:
-            avg_monthly_balance = int(row["avg_monthly_balance"])
-
-    for row in res["query_assets"]:
-        if row["asset"] is not None:
-            asset_amount = int(row["asset"])
-
-    for row in res["query_debts"]:
-        if row["debt"] is not None:
-            debt_amount = int(row["debt"])
 
     for row in res["query_user_details"]:
         first_name = row["First_Name"]
@@ -254,7 +249,7 @@ def hello_http(request):
     print("Total Expenditure = ", total_expenditure)
     print("Name ", first_name)
     print("Asset = ", asset_amount)
-    print("average_mothly_expense = ", average_mothly_expense)
+    print("average_monthly_expense = ", average_monthly_expense)
     print("last_month_expense = ", last_month_expense)
 
     if (
