@@ -3,6 +3,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mutual Fund Calculator</title>
+    <script>src="scripts/script_calculator.js"</script>
     <style>
       body { font-family: 'Poppins', sans-serif; margin: 0px; } h1 { font-size:
       2.5rem; line-height: 1.35; position: fixed; width: 100%; text-align:
@@ -182,62 +183,5 @@
         <div id="requiredInvestmentResult"></div>
       </div>
     </div>
-
-    <script>
-      function updateInputValue(sliderId, inputId) {
-      document.getElementById(inputId).value =
-      document.getElementById(sliderId).value; } function
-      updateSliderValue(sliderId, inputId) {
-      document.getElementById(sliderId).value =
-      document.getElementById(inputId).value; } function calculateReturn() { var
-      investmentAmount =
-      parseFloat(document.getElementById('investmentAmount').value); var
-      investmentDuration =
-      parseInt(document.getElementById('investmentDuration').value); var
-      interestRate = parseFloat(document.getElementById('interestRate').value);
-      // Assuming interest is compounded annually (n = 1) var n = 1; var r =
-      interestRate / 100; // Convert percentage to decimal var futureValue =
-      investmentAmount * Math.pow(1 + r / n, n * investmentDuration);
-      document.getElementById('result').innerHTML = 'After ' +
-      investmentDuration + ' years, your investment will be worth: ₹' +
-      futureValue.toFixed(2); } function calculateRequiredInvestment() { var
-      targetAmount = parseFloat(document.getElementById('targetAmount').value);
-      var targetDuration =
-      parseInt(document.getElementById('targetDuration').value); var
-      targetInterestRate =
-      parseFloat(document.getElementById('targetInterestRate').value); //
-      Assuming interest is compounded annually (n = 1) var n = 1; var r =
-      targetInterestRate / 100; // Convert percentage to decimal // Calculate
-      required investment using the rearranged compound interest formula var
-      requiredInvestment = targetAmount / Math.pow(1 + r / n, n *
-      targetDuration);
-      document.getElementById('requiredInvestmentResult').innerHTML = 'To reach
-      a target amount of ₹' + targetAmount.toFixed(2) + ' in ' + targetDuration
-      + ' years, you need to invest: ₹' + requiredInvestment.toFixed(2); } //
-      Update slider values dynamically for Investment Tab
-      document.getElementById('investmentAmount').addEventListener('input',
-      function () { updateInputValue('investmentAmount',
-      'investmentAmountInput'); });
-      document.getElementById('investmentDuration').addEventListener('input',
-      function () { updateInputValue('investmentDuration',
-      'investmentDurationInput'); });
-      document.getElementById('interestRate').addEventListener('input', function
-      () { updateInputValue('interestRate', 'interestRateInput'); }); // Update
-      slider values dynamically for Target Amount Tab
-      document.getElementById('targetAmount').addEventListener('input', function
-      () { updateInputValue('targetAmount', 'targetAmountInput'); });
-      document.getElementById('targetDuration').addEventListener('input',
-      function () { updateInputValue('targetDuration', 'targetDurationInput');
-      });
-      document.getElementById('targetInterestRate').addEventListener('input',
-      function () { updateInputValue('targetInterestRate',
-      'targetInterestRateInput'); }); // Switch between Investment and Target
-      Amount Tabs function switchTabs(tab) { if (tab === 'investment') {
-      document.getElementById('investmentTab').style.display = 'block';
-      document.getElementById('targetAmountTab').style.display = 'none'; } else
-      if (tab === 'targetAmount') {
-      document.getElementById('investmentTab').style.display = 'none';
-      document.getElementById('targetAmountTab').style.display = 'block'; } }
-    </script>
   </body>
 </html>
