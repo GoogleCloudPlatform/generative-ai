@@ -3,9 +3,8 @@ This module defines the 'ProductDrafts' class, responsible
 for managing and displaying product content drafts.
 """
 
-import streamlit as st
-
 from app.pages_utils.utils_get_llm_response import generate_gemini
+import streamlit as st
 
 
 class ProductDrafts:

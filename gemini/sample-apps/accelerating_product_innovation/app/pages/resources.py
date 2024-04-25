@@ -11,12 +11,11 @@ This module manages the "Resources" page of the Streamlit application. Key funct
     * Provides download and delete options for stored files.
 """
 
-import streamlit as st
-
 import app.pages_utils.utils as utils
+from app.pages_utils.utils_config import PAGES_CFG
 import app.pages_utils.utils_project as utils_project
 import app.pages_utils.utils_resources_store_embeddings as utils_resources_store_embeddings
-from app.pages_utils.utils_config import PAGES_CFG
+import streamlit as st
 
 # Get the page configuration from the config file
 page_cfg = PAGES_CFG["1_Resources"]

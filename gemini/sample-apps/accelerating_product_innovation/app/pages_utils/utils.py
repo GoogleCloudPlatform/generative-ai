@@ -4,10 +4,9 @@ Common utilities for the project. This includes:
     * project selection.
 """
 
-import streamlit as st
-
 import app.pages_utils.utils_project as utils_project
 import app.pages_utils.utils_styles as utils_styles
+import streamlit as st
 
 
 def display_projects():

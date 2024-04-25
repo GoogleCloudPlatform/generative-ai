@@ -7,14 +7,8 @@ import base64
 import io
 import logging
 import os
-import zipfile
 from typing import List
-
-import cv2
-import numpy as np
-import streamlit as st
-import streamlit.components.v1 as components
-from dotenv import load_dotenv
+import zipfile
 
 from app.pages_utils.utils_export_content_pdf import (
     create_content_pdf,
@@ -22,6 +16,11 @@ from app.pages_utils.utils_export_content_pdf import (
 )
 from app.pages_utils.utils_get_llm_response import generate_gemini
 from app.pages_utils.utils_imagen import image_generation
+import cv2
+from dotenv import load_dotenv
+import numpy as np
+import streamlit as st
+import streamlit.components.v1 as components
 
 load_dotenv()
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)

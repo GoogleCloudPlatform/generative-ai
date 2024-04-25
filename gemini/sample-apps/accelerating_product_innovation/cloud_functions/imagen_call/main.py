@@ -7,11 +7,12 @@ import io
 import logging
 import os
 
+from dotenv import load_dotenv
 import functions_framework
 from google.cloud import aiplatform
 from google.protobuf import json_format
 from google.protobuf.struct_pb2 import Value
-from dotenv import load_dotenv
+
 load_dotenv()
 
 

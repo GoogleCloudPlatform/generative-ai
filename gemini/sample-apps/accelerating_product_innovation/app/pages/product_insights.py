@@ -14,11 +14,10 @@ It provides the following functionality:
 * Follow-up Questions: Suggests follow-up questions based on previous queries.
 """
 
-import streamlit as st
-
 import app.pages_utils.utils as utils
-import app.pages_utils.utils_insights as utils_insights
 from app.pages_utils.utils_config import PAGES_CFG
+import app.pages_utils.utils_insights as utils_insights
+import streamlit as st
 
 # Get page configuration from config file
 page_cfg = PAGES_CFG["2_Marketing_Insights"]

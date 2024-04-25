@@ -15,14 +15,13 @@ import logging
 import os
 from typing import Any
 
-import streamlit as st
-from dotenv import load_dotenv
-
 from app.pages_utils.utils_get_llm_response import (
     generate_gemini,
     parallel_generate_search_results,
 )
 from app.pages_utils.utils_imagen import parallel_image_generation
+from dotenv import load_dotenv
+import streamlit as st
 
 logging.basicConfig(
     format="%(levelname)s:%(message)s",
