@@ -4,8 +4,9 @@ Common utilities for the project. This includes:
     * project selection.
 """
 
-import app.pages_utils.utils_project as utils_project
 import streamlit as st
+
+import app.pages_utils.utils_project as utils_project
 import app.pages_utils.utils_styles as utils_styles
 
 
@@ -333,5 +334,8 @@ def page_setup(page_cfg):
 
 
 def load_css(css_file_path: str) -> None:
+    """
+    Load css from the given filepath.
+    """
     with open(css_file_path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
