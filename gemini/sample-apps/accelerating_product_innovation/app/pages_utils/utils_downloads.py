@@ -105,19 +105,15 @@ def download_button(object_to_download: bytes, download_filename: str) -> str:
     # Encode the zip content in base64
     b64 = base64.b64encode(zip_content).decode()
 
-    # Create the download link
-    dl_link = f"""
-    <html>
-    <head>
-    <title>Start Auto Download file</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script>
-    $('<a href="data:application/zip;base64,{b64}" download="{download_filename}">')[0].click()
-    </script>
-    </head>
-    </html>
-    """
-    return dl_link
+    # Read the HTML template file
+    with open("app/download_link.html", "r") as f:
+        html_template = f.read()
+
+    # Replace placeholders in the HTML template
+    html_link = html_template.replace("{b64}", b64)
+    html_link = html_link.replace("{download_filename}", download_filename)
+
+    return html_link
 
 
 def create_zip_buffer(filenames: List[str]) -> io.BytesIO:
