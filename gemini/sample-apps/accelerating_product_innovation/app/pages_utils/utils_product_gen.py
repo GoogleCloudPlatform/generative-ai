@@ -75,8 +75,8 @@ def generate_product_suggestions_for_feature_generation() -> None:
 def build_prompt_form() -> bool:
     """Creates the form for selecting prompts and entering custom queries.
 
-        Returns:
-            Boolean value indicating whether the form was submitted.
+    Returns:
+        Boolean value indicating whether the form was submitted.
     """
     if st.session_state.feature_suggestions is None:
         generate_product_suggestions_for_feature_generation()

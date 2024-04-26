@@ -127,7 +127,9 @@ def get_dot_product(row: pd.Series) -> float:
     return np.dot(row, st.session_state["query_vectors"])
 
 
-def get_filter_context_from_vectordb(question: str = "", sort_index_value: int = 3) -> tuple[str, pd.DataFrame]:
+def get_filter_context_from_vectordb(
+    question: str = "", sort_index_value: int = 3
+) -> tuple[str, pd.DataFrame]:
     """Gets the filter context from the vector database.
 
     Args:
