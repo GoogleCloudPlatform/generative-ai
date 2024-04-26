@@ -152,10 +152,10 @@ def page_setup(page_cfg):
         initialize_all_session_state()
         st.session_state.initialize_session_state = True
     # Apply the sidebar style
-    # utils_styles.sidebar_apply_style(
-    #     style=utils_styles.STYLE_SIDEBAR,
-    #     image_path=page_cfg["sidebar_image_path"],
-    # )
+    utils_styles.sidebar_apply_style(
+        style=utils_styles.STYLE_SIDEBAR,
+        image_path=page_cfg["sidebar_image_path"],
+    )
 
 
 def load_css(css_file_path: str) -> None:
