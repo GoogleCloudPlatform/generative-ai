@@ -44,7 +44,7 @@ def create_pdf_layout(
         # Add image
         pdf.set_font("Arial", "B", 11)
         pdf.set_xy(17, 25)
-        image_path = f"./gen_image{images[j]}.png"
+        image_path = f"gen_image{images[j]}.png"
         pdf.image(image_path, x=60, y=40, w=90, h=70)
 
         # Add text content, handling potential page breaks
@@ -144,7 +144,7 @@ def create_email_pdf(
     pdf.set_xy(17, 25)
     pdf.multi_cell(180, 5, subject, 0, align="C")
     print(os.path)
-    pdf.image(f"./{image_name}", x=60, y=40, w=90, h=70)
+    pdf.image(f"{image_name}", x=60, y=40, w=90, h=70)
 
     pages = check_add_page(pdf, text)
     pdf.set_font("Arial", "", 11)

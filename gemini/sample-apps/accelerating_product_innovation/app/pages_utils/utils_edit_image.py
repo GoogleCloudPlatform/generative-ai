@@ -90,7 +90,7 @@ def initialize_edit_page_state() -> None:
             -1
         )  # No image from generations is being edited.
         st.session_state.image_file_prefix = (
-            "./uploaded_image"  # image prefix for editing uploaded image.
+            "uploaded_image"  # image prefix for editing uploaded image.
         )
         st.session_state.uploaded_img = True  # Set image uploaded to true.
     else:
@@ -135,7 +135,7 @@ def save_draft_image(
 
     # Calculate unique image filename and save image.
     image_num = st.session_state.num_drafts * row + col + 1
-    image.save(f"./gen_image{image_num}.png")
+    image.save(f"gen_image{image_num}.png")
 
     # Display the edited image on product generation image
     st.switch_page("pages/product_generation.py")
@@ -197,7 +197,7 @@ def _handle_edit_suggestion(image_index: int) -> None:
         )
     )
     # Save image.
-    with open("./suggestion1.png", "wb") as f:
+    with open("suggestion1.png", "wb") as f:
         f.write(image_data.getvalue())
 
     # Update state.

@@ -32,10 +32,9 @@ class ImageEditor:
 
     def display_ui(self):
         """Renders the main UI components of the image editor."""
-
         # - Load the image for editing
         image_bytes = self.load_image(
-            f"./{st.session_state.image_file_prefix}{st.session_state.image_to_edit + 1}.png"
+            f"{st.session_state.image_file_prefix}{st.session_state.image_to_edit + 1}.png"
         )
         bg_image = Image.open(image_bytes)
 
