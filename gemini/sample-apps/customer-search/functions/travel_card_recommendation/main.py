@@ -5,7 +5,8 @@ from typing import Dict
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 client: bigquery.Client = bigquery.Client()
@@ -70,14 +71,19 @@ def hello_http(request):
 
     if customer_age_on_book < 365:
         vertexai.init(project=project_id, location="us-central1")
-        parameters = {
-            "max_output_tokens": 512,
-            "temperature": 0.5,
-            "top_p": 0.8,
-            "top_k": 40,
+        generation_config = {
+            "max_output_tokens": 2048,
+            "temperature": 1,
+            "top_p": 1,
         }
-        model = TextGenerationModel.from_pretrained("text-bison")
-        response = model.predict(
+        safety_settings = {
+            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        }
+        model = GenerativeModel("gemini-1.0-pro-002")
+        response = model.generate_content(
             """You are a chatbot for a bank application.
         Tell the user politely that they are not eligible for the the credit card as they are new customer. Only cutomer older than 1 year with the bank are eligible for credit card.
         Ask the user to wait and ask if they want anything else like mutual funds or fixed deposit.
@@ -87,11 +93,18 @@ def hello_http(request):
         The user lives in India.
         The message should be in a conversation-like manner based on the Account Status.
         The message should be in second person's perespective tone.
-        """
+        """,
+            generation_config=generation_config,
+            safety_settings=safety_settings,
+            stream=True,
         )
 
+        final_response = ""
+        for response in response:
+            final_response += response.tex
+
         res = {
-            "fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]},
+            "fulfillment_response": {"messages": [{"text": {"text": [final_response.text]}}]},
             "target_page": "projects/{project_id}/locations/asia-south1/agents/118233dd-f023-4dad-b302-3906a7365ccc/flows/00000000-0000-0000-0000-000000000000/pages/06e52d7c-536a-4cbf-baba-4fe7d686e472",
         }
         print(res)
@@ -343,35 +356,46 @@ def hello_http(request):
 
     print("credit_card = ", credit_card)
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.5,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
-    response = model.predict(
-        """You are a chatbot for a bank application you have been given the Credit Card as {0}.
-    You have to recommend the given credit card to the user and explain the benefits of the credit card.
-    Write in a professional and business-neutral tone.
-    Word Limit is 100 words.
-    The message comes in middle of conversation so don't greet the user with Hello/Hi.
-    The user lives in India.
-    Assume the currency that you suggest to the user to be Indian Rupees(₹).
-    ONLY USE INDIAN RUPEES(₹) EVERYWHERE.
-    The amount should comma seprated in indian rupees format.
-    The message should be in a conversation-like manner based on the Account Status.
-    The message should only be based on the information presented above.
-    The message should be in second person's perespective tone.
-    """.format(
-            credit_card
-        ),
-        **parameters,
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = GenerativeModel("gemini-1.0-pro-002")
+    response = model.generate_content(
+    f"""
+        You are a chatbot for a bank application you have been given the Credit Card as {credit_card}.
+        You have to recommend the given credit card to the user and explain the benefits of the credit card.
+        Write in a professional and business-neutral tone.
+        Word Limit is 100 words.
+        The message comes in middle of conversation so don't greet the user with Hello/Hi.
+        The user lives in India.
+        Assume the currency that you suggest to the user to be Indian Rupees(₹).
+        ONLY USE INDIAN RUPEES(₹) EVERYWHERE.
+        The amount should comma seprated in indian rupees format.
+        The message should be in a conversation-like manner based on the Account Status.
+        The message should only be based on the information presented above.
+        The message should be in second person's perespective tone.
+    """,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
+
+    final_response = ""
+    for response in response:
+        final_response += response.text
+
     res = {
         "fulfillment_response": {
             "messages": [
-                {"text": {"text": [response.text]}},
+                {"text": {"text": [final_response.text]}},
                 {"text": {"text": ["Would you like to apply for this card?"]}},
             ]
         },
