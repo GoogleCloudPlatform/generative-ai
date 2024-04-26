@@ -25,7 +25,13 @@ class ImageEditor:
         self.realtime_update = True
 
     def load_image(self, image_file: str) -> io.BytesIO:
-        """Load an image from a local file as BytesIO."""
+        """Load an image from a local file as BytesIO.
+        Args:
+            image_file: path to image file to be loaded.
+
+        Returns:
+            Image bytes object.
+        """
         with open(image_file, "rb") as f:
             image_data = f.read()
         return io.BytesIO(image_data)

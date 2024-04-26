@@ -227,7 +227,7 @@ def modify_selection(content: st.container) -> None:
     """Modifies the selection of features.
 
     Args:
-        content: The streamlit widget to modify.
+        content: The streamlit container widget to modify.
     """
     st.session_state.modifying = True
     new_features = st.empty()

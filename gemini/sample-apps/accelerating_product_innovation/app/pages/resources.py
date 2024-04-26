@@ -31,8 +31,6 @@ def get_resources_img() -> None:
     """
     Loads, displays and caches the resources header image.
 
-    Arguments: None
-
     Returns: None.
     """
     # Get the file path of the resources image

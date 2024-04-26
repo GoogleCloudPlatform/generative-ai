@@ -39,7 +39,7 @@ def get_prod_gen_img() -> None:
     This function loads an image from a file, displays, and caches it.
 
     Returns:
-       None.
+       None
     """
     # Display the top image for this page.
     page_images = [page_cfg["prod_gen_img"]]
@@ -82,7 +82,7 @@ utils.page_setup(page_cfg)
 initialize_prod_gen()
 
 # Page styles
-utils.load_css("app/css/prod_gen_styles")
+utils.load_css("app/css/prod_gen_styles.css")
 # logging initialization
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 

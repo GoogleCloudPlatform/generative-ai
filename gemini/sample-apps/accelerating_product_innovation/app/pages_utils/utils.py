@@ -8,7 +8,7 @@ import app.pages_utils.utils_project as utils_project
 import streamlit as st
 
 
-def display_projects():
+def display_projects() -> None:
     """Displays the list of projects and allows the user to select one.
 
     Args:
@@ -28,7 +28,13 @@ def display_projects():
         st.rerun()
 
 
-def get_session_state():
+def get_session_state() -> dict:
+    """
+    Defines default values for session state
+
+    Returns:
+        session_state_defaults (dict): A dictionary of default key-value pairs for session state
+    """
     session_state_defaults = {
         "product_categories": utils_project.get_projects_list(),
         "new_product_category_added": None,
@@ -127,7 +133,7 @@ def reinitialize_session_states():
         st.session_state[key] = value
 
 
-def page_setup(page_cfg):
+def page_setup(page_cfg: dict) -> None:
     """
     This function initializes the page configuration and applies custom styles.
 
@@ -151,7 +157,7 @@ def page_setup(page_cfg):
         initialize_all_session_state()
         st.session_state.initialize_session_state = True
     # Apply the sidebar style
-    add_logo()
+    load_css("app/css/sidebar_styles.css")
 
 
 def load_css(css_file_path: str) -> None:
@@ -160,13 +166,3 @@ def load_css(css_file_path: str) -> None:
     """
     with open(css_file_path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
-def add_logo():
-    """Adds a logo to the sidebar.
-
-    Args:
-        png_file (str): The path to the PNG file of the logo.
-
-    """
-    load_css("app/css/sidebar_styles.css")

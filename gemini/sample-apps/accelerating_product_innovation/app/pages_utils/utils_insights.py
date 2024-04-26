@@ -100,7 +100,7 @@ def check_if_file_uploaded() -> pd.DataFrame:
     return dff
 
 
-def split_text(row: pd.Series):
+def split_text(row: pd.Series) -> list[str]:
     """Splits the given text into chunks.
 
     Args:
@@ -127,7 +127,7 @@ def get_dot_product(row: pd.Series) -> float:
     return np.dot(row, st.session_state["query_vectors"])
 
 
-def get_filter_context_from_vectordb(question: str = "", sort_index_value: int = 3):
+def get_filter_context_from_vectordb(question: str = "", sort_index_value: int = 3) -> tuple[str, pd.DataFrame]:
     """Gets the filter context from the vector database.
 
     Args:
@@ -164,7 +164,7 @@ def get_filter_context_from_vectordb(question: str = "", sort_index_value: int =
     return (context, top_matched_df)
 
 
-def generate_insights_search_result(query):
+def generate_insights_search_result(query) -> tuple[str, pd.DataFrame]:
     """Generates insights search results for the given query.
 
     Args:

@@ -272,7 +272,7 @@ async def csv_pocessing(
     return
 
 
-def convert_file_to_data_packets(filename: str):
+def convert_file_to_data_packets(filename: str) -> None:
     """Converts the file to data packets.
 
     This function converts the file to data packets.

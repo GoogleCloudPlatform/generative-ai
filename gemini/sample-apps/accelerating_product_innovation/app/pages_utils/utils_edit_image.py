@@ -189,7 +189,10 @@ def render_suggested_images(
 
 
 def _handle_edit_suggestion(image_index: int) -> None:
-    """Handles the logic for when the 'Edit' button is clicked."""
+    """Handles the logic for when the 'Edit' button is clicked.
+    Args:
+        image_index (int): corresponding draft number of image being edited.
+    """
     # Get Byte data of the image.
     image_data = io.BytesIO(
         base64.b64decode(

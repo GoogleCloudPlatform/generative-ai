@@ -60,9 +60,6 @@ def update_generation_state() -> None:
 def generate_product_suggestions_for_feature_generation() -> None:
     """Generates suggestions for a given product category for feature generation.
 
-    Args:
-        product_category (str): The category of the product.
-
     Returns:
         list: A list of feature suggestions.
     """
@@ -76,7 +73,11 @@ def generate_product_suggestions_for_feature_generation() -> None:
 
 
 def build_prompt_form() -> bool:
-    """Creates the form for selecting prompts and entering custom queries."""
+    """Creates the form for selecting prompts and entering custom queries.
+
+        Returns:
+            Boolean value indicating whether the form was submitted.
+    """
     if st.session_state.feature_suggestions is None:
         generate_product_suggestions_for_feature_generation()
     with st.form("prompt input"):

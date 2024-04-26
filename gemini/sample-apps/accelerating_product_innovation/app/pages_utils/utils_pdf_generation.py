@@ -20,7 +20,7 @@ class PDFRounded(fpdf.FPDF):
     Initializes basic PDF template for email and content files
     """
 
-    def rounded_rect(self, x, y, w, h, r, style="", corners="1234"):
+    def rounded_rect(self, x: float, y: float, w: float, h: float, r: float, style: str = "", corners: str = "1234"):
         """
         Draws a rectangle with rounded corners.
 
@@ -113,7 +113,7 @@ class PDFRounded(fpdf.FPDF):
             )
         self._out(op)
 
-    def _arc(self, x1, y1, x2, y2, x3, y3):
+    def _arc(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float):
         """
         Draws an arc.
 

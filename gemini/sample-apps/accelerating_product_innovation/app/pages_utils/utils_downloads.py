@@ -7,7 +7,6 @@ import base64
 import io
 import logging
 import os
-from typing import List
 import zipfile
 
 from app.pages_utils.utils_export_content_pdf import (
@@ -116,7 +115,7 @@ def download_button(object_to_download: bytes, download_filename: str) -> str:
     return html_link
 
 
-def create_zip_buffer(filenames: List[str]) -> io.BytesIO:
+def create_zip_buffer(filenames: list[str]) -> io.BytesIO:
     """Creates a BytesIO object containing a zip file of the specified files.
 
     Args:
