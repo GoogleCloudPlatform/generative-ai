@@ -27,6 +27,7 @@ def display_projects():
         st.session_state.previous_product_category = st.session_state.product_category
         st.rerun()
 
+
 def get_session_state():
     session_state_defaults = {
         "product_categories": utils_project.get_projects_list(),
@@ -88,10 +89,11 @@ def get_session_state():
         "email_files": [],
         "image_edit_col": None,
         "image_edit_row": None,
-        "bg_editing": False
+        "bg_editing": False,
     }
 
     return session_state_defaults
+
 
 def initialize_all_session_state():
     """Initializes all the session states used in the app.
@@ -107,10 +109,8 @@ def initialize_all_session_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-
     if "product_category" not in st.session_state:
         st.session_state.product_category = st.session_state.product_categories[0]
-
 
 
 def reinitialize_session_states():
@@ -169,4 +169,4 @@ def add_logo():
         png_file (str): The path to the PNG file of the logo.
 
     """
-    load_css('app/css/sidebar_styles.css')
+    load_css("app/css/sidebar_styles.css")
