@@ -5,7 +5,6 @@ Common utilities for the project. This includes:
 """
 
 import app.pages_utils.utils_project as utils_project
-import app.pages_utils.utils_styles as utils_styles
 import streamlit as st
 
 
@@ -152,10 +151,7 @@ def page_setup(page_cfg):
         initialize_all_session_state()
         st.session_state.initialize_session_state = True
     # Apply the sidebar style
-    utils_styles.sidebar_apply_style(
-        style=utils_styles.STYLE_SIDEBAR,
-        image_path=page_cfg["sidebar_image_path"],
-    )
+    add_logo()
 
 
 def load_css(css_file_path: str) -> None:
@@ -164,3 +160,13 @@ def load_css(css_file_path: str) -> None:
     """
     with open(css_file_path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+
+def add_logo():
+    """Adds a logo to the sidebar.
+
+    Args:
+        png_file (str): The path to the PNG file of the logo.
+
+    """
+    load_css('app/css/sidebar_styles.css')
