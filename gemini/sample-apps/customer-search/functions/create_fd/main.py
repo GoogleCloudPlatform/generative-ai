@@ -237,38 +237,3 @@ def create_fixed_deposit(request):
     print(res)
 
     return res
-
-    #     Generate a mail showing that user's FD of amount {0} is created for tenure {1}.
-    # The user name is {2}.The FD Interest rate is {3}
-    # The amount should be displayed in this format e.g - ₹ 1,40,000 instead of 140000
-    # The response should not be more than 40 words.
-
-    #     write a confirmation email to the user and do not ask user to do any next step. make it more user friendly
-
-    # input:
-    # amount = 51233
-    # tenure = 4 years
-    # user name = tom
-    # interest rate = 6.5
-
-    # output:
-    # Dear Tom,
-
-    # Congratulations! Your Fixed Deposit has been successfully created
-
-    # FD Amount: ₹51,234
-    # FD Interest Rate: 6.5%
-    # FD Tenure: 1 year
-
-    # Thank you for choosing Cymbuddy!
-
-    # Sincerely,
-    # Cymbuddy
-
-    # input:
-    # amount = {0}
-    # tenure = {1}
-    # user name = {2}
-    # interest rate = {3}
-
-    # Do not mention output just return the mail
