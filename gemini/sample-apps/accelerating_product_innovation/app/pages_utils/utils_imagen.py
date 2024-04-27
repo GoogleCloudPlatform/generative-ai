@@ -13,11 +13,10 @@ import os
 
 import aiohttp
 import cv2
-from google.cloud import aiplatform
-from google.protobuf import json_format
-from google.protobuf.struct_pb2 import Value
 import numpy as np
 import streamlit as st
+import vertexai
+from vertexai.preview.vision_models import Image, ImageGenerationModel
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
@@ -26,22 +25,12 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 # Set project parameters
-IMAGE_MODEL_NAME = "imagegeneration@005"
-IMAGE_MODEL_NAME_ = "imagegeneration@002"
-IMAGEN_API_ENDPOINT = f"{LOCATION}-aiplatform.googleapis.com"
-IMAGEN_ENDPOINT = f"projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{IMAGE_MODEL_NAME}"
-IMAGEN_ENDPOINT_ = f"projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{IMAGE_MODEL_NAME_}"
-IMAGE_UPLOAD_BYTES_LIMIT = 4096
-# The AI Platform services require regional API endpoints.
-client_options = {"api_endpoint": IMAGEN_API_ENDPOINT}
-# Initialize client that will be used to create and send requests.
-imagen_client = aiplatform.gapic.PredictionServiceClient(client_options=client_options)
+IMAGE_MODEL_NAME = "imagegeneration@006"
 
 
 def predict_image(
     instance_dict: dict,
     parameters: dict,
-    endpoint_name: str = IMAGEN_ENDPOINT,
 ) -> list[str]:
     """Predicts the output of imagen on a given instance dict.
     Args:
@@ -56,16 +45,19 @@ def predict_image(
         aiplatform.exceptions.BadRequestError: If the input is invalid.
         aiplatform.exceptions.InternalServerError: If an internal error occurred.
     """
+    vertexai.init(project=PROJECT_ID, location=LOCATION)
 
-    instance = json_format.ParseDict(instance_dict, Value())
-    instances = [instance]
-    parameters_client = json_format.ParseDict(parameters, Value())
-    response = imagen_client.predict(
-        endpoint=endpoint_name,
-        instances=instances,
-        parameters=parameters_client,
+    model = ImageGenerationModel.from_pretrained("imagegeneration@006")
+
+    responses = model.edit_image(
+        prompt=instance_dict["prompt"],
+        base_image=instance_dict["image"],
+        # Optional parameters
+        number_of_images=parameters["sampleCount"],
+        language="en",
+        mask=instance_dict["mask"]
     )
-    return response.predictions
+    return responses
 
 
 def image_generation(
@@ -129,20 +121,15 @@ def edit_image_generation(
     """
     input_dict = {
         "prompt": prompt,
-        "image": {"bytesBase64Encoded": base64.b64encode(bytes_data).decode("utf-8")},
+        "image": Image.load_from_file("image_to_edit.png"),
     }
 
     if mask_bytes_data:
-        input_dict["mask"] = {
-            "image": {
-                "bytesBase64Encoded": base64.b64encode(mask_bytes_data).decode("utf-8")
-            }
-        }
+        input_dict["mask"] = Image.load_from_file("mask.png")
 
     st.session_state[state_key] = predict_image(
         instance_dict=input_dict,
         parameters={"sampleCount": sample_count},
-        endpoint_name=IMAGEN_ENDPOINT_,
     )
     return True
 

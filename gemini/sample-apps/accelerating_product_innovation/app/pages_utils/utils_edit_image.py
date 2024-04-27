@@ -20,6 +20,7 @@ generation page.
 
 import base64
 import io
+import json
 import logging
 
 import PIL
@@ -175,9 +176,7 @@ def render_suggested_images(
                     _handle_edit_suggestion(image_index)
                 # Add download button for current suggestion.
                 image_data = io.BytesIO(
-                    base64.b64decode(
-                        generated_images[image_index]["bytesBase64Encoded"]
-                    )
+                    suggested_images[image_index]
                 )
                 st.download_button(
                     label="Download",
@@ -227,22 +226,38 @@ def generate_suggested_images(
         image_bytes (BytesIO): Initial image data for inpainting or variation.
         mask_image (BytesIO or None): Mask defining the region to edit (optional).
     """
+     # Create a BytesIO object from the image bytes
+    image_stream = io.BytesIO(image_bytes.getvalue())
 
+    # Open the image using Pillow
+    image = Image.open(image_stream)
+
+    # Save the image as a PNG
+    image.save("image_to_edit.png", "PNG")
+
+      # Create a BytesIO object from the image bytes
+    mask_image_stream = io.BytesIO(mask_image)
+
+    # Open the image using Pillow
+    mask_image = Image.open(mask_image_stream)
+
+    # Save the image as a PNG
+    mask_image.save("mask.png", "PNG")
     st.session_state.suggested_images = []  # Clear previous suggestions
     with st.spinner("Generating suggested images"):
         edit_image_completed = edit_image_generation(
             image_prompt,
             6,  # Number of suggested images to be generated
-            image_bytes.getvalue(),
+            "image_to_edit",
             "generated_image",  # Session state key for storing results
-            mask_image,  # Mask value
+            "mask",  # Mask value
         )
 
     # Append newly generated suggestions to suggested images state key.
     if edit_image_completed:
         for image_data in st.session_state.generated_image:
-            encoded_image = base64.b64decode(image_data["bytesBase64Encoded"])
-            st.session_state.suggested_images.append(io.BytesIO(encoded_image))
+            print(image_data.__dict__.keys())
+            st.session_state.suggested_images.append(image_data.__dict__["_loaded_bytes"])
     else:
         st.session_state.suggested_images = None
     # End image generation.
