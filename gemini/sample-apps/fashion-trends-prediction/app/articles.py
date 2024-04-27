@@ -1,17 +1,16 @@
 import json
 import pickle
-import vertexai
-import vertexai.preview.generative_models as generative_models
 
 from config import config
 from genai_prompts import articles_prompt
-from sentence_transformers import SentenceTransformer
-
-from langchain.vectorstores import VectorStore
 from langchain.docstore.document import Document
 from langchain.retrievers import BM25Retriever, EnsembleRetriever
+from langchain.vectorstores import VectorStore
+from sentence_transformers import SentenceTransformer
+import vertexai
+from vertexai.generative_models import GenerationConfig, GenerativeModel
 from vertexai.language_models import ChatModel, InputOutputTextPair
-from vertexai.generative_models import GenerativeModel, GenerationConfig
+import vertexai.preview.generative_models as generative_models
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
@@ -48,8 +47,7 @@ class Articles:
                 global vectorstore
                 local_vectorstore: VectorStore = pickle.load(f)
 
-        faiss_retriever = local_vectorstore.as_retriever(
-            search_kwargs={"k": 3})
+        faiss_retriever = local_vectorstore.as_retriever(search_kwargs={"k": 3})
 
         # initialize the ensemble retriever
         p = 0.6
@@ -60,7 +58,6 @@ class Articles:
         vertexai.init(project=PROJECT_ID, location=LOCATION)
 
         self.model = GenerativeModel("gemini-1.0-pro-002")
-
 
     def get_articles(self, outfit):
         """Gets articles related to a given outfit.
@@ -84,11 +81,15 @@ class Articles:
                     article_s = self.data[id][1][:8000]
 
                 try:
-                    response = self.model.generate_content([articles_prompt.format(outfit=outfit, article=article_s)], generation_config=GenerationConfig(
-                        max_output_tokens=2048,
-                        temperature=1,
-                        top_p=1,
-                    ), stream=False)
+                    response = self.model.generate_content(
+                        [articles_prompt.format(outfit=outfit, article=article_s)],
+                        generation_config=GenerationConfig(
+                            max_output_tokens=2048,
+                            temperature=1,
+                            top_p=1,
+                        ),
+                        stream=False,
+                    )
                     if response.text.split()[0][0] == "Y":
                         # [summary, link]
                         answers.append([self.data[id][1], self.data[id][0]])
