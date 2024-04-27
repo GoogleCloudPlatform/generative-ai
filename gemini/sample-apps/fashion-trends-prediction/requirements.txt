@@ -1,6 +1,6 @@
 beautifulsoup4==4.12.2
 bertopic==0.16.0
-google_cloud_aiplatform==1.39.0
+google-cloud-aiplatform==1.48.0
 hdbscan==0.8.33
 langchain==0.0.348
 numpy==1.26.2
