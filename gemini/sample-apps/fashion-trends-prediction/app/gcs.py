@@ -7,13 +7,13 @@ from google.cloud import storage
 
 
 def read_file_from_gcs_link(gcs_link):
-    """Reads a JSON or pickle or jpg file directly from a Google Cloud Storage link.
+    """Reads a JSON or pickle file directly from a Google Cloud Storage link.
 
     Args:
                     gcs_link (str): The gcs path to file.
 
     Returns:
-                    data: A JSON or pkl or image string
+                    data: A JSON or pkl object
     """
 
     storage_client = storage.Client()
@@ -34,8 +34,6 @@ def read_file_from_gcs_link(gcs_link):
         data = json.loads(file_content)
     elif gcs_link.endswith(".pkl"):
         data = pickle.loads(file_content)
-    elif gcs_link.endswith(".jpg"):
-        data = base64.b64encode(file_content).decode("utf-8")  # Decode to get string
     else:
         raise ValueError(
             "Unsupported file type. Please provide a JSON or pickle or jpg file."

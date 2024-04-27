@@ -10,7 +10,6 @@ from langchain.vectorstores import VectorStore
 from sentence_transformers import SentenceTransformer
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
-from vertexai.language_models import ChatModel, InputOutputTextPair
 import vertexai.preview.generative_models as generative_models
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}

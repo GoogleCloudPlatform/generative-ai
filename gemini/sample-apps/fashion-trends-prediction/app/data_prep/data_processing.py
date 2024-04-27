@@ -9,7 +9,6 @@ import vertexai.preview.generative_models as generative_models
 
 sys.path.append("../")
 from config import config
-from gcs import read_file_from_gcs_link
 from genai_prompts import qList, qList2
 from helper_functions_insta import get_id
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel, Part
@@ -26,8 +25,7 @@ fewshot_images = []
 num_files = len(config["fewshot_images"])
 for i in range(num_files):
     filename = "image" + str(i + 1)
-    encoded_image = read_file_from_gcs_link(config["fewshot_images"][filename])
-    fewshot_images.append(Part.from_data(data=encoded_image, mime_type="image/jpeg"))
+    fewshot_images.append(Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"))
 
 
 def generate_caption(image_path):
