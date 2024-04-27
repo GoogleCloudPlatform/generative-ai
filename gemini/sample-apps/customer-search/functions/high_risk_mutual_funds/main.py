@@ -22,7 +22,9 @@ def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]
     return result
 
 
-def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: str) -> str:
+def upload_blob(
+    bucket_name: str, source_file_name: str, destination_blob_name: str
+) -> str:
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -200,12 +202,6 @@ def high_risk_mutual_funds(request):
     url = "https://storage.cloud.google.com/public_bucket_fintech_app/Market%20Summary.pdf"
     print(url)
 
-    res = {
-        "fulfillment_response": {
-            "messages": [
-                {"text": {"text": [response.text]}}
-            ]
-        }
-    }
+    res = {"fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]}}
     print(res)
     return res

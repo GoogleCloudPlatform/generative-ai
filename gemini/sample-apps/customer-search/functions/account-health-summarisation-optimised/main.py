@@ -23,7 +23,9 @@ def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]
     return result
 
 
-def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: str) -> str:
+def upload_blob(
+    bucket_name: str, source_file_name: str, destination_blob_name: str
+) -> str:
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
@@ -34,7 +36,9 @@ def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: 
     return blob.public_url
 
 
-def get_financial_details(query_str: str, value_str: str, res: Dict[str, bigquery.table.RowIterator]) -> int:
+def get_financial_details(
+    query_str: str, value_str: str, res: Dict[str, bigquery.table.RowIterator]
+) -> int:
     for row in res[query_str]:
         if row[value_str] is not None:
             return int(row[value_str])

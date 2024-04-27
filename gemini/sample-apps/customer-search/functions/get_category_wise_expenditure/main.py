@@ -10,7 +10,9 @@ from vertexai.language_models import TextGenerationModel
 project_id = environ.get("PROJECT_ID")
 
 
-def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: str) -> str:
+def upload_blob(
+    bucket_name: str, source_file_name: str, destination_blob_name: str
+) -> str:
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)

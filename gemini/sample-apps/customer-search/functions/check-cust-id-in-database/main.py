@@ -50,8 +50,7 @@ def check_customer_id(request):
     res = {
         "fulfillment_response": {
             "messages": [
-                {"text": {
-                    "text": ["That's great! What can I help you with today?"]}}
+                {"text": {"text": ["That's great! What can I help you with today?"]}}
             ]
         }
     }

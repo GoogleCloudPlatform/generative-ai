@@ -33,8 +33,7 @@ def check_senior_citizen(dob):
     """
 
     today = datetime.date.today()
-    age = today.year - dob.year - \
-        ((today.month, today.day) < (dob.month, dob.day))
+    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
     print("Today = ", today)
     print("age = ", age)
     return age >= 60
