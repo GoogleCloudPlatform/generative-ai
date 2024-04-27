@@ -4,13 +4,12 @@ import json
 import time
 
 from config import config
+from gcs import read_file_from_gcs_link
 import streamlit as st
 from utilities import add_logo
 from utils_standalone_image_gen import predict_image, render_image_edit_prompt
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel, Part
-from gcs import read_file_from_gcs_link
-
 
 add_logo(config["Images"]["logo"])
 
@@ -40,7 +39,6 @@ if "JSONdata" not in st.session_state:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
 
     st.session_state["JSONdata"] = read_file_from_gcs_link(DATA_PATH)
-
 
 
 country = st.selectbox(

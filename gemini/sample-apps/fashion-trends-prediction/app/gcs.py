@@ -1,14 +1,14 @@
+import base64
 import json
 import pickle
-import base64
+from urllib.parse import urlparse
 
 from google.cloud import storage
-from urllib.parse import urlparse
 
 
 def read_file_from_gcs_link(gcs_link):
     """Reads a JSON or pickle or jpg file directly from a Google Cloud Storage link.
-    
+
     Args:
                     gcs_link (str): The gcs path to file.
 
@@ -21,7 +21,7 @@ def read_file_from_gcs_link(gcs_link):
     # Parse the GCS link
     parsed_url = urlparse(gcs_link)
     bucket_name = parsed_url.netloc
-    blob_name = parsed_url.path.lstrip('/')  # Remove leading slash
+    blob_name = parsed_url.path.lstrip("/")  # Remove leading slash
 
     # Get bucket and blob references
     bucket = storage_client.bucket(bucket_name)
@@ -35,8 +35,10 @@ def read_file_from_gcs_link(gcs_link):
     elif gcs_link.endswith(".pkl"):
         data = pickle.loads(file_content)
     elif gcs_link.endswith(".jpg"):
-        data = base64.b64encode(file_content).decode('utf-8')  # Decode to get string
+        data = base64.b64encode(file_content).decode("utf-8")  # Decode to get string
     else:
-        raise ValueError("Unsupported file type. Please provide a JSON or pickle or jpg file.")
+        raise ValueError(
+            "Unsupported file type. Please provide a JSON or pickle or jpg file."
+        )
 
     return data

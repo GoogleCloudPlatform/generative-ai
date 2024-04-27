@@ -63,13 +63,14 @@ def render_svg(svg_image_path):
     """
     """Renders the svg string at given path."""
 
-    st.markdown(f"""
+    st.markdown(
+        f"""
     <div style="text-align: center;">
         <img src="{svg_image_path}" alt="Logo">
     </div>
     """,
-                unsafe_allow_html=True
-                )
+        unsafe_allow_html=True,
+    )
 
 
 def build_markup_for_logo(

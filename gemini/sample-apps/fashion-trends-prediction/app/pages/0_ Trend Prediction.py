@@ -1,21 +1,20 @@
-import io
-import json
 import base64
-import vertexai
+import io
+from io import StringIO
+import json
+
+from articles import Articles
+from config import config
+from gcs import read_file_from_gcs_link
+from genai_prompts import image_prompt, trends_prompt
+from prediction import Prediction
 import requests
 import streamlit as st
 import streamlit.components.v1 as components
-import vertexai.preview.generative_models as generative_models
-
-from io import StringIO
-from config import config
-from articles import Articles
-from gcs import read_file_from_gcs_link
 from utilities import add_logo
-from prediction import Prediction
 from utils_standalone_image_gen import predict_image
-from genai_prompts import image_prompt, trends_prompt
-
+import vertexai
+import vertexai.preview.generative_models as generative_models
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
