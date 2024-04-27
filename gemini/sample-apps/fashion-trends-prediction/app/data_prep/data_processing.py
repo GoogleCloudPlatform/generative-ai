@@ -1,22 +1,20 @@
+import base64
+import json
 import os
 import sys
-import json
-import base64
-import requests
 import urllib.request
+
+import requests
 import vertexai.preview.generative_models as generative_models
 
-sys.path.append('../')
+sys.path.append("../")
 from config import config
-from genai_prompts import qList, qList2
 from gcs import read_file_from_gcs_link
+from genai_prompts import qList, qList2
 from helper_functions_insta import get_id
-
-from vertexai.preview.generative_models import \
-         GenerationConfig, GenerativeModel, Part
-from vertexai.preview.vision_models import Image, ImageQnAModel
+from vertexai.preview.generative_models import GenerationConfig, GenerativeModel, Part
 from vertexai.preview.language_models import TextGenerationModel
-
+from vertexai.preview.vision_models import Image, ImageQnAModel
 
 gemini_model = GenerativeModel("gemini-1.0-pro-vision-001")
 gemini_model_language = GenerativeModel("gemini-1.0-pro-002")
@@ -25,15 +23,11 @@ parameters = config["parameters"]["standard"]
 
 
 fewshot_images = []
-num_files = len(config['fewshot_images'])
+num_files = len(config["fewshot_images"])
 for i in range(num_files):
-    filename = 'image' + str(i+1)
-    encoded_image = read_file_from_gcs_link(config['fewshot_images'][filename])
-    fewshot_images.append(
-        Part.from_data(
-            data=encoded_image, mime_type="image/jpeg"
-        )
-    )
+    filename = "image" + str(i + 1)
+    encoded_image = read_file_from_gcs_link(config["fewshot_images"][filename])
+    fewshot_images.append(Part.from_data(data=encoded_image, mime_type="image/jpeg"))
 
 
 def generate_caption(image_path):
