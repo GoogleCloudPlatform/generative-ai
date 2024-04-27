@@ -12,10 +12,8 @@ from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 from vertexai.preview.language_models import TextGenerationModel
 from vertexai.preview.vision_models import Image, ImageQnAModel
 
-image_qna_model = ImageQnAModel.from_pretrained("imagetext")
-text_model = TextGenerationModel.from_pretrained("text-bison-32k")
 gemini_model = GenerativeModel("gemini-1.0-pro-vision-001")
-
+gemini_model_language = GenerativeModel("gemini-1.0-pro-002")
 
 parameters = config["parameters"]["standard"]
 
@@ -34,7 +32,7 @@ for filename in sorted_files:
         )
 
 
-def generate_caption_gemini(image_path):
+def generate_caption(image_path):
     """Generates a caption for an image using the Gemini model.
 
     Args:
@@ -132,109 +130,6 @@ def generate_caption_gemini(image_path):
     return answer
 
 
-def generate_caption_imageQnA(image_path):
-    """Generates a caption for an image using the ImageQnA model.
-
-    Args:
-                    image_path (str): The path to the image file.
-
-    Returns:
-                    dict: A dictionary containing the generated caption.
-    """
-
-    answer = {}
-
-    # Load the downloaded image
-    user_image = Image.load_from_file(image_path)
-
-    if (
-        str(
-            image_qna_model.ask_question(
-                image=user_image,
-                question=qList[0],
-                number_of_results=1,
-            )[0]
-        )
-        == "no"
-    ):
-        return answer
-
-    items = str(
-        image_qna_model.ask_question(
-            image=user_image,
-            question=qList[1],
-            number_of_results=1,
-        )[0]
-    ).split(",")
-
-    for item in items:
-        res = set()
-        for q in qList2:
-            res.add(
-                str(
-                    image_qna_model.ask_question(
-                        image=user_image,
-                        question=q.replace("x", item),
-                        number_of_results=1,
-                    )[0]
-                )
-            )
-
-        result = " ".join(res)
-
-        answer[item] = [result]
-
-    answer["Sleeves"] = [
-        str(
-            image_qna_model.ask_question(
-                image=user_image,
-                question=qList[2],
-                number_of_results=1,
-            )[0]
-        )
-    ]
-
-    answer["Neckline"] = [
-        str(
-            image_qna_model.ask_question(
-                image=user_image,
-                question=qList[3],
-                number_of_results=1,
-            )[0]
-        )
-    ]
-
-    answer["Jewellery"] = [
-        str(
-            image_qna_model.ask_question(
-                image=user_image,
-                question=qList[4],
-                number_of_results=1,
-            )[0]
-        )
-    ]
-
-    return answer
-
-
-def generate_caption(image_path, model):
-    """Generates a caption for an image using the specified model.
-
-    Args:
-                    image_path (str): The path to the image file.
-                    model (str): The model to use for generating the caption.
-
-    Returns:
-                    dict: A dictionary containing the generated caption.
-    """
-
-    if model == "Gemini":
-        return generate_caption_gemini(image_path)
-
-    elif model == "ImageQnA":
-        return generate_caption_imageQnA(image_path)
-
-
 def get_posts(user, previous, cnt=10, cookies={}, model="Gemini"):
     """Gets a list of posts from an Instagram user.
 
@@ -299,7 +194,7 @@ def get_posts(user, previous, cnt=10, cookies={}, model="Gemini"):
             urllib.request.urlretrieve(postlink, actual_img_path)
 
             try:
-                caption = generate_caption(actual_img_path, "Gemini")
+                caption = generate_caption(actual_img_path)
             except Exception as e:
                 print(e)
             else:
@@ -331,47 +226,20 @@ def summarize_article(article_text: str) -> str:
                     str: The summary.
     """
 
-    response = text_model.predict(
-        f"Provide a brief summary for the following article: {article_text}",
-        **parameters,
+    response = gemini_model_language.generate_content(
+        [f"Provide a brief summary for the following article: {article_text}"],
+        generation_config=GenerationConfig(
+            max_output_tokens=2048,
+            temperature=1,
+            top_p=1,
+        ),
+        safety_settings={
+            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+        },
+        stream=False,
     )
 
     return response.text
-
-
-def create_attributes(article_summary):
-    """Creates a dictionary of attributes from an article summary.
-
-    Args:
-                    article_summary (str): The article summary.
-
-    Returns:
-                    dict: A dictionary of attributes.
-    """
-
-    response = text_model.predict(
-        """Given an article summary, I want to extract all the clothing items listed in the text. The items must be categorized by the type of item (eg. pants, jewellery, dress, etc.). The output must be a json with the keys being the name of the item and value being its description.
-
-input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - Karisma Kapoor looked stunning in a white kurta set while visiting the Taj Mahal. She paired the outfit with matching Kolhapuri sandals, black oversized sunglasses, and dainty Kundan jhumkas. Her makeup was understated yet flawless, with a clean, natural look and a pop of red on her lips. Karisma Kapoor has established herself as a fashion icon, and her love for traditional attire has provided us with a rich source of wardrobe inspiration.
-output: {
-\"kurta\": \"white kurta set\",
-\"footwear\": \"kolhapuri sandals\",
-\"accessories\": \"black oversized sunglasses\",
-\"jewellery\": \"dainty kundan jhumkas\"
-}
-
-input: Given the following news article summary, give a json output where the key is the type of fashion item (eg. jacket, jewellery, pants etc.) and the value is the exact description - """
-        + article_summary
-        + """output:
-""",
-        **parameters,
-    )
-
-    try:
-        output_json = json.loads(response.text)
-    except Exception as e:
-        print(e)
-        print("not perfect json ", response.text)
-        return {}
-
-    return output_json

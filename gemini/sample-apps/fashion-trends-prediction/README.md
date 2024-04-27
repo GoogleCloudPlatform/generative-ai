@@ -40,7 +40,7 @@ Finally, there's a chatbot that has the predicted fashion trends data as context
 
 1. **Data Extraction and Processing** -
     * **From social media** - For each country in list, the latest 20 posts from top 50 influencers and celebrities’ Instagram profiles are scraped using Instagram Graph API. Using VertexAI’s Gemini multimodal, attributes are generated for each image.
-    * **From news sites** - Fashion news articles are scraped from Vogue India site. Using VertexAI text-bison-32k language model, the articles are summarized.
+    * **From news sites** - Fashion news articles are scraped from Vogue India site. Using VertexAI language model, the articles are summarized.
 
     This data consisting of image attributes for the Instagram images and articles are stored.
 
@@ -52,7 +52,7 @@ Finally, there's a chatbot that has the predicted fashion trends data as context
 
 4. **Displaying supporting articles** - For explainability, news articles related to the results are displayed to the user. This is done using hybrid search. An ensemble retriever made of keyword-based BM25 and the all-MiniLM-L6-v2 sentence transformer is used to retrieve relevant articles.
 
-5. **Chatbot** - Vertex AI's chat-bison-32k is given the relevant content from the JSON file as context and used to answer user queries. It is integrated with Imagen so user can generate and edit images in the chat interface itself.
+5. **Chatbot** - Vertex AI's language model is given the relevant content from the JSON file as context and used to answer user queries. It is integrated with Imagen so user can generate and edit images in the chat interface itself.
 
 6. **Deployment** - The UI is designed using Streamlit and the application is deployed using cloud run.
 
@@ -181,11 +181,7 @@ Required JSON format -
         ...
     },
 
-    "articles": [["article_link", "article_summary", {
-        "category1": ["outfit1", "outfit2", "outfit3", ...],
-        "category2": [],
-        ...
-        }],
+    "articles": [["article_link", "article_summary"],
         ...
     ]
 }

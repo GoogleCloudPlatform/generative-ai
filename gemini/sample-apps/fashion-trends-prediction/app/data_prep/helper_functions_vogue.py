@@ -1,7 +1,7 @@
 import time
 
 from bs4 import BeautifulSoup
-from data_processing import create_attributes, summarize_article
+from data_processing import summarize_article
 
 # Get news articles content
 
@@ -54,9 +54,8 @@ def get_articles(url, past_scrape, numPages=2):
                 continue
 
             article_summary = summarize_article(article_text)
-            article_attributes = create_attributes(article_summary)
             time.sleep(1)
-            articles.append((new_url, article_summary, article_attributes))
+            articles.append((new_url, article_summary))
             print("article appended")
 
         if finish:

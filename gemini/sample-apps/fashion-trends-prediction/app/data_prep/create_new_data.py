@@ -28,7 +28,7 @@ def images_scrape(saved):
         image_path = os.path.join("gemini_fewshot_images", image_file)
 
         print(image_path)
-        answer = generateCaption(image_path, "Gemini")
+        answer = generate_caption(image_path)
         answers.append(answer)
 
     saved["finaldata"] = {}

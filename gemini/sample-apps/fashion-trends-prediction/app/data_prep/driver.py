@@ -230,40 +230,6 @@ def create_news_articles_data():
         json.dump(saved, outfile)
 
 
-def create_article_attributes():
-    """Extracts attributes from news articles and saves them in a JSON file."""
-
-    with open(data_path, "r") as f:
-        saved = json.load(f)
-
-    print("creating article attributes")
-    saved["article_attributes"] = {}  # make new everytime
-
-    for article in saved["articles"]:
-        article_link = article[0]
-        article_summary = article[1]
-        article_attr = article[2]
-        for item in article_attr:
-            if (
-                (article_attr[item] == "none")
-                or (article_attr[item] == "None")
-                or isinstance(item, str) is False
-            ):
-                print("invalid \n  ", item, article_attr[item])
-                continue
-            if item in saved["article_attributes"]:
-                saved["article_attributes"][item].append(
-                    [article_attr[item], article_summary, article_link]
-                )
-            else:
-                saved["article_attributes"][item] = [
-                    [article_attr[item], article_summary, article_link]
-                ]
-
-    with open(data_path, "w") as outfile:
-        json.dump(saved, outfile)
-
-
 def get_top_categories(saved):
     """Gets the top categories from the final data file.
 
@@ -308,7 +274,6 @@ def vogue_scrape():
     """Scrapes data from Vogue and saves it in a JSON file."""
 
     create_news_articles_data()
-    # create_article_attributes()
     prepare_data_for_retriever()
 
 
