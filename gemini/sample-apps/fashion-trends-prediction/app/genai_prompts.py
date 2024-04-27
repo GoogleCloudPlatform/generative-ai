@@ -173,3 +173,30 @@ qList2 = [
     "What is the color of x?",
     "What is the material of x?",
 ]
+
+
+articles_prompt = """You are a fashion journalist and want to know whether an article is talking about a given fashion clothing item. Answer this by searching for the presence of the item or a similar item in the text. The first word of the output should be Yes/No.
+
+Examples:
+
+input_text = Is the following article related to White tie dye dress - Tie-dye, known for its vibrant and carefree nature, has evolved through different eras, from the 60s hippie movement to the 90s stoner culture, and recently, the \\\"scumbro\\\" style. Alia Bhatt showcased a tie-dye lounge set, representing the hedonistic and relaxed spirit of the trend. While it may not dominate red carpets as before, tie-dye is making a comeback in subtle ways, such as Bhatt\\\'s outfit, symbolizing fun and carefree vibes.
+
+output_text = Yes, since the article contains the main component of the query item that is tie dye.
+
+#####
+
+input_text = Is the following article related to Off the shoulder knit brown dress - While some Bollywood celebrities are attending Diwali events, Shanaya Kapoor is vacationing in the Maldives. She showcased several stylish outfits during her trip, including a cobalt blue bikini top with a checkered skirt, a ruffled bralette and skirt set, a bustier with a chunky knit skirt, and a crochet dress. Kapoor\\\'s vacation style is reminiscent of the knitwear and crochet trend seen in recent years, popularized by celebrities like Kim Kardashian and Kylie Jenner.
+
+output_text = Yes, since the article mentions knitwear which is the main component of the query item.
+
+#####
+
+input_text = Is the following article related to white cotton jacket - It was a big weekend for Kylie Jenner and Timothée Chalamet. The actor hosted Saturday Night Live last night in New York City, where he was joined by the musical guest Boygenius. And while the star nailed his comedic sketches on-screen—did you catch him as a Troye Sivan sleep demon?—it was the show’s after-party that we’re particularly intrigued by. Stepping out with the rest of the SNL cast, Chalamet was joined by girlfriend Kylie Jenner—and they both embraced polar-opposite date night style for the affair, no less.Photo: Getty ImagesWhile Jenner and Chalamet have kept things coy and have rarely stepped out in public, the couple hit the town together last night, and they couldn’t be dressed more differently. Jenner continued her winning style streak of sleek, all-black looks: She wore an off-the-shoulder mini dress with shiny leggings and black strappy pumps. Chalamet, meanwhile, went a sportier and more colorful route: He sported a purple zip-up jacket with a colour-blocked hoodie and grey jeans.Photo: Getty ImagesTheir juxtaposing fashion vibe is something we’ve seen other A-list couples, like the Biebers, pull off. Who says couples have to match? As they’ve proven with their clashing outfits, individuality rules.This article first appeared on vogue.comTimothée Chalamet and Zendaya illustrate two different ways to pull off a vestKylie Jenner picks up her first fashion designer plaudit with Timothée in towThe pantless trend really is happening—and Kylie Jenner is hopping on the trend.
+
+output_text = No, this article is not talking about white cotton jacket. At the maximum, the article mentions jacket but that is a very generic item and should not be given that much importance.
+
+#####
+
+input_text = Is the following article related to {outfit} - {article} Respond in Yes or No.
+
+output_text ="""
