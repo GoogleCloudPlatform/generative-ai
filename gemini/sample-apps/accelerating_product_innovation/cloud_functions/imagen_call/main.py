@@ -1,7 +1,8 @@
-import os
-import functions_framework
-from dotenv import load_dotenv
 import logging
+import os
+
+from dotenv import load_dotenv
+import functions_framework
 import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
 
@@ -12,8 +13,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-
-def image_generation(prompt:str):
+def image_generation(prompt: str):
     vertexai.init(project=PROJECT_ID, location=LOCATION)
     model = ImageGenerationModel.from_pretrained("imagegeneration@006")
     try:
@@ -22,12 +22,15 @@ def image_generation(prompt:str):
             # Optional parameters
             number_of_images=1,
             language="en",
-            aspect_ratio="1:1"
+            aspect_ratio="1:1",
         )[0].__dict__["_loaded_bytes"]
     except Exception as e:
         logging.exception("An error occurred during image generation: %s", e)
         # Optionally, raise the exception here if you want to propagate it for debugging
-        return "An error occurred. Check server logs for details.",500  # More user-friendly
+        return (
+            "An error occurred. Check server logs for details.",
+            500,
+        )  # More user-friendly
 
 
 @functions_framework.http
