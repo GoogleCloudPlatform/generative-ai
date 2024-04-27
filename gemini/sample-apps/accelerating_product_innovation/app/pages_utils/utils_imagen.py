@@ -26,9 +26,10 @@ LOCATION = os.getenv("LOCATION")
 
 # Set project parameters
 IMAGE_MODEL_NAME = "imagegeneration@006"
+vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 
-def predict_image(
+def predict_edit_image(
     instance_dict: dict,
     parameters: dict,
 ) -> list[str]:
@@ -39,13 +40,8 @@ def predict_image(
         parameters:
             The parameters for the prediction. (dict)
     Returns:
-        A list of strings containing the predictions.
-    Raises:
-        aiplatform.exceptions.NotFoundError: If the endpoint does not exist.
-        aiplatform.exceptions.BadRequestError: If the input is invalid.
-        aiplatform.exceptions.InternalServerError: If an internal error occurred.
+        A list of <vertexai.preview.vision_models.GeneratedImage> object containing the predictions.
     """
-    vertexai.init(project=PROJECT_ID, location=LOCATION)
 
     model = ImageGenerationModel.from_pretrained("imagegeneration@006")
 
@@ -63,9 +59,8 @@ def predict_image(
 def image_generation(
     prompt: str,
     sample_count: int,
-    sample_image_size: int,
     aspect_ratio: str,
-    state_key: str,
+    filename: str,
 ) -> None:
     """Generates an image from a prompt.
 
@@ -74,33 +69,31 @@ def image_generation(
             The prompt to use to generate the image.
         sample_count:
             The number of images to generate.
-        sample_image_size:
-            The size of the generated images.
         aspect_ratio:
             The aspect ratio of the generated images.
-        state_key:
-            The key to use to store the generated images in the session state.
+        filename:
+            The filename to store the image.
 
     Returns:
         None.
     """
-
-    st.session_state[state_key] = predict_image(
-        instance_dict={"prompt": prompt},
-        parameters={
-            "sampleCount": sample_count,
-            "sampleImageSize": sample_image_size,
-            "aspectRatio": aspect_ratio,
-        },
+    model = ImageGenerationModel.from_pretrained("imagegeneration@006")
+    images = model.generate_images(
+        prompt=prompt,
+        # Optional parameters
+        number_of_images=sample_count,
+        language="en",
+        aspect_ratio=aspect_ratio
     )
+    images[0].save(location=f"{filename}.png", include_generation_parameters=False)
+
 
 
 def edit_image_generation(
     prompt: str,
     sample_count: int,
-    bytes_data: bytes,
     state_key: str,
-    mask_bytes_data: bytes = b"",
+    mask_exists: bool
 ) -> bool:
     """Generates an edited image from a prompt and a base image.
 
@@ -109,12 +102,10 @@ def edit_image_generation(
             A string that describes the desired edit to the image.
         sample_count:
             The number of edited images to generate.
-        bytes_data:
-            The image data in bytes.
         state_key:
             The key to store the generated images in the session state.
-        mask_bytes_data:
-            The mask data in bytes.
+        mask_exists:
+            Boolean value indicating if mask has been provided.
 
     Returns:
         Boolean value indicating if editing was completed.
@@ -124,10 +115,10 @@ def edit_image_generation(
         "image": Image.load_from_file("image_to_edit.png"),
     }
 
-    if mask_bytes_data:
+    if mask_exists:
         input_dict["mask"] = Image.load_from_file("mask.png")
 
-    st.session_state[state_key] = predict_image(
+    st.session_state[state_key] = predict_edit_image(
         instance_dict=input_dict,
         parameters={"sampleCount": sample_count},
     )

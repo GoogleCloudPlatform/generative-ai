@@ -53,26 +53,16 @@ def generate_email(prompt: str, title: str) -> None:
         in an aesthetic background. Image should be suitable for advertising.
         Content should be written on packaging in English.""",
         1,
-        256,
         "1:1",
         "email_image",
     )
-
-    # Read Byte data of the image.
-    image_data = io.BytesIO(
-        base64.b64decode(st.session_state.email_image[0]["bytesBase64Encoded"])
-    )
-
-    # Save image to display on pdf file.
-    image_array = cv2.imdecode(np.frombuffer(image_data.read(), dtype=np.uint8), 1)
-    cv2.imwrite("email_image1.png", image_array)
 
     # Generate pdf containing the email content and image.
     create_email_pdf(
         title,
         email_text.replace("**", ""),
         f"email_copy_0_{title}",
-        "email_image1.png",
+        "email_image.png",
     )
     st.session_state.email_files.append(f"email_copy_0_{title}.pdf")
 

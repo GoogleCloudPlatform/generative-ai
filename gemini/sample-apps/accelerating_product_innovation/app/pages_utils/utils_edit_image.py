@@ -193,11 +193,7 @@ def _handle_edit_suggestion(image_index: int) -> None:
         image_index (int): corresponding draft number of image being edited.
     """
     # Get Byte data of the image.
-    image_data = io.BytesIO(
-        base64.b64decode(
-            st.session_state.generated_image[image_index]["bytesBase64Encoded"]
-        )
-    )
+    image_data = io.BytesIO(st.session_state.suggested_images[image_index])
     # Save image.
     with open("suggestion1.png", "wb") as f:
         f.write(image_data.getvalue())
@@ -214,6 +210,17 @@ def _handle_edit_suggestion(image_index: int) -> None:
     st.rerun()
 
 
+def save_image_for_editing(image_bytes: bytes, filename: str) -> None:
+     # Create a BytesIO object from the image bytes
+    image_stream = io.BytesIO(image_bytes)
+
+    # Open the image using Pillow
+    image = Image.open(image_stream)
+
+    # Save the image as a PNG
+    image.save(f"{filename}.png", "PNG")
+
+
 def generate_suggested_images(
     image_prompt: str, image_bytes: io.BytesIO, mask_image: io.BytesIO
 ) -> None:
@@ -226,31 +233,20 @@ def generate_suggested_images(
         image_bytes (BytesIO): Initial image data for inpainting or variation.
         mask_image (BytesIO or None): Mask defining the region to edit (optional).
     """
-     # Create a BytesIO object from the image bytes
-    image_stream = io.BytesIO(image_bytes.getvalue())
+    save_image_for_editing(image_bytes.getvalue(), "image_to_edit")
+    save_image_for_editing(mask_image, "mask")
 
-    # Open the image using Pillow
-    image = Image.open(image_stream)
-
-    # Save the image as a PNG
-    image.save("image_to_edit.png", "PNG")
-
-      # Create a BytesIO object from the image bytes
-    mask_image_stream = io.BytesIO(mask_image)
-
-    # Open the image using Pillow
-    mask_image = Image.open(mask_image_stream)
-
-    # Save the image as a PNG
-    mask_image.save("mask.png", "PNG")
+    # Check if mask exists.
+    mask_exists = False
+    if mask_image:
+        mask_exists = True
     st.session_state.suggested_images = []  # Clear previous suggestions
     with st.spinner("Generating suggested images"):
         edit_image_completed = edit_image_generation(
             image_prompt,
             6,  # Number of suggested images to be generated
-            "image_to_edit",
             "generated_image",  # Session state key for storing results
-            "mask",  # Mask value
+            mask_exists
         )
 
     # Append newly generated suggestions to suggested images state key.
