@@ -20,7 +20,7 @@ Image Generation:
 
 from config import config
 import streamlit as st
-from utilities import *
+from utilities import add_logo
 import utils_standalone_image_gen
 
 add_logo(config["Images"]["logo"])
@@ -47,7 +47,7 @@ IMAGE_TO_EDIT_PROMPT_KEY = f"{PAGE_KEY_PREFIX}_Edit_Prompt_key"
 PRE_POPULATED_PROMPTS = ["white crop top", "blue jeans", "white cargo"]
 
 
-st.image(image=stImg(config["Images"]["imagen"]), width=150)
+st.image(image=config["Images"]["imagen"], width=150)
 
 # Generate image
 st.subheader("Image Generation")

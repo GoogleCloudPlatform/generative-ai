@@ -1,16 +1,19 @@
 import json
 import pickle
+import vertexai
+import vertexai.preview.generative_models as generative_models
 
 from config import config
+from gcs import read_file_from_gcs_link
 from genai_prompts import articles_prompt
+from sentence_transformers import SentenceTransformer
+
+from langchain.vectorstores import VectorStore
 from langchain.docstore.document import Document
 from langchain.retrievers import BM25Retriever, EnsembleRetriever
-from langchain.vectorstores import VectorStore
-from sentence_transformers import SentenceTransformer
-import vertexai
-from vertexai.generative_models import GenerationConfig, GenerativeModel
 from vertexai.language_models import ChatModel, InputOutputTextPair
-import vertexai.preview.generative_models as generative_models
+from vertexai.generative_models import GenerationConfig, GenerativeModel
+
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
@@ -28,24 +31,20 @@ class Articles:
         self.embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
         if mode == 0:
-            with open("data/chunks_local.json", "r") as f:
-                chunks = json.load(f)
+            chunks = read_file_from_gcs_link(config['Data']['chunks_local'])
         else:
-            with open("data/chunks_prod.json", "r") as f:
-                chunks = json.load(f)
+            chunks = read_file_from_gcs_link(config['Data']['chunks_prod'])
 
         chunks = [Document(**chunk) for chunk in chunks]
         bm25_retriever = BM25Retriever.from_documents(chunks)
         bm25_retriever.k = 3
 
         if mode == 0:
-            with open("data/vectorstore_local.pkl", "rb") as f:
-                global vectorstore
-                local_vectorstore: VectorStore = pickle.load(f)
+            global vectorstore
+            local_vectorstore: VectorStore = read_file_from_gcs_link(config['Data']['vectorstore_local'])
         else:
-            with open("data/vectorstore_prod.pkl", "rb") as f:
-                global vectorstore
-                local_vectorstore: VectorStore = pickle.load(f)
+            global vectorstore
+            local_vectorstore: VectorStore = read_file_from_gcs_link(config['Data']['vectorstore_prod'])
 
         faiss_retriever = local_vectorstore.as_retriever(search_kwargs={"k": 3})
 
