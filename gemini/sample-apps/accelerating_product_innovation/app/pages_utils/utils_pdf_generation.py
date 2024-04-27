@@ -20,7 +20,16 @@ class PDFRounded(fpdf.FPDF):
     Initializes basic PDF template for email and content files
     """
 
-    def rounded_rect(self, x: float, y: float, w: float, h: float, r: float, style: str = "", corners: str = "1234"):
+    def rounded_rect(
+        self,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        r: float,
+        style: str = "",
+        corners: str = "1234",
+    ):
         """
         Draws a rectangle with rounded corners.
 
