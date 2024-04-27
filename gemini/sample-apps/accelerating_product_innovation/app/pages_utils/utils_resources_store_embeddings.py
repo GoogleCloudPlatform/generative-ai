@@ -164,13 +164,13 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
             if response.status == 200:
                 response = await response.text()
                 response = json.loads(response)
+                print("RESPONSE")
+                print(response)
                 response = response["embedding_column"]
                 try:
                     pdf_data["embedding"] = response
-                except Exception:
-                    st.write(pdf_data.shape[0])
-                    st.write(len(response))
-                    st.write(response)
+                except Exception as e:
+                   print(e)
             else:
                 print("Request failed:", await response.text())
 
