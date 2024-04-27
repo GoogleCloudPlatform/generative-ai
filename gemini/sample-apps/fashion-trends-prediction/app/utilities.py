@@ -40,21 +40,6 @@ def nav_page(page_name, timeout_secs=3):
     html(nav_script)
 
 
-def get_base64_of_bin_file(png_file):
-    """Converts a binary file to a base64 encoded string.
-
-    Args:
-        png_file (str): The path to the binary file.
-
-    Returns:
-        str: The base64 encoded string of the binary file.
-
-    """
-    with open(png_file, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-
-
 def render_svg(svg_image_path):
     """Renders an svg image
     Args:

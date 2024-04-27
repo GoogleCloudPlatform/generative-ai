@@ -46,6 +46,8 @@ def prepare_data_for_retriever():
     for chunk in all_chunks:
         chunks_list.append(chunk.dict())
 
+    # either create a data directory and run the below code to store the files locally and correspondingly change the code in articles.py to read from local
+    # or store these files in gcs and change the path in config.py of relevant keys of config['Data']
     with open("../data/chunks_final.json", "w") as outfile:
         json.dump(chunks_list, outfile)
 
