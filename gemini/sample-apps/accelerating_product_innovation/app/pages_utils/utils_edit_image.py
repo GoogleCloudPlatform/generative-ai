@@ -175,9 +175,7 @@ def render_suggested_images(
                 ):
                     _handle_edit_suggestion(image_index)
                 # Add download button for current suggestion.
-                image_data = io.BytesIO(
-                    suggested_images[image_index]
-                )
+                image_data = io.BytesIO(suggested_images[image_index])
                 st.download_button(
                     label="Download",
                     data=image_data,
@@ -211,7 +209,7 @@ def _handle_edit_suggestion(image_index: int) -> None:
 
 
 def save_image_for_editing(image_bytes: bytes, filename: str) -> None:
-     # Create a BytesIO object from the image bytes
+    # Create a BytesIO object from the image bytes
     image_stream = io.BytesIO(image_bytes)
 
     # Open the image using Pillow
@@ -246,14 +244,16 @@ def generate_suggested_images(
             image_prompt,
             6,  # Number of suggested images to be generated
             "generated_image",  # Session state key for storing results
-            mask_exists
+            mask_exists,
         )
 
     # Append newly generated suggestions to suggested images state key.
     if edit_image_completed:
         for image_data in st.session_state.generated_image:
             print(image_data.__dict__.keys())
-            st.session_state.suggested_images.append(image_data.__dict__["_loaded_bytes"])
+            st.session_state.suggested_images.append(
+                image_data.__dict__["_loaded_bytes"]
+            )
     else:
         st.session_state.suggested_images = None
     # End image generation.
