@@ -11,8 +11,6 @@ load_dotenv()
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
-PROJECT_ID = os.get
-LOCATION = "us-central1"
 
 
 def image_generation(prompt:str):
