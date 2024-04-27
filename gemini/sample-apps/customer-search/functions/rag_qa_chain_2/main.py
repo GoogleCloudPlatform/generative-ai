@@ -1,23 +1,22 @@
-import os
 import json
-import textwrap
-import vertexai
-import nest_asyncio
-import urllib.request
-import functions_framework
-
+import os
 from os import environ
+import textwrap
+import urllib.request
 
+import functions_framework
 from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
 from langchain.document_loaders import WebBaseLoader
-from vertexai.language_models import TextGenerationModel
+from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_vertexai import (
     VectorSearchVectorStore,
     VertexAI,
     VertexAIEmbeddings,
 )
+import nest_asyncio
+import vertexai
+from vertexai.language_models import TextGenerationModel
 
 project_id = environ.get("PROJECT_ID")
 

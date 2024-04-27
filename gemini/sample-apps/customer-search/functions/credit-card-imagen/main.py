@@ -1,10 +1,9 @@
-import json
 import base64
-import vertexai
-import functions_framework
-
+import json
 from os import environ
 
+import functions_framework
+import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
 
 PROJECT_ID = environ.get("PROJECT_ID")

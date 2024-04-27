@@ -1,8 +1,7 @@
 import datetime
-import functions_framework
-
 from os import environ
 
+import functions_framework
 from google.cloud import bigquery
 
 project_id = environ.get("PROJECT_ID")
