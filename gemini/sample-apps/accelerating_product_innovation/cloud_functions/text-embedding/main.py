@@ -3,15 +3,13 @@ Cloud function to generate embedding of given file.
 """
 
 
+import json
 import os
+from typing import Any
 
 from dotenv import load_dotenv
-
 import functions_framework
-from typing import Any
-import json
 from vertexai.preview.language_models import TextEmbeddingModel
-
 
 load_dotenv()
 
@@ -51,9 +49,9 @@ def generate_embeddings(pdf_data: dict) -> dict:
     Args:
         pdf_data (dict): file data to be processed.
     """
-    pdf_data=json.loads(pdf_data)
-    instances=[]
-    values=[]
+    pdf_data = json.loads(pdf_data)
+    instances = []
+    values = []
 
     batch_size = 10
     iterate = 0
@@ -68,8 +66,7 @@ def generate_embeddings(pdf_data: dict) -> dict:
 
             instances = []
 
-
-    response_json = json.dumps({'embedding_column': values})
+    response_json = json.dumps({"embedding_column": values})
     response = json.loads(response_json)
     return response
 
@@ -80,4 +77,4 @@ def hello_http(request):
     if not request_json or "pdf_data" not in request_json:
         return {"error": "Request body must contain 'pdf_data' field."}, 400
     pdf_data = request_json["pdf_data"]
-    return  generate_embeddings(pdf_data)
+    return generate_embeddings(pdf_data)

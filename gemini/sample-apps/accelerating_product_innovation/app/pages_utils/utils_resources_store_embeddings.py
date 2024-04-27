@@ -170,7 +170,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
                 try:
                     pdf_data["embedding"] = response
                 except Exception as e:
-                   print(e)
+                    print(e)
             else:
                 print("Request failed:", await response.text())
 
