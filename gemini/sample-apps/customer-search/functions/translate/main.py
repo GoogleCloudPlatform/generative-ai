@@ -1,9 +1,10 @@
 import json
+import requests
+import functions_framework
+
 from os import environ
 
-import functions_framework
 from google.cloud import translate
-import requests
 
 # Define the project ID as an environment variable
 project_id = environ.get("PROJECT_ID")

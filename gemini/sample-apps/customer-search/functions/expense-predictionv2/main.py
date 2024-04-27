@@ -1,13 +1,14 @@
 import os
-from os import environ
 import tempfile
-
-import functions_framework
-from google.cloud import bigquery, storage
-import pandas as pd
-import plotly.express as px
-import plotly.io as pio
 import vertexai
+import pandas as pd
+import plotly.io as pio
+import functions_framework
+import plotly.express as px
+
+from os import environ
+
+from google.cloud import bigquery, storage
 from vertexai.language_models import TextGenerationModel
 
 project_id = environ.get("PROJECT_ID")

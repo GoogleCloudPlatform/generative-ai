@@ -1,10 +1,11 @@
-from concurrent.futures import ThreadPoolExecutor
+import vertexai
+import functions_framework
+
 from os import environ
 from typing import Dict
 
-import functions_framework
 from google.cloud import bigquery, storage
-import vertexai
+from concurrent.futures import ThreadPoolExecutor
 from vertexai.language_models import TextGenerationModel
 
 project_id = environ.get("PROJECT_ID")

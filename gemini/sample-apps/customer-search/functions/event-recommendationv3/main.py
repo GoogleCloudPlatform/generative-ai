@@ -1,13 +1,14 @@
 import os
-from os import environ
 import random
 import string
 import tempfile
+import vertexai
+import functions_framework
 
 from PIL import Image
-import functions_framework
+from os import environ
+
 from google.cloud import bigquery, storage
-import vertexai
 from vertexai.language_models import TextGenerationModel
 from vertexai.preview.vision_models import ImageGenerationModel
 
