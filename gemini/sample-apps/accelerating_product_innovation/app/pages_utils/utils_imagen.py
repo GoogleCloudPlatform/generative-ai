@@ -51,7 +51,7 @@ def predict_edit_image(
         # Optional parameters
         number_of_images=parameters["sampleCount"],
         language="en",
-        mask=instance_dict["mask"]
+        mask=instance_dict["mask"],
     )
     return responses
 
@@ -83,17 +83,13 @@ def image_generation(
         # Optional parameters
         number_of_images=sample_count,
         language="en",
-        aspect_ratio=aspect_ratio
+        aspect_ratio=aspect_ratio,
     )
     images[0].save(location=f"{filename}.png", include_generation_parameters=False)
 
 
-
 def edit_image_generation(
-    prompt: str,
-    sample_count: int,
-    state_key: str,
-    mask_exists: bool
+    prompt: str, sample_count: int, state_key: str, mask_exists: bool
 ) -> bool:
     """Generates an edited image from a prompt and a base image.
 
