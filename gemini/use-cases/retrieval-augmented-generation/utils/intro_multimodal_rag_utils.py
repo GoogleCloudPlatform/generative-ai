@@ -3,12 +3,12 @@ import os
 import time
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
+from IPython.display import display
+import PIL
 import fitz
 import numpy as np
 import pandas as pd
-import PIL
 import requests
-from IPython.display import display
 from vertexai.generative_models import (
     GenerationConfig,
     HarmBlockThreshold,
