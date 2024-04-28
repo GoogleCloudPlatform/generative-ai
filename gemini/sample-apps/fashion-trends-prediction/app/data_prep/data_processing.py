@@ -1,13 +1,16 @@
 import base64
 import json
 import os
+import sys
 import urllib.request
 
+import requests
+import vertexai.preview.generative_models as generative_models
+
+sys.path.append("../")
 from config import config
 from genai_prompts import qList, qList2
 from helper_functions_insta import get_id
-import requests
-import vertexai.preview.generative_models as generative_models
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel, Part
 from vertexai.preview.language_models import TextGenerationModel
 from vertexai.preview.vision_models import Image, ImageQnAModel
@@ -18,18 +21,11 @@ gemini_model_language = GenerativeModel("gemini-1.0-pro-002")
 parameters = config["parameters"]["standard"]
 
 
-directory = "gemini_fewshot_images"
-files = os.listdir(directory)
-sorted_files = sorted(files)  # sort by lexicographical order of the filenames
 fewshot_images = []
-for filename in sorted_files:
-    with open(os.path.join(directory, filename), "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read())
-        fewshot_images.append(
-            Part.from_data(
-                data=base64.b64decode(encoded_string), mime_type="image/jpeg"
-            )
-        )
+num_files = len(config["fewshot_images"])
+for i in range(num_files):
+    filename = "image" + str(i + 1)
+    fewshot_images.append(Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"))
 
 
 def generate_caption(image_path):

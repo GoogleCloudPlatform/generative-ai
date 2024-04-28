@@ -4,8 +4,9 @@ import json
 import time
 
 from config import config
+from gcs import read_file_from_gcs_link
 import streamlit as st
-from utilities import add_logo, stImg
+from utilities import add_logo
 from utils_standalone_image_gen import predict_image, render_image_edit_prompt
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel, Part
@@ -15,7 +16,7 @@ add_logo(config["Images"]["logo"])
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
-data_path = config["Data"]["current_data"]
+DATA_PATH = config["Data"]["current_data"]
 
 params = config["parameters"]["fashion_bot"]
 generation_config = GenerationConfig(
@@ -32,13 +33,12 @@ safety_settings = {
 }
 
 
-st.image(image=stImg(config["Images"]["chat"]), width=200)
+st.image(image=config["Images"]["chat"], width=200)
 
 if "JSONdata" not in st.session_state:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
 
-    with open(data_path, "r") as f:
-        st.session_state["JSONdata"] = json.load(f)
+    st.session_state["JSONdata"] = read_file_from_gcs_link(DATA_PATH)
 
 
 country = st.selectbox(

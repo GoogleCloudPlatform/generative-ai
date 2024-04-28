@@ -5,12 +5,15 @@ import json
 
 from articles import Articles
 from config import config
+from gcs import read_file_from_gcs_link
 from genai_prompts import image_prompt, trends_prompt
 from prediction import Prediction
+import requests
 import streamlit as st
 import streamlit.components.v1 as components
 from utilities import add_logo, stImg ,button_html_script ,details_html, exception_html
 from utils_standalone_image_gen import predict_image
+import vertexai
 import vertexai.preview.generative_models as generative_models
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 
@@ -18,7 +21,6 @@ PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
 DATA_PATH = config["Data"]["current_data"]
 
-print("DATA_PATH: ", DATA_PATH)
 
 if "gemini_model" not in st.session_state:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
@@ -28,15 +30,10 @@ if "source" not in st.session_state:
     st.session_state["source"] = "Insta"
 
 if "JSONdata" not in st.session_state:
-    with open(DATA_PATH, "r") as f:
-        st.session_state["JSONdata"] = json.load(f)
-
-    with open(DATA_PATH, "r") as f:
-        st.session_state["JSONdata_for_articles"] = json.load(f)
-
+    st.session_state["JSONdata"] = read_file_from_gcs_link(DATA_PATH)
 
 add_logo(config["Images"]["logo"])
-st.image(image=stImg(config["Images"]["trend"]))
+st.image(image=config["Images"]["trend"])
 st.title("Fashion Trend Prediction")
 
 uploaded_file = st.file_uploader("Choose a file (optional)")
@@ -51,7 +48,7 @@ if uploaded_file is not None and st.session_state["source"] != uploaded_file.nam
     st.session_state["predictionModel"] = Prediction(st.session_state["JSONdata"])
 
     st.session_state["articleModel"] = Articles(
-        st.session_state["JSONdata_for_articles"]["articles"]
+        st.session_state["JSONdata"]["articles"]
     )
 
 
@@ -80,7 +77,7 @@ prediction_model = st.session_state["predictionModel"]
 
 if "articleModel" not in st.session_state:
     st.session_state["articleModel"] = Articles(
-        st.session_state["JSONdata_for_articles"]["articles"]
+        st.session_state["JSONdata"]["articles"]
     )
 articles = st.session_state["articleModel"]
 

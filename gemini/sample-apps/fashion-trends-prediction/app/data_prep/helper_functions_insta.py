@@ -6,8 +6,6 @@ from config import config
 import requests
 
 # Get the entire list of country names
-
-
 def get_countries():
     URL = "https://hypeauditor.com/top-instagram/"
     response = requests.get(URL)

@@ -50,7 +50,7 @@ Finally, there's a chatbot that has the predicted fashion trends data as context
 
 3. **Image Generation** - For the returned outfit names, images are generated using VertexAI Imagen.
 
-4. **Displaying supporting articles** - For explainability, news articles related to the results are displayed to the user. This is done using hybrid search. An ensemble retriever made of keyword-based BM25 and the all-MiniLM-L6-v2 sentence transformer is used to retrieve relevant articles.
+4. **Displaying supporting articles** - For explainability, news articles related to the results are displayed to the user. This is done using hybrid search. An ensemble retriever made of keyword-based BM25 and sentence transformer is used to retrieve relevant articles.
 
 5. **Chatbot** - Vertex AI's language model is given the relevant content from the JSON file as context and used to answer user queries. It is integrated with Imagen so user can generate and edit images in the chat interface itself.
 

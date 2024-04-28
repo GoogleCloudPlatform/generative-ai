@@ -1,27 +1,7 @@
 import base64
-import urllib.request
 
-from PIL import Image as ImagePIL
 import streamlit as st
 from streamlit.components.v1 import html
-
-
-def stImg(file):
-    """Converts an image file to a base64 encoded string.
-
-    Args:
-        file (str): The path to the image file.
-
-    Returns:
-        str: The base64 encoded string of the image.
-
-    """
-    with open(file, "rb") as fp:
-        contents = fp.read()
-        img = base64.b64encode(contents).decode("utf-8")
-        img = "data:image/png;base64," + img
-
-    return img
 
 
 def nav_page(page_name, timeout_secs=3):
@@ -74,36 +54,26 @@ def button_html_script(widget_label , btn_bg_color1 , btn_bg_color2):
     """
 
 
-def get_base64_of_bin_file(png_file):
-    """Converts a binary file to a base64 encoded string.
-
+def render_svg(svg_image_path):
+    """Renders an svg image
     Args:
-        png_file (str): The path to the binary file.
-
-    Returns:
-        str: The base64 encoded string of the binary file.
+        svg_image_path (str): The SVG string path to render.
 
     """
-    with open(png_file, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
+    """Renders the svg string at given path."""
 
-
-def render_svg(svg):
-    """Renders an SVG string.
-
-    Args:
-        svg (str): The SVG string to render.
-
-    """
-    """Renders the given svg string."""
-    b64 = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
-    html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
-    st.write(html, unsafe_allow_html=True)
+    st.markdown(
+        f"""
+    <div style="text-align: center;">
+        <img src="{svg_image_path}" alt="Logo">
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
 
 
 def build_markup_for_logo(
-    png_file,
+    png_file_path,
     background_position="50% 10%",
     margin_top="5%",
     image_width="80%",
@@ -112,7 +82,7 @@ def build_markup_for_logo(
     """Builds the HTML markup for a logo.
 
     Args:
-        png_file (str): The path to the PNG file of the logo.
+        png_file_path (str): The source path to the PNG file of the logo.
         background_position (str, optional): The background position of the logo. Defaults to "50% 10%".
         margin_top (str, optional): The margin top of the logo. Defaults to "5%".
         image_width (str, optional): The width of the logo. Defaults to "80%".
@@ -122,11 +92,10 @@ def build_markup_for_logo(
         str: The HTML markup for the logo.
 
     """
-    binary_string = get_base64_of_bin_file(png_file)
     return """
             <style>
                 [data-testid="stSidebarNav"] {
-                    background-image: url("data:image/png;base64,%s");
+                    background-image: url("%s");
                     background-repeat: no-repeat;
                     background-position: %s;
                     margin-top: %s;
@@ -134,7 +103,7 @@ def build_markup_for_logo(
                 }
             </style>
             """ % (
-        binary_string,
+        png_file_path,
         background_position,
         margin_top,
         image_width,
@@ -142,14 +111,14 @@ def build_markup_for_logo(
     )
 
 
-def add_logo(png_file):
+def add_logo(png_file_path):
     """Adds a logo to the sidebar.
 
     Args:
-        png_file (str): The path to the PNG file of the logo.
+        png_file_path (str): The source path to the PNG file of the logo.
 
     """
-    logo_markup = build_markup_for_logo(png_file)
+    logo_markup = build_markup_for_logo(png_file_path)
     st.markdown(
         logo_markup,
         unsafe_allow_html=True,

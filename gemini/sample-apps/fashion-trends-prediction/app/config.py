@@ -10,6 +10,7 @@ Config = TypedDict(
         "password": str,
         "Images": dict,
         "Data": dict,
+        "fewshot_images": dict,
         "countryList": list,
         "links": dict,
         "postid": int,
@@ -46,7 +47,6 @@ config: Config = {
     "password": "<YOUR_INSTAGRAM_PASSWORD>",
     "Images": {
         "logo": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/logo.png",
-        "home": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/home.png",
         "trend": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/trend-page-img.avif",
         "chat": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/chat.png",
         "imagen": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/canvas.png",
@@ -56,6 +56,14 @@ config: Config = {
     },
     "Data": {
         "current_data": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data/instagram_data.json",
+        "chunks_local": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data/chunks_local.json",
+        "chunks_prod": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data/chunks_prod.json",
+        "vectorstore_local": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data/vectorstore_local.pkl",
+        "vectorstore_prod": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data/vectorstore_prod.pkl",
+    },
+    "fewshot_images": {
+        "image1": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data_prep/gemini_fewshot_images/image_1.jpg",
+        "image2": "gs://github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/data_prep/gemini_fewshot_images/image_2.jpg",
     },
     "countryList": [
         "All countries",
