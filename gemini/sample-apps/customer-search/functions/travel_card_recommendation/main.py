@@ -104,7 +104,9 @@ def hello_http(request):
             final_response += response.tex
 
         res = {
-            "fulfillment_response": {"messages": [{"text": {"text": [final_response.text]}}]},
+            "fulfillment_response": {
+                "messages": [{"text": {"text": [final_response.text]}}]
+            },
             "target_page": "projects/{project_id}/locations/asia-south1/agents/118233dd-f023-4dad-b302-3906a7365ccc/flows/00000000-0000-0000-0000-000000000000/pages/06e52d7c-536a-4cbf-baba-4fe7d686e472",
         }
         print(res)
@@ -369,7 +371,7 @@ def hello_http(request):
     }
     model = GenerativeModel("gemini-1.0-pro-002")
     response = model.generate_content(
-    f"""
+        f"""
         You are a chatbot for a bank application you have been given the Credit Card as {credit_card}.
         You have to recommend the given credit card to the user and explain the benefits of the credit card.
         Write in a professional and business-neutral tone.

@@ -136,7 +136,7 @@ def hello_http(
     model = GenerativeModel("gemini-1.0-pro-002")
     # Generate the model response
     response = model.generate_content(
-    """
+        """
         You are a chatbot for a bank application.
         Tell the user that thier response has been recorded and they will recieve the credit card in next few days.
         Thank the user for enrolling with the bank.
@@ -147,9 +147,9 @@ def hello_http(
         The message should be in a conversation-like manner.
         The message should be in second person's perespective tone.
     """,
-      generation_config=generation_config,
-      safety_settings=safety_settings,
-      stream=True,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
     final_response = ""
@@ -157,7 +157,11 @@ def hello_http(
         final_response += response.text
 
     # Set the response message
-    res = {"fulfillment_response": {"messages": [{"text": {"text": [final_response.text]}}]}}
+    res = {
+        "fulfillment_response": {
+            "messages": [{"text": {"text": [final_response.text]}}]
+        }
+    }
 
     print(res)
     # Return the response
