@@ -9,7 +9,7 @@ from genai_prompts import image_prompt, trends_prompt
 from prediction import Prediction
 import streamlit as st
 import streamlit.components.v1 as components
-from utilities import add_logo, stImg
+from utilities import add_logo, stImg ,button_html_script ,details_html, exception_html
 from utils_standalone_image_gen import predict_image
 import vertexai.preview.generative_models as generative_models
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
@@ -96,18 +96,10 @@ def change_button_colour(widget_label, prsd_status):
         prsd_status (bool): True if the button is pressed, False otherwise.
     """
     btn_bg_colour = pressed_colour if prsd_status is True else unpressed_colour
-    htmlstr = f"""
-        <script>
-            var elements = window.parent.document.querySelectorAll('button');
-            for (var i = 0; i < elements.length; ++i) {{
-                if (elements[i].innerText == '{widget_label}') {{
-                    elements[i].style.color = '{btn_bg_colour[0]}';  // Set text color
-                    elements[i].style.borderColor = '{btn_bg_colour[1]}';  // Change border color
-                    elements[i].style.display = 'inline-block'; // Or 'block' if that's your original layout
-                }}
-            }}
-        </script>
-        """
+    htmlstr = button_html_script(widget_label=widget_label ,
+                                btn_bg_color1=btn_bg_colour[0] ,
+                                btn_bg_color2=btn_bg_colour[1])
+
     components.html(f"{htmlstr}", height=0, width=0)
 
 
@@ -275,38 +267,12 @@ if submit or key in st.session_state:
                             )
 
                         else:
-                            st.markdown(
-                                """
-                                    <style>
-                                    .box-container {
-                                        border: 1px solid gray;
-                                        padding: 120px;
-                                        border-radius: 5px;
-                                        background-color: #f5f5f5;
-                                    }
-                                    </style>
-                                    <div class="box-container">
-                                        Image generation failed due to responsible AI restrictions.
-                                    </div>
-                                    """,
+                            st.markdown(exception_html,
                                 unsafe_allow_html=True,
                             )
 
                     except Exception as error:
-                        st.markdown(
-                            """
-                                    <style>
-                                    .box-container {
-                                        border: 1px solid gray;
-                                        padding: 120px;
-                                        border-radius: 5px;
-                                        background-color: #f5f5f5;
-                                    }
-                                    </style>
-                                    <div class="box-container">
-                                        Image generation failed due to responsible AI restrictions.
-                                    </div>
-                                    """,
+                        st.markdown(exception_html,
                             unsafe_allow_html=True,
                         )
                         print("error in generating imgs: ", error)
@@ -363,19 +329,6 @@ if submit or key in st.session_state:
             )
             print("values_str: ", values_str)
             if index != len(response) - 1:
-                details_content += f"""
-                                    <style>
-                                    .box-container {{
-                                        border: 1px solid gray;
-                                        padding: 10px;
-                                        border-radius: 5px;
-                                        background-color: #f5f5f5;
-                                        margin: 15px;
-                                    }}
-                                    </style>
-                                    <div class="box-container">
-                                        <summary style='list-style: none;'><span style='color: #ff4c4b; font-size: 17px;'>{key}:<br> </span></summary><div><span style='font-size: 16px;'>{values_str}<br></span></div>
-                                    </div>
-                                    """
+                details_content += details_html(key=key , values_str=values_str)
 
         st.markdown(details_content, unsafe_allow_html=True)

@@ -59,6 +59,20 @@ def nav_page(page_name, timeout_secs=3):
     )
     html(nav_script)
 
+def button_html_script(widget_label , btn_bg_color1 , btn_bg_color2):
+    return f"""
+        <script>
+            var elements = window.parent.document.querySelectorAll('button');
+            for (var i = 0; i < elements.length; ++i) {{
+                if (elements[i].innerText == '{widget_label}') {{
+                    elements[i].style.color = '{btn_bg_color1}';  // Set text color
+                    elements[i].style.borderColor = '{btn_bg_color2}';  // Change border color
+                    elements[i].style.display = 'inline-block'; // Or 'block' if that's your original layout
+                }}
+            }}
+        </script>
+    """
+
 
 def get_base64_of_bin_file(png_file):
     """Converts a binary file to a base64 encoded string.
@@ -140,3 +154,33 @@ def add_logo(png_file):
         logo_markup,
         unsafe_allow_html=True,
     )
+
+def details_html(key , values_str):
+    return f"""
+            <style>
+            .box-container {{
+                border: 1px solid gray;
+                padding: 10px;
+                border-radius: 5px;
+                background-color: #f5f5f5;
+                margin: 15px;
+            }}
+            </style>
+            <div class="box-container">
+                <summary style='list-style: none;'><span style='color: #ff4c4b; font-size: 17px;'>{key}:<br> </span></summary><div><span style='font-size: 16px;'>{values_str}<br></span></div>
+            </div>
+            """
+
+exception_html = """
+                    <style>
+                    .box-container {
+                        border: 1px solid gray;
+                        padding: 120px;
+                        border-radius: 5px;
+                        background-color: #f5f5f5;
+                    }
+                    </style>
+                    <div class="box-container">
+                        Image generation failed due to responsible AI restrictions.
+                    </div>
+                """
