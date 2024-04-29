@@ -149,7 +149,11 @@ def get_credit_card(
         final_response += response.text
 
     # Set the response message
-    res = {"fulfillment_response": {"messages": [{"text": {"text": [final_response.text]}}]}}
+    res = {
+        "fulfillment_response": {
+            "messages": [{"text": {"text": [final_response.text]}}]
+        }
+    }
 
     # Return the response
     return res
