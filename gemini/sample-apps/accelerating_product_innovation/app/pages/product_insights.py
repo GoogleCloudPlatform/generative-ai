@@ -14,9 +14,9 @@ It provides the following functionality:
 * Follow-up Questions: Suggests follow-up questions based on previous queries.
 """
 
-import streamlit as st
 from app.pages_utils import utils, utils_insights
 from app.pages_utils.utils_config import PAGES_CFG
+import streamlit as st
 
 # Get page configuration from config file
 page_cfg = PAGES_CFG["2_Marketing_Insights"]
