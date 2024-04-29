@@ -5,7 +5,8 @@ from typing import Dict
 import functions_framework
 from google.cloud import bigquery, storage
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 client: bigquery.Client = bigquery.Client()
 
@@ -187,9 +188,7 @@ def account_health_summary(request):
         res=res,
     )
     last_month_expense = get_financial_details(
-        query_str="query_last_month_expense",
-        value_str="last_month_expense",
-        res=res,
+        query_str="query_last_month_expense", value_str="last_month_expense", res=res
     )
     user_accounts = []
 
@@ -270,29 +269,33 @@ def account_health_summary(request):
         account_status = "Concerning"
 
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
-    response = model.predict(
-        """You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
-    You are provided with name, total income, total expenditure, total assest ammount, total debt amount, total investment amount, high risk investments for the user in the following lines.
-    Name = {0}
-    Total Income = ₹{1}
-    Total Expenditure = ₹{2}
-    Total Asset Amount = ₹{3}
-    Total Debt Amount = ₹{4}
-    Total Investment = ₹{5}
-    High Risk Investment = ₹{6}
-    Average Monthly Balance = ₹{7}
-    Account Status = {8}
-    Scheme_Name = {9}
-    One_Month_Return = {10}
-    TTM_Return = {11}
-
+    safety_settings = {
+    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = model = GenerativeModel("gemini-1.0-pro-002")
+    responses = model.generate_content(
+      f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
+    You are provided with name, total income, total expenditure, total asset amount, total debt amount, total investment amount, high risk investments for the user in the following lines.
+    {first_name},
+    {total_income},
+    {total_expenditure},
+    {asset_amount},
+    {debt_amount},
+    {total_investment},
+    {total_high_risk_investment},
+    {avg_monthly_balance},
+    {account_status},
+    {scheme_name},
+    {one_month_return},
+    {ttm_return},
 
     Write in a professional and business-neutral tone.
     The summary should be in a conversation-like manner based on the Account Status.
@@ -312,25 +315,20 @@ def account_health_summary(request):
     One_Month_Return and TTM_Return store the amounts in Indian currency, i.e., ₹.
     If Total Investment is greater than 0: the following details must be mentioned in a uniformly formatted table:
     For each element in Scheme_Name: mention the respective one month from One_Month_Return in ₹ and trailing twelve month returns from TTM_Return in ₹ in the table.
-    """.format(
-            first_name,
-            total_income,
-            total_expenditure,
-            asset_amount,
-            debt_amount,
-            total_investment,
-            total_high_risk_investment,
-            avg_monthly_balance,
-            account_status,
-            scheme_name,
-            one_month_return,
-            ttm_return,
-        ),
-        **parameters,
+    """,
+      generation_config=generation_config,
+      safety_settings=safety_settings,
+      stream=True,
     )
 
+    final_response = ""
+    for response in responses:
+        final_response += response.text 
+
+    print(f"Response from Model: {final_response}")
+
     res = {
-        "fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]},
+        "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
         "sessionInfo": {
             "parameters": {
                 "account_status": account_status,

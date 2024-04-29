@@ -7,7 +7,8 @@ import re
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
@@ -141,37 +142,42 @@ def create_fixed_deposit(request):
     interest_rate = get_interest_rate(is_sr_citizen, number_of_days)
 
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
+    safety_settings = {
+    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = model = GenerativeModel("gemini-1.0-pro-002")
 
-    response = model.predict(
-        """Generate a confirmation message on creating a fd.
-    The user name is {2}
-    The amount is {0}
-    The tenure is {1}
-    The interest rate is {3} .
+    responses = model.generate_content(
+        f"""Generate a confirmation message on creating a fd.
+    The user name is {user_name}
+    The amount is {fd_amount}
+    The tenure is {fd_tenure}
+    The interest rate is {interest_rate} .
     The order should be amount then tenure then interest rate and these things should be in bullet points.
     The bank name is Cymbal Bank.
     The amount should be in the format ₹1,20,312.15 instead of 120312.15
     Do not show maturity date and maturity amount.
     The output should be within 40 words. Use emojis.
-    """.format(
-            fd_amount, fd_tenure, user_name, interest_rate
-        ),
-        **parameters,
+    """,
+      generation_config=generation_config,
+      safety_settings=safety_settings,
+      stream=True,
     )
 
     body = model.predict(
         """Generate a confirmation email on creating a fd.
-    The user name is {2}
-    The amount is {0}
-    The tenure is {1}
-    The interest rate is {3} .
+    The user name is {user_name}
+    The amount is {fd_amount}
+    The tenure is {fd_tenure}
+    The interest rate is {interest_rate} .
     The order should be amount then tenure then interest rate and these things should be in bullet points.
     The bank name is Cymbal Bank.
     The amount should be in the format ₹1,20,312.15 instead of 120312.15
@@ -197,16 +203,20 @@ def create_fixed_deposit(request):
     Sincerely,
     Cymbal Bank
 
-    """.format(
-            fd_amount, fd_tenure, user_name, interest_rate
-        ),
-        **parameters,
+    """,
+      generation_config=generation_config,
+      safety_settings=safety_settings,
+      stream=True,
     )
 
     subject = "Fixed Deposit Confirmation - Cymbal Bank"
 
+    final_response = ""
+    for response in responses:
+        final_response += response.text
+
     res = {
-        "fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]},
+        "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
         "sessionInfo": {
             "parameters": {
                 "fd_amount": fd_amount,

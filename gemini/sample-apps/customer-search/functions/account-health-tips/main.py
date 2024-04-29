@@ -3,7 +3,8 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
@@ -86,21 +87,25 @@ def account_health_tips(request):
             last_month_expense = int(row["last_month_expense"])
 
     transaction_list = transaction_list[1:]
-
+    
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 1024,
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison@002")
-
-    response = model.predict(
-        """You are a bank chatbot.
-    Tell the user whether the Last Month Expense = ₹{0} is less than or greater than the Average monthly expense = ₹{1}.
+    safety_settings = {
+    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+}
+    model = model = GenerativeModel("gemini-1.0-pro-002")
+    responses = model.generate_content(
+      f"""You are a bank chatbot.
+    Tell the user whether the Last Month Expense = ₹{lm_amount} is less than or greater than the Average monthly expense = ₹{average_monthly_expense}.
     You have been give list of categories and amount spend.
-    Transaction List  = {2}.
+    Transaction List  = {transaction_list_str}.
     Depending on the data get some insights on how the spending and if any what to do for better account health, explain exaclty where is is not good and why.
     Write in a professional and business-neutral tone in very brief in about 60 words in a very readable form.
     do not say that largest expense category is housing as housing is a necessity.
@@ -109,14 +114,18 @@ def account_health_tips(request):
     The summary is to be read in a chat response.
     The amount should be comma seprated in indian rupee format and upto 2 decimal places. Convert amount to correct format for example ₹ 100235 to ₹ 1,00,235.00.
     For example the output should look like : The last month's expense of ₹24,07,764.00 is greater than the average monthly expense of ₹13,09,025.00. The largest expense category is xyz, followed by abc. You may want to consider reducing your spending in these areas to improve your account health.
-    """.format(
-            lm_amount, average_monthly_expense, transaction_list_str
-        ),
-        **parameters,
+    """,
+      generation_config=generation_config,
+      safety_settings=safety_settings,
+      stream=True,
     )
 
+    final_response = ""
+    for response in responses:
+        final_response += response.text 
+
     res = {
-        "fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]},
+        "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
         "sessionInfo": {"parameters": {"vehicle_type": "Bike"}},
     }
     return res
