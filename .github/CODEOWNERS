@@ -42,8 +42,10 @@
 /generative-ai/vision/use-cases                             @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/getting-started                       @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb        @saeedaghabozorgi @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/genwealth/                @paulramsey @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/analyze-poster-images-in-bigquery/poster_image_analysis.ipynb     @aliciawilliams @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/RAG_Based_on_Sensitive_Data_Protection_using_Faker.ipynb @ainaomotayo @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_langchain_bigquery_vector_search.ipynb @ashleyxuu @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/data-generation/synthetic_data_generation_using_gemini.ipynb    @vagrantism @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/prompts/examples/chain_of_thought_react.ipynb     @ChrisHanna @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/tuning/supervised_finetuning_using_gemini.ipynb   @dmoonat @GoogleCloudPlatform/generative-ai-devrel
