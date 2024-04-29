@@ -20,8 +20,8 @@ import docx
 import numpy as np
 import pandas as pd
 import streamlit as st
+from app.pages_utils.embedding_model import embedding_model_with_backoff
 from dotenv import load_dotenv
-from embedding_model import embedding_model_with_backoff
 from google.cloud import storage
 from PyPDF2 import PdfReader
 

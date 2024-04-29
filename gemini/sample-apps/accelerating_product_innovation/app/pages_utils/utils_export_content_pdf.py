@@ -6,8 +6,8 @@ layouts and formatting.
 import os
 
 import streamlit as st
-from utils_pdf_generation import PDFRounded as FPDF
-from utils_pdf_generation import add_formatted_page, check_add_page
+from app.pages_utils.utils_pdf_generation import PDFRounded as FPDF
+from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
 
 
 def create_pdf_layout(

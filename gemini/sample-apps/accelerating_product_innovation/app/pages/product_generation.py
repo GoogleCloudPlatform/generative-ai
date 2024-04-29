@@ -16,7 +16,8 @@ with a focus on guiding users through product generation. This module:
 import asyncio
 import logging
 
-import app.pages_utils.utils as utils
+import streamlit as st
+from app.pages_utils import utils
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_downloads import download_content, download_file
 from app.pages_utils.utils_draft_generation import ProductDrafts
@@ -30,7 +31,6 @@ from app.pages_utils.utils_product_gen import (
     render_content,
     update_generation_state,
 )
-import streamlit as st
 
 
 @st.cache_data
