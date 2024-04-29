@@ -15,15 +15,15 @@ import json
 import logging
 import os
 
+from PyPDF2 import PdfReader
 import aiohttp
 import docx
-import numpy as np
-import pandas as pd
-import streamlit as st
 from dotenv import load_dotenv
 from embedding_model import embedding_model_with_backoff
 from google.cloud import storage
-from PyPDF2 import PdfReader
+import numpy as np
+import pandas as pd
+import streamlit as st
 
 load_dotenv()
 

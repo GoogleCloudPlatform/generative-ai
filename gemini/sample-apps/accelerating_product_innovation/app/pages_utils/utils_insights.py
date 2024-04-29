@@ -11,14 +11,14 @@ import json
 import os
 import re
 
-import numpy as np
-import pandas as pd
-import streamlit as st
-import utils_resources_store_embeddings
 from dotenv import load_dotenv
 from embedding_model import embedding_model_with_backoff
 from google.cloud import storage
+import numpy as np
+import pandas as pd
+import streamlit as st
 from utils_get_llm_response import generate_gemini
+import utils_resources_store_embeddings
 
 load_dotenv()
 

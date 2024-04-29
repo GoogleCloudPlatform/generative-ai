@@ -22,8 +22,8 @@ import io
 import logging
 
 import PIL
-import streamlit as st
 from PIL import Image
+import streamlit as st
 from utils_imagen import edit_image_generation
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)

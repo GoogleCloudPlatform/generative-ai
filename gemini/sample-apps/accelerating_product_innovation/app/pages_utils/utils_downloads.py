@@ -9,9 +9,9 @@ import logging
 import os
 import zipfile
 
+from dotenv import load_dotenv
 import streamlit as st
 import streamlit.components.v1 as components
-from dotenv import load_dotenv
 from utils_export_content_pdf import create_content_pdf, create_email_pdf
 from utils_get_llm_response import generate_gemini
 from utils_imagen import image_generation
