@@ -201,7 +201,6 @@ def high_risk_mutual_funds(request):
     url = "https://storage.cloud.google.com/public_bucket_fintech_app/Market%20Summary.pdf"
     print(url)
 
-    res = {"fulfillment_response": {
-        "messages": [{"text": {"text": [response.text]}}]}}
+    res = {"fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]}}
     print(res)
     return res
