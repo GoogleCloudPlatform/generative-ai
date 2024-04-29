@@ -22,9 +22,9 @@ import io
 import logging
 
 import PIL
-import streamlit as st
-from app.pages_utils.utils_imagen import edit_image_generation
 from PIL import Image
+from app.pages_utils.utils_imagen import edit_image_generation
+import streamlit as st
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
