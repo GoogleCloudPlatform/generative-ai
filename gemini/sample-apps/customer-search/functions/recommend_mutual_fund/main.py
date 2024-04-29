@@ -77,9 +77,9 @@ def mutual_fund_recommendation(request):
         For each mutual fund in the top 3 list: mention the respective one month from six_month return in ₹, one_year return in ₹, three_year in ₹, NAV.
         "
     """,
-      generation_config=generation_config,
-      safety_settings=safety_settings,
-      stream=True,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
     final_response = ""
