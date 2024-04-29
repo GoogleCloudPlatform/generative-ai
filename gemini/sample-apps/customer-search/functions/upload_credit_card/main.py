@@ -128,7 +128,7 @@ def get_credit_card(
     model = GenerativeModel("gemini-1.0-pro-002")
     # Generate the model response
     response = model.generate_content(
-    """
+        """
         You are a chatbot for a bank application.
         Tell the user that thier response has been recorded and they will recieve the credit card in next few days.
         Thank the user for enrolling with the bank.
