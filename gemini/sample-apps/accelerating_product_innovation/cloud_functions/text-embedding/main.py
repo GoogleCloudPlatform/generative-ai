@@ -2,13 +2,12 @@
 Cloud function to generate embedding of given file.
 """
 
-
 import json
 import os
 from typing import Any
 
-from dotenv import load_dotenv
 import functions_framework
+from dotenv import load_dotenv
 from vertexai.preview.language_models import TextEmbeddingModel
 
 load_dotenv()

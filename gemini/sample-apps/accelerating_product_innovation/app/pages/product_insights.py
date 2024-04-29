@@ -15,9 +15,9 @@ It provides the following functionality:
 """
 
 import app.pages_utils.utils as utils
-from app.pages_utils.utils_config import PAGES_CFG
 import app.pages_utils.utils_insights as utils_insights
 import streamlit as st
+from app.pages_utils.utils_config import PAGES_CFG
 
 # Get page configuration from config file
 page_cfg = PAGES_CFG["2_Marketing_Insights"]

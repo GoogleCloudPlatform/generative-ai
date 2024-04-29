@@ -3,9 +3,9 @@ Defines functions for generating text embeddings using a Vertex AI TextEmbedding
 """
 
 import backoff
-from google.api_core.exceptions import ResourceExhausted
 import numpy as np
 import streamlit as st
+from google.api_core.exceptions import ResourceExhausted
 from vertexai.preview.language_models import TextEmbeddingModel
 
 

@@ -1,9 +1,9 @@
 import logging
 import os
 
-from dotenv import load_dotenv
 import functions_framework
 import vertexai
+from dotenv import load_dotenv
 from vertexai.preview.vision_models import ImageGenerationModel
 
 load_dotenv()

@@ -6,7 +6,6 @@ Utility module to:
  - Render the image generation and editing UI
 """
 
-import base64
 import json
 import logging
 import os
