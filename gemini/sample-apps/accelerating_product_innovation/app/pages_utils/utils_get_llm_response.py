@@ -16,10 +16,10 @@ import logging
 import os
 
 import aiohttp
-from dotenv import load_dotenv
 import streamlit as st
 import vertexai
 import vertexai.generative_models as generative_models
+from dotenv import load_dotenv
 from vertexai.generative_models import GenerativeModel
 
 load_dotenv()
