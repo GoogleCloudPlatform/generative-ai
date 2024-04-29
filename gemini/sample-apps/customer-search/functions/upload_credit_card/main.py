@@ -139,9 +139,9 @@ def get_credit_card(
         The message should be in a conversation-like manner.
         The message should be in second person's perespective tone.
     """,
-      generation_config=generation_config,
-      safety_settings=safety_settings,
-      stream=True,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
     final_response = ""
