@@ -14,7 +14,7 @@ It provides the following features:
 
 import logging
 
-from PIL import Image
+import streamlit as st
 from app.pages_utils import utils
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_edit_image import (
@@ -26,7 +26,7 @@ from app.pages_utils.utils_edit_image import (
     save_draft_image,
 )
 from app.pages_utils.utils_editor_ui import ImageEditor
-import streamlit as st
+from PIL import Image
 
 # Get the configuration for the edit page
 page_cfg = PAGES_CFG["Editor"]
@@ -88,7 +88,4 @@ if st.session_state.start_editing is None or st.session_state.start_editing is T
 
     # If the image generation is complete, render suggestion on ui
     if st.session_state.suggested_images is not None:
-        render_suggested_images(
-            st.session_state.suggested_images,
-            st.session_state.generated_image,
-        )
+        render_suggested_images(st.session_state.suggested_images)

@@ -22,9 +22,9 @@ import io
 import logging
 
 import PIL
-from PIL import Image
-from app.pages_utils.utils_imagen import edit_image_generation
 import streamlit as st
+from app.pages_utils.utils_imagen import edit_image_generation
+from PIL import Image
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
@@ -140,16 +140,12 @@ def save_draft_image(
     st.switch_page("pages/product_generation.py")
 
 
-def render_suggested_images(
-    suggested_images: list[str], generated_images: list[dict]
-) -> None:
+def render_suggested_images(suggested_images: list[str]) -> None:
     """
     Renders suggested images in a grid layout with "Edit" and "Download" buttons.
 
     Args:
         suggested_images: A list of image paths or data to display as suggestions.
-        generated_images: A list of dictionaries containing base64-encoded image data
-                          with keys like 'bytesBase64Encoded'
     """
 
     # Set number of images to be displayed per row.
@@ -207,6 +203,13 @@ def _handle_edit_suggestion(image_index: int) -> None:
 
 
 def save_image_for_editing(image_bytes: bytes, filename: str) -> None:
+    """
+    Saves image for image editing by Imagen
+
+    Args:
+        image_bytes (bytes): Image bytes for the image to saved.
+        filename (str): Name of the saved file.
+    """
     # Create a BytesIO object from the image bytes
     image_stream = io.BytesIO(image_bytes)
 
