@@ -14,8 +14,8 @@ It provides the following features:
 
 import logging
 
+from PIL import Image
 import app.pages_utils.utils as utils
-import streamlit as st
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_edit_image import (
     generate_suggested_images,
@@ -26,7 +26,7 @@ from app.pages_utils.utils_edit_image import (
     save_draft_image,
 )
 from app.pages_utils.utils_editor_ui import ImageEditor
-from PIL import Image
+import streamlit as st
 
 # Get the configuration for the edit page
 page_cfg = PAGES_CFG["Editor"]

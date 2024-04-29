@@ -6,8 +6,8 @@ import json
 import os
 from typing import Any
 
-import functions_framework
 from dotenv import load_dotenv
+import functions_framework
 from vertexai.preview.language_models import TextEmbeddingModel
 
 load_dotenv()
