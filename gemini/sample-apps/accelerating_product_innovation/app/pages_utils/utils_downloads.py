@@ -11,13 +11,10 @@ import zipfile
 
 import streamlit as st
 import streamlit.components.v1 as components
-from app.pages_utils.utils_export_content_pdf import (
-    create_content_pdf,
-    create_email_pdf,
-)
-from app.pages_utils.utils_get_llm_response import generate_gemini
-from app.pages_utils.utils_imagen import image_generation
 from dotenv import load_dotenv
+from utils_export_content_pdf import create_content_pdf, create_email_pdf
+from utils_get_llm_response import generate_gemini
+from utils_imagen import image_generation
 
 load_dotenv()
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)

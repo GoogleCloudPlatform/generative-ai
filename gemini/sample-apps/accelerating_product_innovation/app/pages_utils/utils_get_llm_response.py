@@ -79,13 +79,13 @@ async def parallel_generate_search_results(query: str) -> str:
         The generated search results.
     """
     data = {"text_prompt": query}
-    data = json.dumps(data)
+    data_json = json.dumps(data)
     logging.debug("Text call start")
     headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
         url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
         async with session.post(
-            url, data=data, headers=headers, verify_ssl=False
+            url, data=data_json, headers=headers, verify_ssl=False
         ) as response:
             logging.debug("Inside IF else of session")
             if response.status == 200:
@@ -98,4 +98,3 @@ async def parallel_generate_search_results(query: str) -> str:
                     response.status,
                     await response.text(),
                 )
-    logging.debug("Text call end")

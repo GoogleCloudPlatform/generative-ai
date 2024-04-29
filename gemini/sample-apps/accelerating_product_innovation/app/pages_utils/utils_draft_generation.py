@@ -4,7 +4,7 @@ for managing and displaying product content drafts.
 """
 
 import streamlit as st
-from app.pages_utils.utils_get_llm_response import generate_gemini
+from utils_get_llm_response import generate_gemini
 
 
 class ProductDrafts:

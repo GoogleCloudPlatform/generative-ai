@@ -10,8 +10,8 @@ import logging
 import os
 
 import streamlit as st
-from app.pages_utils.utils_get_llm_response import generate_gemini
 from dotenv import load_dotenv
+from utils_get_llm_response import generate_gemini
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 

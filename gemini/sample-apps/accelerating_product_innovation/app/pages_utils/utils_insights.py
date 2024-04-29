@@ -11,14 +11,14 @@ import json
 import os
 import re
 
-import app.pages_utils.utils_resources_store_embeddings as utils_resources_store_embeddings
 import numpy as np
 import pandas as pd
 import streamlit as st
-from app.pages_utils.embedding_model import embedding_model_with_backoff
-from app.pages_utils.utils_get_llm_response import generate_gemini
+import utils_resources_store_embeddings
 from dotenv import load_dotenv
+from embedding_model import embedding_model_with_backoff
 from google.cloud import storage
+from utils_get_llm_response import generate_gemini
 
 load_dotenv()
 

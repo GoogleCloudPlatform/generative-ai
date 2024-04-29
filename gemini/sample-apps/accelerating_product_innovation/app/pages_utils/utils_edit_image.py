@@ -23,8 +23,8 @@ import logging
 
 import PIL
 import streamlit as st
-from app.pages_utils.utils_imagen import edit_image_generation
 from PIL import Image
+from utils_imagen import edit_image_generation
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 

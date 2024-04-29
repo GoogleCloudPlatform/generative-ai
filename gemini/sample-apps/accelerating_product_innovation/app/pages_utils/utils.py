@@ -4,6 +4,8 @@ Common utilities for the project. This includes:
     * project selection.
 """
 
+from typing import Any
+
 import app.pages_utils.utils_project as utils_project
 import streamlit as st
 
@@ -37,7 +39,7 @@ def get_session_state() -> dict:
     Returns:
         session_state_defaults (dict): A dictionary of default key-value pairs for session state
     """
-    session_state_defaults = {
+    session_state_defaults: dict[str, Any] = {
         "product_categories": utils_project.get_projects_list(),
         "new_product_category_added": None,
         "previous_product_category": None,
