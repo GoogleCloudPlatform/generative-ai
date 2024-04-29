@@ -28,7 +28,7 @@ export class ProspectusRag {
             if (rows.length == 0)
                 throw new Error(`No data for ticker: ${ticker}`);
 
-            return rows.map((row) => row.content);
+            return rows.map((row: { content: any; }) => row.content);
         }
         catch (error)
         {
@@ -52,10 +52,10 @@ export class ProspectusRag {
         // Instantiate the models
         const generativeModel = vertex_ai.preview.getGenerativeModel({
             model: model,
-            generation_config: {
-                "max_output_tokens": 2048,
+            generationConfig: {
+                "maxOutputTokens": 2048,
                 "temperature": 0.5,
-                "top_p": 1,
+                "topP": 1,
             },
         });
         
@@ -65,7 +65,7 @@ export class ProspectusRag {
 
         const streamingResp = await generativeModel.generateContentStream(request);
 
-        const text = (await streamingResp.response).candidates[0].content.parts[0].text;
+        const text = (await streamingResp.response).candidates![0].content.parts[0].text;
 
         var response = {query: prompt, data: [text]};
 
