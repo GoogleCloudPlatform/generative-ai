@@ -77,5 +77,4 @@ def hello_http(request):
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": investment_list_str}}]}
     }
-    print(res)
     return res

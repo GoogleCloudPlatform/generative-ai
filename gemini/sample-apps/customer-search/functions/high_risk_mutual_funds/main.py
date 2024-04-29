@@ -30,9 +30,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     bucket = storage_client.bucket(bucket_name)
 
     blob = bucket.blob(destination_blob_name)
-    # blob.make_public()
     blob.upload_from_string(source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
     return blob.public_url
 
 
@@ -41,8 +39,6 @@ def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
-
-    # print(request_json['sessionInfo']['parameters'])
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     # customer_id = 235813
@@ -73,7 +69,6 @@ def hello_http(request):
                     ]
                 }
             }
-            print(res)
             return res
 
     query_fd = f"""
@@ -197,17 +192,9 @@ def hello_http(request):
     final_response = ""
     for response in responses:
         final_response += response.text
-        
-    print("One month return -> ", one_month_return)
-    print("One month return percentage -> ", one_m)
-    print("TTM month return -> ", ttm_return)
-    print("TTM month return percentage  -> ", TTM)
-    print("Amount Invested -> ", amount_invested)
-    print(f"Response from Model: {final_response}")
     
 
     url = "https://storage.cloud.google.com/public_bucket_fintech_app/Market%20Summary.pdf"
-    print(url)
 
     res = {
         "fulfillment_response": {
@@ -216,5 +203,4 @@ def hello_http(request):
             ]
         }
     }
-    print(res)
     return res

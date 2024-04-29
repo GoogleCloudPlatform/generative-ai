@@ -23,7 +23,6 @@ def hello_http(request):
     PUBLIC_BUCKET = environ.get("PUBLIC_BUCKET")
     MARKET_SUMM_DOC = environ.get("MARKET_SUMM_DOC")
     url = "https://storage.cloud.google.com/" + PUBLIC_BUCKET + "/" + MARKET_SUMM_DOC
-    print(url)
 
     resp = (
         "Debt Funds gave a TTM return of 6%. Returns on liquid funds have been"
@@ -67,5 +66,4 @@ def hello_http(request):
             ]
         }
     }
-    print(res)
     return res

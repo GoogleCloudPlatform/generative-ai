@@ -20,8 +20,6 @@ def is_date_later_than(start_date, end_date):
 def hello_http(request):
     request_json = request.get_json(silent=True)
 
-    print(request_json["sessionInfo"]["parameters"])
-
     dates = request_json["sessionInfo"]["parameters"]["date"]
     if (len(dates)) != 2:
         res = {
@@ -44,7 +42,6 @@ def hello_http(request):
                 }
             },
         }
-        print(res)
         return res
 
     if "future" not in dates[0]:
@@ -62,9 +59,6 @@ def hello_http(request):
     else:
         end_date = date2
         start_date = date1
-
-    print(start_date)
-    print(end_date)
 
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [""]}}]},
@@ -88,5 +82,4 @@ def hello_http(request):
             }
         },
     }
-    print(res)
     return res

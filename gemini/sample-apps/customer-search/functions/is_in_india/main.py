@@ -20,8 +20,6 @@ def hello_http(request):
     places_api_key = environ.get("MAPS_API_KEY")
     request_json = request.get_json(silent=True)
 
-    print(request_json["sessionInfo"]["parameters"])
-
     city = None
     country = None
 
@@ -47,7 +45,6 @@ def hello_http(request):
             },
             "targetPage": "/projects/fintech-app-gcp/locations/us-central1/agents/ba85d3e8-3197-4938-baec-5f6dd65e7320/flows/00000000-0000-0000-0000-000000000000/pages/Get_Destination",
         }
-        print(res)
         return res
 
     """
@@ -60,7 +57,6 @@ def hello_http(request):
         headers = {"Content-Type": "application/json"}
         place_id_res = requests.get(get_place_id_url, headers=headers)
         place_id_json = place_id_res.json()
-        print(place_id_json)
 
         place_id = place_id_json["candidates"][0]["place_id"]
 
@@ -68,12 +64,9 @@ def hello_http(request):
         headers = {"Content-Type": "application/json"}
         place_details_res = requests.get(get_place_details_url, headers=headers)
         place_details_json = place_details_res.json()
-        print(place_details_json)
         for place in place_details_json["result"]["address_components"]:
             if "country" in place["types"]:
                 country = place["long_name"]
-
-    print(country)
 
     if city is not None:
         res = {
@@ -92,5 +85,4 @@ def hello_http(request):
                 }
             }
         }
-    print(res)
     return res

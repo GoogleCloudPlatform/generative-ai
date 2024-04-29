@@ -37,7 +37,6 @@ def hello_http(request):
     for row in result_account_balance:
         account_balance = int(row["total_account_balance"])
 
-    print(account_balance)
     account_balance_str = f"Your account balance is ₹{account_balance}."
 
     res = {

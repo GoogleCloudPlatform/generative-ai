@@ -44,7 +44,6 @@ def hello_http(request):
         category = "Standard"
     else:
         category = "Premium"
-    print(category)
 
     query_car_dealers = (
         "SELECT brand, dealer_name, address FROM"
@@ -62,12 +61,9 @@ def hello_http(request):
 
     car_dealers = {}
     for row in result_car_dealers:
-        print(row)
         if row["brand"] not in car_dealers:
             car_dealers[row["brand"]] = []
         car_dealers[row["brand"]].append((row["dealer_name"], row["address"]))
-
-    print(car_dealers)
 
     cust_address = ""
     for row in result_cust_address:
@@ -82,21 +78,16 @@ def hello_http(request):
             + " "
             + str(row["Plus_Code"])
         )
-    print(cust_address)
 
     distances = []
     for brand in car_dealers:
         for dealer_name, dealer_address in car_dealers[brand]:
-            print(dealer_name, dealer_address)
             dist_api_url = (
                 f"https://maps.googleapis.com/maps/api/distancematrix/json?destinations={dealer_name},"
                 f" {dealer_address}&origins={cust_address}&key={api_key}"
             )
-            print(dist_api_url)
             dist_res = requests.get(dist_api_url, headers=headers)
             dist_res_json = dist_res.json()
-            print(dist_res_json)
-            print(dist_res_json["rows"][0]["elements"][0]["distance"]["value"])
             distances.append(
                 (
                     dist_res_json["rows"][0]["elements"][0]["distance"]["value"],
@@ -105,7 +96,6 @@ def hello_http(request):
             )
 
     distances.sort()
-    print(distances)
 
     vertexai.init(project=project_id, location="us-central1")
     generation_config = {

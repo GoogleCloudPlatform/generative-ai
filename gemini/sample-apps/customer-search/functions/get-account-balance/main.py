@@ -14,7 +14,6 @@ def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
-    print(request_json)
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
     if customer_id is not None:
@@ -34,8 +33,6 @@ def hello_http(request):
     for row in result_account_balance:
         account_balance = int(row["total_account_balance"])
 
-    print(account_balance)
-
     query_upcoming_payments = f"""
         SELECT * FROM `{project_id}.DummyBankDataset.StandingInstructions`
         where account_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id={customer_id}) and EXTRACT(MONTH from Next_Payment_Date) = 10 and EXTRACT(YEAR from Next_Payment_Date) = 2023 and fund_transfer_amount IS NOT NULL
@@ -51,12 +48,6 @@ def hello_http(request):
             f" {row['Next_Payment_Date']}\n"
         )
         upcoming_month_expenses_amount += row["fund_transfer_amount"]
-        print("row = ", row["fund_transfer_amount"])
-        print("payment list str = ", payment_list_str)
-
-    print("Upcoming month expense amount = ", upcoming_month_expenses_amount)
-
-    print("payment list debug - ", payment_list_str)
 
     payment_list_str_formatted = payment_list_str.split("\n")
     
@@ -112,10 +103,6 @@ def hello_http(request):
         account_balance_formatted += response.text 
         
     account_balance_str = f"Your account balance is {account_balance_formatted}"
-
-    print("This is = ", payment_list_str_formatted)
-    print("new = ", account_balance_formatted)
-    print("old = ", account_balance)
 
     if account_balance < upcoming_month_expenses_amount:
         if customer_id == 592783:

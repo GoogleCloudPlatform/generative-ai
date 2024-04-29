@@ -15,12 +15,7 @@ def round_to_nearest_thousands(number):
     if length > 0:
         length = length - 1
 
-    print(length)
-    print(str(int(number)))
-
-    print(length)
     length = min(length, 6)
-    print(length)
 
     return number - number % pow(10, length)
 
@@ -65,8 +60,6 @@ def check_senior_citizen(dob):
 
     today = datetime.date.today()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-    print("Today = ", today)
-    print("age = ", age)
     return age >= 60
 
 
@@ -75,8 +68,6 @@ def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
-
-    print(request_json["sessionInfo"]["parameters"])
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     # customer_id = 235813
@@ -120,8 +111,6 @@ def hello_http(request):
         if row["dob"] is not None:
             dob = row["dob"]
             is_sr_citizen = check_senior_citizen(dob)
-            print(type(dob))
-            print(dob)
 
     for row in result_best_interest_rate_row:
         if row["bucket_start_days"] is not None:
@@ -145,13 +134,9 @@ def hello_http(request):
     for row in result_upcoming_payments:
         if row["fund_transfer_amount"] is not None:
             fd_amount = fd_amount - row["fund_transfer_amount"]
-            print(row["fund_transfer_amount"])
 
-    print(balance)
-    print(fd_amount)
 
     rounded_fd_amount = round_to_nearest_thousands(fd_amount)
-    print("Rounded Fd Amount = ", rounded_fd_amount)
 
     # if balance < 200000:
     #   result = "This is not sufficient to cover upcoming expenses of electricity for rest of the month"
@@ -212,8 +197,6 @@ def hello_http(request):
     final_response = ""
     for response in responses:
         final_response += response.text 
-        
-    print("Result = ", final_response)
 
     res = {
         "fulfillment_response": {
@@ -230,5 +213,4 @@ def hello_http(request):
             }
         },
     }
-    print(res)
     return res

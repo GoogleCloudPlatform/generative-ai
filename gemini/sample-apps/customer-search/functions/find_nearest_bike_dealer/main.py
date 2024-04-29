@@ -33,13 +33,11 @@ def hello_http(request):
         if row["asset"] is not None:
             asset_amount = int(row["asset"])
 
-    print(asset_amount)
     category = ""
     if asset_amount < 6000000:
         category = "Standard"
     else:
         category = "Premium"
-    print(category)
 
     query_cust_address = f"""
         SELECT Address_2nd_Line, Address_3rd_Line, city, state, Plus_Code FROM `{project_id}.DummyBankDataset.Customer` where customer_id = {customer_id}
@@ -60,7 +58,6 @@ def hello_http(request):
             + " "
             + str(row["Plus_Code"])
         )
-    print(cust_address)
     
     vertexai.init(project=project_id, location="us-central1")
     generation_config = {

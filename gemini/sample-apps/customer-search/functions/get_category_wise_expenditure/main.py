@@ -17,9 +17,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     bucket = storage_client.bucket(bucket_name)
 
     blob = bucket.blob(destination_blob_name)
-    # blob.make_public()
     blob.upload_from_string(source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
     return blob.public_url
 
 
@@ -44,7 +42,6 @@ def hello_http(request):
     """
 
     result_categories = client.query(query_expenditure_category)
-    print(result_categories)
 
     amount = []
     category = []
@@ -108,8 +105,6 @@ def hello_http(request):
     final_response = ""
     for response in responses:
         final_response += response.text 
-        
-    print("Debug -> ", final_response, " End of debug")
 
     transaction_list_str = final_response
     transaction_list = transaction_list_str.split("*")
@@ -125,7 +120,6 @@ def hello_http(request):
     id = uuid.uuid4()
     BUCKET_NAME = environ.get("PUBLIC_BUCKET_NAME")
     SOURCE_FILE_NAME = fig.to_image(format="png")
-    print("SOURCE_FILE_NAME = ", SOURCE_FILE_NAME)
     DESTINATION_FILE_NAME = f"pie_chart_{id}"
     url = upload_blob(BUCKET_NAME, SOURCE_FILE_NAME, DESTINATION_FILE_NAME)
 
@@ -169,6 +163,4 @@ def hello_http(request):
             ]
         }
     }
-    print(res)
-    # res = {"fulfillment_response": {"messages": [{"text": {"text": transaction_list_str}}]}}
     return res
