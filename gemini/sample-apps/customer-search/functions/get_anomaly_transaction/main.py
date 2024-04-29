@@ -7,7 +7,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def transaction_anomaly_detection(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

@@ -3,13 +3,14 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def find_nearest_bike_dealer(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -60,32 +61,42 @@ def find_nearest_bike_dealer(request):
             + str(row["Plus_Code"])
         )
     print(cust_address)
-
+    
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 1024,
-        "temperature": 0.5,
-        "top_p": 0.9,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
-    response = model.predict(
-        """You are a chatbot for Cymbal bank application.
-    The user is interested in buying a new motorcycle. Given the address of the user as {0}, provide the user information about 5 motorcycle dealers of {1} category brands along with address of their showrooms nearest to their address {0} and some of the best selling models with proper spacing and indentation for clear readability.
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = GenerativeModel("gemini-1.0-pro-002")
+    
+    responses = model.generate_content(
+        f"""You are a chatbot for Cymbal bank application.
+    The user is interested in buying a new motorcycle. Given the address of the user as {cust_address}, provide the user information about 5 motorcycle dealers of {category} category brands along with address of their showrooms nearest to their address {0} and some of the best selling models with proper spacing and indentation for clear readability.
     Also provide discount offers for the Cymbal bank's customers for each of the respective dealers in a professional manner. Maximum word limit is 1000.
-    *DO NOT* mention the category {1} of the brands.
+    *DO NOT* mention the category {category} of the brands.
 
     The currency to be used is Indian Rupee,i.e.,₹.
-    """.format(
-            cust_address, category
-        ),
-        **parameters,
+    """,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
+    final_response = ""
+    for response in responses:
+        final_response += response.text
+        
     res = {
-        "fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]},
+        "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
         "sessionInfo": {
-            "parameters": {"vehicle_type": "Bike", "showrooms": response.text}
+            "parameters": {"vehicle_type": "Bike", "showrooms": final_response}
         },
     }
     return res

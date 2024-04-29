@@ -5,26 +5,26 @@ import functions_framework
 from google.cloud import bigquery, storage
 import plotly.graph_objects as go
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
 
-def upload_blob(
-    bucket_name: str, source_file_name: str, destination_blob_name: str
-) -> str:
+def upload_blob(bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
     blob = bucket.blob(destination_blob_name)
+    # blob.make_public()
     blob.upload_from_string(source_file_name)
-    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
+    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
     return blob.public_url
 
 
 @functions_framework.http
-def category_wise_expenditure(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -49,6 +49,7 @@ def category_wise_expenditure(request):
     amount = []
     category = []
     transaction_list_str = ""
+    # transaction_list = []
     total_expenditure = 0
     for row in result_categories:
         amount.append(round(row["amount"], 2))
@@ -56,20 +57,29 @@ def category_wise_expenditure(request):
         transaction_list_str = (
             transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
         )
+        # transaction_list.append(f"{row['sub_category']}: ₹{row['amount']}\n")
         total_expenditure = total_expenditure + row["amount"]
 
+    # transaction_list_str = transaction_list_str[1:]
+
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
-    response = model.predict(
-        """You are a chatbot for a bank application. Given the transaction list {0} do the following:
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = GenerativeModel("gemini-1.0-pro-002")
+    
+    responses = model.generate_content(
+        f"""You are a chatbot for a bank application. Given the transaction list {transaction_list_str} do the following:
     1. Convert amount to correct format, for example ₹100235 to ₹1,00,235.00.
-    2. Specify the Total Expenditure {1} of the user.
+    2. Specify the Total Expenditure {total_expenditure} of the user.
     3. Convert the list to a meaningful sentence and display each sentence in a new line.
     4. Every sentence should be presented in a new line and properly formatted.
     5. Max limit should be 50 words.
@@ -88,15 +98,20 @@ def category_wise_expenditure(request):
     * Transportation: ₹13,000.00.
     * Entertainment: ₹38,000.00.
     * Miscellaneous: ₹57,200.00.
-    """.format(
-            transaction_list_str, total_expenditure
-        ),
-        **parameters,
+    """,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
-    print("Debug -> ", response.text, " End of debug")
+    
+    final_response = ""
+    for response in responses:
+        final_response += response.text 
+        
+    print("Debug -> ", final_response, " End of debug")
 
-    transaction_list_str = response.text
+    transaction_list_str = final_response
     transaction_list = transaction_list_str.split("*")
     if len(transaction_list) == 1:
         transaction_list = transaction_list_str.split("-")
@@ -135,6 +150,11 @@ def category_wise_expenditure(request):
                                     "title": "Last Month Expenditure",
                                     "text": transaction_list,
                                 }
+                                # {
+                                #     "type": "image",
+                                #     "rawUrl": url,
+                                #     "accessibilityText": "Example logo"
+                                # }
                             ],
                             [
                                 {
@@ -150,4 +170,5 @@ def category_wise_expenditure(request):
         }
     }
     print(res)
+    # res = {"fulfillment_response": {"messages": [{"text": {"text": transaction_list_str}}]}}
     return res

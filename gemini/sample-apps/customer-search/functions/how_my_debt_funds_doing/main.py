@@ -8,10 +8,12 @@ client: bigquery.Client = bigquery.Client()
 
 
 @functions_framework.http
-def debt_funds_summary(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
+    # customer_id = 235813
+    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)

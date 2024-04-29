@@ -4,7 +4,8 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
@@ -70,7 +71,7 @@ def check_senior_citizen(dob):
 
 
 @functions_framework.http
-def fixed_deposit_recommendation(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -78,6 +79,8 @@ def fixed_deposit_recommendation(request):
     print(request_json["sessionInfo"]["parameters"])
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
+    # customer_id = 235813
+    # 342345, 592783
 
     # get account balance of the user
     query_account_balance = f"""
@@ -163,24 +166,29 @@ def fixed_deposit_recommendation(request):
     result = "You should invest in FD"
 
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.3,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = GenerativeModel("gemini-1.0-pro-002")
 
-    response = model.predict(
-        """
-    You are a chatbot for a bank application.As the user have surplus amount of {0} after setting aside for scheduled expenses
+    responses = model.generate_content(
+        f"""
+    You are a chatbot for a bank application.As the user have surplus amount of {fd_amount} after setting aside for scheduled expenses
     Format the amount in the following way
     e.g. amount = 100000000 to ₹10,00,00,000.00 upto two decimal places
     Mention that the surplus amount is after setting aside for scheduled expenses
-    Recommend user the option to put {4} money in Fd and
+    Recommend user the option to put {rounded_fd_amount} money in Fd and
     ask user whether they would like to open an fd in Cymbal Bank.
-    Also tell the user that interest rates are best for time period from {1} to {2} and
-    the interest rate is {3}%.
+    Also tell the user that interest rates are best for time period from {tenure_start} to {tenure_end} and
+    the interest rate is {rate_of_interest}%.
     Write in a professional and business-neutral tone.
     Do not say Hi Hello etc.
     Do not ask to open a fd.
@@ -195,22 +203,22 @@ def fixed_deposit_recommendation(request):
     Consider putting ₹30,00,000 in an FD with Cymbal Bank.
     Interest rates are best for 1-2 years at 6.8%.
 
-    """.format(
-            fd_amount,
-            tenure_start,
-            tenure_end,
-            rate_of_interest,
-            rounded_fd_amount,
-        ),
-        **parameters,
+    """,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
-    print("Result = ", response.text)
+    final_response = ""
+    for response in responses:
+        final_response += response.text 
+        
+    print("Result = ", final_response)
 
     res = {
         "fulfillment_response": {
             "messages": [
-                {"text": {"text": [response.text]}},
+                {"text": {"text": [final_response]}},
                 {"text": {"text": ["Would you like to open an FD?"]}},
             ]
         },

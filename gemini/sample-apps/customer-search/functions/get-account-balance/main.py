@@ -3,13 +3,14 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def account_balance(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -35,16 +36,6 @@ def account_balance(request):
 
     print(account_balance)
 
-    # Getting upcoming expenses
-    vertexai.init(project=project_id, location="us-central1")
-    model_prompt = TextGenerationModel.from_pretrained("text-bison@001")
-    parameters = {
-        "max_output_tokens": 1024,
-        "temperature": 0.1,
-        "top_p": 0.8,
-        "top_k": 40,
-    }
-
     query_upcoming_payments = f"""
         SELECT * FROM `{project_id}.DummyBankDataset.StandingInstructions`
         where account_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id={customer_id}) and EXTRACT(MONTH from Next_Payment_Date) = 10 and EXTRACT(YEAR from Next_Payment_Date) = 2023 and fund_transfer_amount IS NOT NULL
@@ -68,7 +59,22 @@ def account_balance(request):
     print("payment list debug - ", payment_list_str)
 
     payment_list_str_formatted = payment_list_str.split("\n")
-    payment_list_str_formatted = model_prompt.predict(
+    
+    vertexai.init(project=project_id, location="us-central1")
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
+    }
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = GenerativeModel("gemini-1.0-pro-002")
+    
+    responses = model.generate_content(
         """
         Format the dates in the following information,e.g. 2024-10-01 to  Oct 1, 2024
         {0}
@@ -79,24 +85,36 @@ def account_balance(request):
         """.format(
             payment_list_str
         ),
-        **parameters,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
-    account_balance_formatted = model_prompt.predict(
-        """
-            display the {0} in proper format in indian currency
+    
+    payment_list_str_formatted = ""
+    for response in responses:
+        payment_list_str_formatted += response.text 
+        
+    responses = model.generate_content(
+        f"""
+            display the {account_balance} in proper format in indian currency
             example amount  = 10200 then ₹10,200.00
-            amount = {0}
+            amount = {account_balance}
             return a one word response
-        """.format(
-            account_balance
-        ),
-        **parameters,
+        """,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
-    account_balance_str = f"Your account balance is {account_balance_formatted.text}"
+    account_balance_formatted = ""
+    
+    for response in responses:
+        account_balance_formatted += response.text 
+        
+    account_balance_str = f"Your account balance is {account_balance_formatted}"
 
-    print("This is = ", payment_list_str_formatted.text)
-    print("new = ", account_balance_formatted.text)
+    print("This is = ", payment_list_str_formatted)
+    print("new = ", account_balance_formatted)
     print("old = ", account_balance)
 
     if account_balance < upcoming_month_expenses_amount:
@@ -109,7 +127,7 @@ def account_balance(request):
                             "text": {
                                 "text": [
                                     "And, scheduled expenses for rest of month"
-                                    " are:\n" + payment_list_str_formatted.text
+                                    " are:\n" + payment_list_str_formatted
                                 ]
                             }
                         },
@@ -139,7 +157,7 @@ def account_balance(request):
                             "text": {
                                 "text": [
                                     "And, scheduled expenses for rest of month"
-                                    " are:\n" + payment_list_str_formatted.text
+                                    " are:\n" + payment_list_str_formatted
                                 ]
                             }
                         },
@@ -157,7 +175,7 @@ def account_balance(request):
                         "text": {
                             "text": [
                                 "And, scheduled expenses for rest of month"
-                                " are:\n" + payment_list_str_formatted.text
+                                " are:\n" + payment_list_str_formatted
                             ]
                         }
                     },
@@ -179,7 +197,7 @@ def account_balance(request):
                         "text": {
                             "text": [
                                 "And, scheduled expenses for rest of month"
-                                " are:\n" + payment_list_str_formatted.text
+                                " are:\n" + payment_list_str_formatted
                             ]
                         }
                     },

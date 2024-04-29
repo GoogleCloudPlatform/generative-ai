@@ -4,16 +4,18 @@ from typing import Dict
 import functions_framework
 from google.cloud import bigquery, storage
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 client: bigquery.Client = bigquery.Client()
 
+project_id = environ.get("PROJECT_ID")
 
-def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
+def run(name, statement):
     return name, client.query(statement).result()  # blocks the thread
 
 
-def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
+def run_all(statements: Dict[str, str]):
     with ThreadPoolExecutor() as executor:
         jobs = []
         for name, statement in statements.items():
@@ -22,26 +24,29 @@ def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]
     return result
 
 
-def upload_blob(
-    bucket_name: str, source_file_name: str, destination_blob_name: str
-) -> str:
+def upload_blob(bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
     blob = bucket.blob(destination_blob_name)
+    # blob.make_public()
     blob.upload_from_string(source_file_name)
-    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
+    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
     return blob.public_url
 
 
 @functions_framework.http
-def high_risk_mutual_funds(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
 
+    # print(request_json['sessionInfo']['parameters'])
+
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
+    # customer_id = 235813
+    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)
@@ -133,25 +138,31 @@ def high_risk_mutual_funds(request):
         if row["total_high_risk_investment"] is not None:
             total_high_risk_investment += row["total_high_risk_investment"]
 
-    vertexai.init(project="fintech-app-gcp", location="us-central1")
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "top_k": 40,
+    vertexai.init(project=project_id, location="us-central1")
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
-    response = model.predict(
-        """You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values as Investment Summary in small pointers.
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = GenerativeModel("gemini-1.0-pro-002")
+    
+    responses = model.generate_content(
+        f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values as Investment Summary in small pointers.
 
-    Total Investment = ₹{0}
-    Investment in Fixed Deposits = ₹{4}
-    Scheme_Name = {1}
-    One_Month_Return = {2}
-    One_Month_Return_Percentage = {5}
-    TTM_Return = {3}
-    TTM_Return_Percentage = {6}
-    amount_invested = {7}
+    Total Investment = ₹{total_investment}
+    Investment in Fixed Deposits = ₹{fd_inv}
+    Scheme_Name = {scheme_name}
+    One_Month_Return = {one_month_return}
+    One_Month_Return_Percentage = {one_m}
+    TTM_Return = {ttm_return}
+    TTM_Return_Percentage = {TTM}
+    amount_invested = {amount_invested}
 
     Write in a professional and business-neutral tone.
 
@@ -177,30 +188,33 @@ def high_risk_mutual_funds(request):
     HDFC Sensex ETF	₹17,00,000	₹2,55,000	15	₹7,65,000	45
     Nippon India Nifty 50 ETF	₹23,00,000	₹4,14,000	18	₹12,42,000	54
 
-    """.format(
-            total_investment,
-            scheme_name,
-            one_month_return,
-            ttm_return,
-            fd_inv,
-            one_m,
-            TTM,
-            amount_invested,
-        ),
-        **parameters,
+    """,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
+    final_response = ""
+    for response in responses:
+        final_response += response.text
+        
     print("One month return -> ", one_month_return)
     print("One month return percentage -> ", one_m)
     print("TTM month return -> ", ttm_return)
     print("TTM month return percentage  -> ", TTM)
     print("Amount Invested -> ", amount_invested)
-
-    print(f"Response from Model: {response.text}")
+    print(f"Response from Model: {final_response}")
+    
 
     url = "https://storage.cloud.google.com/public_bucket_fintech_app/Market%20Summary.pdf"
     print(url)
 
-    res = {"fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]}}
+    res = {
+        "fulfillment_response": {
+            "messages": [
+                {"text": {"text": [final_response]}},
+            ]
+        }
+    }
     print(res)
     return res

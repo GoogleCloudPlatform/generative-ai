@@ -3,13 +3,14 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part, FinishReason
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def return_of_investment(request):
+def hello_http(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
@@ -42,26 +43,36 @@ def return_of_investment(request):
     investment_list_str = investment_list_str[1:]
 
     vertexai.init(project=project_id, location="us-central1")
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.3,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    model = TextGenerationModel.from_pretrained("text-bison")
-    response = model.predict(
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    model = GenerativeModel("gemini-1.0-pro-002")
+    
+    responses = model.generate_content(
         """Given the return of investment list do the following:
     1. Convert amount to correct format for example ₹ 100235 to ₹ 1,00,235, ₹ 16423.3423 to ₹ 16,423.3423.
     2. Convert the list to a meaningful sentence.
-    Transaction List = {0}
+    Transaction List = {investment_list_str}
     Assume that a positive amount indicate profit while negative indicate loss.
-    """.format(
-            investment_list_str
-        ),
-        **parameters,
+    """,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
-    investment_list_str = response.text
+    final_response = ""
+    for response in responses:
+        final_response += response.text 
+
+    investment_list_str = final_response
 
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": investment_list_str}}]}
