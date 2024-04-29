@@ -346,7 +346,7 @@ def travel_card_recommendation(request):
     }
     model = GenerativeModel("gemini-1.0-pro-002")
     response = model.generate_content(
-    f"""
+        f"""
         You are a chatbot for a bank application you have been given the Credit Card as {credit_card}.
         You have to recommend the given credit card to the user and explain the benefits of the credit card.
         Write in a professional and business-neutral tone.
