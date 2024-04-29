@@ -17,7 +17,6 @@ def get_ac_number():
     for i in range(5):
         account_number += str(random.randint(0, 9))
 
-    print("Account Number = ", account_number)
     return int(account_number)
 
 
@@ -33,9 +32,8 @@ def check_senior_citizen(dob):
     """
 
     today = datetime.date.today()
-    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-    print("Today = ", today)
-    print("age = ", age)
+    age = today.year - dob.year - \
+        ((today.month, today.day) < (dob.month, dob.day))
     return age >= 60
 
 
@@ -59,7 +57,6 @@ def get_number_of_days(fd_tenure):
     # Calculate the total number of days in the tenure.
     total_days = 365 * years + 30 * months + days
 
-    print(total_days)
     return total_days
 
 
@@ -92,17 +89,10 @@ def create_fixed_deposit(request):
 
     client = bigquery.Client()
 
-    print(request_json["sessionInfo"]["parameters"])
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     fd_amount = request_json["sessionInfo"]["parameters"]["fd_amount"]
     fd_tenure = request_json["sessionInfo"]["parameters"]["fd_tenure"]
     user_name = request_json["sessionInfo"]["parameters"]["name"]
-
-    print(customer_id)
-    print(fd_amount)
-    print(fd_tenure)
-    print(user_name)
 
     # verifying that the customer is valid and exists in our database or not
     if customer_id is not None:
@@ -115,7 +105,6 @@ def create_fixed_deposit(request):
   """
     result_query_check_cust_id = client.query(query_check_cust_id)
     for row in result_query_check_cust_id:
-        print(row["check"])
         if row["check"] == 0:
             res = {
                 "fulfillment_response": {
@@ -131,7 +120,6 @@ def create_fixed_deposit(request):
                     ]
                 }
             }
-            print(res)
             return res
 
     # get the date of birth of the user
@@ -152,10 +140,6 @@ def create_fixed_deposit(request):
     present_date = date.today()
     present_date = present_date.isoformat()
     interest_rate = get_interest_rate(is_sr_citizen, number_of_days)
-
-    print(interest_rate)
-    print(number_of_days)
-    print(is_sr_citizen)
 
     vertexai.init(project=project_id, location="us-central1")
     parameters = {
@@ -232,7 +216,5 @@ def create_fixed_deposit(request):
             }
         },
     }
-
-    print(res)
 
     return res

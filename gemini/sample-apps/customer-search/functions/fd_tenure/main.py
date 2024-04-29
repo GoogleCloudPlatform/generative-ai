@@ -47,8 +47,6 @@ def check_senior_citizen(dob):
 
     today = datetime.date.today()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-    print("Today = ", today)
-    print("age = ", age)
     return age >= 60
 
 
@@ -57,8 +55,6 @@ def ask_fd_tenure(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
-
-    print(request_json["sessionInfo"]["parameters"])
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
@@ -73,7 +69,6 @@ def ask_fd_tenure(request):
   """
     result_query_check_cust_id = client.query(query_check_cust_id)
     for row in result_query_check_cust_id:
-        print(row["check"])
         if row["check"] == 0:
             res = {
                 "fulfillment_response": {
@@ -89,7 +84,6 @@ def ask_fd_tenure(request):
                     ]
                 }
             }
-            print(res)
             return res
 
     # get the date of birth of the user
@@ -115,8 +109,6 @@ def ask_fd_tenure(request):
         if row["dob"] is not None:
             dob = row["dob"]
             is_sr_citizen = check_senior_citizen(dob)
-            print(type(dob))
-            print(dob)
 
     for row in result_best_interest_rate_row:
         if row["bucket_start_days"] is not None:

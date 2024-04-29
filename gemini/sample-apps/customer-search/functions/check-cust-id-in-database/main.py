@@ -12,8 +12,6 @@ def check_customer_id(request):
 
     client = bigquery.Client()
 
-    print(request_json["sessionInfo"]["parameters"])
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     # 342345, 592783
 
@@ -28,7 +26,6 @@ def check_customer_id(request):
 
     result_query_check_cust_id = client.query(query_check_cust_id)
     for row in result_query_check_cust_id:
-        print(row["check"])
         if row["check"] == 0:
             res = {
                 "fulfillment_response": {
@@ -44,7 +41,6 @@ def check_customer_id(request):
                     ]
                 }
             }
-            print(res)
             return res
 
     res = {
@@ -54,5 +50,4 @@ def check_customer_id(request):
             ]
         }
     }
-    print(res)
     return res

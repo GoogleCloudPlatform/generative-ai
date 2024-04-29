@@ -64,7 +64,6 @@ def account_health_summary(request):
     """
     result_query_check_cust_id = client.query(query_check_cust_id)
     for row in result_query_check_cust_id:
-        print(row["check"])
         if row["check"] == 0:
             res = {
                 "fulfillment_response": {
@@ -80,7 +79,6 @@ def account_health_summary(request):
                     ]
                 }
             }
-            print(res)
             return res
 
     query_assets = f"""
@@ -248,15 +246,6 @@ def account_health_summary(request):
         if row["total_high_risk_investment"] is not None:
             total_high_risk_investment += row["total_high_risk_investment"]
 
-    print("Total Investment = ", total_investment)
-    print("Total High Risk = ", total_high_risk_investment)
-    print("Total Income = ", total_income)
-    print("Total Expenditure = ", total_expenditure)
-    print("Name ", first_name)
-    print("Asset = ", asset_amount)
-    print("average_monthly_expense = ", average_monthly_expense)
-    print("last_month_expense = ", last_month_expense)
-
     if (
         total_expenditure < 0.75 * total_income
         and asset_amount >= 0.2 * total_income
@@ -279,8 +268,6 @@ def account_health_summary(request):
         account_status = "Needs Attention"
     else:
         account_status = "Concerning"
-
-    print("Account Status = ", account_status)
 
     vertexai.init(project=project_id, location="us-central1")
     parameters = {
@@ -342,8 +329,6 @@ def account_health_summary(request):
         **parameters,
     )
 
-    print(f"Response from Model: {response.text}")
-
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]},
         "sessionInfo": {
@@ -353,5 +338,4 @@ def account_health_summary(request):
         },
     }
 
-    print(res)
     return res

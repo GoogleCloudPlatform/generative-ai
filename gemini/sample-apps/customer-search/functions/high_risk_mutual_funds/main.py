@@ -53,7 +53,6 @@ def high_risk_mutual_funds(request):
     """
     result_query_check_cust_id = client.query(query_check_cust_id)
     for row in result_query_check_cust_id:
-        print(row["check"])
         if row["check"] == 0:
             res = {
                 "fulfillment_response": {
@@ -202,6 +201,7 @@ def high_risk_mutual_funds(request):
     url = "https://storage.cloud.google.com/public_bucket_fintech_app/Market%20Summary.pdf"
     print(url)
 
-    res = {"fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]}}
+    res = {"fulfillment_response": {
+        "messages": [{"text": {"text": [response.text]}}]}}
     print(res)
     return res

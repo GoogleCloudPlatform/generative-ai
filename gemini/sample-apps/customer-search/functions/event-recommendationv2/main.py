@@ -17,7 +17,6 @@ project_id = environ.get("PROJECT_ID")
 def event_recommendation_v2(request):
     request_json = request.get_json(silent=True)
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    print(request_json)
     bq_client = bigquery.Client()
     query_user_affinities = f"""
         SELECT Affinities FROM `{project_id}.DummyBankDataset.Customer`
@@ -30,20 +29,16 @@ def event_recommendation_v2(request):
     result_event_details = bq_client.query(query_event_details)
 
     for row in result_user_affinities:
-        print(row)
         if row["Affinities"] is not None:
             user_affinities = row["Affinities"].split(",")
     for i in range(len(user_affinities)):
         user_affinities[i] = user_affinities[i].lower().strip()
-    print(user_affinities)
 
     event_recommended = None
 
     # ASSUMPTION: There exists an event which always matches the user affinities - wrong assumption but will handle that case later
     for row in result_event_details:
-        print(row)
         event_tags = row["event_tags_"].split(",")
-        print(event_tags)
         for i in range(len(event_tags)):
             event_tags[i] = event_tags[i].lower().strip()
         for tag in event_tags:
@@ -52,8 +47,6 @@ def event_recommendation_v2(request):
                 break
         if event_recommended is not None:
             break
-
-    print(event_recommended)
 
     vertexai.init(project=project_id, location="us-central1")
     model_prompt = TextGenerationModel.from_pretrained("text-bison@001")
@@ -126,7 +119,6 @@ def event_recommendation_v2(request):
         ),
         **parameters,
     )
-    print(response.text)
     model = ImageGenerationModel.from_pretrained("imagegeneration@002")
     response = model.generate_images(
         prompt=response.text,
@@ -151,10 +143,6 @@ def event_recommendation_v2(request):
     if not os.path.isdir(image_dir):
         os.mkdir(image_dir)
 
-    print("Image dir = ", image_dir)
-    print("Image path = ", image_path)
-    print("Image file_name = ", image_file_name)
-
     response[0].save(image_path)
 
     gcs_client = storage.Client()
@@ -162,8 +150,6 @@ def event_recommendation_v2(request):
     generated_image = bucket.blob(image_file_name)
     generated_image.upload_from_filename(image_path)
 
-    print(type(response[0]))
-    print(response[0])
     rawUrl = "https://storage.googleapis.com/" + output_bucket + "/" + image_file_name
 
     response2 = model_prompt.predict(
@@ -207,7 +193,6 @@ Registration closes on October 21st, so don't miss out! 🏌️‍♀️🏌️�
         ),
         **parameters,
     )
-    print(response2.text)
 
     custom_payload = {
         "payload": {
@@ -228,7 +213,5 @@ Registration closes on October 21st, so don't miss out! 🏌️‍♀️🏌️�
             "text": [response2.text],
         }
     }
-    print(custom_payload)
     res = {"fulfillment_response": {"messages": [invitation, custom_payload]}}
-    print(res)
     return res

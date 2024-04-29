@@ -24,7 +24,6 @@ def event_recommendation_v3(request):
     start_date = request_json["sessionInfo"]["parameters"]["start_date"]
     end_date = request_json["sessionInfo"]["parameters"]["end_date"]
 
-    print(request_json)
     bq_client = bigquery.Client()
     query_user_affinities = f"""
         SELECT Affinities FROM `{project_id}.DummyBankDataset.Customer`
@@ -33,12 +32,10 @@ def event_recommendation_v3(request):
     result_user_affinities = bq_client.query(query_user_affinities)
 
     for row in result_user_affinities:
-        print(row)
         if row["Affinities"] is not None:
             user_affinities = row["Affinities"].split(",")
     for i in range(len(user_affinities)):
         user_affinities[i] = user_affinities[i].lower().strip()
-    print(user_affinities)
 
     # #ASSUMPTION: There exists an event which always matches the user affinities - wrong assumption but will handle that case later
 
@@ -114,7 +111,6 @@ Output:
         ),
         **parameters,
     )
-    print(response2.text)
 
     response3 = model_prompt.predict(
         """
@@ -201,7 +197,6 @@ Your Cymbal Bank card gets you 2-for-1 tickets.
         ),
         **parameters,
     )
-    print(response3.text)
 
     parameters = {
         "max_output_tokens": 1024,
@@ -251,7 +246,6 @@ Output: Art style: Surrealism Viewpoint: Aerial view Framing: A view of an opera
         ),
         **parameters,
     )
-    print(response.text)
     model = ImageGenerationModel.from_pretrained("imagegeneration@005")
     response = model.generate_images(
         prompt=response.text,
@@ -379,10 +373,6 @@ weird colors""",
     if not os.path.isdir(image_dir):
         os.mkdir(image_dir)
 
-    print("Image dir = ", image_dir)
-    print("Image path = ", image_path)
-    print("Image file_name = ", image_file_name)
-
     response[0].save(image_path)
 
     im = Image.open(image_path)
@@ -394,8 +384,6 @@ weird colors""",
     generated_image = bucket.blob(image_file_name)
     generated_image.upload_from_filename(image_path)
 
-    print(type(response[0]))
-    print(response[0])
     rawUrl = "https://storage.googleapis.com/" + output_bucket + "/" + image_file_name
 
     custom_payload = {
@@ -417,7 +405,5 @@ weird colors""",
             "text": [response2.text],
         }
     }
-    print(custom_payload)
     res = {"fulfillment_response": {"messages": [invitation, custom_payload]}}
-    print(res)
     return res

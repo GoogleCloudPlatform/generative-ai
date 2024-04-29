@@ -14,15 +14,9 @@ FD_TNC_DOC = environ.get("FD_TNC_DOC")
 def generate_fd_confirmation_message(request):
     request_json = request.get_json(silent=True)
 
-    print(request_json["sessionInfo"]["parameters"])
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     fd_amount = request_json["sessionInfo"]["parameters"]["fd_amount"]
     fd_tenure = request_json["sessionInfo"]["parameters"]["fd_tenure"]
-
-    print(customer_id)
-    print(fd_amount)
-    print(fd_tenure)
 
     vertexai.init(project=project_id, location="us-central1")
     parameters = {
@@ -46,15 +40,11 @@ def generate_fd_confirmation_message(request):
         **parameters,
     )
 
-    print(response.text)
-
     confirmation_msg = (
         f"Please confirm that you want to invest {response.text} for"
         f" {fd_tenure}.\nMake sure you go through the following terms and"
         " conditions before proceeding."
     )
-
-    print(confirmation_msg)
 
     res = {
         "fulfillment_response": {
@@ -100,7 +90,5 @@ def generate_fd_confirmation_message(request):
             }
         },
     }
-
-    print(res)
 
     return res

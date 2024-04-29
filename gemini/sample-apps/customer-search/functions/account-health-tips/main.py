@@ -14,8 +14,6 @@ def account_health_tips(request):
 
     client = bigquery.Client()
 
-    print(request_json["sessionInfo"]["parameters"])
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
     if customer_id is not None:
@@ -54,7 +52,6 @@ def account_health_tips(request):
     """
 
     rc = client.query(query_expenditure_category)
-    print(rc)
 
     lm_amount = 0
     category = []
@@ -69,8 +66,6 @@ def account_health_tips(request):
         total_expenditure = total_expenditure + row["amount"]
 
     # modification ends
-
-    print("Transaction List -> ", transaction_list_str)
 
     average_monthly_expense = 0
     last_month_expense = 0
@@ -90,12 +85,7 @@ def account_health_tips(request):
         if row["last_month_expense"] is not None:
             last_month_expense = int(row["last_month_expense"])
 
-    print("average_monthly_expense = ", average_monthly_expense)
-    print("last_month_expense = ", last_month_expense)
-    print(transaction_list)
-
     transaction_list = transaction_list[1:]
-    print("Transaction List -> ", transaction_list)
 
     vertexai.init(project=project_id, location="us-central1")
     parameters = {
@@ -125,7 +115,6 @@ def account_health_tips(request):
         **parameters,
     )
 
-    print(f"Response from Model: {response.text}")
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]},
         "sessionInfo": {"parameters": {"vehicle_type": "Bike"}},

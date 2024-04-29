@@ -30,8 +30,6 @@ def create_graph(amount, category, date, cust_id):
     df = pd.DataFrame(lst, columns=["Date", "Category", "Amount"])
     df = df.sort_values(by="Date", ascending=False)
 
-    print(df)
-
     fig = px.line(
         df,
         x="Date",
@@ -143,7 +141,6 @@ def create_predicted_expense_table(customer_id):
 def expense_prediction(request):
     request_json = request.get_json(silent=True)
 
-    print(request_json)
     client = bigquery.Client()
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
@@ -182,17 +179,11 @@ def expense_prediction(request):
                 row["transaction_amount"], 2
             )
 
-    print(amount)
-    print(category)
-    print(date)
-
     for k in total_expenditure:
         total_expenditure_str = (
             total_expenditure_str
             + f"Total predicted expenses in {k}: {total_expenditure[k]}"
         )
-    print(transaction_list_str)
-    print(total_expenditure_str)
 
     vertexai.init(project=project_id, location="us-central1")
     model_prompt = TextGenerationModel.from_pretrained("text-bison@001")
@@ -254,7 +245,6 @@ def expense_prediction(request):
         ),
         **parameters,
     )
-    print(response.text)
     transaction_list_str = response.text
     transaction_list = transaction_list_str.split("*")
     if len(transaction_list) == 1:
@@ -274,7 +264,6 @@ def expense_prediction(request):
         )
 
     payment_list = payment_list_str.split("\n")
-    print("debug - ", payment_list_str)
 
     response2 = model_prompt.predict(
         """
@@ -287,13 +276,11 @@ def expense_prediction(request):
         ),
         **parameters,
     )
-    print(response2.text)
 
     # rawUrl = "https://storage.googleapis.com/"+output_bucket+"/predicted_expenses/"+str(int(customer_id))+"_oct_dec_23.png"
     # create a graph out of the data
     rawUrl = create_graph(amount, category, date, customer_id)
 
-    print(len(payment_list))
     if len(payment_list) > 1:
         custom_payload = [
             {
@@ -343,8 +330,6 @@ def expense_prediction(request):
             {"text": {"text": [response.text]}},
         ]
 
-    print(custom_payload)
     res = {"fulfillment_response": {"messages": custom_payload}}
-    print(res)
 
     return res

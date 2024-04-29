@@ -15,7 +15,6 @@ def extend_overdraft(request):
     client = bigquery.Client()
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    print(request_json["sessionInfo"]["parameters"])
 
     # verifying that the customer is valid and exists in our database or not
     if customer_id is not None:
@@ -36,7 +35,6 @@ def extend_overdraft(request):
     min_processing_fee = -1
 
     for row in result_overdraft:
-        print(row)
         if (
             row.get("amount") is None
             or row.get("interest_rate") is None
@@ -49,7 +47,6 @@ def extend_overdraft(request):
                     "messages": [{"text": {"text": ["Some unknown Error occured"]}}]
                 }
             }
-            print(res)
             return res
 
         overdraft_amount = row["amount"]
@@ -89,7 +86,6 @@ def extend_overdraft(request):
                 }
             }
         }
-        print(res)
         return res
 
     requested_amount = request_json["sessionInfo"]["parameters"]["number"]
@@ -107,5 +103,4 @@ def extend_overdraft(request):
             }
         }
     }
-    print(res)
     return res
