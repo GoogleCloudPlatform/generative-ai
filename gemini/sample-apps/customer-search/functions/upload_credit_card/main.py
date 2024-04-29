@@ -5,7 +5,8 @@ import random
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel
+import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
 
@@ -34,7 +35,6 @@ def get_credit_card(
     # Get the customer ID and credit card name from the request
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     credit_card = request_json["sessionInfo"]["parameters"]["credit_card"]
-    print(credit_card)
 
     # Check if the customer ID is valid
     if customer_id is not None:
@@ -49,7 +49,6 @@ def get_credit_card(
     result_query_check_cust_id = client.query(query_check_cust_id)
     # Iterate over the query results
     for row in result_query_check_cust_id:
-        print(row["check"])
         # If the customer ID does not exist, return an error message
         if row["check"] == 0:
             res = {
@@ -66,7 +65,6 @@ def get_credit_card(
                     ]
                 }
             }
-            print(res)
             return res
 
     # Generate a random credit card number
@@ -75,8 +73,6 @@ def get_credit_card(
     present_date = date.today()
     # Format the date as a string
     present_date_str = present_date.isoformat()
-    print("present_date = ", present_date_str)
-    print("Card Number = ", card_number)
 
     # Query BigQuery to check if the credit card already exists for the customer
     query_credit_card_count = f"""
@@ -85,14 +81,12 @@ def get_credit_card(
     """
     result_credit_card_count = client.query(query_credit_card_count)
 
-    print(result_credit_card_count)
     # Initialize the count variable
     count = 0
     # Iterate over the query results
     for row in result_credit_card_count:
         # Set the count variable to the value of the 'count' column
         count = row["count"]
-    print("count = ", count)
     # If the credit card does not exist, insert it into the database
     if count == 0:
         table_id = "{project_id}.DummyBankDataset.CreditCards"
@@ -116,35 +110,46 @@ def get_credit_card(
             """
         client.query(query_update_credit_card)
 
-    print("credit_card = ", credit_card)
     # Initialize the Vertex AI client library
     vertexai.init(project=project_id, location="us-central1")
     # Set the model parameters
-    parameters = {
-        "max_output_tokens": 512,
-        "temperature": 0.5,
-        "top_p": 0.8,
-        "top_k": 40,
+    generation_config = {
+        "max_output_tokens": 2048,
+        "temperature": 1,
+        "top_p": 1,
     }
-    # Load the text generation model
-    model = TextGenerationModel.from_pretrained("text-bison")
+    safety_settings = {
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    }
+    # Load gemini model
+    model = GenerativeModel("gemini-1.0-pro-002")
     # Generate the model response
-    response = model.predict(
-        """You are a chatbot for a bank application.
-    Tell the user that thier response has been recorded and they will recieve the credit card in next few days.
-    Thank the user for enrolling with the bank.
-    Ask the user if there's anything else he wants to know.
-    Write in a professional and business-neutral tone.
-    Word Limit is 50 words.
-    The message comes in middle of conversation so don't greet the user with Hello/Hi.
-    The message should be in a conversation-like manner.
-    The message should be in second person's perespective tone.
+    response = model.generate_content(
+    """
+        You are a chatbot for a bank application.
+        Tell the user that thier response has been recorded and they will recieve the credit card in next few days.
+        Thank the user for enrolling with the bank.
+        Ask the user if there's anything else he wants to know.
+        Write in a professional and business-neutral tone.
+        Word Limit is 50 words.
+        The message comes in middle of conversation so don't greet the user with Hello/Hi.
+        The message should be in a conversation-like manner.
+        The message should be in second person's perespective tone.
     """,
-        **parameters,
+      generation_config=generation_config,
+      safety_settings=safety_settings,
+      stream=True,
     )
-    # Set the response message
-    res = {"fulfillment_response": {"messages": [{"text": {"text": [response.text]}}]}}
 
-    print(res)
+    final_response = ""
+    for response in response:
+        final_response += response.text
+
+    # Set the response message
+    res = {"fulfillment_response": {"messages": [{"text": {"text": [final_response.text]}}]}}
+
     # Return the response
     return res
