@@ -5,9 +5,9 @@ Cloud Function for getting text response from Gemini API.
 
 import os
 
+from dotenv import load_dotenv
 import functions_framework
 import vertexai.preview.generative_models as generative_models
-from dotenv import load_dotenv
 from vertexai.preview.generative_models import GenerativeModel
 
 load_dotenv()
