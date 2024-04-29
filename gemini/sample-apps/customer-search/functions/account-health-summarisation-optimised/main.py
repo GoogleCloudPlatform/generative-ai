@@ -5,7 +5,7 @@ from typing import Dict
 import functions_framework
 from google.cloud import bigquery, storage
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 client: bigquery.Client = bigquery.Client()
@@ -275,14 +275,14 @@ def account_health_summary(request):
         "top_p": 1,
     }
     safety_settings = {
-    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = model = GenerativeModel("gemini-1.0-pro-002")
     responses = model.generate_content(
-      f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
+        f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
     You are provided with name, total income, total expenditure, total asset amount, total debt amount, total investment amount, high risk investments for the user in the following lines.
     {first_name},
     {total_income},
@@ -316,14 +316,14 @@ def account_health_summary(request):
     If Total Investment is greater than 0: the following details must be mentioned in a uniformly formatted table:
     For each element in Scheme_Name: mention the respective one month from One_Month_Return in ₹ and trailing twelve month returns from TTM_Return in ₹ in the table.
     """,
-      generation_config=generation_config,
-      safety_settings=safety_settings,
-      stream=True,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
     )
 
     final_response = ""
     for response in responses:
-        final_response += response.text 
+        final_response += response.text
 
     print(f"Response from Model: {final_response}")
 
