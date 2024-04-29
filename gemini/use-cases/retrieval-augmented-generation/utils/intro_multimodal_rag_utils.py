@@ -218,11 +218,16 @@ def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
 
     embeddings_dict = {}
 
+    if not text_data:
+        return embeddings_dict
+
     if isinstance(text_data, dict):
         # Process each chunk
         # print(text_data)
         for chunk_number, chunk_value in text_data.items():
-            text_embd = get_text_embedding_from_text_embedding_model(text=chunk_value)
+            text_embd = get_text_embedding_from_text_embedding_model(
+                text=chunk_value
+            )
             embeddings_dict[chunk_number] = text_embd
     else:
         # Process the first 1000 characters of the page text
