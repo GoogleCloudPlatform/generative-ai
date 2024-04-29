@@ -60,7 +60,7 @@ def mutual_fund_recommendation(request):
     }
     model = GenerativeModel("gemini-1.0-pro-002")
     response = model.generate_content(
-    f"""
+        f"""
         You are a mutual fund expert/analyst and you have to recommed the 3 best possible mutual fund based on returns among the given list in csv format
         {csv_table}
 
