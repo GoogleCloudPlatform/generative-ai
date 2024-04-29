@@ -58,7 +58,6 @@ def find_nearest_bike_dealer(request):
             + " "
             + str(row["Plus_Code"])
         )
-
     vertexai.init(project=project_id, location="us-central1")
     generation_config = {
         "max_output_tokens": 2048,
