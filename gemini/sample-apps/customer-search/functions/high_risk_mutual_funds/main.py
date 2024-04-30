@@ -35,14 +35,12 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 
 
 @functions_framework.http
-def hello_http(request):
+def high_risk_mutual_funds(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
-    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)

@@ -64,14 +64,12 @@ def check_senior_citizen(dob):
 
 
 @functions_framework.http
-def hello_http(request):
+def fixed_deposit_recommendation(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
-    # 342345, 592783
 
     # get account balance of the user
     query_account_balance = f"""
@@ -137,11 +135,6 @@ def hello_http(request):
 
 
     rounded_fd_amount = round_to_nearest_thousands(fd_amount)
-
-    # if balance < 200000:
-    #   result = "This is not sufficient to cover upcoming expenses of electricity for rest of the month"
-    #   output = {"fulfillment_response": {"messages": [{"text": {"text": [result]}}]}}
-    #   return output
 
     if fd_amount < 10000:
         result = "Your balance is too low for FD."

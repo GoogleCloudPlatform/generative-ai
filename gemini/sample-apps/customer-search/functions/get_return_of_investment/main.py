@@ -10,7 +10,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def hello_http(request):
+def return_of_investment(request):
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

@@ -12,7 +12,7 @@ api_key = environ.get("API_KEY")
 
 
 @functions_framework.http
-def hello_http(request):
+def find_nearest_bike_dealer(request):
     headers = {"Content-Type": "application/json"}
 
     request_json = request.get_json(silent=True)
@@ -20,8 +20,6 @@ def hello_http(request):
     client = bigquery.Client()
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # customer_id = 235813
-    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)
