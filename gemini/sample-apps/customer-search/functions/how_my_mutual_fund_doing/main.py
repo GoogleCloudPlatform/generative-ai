@@ -12,11 +12,11 @@ project_id = environ.get("PROJECT_ID")
 client: bigquery.Client = bigquery.Client()
 
 
-def run(name, statement):
+def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
     return name, client.query(statement).result()  # blocks the thread
 
 
-def run_all(statements: Dict[str, str]):
+def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
     with ThreadPoolExecutor() as executor:
         jobs = []
         for name, statement in statements.items():
@@ -25,7 +25,9 @@ def run_all(statements: Dict[str, str]):
     return result
 
 
-def upload_blob(bucket_name, source_file_name, destination_blob_name):
+def upload_blob(
+    bucket_name: str, source_file_name: str, destination_blob_name: str
+) -> str:
     """Uploads a file to the bucket"""
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
