@@ -12,7 +12,7 @@ country_names = config["countryList"]
 data_path = config["Data"]["current_data"]
 
 
-def extract_json_influencer_wise(scrape_size, first_scrape, saved):
+def extract_json_influencer_wise(scrape_size: dict, first_scrape: bool, saved: dict) -> None:
     """Extracts data from Instagram and saves it in a JSON file.
 
     Args:
@@ -23,7 +23,7 @@ def extract_json_influencer_wise(scrape_size, first_scrape, saved):
     """
 
 
-def periodic_extraction(scrape_size, first_period):
+def periodic_extraction(scrape_size: dict, first_period: bool) -> None:
     """Extracts data from Instagram periodically and saves it in a JSON file.
 
     Args:
@@ -97,7 +97,7 @@ def periodic_extraction(scrape_size, first_period):
         json.dump(saved, outfile)
 
 
-def create_final_data(scrape_size):
+def create_final_data(scrape_size: dict) -> None:
     """Creates the summarized final data from the results of image captioning.
 
     Args:
@@ -136,7 +136,7 @@ def create_final_data(scrape_size):
         json.dump(saved, outfile)
 
 
-def merge_keys():
+def merge_keys() -> None:
     """Merges keys in the final data file that have only a difference of spaces, capital letters, etc."""
 
     # merging the keys which only have a difference of spaces, capital letters
@@ -169,7 +169,7 @@ def merge_keys():
         json.dump(saved, outfile)
 
 
-def combine_insta_and_vogue():
+def combine_insta_and_vogue() -> None:
     """Combines data from Instagram and Vogue into a single file."""
 
     # Combining Instagram (India) and Vogue-India data
@@ -212,7 +212,7 @@ def combine_insta_and_vogue():
         json.dump(saved, outfile)
 
 
-def create_news_articles_data():
+def create_news_articles_data() -> None:
     """Extracts news articles from Vogue and saves them in a JSON file."""
 
     with open(data_path, "r") as f:
@@ -230,7 +230,7 @@ def create_news_articles_data():
         json.dump(saved, outfile)
 
 
-def get_top_categories(saved):
+def get_top_categories(saved: dict) -> None:
     """Gets the top categories from the final data file.
 
     Args:
@@ -251,7 +251,7 @@ def get_top_categories(saved):
         json.dump(saved, outfile)
 
 
-def insta_scrape():
+def insta_scrape() -> None:
     """Scrapes data from Instagram and saves it in a JSON file."""
 
     scrape_size = {"num_countries": 10, "num_influencers": 20, "num_posts": 50}
@@ -270,7 +270,7 @@ def insta_scrape():
     get_top_categories(saved)
 
 
-def vogue_scrape():
+def vogue_scrape() -> None:
     """Scrapes data from Vogue and saves it in a JSON file."""
 
     create_news_articles_data()

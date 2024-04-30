@@ -8,6 +8,7 @@ Classes:
 
 from bertopic import BERTopic
 from hdbscan import HDBSCAN
+from typing import List, Tuple
 from umap import UMAP
 
 
@@ -23,7 +24,7 @@ class Prediction:
         model_a (BERTopic): A BERTopic model used for topic modeling.
     """
 
-    def __init__(self, data):
+    def __init__(self, data: dict):
         """Initializes the Prediction class.
 
         Args:
@@ -50,7 +51,7 @@ class Prediction:
             n_gram_range=(1, 5),
         )
 
-    def query(self, category, country):
+    def query(self, category: str, country: str) -> Tuple[List[str], List[List[str]]]:
         """Queries the model to generate predictions.
 
         Args:

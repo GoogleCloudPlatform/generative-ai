@@ -41,6 +41,29 @@ if "JSONdata" not in st.session_state:
     st.session_state["JSONdata"] = read_file_from_gcs_link(DATA_PATH)
 
 
+def img_gen_prompt(text: str) -> str:
+    """Generates a prompt for image generation based on the given text.
+
+    Args:
+        text (str): The text to generate the prompt from.
+
+    Returns:
+        str: The generated prompt.
+
+    """
+    query = """
+                "{}", what does the user want to generate image of based on current chat history? Strictly give the name of the outfit only.
+            """.format(
+        text
+    )
+    print(query)
+    res = bot.send_message(
+        query, generation_config=generation_config, safety_settings=safety_settings
+    )
+    prompt = "Outfit - " + res.text
+    return prompt
+
+
 country = st.selectbox(
     "Select Country", st.session_state["JSONdata"]["finaldata"].keys()
 )
@@ -139,29 +162,6 @@ if hist_key not in st.session_state:
         st.session_state[hist_key] = [
             ["assistant", "Ask me anything about " + category + " outfits"]
         ]
-
-
-def img_gen_prompt(text):
-    """Generates a prompt for image generation based on the given text.
-
-    Args:
-        text (str): The text to generate the prompt from.
-
-    Returns:
-        str: The generated prompt.
-
-    """
-    query = """
-                "{}", what does the user want to generate image of based on current chat history? Strictly give the name of the outfit only.
-            """.format(
-        text
-    )
-    print(query)
-    res = bot.send_message(
-        query, generation_config=generation_config, safety_settings=safety_settings
-    )
-    prompt = "Outfit - " + res.text
-    return prompt
 
 
 with st.container(border=True):

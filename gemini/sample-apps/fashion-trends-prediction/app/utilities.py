@@ -4,7 +4,7 @@ import streamlit as st
 from streamlit.components.v1 import html
 
 
-def nav_page(page_name, timeout_secs=3):
+def nav_page(page_name: str, timeout_secs: int = 3) -> None:
     """Navigates to a page in the Streamlit app.
 
     Args:
@@ -39,7 +39,18 @@ def nav_page(page_name, timeout_secs=3):
     )
     html(nav_script)
 
-def button_html_script(widget_label , btn_bg_color1 , btn_bg_color2):
+def button_html_script(widget_label: str , btn_bg_color1: str , btn_bg_color2: str) -> str:
+    """Generates HTML script to change the color of a button.
+
+    Args:
+        widget_label (str): The label of the button.
+        btn_bg_color1 (str): The background color of the button.
+        btn_bg_color2 (str): The border color of the button.
+
+    Returns:
+        str: The HTML script.
+
+    """
     return f"""
         <script>
             var elements = window.parent.document.querySelectorAll('button');
@@ -54,7 +65,7 @@ def button_html_script(widget_label , btn_bg_color1 , btn_bg_color2):
     """
 
 
-def render_svg(svg_image_path):
+def render_svg(svg_image_path: str) -> None:
     """Renders an svg image
     Args:
         svg_image_path (str): The SVG string path to render.
@@ -73,12 +84,12 @@ def render_svg(svg_image_path):
 
 
 def build_markup_for_logo(
-    png_file_path,
-    background_position="50% 10%",
-    margin_top="5%",
-    image_width="80%",
-    image_height="",
-):
+    png_file_path: str,
+    background_position: str = "50% 10%",
+    margin_top: str = "5%",
+    image_width: str = "80%",
+    image_height: str = "",
+) -> str:
     """Builds the HTML markup for a logo.
 
     Args:
@@ -111,7 +122,7 @@ def build_markup_for_logo(
     )
 
 
-def add_logo(png_file_path):
+def add_logo(png_file_path: str) -> None:
     """Adds a logo to the sidebar.
 
     Args:
@@ -124,7 +135,17 @@ def add_logo(png_file_path):
         unsafe_allow_html=True,
     )
 
-def details_html(key , values_str):
+def details_html(key: str , values_str: str) -> str:
+    """Generates HTML for displaying details in a box.
+
+    Args:
+        key (str): The key of the details.
+        values_str (str): The values of the details.
+
+    Returns:
+        str: The HTML.
+
+    """
     return f"""
             <style>
             .box-container {{

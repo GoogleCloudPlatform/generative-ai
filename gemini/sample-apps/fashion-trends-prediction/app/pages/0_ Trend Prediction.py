@@ -11,7 +11,7 @@ from prediction import Prediction
 import requests
 import streamlit as st
 import streamlit.components.v1 as components
-from utilities import add_logo, stImg ,button_html_script ,details_html, exception_html
+from utilities import add_logo ,button_html_script ,details_html, exception_html
 from utils_standalone_image_gen import predict_image
 import vertexai
 import vertexai.preview.generative_models as generative_models
@@ -85,7 +85,7 @@ articles = st.session_state["articleModel"]
 submit = st.button("Get trend predictions", type="primary")
 
 
-def change_button_colour(widget_label, prsd_status):
+def change_button_colour(widget_label: str, prsd_status: bool) -> None:
     """Changes the color of a button based on its pressed status.
 
     Args:
@@ -100,7 +100,7 @@ def change_button_colour(widget_label, prsd_status):
     components.html(f"{htmlstr}", height=0, width=0)
 
 
-def chk_btn_status_and_assign_colour(buttons):
+def chk_btn_status_and_assign_colour(buttons: list) -> None:
     """Checks the pressed status of a list of buttons and assigns colors accordingly.
 
     Args:
@@ -110,7 +110,7 @@ def chk_btn_status_and_assign_colour(buttons):
         change_button_colour(buttons[i], state["btn_prsd_status"][i])
 
 
-def btn_pressed_callback(i):
+def btn_pressed_callback(i: int) -> None:
     """Callback function for when a button is pressed.
 
     Args:

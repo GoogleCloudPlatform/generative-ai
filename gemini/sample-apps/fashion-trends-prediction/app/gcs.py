@@ -1,12 +1,13 @@
 import base64
 import json
 import pickle
+from typing import Union
 from urllib.parse import urlparse
 
 from google.cloud import storage
 
 
-def read_file_from_gcs_link(gcs_link):
+def read_file_from_gcs_link(gcs_link: str) -> Union[dict, bytes]:
     """Reads a JSON or pickle file directly from a Google Cloud Storage link.
 
     Args:

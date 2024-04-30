@@ -15,20 +15,20 @@ from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 from vertexai.preview.language_models import TextGenerationModel
 from vertexai.preview.vision_models import Image, ImageQnAModel
 
-gemini_model = GenerativeModel("gemini-1.0-pro-vision-001")
-gemini_model_language = GenerativeModel("gemini-1.0-pro-002")
+gemini_model: GenerativeModel = GenerativeModel("gemini-1.0-pro-vision-001")
+gemini_model_language: GenerativeModel = GenerativeModel("gemini-1.0-pro-002")
 
 parameters = config["parameters"]["standard"]
 
 
-fewshot_images = []
+fewshot_images: list[Part] = []
 num_files = len(config["fewshot_images"])
 for i in range(num_files):
     filename = "image" + str(i + 1)
     fewshot_images.append(Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"))
 
 
-def generate_caption(image_path):
+def generate_caption(image_path: str) -> dict:
     """Generates a caption for an image using the Gemini model.
 
     Args:
@@ -38,7 +38,7 @@ def generate_caption(image_path):
                     dict: A dictionary containing the generated caption.
     """
 
-    answer = {}
+    answer: dict = {}
 
     with open(image_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
@@ -126,7 +126,7 @@ def generate_caption(image_path):
     return answer
 
 
-def get_posts(user, previous, cnt=10, cookies={}, model="Gemini"):
+def get_posts(user: str, previous: list, cnt: int = 10, cookies: dict = {}) -> list:
     """Gets a list of posts from an Instagram user.
 
     Args:

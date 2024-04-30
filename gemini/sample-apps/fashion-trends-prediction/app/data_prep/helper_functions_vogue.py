@@ -1,10 +1,11 @@
 import time
+import requests
 
 from bs4 import BeautifulSoup
 from data_processing import summarize_article
 
 # Get news articles content
-def get_articles(url, past_scrape, numPages=2):
+def get_articles(url: str, past_scrape: list, numPages: int = 2) -> list:
     """Gets news articles from a given URL and returns a list of tuples containing the article URL, summary, and attributes.
 
     Args:

@@ -6,7 +6,13 @@ from config import config
 import requests
 
 # Get the entire list of country names
-def get_countries():
+def get_countries() -> list:
+    """Gets the entire list of country names.
+
+    Returns:
+            list: A list of country names.
+
+    """
     URL = "https://hypeauditor.com/top-instagram/"
     response = requests.get(URL)
     page = BeautifulSoup(response.content, "html.parser")
@@ -21,7 +27,16 @@ def get_countries():
 
 
 # Get list of top 50 influencers country wise
-def get_influencers(country):
+def get_influencers(country: str) -> list:
+    """Gets a list of top 50 influencers country wise.
+
+    Args:
+            country (str): The country name.
+
+    Returns:
+            list: A list of top 50 influencers of that country.
+
+    """
     if country == "All countries":
         url = "https://hypeauditor.com/top-instagram-fashion"
     else:
@@ -43,7 +58,13 @@ def get_influencers(country):
     return influencers
 
 
-def insta_login():
+def insta_login() -> dict:
+    """Logs into Instagram and returns a dictionary of cookies.
+
+    Returns:
+            dict: A dictionary of cookies.
+
+    """
     # Creating a session
     # reference: https://github.com/KEAGTORB/grab-insta/blob/main/grab.py
     username = config["username"]
@@ -78,7 +99,17 @@ def insta_login():
     return cookies
 
 
-def get_id(user, cookies):
+def get_id(user: str, cookies: dict) -> str:
+    """Gets the Instagram user ID.
+
+    Args:
+            user (str): The Instagram username.
+            cookies (dict): A dictionary of cookies.
+
+    Returns:
+            str: The Instagram user ID.
+
+    """
     link = "https://www.instagram.com/web/search/topsearch/?query={}".format(user)
     response = requests.get(link, cookies=cookies)
 

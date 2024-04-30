@@ -8,7 +8,7 @@ from driver import get_top_categories
 data_path = config["Data"]["current_data"]
 
 
-def images_scrape(saved):
+def images_scrape(saved: dict) -> None:
     """
 
     Write code here to extract/ scrape images from your data source.

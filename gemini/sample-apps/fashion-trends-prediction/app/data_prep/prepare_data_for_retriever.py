@@ -10,7 +10,7 @@ from langchain.vectorstores import FAISS
 data_path = config["Data"]["current_data"]
 
 
-def prepare_data_for_retriever():
+def prepare_data_for_retriever() -> None:
     """Prepares data for the retriever.
 
     This function loads the saved data, converts articles to lowercase, creates Document objects for each article, splits the documents into chunks, and saves the chunks and vectorstore to disk.

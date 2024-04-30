@@ -18,7 +18,7 @@ mode = config["mode"]
 
 
 class Articles:
-    def __init__(self, data):
+    def __init__(self, data: dict):
         """Initializes the Articles class.
 
         Args:
@@ -59,7 +59,7 @@ class Articles:
 
         self.model = GenerativeModel("gemini-1.0-pro-002")
 
-    def get_articles(self, outfit):
+    def get_articles(self, outfit: str) -> list:
         """Gets articles related to a given outfit.
 
         Args:
