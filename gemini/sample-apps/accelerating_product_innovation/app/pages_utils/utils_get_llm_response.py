@@ -19,8 +19,7 @@ import aiohttp
 from dotenv import load_dotenv
 import streamlit as st
 import vertexai
-import vertexai.generative_models as generative_models
-from vertexai.generative_models import GenerativeModel
+from vertexai import generative_models
 
 load_dotenv()
 
@@ -41,7 +40,7 @@ def generate_gemini(text_prompt: str) -> str:
     Returns:
         The generated text.
     """
-    model = GenerativeModel("gemini-pro")
+    model = generative_models.GenerativeModel("gemini-pro")
     safety_setting = generative_models.HarmBlockThreshold.BLOCK_NONE
     try:
         responses = model.generate_content(

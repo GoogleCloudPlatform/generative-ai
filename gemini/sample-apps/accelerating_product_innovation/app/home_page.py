@@ -2,7 +2,7 @@
 Entry page of the streamlit application.
 """
 
-import app.pages_utils.utils as utils
+from app.pages_utils import utils
 from app.pages_utils.utils_config import PAGES_CFG
 from st_pages import show_pages_from_config
 import streamlit as st
