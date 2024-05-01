@@ -3,7 +3,7 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
@@ -55,7 +55,7 @@ def return_of_investment(request):
         generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = GenerativeModel("gemini-1.0-pro-002")
-    
+
     responses = model.generate_content(
         """Given the return of investment list do the following:
     1. Convert amount to correct format for example ₹ 100235 to ₹ 1,00,235, ₹ 16423.3423 to ₹ 16,423.3423.
@@ -70,7 +70,7 @@ def return_of_investment(request):
 
     final_response = ""
     for response in responses:
-        final_response += response.text 
+        final_response += response.text
 
     investment_list_str = final_response
 

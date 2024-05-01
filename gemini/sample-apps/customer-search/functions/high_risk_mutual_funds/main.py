@@ -4,12 +4,13 @@ from typing import Dict
 import functions_framework
 from google.cloud import bigquery, storage
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 client: bigquery.Client = bigquery.Client()
 
 project_id = environ.get("PROJECT_ID")
+
 
 def run(name, statement):
     return name, client.query(statement).result()  # blocks the thread
@@ -144,7 +145,7 @@ def high_risk_mutual_funds(request):
         generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = GenerativeModel("gemini-1.0-pro-002")
-    
+
     responses = model.generate_content(
         f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values as Investment Summary in small pointers.
 
@@ -190,7 +191,6 @@ def high_risk_mutual_funds(request):
     final_response = ""
     for response in responses:
         final_response += response.text
-    
 
     url = "https://storage.cloud.google.com/public_bucket_fintech_app/Market%20Summary.pdf"
 

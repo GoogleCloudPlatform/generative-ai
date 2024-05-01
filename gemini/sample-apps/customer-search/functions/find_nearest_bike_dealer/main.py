@@ -3,7 +3,7 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
@@ -58,7 +58,7 @@ def find_nearest_bike_dealer(request):
             + " "
             + str(row["Plus_Code"])
         )
-    
+
     vertexai.init(project=project_id, location="us-central1")
     generation_config = {
         "max_output_tokens": 2048,
@@ -72,7 +72,7 @@ def find_nearest_bike_dealer(request):
         generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = GenerativeModel("gemini-1.0-pro-002")
-    
+
     responses = model.generate_content(
         f"""You are a chatbot for Cymbal bank application.
     The user is interested in buying a new motorcycle. Given the address of the user as {cust_address}, provide the user information about 5 motorcycle dealers of {category} category brands along with address of their showrooms nearest to their address {0} and some of the best selling models with proper spacing and indentation for clear readability.
@@ -89,7 +89,7 @@ def find_nearest_bike_dealer(request):
     final_response = ""
     for response in responses:
         final_response += response.text
-        
+
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
         "sessionInfo": {

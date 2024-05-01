@@ -4,7 +4,7 @@ import functions_framework
 from google.cloud import bigquery
 import requests
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
@@ -108,7 +108,7 @@ def find_nearest_bike_dealer(request):
         generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = GenerativeModel("gemini-1.0-pro-002")
-    
+
     responses = model.generate_content(
         f"""You are a chatbot for Cymbal bank. The user is interested in buying a new car. Acknowledge that the user is not interested in Fixed Deposit because they are saving to purchase a new car and provide them information about some partner car dealers near his location using the following:
     Distances = {distances}
@@ -132,8 +132,8 @@ def find_nearest_bike_dealer(request):
 
     final_response = ""
     for response in responses:
-        final_response += response.text 
-        
+        final_response += response.text
+
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
         "sessionInfo": {

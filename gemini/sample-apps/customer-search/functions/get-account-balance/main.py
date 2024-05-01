@@ -3,7 +3,7 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
@@ -50,7 +50,7 @@ def account_balance(request):
         upcoming_month_expenses_amount += row["fund_transfer_amount"]
 
     payment_list_str_formatted = payment_list_str.split("\n")
-    
+
     vertexai.init(project=project_id, location="us-central1")
     generation_config = {
         "max_output_tokens": 2048,
@@ -64,7 +64,7 @@ def account_balance(request):
         generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = GenerativeModel("gemini-1.0-pro-002")
-    
+
     responses = model.generate_content(
         """
         Format the dates in the following information,e.g. 2024-10-01 to  Oct 1, 2024
@@ -80,11 +80,11 @@ def account_balance(request):
         safety_settings=safety_settings,
         stream=True,
     )
-    
+
     payment_list_str_formatted = ""
     for response in responses:
-        payment_list_str_formatted += response.text 
-        
+        payment_list_str_formatted += response.text
+
     responses = model.generate_content(
         f"""
             display the {account_balance} in proper format in indian currency
@@ -98,10 +98,10 @@ def account_balance(request):
     )
 
     account_balance_formatted = ""
-    
+
     for response in responses:
-        account_balance_formatted += response.text 
-        
+        account_balance_formatted += response.text
+
     account_balance_str = f"Your account balance is {account_balance_formatted}"
 
     if account_balance < upcoming_month_expenses_amount:

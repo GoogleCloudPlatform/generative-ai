@@ -5,7 +5,7 @@ from typing import Dict
 import functions_framework
 from google.cloud import bigquery, storage
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
@@ -149,7 +149,7 @@ def hello_http(request):
         generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = GenerativeModel("gemini-1.0-pro-002")
-    
+
     responses = model.generate_content(
         f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values as Investment Summary in small pointers.
 
@@ -191,7 +191,6 @@ def hello_http(request):
         safety_settings=safety_settings,
         stream=True,
     )
-
 
     final_response = ""
     for response in responses:

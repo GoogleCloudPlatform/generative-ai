@@ -5,7 +5,7 @@ import functions_framework
 from google.cloud import bigquery, storage
 import plotly.graph_objects as go
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
@@ -68,7 +68,7 @@ def category_wise_expenditure(request):
         generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     }
     model = GenerativeModel("gemini-1.0-pro-002")
-    
+
     responses = model.generate_content(
         f"""You are a chatbot for a bank application. Given the transaction list {transaction_list_str} do the following:
     1. Convert amount to correct format, for example ₹100235 to ₹1,00,235.00.
@@ -97,10 +97,9 @@ def category_wise_expenditure(request):
         stream=True,
     )
 
-    
     final_response = ""
     for response in responses:
-        final_response += response.text 
+        final_response += response.text
 
     transaction_list_str = final_response
     transaction_list = transaction_list_str.split("*")

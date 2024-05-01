@@ -4,7 +4,7 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part, FinishReason
+from vertexai.generative_models import FinishReason, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 
 project_id = environ.get("PROJECT_ID")
@@ -133,7 +133,6 @@ def fixed_deposit_recommendation(request):
         if row["fund_transfer_amount"] is not None:
             fd_amount = fd_amount - row["fund_transfer_amount"]
 
-
     rounded_fd_amount = round_to_nearest_thousands(fd_amount)
 
     if fd_amount < 10000:
@@ -189,7 +188,7 @@ def fixed_deposit_recommendation(request):
 
     final_response = ""
     for response in responses:
-        final_response += response.text 
+        final_response += response.text
 
     res = {
         "fulfillment_response": {
