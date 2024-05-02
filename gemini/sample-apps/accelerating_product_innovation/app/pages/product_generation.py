@@ -9,7 +9,8 @@ with a focus on guiding users through product generation. This module:
 * Content Drafts:
    * Creates and displays new product ideas based on generated features.
    * Allows users to modify their selected features and content drafts.
-* Export Options:  Enables downloading generated content and creating email copies.
+* Export Options:  Enables downloading generated content and creating email
+  copies.
 * Image Editing:  Facilitates redirection to an image editing page.
 """
 
@@ -49,7 +50,8 @@ def get_prod_gen_img() -> None:
 
 def initialize_prod_gen() -> None:
     """
-    This function initializes the session state for the product generation page.
+    This function initializes the session state for the product generation
+    page.
 
     Args:
         None
@@ -57,15 +59,12 @@ def initialize_prod_gen() -> None:
     Returns:
         None
     """
-
-    st.session_state.image_file_prefix = (
-        "gen_image"  # All images generated on this page have prefix 'gen_image'
-    )
+    # All images generated on this page have prefix 'gen_image'
+    st.session_state.image_file_prefix = "gen_image"
     st.session_state.image_to_edit = -1  # No image is being edited.
     st.session_state.text_to_edit = -1  # Text is not being edited
-    st.session_state.suggested_images = (
-        None  # Tracks whether image suggestions have been generated (on edit image).
-    )
+    # Tracks whether image suggestions have been generated (on edit image).
+    st.session_state.suggested_images = None
     st.session_state.generate_images = (
         False  # Tracks whetehr images for product ideas have been generated.
     )
@@ -88,7 +87,8 @@ logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 # page title
 st.write(
-    "This page provides a step-by-step guide to generating products with desired characteristics."
+    """This page provides a step-by-step guide to generating products with
+    desired characteristics."""
 )
 
 # Display the project selected by the user
@@ -160,5 +160,8 @@ if (
                 )
 
     # If user clicks edit image, redirect to edit page
-    if st.session_state.image_to_edit != -1 or st.session_state.generate_images is True:
+    if (
+        st.session_state.image_to_edit != -1
+        or st.session_state.generate_images is True
+    ):
         st.switch_page("pages/edit_image.py")

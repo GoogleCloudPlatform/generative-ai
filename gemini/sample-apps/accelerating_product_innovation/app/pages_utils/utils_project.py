@@ -1,10 +1,11 @@
 """
-This module provides functions for interacting with the Google Cloud Storage (GCS)
+This module provides functions for interacting with the Google Cloud Storage
 bucket, specifically for managing projects and their associated files.
 This module:
     * Retrieves a list of existing projects from the GCS bucket.
     * Updates the project list stored in the GCS bucket.
-    * Lists PDF, text, and other supported file types in the current project's GCS bucket.
+    * Lists PDF, text, and other supported file types in the current
+      project's GCS bucket.
     * Deletes an entire project and its contents from the GCS bucket.
     * Deletes a specific file from the GCS project.
 """
@@ -55,7 +56,8 @@ def update_projects(my_list: list[str]) -> None:
 
     This function updates the list of projects in the 'project_list.txt'
     file in the 'product_innovation_bucket' GCS bucket.
-    It uses the 'storage_client' to get the 'blob' object for the 'project_list.txt'
+    It uses the 'storage_client' to get the 'blob' object for the
+    'project_list.txt'
     file and then uploads the contents of the list as a string to the blob.
 
     Args:
@@ -78,7 +80,8 @@ def list_pdf_files_gcs() -> list[list[Any]]:
     It then returns a list of tuples of the blob name and the file extension.
 
     Returns:
-        list[list[Any]]: A list of tuples of the blob name and the file extension.
+        list[list[Any]]: A list of tuples of the blob name and the file
+        extension.
     """
     project_id = PROJECT_ID
     storage_client = storage.Client(project=project_id)
@@ -119,9 +122,13 @@ def delete_project_from_gcs() -> None:
     blobs = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
     for blob in blobs:
         blob.delete()
-    st.session_state.product_categories.remove(st.session_state.product_category)
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
     if len(st.session_state.product_categories) >= 1:
-        st.session_state.product_category = st.session_state.product_categories[0]
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
     update_projects(st.session_state.product_categories)
     st.rerun()
 
@@ -130,7 +137,8 @@ def delete_file_from_gcs(file_name: str) -> None:
     """Deletes a file from the GCS bucket.
 
     This function deletes a file from the GCS bucket.
-    It uses the 'storage_client' to get the 'blob' object for the file and then deletes the blob.
+    It uses the 'storage_client' to get the 'blob' object for the file and
+    then deletes the blob.
 
     Args:
         file_name (str): The name of the file to delete.

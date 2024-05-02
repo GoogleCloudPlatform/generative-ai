@@ -1,13 +1,16 @@
 """
-This module provides functions for adding and formatting content within PDF documents.
+This module provides functions for adding and formatting content within PDF
+documents.
 
 * add_formatted_page(pdf):
-    * Adds a standard-format page with a light gray background and a centered white rectangle.
+    * Adds a standard-format page with a light gray background and a centered
+      white rectangle.
 
 * check_add_page(pdf, text):
     * Handles potential text overflow onto subsequent pages.
 
-* Provides class for generating a pdf template for exporting content and emails.
+* Provides class for generating a pdf template for exporting content and
+ emails.
 """
 
 from math import sqrt
@@ -34,8 +37,10 @@ class PDFRounded(fpdf.FPDF):
         Draws a rectangle with rounded corners.
 
         Args:
-            x (float): The x-coordinate of the top-left corner of the rectangle.
-            y (float): The y-coordinate of the top-left corner of the rectangle.
+            x (float): The x-coordinate of the top-left corner of the
+                       rectangle.
+            y (float): The y-coordinate of the top-left corner of the
+                       rectangle.
             w (float): The width of the rectangle.
             h (float): The height of the rectangle.
             r (float): The radius of the rounded corners.
@@ -44,7 +49,8 @@ class PDFRounded(fpdf.FPDF):
             or 'DF' for drawn and filled. Defaults to 'S' for stroked.
             corners (str, optional): A string of characters indicating
             which corners of the rectangle should be rounded.
-            Can be '1234' for all corners, '12' for the top-left and top-right corners,
+            Can be '1234' for all corners, '12' for the top-left and top-right
+            corners,
             '34' for the bottom-left and bottom-right corners, or
             '13' for the top-left and bottom-right corners. Defaults to '1234'.
         """
@@ -122,7 +128,9 @@ class PDFRounded(fpdf.FPDF):
             )
         self._out(op)
 
-    def _arc(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float):
+    def _arc(
+        self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float
+    ):
         """
         Draws an arc.
 
@@ -146,8 +154,10 @@ class PDFRounded(fpdf.FPDF):
 def add_formatted_page(pdf: fpdf) -> None:
     """Adds a formatted page to the PDF document.
 
-    The page is filled with a light gray color and has a white rectangle in the center.
-    The font is set to Arial, bold, size 18, and the fill color is set to white.
+    The page is filled with a light gray color and has a white rectangle in
+    the center.
+    The font is set to Arial, bold, size 18, and the fill color is set to
+    white.
 
     Args:
         pdf: The PDF document to which the page is added.
@@ -161,7 +171,8 @@ def add_formatted_page(pdf: fpdf) -> None:
 
 
 def check_add_page(pdf: fpdf, text: str) -> list[str]:
-    """Checks if the text overflows onto a new page and adds a new page if necessary.
+    """Checks if the text overflows onto a new page and adds a new page if
+      necessary.
 
     The text is split into lines based on the available page width.
     If the text overflows onto a new page, a new page is added and the text
@@ -172,7 +183,8 @@ def check_add_page(pdf: fpdf, text: str) -> list[str]:
         text: The text to be added to the PDF document.
 
     Returns:
-        A list of strings, where each page is a string containing the text that fits on that page.
+        A list of strings, where each page is a string containing the text
+        that fits on that page.
     """
 
     pages = []  # Store the text content for each page

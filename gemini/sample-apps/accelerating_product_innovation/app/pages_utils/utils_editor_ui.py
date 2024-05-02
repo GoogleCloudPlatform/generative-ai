@@ -1,5 +1,6 @@
 """
-This module defines the 'ImageEditor' class, providing an interactive image editing interface.
+This module defines the 'ImageEditor' class, providing an interactive image
+editing interface.
 """
 
 import io
@@ -12,10 +13,12 @@ from streamlit_drawable_canvas import st_canvas
 class ImageEditor:
     """
     Functions include:
-    * Drawing Tools: Offers tools for drawing masks (rectangles, free drawing, circles).
+    * Drawing Tools: Offers tools for drawing masks (rectangles,
+      free drawing, circles).
     * Customization: Allows control over stroke width and drawing mode.
     * Background Editing:  Enables background modification (with masking).
-    * Prompts:  Facilitates image generation based on user-provided text prompts.
+    * Prompts:  Facilitates image generation based on user-provided text
+      prompts.
     """
 
     def __init__(self):
@@ -40,7 +43,8 @@ class ImageEditor:
         """Renders the main UI components of the image editor."""
         # - Load the image for editing
         image_bytes = self.load_image(
-            f"{st.session_state.image_file_prefix}{st.session_state.image_to_edit + 1}.png"
+            f"""{st.session_state.image_file_prefix}
+            {st.session_state.image_to_edit + 1}.png"""
         )
         bg_image = Image.open(image_bytes)
 
@@ -61,7 +65,9 @@ class ImageEditor:
             # - Provide a description of the form's purpose
             st.write("Input a query to generate the product.")
             img_prompt = st.text_input("Enter your custom query", "")
-            edit_img_btn = st.form_submit_button("Submit prompt", type="primary")
+            edit_img_btn = st.form_submit_button(
+                "Submit prompt", type="primary"
+            )
 
             # - Handle form submission
             if edit_img_btn:
@@ -71,7 +77,7 @@ class ImageEditor:
 
         # Mask Drawing Setup
         drawing_dict = (
-            {  # - Dictionary mapping descriptive names to internal drawing modes
+            {  # - Dictionary mapping descriptive names to drawing modes.
                 "⬜ Rectangle": "rect",
                 "🖌️ Brush": "freedraw",
                 "⚪ Circle": "circle",
@@ -93,7 +99,7 @@ class ImageEditor:
             stroke_width=self.stroke_width,
             stroke_color="rgba(255, 255, 255, 1)",
             background_color="#000",
-            background_image=bg_image,  # - Use loaded image as canvas background
+            background_image=bg_image,  # Use loaded image as background
             update_streamlit=self.realtime_update,
             height=height,
             initial_drawing=None,
@@ -105,7 +111,9 @@ class ImageEditor:
 
         # Background Editing Control
         if st.checkbox("Edit Image Background"):
-            st.session_state.bg_editing = True  # - Enable background editing mode
+            st.session_state.bg_editing = (
+                True  # - Enable background editing mode
+            )
             st.write("       Please mask the area you want to preserve")
         else:
             st.session_state.bg_editing = False  # - Disable background editing

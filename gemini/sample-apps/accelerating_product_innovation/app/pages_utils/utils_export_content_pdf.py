@@ -5,7 +5,10 @@ layouts and formatting.
 
 import os
 
-from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
+from app.pages_utils.utils_pdf_generation import (
+    add_formatted_page,
+    check_add_page,
+)
 from app.pages_utils.utils_pdf_generation import PDFRounded as FPDF
 import streamlit as st
 
@@ -65,11 +68,14 @@ def create_pdf_layout(
             pdf.multi_cell(170, 5, page)  # Output the text
 
 
-def create_content_pdf(product_content: list, selected_titles: list[str]) -> None:
+def create_content_pdf(
+    product_content: list, selected_titles: list[str]
+) -> None:
     """Creates a PDF for each product content and selected title.
 
     Args:
-        product_content: A list of lists of dictionaries representing the product content.
+        product_content: A list of lists of dictionaries representing the
+        product content.
         selected_titles: A list of selected titles for each product content.
     """
     print("HERE....")
@@ -79,7 +85,9 @@ def create_content_pdf(product_content: list, selected_titles: list[str]) -> Non
         images = []
 
         # Build content and image lists for the current product
-        content.append(product_content[product_index][0]["text"].replace("**", ""))
+        content.append(
+            product_content[product_index][0]["text"].replace("**", "")
+        )
         images.append(st.session_state.num_drafts * product_index + 1)
 
         # Generate the PDF layout
@@ -119,7 +127,8 @@ def create_email_pdf(
         title: The title of the email.
         email_text: The body of the email.
         filename: The name of the PDF file to be created.
-        image_name: The name of the image file to be included in the PDF document.
+        image_name: The name of the image file to be included in the PDF
+        document.
     """
     pdf = FPDF()
     parts = email_text.split("\n", 1)

@@ -4,9 +4,11 @@ It provides the following features:
 
 * Image Upload Handling: Processes and stores uploaded images.
 * Interactive Image Editor:
-    * Offers an interface for modifying images (drawing, background editing, etc.).
+    * Offers an interface for modifying images (drawing, background editing,
+      etc.).
     * Processes and combines foreground edits with the background image.
-* Draft Saving: Enables saving edited images as drafts, replacing the original draft versions.
+* Draft Saving: Enables saving edited images as drafts, replacing the original
+ draft versions.
 * Image Suggestion Generation:
     * Accepts text prompts to generate variations of the edited image.
     * Displays the generated image suggestions.
@@ -45,7 +47,10 @@ if st.session_state.uploaded_img is True:
     handle_image_upload()
 
 # Check if the user has started editing the image
-if st.session_state.start_editing is None or st.session_state.start_editing is True:
+if (
+    st.session_state.start_editing is None
+    or st.session_state.start_editing is True
+):
     # Initialize Editor
     image_editor = ImageEditor()
 
@@ -54,7 +59,8 @@ if st.session_state.start_editing is None or st.session_state.start_editing is T
     background = Image.new("RGB", bg_image.size)
 
     # Display save button only if draft elements exist
-    # Function of save button: replace the original image in drafts with edited image
+    # Function of save button: replace the original image in drafts with
+    # edited image
     if st.session_state.draft_elements is not None:
         if st.button("Save"):
             row = st.session_state.image_edit_row
@@ -72,7 +78,7 @@ if st.session_state.start_editing is None or st.session_state.start_editing is T
         # Call image processing function, using canvas drawing as foreground
         processed_image_bytes = process_foreground_image(
             foreground_image=foreground,
-            background_image=background,  # Assuming 'background' is defined elsewhere
+            background_image=background,
             bg_editing=st.session_state.bg_editing,
         )
         # Store the processed image data for further use

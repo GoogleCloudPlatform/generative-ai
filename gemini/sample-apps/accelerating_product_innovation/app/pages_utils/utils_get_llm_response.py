@@ -1,5 +1,6 @@
 """
-This module provides functions for interacting with Vertex AI text generation model (Gemini-Pro).
+This module provides functions for interacting with Vertex AI text generation
+model (Gemini-Pro).
 
 * generate_gemini():
     * Utilizes the Gemini-Pro model for flexible text generation.
@@ -42,6 +43,7 @@ def generate_gemini(text_prompt: str) -> str:
     """
     model = generative_models.GenerativeModel("gemini-pro")
     safety_setting = generative_models.HarmBlockThreshold.BLOCK_NONE
+    harm_category = generative_models.HarmCategory
     try:
         responses = model.generate_content(
             text_prompt,
@@ -51,10 +53,10 @@ def generate_gemini(text_prompt: str) -> str:
                 "top_p": 1,
             },
             safety_settings={
-                generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: safety_setting,
-                generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
-                generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
-                generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: safety_setting,
+                harm_category.HARM_CATEGORY_HATE_SPEECH: safety_setting,
+                harm_category.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
+                harm_category.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
+                harm_category.HARM_CATEGORY_HARASSMENT: safety_setting,
             },
             stream=True,
         )
@@ -69,7 +71,8 @@ def generate_gemini(text_prompt: str) -> str:
 
 
 async def parallel_generate_search_results(query: str) -> str:
-    """Generates search results using the Text-Bison model in a parallel fashion.
+    """Generates search results using the Text-Bison model in a parallel
+       fashion.
 
     Args:
         query: The query to generate search results for.
@@ -82,7 +85,9 @@ async def parallel_generate_search_results(query: str) -> str:
     logging.debug("Text call start")
     headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
-        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        url = (
+            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        )
         async with session.post(
             url, data=data_json, headers=headers, verify_ssl=False
         ) as response:

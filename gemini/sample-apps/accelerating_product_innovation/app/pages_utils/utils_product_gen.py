@@ -6,7 +6,8 @@ Functions include:
     * Initiate text and image generation with user-provided features.
     * Store the generated content for display.
     * Support content generation with asynchronous calls.
-    * Render a form for selecting pre-defined prompts or entering custom queries.
+    * Render a form for selecting pre-defined prompts or entering custom
+      queries.
     * Facilitate the generation of product feature suggestions.
 """
 
@@ -53,23 +54,30 @@ def update_generation_state() -> None:
     st.session_state.selected_titles = (
         []
     )  # Stores selected titles for new product generation.
-    st.session_state.product_content = []  # Content corresponding to each feature.
-    st.session_state.content_edited = False  # Tracks whether content is being edited.
+    st.session_state.product_content = (
+        []
+    )  # Content corresponding to each feature.
+    st.session_state.content_edited = (
+        False  # Tracks whether content is being edited.
+    )
 
 
 def generate_product_suggestions_for_feature_generation() -> None:
-    """Generates suggestions for a given product category for feature generation.
+    """Generates suggestions for a given product category for feature
+      generation.
 
     Returns:
         list: A list of feature suggestions.
     """
     with st.spinner("Fetching Suggestions..."):
         feature_prompts = generate_gemini(
-            f"""5 broad categories of {st.session_state.product_category} buyers.
-            Give answer as a numbered list. Each point should strictly be only
-            a category without any description."""
+            f"""5 broad categories of {st.session_state.product_category}
+            buyers. Give answer as a numbered list. Each point should
+            strictly be only a category without any description."""
         )
-        st.session_state.feature_suggestions = create_suggestion_list(feature_prompts)
+        st.session_state.feature_suggestions = create_suggestion_list(
+            feature_prompts
+        )
 
 
 def build_prompt_form() -> bool:
@@ -82,7 +90,8 @@ def build_prompt_form() -> bool:
         generate_product_suggestions_for_feature_generation()
     with st.form("prompt input"):
         options = [
-            f"Recommend {st.session_state.product_category} formulation features for {segment}"
+            f"""Recommend {st.session_state.product_category} formulation
+            features for {segment}"""
             for segment in st.session_state.feature_suggestions
         ]
         st.session_state.selected_prompt = st.selectbox(
@@ -124,34 +133,43 @@ async def parallel_call(title_arr: list[str]) -> list[Any]:
         title_arr (list): A list of product titles.
 
     Returns:
-        list: A list of tuples containing the text and image generation results.
+        list: A list of tuples containing the text and image generation
+          results.
     """
     logging.debug("entered parallel call")
     text_processes = []
     img_processes = []
     for index, title in enumerate(title_arr):
-        # Handle edge case (No assorted products to be created in case only one feature is selected)
+        # Handle edge case (No assorted products to be created in case only
+        # one feature is selected)
         if index == 1 and len(st.session_state.selected_titles) == 1:
             break
 
         # Create image generation and text generation prompts.
-        img_prompt = f"{st.session_state.product_category} with {title} packaging."
+        img_prompt = (
+            f"{st.session_state.product_category} with {title} packaging."
+        )
         text_prompt = f"""Generate an innovative and original idea for a
         {st.session_state.product_category} that is {title} for
-        {st.session_state.selected_prompt}. List ingredients of the suggested product.
-        List benefits for different demographics of consumers of the product.
-        The answer should strictly be very long and detailed and capture all features of
-        the suggested product. Separately give the utility of the product for any
-        three example consumer segments. Strictly demonstrate how the suggested product is
-        an improvement over existing products."""
+        {st.session_state.selected_prompt}. List ingredients of the suggested
+        product. List benefits for different demographics of consumers of the
+        product. The answer should strictly be very long and detailed and
+        capture all features of the suggested product. Separately give the
+        utility of the product for any three example consumer segments.
+        Strictly demonstrate how the suggested product is an improvement
+        over existing products."""
 
         # Parallel calls to generate new content.
         if st.session_state.content_generated is False:
             text_processes.append(
-                asyncio.create_task(parallel_generate_search_results(text_prompt))
+                asyncio.create_task(
+                    parallel_generate_search_results(text_prompt)
+                )
             )
             img_processes.append(
-                asyncio.create_task(parallel_image_generation(img_prompt, index))
+                asyncio.create_task(
+                    parallel_image_generation(img_prompt, index)
+                )
             )
 
     # Append the generated content to final resul arrays.
@@ -170,12 +188,14 @@ async def prepare_titles() -> list[str]:
     title_arr = []
     i = 0
     while i <= len(st.session_state.selected_titles):
-        # No assorted titles to be created if the length of selected features is 1.
+        # No assorted titles to be created if the length of selected features
+        # is 1.
         if i == 1 and len(st.session_state.selected_titles) == 1:
             break
 
         # Create assorted product title if end of array is reached.
-        # If end of array selected_titles array is not reached, keep original title.
+        # If end of array selected_titles array is not reached, keep original
+        # title.
         title = (
             st.session_state.selected_titles[i]
             if i < len(st.session_state.selected_titles)
@@ -196,7 +216,9 @@ async def generate_product_content() -> None:
     """
 
     if st.session_state.product_content is None:
-        st.session_state.product_content = []  # Initialize product content storage
+        st.session_state.product_content = (
+            []
+        )  # Initialize product content storage
 
     elements = []
 
@@ -218,7 +240,8 @@ async def generate_product_content() -> None:
             # Prepare containers for the current iteration's content
             current_content = []
 
-            # Representing elements as a list of lists to handle multiple drafts for same feature.
+            # Representing elements as a list of lists to handle multiple
+            # drafts for same feature.
             elements.append([])
 
             if i < len(st.session_state.selected_titles):
@@ -230,7 +253,9 @@ async def generate_product_content() -> None:
                     current_content.append(text_result_arr[i])
                     st.session_state.product_content.append(current_content)
                 else:
-                    st.session_state.assorted_prod_content.append(text_result_arr[i])
+                    st.session_state.assorted_prod_content.append(
+                        text_result_arr[i]
+                    )
 
                 # Build data for display elements
                 elements[i].append(
@@ -256,7 +281,8 @@ async def render_content(features: st.container) -> None:
     Handles button clicks and content generation logic.
 
     Args:
-        features (streamlit.container): A container to be cleared after content generation.
+        features (streamlit.container): A container to be cleared after
+        content generation.
     """
 
     if st.button("Generate Content", type="primary"):
@@ -268,7 +294,8 @@ async def handle_content_generation(features: st.container) -> None:
     Encapsulates the core content generation process.
 
     Args:
-        features (streamlit.container): A container to be cleared after content generation.
+        features (streamlit.container): A container to be cleared after
+        content generation.
     """
 
     if not st.session_state.selected_titles:
@@ -290,4 +317,6 @@ async def handle_content_generation(features: st.container) -> None:
     # Prepare titles for processing.
     st.session_state.chosen_titles = st.session_state.selected_titles.copy()
     if len(st.session_state.selected_titles) > 1:
-        st.session_state.chosen_titles.append(st.session_state.assorted_prod_title)
+        st.session_state.chosen_titles.append(
+            st.session_state.assorted_prod_title
+        )

@@ -22,13 +22,22 @@ def display_projects() -> None:
     st.session_state.product_category = st.selectbox(
         "Select a project", st.session_state.product_categories
     )
-    st.session_state.product_categories.remove(st.session_state.product_category)
-    st.session_state.product_categories.insert(0, st.session_state.product_category)
-    if st.session_state.previous_product_category != st.session_state.product_category:
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
+    st.session_state.product_categories.insert(
+        0, st.session_state.product_category
+    )
+    if (
+        st.session_state.previous_product_category
+        != st.session_state.product_category
+    ):
         print(st.session_state.previous_product_category)
         print(st.session_state.product_category)
         reinitialize_session_states()
-        st.session_state.previous_product_category = st.session_state.product_category
+        st.session_state.previous_product_category = (
+            st.session_state.product_category
+        )
         st.rerun()
 
 
@@ -37,7 +46,8 @@ def get_session_state() -> dict:
     Defines default values for session state
 
     Returns:
-        session_state_defaults (dict): A dictionary of default key-value pairs for session state
+        session_state_defaults (dict): A dictionary of default key-value pairs
+        for session state
     """
     session_state_defaults: dict[str, Any] = {
         "product_categories": utils_project.get_projects_list(),
@@ -120,7 +130,9 @@ def initialize_all_session_state():
             st.session_state[key] = value
 
     if "product_category" not in st.session_state:
-        st.session_state.product_category = st.session_state.product_categories[0]
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
 
 
 def reinitialize_session_states():
@@ -142,7 +154,8 @@ def page_setup(page_cfg: dict) -> None:
     This function initializes the page configuration and applies custom styles.
 
     Args:
-        page_cfg (dict): A dictionary containing the configuration for the page.
+        page_cfg (dict): A dictionary containing the configuration for the
+        page.
 
     Returns:
         None

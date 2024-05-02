@@ -1,5 +1,6 @@
 """
-Defines functions for generating text embeddings using a Vertex AI TextEmbeddingModel.
+Defines functions for generating text embeddings using a Vertex AI
+TextEmbeddingModel.
 """
 
 import backoff

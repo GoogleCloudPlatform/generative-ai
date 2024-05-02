@@ -10,7 +10,8 @@ It provides the following functionality:
     * Offers suggested questions for insights (requires uploaded data)
       through Retreival Augmented Generation.
     * Enables users to input their own questions.
-    * Generates answers to questions based on uploaded data, including references.
+    * Generates answers to questions based on uploaded data, including
+      references.
 * Follow-up Questions: Suggests follow-up questions based on previous queries.
 """
 
@@ -71,9 +72,9 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
         key=key,
     ):
         # Update session state with selected suggestion
-        st.session_state.insights_placeholder = st.session_state.insights_suggestion[
-            suggestion_num
-        ]
+        st.session_state.insights_placeholder = (
+            st.session_state.insights_suggestion[suggestion_num]
+        )
         # Set flag to generate RAG answers
         st.session_state.rag_answers_gen = True
 
@@ -161,7 +162,9 @@ if st.session_state.rag_answers_gen:
     if st.session_state.dff.empty:
         # Display error message
         st.error(
-            "Add files in " + st.session_state.product_category + " file storage",
+            "Add files in "
+            + st.session_state.product_category
+            + " file storage",
             icon="🚨",
         )
     # Check if search term is empty

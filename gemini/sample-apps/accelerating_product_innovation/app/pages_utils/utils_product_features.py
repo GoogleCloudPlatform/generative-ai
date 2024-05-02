@@ -1,9 +1,12 @@
 """
-This module provides functions for rendering product feature drafts and managing user selections.
+This module provides functions for rendering product feature drafts and
+ managing user selections.
 This module:
-    * Fetches a product feature response from the LLM, ensuring a specific format.
+    * Fetches a product feature response from the LLM, ensuring a specific
+      format.
     * Displays draft features in a grid layout with checkboxes for selection.
-    * Facilitates the modification of selected features, updating the UI accordingly.
+    * Facilitates the modification of selected features, updating the UI
+      accordingly.
 """
 
 import logging

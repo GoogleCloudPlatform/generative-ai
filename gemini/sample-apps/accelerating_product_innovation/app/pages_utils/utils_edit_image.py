@@ -1,16 +1,21 @@
 """
-This module provides functions for image processing and session state management
+This module provides functions for image processing and session state
+management
 related to image editing.  This module:
 * process_foreground_image():
     * Prepares a foreground image for merging with a background.
     * Optionally removes white regions for background editing.
-* initialize_edit_page_state():  Initializes session state for the image editing
+* initialize_edit_page_state():  Initializes session state for the
+  image editing
 page and handles uploaded images.
-* handle_image_upload(): Manages the image upload process and updates session state.
-* save_draft_image(): Saves edited draft images and facilitates a return to the product
+* handle_image_upload(): Manages the image upload process and updates session
+ state.
+* save_draft_image(): Saves edited draft images and facilitates a return to
+ the product
 generation page.
 * generate_suggested_images():
-    * Generates image variations based on text prompts, an initial image, and an optional mask.
+    * Generates image variations based on text prompts, an initial image, and
+      an optional mask.
 * render_suggested_images():
     * Displays generated suggestions in a grid.
     * Provides "Edit" and "Download" buttons for each suggestion.
@@ -39,10 +44,12 @@ def process_foreground_image(
     and prepares it for merging with a background image.
 
     Args:
-        foreground_image (Image.Image): The PIL Image object representing the foreground.
-        background_image (Image.Image): The PIL Image object representing the background.
-        bg_editing (bool, optional): If True, removes white regions from the foreground.
-                                     Defaults to False.
+        foreground_image (Image.Image): The PIL Image object representing the
+        foreground.
+        background_image (Image.Image): The PIL Image object representing the
+        background.
+        bg_editing (bool, optional): If True, removes white regions from the
+        foreground. Defaults to False.
 
     Returns:
         bytes: The processed and merged image data as bytes.
@@ -79,12 +86,17 @@ def initialize_edit_page_state() -> None:
     """
     Initializes the session state for the image editing page.
 
-    This function checks if the session state has been initialized, and if not, it initializes it.
-    It also checks if an image has been uploaded, and if so, it sets the session state accordingly.
+    This function checks if the session state has been initialized, and if not,
+    it initializes it.
+    It also checks if an image has been uploaded, and if so, it sets
+    the session state accordingly.
     """
 
     # Check which image file prefix points to the image to be edited
-    if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
+    if (
+        "image_to_edit" not in st.session_state
+        or st.session_state.image_to_edit == -1
+    ):
         st.session_state.image_to_edit = (
             -1
         )  # No image from generations is being edited.
@@ -127,7 +139,9 @@ def save_draft_image(
         draft_elements (dict): Dictionary holding the draft image elements.
     """
 
-    st.session_state.content_edited = True  # Track whether image has been edited.
+    st.session_state.content_edited = (
+        True  # Track whether image has been edited.
+    )
     draft_elements[row][col][
         "img"
     ] = image  # Update the drafts to display updated image.
@@ -142,10 +156,12 @@ def save_draft_image(
 
 def render_suggested_images(suggested_images: list[str]) -> None:
     """
-    Renders suggested images in a grid layout with "Edit" and "Download" buttons.
+    Renders suggested images in a grid layout with "Edit" and "Download"
+    buttons.
 
     Args:
-        suggested_images: A list of image paths or data to display as suggestions.
+        suggested_images: A list of image paths or data to display as
+        suggestions.
     """
 
     # Set number of images to be displayed per row.
@@ -230,7 +246,8 @@ def generate_suggested_images(
     Args:
         image_prompt (str): Text prompt for image generation.
         image_bytes (BytesIO): Initial image data for inpainting or variation.
-        mask_image (BytesIO or None): Mask defining the region to edit (optional).
+        mask_image (BytesIO or None): Mask defining the region to
+        edit (optional).
     """
     save_image_for_editing(image_bytes.getvalue(), "image_to_edit")
     save_image_for_editing(mask_image, "mask")

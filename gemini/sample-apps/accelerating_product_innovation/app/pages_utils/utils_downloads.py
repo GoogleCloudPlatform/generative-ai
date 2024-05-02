@@ -1,5 +1,6 @@
 """
-This module provides functions for downloading generated content (emails, product content)
+This module provides functions for downloading generated content (emails,
+product content)
 as zip archives.
 """
 
@@ -35,8 +36,9 @@ def generate_email(prompt: str, title: str) -> None:
         title (str): The title of the email.
     """
     # Create prompt for email generation for given product idea.
-    email_prompt = f"""Write an email introducing the concept for a new product, {prompt}.
-    Write the benefits for different demographics, skin types, genders, etc., too.
+    email_prompt = f"""Write an email introducing the concept for a new
+    product, {prompt}. Write the benefits for different demographics,
+    skin types, genders, etc., too.
     The email should strictly share the concept with the innovation team.
     The email should strictly not announce launch, only the concept.
     Keep the email brief."""
@@ -168,7 +170,9 @@ def download_file() -> None:
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(zip_buffer.getvalue(), f"email_{email_file_title}.zip"),
+        download_button(
+            zip_buffer.getvalue(), f"email_{email_file_title}.zip"
+        ),
         height=0,
     )
     st.success("Email Copies Downloaded")

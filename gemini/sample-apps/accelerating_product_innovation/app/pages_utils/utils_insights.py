@@ -2,7 +2,8 @@
 This module provides functions for generating insights and searching
 relevant information from uploaded data.
     This module:
-    * Retrieves relevant context from a vector database based on a user's query.
+    * Retrieves relevant context from a vector database based on a user's
+      query.
     * Leverages Gemini-Pro to generate a precise answer.
     * Presents the answer along with top-matched context sources.
 """
@@ -73,7 +74,9 @@ def get_suggestions(state_key: str) -> None:
     else:
         context = st.session_state.rag_search_term
         prompt = f""" Context: \n {context} \n
-            generate 5 questions based on the given context. The questions should strictly be questions for further analysis of {st.session_state.rag_search_term}
+            generate 5 questions based on the given context. The questions
+            should strictly be questions for further analysis of
+            {st.session_state.rag_search_term}
         """
     print("CONTEXT")
     print(context)
@@ -133,12 +136,15 @@ def get_filter_context_from_vectordb(
     """Gets the filter context from the vector database.
 
     Args:
-        question (str, optional): The question to get the filter context for. Defaults to "".
-        sort_index_value (int, optional): The number of top matched results to return.
+        question (str, optional): The question to get the filter context for.
+        Defaults to "".
+        sort_index_value (int, optional): The number of top matched results
+        to return.
         # Defaults to 3.
 
     Returns:
-        tuple: A tuple containing the filter context and the top matched results.
+        tuple: A tuple containing the filter context and the top matched
+        results.
     """
     st.session_state["query_vectors"] = np.array(
         embedding_model_with_backoff([question])
@@ -150,17 +156,23 @@ def get_filter_context_from_vectordb(
     )
 
     top_matched_df = st.session_state["processed_data_list"][
-        st.session_state["processed_data_list"].index.isin(top_matched_score.index)
+        st.session_state["processed_data_list"].index.isin(
+            top_matched_score.index
+        )
     ]
     top_matched_df = top_matched_df[
         ["file_name", "page_number", "chunk_number", "content"]
     ]
     top_matched_df["confidence_score"] = top_matched_score
-    top_matched_df.sort_values(by=["confidence_score"], ascending=False, inplace=True)
+    top_matched_df.sort_values(
+        by=["confidence_score"], ascending=False, inplace=True
+    )
 
     context = "\n".join(
         st.session_state["processed_data_list"][
-            st.session_state["processed_data_list"].index.isin(top_matched_score.index)
+            st.session_state["processed_data_list"].index.isin(
+                top_matched_score.index
+            )
         ]["content"].values
     )
     return (context, top_matched_df)
@@ -173,7 +185,8 @@ def generate_insights_search_result(query) -> tuple[str, pd.DataFrame]:
         query (str): The query to generate insights search results for.
 
     Returns:
-        tuple: A tuple containing the insights answer and the top matched results.
+        tuple: A tuple containing the insights answer and the top matched
+        results.
     """
 
     question = query
@@ -183,7 +196,8 @@ def generate_insights_search_result(query) -> tuple[str, pd.DataFrame]:
 
     question_prompt_template = f"""
     Answer the question as precise as possible using the provided context.
-    If the answer is not contained in the context, say "answer not available in context"
+    If the answer is not contained in the context, say "answer not available
+    in context"
     \n \n
     Context: \n {context} \n
     Question: \n {question} \n
