@@ -6,7 +6,7 @@ import json
 from flask import jsonify, request
 
 
-def getMarketingAndOutreachData() -> tuple[dict, int]:
+def get_marketing_and_outreach_data() -> tuple[dict, int]:
     """
     This function gets the marketing and outreach data from a JSON
       file and returns it in a JSON format.
@@ -29,34 +29,34 @@ def getMarketingAndOutreachData() -> tuple[dict, int]:
         end_date = datetime.now().strftime("%Y-%m-%d")
 
     (
-        websiteTraffic,
+        website_traffic,
         likes,
         comments,
         shares,
-        emailsent,
-        openrate,
-        topPerformaingPlatform,
-        chartData,
-    ) = getMetricsData(data, start_date, end_date)
+        emails_sent,
+        open_rate,
+        top_performing_platform,
+        chart_data,
+    ) = get_metrics_data(data, start_date, end_date)
 
     return (
         jsonify(
             {
-                "websiteTraffic": websiteTraffic,
+                "website_traffic": website_traffic,
                 "likes": likes,
                 "comments": comments,
                 "shares": shares,
-                "emailsent": emailsent,
-                "openrate": openrate,
-                "topPerformaingPlatform": topPerformaingPlatform,
-                "chartData": chartData,
+                "emails_sent": emails_sent,
+                "open_rate": open_rate,
+                "top_performing_platform": top_performing_platform,
+                "chart_data": chart_data,
             }
         ),
         200,
     )
 
 
-def getMetricsData(
+def get_metrics_data(
     data: list, start_date: str, end_date: str
 ) -> tuple[int, int, int, int, int, float, str, list]:
     """
@@ -71,59 +71,60 @@ def getMetricsData(
         tuple: A tuple containing the website traffic, likes, comments,
         shares, emails sent, open rate, top performing platform, and chart data.
     """
-    websiteTraffic = 0
+    website_traffic = 0
     likes = 0
     comments = 0
     shares = 0
-    emailsent = 0
-    mailopened = 0
-    maxSales = 0
-    topPerformaingPlatform = ""
-    salesPltforms = [
-        "facebook Sales",
-        "newspaper Sales",
-        "TVAds Sales",
-        "insta Sales",
-        "mail Sales",
-        "telephone Sales",
+    emails_sent = 0
+    mail_opened = 0
+    max_sales = 0
+    top_performing_platform = ""
+    sales_platforms = [
+        "facebook sales",
+        "newspaper sales",
+        "tvads sales",
+        "insta sales",
+        "mail sales",
+        "telephone sales",
     ]
-    sumSales = {}
-    for platform in salesPltforms:
-        sumSales[platform] = 0
+    sum_sales = {}
+    for platform in sales_platforms:
+        sum_sales[platform] = 0
     for item in data:
         if (
             item["campaign_start_date"] >= start_date
             and item["campaign_start_date"] <= end_date
         ):
-            websiteTraffic += item["websiteVisitors"]
-            likes += item["instaLikes"] + item["facebookLikes"]
-            comments += item["instaComments"] + item["facebookComments"]
-            shares += item["facebookShares"]
-            emailsent += item["numberOfMailSent"]
-            mailopened += item["numberOfMailOpen"]
-            for platform in salesPltforms:
-                sumSales[platform] += item[platform.replace(" ", "")]
+            website_traffic += item["website_visitors"]
+            likes += item["insta_likes"] + item["facebook_likes"]
+            comments += item["insta_comments"] + item["facebook_comments"]
+            shares += item["facebook_shares"]
+            emails_sent += item["number_of_mail_sent"]
+            mail_opened += item["number_of_mail_open"]
+            for platform in sales_platforms:
+                sum_sales[platform] += item[platform.replace(" ", "")]
 
-    for platform in salesPltforms:
-        if sumSales[platform] > maxSales:
-            maxSales = sumSales[platform]
-            topPerformaingPlatform = platform
+    for platform in sales_platforms:
+        if sum_sales[platform] > max_sales:
+            max_sales = sum_sales[platform]
+            top_performing_platform = platform
 
-    openrate = 0.0
-    if emailsent != 0:
-        openrate = (mailopened * 100) / emailsent
-    openrate = round(openrate, 2)
+    open_rate = 0.0
+    if emails_sent != 0:
+        open_rate = (mail_opened * 100) / emails_sent
+    open_rate = round(open_rate, 2)
 
-    chartData = []
-    for platform in salesPltforms:
-        chartData.append({"x": platform, "y1": sumSales[platform]})
+    chart_data = []
+    for platform in sales_platforms:
+        chart_data.append({"x": platform, "y1": sum_sales[platform]})
     return (
-        websiteTraffic,
+        website_traffic,
         likes,
         comments,
         shares,
-        emailsent,
-        openrate,
-        topPerformaingPlatform.split(" ")[0],
-        chartData,
+        emails_sent,
+        open_rate,
+        top_performing_platform.split(" ")[0],
+        chart_data,
     )
+

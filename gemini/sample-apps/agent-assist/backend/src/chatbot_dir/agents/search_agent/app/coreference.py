@@ -6,7 +6,7 @@ from langchain.chat_models import ChatVertexAI
 from langchain.memory import ConversationBufferMemory
 import vertexai
 
-prompt = """
+PROMPT = """
 You are an expert in English Language.
 You have to assist a chatbot in answering questions. You have to reframe the questions using your chat history to replace it, them and other such pronouns with the appropriate nouns coreferencing them from your chat history.
 Make sure to think step by step before arriving at the answer.
@@ -53,6 +53,6 @@ def get_rephrased_question(question: str, chat_chain: ConversationChain) -> str:
         str: The rephrased question.
     """
 
-    rephrased_question = chat_chain.run(prompt.format(question))
+    rephrased_question = chat_chain.run(PROMPT.format(question))
     print("rephrased_question: ", rephrased_question)
     return rephrased_question

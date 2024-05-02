@@ -2,7 +2,7 @@
 
 from utils.gemini_text import GeminiText
 
-prompt = """
+PROMPT = """
 Given context and chat history, continue the conversation with the query
 as the last user message.
 
@@ -29,6 +29,6 @@ def fallback_component(query: str, chat_history: str, context: str) -> str:
 
     gt = GeminiText()
     response = gt.generate_response(
-        prompt.format(context=context, chat_history=chat_history, query=query)
+        PROMPT.format(context=context, chat_history=chat_history, query=query)
     )
     return response

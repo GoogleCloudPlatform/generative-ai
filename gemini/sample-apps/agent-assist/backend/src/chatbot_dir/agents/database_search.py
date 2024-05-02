@@ -53,8 +53,8 @@ def generate_answer(question: str) -> str:
     today = date.today()
     formatted_date = today.strftime("%d/%m/%Y")
     df = pd.DataFrame(policy_json)
-    prompt = SQL_PROMPT.format(question=question, date_today=formatted_date)
-    answer = tb.generate_response(prompt=prompt)
+    PROMPT = SQL_PROMPT.format(question=question, date_today=formatted_date)
+    answer = tb.generate_response(PROMPT=PROMPT)
     answer = answer.replace("<SQL>", "")
     sql_query = answer.replace("</SQL>", "")
     sql_query = sql_query.strip()
@@ -64,8 +64,8 @@ def generate_answer(question: str) -> str:
         answer_df = ps.sqldf(sql_query, locals())
         print(answer_df)
         temp_df = answer_df.astype(str)
-        prompt = FINAL_ANSWER_PROMPT.format(question=question, df=temp_df)
-        answer_natural_language = tb.generate_response(prompt)
+        PROMPT = FINAL_ANSWER_PROMPT.format(question=question, df=temp_df)
+        answer_natural_language = tb.generate_response(PROMPT)
         print("answer_natural_language : ", answer_natural_language)
         return answer_natural_language
 

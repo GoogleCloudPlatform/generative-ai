@@ -2,7 +2,7 @@
 
 from utils.text_bison import TextBison
 
-prompt = """
+PROMPT = """
 You are the helper to an intelligent AI powered chatbot.
 You have to deal everything related to handling the calendar events in the bot.
 

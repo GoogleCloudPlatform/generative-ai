@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-from src.chatbot_dir.agents.search_agent.preprocessing.table.one_shot.prompt import (
+from src.chatbot_dir.agents.search_agent.preprocessing.table.one_shot.PROMPT import (
     PROMPT_FOR_TABLE,
 )
 from src.chatbot_dir.agents.search_agent.preprocessing.table.text_bison import TextBison
@@ -16,6 +16,6 @@ def processTable(table_df_string: str) -> str:
         str: The processed table in dataframe string format.
     """
     tb = TextBison()
-    prompt = PROMPT_FOR_TABLE.format(table_df_string)
-    df_string = tb.generate_response(prompt)
+    PROMPT = PROMPT_FOR_TABLE.format(table_df_string)
+    df_string = tb.generate_response(PROMPT)
     return df_string

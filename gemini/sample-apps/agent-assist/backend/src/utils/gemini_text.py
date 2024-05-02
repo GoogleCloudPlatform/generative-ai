@@ -59,20 +59,20 @@ class GeminiText:
         self.model = GenerativeModel(config["gemini_model"])
         self.chat = self.model.start_chat()
 
-    def generate_response(self, prompt: str) -> str:
+    def generate_response(self, PROMPT: str) -> str:
         """
-        Generates a response to a given prompt.
+        Generates a response to a given PROMPT.
 
         Args:
-            prompt (str): The prompt to generate a response for.
+            PROMPT (str): The PROMPT to generate a response for.
 
         Returns:
             str: The generated response.
         """
         print("running tb.generate_response")
         parameters = self.parameters
-        # response =self.model.predict(prompt,**parameters)
-        response = self.chat.send_message(prompt, generation_config=parameters)
+        # response =self.model.predict(PROMPT,**parameters)
+        response = self.chat.send_message(PROMPT, generation_config=parameters)
         return response.text
 
 

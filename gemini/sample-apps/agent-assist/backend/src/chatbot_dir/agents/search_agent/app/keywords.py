@@ -49,12 +49,12 @@ def get_keywords(query: str, for_lexical: bool = True) -> str:
         (str) The keywords from the query.
     """
     if for_lexical:
-        prompt = PROMPT_LEXICAL
+        PROMPT = PROMPT_LEXICAL
     else:
-        prompt = PROMPT_SEMANTIC
+        PROMPT = PROMPT_SEMANTIC
 
     tb = TextBison()
-    response = tb.generate_response(prompt.format(query))
+    response = tb.generate_response(PROMPT.format(query))
 
     print("lexical", for_lexical, "keywords", response)
     return response

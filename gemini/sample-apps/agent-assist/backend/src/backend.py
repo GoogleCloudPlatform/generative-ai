@@ -100,7 +100,7 @@ def create_calendar_event():
 
 
 app.add_url_rule(
-    "/workbench/performance", methods=["GET"], view_func=performance.getPerformanceData
+    "/workbench/performance", methods=["GET"], view_func=performance.get_performance_data
 )
 app.add_url_rule(
     "/workbench/leadsandsales",
@@ -110,12 +110,12 @@ app.add_url_rule(
 app.add_url_rule(
     "/workbench/customermanagement",
     methods=["GET"],
-    view_func=customermanagement.getCustomerManagementData,
+    view_func=customermanagement.get_customer_management_data,
 )
 app.add_url_rule(
     "/workbench/marketingandoutreach",
     methods=["GET"],
-    view_func=marketingandoutreach.getMarketingAndOutreachData,
+    view_func=marketingandoutreach.get_marketing_and_outreach_data,
 )
 app.add_url_rule("/chatbot", methods=["POST"], view_func=chatbot.chatbot_entry)
 app.add_url_rule(

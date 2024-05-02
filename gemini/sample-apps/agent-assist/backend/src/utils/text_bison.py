@@ -35,17 +35,17 @@ class TextBison:
         # Load the pre-trained Text-Bison model
         self.model = TextGenerationModel.from_pretrained("text-bison")
 
-    def generate_response(self, prompt: str) -> str:
+    def generate_response(self, PROMPT: str) -> str:
         """
         Generates a text response using the Text-Bison model.
 
         Args:
-            prompt (str): The input prompt for text generation.
+            PROMPT (str): The input PROMPT for text generation.
 
         Returns:
             str: The generated text response.
         """
         print("running tb.generate_response")
         parameters = self.parameters
-        response = self.model.predict(prompt, **parameters)
+        response = self.model.predict(PROMPT, **parameters)
         return response.text

@@ -6,7 +6,7 @@ import json
 from flask import jsonify, request
 
 
-def getCustomerManagementData():
+def get_customer_management_data():
     """
     This function is used to get the customer management data.
 
@@ -27,28 +27,28 @@ def getCustomerManagementData():
         start_date = start_date.strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
 
-    totalActiveCustomers, averageSatisfactionScore = getMetricsData(
+    total_active_customers, average_satisfaction_score = get_metrics_data(
         data, start_date, end_date
     )
-    totalLapsedCustomers = getLapsedCustomers(data, start_date, end_date)
-    chartData = getChartData(data, start_date, end_date)
+    total_lapsed_customers = get_lapsed_customers(data, start_date, end_date)
+    chart_data = get_chart_data(data, start_date, end_date)
 
     return (
         jsonify(
             {
-                "totalActiveCustomers": totalActiveCustomers,
-                "averageSatisfactionScore": float(
-                    "{:.3}".format(averageSatisfactionScore)
+                "total_active_customers": total_active_customers,
+                "average_satisfaction_score": float(
+                    "{:.3}".format(average_satisfaction_score)
                 ),
-                "totalLapsedCustomers": totalLapsedCustomers,
-                "chartData": chartData,
+                "total_lapsed_customers": total_lapsed_customers,
+                "chart_data": chart_data,
             }
         ),
         200,
     )
 
 
-def getMetricsData(data: list, start_date: str, end_date: str):
+def get_metrics_data(data: list, start_date: str, end_date: str):
     """
     This function is used to get the metrics data.
 
@@ -62,15 +62,15 @@ def getMetricsData(data: list, start_date: str, end_date: str):
         tuple: A tuple containing the total number of
           active customers and the average satisfaction score.
     """
-    totalActiveCustomers = 0
-    averageSatisfactionScore = 0.0
-    totalratings = 0
+    total_active_customers = 0
+    average_satisfaction_score = 0.0
+    total_ratings = 0
     for policy in data:
         policy_start_date = policy["policy_start_date"]
 
         if policy["satisfaction_score"]:
-            averageSatisfactionScore += policy["satisfaction_score"]
-            totalratings += 1
+            average_satisfaction_score += policy["satisfaction_score"]
+            total_ratings += 1
 
         if policy_start_date is None:
             continue
@@ -79,15 +79,15 @@ def getMetricsData(data: list, start_date: str, end_date: str):
             and policy_start_date >= start_date
             and policy_start_date <= end_date
         ):
-            totalActiveCustomers += 1
+            total_active_customers += 1
 
-    if totalratings != 0:
-        averageSatisfactionScore = averageSatisfactionScore / totalratings
+    if total_ratings != 0:
+        average_satisfaction_score = average_satisfaction_score / total_ratings
 
-    return totalActiveCustomers, averageSatisfactionScore
+    return total_active_customers, average_satisfaction_score
 
 
-def getLapsedCustomers(data: list, start_date: str, end_date: str):
+def get_lapsed_customers(data: list, start_date: str, end_date: str):
     """
     This function is used to get the number of lapsed customers.
 
@@ -99,7 +99,7 @@ def getLapsedCustomers(data: list, start_date: str, end_date: str):
     Returns:
         int: The total number of lapsed customers.
     """
-    totalLapsedCustomers = 0
+    total_lapsed_customers = 0
     for policy in data:
         policy_end_date = policy["policy_end_date"]
         if policy_end_date is None:
@@ -109,12 +109,12 @@ def getLapsedCustomers(data: list, start_date: str, end_date: str):
             and policy_end_date >= start_date
             and policy_end_date <= end_date
         ):
-            totalLapsedCustomers += 1
+            total_lapsed_customers += 1
 
-    return totalLapsedCustomers
+    return total_lapsed_customers
 
 
-def getChartData(data: list, start_date: str, end_date: str):
+def get_chart_data(data: list, start_date: str, end_date: str):
     """
     This function is used to get the chart data.
 
@@ -137,20 +137,20 @@ def getChartData(data: list, start_date: str, end_date: str):
         )
     ]
 
-    monthData = {}
+    month_data = {}
     for month in month_list:
-        monthData[month] = {"satisfaction_score": 0, "active_customers": 0, "count": 0}
+        month_data[month] = {"satisfaction_score": 0, "active_customers": 0, "count": 0}
     for policy in data:
         policy_start_date = policy["policy_start_date"]
         if policy_start_date is None:
             continue
         month = datetime.strptime(policy_start_date, "%Y-%m-%d").strftime("%b-%y")
         if policy["satisfaction_score"]:
-            if month in monthData:
-                monthData[month]["satisfaction_score"] += policy["satisfaction_score"]
-                monthData[month]["count"] += 1
+            if month in month_data:
+                month_data[month]["satisfaction_score"] += policy["satisfaction_score"]
+                month_data[month]["count"] += 1
             else:
-                monthData[month] = {
+                month_data[month] = {
                     "satisfaction_score": policy["satisfaction_score"],
                     "count": 1,
                 }
@@ -159,22 +159,23 @@ def getChartData(data: list, start_date: str, end_date: str):
             and policy_start_date >= start_date
             and policy_start_date <= end_date
         ):
-            if month in monthData:
-                monthData[month]["active_customers"] += 1
+            if month in month_data:
+                month_data[month]["active_customers"] += 1
             else:
-                monthData[month] = {"active_customers": 1}
+                month_data[month] = {"active_customers": 1}
 
-    chartData = []
+    chart_data = []
     for month in month_list:
-        chartData.append(
+        chart_data.append(
             {
                 "x": month,
-                "y1": monthData[month]["active_customers"],
+                "y1": month_data[month]["active_customers"],
                 "y2": (
-                    monthData[month]["satisfaction_score"] / monthData[month]["count"]
-                    if monthData[month]["count"] != 0
+                    month_data[month]["satisfaction_score"] / month_data[month]["count"]
+                    if month_data[month]["count"] != 0
                     else 0
                 ),
             }
         )
-    return chartData
+    return chart_data
+

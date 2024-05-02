@@ -46,17 +46,17 @@ class GeminiText:
         self.model = GenerativeModel(config["gemini_model"])
         self.chat = self.model.start_chat()
 
-    def generate_response(self, prompt):
-        """Generates a response to a prompt.
+    def generate_response(self, PROMPT):
+        """Generates a response to a PROMPT.
 
         Args:
-            prompt (str): The prompt to generate a response to.
+            PROMPT (str): The PROMPT to generate a response to.
 
         Returns:
             str: The generated response.
         """
         parameters = self.parameters
-        response = self.chat.send_message(prompt, generation_config=parameters)
+        response = self.chat.send_message(PROMPT, generation_config=parameters)
         return response.text
 
 

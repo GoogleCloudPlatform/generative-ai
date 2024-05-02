@@ -59,17 +59,17 @@ class TextBison:
 
         self.model = TextGenerationModel.from_pretrained(config["text_bison_model"])
 
-    def generate_response(self, prompt: str) -> str:
+    def generate_response(self, PROMPT: str) -> str:
         """
         Generate a response using the Text Bison model.
 
         Args:
-            prompt (str): The prompt to generate a response for.
+            PROMPT (str): The PROMPT to generate a response for.
 
         Returns:
             str: The generated response.
         """
         print("running tb.generate_response")
         parameters = self.parameters
-        response = self.model.predict(prompt, **parameters)
+        response = self.model.predict(PROMPT, **parameters)
         return response.text

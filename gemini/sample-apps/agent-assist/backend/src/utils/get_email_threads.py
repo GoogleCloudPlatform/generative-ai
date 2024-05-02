@@ -6,7 +6,7 @@ from datetime import datetime
 from utils.mail_trial import show_chatty_threads
 from utils.text_bison import TextBison
 
-prompt = """
+PROMPT = """
 Summarise the following email thread:
 
 INPUT: {}
@@ -105,7 +105,7 @@ def get_email_threads_summary(
         service, user_email_id, threads
     )
     print(email_thread_content, last_contacted_date)
-    email_thread_summary = tb.generate_response(prompt.format(email_thread_content))
+    email_thread_summary = tb.generate_response(PROMPT.format(email_thread_content))
     print(email_thread_summary)
     return email_thread_summary, last_contacted_date
 

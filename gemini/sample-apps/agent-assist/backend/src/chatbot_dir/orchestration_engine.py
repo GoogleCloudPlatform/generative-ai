@@ -52,17 +52,17 @@ def search(query: str, policy_list: List[str]) -> str:
     return response
 
 
-def create_sales_pitch(prompt: str, policy_name: str) -> str:
+def create_sales_pitch(PROMPT: str, policy_name: str) -> str:
     """Create sales pitch function to handle queries related to creating sales pitches.
 
     Args:
-        prompt (str): The prompt for the sales pitch.
+        PROMPT (str): The PROMPT for the sales pitch.
         policy_name (str): The name of the insurance policy to create a sales pitch for.
 
     Returns:
         str: A sales pitch for the given policy.
     """
-    response = sales_pitch_component(prompt, policy_name)
+    response = sales_pitch_component(PROMPT, policy_name)
 
     emit("chat", ["Generating..."])
     emit("chat", [{"intent": "Sales Pitch ", "data": {"response": response}}])
@@ -70,17 +70,17 @@ def create_sales_pitch(prompt: str, policy_name: str) -> str:
     return response
 
 
-def generate_email(prompt: str, chat_history: str) -> tuple[str, str]:
+def generate_email(PROMPT: str, chat_history: str) -> tuple[str, str]:
     """Generate email function to handle queries related to generating emails.
 
     Args:
-        prompt (str): The prompt for the email.
+        PROMPT (str): The PROMPT for the email.
         chat_history (str): The chat history of the conversation.
 
     Returns:
         tuple[str, str]: A tuple containing the email subject and body.
     """
-    return mail_component(query=prompt, chat_history=chat_history)
+    return mail_component(query=PROMPT, chat_history=chat_history)
 
 
 def send_email(email_id: str, subject: str, body: str) -> None:
@@ -217,7 +217,7 @@ def database_search_orchestrator(query: str) -> str:
     return response
 
 
-prompt = """
+PROMPT = """
 You are an AI-powered intelligent chatbot driver.
 Your task is to act on a user input which might be a compound query or a simple query.
 You have to think step-by-step on it and decide what to do.
@@ -242,8 +242,8 @@ The list of actions available are:
 1.  <PYTHON> search(query: str, policy_list: List[str]) -> str </PYTHON>
 # This function takes the query and policy list as input and gives an answer to the query as the output. The policy list should strictly be from the following: ['Home Shield', 'Bharat Griha Raksha Plus', 'Micro Insurance - Home Insurance', 'My Asset Home Insurance'].
 
-2. <PYTHON> generate_email(prompt: str, chat_history: str) -> tuple[str, str]  </PYTHON>
-# This function generated an email subject and body for the given prompt.
+2. <PYTHON> generate_email(PROMPT: str, chat_history: str) -> tuple[str, str]  </PYTHON>
+# This function generated an email subject and body for the given PROMPT.
 
 3. <PYTHON> send_email(email_id: str, subject: str, body: str) -> None </PYTHON>
 #This function sends an email to the email_id with the subject and body given as parameters. If the user name is given and not email id, get the email id from the email list below.
@@ -257,8 +257,8 @@ The list of actions available are:
 6. <PYTHON> get_calendar_events(dates: List[str]) -> List[str] </PYTHON>
 #This function gets the calendar events for the given dates.
 
-7. <PYTHON> create_sales_pitch(prompt: str, policy_name: str) -> str </PYTHON>
-#This function creates a sales pitch for the given policy name as per the prompt given. The policy name should strictly be from the following: ['Home Shield', 'Bharat Griha Raksha Plus', 'Micro Insurance - Home Insurance', 'My Asset Home Insurance']
+7. <PYTHON> create_sales_pitch(PROMPT: str, policy_name: str) -> str </PYTHON>
+#This function creates a sales pitch for the given policy name as per the PROMPT given. The policy name should strictly be from the following: ['Home Shield', 'Bharat Griha Raksha Plus', 'Micro Insurance - Home Insurance', 'My Asset Home Insurance']
 
 8. <PYTHON> fallback(query: str, chat_history: str) -> str </PYTHON>
 #This function returns a fallback response for the given query)
@@ -277,7 +277,7 @@ Some important notes:
 -------------------------------
 
 The actions follow a logical order in case multiple actions are present in a query.
-* Let us suppose the query is : Email comparison of Home Shield Insurance and Bharat Griha Raksha Plus for coverage of earthquake damage, to johnsmith@gmail.com. In this case, we need to email the comparison between the two insurance policies pertaining to earthquake damage to the given user. So, logically, first we need to find this comparison for which we need the function call <PYTHON> answer = search(query="Compare Home Shield Insurance and Bharat Griha Raksha Plus for coverage of earthquake damage", policy_list=["Home Shield Insurance", "Bharat Griha Raksha Plus"]) </PYTHON>"). After that we need to generate an email subject and body for the given prompt using the function call <PYTHON> subject, body = generate_email(prompt=answer, chat_history=chat_history) </PYTHON>), and then send the email to the user using the function call <PYTHON> result = send_email(email_id="johnsmith@gmail.com", subject=subject, body=body) </PYTHON>).
+* Let us suppose the query is : Email comparison of Home Shield Insurance and Bharat Griha Raksha Plus for coverage of earthquake damage, to johnsmith@gmail.com. In this case, we need to email the comparison between the two insurance policies pertaining to earthquake damage to the given user. So, logically, first we need to find this comparison for which we need the function call <PYTHON> answer = search(query="Compare Home Shield Insurance and Bharat Griha Raksha Plus for coverage of earthquake damage", policy_list=["Home Shield Insurance", "Bharat Griha Raksha Plus"]) </PYTHON>"). After that we need to generate an email subject and body for the given PROMPT using the function call <PYTHON> subject, body = generate_email(PROMPT=answer, chat_history=chat_history) </PYTHON>), and then send the email to the user using the function call <PYTHON> result = send_email(email_id="johnsmith@gmail.com", subject=subject, body=body) </PYTHON>).
 
 On a general level, the workflow is as follows:
 search() -> create_sales_pitch() -> generate_email() -> send_email()
@@ -325,7 +325,7 @@ def run_orchestrator(query, chat_history):
     examples = get_similar_examples(query, chat_history)
 
     actions = tb.generate_response(
-        prompt.format(
+        PROMPT.format(
             query=query,
             chat_history=chat_history,
             date_today=formatted_date,

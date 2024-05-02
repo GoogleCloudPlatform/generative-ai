@@ -27,7 +27,7 @@ def format_inr(number):
         return "₹" + str(number)
 
 
-def getPerformanceData():
+def get_performance_data():
     """
     Gets the performance data from the JSON file.
 
@@ -48,24 +48,24 @@ def getPerformanceData():
     return (
         jsonify(
             {
-                "numberOfPoliciesSold": getNumberOfPoliciesSold(
+                "number_of_policies_sold": get_number_of_policies_sold(
                     data, start_date, end_date
                 ),
                 "revenue_generated": format_inr(
-                    getrevenue_generated(data, start_date, end_date)
+                    get_revenue_generated(data, start_date, end_date)
                 ),
-                "renewalRate": getRenewalRate(data, start_date, end_date),
-                "monthData": getMonthData(data, start_date, end_date),
+                "renewal_rate": get_renewal_rate(data, start_date, end_date),
+                "month_data": get_month_data(data, start_date, end_date),
             }
         ),
         200,
     )
 
 
-# getNumberOfPoliciesSold
+# get_number_of_policies_sold
 
 
-def getNumberOfPoliciesSold(data: list, start_date: str, end_date: str) -> int:
+def get_number_of_policies_sold(data: list, start_date: str, end_date: str) -> int:
     """
     Gets the number of policies sold between the given start and end dates.
 
@@ -87,7 +87,7 @@ def getNumberOfPoliciesSold(data: list, start_date: str, end_date: str) -> int:
     return count
 
 
-def getrevenue_generated(data: list, start_date: str, end_date: str) -> float:
+def get_revenue_generated(data: list, start_date: str, end_date: str) -> float:
     """
     Gets the revenue generated between the given start and end dates.
 
@@ -109,7 +109,7 @@ def getrevenue_generated(data: list, start_date: str, end_date: str) -> float:
     return revenue
 
 
-def getRenewalRate(data: list, start_date: str, end_date: str) -> float:
+def get_renewal_rate(data: list, start_date: str, end_date: str) -> float:
     """
     Gets the renewal rate between the given start and end dates.
 
@@ -121,10 +121,10 @@ def getRenewalRate(data: list, start_date: str, end_date: str) -> float:
     Returns:
         float: The renewal rate between the given start and end dates.
     """
-    totalPolicies = 0
-    policiesRenewed = 0
+    total_policies = 0
+    policies_renewed = 0
     for policy in data:
-        totalPolicies += 1
+        total_policies += 1
         policy_start_date = policy["policy_start_date"]
         if policy_start_date is None:
             continue
@@ -133,12 +133,12 @@ def getRenewalRate(data: list, start_date: str, end_date: str) -> float:
             and policy_start_date <= end_date
             and policy["current_policy"] == policy["old_policy"]
         ):
-            policiesRenewed += 1
+            policies_renewed += 1
 
-    return float("{:.4}".format((policiesRenewed * 100) / totalPolicies))
+    return float("{:.4}".format((policies_renewed * 100) / total_policies))
 
 
-def getMonthData(data: list, start_date: str, end_date: str) -> list:
+def get_month_data(data: list, start_date: str, end_date: str) -> list:
     """
     Gets the month wise policy sold and revenue during the given period
 
@@ -150,7 +150,7 @@ def getMonthData(data: list, start_date: str, end_date: str) -> list:
     Returns:
         list: The month wise policy sold and revenue during the given period
     """
-    monthData: Dict[str, Any] = {}
+    month_data: Dict[str, Any] = {}
 
     # Get month wise policy sold and revenue during the given period
     for policy in data:
@@ -159,12 +159,12 @@ def getMonthData(data: list, start_date: str, end_date: str) -> list:
             continue
         if policy_start_date >= start_date and policy_start_date <= end_date:
             month = datetime.strptime(policy_start_date, "%Y-%m-%d").strftime("%b-%y")
-            if month in monthData:
-                monthData[month]["policiesSold"] += 1
-                monthData[month]["revenue"] += policy["policy_amount"]
+            if month in month_data:
+                month_data[month]["policies_sold"] += 1
+                month_data[month]["revenue"] += policy["policy_amount"]
             else:
-                monthData[month] = {
-                    "policiesSold": 1,
+                month_data[month] = {
+                    "policies_sold": 1,
                     "revenue": policy["policy_amount"],
                 }
 
@@ -182,14 +182,14 @@ def getMonthData(data: list, start_date: str, end_date: str) -> list:
 
     final_data = []
     for month in month_list:
-        if month not in monthData:
+        if month not in month_data:
             final_data.append({"x": month, "y1": 0, "y2": 0})
             continue
         final_data.append(
             {
                 "x": month,
-                "y1": monthData[month]["policiesSold"],
-                "y2": monthData[month]["revenue"],
+                "y1": month_data[month]["policies_sold"],
+                "y2": month_data[month]["revenue"],
             }
         )
     return final_data
@@ -199,4 +199,4 @@ if __name__ == "__main__":
     file_path = "../data/policy.json"
     with open(file_path) as json_file:
         data = json.load(json_file)
-    getMonthData(data, "2022-01-01", "2023-12-31")
+    get_month_data(data, "2022-01-01", "2023-12-31")
