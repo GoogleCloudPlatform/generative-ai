@@ -41,7 +41,9 @@
 4. Run the following command from the root directory of the repository to deploy your app to cloud run.
 
    ```bash
-   ./deploy_helper.sh
+   npm run build --prefix frontend
+   cp -r frontend/build/ backend/src/build
+   gcloud run deploy agent-assist --source backend --port 8000 --region asia-south1 --platform managed --allow-unauthenticated
    ```
 
 5. See the Google Cloud Run Service named **agent-assist** in the Console and open the URL for the service given there.
