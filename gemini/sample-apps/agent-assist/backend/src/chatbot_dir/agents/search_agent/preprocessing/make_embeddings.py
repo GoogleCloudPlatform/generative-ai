@@ -1,4 +1,5 @@
 """This is a python utility file."""
+# pylint: disable=E0401
 
 from app.chunks import get_all_chunks
 from langchain.embeddings import HuggingFaceEmbeddings

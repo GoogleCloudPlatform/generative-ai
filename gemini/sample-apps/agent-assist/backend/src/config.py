@@ -1,4 +1,5 @@
 """This is a python utility file."""
+# pylint: disable=E0401
 
 config = {
     "PROJECT_ID": "<PROJECT_ID>",

@@ -1,4 +1,5 @@
 """This is a python utility file."""
+# pylint: disable=E0401
 
 from config import config
 from langchain.chains import ConversationChain
