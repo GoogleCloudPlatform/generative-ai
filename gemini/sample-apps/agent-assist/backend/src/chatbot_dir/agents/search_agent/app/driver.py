@@ -61,14 +61,18 @@ class Driver:
             single_policy_flag = len(policies) == 1
             keywords_lexical = get_keywords(query)
             keywords_semantic = get_keywords(query, False)
-            chunk_list = self.get_chunks_str(policies, keywords_lexical, keywords_semantic)
+            chunk_list = self.get_chunks_str(
+                policies, keywords_lexical, keywords_semantic
+            )
 
             if single_policy_flag:
                 reformed_question = query
                 answer = self.get_answer_one_policy(chunk_list[0], reformed_question)
 
                 emit("chat", ["Generating..."])
-                emit("chat", [{"intent": "Search Result ", "data": {"response": answer}}])
+                emit(
+                    "chat", [{"intent": "Search Result ", "data": {"response": answer}}]
+                )
             else:
                 reformed_question = get_reformed_subquestion(self.tb, query)
                 print("reformed question:", reformed_question)
@@ -80,7 +84,9 @@ class Driver:
                             "intent": "Intermediate Response - Search",
                             "data": {
                                 "response": (
-                                    "Reformulated question: " + reformed_question + "\n\n"
+                                    "Reformulated question: "
+                                    + reformed_question
+                                    + "\n\n"
                                 )
                             },
                         }
@@ -92,7 +98,10 @@ class Driver:
                     for chunk_str in chunk_list
                 ]
 
-                columns = {policies[i]: individual_policy_answers[i] for i in range(len(policies))}
+                columns = {
+                    policies[i]: individual_policy_answers[i]
+                    for i in range(len(policies))
+                }
                 emit("chat", [{"intent": "Comparison", "data": columns}])
                 print("individual policy answers:", individual_policy_answers)
 
@@ -130,7 +139,9 @@ class Driver:
             (str) The answer to the query.
         """
         tb = TextBison()
-        response = tb.generate_response(PROMPT_RESULT.format(chunk_str, reformed_question))
+        response = tb.generate_response(
+            PROMPT_RESULT.format(chunk_str, reformed_question)
+        )
         return response
 
     def get_chunks_str(

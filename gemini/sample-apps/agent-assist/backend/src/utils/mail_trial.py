@@ -18,7 +18,9 @@ def show_chatty_threads():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("keys/read_mail.json", SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "keys/read_mail.json", SCOPES
+            )
             creds = flow.run_local_server(port=0)
         with open("mail_token.json", "w") as token:
             token.write(creds.to_json())
@@ -27,7 +29,9 @@ def show_chatty_threads():
 
         # pylint: disable=maybe-no-member
         # pylint: disable:R1710
-        threads = service.users().threads().list(userId="me").execute().get("threads", [])
+        threads = (
+            service.users().threads().list(userId="me").execute().get("threads", [])
+        )
         return threads, service
 
     except HttpError as error:

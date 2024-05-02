@@ -25,7 +25,9 @@ def getCustomerManagementData():
         startDate = startDate.strftime("%Y-%m-%d")
         endDate = datetime.now().strftime("%Y-%m-%d")
 
-    totalActiveCustomers, averageSatisfactionScore = getMetricsData(data, startDate, endDate)
+    totalActiveCustomers, averageSatisfactionScore = getMetricsData(
+        data, startDate, endDate
+    )
     totalLapsedCustomers = getLapsedCustomers(data, startDate, endDate)
     chartData = getChartData(data, startDate, endDate)
 
@@ -33,7 +35,9 @@ def getCustomerManagementData():
         jsonify(
             {
                 "totalActiveCustomers": totalActiveCustomers,
-                "averageSatisfactionScore": float("{:.3}".format(averageSatisfactionScore)),
+                "averageSatisfactionScore": float(
+                    "{:.3}".format(averageSatisfactionScore)
+                ),
                 "totalLapsedCustomers": totalLapsedCustomers,
                 "chartData": chartData,
             }

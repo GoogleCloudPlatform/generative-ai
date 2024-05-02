@@ -19,7 +19,9 @@ class Mail:
     Class to send and receive emails.
     """
 
-    def __init__(self, sender=config["company_email"], password=config["mail_password"]):
+    def __init__(
+        self, sender=config["company_email"], password=config["mail_password"]
+    ):
         """
         Initializes the Mail class.
 
@@ -53,7 +55,9 @@ class Mail:
                 with open(filepath, "rb") as fil:
                     part = MIMEApplication(fil.read(), Name=basename(filepath))
                 # After the file is closed
-                part["Content-Disposition"] = 'attachment; filename="%s"' % basename(filepath)
+                part["Content-Disposition"] = 'attachment; filename="%s"' % basename(
+                    filepath
+                )
                 msg.attach(part)
 
             server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -99,7 +103,9 @@ class Mail:
         except Exception as e:
             print(e)
 
-        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        __location__ = os.path.realpath(
+            os.path.join(os.getcwd(), os.path.dirname(__file__))
+        )
         f = os.path.join(__location__, "invite.ics")
         ics_content = open(f).read()
 
@@ -110,7 +116,9 @@ class Mail:
             replaced_contents = replaced_contents.replace(
                 "endDate", param["endDate"].strftime("%Y%m%dT%H%M%SZ")
             )
-            replaced_contents = replaced_contents.replace("telephonic", param["location"])
+            replaced_contents = replaced_contents.replace(
+                "telephonic", param["location"]
+            )
             replaced_contents = replaced_contents.replace(
                 "now", datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ")
             )
