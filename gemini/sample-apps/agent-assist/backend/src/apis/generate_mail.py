@@ -1,4 +1,5 @@
 """This is a python utility file."""
+# pylint: disable=import-error
 
 from flask import jsonify, request
 from utils.mail import Mail
