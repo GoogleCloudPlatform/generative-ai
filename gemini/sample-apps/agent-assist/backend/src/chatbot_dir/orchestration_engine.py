@@ -150,19 +150,19 @@ def schedule_calendar_event(event_date, start_time, end_time, participants) -> N
     else:
         start_time = parse(start_time).time()
         end_time = parse(end_time).time()
-        meet_date = parse(event_date, dayfirst=True).date()
+        meet_day = parse(event_date, dayfirst=True).date()
 
         start_date_time = datetime(
-            meet_date.year,
-            meet_date.month,
-            meet_date.day,
+            meet_day.year,
+            meet_day.month,
+            meet_day.day,
             start_time.hour,
             start_time.minute,
         ).isoformat()
         end_date_time = datetime(
-            meet_date.year,
-            meet_date.month,
-            meet_date.day,
+            meet_day.year,
+            meet_day.month,
+            meet_day.day,
             end_time.hour,
             end_time.minute,
         ).isoformat()

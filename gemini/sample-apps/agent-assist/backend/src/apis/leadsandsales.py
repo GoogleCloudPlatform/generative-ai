@@ -40,20 +40,20 @@ def get_leads_and_sales_data() -> tuple[dict, int]:
     with open(file_path, encoding="UTF-8") as json_file:
         data = json.load(json_file)
 
-    start_date = request.args.get("start_date")
-    end_date = request.args.get("end_date")
-    if start_date is None or end_date is None:
-        start_date = datetime.now() - timedelta(days=90)
-        start_date = start_date.strftime("%Y-%m-%d")
-        end_date = datetime.now().strftime("%Y-%m-%d")
+    start_day = request.args.get("start_date")
+    end_day = request.args.get("end_date")
+    if start_day is None or end_day is None:
+        start_day = datetime.now() - timedelta(days=90)
+        start_day = start_day.strftime("%Y-%m-%d")
+        end_day = datetime.now().strftime("%Y-%m-%d")
 
     conversion_rate, leads_generated, revenue_generated = get_conversion_rate(
-        data, start_date, end_date
+        data, start_day, end_day
     )
     platform_data, top_performing_platform = get_different_platform_data(
-        data, start_date, end_date
+        data, start_day, end_day
     )
-    top_performing_policy = get_top_performing_policy(data, start_date, end_date)
+    top_performing_policy = get_top_performing_policy(data, start_day, end_day)
 
     return (
         jsonify(
