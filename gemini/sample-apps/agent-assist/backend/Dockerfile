@@ -4,9 +4,15 @@ WORKDIR /app/
 
 COPY requirements.txt /app/
 
+RUN python -m venv venv
+
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app/
+
+RUN /app/venv/bin/activate
+
+ENV PYTHONPATH=/app
 
 WORKDIR /app/src/
 
