@@ -57,7 +57,7 @@ def make_chunks(document_path: str, policy_name: str) -> None:
     chunks_dict: dict[str, Any] = {}
     chunks_dict["chunks"] = []
     chunks_dict["TOTAL_DOC_CHUNKS"] = total_doc_chunks
-    chunks_dict["chunks"] = l
+    chunks_dict["chunks"] = chunk_list
 
     with open(chunks_path, "w") as f:
         json.dump(chunks_dict, f)
