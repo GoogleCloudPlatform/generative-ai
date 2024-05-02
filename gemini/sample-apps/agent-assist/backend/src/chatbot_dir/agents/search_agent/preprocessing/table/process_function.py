@@ -8,7 +8,7 @@ from src.chatbot_dir.agents.search_agent.preprocessing.table.one_shot.PROMPT imp
 from src.chatbot_dir.agents.search_agent.preprocessing.table.text_bison import TextBison
 
 
-def processTable(table_df_string: str) -> str:
+def process_table(table_df_string: str) -> str:
     """Processes a table in dataframe string format using TextBison.
 
     Args:
@@ -18,6 +18,6 @@ def processTable(table_df_string: str) -> str:
         str: The processed table in dataframe string format.
     """
     tb = TextBison()
-    PROMPT = PROMPT_FOR_TABLE.format(table_df_string)
-    df_string = tb.generate_response(PROMPT)
+    prompt = PROMPT_FOR_TABLE.format(table_df_string)
+    df_string = tb.generate_response(prompt)
     return df_string

@@ -54,8 +54,8 @@ def generate_answer(question: str) -> str:
     with open("data/likes.json", "rb") as f:
         df2 = pd.DataFrame(json.load(f))
 
-    PROMPT = SQL_PROMPT.format(question=question)
-    answer = tb.generate_response(PROMPT=PROMPT)
+    prompt = SQL_PROMPT.format(question=question)
+    answer = tb.generate_response(prompt=prompt)
     answer = answer.replace("<SQL>", "")
     sql_query = answer.replace("</SQL>", "")
     sql_query = sql_query.strip()
@@ -65,8 +65,8 @@ def generate_answer(question: str) -> str:
         answer_df = ps.sqldf(sql_query, locals())
         print(answer_df)
         temp_df = answer_df.astype(str)
-        PROMPT = FINAL_ANSWER_PROMPT.format(question=question, df=temp_df)
-        answer_natural_language = tb.generate_response(PROMPT)
+        prompt = FINAL_ANSWER_PROMPT.format(question=question, df=temp_df)
+        answer_natural_language = tb.generate_response(prompt)
         print("answer_natural_language : ", answer_natural_language)
         return answer_natural_language
 

@@ -15,10 +15,18 @@ parameters = {
 
 
 class TextBison:
+    """
+    Initializes the TextBison class for text generation.
+
+    Args:
+        PROJECT_ID: GCP Project ID.
+        LOCATION: GCP Region. Defaults to "us-central1".
+    """
+
     def __init__(
         self,
-        PROJECT_ID=config["PROJECT_ID"],
-        LOCATION=config["LOCATION"],
+        project_id=config["PROJECT_ID"],
+        location=config["LOCATION"],
         max_output_tokens=2048,
         temperature=0.05,
         top_p=0.8,
@@ -27,15 +35,15 @@ class TextBison:
         """Initializes the TextBison class.
 
         Args:
-            PROJECT_ID (str): The Google Cloud project ID.
-            LOCATION (str): The Google Cloud region where the model is deployed.
+            project_id (str): The Google Cloud project ID.
+            location (str): The Google Cloud region where the model is deployed.
             max_output_tokens (int): The maximum number of tokens to generate.
             temperature (float): The temperature to use for sampling.
             top_p (float): The top-p value to use for sampling.
             top_k (int): The top-k value to use for sampling.
         """
-        self.PROJECT_ID = PROJECT_ID
-        self.LOCATION = LOCATION
+        self.project_id = project_id
+        self.location = location
         self.parameters = {
             "max_output_tokens": max_output_tokens,
             "temperature": temperature,
@@ -43,11 +51,11 @@ class TextBison:
             "top_k": top_k,
         }
 
-        vertexai.init(project=self.PROJECT_ID, location=self.LOCATION)
+        vertexai.init(project=self.project_id, location=self.location)
 
         self.model = TextGenerationModel.from_pretrained(config["text_bison_model"])
 
-    def generate_response(self, PROMPT):
+    def generate_response(self, prompt):
         """Generates a response to a given PROMPT.
 
         Args:
@@ -57,5 +65,5 @@ class TextBison:
             str: The generated response.
         """
         parameters = self.parameters
-        response = self.model.predict(PROMPT, **parameters)
+        response = self.model.predict(prompt, **parameters)
         return response.text

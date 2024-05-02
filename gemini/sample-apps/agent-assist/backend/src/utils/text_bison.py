@@ -18,26 +18,26 @@ parameters = {
 class TextBison:
     def __init__(
         self,
-        PROJECT_ID=config["PROJECT_ID"],  # GCP Project ID
-        LOCATION=config["LOCATION"],  # GCP Region
+        project_id=config["PROJECT_ID"],  # GCP Project ID
+        location=config["LOCATION"],  # GCP Region
     ):
         """
         Initializes the TextBison class for text generation.
 
         Args:
-            PROJECT_ID: GCP Project ID.
-            LOCATION: GCP Region. Defaults to "us-central1".
+            project_id: GCP Project ID.
+            location: GCP Region. Defaults to "us-central1".
         """
-        self.PROJECT_ID = PROJECT_ID
-        self.LOCATION = LOCATION
+        self.project_id = project_id
+        self.location = location
         self.parameters = config["text_bison_parameters"]
         # Initialize the Vertex AI client library
-        vertexai.init(project=self.PROJECT_ID, location=self.LOCATION)
+        vertexai.init(project=self.project_id, location=self.location)
 
         # Load the pre-trained Text-Bison model
         self.model = TextGenerationModel.from_pretrained("text-bison")
 
-    def generate_response(self, PROMPT: str) -> str:
+    def generate_response(self, prompt: str) -> str:
         """
         Generates a text response using the Text-Bison model.
 
@@ -49,5 +49,5 @@ class TextBison:
         """
         print("running tb.generate_response")
         parameters = self.parameters
-        response = self.model.predict(PROMPT, **parameters)
+        response = self.model.predict(prompt, **parameters)
         return response.text

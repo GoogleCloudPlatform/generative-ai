@@ -37,8 +37,7 @@ def chatbot_entry(data: dict = {}) -> dict:
     with open("data/static/oe_examples/logs.json", "w") as f:
         json.dump(logs, f)
 
-    result = run_orchestrator(query, chat_history_string)
-    return result
+    run_orchestrator(query, chat_history_string)
 
 
 def process_history(chat_history):

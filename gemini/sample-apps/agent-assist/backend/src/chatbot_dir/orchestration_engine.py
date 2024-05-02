@@ -72,7 +72,7 @@ def create_sales_pitch(prompt: str, policy_name: str) -> str:
     return response
 
 
-def generate_email(PROMPT: str, chat_history: str) -> tuple[str, str]:
+def generate_email(prompt: str, chat_history: str) -> tuple[str, str]:
     """Generate email function to handle queries related to generating emails.
 
     Args:
@@ -82,7 +82,7 @@ def generate_email(PROMPT: str, chat_history: str) -> tuple[str, str]:
     Returns:
         tuple[str, str]: A tuple containing the email subject and body.
     """
-    return mail_component(query=PROMPT, chat_history=chat_history)
+    return mail_component(query=prompt, chat_history=chat_history)
 
 
 def send_email(email_id: str, subject: str, body: str) -> None:

@@ -20,8 +20,8 @@ class TextBison:
     A class to interact with the Text Bison model from Vertex AI.
 
     Args:
-        PROJECT_ID (str): The project ID of the Vertex AI project.
-        LOCATION (str): The location of the Vertex AI project.
+        project_id (str): The project ID of the Vertex AI project.
+        location (str): The location of the Vertex AI project.
         max_output_tokens (int): The maximum number of tokens to generate.
         temperature (float): The temperature controls the randomness of the generated text.
         top_p (float): Top-p nucleus sampling.
@@ -30,8 +30,8 @@ class TextBison:
 
     def __init__(
         self,
-        PROJECT_ID=config["PROJECT_ID"],
-        LOCATION=config["LOCATION"],
+        project_id=config["PROJECT_ID"],
+        location=config["LOCATION"],
         max_output_tokens: int = 8192,
         temperature: float = 0.1,
         top_p: float = 0.8,
@@ -41,15 +41,15 @@ class TextBison:
         Initialize the TextBison class.
 
         Args:
-            PROJECT_ID (str): The project ID of the Vertex AI project.
-            LOCATION (str): The location of the Vertex AI project.
+            project_id (str): The project ID of the Vertex AI project.
+            location (str): The location of the Vertex AI project.
             max_output_tokens (int): The maximum number of tokens to generate.
             temperature (float): The temperature controls the randomness of the generated text.
             top_p (float): Top-p nucleus sampling.
             top_k (int): Top-k nucleus sampling.
         """
-        self.PROJECT_ID = PROJECT_ID
-        self.LOCATION = LOCATION
+        self.project_id = project_id
+        self.location = location
         self.parameters = {
             "max_output_tokens": max_output_tokens,
             "temperature": temperature,
@@ -57,11 +57,11 @@ class TextBison:
             "top_k": top_k,
         }
 
-        vertexai.init(project=self.PROJECT_ID, location=self.LOCATION)
+        vertexai.init(project=self.project_id, location=self.location)
 
         self.model = TextGenerationModel.from_pretrained(config["text_bison_model"])
 
-    def generate_response(self, PROMPT: str) -> str:
+    def generate_response(self, prompt: str) -> str:
         """
         Generate a response using the Text Bison model.
 
@@ -73,5 +73,5 @@ class TextBison:
         """
         print("running tb.generate_response")
         parameters = self.parameters
-        response = self.model.predict(PROMPT, **parameters)
+        response = self.model.predict(prompt, **parameters)
         return response.text

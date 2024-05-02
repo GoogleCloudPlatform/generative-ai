@@ -163,8 +163,7 @@ def handle_chatbot(data):
     """Handles the chatbot."""
     print(data)
     emit("chat", ["Generating..."])
-    chatbot_response = chatbot.chatbot_entry(data)
-    print(chatbot_response)
+    chatbot.chatbot_entry(data)
     emit("chat", ["Done"])
 
 

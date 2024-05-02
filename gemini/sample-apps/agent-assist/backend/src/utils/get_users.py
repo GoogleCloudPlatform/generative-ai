@@ -5,11 +5,11 @@
 import json
 
 
-def get_users(isContact: bool = True) -> list:
+def get_users(is_contact: bool = True) -> list:
     """Gets a list of users from a JSON file.
 
     Args:
-    isContact: A boolean value indicating whether to return users who have been contacted or not.
+    is_contact: A boolean value indicating whether to return users who have been contacted or not.
 
     Returns:
     A list of dictionaries representing users.
@@ -18,12 +18,12 @@ def get_users(isContact: bool = True) -> list:
     with open("data/real_users_db.json") as f:
         users = json.load(f)
 
-    if isContact:
+    if is_contact:
         contacted_users = list(filter(lambda x: x["LastContacted"] is not None, users))
         return contacted_users
-    else:
-        potential_users = list(filter(lambda x: x["LastContacted"] is None, users))
-        return potential_users
+    
+    potential_users = list(filter(lambda x: x["LastContacted"] is None, users))
+    return potential_users
 
 
 if __name__ == "__main__":

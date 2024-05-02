@@ -13,17 +13,20 @@ from googleapiclient.errors import HttpError
 
 
 def show_chatty_threads():
-    SCOPES = [config["MAIL_TRIAL_SCOPE"]]
+    """Shows basic usage of the Gmail API.
+    Prints the threads in the user's mailbox.
+    """
+    scopes = [config["MAIL_TRIAL_SCOPE"]]
     creds = None
 
     if os.path.exists("mail_token.json"):
-        creds = Credentials.from_authorized_user_file("mail_token.json", SCOPES)
+        creds = Credentials.from_authorized_user_file("mail_token.json", scopes)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "keys/read_mail.json", SCOPES
+                "keys/read_mail.json", scopes
             )
             creds = flow.run_local_server(port=0)
         with open("mail_token.json", "w") as token:
@@ -40,6 +43,7 @@ def show_chatty_threads():
 
     except HttpError as error:
         print(f"An error occurred: {error}")
+        return None
 
 
 if __name__ == "__main__":

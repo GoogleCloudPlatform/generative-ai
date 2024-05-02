@@ -24,18 +24,18 @@ class Calendar:
         Initializes the Calendar class.
         """
         self.self_email = config["company_email"]
-        self.SCOPES = [config["CALENDAR_SCOPE"]]
+        self.scopes = [config["CALENDAR_SCOPE"]]
         self.creds = None
         if os.path.exists("cal_token.json"):
             self.creds = Credentials.from_authorized_user_file(
-                "cal_token.json", self.SCOPES
+                "cal_token.json", self.scopes
             )
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
                 self.creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "keys/credentials_desktop.json", self.SCOPES
+                    "keys/credentials_desktop.json", self.scopes
                 )
                 self.creds = flow.run_local_server(port=0)
             with open("cal_token.json", "w") as token:
@@ -43,7 +43,7 @@ class Calendar:
         try:
             self.service = build("calendar", "v3", credentials=self.creds)
         except HttpError as error:
-            print("An error occurred: %s" % error)
+            print(f"An error occurred: {error}")
 
     def create_event(
         self, email: list[str], start_date_time: str, end_date_time: str
@@ -97,7 +97,7 @@ class Calendar:
             .insert(calendarId="primary", body=event, sendUpdates="all")
             .execute()
         )
-        print("Event created: %s" % (event.get("htmlLink")))
+        print(f"Event created: {event.get('htmlLink')}")
 
         # print(event)
         return event

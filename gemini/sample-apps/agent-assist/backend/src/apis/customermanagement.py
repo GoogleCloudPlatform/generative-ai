@@ -39,9 +39,7 @@ def get_customer_management_data():
         jsonify(
             {
                 "total_active_customers": total_active_customers,
-                "average_satisfaction_score": float(
-                    "{:.3}".format(average_satisfaction_score)
-                ),
+                "average_satisfaction_score": float(f"{average_satisfaction_score:.3}"),
                 "total_lapsed_customers": total_lapsed_customers,
                 "chart_data": chart_data,
             }
@@ -76,11 +74,7 @@ def get_metrics_data(data: list, start_date: str, end_date: str):
 
         if policy_start_date is None:
             continue
-        if (
-            policy["current_policy"]
-            and policy_start_date >= start_date
-            and policy_start_date <= end_date
-        ):
+        if policy["current_policy"] and start_date <= policy_start_date <= end_date:
             total_active_customers += 1
 
     if total_ratings != 0:
@@ -106,11 +100,7 @@ def get_lapsed_customers(data: list, start_date: str, end_date: str):
         policy_end_date = policy["policy_end_date"]
         if policy_end_date is None:
             continue
-        if (
-            policy["current_policy"] is None
-            and policy_end_date >= start_date
-            and policy_end_date <= end_date
-        ):
+        if policy["current_policy"] is None and start_date <= policy_end_date <= end_date:
             total_lapsed_customers += 1
 
     return total_lapsed_customers
@@ -131,7 +121,7 @@ def get_chart_data(data, start_date, end_date):
     start_date = datetime.strptime(start_date, "%Y-%m-%d")
     end_date = datetime.strptime(end_date, "%Y-%m-%d")
     month_list = [
-        datetime.strptime("%2.2d-%2.2d" % (year, month), "%Y-%m").strftime("%b-%y")
+        datetime.strptime(f"{year:02}-{month:02}", "%Y-%m").strftime("%b-%y")
         for year in range(start_date.year, end_date.year + 1)
         for month in range(
             start_date.month if year == start_date.year else 1,
@@ -156,11 +146,7 @@ def get_chart_data(data, start_date, end_date):
                     "satisfaction_score": policy["satisfaction_score"],
                     "count": 1,
                 }
-        if (
-            policy["current_policy"]
-            and policy_start_date >= start_date
-            and policy_start_date <= end_date
-        ):
+        if policy["current_policy"] and start_date <= policy_start_date <= end_date:
             if month in month_data:
                 month_data[month]["active_customers"] += 1
             else:
