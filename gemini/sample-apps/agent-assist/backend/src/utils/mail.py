@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 import datetime
 from email.mime.application import MIMEApplication
 from email.mime.base import MIMEBase
@@ -94,7 +96,9 @@ class Mail:
         try:
             for att in param["receiver"]:
                 attendees += (
-                    "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=FALSE;CN="
+                    "ATTENDEE;CUTYPE=INDIVIDUAL;\
+                        ROLE=REQ-PARTICIPANT;\
+                        PARTSTAT=NEEDS-ACTION;RSVP=FALSE;CN="
                     + att
                     + ";X-NUM-GUESTS=0:mailto:"
                     + att

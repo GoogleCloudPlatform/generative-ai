@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 POLICIES = [
     "Home Shield",
     "Bharat Griha Raksha Plus",

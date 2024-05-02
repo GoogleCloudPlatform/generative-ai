@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 PROMPT_FOR_SUBQUESTION = """
 You're presented with various queries that compare different policies.
 Your task is to simplify these complex queries into simple straightforward questions.

@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 from src.chatbot_dir.agents.search_agent.preprocessing.table.one_shot.prompt import (
     PROMPT_FOR_TABLE,
 )

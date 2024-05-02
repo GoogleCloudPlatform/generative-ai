@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 from app.chunks import get_all_chunks
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS

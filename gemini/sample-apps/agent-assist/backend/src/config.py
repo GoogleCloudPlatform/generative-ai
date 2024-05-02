@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 config = {
     "PROJECT_ID": "<PROJECT_ID>",
     "LOCATION": "<LOCATION>",

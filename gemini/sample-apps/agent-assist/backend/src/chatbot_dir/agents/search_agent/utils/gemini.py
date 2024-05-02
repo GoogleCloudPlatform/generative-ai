@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 from config import config
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel

@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 import os
 
 from img2table.document import PDF

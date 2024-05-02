@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 import os.path
 
 from config import config

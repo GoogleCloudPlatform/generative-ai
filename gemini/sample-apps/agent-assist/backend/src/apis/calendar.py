@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 from datetime import datetime
 
 from flask import jsonify

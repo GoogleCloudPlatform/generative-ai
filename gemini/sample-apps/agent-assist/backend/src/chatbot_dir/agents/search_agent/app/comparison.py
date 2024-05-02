@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 PROMPT_FOR_COMPARISON = """
 You are a  home insurance domain expert who has a lot of knowledge about home insurance policies.
 Your task is to thoroughly evaluate and compare various medical policies or recommend the most suitable policy from a given set.

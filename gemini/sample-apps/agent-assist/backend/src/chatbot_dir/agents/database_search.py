@@ -1,8 +1,10 @@
+"""This is a python utility file."""
+
 from datetime import date
 import json
 
-import pandas as pd
-import pandasql as ps
+import pandas as pd  # type: ignore
+import pandasql as ps  # type: ignore
 from utils.text_bison import TextBison
 
 # SQL_PROMPT is a string template that is used to generate the SQL query.

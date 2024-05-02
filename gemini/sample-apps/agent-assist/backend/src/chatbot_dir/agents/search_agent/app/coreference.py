@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 from config import config
 from langchain.chains import ConversationChain
 from langchain.chat_models import ChatVertexAI
