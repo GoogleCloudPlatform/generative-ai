@@ -1,4 +1,4 @@
-"""This is a python utility file."""
+"""This is a python utility file created for help."""
 
 from datetime import datetime
 
