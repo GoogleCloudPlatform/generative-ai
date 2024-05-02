@@ -1,5 +1,5 @@
 """
-Entry page of the streamlit application.
+Entry page of streamlit application.
 """
 
 from app.pages_utils import utils
