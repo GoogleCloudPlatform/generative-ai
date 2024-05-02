@@ -35,8 +35,8 @@ def get_chat_chain() -> ConversationChain:
         ConversationChain: A ConversationChain object.
     """
 
-    PROJECT_ID = config["PROJECT_ID"]
-    vertexai.init(project=PROJECT_ID, location=config["LOCATION"])
+    project_id = config["PROJECT_ID"]
+    vertexai.init(project=project_id, location=config["LOCATION"])
     chat_llm = ChatVertexAI(temperature=0.08)
     chat_chain = ConversationChain(llm=chat_llm, memory=ConversationBufferMemory())
     return chat_chain

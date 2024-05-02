@@ -54,17 +54,17 @@ def search(query: str, policy_list: List[str]) -> str:
     return response
 
 
-def create_sales_pitch(PROMPT: str, policy_name: str) -> str:
+def create_sales_pitch(prompt: str, policy_name: str) -> str:
     """Create sales pitch function to handle queries related to creating sales pitches.
 
     Args:
-        PROMPT (str): The PROMPT for the sales pitch.
+        prompt (str): The prompt for the sales pitch.
         policy_name (str): The name of the insurance policy to create a sales pitch for.
 
     Returns:
         str: A sales pitch for the given policy.
     """
-    response = sales_pitch_component(PROMPT, policy_name)
+    response = sales_pitch_component(prompt, policy_name)
 
     emit("chat", ["Generating..."])
     emit("chat", [{"intent": "Sales Pitch ", "data": {"response": response}}])
@@ -113,7 +113,7 @@ def get_email_conversation_summary(email_id: str) -> dict:
     Returns:
         str: A summary of the email conversation.
     """
-    email_content, lastContactedDate = get_email_threads_summary(email_id)
+    email_content, _ = get_email_threads_summary(email_id)
     response = {
         "status": "valid",
         "intent": "response",

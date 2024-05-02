@@ -37,6 +37,17 @@ OUTPUT: """
 
 
 class Driver:
+    """
+    The Driver class is responsible for running the search agent.
+
+    The Driver class has the following responsibilities:
+
+    * Getting the chat chain.
+    * Getting the keywords from the query.
+    * Getting the chunks from the policies.
+    * Getting the answer to the query.
+    """
+
     def __init__(self):
         """Initializes the Driver class.
 

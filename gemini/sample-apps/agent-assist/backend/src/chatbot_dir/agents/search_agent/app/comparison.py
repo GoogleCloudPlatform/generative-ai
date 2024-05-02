@@ -124,7 +124,7 @@ def comparison(tb, input):
     Therefore, based on the explicit information available within each policy regarding home assistance services coverage, CareHaven Assurance logically appears to offer a more comprehensive range of in-home care services compared to ComfortCare Plan.
     """
 
-    PROMPT = PROMPT_FOR_COMPARISON.format(
+    prompt = PROMPT_FOR_COMPARISON.format(
         first_input,
         first_output,
         second_input,
@@ -135,5 +135,5 @@ def comparison(tb, input):
         fourth_output,
         input=input,
     )
-    response = tb.generate_response(PROMPT)
+    response = tb.generate_response(prompt)
     return response

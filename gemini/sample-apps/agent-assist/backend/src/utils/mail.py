@@ -59,9 +59,7 @@ class Mail:
                 with open(file_path, "rb") as fil:
                     part = MIMEApplication(fil.read(), Name=basename(file_path))
                 # After the file is closed
-                part["Content-Disposition"] = 'attachment; filename="%s"' % basename(
-                    file_path
-                )
+                part["Content-Disposition"] = f'attachment; filename="{basename(file_path)}"'
                 msg.attach(part)
 
             server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -93,7 +91,7 @@ class Mail:
             print(e)
             param["location"] = "https://meet.google.com/ybf-xwfa-ygj"
 
-        CRLF = "\r\n"
+        crlf = "\r\n"
         attendees = ""
         try:
             for att in param["receiver"]:
@@ -104,7 +102,7 @@ class Mail:
                     + att
                     + ";X-NUM-GUESTS=0:mailto:"
                     + att
-                    + CRLF
+                    + crlf
                 )
         except Exception as e:
             print(e)
@@ -113,7 +111,9 @@ class Mail:
             os.path.join(os.getcwd(), os.path.dirname(__file__))
         )
         f = os.path.join(__location__, "invite.ics")
-        ics_content = open(f).read()
+
+        with open(f) as file:
+            ics_content = file.read()
 
         replaced_contents = ics_content.replace(
             "start_date", param["start_date"].strftime("%Y%m%dT%H%M%SZ")
@@ -136,26 +136,26 @@ class Mail:
         replaced_contents = replaced_contents.replace("describe", param["subject"])
 
         part_email = MIMEText(replaced_contents, "calendar;method=REQUEST")
-        ical_atch = MIMEBase("text/calendar", ' ;name="%s"' % "invitation.ics")
+        ical_atch = MIMEBase("text/calendar", ' ;name="invitation.ics"')
         ical_atch.set_payload(replaced_contents)
-        ical_atch.add_header("Content-Disposition", 'attachment; filename="%s"' % f)
+        ical_atch.add_header("Content-Disposition", f'attachment; filename="{f}"')
 
-        msgAlternative = MIMEMultipart("alternative")
-        msgAlternative.attach(part_email)
+        msg_alternative = MIMEMultipart("alternative")
+        msg_alternative.attach(part_email)
         msg = MIMEMultipart("mixed")
         msg["Reply-To"] = self.sender
         msg["Date"] = formatdate(localtime=True)
         msg["Subject"] = param["subject"]
         msg["From"] = self.sender
         msg["To"] = param["receiver"]
-        msg.attach(msgAlternative)
-        mailServer = smtplib.SMTP("smtp.gmail.com", 587)
-        mailServer.ehlo()
-        mailServer.starttls()
-        mailServer.ehlo()
-        mailServer.login(self.sender, self.password)
-        mailServer.sendmail(self.sender, param["receiver"], msg.as_string())
-        mailServer.close()
+        msg.attach(msg_alternative)
+        mail_server = smtplib.SMTP("smtp.gmail.com", 587)
+        mail_server.ehlo()
+        mail_server.starttls()
+        mail_server.ehlo()
+        mail_server.login(self.sender, self.password)
+        mail_server.sendmail(self.sender, param["receiver"], msg.as_string())
+        mail_server.close()
 
         print("Email sent successfully")
 
@@ -171,12 +171,11 @@ class Mail:
         def get_body(msg):
             if msg.is_multipart():
                 return get_body(msg.get_payload(0))
-            else:
-                return msg.get_payload(None, True)
+            return msg.get_payload(None, True)
 
         # Function to search for a key value pair
         def search(key, value, con):
-            result, data = con.search(None, key, '"{}"'.format(value))
+            result, data = con.search(None, key, f'"{value}"')
             return data
 
         # Function to get the list of emails under this label
@@ -202,7 +201,7 @@ class Mail:
         print("Messages: ", msgs)
         for msg in msgs[::-1]:
             for sent in msg:
-                if type(sent) is tuple:
+                if isinstance(sent, tuple):
                     content = str(sent[1], "utf-8")
                     data = str(content)
 
