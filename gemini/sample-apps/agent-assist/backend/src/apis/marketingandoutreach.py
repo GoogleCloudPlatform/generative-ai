@@ -24,11 +24,11 @@ def get_marketing_and_outreach_data() -> tuple[dict, int]:
         data = json.load(json_file)
 
     start_date = request.args.get("start_date")
-    end_date = request.args.get("end_date")
-    if start_date is None or end_date is None:
+    finish_date = request.args.get("end_date")
+    if start_date is None or finish_date is None:
         start_date = datetime.now() - timedelta(days=90)
         start_date = start_date.strftime("%Y-%m-%d")
-        end_date = datetime.now().strftime("%Y-%m-%d")
+        finish_date = datetime.now().strftime("%Y-%m-%d")
 
     (
         website_traffic,
@@ -39,7 +39,7 @@ def get_marketing_and_outreach_data() -> tuple[dict, int]:
         open_rate,
         top_performing_platform,
         chart_data,
-    ) = get_metrics_data(data, start_date, end_date)
+    ) = get_metrics_data(data, start_date, finish_date)
 
     return (
         jsonify(

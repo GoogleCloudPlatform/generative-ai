@@ -9,24 +9,24 @@ from typing import Any, Dict
 from flask import jsonify, request
 
 
-def format_inr(number):
+def format_inr(num):
     """
     Formats the given number to Indian Rupee format.
 
     Args:
-        number (int): The number to be formatted.
+        num (int): The number to be formatted.
 
     Returns:
         str: The formatted number in Indian Rupee format.
     """
-    if number > 10000000:
-        return "₹" + f"{number / 10000000:.4}" + "Cr"
-    if number > 100000:
-        return "₹" + f"{number / 100000:.4}" + "L"
-    if number > 1000:
-        return "₹" + f"{number / 1000:.4}" + "K"
+    if num > 10000000:
+        return "₹" + f"{num / 10000000:.4}" + "Cr"
+    if num > 100000:
+        return "₹" + f"{num / 100000:.4}" + "L"
+    if num > 1000:
+        return "₹" + f"{num / 1000:.4}" + "K"
 
-    return "₹" + str(number)
+    return "₹" + str(num)
 
 
 def get_performance_data():
@@ -40,24 +40,24 @@ def get_performance_data():
     with open(file_path, encoding="UTF-8") as json_file:
         data = json.load(json_file)
 
-    start_date = request.args.get("start_date")
+    begin_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
-    if start_date is None or end_date is None:
-        start_date = datetime.now() - timedelta(days=90)
-        start_date = start_date.strftime("%Y-%m-%d")
+    if begin_date is None or end_date is None:
+        begin_date = datetime.now() - timedelta(days=90)
+        begin_date = begin_date.strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
 
     return (
         jsonify(
             {
                 "number_of_policies_sold": get_number_of_policies_sold(
-                    data, start_date, end_date
+                    data, begin_date, end_date
                 ),
                 "revenue_generated": format_inr(
-                    get_revenue_generated(data, start_date, end_date)
+                    get_revenue_generated(data, begin_date, end_date)
                 ),
-                "renewal_rate": get_renewal_rate(data, start_date, end_date),
-                "month_data": get_month_data(data, start_date, end_date),
+                "renewal_rate": get_renewal_rate(data, begin_date, end_date),
+                "month_data": get_month_data(data, begin_date, end_date),
             }
         ),
         200,

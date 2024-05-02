@@ -94,7 +94,7 @@ def create_calendar_event():
     print(meet_date)
     meet_date = dateutil.parser.parse(meet_date).date()
     cal = Calendar()
-    start_date_time = datetime(
+    start_datetime = datetime(
         meet_date.year,
         meet_date.month,
         meet_date.day,
@@ -105,9 +105,9 @@ def create_calendar_event():
         meet_date.year, meet_date.month, meet_date.day, end_time.hour, end_time.minute
     ).isoformat()
 
-    print(start_date_time, end_date_time)
+    print(start_datetime, end_date_time)
     event = cal.create_event(
-        email=mail_id, start_date_time=start_date_time, end_date_time=end_date_time
+        email=mail_id, start_date_time=start_datetime, end_date_time=end_date_time
     )
     print(mail_id, start_time, end_time, meet_date)
     return jsonify({"event": event}), 200
