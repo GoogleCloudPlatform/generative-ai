@@ -178,4 +178,3 @@ def get_chart_data(data: list, start_date: str, end_date: str):
             }
         )
     return chart_data
-

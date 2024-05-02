@@ -127,4 +127,3 @@ def get_metrics_data(
         top_performing_platform.split(" ")[0],
         chart_data,
     )
-

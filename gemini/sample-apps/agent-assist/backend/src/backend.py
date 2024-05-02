@@ -100,7 +100,9 @@ def create_calendar_event():
 
 
 app.add_url_rule(
-    "/workbench/performance", methods=["GET"], view_func=performance.get_performance_data
+    "/workbench/performance",
+    methods=["GET"],
+    view_func=performance.get_performance_data,
 )
 app.add_url_rule(
     "/workbench/leadsandsales",
