@@ -1,20 +1,16 @@
-import json
-import pickle
-
 from config import config
 from gcs import read_file_from_gcs_link
-from genai_prompts import articles_prompt
+from genai_prompts import ARTICLES_PROMPT
 from langchain.docstore.document import Document
 from langchain.retrievers import BM25Retriever, EnsembleRetriever
 from langchain.vectorstores import VectorStore
 from sentence_transformers import SentenceTransformer
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
-import vertexai.preview.generative_models as generative_models
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
-mode = config["mode"]
+MODE = config["mode"]
 
 
 class Articles:
@@ -27,7 +23,7 @@ class Articles:
         self.data = data
         self.embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
-        if mode == 0:
+        if MODE == 0:
             chunks = read_file_from_gcs_link(config["Data"]["chunks_local"])
         else:
             chunks = read_file_from_gcs_link(config["Data"]["chunks_prod"])
@@ -36,7 +32,7 @@ class Articles:
         bm25_retriever = BM25Retriever.from_documents(chunks)
         bm25_retriever.k = 3
 
-        if mode == 0:
+        if MODE == 0:
             global vectorstore
             local_vectorstore: VectorStore = read_file_from_gcs_link(
                 config["Data"]["vectorstore_local"]
@@ -82,7 +78,7 @@ class Articles:
 
                 try:
                     response = self.model.generate_content(
-                        [articles_prompt.format(outfit=outfit, article=article_s)],
+                        [ARTICLES_PROMPT.format(outfit=outfit, article=article_s)],
                         generation_config=GenerationConfig(
                             max_output_tokens=2048,
                             temperature=1,

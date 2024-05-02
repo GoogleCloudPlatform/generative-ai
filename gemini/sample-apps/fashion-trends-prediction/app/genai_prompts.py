@@ -1,4 +1,4 @@
-image_prompt = """
+IMAGE_PROMPT = """
 
 You are a fashion designer at a fast fashion retailer and your goal is to visualize different draft styles for a given outfit.
 
@@ -16,7 +16,7 @@ Outfit: {outfit}
 """
 
 
-trends_prompt = """
+TRENDS_PROMPT = """
 
 You are supposed to summarize trends in the data given.
 - Iterate through the data entry by entry.
@@ -175,7 +175,7 @@ qList2 = [
 ]
 
 
-articles_prompt = """You are a fashion journalist and want to know whether an article is talking about a given fashion clothing item. Answer this by searching for the presence of the item or a similar item in the text. The first word of the output should be Yes/No.
+ARTICLES_PROMPT = """You are a fashion journalist and want to know whether an article is talking about a given fashion clothing item. Answer this by searching for the presence of the item or a similar item in the text. The first word of the output should be Yes/No.
 
 Examples:
 

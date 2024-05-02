@@ -9,11 +9,8 @@ import vertexai.preview.generative_models as generative_models
 
 sys.path.append("../")
 from config import config
-from genai_prompts import qList, qList2
 from helper_functions_insta import get_id
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel, Part
-from vertexai.preview.language_models import TextGenerationModel
-from vertexai.preview.vision_models import Image, ImageQnAModel
 
 gemini_model: GenerativeModel = GenerativeModel("gemini-1.0-pro-vision-001")
 gemini_model_language: GenerativeModel = GenerativeModel("gemini-1.0-pro-002")
@@ -25,7 +22,7 @@ fewshot_images: list[Part] = []
 num_files = len(config["fewshot_images"])
 for i in range(num_files):
     filename = "image" + str(i + 1)
-    fewshot_images.append(Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"))
+    fewshot_images.append(Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg")
 
 
 def generate_caption(image_path: str) -> dict:
@@ -112,7 +109,7 @@ def generate_caption(image_path: str) -> dict:
 
     try:
         response = json.loads(response)
-    except Exception as e:
+    except json.decoder.JSONDecodeError as e:
         print(e)
         return {}
 
@@ -126,13 +123,13 @@ def generate_caption(image_path: str) -> dict:
     return answer
 
 
-def get_posts(user: str, previous: list, cnt: int = 10, cookies: dict = {}) -> list:
+def get_posts(user: str, previous: list, count: int = 10, cookies: dict = {}) -> list:
     """Gets a list of posts from an Instagram user.
 
     Args:
                     user (str): The username of the Instagram user.
                     previous (list): A list of previous posts.
-                    cnt (int): The number of posts to get.
+                    count (int): The number of posts to get.
                     cookies (dict): A dictionary of cookies.
                     model (str): The model to use for generating the captions.
 
@@ -140,7 +137,7 @@ def get_posts(user: str, previous: list, cnt: int = 10, cookies: dict = {}) -> l
                     list: A list of posts.
     """
 
-    org_cnt = cnt
+    original_count = count
     userId = get_id(user, cookies)
     if userId is None:
         return previous
@@ -155,19 +152,16 @@ def get_posts(user: str, previous: list, cnt: int = 10, cookies: dict = {}) -> l
     else:
         latest_id = ""
 
-    print("latest id: ", latest_id, "\n")
     posts = []
 
     flag = False
-    while cnt > 0 and flag is False:
+    while count > 0 and flag is False:
         response = requests.get(
             config["links"]["graphql"], params=params, cookies=cookies
         )
 
-        print(response.status_code)
 
         if response.status_code != 200:
-            print(response)
             break
 
         parsed_data = json.loads(response.text)
@@ -180,7 +174,6 @@ def get_posts(user: str, previous: list, cnt: int = 10, cookies: dict = {}) -> l
 
             postid = media["edges"][i]["node"]["id"]
             postlink = media["edges"][i]["node"]["display_url"]
-            print("post id: ", postid)
 
             if postid == latest_id:
                 flag = True
@@ -191,24 +184,23 @@ def get_posts(user: str, previous: list, cnt: int = 10, cookies: dict = {}) -> l
 
             try:
                 caption = generate_caption(actual_img_path)
-            except Exception as e:
+            except generative_models.GenerationError as e:
                 print(e)
             else:
                 posts = [(postid, postlink, caption)] + posts  # newest post stays first
-                cnt -= 1
+                count -= 1
             finally:
                 os.remove(actual_img_path)
 
-            if cnt == 0:
+            if count == 0:
                 break
 
         params["after"] = media["page_info"]["end_cursor"]
 
     posts = posts + previous
-    if len(posts) > org_cnt:
-        posts = posts[:org_cnt]
+    if len(posts) > original_count:
+        posts = posts[:original_count]
 
-    print("final cnt = ", cnt)
     return posts
 
 

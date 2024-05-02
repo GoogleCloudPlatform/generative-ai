@@ -9,7 +9,10 @@ import streamlit as st
 from utilities import add_logo
 from utils_standalone_image_gen import predict_image, render_image_edit_prompt
 import vertexai
-from vertexai.generative_models import GenerationConfig, GenerativeModel, Part
+from vertexai.generative_models import GenerationConfig, GenerativeModel
+import vertexai.preview.generative_models as generative_models
+from google.api_core.exceptions import InvalidArgument
+
 
 add_logo(config["Images"]["logo"])
 
@@ -237,21 +240,18 @@ with st.container(border=True):
                     )
                     st.image(imgs[0], width=200)
 
-                except:
+                except InvalidArgument as e:
                     res_text = "Invalid prompt. Try again."
                     st.chat_message("assistant").write(res_text)
                     st.session_state[hist_key].append(["assistant", res_text])
 
             else:
-                try:
-                    res = bot.send_message(
-                        st.session_state["prompt"],
-                        generation_config=generation_config,
-                        safety_settings=safety_settings,
-                    )
-                    res_text = res.text
-                except:
-                    res_text = "Invalid prompt. Try again."
+                res = bot.send_message(
+                    st.session_state["prompt"],
+                    generation_config=generation_config,
+                    safety_settings=safety_settings,
+                )
+                res_text = res.text
 
                 st.chat_message("assistant").write(res.text)
                 st.session_state[hist_key].append(["assistant", res_text])

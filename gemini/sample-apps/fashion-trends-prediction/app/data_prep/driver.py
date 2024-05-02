@@ -1,33 +1,39 @@
 import json
 import time
+import logging
 
 from config import config
 from data_processing import get_posts
-from helper_functions_insta import get_influencers, insta_login
 from helper_functions_vogue import get_articles
+from helper_functions_insta import get_influencers, insta_login
 from prepare_data_for_retriever import prepare_data_for_retriever
+
+logging.basicConfig(level=logging.INFO)
 
 parameters = config["parameters"]["standard"]
 country_names = config["countryList"]
 data_path = config["Data"]["current_data"]
 
 
-def extract_json_influencer_wise(scrape_size: dict, first_scrape: bool, saved: dict) -> None:
-    """Extracts data from Instagram and saves it in a JSON file.
+class Scrape:
+    def __init__(self, num_countries: int, num_influencers: int, num_posts: int):
+        """Initializes the scrape parameters.
 
-    Args:
-            scrape_size (dict): A dictionary containing the number of countries, influencers, and posts to scrape.
-            first_scrape (bool): A boolean indicating whether this is the first scrape.
-            saved (dict): A dictionary containing the saved data.
+        Args:
+                num_countries (int): The number of countries to scrape.
+                num_influencers (int): The number of influencers to scrape per country.
+                num_posts (int): The number of posts to scrape per influencer.
+        """
+        self.num_countries = num_countries
+        self.num_influencers = num_influencers
+        self.num_posts = num_posts
 
-    """
 
-
-def periodic_extraction(scrape_size: dict, first_period: bool) -> None:
+def periodic_extraction(scrape_parameters: Scrape, first_period: bool) -> None:
     """Extracts data from Instagram periodically and saves it in a JSON file.
 
     Args:
-            scrape_size (dict): A dictionary containing the number of countries, influencers, and posts to scrape.
+            scrape_parameters (Scrape): An object containing the number of countries, influencers, and posts to scrape.
             first_period (bool): A boolean indicating whether this is the first period.
 
     """
@@ -51,14 +57,14 @@ def periodic_extraction(scrape_size: dict, first_period: bool) -> None:
 
     cookies = insta_login()
 
-    for country_name in country_names[: scrape_size["num_countries"]]:
-        print(country_name)
+    for country_name in country_names[: scrape_parameters.num_countries]:
+        logging.info(f"Scraping country {country_name}")
 
         # the top influencers of that country right now
         influencers = get_influencers(country_name)
 
-        for influencer in influencers[: scrape_size["num_influencers"]]:
-            print(influencer)
+        for influencer in influencers[: scrape_parameters.num_influencers]:
+            logging.info(f"Scraping influencer {influencer}")
 
             if (
                 influencer not in scraped_influencers
@@ -69,7 +75,7 @@ def periodic_extraction(scrape_size: dict, first_period: bool) -> None:
                     posts = get_posts(
                         influencer,
                         saved["global"][influencer],
-                        scrape_size["num_posts"],
+                        scrape_parameters.num_posts,
                         cookies,
                         model="Gemini",
                     )
@@ -77,7 +83,7 @@ def periodic_extraction(scrape_size: dict, first_period: bool) -> None:
                     posts = get_posts(
                         influencer,
                         [],
-                        scrape_size["num_posts"],
+                        scrape_parameters.num_posts,
                         cookies,
                         model="Gemini",
                     )
@@ -97,11 +103,11 @@ def periodic_extraction(scrape_size: dict, first_period: bool) -> None:
         json.dump(saved, outfile)
 
 
-def create_final_data(scrape_size: dict) -> None:
+def create_final_data(scrape_parameters: Scrape) -> None:
     """Creates the summarized final data from the results of image captioning.
 
     Args:
-            scrape_size (dict): A dictionary containing the number of countries, influencers, and posts to scrape.
+            scrape_parameters (Scrape): An object containing the number of countries, influencers, and posts to scrape.
 
     """
 
@@ -109,28 +115,19 @@ def create_final_data(scrape_size: dict) -> None:
         saved = json.load(f)
 
     saved["finaldata"] = {}
-    for country_name in country_names[: scrape_size["num_countries"]]:
-        print(country_name)
+    for country_name in country_names[: scrape_parameters.num_countries]:
         saved["finaldata"][country_name] = {}
+        influencers = get_influencers(country_name)[: scrape_parameters.num_influencers] # the top influencers of that country right now
 
-        # the top influencers of that country right now
-        influencers = get_influencers(country_name)
+        for influencer in influencers:
+            if influencer not in saved["global"]:
+                continue
 
-        for influencer in influencers[: scrape_size["num_influencers"]]:
-            print(influencer)
-            if influencer in saved["global"]:
-                for element in saved["global"][influencer]:
-                    image_attr = element[2]
+            for element in saved["global"][influencer]:
+                image_attr = element[2]
+                for cat, values in image_attr.items():
+                    saved["finaldata"][country_name].setdefault(cat, []).extend(values.copy())
 
-                    for cat in image_attr:
-                        if cat in saved["finaldata"][country_name]:
-                            saved["finaldata"][country_name][cat].extend(
-                                image_attr[cat].copy()
-                            )
-                        else:
-                            saved["finaldata"][country_name][cat] = image_attr[
-                                cat
-                            ].copy()
 
     with open(data_path, "w") as outfile:
         json.dump(saved, outfile)
@@ -139,12 +136,9 @@ def create_final_data(scrape_size: dict) -> None:
 def merge_keys() -> None:
     """Merges keys in the final data file that have only a difference of spaces, capital letters, etc."""
 
-    # merging the keys which only have a difference of spaces, capital letters
-
     with open(data_path, "r") as f:
         saved = json.load(f)
 
-    print("merging keys")
     finaldata_new = {}
     finaldata = saved["finaldata"]
     countries = [key for key in finaldata]
@@ -171,8 +165,6 @@ def merge_keys() -> None:
 
 def combine_insta_and_vogue() -> None:
     """Combines data from Instagram and Vogue into a single file."""
-
-    # Combining Instagram (India) and Vogue-India data
 
     with open(data_path, "r") as f:
         saved = json.load(f)
@@ -224,7 +216,7 @@ def create_news_articles_data() -> None:
     url = "https://www.vogue.in"
 
     past_scrape = saved["articles"]
-    saved["articles"] = get_articles(url, past_scrape, numPages=10)
+    saved["articles"] = get_articles(url, past_scrape, num_pages=10)
 
     with open(data_path, "w") as outfile:
         json.dump(saved, outfile)
@@ -254,15 +246,15 @@ def get_top_categories(saved: dict) -> None:
 def insta_scrape() -> None:
     """Scrapes data from Instagram and saves it in a JSON file."""
 
-    scrape_size = {"num_countries": 10, "num_influencers": 20, "num_posts": 50}
+    scrape_parameters = Scrape(num_countries=10, num_influencers=20, num_posts=50)
 
     # set first to True if this is the first time you are extracting
-    periodic_extraction(scrape_size=scrape_size, first_period=True)
+    periodic_extraction(scrape_parameters=scrape_parameters, first_period=True)
 
     with open(data_path, "r") as f:
         saved = json.load(f)
 
-    create_final_data(scrape_size)
+    create_final_data(scrape_parameters)
 
     with open(data_path, "r") as f:
         saved = json.load(f)

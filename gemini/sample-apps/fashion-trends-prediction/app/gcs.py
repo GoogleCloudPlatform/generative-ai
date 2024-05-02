@@ -1,4 +1,3 @@
-import base64
 import json
 import pickle
 from typing import Union

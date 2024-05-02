@@ -13,28 +13,28 @@ It uses the [Streamlit Framework](https://streamlit.io/) and Generative AI model
 Choose a file if you want to run on your own JSON data or skip this option if you want to run on the default data.
 Choose the country and category of outfit for which you need to get the predicted fashion trends.
 
-<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image1.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image1.png" width="70%" alt="Choosing fields">
 
 Click on any of the predicted item to see a generated image with some similar outfits.
 
-<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image2.png" width="70%" >
-<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image3.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image2.png" width="70%" alt="example trend">
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image3.png" width="70%" alt="another example">
 
 Go to the "Overall trends across attributes" tab to see the trends in the order of their predicted popularity across different features of the outfit category.
 
-<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image4.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image4.png" width="70%" alt="overall trends across attributes">
 
 For the selected country: 'India', one gets relevant fashion news articles.
 
-<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image5.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image5.png" width="70%" alt="relevant articles when India is chosen as country">
 
 Finally, there's a chatbot that has the predicted fashion trends data as context and can be used to answer queries related to that. It can also be used to generate and edit images of different outfits.
 
-<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image6.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image6.png" width="70%" alt="chatbot">
 
 ## Technical Implementation
 
-<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image7.png" width="70%" >
+<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app_screenshots/image7.png" width="70%" alt="flow diagram">
 
 ### Broad Implementation Steps
 
@@ -188,9 +188,3 @@ Required JSON format -
 ```
 
 To extend this, one can use Cloud Scheduler to do the scraping periodically (since we want the data to not be stale for this usecase) and store the results in a Cloud Storage bucket from where they will be read to predict upcoming trends.
-
-## Useful links
-
-[Slide deck](https://docs.google.com/presentation/d/1io-ks1vWeymwykUJE789_A-16apZm9GoatAtBClsB94/edit?usp=sharing&resourcekey=0-TqnMc8_S7nTXBHK-CtmoFw "Slide deck")
-
-[Demo video](https://drive.google.com/file/d/19Pq5zlA2tJuXToFu_nSGN_NIsOTTmNh0/view?usp=sharing&resourcekey=0-iNkZFOnPleBYPGmj1Vn4mg "Demo video")

@@ -5,7 +5,7 @@ from config import config
 from data_processing import generate_caption
 from driver import get_top_categories
 
-data_path = config["Data"]["current_data"]
+DATA_PATH = config["Data"]["current_data"]
 
 
 def images_scrape(saved: dict) -> None:
@@ -27,7 +27,6 @@ def images_scrape(saved: dict) -> None:
     for image_file in image_files:
         image_path = os.path.join("gemini_fewshot_images", image_file)
 
-        print(image_path)
         answer = generate_caption(image_path)
         answers.append(answer)
 
@@ -41,14 +40,14 @@ def images_scrape(saved: dict) -> None:
             else:
                 saved["finaldata"]["All countries"][cat] = image_attr[cat].copy()
 
-    with open(data_path, "w") as outfile:
+    with open(DATA_PATH, "w") as outfile:
         json.dump(saved, outfile)
 
     get_top_categories(saved)
 
 
 if __name__ == "__main__":
-    with open(data_path, "r") as f:
+    with open(DATA_PATH, "r") as f:
         saved = json.load(f)
 
     # the below function is called to replace the current images data

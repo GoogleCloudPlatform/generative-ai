@@ -1,25 +1,72 @@
-import base64
 import io
-from io import StringIO
 import json
-
-from articles import Articles
-from config import config
-from gcs import read_file_from_gcs_link
-from genai_prompts import image_prompt, trends_prompt
-from prediction import Prediction
-import requests
+import base64
+import logging
+import vertexai
 import streamlit as st
 import streamlit.components.v1 as components
-from utilities import add_logo ,button_html_script ,details_html, exception_html
-from utils_standalone_image_gen import predict_image
-import vertexai
 import vertexai.preview.generative_models as generative_models
+
+sys.path.append("../")
+from io import StringIO
+from config import config
+from articles import Articles
+from prediction import Prediction
+from gcs import read_file_from_gcs_link
+from utils_standalone_image_gen import predict_image
+from genai_prompts import IMAGE_PROMPT, TRENDS_PROMPT
+from utilities import add_logo, button_html_script, details_html, exception_html
+
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
+
+
+logging.basicConfig(level=logging.INFO)
 
 PROJECT_ID = config["PROJECT_ID"]  # @param {type:"string"}
 LOCATION = config["LOCATION"]  # @param {type:"string"}
 DATA_PATH = config["Data"]["current_data"]
+
+
+def change_button_colour(widget_label: str, prsd_status: bool) -> None:
+    """Changes the color of a button based on its pressed status.
+
+    Args:
+        widget_label (str): The label of the button.
+        prsd_status (bool): True if the button is pressed, False otherwise.
+    """
+    btn_bg_colour = pressed_colour if prsd_status is True else unpressed_colour
+    htmlstr = button_html_script(widget_label=widget_label,
+                                btn_bg_color1=btn_bg_colour[0],
+                                btn_bg_color2=btn_bg_colour[1])
+
+    components.html(f"{htmlstr}", height=0, width=0)
+
+
+def chk_btn_status_and_assign_colour(buttons: list) -> None:
+    """Checks the pressed status of a list of buttons and assigns colors accordingly.
+
+    Args:
+        buttons (list): A list of button labels.
+    """
+    for i in range(len(buttons)):
+        change_button_colour(buttons[i], state["btn_prsd_status"][i])
+
+
+def btn_pressed_callback(i: int) -> None:
+    """Callback function for when a button is pressed.
+
+    Args:
+        i (int): The index of the button that was pressed.
+    """
+    # toggle
+    if state["btn_prsd_status"][i]:  # button was pressed
+        state["btn_prsd_status"][i] = False
+
+    else:  # button was not pressed
+        state["btn_prsd_status"] = [False] * len(
+            state["btn_prsd_status"]
+        )  # unpress other buttons
+        state["btn_prsd_status"][i] = True
 
 
 if "gemini_model" not in st.session_state:
@@ -39,7 +86,6 @@ st.title("Fashion Trend Prediction")
 uploaded_file = st.file_uploader("Choose a file (optional)")
 
 if uploaded_file is not None and st.session_state["source"] != uploaded_file.name:
-    print("!!!inside uploaded_file if block!!!")
     stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
     string_data = stringio.read()
     st.session_state["source"] = uploaded_file.name
@@ -85,46 +131,6 @@ articles = st.session_state["articleModel"]
 submit = st.button("Get trend predictions", type="primary")
 
 
-def change_button_colour(widget_label: str, prsd_status: bool) -> None:
-    """Changes the color of a button based on its pressed status.
-
-    Args:
-        widget_label (str): The label of the button.
-        prsd_status (bool): True if the button is pressed, False otherwise.
-    """
-    btn_bg_colour = pressed_colour if prsd_status is True else unpressed_colour
-    htmlstr = button_html_script(widget_label=widget_label ,
-                                btn_bg_color1=btn_bg_colour[0] ,
-                                btn_bg_color2=btn_bg_colour[1])
-
-    components.html(f"{htmlstr}", height=0, width=0)
-
-
-def chk_btn_status_and_assign_colour(buttons: list) -> None:
-    """Checks the pressed status of a list of buttons and assigns colors accordingly.
-
-    Args:
-        buttons (list): A list of button labels.
-    """
-    for i in range(len(buttons)):
-        change_button_colour(buttons[i], state["btn_prsd_status"][i])
-
-
-def btn_pressed_callback(i: int) -> None:
-    """Callback function for when a button is pressed.
-
-    Args:
-        i (int): The index of the button that was pressed.
-    """
-    # toggle
-    if state["btn_prsd_status"][i]:  # button was pressed
-        state["btn_prsd_status"][i] = False
-
-    else:  # button was not pressed
-        state["btn_prsd_status"] = [False] * len(
-            state["btn_prsd_status"]
-        )  # unpress other buttons
-        state["btn_prsd_status"][i] = True
 
 
 if submit or key in st.session_state:
@@ -143,7 +149,7 @@ if submit or key in st.session_state:
 
         # generic trends
         with st.spinner("Computing overall trends across attributes..."):
-            prompt_for_generic_trends = trends_prompt.format(
+            prompt_for_generic_trends = TRENDS_PROMPT.format(
                 data=st.session_state["JSONdata"]["finaldata"][country][category],
                 category=category,
             )
@@ -170,8 +176,7 @@ if submit or key in st.session_state:
                 response = json.loads(resp)
                 state["summary"] = response
 
-            except Exception as error:
-                print("An error occurred:", error)
+            except (IndexError, json.decoder.JSONDecodeError) as error:
                 state["summary"] = ""
 
         state["items"] = [i.capitalize() for i in state["items"]]
@@ -180,8 +185,8 @@ if submit or key in st.session_state:
             for list_var in state["additional_outfits"]
         ]
 
-        print(state["items"])
-        print(state["additional_outfits"])
+        logging.info(state["items"])
+        logging.info(state["additional_outfits"])
 
     outer_tabs = st.tabs(
         ["### Trending outfits", "### Overall trends across attributes"]
@@ -224,7 +229,7 @@ if submit or key in st.session_state:
                                 instance_dict={
                                     "prompt": st.session_state["gemini_model"]
                                     .generate_content(
-                                        image_prompt.format(outfit=outfit),
+                                        IMAGE_PROMPT.format(outfit=outfit),
                                         generation_config=GenerationConfig(
                                             max_output_tokens=2048,
                                             temperature=0.2,
@@ -315,17 +320,16 @@ if submit or key in st.session_state:
 
     with outer_tabs[1]:
         response = state["summary"]
-        details_content = ""
+        DETAILS_CONTENT = ""
         for index, (key, values) in enumerate(response.items()):
             values = [value for idx, value in enumerate(values, start=1)]
             print("values: ", values)
             values = [v.capitalize() for v in values]
             print("values: ", values)
-            values_str = ",&nbsp;&nbsp;&nbsp;".join(
+            VALUES_STR = ",&nbsp;&nbsp;&nbsp;".join(
                 [f"{idx}. {value}" for idx, value in enumerate(values, start=1)]
             )
-            print("values_str: ", values_str)
             if index != len(response) - 1:
-                details_content += details_html(key=key , values_str=values_str)
+                DETAILS_CONTENT += details_html(key=key, values_str=VALUES_STR)
 
-        st.markdown(details_content, unsafe_allow_html=True)
+        st.markdown(DETAILS_CONTENT, unsafe_allow_html=True)

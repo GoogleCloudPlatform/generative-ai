@@ -7,7 +7,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 
-data_path = config["Data"]["current_data"]
+DATA_PATH = config["Data"]["current_data"]
 
 
 def prepare_data_for_retriever() -> None:
@@ -17,7 +17,7 @@ def prepare_data_for_retriever() -> None:
 
     """
 
-    with open(data_path, "r") as f:
+    with open(DATA_PATH, "r") as f:
         saved = json.load(f)
 
     articles = [item[1].lower() for item in saved["articles"]]

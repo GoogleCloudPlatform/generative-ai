@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from config import config
 import requests
 
+
 # Get the entire list of country names
 def get_countries() -> list:
     """Gets the entire list of country names.
@@ -37,12 +38,10 @@ def get_influencers(country: str) -> list:
             list: A list of top 50 influencers of that country.
 
     """
-    if country == "All countries":
-        url = "https://hypeauditor.com/top-instagram-fashion"
-    else:
+    url = "https://hypeauditor.com/top-instagram-fashion"
+    if country != "All countries":
         country = country.lower().replace(" ", "-")
-        baseurl = "https://hypeauditor.com/top-instagram-fashion-"
-        url = baseurl + country
+        url = url + "-" + country
 
     response = requests.get(url)
     if response.status_code != 200:
@@ -110,7 +109,7 @@ def get_id(user: str, cookies: dict) -> str:
             str: The Instagram user ID.
 
     """
-    link = "https://www.instagram.com/web/search/topsearch/?query={}".format(user)
+    link = f"https://www.instagram.com/web/search/topsearch/?query={user}"
     response = requests.get(link, cookies=cookies)
 
     if response.status_code >= 300:

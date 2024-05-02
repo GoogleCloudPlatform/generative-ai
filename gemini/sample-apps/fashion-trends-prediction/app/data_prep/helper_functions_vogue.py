@@ -1,17 +1,22 @@
 import time
+import logging
 import requests
 
 from bs4 import BeautifulSoup
 from data_processing import summarize_article
 
+
+logging.basicConfig(level=logging.INFO)
+
+
 # Get news articles content
-def get_articles(url: str, past_scrape: list, numPages: int = 2) -> list:
+def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
     """Gets news articles from a given URL and returns a list of tuples containing the article URL, summary, and attributes.
 
     Args:
             url (str): The URL of the news website.
             past_scrape (list): A list of tuples containing the article URL, summary, and attributes of previously scraped articles.
-            numPages (int, optional): The number of pages to scrape. Defaults to 2.
+            num_pages (int, optional): The number of pages to scrape. Defaults to 2.
 
     Returns:
             list: A list of tuples containing the article URL, summary, and attributes.
@@ -22,42 +27,26 @@ def get_articles(url: str, past_scrape: list, numPages: int = 2) -> list:
     else:
         latest_link = ""
 
-    finish = False
     articles = []
-    for page in range(1, numPages):
-        print(
-            "page no ------------------------------------------------------------ ",
-            page,
-        )
-        response = requests.get(url + "/fashion?page=" + str(page))
-        fashionPage = BeautifulSoup(response.content, "html.parser")
+    for page in range(1, num_pages):
+        logging.info(f"Scraping page number {page}")
+        fashion_page = BeautifulSoup(requests.get(url + "/fashion?page=" + str(page)).content, "html.parser")
 
-        for link in fashionPage.find_all("a", class_="SummaryItemHedLink-civMjp"):
+        for link in fashion_page.find_all("a", class_="SummaryItemHedLink-civMjp"):
             new_url = url + link["href"]
 
             if new_url == latest_link:
-                print("new url is same as past")
-                finish = True
-                break
+                return articles + past_scrape
 
-            res = requests.get(new_url)
-
-            page = BeautifulSoup(res.content, "html.parser")
             article_text = ""
-            for div in page.find_all("div", class_="article__body"):
-                for p in div.find_all("p"):
-                    article_text += p.text
+            for div in BeautifulSoup(requests.get(new_url).content, "html.parser").find_all("div", class_="article__body"):
+                article_text += "".join(p.text for p in div.find_all("p"))
 
             if article_text == "":
-                print("Empty", new_url)
                 continue
 
             article_summary = summarize_article(article_text)
             time.sleep(1)
             articles.append((new_url, article_summary))
-            print("article appended")
-
-        if finish:
-            break
 
     return articles + past_scrape
