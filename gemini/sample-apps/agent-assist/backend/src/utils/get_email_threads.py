@@ -62,7 +62,11 @@ def get_data_from_threads(service, emailid, threads):
 
                     try:
                         date = next(
-                            (x for x in data["payload"]["headers"] if x["name"] == "Date"),
+                            (
+                                x
+                                for x in data["payload"]["headers"]
+                                if x["name"] == "Date"
+                            ),
                             {"value": datetime.now().date()},
                         )
                     except Exception as e:
