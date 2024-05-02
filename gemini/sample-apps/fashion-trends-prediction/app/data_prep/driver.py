@@ -1,11 +1,11 @@
 import json
-import time
 import logging
+import time
 
 from config import config
 from data_processing import get_posts
-from helper_functions_vogue import get_articles
 from helper_functions_insta import get_influencers, insta_login
+from helper_functions_vogue import get_articles
 from prepare_data_for_retriever import prepare_data_for_retriever
 
 logging.basicConfig(level=logging.INFO)
@@ -117,7 +117,9 @@ def create_final_data(scrape_parameters: Scrape) -> None:
     saved["finaldata"] = {}
     for country_name in country_names[: scrape_parameters.num_countries]:
         saved["finaldata"][country_name] = {}
-        influencers = get_influencers(country_name)[: scrape_parameters.num_influencers] # the top influencers of that country right now
+        influencers = get_influencers(country_name)[
+            : scrape_parameters.num_influencers
+        ]  # the top influencers of that country right now
 
         for influencer in influencers:
             if influencer not in saved["global"]:
@@ -126,8 +128,9 @@ def create_final_data(scrape_parameters: Scrape) -> None:
             for element in saved["global"][influencer]:
                 image_attr = element[2]
                 for cat, values in image_attr.items():
-                    saved["finaldata"][country_name].setdefault(cat, []).extend(values.copy())
-
+                    saved["finaldata"][country_name].setdefault(cat, []).extend(
+                        values.copy()
+                    )
 
     with open(data_path, "w") as outfile:
         json.dump(saved, outfile)

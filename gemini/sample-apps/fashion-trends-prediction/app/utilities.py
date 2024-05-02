@@ -1,4 +1,3 @@
-
 import streamlit as st
 from streamlit.components.v1 import html
 
@@ -38,7 +37,10 @@ def nav_page(page_name: str, timeout_secs: int = 3) -> None:
     )
     html(nav_script)
 
-def button_html_script(widget_label: str , btn_bg_color1: str , btn_bg_color2: str) -> str:
+
+def button_html_script(
+    widget_label: str, btn_bg_color1: str, btn_bg_color2: str
+) -> str:
     """Generates HTML script to change the color of a button.
 
     Args:
@@ -134,7 +136,8 @@ def add_logo(png_file_path: str) -> None:
         unsafe_allow_html=True,
     )
 
-def details_html(key: str , values_str: str) -> str:
+
+def details_html(key: str, values_str: str) -> str:
     """Generates HTML for displaying details in a box.
 
     Args:
@@ -159,6 +162,7 @@ def details_html(key: str , values_str: str) -> str:
                 <summary style='list-style: none;'><span style='color: #ff4c4b; font-size: 17px;'>{key}:<br> </span></summary><div><span style='font-size: 16px;'>{values_str}<br></span></div>
             </div>
             """
+
 
 exception_html = """
                     <style>

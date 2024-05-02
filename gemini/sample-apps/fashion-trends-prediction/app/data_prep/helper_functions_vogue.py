@@ -1,10 +1,9 @@
-import time
 import logging
-import requests
+import time
 
 from bs4 import BeautifulSoup
 from data_processing import summarize_article
-
+import requests
 
 logging.basicConfig(level=logging.INFO)
 
@@ -30,7 +29,9 @@ def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
     articles = []
     for page in range(1, num_pages):
         logging.info(f"Scraping page number {page}")
-        fashion_page = BeautifulSoup(requests.get(url + "/fashion?page=" + str(page)).content, "html.parser")
+        fashion_page = BeautifulSoup(
+            requests.get(url + "/fashion?page=" + str(page)).content, "html.parser"
+        )
 
         for link in fashion_page.find_all("a", class_="SummaryItemHedLink-civMjp"):
             new_url = url + link["href"]
@@ -39,7 +40,9 @@ def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
                 return articles + past_scrape
 
             article_text = ""
-            for div in BeautifulSoup(requests.get(new_url).content, "html.parser").find_all("div", class_="article__body"):
+            for div in BeautifulSoup(
+                requests.get(new_url).content, "html.parser"
+            ).find_all("div", class_="article__body"):
                 article_text += "".join(p.text for p in div.find_all("p"))
 
             if article_text == "":

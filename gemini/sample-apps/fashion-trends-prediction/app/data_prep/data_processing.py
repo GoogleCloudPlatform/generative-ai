@@ -22,7 +22,9 @@ fewshot_images: list[Part] = []
 num_files = len(config["fewshot_images"])
 for i in range(num_files):
     filename = "image" + str(i + 1)
-    fewshot_images.append(Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg")
+    fewshot_images.append(
+        Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"
+    )
 
 
 def generate_caption(image_path: str) -> dict:
@@ -159,7 +161,6 @@ def get_posts(user: str, previous: list, count: int = 10, cookies: dict = {}) ->
         response = requests.get(
             config["links"]["graphql"], params=params, cookies=cookies
         )
-
 
         if response.status_code != 200:
             break
