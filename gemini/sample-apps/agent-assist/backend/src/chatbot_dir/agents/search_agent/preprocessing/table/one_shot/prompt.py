@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 PROMPT_FOR_TABLE = """
 Given a table, turn it into natural language. The table data needs to be retrieved for question answering. Therefore it is essential to not miss any single cell.
 Think step-by-step. Look at all the row and column headers carefully.

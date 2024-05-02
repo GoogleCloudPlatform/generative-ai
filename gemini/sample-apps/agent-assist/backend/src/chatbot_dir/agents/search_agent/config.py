@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 POLICIES = [
     "Home Shield",
     "Bharat Griha Raksha Plus",

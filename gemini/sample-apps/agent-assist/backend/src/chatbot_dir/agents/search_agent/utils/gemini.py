@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 from config import config
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel

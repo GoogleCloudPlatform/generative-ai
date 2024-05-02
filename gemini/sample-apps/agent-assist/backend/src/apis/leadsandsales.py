@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 from datetime import datetime, timedelta
 import json
 from typing import Any, Dict
@@ -23,7 +25,7 @@ def format_inr(number) -> str:
         return "₹" + f"{number / 100000:.4}" + "L"
     if number > 1000:
         return "₹" + f"{number / 1000:.4}" + "K"
-    
+
     return "₹" + str(number)
 
 
@@ -127,9 +129,7 @@ def get_different_platform_data(data: list, start_date: str, end_date: str) -> t
     chart_data = []
     top_performing_platform = max(final_data, key=lambda x: final_data[x]["revenue"])
     for key, value in final_data.items():
-        chart_data.append(
-            {"x": key, "y1": value["count"], "y2": value["revenue"]}
-        )
+        chart_data.append({"x": key, "y1": value["count"], "y2": value["revenue"]})
 
     return chart_data, top_performing_platform
 

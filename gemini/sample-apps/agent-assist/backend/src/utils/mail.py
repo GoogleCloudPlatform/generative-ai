@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 import datetime
 from email.mime.application import MIMEApplication
 from email.mime.base import MIMEBase

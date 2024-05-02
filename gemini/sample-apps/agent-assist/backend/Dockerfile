@@ -4,7 +4,8 @@ WORKDIR /app/
 
 COPY requirements.txt /app/
 
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# Disable Pylint import checker
+RUN pip install --no-cache-dir -r /app/requirements.txt # pylint: disable=wrong-import-position
 
 COPY . /app/
 

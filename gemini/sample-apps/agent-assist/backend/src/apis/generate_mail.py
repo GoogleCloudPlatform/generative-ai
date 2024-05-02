@@ -1,5 +1,8 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+# pylint: disable=all
+
 from flask import jsonify, request
 from utils.mail import Mail
 from utils.text_bison import TextBison

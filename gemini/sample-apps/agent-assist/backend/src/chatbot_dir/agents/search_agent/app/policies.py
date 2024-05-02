@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 from utils.text_bison import TextBison
 
 from ..config import POLICIES

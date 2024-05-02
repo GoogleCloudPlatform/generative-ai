@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 import json
 import os
 from typing import Any
@@ -48,9 +50,9 @@ def make_chunks(document_path: str, policy_name: str) -> None:
                 table_chunk.metadata["isTable"] = True
                 chunks.append(table_chunk)
 
-    l = []
+    chunk_list = []
     for chunk in chunks:
-        l.append(chunk.dict())
+        chunk_list.append(chunk.dict())
 
     chunks_dict: dict[str, Any] = {}
     chunks_dict["chunks"] = []

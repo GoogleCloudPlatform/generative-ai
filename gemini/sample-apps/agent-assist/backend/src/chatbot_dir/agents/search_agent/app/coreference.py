@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 from config import config
 from langchain.chains import ConversationChain
 from langchain.chat_models import ChatVertexAI

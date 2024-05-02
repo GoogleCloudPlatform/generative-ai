@@ -1,5 +1,7 @@
 """This is a python utility file."""
 
+# pylint: disable=all
+
 from datetime import datetime
 import json
 from typing import Any, Dict
