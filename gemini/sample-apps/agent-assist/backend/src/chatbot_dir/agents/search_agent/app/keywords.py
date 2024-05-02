@@ -2,7 +2,7 @@
 
 # pylint: disable=E0401
 
-from utils.text_bison import TextBison
+from utils.gemini_text import GeminiText
 
 PROMPT_LEXICAL = """
 Given a query related to Home insurance policies, output the defining term in the query.
@@ -55,7 +55,7 @@ def get_keywords(query: str, for_lexical: bool = True) -> str:
     else:
         prompt = PROMPT_SEMANTIC
 
-    tb = TextBison()
+    tb = GeminiText()
     response = tb.generate_response(prompt.format(query))
 
     print("lexical", for_lexical, "keywords", response)

@@ -77,6 +77,23 @@ class GeminiText:
         response = self.chat.send_message(prompt, generation_config=inner_parameters)
         return response.text
 
+    def summarise(self, passage: str) -> str:
+        """
+        Generates a summary for the given passage.
+
+        Args:
+            passage (str): The input passage to be summarised
+
+        Returns:
+            str: The summary
+        """
+        inner_parameters = self.parameters
+        response = self.chat.send_message(
+            f"SUMMARISE THIS PASSAGE: {passage}",
+            generation_config=inner_parameters
+        )
+        return response
+
 
 if __name__ == "__main__":
     gemini = GeminiText()

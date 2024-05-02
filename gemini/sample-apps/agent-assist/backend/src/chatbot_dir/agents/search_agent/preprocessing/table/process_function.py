@@ -5,7 +5,7 @@
 from src.chatbot_dir.agents.search_agent.preprocessing.table.one_shot.PROMPT import (
     PROMPT_FOR_TABLE,
 )
-from src.chatbot_dir.agents.search_agent.preprocessing.table.text_bison import TextBison
+from src.utils.gemini_text import GeminiText
 
 
 def process_table(table_df_string: str) -> str:
@@ -17,7 +17,7 @@ def process_table(table_df_string: str) -> str:
     Returns:
         str: The processed table in dataframe string format.
     """
-    tb = TextBison()
+    tb = GeminiText()
     prompt = PROMPT_FOR_TABLE.format(table_df_string)
     df_string = tb.generate_response(prompt)
     return df_string

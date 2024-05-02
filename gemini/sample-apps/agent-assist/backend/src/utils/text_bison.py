@@ -53,3 +53,19 @@ class TextBison:
         inner_parameters = self.parameters
         response = self.model.predict(prompt, **inner_parameters)
         return response.text
+
+    def summarise(self, passage: str) -> str:
+        """
+        Generates a summary for the given passage.
+
+        Args:
+            passage (str): The input passage to be summarised
+
+        Returns:
+            str: The summary
+        """
+        inner_parameters = self.parameters
+        response = self.model.predict(
+            f"SUMMARISE THIS PASSAGE: {passage}", **inner_parameters
+        )
+        return response

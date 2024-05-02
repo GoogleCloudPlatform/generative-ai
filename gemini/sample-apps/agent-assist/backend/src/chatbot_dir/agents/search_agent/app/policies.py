@@ -2,7 +2,7 @@
 
 # pylint: disable=E0401
 
-from utils.text_bison import TextBison
+from utils.gemini_text import GeminiText
 
 from ..config import POLICIES
 
@@ -52,7 +52,7 @@ def get_policies(query: str):
     Returns:
         list| str: A list of policy indices or a string indicating that the policy is not known.
     """
-    tb = TextBison()
+    tb = GeminiText()
 
     response = tb.generate_response(PROMPT.format(POLICIES_STR, query))
 

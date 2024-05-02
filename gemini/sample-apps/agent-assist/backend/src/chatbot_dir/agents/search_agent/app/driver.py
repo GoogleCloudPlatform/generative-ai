@@ -3,7 +3,7 @@
 # pylint: disable=E0401
 
 from flask_socketio import emit
-from utils.text_bison import TextBison
+from utils.gemini_text import GeminiText
 
 from .chunks import get_chunks
 from .comparison import comparison
@@ -55,7 +55,7 @@ class Driver:
         * `tb`: A TextBison object.
         """
         self.chat_chain = get_chat_chain()
-        self.tb = TextBison()
+        self.tb = GeminiText()
 
     def run(self, query, policies) -> str:
         """
@@ -151,7 +151,7 @@ class Driver:
         Returns:
             (str) The answer to the query.
         """
-        tb = TextBison()
+        tb = GeminiText()
         response = tb.generate_response(
             PROMPT_RESULT.format(chunk_str, reformed_question)
         )
