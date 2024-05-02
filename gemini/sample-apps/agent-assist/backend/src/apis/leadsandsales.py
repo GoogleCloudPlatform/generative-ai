@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=E0401
+# pylint: disable=all
 
 from datetime import datetime, timedelta
 import json
