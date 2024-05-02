@@ -135,7 +135,7 @@ def add_neighbouring_chunks(
     final_list_of_chunks = []
     for chunk_id in relevant_chunk_list:
         final_list_of_chunks.append(chunk_id)
-        if chunk_id == 0 or chunk_id == non_table_chunks - 1:
+        if chunk_id in (0, non_table_chunks - 1):
             continue
         if chunk_id + 1 not in relevant_chunk_list:
             final_list_of_chunks.append(chunk_id + 1)

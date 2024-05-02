@@ -3,18 +3,18 @@
 from preprocessing.make_embeddings import make_embeddings
 
 
-def process_pdf(DOCUMENT_PATH: str, POLICY_NAME: str):
+def process_pdf(document_path: str, policy_name: str):
     """Processes a PDF document for use in the chatbot.
 
     Args:
-        DOCUMENT_PATH (str): The path to the PDF document.
-        POLICY_NAME (str): The name of the policy associated with the document.
+        document_path (str): The path to the PDF document.
+        policy_name (str): The name of the policy associated with the document.
 
     Returns:
         None
     """
 
-    make_embeddings(POLICY_NAME)
+    make_embeddings(policy_name)
 
 
 if __name__ == "__main__":

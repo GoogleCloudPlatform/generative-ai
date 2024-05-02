@@ -38,13 +38,13 @@ def make_chunks(document_path: str, policy_name: str) -> None:
         chunk.metadata["chunk_id"] = chunk_id
         chunk.metadata["isTable"] = False
 
-    TOTAL_DOC_CHUNKS = len(chunks)
+    total_doc_chunks = len(chunks)
 
     for folder_id in os.listdir(f"{tables_path}"):
         for file_id in os.listdir(f"{tables_path}/{folder_id}"):
             if file_id.startswith("table_string"):
                 loader = TextLoader(f"{tables_path}/{folder_id}/{file_id}")
-                table_chunk = loader.load()[0]
+                table_chunk = loader.load()[0]  
                 table_chunk.metadata["isTable"] = True
                 chunks.append(table_chunk)
 
@@ -54,7 +54,7 @@ def make_chunks(document_path: str, policy_name: str) -> None:
 
     chunks_dict: dict[str, Any] = {}
     chunks_dict["chunks"] = []
-    chunks_dict["TOTAL_DOC_CHUNKS"] = TOTAL_DOC_CHUNKS
+    chunks_dict["TOTAL_DOC_CHUNKS"] = total_doc_chunks
     chunks_dict["chunks"] = l
 
     with open(chunks_path, "w") as f:

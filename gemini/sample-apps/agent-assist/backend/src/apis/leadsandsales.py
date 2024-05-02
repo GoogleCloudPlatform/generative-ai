@@ -93,7 +93,7 @@ def get_conversion_rate(data: list, start_date: str, end_date: str) -> tuple:
             revenue += policy["policy_amount"] if policy["converted"] else 0
 
     return (
-        float(f"{(count * 100) / total_count:.4}",
+        float(f"{(count * 100) / total_count:.4}"),
         total_count,
         format_inr(revenue),
     )

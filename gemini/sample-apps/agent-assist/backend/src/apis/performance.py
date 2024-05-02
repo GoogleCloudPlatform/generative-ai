@@ -23,7 +23,7 @@ def format_inr(number):
         return "₹" + f"{number / 100000:.4}" + "L"
     if number > 1000:
         return "₹" + f"{number / 1000:.4}" + "K"
-    
+
     return "₹" + str(number)
 
 
@@ -129,8 +129,7 @@ def get_renewal_rate(data: list, start_date: str, end_date: str) -> float:
         if policy_start_date is None:
             continue
         if (
-            policy_start_date >= start_date
-            and policy_start_date <= end_date
+            start_date <= policy_start_date <= end_date
             and policy["current_policy"] == policy["old_policy"]
         ):
             policies_renewed += 1
@@ -172,7 +171,7 @@ def get_month_data(data: list, start_date: str, end_date: str) -> list:
     start_date = datetime.strptime(start_date, "%Y-%m-%d")
     end_date = datetime.strptime(end_date, "%Y-%m-%d")
     month_list = [
-        datetime.strptime("%2.2d-%2.2d" % (year, month), "%Y-%m").strftime("%b-%y")
+        datetime.strptime(f"{year:02d}-{month:02d}", "%Y-%m").strftime("%b-%y")
         for year in range(start_date.year, end_date.year + 1)
         for month in range(
             start_date.month if year == start_date.year else 1,
@@ -193,10 +192,3 @@ def get_month_data(data: list, start_date: str, end_date: str) -> list:
             }
         )
     return final_data
-
-
-if __name__ == "__main__":
-    FILE_PATH = "../data/policy.json"
-    with open(FILE_PATH) as json_file:
-        data = json.load(json_file)
-    get_month_data(data, "2022-01-01", "2023-12-31")

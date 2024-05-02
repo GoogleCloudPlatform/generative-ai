@@ -6,10 +6,7 @@ import secrets
 import time
 
 from apis import calendar, chatbot, email, generate_mail, kanban
-import apis.customermanagement as customermanagement
-import apis.leadsandsales as leadsandsales
-import apis.marketingandoutreach as marketingandoutreach
-import apis.performance as performance
+from apis import customermanagement, leadsandsales, marketingandoutreach, performance
 import dateutil
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
@@ -36,23 +33,27 @@ Session(app)
 
 @app.route("/")
 def hello_world():
+    """Renders the index page."""
     return render_template("index.html")
 
 
 @app.route("/users/contacted", methods=["GET"])
 def get_real_users_contacted():
+    """Gets the list of real users who have been contacted."""
     users = get_users(isContact=True)
     return jsonify(users), 200
 
 
 @app.route("/users/potential", methods=["GET"])
 def get_real_users_potential():
+    """Gets the list of real users who have not been contacted."""
     users = get_users(isContact=False)
     return jsonify(users), 200
 
 
 @app.route("/users/mail_summary/<mail_id>", methods=["GET"])
 def get_mail_summary(mail_id):
+    """Gets the summary of the email thread."""
     print(mail_id)
     email_summary = get_email_threads_summary(mail_id)
     print(email_summary)
@@ -60,6 +61,7 @@ def get_mail_summary(mail_id):
 
 
 def datetime_from_utc_to_local(utc_datetime):
+    """Converts a UTC datetime to a local datetime."""
     now_timestamp = time.time()
     offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(
         now_timestamp
@@ -69,6 +71,7 @@ def datetime_from_utc_to_local(utc_datetime):
 
 @app.route("/users/create_calendar_event", methods=["POST"])
 def create_calendar_event():
+    """Creates a calendar event."""
     data = request.json
     mail_id = data.get("emailId")
     print("participants", mail_id)
@@ -146,6 +149,7 @@ app.add_url_rule(
 
 @socketio.on("chat")
 def handle_chatbot(data):
+    """Handles the chatbot."""
     print(data)
     emit("chat", ["Generating..."])
     chatbot_response = chatbot.chatbot_entry(data)

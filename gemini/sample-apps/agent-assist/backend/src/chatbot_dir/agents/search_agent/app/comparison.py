@@ -38,6 +38,7 @@ OUTPUT: """
 
 
 def comparison(tb, input):
+    """Function for policy comparison."""
     first_input = """
     Policy 1: MediCarePro Health Insurance
     Partial coverage for cataract surgery, including intraocular lens implants.
