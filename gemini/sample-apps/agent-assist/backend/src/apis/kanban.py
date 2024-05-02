@@ -21,7 +21,7 @@ def get_kanban_data() -> tuple[dict, int]:
     """
 
     file_path = "data/real_users_db.json"
-    with open(file_path) as json_file:
+    with open(file_path, encoding='UTF-8') as json_file:
         data = json.load(json_file)
 
     # Create a dictionary of users, where the key is the user ID and the value is the user data.
@@ -73,7 +73,7 @@ def update_kanban_data() -> tuple[dict, int]:
 
     # Read the kanban board data from the JSON file.
     file_path = "data/real_users_db.json"
-    with open(file_path) as json_file:
+    with open(file_path, encoding='UTF-8') as json_file:
         data = json.load(json_file)
 
     # Find the user in the data and update their column.
@@ -110,7 +110,7 @@ def update_kanban_data() -> tuple[dict, int]:
             break
 
     # Write the updated data to the JSON file.
-    with open(file_path, "w") as json_file:
+    with open(file_path, "w", encoding='UTF-8') as json_file:
         json.dump(data, json_file)
 
     # Return a success message as a JSON response.

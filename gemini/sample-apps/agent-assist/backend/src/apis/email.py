@@ -17,7 +17,7 @@ def mail() -> tuple[dict, int]:
     body = request.json.get("body")
     subject = request.json.get("subject")
 
-    mail = Mail()
-    mail.send_email(email, subject, body)
+    mail_instance = Mail()
+    mail_instance.send_email(email, subject, body)
 
     return jsonify({"message": "Email sent successfully"}), 200
