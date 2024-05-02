@@ -6,9 +6,10 @@ Classes:
     Prediction: Predicts fashion trends based on a given dataset.
 """
 
+from typing import List, Tuple
+
 from bertopic import BERTopic
 from hdbscan import HDBSCAN
-from typing import List, Tuple
 from umap import UMAP
 
 

@@ -1,24 +1,24 @@
+import base64
 import io
 import json
-import base64
 import logging
-import vertexai
+
 import streamlit as st
 import streamlit.components.v1 as components
+import vertexai
 import vertexai.preview.generative_models as generative_models
 
 sys.path.append("../")
 from io import StringIO
-from config import config
+
 from articles import Articles
-from prediction import Prediction
+from config import config
 from gcs import read_file_from_gcs_link
-from utils_standalone_image_gen import predict_image
 from genai_prompts import IMAGE_PROMPT, TRENDS_PROMPT
+from prediction import Prediction
 from utilities import add_logo, button_html_script, details_html, exception_html
-
+from utils_standalone_image_gen import predict_image
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
-
 
 logging.basicConfig(level=logging.INFO)
 
@@ -35,9 +35,11 @@ def change_button_colour(widget_label: str, prsd_status: bool) -> None:
         prsd_status (bool): True if the button is pressed, False otherwise.
     """
     btn_bg_colour = pressed_colour if prsd_status is True else unpressed_colour
-    htmlstr = button_html_script(widget_label=widget_label,
-                                btn_bg_color1=btn_bg_colour[0],
-                                btn_bg_color2=btn_bg_colour[1])
+    htmlstr = button_html_script(
+        widget_label=widget_label,
+        btn_bg_color1=btn_bg_colour[0],
+        btn_bg_color2=btn_bg_colour[1],
+    )
 
     components.html(f"{htmlstr}", height=0, width=0)
 
@@ -129,8 +131,6 @@ articles = st.session_state["articleModel"]
 
 
 submit = st.button("Get trend predictions", type="primary")
-
-
 
 
 if submit or key in st.session_state:
@@ -269,12 +269,14 @@ if submit or key in st.session_state:
                             )
 
                         else:
-                            st.markdown(exception_html,
+                            st.markdown(
+                                exception_html,
                                 unsafe_allow_html=True,
                             )
 
                     except Exception as error:
-                        st.markdown(exception_html,
+                        st.markdown(
+                            exception_html,
                             unsafe_allow_html=True,
                         )
                         print("error in generating imgs: ", error)
