@@ -1,0 +1,8 @@
+auto_mix_prep==0.2.0
+flask_socketio==5.3.6
+img2table==1.2.11
+langchain==0.1.17
+pandas==2.2.2
+pandasql==0.7.3
+python_dateutil==2.9.0.post0
+vertexai==1.49.0

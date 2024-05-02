@@ -1,0 +1,7 @@
+config==0.5.1
+google_api_python_client==2.127.0
+google_auth_oauthlib==1.2.0
+Markdown==3.6
+protobuf==5.26.1
+pytz==2024.1
+vertexai==1.49.0
