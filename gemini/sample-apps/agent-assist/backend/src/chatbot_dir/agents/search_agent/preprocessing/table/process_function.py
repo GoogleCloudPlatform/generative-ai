@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=#E0401
+# pylint: disable=E0401
 
 from src.chatbot_dir.agents.search_agent.preprocessing.table.one_shot.PROMPT import (
     PROMPT_FOR_TABLE,

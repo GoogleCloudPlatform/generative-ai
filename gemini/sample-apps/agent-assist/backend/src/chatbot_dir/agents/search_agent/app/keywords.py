@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=#E0401
+# pylint: disable=E0401
 
 from utils.text_bison import TextBison
 

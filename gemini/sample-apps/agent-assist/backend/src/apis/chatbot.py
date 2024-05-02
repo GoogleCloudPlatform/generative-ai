@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=#E0401
+# pylint: disable=E0401
 
 from datetime import datetime
 import json
@@ -38,6 +38,8 @@ def chatbot_entry(data: dict) -> dict:
         json.dump(logs, f)
 
     run_orchestrator(query, chat_history_string)
+
+    return
 
 
 def process_history(chat_history):

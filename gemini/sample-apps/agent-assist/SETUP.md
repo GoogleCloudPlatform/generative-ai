@@ -41,7 +41,7 @@
 4. Run the following command from the root directory of the repository to deploy your app to cloud run.
 
    ```bash
-   ./deploy.sh
+   ./deploy_helper.sh
    ```
 
 5. See the Google Cloud Run Service named **agent-assist** in the Console and open the URL for the service given there.

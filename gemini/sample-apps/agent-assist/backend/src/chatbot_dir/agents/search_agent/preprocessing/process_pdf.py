@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=#E0401
+# pylint: disable=E0401
 
 from preprocessing.make_chunks import make_chunks
 from preprocessing.make_embeddings import make_embeddings
