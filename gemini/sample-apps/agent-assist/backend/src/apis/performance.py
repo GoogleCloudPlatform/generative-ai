@@ -139,7 +139,7 @@ def get_renewal_rate(data: list, start_date: str, end_date: str) -> float:
     return float(f"{(policies_renewed * 100) / total_policies:.4}")
 
 
-def get_month_data(data: list, start_date: str, end_date: str) -> list:
+def get_month_data(data, start_date, end_date):
     """
     Gets the month wise policy sold and revenue during the given period
 
