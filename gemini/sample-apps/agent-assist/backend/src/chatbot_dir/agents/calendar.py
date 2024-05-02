@@ -66,14 +66,18 @@ EXPLANATION:
 
 def calendar_component(query, chat_history="[]"):
     """
-    This function takes a query and a chat history as input and returns a dictionary with the following keys:
+    This function takes a query and a chat history as input and
+      returns a dictionary with the following keys:
     - task: The task to be performed. This can be either "schedule" or "get_appointments".
     - date: The date of the appointment. This is only present if the task is "schedule".
     - start_time: The start time of the appointment. This is only present if the task is "schedule".
     - end_time: The end time of the appointment. This is only present if the task is "schedule".
-    - participant: The participant in the appointment. This is only present if the task is "schedule".
-    - number_of_upcoming_appointments: The number of upcoming appointments to return. This is only present if the task is "get_appointments".
-    - time_frame: The time frame for which to return upcoming appointments. This is only present if the task is "get_appointments".
+    - participant: The participant in the appointment.
+        This is only present if the task is "schedule".
+    - number_of_upcoming_appointments: The number of upcoming appointments to return.
+      This is only present if the task is "get_appointments".
+    - time_frame: The time frame for which to return upcoming appointments.
+      This is only present if the task is "get_appointments".
     - event: The event object created in the calendar. This is only present if the task is "schedule".
 
     Args:

@@ -40,7 +40,8 @@ def get_keywords(query: str, forLexical: bool = True) -> str:
 
     Args:
         (str) query: The query to get the keywords from.
-        (bool) forLexical: A boolean value indicating whether to get the lexical or semantic keywords.
+        (bool) forLexical: A boolean value indicating whether to get
+            the lexical or semantic keywords.
 
     Returns:
         (str) The keywords from the query.

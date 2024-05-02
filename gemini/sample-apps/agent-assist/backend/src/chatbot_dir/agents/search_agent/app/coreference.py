@@ -44,7 +44,8 @@ def get_rephrased_question(question: str, chat_chain: ConversationChain) -> str:
 
     Args:
         question (str): The question to be rephrased.
-        chat_chain (ConversationChain): The ConversationChain object to use for coreference resolution.
+        chat_chain (ConversationChain):
+          The ConversationChain object to use for coreference resolution.
 
     Returns:
         str: The rephrased question.

@@ -6,7 +6,8 @@ from flask import jsonify, request
 
 def getMarketingAndOutreachData() -> tuple[dict, int]:
     """
-    This function gets the marketing and outreach data from a JSON file and returns it in a JSON format.
+    This function gets the marketing and outreach data from a JSON
+      file and returns it in a JSON format.
 
     Args:
         None
@@ -65,7 +66,8 @@ def getMetricsData(
         endDate (str): The end date of the data to be retrieved.
 
     Returns:
-        tuple: A tuple containing the website traffic, likes, comments, shares, emails sent, open rate, top performing platform, and chart data.
+        tuple: A tuple containing the website traffic, likes, comments,
+        shares, emails sent, open rate, top performing platform, and chart data.
     """
     websiteTraffic = 0
     likes = 0

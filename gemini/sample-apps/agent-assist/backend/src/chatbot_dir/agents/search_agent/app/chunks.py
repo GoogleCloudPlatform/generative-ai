@@ -14,8 +14,10 @@ def get_chunks(
     policies: list[str], keywords_lexical: str, keywords_semantic: str
 ) -> dict[str, list[str]]:
     """
-    This function takes in a list of policy names, a string of lexical keywords, and a string of semantic keywords.
-    It returns a dictionary of policy names to a list of chunks of text that are relevant to the given keywords.
+    This function takes in a list of policy names, a string of
+      lexical keywords, and a string of semantic keywords.
+    It returns a dictionary of policy names to a list
+      of chunks of text that are relevant to the given keywords.
 
     Args:
         policies (list[str]): A list of policy names.
@@ -23,7 +25,8 @@ def get_chunks(
         keywords_semantic (str): A string of semantic keywords.
 
     Returns:
-        dict[str, list[str]]: A dictionary of policy names to a list of chunks of text that are relevant to the given keywords.
+        dict[str, list[str]]: A dictionary of policy names
+          to a list of chunks of text that are relevant to the given keywords.
     """
     chunks_semantic = get_chunks_semantic(policies, keywords_semantic)
     chunks_lexical = get_chunks_lexical(policies, keywords_lexical)
@@ -40,14 +43,16 @@ def get_chunks_semantic(
 ) -> dict[str, list[Document]]:
     """
     This function takes in a list of policy names and a string of semantic keywords.
-    It returns a dictionary of policy names to a list of chunks of text that are relevant to the given keywords.
+    It returns a dictionary of policy names to a list of chunks
+      of text that are relevant to the given keywords.
 
     Args:
         policies (list[str]): A list of policy names.
         keywords (str): A string of semantic keywords.
 
     Returns:
-        dict[str, list[Document]]: A dictionary of policy names to a list of chunks of text that are relevant to the given keywords.
+        dict[str, list[Document]]: A dictionary of policy names to a list of
+          chunks of text that are relevant to the given keywords.
     """
     chunks_for_policy = {}
     for POLICY_NAME in policies:
@@ -68,14 +73,16 @@ def get_chunks_semantic(
 def get_chunks_lexical(policies: list[str], keywords: str) -> dict[str, list[Document]]:
     """
     This function takes in a list of policy names and a string of lexical keywords.
-    It returns a dictionary of policy names to a list of chunks of text that are relevant to the given keywords.
+    It returns a dictionary of policy names to a list of chunks
+    of text that are relevant to the given keywords.
 
     Args:
         policies (list[str]): A list of policy names.
         keywords (str): A string of lexical keywords.
 
     Returns:
-        dict[str, list[Document]]: A dictionary of policy names to a list of chunks of text that are relevant to the given keywords.
+        dict[str, list[Document]]: A dictionary of policy names to
+          a list of chunks of text that are relevant to the given keywords.
     """
     chunks_for_policy = {}
 
@@ -101,8 +108,10 @@ def add_neighbouring_chunks(
     relevant_chunks: list[Document], all_chunks: list[Document], non_table_chunks: int
 ) -> list[Document]:
     """
-    This function takes in a list of relevant chunks, a list of all chunks, and the total number of chunks in the document.
-    It returns a list of chunks that includes the relevant chunks and their neighboring chunks.
+    This function takes in a list of relevant chunks, a list of
+    all chunks, and the total number of chunks in the document.
+    It returns a list of chunks that includes the relevant chunks
+      and their neighboring chunks.
 
     Args:
         relevant_chunks (list[Document]): A list of relevant chunks.
@@ -110,7 +119,8 @@ def add_neighbouring_chunks(
         non_table_chunks (int): The total number of chunks in the document.
 
     Returns:
-        list[Document]: A list of chunks that includes the relevant chunks and their neighboring chunks.
+        list[Document]: A list of chunks that includes the
+        relevant chunks and their neighboring chunks.
     """
     relevantChunkList = []
     relevantTableChunks = []
@@ -139,13 +149,15 @@ def add_neighbouring_chunks(
 
 def get_all_chunks(POLICY_NAME: str) -> tuple[list[Document], int]:
     """
-    This function takes in a policy name and returns a list of all chunks in the policy and the total number of chunks in the policy.
+    This function takes in a policy name and returns a list
+    of all chunks in the policy and the total number of chunks in the policy.
 
     Args:
         POLICY_NAME (str): The name of the policy.
 
     Returns:
-        tuple[list[Document], int]: A tuple containing a list of all chunks in the policy and the total number of chunks in the policy.
+        tuple[list[Document], int]: A tuple containing a list
+          of all chunks in the policy and the total number of chunks in the policy.
     """
     with open(f"data/static/chunks/chunks_{POLICY_NAME}.json") as f:
         chunks_dict = json.load(f)

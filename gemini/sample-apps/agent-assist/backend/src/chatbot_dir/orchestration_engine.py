@@ -100,7 +100,8 @@ def send_email(email_id: str, subject: str, body: str) -> None:
 
 
 def get_email_conversation_summary(email_id: str) -> dict:
-    """Get email conversation summary function to handle queries related to getting email conversation summaries.
+    """Get email conversation summary function to
+      handle queries related to getting email conversation summaries.
 
     Args:
         email_id (str): The email address of the user.

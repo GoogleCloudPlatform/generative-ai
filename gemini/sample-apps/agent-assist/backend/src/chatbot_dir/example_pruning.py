@@ -13,7 +13,8 @@ embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 def main():
     """
-    This function loads the examples from a JSON file and creates two FAISS vectorstores, one for the query and one for the chat history.
+    This function loads the examples from a JSON file
+      and creates two FAISS vectorstores, one for the query and one for the chat history.
     """
 
     try:
@@ -70,7 +71,8 @@ def get_similar_examples(query: str, chat_history: str) -> str:
 
 def get_similar_examples_query(query: str) -> list:
     """
-    This function takes a query as input and returns a list of similar examples from the query vectorstore.
+    This function takes a query as input and
+    returns a list of similar examples from the query vectorstore.
 
     Args:
         query (str): The query string.
@@ -86,7 +88,8 @@ def get_similar_examples_query(query: str) -> list:
 
 def get_similar_examples_history(chat_history: str) -> list:
     """
-    This function takes a chat history as input and returns a list of similar examples from the history vectorstore.
+    This function takes a chat history as input and returns
+      a list of similar examples from the history vectorstore.
 
     Args:
         chat_history (str): The chat history string.

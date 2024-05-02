@@ -83,7 +83,8 @@ EMAIL SUBJECT:
 
 def mail_component(query: str, chat_history: str, context: str = "") -> tuple[str, str]:
     """
-    This function takes a query, chat_history and context as input and generates an email subject and body.
+    This function takes a query, chat_history and context as input and
+    generates an email subject and body.
 
     Args:
         query (str): The user's query.

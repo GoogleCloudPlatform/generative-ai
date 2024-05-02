@@ -46,10 +46,12 @@ def generate_mail() -> tuple[dict, int]:
 
 def extract_and_send_mail() -> tuple[dict, int]:
     """
-    Extracts the subject and body from the generated email and sends the email to the given email address.
+    Extracts the subject and body from the generated email and sends the email
+    to the given email address.
 
     Returns:
-        dict: A dictionary containing a message indicating whether the email was sent successfully.
+        dict: A dictionary containing a message indicating whether
+            the email was sent successfully.
     """
     generated_mail = request.json.get("generatedMail")
     email_id = request.json.get("emailId")

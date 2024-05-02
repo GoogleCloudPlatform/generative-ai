@@ -52,11 +52,13 @@ def getMetricsData(data: list, startDate: str, endDate: str):
 
     Args:
         data (list): A list of dictionaries containing the policy data.
-        startDate (str): The start date of the period for which the data is to be retrieved.
+        startDate (str): The start date of the period
+          for which the data is to be retrieved.
         endDate (str): The end date of the period for which the data is to be retrieved.
 
     Returns:
-        tuple: A tuple containing the total number of active customers and the average satisfaction score.
+        tuple: A tuple containing the total number of
+          active customers and the average satisfaction score.
     """
     totalActiveCustomers = 0
     averageSatisfactionScore = 0.0

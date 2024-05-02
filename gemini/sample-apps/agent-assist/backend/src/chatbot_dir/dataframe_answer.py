@@ -4,7 +4,6 @@ import pandas as pd
 import pandasql as ps
 from utils.text_bison import TextBison
 
-# SQL_PROMPT is a string template that is used to generate the SQL query prompt for the TextBison model.
 # It takes a question as input and generates a SQL query that can be used to answer the question.
 SQL_PROMPT = """
 You are an SQL Expert. Given an input question, use sqlite syntax to generate a sql query by choosing
@@ -22,8 +21,6 @@ Question: {question}
 Query:
 """
 
-# FINAL_ANSWER_PROMPT is a string template that is used to generate the final answer prompt for the TextBison model.
-# It takes a question and a dataframe as input and generates a natural language answer to the question.
 FINAL_ANSWER_PROMPT = """
 
 You are an experienced programmer and also good at English Language. You need to understand the output answer of a question.

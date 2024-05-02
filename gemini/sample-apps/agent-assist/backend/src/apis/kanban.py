@@ -23,7 +23,6 @@ def get_kanban_data() -> tuple[dict, int]:
     # Create a dictionary of users, where the key is the user ID and the value is the user data.
     userData: Dict[str, Any] = {str(user["userid"]): user for user in data}
 
-    # Create a dictionary of the kanban board, where the key is the column name and the value is a list of user IDs.
     finalData: Dict[str, Any] = {
         "initial-contact": [],
         "needs-analysis": [],
@@ -53,7 +52,8 @@ def get_kanban_data() -> tuple[dict, int]:
 def update_kanban_data() -> tuple[dict, int]:
     """
     This function updates the kanban board by moving a user from one column to another.
-    It reads the data from a JSON file, updates the user's column, and writes the updated data to the JSON file.
+    It reads the data from a JSON file, updates the user's column, and
+      writes the updated data to the JSON file.
 
     Args:
         None

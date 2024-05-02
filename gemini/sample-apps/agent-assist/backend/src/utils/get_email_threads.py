@@ -23,7 +23,8 @@ def get_data_from_threads(service, emailid, threads):
         threads: The list of threads.
 
     Returns:
-        tuple[str, datetime]: A tuple containing the email thread content and the last contacted date.
+        tuple[str, datetime]: A tuple containing the
+          email thread content and the last contacted date.
     """
     return_str = ""
     date_value = datetime(1666, 10, 10)
@@ -93,7 +94,8 @@ def get_email_threads_summary(
         user_email_id (str): The email id of the user.
 
     Returns:
-        tuple[str, datetime]: A tuple containing the email thread summary and the last contacted date.
+        tuple[str, datetime]: A tuple containing the email
+          thread summary and the last contacted date.
     """
     threads, service = show_chatty_threads()
     tb = TextBison()

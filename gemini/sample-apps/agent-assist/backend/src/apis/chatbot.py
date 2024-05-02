@@ -6,7 +6,8 @@ from chatbot_dir.orchestration_engine import run_orchestrator
 
 def chatbot_entry(data: dict = {}) -> dict:
     """
-    This function is the main entry point for the chatbot. It takes a dictionary of data as input and returns a dictionary of data as output.
+    This function is the main entry point for the chatbot.
+    It takes a dictionary of data as input and returns a dictionary of data as output.
 
     Args:
         data (dict): A dictionary of data representing the input to the chatbot.
@@ -38,7 +39,8 @@ def chatbot_entry(data: dict = {}) -> dict:
 
 def process_history(chat_history):
     """
-    This function processes the chat history and returns a string that can be used to display the chat history.
+    This function processes the chat history and returns a
+    string that can be used to display the chat history.
 
     Args:
         chat_history (list): A list of dictionaries representing the chat history.
@@ -65,7 +67,8 @@ def process_history(chat_history):
 
 def process_response(response: dict) -> str:
     """
-    This function processes the response from the orchestration engine and returns a string that can be used to display the response.
+    This function processes the response from the orchestration
+    engine and returns a string that can be used to display the response.
 
     Args:
         response (dict): A dictionary representing the response from the orchestration engine.
