@@ -1,5 +1,7 @@
 """This is a python utility file created for help."""
 
+# pylint: disable=all
+
 from datetime import datetime
 
 from flask import jsonify
