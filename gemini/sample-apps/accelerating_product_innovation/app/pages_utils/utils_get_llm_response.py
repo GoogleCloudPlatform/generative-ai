@@ -18,7 +18,6 @@ import os
 
 import aiohttp
 from dotenv import load_dotenv
-import streamlit as st
 import vertexai
 from vertexai import generative_models
 
@@ -44,30 +43,27 @@ def generate_gemini(text_prompt: str) -> str:
     model = generative_models.GenerativeModel("gemini-pro")
     safety_setting = generative_models.HarmBlockThreshold.BLOCK_NONE
     harm_category = generative_models.HarmCategory
-    try:
-        responses = model.generate_content(
-            text_prompt,
-            generation_config={
-                "max_output_tokens": 8192,
-                "temperature": 0.001,
-                "top_p": 1,
-            },
-            safety_settings={
-                harm_category.HARM_CATEGORY_HATE_SPEECH: safety_setting,
-                harm_category.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
-                harm_category.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
-                harm_category.HARM_CATEGORY_HARASSMENT: safety_setting,
-            },
-            stream=True,
-        )
-        final_response = ""
-        for response in responses:
-            final_response += response.text
-        logging.debug(final_response)
-        return final_response
-    except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
-        st.stop()
+
+    responses = model.generate_content(
+        text_prompt,
+        generation_config={
+            "max_output_tokens": 8192,
+            "temperature": 0.001,
+            "top_p": 1,
+        },
+        safety_settings={
+            harm_category.HARM_CATEGORY_HATE_SPEECH: safety_setting,
+            harm_category.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
+            harm_category.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
+            harm_category.HARM_CATEGORY_HARASSMENT: safety_setting,
+        },
+        stream=True,
+    )
+    final_response = ""
+    for response in responses:
+        final_response += response.text
+    logging.debug(final_response)
+    return final_response
 
 
 async def parallel_generate_search_results(query: str) -> str:

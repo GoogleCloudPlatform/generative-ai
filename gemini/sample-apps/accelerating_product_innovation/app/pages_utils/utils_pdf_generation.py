@@ -64,13 +64,13 @@ class PDFRounded(fpdf.FPDF):
         else:
             op = "S"
         my_arc = 4 / 3 * (sqrt(2) - 1)
-        self._out("%.2F %.2F m" % ((x + r) * k, (hp - y) * k))
+        self._out(f"{(x + r) * k} {(hp - y) * k} m")
 
         xc = x + w - r
         yc = y + r
-        self._out("%.2F %.2F l" % (xc * k, (hp - y) * k))
+        self._out(f"{xc * k} {(hp - y) * k} l")
         if "2" not in corners:
-            self._out("%.2F %.2F l" % ((x + w) * k, (hp - y) * k))
+            self._out(f"{(x + w) * k} {(hp - y) * k} l")
         else:
             self._arc(
                 xc + r * my_arc,
@@ -83,9 +83,9 @@ class PDFRounded(fpdf.FPDF):
 
         xc = x + w - r
         yc = y + h - r
-        self._out("%.2F %.2F l" % ((x + w) * k, (hp - yc) * k))
+        self._out(f"{(x + w) * k} {(hp - yc) * k} l")
         if "3" not in corners:
-            self._out("%.2F %.2F l" % ((x + w) * k, (hp - (y + h)) * k))
+            self._out(f"{(x + w) * k} {(hp - (y + h)) * k} l")
         else:
             self._arc(
                 xc + r,
@@ -98,9 +98,9 @@ class PDFRounded(fpdf.FPDF):
 
         xc = x + r
         yc = y + h - r
-        self._out("%.2F %.2F l" % (xc * k, (hp - (y + h)) * k))
+        self._out(f"{xc * k} {(hp - (y + h)) * k} l")
         if "4" not in corners:
-            self._out("%.2F %.2F l" % (x * k, (hp - (y + h)) * k))
+            self._out(f"{x * k} {(hp - (y + h)) * k} l")
         else:
             self._arc(
                 xc - r * my_arc,
@@ -113,10 +113,10 @@ class PDFRounded(fpdf.FPDF):
 
         xc = x + r
         yc = y + r
-        self._out("%.2F %.2F l" % (x * k, (hp - yc) * k))
+        self._out(f"{x * k} {(hp - yc) * k} l")
         if "1" not in corners:
-            self._out("%.2F %.2F l" % (x * k, (hp - y) * k))
-            self._out("%.2F %.2F l" % ((x + r) * k, (hp - y) * k))
+            self._out(f"{x * k} {(hp - y) * k} l")
+            self._out(f"{(x + r) * k} {(hp - y) * k} l")
         else:
             self._arc(
                 xc - r,

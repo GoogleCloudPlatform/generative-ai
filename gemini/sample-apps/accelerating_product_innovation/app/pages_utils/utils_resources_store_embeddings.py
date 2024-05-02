@@ -170,10 +170,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
                 response_text = await response.text()
                 final_response = json.loads(response_text)
                 embedding = final_response["embedding_column"]
-                try:
-                    pdf_data["embedding"] = embedding
-                except Exception as e:
-                    print(e)
+                pdf_data["embedding"] = embedding
             else:
                 print("Request failed:", await response.text())
 
@@ -400,26 +397,20 @@ def convert_file_to_data_packets(filename: str) -> None:
                             file_content=chunk_content,
                         )
                         final_data.append(packet)
-        try:
-            # Stores the embeddings in the GCS bucket.
-            with st.spinner("Storing Embeddings"):
-                pdf_data = pd.DataFrame.from_dict(final_data)
-                pdf_data.reset_index(inplace=True, drop=True)
-                pdf_data["types"] = pdf_data["content"].apply(
-                    lambda x: type(x)
-                )
-                pdf_data["embedding"] = pdf_data["content"].apply(
-                    lambda x: embedding_model_with_backoff([x])
-                )
-                pdf_data["embedding"] = pdf_data.embedding.apply(np.array)
-                pdf_data = pd.concat([dff, pdf_data])
-                pdf_data = pdf_data.drop_duplicates(
-                    subset=["content"], keep="first"
-                )
-                pdf_data.reset_index(inplace=True, drop=True)
-                bucket.blob(
-                    f"{st.session_state.product_category}/embeddings.json"
-                ).upload_from_string(pdf_data.to_json(), "application/json")
-        except Exception:
-            # Handles any exceptions that occur during the embedding process.
-            st.error(f"Unable to load the file {filename}!")
+        # Stores the embeddings in the GCS bucket.
+        with st.spinner("Storing Embeddings"):
+            pdf_data = pd.DataFrame.from_dict(final_data)
+            pdf_data.reset_index(inplace=True, drop=True)
+            pdf_data["types"] = pdf_data["content"].apply(lambda x: type(x))
+            pdf_data["embedding"] = pdf_data["content"].apply(
+                lambda x: embedding_model_with_backoff([x])
+            )
+            pdf_data["embedding"] = pdf_data.embedding.apply(np.array)
+            pdf_data = pd.concat([dff, pdf_data])
+            pdf_data = pdf_data.drop_duplicates(
+                subset=["content"], keep="first"
+            )
+            pdf_data.reset_index(inplace=True, drop=True)
+            bucket.blob(
+                f"{st.session_state.product_category}/embeddings.json"
+            ).upload_from_string(pdf_data.to_json(), "application/json")
