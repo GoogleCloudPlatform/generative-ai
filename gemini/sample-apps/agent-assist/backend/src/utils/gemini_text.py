@@ -89,8 +89,7 @@ class GeminiText:
         """
         inner_parameters = self.parameters
         response = self.chat.send_message(
-            f"SUMMARISE THIS PASSAGE: {passage}",
-            generation_config=inner_parameters
+            f"SUMMARISE THIS PASSAGE: {passage}", generation_config=inner_parameters
         )
         return response
 
