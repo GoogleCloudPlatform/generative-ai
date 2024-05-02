@@ -11,7 +11,7 @@ import smtplib
 from typing import Any
 
 from config import config
-import markdown # type: ignore
+import markdown  # type: ignore
 
 
 class Mail:
