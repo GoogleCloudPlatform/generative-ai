@@ -4,9 +4,9 @@ import os
 import sys
 import urllib.request
 
+from data_prep_genai_prompts import image_attribute_prompt
 import requests
 import vertexai.preview.generative_models as generative_models
-from data_prep_genai_prompts import image_attribute_prompt
 
 sys.path.append("../")
 from config import config

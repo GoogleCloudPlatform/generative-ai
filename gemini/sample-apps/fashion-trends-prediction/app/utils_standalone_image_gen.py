@@ -31,10 +31,9 @@ from vertexai.preview.vision_models import ImageGenerationModel
 # output_file = "my-output.png"
 # prompt = "" # The text prompt describing what you want to see.
 
-vertexai.init(project='aurora-cohort-2', location="us-central1")
+vertexai.init(project="aurora-cohort-2", location="us-central1")
 
 model = ImageGenerationModel.from_pretrained("imagegeneration@002")
-
 
 
 # Set project parameters
@@ -150,7 +149,7 @@ def image_generation(
         # safety_filter_level="block_some",
         # person_generation="allow_adult",
     )
-    print(imgs[0]['image_bytes'])
+    print(imgs[0]["image_bytes"])
     st.session_state[state_key] = imgs
 
     # st.session_state[state_key] = predict_image(

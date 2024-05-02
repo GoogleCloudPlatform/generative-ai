@@ -1,5 +1,6 @@
 def image_attribute_prompt(fewshot_images, user_image):
-    return ["""
+    return [
+        """
                 You are a fashion editor and your task is to spot fashion trends and extract outfit and fashion items from the image provided .
                 List all outfit items in list of json format, with separate json for each person in the input image.
                 Be as detailed as possible listing shapes, texture, material, length, design pattern, design description and brands.
@@ -42,5 +43,5 @@ def image_attribute_prompt(fewshot_images, user_image):
 
     Input image:""",
         user_image,
-        """Output:"""]
-
+        """Output:""",
+    ]
