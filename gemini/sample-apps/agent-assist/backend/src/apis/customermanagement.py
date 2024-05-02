@@ -100,7 +100,10 @@ def get_lapsed_customers(data: list, start_date: str, end_date: str):
         policy_end_date = policy["policy_end_date"]
         if policy_end_date is None:
             continue
-        if policy["current_policy"] is None and start_date <= policy_end_date <= end_date:
+        if (
+            policy["current_policy"] is None
+            and start_date <= policy_end_date <= end_date
+        ):
             total_lapsed_customers += 1
 
     return total_lapsed_customers

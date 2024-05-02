@@ -21,7 +21,7 @@ def get_users(is_contact: bool = True) -> list:
     if is_contact:
         contacted_users = list(filter(lambda x: x["LastContacted"] is not None, users))
         return contacted_users
-    
+
     potential_users = list(filter(lambda x: x["LastContacted"] is None, users))
     return potential_users
 
