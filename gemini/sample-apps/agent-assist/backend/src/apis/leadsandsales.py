@@ -25,7 +25,7 @@ def format_inr(number) -> str:
         return "₹" + f"{number / 100000:.4}" + "L"
     if number > 1000:
         return "₹" + f"{number / 1000:.4}" + "K"
-    
+
     return "₹" + str(number)
 
 
@@ -95,7 +95,7 @@ def get_conversion_rate(data: list, start_date: str, end_date: str) -> tuple:
             revenue += policy["policy_amount"] if policy["converted"] else 0
 
     return (
-        float(f"{(count * 100) / total_count:.4}",
+        float(f"{(count * 100) / total_count:.4}"),
         total_count,
         format_inr(revenue),
     )
@@ -129,9 +129,7 @@ def get_different_platform_data(data: list, start_date: str, end_date: str) -> t
     chart_data = []
     top_performing_platform = max(final_data, key=lambda x: final_data[x]["revenue"])
     for key, value in final_data.items():
-        chart_data.append(
-            {"x": key, "y1": value["count"], "y2": value["revenue"]}
-        )
+        chart_data.append({"x": key, "y1": value["count"], "y2": value["revenue"]})
 
     return chart_data, top_performing_platform
 

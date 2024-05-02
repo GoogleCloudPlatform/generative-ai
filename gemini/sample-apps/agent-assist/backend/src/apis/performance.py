@@ -25,7 +25,7 @@ def format_inr(number):
         return "₹" + f"{number / 100000:.4}" + "L"
     if number > 1000:
         return "₹" + f"{number / 1000:.4}" + "K"
-    
+
     return "₹" + str(number)
 
 

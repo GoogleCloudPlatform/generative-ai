@@ -50,14 +50,14 @@ def make_chunks(document_path: str, policy_name: str) -> None:
                 table_chunk.metadata["isTable"] = True
                 chunks.append(table_chunk)
 
-    l = []
+    chunk_list = []
     for chunk in chunks:
-        l.append(chunk.dict())
+        chunk_list.append(chunk.dict())
 
     chunks_dict: dict[str, Any] = {}
     chunks_dict["chunks"] = []
     chunks_dict["TOTAL_DOC_CHUNKS"] = TOTAL_DOC_CHUNKS
-    chunks_dict["chunks"] = l
+    chunks_dict["chunks"] = chunk_list
 
     with open(chunks_path, "w") as f:
         json.dump(chunks_dict, f)
