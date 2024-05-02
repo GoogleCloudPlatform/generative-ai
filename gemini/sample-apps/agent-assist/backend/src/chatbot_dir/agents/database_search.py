@@ -49,7 +49,7 @@ def generate_answer(question: str) -> str:
         str: The answer to the question.
     """
     tb = TextBison()
-    with open("data/policy.json", encoding='UTF-8') as f:
+    with open("data/policy.json", encoding="UTF-8") as f:
         policy_json = json.load(f)
 
     today = date.today()

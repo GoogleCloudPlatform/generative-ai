@@ -38,7 +38,7 @@ class Calendar:
                     "keys/credentials_desktop.json", self.scopes
                 )
                 self.creds = flow.run_local_server(port=0)
-            with open("cal_token.json", "w", encoding='UTF-8') as token:
+            with open("cal_token.json", "w", encoding="UTF-8") as token:
                 token.write(self.creds.to_json())
         try:
             self.service = build("calendar", "v3", credentials=self.creds)

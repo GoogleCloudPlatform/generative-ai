@@ -26,7 +26,7 @@ def main():
     except Exception as e:
         print(e)
 
-    with open(EXAMPLES_PATH, encoding='UTF-8') as f:
+    with open(EXAMPLES_PATH, encoding="UTF-8") as f:
         examples_list = json.load(f)
 
     examples = []

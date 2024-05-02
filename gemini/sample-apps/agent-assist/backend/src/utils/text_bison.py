@@ -17,6 +17,7 @@ parameters = {
 
 class TextBison:
     """This class provides a simple interface to the Text-Bison generative language model."""
+
     def __init__(
         self,
         project_id=config["PROJECT_ID"],  # GCP Project ID

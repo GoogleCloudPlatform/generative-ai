@@ -19,7 +19,7 @@ def get_customer_management_data():
         json: A JSON object containing the customer management data.
     """
     file_path = "data/policy.json"
-    with open(file_path, encoding='UTF-8') as json_file:
+    with open(file_path, encoding="UTF-8") as json_file:
         data = json.load(json_file)
 
     start_date = request.args.get("start_date")

@@ -114,7 +114,7 @@ class Mail:
         )
         f = os.path.join(__location__, "invite.ics")
 
-        with open(f, encoding='UTF-8') as file:
+        with open(f, encoding="UTF-8") as file:
             ics_content = file.read()
 
         replaced_contents = ics_content.replace(

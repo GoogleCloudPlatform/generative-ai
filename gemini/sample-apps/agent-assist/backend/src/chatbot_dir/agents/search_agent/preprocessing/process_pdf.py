@@ -2,8 +2,8 @@
 
 # pylint: disable=#E0401
 
-from preprocessing.make_embeddings import make_embeddings
 from preprocessing.make_chunks import make_chunks
+from preprocessing.make_embeddings import make_embeddings
 
 
 def process_pdf(document_path: str, policy_name: str):

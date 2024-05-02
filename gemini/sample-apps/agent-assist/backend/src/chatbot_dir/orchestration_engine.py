@@ -321,7 +321,7 @@ def run_orchestrator(query, chat_history):
     tb = TextBison()
     today = date.today()
     formatted_date = today.strftime("%d/%m/%Y")
-    with open("data/user_list.txt", encoding= "utf-8") as f:
+    with open("data/user_list.txt", encoding="utf-8") as f:
         user_list = f.read()
 
     examples = get_similar_examples(query, chat_history)

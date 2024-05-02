@@ -24,7 +24,7 @@ def chatbot_entry(data: dict) -> dict:
     query = data.get("query")
 
     chat_history_string = process_history(chat_history)
-    with open("data/static/oe_examples/logs.json", encoding='UTF-8') as f:
+    with open("data/static/oe_examples/logs.json", encoding="UTF-8") as f:
         logs = json.load(f)
 
     logs.append(
@@ -34,7 +34,7 @@ def chatbot_entry(data: dict) -> dict:
             "chat_history": chat_history_string,
         }
     )
-    with open("data/static/oe_examples/logs.json", "w", encoding='UTF-8') as f:
+    with open("data/static/oe_examples/logs.json", "w", encoding="UTF-8") as f:
         json.dump(logs, f)
 
     run_orchestrator(query, chat_history_string)

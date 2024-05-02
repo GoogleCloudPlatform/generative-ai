@@ -34,7 +34,6 @@ QUERY: {}
 OUTPUT: """
 
 
-
 class Driver:
     """
     The Driver class is responsible for running the search agent.

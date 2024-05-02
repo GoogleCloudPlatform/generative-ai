@@ -37,7 +37,7 @@ def get_performance_data():
         json: The performance data in JSON format.
     """
     file_path = "data/policy.json"
-    with open(file_path, encoding='UTF-8') as json_file:
+    with open(file_path, encoding="UTF-8") as json_file:
         data = json.load(json_file)
 
     start_date = request.args.get("start_date")
