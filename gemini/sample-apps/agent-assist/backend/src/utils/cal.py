@@ -44,15 +44,15 @@ class Calendar:
             print("An error occurred: %s" % error)
 
     def create_event(
-        self, email: list[str], startDateTime: str, endDateTime: str
+        self, email: list[str], start_date_time: str, end_date_time: str
     ) -> dict:
         """
         Creates an event on the user's calendar.
 
         Args:
             email (list[str]): A list of email addresses of the attendees.
-            startDateTime (str): The start date and time of the event in ISO 8601 format.
-            endDateTime (str): The end date and time of the event in ISO 8601 format.
+            start_date_time (str): The start date and time of the event in ISO 8601 format.
+            end_date_time (str): The end date and time of the event in ISO 8601 format.
 
         Returns:
             dict: The event created.
@@ -66,11 +66,11 @@ class Calendar:
             "location": "GMeet",
             "description": "Meeting with " + (email[0]),
             "start": {
-                "dateTime": startDateTime,
+                "dateTime": start_date_time,
                 "timeZone": "Asia/Kolkata",
             },
             "end": {
-                "dateTime": endDateTime,
+                "dateTime": end_date_time,
                 "timeZone": "Asia/Kolkata",
             },
             "attendees": participants,

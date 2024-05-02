@@ -34,7 +34,7 @@ class Mail:
         self.sender = sender
         self.password = password
 
-    def send_email(self, to_mail, subject, body, filepath: Any = None) -> None:
+    def send_email(self, to_mail, subject, body, file_path: Any = None) -> None:
         """
         Sends an email.
 
@@ -42,7 +42,7 @@ class Mail:
             to_mail (str): The email address of the recipient.
             subject (str): The subject of the email.
             body (str): The body of the email.
-            filepath (str): The path to a file to attach to the email
+            file_path (str): The path to a file to attach to the email
         """
         try:
             body = markdown.markdown(body)
@@ -53,12 +53,12 @@ class Mail:
             msg["Subject"] = subject
             msg.attach(MIMEText(body, "html"))
 
-            if filepath is not None:
-                with open(filepath, "rb") as fil:
-                    part = MIMEApplication(fil.read(), Name=basename(filepath))
+            if file_path is not None:
+                with open(file_path, "rb") as fil:
+                    part = MIMEApplication(fil.read(), Name=basename(file_path))
                 # After the file is closed
                 part["Content-Disposition"] = 'attachment; filename="%s"' % basename(
-                    filepath
+                    file_path
                 )
                 msg.attach(part)
 
@@ -78,8 +78,8 @@ class Mail:
 
             INPUT: param (dict):
                 -receiver (list):  mail ids of receiver
-                -startDate (dateTime): start date of the event
-                -endDate (dateTime): end date of the event
+                -start_date (dateTime): start date of the event
+                -end_date (dateTime): end date of the event
                 -location (str): meet link
                 -subject (str): subject of the event
 
@@ -114,11 +114,11 @@ class Mail:
         ics_content = open(f).read()
 
         replaced_contents = ics_content.replace(
-            "startDate", param["startDate"].strftime("%Y%m%dT%H%M%SZ")
+            "start_date", param["start_date"].strftime("%Y%m%dT%H%M%SZ")
         )
         try:
             replaced_contents = replaced_contents.replace(
-                "endDate", param["endDate"].strftime("%Y%m%dT%H%M%SZ")
+                "end_date", param["end_date"].strftime("%Y%m%dT%H%M%SZ")
             )
             replaced_contents = replaced_contents.replace(
                 "telephonic", param["location"]

@@ -17,16 +17,16 @@ def getMarketingAndOutreachData() -> tuple[dict, int]:
     Returns:
         JSON: A JSON object containing the marketing and outreach data.
     """
-    filePath = "data/likes.json"
-    with open(filePath) as json_file:
+    file_path = "data/likes.json"
+    with open(file_path) as json_file:
         data = json.load(json_file)
 
-    startDate = request.args.get("startDate")
-    endDate = request.args.get("endDate")
-    if startDate is None or endDate is None:
-        startDate = datetime.now() - timedelta(days=90)
-        startDate = startDate.strftime("%Y-%m-%d")
-        endDate = datetime.now().strftime("%Y-%m-%d")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    if start_date is None or end_date is None:
+        start_date = datetime.now() - timedelta(days=90)
+        start_date = start_date.strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
 
     (
         websiteTraffic,
@@ -37,7 +37,7 @@ def getMarketingAndOutreachData() -> tuple[dict, int]:
         openrate,
         topPerformaingPlatform,
         chartData,
-    ) = getMetricsData(data, startDate, endDate)
+    ) = getMetricsData(data, start_date, end_date)
 
     return (
         jsonify(
@@ -57,15 +57,15 @@ def getMarketingAndOutreachData() -> tuple[dict, int]:
 
 
 def getMetricsData(
-    data: list, startDate: str, endDate: str
+    data: list, start_date: str, end_date: str
 ) -> tuple[int, int, int, int, int, float, str, list]:
     """
     This function gets the metrics data from a list of dictionaries and returns it in a tuple.
 
     Args:
         data (list): A list of dictionaries containing the marketing and outreach data.
-        startDate (str): The start date of the data to be retrieved.
-        endDate (str): The end date of the data to be retrieved.
+        start_date (str): The start date of the data to be retrieved.
+        end_date (str): The end date of the data to be retrieved.
 
     Returns:
         tuple: A tuple containing the website traffic, likes, comments,
@@ -92,8 +92,8 @@ def getMetricsData(
         sumSales[platform] = 0
     for item in data:
         if (
-            item["campaign_start_date"] >= startDate
-            and item["campaign_start_date"] <= endDate
+            item["campaign_start_date"] >= start_date
+            and item["campaign_start_date"] <= end_date
         ):
             websiteTraffic += item["websiteVisitors"]
             likes += item["instaLikes"] + item["facebookLikes"]

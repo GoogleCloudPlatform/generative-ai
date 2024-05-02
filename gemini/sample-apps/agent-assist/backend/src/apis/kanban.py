@@ -18,37 +18,37 @@ def get_kanban_data() -> tuple[dict, int]:
         JSON response with the current state of the kanban board.
     """
 
-    filePath = "data/real_users_db.json"
-    with open(filePath) as json_file:
+    file_path = "data/real_users_db.json"
+    with open(file_path) as json_file:
         data = json.load(json_file)
 
     # Create a dictionary of users, where the key is the user ID and the value is the user data.
-    userData: Dict[str, Any] = {str(user["userid"]): user for user in data}
+    user_data: Dict[str, Any] = {str(user["userid"]): user for user in data}
 
-    finalData: Dict[str, Any] = {
+    final_data: Dict[str, Any] = {
         "initial-contact": [],
         "needs-analysis": [],
         "proposal-sent": [],
         "followup": [],
         "closed": [],
-        "users": userData,
+        "users": user_data,
     }
 
     # Iterate over the users and add them to the appropriate column in the kanban board.
     for user in data:
         if not user["LastContacted"]:
-            finalData["initial-contact"].append(str(user["userid"]))
+            final_data["initial-contact"].append(str(user["userid"]))
         elif user["NeedsAnalysis"]:
-            finalData["needs-analysis"].append(str(user["userid"]))
+            final_data["needs-analysis"].append(str(user["userid"]))
         elif user["ProposalSent"]:
-            finalData["proposal-sent"].append(str(user["userid"]))
+            final_data["proposal-sent"].append(str(user["userid"]))
         elif user["converted"]:
-            finalData["closed"].append(str(user["userid"]))
+            final_data["closed"].append(str(user["userid"]))
         else:
-            finalData["followup"].append(str(user["userid"]))
+            final_data["followup"].append(str(user["userid"]))
 
     # Return the kanban board data as a JSON response.
-    return jsonify(finalData), 200
+    return jsonify(final_data), 200
 
 
 def update_kanban_data() -> tuple[dict, int]:
@@ -64,51 +64,51 @@ def update_kanban_data() -> tuple[dict, int]:
 
     """
 
-    fromCol = request.json["fromCol"]
-    toCol = request.json["toCol"]
+    from_col = request.json["from_col"]
+    to_col = request.json["to_col"]
     userid = request.json["id"]
-    print(fromCol, toCol, userid)
+    print(from_col, to_col, userid)
 
     # Read the kanban board data from the JSON file.
-    filePath = "data/real_users_db.json"
-    with open(filePath) as json_file:
+    file_path = "data/real_users_db.json"
+    with open(file_path) as json_file:
         data = json.load(json_file)
 
     # Find the user in the data and update their column.
     for user in data:
         if str(user["userid"]) == userid:
-            if fromCol == "initial-contact":
+            if from_col == "initial-contact":
                 user["LastContacted"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            if toCol == "initial-contact":
+            if to_col == "initial-contact":
                 user["LastContacted"] = None
                 user["NeedsAnalysis"] = False
                 user["ProposalSent"] = False
                 user["converted"] = False
 
-            if toCol == "needs-analysis":
+            if to_col == "needs-analysis":
                 user["NeedsAnalysis"] = True
                 user["ProposalSent"] = False
                 user["converted"] = False
 
-            elif toCol == "proposal-sent":
+            elif to_col == "proposal-sent":
                 user["NeedsAnalysis"] = False
                 user["ProposalSent"] = True
                 user["converted"] = False
 
-            elif toCol == "followup":
+            elif to_col == "followup":
                 user["NeedsAnalysis"] = False
                 user["ProposalSent"] = False
                 user["converted"] = False
 
-            elif toCol == "closed":
+            elif to_col == "closed":
                 user["NeedsAnalysis"] = False
                 user["ProposalSent"] = False
                 user["converted"] = True
             break
 
     # Write the updated data to the JSON file.
-    with open(filePath, "w") as json_file:
+    with open(file_path, "w") as json_file:
         json.dump(data, json_file)
 
     # Return a success message as a JSON response.

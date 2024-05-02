@@ -37,24 +37,24 @@ Query: {}
 Output: """
 
 
-def get_keywords(query: str, forLexical: bool = True) -> str:
+def get_keywords(query: str, for_lexical: bool = True) -> str:
     """Gets the keywords from a query.
 
     Args:
         (str) query: The query to get the keywords from.
-        (bool) forLexical: A boolean value indicating whether to get
+        (bool) for_lexical: A boolean value indicating whether to get
             the lexical or semantic keywords.
 
     Returns:
         (str) The keywords from the query.
     """
-    if forLexical:
-        PROMPT = PROMPT_LEXICAL
+    if for_lexical:
+        prompt = PROMPT_LEXICAL
     else:
-        PROMPT = PROMPT_SEMANTIC
+        prompt = PROMPT_SEMANTIC
 
     tb = TextBison()
-    response = tb.generate_response(PROMPT.format(query))
+    response = tb.generate_response(prompt.format(query))
 
-    print("lexical", forLexical, "keywords", response)
+    print("lexical", for_lexical, "keywords", response)
     return response

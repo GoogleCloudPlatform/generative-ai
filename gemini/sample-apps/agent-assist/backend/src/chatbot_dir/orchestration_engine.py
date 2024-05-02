@@ -150,14 +150,14 @@ def schedule_calendar_event(date, start_time, end_time, participants) -> None:
         end_time = parse(end_time).time()
         meet_date = parse(date, dayfirst=True).date()
 
-        startDateTime = datetime(
+        start_date_time = datetime(
             meet_date.year,
             meet_date.month,
             meet_date.day,
             start_time.hour,
             start_time.minute,
         ).isoformat()
-        endDateTime = datetime(
+        end_date_time = datetime(
             meet_date.year,
             meet_date.month,
             meet_date.day,
@@ -165,10 +165,10 @@ def schedule_calendar_event(date, start_time, end_time, participants) -> None:
             end_time.minute,
         ).isoformat()
 
-        print("start", startDateTime)
-        print("end", endDateTime)
+        print("start", start_date_time)
+        print("end", end_date_time)
         calendar = Calendar()
-        event = calendar.create_event(participants, startDateTime, endDateTime)
+        event = calendar.create_event(participants, start_date_time, end_date_time)
 
         response = {"status": "valid", "intent": "calendar", "data": {"event": event}}
 
@@ -217,7 +217,7 @@ def database_search_orchestrator(query: str) -> str:
     return response
 
 
-PROMPT = """
+prompt = """
 You are an AI-powered intelligent chatbot driver.
 Your task is to act on a user input which might be a compound query or a simple query.
 You have to think step-by-step on it and decide what to do.
@@ -325,7 +325,7 @@ def run_orchestrator(query, chat_history):
     examples = get_similar_examples(query, chat_history)
 
     actions = tb.generate_response(
-        PROMPT.format(
+        prompt.format(
             query=query,
             chat_history=chat_history,
             date_today=formatted_date,

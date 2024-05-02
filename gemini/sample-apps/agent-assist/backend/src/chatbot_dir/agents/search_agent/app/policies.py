@@ -4,11 +4,11 @@ from utils.text_bison import TextBison
 
 from ..config import POLICIES
 
-POLICIES_str = ""
+policies_str = ""
 for POLICY_NAME, i in enumerate(POLICIES):
-    POLICIES_str += f"{i} - {POLICY_NAME}\n"
+    policies_str += f"{i} - {POLICY_NAME}\n"
 
-PROMPT = """
+prompt = """
 The insurance policies which we have are:
 
 {}
@@ -52,7 +52,7 @@ def get_policies(query: str):
     """
     tb = TextBison()
 
-    response = tb.generate_response(PROMPT.format(POLICIES_str, query))
+    response = tb.generate_response(prompt.format(policies_str, query))
 
     if "[" in response:
         response = response.strip("[] ")

@@ -16,22 +16,22 @@ def getCustomerManagementData():
     Returns:
         json: A JSON object containing the customer management data.
     """
-    filePath = "data/policy.json"
-    with open(filePath) as json_file:
+    file_path = "data/policy.json"
+    with open(file_path) as json_file:
         data = json.load(json_file)
 
-    startDate = request.args.get("startDate")
-    endDate = request.args.get("endDate")
-    if startDate is None or endDate is None:
-        startDate = datetime.now() - timedelta(days=90)
-        startDate = startDate.strftime("%Y-%m-%d")
-        endDate = datetime.now().strftime("%Y-%m-%d")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    if start_date is None or end_date is None:
+        start_date = datetime.now() - timedelta(days=90)
+        start_date = start_date.strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
 
     totalActiveCustomers, averageSatisfactionScore = getMetricsData(
-        data, startDate, endDate
+        data, start_date, end_date
     )
-    totalLapsedCustomers = getLapsedCustomers(data, startDate, endDate)
-    chartData = getChartData(data, startDate, endDate)
+    totalLapsedCustomers = getLapsedCustomers(data, start_date, end_date)
+    chartData = getChartData(data, start_date, end_date)
 
     return (
         jsonify(
@@ -48,15 +48,15 @@ def getCustomerManagementData():
     )
 
 
-def getMetricsData(data: list, startDate: str, endDate: str):
+def getMetricsData(data: list, start_date: str, end_date: str):
     """
     This function is used to get the metrics data.
 
     Args:
         data (list): A list of dictionaries containing the policy data.
-        startDate (str): The start date of the period
+        start_date (str): The start date of the period
           for which the data is to be retrieved.
-        endDate (str): The end date of the period for which the data is to be retrieved.
+        end_date (str): The end date of the period for which the data is to be retrieved.
 
     Returns:
         tuple: A tuple containing the total number of
@@ -76,8 +76,8 @@ def getMetricsData(data: list, startDate: str, endDate: str):
             continue
         if (
             policy["current_policy"]
-            and policy_start_date >= startDate
-            and policy_start_date <= endDate
+            and policy_start_date >= start_date
+            and policy_start_date <= end_date
         ):
             totalActiveCustomers += 1
 
@@ -87,14 +87,14 @@ def getMetricsData(data: list, startDate: str, endDate: str):
     return totalActiveCustomers, averageSatisfactionScore
 
 
-def getLapsedCustomers(data: list, startDate: str, endDate: str):
+def getLapsedCustomers(data: list, start_date: str, end_date: str):
     """
     This function is used to get the number of lapsed customers.
 
     Args:
         data (list): A list of dictionaries containing the policy data.
-        startDate (str): The start date of the period for which the data is to be retrieved.
-        endDate (str): The end date of the period for which the data is to be retrieved.
+        start_date (str): The start date of the period for which the data is to be retrieved.
+        end_date (str): The end date of the period for which the data is to be retrieved.
 
     Returns:
         int: The total number of lapsed customers.
@@ -106,28 +106,28 @@ def getLapsedCustomers(data: list, startDate: str, endDate: str):
             continue
         if (
             policy["current_policy"] is None
-            and policy_end_date >= startDate
-            and policy_end_date <= endDate
+            and policy_end_date >= start_date
+            and policy_end_date <= end_date
         ):
             totalLapsedCustomers += 1
 
     return totalLapsedCustomers
 
 
-def getChartData(data: list, startDate: str, endDate: str):
+def getChartData(data: list, start_date: str, end_date: str):
     """
     This function is used to get the chart data.
 
     Args:
         data (list): A list of dictionaries containing the policy data.
-        startDate (str): The start date of the period for which the data is to be retrieved.
-        endDate (str): The end date of the period for which the data is to be retrieved.
+        start_date (str): The start date of the period for which the data is to be retrieved.
+        end_date (str): The end date of the period for which the data is to be retrieved.
 
     Returns:
         list: A list of dictionaries containing the chart data.
     """
-    start_date = datetime.strptime(startDate, "%Y-%m-%d")
-    end_date = datetime.strptime(endDate, "%Y-%m-%d")
+    start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date, "%Y-%m-%d")
     month_list = [
         datetime.strptime("%2.2d-%2.2d" % (year, month), "%Y-%m").strftime("%b-%y")
         for year in range(start_date.year, end_date.year + 1)
@@ -156,8 +156,8 @@ def getChartData(data: list, startDate: str, endDate: str):
                 }
         if (
             policy["current_policy"]
-            and policy_start_date >= startDate
-            and policy_start_date <= endDate
+            and policy_start_date >= start_date
+            and policy_start_date <= end_date
         ):
             if month in monthData:
                 monthData[month]["active_customers"] += 1

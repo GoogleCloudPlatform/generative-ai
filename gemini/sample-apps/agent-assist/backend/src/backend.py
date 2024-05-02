@@ -5,7 +5,7 @@ import pathlib
 import secrets
 import time
 
-from apis import calendar, chatbot, email, generateMail, kanban
+from apis import calendar, chatbot, email, generate_mail, kanban
 import apis.customermanagement as customermanagement
 import apis.leadsandsales as leadsandsales
 import apis.marketingandoutreach as marketingandoutreach
@@ -80,20 +80,20 @@ def create_calendar_event():
     print(meet_date)
     meet_date = dateutil.parser.parse(meet_date).date()
     calendar = Calendar()
-    startDateTime = datetime(
+    start_date_time = datetime(
         meet_date.year,
         meet_date.month,
         meet_date.day,
         start_time.hour,
         start_time.minute,
     ).isoformat()
-    endDateTime = datetime(
+    end_date_time = datetime(
         meet_date.year, meet_date.month, meet_date.day, end_time.hour, end_time.minute
     ).isoformat()
 
-    print(startDateTime, endDateTime)
+    print(start_date_time, end_date_time)
     event = calendar.create_event(
-        email=mail_id, startDateTime=startDateTime, endDateTime=endDateTime
+        email=mail_id, start_date_time=start_date_time, end_date_time=end_date_time
     )
     print(mail_id, start_time, end_time, meet_date)
     return jsonify({"event": event}), 200
@@ -105,7 +105,7 @@ app.add_url_rule(
 app.add_url_rule(
     "/workbench/leadsandsales",
     methods=["GET"],
-    view_func=leadsandsales.getLeadsAndSalesData,
+    view_func=leadsandsales.get_leads_and_sales_data,
 )
 app.add_url_rule(
     "/workbench/customermanagement",
@@ -127,12 +127,12 @@ app.add_url_rule("/mail", methods=["POST"], view_func=email.mail)
 app.add_url_rule(
     "/agent-assist/generate_mail",
     methods=["POST"],
-    view_func=generateMail.generate_mail,
+    view_func=generate_mail.generate_mail,
 )
 app.add_url_rule(
     "/agent-assist/send_mail",
     methods=["POST"],
-    view_func=generateMail.extract_and_send_mail,
+    view_func=generate_mail.extract_and_send_mail,
 )
 app.add_url_rule(
     "/agent-assist/kanban", methods=["get"], view_func=kanban.get_kanban_data

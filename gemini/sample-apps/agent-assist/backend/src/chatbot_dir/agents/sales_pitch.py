@@ -2,7 +2,7 @@
 
 from utils.gemini_text import GeminiText
 
-PROMPT = """
+prompt = """
 Modify the sales pitch given below emphasizing the content related to the query.
 
 Original Sales Pitch:
@@ -30,7 +30,7 @@ def sales_pitch_component(query: str, policy_name: str) -> str:
         original = f.read()
 
     gt = GeminiText()
-    response = gt.generate_response(PROMPT.format(query=query, original=original))
+    response = gt.generate_response(prompt.format(query=query, original=original))
 
     print("sales pitch:", response)
     return response
