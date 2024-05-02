@@ -361,7 +361,8 @@ def run_orchestrator(query, chat_history):
     print(actions_str)
 
     d = {"chat_history": chat_history}
-    exec(actions_str, globals(), d)
+    exec(actions_str, globals(), d) # pylint: disable=W0122
+
 
 
 if __name__ == "__main__":

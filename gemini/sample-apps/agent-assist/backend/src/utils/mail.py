@@ -209,6 +209,7 @@ class Mail:
 
                     try:
                         indexstart = data.find("ltr")
+                        # pylint: disable=C2801
                         data2 = data.__getitem__(slice(indexstart + 5, len(data)))
                         indexend = data2.find("</div>")
                         print(data2[0:indexend])
