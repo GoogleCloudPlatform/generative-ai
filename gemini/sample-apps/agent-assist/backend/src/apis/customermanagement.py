@@ -116,7 +116,7 @@ def get_lapsed_customers(data: list, start_date: str, end_date: str):
     return total_lapsed_customers
 
 
-def get_chart_data(data: list, start_date: str, end_date: str):
+def get_chart_data(data, start_date, end_date):
     """
     This function is used to get the chart data.
 
