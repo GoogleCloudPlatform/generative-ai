@@ -156,23 +156,17 @@ def get_filter_context_from_vectordb(
     )
 
     top_matched_df = st.session_state["processed_data_list"][
-        st.session_state["processed_data_list"].index.isin(
-            top_matched_score.index
-        )
+        st.session_state["processed_data_list"].index.isin(top_matched_score.index)
     ]
     top_matched_df = top_matched_df[
         ["file_name", "page_number", "chunk_number", "content"]
     ]
     top_matched_df["confidence_score"] = top_matched_score
-    top_matched_df.sort_values(
-        by=["confidence_score"], ascending=False, inplace=True
-    )
+    top_matched_df.sort_values(by=["confidence_score"], ascending=False, inplace=True)
 
     context = "\n".join(
         st.session_state["processed_data_list"][
-            st.session_state["processed_data_list"].index.isin(
-                top_matched_score.index
-            )
+            st.session_state["processed_data_list"].index.isin(top_matched_score.index)
         ]["content"].values
     )
     return (context, top_matched_df)
