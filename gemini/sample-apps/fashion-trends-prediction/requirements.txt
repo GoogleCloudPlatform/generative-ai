@@ -2,7 +2,7 @@ beautifulsoup4==4.12.2
 bertopic==0.16.0
 google-cloud-aiplatform==1.48.0
 hdbscan==0.8.33
-langchain==0.0.348
+langchain==0.1.0
 numpy==1.26.2
 pandas==2.1.4
 Pillow==10.1.0

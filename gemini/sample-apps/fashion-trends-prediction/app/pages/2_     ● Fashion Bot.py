@@ -211,12 +211,9 @@ with st.container(border=True):
         st.session_state[hist_key].append(["user", st.session_state["prompt"]])
 
         words_list = ["generate", "create", "produce", "show", "image"]
-        condition = bool(
-            any(word in st.session_state["prompt"].lower() for word in words_list)
-        )
 
         with st.spinner("Generating response..."):
-            if condition:
+            if any(word in st.session_state["prompt"].lower() for word in words_list):
                 gen_prompt = img_gen_prompt(st.session_state["prompt"]) + " " + category
                 print(gen_prompt)
                 try:

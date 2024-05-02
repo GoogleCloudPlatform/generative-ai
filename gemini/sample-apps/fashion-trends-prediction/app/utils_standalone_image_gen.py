@@ -23,6 +23,20 @@ import utils_edit_image
 PROJECT_ID = config["PROJECT_ID"]
 LOCATION = config["LOCATION"]
 
+import vertexai
+from vertexai.preview.vision_models import ImageGenerationModel
+
+# TODO(developer): Update and un-comment below lines
+# project_id = "PROJECT_ID"
+# output_file = "my-output.png"
+# prompt = "" # The text prompt describing what you want to see.
+
+vertexai.init(project='aurora-cohort-2', location="us-central1")
+
+model = ImageGenerationModel.from_pretrained("imagegeneration@002")
+
+
+
 # Set project parameters
 IMAGE_MODEL_NAME = "imagegeneration@005"
 IMAGE_MODEL_NAME_ = "imagegeneration@002"
@@ -94,11 +108,9 @@ def predict_image(
     instance = json_format.ParseDict(instance_dict, Value())
     instances = [instance]
     parameters_client = json_format.ParseDict(parameters, Value())
-
     response = imagen_client.predict(
         endpoint=endpoint_name, instances=instances, parameters=parameters_client
     )
-
     return response.predictions
 
 
@@ -126,15 +138,29 @@ def image_generation(
     Returns:
         None.
     """
-
-    st.session_state[state_key] = predict_image(
-        instance_dict={"prompt": prompt},
-        parameters={
-            "sampleCount": sample_count,
-            "sampleImageSize": sample_image_size,
-            "aspectRatio": aspect_ratio,
-        },
+    imgs = model.generate_images(
+        prompt=prompt,
+        # Optional parameters
+        number_of_images=sample_count,
+        language="en",
+        # You can't use a seed value and watermark at the same time.
+        # add_watermark=False,
+        # seed=100,
+        # aspect_ratio="1:1",
+        # safety_filter_level="block_some",
+        # person_generation="allow_adult",
     )
+    print(imgs[0]['image_bytes'])
+    st.session_state[state_key] = imgs
+
+    # st.session_state[state_key] = predict_image(
+    #     instance_dict={"prompt": prompt},
+    #     parameters={
+    #         "sampleCount": sample_count,
+    #         "sampleImageSize": sample_image_size,
+    #         "aspectRatio": aspect_ratio,
+    #     },
+    # )
 
 
 def edit_image_generation(

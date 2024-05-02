@@ -159,22 +159,6 @@ Output:
 """
 
 
-qList = [
-    "Is there a person in the photo (yes/no)?",
-    "What is the name of each part of the outfit?",
-    "What is the type of sleeves?",
-    "What is the type of neckline or collar?",
-    "What are the jewellery items worn?",
-]
-
-
-qList2 = [
-    "What is the type of x?",
-    "What is the color of x?",
-    "What is the material of x?",
-]
-
-
 ARTICLES_PROMPT = """You are a fashion journalist and want to know whether an article is talking about a given fashion clothing item. Answer this by searching for the presence of the item or a similar item in the text. The first word of the output should be Yes/No.
 
 Examples:
