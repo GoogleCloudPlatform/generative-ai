@@ -7,8 +7,17 @@ import pathlib
 import secrets
 import time
 
-from apis import calendar, chatbot, email, generate_mail, kanban
-from apis import customermanagement, leadsandsales, marketingandoutreach, performance
+from apis import (
+    calendar,
+    chatbot,
+    customermanagement,
+    email,
+    generate_mail,
+    kanban,
+    leadsandsales,
+    marketingandoutreach,
+    performance,
+)
 import dateutil
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS

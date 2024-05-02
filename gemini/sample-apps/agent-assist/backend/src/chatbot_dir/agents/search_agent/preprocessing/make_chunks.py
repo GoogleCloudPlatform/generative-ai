@@ -46,7 +46,7 @@ def make_chunks(document_path: str, policy_name: str) -> None:
         for file_id in os.listdir(f"{tables_path}/{folder_id}"):
             if file_id.startswith("table_string"):
                 loader = TextLoader(f"{tables_path}/{folder_id}/{file_id}")
-                table_chunk = loader.load()[0]  
+                table_chunk = loader.load()[0]
                 table_chunk.metadata["isTable"] = True
                 chunks.append(table_chunk)
 
