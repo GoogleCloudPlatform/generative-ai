@@ -43,12 +43,8 @@ def getLeadsAndSalesData() -> tuple[dict, int]:
         startDate = startDate.strftime("%Y-%m-%d")
         endDate = datetime.now().strftime("%Y-%m-%d")
 
-    conversionRate, leadsGenerated, revenueGenerated = getConversionRate(
-        data, startDate, endDate
-    )
-    platformData, topPerformingPlatform = getDifferentPlatformData(
-        data, startDate, endDate
-    )
+    conversionRate, leadsGenerated, revenueGenerated = getConversionRate(data, startDate, endDate)
+    platformData, topPerformingPlatform = getDifferentPlatformData(data, startDate, endDate)
     topPerformingPolicy = getTopPerformingPolicy(data, startDate, endDate)
 
     return (

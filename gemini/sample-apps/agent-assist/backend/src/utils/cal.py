@@ -23,9 +23,7 @@ class Calendar:
         self.SCOPES = [config["CALENDAR_SCOPE"]]
         self.creds = None
         if os.path.exists("cal_token.json"):
-            self.creds = Credentials.from_authorized_user_file(
-                "cal_token.json", self.SCOPES
-            )
+            self.creds = Credentials.from_authorized_user_file("cal_token.json", self.SCOPES)
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
                 self.creds.refresh(Request())
@@ -41,9 +39,7 @@ class Calendar:
         except HttpError as error:
             print("An error occurred: %s" % error)
 
-    def create_event(
-        self, email: list[str], startDateTime: str, endDateTime: str
-    ) -> dict:
+    def create_event(self, email: list[str], startDateTime: str, endDateTime: str) -> dict:
         """
         Creates an event on the user's calendar.
 

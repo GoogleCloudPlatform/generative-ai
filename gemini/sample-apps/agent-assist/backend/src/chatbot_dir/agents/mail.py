@@ -95,14 +95,10 @@ def mail_component(query: str, chat_history: str, context: str = "") -> tuple[st
     """
     gemini = TextBison()
     email_body = gemini.generate_response(
-        PROMPT_EMAIL_BODY.format(
-            query=query, context=context, chat_history=chat_history
-        )
+        PROMPT_EMAIL_BODY.format(query=query, context=context, chat_history=chat_history)
     )
     email_subject = gemini.generate_response(
-        PROMPT_EMAIL_SUBJECT.format(
-            query=query, context=context, chat_history=chat_history
-        )
+        PROMPT_EMAIL_SUBJECT.format(query=query, context=context, chat_history=chat_history)
     )
 
     return email_subject, email_body

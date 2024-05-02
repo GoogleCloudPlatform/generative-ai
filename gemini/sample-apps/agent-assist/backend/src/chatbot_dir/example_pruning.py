@@ -59,9 +59,7 @@ def get_similar_examples(query: str, chat_history: str) -> str:
         str: A string containing the similar examples.
     """
 
-    queries = get_similar_examples_query(query) + get_similar_examples_history(
-        chat_history
-    )
+    queries = get_similar_examples_query(query) + get_similar_examples_history(chat_history)
 
     examples = "\n\n-------------------------------\n\n".join(queries)
 

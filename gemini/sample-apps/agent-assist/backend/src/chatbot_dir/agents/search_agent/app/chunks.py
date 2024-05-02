@@ -35,9 +35,7 @@ def get_chunks(
     return chunks
 
 
-def get_chunks_semantic(
-    policies: list[str], keywords: str
-) -> dict[str, list[Document]]:
+def get_chunks_semantic(policies: list[str], keywords: str) -> dict[str, list[Document]]:
     """
     This function takes in a list of policy names and a string of semantic keywords.
     It returns a dictionary of policy names to a list of chunks of text that are relevant to the given keywords.
@@ -53,9 +51,7 @@ def get_chunks_semantic(
     for POLICY_NAME in policies:
         chunks, non_table_chunks = get_all_chunks(POLICY_NAME)
         embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        faiss_vectorstore = FAISS.load_local(
-            EMBEDDINGS_PATH.format(POLICY_NAME), embedding
-        )
+        faiss_vectorstore = FAISS.load_local(EMBEDDINGS_PATH.format(POLICY_NAME), embedding)
         faiss_retriever = faiss_vectorstore.as_retriever(search_kwards={"k": 3})
         docs = faiss_retriever.get_relevant_documents(keywords.lower())
         final_chunks = add_neighbouring_chunks(docs, chunks, non_table_chunks)
@@ -153,8 +149,7 @@ def get_all_chunks(POLICY_NAME: str) -> tuple[list[Document], int]:
     TOTAL_DOC_CHUNKS = chunks_dict["TOTAL_DOC_CHUNKS"]
     chunks_all = []
     chunks_all += [
-        Document(**chunks_dict["chunks"][idx])
-        for idx in range(len(chunks_dict["chunks"]))
+        Document(**chunks_dict["chunks"][idx]) for idx in range(len(chunks_dict["chunks"]))
     ]
 
     return chunks_all, TOTAL_DOC_CHUNKS

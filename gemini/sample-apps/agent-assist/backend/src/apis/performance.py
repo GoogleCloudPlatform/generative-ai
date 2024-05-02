@@ -46,12 +46,8 @@ def getPerformanceData():
     return (
         jsonify(
             {
-                "numberOfPoliciesSold": getNumberOfPoliciesSold(
-                    data, startDate, endDate
-                ),
-                "revenueGenerated": formatINR(
-                    getRevenueGenerated(data, startDate, endDate)
-                ),
+                "numberOfPoliciesSold": getNumberOfPoliciesSold(data, startDate, endDate),
+                "revenueGenerated": formatINR(getRevenueGenerated(data, startDate, endDate)),
                 "renewalRate": getRenewalRate(data, startDate, endDate),
                 "monthData": getMonthData(data, startDate, endDate),
             }

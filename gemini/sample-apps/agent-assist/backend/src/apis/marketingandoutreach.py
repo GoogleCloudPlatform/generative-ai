@@ -87,10 +87,7 @@ def getMetricsData(
     for platform in salesPltforms:
         sumSales[platform] = 0
     for item in data:
-        if (
-            item["campaign_start_date"] >= startDate
-            and item["campaign_start_date"] <= endDate
-        ):
+        if item["campaign_start_date"] >= startDate and item["campaign_start_date"] <= endDate:
             websiteTraffic += item["websiteVisitors"]
             likes += item["instaLikes"] + item["facebookLikes"]
             comments += item["instaComments"] + item["facebookComments"]

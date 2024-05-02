@@ -17,9 +17,7 @@ from utils.cal import Calendar
 from utils.get_email_threads import get_email_threads_summary
 from utils.get_users import get_users
 
-app = Flask(
-    __name__, static_url_path="", static_folder="build", template_folder="build"
-)
+app = Flask(__name__, static_url_path="", static_folder="build", template_folder="build")
 app.secret_key = secrets.token_hex(24)
 CORS(app, resources=r"/*")
 directory_path = pathlib.Path(__file__).parent.resolve()
@@ -59,9 +57,7 @@ def get_mail_summary(mail_id):
 
 def datetime_from_utc_to_local(utc_datetime):
     now_timestamp = time.time()
-    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(
-        now_timestamp
-    )
+    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
     return utc_datetime + offset
 
 
@@ -132,9 +128,7 @@ app.add_url_rule(
     methods=["POST"],
     view_func=generateMail.extract_and_send_mail,
 )
-app.add_url_rule(
-    "/agent-assist/kanban", methods=["get"], view_func=kanban.get_kanban_data
-)
+app.add_url_rule("/agent-assist/kanban", methods=["get"], view_func=kanban.get_kanban_data)
 app.add_url_rule(
     "/agent-assist/kanban/update", methods=["post"], view_func=kanban.update_kanban_data
 )

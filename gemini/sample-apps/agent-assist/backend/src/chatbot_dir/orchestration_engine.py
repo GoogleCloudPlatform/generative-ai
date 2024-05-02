@@ -207,9 +207,7 @@ def database_search_orchestrator(query: str) -> str:
     response = database_search.generate_answer(query)
 
     emit("chat", ["Generating..."])
-    emit(
-        "chat", [{"intent": "Database Search Result ", "data": {"response": response}}]
-    )
+    emit("chat", [{"intent": "Database Search Result ", "data": {"response": response}}])
 
     return response
 
