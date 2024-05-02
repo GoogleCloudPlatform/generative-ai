@@ -14,8 +14,8 @@ def get_countries() -> list:
             list: A list of country names.
 
     """
-    URL = "https://hypeauditor.com/top-instagram/"
-    response = requests.get(URL)
+    url = "https://hypeauditor.com/top-instagram/"
+    response = requests.get(url)
     page = BeautifulSoup(response.content, "html.parser")
 
     divs = page.find_all("div", class_="menu")

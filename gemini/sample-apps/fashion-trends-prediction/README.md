@@ -158,7 +158,7 @@ The current data is created by scraping posts from Instagram influencers and cel
 
 If you want to create your own data (a different source from Instagram or a different set of accounts and posts), then replace the file at the location specified in `config['Data']['current_data']` or upload your file on the UI itself.
 
-The file app/data_prep/create_new_data.py can be used to generate the new data file in the required format. Add your Instagram account username and password in the app/config.py file before starting to scrape Instagram.
+The file app/data_prep/create_new_data.py can be used to generate the new data file in the required format. The data file is created locally and again either upload it to gcs and update the path in `config['Data']['current_data']` or upload this file on the UI itself. Add your Instagram account username and password in the app/config.py file before starting to scrape Instagram.
 
 Required JSON format -
 
