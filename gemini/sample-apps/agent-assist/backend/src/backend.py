@@ -1,6 +1,6 @@
 """This is a main python backend file."""
 
-# pylint: disable=all
+# pylint: disable=#E0401
 
 from datetime import datetime
 import pathlib

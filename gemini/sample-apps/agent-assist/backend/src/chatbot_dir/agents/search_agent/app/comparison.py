@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=all
+# pylint: disable=#E0401
 
 PROMPT_FOR_COMPARISON = """
 You are a  home insurance domain expert who has a lot of knowledge about home insurance policies.

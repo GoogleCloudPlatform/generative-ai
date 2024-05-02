@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=all
+# pylint: disable=#E0401
 
 import base64
 from datetime import datetime

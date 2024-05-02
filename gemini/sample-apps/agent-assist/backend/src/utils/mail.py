@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=all
+# pylint: disable=#E0401
 
 import datetime
 from email.mime.application import MIMEApplication

@@ -1,6 +1,6 @@
 """This is a python utility file."""
 
-# pylint: disable=all
+# pylint: disable=#E0401
 
 PROMPT_FOR_SUBQUESTION = """
 You're presented with various queries that compare different policies.
