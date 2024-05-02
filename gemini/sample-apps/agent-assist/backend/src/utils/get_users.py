@@ -15,7 +15,7 @@ def get_users(is_contact: bool = True) -> list:
     A list of dictionaries representing users.
     """
 
-    with open("data/real_users_db.json") as f:
+    with open("data/real_users_db.json", encoding='UTF-8') as f:
         users = json.load(f)
 
     if is_contact:

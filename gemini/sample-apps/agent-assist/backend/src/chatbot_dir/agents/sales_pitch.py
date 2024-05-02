@@ -28,7 +28,7 @@ def sales_pitch_component(query: str, policy_name: str) -> str:
     """
     sp_path = f"data/static/sales_pitch/{policy_name}.txt"
 
-    with open(sp_path) as f:
+    with open(sp_path, encoding="utf-8") as f:
         original = f.read()
 
     gt = GeminiText()

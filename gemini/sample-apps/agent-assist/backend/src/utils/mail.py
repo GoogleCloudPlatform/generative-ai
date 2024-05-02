@@ -114,7 +114,7 @@ class Mail:
         )
         f = os.path.join(__location__, "invite.ics")
 
-        with open(f) as file:
+        with open(f, encoding='UTF-8') as file:
             ics_content = file.read()
 
         replaced_contents = ics_content.replace(
@@ -177,14 +177,14 @@ class Mail:
 
         # Function to search for a key value pair
         def search(key, value, con):
-            result, data = con.search(None, key, f'"{value}"')
+            _, data = con.search(None, key, f'"{value}"')
             return data
 
         # Function to get the list of emails under this label
         def get_emails(result_bytes):
             msgs = []  # all the email data are pushed inside an array
             for num in result_bytes[0].split():
-                typ, data = con.fetch(num, "(RFC822)")
+                _, data = con.fetch(num, "(RFC822)")
                 msgs.append(data)
 
             return msgs

@@ -10,10 +10,6 @@ from langchain.schema import Document
 from langchain.vectorstores import FAISS
 
 EMBEDDINGS_PATH = "data/static/embeddings/{}.vs"
-
-# TODO: threading, remove duplicate chunks, automerging
-
-
 def get_chunks(
     policies: list[str], keywords_lexical: str, keywords_semantic: str
 ) -> dict[str, list[str]]:
@@ -163,7 +159,7 @@ def get_all_chunks(policy_name: str) -> tuple[list[Document], int]:
         tuple[list[Document], int]: A tuple containing a list
           of all chunks in the policy and the total number of chunks in the policy.
     """
-    with open(f"data/static/chunks/chunks_{policy_name}.json") as f:
+    with open(f"data/static/chunks/chunks_{policy_name}.json", encoding='UTF-8') as f:
         chunks_dict = json.load(f)
 
     total_doc_chunks = chunks_dict["TOTAL_DOC_CHUNKS"]

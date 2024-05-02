@@ -72,9 +72,9 @@ class GeminiText:
             str: The generated response.
         """
         print("running tb.generate_response")
-        parameters = self.parameters
+        inner_parameters = self.parameters
         # response =self.model.predict(PROMPT,**parameters)
-        response = self.chat.send_message(prompt, generation_config=parameters)
+        response = self.chat.send_message(prompt, generation_config=inner_parameters)
         return response.text
 
 

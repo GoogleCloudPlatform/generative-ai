@@ -33,7 +33,6 @@ Answer strictly from the policy chunks given. Do not answer anything from your o
 QUERY: {}
 OUTPUT: """
 
-# TODO: threading
 
 
 class Driver:
@@ -177,7 +176,7 @@ class Driver:
         chunk_str = ""
         chunks = get_chunks(policies, keywords_lexical, keywords_semantic)
         chunk_list = []
-        for policy, chunk_l in chunks.items():
+        for _, chunk_l in chunks.items():
             chunk_str = ""
             chunk_str += "\n --------- \n".join(chunk_l)
             chunk_list.append(chunk_str)

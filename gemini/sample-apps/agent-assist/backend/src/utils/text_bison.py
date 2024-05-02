@@ -16,6 +16,7 @@ parameters = {
 
 
 class TextBison:
+    """This class provides a simple interface to the Text-Bison generative language model."""
     def __init__(
         self,
         project_id=config["PROJECT_ID"],  # GCP Project ID
@@ -48,6 +49,6 @@ class TextBison:
             str: The generated text response.
         """
         print("running tb.generate_response")
-        parameters = self.parameters
-        response = self.model.predict(prompt, **parameters)
+        inner_parameters = self.parameters
+        response = self.model.predict(prompt, **inner_parameters)
         return response.text

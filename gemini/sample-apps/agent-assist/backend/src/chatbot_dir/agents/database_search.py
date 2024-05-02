@@ -49,14 +49,14 @@ def generate_answer(question: str) -> str:
         str: The answer to the question.
     """
     tb = TextBison()
-    with open("data/policy.json") as f:
+    with open("data/policy.json", encoding='UTF-8') as f:
         policy_json = json.load(f)
 
     today = date.today()
     formatted_date = today.strftime("%d/%m/%Y")
     df = pd.DataFrame(policy_json)
     prompt = SQL_PROMPT.format(question=question, date_today=formatted_date)
-    answer = tb.generate_response(PROMPT=prompt)
+    answer = tb.generate_response(prompt=prompt)
     answer = answer.replace("<SQL>", "")
     sql_query = answer.replace("</SQL>", "")
     sql_query = sql_query.strip()

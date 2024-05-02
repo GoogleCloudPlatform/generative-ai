@@ -29,7 +29,7 @@ def show_chatty_threads():
                 "keys/read_mail.json", scopes
             )
             creds = flow.run_local_server(port=0)
-        with open("mail_token.json", "w") as token:
+        with open("mail_token.json", "w", encoding="utf-8") as token:
             token.write(creds.to_json())
     try:
         service = build("gmail", "v1", credentials=creds)

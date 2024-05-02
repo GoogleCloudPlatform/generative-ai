@@ -35,11 +35,11 @@ OUTPUT: {}
 
 ---------------------------------------
 
-INPUT: {input}
+INPUT: {query}
 OUTPUT: """
 
 
-def comparison(tb, input):
+def comparison(tb, query):
     """Function for policy comparison."""
     first_input = """
     Policy 1: MediCarePro Health Insurance
@@ -133,7 +133,7 @@ def comparison(tb, input):
         third_output,
         fourth_input,
         fourth_output,
-        input=input,
+        query=query,
     )
     response = tb.generate_response(prompt)
     return response

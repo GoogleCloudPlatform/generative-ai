@@ -72,6 +72,6 @@ class TextBison:
             str: The generated response.
         """
         print("running tb.generate_response")
-        parameters = self.parameters
-        response = self.model.predict(prompt, **parameters)
+        inner_parameters = self.parameters
+        response = self.model.predict(prompt, **inner_parameters)
         return response.text

@@ -40,8 +40,8 @@ def process_pdf_tables(document_path: str, policy_name: str) -> None:
             table_df_string = table.df.to_string()
             table_string = process_table(table_df_string)
             print(table_string)
-            with open(output_path + f"{idx}/table_df_{jdx}.txt", "w") as f:
+            with open(output_path + f"{idx}/table_df_{jdx}.txt", "w", encoding='UTF-8') as f:
                 f.write(table_df_string)
 
-            with open(output_path + f"{idx}/table_string_{jdx}.txt", "w") as f:
+            with open(output_path + f"{idx}/table_string_{jdx}.txt", "w", encoding='UTF-8') as f:
                 f.write(table_string)

@@ -64,6 +64,6 @@ class TextBison:
         Returns:
             str: The generated response.
         """
-        parameters = self.parameters
-        response = self.model.predict(prompt, **parameters)
+        inner_parameters = self.parameters
+        response = self.model.predict(prompt, **inner_parameters)
         return response.text

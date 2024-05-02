@@ -126,21 +126,21 @@ def get_email_conversation_summary(email_id: str) -> dict:
     return response
 
 
-def schedule_calendar_event(date, start_time, end_time, participants) -> None:
+def schedule_calendar_event(event_date, start_time, end_time, participants) -> None:
     """Schedule calendar event function to handle queries related to scheduling calendar events.
 
     Args:
-        date: The date of the event.
+        event_date: The date of the event.
         start_time: The start time of the event.
         end_time: The end time of the event.
         participants: A list of participants in the event.
     """
-    if "undefined" in [date, start_time, end_time, participants]:
+    if "undefined" in [event_date, start_time, end_time, participants]:
         response = {
             "status": "invalid",
             "intent": "calendar",
             "data": {
-                "date": date,
+                "date": event_date,
                 "start_time": start_time,
                 "end_time": end_time,
                 "participants": participants,
@@ -150,7 +150,7 @@ def schedule_calendar_event(date, start_time, end_time, participants) -> None:
     else:
         start_time = parse(start_time).time()
         end_time = parse(end_time).time()
-        meet_date = parse(date, dayfirst=True).date()
+        meet_date = parse(event_date, dayfirst=True).date()
 
         start_date_time = datetime(
             meet_date.year,
@@ -321,7 +321,7 @@ def run_orchestrator(query, chat_history):
     tb = TextBison()
     today = date.today()
     formatted_date = today.strftime("%d/%m/%Y")
-    with open("data/user_list.txt") as f:
+    with open("data/user_list.txt", encoding= "utf-8") as f:
         user_list = f.read()
 
     examples = get_similar_examples(query, chat_history)

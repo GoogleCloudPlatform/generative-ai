@@ -20,7 +20,7 @@ def get_marketing_and_outreach_data() -> tuple[dict, int]:
         JSON: A JSON object containing the marketing and outreach data.
     """
     file_path = "data/likes.json"
-    with open(file_path) as json_file:
+    with open(file_path, encoding='UTF-8') as json_file:
         data = json.load(json_file)
 
     start_date = request.args.get("start_date")

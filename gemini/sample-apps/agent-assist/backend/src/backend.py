@@ -51,14 +51,14 @@ def hello_world():
 @app.route("/users/contacted", methods=["GET"])
 def get_real_users_contacted():
     """Gets the list of real users who have been contacted."""
-    users = get_users(isContact=True)
+    users = get_users(is_contact=True)
     return jsonify(users), 200
 
 
 @app.route("/users/potential", methods=["GET"])
 def get_real_users_potential():
     """Gets the list of real users who have not been contacted."""
-    users = get_users(isContact=False)
+    users = get_users(is_contact=False)
     return jsonify(users), 200
 
 
@@ -93,7 +93,7 @@ def create_calendar_event():
     meet_date = data.get("meetDate")
     print(meet_date)
     meet_date = dateutil.parser.parse(meet_date).date()
-    calendar = Calendar()
+    cal = Calendar()
     start_date_time = datetime(
         meet_date.year,
         meet_date.month,
@@ -106,7 +106,7 @@ def create_calendar_event():
     ).isoformat()
 
     print(start_date_time, end_date_time)
-    event = calendar.create_event(
+    event = cal.create_event(
         email=mail_id, start_date_time=start_date_time, end_date_time=end_date_time
     )
     print(mail_id, start_time, end_time, meet_date)
