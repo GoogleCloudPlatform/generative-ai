@@ -16,5 +16,5 @@ POLICY_SOURCES = [
 
 SOURCE_TO_POLICY = {}
 
-for i in range(len(POLICIES)):
-    SOURCE_TO_POLICY[POLICY_SOURCES[i]] = POLICIES[i]
+for i, policy in enumerate(POLICIES):
+    SOURCE_TO_POLICY[POLICY_SOURCES[i]] = policy

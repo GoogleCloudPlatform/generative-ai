@@ -34,8 +34,8 @@ def get_chunks(
     chunks_lexical = get_chunks_lexical(policies, keywords_lexical)
 
     chunks = {}
-    for POLICY_NAME in policies:
-        chunks[POLICY_NAME] = chunks_semantic[POLICY_NAME] + chunks_lexical[POLICY_NAME]
+    for policy_name in policies:
+        chunks[policy_name] = chunks_semantic[policy_name] + chunks_lexical[policy_name]
 
     return chunks
 
@@ -57,17 +57,17 @@ def get_chunks_semantic(
           chunks of text that are relevant to the given keywords.
     """
     chunks_for_policy = {}
-    for POLICY_NAME in policies:
-        chunks, non_table_chunks = get_all_chunks(POLICY_NAME)
+    for policy_name in policies:
+        chunks, non_table_chunks = get_all_chunks(policy_name)
         embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         faiss_vectorstore = FAISS.load_local(
-            EMBEDDINGS_PATH.format(POLICY_NAME), embedding
+            EMBEDDINGS_PATH.format(policy_name), embedding
         )
         faiss_retriever = faiss_vectorstore.as_retriever(search_kwards={"k": 3})
         docs = faiss_retriever.get_relevant_documents(keywords.lower())
         final_chunks = add_neighbouring_chunks(docs, chunks, non_table_chunks)
         final_chunks = [x.page_content for x in final_chunks]
-        chunks_for_policy[POLICY_NAME] = final_chunks
+        chunks_for_policy[policy_name] = final_chunks
 
     return chunks_for_policy
 
@@ -88,8 +88,8 @@ def get_chunks_lexical(policies: list[str], keywords: str) -> dict[str, list[Doc
     """
     chunks_for_policy = {}
 
-    for POLICY_NAME in policies:
-        chunks, non_table_chunks = get_all_chunks(POLICY_NAME)
+    for policy_name in policies:
+        chunks, non_table_chunks = get_all_chunks(policy_name)
 
         # lexically matching
         bm25_retriever = BM25Retriever.from_documents(chunks)
@@ -98,7 +98,7 @@ def get_chunks_lexical(policies: list[str], keywords: str) -> dict[str, list[Doc
         docs = bm25_retriever.get_relevant_documents(keywords.lower())
         final_chunks = add_neighbouring_chunks(docs, chunks, non_table_chunks)
         final_chunks = [x.page_content for x in final_chunks]
-        chunks_for_policy[POLICY_NAME] = final_chunks
+        chunks_for_policy[policy_name] = final_chunks
 
     return chunks_for_policy
 
@@ -124,51 +124,51 @@ def add_neighbouring_chunks(
         list[Document]: A list of chunks that includes the
         relevant chunks and their neighboring chunks.
     """
-    relevantChunkList = []
-    relevantTableChunks = []
+    relevant_chunk_list = []
+    relevant_table_chunks = []
     for doc in relevant_chunks:
         if doc.metadata["isTable"]:
-            relevantTableChunks.append(doc)
+            relevant_table_chunks.append(doc)
         else:
-            relevantChunkList.append(doc.metadata["chunk_id"])
+            relevant_chunk_list.append(doc.metadata["chunk_id"])
 
-    finalListOfChunks = []
-    for chunk_id in relevantChunkList:
-        finalListOfChunks.append(chunk_id)
+    final_list_of_chunks = []
+    for chunk_id in relevant_chunk_list:
+        final_list_of_chunks.append(chunk_id)
         if chunk_id == 0 or chunk_id == non_table_chunks - 1:
             continue
-        if chunk_id + 1 not in relevantChunkList:
-            finalListOfChunks.append(chunk_id + 1)
+        if chunk_id + 1 not in relevant_chunk_list:
+            final_list_of_chunks.append(chunk_id + 1)
 
-        if chunk_id - 1 not in relevantChunkList:
-            finalListOfChunks.append(chunk_id - 1)
+        if chunk_id - 1 not in relevant_chunk_list:
+            final_list_of_chunks.append(chunk_id - 1)
 
-    finalChunks = [all_chunks[idx] for idx in finalListOfChunks]
-    finalChunks += relevantTableChunks
+    final_chunks = [all_chunks[idx] for idx in final_list_of_chunks]
+    final_chunks += relevant_table_chunks
 
-    return finalChunks
+    return final_chunks
 
 
-def get_all_chunks(POLICY_NAME: str) -> tuple[list[Document], int]:
+def get_all_chunks(policy_name: str) -> tuple[list[Document], int]:
     """
     This function takes in a policy name and returns a list
     of all chunks in the policy and the total number of chunks in the policy.
 
     Args:
-        POLICY_NAME (str): The name of the policy.
+        policy_name (str): The name of the policy.
 
     Returns:
         tuple[list[Document], int]: A tuple containing a list
           of all chunks in the policy and the total number of chunks in the policy.
     """
-    with open(f"data/static/chunks/chunks_{POLICY_NAME}.json") as f:
+    with open(f"data/static/chunks/chunks_{policy_name}.json") as f:
         chunks_dict = json.load(f)
 
-    TOTAL_DOC_CHUNKS = chunks_dict["TOTAL_DOC_CHUNKS"]
+    total_doc_chunks = chunks_dict["TOTAL_DOC_CHUNKS"]
     chunks_all = []
     chunks_all += [
         Document(**chunks_dict["chunks"][idx])
         for idx in range(len(chunks_dict["chunks"]))
     ]
 
-    return chunks_all, TOTAL_DOC_CHUNKS
+    return chunks_all, total_doc_chunks

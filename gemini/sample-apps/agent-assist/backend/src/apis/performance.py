@@ -18,13 +18,13 @@ def format_inr(number):
         str: The formatted number in Indian Rupee format.
     """
     if number > 10000000:
-        return "₹" + "{:.4}".format(number / 10000000) + "Cr"
-    elif number > 100000:
-        return "₹" + "{:.4}".format(number / 100000) + "L"
-    elif number > 1000:
-        return "₹" + "{:.4}".format(number / 1000) + "K"
-    else:
-        return "₹" + str(number)
+        return "₹" + f"{number / 10000000:.4}" + "Cr"
+    if number > 100000:
+        return "₹" + f"{number / 100000:.4}" + "L"
+    if number > 1000:
+        return "₹" + f"{number / 1000:.4}" + "K"
+    
+    return "₹" + str(number)
 
 
 def get_performance_data():
@@ -82,7 +82,7 @@ def get_number_of_policies_sold(data: list, start_date: str, end_date: str) -> i
         policy_start_date = policy["policy_start_date"]
         if policy_start_date is None:
             continue
-        if policy_start_date >= start_date and policy_start_date <= end_date:
+        if start_date <= policy_start_date <= end_date:
             count += 1
     return count
 
@@ -104,7 +104,7 @@ def get_revenue_generated(data: list, start_date: str, end_date: str) -> float:
         policy_start_date = policy["policy_start_date"]
         if policy_start_date is None:
             continue
-        if policy_start_date >= start_date and policy_start_date <= end_date:
+        if start_date <= policy_start_date <= end_date:
             revenue += policy["policy_amount"]
     return revenue
 
@@ -135,7 +135,7 @@ def get_renewal_rate(data: list, start_date: str, end_date: str) -> float:
         ):
             policies_renewed += 1
 
-    return float("{:.4}".format((policies_renewed * 100) / total_policies))
+    return float(f"{(policies_renewed * 100) / total_policies:.4}")
 
 
 def get_month_data(data: list, start_date: str, end_date: str) -> list:
@@ -157,7 +157,7 @@ def get_month_data(data: list, start_date: str, end_date: str) -> list:
         policy_start_date = policy["policy_start_date"]
         if policy_start_date is None:
             continue
-        if policy_start_date >= start_date and policy_start_date <= end_date:
+        if start_date <= policy_start_date <= end_date:
             month = datetime.strptime(policy_start_date, "%Y-%m-%d").strftime("%b-%y")
             if month in month_data:
                 month_data[month]["policies_sold"] += 1
@@ -196,7 +196,7 @@ def get_month_data(data: list, start_date: str, end_date: str) -> list:
 
 
 if __name__ == "__main__":
-    file_path = "../data/policy.json"
-    with open(file_path) as json_file:
+    FILE_PATH = "../data/policy.json"
+    with open(FILE_PATH) as json_file:
         data = json.load(json_file)
     get_month_data(data, "2022-01-01", "2023-12-31")

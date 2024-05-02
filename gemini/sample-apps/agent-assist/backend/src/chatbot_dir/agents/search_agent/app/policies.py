@@ -62,6 +62,6 @@ def get_policies(query: str):
         response_policies = [POLICIES[x] for x in response_list_int]
     print("policies names:", response_policies)
 
-    if type(response) is str:
+    if isinstance(response, str):
         raise Exception("Policy not found")
     return response

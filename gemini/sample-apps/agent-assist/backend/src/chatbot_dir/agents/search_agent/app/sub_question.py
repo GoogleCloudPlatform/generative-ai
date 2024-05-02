@@ -49,5 +49,5 @@ def get_reformed_subquestion(tb, query: str) -> str:
     Returns:
     The reformed subquestion.
     """
-    PROMPT = PROMPT_FOR_SUBQUESTION.format(query)
-    return tb.generate_response(PROMPT)
+    prompt = PROMPT_FOR_SUBQUESTION.format(query)
+    return tb.generate_response(prompt)

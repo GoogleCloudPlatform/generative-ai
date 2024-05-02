@@ -24,9 +24,9 @@ def sales_pitch_component(query: str, policy_name: str) -> str:
     Returns:
         str: The modified sales pitch.
     """
-    SP_PATH = f"data/static/sales_pitch/{policy_name}.txt"
+    sp_path = f"data/static/sales_pitch/{policy_name}.txt"
 
-    with open(SP_PATH) as f:
+    with open(sp_path) as f:
         original = f.read()
 
     gt = GeminiText()

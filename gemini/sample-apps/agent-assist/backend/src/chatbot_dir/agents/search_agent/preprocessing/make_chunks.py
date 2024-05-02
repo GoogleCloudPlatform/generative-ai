@@ -8,27 +8,27 @@ from langchain.document_loaders import PyMuPDFLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
-def make_chunks(DOCUMENT_PATH: str, POLICY_NAME: str) -> None:
+def make_chunks(document_path: str, policy_name: str) -> None:
     """Makes chunks of text from a PDF document.
 
     Args:
-        DOCUMENT_PATH (str): The path to the PDF document.
-        POLICY_NAME (str): The name of the policy.
+        document_path (str): The path to the PDF document.
+        policy_name (str): The name of the policy.
 
     Returns:
         None
     """
-    TABLES_PATH = "data/static/table_text/{POLICY_NAME}/"
-    CHUNKS_PATH = f"data/static/chunks/chunks_{POLICY_NAME}.json"
+    tables_path = "data/static/table_text/{policy_name}/"
+    chunks_path = f"data/static/chunks/chunks_{policy_name}.json"
 
     try:
-        os.makedirs(TABLES_PATH)
+        os.makedirs(tables_path)
     except Exception as e:
         print(e)
 
-    POLICY_NAME = DOCUMENT_PATH.split("/")[-1].split(".")[0]
+    policy_name = document_path.split("/")[-1].split(".")[0]
 
-    loader = PyMuPDFLoader(DOCUMENT_PATH)
+    loader = PyMuPDFLoader(document_path)
     data = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 
@@ -40,10 +40,10 @@ def make_chunks(DOCUMENT_PATH: str, POLICY_NAME: str) -> None:
 
     TOTAL_DOC_CHUNKS = len(chunks)
 
-    for folder_id in os.listdir(f"{TABLES_PATH}"):
-        for file_id in os.listdir(f"{TABLES_PATH}/{folder_id}"):
+    for folder_id in os.listdir(f"{tables_path}"):
+        for file_id in os.listdir(f"{tables_path}/{folder_id}"):
             if file_id.startswith("table_string"):
-                loader = TextLoader(f"{TABLES_PATH}/{folder_id}/{file_id}")
+                loader = TextLoader(f"{tables_path}/{folder_id}/{file_id}")
                 table_chunk = loader.load()[0]
                 table_chunk.metadata["isTable"] = True
                 chunks.append(table_chunk)
@@ -57,5 +57,5 @@ def make_chunks(DOCUMENT_PATH: str, POLICY_NAME: str) -> None:
     chunks_dict["TOTAL_DOC_CHUNKS"] = TOTAL_DOC_CHUNKS
     chunks_dict["chunks"] = l
 
-    with open(CHUNKS_PATH, "w") as f:
+    with open(chunks_path, "w") as f:
         json.dump(chunks_dict, f)

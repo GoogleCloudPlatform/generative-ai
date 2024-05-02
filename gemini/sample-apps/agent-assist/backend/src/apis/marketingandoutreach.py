@@ -124,6 +124,6 @@ def get_metrics_data(
         shares,
         emails_sent,
         open_rate,
-        top_performing_platform.split(" ")[0],
+        top_performing_platform.split(" ", maxsplit=1)[0],
         chart_data,
     )

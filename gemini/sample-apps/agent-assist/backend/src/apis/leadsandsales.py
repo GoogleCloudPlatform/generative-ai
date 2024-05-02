@@ -18,13 +18,13 @@ def format_inr(number) -> str:
         str: The formatted number in Indian Rupee format.
     """
     if number > 10000000:
-        return "₹" + "{:.4}".format(number / 10000000) + "Cr"
-    elif number > 100000:
-        return "₹" + "{:.4}".format(number / 100000) + "L"
-    elif number > 1000:
-        return "₹" + "{:.4}".format(number / 1000) + "K"
-    else:
-        return "₹" + str(number)
+        return "₹" + f"{number / 10000000:.4}" + "Cr"
+    if number > 100000:
+        return "₹" + f"{number / 100000:.4}" + "L"
+    if number > 1000:
+        return "₹" + f"{number / 1000:.4}" + "K"
+    
+    return "₹" + str(number)
 
 
 def get_leads_and_sales_data() -> tuple[dict, int]:
@@ -87,13 +87,13 @@ def get_conversion_rate(data: list, start_date: str, end_date: str) -> tuple:
         last_contacted_data = policy["last_contacted"]
         if last_contacted_data is None:
             continue
-        if last_contacted_data >= start_date and last_contacted_data <= end_date:
+        if start_date <= last_contacted_data <= end_date:
             total_count += 1
             count += 1 if policy["converted"] else 0
             revenue += policy["policy_amount"] if policy["converted"] else 0
 
     return (
-        float("{:.4}".format((count * 100) / total_count)),
+        float(f"{(count * 100) / total_count:.4}",
         total_count,
         format_inr(revenue),
     )
@@ -116,7 +116,7 @@ def get_different_platform_data(data: list, start_date: str, end_date: str) -> t
         last_contacted_data = policy["last_contacted"]
         if last_contacted_data is None:
             continue
-        if last_contacted_data >= start_date and last_contacted_data <= end_date:
+        if start_date <= last_contacted_data <= end_date:
             if policy["platform"] in final_data:
                 final_data[policy["platform"]]["count"] += 1
                 final_data[policy["platform"]]["revenue"] += (
@@ -126,9 +126,9 @@ def get_different_platform_data(data: list, start_date: str, end_date: str) -> t
                 final_data[policy["platform"]] = {"count": 0, "revenue": 0}
     chart_data = []
     top_performing_platform = max(final_data, key=lambda x: final_data[x]["revenue"])
-    for key in final_data.keys():
+    for key, value in final_data.items():
         chart_data.append(
-            {"x": key, "y1": final_data[key]["count"], "y2": final_data[key]["revenue"]}
+            {"x": key, "y1": value["count"], "y2": value["revenue"]}
         )
 
     return chart_data, top_performing_platform
@@ -151,7 +151,7 @@ def get_top_performing_policy(data: list, start_date: str, end_date: str) -> str
         last_contacted_data = policy["last_contacted"]
         if last_contacted_data is None:
             continue
-        if last_contacted_data >= start_date and last_contacted_data <= end_date:
+        if start_date <= last_contacted_data <= end_date:
             if policy["current_policy"] is None:
                 continue
             if policy["current_policy"] in final_data:
