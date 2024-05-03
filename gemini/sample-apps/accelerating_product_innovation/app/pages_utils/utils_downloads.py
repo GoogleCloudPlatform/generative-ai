@@ -4,6 +4,8 @@ product content)
 as zip archives.
 """
 
+# pylint: disable=E0401
+
 import base64
 import io
 import logging
@@ -170,7 +172,9 @@ def download_file() -> None:
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(zip_buffer.getvalue(), f"email_{email_file_title}.zip"),
+        download_button(
+            zip_buffer.getvalue(), f"email_{email_file_title}.zip"
+        ),
         height=0,
     )
     st.success("Email Copies Downloaded")

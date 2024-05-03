@@ -9,6 +9,8 @@ This module:
       accordingly.
 """
 
+# pylint: disable=E0401
+
 import logging
 import os
 

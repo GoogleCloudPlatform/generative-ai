@@ -14,6 +14,8 @@ It provides the following features:
     * Displays the generated image suggestions.
 """
 
+# pylint: disable=E0401
+
 import logging
 import streamlit as st
 

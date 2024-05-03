@@ -1,3 +1,9 @@
+"""
+Cloud function to make calls to imagen API.
+"""
+
+# pylint: disable=E0401
+
 import os
 
 from dotenv import load_dotenv

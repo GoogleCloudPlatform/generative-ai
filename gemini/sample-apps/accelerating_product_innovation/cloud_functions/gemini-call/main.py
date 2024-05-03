@@ -3,6 +3,8 @@ Cloud Function for getting text response from Gemini API.
 (Required for parallel image generation)
 """
 
+# pylint: disable=E0401
+
 import os
 
 from dotenv import load_dotenv

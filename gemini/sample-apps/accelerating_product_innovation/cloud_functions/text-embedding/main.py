@@ -2,6 +2,8 @@
 Cloud function to generate embedding of given file.
 """
 
+# pylint: disable=E0401
+
 import json
 import os
 from typing import Any
