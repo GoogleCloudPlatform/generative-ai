@@ -8,7 +8,7 @@ from gcs import read_file_from_gcs_link
 from google.api_core.exceptions import InvalidArgument
 import streamlit as st
 from utilities import add_logo
-from utils_standalone_image_gen import predict_image, render_image_edit_prompt
+from utils_standalone_image_gen import image_generation, render_image_edit_prompt
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
 import vertexai.preview.generative_models as generative_models
@@ -185,7 +185,7 @@ with st.container(border=True):
                 )
             with col2:
                 if st.button(label=":pencil2:", key=f"image: {stamp}"):
-                    st.session_state[edit_img_key] = chat[1].getvalue()
+                    st.session_state[edit_img_key] = chat[1]
                     st.session_state[hist_key][i][2] = True
 
             if st.session_state[hist_key][i][2]:
@@ -216,19 +216,12 @@ with st.container(border=True):
                 gen_prompt = img_gen_prompt(st.session_state["prompt"]) + " " + category
                 print(gen_prompt)
                 try:
-                    _imgs = predict_image(
-                        instance_dict={
-                            "prompt": gen_prompt + " " + category,
-                        },
-                        parameters={
-                            "sampleCount": 1,
-                            "sampleImageSize": 512,
-                            "aspectRatio": "1:1",
-                        },
-                    )
+                    _imgs = image_generation(prompt=gen_prompt + " " + category,
+                                    sample_count=1,
+                                    state_key='imagen_image')
 
                     imgs = [
-                        io.BytesIO(base64.b64decode(_img["bytesBase64Encoded"]))
+                        _img._image_bytes
                         for _img in _imgs
                     ]
                     st.session_state[hist_key].append(

@@ -1,5 +1,3 @@
-import base64
-import io
 import json
 import logging
 
@@ -8,6 +6,7 @@ import streamlit.components.v1 as components
 import vertexai
 import vertexai.preview.generative_models as generative_models
 
+import sys
 sys.path.append("../")
 from io import StringIO
 
@@ -17,7 +16,7 @@ from gcs import read_file_from_gcs_link
 from genai_prompts import IMAGE_PROMPT, TRENDS_PROMPT
 from prediction import Prediction
 from utilities import add_logo, button_html_script, details_html, exception_html
-from utils_standalone_image_gen import predict_image
+from utils_standalone_image_gen import image_generation
 from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 
 logging.basicConfig(level=logging.INFO)
@@ -225,10 +224,7 @@ if submit or key in st.session_state:
                     try:
                         print(state.keys())
                         if state[outfit] == {}:
-                            _imgs = predict_image(
-                                instance_dict={
-                                    "prompt": st.session_state["gemini_model"]
-                                    .generate_content(
+                            prompt = st.session_state["gemini_model"].generate_content(
                                         IMAGE_PROMPT.format(outfit=outfit),
                                         generation_config=GenerationConfig(
                                             max_output_tokens=2048,
@@ -243,20 +239,11 @@ if submit or key in st.session_state:
                                             generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
                                         },
                                         stream=False,
-                                    )
-                                    .text
-                                },
-                                parameters={
-                                    "sampleCount": 1,
-                                    "sampleImageSize": 512,
-                                    "aspectRatio": "1:1",
-                                },
-                            )
+                                    ).text
 
-                            state[outfit]["imgs"] = [
-                                io.BytesIO(base64.b64decode(_img["bytesBase64Encoded"]))
-                                for _img in _imgs
-                            ]
+                            state[outfit]["imgs"] = [_img._image_bytes for _img in image_generation(prompt=prompt,
+                                                        sample_count=1,
+                                                        state_key='imagen_image')]
 
                         if len(state[outfit]["imgs"]) > 0:
                             st.image(state[outfit]["imgs"][0], use_column_width=True)

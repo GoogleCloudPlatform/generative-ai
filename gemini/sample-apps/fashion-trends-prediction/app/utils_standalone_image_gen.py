@@ -6,121 +6,30 @@ Utility module to:
  - Render the image generation and editing UI
 """
 
-import base64
-import io
-import math
-from typing import List
-
-from PIL import Image
-from config import config
-from google.cloud import aiplatform
-from google.protobuf import json_format
-from google.protobuf.struct_pb2 import Value
+import vertexai
 import streamlit as st
 import utils_edit_image
+
+from typing import List
+from config import config
+
+from vertexai.preview.vision_models import Image
+from vertexai.preview.vision_models import ImageGenerationModel
+
 
 # Set project parameters
 PROJECT_ID = config["PROJECT_ID"]
 LOCATION = config["LOCATION"]
-
-import vertexai
-from vertexai.preview.vision_models import ImageGenerationModel
-
-# TODO(developer): Update and un-comment below lines
-# project_id = "PROJECT_ID"
-# output_file = "my-output.png"
-# prompt = "" # The text prompt describing what you want to see.
-
-vertexai.init(project='aurora-cohort-2', location="us-central1")
+vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 model = ImageGenerationModel.from_pretrained("imagegeneration@002")
 
 
-
-# Set project parameters
-IMAGE_MODEL_NAME = "imagegeneration@005"
-IMAGE_MODEL_NAME_ = "imagegeneration@002"
-IMAGEN_API_ENDPOINT = f"{LOCATION}-aiplatform.googleapis.com"
-IMAGEN_ENDPOINT = f"projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{IMAGE_MODEL_NAME}"
-IMAGEN_ENDPOINT_ = f"projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{IMAGE_MODEL_NAME_}"
-IMAGE_UPLOAD_BYTES_LIMIT = 4096
-# The AI Platform services require regional API endpoints.
-client_options = {"api_endpoint": IMAGEN_API_ENDPOINT}
-# Initialize client that will be used to create and send requests.
-imagen_client = aiplatform.gapic.PredictionServiceClient(client_options=client_options)
-
-
-def resize_image_bytes(
-    bytes_data: bytes, bytes_limit: int = IMAGE_UPLOAD_BYTES_LIMIT
-) -> bytes:
-    """Resizes an image to a specified byte limit.
-
-    Args:
-        bytes_data:
-            The image data in bytes. (bytes)
-        bytes_limit:
-            The maximum byte size of the resized image. (int)
-
-    Returns:
-        The resized image data in bytes.
-
-    Raises:
-        Image.ImageTooBigError: If the image is larger than the bytes_limit.
-    """
-    with io.BytesIO(bytes_data) as buffer_in:
-        img_to_resize = Image.open(buffer_in)
-        width = img_to_resize.size[0]
-        aspect = img_to_resize.size[0] / img_to_resize.size[1]
-        bytes_size = len(bytes_data)
-
-        while bytes_size > bytes_limit:
-            resize_factor = bytes_size / (bytes_limit * 0.9)
-            width = width / math.sqrt(resize_factor)
-            height = width / aspect
-            # resize from img_orig to not lose quality
-            img = img_to_resize.resize((int(width), int(height)))
-
-            with io.BytesIO() as buffer_out:
-                img.save(buffer_out, format="PNG")
-                bytes_data = buffer_out.getvalue()
-                bytes_size = len(bytes_data)
-
-    return bytes_data
-
-
-def predict_image(
-    instance_dict: dict, parameters: dict, endpoint_name: str = IMAGEN_ENDPOINT
-):
-    """Predicts the output of imagen on a given instance dict.
-    Args:
-        instance_dict:
-            The input to the large language model. (dict)
-        parameters:
-            The parameters for the prediction. (dict)
-    Returns:
-        A list of strings containing the predictions.
-    Raises:
-        aiplatform.exceptions.NotFoundError: If the endpoint does not exist.
-        aiplatform.exceptions.BadRequestError: If the input is invalid.
-        aiplatform.exceptions.InternalServerError: If an internal error occurred.
-    """
-
-    instance = json_format.ParseDict(instance_dict, Value())
-    instances = [instance]
-    parameters_client = json_format.ParseDict(parameters, Value())
-    response = imagen_client.predict(
-        endpoint=endpoint_name, instances=instances, parameters=parameters_client
-    )
-    return response.predictions
-
-
 def image_generation(
-    prompt: str,
-    sample_count: int,
-    sample_image_size: int,
-    aspect_ratio: str,
-    state_key: str,
-):
+        prompt: str,
+        sample_count: int,
+        state_key: str,
+    ) -> List:
     """Generates an image from a prompt.
 
     Args:
@@ -140,27 +49,11 @@ def image_generation(
     """
     imgs = model.generate_images(
         prompt=prompt,
-        # Optional parameters
         number_of_images=sample_count,
         language="en",
-        # You can't use a seed value and watermark at the same time.
-        # add_watermark=False,
-        # seed=100,
-        # aspect_ratio="1:1",
-        # safety_filter_level="block_some",
-        # person_generation="allow_adult",
     )
-    print(imgs[0]['image_bytes'])
-    st.session_state[state_key] = imgs
-
-    # st.session_state[state_key] = predict_image(
-    #     instance_dict={"prompt": prompt},
-    #     parameters={
-    #         "sampleCount": sample_count,
-    #         "sampleImageSize": sample_image_size,
-    #         "aspectRatio": aspect_ratio,
-    #     },
-    # )
+    st.session_state[state_key] = imgs.images
+    return imgs.images
 
 
 def edit_image_generation(
@@ -189,32 +82,31 @@ def edit_image_generation(
     """
     input_dict = {
         "prompt": prompt,
-        "image": {"bytesBase64Encoded": base64.b64encode(bytes_data).decode("utf-8")},
+        "image": Image(image_bytes=bytes_data),
     }
-
+    input_dict["mask"] = None
     if mask_bytes_data:
-        input_dict["mask"] = {
-            "image": {
-                "bytesBase64Encoded": base64.b64encode(mask_bytes_data).decode("utf-8")
-            }
-        }
+        input_dict["mask"] = Image(image_bytes=mask_bytes_data)
 
-    st.session_state[state_key] = predict_image(
-        instance_dict=input_dict,
-        parameters={"sampleCount": sample_count},
-        endpoint_name=IMAGEN_ENDPOINT_,
-    )
+    st.session_state[state_key] = model.edit_image(
+        prompt=input_dict["prompt"],
+        base_image=input_dict["image"],
+        # Optional parameters
+        number_of_images=sample_count,
+        language="en",
+        mask=input_dict["mask"],
+    ).images
 
 
 def render_one_image(
-    images_key: str,
-    image_position: int,
-    select_button: bool = False,
-    selected_image_key: str = "",
-    edit_button: bool = False,
-    image_to_edit_key: str = "",
-    download_button: bool = True,
-):
+        images_key: str,
+        image_position: int,
+        select_button: bool = False,
+        selected_image_key: str = "",
+        edit_button: bool = False,
+        image_to_edit_key: str = "",
+        download_button: bool = True,
+    ):
     """
     Renders one image from a list of images.
 
@@ -237,14 +129,10 @@ def render_one_image(
     Returns:
         None.
     """
-    image = io.BytesIO(
-        base64.b64decode(
-            st.session_state[images_key][image_position]["bytesBase64Encoded"]
-        )
-    )
+    image = st.session_state[images_key][image_position]._image_bytes
     st.image(image)
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, _ = st.columns(3)
 
     with col1:
         if download_button:
@@ -256,16 +144,10 @@ def render_one_image(
                 file_name="image.png",
             )
 
-    # with col3:
-    #     if select_button and selected_image_key:
-    #         if st.button(
-    #             "Select", key=f"_btn_select_{images_key}_{image_position}"):
-    #             st.session_state[selected_image_key] = image
-
     with col2:
         if edit_button and image_to_edit_key:
             if st.button(":pencil2:", key=f"_btn_edit_{images_key}_{image_position}"):
-                st.session_state[image_to_edit_key] = image.getvalue()
+                st.session_state[image_to_edit_key] = image
 
 
 def generate_image_columns(
@@ -360,7 +242,7 @@ def render_image_generation_ui(
         None.
     """
 
-    SAMPLE_COUNT = [8, 4, 2, 1]
+    SAMPLE_COUNT = [4, 2, 1]
     SAMPLE_IMAGE_SIZE = [256, 64, 512, 1024]
     ASPECT_RATIO = ["1:1", "5:4", "3:2", "7:4", "4:3", "16:9", "9:16"]
 
@@ -425,8 +307,6 @@ def render_image_generation_ui(
                 image_generation(
                     question or "",
                     sample_count or 1,
-                    sample_image_size or 256,
-                    aspect_ratio or "1:1",
                     generated_images_key,
                 )
         except Exception as e:
@@ -439,8 +319,6 @@ def render_image_generation_ui(
                 image_generation(
                     pre_populated_prompts[0],
                     SAMPLE_COUNT[0],
-                    SAMPLE_IMAGE_SIZE[0],
-                    ASPECT_RATIO[0],
                     generated_images_key,
                 )
 
@@ -496,7 +374,7 @@ def render_image_edit_prompt(
         None.
     """
 
-    SAMPLE_COUNT = [8, 4, 2, 1]
+    SAMPLE_COUNT = [4, 2, 1]
 
     def submitted():
         st.session_state[edit_image_prompt_key] = st.session_state[
@@ -553,9 +431,6 @@ def render_image_edit_prompt(
             bytes_data = st.session_state[image_to_edit_key]
 
             if bytes_data:
-                # if len(bytes_data) > IMAGE_UPLOAD_BYTES_LIMIT:
-                #     bytes_data = resize_image_bytes(bytes_data)
-
                 if not edit_image_prompt:
                     st.error("Provide a prompt for editing the image")
                 else:
@@ -589,21 +464,21 @@ def render_image_edit_prompt(
 
 
 def render_image_generation_and_edition_ui(
-    image_text_prompt_key: str,
-    generated_images_key: str,
-    edit_image_prompt_key: str,
-    pre_populated_prompts: List[str] = ["an image of a cat"],
-    select_button: bool = False,
-    selected_image_key: str = "",
-    edit_button: bool = False,
-    title: str = "Generate Images",
-    image_to_edit_key: str = "",
-    edit_with_mask: bool = False,
-    mask_image_key: str = "",
-    edited_images_key: str = "",
-    download_button: bool = False,
-    auto_submit_first_pre_populated=False,
-):
+        image_text_prompt_key: str,
+        generated_images_key: str,
+        edit_image_prompt_key: str,
+        pre_populated_prompts: List[str] = ["an image of a cat"],
+        select_button: bool = False,
+        selected_image_key: str = "",
+        edit_button: bool = False,
+        title: str = "Generate Images",
+        image_to_edit_key: str = "",
+        edit_with_mask: bool = False,
+        mask_image_key: str = "",
+        edited_images_key: str = "",
+        download_button: bool = False,
+        auto_submit_first_pre_populated=False,
+    ):
     render_image_generation_ui(
         image_text_prompt_key,
         generated_images_key,
