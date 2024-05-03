@@ -6,16 +6,13 @@ Utility module to:
  - Render the image generation and editing UI
 """
 
-import vertexai
+from typing import List
+
+from config import config
 import streamlit as st
 import utils_edit_image
-
-from typing import List
-from config import config
-
-from vertexai.preview.vision_models import Image
-from vertexai.preview.vision_models import ImageGenerationModel
-
+import vertexai
+from vertexai.preview.vision_models import Image, ImageGenerationModel
 
 # Set project parameters
 PROJECT_ID = config["PROJECT_ID"]
@@ -26,10 +23,10 @@ model = ImageGenerationModel.from_pretrained("imagegeneration@002")
 
 
 def image_generation(
-        prompt: str,
-        sample_count: int,
-        state_key: str,
-    ) -> List:
+    prompt: str,
+    sample_count: int,
+    state_key: str,
+) -> List:
     """Generates an image from a prompt.
 
     Args:
@@ -99,14 +96,14 @@ def edit_image_generation(
 
 
 def render_one_image(
-        images_key: str,
-        image_position: int,
-        select_button: bool = False,
-        selected_image_key: str = "",
-        edit_button: bool = False,
-        image_to_edit_key: str = "",
-        download_button: bool = True,
-    ):
+    images_key: str,
+    image_position: int,
+    select_button: bool = False,
+    selected_image_key: str = "",
+    edit_button: bool = False,
+    image_to_edit_key: str = "",
+    download_button: bool = True,
+):
     """
     Renders one image from a list of images.
 
@@ -464,21 +461,21 @@ def render_image_edit_prompt(
 
 
 def render_image_generation_and_edition_ui(
-        image_text_prompt_key: str,
-        generated_images_key: str,
-        edit_image_prompt_key: str,
-        pre_populated_prompts: List[str] = ["an image of a cat"],
-        select_button: bool = False,
-        selected_image_key: str = "",
-        edit_button: bool = False,
-        title: str = "Generate Images",
-        image_to_edit_key: str = "",
-        edit_with_mask: bool = False,
-        mask_image_key: str = "",
-        edited_images_key: str = "",
-        download_button: bool = False,
-        auto_submit_first_pre_populated=False,
-    ):
+    image_text_prompt_key: str,
+    generated_images_key: str,
+    edit_image_prompt_key: str,
+    pre_populated_prompts: List[str] = ["an image of a cat"],
+    select_button: bool = False,
+    selected_image_key: str = "",
+    edit_button: bool = False,
+    title: str = "Generate Images",
+    image_to_edit_key: str = "",
+    edit_with_mask: bool = False,
+    mask_image_key: str = "",
+    edited_images_key: str = "",
+    download_button: bool = False,
+    auto_submit_first_pre_populated=False,
+):
     render_image_generation_ui(
         image_text_prompt_key,
         generated_images_key,

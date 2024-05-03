@@ -151,10 +151,7 @@ with st.container(border=True):
                                     sample_count=1,
                                     state_key='imagen_image')
 
-                    imgs = [
-                        _img._image_bytes
-                        for _img in _imgs
-                    ]
+                    imgs = [_img._image_bytes for _img in _imgs]
                     st.session_state[hist_key].append(
                         ["image", imgs[0], False, time.time()]
                     )

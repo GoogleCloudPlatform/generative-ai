@@ -1,11 +1,11 @@
 import json
 import logging
+import sys
 
 import streamlit as st
 import streamlit.components.v1 as components
 import vertexai
 
-import sys
 sys.path.append("../")
 from io import StringIO
 
@@ -86,8 +86,7 @@ st.title("Fashion Trend Prediction")
 uploaded_file = st.file_uploader("Choose a file (optional)")
 
 if uploaded_file is not None and st.session_state["source"] != uploaded_file.name:
-    stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-    string_data = stringio.read()
+    string_data = StringIO(uploaded_file.getvalue().decode("utf-8")).read()
     st.session_state["source"] = uploaded_file.name
     st.session_state["JSONdata"] = json.loads(string_data)
 
@@ -240,9 +239,14 @@ if submit or key in st.session_state:
                                         stream=False,
                                     ).text
 
-                            state[outfit]["imgs"] = [_img._image_bytes for _img in image_generation(prompt=prompt,
-                                                        sample_count=1,
-                                                        state_key='imagen_image')]
+                            state[outfit]["imgs"] = [
+                                _img._image_bytes
+                                for _img in image_generation(
+                                    prompt=prompt,
+                                    sample_count=1,
+                                    state_key="imagen_image",
+                                )
+                            ]
 
                         if len(state[outfit]["imgs"]) > 0:
                             st.image(state[outfit]["imgs"][0], use_column_width=True)
