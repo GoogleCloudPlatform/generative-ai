@@ -15,6 +15,7 @@ It provides the following features:
 """
 
 import logging
+import streamlit as st
 
 from PIL import Image
 from app.pages_utils import utils
@@ -28,7 +29,7 @@ from app.pages_utils.utils_edit_image import (
     save_draft_image,
 )
 from app.pages_utils.utils_editor_ui import ImageEditor
-import streamlit as st
+
 
 # Get the configuration for the edit page
 page_cfg = PAGES_CFG["Editor"]
@@ -47,7 +48,10 @@ if st.session_state.uploaded_img is True:
     handle_image_upload()
 
 # Check if the user has started editing the image
-if st.session_state.start_editing is None or st.session_state.start_editing is True:
+if (
+    st.session_state.start_editing is None
+    or st.session_state.start_editing is True
+):
     # Initialize Editor
     image_editor = ImageEditor()
 
