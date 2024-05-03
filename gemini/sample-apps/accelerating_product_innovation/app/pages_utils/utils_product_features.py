@@ -135,9 +135,9 @@ def split_sentence(sentence: str) -> list[str]:
         first_part = parts[0].strip()
         second_part = parts[1].strip()
         return [first_part, second_part]
-    else:
-        # No colon found, return the whole sentence
-        return [sentence]
+
+    # No colon found, return the whole sentence
+    return [sentence]
 
 
 def trim_title(title: str) -> str:
@@ -152,7 +152,7 @@ def trim_title(title: str) -> str:
     try:
         title_parts = title.split(".")
         return title_parts[1].strip()
-    except Exception:
+    except IndexError:
         return title
 
 

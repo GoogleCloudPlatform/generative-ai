@@ -43,9 +43,9 @@ class ProductDrafts:
                     )
 
                     # Call the helper function to display drafts for this title
-                    self._display_draft_row(i)
+                    self.display_draft_row(i)
 
-    def _display_draft_row(self, title_index: int) -> None:
+    def display_draft_row(self, title_index: int) -> None:
         """
         Displays a single row of drafts for a given product title.
 
@@ -59,14 +59,18 @@ class ProductDrafts:
 
             with img_col:
                 # Display the image for the current draft
-                st.image(st.session_state.draft_elements[title_index][j]["img"])
+                st.image(
+                    st.session_state.draft_elements[title_index][j]["img"]
+                )
 
                 # Call the function to handle image editing interactions
                 self._handle_image_edit(title_index, j)
 
             with text_col:
                 # Display the text for the current draft
-                st.write(st.session_state.draft_elements[title_index][j]["text"])
+                st.write(
+                    st.session_state.draft_elements[title_index][j]["text"]
+                )
                 st.session_state.text_edit_prompt = st.text_input(
                     key="edit_text_prompt" + str(title_index) + str(j),
                     placeholder="Write a query to edit the text",
@@ -82,15 +86,15 @@ class ProductDrafts:
                 ):
                     # On button click begin content regeneration.
                     st.session_state.regenerate_btn = True
-                    st.session_state.row = title_index  # Title number being edited.
+                    st.session_state.row = (
+                        title_index  # Title number being edited.
+                    )
                     # In case of multiple drafts, track the draft number
                     # being edited.
                     st.session_state.col = j
-                    st.session_state.text_to_edit = st.session_state.draft_elements[
-                        title_index
-                    ][j][
-                        "text"
-                    ]  # Text content being edited.
+                    st.session_state.text_to_edit = (
+                        st.session_state.draft_elements[title_index][j]["text"]
+                    )  # Text content being edited.
 
                     # Update content
                     with st.spinner("Updating Content..."):

@@ -72,9 +72,9 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
         key=key,
     ):
         # Update session state with selected suggestion
-        st.session_state.insights_placeholder = st.session_state.insights_suggestion[
-            suggestion_num
-        ]
+        st.session_state.insights_placeholder = (
+            st.session_state.insights_suggestion[suggestion_num]
+        )
         # Set flag to generate RAG answers
         st.session_state.rag_answers_gen = True
 
@@ -94,21 +94,19 @@ if st.session_state.dff.empty:
     )
 else:
     # Loop until suggestions are loaded or try limit is reached
-    try_var = 0
-    while (
-        st.session_state.suggestion_first_time
-        and st.session_state.insights_suggestion is None
-        and try_var < 3
-    ):
-        try_var += 1
-        with st.spinner("Loading suggestion..."):
-            utils_insights.get_suggestions("insights_suggestion")
-            # Check if number of suggestions is less than 4
-            if (
-                st.session_state.insights_suggestion is not None
-                and len(st.session_state.insights_suggestion) < 4
-            ):
+    for try_var in range(3):
+        if (
+            st.session_state.suggestion_first_time
+            and st.session_state.insights_suggestion is None
+        ):
+            with st.spinner("Loading suggestion..."):
                 utils_insights.get_suggestions("insights_suggestion")
+                # Check if number of suggestions is less than 4
+                if (
+                    st.session_state.insights_suggestion is not None
+                    and len(st.session_state.insights_suggestion) < 4
+                ):
+                    utils_insights.get_suggestions("insights_suggestion")
 
     # Check if suggestions are loaded
     if (
@@ -162,7 +160,9 @@ if st.session_state.rag_answers_gen:
     if st.session_state.dff.empty:
         # Display error message
         st.error(
-            "Add files in " + st.session_state.product_category + " file storage",
+            "Add files in "
+            + st.session_state.product_category
+            + " file storage",
             icon="🚨",
         )
     # Check if search term is empty

@@ -97,7 +97,7 @@ async def add_type_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
     """
     Adds 'type' column to pdf_data.
     """
-    pdf_data["types"] = pdf_data["content"].apply(lambda x: type(x))
+    pdf_data["types"] = pdf_data["content"].apply(get_type)
     return pdf_data
 
 
@@ -125,7 +125,9 @@ async def generate_embeddings(pdf_data: pd.DataFrame) -> np.array:
     Returns:
         np.array: The embeddings for the PDF data.
     """
-    tasks = [asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]]
+    tasks = [
+        asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]
+    ]
     embeddings = await asyncio.gather(*tasks)
     return np.array(embeddings)
 
@@ -252,12 +254,16 @@ async def csv_pocessing(
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(asyncio.create_task(add_type_col(parallel_task_array[i])))
+        temp_arr.append(
+            asyncio.create_task(add_type_col(parallel_task_array[i]))
+        )
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(asyncio.create_task(add_embedding_col(parallel_task_array[i])))
+        temp_arr.append(
+            asyncio.create_task(add_embedding_col(parallel_task_array[i]))
+        )
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     for i in range(split_num):
@@ -270,6 +276,18 @@ async def csv_pocessing(
         f"{st.session_state.product_category}/embeddings.json"
     ).upload_from_string(pdf_data.to_json(), "application/json")
     return
+
+
+def get_type(x: any) -> any:
+    """
+    Returns type of variable x.
+    Args:
+        x: Variable whose type is to be applied.
+
+    Returns:
+        datatype of var x.
+    """
+    return type(x)
 
 
 def convert_file_to_data_packets(filename: str) -> None:
@@ -286,8 +304,12 @@ def convert_file_to_data_packets(filename: str) -> None:
         project_id = PROJECT_ID
         storage_client = storage.Client(project=project_id)
         bucket = storage_client.bucket("product_innovation_bucket")
-        blob = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
-        blob2 = bucket.blob(f"{st.session_state.product_category}/{filename.name}")
+        blob = bucket.blob(
+            f"{st.session_state.product_category}/embeddings.json"
+        )
+        blob2 = bucket.blob(
+            f"{st.session_state.product_category}/{filename.name}"
+        )
 
         if blob.exists():
             stored_embedding_data = blob.download_as_string()
@@ -314,7 +336,7 @@ def convert_file_to_data_packets(filename: str) -> None:
                 asyncio.run(csv_pocessing(df, header, dff, bucket, file))
             return
 
-        elif filename.type == "text/plain":
+        if filename.type == "text/plain":
             # If the file is a plain text file, it reads the file and uploads
             # it to the GCS bucket.
             # It then splits the file into chunks and processes each chunk
@@ -391,13 +413,15 @@ def convert_file_to_data_packets(filename: str) -> None:
         with st.spinner("Storing Embeddings"):
             pdf_data = pd.DataFrame.from_dict(final_data)
             pdf_data.reset_index(inplace=True, drop=True)
-            pdf_data["types"] = pdf_data["content"].apply(lambda x: type(x))
+            pdf_data["types"] = pdf_data["content"].apply(get_type)
             pdf_data["embedding"] = pdf_data["content"].apply(
                 lambda x: embedding_model_with_backoff([x])
             )
             pdf_data["embedding"] = pdf_data.embedding.apply(np.array)
             pdf_data = pd.concat([dff, pdf_data])
-            pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
+            pdf_data = pdf_data.drop_duplicates(
+                subset=["content"], keep="first"
+            )
             pdf_data.reset_index(inplace=True, drop=True)
             bucket.blob(
                 f"{st.session_state.product_category}/embeddings.json"

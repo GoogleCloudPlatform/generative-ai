@@ -32,13 +32,9 @@ def get_embeddings(instances: list[str]) -> list[Any]:
         embeddings (list):
             values of embeddings.
     """
-    try:
-        embeddings = embedding_model.get_embeddings(instances)
-        return [embedding.values for embedding in embeddings]
-    except Exception as e:
-        print("NOT PROCESSED")
-        print(e)
-        return []
+
+    embeddings = embedding_model.get_embeddings(instances)
+    return [embedding.values for embedding in embeddings]
 
 
 def generate_embeddings(pdf_data: dict) -> dict:
@@ -71,7 +67,18 @@ def generate_embeddings(pdf_data: dict) -> dict:
 
 
 @functions_framework.http
-def hello_http(request):
+def hello_http(request) -> dict:
+    """
+    Processes request for generating embeddings.
+
+    Args:
+        request:
+            Data for conversion to embeddings with
+            headers by the calling func.
+    Returns:
+        embeddings (dict):
+            generated embeddings
+    """
     request_json = request.get_json(silent=True)
     if not request_json or "pdf_data" not in request_json:
         return {"error": "Request body must contain 'pdf_data' field."}, 400

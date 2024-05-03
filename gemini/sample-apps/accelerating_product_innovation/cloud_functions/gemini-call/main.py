@@ -27,28 +27,26 @@ def generate_text(prompt: str):
     """
     model = GenerativeModel("gemini-pro")
     safety_setting = generative_models.HarmBlockThreshold.BLOCK_NONE
-    try:
-        responses = model.generate_content(
-            prompt,
-            generation_config={
-                "max_output_tokens": 2048,
-                "temperature": 0.001,
-                "top_p": 1,
-            },
-            safety_settings={
-                generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: safety_setting,
-                generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
-                generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
-                generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: safety_setting,
-            },
-            stream=True,
-        )
-        final_response = ""
-        for response in responses:
-            final_response += response.text
-        return final_response
-    except Exception as e:
-        return e
+
+    responses = model.generate_content(
+        prompt,
+        generation_config={
+            "max_output_tokens": 2048,
+            "temperature": 0.001,
+            "top_p": 1,
+        },
+        safety_settings={
+            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: safety_setting,
+            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
+            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
+            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: safety_setting,
+        },
+        stream=True,
+    )
+    final_response = ""
+    for response in responses:
+        final_response += response.text
+    return final_response
 
 
 @functions_framework.http
