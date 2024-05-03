@@ -29,31 +29,19 @@ class Scrape:
         self.num_posts = num_posts
 
 
-def periodic_extraction(scrape_parameters: Scrape, first_period: bool) -> None:
+def periodic_extraction(scrape_parameters: Scrape) -> None:
     """Extracts data from Instagram periodically and saves it in a JSON file.
 
     Args:
             scrape_parameters (Scrape): An object containing the number of countries, influencers, and posts to scrape.
-            first_period (bool): A boolean indicating whether this is the first period.
 
     """
 
-    if first_period:
-        saved = {}
-        saved["global"] = {}
-    else:
-        with open(data_path, "r") as f:
-            saved = json.load(f)
+    saved = {}
+    saved["global"] = {}
 
-    # first scrape is set to True when you are running for the first time in an extraction period
-    first_scrape = True
-    if first_scrape:
-        temp_map = {}
-        scraped_influencers = set()
-    else:
-        with open(data_path, "r") as f:
-            temp_map = json.load(f)
-        scraped_influencers = set(temp_map.keys())
+    temp_map = {}
+    scraped_influencers = set()
 
     cookies = insta_login()
 
@@ -207,24 +195,6 @@ def combine_insta_and_vogue() -> None:
         json.dump(saved, outfile)
 
 
-def create_news_articles_data() -> None:
-    """Extracts news articles from Vogue and saves them in a JSON file."""
-
-    with open(data_path, "r") as f:
-        saved = json.load(f)
-
-    if "articles" not in saved:
-        saved["articles"] = []
-
-    url = "https://www.vogue.in"
-
-    past_scrape = saved["articles"]
-    saved["articles"] = get_articles(url, past_scrape, num_pages=10)
-
-    with open(data_path, "w") as outfile:
-        json.dump(saved, outfile)
-
-
 def get_top_categories(saved: dict) -> None:
     """Gets the top categories from the final data file.
 
@@ -252,7 +222,7 @@ def insta_scrape() -> None:
     scrape_parameters = Scrape(num_countries=10, num_influencers=20, num_posts=50)
 
     # set first to True if this is the first time you are extracting
-    periodic_extraction(scrape_parameters=scrape_parameters, first_period=True)
+    periodic_extraction(scrape_parameters)
 
     with open(data_path, "r") as f:
         saved = json.load(f)
@@ -268,7 +238,16 @@ def insta_scrape() -> None:
 def vogue_scrape() -> None:
     """Scrapes data from Vogue and saves it in a JSON file."""
 
-    create_news_articles_data()
+    with open(data_path, "r") as f:
+        saved = json.load(f)
+
+    if "articles" not in saved:
+        saved["articles"] = []
+    saved["articles"] = get_articles("https://www.vogue.in", saved["articles"], num_pages=10)
+
+    with open(data_path, "w") as outfile:
+        json.dump(saved, outfile)
+
     prepare_data_for_retriever()
 
 

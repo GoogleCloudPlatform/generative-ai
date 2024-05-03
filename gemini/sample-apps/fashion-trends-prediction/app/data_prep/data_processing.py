@@ -6,12 +6,11 @@ import urllib.request
 
 from data_prep_genai_prompts import image_attribute_prompt
 import requests
-import vertexai.preview.generative_models as generative_models
 
 sys.path.append("../")
 from config import config
 from helper_functions_insta import get_id
-from vertexai.preview.generative_models import GenerationConfig, GenerativeModel, Part
+from vertexai.preview.generative_models import GenerationConfig, GenerativeModel, Part, HarmCategory, HarmBlockThreshold
 
 gemini_model: GenerativeModel = GenerativeModel("gemini-1.0-pro-vision-001")
 gemini_model_language: GenerativeModel = GenerativeModel("gemini-1.0-pro-002")
@@ -55,10 +54,10 @@ def generate_caption(image_path: str) -> dict:
             top_k=32,
         ),
         safety_settings={
-            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         },
         stream=False,
     ).text
@@ -79,7 +78,7 @@ def generate_caption(image_path: str) -> dict:
     return answer
 
 
-def get_posts(user: str, previous: list, count: int = 10, cookies: dict = {}) -> list:
+def get_posts(user: str, previous: list, count: int = 10, cookies: dict = None) -> list:
     """Gets a list of posts from an Instagram user.
 
     Args:
@@ -139,7 +138,7 @@ def get_posts(user: str, previous: list, count: int = 10, cookies: dict = {}) ->
 
             try:
                 caption = generate_caption(actual_img_path)
-            except generative_models.GenerationError as e:
+            except Exception as e:
                 print(e)
             else:
                 posts = [(postid, postlink, caption)] + posts  # newest post stays first
@@ -177,10 +176,10 @@ def summarize_article(article_text: str) -> str:
             top_p=1,
         ),
         safety_settings={
-            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         },
         stream=False,
     )

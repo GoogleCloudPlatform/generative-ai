@@ -21,6 +21,7 @@ def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
             list: A list of tuples containing the article URL, summary, and attributes.
 
     """
+
     if len(past_scrape) != 0:
         latest_link = past_scrape[0][0]
     else:

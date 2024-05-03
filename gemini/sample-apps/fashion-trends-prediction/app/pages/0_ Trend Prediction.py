@@ -4,7 +4,6 @@ import logging
 import streamlit as st
 import streamlit.components.v1 as components
 import vertexai
-import vertexai.preview.generative_models as generative_models
 
 import sys
 sys.path.append("../")
@@ -17,7 +16,7 @@ from genai_prompts import IMAGE_PROMPT, TRENDS_PROMPT
 from prediction import Prediction
 from utilities import add_logo, button_html_script, details_html, exception_html
 from utils_standalone_image_gen import image_generation
-from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
+from vertexai.preview.generative_models import GenerationConfig, GenerativeModel, HarmCategory, HarmBlockThreshold
 
 logging.basicConfig(level=logging.INFO)
 
@@ -233,10 +232,10 @@ if submit or key in st.session_state:
                                             top_k=32,
                                         ),
                                         safety_settings={
-                                            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                                            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                                            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                                            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
                                         },
                                         stream=False,
                                     ).text

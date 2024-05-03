@@ -1,3 +1,42 @@
+def fashion_bot_context(country: str, category: str, data: dict) -> str:
+    """Generates a context for the fashion bot based on the given country and category.
+
+    Args:
+        country (str): The country for which to generate the context.
+        category (str): The category of outfit for which to generate the context.
+        data (dict): The data to use to generate the context.
+
+    Returns:
+        str: The generated context.
+    """
+
+    context = f"""You are a fashion expert in {category}. Answer fashion related queries solely based on the data provided.
+
+    Important points -
+    - The data provided represents what popular influencers are wearing nowadays
+    - If user asks about something that is not present in the data, answer that it is not trending in fashion
+    - Popularity of an item is proportional to its counts in the data
+    - Counts of the item includes the frequency of semantically similar items
+    - Don't mention counts with answer
+    - If item is not in data provided, it is not fashionable.
+
+    {category.capitalize()} data - """
+
+    outfits_list = []
+    if country in data and category in data[country]:
+        for outfit in data[country][category]:
+            if isinstance(outfit, str)
+                outfits_list.append(outfit)
+            if len(outfits_list) > 3000:
+                break
+
+    context += ", ".join(outfits_list)
+    return context
+
+
+FASHION_BOT_IMG_GEN_INTENT = "{text}, what does the user want to generate image of based on current chat history? Strictly give the name of the outfit only."
+
+
 IMAGE_PROMPT = """
 
 You are a fashion designer at a fast fashion retailer and your goal is to visualize different draft styles for a given outfit.
