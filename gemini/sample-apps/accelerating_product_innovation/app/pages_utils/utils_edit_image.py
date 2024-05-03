@@ -27,11 +27,12 @@ generation page.
 
 import io
 import logging
+import streamlit as st
 
 import PIL
 from PIL import Image
 from app.pages_utils.utils_imagen import edit_image_generation
-import streamlit as st
+
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
