@@ -87,8 +87,7 @@ st.title("Fashion Trend Prediction")
 uploaded_file = st.file_uploader("Choose a file (optional)")
 
 if uploaded_file is not None and st.session_state["source"] != uploaded_file.name:
-    stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-    string_data = stringio.read()
+    string_data = StringIO(uploaded_file.getvalue().decode("utf-8")).read()
     st.session_state["source"] = uploaded_file.name
     st.session_state["JSONdata"] = json.loads(string_data)
 
