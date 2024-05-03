@@ -9,7 +9,7 @@ import os
 
 from dotenv import load_dotenv
 import functions_framework
-import vertexai.preview.generative_models as generative_models
+from vertexai.preview import generative_models
 from vertexai.preview.generative_models import GenerativeModel
 
 load_dotenv()

@@ -2,6 +2,8 @@
 Utility module to work with app config.
 """
 
+# pylint: disable=E0401
+
 from os.path import isfile
 
 import pytomlpp
@@ -20,7 +22,10 @@ with open(APP_TOML, "rb") as f:
         raise
 
 
-def merge(a: dict, b: dict):
+def merge(a: dict, b: dict) -> None:
+    """
+    merge dictionaries a and b.
+    """
     for key in b:
         if key in a:
             if isinstance(a[key], dict) and isinstance(b[key], dict):

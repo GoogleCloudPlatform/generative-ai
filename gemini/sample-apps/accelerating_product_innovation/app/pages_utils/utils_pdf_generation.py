@@ -14,10 +14,10 @@ documents.
 """
 
 # pylint: disable=E0401
-
-from math import sqrt
+# pylint: disable=R0913
 
 import fpdf
+from math import sqrt
 
 
 class PDFRounded(fpdf.FPDF):
@@ -74,7 +74,7 @@ class PDFRounded(fpdf.FPDF):
         if "2" not in corners:
             self._out(f"{(x + w) * k} {(hp - y) * k} l")
         else:
-            self._arc(
+            self.arc(
                 xc + r * my_arc,
                 yc - r,
                 xc + r,
@@ -89,7 +89,7 @@ class PDFRounded(fpdf.FPDF):
         if "3" not in corners:
             self._out(f"{(x + w) * k} {(hp - (y + h)) * k} l")
         else:
-            self._arc(
+            self.arc(
                 xc + r,
                 yc + r * my_arc,
                 xc + r * my_arc,
@@ -104,7 +104,7 @@ class PDFRounded(fpdf.FPDF):
         if "4" not in corners:
             self._out(f"{x * k} {(hp - (y + h)) * k} l")
         else:
-            self._arc(
+            self.arc(
                 xc - r * my_arc,
                 yc + r,
                 xc - r,
@@ -120,7 +120,7 @@ class PDFRounded(fpdf.FPDF):
             self._out(f"{x * k} {(hp - y) * k} l")
             self._out(f"{(x + r) * k} {(hp - y) * k} l")
         else:
-            self._arc(
+            self.arc(
                 xc - r,
                 yc - r * my_arc,
                 xc - r * my_arc,
@@ -130,7 +130,9 @@ class PDFRounded(fpdf.FPDF):
             )
         self._out(op)
 
-    def _arc(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float):
+    def arc(
+        self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float
+    ):
         """
         Draws an arc.
 
