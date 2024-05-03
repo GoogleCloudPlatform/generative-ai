@@ -9,7 +9,6 @@ import io
 import logging
 import os
 import zipfile
-import streamlit as st
 
 from app.pages_utils.utils_export_content_pdf import (
     create_content_pdf,
@@ -18,6 +17,7 @@ from app.pages_utils.utils_export_content_pdf import (
 from app.pages_utils.utils_get_llm_response import generate_gemini
 from app.pages_utils.utils_imagen import image_generation
 from dotenv import load_dotenv
+import streamlit as st
 import streamlit.components.v1 as components
 
 load_dotenv()
@@ -170,9 +170,7 @@ def download_file() -> None:
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(
-            zip_buffer.getvalue(), f"email_{email_file_title}.zip"
-        ),
+        download_button(zip_buffer.getvalue(), f"email_{email_file_title}.zip"),
         height=0,
     )
     st.success("Email Copies Downloaded")
