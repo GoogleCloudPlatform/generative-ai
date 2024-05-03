@@ -1,10 +1,11 @@
 {
   "extends": [
-    "group:allNonMajor"
+    "config:base"
   ],
   "prConcurrentLimit": 0,
   "lockFileMaintenance": {
-    "enabled": false
+    "enabled": true,
+    "automerge": true
   },
   "packageRules": [
     {
@@ -23,10 +24,6 @@
     {
       "matchUpdateTypes": ["patch"],
       "extends": ["schedule:quarterly"]
-    },
-    {
-      "matchDepTypes": ["all"],
-      "excludePaths": ["gemini/sample-apps/genwealth/**"]
     }
   ],
   "vulnerabilityAlerts": {
