@@ -1,2 +1,2 @@
 # .super-linter.yaml
-python_path: /backend/
+PYTHONPATH: .
