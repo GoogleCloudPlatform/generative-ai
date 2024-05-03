@@ -59,9 +59,8 @@ class Mail:
                 with open(file_path, "rb") as fil:
                     part = MIMEApplication(fil.read(), Name=basename(file_path))
                 # After the file is closed
-                part[
-                    "Content-Disposition"
-                ] = f'attachment; filename="{basename(file_path)}"'
+                content_dis = f'attachment; filename="{basename(file_path)}"'
+                part["Content-Disposition"] = content_dis
                 msg.attach(part)
 
             server = smtplib.SMTP("smtp.gmail.com", 587)
