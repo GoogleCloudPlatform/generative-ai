@@ -1,3 +1,4 @@
+pylint
 vertexai
 google-auth
 google-cloud-documentai
@@ -24,10 +25,15 @@ fpdf
 opencv-python-headless
 python-docx
 dask
+dotenv
+pillow
 st_pages
 numpy
 docx
 distributed
+pandas
+aiohttp
+
 
 
 

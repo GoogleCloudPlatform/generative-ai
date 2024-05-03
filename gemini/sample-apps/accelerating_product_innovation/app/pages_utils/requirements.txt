@@ -1,3 +1,4 @@
+pylint
 vertexai
 google-auth
 google-cloud-documentai
