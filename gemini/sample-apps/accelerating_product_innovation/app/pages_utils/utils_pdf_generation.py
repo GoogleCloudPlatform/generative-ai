@@ -130,9 +130,7 @@ class PDFRounded(fpdf.FPDF):
             )
         self._out(op)
 
-    def _arc(
-        self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float
-    ):
+    def _arc(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float):
         """
         Draws an arc.
 

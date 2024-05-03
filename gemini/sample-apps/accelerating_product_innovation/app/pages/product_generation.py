@@ -162,8 +162,5 @@ if (
                 )
 
     # If user clicks edit image, redirect to edit page
-    if (
-        st.session_state.image_to_edit != -1
-        or st.session_state.generate_images is True
-    ):
+    if st.session_state.image_to_edit != -1 or st.session_state.generate_images is True:
         st.switch_page("pages/edit_image.py")
