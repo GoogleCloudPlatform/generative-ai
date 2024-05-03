@@ -131,7 +131,7 @@ class Driver:
                     [{"intent": "Recommended Policy", "data": {"response": answer}}],
                 )
 
-        except Exception as e:
+        except ValueError as e:
             if e.args[0] == "Policy not found":
                 answer = "Policy not in database"
             else:

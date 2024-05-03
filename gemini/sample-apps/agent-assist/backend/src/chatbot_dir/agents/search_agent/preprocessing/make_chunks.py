@@ -10,6 +10,7 @@ from langchain.document_loaders import PyMuPDFLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
+# pylint: disable=R0914
 def make_chunks(document_path: str, policy_name: str) -> None:
     """Makes chunks of text from a PDF document.
 
@@ -25,7 +26,7 @@ def make_chunks(document_path: str, policy_name: str) -> None:
 
     try:
         os.makedirs(tables_path)
-    except Exception as e:
+    except ValueError as e:
         print(e)
 
     policy_name = document_path.split("/")[-1].split(".")[0]

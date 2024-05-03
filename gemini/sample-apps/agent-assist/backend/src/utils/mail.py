@@ -59,9 +59,9 @@ class Mail:
                 with open(file_path, "rb") as fil:
                     part = MIMEApplication(fil.read(), Name=basename(file_path))
                 # After the file is closed
-                part[
-                    "Content-Disposition"
-                ] = f'attachment; filename="{basename(file_path)}"'
+                part["Content-Disposition"] = (
+                    f'attachment; filename="{basename(file_path)}"'
+                )
                 msg.attach(part)
 
             server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -71,9 +71,10 @@ class Mail:
             server.quit()
             print("Email sent successfully")
 
-        except Exception as e:
+        except ValueError as e:
             print("Error: unable to send email", e)
 
+    # pylint: disable=R0914
     def send_calendar_event(self, param: dict) -> None:
         """
         Function to send an ics file of the event to the email account of the receipient
@@ -89,7 +90,7 @@ class Mail:
 
         try:
             param["location"]
-        except Exception as e:
+        except ValueError as e:
             print(e)
             param["location"] = "https://meet.google.com/ybf-xwfa-ygj"
 
@@ -106,7 +107,7 @@ class Mail:
                     + att
                     + crlf
                 )
-        except Exception as e:
+        except ValueError as e:
             print(e)
 
         __location__ = os.path.realpath(
@@ -130,7 +131,7 @@ class Mail:
             replaced_contents = replaced_contents.replace(
                 "now", datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ")
             )
-        except Exception as e:
+        except ValueError as e:
             print(e)
 
         replaced_contents = replaced_contents.replace("attend", attendees)
@@ -161,6 +162,7 @@ class Mail:
 
         print("Email sent successfully")
 
+    # pylint: disable=R0914
     def read_email(self):
         """
         Reads emails from the inbox.

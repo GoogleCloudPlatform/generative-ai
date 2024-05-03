@@ -58,6 +58,7 @@ def get_marketing_and_outreach_data() -> tuple[dict, int]:
     )
 
 
+# pylint: disable=R0914
 def get_metrics_data(
     data: list, start_date: str, end_date: str
 ) -> tuple[int, int, int, int, int, float, str, list]:

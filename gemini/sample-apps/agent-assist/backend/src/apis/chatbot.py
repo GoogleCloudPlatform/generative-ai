@@ -8,7 +8,7 @@ import json
 from chatbot_dir.orchestration_engine import run_orchestrator
 
 
-def chatbot_entry(data: dict) -> None:
+def chatbot_entry(data: dict) -> str:
     """
     This function is the main entry point for the chatbot.
     It takes a dictionary of data as input and returns a dictionary of data as output.
@@ -39,7 +39,7 @@ def chatbot_entry(data: dict) -> None:
 
     run_orchestrator(query, chat_history_string)
 
-    return None
+    return "success"
 
 
 def process_history(chat_history):

@@ -54,7 +54,8 @@ def generate_answer(question: str) -> str:
 
     today = date.today()
     formatted_date = today.strftime("%d/%m/%Y")
-    df = pd.DataFrame(policy_json)
+    # diabling pylint unused variable check here, variable used in locals()
+    df = pd.DataFrame(policy_json)  # pylint: disable=W0641
     prompt = SQL_PROMPT.format(question=question, date_today=formatted_date)
     answer = tb.generate_response(prompt=prompt)
     answer = answer.replace("<SQL>", "")
@@ -71,7 +72,7 @@ def generate_answer(question: str) -> str:
         print("answer_natural_language : ", answer_natural_language)
         return answer_natural_language
 
-    except Exception as e:
+    except ValueError as e:
         print(e)
         return "Unable to answer. Try again!!"
 

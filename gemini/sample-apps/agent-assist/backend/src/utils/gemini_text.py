@@ -29,8 +29,6 @@ class GeminiText:
 
     def __init__(
         self,
-        project_id=config["PROJECT_ID"],
-        location=config["LOCATION"],
         max_output_tokens=2048,
         temperature=0,
         top_p=0.8,
@@ -47,8 +45,8 @@ class GeminiText:
             top_p (float): The top-p value to use for sampling.
             top_k (int): The top-k value to use for sampling.
         """
-        self.project_id = project_id
-        self.location = location
+        self.project_id = config["PROJECT_ID"]
+        self.location = config["LOCATION"]
         self.parameters = {
             "max_output_tokens": max_output_tokens,
             "temperature": temperature,

@@ -49,7 +49,7 @@ def get_data_from_threads(service, emailid, threads):
                     try:
                         message = data["payload"]["parts"][0]["body"]["data"]
                         message = base64.b64decode(message)
-                    except Exception as e:
+                    except ValueError as e:
                         print("Error: " + str(e))
                         message = ""
                     try:
@@ -61,7 +61,7 @@ def get_data_from_threads(service, emailid, threads):
                             ),
                             "",
                         )
-                    except Exception as e:
+                    except ValueError as e:
                         print("Error: " + str(e))
                         subject = ""
 
@@ -74,7 +74,7 @@ def get_data_from_threads(service, emailid, threads):
                             ),
                             {"value": datetime.now().date()},
                         )
-                    except Exception as e:
+                    except ValueError as e:
                         print("Error: " + str(e))
                         date = {"value": datetime.now().date()}
 

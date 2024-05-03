@@ -23,7 +23,7 @@ def main():
 
     try:
         os.makedirs(EXAMPLES_PATH)
-    except Exception as e:
+    except ValueError as e:
         print(e)
 
     with open(EXAMPLES_PATH, encoding="UTF-8") as f:

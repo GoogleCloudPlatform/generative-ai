@@ -36,7 +36,7 @@ def generate_mail() -> tuple[dict, int]:
             PROMPT_TO_GENERATE_MAIL.format(query=text_to_generate)
         )
         return jsonify({"generatedMail": response}), 200
-    except Exception as e:
+    except ValueError as e:
         return (
             jsonify(
                 {

@@ -65,5 +65,5 @@ def get_policies(query: str):
     print("policies names:", response_policies)
 
     if isinstance(response, str):
-        raise Exception("Policy not found")
+        raise ValueError("Policy not found")
     return response
