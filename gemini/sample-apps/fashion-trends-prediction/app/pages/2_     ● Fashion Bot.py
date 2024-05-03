@@ -216,14 +216,13 @@ with st.container(border=True):
                 gen_prompt = img_gen_prompt(st.session_state["prompt"]) + " " + category
                 print(gen_prompt)
                 try:
-                    _imgs = image_generation(prompt=gen_prompt + " " + category,
-                                    sample_count=1,
-                                    state_key='imagen_image')
+                    _imgs = image_generation(
+                        prompt=gen_prompt + " " + category,
+                        sample_count=1,
+                        state_key="imagen_image",
+                    )
 
-                    imgs = [
-                        _img._image_bytes
-                        for _img in _imgs
-                    ]
+                    imgs = [_img._image_bytes for _img in _imgs]
                     st.session_state[hist_key].append(
                         ["image", imgs[0], False, time.time()]
                     )

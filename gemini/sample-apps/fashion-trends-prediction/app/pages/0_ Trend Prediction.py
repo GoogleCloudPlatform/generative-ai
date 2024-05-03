@@ -1,12 +1,12 @@
 import json
 import logging
+import sys
 
 import streamlit as st
 import streamlit.components.v1 as components
 import vertexai
 import vertexai.preview.generative_models as generative_models
 
-import sys
 sys.path.append("../")
 from io import StringIO
 
@@ -224,26 +224,35 @@ if submit or key in st.session_state:
                     try:
                         print(state.keys())
                         if state[outfit] == {}:
-                            prompt = st.session_state["gemini_model"].generate_content(
-                                        IMAGE_PROMPT.format(outfit=outfit),
-                                        generation_config=GenerationConfig(
-                                            max_output_tokens=2048,
-                                            temperature=0.2,
-                                            top_p=1,
-                                            top_k=32,
-                                        ),
-                                        safety_settings={
-                                            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                                            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                                            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                                            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-                                        },
-                                        stream=False,
-                                    ).text
+                            prompt = (
+                                st.session_state["gemini_model"]
+                                .generate_content(
+                                    IMAGE_PROMPT.format(outfit=outfit),
+                                    generation_config=GenerationConfig(
+                                        max_output_tokens=2048,
+                                        temperature=0.2,
+                                        top_p=1,
+                                        top_k=32,
+                                    ),
+                                    safety_settings={
+                                        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                                    },
+                                    stream=False,
+                                )
+                                .text
+                            )
 
-                            state[outfit]["imgs"] = [_img._image_bytes for _img in image_generation(prompt=prompt,
-                                                        sample_count=1,
-                                                        state_key='imagen_image')]
+                            state[outfit]["imgs"] = [
+                                _img._image_bytes
+                                for _img in image_generation(
+                                    prompt=prompt,
+                                    sample_count=1,
+                                    state_key="imagen_image",
+                                )
+                            ]
 
                         if len(state[outfit]["imgs"]) > 0:
                             st.image(state[outfit]["imgs"][0], use_column_width=True)
