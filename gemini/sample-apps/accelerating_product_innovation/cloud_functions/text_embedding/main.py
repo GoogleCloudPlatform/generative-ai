@@ -84,4 +84,5 @@ def hello_http(request) -> tuple[dict[str, str], int]:
     if not request_json or "pdf_data" not in request_json:
         return {"error": "Request body must contain 'pdf_data' field."}, 400
     pdf_data = request_json["pdf_data"]
-    return generate_embeddings(pdf_data)
+    embeddings = generate_embeddings(pdf_data)
+    return embeddings, 200

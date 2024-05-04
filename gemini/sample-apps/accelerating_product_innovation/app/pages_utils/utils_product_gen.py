@@ -56,8 +56,12 @@ def update_generation_state() -> None:
     st.session_state.selected_titles = (
         []
     )  # Stores selected titles for new product generation.
-    st.session_state.product_content = []  # Content corresponding to each feature.
-    st.session_state.content_edited = False  # Tracks whether content is being edited.
+    st.session_state.product_content = (
+        []
+    )  # Content corresponding to each feature.
+    st.session_state.content_edited = (
+        False  # Tracks whether content is being edited.
+    )
 
 
 def generate_product_suggestions_for_feature_generation() -> None:
@@ -73,7 +77,9 @@ def generate_product_suggestions_for_feature_generation() -> None:
             buyers. Give answer as a numbered list. Each point should
             strictly be only a category without any description."""
         )
-        st.session_state.feature_suggestions = create_suggestion_list(feature_prompts)
+        st.session_state.feature_suggestions = create_suggestion_list(
+            feature_prompts
+        )
 
 
 def build_prompt_form() -> bool:
@@ -83,13 +89,14 @@ def build_prompt_form() -> bool:
         Boolean value indicating whether the form was submitted.
     """
     if st.session_state.feature_suggestions is None:
+        st.session_state.feature_suggestions = []
         generate_product_suggestions_for_feature_generation()
     with st.form("prompt input"):
         options = [
             f"""Recommend {st.session_state.product_category} formulation
             features for {segment}"""
             for segment in st.session_state.feature_suggestions
-            if segment is not None
+            if st.session_state.feature_suggestions is not None
         ]
         st.session_state.selected_prompt = st.selectbox(
             "Select an option or enter a custom query",
@@ -143,7 +150,9 @@ async def parallel_call(title_arr: list[str]) -> list[Any]:
             break
 
         # Create image generation and text generation prompts.
-        img_prompt = f"{st.session_state.product_category} with {title} packaging."
+        img_prompt = (
+            f"{st.session_state.product_category} with {title} packaging."
+        )
         text_prompt = f"""Generate an innovative and original idea for a
         {st.session_state.product_category} that is {title} for
         {st.session_state.selected_prompt}. List ingredients of the suggested
@@ -157,10 +166,14 @@ async def parallel_call(title_arr: list[str]) -> list[Any]:
         # Parallel calls to generate new content.
         if st.session_state.content_generated is False:
             text_processes.append(
-                asyncio.create_task(parallel_generate_search_results(text_prompt))
+                asyncio.create_task(
+                    parallel_generate_search_results(text_prompt)
+                )
             )
             img_processes.append(
-                asyncio.create_task(parallel_image_generation(img_prompt, index))
+                asyncio.create_task(
+                    parallel_image_generation(img_prompt, index)
+                )
             )
 
     # Append the generated content to final resul arrays.
@@ -207,9 +220,11 @@ async def generate_product_content() -> None:
     """
 
     if st.session_state.product_content is None:
-        st.session_state.product_content = []  # Initialize product content storage
+        st.session_state.product_content = (
+            []
+        )  # Initialize product content storage
 
-    elements: list[dict[str, Any]] = []
+    elements: list[list[dict[str, Any]]] = []
 
     with st.spinner("Generating Product Ideas.."):
         # Fetch appropriate titles for processing
@@ -242,7 +257,9 @@ async def generate_product_content() -> None:
                     current_content.append(text_result_arr[i])
                     st.session_state.product_content.append(current_content)
                 else:
-                    st.session_state.assorted_prod_content.append(text_result_arr[i])
+                    st.session_state.assorted_prod_content.append(
+                        text_result_arr[i]
+                    )
 
                 # Build data for display elements
                 elements[i].append(
@@ -304,4 +321,6 @@ async def handle_content_generation(features: st.container) -> None:
     # Prepare titles for processing.
     st.session_state.chosen_titles = st.session_state.selected_titles.copy()
     if len(st.session_state.selected_titles) > 1:
-        st.session_state.chosen_titles.append(st.session_state.assorted_prod_title)
+        st.session_state.chosen_titles.append(
+            st.session_state.assorted_prod_title
+        )
