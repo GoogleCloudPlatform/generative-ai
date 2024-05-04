@@ -29,7 +29,7 @@ while read -r line; do
         fi
         previous_data="$word"
     done
-done <$file 
+done <$file
 
 echo "se: $YOUR_EMAIL"
 echo "pn : $PROJECT_NUMBER"
@@ -66,7 +66,7 @@ while read -r line; do
         fi
         previous_data="$word"
     done
-done <$file 
+done <$file
 echo "Imagen Call URL: $imagen_call_url" > cloud_functions_urls
 
 gcloud functions deploy gemini-call \
@@ -89,7 +89,7 @@ while read -r line; do
         fi
         previous_data="$word"
     done
-done <$file 
+done <$file
 echo "Text Bison Call URL: $text_bison_url" >> cloud_functions_urls
 
 
