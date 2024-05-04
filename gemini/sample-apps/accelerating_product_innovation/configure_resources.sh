@@ -8,26 +8,26 @@ while IFS= read -r line; do
     for word in $line; do
         echo "pw: $previous_data, w: $word"
         case "$previous_data" in
-            "PROJECT_ID")
-                echo "pid"
-                PROJECT_ID="$word"
-                ;;
-            "LOCATION")
-                echo "loc"
-                LOCATION="$word"
-                ;;
-            "REGION")
-                echo "reg"
-                REGION="$word"
-                ;;
-            "YOUR_EMAIL")
-                echo "se"
-                YOUR_EMAIL="$word"
-                ;;
-            "PROJECT_NUMBER")
-                echo "pn"
-                PROJECT_NUMBER="$word"
-                ;;
+        "PROJECT_ID")
+            echo "pid"
+            PROJECT_ID="$word"
+            ;;
+        "LOCATION")
+            echo "loc"
+            LOCATION="$word"
+            ;;
+        "REGION")
+            echo "reg"
+            REGION="$word"
+            ;;
+        "YOUR_EMAIL")
+            echo "se"
+            YOUR_EMAIL="$word"
+            ;;
+        "PROJECT_NUMBER")
+            echo "pn"
+            PROJECT_NUMBER="$word"
+            ;;
         esac
         previous_data="$word"
     done
@@ -56,7 +56,7 @@ gcloud functions deploy imagen-call \
     --trigger-http \
     --set-env-vars location="$LOCATION" \
     --set-env-vars project_id="$PROJECT_ID" \
-    --set-env-vars MEMORY=512MB > cloud_fn_1
+    --set-env-vars MEMORY=512MB >cloud_fn_1
 
 file="cloud_fn_1"
 previous_data=""
@@ -68,7 +68,7 @@ while IFS= read -r line; do
         previous_data="$word"
     done
 done <"$file"
-echo "Imagen Call URL: $imagen_call_url" > cloud_functions_urls
+echo "Imagen Call URL: $imagen_call_url" >cloud_functions_urls
 
 gcloud functions deploy gemini-call \
     --allow-unauthenticated \
@@ -82,7 +82,7 @@ gcloud functions deploy gemini-call \
     --trigger-http \
     --set-env-vars location="$LOCATION" \
     --set-env-vars project_id="$PROJECT_ID" \
-    --set-env-vars MEMORY=512MB > cloud_fn_1
+    --set-env-vars MEMORY=512MB >cloud_fn_1
 
 while IFS= read -r line; do
     for word in $line; do
@@ -92,7 +92,7 @@ while IFS= read -r line; do
         previous_data="$word"
     done
 done <"$file"
-echo "Text Bison Call URL: $text_bison_url" >> cloud_functions_urls
+echo "Text Bison Call URL: $text_bison_url" >>cloud_functions_urls
 
 gcloud functions deploy text-embedding \
     --allow-unauthenticated \
@@ -106,7 +106,7 @@ gcloud functions deploy text-embedding \
     --trigger-http \
     --set-env-vars location="$LOCATION" \
     --set-env-vars project_id="$PROJECT_ID" \
-    --set-env-vars MEMORY=512MB > cloud_fn_1
+    --set-env-vars MEMORY=512MB >cloud_fn_1
 
 while IFS= read -r line; do
     for word in $line; do
@@ -116,7 +116,7 @@ while IFS= read -r line; do
         previous_data="$word"
     done
 done <"$file"
-echo "Text Embedding URL: $text_embedding_url" >> cloud_functions_urls
+echo "Text Embedding URL: $text_embedding_url" >>cloud_functions_urls
 rm cloud_fn_1
 
 # Set project ID, region, and service name (modify as needed)
