@@ -19,7 +19,7 @@ It provides the following features:
 import logging
 
 from PIL import Image
-from app.pages_utils import utils
+from app.pages_utils import utils_setup
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_edit_image import (
     generate_suggested_images,
@@ -36,7 +36,7 @@ import streamlit as st
 page_cfg = PAGES_CFG["Editor"]
 
 # Setup the general state of the app if uninitialized.
-utils.page_setup(page_cfg)
+utils_setup.page_setup(page_cfg)
 
 # Initialize the state of the edit page
 initialize_edit_page_state()
@@ -49,7 +49,10 @@ if st.session_state.uploaded_img is True:
     handle_image_upload()
 
 # Check if the user has started editing the image
-if st.session_state.start_editing is None or st.session_state.start_editing is True:
+if (
+    st.session_state.start_editing is None
+    or st.session_state.start_editing is True
+):
     # Initialize Editor
     image_editor = ImageEditor()
 

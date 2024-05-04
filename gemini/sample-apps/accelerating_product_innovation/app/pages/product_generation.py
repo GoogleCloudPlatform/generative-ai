@@ -19,7 +19,7 @@ with a focus on guiding users through product generation. This module:
 import asyncio
 import logging
 
-from app.pages_utils import utils
+from app.pages_utils import utils_setup
 from app.pages_utils.utils_config import PAGES_CFG
 from app.pages_utils.utils_downloads import download_content, download_file
 from app.pages_utils.utils_draft_generation import ProductDrafts
@@ -77,13 +77,13 @@ def initialize_prod_gen() -> None:
 # Initialize page config.
 page_cfg = PAGES_CFG["3_Generations"]
 
-utils.page_setup(page_cfg)
+utils_setup.page_setup(page_cfg)
 
 # Set product generation states.
 initialize_prod_gen()
 
 # Page styles
-utils.load_css("app/css/prod_gen_styles.css")
+utils_setup.load_css("app/css/prod_gen_styles.css")
 # logging initialization
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
@@ -94,7 +94,7 @@ st.write(
 )
 
 # Display the project selected by the user
-utils.display_projects()
+utils_setup.display_projects()
 
 # Product generate form
 generate_btn = build_prompt_form()
@@ -162,5 +162,8 @@ if (
                 )
 
     # If user clicks edit image, redirect to edit page
-    if st.session_state.image_to_edit != -1 or st.session_state.generate_images is True:
+    if (
+        st.session_state.image_to_edit != -1
+        or st.session_state.generate_images is True
+    ):
         st.switch_page("pages/edit_image.py")

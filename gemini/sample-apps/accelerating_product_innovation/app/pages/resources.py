@@ -14,13 +14,17 @@ functionalities include:
 
 # pylint: disable=E0401
 
-from app.pages_utils import utils, utils_project, utils_resources_store_embeddings
+from app.pages_utils import (
+    utils_setup,
+    utils_project,
+    utils_resources_store_embeddings,
+)
 from app.pages_utils.utils_config import PAGES_CFG
 import streamlit as st
 
 # Get the page configuration from the config file
 page_cfg = PAGES_CFG["1_Resources"]
-utils.page_setup(page_cfg)
+utils_setup.page_setup(page_cfg)
 
 # Initialize project form submission state if not already initialized
 if "project_form_submitted" not in st.session_state:
@@ -49,7 +53,7 @@ screen = st.container()
 # Create a form for the resources page
 with st.form(key="resources_form", clear_on_submit=True):
     # Display the projects
-    utils.display_projects()
+    utils_setup.display_projects()
 
     # Add a text input field for adding a new project category
     st.session_state.new_product_category_added = st.text_input(
@@ -78,7 +82,9 @@ if submitted:
         and st.session_state.new_product_category_added != ""
     ):
         # Update the product category list
-        st.session_state.product_category = st.session_state.new_product_category_added
+        st.session_state.product_category = (
+            st.session_state.new_product_category_added
+        )
         st.session_state.product_categories = [
             st.session_state.new_product_category_added
         ] + st.session_state.product_categories
@@ -101,7 +107,9 @@ if submitted:
     if st.session_state.uploaded_files is not None:
         # Convert the uploaded files to data packets and upload them to GCS
         for uploaded_file in st.session_state.uploaded_files:
-            utils_resources_store_embeddings.convert_file_to_data_packets(uploaded_file)
+            utils_resources_store_embeddings.convert_file_to_data_packets(
+                uploaded_file
+            )
 
 
 # Check if the project form was submitted and the file upload is complete
@@ -166,7 +174,9 @@ if st.session_state.project_form_submitted is True:
             with list_files_columns[1]:
                 st.download_button(
                     label=":arrow_down:",
-                    data=utils_project.get_file_contents(file[0][len_prod_cat:]),
+                    data=utils_project.get_file_contents(
+                        file[0][len_prod_cat:]
+                    ),
                     file_name=file[0][len_prod_cat:],
                     mime=file[1],
                 )
@@ -177,4 +187,6 @@ if st.session_state.project_form_submitted is True:
                     ":x:",
                     key=file[0][len_prod_cat:],
                 ):
-                    utils_project.delete_file_from_gcs(file_name=file[0][len_prod_cat:])
+                    utils_project.delete_file_from_gcs(
+                        file_name=file[0][len_prod_cat:]
+                    )

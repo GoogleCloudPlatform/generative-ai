@@ -17,13 +17,13 @@ It provides the following functionality:
 
 # pylint: disable=E0401
 
-from app.pages_utils import utils, utils_insights
+from app.pages_utils import utils_setup, utils_insights
 from app.pages_utils.utils_config import PAGES_CFG
 import streamlit as st
 
 # Get page configuration from config file
 page_cfg = PAGES_CFG["2_Marketing_Insights"]
-utils.page_setup(page_cfg)
+utils_setup.page_setup(page_cfg)
 
 # Initialize temporary suggestions if not already initialized
 if "temp_suggestions" not in st.session_state:
@@ -49,7 +49,7 @@ def get_insights_img() -> None:
 get_insights_img()
 
 # Display projects
-utils.display_projects()
+utils_setup.display_projects()
 
 # Check if data frame is empty
 if st.session_state.dff is None or st.session_state.dff.empty:
@@ -67,16 +67,16 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
         suggestion_num: Current suggestion number.
     """
     # Apply custom styling to suggestion box
-    utils.load_css("app/css/prod_insights_styles.css")
+    utils_setup.load_css("app/css/prod_insights_styles.css")
     # Display suggestion button
     if st.button(
         st.session_state.insights_suggestion[suggestion_num],
         key=key,
     ):
         # Update session state with selected suggestion
-        st.session_state.insights_placeholder = st.session_state.insights_suggestion[
-            suggestion_num
-        ]
+        st.session_state.insights_placeholder = (
+            st.session_state.insights_suggestion[suggestion_num]
+        )
         # Set flag to generate RAG answers
         st.session_state.rag_answers_gen = True
 
@@ -162,7 +162,9 @@ if st.session_state.rag_answers_gen:
     if st.session_state.dff.empty:
         # Display error message
         st.error(
-            "Add files in " + st.session_state.product_category + " file storage",
+            "Add files in "
+            + st.session_state.product_category
+            + " file storage",
             icon="🚨",
         )
     # Check if search term is empty
