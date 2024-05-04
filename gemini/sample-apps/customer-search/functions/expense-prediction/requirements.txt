@@ -5,4 +5,3 @@ google-cloud-aiplatform
 plotly
 pandas
 kaleido
-

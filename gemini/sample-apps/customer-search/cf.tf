@@ -219,20 +219,20 @@ resource "google_cloud_run_service_iam_member" "member_create_fd" {
 }
 
 ###################################################################################
-data "archive_file" "event-recommendationv2" {
+data "archive_file" "event-recommendation" {
   type        = "zip"
-  output_path = "/tmp/event-recommendationv2.zip"
-  source_dir  = "functions/event-recommendationv2/"
+  output_path = "/tmp/event-recommendation.zip"
+  source_dir  = "functions/event-recommendation/"
 }
-resource "google_storage_bucket_object" "object_event-recommendationv2" {
-  name   = "event-recommendationv2.zip"
+resource "google_storage_bucket_object" "object_event-recommendation" {
+  name   = "event-recommendation.zip"
   bucket = google_storage_bucket.default.name
-  source = data.archive_file.event-recommendationv2.output_path # Add path to the zipped function source code
+  source = data.archive_file.event-recommendation.output_path # Add path to the zipped function source code
   # project     = var.project
 }
 
-resource "google_cloudfunctions2_function" "event-recommendationv2" {
-  name        = "event-recommendationv2"
+resource "google_cloudfunctions2_function" "event-recommendation" {
+  name        = "event-recommendation"
   location    = "us-central1"
   description = "function which gives account health and summary"
   project     = var.project
@@ -243,7 +243,7 @@ resource "google_cloudfunctions2_function" "event-recommendationv2" {
     source {
       storage_source {
         bucket = google_storage_bucket.default.name
-        object = google_storage_bucket_object.object_event-recommendationv2.name
+        object = google_storage_bucket_object.object_event-recommendation.name
       }
     }
     environment_variables = {
@@ -257,9 +257,9 @@ resource "google_cloudfunctions2_function" "event-recommendationv2" {
     timeout_seconds    = 60
   }
 }
-resource "google_cloud_run_service_iam_member" "member_event-recommendationv2" {
-  location = google_cloudfunctions2_function.event-recommendationv2.location
-  service  = google_cloudfunctions2_function.event-recommendationv2.name
+resource "google_cloud_run_service_iam_member" "member_event-recommendation" {
+  location = google_cloudfunctions2_function.event-recommendation.location
+  service  = google_cloudfunctions2_function.event-recommendation.name
   role     = "roles/run.invoker"
   member   = "allUsers"
   project  = var.project
@@ -267,20 +267,20 @@ resource "google_cloud_run_service_iam_member" "member_event-recommendationv2" {
 
 
 ###################################################################################
-data "archive_file" "event-recommendationv3" {
+data "archive_file" "travel-event-recommendation" {
   type        = "zip"
-  output_path = "/tmp/event-recommendationv3.zip"
-  source_dir  = "functions/event-recommendationv3/"
+  output_path = "/tmp/travel-event-recommendation.zip"
+  source_dir  = "functions/travel-event-recommendation/"
 }
-resource "google_storage_bucket_object" "object_event-recommendationv3" {
-  name   = "event-recommendationv3.zip"
+resource "google_storage_bucket_object" "object_travel-event-recommendation" {
+  name   = "travel-event-recommendation.zip"
   bucket = google_storage_bucket.default.name
-  source = data.archive_file.event-recommendationv3.output_path # Add path to the zipped function source code
+  source = data.archive_file.travel-event-recommendation.output_path # Add path to the zipped function source code
   # project     = var.project
 }
 
-resource "google_cloudfunctions2_function" "event-recommendationv3" {
-  name        = "event-recommendationv3"
+resource "google_cloudfunctions2_function" "travel-event-recommendation" {
+  name        = "travel-event-recommendation"
   location    = "us-central1"
   description = "function which gives account health and summary"
   project     = var.project
@@ -291,7 +291,7 @@ resource "google_cloudfunctions2_function" "event-recommendationv3" {
     source {
       storage_source {
         bucket = google_storage_bucket.default.name
-        object = google_storage_bucket_object.object_event-recommendationv3.name
+        object = google_storage_bucket_object.object_travel-event-recommendation.name
       }
     }
     environment_variables = {
@@ -306,9 +306,9 @@ resource "google_cloudfunctions2_function" "event-recommendationv3" {
 
   }
 }
-resource "google_cloud_run_service_iam_member" "member_event-recommendationv3" {
-  location = google_cloudfunctions2_function.event-recommendationv3.location
-  service  = google_cloudfunctions2_function.event-recommendationv3.name
+resource "google_cloud_run_service_iam_member" "member_travel-event-recommendation" {
+  location = google_cloudfunctions2_function.travel-event-recommendation.location
+  service  = google_cloudfunctions2_function.travel-event-recommendation.name
   role     = "roles/run.invoker"
   member   = "allUsers"
   project  = var.project
@@ -316,20 +316,20 @@ resource "google_cloud_run_service_iam_member" "member_event-recommendationv3" {
 
 
 ###################################################################################
-data "archive_file" "expense-predictionv2" {
+data "archive_file" "expense-prediction" {
   type        = "zip"
-  output_path = "/tmp/expense-predictionv2.zip"
-  source_dir  = "functions/expense-predictionv2/"
+  output_path = "/tmp/expense-prediction.zip"
+  source_dir  = "functions/expense-prediction/"
 }
-resource "google_storage_bucket_object" "object_expense-predictionv2" {
-  name   = "expense-predictionv2.zip"
+resource "google_storage_bucket_object" "object_expense-prediction" {
+  name   = "expense-prediction.zip"
   bucket = google_storage_bucket.default.name
-  source = data.archive_file.expense-predictionv2.output_path # Add path to the zipped function source code
+  source = data.archive_file.expense-prediction.output_path # Add path to the zipped function source code
   # project     = var.project
 }
 
-resource "google_cloudfunctions2_function" "expense-predictionv2" {
-  name        = "expense-predictionv2"
+resource "google_cloudfunctions2_function" "expense-prediction" {
+  name        = "expense-prediction"
   location    = "us-central1"
   description = "function which gives account health and summary"
   project     = var.project
@@ -340,7 +340,7 @@ resource "google_cloudfunctions2_function" "expense-predictionv2" {
     source {
       storage_source {
         bucket = google_storage_bucket.default.name
-        object = google_storage_bucket_object.object_expense-predictionv2.name
+        object = google_storage_bucket_object.object_expense-prediction.name
       }
     }
     environment_variables = {
@@ -356,9 +356,9 @@ resource "google_cloudfunctions2_function" "expense-predictionv2" {
 
   }
 }
-resource "google_cloud_run_service_iam_member" "member_expense-predictionv2" {
-  location = google_cloudfunctions2_function.expense-predictionv2.location
-  service  = google_cloudfunctions2_function.expense-predictionv2.name
+resource "google_cloud_run_service_iam_member" "member_expense-prediction" {
+  location = google_cloudfunctions2_function.expense-prediction.location
+  service  = google_cloudfunctions2_function.expense-prediction.name
   role     = "roles/run.invoker"
   member   = "allUsers"
   project  = var.project
@@ -1619,8 +1619,8 @@ resource "google_cloudfunctions2_function" "translation-handler-cymbal-bank" {
       CREDIT_CARD_RECOMM_URL  = google_cloudfunctions2_function.travel_card_recommendation.url
       CREDIT_CARD_CREATE_URL  = google_cloudfunctions2_function.upload_credit_card.url
       DEBT_FUND_URL           = google_cloudfunctions2_function.how_my_debt_funds_doing.url
-      EVENT_RECOMM_URL        = google_cloudfunctions2_function.event-recommendationv2.url
-      EXPENSE_PREDICT_URL     = google_cloudfunctions2_function.expense-predictionv2.url
+      EVENT_RECOMM_URL        = google_cloudfunctions2_function.event-recommendation.url
+      EXPENSE_PREDICT_URL     = google_cloudfunctions2_function.expense-prediction.url
       FD_RECOMM_URL           = google_cloudfunctions2_function.fd_recommendation.url
       FD_CONFIRM_URL          = google_cloudfunctions2_function.fd_confirmation.url
       FD_TENURE_URL           = google_cloudfunctions2_function.fd_tenure.url
@@ -1630,7 +1630,7 @@ resource "google_cloudfunctions2_function" "translation-handler-cymbal-bank" {
       DEBT_FUND_RECOMM_URL    = google_cloudfunctions2_function.recommend_debt_funds.url
       UNUSUAL_EXPENSE_URL     = google_cloudfunctions2_function.unusual_spends.url
       FIND_NEAREST_DEALER_URL = google_cloudfunctions2_function.find_nearest_car_dealers.url
-      TRAVEL_EVENT_RECOMM_URL = google_cloudfunctions2_function.event-recommendationv3.url
+      TRAVEL_EVENT_RECOMM_URL = google_cloudfunctions2_function.travel-event-recommendation.url
       FD_TENURE_VAL_URL       = google_cloudfunctions2_function.tenure_validation.url
     }
   }

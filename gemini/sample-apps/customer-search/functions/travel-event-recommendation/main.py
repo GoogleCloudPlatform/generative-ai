@@ -1,23 +1,23 @@
-import os
-from os import environ
-import random
-import string
-import tempfile
-
-from PIL import Image
 import functions_framework
-from google.cloud import bigquery, storage
+from google.cloud import bigquery
+from google.cloud import storage
 import vertexai
-from vertexai.language_models import TextGenerationModel
 from vertexai.preview.vision_models import ImageGenerationModel
+from vertexai.generative_models import GenerativeModel, GenerationConfig
+import os
+import tempfile
+import string
+import random
+from PIL import Image
+from os import environ
 
 project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def event_recommendation_v3(request):
+def travel_event_recommendation(request):
     request_json = request.get_json(silent=True)
-    # customer_id = request_json['customer_id']
+
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     city = request_json["sessionInfo"]["parameters"]["city"]
     country = request_json["sessionInfo"]["parameters"]["country"]
@@ -37,19 +37,17 @@ def event_recommendation_v3(request):
     for i in range(len(user_affinities)):
         user_affinities[i] = user_affinities[i].lower().strip()
 
-    # #ASSUMPTION: There exists an event which always matches the user affinities - wrong assumption but will handle that case later
-
     vertexai.init(project=project_id, location="us-central1")
-    model_prompt = TextGenerationModel.from_pretrained("text-bison")
-    parameters = {
-        "max_output_tokens": 1024,
-        "temperature": 0.2,
-        "top_p": 0.95,
-        "top_k": 40,
-    }
+    model = GenerativeModel("gemini-1.0-pro")
+    generation_config = GenerationConfig(
+        temperature=0.2,
+        top_p=0.95,
+        top_k=40,
+        candidate_count=1,
+        max_output_tokens=1024,
+    )
 
-    response2 = model_prompt.predict(
-        """
+    trip_event_recommendation_prompt = f"""
 You are CymBuddy, a bot for Cymbal Bank. You need to recommend an event to the user based on their interests which they can enjoy on their upcoming trip.
 
 
@@ -100,20 +98,21 @@ Tickets are now available at a 20% discount for all Cymbal Bank cardholders. Jus
 
 
 Input:
-The user is travelling to {0}{1} from {2} to {3}. The user is interested in {4}.
+The user is travelling to {city}{country} from {start_date} to {end_date}. The user is interested in {user_affinities}.
 
 Output:
 
 
 
-    """.format(
-            city, country, start_date, end_date, user_affinities
-        ),
-        **parameters,
+    """
+
+    response = model.generate_content(
+        trip_event_recommendation_prompt,
+        generation_config=generation_config,
+        stream=False,
     )
 
-    response3 = model_prompt.predict(
-        """
+    find_event_type_prompt = f"""
     What is the type of event in the following invite?
 
 
@@ -188,25 +187,16 @@ Your Cymbal Bank card gets you 2-for-1 tickets.
     Ouput: Orchestra
 
     Input:
-     {0}
+     {response.text}
 
      Output:
 
-    """.format(
-            response2.text
-        ),
-        **parameters,
+    """
+    response2 = model.generate_content(
+        find_event_type_prompt, generation_config=generation_config, stream=False
     )
 
-    parameters = {
-        "max_output_tokens": 1024,
-        "temperature": 0.5,
-        "top_p": 0.95,
-        "top_k": 40,
-    }
-
-    response = model_prompt.predict(
-        """
+    create_image_for_invite_prompt = f"""
     You are a graphic designer and need to create prompts to generate image invite for events.
 
     Describe in detail the image content, art style, viewpoint, framing, lighting, colour scheme .
@@ -239,16 +229,19 @@ Your Cymbal Bank card gets you 2-for-1 tickets.
     Input:Create a prompt to generate invite image for a Opera event. There should be no humans in the image.
 Output: Art style: Surrealism Viewpoint: Aerial view Framing: A view of an opera house from above, with the stage and orchestra pit in the foreground. The audience is represented by a sea of empty seats. Color scheme: Dark and moody, with pops of color from the stage lights.  Additional details:  A spotlight shining down on the empty stage A grand piano on the stage A conductor's podium in front of the orchestra pit Rows of empty seats in the audience A chandelier hanging from the ceiling Mobile optimization: The focal point of the image should be placed in the center of the frame The image should be high-resolution and visually appealing
 
-    Input: Create a prompt to generate invite image for a {0} event. There should be no humans in the image.
+    Input: Create a prompt to generate invite image for a {response2.text} event. There should be no humans in the image.
     Output:
-    """.format(
-            response3.text
-        ),
-        **parameters,
+    """
+
+    response3 = model.generate_content(
+        create_image_for_invite_prompt,
+        generation_config=generation_config,
+        stream=False,
     )
+
     model = ImageGenerationModel.from_pretrained("imagegeneration@005")
     response = model.generate_images(
-        prompt=response.text,
+        prompt=response3.text,
         # Optional:
         negative_prompt="""3D
 absent limbs

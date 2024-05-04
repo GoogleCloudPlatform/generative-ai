@@ -1,6 +1,6 @@
 # Cymbal Bank Website Demo: CymBuddy and Search
 
-This repository contains the code for the Cymbal Bank demo website, a cutting-edge fintech platform designed to cater to the diverse needs of our customers.
+This codebase showcases the Cymbal Bank demo website, featuring CymBuddy, a personalized assistant built with Dialogflow CX and Gemini Pro. The website and CymBuddy also leverage Retrieval Augmented Generation (RAG) to provide accurate and relevant search results across Cymbal Bank's range of products and services.
 
 ## **Main Features:**
 
@@ -51,6 +51,9 @@ This repository contains the code for the Cymbal Bank demo website, a cutting-ed
 
 ## **Additional Information:**
 
-- The demo showcases the core functionalities and capabilities of the Cymbal Bank platform.
+- The demo showcases the core functionalities and capabilities of CymBuddy and the Cymbal Bank platform.
 - The investment data and recommendations are simulated and for illustrative purposes only.
-- This repository is intended for demonstration purposes and may not reflect the full features and functionalities of the final product.
+- This repository is intended for demonstration purposes. The final product may include additional functionality.
+  
+  For example, this demo does not support actual transactions while creating FDs or STPs; it only modifies database entries to simulate them. A fintech/bank adopting this demo, would need to add transaction support.
+  

@@ -1,14 +1,14 @@
-import os
-from os import environ
-import tempfile
-
 import functions_framework
-from google.cloud import bigquery, storage
-import pandas as pd
-import plotly.express as px
-import plotly.io as pio
+from google.cloud import storage
+from google.cloud import bigquery
 import vertexai
-from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, GenerationConfig
+import plotly.express as px
+import pandas as pd
+import os
+import tempfile
+import plotly.io as pio
+from os import environ
 
 project_id = environ.get("PROJECT_ID")
 public_bucket = environ.get("PUBLIC_BUCKET")
@@ -186,15 +186,16 @@ def expense_prediction(request):
         )
 
     vertexai.init(project=project_id, location="us-central1")
-    model_prompt = TextGenerationModel.from_pretrained("text-bison@001")
-    parameters = {
-        "max_output_tokens": 1024,
-        "temperature": 0.2,
-        "top_p": 0.95,
-        "top_k": 40,
-    }
-    response = model_prompt.predict(
-        """
+    model = GenerativeModel("gemini-1.0-pro")
+    generation_config = GenerationConfig(
+        temperature=0.2,
+        top_p=0.95,
+        top_k=40,
+        candidate_count=1,
+        max_output_tokens=1024,
+    )
+
+    summarize_expense_prediction_prompt = f"""
     You are a financial analyst and you need to summarize the predicted expenses of the customer.
 
     Group together categories with similar trends.
@@ -235,22 +236,25 @@ def expense_prediction(request):
     Total expenses to increase by 13% from Oct 2023 to Dec 2023.
 
     Input:
-    {0}
-    {1}
+    {transaction_list_str}
+    {total_expenditure_str}
 
     Output:
     "
-    """.format(
-            transaction_list_str, total_expenditure_str
-        ),
-        **parameters,
+    """
+    response = model.generate_content(
+        summarize_expense_prediction_prompt,
+        generation_config=generation_config,
+        stream=False,
     )
+
     transaction_list_str = response.text
     transaction_list = transaction_list_str.split("*")
     if len(transaction_list) == 1:
         transaction_list = transaction_list_str.split("-")
 
-    # finding upcoming payments considering last date of transaction data as 2023-09-30
+    # finding upcoming payments considering last date of transaction data as
+    # 2023-09-30
     query_upcoming_payments = f"""
         SELECT * FROM `{project_id}.DummyBankDataset.StandingInstructions`
         where account_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id={customer_id}) and Next_Payment_Date < '2023-12-31' and fund_transfer_amount IS NOT NULL
@@ -265,19 +269,16 @@ def expense_prediction(request):
 
     payment_list = payment_list_str.split("\n")
 
-    response2 = model_prompt.predict(
-        """
+    format_date_prompt = f"""
     Format the dates in the following information,e.g. 2024-10-01 to  Oct 1, 2024
-    {0}
+    {payment_list_str}
 
 
-    """.format(
-            payment_list_str
-        ),
-        **parameters,
+    """
+    response2 = model.generate_content(
+        format_date_prompt, generation_config=generation_config, stream=False
     )
 
-    # rawUrl = "https://storage.googleapis.com/"+output_bucket+"/predicted_expenses/"+str(int(customer_id))+"_oct_dec_23.png"
     # create a graph out of the data
     rawUrl = create_graph(amount, category, date, customer_id)
 

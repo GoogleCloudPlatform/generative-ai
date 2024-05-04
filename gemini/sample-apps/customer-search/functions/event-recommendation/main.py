@@ -1,20 +1,20 @@
-import os
-from os import environ
-import random
-import string
-import tempfile
-
 import functions_framework
-from google.cloud import bigquery, storage
+from google.cloud import bigquery
+from google.cloud import storage
 import vertexai
-from vertexai.language_models import TextGenerationModel
 from vertexai.preview.vision_models import ImageGenerationModel
+from vertexai.generative_models import GenerativeModel, GenerationConfig
+import os
+import tempfile
+import string
+import random
+from os import environ
 
 project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def event_recommendation_v2(request):
+def event_recommendation(request):
     request_json = request.get_json(silent=True)
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     bq_client = bigquery.Client()
@@ -36,7 +36,8 @@ def event_recommendation_v2(request):
 
     event_recommended = None
 
-    # ASSUMPTION: There exists an event which always matches the user affinities - wrong assumption but will handle that case later
+    # ASSUMPTION: There exists an event which always matches the user
+    # affinities - wrong assumption but will handle that case later
     for row in result_event_details:
         event_tags = row["event_tags_"].split(",")
         for i in range(len(event_tags)):
@@ -49,15 +50,16 @@ def event_recommendation_v2(request):
             break
 
     vertexai.init(project=project_id, location="us-central1")
-    model_prompt = TextGenerationModel.from_pretrained("text-bison@001")
-    parameters = {
-        "max_output_tokens": 1024,
-        "temperature": 0.2,
-        "top_p": 0.95,
-        "top_k": 40,
-    }
-    response = model_prompt.predict(
-        """
+    model = GenerativeModel("gemini-1.0-pro")
+    generation_config = GenerationConfig(
+        temperature=0.2,
+        top_p=0.95,
+        top_k=40,
+        candidate_count=1,
+        max_output_tokens=1024,
+    )
+
+    create_image_for_invite_prompt = f"""
     You are a graphic designer and need to create prompts to generate image invite for events.
 
     Describe in detail the image content, art style, viewpoint, framing, lighting, colour scheme .
@@ -113,12 +115,15 @@ def event_recommendation_v2(request):
     The image should convey a sense of excitement, energy, and fun. It should be inviting and encourage viewers to come to the DJ-Night event.
 
 
-    Create a prompt to generate invite image for a {1} event called {0} . Do not include humans in the image.
-    """.format(
-            event_recommended["event_name_"], event_recommended["event_type"]
-        ),
-        **parameters,
+    Create a prompt to generate invite image for a {event_recommended["event_name_"]} event called {event_recommended["event_type"]} . Do not include humans in the image.
+    """
+
+    response = model.generate_content(
+        create_image_for_invite_prompt,
+        generation_config=generation_config,
+        stream=False,
     )
+
     model = ImageGenerationModel.from_pretrained("imagegeneration@002")
     response = model.generate_images(
         prompt=response.text,
@@ -152,20 +157,21 @@ def event_recommendation_v2(request):
 
     rawUrl = "https://storage.googleapis.com/" + output_bucket + "/" + image_file_name
 
-    response2 = model_prompt.predict(
-        """
-    You are CymBuddy , a chatbot of Cymbal Bank. You need to recommend an event to the user because their account status is healthy. The user's interests are {6}. You choose to recommend the following event because the event tags matched one or more of the user's interests:
-    Event name: {0}
-    event date: {1}
-    event type: {2}
-    event tags: {3}
-    location: {4}
-    last date to register: {5}
+    invite_generation_prompt = f"""
+    You are CymBuddy , a chatbot of Cymbal Bank. You need to recommend an event to the user because their account status is healthy. The user's interests are {user_affinities}. You choose to recommend the following event because the event tags matched one or more of the user's interests:
+    Event name: {event_recommended["event_name_"]}
+    event date: {event_recommended["event_date_"]}
+    event type: {event_recommended["event_type"]}
+    event tags: {event_recommended["event_tags_"]}
+    location: {event_recommended["location"]}
+    last date to register: {event_recommended["last_date_of_invite_"]}
 
     Create a message inviting the user to the event.  The tone should be friendly and conversational. Do not greet the user, that is, do not say hi or hey.
 
     Example:
-    You are CymBuddy , a chatbot of Cymbal Bank. You need to recommend an event to the user because their account status is healthy. The user's interests are Classical Music, Golf, Hiking, Real Estate. You choose to recommend the following event because the event tags matched one or more of the user's interests:
+    You are CymBuddy , a chatbot of Cymbal Bank. You need to recommend an event to the user because their account status is healthy.
+    The user's interests are Classical Music, Golf, Hiking, Real Estate.
+    You choose to recommend the following event because the event tags matched one or more of the user's interests:
     Event name: Golf Day
     event date: 2023-10-31
     event tags: Golf, Networking
@@ -174,24 +180,17 @@ def event_recommendation_v2(request):
 
 
 
-Heads up, golf enthusiast! ⛳️
+    Heads up, golf enthusiast! ⛳️
 
-We noticed you're a fan of the green, so we thought you might be interested in the upcoming Golf Day event on October 31st at Golfshire.
+    We noticed you're a fan of the green, so we thought you might be interested in the upcoming Golf Day event on October 31st at Golfshire.
 
-It's a great opportunity to network with other golf aficionados and enjoy a day of friendly competition. Plus, there'll be plenty of opportunities to learn from experts and improve your game.
+    It's a great opportunity to network with other golf aficionados and enjoy a day of friendly competition. Plus, there'll be plenty of opportunities to learn from experts and improve your game.
 
-Registration closes on October 21st, so don't miss out! 🏌️‍♀️🏌️‍♂️
+    Registration closes on October 21st, so don't miss out! 🏌️‍♀️🏌️‍♂️
 
-    """.format(
-            event_recommended["event_name_"],
-            event_recommended["event_date_"],
-            event_recommended["event_type"],
-            event_recommended["event_tags_"],
-            event_recommended["location"],
-            event_recommended["last_date_of_invite_"],
-            user_affinities,
-        ),
-        **parameters,
+    """
+    response2 = model.generate_content(
+        invite_generation_prompt, generation_config=generation_config, stream=False
     )
 
     custom_payload = {
@@ -207,7 +206,7 @@ Registration closes on October 21st, so don't miss out! 🏌️‍♀️🏌️�
             ]
         }
     }
-    # {"text": {"text": [text]}}
+
     invitation = {
         "text": {
             "text": [response2.text],
