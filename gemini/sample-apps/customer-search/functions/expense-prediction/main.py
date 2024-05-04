@@ -1,14 +1,14 @@
-import functions_framework
-from google.cloud import storage
-from google.cloud import bigquery
-import vertexai
-from vertexai.generative_models import GenerativeModel, GenerationConfig
-import plotly.express as px
-import pandas as pd
 import os
-import tempfile
-import plotly.io as pio
 from os import environ
+import tempfile
+
+import functions_framework
+from google.cloud import bigquery, storage
+import pandas as pd
+import plotly.express as px
+import plotly.io as pio
+import vertexai
+from vertexai.generative_models import GenerationConfig, GenerativeModel
 
 project_id = environ.get("PROJECT_ID")
 public_bucket = environ.get("PUBLIC_BUCKET")

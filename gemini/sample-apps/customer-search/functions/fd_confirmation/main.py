@@ -73,7 +73,7 @@ def generate_fd_confirmation_message(request):
                                                     + PUBLIC_BUCKET
                                                     + "/"
                                                     + TNC_IMAGE
-                                                ) #can replace with image name to show with terms and conditions
+                                                )  # can replace with image name to show with terms and conditions
                                             },
                                             "anchor": {
                                                 "href": (
@@ -81,7 +81,7 @@ def generate_fd_confirmation_message(request):
                                                     + PUBLIC_BUCKET
                                                     + "/"
                                                     + FD_TNC_DOC
-                                                ) #replace with own T&C doc name
+                                                )  # replace with own T&C doc name
                                             },
                                         }
                                     ],
