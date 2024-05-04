@@ -62,7 +62,7 @@ class PDFRounded(fpdf.FPDF):
         hp = self.h
         if style == "F":
             op = "f"
-        elif style == "FD" or style == "DF":
+        elif style in ("FD", "DF"):
             op = "B"
         else:
             op = "S"
@@ -131,7 +131,9 @@ class PDFRounded(fpdf.FPDF):
             )
         self._out(op)
 
-    def arc(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float):
+    def arc(
+        self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float
+    ):
         """
         Draws an arc.
 

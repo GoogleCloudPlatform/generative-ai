@@ -1,4 +1,4 @@
-div.stButton > button:first-child {
+div.row-widget > button:first-child {
     border-radius: 25px;
 }
 
