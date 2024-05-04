@@ -7,10 +7,7 @@ layouts and formatting.
 
 import os
 
-from app.pages_utils.utils_pdf_generation import (
-    add_formatted_page,
-    check_add_page,
-)
+from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
 from app.pages_utils.utils_pdf_generation import PDFRounded as FPDF
 import streamlit as st
 
@@ -70,9 +67,7 @@ def create_pdf_layout(
             pdf.multi_cell(170, 5, page)  # Output the text
 
 
-def create_content_pdf(
-    product_content: list, selected_titles: list[str]
-) -> None:
+def create_content_pdf(product_content: list, selected_titles: list[str]) -> None:
     """Creates a PDF for each product content and selected title.
 
     Args:
@@ -87,9 +82,7 @@ def create_content_pdf(
         images = []
 
         # Build content and image lists for the current product
-        content.append(
-            product_content[product_index][0]["text"].replace("**", "")
-        )
+        content.append(product_content[product_index][0]["text"].replace("**", ""))
         images.append(st.session_state.num_drafts * product_index + 1)
 
         # Generate the PDF layout

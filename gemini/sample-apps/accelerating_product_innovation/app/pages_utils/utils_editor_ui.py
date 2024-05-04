@@ -66,9 +66,7 @@ class ImageEditor:
             # - Provide a description of the form's purpose
             st.write("Input a query to generate the product.")
             img_prompt = st.text_input("Enter your custom query", "")
-            edit_img_btn = st.form_submit_button(
-                "Submit prompt", type="primary"
-            )
+            edit_img_btn = st.form_submit_button("Submit prompt", type="primary")
 
             # - Handle form submission
             if edit_img_btn:
@@ -77,14 +75,12 @@ class ImageEditor:
                 st.session_state.image_prompt = img_prompt
 
         # Mask Drawing Setup
-        drawing_dict = (
-            {  # - Dictionary mapping descriptive names to drawing modes.
-                "⬜ Rectangle": "rect",
-                "🖌️ Brush": "freedraw",
-                "⚪ Circle": "circle",
-                "📏 Move/Scale/Rotate": "transform",
-            }
-        )
+        drawing_dict = {  # - Dictionary mapping descriptive names to drawing modes.
+            "⬜ Rectangle": "rect",
+            "🖌️ Brush": "freedraw",
+            "⚪ Circle": "circle",
+            "📏 Move/Scale/Rotate": "transform",
+        }
         self.drawing_mode = st.selectbox(
             "[Optional] Draw a mask where you want to edit the image",
             drawing_dict.keys(),
@@ -112,9 +108,7 @@ class ImageEditor:
 
         # Background Editing Control
         if st.checkbox("Edit Image Background"):
-            st.session_state.bg_editing = (
-                True  # - Enable background editing mode
-            )
+            st.session_state.bg_editing = True  # - Enable background editing mode
             st.write("       Please mask the area you want to preserve")
         else:
             st.session_state.bg_editing = False  # - Disable background editing
