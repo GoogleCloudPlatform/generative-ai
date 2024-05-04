@@ -74,9 +74,9 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
         key=key,
     ):
         # Update session state with selected suggestion
-        st.session_state.insights_placeholder = st.session_state.insights_suggestion[
-            suggestion_num
-        ]
+        st.session_state.insights_placeholder = (
+            st.session_state.insights_suggestion[suggestion_num]
+        )
         # Set flag to generate RAG answers
         st.session_state.rag_answers_gen = True
 
@@ -162,7 +162,9 @@ if st.session_state.rag_answers_gen:
     if st.session_state.dff.empty:
         # Display error message
         st.error(
-            "Add files in " + st.session_state.product_category + " file storage",
+            "Add files in "
+            + st.session_state.product_category
+            + " file storage",
             icon="🚨",
         )
     # Check if search term is empty

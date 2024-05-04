@@ -27,11 +27,12 @@ generation page.
 
 import io
 import logging
+import streamlit as st
 
 import PIL
 from PIL import Image
 from app.pages_utils.utils_imagen import edit_image_generation
-import streamlit as st
+
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
@@ -67,7 +68,7 @@ def process_foreground_image(
             if item[0] == 255 and item[1] == 255 and item[2] == 255:
                 new_bytes.append((255, 255, 255, 0))
             else:
-                new_bytes.append((255, 255, 255))
+                new_bytes.append((255, 255, 255, 1))
 
         foreground_image.putdata(new_bytes)
 
@@ -95,7 +96,10 @@ def initialize_edit_page_state() -> None:
     """
 
     # Check which image file prefix points to the image to be edited
-    if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
+    if (
+        "image_to_edit" not in st.session_state
+        or st.session_state.image_to_edit == -1
+    ):
         st.session_state.image_to_edit = (
             -1
         )  # No image from generations is being edited.
@@ -138,7 +142,9 @@ def save_draft_image(
         draft_elements (dict): Dictionary holding the draft image elements.
     """
 
-    st.session_state.content_edited = True  # Track whether image has been edited.
+    st.session_state.content_edited = (
+        True  # Track whether image has been edited.
+    )
     draft_elements[row][col][
         "img"
     ] = image  # Update the drafts to display updated image.
@@ -182,7 +188,7 @@ def render_suggested_images(suggested_images: list[str]) -> None:
                 ):
                     _handle_edit_suggestion(image_index)
                 # Add download button for current suggestion.
-                image_data = io.BytesIO(suggested_images[image_index])
+                image_data = suggested_images[image_index]
                 st.download_button(
                     label="Download",
                     data=image_data,
@@ -234,7 +240,7 @@ def save_image_for_editing(image_bytes: bytes, filename: str) -> None:
 
 
 def generate_suggested_images(
-    image_prompt: str, image_bytes: io.BytesIO, mask_image: io.BytesIO
+    image_prompt: str, image_bytes: io.BytesIO, mask_image: bytes
 ) -> None:
     """
     Generates suggested images based on the provided prompt, image, and mask.
@@ -243,7 +249,7 @@ def generate_suggested_images(
     Args:
         image_prompt (str): Text prompt for image generation.
         image_bytes (BytesIO): Initial image data for inpainting or variation.
-        mask_image (BytesIO or None): Mask defining the region to
+        mask_image (bytes): Mask defining the region to
         edit (optional).
     """
     save_image_for_editing(image_bytes.getvalue(), "image_to_edit")

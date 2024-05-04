@@ -4,31 +4,31 @@ file="env.txt"
 previous_data=""
 
 while read -r line; do
-    echo "line: $line"
-    for word in $line; do
-        echo "pw: $previous_data, w: $word"
-        if [ "$previous_data" == "PROJECT_ID" ]; then
-            echo "pid"
-            PROJECT_ID="$word"
-        fi
-        if [ "$previous_data" == "LOCATION" ]; then
-            echo "loc"
-            LOCATION="$word"
-        fi
-        if [ "$previous_data" == "REGION" ]; then
-            echo "reg"
-            REGION="$word"
-        fi
-        if [ "$previous_data" == "YOUR_EMAIL" ]; then
-            echo "se"
-            YOUR_EMAIL="$word"
-        fi
-        if [ "$previous_data" == "PROJECT_NUMBER" ]; then
-            echo "pn"
-            PROJECT_NUMBER="$word"
-        fi
-        previous_data="$word"
-    done
+ echo "line: $line"
+ for word in $line; do
+  echo "pw: $previous_data, w: $word"
+  if [ "$previous_data" == "PROJECT_ID" ]; then
+   echo "pid"
+   PROJECT_ID="$word"
+  fi
+  if [ "$previous_data" == "LOCATION" ]; then
+   echo "loc"
+   LOCATION="$word"
+  fi
+  if [ "$previous_data" == "REGION" ]; then
+   echo "reg"
+   REGION="$word"
+  fi
+  if [ "$previous_data" == "YOUR_EMAIL" ]; then
+   echo "se"
+   YOUR_EMAIL="$word"
+  fi
+  if [ "$previous_data" == "PROJECT_NUMBER" ]; then
+   echo "pn"
+   PROJECT_NUMBER="$word"
+  fi
+  previous_data="$word"
+ done
 done <$file
 
 echo "se: $YOUR_EMAIL"
@@ -60,12 +60,12 @@ gcloud functions deploy imagen-call \
 file="cloud_fn_1"
 previous_data=""
 while read -r line; do
-    for word in $line; do
-        if [ "$previous_data" == "url:" ]; then
-            imagen_call_url="$word"
-        fi
-        previous_data="$word"
-    done
+ for word in $line; do
+  if [ "$previous_data" == "url:" ]; then
+   imagen_call_url="$word"
+  fi
+  previous_data="$word"
+ done
 done <$file
 echo "Imagen Call URL: $imagen_call_url" > cloud_functions_urls
 
@@ -83,12 +83,12 @@ gcloud functions deploy gemini-call \
 --set-env-vars project_id="$PROJECT_ID" \
 --set-env-vars MEMORY=512MB  > cloud_fn_1
 while read -r line; do
-    for word in $line; do
-        if [ "$previous_data" == "url:" ]; then
-            text_bison_url="$word"
-        fi
-        previous_data="$word"
-    done
+ for word in $line; do
+  if [ "$previous_data" == "url:" ]; then
+   text_bison_url="$word"
+  fi
+  previous_data="$word"
+ done
 done <$file
 echo "Text Bison Call URL: $text_bison_url" >> cloud_functions_urls
 
@@ -107,12 +107,12 @@ gcloud functions deploy text-embedding \
 --set-env-vars project_id="$PROJECT_ID" \
 --set-env-vars MEMORY=512MB  > cloud_fn_1
 while read -r line; do
-    for word in $line; do
-        if [ "$previous_data" == "url:" ]; then
-            text_embedding_url="$word"
-        fi
-        previous_data="$word"
-    done
+ for word in $line; do
+  if [ "$previous_data" == "url:" ]; then
+   text_embedding_url="$word"
+  fi
+  previous_data="$word"
+ done
 done <$file
 echo "Text Embedding URL: $text_embedding_url" >> cloud_functions_urls
 rm cloud_fn_1

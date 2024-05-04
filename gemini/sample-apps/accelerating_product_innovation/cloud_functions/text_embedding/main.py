@@ -46,7 +46,6 @@ def generate_embeddings(pdf_data: dict) -> dict:
     Args:
         pdf_data (dict): file data to be processed.
     """
-    pdf_data = json.loads(pdf_data)
     instances = []
     values = []
 
@@ -69,7 +68,7 @@ def generate_embeddings(pdf_data: dict) -> dict:
 
 
 @functions_framework.http
-def hello_http(request) -> dict:
+def hello_http(request) -> tuple[dict[str, str], int]:
     """
     Processes request for generating embeddings.
 

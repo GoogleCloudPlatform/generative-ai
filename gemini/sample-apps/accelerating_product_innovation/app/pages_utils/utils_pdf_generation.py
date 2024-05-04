@@ -131,7 +131,9 @@ class PDFRounded(fpdf.FPDF):
             )
         self._out(op)
 
-    def arc(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float):
+    def arc(
+        self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float
+    ):
         """
         Draws an arc.
 
@@ -188,7 +190,7 @@ def check_add_page(pdf: fpdf, text: str) -> list[str]:
         that fits on that page.
     """
 
-    pages = []  # Store the text content for each page
+    pages: list[str] = []  # Store the text content for each page
     page_content = ""  # Text for the current page being built
 
     pdf.set_font("Arial", "", 11)

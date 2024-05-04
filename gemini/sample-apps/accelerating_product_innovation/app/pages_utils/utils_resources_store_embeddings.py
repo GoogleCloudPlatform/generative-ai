@@ -24,6 +24,7 @@ from app.pages_utils.embedding_model import embedding_model_with_backoff
 import docx
 from dotenv import load_dotenv
 from google.cloud import storage
+from typing import Any
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -127,7 +128,9 @@ async def generate_embeddings(pdf_data: pd.DataFrame) -> np.array:
     Returns:
         np.array: The embeddings for the PDF data.
     """
-    tasks = [asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]]
+    tasks = [
+        asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]
+    ]
     embeddings = await asyncio.gather(*tasks)
     return np.array(embeddings)
 
@@ -155,9 +158,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
 
     async with aiohttp.ClientSession() as session:
         # URL for cloud function.
-        url = f"""
-        https://us-central1-{PROJECT_ID}.cloudfunctions.net/text-embedding
-        """
+        url = f"""https://us-central1-{PROJECT_ID}.cloudfunctions.net/text-embedding"""
 
         # Call cloud function to generate embeddings with data and headers.
         async with session.post(
@@ -254,12 +255,16 @@ async def csv_pocessing(
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(asyncio.create_task(add_type_col(parallel_task_array[i])))
+        temp_arr.append(
+            asyncio.create_task(add_type_col(parallel_task_array[i]))
+        )
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(asyncio.create_task(add_embedding_col(parallel_task_array[i])))
+        temp_arr.append(
+            asyncio.create_task(add_embedding_col(parallel_task_array[i]))
+        )
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     for i in range(split_num):
@@ -274,7 +279,7 @@ async def csv_pocessing(
     return
 
 
-def get_type(x: any) -> any:
+def get_type(x: Any) -> Any:
     """
     Returns type of variable x.
     Args:
@@ -287,10 +292,11 @@ def get_type(x: any) -> any:
 
 
 def save_chunks_to_data_packet(
-    file_content: str, filename: any, final_data: list[dict[str, any]]
+    file_content: str, filename: Any, final_data: list[dict[str, Any]]
 ) -> None:
     """
-    Splits file content into chunks, creates data packets, and appends to the final_data list.
+    Splits file content into chunks, creates data packets, and appends
+    to the final_data list.
 
     Args:
         file_content: The text content to split and process.
@@ -311,14 +317,15 @@ def save_chunks_to_data_packet(
 
 
 def store_embeddings_to_gcs(
-    final_data: list[dict[str, any]],
+    final_data: list[dict[str, Any]],
     dff: pd.DataFrame,
 ) -> None:
     """
     Stores embeddings to Google Cloud Storage (GCS).
 
     Args:
-        final_data: A list of dictionaries containing the new data to process (e.g., from PDFs).
+        final_data: A list of dictionaries containing the new data
+        to process (e.g., from PDFs).
         dff: A pandas DataFrame holding previously processed data.
     """
     storage_client = storage.Client(project=PROJECT_ID)
@@ -340,10 +347,10 @@ def store_embeddings_to_gcs(
 
 
 def convert_csv_to_data_packets(
-    filename: any,
-    blob: any,
+    filename: Any,
+    blob: Any,
     dff: pd.DataFrame,
-    bucket: any,
+    bucket: Any,
 ) -> None:
     """
     Reads a CSV file, processes it into data packets, and uploads the processed
@@ -367,9 +374,10 @@ def convert_csv_to_data_packets(
 
 
 def convert_text_file_to_data_packets(
-    filename: any, blob: any, final_data: list[dict[str, any]]
+    filename: Any, blob: Any, final_data: list[dict[str, Any]]
 ) -> None:
-    """Converts a text file into data packets and uploads to Google Cloud Storage.
+    """Converts a text file into data packets and uploads to Google
+       Cloud Storage.
 
     Args:
         filename: A file-like object (e.g., from Streamlit's file_uploader).
@@ -383,9 +391,10 @@ def convert_text_file_to_data_packets(
 
 
 def convert_doc_to_data_packet(
-    filename: any, blob: any, final_data: list[dict[str, any]]
+    filename: Any, blob: Any, final_data: list[dict[str, Any]]
 ) -> None:
-    """Converts a docx file into data packets and uploads to Google Cloud Storage.
+    """Converts a docx file into data packets and uploads to Google
+       Cloud Storage.
 
     Args:
         filename: A file-like object (e.g., from Streamlit's file_uploader).
@@ -401,7 +410,7 @@ def convert_doc_to_data_packet(
     save_chunks_to_data_packet(file_content, filename, final_data)
 
 
-def convert_file_to_data_packets(filename: str) -> None:
+def convert_file_to_data_packets(filename: Any) -> None:
     """Converts the file to data packets.
 
     This function converts the file to data packets.
@@ -416,9 +425,13 @@ def convert_file_to_data_packets(filename: str) -> None:
         storage_client = storage.Client(project=PROJECT_ID)
         bucket = storage_client.bucket("product_innovation_bucket")
 
-        blob = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
+        blob = bucket.blob(
+            f"{st.session_state.product_category}/embeddings.json"
+        )
 
-        blob2 = bucket.blob(f"{st.session_state.product_category}/{filename.name}")
+        blob2 = bucket.blob(
+            f"{st.session_state.product_category}/{filename.name}"
+        )
 
         if blob.exists():
             stored_embedding_data = blob.download_as_string()
@@ -427,12 +440,12 @@ def convert_file_to_data_packets(filename: str) -> None:
         else:
             dff = pd.DataFrame()
 
-        final_data = []
+        final_data: list[Any] = []
 
         if filename.type == "text/csv":
             # If the file is a CSV file, it reads the file and uploads it to
-            # the GCS bucket. It then processes the file in parallel and uploads
-            # the resulting DataFrameto the GCS bucket.
+            # the GCS bucket. It then processes the file in parallel and
+            # uploads the resulting DataFrameto the GCS bucket.
             convert_csv_to_data_packets(filename, blob2, dff, bucket)
             return
 
@@ -452,9 +465,9 @@ def convert_file_to_data_packets(filename: str) -> None:
         else:
             # If the file is a PDF file, it reads the file and uploads it to
             # the GCS bucket. It then extracts the text from the file and
-            # splits it into chunks. It then processes each chunk in parallel and
-            # concatenates the results. It then uploads the resulting DataFrame
-            # to the GCS bucket.
+            # splits it into chunks. It then processes each chunk in parallel
+            # and concatenates the results. It then uploads the resulting
+            # DataFrame to the GCS bucket.
 
             file_content = filename.read()
             blob2.upload_from_string(file_content, content_type=filename.type)
@@ -468,7 +481,9 @@ def convert_file_to_data_packets(filename: str) -> None:
                 text += page.extract_text()
                 pg = page.extract_text()
                 if pg:
-                    save_chunks_to_data_packet(file_content, filename, final_data)
+                    save_chunks_to_data_packet(
+                        file_content, filename, final_data
+                    )
 
         # Stores the embeddings in the GCS bucket.
         store_embeddings_to_gcs(final_data, dff)
