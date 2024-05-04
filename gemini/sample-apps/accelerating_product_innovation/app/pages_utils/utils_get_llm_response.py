@@ -83,12 +83,15 @@ async def parallel_generate_search_results(query: str) -> str:
     logging.debug("Text call start")
     headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
-        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        url = (
+            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        )
+        # Create post request to get text.
         async with session.post(
             url, data=data_json, headers=headers, verify_ssl=False
         ) as response:
-            logging.debug("Inside IF else of session")
             if response.status == 200:
+                # If response is valid, return generated text.
                 response = await response.json()
                 response = response["generated_text"]
                 return response

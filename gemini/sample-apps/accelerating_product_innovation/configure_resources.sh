@@ -67,14 +67,14 @@ while read -r line; do
 done <$file
 echo "Imagen Call URL: $imagen_call_url" >cloud_functions_urls
 
-gcloud functions deploy gemini-call \
+gcloud functions deploy gemini_call \
     --allow-unauthenticated \
     --service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
     --run-service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
     --gen2 \
     --runtime=python311 \
     --region="$REGION" \
-    --source=./cloud_functions/gemini-call \
+    --source=./cloud_functions/gemini_call \
     --entry-point=generate_text_http \
     --trigger-http \
     --set-env-vars location="$LOCATION" \
@@ -90,14 +90,14 @@ while read -r line; do
 done <$file
 echo "Gemini Call URL: $text_bison_url" >>cloud_functions_urls
 
-gcloud functions deploy text-embedding \
+gcloud functions deploy text_embedding \
     --allow-unauthenticated \
     --service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
     --run-service-account="retail-accelerating-prod-i-982@$PROJECT_ID.iam.gserviceaccount.com" \
     --gen2 \
     --runtime=python311 \
     --region="$REGION" \
-    --source=./cloud_functions/text-embedding \
+    --source=./cloud_functions/text_embedding \
     --entry-point=hello_http \
     --trigger-http \
     --set-env-vars location="$LOCATION" \

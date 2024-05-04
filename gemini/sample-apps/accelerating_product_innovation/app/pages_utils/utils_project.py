@@ -10,6 +10,8 @@ This module:
     * Deletes a specific file from the GCS project.
 """
 
+# pylint: disable=E0401
+
 import json
 import logging
 import os
@@ -19,7 +21,6 @@ from dotenv import load_dotenv
 from google.cloud import storage
 import pandas as pd
 
-# pylint: disable=E0401
 import streamlit as st
 
 load_dotenv()
@@ -119,9 +120,13 @@ def delete_project_from_gcs() -> None:
     blobs = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
     for blob in blobs:
         blob.delete()
-    st.session_state.product_categories.remove(st.session_state.product_category)
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
     if len(st.session_state.product_categories) >= 1:
-        st.session_state.product_category = st.session_state.product_categories[0]
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
     update_projects(st.session_state.product_categories)
     st.rerun()
 
