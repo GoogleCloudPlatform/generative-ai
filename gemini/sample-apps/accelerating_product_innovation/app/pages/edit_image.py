@@ -49,10 +49,7 @@ if st.session_state.uploaded_img is True:
     handle_image_upload()
 
 # Check if the user has started editing the image
-if (
-    st.session_state.start_editing is None
-    or st.session_state.start_editing is True
-):
+if st.session_state.start_editing is None or st.session_state.start_editing is True:
     # Initialize Editor
     image_editor = ImageEditor()
 
