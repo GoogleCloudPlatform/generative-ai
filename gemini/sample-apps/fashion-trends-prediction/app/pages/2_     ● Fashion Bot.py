@@ -5,15 +5,14 @@ import time
 
 from config import config
 from gcs import read_file_from_gcs_link
+from genai_prompts import FASHION_BOT_IMG_GEN_INTENT, fashion_bot_context
 from google.api_core.exceptions import InvalidArgument
 import streamlit as st
 from utilities import add_logo
-from genai_prompts import fashion_bot_context, FASHION_BOT_IMG_GEN_INTENT
 from utils_standalone_image_gen import image_generation, render_image_edit_prompt
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
-from vertexai.preview.generative_models import HarmCategory, HarmBlockThreshold
-
+from vertexai.preview.generative_models import HarmBlockThreshold, HarmCategory
 
 add_logo(config["Images"]["logo"])
 

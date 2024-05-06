@@ -19,8 +19,8 @@ from utils_standalone_image_gen import image_generation
 from vertexai.preview.generative_models import (
     GenerationConfig,
     GenerativeModel,
-    HarmCategory,
     HarmBlockThreshold,
+    HarmCategory,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -68,7 +68,9 @@ def btn_pressed_callback(i: int) -> None:
         state["btn_prsd_status"][i] = False
 
     else:  # button was not pressed
-        state["btn_prsd_status"] = [False] * len(state["btn_prsd_status"])  # unpress other buttons
+        state["btn_prsd_status"] = [False] * len(
+            state["btn_prsd_status"]
+        )  # unpress other buttons
         state["btn_prsd_status"][i] = True
 
 
@@ -95,11 +97,15 @@ if uploaded_file is not None and st.session_state["source"] != uploaded_file.nam
 
     st.session_state["predictionModel"] = Prediction(st.session_state["JSONdata"])
 
-    st.session_state["articleModel"] = Articles(st.session_state["JSONdata"]["articles"])
+    st.session_state["articleModel"] = Articles(
+        st.session_state["JSONdata"]["articles"]
+    )
 
 
 if "JSONdata" in st.session_state:
-    country = st.selectbox("Select Country", st.session_state["JSONdata"]["finaldata"].keys())
+    country = st.selectbox(
+        "Select Country", st.session_state["JSONdata"]["finaldata"].keys()
+    )
 
     category = st.selectbox(
         "Select category of outfit",
@@ -120,7 +126,9 @@ if "predictionModel" not in st.session_state:
 prediction_model = st.session_state["predictionModel"]
 
 if "articleModel" not in st.session_state:
-    st.session_state["articleModel"] = Articles(st.session_state["JSONdata"]["articles"])
+    st.session_state["articleModel"] = Articles(
+        st.session_state["JSONdata"]["articles"]
+    )
 articles = st.session_state["articleModel"]
 
 
@@ -135,7 +143,9 @@ if submit or key in st.session_state:
 
     if submit:
         with st.spinner("Getting trending outfits..."):
-            state["items"], state["additional_outfits"] = prediction_model.query(category, country)
+            state["items"], state["additional_outfits"] = prediction_model.query(
+                category, country
+            )
 
         state["btn_prsd_status"] = [False] * len(state["items"])
 
@@ -173,13 +183,16 @@ if submit or key in st.session_state:
 
         state["items"] = [i.capitalize() for i in state["items"]]
         state["additional_outfits"] = [
-            [i.capitalize() for i in list_var] for list_var in state["additional_outfits"]
+            [i.capitalize() for i in list_var]
+            for list_var in state["additional_outfits"]
         ]
 
         logging.info(state["items"])
         logging.info(state["additional_outfits"])
 
-    outer_tabs = st.tabs(["### Trending outfits", "### Overall trends across attributes"])
+    outer_tabs = st.tabs(
+        ["### Trending outfits", "### Overall trends across attributes"]
+    )
     with outer_tabs[0]:
         col1, col2 = st.columns([1, 1.5])
         buttons = state["items"]
