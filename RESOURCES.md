@@ -64,23 +64,36 @@ Please submit additional resources via a PR.
 
 ## Cloud Skills Boost
 
-- [Generative AI Learning Path](https://www.cloudskillsboost.google/journeys/118) : This learning path guides you through a curated collection of content on Generative AI products and technologies, from the fundamentals of Large Language Models to how to create and deploy generative AI solutions on Google Cloud.
-
-  This learning path currently has several courses listed below:
-
+- [Beginner: Introduction to Generative AI Learning Path](https://www.cloudskillsboost.google/paths/118): This learning path provides an overview of generative AI concepts, from the fundamentals of large language models to responsible AI principles. This learning path currently has several courses listed below:
   - [Introduction to Generative AI](https://www.cloudskillsboost.google/course_templates/536)
   - [Introduction to Large Language Models](https://www.cloudskillsboost.google/course_templates/539)
-  - [Attention Mechanism](https://www.cloudskillsboost.google/course_templates/537)
-  - [Transformer Models and BERT Model](https://www.cloudskillsboost.google/course_templates/538)
-  - [Introduction to Image Generation](https://www.cloudskillsboost.google/course_templates/541)
-  - [Create Image Captioning Models](https://www.cloudskillsboost.google/course_templates/542)
-  - [Encoder-Decoder Architecture](https://www.cloudskillsboost.google/course_templates/543)
   - [Introduction to Responsible AI](https://www.cloudskillsboost.google/course_templates/554)
-  - [Introduction to Generative AI Studio](https://www.cloudskillsboost.google/course_templates/552)
-  - [Generative AI Fundamentals](https://www.cloudskillsboost.google/journeys/118)
+  - [Prompt Design in Vertex AI](https://www.cloudskillsboost.google/paths/118/course_templates/976)
+  - [Responsible AI: Applying AI Principles with Google Cloud](https://www.cloudskillsboost.google/paths/118/course_templates/388)
 
-- [Generative AI Explorer - Vertex AI](https://www.cloudskillsboost.google/quests/299): The Generative AI Explorer - Vertex Quest is a collection of labs for partners on how to use Generative AI on Google Cloud. Through the labs, you will learn about how to use the models in the Vertex AI PaLM API family, including text-bison, chat-bison, and textembedding-gecko.
+- [Intermediate: Gemini for Google Cloud Learning Path](https://www.cloudskillsboost.google/paths/236): The Gemini for Google Cloud learning path provides examples of how Gemini can help make engineers of all types more efficient in their daily activities.
+  - [Gemini for Application Developers](https://www.cloudskillsboost.google/paths/236/course_sessions/7024601/labs/448290)
+  - [Gemini for Cloud Architects](https://www.cloudskillsboost.google/paths/236/course_templates/878)
+  - [Gemini for Data Scientists and Analysts](https://www.cloudskillsboost.google/paths/236/course_templates/879)
+  - [Gemini for Network Engineers](https://www.cloudskillsboost.google/paths/236/course_templates/884)
+  - [Gemini for Security Engineers](https://www.cloudskillsboost.google/paths/236/course_templates/886)
+  - [Gemini for DevOps Engineers](https://www.cloudskillsboost.google/paths/236/course_templates/882)
+  - [Gemini for end-to-end SDLC](https://www.cloudskillsboost.google/paths/236/course_sessions/11762414/labs/448528)
+  - [Develop Gen AI Apps with Gemini and Streamlit](https://www.cloudskillsboost.google/paths/236/course_templates/978)
 
+- [Advanced: Generative AI for Developers Learning Path](https://www.cloudskillsboost.google/paths/183): A Generative AI Learning Path with a technical focus, built for App Developers, Machine Learning Engineers, and Data Scientists. Recommended prerequisite: Introduction to Generative AI learning path.
+  - [Introduction to Image Generation](https://www.cloudskillsboost.google/paths/183/course_templates/541)
+  - [Attention Mechanism](https://www.cloudskillsboost.google/paths/183/course_templates/537)
+  - [Encoder-Decoder Architecture](https://www.cloudskillsboost.google/paths/183/course_templates/543)
+  - [Transformer Models and BERT Model](https://www.cloudskillsboost.google/paths/183/course_templates/538)
+  - [Create Image Captioning Models](https://www.cloudskillsboost.google/paths/183/course_templates/542)
+  - [Introduction to Vertex AI Studio](https://www.cloudskillsboost.google/paths/183/course_templates/552)
+  - [Vector Search and Embeddings](https://www.cloudskillsboost.google/paths/183/course_templates/939)
+  - [Inspect Rich Documents with Gemini Multimodality and Multimodal RAG](https://www.cloudskillsboost.google/paths/183/course_templates/981)
+  - [Responsible AI for Developers: Fairness and Bias](https://www.cloudskillsboost.google/paths/183/course_templates/985)
+  - [Responsible AI for Developers: Interpretability & Transparency](https://www.cloudskillsboost.google/paths/183/course_templates/989)
+  - [Machine Learning Operations (MLOps) for Generative AI](https://www.cloudskillsboost.google/paths/183/course_templates/927)
+  
 ## Google Cloud Next 2023 Announcements + Videos
 
 - Video: [What's new with generative AI at Google Cloud](https://cloud.withgoogle.com/next/generative-ai?session=SPTL200)
