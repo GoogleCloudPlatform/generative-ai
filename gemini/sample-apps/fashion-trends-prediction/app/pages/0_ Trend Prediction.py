@@ -1,3 +1,7 @@
+"""The page that computes and displays the predicted fashion trends"""
+
+# pylint: disable=E0401
+
 import json
 import logging
 import sys

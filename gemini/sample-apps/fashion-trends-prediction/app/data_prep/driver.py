@@ -1,3 +1,7 @@
+"""
+Module for scraping and preparing data for the fashion trends prediction app.
+"""
+
 import json
 import logging
 import time

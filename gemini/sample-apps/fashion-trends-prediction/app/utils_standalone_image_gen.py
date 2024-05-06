@@ -6,6 +6,8 @@ Utility module to:
  - Render the image generation and editing UI
 """
 
+# pylint: disable=E0401
+
 from typing import List
 
 from config import config

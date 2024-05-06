@@ -1,3 +1,5 @@
+"""Module to help user create their own data from their chosen set of images."""
+
 import json
 import os
 
@@ -13,7 +15,8 @@ def images_scrape(saved: dict) -> None:
 
     Write code here to extract/ scrape images from your data source.
     For each image, store it in your local directory (same path as this file)
-    Then, for each image, call generateCaption() function written in data_processing.py which returns a dictionary
+    Then, for each image, call generateCaption() function written in data_processing.py which
+    returns a dictionary
     Store the results in an array to finally get an array of dictionaries
 
     Dummy code for two locally stored images is given in this function definition

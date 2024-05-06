@@ -2,6 +2,8 @@
 Utility module for image generation and editing with Imagen
 """
 
+# pylint: disable=E0401
+
 import io
 
 from PIL import Image

@@ -1,3 +1,11 @@
+"""
+Module for the home page of the fashion trends prediction app.
+
+This module sets the page title, adds a logo, and renders two SVG images.
+"""
+
+# pylint: disable=E0401
+
 from config import config
 import streamlit as st
 from utilities import add_logo, render_svg

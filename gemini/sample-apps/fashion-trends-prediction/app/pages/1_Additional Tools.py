@@ -1,3 +1,7 @@
+"""
+Module for the "Additional Tools" page of the fashion trends prediction app.
+"""
+
 from config import config
 from utilities import add_logo, render_svg
 

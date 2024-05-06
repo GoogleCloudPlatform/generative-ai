@@ -1,3 +1,14 @@
+"""
+Module for scraping Instagram data for the fashion trends prediction app.
+
+- Gets the entire list of country names.
+- Gets a list of top 50 influencers country wise.
+- Logs into Instagram and returns a dictionary of cookies.
+- Gets the Instagram user ID.
+"""
+
+# pylint: disable=E0401
+
 import json
 from uuid import uuid4
 
@@ -11,7 +22,7 @@ def get_countries() -> list:
     """Gets the entire list of country names.
 
     Returns:
-            list: A list of country names.
+        list: A list of country names.
 
     """
     url = "https://hypeauditor.com/top-instagram/"
@@ -32,10 +43,10 @@ def get_influencers(country: str) -> list:
     """Gets a list of top 50 influencers country wise.
 
     Args:
-            country (str): The country name.
+        country (str): The country name.
 
     Returns:
-            list: A list of top 50 influencers of that country.
+        list: A list of top 50 influencers of that country.
 
     """
     url = "https://hypeauditor.com/top-instagram-fashion"
@@ -68,12 +79,13 @@ def insta_login() -> dict:
     # reference: https://github.com/KEAGTORB/grab-insta/blob/main/grab.py
     username = config["username"]
     password = config["password"]
+    params = "iPhone8,1; iOS 14_1; en_SA@calendar=gregorian; ar-SA; scale=2.00; 750x1334; 244425769"
     headers = {
         "Host": "i.instagram.com",
         "X-Ig-Connection-Type": "WiFi",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Ig-Capabilities": "36r/Fx8=",
-        "User-Agent": "Instagram 159.0.0.28.123 (iPhone8,1; iOS 14_1; en_SA@calendar=gregorian; ar-SA; scale=2.00; 750x1334; 244425769) AppleWebKit/420+",
+        "User-Agent": f"Instagram 159.0.0.28.123 ({params}) AppleWebKit/420+",
         "X-Ig-App-Locale": "en",
         "X-Mid": "Ypg64wAAAAGXLOPZjFPNikpr8nJt",
         "Content-Length": "778",
@@ -102,11 +114,11 @@ def get_id(user: str, cookies: dict) -> str:
     """Gets the Instagram user ID.
 
     Args:
-            user (str): The Instagram username.
-            cookies (dict): A dictionary of cookies.
+        user (str): The Instagram username.
+        cookies (dict): A dictionary of cookies.
 
     Returns:
-            str: The Instagram user ID.
+        str: The Instagram user ID.
 
     """
     link = f"https://www.instagram.com/web/search/topsearch/?query={user}"

@@ -1,3 +1,9 @@
+"""
+Module for scraping news articles from Vogue for the fashion trends prediction app.
+"""
+
+# pylint: disable=E0401
+
 import logging
 import time
 

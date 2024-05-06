@@ -6,6 +6,8 @@ Classes:
     Prediction: Predicts fashion trends based on a given dataset.
 """
 
+# pylint: disable=E0401
+
 from typing import List, Tuple
 
 from bertopic import BERTopic

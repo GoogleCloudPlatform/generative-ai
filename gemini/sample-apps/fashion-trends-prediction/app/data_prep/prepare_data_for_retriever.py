@@ -1,3 +1,9 @@
+"""
+Module for preparing data for the retriever in the fashion trends prediction app.
+"""
+
+# pylint: disable=E0401
+
 import json
 import pickle
 
@@ -13,7 +19,9 @@ DATA_PATH = config["Data"]["current_data"]
 def prepare_data_for_retriever() -> None:
     """Prepares data for the retriever.
 
-    This function loads the saved data, converts articles to lowercase, creates Document objects for each article, splits the documents into chunks, and saves the chunks and vectorstore to disk.
+    This function loads the saved data, converts articles to lowercase,
+    creates Document objects for each article, splits the documents into chunks, and
+    saves the chunks and vectorstore to disk.
 
     """
 

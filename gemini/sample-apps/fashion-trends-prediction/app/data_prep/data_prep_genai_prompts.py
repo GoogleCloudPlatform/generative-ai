@@ -1,3 +1,7 @@
+"""Module for prompt to be given to Gemini for generation during data preparation."""
+
+# pylint: disable=C0301
+
 def image_attribute_prompt(fewshot_images, user_image):
     return [
         """

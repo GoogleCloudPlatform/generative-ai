@@ -1,3 +1,9 @@
+"""
+Module for reading files from Google Cloud Storage.
+"""
+
+# pylint: disable=E0401
+
 import json
 import pickle
 from typing import Union

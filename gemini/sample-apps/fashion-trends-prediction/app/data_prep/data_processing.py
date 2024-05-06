@@ -1,3 +1,12 @@
+"""
+This module provides functions to
+    - Get posts from Instagram.
+    - Generate captions for images using the Gemini model.
+    - Summarize articles using the Gemini model.
+"""
+
+# pylint: disable=E0401
+
 import base64
 import json
 import os

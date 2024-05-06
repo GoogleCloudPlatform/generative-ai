@@ -1,3 +1,9 @@
+"""
+Module for retrieving articles related to a given outfit using the ensemble retriever.
+"""
+
+# pylint: disable=E0401
+
 from config import config
 from gcs import read_file_from_gcs_link
 from genai_prompts import ARTICLES_PROMPT

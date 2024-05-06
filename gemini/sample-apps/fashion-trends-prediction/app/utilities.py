@@ -1,3 +1,9 @@
+"""
+Module for utility functions.
+"""
+
+# pylint: disable=E0401
+
 import streamlit as st
 from streamlit.components.v1 import html
 
@@ -7,7 +13,7 @@ def nav_page(page_name: str, timeout_secs: int = 3) -> None:
 
     Args:
         page_name (str): The name of the page to navigate to.
-        timeout_secs (int, optional): The number of seconds to wait for the page to load. Defaults to 3.
+        timeout_secs (int, optional): Number of seconds to wait for the page to load. Defaults to 3.
 
     """
     nav_script = """
@@ -38,9 +44,7 @@ def nav_page(page_name: str, timeout_secs: int = 3) -> None:
     html(nav_script)
 
 
-def button_html_script(
-    widget_label: str, btn_bg_color1: str, btn_bg_color2: str
-) -> str:
+def button_html_script(widget_label: str, btn_bg_color1: str, btn_bg_color2: str) -> str:
     """Generates HTML script to change the color of a button.
 
     Args:
@@ -95,7 +99,7 @@ def build_markup_for_logo(
 
     Args:
         png_file_path (str): The source path to the PNG file of the logo.
-        background_position (str, optional): The background position of the logo. Defaults to "50% 10%".
+        background_position (str, optional): The bg position of the logo. Defaults to "50% 10%".
         margin_top (str, optional): The margin top of the logo. Defaults to "5%".
         image_width (str, optional): The width of the logo. Defaults to "80%".
         image_height (str, optional): The height of the logo. Defaults to "".
@@ -159,7 +163,14 @@ def details_html(key: str, values_str: str) -> str:
             }}
             </style>
             <div class="box-container">
-                <summary style='list-style: none;'><span style='color: #ff4c4b; font-size: 17px;'>{key}:<br> </span></summary><div><span style='font-size: 16px;'>{values_str}<br></span></div>
+                <summary style='list-style: none;'>
+                    <span style='color: #ff4c4b; font-size: 17px;'>{key}:<br>
+                    </span>
+                </summary>
+                <div>
+                    <span style='font-size: 16px;'>{values_str}<br>
+                    </span>
+                </div>
             </div>
             """
 
