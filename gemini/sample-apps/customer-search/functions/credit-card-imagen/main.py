@@ -1,4 +1,3 @@
-import base64
 import json
 from os import environ
 
@@ -25,10 +24,8 @@ def generate_base64_image(user_prompt):
     images = model.generate_images(prompt=user_prompt, number_of_images=1, seed=1)
 
     try:
-        images[0].save(location="./gen-img1.png", include_generation_parameters=True)
-        with open("./gen-img1.png", "rb") as img_file:
-            base64_image = base64.b64encode(img_file.read()).decode("utf-8")
-            return {"base64_image": base64_image}
+        base64_image = images[0]._as_base64_string()
+        return {"base64_image": base64_image}
     except Exception as e:
         print(f"Error occurred: {e}")
         return {"error": "Failed to generate or encode image."}
