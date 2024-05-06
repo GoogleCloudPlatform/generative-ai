@@ -4,22 +4,35 @@ A collection of videos, codelabs, courses, repositories, articles that help ever
 
 Please submit additional resources via a PR.
 
-## Official Documentation
+## Generative AI on Google Cloud
 
 - [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai)
+- [Overview of Generative AI on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/overview)
+- [Certifications and security controls](https://cloud.google.com/vertex-ai/generative-ai/docs/security-controls)
+- [Quotas and Limits](https://cloud.google.com/vertex-ai/generative-ai/docs/quotas)
+- [Pricing](https://cloud.google.com/vertex-ai/pricing#generative_ai_models)
 
 ## Products
 
-- Generative AI support on [Vertex AI](https://cloud.google.com/vertex-ai)
-  - [Overview](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview)
-  - [Generative AI Studio](https://cloud.google.com/generative-ai-studio)
-  - [Available Models](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/generative-ai-studio)
-    - Language Models ([Text](https://cloud.google.com/vertex-ai/docs/generative-ai/text/text-overview), [Code](https://cloud.google.com/vertex-ai/docs/generative-ai/code/code-models-overview), [Chat](https://cloud.google.com/vertex-ai/docs/generative-ai/chat/chat-prompts))
-    - Image Models ([link](https://cloud.google.com/vertex-ai/docs/generative-ai/image/overview))
-    - Speech Models ([Text-to-Speech](https://cloud.google.com/vertex-ai/docs/generative-ai/speech/text-to-speech) , [Speech-To-Text](https://cloud.google.com/vertex-ai/docs/generative-ai/speech/speech-to-text))
-  - [Model Garden](https://cloud.google.com/model-garden)
-  - [Pricing](https://cloud.google.com/vertex-ai/pricing#generative_ai_models)
-- Generative AI App Builder ([Blog](https://cloud.google.com/blog/products/ai-machine-learning/create-generative-apps-in-minutes-with-gen-app-builder), [Video 1](https://youtube.com/watch?v=0vM5UWC5crs), [Video 2](https://youtube.com/watch?v=kOmG83wGfTs))
+### Vertex AI
+- Use [Vertex AI](https://cloud.google.com/vertex-ai) to interact with, customize, and embed foundation models into your applications
+- Access foundation models on [Model Garden](https://cloud.google.com/model-garden)
+- Tune models via a simple UI on [Vertex AI Studio](https://cloud.google.com/generative-ai-studio)
+- Use [Vertex AI Agent Builder](https://cloud.google.com/products/agent-builder), to build and deploy AI agents grounded in their data
+- Google foundation models
+  - [Gemini API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#gemini-models)
+  - [PaLM API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#palm-models)
+  - [Codey API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#codey-models)
+  - [Imagen API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#imagen-models)
+  - [MedLM API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#medlm-models)
+
+### Gemini Models
+- [Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/overview), a multimodal model from Google DeepMind, is capable of understanding virtually any input, combining different types of information, and generating almost any output.
+- Prompt and test Gemini in [Vertex AI](https://console.cloud.google.com/freetrial/?redirectPath=%2Fvertex-ai%2Fgenerative%2Fmultimodal%2Fcreate%2Ftext) using text, images, video, or code.
+
+### Gemini for Google Cloud
+- [Gemini Code Assist](https://cloud.google.com/products/gemini/code-assist) offers AI-powered assistance to help developers build applications with higher velocity, quality, and security in popular code editors like VS Code and JetBrains, and on developer platforms like Firebase.
+- [Gemini for Google Cloud](https://cloud.google.com/products/gemini) offerings assist users in working and coding more effectively, gaining deeper data insights, navigating security challenges, and more.
 
 ## Videos
 
