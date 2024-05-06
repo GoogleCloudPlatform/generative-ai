@@ -16,6 +16,7 @@ Please submit additional resources via a PR.
 ## Products
 
 ### Vertex AI
+
 - Use [Vertex AI](https://cloud.google.com/vertex-ai) to interact with, customize, and embed foundation models into your applications
 - Access foundation models on [Model Garden](https://cloud.google.com/model-garden)
 - Tune models via a simple UI on [Vertex AI Studio](https://cloud.google.com/generative-ai-studio)
@@ -28,14 +29,17 @@ Please submit additional resources via a PR.
   - [MedLM API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#medlm-models)
 
 ### Gemini Models
+
 - [Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/overview), a multimodal model from Google DeepMind, is capable of understanding virtually any input, combining different types of information, and generating almost any output.
 - Prompt and test Gemini in [Vertex AI](https://console.cloud.google.com/freetrial/?redirectPath=%2Fvertex-ai%2Fgenerative%2Fmultimodal%2Fcreate%2Ftext) using text, images, video, or code.
 
 ### Gemini for Google Cloud
+
 - [Gemini Code Assist](https://cloud.google.com/products/gemini/code-assist) offers AI-powered assistance to help developers build applications with higher velocity, quality, and security in popular code editors like VS Code and JetBrains, and on developer platforms like Firebase.
 - [Gemini for Google Cloud](https://cloud.google.com/products/gemini) offerings assist users in working and coding more effectively, gaining deeper data insights, navigating security challenges, and more.
 
 ## Get Started
+
 - Quickstart tutorial using [Vertex AI Studio](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart) or the [Vertex AI API](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart-multimodal)
 - Explore pretrained models in [Model Garden](https://cloud.google.com/vertex-ai/docs/start/explore-models)
 - [Tune a Foundation model](https://cloud.google.com/vertex-ai/generative-ai/docs/models/tune-models)
