@@ -44,6 +44,7 @@ echo "Creating AlloyDB Primary Instance"
 gcloud alloydb instances create "${ALLOYDB_INSTANCE}" \
     --instance-type=PRIMARY \
     --cpu-count=2 \
+    --availability-type=ZONAL \
     --region="${REGION}" \
     --cluster="${ALLOYDB_CLUSTER}" \
     --project="${PROJECT_ID}" \
