@@ -1,6 +1,6 @@
 # Google Generative AI resources
 
-A collection of videos, codelabs, courses, repositories, articles that help everyone learn more about Google Generative AI offerings.
+A collection of resources that helps everyone learn more about Google Generative AI offerings.
 
 Please submit additional resources via a PR.
 
