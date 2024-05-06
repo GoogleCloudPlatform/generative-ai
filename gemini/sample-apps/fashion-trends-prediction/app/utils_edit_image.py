@@ -46,9 +46,9 @@ def edit_image_canvas(result_image_key: str, background_image: bytes):
         "Stroke width: ", 10, 50, 20, key=f"{result_image_key}_canvas_slider"
     )
 
-    background_image_PIL = Image.open(io.BytesIO(background_image))
-    height = int(background_image_PIL.size[1] / (background_image_PIL.size[0] / 704))
-    background = Image.new("RGB", background_image_PIL.size)
+    background_image_pil = Image.open(io.BytesIO(background_image))
+    height = int(background_image_pil.size[1] / (background_image_pil.size[0] / 704))
+    background = Image.new("RGB", background_image_pil.size)
 
     # Create a canvas component
     canvas_result = st_canvas(
@@ -56,7 +56,7 @@ def edit_image_canvas(result_image_key: str, background_image: bytes):
         stroke_width=stroke_width,
         stroke_color="rgba(255, 255, 255, 1)",
         background_color="#000",
-        background_image=background_image_PIL,  # type: ignore
+        background_image=background_image_pil,  # type: ignore
         update_streamlit=True,
         height=height,
         width=704,

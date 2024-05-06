@@ -1,8 +1,20 @@
 """Module for prompt to be given to Gemini for generation during data preparation."""
 
 # pylint: disable=C0301
+# pylint: disable=E0401
 
-def image_attribute_prompt(fewshot_images, user_image):
+from vertexai.preview.generative_models import Part
+from config import config
+
+fewshot_images: list[Part] = []
+num_files = len(config["fewshot_images"])
+for i in range(num_files):
+    filename = "image" + str(i + 1)
+    fewshot_images.append(
+        Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"
+    )
+
+def image_attribute_prompt(user_image):
     return [
         """
                 You are a fashion editor and your task is to spot fashion trends and extract outfit and fashion items from the image provided .

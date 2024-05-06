@@ -36,10 +36,6 @@ def image_generation(
             The prompt to use to generate the image.
         sample_count:
             The number of images to generate.
-        sample_image_size:
-            The size of the generated images.
-        aspect_ratio:
-            The aspect ratio of the generated images.
         state_key:
             The key to use to store the generated images in the session state.
 
@@ -100,8 +96,6 @@ def edit_image_generation(
 def render_one_image(
     images_key: str,
     image_position: int,
-    select_button: bool = False,
-    selected_image_key: str = "",
     edit_button: bool = False,
     image_to_edit_key: str = "",
     download_button: bool = True,
@@ -114,10 +108,6 @@ def render_one_image(
             The key in the session state that stores the list of images.
         image_position:
             The index of the image to render.
-        select_button:
-            Whether to show a button that allows the user to select the image.
-        selected_image_key:
-            The key in the session state to store the selected image.
         edit_button:
             Whether to show a button that allows the user to edit the image.
         image_to_edit_key:
@@ -151,8 +141,6 @@ def render_one_image(
 
 def generate_image_columns(
     images_key: str,
-    select_button: bool = False,
-    selected_image_key: str = "",
     edit_button: bool = True,
     image_to_edit_key: str = "",
     download_button: bool = True,
@@ -162,10 +150,6 @@ def generate_image_columns(
     Args:
         images_key (str):
             The key in the session state that stores the images.
-        select_button (bool, optional):
-            Whether to show a button to select the image. Defaults to False.
-        selected_image_key (str, optional):
-            The key in session state that stores the selected image. Defaults to an empty string.
         edit_button (bool, optional):
             Whether to show a button to edit the image. Defaults to False.
         image_to_edit_key (str, optional):
@@ -188,8 +172,6 @@ def generate_image_columns(
                     render_one_image(
                         images_key,
                         i + counter,
-                        select_button,
-                        selected_image_key,
                         edit_button,
                         image_to_edit_key,
                         download_button,
@@ -222,10 +204,6 @@ def render_image_generation_ui(
             The key used to store the generated images in the session state.
         pre_populated_prompts:
             A list of pre-populated prompts.
-        select_button:
-            Whether to show a button to select a pre-populated prompt.
-        selected_image_key:
-            The key used to store the selected image in the session state.
         edit_button:
             Whether to show a button to edit the selected image.
         title:
@@ -324,8 +302,6 @@ def render_image_generation_ui(
     if generated_images_key in st.session_state:
         generate_image_columns(
             generated_images_key,
-            select_button,
-            selected_image_key,
             edit_button,
             image_to_edit_key,
             download_button,
@@ -456,8 +432,6 @@ def render_image_edit_prompt(
     if edited_images_key in st.session_state:
         generate_image_columns(
             edited_images_key,
-            select_button,
-            selected_image_key,
             download_button=download_button,
         )
 

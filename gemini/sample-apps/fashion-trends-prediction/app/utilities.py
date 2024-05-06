@@ -71,12 +71,11 @@ def button_html_script(widget_label: str, btn_bg_color1: str, btn_bg_color2: str
 
 
 def render_svg(svg_image_path: str) -> None:
-    """Renders an svg image
+    """Renders the svg string at given path.
     Args:
         svg_image_path (str): The SVG string path to render.
 
     """
-    """Renders the svg string at given path."""
 
     st.markdown(
         f"""
@@ -175,7 +174,7 @@ def details_html(key: str, values_str: str) -> str:
             """
 
 
-exception_html = """
+EXCEPTION_HTML = """
                     <style>
                     .box-container {
                         border: 1px solid gray;

@@ -33,15 +33,6 @@ gemini_model_language: GenerativeModel = GenerativeModel("gemini-1.0-pro-002")
 parameters = config["parameters"]["standard"]
 
 
-fewshot_images: list[Part] = []
-num_files = len(config["fewshot_images"])
-for i in range(num_files):
-    filename = "image" + str(i + 1)
-    fewshot_images.append(
-        Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"
-    )
-
-
 def generate_caption(image_path: str) -> dict:
     """Generates a caption for an image using the Gemini model.
 
@@ -61,7 +52,7 @@ def generate_caption(image_path: str) -> dict:
         )
 
     response = gemini_model.generate_content(
-        image_attribute_prompt(fewshot_images=fewshot_images, user_image=user_image),
+        image_attribute_prompt(user_image=user_image),
         generation_config=GenerationConfig(
             max_output_tokens=2048,
             temperature=0.4,

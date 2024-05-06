@@ -69,7 +69,6 @@ def periodic_extraction(scrape_parameters: Scrape) -> None:
                         saved["global"][influencer],
                         scrape_parameters.num_posts,
                         cookies,
-                        model="Gemini",
                     )
                 else:
                     posts = get_posts(
@@ -77,7 +76,6 @@ def periodic_extraction(scrape_parameters: Scrape) -> None:
                         [],
                         scrape_parameters.num_posts,
                         cookies,
-                        model="Gemini",
                     )
 
                 temp_map[influencer] = posts

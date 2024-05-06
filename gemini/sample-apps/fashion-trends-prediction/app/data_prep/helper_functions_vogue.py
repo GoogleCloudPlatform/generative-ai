@@ -37,7 +37,7 @@ def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
 
     articles = []
     for page in range(1, num_pages):
-        logging.info(f"Scraping page number {page}")
+        logging.info("Scraping page number %s", str(page))
         fashion_page = BeautifulSoup(
             requests.get(url + "/fashion?page=" + str(page)).content, "html.parser"
         )

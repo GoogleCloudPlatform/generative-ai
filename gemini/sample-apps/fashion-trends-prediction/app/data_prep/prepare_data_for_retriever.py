@@ -25,7 +25,7 @@ def prepare_data_for_retriever() -> None:
 
     """
 
-    with open(DATA_PATH, "r") as f:
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
         saved = json.load(f)
 
     articles = [item[1].lower() for item in saved["articles"]]
@@ -44,8 +44,8 @@ def prepare_data_for_retriever() -> None:
     )
 
     all_chunks = []
-    for i in range(len(article_docs)):
-        chunks = text_splitter.split_documents([article_docs[i]])
+    for i, doc in enumerate(article_docs):
+        chunks = text_splitter.split_documents([doc])
         for chunk in chunks:
             chunk.metadata["id"] = i
         all_chunks += chunks
@@ -54,9 +54,10 @@ def prepare_data_for_retriever() -> None:
     for chunk in all_chunks:
         chunks_list.append(chunk.dict())
 
-    # either create a data directory and run the below code to store the files locally and correspondingly change the code in articles.py to read from local
-    # or store these files in gcs and change the path in config.py of relevant keys of config['Data']
-    with open("../data/chunks_final.json", "w") as outfile:
+    # either create a data directory and run the below code to store the files locally
+    # and correspondingly change the code in articles.py to read from local
+    # or store these files in gcs and change path in config.py of relevant keys of config['Data']
+    with open("../data/chunks_final.json", "w", encoding="utf-8") as outfile:
         json.dump(chunks_list, outfile)
 
     embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
