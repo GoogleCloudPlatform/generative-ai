@@ -97,22 +97,7 @@ Please submit additional resources via a PR.
   - [Responsible AI for Developers: Interpretability & Transparency](https://www.cloudskillsboost.google/paths/183/course_templates/989)
   - [Machine Learning Operations (MLOps) for Generative AI](https://www.cloudskillsboost.google/paths/183/course_templates/927)
   
-## Google Cloud Next 2023 Announcements + Videos
+## Google Cloud Playlists/Videos
 
-- Video: [What's new with generative AI at Google Cloud](https://cloud.withgoogle.com/next/generative-ai?session=SPTL200)
-- Video: [Imagination to creation: Build a differentiated generative AI application on Google Cloud](https://cloud.withgoogle.com/next/session-library?session=AIML202)
-- Video: [Build extensions and extension-powered applications with Vertex AI](https://cloud.withgoogle.com/next/session-library?session=AIML209)
-- Video: [Generative AI and search: Better together to unlock enterprise data](https://cloud.withgoogle.com/next/session-library?session=AIML105)
-- Video: [Transform search experiences for customers and employees](https://cloud.withgoogle.com/next/session-library?session=AIML111)
-- Video: [Conversational AI experiences](https://cloud.withgoogle.com/next/session-library?session=AIML115)
-- Video: [Common business use cases for generative AI](https://cloud.withgoogle.com/next/session-library?session=AIML110)
-
-## Google I/O 2023 Announcements + Videos
-
-- Video: [Recap of Generative AI Announcements](https://www.youtube.com/shorts/EWLfMw-mfRs)
-- Blog : [At Google I/O Generative AI gets to work](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-at-io-2023)
-- Blog : [Google Cloud advances generative AI at I/O: new foundation models, embeddings, and tuning tools in Vertex AI](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-launches-new-ai-models-opens-generative-ai-studio)
-- Video : [10 Ways to use Machine Learning with Google Cloud](https://www.youtube.com/watch?v=oQMgqMRR-io)
-- Video : [Utilizing LLMs for Search](https://www.youtube.com/watch?v=AtyCqaOGoj4)
-- Video : [Generative AI for conversational experiences](https://www.youtube.com/watch?v=50EJft0ILUI)
-- Video : [Scaling Large Language Models on Google Cloud](https://www.youtube.com/watch?v=t74WVC6L5wU)
+- [Generative AI - Google Cloud Next 2024](https://www.youtube.com/watch?v=PyM3Vt6s1GI&list=PLIivdWyY5sqLHERDVwseyPGka96mCiwpq)
+- [AI and Machine Learning with Google Cloud](https://www.youtube.com/watch?v=V6YTS5aofqU&list=PLIivdWyY5sqJdmVMjLI8iCul14XkTRosn)
