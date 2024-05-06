@@ -50,8 +50,8 @@ config: Config = {
     "username": "<YOUR_INSTAGRAM_USERNAME>",
     "password": "<YOUR_INSTAGRAM_PASSWORD>",
     "Images": {
-        "logo": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/logo.png", # noqa
-        "trend": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/trend-page-img.avif", # noqa
+        "logo": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/logo.png",  # noqa
+        "trend": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/trend-page-img.avif",  # noqa
         "chat": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/chat.png",
         "imagen": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/canvas.png",
         "slide1": "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/fashion-trends-prediction/app/images/slide1.svg",

@@ -44,7 +44,9 @@ def nav_page(page_name: str, timeout_secs: int = 3) -> None:
     html(nav_script)
 
 
-def button_html_script(widget_label: str, btn_bg_color1: str, btn_bg_color2: str) -> str:
+def button_html_script(
+    widget_label: str, btn_bg_color1: str, btn_bg_color2: str
+) -> str:
     """Generates HTML script to change the color of a button.
 
     Args:
