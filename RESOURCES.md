@@ -40,7 +40,7 @@ Please submit additional resources via a PR.
 - Explore pretrained models in [Model Garden](https://cloud.google.com/vertex-ai/docs/start/explore-models)
 - [Tune a Foundation model](https://cloud.google.com/vertex-ai/generative-ai/docs/models/tune-models)
 
-## Videos
+## Video Courses
 
 - [Intro to Gen AI - Playlist](https://www.youtube.com/playlist?list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK)
   - [Introduction to Generative AI](https://www.youtube.com/watch?v=cZaNf2rA30k&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=1&pp=iAQB)
@@ -55,6 +55,15 @@ Please submit additional resources via a PR.
   - [Create Image Captioning Models: Overview](https://www.youtube.com/watch?v=0BaIeMoFEoE&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=5&pp=iAQB)
   - [Introduction to Vertex AI Studio](https://www.youtube.com/watch?v=KWarqNq195M&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=6&pp=iAQB)
   - [Vector Search and Embeddings](https://www.youtube.com/watch?v=YlAWtEAJl9g&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=7&pp=iAQB)
+- [Gemini for Google Cloud - Playlist](https://www.youtube.com/playlist?list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F)
+  - [Gemini for Application Developers](https://www.youtube.com/watch?v=WsXVGr0Q3C4&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=1&pp=iAQB)
+  - [Gemini for Cloud Architects](https://www.youtube.com/watch?v=y-dlxWHtfhQ&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=2&pp=iAQB)
+  - [Gemini for Data Scientists and Analysts](https://www.youtube.com/watch?v=0H7brO5JeCQ&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=3&pp=iAQB)
+  - [Gemini for Network Engineers](https://www.youtube.com/watch?v=RHla4EEleCE&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=4&pp=iAQB)
+  - [Gemini for Security Engineers](https://www.youtube.com/watch?v=08xeOzUUL-g&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=5&pp=iAQB)
+  - [Gemini for Cloud DevOps Engineers](https://www.youtube.com/watch?v=zaVTJVwtyzI&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=6&pp=iAQB)
+  - [Gemini end-to-end Software Development Lifecycle](https://www.youtube.com/watch?v=h41eoDraUzE&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=7&pp=iAQB)
+  - [Technical training courses in Generative AI from Google Cloud](https://www.youtube.com/watch?v=5FIlXPSmUUc&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=8&pp=iAQB)
 
 ## Cloud Skills Boost
 
