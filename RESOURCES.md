@@ -42,25 +42,19 @@ Please submit additional resources via a PR.
 
 ## Videos
 
-- [Generative AI for Developers - Playlist](https://www.youtube.com/playlist?list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn)
-  - [Introduction to Machine Learning on Vertex AI](https://www.youtube.com/watch?v=-3Olw-C4FN4&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=1&pp=iAQB)
-  - [Prototyping Language Apps with Generative AI Studio](https://www.youtube.com/watch?v=9_zwIyutN7o&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=2&t=1s&pp=iAQB)
-  - [How to tune LLMs in Generative AI Studio](https://www.youtube.com/watch?v=4A4W03qUTsw&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=3&pp=iAQB)
-  - [Introduction to foundational models on Google Cloud](https://www.youtube.com/watch?v=YCZ6nwGnL4o&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=4&pp=iAQB)
-  - [Enterprise Search via Generative AI App Builder](https://www.youtube.com/watch?v=fY8aOe6H2nw&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=5&pp=iAQB)
-  - [Generate and edit images with Generative AI Studio](https://www.youtube.com/watch?v=6n5ngB88DHU&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn)
-  - [Introduction to Vertex AI Model Garden](https://www.youtube.com/watch?v=I7UiSU96CLc&list=PLIivdWyY5sqLRCzKJyixrIDPQKwU6XHpn&index=8)
-  - [Which AI/ML solution on Vertex AI](https://www.youtube.com/watch?v=AtyCqaOGoj4)
-- Google LLM Foundations
-  - [Transformers, explained: Understand the model behind GPT, BERT, and T5](https://www.youtube.com/watch?v=SZorAJ4I-sA)
-  - [What are Large Language Models (LLMs)?](https://www.youtube.com/watch?v=iR2O2GPbB0E)
-  - [Connecting LLMs to Tools](https://www.youtube.com/watch?v=P3buv6P_u7c)
-- Generative AI Learning Path
-  - [Introduction to Large Language Models](https://www.youtube.com/watch?v=zizonToFXDs)
-  - [Introduction to Generative AI](https://www.youtube.com/watch?v=G2fqAlgmoPo)
-  - [Introduction to Responsible AI](https://www.youtube.com/watch?v=3-xhMXeYIcg)
-  - [Introduction to Generative AI Studio](https://www.youtube.com/watch?v=-7nf5EJ2Fsc)
-  - [Transformer Models and BERT Overview](https://www.youtube.com/watch?v=t45S_MwAcOw)
+- [Intro to Gen AI - Playlist](https://www.youtube.com/playlist?list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK)
+  - [Introduction to Generative AI](https://www.youtube.com/watch?v=cZaNf2rA30k&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=1&pp=iAQB)
+  - [Introduction to Large Language Models](https://www.youtube.com/watch?v=RBzXsQHjptQ&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=2&pp=iAQB)
+  - [Introduction to Responsible AI](https://www.youtube.com/watch?v=w_3L1Bf2P_g&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=3&pp=iAQB)
+  - [Intro to Gen AI training course from Google Cloud](https://www.youtube.com/watch?v=9Eh7gsIH5h4&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=4&pp=iAQB)
+- [Gen AI for Developers](https://www.youtube.com/watch?v=JR9Gdo-_lx8&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20)
+  - [Introduction to Image Generation](https://www.youtube.com/watch?v=JR9Gdo-_lx8&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=1&pp=iAQB)
+  - [Attention Mechanism: Overview](https://www.youtube.com/watch?v=8PmOaVYVeKY&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=2&pp=iAQB)
+  - [Encoder-Decoder Architecture: Overview](https://www.youtube.com/watch?v=671xny8iows&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=3&pp=iAQB)
+  - [Transformer Models and BERT Model: Overview](https://www.youtube.com/watch?v=hsp1OAcoLBY&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=4&pp=iAQB)
+  - [Create Image Captioning Models: Overview](https://www.youtube.com/watch?v=0BaIeMoFEoE&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=5&pp=iAQB)
+  - [Introduction to Vertex AI Studio](https://www.youtube.com/watch?v=KWarqNq195M&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=6&pp=iAQB)
+  - [Vector Search and Embeddings](https://www.youtube.com/watch?v=YlAWtEAJl9g&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=7&pp=iAQB)
 
 ## Cloud Skills Boost
 
