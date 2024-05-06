@@ -2,6 +2,7 @@
 
 # pylint: disable=C0301
 
+
 def image_attribute_prompt(fewshot_images, user_image):
     return [
         """

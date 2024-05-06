@@ -2,6 +2,7 @@
 
 # pylint: disable=C0301
 
+
 def fashion_bot_context(country: str, category: str, data: dict) -> str:
     """Generates a context for the fashion bot based on the given country and category.
 
