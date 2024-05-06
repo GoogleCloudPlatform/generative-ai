@@ -9,6 +9,7 @@ Please submit additional resources via a PR.
 - [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai)
 - [Overview of Generative AI on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/overview)
 - [Certifications and security controls](https://cloud.google.com/vertex-ai/generative-ai/docs/security-controls)
+- [Responsible AI best practices](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/responsible-ai)
 - [Quotas and Limits](https://cloud.google.com/vertex-ai/generative-ai/docs/quotas)
 - [Pricing](https://cloud.google.com/vertex-ai/pricing#generative_ai_models)
 
@@ -33,6 +34,11 @@ Please submit additional resources via a PR.
 ### Gemini for Google Cloud
 - [Gemini Code Assist](https://cloud.google.com/products/gemini/code-assist) offers AI-powered assistance to help developers build applications with higher velocity, quality, and security in popular code editors like VS Code and JetBrains, and on developer platforms like Firebase.
 - [Gemini for Google Cloud](https://cloud.google.com/products/gemini) offerings assist users in working and coding more effectively, gaining deeper data insights, navigating security challenges, and more.
+
+## Get Started
+- Quickstart tutorial using [Vertex AI Studio](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart) or the [Vertex AI API](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart-multimodal)
+- Explore pretrained models in [Model Garden](https://cloud.google.com/vertex-ai/docs/start/explore-models)
+- [Tune a Foundation model](https://cloud.google.com/vertex-ai/generative-ai/docs/models/tune-models)
 
 ## Videos
 
