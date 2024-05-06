@@ -33,7 +33,7 @@ def periodic_extraction(scrape_parameters: Scrape) -> None:
     """Extracts data from Instagram periodically and saves it in a JSON file.
 
     Args:
-            scrape_parameters (Scrape): An object containing the number of countries, influencers, and posts to scrape.
+        scrape_parameters (Scrape): Object having no. of countries, influencers, posts to scrape.
 
     """
 
@@ -95,7 +95,7 @@ def create_final_data(scrape_parameters: Scrape) -> None:
     """Creates the summarized final data from the results of image captioning.
 
     Args:
-            scrape_parameters (Scrape): An object containing the number of countries, influencers, and posts to scrape.
+        scrape_parameters (Scrape): Object having no. of countries, influencers, posts to scrape.
 
     """
 
@@ -116,16 +116,14 @@ def create_final_data(scrape_parameters: Scrape) -> None:
             for element in saved["global"][influencer]:
                 image_attr = element[2]
                 for cat, values in image_attr.items():
-                    saved["finaldata"][country_name].setdefault(cat, []).extend(
-                        values.copy()
-                    )
+                    saved["finaldata"][country_name].setdefault(cat, []).extend(values.copy())
 
     with open(data_path, "w") as outfile:
         json.dump(saved, outfile)
 
 
 def merge_keys() -> None:
-    """Merges keys in the final data file that have only a difference of spaces, capital letters, etc."""
+    """Merges keys in final data file that have a difference of spaces, capital letters, etc."""
 
     with open(data_path, "r") as f:
         saved = json.load(f)
@@ -138,11 +136,7 @@ def merge_keys() -> None:
         finaldata_new[country] = {}
 
         for key in finaldata[country]:
-            newkey = (
-                key.strip().lower()
-                if not (key.strip() == key and key.lower() == key)
-                else key
-            )
+            newkey = key.strip().lower() if not (key.strip() == key and key.lower() == key) else key
             if newkey in finaldata_new[country]:
                 finaldata_new[country][newkey] += finaldata[country][key].copy()
             else:

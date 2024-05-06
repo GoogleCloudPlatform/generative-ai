@@ -72,7 +72,9 @@ category = category.lower()
 cat_key = "chat-context" + country + category
 
 if cat_key not in st.session_state:
-    st.session_state[cat_key] = fashion_bot_context(country, category, st.session_state["JSONdata"]["finaldata"])
+    st.session_state[cat_key] = fashion_bot_context(
+        country, category, st.session_state["JSONdata"]["finaldata"]
+    )
 
 bot_key = "bot" + country + category
 
@@ -80,7 +82,9 @@ bot_key = "bot" + country + category
 if bot_key in st.session_state:
     bot = st.session_state[bot_key]
 else:
-    model = GenerativeModel(model_name="gemini-1.0-pro-002", system_instruction=[st.session_state[cat_key]])
+    model = GenerativeModel(
+        model_name="gemini-1.0-pro-002", system_instruction=[st.session_state[cat_key]]
+    )
     bot = model.start_chat()
 
     st.session_state[bot_key] = bot
@@ -143,13 +147,17 @@ with st.container(border=True):
 
         with st.spinner("Generating response..."):
             if any(word in st.session_state["prompt"].lower() for word in words_list):
-                intented_outfit = bot.send_message(FASHION_BOT_IMG_GEN_INTENT.format(st.session_state["prompt"]), generation_config=generation_config, safety_settings=safety_settings).text
+                intented_outfit = bot.send_message(
+                    FASHION_BOT_IMG_GEN_INTENT.format(st.session_state["prompt"]),
+                    generation_config=generation_config,
+                    safety_settings=safety_settings,
+                ).text
                 gen_prompt = "Outfit - " + intented_outfit + " " + category
 
                 try:
-                    _imgs = image_generation(prompt=gen_prompt,
-                                    sample_count=1,
-                                    state_key='imagen_image')
+                    _imgs = image_generation(
+                        prompt=gen_prompt, sample_count=1, state_key="imagen_image"
+                    )
 
                     imgs = [_img._image_bytes for _img in _imgs]
                     st.session_state[hist_key].append(

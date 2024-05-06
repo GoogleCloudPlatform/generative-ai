@@ -163,7 +163,7 @@ def generate_image_columns(
         select_button (bool, optional):
             Whether to show a button to select the image. Defaults to False.
         selected_image_key (str, optional):
-            The key in the session state that stores the selected image. Defaults to an empty string.
+            The key in session state that stores the selected image. Defaults to an empty string.
         edit_button (bool, optional):
             Whether to show a button to edit the image. Defaults to False.
         image_to_edit_key (str, optional):

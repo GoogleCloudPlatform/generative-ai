@@ -19,8 +19,7 @@ Config = TypedDict(
 )
 
 config: Config = {
-    # "PROJECT_ID": "<YOUR_GCP_PROJECT_ID>",
-    "PROJECT_ID": "aurora-cohort-2",
+    "PROJECT_ID": "<YOUR_GCP_PROJECT_ID>",
     "LOCATION": "us-central1",
     "parameters": {
         "standard": {

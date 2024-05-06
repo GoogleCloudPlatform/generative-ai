@@ -10,11 +10,13 @@ logging.basicConfig(level=logging.INFO)
 
 # Get news articles content
 def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
-    """Gets news articles from a given URL and returns a list of tuples containing the article URL, summary, and attributes.
+    """Gets news articles from a given URL and returns a list of tuples containing the article URL,
+    summary, and attributes.
 
     Args:
             url (str): The URL of the news website.
-            past_scrape (list): A list of tuples containing the article URL, summary, and attributes of previously scraped articles.
+            past_scrape (list): A list of tuples containing the article URL,
+                                summary, and attributes of previously scraped articles.
             num_pages (int, optional): The number of pages to scrape. Defaults to 2.
 
     Returns:
@@ -41,9 +43,9 @@ def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
                 return articles + past_scrape
 
             article_text = ""
-            for div in BeautifulSoup(
-                requests.get(new_url).content, "html.parser"
-            ).find_all("div", class_="article__body"):
+            for div in BeautifulSoup(requests.get(new_url).content, "html.parser").find_all(
+                "div", class_="article__body"
+            ):
                 article_text += "".join(p.text for p in div.find_all("p"))
 
             if article_text == "":

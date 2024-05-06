@@ -25,7 +25,7 @@ def fashion_bot_context(country: str, category: str, data: dict) -> str:
     outfits_list = []
     if country in data and category in data[country]:
         for outfit in data[country][category]:
-            if isinstance(outfit, str)
+            if isinstance(outfit, str):
                 outfits_list.append(outfit)
             if len(outfits_list) > 3000:
                 break
