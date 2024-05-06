@@ -120,7 +120,9 @@ def create_final_data(scrape_parameters: Scrape) -> None:
             for element in saved["global"][influencer]:
                 image_attr = element[2]
                 for cat, values in image_attr.items():
-                    saved["finaldata"][country_name].setdefault(cat, []).extend(values.copy())
+                    saved["finaldata"][country_name].setdefault(cat, []).extend(
+                        values.copy()
+                    )
 
     with open(data_path, "w") as outfile:
         json.dump(saved, outfile)
@@ -140,7 +142,11 @@ def merge_keys() -> None:
         finaldata_new[country] = {}
 
         for key in finaldata[country]:
-            newkey = key.strip().lower() if not (key.strip() == key and key.lower() == key) else key
+            newkey = (
+                key.strip().lower()
+                if not (key.strip() == key and key.lower() == key)
+                else key
+            )
             if newkey in finaldata_new[country]:
                 finaldata_new[country][newkey] += finaldata[country][key].copy()
             else:
@@ -241,7 +247,9 @@ def vogue_scrape() -> None:
 
     if "articles" not in saved:
         saved["articles"] = []
-    saved["articles"] = get_articles("https://www.vogue.in", saved["articles"], num_pages=10)
+    saved["articles"] = get_articles(
+        "https://www.vogue.in", saved["articles"], num_pages=10
+    )
 
     with open(data_path, "w") as outfile:
         json.dump(saved, outfile)

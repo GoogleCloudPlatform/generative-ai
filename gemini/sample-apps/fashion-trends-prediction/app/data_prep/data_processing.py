@@ -13,12 +13,12 @@ import os
 import sys
 import urllib.request
 
-import requests
-
 from data_prep_genai_prompts import image_attribute_prompt
+import requests
 
 sys.path.append("../")
 from config import config
+from helper_functions_insta import get_id
 from vertexai.preview.generative_models import (
     GenerationConfig,
     GenerativeModel,
@@ -26,8 +26,6 @@ from vertexai.preview.generative_models import (
     HarmCategory,
     Part,
 )
-
-from helper_functions_insta import get_id
 
 gemini_model: GenerativeModel = GenerativeModel("gemini-1.0-pro-vision-001")
 gemini_model_language: GenerativeModel = GenerativeModel("gemini-1.0-pro-002")
@@ -39,7 +37,9 @@ fewshot_images: list[Part] = []
 num_files = len(config["fewshot_images"])
 for i in range(num_files):
     filename = "image" + str(i + 1)
-    fewshot_images.append(Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg")
+    fewshot_images.append(
+        Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"
+    )
 
 
 def generate_caption(image_path: str) -> dict:
@@ -56,7 +56,9 @@ def generate_caption(image_path: str) -> dict:
 
     with open(image_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
-        user_image = Part.from_data(data=base64.b64decode(encoded_string), mime_type="image/jpeg")
+        user_image = Part.from_data(
+            data=base64.b64decode(encoded_string), mime_type="image/jpeg"
+        )
 
     response = gemini_model.generate_content(
         image_attribute_prompt(fewshot_images=fewshot_images, user_image=user_image),
@@ -124,7 +126,9 @@ def get_posts(user: str, previous: list, count: int = 10, cookies: dict = None) 
 
     flag = False
     while count > 0 and flag is False:
-        response = requests.get(config["links"]["graphql"], params=params, cookies=cookies)
+        response = requests.get(
+            config["links"]["graphql"], params=params, cookies=cookies
+        )
 
         if response.status_code != 200:
             break

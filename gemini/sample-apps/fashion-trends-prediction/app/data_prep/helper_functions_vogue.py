@@ -49,9 +49,9 @@ def get_articles(url: str, past_scrape: list, num_pages: int = 2) -> list:
                 return articles + past_scrape
 
             article_text = ""
-            for div in BeautifulSoup(requests.get(new_url).content, "html.parser").find_all(
-                "div", class_="article__body"
-            ):
+            for div in BeautifulSoup(
+                requests.get(new_url).content, "html.parser"
+            ).find_all("div", class_="article__body"):
                 article_text += "".join(p.text for p in div.find_all("p"))
 
             if article_text == "":
