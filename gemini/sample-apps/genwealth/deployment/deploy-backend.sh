@@ -17,55 +17,55 @@ gcloud compute networks create "${VPC_NAME}" --project="${PROJECT_ID}" --subnet-
 # Create an IP Allocation for Private Services Access
 echo "Creating IP Allocation for PSA"
 gcloud compute addresses create demo-psa-range \
-    --global \
-    --purpose=VPC_PEERING \
-    --prefix-length=16 \
-    --network="${VPC_NAME}"
+  --global \
+  --purpose=VPC_PEERING \
+  --prefix-length=16 \
+  --network="${VPC_NAME}"
 
 # Create the Private Services Access Connection
 echo "Creating PSA connection"
 gcloud services vpc-peerings connect \
-    --service=servicenetworking.googleapis.com \
-    --ranges="demo-psa-range" \
-    --network="${VPC_NAME}"
+  --service=servicenetworking.googleapis.com \
+  --ranges="demo-psa-range" \
+  --network="${VPC_NAME}"
 
 # Create AlloyDB Cluster
 echo "Creating AlloyDB Cluster"
 gcloud alloydb clusters create "${ALLOYDB_CLUSTER}" \
-    --database-version="POSTGRES_14" \
-    --password="${ALLOYDB_PASSWORD}" \
-    --network="${VPC_NAME}" \
-    --region="${REGION}" \
-    --project="${PROJECT_ID}" \
-    --allocated-ip-range-name="demo-psa-range"
+  --database-version="POSTGRES_14" \
+  --password="${ALLOYDB_PASSWORD}" \
+  --network="${VPC_NAME}" \
+  --region="${REGION}" \
+  --project="${PROJECT_ID}" \
+  --allocated-ip-range-name="demo-psa-range"
 
 # Create AlloyDB Primary Instance
 echo "Creating AlloyDB Primary Instance"
 gcloud alloydb instances create "${ALLOYDB_INSTANCE}" \
-    --instance-type=PRIMARY \
-    --cpu-count=2 \
-    --availability-type=ZONAL \
-    --region="${REGION}" \
-    --cluster="${ALLOYDB_CLUSTER}" \
-    --project="${PROJECT_ID}" \
-    --ssl-mode="ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+  --instance-type=PRIMARY \
+  --cpu-count=2 \
+  --availability-type=ZONAL \
+  --region="${REGION}" \
+  --cluster="${ALLOYDB_CLUSTER}" \
+  --project="${PROJECT_ID}" \
+  --ssl-mode="ALLOW_UNENCRYPTED_AND_ENCRYPTED"
 
 # Create GCE Instance for pgadmin
 echo "Creating GCE instance for pgAdmin"
 gcloud compute instances create "${GCE_INSTANCE}" \
-    --project="${PROJECT_ID}" \
-    --zone="${ZONE}" \
-    --machine-type=e2-standard-2 \
-    --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet="${VPC_NAME}" \
-    --metadata=enable-oslogin=true \
-    --provisioning-model=STANDARD \
-    --service-account="${PROJECT_NUMBER}"-compute@developer.gserviceaccount.com \
-    --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append,https://www.googleapis.com/auth/cloud-platform \
-    --tags="${GCE_INSTANCE}" \
-    --create-disk=auto-delete=yes,boot=yes,device-name="${GCE_INSTANCE}",image=projects/debian-cloud/global/images/debian-12-bookworm-v20240213,mode=rw,size=100,type=projects/"${PROJECT_ID}"/zones/${ZONE}/diskTypes/pd-ssd \
-    --shielded-secure-boot \
-    --shielded-vtpm \
-    --shielded-integrity-monitoring 
+  --project="${PROJECT_ID}" \
+  --zone="${ZONE}" \
+  --machine-type=e2-standard-2 \
+  --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet="${VPC_NAME}" \
+  --metadata=enable-oslogin=true \
+  --provisioning-model=STANDARD \
+  --service-account="${PROJECT_NUMBER}"-compute@developer.gserviceaccount.com \
+  --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append,https://www.googleapis.com/auth/cloud-platform \
+  --tags="${GCE_INSTANCE}" \
+  --create-disk=auto-delete=yes,boot=yes,device-name="${GCE_INSTANCE}",image=projects/debian-cloud/global/images/debian-12-bookworm-v20240213,mode=rw,size=100,type=projects/"${PROJECT_ID}"/zones/${ZONE}/diskTypes/pd-ssd \
+  --shielded-secure-boot \
+  --shielded-vtpm \
+  --shielded-integrity-monitoring
 
 # Add necessary permissions for GCE instance
 echo "Adding permissions"
@@ -79,7 +79,7 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
-  --role="roles/alloydb.admin" 
+  --role="roles/alloydb.admin"
 
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-alloydb.iam.gserviceaccount.com" \
@@ -158,4 +158,3 @@ gcloud compute copy-files ./env.sh "$GCE_INSTANCE":/tmp/env.sh --zone="$ZONE"
 gcloud compute ssh "$GCE_INSTANCE" --zone="$ZONE" --command="chmod +x /tmp/install-pgadmin.sh"
 gcloud compute ssh "$GCE_INSTANCE" --zone="$ZONE" --command="chmod +x /tmp/env.sh"
 gcloud compute ssh "$GCE_INSTANCE" --zone="$ZONE" --command="/tmp/install-pgadmin.sh"
-

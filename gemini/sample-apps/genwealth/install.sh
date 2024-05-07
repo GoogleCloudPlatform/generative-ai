@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###
-### Deploys the genwealth app 
+### Deploys the genwealth app
 ###
 ### NOTE: you need the latest version of gcloud (i.e. 468 or later) to deploy this
 ###
@@ -10,7 +10,7 @@
 usage() {
   echo "Usage: $0 [--skip-org-policy-updates]"
   echo "Executes deploy-org-policies.sh, optionally skipping policy updates."
-  exit 1 
+  exit 1
 }
 
 # Set the default behavior to update policies
@@ -19,10 +19,10 @@ skip_org_policies=false
 # Process command-line flags
 while [[ "$1" != "" ]]; do
   case "$1" in
-    --skip-org-policy-updates ) skip_org_policies=true ;;
-    * ) usage ;; # Catch any other flags as incorrect usage
+  --skip-org-policy-updates) skip_org_policies=true ;;
+  *) usage ;; # Catch any other flags as incorrect usage
   esac
-  shift  # Shift to the next argument
+  shift # Shift to the next argument
 done
 
 # Enable necessary APIs
