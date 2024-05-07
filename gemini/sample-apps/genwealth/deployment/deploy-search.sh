@@ -73,9 +73,9 @@ curl -X POST \
   "dataStoreIds": ["'"${DATA_STORE_ID}"'"],
   "solutionType": "SOLUTION_TYPE_SEARCH",
   "searchEngineConfig": {
-     "searchTier": "SEARCH_TIER_ENTERPRISE",
-     "searchAddOns": ["SEARCH_ADD_ON_LLM"]
-   }
+    "searchTier": "SEARCH_TIER_ENTERPRISE",
+    "searchAddOns": ["SEARCH_ADD_ON_LLM"]
+  }
 }'
 
 echo "Deploying function: update-search-index"

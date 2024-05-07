@@ -116,9 +116,9 @@ CREATE TABLE IF NOT EXISTS conversation_history (
     id SERIAL PRIMARY KEY,  
     user_id INTEGER, 
     user_prompt TEXT, 
-	user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', user_prompt)) STORED,
+  user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', user_prompt)) STORED,
     ai_response TEXT,
-	ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', ai_response)) STORED,
+  ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', ai_response)) STORED,
     datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
 
@@ -212,8 +212,8 @@ sql=$(
   cat <<EOF
 CREATE OR REPLACE FUNCTION update_overview_embedding() RETURNS trigger AS \$\$
 BEGIN
- NEW.overview_embedding := embedding('textembedding-gecko@003', NEW.overview);
- RETURN NEW;
+  NEW.overview_embedding := embedding('textembedding-gecko@003', NEW.overview);
+  RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
 
@@ -225,8 +225,8 @@ EXECUTE PROCEDURE update_overview_embedding();
 -- Analysis overview and function
 CREATE OR REPLACE FUNCTION update_analysis_embedding() RETURNS trigger AS \$\$
 BEGIN
- NEW.analysis_embedding := embedding('textembedding-gecko@003', NEW.analysis);
- RETURN NEW;
+  NEW.analysis_embedding := embedding('textembedding-gecko@003', NEW.analysis);
+  RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
 
