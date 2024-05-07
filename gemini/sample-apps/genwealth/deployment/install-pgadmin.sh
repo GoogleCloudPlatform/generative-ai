@@ -16,7 +16,7 @@ curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --d
 sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
 
 # Install for web mode only:
-sudo apt -y install pgadmin4-web 
+sudo apt -y install pgadmin4-web
 
 # Configure the webserver
 echo "Configuring the pgadmin webserver"
@@ -26,7 +26,8 @@ sudo -E /usr/pgadmin4/bin/setup-web.sh --yes
 
 # Create ragdemos Database
 echo "Creating the ragdemos database"
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 CREATE DATABASE ragdemos;
 EOF
 )
@@ -36,7 +37,8 @@ sleep 3
 
 # Install AlloyDB AI extensions
 echo "Installing AlloyDB AI extensions"
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 CREATE EXTENSION IF NOT EXISTS google_ml_integration VERSION '1.1' CASCADE;
 GRANT EXECUTE ON FUNCTION embedding TO postgres;
 EOF
@@ -44,7 +46,8 @@ EOF
 echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Install pgvector extension
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 CREATE EXTENSION IF NOT EXISTS vector CASCADE;
 EOF
 )
@@ -52,7 +55,8 @@ echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -
 
 # Create investments table and indexes
 echo "Creating tables"
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 CREATE TABLE investments (
   id SERIAL PRIMARY KEY,
   ticker VARCHAR(255) NOT NULL UNIQUE,
@@ -79,7 +83,8 @@ EOF
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create the user_profiles table
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 CREATE TABLE user_profiles (
   id SERIAL PRIMARY KEY,
   username VARCHAR(255) NOT NULL UNIQUE,
@@ -105,14 +110,15 @@ EOF
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create the conversation_history table and indexes
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 CREATE TABLE IF NOT EXISTS conversation_history (
     id SERIAL PRIMARY KEY,  
     user_id INTEGER, 
     user_prompt TEXT, 
-	user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', user_prompt)) STORED,
+  user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', user_prompt)) STORED,
     ai_response TEXT,
-	ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', ai_response)) STORED,
+  ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', ai_response)) STORED,
     datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
 
@@ -131,7 +137,8 @@ EOF
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Create the langchain_vector_store table and index
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 DROP TABLE IF EXISTS public.langchain_vector_store;
 CREATE TABLE IF NOT EXISTS public.langchain_vector_store
 (
@@ -167,7 +174,6 @@ EOF
 )
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
-
 # Download test data
 echo "Downloading data"
 cd || echo "Could not cd into user profile root"
@@ -178,10 +184,10 @@ gsutil -m cp \
   "gs://pr-public-demo-data/genwealth-demo/user_profiles" \
   "gs://pr-public-demo-data/genwealth-demo/llm.sql" .
 
-
 # Load the investments table
 echo "Loading the investments table"
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 \copy investments FROM '/tmp/demo-data/investments' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
 EOF
 )
@@ -189,7 +195,8 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 
 # Load the user_profiles table
 echo "Loading the user_profiles table"
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 \copy user_profiles FROM '/tmp/demo-data/user_profiles' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
 EOF
 )
@@ -197,15 +204,16 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 
 # Create the llm() function
 echo "Creating the llm() function"
-PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos < llm.sql
+PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos <llm.sql
 
 # Create embeddings triggers for investments table
 echo "Creating embeddings triggers"
-sql=$(cat << EOF
+sql=$(
+  cat <<EOF
 CREATE OR REPLACE FUNCTION update_overview_embedding() RETURNS trigger AS \$\$
 BEGIN
- NEW.overview_embedding := embedding('textembedding-gecko@003', NEW.overview);
- RETURN NEW;
+  NEW.overview_embedding := embedding('textembedding-gecko@003', NEW.overview);
+  RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
 
@@ -217,8 +225,8 @@ EXECUTE PROCEDURE update_overview_embedding();
 -- Analysis overview and function
 CREATE OR REPLACE FUNCTION update_analysis_embedding() RETURNS trigger AS \$\$
 BEGIN
- NEW.analysis_embedding := embedding('textembedding-gecko@003', NEW.analysis);
- RETURN NEW;
+  NEW.analysis_embedding := embedding('textembedding-gecko@003', NEW.analysis);
+  RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
 
