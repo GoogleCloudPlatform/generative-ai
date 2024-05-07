@@ -108,6 +108,8 @@ The GenWealth demo application was built using:
 
 The application database (`ragdemos`) is hosted in GCP on AlloyDB, a high-performance, Enterprise-grade PostgreSQL database service.
 
+> NOTE: For the purposes of the demo environment, the AlloyDB instance is provisioned as a Zonal instance to reduce cost. For production workloads, we strongly recommend enabling Regional availability.
+
 #### Gen AI Integrations
 
 AlloyDB [integrates directly](https://cloud.google.com/alloydb/docs/ai/configure-vertex-ai) with Vertex AI LLMs through the database engine to [generate embeddings](https://cloud.google.com/alloydb/docs/ai/work-with-embeddings) and perform [text completion](https://cloud.google.com/alloydb/docs/ai/invoke-predictions) functions. This empowers you to run semantic similarity search and text-completion queries on your relational database, as shown in the example queries below:
