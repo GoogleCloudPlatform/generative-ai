@@ -162,4 +162,3 @@ def analyze_prospectus(cloud_event):
     print("Closing database connection.")
     connector.close()
     print(f"Finished analyzing ticker {ticker}.")
-    
