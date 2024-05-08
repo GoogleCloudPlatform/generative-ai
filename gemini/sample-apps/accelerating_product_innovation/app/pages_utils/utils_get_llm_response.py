@@ -43,29 +43,39 @@ def generate_gemini(text_prompt: str) -> str:
         The generated text.
     """
     model = generative_models.GenerativeModel("gemini-pro")
-    safety_setting = generative_models.HarmBlockThreshold.BLOCK_NONE
-    harm_category = generative_models.HarmCategory
 
-    responses = model.generate_content(
-        text_prompt,
-        generation_config={
-            "max_output_tokens": 8192,
-            "temperature": 0.001,
-            "top_p": 1,
-        },
-        safety_settings={
-            harm_category.HARM_CATEGORY_HATE_SPEECH: safety_setting,
-            harm_category.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
-            harm_category.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
-            harm_category.HARM_CATEGORY_HARASSMENT: safety_setting,
-        },
-        stream=True,
+    safety_config = [
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+    ]
+
+    generation_config = generative_models.GenerationConfig(
+        max_output_tokens=8192,
+        temperature=0.001,
+        top_p=1,
     )
-    final_response = ""
-    for response in responses:
-        final_response += response.text
-    logging.debug(final_response)
-    return final_response
+
+    response = model.generate_content(
+        text_prompt,
+        generation_config=generation_config,
+        safety_settings=safety_config,
+    )
+    logging.debug(response.text)
+    return response.text
 
 
 async def parallel_generate_search_results(query: str) -> str:
@@ -78,12 +88,13 @@ async def parallel_generate_search_results(query: str) -> str:
     Returns:
         The generated search results.
     """
-    data = {"text_prompt": query}
-    data_json = json.dumps(data)
+    data_json = json.dumps({"text_prompt": query})
     logging.debug("Text call start")
     headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
-        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        url = (
+            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        )
         # Create post request to get text.
         async with session.post(
             url, data=data_json, headers=headers, verify_ssl=False

@@ -87,11 +87,16 @@ def image_generation(
         language="en",
         aspect_ratio=aspect_ratio,
     )
-    images[0].save(location=f"{filename}.png", include_generation_parameters=False)
+    images[0].save(
+        location=f"{filename}.png", include_generation_parameters=False
+    )
 
 
 def edit_image_generation(
-    prompt: str, sample_count: int, state_key: str, mask_exists: bool
+    prompt: str,
+    sample_count: int,
+    mask_image: bytes,
+    state_key: str = "Generated Image",
 ) -> bool:
     """Generates an edited image from a prompt and a base image.
 
@@ -100,10 +105,11 @@ def edit_image_generation(
             A string that describes the desired edit to the image.
         sample_count:
             The number of edited images to generate.
-        state_key:
+        state_key (optional):
+            Defaults to 'generated_image'
             The key to store the generated images in the session state.
-        mask_exists:
-            Boolean value indicating if mask has been provided.
+        mask_image:
+            Bytes for the mask image.
 
     Returns:
         Boolean value indicating if editing was completed.
@@ -113,7 +119,7 @@ def edit_image_generation(
         "image": Image.load_from_file("image_to_edit.png"),
     }
 
-    if mask_exists:
+    if mask_image:
         input_dict["mask"] = Image.load_from_file("mask.png")
 
     st.session_state[state_key] = predict_edit_image(
@@ -131,12 +137,13 @@ async def parallel_image_generation(prompt: str, col: int):
         prompt (String): Prompt for image Generation.
         col (int): A pointer to the draft number of the image.
     """
-    data = {"img_prompt": prompt}
-    data_json = json.dumps(data)
+    data_json = json.dumps({"img_prompt": prompt})
     logging.debug("Image call start")
     headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
-        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
+        url = (
+            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
+        )
         # Create a post request to get images.
         async with session.post(
             url, data=data_json, headers=headers, verify_ssl=False
@@ -144,14 +151,16 @@ async def parallel_image_generation(prompt: str, col: int):
             # Check if respose is valid.
             if response.status == 200:
                 response = await response.read()
-                response = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
+                response = cv2.imdecode(
+                    np.frombuffer(response, dtype=np.uint8), 1
+                )
                 cv2.imwrite(
                     f"gen_image{st.session_state.num_drafts+col}.png",
                     response,
                 )
                 return response
 
-            print(
+            logging.debug(
                 "Request failed:",
                 response.status,
                 await response.text(),

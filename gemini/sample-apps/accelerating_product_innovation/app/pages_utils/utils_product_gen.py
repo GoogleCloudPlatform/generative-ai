@@ -32,9 +32,6 @@ logging.basicConfig(
 )
 load_dotenv()
 
-PROJECT_ID = os.getenv("PROJECT_ID")
-LOCATION = os.getenv("LOCATION")
-
 
 def update_generation_state() -> None:
     """Updates the generation state post generate button click."""
@@ -56,8 +53,12 @@ def update_generation_state() -> None:
     st.session_state.selected_titles = (
         []
     )  # Stores selected titles for new product generation.
-    st.session_state.product_content = []  # Content corresponding to each feature.
-    st.session_state.content_edited = False  # Tracks whether content is being edited.
+    st.session_state.product_content = (
+        []
+    )  # Content corresponding to each feature.
+    st.session_state.content_edited = (
+        False  # Tracks whether content is being edited.
+    )
 
 
 def generate_product_suggestions_for_feature_generation() -> None:
@@ -73,7 +74,9 @@ def generate_product_suggestions_for_feature_generation() -> None:
             buyers. Give answer as a numbered list. Each point should
             strictly be only a category without any description."""
         )
-        st.session_state.feature_suggestions = create_suggestion_list(feature_prompts)
+        st.session_state.feature_suggestions = create_suggestion_list(
+            feature_prompts
+        )
 
 
 def build_prompt_form() -> bool:
@@ -123,12 +126,12 @@ def create_suggestion_list(gen_suggestions: str) -> list[str]:
     return suggestions
 
 
-async def parallel_call(title_arr: list[str]) -> list[Any]:
+async def parallel_call(titles: list[str]) -> list[Any]:
     """
     Performs parallel calls to the text and image generation APIs.
 
     Args:
-        title_arr (list): A list of product titles.
+        titles (list): A list of product titles.
 
     Returns:
         list: A list of tuples containing the text and image generation
@@ -137,14 +140,16 @@ async def parallel_call(title_arr: list[str]) -> list[Any]:
     logging.debug("entered parallel call")
     text_processes = []
     img_processes = []
-    for index, title in enumerate(title_arr):
+    for index, title in enumerate(titles):
         # Handle edge case (No assorted products to be created in case only
         # one feature is selected)
         if index == 1 and len(st.session_state.selected_titles) == 1:
             break
 
         # Create image generation and text generation prompts.
-        img_prompt = f"{st.session_state.product_category} with {title} packaging."
+        img_prompt = (
+            f"{st.session_state.product_category} with {title} packaging."
+        )
         text_prompt = f"""Generate an innovative and original idea for a
         {st.session_state.product_category} that is {title} for
         {st.session_state.selected_prompt}. List ingredients of the suggested
@@ -158,10 +163,14 @@ async def parallel_call(title_arr: list[str]) -> list[Any]:
         # Parallel calls to generate new content.
         if st.session_state.content_generated is False:
             text_processes.append(
-                asyncio.create_task(parallel_generate_search_results(text_prompt))
+                asyncio.create_task(
+                    parallel_generate_search_results(text_prompt)
+                )
             )
             img_processes.append(
-                asyncio.create_task(parallel_image_generation(img_prompt, index))
+                asyncio.create_task(
+                    parallel_image_generation(img_prompt, index)
+                )
             )
 
     # Append the generated content to final resul arrays.
@@ -177,7 +186,7 @@ async def prepare_titles() -> list[str]:
     Returns:
         list: A list of processed titles.
     """
-    title_arr = []
+    titles = []
     i = 0
     while i <= len(st.session_state.selected_titles):
         # No assorted titles to be created if the length of selected features
@@ -193,13 +202,13 @@ async def prepare_titles() -> list[str]:
             if i < len(st.session_state.selected_titles)
             else ", ".join(st.session_state.selected_titles)
         )
-        title_arr.append(title)
+        titles.append(title)
 
         # Store assorted title in session state.
         st.session_state.assorted_prod_title = title
         i += 1
 
-    return title_arr
+    return titles
 
 
 async def generate_product_content() -> None:
@@ -208,16 +217,18 @@ async def generate_product_content() -> None:
     """
 
     if st.session_state.product_content is None:
-        st.session_state.product_content = []  # Initialize product content storage
+        st.session_state.product_content = (
+            []
+        )  # Initialize product content storage
 
     elements: list[list[dict[str, Any]]] = []
 
     with st.spinner("Generating Product Ideas.."):
         # Fetch appropriate titles for processing
-        title_arr = await prepare_titles()
+        titles = await prepare_titles()
 
         # Call image and text generation function in parallel for efficiency
-        task1 = asyncio.create_task(parallel_call(title_arr))
+        task1 = asyncio.create_task(parallel_call(titles))
         result_array = await task1
         text_result_arr = result_array[0]
 
@@ -235,7 +246,7 @@ async def generate_product_content() -> None:
             elements.append([])
 
             if i < len(st.session_state.selected_titles):
-                title = title_arr[i]
+                title = titles[i]
 
             # Generate content only if not already generated
             if st.session_state.content_generated is False:
@@ -243,7 +254,9 @@ async def generate_product_content() -> None:
                     current_content.append(text_result_arr[i])
                     st.session_state.product_content.append(current_content)
                 else:
-                    st.session_state.assorted_prod_content.append(text_result_arr[i])
+                    st.session_state.assorted_prod_content.append(
+                        text_result_arr[i]
+                    )
 
                 # Build data for display elements
                 elements[i].append(
@@ -305,4 +318,6 @@ async def handle_content_generation(features: st.container) -> None:
     # Prepare titles for processing.
     st.session_state.chosen_titles = st.session_state.selected_titles.copy()
     if len(st.session_state.selected_titles) > 1:
-        st.session_state.chosen_titles.append(st.session_state.assorted_prod_title)
+        st.session_state.chosen_titles.append(
+            st.session_state.assorted_prod_title
+        )

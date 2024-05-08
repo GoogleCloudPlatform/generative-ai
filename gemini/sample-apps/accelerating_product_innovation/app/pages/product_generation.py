@@ -30,7 +30,7 @@ from app.pages_utils.utils_product_features import (
 )
 from app.pages_utils.utils_product_gen import (
     build_prompt_form,
-    render_content,
+    handle_content_generation,
     update_generation_state,
 )
 import streamlit as st
@@ -129,7 +129,8 @@ if (
     # Generate Button
     with content_gen_btns[0]:
         # Get content corresponding to the features
-        asyncio.run(render_content(features))
+        if st.button("Generate Content", type="primary"):
+            asyncio.run(handle_content_generation(features))
 
     # Display the generated content drafts
     product_drafts = ProductDrafts()
@@ -162,5 +163,8 @@ if (
                 )
 
     # If user clicks edit image, redirect to edit page
-    if st.session_state.image_to_edit != -1 or st.session_state.generate_images is True:
+    if (
+        st.session_state.image_to_edit != -1
+        or st.session_state.generate_images is True
+    ):
         st.switch_page("pages/edit_image.py")

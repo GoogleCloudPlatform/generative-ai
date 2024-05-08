@@ -30,20 +30,6 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-def parse_and_format_text(text: str) -> str:
-    """Utility funtion to parse and format the LLM generated response.
-
-    Args:
-        text (str): The text to parse and format.
-
-    Returns:
-        str: The parsed and formatted text.
-    """
-    bold_pattern = r"\*\*(.*?)\*\*"
-    formatted_text = re.sub(bold_pattern, r"<b>\1</b>", text)
-    return formatted_text
-
-
 def extract_bullet_points(text: str) -> list[str]:
     """Extracts bullet points from the LLM generated text.
 
@@ -56,7 +42,9 @@ def extract_bullet_points(text: str) -> list[str]:
     bullet_points = []
     for line in text.splitlines():
         if re.match(r"^[-*•\d]\s*", line):
-            bullet_points.append(parse_and_format_text(line))
+            bold_pattern = r"\*\*(.*?)\*\*"
+            formatted_text = re.sub(bold_pattern, r"<b>\1</b>", text)
+            bullet_points.append(formatted_text)
     return bullet_points
 
 
@@ -80,8 +68,6 @@ def get_suggestions(state_key: str) -> None:
             should strictly be questions for further analysis of
             {st.session_state.rag_search_term}
         """
-    print("CONTEXT")
-    print(context)
     gen_suggestions = generate_gemini(prompt)
     st.session_state[state_key] = extract_bullet_points(gen_suggestions)
 
@@ -158,17 +144,23 @@ def get_filter_context_from_vectordb(
     )
 
     top_matched_df = st.session_state["processed_data_list"][
-        st.session_state["processed_data_list"].index.isin(top_matched_score.index)
+        st.session_state["processed_data_list"].index.isin(
+            top_matched_score.index
+        )
     ]
     top_matched_df = top_matched_df[
         ["file_name", "page_number", "chunk_number", "content"]
     ]
     top_matched_df["confidence_score"] = top_matched_score
-    top_matched_df.sort_values(by=["confidence_score"], ascending=False, inplace=True)
+    top_matched_df.sort_values(
+        by=["confidence_score"], ascending=False, inplace=True
+    )
 
     context = "\n".join(
         st.session_state["processed_data_list"][
-            st.session_state["processed_data_list"].index.isin(top_matched_score.index)
+            st.session_state["processed_data_list"].index.isin(
+                top_matched_score.index
+            )
         ]["content"].values
     )
     return (context, top_matched_df)

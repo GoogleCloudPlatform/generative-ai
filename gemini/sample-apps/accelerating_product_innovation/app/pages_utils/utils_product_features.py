@@ -12,7 +12,6 @@ This module:
 # pylint: disable=E0401
 
 import logging
-import os
 
 from app.pages_utils.utils_get_llm_response import generate_gemini
 from dotenv import load_dotenv
@@ -21,9 +20,6 @@ import streamlit as st
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 load_dotenv()
-
-PROJECT_ID = os.getenv("PROJECT_ID")
-LOCATION = os.getenv("LOCATION")
 
 BOX_STYLE = """
     border: 0.5px solid #6a90e2;
@@ -88,8 +84,11 @@ def _render_box(box_id: str, title: str, parts: list, style: str) -> None:
         )
 
 
-def get_points(text: str) -> list[str]:
-    """Gets a list of points from the given text.
+def get_features(text: str) -> list[str]:
+    """Gets a list of features from the given text.
+        App displays a grid of boxes where each box corresponds to
+        a particular feature. This function divides the given input
+        text to a list of those features
 
     Args:
         text (str): The text to get the points from.
@@ -113,49 +112,6 @@ def get_points(text: str) -> list[str]:
             else:
                 curr += point
     return sep_points
-
-
-def split_sentence(sentence: str) -> list[str]:
-    """Splits a sentence into two parts based on a colon (':') delimiter.
-
-    If the sentence doesn't contain a colon, the original sentence is returned
-    as a single item in a list.
-
-    Args:
-        sentence: The sentence to be split.
-
-    Returns:
-        A list of strings, containing either:
-            * The two parts of the sentence (if a colon was found)
-            * The original sentence as a single item (if no colon was found)
-    """
-
-    parts = sentence.split(":", 1)  # Split at most once
-
-    if len(parts) == 2:
-        # Extract and clean up the parts
-        first_part = parts[0].strip()
-        second_part = parts[1].strip()
-        return [first_part, second_part]
-
-    # No colon found, return the whole sentence
-    return [sentence]
-
-
-def trim_title(title: str) -> str:
-    """Trims the title to remove the leading number and period.
-
-    Args:
-        title (str): The title to trim.
-
-    Returns:
-        str: The trimmed title.
-    """
-    try:
-        title_parts = title.split(".")
-        return title_parts[1].strip()
-    except IndexError:
-        return title
 
 
 def generate_formatted_response(prompt: str) -> str:
@@ -191,7 +147,7 @@ def render_features(features: st.delta_generator.DeltaGenerator) -> None:
     """
 
     if st.session_state.generated_points is None:
-        st.session_state.generated_points = get_points(
+        st.session_state.generated_points = get_features(
             st.session_state.generated_response
         )
 
@@ -204,8 +160,25 @@ def render_features(features: st.delta_generator.DeltaGenerator) -> None:
             )  # Inline conditionals
 
             box_id = f"box_{i}"
-            parts = split_sentence(point)
-            title = trim_title(parts[0])
+
+            # Split point into two parts based on a colon (':') delimiter
+            parts = point.split(":", 1)  # Split at most once
+            if len(parts) == 2:
+                # Extract and clean up the parts
+                first_part = parts[0].strip()
+                second_part = parts[1].strip()
+                parts = [first_part, second_part]
+            # No colon found, part assigned as the whole sentence
+            else:
+                parts = [point]
+
+            # Trim title to only the heading
+            title = parts[0]
+            try:
+                title_parts = title.split(".")
+                title = title_parts[1].strip()
+            except IndexError:
+                logging.debug("Unable to trim title")
 
             with box:
                 checkbox_key = f"{title} {i}"

@@ -26,9 +26,6 @@ load_dotenv()
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 st.session_state.image_file_prefix = "email_image"
 
-PROJECT_ID = os.getenv("PROJECT_ID")
-LOCATION = os.getenv("LOCATION")
-
 
 def generate_email(prompt: str, title: str) -> None:
     """Generates an email PDF with the given prompt and title.
@@ -125,9 +122,11 @@ def create_zip_buffer(filenames: list[str]) -> io.BytesIO:
     return zip_buffer
 
 
-def load_product_lists():
+def load_product_lists() -> tuple[list[str], list[str]]:
     """
     Creates copies of Product titles and content to be imported.
+    Returns:
+        Tuple containing two lists - Product Content and titles.
     """
     # Create copies to avoid modifying session data
     prod_content = st.session_state.draft_elements.copy()
@@ -172,7 +171,9 @@ def download_file() -> None:
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(zip_buffer.getvalue(), f"email_{email_file_title}.zip"),
+        download_button(
+            zip_buffer.getvalue(), f"email_{email_file_title}.zip"
+        ),
         height=0,
     )
     st.success("Email Copies Downloaded")

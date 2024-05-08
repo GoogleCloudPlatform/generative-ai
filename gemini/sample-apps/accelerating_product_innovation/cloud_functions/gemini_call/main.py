@@ -28,27 +28,37 @@ def generate_text(prompt: str):
         The generated text.
     """
     model = GenerativeModel("gemini-pro")
-    safety_setting = generative_models.HarmBlockThreshold.BLOCK_NONE
+    safety_config = [
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+    ]
 
-    responses = model.generate_content(
-        prompt,
-        generation_config={
-            "max_output_tokens": 2048,
-            "temperature": 0.001,
-            "top_p": 1,
-        },
-        safety_settings={
-            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: safety_setting,
-            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: safety_setting,
-            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: safety_setting,
-            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: safety_setting,
-        },
-        stream=True,
+    generation_config = generative_models.GenerationConfig(
+        max_output_tokens=8192,
+        temperature=0.001,
+        top_p=1,
     )
-    final_response = ""
-    for response in responses:
-        final_response += response.text
-    return final_response
+
+    response = model.generate_content(
+        prompt,
+        generation_config=generation_config,
+        safety_settings=safety_config,
+    )
+    return response.text
 
 
 @functions_framework.http

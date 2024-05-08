@@ -95,7 +95,10 @@ def initialize_edit_page_state() -> None:
     """
 
     # Check which image file prefix points to the image to be edited
-    if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
+    if (
+        "image_to_edit" not in st.session_state
+        or st.session_state.image_to_edit == -1
+    ):
         st.session_state.image_to_edit = (
             -1
         )  # No image from generations is being edited.
@@ -138,7 +141,9 @@ def save_draft_image(
         draft_elements (dict): Dictionary holding the draft image elements.
     """
 
-    st.session_state.content_edited = True  # Track whether image has been edited.
+    st.session_state.content_edited = (
+        True  # Track whether image has been edited.
+    )
     draft_elements[row][col][
         "img"
     ] = image  # Update the drafts to display updated image.
@@ -250,22 +255,18 @@ def generate_suggested_images(
     save_image_for_editing(mask_image, "mask")
 
     # Check if mask exists.
-    mask_exists = False
-    if mask_image:
-        mask_exists = True
     st.session_state.suggested_images = []  # Clear previous suggestions
     with st.spinner("Generating suggested images"):
         edit_image_completed = edit_image_generation(
             image_prompt,
             6,  # Number of suggested images to be generated
+            mask_image,
             "generated_image",  # Session state key for storing results
-            mask_exists,
         )
 
     # Append newly generated suggestions to suggested images state key.
     if edit_image_completed:
         for image_data in st.session_state.generated_image:
-            print(image_data.__dict__.keys())
             st.session_state.suggested_images.append(
                 image_data.__dict__["_loaded_bytes"]
             )

@@ -7,7 +7,10 @@ layouts and formatting.
 
 import os
 
-from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
+from app.pages_utils.utils_pdf_generation import (
+    add_formatted_page,
+    check_add_page,
+)
 from app.pages_utils.utils_pdf_generation import PDFRounded as FPDF
 import streamlit as st
 
@@ -67,7 +70,9 @@ def create_pdf_layout(
             pdf.multi_cell(170, 5, page)  # Output the text
 
 
-def create_content_pdf(product_content: list, selected_titles: list[str]) -> None:
+def create_content_pdf(
+    product_content: list[list[dict]], selected_titles: list[str]
+) -> None:
     """Creates a PDF for each product content and selected title.
 
     Args:
@@ -75,22 +80,17 @@ def create_content_pdf(product_content: list, selected_titles: list[str]) -> Non
         product content.
         selected_titles: A list of selected titles for each product content.
     """
-    print("HERE....")
     for product_index in range(len(product_content) - 1):
         pdf = FPDF()  # Create a PDF for the current product
-        content = []
-        images = []
 
         # Build content and image lists for the current product
-        content.append(product_content[product_index][0]["text"].replace("**", ""))
-        images.append(st.session_state.num_drafts * product_index + 1)
+        content = [product_content[product_index][0]["text"].replace("**", "")]
+        images = [st.session_state.num_drafts * product_index + 1]
 
         # Generate the PDF layout
         create_pdf_layout(pdf, content, selected_titles[product_index], images)
 
         # Save the PDF with an appropriate filename
-        print("SAVING")
-
         pdf.output(f"content_{product_index}.pdf")
 
 
@@ -146,7 +146,6 @@ def create_email_pdf(
     pdf.set_font("Arial", "B", 11)
     pdf.set_xy(17, 25)
     pdf.multi_cell(180, 5, subject, 0, align="C")
-    print(os.path)
     pdf.image(f"{image_name}", x=60, y=40, w=90, h=70)
 
     pages = check_add_page(pdf, text)

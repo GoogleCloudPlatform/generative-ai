@@ -48,5 +48,4 @@ def hello_http(request):
             calling function.
     """
     request_json = request.get_json(silent=True)
-    print(request_json)
     return image_generation(request_json["img_prompt"])

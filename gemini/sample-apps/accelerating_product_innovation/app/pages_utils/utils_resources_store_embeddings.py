@@ -128,7 +128,9 @@ async def generate_embeddings(pdf_data: pd.DataFrame) -> np.array:
     Returns:
         np.array: The embeddings for the PDF data.
     """
-    tasks = [asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]]
+    tasks = [
+        asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]
+    ]
     embeddings = await asyncio.gather(*tasks)
     return np.array(embeddings)
 
@@ -149,8 +151,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
     """
     # Make request data payload
     json_data = pdf_data["content"].to_json()
-    data = {"pdf_data": json_data}
-    data_json = json.dumps(data)
+    data = json.dumps({"pdf_data": json_data})
     # Make request headers
     headers = {"Content-Type": "application/json"}
 
@@ -160,7 +161,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
 
         # Call cloud function to generate embeddings with data and headers.
         async with session.post(
-            url, data=data_json, headers=headers, verify_ssl=False
+            url, data=data, headers=headers, verify_ssl=False
         ) as response:
             logging.debug("Inside IF else of session")
 
@@ -171,7 +172,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
                 embedding = final_response["embedding_column"]
                 pdf_data["embedding"] = embedding
             else:
-                print("Request failed:", await response.text())
+                logging.debug("Request failed:", await response.text())
 
     logging.debug("Embedding call end")
 
@@ -253,12 +254,16 @@ async def csv_pocessing(
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(asyncio.create_task(add_type_col(parallel_task_array[i])))
+        temp_arr.append(
+            asyncio.create_task(add_type_col(parallel_task_array[i]))
+        )
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(asyncio.create_task(add_embedding_col(parallel_task_array[i])))
+        temp_arr.append(
+            asyncio.create_task(add_embedding_col(parallel_task_array[i]))
+        )
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     for i in range(split_num):
@@ -419,9 +424,13 @@ def convert_file_to_data_packets(filename: Any) -> None:
         storage_client = storage.Client(project=PROJECT_ID)
         bucket = storage_client.bucket("product_innovation_bucket")
 
-        blob = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
+        blob = bucket.blob(
+            f"{st.session_state.product_category}/embeddings.json"
+        )
 
-        blob2 = bucket.blob(f"{st.session_state.product_category}/{filename.name}")
+        blob2 = bucket.blob(
+            f"{st.session_state.product_category}/{filename.name}"
+        )
 
         if blob.exists():
             stored_embedding_data = blob.download_as_string()
@@ -471,7 +480,9 @@ def convert_file_to_data_packets(filename: Any) -> None:
                 text += page.extract_text()
                 pg = page.extract_text()
                 if pg:
-                    save_chunks_to_data_packet(file_content, filename, final_data)
+                    save_chunks_to_data_packet(
+                        file_content, filename, final_data
+                    )
 
         # Stores the embeddings in the GCS bucket.
         store_embeddings_to_gcs(final_data, dff)
