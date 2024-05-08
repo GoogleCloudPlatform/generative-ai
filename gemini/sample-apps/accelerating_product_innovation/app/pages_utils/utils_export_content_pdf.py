@@ -7,10 +7,7 @@ layouts and formatting.
 
 import os
 
-from app.pages_utils.utils_pdf_generation import (
-    add_formatted_page,
-    check_add_page,
-)
+from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
 from app.pages_utils.utils_pdf_generation import PDFRounded as FPDF
 import streamlit as st
 
