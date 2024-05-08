@@ -60,8 +60,8 @@ def analyze_prospectus(cloud_event):
  You are an experienced financial analyst. Your task is to create a detailed
  company overview for {ticker} using their latest prospectus. I will be
  sending you the prospectus one chunk at a time. There are a total of
- {total_chunk_count} chunks, and I am sending you chunk number
- {current_chunk_count} as part of this request. You should include details
+ {total_chunk_count} chunks, and I am sending you chunk numbers
+ {first_chunk} through {last_chunk} as part of this request. You should include details
  from every chunk in your final overview.
 </MISSION>
 
@@ -89,21 +89,38 @@ def analyze_prospectus(cloud_event):
         # commit transaction (SQLAlchemy v2.X.X is commit as you go)
         db_conn.commit()
 
-        # Do something with the results
+        # Iterate through results
         total_chunk_count = len(result)
-        overview = "None"
+        overview = ""
+        chunk_text = ""
+        first_chunk = 1
+        last_chunk = 1
 
         for i in range(len(result)):
             current_chunk = i + 1
-            print(f"Adding chunk {current_chunk} of {total_chunk_count} to overview...")
+            first_chunk = min(first_chunk, current_chunk)
+            last_chunk = max(last_chunk, current_chunk)
+
+            # Add text to chunk_text until token window is full
+            chunk_text = chunk_text + str(result[i].content) + ' '
+            if len(chunk_text) < 50000:
+                continue
+
+            # Invoke the model
+            print(f"Adding chunks {first_chunk} through {last_chunk} out of {total_chunk_count} to overview...")
             fmt_prompt = prompt.format(
                 total_chunk_count=total_chunk_count,
-                current_chunk_count=i,
+                first_chunk=first_chunk,
+                last_chunk=last_chunk,
                 previous_overview=overview,
-                chunk_text=result[i].content,
+                chunk_text=chunk_text,
                 ticker=ticker,
             )
             overview = model.invoke(fmt_prompt)
+
+            # Reset first_chunk and chunk_text values
+            first_chunk = current_chunk
+            chunk_text = ""
 
     analysis = model.invoke(
         f"You are an experienced financial analyst. Write a financial analysis for ticker {ticker} that includes an Investment Rating (buy, sell, or hold), Investment Risk (high, medium, low), Target Investor (conservative, neutral, aggressive) and a two-paragraph analysis. Use the following company overview as context for the analysis: \n\n{overview}"
