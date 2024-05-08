@@ -57,27 +57,26 @@ def analyze_prospectus(cloud_event):
     model = VertexAI(model_name="gemini-pro", max_output_tokens=1024, temperature=0.0)
     template = """
 <MISSION>
- You are an experienced financial analyst. Your task is to create a detailed
- company overview for {ticker} using their latest prospectus. I will be
- sending you the prospectus one chunk at a time. There are a total of
- {total_chunk_count} chunks, and I am sending you chunk numbers
- {first_chunk} through {last_chunk} as part of this request. You should include details
- from every chunk in your final overview.
+ You are an experienced financial analyst. Your mission is to create a detailed
+ company financial overview for {ticker} using their latest prospectus. I will be
+ sending you the prospectus a few chunks at a time. There are a total of
+ {total_chunk_count} prospectus chunks, and I am sending you prospectus chunk numbers
+ {first_chunk}-{last_chunk} as part of this request.
 </MISSION>
 
 <TASK>
- Without losing any detail from <PREVIOUS_OVERVIEW>, use <NEXT_CHUNK> below
- to improve the summary in <PREVIOUS_OVERVIEW>. You must respond using less
- than 4000 characters, including whitespace.
+ Use the financial overview labeled <OVERVIEW> below, and use the additional details from 
+ the section labeled <ADDITIONAL_CONTEXT> below to improve the financial overview in the <OVERVIEW>. 
+ Respond using less than 4000 characters, including whitespace.
 </TASK>
 
-<PREVIOUS_OVERVIEW>
+<OVERVIEW>
 {previous_overview}
-</PREVIOUS_OVERVIEW>
+</OVERVIEW>
 
-<NEXT_CHUNK>
+<ADDITIONAL_CONTEXT>
 {chunk_text}
-</NEXT_CHUNK>"""
+</ADDITIONAL_CONTEXT>"""
 
     prompt = PromptTemplate.from_template(template)
 
@@ -107,7 +106,7 @@ def analyze_prospectus(cloud_event):
                 continue
 
             # Invoke the model
-            print(f"Adding chunks {first_chunk} through {last_chunk} out of {total_chunk_count} to overview...")
+            print(f"Adding chunks {first_chunk} through {last_chunk} out of {total_chunk_count} to {ticker} overview...")
             fmt_prompt = prompt.format(
                 total_chunk_count=total_chunk_count,
                 first_chunk=first_chunk,
@@ -116,6 +115,7 @@ def analyze_prospectus(cloud_event):
                 chunk_text=chunk_text,
                 ticker=ticker,
             )
+            
             overview = model.invoke(fmt_prompt)
 
             # Reset first_chunk and chunk_text values
@@ -162,3 +162,4 @@ def analyze_prospectus(cloud_event):
     print("Closing database connection.")
     connector.close()
     print(f"Finished analyzing ticker {ticker}.")
+    
