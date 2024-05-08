@@ -119,7 +119,7 @@ def analyze_prospectus(cloud_event):
             overview = model.invoke(fmt_prompt)
 
             # Reset first_chunk and chunk_text values
-            first_chunk = current_chunk
+            first_chunk = current_chunk + 1
             chunk_text = ""
 
     analysis = model.invoke(
@@ -161,4 +161,4 @@ def analyze_prospectus(cloud_event):
 
     print("Closing database connection.")
     connector.close()
-    print("Finished analyzing ticker.")
+    print(f"Finished analyzing ticker {ticker}.")
