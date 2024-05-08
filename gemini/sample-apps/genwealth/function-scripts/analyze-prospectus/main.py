@@ -101,12 +101,14 @@ def analyze_prospectus(cloud_event):
             last_chunk = max(last_chunk, current_chunk)
 
             # Add text to chunk_text until token window is full
-            chunk_text = chunk_text + str(result[i].content) + ' '
+            chunk_text = chunk_text + str(result[i].content) + " "
             if len(chunk_text) < 50000:
                 continue
 
             # Invoke the model
-            print(f"Adding chunks {first_chunk} through {last_chunk} out of {total_chunk_count} to {ticker} overview...")
+            print(
+                f"Adding chunks {first_chunk} through {last_chunk} out of {total_chunk_count} to {ticker} overview..."
+            )
             fmt_prompt = prompt.format(
                 total_chunk_count=total_chunk_count,
                 first_chunk=first_chunk,
@@ -115,7 +117,7 @@ def analyze_prospectus(cloud_event):
                 chunk_text=chunk_text,
                 ticker=ticker,
             )
-            
+
             overview = model.invoke(fmt_prompt)
 
             # Reset first_chunk and chunk_text values
