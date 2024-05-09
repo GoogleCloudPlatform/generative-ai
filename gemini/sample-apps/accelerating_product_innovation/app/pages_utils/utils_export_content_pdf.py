@@ -66,9 +66,7 @@ def create_pdf_layout(
             pdf.multi_cell(170, 5, page)  # Output the text
 
 
-def create_content_pdf(
-    product_content: list[str], selected_titles: list[str]
-) -> None:
+def create_content_pdf(product_content: list[str], selected_titles: list[str]) -> None:
     """Creates a PDF for each product content and selected title.
 
     Args:
