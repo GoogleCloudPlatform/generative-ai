@@ -30,7 +30,8 @@ import logging
 
 import PIL
 from PIL import Image
-from app.pages_utils.imagen import edit_image_generation
+from app.pages_utils.imagen import predict_edit_image
+from vertexai.preview.vision_models import Image as vertex_image
 import streamlit as st
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
@@ -239,7 +240,10 @@ def save_image_for_editing(image_bytes: bytes, filename: str) -> None:
 
 
 def generate_suggested_images(
-    image_prompt: str, image_bytes: io.BytesIO, mask_image: bytes
+    image_prompt: str,
+    image_bytes: io.BytesIO,
+    mask_image: bytes,
+    sample_count: int = 6,
 ) -> None:
     """
     Generates suggested images based on the provided prompt, image, and mask.
@@ -254,23 +258,27 @@ def generate_suggested_images(
     save_image_for_editing(image_bytes.getvalue(), "image_to_edit")
     save_image_for_editing(mask_image, "mask")
 
-    # Check if mask exists.
     st.session_state.suggested_images = []  # Clear previous suggestions
+
+    # Generated edit image results
     with st.spinner("Generating suggested images"):
-        edit_image_completed = edit_image_generation(
-            image_prompt,
-            6,  # Number of suggested images to be generated
-            mask_image,
-            "generated_image",  # Session state key for storing results
+        input_dict = {
+            "prompt": image_prompt,
+            "image": vertex_image.load_from_file("image_to_edit.png"),
+        }
+
+        if mask_image:
+            input_dict["mask"] = vertex_image.load_from_file("mask.png")
+
+        st.session_state["generated_image"] = predict_edit_image(
+            instance_dict=input_dict,
+            parameters={"sampleCount": sample_count},
         )
 
     # Append newly generated suggestions to suggested images state key.
-    if edit_image_completed:
-        for image_data in st.session_state.generated_image:
-            st.session_state.suggested_images.append(
-                image_data.__dict__["_loaded_bytes"]
-            )
-    else:
-        st.session_state.suggested_images = None
+    for image_data in st.session_state.generated_image:
+        st.session_state.suggested_images.append(
+            image_data.__dict__["_loaded_bytes"]
+        )
     # End image generation.
     st.session_state.generate_images = False  # Update generation state

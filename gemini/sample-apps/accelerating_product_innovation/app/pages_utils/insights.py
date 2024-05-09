@@ -104,28 +104,13 @@ def split_text(row: pd.Series) -> list[str]:
     return chunk_iter
 
 
-def get_dot_product(row: pd.Series) -> float:
-    """Gets the dot product of the given row and the query vectors.
-
-    Args:
-        row (pandas.Series): The row to get the dot product of.
-
-    Returns:
-        float: The dot product of the row and the query vectors.
-    """
-    if row is None:
-        return 0
-    return np.dot(row, st.session_state["query_vectors"])
-
-
 def get_filter_context_from_vectordb(
-    question: str = "", sort_index_value: int = 3
+    question: str, sort_index_value: int = 3
 ) -> tuple[str, pd.DataFrame]:
     """Gets the filter context from the vector database.
 
     Args:
-        question (str, optional): The question to get the filter context for.
-        Defaults to "".
+        question (str): The question to get the filter context for.
         sort_index_value (int, optional): The number of top matched results
         to return.
         # Defaults to 3.
@@ -139,7 +124,13 @@ def get_filter_context_from_vectordb(
     )
     top_matched_score = (
         st.session_state["processed_data_list"]["embedding"]
-        .apply(get_dot_product)
+        .apply(
+            lambda row: (
+                np.dot(row, st.session_state["query_vectors"])
+                if row is not None
+                else 0
+            )
+        )
         .sort_values(ascending=False)[:sort_index_value]
     )
 
@@ -166,7 +157,7 @@ def get_filter_context_from_vectordb(
     return (context, top_matched_df)
 
 
-def generate_insights_search_result(query) -> tuple[str, pd.DataFrame]:
+def generate_insights_search_result(query: str) -> tuple[str, pd.DataFrame]:
     """Generates insights search results for the given query.
 
     Args:

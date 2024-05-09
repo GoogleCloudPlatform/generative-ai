@@ -17,7 +17,7 @@ import cv2
 import numpy as np
 import streamlit as st
 import vertexai
-from vertexai.preview.vision_models import Image, ImageGenerationModel
+from vertexai.preview.vision_models import ImageGenerationModel
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
@@ -90,43 +90,6 @@ def image_generation(
     images[0].save(
         location=f"{filename}.png", include_generation_parameters=False
     )
-
-
-def edit_image_generation(
-    prompt: str,
-    sample_count: int,
-    mask_image: bytes,
-    state_key: str = "Generated Image",
-) -> bool:
-    """Generates an edited image from a prompt and a base image.
-
-    Args:
-        prompt:
-            A string that describes the desired edit to the image.
-        sample_count:
-            The number of edited images to generate.
-        state_key (optional):
-            Defaults to 'generated_image'
-            The key to store the generated images in the session state.
-        mask_image:
-            Bytes for the mask image.
-
-    Returns:
-        Boolean value indicating if editing was completed.
-    """
-    input_dict = {
-        "prompt": prompt,
-        "image": Image.load_from_file("image_to_edit.png"),
-    }
-
-    if mask_image:
-        input_dict["mask"] = Image.load_from_file("mask.png")
-
-    st.session_state[state_key] = predict_edit_image(
-        instance_dict=input_dict,
-        parameters={"sampleCount": sample_count},
-    )
-    return True
 
 
 async def parallel_image_generation(prompt: str, col: int):

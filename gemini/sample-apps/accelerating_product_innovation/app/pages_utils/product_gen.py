@@ -185,27 +185,19 @@ async def prepare_titles() -> list[str]:
     Returns:
         list: A list of processed titles.
     """
-    titles = []
-    i = 0
-    while i <= len(st.session_state.selected_titles):
-        # No assorted titles to be created if the length of selected features
-        # is 1.
-        if i == 1 and len(st.session_state.selected_titles) == 1:
-            break
+    titles = st.session_state.selected_titles.copy()
 
+    # Assorted titles to be created only if the length of selected features
+    # is greater than 1.
+    if len(st.session_state.selected_titles) > 1:
         # Create assorted product title if end of array is reached.
         # If end of array selected_titles array is not reached, keep original
         # title.
-        title = (
-            st.session_state.selected_titles[i]
-            if i < len(st.session_state.selected_titles)
-            else ", ".join(st.session_state.selected_titles)
-        )
-        titles.append(title)
+        assorted_title = ", ".join(st.session_state.selected_titles)
 
+        titles.append(assorted_title)
         # Store assorted title in session state.
-        st.session_state.assorted_prod_title = title
-        i += 1
+        st.session_state.assorted_prod_title = assorted_title
 
     return titles
 
