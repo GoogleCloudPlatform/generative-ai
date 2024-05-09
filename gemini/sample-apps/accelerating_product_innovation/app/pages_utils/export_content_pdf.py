@@ -6,8 +6,8 @@ layouts and formatting.
 # pylint: disable=E0401
 
 
-from app.pages_utils.pdf_generation import add_formatted_page, check_add_page
 from app.pages_utils.pdf_generation import PDFRounded as FPDF
+from app.pages_utils.pdf_generation import add_formatted_page, check_add_page
 import streamlit as st
 
 
@@ -66,9 +66,7 @@ def create_pdf_layout(
             pdf.multi_cell(170, 5, page)  # Output the text
 
 
-def create_content_pdf(
-    product_content: list[str], selected_titles: list[str]
-) -> None:
+def create_content_pdf(product_content: list[str], selected_titles: list[str]) -> None:
     """Creates a PDF for each product content and selected title.
 
     Args:

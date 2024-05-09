@@ -20,7 +20,6 @@ import logging
 
 from PIL import Image
 from app.pages_utils import setup
-from app.pages_utils.pages_config import PAGES_CFG
 from app.pages_utils.edit_image import (
     generate_suggested_images,
     handle_image_upload,
@@ -30,6 +29,7 @@ from app.pages_utils.edit_image import (
     save_draft_image,
 )
 from app.pages_utils.editor_ui import ImageEditor
+from app.pages_utils.pages_config import PAGES_CFG
 import streamlit as st
 
 # Get the configuration for the edit page
@@ -49,10 +49,7 @@ if st.session_state.uploaded_img is True:
     handle_image_upload()
 
 # Check if the user has started editing the image
-if (
-    st.session_state.start_editing is None
-    or st.session_state.start_editing is True
-):
+if st.session_state.start_editing is None or st.session_state.start_editing is True:
     # Initialize Editor
     image_editor = ImageEditor()
 
