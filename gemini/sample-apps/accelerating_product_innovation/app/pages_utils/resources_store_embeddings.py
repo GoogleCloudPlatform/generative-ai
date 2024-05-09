@@ -98,31 +98,10 @@ def create_data_packet(
     return data_packet
 
 
-async def add_type_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
-    """
-    Adds 'type' column to pdf_data.
-    """
-    pdf_data["types"] = pdf_data["content"].apply(get_type)
-    return pdf_data
-
-
-async def process_embedding(text: str) -> np.array:
-    """
-    Fetches results from embedding model.
-
-    Args:
-        text: Text to be stored as embeddings.
-    """
-    result = embedding_model_with_backoff([text])
-    return result
-
-
 async def generate_embeddings(pdf_data: pd.DataFrame) -> np.array:
     """Generates the embeddings.
 
     This function generates the embeddings.
-    It uses the 'map' function to apply the 'process_embedding' function to
-    each row of the 'content' column and returns the resulting numpy array.
 
     Args:
         pdf_data (pd.DataFrame): The PDF data.
@@ -131,7 +110,8 @@ async def generate_embeddings(pdf_data: pd.DataFrame) -> np.array:
         np.array: The embeddings for the PDF data.
     """
     tasks = [
-        asyncio.create_task(process_embedding(x)) for x in pdf_data["content"]
+        asyncio.create_task(embedding_model_with_backoff([x]))
+        for x in pdf_data["content"]
     ]
     embeddings = await asyncio.gather(*tasks)
     return np.array(embeddings)
@@ -213,14 +193,14 @@ async def process_rows(
             file_content=chunk_content,
         )
         final_data.append(packet)
-    pdf_data = pd.DataFrame.from_dict(final_data)
+    pdf_data = pd.read_json(final_data)
     return pdf_data
 
 
 async def csv_pocessing(
     df: pd.DataFrame,
     header: list,
-    dff: pd.DataFrame,
+    embeddings_df: pd.DataFrame,
     file: str,
 ) -> None:
     """Processes the CSV file.
@@ -233,7 +213,7 @@ async def csv_pocessing(
     Args:
         df (pd.DataFrame): The DataFrame to process.
         header (list): The header of the file.
-        dff (pd.DataFrame): The DataFrame with the stored embeddings.
+        embeddings_df (pd.DataFrame): The DataFrame with the stored embeddings.
         file (str): The name of the file.
     """
     pdf_data = pd.DataFrame()
@@ -255,7 +235,10 @@ async def csv_pocessing(
     temp_arr = []
     for i in range(split_num):
         temp_arr.append(
-            asyncio.create_task(add_type_col(parallel_task_array[i]))
+            asyncio.create_task(
+                pdf_data.assign(types=pdf_data["content"].apply(get_type))
+                for pdf_data in parallel_task_array[i]
+            )
         )
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
@@ -269,7 +252,7 @@ async def csv_pocessing(
     for i in range(split_num):
         pdf_data = pd.concat([parallel_task_array[i], pdf_data])
 
-    pdf_data = pd.concat([dff, pdf_data])
+    pdf_data = pd.concat([embeddings_df, pdf_data])
     pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
     pdf_data.reset_index(inplace=True, drop=True)
     bucket.blob(
@@ -317,7 +300,7 @@ def save_chunks_to_data_packet(
 
 def store_embeddings_to_gcs(
     final_data: list[dict[str, Any]],
-    dff: pd.DataFrame,
+    embeddings_df: pd.DataFrame,
 ) -> None:
     """
     Stores embeddings to Google Cloud Storage (GCS).
@@ -325,17 +308,17 @@ def store_embeddings_to_gcs(
     Args:
         final_data: A list of dictionaries containing the new data
         to process (e.g., from PDFs).
-        dff: A pandas DataFrame holding previously processed data.
+        embeddings_df: A pandas DataFrame holding previously processed data.
     """
     with st.spinner("Storing Embeddings"):
-        pdf_data = pd.DataFrame.from_dict(final_data)
+        pdf_data = pd.read_json(final_data)
         pdf_data.reset_index(inplace=True, drop=True)
         pdf_data["types"] = pdf_data["content"].apply(get_type)
         pdf_data["embedding"] = pdf_data["content"].apply(
             lambda x: embedding_model_with_backoff([x])
         )
         pdf_data["embedding"] = pdf_data.embedding.apply(np.array)
-        pdf_data = pd.concat([dff, pdf_data])
+        pdf_data = pd.concat([embeddings_df, pdf_data])
         pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
         pdf_data.reset_index(inplace=True, drop=True)
         bucket.blob(
@@ -346,7 +329,7 @@ def store_embeddings_to_gcs(
 def convert_csv_to_data_packets(
     filename: Any,
     blob: Any,
-    dff: pd.DataFrame,
+    embeddings_df: pd.DataFrame,
 ) -> None:
     """
     Reads a CSV file, processes it into data packets, and uploads the processed
@@ -355,7 +338,7 @@ def convert_csv_to_data_packets(
     Args:
         filename: The name of the CSV file.
         blob: The Blob object representing the CSV file in GCS.
-        dff: A pandas DataFrame containing existing data (if any).
+        embeddings_df: A pandas DataFrame containing existing data (if any).
     """
     header = []
     df = pd.read_csv(filename)
@@ -365,7 +348,7 @@ def convert_csv_to_data_packets(
     for col in df.columns:
         header.append(col)
     with st.spinner("Processing csv...this might take some time..."):
-        asyncio.run(csv_pocessing(df, header, dff, filename.name))
+        asyncio.run(csv_pocessing(df, header, embeddings_df, filename.name))
 
 
 def convert_text_file_to_data_packets(
@@ -426,10 +409,10 @@ def convert_file_to_data_packets(filename: Any) -> None:
 
         if blob.exists():
             stored_embedding_data = blob.download_as_string()
-            dff = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
+            embeddings_df = pd.read_json(json.loads(stored_embedding_data))
 
         else:
-            dff = pd.DataFrame()
+            embeddings_df = pd.DataFrame()
 
         final_data: list[Any] = []
 
@@ -437,7 +420,7 @@ def convert_file_to_data_packets(filename: Any) -> None:
             # If the file is a CSV file, it reads the file and uploads it to
             # the GCS bucket. It then processes the file in parallel and
             # uploads the resulting DataFrameto the GCS bucket.
-            convert_csv_to_data_packets(filename, blob2, dff)
+            convert_csv_to_data_packets(filename, blob2, embeddings_df)
             return
 
         if filename.type == "text/plain":
@@ -477,4 +460,4 @@ def convert_file_to_data_packets(filename: Any) -> None:
                     )
 
         # Stores the embeddings in the GCS bucket.
-        store_embeddings_to_gcs(final_data, dff)
+        store_embeddings_to_gcs(final_data, embeddings_df)

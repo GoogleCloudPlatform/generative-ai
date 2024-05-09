@@ -13,8 +13,8 @@ relevant information from uploaded data.
 import json
 import os
 import re
+from typing import Optional
 
-from app.pages_utils import resources_store_embeddings
 from app.pages_utils.embedding_model import embedding_model_with_backoff
 from app.pages_utils.get_llm_response import generate_gemini
 from dotenv import load_dotenv
@@ -58,8 +58,8 @@ def get_suggestions(state_key: str) -> None:
     """
 
     if st.session_state.rag_search_term is None:
-        dff = st.session_state["processed_data_list"].head(2)
-        context = "\n".join(dff["content"].values)
+        embeddings_df = st.session_state["processed_data_list"].head(2)
+        context = "\n".join(embeddings_df["content"].values)
         prompt = f""" Context: \n {context} \n
          generate 5 questions based on the given context
       """
@@ -74,20 +74,22 @@ def get_suggestions(state_key: str) -> None:
     st.session_state[state_key] = extract_bullet_points(gen_suggestions)
 
 
-def check_if_file_uploaded() -> pd.DataFrame:
-    """Checks if a file has been uploaded.
+def get_stored_embeddings_as_df() -> Optional[pd.DataFrame]:
+    """Retrieves and processes stored embeddings from cloud storage.
 
     Returns:
-        pandas.DataFrame: A DataFrame containing the uploaded file's data.
+        A Pandas DataFrame containing the embeddings, or None if not found.
     """
-    blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
-    if blob.exists():
-        stored_embedding_data = blob.download_as_string()
-        dff = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
-        st.session_state["processed_data_list"] = dff
-    else:
-        dff = pd.DataFrame()
-    return dff
+    embedding = bucket.blob(
+        st.session_state.product_category + "/embeddings.json"
+    )
+    if embedding.exists():
+        stored_embedding_data = embedding.download_as_string()
+        embedding_dataframe = pd.read_json(json.loads(stored_embedding_data))
+        st.session_state["processed_data_list"] = embedding_dataframe
+        return embedding_dataframe
+
+    return None
 
 
 def get_filter_context_from_vectordb(

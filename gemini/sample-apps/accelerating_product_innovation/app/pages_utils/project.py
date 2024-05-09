@@ -100,9 +100,11 @@ def delete_file_from_gcs(file_name: str) -> None:
     file_blob.delete()
     blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
     stored_embedding_data = blob.download_as_string()
-    dff = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
-    dff = dff.drop(dff[dff["file_name"] == file_name].index)
-    dff.reset_index(inplace=True, drop=True)
+    embeddings_df = pd.read_json(json.loads(stored_embedding_data))
+    embeddings_df = embeddings_df.drop(
+        embeddings_df[embeddings_df["file_name"] == file_name].index
+    )
+    embeddings_df.reset_index(inplace=True, drop=True)
     bucket.blob(
         f"{st.session_state.product_category}/embeddings.json"
-    ).upload_from_string(dff.to_json(), "application/json")
+    ).upload_from_string(embeddings_df.to_json(), "application/json")

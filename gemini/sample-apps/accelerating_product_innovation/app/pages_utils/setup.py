@@ -75,7 +75,7 @@ def get_session_state() -> dict:
         "suggestion_first_time": 1,
         "processed_data_list": [],
         "query_vectors": [],
-        "dff": None,
+        "embeddings_df": None,
         "temp_suggestions": None,
         "assorted_prod_title": None,
         "assorted_prod_content": [],
