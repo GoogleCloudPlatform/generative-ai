@@ -87,7 +87,9 @@ def image_generation(
         language="en",
         aspect_ratio=aspect_ratio,
     )
-    images[0].save(location=f"{filename}.png", include_generation_parameters=False)
+    images[0].save(
+        location=f"{filename}.png", include_generation_parameters=False
+    )
 
 
 def edit_image_generation(
@@ -139,7 +141,9 @@ async def parallel_image_generation(prompt: str, col: int):
     logging.debug("Image call start")
     headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
-        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
+        url = (
+            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
+        )
         # Create a post request to get images.
         async with session.post(
             url, data=data_json, headers=headers, verify_ssl=False
@@ -147,16 +151,14 @@ async def parallel_image_generation(prompt: str, col: int):
             # Check if respose is valid.
             if response.status == 200:
                 response = await response.read()
-                response = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
+                response = cv2.imdecode(
+                    np.frombuffer(response, dtype=np.uint8), 1
+                )
                 cv2.imwrite(
                     f"gen_image{st.session_state.num_drafts+col}.png",
                     response,
                 )
                 return response
 
-            logging.debug(
-                "Request failed:",
-                response.status,
-                await response.text(),
-            )
+            logging.debug("Request failed:", await response.text())
     logging.debug("Image call end")
