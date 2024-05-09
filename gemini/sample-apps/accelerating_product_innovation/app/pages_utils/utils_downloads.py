@@ -9,7 +9,6 @@ as zip archives.
 import base64
 import io
 import logging
-import os
 import zipfile
 
 from app.pages_utils.utils_export_content_pdf import (

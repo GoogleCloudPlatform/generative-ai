@@ -5,7 +5,6 @@ layouts and formatting.
 
 # pylint: disable=E0401
 
-import os
 
 from app.pages_utils.utils_pdf_generation import (
     add_formatted_page,
@@ -71,12 +70,12 @@ def create_pdf_layout(
 
 
 def create_content_pdf(
-    product_content: list[list[dict]], selected_titles: list[str]
+    product_content: list[str], selected_titles: list[str]
 ) -> None:
     """Creates a PDF for each product content and selected title.
 
     Args:
-        product_content: A list of lists of dictionaries representing the
+        product_content: A list of strings representing the
         product content.
         selected_titles: A list of selected titles for each product content.
     """

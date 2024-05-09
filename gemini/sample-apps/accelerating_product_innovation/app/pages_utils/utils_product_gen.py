@@ -15,7 +15,6 @@ Functions include:
 
 import asyncio
 import logging
-import os
 from typing import Any
 
 from app.pages_utils.utils_get_llm_response import (
@@ -275,19 +274,6 @@ async def generate_product_content() -> None:
 
     # Store elements for display purposes
     st.session_state.draft_elements = elements
-
-
-async def render_content(features: st.container) -> None:
-    """
-    Handles button clicks and content generation logic.
-
-    Args:
-        features (streamlit.container): A container to be cleared after
-        content generation.
-    """
-
-    if st.button("Generate Content", type="primary"):
-        await handle_content_generation(features)
 
 
 async def handle_content_generation(features: st.container) -> None:
