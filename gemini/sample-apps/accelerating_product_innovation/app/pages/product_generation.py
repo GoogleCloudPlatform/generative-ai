@@ -20,9 +20,9 @@ import asyncio
 import logging
 
 from app.pages_utils import setup
-from app.pages_utils.pages_config import PAGES_CFG
 from app.pages_utils.downloads import download_content, download_file
 from app.pages_utils.draft_generation import ProductDrafts
+from app.pages_utils.pages_config import PAGES_CFG
 from app.pages_utils.product_features import (
     generate_formatted_response,
     modify_selection,
@@ -163,8 +163,5 @@ if (
                 )
 
     # If user clicks edit image, redirect to edit page
-    if (
-        st.session_state.image_to_edit != -1
-        or st.session_state.generate_images is True
-    ):
+    if st.session_state.image_to_edit != -1 or st.session_state.generate_images is True:
         st.switch_page("pages/edit_image.py")
