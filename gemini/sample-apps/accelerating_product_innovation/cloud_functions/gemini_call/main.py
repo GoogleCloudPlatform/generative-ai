@@ -62,7 +62,7 @@ def generate_text(prompt: str):
 
 
 @functions_framework.http
-def generate_text_http(request):
+def get_llm_response(request):
     """HTTP Cloud Function that generates text using the Gemini-Pro model.
 
     Args:

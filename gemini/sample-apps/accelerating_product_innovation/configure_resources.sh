@@ -52,7 +52,7 @@ gcloud functions deploy imagen-call \
   --runtime=python311 \
   --region="$REGION" \
   --source=./cloud_functions/imagen_call \
-  --entry-point=hello_http \
+  --entry-point=get_images \
   --trigger-http \
   --set-env-vars location="$LOCATION" \
   --set-env-vars project_id="$PROJECT_ID" \
@@ -78,7 +78,7 @@ gcloud functions deploy gemini-call \
   --runtime=python311 \
   --region="$REGION" \
   --source=./cloud_functions/gemini-call \
-  --entry-point=generate_text_http \
+  --entry-point=get_llm_response \
   --trigger-http \
   --set-env-vars location="$LOCATION" \
   --set-env-vars project_id="$PROJECT_ID" \
@@ -102,7 +102,7 @@ gcloud functions deploy text-embedding \
   --runtime=python311 \
   --region="$REGION" \
   --source=./cloud_functions/text-embedding \
-  --entry-point=hello_http \
+  --entry-point=get_text_embeddings \
   --trigger-http \
   --set-env-vars location="$LOCATION" \
   --set-env-vars project_id="$PROJECT_ID" \

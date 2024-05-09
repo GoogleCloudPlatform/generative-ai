@@ -44,14 +44,18 @@ def list_pdf_files_gcs() -> list[list[Any]]:
         list[list[Any]]: A list of tuples of the blob name and the file
         extension.
     """
-    blob = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
+    project_embedding = bucket.blob(
+        f"{st.session_state.product_category}/embeddings.json"
+    )
     files = []
-    if blob.exists():
-        blobs = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
-        for blob in blobs:
-            _, file_extension = os.path.splitext(blob.name)
+    if project_embedding.exists():
+        file_list = bucket.list_blobs(
+            prefix=f"{st.session_state.product_category}/"
+        )
+        for file in file_list:
+            _, file_extension = os.path.splitext(file.name)
             if file_extension in (".pdf", ".txt", ".csv", ".docx"):
-                files.append([blob.name, file_extension])
+                files.append([file.name, file_extension])
     else:
         st.write("No file uploaded")
     return files
@@ -66,13 +70,27 @@ def delete_project_from_gcs() -> None:
     It then removes the current project from the list of projects and
     updates the 'project_list.txt' file in the GCS bucket.
     """
-    blobs = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
-    for blob in blobs:
-        blob.delete()
-    st.session_state.product_categories.remove(st.session_state.product_category)
-    if len(st.session_state.product_categories) >= 1:
-        st.session_state.product_category = st.session_state.product_categories[0]
+    # Load list of files for current project.
+    project_file_list = bucket.list_blobs(
+        prefix=f"{st.session_state.product_category}/"
+    )
 
+    # Delete the files in the project.
+    for file in project_file_list:
+        file.delete()
+
+    # Remove the project name corresponding to the deleted project.
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
+
+    # Reset selected project to next project in list.
+    if len(st.session_state.product_categories) >= 1:
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
+
+    # Update list of projects.
     project_list_blob = bucket.blob("project_list.txt")
     project_list_blob.upload_from_string(
         json.dumps(st.session_state.product_categories)
@@ -92,8 +110,10 @@ def delete_file_from_gcs(file_name: str) -> None:
     """
     file_blob = bucket.blob(f"{st.session_state.product_category}/{file_name}")
     file_blob.delete()
-    blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
-    stored_embedding_data = blob.download_as_string()
+    file_embeddings = bucket.blob(
+        st.session_state.product_category + "/embeddings.json"
+    )
+    stored_embedding_data = file_embeddings.download_as_string()
     embeddings_df = pd.read_json(json.loads(stored_embedding_data))
     embeddings_df = embeddings_df.drop(
         embeddings_df[embeddings_df["file_name"] == file_name].index

@@ -31,24 +31,42 @@ def display_projects() -> None:
     st.session_state.product_category = st.selectbox(
         "Select a project", st.session_state.product_categories
     )
-    st.session_state.product_categories.remove(st.session_state.product_category)
-    st.session_state.product_categories.insert(0, st.session_state.product_category)
-    if st.session_state.previous_product_category != st.session_state.product_category:
-        reinitialize_session_states()
-        st.session_state.previous_product_category = st.session_state.product_category
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
+    st.session_state.product_categories.insert(
+        0, st.session_state.product_category
+    )
+    if (
+        st.session_state.previous_product_category
+        != st.session_state.product_category
+    ):
+        initialize_all_session_state(reinitialize=True)
+        st.session_state.previous_product_category = (
+            st.session_state.product_category
+        )
         st.rerun()
 
 
-def get_session_state() -> dict:
-    """
-    Defines default values for session state
+def initialize_all_session_state(reinitialize: bool = False):
+    """Initializes all the session states used in the app.
+
+    Args:
+        reinitialize (optional, bool):
+            Indicated if the session state is being reinitialized
+            or being initialized for the first time.
+            (This value is important to indicate that the value of
+            the selected project has been updated. If it is set to false
+            then no modification is made to the session state).
 
     Returns:
-        session_state_defaults (dict): A dictionary of default key-value pairs
-        for session state
+        None
     """
+    # Get lists of projects in the application.
     project_list_blob = bucket.blob("project_list.txt")
     project_list = json.loads(project_list_blob.download_as_string())
+
+    # Initialize default values for the session state.
     session_state_defaults: dict[str, Any] = {
         "product_categories": project_list,
         "new_product_category_added": None,
@@ -112,41 +130,16 @@ def get_session_state() -> dict:
         "bg_editing": False,
     }
 
-    return session_state_defaults
-
-
-def initialize_all_session_state():
-    """Initializes all the session states used in the app.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    session_state_defaults = get_session_state()
     for key, value in session_state_defaults.items():
-        if key not in st.session_state:
+        if (
+            reinitialize is False and key not in st.session_state
+        ) or reinitialize is True:
             st.session_state[key] = value
 
     if "product_category" not in st.session_state:
-        st.session_state.product_category = st.session_state.product_categories[0]
-
-
-def reinitialize_session_states():
-    """Reinitializes all the session states used in the app.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-
-    # Reset state to default.
-    session_state_defaults = get_session_state()
-    for key, value in session_state_defaults.items():
-        st.session_state[key] = value
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
 
 
 def page_setup(page_cfg: dict) -> None:

@@ -39,7 +39,7 @@ def image_generation(prompt: str):
 
 
 @functions_framework.http
-def hello_http(request):
+def get_images(request):
     """
     Invokes image generation call.
     Args:

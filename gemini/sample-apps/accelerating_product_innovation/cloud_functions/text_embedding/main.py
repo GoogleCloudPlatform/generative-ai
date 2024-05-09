@@ -68,7 +68,7 @@ def generate_embeddings(pdf_data: dict) -> dict:
 
 
 @functions_framework.http
-def hello_http(request) -> tuple[dict[str, str], int]:
+def get_text_embeddings(request) -> tuple[dict[str, str], int]:
     """
     Processes request for generating embeddings.
 
