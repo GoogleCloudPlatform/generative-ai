@@ -90,19 +90,6 @@ def check_if_file_uploaded() -> pd.DataFrame:
     return dff
 
 
-def split_text(row: pd.Series) -> list[str]:
-    """Splits the given text into chunks.
-
-    Args:
-        row (pandas.Series): The row to split.
-
-    Returns:
-        generator: A generator of chunks.
-    """
-    chunk_iter = resources_store_embeddings.get_chunks_iter(row, 2000)
-    return chunk_iter
-
-
 def get_filter_context_from_vectordb(
     question: str, sort_index_value: int = 3
 ) -> tuple[str, pd.DataFrame]:
