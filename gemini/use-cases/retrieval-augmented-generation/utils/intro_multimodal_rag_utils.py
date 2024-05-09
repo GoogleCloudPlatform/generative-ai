@@ -218,6 +218,9 @@ def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
 
     embeddings_dict = {}
 
+    if not text_data:
+        return embeddings_dict
+
     if isinstance(text_data, dict):
         # Process each chunk
         # print(text_data)

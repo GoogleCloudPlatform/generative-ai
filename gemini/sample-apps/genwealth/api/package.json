@@ -12,7 +12,7 @@
   "dependencies": {
     "@google-cloud/discoveryengine": "^1.4.1",
     "@google-cloud/storage": "^7.9.0",
-    "@google-cloud/vertexai": "^0.5.0",
+    "@google-cloud/vertexai": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "lodash": "^4.17.21",
