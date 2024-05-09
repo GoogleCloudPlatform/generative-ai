@@ -6,10 +6,18 @@ Common utilities for the project. This includes:
 
 # pylint: disable=E0401
 
+import json
+import os
 from typing import Any
 
-from app.pages_utils import project
 import streamlit as st
+from google.cloud import storage
+
+
+PROJECT_ID = os.getenv("PROJECT_ID")
+LOCATION = os.getenv("LOCATION")
+storage_client = storage.Client(project=PROJECT_ID)
+bucket = storage_client.bucket("product_innovation_bucket")
 
 
 def display_projects() -> None:
@@ -49,8 +57,10 @@ def get_session_state() -> dict:
         session_state_defaults (dict): A dictionary of default key-value pairs
         for session state
     """
+    project_list_blob = bucket.blob("project_list.txt")
+    project_list = json.loads(project_list_blob.download_as_string())
     session_state_defaults: dict[str, Any] = {
-        "product_categories": project.get_projects_list(),
+        "product_categories": project_list,
         "new_product_category_added": None,
         "previous_product_category": None,
         "text_edit_prompt": None,

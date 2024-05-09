@@ -37,6 +37,8 @@ logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
+storage_client = storage.Client(project=PROJECT_ID)
+bucket = storage_client.bucket("product_innovation_bucket")
 
 
 def get_chunks_iter(text: str, maxlength: int) -> list[str]:
@@ -219,7 +221,6 @@ async def csv_pocessing(
     df: pd.DataFrame,
     header: list,
     dff: pd.DataFrame,
-    bucket: storage.Bucket,
     file: str,
 ) -> None:
     """Processes the CSV file.
@@ -233,7 +234,6 @@ async def csv_pocessing(
         df (pd.DataFrame): The DataFrame to process.
         header (list): The header of the file.
         dff (pd.DataFrame): The DataFrame with the stored embeddings.
-        bucket (storage.Bucket): The GCS bucket to upload the results to.
         file (str): The name of the file.
     """
     pdf_data = pd.DataFrame()
@@ -327,8 +327,6 @@ def store_embeddings_to_gcs(
         to process (e.g., from PDFs).
         dff: A pandas DataFrame holding previously processed data.
     """
-    storage_client = storage.Client(project=PROJECT_ID)
-    bucket = storage_client.bucket("product_innovation_bucket")
     with st.spinner("Storing Embeddings"):
         pdf_data = pd.DataFrame.from_dict(final_data)
         pdf_data.reset_index(inplace=True, drop=True)
@@ -349,7 +347,6 @@ def convert_csv_to_data_packets(
     filename: Any,
     blob: Any,
     dff: pd.DataFrame,
-    bucket: Any,
 ) -> None:
     """
     Reads a CSV file, processes it into data packets, and uploads the processed
@@ -359,7 +356,6 @@ def convert_csv_to_data_packets(
         filename: The name of the CSV file.
         blob: The Blob object representing the CSV file in GCS.
         dff: A pandas DataFrame containing existing data (if any).
-        bucket: The GCS bucket where processed data should be stored.
     """
     header = []
     df = pd.read_csv(filename)
@@ -369,7 +365,7 @@ def convert_csv_to_data_packets(
     for col in df.columns:
         header.append(col)
     with st.spinner("Processing csv...this might take some time..."):
-        asyncio.run(csv_pocessing(df, header, dff, bucket, filename.name))
+        asyncio.run(csv_pocessing(df, header, dff, filename.name))
 
 
 def convert_text_file_to_data_packets(
@@ -420,10 +416,6 @@ def convert_file_to_data_packets(filename: Any) -> None:
     """
 
     with st.spinner("Uploading files..."):
-        # Load bucket to store file embeddings
-        storage_client = storage.Client(project=PROJECT_ID)
-        bucket = storage_client.bucket("product_innovation_bucket")
-
         blob = bucket.blob(
             f"{st.session_state.product_category}/embeddings.json"
         )
@@ -445,7 +437,7 @@ def convert_file_to_data_packets(filename: Any) -> None:
             # If the file is a CSV file, it reads the file and uploads it to
             # the GCS bucket. It then processes the file in parallel and
             # uploads the resulting DataFrameto the GCS bucket.
-            convert_csv_to_data_packets(filename, blob2, dff, bucket)
+            convert_csv_to_data_packets(filename, blob2, dff)
             return
 
         if filename.type == "text/plain":

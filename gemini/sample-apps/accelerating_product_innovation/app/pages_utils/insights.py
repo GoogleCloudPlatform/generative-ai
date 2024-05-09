@@ -28,6 +28,8 @@ load_dotenv()
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
+storage_client = storage.Client(project=PROJECT_ID)
+bucket = storage_client.bucket("product_innovation_bucket")
 
 
 def extract_bullet_points(text: str) -> list[str]:
@@ -78,9 +80,6 @@ def check_if_file_uploaded() -> pd.DataFrame:
     Returns:
         pandas.DataFrame: A DataFrame containing the uploaded file's data.
     """
-    project_id = PROJECT_ID
-    storage_client = storage.Client(project=project_id)
-    bucket = storage_client.bucket("product_innovation_bucket")
     blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
     if blob.exists():
         stored_embedding_data = blob.download_as_string()

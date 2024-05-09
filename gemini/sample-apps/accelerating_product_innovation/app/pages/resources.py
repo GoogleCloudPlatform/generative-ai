@@ -14,6 +14,8 @@ functionalities include:
 
 # pylint: disable=E0401
 
+import json
+import os
 from app.pages_utils import (
     project,
     resources_store_embeddings,
@@ -21,10 +23,19 @@ from app.pages_utils import (
 )
 from app.pages_utils.pages_config import PAGES_CFG
 import streamlit as st
+from google.cloud import storage
+
 
 # Get the page configuration from the config file
 page_cfg = PAGES_CFG["1_Resources"]
 setup.page_setup(page_cfg)
+
+
+PROJECT_ID = os.getenv("PROJECT_ID")
+LOCATION = os.getenv("LOCATION")
+storage_client = storage.Client(project=PROJECT_ID)
+bucket = storage_client.bucket("product_innovation_bucket")
+
 
 # Initialize project form submission state if not already initialized
 if "project_form_submitted" not in st.session_state:
@@ -90,7 +101,10 @@ if submitted:
         ] + st.session_state.product_categories
 
         # Update the projects in GCS
-        project.update_projects(st.session_state.product_categories)
+        project_list_blob = bucket.blob("project_list.txt")
+        project_list_blob.upload_from_string(
+            json.dumps(st.session_state.product_categories)
+        )
 
         # Reset the new project category field
         st.session_state.new_product_category_added = None
@@ -171,10 +185,14 @@ if st.session_state.project_form_submitted is True:
                 color_counter += 1
 
             # Add a download button for the file
+            blob = bucket.blob(
+                f"{st.session_state.product_category}/{file[0][len_prod_cat:]}"
+            )
+            file_contents = blob.download_as_string()
             with list_files_columns[1]:
                 st.download_button(
                     label=":arrow_down:",
-                    data=project.get_file_contents(file[0][len_prod_cat:]),
+                    data=file_contents,
                     file_name=file[0][len_prod_cat:],
                     mime=file[1],
                 )
