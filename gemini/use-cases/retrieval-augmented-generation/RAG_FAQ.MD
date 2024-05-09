@@ -6,7 +6,7 @@ Q: Why do we need both variables: text_embedding_page (the embedding of the enti
 A: We use chunk for most cases in the downstream task in the notebook. This is again from a demonstration purposes that you can either take the whole page or divide them further into smaller chunk. A lot depends on 1) LLM token limit, 2) How would you want your data to be structured and searched. Like, Gemin 1.0 has 8k token limit, so we can very easily do a single page (and multiple as well), and same with Gemini 1.5, where you can probably send a whole document at go. One of the rationale for chunk is to make sure, we don't have too much noise while search for something specific. Hope that clarifies?
 
 Q. The accompanying presentation (and https://github.com/GoogleCloudPlatform/generative-ai/blob/main/embeddings/intro-textemb-vectorsearch.ipynb talks about ANN method of finding closest embeddings match, but the code uses cosine similarity… Should we even mention ANN for this notebook?
-A” Yes, In the notebook, we use simple "cosine similarity", but in real world at big scale, you would want something like managed ANN, as given in the presentation.
+A. Yes, In the notebook, we use simple "cosine similarity", but in real world at big scale, you would want something like managed ANN, as given in the presentation.
 
 Q. The cell which calls get_gemini_response()  generates different responses if I run it several times, even with temperature=0 and same 'query' and 'context' variable. Is this expected? Can anything be done to make it generate the same response every time?
 A. Yeah, that behavior is expected. Temp=0 doesn't solve it. I am not sure if there is any plan in the roadmap to address it. You can however make prompts do that magic by forcing structure like JSON
