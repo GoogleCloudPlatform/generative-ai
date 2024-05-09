@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 import os
 from os import environ
 import tempfile
@@ -15,6 +17,19 @@ public_bucket = environ.get("PUBLIC_BUCKET")
 
 
 def create_graph(amount, category, date, cust_id):
+    """
+    Creates a graph of the predicted expenses.
+
+    Args:
+        amount (list): The amount of each expense.
+        category (list): The category of each expense.
+        date (list): The date of each expense.
+        cust_id (int): The customer ID.
+
+    Returns:
+        str: The public URL of the graph.
+    """
+
     pio.templates.default = "plotly_white"
 
     lst = []
@@ -60,6 +75,10 @@ def create_graph(amount, category, date, cust_id):
 
 
 def create_aggregate_transaction_table():
+    """
+    Creates an aggregate transaction table.
+    """
+
     client = bigquery.Client()
     query = f"""
       SELECT ac_id, DATE_TRUNC(date, MONTH) AS month_year ,sub_category,category,sum(transaction_amount) as transaction_amount
@@ -89,6 +108,10 @@ def create_aggregate_transaction_table():
 
 
 def train_model():
+    """
+    Trains the expense prediction model.
+    """
+
     client = bigquery.Client()
     query_train_arima = f"""
     CREATE OR REPLACE MODEL
@@ -107,6 +130,16 @@ def train_model():
 
 
 def create_predicted_expense_table(customer_id):
+    """
+    Creates a predicted expense table for a customer.
+
+    Args:
+        customer_id (int): The customer ID.
+
+    Returns:
+        bigquery.table.RowIterator: The predicted expense table.
+    """
+
     client = bigquery.Client()
     query = f"""
     SELECT
@@ -139,6 +172,19 @@ def create_predicted_expense_table(customer_id):
 
 @functions_framework.http
 def expense_prediction(request):
+    """
+    Predicts the expenses of a customer based on their transaction history.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

@@ -1,7 +1,20 @@
+# pylint: disable=E0401
+
 import functions_framework
 
 
 def is_date_later_than(start_date, end_date):
+    """
+    Checks if a start date is later than an end date.
+
+    Args:
+        start_date (dict): The start date.
+        end_date (dict): The end date.
+
+    Returns:
+        bool: True if the start date is later than the end date, False otherwise.
+    """
+
     return (
         (start_date["year"] > end_date["year"])
         or (
@@ -18,6 +31,19 @@ def is_date_later_than(start_date, end_date):
 
 @functions_framework.http
 def ask_travel_dates(request):
+    """
+    Asks the user for their travel dates.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     dates = request_json["sessionInfo"]["parameters"]["date"]

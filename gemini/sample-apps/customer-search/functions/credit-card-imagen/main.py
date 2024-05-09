@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 import json
 from os import environ
 
@@ -10,6 +12,17 @@ LOCATION = environ.get("LOCATION")
 
 
 def get_prompt(request_json, request_args):
+    """
+    Gets the prompt from the request.
+
+    Args:
+        request_json (dict): The request body as a JSON object.
+        request_args (dict): The request arguments as a dictionary.
+
+    Returns:
+        The prompt as a string.
+    """
+
     if request_json and "prompt" in request_json:
         return request_json["prompt"]
     elif request_args and "prompt" in request_args:
@@ -19,6 +32,16 @@ def get_prompt(request_json, request_args):
 
 
 def generate_base64_image(user_prompt):
+    """
+    Generates a base64-encoded image using the given prompt.
+
+    Args:
+        user_prompt (str): The prompt to use for image generation.
+
+    Returns:
+        A dictionary containing the base64-encoded image.
+    """
+
     vertexai.init(project=PROJECT_ID, location=LOCATION)
     model = ImageGenerationModel.from_pretrained("imagegeneration@005")
     images = model.generate_images(prompt=user_prompt, number_of_images=1, seed=1)
@@ -33,6 +56,19 @@ def generate_base64_image(user_prompt):
 
 @functions_framework.http
 def generate_credit_card_image(request):
+    """
+    Generates a credit card image using the given prompt.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     if request.method == "OPTIONS":
         headers = {
             "Access-Control-Allow-Origin": "*",

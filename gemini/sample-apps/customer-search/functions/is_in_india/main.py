@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from os import environ
 
 import functions_framework
@@ -8,15 +10,19 @@ project_id = environ.get("PROJECT_ID")
 
 @functions_framework.http
 def check_is_city_in_india(request):
-    """HTTP Cloud Function.
+    """
+    Checks if a given city is in India.
+
     Args:
         request (flask.Request): The request object.
-        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
     Returns:
         The response text, or any set of values that can be turned into a
         Response object using `make_response`
         <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
+
     places_api_key = environ.get("MAPS_API_KEY")
     request_json = request.get_json(silent=True)
 

@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 import datetime
 from os import environ
 
@@ -8,6 +10,16 @@ project_id = environ.get("PROJECT_ID")
 
 
 def convert_days_to_proper_format(days):
+    """
+    Converts the number of days to a proper format, e.g. 365 days to 1 year.
+
+    Args:
+        days (int): The number of days.
+
+    Returns:
+        str: The number of days in a proper format.
+    """
+
     years = days // 365
     days -= years * 365
 
@@ -52,6 +64,19 @@ def check_senior_citizen(dob):
 
 @functions_framework.http
 def ask_fd_tenure(request):
+    """
+    Asks the user for the tenure of their fixed deposit.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from os import environ
 
 import functions_framework
@@ -8,6 +10,19 @@ project_id = environ.get("PROJECT_ID")
 
 @functions_framework.http
 def transaction_anomaly_detection(request):
+    """
+    Detects anomalous transactions for a customer.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

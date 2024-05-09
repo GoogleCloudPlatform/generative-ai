@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from concurrent.futures import ThreadPoolExecutor
 from os import environ
 from typing import Dict
@@ -12,10 +14,31 @@ client: bigquery.Client = bigquery.Client()
 
 
 def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
+    """
+    Runs a BigQuery query and returns the name of the query and the result iterator.
+
+    Args:
+        name (str): The name of the query.
+        statement (str): The BigQuery query statement.
+
+    Returns:
+        A tuple containing the name of the query and the result iterator.
+    """
+
     return name, client.query(statement).result()  # blocks the thread
 
 
 def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
+    """
+    Runs multiple BigQuery queries in parallel and returns a dictionary of the results.
+
+    Args:
+        statements (Dict[str, str]): A dictionary of query names and statements.
+
+    Returns:
+        A dictionary of query names and result iterators.
+    """
+
     with ThreadPoolExecutor() as executor:
         jobs = []
         for name, statement in statements.items():
@@ -27,7 +50,18 @@ def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]
 def upload_blob(
     bucket_name: str, source_file_name: str, destination_blob_name: str
 ) -> str:
-    """Uploads a file to the bucket"""
+    """
+    Uploads a file to a Google Cloud Storage bucket.
+
+    Args:
+        bucket_name (str): The name of the bucket to upload the file to.
+        source_file_name (str): The name of the file to upload.
+        destination_blob_name (str): The name of the blob to create in the bucket.
+
+    Returns:
+        The public URL of the uploaded file.
+    """
+
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
@@ -40,6 +74,18 @@ def upload_blob(
 def get_financial_details(
     query_str: str, value_str: str, res: Dict[str, bigquery.table.RowIterator]
 ) -> int:
+    """
+    Gets a financial detail from a BigQuery query result.
+
+    Args:
+        query_str (str): The name of the query that returned the result.
+        value_str (str): The name of the value to get.
+        res (Dict[str, bigquery.table.RowIterator]): The dictionary of query results.
+
+    Returns:
+        The financial detail as an integer.
+    """
+
     for row in res[query_str]:
         if row[value_str] is not None:
             return int(row[value_str])
@@ -48,6 +94,19 @@ def get_financial_details(
 
 @functions_framework.http
 def account_health_summary(request):
+    """
+    Summarises the account health of a customer.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

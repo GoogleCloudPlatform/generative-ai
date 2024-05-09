@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 import json
 import os
 from os import environ
@@ -22,6 +24,10 @@ project_id = environ.get("PROJECT_ID")
 
 
 def init_me_libs():
+    """
+    Initializes the necessary libraries for the module.
+    """
+
     if not os.path.exists("utils"):
         os.makedirs("utils")
 
@@ -36,6 +42,13 @@ init_me_libs()
 
 
 def load_website_content():
+    """
+    Loads the content of the website.
+
+    Returns:
+        A list of documents.
+    """
+
     nest_asyncio.apply()
 
     loader = WebBaseLoader(
@@ -69,6 +82,16 @@ def load_website_content():
 
 
 def chunk_documents(documents):
+    """
+    Chunks the documents into smaller chunks.
+
+    Args:
+        documents (list): The list of documents to chunk.
+
+    Returns:
+        A list of document chunks.
+    """
+
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=50,
@@ -85,6 +108,16 @@ def chunk_documents(documents):
 
 
 def reformat(resp):
+    """
+    Reformats the response from the LLM.
+
+    Args:
+        resp (str): The response from the LLM.
+
+    Returns:
+        The reformatted response.
+    """
+
     parameters = {
         "max_output_tokens": 1024,
         "temperature": 0.2,
@@ -104,6 +137,16 @@ Given the input text {0}, reformat it to make it clean and representable to be s
 
 
 def formatter(result):
+    """
+    Formats the result of the QA chain.
+
+    Args:
+        result (dict): The result of the QA chain.
+
+    Returns:
+        The formatted result.
+    """
+
     print(f"Query: {result['query']}")
     print("." * 80)
     references = []
@@ -134,10 +177,33 @@ def formatter(result):
 
 
 def wrap(s):
+    """
+    Wraps the text to a width of 120.
+
+    Args:
+        s (str): The text to wrap.
+
+    Returns:
+        The wrapped text.
+    """
+
     return "\n".join(textwrap.wrap(s, width=120, break_long_words=False))
 
 
 def ask(query, qa, k, search_distance):
+    """
+    Asks a question to the QA chain.
+
+    Args:
+        query (str): The question to ask.
+        qa (RetrievalQA): The QA chain to use.
+        k (int): The number of results to return.
+        search_distance (float): The search distance threshold.
+
+    Returns:
+        The formatted result.
+    """
+
     qa.retriever.search_kwargs["search_distance"] = search_distance
     qa.retriever.search_kwargs["k"] = k
     result = qa({"query": query})
@@ -145,14 +211,21 @@ def ask(query, qa, k, search_distance):
     return formatter(result)
 
 
-def ask_react(query, react_agent):
-    result = react_agent.run(query)
-    print(result)
-    return formatter(result)
-
-
 @functions_framework.http
 def qa_over_website(request):
+    """
+    Answers questions about the content of a website.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
     request_args = request.args
 

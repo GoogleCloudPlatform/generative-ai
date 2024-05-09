@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from os import environ
 
 import functions_framework
@@ -9,6 +11,19 @@ client: bigquery.Client = bigquery.Client()
 
 @functions_framework.http
 def debt_funds_summary(request):
+    """
+    Generates a debt funds summary for a customer.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]

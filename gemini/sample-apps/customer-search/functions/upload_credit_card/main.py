@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from datetime import date
 from os import environ
 import random

@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from os import environ
 
 import functions_framework

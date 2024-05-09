@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 import re
 
 import functions_framework
@@ -45,17 +47,15 @@ def get_number_of_days(fd_tenure: str) -> int:
 def validate_fd_tenure(
     request: functions_framework.HttpRequest,
 ) -> functions_framework.HttpResponse:
-    """HTTP Cloud Function.
+    """Validates the fixed deposit tenure.
 
     Args:
-      request (flask.Request): The request object.
-      <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+      request (functions_framework.HttpRequest): The HTTP request object.
 
     Returns:
-      The response text, or any set of values that can be turned into a
-      Response object using `make_response`
-      <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+      functions_framework.HttpResponse: The HTTP response object.
     """
+
     request_json = request.get_json(silent=True)
 
     print(request_json["sessionInfo"]["parameters"])

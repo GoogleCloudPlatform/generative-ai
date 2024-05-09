@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from os import environ
 
 import functions_framework
@@ -8,12 +10,24 @@ project_id = environ.get("PROJECT_ID")
 
 @functions_framework.http
 def check_customer_id(request):
+    """
+    This function checks if a customer ID exists in a database.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    # 342345, 592783
 
     if customer_id is not None:
         print("Customer ID ", customer_id)

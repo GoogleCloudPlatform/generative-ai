@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 import datetime
 from datetime import date
 from os import environ
@@ -14,6 +16,13 @@ project_id = environ.get("PROJECT_ID")
 
 
 def get_ac_number():
+    """
+    Generates a random account number.
+
+    Returns:
+        A random account number as an integer.
+    """
+
     account_number = "11000"
     for i in range(5):
         account_number += str(random.randint(0, 9))
@@ -38,6 +47,16 @@ def check_senior_citizen(dob):
 
 
 def get_number_of_days(fd_tenure):
+    """
+    Calculates the number of days in a fixed deposit tenure.
+
+    Args:
+      fd_tenure: A string representing the fixed deposit tenure.
+
+    Returns:
+      The number of days in the fixed deposit tenure as an integer.
+    """
+
     years = 0
     months = 0
     days = 0
@@ -61,6 +80,17 @@ def get_number_of_days(fd_tenure):
 
 
 def get_interest_rate(is_sr_citizen, number_of_days):
+    """
+    Gets the interest rate for a fixed deposit based on the tenure and whether the customer is a senior citizen.
+
+    Args:
+      is_sr_citizen: A boolean indicating whether the customer is a senior citizen.
+      number_of_days: The number of days in the fixed deposit tenure.
+
+    Returns:
+      The interest rate for the fixed deposit as a float.
+    """
+
     client = bigquery.Client()
 
     roi = 3.0
@@ -85,6 +115,19 @@ def get_interest_rate(is_sr_citizen, number_of_days):
 
 @functions_framework.http
 def create_fixed_deposit(request):
+    """
+    Creates a fixed deposit for a customer.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from concurrent.futures import ThreadPoolExecutor
 from os import environ
 from typing import Dict
@@ -13,10 +15,31 @@ client: bigquery.Client = bigquery.Client()
 
 
 def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
+    """
+    Runs a BigQuery query and returns the name of the query and the result iterator.
+
+    Args:
+        name (str): The name of the query.
+        statement (str): The BigQuery query statement.
+
+    Returns:
+        A tuple containing the name of the query and the result iterator.
+    """
+
     return name, client.query(statement).result()  # blocks the thread
 
 
 def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
+    """
+    Runs multiple BigQuery queries in parallel and returns a dictionary of the results.
+
+    Args:
+        statements (Dict[str, str]): A dictionary of query names and statements.
+
+    Returns:
+        A dictionary of query names and result iterators.
+    """
+
     with ThreadPoolExecutor() as executor:
         jobs = []
         for name, statement in statements.items():
@@ -27,6 +50,19 @@ def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]
 
 @functions_framework.http
 def travel_card_recommendation(request):
+    """
+    Recommends a travel credit card to the user based on their financial profile.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()

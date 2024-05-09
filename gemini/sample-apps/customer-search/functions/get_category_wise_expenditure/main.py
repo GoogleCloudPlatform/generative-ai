@@ -1,3 +1,5 @@
+# pylint: disable=E0401
+
 from os import environ
 import uuid
 
@@ -12,7 +14,18 @@ project_id = environ.get("PROJECT_ID")
 
 
 def upload_blob(bucket_name, source_file_name, destination_blob_name):
-    """Uploads a file to the bucket"""
+    """
+    Uploads a file to a Google Cloud Storage bucket.
+
+    Args:
+        bucket_name (str): The name of the bucket to upload the file to.
+        source_file_name (str): The name of the file to upload.
+        destination_blob_name (str): The name of the blob to create in the bucket.
+
+    Returns:
+        The public URL of the uploaded file.
+    """
+
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
@@ -23,6 +36,19 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 
 @functions_framework.http
 def category_wise_expenditure(request):
+    """
+    Generates a pie chart of the category-wise expenditure of a customer.
+
+    Args:
+        request (flask.Request): The request object.
+            <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
+
     request_json = request.get_json(silent=True)
 
     client = bigquery.Client()
