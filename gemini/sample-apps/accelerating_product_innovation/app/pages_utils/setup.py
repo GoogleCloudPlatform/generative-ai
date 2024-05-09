@@ -10,9 +10,8 @@ import json
 import os
 from typing import Any
 
-import streamlit as st
 from google.cloud import storage
-
+import streamlit as st
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
@@ -32,20 +31,11 @@ def display_projects() -> None:
     st.session_state.product_category = st.selectbox(
         "Select a project", st.session_state.product_categories
     )
-    st.session_state.product_categories.remove(
-        st.session_state.product_category
-    )
-    st.session_state.product_categories.insert(
-        0, st.session_state.product_category
-    )
-    if (
-        st.session_state.previous_product_category
-        != st.session_state.product_category
-    ):
+    st.session_state.product_categories.remove(st.session_state.product_category)
+    st.session_state.product_categories.insert(0, st.session_state.product_category)
+    if st.session_state.previous_product_category != st.session_state.product_category:
         reinitialize_session_states()
-        st.session_state.previous_product_category = (
-            st.session_state.product_category
-        )
+        st.session_state.previous_product_category = st.session_state.product_category
         st.rerun()
 
 
@@ -140,9 +130,7 @@ def initialize_all_session_state():
             st.session_state[key] = value
 
     if "product_category" not in st.session_state:
-        st.session_state.product_category = (
-            st.session_state.product_categories[0]
-        )
+        st.session_state.product_category = st.session_state.product_categories[0]
 
 
 def reinitialize_session_states():

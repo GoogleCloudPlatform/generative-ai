@@ -47,9 +47,7 @@ def list_pdf_files_gcs() -> list[list[Any]]:
     blob = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
     files = []
     if blob.exists():
-        blobs = bucket.list_blobs(
-            prefix=f"{st.session_state.product_category}/"
-        )
+        blobs = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
         for blob in blobs:
             _, file_extension = os.path.splitext(blob.name)
             if file_extension in (".pdf", ".txt", ".csv", ".docx"):
@@ -71,13 +69,9 @@ def delete_project_from_gcs() -> None:
     blobs = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
     for blob in blobs:
         blob.delete()
-    st.session_state.product_categories.remove(
-        st.session_state.product_category
-    )
+    st.session_state.product_categories.remove(st.session_state.product_category)
     if len(st.session_state.product_categories) >= 1:
-        st.session_state.product_category = (
-            st.session_state.product_categories[0]
-        )
+        st.session_state.product_category = st.session_state.product_categories[0]
 
     project_list_blob = bucket.blob("project_list.txt")
     project_list_blob.upload_from_string(
