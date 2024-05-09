@@ -6,8 +6,8 @@ layouts and formatting.
 # pylint: disable=E0401
 
 
-from app.pages_utils.utils_pdf_generation import add_formatted_page, check_add_page
-from app.pages_utils.utils_pdf_generation import PDFRounded as FPDF
+from app.pages_utils.pdf_generation import add_formatted_page, check_add_page
+from app.pages_utils.pdf_generation import PDFRounded as FPDF
 import streamlit as st
 
 
@@ -66,7 +66,9 @@ def create_pdf_layout(
             pdf.multi_cell(170, 5, page)  # Output the text
 
 
-def create_content_pdf(product_content: list[str], selected_titles: list[str]) -> None:
+def create_content_pdf(
+    product_content: list[str], selected_titles: list[str]
+) -> None:
     """Creates a PDF for each product content and selected title.
 
     Args:
@@ -119,14 +121,21 @@ def create_email_pdf(
         document.
     """
     pdf = FPDF()
+
+    # Extract subject and text from email text.
     parts = email_text.split("\n", 1)
     subject = parts[0]
     text = parts[1]
+
+    # Add first page of pdf.
     add_formatted_page(pdf)
 
+    # Set location and text style for heading.
     pdf.set_xy(15, 15)
     pdf.set_text_color(106, 144, 226)
     pdf.set_font("Arial", "B", 11)
+
+    # Add heading to pdf object.
     pdf.multi_cell(
         180,
         5,
@@ -135,15 +144,25 @@ def create_email_pdf(
         align="C",
     )
 
+    # Set text location and styling for subject.
     pdf.set_text_color(0, 0, 0)
-
-    pdf.set_font("Arial", "B", 11)
     pdf.set_xy(17, 25)
+
+    # Add subject to pdf.
     pdf.multi_cell(180, 5, subject, 0, align="C")
+
+    # Add image to pdf object.
     pdf.image(f"{image_name}", x=60, y=40, w=90, h=70)
 
+    # Check if new page needs to be added, and
+    # add required pages.
+    # List pages stores the text content for each page.
     pages = check_add_page(pdf, text)
+
+    # Set font style for email body.
     pdf.set_font("Arial", "", 11)
+
+    # Add text content to each page of pdf.
     for i, page in enumerate(pages):
         # Check if an empty page is encountered.
         if page.strip() == "":

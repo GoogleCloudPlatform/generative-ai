@@ -30,7 +30,7 @@ import logging
 
 import PIL
 from PIL import Image
-from app.pages_utils.utils_imagen import edit_image_generation
+from app.pages_utils.imagen import edit_image_generation
 import streamlit as st
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
@@ -95,7 +95,10 @@ def initialize_edit_page_state() -> None:
     """
 
     # Check which image file prefix points to the image to be edited
-    if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
+    if (
+        "image_to_edit" not in st.session_state
+        or st.session_state.image_to_edit == -1
+    ):
         st.session_state.image_to_edit = (
             -1
         )  # No image from generations is being edited.
@@ -138,7 +141,9 @@ def save_draft_image(
         draft_elements (dict): Dictionary holding the draft image elements.
     """
 
-    st.session_state.content_edited = True  # Track whether image has been edited.
+    st.session_state.content_edited = (
+        True  # Track whether image has been edited.
+    )
     draft_elements[row][col][
         "img"
     ] = image  # Update the drafts to display updated image.

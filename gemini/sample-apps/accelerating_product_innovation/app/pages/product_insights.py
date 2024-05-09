@@ -17,13 +17,13 @@ It provides the following functionality:
 
 # pylint: disable=E0401
 
-from app.pages_utils import utils_insights, utils_setup
-from app.pages_utils.utils_config import PAGES_CFG
+from app.pages_utils import insights, setup
+from app.pages_utils.pages_config import PAGES_CFG
 import streamlit as st
 
 # Get page configuration from config file
 page_cfg = PAGES_CFG["2_Marketing_Insights"]
-utils_setup.page_setup(page_cfg)
+setup.page_setup(page_cfg)
 
 # Initialize temporary suggestions if not already initialized
 if "temp_suggestions" not in st.session_state:
@@ -49,12 +49,12 @@ def get_insights_img() -> None:
 get_insights_img()
 
 # Display projects
-utils_setup.display_projects()
+setup.display_projects()
 
 # Check if data frame is empty
 if st.session_state.dff is None or st.session_state.dff.empty:
     with st.spinner("Fetching Uploaded Files..."):
-        dff = utils_insights.check_if_file_uploaded()
+        dff = insights.check_if_file_uploaded()
         st.session_state.dff = dff
 
 
@@ -67,16 +67,16 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
         suggestion_num: Current suggestion number.
     """
     # Apply custom styling to suggestion box
-    utils_setup.load_css("app/css/prod_insights_styles.css")
+    setup.load_css("app/css/prod_insights_styles.css")
     # Display suggestion button
     if st.button(
         st.session_state.insights_suggestion[suggestion_num],
         key=key,
     ):
         # Update session state with selected suggestion
-        st.session_state.insights_placeholder = st.session_state.insights_suggestion[
-            suggestion_num
-        ]
+        st.session_state.insights_placeholder = (
+            st.session_state.insights_suggestion[suggestion_num]
+        )
         # Set flag to generate RAG answers
         st.session_state.rag_answers_gen = True
 
@@ -102,13 +102,13 @@ else:
             and st.session_state.insights_suggestion is None
         ):
             with st.spinner("Loading suggestion..."):
-                utils_insights.get_suggestions("insights_suggestion")
+                insights.get_suggestions("insights_suggestion")
                 # Check if number of suggestions is less than 4
                 if (
                     st.session_state.insights_suggestion is not None
                     and len(st.session_state.insights_suggestion) < 4
                 ):
-                    utils_insights.get_suggestions("insights_suggestion")
+                    insights.get_suggestions("insights_suggestion")
 
     # Check if suggestions are loaded
     if (
@@ -162,7 +162,9 @@ if st.session_state.rag_answers_gen:
     if st.session_state.dff.empty:
         # Display error message
         st.error(
-            "Add files in " + st.session_state.product_category + " file storage",
+            "Add files in "
+            + st.session_state.product_category
+            + " file storage",
             icon="🚨",
         )
     # Check if search term is empty
@@ -185,13 +187,13 @@ if st.session_state.rag_answers_gen:
             (
                 st.session_state.rag_answer,
                 st.session_state.rag_answer_references,
-            ) = utils_insights.generate_insights_search_result(
+            ) = insights.generate_insights_search_result(
                 st.session_state.rag_search_term
             )
 
             # Get new suggestions
             with st.spinner("Getting new Suggestions"):
-                utils_insights.get_suggestions("temp_suggestions")
+                insights.get_suggestions("temp_suggestions")
 
 # Check if RAG answer and references are available
 if (

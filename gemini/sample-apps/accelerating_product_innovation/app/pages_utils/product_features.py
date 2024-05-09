@@ -13,7 +13,7 @@ This module:
 
 import logging
 
-from app.pages_utils.utils_get_llm_response import generate_gemini
+from app.pages_utils.get_llm_response import generate_gemini
 from dotenv import load_dotenv
 import streamlit as st
 

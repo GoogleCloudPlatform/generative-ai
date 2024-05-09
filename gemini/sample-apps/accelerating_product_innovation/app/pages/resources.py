@@ -14,13 +14,17 @@ functionalities include:
 
 # pylint: disable=E0401
 
-from app.pages_utils import utils_project, utils_resources_store_embeddings, utils_setup
-from app.pages_utils.utils_config import PAGES_CFG
+from app.pages_utils import (
+    project,
+    resources_store_embeddings,
+    setup,
+)
+from app.pages_utils.pages_config import PAGES_CFG
 import streamlit as st
 
 # Get the page configuration from the config file
 page_cfg = PAGES_CFG["1_Resources"]
-utils_setup.page_setup(page_cfg)
+setup.page_setup(page_cfg)
 
 # Initialize project form submission state if not already initialized
 if "project_form_submitted" not in st.session_state:
@@ -49,7 +53,7 @@ screen = st.container()
 # Create a form for the resources page
 with st.form(key="resources_form", clear_on_submit=True):
     # Display the projects
-    utils_setup.display_projects()
+    setup.display_projects()
 
     # Add a text input field for adding a new project category
     st.session_state.new_product_category_added = st.text_input(
@@ -78,13 +82,15 @@ if submitted:
         and st.session_state.new_product_category_added != ""
     ):
         # Update the product category list
-        st.session_state.product_category = st.session_state.new_product_category_added
+        st.session_state.product_category = (
+            st.session_state.new_product_category_added
+        )
         st.session_state.product_categories = [
             st.session_state.new_product_category_added
         ] + st.session_state.product_categories
 
         # Update the projects in GCS
-        utils_project.update_projects(st.session_state.product_categories)
+        project.update_projects(st.session_state.product_categories)
 
         # Reset the new project category field
         st.session_state.new_product_category_added = None
@@ -93,7 +99,7 @@ if submitted:
         if st.session_state.uploaded_files is not None:
             # Convert the uploaded files to data packets and upload them to GCS
             for uploaded_file in st.session_state.uploaded_files:
-                utils_resources_store_embeddings.convert_file_to_data_packets(
+                resources_store_embeddings.convert_file_to_data_packets(
                     uploaded_file
                 )
 
@@ -101,7 +107,9 @@ if submitted:
     if st.session_state.uploaded_files is not None:
         # Convert the uploaded files to data packets and upload them to GCS
         for uploaded_file in st.session_state.uploaded_files:
-            utils_resources_store_embeddings.convert_file_to_data_packets(uploaded_file)
+            resources_store_embeddings.convert_file_to_data_packets(
+                uploaded_file
+            )
 
 
 # Check if the project form was submitted and the file upload is complete
@@ -123,10 +131,10 @@ if st.session_state.project_form_submitted is True:
             # Display a spinner while deleting the project
             with st.spinner("Deleting Project..."):
                 # Delete the project from GCS
-                utils_project.delete_project_from_gcs()
+                project.delete_project_from_gcs()
 
     # List the PDF files in the GCS bucket
-    files = utils_project.list_pdf_files_gcs()
+    files = project.list_pdf_files_gcs()
 
     # Get the length of the product category name
     len_prod_cat = len(st.session_state.product_category) + 1
@@ -166,7 +174,7 @@ if st.session_state.project_form_submitted is True:
             with list_files_columns[1]:
                 st.download_button(
                     label=":arrow_down:",
-                    data=utils_project.get_file_contents(file[0][len_prod_cat:]),
+                    data=project.get_file_contents(file[0][len_prod_cat:]),
                     file_name=file[0][len_prod_cat:],
                     mime=file[1],
                 )
@@ -177,4 +185,6 @@ if st.session_state.project_form_submitted is True:
                     ":x:",
                     key=file[0][len_prod_cat:],
                 ):
-                    utils_project.delete_file_from_gcs(file_name=file[0][len_prod_cat:])
+                    project.delete_file_from_gcs(
+                        file_name=file[0][len_prod_cat:]
+                    )

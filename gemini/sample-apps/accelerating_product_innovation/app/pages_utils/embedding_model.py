@@ -3,6 +3,8 @@ Defines functions for generating text embeddings using a Vertex AI
 TextEmbeddingModel.
 """
 
+# pylint: disable=E0401
+
 import backoff
 from google.api_core.exceptions import ResourceExhausted
 import numpy as np

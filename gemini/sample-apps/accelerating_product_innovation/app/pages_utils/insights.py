@@ -14,9 +14,9 @@ import json
 import os
 import re
 
-from app.pages_utils import utils_resources_store_embeddings
+from app.pages_utils import resources_store_embeddings
 from app.pages_utils.embedding_model import embedding_model_with_backoff
-from app.pages_utils.utils_get_llm_response import generate_gemini
+from app.pages_utils.get_llm_response import generate_gemini
 from dotenv import load_dotenv
 from google.cloud import storage
 import numpy as np
@@ -100,7 +100,7 @@ def split_text(row: pd.Series) -> list[str]:
     Returns:
         generator: A generator of chunks.
     """
-    chunk_iter = utils_resources_store_embeddings.get_chunks_iter(row, 2000)
+    chunk_iter = resources_store_embeddings.get_chunks_iter(row, 2000)
     return chunk_iter
 
 
@@ -144,17 +144,23 @@ def get_filter_context_from_vectordb(
     )
 
     top_matched_df = st.session_state["processed_data_list"][
-        st.session_state["processed_data_list"].index.isin(top_matched_score.index)
+        st.session_state["processed_data_list"].index.isin(
+            top_matched_score.index
+        )
     ]
     top_matched_df = top_matched_df[
         ["file_name", "page_number", "chunk_number", "content"]
     ]
     top_matched_df["confidence_score"] = top_matched_score
-    top_matched_df.sort_values(by=["confidence_score"], ascending=False, inplace=True)
+    top_matched_df.sort_values(
+        by=["confidence_score"], ascending=False, inplace=True
+    )
 
     context = "\n".join(
         st.session_state["processed_data_list"][
-            st.session_state["processed_data_list"].index.isin(top_matched_score.index)
+            st.session_state["processed_data_list"].index.isin(
+                top_matched_score.index
+            )
         ]["content"].values
     )
     return (context, top_matched_df)
