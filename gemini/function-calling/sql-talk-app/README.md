@@ -28,7 +28,7 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 - A Google Cloud project with billing enabled
 - A BigQuery dataset (we used the
   [`thelook_ecommerce` public dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce))
-- APIs for Vertex AI, BigQuery, and Cloud Run enabled
+- APIs for Vertex AI, BigQuery, BigQuery Data Transfer, and Cloud Run enabled
 - Familiarity with Python and SQL concepts
 
 ## Run and modify the app in Cloud Shell Editor
