@@ -108,19 +108,26 @@ def delete_file_from_gcs(file_name: str) -> None:
     Args:
         file_name (str): The name of the file to delete.
     """
+    # Load and delete embeddings of deleted file.
+    deleted_file_blob = bucket.blob(
+        f"{st.session_state.product_category}/{file_name}"
+    )
+    deleted_file_blob.delete()
 
-    project_id = PROJECT_ID
-    storage_client = storage.Client(project=project_id)
-    bucket = storage_client.bucket("product_innovation_bucket")
-    file_blob = bucket.blob(f"{st.session_state.product_category}/{file_name}")
-    file_blob.delete()
-    blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
-    stored_embedding_data = blob.download_as_string()
+    # Load embeddings of the project
+    project_embeddings = bucket.blob(
+        st.session_state.product_category + "/embeddings.json"
+    )
+    stored_embedding_data = project_embeddings.download_as_string()
     embeddings_df = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
+
+    # Remove deleted file from project embeddings.
     embeddings_df = embeddings_df.drop(
         embeddings_df[embeddings_df["file_name"] == file_name].index
     )
     embeddings_df.reset_index(inplace=True, drop=True)
+
+    # Update embeddings in GCS.
     bucket.blob(
         f"{st.session_state.product_category}/embeddings.json"
     ).upload_from_string(embeddings_df.to_json(), "application/json")

@@ -109,7 +109,7 @@ if submitted:
         if st.session_state.uploaded_files is not None:
             # Convert the uploaded files to data packets and upload them to GCS
             for uploaded_file in st.session_state.uploaded_files:
-                resources_store_embeddings.convert_file_to_data_packets(
+                resources_store_embeddings.create_and_store_embeddings(
                     uploaded_file
                 )
 
@@ -117,7 +117,7 @@ if submitted:
     if st.session_state.uploaded_files is not None:
         # Convert the uploaded files to data packets and upload them to GCS
         for uploaded_file in st.session_state.uploaded_files:
-            resources_store_embeddings.convert_file_to_data_packets(
+            resources_store_embeddings.create_and_store_embeddings(
                 uploaded_file
             )
 
