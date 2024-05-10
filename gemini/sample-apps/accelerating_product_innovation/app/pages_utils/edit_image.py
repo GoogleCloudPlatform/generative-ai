@@ -97,7 +97,9 @@ def initialize_edit_page_state() -> None:
 
     # Check which image file prefix points to the image to be edited
     if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
-        st.session_state.image_to_edit = -1  # No image from generations is being edited.
+        st.session_state.image_to_edit = (
+            -1
+        )  # No image from generations is being edited.
         st.session_state.image_file_prefix = (
             "uploaded_image"  # image prefix for editing uploaded image.
         )
@@ -125,7 +127,9 @@ def handle_image_upload() -> None:
             st.error(f"Error opening image: {e}")
 
 
-def save_draft_image(row: int, col: int, image: Image.Image, draft_elements: dict) -> None:
+def save_draft_image(
+    row: int, col: int, image: Image.Image, draft_elements: dict
+) -> None:
     """Saves the draft image and updates session state for content editing.
 
     Args:
@@ -136,7 +140,9 @@ def save_draft_image(row: int, col: int, image: Image.Image, draft_elements: dic
     """
 
     st.session_state.content_edited = True  # Track whether image has been edited.
-    draft_elements[row][col]["img"] = image  # Update the drafts to display updated image.
+    draft_elements[row][col][
+        "img"
+    ] = image  # Update the drafts to display updated image.
 
     # Calculate unique image filename and save image.
     image_num = st.session_state.num_drafts * row + col + 1
@@ -199,7 +205,9 @@ def _handle_edit_suggestion(image_index: int) -> None:
         f.write(image_data.getvalue())
 
     # Update state.
-    st.session_state.edit_suggestion = True  # Track whether a suggestion is being edited.
+    st.session_state.edit_suggestion = (
+        True  # Track whether a suggestion is being edited.
+    )
     st.session_state.image_file_prefix = (
         "suggestion"  # Image saved with prefix suggestion is beig edited.
     )
