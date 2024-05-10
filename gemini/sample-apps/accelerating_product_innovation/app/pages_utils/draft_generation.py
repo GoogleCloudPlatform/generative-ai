@@ -86,9 +86,9 @@ class ProductDrafts:
                     # In case of multiple drafts, track the draft number
                     # being edited.
                     st.session_state.col = j
-                    st.session_state.text_to_edit = st.session_state.draft_elements[title_index][
-                        j
-                    ][
+                    st.session_state.text_to_edit = st.session_state.draft_elements[
+                        title_index
+                    ][j][
                         "text"
                     ]  # Text content being edited.
 
