@@ -75,13 +75,12 @@ def chunk_and_store_data(
 ) -> list:
     """Creates a data packet.
 
-    This function creates a data packet.
-    It takes the file name, page number, chunk number, and file content as
-    input and returns a dictionary with the data packet.
+    This function divides file contents into chunks and stores them as data packets.
 
     Args:
         uploaded_file: File like object from streamlit uploader.
         file_content (str): The contents of the file.
+        page_number(optional): page number of file contents.
 
     Returns:
         final_data: A list of data packets.
@@ -115,28 +114,6 @@ async def add_type_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
     """
     pdf_data["types"] = pdf_data["content"].apply(lambda x: type(x))
     return pdf_data
-
-
-async def generate_embeddings(pdf_data: pd.DataFrame) -> np.array:
-    """Generates the embeddings.
-
-    This function generates the embeddings.
-    It uses the 'map' function to apply the 'embedding_model_with_backoff'
-    function to each row of the 'content' column and returns the
-    resulting numpy array.
-
-    Args:
-        pdf_data (pd.DataFrame): The PDF data.
-
-    Returns:
-        np.array: The embeddings for the PDF data.
-    """
-    tasks = [
-        asyncio.create_task(embedding_model_with_backoff([x]))
-        for x in pdf_data["content"]
-    ]
-    embeddings = await asyncio.gather(*tasks)
-    return np.array(embeddings)
 
 
 async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
