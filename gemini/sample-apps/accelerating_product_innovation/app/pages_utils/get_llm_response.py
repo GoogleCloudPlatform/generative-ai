@@ -68,10 +68,10 @@ async def parallel_generate_search_results(query: str) -> str:
             data=data_json,
             headers=st.session_state.headers,
             verify_ssl=False,
-        ) as response:
-            if response.status == 200:
+        ) as text_response:
+            if text_response.status == 200:
                 # If response is valid, return generated text.
-                response = await response.json()
+                response = await text_response.json()
                 response_text = response["generated_text"]
                 return response_text
             return ""
