@@ -6,10 +6,11 @@ layouts and formatting.
 # pylint: disable=E0401
 
 
+from typing import Any
+
 from app.pages_utils.pdf_generation import PDFRounded as FPDF
 from app.pages_utils.pdf_generation import add_formatted_page, check_add_page
 import streamlit as st
-from typing import Any
 
 
 def create_pdf_layout(
@@ -81,9 +82,7 @@ def create_content_pdf(
         pdf = FPDF()  # Create a PDF for the current product
 
         # Build content and image lists for the current product
-        content = [
-            product_content[(int)(product_index)][0]["text"].replace("**", "")
-        ]
+        content = [product_content[(int)(product_index)][0]["text"].replace("**", "")]
         images = [st.session_state.num_drafts * product_index + 1]
 
         # Generate the PDF layout
