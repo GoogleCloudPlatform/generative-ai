@@ -17,7 +17,7 @@ import asyncio
 import json
 import logging
 import os
-from typing import Any, List, Union
+from typing import Any
 
 from PyPDF2 import PdfReader
 import aiohttp
@@ -71,7 +71,7 @@ def get_chunks_iter(text: str, maxlength: int) -> list[str]:
 
 
 def chunk_and_store_data(
-    uploaded_file: Union[UploadedFile, List[UploadedFile]],
+    uploaded_file: UploadedFile,
     file_content: str,
 ) -> list:
     """Creates a data packet.
@@ -188,7 +188,7 @@ async def process_rows(
             chunk_content += f"{head} is {df.iloc[[i], [j]].squeeze()}. "
         data_packet = {}
         data_packet["file_name"] = filename
-        data_packet["chunk_number"] = i + 1
+        data_packet["chunk_number"] = str(i + 1)
         data_packet["content"] = chunk_content
 
         final_data.append(data_packet)
@@ -251,7 +251,7 @@ async def csv_processing(
 
 
 def load_file_content(
-    uploaded_file: Union[UploadedFile, List[UploadedFile]],
+    uploaded_file: UploadedFile,
     uploaded_file_blob: storage.Blob,
 ) -> Any:
     """Loads and processes the content of various file types (text, docx, pdf).
@@ -304,9 +304,7 @@ def load_file_content(
     return file_content
 
 
-def create_and_store_embeddings(
-    uploaded_file: Union[UploadedFile, List[UploadedFile]]
-) -> None:
+def create_and_store_embeddings(uploaded_file: UploadedFile) -> None:
     """Converts the file to data packets.
 
     This function converts the file to data packets.
