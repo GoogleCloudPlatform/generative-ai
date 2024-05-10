@@ -4,8 +4,6 @@ product content)
 as zip archives.
 """
 
-# pylint: disable=E0401
-
 import base64
 import io
 import logging
