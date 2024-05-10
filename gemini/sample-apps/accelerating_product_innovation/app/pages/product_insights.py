@@ -52,10 +52,7 @@ get_insights_img()
 setup.display_projects()
 
 # Check if data frame is empty
-if (
-    st.session_state.embeddings_df is None
-    or st.session_state.embeddings_df.empty
-):
+if st.session_state.embeddings_df is None or st.session_state.embeddings_df.empty:
     with st.spinner("Fetching Uploaded Files..."):
         embeddings_df = insights.get_stored_embeddings_as_df()
         st.session_state.embeddings_df = embeddings_df

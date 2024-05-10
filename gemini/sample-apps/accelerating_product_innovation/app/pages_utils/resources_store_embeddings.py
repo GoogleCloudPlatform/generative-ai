@@ -17,19 +17,19 @@ import asyncio
 import json
 import logging
 import os
+from typing import List, Union
 
 from PyPDF2 import PdfReader
 import aiohttp
+from app.pages_utils import insights
 from app.pages_utils.embedding_model import embedding_model_with_backoff
 import docx
 from dotenv import load_dotenv
 from google.cloud import storage
 import numpy as np
 import pandas as pd
-from typing import Union, List
-from streamlit.runtime.uploaded_file_manager import UploadedFile
-from app.pages_utils import insights
 import streamlit as st
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 load_dotenv()
 
@@ -258,16 +258,12 @@ async def csv_pocessing(
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(
-            asyncio.create_task(add_type_col(parallel_task_array[i]))
-        )
+        temp_arr.append(asyncio.create_task(add_type_col(parallel_task_array[i])))
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     temp_arr = []
     for i in range(split_num):
-        temp_arr.append(
-            asyncio.create_task(add_embedding_col(parallel_task_array[i]))
-        )
+        temp_arr.append(asyncio.create_task(add_embedding_col(parallel_task_array[i])))
     parallel_task_array = temp_arr
     parallel_task_array = await asyncio.gather(*parallel_task_array)
     for i in range(split_num):
@@ -295,7 +291,6 @@ def create_and_store_embeddings(
         uploaded_file: The file to convert to data packets.
     """
     with st.spinner("Uploading files..."):
-
         uploaded_file_blob = bucket.blob(
             f"{st.session_state.product_category}/{uploaded_file.name}"
         )
@@ -322,9 +317,7 @@ def create_and_store_embeddings(
             # to the GCS bucket.
             with st.spinner("Processing csv...this might take some time..."):
                 asyncio.run(
-                    csv_pocessing(
-                        df, header, embeddings_df, uploaded_file.name
-                    )
+                    csv_pocessing(df, header, embeddings_df, uploaded_file.name)
                 )
             return
 
@@ -409,9 +402,7 @@ def create_and_store_embeddings(
             # Concatenate the data of newly uploaded files with that of
             # existing file embeddings
             pdf_data = pd.concat([embeddings_df, pdf_data])
-            pdf_data = pdf_data.drop_duplicates(
-                subset=["content"], keep="first"
-            )
+            pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
             pdf_data.reset_index(inplace=True, drop=True)
 
             # Upload newly created embeddings to gcs

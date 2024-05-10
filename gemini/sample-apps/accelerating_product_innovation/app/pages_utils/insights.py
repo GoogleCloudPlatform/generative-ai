@@ -47,9 +47,7 @@ def extract_bullet_points(text: str) -> list[str]:
     matches = re.findall(pattern, text)
 
     # Flatten and filter out empty matches
-    bold_text = [
-        match for group in matches for match in group if match.strip()
-    ]
+    bold_text = [match for group in matches for match in group if match.strip()]
 
     return bold_text
 
@@ -84,15 +82,11 @@ def get_stored_embeddings_as_df() -> Optional[pd.DataFrame]:
     Returns:
         A Pandas DataFrame containing the embeddings, or None if not found.
     """
-    embedding = bucket.blob(
-        st.session_state.product_category + "/embeddings.json"
-    )
+    embedding = bucket.blob(st.session_state.product_category + "/embeddings.json")
 
     if embedding.exists():
         stored_embedding_data = embedding.download_as_string()
-        embedding_dataframe = pd.DataFrame.from_dict(
-            json.loads(stored_embedding_data)
-        )
+        embedding_dataframe = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
         st.session_state["processed_data_list"] = embedding_dataframe
         return embedding_dataframe
 
@@ -121,32 +115,24 @@ def get_filter_context_from_vectordb(
         st.session_state["processed_data_list"]["embedding"]
         .apply(
             lambda row: (
-                np.dot(row, st.session_state["query_vectors"])
-                if row is not None
-                else 0
+                np.dot(row, st.session_state["query_vectors"]) if row is not None else 0
             )
         )
         .sort_values(ascending=False)[:sort_index_value]
     )
 
     top_matched_df = st.session_state["processed_data_list"][
-        st.session_state["processed_data_list"].index.isin(
-            top_matched_score.index
-        )
+        st.session_state["processed_data_list"].index.isin(top_matched_score.index)
     ]
     top_matched_df = top_matched_df[
         ["file_name", "page_number", "chunk_number", "content"]
     ]
     top_matched_df["confidence_score"] = top_matched_score
-    top_matched_df.sort_values(
-        by=["confidence_score"], ascending=False, inplace=True
-    )
+    top_matched_df.sort_values(by=["confidence_score"], ascending=False, inplace=True)
 
     context = "\n".join(
         st.session_state["processed_data_list"][
-            st.session_state["processed_data_list"].index.isin(
-                top_matched_score.index
-            )
+            st.session_state["processed_data_list"].index.isin(top_matched_score.index)
         ]["content"].values
     )
     return (context, top_matched_df)
