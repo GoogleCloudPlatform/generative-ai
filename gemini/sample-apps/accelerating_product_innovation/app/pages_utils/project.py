@@ -16,7 +16,7 @@ import json
 import logging
 import os
 from typing import Any
-
+from app.pages_utils.pages_config import GLOBAL_CFG
 from dotenv import load_dotenv
 from google.cloud import storage
 import pandas as pd
@@ -28,8 +28,10 @@ logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
+
+# Define storage bucket
 storage_client = storage.Client(project=PROJECT_ID)
-bucket = storage_client.bucket("product_innovation_bucket")
+bucket = storage_client.bucket(GLOBAL_CFG["bucket_name"])
 
 
 def list_pdf_files_gcs() -> list[list[Any]]:
@@ -49,7 +51,9 @@ def list_pdf_files_gcs() -> list[list[Any]]:
     )
     files = []
     if project_embedding.exists():
-        file_list = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
+        file_list = bucket.list_blobs(
+            prefix=f"{st.session_state.product_category}/"
+        )
         for file in file_list:
             _, file_extension = os.path.splitext(file.name)
             if file_extension in (".pdf", ".txt", ".csv", ".docx"):
@@ -78,11 +82,15 @@ def delete_project_from_gcs() -> None:
         file.delete()
 
     # Remove the project name corresponding to the deleted project.
-    st.session_state.product_categories.remove(st.session_state.product_category)
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
 
     # Reset selected project to next project in list.
     if len(st.session_state.product_categories) >= 1:
-        st.session_state.product_category = st.session_state.product_categories[0]
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
 
     # Update list of projects.
     project_list_blob = bucket.blob("project_list.txt")
@@ -103,7 +111,9 @@ def delete_file_from_gcs(file_name: str) -> None:
         file_name (str): The name of the file to delete.
     """
     # Load and delete embeddings of deleted file.
-    deleted_file_blob = bucket.blob(f"{st.session_state.product_category}/{file_name}")
+    deleted_file_blob = bucket.blob(
+        f"{st.session_state.product_category}/{file_name}"
+    )
     deleted_file_blob.delete()
 
     # Load embeddings of the project

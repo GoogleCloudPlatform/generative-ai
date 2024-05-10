@@ -25,7 +25,6 @@ setup.page_setup(page_cfg)
 
 show_pages_from_config()
 
-
 st.image(page_cfg["home_img_1"])
 st.divider()
 st.image(page_cfg["home_img_2"])

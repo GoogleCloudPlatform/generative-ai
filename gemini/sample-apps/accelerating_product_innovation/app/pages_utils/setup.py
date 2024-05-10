@@ -9,14 +9,18 @@ Common utilities for the project. This includes:
 import json
 import os
 from typing import Any
+from app.pages_utils.pages_config import GLOBAL_CFG
+from vertexai import generative_models
 
 from google.cloud import storage
 import streamlit as st
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
+
+# Define storage bucket
 storage_client = storage.Client(project=PROJECT_ID)
-bucket = storage_client.bucket("product_innovation_bucket")
+bucket = storage_client.bucket(GLOBAL_CFG["bucket_name"])
 
 
 def display_projects() -> None:
@@ -31,11 +35,20 @@ def display_projects() -> None:
     st.session_state.product_category = st.selectbox(
         "Select a project", st.session_state.product_categories
     )
-    st.session_state.product_categories.remove(st.session_state.product_category)
-    st.session_state.product_categories.insert(0, st.session_state.product_category)
-    if st.session_state.previous_product_category != st.session_state.product_category:
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
+    st.session_state.product_categories.insert(
+        0, st.session_state.product_category
+    )
+    if (
+        st.session_state.previous_product_category
+        != st.session_state.product_category
+    ):
         initialize_all_session_state(reinitialize=True)
-        st.session_state.previous_product_category = st.session_state.product_category
+        st.session_state.previous_product_category = (
+            st.session_state.product_category
+        )
         st.rerun()
 
 
@@ -128,7 +141,34 @@ def initialize_all_session_state(reinitialize: bool = False):
             st.session_state[key] = value
 
     if "product_category" not in st.session_state:
-        st.session_state.product_category = st.session_state.product_categories[0]
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
+
+    st.session_state.safety_config = [
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+    ]
+
+    st.session_state.generation_config = generative_models.GenerationConfig(
+        max_output_tokens=8192,
+        temperature=0.001,
+        top_p=1,
+    )
 
 
 def page_setup(page_cfg: dict) -> None:

@@ -21,6 +21,8 @@ import os
 from PyPDF2 import PdfReader
 import aiohttp
 from app.pages_utils.embedding_model import embedding_model_with_backoff
+from app.pages_utils.pages_config import GLOBAL_CFG
+
 import docx
 from dotenv import load_dotenv
 from google.cloud import storage
@@ -33,14 +35,14 @@ import streamlit as st
 
 load_dotenv()
 
+PROJECT_ID = os.getenv("PROJECT_ID")
+LOCATION = os.getenv("LOCATION")
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
-
-PROJECT_ID = os.getenv("PROJECT_ID")
-LOCATION = os.getenv("LOCATION")
+# Define storage bucket
 storage_client = storage.Client(project=PROJECT_ID)
-bucket = storage_client.bucket("product_innovation_bucket")
+bucket = storage_client.bucket(GLOBAL_CFG["bucket_name"])
 
 
 def get_chunks_iter(text: str, maxlength: int) -> list[str]:
@@ -90,7 +92,7 @@ def chunk_and_store_data(
 
     # Return if empty or invalid file is found.
     if file_content == "":
-        return
+        return []
 
     final_data = []
 
@@ -145,8 +147,6 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
         async with session.post(
             url, data=data_json, headers=headers, verify_ssl=False
         ) as response:
-            logging.debug("Inside IF else of session")
-
             # Process cloud function Response
             if response.status == 200:
                 response_text = await response.text()
@@ -155,7 +155,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
                 embedding = pd.Series(embedding[0])
                 pdf_data["embedding"] = embedding
             else:
-                print("Request failed:", await response.text())
+                logging.debug("Request failed", await response.text())
 
     logging.debug("Embedding call end")
 
@@ -231,10 +231,7 @@ async def csv_processing(
 
     # Parallel processing in stages
     processed_chunks = await asyncio.gather(
-        *(
-            process_rows(chunk, file, header, i)
-            for i, chunk in enumerate(chunks)
-        )
+        *(process_rows(chunk, file, header) for i, chunk in enumerate(chunks))
     )
     typed_chunks = await asyncio.gather(
         *(add_type_col(chunk) for chunk in processed_chunks)
@@ -359,6 +356,8 @@ def create_and_store_embeddings(
             uploaded_file=uploaded_file,
             file_content=file_content,
         )
+        if len(final_data) == 0:
+            return
         # Stores the embeddings in the GCS bucket.
         with st.spinner("Storing Embeddings"):
             # Create a dataframe from final chuncked data.

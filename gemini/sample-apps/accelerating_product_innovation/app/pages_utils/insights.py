@@ -14,6 +14,7 @@ import json
 import os
 import re
 from typing import Optional
+from app.pages_utils.pages_config import GLOBAL_CFG
 
 from app.pages_utils.embedding_model import embedding_model_with_backoff
 from app.pages_utils.get_llm_response import generate_gemini
@@ -28,8 +29,10 @@ load_dotenv()
 
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
+
+# Define storage bucket
 storage_client = storage.Client(project=PROJECT_ID)
-bucket = storage_client.bucket("product_innovation_bucket")
+bucket = storage_client.bucket(GLOBAL_CFG["bucket_name"])
 
 
 def extract_bullet_points(text: str) -> list[str]:

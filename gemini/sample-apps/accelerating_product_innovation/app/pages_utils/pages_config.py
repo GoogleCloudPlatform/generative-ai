@@ -55,3 +55,4 @@ assert "pages" in data, "No page configurations found in the config"
 
 TRANSLATE_CFG = data["translate_api"]
 PAGES_CFG = data["pages"]
+GLOBAL_CFG = data["global"]
