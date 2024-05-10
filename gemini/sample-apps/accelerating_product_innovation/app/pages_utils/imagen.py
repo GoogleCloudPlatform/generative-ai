@@ -98,13 +98,13 @@ async def parallel_image_generation(prompt: str, col: int):
         prompt (String): Prompt for image Generation.
         col (int): A pointer to the draft number of the image.
     """
-    data = json.dumps({"img_prompt": prompt})
+    image_prompt = json.dumps({"img_prompt": prompt})
     async with aiohttp.ClientSession() as session:
         url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
         # Create a post request to get images.
         async with session.post(
             url,
-            data=data,
+            data=image_prompt,
             headers=st.session_state.headers,
             verify_ssl=False,
         ) as img_response:

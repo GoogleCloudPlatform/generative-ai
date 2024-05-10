@@ -123,7 +123,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The PDF data with the 'embedding' column.
     """
     # Make request data payload
-    data = json.dumps({"pdf_data": pdf_data["content"].to_json()})
+    pdf_content = json.dumps({"pdf_data": pdf_data["content"].to_json()})
 
     async with aiohttp.ClientSession() as session:
         # URL for cloud function.
@@ -132,7 +132,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
         # Call cloud function to generate embeddings with data and headers.
         async with session.post(
             url,
-            data=data,
+            data=pdf_content,
             headers=st.session_state.headers,
             verify_ssl=False,
         ) as embedding_response:
