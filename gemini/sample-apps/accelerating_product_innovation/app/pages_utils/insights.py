@@ -14,10 +14,10 @@ import json
 import os
 import re
 from typing import Optional
-from app.pages_utils.pages_config import GLOBAL_CFG
 
 from app.pages_utils.embedding_model import embedding_model_with_backoff
 from app.pages_utils.get_llm_response import generate_gemini
+from app.pages_utils.pages_config import GLOBAL_CFG
 from dotenv import load_dotenv
 from google.cloud import storage
 import numpy as np
