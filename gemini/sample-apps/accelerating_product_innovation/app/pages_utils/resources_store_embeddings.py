@@ -72,7 +72,7 @@ def get_chunks_iter(text: str, maxlength: int) -> list[str]:
 def chunk_and_store_data(
     uploaded_file: UploadedFile,
     file_content: str,
-) -> list[Any]:
+) -> list:
     """Creates a data packet.
 
     This function creates and returns a list of chunks from the file contents.
@@ -149,7 +149,9 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
     return pdf_data
 
 
-async def process_rows(df: pd.DataFrame, filename: str, header: list) -> pd.DataFrame:
+async def process_rows(
+    df: pd.DataFrame, filename: str, header: list
+) -> pd.DataFrame:
     """Processes the rows.
 
     This function processes the rows.
@@ -216,12 +218,12 @@ async def csv_processing(
 
     # Parallel processing in stages
     processed_chunks = await asyncio.gather(
-        *(process_rows(chunk, file, header) for i, chunk in enumerate(chunks))
+        *(process_rows(chunk, file, header) for _, chunk in enumerate(chunks))
     )
     typed_chunks = await asyncio.gather(
         *(
             asyncio.to_thread(
-                lambda chunk: chunk.assign(types=[type(x) for x in chunk["content"]])
+                chunk.assign(types=[type(x) for x in chunk["content"]]), chunk
             )
             for chunk in processed_chunks
         )
@@ -232,9 +234,9 @@ async def csv_processing(
 
     # Combine, merge, deduplicate, and upload
     pdf_data = pd.concat(embedded_chunks + [embeddings_df])
-    pdf_data = pdf_data.drop_duplicates(subset="content", keep="first").reset_index(
-        drop=True
-    )
+    pdf_data = pdf_data.drop_duplicates(
+        subset="content", keep="first"
+    ).reset_index(drop=True)
     bucket.blob(
         f"{st.session_state.product_category}/embeddings.json"
     ).upload_from_string(pdf_data.to_json(), "application/json")
@@ -331,7 +333,9 @@ def create_and_store_embeddings(uploaded_file: UploadedFile) -> None:
             # to the GCS bucket.
             with st.spinner("Processing csv...this might take some time..."):
                 asyncio.run(
-                    csv_processing(df, header, embeddings_df, uploaded_file.name)
+                    csv_processing(
+                        df, header, embeddings_df, uploaded_file.name
+                    )
                 )
             return
 
@@ -361,7 +365,9 @@ def create_and_store_embeddings(uploaded_file: UploadedFile) -> None:
             # Concatenate the data of newly uploaded files with that of
             # existing file embeddings
             pdf_data = pd.concat([embeddings_df, pdf_data])
-            pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
+            pdf_data = pdf_data.drop_duplicates(
+                subset=["content"], keep="first"
+            )
             pdf_data.reset_index(inplace=True, drop=True)
 
             # Upload newly created embeddings to gcs

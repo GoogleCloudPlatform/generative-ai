@@ -1,37 +1,5 @@
 #!/bin/bash
-
-file="env.txt"
-previous_data=""
-
-while IFS= read -r line; do
-  echo "line: $line"
-  for word in $line; do
-    echo "pw: $previous_data, w: $word"
-    case "$previous_data" in
-      "PROJECT_ID")
-        echo "pid"
-        PROJECT_ID="$word"
-        ;;
-      "LOCATION")
-        echo "loc"
-        LOCATION="$word"
-        ;;
-      "REGION")
-        echo "reg"
-        REGION="$word"
-        ;;
-      "YOUR_EMAIL")
-        echo "se"
-        YOUR_EMAIL="$word"
-        ;;
-      "PROJECT_NUMBER")
-        echo "pn"
-        PROJECT_NUMBER="$word"
-        ;;
-    esac
-    previous_data="$word"
-  done
-done <"$file"
+source .env
 
 echo "se: $YOUR_EMAIL"
 echo "pn : $PROJECT_NUMBER"

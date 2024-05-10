@@ -70,9 +70,13 @@ def _render_box(box_id: str, title: str, parts: list, class_name: str) -> None:
         style (str): The style of the box.
     """
     st.markdown(
-        f'<div id="{box_id}" class="{class_name}">'
-        f'<h5 style="color: #3367D6; text-align: center">{title if len(parts)==2 else parts[0]}</h5>'
-        f"{'' if len(parts)==0 else parts[1]}</div>",
+        f"""<div id={box_id} class={class_name}>
+                <h5 style="color: #3367D6; text-align: center">
+                    {title if len(parts)==2 else parts[0]}
+                </h5>
+                <div> {'' if len(parts)==0 else parts[1]} </div>
+            </div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -189,9 +193,9 @@ def render_features(features: st.delta_generator.DeltaGenerator) -> None:
 
                 # Rendering with appropriate styles
                 if title in st.session_state.selected_titles:
-                    _render_box(box_id, title, parts, "box_clicked")
+                    _render_box(box_id, title, parts, "box-clicked")
                 else:
-                    _render_box(box_id, title, parts, "box_default")
+                    _render_box(box_id, title, parts, "box-default")
 
 
 def modify_selection(content: st.container) -> None:

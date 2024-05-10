@@ -58,8 +58,8 @@ Follow the below steps to deploy the solution to Cloud Run environment.
 
 ### Environment Setup
 
-1. Ensure that the `configure_resources` script is in the directory containing the solution's code.
-2. Edit the file named `env.txt` within the same directory and populate it with the same values as mentioned above.
+1. Ensure that the `configure_resources.sh` script is in the directory containing the solution's code.
+2. Create a `.env` file within the same directory and populate it with the same values as mentioned above.
 3. Create a `.env` file in the 'cloud_functions' directory and populate it with necessary environment variables as mentioned above.
 
 ### Execute the Script
@@ -72,7 +72,7 @@ Follow the below steps to deploy the solution to Cloud Run environment.
   ```
 
 - The script will:
-  - Parse `env.txt` to obtain project details.
+  - Parse `.env` to obtain project details.
   - Initialize gcloud and set project configuration.
   - Set up a service account with necessary IAM roles.
   - Deploy Cloud Functions (`imagen-call`, `gemini-call`, `text-embedding`).
