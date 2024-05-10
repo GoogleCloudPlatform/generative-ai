@@ -15,7 +15,6 @@ model (Gemini-Pro).
 # pylint: disable=E0401
 
 import json
-import logging
 import os
 
 import aiohttp
@@ -31,7 +30,6 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 vertexai.init(project=PROJECT_ID, location=LOCATION)
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 
 def generate_gemini(text_prompt: str) -> str:
@@ -47,9 +45,7 @@ def generate_gemini(text_prompt: str) -> str:
     response = model.generate_content(
         text_prompt,
         generation_config=st.session_state.generation_config,
-        safety_settings=st.session_state.safety_config,
     )
-    logging.debug(response.text)
     return response.text
 
 
@@ -64,17 +60,20 @@ async def parallel_generate_search_results(query: str) -> str:
         The generated search results.
     """
     data_json = json.dumps({"text_prompt": query})
-    logging.debug("Text call start")
-    headers = {"Content-Type": "application/json"}
     async with aiohttp.ClientSession() as session:
-        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        url = (
+            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
+        )
         # Create post request to get text.
         async with session.post(
-            url, data=data_json, headers=headers, verify_ssl=False
+            url,
+            data=data_json,
+            headers=st.session_state.headers,
+            verify_ssl=False,
         ) as response:
             if response.status == 200:
                 # If response is valid, return generated text.
                 response = await response.json()
-                response = response["generated_text"]
-                return response
+                response_text = response["generated_text"]
+                return response_text
             return ""

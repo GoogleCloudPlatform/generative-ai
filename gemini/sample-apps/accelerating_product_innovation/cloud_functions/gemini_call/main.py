@@ -28,24 +28,6 @@ def generate_text(prompt: str):
         The generated text.
     """
     model = GenerativeModel("gemini-pro")
-    safety_config = [
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-    ]
 
     generation_config = generative_models.GenerationConfig(
         max_output_tokens=8192,
@@ -56,7 +38,6 @@ def generate_text(prompt: str):
     response = model.generate_content(
         prompt,
         generation_config=generation_config,
-        safety_settings=safety_config,
     )
     return response.text
 

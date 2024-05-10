@@ -122,11 +122,7 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The PDF data with the 'embedding' column.
     """
     # Make request data payload
-    json_data = pdf_data["content"].to_json()
-    data = {"pdf_data": json_data}
-    data_json = json.dumps(data)
-    # Make request headers
-    headers = {"Content-Type": "application/json"}
+    data = json.dumps({"pdf_data": pdf_data["content"].to_json()})
 
     async with aiohttp.ClientSession() as session:
         # URL for cloud function.
@@ -134,22 +130,27 @@ async def add_embedding_col(pdf_data: pd.DataFrame) -> pd.DataFrame:
 
         # Call cloud function to generate embeddings with data and headers.
         async with session.post(
-            url, data=data_json, headers=headers, verify_ssl=False
+            url,
+            data=data,
+            headers=st.session_state.headers,
+            verify_ssl=False,
         ) as response:
             # Process cloud function Response
             if response.status == 200:
-                response_text = await response.text()
-                final_response = json.loads(response_text)
-                embedding = final_response["embedding_column"]
-                embedding = pd.Series(embedding[0])
-                pdf_data["embedding"] = embedding
-
-    logging.debug("Embedding call end")
+                response = await response.text()  # Read response
+                # Extract text embeddings and convert to pd.Series.
+                text_embeddings = pd.Series(
+                    json.loads(response)["embedding_column"][0]
+                )
+                # Add embedding column
+                pdf_data["embedding"] = text_embeddings
 
     return pdf_data
 
 
-async def process_rows(df: pd.DataFrame, filename: str, header: list) -> pd.DataFrame:
+async def process_rows(
+    df: pd.DataFrame, filename: str, header: list
+) -> pd.DataFrame:
     """Processes the rows.
 
     This function processes the rows.
@@ -232,9 +233,9 @@ async def csv_processing(
 
     # Combine, merge, deduplicate, and upload
     pdf_data = pd.concat(embedded_chunks + [embeddings_df])
-    pdf_data = pdf_data.drop_duplicates(subset="content", keep="first").reset_index(
-        drop=True
-    )
+    pdf_data = pdf_data.drop_duplicates(
+        subset="content", keep="first"
+    ).reset_index(drop=True)
     bucket.blob(
         f"{st.session_state.product_category}/embeddings.json"
     ).upload_from_string(pdf_data.to_json(), "application/json")
@@ -331,7 +332,9 @@ def create_and_store_embeddings(uploaded_file: UploadedFile) -> None:
             # to the GCS bucket.
             with st.spinner("Processing csv...this might take some time..."):
                 asyncio.run(
-                    csv_processing(df, header, embeddings_df, uploaded_file.name)
+                    csv_processing(
+                        df, header, embeddings_df, uploaded_file.name
+                    )
                 )
             return
 
@@ -361,7 +364,9 @@ def create_and_store_embeddings(uploaded_file: UploadedFile) -> None:
             # Concatenate the data of newly uploaded files with that of
             # existing file embeddings
             pdf_data = pd.concat([embeddings_df, pdf_data])
-            pdf_data = pdf_data.drop_duplicates(subset=["content"], keep="first")
+            pdf_data = pdf_data.drop_duplicates(
+                subset=["content"], keep="first"
+            )
             pdf_data.reset_index(inplace=True, drop=True)
 
             # Upload newly created embeddings to gcs

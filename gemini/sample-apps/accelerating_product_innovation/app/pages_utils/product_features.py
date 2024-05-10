@@ -72,9 +72,9 @@ def _render_box(box_id: str, title: str, parts: list, class_name: str) -> None:
     st.markdown(
         f"""<div id={box_id} class={class_name}>
                 <h5 style="color: #3367D6; text-align: center">
-                    {title if len(parts)==2 else parts[0]}
+                    {title if len(parts) == 2 else parts[0]}
                 </h5>
-                <div> {'' if len(parts)==0 else parts[1]} </div>
+                <div> {'' if len(parts) == 0 else parts[1]} </div>
             </div>
         """,
         unsafe_allow_html=True,

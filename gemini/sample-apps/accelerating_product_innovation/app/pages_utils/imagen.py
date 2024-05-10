@@ -87,7 +87,9 @@ def image_generation(
         language="en",
         aspect_ratio=aspect_ratio,
     )
-    images[0].save(location=f"{filename}.png", include_generation_parameters=False)
+    images[0].save(
+        location=f"{filename}.png", include_generation_parameters=False
+    )
 
 
 async def parallel_image_generation(prompt: str, col: int):
@@ -98,20 +100,28 @@ async def parallel_image_generation(prompt: str, col: int):
         prompt (String): Prompt for image Generation.
         col (int): A pointer to the draft number of the image.
     """
-    data_json = json.dumps({"img_prompt": prompt})
-    headers = {"Content-Type": "application/json"}
+    data = json.dumps({"img_prompt": prompt})
     async with aiohttp.ClientSession() as session:
-        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
+        url = (
+            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
+        )
         # Create a post request to get images.
         async with session.post(
-            url, data=data_json, headers=headers, verify_ssl=False
+            url,
+            data=data,
+            headers=st.session_state.headers,
+            verify_ssl=False,
         ) as response:
             # Check if respose is valid.
             if response.status == 200:
                 response = await response.read()
-                response = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
+                # Load image from response.
+                response_image = cv2.imdecode(
+                    np.frombuffer(response, dtype=np.uint8), 1
+                )
+                # Save image for later use.
                 cv2.imwrite(
                     f"gen_image{st.session_state.num_drafts+col}.png",
-                    response,
+                    response_image,
                 )
-                return response
+                return response_image

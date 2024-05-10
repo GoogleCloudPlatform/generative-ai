@@ -35,11 +35,20 @@ def display_projects() -> None:
     st.session_state.product_category = st.selectbox(
         "Select a project", st.session_state.product_categories
     )
-    st.session_state.product_categories.remove(st.session_state.product_category)
-    st.session_state.product_categories.insert(0, st.session_state.product_category)
-    if st.session_state.previous_product_category != st.session_state.product_category:
+    st.session_state.product_categories.remove(
+        st.session_state.product_category
+    )
+    st.session_state.product_categories.insert(
+        0, st.session_state.product_category
+    )
+    if (
+        st.session_state.previous_product_category
+        != st.session_state.product_category
+    ):
         initialize_all_session_state(reinitialize=True)
-        st.session_state.previous_product_category = st.session_state.product_category
+        st.session_state.previous_product_category = (
+            st.session_state.product_category
+        )
         st.rerun()
 
 
@@ -67,6 +76,7 @@ def initialize_all_session_state(reinitialize: bool = False):
         "new_product_category_added": None,
         "previous_product_category": None,
         "text_edit_prompt": None,
+        "headers": {"Content-Type": "application/json"},
         "update_text_btn": None,
         "uploaded_files": None,
         "rag_search_term": None,
@@ -132,26 +142,9 @@ def initialize_all_session_state(reinitialize: bool = False):
             st.session_state[key] = value
 
     if "product_category" not in st.session_state:
-        st.session_state.product_category = st.session_state.product_categories[0]
-
-    st.session_state.safety_config = [
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-    ]
+        st.session_state.product_category = (
+            st.session_state.product_categories[0]
+        )
 
     st.session_state.generation_config = generative_models.GenerationConfig(
         max_output_tokens=8192,
