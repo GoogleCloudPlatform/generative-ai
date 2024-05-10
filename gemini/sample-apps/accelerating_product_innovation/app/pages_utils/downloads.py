@@ -9,13 +9,10 @@ as zip archives.
 import base64
 import io
 import logging
-import zipfile
 from typing import Any
+import zipfile
 
-from app.pages_utils.export_content_pdf import (
-    create_content_pdf,
-    create_email_pdf,
-)
+from app.pages_utils.export_content_pdf import create_content_pdf, create_email_pdf
 from app.pages_utils.get_llm_response import generate_gemini
 from app.pages_utils.imagen import image_generation
 from dotenv import load_dotenv
@@ -171,9 +168,7 @@ def download_file() -> None:
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(
-            zip_buffer.getvalue(), f"email_{email_file_title}.zip"
-        ),
+        download_button(zip_buffer.getvalue(), f"email_{email_file_title}.zip"),
         height=0,
     )
     st.success("Email Copies Downloaded")
