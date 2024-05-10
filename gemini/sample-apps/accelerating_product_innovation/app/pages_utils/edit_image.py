@@ -23,14 +23,15 @@ generation page.
     * Handles the logic for editing a selected suggestion.
 """
 
+# pylint: disable=E0401
+
 import io
 import logging
-import streamlit as st
 
 import PIL
 from PIL import Image
 from app.pages_utils.imagen import predict_edit_image
-
+import streamlit as st
 from vertexai.preview.vision_models import Image as vertex_image
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)

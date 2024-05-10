@@ -3,6 +3,8 @@ This module defines the 'ProductDrafts' class, responsible
 for managing and displaying product content drafts.
 """
 
+# pylint: disable=E0401
+
 from app.pages_utils.get_llm_response import generate_gemini
 import streamlit as st
 
