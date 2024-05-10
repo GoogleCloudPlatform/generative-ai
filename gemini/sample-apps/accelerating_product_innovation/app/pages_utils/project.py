@@ -108,13 +108,15 @@ def delete_file_from_gcs(file_name: str) -> None:
     Args:
         file_name (str): The name of the file to delete.
     """
+
+    project_id = PROJECT_ID
+    storage_client = storage.Client(project=project_id)
+    bucket = storage_client.bucket("product_innovation_bucket")
     file_blob = bucket.blob(f"{st.session_state.product_category}/{file_name}")
     file_blob.delete()
-    file_embeddings = bucket.blob(
-        st.session_state.product_category + "/embeddings.json"
-    )
-    stored_embedding_data = file_embeddings.download_as_string()
-    embeddings_df = pd.read_json(json.loads(stored_embedding_data))
+    blob = bucket.blob(st.session_state.product_category + "/embeddings.json")
+    stored_embedding_data = blob.download_as_string()
+    embeddings_df = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
     embeddings_df = embeddings_df.drop(
         embeddings_df[embeddings_df["file_name"] == file_name].index
     )

@@ -33,21 +33,25 @@ bucket = storage_client.bucket("product_innovation_bucket")
 
 
 def extract_bullet_points(text: str) -> list[str]:
-    """Extracts bullet points from the LLM generated text.
+    """
+    Extracts all text enclosed within <b> and </b> tags
+    or between ** tags from given string.
 
     Args:
-        text (str): The text to extract bullet points from.
+        html_string: The HTML string to process.
 
     Returns:
-        list: A list of bullet points.
+        A list containing the extracted text segments.
     """
-    bullet_points = []
-    for line in text.splitlines():
-        if re.match(r"^[-*•\d]\s*", line):
-            bold_pattern = r"\*\*(.*?)\*\*"
-            formatted_text = re.sub(bold_pattern, r"<b>\1</b>", text)
-            bullet_points.append(formatted_text)
-    return bullet_points
+    pattern = r"(?:<b>([^<]+?)</b>)|(?:\*\*(.+?)\*\*)"
+    matches = re.findall(pattern, text)
+
+    # Flatten and filter out empty matches
+    bold_text = [
+        match for group in matches for match in group if match.strip()
+    ]
+
+    return bold_text
 
 
 def get_suggestions(state_key: str) -> None:
@@ -86,7 +90,9 @@ def get_stored_embeddings_as_df() -> Optional[pd.DataFrame]:
 
     if embedding.exists():
         stored_embedding_data = embedding.download_as_string()
-        embedding_dataframe = pd.read_json(json.loads(stored_embedding_data))
+        embedding_dataframe = pd.DataFrame.from_dict(
+            json.loads(stored_embedding_data)
+        )
         st.session_state["processed_data_list"] = embedding_dataframe
         return embedding_dataframe
 
