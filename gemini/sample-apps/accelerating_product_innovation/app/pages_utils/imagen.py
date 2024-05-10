@@ -87,9 +87,7 @@ def image_generation(
         language="en",
         aspect_ratio=aspect_ratio,
     )
-    images[0].save(
-        location=f"{filename}.png", include_generation_parameters=False
-    )
+    images[0].save(location=f"{filename}.png", include_generation_parameters=False)
 
 
 async def parallel_image_generation(prompt: str, col: int):
@@ -102,9 +100,7 @@ async def parallel_image_generation(prompt: str, col: int):
     """
     data = json.dumps({"img_prompt": prompt})
     async with aiohttp.ClientSession() as session:
-        url = (
-            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
-        )
+        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
         # Create a post request to get images.
         async with session.post(
             url,

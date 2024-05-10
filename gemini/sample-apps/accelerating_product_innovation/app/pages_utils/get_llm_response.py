@@ -61,9 +61,7 @@ async def parallel_generate_search_results(query: str) -> str:
     """
     data_json = json.dumps({"text_prompt": query})
     async with aiohttp.ClientSession() as session:
-        url = (
-            f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
-        )
+        url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
         # Create post request to get text.
         async with session.post(
             url,
