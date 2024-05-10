@@ -60,7 +60,7 @@ def _remove_title_from_selection(title: str) -> None:
         st.session_state.selected_titles.remove(title)
 
 
-def _render_box(box_id: str, title: str, parts: list, style: str) -> None:
+def _render_box(box_id: str, title: str, parts: list, class_name: str) -> None:
     """Renders a box with the given title, parts, and style.
 
     Args:
@@ -69,19 +69,12 @@ def _render_box(box_id: str, title: str, parts: list, style: str) -> None:
         parts (list): The parts of the box.
         style (str): The style of the box.
     """
-    if len(parts) == 2:
-        st.markdown(
-            f'<div id="{box_id}" class="custom-box" style="{style}">'
-            f'<h5 style="color: #3367D6; text-align: center">{title}</h5>'
-            f"{parts[1]}</div>",
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            f'<div id="{box_id}" class="custom-box" style="{style}">'
-            f"{parts[0]}</div>",
-            unsafe_allow_html=True,
-        )
+    st.markdown(
+        f'<div id="{box_id}" class="{class_name}">'
+        f'<h5 style="color: #3367D6; text-align: center">{title if len(parts)==2 else parts[0]}</h5>'
+        f"{'' if len(parts)==0 else parts[1]}</div>",
+        unsafe_allow_html=True,
+    )
 
 
 def get_features(text: str) -> list[str]:
@@ -196,9 +189,9 @@ def render_features(features: st.delta_generator.DeltaGenerator) -> None:
 
                 # Rendering with appropriate styles
                 if title in st.session_state.selected_titles:
-                    _render_box(box_id, title, parts, CLICKED_BOX_STYLE)
+                    _render_box(box_id, title, parts, "box_clicked")
                 else:
-                    _render_box(box_id, title, parts, BOX_STYLE)
+                    _render_box(box_id, title, parts, "box_default")
 
 
 def modify_selection(content: st.container) -> None:

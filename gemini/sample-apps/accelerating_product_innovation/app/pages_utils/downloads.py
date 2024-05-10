@@ -10,8 +10,12 @@ import base64
 import io
 import logging
 import zipfile
+from typing import Any
 
-from app.pages_utils.export_content_pdf import create_content_pdf, create_email_pdf
+from app.pages_utils.export_content_pdf import (
+    create_content_pdf,
+    create_email_pdf,
+)
 from app.pages_utils.get_llm_response import generate_gemini
 from app.pages_utils.imagen import image_generation
 from dotenv import load_dotenv
@@ -118,7 +122,7 @@ def create_zip_buffer(filenames: list[str]) -> io.BytesIO:
     return zip_buffer
 
 
-def load_product_lists() -> tuple[list[str], list[str]]:
+def load_product_lists() -> tuple[list[list[dict[str, Any]]], list[str]]:
     """
     Creates copies of Product titles and content to be imported.
     Returns:
@@ -167,7 +171,9 @@ def download_file() -> None:
 
     # Provide download button with appropriate filename
     components.html(
-        download_button(zip_buffer.getvalue(), f"email_{email_file_title}.zip"),
+        download_button(
+            zip_buffer.getvalue(), f"email_{email_file_title}.zip"
+        ),
         height=0,
     )
     st.success("Email Copies Downloaded")

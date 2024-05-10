@@ -30,11 +30,7 @@ def generate_text(prompt: str):
     model = GenerativeModel("gemini-pro")
     safety_config = [
         generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
             threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
         ),
         generative_models.SafetySetting(
@@ -42,7 +38,11 @@ def generate_text(prompt: str):
             threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
         ),
         generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
             threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
         ),
     ]

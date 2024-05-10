@@ -52,7 +52,10 @@ get_insights_img()
 setup.display_projects()
 
 # Check if data frame is empty
-if st.session_state.embeddings_df is None or st.session_state.embeddings_df.empty:
+if (
+    st.session_state.embeddings_df is None
+    or st.session_state.embeddings_df.empty
+):
     with st.spinner("Fetching Uploaded Files..."):
         embeddings_df = insights.get_stored_embeddings_as_df()
         st.session_state.embeddings_df = embeddings_df
@@ -74,9 +77,9 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
         key=key,
     ):
         # Update session state with selected suggestion
-        st.session_state.insights_placeholder = st.session_state.insights_suggestion[
-            suggestion_num
-        ]
+        st.session_state.insights_placeholder = (
+            st.session_state.insights_suggestion[suggestion_num]
+        )
         # Set flag to generate RAG answers
         st.session_state.rag_answers_gen = True
 
@@ -86,7 +89,10 @@ st.divider()
 st.write("**SUGGESTED QUESTIONS:**")
 
 # Check if data frame is empty
-if st.session_state.embeddings_df.empty:
+if (
+    st.session_state.embeddings_df is None
+    or st.session_state.embeddings_df.empty
+):
     # Display error message
     st.error(
         "Add files in "
@@ -159,10 +165,15 @@ if st.button("Search", type="primary"):
 # Check if RAG answers should be generated
 if st.session_state.rag_answers_gen:
     # Check if data frame is empty
-    if st.session_state.embeddings_df.empty:
+    if (
+        st.session_state.embeddings_df is None
+        or st.session_state.embeddings_df.empty
+    ):
         # Display error message
         st.error(
-            "Add files in " + st.session_state.product_category + " file storage",
+            "Add files in "
+            + st.session_state.product_category
+            + " file storage",
             icon="🚨",
         )
     # Check if search term is empty
