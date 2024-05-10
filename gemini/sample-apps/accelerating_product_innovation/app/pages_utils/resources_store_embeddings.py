@@ -17,9 +17,11 @@ import asyncio
 import json
 import logging
 import os
+from typing import Any, List, Union
 
 from PyPDF2 import PdfReader
 import aiohttp
+from app.pages_utils import insights
 from app.pages_utils.embedding_model import embedding_model_with_backoff
 from app.pages_utils.pages_config import GLOBAL_CFG
 
@@ -28,10 +30,8 @@ from dotenv import load_dotenv
 from google.cloud import storage
 import numpy as np
 import pandas as pd
-from typing import Union, List, Any
-from streamlit.runtime.uploaded_file_manager import UploadedFile
-from app.pages_utils import insights
 import streamlit as st
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 load_dotenv()
 
@@ -317,7 +317,6 @@ def create_and_store_embeddings(
         uploaded_file: The file to convert to data packets.
     """
     with st.spinner("Uploading files..."):
-
         uploaded_file_blob = bucket.blob(
             f"{st.session_state.product_category}/{uploaded_file.name}"
         )
