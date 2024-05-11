@@ -31,6 +31,93 @@ def get_financial_details(
             return int(row[value_str])
     return 0
 
+def get_ac_health_status(
+    total_expenditure: int, 
+    asset_amount: int, 
+    debt_amount: int, 
+    total_high_risk_investment: int, 
+    total_investment: int, 
+    total_income: int
+) -> str:
+    """
+    Calculates the account health status based on financial details.
+
+    Args:
+        total_expenditure (int): Total expenditure of the customer.
+        asset_amount (int): Total asset amount of the customer.
+        debt_amount (int): Total debt amount of the customer.
+        total_high_risk_investment (int): Total high-risk investment amount of the customer.
+        total_investment (int): Total investment amount of the customer.
+        total_income (int): Total income of the customer.
+
+    Returns:
+        str: The account health status ("Healthy", "Needs Attention", or "Concerning").
+    """
+
+    account_status = ""    
+    if (
+        total_expenditure < 0.75 * total_income
+        and asset_amount >= 0.2 * total_income
+        and debt_amount < 0.3 * asset_amount
+        and total_high_risk_investment < 0.3 * total_investment
+    ):
+        account_status = "Healthy"
+    elif (
+        (
+            total_expenditure >= 0.75 * total_income
+            and total_expenditure < 0.9 * total_income
+        )
+        or (asset_amount < 0.2 * total_income and asset_amount > 0.1 * total_income)
+        or (debt_amount >= 0.3 * asset_amount and debt_amount < 0.75 * asset_amount)
+        or (
+            total_high_risk_investment >= 0.3 * total_investment
+            and total_high_risk_investment < 0.8 * total_investment
+        )
+    ):
+        account_status = "Needs Attention"
+    else:
+        account_status = "Concerning"
+
+    return account_status
+
+def get_ac_details(project_id: str, user_accounts: list) -> tuple:
+    """
+    Calculates the total income and total expenditure of a customer.
+
+    Args:
+        project_id (str): The project ID of the customer.
+        user_accounts (list): A list of account IDs of the customer.
+
+    Returns:
+        tuple: A tuple containing the total income and total expenditure of the customer.
+    """
+
+    total_income = 0
+    total_expenditure = 0
+    for account in user_accounts:
+        query_expenditure_details = f"""
+            SELECT SUM(transaction_amount) as expenditure FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} AND debit_credit_indicator = 'Debit'
+        """
+
+        query_income = f"""
+            SELECT SUM(transaction_amount) as income FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} and debit_credit_indicator = 'Credit'
+        """
+
+        res_sub = run_all(
+            {
+                "query_expenditure_details": query_expenditure_details,
+                "query_income": query_income,
+            }
+        )
+        for row in res_sub["query_income"]:
+            if row["income"] is not None:
+                total_income += row["income"]
+
+        for row in res_sub["query_expenditure_details"]:
+            if row["expenditure"] is not None:
+                total_expenditure = total_expenditure + row["expenditure"]
+
+    return total_income, total_expenditure
 
 @functions_framework.http
 def account_health_summary(request):
@@ -89,15 +176,12 @@ def account_health_summary(request):
     debt_amount = get_financial_details(
         query_str="query_debts", value_str="debt", res=res
     )
-    total_income = 0
-    total_expenditure = 0
     first_name = ""
     total_investment = 0
     total_high_risk_investment = 0
     avg_monthly_balance = get_financial_details(
         query_str="query_avg_monthly_balance", value_str="avg_monthly_balance", res=res
     )
-    amount_transfered = ""
     account_status = ""
     user_accounts = []
 
@@ -107,40 +191,9 @@ def account_health_summary(request):
     for row in res["query_account_details"]:
         user_accounts.append(row["account_id"])
 
-    for account in user_accounts:
-        query_transaction_details = f"""
-            SELECT * FROM `{project_id}.DummyBankDataset.AccountTransactions`
-            WHERE ac_id = {account}
-        """
-
-        query_expenditure_details = f"""
-            SELECT SUM(transaction_amount) as expenditure FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} AND debit_credit_indicator = 'Debit'
-        """
-
-        query_income = f"""
-            SELECT SUM(transaction_amount) as income FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} and debit_credit_indicator = 'Credit'
-        """
-
-        res_sub = run_all(
-            {
-                "query_transaction_details": query_transaction_details,
-                "query_expenditure_details": query_expenditure_details,
-                "query_income": query_income,
-            }
-        )
-        for row in res_sub["query_income"]:
-            if row["income"] is not None:
-                total_income += row["income"]
-
-        for row in res_sub["query_transaction_details"]:
-            amount_transfered = (
-                f"{amount_transfered},"
-                f" {row['transaction_amount']} {row['description']}"
-            )
-
-        for row in res_sub["query_expenditure_details"]:
-            if row["expenditure"] is not None:
-                total_expenditure = total_expenditure + row["expenditure"]
+    total_income, total_expenditure = get_ac_details(
+        project_id=project_id, user_accounts=user_accounts
+    )
 
     for row in res["query_fd"]:
         if row["asset"] is not None:
@@ -154,28 +207,14 @@ def account_health_summary(request):
         if row["total_high_risk_investment"] is not None:
             total_high_risk_investment += row["total_high_risk_investment"]
 
-    if (
-        total_expenditure < 0.75 * total_income
-        and asset_amount >= 0.2 * total_income
-        and debt_amount < 0.3 * asset_amount
-        and total_high_risk_investment < 0.3 * total_investment
-    ):
-        account_status = "Healthy"
-    elif (
-        (
-            total_expenditure >= 0.75 * total_income
-            and total_expenditure < 0.9 * total_income
-        )
-        or (asset_amount < 0.2 * total_income and asset_amount > 0.1 * total_income)
-        or (debt_amount >= 0.3 * asset_amount and debt_amount < 0.75 * asset_amount)
-        or (
-            total_high_risk_investment >= 0.3 * total_investment
-            and total_high_risk_investment < 0.8 * total_investment
-        )
-    ):
-        account_status = "Needs Attention"
-    else:
-        account_status = "Concerning"
+    account_status = get_ac_health_status(
+        total_income=total_income,
+        total_expenditure=total_expenditure,
+        asset_amount=asset_amount,
+        debt_amount=debt_amount,
+        total_investment=total_investment,
+        total_high_risk_investment=total_high_risk_investment
+    )
 
     model = Gemini()
 
