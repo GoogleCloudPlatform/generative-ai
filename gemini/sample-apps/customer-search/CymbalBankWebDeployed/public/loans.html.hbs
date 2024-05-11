@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loans</title>
+    <script defer type="module" src="scripts/script.js"></script>
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+    <style>
+        df-messenger {
+            z-index: 999;
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            --df-messenger-primary-color: #4bbb7d;
+            --df-messenger-chat-window-height: 55vh;
+            --df-messenger-chat-window-width: 50vw;
+        }
+
+        .header {
+            padding: 0 3rem;
+            height: 10rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* margin: 25px; */
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            height: 100vh;
+            padding-left: 4%;
+            padding-right: 4%;
+            
+        }
+
+        .loansh2 {
+            line-height: 1.35;
+            text-align: center;
+            padding-top: 120px;
+            padding-bottom: 40px;
+        }
+
+        .card {
+            width: 600px;
+            margin: 2rem 2rem;
+            /* margin: 1rem 2rem 2rem 1rem; */
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        header {
+            display: flex;
+            margin-top: 8rem;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .card h3 {
+            /* color: #1bb52a; */
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .card ul {
+            /* list-style: none; */
+            /* padding: 0; */
+            margin: 15px 0;
+        }
+
+        .card li {
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .additional-content {
+            max-width: 90vw;
+            /* Adjust the width as needed */
+            margin: 2rem auto;
+            text-align: center;
+            /* padding: 20px; */
+            background-color: #fff;
+            /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+            border-radius: 8px;
+            font-size: 1.5rem;
+        }
+
+        .savingh2 {
+        font-size: 4.5rem;
+        line-height: 1.35;
+        text-align: center;
+        padding-top: 60px;
+        padding-bottom: 20px;
+        }
+
+
+    
+    </style>
+    <script>
+        window.addEventListener('df-messenger-loaded', function (event) {
+            // Get the Dialogflow Messenger instance
+            console.log('dfMessengerLoaded');
+
+            const dfMessenger = document.querySelector('df-messenger');
+            dfMessenger.clearStorage();
+        });
+    </script>
+</head>
+<base target="_blank">
+
+<script type="text/javascript">
+    function searchKeyPress(e) {
+
+        // look for window.event in case event isn't passed in
+
+        e = e || window.event;
+
+        if (e.keyCode == 13) {
+
+            // document.getElementById('search-icon').click();
+
+            // return false;
+            console.log('hello')
+            document.getElementById('loader').style.display = 'block';
+
+            var siteSearchUrl = 'https://sites.google.com/corp/search/pranshusingh.altostrat.com/cymbalbank?query=';
+
+            var query = document.getElementById("search-query-input").value;
+            var searchResultsPage = './search.html';
+
+            const uri = '{{rag_qa_chain_url_translate}}';
+            const body = JSON.stringify({ query: query })
+            const initDetails = {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                referrerPolicy: "strict-origin-when-cross-origin",
+                body: body
+            }
+
+            fetch(uri, initDetails)
+                .then(response => {
+                    if (response.status !== 200) {
+                        console.log('Looks like there was a problem. Status Code: ' +
+                            response.status);
+                        return;
+                    }
+                    console.log(response.headers.get("Content-Type"));
+                    return response.json();
+                }
+                )
+                .then(myJson => {
+                    console.log(JSON.stringify(myJson));
+                    var obj = JSON.parse(JSON.stringify(myJson));
+
+                    sessionStorage.setItem('temp_result', JSON.stringify(obj));
+                    window.location.href = '/search';
+
+
+                    references = JSON.parse(obj.fulfillment_response.messages[0].text.text[1]);
+                    console.log(references)
+                    var str = '';
+                    var i = 0;
+                    var count = 0
+                })
+                .catch(err => {
+                    console.log('Fetch Error :-S', err);
+                })
+                .finally(() => {
+                    // Hide loading symbol
+                    document.getElementById('loader').style.display = 'none';
+                });;
+
+        }
+
+        return true;
+
+    }
+</script>
+
+<body>
+    <div id="df-messenger-container">
+        <df-messenger location="us-central1" project-id="{{project_id}}"
+            agent-id="{{df_agent_id}}" language-code="en">
+            <df-messenger-chat-bubble chat-title="CymBuddy">
+            </df-messenger-chat-bubble>
+        </df-messenger>
+    </div>
+
+    <header class="header">
+        <nav>
+            <div class="navbar">
+                <i class='bx bx-menu'></i>
+                <div class="sidebar-logo-container">
+                <a href="/" target="_self"> <img src="assets/cymbal_logo.png" alt="Cymbal Bank logo" class="nav-logo"
+                        id="logo" data-version-number="3.0" /></a>
+                </div>
+                <div class="nav-links">
+                    <div class="sidebar-logo">
+                        <span class="logo-name">Cymbal Bank</span>
+                        <i class='bx bx-x'></i>
+                    </div>
+                    <ul class="links">
+                        <li class="nav-item">
+                            <a class="nav-link">Pay</a>
+                            <i class='bx bxs-chevron-down pay-arrow arrow'></i>
+                            <ul class="pay-sub-menu sub-menu">
+                                <li class="moneytransfer">
+                                    <span><a class="nav-link" href="#">Money Transfer</a>
+                                        <i class='bx bxs-chevron-right arrow moneytransfer-arrow'></i>
+                                    </span>
+                                    <ul class="moneytransfer-sub-menu sub-menu">
+                                        <li><a class="nav-link" href="/upi">UPI</a></li>
+                                        <li><a class="nav-link" href="/imps">IMPS</a></li>
+                                        <li><a class="nav-link" href="/neft">NEFT</a></li>
+                                    </ul>
+                                </li>
+                                <li class="bills">
+                                    <span><a class="nav-link" href="#">Bills</a>
+                                        <i class='bx bxs-chevron-right arrow bills-arrow'></i>
+                                    </span>
+                                    <ul class="bills-sub-menu sub-menu">
+                                        <li><a class="nav-link" href="/recharge">Recharge (Mobile, DTH, Broadband)</a>
+                                        </li>
+                                        <li><a class="nav-link" href="/electricity">Electricity</a></li>
+                                        <li><a class="nav-link" href="/insurance_premium">Insurance Premium</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">Save</a>
+                            <i class='bx bxs-chevron-down save-arrow arrow'></i>
+                            <ul class="save-sub-menu sub-menu">
+                                <li class="accounts">
+                                    <span><a class="nav-link" href="#">Accounts</a>
+                                        <i class='bx bxs-chevron-right arrow accounts-arrow'></i>
+                                    </span>
+                                    <ul class="accounts-sub-menu sub-menu">
+                                        <li><a class="nav-link" href="/saving">Saving</a></li>
+                                        <li><a class="nav-link" href="/current">Current</a></li>
+                                        <li><a class="nav-link" href="/salary">Salary</a></li>
+                                    </ul>
+                                </li>
+                                <li class="deposits">
+                                    <span><a class="nav-link" href="#">Deposits</a>
+                                        <i class='bx bxs-chevron-right arrow deposits-arrow'></i>
+                                    </span>
+                                    <ul class="deposits-sub-menu sub-menu">
+                                        <li><a class="nav-link" href="/fixed_deposit">Fixed Deposit</a></li>
+                                        <li><a class="nav-link" href="/recurring_deposit">Recurring Deposit</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/credit_card">Credit Card</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link">Invest</a>
+                            <i class='bx bxs-chevron-down invest-arrow arrow'></i>
+                            <ul class="invest-sub-menu sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="/stocks">Equities and Derivatives</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link" href="/ipo">IPO through ASBA</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/mutual_funds">Mutual Funds</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/loans">Loans</a>
+                            <i class='bx bxs-chevron-down borrow-arrow arrow'></i>
+                            <ul class="borrow-sub-menu sub-menu">
+                                <li><a class="nav-link" href="loans">Car Loan</a></li>
+                                <li><a class="nav-link" href="loans">Two Wheeler Loan</a></li>
+                                <li><a class="nav-link" href="loans">Personal Loan</a></li>
+                                <li><a class="nav-link" href="loans">Fixed Deposit Overdraft</a></li>
+                                <li><a class="nav-link" href="loans">Overdraft Against Securities</a></li>
+                                <li><a class="nav-link" href="loans">Home Loan</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-btn btn--show-modal" id="login_menu_btn">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-btn btn--show-modal" id="logout_menu_btn"
+                                style="display: none">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            </div>
+        </nav>
+        <div id="search-container">
+            <div id="search-query">
+                <img id="search-icon"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAQAAABIkb+zAAADAklEQVR4AezZA6xcQRSA4b92g9q2/VRuw9puVLcxake13Zh1G9W2bds2T42ZzNPeO7Pb5H5/zD17PUMgEAgEAoFAIGxFGMRMlrGTi7zjFZfZwTJmMohCRLkajOMYkkRHGUdNolI8B5EUdpB4okpJViOpbDXFiArpGMcHJIzeMY50RFgB9iIe2ksBIiiGR4jHHhFDhHTlI+JDH+lKBMQmceY/YhZNqExBMn+rAJUIMZMnCOY+EItjxRP9OetoTQZMMtCadYixJ5TAoQyYH1cbiCE5CWxADB0jA85MNp7JHUipnsbTbwqO1OWL4RSIIzUSDKfgF+riQBrOIFrPKENqleEZonWGNFjX0vDPNSUcTQ1HsiXWbUO0hhOu4YjWViwri2gdwYvDiFZ5rJqIaMXgRRyiNRGr7iBKa/BqDaJ0G4vKIVqN8Kqxy5OoL6L0mDR4lUZ/o2UA1sxHlBbhh8WI0jys2Y4odcUPXRCl7VhzDVFqgB8aIErXsUZ/fylr5dnyGGv0R38O/JADUfqMNfpLcHb8kF1/Mf/fT6HnWHMdUWqIHxoiSjexZiui1A0/dEWUtmHNPERpsZUH2WJ3rxKPSIdX6XiMKPXGmvKIVgivQohWJSx6YP11+g5WTUK04vAiBtGaBeDyJDqMF0cQrVpYthnRGkq4hiJau7GuhW/LKiHDskpzrEvDKV8WtkobFrZ24UQ9H5YW44xLi7VwZIpxcbcbKdXNuDUyG2cychQxtJ4YkhPPOsTQJXLiUMmwNjhasQUx9obyOBafzBZTiMoUIguZKUhlQszSRtYHaI5z+pnsT6NxKI5HiMee8xlRGoJDhdiNeOg6ZWmNRHKEdIzlXZj7w/PIDYBEdgQoxmokla2nNL9J5EeAeI4iKWwPXfiXRMcIUJPxHEOS6CTDKYVuTGRH0BViEDNZyk4u8gpBeMMuJtKegujcj2DN1/bnmAgAEIBhIJIZGZHOWAEslPsoyCMgIHxPmAgICAjXIQRQSsh+JSH7vYQ1StvZryW8vy9JkiQdHsFQT60Y7OcAAAAASUVORK5CYII="
+                    alt="Search Icon" onclick="submitSearch();">
+
+                <input type="text" id="search-query-input" placeholder="Search this site"
+                    onkeypress="return searchKeyPress(event);" style="box-shadow:none" ;>
+            </div>
+        </div>
+
+        <div id="loader"></div>
+
+    </header>
+
+    <div class="card-container">
+        <div class="card">
+            <img src="assets/car_loan.png" alt="Card Image">
+            <h2 class="loansh2">Car Loan</h2>
+            <ul class="savingul">
+                <li>High Loan to Value of vehicle: 85% of On-Road Price of vehicle</li>
+                <li>Low processing fees of 1% of loan amount</li>
+                <li>Direct disbursement to approved dealers for seamless experience</li>
+                <li>High EMI/NMI ratio of up to 40%</li>
+                <li>Special dealer offers and test drive at home facility</li>
+            </ul>
+            <div class="additional-content">
+                <h3>All you need to know</h3>
+                <p>Don’t wait for your dream car. Now you can drive home your favorite car with loans at
+                    attractive rates
+                    for purchase of new cars (Registration with RTO is mandatory). Special discounts and offers
+                    for Cymbal
+                    bank customers. Please share your pin code for list of dealers in your vicinity </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="assets/bike_loan.png" alt="Card Image">
+            <h2 class="loansh2">Two Wheeler Loan</h2>
+            <ul class="savingul">
+                <li>High Loan to Value of vehicle: 85% of On-Road Price of vehicle</li>
+                <li>Low processing fees of 1% of loan amount</li>
+                <li>Direct disbursement to approved dealers for seamless experience</li>
+                <li>High EMI/NMI ratio of up to 40%</li>
+                <li>Special dealer offers for select customers </li>
+            </ul>
+            <div class="additional-content">
+                <h3>All you need to know</h3>
+                <p>Customers can avail loan at attractive rates for purchase of new two-wheeler vehicles - viz.
+                    scooter/motorcycle/ moped/battery operated/electric vehicles of reputed make (Registration with
+                    RTO is
+                    mandatory).
+                    Ride home your dream vehicle with special discounts and offers for Cymbal bank customers.
+                    Please share your pin code for a list of dealers in your vicinity. </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="assets/personal_loan_img.png" alt="Card Image">
+            <h2 class="loanh2">Pre-approved Personal Loan</h2>
+            <ul class="savingul">
+                <li>Low processing fees of 500/-</li>
+                <li>Instant disbursement</li>
+                <li>No physical documentation or branch visits</li>
+                <li>24*7 availability</li>
+                <li>Flexibility of tenure</li>
+            </ul>
+            <div class="additional-content">
+                <h3>All you need to know</h3>
+                <p>Available for select list of existing Cymbal Bank’s Savings Account customers at low interest
+                    rates. You can
+                    avail a personal loan instantly at your convenience on a 24*7 basis through the app. Please
+                    input your Cust
+                    Id to check if you are pre-approved.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="assets/personal_loan_img3.png" alt="Card Image">
+            <h2 class="loanh2"> Digital Personal Loan</h2>
+            <ul class="savingul">
+                <li>Low processing fees of Rs. 1000/--</li>
+                <li>Disbursement in less than 15-min <br>(If credit score is above 600 and KYC is confirmed
+                    digitally)
+                </li>
+                <li>No physical documentation or branch visits</li>
+                <li>24*7 availability</li>
+                <li>Flexibility of tenure</li>
+            </ul>
+            <div class="additional-content">
+                <h3>All you need to know</h3>
+                <p>Available for new customers and for existing customers that are not pre-approved. You can
+                    avail a
+                    personal loans in less than 15-min at your convenience on 24*7 basis through the app.
+                    Customers need to upload PAN Card, Aadhar Card for processing the loan. Cymbal Bank , at
+                    it’s
+                    discretion, can ask for additional documentation to support. </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="assets/fd_od.png" alt="Card Image">
+            <h2 class="loanh2"> Fixed Deposit Overdraft</h2>
+            <ul class="savingul">
+                <li>No processing fees</li>
+                <li>Instantaneous overdraft created linked Savings Account</li>
+                <li>No physical documentation or branch visits</li>
+                <li>24*7 availability</li>
+                <li>Interest charged only for the amount and duration facility is used</li>
+            </ul>
+            <div class="additional-content">
+                <h3>All you need to know</h3>
+                <p>Now , you can get funds without breaking your deposits! Existing customers having a fixed deposit
+                    with any branch can avail an overdraft against their fixed deposit.
+                    You can avail an overdraft instantaneously at your convenience on 24*7 basis through the app.
+                    Overdraft can be availed of up to 85% of fixed deposit at an interest rate of 2% over the applicable
+                    rate for fixed deposit. </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="assets/od_against_security.png" alt="Card Image">
+            <h2 class="loanh2"> Overdraft Against Securities</h2>
+            <ul class="savingul">
+                <li>Extensive list of approved securities</li>
+                <li>Low processing fees of 1% of overdraft amount</li>
+                <li>Instantaneous overdraft created in linked Savings Account</li>
+                <li>24*7 availability </li>
+                <li>Special dealer offers for select customers</li>
+                <li>Interest charged only for the amount and duration facility is used</li>
+            </ul>
+            <div class="additional-content">
+                <h3>All you need to know</h3>
+                <p>Now , you can get funds without breaking your deposits! Existing customers having a fixed deposit
+                    with any
+                    branch can avail an overdraft against their fixed deposit.
+                    You can avail an overdraft instantaneously at your convenience on 24*7 basis through the app.
+                    Overdraft can be availed of up to 85% of fixed deposit at an interest rate of 2% over the applicable
+                    rate
+                    for fixed deposit. </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="assets/home_loan.png" alt="Card Image">
+            <h2 class="loanh2"> Home Loan</h2>
+            <ul class="savingul">
+                <li>Loan of up to 95% for pre-approved projects</li>
+                <li>Low interest rates and low processing fees of 0.5% of loan amount</li>
+                <li>Flexible tenure of up to 25 years ( Maximum age at maturity of 70 years)</li>
+                <li>High EMI/NMI ratio of up to 60%</li>
+                <li>Option of fixed or floating rates (Fixed rate starting at 9% p.a and Floating rate of External
+                    Benchmark + 2%) </li>
+                <li>Balloon repayment available for select customers </li>
+                <li>Special rates for women customers, government of india employees, PSU employees and select
+                    private companies </li>
+                <li>Haven’t decided on property ? - we can help thru our Property Search team that provides verified
+                    listings and document verification</li>
+                <li>Clubbing of spouse income for NMI calculation (Loan will have to be taken in joint name)</li>
+            </ul>
+            <div class="additional-content">
+                <h3>All you need to know</h3>
+                <p>Cymbal Home Loans has successfully helped over 5 lakh families achieve their dream of owning a
+                    home. Loan available for purchase of ready built property, purchase of under construction
+                    property, purchase of pre-owned homes, construction of a house, extension of house and
+                    repair/renovation.</p>
+            </div>
+        </div>
+    </div>
+
+    <section>
+        <h2 class="savingh2">Car Loans</h2 class="savingh2">
+
+        <h3 class="savingh3">Competitive Car Loan Rates</h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                <strong>Interest Rates Starting From: India: 8.40% p.a. (as of November 2023).</strong>
+            </li>
+            <li>
+                <strong>Global Average Car Loan Interest Rate: 5.15%
+                </strong>
+            </li>
+            <li>
+                <strong> Transparent Pricing:
+                </strong> No hidden fees or charges, so you know exactly what you're paying.
+            </li>
+            <li>
+                <strong>Flexible Loan Terms:</strong> Choose from loan terms ranging from 12 to 84 months to find the
+                repayment plan that fits your budget.
+            </li>
+        </ul>
+
+
+
+        <h3 class="savingh3">Diverse Car Loan Options for Your Needs</h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                New & Used Car Loans: Purchase the car of your dreams, whether brand new or pre-owned.
+            </li>
+            <li>
+                Electric Vehicle (EV) Loans: Embrace sustainable mobility with our competitive EV loan rates and
+                flexible terms.
+            </li>
+            <li>
+                Balance Transfer: Transfer your existing car loan to Cymbal and enjoy lower interest rates and improved
+                terms, saving you money in the long run.
+            </li>
+            <li>
+                Top-up Loans: Get additional funds for car accessories or unexpected repairs with our convenient top-up
+                loan options.
+            </li>
+            <li> Prepayment Options: Prepay your loan partially or completely at any time without any prepayment
+                penalties.
+            </li>
+        </ul>
+    </section>
+
+
+    <section>
+        <h2 class="savingh2">Two Wheeler Loans</h2 class="savingh2">
+
+
+
+        <h3 class="savingh3">Competitive Two Wheeler Loan Rates</h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                <strong>Interest Rates Starting From: 10.20% p.a. (as of November 2023).</strong>
+            </li>
+            <li>
+                Global Average Bike Loan Interest Rate: 6.10%
+            </li>
+            <li>
+                Transparent Pricing: No hidden fees or charges, so you know exactly what you're paying.
+            </li>
+            <li>
+                Flexible Loan Terms: Choose from loan terms ranging from 12 to 60 months to find the repayment plan that
+                fits your budget.
+            </li>
+        </ul>
+
+
+
+        <h3 class="savingh3">Diverse Two Wheeler Loan Options for Your Needs</h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                New & Used Bike Loans: Purchase the bike of your dreams, whether brand new or pre-owned.
+            </li>
+            <li>
+                Electric Bike (E-Bike) Loans: Embrace sustainable transportation with our competitive E-Bike loan rates
+                and flexible terms.
+            </li>
+            <li>
+                Balance Transfer: Transfer your existing bike loan to Cymbal and enjoy lower interest rates and improved
+                terms, saving you money in the long run.
+            </li>
+            <li>
+                Top-up Loans: Get additional funds for bike accessories or unexpected repairs with our convenient top-up
+                loan options.
+            </li>
+            <li> Prepayment Options: Prepay your loan partially or completely at any time without any prepayment
+                penalties.
+            </li>
+        </ul>
+    </section>
+
+
+
+
+    <section>
+        <h2 class="savingh2">Personal Loans</h2 class="savingh2">
+
+
+
+        <h3 class="savingh3">Competitive Personal Loans Rates
+        </h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                <strong>Interest Rates Starting From: 11.50% p.a. (as of November 2023).</strong>
+            </li>
+            <li>
+                Global Average Bike Loan Interest Rate: 8.60%
+            </li>
+            <li>
+                Transparent Pricing: No hidden fees or charges, ensuring you know exactly what you're paying.
+            </li>
+            <li>
+                Flexible Loan Amounts: Borrow up to ₹20 lakhs (India) or $25,000 (United States), or the equivalent
+                amount in other regions.
+            </li>
+            <li> Choose Your Loan Term: Opt for a term ranging from 12 to 84 months to fit your repayment schedule and
+                budget.
+            </li>
+        </ul>
+
+
+
+        <h3 class="savingh3">Diverse Personal Loan Options for Your Needs</h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                Debt Consolidation Loan: Simplify your finances by consolidating your high-interest debts into a single,
+                lower-interest loan.
+            </li>
+            <li>
+                Home Improvement Loan: Renovate your home and enhance your living space with our competitive home
+                improvement loan options.
+            </li>
+            <li>
+                Medical Loan: Cover unexpected medical expenses or finance necessary medical treatments without
+                financial strain.
+            </li>
+            <li>
+                Education Loan: Invest in your future or your child's education with our flexible education loan plans.
+            </li>
+            <li> Prepayment Options: Prepay your loan partially or completely at any time without any prepayment
+                penalties.
+            </li>
+            <li> Wedding Loan: Make your dream wedding a reality with our personalized wedding loan solutions.
+            </li>
+        </ul>
+    </section>
+
+
+
+
+
+
+
+    <section>
+        <h2 class="savingh2">Overdraft</h2 class="savingh2">
+
+
+
+        <h3 class="savingh3"> Enjoy the Convenience of Overdraft:
+
+        </h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                Access Additional Funds: Withdraw beyond your current account balance, up to a pre-approved limit.</li>
+            <li>
+                Cover Short-Term Needs: Pay for unexpected bills, emergency repairs, or even a sudden opportunity
+                without worrying about insufficient funds.
+            </li>
+            <li>
+                Maintain Financial Stability: Avoid late payment penalties and ensure your financial obligations are met
+                during unexpected circumstances.
+            </li>
+        </ul>
+
+
+
+        <h3 class="savingh3"> Tailored to Your Needs:
+        </h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                Flexible Overdraft Limits: Access up to a pre-approved limit based on your financial standing and
+                account history.
+            </li>
+            <li>
+                Competitive Interest Rates: Pay interest only on the amount you utilize, ensuring cost-effectiveness.
+            </li>
+            <li>
+                Automatic Overdraft Repayment: Your account automatically replenishes when you receive deposits, making
+                repayment seamless.
+            </li>
+        </ul>
+
+
+        <h3 class="savingh3"> Beyond Convenience and Flexibility:
+
+        </h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                Quick and Easy Activation: Activate your overdraft facility online or through our mobile app in minutes.
+            </li>
+            <li>
+                24/7 Account Access: Monitor your account balance and overdraft utilization anytime, anywhere.
+            </li>
+            <li>
+                Dedicated Customer Support: Our team is available 24/7 to answer your questions and assist you with any
+                overdraft-related concerns.
+            </li>
+        </ul>
+
+    </section>
+
+
+    <section>
+        <h2 class="savingh2">Home Loans</h2 class="savingh2">
+
+
+
+        <h3 class="savingh3"> Unlocking Homeownership with Competitive Rates
+
+        </h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                <strong>Interest Rates Starting From: 8.90% p.a. (as of November 2023).</strong>
+            </li>
+            <li>
+                Global Average Home Loan Interest Rate: 7.10%
+            </li>
+            <li>
+                Transparent Loan Structure: No hidden fees or charges, ensuring you have a clear understanding of your
+                loan terms.
+            </li>
+            <li>
+                Flexible Loan Options: Choose from a variety of loan types and features to meet your specific needs and
+                financial goals.
+            </li>
+            <li>Pre-Approved Home Loans: Get pre-approved for your loan before you start house hunting, giving you a
+                competitive edge in the market.
+            </li>
+        </ul>
+
+
+
+
+        <h3 class="savingh3">Diverse Home Loan Options for Your Dream Home:
+        </h3 class="savingh3">
+
+        <ul class="savingul">
+            <li>
+                New Home Loan: Purchase your dream home with our competitive new home loan rates and flexible terms.
+            </li>
+            <li>
+                Used Home Loan: Find the perfect pre-owned home and finance it with our affordable used home loan
+                options.
+            </li>
+            <li>
+                Balance Transfer: Transfer your existing home loan to Cymbal and benefit from lower interest rates and
+                improved terms, potentially saving you thousands over the life of your loan.
+            </li>
+            <li>
+                Home Improvement Loan: Renovate your current home and create the living space you've always desired.
+            </li>
+            <li> Reverse Mortgage: Access the equity in your home for retirement or other financial needs with our
+                reverse mortgage solutions (available in specific regions).
+            </li>
+        </ul>
+    </section>
+
+
+    <section>
+        <h2 class="savingh2">FAQ'S</h2 class="savingh2">
+
+        <p class="savingp">
+
+            <strong>1. What types of loans does Cymbal Bank offer?
+            </strong></br>
+
+
+            Cymbal Bank offers a comprehensive range of loan products to meet your diverse financial needs:
+
+        </p>
+
+        <ul class="savingul">
+
+            <li>
+                Car Loans: Finance your dream car, whether new or used, with competitive rates, flexible terms, and high
+                loan-to-value ratios.
+            </li>
+            <li>
+                Bike Loans: Get the wheels you need, from motorcycles to scooters, with affordable bike loans tailored
+                to your budget and repayment preferences.
+            </li>
+            <li>
+                Personal Loans: Consolidate debt, cover unexpected expenses, or invest in your future with flexible
+                personal loans offering competitive rates and transparent terms.
+            </li>
+            <li>Home Loans: Unlock the door to homeownership with attractive interest rates, diverse loan options, and
+                expert guidance throughout the process.
+            </li>
+        </ul>
+        </br>
+
+        <p class="savingp">
+
+            <strong>2. What are the interest rates like?
+            </strong></br>
+
+
+            Cymbal Bank prides itself on offering competitive interest rates across all loan products. However, the
+            specific rate you qualify for will depend on several factors, including:
+
+        </p>
+
+        <ul class="savingul">
+
+            <li>
+                Loan type: Different loan types have different base rates.
+            </li>
+            <li>
+                Loan term: Longer loan terms typically carry slightly higher interest rates.
+            <li>
+                Creditworthiness: Your credit score significantly influences the interest rate offered.
+            </li>
+            <li>
+                Region: Interest rates may vary slightly depending on your location.
+            </li>
+        </ul>
+        </br>
+
+        <p class="savingp">
+
+            <strong>3. Who is eligible for a Cymbal Bank loan?
+
+
+            </strong></br>
+
+
+            To be eligible for a Cymbal Bank loan, you need to meet some basic criteria:
+
+        </p>
+
+        <ul class="savingul">
+
+            <li>
+                Age: You must be at least 18 years old.
+            </li>
+            <li>
+                Income: You must possess a demonstrably stable source of income.
+            </li>
+            <li>
+                Creditworthiness: You need to meet the minimum credit score requirements specific to the loan type.
+            </li>
+        </ul>
+        </br>
+
+        <p class="savingp">
+            <strong>4. What documents do I need to apply?</strong><br>
+            The required documents will vary depending on the type of loan you apply for. However, some common documents
+            include:
+        </p>
+
+        <ul class="savingul">
+            <li>Proof of income: Latest salary slips or income tax returns.</li>
+            <li>Proof of identity: Passport, Aadhaar card, or driver's license.</li>
+            <li>Proof of residence: Utility bills, rent agreement, or property ownership documents.</li>
+            <li>Bank statements: Recent bank statements demonstrating your financial stability.</li>
+            <li>Credit report: This helps Cymbal Bank assess your creditworthiness.</li>
+        </ul>
+        <br>
+
+        <p class="savingp">
+            <strong>5. How long does approval take?</strong><br>
+            Cymbal Bank strives for swift and efficient loan approvals. Typically, the process takes 3-5 business days.
+            However, the actual time may vary depending on the complexity of your application and the loan type.
+        </p>
+        </br>
+        <p class="savingp">
+            <strong>6. Can I prepay my loan without penalty?</strong><br>
+            Yes, Cymbal Bank encourages loan prepayment and does not impose any penalty for doing so. Prepaying your
+            loan can help you save on interest costs and shorten your loan term.
+        </p>
+        </br>
+        <p class="savingp">
+            <strong>7. What are the loan disbursement options?</strong><br>
+            Cymbal Bank offers various disbursement options for your convenience:
+        </p>
+
+        <ul class="savingul">
+            <li>Direct bank transfer: The loan amount is directly transferred to your designated bank account.</li>
+            <li>Check payment: You receive a check for the loan amount.</li>
+            <li>Dealer payments: For car and bike loans, Cymbal Bank can directly pay the dealer on your behalf.</li>
+        </ul>
+        <br>
+
+        <p class="savingp">
+            <strong>8. Can I make additional payments to my loan?</strong><br>
+            Absolutely! You can make additional payments towards your loan principal anytime without penalty. This
+            allows you to reduce your overall interest cost and shorten your loan term significantly.
+        </p>
+        </br>
+        <p class="savingp">
+            <strong>9. What happens if I miss a loan payment?</strong><br>
+            Missing a loan payment can negatively impact your credit score and may incur late fees. If you face
+            difficulty making your payments, contact Cymbal Bank immediately. They offer various options like payment
+            deferrals or adjustments to help you manage your loan obligations.
+        </p>
+        </br>
+        <p class="savingp">
+            <strong>10. What are the co-applicant requirements for joint loans?</strong><br>
+            Both co-applicants must meet the basic eligibility criteria, including age, income, and credit score
+            requirements. They will also be jointly responsible for the loan repayment.
+        </p>
+        </br>
+        <p class="savingp">
+            <strong>11. Can I transfer my loan balance to Cymbal Bank from another lender?</strong><br>
+            Yes, Cymbal Bank offers balance transfer options for car, personal, and home loans. You may be eligible for
+            lower interest rates and improved terms by transferring your existing loan balance, potentially saving you
+            money over the loan term.
+        </p>
+        </br>
+        <p class="savingp">
+            <strong>12. How can I contact Cymbal Bank for further assistance?</strong><br>
+            Cymbal Bank provides multiple ways to reach their customer service team:
+        </p>
+
+        <ul class="savingul">
+            <li>Website: Visit their website and access the online chat feature or contact form.</li>
+            <li>Email: Send an email to their dedicated customer service email address.</li>
+            <li>Phone: Call their toll-free number available 24/7.</li>
+        </ul>
+    </section>
+
+    <section>
+        <p class="savingp" style="text-align: center;"><a href="/loans/terms_and_condition">Terms and conditions</a></p>
+    </section>
+
+    <section>
+        <p class="savingp" style="text-align: center;"><a href="https://storage.googleapis.com/hackathon_102/Loan%20Agreement%20Cymbal%20Bank.pdf">Loan Agreement</a></p>
+    </section>
+
+    <section class="section section-sign-up">
+        <div class="section-title">
+            <h3 class="section-header">
+                The best day to join Cymbal Bank was one year ago. The second
+                best is today!
+            </h3>
+        </div>
+        <button class="btn btn--show-modal">
+            Open your free account today!
+        </button>
+    </section>
+
+    <footer class="footer">
+        <ul class="footer-nav">
+            <li class="footer-item">
+                <a class="footer-link" href="#">About</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Terms of Use</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Privacy Policy</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Careers</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Contact Us</a>
+            </li>
+        </ul>
+        <img src="assets/cymbal_logo.png" alt="Logo" class="footer-logo" />
+    </footer>
+
+    <div class="modal hidden">
+        <button class="btn-close-modal">&times;</button>
+        <div class="authenticate">
+            <div class="authenticate-tab-container">
+                <button class="btn authenticate-tab authenticate-tab-1 authenticate-tab-active" data-tab="1">
+                    LOGIN
+                </button>
+                <button class="btn authenticate-tab authenticate-tab--2" data-tab="2">
+                    CREATE ACCOUNT
+                </button>
+            </div>
+            <div class="authenticate-content authenticate-content--1 authenticate-content-active">
+                <form class="modal-form" id="sigin_form">
+                    <label>Email Address</label>
+                    <input type="email" />
+                    <label>Password</label>
+                    <input type="password" />
+                    <button class="btn" id="signin_btn">Login</button>
+                </form>
+            </div>
+
+            <div class="authenticate-content authenticate-content--2">
+                <form class="modal-form" id="signup_form">
+                    <label>First Name</label>
+                    <input type="text" />
+                    <label>Last Name</label>
+                    <input type="text" />
+                    <label>Aadhar</label>
+                    <input type="text" />
+                    <label>PAN</label>
+                    <input type="text" />
+                    <label>Email Address</label>
+                    <input type="email" />
+                    <label>Password</label>
+                    <input type="password" />
+                    <button class="btn" id="signup_btn">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="overlay hidden"></div>
+
+</body>
+
+</html>

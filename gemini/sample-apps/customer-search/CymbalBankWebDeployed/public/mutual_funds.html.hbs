@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutual Funds</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer type="module" src="scripts/script.js"></script>
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+    <style>
+        df-messenger {
+            z-index: 999;
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            --df-messenger-primary-color: #4bbb7d;
+            --df-messenger-chat-window-height: 55vh;
+            --df-messenger-chat-window-width: 50vw;
+        }
+    </style>
+    <style>
+        #csvTable {
+            border-collapse: collapse;
+            width: 100%;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+
+        #csvTable th,
+        #csvTable td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            /* Allow content to break into multiple lines */
+            word-break: break-all;
+        }
+
+        #csvTable th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<script>
+    function submitSearch() {
+        document.getElementById('loader').style.display = 'block';
+
+        var siteSearchUrl = 'https://sites.google.com/corp/search/pranshusingh.altostrat.com/cymbalbank?query=';
+
+        var query = document.getElementById("search-query-input").value;
+        var searchResultsPage = '/search';
+
+        const uri = '{{rag_qa_chain_url_translate}}';
+        const body = JSON.stringify({ query: query })
+        const initDetails = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            referrerPolicy: "strict-origin-when-cross-origin",
+            body: body
+        }
+
+        fetch(uri, initDetails)
+            .then(response => {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+                console.log(response.headers.get("Content-Type"));
+                return response.json();
+            }
+            )
+            .then(myJson => {
+                console.log(JSON.stringify(myJson));
+                var obj = JSON.parse(JSON.stringify(myJson));
+
+                sessionStorage.setItem('temp_result', JSON.stringify(obj));
+                window.location.href = '/search';
+
+
+                references = JSON.parse(obj.fulfillment_response.messages[0].text.text[1]);
+                console.log(references)
+                var str = '';
+                var i = 0;
+                var count = 0
+
+
+            })
+            .catch(err => {
+                console.log('Fetch Error :-S', err);
+            })
+            .finally(() => {
+                // Hide loading symbol
+                document.getElementById('loader').style.display = 'none';
+            });;
+
+
+    }
+
+
+    function searchKeyPress(e) {
+
+        // look for window.event in case event isn't passed in
+
+
+        e = e || window.event;
+
+        if (e.keyCode == 13) {
+
+            document.getElementById('search-icon').click();
+
+            return false;
+
+        }
+
+        return true;
+
+    }  
+</script>
+
+<body>
+    <df-messenger location="us-central1" project-id="{{project_id}}"
+            agent-id="{{df_agent_id}}" language-code="en">
+            <df-messenger-chat-bubble chat-title="CymBuddy">
+            </df-messenger-chat-bubble>
+        </df-messenger>
+    <nav>
+        <div class="navbar">
+            <i class='bx bx-menu'></i>
+            <div class="sidebar-logo-container">
+                <a href="/" target="_self"> <img src="assets/cymbal_logo.png" alt="Cymbal Bank logo" class="nav-logo"
+                        id="logo" data-version-number="3.0" /></a>
+                </div>
+            <div class="nav-links">
+                <div class="sidebar-logo">
+                    <span class="logo-name">Cymbal Bank</span>
+                    <i class='bx bx-x'></i>
+                </div>
+                <ul class="links">
+                    <li class="nav-item">
+                        <a class="nav-link">Pay</a>
+                        <i class='bx bxs-chevron-down pay-arrow arrow'></i>
+                        <ul class="pay-sub-menu sub-menu">
+                            <li class="moneytransfer">
+                                <span><a class="nav-link" href="#">Money Transfer</a>
+                                    <i class='bx bxs-chevron-right arrow moneytransfer-arrow'></i>
+                                </span>
+                                <ul class="moneytransfer-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/upi">UPI</a></li>
+                                    <li><a class="nav-link" href="/imps">IMPS</a></li>
+                                    <li><a class="nav-link" href="/neft">NEFT</a></li>
+                                </ul>
+                            </li>
+                            <li class="bills">
+                                <span><a class="nav-link" href="#">Bills</a>
+                                    <i class='bx bxs-chevron-right arrow bills-arrow'></i>
+                                </span>
+                                <ul class="bills-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/recharge">Recharge (Mobile, DTH, Broadband)</a>
+                                    </li>
+                                    <li><a class="nav-link" href="/electricity">Electricity</a></li>
+                                    <li><a class="nav-link" href="/insurance_premium">Insurance Premium</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Save</a>
+                        <i class='bx bxs-chevron-down save-arrow arrow'></i>
+                        <ul class="save-sub-menu sub-menu">
+                            <li class="accounts">
+                                <span><a class="nav-link" href="#">Accounts</a>
+                                    <i class='bx bxs-chevron-right arrow accounts-arrow'></i>
+                                </span>
+                                <ul class="accounts-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/saving">Saving</a></li>
+                                    <li><a class="nav-link" href="/current">Current</a></li>
+                                    <li><a class="nav-link" href="/salary">Salary</a></li>
+                                </ul>
+                            </li>
+                            <li class="deposits">
+                                <span><a class="nav-link" href="#">Deposits</a>
+                                    <i class='bx bxs-chevron-right arrow deposits-arrow'></i>
+                                </span>
+                                <ul class="deposits-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/fixed_deposit">Fixed Deposit</a></li>
+                                    <li><a class="nav-link" href="/recurring_deposit">Recurring Deposit</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/credit_card">Credit Card</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Invest</a>
+                        <i class='bx bxs-chevron-down invest-arrow arrow'></i>
+                        <ul class="invest-sub-menu sub-menu">
+                            <li class="nav-item"><a class="nav-link" href="/stocks">Equities and Derivatives</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/ipo">IPO through ASBA</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/mutual_funds">Mutual Funds</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/loans">Loans</a>
+                        <i class='bx bxs-chevron-down borrow-arrow arrow'></i>
+                        <ul class="borrow-sub-menu sub-menu">
+                            <li><a class="nav-link" href="loans">Car Loan</a></li>
+                            <li><a class="nav-link" href="loans">Two Wheeler Loan</a></li>
+                            <li><a class="nav-link" href="loans">Personal Loan</a></li>
+                            <li><a class="nav-link" href="loans">Fixed Deposit Overdraft</a></li>
+                            <li><a class="nav-link" href="loans">Overdraft Against Securities</a></li>
+                            <li><a class="nav-link" href="loans">Home Loan</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-btn btn--show-modal" id="login_menu_btn">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-btn btn--show-modal" id="logout_menu_btn"
+                            style="display: none">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        </div>
+    </nav>
+
+    <div class="custom-body">
+        <div id="search-container">
+            <div id="search-query">
+                <img id="search-icon"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAQAAABIkb+zAAADAklEQVR4AezZA6xcQRSA4b92g9q2/VRuw9puVLcxake13Zh1G9W2bds2T42ZzNPeO7Pb5H5/zD17PUMgEAgEAoFAIGxFGMRMlrGTi7zjFZfZwTJmMohCRLkajOMYkkRHGUdNolI8B5EUdpB4okpJViOpbDXFiArpGMcHJIzeMY50RFgB9iIe2ksBIiiGR4jHHhFDhHTlI+JDH+lKBMQmceY/YhZNqExBMn+rAJUIMZMnCOY+EItjxRP9OetoTQZMMtCadYixJ5TAoQyYH1cbiCE5CWxADB0jA85MNp7JHUipnsbTbwqO1OWL4RSIIzUSDKfgF+riQBrOIFrPKENqleEZonWGNFjX0vDPNSUcTQ1HsiXWbUO0hhOu4YjWViwri2gdwYvDiFZ5rJqIaMXgRRyiNRGr7iBKa/BqDaJ0G4vKIVqN8Kqxy5OoL6L0mDR4lUZ/o2UA1sxHlBbhh8WI0jys2Y4odcUPXRCl7VhzDVFqgB8aIErXsUZ/fylr5dnyGGv0R38O/JADUfqMNfpLcHb8kF1/Mf/fT6HnWHMdUWqIHxoiSjexZiui1A0/dEWUtmHNPERpsZUH2WJ3rxKPSIdX6XiMKPXGmvKIVgivQohWJSx6YP11+g5WTUK04vAiBtGaBeDyJDqMF0cQrVpYthnRGkq4hiJau7GuhW/LKiHDskpzrEvDKV8WtkobFrZ24UQ9H5YW44xLi7VwZIpxcbcbKdXNuDUyG2cychQxtJ4YkhPPOsTQJXLiUMmwNjhasQUx9obyOBafzBZTiMoUIguZKUhlQszSRtYHaI5z+pnsT6NxKI5HiMee8xlRGoJDhdiNeOg6ZWmNRHKEdIzlXZj7w/PIDYBEdgQoxmokla2nNL9J5EeAeI4iKWwPXfiXRMcIUJPxHEOS6CTDKYVuTGRH0BViEDNZyk4u8gpBeMMuJtKegujcj2DN1/bnmAgAEIBhIJIZGZHOWAEslPsoyCMgIHxPmAgICAjXIQRQSsh+JSH7vYQ1StvZryW8vy9JkiQdHsFQT60Y7OcAAAAASUVORK5CYII="
+                    alt="Search Icon" onclick="submitSearch();">
+
+                <input type="text" id="search-query-input" placeholder="Search this site"
+                    onkeypress="return searchKeyPress(event);" style="box-shadow:none" ;>
+            </div>
+        </div>
+        <div id="loader"></div>
+        <h2 class="savingh2">Mutual Funds
+        </h2 class="savingh2">
+        <section>
+            <h3 class="savingh3">Mutual Funds: Diversifying Your Investment Portfolio</h3>
+
+            <h4 class="savingh4">What are Mutual Funds?</h4>
+
+            <p class="savingp">
+                Mutual Funds, with their professional management through the expertise of their fund managers, are one
+                of
+                the best- option to meet your long term investment goals.
+                In addition, it also brings the advantages of diversification, liquidity, convenience and tax
+                efficiency.
+                Mutual funds are however, subject to market risks and respective scheme documents should be referred
+                before
+                making investments.
+
+            </p>
+            <h4 class="savingh4">Understanding Mutual Funds: A Collective Investment Approach
+            </h4>
+            <p class="savingp">
+                Mutual funds are professionally managed investment vehicles that pool together money from numerous
+                investors
+                to purchase a collection of securities, such as stocks, bonds, or other assets. This collective
+                investment
+                approach offers several benefits, including:
+            </p>
+            <ul class="savingul">
+                <li>Professional Management: Mutual funds are managed by experienced fund managers who possess expertise
+                    in
+                    analyzing and selecting securities, aiming to achieve optimal returns for investors.</li>
+                <li>Diversification: By investing in a mutual fund, you gain exposure to a diversified portfolio of
+                    securities, reducing the risk associated with investing in individual stocks or bonds.</li>
+                <li>Affordability: Mutual funds allow you to invest in a diversified portfolio with a relatively small
+                    initial investment, making them accessible to a wide range of investors.</li>
+            </ul>
+            <h4 class="savingh4">Types of Mutual Funds: Matching Your Investment Goals
+            </h4>
+            <p class="savingp">
+                Mutual funds can be categorized based on their investment objectives, risk profiles, and the types of
+                securities they invest in. Some common types of mutual funds include:
+            </p>
+            <ul class="savingul">
+                <li>Equity Funds: These funds invest primarily in stocks, aiming for capital appreciation over the long
+                    term. They may focus on specific sectors or invest in a broad range of companies.</li>
+                <li>Debt Funds: These funds invest in fixed-income securities like bonds, offering relatively stable
+                    returns
+                    and lower risk compared to equity funds.</li>
+                <li>Hybrid Funds: These funds combine investments in both equities and debt instruments, offering a
+                    balance
+                    between potential growth and stability.</li>
+            </ul>
+            <h4 class="savingh4">Investing in Mutual Funds: A Simplified Process
+
+            </h4>
+            <p class="savingp">
+                Mutual funds can be categorized based on their investment objectives, risk profiles, and the types of
+                securities they invest in. Some common types of mutual funds include:
+            </p>
+
+            <ul class="savingol">
+                <li> Equity Funds: These funds invest primarily in stocks, aiming for capital appreciation over the long
+                    term. They may focus on specific sectors or invest in a broad range of companies.
+                </li>
+                <li>Debt Funds: These funds invest in fixed-income securities like bonds, offering relatively stable
+                    returns
+                    and lower risk compared to equity funds.
+                </li>
+                <li>Hybrid Funds: These funds combine investments in both equities and debt instruments, offering a
+                    balance
+                    between potential growth and stability.
+                </li>
+            </ul>
+            <h4 class="savingh4">Unveiling the Benefits of Mutual Funds
+            </h4>
+            <p class="savingp">
+                Investing in mutual funds offers several advantages, including:
+            </p>
+
+            <ul class="savingol">
+                <li> Diversification: Diversification helps mitigate risk by spreading your investment across a variety
+                    of
+                    securities, reducing the impact of fluctuations in individual stocks or bonds.
+                </li>
+                <li>Professional Management: Experienced fund managers actively manage your investments, conducting
+                    thorough
+                    research and analysis to make informed investment decisions.
+                </li>
+                <li>Liquidity: Mutual funds offer relatively high liquidity, allowing you to redeem your investments
+                    easily
+                    when needed.
+                </li>
+                <li>Transparency: Mutual funds are regulated and provide regular disclosures, ensuring transparency in
+                    their
+                    investment strategies and performance.
+                </li>
+            </ul>
+            <h4 class="savingh4">Embark on Your Mutual Fund Journey with Cymbal Bank
+
+            </h4>
+            <p class="savingp">
+                At Cymbal Bank, we are dedicated to helping you make informed investment decisions and achieve your
+                financial aspirations. Our team of financial experts can assist you in selecting mutual funds that align
+                with your unique investment goals and risk tolerance.
+                Contact us today to explore our comprehensive range of mutual fund options and embark on a rewarding
+                investment journey with Cymbal Bank.
+            </p>
+
+
+
+        </section>
+        <br>
+        <button class="btn btn--show-modal" onclick="redirectToCalculator()">
+            Calculate Mutual Fund Returns
+        </button>
+        <br><br>
+        <h2 class="savingh3">List of Top Performing Mutual Funds
+        </h2 class="savingh3">
+         <table id="csvTable">
+            <thead id="tableHeaders">
+                <!-- Headers will be populated here -->
+            <tr><th>Name</th><th>Risk Category</th><th>Type Of Fund</th><th>Size</th><th>One Month</th><th>Six Month</th><th>One Year</th><th>Three Year</th><th>Five Year</th><th>All Time</th><th>NAV</th><th>Min SIP Amount</th><th>Fund Size</th><th>Expense Ratio</th><th>Exit Load</th><th>Stamp Duty</th></tr></thead>
+            <tbody id="csvData">
+                <!-- Data will be populated here -->
+            <tr><td>Quant Small Cap Fund Direct Plan Growth</td><td>Very High Risk</td><td>Equity</td><td>Small Cap</td><td>2.11</td><td>30.64</td><td>40.43</td><td>47.15</td><td>31.04</td><td>17.72</td><td>197.65</td><td>1000</td><td>9089</td><td>0.77</td><td>1% if redeemed within 1 year</td><td>0.005</td></tr><tr><td>ICICI Prudential Commodities Fund Direct Growth</td><td>High Risk</td><td>Equity</td><td>Sectoral/Thematic</td><td>-0.86</td><td>17.48</td><td>29.46</td><td>45.59</td><td></td><td>35.11</td><td>33.27</td><td>100</td><td>1325</td><td>1.03</td><td>1% if redeemed within 3 months</td><td>0.005</td></tr><tr><td>Parag Parikh Flexi Cap Fund Direct Growth</td><td>Very High Risk</td><td>Equity</td><td>Flexi Cap</td><td>0.77</td><td>17.18</td><td>26.2</td><td>23.84</td><td>21.64</td><td>19.53</td><td>63.69</td><td>1000</td><td>42784</td><td>0.66</td><td>For units above 10% of the investment exit load of 2% if redeemed within 365 days and 1% if redeemed after 365 days but on or before 730 days.</td><td>0.005</td></tr><tr><td>Nippon India Small Cap Fund Direct Growth</td><td>Very High Risk</td><td>Equity</td><td>Small Cap</td><td>1.87</td><td>33.62</td><td>37.1</td><td>45.8</td><td>27.32</td><td>26.37</td><td>137.37</td><td>100</td><td>37374</td><td>0.71</td><td>1% if redeemed within one month.</td><td>0.005</td></tr><tr><td>SBI Bluechip Direct Plan Growth</td><td>Very High Risk</td><td>Equity</td><td>Large Cap</td><td>-0.36</td><td>14.05</td><td>19.71</td><td>22.64</td><td>16.3</td><td>15.43</td><td>79.04</td><td>500</td><td>39650</td><td>0.87</td><td>1% if redeemed within 1 year</td><td>0.005</td></tr><tr><td>HDFC Short Term Debt Fund</td><td>Moderate Risk</td><td>Debt</td><td></td><td>0.55</td><td>3.16</td><td>7.3</td><td>5.2</td><td>7.4</td><td>8.0</td><td>28.91</td><td>100</td><td>12285</td><td>0.37</td><td>Nil</td><td>0.005</td></tr><tr><td>SBI Short Term Debt Fund Direct Growth</td><td>Moderate Risk</td><td>Debt</td><td></td><td>0.5</td><td>2.92</td><td>6.97</td><td>4.76</td><td>6.96</td><td>7.74</td><td>29.9</td><td>500</td><td>13478</td><td>0.35</td><td>Nil</td><td>0.005</td></tr><tr><td>Nippon India Strategic Debt Fund Direct Growth</td><td>Moderate Risk</td><td>Debt</td><td></td><td>0.52</td><td>2.41</td><td>7.22</td><td>9.26</td><td>-0.47</td><td>4.07</td><td>14.6</td><td>100</td><td>120</td><td>1.44</td><td>1% if redeemede within 12 months</td><td>0.005</td></tr><tr><td>Axis Corporate Debt Fund Direct Growth</td><td>Moderate Risk</td><td>Debt</td><td></td><td>0.53</td><td>2.99</td><td>7.19</td><td>5.31</td><td>7.09</td><td>7.31</td><td>15.73</td><td>100</td><td>4827</td><td>0.29</td><td>Nil</td><td>0.005</td></tr><tr><td>Kotak Emerging Equity Fund Direct Growth</td><td>Very High Risk</td><td>Equity</td><td>Mid Cap</td><td>5.04</td><td>20.63</td><td>26.15</td><td>27.84</td><td>23.74</td><td>20.8</td><td>111.72</td><td>100</td><td>36527</td><td>0.38</td><td>For units in excess of 10% of the investment 1% will be charged for redemption within 365 days</td><td>0.005</td></tr></tbody>
+        </table>
+    </div>
+
+    <br><br><br>
+    <section class="section section-sign-up">
+        <div class="section-title">
+            <h3 class="section-header">
+                The best day to join Cymbal was one year ago. The second
+                best is today!
+            </h3>
+        </div>
+        <button class="btn btn--show-modal">
+            Open your free account today!
+        </button>
+    </section>
+    <footer class="footer">
+        <ul class="footer-nav">
+            <li class="footer-item">
+                <a class="footer-link" href="#">About</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Terms of Use</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Privacy Policy</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Careers</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Contact Us</a>
+            </li>
+        </ul>
+        <img src="assets/cymbal_logo.png" alt="Logo" class="footer-logo" />
+    </footer>
+    <div class="modal hidden">
+        <button class="btn-close-modal">&times;</button>
+        <div class="authenticate">
+            <div class="authenticate-tab-container">
+                <button class="btn authenticate-tab authenticate-tab-1 authenticate-tab-active" data-tab="1">
+                    LOGIN
+                </button>
+                <button class="btn authenticate-tab authenticate-tab--2" data-tab="2">
+                    CREATE ACCOUNT
+                </button>
+            </div>
+            <div class="authenticate-content authenticate-content--1 authenticate-content-active">
+                <form class="modal-form" id="sigin_form">
+                    <label>Email Address</label>
+                    <input type="email" />
+                    <label>Password</label>
+                    <input type="password" />
+                    <button class="btn" id="signin_btn">Login</button>
+                </form>
+            </div>
+
+            <div class="authenticate-content authenticate-content--2">
+                <form class="modal-form" id="signup_form">
+                    <label>First Name</label>
+                    <input type="text" />
+                    <label>Last Name</label>
+                    <input type="text" />
+                    <label>Aadhar</label>
+                    <input type="text" />
+                    <label>PAN</label>
+                    <input type="text" />
+                    <label>Email Address</label>
+                    <input type="email" />
+                    <label>Password</label>
+                    <input type="password" />
+                    <button class="btn" id="signup_btn">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="overlay hidden"></div>
+    <script>
+        function redirectToCalculator() {
+            window.location.href = '/calculator';
+        }
+    </script>
+</body>
+
+</html>

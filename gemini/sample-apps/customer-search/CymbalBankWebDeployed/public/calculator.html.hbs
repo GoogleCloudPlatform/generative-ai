@@ -1,0 +1,187 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mutual Fund Calculator</title>
+    <script>src="scripts/script_calculator.js"</script>
+    <style>
+      body { font-family: 'Poppins', sans-serif; margin: 0px; } h1 { font-size:
+      2.5rem; line-height: 1.35; position: fixed; width: 100%; text-align:
+      center; top: 0; padding: 2%; margin-top: 0; background-color: #4bbb7d; }
+      #calculatorContainer { max-width: 45rem; margin: 10rem auto; /*
+      Center-align the container */ } label { display: block; margin-bottom:
+      5px; } /* input[type="range"] { margin-bottom: 10px; width: 100%;
+      box-sizing: border-box; } */ input[type="range"] { margin-bottom: 10px;
+      width: 100%; box-sizing: border-box; /* Styles for the track (progress
+      bar) */ -webkit-appearance: none; appearance: none; height: 10px;
+      border-radius: 5px; /* background: #ddd; */ outline: none; }
+      input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none;
+      appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: #000; /* Set the thumb color to black */ cursor: pointer; } /*
+      For Firefox */ input[type="range"]::-moz-range-thumb { width: 20px;
+      height: 20px; border-radius: 50%; background: #1111; /* Set the thumb
+      color to black */ cursor: pointer; }
+      input[type="range"]::-webkit-slider-runnable-track { height: 15px;
+      border-radius: 3px; background: #ddd; /* Set the track color to light gray
+      */ } input[type="number"] { width: 100%; box-sizing: border-box;
+      margin-bottom: 10px; padding: 8px; } button { padding: 15px;
+      background-color: #4CAF50; color: white; border: none; cursor: pointer;
+      font-size: 1rem; } #result { margin-top: 20px; font-weight: bold; padding:
+      0px; /* background-color: #f0f0f0; */ } #requiredInvestmentResult {
+      margin-top: 20px; font-weight: bold; padding: 10px; /* background-color:
+      #f0f0f0; */ } #tabSwitch { margin-bottom: 10px; }
+    </style>
+  </head>
+  <body>
+    <h1 class="heading-title">Cymbal Bank Investment Calculator</h1>
+    <div id="calculatorContainer">
+
+      <div id="tabSwitch">
+        <button onclick="switchTabs('investment')">Investment</button>
+        <button onclick="switchTabs('targetAmount')">Target Amount</button>
+      </div>
+
+      <!-- Investment Tab -->
+      <div id="investmentTab">
+        <label for="investmentAmount">Investment Amount
+          <span id="investmentAmountValue">(₹):</span></label>
+        <input
+          type="range"
+          id="investmentAmount"
+          min="1"
+          max="10000000"
+          step="1"
+          value="1"
+          oninput="updateInputValue('investmentAmount', 'investmentAmountInput')"
+        />
+        <input
+          type="number"
+          id="investmentAmountInput"
+          min="1"
+          max="10000000"
+          step="1"
+          value="1"
+          oninput="updateSliderValue('investmentAmount', 'investmentAmountInput')"
+        />
+
+        <label for="investmentDuration">Investment Duration
+          <span id="investmentDurationValue">(Years):</span></label>
+        <input
+          type="range"
+          id="investmentDuration"
+          min="1"
+          max="50"
+          step="1"
+          value="1"
+          oninput="updateInputValue('investmentDuration', 'investmentDurationInput')"
+        />
+        <input
+          type="number"
+          id="investmentDurationInput"
+          min="1"
+          max="50"
+          step="1"
+          value="1"
+          oninput="updateSliderValue('investmentDuration', 'investmentDurationInput')"
+        />
+
+        <label for="interestRate">Annual Interest Rate
+          <span id="interestRateValue">(%):</span></label>
+        <input
+          type="range"
+          id="interestRate"
+          min="1"
+          max="100"
+          step="0.01"
+          value="1"
+          oninput="updateInputValue('interestRate', 'interestRateInput')"
+        />
+        <input
+          type="number"
+          id="interestRateInput"
+          min="1"
+          max="100"
+          step="0.01"
+          value="1"
+          oninput="updateSliderValue('interestRate', 'interestRateInput')"
+        />
+
+        <button onclick="calculateReturn()">Calculate Return</button>
+
+        <div id="result"></div>
+      </div>
+
+      <!-- Target Amount Tab -->
+      <div id="targetAmountTab" style="display:none;">
+        <label for="targetAmount">Target Amount
+          <span id="targetAmountValue">(₹):</span></label>
+        <input
+          type="range"
+          id="targetAmount"
+          min="1"
+          max="10000000"
+          step="1"
+          value="1"
+          oninput="updateInputValue('targetAmount', 'targetAmountInput')"
+        />
+        <input
+          type="number"
+          id="targetAmountInput"
+          min="1"
+          max="10000000"
+          step="1"
+          value="1"
+          oninput="updateSliderValue('targetAmount', 'targetAmountInput')"
+        />
+
+        <label for="targetDuration">Investment Duration
+          <span id="targetDurationValue">(Years):</span>
+        </label>
+        <input
+          type="range"
+          id="targetDuration"
+          min="1"
+          max="50"
+          step="1"
+          value="1"
+          oninput="updateInputValue('targetDuration', 'targetDurationInput')"
+        />
+        <input
+          type="number"
+          id="targetDurationInput"
+          min="1"
+          max="50"
+          step="1"
+          value="1"
+          oninput="updateSliderValue('targetDuration', 'targetDurationInput')"
+        />
+
+        <label for="targetInterestRate">Annual Interest Rate
+          <span id="targetInterestRateValue">(%):</span></label>
+        <input
+          type="range"
+          id="targetInterestRate"
+          min="1"
+          max="100"
+          step="0.01"
+          value="1"
+          oninput="updateInputValue('targetInterestRate', 'targetInterestRateInput')"
+        />
+        <input
+          type="number"
+          id="targetInterestRateInput"
+          min="1"
+          max="100"
+          step="0.01"
+          value="1"
+          oninput="updateSliderValue('targetInterestRate', 'targetInterestRateInput')"
+        />
+
+        <button onclick="calculateRequiredInvestment()">Calculate Required
+          Investment</button>
+
+        <div id="requiredInvestmentResult"></div>
+      </div>
+    </div>
+  </body>
+</html>

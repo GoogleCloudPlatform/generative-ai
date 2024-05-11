@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saving</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer type="module" src="scripts/script.js"></script>
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+    <style>
+        df-messenger {
+            z-index: 999;
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            --df-messenger-primary-color: #4bbb7d;
+            --df-messenger-chat-window-height: 55vh;
+            --df-messenger-chat-window-width: 50vw;
+        }
+    </style>
+
+</head>
+<script>
+    function submitSearch() {
+        document.getElementById('loader').style.display = 'block';
+
+        var siteSearchUrl = 'https://sites.google.com/corp/search/pranshusingh.altostrat.com/cymbalbank?query=';
+
+        var query = document.getElementById("search-query-input").value;
+        var searchResultsPage = '/search';
+
+        const uri = '{{rag_qa_chain_url_translate}}';
+        const body = JSON.stringify({ query: query })
+        const initDetails = {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            referrerPolicy: "strict-origin-when-cross-origin",
+            body: body
+        }
+
+        fetch(uri, initDetails)
+            .then(response => {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+                console.log(response.headers.get("Content-Type"));
+                return response.json();
+            }
+            )
+            .then(myJson => {
+                console.log(JSON.stringify(myJson));
+                var obj = JSON.parse(JSON.stringify(myJson));
+
+                sessionStorage.setItem('temp_result', JSON.stringify(obj));
+                window.location.href = '/search';
+
+
+                references = JSON.parse(obj.fulfillment_response.messages[0].text.text[1]);
+                console.log(references)
+                var str = '';
+                var i = 0;
+                var count = 0
+
+
+            })
+            .catch(err => {
+                console.log('Fetch Error :-S', err);
+            })
+            .finally(() => {
+                // Hide loading symbol
+                document.getElementById('loader').style.display = 'none';
+            });;
+
+
+    }
+
+
+    function searchKeyPress(e) {
+
+        // look for window.event in case event isn't passed in
+
+
+        e = e || window.event;
+
+        if (e.keyCode == 13) {
+
+            document.getElementById('search-icon').click();
+
+            return false;
+
+        }
+
+        return true;
+
+    }  
+</script>
+
+<body>
+    <df-messenger location="us-central1" project-id="{{project_id}}"
+            agent-id="{{df_agent_id}}" language-code="en">
+            <df-messenger-chat-bubble chat-title="CymBuddy">
+            </df-messenger-chat-bubble>
+        </df-messenger>
+    <nav>
+        <div class="navbar">
+            <i class='bx bx-menu'></i>
+            <div class="sidebar-logo-container">
+                <a href="/" target="_self"> <img src="assets/cymbal_logo.png" alt="Cymbal Bank logo" class="nav-logo"
+                        id="logo" data-version-number="3.0" /></a>
+                </div>
+            <div class="nav-links">
+                <div class="sidebar-logo">
+                    <span class="logo-name">Cymbal Bank</span>
+                    <i class='bx bx-x'></i>
+                </div>
+                <ul class="links">
+                    <li class="nav-item">
+                        <a class="nav-link">Pay</a>
+                        <i class='bx bxs-chevron-down pay-arrow arrow'></i>
+                        <ul class="pay-sub-menu sub-menu">
+                            <li class="moneytransfer">
+                                <span><a class="nav-link" href="#">Money Transfer</a>
+                                    <i class='bx bxs-chevron-right arrow moneytransfer-arrow'></i>
+                                </span>
+                                <ul class="moneytransfer-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/upi">UPI</a></li>
+                                    <li><a class="nav-link" href="/imps">IMPS</a></li>
+                                    <li><a class="nav-link" href="/neft">NEFT</a></li>
+                                </ul>
+                            </li>
+                            <li class="bills">
+                                <span><a class="nav-link" href="#">Bills</a>
+                                    <i class='bx bxs-chevron-right arrow bills-arrow'></i>
+                                </span>
+                                <ul class="bills-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/recharge">Recharge (Mobile, DTH, Broadband)</a>
+                                    </li>
+                                    <li><a class="nav-link" href="/electricity">Electricity</a></li>
+                                    <li><a class="nav-link" href="/insurance_premium">Insurance Premium</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Save</a>
+                        <i class='bx bxs-chevron-down save-arrow arrow'></i>
+                        <ul class="save-sub-menu sub-menu">
+                            <li class="accounts">
+                                <span><a class="nav-link" href="#">Accounts</a>
+                                    <i class='bx bxs-chevron-right arrow accounts-arrow'></i>
+                                </span>
+                                <ul class="accounts-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/saving">Saving</a></li>
+                                    <li><a class="nav-link" href="/current">Current</a></li>
+                                    <li><a class="nav-link" href="/salary">Salary</a></li>
+                                </ul>
+                            </li>
+                            <li class="deposits">
+                                <span><a class="nav-link" href="#">Deposits</a>
+                                    <i class='bx bxs-chevron-right arrow deposits-arrow'></i>
+                                </span>
+                                <ul class="deposits-sub-menu sub-menu">
+                                    <li><a class="nav-link" href="/fixed_deposit">Fixed Deposit</a></li>
+                                    <li><a class="nav-link" href="/recurring_deposit">Recurring Deposit</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/credit_card">Credit Card</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Invest</a>
+                        <i class='bx bxs-chevron-down invest-arrow arrow'></i>
+                        <ul class="invest-sub-menu sub-menu">
+                            <li class="nav-item"><a class="nav-link" href="/stocks">Equities and Derivatives</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/ipo">IPO through ASBA</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/mutual_funds">Mutual Funds</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/loans">Loans</a>
+                        <i class='bx bxs-chevron-down borrow-arrow arrow'></i>
+                        <ul class="borrow-sub-menu sub-menu">
+                            <li><a class="nav-link" href="loans">Car Loan</a></li>
+                            <li><a class="nav-link" href="loans">Two Wheeler Loan</a></li>
+                            <li><a class="nav-link" href="loans">Personal Loan</a></li>
+                            <li><a class="nav-link" href="loans">Fixed Deposit Overdraft</a></li>
+                            <li><a class="nav-link" href="loans">Overdraft Against Securities</a></li>
+                            <li><a class="nav-link" href="loans">Home Loan</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-btn btn--show-modal" id="login_menu_btn">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-btn btn--show-modal" id="logout_menu_btn"
+                            style="display: none">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        </div>
+    </nav>
+    <div id="search-container">
+        <div id="search-query">
+            <img id="search-icon"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAQAAABIkb+zAAADAklEQVR4AezZA6xcQRSA4b92g9q2/VRuw9puVLcxake13Zh1G9W2bds2T42ZzNPeO7Pb5H5/zD17PUMgEAgEAoFAIGxFGMRMlrGTi7zjFZfZwTJmMohCRLkajOMYkkRHGUdNolI8B5EUdpB4okpJViOpbDXFiArpGMcHJIzeMY50RFgB9iIe2ksBIiiGR4jHHhFDhHTlI+JDH+lKBMQmceY/YhZNqExBMn+rAJUIMZMnCOY+EItjxRP9OetoTQZMMtCadYixJ5TAoQyYH1cbiCE5CWxADB0jA85MNp7JHUipnsbTbwqO1OWL4RSIIzUSDKfgF+riQBrOIFrPKENqleEZonWGNFjX0vDPNSUcTQ1HsiXWbUO0hhOu4YjWViwri2gdwYvDiFZ5rJqIaMXgRRyiNRGr7iBKa/BqDaJ0G4vKIVqN8Kqxy5OoL6L0mDR4lUZ/o2UA1sxHlBbhh8WI0jys2Y4odcUPXRCl7VhzDVFqgB8aIErXsUZ/fylr5dnyGGv0R38O/JADUfqMNfpLcHb8kF1/Mf/fT6HnWHMdUWqIHxoiSjexZiui1A0/dEWUtmHNPERpsZUH2WJ3rxKPSIdX6XiMKPXGmvKIVgivQohWJSx6YP11+g5WTUK04vAiBtGaBeDyJDqMF0cQrVpYthnRGkq4hiJau7GuhW/LKiHDskpzrEvDKV8WtkobFrZ24UQ9H5YW44xLi7VwZIpxcbcbKdXNuDUyG2cychQxtJ4YkhPPOsTQJXLiUMmwNjhasQUx9obyOBafzBZTiMoUIguZKUhlQszSRtYHaI5z+pnsT6NxKI5HiMee8xlRGoJDhdiNeOg6ZWmNRHKEdIzlXZj7w/PIDYBEdgQoxmokla2nNL9J5EeAeI4iKWwPXfiXRMcIUJPxHEOS6CTDKYVuTGRH0BViEDNZyk4u8gpBeMMuJtKegujcj2DN1/bnmAgAEIBhIJIZGZHOWAEslPsoyCMgIHxPmAgICAjXIQRQSsh+JSH7vYQ1StvZryW8vy9JkiQdHsFQT60Y7OcAAAAASUVORK5CYII="
+                alt="Search Icon" onclick="submitSearch();">
+
+            <input type="text" id="search-query-input" placeholder="Search this site"
+                onkeypress="return searchKeyPress(event);" style="box-shadow:none" ;>
+        </div>
+    </div>
+    <div id="loader"></div>
+    <div class="custom-body">
+        <h2 class="savingh2">Savings accounts
+        </h2 class="savingh2">
+        <div class="card-container">
+            <div class="card regular-account">
+                <img class="card-img" src="assets/image (1).png" alt="">
+                <h2 class="savingh2">Regular Savings Account</h2 class="savingh2">
+                <ul class="savingul">
+                    <li>Instant account opening facility</li>
+                    <li>Choose between multiple international debit cards</li>
+                    <li>Link to ISA account for seamless investment</li>
+                    <li>Pay using UPI, NEFT, RTGS, Cheque</li>
+                    <li>Min. Average Quarterly Balance of ₹10,000/-</li>
+                </ul>
+            </div>
+
+            <div class="card young-citizen">
+                <img class="card-img" src="assets/image (9).png" alt="">
+                <h2 class="savingh2">Young Citizen Savings Account</h2 class="savingh2">
+                <ul class="savingul">
+                    <li>No minimum balance requirement</li>
+                    <li>Free cash back debit card with exclusive invites to entertainment</li>
+                    <li>Access to curated sessions by experts on higher education and career planning</li>
+                    <li>Parents can open in the name of minors</li>
+
+                </ul>
+            </div>
+
+            <div class="card premium-account">
+                <img class="card-img" src="assets/image (5).png" alt="">
+                <h2 class="savingh2">Premium Savings Account</h2 class="savingh2">
+                <ul class="savingul">
+                    <li>Minimum Average Quarterly balance of Rs. 100,000/- or Fixed Deposits of Rs. 2,500,000/-</li>
+                    <li>Platinum debit card with reward points</li>
+                    <li>Invite to exclusive golf event, travel deals</li>
+                    <li>Loans at special rates</li>
+                </ul>
+            </div>
+
+            <div class="card platinum-account">
+                <img class="card-img" src="assets/image (4).png" alt="">
+                <h2 class="savingh2">Platinum Savings Account</h2 class="savingh2">
+                <ul class="savingul">
+                    <li>Invite Only with minimum Average Quarterly Balance of Rs. 500,000/- or Fixed Deposits of Rs.
+                        10,000,000/-</li>
+                    <li>Complimentary Royal Credit Card</li>
+                    <li>Invite to exclusive golf event, curated travel deals, Gold status on major airlines</li>
+                    <li>Loans at special rates</li>
+                    <li>Dedicated relationship manager and access to premium research from our markets team</li>
+                </ul>
+            </div>
+        </div>
+        <section>
+            <h3 class="savingh3">Notable Features</h3 class="savingh3">
+            <ul class="savingul">
+                <li>
+                    <strong>Attractive interest earnings:</strong> With a Savings Account, you can make your hard-earned
+                    money work for you with our attractive Savings Account interest rates. With Cymbal Bank, you can
+                    avail
+                    of interest rates of up to 3.50% for balances of and exceeding ₹50 lakh and 3.00% for account
+                    balance
+                    less than ₹50 lakh.
+                </li>
+                <li>
+                    <strong>Online banking provisions:</strong> Our NetBanking and Mobile Banking platforms allow you to
+                    access and manage your Savings Bank Account facilities, regardless of the geography. With our online
+                    banking platforms, you can check your account balance, view account statements, request chequebooks,
+                    open Fixed Deposits and more.
+                </li>
+                <li>
+                    <strong>Debit Card facilities:</strong> You can avail of a secure Debit Card with your Cymbal Bank
+                    Savings Account. The Debit Card allows you to pay for online and offline spends and withdraw cash
+                    from
+                    ATMs. Our Debit Cards also come with various insurance benefits that differ across card variants.
+                </li>
+                <li>
+                    <strong>Quick fund transfers:</strong> You can send money to other bank accounts at any time and
+                    from
+                    any place, thanks to online banking. We facilitate online fund transfers via National Electronic
+                    Fund
+                    Transfer (NEFT), Real Time Gross Settlement (RTGS), Immediate Payment Service (IMPS), and Unified
+                    Payments Interface (UPI).
+                </li>
+                <li>
+                    <strong>Convenient bill payments:</strong> Long queues for paying bills are a thing of the past,
+                    thanks
+                    to our swift and secure online bill payment interface. With our NetBanking and MobileBanking
+                    platform,
+                    you can pay utility bills instantly, be it electricity, water, property tax, etc. Plus, you can
+                    provide
+                    standing instructions to automate recurring bill payments.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h3 class="savingh3">Savings Account Eligibility</h3 class="savingh3">
+            <ul class="savingul">
+                <li>
+                    <strong>Resident individuals:</strong> Can open and operate the Account solely or jointly.
+                </li>
+                <li>
+                    <strong>Members of Hindu Undivided Families (HUF)</strong>
+                </li>
+                <li>
+                    <strong>Minors above 10 years of age:</strong> Can open and self-operate a Savings Account and get
+                    access to ATM/Debit Card facilities.
+                </li>
+                <li>
+                    <strong>Foreign nationals:</strong> Residing in India for more than 180 days are eligible to open a
+                    Savings Account.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h3 class="savingh3">Fees & Charges</h3 class="savingh3">
+            <p class="savingp" class="savingp">
+                Note that there are no particular fees you must pay for opening a Savings Account online. Depending on
+                your
+                Savings Account types, you may have to pay a minimum initial deposit amount. You must also keep in mind
+                the
+                following associated charges that can differ depending on your Savings Account type:
+            </p class="savingp" class="savingp">
+            <ul class="savingul">
+                <li>Non-maintenance of account balance</li>
+                <li>Duplicate passbook issuance</li>
+                <li>Exhausting the number of free cash transactions</li>
+                <li>Additional cheque book</li>
+                <li>Debit Card replacement charges</li>
+                <li>Debit return charges</li>
+                <li>Standing instruction rejects</li>
+                <li>Fund transfers at bank branch</li>
+            </ul>
+        </section>
+        <section>
+            <h3 class="savingh3">Benefits</h3 class="savingh3">
+            <p class="savingp">
+                Here's why a Savings Account continues to remain the preferred tool for placing your surplus funds:
+            </p class="savingp">
+            <ul class="savingul">
+                <li>
+                    <strong>High liquidity:</strong> You can withdraw your Savings Account funds at will. A Debit Card
+                    allows you to withdraw cash from ATMs at your convenience.
+                </li>
+                <li>
+                    <strong>Facilitates digital transactions:</strong> Your Savings Account can facilitate digital
+                    payments
+                    by way of Debit Cards, NetBanking, or UPI. Digital banking platforms allow electronic fund transfer
+                    between accounts.
+                </li>
+                <li>
+                    <strong>Automated debits:</strong> You can enable the auto-debit facility in your Savings Account
+                    for
+                    various investments, utility bill payments, loan repayments via Equated Monthly Installments (EMIs),
+                    etc.
+                </li>
+                <li>
+                    <strong>Insured savings:</strong> A digital Savings Account offers a secure way of placing money.
+                    Also,
+                    your account deposits are insured by RBI-owned Deposit Insurance and Credit Guarantee Corporation
+                    (DICGC) for up to ₹5 lakh.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h3 class="savingh3">Things to Keep in Mind</h3 class="savingh3">
+            <p class="savingp">
+                When opening an online Savings Account, you must consider the following factors:
+            </p class="savingp">
+            <ul class="savingul">
+                <li>
+                    <strong>Minimum initial deposits:</strong> You may have to pay a certain specific amount as a
+                    deposit to
+                    activate your Savings Account. The amount can vary depending on the Savings Account variant.
+                </li>
+                <li>
+                    <strong>Average monthly balances:</strong> You may have to maintain a specific balance in your
+                    Savings
+                    Account every month. Otherwise, the bank will levy penalties for non-maintenance of account balance.
+                </li>
+                <li>
+                    <strong>Limits on transactions:</strong> The bank may impose limits on the frequency and value of
+                    transactions for your Savings Account. Exceeding those limits can result in penalties.
+                </li>
+                <li>
+                    <strong>Fees & charges:</strong> Ensure you peruse the schedule of fees and charges associated with
+                    your
+                    Savings Account variant. Such information is readily available on the bank website.
+                </li>
+            </ul>
+            <p class="savingp">
+                I hope this information is helpful. Please let me know if you have any other questions.
+            </p class="savingp">
+        </section>
+        <section>
+            <h3 class="savingh3">Savings Account FAQs</h3 class="savingh3">
+            <ol class="savingol">
+                <li>
+                    <strong>What is a Savings Account?</strong><br>
+                    A Savings Account is a deposit account opted for by many who wish to save a certain part of their
+                    earnings. It is a type of bank account wherein you can park your funds, earn interest on the same,
+                    and
+                    also withdraw money at any time. It provides the convenience of liquid funds.
+                </li>
+                <li>
+                    <strong>How can one open a Savings Account online?</strong><br>
+                    The online Savings Account opening process is a simple and fairly easy one. At Cymbal Bank, you can
+                    also
+                    opt for the Video KYC (Know
+                    Your Customer) facility to avoid an in-person visit to the bank branch.
+                </li>
+                <li>
+                    <strong>What are the different types of Savings Account?</strong><br>
+                    There are different types of Savings Account one can opt for at Cymbal Bank - Regular Savings
+                    Account,
+                    DigiSave Youth Account, Women's Savings Account, and Senior Citizens Savings Account, to name a few.
+                    The
+                    saving bank account variants are designed keeping in mind the needs of our varying customer groups.
+                </li>
+                <li>
+                    <strong>What is the minimum balance requirement in a Savings Account?</strong><br>
+                    The minimum balance requirement or average monthly balance (AMB) requirement varies with the type of
+                    Savings Account chosen by the customer as well as the location of the account holder. For instance,
+                    a
+                    minimum initial deposit of Rs 7500 for metro/urban branches, Rs 5,000 for semi-urban branches, and
+                    Rs
+                    2,500 for rural branches is required to open a Cymbal Bank Regular Savings Account.
+                </li>
+            </ol class="savingol">
+            <h3 class="savingh3">Cymbal Bank Savings Account Interest Rates</h3 class="savingh3">
+            <p class="savingp">As of June 11, 2020, Cymbal Bank offers the following interest rates on its Savings
+                Accounts:
+            </p class="savingp">
+            <table border="1">
+                <tr>
+                    <th>Savings Bank balance</th>
+                    <th>Revised Rate w.e.f 11th June, 2020</th>
+                </tr>
+                <tr>
+                    <td>Rs. 50 lakh and above</td>
+                    <td>3.50%</td>
+                </tr>
+                <tr>
+                    <td>Below Rs 50 lakh</td>
+                    <td>3.00%</td>
+                </tr>
+            </table>
+        </section>
+        <section>
+            <h3 class="savingh3">How to Choose the Best Savings Bank Account</h3 class="savingh3">
+            <p class="savingp">When choosing a Savings Account, it is important to consider your individual needs. Some
+                factors to consider
+                include:</p class="savingp">
+            <ul class="savingul">
+                <li>
+                    <strong>Interest rates:</strong> The interest rate you earn on your savings is a key factor to
+                    consider
+                    when choosing a Savings Account. Cymbal Bank offers competitive interest rates on its Savings
+                    Accounts.
+                </li>
+                <li>
+                    <strong>Minimum balance requirements:</strong> Some Savings Accounts have minimum balance
+                    requirements
+                    that you must maintain to earn interest. Cymbal Bank's Savings Accounts do not have any minimum
+                    balance
+                    requirements.
+                </li>
+                <li>
+                    <strong>Fees and charges:</strong> Some Savings Accounts have associated fees and charges. Cymbal
+                    Bank's
+                    Savings Accounts have no monthly maintenance fees or annual fees.
+                </li>
+                <li>
+                    <strong>Additional benefits:</strong> Some Savings Accounts offer additional benefits, such as free
+                    life
+                    insurance or discounts on other banking products and services. Cymbal Bank's Savings Accounts offer
+                    a
+                    variety of additional benefits, including free life insurance, discounts on other banking products
+                    and
+                    services, and access to a network of over 4,000 branches and 13,000 ATMs across India.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h3 class="savingh3">How to Open a Cymbal Bank Savings Account</h3 class="savingh3">
+            <p class="savingp">Opening a Cymbal Bank Savings Account is easy and convenient. You can open an account
+                through
+                various
+                methods:</p class="savingp">
+
+            <h3 class="savingh3">Online Account Opening:</h3 class="savingh3">
+            <p class="savingp">To open a Cymbal Bank Savings Account online, you will need to provide the following
+                information:</p class="savingp">
+            <ul class="savingul">
+                <li>Name</li>
+                <li>Date of birth</li>
+                <li>Address</li>
+                <li>Contact information</li>
+                <li>PAN card number</li>
+                <li>Income details</li>
+            </ul>
+            <p class="savingp">Once you submit your application online, you'll receive a confirmation email. Visit a
+                Cymbal
+                Bank branch to
+                verify your identity and documents.</p class="savingp">
+
+            <h3 class="savingh3">Mobile App Account Opening:</h3 class="savingh3">
+            <p class="savingp">To open an account through the Cymbal Bank Mobile App:</p class="savingp">
+            <ol class="savingol">
+                <li>Download the app from the App Store or Google Play.</li>
+                <li>Create an account and log in.</li>
+                <li>Select the Savings Account you want to open and submit your application.</li>
+            </ol class="savingol">
+
+            <h3 class="savingh3">In-person Account Opening at Branch:</h3 class="savingh3">
+            <p class="savingp">To open an account by visiting a Cymbal Bank branch, bring the following documents:</p
+                class="savingp">
+            <ul class="savingul">
+                <li>Identity proof (driver's license, passport, etc.)</li>
+                <li>Address proof (driver's license, passport, etc.)</li>
+                <li>PAN card</li>
+                <li>Form 16 (if applicable)</li>
+                <li>Two recent passport-sized photographs</li>
+            </ul>
+            <p class="savingp">A Cymbal Bank representative will assist you with the account opening process at the
+                branch.
+            </p class="savingp">
+        </section>
+        <br><br>
+        <section>
+            <p class="savingp" style="text-align: center;"><a href="/saving/terms_and_condition">Terms and
+                    conditions</a></p>
+        </section>
+        <br><br><br>
+    </div>
+    <section class="section section-sign-up">
+        <div class="section-title">
+            <h3 class="section-header">
+                The best day to join Cymbal Bank was one year ago. The second
+                best is today!
+            </h3>
+        </div>
+        <button class="btn btn--show-modal">
+            Open your free account today!
+        </button>
+    </section>
+    <footer class="footer">
+        <ul class="footer-nav">
+            <li class="footer-item">
+                <a class="footer-link" href="#">About</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Terms of Use</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Privacy Policy</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Careers</a>
+            </li>
+            <li class="footer-item">
+                <a class="footer-link" href="#">Contact Us</a>
+            </li>
+        </ul>
+        <img src="assets/cymbal_logo.png" alt="Logo" class="footer-logo" />
+    </footer>
+    <div class="modal hidden">
+        <button class="btn-close-modal">&times;</button>
+        <div class="authenticate">
+            <div class="authenticate-tab-container">
+                <button class="btn authenticate-tab authenticate-tab-1 authenticate-tab-active" data-tab="1">
+                    LOGIN
+                </button>
+                <button class="btn authenticate-tab authenticate-tab--2" data-tab="2">
+                    CREATE ACCOUNT
+                </button>
+            </div>
+            <div class="authenticate-content authenticate-content--1 authenticate-content-active">
+                <form class="modal-form" id="sigin_form">
+                    <label>Email Address</label>
+                    <input type="email" />
+                    <label>Password</label>
+                    <input type="password" />
+                    <button class="btn" id="signin_btn">Login</button>
+                </form>
+            </div>
+
+            <div class="authenticate-content authenticate-content--2">
+                <form class="modal-form" id="signup_form">
+                    <label>First Name</label>
+                    <input type="text" />
+                    <label>Last Name</label>
+                    <input type="text" />
+                    <label>Aadhar</label>
+                    <input type="text" />
+                    <label>PAN</label>
+                    <input type="text" />
+                    <label>Email Address</label>
+                    <input type="email" />
+                    <label>Password</label>
+                    <input type="password" />
+                    <button class="btn" id="signup_btn">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="overlay hidden"></div>
+
+</body>
+
+</html>
