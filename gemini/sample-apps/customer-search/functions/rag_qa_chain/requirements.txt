@@ -1,0 +1,8 @@
+functions-framework==3.*
+tensorflow_hub==0.13.0
+tensorflow_text==2.12.1
+langchain
+nest_asyncio
+google-cloud-aiplatform==1.35.0
+httpimport
+bs4

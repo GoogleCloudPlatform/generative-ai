@@ -1,0 +1,141 @@
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>Credit Card UI</title>
+    <style>
+      /* Add your CSS styles here */ body { font-family: 'Poppins', sans-serif;
+      margin: 0; padding: 0; display: flex; justify-content: center;
+      align-items: center; height: 100vh; background-color: #f0f0f0; } h1 {
+      font-size: 2.5rem; line-height: 1.35; position: fixed; width: 100%;
+      text-align: center; top: 0; padding: 2%; margin-top: 0; background-color:
+      #4bbb7d; } .credit-card { position: relative; width: 340px; height: 215px;
+      border-radius: 15px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); display:
+      flex; flex-direction: column; justify-content: space-between; padding:
+      15px; box-sizing: border-box; background-image: url('decoded_image.png');
+      /* Replace with your image path */ background-size: cover;
+      background-repeat: no-repeat; background-position: center; overflow:
+      hidden; /* Hide overflow from pseudo-element */ } .credit-card::before {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height:
+      100%; background-color: rgba(255, 255, 255, 0.3); /* Adjust opacity here
+      */ } .card-content { position: relative; z-index: 1; } .card-number {
+      color: #382200; font-size: 24px; font-weight: bold; margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); width: 100%; /* Set width to
+      100% */ text-align: center; } .person-name { color: #000000; font-size:
+      16px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); margin-bottom: 20px; }
+      .bank-name { color: #1f1616; font-size: 20px; font-weight: bold;
+      font-family: Verdana, Geneva, Tahoma, sans-serif; text-shadow: 2px 2px 4px
+      rgba(0, 0, 0, 0.3); margin-bottom: 20px; } .card-images { display: flex;
+      justify-content: space-between; } .submit-btn { padding: 8px 16px;
+      font-size: 16px; background-color: #4bbb7d; color: white; border: none;
+      border-radius: 4px; cursor: pointer; transition: box-shadow 0.3s ease; /*
+      Add transition for smooth effect */ box-shadow: 0 3px 6px rgba(0, 0, 0,
+      0.3); /* Add initial box-shadow */ } .submit-btn:active { box-shadow:
+      none; /* Remove box-shadow on button press */ transform: translateY(1px);
+      /* Add a slight downward movement on press */ } .submit-a { padding: 8px
+      16px; font-size: 16px; color: rgb(33, 33, 33); border: none;
+      border-radius: 4px; cursor: pointer; } .name-input { width: calc(80% -
+      12px); /* Adjust width as needed */ height: 30px; /* Adjust height for
+      multi-line input */ margin-bottom: 10px; padding: 5px; border: 1px solid
+      #ccc; border-radius: 4px; font-size: 16px; resize: vertical; /* Allow
+      vertical resizing */ } .prompt-input { width: calc(80% - 12px); /* Adjust
+      width as needed */ height: 80px; /* Adjust height for multi-line input */
+      margin-bottom: 10px; padding: 5px; border: 1px solid #ccc; border-radius:
+      4px; font-size: 16px; resize: vertical; /* Allow vertical resizing */ }
+      #loader { display: none; position: fixed; top: 30%; left: 50%;
+      -webkit-transform: translate(-50%, -50%); transform: translate(-50%,
+      -50%); border: 10px solid #232323; border-radius: 10%; border-top: 10px
+      solid #7ec379; width: 40px; height: 40px; -webkit-animation: spin 1s
+      linear infinite; /* Safari */ animation: spin 1s linear infinite; z-index:
+      999; } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform:
+      rotate(360deg); } }
+    </style>
+  </head>
+
+  <body>
+    <div id="loader" class="loader"></div>
+    <h1 class="heading-title">Cymbal Bank Credit Card</h1>
+    <div class="input-section">
+
+      <input
+        type="text"
+        id="nameInput"
+        class="name-input"
+        placeholder="Your Name"
+      />
+      <textarea
+        id="promptInput"
+        class="prompt-input"
+        placeholder="Description for the Credit Card Image"
+      ></textarea>
+      <button onclick="fetchImageFromAPI()" class="submit-btn">Generate Sample
+        Card</button>
+      <a href="/credit_card" class="submit-a">Set this As Default</a>
+    </div>
+
+    <div class="credit-card-section">
+      <div class="credit-card" id="creditCard">
+        <div class="card-content">
+          <!-- Elements to be dynamically created using JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+      // JavaScript code to fetch image from API and display on the card
+      document.addEventListener("DOMContentLoaded", function () {
+      createCreditCard(); }); // function downloadCreditCard() { // const
+      creditCard = document.querySelector('.credit-card'); //
+      html2canvas(creditCard).then(canvas => { // // Convert the canvas to a
+      data URL // const image = canvas.toDataURL('image/png'); // // Create a
+      temporary link and simulate click to download // const link =
+      document.createElement('a'); // link.href = image; // link.download =
+      'credit_card_image.png'; // link.click(); // }); // } function
+      createCreditCard() { var creditCardDiv =
+      document.querySelector(".card-content"); var bankName =
+      document.createElement("div"); bankName.textContent = "Cymbank Platinum";
+      bankName.className = "bank-name"; var cardNumber =
+      document.createElement("div"); cardNumber.className = "card-number";
+      cardNumber.textContent = "1234 5678 9012 3456"; var personName =
+      document.createElement("div"); personName.textContent = "Y O U R N A M E H
+      E R E"; personName.className = "person-name"; personName.id =
+      "personName"; var cardImages = document.createElement("div");
+      cardImages.className = "card-images"; var chipImage =
+      document.createElement("img"); chipImage.src = "assets/chip.png"; //
+      Replace with your chip image path chipImage.style.width = "60px"; //
+      Adjust image size chipImage.style.height = "50px"; var bankLogo =
+      document.createElement("img"); bankLogo.src = "assets/cymbal.png"; //
+      Replace with your bank logo path bankLogo.style.width = "60px"; // Adjust
+      image size bankLogo.style.height = "auto";
+      cardImages.appendChild(bankName); cardImages.appendChild(bankLogo);
+      creditCardDiv.appendChild(cardImages);
+      creditCardDiv.appendChild(chipImage);
+      creditCardDiv.appendChild(cardNumber);
+      creditCardDiv.appendChild(personName); } function transformName(name) {
+      const characters = name.toUpperCase().split(''); const transformedName =
+      characters.join(' '); return transformedName; } async function
+      fetchImageFromAPI() { document.getElementById('loader').style.display =
+      'block'; const nameInput = document.getElementById('nameInput').value; var
+      personName = document.getElementById("personName"); personName.textContent
+      = transformName(nameInput); const promptInput =
+      document.getElementById('promptInput').value; try { console.log('Fetching
+      image from API...'); const url = "{{credit_card_imagen_url}}"; const
+      headers = { 'Content-Type': 'application/json' }; const payload = {
+      "prompt": promptInput || "A dog reading the newspaper" }; const response =
+      await fetch(url, { method: 'POST', headers: headers, body:
+      JSON.stringify(payload) }); if (response.ok) { const responseData = await
+      response.json(); const image_data = responseData.base64_image; if
+      (image_data) { const imageUrl = 'data:image/png;base64,' + image_data;
+      const creditCard = document.getElementById('creditCard');
+      creditCard.style.backgroundImage = `url(${imageUrl})`;
+      creditCard.style.backgroundSize = 'cover';
+      creditCard.style.backgroundRepeat = 'no-repeat';
+      creditCard.style.backgroundPosition = 'center'; } } else {
+      console.log(`Request failed with status code: ${response.status}`); } }
+      catch (error) { console.log('Error:', error); }
+      document.getElementById('loader').style.display = 'none'; }
+    </script>
+  </body>
+
+</html>
