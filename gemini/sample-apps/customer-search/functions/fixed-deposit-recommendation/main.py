@@ -4,10 +4,9 @@ import datetime
 from os import environ
 
 import functions_framework
-from google.cloud import bigquery
-import vertexai
-from vertexai.generative_models import FinishReason, GenerativeModel, Part
-import vertexai.preview.generative_models as generative_models
+
+from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -102,37 +101,14 @@ def fixed_deposit_recommendation(request):
 
     request_json = request.get_json(silent=True)
 
-    client = bigquery.Client()
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
-    # get account balance of the user
-    query_account_balance = f"""
-    SELECT SUM(avg_monthly_bal) as total_account_balance FROM `{project_id}.DummyBankDataset.Account` where customer_id={customer_id}
-    and avg_monthly_bal is NOT NULL
-    and product IN('Savings A/C ', 'Savings Salary A/C ', 'Premium Current A/C ', 'Gold Card ', 'Platinum Card ')
-  """
+    query_handler = BigQueryHandler(customer_id=customer_id)
 
-    query_upcoming_payments = f"""
-      SELECT * FROM `{project_id}.DummyBankDataset.StandingInstructions`
-      where account_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id={customer_id}) and EXTRACT(MONTH from Next_Payment_Date) = 10 and EXTRACT(YEAR from Next_Payment_Date) = 2023 and fund_transfer_amount IS NOT NULL
-  """
-
-    # get the date of birth of the user
-    query_dob = f"""
-        SELECT date_of_birth as dob FROM `{project_id}.DummyBankDataset.Customer` where customer_id = {customer_id}
-  """
-
-    query_best_interest_rate_row = f"""
-    SELECT * FROM `{project_id}.DummyBankDataset.FdInterestRates`
-    ORDER BY rate_of_interest desc
-    LIMIT 1
-  """
-
-    result_account_balance = client.query(query_account_balance)
-    result_upcoming_payments = client.query(query_upcoming_payments)
-    result_dob = client.query(query_dob)
-    result_best_interest_rate_row = client.query(query_best_interest_rate_row)
+    result_account_balance = query_handler.query("query_account_balance")
+    result_upcoming_payments = query_handler.query("query_upcoming_payments")
+    result_dob = query_handler.query("query_dob")
+    result_best_interest_rate_row = query_handler.query("query_best_interest_rate_row")
 
     balance = 0
     is_sr_citizen = False
@@ -177,30 +153,19 @@ def fixed_deposit_recommendation(request):
 
     result = "You should invest in FD"
 
-    vertexai.init(project=project_id, location="us-central1")
-    generation_config = {
-        "max_output_tokens": 2048,
-        "temperature": 1,
-        "top_p": 1,
-    }
-    safety_settings = {
-        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    }
-    model = GenerativeModel("gemini-1.0-pro-002")
+    model = Gemini()
 
-    responses = model.generate_content(
+    response = model.generate_response(
         f"""
-    You are a chatbot for a bank application.As the user have surplus amount of {fd_amount} after setting aside for scheduled expenses
-    Format the amount in the following way
+    You are a chatbot for a bank application.As the user have surplus amount of {fd_amount}
+    after setting aside for scheduled expenses.
+    Format the amount in the following way:
     e.g. amount = 100000000 to ₹10,00,00,000.00 upto two decimal places
     Mention that the surplus amount is after setting aside for scheduled expenses
     Recommend user the option to put {rounded_fd_amount} money in Fd and
     ask user whether they would like to open an fd in Cymbal Bank.
-    Also tell the user that interest rates are best for time period from {tenure_start} to {tenure_end} and
-    the interest rate is {rate_of_interest}%.
+    Also tell the user that interest rates are best for time period from {tenure_start} to
+    {tenure_end} and the interest rate is {rate_of_interest}%.
     Write in a professional and business-neutral tone.
     Do not say Hi Hello etc.
     Do not ask to open a fd.
@@ -215,20 +180,13 @@ def fixed_deposit_recommendation(request):
     Consider putting ₹30,00,000 in an FD with Cymbal Bank.
     Interest rates are best for 1-2 years at 6.8%.
 
-    """,
-        generation_config=generation_config,
-        safety_settings=safety_settings,
-        stream=True,
+    """
     )
-
-    final_response = ""
-    for response in responses:
-        final_response += response.text
 
     res = {
         "fulfillment_response": {
             "messages": [
-                {"text": {"text": [final_response]}},
+                {"text": {"text": [response]}},
                 {"text": {"text": ["Would you like to open an FD?"]}},
             ]
         },

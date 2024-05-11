@@ -3,10 +3,10 @@
 from os import environ
 
 import functions_framework
-from google.cloud import bigquery
+
+from utils.bq_query_handler import BigQueryHandler
 
 project_id = environ.get("PROJECT_ID")
-client: bigquery.Client = bigquery.Client()
 
 
 @functions_framework.http
@@ -28,10 +28,11 @@ def debt_funds_summary(request):
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
-    if customer_id is not None:
-        print("Customer ID ", customer_id)
-    else:
-        print("Customer ID not defined")
+    query_handler = BigQueryHandler(customer_id=customer_id)
+
+    cust_id_exists, res = query_handler.validate_customer_id()
+    if not cust_id_exists:
+        return res
 
     PUBLIC_BUCKET = environ.get("PUBLIC_BUCKET")
     MARKET_SUMM_DOC = environ.get("MARKET_SUMM_DOC")

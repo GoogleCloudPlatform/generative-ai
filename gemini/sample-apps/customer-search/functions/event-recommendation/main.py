@@ -7,10 +7,11 @@ import string
 import tempfile
 
 import functions_framework
-from google.cloud import bigquery, storage
-import vertexai
-from vertexai.generative_models import GenerationConfig, GenerativeModel
+from google.cloud import storage
 from vertexai.preview.vision_models import ImageGenerationModel
+
+from utils.gemini import Gemini
+from utils.bq_query_handler import BigQueryHandler
 
 project_id = environ.get("PROJECT_ID")
 
@@ -32,16 +33,11 @@ def event_recommendation(request):
 
     request_json = request.get_json(silent=True)
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
-    bq_client = bigquery.Client()
-    query_user_affinities = f"""
-        SELECT Affinities FROM `{project_id}.DummyBankDataset.Customer`
-        WHERE customer_id = {customer_id}
-    """
-    query_event_details = """
-        SELECT * FROM `{project_id}.DummyBankDataset.CustomerEvents`
-    """
-    result_user_affinities = bq_client.query(query_user_affinities)
-    result_event_details = bq_client.query(query_event_details)
+
+    query_handler = BigQueryHandler(customer_id=customer_id)
+
+    result_user_affinities = query_handler.query("query_user_affinities")
+    result_event_details = query_handler.query("query_event_details")
 
     for row in result_user_affinities:
         if row["Affinities"] is not None:
@@ -64,15 +60,7 @@ def event_recommendation(request):
         if event_recommended is not None:
             break
 
-    vertexai.init(project=project_id, location="us-central1")
-    model = GenerativeModel("gemini-1.0-pro")
-    generation_config = GenerationConfig(
-        temperature=0.2,
-        top_p=0.95,
-        top_k=40,
-        candidate_count=1,
-        max_output_tokens=1024,
-    )
+    model = Gemini()
 
     create_image_for_invite_prompt = f"""
     You are a graphic designer and need to create prompts to generate image invite for events.
@@ -88,7 +76,9 @@ def event_recommendation(request):
     Input: Create a prompt to generate image invite for a golfing event called Golf Day.
     Output: Art style: Realistic with a touch of impressionism
     Viewpoint: Bird's eye view
-    Framing: Close-up on a lush green golf course, with rolling hills, manicured fairways, and sparkling bunkers. The sun is setting in the background, casting a warm glow over the scene.
+    Framing: Close-up on a lush green golf course, with rolling hills, manicured fairways,
+    and sparkling bunkers. The sun is setting in the background,
+    casting a warm glow over the scene.
     Color scheme: Shades of green, gold, and orange
 
     Additional details:
@@ -105,13 +95,16 @@ def event_recommendation(request):
     The image should be high-resolution and visually appealing
     Overall impression:
 
-    The image should convey a sense of elegance, sophistication, and excitement. It should be inviting and encourage viewers to learn more about the Golf Day event.
+    The image should convey a sense of elegance, sophistication, and excitement.
+    It should be inviting and encourage viewers to learn more about the Golf Day event.
 
 
-    Input: Create a prompt to generate invite image for a Party event called DJ-Night . Do not include humans in the image.
+    Input: Create a prompt to generate invite image for a Party event called DJ-Night .
+    Do not include humans in the image.
     Output: Art style: Abstract, geometric shapes with vibrant colors
     Viewpoint: Looking up at the DJ booth from the dance floor
-    Framing: Close-up of the DJ booth, with the DJ and their equipment in the center of the frame. The dance floor and crowd are visible in the background.
+    Framing: Close-up of the DJ booth, with the DJ and their equipment in the center of the frame.
+    The dance floor and crowd are visible in the background.
     Lighting: Dark and moody, with spotlights focused on the DJ and the dance floor.
     Color scheme: Neon colors, with a focus on blues and purples.
     Additional details:
@@ -127,21 +120,21 @@ def event_recommendation(request):
     The image should be high-resolution and visually appealing
     Overall impression:
 
-    The image should convey a sense of excitement, energy, and fun. It should be inviting and encourage viewers to come to the DJ-Night event.
+    The image should convey a sense of excitement, energy, and fun.
+    It should be inviting and encourage viewers to come to the DJ-Night event.
 
 
-    Create a prompt to generate invite image for a {event_recommended["event_name_"]} event called {event_recommended["event_type"]} . Do not include humans in the image.
+    Create a prompt to generate invite image for a {event_recommended["event_name_"]} event
+    called {event_recommended["event_type"]} .
+    
+    Do not include humans in the image.
     """
 
-    response = model.generate_content(
-        create_image_for_invite_prompt,
-        generation_config=generation_config,
-        stream=False,
-    )
+    response = model.generate_response(create_image_for_invite_prompt)
 
-    model = ImageGenerationModel.from_pretrained("imagegeneration@002")
-    response = model.generate_images(
-        prompt=response.text,
+    imagen_model = ImageGenerationModel.from_pretrained("imagegeneration@002")
+    response = imagen_model.generate_images(
+        prompt=response,
         # Optional:
         number_of_images=1,
         seed=0,
@@ -173,7 +166,10 @@ def event_recommendation(request):
     rawUrl = "https://storage.googleapis.com/" + output_bucket + "/" + image_file_name
 
     invite_generation_prompt = f"""
-    You are CymBuddy , a chatbot of Cymbal Bank. You need to recommend an event to the user because their account status is healthy. The user's interests are {user_affinities}. You choose to recommend the following event because the event tags matched one or more of the user's interests:
+    You are CymBuddy , a chatbot of Cymbal Bank. You need to recommend an event to the user
+    because their account status is healthy. The user's interests are {user_affinities}.
+    You choose to recommend the following event because the event tags matched
+    one or more of the user's interests:
     Event name: {event_recommended["event_name_"]}
     event date: {event_recommended["event_date_"]}
     event type: {event_recommended["event_type"]}
@@ -181,12 +177,16 @@ def event_recommendation(request):
     location: {event_recommended["location"]}
     last date to register: {event_recommended["last_date_of_invite_"]}
 
-    Create a message inviting the user to the event.  The tone should be friendly and conversational. Do not greet the user, that is, do not say hi or hey.
+    Create a message inviting the user to the event.
+    The tone should be friendly and conversational.
+    Do not greet the user, that is, do not say hi or hey.
 
     Example:
-    You are CymBuddy , a chatbot of Cymbal Bank. You need to recommend an event to the user because their account status is healthy.
+    You are CymBuddy , a chatbot of Cymbal Bank.
+    You need to recommend an event to the user because their account status is healthy.
     The user's interests are Classical Music, Golf, Hiking, Real Estate.
-    You choose to recommend the following event because the event tags matched one or more of the user's interests:
+    You choose to recommend the following event because the event tags matched
+    one or more of the user's interests:
     Event name: Golf Day
     event date: 2023-10-31
     event tags: Golf, Networking
@@ -197,16 +197,17 @@ def event_recommendation(request):
 
     Heads up, golf enthusiast! ⛳️
 
-    We noticed you're a fan of the green, so we thought you might be interested in the upcoming Golf Day event on October 31st at Golfshire.
+    We noticed you're a fan of the green, so we thought you might be interested
+    in the upcoming Golf Day event on October 31st at Golfshire.
 
-    It's a great opportunity to network with other golf aficionados and enjoy a day of friendly competition. Plus, there'll be plenty of opportunities to learn from experts and improve your game.
+    It's a great opportunity to network with other golf aficionados and enjoy a
+    day of friendly competition. Plus, there'll be plenty of opportunities to
+    learn from experts and improve your game.
 
     Registration closes on October 21st, so don't miss out! 🏌️‍♀️🏌️‍♂️
 
     """
-    response2 = model.generate_content(
-        invite_generation_prompt, generation_config=generation_config, stream=False
-    )
+    response2 = model.generate_response(invite_generation_prompt)
 
     custom_payload = {
         "payload": {
@@ -215,7 +216,7 @@ def event_recommendation(request):
                     {
                         "type": "image",
                         "rawUrl": rawUrl,
-                        "accessibilityText": response2.text,
+                        "accessibilityText": response2,
                     }
                 ]
             ]
@@ -224,7 +225,7 @@ def event_recommendation(request):
 
     invitation = {
         "text": {
-            "text": [response2.text],
+            "text": [response2],
         }
     }
     res = {"fulfillment_response": {"messages": [invitation, custom_payload]}}

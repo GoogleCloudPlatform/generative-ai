@@ -9,8 +9,8 @@ from google.cloud import bigquery, storage
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
-import vertexai
-from vertexai.generative_models import GenerationConfig, GenerativeModel
+
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 public_bucket = environ.get("PUBLIC_BUCKET")
@@ -231,15 +231,7 @@ def expense_prediction(request):
             + f"Total predicted expenses in {k}: {total_expenditure[k]}"
         )
 
-    vertexai.init(project=project_id, location="us-central1")
-    model = GenerativeModel("gemini-1.0-pro")
-    generation_config = GenerationConfig(
-        temperature=0.2,
-        top_p=0.95,
-        top_k=40,
-        candidate_count=1,
-        max_output_tokens=1024,
-    )
+    model = Gemini()
 
     summarize_expense_prediction_prompt = f"""
     You are a financial analyst and you need to summarize the predicted expenses of the customer.
@@ -288,13 +280,9 @@ def expense_prediction(request):
     Output:
     "
     """
-    response = model.generate_content(
-        summarize_expense_prediction_prompt,
-        generation_config=generation_config,
-        stream=False,
-    )
+    response = model.generate_response(summarize_expense_prediction_prompt)
 
-    transaction_list_str = response.text
+    transaction_list_str = response
     transaction_list = transaction_list_str.split("*")
     if len(transaction_list) == 1:
         transaction_list = transaction_list_str.split("-")
@@ -303,7 +291,9 @@ def expense_prediction(request):
     # 2023-09-30
     query_upcoming_payments = f"""
         SELECT * FROM `{project_id}.DummyBankDataset.StandingInstructions`
-        where account_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id={customer_id}) and Next_Payment_Date < '2023-12-31' and fund_transfer_amount IS NOT NULL
+        where account_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account`
+        where customer_id={customer_id}) and Next_Payment_Date < '2023-12-31'
+        and fund_transfer_amount IS NOT NULL
     """
     result_upcoming_payments = client.query(query_upcoming_payments)
     payment_list_str = ""
@@ -321,9 +311,7 @@ def expense_prediction(request):
 
 
     """
-    response2 = model.generate_content(
-        format_date_prompt, generation_config=generation_config, stream=False
-    )
+    response2 = model.generate_response(format_date_prompt)
 
     # create a graph out of the data
     rawUrl = create_graph(amount, category, date, customer_id)
@@ -346,12 +334,12 @@ def expense_prediction(request):
                     ]
                 }
             },
-            {"text": {"text": [response.text]}},
+            {"text": {"text": [response]}},
             {
                 "text": {
                     "text": [
                         "Just a friendly reminder that your upcoming payments"
-                        " are due soon:\n" + response2.text
+                        " are due soon:\n" + response2
                     ]
                 }
             },
@@ -374,7 +362,7 @@ def expense_prediction(request):
                     ]
                 }
             },
-            {"text": {"text": [response.text]}},
+            {"text": {"text": [response]}},
         ]
 
     res = {"fulfillment_response": {"messages": custom_payload}}

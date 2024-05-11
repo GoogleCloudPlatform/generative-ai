@@ -84,14 +84,10 @@ def ask_fd_tenure(request):
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
     # verifying that the customer is valid and exists in our database or not
-    if customer_id is not None:
-        print("Customer ID ", customer_id)
-    else:
-        print("Customer ID not defined")
-
     query_check_cust_id = f"""
-      SELECT EXISTS(SELECT * FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id}) as check
-  """
+      SELECT EXISTS(SELECT * FROM `{project_id}.DummyBankDataset.Account`
+      where customer_id = {customer_id}) as check
+    """
     result_query_check_cust_id = client.query(query_check_cust_id)
     for row in result_query_check_cust_id:
         if row["check"] == 0:
@@ -113,14 +109,15 @@ def ask_fd_tenure(request):
 
     # get the date of birth of the user
     query_dob = f"""
-        SELECT date_of_birth as dob FROM `{project_id}.DummyBankDataset.Customer` where customer_id = {customer_id}
-  """
+        SELECT date_of_birth as dob FROM `{project_id}.DummyBankDataset.Customer`
+        where customer_id = {customer_id}
+    """
 
     query_best_interest_rate_row = f"""
     SELECT * FROM `{project_id}.DummyBankDataset.FdInterestRates`
     ORDER BY rate_of_interest desc
     LIMIT 1
-  """
+    """
 
     result_dob = client.query(query_dob)
     result_best_interest_rate_row = client.query(query_best_interest_rate_row)

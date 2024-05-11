@@ -64,8 +64,6 @@ def user_login(
         print(row["customer_id"])
         res = {"cust_id": row["customer_id"], "name": row["First_Name"]}
 
-    print(res)
-
     # Set the CORS headers for the response
     headers = {"Access-Control-Allow-Origin": "*"}
 

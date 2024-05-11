@@ -8,9 +8,9 @@ import re
 
 import functions_framework
 from google.cloud import bigquery
-import vertexai
-from vertexai.generative_models import FinishReason, GenerativeModel, Part
-import vertexai.preview.generative_models as generative_models
+
+from utils.gemini import Gemini
+from utils.bq_query_handler import BigQueryHandler
 
 project_id = environ.get("PROJECT_ID")
 
@@ -100,7 +100,8 @@ def get_interest_rate(is_sr_citizen, number_of_days):
         person = "rate_of_interest_sr_citizen"
 
     query_interest_rate = f"""
-    SELECT {person} as rate_of_interest FROM `{project_id}.DummyBankDataset.FdInterestRates` where bucket_start_days < {number_of_days}
+    SELECT {person} as rate_of_interest FROM `{project_id}.DummyBankDataset.FdInterestRates`
+    where bucket_start_days < {number_of_days}
     order by bucket_start_days desc limit 1
   """
 
@@ -137,40 +138,15 @@ def create_fixed_deposit(request):
     fd_tenure = request_json["sessionInfo"]["parameters"]["fd_tenure"]
     user_name = request_json["sessionInfo"]["parameters"]["name"]
 
-    # verifying that the customer is valid and exists in our database or not
-    if customer_id is not None:
-        print("Customer ID ", customer_id)
-    else:
-        print("Customer ID not defined")
+    query_handler = BigQueryHandler(customer_id=customer_id)
 
-    query_check_cust_id = f"""
-      SELECT EXISTS(SELECT * FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id}) as check
-  """
-    result_query_check_cust_id = client.query(query_check_cust_id)
-    for row in result_query_check_cust_id:
-        if row["check"] == 0:
-            res = {
-                "fulfillment_response": {
-                    "messages": [
-                        {
-                            "text": {
-                                "text": [
-                                    "It seems you have entered an incorrect"
-                                    " Customer ID. Please try again."
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-            return res
+    # verifying that the customer is valid and exists in our database or not
+    cust_id_exists, res = query_handler.validate_customer_id()
+    if not cust_id_exists:
+        return res
 
     # get the date of birth of the user
-    query_dob = f"""
-    SELECT date_of_birth as dob FROM `{project_id}.DummyBankDataset.Customer` where customer_id = {customer_id}
-  """
-
-    result_dob = client.query(query_dob)
+    result_dob = query_handler.query("query_dob")
 
     is_sr_citizen = False
 
@@ -184,44 +160,31 @@ def create_fixed_deposit(request):
     present_date = present_date.isoformat()
     interest_rate = get_interest_rate(is_sr_citizen, number_of_days)
 
-    vertexai.init(project=project_id, location="us-central1")
-    generation_config = {
-        "max_output_tokens": 2048,
-        "temperature": 1,
-        "top_p": 1,
-    }
-    safety_settings = {
-        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    }
-    model = model = GenerativeModel("gemini-1.0-pro-002")
+    model = Gemini()
 
-    responses = model.generate_content(
+    response = model.generate_response(
         f"""Generate a confirmation message on creating a fd.
     The user name is {user_name}
     The amount is {fd_amount}
     The tenure is {fd_tenure}
     The interest rate is {interest_rate} .
-    The order should be amount then tenure then interest rate and these things should be in bullet points.
+    The order should be amount then tenure then interest rate and these things
+    should be in bullet points.
     The bank name is Cymbal Bank.
     The amount should be in the format ₹1,20,312.15 instead of 120312.15
     Do not show maturity date and maturity amount.
     The output should be within 40 words. Use emojis.
-    """,
-        generation_config=generation_config,
-        safety_settings=safety_settings,
-        stream=True,
+    """
     )
 
-    body = model.predict(
-        """Generate a confirmation email on creating a fd.
+    body = model.generate_response(
+        f"""Generate a confirmation email on creating a fd.
     The user name is {user_name}
     The amount is {fd_amount}
     The tenure is {fd_tenure}
     The interest rate is {interest_rate} .
-    The order should be amount then tenure then interest rate and these things should be in bullet points.
+    The order should be amount then tenure then interest rate and these things
+    should be in bullet points.
     The bank name is Cymbal Bank.
     The amount should be in the format ₹1,20,312.15 instead of 120312.15
     Do not show maturity date and maturity amount.
@@ -231,13 +194,15 @@ def create_fixed_deposit(request):
 
     Dear Ayushi,
 
-    Thank you for choosing Cymbal Bank for your fixed deposit. Your fixed deposit has been successfully created. Here are the details of your fixed deposit:
+    Thank you for choosing Cymbal Bank for your fixed deposit.
+    Your fixed deposit has been successfully created. Here are the details of your fixed deposit:
 
     - Amount: ₹30,00,000
     - Tenure: 2 years
     - Interest Rate: 6.8%
 
-    Please note that the maturity date and maturity amount will be communicated to you in a separate email.
+    Please note that the maturity date and maturity amount will be
+    communicated to you in a separate email.
 
     If you have any questions or concerns, please do not hesitate to contact us.
 
@@ -246,25 +211,18 @@ def create_fixed_deposit(request):
     Sincerely,
     Cymbal Bank
 
-    """,
-        generation_config=generation_config,
-        safety_settings=safety_settings,
-        stream=True,
+    """
     )
 
     subject = "Fixed Deposit Confirmation - Cymbal Bank"
 
-    final_response = ""
-    for response in responses:
-        final_response += response.text
-
     res = {
-        "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
+        "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
         "sessionInfo": {
             "parameters": {
                 "fd_amount": fd_amount,
                 "subject": subject,
-                "body": body.text,
+                "body": body,
             }
         },
     }

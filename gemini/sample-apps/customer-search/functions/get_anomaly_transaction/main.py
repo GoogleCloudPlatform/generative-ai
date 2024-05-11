@@ -29,11 +29,6 @@ def transaction_anomaly_detection(request):
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
-    if customer_id is not None:
-        print("Customer ID ", customer_id)
-    else:
-        print("Customer ID not defined")
-
     query_account_balance = f"""
     CREATE OR REPLACE TABLE DummyBankDataset.RuntimeTableForAnomaly AS (
     SELECT * FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE

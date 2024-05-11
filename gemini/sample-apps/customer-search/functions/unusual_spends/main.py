@@ -33,11 +33,6 @@ def detect_unusual_transactions(
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
     # Check if the customer ID is present
-    if customer_id is not None:
-        print("Customer ID ", customer_id)
-    else:
-        print("Customer ID not defined")
-
     # Query BigQuery to get the unusual transactions for the customer
     query_unusual_transactions = f"""SELECT
   *

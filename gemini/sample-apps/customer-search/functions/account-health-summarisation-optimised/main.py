@@ -1,74 +1,14 @@
 # pylint: disable=E0401
 
-from concurrent.futures import ThreadPoolExecutor
 from os import environ
 from typing import Dict
 
 import functions_framework
-from google.cloud import bigquery, storage
-import vertexai
-from vertexai.generative_models import FinishReason, GenerativeModel, Part
-import vertexai.preview.generative_models as generative_models
+from google.cloud import bigquery
 
-client: bigquery.Client = bigquery.Client()
-
-
-def run(name: str, statement: str) -> tuple[str, bigquery.table.RowIterator]:
-    """
-    Runs a BigQuery query and returns the name of the query and the result iterator.
-
-    Args:
-        name (str): The name of the query.
-        statement (str): The BigQuery query statement.
-
-    Returns:
-        A tuple containing the name of the query and the result iterator.
-    """
-
-    return name, client.query(statement).result()  # blocks the thread
-
-
-def run_all(statements: Dict[str, str]) -> Dict[str, bigquery.table.RowIterator]:
-    """
-    Runs multiple BigQuery queries in parallel and returns a dictionary of the results.
-
-    Args:
-        statements (Dict[str, str]): A dictionary of query names and statements.
-
-    Returns:
-        A dictionary of query names and result iterators.
-    """
-
-    with ThreadPoolExecutor() as executor:
-        jobs = []
-        for name, statement in statements.items():
-            jobs.append(executor.submit(run, name, statement))
-        result = dict([job.result() for job in jobs])
-    return result
-
-
-def upload_blob(
-    bucket_name: str, source_file_name: str, destination_blob_name: str
-) -> str:
-    """
-    Uploads a file to a Google Cloud Storage bucket.
-
-    Args:
-        bucket_name (str): The name of the bucket to upload the file to.
-        source_file_name (str): The name of the file to upload.
-        destination_blob_name (str): The name of the blob to create in the bucket.
-
-    Returns:
-        The public URL of the uploaded file.
-    """
-
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_string(source_file_name)
-    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
-    return blob.public_url
+from utils.multithreading import run_all
+from utils.gemini import Gemini
+from utils.bq_query_handler import BigQueryHandler
 
 
 def get_financial_details(
@@ -109,112 +49,30 @@ def account_health_summary(request):
 
     request_json = request.get_json(silent=True)
 
-    client = bigquery.Client()
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
-    if customer_id is not None:
-        print("Customer ID ", customer_id)
-    else:
-        print("Customer ID not defined")
-
     project_id = environ.get("PROJECT_ID")
-    query_check_cust_id = f"""
-        SELECT EXISTS(SELECT * FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id}) as check
-    """
-    result_query_check_cust_id = client.query(query_check_cust_id)
-    for row in result_query_check_cust_id:
-        if row["check"] == 0:
-            res = {
-                "fulfillment_response": {
-                    "messages": [
-                        {
-                            "text": {
-                                "text": [
-                                    "It seems you have entered an incorrect"
-                                    " Customer ID. Please try again."
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-            return res
 
-    query_assets = f"""
-        SELECT sum(avg_monthly_bal) as asset FROM `{project_id}.DummyBankDataset.Account`
-        where customer_id = {customer_id} and product in ('Savings A/C ', 'Savings Salary A/C ', 'Premium Current A/C ', 'Fixed Deposit', 'Flexi Deposit');
-    """
+    query_handler = BigQueryHandler(customer_id=customer_id)
 
-    query_avg_monthly_balance = f"""
-        SELECT sum(avg_monthly_bal) as avg_monthly_balance FROM `{project_id}.DummyBankDataset.Account`
-        where customer_id = {customer_id} and product in ('Savings A/C ', 'Savings Salary A/C ', 'Premium Current A/C ');
-    """
+    cust_id_exists, res = query_handler.validate_customer_id()
+    if not cust_id_exists:
+        return res
 
-    query_fd = f"""
-        SELECT sum(avg_monthly_bal) as asset FROM `{project_id}.DummyBankDataset.Account`
-        where customer_id = {customer_id} and product = 'Fixed Deposit';
-    """
-
-    query_total_mf = f"""
-        SELECT SUM(amount_invested) as total_mf_investment FROM `DummyBankDataset.MutualFundAccountHolding` where account_no in (
-            select account_id from `DummyBankDataset.Account` where customer_id = {customer_id}
-        );
-    """
-
-    query_high_risk_mf = f"""
-        select SUM(amount_invested) as total_high_risk_investment from `DummyBankDataset.MutualFundAccountHolding` where risk_category > 4 and account_no in (
-            select account_id from `DummyBankDataset.Account` where customer_id = {customer_id}
-        )
-    """
-
-    query_debts = f"""
-        SELECT sum(avg_monthly_bal) as debt FROM `{project_id}.DummyBankDataset.Account`
-        where customer_id = {customer_id} and product in ('Gold Card','Medical Insurance','Premium Travel Card','Platinum Card','Personal Loan','Vehicle Loan','Consumer Durables Loan','Broking A/C');
-    """
-
-    query_account_details = f"""
-        SELECT * FROM `{project_id}.DummyBankDataset.Account`
-        WHERE customer_id = {customer_id}
-    """
-
-    query_user_details = f"""
-        SELECT * FROM `{project_id}.DummyBankDataset.Customer`
-        WHERE customer_id = {customer_id}
-    """
-
-    query_average_monthly_expense = f"""SELECT AVG(total_amount) as average_monthly_expense from (
-        SELECT EXTRACT(MONTH FROM 	date) AS month,
-        SUM(transaction_amount) AS total_amount FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id})
-        GROUP BY month
-        ORDER BY month)
-    """
-
-    query_last_month_expense = f"""SELECT EXTRACT(MONTH FROM date) AS month,
-    SUM(transaction_amount) AS last_month_expense FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id={customer_id}) and EXTRACT(MONTH FROM date)=9
-    GROUP BY month
-    ORDER BY month;
-    """
-
-    query_investment_returns = f"""
-        SELECT (amount_invested*one_month_return) as one_month_return, (amount_invested*TTM_Return) as TTM_Return,Scheme_Name from `{project_id}.DummyBankDataset.MutualFundAccountHolding`
-        where account_no in (Select account_id from `{project_id}.DummyBankDataset.Account` where customer_id={customer_id})
-    """
-
-    res = run_all(
-        {
-            "query_assets": query_assets,
-            "query_debts": query_debts,
-            "query_account_details": query_account_details,
-            "query_user_details": query_user_details,
-            "query_fd": query_fd,
-            "query_total_mf": query_total_mf,
-            "query_high_risk_mf": query_high_risk_mf,
-            "query_avg_monthly_balance": query_avg_monthly_balance,
-            "query_average_monthly_expense": query_average_monthly_expense,
-            "query_last_month_expense": query_last_month_expense,
-            "query_investment_returns": query_investment_returns,
-        }
+    res = query_handler.run_all(
+        [
+            "query_assets",
+            "query_debts",
+            "query_account_details",
+            "query_user_details",
+            "query_fd",
+            "query_total_mf",
+            "query_high_risk_mf",
+            "query_avg_monthly_balance",
+            "query_average_monthly_expense",
+            "query_last_month_expense",
+            "query_investment_returns",
+        ]
     )
 
     scheme_name = []
@@ -241,14 +99,6 @@ def account_health_summary(request):
     )
     amount_transfered = ""
     account_status = ""
-    average_monthly_expense = get_financial_details(
-        query_str="query_average_monthly_expense",
-        value_str="average_monthly_expense",
-        res=res,
-    )
-    last_month_expense = get_financial_details(
-        query_str="query_last_month_expense", value_str="last_month_expense", res=res
-    )
     user_accounts = []
 
     for row in res["query_user_details"]:
@@ -327,21 +177,9 @@ def account_health_summary(request):
     else:
         account_status = "Concerning"
 
-    vertexai.init(project=project_id, location="us-central1")
-    generation_config = {
-        "max_output_tokens": 2048,
-        "temperature": 1,
-        "top_p": 1,
-    }
-    safety_settings = {
-        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    }
-    model = model = GenerativeModel("gemini-1.0-pro-002")
-    responses = model.generate_content(
-        f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
+    model = Gemini()
+
+    gemini_prompt =  f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
     You are provided with name, total income, total expenditure, total asset amount, total debt amount, total investment amount, high risk investments for the user in the following lines.
     {first_name},
     {total_income},
@@ -374,20 +212,12 @@ def account_health_summary(request):
     One_Month_Return and TTM_Return store the amounts in Indian currency, i.e., ₹.
     If Total Investment is greater than 0: the following details must be mentioned in a uniformly formatted table:
     For each element in Scheme_Name: mention the respective one month from One_Month_Return in ₹ and trailing twelve month returns from TTM_Return in ₹ in the table.
-    """,
-        generation_config=generation_config,
-        safety_settings=safety_settings,
-        stream=True,
-    )
+    """
 
-    final_response = ""
-    for response in responses:
-        final_response += response.text
-
-    print(f"Response from Model: {final_response}")
+    response = model.generate_response(gemini_prompt)
 
     res = {
-        "fulfillment_response": {"messages": [{"text": {"text": [final_response]}}]},
+        "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
         "sessionInfo": {
             "parameters": {
                 "account_status": account_status,

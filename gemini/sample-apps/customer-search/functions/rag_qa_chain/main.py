@@ -325,13 +325,17 @@ def qa_over_website(request):
         },
     )
 
-    prompt_template = """SYSTEM: You are an intelligent assistant helping the users of Cymbal Bank with their questions on services offered by the bank.
+    prompt_template = """SYSTEM: You are an intelligent assistant helping the users of
+    Cymbal Bank with their questions on services offered by the bank.
 
     Question: {question}
 
-    Strictly Use ONLY the following pieces of context to answer the question at the end. Think step-by-step and then answer. Give a detailed and elaborate answer.
+    Strictly Use ONLY the following pieces of context to answer the question at the end.
+    Think step-by-step and then answer.
+    Give a detailed and elaborate answer.
     Do not try to make up an answer:
-    - If the answer to the question cannot be determined from the context alone, say "I cannot determine the answer to that."
+    - If the answer to the question cannot be determined from the context alone,
+    say "I cannot determine the answer to that."
     - If the context is empty, just say "I do not know the answer to that."
 
     =============

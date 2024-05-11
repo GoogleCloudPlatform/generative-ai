@@ -6,9 +6,9 @@ import random
 
 import functions_framework
 from google.cloud import bigquery
-import vertexai
-from vertexai.generative_models import GenerativeModel
-import vertexai.preview.generative_models as generative_models
+
+from utils.gemini import Gemini
+from utils.bq_query_handler import BigQueryHandler
 
 project_id = environ.get("PROJECT_ID")
 
@@ -38,36 +38,11 @@ def get_credit_card(
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     credit_card = request_json["sessionInfo"]["parameters"]["credit_card"]
 
-    # Check if the customer ID is valid
-    if customer_id is not None:
-        print("Customer ID ", customer_id)
-    else:
-        print("Customer ID not defined")
+    query_handler = BigQueryHandler(customer_id=customer_id)
 
-    # Query BigQuery to check if the customer ID exists
-    query_check_cust_id = f"""
-        SELECT EXISTS(SELECT * FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id}) as check
-    """
-    result_query_check_cust_id = client.query(query_check_cust_id)
-    # Iterate over the query results
-    for row in result_query_check_cust_id:
-        # If the customer ID does not exist, return an error message
-        if row["check"] == 0:
-            res = {
-                "fulfillment_response": {
-                    "messages": [
-                        {
-                            "text": {
-                                "text": [
-                                    "It seems you have entered an incorrect"
-                                    " Customer ID. Please try again."
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-            return res
+    cust_id_exists, res = query_handler.validate_customer_id()
+    if not cust_id_exists:
+        return res
 
     # Generate a random credit card number
     card_number = random.randint(100000000000, 999999999999)
@@ -91,7 +66,7 @@ def get_credit_card(
         count = row["count"]
     # If the credit card does not exist, insert it into the database
     if count == 0:
-        table_id = "{project_id}.DummyBankDataset.CreditCards"
+        table_id = f"{project_id}.DummyBankDataset.CreditCards"
         row = [
             {
                 "customer_id": customer_id,
@@ -112,24 +87,10 @@ def get_credit_card(
             """
         client.query(query_update_credit_card)
 
-    # Initialize the Vertex AI client library
-    vertexai.init(project=project_id, location="us-central1")
-    # Set the model parameters
-    generation_config = {
-        "max_output_tokens": 2048,
-        "temperature": 1,
-        "top_p": 1,
-    }
-    safety_settings = {
-        generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    }
     # Load gemini model
-    model = GenerativeModel("gemini-1.0-pro-002")
+    model = Gemini()
     # Generate the model response
-    response = model.generate_content(
+    response = model.generate_response(
         """
         You are a chatbot for a bank application.
         Tell the user that thier response has been recorded and they will recieve the credit card in next few days.
@@ -140,20 +101,13 @@ def get_credit_card(
         The message comes in middle of conversation so don't greet the user with Hello/Hi.
         The message should be in a conversation-like manner.
         The message should be in second person's perespective tone.
-    """,
-        generation_config=generation_config,
-        safety_settings=safety_settings,
-        stream=True,
+    """
     )
-
-    final_response = ""
-    for response in response:
-        final_response += response.text
 
     # Set the response message
     res = {
         "fulfillment_response": {
-            "messages": [{"text": {"text": [final_response.text]}}]
+            "messages": [{"text": {"text": [response]}}]
         }
     }
 

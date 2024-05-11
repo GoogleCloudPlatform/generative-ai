@@ -8,10 +8,11 @@ import tempfile
 
 from PIL import Image
 import functions_framework
-from google.cloud import bigquery, storage
-import vertexai
-from vertexai.generative_models import GenerationConfig, GenerativeModel
+from google.cloud import storage
 from vertexai.preview.vision_models import ImageGenerationModel
+
+from utils.gemini import Gemini
+from utils.bq_query_handler import BigQueryHandler
 
 project_id = environ.get("PROJECT_ID")
 
@@ -39,12 +40,9 @@ def travel_event_recommendation(request):
     start_date = request_json["sessionInfo"]["parameters"]["start_date"]
     end_date = request_json["sessionInfo"]["parameters"]["end_date"]
 
-    bq_client = bigquery.Client()
-    query_user_affinities = f"""
-        SELECT Affinities FROM `{project_id}.DummyBankDataset.Customer`
-        WHERE customer_id = {customer_id}
-    """
-    result_user_affinities = bq_client.query(query_user_affinities)
+    query_handler = BigQueryHandler(customer_id=customer_id)
+
+    result_user_affinities = query_handler.query("query_user_affinities")
 
     for row in result_user_affinities:
         if row["Affinities"] is not None:
@@ -52,15 +50,7 @@ def travel_event_recommendation(request):
     for i in range(len(user_affinities)):
         user_affinities[i] = user_affinities[i].lower().strip()
 
-    vertexai.init(project=project_id, location="us-central1")
-    model = GenerativeModel("gemini-1.0-pro")
-    generation_config = GenerationConfig(
-        temperature=0.2,
-        top_p=0.95,
-        top_k=40,
-        candidate_count=1,
-        max_output_tokens=1024,
-    )
+    model = Gemini()
 
     trip_event_recommendation_prompt = f"""
 You are CymBuddy, a bot for Cymbal Bank. You need to recommend an event to the user based on their interests which they can enjoy on their upcoming trip.
@@ -121,11 +111,7 @@ Output:
 
     """
 
-    response = model.generate_content(
-        trip_event_recommendation_prompt,
-        generation_config=generation_config,
-        stream=False,
-    )
+    response = model.generate_response(trip_event_recommendation_prompt)
 
     find_event_type_prompt = f"""
     What is the type of event in the following invite?
@@ -202,14 +188,12 @@ Your Cymbal Bank card gets you 2-for-1 tickets.
     Ouput: Orchestra
 
     Input:
-     {response.text}
+     {response}
 
      Output:
 
     """
-    response2 = model.generate_content(
-        find_event_type_prompt, generation_config=generation_config, stream=False
-    )
+    response2 = model.generate_response(find_event_type_prompt)
 
     create_image_for_invite_prompt = f"""
     You are a graphic designer and need to create prompts to generate image invite for events.
@@ -244,19 +228,15 @@ Your Cymbal Bank card gets you 2-for-1 tickets.
     Input:Create a prompt to generate invite image for a Opera event. There should be no humans in the image.
 Output: Art style: Surrealism Viewpoint: Aerial view Framing: A view of an opera house from above, with the stage and orchestra pit in the foreground. The audience is represented by a sea of empty seats. Color scheme: Dark and moody, with pops of color from the stage lights.  Additional details:  A spotlight shining down on the empty stage A grand piano on the stage A conductor's podium in front of the orchestra pit Rows of empty seats in the audience A chandelier hanging from the ceiling Mobile optimization: The focal point of the image should be placed in the center of the frame The image should be high-resolution and visually appealing
 
-    Input: Create a prompt to generate invite image for a {response2.text} event. There should be no humans in the image.
+    Input: Create a prompt to generate invite image for a {response2} event. There should be no humans in the image.
     Output:
     """
 
-    response3 = model.generate_content(
-        create_image_for_invite_prompt,
-        generation_config=generation_config,
-        stream=False,
-    )
+    response3 = model.generate_response(create_image_for_invite_prompt)
 
     model = ImageGenerationModel.from_pretrained("imagegeneration@005")
     response = model.generate_images(
-        prompt=response3.text,
+        prompt=response3,
         # Optional:
         negative_prompt="""3D
 absent limbs
@@ -401,7 +381,7 @@ weird colors""",
                     {
                         "type": "image",
                         "rawUrl": rawUrl,
-                        "accessibilityText": response2.text,
+                        "accessibilityText": response2,
                         "df-messenger-image-border-radius": 5,
                     }
                 ]
@@ -410,7 +390,7 @@ weird colors""",
     }
     invitation = {
         "text": {
-            "text": [response2.text],
+            "text": [response2],
         }
     }
     res = {"fulfillment_response": {"messages": [invitation, custom_payload]}}

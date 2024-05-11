@@ -58,8 +58,6 @@ def validate_fd_tenure(
 
     request_json = request.get_json(silent=True)
 
-    print(request_json["sessionInfo"]["parameters"])
-
     fd_tenure = request_json["sessionInfo"]["parameters"]["fd_tenure"]
     number_of_days = get_number_of_days(fd_tenure)
 
