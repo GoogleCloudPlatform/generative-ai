@@ -53,10 +53,7 @@ def ask_travel_dates(request):
                 "messages": [
                     {
                         "text": {
-                            "text": [
-                                "Please enter two dates for the start and end of"
-                                " travel"
-                            ]
+                            "text": ["Please enter two dates for the start and end of travel"]
                         }
                     }
                 ]

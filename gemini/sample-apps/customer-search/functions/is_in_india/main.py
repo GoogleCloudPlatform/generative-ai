@@ -41,10 +41,7 @@ def check_is_city_in_india(request):
                 "messages": [
                     {
                         "text": {
-                            "text": [
-                                "Please enter the city or country you are"
-                                " travelling to"
-                            ]
+                            "text": ["Please enter the city or country you are" " travelling to"]
                         }
                     }
                 ]

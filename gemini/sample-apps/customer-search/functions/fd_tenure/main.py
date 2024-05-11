@@ -151,10 +151,7 @@ def ask_fd_tenure(request):
     print(tenure_start)
     print(tenure_end)
 
-    query = (
-        "What should be the tenure of your FD? \n We provide FD from 7 days to"
-        " 10 years."
-    )
+    query = "What should be the tenure of your FD? \n We provide FD from 7 days to 10 years."
 
     res = {
         "fulfillment_response": {

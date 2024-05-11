@@ -39,8 +39,7 @@ def return_of_investment(request):
         Scheme_Name.append(row["Scheme_Name"])
         six_month_return.append(row["six_month_return"])
         investment_list_str = (
-            investment_list_str
-            + f",₹ {row['six_month_return']} in {row['Scheme_Name']}"
+            investment_list_str + f",₹ {row['six_month_return']} in {row['Scheme_Name']}"
         )
 
     investment_list_str = investment_list_str[1:]

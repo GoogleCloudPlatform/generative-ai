@@ -94,8 +94,7 @@ def account_balance(request):
                         {
                             "text": {
                                 "text": [
-                                    "Your funds are on vacation, but your"
-                                    " bills never take one."
+                                    "Your funds are on vacation, but your bills never take one."
                                 ]
                             }
                         },

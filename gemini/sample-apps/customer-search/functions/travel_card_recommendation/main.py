@@ -42,10 +42,7 @@ def get_ac_health_status(
     ):
         account_status = "Healthy"
     elif (
-        (
-            total_expenditure >= 0.75 * total_income
-            and total_expenditure < 0.9 * total_income
-        )
+        (total_expenditure >= 0.75 * total_income and total_expenditure < 0.9 * total_income)
         or (asset_amount < 0.2 * total_income and asset_amount > 0.1 * total_income)
         or (debt_amount >= 0.3 * asset_amount and debt_amount < 0.75 * asset_amount)
         or (

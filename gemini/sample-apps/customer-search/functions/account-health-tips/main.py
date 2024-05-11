@@ -50,9 +50,7 @@ def account_health_tips(request):
     for row in rc:
         lm_amount += round(row["amount"], 2)
         category.append(row["sub_category"])
-        transaction_list_str = (
-            transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
-        )
+        transaction_list_str = transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
         total_expenditure = total_expenditure + row["amount"]
 
     # modification ends
