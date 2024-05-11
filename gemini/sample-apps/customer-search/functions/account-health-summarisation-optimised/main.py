@@ -5,10 +5,9 @@ from typing import Dict
 
 import functions_framework
 from google.cloud import bigquery
-
-from utils.multithreading import run_all
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
+from utils.multithreading import run_all
 
 
 def get_financial_details(
@@ -31,13 +30,14 @@ def get_financial_details(
             return int(row[value_str])
     return 0
 
+
 def get_ac_health_status(
-    total_expenditure: int, 
-    asset_amount: int, 
-    debt_amount: int, 
-    total_high_risk_investment: int, 
-    total_investment: int, 
-    total_income: int
+    total_expenditure: int,
+    asset_amount: int,
+    debt_amount: int,
+    total_high_risk_investment: int,
+    total_investment: int,
+    total_income: int,
 ) -> str:
     """
     Calculates the account health status based on financial details.
@@ -54,7 +54,7 @@ def get_ac_health_status(
         str: The account health status ("Healthy", "Needs Attention", or "Concerning").
     """
 
-    account_status = ""    
+    account_status = ""
     if (
         total_expenditure < 0.75 * total_income
         and asset_amount >= 0.2 * total_income
@@ -79,6 +79,7 @@ def get_ac_health_status(
         account_status = "Concerning"
 
     return account_status
+
 
 def get_ac_details(project_id: str, user_accounts: list) -> tuple:
     """
@@ -118,6 +119,7 @@ def get_ac_details(project_id: str, user_accounts: list) -> tuple:
                 total_expenditure = total_expenditure + row["expenditure"]
 
     return total_income, total_expenditure
+
 
 @functions_framework.http
 def account_health_summary(request):
@@ -213,12 +215,12 @@ def account_health_summary(request):
         asset_amount=asset_amount,
         debt_amount=debt_amount,
         total_investment=total_investment,
-        total_high_risk_investment=total_high_risk_investment
+        total_high_risk_investment=total_high_risk_investment,
     )
 
     model = Gemini()
 
-    gemini_prompt =  f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
+    gemini_prompt = f"""You are a chatbot for bank application and you are required to briefly summarize the key insights of given numerical values in small pointers.
     You are provided with name, total income, total expenditure, total asset amount, total debt amount, total investment amount, high risk investments for the user in the following lines.
     {first_name},
     {total_income},

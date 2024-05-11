@@ -3,7 +3,6 @@
 from os import environ
 
 import functions_framework
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 
@@ -26,7 +25,6 @@ def find_nearest_bike_dealer(request):
     """
 
     request_json = request.get_json(silent=True)
-
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
@@ -79,8 +77,6 @@ def find_nearest_bike_dealer(request):
 
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
-        "sessionInfo": {
-            "parameters": {"vehicle_type": "Bike", "showrooms": response}
-        },
+        "sessionInfo": {"parameters": {"vehicle_type": "Bike", "showrooms": response}},
     }
     return res

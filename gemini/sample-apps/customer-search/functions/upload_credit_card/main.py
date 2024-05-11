@@ -6,9 +6,8 @@ import random
 
 import functions_framework
 from google.cloud import bigquery
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -105,11 +104,7 @@ def get_credit_card(
     )
 
     # Set the response message
-    res = {
-        "fulfillment_response": {
-            "messages": [{"text": {"text": [response]}}]
-        }
-    }
+    res = {"fulfillment_response": {"messages": [{"text": {"text": [response]}}]}}
 
     # Return the response
     return res

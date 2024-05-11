@@ -3,7 +3,6 @@
 from os import environ
 
 import functions_framework
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 
@@ -36,7 +35,6 @@ def account_balance(request):
     account_balance = 0
     for row in result_account_balance:
         account_balance = int(row["total_account_balance"])
-
 
     result_upcoming_payments = query_handler.query("query_upcoming_payments")
 

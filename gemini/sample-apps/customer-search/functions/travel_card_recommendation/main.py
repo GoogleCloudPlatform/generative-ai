@@ -3,21 +3,20 @@
 from os import environ
 
 import functions_framework
-
-from utils.multithreading import run_all
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
+from utils.multithreading import run_all
 
 project_id = environ.get("PROJECT_ID")
 
 
 def get_ac_health_status(
-    total_expenditure: int, 
-    asset_amount: int, 
-    debt_amount: int, 
-    total_high_risk_investment: int, 
-    total_investment: int, 
-    total_income: int
+    total_expenditure: int,
+    asset_amount: int,
+    debt_amount: int,
+    total_high_risk_investment: int,
+    total_investment: int,
+    total_income: int,
 ) -> str:
     """
     Calculates the account health status based on financial details.
@@ -34,7 +33,7 @@ def get_ac_health_status(
         str: The account health status ("Healthy", "Needs Attention", or "Concerning").
     """
 
-    account_status = ""    
+    account_status = ""
     if (
         total_expenditure < 0.75 * total_income
         and asset_amount >= 0.2 * total_income
@@ -59,6 +58,7 @@ def get_ac_health_status(
         account_status = "Concerning"
 
     return account_status
+
 
 def get_ac_details(project_id: str, user_accounts: list) -> tuple:
     """
@@ -98,6 +98,7 @@ def get_ac_details(project_id: str, user_accounts: list) -> tuple:
                 total_expenditure = total_expenditure + row["expenditure"]
 
     return total_income, total_expenditure
+
 
 @functions_framework.http
 def travel_card_recommendation(request):
@@ -146,9 +147,7 @@ def travel_card_recommendation(request):
         )
 
         res = {
-            "fulfillment_response": {
-                "messages": [{"text": {"text": [response]}}]
-            },
+            "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
             "target_page": "projects/{project_id}/locations/asia-south1/agents/118233dd-f023-4dad-b302-3906a7365ccc/flows/00000000-0000-0000-0000-000000000000/pages/06e52d7c-536a-4cbf-baba-4fe7d686e472",
         }
         return res
@@ -217,7 +216,7 @@ def travel_card_recommendation(request):
         asset_amount=asset_amount,
         debt_amount=debt_amount,
         total_investment=total_investment,
-        total_high_risk_investment=total_high_risk_investment
+        total_high_risk_investment=total_high_risk_investment,
     )
 
     if account_status == "Healthy":

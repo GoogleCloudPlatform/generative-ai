@@ -3,7 +3,6 @@
 from os import environ
 
 import functions_framework
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 
@@ -58,7 +57,5 @@ def return_of_investment(request):
     """
     )
 
-    res = {
-        "fulfillment_response": {"messages": [{"text": {"text": response}}]}
-    }
+    res = {"fulfillment_response": {"messages": [{"text": {"text": response}}]}}
     return res

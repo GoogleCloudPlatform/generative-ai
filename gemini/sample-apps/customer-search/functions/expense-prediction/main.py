@@ -9,7 +9,6 @@ from google.cloud import bigquery, storage
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
-
 from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")

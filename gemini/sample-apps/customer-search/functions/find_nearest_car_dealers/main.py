@@ -5,7 +5,6 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import requests
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 
@@ -126,8 +125,6 @@ def find_nearest_bike_dealer(request):
 
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
-        "sessionInfo": {
-            "parameters": {"vehicle_type": "Car", "showrooms": response}
-        },
+        "sessionInfo": {"parameters": {"vehicle_type": "Car", "showrooms": response}},
     }
     return res

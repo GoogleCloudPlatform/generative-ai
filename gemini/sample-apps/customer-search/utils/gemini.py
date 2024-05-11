@@ -3,8 +3,8 @@
 from os import environ
 
 import vertexai
-from vertexai.preview.generative_models import GenerativeModel
 import vertexai.preview.generative_models as generative_models
+from vertexai.preview.generative_models import GenerativeModel
 
 generation_config = {
     "max_output_tokens": 2048,
@@ -58,8 +58,10 @@ class Gemini:
             str: The generated response.
         """
 
-        response =self.model.predict(prompt,generation_config=generation_config, safety_settings=safety_settings)
-        
+        response = self.model.predict(
+            prompt, generation_config=generation_config, safety_settings=safety_settings
+        )
+
         final_response = ""
         for response in response:
             final_response += response.text

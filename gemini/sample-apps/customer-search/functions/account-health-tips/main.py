@@ -3,9 +3,8 @@
 from os import environ
 
 import functions_framework
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -36,7 +35,9 @@ def account_health_tips(request):
         return res
 
     result_categories = query_handler.query("query_transaction_category")
-    result_average_monthly_expense = query_handler.query("query_average_monthly_expense")
+    result_average_monthly_expense = query_handler.query(
+        "query_average_monthly_expense"
+    )
 
     # modification starts
 

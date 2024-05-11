@@ -3,7 +3,6 @@
 from os import environ
 
 import functions_framework
-
 from utils.bq_query_handler import BigQueryHandler
 
 project_id = environ.get("PROJECT_ID")
