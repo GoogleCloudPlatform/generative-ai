@@ -10,7 +10,9 @@ from app.pages_utils.pdf_generation import add_formatted_page, check_add_page
 import streamlit as st
 
 
-def create_pdf_layout(pdf: FPDF, content: list[str], title: str, images: list[str]) -> None:
+def create_pdf_layout(
+    pdf: FPDF, content: list[str], title: str, images: list[str]
+) -> None:
     """
     Creates a PDF layout with the given content, title, and images.
 
@@ -102,7 +104,9 @@ def cut_string(string: str, num_characters: int) -> str:
     return string[:num_characters]
 
 
-def create_email_pdf(title: str, email_text: str, filename: str, image_name: str) -> None:
+def create_email_pdf(
+    title: str, email_text: str, filename: str, image_name: str
+) -> None:
     """Creates a PDF document from an email.
 
     The PDF document contains the email subject, body, and an image.
