@@ -1,10 +1,12 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
 
 import json
 from os import environ
 
 import functions_framework
-from google.cloud import translate
+from google.cloud import translate_v2 as translate
 import requests
 
 project_id = environ.get("PROJECT_ID")
@@ -12,7 +14,6 @@ project_id = environ.get("PROJECT_ID")
 
 def detect_language(text: str) -> dict:
     """Detects the text's language."""
-    from google.cloud import translate_v2 as translate
 
     translate_client = translate.Client()
 
@@ -21,8 +22,8 @@ def detect_language(text: str) -> dict:
     result = translate_client.detect_language(text)
 
     print(f"Text: {text}")
-    print("Confidence: {}".format(result["confidence"]))
-    print("Language: {}".format(result["language"]))
+    print(f"Confidence: {result['confidence']}")
+    print(f"Language: {result['language']}")
 
     return result["language"]
 
@@ -34,12 +35,11 @@ def post_request(url, headers, data):
 
 
 def translate_fulfilment_response(
-    json_data, project_id, source_language_code, destination_language_code, i=0
+    json_data, source_language_code, destination_language_code, i=0
 ):
     """Translates the text of DialogFlow CX Webhook Fulfilment Response."""
     return translate_text(
         json_data["fulfillment_response"]["messages"][i]["text"]["text"][0],
-        project_id,
         source_language_code,
         destination_language_code,
     )
@@ -47,7 +47,6 @@ def translate_fulfilment_response(
 
 def translate_text(
     text: str,
-    project_id: str,
     source_language_code: str,
     target_language_code: str,
 ) -> translate.TranslationServiceClient:
@@ -103,11 +102,11 @@ def translation_handler(request):
         source_language_code = request_json["languageCode"]
         print("source language = " + source_language_code)
 
-        """ TODO: 1. figure out the language source 2. do i need to translate
-        anything in req 3. send and recive req 4. if not english, translate
-        back the response (also figure out which fields need to be translated
-        as such)
-        """
+        # 1. figure out the language source
+        # 2. do i need to translate anything in req
+        # 3. send and recive req
+        # 4. if not english, translate back the response (also figure out which
+        # fields need to be translated as such)
         if tag == "rag":
             text = request_json["text"]
             if "en" in source_language_code:
@@ -124,7 +123,7 @@ def translation_handler(request):
                 return (rag_qa_chain_json, 200, headers)
             else:
                 translated_text = translate_text(
-                    text, project_id, source_language_code, "en-US"
+                    text, source_language_code, "en-US"
                 )
 
                 rag_qa_chain_url = environ.get("RAG_QA_CHAIN_URL")
@@ -139,28 +138,24 @@ def translation_handler(request):
                 print(rag_qa_chain_json)
 
                 response = translate_fulfilment_response(
-                    rag_qa_chain_json, project_id, "en-US", source_language_code
+                    rag_qa_chain_json, "en-US", source_language_code
                 )
 
                 reference_list = []
 
                 for ref in json.loads(
-                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"][
-                        "text"
-                    ][1]
+                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][1]
                 ):
                     reference = {}
                     reference["matching_score"] = ref["matching_score"]
                     reference["document_source"] = ref["document_source"]
                     reference["document_name"] = translate_text(
                         ref["document_name"],
-                        "fintech-app-gcp",
                         "en-US",
                         source_language_code,
                     )
                     reference["page_content"] = translate_text(
                         ref["page_content"],
-                        "fintech-app-gcp",
                         "en-US",
                         source_language_code,
                     )
@@ -220,10 +215,10 @@ def translation_handler(request):
             headers = {"Access-Control-Allow-Origin": "*"}
 
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_fulfilment_response(
-                        res_json, project_id, "en-US", source_language_code
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_fulfilment_response(
+                    res_json, "en-US", source_language_code
                 )
 
         elif tag in [
@@ -259,7 +254,7 @@ def translation_handler(request):
                     res_json["fulfillment_response"]["messages"][i]["text"]["text"][
                         0
                     ] = translate_fulfilment_response(
-                        res_json, project_id, "en-US", source_language_code, i
+                        res_json, "en-US", source_language_code, i
                     )
 
         elif tag == "category-wise-expenditure":
@@ -270,10 +265,10 @@ def translation_handler(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
-                    translate_fulfilment_response(
-                        res_json, project_id, "en-US", source_language_code
-                    )
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
+                    0
+                ] = translate_fulfilment_response(
+                    res_json, "en-US", source_language_code
                 )
                 for i in range(
                     len(
@@ -288,7 +283,6 @@ def translation_handler(request):
                         res_json["fulfillment_response"]["messages"][1]["payload"][
                             "richContent"
                         ][0][0]["text"][i],
-                        project_id,
                         "en-US",
                         source_language_code,
                     )
@@ -322,7 +316,6 @@ def translation_handler(request):
                             res_json["fulfillment_response"]["messages"][i]["text"][
                                 "text"
                             ][0],
-                            project_id,
                             "en-US",
                             source_language_code,
                         )
@@ -331,7 +324,6 @@ def translation_handler(request):
             url = environ.get("FD_TENURE_VAL_URL")
             request_json["sessionInfo"]["parameters"]["fd_tenure"] = translate_text(
                 request_json["sessionInfo"]["parameters"]["fd_tenure"],
-                project_id,
                 source_language_code,
                 "en-US",
             )
@@ -378,7 +370,7 @@ def translation_handler(request):
         headers = {"Access-Control-Allow-Origin": "*"}
         return (rag_qa_chain_json, 200, headers)
 
-    translated_text = translate_text(text, project_id, source_language_code, "en-US")
+    translated_text = translate_text(text, source_language_code, "en-US")
 
     data = {"query": translated_text}
     rag_qa_chain_res = post_request(
@@ -389,7 +381,6 @@ def translation_handler(request):
 
     response = translate_text(
         rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
-        "fintech-app-gcp",
         "en-US",
         source_language_code,
     )
@@ -405,13 +396,11 @@ def translation_handler(request):
         reference["document_source"] = ref["document_source"]
         reference["document_name"] = translate_text(
             ref["document_name"],
-            "fintech-app-gcp",
             "en-US",
             source_language_code,
         )
         reference["page_content"] = translate_text(
             ref["page_content"],
-            "fintech-app-gcp",
             "en-US",
             source_language_code,
         )

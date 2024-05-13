@@ -1,3 +1,5 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
 
 from os import environ
@@ -5,10 +7,9 @@ from typing import Dict
 
 import functions_framework
 from google.cloud import bigquery
-
-from utils.multithreading import run_all
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
+from utils.multithreading import run_all
 
 
 def get_financial_details(
@@ -33,12 +34,7 @@ def get_financial_details(
 
 
 def get_ac_health_status(
-    total_expenditure: int,
-    asset_amount: int,
-    debt_amount: int,
-    total_high_risk_investment: int,
-    total_investment: int,
-    total_income: int,
+    financial_details: dict
 ) -> str:
     """
     Calculates the account health status based on financial details.
@@ -55,6 +51,13 @@ def get_ac_health_status(
         str: The account health status ("Healthy", "Needs Attention", or "Concerning").
     """
 
+    total_expenditure = financial_details["total_expenditure"]
+    asset_amount = financial_details["asset_amount"]
+    debt_amount = financial_details["debt_amount"]
+    total_high_risk_investment = financial_details["total_high_risk_investment"]
+    total_investment = financial_details["total_investment"]
+    total_income = financial_details["total_income"]
+
     account_status = ""
     if (
         total_expenditure < 0.75 * total_income
@@ -64,16 +67,11 @@ def get_ac_health_status(
     ):
         account_status = "Healthy"
     elif (
-        (
-            total_expenditure >= 0.75 * total_income
-            and total_expenditure < 0.9 * total_income
-        )
-        or (asset_amount < 0.2 * total_income and asset_amount > 0.1 * total_income)
-        or (debt_amount >= 0.3 * asset_amount and debt_amount < 0.75 * asset_amount)
-        or (
-            total_high_risk_investment >= 0.3 * total_investment
-            and total_high_risk_investment < 0.8 * total_investment
-        )
+        # (total_expenditure >= 0.75 * total_income and total_expenditure < 0.9 * total_income)
+        (0.75 * total_income <= total_expenditure < 0.9 * total_income)
+        or (0.1 * total_income < asset_amount < 0.2 * total_income)
+        or (0.3 * asset_amount <= debt_amount < 0.75 * asset_amount)
+        or (0.3 * total_investment <= total_high_risk_investment < 0.8 * total_investment)
     ):
         account_status = "Needs Attention"
     else:
@@ -173,12 +171,8 @@ def account_health_summary(request):
         one_month_return.append(row["one_month_return"])
         ttm_return.append(row["TTM_Return"])
 
-    asset_amount = get_financial_details(
-        query_str="query_assets", value_str="asset", res=res
-    )
-    debt_amount = get_financial_details(
-        query_str="query_debts", value_str="debt", res=res
-    )
+    asset_amount = get_financial_details(query_str="query_assets", value_str="asset", res=res)
+    debt_amount = get_financial_details(query_str="query_debts", value_str="debt", res=res)
     first_name = ""
     total_investment = 0
     total_high_risk_investment = 0
@@ -211,12 +205,14 @@ def account_health_summary(request):
             total_high_risk_investment += row["total_high_risk_investment"]
 
     account_status = get_ac_health_status(
-        total_income=total_income,
-        total_expenditure=total_expenditure,
-        asset_amount=asset_amount,
-        debt_amount=debt_amount,
-        total_investment=total_investment,
-        total_high_risk_investment=total_high_risk_investment,
+        {
+            "total_income": total_income,
+            "total_expenditure": total_expenditure,
+            "asset_amount": asset_amount,
+            "debt_amount": debt_amount,
+            "total_investment": total_investment,
+            "total_high_risk_investment": total_high_risk_investment
+        }
     )
 
     model = Gemini()
