@@ -80,9 +80,5 @@ def mutual_fund_recommendation(request):
     """
     )
 
-    res = {
-        "fulfillment_response": {
-            "messages": [{"text": {"text": [response]}}]
-        }
-    }
+    res = {"fulfillment_response": {"messages": [{"text": {"text": [response]}}]}}
     return res

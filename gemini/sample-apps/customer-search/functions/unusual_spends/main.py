@@ -52,7 +52,8 @@ FROM
     for row in result_unusual_transactions:
         flag = flag + 1
         unusual_transactions_list = (
-            unusual_transactions_list + f" ₹{row['transaction_amount']} on {row['date']} to"
+            unusual_transactions_list
+            + f" ₹{row['transaction_amount']} on {row['date']} to"
             f" {row['counterparty_name']} in {row['city']},"
             f" {row['country']}." + "\n"
         )

@@ -145,7 +145,9 @@ def translation_handler(request):
                 reference_list = []
 
                 for ref in json.loads(
-                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][1]
+                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"][
+                        "text"
+                    ][1]
                 ):
                     reference = {}
                     reference["matching_score"] = ref["matching_score"]
@@ -218,10 +220,10 @@ def translation_handler(request):
             headers = {"Access-Control-Allow-Origin": "*"}
 
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                    0
-                ] = translate_fulfilment_response(
-                    res_json, project_id, "en-US", source_language_code
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
+                    translate_fulfilment_response(
+                        res_json, project_id, "en-US", source_language_code
+                    )
                 )
 
         elif tag in [
@@ -268,10 +270,10 @@ def translation_handler(request):
             res_json = res.json()
             headers = {"Access-Control-Allow-Origin": "*"}
             if "en" not in source_language_code:
-                res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                    0
-                ] = translate_fulfilment_response(
-                    res_json, project_id, "en-US", source_language_code
+                res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
+                    translate_fulfilment_response(
+                        res_json, project_id, "en-US", source_language_code
+                    )
                 )
                 for i in range(
                     len(

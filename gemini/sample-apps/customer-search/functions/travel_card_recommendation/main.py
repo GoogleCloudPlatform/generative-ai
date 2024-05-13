@@ -43,7 +43,10 @@ def get_ac_health_status(
     ):
         account_status = "Healthy"
     elif (
-        (total_expenditure >= 0.75 * total_income and total_expenditure < 0.9 * total_income)
+        (
+            total_expenditure >= 0.75 * total_income
+            and total_expenditure < 0.9 * total_income
+        )
         or (asset_amount < 0.2 * total_income and asset_amount > 0.1 * total_income)
         or (debt_amount >= 0.3 * asset_amount and debt_amount < 0.75 * asset_amount)
         or (
@@ -145,9 +148,7 @@ def travel_card_recommendation(request):
         )
 
         res = {
-            "fulfillment_response": {
-                "messages": [{"text": {"text": [response]}}]
-            },
+            "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
             "target_page": "projects/{project_id}/locations/asia-south1/agents/118233dd-f023-4dad-b302-3906a7365ccc/flows/00000000-0000-0000-0000-000000000000/pages/06e52d7c-536a-4cbf-baba-4fe7d686e472",
         }
         return res

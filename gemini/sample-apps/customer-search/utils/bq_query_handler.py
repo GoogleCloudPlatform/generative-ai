@@ -6,6 +6,7 @@ from typing import Dict
 
 from google.cloud import bigquery
 
+
 class BigQueryHandler:
     """
     A class to interact with BigQuery.
@@ -28,29 +29,39 @@ class BigQueryHandler:
         self.client = bigquery.Client()
         self.queries = dict()
 
-        self.queries["query_check_cust_id"] = f"""
+        self.queries[
+            "query_check_cust_id"
+        ] = f"""
         SELECT EXISTS(SELECT * FROM `{self.project_id}.DummyBankDataset.Account`
         where customer_id = {self.customer_id}) as check
         """
 
-        self.queries["query_assets"] = f"""
+        self.queries[
+            "query_assets"
+        ] = f"""
         SELECT sum(avg_monthly_bal) as asset FROM `{self.project_id}.DummyBankDataset.Account`
         where customer_id = {self.customer_id} and product in ('Savings A/C ', 
         'Savings Salary A/C ', 'Premium Current A/C ', 'Fixed Deposit', 'Flexi Deposit');
         """
 
-        self.queries["query_avg_monthly_balance"] = f"""
+        self.queries[
+            "query_avg_monthly_balance"
+        ] = f"""
         SELECT sum(avg_monthly_bal) as avg_monthly_balance FROM
         `{self.project_id}.DummyBankDataset.Account` where customer_id = {self.customer_id}
         and product in ('Savings A/C ', 'Savings Salary A/C ', 'Premium Current A/C ');
         """
 
-        self.queries["query_fd"] = f"""
+        self.queries[
+            "query_fd"
+        ] = f"""
         SELECT sum(avg_monthly_bal) as asset FROM `{self.project_id}.DummyBankDataset.Account`
         where customer_id = {self.customer_id} and product = 'Fixed Deposit';
         """
 
-        self.queries["query_total_mf"] = f"""
+        self.queries[
+            "query_total_mf"
+        ] = f"""
         SELECT SUM(amount_invested) as total_mf_investment FROM
         `DummyBankDataset.MutualFundAccountHolding` where account_no in (
         select account_id from `DummyBankDataset.Account` where customer_id
@@ -58,7 +69,9 @@ class BigQueryHandler:
         );
         """
 
-        self.queries["query_high_risk_mf"] = f"""
+        self.queries[
+            "query_high_risk_mf"
+        ] = f"""
         select SUM(amount_invested) as total_high_risk_investment from
         `DummyBankDataset.MutualFundAccountHolding` where risk_category > 4
         and account_no in (
@@ -67,24 +80,32 @@ class BigQueryHandler:
         )
         """
 
-        self.queries["query_debts"] = f"""
+        self.queries[
+            "query_debts"
+        ] = f"""
         SELECT sum(avg_monthly_bal) as debt FROM `{self.project_id}.DummyBankDataset.Account`
         where customer_id = {self.customer_id} and product in ('Gold Card',
         'Medical Insurance','Premium Travel Card','Platinum Card','Personal Loan',
         'Vehicle Loan','Consumer Durables Loan','Broking A/C');
         """
 
-        self.queries["query_account_details"] = f"""
+        self.queries[
+            "query_account_details"
+        ] = f"""
         SELECT * FROM `{self.project_id}.DummyBankDataset.Account`
         WHERE customer_id = {self.customer_id}
         """
 
-        self.queries["query_user_details"] = f"""
+        self.queries[
+            "query_user_details"
+        ] = f"""
         SELECT * FROM `{self.project_id}.DummyBankDataset.Customer`
         WHERE customer_id = {self.customer_id}
         """
 
-        self.queries["query_average_monthly_expense"] = f"""SELECT AVG(total_amount)
+        self.queries[
+            "query_average_monthly_expense"
+        ] = f"""SELECT AVG(total_amount)
         as average_monthly_expense from (
             SELECT EXTRACT(MONTH FROM 	date) AS month,
             SUM(transaction_amount) AS total_amount FROM
@@ -95,7 +116,9 @@ class BigQueryHandler:
             ORDER BY month)
         """
 
-        self.queries["query_last_month_expense"] = f"""SELECT EXTRACT(MONTH FROM date) AS month,
+        self.queries[
+            "query_last_month_expense"
+        ] = f"""SELECT EXTRACT(MONTH FROM date) AS month,
         SUM(transaction_amount) AS last_month_expense FROM
         `{self.project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id IN (SELECT account_id
         FROM `{self.project_id}.DummyBankDataset.Account` where customer_id={self.customer_id})
@@ -104,7 +127,9 @@ class BigQueryHandler:
         ORDER BY month;
         """
 
-        self.queries["query_investment_returns"] = f"""
+        self.queries[
+            "query_investment_returns"
+        ] = f"""
         SELECT (amount_invested*one_month_return) as one_month_return,
         (amount_invested*TTM_Return) as TTM_Return,Scheme_Name from
         `{self.project_id}.DummyBankDataset.MutualFundAccountHolding`
@@ -112,7 +137,9 @@ class BigQueryHandler:
         `{self.project_id}.DummyBankDataset.Account` where customer_id={self.customer_id})
         """
 
-        self.queries["query_transaction_category"] = f"""
+        self.queries[
+            "query_transaction_category"
+        ] = f"""
         SELECT SUM(transaction_amount) as amount, sub_category as category,FROM
         `{self.project_id}.DummyBankDataset.AccountTransactions` where ac_id IN
         (SELECT account_id FROM `{self.project_id}.DummyBankDataset.Account` where
@@ -120,7 +147,9 @@ class BigQueryHandler:
         in('Wants', 'Miscellaneous') GROUP BY sub_category
         """
 
-        self.queries["query_average_monthly_expense"] = f"""SELECT AVG(total_amount) as
+        self.queries[
+            "query_average_monthly_expense"
+        ] = f"""SELECT AVG(total_amount) as
         average_monthly_expense from (
         SELECT EXTRACT(MONTH FROM 	date) AS month,
         SUM(transaction_amount) AS total_amount FROM
@@ -131,7 +160,9 @@ class BigQueryHandler:
         ORDER BY month)
         """
 
-        self.queries["query_last_month_expense"] = f"""SELECT EXTRACT(MONTH FROM date) AS month,
+        self.queries[
+            "query_last_month_expense"
+        ] = f"""SELECT EXTRACT(MONTH FROM date) AS month,
         SUM(transaction_amount) AS last_month_expense FROM
         `{self.project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id IN (SELECT
         account_id FROM `{self.project_id}.DummyBankDataset.Account` where
@@ -141,7 +172,9 @@ class BigQueryHandler:
         ORDER BY month;
         """
 
-        self.queries["query_expenditure_category"] = f"""
+        self.queries[
+            "query_expenditure_category"
+        ] = f"""
         SELECT SUM(transaction_amount) as amount, sub_category, EXTRACT(MONTH FROM date) AS
         month FROM `{self.project_id}.DummyBankDataset.AccountTransactions` where ac_id IN
         (SELECT account_id FROM `{self.project_id}.DummyBankDataset.Account` where
@@ -150,62 +183,84 @@ class BigQueryHandler:
         GROUP BY month, sub_category
         """
 
-        self.queries["query_dob"] = f"""
+        self.queries[
+            "query_dob"
+        ] = f"""
         SELECT date_of_birth as dob FROM `{self.project_id}.DummyBankDataset.Customer`
         where customer_id = {self.customer_id}
         """
 
-        self.queries["query_user_affinities"] = f"""
+        self.queries[
+            "query_user_affinities"
+        ] = f"""
         SELECT Affinities FROM `{self.project_id}.DummyBankDataset.Customer`
         WHERE customer_id = {self.customer_id}
         """
 
-        self.queries["query_event_details"] = f"""
+        self.queries[
+            "query_event_details"
+        ] = f"""
             SELECT * FROM `{self.project_id}.DummyBankDataset.CustomerEvents`
         """
 
-        self.queries["query_cust_address"] = f"""
+        self.queries[
+            "query_cust_address"
+        ] = f"""
             SELECT Address_2nd_Line, Address_3rd_Line, city, state, Plus_Code FROM
-            `{self.project_id}.DummyBankDataset.Customer` where customer_id = {self.ustomer_id}
+            `{self.project_id}.DummyBankDataset.Customer` where customer_id = {self.customer_id}
         """
 
-        self.queries["query_account_balance"] = f"""
+        self.queries[
+            "query_account_balance"
+        ] = f"""
         SELECT SUM(avg_monthly_bal) as total_account_balance FROM
         `{self.project_id}.DummyBankDataset.Account` where customer_id={self.customer_id}
         and avg_monthly_bal is NOT NULL and product IN('Savings A/C ', 'Savings Salary A/C ',
         'Premium Current A/C ', 'Gold Card ', 'Platinum Card ')
         """
 
-        self.queries["query_upcoming_payments"] = f"""
+        self.queries[
+            "query_upcoming_payments"
+        ] = f"""
         SELECT * FROM `{self.project_id}.DummyBankDataset.StandingInstructions` where account_id
         IN (SELECT account_id FROM `{self.project_id}.DummyBankDataset.Account` where
         customer_id={self.customer_id}) and EXTRACT(MONTH from Next_Payment_Date) = 10 and
         EXTRACT(YEAR from Next_Payment_Date) = 2023 and fund_transfer_amount IS NOT NULL
         """
 
-        self.queries["query_best_interest_rate_row"] = f"""
+        self.queries[
+            "query_best_interest_rate_row"
+        ] = f"""
         SELECT * FROM `{self.project_id}.DummyBankDataset.FdInterestRates`
         ORDER BY rate_of_interest desc
         LIMIT 1
         """
 
-        self.queries["query_investments_six_month_return"] = f"""
+        self.queries[
+            "query_investments_six_month_return"
+        ] = f"""
         SELECT (amount_invested*six_month_return) as six_month_return,Scheme_Name from
         `{self.project_id}.DummyBankDataset.MutualFundAccountHolding`
         where account_no in (Select account_id from `{self.project_id}.DummyBankDataset.Account`
         where customer_id={self.customer_id})
         """
 
-        self.queries["query_mf"] = f"""
+        self.queries[
+            "query_mf"
+        ] = f"""
         SELECT * FROM `{self.project_id}.DummyBankDataset.MutualFund`
         """
 
-        self.queries["query_age_on_book"] = f"""
+        self.queries[
+            "query_age_on_book"
+        ] = f"""
         SELECT age_on_book as customer_age_on_book FROM
         `{self.project_id}.DummyBankDataset.Customer` where customer_id = {self.customer_id}
         """
 
-        self.queries["query_travel_expense"] = f"""
+        self.queries[
+            "query_travel_expense"
+        ] = f"""
         SELECT SUM(transaction_amount) as travel_expense from
         `{self.project_id}.DummyBankDataset.AccountTransactions`
         WHERE debit_credit_indicator = 'Debit' and ac_id IN (SELECT account_id FROM
@@ -213,7 +268,9 @@ class BigQueryHandler:
         and sub_category = 'Travel'
         """
 
-    def validate_customer_id(self,) -> tuple[bool, dict[str, dict[str, list[dict[str, dict[str, list[str]]]]]]]:
+    def validate_customer_id(
+        self,
+    ) -> tuple[bool, dict[str, dict[str, list[dict[str, dict[str, list[str]]]]]]]:
         """
         Validates the customer ID.
 
@@ -253,7 +310,7 @@ class BigQueryHandler:
         """
 
         return self.client.query(self.queries[query_name])
-    
+
     def run(self, name: str) -> tuple[str, bigquery.table.RowIterator]:
         """
         Runs a BigQuery query and returns the name of the query and the result iterator.
@@ -266,7 +323,6 @@ class BigQueryHandler:
         """
 
         return name, self.query(name).result()  # blocks the thread
-
 
     def run_all(self, queries: list[str]) -> Dict[str, bigquery.table.RowIterator]:
         """

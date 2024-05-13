@@ -131,8 +131,6 @@ def create_fixed_deposit(request):
 
     request_json = request.get_json(silent=True)
 
-    client = bigquery.Client()
-
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     fd_amount = request_json["sessionInfo"]["parameters"]["fd_amount"]
     fd_tenure = request_json["sessionInfo"]["parameters"]["fd_tenure"]

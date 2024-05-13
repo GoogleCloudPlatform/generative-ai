@@ -1,9 +1,9 @@
+# pylint: disable=E0401
+
 from google.cloud import storage
 
 
-def upload_blob(
-    bucket_name: str, source_file_name: str, destination_blob_name: str
-) -> str:
+def upload_blob(bucket_name: str, source_file_name: str, destination_blob_name: str) -> str:
     """
     Uploads a file to a Google Cloud Storage bucket.
 

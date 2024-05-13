@@ -58,8 +58,10 @@ class Gemini:
             str: The generated response.
         """
 
-        response =self.model.predict(prompt,generation_config=generation_config, safety_settings=safety_settings)
-        
+        response = self.model.predict(
+            prompt, generation_config=generation_config, safety_settings=safety_settings
+        )
+
         final_response = ""
         for response in response:
             final_response += response.text
