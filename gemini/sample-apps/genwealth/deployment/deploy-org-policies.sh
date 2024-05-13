@@ -29,16 +29,15 @@ rm ./policy.json
 # Update org policies
 echo "Updating org policies"
 declare -a policies=("constraints/run.allowedIngress"
-                "constraints/iam.allowedPolicyMemberDomains"
-                )
-for policy in "${policies[@]}"
-do
-cat <<EOF > new_policy.yaml
+  "constraints/iam.allowedPolicyMemberDomains"
+)
+for policy in "${policies[@]}"; do
+  cat <<EOF >new_policy.yaml
 constraint: $policy
 listPolicy:
- allValues: ALLOW
+  allValues: ALLOW
 EOF
-gcloud resource-manager org-policies set-policy new_policy.yaml --project="$PROJECT_ID"
+  gcloud resource-manager org-policies set-policy new_policy.yaml --project="$PROJECT_ID"
 done
 
 # Wait for policies to apply
