@@ -2,8 +2,6 @@
 Utility module to work with app config.
 """
 
-# pylint: disable=E0401
-
 from os.path import isfile
 
 import pytomlpp

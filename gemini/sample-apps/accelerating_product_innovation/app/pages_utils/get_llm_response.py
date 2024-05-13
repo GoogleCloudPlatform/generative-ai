@@ -12,8 +12,6 @@ model (Gemini-Pro).
     * Handles potential errors during communication with the model.
 """
 
-# pylint: disable=E0401
-
 import json
 import os
 

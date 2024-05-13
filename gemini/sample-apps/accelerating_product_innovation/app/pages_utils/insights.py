@@ -8,8 +8,6 @@ relevant information from uploaded data.
     * Presents the answer along with top-matched context sources.
 """
 
-# pylint: disable=E0401
-
 import json
 import os
 import re
@@ -111,15 +109,11 @@ def get_filter_context_from_vectordb(
         tuple: A tuple containing the filter context and the top matched
         results.
     """
-    st.session_state["query_vectors"] = np.array(
-        embedding_model_with_backoff([question])
-    )
+    st.session_state["query_vectors"] = np.array(embedding_model_with_backoff([question]))
     top_matched_score = (
         st.session_state["processed_data_list"]["embedding"]
         .apply(
-            lambda row: (
-                np.dot(row, st.session_state["query_vectors"]) if row is not None else 0
-            )
+            lambda row: (np.dot(row, st.session_state["query_vectors"]) if row is not None else 0)
         )
         .sort_values(ascending=False)[:sort_index_value]
     )
@@ -151,9 +145,7 @@ def generate_insights_search_result(query: str) -> tuple[str, pd.DataFrame]:
     """
 
     question = query
-    context, top_matched_df = get_filter_context_from_vectordb(
-        question=query, sort_index_value=20
-    )
+    context, top_matched_df = get_filter_context_from_vectordb(question=query, sort_index_value=20)
 
     question_prompt_template = f"""
     Answer the question as precise as possible using the provided context.

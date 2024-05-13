@@ -3,8 +3,6 @@ This module defines the 'ImageEditor' class, providing an interactive image
 editing interface.
 """
 
-# pylint: disable=E0401
-
 import io
 
 from PIL import Image

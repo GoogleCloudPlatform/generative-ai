@@ -9,8 +9,6 @@ This module:
       accordingly.
 """
 
-# pylint: disable=E0401
-
 import logging
 
 from app.pages_utils.get_llm_response import generate_gemini
@@ -144,17 +142,13 @@ def render_features(features: st.delta_generator.DeltaGenerator) -> None:
     """
 
     if st.session_state.generated_points is None:
-        st.session_state.generated_points = get_features(
-            st.session_state.generated_response
-        )
+        st.session_state.generated_points = get_features(st.session_state.generated_response)
 
     with features:
         col1, col2, col3 = st.columns(3)
 
         for i, point in enumerate(st.session_state.generated_points):
-            box = (
-                col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3
-            )  # Inline conditionals
+            box = col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3  # Inline conditionals
 
             box_id = f"box_{i}"
 

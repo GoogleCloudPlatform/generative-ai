@@ -13,7 +13,6 @@ documents.
  emails.
 """
 
-# pylint: disable=E0401
 # pylint: disable=R0913
 
 from math import sqrt

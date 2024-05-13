@@ -10,8 +10,6 @@ This module:
     * Deletes a specific file from the GCS project.
 """
 
-# pylint: disable=E0401
-
 import json
 import logging
 import os
@@ -47,9 +45,7 @@ def list_pdf_files_gcs() -> list[list[Any]]:
         list[list[Any]]: A list of tuples of the blob name and the file
         extension.
     """
-    project_embedding = bucket.blob(
-        f"{st.session_state.product_category}/embeddings.json"
-    )
+    project_embedding = bucket.blob(f"{st.session_state.product_category}/embeddings.json")
     files = []
     if project_embedding.exists():
         file_list = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
@@ -72,9 +68,7 @@ def delete_project_from_gcs() -> None:
     updates the 'project_list.txt' file in the GCS bucket.
     """
     # Load list of files for current project.
-    project_file_list = bucket.list_blobs(
-        prefix=f"{st.session_state.product_category}/"
-    )
+    project_file_list = bucket.list_blobs(prefix=f"{st.session_state.product_category}/")
 
     # Delete the files in the project.
     for file in project_file_list:
@@ -89,9 +83,7 @@ def delete_project_from_gcs() -> None:
 
     # Update list of projects.
     project_list_blob = bucket.blob("project_list.txt")
-    project_list_blob.upload_from_string(
-        json.dumps(st.session_state.product_categories)
-    )
+    project_list_blob.upload_from_string(json.dumps(st.session_state.product_categories))
     st.rerun()
 
 
@@ -110,9 +102,7 @@ def delete_file_from_gcs(file_name: str) -> None:
     deleted_file_blob.delete()
 
     # Load embeddings of the project
-    project_embeddings = bucket.blob(
-        st.session_state.product_category + "/embeddings.json"
-    )
+    project_embeddings = bucket.blob(st.session_state.product_category + "/embeddings.json")
     stored_embedding_data = project_embeddings.download_as_string()
     embeddings_df = pd.DataFrame.from_dict(json.loads(stored_embedding_data))
 
@@ -123,6 +113,6 @@ def delete_file_from_gcs(file_name: str) -> None:
     embeddings_df.reset_index(inplace=True, drop=True)
 
     # Update embeddings in GCS.
-    bucket.blob(
-        f"{st.session_state.product_category}/embeddings.json"
-    ).upload_from_string(embeddings_df.to_json(), "application/json")
+    bucket.blob(f"{st.session_state.product_category}/embeddings.json").upload_from_string(
+        embeddings_df.to_json(), "application/json"
+    )

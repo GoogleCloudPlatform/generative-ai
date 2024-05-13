@@ -6,8 +6,6 @@ Utility module to:
  - Render the image generation and editing UI
 """
 
-# pylint: disable=E0401
-
 import json
 import logging
 import os
@@ -112,9 +110,7 @@ async def parallel_image_generation(prompt: str, col: int):
             if img_response.status == 200:
                 response = await img_response.read()
                 # Load image from response.
-                response_image = cv2.imdecode(
-                    np.frombuffer(response, dtype=np.uint8), 1
-                )
+                response_image = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
                 # Save image for later use.
                 cv2.imwrite(
                     f"gen_image{st.session_state.num_drafts+col}.png",
