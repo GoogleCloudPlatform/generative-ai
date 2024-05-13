@@ -42,7 +42,9 @@ FROM
   ML.DETECT_ANOMALIES(MODEL `{project_id}.ExpensePrediction.unsual_spend3`,
   STRUCT(0.02 AS contamination),
   TABLE
-`{project_id}.DummyBankDataset.AccountTransactions`) WHERE debit_credit_indicator = 'Debit' and ac_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id}) and is_anomaly = True ORDER BY mean_squared_error DESC LIMIT 3
+`{project_id}.DummyBankDataset.AccountTransactions`) WHERE debit_credit_indicator = 'Debit'
+and ac_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` 
+where customer_id = {customer_id}) and is_anomaly = True ORDER BY mean_squared_error DESC LIMIT 3
   """
     result_unusual_transactions = client.query(query_unusual_transactions)
 

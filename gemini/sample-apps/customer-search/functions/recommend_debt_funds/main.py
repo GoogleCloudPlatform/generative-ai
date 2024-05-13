@@ -13,7 +13,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def debt_fund_recommendation(request):
+def get_debt_fund_recommendation(request):
     """
     Recommends debt funds to a customer.
 
@@ -37,9 +37,9 @@ def debt_fund_recommendation(request):
     if not cust_id_exists:
         return res
 
-    PUBLIC_BUCKET = environ.get("PUBLIC_BUCKET")
-    MARKET_SUMM_DOC = environ.get("MARKET_SUMM_DOC")
-    url = "https://storage.cloud.google.com/" + PUBLIC_BUCKET + "/" + MARKET_SUMM_DOC
+    public_bucket = environ.get("PUBLIC_BUCKET")
+    market_summ_doc = environ.get("MARKET_SUMM_DOC")
+    url = "https://storage.cloud.google.com/" + public_bucket + "/" + market_summ_doc
 
     model = Gemini()
 
@@ -77,7 +77,9 @@ def debt_fund_recommendation(request):
                                         {
                                             "text": "Market Summary",
                                             "image": {
-                                                "rawUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/391px-PDF_file_icon.svg.png"
+                                                "rawUrl": """https://upload.wikimedia.org/wikipedia/
+                                                commons/thumb/8/87/PDF_file_icon.svg/
+                                                391px-PDF_file_icon.svg.png"""
                                             },
                                             "anchor": {"href": url},
                                         },

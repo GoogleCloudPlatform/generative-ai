@@ -35,11 +35,11 @@ def return_of_investment(request):
 
     result_investments = query_handler.query("query_investments_six_month_return")
 
-    Scheme_Name = []
+    scheme_name = []
     six_month_return = []
     investment_list_str = ""
     for row in result_investments:
-        Scheme_Name.append(row["Scheme_Name"])
+        scheme_name.append(row["Scheme_Name"])
         six_month_return.append(row["six_month_return"])
         investment_list_str = (
             investment_list_str

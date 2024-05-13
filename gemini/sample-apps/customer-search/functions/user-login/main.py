@@ -55,7 +55,8 @@ def user_login(
         return {"message": "Incorrect uid", "status": 400}
 
     # Query BigQuery to get the customer ID and first name for the user
-    query_get_cust_id = f"""SELECT First_Name, customer_id FROM `{project_id}.DummyBankDataset.Customer` where firebase_uid = '{uid}'"""
+    query_get_cust_id = """SELECT First_Name, customer_id FROM
+    `{project_id}.DummyBankDataset.Customer` where firebase_uid = '{uid}'"""
     result_cust_id = client.query(query_get_cust_id)
 
     # Initialize the response object

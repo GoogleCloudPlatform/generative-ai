@@ -50,7 +50,7 @@ def hello_http(request):
     one_month_return = []
     ttm_return = []
     one_m = []
-    TTM = []
+    ttm = []
     amount_invested = []
     fd_inv = 0
     for row in res["query_investment_returns"]:
@@ -58,7 +58,7 @@ def hello_http(request):
         one_month_return.append(row["one_month_return"])
         ttm_return.append(row["TTM_Return"])
         one_m.append(row["one_M"] * 100)
-        TTM.append(row["TTM"] * 100)
+        ttm.append(row["TTM"] * 100)
         amount_invested.append(row["amount_invested"])
 
     total_investment = 0
@@ -90,7 +90,7 @@ def hello_http(request):
     One_Month_Return = {one_month_return}
     One_Month_Return_Percentage = {one_m}
     TTM_Return = {ttm_return}
-    TTM_Return_Percentage = {TTM}
+    TTM_Return_Percentage = {ttm}
     amount_invested = {amount_invested}
 
     Write in a professional and business-neutral tone.

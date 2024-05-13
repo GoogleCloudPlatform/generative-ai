@@ -13,7 +13,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def account_balance(request):
+def get_account_balance(request):
     """
     Gets the account balance of a customer.
 
@@ -55,7 +55,7 @@ def account_balance(request):
     model = Gemini()
 
     payment_list_str_formatted = model.generate_response(
-        """
+        f"""
         Format the dates in the following information,e.g. 2024-10-01 to  Oct 1, 2024
         {0}
         Format the amount used in the following information in indian rupee format
@@ -80,6 +80,7 @@ def account_balance(request):
 
     account_balance_str = f"Your account balance is {account_balance_formatted}"
 
+    res = ""
     if account_balance < upcoming_month_expenses_amount:
         if customer_id == 592783:
             res = {
@@ -109,7 +110,6 @@ def account_balance(request):
                     }
                 },
             }
-            return res
         else:
             res = {
                 "fulfillment_response": {
@@ -126,7 +126,7 @@ def account_balance(request):
                     ]
                 },
             }
-            return res
+        return res
 
     if customer_id == 235813:
         res = {
@@ -149,7 +149,6 @@ def account_balance(request):
                 }
             },
         }
-        return res
     else:
         res = {
             "fulfillment_response": {
@@ -166,4 +165,4 @@ def account_balance(request):
                 ]
             }
         }
-        return res
+    return res
