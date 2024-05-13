@@ -213,7 +213,8 @@ def expense_prediction(request):
         category.append(row["sub_category"])
         date.append(row["date"])
         transaction_list_str = (
-            transaction_list_str + f"{row['sub_category']}: ₹{row['transaction_amount']} in the"
+            transaction_list_str
+            + f"{row['sub_category']}: ₹{row['transaction_amount']} in the"
             f" month of {row['date']}\n"
         )
         if row["date"] not in total_expenditure:
@@ -225,7 +226,8 @@ def expense_prediction(request):
 
     for k in total_expenditure:
         total_expenditure_str = (
-            total_expenditure_str + f"Total predicted expenses in {k}: {total_expenditure[k]}"
+            total_expenditure_str
+            + f"Total predicted expenses in {k}: {total_expenditure[k]}"
         )
 
     model = Gemini()

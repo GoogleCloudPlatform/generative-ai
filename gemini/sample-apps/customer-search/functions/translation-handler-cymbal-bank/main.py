@@ -145,7 +145,9 @@ def translation_handler(request):
                 reference_list = []
 
                 for ref in json.loads(
-                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][1]
+                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"][
+                        "text"
+                    ][1]
                 ):
                     reference = {}
                     reference["matching_score"] = ref["matching_score"]

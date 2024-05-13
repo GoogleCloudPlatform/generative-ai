@@ -42,7 +42,9 @@ def category_wise_expenditure(request):
     for row in result_categories:
         amount.append(round(row["amount"], 2))
         category.append(row["sub_category"])
-        transaction_list_str = transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
+        transaction_list_str = (
+            transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
+        )
         total_expenditure = total_expenditure + row["amount"]
 
     model = Gemini()
