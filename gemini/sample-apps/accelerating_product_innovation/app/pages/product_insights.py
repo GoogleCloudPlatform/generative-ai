@@ -95,7 +95,10 @@ if st.session_state.embeddings_df is None or st.session_state.embeddings_df.empt
 else:
     # Loop until suggestions are loaded or try limit is reached
     for try_var in range(3):
-        if st.session_state.suggestion_first_time and st.session_state.insights_suggestion is None:
+        if (
+            st.session_state.suggestion_first_time
+            and st.session_state.insights_suggestion is None
+        ):
             with st.spinner("Loading suggestion..."):
                 insights.get_suggestions("insights_suggestion")
                 # Check if number of suggestions is less than 4
@@ -180,14 +183,19 @@ if st.session_state.rag_answers_gen:
             (
                 st.session_state.rag_answer,
                 st.session_state.rag_answer_references,
-            ) = insights.generate_insights_search_result(st.session_state.rag_search_term)
+            ) = insights.generate_insights_search_result(
+                st.session_state.rag_search_term
+            )
 
             # Get new suggestions
             with st.spinner("Getting new Suggestions"):
                 insights.get_suggestions("temp_suggestions")
 
 # Check if RAG answer and references are available
-if st.session_state.rag_answer is not None and st.session_state.rag_answer_references is not None:
+if (
+    st.session_state.rag_answer is not None
+    and st.session_state.rag_answer_references is not None
+):
     # Display RAG answer
     st.write(st.session_state.rag_answer)
     st.write()
