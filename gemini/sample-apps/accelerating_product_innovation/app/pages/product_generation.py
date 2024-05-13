@@ -14,8 +14,6 @@ with a focus on guiding users through product generation. This module:
 * Image Editing:  Facilitates redirection to an image editing page.
 """
 
-# pylint: disable=E0401
-
 import asyncio
 import logging
 
@@ -112,10 +110,7 @@ if st.session_state.features_generated is True:
 # feature container
 features = st.empty()
 # Generated features to be displayed only if product content is not generated
-if (
-    st.session_state.generated_response is not None
-    and st.session_state.features_generated is True
-):
+if st.session_state.generated_response is not None and st.session_state.features_generated is True:
     if st.session_state.content_generated is False:
         # Display features on ui
         render_features(features)

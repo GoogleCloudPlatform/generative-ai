@@ -1,2 +1,3 @@
-Pillow==10.3.0
 streamlit==1.33.0
+Pillow==10.3.0
+google-cloud-storage==2.15.0
