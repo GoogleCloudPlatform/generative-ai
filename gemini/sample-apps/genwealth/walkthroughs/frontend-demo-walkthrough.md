@@ -148,7 +148,7 @@ Navigate to the **Ask** interface and click the **Advanced** toggle. Click the a
 
 Click **Ask** and review the result. It should look similar to the output below.
 
-> NOTE: Your results may vary slightly due to the dyanamic nature of Gen AI text completion models.
+> NOTE: Your results may vary slightly due to the dynamic nature of Gen AI text completion models.
 
 ![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/17-emailresult.png "Donya Bartle")
 
