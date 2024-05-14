@@ -177,7 +177,7 @@ If you work in financial services, you know that chatbots aren't allowed to prov
 
 1. You will add response restrictions that instruct the model not to give financial advice.
 
-1. While the response restirctions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
+1. While the response restrictions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
 
 Update your inputs as shown in the screenshot below, and review the results.
 
