@@ -7,7 +7,6 @@ from os import environ
 import functions_framework
 from google.cloud import bigquery
 import requests
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 

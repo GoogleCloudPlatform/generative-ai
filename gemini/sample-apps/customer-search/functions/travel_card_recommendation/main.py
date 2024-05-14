@@ -5,10 +5,9 @@
 from os import environ
 
 import functions_framework
-
-from utils.multithreading import run_all
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
+from utils.multithreading import run_all
 
 project_id = environ.get("PROJECT_ID")
 

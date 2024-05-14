@@ -7,7 +7,6 @@ import uuid
 
 import functions_framework
 import plotly.graph_objects as go
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 from utils.upload_to_gcs import upload_blob

@@ -122,9 +122,7 @@ def translation_handler(request):
                 headers = {"Access-Control-Allow-Origin": "*"}
                 return (rag_qa_chain_json, 200, headers)
             else:
-                translated_text = translate_text(
-                    text, source_language_code, "en-US"
-                )
+                translated_text = translate_text(text, source_language_code, "en-US")
 
                 rag_qa_chain_url = environ.get("RAG_QA_CHAIN_URL")
                 todo = {"query": translated_text}
@@ -144,7 +142,9 @@ def translation_handler(request):
                 reference_list = []
 
                 for ref in json.loads(
-                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][1]
+                    rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"][
+                        "text"
+                    ][1]
                 ):
                     reference = {}
                     reference["matching_score"] = ref["matching_score"]

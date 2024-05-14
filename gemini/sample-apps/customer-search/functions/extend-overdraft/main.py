@@ -6,7 +6,6 @@ from os import environ
 
 import functions_framework
 from google.cloud import bigquery
-
 from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")

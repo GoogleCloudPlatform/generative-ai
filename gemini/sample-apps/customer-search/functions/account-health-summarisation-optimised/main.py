@@ -33,9 +33,7 @@ def get_financial_details(
     return 0
 
 
-def get_ac_health_status(
-    financial_details: dict
-) -> str:
+def get_ac_health_status(financial_details: dict) -> str:
     """
     Calculates the account health status based on financial details.
 
@@ -71,7 +69,11 @@ def get_ac_health_status(
         (0.75 * total_income <= total_expenditure < 0.9 * total_income)
         or (0.1 * total_income < asset_amount < 0.2 * total_income)
         or (0.3 * asset_amount <= debt_amount < 0.75 * asset_amount)
-        or (0.3 * total_investment <= total_high_risk_investment < 0.8 * total_investment)
+        or (
+            0.3 * total_investment
+            <= total_high_risk_investment
+            < 0.8 * total_investment
+        )
     ):
         account_status = "Needs Attention"
     else:
@@ -175,8 +177,12 @@ def account_health_summary(request):
         one_month_return.append(row["one_month_return"])
         ttm_return.append(row["TTM_Return"])
 
-    asset_amount = get_financial_details(query_str="query_assets", value_str="asset", res=res)
-    debt_amount = get_financial_details(query_str="query_debts", value_str="debt", res=res)
+    asset_amount = get_financial_details(
+        query_str="query_assets", value_str="asset", res=res
+    )
+    debt_amount = get_financial_details(
+        query_str="query_debts", value_str="debt", res=res
+    )
     first_name = ""
     total_investment = 0
     total_high_risk_investment = 0
@@ -215,7 +221,7 @@ def account_health_summary(request):
             "asset_amount": asset_amount,
             "debt_amount": debt_amount,
             "total_investment": total_investment,
-            "total_high_risk_investment": total_high_risk_investment
+            "total_high_risk_investment": total_high_risk_investment,
         }
     )
 

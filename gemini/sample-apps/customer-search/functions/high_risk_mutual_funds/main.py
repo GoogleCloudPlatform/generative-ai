@@ -5,9 +5,8 @@
 from os import environ
 
 import functions_framework
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 

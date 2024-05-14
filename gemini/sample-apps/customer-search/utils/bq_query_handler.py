@@ -1,7 +1,7 @@
 # pylint: disable=E0401
 
-from os import environ
 from concurrent.futures import ThreadPoolExecutor
+from os import environ
 from typing import Dict
 
 from google.cloud import bigquery

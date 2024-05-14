@@ -11,10 +11,9 @@ import tempfile
 from PIL import Image
 import functions_framework
 from google.cloud import storage
-from vertexai.preview.vision_models import ImageGenerationModel
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
+from vertexai.preview.vision_models import ImageGenerationModel
 
 project_id = environ.get("PROJECT_ID")
 
