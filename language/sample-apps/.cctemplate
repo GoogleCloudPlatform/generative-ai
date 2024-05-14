@@ -6,7 +6,7 @@
       {
          "path":"chat-flask-cloudrun",
          "name":"Python Flask-based Web Application on Cloud Run interacting with PaLM Vertex AI",
-         "description":"Cloud Run application utilzing Flask framework that demonstrates working with Vertex AI API"
+         "description":"Cloud Run application utilizing Flask framework that demonstrates working with Vertex AI API"
       },
       {
          "path":"chat-gradio",
