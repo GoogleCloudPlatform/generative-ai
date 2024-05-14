@@ -464,7 +464,7 @@ Congratulations! You’ve built three trustworthy Gen AI features using the data
 
    ![LLM Function](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/19-llm.png "LLM Function")
 
-1. Experiment with different combinations of input parameters and notice the impact that spcific changes to the enriched prompt can produce. Here are a few examples to get you started.
+1. Experiment with different combinations of input parameters and notice the impact that specific changes to the enriched prompt can produce. Here are a few examples to get you started.
 
    ```SQL
    -- Adjust runtime parameters for more creative or deterministic answers
