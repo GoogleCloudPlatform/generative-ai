@@ -50,7 +50,7 @@ The data for the `RDYE` prospectus and related tables looks something like this 
 
    ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
 
-1. User profile data, including bios and embedings.
+1. User profile data, including bios and embeddings.
 
    ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
 
