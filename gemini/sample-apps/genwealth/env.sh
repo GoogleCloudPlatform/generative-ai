@@ -7,7 +7,7 @@ export LOCAL_IPV4="X.X.X.X"
 
 # Keep all defaults below
 # shellcheck disable=SC2155
-export PROJECT_ID=$(gcloud config get-value project 2> /dev/null)
+export PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
 export ALLOYDB_CLUSTER="alloydb-cluster"
 export ALLOYDB_INSTANCE="alloydb-instance"
 # shellcheck disable=SC2155
@@ -35,8 +35,8 @@ export DOCS_BUCKET=${PROJECT_ID}-docs
 export DOCS_METADATA_BUCKET=${PROJECT_ID}-docs-metadata
 export DOC_AI_BUCKET=${PROJECT_ID}-doc-ai
 DATASTORE_ID=$(curl -s -X GET \
--H "Authorization: Bearer $(gcloud auth print-access-token)" \
--H "X-Goog-User-Project: ${PROJECT_ID}" \
-"https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores" | jq -r '.dataStores | .[] | select(.displayName=="search-prospectus").name' 2>/dev/null)
+  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores" | jq -r '.dataStores | .[] | select(.displayName=="search-prospectus").name' 2>/dev/null)
 export DATASTORE_ID=${DATASTORE_ID##*/}
 export DATA_STORE_ID=${DATASTORE_ID}
