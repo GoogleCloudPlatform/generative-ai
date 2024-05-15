@@ -225,12 +225,12 @@ def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
         # Process each chunk
         # print(text_data)
         for chunk_number, chunk_value in text_data.items():
-            text_embd = get_text_embedding_from_text_embedding_model(text=chunk_value)
-            embeddings_dict[chunk_number] = text_embd
+            text_embed = get_text_embedding_from_text_embedding_model(text=chunk_value)
+            embeddings_dict[chunk_number] = text_embed
     else:
         # Process the first 1000 characters of the page text
-        text_embd = get_text_embedding_from_text_embedding_model(text=text_data)
-        embeddings_dict["text_embedding"] = text_embd
+        text_embed = get_text_embedding_from_text_embedding_model(text=text_data)
+        embeddings_dict["text_embedding"] = text_embed
 
     return embeddings_dict
 
@@ -638,7 +638,7 @@ def get_user_query_image_embeddings(
 
 
 def get_cosine_score(
-    dataframe: pd.DataFrame, column_name: str, input_text_embd: np.ndarray
+    dataframe: pd.DataFrame, column_name: str, input_text_embed: np.ndarray
 ) -> float:
     """
     Calculates the cosine similarity between the user query embedding and the dataframe embedding for a specific column.
@@ -646,13 +646,13 @@ def get_cosine_score(
     Args:
         dataframe: The pandas DataFrame containing the data to compare against.
         column_name: The name of the column containing the embeddings to compare with.
-        input_text_embd: The NumPy array representing the user query embedding.
+        input_text_embed: The NumPy array representing the user query embedding.
 
     Returns:
         The cosine similarity score (rounded to two decimal places) between the user query embedding and the dataframe embedding.
     """
 
-    text_cosine_score = round(np.dot(dataframe[column_name], input_text_embd), 2)
+    text_cosine_score = round(np.dot(dataframe[column_name], input_text_embed), 2)
     return text_cosine_score
 
 

@@ -146,7 +146,7 @@ class MatchingEngineUtils:
                 f"Creating index with long running operation {r._operation.name}"
             )
 
-            # Poll the operation until it's done successfullly.
+            # Poll the operation until it's done successfully.
             logging.info("Poll the operation to create index ...")
             while True:
                 if r.done():
@@ -253,7 +253,7 @@ class MatchingEngineUtils:
                 index_endpoint=index_endpoint.name, deployed_index=deployed_index
             )
 
-            # Poll the operation until it's done successfullly.
+            # Poll the operation until it's done successfully.
             logger.info("Poll the operation to deploy index ...")
             while True:
                 if r.done():
