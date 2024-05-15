@@ -34,7 +34,7 @@ You can simply drop that file into the `$PROJECT_ID-docs` bucket in GCS to kick 
 
 1. Write the generated results to the `investments` table in AlloyDB.
 
-The data for the `RDYE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
+The data for the `RYDE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
 
 > NOTE: You can explore the application and document data yourself by logging into pgAdmin as described in the [Back End Demo Walkthrough](../walkthroughs/backend-demo-walkthrough.md) guide.
 
@@ -50,7 +50,7 @@ The data for the `RDYE` prospectus and related tables looks something like this 
 
    ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
 
-1. User profile data, including bios and embedings.
+1. User profile data, including bios and embeddings.
 
    ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
 
@@ -148,7 +148,7 @@ Navigate to the **Ask** interface and click the **Advanced** toggle. Click the a
 
 Click **Ask** and review the result. It should look similar to the output below.
 
-> NOTE: Your results may vary slightly due to the dyanamic nature of Gen AI text completion models.
+> NOTE: Your results may vary slightly due to the dynamic nature of Gen AI text completion models.
 
 ![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/17-emailresult.png "Donya Bartle")
 
@@ -177,7 +177,7 @@ If you work in financial services, you know that chatbots aren't allowed to prov
 
 1. You will add response restrictions that instruct the model not to give financial advice.
 
-1. While the response restirctions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
+1. While the response restrictions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
 
 Update your inputs as shown in the screenshot below, and review the results.
 

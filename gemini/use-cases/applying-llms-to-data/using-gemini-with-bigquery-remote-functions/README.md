@@ -50,7 +50,7 @@ cd ./generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigq
 
 Check to make sure the [Cloud Resource Manager API](https://console.cloud.google.com/apis/library/cloudresourcemanager.googleapis.com) is enabled
 
-#### 3. Intialize Terraform
+#### 3. Initialize Terraform
 
 First, initialize Terraform by running
 
@@ -137,7 +137,7 @@ Gemini will analyze the prewritten text prompts when you invoke the `text_query_
 
 ## Pricing Estimation
 
-Installing this demo (by running `terraform apply` in the Cloud Shell CLI) and running the stored stored procedures for text and image analysis 4 times each day will cost approximately $0.06 USD per month. See the [Google Cloud Pricing Calculator](https://cloud.google.com/products/calculator/#id=d3f64c61-9afb-4467-a6af-2bdd9540d489) for more details. The total monthly cost will vary as your usage varies, including how often you deploy and teardown this demo.
+Installing this demo (by running `terraform apply` in the Cloud Shell CLI) and running the stored procedures for text and image analysis 4 times each day will cost approximately $0.06 USD per month. See the [Google Cloud Pricing Calculator](https://cloud.google.com/products/calculator/#id=d3f64c61-9afb-4467-a6af-2bdd9540d489) for more details. The total monthly cost will vary as your usage varies, including how often you deploy and teardown this demo.
 
 **NOTE**: Charges for Multimodal model consumption in Vertex AI take effect on January 15, 2024. We estimate running this demo 4 times per day will increase the total cost by _$3.73 USD per month_. See the [Vertex AI pricing page for Generative AI](https://cloud.google.com/vertex-ai/pricing#generative_ai_models) for full details. Below is a breakdown of this estimate:
 
