@@ -3,8 +3,8 @@
 # pylint: disable=C0301
 # pylint: disable=E0401
 
-from vertexai.preview.generative_models import Part
 from config import config
+from vertexai.preview.generative_models import Part
 
 fewshot_images: list[Part] = []
 num_files = len(config["fewshot_images"])
@@ -13,6 +13,7 @@ for i in range(num_files):
     fewshot_images.append(
         Part.from_uri(config["fewshot_images"][filename]), mime_type="image/jpeg"
     )
+
 
 def image_attribute_prompt(user_image):
     return [
