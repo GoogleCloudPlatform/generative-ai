@@ -7,9 +7,16 @@
       "hosting": {
         "your-firebase-app-name": [
           "your-firebase-app-name"
+        ],
+        "ChatGPSE": [
+          "ChatGPSE"
+        ],
+        "com-lps-global-sales-engine-243309": [
+          "com-lps-global-sales-engine-243309"
         ]
       }
     }
   },
-  "etags": {}
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
