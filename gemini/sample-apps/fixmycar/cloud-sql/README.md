@@ -132,7 +132,7 @@ gsutil cp gs://github-repo/generative-ai/sample-apps/fixmycar/cymbal-starlight-2
 
 2. Enable the **SQL Admin API**: https://console.developers.google.com/apis/api/sqladmin.googleapis.com
 
-3. Open a terminal and install the `psql` client, by following the instructions [here](https://www.postgresql.org/download/). If you're on MacOS, [you can install the `psql` tool with `brew`](https://stackoverflow.com/questions/44654216/correct-way-to-install-psql-without-full-postgres-on-macos):
+3. Open a terminal and install the `psql` client, by following the instructions [here](https://www.postgresql.org/download/). If you're on macOS, [you can install the `psql` tool with `brew`](https://stackoverflow.com/questions/44654216/correct-way-to-install-psql-without-full-postgres-on-macos):
 
 ```
 brew install libpq
