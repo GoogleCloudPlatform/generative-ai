@@ -83,7 +83,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
    - The datastore id is visible on the `Data > Details` page.
    - The engine id is the string after `/engines/` in the Cloud Console URL.
      - `https://console.cloud.google.com/gen-app-builder/engines/contracts-personalize_1687884886933/data/records`
-     - Engine ID is `contracts-personalize_1687884886933`
+     - Engne ID is `contracts-personalize_1687884886933`
 
 4. Configure Image Search
 
