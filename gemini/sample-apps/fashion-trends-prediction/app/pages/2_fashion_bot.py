@@ -129,8 +129,6 @@ with st.container(border=True):
                     edit_img_key,
                     "edit_with_mask" + str(stamp),
                     "mask_image_key" + str(stamp),
-                    "select_button",
-                    "selected_image_key",
                     True,
                 )
 

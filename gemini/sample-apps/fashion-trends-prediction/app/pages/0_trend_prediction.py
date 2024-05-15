@@ -4,22 +4,18 @@
 
 import json
 import logging
-import sys
-
+import vertexai
 import streamlit as st
 import streamlit.components.v1 as components
-import vertexai
 
-sys.path.append("../")
 from io import StringIO
-
-from articles import Articles
 from config import config
+from articles import Articles
+from prediction import Prediction
 from gcs import read_file_from_gcs_link
 from genai_prompts import IMAGE_PROMPT, TRENDS_PROMPT
-from prediction import Prediction
-from utilities import add_logo, button_html_script, details_html, EXCEPTION_HTML
 from utils_standalone_image_gen import image_generation
+from utilities import add_logo, button_html_script, details_html, EXCEPTION_HTML
 from vertexai.preview.generative_models import (
     GenerationConfig,
     GenerativeModel,
@@ -51,31 +47,31 @@ def change_button_colour(widget_label: str, prsd_status: bool) -> None:
     components.html(f"{htmlstr}", height=0, width=0)
 
 
-def chk_btn_status_and_assign_colour(buttons: list) -> None:
+def chk_btn_status_and_assign_colour(buttons_list: list) -> None:
     """Checks the pressed status of a list of buttons and assigns colors accordingly.
 
     Args:
-        buttons (list): A list of button labels.
+        buttons_list (list): A list of button labels.
     """
-    for i in range(len(buttons)):
-        change_button_colour(buttons[i], state["btn_prsd_status"][i])
+    for i, button in enumerate(buttons_list):
+        change_button_colour(button, state["btn_prsd_status"][i])
 
 
-def btn_pressed_callback(i: int) -> None:
+def btn_pressed_callback(i_index: int) -> None:
     """Callback function for when a button is pressed.
 
     Args:
-        i (int): The index of the button that was pressed.
+        i_index (int): The index of the button that was pressed.
     """
     # toggle
-    if state["btn_prsd_status"][i]:  # button was pressed
-        state["btn_prsd_status"][i] = False
+    if state["btn_prsd_status"][i_index]:  # button was pressed
+        state["btn_prsd_status"][i_index] = False
 
     else:  # button was not pressed
         state["btn_prsd_status"] = [False] * len(
             state["btn_prsd_status"]
         )  # unpress other buttons
-        state["btn_prsd_status"][i] = True
+        state["btn_prsd_status"][i_index] = True
 
 
 if "gemini_model" not in st.session_state:

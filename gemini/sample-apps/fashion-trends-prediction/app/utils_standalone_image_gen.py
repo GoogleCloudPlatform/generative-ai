@@ -7,6 +7,9 @@ Utility module to:
 """
 
 # pylint: disable=E0401
+# pylint: disable=R0913
+# pylint: disable=R0914
+# pylint: disable=R0912
 
 from typing import List
 
@@ -19,6 +22,11 @@ from vertexai.preview.vision_models import Image, ImageGenerationModel
 # Set project parameters
 PROJECT_ID = config["PROJECT_ID"]
 LOCATION = config["LOCATION"]
+
+SAMPLE_COUNT = [4, 2, 1]
+SAMPLE_IMAGE_SIZE = [256, 64, 512, 1024]
+ASPECT_RATIO = ["1:1", "5:4", "3:2", "7:4", "4:3", "16:9", "9:16"]
+
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 model = ImageGenerationModel.from_pretrained("imagegeneration@002")
@@ -168,17 +176,13 @@ def generate_image_columns(
         cols = st.columns([25, 25, 25, 25])
         for i, col in enumerate(cols):
             with col:
-                try:
-                    render_one_image(
-                        images_key,
-                        i + counter,
-                        edit_button,
-                        image_to_edit_key,
-                        download_button,
-                    )
-                except Exception as e:
-                    print(e)
-                    continue
+                render_one_image(
+                    images_key,
+                    i + counter,
+                    edit_button,
+                    image_to_edit_key,
+                    download_button,
+                )
         counter += 4
         image_count -= 4
 
@@ -187,8 +191,6 @@ def render_image_generation_ui(
     image_text_prompt_key: str,
     generated_images_key: str,
     pre_populated_prompts: List[str] = ["an image of a cat"],
-    select_button: bool = False,
-    selected_image_key: str = "",
     edit_button: bool = False,
     title: str = "Generate Images",
     image_to_edit_key: str = "",
@@ -219,9 +221,6 @@ def render_image_generation_ui(
         None.
     """
 
-    SAMPLE_COUNT = [4, 2, 1]
-    SAMPLE_IMAGE_SIZE = [256, 64, 512, 1024]
-    ASPECT_RATIO = ["1:1", "5:4", "3:2", "7:4", "4:3", "16:9", "9:16"]
 
     def submitted():
         st.session_state[image_text_prompt_key] = st.session_state[
@@ -240,13 +239,8 @@ def render_image_generation_ui(
             "Select one of the pre populated prompts", pre_populated_prompts
         )
 
-        if (
-            f"{image_text_prompt_key}_text_area" in st.session_state
-            and st.session_state[f"{image_text_prompt_key}_text_area"] != ""
-        ):
-            expanded = True
-        else:
-            expanded = False
+        expanded = (f"{image_text_prompt_key}_text_area" in st.session_state and
+                    st.session_state[f"{image_text_prompt_key}_text_area"] != "")
 
         with st.expander("[Optional] Write a custom prompt", expanded=expanded):
             st.write(
@@ -265,9 +259,9 @@ def render_image_generation_ui(
         with col1:
             sample_count = st.selectbox("Number of samples", SAMPLE_COUNT)
         with col2:
-            sample_image_size = st.selectbox("Sample Image Size", SAMPLE_IMAGE_SIZE)
+            _ = st.selectbox("Sample Image Size", SAMPLE_IMAGE_SIZE)
         with col3:
-            aspect_ratio = st.selectbox("Aspect Ratio", ASPECT_RATIO, disabled=True)
+            _ = st.selectbox("Aspect Ratio", ASPECT_RATIO, disabled=True)
 
         # Every form must have a submit button.
         submit_prompt = st.form_submit_button("Submit", on_click=submitted)
@@ -279,16 +273,12 @@ def render_image_generation_ui(
         else:
             question = select_prompt
 
-        try:
-            with st.spinner("Generating images ..."):
-                image_generation(
-                    question or "",
-                    sample_count or 1,
-                    generated_images_key,
-                )
-        except Exception as e:
-            print(e)
-            st.error("Could not generate image. Try a different prompt.")
+        with st.spinner("Generating images ..."):
+            image_generation(
+                question or "",
+                sample_count or 1,
+                generated_images_key,
+            )
 
     if auto_submit_first_pre_populated:
         if generated_images_key not in st.session_state:
@@ -315,8 +305,6 @@ def render_image_edit_prompt(
     image_to_edit_key: str = "",
     mask_image: bool = False,
     mask_image_key: str = "",
-    select_button: bool = False,
-    selected_image_key: str = "",
     download_button: bool = True,
     file_uploader_key: str = "",
 ):
@@ -349,7 +337,6 @@ def render_image_edit_prompt(
         None.
     """
 
-    SAMPLE_COUNT = [4, 2, 1]
 
     def submitted():
         st.session_state[edit_image_prompt_key] = st.session_state[
@@ -410,22 +397,18 @@ def render_image_edit_prompt(
                     st.error("Provide a prompt for editing the image")
                 else:
                     st.session_state[edit_image_prompt_key] = edit_image_prompt
-                    try:
-                        with st.spinner("Generating edited images ..."):
-                            edit_image_generation(
-                                st.session_state[edit_image_prompt_key],
-                                sample_count or 1,
-                                bytes_data,
-                                edited_images_key,
-                                (
-                                    st.session_state.get(mask_image_key, b"")
-                                    if mask_image and mask_image_key
-                                    else b""
-                                ),
-                            )
-                    except Exception as e:
-                        st.error(e)
-                        st.error("Could not edit image. Try a different prompt.")
+                    with st.spinner("Generating edited images ..."):
+                        edit_image_generation(
+                            st.session_state[edit_image_prompt_key],
+                            sample_count or 1,
+                            bytes_data,
+                            edited_images_key,
+                            (
+                                st.session_state.get(mask_image_key, b"")
+                                if mask_image and mask_image_key
+                                else b""
+                            ),
+                        )
             else:
                 st.error("No image found to edit")
 
@@ -456,8 +439,6 @@ def render_image_generation_and_edition_ui(
         image_text_prompt_key,
         generated_images_key,
         pre_populated_prompts,
-        select_button,
-        selected_image_key,
         edit_button,
         title,
         image_to_edit_key,
@@ -473,7 +454,5 @@ def render_image_generation_and_edition_ui(
             image_to_edit_key,
             edit_with_mask,
             mask_image_key,
-            select_button,
-            selected_image_key,
             download_button,
         )
