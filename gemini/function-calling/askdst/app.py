@@ -4,7 +4,7 @@ from google.cloud import bigquery
 import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
-BIGQUERY_DATASET_ID = "dst-master.product_adoption.p0_totalStats"
+BIGQUERY_DATASET_ID = "dst-master.performanceoverview"
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
@@ -83,8 +83,8 @@ model = GenerativeModel(
 )
 
 st.set_page_config(
-    page_title="AskDST",
-    page_icon="dst_logo_black.png",
+    page_title="SQL Talk with BigQuery",
+    page_icon="vertex-ai.png",
     layout="wide",
 )
 
@@ -92,21 +92,22 @@ col1, col2 = st.columns([8, 1])
 with col1:
     st.title("AskDST")
 with col2:
-    st.image("dst_logo_black.png")
+    st.image("dst_logo.png")
 
-st.subheader("Datasinights powered by DST Performance Overview & Gemini")
+st.subheader("Performance Overview Powered By Gemini")
 
 st.markdown(
-    "[DST](https://sites.google.com/corp/google.com/sellside-datasolutions/home)"
+    "[go/dst-site](https://sites.google.com/corp/google.com/sellside-datasolutions/home)"
 )
 
 with st.expander("Sample prompts", expanded=True):
     st.write(
         """
         - What kind of information is in this database?
-        - How many tables are there in this dataset?
-        - Whats the total revenue for publisher xxx?
-        - Whats the lowest performing ad format for publisher xxx?
+        - What percentage of orders are returned?
+        - How is inventory distributed across our regional distribution centers?
+        - Do customers typically place more than one order?
+        - Which product categories have the highest profit margins?
     """
     )
 
