@@ -2,20 +2,20 @@
 
 # pylint: disable=E0401
 
+from io import StringIO
 import json
 import logging
-import vertexai
-import streamlit as st
-import streamlit.components.v1 as components
 
-from io import StringIO
-from config import config
 from articles import Articles
-from prediction import Prediction
+from config import config
 from gcs import read_file_from_gcs_link
 from genai_prompts import IMAGE_PROMPT, TRENDS_PROMPT
+from prediction import Prediction
+import streamlit as st
+import streamlit.components.v1 as components
+from utilities import EXCEPTION_HTML, add_logo, button_html_script, details_html
 from utils_standalone_image_gen import image_generation
-from utilities import add_logo, button_html_script, details_html, EXCEPTION_HTML
+import vertexai
 from vertexai.preview.generative_models import (
     GenerationConfig,
     GenerativeModel,
