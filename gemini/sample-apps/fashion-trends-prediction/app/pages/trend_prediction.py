@@ -53,8 +53,8 @@ def chk_btn_status_and_assign_colour(buttons_list: list) -> None:
     Args:
         buttons_list (list): A list of button labels.
     """
-    for i, button in enumerate(buttons_list):
-        change_button_colour(button, state["btn_prsd_status"][i])
+    for i_index, button in enumerate(buttons_list):
+        change_button_colour(button, state["btn_prsd_status"][i_index])
 
 
 def btn_pressed_callback(i_index: int) -> None:
@@ -212,75 +212,67 @@ if submit or key in st.session_state:
             chk_btn_status_and_assign_colour(buttons)
         with col2:
             try:
-                index = state["btn_prsd_status"].index(True)
+                INDEX_VAL = state["btn_prsd_status"].index(True)
             except ValueError:
-                index = -1
+                INDEX_VAL = -1
 
-            if index != -1:
-                selected_button = index
+            if INDEX_VAL != -1:
+                selected_button = INDEX_VAL
 
-                outfit = str(state["items"][selected_button])
+                OUTFIT = str(state["items"][selected_button])
 
-                if outfit not in state:
-                    state[outfit] = {}
+                if OUTFIT not in state:
+                    state[OUTFIT] = {}
 
                 with st.spinner("Loading..."):
-                    try:
-                        print(state.keys())
-                        if state[outfit] == {}:
-                            THRESHOLD = HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
-                            prompt = (
-                                st.session_state["gemini_model"]
-                                .generate_content(
-                                    IMAGE_PROMPT.format(outfit=outfit),
-                                    generation_config=GenerationConfig(
-                                        max_output_tokens=2048,
-                                        temperature=0.2,
-                                        top_p=1,
-                                        top_k=32,
-                                    ),
-                                    safety_settings={
-                                        HarmCategory.HARM_CATEGORY_HATE_SPEECH: THRESHOLD,
-                                        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: THRESHOLD,
-                                        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: THRESHOLD,
-                                        HarmCategory.HARM_CATEGORY_HARASSMENT: THRESHOLD,
-                                    },
-                                    stream=False,
-                                )
-                                .text
+                    print(state.keys())
+                    if state[OUTFIT] == {}:
+                        THRESHOLD = HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
+                        prompt = (
+                            st.session_state["gemini_model"]
+                            .generate_content(
+                                IMAGE_PROMPT.format(outfit=OUTFIT),
+                                generation_config=GenerationConfig(
+                                    max_output_tokens=2048,
+                                    temperature=0.2,
+                                    top_p=1,
+                                    top_k=32,
+                                ),
+                                safety_settings={
+                                    HarmCategory.HARM_CATEGORY_HATE_SPEECH: THRESHOLD,
+                                    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: THRESHOLD,
+                                    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: THRESHOLD,
+                                    HarmCategory.HARM_CATEGORY_HARASSMENT: THRESHOLD,
+                                },
+                                stream=False,
                             )
+                            .text
+                        )
 
-                            state[outfit]["imgs"] = [
-                                _img._image_bytes
-                                for _img in image_generation(
-                                    prompt=prompt,
-                                    sample_count=1,
-                                    state_key="imagen_image",
-                                )
-                            ]
-
-                        if len(state[outfit]["imgs"]) > 0:
-                            st.image(state[outfit]["imgs"][0], use_column_width=True)
-
-                            st.download_button(
-                                label="Download",
-                                key=f"_btn_download_{str(0) + ' ' + outfit}",
-                                data=state[outfit]["imgs"][0],
-                                file_name="image.png",
+                        state[OUTFIT]["imgs"] = [
+                            _img._image_bytes
+                            for _img in image_generation(
+                                prompt=prompt,
+                                sample_count=1,
+                                state_key="imagen_image",
                             )
+                        ]
 
-                        else:
-                            st.markdown(
-                                EXCEPTION_HTML,
-                                unsafe_allow_html=True,
-                            )
+                    if len(state[OUTFIT]["imgs"]) > 0:
+                        st.image(state[OUTFIT]["imgs"][0], use_column_width=True)
 
-                    except Exception as error:
+                        st.download_button(
+                            label="Download",
+                            key=f"_btn_download_{str(0) + ' ' + OUTFIT}",
+                            data=state[OUTFIT]["imgs"][0],
+                            file_name="image.png",
+                        )
+
+                    else:
                         st.markdown(
                             EXCEPTION_HTML,
                             unsafe_allow_html=True,
                         )
-                        print("error in generating imgs: ", error)
 
                 st.write("")
                 if len(state["additional_outfits"][selected_button]) > 0:
@@ -291,21 +283,21 @@ if submit or key in st.session_state:
 
                 if country == "India":
                     st.write("#### Relevant Articles")
-                    none_found = True
+                    NONE_FOUND = True
 
-                    if "relevant_articles" not in state[outfit]:
+                    if "relevant_articles" not in state[OUTFIT]:
                         with st.spinner("Fetching relevant articles..."):
                             print(state["items"][selected_button])
-                            state[outfit]["relevant_articles"] = articles.get_articles(
+                            state[OUTFIT]["relevant_articles"] = articles.get_articles(
                                 state["items"][selected_button][0].lower()
                             )
 
-                    for article in state[outfit]["relevant_articles"]:
+                    for article in state[OUTFIT]["relevant_articles"]:
                         st.write(article[0])
                         st.link_button("Vogue Link", article[1])
-                        none_found = False
+                        NONE_FOUND = False
 
-                    if none_found:
+                    if NONE_FOUND:
                         st.write("No relevant articles found")
 
             else:

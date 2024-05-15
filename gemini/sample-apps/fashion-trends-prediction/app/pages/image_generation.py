@@ -57,7 +57,6 @@ utils_standalone_image_gen.render_image_generation_and_edition_ui(
     generated_images_key=GENERATED_IMAGES_KEY,
     edit_image_prompt_key=EDIT_GENERATED_IMAGE_PROMPT_KEY,
     pre_populated_prompts=PRE_POPULATED_PROMPTS,
-    select_button=False,
     edit_button=True,
     image_to_edit_key=IMAGE_TO_EDIT_GENERATION_KEY,
     edit_with_mask=True,

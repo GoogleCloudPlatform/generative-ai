@@ -10,6 +10,7 @@ Utility module to:
 # pylint: disable=R0913
 # pylint: disable=R0914
 # pylint: disable=R0912
+# pylint: disable=W0212
 
 from typing import List
 
@@ -190,7 +191,7 @@ def generate_image_columns(
 def render_image_generation_ui(
     image_text_prompt_key: str,
     generated_images_key: str,
-    pre_populated_prompts: List[str] = ["an image of a cat"],
+    pre_populated_prompts: List[str],
     edit_button: bool = False,
     title: str = "Generate Images",
     image_to_edit_key: str = "",
@@ -423,9 +424,7 @@ def render_image_generation_and_edition_ui(
     image_text_prompt_key: str,
     generated_images_key: str,
     edit_image_prompt_key: str,
-    pre_populated_prompts: List[str] = ["an image of a cat"],
-    select_button: bool = False,
-    selected_image_key: str = "",
+    pre_populated_prompts: List[str],
     edit_button: bool = False,
     title: str = "Generate Images",
     image_to_edit_key: str = "",
@@ -435,6 +434,47 @@ def render_image_generation_and_edition_ui(
     download_button: bool = False,
     auto_submit_first_pre_populated=False,
 ):
+    """Renders a user interface for generating and editing images.
+
+    This function renders a user interface that allows users to:
+
+    - Generate images from text prompts.
+    - Edit existing images using text prompts.
+    - Download generated and edited images.
+
+    Args:
+        image_text_prompt_key:
+            The key used to store the user's text prompt for generating images in the session state.
+        generated_images_key:
+            The key used to store the generated images in the session state.
+        edit_image_prompt_key:
+            The key used to store the user's text prompt for editing images in the session state.
+        pre_populated_prompts:
+            A list of pre-populated prompts for generating images.
+        select_button:
+            Whether to show a button to select an image to edit.
+        selected_image_key:
+            The key used to store the selected image in the session state.
+        edit_button:
+            Whether to show a button to edit the selected image.
+        title:
+            The title of the user interface.
+        image_to_edit_key:
+            The key used to store the image to edit in the session state.
+        edit_with_mask:
+            Whether to allow users to mask the image to edit.
+        mask_image_key:
+            The key used to store the mask image in the session state.
+        edited_images_key:
+            The key used to store the edited images in the session state.
+        download_button:
+            Whether to show a button to download the generated and edited images.
+        auto_submit_first_pre_populated:
+            Whether to automatically submit the form with the first pre-populated prompt.
+
+    Returns:
+        None.
+    """
     render_image_generation_ui(
         image_text_prompt_key,
         generated_images_key,
