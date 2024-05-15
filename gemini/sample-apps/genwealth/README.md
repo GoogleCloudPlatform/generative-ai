@@ -173,14 +173,14 @@ The pipeline is triggered when a file is uploaded to the `$PROJECT_ID-docs` GCS 
 
 ##### RAG Pipeline Branch
 
-The RAG pipeline branch excutes the following steps:
+The RAG pipeline branch executes the following steps:
 
 1. The `process-pdf` Cloud Function extracts text from the pdf using Document AI (OCR), chunks the extracted text with LangChain, and writes the chunked text to the `langchain_vector_store` table in AlloyDB, leveraging [AlloyDB's LangChain vector store integration](https://python.langchain.com/docs/integrations/vectorstores/google_alloydb).
 1. The `analyze-prospectus` Cloud Function retrieves the document chunks from AlloyDB and iteratively builds a company overview, analysis, and buy/sell/hold rating using Vertex AI. Results are saved to the `investments` table in AlloyDB, where AlloyDB generates embeddings of the `overview` and `analysis` columns to enable vector similary search.
 
 ##### Vertex AI Agent Builder Pipeline Branch
 
-The Vertex AI S&C pipeline branch excutes the following steps:
+The Vertex AI S&C pipeline branch executes the following steps:
 
 1. The `write-metadata` function creates a jsonl file in the `$PROJECT_ID-docs-metadata` GCS bucket to enable faceted search.
 1. The `update-search-index` function kicks off re-indexing of the Vertex AI S&C data store to include the new file in its results.

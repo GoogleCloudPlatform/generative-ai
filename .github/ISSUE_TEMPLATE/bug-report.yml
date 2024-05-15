@@ -16,7 +16,7 @@ body:
     id: file-name
     attributes:
       label: File Name
-      description: Which notebook/code sample is the issue occuring in?
+      description: Which notebook/code sample is the issue occurring in?
       placeholder: ex. `gemini/getting-started/intro_gemini_python.ipynb`
     validations:
       required: true

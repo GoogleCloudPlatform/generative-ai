@@ -117,7 +117,7 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
       <br>
       <a href="../RESOURCES.md"><code>RESOURCES.md</code></a>
     </td>
-    <td>Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud</td>
+    <td>Learning resources (e.g. blogs, YouTube playlists) about Generative AI on Google Cloud</td>
     <td><a href="../RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
   </tr>
 
