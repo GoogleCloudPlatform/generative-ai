@@ -14,4 +14,3 @@ curl -X POST \
       "dataSchema": "document",
     }
   }'
-  

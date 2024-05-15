@@ -30,14 +30,13 @@ docker push "$IMAGE"
 #
 echo "Deploying to Cloud Run"
 gcloud beta run deploy genwealth \
-    --image="$IMAGE" \
-    --execution-environment=gen2 \
-    --cpu-boost \
-    --network="$VPC_NETWORK" \
-    --subnet="$VPC_SUBNET" \
-    --vpc-egress=private-ranges-only \
-    --region="$REGION" \
-    --project="$PROJECT_ID" \
-    --allow-unauthenticated \
-    --set-env-vars=PGHOST="$PGHOST",PGPORT="$PGPORT",PGDATABASE="$PGDATABASE",PGUSER="$PGUSER",PGPASSWORD="$PGPASSWORD",DATASTORE_ID="$DATASTORE_ID",PROSPECTUS_BUCKET="$PROSPECTUS_BUCKET",PROJECT_ID="$PROJECT_ID",REGION="$REGION"
-
+  --image="$IMAGE" \
+  --execution-environment=gen2 \
+  --cpu-boost \
+  --network="$VPC_NETWORK" \
+  --subnet="$VPC_SUBNET" \
+  --vpc-egress=private-ranges-only \
+  --region="$REGION" \
+  --project="$PROJECT_ID" \
+  --allow-unauthenticated \
+  --set-env-vars=PGHOST="$PGHOST",PGPORT="$PGPORT",PGDATABASE="$PGDATABASE",PGUSER="$PGUSER",PGPASSWORD="$PGPASSWORD",DATASTORE_ID="$DATASTORE_ID",PROSPECTUS_BUCKET="$PROSPECTUS_BUCKET",PROJECT_ID="$PROJECT_ID",REGION="$REGION"
