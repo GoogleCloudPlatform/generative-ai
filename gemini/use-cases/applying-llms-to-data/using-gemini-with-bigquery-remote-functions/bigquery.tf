@@ -28,7 +28,7 @@ resource "google_bigquery_connection" "function_connection" {
   project       = module.project-services.project_id
   location      = var.region
   friendly_name = "Gemini connection"
-  description   = "Connecting to the remote function that analyzes imges using Gemini"
+  description   = "Connecting to the remote function that analyzes images using Gemini"
   cloud_resource {}
   depends_on = [time_sleep.wait_after_apis]
 }
