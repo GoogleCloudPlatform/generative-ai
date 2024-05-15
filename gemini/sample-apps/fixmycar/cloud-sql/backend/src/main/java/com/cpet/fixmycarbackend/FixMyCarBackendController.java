@@ -80,7 +80,7 @@ public class FixMyCarBackendController {
     return message;
   }
 
-  // Helper fuction - Generate embeddings from the user's prompt in order to
+  // Helper function - Generate embeddings from the user's prompt in order to
   // perform vector search
   public List<Float> generatePromptEmbeddings(String projectId, String userPrompt) {
     String instance = "{ \"content\": \"" + userPrompt + "\" }";
