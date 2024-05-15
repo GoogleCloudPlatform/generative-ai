@@ -6,7 +6,7 @@ Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generati
 
 This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai).
 
-For more Vertex AI samples, please visit the [Vertex AI samples Github repository](https://github.com/GoogleCloudPlatform/vertex-ai-samples/).
+For more Vertex AI samples, please visit the [Vertex AI samples GitHub repository](https://github.com/GoogleCloudPlatform/vertex-ai-samples/).
 
 ## Using this repository
 
@@ -117,7 +117,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples Github repositor
       <br>
       <a href="RESOURCES.md"><code>RESOURCES.md</code></a>
     </td>
-    <td>Learning resources (e.g. blogs, Youtube playlists) about Generative AI on Google Cloud</td>
+    <td>Learning resources (e.g. blogs, YouTube playlists) about Generative AI on Google Cloud</td>
     <td><a href="RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
   </tr>
 </table>

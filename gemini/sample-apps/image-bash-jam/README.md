@@ -160,7 +160,7 @@ nice to see it for longer verbose answers. You can hear it by opening the file u
 
 ### Troubleshooting
 
-Sometimes you might have authentication warnings (partiocularly with the text-to-speech API).
+Sometimes you might have authentication warnings (particularly with the text-to-speech API).
 You can fix it by re-authenticating through ADC:
 
 ```bash

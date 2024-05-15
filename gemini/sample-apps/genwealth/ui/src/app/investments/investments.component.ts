@@ -46,7 +46,7 @@ export class InvestmentsComponent {
   investmentSearch: string = '';
   searchType: string = SearchType.KEYWORD;
   
-  KEYWORD_PLACHOLDER = "Enter comma delimited key terms to search";
+  KEYWORD_PLACEHOLDER = "Enter comma delimited key terms to search";
   SEMANTIC_PLACEHOLDER = "Describe the type of investment you are looking for";
 
   investments?: Observable<QueryResponse<Investment>> = undefined;
