@@ -231,7 +231,7 @@ Follow the steps below to build the new Gen AI feature.
 
 1. Take a look at the bio column, and notice that your first result is a young entrepreneur named Geoffrey Follmer who has a high risk appetite and already has a small investment in cryptocurrency. Your query didn’t mention anything about Bitcoin or cryptocurrency, but the semantic search understood the type of investor you were looking for.
 
-1. Most of the results are of similar quality, but you notice that at least 2 of your results include clients with medium and low risk tolerances (Gino Cardwell and Mellissa Pullum). You also notice that some of the results are for clients who are too close to retirement age to get good candidates for this particular investment.
+1. Most of the results are of similar quality, but you notice that at least 2 of your results include clients with medium and low risk tolerances (Gino Cardwell and Melissa Pullum). You also notice that some of the results are for clients who are too close to retirement age to get good candidates for this particular investment.
 
 #### Hybrid Search (Semantic Search + Keyword Filtering)
 
