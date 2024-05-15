@@ -34,7 +34,7 @@ You can simply drop that file into the `$PROJECT_ID-docs` bucket in GCS to kick 
 
 1. Write the generated results to the `investments` table in AlloyDB.
 
-The data for the `RDYE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
+The data for the `RYDE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
 
 > NOTE: You can explore the application and document data yourself by logging into pgAdmin as described in the [Back End Demo Walkthrough](../walkthroughs/backend-demo-walkthrough.md) guide.
 
