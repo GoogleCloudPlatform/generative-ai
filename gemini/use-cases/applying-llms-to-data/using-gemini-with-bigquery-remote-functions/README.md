@@ -50,7 +50,7 @@ cd ./generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigq
 
 Check to make sure the [Cloud Resource Manager API](https://console.cloud.google.com/apis/library/cloudresourcemanager.googleapis.com) is enabled
 
-#### 3. Intialize Terraform
+#### 3. Initialize Terraform
 
 First, initialize Terraform by running
 
