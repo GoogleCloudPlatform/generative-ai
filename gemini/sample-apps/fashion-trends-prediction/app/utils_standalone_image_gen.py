@@ -222,7 +222,6 @@ def render_image_generation_ui(
         None.
     """
 
-
     def submitted():
         st.session_state[image_text_prompt_key] = st.session_state[
             f"{image_text_prompt_key}_text_area"
@@ -240,8 +239,10 @@ def render_image_generation_ui(
             "Select one of the pre populated prompts", pre_populated_prompts
         )
 
-        expanded = (f"{image_text_prompt_key}_text_area" in st.session_state and
-                    st.session_state[f"{image_text_prompt_key}_text_area"] != "")
+        expanded = (
+            f"{image_text_prompt_key}_text_area" in st.session_state
+            and st.session_state[f"{image_text_prompt_key}_text_area"] != ""
+        )
 
         with st.expander("[Optional] Write a custom prompt", expanded=expanded):
             st.write(
@@ -337,7 +338,6 @@ def render_image_edit_prompt(
     Returns:
         None.
     """
-
 
     def submitted():
         st.session_state[edit_image_prompt_key] = st.session_state[
