@@ -109,11 +109,15 @@ def get_filter_context_from_vector_database(
         tuple: A tuple containing the filter context and the top matched
         results.
     """
-    st.session_state["query_vectors"] = np.array(embedding_model_with_backoff([question]))
+    st.session_state["query_vectors"] = np.array(
+        embedding_model_with_backoff([question])
+    )
     top_matched_score = (
         st.session_state["processed_data_list"]["embedding"]
         .apply(
-            lambda row: (np.dot(row, st.session_state["query_vectors"]) if row is not None else 0)
+            lambda row: (
+                np.dot(row, st.session_state["query_vectors"]) if row is not None else 0
+            )
         )
         .sort_values(ascending=False)[:sort_index_value]
     )

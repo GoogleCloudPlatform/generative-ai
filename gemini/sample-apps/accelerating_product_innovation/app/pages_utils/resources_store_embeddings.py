@@ -215,18 +215,24 @@ async def csv_processing(
     )
     typed_chunks = await asyncio.gather(
         *(
-            asyncio.to_thread(chunk.assign(types=[type(x) for x in chunk["content"]]), chunk)
+            asyncio.to_thread(
+                chunk.assign(types=[type(x) for x in chunk["content"]]), chunk
+            )
             for chunk in processed_chunks
         )
     )
-    embedded_chunks = await asyncio.gather(*(add_embedding_col(chunk) for chunk in typed_chunks))
+    embedded_chunks = await asyncio.gather(
+        *(add_embedding_col(chunk) for chunk in typed_chunks)
+    )
 
     # Combine, merge, deduplicate, and upload
     pdf_data = pd.concat(embedded_chunks + [embeddings_df])
-    pdf_data = pdf_data.drop_duplicates(subset="content", keep="first").reset_index(drop=True)
-    bucket.blob(f"{st.session_state.product_category}/embeddings.json").upload_from_string(
-        pdf_data.to_json(), "application/json"
+    pdf_data = pdf_data.drop_duplicates(subset="content", keep="first").reset_index(
+        drop=True
     )
+    bucket.blob(
+        f"{st.session_state.product_category}/embeddings.json"
+    ).upload_from_string(pdf_data.to_json(), "application/json")
 
 
 def load_file_content(
@@ -248,7 +254,9 @@ def load_file_content(
         # Read and decode contents of the file.
         file_content = uploaded_file.read().decode("utf-8")
         file_content = file_content.replace("\n", " ")
-        uploaded_file_blob.upload_from_string(file_content, content_type=uploaded_file.type)
+        uploaded_file_blob.upload_from_string(
+            file_content, content_type=uploaded_file.type
+        )
     # Handle case when uploaded file is a document.
     elif (
         uploaded_file.type
@@ -260,11 +268,15 @@ def load_file_content(
         for para in doc.paragraphs:
             file_content += para.text
         "\n".join(file_content)
-        uploaded_file_blob.upload_from_string(file_content, content_type=uploaded_file.type)
+        uploaded_file_blob.upload_from_string(
+            file_content, content_type=uploaded_file.type
+        )
     else:
         # Read and process contents of the pdf file.
         pdf_content = uploaded_file.read()
-        uploaded_file_blob.upload_from_string(pdf_content, content_type=uploaded_file.type)
+        uploaded_file_blob.upload_from_string(
+            pdf_content, content_type=uploaded_file.type
+        )
         # Extract pages from the pdf.
         reader = PdfReader(uploaded_file)
         num_pages = len(reader.pages)
@@ -313,7 +325,9 @@ def create_and_store_embeddings(uploaded_file: UploadedFile) -> None:
             # Create embeddings and store contents of the csv file
             # to the GCS bucket.
             with st.spinner("Processing csv...this might take some time..."):
-                asyncio.run(csv_processing(df, header, embeddings_df, uploaded_file.name))
+                asyncio.run(
+                    csv_processing(df, header, embeddings_df, uploaded_file.name)
+                )
             return
 
         file_content = load_file_content(uploaded_file, uploaded_file_blob)
@@ -346,6 +360,6 @@ def create_and_store_embeddings(uploaded_file: UploadedFile) -> None:
             pdf_data.reset_index(inplace=True, drop=True)
 
             # Upload newly created embeddings to gcs
-            bucket.blob(f"{st.session_state.product_category}/embeddings.json").upload_from_string(
-                pdf_data.to_json(), "application/json"
-            )
+            bucket.blob(
+                f"{st.session_state.product_category}/embeddings.json"
+            ).upload_from_string(pdf_data.to_json(), "application/json")
