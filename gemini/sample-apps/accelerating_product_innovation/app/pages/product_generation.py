@@ -110,7 +110,10 @@ if st.session_state.features_generated is True:
 # feature container
 features = st.empty()
 # Generated features to be displayed only if product content is not generated
-if st.session_state.generated_response is not None and st.session_state.features_generated is True:
+if (
+    st.session_state.generated_response is not None
+    and st.session_state.features_generated is True
+):
     if st.session_state.content_generated is False:
         # Display features on ui
         render_features(features)
