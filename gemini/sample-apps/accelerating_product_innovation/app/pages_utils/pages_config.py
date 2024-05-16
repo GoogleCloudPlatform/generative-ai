@@ -4,7 +4,7 @@ Utility module to work with app config.
 
 from os.path import isfile
 
-import pytomlpp
+import pytomlpp as config_loader
 
 APP_TOML = "./app/app_config.toml"
 OVERRIDE_TOML = "./override.toml"
@@ -13,8 +13,8 @@ assert isfile(APP_TOML), f"The file {APP_TOML} should exist"
 
 with open(APP_TOML, "rb") as f:
     try:
-        data = pytomlpp.load(f)
-    except pytomlpp.DecodeError as e:
+        data = config_loader.load(f)
+    except config_loader.DecodeError as e:
         print("Invalid App Configuration TOML file.")
         print(str(e))
         raise
@@ -37,9 +37,9 @@ def merge(a: dict, b: dict) -> None:
 if isfile(OVERRIDE_TOML):
     with open(OVERRIDE_TOML, "rb") as f:
         try:
-            data_override = pytomlpp.load(f)
+            data_override = config_loader.load(f)
             merge(data, data_override)
-        except pytomlpp.DecodeError as e:
+        except config_loader.DecodeError as e:
             print("Invalid Override TOML File")
             print(str(e))
         except Exception as e:

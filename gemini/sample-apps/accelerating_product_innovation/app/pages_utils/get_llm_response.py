@@ -15,7 +15,7 @@ model (Gemini-Pro).
 import json
 import os
 
-import aiohttp
+import aiohttp as cloud_function_call
 from dotenv import load_dotenv
 import streamlit as st
 import vertexai
@@ -58,7 +58,7 @@ async def parallel_generate_search_results(query: str) -> str:
         The generated search results.
     """
     text_query = json.dumps({"text_prompt": query})
-    async with aiohttp.ClientSession() as session:
+    async with cloud_function_call.ClientSession() as session:
         url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/gemini-call"
         # Create post request to get text.
         async with session.post(

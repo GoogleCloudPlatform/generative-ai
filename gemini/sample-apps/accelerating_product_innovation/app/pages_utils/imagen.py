@@ -10,7 +10,7 @@ import json
 import logging
 import os
 
-import aiohttp
+import aiohttp as cloud_function_call
 import cv2
 import numpy as np
 import streamlit as st
@@ -25,6 +25,7 @@ LOCATION = os.getenv("LOCATION")
 
 # Set project parameters
 IMAGE_MODEL_NAME = "imagegeneration@006"
+model = ImageGenerationModel.from_pretrained(IMAGE_MODEL_NAME)
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 
@@ -42,8 +43,6 @@ def predict_edit_image(
         A list of <vertexai.preview.vision_models.GeneratedImage> object
         containing the predictions.
     """
-
-    model = ImageGenerationModel.from_pretrained("imagegeneration@006")
 
     responses = model.edit_image(
         prompt=instance_dict["prompt"],
@@ -77,7 +76,6 @@ def image_generation(
     Returns:
         None.
     """
-    model = ImageGenerationModel.from_pretrained("imagegeneration@006")
     images = model.generate_images(
         prompt=prompt,
         # Optional parameters
@@ -97,7 +95,7 @@ async def parallel_image_generation(prompt: str, col: int):
         col (int): A pointer to the draft number of the image.
     """
     image_prompt = json.dumps({"img_prompt": prompt})
-    async with aiohttp.ClientSession() as session:
+    async with cloud_function_call.ClientSession() as session:
         url = f"https://us-central1-{PROJECT_ID}.cloudfunctions.net/imagen-call"
         # Create a post request to get images.
         async with session.post(
@@ -110,9 +108,7 @@ async def parallel_image_generation(prompt: str, col: int):
             if img_response.status == 200:
                 response = await img_response.read()
                 # Load image from response.
-                response_image = cv2.imdecode(
-                    np.frombuffer(response, dtype=np.uint8), 1
-                )
+                response_image = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
                 # Save image for later use.
                 cv2.imwrite(
                     f"gen_image{st.session_state.num_drafts+col}.png",

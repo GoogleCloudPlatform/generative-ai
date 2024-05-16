@@ -17,10 +17,10 @@ documents.
 
 from math import sqrt
 
-import fpdf
+import fpdf as pdf_generator
 
 
-class PDFRounded(fpdf.FPDF):
+class PDFRounded(pdf_generator.FPDF):
     """
     Initializes basic PDF template for email and content files
     """
@@ -151,7 +151,7 @@ class PDFRounded(fpdf.FPDF):
         )
 
 
-def add_formatted_page(pdf: fpdf) -> None:
+def add_formatted_page(pdf: pdf_generator) -> None:
     """Adds a formatted page to the PDF document.
 
     The page is filled with a light gray color and has a white rectangle in
@@ -170,7 +170,7 @@ def add_formatted_page(pdf: fpdf) -> None:
     pdf.rect(10, 10, 190, 277, "F")
 
 
-def check_add_page(pdf: fpdf, text: str) -> list[str]:
+def check_add_page(pdf: pdf_generator, text: str) -> list[str]:
     """Checks if the text overflows onto a new page and adds a new page if
       necessary.
 

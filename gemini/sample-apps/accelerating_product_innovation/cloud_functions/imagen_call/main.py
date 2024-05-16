@@ -21,7 +21,7 @@ LOCATION = os.getenv("LOCATION")
 def image_generation(prompt: str):
     """
     Generates images based on given prompt
-    using imagegeneration@006 model.
+    using image generation model.
 
     Args:
         prompt (str):

@@ -5,13 +5,13 @@ layouts and formatting.
 
 from typing import Any
 
-from app.pages_utils.pdf_generation import PDFRounded as FPDF
+from app.pages_utils.pdf_generation import PDFRounded as pdf_generator
 from app.pages_utils.pdf_generation import add_formatted_page, check_add_page
 import streamlit as st
 
 
 def create_pdf_layout(
-    pdf: FPDF, content: list[str], title: str, images: list[str]
+    pdf: pdf_generator, content: list[str], title: str, images: list[str]
 ) -> None:
     """
     Creates a PDF layout with the given content, title, and images.
@@ -76,7 +76,7 @@ def create_content_pdf(
         selected_titles: A list of selected titles for each product content.
     """
     for product_index in range(len(product_content) - 1):
-        pdf = FPDF()  # Create a PDF for the current product
+        pdf = pdf_generator()  # Create a PDF for the current product
 
         # Build content and image lists for the current product
         content = [product_content[(int)(product_index)][0]["text"].replace("**", "")]
@@ -104,9 +104,7 @@ def cut_string(string: str, num_characters: int) -> str:
     return string[:num_characters]
 
 
-def create_email_pdf(
-    title: str, email_text: str, filename: str, image_name: str
-) -> None:
+def create_email_pdf(title: str, email_text: str, filename: str, image_name: str) -> None:
     """Creates a PDF document from an email.
 
     The PDF document contains the email subject, body, and an image.
@@ -119,7 +117,7 @@ def create_email_pdf(
         image_name: The name of the image file to be included in the PDF
         document.
     """
-    pdf = FPDF()
+    pdf = pdf_generator()
 
     # Extract subject and text from email text.
     parts = email_text.split("\n", 1)
