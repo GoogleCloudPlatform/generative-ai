@@ -11,8 +11,8 @@ import json
 import logging
 import os
 
-import aiohttp as cloud_function_call
 from PIL import Image
+import aiohttp as cloud_function_call
 import streamlit as st
 import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
