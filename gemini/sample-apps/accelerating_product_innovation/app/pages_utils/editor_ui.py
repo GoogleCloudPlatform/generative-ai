@@ -82,7 +82,7 @@ class ImageEditor:
         self.drawing_mode = st.selectbox(
             "[Optional] Draw a mask where you want to edit the image",
             drawing_dict.keys(),
-            key="canvas_selectbox",
+            key="canvas_select_box",
         )
 
         # Canvas Setup
