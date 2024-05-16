@@ -24,12 +24,13 @@ generation page.
 """
 
 import io
+import streamlit as st
 import logging
 
 import PIL
 from PIL import Image
 from app.pages_utils.imagen import predict_edit_image
-import streamlit as st
+
 from vertexai.preview.vision_models import Image as vertex_image
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
