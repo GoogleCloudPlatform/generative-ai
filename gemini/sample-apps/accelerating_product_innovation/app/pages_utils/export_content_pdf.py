@@ -104,7 +104,9 @@ def cut_string(string: str, num_characters: int) -> str:
     return string[:num_characters]
 
 
-def create_email_pdf(title: str, email_text: str, filename: str, image_name: str) -> None:
+def create_email_pdf(
+    title: str, email_text: str, filename: str, image_name: str
+) -> None:
     """Creates a PDF document from an email.
 
     The PDF document contains the email subject, body, and an image.
