@@ -72,14 +72,6 @@ if st.session_state.start_editing is None or st.session_state.start_editing is T
     if canvas_result.image_data is not None and canvas_result.image_data.any():
         # Convert canvas data to a PIL Image object
         foreground = Image.fromarray(canvas_result.image_data)
-        # Convert to bytes
-        img_byte_arr = io.BytesIO()
-        img_byte_arr.write(canvas_result.image_data.tobytes())
-        img_byte_arr.seek(0)
-
-        # Create PIL Image
-        foreground = Image.open(img_byte_arr)
-
         # Call image processing function, using canvas drawing as foreground
         processed_image_bytes = process_foreground_image(
             foreground_image=foreground,
