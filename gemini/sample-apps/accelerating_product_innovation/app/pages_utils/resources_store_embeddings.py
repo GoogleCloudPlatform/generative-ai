@@ -35,7 +35,7 @@ load_dotenv()
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(level)s:%(message)s", level=logging.DEBUG)
 
 # Define storage bucket
 storage_client = storage.Client(project=PROJECT_ID)
@@ -250,10 +250,7 @@ def load_file_content(
         file_content = file_content.replace("\n", " ")
         uploaded_file_blob.upload_from_string(file_content, content_type=uploaded_file.type)
     # Handle case when uploaded file is a document.
-    elif (
-        uploaded_file.type
-        == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ):
+    elif uploaded_file.name.lower().endswith(".docx"):
         # Read and clean up contents of the document.
         doc = docx.Document(uploaded_file)
         file_content = ""

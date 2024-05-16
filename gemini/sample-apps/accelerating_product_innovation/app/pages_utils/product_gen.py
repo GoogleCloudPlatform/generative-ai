@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 import streamlit as st
 
 logging.basicConfig(
-    format="%(levelname)s:%(message)s",
+    format="%(level)s:%(message)s",
     level=logging.DEBUG,
 )
 load_dotenv()

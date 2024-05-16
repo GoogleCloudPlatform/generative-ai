@@ -83,7 +83,7 @@ initialize_prod_gen()
 # Page styles
 setup.load_css("app/css/prod_gen_styles.css")
 # logging initialization
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(level)s:%(message)s", level=logging.DEBUG)
 
 # page title
 st.write(

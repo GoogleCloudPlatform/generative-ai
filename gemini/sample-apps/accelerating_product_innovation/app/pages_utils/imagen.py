@@ -17,7 +17,7 @@ import streamlit as st
 import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
 
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(level)s:%(message)s", level=logging.DEBUG)
 
 # Set project parameters
 PROJECT_ID = os.getenv("PROJECT_ID")

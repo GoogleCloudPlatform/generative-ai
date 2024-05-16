@@ -32,7 +32,7 @@ from app.pages_utils.imagen import predict_edit_image
 import streamlit as st
 from vertexai.preview.vision_models import Image as vertex_image
 
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(level)s:%(message)s", level=logging.DEBUG)
 
 
 def process_foreground_image(
@@ -58,17 +58,24 @@ def process_foreground_image(
 
     # Logic to edit background (invert mask)
     if bg_editing:
-        # Get image foreground
-        foreground_data = foreground_image.getdata()
-        new_bytes = []
-        # Invert pixels.
-        for item in foreground_data:
-            if item[0] == 255 and item[1] == 255 and item[2] == 255:
-                new_bytes.append((255, 255, 255, 0))
-            else:
-                new_bytes.append((255, 255, 255, 1))
+        # Get pixel access object
+        pixels = foreground_image.load()
 
-        foreground_image.putdata(new_bytes)
+        # Get image dimensions
+        width, height = foreground_image.size
+
+        # Loop through pixels
+        for x in range(width):
+            for y in range(height):
+                r, g, b, a = pixels[x, y]  # Get current pixel values
+
+                # Modify alpha based on color
+                if (r, g, b) == (255, 255, 255):  # White
+                    a = 0
+                else:
+                    a = 255
+
+                pixels[x, y] = (r, g, b, a)  # Update pixel in-place
 
     # Resize and merge foreground with background
     resized_foreground = foreground_image.resize(background_image.size)
@@ -236,7 +243,7 @@ def generate_suggested_images(
 
     Args:
         image_prompt (str): Text prompt for image generation.
-        image_bytes (BytesIO): Initial image data for inpainting or variation.
+        image_bytes (BytesIO): Initial image data for edi.
         mask_image (bytes): Mask defining the region to
         edit (optional).
     """
