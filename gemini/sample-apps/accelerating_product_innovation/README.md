@@ -21,7 +21,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
 - **For Q&A on uploaded files, navigate to 'Product Insights' page**
   - **Insight Generation**: Ask questions to extract critical information from your data.
 - **For Product Idea generation, navigate to 'Product Generation' page**
-  - **Concept Creation**: Initiate product generation using sample queries or creater your own custom query.
+  - **Concept Creation**: Initiate product generation using sample queries or create your own custom query.
   - **Refinement**: Select features, experiment with combinations, and regenerate results until the desired product concept is achieved.
 
 ## Application Workflow
@@ -30,7 +30,7 @@ To access the application, follow the steps in `Setup.md`. Once you have the sol
    You have the option to either create a new project or select an existing project in the resources page of the application for generating product insights. Choose one of the following steps:
 
    - **New Project Creation**:
-     - Initiate a new project within the application by giving it a descriptive name (e.g., "2024 Sunscreen Innovation" or "Haircare Line Extension").
+     - Initiate a new project within the application by giving it a descriptive name (e.g., "2024 Sunscreen Innovation" or "Hair care Line Extension").
      - Once a project is created, the document upload process is mandatory before proceeding to analysis features.
    - **Existing Project Modification**:
      - Select an existing project from a list.

@@ -90,7 +90,7 @@ rm cloud_fn_1
 # Set project ID, region, and service name (modify as needed)
 SERVICE_NAME="accelerating-product-innovation"
 
-# Build the container image (Cloud Buildpacks will detect Python)
+# Build the container image
 gcloud builds submit --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME" .
 
 # Deploy the image to Cloud Run

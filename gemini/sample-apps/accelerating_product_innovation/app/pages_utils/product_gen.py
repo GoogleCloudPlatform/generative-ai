@@ -38,18 +38,12 @@ def update_generation_state() -> None:
         st.session_state.selected_prompt = st.session_state.custom_prompt
         st.session_state.custom_prompt = ""
 
-    st.session_state.features_generated = True  # Initate feature generation
-    st.session_state.generated_response = (
-        None  # store the response by llm for features.
-    )
+    st.session_state.features_generated = True  # Initiate feature generation
+    st.session_state.generated_response = None  # store the response by llm for features.
     # Track whether content corresponding to features has been generated.
     st.session_state.content_generated = False
-    st.session_state.create_product = (
-        False  # Tracks whether a new product idea has been created.
-    )
-    st.session_state.selected_titles = (
-        []
-    )  # Stores selected titles for new product generation.
+    st.session_state.create_product = False  # Tracks whether a new product idea has been created.
+    st.session_state.selected_titles = []  # Stores selected titles for new product generation.
     st.session_state.product_content = []  # Content corresponding to each feature.
     st.session_state.content_edited = False  # Tracks whether content is being edited.
 
@@ -110,8 +104,8 @@ def create_suggestion_list(gen_suggestions: str) -> list[str]:
     suggestions = []
     sep_suggestions = gen_suggestions.split("\n")
     for suggestion in sep_suggestions:
-        sug = suggestion.split(".")
-        if len(sug) > 1:
+        suggestion_split = suggestion.split(".")
+        if len(suggestion_split) > 1:
             suggestions.append(suggestion.split(".", 1)[1])
 
     return suggestions
@@ -154,11 +148,9 @@ async def parallel_call(titles: list[str]) -> list[Any]:
             text_processes.append(
                 asyncio.create_task(parallel_generate_search_results(text_prompt))
             )
-            img_processes.append(
-                asyncio.create_task(parallel_image_generation(img_prompt, index))
-            )
+            img_processes.append(asyncio.create_task(parallel_image_generation(img_prompt, index)))
 
-    # Append the generated content to final resul arrays.
+    # Append the generated content to final result arrays.
     text_result_arr = await asyncio.gather(*text_processes)
     image_result_arr = await asyncio.gather(*img_processes)
 
@@ -268,12 +260,8 @@ async def handle_content_generation(features: st.container) -> None:
 
     await generate_product_content()  # generates content
 
-    st.session_state.create_product = (
-        True  # Tracks whether product ideas have been generated.
-    )
-    st.session_state.content_generated = (
-        True  # Tracks whether product content has been generated.
-    )
+    st.session_state.create_product = True  # Tracks whether product ideas have been generated.
+    st.session_state.content_generated = True  # Tracks whether product content has been generated.
 
     # Prepare titles for processing.
     st.session_state.chosen_titles = st.session_state.selected_titles.copy()

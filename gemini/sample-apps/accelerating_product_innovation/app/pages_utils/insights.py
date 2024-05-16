@@ -94,7 +94,7 @@ def get_stored_embeddings_as_df() -> Optional[pd.DataFrame]:
     return None
 
 
-def get_filter_context_from_vectordb(
+def get_filter_context_from_vector_database(
     question: str, sort_index_value: int = 3
 ) -> tuple[str, pd.DataFrame]:
     """Gets the filter context from the vector database.
@@ -109,15 +109,11 @@ def get_filter_context_from_vectordb(
         tuple: A tuple containing the filter context and the top matched
         results.
     """
-    st.session_state["query_vectors"] = np.array(
-        embedding_model_with_backoff([question])
-    )
+    st.session_state["query_vectors"] = np.array(embedding_model_with_backoff([question]))
     top_matched_score = (
         st.session_state["processed_data_list"]["embedding"]
         .apply(
-            lambda row: (
-                np.dot(row, st.session_state["query_vectors"]) if row is not None else 0
-            )
+            lambda row: (np.dot(row, st.session_state["query_vectors"]) if row is not None else 0)
         )
         .sort_values(ascending=False)[:sort_index_value]
     )
@@ -149,7 +145,7 @@ def generate_insights_search_result(query: str) -> tuple[str, pd.DataFrame]:
     """
 
     question = query
-    context, top_matched_df = get_filter_context_from_vectordb(
+    context, top_matched_df = get_filter_context_from_vector_database(
         question=query, sort_index_value=20
     )
 

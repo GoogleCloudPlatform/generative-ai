@@ -66,7 +66,7 @@ def initialize_prod_gen() -> None:
     # Tracks whether image suggestions have been generated (on edit image).
     st.session_state.suggested_images = None
     st.session_state.generate_images = (
-        False  # Tracks whetehr images for product ideas have been generated.
+        False  # Tracks whether images for product ideas have been generated.
     )
     # Display header images
     get_prod_gen_img()
@@ -110,22 +110,19 @@ if st.session_state.features_generated is True:
 # feature container
 features = st.empty()
 # Generated features to be displayed only if product content is not generated
-if (
-    st.session_state.generated_response is not None
-    and st.session_state.features_generated is True
-):
+if st.session_state.generated_response is not None and st.session_state.features_generated is True:
     if st.session_state.content_generated is False:
         # Display features on ui
         render_features(features)
 
-    # Colunms for four buttons for product content
-    content_gen_btns = st.columns([10, 4, 10, 4, 10, 4, 10])
+    # Columns for four buttons for product content
+    content_gen_buttons = st.columns([10, 4, 10, 4, 10, 4, 10])
 
     # product content container
     content = st.empty()
 
     # Generate Button
-    with content_gen_btns[0]:
+    with content_gen_buttons[0]:
         # Get content corresponding to the features
         if st.button("Generate Content", type="primary"):
             asyncio.run(handle_content_generation(features))
@@ -136,7 +133,7 @@ if (
 
     if st.session_state.create_product is True:
         # Modify Button
-        with content_gen_btns[2]:
+        with content_gen_buttons[2]:
             modify_btn = st.button("Modify Selection", type="primary")
 
         # Redisplay the product drafts if content is being modified
@@ -144,7 +141,7 @@ if (
             modify_selection(content)
 
         # Email download Button
-        with content_gen_btns[4]:
+        with content_gen_buttons[4]:
             email_dl_btn = st.button(
                 "Generate Email Copy",
                 on_click=download_file,
@@ -152,7 +149,7 @@ if (
             )
 
         # Download Content Button
-        with content_gen_btns[6]:
+        with content_gen_buttons[6]:
             if st.session_state.product_content is not None:
                 export_btn = st.button(
                     "Export Content",

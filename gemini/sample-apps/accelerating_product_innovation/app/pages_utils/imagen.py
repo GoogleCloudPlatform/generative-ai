@@ -106,13 +106,11 @@ async def parallel_image_generation(prompt: str, col: int):
             headers=st.session_state.headers,
             verify_ssl=False,
         ) as img_response:
-            # Check if respose is valid.
+            # Check if response is valid.
             if img_response.status == 200:
                 response = await img_response.read()
                 # Load image from response.
-                response_image = cv2.imdecode(
-                    np.frombuffer(response, dtype=np.uint8), 1
-                )
+                response_image = cv2.imdecode(np.frombuffer(response, dtype=np.uint8), 1)
                 # Save image for later use.
                 cv2.imwrite(
                     f"gen_image{st.session_state.num_drafts+col}.png",

@@ -1,6 +1,4 @@
-aiohttp
 backoff
-fpdf
 google-cloud-aiplatform
 numpy
 opencv-python
@@ -8,7 +6,7 @@ opencv-python-headless
 pandas
 pillow
 PyPDF2
-python-dotenv
+dotenv
 python-docx
 pytomlpp
 streamlit
