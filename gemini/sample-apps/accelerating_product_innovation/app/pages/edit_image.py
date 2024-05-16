@@ -14,6 +14,7 @@ It provides the following features:
     * Displays the generated image suggestions.
 """
 
+import io
 import logging
 
 from PIL import Image
@@ -40,7 +41,7 @@ setup.page_setup(page_cfg)
 initialize_edit_page_state()
 
 # Set up logging
-logging.basicConfig(format="%(level)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(levelname)s:%(message)s", levelname=logging.DEBUG)
 
 # Check if the user has uploaded an image
 if st.session_state.uploaded_img is True:
@@ -71,6 +72,13 @@ if st.session_state.start_editing is None or st.session_state.start_editing is T
     if canvas_result.image_data is not None and canvas_result.image_data.any():
         # Convert canvas data to a PIL Image object
         foreground = Image.fromarray(canvas_result.image_data)
+        # Convert to bytes
+        img_byte_arr = io.BytesIO()
+        img_byte_arr.write(canvas_result.image_data.tobytes())
+        img_byte_arr.seek(0)
+
+        # Create PIL Image
+        foreground = Image.open(img_byte_arr)
 
         # Call image processing function, using canvas drawing as foreground
         processed_image_bytes = process_foreground_image(

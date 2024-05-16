@@ -83,7 +83,7 @@ initialize_prod_gen()
 # Page styles
 setup.load_css("app/css/prod_gen_styles.css")
 # logging initialization
-logging.basicConfig(format="%(level)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(levelname)s:%(message)s", levelname=logging.DEBUG)
 
 # page title
 st.write(
@@ -110,10 +110,7 @@ if st.session_state.features_generated is True:
 # feature container
 features = st.empty()
 # Generated features to be displayed only if product content is not generated
-if (
-    st.session_state.generated_response is not None
-    and st.session_state.features_generated is True
-):
+if st.session_state.generated_response is not None and st.session_state.features_generated is True:
     if st.session_state.content_generated is False:
         # Display features on ui
         render_features(features)

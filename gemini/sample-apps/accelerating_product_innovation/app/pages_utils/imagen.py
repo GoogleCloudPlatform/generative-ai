@@ -6,18 +6,18 @@ Utility module to:
  - Render the image generation and editing UI
 """
 
+import io
 import json
 import logging
 import os
 
 import aiohttp as cloud_function_call
-import cv2
-import numpy as np
+from PIL import Image
 import streamlit as st
 import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
 
-logging.basicConfig(format="%(level)s:%(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(levelname)s:%(message)s", levelname=logging.DEBUG)
 
 # Set project parameters
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -107,13 +107,11 @@ async def parallel_image_generation(prompt: str, col: int):
             # Check if response is valid.
             if img_response.status == 200:
                 response = await img_response.read()
-                # Load image from response.
-                response_image = cv2.imdecode(
-                    np.frombuffer(response, dtype=np.uint8), 1
-                )
-                # Save image for later use.
-                cv2.imwrite(
-                    f"gen_image{st.session_state.num_drafts+col}.png",
-                    response_image,
+
+                # Load response image.
+                response_image = Image.open(io.BytesIO(response))
+                # Save image for further use.
+                response_image.save(
+                    f"gen_image{st.session_state.num_drafts+col}.png", format="PNG"
                 )
                 return response_image
