@@ -40,7 +40,7 @@ setup.page_setup(page_cfg)
 initialize_edit_page_state()
 
 # Set up logging
-logging.basicConfig(format="%(levelname)s:%(message)s", levelname=logging.DEBUG)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
 # Check if the user has uploaded an image
 if st.session_state.uploaded_img is True:

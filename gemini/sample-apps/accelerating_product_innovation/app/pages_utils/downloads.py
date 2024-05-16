@@ -18,7 +18,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 load_dotenv()
-logging.basicConfig(format="%(levelname)s:%(message)s", levelname=logging.DEBUG)
+
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 st.session_state.image_file_prefix = "email_image"
 
 
