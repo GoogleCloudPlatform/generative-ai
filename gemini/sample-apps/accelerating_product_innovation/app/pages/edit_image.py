@@ -14,7 +14,6 @@ It provides the following features:
     * Displays the generated image suggestions.
 """
 
-import io
 import logging
 
 from PIL import Image
