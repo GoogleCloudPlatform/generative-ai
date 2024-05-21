@@ -84,7 +84,7 @@ def handle_rag_webhook(
 ) -> dict:
     """Handles translation for rag webhook from the website."""
 
-    rag_qa_chain_url = environ.get("RAG_QA_CHAIN_URL")
+    rag_qa_chain_url: str = environ.get("RAG_QA_CHAIN_URL")
     if "en" in source_language_code:
         todo = {"query": text}
         return get_json_response(rag_qa_chain_url, todo, request_headers)
@@ -140,7 +140,7 @@ def handle_category_wise_expenditure_webhook(
 ) -> dict:
     """Handles translation for category wise expenditure webhook from the website."""
 
-    url = environ.get("CATEGORIZE_EXPENSE_URL")
+    url: str = environ.get("CATEGORIZE_EXPENSE_URL")
     res_json = get_json_response(url, request_json, request_headers)
     if "en" not in source_language_code:
         res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
@@ -203,7 +203,7 @@ def handle_webhook(request_json: dict) -> dict:
         "unusual-expense",
         "find_nearest_dealer",
     ]:
-        url = {
+        url: str = {
             "account-summary": environ.get("ACCOUNT_SUMMARY_URL"),
             "account-tips": environ.get("ACCOUNT_TIPS_URL"),
             "event": environ.get("EVENT_RECOMM_URL"),
@@ -230,7 +230,7 @@ def handle_webhook(request_json: dict) -> dict:
         "fd_tenure",
         "create-fd",
     ]:
-        url = {
+        url: str = {
             "account-balance": environ.get("ACCOUNT_BALANCE_URL"),
             "credit-card-recommendation": environ.get("CREDIT_CARD_RECOMM_URL"),
             "create-credit-card": environ.get("CREDIT_CARD_CREATE_URL"),
@@ -260,7 +260,7 @@ def handle_webhook(request_json: dict) -> dict:
         "recommend-debt-fund",
         "travel",
     ]:
-        url = {
+        url: str = {
             "debt_fund_webhook": environ.get("DEBT_FUND_URL"),
             "expense-prediction": environ.get("EXPENSE_PREDICT_URL"),
             "recommend-debt-fund": environ.get("DEBT_FUND_RECOMM_URL"),
@@ -282,7 +282,7 @@ def handle_webhook(request_json: dict) -> dict:
                     )
 
     elif tag == "tenure-validation":
-        url = environ.get("FD_TENURE_VAL_URL")
+        url: str = environ.get("FD_TENURE_VAL_URL")
         request_json["sessionInfo"]["parameters"]["fd_tenure"] = translate_text(
             request_json["sessionInfo"]["parameters"]["fd_tenure"],
             source_language_code,
@@ -311,7 +311,7 @@ def handle_search(request_json):
 
     source_language_code = detect_language(text)
 
-    rag_qa_chain_url = environ.get("RAG_QA_CHAIN_URL")
+    rag_qa_chain_url: str = environ.get("RAG_QA_CHAIN_URL")
 
     request_headers = {"Content-Type": "application/json"}
 
