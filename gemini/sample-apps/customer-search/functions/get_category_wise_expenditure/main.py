@@ -1,11 +1,14 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 import uuid
 
 import functions_framework
 import plotly.graph_objects as go
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 from utils.upload_to_gcs import upload_blob
@@ -43,7 +46,9 @@ def category_wise_expenditure(request):
     for row in result_categories:
         amount.append(round(row["amount"], 2))
         category.append(row["sub_category"])
-        transaction_list_str = transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
+        transaction_list_str = (
+            transaction_list_str + f"{row['sub_category']}: ₹{row['amount']}\n"
+        )
         total_expenditure = total_expenditure + row["amount"]
 
     model = Gemini()
@@ -85,11 +90,11 @@ def category_wise_expenditure(request):
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
 
     # Uploading pie chart to cloud bucket
-    id = uuid.uuid4()
-    BUCKET_NAME = environ.get("PUBLIC_BUCKET_NAME")
-    SOURCE_FILE_NAME = fig.to_image(format="png")
-    DESTINATION_FILE_NAME = f"pie_chart_{id}"
-    url = upload_blob(BUCKET_NAME, SOURCE_FILE_NAME, DESTINATION_FILE_NAME)
+    uid = uuid.uuid4()
+    bucket_name = environ.get("PUBLIC_BUCKET_NAME")
+    source_file_name = fig.to_image(format="png")
+    destination_file_name = f"pie_chart_{uid}"
+    url = upload_blob(bucket_name, source_file_name, destination_file_name)
 
     # Returning response as image
     res = {

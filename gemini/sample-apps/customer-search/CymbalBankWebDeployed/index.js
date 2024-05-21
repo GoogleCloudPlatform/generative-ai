@@ -58,6 +58,11 @@ let template_credit_tc;
 let template_loan_tc;
 let template_loan_agreement;
 
+handlebars.registerPartial(
+  "layout",
+  readFileSync("public/layout.html.hbs", "utf8")
+);
+
 function handleError(e) {
   console.error(e);
   res.status(500).send("Internal Server Error");
@@ -67,7 +72,7 @@ app.get("/", async (req, res) => {
   if (!template) {
     try {
       template = handlebars.compile(
-        readFileSync("public/index.html.hbs", "utf8"),
+        readFileSync("public/index.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -85,7 +90,7 @@ app.get("/search", async (req, res) => {
   if (!template_search) {
     try {
       template_search = handlebars.compile(
-        readFileSync("public/search.html.hbs", "utf8"),
+        readFileSync("public/search.html.hbs", "utf8")
       );
     } catch (e) {
       console.error(e);
@@ -104,7 +109,7 @@ app.get("/saving", async (req, res) => {
   if (!template_saving) {
     try {
       template_saving = handlebars.compile(
-        readFileSync("public/saving.html.hbs", "utf8"),
+        readFileSync("public/saving.html.hbs", "utf8")
       );
     } catch (e) {
       console.error(e);
@@ -123,7 +128,7 @@ app.get("/credit_card", async (req, res) => {
   if (!template_credit_card) {
     try {
       template_credit_card = handlebars.compile(
-        readFileSync("public/credit_card.html.hbs", "utf8"),
+        readFileSync("public/credit_card.html.hbs", "utf8")
       );
     } catch (e) {
       console.error(e);
@@ -142,7 +147,7 @@ app.get("/custom_credit_card", async (req, res) => {
   if (!template_custom_credit_card) {
     try {
       template_custom_credit_card = handlebars.compile(
-        readFileSync("public/custom_credit_card.html.hbs", "utf8"),
+        readFileSync("public/custom_credit_card.html.hbs", "utf8")
       );
     } catch (e) {
       console.error(e);
@@ -161,7 +166,7 @@ app.get("/neft", async (req, res) => {
   if (!template_neft) {
     try {
       template_neft = handlebars.compile(
-        readFileSync("public/neft.html.hbs", "utf8"),
+        readFileSync("public/neft.html.hbs", "utf8")
       );
     } catch (e) {
       console.error(e);
@@ -180,7 +185,7 @@ app.get("/upi", async (req, res) => {
   if (!template_upi) {
     try {
       template_upi = handlebars.compile(
-        readFileSync("public/upi.html.hbs", "utf8"),
+        readFileSync("public/upi.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -198,7 +203,7 @@ app.get("/imps", async (req, res) => {
   if (!template_imps) {
     try {
       template_imps = handlebars.compile(
-        readFileSync("public/imps.html.hbs", "utf8"),
+        readFileSync("public/imps.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -216,7 +221,7 @@ app.get("/debit_card", async (req, res) => {
   if (!template_debit_card) {
     try {
       template_debit_card = handlebars.compile(
-        readFileSync("public/debit_card.html.hbs", "utf8"),
+        readFileSync("public/debit_card.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -234,7 +239,7 @@ app.get("/recharge", async (req, res) => {
   if (!template_recharge) {
     try {
       template_recharge = handlebars.compile(
-        readFileSync("public/recharge.html.hbs", "utf8"),
+        readFileSync("public/recharge.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -252,7 +257,7 @@ app.get("/electricity", async (req, res) => {
   if (!template_electricity) {
     try {
       template_electricity = handlebars.compile(
-        readFileSync("public/electricity.html.hbs", "utf8"),
+        readFileSync("public/electricity.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -270,7 +275,7 @@ app.get("/insurance_premium", async (req, res) => {
   if (!template_insurance_premium) {
     try {
       template_insurance_premium = handlebars.compile(
-        readFileSync("public/insurance_premium.html.hbs", "utf8"),
+        readFileSync("public/insurance_premium.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -288,7 +293,7 @@ app.get("/mutual_funds", async (req, res) => {
   if (!template_mutual_funds) {
     try {
       template_mutual_funds = handlebars.compile(
-        readFileSync("public/mutual_funds.html.hbs", "utf8"),
+        readFileSync("public/mutual_funds.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -306,7 +311,7 @@ app.get("/ipo", async (req, res) => {
   if (!template_ipo) {
     try {
       template_ipo = handlebars.compile(
-        readFileSync("public/ipo.html.hbs", "utf8"),
+        readFileSync("public/ipo.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -324,7 +329,7 @@ app.get("/stocks", async (req, res) => {
   if (!template_stocks) {
     try {
       template_stocks = handlebars.compile(
-        readFileSync("public/stocks.html.hbs", "utf8"),
+        readFileSync("public/stocks.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -342,7 +347,7 @@ app.get("/current", async (req, res) => {
   if (!template_current) {
     try {
       template_current = handlebars.compile(
-        readFileSync("public/current.html.hbs", "utf8"),
+        readFileSync("public/current.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -360,7 +365,7 @@ app.get("/salary", async (req, res) => {
   if (!template_salary) {
     try {
       template_salary = handlebars.compile(
-        readFileSync("public/salary.html.hbs", "utf8"),
+        readFileSync("public/salary.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -378,7 +383,7 @@ app.get("/fixed_deposit", async (req, res) => {
   if (!template_fixed_deposit) {
     try {
       template_fixed_deposit = handlebars.compile(
-        readFileSync("public/fixed_deposit.html.hbs", "utf8"),
+        readFileSync("public/fixed_deposit.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -396,7 +401,7 @@ app.get("/recurring_deposit", async (req, res) => {
   if (!template_recurring_deposit) {
     try {
       template_recurring_deposit = handlebars.compile(
-        readFileSync("public/recurring_deposit.html.hbs", "utf8"),
+        readFileSync("public/recurring_deposit.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -414,7 +419,7 @@ app.get("/loans", async (req, res) => {
   if (!template_loans) {
     try {
       template_loans = handlebars.compile(
-        readFileSync("public/loans.html.hbs", "utf8"),
+        readFileSync("public/loans.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -432,7 +437,7 @@ app.get("/saving/terms_and_condition", async (req, res) => {
   if (!template_saving_terms) {
     try {
       template_saving_terms = handlebars.compile(
-        readFileSync("public/saving_terms_and_condition.html.hbs", "utf8"),
+        readFileSync("public/saving_terms_and_condition.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -450,7 +455,7 @@ app.get("/calculator", async (req, res) => {
   if (!template_calculator) {
     try {
       template_calculator = handlebars.compile(
-        readFileSync("public/calculator.html.hbs", "utf8"),
+        readFileSync("public/calculator.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -480,7 +485,7 @@ app.get("/loans/terms_and_condition", async (req, res) => {
   if (!template_loan_tc) {
     try {
       template_loan_tc = handlebars.compile(
-        readFileSync("public/loans_T&C.html.hbs", "utf8"),
+        readFileSync("public/loans_T&C.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -498,7 +503,7 @@ app.get("/loans/agreement", async (req, res) => {
   if (!template_loan_agreement) {
     try {
       template_loan_agreement = handlebars.compile(
-        readFileSync("public/loan_agreement.html.hbs", "utf8"),
+        readFileSync("public/loan_agreement.html.hbs", "utf8")
       );
     } catch (e) {
       handleError(e);
@@ -515,6 +520,6 @@ app.get("/loans/agreement", async (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(
-    `Hello from Cloud Run! The container started successfully and is listening for HTTP requests on http://127.0.0.1:${PORT}`,
+    `Hello from Cloud Run! The container started successfully and is listening for HTTP requests on http://127.0.0.1:${PORT}`
   );
 });

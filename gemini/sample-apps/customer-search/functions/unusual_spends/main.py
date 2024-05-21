@@ -1,4 +1,7 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
 
 from os import environ
 
@@ -34,14 +37,12 @@ def detect_unusual_transactions(
 
     # Check if the customer ID is present
     # Query BigQuery to get the unusual transactions for the customer
-    query_unusual_transactions = f"""SELECT
-  *
-FROM
-  ML.DETECT_ANOMALIES(MODEL `{project_id}.ExpensePrediction.unsual_spend3`,
-  STRUCT(0.02 AS contamination),
-  TABLE
-`{project_id}.DummyBankDataset.AccountTransactions`) WHERE debit_credit_indicator = 'Debit' and ac_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` where customer_id = {customer_id}) and is_anomaly = True ORDER BY mean_squared_error DESC LIMIT 3
-  """
+    query_unusual_transactions = f"""SELECT * FROM ML.DETECT_ANOMALIES(MODEL \
+`{project_id}.ExpensePrediction.unsual_spend3`, STRUCT(0.02 AS contamination), TABLE \
+`{project_id}.DummyBankDataset.AccountTransactions`) WHERE debit_credit_indicator = 'Debit' \
+and ac_id IN (SELECT account_id FROM `{project_id}.DummyBankDataset.Account` \
+where customer_id = {customer_id}) and is_anomaly = True ORDER BY mean_squared_error DESC LIMIT 3
+"""
     result_unusual_transactions = client.query(query_unusual_transactions)
 
     # Initialize the list of unusual transactions
@@ -52,7 +53,8 @@ FROM
     for row in result_unusual_transactions:
         flag = flag + 1
         unusual_transactions_list = (
-            unusual_transactions_list + f" ₹{row['transaction_amount']} on {row['date']} to"
+            unusual_transactions_list
+            + f" ₹{row['transaction_amount']} on {row['date']} to"
             f" {row['counterparty_name']} in {row['city']},"
             f" {row['country']}." + "\n"
         )

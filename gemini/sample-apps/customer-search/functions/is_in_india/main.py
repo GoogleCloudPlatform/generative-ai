@@ -1,4 +1,8 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
@@ -41,29 +45,34 @@ def check_is_city_in_india(request):
                 "messages": [
                     {
                         "text": {
-                            "text": ["Please enter the city or country you are" " travelling to"]
+                            "text": [
+                                "Please enter the city or country you are travelling to"
+                            ]
                         }
                     }
                 ]
             },
-            "targetPage": "/projects/fintech-app-gcp/locations/us-central1/agents/ba85d3e8-3197-4938-baec-5f6dd65e7320/flows/00000000-0000-0000-0000-000000000000/pages/Get_Destination",
+            "targetPage": """/projects/fintech-app-gcp/locations/us-central1/agents/\
+            ba85d3e8-3197-4938-baec-5f6dd65e7320/flows/00000000-0000-0000-0000-000000000000/\
+            pages/Get_Destination""",
         }
         return res
 
-    """
-    1. get the place id
-    2. get the country from the place id
-    3. store it in a session variable
-    """
+    # 1. get the place id
+    # 2. get the country from the place id
+    # 3. store it in a session variable
+
     if country is None:
-        get_place_id_url = f"""https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={city}&inputtype=textquery&key={places_api_key}"""
+        get_place_id_url = f"""https://maps.googleapis.com/maps/api/place/findplacefromtext/\
+        json?input={city}&inputtype=textquery&key={places_api_key}"""
         headers = {"Content-Type": "application/json"}
         place_id_res = requests.get(get_place_id_url, headers=headers)
         place_id_json = place_id_res.json()
 
         place_id = place_id_json["candidates"][0]["place_id"]
 
-        get_place_details_url = f"""https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key={places_api_key}"""
+        get_place_details_url = f"""https://maps.googleapis.com/maps/api/place/details/\
+        json?place_id={place_id}&key={places_api_key}"""
         headers = {"Content-Type": "application/json"}
         place_details_res = requests.get(get_place_details_url, headers=headers)
         place_details_json = place_details_res.json()

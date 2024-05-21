@@ -1,24 +1,19 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
+# pylint: disable=R0912
 
 from os import environ
 
 import functions_framework
-
-from utils.multithreading import run_all
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
+from utils.multithreading import run_all
 
-project_id = environ.get("PROJECT_ID")
 
-
-def get_ac_health_status(
-    total_expenditure: int,
-    asset_amount: int,
-    debt_amount: int,
-    total_high_risk_investment: int,
-    total_investment: int,
-    total_income: int,
-) -> str:
+def get_ac_health_status(financial_details: dict) -> str:
     """
     Calculates the account health status based on financial details.
 
@@ -34,6 +29,13 @@ def get_ac_health_status(
         str: The account health status ("Healthy", "Needs Attention", or "Concerning").
     """
 
+    total_expenditure = financial_details["total_expenditure"]
+    asset_amount = financial_details["asset_amount"]
+    debt_amount = financial_details["debt_amount"]
+    total_high_risk_investment = financial_details["total_high_risk_investment"]
+    total_investment = financial_details["total_investment"]
+    total_income = financial_details["total_income"]
+
     account_status = ""
     if (
         total_expenditure < 0.75 * total_income
@@ -43,12 +45,13 @@ def get_ac_health_status(
     ):
         account_status = "Healthy"
     elif (
-        (total_expenditure >= 0.75 * total_income and total_expenditure < 0.9 * total_income)
-        or (asset_amount < 0.2 * total_income and asset_amount > 0.1 * total_income)
-        or (debt_amount >= 0.3 * asset_amount and debt_amount < 0.75 * asset_amount)
+        (0.75 * total_income <= total_expenditure < 0.9 * total_income)
+        or (0.1 * total_income < asset_amount < 0.2 * total_income)
+        or (0.3 * asset_amount <= debt_amount < 0.75 * asset_amount)
         or (
-            total_high_risk_investment >= 0.3 * total_investment
-            and total_high_risk_investment < 0.8 * total_investment
+            0.3 * total_investment
+            <= total_high_risk_investment
+            < 0.8 * total_investment
         )
     ):
         account_status = "Needs Attention"
@@ -74,12 +77,16 @@ def get_ac_details(project_id: str, user_accounts: list) -> tuple:
     total_expenditure = 0
     for account in user_accounts:
         query_expenditure_details = f"""
-            SELECT SUM(transaction_amount) as expenditure FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} AND debit_credit_indicator = 'Debit'
-        """
+SELECT SUM(transaction_amount) as expenditure FROM \
+`{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} \
+AND debit_credit_indicator = 'Debit'
+"""
 
         query_income = f"""
-            SELECT SUM(transaction_amount) as income FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} and debit_credit_indicator = 'Credit'
-        """
+SELECT SUM(transaction_amount) as income FROM \
+`{project_id}.DummyBankDataset.AccountTransactions` WHERE ac_id = {account} \
+and debit_credit_indicator = 'Credit'
+"""
 
         res_sub = run_all(
             {
@@ -113,6 +120,8 @@ def travel_card_recommendation(request):
         <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
 
+    project_id = environ.get("PROJECT_ID")
+
     request_json = request.get_json(silent=True)
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
@@ -133,7 +142,9 @@ def travel_card_recommendation(request):
     if customer_age_on_book < 365:
         response = model.generate_response(
             """You are a chatbot for a bank application.
-        Tell the user politely that they are not eligible for the the credit card as they are new customer. Only cutomer older than 1 year with the bank are eligible for credit card.
+        Tell the user politely that they are not eligible for the the credit card as
+        they are new customer. Only cutomer older than 1 year with the bank
+        are eligible for credit card.
         Ask the user to wait and ask if they want anything else like mutual funds or fixed deposit.
         Write in a professional and business-neutral tone.
         Word Limit is 60 words.
@@ -145,10 +156,10 @@ def travel_card_recommendation(request):
         )
 
         res = {
-            "fulfillment_response": {
-                "messages": [{"text": {"text": [response]}}]
-            },
-            "target_page": "projects/{project_id}/locations/asia-south1/agents/118233dd-f023-4dad-b302-3906a7365ccc/flows/00000000-0000-0000-0000-000000000000/pages/06e52d7c-536a-4cbf-baba-4fe7d686e472",
+            "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
+            "target_page": "projects/{project_id}/locations/asia-south1/agents/"
+            "118233dd-f023-4dad-b302-3906a7365ccc/flows/00000000-0000-0000-0000-000000000000"
+            "/pages/06e52d7c-536a-4cbf-baba-4fe7d686e472",
         }
         return res
 
@@ -211,12 +222,14 @@ def travel_card_recommendation(request):
             total_high_risk_investment += row["total_high_risk_investment"]
 
     account_status = get_ac_health_status(
-        total_income=total_income,
-        total_expenditure=total_expenditure,
-        asset_amount=asset_amount,
-        debt_amount=debt_amount,
-        total_investment=total_investment,
-        total_high_risk_investment=total_high_risk_investment,
+        {
+            "total_income": total_income,
+            "total_expenditure": total_expenditure,
+            "asset_amount": asset_amount,
+            "debt_amount": debt_amount,
+            "total_investment": total_investment,
+            "total_high_risk_investment": total_high_risk_investment,
+        }
     )
 
     if account_status == "Healthy":
@@ -228,8 +241,10 @@ def travel_card_recommendation(request):
 
     response = model.generate_response(
         f"""
-        You are a chatbot for a bank application you have been given the Credit Card as {credit_card}.
-        You have to recommend the given credit card to the user and explain the benefits of the credit card.
+        You are a chatbot for a bank application you have been given the
+        Credit Card as {credit_card}.
+        You have to recommend the given credit card to the user and
+        explain the benefits of the credit card.
         Write in a professional and business-neutral tone.
         Word Limit is 100 words.
         The message comes in middle of conversation so don't greet the user with Hello/Hi.

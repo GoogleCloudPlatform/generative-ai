@@ -1,3 +1,7 @@
+"""This is a python utility file."""
+
+# pylint: disable=E0401
+
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict
 

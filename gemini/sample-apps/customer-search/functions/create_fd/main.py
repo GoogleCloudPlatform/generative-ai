@@ -1,4 +1,8 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 import datetime
 from datetime import date
@@ -8,9 +12,8 @@ import re
 
 import functions_framework
 from google.cloud import bigquery
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -24,7 +27,7 @@ def get_ac_number():
     """
 
     account_number = "11000"
-    for i in range(5):
+    for _ in range(5):
         account_number += str(random.randint(0, 9))
 
     return int(account_number)
@@ -81,7 +84,8 @@ def get_number_of_days(fd_tenure):
 
 def get_interest_rate(is_sr_citizen, number_of_days):
     """
-    Gets the interest rate for a fixed deposit based on the tenure and whether the customer is a senior citizen.
+    Gets the interest rate for a fixed deposit based on the tenure and whether the customer
+    is a senior citizen.
 
     Args:
       is_sr_citizen: A boolean indicating whether the customer is a senior citizen.
@@ -100,10 +104,9 @@ def get_interest_rate(is_sr_citizen, number_of_days):
         person = "rate_of_interest_sr_citizen"
 
     query_interest_rate = f"""
-    SELECT {person} as rate_of_interest FROM `{project_id}.DummyBankDataset.FdInterestRates`
-    where bucket_start_days < {number_of_days}
-    order by bucket_start_days desc limit 1
-  """
+SELECT {person} as rate_of_interest FROM `{project_id}.DummyBankDataset.FdInterestRates` \
+where bucket_start_days < {number_of_days} order by bucket_start_days desc limit 1
+"""
 
     result_query_interest_rate = client.query(query_interest_rate)
 
@@ -130,8 +133,6 @@ def create_fixed_deposit(request):
     """
 
     request_json = request.get_json(silent=True)
-
-    client = bigquery.Client()
 
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
     fd_amount = request_json["sessionInfo"]["parameters"]["fd_amount"]

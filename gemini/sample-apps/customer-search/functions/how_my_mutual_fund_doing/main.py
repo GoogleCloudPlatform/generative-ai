@@ -1,11 +1,14 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
 import functions_framework
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -48,7 +51,7 @@ def hello_http(request):
     one_month_return = []
     ttm_return = []
     one_m = []
-    TTM = []
+    ttm = []
     amount_invested = []
     fd_inv = 0
     for row in res["query_investment_returns"]:
@@ -56,7 +59,7 @@ def hello_http(request):
         one_month_return.append(row["one_month_return"])
         ttm_return.append(row["TTM_Return"])
         one_m.append(row["one_M"] * 100)
-        TTM.append(row["TTM"] * 100)
+        ttm.append(row["TTM"] * 100)
         amount_invested.append(row["amount_invested"])
 
     total_investment = 0
@@ -88,7 +91,7 @@ def hello_http(request):
     One_Month_Return = {one_month_return}
     One_Month_Return_Percentage = {one_m}
     TTM_Return = {ttm_return}
-    TTM_Return_Percentage = {TTM}
+    TTM_Return_Percentage = {ttm}
     amount_invested = {amount_invested}
 
     Write in a professional and business-neutral tone.

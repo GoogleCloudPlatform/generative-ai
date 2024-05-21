@@ -1,4 +1,8 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 import datetime
 from os import environ
@@ -109,14 +113,13 @@ def ask_fd_tenure(request):
 
     # get the date of birth of the user
     query_dob = f"""
-        SELECT date_of_birth as dob FROM `{project_id}.DummyBankDataset.Customer`
-        where customer_id = {customer_id}
+SELECT date_of_birth as dob FROM `{project_id}.DummyBankDataset.Customer` \
+where customer_id = {customer_id}
     """
 
     query_best_interest_rate_row = f"""
-    SELECT * FROM `{project_id}.DummyBankDataset.FdInterestRates`
-    ORDER BY rate_of_interest desc
-    LIMIT 1
+SELECT * FROM `{project_id}.DummyBankDataset.FdInterestRates` \
+ORDER BY rate_of_interest desc LIMIT 1
     """
 
     result_dob = client.query(query_dob)

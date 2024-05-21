@@ -1,3 +1,7 @@
+"""This is a python utility file."""
+
+# pylint: disable=E0401
+
 from google.cloud import storage
 
 

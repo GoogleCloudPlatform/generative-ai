@@ -1,9 +1,12 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
 import functions_framework
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 
@@ -33,14 +36,15 @@ def return_of_investment(request):
 
     result_investments = query_handler.query("query_investments_six_month_return")
 
-    Scheme_Name = []
+    scheme_name = []
     six_month_return = []
     investment_list_str = ""
     for row in result_investments:
-        Scheme_Name.append(row["Scheme_Name"])
+        scheme_name.append(row["Scheme_Name"])
         six_month_return.append(row["six_month_return"])
         investment_list_str = (
-            investment_list_str + f",₹ {row['six_month_return']} in {row['Scheme_Name']}"
+            investment_list_str
+            + f",₹ {row['six_month_return']} in {row['Scheme_Name']}"
         )
 
     investment_list_str = investment_list_str[1:]
@@ -57,7 +61,5 @@ def return_of_investment(request):
     """
     )
 
-    res = {
-        "fulfillment_response": {"messages": [{"text": {"text": response}}]}
-    }
+    res = {"fulfillment_response": {"messages": [{"text": {"text": response}}]}}
     return res

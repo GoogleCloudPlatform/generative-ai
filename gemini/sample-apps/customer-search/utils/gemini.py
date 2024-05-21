@@ -1,10 +1,14 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0903
+# pylint: disable=C0301
 
 from os import environ
 
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel
-import vertexai.preview.generative_models as generative_models
+from vertexai.preview import generative_models
 
 generation_config = {
     "max_output_tokens": 2048,
@@ -58,10 +62,12 @@ class Gemini:
             str: The generated response.
         """
 
-        response =self.model.predict(prompt,generation_config=generation_config, safety_settings=safety_settings)
-        
+        responses = self.model.generate_content(
+            prompt, generation_config=generation_config, safety_settings=safety_settings
+        )
+
         final_response = ""
-        for response in response:
+        for response in responses:
             final_response += response.text
 
         return final_response

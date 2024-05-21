@@ -1,9 +1,12 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
 import functions_framework
-
 from utils.bq_query_handler import BigQueryHandler
 from utils.gemini import Gemini
 
@@ -78,8 +81,6 @@ def find_nearest_bike_dealer(request):
 
     res = {
         "fulfillment_response": {"messages": [{"text": {"text": [response]}}]},
-        "sessionInfo": {
-            "parameters": {"vehicle_type": "Bike", "showrooms": response}
-        },
+        "sessionInfo": {"parameters": {"vehicle_type": "Bike", "showrooms": response}},
     }
     return res

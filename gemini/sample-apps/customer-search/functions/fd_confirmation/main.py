@@ -1,9 +1,12 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
 import functions_framework
-
 from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
@@ -36,7 +39,8 @@ def generate_fd_confirmation_message(request):
     response = model.generate_response(
         f"""
         Format the amount in the following information in indian rupee format
-        (seprated by comma in in every 2 digits) and with 2 decimal places,e.g. ₹100000000 to ₹10,00,00,000.00
+        (seprated by comma in in every 2 digits) and with
+        2 decimal places,e.g. ₹100000000 to ₹10,00,00,000.00
         {fd_amount}.
         The amount should be exact same as {fd_amount} just format it.
         Only the amount should be returned and not the entire code.

@@ -1,11 +1,14 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
 import functions_framework
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -60,8 +63,8 @@ def mutual_fund_recommendation(request):
     model = Gemini()
     response = model.generate_response(
         f"""
-        You are a mutual fund expert/analyst and you have to recommed the 3 best possible mutual fund
-        based on returns among the given list in csv format
+        You are a mutual fund expert/analyst and you have to recommed the
+        3 best possible mutual fund based on returns among the given list in csv format
         {csv_table}
 
         Write in a professional and business-neutral tone.
@@ -80,9 +83,5 @@ def mutual_fund_recommendation(request):
     """
     )
 
-    res = {
-        "fulfillment_response": {
-            "messages": [{"text": {"text": [response]}}]
-        }
-    }
+    res = {"fulfillment_response": {"messages": [{"text": {"text": [response]}}]}}
     return res

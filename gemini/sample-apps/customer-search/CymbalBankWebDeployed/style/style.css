@@ -56,9 +56,7 @@ body {
   border-top: 1px solid #ddd;
 
   /* NOTICE how this transition works w/ .section-hidden below & in the JS file under reveal section */
-  transition:
-    transform 1s,
-    opacity 1s;
+  transition: transform 1s, opacity 1s;
 }
 
 .section-hidden {

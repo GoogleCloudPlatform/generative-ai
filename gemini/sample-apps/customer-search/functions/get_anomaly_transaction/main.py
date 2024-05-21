@@ -1,4 +1,8 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
@@ -30,16 +34,14 @@ def transaction_anomaly_detection(request):
     customer_id = request_json["sessionInfo"]["parameters"]["cust_id"]
 
     query_account_balance = f"""
-    CREATE OR REPLACE TABLE DummyBankDataset.RuntimeTableForAnomaly AS (
-    SELECT * FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE
-    ac_id in (SELECT account_id FROM {project_id}.DummyBankDataset.Account
-    where customer_id={customer_id}));
+CREATE OR REPLACE TABLE DummyBankDataset.RuntimeTableForAnomaly AS ( \
+SELECT * FROM `{project_id}.DummyBankDataset.AccountTransactions` WHERE \
+ac_id in (SELECT account_id FROM {project_id}.DummyBankDataset.Account \
+where customer_id={customer_id}));
 
-    SELECT * FROM ML.DETECT_ANOMALIES(
-    MODEL `ExpensePrediction.my_kmeans_model`,
-    STRUCT(0.005 AS contamination),
-    TABLE `{project_id}.DummyBankDataset.RuntimeTableForAnomaly`)
-    """
+SELECT * FROM ML.DETECT_ANOMALIES(MODEL `ExpensePrediction.my_kmeans_model`,\
+STRUCT(0.005 AS contamination),TABLE `{project_id}.DummyBankDataset.RuntimeTableForAnomaly`)
+"""
 
     result_account_balance = client.query(query_account_balance)
 

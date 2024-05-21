@@ -1,4 +1,8 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 import functions_framework
 
@@ -53,12 +57,16 @@ def ask_travel_dates(request):
                 "messages": [
                     {
                         "text": {
-                            "text": ["Please enter two dates for the start and end of travel"]
+                            "text": [
+                                "Please enter two dates for the start and end of travel"
+                            ]
                         }
                     }
                 ]
             },
-            "targetPage": "projects/fintech-app-gcp/locations/asia-south1/agents/118233dd-f023-4dad-b302-3906a7365ccc/flows/dec04e03-aa13-48ee-8ddb-c1ffff4ddb3b/pages/2f3de251-29ed-4c8f-89b7-489f510eef8b",
+            "targetPage": "projects/fintech-app-gcp/locations/asia-south1/agents/118233dd-f023-4da\
+                d-b302-3906a7365ccc/flows/dec04e03-aa13-48ee-8ddb-c1ffff4ddb3b\
+                    /pages/2f3de251-29ed-4c8f-89b7-489f510eef8b",
             "sessionInfo": {
                 "parameters": {
                     "date": None,

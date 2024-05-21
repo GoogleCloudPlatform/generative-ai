@@ -1,10 +1,14 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 import json
 from os import environ
 
 import functions_framework
-from google.cloud import translate
+from google.cloud import translate_v2 as translate
 import requests
 
 # Define the project ID as an environment variable
@@ -20,7 +24,6 @@ def detect_language(text: str) -> dict:
     Returns:
         dict: A dictionary containing the detected language and its confidence.
     """
-    from google.cloud import translate_v2 as translate
 
     translate_client = translate.Client()
 
@@ -29,8 +32,8 @@ def detect_language(text: str) -> dict:
     result = translate_client.detect_language(text)
 
     print(f"Text: {text}")
-    print("Confidence: {}".format(result["confidence"]))
-    print("Language: {}".format(result["language"]))
+    print(f"Confidence: {result['confidence']}")
+    print(f"Language: {result['language']}")
 
     return result["language"]
 
@@ -40,7 +43,6 @@ def detect_language(text: str) -> dict:
 
 def translate_text(
     text: str,
-    project_id: str,
     source_language_code: str,
     target_language_code: str,
 ) -> translate.TranslationServiceClient:
@@ -85,7 +87,7 @@ def translate_text(
 
 
 @functions_framework.http
-def translate(request):
+def get_translated_text(request):
     """
     Translates text from one language to another.
 
@@ -132,7 +134,7 @@ def translate(request):
         headers = {"Access-Control-Allow-Origin": "*"}
         return (rag_qa_chain_json, 200, headers)
 
-    translated_text = translate_text(text, project_id, source_language_code, "en-US")
+    translated_text = translate_text(text, source_language_code, "en-US")
 
     rag_qa_chain_url = environ.get("RAG_QA_CHAIN_URL")
     todo = {"query": translated_text}
@@ -145,7 +147,6 @@ def translate(request):
 
     response = translate_text(
         rag_qa_chain_json["fulfillment_response"]["messages"][0]["text"]["text"][0],
-        project_id,
         "en-US",
         source_language_code,
     )
@@ -159,10 +160,10 @@ def translate(request):
         reference["matching_score"] = ref["matching_score"]
         reference["document_source"] = ref["document_source"]
         reference["document_name"] = translate_text(
-            ref["document_name"], project_id, "en-US", source_language_code
+            ref["document_name"], "en-US", source_language_code
         )
         reference["page_content"] = translate_text(
-            ref["page_content"], project_id, "en-US", source_language_code
+            ref["page_content"], "en-US", source_language_code
         )
         reference_list.append(reference)
     print(reference_list)

@@ -1,11 +1,14 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from os import environ
 
 import functions_framework
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -48,15 +51,15 @@ def high_risk_mutual_funds(request):
     one_month_return = []
     ttm_return = []
     one_m = []
-    TTM = []
+    ttm = []
     amount_invested = []
     fd_inv = 0
     for row in res["query_investment_returns"]:
         scheme_name.append(row["Scheme_Name"])
         one_month_return.append(row["one_month_return"])
-        ttm_return.append(row["TTM_Return"])
+        ttm_return.append(row["ttm_return"])
         one_m.append(row["one_M"] * 100)
-        TTM.append(row["TTM"] * 100)
+        ttm.append(row["ttm"] * 100)
         amount_invested.append(row["amount_invested"])
 
     total_investment = 0
@@ -86,21 +89,21 @@ def high_risk_mutual_funds(request):
     Scheme_Name = {scheme_name}
     One_Month_Return = {one_month_return}
     One_Month_Return_Percentage = {one_m}
-    TTM_Return = {ttm_return}
-    TTM_Return_Percentage = {TTM}
+    ttm_return = {ttm_return}
+    ttm_return_Percentage = {ttm}
     amount_invested = {amount_invested}
 
     Write in a professional and business-neutral tone.
 
-    One_Month_Return and TTM_Return store the amounts in Indian currency, i.e., ₹.
+    One_Month_Return and ttm_return store the amounts in Indian currency, i.e., ₹.
     do not give any amount in decimal.
     If Total Investment is greater than 0:
     the following details must be mentioned in a uniformly formatted table:
     Spacing should be proper.
     For each element in Scheme_Name:
     Mention the respective amount invested from amount_invested and one month from One_Month_Return
-    and one month percentage return from One_Month_Return_Percentage and TTM returns from
-    TTM_Return and TTM return precentage from  TTM_Return_Percentage .
+    and one month percentage return from One_Month_Return_Percentage and ttm returns from
+    ttm_return and ttm return precentage from  ttm_return_Percentage .
 
     For example the summary should look like :
 

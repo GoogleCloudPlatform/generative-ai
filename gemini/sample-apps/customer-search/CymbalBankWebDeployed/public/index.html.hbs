@@ -1,558 +1,237 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style/style.css" />
-    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cymbal | When Banking meets Technology</title>
-    <script defer type="module" src="scripts/script.js"></script>
-    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
-    <style>
-        df-messenger {
-            z-index: 999;
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-            --df-messenger-primary-color: #4bbb7d;
-            --df-messenger-chat-window-height: 55vh;
-            --df-messenger-chat-window-width: 50vw;
-        }
-    </style>
-    <script>
-        window.addEventListener('df-messenger-loaded', function (event) {
-            // Get the Dialogflow Messenger instance
-            console.log('dfMessengerLoaded');
-
-            const dfMessenger = document.querySelector('df-messenger');
-            dfMessenger.clearStorage();
-        });
-
-        function submitSearch() {
-            document.getElementById('loader').style.display = 'block';
-
-            var siteSearchUrl = 'https://sites.google.com/corp/search/pranshusingh.altostrat.com/cymbalbank?query=';
-
-            var query = document.getElementById("search-query-input").value;
-            var searchResultsPage = '/search';
-
-            const uri = '{{rag_qa_chain_url_translate}}';
-            const body = JSON.stringify({ query: query })
-            const initDetails = {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                referrerPolicy: "strict-origin-when-cross-origin",
-                body: body
-            }
-
-            fetch(uri, initDetails)
-                .then(response => {
-                    if (response.status !== 200) {
-                        console.log('Looks like there was a problem. Status Code: ' +
-                            response.status);
-                        return;
-                    }
-                    console.log(response.headers.get("Content-Type"));
-                    return response.json();
-                }
-                )
-                .then(myJson => {
-                    console.log(JSON.stringify(myJson));
-                    var obj = JSON.parse(JSON.stringify(myJson));
-
-                    sessionStorage.setItem('temp_result', JSON.stringify(obj));
-                    window.location.href = '/search';
-
-
-                    references = JSON.parse(obj.fulfillment_response.messages[0].text.text[1]);
-                    console.log(references)
-                    var str = '';
-                    var i = 0;
-                    var count = 0
-
-
-                })
-                .catch(err => {
-                    console.log('Fetch Error :-S', err);
-                })
-                .finally(() => {
-                    // Hide loading symbol
-                    document.getElementById('loader').style.display = 'none';
-                });;
-
-
-        }
-
-
-        function searchKeyPress(e) {
-
-            // look for window.event in case event isn't passed in
-
-
-            e = e || window.event;
-
-            if (e.keyCode == 13) {
-
-                document.getElementById('search-icon').click();
-
-                return false;
-
-            }
-
-            return true;
-
-        }  
-    </script>
-    <meta name="google-site-verification" content="pRnPGyY3QXpWC3qupc-TpHIdaLKjWVpJHWuvcbY7rNU" />
-</head>
-
-<body>
-    <div id="df-messenger-container">
-        <df-messenger location="us-central1" project-id="{{project_id}}"
-            agent-id="{{df_agent_id}}" language-code="en">
-            <df-messenger-chat-bubble chat-title="CymBuddy">
-            </df-messenger-chat-bubble>
-        </df-messenger>
-    </div>
-
-    <header class="header">
-        <nav>
-            <div class="navbar">
-                <i class='bx bx-menu'></i>
-                <div class="sidebar-logo-container">
-                    <a href="/" target="_self"> <img src="assets/cymbal_logo.png" alt="Cymbal Bank logo"
-                            class="nav-logo" id="logo" data-version-number="3.0" /></a>
-                </div>
-                <div class="nav-links">
-                    <div class="sidebar-logo">
-                        <span class="logo-name">Cymbal Bank</span>
-                        <i class='bx bx-x'></i>
-                    </div>
-                    <ul class="links">
-                        <li class="nav-item">
-                            <a class="nav-link">Pay</a>
-                            <i class='bx bxs-chevron-down pay-arrow arrow'></i>
-                            <ul class="pay-sub-menu sub-menu">
-                                <li class="moneytransfer">
-                                    <span><a class="nav-link" href="#">Money Transfer</a>
-                                        <i class='bx bxs-chevron-right arrow moneytransfer-arrow'></i>
-                                    </span>
-                                    <ul class="moneytransfer-sub-menu sub-menu">
-                                        <li><a class="nav-link" href="/upi">UPI</a></li>
-                                        <li><a class="nav-link" href="/imps">IMPS</a></li>
-                                        <li><a class="nav-link" href="/neft">NEFT</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bills">
-                                    <span><a class="nav-link" href="#">Bills</a>
-                                        <i class='bx bxs-chevron-right arrow bills-arrow'></i>
-                                    </span>
-                                    <ul class="bills-sub-menu sub-menu">
-                                        <li><a class="nav-link" href="/recharge">Recharge (Mobile, DTH, Broadband)</a>
-                                        </li>
-                                        <li><a class="nav-link" href="/electricity">Electricity</a></li>
-                                        <li><a class="nav-link" href="/insurance_premium">Insurance Premium</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link">Save</a>
-                            <i class='bx bxs-chevron-down save-arrow arrow'></i>
-                            <ul class="save-sub-menu sub-menu">
-                                <li class="accounts">
-                                    <span><a class="nav-link" href="#">Accounts</a>
-                                        <i class='bx bxs-chevron-right arrow accounts-arrow'></i>
-                                    </span>
-                                    <ul class="accounts-sub-menu sub-menu">
-                                        <li><a class="nav-link" href="/saving">Saving</a></li>
-                                        <li><a class="nav-link" href="/current">Current</a></li>
-                                        <li><a class="nav-link" href="/salary">Salary</a></li>
-                                    </ul>
-                                </li>
-                                <li class="deposits">
-                                    <span><a class="nav-link" href="#">Deposits</a>
-                                        <i class='bx bxs-chevron-right arrow deposits-arrow'></i>
-                                    </span>
-                                    <ul class="deposits-sub-menu sub-menu">
-                                        <li><a class="nav-link" href="/fixed_deposit">Fixed Deposit</a></li>
-                                        <li><a class="nav-link" href="/recurring_deposit">Recurring Deposit</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/credit_card">Credit Card</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link">Invest</a>
-                            <i class='bx bxs-chevron-down invest-arrow arrow'></i>
-                            <ul class="invest-sub-menu sub-menu">
-                                <li class="nav-item"><a class="nav-link" href="/stocks">Equities and Derivatives</a>
-                                </li>
-                                <li class="nav-item"><a class="nav-link" href="/ipo">IPO through ASBA</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/mutual_funds">Mutual Funds</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/loans">Loans</a>
-                            <i class='bx bxs-chevron-down borrow-arrow arrow'></i>
-                            <ul class="borrow-sub-menu sub-menu">
-                                <li><a class="nav-link" href="loans">Car Loan</a></li>
-                                <li><a class="nav-link" href="loans">Two Wheeler Loan</a></li>
-                                <li><a class="nav-link" href="loans">Personal Loan</a></li>
-                                <li><a class="nav-link" href="loans">Fixed Deposit Overdraft</a></li>
-                                <li><a class="nav-link" href="loans">Overdraft Against Securities</a></li>
-                                <li><a class="nav-link" href="loans">Home Loan</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-btn btn--show-modal" id="login_menu_btn">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-btn btn--show-modal" id="logout_menu_btn"
-                                style="display: none">Logout</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            </div>
-        </nav>
-        <div id="search-container">
-            <div id="search-query">
-                <img id="search-icon"
-                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAQAAABIkb+zAAADAklEQVR4AezZA6xcQRSA4b92g9q2/VRuw9puVLcxake13Zh1G9W2bds2T42ZzNPeO7Pb5H5/zD17PUMgEAgEAoFAIGxFGMRMlrGTi7zjFZfZwTJmMohCRLkajOMYkkRHGUdNolI8B5EUdpB4okpJViOpbDXFiArpGMcHJIzeMY50RFgB9iIe2ksBIiiGR4jHHhFDhHTlI+JDH+lKBMQmceY/YhZNqExBMn+rAJUIMZMnCOY+EItjxRP9OetoTQZMMtCadYixJ5TAoQyYH1cbiCE5CWxADB0jA85MNp7JHUipnsbTbwqO1OWL4RSIIzUSDKfgF+riQBrOIFrPKENqleEZonWGNFjX0vDPNSUcTQ1HsiXWbUO0hhOu4YjWViwri2gdwYvDiFZ5rJqIaMXgRRyiNRGr7iBKa/BqDaJ0G4vKIVqN8Kqxy5OoL6L0mDR4lUZ/o2UA1sxHlBbhh8WI0jys2Y4odcUPXRCl7VhzDVFqgB8aIErXsUZ/fylr5dnyGGv0R38O/JADUfqMNfpLcHb8kF1/Mf/fT6HnWHMdUWqIHxoiSjexZiui1A0/dEWUtmHNPERpsZUH2WJ3rxKPSIdX6XiMKPXGmvKIVgivQohWJSx6YP11+g5WTUK04vAiBtGaBeDyJDqMF0cQrVpYthnRGkq4hiJau7GuhW/LKiHDskpzrEvDKV8WtkobFrZ24UQ9H5YW44xLi7VwZIpxcbcbKdXNuDUyG2cychQxtJ4YkhPPOsTQJXLiUMmwNjhasQUx9obyOBafzBZTiMoUIguZKUhlQszSRtYHaI5z+pnsT6NxKI5HiMee8xlRGoJDhdiNeOg6ZWmNRHKEdIzlXZj7w/PIDYBEdgQoxmokla2nNL9J5EeAeI4iKWwPXfiXRMcIUJPxHEOS6CTDKYVuTGRH0BViEDNZyk4u8gpBeMMuJtKegujcj2DN1/bnmAgAEIBhIJIZGZHOWAEslPsoyCMgIHxPmAgICAjXIQRQSsh+JSH7vYQ1StvZryW8vy9JkiQdHsFQT60Y7OcAAAAASUVORK5CYII="
-                    alt="Search Icon" onclick="submitSearch();">
-
-                <input type="text" id="search-query-input" placeholder="Search this site"
-                    onkeypress="return searchKeyPress(event);" style="box-shadow:none" ;>
-            </div>
-        </div>
-        <div id="loader"></div>
-
-        <div class="header-title">
-            <h1>
-                When
-                <!-- Green highlight effect -->
-                <span class="highlight">banking</span>
-                meets<br />
-                <span class="highlight">technology</span>
-            </h1>
-            <h4>A simpler banking experience for a simpler life.</h4>
-            <button class="btn-text btn--scroll-to">
-                Learn more &DownArrow;
-            </button>
-            <img src="assets/bank-with-tech.png" class="header-img" alt="Minimalist bank items" />
-        </div>
-    </header>
-
-    <section class="section" id="section--1">
-        <div class="section-title">
-            <h2 class="section-description">Features</h2>
-            <h3 class="section-header">
-                Everything you need in a modern bank and more.
-            </h3>
-        </div>
-
-        <div class="features">
-            <img src="/assets/deeper_ai-powered-assistant.png" data-src="assets/ai-powered-assistant.png" class="features-img" alt="Minimalist bank items" height = "300" width = "300" />
-            
-            <div class="features-feature">
-                <div class="features-icon"></div>
-                <h5 class="features-header">Powered by Gen AI</h5>
-                <li>
-                    Advanced Search capabilities.
-                </li>
-                <li>
-                    Recommendations for mutual funds, credit cards, fixed deposits and more.
-                </li>
-                <li>
-                    Trend Analysis to improve account health and explain expense forecast
-                </li>
-            </div>
-
-            <div class="features-feature">
-                <div class="features-icon"></div>
-                <h5 class="features-header">AI-Powered Financial Assistant</h5>
-                <li>
-                    Always by your side, ready to answer questions and guide you 24/7.
-                </li>
-                <li>
-                    Find what you need quickly and discover hidden financial opportunities.
-                </li>
-                <li>
-                    Get tailored advice based on your unique financial profile.
-                </li>
-
-            </div>
-            <img src="/assets/deeper_insight.png" data-src="/assets/deeper_insight.png" class="features-img" alt="Minimalist bank items" height = "300" width = "300"/>
-            <img src="/assets/Aurora.png" data-src="/assets/Aurora.png" alt="Credit card" class="features-img" height="250"/>
-            <div class="features-feature">
-                <div class="features-icon"></div>
-                <h5 class="features-header">Personalized Credit Card, Just for You</h5>
-                <p>
-                    Get a credit card tailored to your unique ideas.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section" id="section--2">
-        <div class="section-title">
-            <h2 class="section-description">Operations</h2>
-            <h3 class="section-header">
-                Everything as simple as possible, but no simpler.
-            </h3>
-        </div>
-
-        <div class="operations">
-            <div class="operations-tab-container">
-                <button class="btn operations-tab operations-tab-1 operations-tab-active" data-tab="1">
-                    <span>01</span>Instant Transfers
-                </button>
-                <button class="btn operations-tab operations-tab--2" data-tab="2">
-                    <span>02</span>Instant Loans
-                </button>
-                <button class="btn operations-tab operations-tab-3" data-tab="3">
-                    <span>03</span>Instant Investment
-                </button>
-            </div>
-            <div class="operations-content operations-content--1 operations-content-active">
-                <div class="operations-icon operations-icon-1"></div>
-                <h5 class="operations-header">
-                    Cymbal lets you experience the speed of life with instant transfers
-                </h5>
-                <p>
-                    Say goodbye to waiting days for your money to arrive, and embrace the convenience of sending and
-                    receiving funds anytime, anywhere. Whether you're paying friends, family, or businesses, splitting
-                    bills, or settling expenses, Cymbal ensures your money gets where it needs to be, instantly and
-                    securely.
-                    With transactions completed within seconds and bank-level encryption safeguarding your information,
-                    Cymbal removes the friction from financial interactions, leaving you free to focus on what matters
-                    most.
-                </p>
-            </div>
-
-            <div class="operations-content operations-content--2">
-                <div class="operations-icon operations-icon-2"></div>
-                <h5 class="operations-header">
-                    Breathe Easy with Cymbal's Low-Interest Loans
-                </h5>
-                <p>
-                    Needing a financial boost shouldn't mean high-interest burdens. Cymbal offers competitive interest
-                    rates and flexible repayment options, making loans accessible and affordable. Whether you're
-                    tackling personal needs, home improvement projects, or business ventures, Cymbal simplifies the loan
-                    process with fast approvals and convenient mobile-app management.
-                    Enjoy transparent loan terms, no hidden fees or prepayment penalties, and the peace of mind knowing
-                    you're working with a trusted partner in achieving your financial goals.
-                </p>
-            </div>
-            <div class="operations-content operations-content--3">
-                <div class="operations-icon operations-icon-3"></div>
-                <h5 class="operations-header">
-                    Invest like a pro with Cymbal's Instant Investments
-                </h5>
-                <p>
-                    Take control of your financial future with Cymbal's Instant Investments. Invest in a wide range of
-                    assets, from stocks and bonds to ETFs and mutual funds, all with just a few taps. Start small with
-                    fractional shares or build a diversified portfolio tailored to your risk tolerance and goals. Get
-                    real-time market updates, track your performance, and automate investments for effortless wealth
-                    building.
-                    With Cymbal, there's no minimum investment amount, making financial growth accessible to everyone.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section" id="section--3">
-        <div class="section-title section-title-testimonials">
-            <h2 class="section-description">Not sure yet?</h2>
-            <h3 class="section-header">
-                Millions of people are already making their lifes simpler.
-            </h3>
-        </div>
-
-        <div class="slider">
-            <div class="slide slide--1">
-                <div class="testimonial">
-                    <h5 class="testimonial-header">
-                        Best financial decision ever!
-                    </h5>
-                    <blockquote class="testimonial-text">
-                        Switching to Cymbal has been the absolute best financial decision I've ever made. I used to
-                        dread dealing with my old bank, with their outdated website, hidden fees, and slow customer
-                        service. Cymbal is the complete opposite! The user-friendly app makes managing my finances a
-                        breeze, and I love the instant transfers, low-interest loans, and easy investment options.
-
-                        For the first time, I feel empowered and in control of my money. Cymbal actually feels like a
-                        partner in my financial journey, not just another bank. The personalized insights and AI-powered
-                        tools help me make informed decisions and reach my financial goals faster.
-
-                        I can't recommend Cymbal enough. If you're looking for a modern, convenient, and
-                        customer-focused banking experience, look no further!
-                    </blockquote>
-                    <address class="testimonial-author">
-                        <img src="" alt="" class="testimonial-photo" />
-                        <h6 class="testimonial-name">Aarav Singh</h6>
-                        <p class="testimonial-location">
-                            New Delhi, India
-                        </p>
-                    </address>
-                </div>
-            </div>
-
-            <div class="slide slide--2">
-                <div class="testimonial">
-                    <h5 class="testimonial-header">
-                        The best step to technology!
-                    </h5>
-                    <blockquote class="testimonial-text">
-                        I never thought I'd say this, but I'm actually excited about banking again. Cymbal isn't just a
-                        bank, it's a complete financial ecosystem that seamlessly integrates everything I need in one
-                        place.
-
-                        Their technology is truly groundbreaking. The AI-powered features are incredible, from the
-                        personalized financial insights to the instant transfers and investments. It feels like Cymbal
-                        is actually looking out for my financial well-being, not just trying to sell me products.
-
-                        Say goodbye to clunky apps and outdated interfaces. Cymbal's mobile app is sleek, intuitive, and
-                        user-friendly. It's actually enjoyable to manage my finances now.
-
-                        And let's not forget the customer service. They're always responsive, helpful, and
-                        knowledgeable. It's refreshing to experience genuine support from a financial institution.
-                    </blockquote>
-                    <address class="testimonial-author">
-                        <img src="" alt="" class="testimonial-photo" />
-                        <h6 class="testimonial-name">Miyah Miles</h6>
-                        <p class="testimonial-location">London, UK</p>
-                    </address>
-                </div>
-            </div>
-
-            <div class="slide slide--3">
-                <div class="testimonial">
-                    <h5 class="testimonial-header">
-                        Finally free from old-school banks
-                    </h5>
-                    <blockquote class="testimonial-text">
-                        I used to dread dealing with my old bank. Endless lines, ancient technology, and a maze of
-                        confusing fees. It felt like they were stuck in the dark ages while the rest of the world moved
-                        on.
-
-                        But then I discovered Cymbal! It's like a breath of fresh air in the banking world. Everything
-                        is modern, convenient, and designed to make my life easier.
-
-                        No more wasting time in line: I can manage my finances anytime, anywhere with their
-                        user-friendly mobile app.
-                        No more hidden fees: Their transparent pricing structure means I always know exactly what I'm
-                        paying for.
-                        Cymbal has truly revolutionized my banking experience. I'm finally free from the shackles of
-                        old-school banks and can now focus on what really matters achieving my financial goals.
-                    </blockquote>
-                    <address class="testimonial-author">
-                        <img src="" alt="" class="testimonial-photo" />
-                        <h6 class="testimonial-name">Shreyash Gupta</h6>
-                        <p class="testimonial-location">
-                            Bengaluru, India
-                        </p>
-                    </address>
-                </div>
-            </div>
-
-            <button class="slider-btn slider-btn-left">&larr;</button>
-            <button class="slider-btn slider-btn-right">&rarr;</button>
-            <div class="dots"></div>
-        </div>
-    </section>
-
-    <section class="section section-sign-up">
-        <div class="section-title">
-            <h3 class="section-header">
-                The best day to join Cymbal Bank was one year ago. The second
-                best is today!
-            </h3>
-        </div>
-        <button class="btn btn--show-modal">
-            Open your free account today!
+{{#> layout title="Homepage"}}
+<div class="header-title">
+        <h1>
+            When
+            <!-- Green highlight effect -->
+            <span class="highlight">banking</span>
+            meets<br />
+            <span class="highlight">technology</span>
+        </h1>
+        <h4>A simpler banking experience for a simpler life.</h4>
+        <button class="btn-text btn--scroll-to">
+            Learn more &DownArrow;
         </button>
-    </section>
+        <img src="assets/bank-with-tech.png" class="header-img" alt="Minimalist bank items" />
+    </div>
+</header>
 
-    <footer class="footer">
-        <ul class="footer-nav">
-            <li class="footer-item">
-                <a class="footer-link" href="#">About</a>
-            </li>
-            <li class="footer-item">
-                <a class="footer-link" href="#">Terms of Use</a>
-            </li>
-            <li class="footer-item">
-                <a class="footer-link" href="#">Privacy Policy</a>
-            </li>
-            <li class="footer-item">
-                <a class="footer-link" href="#">Careers</a>
-            </li>
-            <li class="footer-item">
-                <a class="footer-link" href="#">Contact Us</a>
-            </li>
-        </ul>
-        <img src="assets/cymbal_logo.png" alt="Logo" class="footer-logo" />
-    </footer>
+<section class="section" id="section--1">
+    <div class="section-title">
+        <h2 class="section-description">Features</h2>
+        <h3 class="section-header">
+            Everything you need in a modern bank and more.
+        </h3>
+    </div>
 
-    <div class="modal hidden">
-        <button class="btn-close-modal">&times;</button>
-        <div class="authenticate">
-            <div class="authenticate-tab-container">
-                <button class="btn authenticate-tab authenticate-tab-1 authenticate-tab-active" data-tab="1">
-                    LOGIN
-                </button>
-                <button class="btn authenticate-tab authenticate-tab--2" data-tab="2">
-                    CREATE ACCOUNT
-                </button>
-            </div>
-            <div class="authenticate-content authenticate-content--1 authenticate-content-active">
-                <form class="modal-form" id="sigin_form">
-                    <label>Email Address</label>
-                    <input type="email" />
-                    <label>Password</label>
-                    <input type="password" />
-                    <button class="btn" id="signin_btn">Login</button>
-                </form>
-            </div>
+    <div class="features">
+        <img src="/assets/deeper_ai-powered-assistant.png" data-src="assets/ai-powered-assistant.png" class="features-img" alt="Minimalist bank items" height = "300" width = "300" />
+        
+        <div class="features-feature">
+            <div class="features-icon"></div>
+            <h5 class="features-header">Powered by Gen AI</h5>
+            <li>
+                Advanced Search capabilities.
+            </li>
+            <li>
+                Recommendations for mutual funds, credit cards, fixed deposits and more.
+            </li>
+            <li>
+                Trend Analysis to improve account health and explain expense forecast
+            </li>
+        </div>
 
-            <div class="authenticate-content authenticate-content--2">
-                <form class="modal-form" id="signup_form">
-                    <label>First Name</label>
-                    <input type="text" />
-                    <label>Last Name</label>
-                    <input type="text" />
-                    <label>Aadhar</label>
-                    <input type="text" />
-                    <label>PAN</label>
-                    <input type="text" />
-                    <label>Email Address</label>
-                    <input type="email" />
-                    <label>Password</label>
-                    <input type="password" />
-                    <button class="btn" id="signup_btn">Create Account</button>
-                </form>
-            </div>
+        <div class="features-feature">
+            <div class="features-icon"></div>
+            <h5 class="features-header">AI-Powered Financial Assistant</h5>
+            <li>
+                Always by your side, ready to answer questions and guide you 24/7.
+            </li>
+            <li>
+                Find what you need quickly and discover hidden financial opportunities.
+            </li>
+            <li>
+                Get tailored advice based on your unique financial profile.
+            </li>
+
+        </div>
+        <img src="/assets/deeper_insight.png" data-src="/assets/deeper_insight.png" class="features-img" alt="Minimalist bank items" height = "300" width = "300"/>
+        <img src="/assets/Aurora.png" data-src="/assets/Aurora.png" alt="Credit card" class="features-img" height="250"/>
+        <div class="features-feature">
+            <div class="features-icon"></div>
+            <h5 class="features-header">Personalized Credit Card, Just for You</h5>
+            <p>
+                Get a credit card tailored to your unique ideas.
+            </p>
         </div>
     </div>
-    <div class="overlay hidden"></div>
-    <div class='slide-button-container'>
-        <a href='#' class='slide-button'>
-            <img src='assets/add-user-24.png'>
-            <span class="slide-button-info"> Create Account
-            </span>
-        </a>
-    </div>
-</body>
+</section>
 
-</html>
+<section class="section" id="section--2">
+    <div class="section-title">
+        <h2 class="section-description">Operations</h2>
+        <h3 class="section-header">
+            Everything as simple as possible, but no simpler.
+        </h3>
+    </div>
+
+    <div class="operations">
+        <div class="operations-tab-container">
+            <button class="btn operations-tab operations-tab-1 operations-tab-active" data-tab="1">
+                <span>01</span>Instant Transfers
+            </button>
+            <button class="btn operations-tab operations-tab--2" data-tab="2">
+                <span>02</span>Instant Loans
+            </button>
+            <button class="btn operations-tab operations-tab-3" data-tab="3">
+                <span>03</span>Instant Investment
+            </button>
+        </div>
+        <div class="operations-content operations-content--1 operations-content-active">
+            <div class="operations-icon operations-icon-1"></div>
+            <h5 class="operations-header">
+                Cymbal lets you experience the speed of life with instant transfers
+            </h5>
+            <p>
+                Say goodbye to waiting days for your money to arrive, and embrace the convenience of sending and
+                receiving funds anytime, anywhere. Whether you're paying friends, family, or businesses, splitting
+                bills, or settling expenses, Cymbal ensures your money gets where it needs to be, instantly and
+                securely.
+                With transactions completed within seconds and bank-level encryption safeguarding your information,
+                Cymbal removes the friction from financial interactions, leaving you free to focus on what matters
+                most.
+            </p>
+        </div>
+
+        <div class="operations-content operations-content--2">
+            <div class="operations-icon operations-icon-2"></div>
+            <h5 class="operations-header">
+                Breathe Easy with Cymbal's Low-Interest Loans
+            </h5>
+            <p>
+                Needing a financial boost shouldn't mean high-interest burdens. Cymbal offers competitive interest
+                rates and flexible repayment options, making loans accessible and affordable. Whether you're
+                tackling personal needs, home improvement projects, or business ventures, Cymbal simplifies the loan
+                process with fast approvals and convenient mobile-app management.
+                Enjoy transparent loan terms, no hidden fees or prepayment penalties, and the peace of mind knowing
+                you're working with a trusted partner in achieving your financial goals.
+            </p>
+        </div>
+        <div class="operations-content operations-content--3">
+            <div class="operations-icon operations-icon-3"></div>
+            <h5 class="operations-header">
+                Invest like a pro with Cymbal's Instant Investments
+            </h5>
+            <p>
+                Take control of your financial future with Cymbal's Instant Investments. Invest in a wide range of
+                assets, from stocks and bonds to ETFs and mutual funds, all with just a few taps. Start small with
+                fractional shares or build a diversified portfolio tailored to your risk tolerance and goals. Get
+                real-time market updates, track your performance, and automate investments for effortless wealth
+                building.
+                With Cymbal, there's no minimum investment amount, making financial growth accessible to everyone.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="section--3">
+    <div class="section-title section-title-testimonials">
+        <h2 class="section-description">Not sure yet?</h2>
+        <h3 class="section-header">
+            Millions of people are already making their lifes simpler.
+        </h3>
+    </div>
+
+    <div class="slider">
+        <div class="slide slide--1">
+            <div class="testimonial">
+                <h5 class="testimonial-header">
+                    Best financial decision ever!
+                </h5>
+                <blockquote class="testimonial-text">
+                    Switching to Cymbal has been the absolute best financial decision I've ever made. I used to
+                    dread dealing with my old bank, with their outdated website, hidden fees, and slow customer
+                    service. Cymbal is the complete opposite! The user-friendly app makes managing my finances a
+                    breeze, and I love the instant transfers, low-interest loans, and easy investment options.
+
+                    For the first time, I feel empowered and in control of my money. Cymbal actually feels like a
+                    partner in my financial journey, not just another bank. The personalized insights and AI-powered
+                    tools help me make informed decisions and reach my financial goals faster.
+
+                    I can't recommend Cymbal enough. If you're looking for a modern, convenient, and
+                    customer-focused banking experience, look no further!
+                </blockquote>
+                <address class="testimonial-author">
+                    <img src="" alt="" class="testimonial-photo" />
+                    <h6 class="testimonial-name">Aarav Singh</h6>
+                    <p class="testimonial-location">
+                        New Delhi, India
+                    </p>
+                </address>
+            </div>
+        </div>
+
+        <div class="slide slide--2">
+            <div class="testimonial">
+                <h5 class="testimonial-header">
+                    The best step to technology!
+                </h5>
+                <blockquote class="testimonial-text">
+                    I never thought I'd say this, but I'm actually excited about banking again. Cymbal isn't just a
+                    bank, it's a complete financial ecosystem that seamlessly integrates everything I need in one
+                    place.
+
+                    Their technology is truly groundbreaking. The AI-powered features are incredible, from the
+                    personalized financial insights to the instant transfers and investments. It feels like Cymbal
+                    is actually looking out for my financial well-being, not just trying to sell me products.
+
+                    Say goodbye to clunky apps and outdated interfaces. Cymbal's mobile app is sleek, intuitive, and
+                    user-friendly. It's actually enjoyable to manage my finances now.
+
+                    And let's not forget the customer service. They're always responsive, helpful, and
+                    knowledgeable. It's refreshing to experience genuine support from a financial institution.
+                </blockquote>
+                <address class="testimonial-author">
+                    <img src="" alt="" class="testimonial-photo" />
+                    <h6 class="testimonial-name">Miyah Miles</h6>
+                    <p class="testimonial-location">London, UK</p>
+                </address>
+            </div>
+        </div>
+
+        <div class="slide slide--3">
+            <div class="testimonial">
+                <h5 class="testimonial-header">
+                    Finally free from old-school banks
+                </h5>
+                <blockquote class="testimonial-text">
+                    I used to dread dealing with my old bank. Endless lines, ancient technology, and a maze of
+                    confusing fees. It felt like they were stuck in the dark ages while the rest of the world moved
+                    on.
+
+                    But then I discovered Cymbal! It's like a breath of fresh air in the banking world. Everything
+                    is modern, convenient, and designed to make my life easier.
+
+                    No more wasting time in line: I can manage my finances anytime, anywhere with their
+                    user-friendly mobile app.
+                    No more hidden fees: Their transparent pricing structure means I always know exactly what I'm
+                    paying for.
+                    Cymbal has truly revolutionized my banking experience. I'm finally free from the shackles of
+                    old-school banks and can now focus on what really matters achieving my financial goals.
+                </blockquote>
+                <address class="testimonial-author">
+                    <img src="" alt="" class="testimonial-photo" />
+                    <h6 class="testimonial-name">Shreyash Gupta</h6>
+                    <p class="testimonial-location">
+                        Bengaluru, India
+                    </p>
+                </address>
+            </div>
+        </div>
+
+        <button class="slider-btn slider-btn-left">&larr;</button>
+        <button class="slider-btn slider-btn-right">&rarr;</button>
+        <div class="dots"></div>
+    </div>
+</section>
+
+{{/ layout }}

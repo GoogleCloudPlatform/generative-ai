@@ -1,4 +1,8 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 from datetime import date
 from os import environ
@@ -6,9 +10,8 @@ import random
 
 import functions_framework
 from google.cloud import bigquery
-
-from utils.gemini import Gemini
 from utils.bq_query_handler import BigQueryHandler
+from utils.gemini import Gemini
 
 project_id = environ.get("PROJECT_ID")
 
@@ -21,11 +24,9 @@ def get_credit_card(
 
     Args:
         request (HttpRequest): The request object.
-            <https://cloud.google.com/functions/docs/reference/python/functions_framework#functions_framework.HttpRequest>
 
     Returns:
         HttpResponse: The response object.
-            <https://cloud.google.com/functions/docs/reference/python/functions_framework#functions_framework.HttpResponse>
     """
     # Get the request's JSON payload
     request_json = request.get_json(silent=True)
@@ -53,9 +54,9 @@ def get_credit_card(
 
     # Query BigQuery to check if the credit card already exists for the customer
     query_credit_card_count = f"""
-        SELECT COUNT(*) as count FROM `{project_id}.DummyBankDataset.CreditCards`
-        WHERE customer_id = {customer_id} and credit_card_name = '{credit_card}'
-    """
+SELECT COUNT(*) as count FROM `{project_id}.DummyBankDataset.CreditCards` \
+WHERE customer_id = {customer_id} and credit_card_name = '{credit_card}'
+"""
     result_credit_card_count = client.query(query_credit_card_count)
 
     # Initialize the count variable
@@ -81,10 +82,10 @@ def get_credit_card(
         client.insert_rows_json(table_id, row)
     # If the credit card already exists, update it with the new information
     else:
-        query_update_credit_card = f"""UPDATE `{project_id}.DummyBankDataset.CreditCards`
-            SET credit_card_number = {card_number}, credit_card_last_updated = '{present_date_str}'
-            WHERE customer_id = {customer_id} and credit_card_name = '{credit_card}'
-            """
+        query_update_credit_card = f"""UPDATE `{project_id}.DummyBankDataset.CreditCards` \
+SET credit_card_number = {card_number}, credit_card_last_updated = '{present_date_str}' \
+WHERE customer_id = {customer_id} and credit_card_name = '{credit_card}'
+"""
         client.query(query_update_credit_card)
 
     # Load gemini model
@@ -93,8 +94,8 @@ def get_credit_card(
     response = model.generate_response(
         """
         You are a chatbot for a bank application.
-        Tell the user that thier response has been recorded and they will recieve the credit card in next few days.
-        Thank the user for enrolling with the bank.
+        Tell the user that thier response has been recorded and they will recieve the
+        credit card in next few days. Thank the user for enrolling with the bank.
         Ask the user if there's anything else he wants to know.
         Write in a professional and business-neutral tone.
         Word Limit is 50 words.
@@ -105,11 +106,7 @@ def get_credit_card(
     )
 
     # Set the response message
-    res = {
-        "fulfillment_response": {
-            "messages": [{"text": {"text": [response]}}]
-        }
-    }
+    res = {"fulfillment_response": {"messages": [{"text": {"text": [response]}}]}}
 
     # Return the response
     return res

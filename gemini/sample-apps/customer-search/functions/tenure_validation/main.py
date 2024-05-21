@@ -1,4 +1,7 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
 
 import re
 

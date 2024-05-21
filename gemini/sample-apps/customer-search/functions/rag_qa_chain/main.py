@@ -1,4 +1,8 @@
+"""This is a python utility file."""
+
 # pylint: disable=E0401
+# pylint: disable=R0801
+# pylint: disable=R0914
 
 import json
 import os
@@ -31,7 +35,8 @@ def init_me_libs():
     if not os.path.exists("utils"):
         os.makedirs("utils")
 
-    url_prefix = "https://raw.githubusercontent.com/GoogleCloudPlatform/generative-ai/main/language/use-cases/document-qa/utils"
+    url_prefix = """https://raw.githubusercontent.com/GoogleCloudPlatform/generative-ai\
+    /main/language/use-cases/document-qa/utils"""
     files = ["__init__.py", "matching_engine.py", "matching_engine_utils.py"]
 
     for fname in files:
@@ -126,8 +131,9 @@ def reformat(resp):
     }
     model = TextGenerationModel.from_pretrained("text-bison")
     response = model.predict(
-        """
-Given the input text {0}, reformat it to make it clean and representable to be shown in HTML as search result on a website.
+        f"""
+Given the input text {0}, reformat it to make it clean and representable to be
+shown in HTML as search result on a website.
       """.format(
             resp
         ),
@@ -254,50 +260,49 @@ def qa_over_website(request):
     else:
         query = "Why should I choose Cymbal Bank?"
 
-    PROJECT_ID = project_id  # @param {type:"string"}
-    REGION = "us-central1"  # @param {type:"string"}
+    region = "us-central1"  # @param {type:"string"}
 
     # Initialize Vertex AI SDK
-    vertexai.init(project=PROJECT_ID, location=REGION)
+    vertexai.init(project=project_id, location=region)
 
-    LLM_MODEL = "text-bison@002"  # @param {type: "string"}
-    MAX_OUTPUT_TOKENS = 1024  # @param {type: "integer"}
-    TEMPERATURE = 0.2  # @param {type: "number"}
-    TOP_P = 0.8  # @param {type: "number"}
-    TOP_K = 40  # @param {type: "number"}
-    VERBOSE = True  # @param {type: "boolean"}
-    llm_params = dict(
-        model_name=LLM_MODEL,
-        max_output_tokens=MAX_OUTPUT_TOKENS,
-        temperature=TEMPERATURE,
-        top_p=TOP_P,
-        top_k=TOP_K,
-        verbose=VERBOSE,
-    )
+    llm_model = "text-bison@002"  # @param {type: "string"}
+    max_output_tokens = 1024  # @param {type: "integer"}
+    temperature = 0.2  # @param {type: "number"}
+    top_p = 0.8  # @param {type: "number"}
+    top_k = 40  # @param {type: "number"}
+    verbose = True  # @param {type: "boolean"}
+    llm_params = {
+        "model_name": llm_model,
+        "max_output_tokens": max_output_tokens,
+        "temperature": temperature,
+        "top_p": top_p,
+        "top_k": top_k,
+        "verbose": verbose,
+    }
 
     llm = VertexAI(**llm_params)
 
     # Embeddings API integrated with langChain
     embeddings = VertexAIEmbeddings(model_name="textembedding-gecko@003")
 
-    ME_REGION = "us-central1"
+    me_region = "us-central1"
     # ME_INDEX_NAME = f"{PROJECT_ID}-me-index-3"  # @param {type:"string"}
-    ME_EMBEDDING_DIR = f"{PROJECT_ID}-me-bucket-3"  # @param {type:"string"}
+    me_embedding_dir = f"{project_id}-me-bucket-3"  # @param {type:"string"}
     # ME_DIMENSIONS = 768  # when using Vertex PaLM Embedding
 
-    ME_INDEX_ID = "354891567120515072"
-    ME_INDEX_ENDPOINT_ID = "7646923051275124736"
-    print(f"ME_INDEX_ID={ME_INDEX_ID}")
-    print(f"ME_INDEX_ENDPOINT_ID={ME_INDEX_ENDPOINT_ID}")
+    me_index_id = "354891567120515072"
+    me_index_endpoint_id = "7646923051275124736"
+    print(f"ME_INDEX_ID={me_index_id}")
+    print(f"ME_INDEX_ENDPOINT_ID={me_index_endpoint_id}")
 
     # initialize vector store
     me = VectorSearchVectorStore.from_components(
-        project_id=PROJECT_ID,
-        region=ME_REGION,
-        gcs_bucket_name=f"gs://{ME_EMBEDDING_DIR}".split("/")[2],
+        project_id=project_id,
+        region=me_region,
+        gcs_bucket_name=f"gs://{me_embedding_dir}".split("/")[2],
         embedding=embeddings,
-        index_id=ME_INDEX_ID,
-        endpoint_id=ME_INDEX_ENDPOINT_ID,
+        index_id=me_index_id,
+        endpoint_id=me_index_endpoint_id,
         stream_update=True,
     )
 
@@ -313,15 +318,15 @@ def qa_over_website(request):
     # doc_ids = me.add_texts(texts=texts, metadatas=metadatas)
 
     # Create chain to answer questions
-    NUMBER_OF_RESULTS = 5  # randrandomint(8, 14)
-    SEARCH_DISTANCE_THRESHOLD = 0.6
+    number_of_results = 5  # randrandomint(8, 14)
+    search_distance_threshold = 0.6
 
     # Expose index to the retriever
     retriever = me.as_retriever(
         search_type="similarity",
         search_kwargs={
-            "k": NUMBER_OF_RESULTS,
-            "search_distance": SEARCH_DISTANCE_THRESHOLD,
+            "k": number_of_results,
+            "search_distance": search_distance_threshold,
         },
     )
 
@@ -365,7 +370,7 @@ def qa_over_website(request):
     qa.combine_documents_chain.llm_chain.verbose = True
     qa.combine_documents_chain.llm_chain.llm.verbose = True
 
-    response, ref = ask(query, qa, NUMBER_OF_RESULTS, SEARCH_DISTANCE_THRESHOLD)
+    response, ref = ask(query, qa, number_of_results, search_distance_threshold)
 
     # remove duplicates from references
     references = []
