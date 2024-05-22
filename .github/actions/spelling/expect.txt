@@ -335,3 +335,4 @@ tensorflow
 vectorsearch
 wikilingua
 wikipediaapi
+embeddings
