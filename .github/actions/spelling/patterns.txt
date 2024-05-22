@@ -150,10 +150,10 @@ integrity=(['"])(?:\s*sha\d+-[-a-zA-Z=;:/0-9+]{40,})+\g{-1}
 \b[-a-zA-Z0-9.]*\.googleapis\.com(?:\S*|)
 
 # Jupyter Notebook ID
-"id":\s*"[a-zA-Z0-9_]{12}"
+"id":\s*"[a-zA-Z0-9_-]{12,36}"
 
 # Embedded Images
 "image\/[a-z]*":\s*"[A-Za-z0-9+\/=]{20,}"
 
 # Base64 Images
-base64,
+base64,[A-Za-z0-9+\/=]{20,}
