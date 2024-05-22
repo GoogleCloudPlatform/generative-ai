@@ -153,7 +153,7 @@ integrity=(['"])(?:\s*sha\d+-[-a-zA-Z=;:/0-9+]{40,})+\g{-1}
 "id":\s*"[a-zA-Z0-9]{12}"
 
 # Embedded Images
-/"image\/png":\s*"[A-Za-z0-9+\/=]{20,}"/
+"image\/[a-z]*":\s*"[A-Za-z0-9+\/=]{20,}"
 
 # Base64 Images
 base64,[A-Za-z0-9+\/=]{20,}
