@@ -8,6 +8,7 @@
 (?:^|/)pyproject.toml
 (?:^|/)requirements(?:-dev|-doc|-test|)\.txt$
 (?:^|/)vendor/
+ignore$
 \.a$
 \.ai$
 \.all-contributorsrc$
