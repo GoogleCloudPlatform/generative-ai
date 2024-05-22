@@ -88,3 +88,4 @@ ignore$
 ignore$
 italian
 /CODEOWNERS$
+^\Qgemini/use-cases/healthcare/react_gemini_healthcare_api.ipynb\E$

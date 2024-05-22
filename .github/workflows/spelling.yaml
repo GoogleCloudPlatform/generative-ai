@@ -122,6 +122,7 @@ jobs:
             cspell:typescript/dict/typescript.txt
             cspell:golang/dict/go.txt
             cspell:php/dict/php.txt
+            cspell:companies/dict/companies.txt
 
   comment-push:
     name: Report (Push)

@@ -336,3 +336,10 @@ vectorsearch
 wikilingua
 wikipediaapi
 embeddings
+qubit
+chatbots
+Collider
+Diarization
+crowdsourcing
+fewshot
+Firestore
