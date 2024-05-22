@@ -123,6 +123,11 @@ jobs:
             cspell:golang/dict/go.txt
             cspell:php/dict/php.txt
             cspell:companies/dict/companies.txt
+            cspell:it_IT/it_IT.dic
+            cspell:fr_FR/src/hunspell-french-dictionaries-v7.0/fr-classique.dic
+            cspell:es_ES/src/hunspell/index.dic
+            cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
+            cspell:en_US/src/hunspell/en_US.dic
 
   comment-push:
     name: Report (Push)
