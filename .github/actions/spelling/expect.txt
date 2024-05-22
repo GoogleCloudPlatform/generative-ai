@@ -344,3 +344,5 @@ crowdsourcing
 fewshot
 Firestore
 ecommerce
+open-endedness
+codebases

@@ -150,7 +150,7 @@ integrity=(['"])(?:\s*sha\d+-[-a-zA-Z=;:/0-9+]{40,})+\g{-1}
 \b[-a-zA-Z0-9.]*\.googleapis\.com(?:\S*|)
 
 # Jupyter Notebook ID
-"id":\s*"[a-f0-9]{12}"
+"id":\s*"[a-zA-Z0-9]{12}"
 
 # Embedded Images
 /"image\/png":\s*"[A-Za-z0-9+\/=]{20,}"/
