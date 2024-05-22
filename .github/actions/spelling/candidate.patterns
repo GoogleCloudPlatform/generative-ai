@@ -685,5 +685,3 @@ W/"[^"]+"
 # github runner temp folders
 /home/runner/work/_temp/[-_/a-z0-9]+
 
-# Jupyter Notebook ID
-/\"metadata\":\s*{\s*\"id\":\s*\"[A-Za-z0-9]+\"\s*}\s*,?/
