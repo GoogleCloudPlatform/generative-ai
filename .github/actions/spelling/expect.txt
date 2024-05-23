@@ -343,6 +343,6 @@ crowdsourcing
 fewshot
 Firestore
 ecommerce
-open-endedness
+endedness
 codebases
 anonymization
