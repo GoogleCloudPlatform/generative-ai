@@ -88,7 +88,7 @@ jobs:
     concurrency:
       group: spelling-${{ github.event.pull_request.number || github.ref }}
       # note: If you use only_check_changed_files, you do not want cancel-in-progress
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: check-spelling
         id: spelling
@@ -98,7 +98,7 @@ jobs:
           checkout: true
           check_file_names: 1
           spell_check_this: check-spelling/spell-check-this@prerelease
-          post_comment: 0
+          post_comment: 1
           use_magic_file: 1
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
@@ -136,6 +136,7 @@ jobs:
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-reforme1990.dic
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-toutesvariantes.dic
             cspell:it_IT/it_IT.dic
+          only_check_changed_files: true
 
 
   comment-push:
