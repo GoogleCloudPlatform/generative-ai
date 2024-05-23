@@ -3,3 +3,8 @@ https
 ssh
 ubuntu
 workarounds
+ipynb
+Colab
+gradio
+colab
+vertexai
