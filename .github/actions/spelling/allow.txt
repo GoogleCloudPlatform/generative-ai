@@ -8,3 +8,9 @@ Colab
 gradio
 colab
 vertexai
+plt
+pyplot
+getexif
+ndarray
+astype
+imshow
