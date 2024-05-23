@@ -77,9 +77,9 @@ jobs:
   spelling:
     name: Check Spelling
     permissions:
-      contents: write
-      pull-requests: write
-      actions: write
+      contents: read
+      pull-requests: read
+      actions: read
       security-events: write
     outputs:
       followup: ${{ steps.spelling.outputs.followup }}
@@ -88,7 +88,7 @@ jobs:
     concurrency:
       group: spelling-${{ github.event.pull_request.number || github.ref }}
       # note: If you use only_check_changed_files, you do not want cancel-in-progress
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: check-spelling
         id: spelling
@@ -133,7 +133,7 @@ jobs:
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-classique.dic
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-reforme1990.dic
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-toutesvariantes.dic
-
+          only_check_changed_files: true
   comment-push:
     name: Report (Push)
     # If your workflow isn't running on push, you can remove this job
