@@ -108,6 +108,7 @@ jobs:
           extra_dictionaries: |
             cspell:software-terms/dict/softwareTerms.txt
             cspell:aws/aws.txt
+            cspell:google/google.txt
             cspell:html/dict/html.txt
             cspell:fullstack/dict/fullstack.txt
             cspell:python/src/python/python.txt
