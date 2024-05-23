@@ -77,9 +77,9 @@ jobs:
   spelling:
     name: Check Spelling
     permissions:
-      contents: read
-      pull-requests: read
-      actions: read
+      contents: write
+      pull-requests: write
+      actions: write
       security-events: write
     outputs:
       followup: ${{ steps.spelling.outputs.followup }}
@@ -88,7 +88,7 @@ jobs:
     concurrency:
       group: spelling-${{ github.event.pull_request.number || github.ref }}
       # note: If you use only_check_changed_files, you do not want cancel-in-progress
-      cancel-in-progress: false
+      cancel-in-progress: true
     steps:
       - name: check-spelling
         id: spelling
@@ -104,25 +104,31 @@ jobs:
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
           experimental_apply_changes_via_bot: 1
           use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
+          dictionary_source_prefixes: >
+            {
+              "cspell": "https://raw.githubusercontent.com/check-spelling/cspell-dicts/master/dictionaries/"
+            }
           check_extra_dictionaries: ''
           extra_dictionaries: |
-            cspell:software-terms/dict/softwareTerms.txt
             cspell:aws/aws.txt
-            cspell:html/dict/html.txt
-            cspell:fullstack/dict/fullstack.txt
-            cspell:python/src/python/python.txt
-            cspell:java/src/java.txt
-            cspell:python/src/common/extra.txt
-            cspell:npm/dict/npm.txt
-            cspell:shell/dict/shell-all-words.txt
-            cspell:python/src/python/python-lib.txt
-            cspell:k8s/dict/k8s.txt
+            cspell:bash/bash-words.txt
+            cspell:companies/companies.txt
+            cspell:css/css.txt
+            cspell:django/django.txt
             cspell:filetypes/filetypes.txt
-            cspell:node/dict/node.txt
+            cspell:fonts/fonts.txt
+            cspell:fullstack/fullstack.txt
+            cspell:golang/go.txt
+            cspell:html/html.txt
+            cspell:java/java.txt
+            cspell:latex/latex.txt
+            cspell:node/node.txt
+            cspell:npm/npm.txt
+            cspell:php/php.txt
+            cspell:python/python.txt
+            cspell:k8s/dict/k8s.txt
             cspell:typescript/dict/typescript.txt
-            cspell:golang/dict/go.txt
-            cspell:php/dict/php.txt
-            cspell:companies/dict/companies.txt
+            cspell:software-terms/dict/softwareTerms.txt
             cspell:de_DE/src/German_de_DE.dic
             cspell:de_DE/src/hunspell/index.dic
             cspell:es_ES/src/hunspell/index.dic
@@ -133,8 +139,6 @@ jobs:
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-classique.dic
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-reforme1990.dic
             cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-toutesvariantes.dic
-          only_check_changed_files: true
-
 
   comment-push:
     name: Report (Push)
