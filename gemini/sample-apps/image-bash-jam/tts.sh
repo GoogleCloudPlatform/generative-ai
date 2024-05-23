@@ -29,7 +29,7 @@
 
 set -euo pipefail
 
-SENTENCE="${*//\'/\\\'}" # c'e' l'uomo => "c\' e l\'uomo"
+SENTENCE="${*//\'/\\\'}" # Escape apostrophes
 TMP_OUTPUT_FILE='.tmp.tts-output.json'
 JQ_PATH='.audioContent'
 # Latest model: https://cloud.google.com/text-to-speech/docs/voices
