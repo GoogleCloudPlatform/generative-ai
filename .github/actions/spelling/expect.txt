@@ -172,7 +172,6 @@ noxfile
 nvidia
 ocr
 OLAP
-opensource
 orgpolicy
 originalname
 oslogin
