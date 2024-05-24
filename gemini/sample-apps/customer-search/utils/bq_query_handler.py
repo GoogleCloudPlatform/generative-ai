@@ -182,9 +182,9 @@ SELECT Affinities FROM `{self.project_id}.DummyBankDataset.Customer` \
 WHERE customer_id = {self.customer_id}
 """
 
-        self.queries["query_event_details"] = (
-            f"""SELECT * FROM `{self.project_id}.DummyBankDataset.CustomerEvents`"""
-        )
+        self.queries[
+            "query_event_details"
+        ] = f"""SELECT * FROM `{self.project_id}.DummyBankDataset.CustomerEvents`"""
 
         self.queries[
             "query_cust_address"
@@ -227,9 +227,9 @@ SELECT (amount_invested*six_month_return) as six_month_return,Scheme_Name from \
 where customer_id={self.customer_id})
 """
 
-        self.queries["query_mf"] = (
-            f"""SELECT * FROM `{self.project_id}.DummyBankDataset.MutualFund`"""
-        )
+        self.queries[
+            "query_mf"
+        ] = f"""SELECT * FROM `{self.project_id}.DummyBankDataset.MutualFund`"""
 
         self.queries[
             "query_age_on_book"

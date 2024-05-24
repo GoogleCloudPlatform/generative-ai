@@ -7,8 +7,8 @@
 from os import environ
 
 import vertexai
-from vertexai.preview.generative_models import GenerativeModel
 from vertexai.preview import generative_models
+from vertexai.preview.generative_models import GenerativeModel
 
 generation_config = {
     "max_output_tokens": 2048,
