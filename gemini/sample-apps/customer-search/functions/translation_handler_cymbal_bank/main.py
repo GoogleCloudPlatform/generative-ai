@@ -183,6 +183,8 @@ def handle_webhook(request_json: dict) -> dict:
 
     request_headers = {"Content-Type": "application/json"}
 
+    url = ""
+
     # 1. figure out the language source
     # 2. do i need to translate anything in req
     # 3. send and recive req
@@ -203,7 +205,7 @@ def handle_webhook(request_json: dict) -> dict:
         "unusual-expense",
         "find_nearest_dealer",
     ]:
-        url: str = {
+        url = {
             "account-summary": environ.get("ACCOUNT_SUMMARY_URL"),
             "account-tips": environ.get("ACCOUNT_TIPS_URL"),
             "event": environ.get("EVENT_RECOMM_URL"),
@@ -230,7 +232,7 @@ def handle_webhook(request_json: dict) -> dict:
         "fd_tenure",
         "create-fd",
     ]:
-        url: str = {
+        url = {
             "account-balance": environ.get("ACCOUNT_BALANCE_URL"),
             "credit-card-recommendation": environ.get("CREDIT_CARD_RECOMM_URL"),
             "create-credit-card": environ.get("CREDIT_CARD_CREATE_URL"),
@@ -260,7 +262,7 @@ def handle_webhook(request_json: dict) -> dict:
         "recommend-debt-fund",
         "travel",
     ]:
-        url: str = {
+        url = {
             "debt_fund_webhook": environ.get("DEBT_FUND_URL"),
             "expense-prediction": environ.get("EXPENSE_PREDICT_URL"),
             "recommend-debt-fund": environ.get("DEBT_FUND_RECOMM_URL"),
@@ -282,7 +284,7 @@ def handle_webhook(request_json: dict) -> dict:
                     )
 
     elif tag == "tenure-validation":
-        url: str = environ.get("FD_TENURE_VAL_URL")
+        url = environ.get("FD_TENURE_VAL_URL")
         request_json["sessionInfo"]["parameters"]["fd_tenure"] = translate_text(
             request_json["sessionInfo"]["parameters"]["fd_tenure"],
             source_language_code,
