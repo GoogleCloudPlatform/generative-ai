@@ -14,3 +14,11 @@ getexif
 ndarray
 astype
 imshow
+diy
+gcloud
+ipykernel
+Langchain
+lexer
+nbconvert
+nbformat
+protobuf
