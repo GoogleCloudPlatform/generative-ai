@@ -42,3 +42,5 @@ ipykernel
 pypdf
 QPM
 thelook
+dataframe
+faiss
