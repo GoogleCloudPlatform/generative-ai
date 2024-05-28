@@ -42,6 +42,11 @@ ipykernel
 pypdf
 QPM
 thelook
+diy
+Langchain
+nbconvert
+nbformat
+protobuf
 dataframe
 faiss
 FPDF
