@@ -242,3 +242,6 @@ GHSA(?:-[0-9a-z]{4}){3}
 \bgitlab\.[^/\s"]*/uploads/[-a-zA-Z=;:/0-9+]*
 # GitLab commits
 \bgitlab\.[^/\s"]*/(?:[^/\s"]+/){2}commits?/[0-9a-f]+\b
+
+# mailto urls
+mailto:[-a-zA-Z=;:/?%&0-9+@._]{3,}
