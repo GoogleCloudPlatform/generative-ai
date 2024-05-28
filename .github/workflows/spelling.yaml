@@ -78,7 +78,7 @@ jobs:
     name: Check Spelling
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       actions: read
       security-events: write
     outputs:
@@ -88,7 +88,7 @@ jobs:
     concurrency:
       group: spelling-${{ github.event.pull_request.number || github.ref }}
       # note: If you use only_check_changed_files, you do not want cancel-in-progress
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: check-spelling
         id: spelling
@@ -98,7 +98,7 @@ jobs:
           checkout: true
           check_file_names: 1
           spell_check_this: check-spelling/spell-check-this@prerelease
-          post_comment: 0
+          post_comment: 1
           use_magic_file: 1
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
@@ -122,6 +122,51 @@ jobs:
             cspell:typescript/dict/typescript.txt
             cspell:golang/dict/go.txt
             cspell:php/dict/php.txt
+            cspell:companies/dict/companies.txt
+            cspell:de_DE/src/German_de_DE.dic
+            cspell:de_DE/src/hunspell/index.dic
+            cspell:es_ES/src/hunspell/index.dic
+            cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
+            cspell:fr_FR/src/hunspell-french-dictionaries-v7.0/fr-classique.dic
+            cspell:fr_FR/src/hunspell-french-dictionaries-v7.0/fr-reforme1990.dic
+            cspell:fr_FR/src/hunspell-french-dictionaries-v7.0/fr-toutesvariantes.dic
+            cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-classique.dic
+            cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-reforme1990.dic
+            cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-toutesvariantes.dic
+          only_check_changed_files: true
+  comment-push:
+    name: Report (Push)
+    # If your workflow isn't running on push, you can remove this job
+    runs-on: ubuntu-latest
+    needs: spelling
+    permissions:
+      contents: write
+    if: (success() || failure()) && needs.spelling.outputs.followup && github.event_name == 'push'
+    steps:
+    - name: comment
+      uses: check-spelling/check-spelling@main
+      with:
+        checkout: true
+        spell_check_this: check-spelling/spell-check-this@prerelease
+        task: ${{ needs.spelling.outputs.followup }}
+
+  comment-pr:
+    name: Report (PR)
+    # If you workflow isn't running on pull_request*, you can remove this job
+    runs-on: ubuntu-latest
+    needs: spelling
+    permissions:
+      contents: read
+      pull-requests: write
+    if: (success() || failure()) && needs.spelling.outputs.followup && contains(github.event_name, 'pull_request')
+    steps:
+    - name: comment
+      uses: check-spelling/check-spelling@main
+      with:
+        checkout: true
+        spell_check_this: check-spelling/spell-check-this@prerelease
+        task: ${{ needs.spelling.outputs.followup }}
+        experimental_apply_changes_via_bot: 1
 
   update:
     name: Update PR
