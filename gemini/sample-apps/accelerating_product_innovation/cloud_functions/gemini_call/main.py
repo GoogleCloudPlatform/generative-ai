@@ -3,7 +3,7 @@ Cloud Function for getting text response from Gemini API.
 """
 
 import os
-from typing import Dict, Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 from dotenv import load_dotenv
 import functions_framework
@@ -41,7 +41,7 @@ def generate_text(prompt: str) -> str:
 
 
 @functions_framework.http
-def get_llm_response(request) -> Union[Dict, Tuple]:
+def get_llm_response(request: Any) -> Union[Dict, Tuple]:
     """HTTP Cloud Function that generates text using the Gemini-Pro model.
 
     Args:

@@ -3,7 +3,7 @@ Cloud function to make calls to Imagen API.
 """
 
 import os
-from typing import Dict
+from typing import Any, Dict
 
 from dotenv import load_dotenv
 import functions_framework
@@ -36,7 +36,7 @@ def image_generation(prompt: str) -> bytes:
 
 
 @functions_framework.http
-def get_images(request) -> bytes:
+def get_images(request: Any) -> bytes:
     """Invokes image generation call.
 
     Args:

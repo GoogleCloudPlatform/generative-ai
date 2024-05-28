@@ -87,7 +87,7 @@ def image_generation(
     images[0].save(location=f"{filename}.png", include_generation_parameters=False)
 
 
-async def parallel_image_generation(prompt: str, col: int) -> Optional[Image]:
+async def parallel_image_generation(prompt: str, col: int) -> Optional[Image.Image]:
     """
     Executes parallel generation of images through Imagen.
 
@@ -116,3 +116,5 @@ async def parallel_image_generation(prompt: str, col: int) -> Optional[Image]:
                     f"gen_image{st.session_state.num_drafts+col}.png", format="PNG"
                 )
                 return response_image
+
+    return None
