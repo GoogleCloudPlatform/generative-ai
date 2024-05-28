@@ -135,12 +135,6 @@ jobs:
             cspell:de_DE/src/hunspell/index.dic
             cspell:es_ES/src/hunspell/index.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
-            cspell:fr_FR/src/hunspell-french-dictionaries-v7.0/fr-classique.dic
-            cspell:fr_FR/src/hunspell-french-dictionaries-v7.0/fr-reforme1990.dic
-            cspell:fr_FR/src/hunspell-french-dictionaries-v7.0/fr-toutesvariantes.dic
-            cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-classique.dic
-            cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-reforme1990.dic
-            cspell:fr_FR_90/src/hunspell-french-dictionaries-v7.0/fr-toutesvariantes.dic
           only_check_changed_files: true
   comment-push:
     name: Report (Push)
