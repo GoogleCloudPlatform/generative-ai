@@ -55,7 +55,7 @@ jobs:
           JAVASCRIPT_DEFAULT_STYLE: prettier
           LOG_LEVEL: WARN
           SHELLCHECK_OPTS: -e SC1091 -e 2086
-          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: true
           VALIDATE_NATURAL_LANGUAGE: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_TYPESCRIPT_STANDARD: false # super-linter/super-linter#4445
