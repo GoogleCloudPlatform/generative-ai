@@ -47,3 +47,5 @@ Langchain
 nbconvert
 nbformat
 protobuf
+dataframe
+faiss

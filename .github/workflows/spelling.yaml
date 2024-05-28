@@ -107,22 +107,31 @@ jobs:
           check_extra_dictionaries: ''
           extra_dictionaries: |
             cspell:software-terms/dict/softwareTerms.txt
+            cspell:software-terms/dict/webServices.txt
             cspell:aws/aws.txt
             cspell:html/dict/html.txt
             cspell:fullstack/dict/fullstack.txt
-            cspell:python/src/python/python.txt
             cspell:java/src/java.txt
             cspell:python/src/common/extra.txt
             cspell:npm/dict/npm.txt
             cspell:shell/dict/shell-all-words.txt
-            cspell:python/src/python/python-lib.txt
             cspell:k8s/dict/k8s.txt
             cspell:filetypes/filetypes.txt
+            cspell:fonts/fonts.txt
             cspell:node/dict/node.txt
             cspell:typescript/dict/typescript.txt
             cspell:golang/dict/go.txt
             cspell:php/dict/php.txt
             cspell:companies/dict/companies.txt
+            cspell:django/requirements.txt
+            cspell:django/dict/django.txt
+            cspell:docker/src/docker-words.txt
+            cspell:mnemonics/src/mnemonics.txt
+            cspell:python/src/additional_words.txt
+            cspell:python/src/common/extra.txt
+            cspell:python/src/python/python-lib.txt
+            cspell:python/src/python/python.txt
+            cspell:svelte/dict/svelte.txt
             cspell:de_DE/src/German_de_DE.dic
             cspell:de_DE/src/hunspell/index.dic
             cspell:es_ES/src/hunspell/index.dic
