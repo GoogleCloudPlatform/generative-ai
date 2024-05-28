@@ -42,3 +42,6 @@ ipykernel
 pypdf
 QPM
 thelook
+figsize
+xticks
+yticks
