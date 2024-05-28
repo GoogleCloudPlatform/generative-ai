@@ -50,3 +50,8 @@ protobuf
 dataframe
 faiss
 CHECKOV
+figsize
+ncols
+nrows
+xticks
+yticks
