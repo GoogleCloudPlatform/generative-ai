@@ -1,0 +1,15 @@
+backoff
+google-cloud-aiplatform
+numpy
+opencv-python
+opencv-python-headless
+pandas
+pillow
+PyPDF2
+dotenv
+python-docx
+pytomlpp
+streamlit
+streamlit-drawable-canvas
+vertexai
+google-cloud-storage==2.15.0
