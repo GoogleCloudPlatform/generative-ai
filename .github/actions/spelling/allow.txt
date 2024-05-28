@@ -29,6 +29,16 @@ imdb
 Kamradt
 lexer
 welcom
+bqml
 BQML
 LLMs
+llms
 colwidth
+bbc
+dbln
+FAISS
+fulltext
+ipykernel
+pypdf
+QPM
+thelook
