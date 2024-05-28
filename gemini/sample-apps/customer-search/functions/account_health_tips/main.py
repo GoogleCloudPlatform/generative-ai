@@ -1,6 +1,5 @@
 """This is a python utility file."""
 
-# pylint: disable=E0401
 # pylint: disable=R0801
 # pylint: disable=R0914
 
@@ -34,8 +33,8 @@ def account_health_tips(request):
 
     query_handler = BigQueryHandler(customer_id=customer_id)
 
-    cust_id_exists, res = query_handler.validate_customer_id()
-    if not cust_id_exists:
+    customer_id_exists, res = query_handler.validate_customer_id()
+    if not customer_id_exists:
         return res
 
     result_categories = query_handler.query("query_transaction_category")
@@ -84,14 +83,14 @@ def account_health_tips(request):
     You have been give list of categories and amount spend.
     Transaction List  = {transaction_list_str}.
     Depending on the data get some insights on how the spending and if any what to do for better
-    account health, explain exaclty where is is not good and why.
+    account health, explain exactly where is is not good and why.
     Write in a professional and business-neutral tone in very brief in about
     60 words in a very readable form.
     Do not say that largest expense category is housing as housing is a necessity.
     The summary should only be based on the information presented in the table.
-    Aslo provide 3-4 tips to reduce the spent in largest spent categories.
+    Also provide 3-4 tips to reduce the spent in largest spent categories.
     The summary is to be read in a chat response.
-    The amount should be comma seprated in indian rupee format and upto 2 decimal places.
+    The amount should be comma separated in indian rupee format and upto 2 decimal places.
     Convert amount to correct format for example ₹ 100235 to ₹ 1,00,235.00.
     For example the output should look like : The last month's expense of ₹24,07,764.00 is
     greater than the average monthly expense of ₹13,09,025.00.

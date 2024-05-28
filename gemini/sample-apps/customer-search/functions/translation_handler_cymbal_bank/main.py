@@ -1,6 +1,5 @@
 """This is a python utility file."""
 
-# pylint: disable=E0401
 # pylint: disable=R0801
 
 import json
@@ -143,9 +142,9 @@ def handle_category_wise_expenditure_webhook(
     url: str = environ.get("CATEGORIZE_EXPENSE_URL")
     res_json = get_json_response(url, request_json, request_headers)
     if "en" not in source_language_code:
-        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-            0
-        ] = translate_fulfilment_response(res_json, "en-US", source_language_code)
+        res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
+            translate_fulfilment_response(res_json, "en-US", source_language_code)
+        )
         for i in range(
             len(
                 res_json["fulfillment_response"]["messages"][1]["payload"][
@@ -220,9 +219,9 @@ def handle_webhook(request_json: dict) -> dict:
         res_json = get_json_response(url, request_json, request_headers)
 
         if "en" not in source_language_code:
-            res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                0
-            ] = translate_fulfilment_response(res_json, "en-US", source_language_code)
+            res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
+                translate_fulfilment_response(res_json, "en-US", source_language_code)
+            )
 
     elif tag in [
         "account-balance",
@@ -245,10 +244,10 @@ def handle_webhook(request_json: dict) -> dict:
 
         if "en" not in source_language_code:
             for i in range(len(res_json["fulfillment_response"]["messages"])):
-                res_json["fulfillment_response"]["messages"][i]["text"]["text"][
-                    0
-                ] = translate_fulfilment_response(
-                    res_json, "en-US", source_language_code, i
+                res_json["fulfillment_response"]["messages"][i]["text"]["text"][0] = (
+                    translate_fulfilment_response(
+                        res_json, "en-US", source_language_code, i
+                    )
                 )
 
     elif tag == "category-wise-expenditure":

@@ -1,6 +1,5 @@
 """This is a python utility file."""
 
-# pylint: disable=E0401
 # pylint: disable=R0801
 # pylint: disable=R0914
 # pylint: disable=W0212
