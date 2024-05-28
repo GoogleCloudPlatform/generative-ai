@@ -64,7 +64,7 @@ information on using pull requests.
 ## Community Guidelines
 
 This project follows [Google's Open Source Community
-Guidelines](https:git//opensource.google/conduct/).
+Guidelines](https://opensource.google/conduct/).
 
 ## Contributor Guide
 
@@ -74,12 +74,10 @@ You may follow these steps to contribute:
 
 1. **Fork the official repository.** This will create a copy of the official repository in your own account.
 2. **Sync the branches.** This will ensure that your copy of the repository is up-to-date with the latest changes from the official repository.
-3. **Work on your forked repository's dev branch.** This is where you will make your changes to the code.
-4. **Commit your updates on your forked repository's dev branch.** This will save your changes to your copy of the repository.
+3. **Work on your forked repository's feature branch.** This is where you will make your changes to the code.
+4. **Commit your updates on your forked repository's feature branch.** This will save your changes to your copy of the repository.
 5. **Submit a pull request to the official repository's main branch.** This will request that your changes be merged into the official repository.
 6. **Resolve any lint errors.** This will ensure that your changes are formatted correctly.
-
-![image](https://storage.googleapis.com/github-repo/img/contributing/contributor-guide-diagram.jpg)
 
 Here are some additional things to keep in mind during the process:
 
