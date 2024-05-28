@@ -42,6 +42,11 @@ ipykernel
 pypdf
 QPM
 thelook
-figsize
-xticks
-yticks
+diy
+Langchain
+nbconvert
+nbformat
+protobuf
+dataframe
+faiss
+CHECKOV
