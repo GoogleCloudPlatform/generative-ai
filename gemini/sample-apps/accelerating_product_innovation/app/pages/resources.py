@@ -12,8 +12,6 @@ functionalities include:
     * Provides download and delete options for stored files.
 """
 
-# pylint: disable=E0401
-
 import json
 import os
 

@@ -2,11 +2,9 @@
 Cloud function to generate embedding of given file.
 """
 
-# pylint: disable=E0401
-
 import json
 import os
-from typing import Any
+from typing import Any, List
 
 from dotenv import load_dotenv
 import functions_framework
@@ -22,7 +20,7 @@ LOCATION = os.getenv("LOCATION")
 embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko@003")
 
 
-def get_embeddings(instances: list[str]) -> list[Any]:
+def get_embeddings(instances: list[str]) -> List[List[float]]:
     """
     Generates embeddings for given text.
 
@@ -68,7 +66,7 @@ def generate_embeddings(pdf_data: dict) -> dict:
 
 
 @functions_framework.http
-def get_text_embeddings(request) -> tuple[dict[str, str], int]:
+def get_text_embeddings(request: Any) -> tuple[dict[str, str], int]:
     """
     Processes request for generating embeddings.
 

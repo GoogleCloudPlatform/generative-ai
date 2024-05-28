@@ -34,7 +34,7 @@ class PDFRounded(pdf_generator.FPDF):
         r: float,
         style: str = "",
         corners: str = "1234",
-    ):
+    ) -> None:
         """
         Draws a rectangle with rounded corners.
 
@@ -130,7 +130,9 @@ class PDFRounded(pdf_generator.FPDF):
             )
         self._out(op)
 
-    def arc(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float):
+    def arc(
+        self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float
+    ) -> None:
         """
         Draws an arc.
 

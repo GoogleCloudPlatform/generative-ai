@@ -21,7 +21,7 @@ class ImageEditor:
       prompts.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.stroke_width = 20  # Default stroke width
         self.stroke_color = "black"
         self.drawing_mode = "rect"  # Default drawing mode
@@ -39,7 +39,7 @@ class ImageEditor:
             image_data = f.read()
         return io.BytesIO(image_data)
 
-    def display_ui(self):
+    def display_ui(self) -> tuple[st_canvas, Image.Image, io.BytesIO]:
         """Renders the main UI components of the image editor."""
         # - Load the image for editing
         image_bytes = self.load_image(

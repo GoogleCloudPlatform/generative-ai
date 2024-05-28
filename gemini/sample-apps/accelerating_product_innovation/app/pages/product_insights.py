@@ -104,9 +104,9 @@ else:
                 # Check if number of suggestions is less than 4
                 if (
                     st.session_state.insights_suggestion is not None
-                    and len(st.session_state.insights_suggestion) < 4
+                    and len(st.session_state.insights_suggestion) < 4  # type: ignore
                 ):
-                    insights.get_suggestions("insights_suggestion")
+                    insights.get_suggestions("insights_suggestion")  # type: ignore
 
     # Check if suggestions are loaded
     if (

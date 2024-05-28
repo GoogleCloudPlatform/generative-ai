@@ -1,10 +1,9 @@
 """
-Cloud function to make calls to imagen API.
+Cloud function to make calls to Imagen API.
 """
 
-# pylint: disable=E0401
-
 import os
+from typing import Dict
 
 from dotenv import load_dotenv
 import functions_framework
@@ -13,39 +12,38 @@ from vertexai.preview.vision_models import ImageGenerationModel
 
 load_dotenv()
 
-
 PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-def image_generation(prompt: str):
-    """
-    Generates images based on given prompt
-    using image generation model.
+def image_generation(prompt: str) -> bytes:
+    """Generates images based on given prompt using image generation model.
 
     Args:
-        prompt (str):
-            Prompt for generating image.
+        prompt (str): Prompt for generating image.
+
+    Returns:
+        bytes: The generated image as raw bytes.
     """
     vertexai.init(project=PROJECT_ID, location=LOCATION)
     model = ImageGenerationModel.from_pretrained("imagegeneration@006")
     return model.generate_images(
         prompt=prompt,
-        # Optional parameters
         number_of_images=1,
         language="en",
         aspect_ratio="1:1",
-    )[0].__dict__["_loaded_bytes"]
+    )[0]._loaded_bytes
 
 
 @functions_framework.http
-def get_images(request):
-    """
-    Invokes image generation call.
+def get_images(request) -> bytes:
+    """Invokes image generation call.
+
     Args:
-        request:
-            Data for image generation from the
-            calling function.
+        request: Data for image generation from the calling function.
+
+    Returns:
+        Response: A Flask Response object containing the generated image.
     """
-    request_json = request.get_json(silent=True)
+    request_json: Dict = request.get_json(silent=True)
     return image_generation(request_json["img_prompt"])

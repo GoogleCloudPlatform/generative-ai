@@ -1,11 +1,9 @@
 """
 Cloud Function for getting text response from Gemini API.
-(Required for parallel image generation)
 """
 
-# pylint: disable=E0401
-
 import os
+from typing import Dict, Tuple, Union
 
 from dotenv import load_dotenv
 import functions_framework
@@ -18,7 +16,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-def generate_text(prompt: str):
+def generate_text(prompt: str) -> str:
     """Generates text using the Gemini-Pro model.
 
     Args:
@@ -43,7 +41,7 @@ def generate_text(prompt: str):
 
 
 @functions_framework.http
-def get_llm_response(request):
+def get_llm_response(request) -> Union[Dict, Tuple]:
     """HTTP Cloud Function that generates text using the Gemini-Pro model.
 
     Args:
@@ -55,7 +53,7 @@ def get_llm_response(request):
         Response object using `make_response`
         <http://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
-    request_json = request.get_json(silent=True)
+    request_json: Dict = request.get_json(silent=True)
     if not request_json or "text_prompt" not in request_json:
         return {"error": "Request body must contain 'text_prompt' field."}, 400
 

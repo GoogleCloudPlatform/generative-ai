@@ -19,7 +19,7 @@ class ProductDrafts:
       regeneration for each draft.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Initialize session state if needed
         if "create_product" not in st.session_state:
             st.session_state.create_product = False

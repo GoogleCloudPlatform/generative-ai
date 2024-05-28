@@ -2,8 +2,6 @@
 Entry page of streamlit application.
 """
 
-# pylint: disable=E0401
-
 from app.pages_utils import setup
 from app.pages_utils.pages_config import PAGES_CFG
 from st_pages import show_pages_from_config

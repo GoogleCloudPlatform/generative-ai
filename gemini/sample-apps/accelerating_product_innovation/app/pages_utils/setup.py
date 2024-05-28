@@ -4,8 +4,6 @@ Common utilities for the project. This includes:
     * project selection.
 """
 
-# pylint: disable=E0401
-
 import json
 import os
 from typing import Any
@@ -43,7 +41,7 @@ def display_projects() -> None:
         st.rerun()
 
 
-def initialize_all_session_state(reinitialize: bool = False):
+def initialize_all_session_state(reinitialize: bool = False) -> None:
     """Initializes all the session states used in the app.
 
     Args:

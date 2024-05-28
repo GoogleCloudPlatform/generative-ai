@@ -11,6 +11,8 @@ import json
 import logging
 import os
 
+from typing import Optional
+
 from PIL import Image
 import aiohttp as cloud_function_call
 import streamlit as st
@@ -86,7 +88,7 @@ def image_generation(
     images[0].save(location=f"{filename}.png", include_generation_parameters=False)
 
 
-async def parallel_image_generation(prompt: str, col: int):
+async def parallel_image_generation(prompt: str, col: int) -> Optional[Image]:
     """
     Executes parallel generation of images through Imagen.
 
