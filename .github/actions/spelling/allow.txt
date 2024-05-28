@@ -63,3 +63,8 @@ putdata
 selectbox
 streamlit
 CHECKOV
+figsize
+ncols
+nrows
+xticks
+yticks
