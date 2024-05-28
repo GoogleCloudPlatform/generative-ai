@@ -27,12 +27,13 @@ def image_generation(prompt: str) -> bytes:
     """
     vertexai.init(project=PROJECT_ID, location=LOCATION)
     model = ImageGenerationModel.from_pretrained("imagegeneration@006")
-    return model.generate_images(
+    image = model.generate_images(
         prompt=prompt,
         number_of_images=1,
         language="en",
         aspect_ratio="1:1",
-    )[0]._loaded_bytes
+    )[0]
+    return image._loaded_bytes  # pylint: disable=protected-access
 
 
 @functions_framework.http
