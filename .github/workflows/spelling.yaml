@@ -132,8 +132,6 @@ jobs:
             cspell:python/src/python/python.txt
             cspell:svelte/dict/svelte.txt
             cspell:de_DE/src/German_de_DE.dic
-            cspell:de_DE/src/hunspell/index.dic
-            cspell:es_ES/src/hunspell/index.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
           only_check_changed_files: true
   comment-push:
