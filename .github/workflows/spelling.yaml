@@ -150,26 +150,6 @@ jobs:
         spell_check_this: check-spelling/spell-check-this@prerelease
         task: ${{ needs.spelling.outputs.followup }}
 
-  comment-pr:
-    name: Report (PR)
-    # If you workflow isn't running on pull_request*, you can remove this job
-    runs-on: ubuntu-latest
-    needs: spelling
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: read
-      security-events: write
-    if: (success() || failure()) && needs.spelling.outputs.followup && contains(github.event_name, 'pull_request')
-    steps:
-    - name: comment
-      uses: check-spelling/check-spelling@main
-      with:
-        checkout: true
-        spell_check_this: check-spelling/spell-check-this@prerelease
-        task: ${{ needs.spelling.outputs.followup }}
-        experimental_apply_changes_via_bot: 1
-
   update:
     name: Update PR
     permissions:
