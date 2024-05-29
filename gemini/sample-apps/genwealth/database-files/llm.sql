@@ -22,43 +22,49 @@
 -- DISCLAIMER:  This function is provided for demonstration purposes only and
 --              should not be used in production without sufficient testing.
 -- EXAMPLE USAGE:  SELECT * FROM llm(prompt => 'This is a simple prompt.');
-CREATE OR REPLACE FUNCTION public.llm(
-    set_debug boolean DEFAULT false,
-    enable_history boolean DEFAULT false,
-    uid integer DEFAULT 2147483647,
-    model text DEFAULT 'gemini'::text,
-    user_role text DEFAULT 'I am a generic user'::text,
-    llm_role text DEFAULT ' You are a helpful AI Assistant'::text,
-    mission text DEFAULT null::text,
-    additional_context text DEFAULT null::text,
-    output_format text DEFAULT null::text,
-    examples text DEFAULT null::text,
-    prompt text DEFAULT 'Tell me I need to pass in a prompt parameter.'::text,
-    output_instructions text DEFAULT null::text,
-    response_restrictions text DEFAULT 'You have no response restrictions for this prompt.'::text,
-    disclaimer text DEFAULT null::text,
-    max_output_tokens integer DEFAULT 512,
-    temperature numeric DEFAULT 0.0,
-    top_p numeric DEFAULT 0.95,
-    top_k numeric DEFAULT 40
+DROP FUNCTION IF EXISTS llm;
+CREATE FUNCTION llm(
+    set_debug BOOLEAN DEFAULT false,
+    enable_history BOOLEAN DEFAULT false,
+    enable_stock_lookup BOOLEAN DEFAULT false,
+    uid INT DEFAULT 2147483647,
+    model TEXT DEFAULT 'gemini',
+    user_role TEXT DEFAULT 'I am a generic user',
+    llm_role TEXT DEFAULT ' You are a helpful AI Assistant',
+    mission TEXT DEFAULT null,
+    additional_context TEXT DEFAULT null,
+    output_format TEXT DEFAULT null,
+    examples TEXT DEFAULT null,
+    prompt TEXT DEFAULT 'Tell me I need to pass in a prompt parameter.',
+    output_instructions TEXT DEFAULT null,
+    response_restrictions TEXT DEFAULT 'You have no response restrictions for this prompt.',
+    disclaimer TEXT DEFAULT null,
+    max_output_tokens INT DEFAULT 512,
+    temperature DECIMAL DEFAULT 0.0,
+    top_p DECIMAL DEFAULT 0.95,
+    top_k DECIMAL DEFAULT 40
 )
 RETURNS TABLE (
-    llm_prompt text,
-    llm_prompt_len integer,
-    llm_response text,
-    llm_response_len integer
+    llm_prompt TEXT,
+    llm_prompt_len INT,
+    llm_response TEXT,
+    llm_response_len INT,
+    extractive_prompt TEXT,
+    extractive_response TEXT,
+    recommended_tickers TEXT
 )
 LANGUAGE plpgsql
-AS $function$
+AS $$
 DECLARE
     llm_prompt TEXT := '';
     llm_prompt_len INT := null;
     llm_response TEXT := null;
     interaction_history_count INT := 0;
-	request_id TEXT := gen_random_uuid()::text;
+    extractive_prompt TEXT := '';
+    extractive_response TEXT := '';
+    recommended_tickers TEXT := '';
 BEGIN
-    SELECT CONCAT('Starting request id: ', request_id, E'\n\n') INTO llm_prompt;
-	-- Define user and AI roles
+    -- Define user and AI roles
     IF llm_role IS NOT null THEN SELECT CONCAT(llm_prompt, 'AI ROLE: ', llm_role, E'.\n') INTO llm_prompt; END IF;
     IF mission IS NOT null THEN SELECT CONCAT(llm_prompt, 'AI MISSION: ', mission, E'.\n') INTO llm_prompt; END IF;
     IF user_role IS NOT null THEN SELECT CONCAT(llm_prompt, 'USER ROLE: ', user_role, E' \n\n') INTO llm_prompt; END IF;
@@ -91,7 +97,7 @@ BEGIN
                 SELECT * FROM conversation_history
                 WHERE user_id = uid
                 AND id < (SELECT id FROM conversation_history WHERE user_id = uid ORDER BY datetime DESC LIMIT 1)
-                ORDER BY user_prompt_embedding <=> embedding('textembedding-gecko@003', prompt)
+                ORDER BY user_prompt_embedding <=> embedding('textembedding-gecko@003', prompt)::vector
                 LIMIT 3
             )
             SELECT CONCAT(llm_prompt, E'<OTHER_INTERACTION_HISTORY>\n==========\n', STRING_AGG(CONCAT(E'**TIME**\n', datetime, E'\n\n**USER**\n ', user_prompt, E'\n\n**AI**\n', ai_response), E'\n==========\n<\OTHER_INTERACTION_HISTORY>\n\n'))
@@ -107,20 +113,16 @@ BEGIN
     IF output_instructions IS NOT null THEN SELECT CONCAT(llm_prompt, E'<OUTPUT_INSTRUCTIONS> \nRe-write your OUTPUT using the following instructions:\n', output_instructions, E' \n</OUTPUT_INSTRUCTIONS>\n\n') INTO llm_prompt; END IF;
     IF output_format IS NOT null THEN SELECT CONCAT(llm_prompt, '<OUTPUT_FORMAT> Complete the TASK using the following OUTPUT FORMAT: ', output_format, E' </OUTPUT_FORMAT>\n\n') INTO llm_prompt; END IF;
     
-    -- Close the context tag
-    SELECT CONCAT(llm_prompt, E'</CONTEXT>\n\n') INTO llm_prompt;
-
-	-- Define end of the request
-	SELECT CONCAT(llm_prompt, 'Ending request id: ', request_id, E'\n\n') INTO llm_prompt;
-    
-    -- Send enriched prompt to LLM
-	SELECT google_ml.predict_row(model, json_build_object(
+    -- Do stock lookup if enabled
+    IF enable_stock_lookup is true THEN
+        SELECT CONCAT(E'List 3 words that best describe the type of investment this person is looking for based on their QUESTION, RISK_PROFILE, and BIO. \n\nQUESTION:\n', prompt, E'\n\nRISK_PROFILE: \n', risk_profile, E'\n\nBIO: \n', bio) INTO extractive_prompt FROM user_profiles WHERE id = uid;
+        SELECT google_ml.predict_row(model, json_build_object(
 		'contents', json_build_array(
 			json_build_object(
 				'role', 'user',
 				'parts', json_build_array(
 					json_build_object(
-						'text', llm_prompt
+						'text', extractive_prompt
 					)
 				)
 			)
@@ -130,8 +132,47 @@ BEGIN
 			'topP', top_p,
 			'topK', top_k,
 			'maxOutputTokens', max_output_tokens
-		))) -> 'candidates' -> 0 -> 'content' -> 'parts' -> 0 ->> 'text' INTO llm_response;
+		))) -> 'candidates' -> 0 -> 'content' -> 'parts' -> 0 ->> 'text' INTO extractive_response;
+        
+        WITH inv AS (
+            SELECT ticker, analysis
+            FROM investments
+            WHERE rating = 'BUY'
+            ORDER BY analysis_embedding <=> embedding('textembedding-gecko@003',extractive_response)::vector
+            LIMIT 3
+        )
+        SELECT
+            CONCAT(llm_prompt, E'<SUGGESTED_STOCKS> Recommend these specific stock tickers to me, and tell me why they are a good fit for me based on my BIO and personal details: ', STRING_AGG(ticker, ', '), E'\n\nTicker Details: ', STRING_AGG(CONCAT(E'\n========\n**STOCK TICKER**: ', ticker, E'\n\n', analysis), E'\n'), E'\n========\n</SUGGESTED_STOCKS>\n\n'),
+            CONCAT('Tickers: ', STRING_AGG(ticker, ', '))
+        FROM inv
+        INTO llm_prompt, recommended_tickers;
+    END IF;
+    
+    -- Close the context tag
+    SELECT CONCAT(llm_prompt, E'</CONTEXT>\n\n') INTO llm_prompt;
+    
+    -- Send enriched prompt to LLM
+    IF set_debug is false THEN
+        SELECT google_ml.predict_row(model, json_build_object(
+            'contents', json_build_array(
+                json_build_object(
+                    'role', 'user',
+                    'parts', json_build_array(
+                        json_build_object(
+                            'text', llm_prompt
+                        )
+                    )
+                )
+            ),
+            'generationConfig', json_build_object(
+                'temperature', temperature,
+                'topP', top_p,
+                'topK', top_k,
+                'maxOutputTokens', max_output_tokens
+            ))) -> 'candidates' -> 0 -> 'content' -> 'parts' -> 0 ->> 'text' INTO llm_response;
 
+    END IF;
+    
     -- Record conversation history
     IF enable_history is true THEN
         INSERT INTO conversation_history (user_id, user_prompt, ai_response)
@@ -142,6 +183,6 @@ BEGIN
     IF disclaimer IS NOT null THEN SELECT CONCAT(llm_response, E'\n\n', disclaimer) INTO llm_response; END IF;
     
     -- Return the response
-    RETURN QUERY SELECT llm_prompt, LENGTH(llm_prompt), llm_response, LENGTH(llm_response);
+    RETURN QUERY SELECT llm_prompt, LENGTH(llm_prompt), llm_response, LENGTH(llm_response), extractive_prompt, extractive_response, recommended_tickers;
 END;
-$function$
+$$;

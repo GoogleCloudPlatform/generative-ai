@@ -212,7 +212,7 @@ cd /tmp/demo-data || echo "Could not cd into user profile root"
 gsutil -m cp \
   "gs://pr-public-demo-data/genwealth-demo/investments" \
   "gs://pr-public-demo-data/genwealth-demo/user_profiles" \
-  "gs://pr-public-demo-data/genwealth-demo/llm.sql" .
+  "gs://pr-public-demo-data/genwealth-demo/llm-gemini.sql" .
 
 # Load the investments table
 echo "Loading the investments table"
@@ -234,7 +234,7 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 
 # Create the llm() function
 echo "Creating the llm() function"
-PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos <llm.sql
+PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos <llm-gemini.sql
 
 # Create embeddings triggers for investments table
 echo "Creating embeddings triggers"
