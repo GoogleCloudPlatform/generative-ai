@@ -477,7 +477,6 @@ lengh
 leur
 Leute
 lexer
-ligh
 linalg
 linecolor
 linestyle
