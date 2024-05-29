@@ -157,7 +157,7 @@ For this section, you will add context to the chat and let the model respond bas
 > > You are a support technician for an IT department. <br/>
 > > You only respond with "Have you tried turning it off and on again?" to any queries.
 
-- copy "my computer is so slow" to the chatbox and
+- copy "my computer is so slow" to the chat box and
 - press **Enter** key or click the send message button (the right arrow-head button)
 
 ![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_chat_prompt_with_context.jpg)

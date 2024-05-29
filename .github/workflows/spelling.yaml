@@ -78,7 +78,7 @@ jobs:
     name: Check Spelling
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       actions: read
       security-events: write
     outputs:
@@ -88,7 +88,7 @@ jobs:
     concurrency:
       group: spelling-${{ github.event.pull_request.number || github.ref }}
       # note: If you use only_check_changed_files, you do not want cancel-in-progress
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: check-spelling
         id: spelling
@@ -98,30 +98,57 @@ jobs:
           checkout: true
           check_file_names: 1
           spell_check_this: check-spelling/spell-check-this@prerelease
-          post_comment: 0
+          post_comment: 1
           use_magic_file: 1
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
           experimental_apply_changes_via_bot: 1
-          use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
           check_extra_dictionaries: ''
           extra_dictionaries: |
             cspell:software-terms/dict/softwareTerms.txt
+            cspell:software-terms/dict/webServices.txt
             cspell:aws/aws.txt
             cspell:html/dict/html.txt
             cspell:fullstack/dict/fullstack.txt
-            cspell:python/src/python/python.txt
             cspell:java/src/java.txt
             cspell:python/src/common/extra.txt
             cspell:npm/dict/npm.txt
             cspell:shell/dict/shell-all-words.txt
-            cspell:python/src/python/python-lib.txt
             cspell:k8s/dict/k8s.txt
             cspell:filetypes/filetypes.txt
+            cspell:fonts/fonts.txt
             cspell:node/dict/node.txt
             cspell:typescript/dict/typescript.txt
             cspell:golang/dict/go.txt
             cspell:php/dict/php.txt
+            cspell:companies/dict/companies.txt
+            cspell:django/requirements.txt
+            cspell:django/dict/django.txt
+            cspell:docker/src/docker-words.txt
+            cspell:mnemonics/src/mnemonics.txt
+            cspell:python/src/additional_words.txt
+            cspell:python/src/common/extra.txt
+            cspell:python/src/python/python-lib.txt
+            cspell:python/src/python/python.txt
+            cspell:svelte/dict/svelte.txt
+            cspell:de_DE/src/German_de_DE.dic
+            cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
+          only_check_changed_files: true
+  comment-push:
+    name: Report (Push)
+    # If your workflow isn't running on push, you can remove this job
+    runs-on: ubuntu-latest
+    needs: spelling
+    permissions:
+      contents: write
+    if: (success() || failure()) && needs.spelling.outputs.followup && github.event_name == 'push'
+    steps:
+    - name: comment
+      uses: check-spelling/check-spelling@main
+      with:
+        checkout: true
+        spell_check_this: check-spelling/spell-check-this@prerelease
+        task: ${{ needs.spelling.outputs.followup }}
 
   update:
     name: Update PR
@@ -129,6 +156,7 @@ jobs:
       contents: write
       pull-requests: write
       actions: read
+      security-events: write
     runs-on: ubuntu-latest
     if: ${{
         github.event_name == 'issue_comment' &&
