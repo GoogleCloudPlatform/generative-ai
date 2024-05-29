@@ -39,7 +39,7 @@ sleep 3
 echo "Installing AlloyDB AI extensions"
 sql=$(
   cat <<EOF
-CREATE EXTENSION IF NOT EXISTS google_ml_integration VERSION '1.1' CASCADE;
+CREATE EXTENSION IF NOT EXISTS google_ml_integration VERSION '1.3' CASCADE;
 GRANT EXECUTE ON FUNCTION embedding TO postgres;
 EOF
 )
@@ -52,6 +52,36 @@ CREATE EXTENSION IF NOT EXISTS vector CASCADE;
 EOF
 )
 echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
+
+# Register textembedding-gecko embedding model
+sql=$(
+  cat <<EOF
+CALL google_ml.create_model (
+	model_id => 'textembedding-gecko@003',
+	model_provider => 'google',
+	model_qualified_name => 'textembedding-gecko@003',
+	model_type => 'text_embedding',
+	model_auth_type => 'alloydb_service_agent_iam'
+);
+EOF
+)
+echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
+
+# Register gemini model
+GEMINI_ENDPOINT="https://${REGION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${REGION}/publishers/google/models/gemini-1.0-pro:generateContent"
+sql=$(
+  cat <<EOF
+CALL
+google_ml.create_model (
+	model_id => 'gemini',
+	model_request_url => '${GEMINI_ENDPOINT}',
+	model_provider => 'google',
+	model_auth_type => 'alloydb_service_agent_iam'
+);
+EOF
+)
+echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
+
 
 # Create investments table and indexes
 echo "Creating tables"

@@ -48,7 +48,8 @@ gcloud alloydb instances create "${ALLOYDB_INSTANCE}" \
   --region="${REGION}" \
   --cluster="${ALLOYDB_CLUSTER}" \
   --project="${PROJECT_ID}" \
-  --ssl-mode="ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+  --ssl-mode="ALLOW_UNENCRYPTED_AND_ENCRYPTED" \
+  --database-flags=google_ml_integration.enable_model_support=on
 
 # Create GCE Instance for pgadmin
 echo "Creating GCE instance for pgAdmin"
