@@ -118,7 +118,7 @@ AlloyDB [integrates directly](https://cloud.google.com/alloydb/docs/ai/configure
 -- Search for stocks that might perform well in a high inflation environment
 -- using semantic search with Gen AI embeddings
 SELECT ticker, etf, rating, analysis,
- analysis_embedding <=> embedding('textembedding-gecko@003', 'hedge against high inflation') AS distance
+ analysis_embedding <=> google_ml.embedding('textembedding-gecko@003', 'hedge against high inflation')::vector AS distance
 FROM investments
 ORDER BY distance
 LIMIT 5;
@@ -127,7 +127,7 @@ LIMIT 5;
 ```SQL
 -- Use hybrid search (semantic similarity + keywords) with Gen AI embeddings to find potential customers for a new Bitcoin ETF
 SELECT first_name, last_name, email, age, risk_profile, bio,
- bio_embedding <=> embedding('textembedding-gecko@003', 'young aggressive investor') AS distance
+ bio_embedding <=> google_ml.embedding('textembedding-gecko@003', 'young aggressive investor')::vector AS distance
 FROM user_profiles
 WHERE risk_profile = 'high'
  AND age BETWEEN 18 AND 50
