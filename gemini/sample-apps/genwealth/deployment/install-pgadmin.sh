@@ -255,7 +255,7 @@ EXECUTE PROCEDURE update_overview_embedding();
 -- Analysis overview and function
 CREATE OR REPLACE FUNCTION update_analysis_embedding() RETURNS trigger AS \$\$
 BEGIN
-  NEW.analysis_embedding := google_ml.embedding('textembedding-gecko@003', NEW.analysis):vector;
+  NEW.analysis_embedding := google_ml.embedding('textembedding-gecko@003', NEW.analysis)::vector;
   RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
