@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ChatRequest, ChatResponse, GenWealthServiceClient } from '../services/genwealth-api';
@@ -47,6 +47,7 @@ export class ChatComponent implements OnInit {
   chatResponse?: ChatResponse = undefined;
   
   constructor(
+    private cdRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private error: SnackBarErrorComponent,
     private genWealthClient: GenWealthServiceClient) {}  
@@ -59,6 +60,7 @@ export class ChatComponent implements OnInit {
   }
 
   askQuestion() { 
+    this.cdRef.detectChanges();
     this.loading = true;
     this.genWealthClient.chat(this.chatRequest)
       .subscribe({ 
