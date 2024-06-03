@@ -1,0 +1,6 @@
+.element-container:has(#button-after) + div button {
+    min-height: 100px;
+    max-width: 500px;
+    min-width: 500px;
+    border-radius: 25px;
+}
