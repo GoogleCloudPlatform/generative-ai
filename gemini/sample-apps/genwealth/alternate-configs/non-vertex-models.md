@@ -30,9 +30,9 @@ Create a secret and add permissions for the AlloyDB Omni service account to acce
 
 To use AlloyDB Omni's Model Endpoint Management feature with a custom model, you will need an endpoint for embeddings and text completion. For this walkthrough, we have provided examples for each model. You can use these models, or any other model with a compatible endpoint.
 
-1. Deploy a local embeddings model using the examples provided in [this Github repo](https://github.com/llm-on-gke/sentence_transformers_serving).
+1. Deploy a local embeddings model using the examples provided in [this GitHub repo](https://github.com/llm-on-gke/sentence_transformers_serving).
 
-1. Deploy a local text completion model using the examples provided in [this Github repo](https://github.com/IshmeetMehta/llm-on-gke).
+1. Deploy a local text completion model using the examples provided in [this GitHub repo](https://github.com/IshmeetMehta/llm-on-gke).
 
 ## Register Local Models
 
