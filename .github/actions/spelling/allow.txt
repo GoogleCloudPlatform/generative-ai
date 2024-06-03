@@ -76,6 +76,7 @@ tgz
 thelook
 ubuntu
 vertexai
+VMs
 welcom
 workarounds
 xticks
