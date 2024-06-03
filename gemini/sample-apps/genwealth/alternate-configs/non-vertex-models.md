@@ -8,7 +8,7 @@ This walkthrough uses model endpoint management capabilities in AlloyDB Omni. Fo
 
 ## Secrets Manager
 
-Create a secret and add permissions for the AlloyDB Omni service account to access Secrets Manager. This is required to scurely store the API key(s) for your custom model(s). Update SERVICE_ACCOUNT_ID below with your service acconut ID for AlloyDB Omni.
+Create a secret and add permissions for the AlloyDB Omni service account to access Secrets Manager. This is required to scurely store the API key(s) for your custom model(s). Update SERVICE_ACCOUNT_ID below with your service account ID for AlloyDB Omni.
 
 1. Replace `API_KEY` below with the API key required for your local model, and run the command from Cloud Shell. 
 
