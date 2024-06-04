@@ -1,6 +1,7 @@
 agentic
 alloydb
 astype
+backticks
 bbc
 bigquery
 Bitcoin
@@ -8,6 +9,8 @@ bqml
 CHECKOV
 Colab
 colwidth
+codebase
+codebases
 dataframe
 datname
 dbadmin
@@ -22,6 +25,7 @@ figsize
 FPDF
 freedraw
 fromarray
+FTPS
 fulltext
 gcloud
 gcs
@@ -46,6 +50,7 @@ levelname
 lexer
 llm
 LLMs
+lxml
 nbconvert
 nbformat
 ncols
@@ -59,7 +64,7 @@ plpgsql
 plt
 projectid
 protobuf
-putdata
+pysftp
 pydantic
 pypdf
 pyplot
@@ -70,14 +75,20 @@ RYDE
 scurely
 selectbox
 ssd
+SSRF
 ssh
 streamlit
 tgz
 thelook
 ubuntu
+urandom
+username
+usernames
 vertexai
 VMs
+websites
 welcom
 workarounds
 xticks
 yticks
+XXE
