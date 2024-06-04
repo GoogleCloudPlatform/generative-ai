@@ -26,4 +26,5 @@ gcloud services enable iam.googleapis.com \
 # Enable second batch of APIs
 gcloud services enable run.googleapis.com \
   artifactregistry.googleapis.com \
-  cloudbuild.googleapis.com --project "${PROJECT_ID}"
+  cloudbuild.googleapis.com \
+  discoveryengine.googleapis.com --project "${PROJECT_ID}"
