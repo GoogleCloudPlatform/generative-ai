@@ -1,13 +1,13 @@
 blank_issues_enabled: false
 contact_links:
   - name: Vertex AI Python SDK
-    url: https://github.com/googleapis/python-aiplatform/
-    about: For issues with the Vertex AI Python SDK, please report in the `googleapis/python-aiplatform` repository.
+    url: https://github.com/googleapis/python-aiplatform
+    about: For issues with the Vertex AI Python SDK, please report in the googleapis/python-aiplatform repository.
   - name: Google AI Gemini API
     url: https://github.com/google-gemini
-    about: This repository is for [Generative AI with Vertex AI on Google Cloud](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview), not the [Google AI Gemini/PaLM APIs](https://ai.google.dev/). For issues with the Google AI Gemini API, refer to the [google-gemini](https://github.com/google-gemini) organization or the [Google Developers Community Discourse](https://discuss.ai.google.dev/).
+    about: This repository is for Generative AI with Vertex AI on Google Cloud, not the Google AI Gemini/PaLM APIs. For issues with the Google AI Gemini API, report them in the appropriate repository in the google-gemini GitHub organization.
   - name: Google Cloud Support
-    url: https://cloud.google.com/support/
+    url: https://cloud.google.com/support
     about: If you have a support contract with Google, please create a case in the support console instead of filing on GitHub. This will ensure a timely response.
   - name: Stack Overflow - Google Cloud Collective
     url: https://stackoverflow.com/collectives/google-cloud
