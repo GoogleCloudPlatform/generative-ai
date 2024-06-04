@@ -120,7 +120,7 @@ function query() {
   }
 
   // Populate temporary table in BigQuery with selected data from sheet
-  const prompts = SpreadsheetApp.getActiveRange().getValues();
+  const prompts = sanitizePrompts(SpreadsheetApp.getActiveRange().getValues());
   populateTable(prompts);
 
   const query = `SELECT * FROM ML.GENERATE_TEXT( MODEL \`${datasetId}.${modelId}\`, ` +
@@ -146,11 +146,13 @@ function query() {
     console.log(jsonString);
     const jsonData = JSON.parse(jsonString);
     console.log(jsonData);
-    content = jsonData.candidates[0].content;
+    if (jsonData.candidates) {
+      content = jsonData.candidates[0].content;
+    }
 
     // Is it missing content, e.g. due to a finish reason of 4 (RECITATION)?
     var response = "";
-    if (!content) {
+    if (!jsonData.candidates || !content) {
       invalidResponses = true;
       SpreadsheetApp.getUi().alert(row);
     } else {
@@ -161,7 +163,7 @@ function query() {
   }
 
   if (invalidResponses) {
-    SpreadsheetApp.getUi().alert("Some prompts did not return a response. Check prompts and safety settings.");
+    SpreadsheetApp.getActiveSpreadsheet().toast("Some prompts did not return a response. Check prompts and safety settings.");
   }
 
   // Responses come back in any order.
@@ -172,6 +174,16 @@ function query() {
   }
 
   writeResponses(responses);
+}
+
+function sanitizePrompts(prompts) {    
+  // Sanitize each prompt in the array
+  return prompts.map(row => row.map(prompt => {
+    if (typeof prompt !== 'string') return prompt;
+
+    // Keep only letters, numbers, and whitespace
+    return prompt.replace(/[^a-zA-Z0-9\s]/g, '');
+  }));
 }
 
 /**
