@@ -1,4 +1,5 @@
 agentic
+aip
 alloydb
 astype
 backticks
@@ -7,6 +8,7 @@ bigquery
 Bitcoin
 bqml
 CHECKOV
+colab
 Colab
 colwidth
 codebase
@@ -51,6 +53,7 @@ lexer
 llm
 LLMs
 lxml
+mbsdk
 nbconvert
 nbformat
 ncols
