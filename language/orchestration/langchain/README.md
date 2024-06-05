@@ -2,7 +2,7 @@
 
 Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Language repository.
 
-The notebooks in this folder show examples using [LangChain](www.langchain.com). This README also includes links to notebooks using LangChain in other folders.
+The notebooks in this folder show examples using [LangChain](https://www.langchain.com/). This README also includes links to notebooks using LangChain in other folders.
 
 ## Table of Contents
 
