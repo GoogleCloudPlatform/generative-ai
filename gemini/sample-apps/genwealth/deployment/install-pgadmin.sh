@@ -39,7 +39,7 @@ sleep 3
 echo "Installing AlloyDB AI extensions"
 sql=$(
   cat <<EOF
-CREATE EXTENSION IF NOT EXISTS google_ml_integration VERSION '1.1' CASCADE;
+CREATE EXTENSION IF NOT EXISTS google_ml_integration VERSION '1.3' CASCADE;
 GRANT EXECUTE ON FUNCTION embedding TO postgres;
 EOF
 )
@@ -52,6 +52,36 @@ CREATE EXTENSION IF NOT EXISTS vector CASCADE;
 EOF
 )
 echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
+
+# Register textembedding-gecko embedding model
+sql=$(
+  cat <<EOF
+CALL google_ml.create_model (
+	model_id => 'textembedding-gecko@003',
+	model_provider => 'google',
+	model_qualified_name => 'textembedding-gecko@003',
+	model_type => 'text_embedding',
+	model_auth_type => 'alloydb_service_agent_iam'
+);
+EOF
+)
+echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
+
+# Register gemini model
+GEMINI_ENDPOINT="https://${REGION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${REGION}/publishers/google/models/gemini-1.0-pro:generateContent"
+sql=$(
+  cat <<EOF
+CALL
+google_ml.create_model (
+	model_id => 'gemini',
+	model_request_url => '${GEMINI_ENDPOINT}',
+	model_provider => 'google',
+	model_auth_type => 'alloydb_service_agent_iam'
+);
+EOF
+)
+echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
+
 
 # Create investments table and indexes
 echo "Creating tables"
@@ -116,9 +146,9 @@ CREATE TABLE IF NOT EXISTS conversation_history (
     id SERIAL PRIMARY KEY,  
     user_id INTEGER, 
     user_prompt TEXT, 
-  user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', user_prompt)) STORED,
+  user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (google_ml.embedding('textembedding-gecko@003', user_prompt)::vector) STORED,
     ai_response TEXT,
-  ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (embedding('textembedding-gecko@003', ai_response)) STORED,
+  ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (google_ml.embedding('textembedding-gecko@003', ai_response)::vector) STORED,
     datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
 
@@ -182,7 +212,7 @@ cd /tmp/demo-data || echo "Could not cd into user profile root"
 gsutil -m cp \
   "gs://pr-public-demo-data/genwealth-demo/investments" \
   "gs://pr-public-demo-data/genwealth-demo/user_profiles" \
-  "gs://pr-public-demo-data/genwealth-demo/llm.sql" .
+  "gs://pr-public-demo-data/genwealth-demo/llm-gemini.sql" .
 
 # Load the investments table
 echo "Loading the investments table"
@@ -204,7 +234,7 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 
 # Create the llm() function
 echo "Creating the llm() function"
-PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos <llm.sql
+PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos <llm-gemini.sql
 
 # Create embeddings triggers for investments table
 echo "Creating embeddings triggers"
@@ -212,7 +242,7 @@ sql=$(
   cat <<EOF
 CREATE OR REPLACE FUNCTION update_overview_embedding() RETURNS trigger AS \$\$
 BEGIN
-  NEW.overview_embedding := embedding('textembedding-gecko@003', NEW.overview);
+  NEW.overview_embedding := google_ml.embedding('textembedding-gecko@003', NEW.overview)::vector;
   RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
@@ -225,7 +255,7 @@ EXECUTE PROCEDURE update_overview_embedding();
 -- Analysis overview and function
 CREATE OR REPLACE FUNCTION update_analysis_embedding() RETURNS trigger AS \$\$
 BEGIN
-  NEW.analysis_embedding := embedding('textembedding-gecko@003', NEW.analysis);
+  NEW.analysis_embedding := google_ml.embedding('textembedding-gecko@003', NEW.analysis)::vector;
   RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
