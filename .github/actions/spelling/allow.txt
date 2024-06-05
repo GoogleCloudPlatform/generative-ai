@@ -1,6 +1,7 @@
 aip
 agentic
 alloydb
+Arepa
 astype
 backticks
 bbc
@@ -28,6 +29,7 @@ Eventarc
 FAISS
 figsize
 Fishburne
+Firestore
 FPDF
 freedraw
 fromarray
@@ -37,6 +39,7 @@ Gatace
 gcs
 gcloud
 genai
+Genkit
 getdata
 getexif
 github
@@ -84,6 +87,7 @@ pysftp
 pyplot
 QPM
 ragdemos
+ramen
 rsp
 RYDE
 scurely
