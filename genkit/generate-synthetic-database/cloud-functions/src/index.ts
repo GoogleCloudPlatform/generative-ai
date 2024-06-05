@@ -253,41 +253,40 @@ export const createBoneAppetitSalesDatabase = onRequest(
     for (let i = 0; i < 200; i++) {
       const responsePromise = generator.next().value; // Get the next Promise from the generator
       const structuredResponse = await responsePromise;
-      if (structuredResponse) {
-        const orderObj = new Order(
-          uuidv4(),
-          uuidv4(),
-          structuredResponse["item"],
-          structuredResponse["quantity"],
-          structuredResponse["totalSales"],
-          structuredResponse["status"],
-          Timestamp.fromDate(new Date(structuredResponse["createdAt"])),
-          Timestamp.fromDate(new Date(structuredResponse["shippedAt"])),
-          Timestamp.fromDate(new Date(structuredResponse["deliveredAt"])),
-          getRandomIntInclusive(21, 53),
-          structuredResponse["gender"],
-          structuredResponse["customerRating"],
-          structuredResponse["customerReview"]
-        );
-        const orderData = orderToPlainObject(orderObj);
-        logger.log("This is the current order: " + orderObj.orderId);
-        const orderRef = collectionRef.doc(orderObj.orderId);
-        batch.set(orderRef, orderData);
-        batchCount++;
-        logger.log(
-          "Successfully added Order: " + orderObj.orderId + " to Batch."
-        );
-        // If batch size limit is reached, commit the batch and start a new one.
-        if (batchCount >= BATCH_SIZE) {
-          await batch.commit(); // Commit the batch
-          logger.log(
-            "Successfully committed a full batch of orders to Firestore."
-          );
-          batch = db.batch(); // Create a new batch
-          batchCount = 0;
-        }
-      } else {
+      if (!structuredResponse) {
         throw new Error(`Error in runFlow for iteration ${i}`);
+      }
+      const orderObj = new Order(
+        uuidv4(),
+        uuidv4(),
+        structuredResponse["item"],
+        structuredResponse["quantity"],
+        structuredResponse["totalSales"],
+        structuredResponse["status"],
+        Timestamp.fromDate(new Date(structuredResponse["createdAt"])),
+        Timestamp.fromDate(new Date(structuredResponse["shippedAt"])),
+        Timestamp.fromDate(new Date(structuredResponse["deliveredAt"])),
+        getRandomIntInclusive(21, 53),
+        structuredResponse["gender"],
+        structuredResponse["customerRating"],
+        structuredResponse["customerReview"]
+      );
+      const orderData = orderToPlainObject(orderObj);
+      logger.log("This is the current order: " + orderObj.orderId);
+      const orderRef = collectionRef.doc(orderObj.orderId);
+      batch.set(orderRef, orderData);
+      batchCount++;
+      logger.log(
+        "Successfully added Order: " + orderObj.orderId + " to Batch."
+      );
+      // If batch size limit is reached, commit the batch and start a new one.
+      if (batchCount >= BATCH_SIZE) {
+        await batch.commit(); // Commit the batch
+        logger.log(
+          "Successfully committed a full batch of orders to Firestore."
+        );
+        batch = db.batch(); // Create a new batch
+        batchCount = 0;
       }
     }
     // Commit any remaining orders in the last batch.
