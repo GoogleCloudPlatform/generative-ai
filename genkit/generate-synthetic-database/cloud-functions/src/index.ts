@@ -90,7 +90,7 @@ function getRandomIntInclusive(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Define dogfood menu item details to be used as input for the data generation.
+// Define dog food menu item details to be used as input for the data generation.
 const menuItems = [
   "Doggo chicken instant ramen is sold for $7.99.",
   "Doggo cheese burger is sold for $8.99.",
@@ -281,7 +281,7 @@ export const createBoneAppetitSalesDatabase = onRequest(
         if (batchCount >= BATCH_SIZE) {
           await batch.commit(); // Commit the batch
           logger.log(
-            "Successfully commited a full batch of orders to Firestore."
+            "Successfully committed a full batch of orders to Firestore."
           );
           batch = db.batch(); // Create a new batch
           batchCount = 0;
