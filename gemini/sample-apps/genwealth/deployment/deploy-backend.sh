@@ -48,7 +48,8 @@ gcloud alloydb instances create "${ALLOYDB_INSTANCE}" \
   --region="${REGION}" \
   --cluster="${ALLOYDB_CLUSTER}" \
   --project="${PROJECT_ID}" \
-  --ssl-mode="ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+  --ssl-mode="ALLOW_UNENCRYPTED_AND_ENCRYPTED" \
+  --database-flags=google_ml_integration.enable_model_support=on
 
 # Create GCE Instance for pgadmin
 echo "Creating GCE instance for pgAdmin"
@@ -140,6 +141,14 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
   --role="roles/secretmanager.admin"
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/logging.logWriter"
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/artifactregistry.admin"
 
 # Create Firewall Rule
 echo "Creating firewall rule for pgAdmin instance"
