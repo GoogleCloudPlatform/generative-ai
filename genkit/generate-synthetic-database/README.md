@@ -4,13 +4,13 @@
 | --------- | --------------------------------------------------- |
 | Author(s) | [Aiko Zhao](https://github.com/aikozhaoz) |
 
-This project leverages GenKit AI's structured output alongside the `Gemini 1.5 Pro model`, to generate synthetic sales data for a fictional dog food company called `Bone Appetit`. The generated data is then stored in a Firestore database, row by row, for further analysis or AI/ML use in applications.
+This project leverages [Firebase Genkit](https://firebase.google.com/products/genkit) structured output alongside the [Gemini 1.5 Pro](https://blog.google/technology/ai/google-gemini-next-generation-model-february-2024/) model, to generate synthetic sales data for a fictional dog food company called `Bone Appetit`. The generated data is then stored in a Firestore database, row by row, for further analysis or AI/ML use in applications.
 
 ## Prerequisites
-### Vertex AI for LLM
-### Cloud Functions for deployment
-### Firestore for database storage
-### Firebase for application
+- Vertex AI for LLM
+- Cloud Functions for deployment
+- Firestore for database storage
+- Firebase for application
 
 ## Overview
 
