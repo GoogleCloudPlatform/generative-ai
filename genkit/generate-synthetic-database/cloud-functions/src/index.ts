@@ -286,7 +286,6 @@ export const createBoneAppetitSalesDatabase = onRequest(
           batch = db.batch(); // Create a new batch
           batchCount = 0;
         }
-        i++;
       } else {
         throw new Error(`Error in runFlow for iteration ${i}`);
       }
