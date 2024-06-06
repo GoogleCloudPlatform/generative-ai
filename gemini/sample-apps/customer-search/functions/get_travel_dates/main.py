@@ -6,7 +6,7 @@
 import functions_framework
 
 
-def is_date_later_than(start_date, end_date):
+def is_date_later_than(start_date: dict, end_date: dict) -> bool:
     """
     Checks if a start date is later than an end date.
 
@@ -33,7 +33,7 @@ def is_date_later_than(start_date, end_date):
 
 
 @functions_framework.http
-def ask_travel_dates(request):
+def ask_travel_dates(request) -> dict:
     """
     Asks the user for their travel dates.
 

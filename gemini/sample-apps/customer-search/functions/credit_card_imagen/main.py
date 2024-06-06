@@ -15,7 +15,7 @@ PROJECT_ID = environ.get("PROJECT_ID")
 LOCATION = environ.get("LOCATION")
 
 
-def get_prompt(request_json, request_args):
+def get_prompt(request_json: dict, request_args: dict) -> str:
     """
     Gets the prompt from the request.
 
@@ -35,7 +35,7 @@ def get_prompt(request_json, request_args):
     return "A dog reading the newspaper"
 
 
-def generate_base64_image(user_prompt):
+def generate_base64_image(user_prompt: str) -> dict:
     """
     Generates a base64-encoded image using the given prompt.
 
@@ -54,7 +54,7 @@ def generate_base64_image(user_prompt):
 
 
 @functions_framework.http
-def generate_credit_card_image(request):
+def generate_credit_card_image(request) -> dict:
     """
     Generates a credit card image using the given prompt.
 

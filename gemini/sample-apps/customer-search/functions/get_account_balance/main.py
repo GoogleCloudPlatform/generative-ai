@@ -50,7 +50,7 @@ def get_account_balance(request):
         )
         upcoming_month_expenses_amount += row["fund_transfer_amount"]
 
-    payment_list_str_formatted = payment_list_str.split("\n")
+    payment_list_str = payment_list_str.split("\n")
 
     model = Gemini()
 
@@ -80,7 +80,7 @@ def get_account_balance(request):
 
     account_balance_str = f"Your account balance is {account_balance_formatted}"
 
-    res = ""
+    res = {}
     if account_balance < upcoming_month_expenses_amount:
         if customer_id == 592783:
             res = {

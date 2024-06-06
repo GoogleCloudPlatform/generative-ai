@@ -15,7 +15,7 @@ FD_TNC_DOC = environ.get("FD_TNC_DOC")
 
 
 @functions_framework.http
-def generate_fd_confirmation_message(request):
+def generate_fd_confirmation_message(request) -> dict:
     """
     Generates a confirmation message for a fixed deposit.
 

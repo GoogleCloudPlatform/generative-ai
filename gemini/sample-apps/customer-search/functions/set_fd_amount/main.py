@@ -6,7 +6,7 @@ import functions_framework
 
 
 @functions_framework.http
-def set_fd_amount(request):
+def set_fd_amount(request) -> dict:
     """
     Sets the fixed deposit amount for a customer.
 

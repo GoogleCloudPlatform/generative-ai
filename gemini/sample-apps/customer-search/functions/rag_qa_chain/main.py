@@ -26,7 +26,7 @@ from vertexai.language_models import TextGenerationModel
 project_id = environ.get("PROJECT_ID")
 
 
-def init_me_libs():
+def init_me_libs() -> None:
     """
     Initializes the necessary libraries for the module.
     """
@@ -45,7 +45,7 @@ def init_me_libs():
 init_me_libs()
 
 
-def load_website_content():
+def load_website_content() -> list:
     """
     Loads the content of the website.
 
@@ -85,7 +85,7 @@ def load_website_content():
     return documents
 
 
-def chunk_documents(documents):
+def chunk_documents(documents: list) -> list:
     """
     Chunks the documents into smaller chunks.
 
@@ -111,7 +111,7 @@ def chunk_documents(documents):
     return doc_splits
 
 
-def reformat(resp):
+def reformat(resp: str) -> str:
     """
     Reformats the response from the LLM.
 
@@ -141,7 +141,7 @@ shown in HTML as search result on a website.
     return response.text
 
 
-def formatter(result):
+def formatter(result: dict) -> tuple[str, list]:
     """
     Formats the result of the QA chain.
 
@@ -181,7 +181,7 @@ def formatter(result):
     return reformat(result["result"]), references
 
 
-def wrap(s):
+def wrap(s: str) -> str:
     """
     Wraps the text to a width of 120.
 
@@ -195,7 +195,9 @@ def wrap(s):
     return "\n".join(textwrap.wrap(s, width=120, break_long_words=False))
 
 
-def ask(query, qa, k, search_distance):
+def ask(
+    query: str, qa: RetrievalQA, k: int, search_distance: float
+) -> tuple[str, list]:
     """
     Asks a question to the QA chain.
 
@@ -217,7 +219,7 @@ def ask(query, qa, k, search_distance):
 
 
 @functions_framework.http
-def qa_over_website(request):
+def qa_over_website(request) -> tuple[dict, int, dict]:
     """
     Answers questions about the content of a website.
 

@@ -13,7 +13,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def extend_overdraft(request):
+def extend_overdraft(request) -> dict:
     """
     Extends the overdraft limit of a customer.
 
@@ -78,11 +78,19 @@ def extend_overdraft(request):
         """
     )
 
+    response_list = [
+        {
+            "text": {
+                "text": [response]
+            }
+        }
+    ]
+
     if request_json["sessionInfo"]["parameters"].get("number") is None:
         res = {
             "sessionInfo": {
                 "parameters": {
-                    "extend_overdraft": response,
+                    "extend_overdraft": response_list,
                     "overdraft_interest_rate": overdraft_interest_rate,
                     "processing_fee": overdraft_processing_fee,
                     "min_processing_fee": min_processing_fee,
@@ -97,7 +105,7 @@ def extend_overdraft(request):
     res = {
         "sessionInfo": {
             "parameters": {
-                "extend_overdraft": response,
+                "extend_overdraft": response_list,
                 "overdraft_amount": overdraft_amount,
                 "requested_amount": requested_amount,
                 "overdraft_interest_rate": overdraft_interest_rate,

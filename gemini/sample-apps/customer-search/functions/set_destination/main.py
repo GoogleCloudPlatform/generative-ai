@@ -6,7 +6,7 @@ import functions_framework
 
 
 @functions_framework.http
-def set_destination(request):
+def set_destination(request) -> dict:
     """
     Sets the destination for a customer.
 

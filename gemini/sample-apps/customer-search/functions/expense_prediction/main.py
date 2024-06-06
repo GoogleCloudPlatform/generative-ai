@@ -18,7 +18,7 @@ project_id = environ.get("PROJECT_ID")
 public_bucket = environ.get("PUBLIC_BUCKET")
 
 
-def create_graph(amount, category, date, cust_id):
+def create_graph(amount: list, category: list, date: list, cust_id: int) -> str:
     """
     Creates a graph of the predicted expenses.
 
@@ -76,7 +76,7 @@ def create_graph(amount, category, date, cust_id):
     return cropped_image.public_url
 
 
-def create_aggregate_transaction_table():
+def create_aggregate_transaction_table() -> None:
     """
     Creates an aggregate transaction table.
     """
@@ -110,7 +110,7 @@ def create_aggregate_transaction_table():
     job.result()
 
 
-def train_model():
+def train_model() -> None:
     """
     Trains the expense prediction model.
     """
@@ -132,7 +132,7 @@ def train_model():
     job.result()
 
 
-def create_predicted_expense_table(customer_id):
+def create_predicted_expense_table(customer_id: int) -> bigquery.table.RowIterator:
     """
     Creates a predicted expense table for a customer.
 
@@ -175,7 +175,7 @@ def create_predicted_expense_table(customer_id):
 
 
 @functions_framework.http
-def expense_prediction(request):
+def expense_prediction(request) -> dict:
     """
     Predicts the expenses of a customer based on their transaction history.
 

@@ -12,7 +12,7 @@ from google.cloud import bigquery
 project_id = environ.get("PROJECT_ID")
 
 
-def convert_days_to_proper_format(days):
+def convert_days_to_proper_format(days: int) -> str:
     """
     Converts the number of days to a proper format, e.g. 365 days to 1 year.
 
@@ -49,7 +49,7 @@ def convert_days_to_proper_format(days):
     return s[:-1]
 
 
-def check_senior_citizen(dob):
+def check_senior_citizen(dob: datetime.date) -> bool:
     """
     Checks whether a person is a senior citizen or not using their date of birth.
 
@@ -66,7 +66,7 @@ def check_senior_citizen(dob):
 
 
 @functions_framework.http
-def ask_fd_tenure(request):
+def ask_fd_tenure(request) -> dict:
     """
     Asks the user for the tenure of their fixed deposit.
 

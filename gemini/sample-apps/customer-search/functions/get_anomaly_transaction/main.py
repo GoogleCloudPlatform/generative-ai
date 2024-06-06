@@ -12,7 +12,7 @@ project_id = environ.get("PROJECT_ID")
 
 
 @functions_framework.http
-def transaction_anomaly_detection(request):
+def transaction_anomaly_detection(request) -> dict:
     """
     Detects anomalous transactions for a customer.
 
