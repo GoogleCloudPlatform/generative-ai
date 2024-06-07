@@ -4,12 +4,6 @@ from google.cloud import bigquery
 import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
-"""
-This demo app uses Function Calling in Gemini to answer questions about a
-BigQuery dataset. It provides a chat interface for users to ask questions and
-interacts with BigQuery to retrieve relevant data and generate responses.
-"""
-
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
 
 list_datasets_func = FunctionDeclaration(
@@ -40,9 +34,7 @@ list_tables_func = FunctionDeclaration(
 
 get_table_func = FunctionDeclaration(
     name="get_table",
-    description="""Get information about a table, including the description,
-    schema, and number of rows that will help answer the user's question. Always
-    use the fully qualified dataset and table names.""",
+    description="Get information about a table, including the description, schema, and number of rows that will help answer the user's question. Always use the fully qualified dataset and table names.",
     parameters={
         "type": "object",
         "properties": {
@@ -65,10 +57,7 @@ sql_query_func = FunctionDeclaration(
         "properties": {
             "query": {
                 "type": "string",
-                "description": """SQL query on a single line that will help give
-                quantitative answers to the user's question when run on a
-                BigQuery dataset and table. In the SQL query, always use the
-                fully qualified dataset and table names.""",
+                "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names.",
             }
         },
         "required": [
@@ -106,19 +95,9 @@ with col2:
 
 st.subheader("Powered by Function Calling in Gemini")
 
-# pylint: disable=line-too-long
 st.markdown(
-    """[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)
-    •
-    [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
-    •
-    [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
-    •
-    [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"""
+    "[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)   •   [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)   •   [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)   •   [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"
 )
-# pylint: enable=line-too-long
-
-TEST_STRING = "Testing long lines. Testing long lines. Testing long lines. Testing long lines. Testing long lines. Testing long lines."
 
 with st.expander("Sample prompts", expanded=True):
     st.write(
@@ -136,9 +115,7 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(
-            message["content"].replace("$", "\$")
-        )  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
+        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["backend_details"])
@@ -152,7 +129,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""  # pylint: disable=invalid-name
+        full_response = ""
         chat = model.start_chat()
         client = bigquery.Client()
 
@@ -169,10 +146,10 @@ if prompt := st.chat_input("Ask me about information in the database..."):
         print(response)
 
         api_requests_and_responses = []
-        backend_details = ""  # pylint: disable=invalid-name
+        backend_details = ""
 
-        function_calling_in_progress = True
-        while function_calling_in_progress:
+        function_calling_in_process = True
+        while function_calling_in_process:
             try:
                 params = {}
                 for key, value in response.function_call.args.items():
@@ -233,7 +210,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                         api_requests_and_responses.append(
                             [response.function_call.name, params, api_response]
                         )
-                    except Exception as e:  # pylint: disable=broad-exception-caught
+                    except Exception as e:
                         api_response = f"{str(e)}"
                         api_requests_and_responses.append(
                             [response.function_call.name, params, api_response]
@@ -274,15 +251,13 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                     st.markdown(backend_details)
 
             except AttributeError:
-                function_calling_in_progress = False
+                function_calling_in_process = False
 
         time.sleep(3)
 
         full_response = response.text
         with message_placeholder.container():
-            st.markdown(
-                full_response.replace("$", "\$")
-            )  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
+            st.markdown(full_response.replace("$", "\$"))  # noqa: W605
             with st.expander("Function calls, parameters, and responses:"):
                 st.markdown(backend_details)
 
