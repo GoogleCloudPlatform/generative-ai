@@ -4,6 +4,12 @@ from google.cloud import bigquery
 import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
+"""
+This demo app uses Function Calling in Gemini to answer questions about a
+BigQuery dataset. It provides a chat interface for users to ask questions and
+interacts with BigQuery to retrieve relevant data and generate responses.
+"""
+
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
 
 list_datasets_func = FunctionDeclaration(
@@ -110,6 +116,7 @@ st.markdown(
     •
     [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"""
 )
+# pylint: enable=line-too-long
 
 TEST_STRING = "Testing long lines. Testing long lines. Testing long lines. Testing long lines. Testing long lines. Testing long lines."
 
@@ -129,7 +136,7 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605, W1401
+        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["backend_details"])
@@ -224,7 +231,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                         api_requests_and_responses.append(
                             [response.function_call.name, params, API_RESPONSE]
                         )
-                    except Exception as e:
+                    except Exception as e:  # pylint: disable=broad-exception-caught
                         API_RESPONSE = f"{str(e)}"
                         api_requests_and_responses.append(
                             [response.function_call.name, params, API_RESPONSE]
@@ -271,7 +278,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
         full_response = response.text
         with message_placeholder.container():
-            st.markdown(full_response.replace("$", "\$"))  # noqa: W605, W1401
+            st.markdown(full_response.replace("$", "\$"))  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
             with st.expander("Function calls, parameters, and responses:"):
                 st.markdown(backend_details)
 
