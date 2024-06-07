@@ -78,13 +78,7 @@ def extend_overdraft(request) -> dict:
         """
     )
 
-    response_list = [
-        {
-            "text": {
-                "text": [response]
-            }
-        }
-    ]
+    response_list = [{"text": {"text": [response]}}]
 
     if request_json["sessionInfo"]["parameters"].get("number") is None:
         res = {
