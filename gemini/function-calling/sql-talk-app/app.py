@@ -34,7 +34,9 @@ list_tables_func = FunctionDeclaration(
 
 get_table_func = FunctionDeclaration(
     name="get_table",
-    description="Get information about a table, including the description, schema, and number of rows that will help answer the user's question. Always use the fully qualified dataset and table names.",
+    description="""Get information about a table, including the description,
+    schema, and number of rows that will help answer the user's question. Always
+    use the fully qualified dataset and table names.""",
     parameters={
         "type": "object",
         "properties": {
@@ -57,7 +59,10 @@ sql_query_func = FunctionDeclaration(
         "properties": {
             "query": {
                 "type": "string",
-                "description": "SQL query on a single line that will help give quantitative answers to the user's question when run on a BigQuery dataset and table. In the SQL query, always use the fully qualified dataset and table names.",
+                "description": """SQL query on a single line that will help give
+                quantitative answers to the user's question when run on a
+                BigQuery dataset and table. In the SQL query, always use the
+                fully qualified dataset and table names.""",
             }
         },
         "required": [
@@ -96,7 +101,13 @@ with col2:
 st.subheader("Powered by Function Calling in Gemini")
 
 st.markdown(
-    "[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)   •   [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)   •   [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)   •   [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"
+    """[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)
+    •
+    [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
+    •
+    [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
+    •
+    [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"""
 )
 
 with st.expander("Sample prompts", expanded=True):
@@ -118,7 +129,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"].replace("$", "\$"))  # noqa: W605
         try:
             with st.expander("Function calls, parameters, and responses"):
-                st.markdown(message["backend_details"])
+                st.markdown(message["BACKEND_DETAILS"])
         except KeyError:
             pass
 
@@ -129,7 +140,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""
+        FULL_RESPONSE = ""
         chat = model.start_chat()
         client = bigquery.Client()
 
@@ -146,10 +157,10 @@ if prompt := st.chat_input("Ask me about information in the database..."):
         print(response)
 
         api_requests_and_responses = []
-        backend_details = ""
+        BACKEND_DETAILS = ""
 
-        function_calling_in_process = True
-        while function_calling_in_process:
+        FUNCTION_CALLING_IN_PROCESS = True
+        while FUNCTION_CALLING_IN_PROCESS:
             try:
                 params = {}
                 for key, value in response.function_call.args.items():
@@ -159,38 +170,38 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                 print(params)
 
                 if response.function_call.name == "list_datasets":
-                    api_response = client.list_datasets()
-                    api_response = BIGQUERY_DATASET_ID
+                    API_RESPONSE = client.list_datasets()
+                    API_RESPONSE = BIGQUERY_DATASET_ID
                     api_requests_and_responses.append(
-                        [response.function_call.name, params, api_response]
+                        [response.function_call.name, params, API_RESPONSE]
                     )
 
                 if response.function_call.name == "list_tables":
-                    api_response = client.list_tables(params["dataset_id"])
-                    api_response = str([table.table_id for table in api_response])
+                    API_RESPONSE = client.list_tables(params["dataset_id"])
+                    API_RESPONSE = str([table.table_id for table in API_RESPONSE])
                     api_requests_and_responses.append(
-                        [response.function_call.name, params, api_response]
+                        [response.function_call.name, params, API_RESPONSE]
                     )
 
                 if response.function_call.name == "get_table":
-                    api_response = client.get_table(params["table_id"])
-                    api_response = api_response.to_api_repr()
+                    API_RESPONSE = client.get_table(params["table_id"])
+                    API_RESPONSE = API_RESPONSE.to_api_repr()
                     api_requests_and_responses.append(
                         [
                             response.function_call.name,
                             params,
                             [
-                                str(api_response.get("description", "")),
+                                str(API_RESPONSE.get("description", "")),
                                 str(
                                     [
                                         column["name"]
-                                        for column in api_response["schema"]["fields"]
+                                        for column in API_RESPONSE["schema"]["fields"]
                                     ]
                                 ),
                             ],
                         ]
                     )
-                    api_response = str(api_response)
+                    API_RESPONSE = str(API_RESPONSE)
 
                 if response.function_call.name == "sql_query":
                     job_config = bigquery.QueryJobConfig(
@@ -204,67 +215,67 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                             .replace("\\", "")
                         )
                         query_job = client.query(cleaned_query, job_config=job_config)
-                        api_response = query_job.result()
-                        api_response = str([dict(row) for row in api_response])
-                        api_response = api_response.replace("\\", "").replace("\n", "")
+                        API_RESPONSE = query_job.result()
+                        API_RESPONSE = str([dict(row) for row in API_RESPONSE])
+                        API_RESPONSE = API_RESPONSE.replace("\\", "").replace("\n", "")
                         api_requests_and_responses.append(
-                            [response.function_call.name, params, api_response]
+                            [response.function_call.name, params, API_RESPONSE]
                         )
                     except Exception as e:
-                        api_response = f"{str(e)}"
+                        API_RESPONSE = f"{str(e)}"
                         api_requests_and_responses.append(
-                            [response.function_call.name, params, api_response]
+                            [response.function_call.name, params, API_RESPONSE]
                         )
 
-                print(api_response)
+                print(API_RESPONSE)
 
                 response = chat.send_message(
                     Part.from_function_response(
                         name=response.function_call.name,
                         response={
-                            "content": api_response,
+                            "content": API_RESPONSE,
                         },
                     ),
                 )
                 response = response.candidates[0].content.parts[0]
 
-                backend_details += "- Function call:\n"
-                backend_details += (
+                BACKEND_DETAILS += "- Function call:\n"
+                BACKEND_DETAILS += (
                     "   - Function name: ```"
                     + str(api_requests_and_responses[-1][0])
                     + "```"
                 )
-                backend_details += "\n\n"
-                backend_details += (
+                BACKEND_DETAILS += "\n\n"
+                BACKEND_DETAILS += (
                     "   - Function parameters: ```"
                     + str(api_requests_and_responses[-1][1])
                     + "```"
                 )
-                backend_details += "\n\n"
-                backend_details += (
+                BACKEND_DETAILS += "\n\n"
+                BACKEND_DETAILS += (
                     "   - API response: ```"
                     + str(api_requests_and_responses[-1][2])
                     + "```"
                 )
-                backend_details += "\n\n"
+                BACKEND_DETAILS += "\n\n"
                 with message_placeholder.container():
-                    st.markdown(backend_details)
+                    st.markdown(BACKEND_DETAILS)
 
             except AttributeError:
-                function_calling_in_process = False
+                FUNCTION_CALLING_IN_PROCESS = False
 
         time.sleep(3)
 
-        full_response = response.text
+        FULL_RESPONSE = response.text
         with message_placeholder.container():
-            st.markdown(full_response.replace("$", "\$"))  # noqa: W605
+            st.markdown(FULL_RESPONSE.replace("$", "\$"))  # noqa: W605
             with st.expander("Function calls, parameters, and responses:"):
-                st.markdown(backend_details)
+                st.markdown(BACKEND_DETAILS)
 
         st.session_state.messages.append(
             {
                 "role": "assistant",
-                "content": full_response,
-                "backend_details": backend_details,
+                "content": FULL_RESPONSE,
+                "BACKEND_DETAILS": BACKEND_DETAILS,
             }
         )
