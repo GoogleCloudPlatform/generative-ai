@@ -26,6 +26,7 @@ carloan
 cashback
 colab
 certifi
+cke
 CHECKOV
 Chocolat
 colab
@@ -49,6 +50,7 @@ EBLR
 EMIs
 ETFs
 ecommerce
+emoji
 etf
 Eventarc
 FAISS
@@ -68,6 +70,7 @@ Golfshire
 GST
 gcs
 gcloud
+grpcio
 genai
 Genkit
 getdata
@@ -82,6 +85,7 @@ HUF
 hnsw
 Hogwarts
 https
+IPOs
 ICICI
 IFSC
 iloc
@@ -95,6 +99,7 @@ ipynb
 Jedi
 jan
 kaggle
+kmeans
 Kotak
 KYC
 Kaggle
@@ -104,6 +109,8 @@ langchain
 levelname
 lexer
 llm
+loanh
+loansh
 LLMs
 lxml
 MCLR
@@ -128,6 +135,7 @@ Parag
 Parikh
 Paytm
 pio
+pyasn
 plotly
 pgadmin
 pgvector
@@ -143,6 +151,8 @@ pyplot
 QPM
 RTGS
 RTO
+recomm
+RECOMM
 ragdemos
 ramen
 rsp
@@ -158,6 +168,7 @@ Sensex
 Shanthala
 Shreyash
 signin
+summ
 signout
 signups
 STPs
@@ -189,8 +200,11 @@ VMs
 websites
 webpage
 welcom
+whl
 workarounds
 xticks
+xaxes
 yticks
+yaxes
 XXE
 XIRR

@@ -307,7 +307,7 @@ def qa_over_website(request) -> tuple[dict, int, dict]:
         stream_update=True,
     )
 
-    # UNCOMMENT IF THIS TO UPDATE THE INDEX I.E. WHEN WEBPAGES ARE UPDATED OR NEW WEBPAGES ARE ADDED
+    # UNCOMMENT IF THIS TO UPDATE THE INDEX I.E. WHEN WEB PAGES ARE UPDATED OR NEW WEB PAGES ARE ADDED
     # documents = load_website_content()
 
     # doc_splits = chunk_documents(documents)

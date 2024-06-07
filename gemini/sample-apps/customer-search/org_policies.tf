@@ -22,7 +22,7 @@ resource "google_org_policy_policy" "shielded_vm" {
   }
 }
 
-resource "google_org_policy_policy" "external_ip_acess" {
+resource "google_org_policy_policy" "external_ip_access" {
   depends_on = [google_project_service.init]
   name       = "projects/${var.project}/policies/compute.vmExternalIpAccess"
   parent     = "projects/${var.project}"
