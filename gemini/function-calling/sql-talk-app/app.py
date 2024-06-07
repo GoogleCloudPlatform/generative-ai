@@ -182,38 +182,38 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                 print(params)
 
                 if response.function_call.name == "list_datasets":
-                    API_RESPONSE = client.list_datasets()
-                    API_RESPONSE = BIGQUERY_DATASET_ID
+                    api_response = client.list_datasets()
+                    api_response = BIGQUERY_DATASET_ID
                     api_requests_and_responses.append(
-                        [response.function_call.name, params, API_RESPONSE]
+                        [response.function_call.name, params, api_response]
                     )
 
                 if response.function_call.name == "list_tables":
-                    API_RESPONSE = client.list_tables(params["dataset_id"])
-                    API_RESPONSE = str([table.table_id for table in API_RESPONSE])
+                    api_response = client.list_tables(params["dataset_id"])
+                    api_response = str([table.table_id for table in api_response])
                     api_requests_and_responses.append(
-                        [response.function_call.name, params, API_RESPONSE]
+                        [response.function_call.name, params, api_response]
                     )
 
                 if response.function_call.name == "get_table":
-                    API_RESPONSE = client.get_table(params["table_id"])
-                    API_RESPONSE = API_RESPONSE.to_api_repr()
+                    api_response = client.get_table(params["table_id"])
+                    api_response = api_response.to_api_repr()
                     api_requests_and_responses.append(
                         [
                             response.function_call.name,
                             params,
                             [
-                                str(API_RESPONSE.get("description", "")),
+                                str(api_response.get("description", "")),
                                 str(
                                     [
                                         column["name"]
-                                        for column in API_RESPONSE["schema"]["fields"]
+                                        for column in api_response["schema"]["fields"]
                                     ]
                                 ),
                             ],
                         ]
                     )
-                    API_RESPONSE = str(API_RESPONSE)
+                    api_response = str(api_response)
 
                 if response.function_call.name == "sql_query":
                     job_config = bigquery.QueryJobConfig(
@@ -227,25 +227,25 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                             .replace("\\", "")
                         )
                         query_job = client.query(cleaned_query, job_config=job_config)
-                        API_RESPONSE = query_job.result()
-                        API_RESPONSE = str([dict(row) for row in API_RESPONSE])
-                        API_RESPONSE = API_RESPONSE.replace("\\", "").replace("\n", "")
+                        api_response = query_job.result()
+                        api_response = str([dict(row) for row in api_response])
+                        api_response = api_response.replace("\\", "").replace("\n", "")
                         api_requests_and_responses.append(
-                            [response.function_call.name, params, API_RESPONSE]
+                            [response.function_call.name, params, api_response]
                         )
                     except Exception as e:  # pylint: disable=broad-exception-caught
-                        API_RESPONSE = f"{str(e)}"
+                        api_response = f"{str(e)}"
                         api_requests_and_responses.append(
-                            [response.function_call.name, params, API_RESPONSE]
+                            [response.function_call.name, params, api_response]
                         )
 
-                print(API_RESPONSE)
+                print(api_response)
 
                 response = chat.send_message(
                     Part.from_function_response(
                         name=response.function_call.name,
                         response={
-                            "content": API_RESPONSE,
+                            "content": api_response,
                         },
                     ),
                 )
