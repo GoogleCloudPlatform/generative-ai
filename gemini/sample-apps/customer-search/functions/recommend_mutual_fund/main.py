@@ -62,7 +62,7 @@ def mutual_fund_recommendation(request):
     model = Gemini()
     response = model.generate_response(
         f"""
-        You are a mutual fund expert/analyst and you have to recommed the
+        You are a mutual fund expert/analyst and you have to recommend the
         3 best possible mutual fund based on returns among the given list in csv format
         {csv_table}
 
