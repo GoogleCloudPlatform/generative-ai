@@ -254,7 +254,7 @@ const handleHover = function (e) {
   }
 };
 
-nav.addEventListener("mouseover", handleHover.bind(0.5)); // mouseover instead of mousenter for bubble (delegation). bind() method to manually set the this keyword
+nav.addEventListener("mouseover", handleHover.bind(0.5)); // mouseover instead of mouseenter for bubble (delegation). bind() method to manually set the this keyword
 nav.addEventListener("mouseout", handleHover.bind(1)); // mouseout = opposite of mouseover
 
 // Sticky Nav: Intersection Observer API
@@ -431,7 +431,7 @@ signinBtn.addEventListener("click", async (event) => {
   const password = signinForm.querySelector('input[type="password"]').value;
 
   // Handle the form submission here
-  console.log("Sigin");
+  console.log("Signin");
   console.log("Email:", email);
   console.log("Password:", password);
 

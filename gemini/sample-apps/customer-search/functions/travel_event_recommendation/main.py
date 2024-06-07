@@ -70,10 +70,10 @@ Make sure the event is being held at/near the travel destination.
 
 
 Input:
-The user is travelling to Dubai, United Arab Emirates from 21st Jan 2024 to 14th Fen 2024.
+The user is travelling to Dubai, United Arab Emirates from 21st Jan 2024 to 14th Feb 2024.
 The user is interested in Classical Music, Golf, Hiking, Real Estate.
 
-Ouput:
+Output:
 Also, I found a golf event in Dubai, UAE that you might enjoy during your upcoming trip:
 
 OMEGA Dubai Desert Classic
@@ -87,7 +87,7 @@ your complimentary ticket. Have a wonderful trip!
 
 
 Input:
-The user is travelling to Dubai, United Arab Emirates from 21st Jan 2024 to 14th Fen 2024.
+The user is travelling to Dubai, United Arab Emirates from 21st Jan 2024 to 14th Feb 2024.
 The user is interested in Classical Music, Golf, Hiking, Real Estate.
 
 Output:
@@ -104,7 +104,7 @@ Simply enter your Cymbal Bank card number at the checkout to book your complimen
 Have a wonderful trip!
 
 Input:
-The user is travelling to Manilla, Phillipines from 21st Jan 2024 to 14th Fen 2024.
+The user is travelling to Manilla, Phillipines from 21st Jan 2024 to 14th Feb 2024.
 The user is interested in Classical Music, Golf, Hiking, Real Estate.
 
 Output:
@@ -214,7 +214,7 @@ Output:
 
     Your Cymbal Bank card gets you 2-for-1 tickets.
 
-    Ouput: Orchestra
+    Output: Orchestra
 
     Input:
     {response}
@@ -300,7 +300,7 @@ cartoon
 childish (optional)
 cloned face
 cloned head
-collapsed eyeshadow
+collapsed eye shadow
 combined appendages
 conjoined
 copied visage

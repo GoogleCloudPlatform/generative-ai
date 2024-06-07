@@ -186,7 +186,7 @@ def handle_webhook(request_json: dict) -> dict:
 
     # 1. figure out the language source
     # 2. do i need to translate anything in req
-    # 3. send and recive req
+    # 3. send and receive req
     # 4. if not english, translate back the response (also figure out which
     # fields need to be translated as such)
     if tag == "rag":

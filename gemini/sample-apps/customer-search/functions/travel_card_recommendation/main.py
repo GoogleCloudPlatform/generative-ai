@@ -142,7 +142,7 @@ def travel_card_recommendation(request):
         response = model.generate_response(
             """You are a chatbot for a bank application.
         Tell the user politely that they are not eligible for the the credit card as
-        they are new customer. Only cutomer older than 1 year with the bank
+        they are new customer. Only customer older than 1 year with the bank
         are eligible for credit card.
         Ask the user to wait and ask if they want anything else like mutual funds or fixed deposit.
         Write in a professional and business-neutral tone.
@@ -250,7 +250,7 @@ def travel_card_recommendation(request):
         The user lives in India.
         Assume the currency that you suggest to the user to be Indian Rupees(₹).
         ONLY USE INDIAN RUPEES(₹) EVERYWHERE.
-        The amount should comma seprated in indian rupees format.
+        The amount should comma separated in indian rupees format.
         The message should be in a conversation-like manner based on the Account Status.
         The message should only be based on the information presented above.
         The message should be in second person's perespective tone.

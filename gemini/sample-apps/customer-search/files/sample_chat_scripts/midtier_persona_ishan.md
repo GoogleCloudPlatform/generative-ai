@@ -14,7 +14,7 @@
 **Bot** - Hi Ishan, what can I help you with today?\
 **User** - what's my account balance? (Optional)\
 **Bot** - Your account balance is ₹10,000.00And, scheduled expenses for rest of month are:\
-₹1,500.00 - Wifi Bill on Oct 19, 2023\
+₹1,500.00 - Wi-Fi Bill on Oct 19, 2023\
 ₹1,567.50 - Electricity Bill on Oct 29, 2023\
 ₹18,500.00 - House Rent on Oct 5, 2023\ Your funds are on vacation, but your bills never take one.\
 **User - can i get an loan or overdraft of 50k?**\

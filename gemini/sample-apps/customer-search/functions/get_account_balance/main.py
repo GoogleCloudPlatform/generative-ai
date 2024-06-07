@@ -59,7 +59,7 @@ def get_account_balance(request):
         Format the dates in the following information,e.g. 2024-10-01 to  Oct 1, 2024
         {0}
         Format the amount used in the following information in indian rupee format
-        (seprated by comma in in every 2 digits) and with 2 decimal places,
+        (separated by comma in in every 2 digits) and with 2 decimal places,
         e.g. ₹100000 to ₹1,00,000.00
         {0}.
         The amount should be exact same as {0} just format it.

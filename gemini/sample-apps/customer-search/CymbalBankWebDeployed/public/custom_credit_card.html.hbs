@@ -128,8 +128,8 @@
       response.json(); const image_data = responseData.base64_image; if
       (image_data) { const imageUrl = 'data:image/png;base64,' + image_data;
       const creditCard = document.getElementById('creditCard');
-      creditCard.style.backgroundImage = `url(${imageUrl})`;
       creditCard.style.backgroundSize = 'cover';
+      creditCard.style.backgroundImage = `url(${imageUrl})`;
       creditCard.style.backgroundRepeat = 'no-repeat';
       creditCard.style.backgroundPosition = 'center'; } } else {
       console.log(`Request failed with status code: ${response.status}`); } }

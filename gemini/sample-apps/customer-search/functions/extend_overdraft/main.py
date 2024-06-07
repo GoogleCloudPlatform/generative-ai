@@ -56,7 +56,7 @@ def extend_overdraft(request) -> dict:
         ):
             res = {
                 "fulfillment_response": {
-                    "messages": [{"text": {"text": ["Some unknown Error occured"]}}]
+                    "messages": [{"text": {"text": ["Some unknown Error occurred"]}}]
                 }
             }
             return res

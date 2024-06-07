@@ -30,7 +30,7 @@ EOF
 }
 resource "google_vertex_ai_index_endpoint" "index_endpoint" {
   display_name = "${var.project}-me-index-endpoint"
-  description  = "Enpoint for for LangChain demo"
+  description  = "Endpoint for LangChain demo"
   region       = "us-central1"
   project      = var.project
   labels = {

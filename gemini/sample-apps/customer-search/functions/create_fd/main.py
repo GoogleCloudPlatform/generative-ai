@@ -173,7 +173,7 @@ def create_fixed_deposit(request):
     The bank name is Cymbal Bank.
     The amount should be in the format ₹1,20,312.15 instead of 120312.15
     Do not show maturity date and maturity amount.
-    The output should be within 40 words. Use emojis.
+    The output should be within 40 words. Use emoji.
     """
     )
 

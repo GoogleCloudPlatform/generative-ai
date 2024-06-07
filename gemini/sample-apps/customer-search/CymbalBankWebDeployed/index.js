@@ -64,8 +64,8 @@ handlebars.registerPartial(
 );
 
 function handleError(e) {
-  console.error(e);
-  res.status(500).send("Internal Server Error");
+  console.error("An error occurred while rendering the template:", e);
+  res.status(500).send("An error occurred while processing your request. Please try again later.");
 }
 
 app.get("/", async (req, res) => {
@@ -93,8 +93,7 @@ app.get("/search", async (req, res) => {
         readFileSync("public/search.html.hbs", "utf8")
       );
     } catch (e) {
-      console.error(e);
-      res.status(500).send("Internal Server Error");
+      handleError(e);
     }
   }
   try {
@@ -112,8 +111,7 @@ app.get("/saving", async (req, res) => {
         readFileSync("public/saving.html.hbs", "utf8")
       );
     } catch (e) {
-      console.error(e);
-      res.status(500).send("Internal Server Error");
+      handleError(e);
     }
   }
   try {
@@ -131,8 +129,7 @@ app.get("/credit_card", async (req, res) => {
         readFileSync("public/credit_card.html.hbs", "utf8")
       );
     } catch (e) {
-      console.error(e);
-      res.status(500).send("Internal Server Error");
+      handleError(e);
     }
   }
   try {
@@ -150,8 +147,7 @@ app.get("/custom_credit_card", async (req, res) => {
         readFileSync("public/custom_credit_card.html.hbs", "utf8")
       );
     } catch (e) {
-      console.error(e);
-      res.status(500).send("Internal Server Error");
+      handleError(e);
     }
   }
   try {
@@ -169,8 +165,7 @@ app.get("/neft", async (req, res) => {
         readFileSync("public/neft.html.hbs", "utf8")
       );
     } catch (e) {
-      console.error(e);
-      res.status(500).send("Internal Server Error");
+      handleError(e);
     }
   }
   try {

@@ -83,7 +83,7 @@ def category_wise_expenditure(request):
     if len(transaction_list) == 1:
         transaction_list = transaction_list_str.split("-")
 
-    # Generating pie chart using plo
+    # Generating pie chart using plotly
     labels = category
     values = amount
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])

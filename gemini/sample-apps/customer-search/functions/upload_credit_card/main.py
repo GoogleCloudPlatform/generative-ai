@@ -93,7 +93,7 @@ WHERE customer_id = {customer_id} and credit_card_name = '{credit_card}'
     response = model.generate_response(
         """
         You are a chatbot for a bank application.
-        Tell the user that thier response has been recorded and they will recieve the
+        Tell the user that their response has been recorded and they will receive the
         credit card in next few days. Thank the user for enrolling with the bank.
         Ask the user if there's anything else he wants to know.
         Write in a professional and business-neutral tone.
