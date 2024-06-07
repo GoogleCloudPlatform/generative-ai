@@ -108,7 +108,7 @@ st.markdown(
     [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
     •
     [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"""
-) # noqa: C0301
+)  # noqa: C0301
 
 with st.expander("Sample prompts", expanded=True):
     st.write(
