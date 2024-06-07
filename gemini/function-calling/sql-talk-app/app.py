@@ -129,7 +129,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"].replace("$", "\$"))  # noqa: W605, W1401
         try:
             with st.expander("Function calls, parameters, and responses"):
-                st.markdown(message["BACKEND_DETAILS"])
+                st.markdown(message["backend_details"])
         except KeyError:
             pass
 
@@ -140,7 +140,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        FULL_RESPONSE = ""
+        full_response = ""  #noqa C0103
         chat = model.start_chat()
         client = bigquery.Client()
 
@@ -157,7 +157,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
         print(response)
 
         api_requests_and_responses = []
-        BACKEND_DETAILS = ""
+        backend_details = ""  #noqa C0103
 
         FUNCTION_CALLING_IN_PROCESS = True
         while FUNCTION_CALLING_IN_PROCESS:
@@ -239,43 +239,43 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                 )
                 response = response.candidates[0].content.parts[0]
 
-                BACKEND_DETAILS += "- Function call:\n"
-                BACKEND_DETAILS += (
+                backend_details += "- Function call:\n"
+                backend_details += (
                     "   - Function name: ```"
                     + str(api_requests_and_responses[-1][0])
                     + "```"
                 )
-                BACKEND_DETAILS += "\n\n"
-                BACKEND_DETAILS += (
+                backend_details += "\n\n"
+                backend_details += (
                     "   - Function parameters: ```"
                     + str(api_requests_and_responses[-1][1])
                     + "```"
                 )
-                BACKEND_DETAILS += "\n\n"
-                BACKEND_DETAILS += (
+                backend_details += "\n\n"
+                backend_details += (
                     "   - API response: ```"
                     + str(api_requests_and_responses[-1][2])
                     + "```"
                 )
-                BACKEND_DETAILS += "\n\n"
+                backend_details += "\n\n"
                 with message_placeholder.container():
-                    st.markdown(BACKEND_DETAILS)
+                    st.markdown(backend_details)
 
             except AttributeError:
                 FUNCTION_CALLING_IN_PROCESS = False
 
         time.sleep(3)
 
-        FULL_RESPONSE = response.text
+        full_response = response.text
         with message_placeholder.container():
-            st.markdown(FULL_RESPONSE.replace("$", "\$"))  # noqa: W605, W1401
+            st.markdown(full_response.replace("$", "\$"))  # noqa: W605, W1401
             with st.expander("Function calls, parameters, and responses:"):
-                st.markdown(BACKEND_DETAILS)
+                st.markdown(backend_details)
 
         st.session_state.messages.append(
             {
                 "role": "assistant",
-                "content": FULL_RESPONSE,
-                "BACKEND_DETAILS": BACKEND_DETAILS,
+                "content": full_response,
+                "backend_details": backend_details,
             }
         )
