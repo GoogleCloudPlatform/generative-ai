@@ -11,6 +11,8 @@ bqml
 Boyz
 CHECKOV
 Chocolat
+codelab
+Codelab
 colab
 Colab
 codebase
