@@ -140,7 +140,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""  #noqa C0103
+        full_response = ""  # noqa C0103
         chat = model.start_chat()
         client = bigquery.Client()
 
@@ -157,7 +157,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
         print(response)
 
         api_requests_and_responses = []
-        backend_details = ""  #noqa C0103
+        backend_details = ""  # noqa C0103
 
         FUNCTION_CALLING_IN_PROCESS = True
         while FUNCTION_CALLING_IN_PROCESS:
