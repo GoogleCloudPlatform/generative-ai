@@ -108,7 +108,7 @@ st.markdown(
     [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
     •
     [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"""
-)
+) # noqa: C0301
 
 with st.expander("Sample prompts", expanded=True):
     st.write(
@@ -126,7 +126,7 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605
+        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605, W1401
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["BACKEND_DETAILS"])
@@ -268,7 +268,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
         FULL_RESPONSE = response.text
         with message_placeholder.container():
-            st.markdown(FULL_RESPONSE.replace("$", "\$"))  # noqa: W605
+            st.markdown(FULL_RESPONSE.replace("$", "\$"))  # noqa: W605, W1401
             with st.expander("Function calls, parameters, and responses:"):
                 st.markdown(BACKEND_DETAILS)
 
