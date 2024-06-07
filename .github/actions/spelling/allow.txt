@@ -14,6 +14,7 @@ ASBA
 astype
 ATMs
 ayushi
+Bengaluru
 Bluechip
 backticks
 bbc
@@ -22,6 +23,8 @@ Bitcoin
 bqml
 Boyz
 BSBDA
+chulbul
+cic
 carloan
 cashback
 colab
@@ -39,10 +42,12 @@ cymbuddy
 DICGC
 DTH
 Ducati
+Demat
 dataframe
 datname
 dbadmin
 dbln
+dfcx
 Disturbia
 diy
 Durafast
@@ -83,6 +88,7 @@ gsutil
 HDFC
 HUF
 hnsw
+hdone
 Hogwarts
 https
 IPOs
@@ -123,6 +129,7 @@ NPCI
 NREGA
 Nagar
 neft
+npconvert
 nbconvert
 nbformat
 ncols
