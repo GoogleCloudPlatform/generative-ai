@@ -136,7 +136,9 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
+        st.markdown(
+            message["content"].replace("$", "\$")
+        )  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["backend_details"])
@@ -278,7 +280,9 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
         full_response = response.text
         with message_placeholder.container():
-            st.markdown(full_response.replace("$", "\$"))  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
+            st.markdown(
+                full_response.replace("$", "\$")
+            )  # noqa: W605, W1401 # pylint: disable=anomalous-backslash-in-string
             with st.expander("Function calls, parameters, and responses:"):
                 st.markdown(backend_details)
 
