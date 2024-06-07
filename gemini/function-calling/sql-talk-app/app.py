@@ -100,6 +100,7 @@ with col2:
 
 st.subheader("Powered by Function Calling in Gemini")
 
+# pylint: disable=line-too-long
 st.markdown(
     """[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)
     •
@@ -108,7 +109,9 @@ st.markdown(
     [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)
     •
     [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"""
-)  # pylint: disable=C0301
+)
+
+TEST_STRING = "Testing long lines. Testing long lines. Testing long lines. Testing long lines. Testing long lines. Testing long lines."
 
 with st.expander("Sample prompts", expanded=True):
     st.write(
@@ -140,7 +143,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""  # pylint: disable=C0103
+        full_response = ""  # pylint: disable=invalid-name
         chat = model.start_chat()
         client = bigquery.Client()
 
@@ -157,7 +160,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
         print(response)
 
         api_requests_and_responses = []
-        backend_details = ""  # pylint: disable=C0103
+        backend_details = ""  # pylint: disable=invalid-name
 
         FUNCTION_CALLING_IN_PROCESS = True
         while FUNCTION_CALLING_IN_PROCESS:
