@@ -171,8 +171,8 @@ if prompt := st.chat_input("Ask me about information in the database..."):
         api_requests_and_responses = []
         backend_details = ""  # pylint: disable=invalid-name
 
-        FUNCTION_CALLING_IN_PROCESS = True
-        while FUNCTION_CALLING_IN_PROCESS:
+        function_calling_in_progress = True
+        while function_calling_in_progress:
             try:
                 params = {}
                 for key, value in response.function_call.args.items():
@@ -274,7 +274,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                     st.markdown(backend_details)
 
             except AttributeError:
-                FUNCTION_CALLING_IN_PROCESS = False
+                function_calling_in_progress = False
 
         time.sleep(3)
 
