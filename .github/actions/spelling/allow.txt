@@ -12,12 +12,12 @@ bqml
 Boyz
 CHECKOV
 Chocolat
+codebase
+codebases
 codelab
 Codelab
 colab
 Colab
-codebase
-codebases
 colwidth
 dataframe
 datname
@@ -53,6 +53,7 @@ gsutil
 hnsw
 Hogwarts
 https
+iban
 iloc
 imdb
 imshow
@@ -80,6 +81,8 @@ ncols
 ndarray
 nrows
 owlbot
+paystub
+payslip
 PDFs
 pgadmin
 pgvector
@@ -99,6 +102,7 @@ rsp
 RYDE
 scurely
 selectbox
+ssn
 ssd
 SSRF
 ssh
@@ -122,3 +126,4 @@ xticks
 XXE
 ylabel
 yticks
+ytd
