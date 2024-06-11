@@ -29,7 +29,8 @@ def get_pr_number() -> str:
 def call_gemini(
     pull_request_content: str, model_id: str = "gemini-1.5-flash-001"
 ) -> str:
-    vertexai.init()
+    project_id = os.getenv("GOOGLE_CLOUD_PROJECT_ID")
+    vertexai.init(project=project_id, location="us-central1")
 
     model = GenerativeModel(
         model_id,

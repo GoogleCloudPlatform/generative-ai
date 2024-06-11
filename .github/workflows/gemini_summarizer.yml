@@ -31,4 +31,5 @@ jobs:
       - name: Run Script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
         run: python gemini_summarize_pr.py
