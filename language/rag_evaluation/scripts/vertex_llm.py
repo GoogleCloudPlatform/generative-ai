@@ -28,22 +28,26 @@ class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
     """Class to implement Vertex AI for DeepEval"""
 
     def __init__(self, model) -> None:  # pylint: disable=W0231
-        """INitialise the model"""
+        """Initialise the model"""
         self.model = model
 
     def load_model(self) -> ChatVertexAI:  # pylint: disable=W0221
+        """Loads the model"""
         return self.model
 
     def generate(self, prompt: str) -> str:  # pylint: disable=W0221
+        """Invokes the model"""
         chat_model = self.load_model()
         return chat_model.invoke(prompt).content
 
     async def a_generate(self, prompt: str) -> str:  # pylint: disable=W0221
+        """Invokes the model async"""
         chat_model = self.load_model()
         res = await chat_model.ainvoke(prompt)
         return res.content
 
     def get_model_name(self) -> str:  # pylint: disable=W0236 , W0221
+        """Returns the model name"""
         return "Vertex AI Model"
 
 
