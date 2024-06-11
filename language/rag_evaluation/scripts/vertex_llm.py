@@ -17,7 +17,7 @@
 from deepeval.models.base_model import DeepEvalBaseLLM
 
 # Langchain package for Vertex AI
-from langchain_google_vertexai import (  # type: ignore[import-untyped]
+from langchain_google_vertexai import (
     ChatVertexAI,
     HarmBlockThreshold,
     HarmCategory,
@@ -27,7 +27,7 @@ from langchain_google_vertexai import (  # type: ignore[import-untyped]
 class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
     """Class to implement Vertex AI for DeepEval"""
 
-    def __init__(self, model) -> None:  # pylint: disable=W0231
+    def __init__(self, model : ChatVertexAI) -> None:  # pylint: disable=W0231
         """Initialise the model"""
         self.model = model
 
