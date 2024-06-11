@@ -5,7 +5,7 @@ from deepeval import assert_test
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.test_case import LLMTestCase
 import pytest
-from vertex_llm import google_vertexai_gemini_deepeval # pylint: disable=E0401
+from vertex_llm import google_vertexai_gemini_deepeval  # pylint: disable=E0401
 
 # Evaluation set with questions and ground_truth
 questions = [
@@ -21,7 +21,7 @@ for q, a in itertools.zip_longest(questions, ground_truth):
 
 
 @pytest.mark.parametrize("record", test_set)
-def test_answer_relevancy(record: dict):
+def test_answer_relevancy(record: dict) -> None:
     """Function to test Answer relevancy """
     answer_relevancy_metric = AnswerRelevancyMetric(
         threshold=0.5, model=google_vertexai_gemini_deepeval

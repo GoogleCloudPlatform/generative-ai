@@ -27,7 +27,7 @@ from langchain_google_vertexai import (
 class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
     """Class to implement Vertex AI for DeepEval"""
 
-    def __init__(self, model : ChatVertexAI) -> None:  # pylint: disable=W0231
+    def __init__(self, model: ChatVertexAI) -> None:  # pylint: disable=W0231
         """Initialise the model"""
         self.model = model
 
@@ -54,9 +54,6 @@ class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
 # TODO(developer): Update the below lines
 PROJECT_ID = "<your_project"
 LOCATION = "your_region"
-
-PROJECT_ID = "vertexai-pgt"
-LOCATION = "us-central1"
 
 # Initilialize safety filters for vertex model
 safety_settings = {
