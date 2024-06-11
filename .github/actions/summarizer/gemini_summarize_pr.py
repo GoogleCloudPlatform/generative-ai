@@ -54,50 +54,47 @@ def call_gemini(
     return response.text.replace("## Pull Request Summary", "")
 
 
-def summarize_pr(token: str, repo_name: str, pr_number: str):
-    # Create a GitHub client and access the repository
+def summarize_pr(token, repo_name, pr_number):
+    """Summarizes the pull request using the Gemini model and updates/creates a comment."""
     g = Github(token)
     repo = g.get_repo(repo_name)
     pr = repo.get_pull(pr_number)
 
-    pull_request_content = ""
+    pr_content = f"""
+    Title: {pr.title}
+    Pull Request Description: {pr.body}
+    
+    --- Files Changed ---
+    """
 
-    # Extract and print title and description
-    pull_request_content += f"Title: {pr.title}\n"
-    pull_request_content += f"Pull Request Description: {pr.body}\n"
-
-    # Fetch and print code diff
-    pull_request_content += "\n--- Files Changed ---\n"
     for file in pr.get_files():
-        pull_request_content += f"File name: {file.filename}\n\n"
+        pr_content += f"File name: {file.filename}\n\n"
 
         # Attempt to fetch raw content if patch is not available
         if file.patch is None:
             try:
                 raw_content = requests.get(file.raw_url).text
-                pull_request_content += f"Raw File Content:\n`\n{raw_content}\n`\n\n"
+                pr_content += f"Raw File Content:\n`\n{raw_content}\n`\n\n"
             except requests.exceptions.RequestException:
-                pull_request_content += "Unable to fetch raw file content.\n\n"
+                pr_content += "Unable to fetch raw file content.\n\n"
         else:  # Use patch if available
-            pull_request_content += f"Code Diff:\n{file.patch}\n\n"
+            pr_content += f"Code Diff:\n{file.patch}\n\n"
 
-    gemini_response = call_gemini(pull_request_content)
+    summary = call_gemini(pr_content)
 
-    latest_commit = pr.get_commits()[0].sha
-    comment_header = "## Pull Request Summary from Gemini ✨"
-    comment_body = f"{comment_header}\n {gemini_response} \n---\n "
-
-    # Check for existing comments by the bot
+    comment_header = "## Pull Request Summary from [Gemini ✨](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/overview)"
+    comment_body = (
+        f"{comment_header}\n{summary}\n---\nGenerated at `{pr.get_commits()[0].sha}`"
+    )
     bot_username = "github-actions[bot]"
+
+    # Find and update existing bot comment if any
     for comment in pr.get_issue_comments():
         if comment.user.login == bot_username and comment_header in comment.body:
-            # Update the existing comment
-            comment_body += f"Updated at `{latest_commit}`\n"
             comment.edit(comment_body)
             return
 
-    # If no existing comment is found, create a new one
-    comment_body += f"Generated at `{latest_commit}`\n"
+    # Create a new comment if none exists
     pr.create_issue_comment(comment_body)
 
 
@@ -107,7 +104,7 @@ def main():
     token = os.getenv("GITHUB_TOKEN")
     pr_number = get_pr_number()
 
-    summarize_pr(token, repo_name=repo_name, pr_number=pr_number)
+    summarize_pr(token, repo_name, pr_number)
 
 
 if __name__ == "__main__":

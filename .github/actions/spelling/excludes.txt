@@ -100,3 +100,4 @@
 ^\Qvision/getting-started/visual_captioning.ipynb\E$
 ^\Qvision/use-cases/creating_high_quality_visual_assets_with_gemini_and_imagen.ipynb\E$
 ignore$
+^\Q.github/actions/summarizer/gemini_summarize_pr.py\E$
