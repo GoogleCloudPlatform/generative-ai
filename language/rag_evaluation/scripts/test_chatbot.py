@@ -1,3 +1,4 @@
+"""Test Script for DeepEval with Gemini"""
 import itertools
 
 from deepeval import assert_test
@@ -21,6 +22,7 @@ for q, a in itertools.zip_longest(questions, ground_truth):
 
 @pytest.mark.parametrize("record", test_set)
 def test_answer_relevancy(record):
+    """Function to test Answer relevancy """
     answer_relevancy_metric = AnswerRelevancyMetric(
         threshold=0.5, model=google_vertexai_gemini_deepeval
     )

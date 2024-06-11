@@ -27,10 +27,11 @@ from langchain_google_vertexai import (  # type: ignore[import-untyped]
 class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
     """Class to implement Vertex AI for DeepEval"""
 
-    def __init__(self, model):  # pylint: disable=W0231
+    def __init__(self, model) -> None:  # pylint: disable=W0231
+        """INitialise the model"""
         self.model = model
 
-    def load_model(self):  # pylint: disable=W0221
+    def load_model(self) -> ChatVertexAI:  # pylint: disable=W0221
         return self.model
 
     def generate(self, prompt: str) -> str:  # pylint: disable=W0221
@@ -42,7 +43,7 @@ class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
         res = await chat_model.ainvoke(prompt)
         return res.content
 
-    def get_model_name(self):  # pylint: disable=W0236 , W0221
+    def get_model_name(self) -> str:  # pylint: disable=W0236 , W0221
         return "Vertex AI Model"
 
 
