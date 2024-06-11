@@ -50,7 +50,8 @@ def call_gemini(
     print("---Prompt---\n", prompt)
     response = model.generate_content(prompt)
     print("---Gemini Response---\n", response)
-    return response.text
+
+    return response.text.replace(" ## Pull Request Summary", "")
 
 
 def summarize_pr(token: str, repo_name: str, pr_number: str):
