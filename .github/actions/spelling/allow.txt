@@ -112,6 +112,7 @@ scurely
 SEK
 selectbox
 sku
+SKUs
 ssd
 ssh
 ssn
