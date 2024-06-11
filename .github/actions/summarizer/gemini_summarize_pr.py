@@ -4,14 +4,14 @@ import json
 import os
 import requests
 
-from github import Github
+from github import Github, PullRequest
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
 
 GEMINI_MODEL = "gemini-1.5-flash-001"
 
 
-def get_pr_number(event_path: str) -> str:
+def get_pr_number(event_path: str) -> int:
     """Retrieves the pull request number from GitHub event data."""
     # Load event data
     with open(event_path, "r", encoding="utf-8") as f:
@@ -19,17 +19,17 @@ def get_pr_number(event_path: str) -> str:
 
     # Determine the PR number based on the event
     if "pull_request" in event_data:
-        return event_data["pull_request"]["number"]
+        return int(event_data["pull_request"]["number"])
 
     if (
         "issue" in event_data and "pull_request" in event_data["issue"]
     ):  # For comment events on PRs
-        return event_data["issue"]["number"]
+        return int(event_data["issue"]["number"])
 
     raise ValueError("Unable to determine pull request number from event data.")
 
 
-def get_pr_content(pr: Github.PullRequest) -> str:
+def get_pr_content(pr: PullRequest.PullRequest) -> str:
     """Returns the content of the pull request as a string."""
     pr_content = f"""
     Title: {pr.title}
@@ -88,7 +88,7 @@ def summarize_pr_gemini(
     return response.text.replace("## Pull Request Summary", "")
 
 
-def add_pr_comment(pr: Github.PullRequest, summary: str) -> None:
+def add_pr_comment(pr: PullRequest.PullRequest, summary: str) -> None:
     """Comments on the pull request with the provided summary."""
     comment_header = "## Pull Request Summary from [Gemini ✨](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/overview)"
     comment_body = (
@@ -110,7 +110,7 @@ def main() -> None:
     """Summarizes the pull request using the Gemini model and adds summary to a PR comment."""
 
     # Get GitHub token and repository details
-    repo_name = os.getenv("GITHUB_REPOSITORY")
+    repo_name = os.getenv("GITHUB_REPOSITORY", "")
     token = os.getenv("GITHUB_TOKEN")
     pr_number = get_pr_number(os.getenv("GITHUB_EVENT_PATH", ""))
 
