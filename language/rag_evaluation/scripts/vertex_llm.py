@@ -1,4 +1,3 @@
-
 # Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,35 +13,38 @@
 # limitations under the License.
 """Custom Class implementation"""
 
-# Langchain package for Vertex AI
-from langchain_google_vertexai import ( # type: ignore[import-untyped]
-    ChatVertexAI,
-    HarmBlockThreshold,
-    HarmCategory
-)
-
 # Base LLM for Deepeval
 from deepeval.models.base_model import DeepEvalBaseLLM
 
+# Langchain package for Vertex AI
+from langchain_google_vertexai import (  # type: ignore[import-untyped]
+    ChatVertexAI,
+    HarmBlockThreshold,
+    HarmCategory,
+)
+
+
 class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
-    """ Class to implement Vertex AI for DeepEval"""
-    def __init__(self, model): # pylint: disable=W0231
+    """Class to implement Vertex AI for DeepEval"""
+
+    def __init__(self, model):  # pylint: disable=W0231
         self.model = model
 
-    def load_model(self): # pylint: disable=W0221
+    def load_model(self):  # pylint: disable=W0221
         return self.model
 
-    def generate(self, prompt: str) -> str: # pylint: disable=W0221
+    def generate(self, prompt: str) -> str:  # pylint: disable=W0221
         chat_model = self.load_model()
         return chat_model.invoke(prompt).content
 
-    async def a_generate(self, prompt: str) -> str: # pylint: disable=W0221
+    async def a_generate(self, prompt: str) -> str:  # pylint: disable=W0221
         chat_model = self.load_model()
         res = await chat_model.ainvoke(prompt)
         return res.content
 
-    def get_model_name(self): # pylint: disable=W0236 , W0221
+    def get_model_name(self):  # pylint: disable=W0236 , W0221
         return "Vertex AI Model"
+
 
 # TODO(developer): Update the below lines
 PROJECT_ID = "<your_project"
@@ -62,11 +64,11 @@ safety_settings = {
 
 # Initialise the ChatVertexAI model
 custom_model_gemini = ChatVertexAI(
-    model_name="gemini-1.0-pro-002"
-    , safety_settings=safety_settings
-    , project=PROJECT_ID
-    , location=LOCATION
-    , response_validation=False #Important since deepval cannot handle validation errors
+    model_name="gemini-1.0-pro-002",
+    safety_settings=safety_settings,
+    project=PROJECT_ID,
+    location=LOCATION,
+    response_validation=False,  # Important since deepval cannot handle validation errors
 )
 
 # initiatialize the Deepeval wrapper class
