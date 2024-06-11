@@ -91,9 +91,7 @@ def summarize_pr_gemini(
 def add_pr_comment(pr: PullRequest.PullRequest, summary: str) -> None:
     """Comments on the pull request with the provided summary."""
     comment_header = "## Pull Request Summary from [Gemini ✨](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/overview)"
-    comment_body = (
-        f"{comment_header}\n{summary}\n---\nGenerated at `{pr.get_commits()[-1].sha}`"
-    )
+    comment_body = f"{comment_header}\n{summary}\n---\nGenerated at `{pr.get_commits().reversed[0].sha}`"
     bot_username = "github-actions[bot]"
 
     # Find and update existing bot comment if any
