@@ -179,3 +179,6 @@
 # * code, write a pattern to mask it.
 # * prose, have someone read the English before you dismiss this error.
 \s([A-Z]{3,}|[A-Z][a-z]{2,}|[a-z]{3,})\s\g{-1}\s
+
+# Should be `Gen AI`
+\b[gG]enAI\b
