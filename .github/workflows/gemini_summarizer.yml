@@ -22,11 +22,16 @@ jobs:
       - name: Install Dependencies
         run: pip install google-cloud-aiplatform PyGithub
 
-      - name: Set up Google Cloud credentials
-        uses: google-github-actions/setup-gcloud@v0
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v0'
         with:
-          project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
-          service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
 
       - name: Run Script
         env:
