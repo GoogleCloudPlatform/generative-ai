@@ -51,7 +51,7 @@ def call_gemini(
     response = model.generate_content(prompt)
     print("---Gemini Response---\n", response)
 
-    return response.text.replace(" ## Pull Request Summary", "")
+    return response.text.replace("## Pull Request Summary", "")
 
 
 def summarize_pr(token: str, repo_name: str, pr_number: str):
@@ -85,20 +85,19 @@ def summarize_pr(token: str, repo_name: str, pr_number: str):
 
     latest_commit = pr.get_commits()[0].sha
     comment_header = "## Pull Request Summary from Gemini ✨"
-    comment_body = (
-        f"{comment_header}\n {gemini_response} --- \n Generated at `{latest_commit}`\n"
-    )
+    comment_body = f"{comment_header}\n {gemini_response} \n---\n "
 
     # Check for existing comments by the bot
-    bot_username = os.getenv("GITHUB_ACTOR")
-    print(bot_username)
+    bot_username = "github-actions[bot]"
     for comment in pr.get_issue_comments():
         if comment.user.login == bot_username and comment_header in comment.body:
             # Update the existing comment
+            comment_body += f"Updated at `{latest_commit}`\n"
             comment.edit(comment_body)
             return
 
     # If no existing comment is found, create a new one
+    comment_body += f"Generated at `{latest_commit}`\n"
     pr.create_issue_comment(comment_body)
 
 
