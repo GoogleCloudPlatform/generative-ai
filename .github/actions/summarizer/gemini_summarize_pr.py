@@ -35,7 +35,7 @@ def call_gemini(
     model = GenerativeModel(
         model_id,
         system_instruction=[
-            "You are an expert software engineer.",
+            "You are an expert software engineer, proficient in Generative AI, Git and GitHub.",
         ],
         generation_config=GenerationConfig(temperature=0.0),
     )
@@ -84,7 +84,7 @@ def summarize_pr(token, repo_name, pr_number):
 
     comment_header = "## Pull Request Summary from [Gemini ✨](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/overview)"
     comment_body = (
-        f"{comment_header}\n{summary}\n---\nGenerated at `{pr.get_commits()[0].sha}`"
+        f"{comment_header}\n{summary}\n---\nGenerated at `{pr.get_commits()[-1].sha}`"
     )
     bot_username = "github-actions[bot]"
 
