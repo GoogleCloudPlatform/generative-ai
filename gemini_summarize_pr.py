@@ -1,9 +1,8 @@
-import os
 import json
-import requests
+import os
 
 from github import Github
-
+import requests
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
 
