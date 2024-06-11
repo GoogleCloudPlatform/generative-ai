@@ -2,9 +2,9 @@
 
 import json
 import os
-import requests
 
 from github import Github
+import requests
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
 
