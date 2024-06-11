@@ -72,10 +72,12 @@ def summarize_pr_gemini(
     )
 
     prompt = [
+        # pylint: disable=line-too-long
         "The following is the content of a GitHub Pull Request for a repository focused on Generative AI with Google Cloud."
         "This content includes the Pull Request title, Pull Request description, "
         "a list of all of the files changed with the file name, the code diff and the raw file content."
         "Your task is to output a summary of the Pull Request in Markdown format.",
+        # pylint: enable=line-too-long
         "Content:",
         pull_request_content,
         "Summary:",
