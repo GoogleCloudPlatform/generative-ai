@@ -83,13 +83,17 @@ def summarize_pr(token: str, repo_name: str, pr_number: str):
 
     gemini_response = call_gemini(pull_request_content)
 
-    comment_body = f"## Pull Request Summary from Gemini ✨\n {gemini_response}"
+    latest_commit = pr.get_commits()[0].sha
+    comment_header = "## Pull Request Summary from Gemini ✨"
+    comment_body = (
+        f"{comment_header}\n {gemini_response} --- \n Generated at `{latest_commit}`\n"
+    )
 
     # Check for existing comments by the bot
     bot_username = os.getenv("GITHUB_ACTOR")
-
+    print(bot_username)
     for comment in pr.get_issue_comments():
-        if comment.user.login == bot_username:
+        if comment.user.login == bot_username and comment_header in comment.body:
             # Update the existing comment
             comment.edit(comment_body)
             return
