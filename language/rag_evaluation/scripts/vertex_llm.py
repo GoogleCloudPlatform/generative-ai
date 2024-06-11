@@ -17,11 +17,7 @@
 from deepeval.models.base_model import DeepEvalBaseLLM
 
 # Langchain package for Vertex AI
-from langchain_google_vertexai import (
-    ChatVertexAI,
-    HarmBlockThreshold,
-    HarmCategory,
-)
+from langchain_google_vertexai import ChatVertexAI, HarmBlockThreshold, HarmCategory
 
 
 class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
