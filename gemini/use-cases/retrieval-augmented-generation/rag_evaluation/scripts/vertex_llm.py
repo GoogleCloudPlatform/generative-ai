@@ -66,7 +66,7 @@ custom_model_gemini = ChatVertexAI(
     safety_settings=safety_settings,
     project=PROJECT_ID,
     location=LOCATION,
-    response_validation=False,  # Important since deepval cannot handle validation errors
+    response_validation=False,  # Important since deepeval cannot handle validation errors
 )
 
 # initiatialize the Deepeval wrapper class
