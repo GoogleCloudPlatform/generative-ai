@@ -48,8 +48,8 @@ class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
 
 
 # TODO(developer): Update the below lines
-PROJECT_ID = "<your_project"
-LOCATION = "your_region"
+PROJECT_ID = "<your_project>"
+LOCATION = "<your_region>"
 
 # Initilialize safety filters for vertex model
 safety_settings = {

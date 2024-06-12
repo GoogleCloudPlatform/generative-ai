@@ -99,4 +99,6 @@
 ^\Qvision/getting-started/image_generation.ipynb\E$
 ^\Qvision/getting-started/visual_captioning.ipynb\E$
 ^\Qvision/use-cases/creating_high_quality_visual_assets_with_gemini_and_imagen.ipynb\E$
+^\Qgemini/use-cases/retrieval-augmented-generation/rag_evaluation/ragas_with_gemini.ipynb\E$
+^\Qgemini/use-cases/retrieval-augmented-generation/rag_evaluation/deepeval_with_gemini.ipynb\E$
 ignore$
