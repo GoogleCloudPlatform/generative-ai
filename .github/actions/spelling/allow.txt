@@ -23,6 +23,8 @@ dataframe
 datname
 dbadmin
 dbln
+deepeval
+DeepEval
 Disturbia
 diy
 Durafast
@@ -97,6 +99,8 @@ pysftp
 pyplot
 QPM
 ragdemos
+ragas
+RAGAS
 ramen
 rsp
 RYDE
