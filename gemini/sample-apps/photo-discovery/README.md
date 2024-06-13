@@ -77,3 +77,5 @@ static bool get hasCamera {
 
 ![Vertex Agent and Flutter App Architecture](https://github.com/khanhnwin/flutter-vertex-agent/assets/12416400/324735f9-d52f-402d-9daf-e0f3f7703f28)
 
+
+Made with ❤️ by Kaz Sato & Khanh Nguyen
