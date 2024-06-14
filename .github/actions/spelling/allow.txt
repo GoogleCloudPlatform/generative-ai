@@ -40,8 +40,8 @@ codebases
 Codelab
 codelab
 Codey
-Colab
 colab
+Colab
 Colm
 coloraxis
 colorbar
@@ -73,8 +73,8 @@ etf
 eur
 evals
 Eventarc
-faiss
 FAISS
+faiss
 fewshot
 figsize
 fillmode
@@ -122,6 +122,7 @@ https
 Hubmann
 iban
 idk
+idks
 iloc
 imdb
 imshow
@@ -136,8 +137,8 @@ Jax
 Jedi
 jegadesh
 jupyter
-kaggle
 Kaggle
+kaggle
 Kamradt
 Keanu
 keras
@@ -164,6 +165,7 @@ marb
 mbsdk
 mec
 meme
+memes
 metadatas
 mpe
 mpld
@@ -183,8 +185,8 @@ parcoords
 payslip
 paystub
 pdfminer
-PDFs
 pdfs
+PDFs
 pgadmin
 pgvector
 pii
@@ -250,6 +252,7 @@ tiktoken
 timechart
 toself
 tpu
+TPUs
 tqdm
 Tribbiani
 ubuntu
