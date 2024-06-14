@@ -23,6 +23,7 @@ dependencies:
   flutter_chat_ui: ^1.6.12
   uuid: ^4.4.0
   http: ^1.2.1
+  firebase_auth: ^4.20.0
 
 dev_dependencies:
   flutter_test:

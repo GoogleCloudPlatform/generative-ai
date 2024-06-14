@@ -2,13 +2,15 @@
 
 ![Vertex AI Agent Builder & Flutter Multi-platform Demo – Fallingwater](https://github.com/khanhnwin/flutter-vertex-agent/assets/12416400/2aeba758-a148-4616-a302-0735f57907ff)
 
-This project is a demo that integrates a Vertex AI Agent with a multiplatform Flutter app. 
+This project is a demo that integrates a Vertex AI Agent with a multiplatform Flutter app. Flutter is used as the client app framework, Vertex AI Search is used as a vector DB, and Reasoning Engine helps us build and deploy an agent with LangChain on Vertex AI.
+
+
 
 Users can run the Flutter app and take or upload a photo of a landmark. The app identifies the subject name and provides a brief description. 
 
 To learn more about the subject of the photo, tap “tell me more” to chat with Khanh, an AI agent build built with Vertex AI Agent Builder, and ask follow-up questions about the history of subject in the photo based on information Wikipedia.
 
-The agent can also identify merchandise from the [Google Merchandise Store](https://googlemerchandisestore.com/) and provide product name, description, pricing, and purchase link by referencing a Google Merchandise store dataset.
+The agent can also identify merchandise from the [Google Merchandise Store](https://your.googlemerchandisestore.com) and provide product name, description, pricing, and purchase link by referencing a Google Merchandise store dataset.
 
 > [!NOTE]
 Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI agents with Vertex AI Agent Builder and Flutter](https://youtu.be/V8P_S9OLI_I?si=N2QMBs7HNZL6mKU0).
@@ -16,17 +18,19 @@ Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI 
 ## Demo
 ![Chat UI - Lake Wakatipu](https://github.com/khanhnwin/flutter-vertex-agent/assets/12416400/29a23152-d29b-4083-8589-fe4751331381)
 
+[Try the live demo app](https://photo-discovery-demo.web.app/)
+
 ## Getting Started
 
 ### Building & deploying the agent with Vertex AI Agent Builder
 
 1. Create a search data store on Vertex AI Search: See [Create a search data store](https://cloud.google.com/generative-ai-app-builder/docs/create-data-store-es) to create your own search data store. The "Data store ID" will be your search engine ID.
 
-1. Deploy a Cloud Run app: Edit /ag-web/app/app.py and /ag-web/app/deploy.sh and set the project ID, GCS bucket name and the search engine ID. Run deploy.sh to deploy the Run app. Open "ag-web" app on the Cloud Run console, and find the hostname (eg "ag-web-xxxxxx.a.run.app").
+1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run deploy.sh to deploy the Run app. Open "ag-web" app on the Cloud Run console, and find the hostname (eg "ag-web-xxxxxx.a.run.app").
 
 1. Deploy a Reasoning Engine agent: Open [Cloud Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/create-console-quickstart) and upload /ag-web/ag_setup_re.ipynb. Open the Notebook and edit the GOOGLE_SHOP_VERTEXAI_SEARCH_URL with the Run hostname. Run the Notebook from the start to deploy the agent to the Reasoning Engine runtime. From the output on the deployment, find the reasoning engine ID. The output format is "projects/PROJECT_ID/locations/LOCATION/reasoningEngines/REASONING_ENGINE_ID".
 
-1. Redeploy the Cloud Run app: Edit /ag-web/app/app.py and set the REASONING_ENGINE_ID. Run /ag-web/app/deploy.sh to redeploy it.
+1. Redeploy the Cloud Run app: Edit `/ag-web/app/app.py` and set the REASONING_ENGINE_ID. Run `/ag-web/app/deploy.sh` to redeploy it.
 
 ### Running the Flutter App
 
@@ -78,4 +82,4 @@ static bool get hasCamera {
 ![Vertex Agent and Flutter App Architecture](https://github.com/khanhnwin/flutter-vertex-agent/assets/12416400/324735f9-d52f-402d-9daf-e0f3f7703f28)
 
 
-Made with ❤️ by Kaz Sato & Khanh Nguyen
+Made with ❤️ by [Kaz Sato](https://github.com/kazunori279) & [Khanh Nguyen](https://github.com/khanhnwin)
