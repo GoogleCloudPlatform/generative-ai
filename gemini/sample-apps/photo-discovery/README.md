@@ -1,6 +1,6 @@
 # Vertex AI Agent Builder & Flutter Demo
 
-![Vertex AI Agent Builder & Flutter Multi-platform Demo – Fallingwater](https://github.com/khanhnwin/flutter-vertex-agent/assets/12416400/2aeba758-a148-4616-a302-0735f57907ff)
+![Vertex AI Agent Builder & Flutter Multi-platform Demo – Fallingwater](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/showcase.png)
 
 This project is a demo that integrates a Vertex AI Agent with a multiplatform Flutter app. Flutter is used as the client app framework, Vertex AI Search is used as a vector DB, and Reasoning Engine helps us build and deploy an agent with LangChain on Vertex AI.
 
@@ -16,7 +16,7 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI agents with Vertex AI Agent Builder and Flutter](https://youtu.be/V8P_S9OLI_I?si=N2QMBs7HNZL6mKU0).
 
 ## Demo
-![Chat UI - Lake Wakatipu](https://github.com/khanhnwin/flutter-vertex-agent/assets/12416400/29a23152-d29b-4083-8589-fe4751331381)
+![Chat UI - Lake Wakatipu](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/demo.gif)
 
 [Try the live demo app](https://photo-discovery-demo.web.app/)
 
@@ -79,7 +79,7 @@ static bool get hasCamera {
 
 ## App Architecture
 
-![Vertex Agent and Flutter App Architecture](https://github.com/khanhnwin/flutter-vertex-agent/assets/12416400/324735f9-d52f-402d-9daf-e0f3f7703f28)
+![Vertex Agent and Flutter App Architecture](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/architecture-diagram.png)
 
 
 Made with ❤️ by [Kaz Sato](https://github.com/kazunori279) & [Khanh Nguyen](https://github.com/khanhnwin)
