@@ -55,7 +55,7 @@ Get available devices by running `flutter devices` ex: `AA8A7357`, `macos`, `chr
 
 1. Once the app is running, select an image for analysis. Once the image subject has been identified click the "tell me more" button to start an Agent chat session. 
 
-1. [Optional] Running the app on a mobile device with a camera? You can enable the feature for taking photos directly within the app. In `lib/functionality/adaptive/capabilities.dart` set Capabilities.hasCamera to `true` like so:
+1. [Optional] Running the app on a mobile device with a camera? You can enable the feature for taking photos directly within the app. In `lib/functionality/adaptive/capabilities.dart` set `Capabilities.hasCamera` to `true` like so:
 
 **Before:**
 ```
