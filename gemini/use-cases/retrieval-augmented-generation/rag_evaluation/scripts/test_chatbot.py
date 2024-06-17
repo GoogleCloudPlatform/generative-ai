@@ -1,12 +1,44 @@
 """Test Script for DeepEval with Gemini"""
 
 import itertools
+import pytest
+
+# Langchain package for Vertex AI
+from langchain_google_vertexai import (
+    ChatVertexAI,
+    HarmBlockThreshold,
+    HarmCategory
+    )
 
 from deepeval import assert_test
 from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.test_case import LLMTestCase
-import pytest
-from vertex_llm import google_vertexai_gemini_deepeval  # pylint: disable=E0401
+from vertex_llm import GoogleVertexAIDeepEval  # pylint: disable=E0401
+
+# TODO(developer): Update the below lines
+PROJECT_ID = "<your_project>"
+LOCATION = "<your_region>"
+
+# Initilialize safety filters for Gemini model
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+}
+
+# Initialise the ChatVertexAI model
+custom_model_gemini = ChatVertexAI(
+    model_name="gemini-1.0-pro-002",
+    safety_settings = safety_settings,
+    project=PROJECT_ID,
+    location=LOCATION,
+    response_validation=False,  # Important since deepeval cannot handle validation errors
+)
+
+# initiatialize the Deepeval wrapper class
+google_vertexai_gemini_deepeval = GoogleVertexAIDeepEval(model=custom_model_gemini)
 
 # Evaluation set with questions and ground_truth
 questions = [

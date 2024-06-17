@@ -285,3 +285,10 @@ yticks
 zaxis
 Zscaler
 Zuercher
+Ashish
+Llion
+Parmar
+Shazeer
+Uszkoreit
+Vaswani
+vectordb

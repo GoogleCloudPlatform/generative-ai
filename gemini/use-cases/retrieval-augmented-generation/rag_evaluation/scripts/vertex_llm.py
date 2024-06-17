@@ -17,7 +17,7 @@
 from deepeval.models.base_model import DeepEvalBaseLLM
 
 # Langchain package for Vertex AI
-from langchain_google_vertexai import ChatVertexAI, HarmBlockThreshold, HarmCategory
+from langchain_google_vertexai import ChatVertexAI
 
 
 class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
@@ -45,29 +45,3 @@ class GoogleVertexAIDeepEval(DeepEvalBaseLLM):
     def get_model_name(self) -> str:  # pylint: disable=W0236 , W0221
         """Returns the model name"""
         return "Vertex AI Model"
-
-
-# TODO(developer): Update the below lines
-PROJECT_ID = "<your_project>"
-LOCATION = "<your_region>"
-
-# Initilialize safety filters for vertex model
-safety_settings = {
-    HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-}
-
-# Initialise the ChatVertexAI model
-custom_model_gemini = ChatVertexAI(
-    model_name="gemini-1.0-pro-002",
-    safety_settings=safety_settings,
-    project=PROJECT_ID,
-    location=LOCATION,
-    response_validation=False,  # Important since deepeval cannot handle validation errors
-)
-
-# initiatialize the Deepeval wrapper class
-google_vertexai_gemini_deepeval = GoogleVertexAIDeepEval(model=custom_model_gemini)
