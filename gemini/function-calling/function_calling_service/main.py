@@ -12,8 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import vertexai
+import json
+import logging
+import os
+
+from flask import Flask, jsonify, render_template, request
 import requests
+import vertexai
 from vertexai.generative_models import (
     Content,
     FunctionDeclaration,
@@ -22,10 +27,6 @@ from vertexai.generative_models import (
     Part,
     Tool,
 )
-import os
-from flask import Flask, jsonify, render_template, request
-import logging
-import json
 
 logger = logging.getLogger(__name__)
 
