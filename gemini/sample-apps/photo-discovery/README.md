@@ -26,7 +26,7 @@ Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI 
 
 1. Create a search data store on Vertex AI Search: See [Create a search data store](https://cloud.google.com/generative-ai-app-builder/docs/create-data-store-es) to create your own search data store by importing `/ag-web/google_merch_shop_items.csv` CSV file. The "Data store ID" will be your search engine ID.
 
-1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run deploy.sh to deploy the Run app. Open "ag-web" app on the Cloud Run console, and find the hostname (eg "ag-web-xxxxxx.a.run.app").
+1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run `deploy.sh` to deploy the Run app. Open `ag-web` app on the Cloud Run console, and find the hostname (eg `ag-web-xxxxxx.a.run.app`).
 
 1. Deploy a Reasoning Engine agent: Open [Cloud Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/create-console-quickstart) and upload `/ag-web/ag_setup_re.ipynb`. Open the Notebook and edit the `GOOGLE_SHOP_VERTEXAI_SEARCH_URL` with the Run hostname. Run the Notebook from the start to deploy the agent to the Reasoning Engine runtime. From the output on the deployment, find the reasoning engine ID. The output format is `projects/PROJECT_ID/locations/LOCATION/reasoningEngines/REASONING_ENGINE_ID`.
 
