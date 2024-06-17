@@ -24,7 +24,7 @@ Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI 
 
 ### Building & deploying the agent with Vertex AI Agent Builder
 
-1. Create a search data store on Vertex AI Search: See [Create a search data store](https://cloud.google.com/generative-ai-app-builder/docs/create-data-store-es) to create your own search data store. The "Data store ID" will be your search engine ID.
+1. Create a search data store on Vertex AI Search: See [Create a search data store](https://cloud.google.com/generative-ai-app-builder/docs/create-data-store-es) to create your own search data store by importing `/ag-web/google_merch_shop_items.csv` CSV file. The "Data store ID" will be your search engine ID.
 
 1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run deploy.sh to deploy the Run app. Open "ag-web" app on the Cloud Run console, and find the hostname (eg "ag-web-xxxxxx.a.run.app").
 
