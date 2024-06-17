@@ -31,7 +31,7 @@ safety_settings = {
 # Initialise the ChatVertexAI model
 custom_model_gemini = ChatVertexAI(
     model_name="gemini-1.0-pro-002",
-    safety_settings = safety_settings,
+    safety_settings=safety_settings,
     project=PROJECT_ID,
     location=LOCATION,
     response_validation=False,  # Important since deepeval cannot handle validation errors
