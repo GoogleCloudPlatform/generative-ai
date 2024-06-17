@@ -30,7 +30,7 @@ Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI 
 
 1. Deploy a Reasoning Engine agent: Open [Cloud Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/create-console-quickstart) and upload `/ag-web/ag_setup_re.ipynb`. Open the Notebook and edit the `GOOGLE_SHOP_VERTEXAI_SEARCH_URL` with the Run hostname. Run the Notebook from the start to deploy the agent to the Reasoning Engine runtime. From the output on the deployment, find the reasoning engine ID. The output format is `projects/PROJECT_ID/locations/LOCATION/reasoningEngines/REASONING_ENGINE_ID`.
 
-1. Redeploy the Cloud Run app: Edit `/ag-web/app/app.py` and set the REASONING_ENGINE_ID. Run `/ag-web/app/deploy.sh` to redeploy it.
+1. Redeploy the Cloud Run app: Edit `/ag-web/app/app.py` and set the `REASONING_ENGINE_ID`. Run `/ag-web/app/deploy.sh` to redeploy it.
 
 ### Running the Flutter App
 
