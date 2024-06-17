@@ -4,11 +4,7 @@ import itertools
 import pytest
 
 # Langchain package for Vertex AI
-from langchain_google_vertexai import (
-    ChatVertexAI,
-    HarmBlockThreshold,
-    HarmCategory
-    )
+from langchain_google_vertexai import ChatVertexAI, HarmBlockThreshold, HarmCategory
 
 from deepeval import assert_test
 from deepeval.metrics import AnswerRelevancyMetric
