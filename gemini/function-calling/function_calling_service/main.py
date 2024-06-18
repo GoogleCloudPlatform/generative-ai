@@ -16,15 +16,13 @@ import json
 import logging
 import os
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, render_template, request
 import requests
 import vertexai
 from vertexai.generative_models import (
-    Content,
     FunctionDeclaration,
     GenerationConfig,
     GenerativeModel,
-    Part,
     Tool,
 )
 
@@ -64,43 +62,6 @@ LOCATION = "us-central1"
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 
-@app.route("/static")
-def get_static_coordinates():
-    """
-    Retrieves coordinates for a static address using the Vertex AI Generative AI API and the Nominatim API.
-
-    This function uses a pre-defined prompt to request coordinates for a specific address.
-    It then extracts the arguments from the function call response and constructs a URL for the Nominatim API.
-    Finally, it retrieves the coordinates from the Nominatim API and returns them as a JSON object.
-    """
-
-    prompt = """
-   I want to get the coordinates for the following address:
-   1600 Amphitheatre Pkwy, Mountain View, CA 94043, US
-   """
-
-    response = model.generate_content(
-        prompt,
-        generation_config=GenerationConfig(temperature=0),
-        tools=[location_tool],
-    )
-    response.candidates[0].content.parts[0]
-
-    x = response.candidates[0].content.parts[0].function_call.args
-
-    url = "https://nominatim.openstreetmap.org/search?"
-    for i in x:
-        url += '{}="{}"&'.format(i, x[i])
-    url += "format=json"
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-    }
-    x = requests.get(url, headers=headers)
-    content = x.json()
-    return content
-
-
 @app.route("/", methods=["GET", "POST"])
 def get_coordinates():
     """
@@ -112,66 +73,31 @@ def get_coordinates():
     Finally, it retrieves the coordinates from the Nominatim API and returns them as a JSON object.
     For GET requests, it simply renders the index.html template.
     """
-    if request.method == "POST":
-        address = request.form["address"]
-        prompt = f"""
-        I want to get the coordinates for the following address:
-        {address}
-        """
-        response = model.generate_content(
-            prompt,
-            generation_config=GenerationConfig(temperature=0),
-            tools=[location_tool],
-        )
-
-        x = response.candidates[0].content.parts[0].function_call.args
-        if x is None:
-            content = ""
-        else:
-            url = "https://nominatim.openstreetmap.org/search?"
-            for i in x:
-                url += '{}="{}"&'.format(i, x[i])
-            url += "format=json"
-
-            headers = {
-                "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-            }
-            x = requests.get(url, headers=headers)
-            raw_content = x.json()
-            content = json.dumps(raw_content, indent=4)
-        return render_template("index.html", content=content)
-    else:
+    if request.method == "GET":
         return render_template("index.html")
-    if request.method == "POST":
-        address = request.form["address"]
-        prompt = f"""
-        I want to get the coordinates for the following address:
-        {address}
-        """
-        response = model.generate_content(
-            prompt,
-            generation_config=GenerationConfig(temperature=0),
-            tools=[location_tool],
-        )
+    address = request.form["address"]
+    prompt = f"""
+    I want to get the coordinates for the following address:
+    {address}
+    """
+    response = model.generate_content(prompt)
 
-        x = response.candidates[0].content.parts[0].function_call.args
-        if x is None:
-            content = ""
-        else:
-            url = "https://nominatim.openstreetmap.org/search?"
-            for i in x:
-                url += '{}="{}"&'.format(i, x[i])
-            url += "format=json"
-
-            headers = {
-                "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-            }
-            x = requests.get(url, headers=headers)
-            raw_content = x.json()
-            content = json.dumps(raw_content, indent=4)
-        return render_template("index.html", content=content)
+    x = response.candidates[0].function_calls[0].args
+    if x is None:
+        content = ""
     else:
-        return render_template("index.html")
+        url = "https://nominatim.openstreetmap.org/search?"
+        for i in x:
+            url += '{}="{}"&'.format(i, x[i])
+        url += "format=json"
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+        }
+        x = requests.get(url, headers=headers)
+        raw_content = x.json()
+        content = json.dumps(raw_content, indent=4)
+    return render_template("index.html", content=content)
 
 
 if __name__ == "__main__":
