@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""A Flask app that uses Vertex AI and Nominatim to get address coordinates.
+
+This app takes an address as input and uses the Vertex AI Gemini model to
+extract relevant location information. It then uses the Nominatim API to
+retrieve the coordinates for the address.
+"""
+
 import json
 import logging
 import os
@@ -63,15 +70,17 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 
 @app.route("/", methods=["GET", "POST"])
-def get_coordinates():
+def get_coordinates() -> str:
     """
-    Retrieves coordinates for a given address using the Vertex AI Generative AI API and the Nominatim API.
+    Retrieves coordinates for an address using Vertex AI and Nominatim APIs.
 
     This function handles both GET and POST requests.
-    For POST requests, it retrieves the address from the request form and uses it to construct a prompt for the Vertex AI model.
-    It then extracts the arguments from the function call response and constructs a URL for the Nominatim API.
-    Finally, it retrieves the coordinates from the Nominatim API and returns them as a JSON object.
-    For GET requests, it simply renders the index.html template.
+    For POST requests, it retrieves the address from the request form and uses
+    it to construct a prompt for the Vertex AI model. It then extracts the
+    arguments from the function call response and constructs a URL for the
+    Nominatim API. Finally, it retrieves the coordinates from the Nominatim API
+    and returns them as a JSON object. For GET requests, it simply renders the
+    index.html template.
     """
     if request.method == "GET":
         return render_template("index.html")
@@ -88,7 +97,7 @@ def get_coordinates():
     else:
         url = "https://nominatim.openstreetmap.org/search?"
         for i in x:
-            url += '{}="{}"&'.format(i, x[i])
+            url += f'{i}="{x[i]}&'
         url += "format=json"
 
         headers = {
