@@ -59,3 +59,4 @@
 /generative-ai/vision/gradio/gradio_image_generation_sdk.ipynb  @jbrache @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb   @guruvittal @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/genkit/generate-synthetic-database           @aikozhaoz @GoogleCloudPlatform/generative-ai-devrel
+gemini/evaluation/evaluate_langchain_chains.ipynb           @eliasecchi @GoogleCloudPlatform/generative-ai-devrel
