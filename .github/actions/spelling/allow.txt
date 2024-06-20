@@ -242,6 +242,7 @@ sklearn
 sku
 SKUs
 SNB
+SPII
 ssd
 ssh
 ssn
