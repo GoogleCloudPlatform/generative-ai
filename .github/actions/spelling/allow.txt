@@ -4,6 +4,7 @@ agentic
 AGG
 AGs
 aip
+ainvoke
 Aktu
 alloydb
 Aniston
@@ -54,6 +55,8 @@ dataframe
 datname
 dbadmin
 dbln
+deepeval
+DeepEval
 ddl
 dente
 Depatmint
@@ -210,6 +213,8 @@ QPM
 qubit
 qubits
 ragdemos
+ragas
+RAGAS
 ramen
 ratelimit
 ribeye
@@ -280,3 +285,10 @@ yticks
 zaxis
 Zscaler
 Zuercher
+Ashish
+Llion
+Parmar
+Shazeer
+Uszkoreit
+Vaswani
+vectordb
