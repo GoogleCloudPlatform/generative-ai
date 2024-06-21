@@ -141,8 +141,8 @@ def travel_card_recommendation(request):
     if customer_age_on_book < 365:
         response = model.generate_response(
             """You are a chatbot for a bank application.
-        Tell the user politely that they are not eligible for the the credit card as
-        they are new customer. Only customer older than 1 year with the bank
+        Tell the user politely that they are not eligible for the credit card as
+        they are a new customer. Only customers older than 1 year with the bank
         are eligible for credit card.
         Ask the user to wait and ask if they want anything else like mutual funds or fixed deposit.
         Write in a professional and business-neutral tone.
@@ -150,7 +150,7 @@ def travel_card_recommendation(request):
         The message comes in middle of conversation so don't greet the user with Hello/Hi.
         The user lives in India.
         The message should be in a conversation-like manner based on the Account Status.
-        The message should be in second person's perespective tone.
+        The message should be in second person's perspective tone.
         """
         )
 
@@ -253,7 +253,7 @@ def travel_card_recommendation(request):
         The amount should comma separated in indian rupees format.
         The message should be in a conversation-like manner based on the Account Status.
         The message should only be based on the information presented above.
-        The message should be in second person's perespective tone.
+        The message should be in second person's perspective tone.
     """
     )
 

@@ -61,4 +61,3 @@ resource "google_vertex_ai_index" "index" {
   }
   index_update_method = "STREAM_UPDATE"
 }
-
