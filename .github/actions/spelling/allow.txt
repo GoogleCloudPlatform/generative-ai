@@ -8,6 +8,7 @@ agentic
 AGG
 AGs
 aip
+ainvoke
 Aktu
 alloydb
 aload
@@ -74,6 +75,8 @@ dataframe
 datname
 dbadmin
 dbln
+deepeval
+DeepEval
 ddl
 Demat
 dente
@@ -275,6 +278,8 @@ QPM
 qubit
 qubits
 ragdemos
+ragas
+RAGAS
 ramen
 ratelimit
 RECOMM
@@ -319,6 +324,7 @@ sklearn
 sku
 SKUs
 SNB
+SPII
 ssd
 ssh
 ssn
@@ -378,3 +384,10 @@ yticks
 zaxis
 Zscaler
 Zuercher
+Ashish
+Llion
+Parmar
+Shazeer
+Uszkoreit
+Vaswani
+vectordb
