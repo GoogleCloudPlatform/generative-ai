@@ -82,28 +82,20 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
    export GCP_REGION='us-central1'             # If you change this, make sure the region is supported.
    ```
 
-2. Now you can build the Docker image for the application and push it to Artifact Registry. To do this, you will need one environment variable set that will point to the Artifact Registry name. Included in the script below is a command that will create this Artifact Registry repository for you.
+2. Build and deploy the service to Cloud Run:
 
-   In Cloud Shell, execute the following commands:
+   In Cloud Shell, execute the following command to name the Cloud Run service:
 
    ```bash
-   export AR_REPO='<REPLACE_WITH_YOUR_AR_REPO_NAME>'  # Change this
    export SERVICE_NAME='gemini-streamlit-app' # This is the name of our Application and Cloud Run service. Change it if you'd like.
-
-   #make sure you are in the active directory for 'gemini-streamlit-cloudrun'
-   gcloud artifacts repositories create "$AR_REPO" --location="$GCP_REGION" --repository-format=Docker
-   gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev"
-   gcloud builds submit --tag "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPO/$SERVICE_NAME"
    ```
-
-3. The final step is to deploy the service in Cloud Run with the image that we had built and had pushed to the Artifact Registry in the previous step:
 
    In Cloud Shell, execute the following command:
 
    ```bash
    gcloud run deploy "$SERVICE_NAME" \
      --port=8080 \
-     --image="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPO/$SERVICE_NAME" \
+     --source=. \
      --allow-unauthenticated \
      --region=$GCP_REGION \
      --project=$GCP_PROJECT \
