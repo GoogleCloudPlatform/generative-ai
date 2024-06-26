@@ -10,7 +10,7 @@ Sample screenshots and video demos of the application are shown below:
 
 ## Application screenshots
 
-<img src="https://storage.googleapis.com/github-repo/img/gemini/sample-apps/gemini-streamlit-cloudrun/assets/gemini_pro_text.png" width="50%"/>
+<img src="https://storage.googleapis.com/github-repo/img/gemini/sample-apps/gemini-streamlit-cloudrun/assets/gemini_pro_text.png" width="50%" alt="Vertex AI Gemini App"/>
 
 ## Run the Application locally (on Cloud Shell)
 
