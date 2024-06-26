@@ -16,9 +16,9 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI agents with Vertex AI Agent Builder and Flutter](https://youtu.be/V8P_S9OLI_I?si=N2QMBs7HNZL6mKU0).
 
 ## Demo
-![Chat UI - Lake Wakatipu](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/demo.gif)
-
 [Try the live demo app](https://photo-discovery-demo.web.app/)
+
+![Chat UI - Lake Wakatipu](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/demo.gif)
 
 ## Getting Started
 
