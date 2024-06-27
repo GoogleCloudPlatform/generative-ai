@@ -4,6 +4,7 @@ agentic
 AGG
 AGs
 aip
+ainvoke
 Aktu
 alloydb
 Aniston
@@ -54,6 +55,8 @@ dataframe
 datname
 dbadmin
 dbln
+deepeval
+DeepEval
 ddl
 dente
 Depatmint
@@ -137,6 +140,7 @@ Jax
 Jedi
 jegadesh
 jupyter
+Kaelen
 Kaggle
 kaggle
 Kamradt
@@ -210,6 +214,8 @@ QPM
 qubit
 qubits
 ragdemos
+ragas
+RAGAS
 ramen
 ratelimit
 ribeye
@@ -237,6 +243,7 @@ sklearn
 sku
 SKUs
 SNB
+SPII
 ssd
 ssh
 ssn
@@ -280,3 +287,10 @@ yticks
 zaxis
 Zscaler
 Zuercher
+Ashish
+Llion
+Parmar
+Shazeer
+Uszkoreit
+Vaswani
+vectordb

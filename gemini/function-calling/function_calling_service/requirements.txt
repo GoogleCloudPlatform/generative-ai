@@ -1,0 +1,4 @@
+google-cloud-aiplatform==1.55.0
+Flask==3.0.3
+gunicorn==22.0.0
+Werkzeug==3.0.3
