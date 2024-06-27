@@ -3,8 +3,8 @@ Adidas
 agentic
 AGG
 AGs
-aip
 ainvoke
+aip
 Aktu
 alloydb
 Aniston
@@ -13,6 +13,7 @@ Arborio
 Arepa
 Arsan
 Arxiv
+Ashish
 astype
 Autorater
 autosxs
@@ -50,14 +51,15 @@ colorway
 colwidth
 csa
 CZE
+D'orsay
 Dataform
 dataframe
 datname
 dbadmin
 dbln
+ddl
 deepeval
 DeepEval
-ddl
 dente
 Depatmint
 descgen
@@ -84,6 +86,7 @@ fillmode
 Firestore
 Fishburne
 flac
+Flatform
 Flipkart
 forno
 FPDF
@@ -157,6 +160,7 @@ levelname
 lexer
 linalg
 linecolor
+Llion
 llm
 LLMs
 llms
@@ -186,6 +190,7 @@ owlbot
 paleo
 pancetta
 parcoords
+Parmar
 payslip
 paystub
 pdfminer
@@ -233,6 +238,7 @@ Selam
 selectbox
 sentenc
 SEO
+Shazeer
 showlakes
 showland
 showor
@@ -249,12 +255,14 @@ ssh
 ssn
 SSRF
 STIX
+Strappy
 streamlit
 sytem
 tagline
 tfhub
 tgz
 thelook
+Tianli
 tiktoken
 timechart
 toself
@@ -270,6 +278,9 @@ urandom
 Urs
 username
 usernames
+Uszkoreit
+Vaswani
+vectordb
 vertexai
 VMs
 websites
@@ -287,10 +298,3 @@ yticks
 zaxis
 Zscaler
 Zuercher
-Ashish
-Llion
-Parmar
-Shazeer
-Uszkoreit
-Vaswani
-vectordb
