@@ -1,0 +1,6 @@
+functions-framework==3.*
+google-cloud-bigquery
+google-cloud-aiplatform
+plotly
+kaleido
+google-cloud-storage

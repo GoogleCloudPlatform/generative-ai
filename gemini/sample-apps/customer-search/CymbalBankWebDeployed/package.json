@@ -1,0 +1,23 @@
+{
+  "name": "nodejs-cloud-run-hello-world",
+  "version": "0.0.1",
+  "description": "Hello World application for Cloud Run",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Google LLC",
+  "license": "0BSD",
+  "engines": {
+    "node": ">=11.14"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.17.1",
+    "firebase": "^10.6.0",
+    "firebase-admin": "^11.11.1",
+    "handlebars": "^4.7.4",
+    "run": "^1.4.0"
+  }
+}

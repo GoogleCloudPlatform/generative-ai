@@ -1,0 +1,46 @@
+{{#> layout title="Search Results"}}
+    <div class="half-width">
+        <div id="search-result"></div>
+
+        <div id="slide-container"></div>
+        <script>
+            // Retrieve search results from sessionStorage
+            var storedResults = JSON.parse(sessionStorage.getItem('temp_result'));
+            // print(storedResults)
+
+            if (storedResults) {
+                console.log(storedResults);
+
+                var txt = storedResults.fulfillment_response.messages[0].text.text[0];
+                document.getElementById('search-result').innerHTML = txt;
+                references = JSON.parse(storedResults.fulfillment_response.messages[0].text.text[1]);
+                console.log(references);
+                // Display search results on the page
+                var str = '';
+                var count = 0;
+
+                references.forEach(function (reference) {
+                    var s = reference.page_content
+                    if (!/^[a-zA-Z]+$/.test(s[0])) {
+                        s = s.slice(1);
+                    }
+                    count++;
+                    str += '<li class="search-result-list">';
+                    str += '<h3 class="search-result-title">' + reference.document_name + '</h3>';
+                    str += '<a href="' + reference.document_source + '" class="search-result-url">' + reference.document_source + '</a>';
+                    str += '<p class="search-result-snippet">' + s + '</p>';
+                    str += '</li>';
+
+                });
+                console.log(str);
+                // document.getElementById('search-result').innerHTML = '<h2>Search Results</h2>';
+                document.getElementById('slide-container').innerHTML = str;
+                // document.getElementById('search-result').innerHTML += '<p>Showing ' + count + ' results</p>';
+            } else {
+                // Handle the case when there are no search results
+                // document.getElementById('search-result').innerHTML = '<p>No search results found.</p>';
+            }
+        </script>
+    </div>
+
+ {{/ layout}}
