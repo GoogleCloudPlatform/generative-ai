@@ -94,6 +94,7 @@
 ^\Qgemini/use-cases/healthcare/react_gemini_healthcare_api.ipynb\E$
 ^\Qgemini/use-cases/intro_multimodal_use_cases.ipynb\E$
 ^\Qgemini/use-cases/retrieval-augmented-generation/intro_multimodal_rag.ipynb\E$
+^\Qgemini/use-cases/retail/product_attributes_extraction.ipynb\E$
 ^\Qlanguage/use-cases/document-qa/utils/__init__.py\E$
 ^\Qlanguage/use-cases/marketing-image-overlay/marketing_image_overlay.ipynb\E$
 ^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$

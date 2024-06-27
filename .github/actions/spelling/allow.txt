@@ -3,6 +3,7 @@ Adidas
 agentic
 AGG
 AGs
+ainvoke
 aip
 Aktu
 alloydb
@@ -12,6 +13,7 @@ Arborio
 Arepa
 Arsan
 Arxiv
+Ashish
 astype
 Autorater
 autosxs
@@ -49,12 +51,15 @@ colorway
 colwidth
 csa
 CZE
+D'orsay
 Dataform
 dataframe
 datname
 dbadmin
 dbln
 ddl
+deepeval
+DeepEval
 dente
 Depatmint
 descgen
@@ -81,6 +86,7 @@ fillmode
 Firestore
 Fishburne
 flac
+Flatform
 Flipkart
 forno
 FPDF
@@ -137,6 +143,7 @@ Jax
 Jedi
 jegadesh
 jupyter
+Kaelen
 Kaggle
 kaggle
 Kamradt
@@ -153,6 +160,7 @@ levelname
 lexer
 linalg
 linecolor
+Llion
 llm
 LLMs
 llms
@@ -182,6 +190,7 @@ owlbot
 paleo
 pancetta
 parcoords
+Parmar
 payslip
 paystub
 pdfminer
@@ -210,6 +219,8 @@ QPM
 qubit
 qubits
 ragdemos
+ragas
+RAGAS
 ramen
 ratelimit
 ribeye
@@ -227,6 +238,7 @@ Selam
 selectbox
 sentenc
 SEO
+Shazeer
 showlakes
 showland
 showor
@@ -237,17 +249,20 @@ sklearn
 sku
 SKUs
 SNB
+SPII
 ssd
 ssh
 ssn
 SSRF
 STIX
+Strappy
 streamlit
 sytem
 tagline
 tfhub
 tgz
 thelook
+Tianli
 tiktoken
 timechart
 toself
@@ -263,6 +278,9 @@ urandom
 Urs
 username
 usernames
+Uszkoreit
+Vaswani
+vectordb
 vertexai
 VMs
 websites
