@@ -1,5 +1,5 @@
-from typing import List, Union
 import os
+from typing import List, Union
 
 import streamlit as st
 import vertexai
