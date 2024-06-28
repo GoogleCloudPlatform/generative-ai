@@ -93,7 +93,7 @@ with tab1:
         "Select Gemini Model:",
         [gemini_15_flash, gemini_15_pro],
         format_func=get_model_name,
-        key="selected_model",
+        key="selected_model_story",
         horizontal=True,
     )
 
@@ -196,7 +196,7 @@ with tab2:
         "Select Gemini Model:",
         [gemini_15_flash, gemini_15_pro],
         format_func=get_model_name,
-        key="selected_model",
+        key="selected_model_marketing",
         horizontal=True,
     )
 
@@ -308,7 +308,7 @@ with tab3:
         "Select Gemini Model:",
         [gemini_15_flash, gemini_15_pro],
         format_func=get_model_name,
-        key="selected_model",
+        key="selected_model_image",
         horizontal=True,
     )
 
@@ -584,7 +584,7 @@ with tab4:
         "Select Gemini Model:",
         [gemini_15_flash, gemini_15_pro],
         format_func=get_model_name,
-        key="selected_model",
+        key="selected_model_video",
         horizontal=True,
     )
 
