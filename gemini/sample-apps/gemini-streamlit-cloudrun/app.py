@@ -67,7 +67,9 @@ def get_gemini_response(
 
 
 def get_model_name(model: GenerativeModel) -> str:
-    return model._model_name
+    """Get Gemini Model Name"""
+    model_name = model._model_name.replace("publishers/google/models/", "")
+    return f"`{model_name}`"
 
 
 def get_storage_url(gcs_uri: str) -> str:
