@@ -68,7 +68,9 @@ def get_gemini_response(
 
 def get_model_name(model: GenerativeModel) -> str:
     """Get Gemini Model Name"""
-    model_name = model._model_name.replace("publishers/google/models/", "")
+    model_name = model._model_name.replace(  # pylint: disable=protected-access"
+        "publishers/google/models/", ""
+    )
     return f"`{model_name}`"
 
 
@@ -182,10 +184,7 @@ with tab1:
                     st.write(response)
             with first_tab2:
                 st.text(
-                    f"""Parameters:
-                        - Temperature: `{temperature}`
-                        - Max Output Tokens: `{max_output_tokens}`
-                        """
+                    f"""Parameters:\n- Temperature: {temperature}\n- Max Output Tokens: {max_output_tokens}\n"""
                 )
                 st.text(prompt)
 
