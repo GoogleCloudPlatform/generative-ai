@@ -32,7 +32,7 @@ To run the Streamlit Application locally (on Cloud Shell), we need to perform th
 2. Your application requires access to two environment variables:
 
    - `GCP_PROJECT` : This the Google Cloud project ID.
-   - `GCP_REGION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
+   - `GCP_REGION` : This is the region in which you are deploying your Cloud Run app. For example, `us-central1`.
 
    These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region. The specific code line from the `app.py`
    function is shown here:

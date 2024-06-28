@@ -25,7 +25,9 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 @st.cache_resource
 def load_models() -> Tuple[GenerativeModel, GenerativeModel]:
     """Load Gemini 1.5 Flash and Pro models."""
-    return GenerativeModel("gemini-1.5-flash"), GenerativeModel("gemini-1.5-pro")
+    return GenerativeModel("gemini-1.5-flash-001"), GenerativeModel(
+        "gemini-1.5-pro-001"
+    )
 
 
 def get_gemini_response(
@@ -51,6 +53,9 @@ def get_gemini_response(
         stream=stream,
     )
 
+    if not stream:
+        return responses.text
+
     final_response = []
     for r in responses:
         try:
@@ -74,7 +79,7 @@ tab1, tab2, tab3, tab4 = st.tabs(
 )
 
 with tab1:
-    st.write("Using Gemini 1.5 Flash - Text only model")
+    st.write("Using Gemini 1.5 Flash - Multimodal model")
     st.subheader("Generate a story")
 
     # Story premise
