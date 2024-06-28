@@ -66,6 +66,10 @@ def get_gemini_response(
     return " ".join(final_response)
 
 
+def get_model_name(model: GenerativeModel) -> str:
+    return model._model_name
+
+
 def get_storage_url(gcs_uri: str) -> str:
     """Convert a GCS URI to a storage URL."""
     return "https://storage.googleapis.com/" + gcs_uri.split("gs://")[1]
@@ -79,9 +83,15 @@ tab1, tab2, tab3, tab4 = st.tabs(
 )
 
 with tab1:
-    st.write("Using Gemini 1.5 Flash - Multimodal model")
     st.subheader("Generate a story")
 
+    gemini_model = st.radio(
+        "Gemini Model: \n\n",
+        [gemini_15_flash, gemini_15_pro],
+        key="gemini_model",
+        horizontal=True,
+        format_func=get_model_name,
+    )
     # Story premise
     character_name = st.text_input(
         "Enter character name: \n\n", key="character_name", value="Mittens"
@@ -148,11 +158,13 @@ with tab1:
     generate_t2t = st.button("Generate my story", key="generate_t2t")
     if generate_t2t and prompt:
         # st.write(prompt)
-        with st.spinner("Generating your story using Gemini 1.5 Flash ..."):
+        with st.spinner(
+            f"Generating your story using {get_model_name(gemini_model)} ..."
+        ):
             first_tab1, first_tab2 = st.tabs(["Story", "Prompt"])
             with first_tab1:
                 response = get_gemini_response(
-                    gemini_15_flash,
+                    gemini_model,
                     prompt,
                     generation_config=config,
                 )
