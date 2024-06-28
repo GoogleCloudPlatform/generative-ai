@@ -4,7 +4,7 @@ This module demonstrates the usage of the Vertex AI Gemini 1.5 API within a Stre
 """
 
 import os
-from typing import List, Union, Tuple
+from typing import List, Tuple, Union
 
 import streamlit as st
 import vertexai
