@@ -82,21 +82,20 @@ def get_storage_url(gcs_uri: str) -> str:
 st.header("Vertex AI Gemini 1.5 API", divider="rainbow")
 gemini_15_flash, gemini_15_pro = load_models()
 
-# Select Gemini Model
-selected_model = st.sidebar.radio(
-    "Select Gemini Model:",
-    [gemini_15_flash, gemini_15_pro],
-    format_func=get_model_name,
-    key="selected_model",
-    horizontal=True,
-)
-
 tab1, tab2, tab3, tab4 = st.tabs(
     ["Generate story", "Marketing campaign", "Image Playground", "Video Playground"]
 )
 
 with tab1:
     st.subheader("Generate a story")
+
+    selected_model = st.radio(
+        "Select Gemini Model:",
+        [gemini_15_flash, gemini_15_pro],
+        format_func=get_model_name,
+        key="selected_model",
+        horizontal=True,
+    )
 
     # Story premise
     character_name = st.text_input(
@@ -192,6 +191,14 @@ with tab1:
 
 with tab2:
     st.subheader("Generate your marketing campaign")
+
+    selected_model = st.radio(
+        "Select Gemini Model:",
+        [gemini_15_flash, gemini_15_pro],
+        format_func=get_model_name,
+        key="selected_model",
+        horizontal=True,
+    )
 
     product_name = st.text_input(
         "What is the name of the product? \n\n", key="product_name", value="ZomZoo"
@@ -296,6 +303,14 @@ with tab2:
 
 with tab3:
     st.subheader("Image Playground")
+
+    selected_model = st.radio(
+        "Select Gemini Model:",
+        [gemini_15_flash, gemini_15_pro],
+        format_func=get_model_name,
+        key="selected_model",
+        horizontal=True,
+    )
 
     image_undst, screens_undst, diagrams_undst, recommendations, sim_diff = st.tabs(
         [
@@ -564,6 +579,14 @@ INSTRUCTIONS:
 
 with tab4:
     st.subheader("Video Playground")
+
+    selected_model = st.radio(
+        "Select Gemini Model:",
+        [gemini_15_flash, gemini_15_pro],
+        format_func=get_model_name,
+        key="selected_model",
+        horizontal=True,
+    )
 
     vide_desc, video_tags, video_highlights, video_geolocation = st.tabs(
         ["Video description", "Video tags", "Video highlights", "Video geolocation"]
