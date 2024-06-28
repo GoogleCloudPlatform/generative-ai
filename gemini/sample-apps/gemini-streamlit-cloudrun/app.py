@@ -68,7 +68,7 @@ def get_gemini_response(
 
 def get_model_name(model: GenerativeModel) -> str:
     """Get Gemini Model Name"""
-    model_name = model._model_name.replace(  # pylint: disable=protected-access"
+    model_name = model._model_name.replace(  # pylint: disable=protected-access
         "publishers/google/models/", ""
     )
     return f"`{model_name}`"
@@ -82,6 +82,15 @@ def get_storage_url(gcs_uri: str) -> str:
 st.header("Vertex AI Gemini 1.5 API", divider="rainbow")
 gemini_15_flash, gemini_15_pro = load_models()
 
+# Select Gemini Model
+selected_model = st.sidebar.radio(
+    "Select Gemini Model:",
+    [gemini_15_flash, gemini_15_pro],
+    format_func=get_model_name,
+    key="selected_model",
+    horizontal=True,
+)
+
 tab1, tab2, tab3, tab4 = st.tabs(
     ["Generate story", "Marketing campaign", "Image Playground", "Video Playground"]
 )
@@ -89,13 +98,6 @@ tab1, tab2, tab3, tab4 = st.tabs(
 with tab1:
     st.subheader("Generate a story")
 
-    gemini_model = st.radio(
-        "Gemini Model: \n\n",
-        [gemini_15_flash, gemini_15_pro],
-        key="gemini_model",
-        horizontal=True,
-        format_func=get_model_name,
-    )
     # Story premise
     character_name = st.text_input(
         "Enter character name: \n\n", key="character_name", value="Mittens"
@@ -170,12 +172,12 @@ with tab1:
     if generate_t2t and prompt:
         # st.write(prompt)
         with st.spinner(
-            f"Generating your story using {get_model_name(gemini_model)} ..."
+            f"Generating your story using {get_model_name(selected_model)} ..."
         ):
             first_tab1, first_tab2 = st.tabs(["Story", "Prompt"])
             with first_tab1:
                 response = get_gemini_response(
-                    gemini_model,
+                    selected_model,  # Use the selected model
                     prompt,
                     generation_config=config,
                 )
@@ -189,7 +191,6 @@ with tab1:
                 st.text(prompt)
 
 with tab2:
-    st.write("Using Gemini 1.5 Flash - Multimodal model")
     st.subheader("Generate your marketing campaign")
 
     product_name = st.text_input(
@@ -279,11 +280,11 @@ with tab2:
     if generate_t2t and prompt:
         second_tab1, second_tab2 = st.tabs(["Campaign", "Prompt"])
         with st.spinner(
-            "Generating your marketing campaign using Gemini 1.5 Flash ..."
+            f"Generating your marketing campaign using {get_model_name(selected_model)} ..."
         ):
             with second_tab1:
                 response = get_gemini_response(
-                    gemini_15_flash,
+                    selected_model,  # Use the selected model
                     prompt,
                     generation_config=config,
                 )
@@ -294,7 +295,8 @@ with tab2:
                 st.text(prompt)
 
 with tab3:
-    st.write("Using Gemini 1.5 Pro - Multimodal model")
+    st.subheader("Image Playground")
+
     image_undst, screens_undst, diagrams_undst, recommendations, sim_diff = st.tabs(
         [
             "Furniture recommendation",
@@ -377,8 +379,10 @@ with tab3:
         )
         with tab1:
             if generate_image_description and content:
-                with st.spinner("Generating recommendation using Gemini 1.5 Pro ..."):
-                    response = get_gemini_response(gemini_15_pro, content)
+                with st.spinner(
+                    f"Generating recommendation using {get_model_name(selected_model)} ..."
+                ):
+                    response = get_gemini_response(selected_model, content)
                     st.markdown(response)
         with tab2:
             st.write("Prompt used:")
@@ -408,9 +412,11 @@ If instructions include buttons, also explain where those buttons are physically
         )
         with tab1:
             if generate_instructions_description and prompt:
-                with st.spinner("Generating instructions using Gemini 1.5 Pro..."):
+                with st.spinner(
+                    f"Generating instructions using {get_model_name(selected_model)}..."
+                ):
                     response = get_gemini_response(
-                        gemini_15_pro, [stove_screen_img, prompt]
+                        selected_model, [stove_screen_img, prompt]
                     )
                     st.markdown(response)
         with tab2:
@@ -438,7 +444,9 @@ If instructions include buttons, also explain where those buttons are physically
         with tab1:
             if er_diag_img_description and prompt:
                 with st.spinner("Generating..."):
-                    response = get_gemini_response(gemini_15_pro, [er_diag_img, prompt])
+                    response = get_gemini_response(
+                        selected_model, [er_diag_img, prompt]
+                    )
                     st.markdown(response)
         with tab2:
             st.write("Prompt used:")
@@ -500,8 +508,10 @@ If instructions include buttons, also explain where those buttons are physically
         )
         with tab1:
             if compare_img_description and content:
-                with st.spinner("Generating recommendations using Gemini 1.5 Pro..."):
-                    response = get_gemini_response(gemini_15_pro, content)
+                with st.spinner(
+                    f"Generating recommendations using {get_model_name(selected_model)}..."
+                ):
+                    response = get_gemini_response(selected_model, content)
                     st.markdown(response)
         with tab2:
             st.write("Prompt used:")
@@ -541,10 +551,10 @@ INSTRUCTIONS:
         with tab1:
             if math_image_description and prompt:
                 with st.spinner(
-                    "Generating answers for formula using Gemini 1.5 Pro..."
+                    f"Generating answers for formula using {get_model_name(selected_model)}..."
                 ):
                     response = get_gemini_response(
-                        gemini_15_pro, [math_image_img, prompt]
+                        selected_model, [math_image_img, prompt]
                     )
                     st.markdown(response)
                     st.markdown("\n\n\n")
@@ -553,7 +563,7 @@ INSTRUCTIONS:
             st.text(prompt)
 
 with tab4:
-    st.write("Using Gemini 1.5 Pro - Multimodal model")
+    st.subheader("Video Playground")
 
     vide_desc, video_tags, video_highlights, video_geolocation = st.tabs(
         ["Video description", "Video tags", "Video highlights", "Video geolocation"]
@@ -582,10 +592,10 @@ with tab4:
             with tab1:
                 if vide_desc_description and prompt:
                     with st.spinner(
-                        "Generating video description using Gemini 1.5 Pro ..."
+                        f"Generating video description using {get_model_name(selected_model)} ..."
                     ):
                         response = get_gemini_response(
-                            gemini_15_pro, [prompt, vide_desc_img]
+                            selected_model, [prompt, vide_desc_img]
                         )
                         st.markdown(response)
                         st.markdown("\n\n\n")
@@ -618,10 +628,10 @@ with tab4:
             with tab1:
                 if video_tags_description and prompt:
                     with st.spinner(
-                        "Generating video description using Gemini 1.5 Pro ..."
+                        f"Generating video description using {get_model_name(selected_model)} ..."
                     ):
                         response = get_gemini_response(
-                            gemini_15_pro, [prompt, video_tags_img]
+                            selected_model, [prompt, video_tags_img]
                         )
                         st.markdown(response)
                         st.markdown("\n\n\n")
@@ -656,10 +666,10 @@ Provide the answer in table format.
             with tab1:
                 if video_highlights_description and prompt:
                     with st.spinner(
-                        "Generating video highlights using Gemini 1.5 Pro ..."
+                        f"Generating video highlights using {get_model_name(selected_model)} ..."
                     ):
                         response = get_gemini_response(
-                            gemini_15_pro, [prompt, video_highlights_img]
+                            selected_model, [prompt, video_highlights_img]
                         )
                         st.markdown(response)
                         st.markdown("\n\n\n")
@@ -704,10 +714,10 @@ Provide the answer in table format.
             with tab1:
                 if video_geolocation_description and prompt:
                     with st.spinner(
-                        "Generating location tags using Gemini 1.5 Pro ..."
+                        f"Generating location tags using {get_model_name(selected_model)} ..."
                     ):
                         response = get_gemini_response(
-                            gemini_15_pro, [prompt, video_geolocation_img]
+                            selected_model, [prompt, video_geolocation_img]
                         )
                         st.markdown(response)
                         st.markdown("\n\n\n")
