@@ -104,7 +104,7 @@ with tab1:
     character_persona = st.text_input(
         "What personality does the character have? \n\n",
         key="character_persona",
-        value="Mitten is a very friendly cat.",
+        value="Mittens is a very friendly cat.",
     )
     character_location = st.text_input(
         "Where does the character live? \n\n",
@@ -144,6 +144,11 @@ with tab1:
     else:
         temperature = 0.95
 
+    if length_of_story == "Short":
+        max_output_tokens = 2048
+    else:
+        max_output_tokens = 8192
+
     prompt = f"""Write a {length_of_story} story based on the following premise: \n
     character_name: {character_name} \n
     character_type: {character_type} \n
@@ -155,7 +160,9 @@ with tab1:
     First start by giving the book introduction, chapter introductions and then each chapter. It should also have a proper ending.
     The book should have prologue and epilogue.
     """
-    config = GenerationConfig(temperature=temperature, max_output_tokens=2048)
+    config = GenerationConfig(
+        temperature=temperature, max_output_tokens=max_output_tokens
+    )
 
     generate_t2t = st.button("Generate my story", key="generate_t2t")
     if generate_t2t and prompt:
@@ -174,6 +181,12 @@ with tab1:
                     st.write("Your story:")
                     st.write(response)
             with first_tab2:
+                st.text(
+                    f"""Parameters:
+                        - Temperature: `{temperature}`
+                        - Max Output Tokens: `{max_output_tokens}`
+                        """
+                )
                 st.text(prompt)
 
 with tab2:
