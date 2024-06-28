@@ -17,7 +17,7 @@ Sample screenshots and video demos of the application are shown below:
 > NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
 > Additionally, ensure that you have cloned this repository and you are currently in the `gemini-streamlit-cloudrun` folder. This should be your active working directory for the rest of the commands.
 
-To run the Streamlit Application locally (on cloud shell), we need to perform the following steps:
+To run the Streamlit Application locally (on Cloud Shell), we need to perform the following steps:
 
 1. Setup the Python virtual environment and install the dependencies:
 
@@ -41,7 +41,7 @@ To run the Streamlit Application locally (on cloud shell), we need to perform th
    In Cloud Shell, execute the following commands:
 
    ```bash
-   export GCP_PROJECT='<Your GCP Project Id>'  # Change this
+   export GCP_PROJECT='<Your GCP Project ID>'  # Change this
    export GCP_REGION='us-central1'             # If you change this, make sure the region is supported.
    ```
 
@@ -78,7 +78,7 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
    In Cloud Shell, execute the following commands:
 
    ```bash
-   export GCP_PROJECT='<Your GCP Project Id>'  # Change this
+   export GCP_PROJECT='<Your GCP Project ID>'  # Change this
    export GCP_REGION='us-central1'             # If you change this, make sure the region is supported.
    ```
 

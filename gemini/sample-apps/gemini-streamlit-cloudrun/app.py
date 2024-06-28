@@ -1,5 +1,10 @@
+# pylint: disable=line-too-long,invalid-name
+"""
+This module demonstrates the usage of the Vertex AI Gemini 1.5 API within a Streamlit application.
+"""
+
 import os
-from typing import List, Union
+from typing import List, Union, Tuple
 
 import streamlit as st
 import vertexai
@@ -11,22 +16,16 @@ from vertexai.generative_models import (
     Part,
 )
 
-PROJECT_ID = os.environ.get("GCP_PROJECT")  # Your Google Cloud Project ID
-LOCATION = os.environ.get("GCP_REGION")  # Your Google Cloud Project Region
+PROJECT_ID = os.environ.get("GCP_PROJECT")
+LOCATION = os.environ.get("GCP_REGION")
+
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 
 @st.cache_resource
-def load_models():
-    """
-    Load the generative models for Gemini 1.5 Flash and Pro.
-
-    Returns:
-        Tuple: A tuple containing the Flash Model and Pro Model.
-    """
-    gemini_15_flash = GenerativeModel("gemini-1.5-flash")
-    gemini_15_pro = GenerativeModel("gemini-1.5-pro")
-    return gemini_15_flash, gemini_15_pro
+def load_models() -> Tuple[GenerativeModel, GenerativeModel]:
+    """Load Gemini 1.5 Flash and Pro models."""
+    return GenerativeModel("gemini-1.5-flash"), GenerativeModel("gemini-1.5-pro")
 
 
 def get_gemini_response(
@@ -36,7 +35,8 @@ def get_gemini_response(
         temperature=0.1, max_output_tokens=2048
     ),
     stream: bool = True,
-):
+) -> str:
+    """Generate a response from the Gemini model."""
     safety_settings = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
@@ -54,16 +54,15 @@ def get_gemini_response(
     final_response = []
     for r in responses:
         try:
-            # st.write(response.text)
             final_response.append(r.text)
         except IndexError:
-            # st.write(response)
             final_response.append("")
             continue
     return " ".join(final_response)
 
 
 def get_storage_url(gcs_uri: str) -> str:
+    """Convert a GCS URI to a storage URL."""
     return "https://storage.googleapis.com/" + gcs_uri.split("gs://")[1]
 
 
