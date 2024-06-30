@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: fixmycar-frontend
-          image: us-central1-docker.pkg.dev/cpet-sandbox/fixmycar/frontend-vertex-ai-search:latest
+          image: us-central1-docker.pkg.dev/PROJECT_ID/fixmycar/frontend:latest
           imagePullPolicy: Always
           env:
             - name: BACKEND_URL

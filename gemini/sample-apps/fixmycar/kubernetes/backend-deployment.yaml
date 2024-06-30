@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: fixmycar-backend
-          image: us-central1-docker.pkg.dev/cpet-sandbox/fixmycar/backend-vertex-ai-search:latest
+          image: us-central1-docker.pkg.dev/PROJECT_ID/fixmycar/backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3100
@@ -28,7 +28,7 @@ spec:
             - name: LOG_LEVEL
               value: "debug"
             - name: GCP_PROJECT_ID
-              value: "cpet-sandbox"
+              value: "PROJECT_ID"
             - name: VERTEX_AI_DATASTORE_ID
-              value: "cpet-sandbox-fixmycar-ds"
+              value: "DATASTORE_ID"
       serviceAccountName: fixmycar
