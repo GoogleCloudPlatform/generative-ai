@@ -1,6 +1,6 @@
 # FixMyCar 
 
-FixMyCar is a retrieval-augmented generation (RAG) sample application, powered by Google Cloud, including: Gemini on Vertex AI, Vertex AI Agent Builder (fka Vertex AI Search), Google Kubernetes Engine (GKE), Java (Spring), and Python (Streamlit). This doc guides you through deploying this app to your Google Cloud project.
+FixMyCar is a retrieval-augmented generation (RAG) sample application, powered by Google Cloud, including: Gemini on Vertex AI, Vertex AI Agent Builder, Google Kubernetes Engine (GKE), Java (Spring), and Python (Streamlit). This doc guides you through deploying this app to your Google Cloud project.
 
 ![](images/architecture.png)
 
@@ -141,7 +141,7 @@ Operation completed over 10 objects/156.6 MiB.
 
 ## Set up Vertex AI Agent Builder
 
-You will store the Cymbal Starlight 2024 owner's manual in a Vertex AI Agent Builder (fka Vertex AI Search) data store. This will allow you to search the manual's contents using natural language queries.
+You will store the Cymbal Starlight 2024 owner's manual in a Vertex AI Agent Builder data store. This will allow you to search the manual's contents using natural language queries.
 
 1. Open the Cloud Console and search for "Agent Builder." Open the console page. If prompted, click **Activate API.**
 
