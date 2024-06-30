@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: fixmycar-frontend
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: fixmycar-frontend
   ports:

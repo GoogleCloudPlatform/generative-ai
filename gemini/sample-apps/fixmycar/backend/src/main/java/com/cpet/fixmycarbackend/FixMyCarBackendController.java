@@ -123,7 +123,7 @@ public class FixMyCarBackendController {
     logger.info("🔮 Gemini Prompt: " + geminiPrompt);
 
     String geminiLocation = "us-central1";
-    String modelName = "gemini-pro";
+    String modelName = "gemini-1.5-flash-001";
     try {
       VertexAI vertexAI = new VertexAI(projectId, geminiLocation);
       GenerateContentResponse response;
