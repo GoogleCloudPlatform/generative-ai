@@ -17,6 +17,7 @@
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/reasoning-engine                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/photo-discovery           @kazunori279 @KhanhNwin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions @shanecglass @GoogleCloudPlatform/generative-ai-devrel
