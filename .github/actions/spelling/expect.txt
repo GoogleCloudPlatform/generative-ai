@@ -131,7 +131,6 @@ cloudfunction
 cloudkms
 cloudresourcemanager
 cloudrun
-CLOUDSQL
 cloudsql
 cloudveil
 cmap
@@ -141,7 +140,6 @@ codefile
 codelab
 CODEOWNERS
 coderag
-Codey
 codey
 colab
 Collider
@@ -177,7 +175,6 @@ d'une
 dans
 danza
 darkgrid
-Dataform
 dataform
 dataframe
 datapoints
@@ -274,7 +271,6 @@ etils
 euch
 EUR
 evals
-Eventarc
 eventarc
 exercer
 expl
@@ -292,7 +288,6 @@ fillmode
 fillna
 finall
 firebaserc
-Firestore
 firestore
 Fishburne
 fixmycar
@@ -548,7 +543,6 @@ Nakoso
 nanswer
 Narnia
 nas
-natevily
 naturels
 nazione
 nbconvert
@@ -577,7 +571,6 @@ nuisibles
 nuit
 nvidia
 Nyquil
-occured
 ocr
 ODb
 OLAP
@@ -623,7 +616,6 @@ photorealistic
 Pichai
 pii
 pincodes
-Pixmap
 pixmap
 pkl
 plac
@@ -637,7 +629,6 @@ plt
 poissons
 posargs
 posso
-postgre
 postgres
 postgresql
 pourvu
@@ -735,7 +726,6 @@ Selam
 selfie
 selon
 sentenc
-SEO
 seo
 seperate
 serait
@@ -808,7 +798,6 @@ Tast
 templatefile
 temurin
 tensorboard
-Tensorflow
 tensorflow
 terraform
 testutils
