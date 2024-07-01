@@ -155,7 +155,6 @@ tmp*
 npm-debug.log
 yarn-error.log
 
-
 # IDEs and editors
 .idea/
 .project
@@ -186,3 +185,4 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+*.vscode*
