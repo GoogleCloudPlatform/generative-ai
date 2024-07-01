@@ -21,3 +21,5 @@ Debugging and Optimizing Agents: A Guide to Tracing in Reasoning Engine | [traci
 Building a Conversational Search Agent with Reasoning Engine and RAG on Vertex AI Search | [tutorial_vertex_ai_search_rag_agent.ipynb](tutorial_vertex_ai_search_rag_agent.ipynb)
 Building and Deploying a Google Maps API Agent with Reasoning Engine | [tutorial_google_maps_agent.ipynb](tutorial_google_maps_agent.ipynb)
 Building and Deploying a LangGraph Application with Reasoning Engine in Vertex AI | [tutorial_langgraph.ipynb](tutorial_langgraph.ipynb)
+Deploying a RAG Application with AlloyDB with Reasoning Engine | [tutorial_alloydb_rag_agent.ipynb]
+Deploying a RAG Application with Cloud SQL for PostgreSQL with Reasoning Engine | [tutorial_cloud_sql_pg_rag_agent.ipynb]
