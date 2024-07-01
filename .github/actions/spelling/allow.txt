@@ -179,6 +179,7 @@ memes
 metadatas
 mpe
 mpld
+MVNW
 nas
 nbconvert
 nbformat
@@ -287,6 +288,7 @@ Vaswani
 vectordb
 vertexai
 VMs
+WDIR
 websites
 Wehn
 welcom
