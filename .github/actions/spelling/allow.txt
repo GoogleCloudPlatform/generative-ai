@@ -1,8 +1,12 @@
+aadd
 aaxis
 Adidas
+aexecute
+afrom
 agentic
 AGG
 AGs
+ainit
 ainvoke
 aip
 Aktu
