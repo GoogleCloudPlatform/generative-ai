@@ -25,22 +25,28 @@ like LangChain, PromptFlow, Breadboard, etc.
 
 import html
 import json
+import os
 import re
 
 # https://cloud.google.com/functions/docs/samples/functions-http-content
 import functions_framework
+from dotenv import load_dotenv
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine_v1alpha as discoveryengine
 from proto import Message
 
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables, you must set these in .env
+project_id = os.getenv("PROJECT_ID")
+location = os.getenv("LOCATION")
+data_store_id = os.getenv("DATA_STORE_ID")
+
 # Use Vertex AI Search API to find relevant docs for searches & sumamrize them.
 # https://cloud.google.com/python/docs/reference/discoveryengine/latest
 # https://cloud.google.com/generative-ai-app-builder/docs/libraries
-
-# Your Vertex AI Search config
-project_id = "YOUR_PROJECT_ID"  # alphanumeric
-location = "global"  # or an alternate location
-data_store_id = "YOUR_DATA_STORE_ID"  # not the app id, alphanumeric
 
 
 def get_document_info(search_result_dict):
