@@ -60,7 +60,7 @@ def search_public_kg(
 
 def get_entities(response: ekg.SearchPublicKgResponse) -> List:
     """
-    Extract Entitities from Knowledge Graph Response
+    Extract Entities from Knowledge Graph Response
     """
     item_list_element = ekg.SearchPublicKgResponse.to_dict(response)[
         "item_list_element"

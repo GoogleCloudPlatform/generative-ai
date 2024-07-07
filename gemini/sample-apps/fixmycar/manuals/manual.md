@@ -218,7 +218,7 @@ The following safety warning lights may illuminate in the instrument cluster of 
   - A leak in the ABS hydraulic system
 - **Traction control warning light:** The traction control warning light indicates a problem with the vehicle's traction control system. This light may illuminate for a variety of reasons, including:
   - A faulty traction control sensor
-  - A problem with the traction control control module
+  - A problem with the traction control module
   - A loss of traction
 
 **Other Warning Lights**
@@ -478,7 +478,7 @@ The following safety warning lights may illuminate in the instrument cluster of 
   - A leak in the ABS hydraulic system
 - **Traction control warning light:** The traction control warning light indicates a problem with the vehicle's traction control system. This light may illuminate for a variety of reasons, including:
   - A faulty traction control sensor
-  - A problem with the traction control control module
+  - A problem with the traction control module
   - A loss of traction
 
 **Other Warning Lights**

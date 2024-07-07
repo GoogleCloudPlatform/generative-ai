@@ -34,25 +34,25 @@ You can simply drop that file into the `$PROJECT_ID-docs` bucket in GCS to kick 
 
 1. Write the generated results to the `investments` table in AlloyDB.
 
-The data for the `RDYE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
+The data for the `RYDE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
 
 > NOTE: You can explore the application and document data yourself by logging into pgAdmin as described in the [Back End Demo Walkthrough](../walkthroughs/backend-demo-walkthrough.md) guide.
 
 1. Document chunks in the `langchain_vector_store` table:
 
-    ![Document Chunks](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/2-document-chunks.png "Document Chunks")
+   ![Document Chunks](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/2-document-chunks.png "Document Chunks")
 
 1. Generated `overview` and embeddings in the `investments` table:
 
-    ![Overview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/3-overview.png "Overview")
+   ![Overview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/3-overview.png "Overview")
 
 1. Summary of buy ratings for > 8500 tickers in `investments` table:
 
-    ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
+   ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
 
-1. User profile data, including bios and embedings.
+1. User profile data, including bios and embeddings.
 
-    ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
+   ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
 
 So now that you've extracted all of this useful data from your prospectus, how can you use it to improve your existing Advisory Services software? Let's explore a few use cases in the GenWealth UI.
 
@@ -61,7 +61,7 @@ So now that you've extracted all of this useful data from your prospectus, how c
 Access the GenWealth Advisory Services UI by navigating to the Cloud Run endpoint you provisioned earlier with the [`install.sh`](../install.sh) script. You can retrieve the URL by running the following command in Cloud Shell.
 
 ```bash
-cd && cd gemini/sample-apps/genwealth/
+cd && cd generative-ai/gemini/sample-apps/genwealth/
 source ./env.sh
 gcloud run services describe genwealth --platform managed --region $REGION --format 'value(status.url)' --project $PROJECT_ID
 ```
@@ -148,7 +148,7 @@ Navigate to the **Ask** interface and click the **Advanced** toggle. Click the a
 
 Click **Ask** and review the result. It should look similar to the output below.
 
-> NOTE: Your results may vary slightly due to the dyanamic nature of Gen AI text completion models.
+> NOTE: Your results may vary slightly due to the dynamic nature of Gen AI text completion models.
 
 ![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/17-emailresult.png "Donya Bartle")
 
@@ -161,7 +161,7 @@ Copy/paste the following email into the prompt, and update the User ID to `638`.
 ```text
 Hi Paul,
 
-I just heard about your new Bitcoin ETF. Do you think I should move some money out of my index funds and into that ETF? 
+I just heard about your new Bitcoin ETF. Do you think I should move some money out of my index funds and into that ETF?
 
 Thanks,
 Geoffrey Follmer
@@ -177,7 +177,7 @@ If you work in financial services, you know that chatbots aren't allowed to prov
 
 1. You will add response restrictions that instruct the model not to give financial advice.
 
-1. While the response restirctions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
+1. While the response restrictions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
 
 Update your inputs as shown in the screenshot below, and review the results.
 
@@ -191,7 +191,7 @@ Finally, imagine you're now a Financial Analyst, and you want to ask natural lan
 
 Navigate to the **Research** tab. Select a ticker and ask a natural language question like, "How will the IPO proceeds be used?".
 
-Notice that this interface shows two results. On the left-hand side, you see a response generated by Vertex AI Search and Conversation - the easiest way to get started with document processing and understanding. On the right-hand side, you see a response that's directly querying the database and answering the question with Gemini. There are pros and cons to each approach, and you can use both together based on your use case.
+Notice that this interface shows two results. On the left-hand side, you see a response generated by Vertex AI Agent Builder - the easiest way to get started with document processing and understanding. On the right-hand side, you see a response that's directly querying the database and answering the question with Gemini. There are pros and cons to each approach, and you can use both together based on your use case.
 
 ## Summary
 
