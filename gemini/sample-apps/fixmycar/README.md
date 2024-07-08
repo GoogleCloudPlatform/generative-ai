@@ -272,7 +272,7 @@ fixmycar-frontend   LoadBalancer   <ip-value>       <ip-value>      80:30519/TCP
 
 4. Test a chat prompt based on an existing item in the Cymbal Starlight owner's manual.
 
-For instance, you can ask again about the max cargo capacity of the vehicle. This text is in our Vertex data store, so our app should be able to find this info for us.
+For instance, you can ask again about the max cargo capacity of the vehicle. This text is in our Vertex AI data store, so our app should be able to find this info for us.
 
 ![](images/cargo-manual.png)
 

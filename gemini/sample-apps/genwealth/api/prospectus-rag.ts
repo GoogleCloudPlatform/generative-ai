@@ -45,7 +45,7 @@ export class ProspectusRag {
         
         if (!region) throw new Error('Missing REGION env variable.');
 
-        // Initialize Vertex with your Cloud project and location       
+        // Initialize Vertex AI with your Cloud project and location       
         const vertex_ai = new VertexAI({project: projectId, location: region});
         const model = process.env['RAG_MODEL'] ?? 'gemini-1.0-pro-001';
     

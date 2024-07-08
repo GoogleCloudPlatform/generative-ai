@@ -1,4 +1,4 @@
-# Use Non-Vertex LLMs
+# Use Non-Vertex AI LLMs
 
 AlloyDB Omni supports registering non-vertex AI models and invoking predictions with [Model endpoint management](https://cloud.google.com/alloydb/docs/ai/model-endpoint-overview) in AlloyDB. Follow the steps below to use your preferred model for embeddings and text completion.
 
@@ -60,7 +60,7 @@ Use pgAdmin to connect to the `ragdemos` database in your new AlloyDB Omni clust
     SELECT pg_reload_conf();
     ```
 
-1. Register the Vertex embedding model for backward compatibility.
+1. Register the Vertex AI embedding model for backward compatibility.
 
     ```sql
     CALL google_ml.create_model (

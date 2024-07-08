@@ -1,4 +1,4 @@
-"""Vertex Matching Engine implementation of the vector store."""
+"""Vertex AI Matching Engine implementation of the vector store."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ logger = logging.getLogger()
 
 
 class MatchingEngine(VectorStore):
-    """Vertex Matching Engine implementation of the vector store.
+    """Vertex AI Matching Engine implementation of the vector store.
 
     While the embeddings are stored in the Matching Engine, the embedded
     documents will be stored in GCS.
@@ -49,7 +49,7 @@ class MatchingEngine(VectorStore):
         gcs_bucket_name: str,
         credentials: Credentials = None,
     ):
-        """Vertex Matching Engine implementation of the vector store.
+        """Vertex AI Matching Engine implementation of the vector store.
 
         While the embeddings are stored in the Matching Engine, the embedded
         documents will be stored in GCS.
