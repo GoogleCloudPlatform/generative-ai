@@ -198,6 +198,9 @@
 # Should be `Gemini Version Size` (e.g. `Gemini 1.0 Pro`)
 \bGemini\s(Pro|Flash|Ultra)\s?\d?\.?\d?\b
 
+# Don't say "Powered by Gemini", instead say "with Gemini"
+\b[Pp]owered\sby\s[Gg]emini\b
+
 # Should be BigQuery
 \b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
 
