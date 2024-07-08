@@ -197,3 +197,12 @@
 
 # Should be `Gemini Number Type` (e.g. `Gemini 1.0 Pro`)
 \bGemini\s\w*\s\d\.\d\b
+
+# Should be BigQuery
+\b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
+
+# Should be Python
+\bpython\b
+
+# Should be DataFrame
+\b(?!DataFrame\b)[Dd]ata\s?[Ff]rame\b
