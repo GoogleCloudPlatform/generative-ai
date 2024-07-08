@@ -195,8 +195,8 @@
 # Should be Gemini
 \bgemini\s
 
-# Should be `Gemini Number Type` (e.g. `Gemini 1.0 Pro`)
-\bGemini\s\w*\s\d\.\d\b
+# Should be `Gemini Version Size` (e.g. `Gemini 1.0 Pro`)
+\bGemini\s(Pro|Flash|Ultra)\s?\d?\.?\d?\b
 
 # Should be BigQuery
 \b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
@@ -212,3 +212,15 @@
 
 # Should be DeepMind
 \b(?!DeepMind\b)[Dd]eep\s?[Mm]ind\b
+
+# Should be TensorFlow
+\b(?!TensorFlow\b)(?!tensorflow\b)[Tt]ensor\s?[Ff]low\b
+
+# Should be AlloyDB
+\b(?!AlloyDB\b)(?!alloydb\b)[Aa]lloy\s?[Dd]\s?[Bb]\b
+
+# Should be Translation API
+\bTranslate\s?API\b
+
+# Should be Dialogflow
+\bDialogFlow\b
