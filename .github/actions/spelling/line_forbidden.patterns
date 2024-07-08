@@ -201,6 +201,9 @@
 # Don't say "Powered by Gemini", instead say "with Gemini"
 \b[Pp]owered\sby\s[Gg]emini\b
 
+# Should be Imagen
+\simagen\s\w
+
 # Should be BigQuery
 \b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
 
