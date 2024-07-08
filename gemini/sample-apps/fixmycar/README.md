@@ -181,7 +181,7 @@ You will store the Cymbal Starlight 2024 owner's manual in a Vertex AI Agent Bui
 
 ## Set up GKE auth to Vertex AI
 
-Your GKE-based backend server needs to access Vertex AI Agent Builder and Vertex AI's Gemini API. To do this, we'll map the Kubernetes service account used by the backend pod, to a Google Cloud IAM service account with the right permissions. Here, the Kubernetes-to-GCP service account mapping provides the _authentication_ ("who are you?"), and the GCP service account's IAM roles provide _authorization_ ("what are you allowed to do?"). This setup is called [GKE Workload Identity.](https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
+Your GKE-based backend server needs to access Vertex AI Agent Builder and Vertex AI's Gemini API. To do this, we'll map the Kubernetes service account used by the backend pod, to a Google Cloud IAM service account with the right permissions. Here, the Kubernetes-to-GCP service account mapping provides the _authentication_ ("who are you?"), and the Google Cloud service account's IAM roles provide _authorization_ ("what are you allowed to do?"). This setup is called [GKE Workload Identity.](https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
 
 1. Run the setup script to configure auth.
 

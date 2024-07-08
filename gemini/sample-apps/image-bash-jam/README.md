@@ -253,7 +253,7 @@ There you go, the button IS the ANC button, I thought so! Thanks Gemini!
 
 This is the avatar I use in Google. I randomly asked this:
 
-![Alt text](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/ricc-logo.png "Riccardo GCP logo - taken in the Amsterdam office")
+![Alt text](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/ricc-logo.png "Riccardo Google Cloud logo - taken in the Amsterdam office")
 
 ```bash
 $ ./gemini-explain-image.sh images/ricc-logo.png

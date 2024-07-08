@@ -1,7 +1,7 @@
 import { Database } from "./database";
 import { VertexAI } from "@google-cloud/vertexai";
 
-/** Use retrieval augmented search of Prospectus using AlloyDb embeddings & Gemini Pro.
+/** Use retrieval augmented search of Prospectus using AlloyDB embeddings & Gemini Pro.
  */
 export class ProspectusRag {
 
@@ -80,7 +80,7 @@ export class ProspectusRag {
         console.log('using projectid', projectId);
 
         if (!projectId)
-            throw new Error("Unable to load project id from PROJECT_ID env variable or GCP metadata");
+            throw new Error("Unable to load project id from PROJECT_ID env variable or Google Cloud metadata");
 
         return projectId;
     }

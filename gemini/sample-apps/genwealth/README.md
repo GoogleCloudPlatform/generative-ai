@@ -106,7 +106,7 @@ The GenWealth demo application was built using:
 
 ### Database
 
-The application database (`ragdemos`) is hosted in GCP on AlloyDB, a high-performance, Enterprise-grade PostgreSQL database service.
+The application database (`ragdemos`) is hosted in Google Cloud on AlloyDB, a high-performance, Enterprise-grade PostgreSQL database service.
 
 > NOTE: For the purposes of the demo environment, the AlloyDB instance is provisioned as a Zonal instance to reduce cost. For production workloads, we strongly recommend enabling Regional availability.
 

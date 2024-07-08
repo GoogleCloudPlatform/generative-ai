@@ -74,7 +74,7 @@ class MatchingEngine(VectorStore):
             embedding the text sent. If none is sent, then the
             multilingual TensorFlow Universal Sentence Encoder will be used.
             gcs_client: The Google Cloud Storage client.
-            credentials (Optional): Created GCP credentials.
+            credentials (Optional): Created Google Cloud credentials.
         """
         super().__init__()
         self._validate_google_libraries_installation()
@@ -356,7 +356,7 @@ class MatchingEngine(VectorStore):
         """Takes the object creation out of the constructor.
 
         Args:
-            project_id: The GCP project id.
+            project_id: The Google Cloud project id.
             region: The default location making the API calls. It must have
             the same location as the GCS bucket and must be regional.
             gcs_bucket_name: The location where the vectors will be stored in
@@ -557,7 +557,7 @@ class MatchingEngine(VectorStore):
         """Configures the aiplatform library.
 
         Args:
-            project_id: The GCP project id.
+            project_id: The Google Cloud project id.
             region: The default location making the API calls. It must have
             the same location as the GCS bucket and must be regional.
             gcs_bucket_name: GCS staging location.
