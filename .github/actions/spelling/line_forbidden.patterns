@@ -188,3 +188,6 @@
 
 # Should be LlamaIndex
 \b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
+
+# Should be Vertex AI
+\b(?!Vertex AI\b)Vertex\s?[Aa]?[Ii]?\b
