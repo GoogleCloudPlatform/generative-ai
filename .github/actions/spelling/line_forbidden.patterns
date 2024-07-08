@@ -191,3 +191,9 @@
 
 # Should be Vertex AI
 \b(?!Vertex AI\b)Vertex\s?[Aa]?[Ii]?\b
+
+# Should be Gemini
+\bgemini\s
+
+# Should be `Gemini Number Type` (e.g. `Gemini 1.0 Pro`)
+\bGemini\s\w*\s\d\.\d\b
