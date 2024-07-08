@@ -193,7 +193,7 @@
 \b(?!Vertex AI\b)(?!.*[\(\)\{\}])(?<!import\s)(?<!\.)(?<!,\s)Vertex\s?[Aa]?[Ii]?\b
 
 # Should be Gemini
-\bgemini\s
+\sgemini\s\w
 
 # Should be `Gemini Version Size` (e.g. `Gemini 1.0 Pro`)
 \bGemini\s(Pro|Flash|Ultra)\s?\d?\.?\d?\b
