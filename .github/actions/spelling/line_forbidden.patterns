@@ -190,7 +190,7 @@
 \b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
 
 # Should be Vertex AI
-\b(?!Vertex AI\b)Vertex\s?[Aa]?[Ii]?\b
+\b(?!Vertex AI\b)(?!.*[\(\)\{\}])Vertex\s?[Aa]?[Ii]?\b
 
 # Should be Gemini
 \bgemini\s
