@@ -16,7 +16,7 @@
 # Base LLM for Deepeval
 from deepeval.models.base_model import DeepEvalBaseLLM
 
-# Langchain package for Vertex AI
+# LangChain package for Vertex AI
 from langchain_google_vertexai import ChatVertexAI
 
 

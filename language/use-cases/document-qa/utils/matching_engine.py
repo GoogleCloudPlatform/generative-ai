@@ -72,7 +72,7 @@ class MatchingEngine(VectorStore):
             ~:func:`MatchingEngine.from_components`.
             embedding: A :class:`Embeddings` that will be used for
             embedding the text sent. If none is sent, then the
-            multilingual Tensorflow Universal Sentence Encoder will be used.
+            multilingual TensorFlow Universal Sentence Encoder will be used.
             gcs_client: The Google Cloud Storage client.
             credentials (Optional): Created GCP credentials.
         """
