@@ -182,3 +182,9 @@
 
 # Should be `Gen AI`
 \b[gG]enAI\b
+
+# Should be LangChain
+\b(?!LangChain\b)[Ll]ang\s?[Cc]hain?\b
+
+# Should be LlamaIndex
+\b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
