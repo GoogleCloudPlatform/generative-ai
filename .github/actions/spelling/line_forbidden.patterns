@@ -184,7 +184,7 @@
 \b[gG]enAI\b
 
 # Should be LangChain
-\b(?!LangChain\b)[Ll]ang\s?[Cc]hain?\b
+\b(?!LangChain\b)(?!langchain\b)[Ll]ang\s?[Cc]hain?\b
 
 # Should be LlamaIndex
 \b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
@@ -206,3 +206,6 @@
 
 # Should be DataFrame
 \b(?!DataFrame\b)[Dd]ata\s?[Ff]rame\b
+
+# Should be Google Cloud
+\b[Gg][Cc][Pp]\b
