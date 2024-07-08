@@ -143,7 +143,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
 - Duet AI
   - [Cymbal Superstore](https://github.com/GoogleCloudPlatform/cymbal-superstore)
 - Cloud Databases
-  - [GenAI Databases Retrieval App](https://github.com/GoogleCloudPlatform/genai-databases-retrieval-app)
+  - [Gen AI Databases Retrieval App](https://github.com/GoogleCloudPlatform/genai-databases-retrieval-app)
 - Other
   - [ai-on-gke](https://github.com/GoogleCloudPlatform/ai-on-gke)
   - [ai-infra-cluster-provisioning](https://github.com/GoogleCloudPlatform/ai-infra-cluster-provisioning)
@@ -167,5 +167,3 @@ Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-a
 ## Disclaimer
 
 This repository itself is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
-
-Lang Chain

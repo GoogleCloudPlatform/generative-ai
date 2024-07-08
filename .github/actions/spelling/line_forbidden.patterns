@@ -209,3 +209,6 @@
 
 # Should be Google Cloud
 \b[Gg][Cc][Pp]\b
+
+# Should be DeepMind
+\b(?!DeepMind\b)[Dd]eep\s?[Mm]ind\b
