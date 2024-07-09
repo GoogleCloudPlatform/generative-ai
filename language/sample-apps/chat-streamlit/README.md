@@ -27,7 +27,7 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
    In Cloud Shell, execute the following commands:
 
    ```bash
-   export GCP_PROJECT='<Your GCP Project Id>'  # Change this
+   export GCP_PROJECT='<Your Google Cloud Project Id>'  # Change this
    export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
    ```
 

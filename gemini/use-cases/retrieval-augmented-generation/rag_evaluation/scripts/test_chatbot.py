@@ -33,7 +33,7 @@ custom_model_gemini = ChatVertexAI(
     response_validation=False,  # Important since deepeval cannot handle validation errors
 )
 
-# Initialize the Deepeval wrapper class
+# Initialize the DeepEval wrapper class
 google_vertexai_gemini_deepeval = GoogleVertexAIDeepEval(model=custom_model_gemini)
 
 # Evaluation set with questions and ground_truth
