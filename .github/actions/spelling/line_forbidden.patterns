@@ -182,3 +182,48 @@
 
 # Should be `Gen AI`
 \b[gG]enAI\b
+
+# Should be LangChain
+\b(?!LangChain\b)(?!langchain\b)[Ll]ang\s?[Cc]hain?\b
+
+# Should be LlamaIndex
+\b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
+
+# Should be Vertex AI
+\b(?!Vertex AI\b)Vertex\s?[Aa]?[Ii]?\b
+
+# Should be Gemini
+\bgemini\s
+
+# Should be `Gemini Version Size` (e.g. `Gemini 1.0 Pro`)
+\bGemini\s(Pro|Flash|Ultra)\s?\d?\.?\d?\b
+
+# Don't say "Powered by Gemini", instead say "with Gemini"
+\b[Pp]owered\sby\s[Gg]emini\b
+
+# Should be BigQuery
+\b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
+
+# Should be Python
+\bpython\b
+
+# Should be DataFrame
+\b(?!DataFrame\b)[Dd]ata\s?[Ff]rame\b
+
+# Should be Google Cloud
+\b[Gg][Cc][Pp]\b
+
+# Should be DeepMind
+\b(?!DeepMind\b)[Dd]eep\s?[Mm]ind\b
+
+# Should be TensorFlow
+\b(?!TensorFlow\b)(?!tensorflow\b)[Tt]ensor\s?[Ff]low\b
+
+# Should be AlloyDB
+\b(?!AlloyDB\b)(?!alloydb\b)[Aa]lloy\s?[Dd]\s?[Bb]\b
+
+# Should be Translation API
+\bTranslate\s?API\b
+
+# Should be Dialogflow
+\bDialogFlow\b
