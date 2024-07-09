@@ -429,7 +429,7 @@ class MatchingEngine(VectorStore):
     def _create_credentials_from_file(
         cls, json_credentials_path: Optional[str]
     ) -> Optional[Credentials]:
-        """Creates credentials for GCP.
+        """Creates credentials for Google Cloud.
 
         Args:
              json_credentials_path: The path on the file system where the

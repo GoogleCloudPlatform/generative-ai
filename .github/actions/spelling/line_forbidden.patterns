@@ -187,8 +187,17 @@
 # Should be LangChain
 \b(?!LangChain\b)(?!langchain\b)[Ll]ang\s?[Cc]hain?\b
 
+# Should be LangGraph
+\b(?!LangGraph\b)(?!langgraph\b)[Ll]ang\s?[Gg]raph?\b
+
+# Should be LangServe
+\b(?!LangServe\b)(?!langserve\b)[Ll]ang\s?[Ss]erve?\b
+
 # Should be LlamaIndex
 \b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
+
+# Should be Hugging Face
+\s(?!Hugging Face\b)[Hh]ugging\s?[Ff]ace?\b
 
 # Should be Vertex AI
 \b(?!Vertex AI\b)(?!.*[\(\)\{\},])(?<!import\s)(?<!\.)(?<!,\s)Vertex\s?[Aa]?[Ii]?\b
@@ -213,6 +222,7 @@
 
 # Should be Google Cloud
 \b[Gg][Cc][Pp]\b
+\b(?!Google\sCloud\b)[Gg]oogle\s?[Cc]loud\b
 
 # Should be DeepMind
 \b(?!DeepMind\b)[Dd]eep\s?[Mm]ind\b
@@ -229,6 +239,30 @@
 # Should be Dialogflow
 \bDialogFlow\b
 
+# Should be Firestore
+\b(?!Firestore\b)Fire\s?[Ss]tore\b
+
+# Should be Memorystore
+\b(?!Memorystore\b)Memory\s?[Ss]tore\b
+
 # Should be Colab
 \scolab\b
 \b[Cc]ollab\b
+
+# Should be Kaggle
+\skaggle\b
+
+# Should be TPU or TPUs
+\btpus?\b
+
+# Should be GKE
+\sgke\s
+
+# Should be GCS
+\sgcs\s
+
+# Should be API
+\s(?!API)(?!.*[\(\)\{\},=#]+)[Aa][Pp][Ii]\s
+
+# Should be arXiv
+\bAr[Xx]iv\b

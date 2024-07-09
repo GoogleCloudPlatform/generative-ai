@@ -10,7 +10,7 @@ You have been tasked with building the following Generative AI features into Gen
 
 1. Build the backend for a RAG-powered AI Chatbot that uses existing customer and product data to provide personalized financial advice.
 
-The Advisory Services application was recently migrated to GCP, with the front end and middleware services running on Cloud Run, and the PostgreSQL database running on AlloyDB - a fully managed PostgreSQL-compatible database service that combines the best of Open Source with the best of Google to provide 4x OLTP performance, 10x vector search performance, 100x OLAP performance, and AI-powered engine autotuning.
+The Advisory Services application was recently migrated to Google Cloud, with the front end and middleware services running on Cloud Run, and the PostgreSQL database running on AlloyDB - a fully managed PostgreSQL-compatible database service that combines the best of Open Source with the best of Google to provide 4x OLTP performance, 10x vector search performance, 100x OLAP performance, and AI-powered engine autotuning.
 
 Due to your familiarity with PostgreSQL, you would like to build the new Gen AI features without having to learn a new database technology or programming language, so you decided to leverage AlloyDB AI's direct integration with Vertex AI to develop LLM-powered features using familiar SQL semantics.
 

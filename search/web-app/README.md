@@ -33,7 +33,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 - Follow steps in [Get started with Recommendations][try_recommendations] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
-    - [Natural language papers from ArXiv](https://arxiv.org)
+    - [Natural language papers from arXiv](https://arxiv.org)
       - `gs://cloud-samples-data/gen-app-builder/search/arxiv`
 
 ### Dependencies
