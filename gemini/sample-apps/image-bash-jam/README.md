@@ -17,7 +17,7 @@ consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/
 
 ```bash
 cd
-git clone  https://github.com/GoogleCloudPlatform/generative-ai
+git clone https://github.com/GoogleCloudPlatform/generative-ai
 cd generative-ai/gemini/sample-apps/image-bash-jam/
 
 # [optional] If you like a colored shell, do this. If not, scripts will detect its absence and will just print in shell default color (see `_lolcat` in `_common.sh`).

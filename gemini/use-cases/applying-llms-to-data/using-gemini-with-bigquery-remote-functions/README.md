@@ -42,7 +42,7 @@ You'll need to set your Google Cloud project in Cloud Shell, clone this repo loc
 
 ```shell
 gcloud config set project <PROJECT ID>
-git clone  https://github.com/GoogleCloudPlatform/generative-ai/
+git clone https://github.com/GoogleCloudPlatform/generative-ai/
 cd ./generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions
 ```
 

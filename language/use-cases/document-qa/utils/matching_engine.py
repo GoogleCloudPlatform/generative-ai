@@ -220,7 +220,7 @@ class MatchingEngine(VectorStore):
         Args:
             query: The string that will be used to search for similar documents.
             k: The amount of neighbors that will be retrieved.
-            search_distance: filter search results by  search distance by adding a threshold value
+            search_distance: filter search results by search distance by adding a threshold value
 
         Returns:
             A list of k matching documents.

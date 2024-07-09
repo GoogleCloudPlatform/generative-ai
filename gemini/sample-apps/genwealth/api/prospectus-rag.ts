@@ -16,7 +16,7 @@ export class ProspectusRag {
     private async getContext(prompt: string, ticker: string): Promise<string[]> {
         const query = `SELECT content,
                 embedding <=> google_ml.embedding('textembedding-gecko@003', '${prompt}')::vector AS distance
-            FROM  langchain_vector_store
+            FROM langchain_vector_store
             WHERE ticker='${ticker}'
             ORDER BY distance
             LIMIT 5`;
