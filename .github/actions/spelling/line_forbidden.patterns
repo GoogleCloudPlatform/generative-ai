@@ -208,6 +208,9 @@
 # Should be `Gemini Version Size` (e.g. `Gemini 1.0 Pro`)
 \bGemini\s(Pro|Flash|Ultra)\s?\d\.\d\b
 
+# Gemini Size should be capitalized (e.g. `Gemini 1.0 Pro`)
+\bGemini\s?\d\.\d\s(pro|flash|ultra)\b
+
 # Don't say "Powered by Gemini", instead say "with Gemini"
 \b[Pp]owered\sby\s[Gg]emini\b
 
