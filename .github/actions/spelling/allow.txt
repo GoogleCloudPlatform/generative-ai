@@ -150,8 +150,8 @@ Jedi
 jegadesh
 jupyter
 Kaelen
-Kaggle
 kaggle
+Kaggle
 Kamradt
 Keanu
 keras
@@ -169,8 +169,8 @@ linalg
 linecolor
 Llion
 llm
-llms
 LLMs
+llms
 LOOKBACK
 Lottry
 LSum
@@ -194,6 +194,7 @@ nlp
 nrows
 NVIDIA
 oliv
+OOTB
 owlbot
 paleo
 pancetta
@@ -226,8 +227,8 @@ pysftp
 QPM
 qubit
 qubits
-RAGAS
 ragas
+RAGAS
 ragdemos
 ramen
 ratelimit
