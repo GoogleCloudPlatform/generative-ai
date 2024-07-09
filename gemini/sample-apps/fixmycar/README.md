@@ -181,7 +181,7 @@ You will store the Cymbal Starlight 2024 owner's manual in a Vertex AI Agent Bui
 
 ## Set up GKE auth to Vertex AI
 
-Your GKE-based backend server needs to access Vertex AI Agent Builder and Vertex AI's Gemini API. To do this, we'll map the Kubernetes service account used by the backend pod, to a Google Cloud IAM service account with the right permissions. Here, the Kubernetes-to-GCP service account mapping provides the _authentication_ ("who are you?"), and the GCP service account's IAM roles provide _authorization_ ("what are you allowed to do?"). This setup is called [GKE Workload Identity.](https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
+Your GKE-based backend server needs to access Vertex AI Agent Builder and Vertex AI's Gemini API. To do this, we'll map the Kubernetes service account used by the backend pod, to a Google Cloud IAM service account with the right permissions. Here, the Kubernetes-to-GCP service account mapping provides the _authentication_ ("who are you?"), and the Google Cloud service account's IAM roles provide _authorization_ ("what are you allowed to do?"). This setup is called [GKE Workload Identity.](https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
 
 1. Run the setup script to configure auth.
 
@@ -272,7 +272,7 @@ fixmycar-frontend   LoadBalancer   <ip-value>       <ip-value>      80:30519/TCP
 
 4. Test a chat prompt based on an existing item in the Cymbal Starlight owner's manual.
 
-For instance, you can ask again about the max cargo capacity of the vehicle. This text is in our Vertex data store, so our app should be able to find this info for us.
+For instance, you can ask again about the max cargo capacity of the vehicle. This text is in our Vertex AI data store, so our app should be able to find this info for us.
 
 ![](images/cargo-manual.png)
 
