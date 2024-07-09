@@ -245,6 +245,9 @@
 # Should be Memorystore
 \b(?!Memorystore\b)Memory\s?[Ss]tore\b
 
+# Should be Document AI
+\bDoc\s?AI\b
+
 # Should be Colab
 \scolab\b
 \b[Cc]ollab\b
