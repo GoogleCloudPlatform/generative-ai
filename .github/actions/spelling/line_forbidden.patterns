@@ -285,7 +285,7 @@
 \w \w
 
 # Don't use "smart quotes"
-(?!'")[\u2018\u2019\u201c\u201d]
+(?!'")[‘’“”]
 
 # "an" should only be before vowels.
 \ban\s+(?!f1\b)(?!hour\b)(?!honest\b)(?!llm\b)(?!mp3\b)(?!nlp\b)([b-df-hj-np-tv-zB-DF-HJ-NP-TV-Z]{1}\w*)
