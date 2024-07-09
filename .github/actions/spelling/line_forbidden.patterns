@@ -34,6 +34,7 @@
 
 # Should be `GitHub`
 (?<![&*.]|// |\btype )\bGithub\b(?![{)])
+\b[Gg]it\s[Hh]ub\b
 
 # Should be `GitLab`
 (?<![&*.]|// |\btype )\bGitlab\b(?![{)])
@@ -227,3 +228,7 @@
 
 # Should be Dialogflow
 \bDialogFlow\b
+
+# Should be Colab
+\scolab\b
+\b[Cc]ollab\b
