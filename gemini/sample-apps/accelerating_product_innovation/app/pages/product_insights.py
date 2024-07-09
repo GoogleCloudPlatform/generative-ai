@@ -49,7 +49,7 @@ get_insights_img()
 # Display projects
 setup.display_projects()
 
-# Check if data frame is empty
+# Check if DataFrame is empty
 if st.session_state.embeddings_df is None or st.session_state.embeddings_df.empty:
     with st.spinner("Fetching Uploaded Files..."):
         embeddings_df = insights.get_stored_embeddings_as_df()
@@ -83,7 +83,7 @@ def display_suggestion_box(key: str, suggestion_num: int) -> None:
 st.divider()
 st.write("**SUGGESTED QUESTIONS:**")
 
-# Check if data frame is empty
+# Check if DataFrame is empty
 if st.session_state.embeddings_df is None or st.session_state.embeddings_df.empty:
     # Display error message
     st.error(
@@ -156,7 +156,7 @@ if st.button("Search", type="primary"):
 
 # Check if RAG answers should be generated
 if st.session_state.rag_answers_gen:
-    # Check if data frame is empty
+    # Check if DataFrame is empty
     if st.session_state.embeddings_df is None or st.session_state.embeddings_df.empty:
         # Display error message
         st.error(

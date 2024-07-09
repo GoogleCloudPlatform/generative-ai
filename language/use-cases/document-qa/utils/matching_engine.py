@@ -1,4 +1,4 @@
-"""Vertex Matching Engine implementation of the vector store."""
+"""Vertex AI Matching Engine implementation of the vector store."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ logger = logging.getLogger()
 
 
 class MatchingEngine(VectorStore):
-    """Vertex Matching Engine implementation of the vector store.
+    """Vertex AI Matching Engine implementation of the vector store.
 
     While the embeddings are stored in the Matching Engine, the embedded
     documents will be stored in GCS.
@@ -49,7 +49,7 @@ class MatchingEngine(VectorStore):
         gcs_bucket_name: str,
         credentials: Credentials = None,
     ):
-        """Vertex Matching Engine implementation of the vector store.
+        """Vertex AI Matching Engine implementation of the vector store.
 
         While the embeddings are stored in the Matching Engine, the embedded
         documents will be stored in GCS.
@@ -72,9 +72,9 @@ class MatchingEngine(VectorStore):
             ~:func:`MatchingEngine.from_components`.
             embedding: A :class:`Embeddings` that will be used for
             embedding the text sent. If none is sent, then the
-            multilingual Tensorflow Universal Sentence Encoder will be used.
+            multilingual TensorFlow Universal Sentence Encoder will be used.
             gcs_client: The Google Cloud Storage client.
-            credentials (Optional): Created GCP credentials.
+            credentials (Optional): Created Google Cloud credentials.
         """
         super().__init__()
         self._validate_google_libraries_installation()
@@ -220,7 +220,7 @@ class MatchingEngine(VectorStore):
         Args:
             query: The string that will be used to search for similar documents.
             k: The amount of neighbors that will be retrieved.
-            search_distance: filter search results by  search distance by adding a threshold value
+            search_distance: filter search results by search distance by adding a threshold value
 
         Returns:
             A list of k matching documents.
@@ -356,7 +356,7 @@ class MatchingEngine(VectorStore):
         """Takes the object creation out of the constructor.
 
         Args:
-            project_id: The GCP project id.
+            project_id: The Google Cloud project id.
             region: The default location making the API calls. It must have
             the same location as the GCS bucket and must be regional.
             gcs_bucket_name: The location where the vectors will be stored in
@@ -429,7 +429,7 @@ class MatchingEngine(VectorStore):
     def _create_credentials_from_file(
         cls, json_credentials_path: Optional[str]
     ) -> Optional[Credentials]:
-        """Creates credentials for GCP.
+        """Creates credentials for Google Cloud.
 
         Args:
              json_credentials_path: The path on the file system where the
@@ -557,7 +557,7 @@ class MatchingEngine(VectorStore):
         """Configures the aiplatform library.
 
         Args:
-            project_id: The GCP project id.
+            project_id: The Google Cloud project id.
             region: The default location making the API calls. It must have
             the same location as the GCS bucket and must be regional.
             gcs_bucket_name: GCS staging location.
