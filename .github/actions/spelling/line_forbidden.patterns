@@ -241,6 +241,9 @@
 # Should be Dialogflow
 \bDialogFlow\b
 
+# Should be Firebase
+\b(?!Firebase\b)Fire\s?[Bb]ase\b
+
 # Should be Firestore
 \b(?!Firestore\b)Fire\s?[Ss]tore\b
 
