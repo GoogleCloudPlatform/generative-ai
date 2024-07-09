@@ -40,8 +40,8 @@ codebases
 Codelab
 codelab
 Codey
-Colab
 colab
+Colab
 Colm
 coloraxis
 colorbar
@@ -52,11 +52,12 @@ CZE
 D'orsay
 Dataform
 dataframe
+datname
 dbadmin
 dbln
 ddl
-deepeval
 DeepEval
+deepeval
 dente
 Depatmint
 descgen
@@ -75,8 +76,8 @@ etf
 eur
 evals
 Eventarc
-faiss
 FAISS
+faiss
 fewshot
 figsize
 fillmode
@@ -157,8 +158,8 @@ linalg
 linecolor
 Llion
 llm
-LLMs
 llms
+LLMs
 LOOKBACK
 Lottry
 LSum
@@ -184,8 +185,8 @@ Parmar
 payslip
 paystub
 pdfminer
-pdfs
 PDFs
+pdfs
 pgadmin
 pgvector
 pii

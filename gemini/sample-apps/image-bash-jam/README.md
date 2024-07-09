@@ -259,14 +259,14 @@ This is the avatar I use in Google. I randomly asked this:
 $ ./gemini-explain-image.sh images/ricc-logo.png
 [..]
 This is a photo of a man standing behind a Google Cloud Platform cutout.
-The man is smiling and wearing a shirt that says, “That’s what I do,
+The man is smiling and wearing a shirt that says, “That's what I do,
 I drink and I know things.” The background is a brick wall with blue
 and white accents.
 ```
 
 And I thought! Of course, this is my favourite Games of Thrones tshirt.
 
-Let’s ask Gemini:
+Let's ask Gemini:
 
 ```bash
 $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize the quote in this person tshirt

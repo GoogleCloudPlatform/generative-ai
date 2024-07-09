@@ -13,7 +13,7 @@
 # limitations under the License.
 """Custom Class implementation"""
 
-# Base LLM for Deepeval
+# Base LLM for DeepEval
 from deepeval.models.base_model import DeepEvalBaseLLM
 
 # LangChain package for Vertex AI

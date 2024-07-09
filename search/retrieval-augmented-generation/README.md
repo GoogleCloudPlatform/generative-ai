@@ -11,7 +11,7 @@ _This folder demonstrates how to use Google Cloud [Vertex AI Search](https://clo
 
 ### What is Vertex AI Search?
 
-Vertex AI Search lets developers, even those with limited machine learning skills, quickly and easily tap into the power of Google’s foundation models, search expertise, and conversational AI technologies to create enterprise-grade generative AI applications.
+Vertex AI Search lets developers, even those with limited machine learning skills, quickly and easily tap into the power of Google's foundation models, search expertise, and conversational AI technologies to create enterprise-grade generative AI applications.
 
 Vertex AI Search lets organizations quickly build generative AI powered search engines for customers and employees. The solution is provided within the Google Cloud Console and also via API for integration with enterprise workflows or large language models.
 

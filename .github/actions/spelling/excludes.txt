@@ -102,3 +102,4 @@
 ^\Qvision/use-cases/creating_high_quality_visual_assets_with_gemini_and_imagen.ipynb\E$
 ignore$
 ^\Qowlbot.py\E$
+^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$

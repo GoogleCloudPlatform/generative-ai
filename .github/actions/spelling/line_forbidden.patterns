@@ -269,3 +269,12 @@
 
 # Should be arXiv
 \bAr[Xx]iv\b
+
+# Should be DeepEval
+\b(?!DeepEval\b)(?!deepeval\b)[Dd]eep\s?[Ee]val\b
+
+# Invalid Space Character
+\w \w
+
+# Don't use "smart quotes"
+(?!')’
