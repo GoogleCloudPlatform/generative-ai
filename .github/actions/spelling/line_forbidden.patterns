@@ -288,4 +288,4 @@
 (?!'")[‘’“”]
 
 # "an" should only be before vowels.
-\ban\s+(?!f1\b)(?!hour\b)(?!honest\b)(?!llm\b)(?!mp3\b)(?!nlp\b)([b-df-hj-np-tv-zB-DF-HJ-NP-TV-Z]{1}\w*)
+\ban\s+(?!F1\b)(?!hour\b)(?!honest\b)(?!LLM\b)(?!MP3\b)(?!NLP\b)([b-df-hj-np-tv-zB-DF-HJ-NP-TV-Z]{1}\w*)
