@@ -208,7 +208,7 @@
 \b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
 
 # Should be DataFrame
-\b(?!DataFrame\b)[Dd]ata\s?[Ff]rame\b
+\b(?!DataFrame\b)(?!.*[\(\)\{\}\.,=])[Dd]ata\s?[Ff]rame\b
 
 # Should be Google Cloud
 \b[Gg][Cc][Pp]\b
