@@ -52,9 +52,9 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
    ![Register Connection](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/3-register.png "Register Connection")
 
-1. Enter a friendly name like “AlloyDB” in the Name field, then switch to the Connection tab.
+1. Enter a friendly name like `AlloyDB` in the Name field, then switch to the Connection tab.
 
-   > NOTE: You can ignore the warning that says “Either Host name or Service must be specified”. We will enter that information next.
+   > NOTE: You can ignore the warning that says "Either Host name or Service must be specified". We will enter that information next.
 
    ![Register Server](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/4-general.png "Register Server")
 
@@ -186,7 +186,7 @@ Follow the steps below to build the new Gen AI feature.
 
    ![INN_B](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/12-inflation.png "INN_B")
 
-1. Notice that this is an investment that tracks an economy that is currently experiencing high inflation, and investors may want to hedge against that risk. Our query returned the result because the analysis contains the words “hedge” and “high inflation”, even though this is not an investment we would want to recommend to a client specifically looking for investments that perform well in high-inflation markets.
+1. Notice that this is an investment that tracks an economy that is currently experiencing high inflation, and investors may want to hedge against that risk. Our query returned the result because the analysis contains the words "hedge" and "high inflation", even though this is not an investment we would want to recommend to a client specifically looking for investments that perform well in high-inflation markets.
 
 1. Now you will update the SQL query to use AlloyDB AI's vector similarity search to do semantic search on the analysis_embedding column using the same terms. You will also use AlloyDB AI's built-in [embedding() function](https://cloud.google.com/alloydb/docs/ai/work-with-embeddings#generate) to translate the search string into an embedding so that you can compare it to the existing embeddings in the analysis_embedding column.
 
@@ -216,7 +216,7 @@ Follow the steps below to build the new Gen AI feature.
 
 #### Semantic Search
 
-1. Imagine you are a Marketing Analyst, and you want to find prospective customers for a new Bitcoin ETF that GenWealth just launched. You could use the UI to enter the Search Term “young aggressive investor” to start your search.
+1. Imagine you are a Marketing Analyst, and you want to find prospective customers for a new Bitcoin ETF that GenWealth just launched. You could use the UI to enter the Search Term "young aggressive investor" to start your search.
 
 1. Run the query below to see the results of this search. This query executes a semantic search by using AlloyDB AI's embedding() function to translate the search string into an embedding and then comparing it to the embeddings in the user_profile.bio_embedding column via vector similarity search.
 
@@ -256,7 +256,7 @@ You have now built your first two Gen AI features using just SQL!
 
 ### Build a RAG-Powered Gen AI Chatbot
 
-GenWealth would like to build a new Gen AI chatbot to provide clients with 24/7 access to financial education, account details, and basic information related to budgeting, saving, and different types of investments. GenWealth guards their brand and reputation very carefully, and they don't want to risk deploying a chatbot that might give their customers factually incorrect information (i.e. “hallucinate”).
+GenWealth would like to build a new Gen AI chatbot to provide clients with 24/7 access to financial education, account details, and basic information related to budgeting, saving, and different types of investments. GenWealth guards their brand and reputation very carefully, and they don't want to risk deploying a chatbot that might give their customers factually incorrect information (i.e. "hallucinate").
 
 You will write a PostgreSQL function that takes a user's prompt and enriches it with data from your application database to improve the accuracy and trustworthiness of the chatbot's output. The function will send the enriched prompt to the Google PaLM text-bison model using AlloyDB AI's integration with Vertex AI, and it will return the LLM response to the user.
 

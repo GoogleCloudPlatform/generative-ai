@@ -2,7 +2,7 @@
 
 This demo will showcase how you can combine the data and documents you already have and the skills you already know with the power of AlloyDB AI, Vertex AI, Cloud Run, and Cloud Functions to build trustworthy Gen AI features into your existing applications.
 
-We'll walk through an end-to-end “Knowledge Worker Assist” use case for a fictional Financial Services company called GenWealth. GenWealth, a subsidiary of Cymbal Investments, is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
+We'll walk through an end-to-end "Knowledge Worker Assist" use case for a fictional Financial Services company called GenWealth. GenWealth, a subsidiary of Cymbal Investments, is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
 
 In this scenario, we'll be adding 3 new Gen AI features to GenWealth's existing Investment Advisory software:
 

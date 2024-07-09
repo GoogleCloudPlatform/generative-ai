@@ -4,7 +4,7 @@
 
 <img align="right" style="padding-left: 10px;" src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-logo.png" width="35%" alt="GenWealth Logo"> This demo showcases how you can combine the data and documents you already have and the skills you already know with the power of [AlloyDB AI](https://cloud.google.com/alloydb/ai?hl=en), [Vertex AI](https://cloud.google.com/vertex-ai?hl=en), [Cloud Run](https://cloud.google.com/run?hl=en), and [Cloud Functions](https://cloud.google.com/functions?hl=en) to build trustworthy Gen AI features into your existing applications.
 
-You will implement an end-to-end “Knowledge Worker Assist” use case for a fictional Financial Services company called GenWealth. GenWealth is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
+You will implement an end-to-end "Knowledge Worker Assist" use case for a fictional Financial Services company called GenWealth. GenWealth is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
 
 You will add 3 new Gen AI features to GenWealth's existing Investment Advisory software:
 
