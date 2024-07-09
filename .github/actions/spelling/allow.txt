@@ -46,8 +46,8 @@ codebases
 Codelab
 codelab
 Codey
-colab
 Colab
+colab
 Colm
 coloraxis
 colorbar
@@ -82,8 +82,8 @@ etf
 eur
 evals
 Eventarc
-FAISS
 faiss
+FAISS
 fewshot
 figsize
 fillmode
@@ -144,6 +144,7 @@ ipynb
 iterrows
 IVF
 ixed
+Jang
 Jax
 Jedi
 jegadesh
@@ -168,8 +169,8 @@ linalg
 linecolor
 Llion
 llm
-LLMs
 llms
+LLMs
 LOOKBACK
 Lottry
 LSum
@@ -225,9 +226,9 @@ pysftp
 QPM
 qubit
 qubits
-ragdemos
-ragas
 RAGAS
+ragas
+ragdemos
 ramen
 ratelimit
 ribeye
@@ -256,6 +257,7 @@ sittin
 sklearn
 sku
 SKUs
+Smartbuy
 SNB
 sourced
 SPII
@@ -266,6 +268,7 @@ SSRF
 STIX
 Strappy
 streamlit
+Surampudi
 sytem
 tagline
 tfhub
@@ -283,6 +286,7 @@ ubuntu
 UDFs
 unigram
 unrtf
+upsell
 urandom
 Urs
 username
@@ -291,6 +295,7 @@ Uszkoreit
 Vaswani
 vectordb
 vertexai
+Vijay
 VMs
 WDIR
 websites
