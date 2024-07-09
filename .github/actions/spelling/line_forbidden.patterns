@@ -221,7 +221,9 @@
 \b(?!DataFrame\b)(?!.*[\(\)\{\}\.,=])[Dd]ata\s?[Ff]rame\b
 
 # Should be Google Cloud
-\b[Gg][Cc][Pp]\b
+\s[Gg][Cc][Pp]\s
+
+# Should be Google Cloud
 \b(?!Google\sCloud\b)[Gg]oogle\s?[Cc]loud\b
 
 # Should be DeepMind

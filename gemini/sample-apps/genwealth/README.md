@@ -33,7 +33,7 @@ The GenWealth demo application was built using:
 
 ## Deploying the GenWealth Demo Application
 
-1. Login to the [GCP Console](https://console.cloud.google.com/).
+1. Login to the [Google Cloud Console](https://console.cloud.google.com/).
 
 1. [Create a new project](https://developers.google.com/maps/documentation/places/web-service/cloud-setup) to host the demo and isolate it from other resources in your account.
 
