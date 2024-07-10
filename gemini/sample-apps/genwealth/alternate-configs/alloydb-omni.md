@@ -69,7 +69,7 @@ This guide assumes you have already deployed the GenWealth app as defined [here]
 
     ```
 
-1. Create a secret containing your Vertex AI Service Account json file. Here “vertex-ai-secret” is the name of the secret.
+1. Create a secret containing your Vertex AI Service Account json file. Here `vertex-ai-secret` is the name of the secret.
 
     ```bash
     kubectl create secret generic vertex-ai-secret --from-file=./private-key.json
