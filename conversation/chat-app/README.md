@@ -34,7 +34,7 @@ for more information.
 ## Steps to deploy the web app to Firebase
 
 1. Navigate to the [Firebase console](https://console.firebase.google.com/)
-1. Provision Firebase on a new or existing GCP project
+1. Provision Firebase on a new or existing Google Cloud project
 1. In Firebase console, go to Hosting and add a new site (e.g.,
    `your-firebase-app-name`)
 1. Install the [firebase CLI](https://firebase.google.com/docs/cli)
