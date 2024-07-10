@@ -55,8 +55,8 @@ cke
 cmap
 codebase
 codebases
-Codelab
 codelab
+Codelab
 Codey
 colab
 Colab
@@ -76,8 +76,8 @@ datname
 dbadmin
 dbln
 ddl
-deepeval
 DeepEval
+deepeval
 Demat
 dente
 Depatmint
@@ -175,8 +175,8 @@ ipo
 IPOs
 ipykernel
 ipynb
-Ishan
 ishan
+Ishan
 iterrows
 IVF
 jan
@@ -185,8 +185,8 @@ Jedi
 jegadesh
 jupyter
 Kaelen
-kaggle
 Kaggle
+kaggle
 Kamradt
 Keanu
 keras
@@ -224,6 +224,7 @@ memes
 metadatas
 MMID
 MPIN
+Nagar
 nbconvert
 nbformat
 ncols
@@ -273,8 +274,8 @@ pysftp
 QPM
 qubit
 qubits
-RAGAS
 ragas
+RAGAS
 ragdemos
 ramen
 ratelimit
