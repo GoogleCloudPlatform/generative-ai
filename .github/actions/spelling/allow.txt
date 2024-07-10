@@ -212,6 +212,7 @@ ragas
 RAGAS
 ragdemos
 ramen
+rapideval
 ratelimit
 ribeye
 RLHF
