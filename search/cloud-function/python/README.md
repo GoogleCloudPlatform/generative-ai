@@ -51,7 +51,7 @@ pytest test_vertex_search_client.py
 
 You can install `pytest` and you should expect all tests to pass, if you have
 configured `.env` correctly. These tests call the API and therefore are
-dependant on your data stores being configured in Vertex AI Search.
+dependent on your data stores being configured in Vertex AI Search.
 
 ```bash
 pip install pytest
