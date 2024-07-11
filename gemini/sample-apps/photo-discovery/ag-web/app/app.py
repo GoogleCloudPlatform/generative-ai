@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import json
+import os
 import re
+
 import requests
 
 #
@@ -27,10 +28,13 @@ STAGING_BUCKET = "gs://<YOUR GCS BUCKET>"
 REASONING_ENGINE_ID = "<YOUR REASONING ENGINE ID>"
 
 import vertexai
+
 vertexai.init(project=PROJECT_ID, location=LOCATION, staging_bucket=STAGING_BUCKET)
 from vertexai.preview import reasoning_engines
 
-remote_agent = reasoning_engines.ReasoningEngine(f"projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{REASONING_ENGINE_ID}")
+remote_agent = reasoning_engines.ReasoningEngine(
+    f"projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{REASONING_ENGINE_ID}"
+)
 
 #
 # Vertex AI Search
@@ -41,15 +45,16 @@ from google.cloud import discoveryengine_v1 as discoveryengine
 
 SEARCH_ENGINE_ID = "<YOUR SEARCH ENGINE ID>"
 
-search_client_options = (
-    ClientOptions(api_endpoint=f"us-discoveryengine.googleapis.com")
+search_client_options = ClientOptions(api_endpoint=f"us-discoveryengine.googleapis.com")
+search_client = discoveryengine.SearchServiceClient(
+    client_options=search_client_options
 )
-search_client = discoveryengine.SearchServiceClient(client_options=search_client_options)
 search_serving_config = f"projects/{PROJECT_ID}/locations/us/collections/default_collection/dataStores/{SEARCH_ENGINE_ID}/servingConfigs/default_search:search"
 
 import json
-def search_gms(search_query, rows):
 
+
+def search_gms(search_query, rows):
     # build a search request
     request = discoveryengine.SearchRequest(
         serving_config=search_serving_config,
@@ -76,22 +81,24 @@ def search_gms(search_query, rows):
         corrected_query=resp_pager.corrected_query,
         summary=resp_pager.summary,
     )
-    response_json = json.loads(discoveryengine.SearchResponse.to_json(
-        response,
-        including_default_value_fields=True,
-        use_integers_for_enums=False,
-    ))
+    response_json = json.loads(
+        discoveryengine.SearchResponse.to_json(
+            response,
+            including_default_value_fields=True,
+            use_integers_for_enums=False,
+        )
+    )
 
     # extract ids
     resp_list = [doc for doc in response_json["results"]]
     return resp_list
 
+
 #
 # Flask app
 #
 
-from flask import Flask
-from flask import request
+from flask import Flask, request
 from flask_cors import CORS
 
 # init Flask app
@@ -101,6 +108,7 @@ CORS(app)
 PROF_ENABLED = False
 
 MAX_RETRIES = 3
+
 
 # Endpoint for the Flask app to call the Agent
 @app.route("/ask_gemini", methods=["GET"])
@@ -122,12 +130,14 @@ def ask_gemini():
         raise ValueError("Too many retries.")
     return resp["output"]
 
+
 # Endpoint for the Agent to call Vertex AI Search
 @app.route("/ask_gms", methods=["GET"])
 def ask_gms():
     query = request.args.get("query")
     item = search_gms(query, 1)[0]["document"]["structData"]
     return json.dumps(item)
+
 
 # run Flask app
 if __name__ == "__main__":

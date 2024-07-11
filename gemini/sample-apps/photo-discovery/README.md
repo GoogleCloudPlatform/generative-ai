@@ -16,9 +16,9 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI agents with Vertex AI Agent Builder and Flutter](https://youtu.be/V8P_S9OLI_I?si=N2QMBs7HNZL6mKU0).
 
 ## Demo
-![Chat UI - Lake Wakatipu](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/demo.gif)
-
 [Try the live demo app](https://photo-discovery-demo.web.app/)
+
+![Chat UI - Lake Wakatipu](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/demo.gif)
 
 ## Getting Started
 
@@ -26,11 +26,11 @@ Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI 
 
 1. Create a search data store on Vertex AI Search: See [Create a search data store](https://cloud.google.com/generative-ai-app-builder/docs/create-data-store-es) to create your own search data store by importing `/ag-web/google_merch_shop_items.csv` CSV file. The "Data store ID" will be your search engine ID.
 
-1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run deploy.sh to deploy the Run app. Open "ag-web" app on the Cloud Run console, and find the hostname (eg "ag-web-xxxxxx.a.run.app").
+1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run `deploy.sh` to deploy the Run app. Open `ag-web` app on the Cloud Run console, and find the hostname (eg `ag-web-xxxxxx.a.run.app`).
 
-1. Deploy a Reasoning Engine agent: Open [Cloud Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/create-console-quickstart) and upload /ag-web/ag_setup_re.ipynb. Open the Notebook and edit the GOOGLE_SHOP_VERTEXAI_SEARCH_URL with the Run hostname. Run the Notebook from the start to deploy the agent to the Reasoning Engine runtime. From the output on the deployment, find the reasoning engine ID. The output format is "projects/PROJECT_ID/locations/LOCATION/reasoningEngines/REASONING_ENGINE_ID".
+1. Deploy a Reasoning Engine agent: Open [Cloud Workbench](https://cloud.google.com/vertex-ai/docs/workbench/instances/create-console-quickstart) and upload `/ag-web/ag_setup_re.ipynb`. Open the Notebook and edit the `GOOGLE_SHOP_VERTEXAI_SEARCH_URL` with the Run hostname. Run the Notebook from the start to deploy the agent to the Reasoning Engine runtime. From the output on the deployment, find the reasoning engine ID. The output format is `projects/PROJECT_ID/locations/LOCATION/reasoningEngines/REASONING_ENGINE_ID`.
 
-1. Redeploy the Cloud Run app: Edit `/ag-web/app/app.py` and set the REASONING_ENGINE_ID. Run `/ag-web/app/deploy.sh` to redeploy it.
+1. Redeploy the Cloud Run app: Edit `/ag-web/app/app.py` and set the `REASONING_ENGINE_ID`. Run `/ag-web/app/deploy.sh` to redeploy it.
 
 ### Running the Flutter App
 
@@ -55,7 +55,7 @@ Get available devices by running `flutter devices` ex: `AA8A7357`, `macos`, `chr
 
 1. Once the app is running, select an image for analysis. Once the image subject has been identified click the "tell me more" button to start an Agent chat session. 
 
-1. [Optional] Running the app on a mobile device with a camera? You can enable the feature for taking photos directly within the app. In `lib/functionality/adaptive/capabilities.dart` set Capabilities.hasCamera to `true` like so:
+1. [Optional] Running the app on a mobile device with a camera? You can enable the feature for taking photos directly within the app. In `lib/functionality/adaptive/capabilities.dart` set `Capabilities.hasCamera` to `true` like so:
 
 **Before:**
 ```
