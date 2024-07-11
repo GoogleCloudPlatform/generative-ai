@@ -1,13 +1,14 @@
 # Vertex AI Search accessed via Google Cloud Functions
 
-This example is based on a Google Cloud Function using a HTTPS trigger on a
-Python 3 runtime;
-[read more here](https://cloud.google.com/functions/docs/samples/functions-http-content#functions_http_content-python).
-
 This example is based on the
 [Python client for the Vertex AI Search API](https://cloud.google.com/generative-ai-app-builder/docs/libraries#client-libraries-usage-python),
-which will get search results, snippets, metadata, and the LLM
-summary grounded on search results.
+which will get search results, snippets, metadata, and the LLM summary grounded
+on search results. This is implemented in the `vertex_search_client.py` file.
+
+That functionality is exposed on a REST API which is implemented in `main.py`
+intended to be deployed to a Google Cloud Function using a HTTPS trigger on a
+Python 3 runtime;
+[read more here](https://cloud.google.com/functions/docs/samples/functions-http-content#functions_http_content-python).
 
 **[Read more about Vertex AI Search accessed via Google Cloud Functions](../README.md)**
 
@@ -16,7 +17,7 @@ summary grounded on search results.
 Run this code locally via **Functions Framework** or **Functions Emulator**;
 [read more about running cloud functions locally](https://cloud.google.com/functions/docs/running/overview).
 
-NOTE: this uses a `.env` file to manage local environment values.  You can
+NOTE: this uses a `.env` file to manage local environment values. You can
 optionally use the `setup_env.sh` script to setup or you can manually edit it.
 
 ```bash
@@ -34,4 +35,25 @@ export SEARCH_TERM="Does Cymbal Bank offer a HSA and what are the monthly premiu
 curl -m 310 -X POST localhost:8080 \
 -H "Content-Type: application/json" \
 -d "{\"search_term\": \"${SEARCH_TERM}\"}"
+```
+
+## Run unit tests
+
+You can install `pytest` and you should expect all the unit tests to pass. These
+tests mock the API interactions and therefore should run quickly.
+
+```bash
+pip install pytest
+pytest test_vertex_search_client.py
+```
+
+## Run integration tests
+
+You can install `pytest` and you should expect all tests to pass, if you have
+configured `.env` correctly. These tests call the API and therefore are
+dependant on your data stores being configured in Vertex AI Search.
+
+```bash
+pip install pytest
+pytest test_integration_vertex_search_client.py
 ```
