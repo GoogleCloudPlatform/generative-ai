@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+
+from enums import EngineChunkType, EngineDataType, SummaryType
 import pytest
 from vertex_search_client import VertexSearchClient
-from enums import EngineDataType, EngineChunkType, SummaryType
 
 # Load environment variables
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -23,6 +24,7 @@ DATA_STORE_ID = os.getenv("DATA_STORE_ID")
 ENGINE_DATA_TYPE = os.getenv("ENGINE_DATA_TYPE", 0)
 ENGINE_CHUNK_TYPE = os.getenv("ENGINE_CHUNK_TYPE", 1)
 SUMMARY_TYPE = os.getenv("SUMMARY_TYPE", 1)
+
 
 @pytest.fixture(scope="module")
 def client():
@@ -35,6 +37,7 @@ def client():
         summary_type=SUMMARY_TYPE,
     )
 
+
 def test_search_integration(client):
     # Perform a search
     query = "test query"
@@ -43,7 +46,7 @@ def test_search_integration(client):
     # Check the structure of the results
     assert "simplified_results" in results
     assert isinstance(results["simplified_results"], list)
-    
+
     if results["simplified_results"]:
         first_result = results["simplified_results"][0]
         assert "metadata" in first_result
@@ -52,9 +55,10 @@ def test_search_integration(client):
     # Check for other expected fields
     assert "total_size" in results
     assert isinstance(results["total_size"], int)
-    
+
     if "summary" in results:
         assert "summary_text" in results["summary"]
+
 
 # Test with different engine types and settings.
 # You must have these configured already...
@@ -71,11 +75,12 @@ def test_unstructured_summary():
     # Check the structure of the results
     assert "simplified_results" in results
     assert isinstance(results["simplified_results"], list)
-    
+
     if results["simplified_results"]:
         first_result = results["simplified_results"][0]
         assert "metadata" in first_result
         assert "page_content" in first_result
+
 
 if __name__ == "__main__":
     pytest.main()

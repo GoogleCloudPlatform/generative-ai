@@ -30,17 +30,18 @@ Example usage:
     results = client.search("your search query")
     print(results)
 """
+import html
 import json
 import re
-import html
-from typing import List, Dict, Any, Optional
-from enums import EngineDataType, EngineChunkType, SummaryType
+from typing import Any, Dict, List, Optional
+
+from enums import EngineChunkType, EngineDataType, SummaryType
+from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine_v1alpha as discoveryengine
 from google.cloud.discoveryengine_v1alpha.services.search_service.pagers import (
     SearchPager,
 )
 from google.cloud.discoveryengine_v1alpha.types import SearchResponse
-from google.api_core.client_options import ClientOptions
 
 
 class VertexSearchClient:

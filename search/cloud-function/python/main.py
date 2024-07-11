@@ -46,11 +46,12 @@ See the README.md for more options including local development.
 
 """
 
-import os
 import json
+import os
+
 import functions_framework
-from vertex_search_client import VertexSearchClient
 from google.api_core.exceptions import GoogleAPICallError
+from vertex_search_client import VertexSearchClient
 
 # Initialize the VertexSearchClient
 client = VertexSearchClient(

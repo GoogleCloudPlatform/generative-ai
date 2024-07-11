@@ -11,18 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import pytest
 import json
-from unittest.mock import Mock, patch, MagicMock
-from google.protobuf.struct_pb2 import Struct
+from unittest.mock import MagicMock, Mock, patch
+
+from enums import EngineChunkType, EngineDataType, SummaryType
+from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine_v1alpha as discoveryengine
-from google.cloud.discoveryengine_v1alpha.types import SearchResponse, Document
 from google.cloud.discoveryengine_v1alpha.services.search_service.pagers import (
     SearchPager,
 )
-from google.api_core.client_options import ClientOptions
+from google.cloud.discoveryengine_v1alpha.types import Document, SearchResponse
+from google.protobuf.struct_pb2 import Struct
+import pytest
 from vertex_search_client import VertexSearchClient
-from enums import EngineDataType, EngineChunkType, SummaryType
 
 
 class DerivedStructData:
