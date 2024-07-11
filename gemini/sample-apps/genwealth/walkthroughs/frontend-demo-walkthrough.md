@@ -2,15 +2,15 @@
 
 This demo will showcase how you can combine the data and documents you already have and the skills you already know with the power of AlloyDB AI, Vertex AI, Cloud Run, and Cloud Functions to build trustworthy Gen AI features into your existing applications.
 
-We’ll walk through an end-to-end “Knowledge Worker Assist” use case for a fictional Financial Services company called GenWealth. GenWealth, a subsidiary of Cymbal Investments, is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
+We'll walk through an end-to-end "Knowledge Worker Assist" use case for a fictional Financial Services company called GenWealth. GenWealth, a subsidiary of Cymbal Investments, is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
 
-In this scenario, we’ll be adding 3 new Gen AI features to GenWealth’s existing Investment Advisory software:
+In this scenario, we'll be adding 3 new Gen AI features to GenWealth's existing Investment Advisory software:
 
-1. First, we’ll improve the Investment Search experience for GenWealth’s Financial Advisors with semantic search powered by AlloyDB AI.
+1. First, we'll improve the Investment Search experience for GenWealth's Financial Advisors with semantic search powered by AlloyDB AI.
 
-1. Second, we’ll build a Customer Segmentation feature for GenWealth’s Marketing Analysts to identify prospects for new products and services.
+1. Second, we'll build a Customer Segmentation feature for GenWealth's Marketing Analysts to identify prospects for new products and services.
 
-1. Third, we’ll build a Gen AI chatbot that will supercharge productivity for GenWealth’s Financial Advisors.
+1. Third, we'll build a Gen AI chatbot that will supercharge productivity for GenWealth's Financial Advisors.
 
 ## Walkthrough
 
@@ -128,9 +128,9 @@ With that, you have created your second Gen AI feature, and you now have a tailo
 
 ### Grounded Gen AI Email Responder
 
-Imagine you're a Financial Advisor again, and you took last week off. When you get back in on Monday, your inbox is flooded with questions from clients. GenWealth prides itself on personalized service, so you can’t just reply with a canned response. Each of these emails is going to require you to research the client’s portfolio, financial goals, and preferences before responding.
+Imagine you're a Financial Advisor again, and you took last week off. When you get back in on Monday, your inbox is flooded with questions from clients. GenWealth prides itself on personalized service, so you can't just reply with a canned response. Each of these emails is going to require you to research the client's portfolio, financial goals, and preferences before responding.
 
-For example, let’s say that you got an email from Donya Bartle asking a question about investing an inheritance she just received.
+For example, let's say that you got an email from Donya Bartle asking a question about investing an inheritance she just received.
 
 Refresh your screen and search for Donya Bartle in the Prospects interface to view her profile.
 

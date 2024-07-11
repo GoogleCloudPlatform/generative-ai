@@ -4,12 +4,12 @@ from src.vertex import get_text_generation
 import streamlit as st
 
 st.set_page_config(
-    page_title="Vertex PaLM Text Generation API",
+    page_title="Vertex AI PaLM Text Generation API",
     page_icon=":robot:",
     layout="centered",
     initial_sidebar_state="expanded",
     menu_items={
-        "About": "# This app shows you how to use Vertex PaLM Text Generator API"
+        "About": "# This app shows you how to use Vertex AI PaLM Text Generator API"
     },
 )
 

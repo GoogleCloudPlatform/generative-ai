@@ -11,7 +11,7 @@ fi
 # Get the latest tags.
 git fetch
 
-# Update Vertex S&C configs
+# Update Vertex AI S&C configs
 sed -i "s/genwealth-docs/${DOCS_BUCKET}/" ui/src/app/research/research.component.html
 sed -i "s/8cb387aa-cc8b-4c1b-984a-0ea32285eebc/${SEARCH_CONFIG_ID}/" ui/src/app/research/research.component.html
 
