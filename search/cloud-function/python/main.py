@@ -14,7 +14,7 @@
 """
 Google Cloud Function for Vertex AI Search
 
-This module provides a HTTP endpoint for performing searches using
+This module provides an HTTP endpoint for performing searches using
 the Vertex AI Search API. It uses the VertexSearchClient to handle
 the core search functionality.
 

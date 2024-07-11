@@ -6,7 +6,7 @@ which will get search results, snippets, metadata, and the LLM summary grounded
 on search results. This is implemented in the `vertex_search_client.py` file.
 
 That functionality is exposed on a REST API which is implemented in `main.py`
-intended to be deployed to a Google Cloud Function using a HTTPS trigger on a
+intended to be deployed to a Google Cloud Function using an HTTPS trigger on a
 Python 3 runtime;
 [read more here](https://cloud.google.com/functions/docs/samples/functions-http-content#functions_http_content-python).
 

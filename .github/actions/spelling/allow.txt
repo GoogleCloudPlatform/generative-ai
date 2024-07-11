@@ -40,8 +40,8 @@ codebases
 Codelab
 codelab
 Codey
-colab
 Colab
+colab
 Colm
 coloraxis
 colorbar
@@ -119,9 +119,11 @@ heatmap
 heatmapgl
 Hickson
 Hmmm
+HMO
 hnsw
 Hogwarts
 hovermode
+HSA
 https
 httpx
 Hubmann
@@ -170,6 +172,7 @@ mec
 meme
 memes
 metadatas
+miranda
 nbconvert
 nbformat
 ncols
@@ -185,8 +188,8 @@ Parmar
 payslip
 paystub
 pdfminer
-PDFs
 pdfs
+PDFs
 pgadmin
 pgvector
 pii

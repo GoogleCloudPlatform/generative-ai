@@ -54,7 +54,7 @@ configure Vertex AI Search.
 - WEBSITE
 - BLENDED
 
-```
+```py
 ENGINE_DATA_TYPE = UNSTRUCTURED
 ```
 
@@ -65,11 +65,11 @@ ENGINE_DATA_TYPE = UNSTRUCTURED
 - CHUNK
 - NONE
 
-```
+```python
 ENGINE_CHUNK_TYPE = DOCUMENT_WITH_EXTRACTIVE_SEGMENTS
 ```
 
-# Type of summarization
+## Type of summarization
 
 - NONE results only
 - VERTEX_AI_SEARCH LLM add on provided by [Vertex AI Search]()
@@ -80,7 +80,7 @@ ENGINE_CHUNK_TYPE = DOCUMENT_WITH_EXTRACTIVE_SEGMENTS
   [Vertex AI Search Builder APIs](https://cloud.google.com/generative-ai-app-builder/docs/builder-apis)
 - GEMINI use one of the Gemini models to generate an answer from the results -->
 
-```
+```python
 SUMMARY_TYPE = VERTEX_AI_SEARCH
 ```
 
