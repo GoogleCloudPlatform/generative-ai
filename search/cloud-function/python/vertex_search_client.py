@@ -193,15 +193,15 @@ class VertexSearchClient:
     def _simplify_search_results(self, response: Dict[str, Any]) -> Dict[str, Any]:
         if "results" not in response:
             return response
-        simplifed_results = []
+        simplified_results = []
         for result in response["results"]:
             if "document" in result:
-                simplifed_results.append(
+                simplified_results.append(
                     self._parse_document_result(result["document"])
                 )
             elif "chunk" in result:
-                simplifed_results.append(self._parse_chunk_result(result["chunk"]))
-        response["simplified_results"] = simplifed_results
+                simplified_results.append(self._parse_chunk_result(result["chunk"]))
+        response["simplified_results"] = simplified_results
         return response
 
     def _parse_document_result(self, document: Dict[str, Any]) -> Dict[str, Any]:

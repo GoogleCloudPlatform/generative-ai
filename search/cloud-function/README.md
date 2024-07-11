@@ -87,7 +87,7 @@ SUMMARY_TYPE = VERTEX_AI_SEARCH
 ## Architecture
 
 1. Vertex AI Search is an API hosted on Google Cloud
-1. You will call that API via a Google Cloud Function, which exposes it's own
+1. You will call that API via a Google Cloud Function, which exposes its own
    API
 1. Your users will the Google Cloud Function API, via your custom app or UI
 
