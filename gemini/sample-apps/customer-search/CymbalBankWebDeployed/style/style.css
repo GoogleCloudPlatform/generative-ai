@@ -1473,12 +1473,12 @@ h4 {
   padding-right: 4%;
 }
 
-.savingh1 {
+.saving-h1 {
   font-size: 5.5rem;
   line-height: 1.35;
 }
 
-.savingh2 {
+.saving-h2 {
   font-size: 4.5rem;
   line-height: 1.35;
   text-align: center;
@@ -1486,35 +1486,35 @@ h4 {
   padding-bottom: 40px;
 }
 
-.savingh3 {
+.saving-h3 {
   font-size: 3rem;
   line-height: 1.35;
   padding-top: 40px;
   padding-bottom: 10px;
 }
 
-.savingh4 {
+.saving-h4 {
   font-size: 2.4rem;
   font-weight: 500;
 }
 
-.savingh5 {
+.saving-h5 {
   font-size: 2rem;
   font-weight: 400;
 }
 
-.savingp {
+.saving-p {
   color: #666;
   font-size: 1.5rem;
 }
 
-.savingul {
+.saving-ul {
   color: #666;
   font-size: 1.5rem;
   padding-left: 2%;
 }
 
-.savingol {
+.saving-ol {
   color: #666;
   font-size: 1.5rem;
   padding-left: 2%;

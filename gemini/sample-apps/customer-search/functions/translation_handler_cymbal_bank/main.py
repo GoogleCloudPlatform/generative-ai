@@ -142,9 +142,9 @@ def handle_category_wise_expenditure_webhook(
     url: str = environ.get("CATEGORIZE_EXPENSE_URL")
     res_json = get_json_response(url, request_json, request_headers)
     if "en" not in source_language_code:
-        res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-            0
-        ] = translate_fulfilment_response(res_json, "en-US", source_language_code)
+        res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
+            translate_fulfilment_response(res_json, "en-US", source_language_code)
+        )
         for i in range(
             len(
                 res_json["fulfillment_response"]["messages"][1]["payload"][
@@ -207,7 +207,7 @@ def handle_webhook(request_json: dict) -> dict:
         url = {
             "account-summary": environ.get("ACCOUNT_SUMMARY_URL"),
             "account-tips": environ.get("ACCOUNT_TIPS_URL"),
-            "event": environ.get("EVENT_RECOMM_URL"),
+            "event": environ.get("EVENT_RECOMMENDATION_URL"),
             "fd_confirmation": environ.get("FD_CONFIRM_URL"),
             "high-risk-mutual-fund": environ.get("HIGH_RISK_MF_URL"),
             "recommend-mutual-fund": environ.get("MF_RECOMM_URL"),
@@ -219,9 +219,9 @@ def handle_webhook(request_json: dict) -> dict:
         res_json = get_json_response(url, request_json, request_headers)
 
         if "en" not in source_language_code:
-            res_json["fulfillment_response"]["messages"][0]["text"]["text"][
-                0
-            ] = translate_fulfilment_response(res_json, "en-US", source_language_code)
+            res_json["fulfillment_response"]["messages"][0]["text"]["text"][0] = (
+                translate_fulfilment_response(res_json, "en-US", source_language_code)
+            )
 
     elif tag in [
         "account-balance",
@@ -233,7 +233,7 @@ def handle_webhook(request_json: dict) -> dict:
     ]:
         url = {
             "account-balance": environ.get("ACCOUNT_BALANCE_URL"),
-            "credit-card-recommendation": environ.get("CREDIT_CARD_RECOMM_URL"),
+            "credit-card-recommendation": environ.get("CREDIT_CARD_RECOMMENDATION_URL"),
             "create-credit-card": environ.get("CREDIT_CARD_CREATE_URL"),
             "fd-recommendation": environ.get("FD_RECOMM_URL"),
             "fd_tenure": environ.get("FD_TENURE_URL"),
@@ -244,10 +244,10 @@ def handle_webhook(request_json: dict) -> dict:
 
         if "en" not in source_language_code:
             for i in range(len(res_json["fulfillment_response"]["messages"])):
-                res_json["fulfillment_response"]["messages"][i]["text"]["text"][
-                    0
-                ] = translate_fulfilment_response(
-                    res_json, "en-US", source_language_code, i
+                res_json["fulfillment_response"]["messages"][i]["text"]["text"][0] = (
+                    translate_fulfilment_response(
+                        res_json, "en-US", source_language_code, i
+                    )
                 )
 
     elif tag == "category-wise-expenditure":
@@ -265,7 +265,7 @@ def handle_webhook(request_json: dict) -> dict:
             "debt_fund_webhook": environ.get("DEBT_FUND_URL"),
             "expense-prediction": environ.get("EXPENSE_PREDICT_URL"),
             "recommend-debt-fund": environ.get("DEBT_FUND_RECOMM_URL"),
-            "travel": environ.get("TRAVEL_EVENT_RECOMM_URL"),
+            "travel": environ.get("TRAVEL_EVENT_RECOMMENDATION_URL"),
         }.get(tag)
 
         res_json = get_json_response(url, request_json, request_headers)

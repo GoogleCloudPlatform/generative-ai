@@ -1616,10 +1616,10 @@ resource "google_cloudfunctions2_function" "translation-handler-cymbal-bank" {
       ACCOUNT_SUMMARY_URL     = google_cloudfunctions2_function.account-health-summarisation-optimised.url
       ACCOUNT_BALANCE_URL     = google_cloudfunctions2_function.get-account-balance.url
       ACCOUNT_TIPS_URL        = google_cloudfunctions2_function.account-health-tips.url
-      CREDIT_CARD_RECOMM_URL  = google_cloudfunctions2_function.travel_card_recommendation.url
+      CREDIT_CARD_RECOMMENDATION_URL  = google_cloudfunctions2_function.travel_card_recommendation.url
       CREDIT_CARD_CREATE_URL  = google_cloudfunctions2_function.upload_credit_card.url
       DEBT_FUND_URL           = google_cloudfunctions2_function.how_my_debt_funds_doing.url
-      EVENT_RECOMM_URL        = google_cloudfunctions2_function.event-recommendation.url
+      EVENT_RECOMMENDATION_URL        = google_cloudfunctions2_function.event-recommendation.url
       EXPENSE_PREDICT_URL     = google_cloudfunctions2_function.expense-prediction.url
       FD_RECOMM_URL           = google_cloudfunctions2_function.fd_recommendation.url
       FD_CONFIRM_URL          = google_cloudfunctions2_function.fd_confirmation.url
@@ -1630,7 +1630,7 @@ resource "google_cloudfunctions2_function" "translation-handler-cymbal-bank" {
       DEBT_FUND_RECOMM_URL    = google_cloudfunctions2_function.recommend_debt_funds.url
       UNUSUAL_EXPENSE_URL     = google_cloudfunctions2_function.unusual_spends.url
       FIND_NEAREST_DEALER_URL = google_cloudfunctions2_function.find_nearest_car_dealers.url
-      TRAVEL_EVENT_RECOMM_URL = google_cloudfunctions2_function.travel-event-recommendation.url
+      TRAVEL_EVENT_RECOMMENDATION_URL = google_cloudfunctions2_function.travel-event-recommendation.url
       FD_TENURE_VAL_URL       = google_cloudfunctions2_function.tenure_validation.url
     }
   }
