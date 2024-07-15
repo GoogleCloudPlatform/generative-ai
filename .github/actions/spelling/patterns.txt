@@ -231,6 +231,12 @@ themes\.googleusercontent\.com/static/fonts/[^/\s"]+/v\d+/[^.]+.
 # GHSA
 GHSA(?:-[0-9a-z]{4}){3}
 
+# Twitter/X links
+\b(twitter|x)\.com[\w/]+\b
+
+# Hugging Face links
+\bhuggingface.co[\w\./-]+\b
+
 # GitHub actions
 \buses:\s+[-\w.]+/[-\w./]+@[-\w.]+
 
@@ -242,3 +248,6 @@ GHSA(?:-[0-9a-z]{4}){3}
 \bgitlab\.[^/\s"]*/uploads/[-a-zA-Z=;:/0-9+]*
 # GitLab commits
 \bgitlab\.[^/\s"]*/(?:[^/\s"]+/){2}commits?/[0-9a-f]+\b
+
+# Truncated outputs in Jupyter Notebooks
+[A-Za-z]+\.\.\.

@@ -32,7 +32,7 @@ from google.colab import auth
 auth.authenticate_user()
 ```
 
-When using the vertexai Python SDK, you will also need to initialize it with your GCP `project_id` and `location`:
+When using the vertexai Python SDK, you will also need to initialize it with your Google Cloud `project_id` and `location`:
 
 ```py
 PROJECT_ID = "your-project-id"
