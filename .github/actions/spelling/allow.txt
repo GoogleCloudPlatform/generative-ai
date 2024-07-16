@@ -132,6 +132,8 @@ Genkit
 GenTwo
 getdata
 getexif
+gfile
+GFile
 gidiyor
 Gisting
 github
@@ -274,6 +276,7 @@ pysftp
 QPM
 qubit
 qubits
+Qwiklabs
 ragas
 RAGAS
 ragdemos
