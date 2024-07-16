@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 RUN groupadd --gid 1000 appuser \
     && useradd --uid 1000 --gid 1000 -ms /bin/bash appuser
