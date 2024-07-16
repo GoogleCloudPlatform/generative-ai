@@ -100,6 +100,8 @@ Genkit
 GenTwo
 getdata
 getexif
+gfile
+GFile
 gidiyor
 Gisting
 github
