@@ -1,5 +1,5 @@
 functions-framework==3.*
-google-cloud-alloydb-connector[pg8000]==1.2.0
-langchain-core==0.2.19
-langchain-google-vertexai==1.0.6
-SQLAlchemy==2.0.31
+google-cloud-alloydb-connector[pg8000]==1.0.0
+langchain-core==0.1.45
+langchain-google-vertexai==1.0.1
+SQLAlchemy==2.0.29
