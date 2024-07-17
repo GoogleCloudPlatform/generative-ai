@@ -22,9 +22,8 @@ environment variables and access to the Vertex AI Search service.
 import os
 from typing import Generator
 
-from enums import EngineChunkType, EngineDataType, SummaryType
 import pytest
-from vertex_search_client import VertexSearchClient
+from vertex_search_client import VertexSearchClient, VertexSearchConfig
 
 # Load environment variables
 PROJECT_ID = os.getenv("PROJECT_ID", "your-project")
@@ -47,14 +46,15 @@ def vertex_search_client() -> Generator[VertexSearchClient, None, None]:
     Yields:
         VertexSearchClient: An instance of the VertexSearchClient for testing.
     """
-    client = VertexSearchClient(
+    config = VertexSearchConfig(
         project_id=PROJECT_ID,
         location=LOCATION,
         data_store_id=DATA_STORE_ID,
-        engine_data_type=ENGINE_DATA_TYPE,
-        engine_chunk_type=ENGINE_CHUNK_TYPE,
-        summary_type=SUMMARY_TYPE,
+        engine_data_type="UNSTRUCTURED",
+        engine_chunk_type="DOCUMENT_WITH_EXTRACTIVE_SEGMENTS",
+        summary_type="VERTEX_AI_SEARCH",
     )
+    client = VertexSearchClient(config)
     yield client
 
 
@@ -97,14 +97,15 @@ def test_unstructured_summary() -> None:
     settings for unstructured data and summary generation, then performs
     a search to verify the results.
     """
-    client = VertexSearchClient(
+    config = VertexSearchConfig(
         project_id=PROJECT_ID,
         location=LOCATION,
         data_store_id=DATA_STORE_ID,
-        engine_data_type=EngineDataType.UNSTRUCTURED,
-        engine_chunk_type=EngineChunkType.DOCUMENT_WITH_EXTRACTIVE_SEGMENTS,
-        summary_type=SummaryType.VERTEX_AI_SEARCH,
+        engine_data_type="UNSTRUCTURED",
+        engine_chunk_type="DOCUMENT_WITH_EXTRACTIVE_SEGMENTS",
+        summary_type="VERTEX_AI_SEARCH",
     )
+    client = VertexSearchClient(config)
     results = client.search("What is the name of the company?")
     # Check the structure of the results
     assert "simplified_results" in results

@@ -23,30 +23,13 @@ import json
 from typing import Any, Dict, List
 from unittest.mock import MagicMock, patch
 
-from enums import EngineChunkType, EngineDataType, SummaryType
 from google.cloud import discoveryengine_v1alpha as discoveryengine
 from google.cloud.discoveryengine_v1alpha.services.search_service.pagers import (
     SearchPager,
 )
 from google.cloud.discoveryengine_v1alpha.types import Document, SearchResponse
 import pytest
-from vertex_search_client import VertexSearchClient
-
-
-class DerivedStructData:
-    """Mock class for derived struct data in test responses."""
-
-    def __init__(
-        self,
-        title: str,
-        link: str,
-        extractive_answers: List[Dict[str, Any]],
-        snippets: List[Dict[str, Any]],
-    ):
-        self.title = title
-        self.link = link
-        self.extractive_answers = extractive_answers
-        self.snippets = snippets
+from vertex_search_client import VertexSearchClient, VertexSearchConfig
 
 
 def create_mock_search_pager_result() -> MagicMock:
@@ -96,35 +79,38 @@ def mock_search_service_client() -> MagicMock:
 
 
 @pytest.fixture
-def vertex_search_client(mock_search_service_client: MagicMock) -> VertexSearchClient:
+def vertex_search_config() -> VertexSearchConfig:
+    """Fixture to create a VertexSearchConfig instance for testing."""
+    return VertexSearchConfig(
+        project_id="test-project",
+        location="us-central1",
+        data_store_id="test-data-store",
+        engine_data_type="UNSTRUCTURED",
+        engine_chunk_type="DOCUMENT_WITH_EXTRACTIVE_SEGMENTS",
+        summary_type="VERTEX_AI_SEARCH",
+    )
+
+
+@pytest.fixture
+def vertex_search_client(
+    mock_search_service_client: MagicMock, vertex_search_config: VertexSearchConfig
+) -> VertexSearchClient:
     """Fixture to create a VertexSearchClient instance for testing."""
-    return VertexSearchClient(
-        project_id="test-project",
-        location="us-central1",
-        data_store_id="test-data-store",
-        engine_data_type=EngineDataType.UNSTRUCTURED,
-        engine_chunk_type=EngineChunkType.DOCUMENT_WITH_EXTRACTIVE_SEGMENTS,
-        summary_type=SummaryType.VERTEX_AI_SEARCH,
-    )
+    return VertexSearchClient(vertex_search_config)
 
 
-def test_init(mock_search_service_client: MagicMock) -> None:
+def test_init(
+    mock_search_service_client: MagicMock, vertex_search_config: VertexSearchConfig
+) -> None:
     """Test the initialization of VertexSearchClient."""
-    client = VertexSearchClient(
-        project_id="test-project",
-        location="us-central1",
-        data_store_id="test-data-store",
-        engine_data_type=EngineDataType.UNSTRUCTURED,
-        engine_chunk_type=EngineChunkType.DOCUMENT_WITH_EXTRACTIVE_SEGMENTS,
-        summary_type=SummaryType.VERTEX_AI_SEARCH,
-    )
+    client = VertexSearchClient(vertex_search_config)
 
-    assert client.project_id == "test-project"
-    assert client.location == "us-central1"
-    assert client.data_store_id == "test-data-store"
-    assert client.engine_data_type == EngineDataType.UNSTRUCTURED
-    assert client.engine_chunk_type == EngineChunkType.DOCUMENT_WITH_EXTRACTIVE_SEGMENTS
-    assert client.summary_type == SummaryType.VERTEX_AI_SEARCH
+    assert client.config.project_id == "test-project"
+    assert client.config.location == "us-central1"
+    assert client.config.data_store_id == "test-data-store"
+    assert client.config.engine_data_type == "UNSTRUCTURED"
+    assert client.config.engine_chunk_type == "DOCUMENT_WITH_EXTRACTIVE_SEGMENTS"
+    assert client.config.summary_type == "VERTEX_AI_SEARCH"
 
     mock_search_service_client.assert_called_once()
 

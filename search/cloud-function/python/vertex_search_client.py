@@ -19,29 +19,51 @@ Vertex AI Search API. It handles configuration, query construction, and
 result parsing.
 
 Example usage:
-    client = VertexSearchClient(
-        project_id="your-project-id",
-        location="your-location",
-        data_store_id="your-data-store-id",
-        engine_data_type=0,
-        engine_chunk_type=1,
-        summary_type=1
+    config = VertexSearchConfig(
+        project_id="your-project",
+        location="global",
+        data_store_id="your-data-store",
+        engine_data_type="UNSTRUCTURED",
+        engine_chunk_type="CHUNK",
+        summary_type="VERTEX_AI_SEARCH",
     )
+    client = VertexSearchClient(config)
     results = client.search("your search query")
     print(results)
 """
+from dataclasses import dataclass
 import html
 import json
 import re
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Literal, Union
 
-from enums import EngineChunkType, EngineDataType, SummaryType
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine_v1alpha as discoveryengine
 from google.cloud.discoveryengine_v1alpha.services.search_service.pagers import (
     SearchPager,
 )
 from google.cloud.discoveryengine_v1alpha.types import SearchResponse
+
+# Define types using string literals, similar to enums.
+EngineDataTypeStr = Literal["UNSTRUCTURED", "STRUCTURED", "WEBSITE", "BLENDED"]
+EngineChunkTypeStr = Literal[
+    "DOCUMENT_WITH_SNIPPETS", "DOCUMENT_WITH_EXTRACTIVE_SEGMENTS", "CHUNK"
+]
+SummaryTypeStr = Literal[
+    "NONE", "VERTEX_AI_SEARCH", "GENERATE_GROUNDED_ANSWERS", "GEMINI"
+]
+
+
+@dataclass
+class VertexSearchConfig:
+    """Config for the Vertex AI Search data store."""
+
+    project_id: str
+    location: str
+    data_store_id: str
+    engine_data_type: EngineDataTypeStr
+    engine_chunk_type: EngineChunkTypeStr
+    summary_type: SummaryTypeStr
 
 
 class VertexSearchClient:
@@ -53,15 +75,7 @@ class VertexSearchClient:
     configurations.
     """
 
-    def __init__(
-        self,
-        project_id: str,
-        location: str,
-        data_store_id: str,
-        engine_data_type: Union[EngineDataType, int, str],
-        engine_chunk_type: Union[EngineChunkType, int, str],
-        summary_type: Union[SummaryType, int, str],
-    ):
+    def __init__(self, config: VertexSearchConfig):
         """
         Initialize the VertexSearchClient.
 
@@ -73,12 +87,7 @@ class VertexSearchClient:
             engine_chunk_type (EngineChunkType | int | str): The type of chunking used.
             summary_type (SummaryType | int | str): The type of summary to generate.
         """
-        self.project_id = project_id
-        self.location = location
-        self.data_store_id = data_store_id
-        self.engine_data_type = EngineDataType(engine_data_type)
-        self.engine_chunk_type = EngineChunkType(engine_chunk_type)
-        self.summary_type = SummaryType(summary_type)
+        self.config = config
         self.client = self._create_client()
         self.serving_config = self._get_serving_config()
 
@@ -90,8 +99,8 @@ class VertexSearchClient:
             discoveryengine.SearchServiceClient: The configured client.
         """
         client_options = None
-        if self.location != "global":
-            api_endpoint = f"{self.location}-discoveryengine.googleapis.com"
+        if self.config.location != "global":
+            api_endpoint = f"{self.config.location}-discoveryengine.googleapis.com"
             client_options = ClientOptions(api_endpoint=api_endpoint)
         return discoveryengine.SearchServiceClient(client_options=client_options)
 
@@ -103,9 +112,9 @@ class VertexSearchClient:
             str: The serving configuration path.
         """
         return self.client.serving_config_path(
-            project=self.project_id,
-            location=self.location,
-            data_store=self.data_store_id,
+            project=self.config.project_id,
+            location=self.config.location,
+            data_store=self.config.data_store_id,
             serving_config="default_config",
         )
 
@@ -142,11 +151,11 @@ class VertexSearchClient:
         """
         snippet_spec = None
         extractive_content_spec = None
-        if self.engine_chunk_type == EngineChunkType.DOCUMENT_WITH_SNIPPETS:
+        if self.config.engine_chunk_type == "DOCUMENT_WITH_SNIPPETS":
             snippet_spec = discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
                 return_snippet=True,
             )
-        if self.engine_chunk_type == EngineChunkType.DOCUMENT_WITH_EXTRACTIVE_SEGMENTS:
+        if self.config.engine_chunk_type == "DOCUMENT_WITH_EXTRACTIVE_SEGMENTS":
             snippet_spec = discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
                 return_snippet=True,
             )
@@ -158,7 +167,7 @@ class VertexSearchClient:
             )
 
         summary_spec = None
-        if self.summary_type == SummaryType.VERTEX_AI_SEARCH:
+        if self.config.summary_type == "VERTEX_AI_SEARCH":
             summary_spec = discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
                 summary_result_count=5,
                 include_citations=True,
@@ -284,7 +293,7 @@ class VertexSearchClient:
         metadata.update(json_data)
         result: Dict[str, Any] = {"metadata": metadata}
 
-        if self.engine_data_type == EngineDataType.STRUCTURED:
+        if self.config.engine_data_type == "STRUCTURED":
             structured_data = (
                 json_data if json_data else document.get("struct_data", {})
             )

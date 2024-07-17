@@ -29,10 +29,10 @@ from typing import Dict, Tuple
 from flask import Flask, Request, request
 import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
-from vertex_search_client import VertexSearchClient
+from vertex_search_client import VertexSearchClient, VertexSearchConfig
 
 # Initialize the VertexSearchClient
-client = VertexSearchClient(
+config = VertexSearchConfig(
     project_id=os.getenv("PROJECT_ID", "your-project"),
     location=os.getenv("LOCATION", "global"),
     data_store_id=os.getenv("DATA_STORE_ID", "your-data-store"),
@@ -40,6 +40,7 @@ client = VertexSearchClient(
     engine_chunk_type=os.getenv("ENGINE_CHUNK_TYPE", "CHUNK"),
     summary_type=os.getenv("SUMMARY_TYPE", "VERTEX_AI_SEARCH"),
 )
+client = VertexSearchClient(config)
 
 
 def set_cors_headers(headers: Dict[str, str]) -> None:
