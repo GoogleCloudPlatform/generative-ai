@@ -29,7 +29,6 @@ from typing import Dict, Tuple
 from flask import Request
 import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
-
 from vertex_search_client import VertexSearchClient
 
 # Initialize the VertexSearchClient
