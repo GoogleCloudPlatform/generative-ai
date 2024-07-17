@@ -45,6 +45,14 @@ from google.cloud.discoveryengine_v1alpha.types import SearchResponse
 
 
 class VertexSearchClient:
+    """
+    A client for interacting with Google Cloud Vertex AI Search.
+
+    This class provides methods to configure the search engine, perform searches,
+    and parse the results. It supports different types of data stores and search
+    configurations.
+    """
+
     def __init__(
         self,
         project_id: str,
@@ -54,6 +62,17 @@ class VertexSearchClient:
         engine_chunk_type: EngineChunkType,
         summary_type: SummaryType,
     ):
+        """
+        Initialize the VertexSearchClient.
+
+        Args:
+            project_id (str): The Google Cloud project ID.
+            location (str): The location of the Vertex AI Search data store.
+            data_store_id (str): The ID of the Vertex AI Search data store.
+            engine_data_type (EngineDataType): The type of data in the engine.
+            engine_chunk_type (EngineChunkType): The type of chunking used.
+            summary_type (SummaryType): The type of summary to generate.
+        """
         self.project_id = project_id
         self.location = location
         self.data_store_id = data_store_id
@@ -64,6 +83,12 @@ class VertexSearchClient:
         self.serving_config = self._get_serving_config()
 
     def _create_client(self) -> discoveryengine.SearchServiceClient:
+        """
+        Create and configure the SearchServiceClient.
+
+        Returns:
+            discoveryengine.SearchServiceClient: The configured client.
+        """
         client_options = None
         if self.location != "global":
             api_endpoint = f"{self.location}-discoveryengine.googleapis.com"
@@ -71,6 +96,12 @@ class VertexSearchClient:
         return discoveryengine.SearchServiceClient(client_options=client_options)
 
     def _get_serving_config(self) -> str:
+        """
+        Get the serving configuration path for the Vertex AI Search data store.
+
+        Returns:
+            str: The serving configuration path.
+        """
         return self.client.serving_config_path(
             project=self.project_id,
             location=self.location,
@@ -87,7 +118,7 @@ class VertexSearchClient:
             page_size (int): Number of results to return per page.
 
         Returns:
-            dict: Parsed search results.
+            dict: Parsed and simplified search results.
         """
         request = self._build_search_request(query, page_size)
         print(f"<request> {request} </request>")
@@ -99,6 +130,16 @@ class VertexSearchClient:
     def _build_search_request(
         self, query: str, page_size: int
     ) -> discoveryengine.SearchRequest:
+        """
+        Build a SearchRequest object based on the client configuration and query.
+
+        Args:
+            query (str): The search query.
+            page_size (int): Number of results to return per page.
+
+        Returns:
+            discoveryengine.SearchRequest: The configured search request object.
+        """
         snippet_spec = None
         extractive_content_spec = None
         if self.engine_chunk_type == EngineChunkType.DOCUMENT_WITH_SNIPPETS:
@@ -144,12 +185,12 @@ class VertexSearchClient:
 
     def _map_search_pager_to_dict(self, pager: SearchPager) -> Dict[str, Any]:
         """
-        Maps a SearchPager to a dictionary structure.
+        Maps a SearchPager to a dictionary structure, iterativly requesting results.
+
         https://cloud.google.com/python/docs/reference/discoveryengine/latest/google.cloud.discoveryengine_v1alpha.services.search_service.pagers.SearchPager
 
         Args:
             pager (SearchPager): The pager returned by the search method.
-            max_results (int, optional): Maximum number of results to return.
 
         Returns:
             Dict[str, Any]: A dictionary containing the search results and metadata.
@@ -191,6 +232,15 @@ class VertexSearchClient:
         return output
 
     def _simplify_search_results(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Simplify the search results by parsing documents and chunks.
+
+        Args:
+            response (Dict[str, Any]): The raw search response.
+
+        Returns:
+            Dict[str, Any]: The simplified search results.
+        """
         if "results" not in response:
             return response
         simplified_results = []
@@ -205,6 +255,18 @@ class VertexSearchClient:
         return response
 
     def _parse_document_result(self, document: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Parse a single document result from the search response.
+
+        This supports both structured and unstructured data, and also supports
+        extractive segments and answers and snippets.
+
+        Args:
+            document (Dict[str, Any]): The document data from the search result.
+
+        Returns:
+            Dict[str, Any]: The parsed document page_content and metadata.
+        """
         metadata = {
             **document.get("derived_struct_data", {}),
             **document.get("struct_data", {}),
@@ -240,6 +302,15 @@ class VertexSearchClient:
         return result
 
     def _parse_segments(self, segments: List[Dict[str, Any]]) -> str:
+        """
+        Parse extractive segments from a single document of search results.
+
+        Args:
+            segments (List[Dict[str, Any]]): The list of extractive segments.
+
+        Returns:
+            str: A formatted string containing page number, score and the text of each segment.
+        """
         parsed_segments = [
             {
                 "content": self._strip_content(segment.get("content", "")),
@@ -254,6 +325,15 @@ class VertexSearchClient:
         )
 
     def _parse_snippets(self, snippets: List[Dict[str, Any]]) -> str:
+        """
+        Parse snippets from a single document of search results.
+
+        Args:
+            snippets (List[Dict[str, Any]]): The list of snippets.
+
+        Returns:
+            str: A formatted string containing the successfully parsed snippets.
+        """
         return "\n\n".join(
             self._strip_content(snippet.get("snippet", ""))
             for snippet in snippets
@@ -261,6 +341,15 @@ class VertexSearchClient:
         )
 
     def _parse_chunk_result(self, chunk: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Parse a single chunk result from the search response.
+
+        Args:
+            chunk (Dict[str, Any]): The chunk data from the search result.
+
+        Returns:
+            Dict[str, Any]: The parsed chunk page_content and metadata.
+        """
         metadata = {
             "chunk_id": chunk.get("id"),
             "score": chunk.get("relevance_score"),
@@ -281,5 +370,14 @@ class VertexSearchClient:
 
     @staticmethod
     def _strip_content(text: str) -> str:
+        """
+        Strip HTML tags and unescape HTML entities from the given text.
+
+        Args:
+            text (str): The input text to clean.
+
+        Returns:
+            str: The cleaned text.
+        """
         text = re.sub("<.*?>", "", text)
         return html.unescape(text).strip()

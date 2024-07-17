@@ -14,12 +14,13 @@
 import json
 from unittest.mock import MagicMock, patch
 
-import pytest
 from enums import EngineChunkType, EngineDataType, SummaryType
 from google.cloud import discoveryengine_v1alpha as discoveryengine
-from google.cloud.discoveryengine_v1alpha.services.search_service.pagers import \
-    SearchPager
+from google.cloud.discoveryengine_v1alpha.services.search_service.pagers import (
+    SearchPager,
+)
 from google.cloud.discoveryengine_v1alpha.types import Document, SearchResponse
+import pytest
 from vertex_search_client import VertexSearchClient
 
 

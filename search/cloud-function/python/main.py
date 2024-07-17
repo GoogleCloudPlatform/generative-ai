@@ -18,34 +18,9 @@ This module provides an HTTP endpoint for performing searches using
 the Vertex AI Search API. It uses the VertexSearchClient to handle
 the core search functionality.
 
-This is an optional means to access and control your queries to the
-Vertex AI Search API. You may do this to simplify CORS and bearer
-token authentication, or to customize inputs and outputs.
-
-If you want more customization, you may want to use an orchestration
-framework like LangChain, PromptFlow, Breadboard, etc.
-
-To deploy this function:
-1. Ensure you have the Google Cloud SDK installed and configured.
-2. Run: gcloud functions deploy vertex_search --runtime python39 --trigger-http --allow-unauthenticated
-
-Environment variables required:
-- PROJECT_ID: Your Google Cloud project ID
-- LOCATION: The location of your Vertex AI Search data store
-- DATA_STORE_ID: The ID of your Vertex AI Search data store
-- ENGINE_DATA_TYPE: Type of data in the engine (0-3)
-- ENGINE_CHUNK_TYPE: Type of chunking used (0-3)
-- SUMMARY_TYPE: Type of summary used (0-3)
-
-Example usage (after deployment):
-    curl -X POST https://YOUR_FUNCTION_URL \
-    -H "Content-Type: application/json" \
-    -d '{"search_term": "your search query"}'
-
-See the README.md for more options including local development.
-
+For deployment instructions, environment variable setup, and usage examples,
+please refer to the README.md file.
 """
-
 import json
 import os
 
@@ -65,6 +40,14 @@ client = VertexSearchClient(
 
 
 def set_cors_headers(headers):
+    """
+    Set CORS headers for the response.
+
+    This function adds the necessary headers to allow cross-origin requests.
+
+    Args:
+        headers (dict): The headers dictionary to update with CORS headers.
+    """
     headers.update(
         {
             "Access-Control-Allow-Origin": "*",
@@ -77,6 +60,19 @@ def set_cors_headers(headers):
 
 @functions_framework.http
 def vertex_search(request):
+    """
+    Handle HTTP requests for Vertex AI Search.
+
+    This function processes incoming HTTP requests, performs the search using
+    the VertexSearchClient, and returns the results. It handles CORS, validates
+    the request, and manages potential errors.
+
+    Args:
+        request (flask.Request): The incoming HTTP request object.
+
+    Returns:
+        tuple: A tuple containing the response body, status code, and headers.
+    """
     headers = {}
     set_cors_headers(headers)
 
@@ -108,6 +104,15 @@ if __name__ == "__main__":
 
     @app.route("/", methods=["POST"])
     def index():
+        """
+        Flask route for handling POST requests when running locally.
+
+        This function is used when the script is run directly (not as a Google Cloud Function).
+        It mimics the behavior of the vertex_search function for local testing.
+
+        Returns:
+            The result of calling vertex_search with the current request.
+        """
         return vertex_search(request)
 
     app.run("localhost", 8080, debug=True)
