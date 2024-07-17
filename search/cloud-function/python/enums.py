@@ -17,6 +17,8 @@ from enum import IntEnum
 class FlexibleIntEnum(IntEnum):
     @classmethod
     def _missing_(cls, value):
+        if isinstance(value, cls):
+            return value
         if isinstance(value, str):
             try:
                 return cls[value.upper()]
@@ -24,10 +26,13 @@ class FlexibleIntEnum(IntEnum):
                 pass
         elif isinstance(value, int):
             try:
-                return cls(value)
-            except ValueError:
+                return next(member for member in cls if member.value == value)
+            except StopIteration:
                 pass
         raise ValueError(f"{value} is not a valid {cls.__name__}")
+
+    def __str__(self):
+        return self.name
 
 
 class EngineDataType(FlexibleIntEnum):
