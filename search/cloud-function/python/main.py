@@ -21,32 +21,36 @@ the core search functionality.
 For deployment instructions, environment variable setup, and usage examples,
 please refer to the README.md file.
 """
+
 import json
 import os
+from typing import Any, Dict, Tuple
 
+from enums import EngineChunkType, EngineDataType, SummaryType
+from flask import Request
 import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
 from vertex_search_client import VertexSearchClient
 
 # Initialize the VertexSearchClient
 client = VertexSearchClient(
-    project_id=os.getenv("PROJECT_ID"),
-    location=os.getenv("LOCATION"),
-    data_store_id=os.getenv("DATA_STORE_ID"),
-    engine_data_type=os.getenv("ENGINE_DATA_TYPE", 0),
-    engine_chunk_type=os.getenv("ENGINE_CHUNK_TYPE", 1),
-    summary_type=os.getenv("SUMMARY_TYPE", 1),
+    project_id=os.getenv("PROJECT_ID", "your-project"),
+    location=os.getenv("LOCATION", "global"),
+    data_store_id=os.getenv("DATA_STORE_ID", "your-data-store"),
+    engine_data_type=os.getenv("ENGINE_DATA_TYPE", "UNSTRUCTURED"),
+    engine_chunk_type=os.getenv("ENGINE_CHUNK_TYPE", "CHUNK"),
+    summary_type=os.getenv("SUMMARY_TYPE", "VERTEX_AI_SEARCH"),
 )
 
 
-def set_cors_headers(headers):
+def set_cors_headers(headers: Dict[str, str]) -> None:
     """
     Set CORS headers for the response.
 
     This function adds the necessary headers to allow cross-origin requests.
 
     Args:
-        headers (dict): The headers dictionary to update with CORS headers.
+        headers (Dict[str, str]): The headers dictionary to update with CORS headers.
     """
     headers.update(
         {
@@ -59,7 +63,7 @@ def set_cors_headers(headers):
 
 
 @functions_framework.http
-def vertex_search(request):
+def vertex_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
     """
     Handle HTTP requests for Vertex AI Search.
 
@@ -71,9 +75,10 @@ def vertex_search(request):
         request (flask.Request): The incoming HTTP request object.
 
     Returns:
-        tuple: A tuple containing the response body, status code, and headers.
+        Tuple[str, int, Dict[str, str]]: A tuple containing the response body,
+        status code, and headers.
     """
-    headers = {}
+    headers: Dict[str, str] = {}
     set_cors_headers(headers)
 
     if request.method == "OPTIONS":
@@ -98,12 +103,12 @@ def vertex_search(request):
 
 
 if __name__ == "__main__":
-    from flask import Flask, request
+    from flask import Flask
 
     app = Flask(__name__)
 
     @app.route("/", methods=["POST"])
-    def index():
+    def index() -> Tuple[str, int, Dict[str, str]]:
         """
         Flask route for handling POST requests when running locally.
 
@@ -111,7 +116,7 @@ if __name__ == "__main__":
         It mimics the behavior of the vertex_search function for local testing.
 
         Returns:
-            The result of calling vertex_search with the current request.
+            Tuple[str, int, Dict[str, str]]: The result of calling vertex_search with the current request.
         """
         return vertex_search(request)
 

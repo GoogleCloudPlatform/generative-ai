@@ -58,9 +58,9 @@ class VertexSearchClient:
         project_id: str,
         location: str,
         data_store_id: str,
-        engine_data_type: EngineDataType,
-        engine_chunk_type: EngineChunkType,
-        summary_type: SummaryType,
+        engine_data_type: EngineDataType | int | str,
+        engine_chunk_type: EngineChunkType | int | str,
+        summary_type: SummaryType | int | str,
     ):
         """
         Initialize the VertexSearchClient.
@@ -69,9 +69,9 @@ class VertexSearchClient:
             project_id (str): The Google Cloud project ID.
             location (str): The location of the Vertex AI Search data store.
             data_store_id (str): The ID of the Vertex AI Search data store.
-            engine_data_type (EngineDataType): The type of data in the engine.
-            engine_chunk_type (EngineChunkType): The type of chunking used.
-            summary_type (SummaryType): The type of summary to generate.
+            engine_data_type (EngineDataType | int | str): The type of data in the engine.
+            engine_chunk_type (EngineChunkType | int | str): The type of chunking used.
+            summary_type (SummaryType | int | str): The type of summary to generate.
         """
         self.project_id = project_id
         self.location = location
@@ -195,7 +195,7 @@ class VertexSearchClient:
         Returns:
             Dict[str, Any]: A dictionary containing the search results and metadata.
         """
-        output = {
+        output: Dict[str, Any] = {
             "results": [
                 SearchResponse.SearchResult.to_dict(result) for result in pager
             ],
@@ -224,6 +224,7 @@ class VertexSearchClient:
             output["query_expansion_info"] = SearchResponse.QueryExpansionInfo.to_dict(
                 pager.query_expansion_info
             )
+
         if pager.applied_controls:
             output["applied_controls"] = [
                 control.strip() for control in pager.applied_controls

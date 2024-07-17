@@ -18,16 +18,16 @@ import pytest
 from vertex_search_client import VertexSearchClient
 
 # Load environment variables
-PROJECT_ID = os.getenv("PROJECT_ID")
-LOCATION = os.getenv("LOCATION")
-DATA_STORE_ID = os.getenv("DATA_STORE_ID")
-ENGINE_DATA_TYPE = os.getenv("ENGINE_DATA_TYPE", 0)
-ENGINE_CHUNK_TYPE = os.getenv("ENGINE_CHUNK_TYPE", 1)
-SUMMARY_TYPE = os.getenv("SUMMARY_TYPE", 1)
+PROJECT_ID = os.getenv("PROJECT_ID", "your-project")
+LOCATION = os.getenv("LOCATION", "global")
+DATA_STORE_ID = os.getenv("DATA_STORE_ID", "your-data-store")
+ENGINE_DATA_TYPE = os.getenv("ENGINE_DATA_TYPE", "UNSTRUCTURED")
+ENGINE_CHUNK_TYPE = os.getenv("ENGINE_CHUNK_TYPE", "CHUNK")
+SUMMARY_TYPE = os.getenv("SUMMARY_TYPE", "VERTEX_AI_SEARCH")
 
 
 @pytest.fixture(scope="module")
-def client():
+def client() -> VertexSearchClient:
     return VertexSearchClient(
         project_id=PROJECT_ID,
         location=LOCATION,
@@ -38,7 +38,7 @@ def client():
     )
 
 
-def test_search_integration(client):
+def test_search_integration(client: VertexSearchClient) -> None:
     # Perform a search
     query = "test query"
     results = client.search(query)
@@ -62,7 +62,7 @@ def test_search_integration(client):
 
 # Test with different engine types and settings.
 # You must have these configured already...
-def test_unstructured_summary():
+def test_unstructured_summary() -> None:
     client = VertexSearchClient(
         project_id=PROJECT_ID,
         location=LOCATION,

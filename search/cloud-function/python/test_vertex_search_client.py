@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
+from typing import Any, Dict, List
 from unittest.mock import MagicMock, patch
 
 from enums import EngineChunkType, EngineDataType, SummaryType
@@ -25,14 +26,20 @@ from vertex_search_client import VertexSearchClient
 
 
 class DerivedStructData:
-    def __init__(self, title, link, extractive_answers, snippets):
+    def __init__(
+        self,
+        title: str,
+        link: str,
+        extractive_answers: List[Dict[str, Any]],
+        snippets: List[Dict[str, Any]],
+    ):
         self.title = title
         self.link = link
         self.extractive_answers = extractive_answers
         self.snippets = snippets
 
 
-def create_mock_search_pager_result():
+def create_mock_search_pager_result() -> MagicMock:
     mock_pager = MagicMock(spec=SearchPager)
     mock_pager.__iter__.return_value = [create_mock_search_pager_return_value()]
     mock_pager.total_size = 1
@@ -47,7 +54,7 @@ def create_mock_search_pager_result():
     return mock_pager
 
 
-def create_mock_search_pager_return_value():
+def create_mock_search_pager_return_value() -> SearchResponse.SearchResult:
     search_result = SearchResponse.SearchResult()
     document = Document()
 
@@ -66,7 +73,7 @@ def create_mock_search_pager_return_value():
 
 
 @pytest.fixture
-def mock_search_service_client():
+def mock_search_service_client() -> MagicMock:
     with patch(
         "vertex_search_client.discoveryengine.SearchServiceClient"
     ) as mock_client:
@@ -78,7 +85,7 @@ def mock_search_service_client():
 
 
 @pytest.fixture
-def vertex_search_client(mock_search_service_client):
+def vertex_search_client(mock_search_service_client: MagicMock) -> VertexSearchClient:
     return VertexSearchClient(
         project_id="test-project",
         location="us-central1",
@@ -89,7 +96,7 @@ def vertex_search_client(mock_search_service_client):
     )
 
 
-def test_init(mock_search_service_client):
+def test_init(mock_search_service_client: MagicMock) -> None:
     client = VertexSearchClient(
         project_id="test-project",
         location="us-central1",
@@ -109,7 +116,7 @@ def test_init(mock_search_service_client):
     mock_search_service_client.assert_called_once()
 
 
-def test_get_serving_config(vertex_search_client):
+def test_get_serving_config(vertex_search_client: VertexSearchClient) -> None:
     expected_serving_config = (
         "projects/test-project/locations/us-central1/dataStores/test-data-store/"
         "servingConfigs/default_config"
@@ -117,7 +124,7 @@ def test_get_serving_config(vertex_search_client):
     assert vertex_search_client.serving_config == expected_serving_config
 
 
-def test_build_search_request(vertex_search_client):
+def test_build_search_request(vertex_search_client: VertexSearchClient) -> None:
     query = "test query"
     page_size = 5
     request = vertex_search_client._build_search_request(query, page_size)
@@ -154,7 +161,9 @@ def test_build_search_request(vertex_search_client):
     )
 
 
-def test_map_search_pager_to_dict_basic(vertex_search_client):
+def test_map_search_pager_to_dict_basic(
+    vertex_search_client: VertexSearchClient,
+) -> None:
     mock_pager = create_mock_search_pager_result()
 
     result = vertex_search_client._map_search_pager_to_dict(mock_pager)
@@ -168,7 +177,9 @@ def test_map_search_pager_to_dict_basic(vertex_search_client):
     assert result["summary"]["summary_text"] == "Test summary"
 
 
-def test_map_search_pager_to_dict_document_content(vertex_search_client):
+def test_map_search_pager_to_dict_document_content(
+    vertex_search_client: VertexSearchClient,
+) -> None:
     mock_pager = create_mock_search_pager_result()
 
     result = vertex_search_client._map_search_pager_to_dict(mock_pager)
@@ -188,7 +199,7 @@ def test_map_search_pager_to_dict_document_content(vertex_search_client):
     assert document["derived_struct_data"]["snippets"][0]["snippet"] == "Test snippet"
 
 
-def test_parse_chunk_result(vertex_search_client):
+def test_parse_chunk_result(vertex_search_client: VertexSearchClient) -> None:
     chunk = {
         "id": "chunk1",
         "relevance_score": 0.95,
@@ -208,13 +219,15 @@ def test_parse_chunk_result(vertex_search_client):
     assert result["metadata"]["page_span_end"] == 2
 
 
-def test_strip_content():
+def test_strip_content() -> None:
     input_text = "<p>Test <strong>content</strong> with &quot;quotes&quot;</p>"
     expected_output = 'Test content with "quotes"'
     assert VertexSearchClient._strip_content(input_text) == expected_output
 
 
-def test_simplify_search_results_mixed_chunk_and_segments(vertex_search_client):
+def test_simplify_search_results_mixed_chunk_and_segments(
+    vertex_search_client: VertexSearchClient,
+) -> None:
     input_dict = {
         "results": [
             {"document": {"id": "doc1", "derived_struct_data": {"title": "Test"}}},
@@ -230,7 +243,7 @@ def test_simplify_search_results_mixed_chunk_and_segments(vertex_search_client):
     assert "page_content" in result["simplified_results"][1]
 
 
-def test_parse_document_result(vertex_search_client):
+def test_parse_document_result(vertex_search_client: VertexSearchClient) -> None:
     document = {
         "id": "doc1",
         "derived_struct_data": {
@@ -265,8 +278,11 @@ def test_parse_document_result(vertex_search_client):
 @patch("vertex_search_client.VertexSearchClient._map_search_pager_to_dict")
 @patch("vertex_search_client.VertexSearchClient._simplify_search_results")
 def test_search(
-    mock_simplify, mock_map_pager, vertex_search_client, mock_search_service_client
-):
+    mock_simplify: MagicMock,
+    mock_map_pager: MagicMock,
+    vertex_search_client: VertexSearchClient,
+    mock_search_service_client: MagicMock,
+) -> None:
     mock_pager = create_mock_search_pager_result()
 
     mock_search_service_client.return_value.search.return_value = mock_pager
@@ -283,3 +299,7 @@ def test_search(
 
     results_json = json.dumps(results)
     assert results_json == '{"simplified_results": [{"id": "doc1"}]}'
+
+
+if __name__ == "__main__":
+    pytest.main()
