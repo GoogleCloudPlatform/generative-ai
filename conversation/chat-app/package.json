@@ -20,7 +20,7 @@
     "postcss-load-config": "^6.0.0",
     "prettier": "^3.0.0",
     "prettier-plugin-svelte": "^3.0.0",
-    "prettier-plugin-tailwindcss": "^0.4.1",
+    "prettier-plugin-tailwindcss": "^0.6.0",
     "svelte": "^4.0.5",
     "svelte-check": "^3.4.3",
     "tailwindcss": "^3.3.2",
@@ -32,7 +32,7 @@
   "dependencies": {
     "@floating-ui/dom": "^1.5.1",
     "flowbite": "^2.0.0",
-    "flowbite-svelte": "^0.40.2",
+    "flowbite-svelte": "^0.46.0",
     "tailwind-merge": "^2.0.0"
   }
 }
