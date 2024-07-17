@@ -213,6 +213,7 @@ pysftp
 QPM
 qubit
 qubits
+Qwiklabs
 ragas
 RAGAS
 ragdemos
