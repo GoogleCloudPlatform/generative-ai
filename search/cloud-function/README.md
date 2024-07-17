@@ -47,18 +47,18 @@ DATA_STORE_ID = "YOUR_DATA_STORE_ID"  # not the app id, alphanumeric
 Additionally you'll need to keep track of some of the choices you make when you
 configure Vertex AI Search.
 
-**Type of data source**
+### Type of data source
 
 - UNSTRUCTURED
 - STRUCTURED
 - WEBSITE
 - BLENDED
 
-```py
+```python
 ENGINE_DATA_TYPE = UNSTRUCTURED
 ```
 
-**Type of chunks to return**
+### Type of chunks to return
 
 - DOCUMENT_WITH_SNIPPETS
 - DOCUMENT_WITH_EXTRACTIVE_SEGMENTS
@@ -69,10 +69,11 @@ ENGINE_DATA_TYPE = UNSTRUCTURED
 ENGINE_CHUNK_TYPE = DOCUMENT_WITH_EXTRACTIVE_SEGMENTS
 ```
 
-## Type of summarization
+### Type of summarization
 
 - NONE results only
-- VERTEX_AI_SEARCH LLM add on provided by [Vertex AI Search]()
+- VERTEX_AI_SEARCH LLM add on provided by
+[Vertex AI Search](https://cloud.google.com/generative-ai-app-builder/docs/enterprise-search-introduction)
 <!-- NOT ready yet
 - GENERATE_GROUNDED_ANSWERS use the
   [Generate grounded answers with RAG](https://cloud.google.com/generative-ai-app-builder/docs/grounded-gen)
@@ -87,11 +88,10 @@ SUMMARY_TYPE = VERTEX_AI_SEARCH
 ## Architecture
 
 1. Vertex AI Search is an API hosted on Google Cloud
-1. You will call that API via a Google Cloud Function, which exposes its own
-   API
-1. Your users will the Google Cloud Function API, via your custom app or UI
+2. You will call that API via a Google Cloud Function, which exposes its own API
+3. Your users will the Google Cloud Function API, via your custom app or UI
 
-```miranda
+```mermaid
 flowchart LR
     A[fa:fa-search Vertex Search AI] --> B(Google Cloud Function)
     B --> C[My App Server]

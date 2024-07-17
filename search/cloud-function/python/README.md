@@ -31,10 +31,11 @@ deployment:
 1. Ensure you have the Google Cloud SDK installed and configured.
 2. Clone this repository and navigate to the project directory.
 3. Set up your environment variables:
-   ```bash
-   gcloud auth login
-   bash setup_env.sh
-   ```
+
+```bash
+gcloud auth login
+bash setup_env.sh
+```
 
 Alternatively, you can manually create and edit a `.env` file with the required
 variables.
@@ -88,7 +89,7 @@ To deploy this function to Google Cloud:
    Variables section).
 2. Run the following command:
 
-```
+```bash
 gcloud functions deploy vertex_search --runtime python39 --trigger-http --allow-unauthenticated
 ```
 

@@ -24,12 +24,12 @@ please refer to the README.md file.
 
 import json
 import os
-from typing import Any, Dict, Tuple
+from typing import Dict, Tuple
 
-from enums import EngineChunkType, EngineDataType, SummaryType
 from flask import Request
 import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
+
 from vertex_search_client import VertexSearchClient
 
 # Initialize the VertexSearchClient
