@@ -33,7 +33,7 @@ Example usage:
 import html
 import json
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from enums import EngineChunkType, EngineDataType, SummaryType
 from google.api_core.client_options import ClientOptions
