@@ -13,8 +13,8 @@
 # limitations under the License.
 import os
 
-from enums import EngineChunkType, EngineDataType, SummaryType
 import pytest
+from enums import EngineChunkType, EngineDataType, SummaryType
 from vertex_search_client import VertexSearchClient
 
 # Load environment variables
