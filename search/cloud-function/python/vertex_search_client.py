@@ -33,7 +33,7 @@ Example usage:
 import html
 import json
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from enums import EngineChunkType, EngineDataType, SummaryType
 from google.api_core.client_options import ClientOptions
@@ -58,9 +58,9 @@ class VertexSearchClient:
         project_id: str,
         location: str,
         data_store_id: str,
-        engine_data_type: EngineDataType | int | str,
-        engine_chunk_type: EngineChunkType | int | str,
-        summary_type: SummaryType | int | str,
+        engine_data_type: Union[EngineDataType, int, str],
+        engine_chunk_type: Union[EngineChunkType, int, str],
+        summary_type: Union[SummaryType, int, str],
     ):
         """
         Initialize the VertexSearchClient.
@@ -282,7 +282,7 @@ class VertexSearchClient:
                 json_data = {}
 
         metadata.update(json_data)
-        result = {"metadata": metadata}
+        result: Dict[str, Any] = {"metadata": metadata}
 
         if self.engine_data_type == EngineDataType.STRUCTURED:
             structured_data = (

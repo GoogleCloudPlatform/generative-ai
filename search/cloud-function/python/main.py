@@ -26,7 +26,7 @@ import json
 import os
 from typing import Dict, Tuple
 
-from flask import Request
+from flask import Flask, Request, request
 import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
 from vertex_search_client import VertexSearchClient
@@ -102,8 +102,6 @@ def vertex_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
 
 
 if __name__ == "__main__":
-    from flask import Flask
-
     app = Flask(__name__)
 
     @app.route("/", methods=["POST"])

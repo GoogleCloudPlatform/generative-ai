@@ -11,6 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+Unit tests for the VertexSearchClient class.
+
+This module contains unit tests for the VertexSearchClient class, using
+mocks to simulate the behavior of the Google Cloud Search API. These tests
+ensure that the client correctly handles various scenarios and data structures.
+"""
+
 import json
 from typing import Any, Dict, List
 from unittest.mock import MagicMock, patch
@@ -26,6 +34,8 @@ from vertex_search_client import VertexSearchClient
 
 
 class DerivedStructData:
+    """Mock class for derived struct data in test responses."""
+
     def __init__(
         self,
         title: str,
@@ -40,6 +50,7 @@ class DerivedStructData:
 
 
 def create_mock_search_pager_result() -> MagicMock:
+    """Create a mock SearchPager result for testing."""
     mock_pager = MagicMock(spec=SearchPager)
     mock_pager.__iter__.return_value = [create_mock_search_pager_return_value()]
     mock_pager.total_size = 1
@@ -55,6 +66,7 @@ def create_mock_search_pager_result() -> MagicMock:
 
 
 def create_mock_search_pager_return_value() -> SearchResponse.SearchResult:
+    """Create a mock SearchResponse.SearchResult for testing."""
     search_result = SearchResponse.SearchResult()
     document = Document()
 
@@ -65,15 +77,14 @@ def create_mock_search_pager_return_value() -> SearchResponse.SearchResult:
         "snippets": [{"snippet_status": "SUCCESS", "snippet": "Test snippet"}],
     }
 
-    # Set the derived_struct_data field of the document
     document.derived_struct_data = derived_struct_data
-
     search_result.document = document
     return search_result
 
 
 @pytest.fixture
 def mock_search_service_client() -> MagicMock:
+    """Fixture to create a mock SearchServiceClient."""
     with patch(
         "vertex_search_client.discoveryengine.SearchServiceClient"
     ) as mock_client:
@@ -86,6 +97,7 @@ def mock_search_service_client() -> MagicMock:
 
 @pytest.fixture
 def vertex_search_client(mock_search_service_client: MagicMock) -> VertexSearchClient:
+    """Fixture to create a VertexSearchClient instance for testing."""
     return VertexSearchClient(
         project_id="test-project",
         location="us-central1",
@@ -97,6 +109,7 @@ def vertex_search_client(mock_search_service_client: MagicMock) -> VertexSearchC
 
 
 def test_init(mock_search_service_client: MagicMock) -> None:
+    """Test the initialization of VertexSearchClient."""
     client = VertexSearchClient(
         project_id="test-project",
         location="us-central1",
@@ -117,6 +130,7 @@ def test_init(mock_search_service_client: MagicMock) -> None:
 
 
 def test_get_serving_config(vertex_search_client: VertexSearchClient) -> None:
+    """Test the get_serving_config method of VertexSearchClient."""
     expected_serving_config = (
         "projects/test-project/locations/us-central1/dataStores/test-data-store/"
         "servingConfigs/default_config"
@@ -125,6 +139,7 @@ def test_get_serving_config(vertex_search_client: VertexSearchClient) -> None:
 
 
 def test_build_search_request(vertex_search_client: VertexSearchClient) -> None:
+    """Test the _build_search_request method of VertexSearchClient."""
     query = "test query"
     page_size = 5
     request = vertex_search_client._build_search_request(query, page_size)
@@ -164,6 +179,7 @@ def test_build_search_request(vertex_search_client: VertexSearchClient) -> None:
 def test_map_search_pager_to_dict_basic(
     vertex_search_client: VertexSearchClient,
 ) -> None:
+    """Test the _map_search_pager_to_dict method with basic data."""
     mock_pager = create_mock_search_pager_result()
 
     result = vertex_search_client._map_search_pager_to_dict(mock_pager)
@@ -180,6 +196,7 @@ def test_map_search_pager_to_dict_basic(
 def test_map_search_pager_to_dict_document_content(
     vertex_search_client: VertexSearchClient,
 ) -> None:
+    """Test the _map_search_pager_to_dict method with document content."""
     mock_pager = create_mock_search_pager_result()
 
     result = vertex_search_client._map_search_pager_to_dict(mock_pager)
@@ -200,6 +217,7 @@ def test_map_search_pager_to_dict_document_content(
 
 
 def test_parse_chunk_result(vertex_search_client: VertexSearchClient) -> None:
+    """Test the _parse_chunk_result method of VertexSearchClient."""
     chunk = {
         "id": "chunk1",
         "relevance_score": 0.95,
@@ -220,6 +238,7 @@ def test_parse_chunk_result(vertex_search_client: VertexSearchClient) -> None:
 
 
 def test_strip_content() -> None:
+    """Test the _strip_content static method of VertexSearchClient."""
     input_text = "<p>Test <strong>content</strong> with &quot;quotes&quot;</p>"
     expected_output = 'Test content with "quotes"'
     assert VertexSearchClient._strip_content(input_text) == expected_output
@@ -228,6 +247,7 @@ def test_strip_content() -> None:
 def test_simplify_search_results_mixed_chunk_and_segments(
     vertex_search_client: VertexSearchClient,
 ) -> None:
+    """Test the _simplify_search_results method with mixed chunk and segment data."""
     input_dict = {
         "results": [
             {"document": {"id": "doc1", "derived_struct_data": {"title": "Test"}}},
@@ -244,20 +264,23 @@ def test_simplify_search_results_mixed_chunk_and_segments(
 
 
 def test_parse_document_result(vertex_search_client: VertexSearchClient) -> None:
+    """Test the _parse_document_result method of VertexSearchClient."""
     document = {
         "id": "doc1",
         "derived_struct_data": {
             "title": "Employee Benefits Summary",
             "extractive_answers": [
                 {
-                    "content": "High Deductible HMO • Premiums: Lower premiums at $150 per month. • Deductibles: High at $2000. • Out-of-Pocket Maximums: Higher limit of $6500.",
+                    "content": "High Deductible HMO • Premiums: Lower premiums at $150 per month. "
+                    "• Deductibles: High at $2000. • Out-of-Pocket Maximums: Higher limit of $6500.",
                     "page_number": "3",
                 }
             ],
             "snippets": [
                 {
                     "snippet_status": "SUCCESS",
-                    "snippet": "... <b>per month</b>, due to flexibility and network size. • Deductibles: Moderate at $1,000, offering <b>a</b> balance between <b>cost</b> and <b>coverage</b>. ...",
+                    "snippet": "... <b>per month</b>, due to flexibility and network size. "
+                    "• Deductibles: Moderate at $1,000, offering <b>a</b> balance between <b>cost</b> and <b>coverage</b>. ...",
                 }
             ],
             "link": "gs://company-docs/Employee_Benefits_Summary.pdf",
@@ -283,6 +306,7 @@ def test_search(
     vertex_search_client: VertexSearchClient,
     mock_search_service_client: MagicMock,
 ) -> None:
+    """Test the search method of VertexSearchClient."""
     mock_pager = create_mock_search_pager_result()
 
     mock_search_service_client.return_value.search.return_value = mock_pager

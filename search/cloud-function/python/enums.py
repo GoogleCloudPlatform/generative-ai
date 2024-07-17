@@ -44,7 +44,7 @@ class FlexibleIntEnum(IntEnum):
                 return next(member for member in cls if member.value == value)
             except StopIteration:
                 pass
-        return None
+        raise ValueError(f"{value} is not a valid {cls.__name__}")
 
     def __str__(self) -> str:
         return self.name

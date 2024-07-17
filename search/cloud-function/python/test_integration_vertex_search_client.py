@@ -11,7 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+Integration tests for the VertexSearchClient.
+
+This module contains integration tests that interact with the actual
+Vertex AI Search API. These tests require proper configuration of
+environment variables and access to the Vertex AI Search service.
+"""
+
 import os
+from typing import Generator
 
 from enums import EngineChunkType, EngineDataType, SummaryType
 import pytest
@@ -27,8 +36,18 @@ SUMMARY_TYPE = os.getenv("SUMMARY_TYPE", "VERTEX_AI_SEARCH")
 
 
 @pytest.fixture(scope="module")
-def client() -> VertexSearchClient:
-    return VertexSearchClient(
+def vertex_search_client() -> Generator[VertexSearchClient, None, None]:
+    """
+    Fixture to create and yield a VertexSearchClient instance for testing.
+
+    This fixture creates a VertexSearchClient instance using the
+    environment variables and yields it for use in tests. The client
+    is shared across all tests in the module for efficiency.
+
+    Yields:
+        VertexSearchClient: An instance of the VertexSearchClient for testing.
+    """
+    client = VertexSearchClient(
         project_id=PROJECT_ID,
         location=LOCATION,
         data_store_id=DATA_STORE_ID,
@@ -36,12 +55,22 @@ def client() -> VertexSearchClient:
         engine_chunk_type=ENGINE_CHUNK_TYPE,
         summary_type=SUMMARY_TYPE,
     )
+    yield client
 
 
-def test_search_integration(client: VertexSearchClient) -> None:
+def test_search_integration(vertex_search_client: VertexSearchClient) -> None:
+    """
+    Test the search functionality of VertexSearchClient with the actual API.
+
+    This test performs a search using the VertexSearchClient and verifies
+    that the results have the expected structure and content types.
+
+    Args:
+        vertex_search_client (VertexSearchClient): The client instance to test.
+    """
     # Perform a search
     query = "test query"
-    results = client.search(query)
+    results = vertex_search_client.search(query)
 
     # Check the structure of the results
     assert "simplified_results" in results
@@ -60,9 +89,14 @@ def test_search_integration(client: VertexSearchClient) -> None:
         assert "summary_text" in results["summary"]
 
 
-# Test with different engine types and settings.
-# You must have these configured already...
 def test_unstructured_summary() -> None:
+    """
+    Test VertexSearchClient with unstructured data and summary generation.
+
+    This test creates a new VertexSearchClient instance with specific
+    settings for unstructured data and summary generation, then performs
+    a search to verify the results.
+    """
     client = VertexSearchClient(
         project_id=PROJECT_ID,
         location=LOCATION,
