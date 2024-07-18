@@ -71,15 +71,17 @@ def log_prompt_to_bigquery(
     client = bigquery.Client()
     table_id = os.getenv("BIGQUERY_SUMMARIZE_LOGS_TABLE", "")
 
-    rows_to_insert = {
-        "timestamp": datetime.now(),
-        "pr_number": pr_number,
-        "commit_id": commit_id,
-        "input_prompt": input_prompt,
-        "model_output": model_output,
-        "error_message": error_message,
-        "raw_response": raw_response.to_dict(),
-    }
+    rows_to_insert = [
+        {
+            "timestamp": datetime.now(),
+            "pr_number": pr_number,
+            "commit_id": commit_id,
+            "input_prompt": input_prompt,
+            "model_output": model_output,
+            "error_message": error_message,
+            "raw_response": raw_response.to_dict(),
+        }
+    ]
     return client.insert_rows_json(table_id, rows_to_insert)
 
 
