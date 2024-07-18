@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # build an image 
-gcr_image_path=gcr.io/<YOUR GCP PROJECT ID>/ag-web_$(date +%Y-%m-%d_%H-%M)
+gcr_image_path=gcr.io/<YOUR GOOGLE CLOUD PROJECT ID>/ag-web_$(date +%Y-%m-%d_%H-%M)
 gcloud builds submit --tag $gcr_image_path
 
 # deploy
