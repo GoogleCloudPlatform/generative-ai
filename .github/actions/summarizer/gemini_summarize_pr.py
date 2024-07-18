@@ -88,7 +88,7 @@ def summarize_pr_gemini(
     project_id: str,
     prompt_file_uri: str,
     location: str = "us-central1",
-) -> Tuple[Optional[str], str, GenerationResponse, Optional[str]]:
+) -> Tuple[Optional[str], str, GenerationResponse]:
     """Calls the Gemini model to summarize the pull request content."""
     vertexai.init(project=project_id, location=location)
 
