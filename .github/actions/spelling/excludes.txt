@@ -88,6 +88,8 @@
 ^\Qgemini/reasoning-engine/tutorial_google_maps_agent.ipynb\E$
 ^\Qgemini/sample-apps/image-bash-jam/images/.keep\E$
 ^\Qgemini/sample-apps/image-bash-jam/README.md\E$
+^\Qgemini/sample-apps/photo-discovery/app/linux/CMakeLists.txt\E$
+^\Qgemini/sample-apps/photo-discovery/app/windows/CMakeLists.txt\E$
 ^\Qgemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions/src/sql/provision_text_sample_table.sql\E$
 ^\Qgemini/use-cases/healthcare/react_gemini_healthcare_api.ipynb\E$
 ^\Qgemini/use-cases/intro_multimodal_use_cases.ipynb\E$
