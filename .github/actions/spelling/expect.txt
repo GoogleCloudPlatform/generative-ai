@@ -326,7 +326,7 @@ geht
 genai
 genappbuilder
 Genomics
-Gentwo
+GenTwo
 genwealth
 geocoded
 getconn
@@ -382,7 +382,6 @@ hovermode
 htmlhelp
 htmlhintrc
 Hubmann
-huggingface
 HZN
 iban
 idk
@@ -798,7 +797,6 @@ Tast
 templatefile
 temurin
 tensorboard
-Tensorflow
 tensorflow
 terraform
 testutils
