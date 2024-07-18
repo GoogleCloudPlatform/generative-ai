@@ -64,7 +64,7 @@ def log_prompt_to_bigquery(
     pr_number: int,
     commit_id: str,
     input_prompt: str,
-    model_output: str,
+    model_output: Optional[str],
     raw_response: GenerationResponse,
 ) -> Sequence[dict]:
     """Log Gemini prompt input/output to BigQuery."""
@@ -110,7 +110,7 @@ def summarize_pr_gemini(
     response = model.generate_content(input_prompt)
     try:
         output_text = response.text.replace("## Pull Request Summary", "")
-    except Exception:
+    except Exception:  # pylint: disable=broad-exception-caught
         output_text = None
 
     return (
@@ -162,7 +162,9 @@ def main() -> None:
         pr_number, commit_id, input_prompt, summary, raw_response
     )
     print(bq_output)
-    add_pr_comment(pr, summary, commit_id)
+
+    if summary:
+        add_pr_comment(pr, summary, commit_id)
 
 
 if __name__ == "__main__":
