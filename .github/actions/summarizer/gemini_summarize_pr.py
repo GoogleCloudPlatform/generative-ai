@@ -2,20 +2,18 @@
 
 # pylint: disable=line-too-long
 from datetime import datetime
-from typing import Optional, Sequence, Tuple
-
 import json
 import os
+from typing import Optional, Sequence, Tuple
 
 from github import Github, PullRequest
-from google.cloud import bigquery
-from google.cloud import storage
+from google.cloud import bigquery, storage
 import requests
 import vertexai
 from vertexai.generative_models import (
     GenerationConfig,
-    GenerativeModel,
     GenerationResponse,
+    GenerativeModel,
 )
 
 
