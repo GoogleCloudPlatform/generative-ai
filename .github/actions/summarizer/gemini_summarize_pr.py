@@ -66,6 +66,7 @@ def log_prompt_to_bigquery(
     input_prompt: str,
     model_output: Optional[str],
     raw_response: GenerationResponse,
+    model_name: str,
 ) -> Sequence[dict]:
     """Log Gemini prompt input/output to BigQuery."""
     client = bigquery.Client()
@@ -79,6 +80,7 @@ def log_prompt_to_bigquery(
             "input_prompt": input_prompt,
             "model_output": model_output,
             "raw_response_str": repr(raw_response.to_dict()),
+            "model": model_name,
         }
     ]
     return client.insert_rows_json(table_id, rows_to_insert)
@@ -89,15 +91,16 @@ def summarize_pr_gemini(
     project_id: str,
     prompt_file_uri: str,
     location: str = "us-central1",
-) -> Tuple[Optional[str], str, GenerationResponse]:
+) -> Tuple[Optional[str], str, GenerationResponse, str]:
     """Calls the Gemini model to summarize the pull request content."""
     vertexai.init(project=project_id, location=location)
 
     blob = storage.Blob.from_string(prompt_file_uri, client=storage.Client())
     prompt = json.loads(blob.download_as_text())
 
+    model_name = prompt["model"]
     model = GenerativeModel(
-        prompt["model"],
+        model_name,
         system_instruction=[prompt["system_instruction"]],
         generation_config=GenerationConfig(
             temperature=prompt["temperature"],
@@ -113,11 +116,7 @@ def summarize_pr_gemini(
     except Exception:  # pylint: disable=broad-exception-caught
         output_text = None
 
-    return (
-        output_text,
-        input_prompt,
-        response,
-    )
+    return (output_text, input_prompt, response, model_name)
 
 
 def add_pr_comment(pr: PullRequest.PullRequest, summary: str, commit_id: str) -> None:
@@ -149,7 +148,7 @@ def main() -> None:
     pr = repo.get_pull(pr_number)
 
     pr_content = get_pr_content(pr)
-    summary, input_prompt, raw_response = summarize_pr_gemini(
+    summary, input_prompt, raw_response, model_name = summarize_pr_gemini(
         pr_content,
         os.getenv("GOOGLE_CLOUD_PROJECT_ID", ""),
         # See example_prompt.json for an example prompt.
@@ -159,7 +158,7 @@ def main() -> None:
     commit_id = pr.get_commits().reversed[0].sha
 
     bq_output = log_prompt_to_bigquery(
-        pr_number, commit_id, input_prompt, summary, raw_response
+        pr_number, commit_id, input_prompt, summary, raw_response, model_name
     )
     print(bq_output)
 
