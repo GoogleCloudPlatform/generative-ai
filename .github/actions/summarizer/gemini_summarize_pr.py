@@ -5,10 +5,8 @@ import json
 import os
 
 from github import Github, PullRequest
-import requests
-
 from google.cloud import storage
-
+import requests
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
 
