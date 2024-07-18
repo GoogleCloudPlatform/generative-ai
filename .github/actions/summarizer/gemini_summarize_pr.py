@@ -65,7 +65,6 @@ def log_prompt_to_bigquery(
     commit_id: str,
     input_prompt: str,
     model_output: str,
-    error_message: str,
     raw_response: GenerationResponse,
 ) -> Sequence[dict]:
     client = bigquery.Client()
@@ -78,10 +77,9 @@ def log_prompt_to_bigquery(
             "commit_id": commit_id,
             "input_prompt": input_prompt,
             "model_output": model_output,
-            "error_message": error_message,
+            "raw_response_str": repr(raw_response.to_dict()),
         }
     ]
-    print(raw_response.to_dict())
     return client.insert_rows_json(table_id, rows_to_insert)
 
 
@@ -108,19 +106,16 @@ def summarize_pr_gemini(
 
     input_prompt = prompt["prompt"].format(pull_request_content=pull_request_content)
 
-    error_message = None
+    response = model.generate_content(input_prompt)
     try:
-        response = model.generate_content(input_prompt)
         output_text = response.text.replace("## Pull Request Summary", "")
-    except Exception as e:
-        error_message = repr(e)
+    except Exception:
         output_text = None
 
     return (
         output_text,
         input_prompt,
         response,
-        error_message,
     )
 
 
@@ -153,7 +148,7 @@ def main() -> None:
     pr = repo.get_pull(pr_number)
 
     pr_content = get_pr_content(pr)
-    summary, input_prompt, raw_response, error_message = summarize_pr_gemini(
+    summary, input_prompt, raw_response = summarize_pr_gemini(
         pr_content,
         os.getenv("GOOGLE_CLOUD_PROJECT_ID", ""),
         # See example_prompt.json for an example prompt.
@@ -163,7 +158,7 @@ def main() -> None:
     commit_id = pr.get_commits().reversed[0].sha
 
     bq_output = log_prompt_to_bigquery(
-        pr_number, commit_id, input_prompt, summary, error_message, raw_response
+        pr_number, commit_id, input_prompt, summary, raw_response
     )
     print(bq_output)
     add_pr_comment(pr, summary, commit_id)
