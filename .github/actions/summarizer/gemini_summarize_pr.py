@@ -79,9 +79,9 @@ def log_prompt_to_bigquery(
             "input_prompt": input_prompt,
             "model_output": model_output,
             "error_message": error_message,
-            "raw_response": raw_response.to_dict(),
         }
     ]
+    print(raw_response.to_dict())
     return client.insert_rows_json(table_id, rows_to_insert)
 
 
