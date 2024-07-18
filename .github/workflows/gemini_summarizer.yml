@@ -20,7 +20,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install Dependencies
-        run: pip install google-cloud-aiplatform PyGithub
+        run: pip install --upgrade google-cloud-storage google-cloud-aiplatform PyGithub
 
       - id: 'auth'
         uses: 'google-github-actions/auth@v2'
@@ -37,4 +37,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
+          PROMPT_FILE: ${{ secrets.SUMMARIZE_PROMPT_FILE }}
         run: python .github/actions/summarizer/gemini_summarize_pr.py

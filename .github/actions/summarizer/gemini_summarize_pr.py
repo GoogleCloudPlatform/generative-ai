@@ -6,10 +6,11 @@ import os
 
 from github import Github, PullRequest
 import requests
+
+from google.cloud import storage
+
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel
-
-GEMINI_MODEL = "gemini-1.5-flash-001"
 
 
 def get_pr_number(event_path: str) -> int:
@@ -58,32 +59,28 @@ def get_pr_content(pr: PullRequest.PullRequest) -> str:
 def summarize_pr_gemini(
     pull_request_content: str,
     project_id: str,
+    prompt_file_uri: str,
     location: str = "us-central1",
-    model_id: str = GEMINI_MODEL,
 ) -> str:
     """Calls the Gemini model to summarize the pull request content."""
     vertexai.init(project=project_id, location=location)
 
+    blob = storage.Blob.from_string(prompt_file_uri, client=storage.Client())
+    prompt = json.loads(blob.download_as_text())
+
     model = GenerativeModel(
-        model_id,
-        system_instruction=[
-            "You are an expert software engineer, proficient in Generative AI, Git and GitHub.",
-        ],
-        generation_config=GenerationConfig(temperature=0.0, max_output_tokens=8192),
+        prompt["model"],
+        system_instruction=[prompt["system_instruction"]],
+        generation_config=GenerationConfig(
+            temperature=prompt["temperature"],
+            max_output_tokens=prompt["max_output_tokens"],
+        ),
     )
 
-    prompt = [
-        "The following is the content of a GitHub Pull Request for a repository focused on Generative AI with Google Cloud."
-        "This content includes the Pull Request title, Pull Request description, "
-        "a list of all of the files changed with the file name, the code diff and the raw file content."
-        "Your task is to output a summary of the Pull Request in Markdown format.",
-        "Content:",
-        pull_request_content,
-        "Summary:",
-    ]
+    input_prompt = prompt["prompt"].format(pull_request_content=pull_request_content)
 
-    print("---Prompt---\n", prompt)
-    response = model.generate_content(prompt)
+    print("---Prompt---\n", input_prompt)
+    response = model.generate_content(input_prompt)
     print("---Gemini Response---\n", response)
 
     return response.text.replace("## Pull Request Summary", "")
@@ -118,7 +115,12 @@ def main() -> None:
     pr = repo.get_pull(pr_number)
 
     pr_content = get_pr_content(pr)
-    summary = summarize_pr_gemini(pr_content, os.getenv("GOOGLE_CLOUD_PROJECT_ID", ""))
+    summary = summarize_pr_gemini(
+        pr_content,
+        os.getenv("GOOGLE_CLOUD_PROJECT_ID", ""),
+        # See example_prompt.json for an example prompt.
+        os.getenv("PROMPT_FILE", ""),
+    )
     add_pr_comment(pr, summary)
 
 
