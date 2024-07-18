@@ -73,7 +73,7 @@ def log_prompt_to_bigquery(
 
     rows_to_insert = [
         {
-            "timestamp": datetime.now(),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "pr_number": pr_number,
             "commit_id": commit_id,
             "input_prompt": input_prompt,
