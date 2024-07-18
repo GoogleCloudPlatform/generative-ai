@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This solution is for product category and brand owners, product R&D analysts, marketers, and any personas owning the development of new products in Retail, or any other vertical, where there is a need for a rapid and adaptive pace of new product and new product variant innovation. The solution enables users to leverage Generative AI’s purely creative capabilities to new ideas and new concepts for new products.
+This solution is for product category and brand owners, product R&D analysts, marketers, and any personas owning the development of new products in Retail, or any other vertical, where there is a need for a rapid and adaptive pace of new product and new product variant innovation. The solution enables users to leverage Generative AI's purely creative capabilities to new ideas and new concepts for new products.
 
 In fast and dynamic markets there is a need to,
 

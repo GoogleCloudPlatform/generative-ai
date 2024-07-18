@@ -3,10 +3,10 @@
 # Create Kubernetes service account
 kubectl create serviceaccount fixmycar
 
-# Create GCP service account
+# Create Google Cloud service account
 gcloud iam service-accounts create fixmycar
 
-# Grant GCP service account necessary IAM roles
+# Grant Google Cloud service account necessary IAM roles
 # Note - providing all roles across both app flavors (Cloud SQL and Vertex AI Search)
 GSA_MEMBER="fixmycar@${PROJECT_ID}.iam.gserviceaccount.com"
 

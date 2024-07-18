@@ -30,15 +30,15 @@ Follow the below steps to deploy the solution to Cloud Run environment.
 
 ### Google Cloud Storage Setup
 
-1. **Create Bucket**: Manually create GCS bucket 'product_innovation_bucket' using either the GCP Console or command-line tools (gsutil). The bucket is necessary for:
+1. **Create Bucket**: Manually create GCS bucket 'product_innovation_bucket' using either the Google Cloud Console or command-line tools (gsutil). The bucket is necessary for:
 
    - `document_uploads`: Stores market research, surveys, trend reports, etc.
    - `generated_products`: Stores output images, descriptions, etc.
    - `image_edits`: Stores intermediate/modified images during the regeneration process.
 
-   **Using the GCP Console (Web Interface):**
+   **Using the Google Cloud Console (Web Interface):**
 
-   - Navigate to the [Google Cloud Storage section](https://console.cloud.google.com/storage/browser) of your GCP console.
+   - Navigate to the [Google Cloud Storage section](https://console.cloud.google.com/storage/browser) of your Google Cloud console.
    - Click on the "Create Bucket" button.
    - Provide the following details:
      - **Name**: Enter 'product_innovation_bucket' as bucket name.
