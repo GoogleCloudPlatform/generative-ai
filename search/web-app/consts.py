@@ -51,7 +51,7 @@ IMAGE_SEARCH_DATASTORE_IDs = [
 
 RECOMMENDATIONS_DATASTORE_IDs = [
     {
-        "name": "ArXiv Natural Language Papers",
+        "name": "arXiv Natural Language Papers",
         "datastore_id": "arxiv_xxxxxxxxxx",
         "engine_id": "arxiv-personalize_xxxxxxxx",
     }

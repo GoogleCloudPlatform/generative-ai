@@ -34,6 +34,7 @@
 
 # Should be `GitHub`
 (?<![&*.]|// |\btype )\bGithub\b(?![{)])
+\b[Gg]it\s[Hh]ub\b
 
 # Should be `GitLab`
 (?<![&*.]|// |\btype )\bGitlab\b(?![{)])
@@ -182,3 +183,109 @@
 
 # Should be `Gen AI`
 \b[gG]enAI\b
+
+# Should be LangChain
+\b(?!LangChain\b)(?!langchain\b)[Ll]ang\s?[Cc]hain?\b
+
+# Should be LangGraph
+\b(?!LangGraph\b)(?!langgraph\b)[Ll]ang\s?[Gg]raph?\b
+
+# Should be LangServe
+\b(?!LangServe\b)(?!langserve\b)[Ll]ang\s?[Ss]erve?\b
+
+# Should be LlamaIndex
+\b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
+
+# Should be Hugging Face
+\s(?!Hugging Face\b)[Hh]ugging\s?[Ff]ace?\b
+
+# Should be Vertex AI
+\b(?!Vertex AI\b)(?!.*[\(\)\{\},])(?<!import\s)(?<!\.)(?<!,\s)Vertex\s?[Aa]?[Ii]?\b
+
+# Should be Gemini
+\sgemini\s\w
+
+# Should be `Gemini Version Size` (e.g. `Gemini 1.0 Pro`)
+\bGemini\s(Pro|Flash|Ultra)\s?\d\.\d\b
+
+# Gemini Size should be capitalized (e.g. `Gemini 1.0 Pro`)
+\bGemini\s?\d\.\d\s(pro|flash|ultra)\b
+
+# Don't say "Powered by Gemini", instead say "with Gemini"
+\b[Pp]owered\sby\s[Gg]emini\b
+
+# Should be Imagen
+\simagen\s\w
+
+# Should be BigQuery
+\b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
+
+# Should be DataFrame
+\b(?!DataFrame\b)(?!.*[\(\)\{\}\.,=])[Dd]ata\s?[Ff]rame\b
+
+# Should be Google Cloud
+\s[Gg][Cc][Pp]\s
+
+# Should be Google Cloud
+\b(?!Google\sCloud\b)[Gg]oogle\s?[Cc]loud\b
+
+# Should be DeepMind
+\b(?!DeepMind\b)[Dd]eep\s?[Mm]ind\b
+
+# Should be TensorFlow
+\b(?!TensorFlow\b)(?!tensorflow\b)[Tt]ensor\s?[Ff]low\b
+
+# Should be AlloyDB
+\b(?!AlloyDB\b)(?!alloydb\b)[Aa]lloy\s?[Dd]\s?[Bb]\b
+
+# Should be Translation API
+\bTranslate\s?API\b
+
+# Should be Dialogflow
+\bDialogFlow\b
+
+# Should be Firebase
+\b(?!Firebase\b)Fire\s?[Bb]ase\b
+
+# Should be Firestore
+\b(?!Firestore\b)Fire\s?[Ss]tore\b
+
+# Should be Memorystore
+\b(?!Memorystore\b)Memory\s?[Ss]tore\b
+
+# Should be Document AI
+\bDoc\s?AI\b
+
+# Should be Colab
+\scolab\b
+\b[Cc]ollab\b
+
+# Should be Kaggle
+\skaggle\b
+
+# Should be TPU or TPUs
+\btpus?\b
+
+# Should be GKE
+\sgke\s
+
+# Should be GCS
+\sgcs\s
+
+# Should be API
+\s(?!API)(?!.*[\(\)\{\},=#]+)[Aa][Pp][Ii]\s
+
+# Should be arXiv
+\bAr[Xx]iv\b
+
+# Should be DeepEval
+\b(?!DeepEval\b)(?!deepeval\b)[Dd]eep\s?[Ee]val\b
+
+# Invalid Space Character
+\w \w
+
+# Don't use "smart quotes"
+(?!'")[‘’“”]
+
+# "an" should only be before vowels.
+\ban\s+(?![FHLMNRSX][A-Z0-9]+\b)(?!hour\b)(?!honest\b)([b-df-hj-np-tv-zB-DF-HJ-NP-TV-Z]{1}\w*)
