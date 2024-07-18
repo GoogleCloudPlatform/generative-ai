@@ -1,14 +1,22 @@
 """Summarizes the pull request using the Gemini model and adds summary to a PR comment."""
 
 # pylint: disable=line-too-long
+from datetime import datetime
+from typing import Optional, Sequence, Tuple
+
 import json
 import os
 
 from github import Github, PullRequest
+from google.cloud import bigquery
 from google.cloud import storage
 import requests
 import vertexai
-from vertexai.generative_models import GenerationConfig, GenerativeModel
+from vertexai.generative_models import (
+    GenerationConfig,
+    GenerativeModel,
+    GenerationResponse,
+)
 
 
 def get_pr_number(event_path: str) -> int:
@@ -54,12 +62,35 @@ def get_pr_content(pr: PullRequest.PullRequest) -> str:
     return pr_content
 
 
+def log_prompt_to_bigquery(
+    pr_number: int,
+    commit_id: str,
+    input_prompt: str,
+    model_output: str,
+    error_message: str,
+    raw_response: GenerationResponse,
+) -> Sequence[dict]:
+    client = bigquery.Client()
+    table_id = os.getenv("BIGQUERY_SUMMARIZE_LOGS_TABLE", "")
+
+    rows_to_insert = {
+        "timestamp": datetime.now(),
+        "pr_number": pr_number,
+        "commit_id": commit_id,
+        "input_prompt": input_prompt,
+        "model_output": model_output,
+        "error_message": error_message,
+        "raw_response": raw_response.to_dict(),
+    }
+    return client.insert_rows_json(table_id, rows_to_insert)
+
+
 def summarize_pr_gemini(
     pull_request_content: str,
     project_id: str,
     prompt_file_uri: str,
     location: str = "us-central1",
-) -> str:
+) -> Tuple[Optional[str], str, GenerationResponse, Optional[str]]:
     """Calls the Gemini model to summarize the pull request content."""
     vertexai.init(project=project_id, location=location)
 
@@ -77,17 +108,26 @@ def summarize_pr_gemini(
 
     input_prompt = prompt["prompt"].format(pull_request_content=pull_request_content)
 
-    print("---Prompt---\n", input_prompt)
-    response = model.generate_content(input_prompt)
-    print("---Gemini Response---\n", response)
+    error_message = None
+    try:
+        response = model.generate_content(input_prompt)
+        output_text = response.text.replace("## Pull Request Summary", "")
+    except Exception as e:
+        error_message = repr(e)
+        output_text = None
 
-    return response.text.replace("## Pull Request Summary", "")
+    return (
+        output_text,
+        input_prompt,
+        response,
+        error_message,
+    )
 
 
-def add_pr_comment(pr: PullRequest.PullRequest, summary: str) -> None:
+def add_pr_comment(pr: PullRequest.PullRequest, summary: str, commit_id: str) -> None:
     """Comments on the pull request with the provided summary."""
     comment_header = "## Pull Request Summary from [Gemini ✨](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/overview)"
-    comment_body = f"{comment_header}\n{summary}\n---\nGenerated at `{pr.get_commits().reversed[0].sha}`"
+    comment_body = f"{comment_header}\n{summary}\n---\nGenerated at `{commit_id}`"
     bot_username = "github-actions[bot]"
 
     # Find and update existing bot comment if any
@@ -113,13 +153,20 @@ def main() -> None:
     pr = repo.get_pull(pr_number)
 
     pr_content = get_pr_content(pr)
-    summary = summarize_pr_gemini(
+    summary, input_prompt, raw_response, error_message = summarize_pr_gemini(
         pr_content,
         os.getenv("GOOGLE_CLOUD_PROJECT_ID", ""),
         # See example_prompt.json for an example prompt.
         os.getenv("PROMPT_FILE", ""),
     )
-    add_pr_comment(pr, summary)
+
+    commit_id = pr.get_commits().reversed[0].sha
+
+    bq_output = log_prompt_to_bigquery(
+        pr_number, commit_id, input_prompt, summary, error_message, raw_response
+    )
+    print(bq_output)
+    add_pr_comment(pr, summary, commit_id)
 
 
 if __name__ == "__main__":

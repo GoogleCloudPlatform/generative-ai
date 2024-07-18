@@ -1,4 +1,4 @@
-name: Gemini Pull Request Summarizer
+name: Gemini - Summarize Pull Request
 
 on:
   pull_request:
@@ -38,4 +38,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
           PROMPT_FILE: ${{ secrets.SUMMARIZE_PROMPT_FILE }}
+          BIGQUERY_SUMMARIZE_LOGS_TABLE: ${{ secrets.BIGQUERY_SUMMARIZE_LOGS_TABLE }}
         run: python .github/actions/summarizer/gemini_summarize_pr.py
