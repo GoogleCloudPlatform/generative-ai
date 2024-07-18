@@ -1,6 +1,6 @@
 """Summarizes the pull request using the Gemini model and adds summary to a PR comment."""
 
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long,too-many-arguments
 from datetime import datetime
 import json
 import os
