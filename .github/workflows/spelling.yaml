@@ -78,7 +78,7 @@ jobs:
     name: Check Spelling
     permissions:
       contents: read
-      pull-requests: write
+      # pull-requests: write
       actions: read
       security-events: write
     outputs:
@@ -98,7 +98,7 @@ jobs:
           checkout: true
           check_file_names: 1
           spell_check_this: check-spelling/spell-check-this@prerelease
-          post_comment: 1
+          post_comment: 0
           use_magic_file: 1
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
