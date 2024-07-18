@@ -8,7 +8,7 @@ This project is a demo that integrates a Vertex AI Agent with a multiplatform Fl
 
 Users can run the Flutter app and take or upload a photo of a landmark. The app identifies the subject name and provides a brief description. 
 
-To learn more about the subject of the photo, tap “tell me more” to chat with Khanh, an AI agent build built with Vertex AI Agent Builder, and ask follow-up questions about the history of subject in the photo based on information Wikipedia.
+To learn more about the subject of the photo, tap "tell me more" to chat with Khanh, an AI agent build built with Vertex AI Agent Builder, and ask follow-up questions about the history of subject in the photo based on information Wikipedia.
 
 The agent can also identify merchandise from the [Google Merchandise Store](https://your.googlemerchandisestore.com) and provide product name, description, pricing, and purchase link by referencing a Google Merchandise store dataset.
 
