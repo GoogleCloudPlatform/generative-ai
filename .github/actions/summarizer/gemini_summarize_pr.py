@@ -67,6 +67,7 @@ def log_prompt_to_bigquery(
     model_output: str,
     raw_response: GenerationResponse,
 ) -> Sequence[dict]:
+    """Log Gemini prompt input/output to BigQuery."""
     client = bigquery.Client()
     table_id = os.getenv("BIGQUERY_SUMMARIZE_LOGS_TABLE", "")
 
