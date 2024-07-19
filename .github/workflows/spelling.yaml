@@ -133,4 +133,3 @@ jobs:
             cspell:de_DE/src/German_de_DE.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
           only_check_changed_files: true
-  
