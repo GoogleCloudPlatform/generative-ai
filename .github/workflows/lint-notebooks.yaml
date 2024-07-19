@@ -27,6 +27,7 @@ jobs:
     - name: Run linter on changed files
       if: steps.changed_files.outputs.changed_files != ''
       run: |
-        for file in ${{ steps.changed_files.outputs.changed_files }}; do
+        changed_files=(${{ steps.changed_files.outputs.changed_files }})
+        for file in "${changed_files[@]}"; do
           docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest $file
         done
