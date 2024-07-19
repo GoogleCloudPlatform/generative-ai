@@ -21,7 +21,7 @@ jobs:
     - name: Find changed .ipynb files
       id: changed_files
       run: |
-        changed_files=$(git diff --name-only origin/main...HEAD | grep '\.ipynb$')
+        changed_files=$(git diff --name-only origin/main...HEAD | grep '\.ipynb$' | tr '\n' ' ')
         echo "changed_files=$changed_files" >> $GITHUB_OUTPUT
 
     - name: Run linter on changed files
