@@ -62,7 +62,7 @@ on:
       - "**"
     tags-ignore:
       - "**"
-  pull_request_target:
+  pull_request:
     branches:
       - "**"
     types:
@@ -78,7 +78,6 @@ jobs:
     name: Check Spelling
     permissions:
       contents: read
-      pull-requests: write
       actions: read
       security-events: write
     outputs:
@@ -98,7 +97,7 @@ jobs:
           checkout: true
           check_file_names: 1
           spell_check_this: check-spelling/spell-check-this@prerelease
-          post_comment: 1
+          post_comment: 0
           use_magic_file: 1
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
@@ -134,42 +133,3 @@ jobs:
             cspell:de_DE/src/German_de_DE.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
           only_check_changed_files: true
-  comment-push:
-    name: Report (Push)
-    # If your workflow isn't running on push, you can remove this job
-    runs-on: ubuntu-latest
-    needs: spelling
-    permissions:
-      contents: write
-    if: (success() || failure()) && needs.spelling.outputs.followup && github.event_name == 'push'
-    steps:
-    - name: comment
-      uses: check-spelling/check-spelling@main
-      with:
-        checkout: true
-        spell_check_this: check-spelling/spell-check-this@prerelease
-        task: ${{ needs.spelling.outputs.followup }}
-
-  update:
-    name: Update PR
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: read
-      security-events: write
-    runs-on: ubuntu-latest
-    if: ${{
-        github.event_name == 'issue_comment' &&
-        github.event.issue.pull_request &&
-        contains(github.event.comment.body, '@check-spelling-bot apply')
-      }}
-    concurrency:
-      group: spelling-update-${{ github.event.issue.number }}
-      cancel-in-progress: false
-    steps:
-      - name: apply spelling updates
-        uses: check-spelling/check-spelling@prerelease
-        with:
-          experimental_apply_changes_via_bot: 1
-          checkout: true
-          ssh_key: "${{ secrets.CHECK_SPELLING }}"
