@@ -26,4 +26,6 @@ jobs:
     - name: Run linter on changed files
       if: steps.changed_files.outputs.changed_files != ''
       run: |
-        docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest ${{ steps.changed_files.outputs.changed_files }}
+        for file in ${{ steps.changed_files.outputs.changed_files }}; do
+          docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest $file
+        done
