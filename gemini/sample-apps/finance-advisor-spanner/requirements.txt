@@ -1,0 +1,11 @@
+streamlit
+google-cloud-language>=2.9.1
+google-cloud-spanner 
+itables
+streamlit-navigation-bar
+streamlit-extras
+streamlit-agraph
+SPARQLWrapper
+pyvis
+python-dotenv
+

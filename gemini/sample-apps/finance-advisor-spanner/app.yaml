@@ -1,0 +1,13 @@
+#App Engine
+runtime: python
+entrypoint: streamlit run Home.py --server.enableCORS false --browser.serverAddress 0.0.0.0 --browser.gatherUsageStats false --server.port $PORT
+env: flex
+service: finvest-demo
+runtime_config:
+    operating_system: "ubuntu22"
+    runtime_version: "3.12"
+
+
+#Cloud Run
+# runtime: python39
+# entrypoint: streamlit run Home.py --server.enableCORS false --browser.serverAddress 0.0.0.0 --browser.gatherUsageStats false --server.port $PORT
