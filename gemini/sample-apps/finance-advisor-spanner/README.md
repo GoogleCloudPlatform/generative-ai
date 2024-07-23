@@ -49,6 +49,10 @@ The Finvest Spanner demo application was built using:
    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
    cd generative-ai/gemini/sample-apps/finance-advisor-spanner/
    ```
+   ```network:
+      name: projects/spanner-demos-ce/global/networks/default
+      subnetwork_name: central
+   ```
 6. Create a Spanner instance
    https://console.cloud.google.com/spanner/instances/new
 
@@ -60,15 +64,15 @@ The Finvest Spanner demo application was built using:
 4. The import process will run and import the database into a new Spanner database.
 
 5. Run Additional DDL statements for the database to have all the necessary components.
-   5.1 The DDL statements are here gemini/sample-apps/finance-advisor-spanner/Schema-Operations
-            ALTER MODEL EmbeddingsModel SET OPTIONS (
+   5.1 The DDL statements are in `Schema-Operations` file in this directory
+            ```ALTER MODEL EmbeddingsModel SET OPTIONS (
          endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-004'
          )
-         ;
+         ;```
    5.2 Next run the rest of DDL statements without any change
 6. Now Deploy the App to App Engine
    6.1 gcloud app deploy  
-
+   (Might need overriding ```constraints/compute.requireShieldedVm``` Organization Policy)
    - [Front End Demo Walkthrough]()
    
 ### Troubleshooting
