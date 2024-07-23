@@ -578,7 +578,7 @@ def get_cosine_score(
         The cosine similarity score (rounded to two decimal places) between the user query embedding and the dataframe embedding.
     """
 
-    return round(np.dot(dataframe[column_name], input_text_embd), 2)
+    return round(np.dot(dataframe[column_name], input_text_embed), 2)
 
 
 def print_text_to_image_citation(
