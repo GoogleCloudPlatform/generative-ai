@@ -28,7 +28,7 @@
                     @if (searching) {
                         <mat-spinner class="search-spinner"></mat-spinner>
                     } @else {                    
-                        <mat-card-title>Vertex Search & Conversation</mat-card-title>
+                        <mat-card-title>Vertex AI Agent Builder</mat-card-title>
                         <mat-card-subtitle>Managed Service</mat-card-subtitle>
                         <div class="summary-results" [innerHTML]="summary | textToHtml"></div>
                     }
@@ -39,7 +39,7 @@
                         <mat-spinner class="search-spinner"></mat-spinner>
                     }
                     @else {                                        
-                        <mat-card-title>Databases + Vertex</mat-card-title>
+                        <mat-card-title>Databases + Vertex AI</mat-card-title>
                         <mat-card-subtitle>Platform with Gemini Models</mat-card-subtitle>
                         <app-sql-statement [query]="ragPrompt">See Prompt</app-sql-statement>
                         <div class="summary-results" [innerHTML]="ragSummary | textToHtml"></div>

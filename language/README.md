@@ -1,6 +1,6 @@
 # Generative AI - Language
 
-Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Language repository.
+> **NOTE:** This directory uses the PaLM generative model, which will reach its [discontinuation date in October 2024](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text#model_versions). Please refer to [this directory](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/) for samples which use the latest Gemini model.
 
 ## Table of Contents
 
@@ -46,7 +46,7 @@ language/
     │   ├── <a href="use-cases/sql-code-generation/sql_code_generation.ipynb">[Notebook] SQL Code Generation on Vertex AI</a>
     │   └── <a href="use-cases/sql-code-generation/sql_code_generation_langchain.ipynb">[Notebook] SQL Code Generation on Vertex AI using LangChain 🦜🔗</a>
     ├── <a href="use-cases/description-generation">description-generation/</a>
-    │   ├── <a href="use-cases/description-generation/product_description_generator_attributes_to_text.ipynb">[Notebook] DescriptionGen: SEO-optimized product decription generation for retail using LangChain 🦜🔗</a>
+    │   ├── <a href="use-cases/description-generation/product_description_generator_attributes_to_text.ipynb">[Notebook] DescriptionGen: SEO-optimized product description generation for retail using LangChain 🦜🔗</a>
     │   └── <a href="use-cases/description-generation/product_description_generator_image.ipynb">[Notebook] Product Description Generator From Image</a>
     ├── <a href="use-cases/document-qa">document-qa/</a>
     │   ├── <a href="use-cases/document-qa/question_answering_documentai_matching_engine_palm.ipynb">[Notebook] Question answering with Documents using Document AI, Matching Engine, and PaLM</a>

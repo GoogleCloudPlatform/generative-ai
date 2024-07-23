@@ -1,13 +1,13 @@
 # Cloud Function that wraps the PaLM Text Bison Models
 
-| | |
-|-|-|
-|Author(s) | [Romin Irani](https://github.com/rominirani) |
+|           |                                              |
+| --------- | -------------------------------------------- |
+| Author(s) | [Romin Irani](https://github.com/rominirani) |
 
 This application demonstrates a Cloud Function written in Python that initializes the Vertex AI module and then provides an endpoint to invoke PaLM Text Bison model.
 
 > NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
-Additionally, ensure that you have cloned this repository and are currently in the ```text-predict-cloudfunction``` folder. This should be your active working directory for the rest of the commands.
+> Additionally, ensure that you have cloned this repository and are currently in the `text-predict-cloudfunction` folder. This should be your active working directory for the rest of the commands.
 
 ## Environment variables required
 
@@ -22,7 +22,7 @@ These variables are needed since the Vertex AI initialization needs the Google C
 In Cloud Shell, execute the following commands:
 
 ```bash
-export GCP_PROJECT='<Your GCP Project Id>'  # Change this
+export GCP_PROJECT='<Your Google Cloud Project Id>'  # Change this
 export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
 ```
 

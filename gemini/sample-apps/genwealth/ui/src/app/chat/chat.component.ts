@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ChatRequest, ChatResponse, GenWealthServiceClient } from '../services/genwealth-api';
@@ -47,6 +47,7 @@ export class ChatComponent implements OnInit {
   chatResponse?: ChatResponse = undefined;
   
   constructor(
+    private cdRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private error: SnackBarErrorComponent,
     private genWealthClient: GenWealthServiceClient) {}  
@@ -59,6 +60,7 @@ export class ChatComponent implements OnInit {
   }
 
   askQuestion() { 
+    this.cdRef.detectChanges();
     this.loading = true;
     this.genWealthClient.chat(this.chatRequest)
       .subscribe({ 
@@ -74,6 +76,6 @@ export class ChatComponent implements OnInit {
   }
 
   getAskSuggestion() {
-    this.chatRequest.prompt = 'Hi Paul,\n\nI just unexpectedly inherited about $10k, and I’m not sure how I should invest it. What do you recommend? \n\nThanks,\nDonya Bartle';
+    this.chatRequest.prompt = 'Hi Paul,\n\nI just unexpectedly inherited about $10k, and I'm not sure how I should invest it. What do you recommend? \n\nThanks,\nDonya Bartle';
   }
 }

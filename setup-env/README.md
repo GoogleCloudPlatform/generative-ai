@@ -11,7 +11,7 @@ This folder contains instructions on:
 ## Setting up your Google Cloud project
 
 1. [Select or create a Google Cloud project](https://console.cloud.google.com/cloud-resource-manager).
-When you first create an account, you get a $300 free credit towards your compute/storage costs.
+   When you first create an account, you get a $300 free credit towards your compute/storage costs.
 
 2. [Make sure that billing is enabled for your project](https://cloud.google.com/billing/docs/how-to/modify-project).
 
@@ -32,7 +32,7 @@ from google.colab import auth
 auth.authenticate_user()
 ```
 
-When using the vertexai Python SDK, you will also need to initialize it with your GCP `project_id` and `location`:
+When using the vertexai Python SDK, you will also need to initialize it with your Google Cloud `project_id` and `location`:
 
 ```py
 PROJECT_ID = "your-project-id"

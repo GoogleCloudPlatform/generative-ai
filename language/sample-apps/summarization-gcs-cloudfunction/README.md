@@ -1,8 +1,8 @@
 # Cloud Function that demonstrates how to process an uploaded file in Google Cloud Storage and perform summarization using PaLM Vertex AI API on the contents
 
-| | |
-|-|-|
-|Author(s) | [Romin Irani](https://github.com/rominirani) |
+|           |                                              |
+| --------- | -------------------------------------------- |
+| Author(s) | [Romin Irani](https://github.com/rominirani) |
 
 This application demonstrates a Cloud Function written in Python that gets triggered when a file is uploaded to a specific Google Cloud Storage bucket that is configured with. It does the following:
 
@@ -11,7 +11,7 @@ This application demonstrates a Cloud Function written in Python that gets trigg
 - Writes the summarized data into another Google Cloud Storage (GCS) bucket.
 
 > NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
-Additionally, ensure that you have cloned this repository and are currently in the ```summarization-gcs-cloudfunction``` folder. This should be your active working directory for the rest of the commands.
+> Additionally, ensure that you have cloned this repository and are currently in the `summarization-gcs-cloudfunction` folder. This should be your active working directory for the rest of the commands.
 
 ## Environment variables required
 
@@ -26,7 +26,7 @@ These variables are needed since the Vertex AI initialization needs the Google C
 In Cloud Shell, execute the following commands:
 
 ```bash
-export GCP_PROJECT='<Your GCP Project Id>'  # Change this
+export GCP_PROJECT='<Your Google Cloud Project Id>'  # Change this
 export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
 ```
 

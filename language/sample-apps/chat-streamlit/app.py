@@ -4,12 +4,12 @@ from src.vertex import get_text_generation
 import streamlit as st
 
 st.set_page_config(
-    page_title="Vertex PaLM Text Generation API",
+    page_title="Vertex AI PaLM Text Generation API",
     page_icon=":robot:",
     layout="centered",
     initial_sidebar_state="expanded",
     menu_items={
-        "About": "# This app shows you how to use Vertex PaLM Text Generator API"
+        "About": "# This app shows you how to use Vertex AI PaLM Text Generator API"
     },
 )
 
@@ -31,19 +31,19 @@ with st.sidebar:
 
     st.write("Model Settings:")
 
-    # define the temeperature for the model
+    # define the temperature for the model
     temperature_value = st.slider("Temperature :", 0.0, 1.0, 0.2)
     st.session_state["temperature"] = temperature_value
 
-    # define the temeperature for the model
+    # define the temperature for the model
     token_limit_value = st.slider("Token limit :", 1, 1024, 256)
     st.session_state["token_limit"] = token_limit_value
 
-    # define the temeperature for the model
+    # define the temperature for the model
     top_k_value = st.slider("Top-K  :", 1, 40, 40)
     st.session_state["top_k"] = top_k_value
 
-    # define the temeperature for the model
+    # define the temperature for the model
     top_p_value = st.slider("Top-P :", 0.0, 1.0, 0.8)
     st.session_state["top_p"] = top_p_value
 
