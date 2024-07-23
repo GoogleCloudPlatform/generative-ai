@@ -1,6 +1,6 @@
 # Generative AI - Language
 
-Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Language repository.
+> **NOTE:** This directory uses the PaLM generative model, which will reach its [discontinuation date in October 2024](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text#model_versions). Please refer to [this directory](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/) for samples which use the latest Gemini model.
 
 ## Table of Contents
 

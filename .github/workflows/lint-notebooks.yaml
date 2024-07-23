@@ -1,0 +1,33 @@
+name: Lint Notebooks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Find changed .ipynb files
+      id: changed_files
+      run: |
+        changed_files=$(git diff --name-only origin/main...HEAD | grep '\.ipynb$' | tr '\n' ' ')
+        echo "changed_files=$changed_files" >> $GITHUB_OUTPUT
+
+    - name: Run linter on changed files
+      if: steps.changed_files.outputs.changed_files != ''
+      run: |
+        changed_files=(${{ steps.changed_files.outputs.changed_files }})
+        for file in "${changed_files[@]}"; do
+          docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest $file
+        done
