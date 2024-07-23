@@ -1,5 +1,7 @@
 # Cloud Run application utilizing Streamlit Framework that demonstrates working with Vertex AI API
 
+> **NOTE:** This example uses the PaLM generative model, which will reach its [discontinuation date in October 2024](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text#model_versions). Please refer to [this updated code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/gemini-streamlit-cloudrun) for a version which uses the latest Gemini model.
+
 |           |                                              |
 | --------- | -------------------------------------------- |
 | Author(s) | [Romin Irani](https://github.com/rominirani) |
