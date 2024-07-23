@@ -33,49 +33,44 @@ The Finvest Spanner demo application was built using:
 
 1. Login to the [Google Cloud Console](https://console.cloud.google.com/).
 
-1. [Create a new project](https://developers.google.com/maps/documentation/places/web-service/cloud-setup) to host the demo and isolate it from other resources in your account.
+2. [Create a new project](https://developers.google.com/maps/documentation/places/web-service/cloud-setup) to host the demo and isolate it from other resources in your account.
 
-1. [Switch](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects) to your new project.
+3. [Switch](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects) to your new project.
 
-1. [Activate Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) and confirm your project by running the following commands. Click **Authorize** if prompted.
+4. [Activate Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell) and confirm your project by running the follow4ng commands. Click **Authorize** if prompted.
 
    ```bash
    gcloud auth list
    gcloud config list project
    ```
 
-1. Clone this repository and navigate to the project root:
-
-
-
-2. Create a Spanner instance
+5. Clone this repository and navigate to the project root:
+   ```cd
+   git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+   cd generative-ai/gemini/sample-apps/finance-advisor-spanner/
+   ```
+6. Create a Spanner instance
    https://console.cloud.google.com/spanner/instances/new
 
 3. Import the data into the Spanner instance
    https://cloud.google.com/spanner/docs/import#import-database
-   3.1 
-4. When prompted, enter a password you will remember for the AlloyDB postgres user and the pgAdmin demo user. **Remember these passwords - you will need them later**.
+   3.1 The bucket which has the Spanner export is here
+   [GCS Bucket](https://drive.google.com/file/d/1rgx9TJ1G4bN_5Z3iIrebGi2x7bAQvMob/view?usp=drive_link)
 
-1. Grab some coffee or tea. The script will provision all the necessary back-end resources, which usually takes about 30-35 minutes.
+4. The import process will run and import the database into a new Spanner database.
 
-1. When prompted (after about 30 minutes), enter the `configId` for the Vertex AI Agent Builder widget. Retrieve the `configId` by following these steps:
+5. Run Additional DDL statements for the database to have all the necessary components.
+   5.1 The DDL statements are here gemini/sample-apps/finance-advisor-spanner/Schema-Operations
+            ALTER MODEL EmbeddingsModel SET OPTIONS (
+         endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-004'
+         )
+         ;
+   5.2 Next run the rest of DDL statements without any change
+6. Now Deploy the App to App Engine
+   6.1 gcloud app deploy  
 
-   - Navigate to Vertex AI Agent Builder in the console.
-   - **IMPORTANT:** Click to accept terms and activate the API.
-   - Click `Apps` in the left hand navigation to view the list of apps.
-   - Click into the `search-prospectus` app.
-   - Select `Integration` from the left-hand menu.
-   - Scroll down until you see the `configId` for the gen-search-widget.
-   - Copy just the UUID without the quotes (i.e. `4205ae6a-434e-695e-aee4-58f500bd9000`).
-   - Keep this window open. You will need it in the next step.
-
-1. When the build is complete, it will display a URL where you can access the UI. In the same interface where you copied the `configId`, add the domain (without the leading `https://` or trailing slash) as an allowed domain for the widget. Be sure to click `Save`. Example: `genwealth-420u2zdq69-uc.a.run.app`
-
-1. You can now choose to explore the demo environment from the front end or the back end (or both).
-
-   - [Front End Demo Walkthrough](./walkthroughs/frontend-demo-walkthrough.md)
-   - [Back End Demo Walkthrough](./walkthroughs/backend-demo-walkthrough.md)
-
+   - [Front End Demo Walkthrough]()
+   
 ### Troubleshooting
 
 
@@ -91,15 +86,16 @@ The Finvest Spanner demo application was built using:
 
 ### Frontend
 
-The frontend application is Angular Material using TypeScript, which is built and statically served from the root `/` by express as well:
+The frontend application is Streamlit 
 
 
 
+### Secrets
 
 
 ## Purpose and Extensibility
 
-The purpose of this repo is to help you provision an isolated demo environment that highlights the Generative AI capabilities of AlloyDB AI and Vertex AI. While the ideas in this repo can be extended for many real-world use cases, the demo code itself is overly permissive and has not been hardened for security or reliability. The sample code in this repo is provided on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, and it should NOT be used for production use cases without doing your own testing and security hardening.
+The purpose of this repo is to help you provision an isolated demo environment that highlights the Full Text Search, Semantic Search and Graph capabilities of Spanner. While the ideas in this repo can be extended for many real-world use cases, the demo code itself is overly permissive and has not been hardened for security or reliability. The sample code in this repo is provided on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, and it should NOT be used for production use cases without doing your own testing and security hardening.
 
 ## Clean Up
 
