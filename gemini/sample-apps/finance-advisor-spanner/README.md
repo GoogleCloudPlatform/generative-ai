@@ -45,6 +45,7 @@ The Finvest Spanner demo application was built using:
    ```
 
 5. Clone this repository and navigate to the project root:
+   5.1
    ```cd
    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
    cd generative-ai/gemini/sample-apps/finance-advisor-spanner/
@@ -60,31 +61,44 @@ The Finvest Spanner demo application was built using:
 
    If choosing CloudRun deployment, uncomment the appropriate lines
 
+
 6. Create a Spanner instance
    https://console.cloud.google.com/spanner/instances/new
 
-3. Import the data into the Spanner instance
+   Note the instance Name
+
+7. Import the data into the Spanner instance
    https://cloud.google.com/spanner/docs/import#import-database
    3.1 The bucket which has the Spanner export is here
    [GCS Bucket](https://drive.google.com/file/d/1rgx9TJ1G4bN_5Z3iIrebGi2x7bAQvMob/view?usp=drive_link)
 
-4. The import process will run and import the database into a new Spanner database.
+   Note the Database Name
 
-5. Run Additional DDL statements for the database to have all the necessary components.
+   7.1 The import process will run and import the database into a new Spanner database.
+
+8. Run Additional DDL statements for the database to have all the necessary components.
    5.1 The DDL statements are in `Schema-Operations` file in this directory
             ```ALTER MODEL EmbeddingsModel SET OPTIONS (
          endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-004'
          )
          ;```
    5.2 Next run the rest of DDL statements without any change
-6. Now Deploy:
+
+9. In Cloud Shell:
+   Open .env file
+   edit the following fields with the instance name from Step 6 and database name from Step 7
+   ```instance_id=spanner-fts
+   database_id=mf-data-test``` 
+
+10. Now Deploy:
    If choosing App Engine
    6.1 gcloud app deploy  
-   (Might need overriding ```constraints/compute.requireShieldedVm``` Organization Policy)
+
    If choosing Cloud Run
+   
    6.2 
    Build: ```gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app```
-   Deploy: ```gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/```
+   Deploy: ```gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region us-central1 --allow-unauthenticated```
 
 
 7. [Front End Demo Walkthrough]()
@@ -93,6 +107,7 @@ The Finvest Spanner demo application was built using:
 
 ERROR: (gcloud.app.deploy) Error Response: [7] The App Engine appspot and App Engine flexible environment service accounts must have permissions on the image [us.gcr.io/spanner-demos-ce/appengine/finvest-demo.20240723t192059:721bec84-60bf-4d0b-a93b-4d5295d4a524]. Please check that the App Engine default service account has the [Storage Object Viewer] role and the App Engine  Flexible service account has the App Engine Flexible Environment Service Agent role
 
+(Might need overriding ```constraints/compute.requireShieldedVm``` Organization Policy)
 
 ## Architecture
 
