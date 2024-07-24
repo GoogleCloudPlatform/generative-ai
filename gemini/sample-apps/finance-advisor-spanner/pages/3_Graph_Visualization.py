@@ -17,7 +17,7 @@ st.subheader("Show me the Relationships between Funds ,Companies and Sectors")
 # Network._repr_html_ = net_repr_html
 graph_viz.simple_func_nonx()
 
-HtmlFile = open("graph_visual.html", "r", encoding="utf-8")
+HtmlFile = open("graph_viz.html", "r", encoding="utf-8")
 source_code = HtmlFile.read()
 components.html(source_code, height=950, width=900)
 
