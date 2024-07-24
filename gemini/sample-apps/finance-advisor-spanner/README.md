@@ -49,10 +49,17 @@ The Finvest Spanner demo application was built using:
    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
    cd generative-ai/gemini/sample-apps/finance-advisor-spanner/
    ```
+   Open app.py in editor
+
+   If choosing App Engine Deployment:
+   Change the Network parameter in the file app.py 
    ```network:
       name: projects/spanner-demos-ce/global/networks/default
       subnetwork_name: central
    ```
+
+   If choosing CloudRun deployment, uncomment the appropriate lines
+
 6. Create a Spanner instance
    https://console.cloud.google.com/spanner/instances/new
 
@@ -70,13 +77,21 @@ The Finvest Spanner demo application was built using:
          )
          ;```
    5.2 Next run the rest of DDL statements without any change
-6. Now Deploy the App to App Engine
+6. Now Deploy:
+   If choosing App Engine
    6.1 gcloud app deploy  
    (Might need overriding ```constraints/compute.requireShieldedVm``` Organization Policy)
-   - [Front End Demo Walkthrough]()
+   If choosing Cloud Run
+   6.2 
+   Build: ```gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app```
+   Deploy: ```gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/```
+
+
+7. [Front End Demo Walkthrough]()
    
 ### Troubleshooting
 
+ERROR: (gcloud.app.deploy) Error Response: [7] The App Engine appspot and App Engine flexible environment service accounts must have permissions on the image [us.gcr.io/spanner-demos-ce/appengine/finvest-demo.20240723t192059:721bec84-60bf-4d0b-a93b-4d5295d4a524]. Please check that the App Engine default service account has the [Storage Object Viewer] role and the App Engine  Flexible service account has the App Engine Flexible Environment Service Agent role
 
 
 ## Architecture
