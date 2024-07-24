@@ -2,7 +2,6 @@
 
 **Authors:** [Anirban Bagchi](https://github.com/anirbanbagchi1979) and [Derek Downey](https://github.com/dtest)
 
-<img align="right" style="padding-left: 10px;" src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/Finvest-white.jpg" width="35%" alt="Finvest Logo"> 
 
 Consider a modern financial services company where I am a financial advisor. Finding the right financial investments can be challenging because of the complex nature of investments from structured data such as expense ratios, fund returns, to complex data such as asset holdings, their industry sectors, and more unstructured data, such as investment philosophy and client’s investment goals. Let me show you how Spanner makes this process easy by combining these diverse data structures into a single multi-model platform.
 
@@ -23,7 +22,7 @@ This demo highlights [Spanner](https://cloud.google.com/spanner),  integration w
 The Finvest Spanner demo application was built using:
 
 - [Spanner](https://cloud.google.com/spanner) 
-- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([textembeddings-gecko@003](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) and [text-bison@002](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text))
+- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([textembeddings-gecko@004](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) )
 - [App Engine](https://cloud.google.com/appengine)
 - [Dataflow](https://cloud.google.com/dataflow?)
 - [Streamlit](https://streamlit.io/)
@@ -45,87 +44,98 @@ The Finvest Spanner demo application was built using:
    ```
 
 5. Clone this repository and navigate to the project root:
-   5.1
-   ```cd
+   >5.1
+   ```bash
+   cd
    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
    cd generative-ai/gemini/sample-apps/finance-advisor-spanner/
    ```
-   Open app.py in editor
+   Open ```app.py``` in editor
 
-   If choosing App Engine Deployment:
-   Change the Network parameter in the file app.py 
-   ```network:
+   >5.1.1 If choosing App Engine Deployment:
+   Change the Network parameter as per your setup in the file ```app.py``` 
+   ```bash
+   network:
       name: projects/spanner-demos-ce/global/networks/default
       subnetwork_name: central
    ```
 
-   If choosing CloudRun deployment, uncomment the appropriate lines
+   >5.1.2 If choosing CloudRun deployment, uncomment the appropriate lines
 
 
 6. Create a Spanner instance
    https://console.cloud.google.com/spanner/instances/new
 
-   Note the instance Name
+   >Note the instance Name
 
 7. Import the data into the Spanner instance
    https://cloud.google.com/spanner/docs/import#import-database
-   3.1 The bucket which has the Spanner export is here
+   The bucket which has the Spanner export is here
    [GCS Bucket](https://drive.google.com/file/d/1rgx9TJ1G4bN_5Z3iIrebGi2x7bAQvMob/view?usp=drive_link)
 
-   Note the Database Name
+   >Note the Database Name
 
-   7.1 The import process will run and import the database into a new Spanner database.
+   >7.1 The import process will run and import the database into a new Spanner database.
 
 8. Run Additional DDL statements for the database to have all the necessary components.
-   5.1 The DDL statements are in `Schema-Operations` file in this directory
-            ```ALTER MODEL EmbeddingsModel SET OPTIONS (
+   >8.1 The DDL statements are in `Schema-Operations` file in this directory.
+
+   >8.2 Change the endpoint as per your project and the spanner instance location
+      ```bash 
+      ALTER MODEL EmbeddingsModel SET OPTIONS (
          endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-004'
          )
-         ;```
-   5.2 Next run the rest of DDL statements without any change
+         ;
+      ```
+   >8.3 Next run the rest of DDL statements without any change
 
 9. In Cloud Shell:
-   Open .env file
+   Open ```.env``` file in the same directory
    edit the following fields with the instance name from Step 6 and database name from Step 7
-   ```instance_id=spanner-fts
-   database_id=mf-data-test``` 
+   ```bash
+   instance_id=spanner-fts
+   database_id=mf-data-test
+   ``` 
 
-10. Now Deploy:
-   If choosing App Engine
-   6.1 gcloud app deploy  
+10. Now Deploy the application:
+   >10.1 If deploying to  App Engine
 
-   If choosing Cloud Run
-   
+   ``` 
+   gcloud app deploy
+   ```  
+
+   >10.2 If deploying to Cloud Run
+
    6.2 
-   Build: ```gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app```
-   Deploy: ```gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region us-central1 --allow-unauthenticated```
+   Build: 
+   
+   ```bash
+   gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app
+   ```
+
+   Deploy: 
+   
+   ```bash 
+   gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region us-central1 --allow-unauthenticated
+   ```
 
 
 7. [Front End Demo Walkthrough]()
    
 ### Troubleshooting
 
-ERROR: (gcloud.app.deploy) Error Response: [7] The App Engine appspot and App Engine flexible environment service accounts must have permissions on the image [us.gcr.io/spanner-demos-ce/appengine/finvest-demo.20240723t192059:721bec84-60bf-4d0b-a93b-4d5295d4a524]. Please check that the App Engine default service account has the [Storage Object Viewer] role and the App Engine  Flexible service account has the App Engine Flexible Environment Service Agent role
+>T.1
 
-(Might need overriding ```constraints/compute.requireShieldedVm``` Organization Policy)
+ERROR: (gcloud.app.deploy) Error Response: [7] The App Engine appspot and App Engine flexible environment service accounts must have permissions on the image [us.gcr.io/spanner-demos-ce/appengine/finvest-demo.20240723t192059:721bec84-60bf-4d0b-a93b-4d5295d4a524]. 
+Please check that the App Engine default service account has the [Storage Object Viewer] role and the App Engine  Flexible service account has the App Engine Flexible Environment Service Agent role
 
-## Architecture
+>T.2 If you get org policy constraint violation error
 
-### Database
-
-
-
-#### Schema
-
+ override ```constraints/compute.requireShieldedVm``` Organization Policy
 
 ### Frontend
 
 The frontend application is Streamlit 
-
-
-
-### Secrets
-
 
 ## Purpose and Extensibility
 
