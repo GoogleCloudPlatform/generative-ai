@@ -106,23 +106,21 @@ The Finvest Spanner demo application was built using:
 
    >10.2 If deploying to Cloud Run
 
-   6.2 
-   Build: 
+    
+   >Build: 
    
    ```bash
    gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app
    ```
 
-   Deploy: 
+   >Deploy: 
    
    ```bash 
    gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region us-central1 --allow-unauthenticated
    ```
 
 
-7. [Front End Demo Walkthrough]()
-   
-### Troubleshooting
+   ### Troubleshooting
 
 >T.1
 
