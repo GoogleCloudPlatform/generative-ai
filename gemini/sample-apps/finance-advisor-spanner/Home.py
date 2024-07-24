@@ -1,13 +1,6 @@
+"""This file is the home Page of the Python Streamlit app"""
+
 import streamlit as st
-import pandas as pd
-import numpy as np
-from itables.streamlit import interactive_table
-import pyarrow
-from streamlit.components.v1 import html
-from streamlit.components.v1.components import MarshallComponentException
-from PIL import Image
-from streamlit_navigation_bar import st_navbar
-import pages as pg
 from database import *
 from css import *
 
@@ -29,6 +22,8 @@ st.markdown(footer, unsafe_allow_html=True)
 
 
 def local_css(file_name):
+    """This function loads local CSS File"""
+
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 

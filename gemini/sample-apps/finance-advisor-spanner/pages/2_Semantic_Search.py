@@ -1,17 +1,8 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 from itables.streamlit import interactive_table
-import pyarrow
-from streamlit.components.v1 import html
-from streamlit.components.v1.components import MarshallComponentException
-from PIL import Image
-from streamlit_navigation_bar import st_navbar
-import pages as pg
 from database import *
 from css import *
 from streamlit_extras.stylable_container import stylable_container
-from streamlit_extras.grid import grid
 import time
 
 st.set_page_config(
@@ -24,6 +15,8 @@ st.logo("images/investments.png")
 
 
 def asset_semantic_search():
+    """This function implements Semantic Search feature"""
+
     st.header("FinVest Fund Advisor")
     st.subheader("Semantic Search")
 
@@ -32,7 +25,6 @@ def asset_semantic_search():
     )
     classes = ["display", "compact", "cell-border", "stripe"]
     buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
-    render_with = "itables"
     style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
     it_args = dict(
         classes=classes,
@@ -47,15 +39,15 @@ def asset_semantic_search():
     query_params.append(investment_strategy.strip())
     query_params.append(investment_manager.strip())
     with st.spinner("Querying Spanner..."):
-        start_time = time.time()
+        # start_time = time.time()
         # data_load_state = st.text("Loading data...")
         if annVsKNN == "KNN":
-            returnVals = semantic_query(query_params)
+            return_vals = semantic_query(query_params)
         else:
-            returnVals = semantic_query_ann(query_params)
-        spanner_query = returnVals.get("query")
-        data = returnVals.get("data")
-        time_spent = time.time() - start_time
+            return_vals = semantic_query_ann(query_params)
+        spanner_query = return_vals.get("query")
+        data = return_vals.get("data")
+        # time_spent = time.time() - start_time
         with st.expander("Spanner Query"):
             with stylable_container(
                 "codeblock",
@@ -66,7 +58,7 @@ def asset_semantic_search():
             """,
             ):
                 st.code(spanner_query, language="sql", line_numbers=False)
-        formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
+        # formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
         # st.text(f"The Query took {formatted_time} seconds to complete.")
         # data_load_state.text("Loading data...done!")
     interactive_table(data, caption="", **it_args)

@@ -1,18 +1,11 @@
+"""This module is the page for Asset Search feature"""
+
 import streamlit as st
-import pandas as pd
-import numpy as np
 from itables.streamlit import interactive_table
-import pyarrow
-from streamlit.components.v1 import html
-from streamlit.components.v1.components import MarshallComponentException
-from PIL import Image
-from streamlit_navigation_bar import st_navbar
-import pages as pg
 from database import *
 from css import *
-from streamlit_extras.stylable_container import stylable_container
-from streamlit_extras.grid import grid
 import time as time
+from streamlit_extras.stylable_container import stylable_container
 
 
 st.set_page_config(
@@ -25,6 +18,7 @@ st.logo("images/investments.png")
 
 
 def local_css(file_name):
+    """This loads local css"""
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
@@ -33,6 +27,8 @@ local_css("pages/styles.css")
 
 
 def asset_search_precise():
+    """This function implements Asset search LIKE Query"""
+
     # st.image('images/Finvest-white-removebg-small.png')
     st.header("FinVest Fund Advisor")
     st.subheader("Asset Search")
@@ -61,12 +57,12 @@ def asset_search_precise():
 
     with st.spinner("Querying Spanner..."):
         time.sleep(1)
-        start_time = time.time()
+        # start_time = time.time()
 
-        returnVals = like_query(query_params)
-        spanner_query = returnVals.get("query")
-        time_spent = time.time() - start_time
-        data = returnVals.get("data")
+        return_vals = like_query(query_params)
+        spanner_query = return_vals.get("query")
+        # time_spent = time.time() - start_time
+        data = return_vals.get("data")
 
         with st.expander("Spanner Query"):
             with stylable_container(
@@ -80,7 +76,7 @@ def asset_search_precise():
                 st.code(spanner_query, language="sql", line_numbers=False)
 
         # st.success('Done!')
-    formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
+    # formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
     # st.text(f"The Query took {formatted_time} seconds to complete.")
 
     # data_load_state = st.text('Loading data...')
@@ -89,6 +85,7 @@ def asset_search_precise():
 
 
 def asset_search():
+    """This function immplements Asset Search"""
     # st.image('images/Finvest-white-removebg-small.png')
     st.header("FinVest Fund Advisor")
     st.subheader("Asset Search")
@@ -98,7 +95,7 @@ def asset_search():
     )
     classes = ["display", "compact", "cell-border", "stripe"]
     buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
-    render_with = "itables"
+    # render_with = "itables"
     style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
     it_args = dict(
         classes=classes,
@@ -115,12 +112,12 @@ def asset_search():
 
     with st.spinner("Querying Spanner..."):
         time.sleep(1)
-        start_time = time.time()
+        # start_time = time.time()
 
-        returnVals = fts_query(query_params)
-        spanner_query = returnVals.get("query")
-        time_spent = time.time() - start_time
-        data = returnVals.get("data")
+        return_vals = fts_query(query_params)
+        spanner_query = return_vals.get("query")
+        # time_spent = time.time() - start_time
+        data = return_vals.get("data")
 
         with st.expander("Spanner Query"):
             with stylable_container(
@@ -134,7 +131,7 @@ def asset_search():
                 st.code(spanner_query, language="sql", line_numbers=False)
 
         # st.success('Done!')
-    formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
+    # formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
     # st.text(f"The Query took {formatted_time} seconds to complete.")
 
     # data_load_state = st.text('Loading data...')
@@ -147,7 +144,7 @@ with st.sidebar:
     with st.form("Asset Search"):
         st.subheader("Search Criteria")
         preciseVsText = st.radio("", ["Full-Text", "Precise"], horizontal=True)
-        preciseSearch = False
+        precise_search = False
         with st.expander("Asset Strategy", expanded=True):
             investment_strategy_pt1 = st.text_input("", value="Europe")
             andOrExclude = st.radio("", ["AND", "OR", "EXCLUDE"], horizontal=True)
@@ -167,10 +164,10 @@ with st.sidebar:
                     + investment_strategy_pt2
                 )
         else:
-            preciseSearch = True
+            precise_search = True
         asset_search_submitted = st.form_submit_button("Submit")
 if asset_search_submitted:
-    if preciseSearch:
+    if precise_search:
         asset_search_precise()
     else:
         asset_search()
