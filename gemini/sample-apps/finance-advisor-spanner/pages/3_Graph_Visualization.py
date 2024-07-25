@@ -1,9 +1,9 @@
+import graph_viz
+import matplotlib.pyplot as plt
+import networkx as nx
+from pyvis.network import Network
 import streamlit as st
 import streamlit.components.v1 as components
-import networkx as nx
-import matplotlib.pyplot as plt
-from pyvis.network import Network
-import graph_viz
 
 # Network(notebook=True)
 st.subheader("Show me the Relationships between Funds ,Companies and Sectors")
@@ -24,6 +24,3 @@ components.html(source_code, height=950, width=900)
 with st.sidebar:
     st.subheader("Legend")
     st.image("images/Graph-legend.png")
-
-
-

@@ -1,9 +1,10 @@
-import streamlit as st
-from itables.streamlit import interactive_table
-from database import *
-from css import *
-from streamlit_extras.stylable_container import stylable_container
 import time
+
+from css import *
+from database import *
+from itables.streamlit import interactive_table
+import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 
 st.set_page_config(
     layout="wide",
@@ -65,7 +66,6 @@ def asset_semantic_search():
 
 
 with st.sidebar:
-
     with st.form("Asset Semantic Search"):
         st.subheader("Search Criteria")
         annVsKNN = st.radio("", ["ANN", "KNN"], horizontal=True)

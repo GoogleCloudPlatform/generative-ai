@@ -1,10 +1,10 @@
-from pyvis.network import Network
 from database import *
+from pyvis.network import Network
 
 
 def simple_func_nonx():
-    """This function is for generating the Graph Visualization """
-    
+    """This function is for generating the Graph Visualization"""
+
     graph = Network("900px", "900px", notebook=True, heading="")
     return_vals = graph_dtls_query()
     companies = return_vals.get("Companies")
@@ -25,7 +25,6 @@ def simple_func_nonx():
             color="red",
             title=row["sector_name"],
         )
-
 
     # managers = returnVals.get("Managers")
     # for index, row in managers.iterrows():
@@ -54,10 +53,7 @@ def simple_func_nonx():
     fund_hold_company_relation = return_vals.get("FundsHoldsCompaniesRelation")
     for index, row in fund_hold_company_relation.iterrows():
         graph.add_edge(str(row["NewMFSequence"]), str(row["CompanySeq"]), title="HOLDS")
-    
+
     # Add Legend Nodes
- 
-    
-    
-    
+
     graph.show("graph_viz.html")

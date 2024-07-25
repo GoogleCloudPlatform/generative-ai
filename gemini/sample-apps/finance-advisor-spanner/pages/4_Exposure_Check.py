@@ -1,10 +1,10 @@
-import streamlit as st
-from itables.streamlit import interactive_table
-from database import *
+import time
+
 from css import *
 from database import *
+from itables.streamlit import interactive_table
+import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
-import time
 
 st.set_page_config(
     layout="wide",
@@ -65,7 +65,6 @@ def compliance_search():
 
 
 with st.sidebar:
-
     with st.form("Compliance Search"):
         st.subheader("Search Criteria")
         sectorOption = st.selectbox(

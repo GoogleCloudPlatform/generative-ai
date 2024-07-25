@@ -1,5 +1,5 @@
 # Add footer
-footer="""<style>
+footer = """<style>
 a:link , a:visited{
 color: blue;
 background-color: transparent;
@@ -28,4 +28,4 @@ text-align: center;
 """
 
 
-favicon = 'images/small-logo.png'
+favicon = "images/small-logo.png"

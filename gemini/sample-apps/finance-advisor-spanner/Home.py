@@ -1,8 +1,8 @@
 """This file is the home Page of the Python Streamlit app"""
 
-import streamlit as st
-from database import *
 from css import *
+from database import *
+import streamlit as st
 
 st.set_page_config(
     layout="wide",

@@ -1,10 +1,11 @@
 """This file is for database operations done by the application """
 
 import os
-from google.cloud import spanner
-from google.api_core.client_options import ClientOptions
-import pandas as pd
+
 from dotenv import load_dotenv
+from google.api_core.client_options import ClientOptions
+from google.cloud import spanner
+import pandas as pd
 
 load_dotenv()
 
@@ -24,6 +25,7 @@ spanner_client = spanner.Client(client_options=options)
 instance = spanner_client.instance(instance_id)
 # Get a Cloud Spanner database by ID.
 database = instance.database(database_id)
+
 
 def spanner_read_data(query):
     """This function helps read data from spanner"""
@@ -52,7 +54,6 @@ def spanner_read_data_list(query):
 def spanner_read_data_withparam(query, vector_input):
     """This function helps read data from spanner with input params"""
     with database.snapshot() as snapshot:
-
         results = snapshot.execute_sql(
             query,
             params={"vector": vector_input},
@@ -167,7 +168,7 @@ def semantic_query_ann(query_params):
     #     )
     return_vals = dict()
     return_vals["query"] = query2
-    #print("Semantic ANN Query", query2)
+    # print("Semantic ANN Query", query2)
     # df = spanner_read_data(query)
 
     return_vals["data"] = results_df
@@ -195,7 +196,7 @@ def like_query(query_params):
     # df = spanner_read_data(query)
     return_vals = dict()
     return_vals["query"] = query
-    #print("FTS Query", query)
+    # print("FTS Query", query)
     df = spanner_read_data(query)
 
     return_vals["data"] = df

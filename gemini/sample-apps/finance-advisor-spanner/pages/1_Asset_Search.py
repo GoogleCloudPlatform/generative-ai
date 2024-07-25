@@ -1,12 +1,12 @@
 """This module is the page for Asset Search feature"""
 
-import streamlit as st
-from itables.streamlit import interactive_table
-from database import *
-from css import *
 import time as time
-from streamlit_extras.stylable_container import stylable_container
 
+from css import *
+from database import *
+from itables.streamlit import interactive_table
+import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 
 st.set_page_config(
     layout="wide",
@@ -140,7 +140,6 @@ def asset_search():
 
 
 with st.sidebar:
-
     with st.form("Asset Search"):
         st.subheader("Search Criteria")
         preciseVsText = st.radio("", ["Full-Text", "Precise"], horizontal=True)
