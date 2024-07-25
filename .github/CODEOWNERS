@@ -16,7 +16,10 @@
 /generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/reasoning-engine                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/reasoning-engine/tutorial_alloydb_rag_agent.ipynb @averikitsch
+/generative-ai/gemini/reasoning-engine/tutorial_cloud_sql_pg_rag_agent.ipynb @averikitsch
 /generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/photo-discovery           @kazunori279 @KhanhNwin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions @shanecglass @GoogleCloudPlatform/generative-ai-devrel
@@ -44,6 +47,7 @@
 /generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb        @saeedaghabozorgi @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/genwealth/                @paulramsey @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/analyze-poster-images-in-bigquery/poster_image_analysis.ipynb     @aliciawilliams @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/retail/product_attributes_extraction.ipynb    @tianli @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/RAG_Based_on_Sensitive_Data_Protection_using_Faker.ipynb @ainaomotayo @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_langchain_bigquery_vector_search.ipynb @ashleyxuu @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/retail_warranty_claim_chatbot.ipynb @zthor5 @charleselliott @GoogleCloudPlatform/generative-ai-devrel
@@ -59,3 +63,5 @@
 /generative-ai/vision/gradio/gradio_image_generation_sdk.ipynb  @jbrache @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb   @guruvittal @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/genkit/generate-synthetic-database           @aikozhaoz @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/evaluation/evaluate_langchain_chains.ipynb           @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb           @eliasecchig @lspatarog @GoogleCloudPlatform/generative-ai-devrel

@@ -48,7 +48,7 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
       <br>
       <a href="sample-apps/"><code>sample-apps/</code></a>
     </td>
-    <td>Discover sample apps powered by Gemini</td>
+    <td>Discover sample apps using Gemini</td>
     <td><a href="sample-apps/">Sample apps</a></td>
   </tr>
   <tr>
@@ -68,7 +68,7 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
       <br>
       <a href="evaluation/"><code>evaluation/</code></a>
     </td>
-    <td>Learn how to evaluate Gemini with Vertex AI Model Evaluation for GenAI</td>
+    <td>Learn how to evaluate Gemini with Vertex AI Model Evaluation for Generative AI</td>
     <td><a href="evaluation/">Sample notebooks</a></td>
   </tr>
   <tr>

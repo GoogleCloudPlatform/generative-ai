@@ -175,7 +175,7 @@ def process_pdf(cloud_event):
     region = os.environ["REGION"]
     project_id = os.environ["PROJECT_ID"]
 
-    # Doc AI Vars
+    # Document AI Vars
     source_file = f"gs://{bucket}/{name}"
     gcs_output_uri = f"gs://{project_id}-doc-ai/doc-ai-output/"  # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
     location = "us"  # Format is "us" or "eu"

@@ -3,6 +3,7 @@
 # Enable Vertex AI and BigQuery
 gcloud services enable aiplatform.googleapis.com
 gcloud services enable bigquery.googleapis.com
+gcloud services enable bigquerydatatransfer.googleapis.com
 
 # Copy public dataset
 bq mk --force=true --dataset thelook_ecommerce

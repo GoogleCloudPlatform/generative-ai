@@ -34,7 +34,7 @@ def predict_edit_image(
     instance_dict: dict,
     parameters: dict,
 ) -> list[str]:
-    """Predicts the output of imagen on a given instance dict.
+    """Predicts the output of Imagen on a given instance dict.
     Args:
         instance_dict:
             The input to the large language model. (dict)

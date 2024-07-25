@@ -17,7 +17,7 @@ consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/
 
 ```bash
 cd
-git clone  https://github.com/GoogleCloudPlatform/generative-ai
+git clone https://github.com/GoogleCloudPlatform/generative-ai
 cd generative-ai/gemini/sample-apps/image-bash-jam/
 
 # [optional] If you like a colored shell, do this. If not, scripts will detect its absence and will just print in shell default color (see `_lolcat` in `_common.sh`).
@@ -253,20 +253,20 @@ There you go, the button IS the ANC button, I thought so! Thanks Gemini!
 
 This is the avatar I use in Google. I randomly asked this:
 
-![Alt text](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/ricc-logo.png "Riccardo GCP logo - taken in the Amsterdam office")
+![Alt text](https://storage.googleapis.com/github-repo/use-cases/image-bash-jam/img/ricc-logo.png "Riccardo Google Cloud logo - taken in the Amsterdam office")
 
 ```bash
 $ ./gemini-explain-image.sh images/ricc-logo.png
 [..]
 This is a photo of a man standing behind a Google Cloud Platform cutout.
-The man is smiling and wearing a shirt that says, “That’s what I do,
-I drink and I know things.” The background is a brick wall with blue
+The man is smiling and wearing a shirt that says, "That's what I do,
+I drink and I know things." The background is a brick wall with blue
 and white accents.
 ```
 
 And I thought! Of course, this is my favourite Games of Thrones tshirt.
 
-Let’s ask Gemini:
+Let's ask Gemini:
 
 ```bash
 $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize the quote in this person tshirt
@@ -283,7 +283,7 @@ $ GENERATE_MP3=true ./gemini-generic.sh images/ricc-logo.png Do you recognize th
   <p>🔇 Sorry, Your browser or GitHub markdown does not support the audio element.</p>
   </audio>
 
-- Response: “ "That's what I do, I drink and I know things" is a quote from the TV show
-  Game of Thrones, said by the character Tyrion Lannister.”
+- Response: " "That's what I do, I drink and I know things" is a quote from the TV show
+  Game of Thrones, said by the character Tyrion Lannister."
 
 Wow: _Chapeau_, Gemini!

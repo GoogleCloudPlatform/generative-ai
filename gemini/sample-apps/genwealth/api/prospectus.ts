@@ -22,7 +22,7 @@ export class Prospectus {
         this.metadataBucketName = this.bucketName + "-metadata";
     }
 
-    /** Upload a prospectus and generate the metadata for indexing in Vertex Search & Conversation.
+    /** Upload a prospectus and generate the metadata for indexing in Vertex AI Search & Conversation.
      */
     async upload(buffer: Buffer, filename: string, ticker: string) {
         ticker = ticker.toUpperCase();

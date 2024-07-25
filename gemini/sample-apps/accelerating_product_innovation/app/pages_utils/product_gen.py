@@ -1,5 +1,5 @@
 """
-This module  provides functions for generating and managing product
+This module provides functions for generating and managing product
 content based on selected features.
 Functions include:
 

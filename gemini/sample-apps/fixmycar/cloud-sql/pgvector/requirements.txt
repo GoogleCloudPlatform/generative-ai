@@ -1,6 +1,0 @@
-pdfplumber
-langchain
-nltk
-pandas
-ipykernel
-google-cloud-aiplatform

@@ -26,7 +26,7 @@ These variables are needed since the Vertex AI initialization needs the Google C
 In Cloud Shell, execute the following commands:
 
 ```bash
-export GCP_PROJECT='<Your GCP Project Id>'  # Change this
+export GCP_PROJECT='<Your Google Cloud Project Id>'  # Change this
 export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
 ```
 
