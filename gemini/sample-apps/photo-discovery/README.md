@@ -24,13 +24,22 @@ Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI 
 
 ### Preparing Vertex AI Search search app
 
-1. Create a search data store on Vertex AI Search. On the Console of your Google Cloud project, open `Agent Builder` > `Data Stores` > `CREATE DATA STORE` > `Cloud Storage` > `Structured data (JSONL)`. At `Select a folder or file` choose `FILE`, and enter `gcp-samples-ic0-ag/src/google_merch_shop_items.json`. Click `CONTINUE`. At `Review schema` page, click `CONTINUE`. In `Configure your data store` page, choose `Location of your data store` as `us` and enter `Your data store name` as `gms`. Click `CREATE`.
+1. Create a search data store on Vertex AI Search. 
+- On the Console of your Google Cloud project, open `Agent Builder` > `Data Stores` > `CREATE DATA STORE` > `Cloud Storage` > `Structured data (JSONL)`. 
+- At `Select a folder or file` choose `FILE`, and enter `gcp-samples-ic0-ag/src/google_merch_shop_items.json`. Click `CONTINUE`. 
+- At `Review schema` page, click `CONTINUE`. 
+- In `Configure your data store` page, choose `Location of your data store` as `us` and enter `Your data store name` as `gms`. 
+- Click `CREATE`.
 
-1. Open `Data Stores` and click `gms`. Make sure the `Number of documents` is 204 items. Take a memo of the `Data store ID`. This will be the search engine ID.
+2. Check the data store ID. Open `Data Stores` and click `gms`. Make sure the `Number of documents` is 204 items. Take a memo of the `Data store ID`. This will be the search engine ID.
 
-1. On the Console, open `Agent Builder` > `Apps` > `CREATE APP`. Choose `Search`. On `Search app configuration`, opt out `Enterprise edition features` and `Advanced LLM features` options. Enter `Your app name` as `gms_test`, `External name` as your company name, and `Location of your app` as `us`. Click `CONTINUE`. On `Data Stores` page, choose `gms` and click `CREATE`. This will start building a search index with the gms data store which will take about 5 minutes.
+1. Create a search app.
+- On the Console, open `Agent Builder` > `Apps` > `CREATE APP`. Choose `Search`. 
+- On `Search app configuration`, opt out `Enterprise edition features` and `Advanced LLM features` options. 
+- Enter `Your app name` as `gms_test`, `External name` as your company name, and `Location of your app` as `us`. 
+- Click `CONTINUE`. On `Data Stores` page, choose `gms` and click `CREATE`. This will start building a search index with the gms data store which will take about 5 minutes.
 
-1. After 5 minutes, open `Preview` and type `Dino` on the search box. You should see the search results with Chrome Dino related items.
+4. Preview the app. After 5 minutes, open `Preview` and type `Dino` on the search box. You should see the search results with Chrome Dino related items.
 
 ### Building & deploying the agent with Vertex AI Agent Builder
 
