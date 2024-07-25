@@ -23,7 +23,7 @@ The Finvest Spanner demo application was built using:
 
 - [Spanner](https://cloud.google.com/spanner) 
 - [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([textembeddings-gecko@004](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) )
-- [App Engine](https://cloud.google.com/appengine)
+- [Cloud Run](https://cloud.google.com/run)
 - [Dataflow](https://cloud.google.com/dataflow?)
 - [Streamlit](https://streamlit.io/)
 
@@ -52,18 +52,7 @@ The Finvest Spanner demo application was built using:
    ```
    Open ```app.py``` in editor
 
-   >5.1.1 If choosing App Engine Deployment:
-   Change the Network parameter as per your setup in the file ```app.py``` 
-   ```bash
-   network:
-      name: projects/spanner-demos-ce/global/networks/default
-      subnetwork_name: central
-   ```
-
-   >5.1.2 If choosing CloudRun deployment, uncomment the appropriate lines
-
-
-6. Create a Spanner instance
+   6. Create a Spanner instance
    https://console.cloud.google.com/spanner/instances/new
 
    >Note the instance Name
@@ -98,15 +87,7 @@ The Finvest Spanner demo application was built using:
    ``` 
 
 10. Now Deploy the application:
-   >10.1 If deploying to  App Engine
-
-   ``` 
-   gcloud app deploy
-   ```  
-
-   >10.2 If deploying to Cloud Run
-
-    
+   If deploying to Cloud Run 
    >Build: 
    
    ```bash
@@ -116,24 +97,17 @@ The Finvest Spanner demo application was built using:
    >Deploy: 
    
    ```bash 
-   gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region us-central1 --allow-unauthenticated
+   gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region 'YOUR SPANNER REGION' --allow-unauthenticated
    ```
 
 
    ### Troubleshooting
 
->T.1
 
-ERROR: (gcloud.app.deploy) Error Response: [7] The App Engine appspot and App Engine flexible environment service accounts must have permissions on the image [us.gcr.io/spanner-demos-ce/appengine/finvest-demo.20240723t192059:721bec84-60bf-4d0b-a93b-4d5295d4a524]. 
-Please check that the App Engine default service account has the [Storage Object Viewer] role and the App Engine  Flexible service account has the App Engine Flexible Environment Service Agent role
-
->T.2 If you get org policy constraint violation error
-
- override ```constraints/compute.requireShieldedVm``` Organization Policy
 
 ### Frontend
 
-The frontend application is Streamlit 
+The frontend application is Streamlit running on CloudRun
 
 ## Purpose and Extensibility
 

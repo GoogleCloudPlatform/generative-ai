@@ -1,16 +1,3 @@
-# #App Engine : Uncomment following 10 lines
-# runtime: python
-# entrypoint: streamlit run home.py --server.enableCORS false --browser.serverAddress 0.0.0.0 --browser.gatherUsageStats false --server.port $PORT
-# env: flex
-# service: finvest-demo
-# runtime_config:
-#     operating_system: "ubuntu22"
-#     runtime_version: "3.12"
-# network:
-#   name: projects/spanner-demos-ce/global/networks/default
-#   subnetwork_name: central
-
-
 #Cloud Run : Uncomment following 2 lines
 runtime: python39
 entrypoint: streamlit run home.py --server.enableCORS false --browser.serverAddress 0.0.0.0 --browser.gatherUsageStats false --server.port $PORT
