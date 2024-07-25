@@ -79,8 +79,16 @@ The Finvest Spanner demo application was built using:
    >8.3 Next run the rest of DDL statements without any change
 
 9. In Cloud Shell:
-   Open ```.env``` file in the same directory
-   edit the following fields with the instance name from Step 6 and database name from Step 7
+   
+   Copy ```.env_TMP``` file to ```.env```
+
+   
+   ```bash
+   mv .env_TMP .env
+   ```
+   Open ```.env``` file in the same directory using VI or other Editor
+   
+   Edit the following fields with the instance name from Step 6 and database name from Step 7
    ```bash
    instance_id='YOUR INSTANCE ID'
    database_id='YOUR DATABASE ID'

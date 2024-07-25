@@ -187,3 +187,4 @@ testem.log
 Thumbs.db
 *.vscode*
 gemini/sample-apps/finance-advisor-spanner/gcs-bucket.zip
+gemini/sample-apps/finance-advisor-spanner/.env
