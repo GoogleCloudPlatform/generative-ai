@@ -82,12 +82,12 @@ The Finvest Spanner demo application was built using:
    Open ```.env``` file in the same directory
    edit the following fields with the instance name from Step 6 and database name from Step 7
    ```bash
-   instance_id=spanner-fts
-   database_id=mf-data-test
+   instance_id='YOUR INSTANCE ID'
+   database_id='YOUR DATABASE ID'
    ``` 
 
 10. Now Deploy the application:
-   If deploying to Cloud Run 
+   Deploying to Cloud Run 
    >Build: 
    
    ```bash
