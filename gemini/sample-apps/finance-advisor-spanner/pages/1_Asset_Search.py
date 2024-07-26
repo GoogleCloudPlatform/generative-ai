@@ -1,9 +1,10 @@
 """This module is the page for Asset Search feature"""
+# pylint: disable=line-too-long, invalid-name
 
 import time as time
 
-from css import *
-from database import *
+from css import footer, favicon
+from database import fts_query, like_query
 from itables.streamlit import interactive_table
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
@@ -19,7 +20,7 @@ st.logo("images/investments.png")
 
 def local_css(file_name):
     """This loads local css"""
-    with open(file_name) as f:
+    with open(file_name, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
@@ -33,12 +34,9 @@ def asset_search_precise():
     st.header("FinVest Fund Advisor")
     st.subheader("Asset Search")
 
-    classes_col, buttons_col, style_col, render_with_col = st.columns(
-        [0.25, 0.25, 0.20, 0.10]
-    )
+    st.columns([0.25, 0.25, 0.20, 0.10])
     classes = ["display", "compact", "cell-border", "stripe"]
     buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
-    render_with = "itables"
     style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
     it_args = dict(
         classes=classes,
@@ -57,11 +55,9 @@ def asset_search_precise():
 
     with st.spinner("Querying Spanner..."):
         time.sleep(1)
-        # start_time = time.time()
 
         return_vals = like_query(query_params)
         spanner_query = return_vals.get("query")
-        # time_spent = time.time() - start_time
         data = return_vals.get("data")
 
         with st.expander("Spanner Query"):
@@ -75,27 +71,20 @@ def asset_search_precise():
             ):
                 st.code(spanner_query, language="sql", line_numbers=False)
 
-        # st.success('Done!')
-    # formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
-    # st.text(f"The Query took {formatted_time} seconds to complete.")
-
-    # data_load_state = st.text('Loading data...')
-    #   data_load_state.text('Loading data...done!')
     interactive_table(data, caption="", **it_args)
 
 
 def asset_search():
     """This function immplements Asset Search"""
-    # st.image('images/Finvest-white-removebg-small.png')
+
     st.header("FinVest Fund Advisor")
     st.subheader("Asset Search")
 
-    classes_col, buttons_col, style_col, render_with_col = st.columns(
+    st.columns(
         [0.25, 0.25, 0.20, 0.10]
     )
     classes = ["display", "compact", "cell-border", "stripe"]
     buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
-    # render_with = "itables"
     style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
     it_args = dict(
         classes=classes,
@@ -105,18 +94,15 @@ def asset_search():
     if buttons:
         it_args["buttons"] = buttons
 
-    # st.subheader('Funds Matching your Search')
     query_params = []
     query_params.append(investment_strategy)
     query_params.append(investment_manager)
 
     with st.spinner("Querying Spanner..."):
         time.sleep(1)
-        # start_time = time.time()
 
         return_vals = fts_query(query_params)
         spanner_query = return_vals.get("query")
-        # time_spent = time.time() - start_time
         data = return_vals.get("data")
 
         with st.expander("Spanner Query"):
@@ -130,26 +116,20 @@ def asset_search():
             ):
                 st.code(spanner_query, language="sql", line_numbers=False)
 
-        # st.success('Done!')
-    # formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
-    # st.text(f"The Query took {formatted_time} seconds to complete.")
-
-    # data_load_state = st.text('Loading data...')
-    #   data_load_state.text('Loading data...done!')
     interactive_table(data, caption="", **it_args)
 
 
 with st.sidebar:
     with st.form("Asset Search"):
         st.subheader("Search Criteria")
-        preciseVsText = st.radio("", ["Full-Text", "Precise"], horizontal=True)
+        precise_vs_text = st.radio("", ["Full-Text", "Precise"], horizontal=True)
         precise_search = False
         with st.expander("Asset Strategy", expanded=True):
             investment_strategy_pt1 = st.text_input("", value="Europe")
             andOrExclude = st.radio("", ["AND", "OR", "EXCLUDE"], horizontal=True)
             investment_strategy_pt2 = st.text_input("", value="Asia")
         investment_manager = st.text_input("Investment Manager", value="James")
-        if preciseVsText == "Full-Text":
+        if precise_vs_text == "Full-Text":
             if andOrExclude == "EXCLUDE":
                 investment_strategy = (
                     investment_strategy_pt1 + " -" + investment_strategy_pt2

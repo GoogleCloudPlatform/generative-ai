@@ -1,7 +1,8 @@
-import time
+"""This module is the page for Exposue Check Search feature"""
+# pylint: disable=line-too-long, invalid-name
 
-from css import *
-from database import *
+from css import footer, favicon
+from database import compliance_query
 from itables.streamlit import interactive_table
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
@@ -21,7 +22,7 @@ def compliance_search():
     st.header("FinVest Fund Advisor")
     st.subheader("Exposure Check")
 
-    classes_col, buttons_col, style_col, render_with_col = st.columns(
+    st.columns(
         [0.25, 0.25, 0.20, 0.10]
     )
     classes = ["display", "compact", "cell-border", "stripe"]
@@ -35,17 +36,13 @@ def compliance_search():
     if buttons:
         it_args["buttons"] = buttons
 
-    # st.subheader('Funds Matching your Search')
     query_params = []
     query_params.append(sectorOption)
     query_params.append(exposurePercentage)
     with st.spinner("Querying Spanner..."):
-        # start_time = time.time()
-        # data_load_state = st.text("Loading data...")
         return_vals = compliance_query(query_params)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
-        # time_spent = time.time() - start_time
 
         with st.expander("Spanner Query"):
             with stylable_container(
@@ -58,9 +55,6 @@ def compliance_search():
             ):
                 st.code(spanner_query, language="sql", line_numbers=False)
 
-        # formatted_time = f"{time_spent:.3f}"  # f-string for formatted output
-        # st.text(f"The Query took {formatted_time} seconds to complete.")
-    # data_load_state.text("Loading data...done!")
     interactive_table(data, caption="", **it_args)
 
 

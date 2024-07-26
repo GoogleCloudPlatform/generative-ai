@@ -27,5 +27,4 @@ text-align: center;
 </div>
 """
 
-
 favicon = "images/small-logo.png"

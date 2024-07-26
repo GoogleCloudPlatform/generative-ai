@@ -1,7 +1,6 @@
 """This file is the home Page of the Python Streamlit app"""
 
-from css import *
-from database import *
+from css import favicon, footer
 import streamlit as st
 
 st.set_page_config(
@@ -15,7 +14,6 @@ st.set_page_config(
 st.logo("images/investments.png")
 
 st.header("Welcome")
-# st.image('images/investments.png')
 st.image("images/Finvest-white-removebg-preview.png")
 
 st.markdown(footer, unsafe_allow_html=True)
@@ -24,7 +22,7 @@ st.markdown(footer, unsafe_allow_html=True)
 def local_css(file_name):
     """This function loads local CSS File"""
 
-    with open(file_name) as f:
+    with open(file_name, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 

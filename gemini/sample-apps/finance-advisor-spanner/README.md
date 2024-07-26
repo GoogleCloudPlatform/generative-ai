@@ -2,6 +2,7 @@
 
 **Authors:** [Anirban Bagchi](https://github.com/anirbanbagchi1979) and [Derek Downey](https://github.com/dtest)
 
+<img align="right" style="padding-left: 10px;" src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/Finvest-white.jpg" width="35%" alt="Finvest Logo">
 
 Consider a modern financial services company where I am a financial advisor. Finding the right financial investments can be challenging because of the complex nature of investments from structured data such as expense ratios, fund returns, to complex data such as asset holdings, their industry sectors, and more unstructured data, such as investment philosophy and client’s investment goals. Let me show you how Spanner makes this process easy by combining these diverse data structures into a single multi-model platform.
 
@@ -44,49 +45,44 @@ The Finvest Spanner demo application was built using:
    ```
 
 5. Clone this repository and navigate to the project root:
-   >5.1
+   
    ```bash
    cd
    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
    cd generative-ai/gemini/sample-apps/finance-advisor-spanner/
    ```
-   Open ```app.py``` in editor
 
-   6. Create a Spanner instance
+6. Create a Spanner instance
    https://console.cloud.google.com/spanner/instances/new
 
    >Note the instance Name
 
 7. Import the data into the Spanner instance
    https://cloud.google.com/spanner/docs/import#import-database
-   The bucket which has the Spanner export is here
-   [GCS Bucket](https://drive.google.com/file/d/1rgx9TJ1G4bN_5Z3iIrebGi2x7bAQvMob/view?usp=drive_link)
+   The bucket which has the Spanner export is in this public GCS Bucket
+   
+   ```https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/spanner-fts-mf-data-export/```
+
 
    >Note the Database Name
 
-   >7.1 The import process will run and import the database into a new Spanner database.
+   The import process will run and import the database into a new Spanner database.
 
 8. Run Additional DDL statements for the database to have all the necessary components.
-   >8.1 The DDL statements are in `Schema-Operations` file in this directory.
+   The DDL statements are in [Schema-Operations.sql](./Schema-Operations.sql) file in this directory.
 
-   >8.2 Change the endpoint as per your project and the spanner instance location
+   Change the endpoint as per your project and the spanner instance location
       ```bash 
       ALTER MODEL EmbeddingsModel SET OPTIONS (
-         endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-004'
+         endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-003'
          )
          ;
       ```
-   >8.3 Next run the rest of DDL statements without any change
+   Next run the rest of DDL statements without any change
 
 9. In Cloud Shell:
    
-   Copy ```.env_TMP``` file to ```.env```
-
-   
-   ```bash
-   mv .env_TMP .env
-   ```
-   Open ```.env``` file in the same directory using VI or other Editor
+   Open ```.env``` file in the same directory using vi or other Editor
    
    Edit the following fields with the instance name from Step 6 and database name from Step 7
    ```bash
@@ -94,19 +90,19 @@ The Finvest Spanner demo application was built using:
    database_id='YOUR DATABASE ID'
    ``` 
 
-10. Now Deploy the application:
-   Deploying to Cloud Run 
-   >Build: 
-   
-   ```bash
-   gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app
-   ```
+10. Now Build & Deploy the application:
+      
+      Build: 
 
-   >Deploy: 
-   
-   ```bash 
-   gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region 'YOUR SPANNER REGION' --allow-unauthenticated
-   ```
+      ```bash
+      gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app
+      ```
+
+      Deploy: 
+
+      ```bash 
+      gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region 'YOUR SPANNER REGION' --allow-unauthenticated
+      ```
 
 
    ### Troubleshooting

@@ -1,3 +1,0 @@
-#Cloud Run : Uncomment following 2 lines
-runtime: python39
-entrypoint: streamlit run Home.py --server.enableCORS false --browser.serverAddress 0.0.0.0 --browser.gatherUsageStats false --server.port $PORT

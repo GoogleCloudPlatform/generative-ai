@@ -1,24 +1,17 @@
+"""This module is the page for Graph Visualization feature"""
+# pylint: disable=line-too-long, invalid-name, import-error
+
 import graph_viz
-import matplotlib.pyplot as plt
-import networkx as nx
-from pyvis.network import Network
 import streamlit as st
 import streamlit.components.v1 as components
 
-# Network(notebook=True)
 st.subheader("Show me the Relationships between Funds ,Companies and Sectors")
-# make Network show itself with repr_html
 
-# def net_repr_html(self):
-#  nodes, edges, height, width, options = self.get_network_data()
-#  html = self.template.render(height=height, width=width, nodes=nodes, edges=edges, options=options)
-#  return html
 
-# Network._repr_html_ = net_repr_html
 graph_viz.simple_func_nonx()
 
-HtmlFile = open("graph_viz.html", "r", encoding="utf-8")
-source_code = HtmlFile.read()
+html_file = open("graph_viz.html", "r", encoding="utf-8")
+source_code = html_file.read()
 components.html(source_code, height=950, width=900)
 
 with st.sidebar:
