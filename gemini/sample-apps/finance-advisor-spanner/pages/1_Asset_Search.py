@@ -3,7 +3,7 @@
 
 import time as time
 
-from css import footer, favicon
+from css import favicon, footer
 from database import fts_query, like_query
 from itables.streamlit import interactive_table
 import streamlit as st
@@ -15,7 +15,9 @@ st.set_page_config(
     page_icon=favicon,
     initial_sidebar_state="expanded",
 )
-st.logo("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png")
+st.logo(
+    "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
+)
 
 
 def local_css(file_name):
@@ -78,9 +80,7 @@ def asset_search():
     st.header("FinVest Fund Advisor")
     st.subheader("Asset Search")
 
-    st.columns(
-        [0.25, 0.25, 0.20, 0.10]
-    )
+    st.columns([0.25, 0.25, 0.20, 0.10])
     classes = ["display", "compact", "cell-border", "stripe"]
     buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
     style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"

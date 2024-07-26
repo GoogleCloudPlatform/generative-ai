@@ -2,7 +2,7 @@
 
 # pylint: disable=line-too-long, invalid-name
 
-from css import footer, favicon
+from css import favicon, footer
 from database import semantic_query, semantic_query_ann
 from itables.streamlit import interactive_table
 import streamlit as st
@@ -14,7 +14,9 @@ st.set_page_config(
     page_icon=favicon,
     initial_sidebar_state="expanded",
 )
-st.logo("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png")
+st.logo(
+    "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
+)
 
 
 def asset_semantic_search():

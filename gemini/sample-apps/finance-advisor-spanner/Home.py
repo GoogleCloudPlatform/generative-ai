@@ -11,10 +11,14 @@ st.set_page_config(
 )
 
 
-st.logo("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png")
+st.logo(
+    "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
+)
 
 st.header("Welcome")
-st.image("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/Finvest-white-removebg-preview.png")
+st.image(
+    "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/Finvest-white-removebg-preview.png"
+)
 
 st.markdown(footer, unsafe_allow_html=True)
 

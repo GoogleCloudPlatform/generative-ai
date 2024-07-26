@@ -1,7 +1,7 @@
 """This module is the page for Exposue Check Search feature"""
 # pylint: disable=line-too-long, invalid-name
 
-from css import footer, favicon
+from css import favicon, footer
 from database import compliance_query
 from itables.streamlit import interactive_table
 import streamlit as st
@@ -14,7 +14,9 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.logo("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png")
+st.logo(
+    "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
+)
 
 
 def compliance_search():
@@ -22,9 +24,7 @@ def compliance_search():
     st.header("FinVest Fund Advisor")
     st.subheader("Exposure Check")
 
-    st.columns(
-        [0.25, 0.25, 0.20, 0.10]
-    )
+    st.columns([0.25, 0.25, 0.20, 0.10])
     classes = ["display", "compact", "cell-border", "stripe"]
     buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
     style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
