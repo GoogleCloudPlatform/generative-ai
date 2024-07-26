@@ -186,3 +186,4 @@ testem.log
 .DS_Store
 Thumbs.db
 *.vscode*
+gemini/sample-apps/finance-advisor-spanner/graph_viz.html

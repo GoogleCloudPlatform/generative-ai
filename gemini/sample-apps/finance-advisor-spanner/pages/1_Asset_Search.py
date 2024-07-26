@@ -15,7 +15,7 @@ st.set_page_config(
     page_icon=favicon,
     initial_sidebar_state="expanded",
 )
-st.logo("images/investments.png")
+st.logo("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png")
 
 
 def local_css(file_name):
@@ -30,7 +30,6 @@ local_css("pages/styles.css")
 def asset_search_precise():
     """This function implements Asset search LIKE Query"""
 
-    # st.image('images/Finvest-white-removebg-small.png')
     st.header("FinVest Fund Advisor")
     st.subheader("Asset Search")
 
@@ -46,10 +45,9 @@ def asset_search_precise():
     if buttons:
         it_args["buttons"] = buttons
 
-    # st.subheader('Funds Matching your Search')
     query_params = []
     query_params.append(investment_strategy_pt1.strip())
-    query_params.append(andOrExclude)
+    query_params.append(and_or_exclude)
     query_params.append(investment_strategy_pt2.strip())
     query_params.append(investment_manager.strip())
 
@@ -126,11 +124,11 @@ with st.sidebar:
         precise_search = False
         with st.expander("Asset Strategy", expanded=True):
             investment_strategy_pt1 = st.text_input("", value="Europe")
-            andOrExclude = st.radio("", ["AND", "OR", "EXCLUDE"], horizontal=True)
+            and_or_exclude = st.radio("", ["AND", "OR", "EXCLUDE"], horizontal=True)
             investment_strategy_pt2 = st.text_input("", value="Asia")
         investment_manager = st.text_input("Investment Manager", value="James")
         if precise_vs_text == "Full-Text":
-            if andOrExclude == "EXCLUDE":
+            if and_or_exclude == "EXCLUDE":
                 investment_strategy = (
                     investment_strategy_pt1 + " -" + investment_strategy_pt2
                 )
@@ -138,7 +136,7 @@ with st.sidebar:
                 investment_strategy = (
                     investment_strategy_pt1
                     + " "
-                    + andOrExclude
+                    + and_or_exclude
                     + " "
                     + investment_strategy_pt2
                 )

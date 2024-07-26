@@ -10,7 +10,7 @@ def simple_func_nonx():
     graph = Network("900px", "900px", notebook=True, heading="")
     return_vals = graph_dtls_query()
     companies = return_vals.get("Companies")
-    for row in companies.iterrows():
+    for index, row in companies.iterrows():
         graph.add_node(
             str(row["CompanySeq"]),
             label=row["name"],
@@ -19,7 +19,7 @@ def simple_func_nonx():
         )
 
     sectors = return_vals.get("Sectors")
-    for row in sectors.iterrows():
+    for index, row in sectors.iterrows():
         graph.add_node(
             str(row["SectorSeq"]),
             label=row["sector_name"],
@@ -29,7 +29,7 @@ def simple_func_nonx():
         )
 
     funds = return_vals.get("Funds")
-    for row in funds.iterrows():
+    for index, row in funds.iterrows():
         graph.add_node(
             str(row["NewMFSequence"]),
             label=row["fund_name"],
@@ -38,11 +38,11 @@ def simple_func_nonx():
         )
 
     comp_sector_relation = return_vals.get("CompanySectorRelation")
-    for row in comp_sector_relation.iterrows():
+    for index, row in comp_sector_relation.iterrows():
         graph.add_edge(str(row["CompanySeq"]), str(row["SectorSeq"]), title="BELONGS")
 
     fund_hold_company_relation = return_vals.get("FundsHoldsCompaniesRelation")
-    for row in fund_hold_company_relation.iterrows():
+    for index, row in fund_hold_company_relation.iterrows():
         graph.add_edge(str(row["NewMFSequence"]), str(row["CompanySeq"]), title="HOLDS")
 
     graph.show("graph_viz.html")

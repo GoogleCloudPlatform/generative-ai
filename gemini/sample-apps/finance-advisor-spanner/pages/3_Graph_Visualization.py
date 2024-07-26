@@ -16,4 +16,4 @@ components.html(source_code, height=950, width=900)
 
 with st.sidebar:
     st.subheader("Legend")
-    st.image("images/Graph-legend.png")
+    st.image("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/Graph-legend.png")

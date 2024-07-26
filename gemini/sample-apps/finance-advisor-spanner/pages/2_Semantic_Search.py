@@ -14,7 +14,7 @@ st.set_page_config(
     page_icon=favicon,
     initial_sidebar_state="expanded",
 )
-st.logo("images/investments.png")
+st.logo("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png")
 
 
 def asset_semantic_search():

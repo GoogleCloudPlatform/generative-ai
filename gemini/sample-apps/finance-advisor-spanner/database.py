@@ -117,7 +117,7 @@ def semantic_query_ann(query_params: list) -> dict:
         + query_params[0]
         + '" AS content) ) ;'
     )
-    vector_input = spanner_read_data_list(embedding_query: str)
+    vector_input = spanner_read_data_list(embedding_query)
 
     if query_params[1].strip() != "":
         ann_query = (
@@ -180,7 +180,7 @@ def compliance_query(query_params: list) -> dict:
 
 def graph_dtls_query() -> dict:
     """This function runs Graph Details  Query"""
-    company_query = "select * from  Companies;"
+    company_query = "select CompanySeq,name from  Companies;"
 
     return_vals = dict()
     df_companies = spanner_read_data(company_query)
