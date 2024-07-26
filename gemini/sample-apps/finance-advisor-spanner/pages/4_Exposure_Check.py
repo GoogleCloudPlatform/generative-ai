@@ -19,7 +19,7 @@ st.logo(
 )
 
 
-def compliance_search():
+def compliance_search() -> None:
     """This function implements Compliance Check Graph feature"""
     st.header("FinVest Fund Advisor")
     st.subheader("Exposure Check")

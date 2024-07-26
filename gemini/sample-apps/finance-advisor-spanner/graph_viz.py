@@ -1,10 +1,11 @@
 """This module is the page for Graph Viz Data Search feature"""
+# pylint: disable=unused-variable
 
 from database import graph_dtls_query
 from pyvis.network import Network
 
 
-def simple_func_nonx():
+def simple_func_nonx() -> None:
     """This function is for generating the Graph Visualization"""
 
     graph = Network("900px", "900px", notebook=True, heading="")

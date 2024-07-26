@@ -1,3 +1,4 @@
+
 ALTER MODEL EmbeddingsModel SET OPTIONS (
 endpoint = '//aiplatform.googleapis.com/projects/<project-name>/locations/<location>/publishers/google/models/text-embedding-003'
 )

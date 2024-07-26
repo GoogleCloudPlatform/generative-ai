@@ -19,7 +19,7 @@ st.logo(
 )
 
 
-def asset_semantic_search():
+def asset_semantic_search() -> None:
     """This function implements Semantic Search feature"""
 
     st.header("FinVest Fund Advisor")

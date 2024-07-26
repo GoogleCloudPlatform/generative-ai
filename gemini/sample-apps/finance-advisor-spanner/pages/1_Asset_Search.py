@@ -20,7 +20,7 @@ st.logo(
 )
 
 
-def local_css(file_name):
+def local_css(file_name) -> None:
     """This loads local css"""
     with open(file_name, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -29,7 +29,7 @@ def local_css(file_name):
 local_css("pages/styles.css")
 
 
-def asset_search_precise():
+def asset_search_precise() -> None:
     """This function implements Asset search LIKE Query"""
 
     st.header("FinVest Fund Advisor")
@@ -74,7 +74,7 @@ def asset_search_precise():
     interactive_table(data, caption="", **it_args)
 
 
-def asset_search():
+def asset_search() -> None:
     """This function immplements Asset Search"""
 
     st.header("FinVest Fund Advisor")
