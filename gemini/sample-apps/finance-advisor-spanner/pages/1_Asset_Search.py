@@ -1,7 +1,8 @@
 """This module is the page for Asset Search feature"""
-# pylint: disable=line-too-long, invalid-name
 
-import time as time
+# pylint: disable=line-too-long, invalid-name, import-error
+
+import time as t
 
 from css import favicon, footer
 from database import fts_query, like_query
@@ -20,7 +21,7 @@ st.logo(
 )
 
 
-def local_css(file_name) -> None:
+def local_css(file_name: str) -> None:
     """This loads local css"""
     with open(file_name, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -54,7 +55,7 @@ def asset_search_precise() -> None:
     query_params.append(investment_manager.strip())
 
     with st.spinner("Querying Spanner..."):
-        time.sleep(1)
+        t.sleep(1)
 
         return_vals = like_query(query_params)
         spanner_query = return_vals.get("query")
@@ -97,7 +98,7 @@ def asset_search() -> None:
     query_params.append(investment_manager)
 
     with st.spinner("Querying Spanner..."):
-        time.sleep(1)
+        t.sleep(1)
 
         return_vals = fts_query(query_params)
         spanner_query = return_vals.get("query")

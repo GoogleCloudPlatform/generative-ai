@@ -1,5 +1,5 @@
 """This module is the page for Graph Viz Data Search feature"""
-# pylint: disable=unused-variable
+# pylint: disable=unused-variable, import-error
 
 from database import graph_dtls_query
 from pyvis.network import Network

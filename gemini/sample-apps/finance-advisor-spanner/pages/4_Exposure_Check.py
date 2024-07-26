@@ -1,5 +1,5 @@
 """This module is the page for Exposue Check Search feature"""
-# pylint: disable=line-too-long, invalid-name
+# pylint: disable=line-too-long, invalid-name, import-error
 
 from css import favicon, footer
 from database import compliance_query
