@@ -100,7 +100,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 python3 -m nbqa black "$notebook"
                 BLACK_RTN=$?
                 echo "Running blacken docs..."
-                python3 -m nbqa blacken-docs "$notebook" --nbqa-md --check
+                python3 -m nbqa blacken-docs "$notebook" --nbqa-md
                 BLACKEN_DOCS_RTN=$?
                 echo "Running pyupgrade..."
                 python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
