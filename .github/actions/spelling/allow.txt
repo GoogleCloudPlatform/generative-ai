@@ -232,6 +232,7 @@ levelname
 lexer
 linalg
 linecolor
+linted
 Llion
 llm
 LLMs
@@ -262,6 +263,7 @@ MSCHF
 MSGSEND
 MTL
 nbconvert
+nbfmt
 nbformat
 NCCREATE
 ncols
@@ -331,8 +333,8 @@ QPM
 qubit
 qubits
 Qwiklabs
-ragas
 RAGAS
+ragas
 ragdemos
 rahhhrr
 ramen
@@ -347,6 +349,7 @@ ROOTSPAN
 rpet
 RRF
 rsp
+RTN
 RYDE
 Sahel
 scattergl
