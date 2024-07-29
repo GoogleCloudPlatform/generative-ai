@@ -37,4 +37,3 @@ jobs:
           echo "Then, commit the fixes and push again."
           exit 1
         fi
- 
