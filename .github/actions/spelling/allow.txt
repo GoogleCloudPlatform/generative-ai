@@ -30,6 +30,7 @@ bqml
 Buckleys
 Buffay
 CALIPSO
+Caprese
 carbonara
 caxis
 chatbots
