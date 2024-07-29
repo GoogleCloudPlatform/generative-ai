@@ -122,6 +122,7 @@ def format(session):
         "black",
         *LINT_PATHS,
     )
+    session.run(".github/workflows/notebook_linter/run_linter.sh")
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
