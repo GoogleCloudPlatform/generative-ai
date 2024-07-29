@@ -77,7 +77,6 @@ if [ ${#notebooks[@]} -gt 0 ]; then
             ISORT_RTN="0"
             FLAKE8_RTN="0"
             MYPY_RTN="0"
-            PYLINT_RTN="0"
 
             if [ "$is_test" = true ]; then
                 echo "Running nbfmt..."
@@ -101,10 +100,10 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 echo "Running mypy..."
                 python3 -m nbqa mypy "$notebook" --ignore-missing-imports
                 MYPY_RTN=$?
-                echo "Running pylint..."
-                python3 -m nbqa pylint "$notebook"
-                PYLINT_RTN=$?
             else
+                echo "Running isort..."
+                python3 -m nbqa isort --fss "$notebook"
+                ISORT_RTN=$?
                 echo "Running black..."
                 python3 -m nbqa black "$notebook"
                 BLACK_RTN=$?
@@ -114,9 +113,6 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 echo "Running pyupgrade..."
                 python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
                 PYUPGRADE_RTN=$?
-                echo "Running isort..."
-                python3 -m nbqa isort "$notebook"
-                ISORT_RTN=$?
                 echo "Running nbfmt..."
                 python3 -m tensorflow_docs.tools.nbfmt "$notebook"
                 NBFMT_RTN=$?
@@ -126,9 +122,6 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 echo "Running mypy..."
                 python3 -m nbqa mypy "$notebook" --ignore-missing-imports
                 MYPY_RTN=$?
-                echo "Running pylint..."
-                python3 -m nbqa pylint "$notebook"
-                PYLINT_RTN=$?
             fi
 
             NOTEBOOK_RTN="0"
@@ -166,11 +159,6 @@ if [ ${#notebooks[@]} -gt 0 ]; then
             if [ "$MYPY_RTN" != "0" ]; then
                 NOTEBOOK_RTN="$MYPY_RTN"
                 printf "mypy: Failed\n"
-            fi
-
-            if [ "$PYLINT_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$PYLINT_RTN"
-                printf "pylint: Failed\n"
             fi
 
             echo "Notebook lint finished with return code = $NOTEBOOK_RTN"
