@@ -76,6 +76,8 @@ if [ ${#notebooks[@]} -gt 0 ]; then
             PYUPGRADE_RTN="0"
             ISORT_RTN="0"
             FLAKE8_RTN="0"
+            MYPY_RTN="0"
+            PYLINT_RTN="0"
 
             if [ "$is_test" = true ]; then
                 echo "Running nbfmt..."
@@ -96,6 +98,12 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 echo "Running flake8..."
                 python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
                 FLAKE8_RTN=$?
+                echo "Running mypy..."
+                python3 -m nbqa mypy "$notebook" --ignore-missing-imports
+                MYPY_RTN=$?
+                echo "Running pylint..."
+                python3 -m nbqa pylint "$notebook"
+                PYLINT_RTN=$?
             else
                 echo "Running black..."
                 python3 -m nbqa black "$notebook"
@@ -115,6 +123,12 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 echo "Running flake8..."
                 python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
                 FLAKE8_RTN=$?
+                echo "Running mypy..."
+                python3 -m nbqa mypy "$notebook" --ignore-missing-imports
+                MYPY_RTN=$?
+                echo "Running pylint..."
+                python3 -m nbqa pylint "$notebook"
+                PYLINT_RTN=$?
             fi
 
             NOTEBOOK_RTN="0"
@@ -147,6 +161,16 @@ if [ ${#notebooks[@]} -gt 0 ]; then
             if [ "$FLAKE8_RTN" != "0" ]; then
                 NOTEBOOK_RTN="$FLAKE8_RTN"
                 printf "flake8: Failed\n"
+            fi
+
+            if [ "$MYPY_RTN" != "0" ]; then
+                NOTEBOOK_RTN="$MYPY_RTN"
+                printf "mypy: Failed\n"
+            fi
+
+            if [ "$PYLINT_RTN" != "0" ]; then
+                NOTEBOOK_RTN="$PYLINT_RTN"
+                printf "pylint: Failed\n"
             fi
 
             echo "Notebook lint finished with return code = $NOTEBOOK_RTN"
