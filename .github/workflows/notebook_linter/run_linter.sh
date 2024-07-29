@@ -34,15 +34,15 @@ is_test=false
 
 # Process all options supplied on the command line
 while getopts 'tc' arg; do
-    case $arg in
-    't')
-        is_test=true
-        ;;
-    *)
-        echo "Unimplemented flag"
-        exit 1
-        ;;
-    esac
+  case $arg in
+  't')
+    is_test=true
+    ;;
+  *)
+    echo "Unimplemented flag"
+    exit 1
+    ;;
+  esac
 done
 
 echo "Test mode: $is_test"
@@ -50,134 +50,134 @@ echo "Test mode: $is_test"
 # Read in user-provided notebooks
 notebooks=()
 for arg in "$@"; do
-    if [[ $arg == *.ipynb ]]; then
-        notebooks+=("$arg")
-    fi
+  if [[ $arg == *.ipynb ]]; then
+    notebooks+=("$arg")
+  fi
 done
 
 # Only check notebooks in test folders modified in this pull request.
 # Note: Use process substitution to persist the data in the array
 if [ ${#notebooks[@]} -eq 0 ]; then
-    echo "Checking for changed notebooks using git"
-    while read -r file || [ -n "$line" ]; do
-        notebooks+=("$file")
-    done < <(git diff --name-only main... | grep '\.ipynb$')
+  echo "Checking for changed notebooks using git"
+  while read -r file || [ -n "$line" ]; do
+    notebooks+=("$file")
+  done < <(git diff --name-only main... | grep '\.ipynb$')
 fi
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
-    for notebook in "${notebooks[@]}"; do
-        if [ -f "$notebook" ]; then
-            echo "Checking notebook: ${notebook}"
+  for notebook in "${notebooks[@]}"; do
+    if [ -f "$notebook" ]; then
+      echo "Checking notebook: ${notebook}"
 
-            NBFMT_RTN="0"
-            BLACK_RTN="0"
-            BLACKEN_DOCS_RTN="0"
-            PYUPGRADE_RTN="0"
-            ISORT_RTN="0"
-            FLAKE8_RTN="0"
-            MYPY_RTN="0"
+      NBFMT_RTN="0"
+      BLACK_RTN="0"
+      BLACKEN_DOCS_RTN="0"
+      PYUPGRADE_RTN="0"
+      ISORT_RTN="0"
+      FLAKE8_RTN="0"
+      MYPY_RTN="0"
 
-            if [ "$is_test" = true ]; then
-                echo "Running nbfmt..."
-                python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
-                NBFMT_RTN=$?
-                echo "Running black..."
-                python3 -m nbqa black "$notebook" --check
-                BLACK_RTN=$?
-                echo "Running blacken docs..."
-                python3 -m nbqa blacken-docs "$notebook" --nbqa-md --check
-                BLACKEN_DOCS_RTN=$?
-                echo "Running pyupgrade..."
-                python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
-                PYUPGRADE_RTN=$?
-                echo "Running isort..."
-                python3 -m nbqa isort "$notebook" --check
-                ISORT_RTN=$?
-                echo "Running flake8..."
-                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
-                FLAKE8_RTN=$?
-                echo "Running mypy..."
-                python3 -m nbqa mypy "$notebook" --ignore-missing-imports
-                MYPY_RTN=$?
-            else
-                echo "Running isort..."
-                python3 -m nbqa isort --fss "$notebook"
-                ISORT_RTN=$?
-                echo "Running black..."
-                python3 -m nbqa black "$notebook"
-                BLACK_RTN=$?
-                echo "Running blacken docs..."
-                python3 -m nbqa blacken-docs "$notebook" --nbqa-md
-                BLACKEN_DOCS_RTN=$?
-                echo "Running pyupgrade..."
-                python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
-                PYUPGRADE_RTN=$?
-                echo "Running nbfmt..."
-                python3 -m tensorflow_docs.tools.nbfmt "$notebook"
-                NBFMT_RTN=$?
-                echo "Running flake8..."
-                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
-                FLAKE8_RTN=$?
-                echo "Running mypy..."
-                python3 -m nbqa mypy "$notebook" --ignore-missing-imports
-                MYPY_RTN=$?
-            fi
+      if [ "$is_test" = true ]; then
+        echo "Running nbfmt..."
+        python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
+        NBFMT_RTN=$?
+        echo "Running black..."
+        python3 -m nbqa black "$notebook" --check
+        BLACK_RTN=$?
+        echo "Running blacken docs..."
+        python3 -m nbqa blacken-docs "$notebook" --nbqa-md --check
+        BLACKEN_DOCS_RTN=$?
+        echo "Running pyupgrade..."
+        python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
+        PYUPGRADE_RTN=$?
+        echo "Running isort..."
+        python3 -m nbqa isort "$notebook" --check
+        ISORT_RTN=$?
+        echo "Running flake8..."
+        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
+        FLAKE8_RTN=$?
+        echo "Running mypy..."
+        python3 -m nbqa mypy "$notebook" --ignore-missing-imports
+        MYPY_RTN=$?
+      else
+        echo "Running isort..."
+        python3 -m nbqa isort --fss "$notebook"
+        ISORT_RTN=$?
+        echo "Running black..."
+        python3 -m nbqa black "$notebook"
+        BLACK_RTN=$?
+        echo "Running blacken docs..."
+        python3 -m nbqa blacken-docs "$notebook" --nbqa-md
+        BLACKEN_DOCS_RTN=$?
+        echo "Running pyupgrade..."
+        python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
+        PYUPGRADE_RTN=$?
+        echo "Running nbfmt..."
+        python3 -m tensorflow_docs.tools.nbfmt "$notebook"
+        NBFMT_RTN=$?
+        echo "Running flake8..."
+        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
+        FLAKE8_RTN=$?
+        echo "Running mypy..."
+        python3 -m nbqa mypy "$notebook" --ignore-missing-imports
+        MYPY_RTN=$?
+      fi
 
-            NOTEBOOK_RTN="0"
+      NOTEBOOK_RTN="0"
 
-            if [ "$NBFMT_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$NBFMT_RTN"
-                printf "nbfmt: Failed\n"
-            fi
+      if [ "$NBFMT_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$NBFMT_RTN"
+        printf "nbfmt: Failed\n"
+      fi
 
-            if [ "$BLACK_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$BLACK_RTN"
-                printf "black: Failed\n"
-            fi
+      if [ "$BLACK_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$BLACK_RTN"
+        printf "black: Failed\n"
+      fi
 
-            if [ "$BLACKEN_DOCS_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$BLACKEN_DOCS_RTN"
-                printf "blacken-docs: Failed\n"
-            fi
+      if [ "$BLACKEN_DOCS_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$BLACKEN_DOCS_RTN"
+        printf "blacken-docs: Failed\n"
+      fi
 
-            if [ "$PYUPGRADE_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$PYUPGRADE_RTN"
-                printf "pyupgrade: Failed\n"
-            fi
+      if [ "$PYUPGRADE_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$PYUPGRADE_RTN"
+        printf "pyupgrade: Failed\n"
+      fi
 
-            if [ "$ISORT_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$ISORT_RTN"
-                printf "isort: Failed\n"
-            fi
+      if [ "$ISORT_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$ISORT_RTN"
+        printf "isort: Failed\n"
+      fi
 
-            if [ "$FLAKE8_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$FLAKE8_RTN"
-                printf "flake8: Failed\n"
-            fi
+      if [ "$FLAKE8_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$FLAKE8_RTN"
+        printf "flake8: Failed\n"
+      fi
 
-            if [ "$MYPY_RTN" != "0" ]; then
-                NOTEBOOK_RTN="$MYPY_RTN"
-                printf "mypy: Failed\n"
-            fi
+      if [ "$MYPY_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$MYPY_RTN"
+        printf "mypy: Failed\n"
+      fi
 
-            echo "Notebook lint finished with return code = $NOTEBOOK_RTN"
-            echo ""
-            if [ "$NOTEBOOK_RTN" != "0" ]; then
-                problematic_notebooks+=("$notebook")
-                RTN=$NOTEBOOK_RTN
-            fi
-        fi
-    done
+      echo "Notebook lint finished with return code = $NOTEBOOK_RTN"
+      echo ""
+      if [ "$NOTEBOOK_RTN" != "0" ]; then
+        problematic_notebooks+=("$notebook")
+        RTN=$NOTEBOOK_RTN
+      fi
+    fi
+  done
 else
-    echo "No notebooks modified in this pull request."
+  echo "No notebooks modified in this pull request."
 fi
 
 echo "All tests finished. Exiting with return code = $RTN"
 
 if [ ${#problematic_notebooks[@]} -gt 0 ]; then
-    echo "The following notebooks could not be automatically linted:"
-    printf '%s\n' "${problematic_notebooks[@]}"
+  echo "The following notebooks could not be automatically linted:"
+  printf '%s\n' "${problematic_notebooks[@]}"
 fi
 
 exit "$RTN"
