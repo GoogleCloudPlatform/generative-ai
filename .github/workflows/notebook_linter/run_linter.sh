@@ -80,9 +80,12 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 echo "Running nbfmt..."
                 python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
                 NBFMT_RTN=$?
-                # echo "Running black..."
-                # python3 -m nbqa black "$notebook" --check
-                # BLACK_RTN=$?
+                echo "Running black..."
+                python3 -m nbqa black "$notebook" --check
+                BLACK_RTN=$?
+                echo "Running blacken docs..."
+                python3 -m nbqa blacken-docs "$notebook" --nbqa-md --check
+                BLACKEN_DOCS_RTN=$?
                 echo "Running pyupgrade..."
                 python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
                 PYUPGRADE_RTN=$?
@@ -96,6 +99,9 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 echo "Running black..."
                 python3 -m nbqa black "$notebook"
                 BLACK_RTN=$?
+                echo "Running blacken docs..."
+                python3 -m nbqa blacken-docs "$notebook" --nbqa-md --check
+                BLACKEN_DOCS_RTN=$?
                 echo "Running pyupgrade..."
                 python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
                 PYUPGRADE_RTN=$?
@@ -120,6 +126,11 @@ if [ ${#notebooks[@]} -gt 0 ]; then
             if [ "$BLACK_RTN" != "0" ]; then
                 NOTEBOOK_RTN="$BLACK_RTN"
                 printf "black: Failed\n"
+            fi
+
+            if [ "$BLACKEN_DOCS_RTN" != "0" ]; then
+                NOTEBOOK_RTN="$BLACKEN_DOCS_RTN"
+                printf "blacken-docs: Failed\n"
             fi
 
             if [ "$PYUPGRADE_RTN" != "0" ]; then
