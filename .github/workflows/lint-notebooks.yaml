@@ -33,7 +33,7 @@ jobs:
           echo "python3 -m pip install -U -r .github/workflows/linter/requirements.txt"
           echo ".github/workflows/notebook_linter/run_linter.sh"
           echo ""
-          echo "If it can't be autofixed, please fix them manually."
+          echo "If it can't be auto-fixed, please fix them manually."
           echo "Then, commit the fixes and push again."
           exit 1
         fi
