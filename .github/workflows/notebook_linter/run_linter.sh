@@ -72,6 +72,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
 
             NBFMT_RTN="0"
             BLACK_RTN="0"
+            BLACKEN_DOCS_RTN="0"
             PYUPGRADE_RTN="0"
             ISORT_RTN="0"
             FLAKE8_RTN="0"
