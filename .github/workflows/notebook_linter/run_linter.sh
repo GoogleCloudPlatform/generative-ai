@@ -92,17 +92,17 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
         PYUPGRADE_RTN=$?
         echo "Running isort..."
-        python3 -m nbqa isort "$notebook" --check
+        python3 -m nbqa isort "$notebook" --check --profile black
         ISORT_RTN=$?
         echo "Running flake8..."
-        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
+        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
         FLAKE8_RTN=$?
         echo "Running mypy..."
-        python3 -m nbqa mypy "$notebook" --ignore-missing-imports
+        python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await
         MYPY_RTN=$?
       else
         echo "Running isort..."
-        python3 -m nbqa isort --fss "$notebook"
+        python3 -m nbqa isort --fss "$notebook" --profile black
         ISORT_RTN=$?
         echo "Running black..."
         python3 -m nbqa black "$notebook"
@@ -120,7 +120,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
         FLAKE8_RTN=$?
         echo "Running mypy..."
-        python3 -m nbqa mypy "$notebook" --ignore-missing-imports
+        python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await
         MYPY_RTN=$?
       fi
 
