@@ -18,7 +18,7 @@ jobs:
     - name: Fetch base main branch
       run: git fetch -u "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" main:main
     - name: Install requirements
-      run: python3 -m pip install -U -r .github/workflows/linter/requirements.txt
+      run: python3 -m pip install -U -r .github/workflows/notebook_linter/requirements.txt
     - name: Format and lint notebooks
       run: |
         set +e
@@ -30,7 +30,7 @@ jobs:
           echo "There were problems formatting/linting the notebooks."
           echo "Please run the following commands locally from the root directory to attempt to autofix the issues:"
           echo ""
-          echo "python3 -m pip install -U -r .github/workflows/linter/requirements.txt"
+          echo "python3 -m pip install -U -r .github/workflows/notebook_linter/requirements.txt"
           echo ".github/workflows/notebook_linter/run_linter.sh"
           echo ""
           echo "If it can't be auto-fixed, please fix them manually."
