@@ -315,6 +315,7 @@ PLOTLYENV
 plpgsql
 plt
 podcast
+podcasts
 podfile
 podhelper
 powerups
