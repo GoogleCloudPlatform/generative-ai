@@ -52,8 +52,8 @@ cmap
 COCOAPODS
 codebase
 codebases
-codelab
 Codelab
+codelab
 Codey
 COINIT
 colab
@@ -65,6 +65,7 @@ colorway
 colwidth
 CONOUT
 constexpr
+corpuses
 Cowabunga
 Crossbody
 csa
@@ -107,8 +108,8 @@ etf
 eur
 evals
 Eventarc
-FAISS
 faiss
+FAISS
 fect
 fewshot
 ffi
@@ -146,8 +147,8 @@ GError
 getdata
 getexif
 getparent
-GFile
 gfile
+GFile
 gidiyor
 Gisting
 github
@@ -313,6 +314,8 @@ plotly
 PLOTLYENV
 plpgsql
 plt
+podcast
+podcasts
 podfile
 podhelper
 powerups
