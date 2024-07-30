@@ -2,6 +2,7 @@ git+https://github.com/tensorflow/docs
 ipython
 jupyter
 nbconvert
+types-requests
 black==24.4.2
 blacken-docs==1.18.0
 pyupgrade==3.17.0
