@@ -81,6 +81,7 @@
 \.zip$
 ^\.github/actions/spelling/
 ^\Q.github/workflows/spelling.yaml\E$
+^\Q.github/workflows/notebook_linter/run_linter.sh\E$
 ^\Qgemini/function-calling/use_case_company_news_and_insights.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_1_5_pro.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_pro_vision_python.ipynb\E$
@@ -105,3 +106,4 @@
 ignore$
 ^\Qowlbot.py\E$
 ^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
+/Users/holtskinner/GitHub/generative-ai/.github/workflows/notebook_linter/run_linter.sh
