@@ -9,6 +9,7 @@ from github import Github
 
 
 def main() -> None:
+    """Gets filename mentioned in issue, finds author username in file, assigns issue to user."""
     # Get GitHub token and repository details
     repo_name = os.getenv("GITHUB_REPOSITORY", "")
     token = os.getenv("GITHUB_TOKEN")
@@ -25,8 +26,8 @@ def main() -> None:
         return
 
     file_name = file_match.group(1)
-    print(file_name)
     result = g.search_code(f"repo:{repo_name} filename:{file_name}")
+
     file = str(base64.b64decode(result[0].content))[:4000]
     match = re.search(r"Author.+https://github\.com/([^/\)]+)", file)
 
