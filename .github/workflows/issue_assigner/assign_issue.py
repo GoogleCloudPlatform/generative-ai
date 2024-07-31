@@ -36,11 +36,15 @@ def main() -> None:
     file_match = re.search(r"\b([\w-]+\.ipynb)\b", issue.body, re.IGNORECASE)
 
     if not file_match:
-        print("No matching file found")
+        print("No file found in issue.")
         return
 
     file_name = file_match.group(1)
     result = g.search_code(f"repo:{repo_name} filename:{file_name}")
+
+    if not result:
+        print(f"No files found for {file_name}")
+        return
 
     file = str(base64.b64decode(result[0].content))[:4000]
     match = re.search(r"Author.+https://github\.com/([^/\)]+)", file)
