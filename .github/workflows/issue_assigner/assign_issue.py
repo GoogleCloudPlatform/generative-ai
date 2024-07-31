@@ -2,10 +2,24 @@
 
 # pylint: disable=line-too-long,too-many-arguments
 import base64
+import json
 import os
 import re
 
 from github import Github
+
+
+def get_issue_number(event_path: str) -> int:
+    """Retrieves the issue number from GitHub event data."""
+    # Load event data
+    with open(event_path, "r", encoding="utf-8") as f:
+        event_data = json.load(f)
+
+    # Determine the issue number based on the event
+    if "issue" in event_data:
+        return int(event_data["issue"]["number"])
+
+    raise ValueError("Unable to determine issue number from event data.")
 
 
 def main() -> None:
@@ -13,7 +27,7 @@ def main() -> None:
     # Get GitHub token and repository details
     repo_name = os.getenv("GITHUB_REPOSITORY", "")
     token = os.getenv("GITHUB_TOKEN")
-    issue_number = int(os.environ["GITHUB_EVENT_ISSUE_NUMBER"])
+    issue_number = get_issue_number(os.getenv("GITHUB_EVENT_PATH", ""))
 
     g = Github(token)
     repo = g.get_repo(repo_name)
