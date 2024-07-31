@@ -81,8 +81,8 @@ datname
 dbadmin
 dbln
 ddl
-DeepEval
 deepeval
+DeepEval
 dente
 Depatmint
 descgen
@@ -111,8 +111,8 @@ etf
 eur
 evals
 Eventarc
-FAISS
 faiss
+FAISS
 fect
 fewshot
 ffi
@@ -241,6 +241,7 @@ levelname
 lexer
 linalg
 linecolor
+linted
 Llion
 llm
 LLMs
@@ -259,6 +260,8 @@ Mahindra
 makeover
 Mamah
 Mandiri
+makeover
+Mamah
 mapbox
 maxcold
 mbsdk
@@ -275,6 +278,7 @@ MSGSEND
 MTL
 NARI
 nbconvert
+nbfmt
 nbformat
 NCCREATE
 ncols
@@ -328,6 +332,8 @@ plotly
 PLOTLYENV
 plpgsql
 plt
+podcast
+podcasts
 podfile
 podhelper
 powerups
@@ -365,6 +371,7 @@ ROOTSPAN
 rpet
 RRF
 rsp
+RTN
 RYDE
 Sahel
 scattergl
