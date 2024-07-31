@@ -22,9 +22,26 @@ Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI 
 
 ## Getting Started
 
-### Building & deploying the agent with Vertex AI Agent Builder
+### Preparing Vertex AI Search search app
 
-1. Create a search data store on Vertex AI Search: See [Create a search data store](https://cloud.google.com/generative-ai-app-builder/docs/create-data-store-es) to create your own search data store by importing `/ag-web/google_merch_shop_items.csv` CSV file. The "Data store ID" will be your search engine ID.
+1. Create a search data store on Vertex AI Search. 
+- On the Console of your Google Cloud project, open `Agent Builder` > `Data Stores` > `CREATE DATA STORE` > `Cloud Storage` > `Structured data (JSONL)`. 
+- At `Select a folder or file` choose `FILE`, and enter `gcp-samples-ic0-ag/src/google_merch_shop_items.json`. Click `CONTINUE`. 
+- At `Review schema` page, click `CONTINUE`. 
+- In `Configure your data store` page, choose `Location of your data store` as `us` and enter `Your data store name` as `gms`. 
+- Click `CREATE`.
+
+2. Check the data store ID. Open `Data Stores` and click `gms`. Make sure the `Number of documents` is 204 items. Take a memo of the `Data store ID`. This will be the search engine ID.
+
+1. Create a search app.
+- On the Console, open `Agent Builder` > `Apps` > `CREATE APP`. Choose `Search`. 
+- On `Search app configuration`, opt out `Enterprise edition features` and `Advanced LLM features` options. 
+- Enter `Your app name` as `gms_test`, `External name` as your company name, and `Location of your app` as `us`. 
+- Click `CONTINUE`. On `Data Stores` page, choose `gms` and click `CREATE`. This will start building a search index with the gms data store which will take about 5 minutes.
+
+4. Preview the app. After 5 minutes, open `Preview` and type `Dino` on the search box. You should see the search results with Chrome Dino related items.
+
+### Building & deploying the agent with Vertex AI Agent Builder
 
 1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run `deploy.sh` to deploy the Run app. Open `ag-web` app on the Cloud Run console, and find the hostname (eg `ag-web-xxxxxx.a.run.app`).
 

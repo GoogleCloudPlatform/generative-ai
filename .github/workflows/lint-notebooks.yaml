@@ -1,29 +1,39 @@
 name: Lint Notebooks
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: pull_request
 
 jobs:
-  lint:
+  format_and_lint:
+    name: notebook format and lint
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'      
+    - name: Fetch pull request branch
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
-
-    - name: Find changed .ipynb files
-      id: changed_files
+        fetch-depth: 0      
+    - name: Fetch base main branch
+      run: git fetch -u "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" main:main
+    - name: Install requirements
+      run: python3 -m pip install -U -r .github/workflows/notebook_linter/requirements.txt
+    - name: Format and lint notebooks
       run: |
-        echo "changed_files=$(git diff --name-only origin/main...HEAD | grep '\.ipynb$')" >> $GITHUB_OUTPUT
+        set +e
 
-    - name: Run linter on changed files
-      if: steps.changed_files.outputs.changed_files != ''
-      run: |
-        docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest ${{ steps.changed_files.outputs.changed_files }}
+        .github/workflows/notebook_linter/run_linter.sh -t
+        RTN=$?
+
+        if [ "$RTN" != "0" ]; then
+          echo "There were problems formatting/linting the notebooks."
+          echo "Please run the following commands locally from the root directory to attempt to autofix the issues:"
+          echo ""
+          echo "python3 -m pip install -U -r .github/workflows/notebook_linter/requirements.txt"
+          echo ".github/workflows/notebook_linter/run_linter.sh"
+          echo ""
+          echo "If it can't be auto-fixed, please fix them manually."
+          echo "Then, commit the fixes and push again."
+          exit 1
+        fi

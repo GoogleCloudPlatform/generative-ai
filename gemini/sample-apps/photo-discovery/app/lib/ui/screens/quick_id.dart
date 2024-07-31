@@ -152,9 +152,7 @@ class _GenerateMetadataScreenState extends State<GenerateMetadataScreen> {
         var jsonMap = json.decode(text);
 
         if (mounted) {
-          context
-              .read<AppState>()
-              .updateMetadata(Metadata.fromJson(_image!, jsonMap));
+          context.read<AppState>().updateMetadata(Metadata.fromJson(jsonMap));
         }
       }
     } catch (e) {

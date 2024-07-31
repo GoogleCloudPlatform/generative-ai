@@ -1,11 +1,13 @@
 name: "Pull Request Labeler"
 on:
-- pull_request_target
+  # Do not use pull_request_target with actions/cache or actions/checkout.
+  pull_request_target:
+
+permissions: { }
 
 jobs:
   labeler:
     permissions:
-      contents: read
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
