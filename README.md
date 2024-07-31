@@ -156,6 +156,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   - [solutions-viai-edge-provisioning-configuration](https://github.com/GoogleCloudPlatform/solutions-viai-edge-provisioning-configuration)
   - [mis-ai-accelerator](https://github.com/GoogleCloudPlatform/mis-ai-accelerator)
   - [dataflow-opinion-analysis](https://github.com/GoogleCloudPlatform/dataflow-opinion-analysis)
+  - [genai-beyond-basics](https://github.com/meteatamel/genai-beyond-basics)
 
 ## Contributing
 
