@@ -1,5 +1,5 @@
 """This file is for database operations done by the application """
-# pylint: disable=line-too-long, invalid-name
+# pylint: disable=line-too-long, invalid-name, unrecognized-spelling
 import os
 
 from dotenv import load_dotenv
@@ -42,7 +42,7 @@ def spanner_read_data_list(query: str) -> list:
     return rows
 
 
-def spanner_read_data_withparam(query: str, vector_input: list) -> pd.DataFrame:
+def spanner_read_data_withparameters(query: str, vector_input: list) -> pd.DataFrame:
     """This function helps read data from spanner with input params"""
     with database.snapshot() as snapshot:
         results = snapshot.execute_sql(
@@ -129,7 +129,7 @@ def semantic_query_ann(query_params: list) -> dict:
         )
     else:
         ann_query = "SELECT fund_name, investment_strategy, investment_managers, APPROX_EUCLIDEAN_DISTANCE(investment_strategy_Embedding_vector, @vector, options => JSON '{\"num_leaves_to_search\": 10}') AS distance FROM EU_MutualFunds @{force_index = InvestmentStrategyEmbeddingIndex} WHERE investment_strategy_Embedding_vector IS NOT NULL ORDER BY distance LIMIT 100;"
-    results_df = spanner_read_data_withparam(ann_query, vector_input[0][0])
+    results_df = spanner_read_data_withparameters(ann_query, vector_input[0][0])
 
     return_vals = dict()
     return_vals["query"] = ann_query

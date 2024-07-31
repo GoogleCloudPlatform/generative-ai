@@ -8,7 +8,7 @@ import streamlit.components.v1 as components
 st.subheader("Show me the Relationships between Funds ,Companies and Sectors")
 
 
-graph_viz.simple_func_nonx()
+graph_viz.generate_graph()
 
 html_file = open("graph_viz.html", "r", encoding="utf-8")
 source_code = html_file.read()
