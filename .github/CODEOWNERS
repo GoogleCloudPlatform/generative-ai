@@ -65,3 +65,4 @@
 /generative-ai/genkit/generate-synthetic-database           @aikozhaoz @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/evaluation/evaluate_langchain_chains.ipynb           @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb           @eliasecchig @lspatarog @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/tuning/gemini_supervised_fine-tuning_text_classification        @gabrielahrlr @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
