@@ -12,3 +12,6 @@ contact_links:
   - name: Stack Overflow - Google Cloud Collective
     url: https://stackoverflow.com/collectives/google-cloud
     about: A collective for developers who utilize Google Cloud's infrastructure and platform capabilities. This collective is organized and managed by the Stack Overflow community.
+  - name: Google Cloud Skills Boost (Qwiklabs) Support
+    url: https://support.google.com/qwiklabs/answer/10702448
+    about: For issues with Qwiklabs, such as progress not updating, please contact Qwiklabs support.
