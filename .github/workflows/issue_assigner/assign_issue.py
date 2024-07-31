@@ -42,10 +42,12 @@ def main() -> None:
     file_name = file_match.group(1)
     result = g.search_code(f"repo:{repo_name} filename:{file_name}")
 
-    if not result:
-        print(f"No files found for {file_name}")
-        return
-
+    if result.totalCount == 0:
+        result = g.search_code(f"repo:{repo_name} {file_name}")
+        if result.totalCount == 0:
+            print(f"No files found for {file_name}")
+            return
+    print(result[0])
     file = str(base64.b64decode(result[0].content))[:4000]
     match = re.search(r"Author.+https://github\.com/([^/\)]+)", file)
 
