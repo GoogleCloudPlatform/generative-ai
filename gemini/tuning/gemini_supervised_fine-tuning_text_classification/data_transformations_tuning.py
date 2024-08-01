@@ -1,6 +1,15 @@
-import pandas as pd
+"""
+This module provides functions for transforming datasets into the Gemini tuning format.
+
+It includes functions for:
+    - Preparing a tuning dataset from a pandas DataFrame.
+    - Converting AutoML CSV and JSONL datasets to the Gemini tuning format.
+    - Validating a Gemini tuning JSONL file.
+"""
+
 import json
 from typing import Optional, List, Dict
+import pandas as pd
 from google.cloud import storage
 import gcsfs
 
@@ -42,11 +51,8 @@ def convert_tuning_dataset_from_automl_csv(automl_gcs_csv_path: str,
     """
     Converts an AutoML CSV dataset for text classification to the Gemini tuning format.
 
-    This function takes an AutoML CSV dataset path on Google Cloud Storage and a partition name as input.
-    It reads the CSV file, filters the data based on the partition, and then
-    converts it into the Gemini tuning format. The Gemini tuning format requires a
-    list of dictionaries, where each dictionary represents a conversation turn
-    with "role" and "content" keys.
+    Reads an AutoML CSV dataset from Google Cloud Storage, filters by partition, and converts it to the Gemini tuning format.
+    The Gemini format uses a list of dictionaries, each representing a conversation turn with "role" and "content" keys.
 
     Args:
         automl_gcs_csv_path: The GCS path to the AutoML CSV dataset.
@@ -84,11 +90,10 @@ def convert_tuning_dataset_from_automl_jsonl(
     """
     Converts an AutoML JSONL dataset for text classification to the Gemini tuning format.
 
-    This function takes an AutoML JSONL dataset path on Google Cloud Storage and a partition name as input.
-    It reads the JSONL file, filters the data based on the partition, and then
-    converts it into the Gemini tuning format. The Gemini tuning format requires a
-    list of dictionaries, where each dictionary represents a conversation turn
-    with "role" and "content" keys.
+    This function reads an AutoML JSONL dataset from Google Cloud Storage, filters by partition,
+    and converts it to the Gemini tuning format. The Gemini format uses a list of dictionaries,
+    each representing a conversation turn with "role" and "content" keys.
+
 
     Args:
         automl_gcs_jsonl_path: The GCS path to the AutoML JSONL dataset for text classification.
@@ -105,7 +110,7 @@ def convert_tuning_dataset_from_automl_jsonl(
     with gcs_file_system.open(gcs_json_path) as f:
         for line in f:
             data = json.loads(line)
-            reformatted_data = dict()
+            reformatted_data = {}
             reformatted_data["label"] = data["classificationAnnotation"]["displayName"]
             reformatted_data["text"] = data["textContent"]
             reformatted_data["partition"] = data["dataItemResourceLabels"]["aiplatform.googleapis.com/ml_use"]
@@ -130,7 +135,7 @@ def convert_tuning_dataset_from_automl_jsonl(
 
 def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
     """
-    Validates a JSONL file on Googlce Cloud Storage against the Gemini tuning format.
+    Validates a JSONL file on Google Cloud Storage against the Gemini tuning format.
 
     Args:
         gcs_jsonl_path: The GCS path to the JSONL file.
