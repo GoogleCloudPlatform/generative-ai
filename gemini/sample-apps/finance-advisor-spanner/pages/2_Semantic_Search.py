@@ -3,7 +3,7 @@
 # pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code
 
 from css import favicon, footer
-from database import semantic_query, semantic_query_ann, display_spanner_query
+from database import display_spanner_query, semantic_query, semantic_query_ann
 from itables.streamlit import interactive_table
 import streamlit as st
 

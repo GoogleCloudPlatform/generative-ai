@@ -5,7 +5,7 @@
 import time as t
 
 from css import favicon, footer
-from database import fts_query, like_query, display_spanner_query
+from database import display_spanner_query, fts_query, like_query
 from itables.streamlit import interactive_table
 import streamlit as st
 
