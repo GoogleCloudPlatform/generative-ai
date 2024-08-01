@@ -5,8 +5,8 @@ from google.cloud import storage
 import gcsfs
 
 
-def prepare_tuning_dataset_from_df(tuning_df,
-                                   system_prompt: Optional[str] = None):
+def prepare_tuning_dataset_from_df(tuning_df: pd.DataFrame,
+                                   system_prompt: Optional[str] = None) -> pd.DataFrame:
     """
     Prepares a tuning dataset from a pandas DataFrame for Gemini fine-tuning.
 
@@ -27,7 +27,6 @@ def prepare_tuning_dataset_from_df(tuning_df,
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
-            
         messages.extend([
             {"role": "user", "content": row["text"]},
             {"role": "model", "content": row["label_text"]}
@@ -100,7 +99,6 @@ def convert_tuning_dataset_from_automl_jsonl(
     Returns:
         A pandas DataFrame containing the data in the Gemini tuning format.
     """
-    
     processed_data = []
     gcs_file_system = gcsfs.GCSFileSystem(project=project_id)
     gcs_json_path = automl_gcs_jsonl_path
@@ -213,4 +211,3 @@ def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
                 })
 
     return errors
-
