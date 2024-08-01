@@ -1,6 +1,6 @@
 """This module is the page for Semantic Search feature"""
 
-# pylint: disable=line-too-long, invalid-name, import-error
+# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code
 
 from css import favicon, footer
 from database import semantic_query, semantic_query_ann

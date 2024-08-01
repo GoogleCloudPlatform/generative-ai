@@ -115,7 +115,7 @@ The frontend application is Streamlit running on CloudRun
 
 ## Purpose and Extensibility
 
-The purpose of this repo is to help you provision an isolated demo environment that highlights the Full Text Search, Semantic Search and Graph capabilities of Spanner. While the ideas in this repo can be extended for many real-world use cases, the demo code itself is overly permissive and has not been hardened for security or reliability. The sample code in this repo is provided on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, and it should NOT be used for production use cases without doing your own testing and security hardening.
+The purpose of this repository is to help you provision an isolated demo environment that highlights the Full Text Search, Semantic Search and Graph capabilities of Spanner. While the ideas in this repository can be extended for many real-world use cases, the demo code itself is overly permissive and has not been hardened for security or reliability. The sample code in this repository is provided on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, and it should NOT be used for production use cases without doing your own testing and security hardening.
 
 ## Clean Up
 

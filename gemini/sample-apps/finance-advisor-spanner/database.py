@@ -1,5 +1,6 @@
 """This file is for database operations done by the application """
-# pylint: disable=line-too-long, invalid-name, use-dict-literal, use-list-literal, union-attr
+
+# pylint: disable=line-too-long, invalid-name, use-dict-literal, use-list-literal
 import os
 
 from dotenv import load_dotenv

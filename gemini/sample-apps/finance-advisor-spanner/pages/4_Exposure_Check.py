@@ -1,5 +1,6 @@
 """This module is the page for Exposure Check Search feature"""
-# pylint: disable=line-too-long, invalid-name, import-error
+
+# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal
 
 from css import favicon, footer
 from database import compliance_query

@@ -1,4 +1,5 @@
 """This file is the home Page of the Python Streamlit app"""
+
 # pylint: disable= import-error, invalid-name,line-too-long
 
 from css import favicon, footer
@@ -24,7 +25,7 @@ st.image(
 st.markdown(footer, unsafe_allow_html=True)
 
 
-def local_css(file_name) -> None:
+def local_css(file_name: str) -> None:
     """This function loads local CSS File"""
 
     with open(file_name, encoding="utf-8") as f:

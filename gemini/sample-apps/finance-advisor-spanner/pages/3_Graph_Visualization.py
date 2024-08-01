@@ -1,5 +1,6 @@
 """This module is the page for Graph Visualization feature"""
-# pylint: disable=line-too-long, invalid-name, import-error
+
+# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal
 
 import graph_viz
 import streamlit as st
