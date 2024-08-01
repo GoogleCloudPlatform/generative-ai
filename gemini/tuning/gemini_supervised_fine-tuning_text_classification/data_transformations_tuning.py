@@ -115,8 +115,10 @@ def convert_tuning_dataset_from_automl_jsonl(
                     "label": data["classificationAnnotation"]["displayName"],
                     "text": data["textContent"],
                     "partition": data["dataItemResourceLabels"][
-                        "aiplatform.googleapis.com/ml_use"]
-                })    
+                        "aiplatform.googleapis.com/ml_use"
+                    ]
+                }
+            )
 
     df = pd.DataFrame(processed_data)
     df_automl = df.loc[df["partition"] == partition]
