@@ -107,15 +107,18 @@ def convert_tuning_dataset_from_automl_jsonl(
     """
     processed_data = []
     gcs_file_system = gcsfs.GCSFileSystem(project=project_id)
-    gcs_json_path = automl_gcs_jsonl_path
-    with gcs_file_system.open(gcs_json_path) as f:
+    with gcs_file_system.open(automl_gcs_jsonl_path) as f:
         for line in f:
             data = json.loads(line)
-            reformatted_data = {}
-            reformatted_data["label"] = data["classificationAnnotation"]["displayName"]
-            reformatted_data["text"] = data["textContent"]
-            reformatted_data["partition"] = data["dataItemResourceLabels"]["aiplatform.googleapis.com/ml_use"]
-            processed_data.append(reformatted_data)
+            processed_data.append(
+                {
+                    "label": data["classificationAnnotation"]["displayName"],
+                    "text": data["textContent"],
+                    "partition": data["dataItemResourceLabels"][
+                        "aiplatform.googleapis.com/ml_use"
+                    ],
+                }
+            )    
 
     df = pd.DataFrame(processed_data)
     df_automl = df.loc[df["partition"] == partition]
@@ -187,7 +190,8 @@ def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
                         errors.append({
                             "error_type": "Invalid message format",
                             "row_index": row_index,
-                            "message": f"Row {row_index}, message {message_index}: Message is not a dictionary."
+                            "message": f"""Row {row_index},
+                            message {message_index}: Message is not a dictionary."""
                         })
                         continue
 
@@ -196,7 +200,8 @@ def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
                         errors.append({
                             "error_type": "Missing 'role' or 'content' key",
                             "row_index": row_index,
-                            "message": f"Row {row_index}, message {message_index}: Missing 'role' or 'content' key."
+                            "message": f"""Row {row_index}, message {message_index}: 
+                            Missing 'role' or 'content' key."""
                         })
                         continue
 
@@ -205,7 +210,8 @@ def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
                         errors.append({
                             "error_type": "Invalid 'role' value",
                             "row_index": row_index,
-                            "message": f"Row {row_index}, message {message_index}: Invalid 'role' value. Expected 'system', 'user', or 'model'."
+                            "message": f"""Row {row_index}, message {message_index}:
+                            Invalid 'role' value. Expected 'system', 'user', or 'model'."""
                         })
                         continue
 
