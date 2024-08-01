@@ -108,6 +108,7 @@ with st.sidebar:
             and_or_exclude = st.radio("", ["AND", "OR", "EXCLUDE"], horizontal=True)
             investment_strategy_pt2 = st.text_input("", value="Asia")
         investment_manager = st.text_input("Investment Manager", value="James")
+        investment_strategy = ""
         if precise_vs_text == "Full-Text":
             if and_or_exclude == "EXCLUDE":
                 investment_strategy = (
