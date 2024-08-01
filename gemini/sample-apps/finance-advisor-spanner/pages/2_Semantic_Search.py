@@ -3,10 +3,9 @@
 # pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code
 
 from css import favicon, footer
-from database import semantic_query, semantic_query_ann
+from database import semantic_query, semantic_query_ann, display_spanner_query
 from itables.streamlit import interactive_table
 import streamlit as st
-from streamlit_extras.stylable_container import stylable_container
 
 st.set_page_config(
     layout="wide",
@@ -47,16 +46,8 @@ def asset_semantic_search() -> None:
             return_vals = semantic_query_ann(query_params)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
-        with st.expander("Spanner Query"):
-            with stylable_container(
-                "codeblock",
-                """
-            code {
-                white-space: pre-wrap !important;
-            }
-            """,
-            ):
-                st.code(spanner_query, language="sql", line_numbers=False)
+        display_spanner_query(spanner_query)
+
     interactive_table(data, caption="", **it_args)
 
 

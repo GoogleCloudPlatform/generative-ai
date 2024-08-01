@@ -16,18 +16,17 @@ Finally, before I recommend a fund, I also want to check the exposure to a parti
 
 With the power of Spanner's multimodel support, I can run complex workloads on a single database for relational, analytical, text and vector use cases with virtually unlimited scale, five nines of availability—including enterprise security and governance for mission critical workloads.
 
-This demo highlights [Spanner](https://cloud.google.com/spanner),  integration with [Vertex AI LLMs](https://cloud.google.com/model-garden?hl=en) for both embeddings and text completion models. You will learn how Spanner can help with usecases where you run Full Text Search, Approximate Nearest neighbor search and vector similarity search. 
+This demo highlights [Spanner](https://cloud.google.com/spanner), integration with [Vertex AI LLMs](https://cloud.google.com/model-garden?hl=en) for both embeddings and text completion models. You will learn how Spanner can help with usecases where you run Full Text Search, Approximate Nearest neighbor search and vector similarity search.
 
 ## Tech Stack
 
 The Finvest Spanner demo application was built using:
 
-- [Spanner](https://cloud.google.com/spanner) 
+- [Spanner](https://cloud.google.com/spanner)
 - [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([textembeddings-gecko@004](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) )
 - [Cloud Run](https://cloud.google.com/run)
 - [Dataflow](https://cloud.google.com/dataflow?)
 - [Streamlit](https://streamlit.io/)
-
 
 ## Deploying the Finvest Spanner Demo Application
 
@@ -45,7 +44,7 @@ The Finvest Spanner demo application was built using:
    ```
 
 5. Clone this repository and navigate to the project root:
-   
+
    ```bash
    cd
    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
@@ -53,18 +52,17 @@ The Finvest Spanner demo application was built using:
    ```
 
 6. Create a Spanner instance
-   https://console.cloud.google.com/spanner/instances/new
+   <https://console.cloud.google.com/spanner/instances/new>
 
-   >Note the instance Name
+   > Note the instance Name
 
 7. Import the data into the Spanner instance
-   https://cloud.google.com/spanner/docs/import#import-database
+   <https://cloud.google.com/spanner/docs/import#import-database>
    The bucket which has the Spanner export is in this public GCS Bucket
-   
-   ```https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/spanner-fts-mf-data-export/```
 
+   `https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/spanner-fts-mf-data-export/`
 
-   >Note the Database Name
+   > Note the Database Name
 
    The import process will run and import the database into a new Spanner database.
 
@@ -72,42 +70,42 @@ The Finvest Spanner demo application was built using:
    The DDL statements are in [Schema-Operations.sql](./Schema-Operations.sql) file in this directory.
 
    Change the endpoint as per your project and the spanner instance location
-      ```bash 
-      ALTER MODEL EmbeddingsModel SET OPTIONS (
-         endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-003'
-         )
-         ;
-      ```
+
+   ```bash
+   ALTER MODEL EmbeddingsModel SET OPTIONS (
+      endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-003'
+      )
+      ;
+   ```
+
    Next run the rest of DDL statements without any change
 
 9. In Cloud Shell:
-   
-   Open ```.env``` file in the same directory using vi or other Editor
-   
+
+   Open `.env` file in the same directory using vi or other Editor
+
    Edit the following fields with the instance name from Step 6 and database name from Step 7
+
    ```bash
    instance_id='YOUR INSTANCE ID'
    database_id='YOUR DATABASE ID'
-   ``` 
+   ```
 
 10. Now Build & Deploy the application:
-      
-      Build: 
 
-      ```bash
-      gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app
-      ```
+    Build:
 
-      Deploy: 
+    ```bash
+    gcloud builds submit --tag gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app
+    ```
 
-      ```bash 
-      gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region 'YOUR SPANNER REGION' --allow-unauthenticated
-      ```
+    Deploy:
 
+    ```bash
+    gcloud run deploy finance-advisor-app --image gcr.io/'YOUR PROJECT ID HERE'/finance-advisor-app --platform managed    --region 'YOUR SPANNER REGION' --allow-unauthenticated
+    ```
 
-   ### Troubleshooting
-
-
+### Troubleshooting
 
 ### Frontend
 

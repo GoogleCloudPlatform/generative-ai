@@ -1,4 +1,4 @@
-"""This module is the page for generating CSS """
+"""This module is the page for generating CSS"""
 
 # pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, invalid-name
 # Add footer

@@ -1,14 +1,13 @@
 """This module is the page for Asset Search feature"""
 
-# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code
+# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code, possibly-used-before-assignment
 
 import time as t
 
 from css import favicon, footer
-from database import fts_query, like_query
+from database import fts_query, like_query, display_spanner_query
 from itables.streamlit import interactive_table
 import streamlit as st
-from streamlit_extras.stylable_container import stylable_container
 
 st.set_page_config(
     layout="wide",
@@ -60,17 +59,7 @@ def asset_search_precise() -> None:
         return_vals = like_query(query_params)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
-
-        with st.expander("Spanner Query"):
-            with stylable_container(
-                "codeblock",
-                """
-            code {
-                white-space: pre-wrap !important;
-            }
-            """,
-            ):
-                st.code(spanner_query, language="sql", line_numbers=False)
+        display_spanner_query(spanner_query)
 
     interactive_table(data, caption="", **it_args)
 
@@ -104,16 +93,7 @@ def asset_search() -> None:
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
 
-        with st.expander("Spanner Query"):
-            with stylable_container(
-                "codeblock",
-                """
-            code {
-                white-space: pre-wrap !important;
-            }
-            """,
-            ):
-                st.code(spanner_query, language="sql", line_numbers=False)
+        display_spanner_query(spanner_query)
 
     interactive_table(data, caption="", **it_args)
 

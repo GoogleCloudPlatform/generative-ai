@@ -1,12 +1,11 @@
 """This module is the page for Exposure Check Search feature"""
 
-# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal
+# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code
 
 from css import favicon, footer
-from database import compliance_query
+from database import compliance_query, display_spanner_query
 from itables.streamlit import interactive_table
 import streamlit as st
-from streamlit_extras.stylable_container import stylable_container
 
 st.set_page_config(
     layout="wide",
@@ -44,17 +43,7 @@ def compliance_search() -> None:
         return_vals = compliance_query(query_params)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
-
-        with st.expander("Spanner Query"):
-            with stylable_container(
-                "codeblock",
-                """
-            code {
-                white-space: pre-wrap !important;
-            }
-            """,
-            ):
-                st.code(spanner_query, language="sql", line_numbers=False)
+        display_spanner_query(spanner_query)
 
     interactive_table(data, caption="", **it_args)
 

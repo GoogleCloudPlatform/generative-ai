@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from google.api_core.client_options import ClientOptions
 from google.cloud import spanner
 import pandas as pd
+import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 
 load_dotenv()
 
@@ -212,3 +214,17 @@ def graph_dtls_query() -> dict:
     return_vals["FundsHoldsCompaniesRelation"] = funds_hold_company_edge
 
     return return_vals
+
+
+def display_spanner_query(spanner_query: str) -> None:
+    """This function runs Graph Details  Query"""
+    with st.expander("Spanner Query"):
+        with stylable_container(
+            "codeblock",
+            """
+            code {
+                white-space: pre-wrap !important;
+            }
+            """,
+        ):
+            st.code(spanner_query, language="sql", line_numbers=False)
