@@ -1,6 +1,6 @@
 """This file is the home Page of the Python Streamlit app"""
 
-# pylint: disable= import-error, invalid-name,line-too-long, duplicate-code, no-untyped-def
+# pylint: disable= import-error, invalid-name,line-too-long, duplicate-code
 
 from css import favicon, footer
 import streamlit as st

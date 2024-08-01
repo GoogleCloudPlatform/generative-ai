@@ -1,6 +1,6 @@
 """This module is the page for Asset Search feature"""
 
-# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code, possibly-used-before-assignment
+# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code
 
 import time as t
 
@@ -59,7 +59,7 @@ def asset_search_precise() -> None:
         return_vals = like_query(query_params)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
-        display_spanner_query(spanner_query)
+        display_spanner_query(str(spanner_query))
 
     interactive_table(data, caption="", **it_args)
 
@@ -93,7 +93,7 @@ def asset_search() -> None:
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
 
-        display_spanner_query(spanner_query)
+        display_spanner_query(str(spanner_query))
 
     interactive_table(data, caption="", **it_args)
 

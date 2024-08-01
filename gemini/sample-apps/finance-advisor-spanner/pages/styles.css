@@ -3,13 +3,13 @@ body {
     background-color: #4F8BF9;
 }
 
-.stButton>button {
+.stButton.st-buttonbutton {
     color: #4F8BF9;
     border-radius: 10%;
     height: 3em;
     width: 8em;
 }
 
-.stTextInput>div>div>input {
+.st-text-input.st-buttondiv.st-buttondiv.st-buttoninput {
     color: #4F8BF9;
 }

@@ -46,7 +46,7 @@ def asset_semantic_search() -> None:
             return_vals = semantic_query_ann(query_params)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
-        display_spanner_query(spanner_query)
+        display_spanner_query(str(spanner_query))
 
     interactive_table(data, caption="", **it_args)
 
