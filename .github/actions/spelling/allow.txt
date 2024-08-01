@@ -118,6 +118,7 @@ Mosher
 NARI
 NCCREATE
 NDEBUG
+NGRAMS
 NMT
 NOMINMAX
 NOZORDER
@@ -366,6 +367,7 @@ mec
 meme
 memes
 metadatas
+mgrs
 mpn
 nbconvert
 nbfmt
@@ -373,6 +375,7 @@ nbformat
 ncols
 ndarray
 ngram
+ngrams
 nlp
 nmade
 nmilitary
@@ -499,6 +502,3 @@ ylabel
 ytd
 yticks
 zaxis
-NGRAMS
-ngrams
-mgrs
