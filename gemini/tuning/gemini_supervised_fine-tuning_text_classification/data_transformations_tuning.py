@@ -51,9 +51,10 @@ def convert_tuning_dataset_from_automl_csv(automl_gcs_csv_path: str,
     """
     Converts an AutoML CSV dataset for text classification to the Gemini tuning format.
 
-    Reads an AutoML CSV dataset from Google Cloud Storage, filters by partition, and converts it to the Gemini tuning format.
-    The Gemini format uses a list of dictionaries, each representing a conversation turn with "role" and "content" keys.
-
+    This function reads an AutoML JSONL dataset from Google Cloud Storage, filters by partition,
+    and converts it to the Gemini tuning format. The Gemini format uses a list of dictionaries,
+    each representing a conversation turn with "role" and "content" keys.
+    
     Args:
         automl_gcs_csv_path: The GCS path to the AutoML CSV dataset.
         system_prompt: The instructions to the model.
