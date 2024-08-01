@@ -10,7 +10,7 @@ The client wants me to find assets for funds in North America and Europe that in
 
 Next, the client wants to narrow this list to specific fund managers. I don’t know the exact name, so I put in Liz Peters, and Spanner performs a fuzzy match(Full Text Search - Substring Match) of the name Liz Peters to find funds managed by Elizabeth Peterson.
 
-Among these funds, the client wants to choose from socially responsible funds. Next, I check the box for vector search, and now I can see ESG funds because Spanner performed a KNN vector search to match the search term “socially responsible” with “environmental, social and governance”.
+Among these funds, the client wants to choose from socially responsible funds. Next, I check the box for vector search, and now I can see ESG funds because Spanner performed a KNN vector search to match the search term "socially responsible" with "environmental, social and governance".
 
 Finally, before I recommend a fund, I also want to check the exposure to a particular sector. This can be complex because funds can invest in other funds, called fund of funds which makes it hard to compute this. Spanner performs a graph search using this asset knowledge graph. By traversing the funds and its holdings which could also be funds and their holdings, Spanner can compute the client’s exposure to a particular sector. I can see the funds that have exposure of 20% or more in the technology sector.
 
