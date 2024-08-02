@@ -196,13 +196,12 @@ def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
 
                     # Check for required keys in each message
                     if "role" not in message or "content" not in message:
-                        errors.append(
-                            {
-                                "error_type": "Missing 'role' or 'content' key",
-                                "row_index": row_index,
-                                "message": f"""Row {row_index}, message {message_index}: Missing 'role' or 'content' key."""
-                            }
-                        )
+                        errors.append({
+                            "error_type": "Missing 'role' or 'content' key",
+                            "row_index": row_index,
+                            "message": f"""Row {row_index}, 
+                            message {message_index}: Missing 'role' or 'content' key."""
+                        })
                         continue
 
                     # Check for valid role values
