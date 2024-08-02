@@ -54,7 +54,6 @@ def convert_tuning_dataset_from_automl_csv(automl_gcs_csv_path: str,
     This function reads an AutoML JSONL dataset from Google Cloud Storage, filters by partition,
     and converts it to the Gemini tuning format. The Gemini format uses a list of dictionaries,
     each representing a conversation turn with "role" and "content" keys.
-    
     Args:
         automl_gcs_csv_path: The GCS path to the AutoML CSV dataset.
         system_prompt: The instructions to the model.
@@ -197,12 +196,14 @@ def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
 
                     # Check for required keys in each message
                     if "role" not in message or "content" not in message:
-                        errors.append({
-                            "error_type": "Missing 'role' or 'content' key",
-                            "row_index": row_index,
-                            "message": f"""Row {row_index}, message {message_index}: 
-                            Missing 'role' or 'content' key."""
-                        })
+                        errors.append(
+                            {
+                                "error_type": "Missing 'role' or 'content' key",
+                                "row_index": row_index,
+                                "message": f"""Row {row_index}, message {message_index}: 
+                                Missing 'role' or 'content' key."""
+                            }
+                        )
                         continue
 
                     # Check for valid role values
