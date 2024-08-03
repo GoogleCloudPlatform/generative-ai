@@ -43,9 +43,9 @@ config = VertexAISearchConfig(
     project_id=project_id,
     location=location,
     data_store_id=data_store_id,
-    engine_data_type=engine_data_type,  # type: ignore
-    engine_chunk_type=engine_chunk_type,  # type: ignore
-    summary_type=summary_type,  # type: ignore
+    engine_data_type=engine_data_type,
+    engine_chunk_type=engine_chunk_type,
+    summary_type=summary_type,
 )
 
 # Initialize VertexAISearchClient

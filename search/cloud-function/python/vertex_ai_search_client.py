@@ -65,7 +65,7 @@ class VertexAISearchConfig:
     engine_chunk_type: Union[EngineChunkTypeStr, str]
     summary_type: Union[SummaryTypeStr, str]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate and convert string inputs to appropriate types."""
         self.engine_data_type = self._validate_enum(
             self.engine_data_type, EngineDataTypeStr, "UNSTRUCTURED"
