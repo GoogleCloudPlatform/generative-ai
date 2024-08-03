@@ -22,9 +22,8 @@ For deployment instructions, environment variable setup, and usage examples,
 please refer to the README.md file.
 """
 
-import json
 import os
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any
 
 from flask import Flask, Request, jsonify, request
 import functions_framework
@@ -44,9 +43,9 @@ config = VertexAISearchConfig(
     project_id=project_id,
     location=location,
     data_store_id=data_store_id,
-    engine_data_type=engine_data_type,
-    engine_chunk_type=engine_chunk_type,
-    summary_type=summary_type,
+    engine_data_type=engine_data_type,  # type: ignore
+    engine_chunk_type=engine_chunk_type,  # type: ignore
+    summary_type=summary_type,  # type: ignore
 )
 
 # Initialize VertexAISearchClient
@@ -54,7 +53,7 @@ vertex_ai_search_client = VertexAISearchClient(config)
 
 
 @functions_framework.http
-def vertex_ai_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
+def vertex_ai_search(request: Request) -> Tuple[Any, int, Dict[str, str]]:
     """
     Handle HTTP requests for Vertex AI Search.
 
@@ -67,7 +66,7 @@ def vertex_ai_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
         <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
 
     Returns:
-        Tuple[str, int, Dict[str, str]]: A tuple containing the response body,
+        Tuple[Any, int, Dict[str, str]]: A tuple containing the response body,
         status code, and headers. This output will be turned into a Response
         object using `make_response`
         <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
@@ -87,7 +86,9 @@ def vertex_ai_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
     # Set CORS headers for all responses
     headers = {"Access-Control-Allow-Origin": "*"}
 
-    def create_error_response(message: str, status_code: int):
+    def create_error_response(
+        message: str, status_code: int
+    ) -> Tuple[Any, int, Dict[str, str]]:
         """Standardize the error responses with common headers."""
         return (jsonify({"error": message}), status_code, headers)
 
@@ -105,13 +106,11 @@ def vertex_ai_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
     # Handle the Vertex AI Search and return JSON
     try:
         results = vertex_ai_search_client.search(search_term)
-        return (json.dumps(results, indent=2), 200, headers)
+        return (jsonify(results), 200, headers)
     except GoogleAPICallError as e:
         return create_error_response(
             f"Error calling Vertex AI Search API: {str(e)}", 500
         )
-    except json.JSONDecodeError as e:
-        return create_error_response(f"Error parsing search results: {str(e)}", 500)
     except Exception as e:
         return create_error_response(f"Search failed: {str(e)}", 500)
 
@@ -120,7 +119,7 @@ if __name__ == "__main__":
     app = Flask(__name__)
 
     @app.route("/", methods=["POST"])
-    def index() -> Tuple[str, int, Dict[str, str]]:
+    def index() -> Tuple[Any, int, Dict[str, str]]:
         """
         Flask route for handling POST requests when running locally.
 
@@ -128,7 +127,7 @@ if __name__ == "__main__":
         It mimics the behavior of the vertex_ai_search function for local testing.
 
         Returns:
-            Tuple[str, int, Dict[str, str]]: The vertex search result.
+            Tuple[Any, int, Dict[str, str]]: The vertex search result.
         """
         return vertex_ai_search(request)
 

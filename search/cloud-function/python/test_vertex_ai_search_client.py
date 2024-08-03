@@ -20,7 +20,6 @@ ensure that the client correctly handles various scenarios and data structures.
 """
 
 import json
-from typing import Any, Dict, List
 from unittest.mock import MagicMock, patch
 
 from google.cloud import discoveryengine_v1alpha as discoveryengine
