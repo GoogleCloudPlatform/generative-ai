@@ -22,12 +22,12 @@ For deployment instructions, environment variable setup, and usage examples,
 please refer to the README.md file.
 """
 
-import functions_framework
 import json
 import os
 from typing import Dict, Tuple
 
-from flask import jsonify, Flask, Request, request
+from flask import Flask, Request, jsonify, request
+import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
 from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig
 

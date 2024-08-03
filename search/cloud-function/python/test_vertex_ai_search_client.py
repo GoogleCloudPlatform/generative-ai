@@ -29,7 +29,6 @@ from google.cloud.discoveryengine_v1alpha.services.search_service.pagers import 
 )
 from google.cloud.discoveryengine_v1alpha.types import Document, SearchResponse
 import pytest
-
 from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig
 
 
