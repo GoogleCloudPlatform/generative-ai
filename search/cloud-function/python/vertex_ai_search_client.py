@@ -35,7 +35,7 @@ from dataclasses import dataclass
 import html
 import json
 import re
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Union
 
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine_v1alpha as discoveryengine
@@ -78,12 +78,23 @@ class VertexAISearchConfig:
         )
 
     @staticmethod
-    def _validate_enum(value: str, enum_type: Any, default: str) -> Any:
+    def _validate_enum(value: str, enum_type: Any, default: str) -> str:
         """Validate and convert string to enum type."""
         if value in enum_type.__args__:
             return value
         print(f"Warning: Invalid value '{value}'. Using default: '{default}'")
         return default
+
+    def to_dict(self) -> Dict[str, str]:
+        """Convert the config to a dictionary."""
+        return {
+            "project_id": self.project_id,
+            "location": self.location,
+            "data_store_id": self.data_store_id,
+            "engine_data_type": self.engine_data_type,
+            "engine_chunk_type": self.engine_chunk_type,
+            "summary_type": self.summary_type,
+        }
 
 
 class VertexAISearchClient:

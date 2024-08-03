@@ -25,7 +25,7 @@ please refer to the README.md file.
 import os
 from typing import Any, Dict, Tuple
 
-from flask import Flask, Request, jsonify, request
+from flask import Flask, Request, jsonify
 import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
 from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig
@@ -53,7 +53,7 @@ vertex_ai_search_client = VertexAISearchClient(config)
 
 
 @functions_framework.http
-def vertex_ai_search(request: Request) -> Tuple[Any, int, Dict[str, str]]:
+def vertex_ai_search(http_request: Request) -> Tuple[Any, int, Dict[str, str]]:
     """
     Handle HTTP requests for Vertex AI Search.
 
@@ -62,7 +62,7 @@ def vertex_ai_search(request: Request) -> Tuple[Any, int, Dict[str, str]]:
     the request, and manages potential errors.
 
     Args:
-        request (flask.Request): The request object.
+        http_request (flask.Request): The request object.
         <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
 
     Returns:
@@ -72,7 +72,7 @@ def vertex_ai_search(request: Request) -> Tuple[Any, int, Dict[str, str]]:
         <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
     # Set CORS headers for the preflight request
-    if request.method == "OPTIONS":
+    if http_request.method == "OPTIONS":
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
         headers = {
@@ -93,8 +93,8 @@ def vertex_ai_search(request: Request) -> Tuple[Any, int, Dict[str, str]]:
         return (jsonify({"error": message}), status_code, headers)
 
     # Handle the request and get the search_term
-    request_json = request.get_json(silent=True)
-    request_args = request.args
+    request_json = http_request.get_json(silent=True)
+    request_args = http_request.args
 
     if request_json and "search_term" in request_json:
         search_term = request_json["search_term"]
@@ -111,8 +111,12 @@ def vertex_ai_search(request: Request) -> Tuple[Any, int, Dict[str, str]]:
         return create_error_response(
             f"Error calling Vertex AI Search API: {str(e)}", 500
         )
+    except ValueError as e:
+        return create_error_response(f"Invalid input: {str(e)}", 400)
     except Exception as e:
-        return create_error_response(f"Search failed: {str(e)}", 500)
+        # Log the unexpected exception for debugging
+        print(f"Unexpected error: {str(e)}")
+        return create_error_response("An unexpected error occurred", 500)
 
 
 if __name__ == "__main__":
@@ -129,6 +133,8 @@ if __name__ == "__main__":
         Returns:
             Tuple[Any, int, Dict[str, str]]: The vertex search result.
         """
+        from flask import request
+
         return vertex_ai_search(request)
 
     app.run("localhost", 8080, debug=True)
