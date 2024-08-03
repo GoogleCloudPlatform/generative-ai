@@ -15,91 +15,105 @@
 Google Cloud Function for Vertex AI Search
 
 This module provides an HTTP endpoint for performing searches using
-the Vertex AI Search API. It uses the VertexSearchClient to handle
+the Vertex AI Search API. It uses the VertexAISearchClient to handle
 the core search functionality.
 
 For deployment instructions, environment variable setup, and usage examples,
 please refer to the README.md file.
 """
 
+import functions_framework
 import json
 import os
 from typing import Dict, Tuple
 
-from flask import Flask, Request, request
-import functions_framework
+from flask import jsonify, Flask, Request, request
 from google.api_core.exceptions import GoogleAPICallError
-from vertex_search_client import VertexSearchClient, VertexSearchConfig
+from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig
 
-# Initialize the VertexSearchClient
-config = VertexSearchConfig(
-    project_id=os.getenv("PROJECT_ID", "your-project"),
-    location=os.getenv("LOCATION", "global"),
-    data_store_id=os.getenv("DATA_STORE_ID", "your-data-store"),
-    engine_data_type=os.getenv("ENGINE_DATA_TYPE", "UNSTRUCTURED"),
-    engine_chunk_type=os.getenv("ENGINE_CHUNK_TYPE", "CHUNK"),
-    summary_type=os.getenv("SUMMARY_TYPE", "VERTEX_AI_SEARCH"),
+# Load environment variables
+project_id = os.getenv("PROJECT_ID", "your-project")
+location = os.getenv("LOCATION", "global")
+data_store_id = os.getenv("DATA_STORE_ID", "your-data-store")
+engine_data_type = os.getenv("ENGINE_DATA_TYPE", "UNSTRUCTURED")
+engine_chunk_type = os.getenv("ENGINE_CHUNK_TYPE", "CHUNK")
+summary_type = os.getenv("SUMMARY_TYPE", "VERTEX_AI_SEARCH")
+
+# Create VertexAISearchConfig
+config = VertexAISearchConfig(
+    project_id=project_id,
+    location=location,
+    data_store_id=data_store_id,
+    engine_data_type=engine_data_type,
+    engine_chunk_type=engine_chunk_type,
+    summary_type=summary_type,
 )
-client = VertexSearchClient(config)
 
-
-def set_cors_headers(headers: Dict[str, str]) -> None:
-    """
-    Set CORS headers for the response.
-
-    This function adds the necessary headers to allow cross-origin requests.
-
-    Args:
-        headers (Dict[str, str]): The headers dictionary to update with CORS headers.
-    """
-    headers.update(
-        {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-        }
-    )
+# Initialize VertexAISearchClient
+vertex_ai_search_client = VertexAISearchClient(config)
 
 
 @functions_framework.http
-def vertex_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
+def vertex_ai_search(request: Request) -> Tuple[str, int, Dict[str, str]]:
     """
     Handle HTTP requests for Vertex AI Search.
 
     This function processes incoming HTTP requests, performs the search using
-    the VertexSearchClient, and returns the results. It handles CORS, validates
+    the VertexAISearchClient, and returns the results. It handles CORS, validates
     the request, and manages potential errors.
 
     Args:
-        request (flask.Request): The incoming HTTP request object.
+        request (flask.Request): The request object.
+        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
 
     Returns:
         Tuple[str, int, Dict[str, str]]: A tuple containing the response body,
-        status code, and headers.
+        status code, and headers. This output will be turned into a Response
+        object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
-    headers: Dict[str, str] = {}
-    set_cors_headers(headers)
-
+    # Set CORS headers for the preflight request
     if request.method == "OPTIONS":
+        # Allows GET requests from any origin with the Content-Type
+        # header and caches preflight response for an 3600s
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Max-Age": "3600",
+        }
         return ("", 204, headers)
 
-    if request.content_type != "application/json":
-        return ("Please send a JSON request", 415, headers)
+    # Set CORS headers for all responses
+    headers = {"Access-Control-Allow-Origin": "*"}
 
+    def create_error_response(message: str, status_code: int):
+        """Standardize the error responses with common headers."""
+        return (jsonify({"error": message}), status_code, headers)
+
+    # Handle the request and get the search_term
     request_json = request.get_json(silent=True)
-    if not request_json or "search_term" not in request_json:
-        return ("Invalid JSON, missing 'search_term' field", 400, headers)
+    request_args = request.args
 
+    if request_json and "search_term" in request_json:
+        search_term = request_json["search_term"]
+    elif request_args and "search_term" in request_args:
+        search_term = request_args["search_term"]
+    else:
+        return create_error_response("No search term provided", 400)
+
+    # Handle the Vertex AI Search and return JSON
     try:
-        results = client.search(request_json["search_term"])
+        results = vertex_ai_search_client.search(search_term)
         return (json.dumps(results, indent=2), 200, headers)
     except GoogleAPICallError as e:
-        return (f"Error calling Vertex AI Search API: {str(e)}", 500, headers)
+        return create_error_response(
+            f"Error calling Vertex AI Search API: {str(e)}", 500
+        )
     except json.JSONDecodeError as e:
-        return (f"Error parsing search results: {str(e)}", 500, headers)
+        return create_error_response(f"Error parsing search results: {str(e)}", 500)
     except Exception as e:
-        return (f"Unexpected error: {str(e)}", 500, headers)
+        return create_error_response(f"Search failed: {str(e)}", 500)
 
 
 if __name__ == "__main__":
@@ -111,11 +125,11 @@ if __name__ == "__main__":
         Flask route for handling POST requests when running locally.
 
         This function is used when the script is run directly (not as a Google Cloud Function).
-        It mimics the behavior of the vertex_search function for local testing.
+        It mimics the behavior of the vertex_ai_search function for local testing.
 
         Returns:
-            Tuple[str, int, Dict[str, str]]: The result of calling vertex_search with the current request.
+            Tuple[str, int, Dict[str, str]]: The vertex search result.
         """
-        return vertex_search(request)
+        return vertex_ai_search(request)
 
     app.run("localhost", 8080, debug=True)

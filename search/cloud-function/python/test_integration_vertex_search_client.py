@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Integration tests for the VertexSearchClient.
+Integration tests for the VertexAISearchClient.
 
 This module contains integration tests that interact with the actual
 Vertex AI Search API. These tests require proper configuration of
@@ -23,7 +23,7 @@ import os
 from typing import Generator
 
 import pytest
-from vertex_search_client import VertexSearchClient, VertexSearchConfig
+from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig
 
 # Load environment variables
 PROJECT_ID = os.getenv("PROJECT_ID", "your-project")
@@ -35,18 +35,18 @@ SUMMARY_TYPE = os.getenv("SUMMARY_TYPE", "VERTEX_AI_SEARCH")
 
 
 @pytest.fixture(scope="module")
-def vertex_search_client() -> Generator[VertexSearchClient, None, None]:
+def vertex_ai_search_client() -> Generator[VertexAISearchClient, None, None]:
     """
-    Fixture to create and yield a VertexSearchClient instance for testing.
+    Fixture to create and yield a VertexAISearchClient instance for testing.
 
-    This fixture creates a VertexSearchClient instance using the
+    This fixture creates a VertexAISearchClient instance using the
     environment variables and yields it for use in tests. The client
     is shared across all tests in the module for efficiency.
 
     Yields:
-        VertexSearchClient: An instance of the VertexSearchClient for testing.
+        VertexAISearchClient: An instance of the VertexAISearchClient for testing.
     """
-    config = VertexSearchConfig(
+    config = VertexAISearchConfig(
         project_id=PROJECT_ID,
         location=LOCATION,
         data_store_id=DATA_STORE_ID,
@@ -54,23 +54,23 @@ def vertex_search_client() -> Generator[VertexSearchClient, None, None]:
         engine_chunk_type="DOCUMENT_WITH_EXTRACTIVE_SEGMENTS",
         summary_type="VERTEX_AI_SEARCH",
     )
-    client = VertexSearchClient(config)
+    client = VertexAISearchClient(config)
     yield client
 
 
-def test_search_integration(vertex_search_client: VertexSearchClient) -> None:
+def test_search_integration(client: VertexAISearchClient) -> None:
     """
-    Test the search functionality of VertexSearchClient with the actual API.
+    Test the search functionality of VertexAISearchClient with the actual API.
 
-    This test performs a search using the VertexSearchClient and verifies
+    This test performs a search using the VertexAISearchClient and verifies
     that the results have the expected structure and content types.
 
     Args:
-        vertex_search_client (VertexSearchClient): The client instance to test.
+        vertex_ai_search_client (VertexAISearchClient): The client instance to test.
     """
     # Perform a search
     query = "test query"
-    results = vertex_search_client.search(query)
+    results = client.search(query)
 
     # Check the structure of the results
     assert "simplified_results" in results
@@ -91,13 +91,13 @@ def test_search_integration(vertex_search_client: VertexSearchClient) -> None:
 
 def test_unstructured_summary() -> None:
     """
-    Test VertexSearchClient with unstructured data and summary generation.
+    Test VertexAISearchClient with unstructured data and summary generation.
 
-    This test creates a new VertexSearchClient instance with specific
+    This test creates a new VertexAISearchClient instance with specific
     settings for unstructured data and summary generation, then performs
     a search to verify the results.
     """
-    config = VertexSearchConfig(
+    config = VertexAISearchConfig(
         project_id=PROJECT_ID,
         location=LOCATION,
         data_store_id=DATA_STORE_ID,
@@ -105,7 +105,7 @@ def test_unstructured_summary() -> None:
         engine_chunk_type="DOCUMENT_WITH_EXTRACTIVE_SEGMENTS",
         summary_type="VERTEX_AI_SEARCH",
     )
-    client = VertexSearchClient(config)
+    client = VertexAISearchClient(config)
     results = client.search("What is the name of the company?")
     # Check the structure of the results
     assert "simplified_results" in results

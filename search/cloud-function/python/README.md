@@ -3,7 +3,7 @@
 This example is based on the
 [Python client for the Vertex AI Search API](https://cloud.google.com/generative-ai-app-builder/docs/libraries#client-libraries-usage-python),
 which will get search results, snippets, metadata, and the LLM summary grounded
-on search results. This is implemented in the `vertex_search_client.py` file.
+on search results. This is implemented in the `vertex_ai_search_client.py` file.
 
 That functionality is exposed on a REST API which is implemented in `main.py`
 intended to be deployed to a Google Cloud Function using an HTTPS trigger on a
@@ -48,7 +48,7 @@ Run this code locally via **Functions Framework** or **Functions Emulator**;
 ```bash
 pip install -r requirements.txt
 pip install functions-framework
-functions-framework --target=vertex_search
+functions-framework --target=vertex_ai_search
 ```
 
 In a different terminal, execute a `POST` search query based on your data:
@@ -68,7 +68,7 @@ These tests mock the API interactions and should run quickly:
 
 ```bash
 pip install pytest
-pytest test_vertex_search_client.py
+pytest test_vertex_ai_search_client.py
 ```
 
 #### Integration tests
@@ -78,7 +78,7 @@ stores being configured in Vertex AI Search:
 
 ```bash
 pip install pytest
-pytest test_integration_vertex_search_client.py
+pytest test_integration_vertex_ai_search_client.py
 ```
 
 ## Deployment
@@ -90,7 +90,7 @@ To deploy this function to Google Cloud:
 2. Run the following command:
 
 ```bash
-gcloud functions deploy vertex_search --runtime python39 --trigger-http --allow-unauthenticated
+gcloud functions deploy vertex_ai_search --runtime python39 --trigger-http --allow-unauthenticated
 ```
 
 You will get back a URL for triggering the function.

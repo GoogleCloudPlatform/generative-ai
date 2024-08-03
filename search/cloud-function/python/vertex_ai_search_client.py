@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-VertexSearchClient for interacting with Google Cloud Vertex AI Search.
+VertexAISearchClient for interacting with Google Cloud Vertex AI Search.
 
 This module provides a client class for simplifying interactions with the
 Vertex AI Search API. It handles configuration, query construction, and
 result parsing.
 
 Example usage:
-    config = VertexSearchConfig(
+    config = VertexAISearchConfig(
         project_id="your-project",
         location="global",
         data_store_id="your-data-store",
@@ -27,7 +27,7 @@ Example usage:
         engine_chunk_type="CHUNK",
         summary_type="VERTEX_AI_SEARCH",
     )
-    client = VertexSearchClient(config)
+    client = VertexAISearchClient(config)
     results = client.search("your search query")
     print(results)
 """
@@ -55,7 +55,7 @@ SummaryTypeStr = Literal[
 
 
 @dataclass
-class VertexSearchConfig:
+class VertexAISearchConfig:
     """Config for the Vertex AI Search data store."""
 
     project_id: str
@@ -66,7 +66,7 @@ class VertexSearchConfig:
     summary_type: SummaryTypeStr
 
 
-class VertexSearchClient:
+class VertexAISearchClient:
     """
     A client for interacting with Google Cloud Vertex AI Search.
 
@@ -75,9 +75,9 @@ class VertexSearchClient:
     configurations.
     """
 
-    def __init__(self, config: VertexSearchConfig):
+    def __init__(self, config: VertexAISearchConfig):
         """
-        Initialize the VertexSearchClient.
+        Initialize the VertexAISearchClient.
 
         Args:
             project_id (str): The Google Cloud project ID.
