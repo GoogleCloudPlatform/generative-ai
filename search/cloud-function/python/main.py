@@ -25,7 +25,7 @@ please refer to the README.md file.
 import os
 from typing import Any, Dict, Tuple
 
-from flask import Flask, Request, jsonify
+from flask import Flask, Request, jsonify, request
 import functions_framework
 from google.api_core.exceptions import GoogleAPICallError
 from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig
@@ -133,7 +133,6 @@ if __name__ == "__main__":
         Returns:
             Tuple[Any, int, Dict[str, str]]: The vertex search result.
         """
-        from flask import request
 
         return vertex_ai_search(request)
 

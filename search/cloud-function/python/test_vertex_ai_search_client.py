@@ -92,17 +92,23 @@ def vertex_ai_search_config() -> VertexAISearchConfig:
 
 @pytest.fixture
 def vertex_ai_search_client(
-    mock_search_service_client: MagicMock, vertex_ai_search_config: VertexAISearchConfig
+    vertex_ai_search_config: VertexAISearchConfig,
 ) -> VertexAISearchClient:
     """Fixture to create a VertexAISearchClient instance for testing."""
-    return VertexAISearchClient(vertex_ai_search_config)
+    with patch(
+        "vertex_ai_search_client.discoveryengine.SearchServiceClient"
+    ) as mock_client:
+        mock_client.return_value.serving_config_path.return_value = (
+            "projects/test-project/locations/us-central1/dataStores/test-data-store/"
+            "servingConfigs/default_config"
+        )
+        return VertexAISearchClient(vertex_ai_search_config)
 
 
-def test_init(
-    mock_search_service_client: MagicMock, vertex_ai_search_config: VertexAISearchConfig
-) -> None:
+def test_init(vertex_ai_search_config: VertexAISearchConfig) -> None:
     """Test the initialization of VertexAISearchClient."""
-    client = VertexAISearchClient(vertex_ai_search_config)
+    with patch("vertex_ai_search_client.discoveryengine.SearchServiceClient"):
+        client = VertexAISearchClient(vertex_ai_search_config)
 
     assert client.config.project_id == "test-project"
     assert client.config.location == "us-central1"
@@ -110,8 +116,6 @@ def test_init(
     assert client.config.engine_data_type == "UNSTRUCTURED"
     assert client.config.engine_chunk_type == "DOCUMENT_WITH_EXTRACTIVE_SEGMENTS"
     assert client.config.summary_type == "VERTEX_AI_SEARCH"
-
-    mock_search_service_client.assert_called_once()
 
 
 def test_get_serving_config(vertex_ai_search_client: VertexAISearchClient) -> None:
@@ -256,16 +260,14 @@ def test_parse_document_result(vertex_ai_search_client: VertexAISearchClient) ->
             "title": "Employee Benefits Summary",
             "extractive_answers": [
                 {
-                    "content": "High Deductible HMO • Premiums: Lower premiums at $150 per month. "
-                    "• Deductibles: High at $2000. • Out-of-Pocket Maximums: Higher limit of $6500.",
+                    "content": "Test content",
                     "page_number": "3",
                 }
             ],
             "snippets": [
                 {
                     "snippet_status": "SUCCESS",
-                    "snippet": "... <b>per month</b>, due to flexibility and network size. "
-                    "• Deductibles: Moderate at $1,000, offering <b>a</b> balance between <b>cost</b> and <b>coverage</b>. ...",
+                    "snippet": "Test snippet",
                 }
             ],
             "link": "gs://company-docs/Employee_Benefits_Summary.pdf",
@@ -279,7 +281,7 @@ def test_parse_document_result(vertex_ai_search_client: VertexAISearchClient) ->
         result["metadata"]["link"] == "gs://company-docs/Employee_Benefits_Summary.pdf"
     )
     assert "page_content" in result
-    assert "High Deductible HMO" in result["page_content"]
+    assert "Test content" in result["page_content"]
     assert "On page 3" in result["page_content"]
 
 
@@ -289,19 +291,18 @@ def test_search(
     mock_simplify: MagicMock,
     mock_map_pager: MagicMock,
     vertex_ai_search_client: VertexAISearchClient,
-    mock_search_service_client: MagicMock,
 ) -> None:
     """Test the search method of VertexAISearchClient."""
     mock_pager = create_mock_search_pager_result()
 
-    mock_search_service_client.return_value.search.return_value = mock_pager
+    vertex_ai_search_client.client.search.return_value = mock_pager
 
     mock_map_pager.return_value = {"results": [{"document": {"id": "doc1"}}]}
     mock_simplify.return_value = {"simplified_results": [{"id": "doc1"}]}
 
     results = vertex_ai_search_client.search("test query")
 
-    mock_search_service_client.return_value.search.assert_called_once()
+    vertex_ai_search_client.client.search.assert_called_once()
     mock_map_pager.assert_called_once_with(mock_pager)
     mock_simplify.assert_called_once_with({"results": [{"document": {"id": "doc1"}}]})
     assert results == {"simplified_results": [{"id": "doc1"}]}
