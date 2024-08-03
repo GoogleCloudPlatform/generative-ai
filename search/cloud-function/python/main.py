@@ -113,10 +113,6 @@ def vertex_ai_search(http_request: Request) -> Tuple[Any, int, Dict[str, str]]:
         )
     except ValueError as e:
         return create_error_response(f"Invalid input: {str(e)}", 400)
-    except Exception as e:
-        # Log the unexpected exception for debugging
-        print(f"Unexpected error: {str(e)}")
-        return create_error_response("An unexpected error occurred", 500)
 
 
 if __name__ == "__main__":

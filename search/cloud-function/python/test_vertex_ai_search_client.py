@@ -31,6 +31,7 @@ import pytest
 from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig
 
 
+# Test helper functions
 def create_mock_search_pager_result() -> MagicMock:
     """Create a mock SearchPager result for testing."""
     mock_pager = MagicMock(spec=SearchPager)
@@ -64,6 +65,7 @@ def create_mock_search_pager_return_value() -> SearchResponse.SearchResult:
     return search_result
 
 
+# Fixtures
 @pytest.fixture
 def mock_search_service_client() -> MagicMock:
     """Fixture to create a mock SearchServiceClient."""
@@ -78,7 +80,7 @@ def mock_search_service_client() -> MagicMock:
 
 
 @pytest.fixture
-def vertex_ai_search_config() -> VertexAISearchConfig:
+def search_config() -> VertexAISearchConfig:
     """Fixture to create a VertexAISearchConfig instance for testing."""
     return VertexAISearchConfig(
         project_id="test-project",
@@ -91,9 +93,7 @@ def vertex_ai_search_config() -> VertexAISearchConfig:
 
 
 @pytest.fixture
-def vertex_ai_search_client(
-    vertex_ai_search_config: VertexAISearchConfig,
-) -> VertexAISearchClient:
+def search_client(search_config: VertexAISearchConfig) -> VertexAISearchClient:
     """Fixture to create a VertexAISearchClient instance for testing."""
     with patch(
         "vertex_ai_search_client.discoveryengine.SearchServiceClient"
@@ -102,13 +102,14 @@ def vertex_ai_search_client(
             "projects/test-project/locations/us-central1/dataStores/test-data-store/"
             "servingConfigs/default_config"
         )
-        return VertexAISearchClient(vertex_ai_search_config)
+        return VertexAISearchClient(search_config)
 
 
-def test_init(vertex_ai_search_config: VertexAISearchConfig) -> None:
+# Tests
+def test_init(search_config: VertexAISearchConfig) -> None:
     """Test the initialization of VertexAISearchClient."""
     with patch("vertex_ai_search_client.discoveryengine.SearchServiceClient"):
-        client = VertexAISearchClient(vertex_ai_search_config)
+        client = VertexAISearchClient(search_config)
 
     assert client.config.project_id == "test-project"
     assert client.config.location == "us-central1"
@@ -118,23 +119,26 @@ def test_init(vertex_ai_search_config: VertexAISearchConfig) -> None:
     assert client.config.summary_type == "VERTEX_AI_SEARCH"
 
 
-def test_get_serving_config(vertex_ai_search_client: VertexAISearchClient) -> None:
+def test_get_serving_config(search_client: VertexAISearchClient) -> None:
     """Test the get_serving_config method of VertexAISearchClient."""
     expected_serving_config = (
         "projects/test-project/locations/us-central1/dataStores/test-data-store/"
         "servingConfigs/default_config"
     )
-    assert vertex_ai_search_client.serving_config == expected_serving_config
+    assert search_client.serving_config == expected_serving_config
 
 
-def test_build_search_request(vertex_ai_search_client: VertexAISearchClient) -> None:
-    """Test the _build_search_request method of VertexAISearchClient."""
+def test_build_search_request(search_client: VertexAISearchClient) -> None:
+    """Test the build_search_request method of VertexAISearchClient."""
     query = "test query"
     page_size = 5
-    request = vertex_ai_search_client._build_search_request(query, page_size)
+    # Access to protected member is necessary for testing
+    request = search_client.build_search_request(
+        query, page_size
+    )  # pylint: disable=protected-access
 
     assert isinstance(request, discoveryengine.SearchRequest)
-    assert request.serving_config == vertex_ai_search_client.serving_config
+    assert request.serving_config == search_client.serving_config
     assert request.query == query
     assert request.page_size == page_size
 
@@ -165,13 +169,14 @@ def test_build_search_request(vertex_ai_search_client: VertexAISearchClient) -> 
     )
 
 
-def test_map_search_pager_to_dict_basic(
-    vertex_ai_search_client: VertexAISearchClient,
-) -> None:
-    """Test the _map_search_pager_to_dict method with basic data."""
+def test_map_search_pager_to_dict_basic(search_client: VertexAISearchClient) -> None:
+    """Test the map_search_pager_to_dict method with basic data."""
     mock_pager = create_mock_search_pager_result()
 
-    result = vertex_ai_search_client._map_search_pager_to_dict(mock_pager)
+    # Access to protected member is necessary for testing
+    result = search_client.map_search_pager_to_dict(
+        mock_pager
+    )  # pylint: disable=protected-access
 
     assert "results" in result
     assert len(result["results"]) == 1
@@ -183,12 +188,15 @@ def test_map_search_pager_to_dict_basic(
 
 
 def test_map_search_pager_to_dict_document_content(
-    vertex_ai_search_client: VertexAISearchClient,
+    search_client: VertexAISearchClient,
 ) -> None:
-    """Test the _map_search_pager_to_dict method with document content."""
+    """Test the map_search_pager_to_dict method with document content."""
     mock_pager = create_mock_search_pager_result()
 
-    result = vertex_ai_search_client._map_search_pager_to_dict(mock_pager)
+    # Access to protected member is necessary for testing
+    result = search_client.map_search_pager_to_dict(
+        mock_pager
+    )  # pylint: disable=protected-access
 
     document = result["results"][0]["document"]
     assert document["derived_struct_data"]["title"] == "Employee Benefits Summary"
@@ -205,7 +213,7 @@ def test_map_search_pager_to_dict_document_content(
     assert document["derived_struct_data"]["snippets"][0]["snippet"] == "Test snippet"
 
 
-def test_parse_chunk_result(vertex_ai_search_client: VertexAISearchClient) -> None:
+def test_parse_chunk_result(search_client: VertexAISearchClient) -> None:
     """Test the _parse_chunk_result method of VertexAISearchClient."""
     chunk = {
         "id": "chunk1",
@@ -215,7 +223,10 @@ def test_parse_chunk_result(vertex_ai_search_client: VertexAISearchClient) -> No
         "page_span": {"page_start": 1, "page_end": 2},
     }
 
-    result = vertex_ai_search_client._parse_chunk_result(chunk)
+    # Access to protected member is necessary for testing
+    result = search_client._parse_chunk_result(
+        chunk
+    )  # pylint: disable=protected-access
 
     assert result["page_content"] == "Test content"
     assert result["metadata"]["chunk_id"] == "chunk1"
@@ -230,13 +241,16 @@ def test_strip_content() -> None:
     """Test the _strip_content static method of VertexAISearchClient."""
     input_text = "<p>Test <strong>content</strong> with &quot;quotes&quot;</p>"
     expected_output = 'Test content with "quotes"'
-    assert VertexAISearchClient._strip_content(input_text) == expected_output
+    # Access to protected member is necessary for testing
+    assert (
+        VertexAISearchClient._strip_content(input_text) == expected_output
+    )  # pylint: disable=protected-access
 
 
 def test_simplify_search_results_mixed_chunk_and_segments(
-    vertex_ai_search_client: VertexAISearchClient,
+    search_client: VertexAISearchClient,
 ) -> None:
-    """Test the _simplify_search_results method with mixed chunk and segment data."""
+    """Test the simplify_search_results method with mixed chunk and segment data."""
     input_dict = {
         "results": [
             {"document": {"id": "doc1", "derived_struct_data": {"title": "Test"}}},
@@ -244,7 +258,10 @@ def test_simplify_search_results_mixed_chunk_and_segments(
         ]
     }
 
-    result = vertex_ai_search_client._simplify_search_results(input_dict)
+    # Access to protected member is necessary for testing
+    result = search_client.simplify_search_results(
+        input_dict
+    )  # pylint: disable=protected-access
 
     assert "simplified_results" in result
     assert len(result["simplified_results"]) == 2
@@ -252,7 +269,7 @@ def test_simplify_search_results_mixed_chunk_and_segments(
     assert "page_content" in result["simplified_results"][1]
 
 
-def test_parse_document_result(vertex_ai_search_client: VertexAISearchClient) -> None:
+def test_parse_document_result(search_client: VertexAISearchClient) -> None:
     """Test the _parse_document_result method of VertexAISearchClient."""
     document = {
         "id": "doc1",
@@ -274,7 +291,10 @@ def test_parse_document_result(vertex_ai_search_client: VertexAISearchClient) ->
         },
     }
 
-    result = vertex_ai_search_client._parse_document_result(document)
+    # Access to protected member is necessary for testing
+    result = search_client._parse_document_result(
+        document
+    )  # pylint: disable=protected-access
 
     assert result["metadata"]["title"] == "Employee Benefits Summary"
     assert (
@@ -285,24 +305,24 @@ def test_parse_document_result(vertex_ai_search_client: VertexAISearchClient) ->
     assert "On page 3" in result["page_content"]
 
 
-@patch("vertex_ai_search_client.VertexAISearchClient._map_search_pager_to_dict")
-@patch("vertex_ai_search_client.VertexAISearchClient._simplify_search_results")
+@patch("vertex_ai_search_client.VertexAISearchClient.map_search_pager_to_dict")
+@patch("vertex_ai_search_client.VertexAISearchClient.simplify_search_results")
 def test_search(
     mock_simplify: MagicMock,
     mock_map_pager: MagicMock,
-    vertex_ai_search_client: VertexAISearchClient,
+    search_client: VertexAISearchClient,
 ) -> None:
     """Test the search method of VertexAISearchClient."""
     mock_pager = create_mock_search_pager_result()
 
-    vertex_ai_search_client.client.search.return_value = mock_pager
+    search_client.client.search.return_value = mock_pager
 
     mock_map_pager.return_value = {"results": [{"document": {"id": "doc1"}}]}
     mock_simplify.return_value = {"simplified_results": [{"id": "doc1"}]}
 
-    results = vertex_ai_search_client.search("test query")
+    results = search_client.search("test query")
 
-    vertex_ai_search_client.client.search.assert_called_once()
+    search_client.client.search.assert_called_once()
     mock_map_pager.assert_called_once_with(mock_pager)
     mock_simplify.assert_called_once_with({"results": [{"document": {"id": "doc1"}}]})
     assert results == {"simplified_results": [{"id": "doc1"}]}

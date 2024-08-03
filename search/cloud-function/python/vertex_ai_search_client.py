@@ -155,14 +155,14 @@ class VertexAISearchClient:
         Returns:
             dict: Parsed and simplified search results.
         """
-        request = self._build_search_request(query, page_size)
+        request = self.build_search_request(query, page_size)
         print(f"<request> {request} </request>")
         search_pager = self.client.search(request)
-        response = self._map_search_pager_to_dict(search_pager)
+        response = self.map_search_pager_to_dict(search_pager)
         print(f"<response> {response} </response>")
-        return self._simplify_search_results(response)
+        return self.simplify_search_results(response)
 
-    def _build_search_request(
+    def build_search_request(
         self, query: str, page_size: int
     ) -> discoveryengine.SearchRequest:
         """
@@ -218,7 +218,7 @@ class VertexAISearchClient:
             ),
         )
 
-    def _map_search_pager_to_dict(self, pager: SearchPager) -> Dict[str, Any]:
+    def map_search_pager_to_dict(self, pager: SearchPager) -> Dict[str, Any]:
         """
         Maps a SearchPager to a dictionary structure, iterativly requesting results.
 
@@ -267,7 +267,7 @@ class VertexAISearchClient:
 
         return output
 
-    def _simplify_search_results(self, response: Dict[str, Any]) -> Dict[str, Any]:
+    def simplify_search_results(self, response: Dict[str, Any]) -> Dict[str, Any]:
         """
         Simplify the search results by parsing documents and chunks.
 
@@ -356,7 +356,8 @@ class VertexAISearchClient:
             for segment in segments
         ]
         return "\n\n".join(
-            f"On page {segment['page_number']} with a relevance score of {segment['score']}:\n```\n{segment['content']}\n```"
+            f"On page {segment['page_number']} with a relevance score of {segment['score']}:\n"
+            f"```\n{segment['content']}\n```"
             for segment in parsed_segments
         )
 
