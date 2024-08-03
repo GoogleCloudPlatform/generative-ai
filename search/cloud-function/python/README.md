@@ -122,6 +122,6 @@ the Vertex AI Search API. It simplifies CORS and bearer token authentication,
 and allows for some minor customization of inputs and outputs.
 
 If you require more extensive customization, consider using an orchestration
-framework like [LangChain](https://www.langchain.com/).
-
-**Take a look at other implementations in [search/cloud-functions/](../)**.
+framework like [LangChain](https://www.langchain.com/) or
+[LlamaIndex](https://www.llamaindex.ai/) which have Vertex AI Search
+integrations.
