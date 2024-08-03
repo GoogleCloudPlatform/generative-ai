@@ -30,6 +30,7 @@ def create_index(vector_index_name: str, approximate_neighbors_count: int):
         )
         return vs_index, False
 
+
 def create_endpoint(index_endpoint_name: str):
     endpoint_names = [
         endpoint.resource_name
@@ -39,9 +40,7 @@ def create_endpoint(index_endpoint_name: str):
     ]
 
     if len(endpoint_names) == 0:
-        print(
-            f"Creating Vector Search index endpoint {index_endpoint_name} ..."
-        )
+        print(f"Creating Vector Search index endpoint {index_endpoint_name} ...")
         vs_endpoint = aiplatform.MatchingEngineIndexEndpoint.create(
             display_name=index_endpoint_name, public_endpoint_enabled=True
         )
@@ -57,9 +56,12 @@ def create_endpoint(index_endpoint_name: str):
         )
     return vs_endpoint
 
-def deploy_index(vs_index: aiplatform.MatchingEngineIndex, 
-                 vs_endpoint: aiplatform.MatchingEngineIndexEndpoint,
-                 vector_index_name: str):
+
+def deploy_index(
+    vs_index: aiplatform.MatchingEngineIndex,
+    vs_endpoint: aiplatform.MatchingEngineIndexEndpoint,
+    vector_index_name: str,
+):
     index_endpoints = [
         (deployed_index.index_endpoint, deployed_index.deployed_index_id)
         for deployed_index in vs_index.deployed_indexes
@@ -89,8 +91,8 @@ def deploy_index(vs_index: aiplatform.MatchingEngineIndex,
         )
     return vs_deployed_index
 
-def get_existing_index_and_endpoint(vector_index_name: str, 
-                                    index_endpoint_name: str):
+
+def get_existing_index_and_endpoint(vector_index_name: str, index_endpoint_name: str):
     # Check for existing index
     index = None
     index_list = aiplatform.MatchingEngineIndex.list(
@@ -99,7 +101,7 @@ def get_existing_index_and_endpoint(vector_index_name: str,
     if index_list:
         index = index_list[0]
         print(f"Found existing index: {index.display_name}")
-    
+
     # Check for existing endpoint
     endpoint = None
     endpoint_list = aiplatform.MatchingEngineIndexEndpoint.list(
@@ -108,25 +110,29 @@ def get_existing_index_and_endpoint(vector_index_name: str,
     if endpoint_list:
         endpoint = endpoint_list[0]
         print(f"Found existing endpoint: {endpoint.display_name}")
-    
+
     return index, endpoint
 
 
-def get_or_create_existing_index(vector_index_name: str,
-                                 index_endpoint_name: str,
-                                 approximate_neighbors_count: int):
+def get_or_create_existing_index(
+    vector_index_name: str, index_endpoint_name: str, approximate_neighbors_count: int
+):
     # Creating Vector Search Index
-    vs_index, vs_endpoint = get_existing_index_and_endpoint(vector_index_name, index_endpoint_name)
+    vs_index, vs_endpoint = get_existing_index_and_endpoint(
+        vector_index_name, index_endpoint_name
+    )
     existing_index = vs_index is not None
-    
+
     if vs_index and vs_endpoint:
         print("Using existing index and endpoint")
     else:
         print("Creating new index and/or endpoint")
         if not vs_index:
-            vs_index, is_new_index = create_index(vector_index_name, approximate_neighbors_count)
+            vs_index, is_new_index = create_index(
+                vector_index_name, approximate_neighbors_count
+            )
         if not vs_endpoint:
             vs_endpoint = create_endpoint(index_endpoint_name)
         vs_deployed_index = deploy_index(vs_index, vs_endpoint, vector_index_name)
-    
+
     return vs_index, vs_endpoint

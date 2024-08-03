@@ -14,15 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from llama_index.core import QueryBundle
-from llama_index.core.postprocessor.types import BaseNodePostprocessor
-from llama_index.core.schema import NodeWithScore, TextNode
-from typing import List, Optional
-import requests
-import google.auth
-import google.auth.transport.requests
+import logging
 from typing import Callable, List, Optional
 
+import google.auth
+import google.auth.transport.requests
+from llama_index.core import QueryBundle, Settings
 from llama_index.core.bridge.pydantic import Field, PrivateAttr
 from llama_index.core.indices.utils import (
     default_format_node_batch_fn,
@@ -33,28 +30,30 @@ from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.prompts import BasePromptTemplate
 from llama_index.core.prompts.default_prompts import DEFAULT_CHOICE_SELECT_PROMPT
 from llama_index.core.prompts.mixin import PromptDictType
-from llama_index.core.schema import NodeWithScore, QueryBundle
+from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
 from llama_index.core.service_context import ServiceContext
 from llama_index.core.settings import Settings, llm_from_settings_or_context
-import logging
 from llama_index.llms.vertex import Vertex
-from llama_index.core import Settings
+import requests
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
-
 
 
 # Initialize the LLM and set it in the Settings
 llm = Vertex(model="gemini-1.5-flash", temperature=0.0)
 Settings.llm = llm
 
+
 def authenticate_google():
     """Authenticate using Google credentials and return the access token."""
-    credentials, project_id = google.auth.default(quota_project_id="pr-sbx-vertex-genai")
+    credentials, project_id = google.auth.default(
+        quota_project_id="pr-sbx-vertex-genai"
+    )
     auth_req = google.auth.transport.requests.Request()
     credentials.refresh(auth_req)
     return credentials.token
+
 
 def call_reranker(query, records, google_token):
     """Calls the reranker API with the given query and records.
@@ -72,7 +71,6 @@ def call_reranker(query, records, google_token):
     model_name = "semantic-ranker-512@latest"
     url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/locations/global/rankingConfigs/default_ranking_config:rank"
 
-    
     headers = {
         "Authorization": "Bearer " + google_token,
         "Content-Type": "application/json",
@@ -84,7 +82,7 @@ def call_reranker(query, records, google_token):
         "query": query,
         "records": records,
     }
-    
+
     response = requests.post(url, headers=headers, json=data)
     print(response)
     response.raise_for_status()  # Raise an error if the request failed
@@ -92,17 +90,20 @@ def call_reranker(query, records, google_token):
 
 
 class GoogleReRankerSecretSauce(BaseNodePostprocessor):
-
     def _postprocess_nodes(
         self, nodes: List[NodeWithScore], query_bundle: Optional[QueryBundle]
     ) -> List[NodeWithScore]:
         google_token = authenticate_google()
-        
+
         records = []
         for node_wscore in nodes:
-            records.append({"id": node_wscore.node.id_, 
-                           "title": node_wscore.node.metadata["title"], 
-                           "content": node_wscore.node.text})
+            records.append(
+                {
+                    "id": node_wscore.node.id_,
+                    "title": node_wscore.node.metadata["title"],
+                    "content": node_wscore.node.text,
+                }
+            )
         response_json = call_reranker(query_bundle.query_str, records, google_token)
 
         records = response_json["records"]
@@ -113,7 +114,7 @@ class GoogleReRankerSecretSauce(BaseNodePostprocessor):
             new_nodes_wscores.append(node_wscore)
 
         return sorted(new_nodes_wscores, key=lambda x: x.score or 0.0, reverse=True)
-    
+
 
 class CustomLLMRerank(BaseNodePostprocessor):
     """LLM-based reranker."""
@@ -169,7 +170,7 @@ class CustomLLMRerank(BaseNodePostprocessor):
     @classmethod
     def class_name(cls) -> str:
         return "LLMRerank"
-    
+
     async def postprocess_nodes(
         self,
         nodes: List[NodeWithScore],
@@ -209,7 +210,7 @@ class CustomLLMRerank(BaseNodePostprocessor):
                 context_str=fmt_batch_str,
                 query_str=query_str,
             )
-            
+
             logging.info(raw_response)
             try:
                 raw_choices, relevances = self._parse_choice_select_answer_fn(

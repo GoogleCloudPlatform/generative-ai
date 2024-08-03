@@ -1,12 +1,11 @@
-import streamlit as st
-import requests
 import logging
+import os
+
 import google.cloud.logging
 from google.cloud.logging import Client
 from google.cloud.logging.handlers import CloudLoggingHandler
-import os
-
-
+import requests
+import streamlit as st
 import yaml
 
 # # Get the directory of the current script
@@ -16,57 +15,75 @@ import yaml
 # config_path = os.path.join(current_dir, '..', '..', 'common', 'config.yaml')
 
 
-
-config_path = os.environ.get('CONFIG_PATH', os.path.join(os.path.dirname(__file__), '..', '..', 'common', 'config.yaml'))
+config_path = os.environ.get(
+    "CONFIG_PATH",
+    os.path.join(os.path.dirname(__file__), "..", "..", "common", "config.yaml"),
+)
 
 
 # Load the config file
-with open(config_path, 'r') as file:
+with open(config_path, "r") as file:
     config = yaml.safe_load(file)
 
-fastapi_url = config['fastapi_url']
+fastapi_url = config["fastapi_url"]
 
 # Configure Google Cloud Logging
 client = Client()
 handler = CloudLoggingHandler(client)
-cloud_logger = logging.getLogger('cloudLogger')
+cloud_logger = logging.getLogger("cloudLogger")
 cloud_logger.setLevel(logging.DEBUG)
 cloud_logger.addHandler(handler)
 
 # Get current index info in order to apply logic to prevent bad inputs
 try:
-    response = requests.get(url = f"{config['fastapi_url']}/get_current_index_info")
+    response = requests.get(url=f"{config['fastapi_url']}/get_current_index_info")
     if response.status_code == 200:
         current_index_info = response.json()
     else:
-        st.error("Failed to fetch current index info. Check your Vector DBs and Firestore.")
+        st.error(
+            "Failed to fetch current index info. Check your Vector DBs and Firestore."
+        )
 except Exception as e:
     print(e)
 
 
-def verify_user_input(current_index_info, 
-                      retrieval_strategy, 
-                      qa_followup, 
-                      hybrid_retrieval):
-    if (current_index_info["firestore_db_name"] is None) or (current_index_info["firestore_namespace"] is None):
-        if (retrieval_strategy == "auto_merging") or (retrieval_strategy == "parent") or (hybrid_retrieval == True):
-            raise ValueError("Invalid inputs: No Firestore docstore specified so can't use auto_merging, parent or hybrid retrieval")
-    if (current_index_info["qa_index_name"] is None) or (current_index_info["qa_endpoint_name"] is None):
-        if (qa_followup == True):
-            raise ValueError("Invalid inputs: No Questions Answered Index specified, can't do qa followup retrieval")
+def verify_user_input(
+    current_index_info, retrieval_strategy, qa_followup, hybrid_retrieval
+):
+    if (current_index_info["firestore_db_name"] is None) or (
+        current_index_info["firestore_namespace"] is None
+    ):
+        if (
+            (retrieval_strategy == "auto_merging")
+            or (retrieval_strategy == "parent")
+            or (hybrid_retrieval == True)
+        ):
+            raise ValueError(
+                "Invalid inputs: No Firestore docstore specified so can't use auto_merging, parent or hybrid retrieval"
+            )
+    if (current_index_info["qa_index_name"] is None) or (
+        current_index_info["qa_endpoint_name"] is None
+    ):
+        if qa_followup == True:
+            raise ValueError(
+                "Invalid inputs: No Questions Answered Index specified, can't do qa followup retrieval"
+            )
+
 
 # Function to query FastAPI backend
-def query_fastapi(query, 
-                  llm_name, 
-                  temperature, 
-                  similarity_top_k, 
-                  retrieval_strategy, 
-                  use_hyde, 
-                  use_refine, 
-                  use_node_rerank, 
-                  qa_followup,
-                  hybrid_retrieval,
-                  evaluate_response):
+def query_fastapi(
+    query,
+    llm_name,
+    temperature,
+    similarity_top_k,
+    retrieval_strategy,
+    use_hyde,
+    use_refine,
+    use_node_rerank,
+    qa_followup,
+    hybrid_retrieval,
+    evaluate_response,
+):
     url = f"{config['fastapi_url']}/query_rag"
     payload = {
         "query": query,
@@ -77,17 +94,14 @@ def query_fastapi(query,
         "use_hyde": use_hyde,
         "use_refine": use_refine,
         "use_node_rerank": use_node_rerank,
-        "use_react":use_react,
-        "qa_followup":qa_followup,
-        "hybrid_retrieval":hybrid_retrieval,
+        "use_react": use_react,
+        "qa_followup": qa_followup,
+        "hybrid_retrieval": hybrid_retrieval,
         "evaluate_response": evaluate_response,
         "eval_model_name": "gemini-1.5-flash",
-        "embedding_model_name": "text-embedding-004"
+        "embedding_model_name": "text-embedding-004",
     }
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json"
-    }
+    headers = {"accept": "application/json", "Content-Type": "application/json"}
 
     # Adding debug statements
     cloud_logger.debug(f"URL: {url}")
@@ -112,21 +126,26 @@ def query_fastapi(query,
 
 
 def extract_top_titles_and_content(response, num_chunks=3):
-    if response and 'retreived_chunks' in response:
+    if response and "retreived_chunks" in response:
         chunks = []
-        for chunk in response['retreived_chunks'][:num_chunks]:
-            source = chunk['node']['metadata'].get('source', 'No source available')
-            title = source.split('/')[-1] if source else 'No title available'
-            text = chunk['node'].get('text', 'No content available')
-            chunks.append({'title': title, 'text': text})
+        for chunk in response["retreived_chunks"][:num_chunks]:
+            source = chunk["node"]["metadata"].get("source", "No source available")
+            title = source.split("/")[-1] if source else "No title available"
+            text = chunk["node"].get("text", "No content available")
+            chunks.append({"title": title, "text": text})
         return chunks
     return []
 
-st.set_page_config(layout="wide", page_title="LlamaIndex Advanced Agentic RAG Implenentation Chatbot", page_icon=":speech_balloon:")
+
+st.set_page_config(
+    layout="wide",
+    page_title="LlamaIndex Advanced Agentic RAG Implenentation Chatbot",
+    page_icon=":speech_balloon:",
+)
 
 
-
-st.markdown("""
+st.markdown(
+    """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -244,10 +263,13 @@ st.markdown("""
         margin-bottom: 0;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
-st.markdown("""
+st.markdown(
+    """
 <style>
     ... (existing styles) ...
     .streamlit-expanderHeader {
@@ -272,21 +294,29 @@ st.markdown("""
         word-wrap: break-word;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 st.sidebar.markdown("#### 🛠️ RAG Configurations")
 
 st.sidebar.markdown("##### 🤖 LLM Model")
-llm_name = st.sidebar.selectbox("Select a model:", [ "gemini-1.5-flash","gemini-1.5-pro","claude-sonnet-3.5"])
+llm_name = st.sidebar.selectbox(
+    "Select a model:", ["gemini-1.5-flash", "gemini-1.5-pro", "claude-sonnet-3.5"]
+)
 
 st.sidebar.markdown("##### 🌡️ Temperature")
 temperature = st.sidebar.slider("Adjust temperature:", 0.0, 1.0, 0.2)
 
 st.sidebar.markdown("##### 🔍 Similarity Top K")
-similarity_top_k = st.sidebar.number_input("Set top K value:", min_value=1, max_value=20, value=5)
+similarity_top_k = st.sidebar.number_input(
+    "Set top K value:", min_value=1, max_value=20, value=5
+)
 
 st.sidebar.markdown("##### 📊 Retrieval Strategy")
-retrieval_strategy = st.sidebar.selectbox("Choose strategy:", ["auto_merging", "parent", "baseline"])
+retrieval_strategy = st.sidebar.selectbox(
+    "Choose strategy:", ["auto_merging", "parent", "baseline"]
+)
 
 st.sidebar.markdown("##### 🔧 Advanced Options")
 use_hyde = st.sidebar.checkbox("🧠 Use HYDE", value=True)
@@ -308,7 +338,7 @@ if "metrics" not in st.session_state:
     st.session_state.metrics = {
         "Answer Relevancy": "N/A",
         "Faithfulness": "N/A",
-        "Context Relevancy": "N/A"
+        "Context Relevancy": "N/A",
     }
 
 # Create two columns: one for chat, one for metrics
@@ -339,53 +369,76 @@ with chat_col:
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     try:
-                        verify_user_input(current_index_info, 
-                                          retrieval_strategy=retrieval_strategy, 
-                                          qa_followup=qa_followup, 
-                                          hybrid_retrieval=hybrid_retrieval)
-                        response = query_fastapi(prompt, 
-                                                llm_name, 
-                                                temperature, 
-                                                similarity_top_k, 
-                                                retrieval_strategy, 
-                                                use_hyde, 
-                                                use_refine, 
-                                                use_node_rerank, 
-                                                qa_followup,
-                                                hybrid_retrieval,
-                                                evaluate_response)
-                        
+                        verify_user_input(
+                            current_index_info,
+                            retrieval_strategy=retrieval_strategy,
+                            qa_followup=qa_followup,
+                            hybrid_retrieval=hybrid_retrieval,
+                        )
+                        response = query_fastapi(
+                            prompt,
+                            llm_name,
+                            temperature,
+                            similarity_top_k,
+                            retrieval_strategy,
+                            use_hyde,
+                            use_refine,
+                            use_node_rerank,
+                            qa_followup,
+                            hybrid_retrieval,
+                            evaluate_response,
+                        )
+
                         if response is not None:
-                            assistant_response = response.get("response", "No response content received from the server.")
+                            assistant_response = response.get(
+                                "response",
+                                "No response content received from the server.",
+                            )
                             st.markdown(assistant_response)
                             if evaluate_response:
                                 st.session_state.metrics = {
-                                    "Answer Relevancy": response.get("answer_relevancy", "N/A"),
+                                    "Answer Relevancy": response.get(
+                                        "answer_relevancy", "N/A"
+                                    ),
                                     "Faithfulness": response.get("faithfulness", "N/A"),
-                                    "Context Relevancy": response.get("context_relevancy", "N/A")
+                                    "Context Relevancy": response.get(
+                                        "context_relevancy", "N/A"
+                                    ),
                                 }
                             # st.session_state.top_titles = extract_top_titles(response)
-                            st.session_state.chunks = extract_top_titles_and_content(response)
-                            st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+                            st.session_state.chunks = extract_top_titles_and_content(
+                                response
+                            )
+                            st.session_state.messages.append(
+                                {"role": "assistant", "content": assistant_response}
+                            )
                         else:
-                            st.error("Failed to get a response from the server. Please check the server status and try again.")
+                            st.error(
+                                "Failed to get a response from the server. Please check the server status and try again."
+                            )
                     except ValueError as e:
                         st.error(e)
 
 # Display evaluation metrics in the right column
 with metrics_col:
-    st.markdown("<h3 style='text-align: center; color: #0366d6;'>Evaluation Metrics</h3>", unsafe_allow_html=True)
+    st.markdown(
+        "<h3 style='text-align: center; color: #0366d6;'>Evaluation Metrics</h3>",
+        unsafe_allow_html=True,
+    )
     metrics_container = st.container()
     with metrics_container:
         for metric, value in st.session_state.metrics.items():
             formatted_value = f"{value:.2f}" if isinstance(value, float) else value
-            st.markdown(f"""
+            st.markdown(
+                f"""
             <div class="metric-card">
                 <p class="metric-label">{metric}</p>
                 <p class="metric-value">{formatted_value}</p>
             </div>
-            """, unsafe_allow_html=True)
-        
+            """,
+                unsafe_allow_html=True,
+            )
+
         # # Display top titles
         # if hasattr(st.session_state, 'top_titles'):
         #     st.markdown('<div class="top-docs">', unsafe_allow_html=True)
@@ -393,14 +446,17 @@ with metrics_col:
         #     for i, title in enumerate(st.session_state.top_titles, 1):
         #         st.markdown(f'<div class="doc-title">{i}. {title}</div>', unsafe_allow_html=True)
         #     st.markdown('</div>', unsafe_allow_html=True)
-                # Display top titles and expandable chunks
-        if hasattr(st.session_state, 'chunks'):
+        # Display top titles and expandable chunks
+        if hasattr(st.session_state, "chunks"):
             st.markdown('<div class="top-docs">', unsafe_allow_html=True)
             st.markdown("<h4>Top Retrieved Documents</h4>", unsafe_allow_html=True)
             for i, chunk in enumerate(st.session_state.chunks, 1):
                 with st.expander(f"{i}. {chunk['title']}"):
-                    st.markdown(f'<div class="chunk-content">{chunk["text"]}</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="chunk-content">{chunk["text"]}</div>',
+                        unsafe_allow_html=True,
+                    )
+            st.markdown("</div>", unsafe_allow_html=True)
 
 # Display a warning if the FastAPI server might not be running
-#st.sidebar.warning("Powered by Google's Gemini Models !!")
+# st.sidebar.warning("Powered by Google's Gemini Models !!")

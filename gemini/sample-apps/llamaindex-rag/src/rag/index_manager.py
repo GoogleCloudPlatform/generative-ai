@@ -14,67 +14,74 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pandas as pd
-from llama_index.core import Settings
-from llama_index.core import PromptTemplate
-from llama_index.core.retrievers import AutoMergingRetriever, VectorIndexRetriever
+import logging
+from typing import Optional
+
+import Stemmer
+from common.common import DATA_PATH
+from google.cloud import aiplatform
 from llama_index.core import (
+    PromptTemplate,
+    Settings,
+    StorageContext,
     VectorStoreIndex,
     get_response_synthesizer,
-    StorageContext
+    load_index_from_storage,
 )
 from llama_index.core.agent import ReActAgent
 from llama_index.core.chat_engine import ContextChatEngine
+from llama_index.core.retrievers import (
+    AutoMergingRetriever,
+    BaseRetriever,
+    QueryFusionRetriever,
+    VectorIndexRetriever,
+)
 from llama_index.core.tools import QueryEngineTool, ToolMetadata
-from llama_index.llms.vertex import Vertex
 from llama_index.embeddings.vertex import VertexTextEmbedding
-from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
+from llama_index.llms.vertex import Vertex
 from llama_index.retrievers.bm25 import BM25Retriever
-from llama_index.core.retrievers import BaseRetriever
-from llama_index.core.retrievers import QueryFusionRetriever
-from llama_index.core import StorageContext, VectorStoreIndex
-from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
-from llama_index.core import load_index_from_storage
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
-
-from src.rag.parent_retriever import ParentRetriever
-from src.rag.node_reranker import CustomLLMRerank
-from src.rag.async_extensions import AsyncHyDEQueryTransform, AsyncTransformQueryEngine, AsyncRetrieverQueryEngine
-from src.rag.qa_followup_retriever import QAFollowupRetriever, QARetriever
-from src.rag.prompts import Prompts
+from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
+import pandas as pd
+from src.rag.async_extensions import (
+    AsyncHyDEQueryTransform,
+    AsyncRetrieverQueryEngine,
+    AsyncTransformQueryEngine,
+)
 from src.rag.claude_vertex import ClaudeVertexLLM
-from common.common import DATA_PATH
-
-from google.cloud import aiplatform
-import logging
-import Stemmer
-from typing import Optional
+from src.rag.node_reranker import CustomLLMRerank
+from src.rag.parent_retriever import ParentRetriever
+from src.rag.prompts import Prompts
+from src.rag.qa_followup_retriever import QAFollowupRetriever, QARetriever
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
 
+
 class IndexManager(object):
-    '''
+    """
     This class manages state for vector indexes, docstores, query engines and chat engines
     across the app's lifecycle (e.g. through UI manipulations). The index_manager (instantiated)
     will be injected into all API calls that need to access its state or manipulate its state.
     This includes:
     - Switching out vector indices or docstores
     - Changing retrieval parameters (e.g. temperature, llm model, etc.)
-    '''
+    """
 
-    def __init__(self, 
-                 project_id: str,
-                location: str,
-                base_index_name: str,
-                base_endpoint_name: str,
-                qa_index_name: Optional[str],
-                qa_endpoint_name: Optional[str],
-                embeddings_model_name: str,
-                firestore_db_name: Optional[str],
-                firestore_namespace: Optional[str],
-                vs_bucket_name: str):
-        self.project_id =project_id
+    def __init__(
+        self,
+        project_id: str,
+        location: str,
+        base_index_name: str,
+        base_endpoint_name: str,
+        qa_index_name: Optional[str],
+        qa_endpoint_name: Optional[str],
+        embeddings_model_name: str,
+        firestore_db_name: Optional[str],
+        firestore_namespace: Optional[str],
+        vs_bucket_name: str,
+    ):
+        self.project_id = project_id
         self.location = location
         self.embeddings_model_name = embeddings_model_name
         self.base_index_name = base_index_name
@@ -84,23 +91,27 @@ class IndexManager(object):
         self.firestore_db_name = firestore_db_name
         self.firestore_namespace = firestore_namespace
         self.vs_bucket_name = vs_bucket_name
-        self.embed_model = VertexTextEmbedding(model_name=self.embeddings_model_name, 
-                                               project=self.project_id,
-                                               location=self.location)
+        self.embed_model = VertexTextEmbedding(
+            model_name=self.embeddings_model_name,
+            project=self.project_id,
+            location=self.location,
+        )
         self.base_index = self.get_vector_index(
-                            index_name=self.base_index_name,
-                            endpoint_name=self.base_endpoint_name,
-                            firestore_db_name=self.firestore_db_name,
-                            firestore_namespace=self.firestore_namespace)
+            index_name=self.base_index_name,
+            endpoint_name=self.base_endpoint_name,
+            firestore_db_name=self.firestore_db_name,
+            firestore_namespace=self.firestore_namespace,
+        )
         if self.qa_endpoint_name and self.qa_index_name:
             self.qa_index = self.get_vector_index(
-                                        index_name=self.qa_index_name,
-                                        endpoint_name=self.qa_endpoint_name,
-                                        firestore_db_name=self.firestore_db_name,
-                                        firestore_namespace=self.firestore_namespace)
+                index_name=self.qa_index_name,
+                endpoint_name=self.qa_endpoint_name,
+                firestore_db_name=self.firestore_db_name,
+                firestore_namespace=self.firestore_namespace,
+            )
         else:
             self.qa_index = None
-    
+
     def get_current_index_info(self):
         return {
             "base_index_name": self.base_index_name,
@@ -110,32 +121,35 @@ class IndexManager(object):
             "firestore_db_name": self.firestore_db_name,
             "firestore_namespace": self.firestore_namespace,
         }
-        
-    def get_vertex_llm(self, 
-                       llm_name: str,
-                       temperature: float,
-                       system_prompt: str):
+
+    def get_vertex_llm(self, llm_name: str, temperature: float, system_prompt: str):
         if "gemini" in llm_name:
-            llm = Vertex(model=llm_name, 
-                        max_tokens=3000, 
-                        temperature=temperature, 
-                        system_prompt=system_prompt)
+            llm = Vertex(
+                model=llm_name,
+                max_tokens=3000,
+                temperature=temperature,
+                system_prompt=system_prompt,
+            )
         elif "claude" in llm_name:
-            llm = ClaudeVertexLLM(project_id=self.project_id,
-                                region="us-east5",
-                                model_name="claude-3-5-sonnet@20240620",
-                                max_tokens=3000,
-                                system_prompt=system_prompt)
+            llm = ClaudeVertexLLM(
+                project_id=self.project_id,
+                region="us-east5",
+                model_name="claude-3-5-sonnet@20240620",
+                max_tokens=3000,
+                system_prompt=system_prompt,
+            )
         Settings.llm = llm
         return llm
 
-    def set_current_indexes(self,
-                            base_index_name,
-                            base_endpoint_name,
-                            qa_index_name: Optional[str],
-                            qa_endpoint_name: Optional[str],
-                            firestore_db_name: Optional[str],
-                            firestore_namespace: Optional[str]):
+    def set_current_indexes(
+        self,
+        base_index_name,
+        base_endpoint_name,
+        qa_index_name: Optional[str],
+        qa_endpoint_name: Optional[str],
+        firestore_db_name: Optional[str],
+        firestore_namespace: Optional[str],
+    ):
         self.base_index_name = base_index_name
         self.base_endpoint_name = base_endpoint_name
         self.qa_index_name = qa_index_name
@@ -143,28 +157,32 @@ class IndexManager(object):
         self.firestore_db_name = firestore_db_name
         self.firestore_namespace = firestore_namespace
         self.base_index = self.get_vector_index(
-                            index_name=self.base_index_name,
-                            endpoint_name=self.base_endpoint_name,
-                            firestore_db_name=self.firestore_db_name,
-                            firestore_namespace=self.firestore_namespace)
+            index_name=self.base_index_name,
+            endpoint_name=self.base_endpoint_name,
+            firestore_db_name=self.firestore_db_name,
+            firestore_namespace=self.firestore_namespace,
+        )
         if self.qa_endpoint_name and self.qa_index_name:
             self.qa_index = self.get_vector_index(
-                                        index_name=self.qa_index_name,
-                                        endpoint_name=self.qa_endpoint_name,
-                                        firestore_db_name=self.firestore_db_name,
-                                        firestore_namespace=self.firestore_namespace)
+                index_name=self.qa_index_name,
+                endpoint_name=self.qa_endpoint_name,
+                firestore_db_name=self.firestore_db_name,
+                firestore_namespace=self.firestore_namespace,
+            )
         else:
             self.qa_index = None
 
-    def get_vector_index(self, 
-                        index_name: str,
-                        endpoint_name: str,
-                        firestore_db_name: Optional[str],
-                        firestore_namespace: Optional[str]):
-        '''
-        Returns a llamaindex VectorStoreIndex object which contains a storage context, 
+    def get_vector_index(
+        self,
+        index_name: str,
+        endpoint_name: str,
+        firestore_db_name: Optional[str],
+        firestore_namespace: Optional[str],
+    ):
+        """
+        Returns a llamaindex VectorStoreIndex object which contains a storage context,
         with an accompanying local document store from google cloud storage.
-        '''
+        """
         # Initialize Vertex AI
         aiplatform.init(project=self.project_id, location=self.location)
         # Get the Vector Search index
@@ -187,81 +205,93 @@ class IndexManager(object):
             region=self.location,
             index_id=vs_index.resource_name.split("/")[-1],
             endpoint_id=vs_endpoint.resource_name.split("/")[-1],
-            gcs_bucket_name=self.vs_bucket_name
+            gcs_bucket_name=self.vs_bucket_name,
         )
         if firestore_db_name and firestore_namespace:
-            docstore = FirestoreDocumentStore.from_database(project=self.project_id,
-                                                            database=firestore_db_name,
-                                                            namespace=firestore_namespace)
+            docstore = FirestoreDocumentStore.from_database(
+                project=self.project_id,
+                database=firestore_db_name,
+                namespace=firestore_namespace,
+            )
         else:
             docstore = None
         # Create storage context
         storage_context = StorageContext.from_defaults(
-            vector_store=vector_store,
-            docstore=docstore
+            vector_store=vector_store, docstore=docstore
         )
         # Create and return the index
-        vector_store_index = VectorStoreIndex(nodes=[],
-                                                storage_context=storage_context,
-                                                embed_model=self.embed_model)
+        vector_store_index = VectorStoreIndex(
+            nodes=[], storage_context=storage_context, embed_model=self.embed_model
+        )
         return vector_store_index
-    
 
-    def get_query_engine(self,
-                        prompts: Prompts,
-                        llm_name: str = "gemini-1.5-flash", 
-                        temperature: float = 0.0,
-                        similarity_top_k: int = 5,
-                        retrieval_strategy: str = "auto_merging",
-                        use_hyde: bool = True,
-                        use_refine: bool = True,
-                        use_node_rerank: bool = False,
-                        qa_followup: bool = True,
-                        hybrid_retrieval: bool = True):
-        '''
+    def get_query_engine(
+        self,
+        prompts: Prompts,
+        llm_name: str = "gemini-1.5-flash",
+        temperature: float = 0.0,
+        similarity_top_k: int = 5,
+        retrieval_strategy: str = "auto_merging",
+        use_hyde: bool = True,
+        use_refine: bool = True,
+        use_node_rerank: bool = False,
+        qa_followup: bool = True,
+        hybrid_retrieval: bool = True,
+    ):
+        """
         Creates a llamaindex QueryEngine given a VectorStoreIndex and hyperparameters
-        '''
-        llm = self.get_vertex_llm(llm_name=llm_name, 
-                                  temperature=temperature, 
-                                  system_prompt=Prompts.system_prompt)
+        """
+        llm = self.get_vertex_llm(
+            llm_name=llm_name,
+            temperature=temperature,
+            system_prompt=Prompts.system_prompt,
+        )
         Settings.llm = llm
 
         qa_prompt = PromptTemplate(prompts.qa_prompt_tmpl)
         refine_prompt = PromptTemplate(prompts.refine_prompt_tmpl)
 
         if use_refine:
-            synth = get_response_synthesizer(text_qa_template=qa_prompt, 
-                                            refine_template=refine_prompt,
-                                            response_mode="compact",
-                                            use_async=True)
+            synth = get_response_synthesizer(
+                text_qa_template=qa_prompt,
+                refine_template=refine_prompt,
+                response_mode="compact",
+                use_async=True,
+            )
         else:
-            synth = get_response_synthesizer(text_qa_template=qa_prompt, 
-                                            response_mode="compact",
-                                            use_async=True)
-        
+            synth = get_response_synthesizer(
+                text_qa_template=qa_prompt, response_mode="compact", use_async=True
+            )
+
         base_retriever = self.base_index.as_retriever(similarity_top_k=similarity_top_k)
         if self.qa_index:
-            qa_vector_retriever = self.qa_index.as_retriever(similarity_top_k=similarity_top_k)
+            qa_vector_retriever = self.qa_index.as_retriever(
+                similarity_top_k=similarity_top_k
+            )
         else:
             qa_vector_retriever = None
         query_engine = None  # Default initialization
 
-        # Choose between retrieval strategies and configurations. 
+        # Choose between retrieval strategies and configurations.
         if retrieval_strategy == "auto_merging":
             logger.info(self.base_index.storage_context.docstore)
-            retriever = AutoMergingRetriever(base_retriever, 
-                                                self.base_index.storage_context,
-                                                verbose=True)
+            retriever = AutoMergingRetriever(
+                base_retriever, self.base_index.storage_context, verbose=True
+            )
         elif retrieval_strategy == "parent":
-            retriever = ParentRetriever(base_retriever, docstore=self.base_index.docstore)
+            retriever = ParentRetriever(
+                base_retriever, docstore=self.base_index.docstore
+            )
         elif retrieval_strategy == "baseline":
-            retriever=base_retriever
+            retriever = base_retriever
 
         if qa_followup:
-            qa_retriever = QARetriever(qa_vector_retriever=qa_vector_retriever,
-                                    docstore=self.qa_index.docstore)
-            retriever = QAFollowupRetriever(qa_retriever=qa_retriever,
-                                            base_retriever=retriever)
+            qa_retriever = QARetriever(
+                qa_vector_retriever=qa_vector_retriever, docstore=self.qa_index.docstore
+            )
+            retriever = QAFollowupRetriever(
+                qa_retriever=qa_retriever, base_retriever=retriever
+            )
 
         if hybrid_retrieval:
             bm25_retriever = BM25Retriever.from_defaults(
@@ -272,7 +302,7 @@ class IndexManager(object):
                 # The default is english for both
                 stemmer=Stemmer.Stemmer("english"),
                 language="english",
-            )   
+            )
             retriever = QueryFusionRetriever(
                 [retriever, bm25_retriever],
                 similarity_top_k=similarity_top_k,
@@ -284,59 +314,78 @@ class IndexManager(object):
             )
 
         if use_node_rerank:
-            reranker_llm = Vertex(model="gemini-1.5-flash", 
-                                max_tokens=8192, 
-                                temperature=temperature, 
-                                system_prompt=prompts.system_prompt)
+            reranker_llm = Vertex(
+                model="gemini-1.5-flash",
+                max_tokens=8192,
+                temperature=temperature,
+                system_prompt=prompts.system_prompt,
+            )
             choice_select_prompt = PromptTemplate(prompts.choice_select_prompt_tmpl)
-            llm_reranker = CustomLLMRerank(choice_batch_size=10, top_n=5, choice_select_prompt=choice_select_prompt, llm=reranker_llm)
+            llm_reranker = CustomLLMRerank(
+                choice_batch_size=10,
+                top_n=5,
+                choice_select_prompt=choice_select_prompt,
+                llm=reranker_llm,
+            )
         else:
             llm_reranker = None
-        
-        query_engine = AsyncRetrieverQueryEngine.from_args(retriever, 
-                                                            response_synthesizer=synth, 
-                                                            node_postprocessors=[llm_reranker] if llm_reranker else None)
+
+        query_engine = AsyncRetrieverQueryEngine.from_args(
+            retriever,
+            response_synthesizer=synth,
+            node_postprocessors=[llm_reranker] if llm_reranker else None,
+        )
 
         if use_hyde:
             hyde_prompt = PromptTemplate(prompts.hyde_prompt_tmpl)
-            hyde = AsyncHyDEQueryTransform(include_original=True, hyde_prompt=hyde_prompt)
-            query_engine = AsyncTransformQueryEngine(query_engine=query_engine, query_transform=hyde)
-        
+            hyde = AsyncHyDEQueryTransform(
+                include_original=True, hyde_prompt=hyde_prompt
+            )
+            query_engine = AsyncTransformQueryEngine(
+                query_engine=query_engine, query_transform=hyde
+            )
+
         self.query_engine = query_engine
         return query_engine
 
-    def get_react_agent(self,
-                        prompts: Prompts,
-                        llm_name: str = "gemini-1.5-flash",
-                        temperature: float = 0.2):
-        '''
+    def get_react_agent(
+        self,
+        prompts: Prompts,
+        llm_name: str = "gemini-1.5-flash",
+        temperature: float = 0.2,
+    ):
+        """
         Creates a ReAct agent from a given QueryEngine
-        '''
+        """
         query_engine_tools = [
-                QueryEngineTool(
-                    query_engine=self.query_engine,
-                    metadata=ToolMetadata(
-                        name="google_financials",
-                        description=(
-                            "Provides information about Google financials. "
-                            "Use a detailed plain text question as input to the tool."
-                        ),
+            QueryEngineTool(
+                query_engine=self.query_engine,
+                metadata=ToolMetadata(
+                    name="google_financials",
+                    description=(
+                        "Provides information about Google financials. "
+                        "Use a detailed plain text question as input to the tool."
                     ),
-                )]
-        llm = self.get_vertex_llm(llm_name=llm_name, 
-                                  temperature=temperature, 
-                                  system_prompt=prompts.system_prompt)
+                ),
+            )
+        ]
+        llm = self.get_vertex_llm(
+            llm_name=llm_name,
+            temperature=temperature,
+            system_prompt=prompts.system_prompt,
+        )
         Settings.llm = llm
-        agent = ReActAgent.from_tools(query_engine_tools,
-                                        llm=llm,
-                                        verbose=True,
-                                        context=prompts.system_prompt)
+        agent = ReActAgent.from_tools(
+            query_engine_tools, llm=llm, verbose=True, context=prompts.system_prompt
+        )
         return agent
 
-    def get_chat_engine(self,
-                        retriever: BaseRetriever,
-                        prompts: Prompts,
-                        llm_name: str,
-                        temperature: float):
+    def get_chat_engine(
+        self,
+        retriever: BaseRetriever,
+        prompts: Prompts,
+        llm_name: str,
+        temperature: float,
+    ):
         pass
         # TODO

@@ -15,18 +15,21 @@
 # limitations under the License.
 
 
+import os
+
 # common.py
 import yaml
-import os
+
 
 # Function to load the configuration
 def load_config():
-    config_path = os.path.join(os.path.dirname(__file__),  'config.yaml')
-    with open(config_path, 'r') as config_file:
+    config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
+    with open(config_path, "r") as config_file:
         return yaml.safe_load(config_file)
+
 
 # Load the configuration
 config = load_config()
 
 # Get the DATA_PATH from the config
-DATA_PATH = config['data_path']
+DATA_PATH = config["data_path"]
