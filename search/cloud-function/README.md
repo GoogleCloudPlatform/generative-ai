@@ -17,7 +17,7 @@ information, see the blog post
 [Your RAG powered by Google Search](https://cloud.google.com/blog/products/ai-machine-learning/rags-powered-by-google-search-technology-part-1)).
 
 If you want even more control see
-[Vertex AI APIs for building search and RAG experiences](https://cloud.google.com/generative-ai-app-builder/docs/builder-apis),
+[Vertex AI Search Component APIs](https://cloud.google.com/generative-ai-app-builder/docs/builder-apis),
 but first explore the out-of-the-box offering because it's easy to setup.
 
 This example is for the out-of-the-box Vertex AI Search supporting many
@@ -119,6 +119,6 @@ system, you're always going to need search based RAG. The better the search
 quality the better the agent response based on your source data.
 
 For more on agents, check out
-[Agent Builder Use Cases](https://cloud.google.com/products/agent-builder?hl=en#common-uses)
+[Vertex AI Agent Builder Use Cases](https://cloud.google.com/products/agent-builder?hl=en#common-uses)
 and
 [https://github.com/GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai).
