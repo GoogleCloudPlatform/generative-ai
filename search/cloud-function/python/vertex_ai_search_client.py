@@ -35,7 +35,7 @@ from dataclasses import dataclass
 import html
 import json
 import re
-from typing import Any, Dict, List, Literal, Union, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine_v1alpha as discoveryengine

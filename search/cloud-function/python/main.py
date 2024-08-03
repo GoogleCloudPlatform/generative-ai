@@ -23,7 +23,7 @@ please refer to the README.md file.
 """
 
 import os
-from typing import Dict, Tuple, Any
+from typing import Any, Dict, Tuple
 
 from flask import Flask, Request, jsonify, request
 import functions_framework
