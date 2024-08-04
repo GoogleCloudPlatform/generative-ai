@@ -59,3 +59,4 @@ jobs:
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_TYPESCRIPT_STANDARD: false # super-linter/super-linter#4445
           VALIDATE_CHECKOV: false
+          TEXTLINT_CONFIG_FILE: .textlintrc
