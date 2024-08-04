@@ -1,0 +1,92 @@
+import numpy as np
+from mpmath import mp
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Conv3D, MaxPooling3D, Dropout, Input
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import matplotlib.pyplot as plt
+
+# Configuración de precisión para obtener los dígitos de π
+mp.dps = 100000  # Ejemplo con 100,000 dígitos para fines prácticos
+pi_str = str(mp.pi)[2:]  # Obtener π como cadena sin el "3."
+
+# Función para crear teseractos
+def crear_teseracto(pi_str, lado):
+    teseracto = np.zeros((lado, lado, lado, lado))
+    idx = 0
+    for i in range(lado):
+        for j in range(lado):
+            for k in range(lado):
+                for l in range(lado):
+                    if idx < len(pi_str):
+                        teseracto[i, j, k, l] = int(pi_str[idx])
+                        idx += 1
+    return teseracto
+
+# Crear lista de teseractos
+def crear_lista_teseractos(pi_str, lado, num_teseractos):
+    teseractos = []
+    for _ in range(num_teseractos):
+        teseracto = crear_teseracto(pi_str, lado)
+        teseractos.append(teseracto)
+    return np.array(teseractos)
+
+# Función para crear el modelo de red neuronal
+def crear_modelo(input_shape):
+    model = Sequential([
+        Conv3D(64, kernel_size=3, activation='relu', input_shape=input_shape),
+        MaxPooling3D(pool_size=(2, 2, 2)),
+        Conv3D(128, kernel_size=3, activation='relu'),
+        MaxPooling3D(pool_size=(2, 2, 2)),
+        Conv3D(256, kernel_size=3, activation='relu'),
+        MaxPooling3D(pool_size=(2, 2, 2)),
+        Flatten(),
+        Dense(512, activation='relu'),
+        Dropout(0.5),
+        Dense(256, activation='relu'),
+        Dense(1, activation='linear')
+    ])
+    model.compile(optimizer='adam', loss='mse', metrics=['mae', 'mse'])
+    return model
+
+# Generación de teseractos y etiquetas ficticias para el entrenamiento
+lado = 32  # Lado del teseracto, ajustado para que el ejemplo sea práctico
+num_teseractos = 10  # Número de teseractos para el ejemplo
+teseractos = crear_lista_teseractos(pi_str, lado, num_teseractos)
+
+# Generar etiquetas ficticias para el entrenamiento
+y_train = np.random.rand(num_teseractos, 1)
+
+# Preparar los datos para entrenamiento
+X_train = teseractos.reshape(num_teseractos, lado, lado, lado, lado, 1)
+X_train_split, X_test_split, y_train_split, y_test_split = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+
+# Creación y entrenamiento del modelo
+input_shape = X_train_split.shape[1:]
+modelo = crear_modelo(input_shape)
+early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+checkpoint = ModelCheckpoint('best_model.keras', monitor='val_loss', save_best_only=True)
+
+historia = modelo.fit(
+    X_train_split, y_train_split,
+    validation_data=(X_test_split, y_test_split),
+    epochs=100,
+    callbacks=[early_stopping, checkpoint]
+)
+
+# Evaluación del modelo
+y_pred = modelo.predict(X_test_split)
+mse = mean_squared_error(y_test_split, y_pred)
+mae = mean_absolute_error(y_test_split, y_pred)
+r2 = r2_score(y_test_split, y_pred)
+print(f"MSE: {mse}, MAE: {mae}, R^2: {r2}")
+
+# Visualización del proceso de entrenamiento
+plt.plot(historia.history['loss'], label='Pérdida de Entrenamiento')
+plt.plot(historia.history['val_loss'], label='Pérdida de Validación')
+plt.title('Pérdida del Modelo')
+plt.xlabel('Época')
+plt.ylabel('Pérdida')
+plt.legend()
+plt.show()
