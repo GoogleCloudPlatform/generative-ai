@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "terminology": {
+      "terms": [
+        ["WEBSITE", "Site", { "allowlist": ["WEBSITE"] }]
+      ]
+    }
+  }
+}
