@@ -1,6 +1,6 @@
 """This module is the page for Asset Search feature"""
 
-# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, duplicate-code
+# pylint: disable=line-too-long,import-error
 
 import time as t
 

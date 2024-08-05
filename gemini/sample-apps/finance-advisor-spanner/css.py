@@ -1,6 +1,6 @@
 """This module is the page for generating CSS"""
 
-# pylint: disable=line-too-long, invalid-name, import-error, use-dict-literal, invalid-name
+# pylint: disable=line-too-long, import-error
 # Add footer
 footer = """<style>
 a:link , a:visited{
