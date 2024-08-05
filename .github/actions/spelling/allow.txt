@@ -199,6 +199,7 @@ alloydb
 antiword
 arXiv
 astype
+automl
 autoptr
 autosxs
 backticks
@@ -265,6 +266,7 @@ gboolean
 gchar
 gcloud
 gcs
+gcsfs
 gdk
 gdkx
 genai
