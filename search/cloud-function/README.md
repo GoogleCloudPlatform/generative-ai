@@ -49,10 +49,14 @@ configure Vertex AI Search.
 
 ### Type of data source
 
+<!-- textlint-disable -->
+
 - UNSTRUCTURED
 - STRUCTURED
 - WEBSITE
 - BLENDED
+
+<!-- textlint-enable -->
 
 ```python
 ENGINE_DATA_TYPE = UNSTRUCTURED
