@@ -8,14 +8,16 @@ It includes functions for:
 """
 
 import json
-from typing import Optional, List, Dict
-import pandas as pd
-from google.cloud import storage
+from typing import Dict, List, Optional
+
 import gcsfs
+from google.cloud import storage
+import pandas as pd
 
 
-def prepare_tuning_dataset_from_df(tuning_df: pd.DataFrame,
-                                   system_prompt: Optional[str] = None) -> pd.DataFrame:
+def prepare_tuning_dataset_from_df(
+    tuning_df: pd.DataFrame, system_prompt: Optional[str] = None
+) -> pd.DataFrame:
     """
     Prepares a tuning dataset from a pandas DataFrame for Gemini fine-tuning.
 
@@ -36,18 +38,22 @@ def prepare_tuning_dataset_from_df(tuning_df: pd.DataFrame,
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
-        messages.extend([
-            {"role": "user", "content": row["text"]},
-            {"role": "model", "content": row["label_text"]}
-        ])
+        messages.extend(
+            [
+                {"role": "user", "content": row["text"]},
+                {"role": "model", "content": row["label_text"]},
+            ]
+        )
         tuning_dataset.append({"messages": messages})
 
     return pd.DataFrame(tuning_dataset)
 
 
-def convert_tuning_dataset_from_automl_csv(automl_gcs_csv_path: str,
-                                           system_prompt: Optional[str] = None,
-                                           partition: str = "training") -> pd.DataFrame:
+def convert_tuning_dataset_from_automl_csv(
+    automl_gcs_csv_path: str,
+    system_prompt: Optional[str] = None,
+    partition: str = "training",
+) -> pd.DataFrame:
     """
     Converts an AutoML CSV dataset for text classification to the Gemini tuning format.
 
@@ -72,10 +78,12 @@ def convert_tuning_dataset_from_automl_csv(automl_gcs_csv_path: str,
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
-        messages.extend([
-            {"role": "user", "content": row["text"]},
-            {"role": "model", "content": row["label"]}
-        ])
+        messages.extend(
+            [
+                {"role": "user", "content": row["text"]},
+                {"role": "model", "content": row["label"]},
+            ]
+        )
         gemini_dataset.append({"messages": messages})
 
     return pd.DataFrame(gemini_dataset)
@@ -85,7 +93,7 @@ def convert_tuning_dataset_from_automl_jsonl(
     project_id: str,
     automl_gcs_jsonl_path: str,
     system_prompt: Optional[str] = None,
-    partition: str = "training"
+    partition: str = "training",
 ) -> pd.DataFrame:
     """
     Converts an AutoML JSONL dataset for text classification to the Gemini tuning format.
@@ -115,7 +123,7 @@ def convert_tuning_dataset_from_automl_jsonl(
                     "text": data["textContent"],
                     "partition": data["dataItemResourceLabels"][
                         "aiplatform.googleapis.com/ml_use"
-                    ]
+                    ],
                 }
             )
 
@@ -127,10 +135,12 @@ def convert_tuning_dataset_from_automl_jsonl(
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
-        messages.extend([
-            {"role": "user", "content": row["text"]},
-            {"role": "model", "content": row["label"]}
-        ])
+        messages.extend(
+            [
+                {"role": "user", "content": row["text"]},
+                {"role": "model", "content": row["label"]},
+            ]
+        )
         gemini_dataset.append({"messages": messages})
 
     return pd.DataFrame(gemini_dataset)
@@ -155,70 +165,82 @@ def validate_gemini_tuning_jsonl(gcs_jsonl_path: str) -> List[Dict]:
 
     errors = []
     storage_client = storage.Client()
-    bucket_name = gcs_jsonl_path.split('/')[2]
-    blob_name = '/'.join(gcs_jsonl_path.split('/')[3:])
+    bucket_name = gcs_jsonl_path.split("/")[2]
+    blob_name = "/".join(gcs_jsonl_path.split("/")[3:])
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
 
-    with blob.open('r') as f:
+    with blob.open("r") as f:
         for row_index, line in enumerate(f):
             try:
                 data = json.loads(line)
                 # Check for the presence of the "messages" key
                 if "messages" not in data:
-                    errors.append({
-                        "error_type": "Missing 'messages' key",
-                        "row_index": row_index,
-                        "message": f"Row {row_index} is missing the 'messages' key."
-                    })
+                    errors.append(
+                        {
+                            "error_type": "Missing 'messages' key",
+                            "row_index": row_index,
+                            "message": f"Row {row_index} is missing the 'messages' key.",
+                        }
+                    )
                     continue
 
                 messages = data["messages"]
                 # Check if "messages" is a list
                 if not isinstance(messages, list):
-                    errors.append({
-                        "error_type": "Invalid 'messages' type",
-                        "row_index": row_index,
-                        "message": f"Row {row_index}: 'messages' is not a list."
-                    })
+                    errors.append(
+                        {
+                            "error_type": "Invalid 'messages' type",
+                            "row_index": row_index,
+                            "message": f"Row {row_index}: 'messages' is not a list.",
+                        }
+                    )
                     continue
 
                 # Validate each message in the "messages" list
                 for message_index, message in enumerate(messages):
                     if not isinstance(message, dict):
-                        errors.append({
-                            "error_type": "Invalid message format",
-                            "row_index": row_index,
-                            "message": f"""Row {row_index},
-                            message {message_index}: Message is not a dictionary."""
-                        })
+                        errors.append(
+                            {
+                                "error_type": "Invalid message format",
+                                "row_index": row_index,
+                                "message": f"""Row {row_index},
+                            message {message_index}: Message is not a dictionary.""",
+                            }
+                        )
                         continue
 
                     # Check for required keys in each message dictionary
                     if "role" not in message or "content" not in message:
-                        errors.append({
-                            "error_type": "Missing 'role' or 'content' key",
-                            "row_index": row_index,
-                            "message": f"Row {row_index}, message {message_index}: "
-                                      "Missing 'role' or 'content' key."
-                        })
+                        errors.append(
+                            {
+                                "error_type": "Missing 'role' or 'content' key",
+                                "row_index": row_index,
+                                "message": f"Row {row_index}, message {message_index}: "
+                                "Missing 'role' or 'content' key.",
+                            }
+                        )
                         continue
 
                     # Check for valid role values
                     if message["role"] not in ["system", "user", "model"]:
-                        errors.append({
-                            "error_type": "Invalid 'role' value",
-                            "row_index": row_index,
-                            "message": f"""Row {row_index}, message {message_index}:
-                            Invalid 'role' value. Expected 'system', 'user', or 'model'."""
-                        })
+                        errors.append(
+                            {
+                                "error_type": "Invalid 'role' value",
+                                "row_index": row_index,
+                                "message": f"""Row {row_index}, message {message_index}:
+                            Invalid 'role' value. Expected 'system', 'user', or 'model'.""",
+                            }
+                        )
                         continue
 
             except json.JSONDecodeError as e:
-                errors.append({
-                    "error_type": "JSON Decode Error",
-                    "row_index": row_index,
-                    "message": f"Row {row_index}: JSON decoding error: {e}"
-                })
+                errors.append(
+                    {
+                        "error_type": "JSON Decode Error",
+                        "row_index": row_index,
+                        "message": f"Row {row_index}: JSON decoding error: {e}",
+                    }
+                )
 
     return errors
