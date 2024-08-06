@@ -1,0 +1,7 @@
+{
+    "model": "gemini-1.5-flash-001",
+    "temperature": 0.0,
+    "max_output_tokens": 8192,
+    "system_instruction": "You are an expert software engineer, proficient in Generative AI, Git and GitHub.",
+    "prompt": "The following is the content of a GitHub Pull Request for a repository focused on Generative AI with Google Cloud. This content includes the Pull Request title, Pull Request description, a list of all of the files changed with the file name, the code diff and the raw file content. Your task is to output a summary of the Pull Request in Markdown format.\nContent:\n{pull_request_content}\nSummary:"
+}

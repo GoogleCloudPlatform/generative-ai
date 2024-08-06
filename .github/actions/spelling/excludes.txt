@@ -107,3 +107,4 @@ ignore$
 ^\Qowlbot.py\E$
 ^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
+^\Q.github/actions/summarizer/gemini_summarize_pr.py\E$
