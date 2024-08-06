@@ -1,4 +1,5 @@
 AFX
+ANZ
 APIENTRY
 APSTUDIO
 Adidas
@@ -7,6 +8,7 @@ Arborio
 Arepa
 Arsan
 Ashish
+Aspeed
 Autechre
 Autorater
 BITCODE
@@ -54,6 +56,7 @@ FLX
 FMWK
 FPDF
 FTPS
+Finvest
 Firestore
 Fishburne
 Flatform
@@ -69,6 +72,7 @@ Genkit
 Gisting
 Glickman
 Googlers
+HDFC
 HIDPI
 HREDRAW
 Hamers
@@ -76,11 +80,13 @@ Hickson
 Hmmm
 Hogwarts
 Hubmann
+ICICI
 INFOPLIST
 IVF
 Jang
 Jedi
 Joji
+KNN
 Kaelen
 Kaggle
 Kamradt
@@ -102,12 +108,17 @@ Lottry
 MSCHF
 MSGSEND
 MTL
+Maarten
+Mahindra
 Mamah
+Mandiri
 Memegen
 Mewgler
 Mosher
+NARI
 NCCREATE
 NDEBUG
+NGRAMS
 NMT
 NOMINMAX
 NOZORDER
@@ -121,7 +132,9 @@ Onone
 PDFs
 PLOTLYENV
 Parmar
+Persero
 Phaidon
+Pharma
 QPM
 Qwiklabs
 RAGAS
@@ -130,7 +143,9 @@ ROOTSPAN
 RRF
 RTN
 RYDE
+Resona
 Rizzoli
+Robeco
 SDKROOT
 SEK
 SEO
@@ -147,6 +162,7 @@ Schwimmer
 Selam
 Sestero
 Shazeer
+Shenzhou
 Simpsons
 Siri
 Sketchfab
@@ -155,11 +171,14 @@ Storrer
 Strappy
 Surampudi
 TARG
+TOKENLIST
 TPU
 TPUs
 Tadao
 Tafel
+Tbk
 Tbl
+Tencent
 Testables
 Tianli
 Topolino
@@ -168,6 +187,7 @@ Tribbiani
 Tricyle
 UDFs
 USERDATA
+Unimicron
 Urs
 Uszkoreit
 VFT
@@ -185,6 +205,7 @@ Wehn
 Wnd
 Womens
 XXE
+Zijin
 Zscaler
 Zuercher
 aadd
@@ -202,6 +223,7 @@ astype
 autoptr
 autosxs
 backticks
+bagchi
 barmode
 barpolar
 baxis
@@ -222,6 +244,7 @@ colab
 coloraxis
 colorbar
 colorway
+colvis
 colwidth
 constexpr
 corpuses
@@ -259,6 +282,7 @@ forno
 freedraw
 freopen
 fromarray
+fts
 fulltext
 funtion
 gboolean
@@ -310,6 +334,7 @@ iphoneos
 ipykernel
 ipynb
 isa
+itables
 iterrows
 jegadesh
 jetbrains
@@ -342,12 +367,15 @@ mec
 meme
 memes
 metadatas
+mgrs
 mpn
 nbconvert
 nbfmt
 nbformat
 ncols
 ndarray
+ngram
+ngrams
 nlp
 nmade
 nmilitary
@@ -395,6 +423,7 @@ pymupdf
 pypdf
 pyplot
 pysftp
+pyvis
 qubit
 qubits
 ragas
