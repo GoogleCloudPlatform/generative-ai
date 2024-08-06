@@ -79,9 +79,9 @@ if [ ${#notebooks[@]} -gt 0 ]; then
       MYPY_RTN="0"
 
       if [ "$is_test" = true ]; then
-        echo "Running nbfmt..."
-        python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
-        NBFMT_RTN=$?
+        echo "Running isort..."
+        python3 -m nbqa isort "$notebook" --check --profile black
+        ISORT_RTN=$?
         echo "Running black..."
         python3 -m nbqa black "$notebook" --check
         BLACK_RTN=$?
@@ -91,9 +91,9 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         echo "Running pyupgrade..."
         python3 -m nbqa pyupgrade --exit-zero-even-if-changed "$notebook"
         PYUPGRADE_RTN=$?
-        echo "Running isort..."
-        python3 -m nbqa isort "$notebook" --check --profile black
-        ISORT_RTN=$?
+        echo "Running nbfmt..."
+        python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
+        NBFMT_RTN=$?
         echo "Running flake8..."
         python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
         FLAKE8_RTN=$?
