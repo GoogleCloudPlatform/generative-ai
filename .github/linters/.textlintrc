@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "terminology": {
+      "exclude": [
+        ["web[- ]?site(s)?", "site$1"]
+      ]
+    }
+  }
+}
