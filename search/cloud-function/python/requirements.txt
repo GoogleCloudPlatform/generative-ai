@@ -1,0 +1,7 @@
+Flask==3.0.3
+functions_framework==3.8.0
+google-cloud-discoveryengine>=0.11
+mypy==1.4.1
+protobuf==5.27.2
+pytest==8.2.2
+python-dotenv==1.0.1
