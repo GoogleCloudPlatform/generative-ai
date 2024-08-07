@@ -70,7 +70,9 @@ Gisting
 Glickman
 Googlers
 HIDPI
+HMO
 HREDRAW
+HSA
 Hamers
 Hickson
 Hmmm
@@ -342,6 +344,7 @@ mec
 meme
 memes
 metadatas
+miranda
 mpn
 nbconvert
 nbfmt
