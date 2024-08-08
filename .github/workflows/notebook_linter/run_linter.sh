@@ -80,7 +80,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
 
       if [ "$is_test" = true ]; then
         echo "Running isort..."
-        python3 -m nbqa isort "$notebook" --check --profile black
+        python3 -m nbqa isort --fss "$notebook" --check --profile black
         ISORT_RTN=$?
         echo "Running black..."
         python3 -m nbqa black "$notebook" --check
