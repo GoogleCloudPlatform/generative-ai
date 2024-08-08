@@ -83,7 +83,7 @@ You may follow these steps to contribute:
 3. **Work on your forked repository's feature branch.** This is where you will make your changes to the code.
 4. **Commit your updates on your forked repository's feature branch.** This will save your changes to your copy of the repository.
 5. **Submit a pull request to the official repository's main branch.** This will request that your changes be merged into the official repository.
-6. **Resolve any lint errors.** This will ensure that your changes are formatted correctly.
+6. **Resolve any linting errors.** This will ensure that your changes are formatted correctly.
 
 Here are some additional things to keep in mind during the process:
 
