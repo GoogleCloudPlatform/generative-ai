@@ -51,7 +51,13 @@ then you will need to manually address them before submitting your PR.
 Note: For official, only submit one notebook per PR.
 
 ```shell
-docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest your_notebook
+python3 -m pip install -U -r .github/workflows/notebook_linter/requirements.txt
+.github/workflows/notebook_linter/run_linter.sh
+```
+
+```shell
+python3 -m pip install --upgrade nox
+nox -s format
 ```
 
 ## Code Reviews
