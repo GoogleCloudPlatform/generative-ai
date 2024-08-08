@@ -51,7 +51,13 @@ then you will need to manually address them before submitting your PR.
 Note: For official, only submit one notebook per PR.
 
 ```shell
-docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest your_notebook
+python3 -m pip install -U -r .github/workflows/notebook_linter/requirements.txt
+.github/workflows/notebook_linter/run_linter.sh
+```
+
+```shell
+python3 -m pip install --upgrade nox
+nox -s format
 ```
 
 ## Code Reviews
@@ -77,7 +83,7 @@ You may follow these steps to contribute:
 3. **Work on your forked repository's feature branch.** This is where you will make your changes to the code.
 4. **Commit your updates on your forked repository's feature branch.** This will save your changes to your copy of the repository.
 5. **Submit a pull request to the official repository's main branch.** This will request that your changes be merged into the official repository.
-6. **Resolve any lint errors.** This will ensure that your changes are formatted correctly.
+6. **Resolve any linting errors.** This will ensure that your changes are formatted correctly.
 
 Here are some additional things to keep in mind during the process:
 
