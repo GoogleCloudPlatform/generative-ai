@@ -6,11 +6,11 @@ from Home import table_columns_layout_setup
 from database import display_spanner_query, semantic_query, semantic_query_ann
 from itables.streamlit import interactive_table
 import streamlit as st
+from Home import table_columns_layout_setup
 
 st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
-
 
 def asset_semantic_search() -> None:
     """This function implements Semantic Search feature"""
