@@ -2,22 +2,14 @@
 
 # pylint: disable=line-too-long,import-error
 
-import time as t
-
 from database import display_spanner_query, fts_query, like_query
 from itables.streamlit import interactive_table
 import streamlit as st
+from Home import table_columns_layout_setup
 
-st.set_page_config(
-    layout="wide",
-    page_title="FinVest Advisor",
-    page_icon="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/small-logo.png",
-    initial_sidebar_state="expanded",
-)
 st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
-
 
 def asset_search_precise() -> None:
     """This function implements Asset search LIKE Query"""
@@ -37,12 +29,12 @@ def asset_search_precise() -> None:
     if buttons:
         it_args["buttons"] = buttons
 
-    query_params = [
-        investment_strategy_pt1.strip(),
-        and_or_exclude,
-        investment_strategy_pt2.strip(),
-        investment_manager.strip(),
-    ]
+    query_params = []
+    query_params.append(investment_strategy_pt1.strip())
+    query_params.append(and_or_exclude)
+    query_params.append(investment_strategy_pt2.strip())
+    query_params.append(investment_manager.strip())
+
     with st.spinner("Querying Spanner..."):
         t.sleep(1)
 
@@ -56,37 +48,10 @@ def asset_search_precise() -> None:
 
 def asset_search() -> None:
     """This function implements Asset Search"""
-
-    st.header("FinVest Fund Advisor")
-    st.subheader("Asset Search")
-
-    st.columns([0.25, 0.25, 0.20, 0.10])
-    classes = ["display", "compact", "cell-border", "stripe"]
-    buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
-    style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
-    it_args = dict(
-        classes=classes,
-        style=style,
-    )
-
-    if buttons:
-        it_args["buttons"] = buttons
-
     query_params = []
     query_params.append(investment_strategy)
     query_params.append(investment_manager)
-
-    with st.spinner("Querying Spanner..."):
-        t.sleep(1)
-
-        return_vals = fts_query(query_params)
-        spanner_query = return_vals.get("query")
-        data = return_vals.get("data")
-
-        display_spanner_query(str(spanner_query))
-
-    interactive_table(data, caption="", **it_args)
-
+    asset_search_common(query_params,"FTS")
 
 with st.sidebar:
     with st.form("Asset Search"):

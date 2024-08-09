@@ -5,35 +5,16 @@
 from database import compliance_query, display_spanner_query
 from itables.streamlit import interactive_table
 import streamlit as st
-
-st.set_page_config(
-    layout="wide",
-    page_title="FinVest Advisor",
-    page_icon="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/small-logo.png",
-    initial_sidebar_state="expanded",
-)
+from Home import table_columns_layout_setup
 
 st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
 
-
 def compliance_search() -> None:
     """This function implements Compliance Check Graph feature"""
     st.header("FinVest Fund Advisor")
     st.subheader("Exposure Check")
-
-    st.columns([0.25, 0.25, 0.20, 0.10])
-    classes = ["display", "compact", "cell-border", "stripe"]
-    buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
-    style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
-    it_args = dict(
-        classes=classes,
-        style=style,
-    )
-
-    if buttons:
-        it_args["buttons"] = buttons
 
     query_params = []
     query_params.append(sectorOption)
@@ -44,7 +25,7 @@ def compliance_search() -> None:
         data = return_vals.get("data")
         display_spanner_query(str(spanner_query))
 
-    interactive_table(data, caption="", **it_args)
+    interactive_table(data, caption="", **table_columns_layout_setup())
 
 
 with st.sidebar:
