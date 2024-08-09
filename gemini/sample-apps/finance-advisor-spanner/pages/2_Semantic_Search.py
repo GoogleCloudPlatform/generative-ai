@@ -36,7 +36,6 @@ def asset_semantic_search() -> None:
     if buttons:
         it_args["buttons"] = buttons
 
-    query_params = []
     query_params = [investment_strategy.strip(), investment_manager.strip()]
 
     with st.spinner("Querying Spanner..."):
