@@ -11,6 +11,7 @@ st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
 
+
 def compliance_search() -> None:
     """This function implements Compliance Check Graph feature"""
     st.header("FinVest Fund Advisor")
@@ -26,6 +27,7 @@ def compliance_search() -> None:
         display_spanner_query(str(spanner_query))
 
     interactive_table(data, caption="", **table_columns_layout_setup())
+
 
 with st.sidebar:
     with st.form("Compliance Search"):

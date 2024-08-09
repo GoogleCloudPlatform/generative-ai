@@ -37,7 +37,8 @@ def table_columns_layout_setup() -> dict:
         it_args["buttons"] = buttons
     return it_args
 
-def table_columns_layout_setup() -> dict :
+
+def table_columns_layout_setup() -> dict:
     """This function implements common layouts across the pages"""
     st.columns([0.25, 0.25, 0.20, 0.10])
     classes = ["display", "compact", "cell-border", "stripe"]
