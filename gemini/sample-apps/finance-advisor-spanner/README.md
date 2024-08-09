@@ -16,7 +16,7 @@ Finally, before I recommend a fund, I also want to check the exposure to a parti
 
 With the power of Spanner's multimodel support, I can run complex workloads on a single database for relational, analytical, text and vector use cases with virtually unlimited scale, five nines of availability—including enterprise security and governance for mission critical workloads.
 
-This demo highlights [Spanner](https://cloud.google.com/spanner), integration with [Vertex AI LLMs](https://cloud.google.com/model-garden?hl=en) for both embeddings and text completion models. You will learn how Spanner can help with usecases where you run Full Text Search, Approximate Nearest neighbor search and vector similarity search.
+This demo highlights [Spanner](https://cloud.google.com/spanner), integration with [Vertex AI LLMs](https://cloud.google.com/model-garden?hl=en) for both embeddings and text completion models. You will learn how Spanner can help with use cases where you run Full Text Search, Approximate Nearest Neighbor search and vector similarity search.
 
 ## Tech Stack
 
