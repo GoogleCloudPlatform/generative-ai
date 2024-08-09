@@ -18,6 +18,7 @@ st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
 
+
 def asset_search_precise() -> None:
     """This function implements Asset search LIKE Query"""
 
