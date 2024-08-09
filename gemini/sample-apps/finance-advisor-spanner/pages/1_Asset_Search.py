@@ -37,12 +37,12 @@ def asset_search_precise() -> None:
     if buttons:
         it_args["buttons"] = buttons
 
-    query_params = []
-    query_params.append(investment_strategy_pt1.strip())
-    query_params.append(and_or_exclude)
-    query_params.append(investment_strategy_pt2.strip())
-    query_params.append(investment_manager.strip())
-
+    query_params = [
+        investment_strategy_pt1.strip(),
+        and_or_exclude,
+        investment_strategy_pt2.strip(),
+        investment_manager.strip()
+    ]
     with st.spinner("Querying Spanner..."):
         t.sleep(1)
 
