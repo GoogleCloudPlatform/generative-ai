@@ -2,7 +2,7 @@
 
 # pylint: disable=line-too-long,import-error
 
-from Home import table_columns_layout_setup
+from home import table_columns_layout_setup
 from database import display_spanner_query, fts_query, like_query
 from itables.streamlit import interactive_table
 import streamlit as st
