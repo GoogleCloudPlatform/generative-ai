@@ -4,7 +4,6 @@
 
 import time as t
 
-from css import favicon, footer
 from database import display_spanner_query, fts_query, like_query
 from itables.streamlit import interactive_table
 import streamlit as st
@@ -12,22 +11,12 @@ import streamlit as st
 st.set_page_config(
     layout="wide",
     page_title="FinVest Advisor",
-    page_icon=favicon,
+    page_icon="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/small-logo.png",
     initial_sidebar_state="expanded",
 )
 st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
-
-
-def local_css(file_name: str) -> None:
-    """This loads local css"""
-    with open(file_name, encoding="utf-8") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
-local_css("pages/styles.css")
-
 
 def asset_search_precise() -> None:
     """This function implements Asset search LIKE Query"""
@@ -130,5 +119,3 @@ if asset_search_submitted:
         asset_search_precise()
     else:
         asset_search()
-
-st.markdown(footer, unsafe_allow_html=True)

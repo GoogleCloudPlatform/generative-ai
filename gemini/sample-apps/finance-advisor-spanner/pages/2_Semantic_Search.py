@@ -2,7 +2,6 @@
 
 # pylint: disable=line-too-long,import-error
 
-from css import favicon, footer
 from database import display_spanner_query, semantic_query, semantic_query_ann
 from itables.streamlit import interactive_table
 import streamlit as st
@@ -10,7 +9,7 @@ import streamlit as st
 st.set_page_config(
     layout="wide",
     page_title="FinVest Advisor",
-    page_icon=favicon,
+    page_icon="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/small-logo.png",
     initial_sidebar_state="expanded",
 )
 st.logo(
@@ -62,5 +61,3 @@ with st.sidebar:
         asset_semantic_search_submitted = st.form_submit_button("Submit")
 if asset_semantic_search_submitted:
     asset_semantic_search()
-
-st.markdown(footer, unsafe_allow_html=True)

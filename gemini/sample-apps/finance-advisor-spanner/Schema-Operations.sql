@@ -3,7 +3,6 @@ ALTER MODEL EmbeddingsModel SET OPTIONS (
 endpoint = '//aiplatform.googleapis.com/projects/<project-name>/locations/<location>/publishers/google/models/text-embedding-003'
 )
 ;
-
 ALTER TABLE EU_MutualFunds ADD COLUMN  fund_name_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(fund_name)) HIDDEN;
 ALTER TABLE EU_MutualFunds ADD COLUMN  category_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(category)) HIDDEN;
 ALTER TABLE EU_MutualFunds ADD COLUMN  investment_strategy_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(investment_strategy)) HIDDEN;
@@ -13,15 +12,12 @@ ALTER TABLE EU_MutualFunds ADD COLUMN  morningstar_benchmark_Tokens TOKENLIST AS
 ALTER TABLE EU_MutualFunds ADD COLUMN  top5_regions_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(top5_regions)) HIDDEN;
 ALTER TABLE EU_MutualFunds ADD COLUMN  top5_holdings_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(top5_holdings)) HIDDEN;
 ALTER TABLE EU_MutualFunds ADD COLUMN  investment_managers_Substring_Tokens  TOKENLIST AS (TOKENIZE_SUBSTRING(investment_managers)) HIDDEN;
-
 ALTER TABLE
   EU_MutualFunds ADD COLUMN investment_managers_Substring_Tokens_NGRAM TOKENLIST AS ( TOKENIZE_SUBSTRING(investment_managers,
       ngram_size_min=>2,
       ngram_size_max=>3,
       relative_search_types=>["word_prefix",
       "word_suffix"])) HIDDEN;
-
-
 UPDATE EU_MutualFunds SET investment_strategy_Embedding_vector = investment_strategy_Embedding WHERE investment_strategy_Embedding is not NULL and  EXTRACT(YEAR from inception_date)  = 1958 ;
 UPDATE EU_MutualFunds SET investment_strategy_Embedding_vector = investment_strategy_Embedding WHERE investment_strategy_Embedding is not NULL and  EXTRACT(YEAR from inception_date)  = 2008;
 UPDATE EU_MutualFunds SET investment_strategy_Embedding_vector = investment_strategy_Embedding WHERE investment_strategy_Embedding is not NULL and  EXTRACT(YEAR from inception_date)  = 2004;
@@ -66,8 +62,6 @@ UPDATE EU_MutualFunds SET investment_strategy_Embedding_vector = investment_stra
 UPDATE EU_MutualFunds SET investment_strategy_Embedding_vector = investment_strategy_Embedding WHERE investment_strategy_Embedding is not NULL and  EXTRACT(YEAR from inception_date)  = 2020;
 UPDATE EU_MutualFunds SET investment_strategy_Embedding_vector = investment_strategy_Embedding WHERE investment_strategy_Embedding is not NULL and  EXTRACT(YEAR from inception_date)  = 2000;
 UPDATE EU_MutualFunds SET investment_strategy_Embedding_vector = investment_strategy_Embedding WHERE investment_strategy_Embedding is not NULL and  EXTRACT(YEAR from inception_date)  = 1992;
-
-
 CREATE SEARCH INDEX
   category_Tokens_IDX
 ON
@@ -109,8 +103,6 @@ CREATE SEARCH INDEX
 ON
   EU_MutualFunds(investment_managers_Substring_Tokens,
     investment_strategy_Tokens);
-
-
 CREATE SEARCH INDEX
   investment_managers_Substring_NgRAM_investment_Strategy_Tokens_Combo_IDX
 ON
@@ -124,15 +116,10 @@ WHERE
   investment_strategy_Embedding_vector IS NOT NULL OPTIONS ( tree_depth = 2,
     num_leaves = 40,
     distance_type = 'EUCLIDEAN' );
-
 CREATE SEARCH INDEX
   investment_managers_Substring_Tokens_with_vectors_NGRAM_IDX
 ON
   EU_MutualFunds(investment_managers_Substring_Tokens_NGRAM) STORING (investment_strategy_Embedding_vector);
-
-
-
-
 CREATE OR REPLACE PROPERTY GRAPH FundGraph NODE TABLES( Companies AS Company DEFAULT LABEL PROPERTIES ALL COLUMNS,
     EU_MutualFunds AS Fund DEFAULT LABEL PROPERTIES ALL COLUMNS EXCEPT (_Injected_SearchUid,
       _Injected_VectorIndex_InvestmentStrategyEmbeddingIndex_FP8,
@@ -147,6 +134,3 @@ CREATE OR REPLACE PROPERTY GRAPH FundGraph NODE TABLES( Companies AS Company DEF
     Company(CompanySeq) DESTINATION KEY(SectorSeq)
   REFERENCES
     Sector(SectorSeq) LABEL Belongs_To PROPERTIES ALL COLUMNS );
-
-
-
