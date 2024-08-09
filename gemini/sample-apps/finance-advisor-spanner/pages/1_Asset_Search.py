@@ -2,14 +2,15 @@
 
 # pylint: disable=line-too-long,import-error
 
+from Home import table_columns_layout_setup
 from database import display_spanner_query, fts_query, like_query
 from itables.streamlit import interactive_table
 import streamlit as st
-from Home import table_columns_layout_setup
 
 st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
+
 
 def asset_search_precise() -> None:
     """This function implements Asset search LIKE Query"""
@@ -36,7 +37,6 @@ def asset_search_precise() -> None:
     query_params.append(investment_manager.strip())
 
     with st.spinner("Querying Spanner..."):
-
         return_vals = like_query(query_params)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
@@ -50,7 +50,8 @@ def asset_search() -> None:
     query_params = []
     query_params.append(investment_strategy)
     query_params.append(investment_manager)
-    asset_search_common(query_params,"FTS")
+    asset_search_common(query_params, "FTS")
+
 
 with st.sidebar:
     with st.form("Asset Search"):
