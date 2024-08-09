@@ -20,4 +20,3 @@ st.header("Welcome")
 st.image(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/Finvest-white-removebg-preview.png"
 )
-

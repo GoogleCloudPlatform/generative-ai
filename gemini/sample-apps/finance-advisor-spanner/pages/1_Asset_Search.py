@@ -18,6 +18,7 @@ st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
 
+
 def asset_search_precise() -> None:
     """This function implements Asset search LIKE Query"""
 
@@ -40,7 +41,7 @@ def asset_search_precise() -> None:
         investment_strategy_pt1.strip(),
         and_or_exclude,
         investment_strategy_pt2.strip(),
-        investment_manager.strip()
+        investment_manager.strip(),
     ]
     with st.spinner("Querying Spanner..."):
         t.sleep(1)
