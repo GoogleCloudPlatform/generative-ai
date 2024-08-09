@@ -22,11 +22,10 @@ spanner_client = spanner.Client(client_options=options)
 instance = spanner_client.instance(instance_id)
 database = instance.database(database_id)
 
-
 def spanner_read_data(query: str, *vector_input: list) -> pd.DataFrame:
     """This function helps read data from Spanner"""
     with database.snapshot() as snapshot:
-        if len(vector_input) != 0:
+        if(len(vector_input) != 0 ):
             results = snapshot.execute_sql(
                 query,
                 params={"vector": vector_input[0]},
@@ -36,7 +35,6 @@ def spanner_read_data(query: str, *vector_input: list) -> pd.DataFrame:
         rows = list(results)
         cols = [x.name for x in results.fields]
         return pd.DataFrame(rows, columns=cols)
-
 
 def fts_query(query_params: list) -> dict:
     """This function runs Full Text Search Query"""
@@ -97,7 +95,7 @@ def semantic_query_ann(query_params: list) -> dict:
         + query_params[0]
         + '" AS content) ) ;'
     )
-    vector_input = spanner_read_data(embedding_query).values.tolist()
+    vector_input = spanner_read_data(embedding_query).values.tolist();
 
     if query_params[1].strip() != "":
         ann_query = (
@@ -109,6 +107,7 @@ def semantic_query_ann(query_params: list) -> dict:
         )
     else:
         ann_query = "SELECT fund_name, investment_strategy, investment_managers, APPROX_EUCLIDEAN_DISTANCE(investment_strategy_Embedding_vector, @vector, options => JSON '{\"num_leaves_to_search\": 10}') AS distance FROM EU_MutualFunds @{force_index = InvestmentStrategyEmbeddingIndex} WHERE investment_strategy_Embedding_vector IS NOT NULL ORDER BY distance LIMIT 100;"
+    results_df = spanner_read_data(ann_query, vector_input[0][0])
     results_df = spanner_read_data(ann_query, vector_input[0][0])
 
     return_vals = dict()
