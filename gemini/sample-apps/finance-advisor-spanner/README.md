@@ -71,7 +71,7 @@ The Finvest Spanner demo application was built using:
 
    Change the endpoint as per your project and the spanner instance location
 
-   ```bash
+   ```sql
    ALTER MODEL EmbeddingsModel SET OPTIONS (
       endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-003'
       )
