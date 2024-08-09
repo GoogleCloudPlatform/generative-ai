@@ -41,7 +41,7 @@ def asset_search_precise() -> None:
         investment_strategy_pt1.strip(),
         and_or_exclude,
         investment_strategy_pt2.strip(),
-        investment_manager.strip()
+        investment_manager.strip(),
     ]
     with st.spinner("Querying Spanner..."):
         t.sleep(1)
