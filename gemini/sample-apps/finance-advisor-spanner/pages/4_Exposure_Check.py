@@ -2,14 +2,15 @@
 
 # pylint: disable=line-too-long,import-error
 
+from Home import table_columns_layout_setup
 from database import compliance_query, display_spanner_query
 from itables.streamlit import interactive_table
 import streamlit as st
-from Home import table_columns_layout_setup
 
 st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
+
 
 def compliance_search() -> None:
     """This function implements Compliance Check Graph feature"""
