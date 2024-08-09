@@ -65,7 +65,7 @@ def asset_search_precise() -> None:
 
 
 def asset_search() -> None:
-    """This function immplements Asset Search"""
+    """This function implements Asset Search"""
 
     st.header("FinVest Fund Advisor")
     st.subheader("Asset Search")
