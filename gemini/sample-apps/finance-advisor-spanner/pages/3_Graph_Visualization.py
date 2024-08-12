@@ -1,6 +1,6 @@
 """This module is the page for Graph Visualization feature"""
 
-# pylint: disable=line-too-long,import-error
+# pylint: disable=line-too-long,import-error,invalid-name
 
 import graph_viz
 import streamlit as st
@@ -13,8 +13,8 @@ st.logo(
 )
 graph_viz.generate_graph()
 
-html_file = open("graph_viz.html", "r", encoding="utf-8")
-source_code = html_file.read()
+with open("graph_viz.html", "r", encoding="utf-8") as html_file:
+    source_code = html_file.read()
 components.html(source_code, height=950, width=900)
 
 with st.sidebar:

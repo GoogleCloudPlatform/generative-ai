@@ -1,6 +1,6 @@
 """This module is the page for Semantic Search feature"""
 
-# pylint: disable=line-too-long,import-error
+# pylint: disable=line-too-long,import-error,invalid-name
 
 from database import display_spanner_query, semantic_query, semantic_query_ann
 from home import table_columns_layout_setup
@@ -21,12 +21,12 @@ def asset_semantic_search() -> None:
 
     with st.spinner("Querying Spanner..."):
         if annVsKNN == "KNN":
-            return_vals = semantic_query(query_params)
+            semantic_return_vals = semantic_query(query_params)
         else:
-            return_vals = semantic_query_ann(query_params)
-        spanner_query = return_vals.get("query")
-        data = return_vals.get("data")
-        display_spanner_query(str(spanner_query))
+            semantic_return_vals = semantic_query_ann(query_params)
+        semantic_queries = semantic_return_vals.get("query")
+        data = semantic_return_vals.get("data")
+        display_spanner_query(str(semantic_queries))
 
     interactive_table(data, caption="", **table_columns_layout_setup())
 

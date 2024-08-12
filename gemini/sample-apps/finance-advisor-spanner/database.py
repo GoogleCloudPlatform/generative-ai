@@ -57,7 +57,7 @@ def fts_query(query_params: list) -> dict:
             + "') ) ORDER BY score DESC;"
         )
 
-    return_vals = dict()
+    return_vals = {}
     return_vals["query"] = fts_query_str
     df = spanner_read_data(fts_query_str)
 
@@ -81,7 +81,7 @@ def semantic_query(query_params: list) -> dict:
             + query_params[0]
             + "' AS content) ) ) ) AS distance FROM EU_MutualFunds WHERE investment_strategy_Embedding is not NULL  ORDER BY distance LIMIT 10;"
         )
-    return_vals = dict()
+    return_vals = {}
     return_vals["query"] = semantic_query_string
     df = spanner_read_data(semantic_query_string)
 
@@ -114,7 +114,7 @@ def semantic_query_ann(query_params: list) -> dict:
     results_df = spanner_read_data(ann_query, vector_input[0][0])
     results_df = spanner_read_data(ann_query, vector_input[0][0])
 
-    return_vals = dict()
+    return_vals = {}
     return_vals["query"] = ann_query
     return_vals["data"] = results_df
     return return_vals
@@ -136,7 +136,7 @@ def like_query(query_params: list) -> dict:
         + query_params[2]
         + "%') ) ORDER BY fund_name;"
     )
-    return_vals = dict()
+    return_vals = {}
     return_vals["query"] = precise_query
     df = spanner_read_data(precise_query)
 
@@ -154,7 +154,7 @@ def compliance_query(query_params: list) -> dict:
         + " RETURN fund_name, totalHoldings"
     )
 
-    return_vals = dict()
+    return_vals = {}
     return_vals["query"] = graph_compliance_query
     df = spanner_read_data(graph_compliance_query)
     return_vals["data"] = df
@@ -165,7 +165,7 @@ def graph_dtls_query() -> dict:
     """This function runs Graph Details  Query"""
     company_query = "select CompanySeq,name from  Companies;"
 
-    return_vals = dict()
+    return_vals = {}
     df_companies = spanner_read_data(company_query)
     return_vals["Companies"] = df_companies
 

@@ -1,6 +1,6 @@
 """This module is the page for Graph Viz Data Search feature"""
 
-# pylint: disable=import-error, line-too-long
+# pylint: disable=import-error, line-too-long, unused-variable
 
 from database import graph_dtls_query
 from pyvis.network import Network

@@ -1,6 +1,6 @@
 """This module is the page for Exposure Check Search feature"""
 
-# pylint: disable=line-too-long,import-error
+# pylint: disable=line-too-long,import-error,invalid-name
 
 from database import compliance_query, display_spanner_query
 from home import table_columns_layout_setup
@@ -21,10 +21,10 @@ def compliance_search() -> None:
     query_params.append(sectorOption)
     query_params.append(exposurePercentage)
     with st.spinner("Querying Spanner..."):
-        return_vals = compliance_query(query_params)
-        spanner_query = return_vals.get("query")
-        data = return_vals.get("data")
-        display_spanner_query(str(spanner_query))
+        compliance_vals = compliance_query(query_params)
+        compliance_queryies = compliance_vals.get("query")
+        data = compliance_vals.get("data")
+        display_spanner_query(str(compliance_queryies))
 
     interactive_table(data, caption="", **table_columns_layout_setup())
 

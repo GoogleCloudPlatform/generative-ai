@@ -1,6 +1,6 @@
 """This module is the page for Asset Search feature"""
 
-# pylint: disable=line-too-long,import-error
+# pylint: disable=line-too-long,import-error,invalid-name
 
 from database import display_spanner_query, fts_query, like_query
 from home import table_columns_layout_setup
