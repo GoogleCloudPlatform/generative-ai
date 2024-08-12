@@ -11,6 +11,7 @@ st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
 
+
 def asset_search_common(query_params: list, query_type: str) -> None:
     """This function implements Asset search common  functions"""
 
@@ -62,12 +63,9 @@ if asset_search_submitted:
             investment_strategy_pt1.strip(),
             and_or_exclude,
             investment_strategy_pt2.strip(),
-            investment_manager.strip()
+            investment_manager.strip(),
         ]
         asset_search_common(query_params, "PRECISE")
     else:
-        query_params = [
-        investment_strategy,
-        investment_manager
-        ]
+        query_params = [investment_strategy, investment_manager]
         asset_search_common(query_params, "FTS")
