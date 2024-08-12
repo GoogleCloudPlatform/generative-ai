@@ -74,7 +74,9 @@ Glickman
 Googlers
 HDFC
 HIDPI
+HMO
 HREDRAW
+HSA
 Hamers
 Hickson
 Hmmm
@@ -368,6 +370,7 @@ meme
 memes
 metadatas
 mgrs
+miranda
 mpn
 nbconvert
 nbfmt
