@@ -12,7 +12,7 @@ st.logo(
 )
 
 
-def asset_search_common(query_params: list, query_type: str) -> None:
+def asset_search_common(query_parameters: list, query_type: str) -> None:
     """This function implements Asset search common  functions"""
 
     st.header("FinVest Fund Advisor")
@@ -20,9 +20,9 @@ def asset_search_common(query_params: list, query_type: str) -> None:
 
     with st.spinner("Querying Spanner..."):
         if query_type == "PRECISE":
-            return_vals = like_query(query_params)
+            return_vals = like_query(query_parameters)
         else:
-            return_vals = fts_query(query_params)
+            return_vals = fts_query(query_parameters)
         spanner_query = return_vals.get("query")
         data = return_vals.get("data")
         display_spanner_query(str(spanner_query))
