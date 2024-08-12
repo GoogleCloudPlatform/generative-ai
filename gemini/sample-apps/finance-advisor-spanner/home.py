@@ -28,10 +28,7 @@ def table_columns_layout_setup() -> dict:
     classes = ["display", "compact", "cell-border", "stripe"]
     buttons = ["pageLength", "csvHtml5", "excelHtml5", "colvis"]
     style = "table-layout:auto;width:auto;margin:auto;caption-side:bottom"
-    it_args = dict(
-        classes=classes,
-        style=style,
-    )
+    it_args = {"classes": classes, "style": style}
 
     if buttons:
         it_args["buttons"] = buttons
