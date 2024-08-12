@@ -11,18 +11,6 @@ st.logo(
     "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/finance-advisor-spanner/images/investments.png"
 )
 
-
-def asset_search_precise() -> None:
-    """This function implements Asset search LIKE Query"""
-
-    query_params = []
-    query_params.append(investment_strategy_pt1.strip())
-    query_params.append(and_or_exclude)
-    query_params.append(investment_strategy_pt2.strip())
-    query_params.append(investment_manager.strip())
-    asset_search_common(query_params, "PRECISE")
-
-
 def asset_search_common(query_params: list, query_type: str) -> None:
     """This function implements Asset search common  functions"""
 
@@ -39,14 +27,6 @@ def asset_search_common(query_params: list, query_type: str) -> None:
         display_spanner_query(str(spanner_query))
 
     interactive_table(data, caption="", **table_columns_layout_setup())
-
-
-def asset_search() -> None:
-    """This function implements Asset Search"""
-    query_params = []
-    query_params.append(investment_strategy)
-    query_params.append(investment_manager)
-    asset_search_common(query_params, "FTS")
 
 
 with st.sidebar:
@@ -78,6 +58,16 @@ with st.sidebar:
         asset_search_submitted = st.form_submit_button("Submit")
 if asset_search_submitted:
     if precise_search:
-        asset_search_precise()
+        query_params = [
+            investment_strategy_pt1.strip(),
+            and_or_exclude,
+            investment_strategy_pt2.strip(),
+            investment_manager.strip()
+        ]
+        asset_search_common(query_params, "PRECISE")
     else:
-        asset_search()
+        query_params = [
+        investment_strategy,
+        investment_manager
+        ]
+        asset_search_common(query_params, "FTS")
