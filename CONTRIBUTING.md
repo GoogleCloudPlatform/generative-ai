@@ -90,3 +90,17 @@ Here are some additional things to keep in mind during the process:
 - **Read the [Google's Open Source Community Guidelines](https://opensource.google/conduct/).** The contribution guidelines will provide you with more information about the project and how to contribute.
 - **Test your changes.** Before you submit a pull request, make sure that your changes work as expected.
 - **Be patient.** It may take some time for your pull request to be reviewed and merged.
+
+---
+
+## For Google Employees
+
+Complete the following steps to register your GitHub account and be added as a contributor to this repository.
+
+1. Register your Github account at [go/github](https://goto.google.com/github)
+
+1. Once you have registered, go to [go/github-googlecloudplatform](https://goto.google.com/github-googlecloudplatform)and request to join the GoogleCloudPlatform organization. Check the box "I need write access on a public repository".
+
+1. You'll receive an email to your GitHub registered email to approve the request to join. Approve it.
+
+1. Request to join this team [GoogleCloudPlatform/teams/generative-ai-samples-contributors](https://github.com/orgs/GoogleCloudPlatform/teams/generative-ai-samples-contributors/members)
