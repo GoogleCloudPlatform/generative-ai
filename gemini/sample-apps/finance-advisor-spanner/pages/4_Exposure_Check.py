@@ -22,9 +22,9 @@ def compliance_search() -> None:
     query_params.append(exposurePercentage)
     with st.spinner("Querying Spanner..."):
         compliance_vals = compliance_query(query_params)
-        compliance_queryies = compliance_vals.get("query")
+        compliance_queries = compliance_vals.get("query")
         data = compliance_vals.get("data")
-        display_spanner_query(str(compliance_queryies))
+        display_spanner_query(str(compliance_queries))
 
     interactive_table(data, caption="", **table_columns_layout_setup())
 
