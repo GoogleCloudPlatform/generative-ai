@@ -1,10 +1,13 @@
-from src.rag.prompts import Prompts
-from src.rag.index_manager import IndexManager
 import os
+
+from src.rag.index_manager import IndexManager
+from src.rag.prompts import Prompts
 import yaml
 
 # Load configuration from config.yaml
-config_path = os.path.join(os.path.dirname(__file__), "..", "..", "common", "config.yaml")
+config_path = os.path.join(
+    os.path.dirname(__file__), "..", "..", "common", "config.yaml"
+)
 with open(config_path, "r") as config_file:
     config = yaml.safe_load(config_file)
 
@@ -26,13 +29,15 @@ BUCKET_NAME = config.get("docstore_bucket_name")
 # Initialize State of Prompts and Indexes
 
 prompts = Prompts()
-index_manager = IndexManager(project_id=PROJECT_ID,
-                             location=LOCATION,
-                             base_index_name=VECTOR_INDEX_NAME,
-                             base_endpoint_name=INDEX_ENDPOINT_NAME,
-                             qa_index_name=QA_INDEX_NAME,
-                             qa_endpoint_name=QA_ENDPOINT_NAME,
-                             embeddings_model_name=EMBEDDINGS_MODEL_NAME,
-                             firestore_db_name=FIRESTORE_DB_NAME,
-                             firestore_namespace=FIRESTORE_NAMESPACE,
-                             vs_bucket_name=BUCKET_NAME)
+index_manager = IndexManager(
+    project_id=PROJECT_ID,
+    location=LOCATION,
+    base_index_name=VECTOR_INDEX_NAME,
+    base_endpoint_name=INDEX_ENDPOINT_NAME,
+    qa_index_name=QA_INDEX_NAME,
+    qa_endpoint_name=QA_ENDPOINT_NAME,
+    embeddings_model_name=EMBEDDINGS_MODEL_NAME,
+    firestore_db_name=FIRESTORE_DB_NAME,
+    firestore_namespace=FIRESTORE_NAMESPACE,
+    vs_bucket_name=BUCKET_NAME,
+)

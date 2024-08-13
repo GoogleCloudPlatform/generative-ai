@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from typing import Dict
 
 system_prompt = "You are an expert assistant specializing in financial products and services.  Your primary goal is to help users understand Google's financial offerings, guidelines, and processes. You will answer questions about different financial topics (e.g., investments, loans, savings, retirement planning) and any relevant industry regulations surrounding these topics."
@@ -77,50 +77,51 @@ multi_select_prompt_tmpl = (
 )
 
 choice_select_prompt_tmpl = (
-"A list of documents is shown below. Each document has a number next to it along "
-"with a summary of the document. A question is also provided. \n"
-"Respond with the numbers of the documents "
-"you should consult to answer the question, in order of relevance, as well \n"
-"as the relevance score. The relevance score is a number from 1-10 based on "
-"how relevant you think the document is to the question.\n"
-"Do not include any documents that are not relevant to the question. \n"
-"Example format: \n"
-"Document 1:\n<summary of document 1>\n\n"
-"Document 2:\n<summary of document 2>\n\n"
-"...\n\n"
-"Document 10:\n<summary of document 10>\n\n"
-"Question: <question>\n"
-"Answer:\n"
-"Doc: 9, Relevance: 7\n"
-"Doc: 3, Relevance: 4\n"
-"Doc: 7, Relevance: 3\n\n"
-"Let's do this now and it is extremely important that you follow the EXACT format above where 1 line of output is: \n"
-"Doc: <doc_num>, Relevance: <score>\n"
-"Do not include any extra formatting whatsoever\n"
-"Go!\n\n"
-"{context_str}\n"
-"Question: {query_str}\n"
-"Answer:\n"
+    "A list of documents is shown below. Each document has a number next to it along "
+    "with a summary of the document. A question is also provided. \n"
+    "Respond with the numbers of the documents "
+    "you should consult to answer the question, in order of relevance, as well \n"
+    "as the relevance score. The relevance score is a number from 1-10 based on "
+    "how relevant you think the document is to the question.\n"
+    "Do not include any documents that are not relevant to the question. \n"
+    "Example format: \n"
+    "Document 1:\n<summary of document 1>\n\n"
+    "Document 2:\n<summary of document 2>\n\n"
+    "...\n\n"
+    "Document 10:\n<summary of document 10>\n\n"
+    "Question: <question>\n"
+    "Answer:\n"
+    "Doc: 9, Relevance: 7\n"
+    "Doc: 3, Relevance: 4\n"
+    "Doc: 7, Relevance: 3\n\n"
+    "Let's do this now and it is extremely important that you follow the EXACT format above where 1 line of output is: \n"
+    "Doc: <doc_num>, Relevance: <score>\n"
+    "Do not include any extra formatting whatsoever\n"
+    "Go!\n\n"
+    "{context_str}\n"
+    "Question: {query_str}\n"
+    "Answer:\n"
 )
 
 eval_prompt_wcontext_system = (
-"You are an advanced large language model acting as an evaluation tool for a search retrieval pipeline. You will be provided with a question, some documentation to serve as context, an LLM response, and a ground truth which represents the known source of truth or ideal answer to the question.\n"
-"Your task is to compare the LLM response to the ground truth. You must perform an in-depth analysis of the LLM response for an understanding of the question, clarity of expression, and the overall relevance of the points made. Compare these points to the key points contained in the ground truth provided. Then examine the context provided for any additional details and facts that may be included in the LLM response.\n"
-"You must place a strong emphasis on the accuracy of the facts and figures of the LLM response when compared to the ground truth. An incomplete answer that only states correct facts is better than an answer that contains even one piece of inaccurate or false information. Even one incorrect or inaccurate fact or figure should completely discredit the LLM answer as a whole, despite other parts of the answer being accurate.\n"
-"If the LLM response contains additional details or facts when compared to the ground truth, compare the additional details or facts against the information contained in the context. If and only if found to be accurate based on the context, do not discredit the LLM response but mention the additional information in your feedback.  If the additional information includes any items that appear to be document citations or references indicated by guids or other alpha-numeric strings, do not detract points from the score.\n"
+    "You are an advanced large language model acting as an evaluation tool for a search retrieval pipeline. You will be provided with a question, some documentation to serve as context, an LLM response, and a ground truth which represents the known source of truth or ideal answer to the question.\n"
+    "Your task is to compare the LLM response to the ground truth. You must perform an in-depth analysis of the LLM response for an understanding of the question, clarity of expression, and the overall relevance of the points made. Compare these points to the key points contained in the ground truth provided. Then examine the context provided for any additional details and facts that may be included in the LLM response.\n"
+    "You must place a strong emphasis on the accuracy of the facts and figures of the LLM response when compared to the ground truth. An incomplete answer that only states correct facts is better than an answer that contains even one piece of inaccurate or false information. Even one incorrect or inaccurate fact or figure should completely discredit the LLM answer as a whole, despite other parts of the answer being accurate.\n"
+    "If the LLM response contains additional details or facts when compared to the ground truth, compare the additional details or facts against the information contained in the context. If and only if found to be accurate based on the context, do not discredit the LLM response but mention the additional information in your feedback.  If the additional information includes any items that appear to be document citations or references indicated by guids or other alpha-numeric strings, do not detract points from the score.\n"
 )
 
 
 eval_prompt_wcontext_user = (
-"Assign a score on the continuous spectrum of integers from 0 to 100. Supply the score at the beginning of the response, leave a blank line, and then provide any other feedback. It is extremely important you maintain this format of response. Remember to be fair, unbiased, and thorough in your grading.\n"
-"Begin the grading process with the following question, the accepted ground_truth, the llm's response, and the provided context. Keep your assessment short and concise"
-"\n"
-"question: {question}\n"
-"ground truth: {ground_truth}\n"
-"context: {context}\n"
-"LLM response: {answer}\n"
-"score:"
+    "Assign a score on the continuous spectrum of integers from 0 to 100. Supply the score at the beginning of the response, leave a blank line, and then provide any other feedback. It is extremely important you maintain this format of response. Remember to be fair, unbiased, and thorough in your grading.\n"
+    "Begin the grading process with the following question, the accepted ground_truth, the llm's response, and the provided context. Keep your assessment short and concise"
+    "\n"
+    "question: {question}\n"
+    "ground truth: {ground_truth}\n"
+    "context: {context}\n"
+    "LLM response: {answer}\n"
+    "score:"
 )
+
 
 @dataclass
 class Prompts:
@@ -140,4 +141,3 @@ class Prompts:
 
     def to_dict(self) -> Dict[str, str]:
         return asdict(self)
-    

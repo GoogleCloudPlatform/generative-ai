@@ -14,29 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from llama_index.core.query_engine import TransformQueryEngine
-from llama_index.core.query_engine import BaseQueryEngine, RetrieverQueryEngine
-from llama_index.core.indices.query.query_transform.base import BaseQueryTransform
-from typing import Optional, List, Sequence, Dict
+import logging
+from typing import Dict, List, Optional, Sequence
+
 from llama_index.core.base.response.schema import RESPONSE_TYPE
 from llama_index.core.callbacks import CallbackManager
-from llama_index.core.schema import NodeWithScore, QueryBundle, QueryType
-from llama_index.core.service_context_elements.llm_predictor import (
-    LLMPredictorType,
-)
+from llama_index.core.indices.query.query_transform.base import BaseQueryTransform
 from llama_index.core.prompts import BasePromptTemplate
 from llama_index.core.prompts.default_prompts import DEFAULT_HYDE_PROMPT
-from llama_index.core.settings import Settings
-from llama_index.core.prompts.mixin import (
-    PromptDictType,
-    PromptMixin,
-    PromptMixinType,
+from llama_index.core.prompts.mixin import PromptDictType, PromptMixin, PromptMixinType
+from llama_index.core.query_engine import (
+    BaseQueryEngine,
+    RetrieverQueryEngine,
+    TransformQueryEngine,
 )
+from llama_index.core.schema import NodeWithScore, QueryBundle, QueryType
+from llama_index.core.service_context_elements.llm_predictor import LLMPredictorType
+from llama_index.core.settings import Settings
 from pydantic import Field
-import logging
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
+
 
 class AsyncTransformQueryEngine(BaseQueryEngine):
     """Transform query engine.
@@ -52,6 +51,7 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
         callback_manager (Optional[CallbackManager]): A callback manager.
 
     """
+
     callback_manager: CallbackManager = Field(
         default_factory=lambda: CallbackManager([]), exclude=True
     )
@@ -133,7 +133,7 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
             nodes=nodes,
             additional_source_nodes=additional_source_nodes,
         )
-    
+
     def _query(self, query_bundle: QueryBundle) -> RESPONSE_TYPE:
         """Answer a query."""
         query_bundle = self._query_transform.run(
@@ -147,8 +147,8 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
             query_bundle, metadata=self._transform_metadata
         )
         return await self._query_engine.aquery(query_bundle)
-    
-    
+
+
 class AsyncHyDEQueryTransform(BaseQueryTransform):
     """Hypothetical Document Embeddings (HyDE) query transform.
 
@@ -206,7 +206,9 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
         """Run query transform."""
         # TODO: support generating multiple hypothetical docs
         query_str = query_bundle.query_str
-        hypothetical_doc = await self._llm.apredict(self._hyde_prompt, context_str=query_str)
+        hypothetical_doc = await self._llm.apredict(
+            self._hyde_prompt, context_str=query_str
+        )
         embedding_strs = [hypothetical_doc]
         if self._include_original:
             embedding_strs.extend(query_bundle.embedding_strs)
@@ -214,10 +216,9 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
             query_str=query_str,
             custom_embedding_strs=embedding_strs,
         )
-    
+
 
 class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
-
     async def _apply_node_postprocessors(
         self, nodes: List[NodeWithScore], query_bundle: QueryBundle
     ) -> List[NodeWithScore]:
@@ -226,7 +227,7 @@ class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
                 nodes, query_bundle=query_bundle
             )
         return nodes
-    
+
     async def aretrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
         nodes = await self._retriever.aretrieve(query_bundle)
         num_nodes = len(nodes)

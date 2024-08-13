@@ -1,13 +1,16 @@
-import time, json
+import json
 import logging
-from google.cloud import documentai, storage
-from google.api_core.client_options import ClientOptions
-from llama_index.core import Document
+import time
 from typing import List, Optional
+
+from google.api_core.client_options import ClientOptions
+from google.cloud import documentai, storage
 from google.cloud.storage import Blob
+from llama_index.core import Document
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class DocAIParser:
     def __init__(
@@ -24,32 +27,46 @@ class DocAIParser:
         self._client = self._initialize_client()
 
     def _initialize_client(self):
-        options = ClientOptions(api_endpoint=f"{self.location}-documentai.googleapis.com")
+        options = ClientOptions(
+            api_endpoint=f"{self.location}-documentai.googleapis.com"
+        )
         return documentai.DocumentProcessorServiceClient(client_options=options)
 
-    def batch_parse(self, blobs: List[Blob], chunk_size: int = 500, include_ancestor_headings: bool = True, timeout_sec: int = 3600, check_in_interval_sec: int = 60):
-      try:
-          operations = self._start_batch_process(blobs, chunk_size, include_ancestor_headings)
-          print(f"Number of operations started: {len(operations)}")
-          self._wait_for_operations(operations, timeout_sec, check_in_interval_sec)
-          print("Operations completed successfully")
+    def batch_parse(
+        self,
+        blobs: List[Blob],
+        chunk_size: int = 500,
+        include_ancestor_headings: bool = True,
+        timeout_sec: int = 3600,
+        check_in_interval_sec: int = 60,
+    ):
+        try:
+            operations = self._start_batch_process(
+                blobs, chunk_size, include_ancestor_headings
+            )
+            print(f"Number of operations started: {len(operations)}")
+            self._wait_for_operations(operations, timeout_sec, check_in_interval_sec)
+            print("Operations completed successfully")
 
-          for i, operation in enumerate(operations):
-              print(f"Operation {i + 1} metadata: {operation.metadata}")
+            for i, operation in enumerate(operations):
+                print(f"Operation {i + 1} metadata: {operation.metadata}")
 
-          results = self._get_results(operations)
-          print(f"Number of results: {len(results)}")
-          parsed_docs = self._parse_from_results(results)
-          print(f"Number of parsed documents: {len(parsed_docs)}")
-          return parsed_docs, results
-      except Exception as e:
-          print(f"Error in batch_parse: {str(e)}")
-          import traceback
-          traceback.print_exc()
-          # Return any successfully parsed documents instead of raising an exception
-          return [], []
+            results = self._get_results(operations)
+            print(f"Number of results: {len(results)}")
+            parsed_docs = self._parse_from_results(results)
+            print(f"Number of parsed documents: {len(parsed_docs)}")
+            return parsed_docs, results
+        except Exception as e:
+            print(f"Error in batch_parse: {str(e)}")
+            import traceback
 
-    def _start_batch_process(self, blobs: List[Blob], chunk_size: int, include_ancestor_headings: bool):
+            traceback.print_exc()
+            # Return any successfully parsed documents instead of raising an exception
+            return [], []
+
+    def _start_batch_process(
+        self, blobs: List[Blob], chunk_size: int, include_ancestor_headings: bool
+    ):
         input_config = documentai.BatchDocumentsInputConfig(
             gcs_documents=documentai.GcsDocuments(
                 documents=[
@@ -109,7 +126,7 @@ class DocAIParser:
         results = []
         for operation in operations:
             metadata = operation.metadata
-            if hasattr(metadata, 'individual_process_statuses'):
+            if hasattr(metadata, "individual_process_statuses"):
                 for status in metadata.individual_process_statuses:
                     results.append(
                         DocAIParsingResults(
@@ -126,15 +143,23 @@ class DocAIParser:
         storage_client = storage.Client()
 
         for result in results:
-            print(f"Processing result: source_path={result.source_path}, parsed_path={result.parsed_path}")
+            print(
+                f"Processing result: source_path={result.source_path}, parsed_path={result.parsed_path}"
+            )
             if not result.parsed_path:
-                print(f"Warning: Empty parsed_path for source {result.source_path}. Skipping.")
+                print(
+                    f"Warning: Empty parsed_path for source {result.source_path}. Skipping."
+                )
                 continue
 
             try:
-                bucket_name, prefix = result.parsed_path.replace("gs://", "").split("/", 1)
+                bucket_name, prefix = result.parsed_path.replace("gs://", "").split(
+                    "/", 1
+                )
             except ValueError:
-                print(f"Error: Invalid parsed_path format for {result.source_path}. Skipping.")
+                print(
+                    f"Error: Invalid parsed_path format for {result.source_path}. Skipping."
+                )
                 continue
 
             bucket = storage_client.bucket(bucket_name)
@@ -142,59 +167,68 @@ class DocAIParser:
             print(f"Found {len(blobs)} blobs in {result.parsed_path}")
 
             for blob in blobs:
-                if blob.name.endswith('.json'):
+                if blob.name.endswith(".json"):
                     print(f"Processing JSON blob: {blob.name}")
                     try:
                         content = blob.download_as_text()
                         doc_data = json.loads(content)
 
-                        if 'chunkedDocument' in doc_data and 'chunks' in doc_data['chunkedDocument']:
-                            for chunk in doc_data['chunkedDocument']['chunks']:
+                        if (
+                            "chunkedDocument" in doc_data
+                            and "chunks" in doc_data["chunkedDocument"]
+                        ):
+                            for chunk in doc_data["chunkedDocument"]["chunks"]:
                                 doc = Document(
-                                    text=chunk['content'],
+                                    text=chunk["content"],
                                     metadata={
-                                        'chunk_id': chunk['chunkId'],
-                                        'source': result.source_path,
-                                    }
+                                        "chunk_id": chunk["chunkId"],
+                                        "source": result.source_path,
+                                    },
                                 )
                                 documents.append(doc)
-                            print(f"Created {len(doc_data['chunkedDocument']['chunks'])} documents from chunks")
+                            print(
+                                f"Created {len(doc_data['chunkedDocument']['chunks'])} documents from chunks"
+                            )
                         else:
-                            print(f"Warning: Expected 'chunkedDocument' structure not found in {blob.name}")
+                            print(
+                                f"Warning: Expected 'chunkedDocument' structure not found in {blob.name}"
+                            )
                     except Exception as e:
                         print(f"Error processing blob {blob.name}: {str(e)}")
 
         print(f"Total documents created: {len(documents)}")
         return documents
 
+
 class DocAIParsingResults:
     def __init__(self, source_path: str, parsed_path: str):
         self.source_path = source_path
         self.parsed_path = parsed_path
 
+
 class Blob:
     def __init__(self, path: str, mimetype: str):
         self.path = path
         self.mimetype = mimetype
-        
-        
+
+
 def get_or_create_docai_processor(
     project_id: str,
     location: str,
     processor_display_name: str,
     processor_id: Optional[str] = None,
     create_new: bool = False,
-    processor_type: str = "LAYOUT_PARSER_PROCESSOR"
+    processor_type: str = "LAYOUT_PARSER_PROCESSOR",
 ) -> documentai.Processor:
     client_options = ClientOptions(
-    api_endpoint=f"{location}-documentai.googleapis.com",
-    quota_project_id=project_id
+        api_endpoint=f"{location}-documentai.googleapis.com",
+        quota_project_id=project_id,
     )
     client = documentai.DocumentProcessorServiceClient(client_options=client_options)
-#     client = documentai.DocumentProcessorServiceClient(
-#         client_options=ClientOptions(api_endpoint=f"{location}-documentai.googleapis.com")
-#     )
-    
+    #     client = documentai.DocumentProcessorServiceClient(
+    #         client_options=ClientOptions(api_endpoint=f"{location}-documentai.googleapis.com")
+    #     )
+
     if not create_new:
         if processor_id:
             # Try to get the existing processor by ID
@@ -204,25 +238,27 @@ def get_or_create_docai_processor(
             except Exception as e:
                 print(f"Error getting processor by ID: {e}")
                 print("Falling back to searching by display name...")
-        
+
         # Search for the processor by display name
         parent = client.common_location_path(project_id, location)
         processors = [
-            p for p in client.list_processors(parent=parent)
+            p
+            for p in client.list_processors(parent=parent)
             if p.display_name == processor_display_name
         ]
-        
+
         if processors:
             return processors[0]
         elif not create_new:
-            raise ValueError(f"No processor found with display name '{processor_display_name}' and create_new is False")
-    
+            raise ValueError(
+                f"No processor found with display name '{processor_display_name}' and create_new is False"
+            )
+
     # If we reach here, we need to create a new processor
     parent = client.common_location_path(project_id, location)
     return client.create_processor(
         parent=parent,
         processor=documentai.Processor(
-            display_name=processor_display_name,
-            type_=processor_type
-        )
+            display_name=processor_display_name, type_=processor_type
+        ),
     )

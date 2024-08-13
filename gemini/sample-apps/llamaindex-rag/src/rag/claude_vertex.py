@@ -1,17 +1,17 @@
-from typing import Optional, List, Mapping, Any
-from pydantic import Field, PrivateAttr
+from typing import Any, List, Mapping, Optional
 
+from anthropic import AnthropicVertex, AsyncAnthropicVertex
+from llama_index.core import Settings
 from llama_index.core.callbacks import CallbackManager
 from llama_index.core.llms import (
-    CustomLLM,
     CompletionResponse,
     CompletionResponseGen,
+    CustomLLM,
     LLMMetadata,
 )
-from llama_index.core.llms.function_calling import FunctionCallingLLM
 from llama_index.core.llms.callbacks import llm_completion_callback
-from llama_index.core import Settings
-from anthropic import AnthropicVertex, AsyncAnthropicVertex
+from llama_index.core.llms.function_calling import FunctionCallingLLM
+from pydantic import Field, PrivateAttr
 
 
 class ClaudeVertexLLM(CustomLLM):
@@ -23,11 +23,13 @@ class ClaudeVertexLLM(CustomLLM):
 
     client: Any = PrivateAttr()
     async_client: Any = PrivateAttr()
-    
+
     def __init__(self, **data):
         super().__init__(**data)
         self.client = AnthropicVertex(project_id=self.project_id, region=self.region)
-        self.async_client = AsyncAnthropicVertex(project_id=self.project_id, region=self.region)
+        self.async_client = AsyncAnthropicVertex(
+            project_id=self.project_id, region=self.region
+        )
 
     @property
     def metadata(self) -> LLMMetadata:
@@ -35,7 +37,7 @@ class ClaudeVertexLLM(CustomLLM):
         return LLMMetadata(
             model_name=self.model_name,
             max_tokens=self.max_tokens,
-            system_prompt=self.system_prompt
+            system_prompt=self.system_prompt,
         )
 
     @llm_completion_callback()
@@ -52,7 +54,7 @@ class ClaudeVertexLLM(CustomLLM):
             ],
         )
         return CompletionResponse(text=message.content[0].text)
-    
+
     @llm_completion_callback()
     async def acomplete(self, prompt: str, **kwargs: Any) -> CompletionResponse:
         message = await self.async_client.messages.create(
@@ -69,20 +71,14 @@ class ClaudeVertexLLM(CustomLLM):
         return CompletionResponse(text=message.content[0].text)
 
     @llm_completion_callback()
-    def stream_complete(
-        self, prompt: str, **kwargs: Any
-    ) -> CompletionResponseGen:
+    def stream_complete(self, prompt: str, **kwargs: Any) -> CompletionResponseGen:
         with self.client.messages.stream(
             model=self.model_name,
             max_tokens=self.max_tokens,
             system=self.system_prompt,
-            messages=[
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                     ]) as stream:
-            response=""
+            messages=[{"role": "user", "content": prompt}],
+        ) as stream:
+            response = ""
             for text in stream.text_stream:
                 response += text
                 yield CompletionResponse(text=response, delta=text)

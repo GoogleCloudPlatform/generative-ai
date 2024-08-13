@@ -4,9 +4,9 @@ import streamlit as st
 st.set_page_config(layout="wide", page_title="LlamaIndex RAG Evaluation", page_icon="🏠")
 
 
-
 # Custom CSS for styling
-st.markdown("""
+st.markdown(
+    """
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
   body { font-family: 'Roboto', sans-serif; background-color: #f0f2f6; }
@@ -38,11 +38,14 @@ st.markdown("""
   
   
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Home Page Content
 st.title("LlamaIndex RAG Evaluation")
-st.markdown("""
+st.markdown(
+    """
 Welcome to the LlamaIndex RAG Evaluation application. This application leverages:
 - **LlamaIndex**: LlamaIndex is a powerful LLM orchestration framework designed for building advanced Large Language Model (LLM) applications, with a particular focus on Retrieval-Augmented Generation (RAG). It provides a comprehensive set of tools and abstractions that simplify the process of ingesting, structuring, and querying various data sources..
 - **RAGAS**: RAGAS is a framework which provides some out of the box, heuristic metrics which can be computed given this triple, namely answer faithfulness, answer relevancy, and context relevancy. We compute these on the fly with each chat interaction and display them for the user.
@@ -50,7 +53,5 @@ Welcome to the LlamaIndex RAG Evaluation application. This application leverages
 - **Cloud Run**: Google Cloud Run is a fully managed compute platform that automatically scales your stateless containers. It abstracts away the underlying infrastructure, allowing developers to focus on writing code without worrying about server management.
 
 ![Architecture](https://i.imgur.com/YjhCWzu.png)
-""")
-
-
-
+"""
+)

@@ -14,25 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''
+"""
 GCP Download utilities
-'''
-from google.cloud import storage
-from llama_index.core.schema import TextNode, NodeRelationship, RelatedNodeInfo
-from llama_index.core import Document
-import os
-import yaml
+"""
 import logging
+import os
+
+from google.cloud import storage
+from llama_index.core import Document
+from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
+import yaml
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
+
 
 class Blob:
     def __init__(self, path: str, mimetype: str):
         self.path = path
         self.mimetype = mimetype
-        
-        
+
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
     """Downloads a blob from the bucket."""
@@ -61,9 +62,15 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
             source_blob_name, bucket_name, destination_file_name
         )
     )
-    
+
+
 def download_bucket_with_transfer_manager(
-    bucket_name, prefix, delimiter=None, destination_directory="", workers=8, max_results=1000
+    bucket_name,
+    prefix,
+    delimiter=None,
+    destination_directory="",
+    workers=8,
+    max_results=1000,
 ):
     """Download all of the blobs in a bucket, concurrently in a process pool.
 
@@ -107,10 +114,18 @@ def download_bucket_with_transfer_manager(
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
 
-    blob_names = [blob.name for blob in bucket.list_blobs(prefix=prefix, delimiter=delimiter, max_results=max_results)]
+    blob_names = [
+        blob.name
+        for blob in bucket.list_blobs(
+            prefix=prefix, delimiter=delimiter, max_results=max_results
+        )
+    ]
 
     results = transfer_manager.download_many_to_path(
-        bucket, blob_names, destination_directory=destination_directory, max_workers=workers
+        bucket,
+        blob_names,
+        destination_directory=destination_directory,
+        max_workers=workers,
     )
 
     for name, result in zip(blob_names, results):
@@ -118,22 +133,29 @@ def download_bucket_with_transfer_manager(
         # the input list, in order.
 
         if isinstance(result, Exception):
-            logger.info("Failed to download {} due to exception: {}".format(name, result))
+            logger.info(
+                "Failed to download {} due to exception: {}".format(name, result)
+            )
         else:
-            logger.info("Downloaded {} to {}.".format(name, destination_directory + name))
+            logger.info(
+                "Downloaded {} to {}.".format(name, destination_directory + name)
+            )
 
 
 def link_nodes(node_list):
     for i, current_node in enumerate(node_list):
         if i > 0:  # Not the first node
             previous_node = node_list[i - 1]
-            current_node.relationships[NodeRelationship.PREVIOUS] = RelatedNodeInfo(node_id=previous_node.node_id)
+            current_node.relationships[NodeRelationship.PREVIOUS] = RelatedNodeInfo(
+                node_id=previous_node.node_id
+            )
 
         if i < len(node_list) - 1:  # Not the last node
             next_node = node_list[i + 1]
-            current_node.relationships[NodeRelationship.NEXT] = RelatedNodeInfo(node_id=next_node.node_id)
+            current_node.relationships[NodeRelationship.NEXT] = RelatedNodeInfo(
+                node_id=next_node.node_id
+            )
     return node_list
-
 
 
 def create_pdf_blob_list(bucket_name, prefix):
@@ -147,11 +169,12 @@ def create_pdf_blob_list(bucket_name, prefix):
     return [
         Blob(
             path=f"gs://{bucket_name}/{blob.name}",
-            mimetype=blob.content_type or "application/pdf"
+            mimetype=blob.content_type or "application/pdf",
         )
         for blob in blobs
-        if blob.name.lower().endswith('.pdf')
+        if blob.name.lower().endswith(".pdf")
     ]
+
 
 def upload_directory_to_gcs(local_dir_path: str, bucket_name: str, prefix: str):
     storage_client = storage.Client()
@@ -174,20 +197,22 @@ def ensure_directory_exists(directory):
     """
     os.makedirs(directory, exist_ok=True)
 
+
 def clean_text(text):
     """
     Clean and preprocess the extracted text.
     """
     import re
-    
+
     # Remove extra whitespace
-    text = re.sub(r'\s+', ' ', text).strip()
-    
+    text = re.sub(r"\s+", " ", text).strip()
+
     # Remove any non-printable characters
-    text = ''.join(char for char in text if char.isprintable() or char.isspace())
+    text = "".join(char for char in text if char.isprintable() or char.isspace())
     print(f"Cleaned text length: {len(text)}")
-    
+
     return text
+
 
 def chunk_text(text, chunk_size=512, overlap=50):
     """
@@ -195,12 +220,13 @@ def chunk_text(text, chunk_size=512, overlap=50):
     """
     words = text.split()
     chunks = []
-    
+
     for i in range(0, len(words), chunk_size - overlap):
-        chunk = ' '.join(words[i:i + chunk_size])
+        chunk = " ".join(words[i : i + chunk_size])
         chunks.append(chunk)
-    
+
     return chunks
+
 
 def create_text_nodes(chunks, metadata, chunk_size=512, overlap=50):
     """
@@ -211,12 +237,12 @@ def create_text_nodes(chunks, metadata, chunk_size=512, overlap=50):
         node = TextNode(
             text=chunk,
             metadata={
-                'chunk_id': i,
-                'chunk_size': chunk_size,
-                'chunk_overlap': overlap,
-                **metadata
-            }
+                "chunk_id": i,
+                "chunk_size": chunk_size,
+                "chunk_overlap": overlap,
+                **metadata,
+            },
         )
         nodes.append(node)
-    
+
     return link_nodes(nodes)
