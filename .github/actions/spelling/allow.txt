@@ -47,6 +47,7 @@ EHsc
 EIP
 ENU
 ESG
+Embs
 Envane
 Eventarc
 FAISS
@@ -270,6 +271,7 @@ drinkware
 dropna
 dwmapi
 ecommerce
+embs
 emojis
 etf
 eur
