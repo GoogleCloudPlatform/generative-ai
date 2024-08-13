@@ -1,5 +1,7 @@
 # Cloud Run application utilizing Streamlit Framework that demonstrates working with Vertex AI API
 
+> **NOTE:** This example uses the PaLM generative model, which will reach its [discontinuation date in October 2024](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text#model_versions). Please refer to [this updated code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/gemini-streamlit-cloudrun) for a version which uses the latest Gemini model.
+
 |           |                                              |
 | --------- | -------------------------------------------- |
 | Author(s) | [Romin Irani](https://github.com/rominirani) |
@@ -27,7 +29,7 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
    In Cloud Shell, execute the following commands:
 
    ```bash
-   export GCP_PROJECT='<Your GCP Project Id>'  # Change this
+   export GCP_PROJECT='<Your Google Cloud Project Id>'  # Change this
    export GCP_REGION='us-central1'             # If you change this, make sure region is supported by Model Garden. When in doubt, keep this.
    ```
 

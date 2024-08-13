@@ -1,0 +1,6 @@
+Flask==3.0.0
+flask-cors
+gunicorn==23.0.0
+Werkzeug==3.0.3
+google-cloud-aiplatform[langchain,reasoningengine]==1.55.0
+google-cloud-discoveryengine==0.11.10

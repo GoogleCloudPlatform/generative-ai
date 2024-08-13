@@ -2,7 +2,9 @@
 
 Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai) repository.
 
-<a href="gemini"><img src="https://lh3.googleusercontent.com/eDr6pYKs1tT0iK0nt3pPhvVlP2Wn96fbGqbWgBAARRZ7isej037g_tWobjV8zQkxOsWzJuEH8p-fksczXUOeqxGZZIo_HUCdkn8q-a4fuwATD7Q9Xrs=w2456-l100-sg-rj-c0xffffff" style="width:35em"></a>
+<!-- markdownlint-disable MD033 -->
+
+<a href="gemini"><img src="https://lh3.googleusercontent.com/eDr6pYKs1tT0iK0nt3pPhvVlP2Wn96fbGqbWgBAARRZ7isej037g_tWobjV8zQkxOsWzJuEH8p-fksczXUOeqxGZZIo_HUCdkn8q-a4fuwATD7Q9Xrs=w2456-l100-sg-rj-c0xffffff" style="width:35em" alt="Welcome to the Gemini era"></a>
 
 This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai).
 
@@ -12,7 +14,6 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
 
 [![Applied AI Summit: The cloud toolkit for generative AI](https://img.youtube.com/vi/xT7WW2SKLfE/hqdefault.jpg)](https://www.youtube.com/watch?v=xT7WW2SKLfE)
 
-<!-- markdownlint-disable MD033 -->
 <table>
 
   <tr>
@@ -22,7 +23,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
     <tr>
     <td>
-      <img src="https://storage.googleapis.com/github-repo/img/gemini/Spark__Gradient_Alpha_100px.gif" width="45px">
+      <img src="https://storage.googleapis.com/github-repo/img/gemini/Spark__Gradient_Alpha_100px.gif" width="45px" alt="Gemini">
       <br>
       <a href="gemini/"><code>gemini/</code></a>
     </td>
@@ -33,7 +34,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
-      <img src="https://www.gstatic.com/images/branding/gcpiconscolors/service_discovery/v1/24px.svg" width="40px">
+      <img src="https://www.gstatic.com/images/branding/gcpiconscolors/service_discovery/v1/24px.svg" width="40px" alt="Search">
       <br>
       <a href="search/"><code>search/</code></a>
     </td>
@@ -42,7 +43,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
-      <img src="https://www.gstatic.com/images/branding/gcpiconscolors/dialogflow_cx/v1/24px.svg" width="40px">
+      <img src="https://www.gstatic.com/images/branding/gcpiconscolors/dialogflow_cx/v1/24px.svg" width="40px" alt="Conversation">
       <br>
       <a href="conversation/"><code>conversation/</code></a>
     </td>
@@ -51,7 +52,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_note/default/40px.svg">
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_note/default/40px.svg"  alt="Language">
       <br>
       <a href="language/"><code>language/</code></a>
     </td>
@@ -75,7 +76,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/image/default/40px.svg">
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/image/default/40px.svg"  alt="Vision">
       <br>
       <a href="vision/"><code>vision/</code></a>
     </td>
@@ -93,7 +94,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/mic/default/40px.svg">
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/mic/default/40px.svg"  alt="Speech">
       <br>
       <a href="speech/"><code>speech/</code></a>
     </td>
@@ -104,7 +105,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg">
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg"  alt="Setup Env">
       <br>
       <a href="setup-env/"><code>setup-env/</code></a>
     </td>
@@ -113,7 +114,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg">
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg"  alt="Resources">
       <br>
       <a href="RESOURCES.md"><code>RESOURCES.md</code></a>
     </td>
@@ -143,7 +144,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
 - Duet AI
   - [Cymbal Superstore](https://github.com/GoogleCloudPlatform/cymbal-superstore)
 - Cloud Databases
-  - [GenAI Databases Retrieval App](https://github.com/GoogleCloudPlatform/genai-databases-retrieval-app)
+  - [Gen AI Databases Retrieval App](https://github.com/GoogleCloudPlatform/genai-databases-retrieval-app)
 - Other
   - [ai-on-gke](https://github.com/GoogleCloudPlatform/ai-on-gke)
   - [ai-infra-cluster-provisioning](https://github.com/GoogleCloudPlatform/ai-infra-cluster-provisioning)
@@ -155,6 +156,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   - [solutions-viai-edge-provisioning-configuration](https://github.com/GoogleCloudPlatform/solutions-viai-edge-provisioning-configuration)
   - [mis-ai-accelerator](https://github.com/GoogleCloudPlatform/mis-ai-accelerator)
   - [dataflow-opinion-analysis](https://github.com/GoogleCloudPlatform/dataflow-opinion-analysis)
+  - [genai-beyond-basics](https://github.com/meteatamel/genai-beyond-basics)
 
 ## Contributing
 

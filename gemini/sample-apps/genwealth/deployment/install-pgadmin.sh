@@ -67,7 +67,7 @@ EOF
 )
 echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
-# Register gemini model
+# Register Gemini model
 GEMINI_ENDPOINT="https://${REGION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${REGION}/publishers/google/models/gemini-1.0-pro:generateContent"
 sql=$(
   cat <<EOF

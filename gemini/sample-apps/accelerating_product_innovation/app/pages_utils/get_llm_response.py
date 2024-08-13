@@ -48,7 +48,7 @@ def generate_gemini(text_prompt: str) -> str:
 
 
 async def parallel_generate_search_results(query: str) -> str:
-    """Generates search results using the gemini model in a parallel
+    """Generates search results using the Gemini model in a parallel
        fashion.
 
     Args:

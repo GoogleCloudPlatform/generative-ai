@@ -569,15 +569,6 @@ PrependWithABINamepsace
 # basic auth
 (['"])[Bb]asic [-a-zA-Z=;:/0-9+]{3,}\g{-1}
 
-# base64 encoded content
-([`'"])[-a-zA-Z=;:/0-9+]{3,}=\g{-1}
-# base64 encoded content in xml/sgml
->[-a-zA-Z=;:/0-9+]{3,}=</
-# base64 encoded content, possibly wrapped in mime
-#(?:^|[\s=;:?])[-a-zA-Z=;:/0-9+]{50,}(?:[\s=;:?]|$)
-# base64 in notebooks
-base64,[A-Za-z0-9+\/=]{20,}
-
 # encoded-word
 =\?[-a-zA-Z0-9"*%]+\?[BQ]\?[^?]{0,75}\?=
 
@@ -684,4 +675,3 @@ W/"[^"]+"
 /var/folders/\w\w/[+\w]+/(?:T|-Caches-)/
 # github runner temp folders
 /home/runner/work/_temp/[-_/a-z0-9]+
-

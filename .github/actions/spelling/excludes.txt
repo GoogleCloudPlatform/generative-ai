@@ -81,6 +81,7 @@
 \.zip$
 ^\.github/actions/spelling/
 ^\Q.github/workflows/spelling.yaml\E$
+^\Q.github/workflows/notebook_linter/run_linter.sh\E$
 ^\Qgemini/function-calling/use_case_company_news_and_insights.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_1_5_pro.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_pro_vision_python.ipynb\E$
@@ -88,10 +89,13 @@
 ^\Qgemini/reasoning-engine/tutorial_google_maps_agent.ipynb\E$
 ^\Qgemini/sample-apps/image-bash-jam/images/.keep\E$
 ^\Qgemini/sample-apps/image-bash-jam/README.md\E$
+^\Qgemini/sample-apps/photo-discovery/app/linux/CMakeLists.txt\E$
+^\Qgemini/sample-apps/photo-discovery/app/windows/CMakeLists.txt\E$
 ^\Qgemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions/src/sql/provision_text_sample_table.sql\E$
 ^\Qgemini/use-cases/healthcare/react_gemini_healthcare_api.ipynb\E$
 ^\Qgemini/use-cases/intro_multimodal_use_cases.ipynb\E$
 ^\Qgemini/use-cases/retrieval-augmented-generation/intro_multimodal_rag.ipynb\E$
+^\Qgemini/use-cases/retail/product_attributes_extraction.ipynb\E$
 ^\Qlanguage/use-cases/document-qa/utils/__init__.py\E$
 ^\Qlanguage/use-cases/marketing-image-overlay/marketing_image_overlay.ipynb\E$
 ^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
@@ -100,3 +104,6 @@
 ^\Qvision/getting-started/visual_captioning.ipynb\E$
 ^\Qvision/use-cases/creating_high_quality_visual_assets_with_gemini_and_imagen.ipynb\E$
 ignore$
+^\Qowlbot.py\E$
+^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
+^\Q.github/workflows/issue_assigner/assign_issue.py\E$

@@ -34,7 +34,7 @@ You will also have access to two BigQuery stored procedures which allow you to e
 
 ### Deploying the infrastructure
 
-**Note:** Though using a new GCP project for this example is not a requirement, it might be easiest to use a new GCP project for this. This makes cleanup much easier, as you can delete the whole project to ensure all assets are removed and it ensures no potential conflicts with existing resources. You can also remove resources by running `terraform destroy` after you deploy the resources, but it will also disable the associated APIs.
+**Note:** Though using a new Google Cloud project for this example is not a requirement, it might be easiest to use a new Google Cloud project for this. This makes cleanup much easier, as you can delete the whole project to ensure all assets are removed and it ensures no potential conflicts with existing resources. You can also remove resources by running `terraform destroy` after you deploy the resources, but it will also disable the associated APIs.
 
 #### 1. Clone this repo in Cloud Shell
 
@@ -42,7 +42,7 @@ You'll need to set your Google Cloud project in Cloud Shell, clone this repo loc
 
 ```shell
 gcloud config set project <PROJECT ID>
-git clone  https://github.com/GoogleCloudPlatform/generative-ai/
+git clone https://github.com/GoogleCloudPlatform/generative-ai/
 cd ./generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions
 ```
 

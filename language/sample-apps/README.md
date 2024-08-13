@@ -2,7 +2,7 @@
 
 Looking to build Gen AI applications that integrate with Vertex AI PaLM Foundational models? Would you like to use utilize standard frameworks like Python Flask, Streamlit, Gradio to host these applications on Google Cloud? You have come to the right place.
 
-The Sample Applications listed are provided as application templates that you can use. The key goal of these applications is to get you started quickly and help you understand how you can integrate the Vertex PaLM API and the necessary commands to deploy these applications to Google Cloud.
+The Sample Applications listed are provided as application templates that you can use. The key goal of these applications is to get you started quickly and help you understand how you can integrate the Vertex AI PaLM API and the necessary commands to deploy these applications to Google Cloud.
 
 You can go through the various applications and pick an application or two that interests you. Click on any of the applications to see detailed documentation, sample template and instructions to deploy on Google Cloud.
 

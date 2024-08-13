@@ -1,7 +1,7 @@
 import { Database } from "./database";
 import { VertexAI } from "@google-cloud/vertexai";
 
-/** Use retrieval augmented search of Prospectus using AlloyDb embeddings & Gemini Pro.
+/** Use retrieval augmented search of Prospectus using AlloyDB embeddings & Gemini Pro.
  */
 export class ProspectusRag {
 
@@ -16,7 +16,7 @@ export class ProspectusRag {
     private async getContext(prompt: string, ticker: string): Promise<string[]> {
         const query = `SELECT content,
                 embedding <=> google_ml.embedding('textembedding-gecko@003', '${prompt}')::vector AS distance
-            FROM  langchain_vector_store
+            FROM langchain_vector_store
             WHERE ticker='${ticker}'
             ORDER BY distance
             LIMIT 5`;
@@ -45,7 +45,7 @@ export class ProspectusRag {
         
         if (!region) throw new Error('Missing REGION env variable.');
 
-        // Initialize Vertex with your Cloud project and location       
+        // Initialize Vertex AI with your Cloud project and location       
         const vertex_ai = new VertexAI({project: projectId, location: region});
         const model = process.env['RAG_MODEL'] ?? 'gemini-1.0-pro-001';
     
@@ -80,7 +80,7 @@ export class ProspectusRag {
         console.log('using projectid', projectId);
 
         if (!projectId)
-            throw new Error("Unable to load project id from PROJECT_ID env variable or GCP metadata");
+            throw new Error("Unable to load project id from PROJECT_ID env variable or Google Cloud metadata");
 
         return projectId;
     }

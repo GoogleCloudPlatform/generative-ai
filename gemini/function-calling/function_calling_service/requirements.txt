@@ -1,4 +1,4 @@
-google-cloud-aiplatform==1.55.0
+google-cloud-aiplatform==1.59.0
 Flask==3.0.3
-gunicorn==22.0.0
+gunicorn==23.0.0
 Werkzeug==3.0.3

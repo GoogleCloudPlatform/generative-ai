@@ -17,5 +17,5 @@ export PGPASSWORD=${ALLOYDB_PASSWORD}
 export PROJECT_ID=$(gcloud config get-value project)
 # GCS Bucket for storing prospectus PDFs
 export PROSPECTUS_BUCKET=
-# Datastore ID used by Vertex S&C
+# Datastore ID used by Vertex AI S&C
 export DATASTORE_ID=

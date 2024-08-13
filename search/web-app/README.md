@@ -33,7 +33,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 - Follow steps in [Get started with Recommendations][try_recommendations] for Unstructured Data.
 
   - Sample Data Sources used in the deployed demo:
-    - [Natural language papers from ArXiv](https://arxiv.org)
+    - [Natural language papers from arXiv](https://arxiv.org)
       - `gs://cloud-samples-data/gen-app-builder/search/arxiv`
 
 ### Dependencies
@@ -55,8 +55,8 @@ Additional features include how to search the public Cloud Knowledge Graph using
 9. Give the Cloud Run service account required permissions:
 
    ```sh
-   gcloud projects add-iam-policy-binding [PROJECT_ID] \
-      --member='serviceAccount:[PROJECT_ID]-compute@developer.gserviceaccount.com' \
+   gcloud projects add-iam-policy-binding [PROJECT_ID or PROJECT_NUMBER] \
+      --member='serviceAccount:[PROJECT_NUMBER]-compute@developer.gserviceaccount.com' \
       --role='roles/discoveryengine.viewer'
    ```
 
@@ -68,7 +68,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
 
 2. Configure Vertex AI Search
 
-   - To use the prebuilt widget provided in the Cloud Console for Enterprise, Copy the `configId` from the `<gen-search-widget>` in the `Integration > Widget` tab.
+   - To use the [prebuilt widget](https://cloud.google.com/generative-ai-app-builder/docs/add-widget), copy the `configId` from the `<gen-search-widget>` in the `Integration > Widget` tab in the [Cloud Console](https://console.cloud.google.com/gen-app-builder).
      - ![configId](img/configId.png)
      - Be sure to set authorization type as `Public Access` and add your web application url to the `Allowed Domains` once it's deployed.
      - Add the `configId` for your Search Engines to `WIDGET_CONFIGS` in `consts.py`
