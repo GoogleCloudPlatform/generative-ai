@@ -1,6 +1,4 @@
-### Building Search Applications with Vertex AI 
-#### Google Cloud's Vertex AI: Powering the Future of Search 
-
+## Google Cloud Vertex AI: Powering the Future of Search 
 
 Google Cloud Vertex AI offers a comprehensive suite of tools and services to address the above search patterns.
 
@@ -15,19 +13,19 @@ Building and managing RAG systems can be complex and can be quite nuanced. Devel
 - It can leverage layout information to parsing  tables, paragraphs, headings and other elements  in documents and chunk it more effectively. 
 - It uses a combination of keyword (sparse) and LLM (dense) based embeddings to be able to handle varied user queries better. Sparse vectors tend to directly map words to numbers and dense vectors are designed to better represent the meaning of a piece of text. 
 - It leverages advanced [neural matching](https://blog.google/products/search/improving-search-next-20-years/) between user queries and document snippets to retrieve highly relevant and ranked results for the user. Neural matching allows a retrieval engine to learn the relationships between a query’s intentions and highly relevant documents, allowing Search to recognize the context of a query instead of the simple similarity search. 
-- It provides users with LLM powered summaries with citations and is designed to scale to your search traffic. Vertex Search now also supports custom instruction templates, making it easy to create powerful competent search experiences with minimal effort. Developers can leverage the console / SDK to quickly leverage and test the OOTB agent.
+- It provides users with LLM powered summaries with citations and is designed to scale to your search traffic. Vertex AI Search now also supports custom instruction templates, making it easy to create powerful competent search experiences with minimal effort. Developers can leverage the console / SDK to quickly leverage and test the OOTB agent.
 
-Explore [this notebook example](ootb_vertex_search.ipynb) of how to leverage the Vertex Search SDK to start building your search application.
+Explore [Part 1 of this notebook example](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/search/vertex-search-options/vertex_search_ootb_customize.ipynb.ipynb) to see how to leverage the Vertex AI Agent Builder SDK to start building your search application.
 
 
 ### For greater customization 
-Vertex AI Search SDK further allows developers to integrate Vertex Search with open-source LLMs or other custom components, tailoring the search pipeline to their specific needs. As mentioned above, building end to end RAG solutions can be complex, developers might want to rely on Vertex Search as a grounding source for search results retrieval and ranking, and leverage custom LLM for the guided summary.   Vertex Search also provides grounding in Google Search and 3P commercial datasets e.g. Bloomberg market data, TR legal documents, D&B company business information.
+Vertex AI Search SDK further allows developers to integrate Vertex AI Search with open-source LLMs or other custom components, tailoring the search pipeline to their specific needs. As mentioned above, building end to end RAG solutions can be complex, developers might want to rely on Vertex AI Search as a grounding source for search results retrieval and ranking, and leverage custom LLM for the guided summary.   Vertex AI Search also provides grounding in Google Search and 3P commercial datasets e.g. Bloomberg market data, TR legal documents, D&B company business information.
 
-Find an example for Grounding Responses for Gemini mode [Example Notebook here](customize_ground_gemini_vertex_search.ipynb).
+Find an example for using Vertex AI Search to Ground Responses for Gemini mode in [Part 2 of this example notebook here](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/search/vertex-search-options/vertex_search_ootb_customize.ipynb.ipynb).
 
-Developers might already be leveraging frameworks like Langchain/ LLamaIndex for orchestration of their LLM application and would want to use Vertex Search for information retrieval. Vertex Search  has native integration with Langchain or can be enabled as an available tool in Vertex Gemini SDK to generate custom grounded responses providing developers with varied choice to build their RAG solutions
+Developers might already be leveraging frameworks like Langchain/ LLamaIndex for orchestration of their LLM application and would want to use Vertex AI Search for information retrieval. Vertex AI Search  has native integration with Langchain or can be enabled as an available tool in Vertex Gemini SDK to generate custom grounded responses providing developers with varied choice to build their RAG solutions
 
-[Here is a Notebook example](customize_langchain_vertex_search.ipynb) for leveraging Vertex Search from Langchain here.
+[Part 3 of this notebook example](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/search/vertex-search-options/vertex_search_ootb_customize.ipynb.ipynb) for leveraging Vertex AI Search from Langchain here.
 
 Vertex AI provides the essential building blocks for developers who want to construct their own end-to-end RAG solutions with full flexibility. These include APIs for document parsing, chunking, LLM text and multimodal vector embeddings, versatile vector database options (Vertex Vector Search, AlloyDB, BigQuery Vector DB), reranking APIs, and grounding checks.
 
@@ -38,4 +36,4 @@ It’s also worth noting that [Gemini 1.5 pro](https://cloud.google.com/vertex-a
 
 ![Building Search Applications with Vertex AI](search_options.png)
 
-Based on where Developers are in their journey, their orchestration framework of choice,  they can select Vertex Search OOTB capabilities or customize their search solutions with Vertex Retrievers or use the Vertex AI DIY APIs to build the end to end RAG application. Understanding your organization’s appetite towards building, maintaining and scaling RAG applications can also help guide a particular solution path. 
+Based on where Developers are in their journey, their orchestration framework of choice,  they can select Vertex AI Search OOTB capabilities or customize their search solutions with Vertex Retrievers or use the Vertex AI DIY APIs to build the end to end RAG application. Understanding your organization’s appetite towards building, maintaining and scaling RAG applications can also help guide a particular solution path. 
