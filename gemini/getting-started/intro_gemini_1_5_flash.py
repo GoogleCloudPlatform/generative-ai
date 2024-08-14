@@ -61,30 +61,42 @@
 
 # + [markdown] id="t1DnOs6rkbOy"
 # ## Overview
+# This notebook provides a practical introduction to Google's Gemini 1.5 Flash model, a powerful new AI model designed for fast and efficient processing of diverse data types.
 #
-# Gemini 1.5 Flash is a new language model from the Gemini family. This model includes the long context window of up to 1 million tokens from Gemini 1.5 Pro and is optimized for low-latency tasks. It can process text, images, audio, video, and code all together for deeper insights. Learn more about [Gemini 1.5 Flash](https://deepmind.google/technologies/gemini/flash/).
+# **What is Gemini 1.5 Flash?**
 #
-# With this tutorial, you learn how to use the Vertex AI Gemini API and the Vertex AI SDK to work with the Gemini 1.5 Flash model to:
+# Gemini 1.5 Flash is a large language model (LLM) from Google's Gemini family. It's built with a focus on speed and efficiency, while still maintaining the capabilities of its predecessors. Flash has the ability to understand and process various types of content, including text, images, audio, and video. This makes it a versatile tool for a wide range of tasks.
 #
-# - analyze audio for insights.
-# - understand videos (including their audio components).
-# - extract information from PDF documents.
-# - process images, video, audio, and text simultaneously.
-
-# + [markdown] id="61RBz8LLbxCR"
+# **What you'll learn:**
+#
+# In this notebook, you'll learn how to use Gemini 1.5 Flash through the Vertex AI SDK to:
+#
+# - Analyze audio files and extract insights.
+# - Understand video content, including spoken words.
+# - Process PDF documents and extract information.
+# - Process different types of data simultaneously (images, video, audio, and text).
+#
+# **Before you start:**
+#
+# 1. **Google Cloud Project:** Ensure you have a Google Cloud project set up. If you don't, create one at [https://console.cloud.google.com/](https://console.cloud.google.com/).
+# 2. **Vertex AI API Enablement:** Enable the Vertex AI API in your Google Cloud project. You can do this in the Google Cloud Console at [https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com).
+# 3. **Vertex AI SDK:** Install the Vertex AI SDK for Python using `pip3 install google-cloud-aiplatform`.
 # ## Getting Started
 
 # + [markdown] id="No17Cw5hgx12"
-# ### Install Vertex AI SDK for Python
+# ### Setting up Your Environment
 #
+# **Installing the Vertex AI SDK**
+#
+# Let's start by installing the Vertex AI SDK for Python, which provides the tools we'll use to interact with the Gemini model.
 
 # + id="tFy3H3aPgx12"
 # ! pip3 install --upgrade --user --quiet google-cloud-aiplatform
 
 # + [markdown] id="R5Xep4W9lq-Z"
-# ### Restart runtime
+# **Restarting the Runtime (Colab)**
 #
-# To use the newly installed packages in this Jupyter runtime, you must restart the runtime. You can do this by running the cell below, which restarts the current kernel.
+# If you're using Colab, you'll need to restart the runtime to make the newly installed packages available. Run the following cell to do so.
 
 # + id="XRvKdaPDTznN"
 import sys
@@ -102,10 +114,9 @@ if "google.colab" in sys.modules:
 #
 
 # + [markdown] id="dmWOrTJ3gx13"
-# ### Authenticate your notebook environment (Colab only)
+# **Authentication (Colab Only)**
 #
-# If you are running this notebook on Google Colab, run the cell below to authenticate your environment.
-#
+# If you're running this notebook on Google Colab, authenticate your environment to connect to your Google Cloud project.
 
 # + id="NyKGtVQjgx13"
 import sys
@@ -116,11 +127,9 @@ if "google.colab" in sys.modules:
     auth.authenticate_user()
 
 # + [markdown] id="DF4l8DTdWgPY"
-# ### Set Google Cloud project information and initialize Vertex AI SDK
+# ### Project Setup and Initialization
 #
-# To get started using Vertex AI, you must have an existing Google Cloud project and [enable the Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com).
-#
-# Learn more about [setting up a project and a development environment](https://cloud.google.com/vertex-ai/docs/start/cloud-environment).
+# **Project ID and Location:**  Set your Google Cloud project ID and the location where you want to use Vertex AI. You'll need to replace `[your-project-id]` with your actual project ID.
 
 # + id="Nqwi-5ufWp_B"
 PROJECT_ID = "[your-project-id]"  # @param {type:"string"}
@@ -131,8 +140,7 @@ import vertexai
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 # + [markdown] id="jXHfaVS66_01"
-# ### Import libraries
-#
+# ### Importing Libraries
 
 from IPython.core.interactiveshell import InteractiveShell
 
@@ -150,10 +158,9 @@ from vertexai.generative_models import (
 )
 
 # + [markdown] id="BY1nfXrqRxVX"
-# ### Load the Gemini 1.5 Flash model
+# ### Loading the Gemini 1.5 Flash Model
 #
-# To learn more about all [Gemini API models on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#gemini-models).
-#
+# Now, let's load the Gemini 1.5 Flash model using the Vertex AI SDK.  The `MODEL_ID` is set to the specific identifier for the Gemini 1.5 Flash model on Vertex AI.
 
 # + id="U7ExWmuLBdIA"
 MODEL_ID = "gemini-1.5-flash-001"  # @param {type:"string"}
@@ -161,9 +168,9 @@ MODEL_ID = "gemini-1.5-flash-001"  # @param {type:"string"}
 model = GenerativeModel(MODEL_ID)
 
 # + [markdown] id="l9OKM0-4SQf8"
-# ### Vertex AI SDK basic usage
+# ## Basic Usage Example
 #
-# Below is a simple example that demonstrates how to prompt the Gemini 1.5 Flash model using the Vertex AI SDK. Learn more about the [Gemini API parameters](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini#gemini-pro).
+# Here's a simple example to demonstrate how to use the Vertex AI SDK to interact with Gemini 1.5 Flash. We'll prompt the model to translate a sentence from English to French.
 
 # + id="FhFxrtfdSwOP"
 # Load a example model with system instructions
@@ -193,8 +200,8 @@ safety_settings = {
 }
 
 prompt = """
-  User input: I like bagels.
-  Answer:
+ User input: I like bagels.
+ Answer:
 """
 
 # Set contents to send to the model
@@ -217,10 +224,9 @@ print(f"\nFinish reason:\n{response.candidates[0].finish_reason}")
 print(f"\nSafety settings:\n{response.candidates[0].safety_ratings}")
 
 # + [markdown] id="acRxKRA-sr0j"
-# ## Audio understanding
+# ## Audio Understanding
 #
-# Gemini 1.5 Flash can directly process audio for long-context understanding.
-#
+# Gemini 1.5 Flash can work directly with audio files, providing insights and summaries.
 
 # + id="10hgCOIA4E5_"
 audio_file_path = "cloud-samples-data/generative-ai/audio/pixel.mp3"
@@ -230,13 +236,15 @@ audio_file_url = f"https://storage.googleapis.com/{audio_file_path}"
 IPython.display.Audio(audio_file_url)
 
 # + [markdown] id="9sXM19QQ4vj1"
-# #### Example 1: Summarization
+# ### Example 1: Summarizing Audio
+#
+# Let's get a summary of the audio content. We'll ask Gemini 1.5 Flash to provide chapter titles, keeping it concise.
 
 # + id="OPQ1fBk44E6L"
 prompt = """
-  Please provide a summary for the audio.
-  Provide chapter titles, be concise and short, no need to provide chapter summaries.
-  Do not make up any information that is not part of the audio and do not be verbose.
+ Please provide a summary for the audio.
+ Provide chapter titles, be concise and short, no need to provide chapter summaries.
+ Do not make up any information that is not part of the audio and do not be verbose.
 """
 
 audio_file = Part.from_uri(audio_file_uri, mime_type="audio/mpeg")
@@ -246,12 +254,14 @@ response = model.generate_content(contents)
 print(response.text)
 
 # + [markdown] id="dzA8vKgQATGL"
-# #### Example 2: Transcription
+# ### Example 2: Transcription
+#
+# In this example, we'll have Gemini 1.5 Flash transcribe the audio, including timestamps and speaker identification.
 
 # + id="buziSRMG-42a"
 prompt = """
-    Can you transcribe this interview, in the format of timecode, speaker, caption.
-    Use speaker A, speaker B, etc. to identify the speakers.
+  Can you transcribe this interview, in the format of timecode, speaker, caption.
+  Use speaker A, speaker B, etc. to identify the speakers.
 """
 
 audio_file = Part.from_uri(audio_file_uri, mime_type="audio/mpeg")
@@ -263,9 +273,9 @@ for response in responses:
     print(response.text)
 
 # + [markdown] id="_U36v4TmswAG"
-# ## Video with audio understanding
+# ## Video with Audio Understanding
 #
-# Try out Gemini 1.5 Flash's native multimodal and long context capabilities on video interleaving with audio inputs.
+# Gemini 1.5 Flash can process videos along with their audio tracks, enabling you to understand the content of both.
 
 # + id="EDswcPI0tSRk"
 video_file_path = "cloud-samples-data/generative-ai/video/pixel8.mp4"
@@ -276,8 +286,8 @@ IPython.display.Video(video_file_url, width=450)
 
 # + id="R9isZfjzCYxw"
 prompt = """
-  Provide a description of the video.
-  The description should also contain anything important which people say in the video.
+ Provide a description of the video.
+ The description should also contain anything important which people say in the video.
 """
 
 video_file = Part.from_uri(video_file_uri, mime_type="video/mp4")
@@ -287,23 +297,23 @@ response = model.generate_content(contents)
 print(response.text)
 
 # + [markdown] id="JcBZZ-bJe2yS"
-# Gemini 1.5 Flash model is able to process the video with audio, retrieve and extract textual and audio information.
+# As you can see, the model is able to extract text and audio information from the video, showing its multimodal capabilities.
 
 # + [markdown] id="3dTcKyoutS7U"
-# ## PDF document analysis
+# ## PDF Document Analysis
 #
-# You can use Gemini 1.5 Flash to process PDF documents, and analyze content, retain information, and provide answers to queries regarding the documents.
+# You can use Gemini 1.5 Flash to process PDF documents. This is useful for extracting information, summarizing content, and answering questions about the document.
 #
-# The PDF document example used here is the Gemini 1.5 paper (https://arxiv.org/pdf/2403.05530.pdf).
+# **Example: The Gemini 1.5 Paper**
 #
-# ![image.png](https://storage.googleapis.com/cloud-samples-data/generative-ai/image/gemini1.5-paper-2403.05530.png)
+# Let's try this out with the Gemini 1.5 research paper.
 
 # + id="JgKDIZUstYwV"
 pdf_file_uri = "gs://cloud-samples-data/generative-ai/pdf/2403.05530.pdf"
 
 prompt = """
-  You are a very professional document summarization specialist.
-  Please summarize the given document.
+ You are a very professional document summarization specialist.
+ Please summarize the given document.
 """
 
 pdf_file = Part.from_uri(pdf_file_uri, mime_type="application/pdf")
@@ -327,7 +337,7 @@ Instructions:
 - Look through the image and the PDF document carefully and answer the question.
 - Give a short and terse answer to the following question.
 - Do not paraphrase or reformat the text you see in the image.
-- Cite the source of page number for the PDF document provided as context.
+- Cite the source of page number for the PDF document provided as context as "(Page X)".
 
   Questions:
   - What is in the given image?
@@ -348,14 +358,12 @@ response = model.generate_content(contents)
 print(response.text)
 
 # + [markdown] id="RIwBUZTyLJh0"
-# Gemini 1.5 Flash is able to identify and locate the graph on page 10 from the PDF document.
-#
+# Gemini 1.5 Flash is capable of cross-referencing the image and the PDF document to identify the graph mentioned in the document.
 
 # + [markdown] id="s3vu8ogWs7iZ"
-# ## All modalities (images, video, audio, text) at once
+# ## All Modalities at Once
 #
-# Gemini 1.5 Flash is natively multimodal and supports interleaving of data from different modalities, it can support a mix of audio, visual, text, and
-# code inputs in the same input sequence.
+# Gemini 1.5 Flash excels at handling various data types simultaneously. You can combine images, video, audio, and text in a single input sequence.
 
 # + id="Gp216wxgiKg4"
 video_file_path = "cloud-samples-data/generative-ai/video/behind_the_scenes_pixel.mp4"
@@ -394,9 +402,4 @@ print(response.text)
 # + [markdown] id="b3iovYxOwOT7"
 # ## Conclusion
 #
-# In this tutorial, you've learned how to use Gemini 1.5 Flash with the Vertex AI SDK to:
-#
-# - analyze audio for insights.
-# - understand videos (including their audio components).
-# - extract information from PDF documents.
-# - process images, video, audio, and text simultaneously.
+# In this tutorial, you've explored the capabilities of Gemini 1.5 Flash and learned how to use it through the Vertex AI SDK. With its speed, efficiency, and multimodal understanding, Gemini 1.5 Flash opens up exciting possibilities for building innovative AI applications.
