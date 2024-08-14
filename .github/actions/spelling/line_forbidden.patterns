@@ -256,6 +256,9 @@
 # Should be Document AI
 \bDoc\s?AI\b
 
+# Should be Vertex AI Search
+\bVertex\s?Search\b
+
 # Should be Colab
 \scolab\b
 \b[Cc]ollab\b
@@ -289,3 +292,6 @@
 
 # "an" should only be before vowels.
 \ban\s+(?![FHLMNRSX][A-Z0-9]+\b)(?!hour\b)(?!honest\b)([b-df-hj-np-tv-zB-DF-HJ-NP-TV-Z]{1}\w*)
+
+# Don't use Google internal links
+((corp|prod).google.com|googleplex.com|https?://[0-9a-z][0-9a-z-]+/|(?:^|[^/.-])\b(?:go|b|cl|cr)/[a-z0-9_.-]+\b)
