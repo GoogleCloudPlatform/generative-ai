@@ -38,7 +38,7 @@
 /generative-ai/language/use-cases/prod-catalog-enrichment   @slatawa @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/sql-code-generation       @rarsan @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/sql-code-generation/sql_code_generation_langchain.ipynb @rarsan @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/search                                       @holtskinner @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/search                                       @agarwal22megha @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/search/retrieval-augmented-generation        @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/getting-started                       @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/use-cases/storytelling                @holtskinner @GoogleCloudPlatform/generative-ai-devrel
