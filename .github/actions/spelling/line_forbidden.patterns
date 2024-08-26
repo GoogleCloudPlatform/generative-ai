@@ -262,7 +262,7 @@
 # Should be Colab
 \scolabs?\b
 \b[Cc]ollabs?\b
-\s[Cc]oLabs?\b
+\b[Cc]oLabs?\b
 
 # Should be Kaggle
 \skaggle\b
