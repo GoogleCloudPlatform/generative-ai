@@ -256,6 +256,9 @@
 # Should be Document AI
 \bDoc\s?AI\b
 
+# Should be Vertex AI Search
+\bVertex\s?Search\b
+
 # Should be Colab
 \scolab\b
 \b[Cc]ollab\b

@@ -47,6 +47,7 @@ EHsc
 EIP
 ENU
 ESG
+Embs
 Envane
 Eventarc
 FAISS
@@ -83,6 +84,7 @@ Hmmm
 Hogwarts
 Hubmann
 ICICI
+ICML
 INFOPLIST
 IVF
 Jang
@@ -131,6 +133,7 @@ Oberst
 Olgivanna
 Omnibox
 Onone
+Oort
 PDFs
 PLOTLYENV
 Parmar
@@ -222,6 +225,7 @@ alloydb
 antiword
 arXiv
 astype
+automl
 autoptr
 autosxs
 backticks
@@ -265,10 +269,12 @@ dino
 diy
 docai
 dpi
+draig
 drinkware
 dropna
 dwmapi
 ecommerce
+embs
 emojis
 etf
 eur
@@ -291,6 +297,7 @@ gboolean
 gchar
 gcloud
 gcs
+gcsfs
 gdk
 gdkx
 genai
@@ -358,6 +365,7 @@ linecolor
 linted
 llm
 llms
+logprobs
 lparam
 lxml
 lycra
