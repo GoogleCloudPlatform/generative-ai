@@ -97,9 +97,9 @@ Here are some additional things to keep in mind during the process:
 
 Complete the following steps to register your GitHub account and be added as a contributor to this repository.
 
-1. Register your GitHub account at [go/github](https://goto.google.com/github)
+1. Register your GitHub account at [go/github](http://go/github)
 
-1. Once you have registered, go to [go/github-googlecloudplatform](https://goto.google.com/github-googlecloudplatform) and request to join the GoogleCloudPlatform organization. Check the box "I need write access on a public repository".
+1. Once you have registered, go to [go/github-googlecloudplatform](http://go/github-googlecloudplatform) and request to join the GoogleCloudPlatform organization. Check the box "I need write access on a public repository".
 
 1. You'll receive an email to your GitHub registered email to approve the request to join. Approve it.
 
