@@ -1,7 +1,7 @@
 import os
 
-from src.rag.index_manager import IndexManager
-from src.rag.prompts import Prompts
+from backend.rag.index_manager import IndexManager
+from backend.rag.prompts import Prompts
 import yaml
 from common.utils import load_config
 

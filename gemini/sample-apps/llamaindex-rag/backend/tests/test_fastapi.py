@@ -4,9 +4,9 @@ import json
 from fastapi.testclient import TestClient
 import pandas as pd
 import pytest
-from src.app.main import app
-from src.rag.index_manager import IndexManager
-from src.rag.prompts import Prompts
+from backend.app.main import app
+from backend.rag.index_manager import IndexManager
+from backend.rag.prompts import Prompts
 
 
 @pytest.fixture

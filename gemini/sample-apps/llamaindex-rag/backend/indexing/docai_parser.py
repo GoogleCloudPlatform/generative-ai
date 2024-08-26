@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from google.api_core.client_options import ClientOptions
 from google.cloud import documentai, storage
@@ -39,7 +39,7 @@ class DocAIParser:
         include_ancestor_headings: bool = True,
         timeout_sec: int = 3600,
         check_in_interval_sec: int = 60,
-    ):
+    ) -> Tuple[List[str], List[str]]:
         try:
             operations = self._start_batch_process(
                 blobs, chunk_size, include_ancestor_headings

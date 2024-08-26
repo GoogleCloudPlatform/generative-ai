@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from src.app.models import RAGRequest
-from src.app.dependencies import get_index_manager, get_prompts
+from backend.app.models import RAGRequest
+from backend.app.dependencies import get_index_manager, get_prompts
 from ragas.metrics import answer_relevancy, faithfulness, context_relevancy
 from datasets import Dataset
 from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
@@ -16,7 +16,7 @@ async def query_rag(
     rag_request: RAGRequest,
     index_manager=Depends(get_index_manager),
     prompts=Depends(get_prompts),
-):
+) -> dict:
     query_engine = index_manager.get_query_engine(
         prompts=prompts,
         llm_name=rag_request.llm_name,

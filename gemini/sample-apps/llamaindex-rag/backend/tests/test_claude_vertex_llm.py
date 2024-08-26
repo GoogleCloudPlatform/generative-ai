@@ -1,4 +1,4 @@
-from src.rag.claude_vertex import ClaudeVertexLLM
+from backend.rag.claude_vertex import ClaudeVertexLLM
 
 
 def test_claude_vertex_llm():

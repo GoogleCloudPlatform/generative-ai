@@ -1,6 +1,6 @@
 import os
 
-from src.rag.index_manager import IndexManager
+from backend.rag.index_manager import IndexManager
 import yaml
 
 # Load configuration from config.yaml

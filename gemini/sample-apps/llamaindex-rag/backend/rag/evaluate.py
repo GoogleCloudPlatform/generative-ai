@@ -23,7 +23,7 @@ from google.cloud import bigquery
 from llama_index.core.base.response.schema import Response
 from llama_index.core.chat_engine.types import AgentChatResponse
 import pandas as pd
-from src.rag.claude_vertex import ClaudeVertexLLM
+from backend.rag.claude_vertex import ClaudeVertexLLM
 from vertexai.generative_models import (
     GenerationConfig,
     GenerativeModel,

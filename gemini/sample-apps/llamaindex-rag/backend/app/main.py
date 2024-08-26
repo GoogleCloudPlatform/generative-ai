@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.app.routers import prompts, indexes, rag, evaluation
+from backend.app.routers import prompts, indexes, rag, evaluation
 from common.utils import load_config
 import logging
 import yaml

@@ -1,6 +1,6 @@
 # Project and environment settings
-project_id: "<your project id>"
-location: "<your region>"
+project_id: "sysco-smarter-catalog"
+location: "us-central1"
 
 # Data and storage settings
 data_path: '{base_path}/data/data'

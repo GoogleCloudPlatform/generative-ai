@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.app.models import PromptUpdate
-from src.app.dependencies import get_prompts
+from backend.app.models import PromptUpdate
+from backend.app.dependencies import get_prompts
 
 router = APIRouter()
 
 @router.get("/get_all_prompts")
-async def get_all_prompts(prompts=Depends(get_prompts)):
+async def get_all_prompts(prompts=Depends(get_prompts)) -> dict:
     return prompts.to_dict()
 
 @router.post("/update_prompt")
-async def update_prompt(prompt_update: PromptUpdate, prompts=Depends(get_prompts)):
+async def update_prompt(prompt_update: PromptUpdate, prompts=Depends(get_prompts)) -> None:
     try:
         prompts.update(prompt_update.prompt_name, prompt_update.new_content)
         return {"message": f"Prompt {prompt_update.prompt_name} updated successfully"}

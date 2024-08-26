@@ -42,16 +42,16 @@ from llama_index.retrievers.bm25 import BM25Retriever
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
 import pandas as pd
-from src.rag.async_extensions import (
+from backend.rag.async_extensions import (
     AsyncHyDEQueryTransform,
     AsyncRetrieverQueryEngine,
     AsyncTransformQueryEngine,
 )
-from src.rag.claude_vertex import ClaudeVertexLLM
-from src.rag.node_reranker import CustomLLMRerank
-from src.rag.parent_retriever import ParentRetriever
-from src.rag.prompts import Prompts
-from src.rag.qa_followup_retriever import QAFollowupRetriever, QARetriever
+from backend.rag.claude_vertex import ClaudeVertexLLM
+from backend.rag.node_reranker import CustomLLMRerank
+from backend.rag.parent_retriever import ParentRetriever
+from backend.rag.prompts import Prompts
+from backend.rag.qa_followup_retriever import QAFollowupRetriever, QARetriever
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
@@ -111,7 +111,7 @@ class IndexManager(object):
         else:
             self.qa_index = None
 
-    def get_current_index_info(self):
+    def get_current_index_info(self) -> dict:
         return {
             "base_index_name": self.base_index_name,
             "base_endpoint_name": self.base_endpoint_name,
@@ -121,7 +121,9 @@ class IndexManager(object):
             "firestore_namespace": self.firestore_namespace,
         }
 
-    def get_vertex_llm(self, llm_name: str, temperature: float, system_prompt: str):
+    def get_vertex_llm(self, llm_name: str, 
+                       temperature: float, 
+                       system_prompt: str) -> Vertex | ClaudeVertexLLM:
         if "gemini" in llm_name:
             llm = Vertex(
                 model=llm_name,
@@ -148,7 +150,7 @@ class IndexManager(object):
         qa_endpoint_name: Optional[str],
         firestore_db_name: Optional[str],
         firestore_namespace: Optional[str],
-    ):
+    ) -> None:
         self.base_index_name = base_index_name
         self.base_endpoint_name = base_endpoint_name
         self.qa_index_name = qa_index_name
@@ -177,7 +179,7 @@ class IndexManager(object):
         endpoint_name: str,
         firestore_db_name: Optional[str],
         firestore_namespace: Optional[str],
-    ):
+    ) -> VectorStoreIndex:
         """
         Returns a llamaindex VectorStoreIndex object which contains a storage context,
         with an accompanying local document store from google cloud storage.
@@ -236,7 +238,7 @@ class IndexManager(object):
         use_node_rerank: bool = False,
         qa_followup: bool = True,
         hybrid_retrieval: bool = True,
-    ):
+    ) -> AsyncRetrieverQueryEngine:
         """
         Creates a llamaindex QueryEngine given a VectorStoreIndex and hyperparameters
         """
@@ -352,7 +354,7 @@ class IndexManager(object):
         prompts: Prompts,
         llm_name: str = "gemini-1.5-flash",
         temperature: float = 0.2,
-    ):
+    ) -> ReActAgent:
         """
         Creates a ReAct agent from a given QueryEngine
         """

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from src.app.models import EvalRequest
-from src.app.dependencies import get_index_manager, get_prompts
+from backend.app.models import EvalRequest
+from backend.app.dependencies import get_index_manager, get_prompts
 from common.utils import download_blob
-from src.rag.evaluate import LLMEvaluator
+from backend.rag.evaluate import LLMEvaluator
 from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
 from ragas import evaluate
 from ragas.metrics import (
@@ -38,7 +38,7 @@ def eval_batch(
     eval_batch_request: EvalRequest,
     index_manager=Depends(get_index_manager),
     prompts=Depends(get_prompts),
-):
+) -> dict:
     query_engine = index_manager.get_query_engine(
         prompts=prompts,
         llm_name=eval_batch_request.llm_name,

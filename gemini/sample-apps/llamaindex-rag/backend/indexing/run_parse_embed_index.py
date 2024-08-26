@@ -4,8 +4,8 @@ import os
 import traceback
 from typing import List
 
-from common.common import *
 from common.utils import (
+    download_blob,
     create_pdf_blob_list,
     download_bucket_with_transfer_manager,
     link_nodes,
@@ -26,10 +26,9 @@ from llama_index.llms.vertex import Vertex
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
 from pydantic import BaseModel
-from src.indexing.custom_parsing import *
-from src.indexing.docai_parser import DocAIParser, get_or_create_docai_processor
-from src.indexing.prompts import qa_extraction_prompt, qa_parser_prompt
-from src.indexing.vector_search_utils import *
+from backend.indexing.docai_parser import DocAIParser, get_or_create_docai_processor
+from backend.indexing.prompts import qa_extraction_prompt, qa_parser_prompt
+from backend.indexing.vector_search_utils import *
 from tqdm.asyncio import tqdm_asyncio
 import yaml
 
