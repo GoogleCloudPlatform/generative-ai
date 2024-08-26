@@ -1,7 +1,7 @@
 # Attacks and Mitigation Labs 
  **Prompt, RAG and ReAct**
 
- This comprehensive learning CoLabs dives deep into the critical world of LLM security, equipping you with the knowledge and skills to build, deploy, and maintain secure and trustworthy AI solutions. From understanding the latest attack vectors to implementing cutting-edge defenses, this CoLabs is your guide to navigating the evolving landscape of LLM security.
+ These comprehensive learning notebooks dive deep into the critical world of LLM security, equipping you with the knowledge and skills to build, deploy, and maintain secure and trustworthy AI solutions. From understanding the latest attack vectors to implementing cutting-edge defenses, these notebooks are your guide to navigating the evolving landscape of LLM security.
 
 
 - LLM Prompt attacks and mitigation 
@@ -27,7 +27,7 @@
     - Responsible AI Safety filters
     - Embeddings
 
-- ReAct and RAG attacks and mitigation options [GenAI_and_LLM_Security_ReAct_and_RAG_attacks_&_mitigations.ipynb](GenAI_and_LLM_Security_ReAct_and_RAG_attacks_&_mitigations.ipynb)
+- [ReAct and RAG attacks and mitigation options](GenAI_and_LLM_Security_ReAct_and_RAG_attacks_&_mitigations.ipynb)
   - Simple ReAct applicaiton design 
   - Attacks using ReAct Agent 
   - Mitigation using ReAct Agent information
