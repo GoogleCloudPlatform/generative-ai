@@ -6,9 +6,7 @@ from typing import List
 
 from common.common import *
 from common.utils import (
-    clean_text,
     create_pdf_blob_list,
-    download_blob,
     download_bucket_with_transfer_manager,
     link_nodes,
 )

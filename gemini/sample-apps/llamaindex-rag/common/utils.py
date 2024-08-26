@@ -19,6 +19,7 @@ GCP Download utilities
 """
 import logging
 import os
+import re
 
 from google.cloud import storage
 from llama_index.core import Document
@@ -57,11 +58,8 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
     blob = bucket.blob(source_blob_name)
     blob.download_to_filename(destination_file_name)
 
-    print(
-        "Downloaded storage object {} from bucket {} to local file {}.".format(
-            source_blob_name, bucket_name, destination_file_name
-        )
-    )
+    print(f"Downloaded storage object {source_blob_name} \
+          from bucket {bucket_name} to local file {destination_file_name}.")
 
 
 def download_bucket_with_transfer_manager(
@@ -190,19 +188,11 @@ def upload_directory_to_gcs(local_dir_path: str, bucket_name: str, prefix: str):
             blob.upload_from_filename(local_file_path)
             print(f"File {local_file_path} uploaded to {gcs_blob_name}")
 
-
-def ensure_directory_exists(directory):
-    """
-    Ensure that the given directory exists, creating it if necessary.
-    """
-    os.makedirs(directory, exist_ok=True)
-
-
 def clean_text(text):
     """
     Clean and preprocess the extracted text.
     """
-    import re
+
 
     # Remove extra whitespace
     text = re.sub(r"\s+", " ", text).strip()
@@ -212,37 +202,3 @@ def clean_text(text):
     print(f"Cleaned text length: {len(text)}")
 
     return text
-
-
-def chunk_text(text, chunk_size=512, overlap=50):
-    """
-    Split the text into chunks of approximately equal size.
-    """
-    words = text.split()
-    chunks = []
-
-    for i in range(0, len(words), chunk_size - overlap):
-        chunk = " ".join(words[i : i + chunk_size])
-        chunks.append(chunk)
-
-    return chunks
-
-
-def create_text_nodes(chunks, metadata, chunk_size=512, overlap=50):
-    """
-    Create TextNode objects from text chunks.
-    """
-    nodes = []
-    for i, chunk in enumerate(chunks):
-        node = TextNode(
-            text=chunk,
-            metadata={
-                "chunk_id": i,
-                "chunk_size": chunk_size,
-                "chunk_overlap": overlap,
-                **metadata,
-            },
-        )
-        nodes.append(node)
-
-    return link_nodes(nodes)
