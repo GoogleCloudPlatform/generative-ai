@@ -12,7 +12,7 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 
 ## Architecture
 
-![Architecture Diagram](./images/LlamaIndex_Architecture.png)
+![Architecture Diagram](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/llamaindex-rag/LlamaIndex_Architecture.png)
 
 *The architecture demonstrates a comprehensive flow from data ingestion to serving, incorporating various Google Cloud services to handle different aspects of the RAG system. It emphasizes the use of Vertex AI for key AI/ML components such as embeddings, vector storage, and language model inference. The system is designed to handle document processing, text embedding, efficient storage and retrieval, and serving of AI-powered results, with additional components for evaluation and monitoring.*
 
@@ -29,10 +29,10 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 ## Demonstration
 
 ### Chat Interface
-![Chat Interface Demo](./images/QnA_Rag_v3.gif?_xsrf=2%7C16debbe5%7Cc8f2fdfec68f37f0f6b1cb6926b6a020%7C1719960111)
+![QAChatbot](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/llamaindex-rag/QnA_Rag_v3.gif)
 
 ### Evaluation Metrics
-![Evaluation Metrics Demo](./images/Batch_RAG_EVAL_v3.gif?_xsrf=2%7C16debbe5%7Cc8f2fdfec68f37f0f6b1cb6926b6a020%7C1719960111)
+![Eval](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/llamaindex-rag/Batch_RAG_EVAL_v3.gif)
 
 ## Components
 

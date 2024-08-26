@@ -25,10 +25,21 @@ from google.cloud import storage
 from llama_index.core import Document
 from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
 import yaml
+import os
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
 
+# Function to load the configuration
+def load_config():
+    config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
+    with open(config_path, "r") as config_file:
+        return yaml.safe_load(config_file)
+
+# Load the configuration
+config = load_config()
+# Get the DATA_PATH from the config
+DATA_PATH = config["data_path"]
 
 class Blob:
     def __init__(self, path: str, mimetype: str):
