@@ -61,8 +61,6 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
    - Model names
    - Vector index and endpoint names
 
-## Deployment Steps
-
 ### Prerequisites
 - Access to a VM machine (recommended for local indexing)
 - Docker installed
@@ -81,23 +79,21 @@ cd gemini/sample-apps/llamaindex-rag
 
 ```
 conda create -n llamaindex-rag python=3.10
-conda activate llamaindex-rag
-pip install -r requirements.txt
+poetry install
 ```
 
 
 3. Configure the application:
 - Modify the parameters in `common/config.yaml` as needed
 
-4. Run the indexing job:
 
-
+1. Run the indexing job:
 ```
 export PYTHONPATH="." (in the parent directory llamaindex-rag)
-python src/indexing/index_vector_search.py
+python src/indexing/run_parse_embed_index.py
 ```
 
-5. Build and deploy the FastAPI application:
+1. Build and deploy the FastAPI application:
 
 ```sh
 export PROJECT_ID=your-project-id
@@ -118,6 +114,11 @@ gcloud run deploy fastapi-llamaindex-rag
 --max-instances 1
 ```
 
+OR run locally:
+```sh
+python backend/app/main.py
+```
+
 6. Build and deploy the Streamlit UI:
 
 ```sh
@@ -136,8 +137,12 @@ gcloud run deploy fastapi-streamlit-app
 --max-instances 1
 ```
 
-Note: Replace `your-project-id` and `your-service-account@your-project.iam.gserviceaccount.com` with your actual Google Cloud project ID and service account email.
+OR run locally:
+```sh
+streamlit run ui/🏠 Home.py
+```
 
+Note: Replace `your-project-id` and `your-service-account@your-project.iam.gserviceaccount.com` with your actual Google Cloud project ID and service account email.
 
 ## Advanced Features
 
@@ -166,8 +171,6 @@ These metrics help in assessing the quality and reliability of the generated res
 - Enhanced logging and monitoring
 - Support for multi-modal inputs
 - Improved caching mechanisms for faster responses
-
-
 
 ## Contributing
 

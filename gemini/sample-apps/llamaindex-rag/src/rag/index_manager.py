@@ -18,7 +18,6 @@ import logging
 from typing import Optional
 
 import Stemmer
-from common.common import DATA_PATH
 from google.cloud import aiplatform
 from llama_index.core import (
     PromptTemplate,

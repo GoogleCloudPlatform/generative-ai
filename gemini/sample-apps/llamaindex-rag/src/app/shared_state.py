@@ -3,13 +3,9 @@ import os
 from src.rag.index_manager import IndexManager
 from src.rag.prompts import Prompts
 import yaml
+from common.utils import load_config
 
-# Load configuration from config.yaml
-config_path = os.path.join(
-    os.path.dirname(__file__), "..", "..", "common", "config.yaml"
-)
-with open(config_path, "r") as config_file:
-    config = yaml.safe_load(config_file)
+config = load_config()
 
 PROJECT_ID = config["project_id"]
 LOCATION = config["location"]

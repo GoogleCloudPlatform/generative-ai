@@ -1,6 +1,6 @@
 # Project and environment settings
-project_id: "sysco-smarter-catalog"
-location: "us-central1"
+project_id: "<your project id>"
+location: "<your region>"
 
 # Data and storage settings
 data_path: '{base_path}/data/data'
@@ -16,10 +16,10 @@ firestore_namespace: "hierarchical_docs"
 # Index settings
 index_id: "llamaindex_rag"
 vector_index_name: "google_hierarchical"
-index_endpoint_name: "google_hierarchical_endpoint"
+index_endpoint_name: "hierarchical_endpoint"
 indexing_method: "hierarchical"
 qa_index_name: "google_qa"
-qa_endpoint_name: "google_qa_endpoint"
+qa_endpoint_name: "hierarchical_endpoint"
 
 # Chunking and embedding settings
 chunk_sizes: [4096, 2048, 1024, 512]
@@ -38,7 +38,6 @@ create_docai_processor: false
 service_account_key: "llamaindex-rag"
 
 # API settings
-# fastapi_url: "https://fastapi-llamaindex-rag-32ppfncwva-uc.a.run.app"
 fastapi_url: "http://localhost:8033"
 
 # UI settings
