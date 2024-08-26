@@ -13,8 +13,6 @@ COPY common /app/common
 COPY src /app/src
 COPY ui /app/ui
 
-
-
 # Expose the port your FastAPI app will run on 
 EXPOSE 8080
 

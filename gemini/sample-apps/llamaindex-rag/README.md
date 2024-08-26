@@ -2,16 +2,13 @@
 
 ## Overview
 
-This project implements an advanced Retrieval-Augmented Generation (RAG) system using LlamaIndex and Google's Vertex AI. It primarily focusses on rapid prototyping and experimentation of different combinations of indexing strategies, retrieval algorithms, and llms in order to attain the best performing combination for your problem. It covers RAG design, indexing, retrieval, evaluation metrics, and deployment on Google Cloud Platform, emphasizing rapid experimentation and evaluation. It features a FastAPI backend for query processing and a Streamlit frontend for user interaction. The system leverages Google's Gemini models for natural language processing and Vertex AI Vector Search for efficient document retrieval.
+This project implements an advanced Retrieval-Augmented Generation (RAG) system using LlamaIndex and Google Cloud Vertex AI. It primarily focuses on rapid prototyping and experimentation of different combinations of indexing strategies, retrieval algorithms, and LLMs in order to attain the best performing combination for your problem. It covers RAG design, indexing, retrieval, evaluation metrics, and deployment on Google Cloud, emphasizing rapid experimentation and evaluation. It features a FastAPI backend for query processing and a Streamlit frontend for user interaction. The system leverages Google Gemini models for natural language processing and Vertex AI Vector Search for efficient document retrieval.
 
 
 ## Authors
 
-- Sagar Kewalramani (skewalramani@)
-- Ken H Lee (kenhlee@)
-- Miguel Rocha (miguelrocha@)
-
-
+- Sagar Kewalramani (`saaagesh`)
+- Ken H Lee (`kenleejr`)
 
 ## Architecture
 
@@ -22,10 +19,10 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 ## Key Features
 
 - **Advanced RAG Techniques**: Implements various retrieval strategies including auto-merging, parent retrieval, and baseline approaches. 
-- **Flexible LLM Integration**: Supports multiple Gemini models (1.5-pro, 1.5-flash) and Claude models (3.5-sonnet) with configurable parameters.
+- **Flexible LLM Integration**: Supports multiple Gemini models (`gemini-1.5-pro`, `gemini-1.5-flash`) and Claude models (`claude-3.5-sonnet`) with configurable parameters.
 - **Vector Search**: Utilizes Vertex AI Vector Search for efficient document indexing and retrieval.
 - **Firestore**: Utilizes Firestore for document retrieval and auxiliary retrieval techniques
-- **Document AI Integration**: Incorporates Google's Document AI for processing and parsing various document formats.
+- **Document AI Integration**: Incorporates Google Cloud Document AI for processing and parsing various document formats.
 - **Evaluation Metrics**: Includes built-in evaluation using metrics like answer relevancy, faithfulness, and context relevancy.
 - **Interactive UI**: Features a Streamlit-based chat interface with real-time metric display and retrieved document information.
 
@@ -34,10 +31,8 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 ### Chat Interface
 ![Chat Interface Demo](./images/QnA_Rag_v3.gif?_xsrf=2%7C16debbe5%7Cc8f2fdfec68f37f0f6b1cb6926b6a020%7C1719960111)
 
-
 ### Evaluation Metrics
 ![Evaluation Metrics Demo](./images/Batch_RAG_EVAL_v3.gif?_xsrf=2%7C16debbe5%7Cc8f2fdfec68f37f0f6b1cb6926b6a020%7C1719960111)
-
 
 ## Components
 
@@ -68,9 +63,7 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 
 ## Deployment Steps
 
-
-
-## Prerequisites
+### Prerequisites
 - Access to a VM machine (recommended for local indexing)
 - Docker installed
 - Google Cloud SDK installed and configured
@@ -80,8 +73,8 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 1. Clone the repository:
 
 ```
-git clone https://gitlab.com/google-cloud-ce/communities/NATT-AIML/genai-fsa/llamaindex-rag.git
-cd llamaindex-rag
+git clone https://github.com/GoogleCloudPlatform/generative-ai
+cd gemini/sample-apps/llamaindex-rag
 ```
 
 2. Set up the environment:
@@ -106,7 +99,7 @@ python src/indexing/index_vector_search.py
 
 5. Build and deploy the FastAPI application:
 
-```
+```sh
 export PROJECT_ID=your-project-id
 export SERVICE_ACCOUNT=your-service-account@your-project.iam.gserviceaccount.com
 docker build -t fastapi-llamaindex-rag .
@@ -127,7 +120,7 @@ gcloud run deploy fastapi-llamaindex-rag
 
 6. Build and deploy the Streamlit UI:
 
-```
+```sh
 docker build -f ui/Dockerfile -t fastapi-streamlit-app .
 docker tag fastapi-streamlit-app gcr.io/${PROJECT_ID}/fastapi-streamlit-app
 docker push gcr.io/${PROJECT_ID}/fastapi-streamlit-app
@@ -186,10 +179,7 @@ This project is licensed under the standard Google Apache-2.0 license.
 
 ## Get in Touch
 
-We'd love to hear from you! If you have any questions, suggestions, or just want to chat about the project, reach out to 
+Please file any Github issues if you have any questions or suggestions. 
 
-- **skewalramani@**
-- **kenhlee@**
-
-
-Don't hesitate to fork and submit pull requests!
+- Sagar Kewalramani (`saaagesh`)
+- Ken H Lee (`kenleejr`)
