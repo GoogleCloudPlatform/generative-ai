@@ -195,7 +195,6 @@ Tadao
 Tafel
 Tbk
 Tbl
-Templeted
 Tencent
 Testables
 Tetsuo
@@ -226,7 +225,7 @@ Wnd
 Womens
 XXE
 Yuzuru
-YuzuruZijin
+Zijin
 Zscaler
 Zuercher
 aadd
@@ -286,7 +285,6 @@ dino
 diy
 docai
 dpi
-dply
 draig
 drinkware
 dropna
@@ -390,7 +388,6 @@ lycra
 makeover
 mapbox
 maxcold
-mbedding
 mbsdk
 mec
 meme
@@ -427,7 +424,6 @@ paystub
 pbxproj
 pdfminer
 pdfs
-peforms
 pfas
 pgadmin
 pgvector
