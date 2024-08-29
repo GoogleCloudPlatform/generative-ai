@@ -194,7 +194,7 @@
 \b(?!LangServe\b)(?!langserve\b)[Ll]ang\s?[Ss]erve?\b
 
 # Should be LlamaIndex
-\b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
+\b(?!LlamaIndex\b)[Ll][Ll]ama\s?[Ii]ndex?\s
 
 # Should be Hugging Face
 \s(?!Hugging Face\b)[Hh]ugging\s?[Ff]ace?\b
