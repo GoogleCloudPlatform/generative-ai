@@ -170,6 +170,7 @@ SEO
 SKUs
 SNB
 SPII
+SPLADE
 SSRF
 SUBLANG
 SWP
@@ -460,11 +461,13 @@ ragdemos
 rahhhrr
 ramen
 rapideval
+rarians
 ratelimit
 repreve
 ribeye
 ringspun
 rpet
+rrf
 rsp
 scattergl
 seaborn
@@ -487,10 +490,12 @@ streamlit
 strfreev
 stuffie
 subviews
+subword
 supima
 tagline
 tencel
 tfhub
+tfidf
 tgz
 thelook
 tiktoken
