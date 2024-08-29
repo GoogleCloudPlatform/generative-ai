@@ -62,16 +62,19 @@ Firestore
 Fishburne
 Flatform
 Flipkart
+Frodo
 GError
 GFile
 GObject
 GWLP
 Gameplay
+Gandalf
 Gatace
 GenTwo
 Genkit
 Gisting
 Glickman
+GmbH
 Googlers
 HDFC
 HIDPI
@@ -79,6 +82,7 @@ HMO
 HREDRAW
 HSA
 Hamers
+Hbf
 Hickson
 Hmmm
 Hogwarts
@@ -96,6 +100,7 @@ Kaggle
 Kamradt
 Kaufmanns
 Keanu
+Ketamine
 Khanh
 Knopf
 Kudrow
@@ -114,6 +119,7 @@ MSGSEND
 MTL
 Maarten
 Mahindra
+Malware
 Mamah
 Mandiri
 Memegen
