@@ -35,7 +35,7 @@ Learn more about the Build your own RAG workflow with DIY APIs [here](https://cl
 
 It is also worth noting that [Gemini 1.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#gemini-1.5-pro) available on Vertex AI supports a 2M token input context window, around 2000 pages worth of context, while maintaining [state-of-the-art reasoning capabilities](https://deepmind.google/technologies/gemini/pro/?_gl=1*128a4ox*_up*MQ..*_ga*MTgzMDgwODIxNC4xNzE5OTU2NjIw*_ga_LS8HVHCNQ0*MTcxOTk1NjYyMC4xLjAuMTcxOTk1NjYyMC4wLjAuMA..). Recently Google DeepMind and University of Michigan published a comprehensive research on [RAG or Long Context window](https://arxiv.org/html/2407.16833v1). Gemini 1.5 Pro can reason with user input query, available Prompt System Instructions, the given context and respond to user queries. With the long context window clubbed with multimodal reasoning, caching ability, developers can quickly start with Gemini 1.5 Pro to quickly test and prototype their semantic information retrieval use case.
 
-![Building Search Applications with Vertex AI](vertex-search-options/search_options.png)
+![Building Search Applications with Vertex AI](vertexai-search-options/search_options.png)
 
 Based on where Developers are in their journey, their orchestration framework of choice, they can select Vertex AI Search out-of-the-box capabilities or customize their search solutions with Vertex AI Search Retrievers or use the Vertex AI DIY APIs to build the end-to-end RAG application. Understanding the appetite your organization has towards building, maintaining and scaling RAG applications can also help guide a particular solution path.
 
@@ -45,7 +45,7 @@ Based on where Developers are in their journey, their orchestration framework of
 <pre>
 search/
 
-├── <a href="vertex-search-options"> Vertex AI Search Out-of-the-box to Customize with LangChain/Grounding Service </a>
+├── <a href="vertexai-search-options"> Various ways to develop with Vertex AI Search: Out-of-the-box to customizing with LangChain/Grounding Service </a>
 ├── <a href="retrieval-augmented-generation">retrieval-augmented-generation/</a>
 │   └──  <a href="retrieval-augmented-generation/examples/question_answering.ipynb">[Notebook] Question Answering Over Documents with Vertex AI Search and LangChain 🦜🔗</a>
 └── <a href="web-app">web-app/</a>
