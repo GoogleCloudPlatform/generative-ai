@@ -45,7 +45,7 @@ Based on where Developers are in their journey, their orchestration framework of
 <pre>
 search/
 └── <a href="bulk-question-answering">bulk-question-answering/</a>
-|    └──  <a href="bulk-question-answering/bulk_question_answering.ipynb">[Notebook] Q&A from CSV using Vertex AI Search. </a>
+|    └──  <a href="bulk-question-answering/bulk_question_answering.ipynb">[Notebook] question/ answering from csv using Vertex AI Search. </a>
 └── <a href="cloud-function">cloud-function/</a>
 |    └──  <a href="cloud-function">[Demo] Access Vertex AI Search from Google Cloud Function. </a>
 └── <a href="custom-embeddings">custom-embeddings/</a>
