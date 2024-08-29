@@ -44,10 +44,16 @@ Based on where Developers are in their journey, their orchestration framework of
 <!-- markdownlint-disable MD033 -->
 <pre>
 search/
-
-├── <a href="vertexai-search-options">Various ways to develop with Vertex AI Search: Out-of-the-box to customizing with LangChain/Grounding Service </a>
+└── <a href="bulk-question-answering">bulk-question-answering/</a>
+|    └──  <a href="bulk-question-answering/bulk_question_answering.ipynb">[Notebook] Q&A from CSV using Vertex AI Search. </a>
+└── <a href="cloud-function">cloud-function/</a>
+|    └──  <a href="cloud-function">[Demo] Access Vertex AI Search from Google Cloud Function. </a>
+└── <a href="custom-embeddings">custom-embeddings/</a>
+|    └──  <a href="custom-embeddings/custom_embeddings.ipynb">[Notebook] Custom Embeddings with Vertex AI Search. </a>
 ├── <a href="retrieval-augmented-generation">retrieval-augmented-generation/</a>
 │   └──  <a href="retrieval-augmented-generation/examples/question_answering.ipynb">[Notebook] Question Answering Over Documents with Vertex AI Search and LangChain 🦜🔗</a>
+└── <a href="vertexai-search-options">vertexai-search-options/</a>
+│    └──  <a href="vertexai-search-options/vertexai_search_options.ipynb">[Notebook] Various ways to build with Vertex AI Search </a>
 └── <a href="web-app">web-app/</a>
     └──  <a href="web-app">[Demo] Vertex AI Search Web Application</a>
 </pre>
