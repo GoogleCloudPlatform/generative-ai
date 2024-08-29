@@ -17,17 +17,17 @@ Building and managing RAG systems can be complex and can be quite nuanced. Devel
 - It leverages advanced [neural matching](https://blog.google/products/search/improving-search-next-20-years/) between user queries and document snippets to retrieve highly relevant and ranked results for the user. Neural matching allows a retrieval engine to learn the relationships between intention of a query and highly relevant documents, allowing Search to recognize the context of a query instead of the simple similarity search.
 - It provides users with LLM powered summaries with citations and is designed to scale to your search traffic. Vertex AI Search now also supports custom instruction templates, making it easy to create powerful competent search experiences with minimal effort. Developers can leverage the console / SDK to quickly leverage and test the out-of-the-box agent.
 
-Explore [Part 1 of this notebook example](vertex-search-options/vertex_search_options.ipynb) to see how to leverage the Vertex AI Agent Builder SDK to start building your search application.
+Explore [Part 1 of this notebook example](vertexai-search-options/vertexai_search_options.ipynb) to see how to leverage the Vertex AI Agent Builder SDK to start building your search application.
 
 ## For greater customization
 
 Vertex AI Search SDK further allows developers to integrate Vertex AI Search with open-source LLMs or other custom components, tailoring the search pipeline to their specific needs. As mentioned above, building end-to-end RAG solutions can be complex, developers might want to rely on Vertex AI Search as a grounding source for search results retrieval and ranking, and leverage custom LLM for the guided summary. Vertex AI Search also provides grounding in Google Search and 3P commercial datasets e.g. Bloomberg market data, TR legal documents, D&B company business information.
 
-Find an example for using Vertex AI Search to Ground Responses for Gemini mode in [Part 2 of this example notebook here](vertex-search-options/vertex_search_options.ipynb).
+Find an example for using Vertex AI Search to Ground Responses for Gemini mode in [Part 2 of this example notebook here](vertexai-search-options/vertexai_search_options.ipynb).
 
 Developers might already be leveraging frameworks like LangChain/ LLamaIndex for orchestration of their LLM application and would want to use Vertex AI Search for information retrieval. Vertex AI Search has native integration with LangChain or can be enabled as an available tool in Vertex AI Gemini SDK to generate custom grounded responses providing developers with varied choice to build their RAG solutions
 
-[Part 3 of this notebook example](vertex-search-options/vertex_search_options.ipynb) for leveraging Vertex AI Search from LangChain here.
+[Part 3 of this notebook example](vertexai-search-options/vertexai_search_options.ipynb) for leveraging Vertex AI Search from LangChain here.
 
 Vertex AI provides the essential building blocks for developers who want to construct their own end-to-end RAG solutions with full flexibility. These include APIs for document parsing, chunking, LLM text and multimodal vector embeddings, versatile vector database options (Vertex AI Vector Search, AlloyDB, BigQuery Vector DB), reranking APIs, and grounding checks.
 
@@ -45,7 +45,7 @@ Based on where Developers are in their journey, their orchestration framework of
 <pre>
 search/
 
-├── <a href="vertexai-search-options"> Various ways to develop with Vertex AI Search: Out-of-the-box to customizing with LangChain/Grounding Service </a>
+├── <a href="vertexai-search-options">Various ways to develop with Vertex AI Search: Out-of-the-box to customizing with LangChain/Grounding Service </a>
 ├── <a href="retrieval-augmented-generation">retrieval-augmented-generation/</a>
 │   └──  <a href="retrieval-augmented-generation/examples/question_answering.ipynb">[Notebook] Question Answering Over Documents with Vertex AI Search and LangChain 🦜🔗</a>
 └── <a href="web-app">web-app/</a>
