@@ -260,9 +260,7 @@
 \bVertex\s?Search\b
 
 # Should be Colab
-\scolabs?\b
-\b[Cc]ollabs?\b
-\b[Cc]oLabs?\b
+\s(?!Colab)[Cc]o[Ll][Ll]?abs?\b
 
 # Should be Kaggle
 \skaggle\b
