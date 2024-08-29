@@ -67,3 +67,5 @@
 /generative-ai/gemini/evaluation/evaluate_langchain_chains.ipynb           @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb           @eliasecchig @lspatarog @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/tuning/gemini_supervised_finetuning_text_classification.ipynb           @gabrielahrlr @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving         @polong-lin @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb       @eliasecchig @GoogleCloudPlatform/generative-ai-devrel

@@ -143,6 +143,7 @@ Noogler
 OOTB
 Oberst
 Olgivanna
+Ollama
 Omnibox
 Onone
 Oort
@@ -409,6 +410,7 @@ nmilitary
 notetaker
 nrows
 objc
+ollama
 onesie
 onesies
 osx
