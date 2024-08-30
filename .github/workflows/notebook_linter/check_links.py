@@ -67,7 +67,8 @@ def fix_links_in_notebook(notebook_path: str):
                 with open(notebook_path, "w", encoding="utf-8") as f:
                     nbformat.write(notebook, f)
                 print(f"Updated {notebook_path}\n")
-                return
+                return 1
+    return 0
 
 
 if __name__ == "__main__":

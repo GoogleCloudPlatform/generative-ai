@@ -71,6 +71,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
     if [ -f "$notebook" ]; then
       echo "Checking notebook: ${notebook}"
 
+      LINK_RTN="0"
       NBFMT_RTN="0"
       BLACK_RTN="0"
       BLACKEN_DOCS_RTN="0"
@@ -80,8 +81,9 @@ if [ ${#notebooks[@]} -gt 0 ]; then
       MYPY_RTN="0"
 
       if [ "$is_test" = true ]; then
-        echo "Running link fixer..."
+        echo "Running link checker..."
         python3 "$script_dir/check_links.py" "$notebook"
+        LINK_RTN=$?
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --check --profile black
         ISORT_RTN=$?
@@ -104,8 +106,9 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await --disable-error-code=attr-defined
         MYPY_RTN=$?
       else
-        echo "Running link fixer..."
+        echo "Running link checker..."
         python3 "$script_dir/check_links.py" "$notebook"
+        LINK_RTN=$?
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --profile black
         ISORT_RTN=$?
@@ -130,6 +133,11 @@ if [ ${#notebooks[@]} -gt 0 ]; then
       fi
 
       NOTEBOOK_RTN="0"
+
+      if [ "$LINK_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$LINK_RTN"
+        printf "link: Failed\n"
+      fi
 
       if [ "$NBFMT_RTN" != "0" ]; then
         NOTEBOOK_RTN="$NBFMT_RTN"
