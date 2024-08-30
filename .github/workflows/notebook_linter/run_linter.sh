@@ -66,6 +66,7 @@ fi
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
+  script_dir="$(dirname "$0")"
   for notebook in "${notebooks[@]}"; do
     if [ -f "$notebook" ]; then
       echo "Checking notebook: ${notebook}"
@@ -80,7 +81,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
 
       if [ "$is_test" = true ]; then
         echo "Running link fixer..."
-        python3 check_links.py "$notebook"
+        python3 "$script_dir/check_links.py" "$notebook"
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --check --profile black
         ISORT_RTN=$?
@@ -104,7 +105,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         MYPY_RTN=$?
       else
         echo "Running link fixer..."
-        python3 check_links.py "$notebook"
+        python3 "$script_dir/check_links.py" "$notebook"
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --profile black
         ISORT_RTN=$?
