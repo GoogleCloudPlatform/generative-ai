@@ -79,6 +79,8 @@ if [ ${#notebooks[@]} -gt 0 ]; then
       MYPY_RTN="0"
 
       if [ "$is_test" = true ]; then
+        echo "Running link fixer..."
+        python3 check_links.py "$notebook"
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --check --profile black
         ISORT_RTN=$?
@@ -101,6 +103,8 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await --disable-error-code=attr-defined
         MYPY_RTN=$?
       else
+        echo "Running link fixer..."
+        python3 check_links.py "$notebook"
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --profile black
         ISORT_RTN=$?
