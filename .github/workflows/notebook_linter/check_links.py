@@ -1,6 +1,7 @@
 import os
-import urllib.parse
 import sys
+import urllib.parse
+
 import nbformat
 
 LINK_PREFIXES = {
