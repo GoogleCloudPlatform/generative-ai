@@ -3,6 +3,7 @@ ANZ
 APIENTRY
 APSTUDIO
 Adidas
+Akihiro
 Aniston
 Arborio
 Arepa
@@ -63,6 +64,7 @@ Fishburne
 Flatform
 Flipkart
 Frodo
+Fujita
 GError
 GFile
 GObject
@@ -81,9 +83,14 @@ HIDPI
 HMO
 HREDRAW
 HSA
+HVDC
+Hamamoto
 Hamers
 Hbf
 Hickson
+Hida
+Hikaru
+Hisaki
 Hmmm
 Hogwarts
 Hubmann
@@ -99,6 +106,7 @@ Kaelen
 Kaggle
 Kamradt
 Kaufmanns
+Kawagoe
 Keanu
 Ketamine
 Khanh
@@ -122,9 +130,12 @@ Mahindra
 Malware
 Mamah
 Mandiri
+Masaru
 Memegen
 Mewgler
+Mitani
 Mosher
+Mvar
 NARI
 NCCREATE
 NDEBUG
@@ -133,6 +144,7 @@ NMT
 NOMINMAX
 NOZORDER
 NVIDIA
+Niitsuma
 Noogler
 OOTB
 Oberst
@@ -193,6 +205,7 @@ Tbk
 Tbl
 Tencent
 Testables
+Tetsuo
 Tianli
 Topolino
 Trapp
@@ -201,6 +214,7 @@ Tricyle
 UDFs
 USERDATA
 Unimicron
+Upserting
 Urs
 Uszkoreit
 VFT
@@ -218,6 +232,7 @@ Wehn
 Wnd
 Womens
 XXE
+Yuzuru
 Zijin
 Zscaler
 Zuercher
@@ -255,6 +270,7 @@ codebase
 codebases
 codelab
 colab
+coldline
 coloraxis
 colorbar
 colorway
