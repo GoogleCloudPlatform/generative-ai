@@ -11,7 +11,10 @@ Building and managing RAG systems can be complex and can be quite nuanced. Devel
 ## Why Vertex AI Search Out-of-the-box
 
 The out-of-the-box solution can bring Google-Quality search to build end-to-end state-of-the-art semantic and hybrid search applications.
-- It has in-built connectors to several data sources   (Cloud Storage, BigQuery, sites, Confluence, Jira, Salesforce, Slack and many more).
+- It has in-built connectors to several data sources 
+
+  (Cloud Storage, BigQuery, sites, Confluence, Jira, Salesforce, Slack and many more).
+
 - It has a state of the art document layout parser capable of keeping chunks of data organized across pages, containing embedded tables, annotating embedded images, and can track heading ancestry as metadata for each chunk.
 - It uses "hybrid search" - a combination of keyword (sparse) and LLM (dense) based embeddings to be able to handle any user query.Sparse vectors tend to directly map words to numbers and dense vectors are designed to better represent the meaning of a piece of text.
 - It leverages advanced [neural matching](https://blog.google/products/search/improving-search-next-20-years/) between user queries and document snippets to retrieve highly relevant and ranked results for the user. Neural matching allows a retrieval engine to learn the relationships between intention of a query and highly relevant documents, allowing Search to recognize the context of a query instead of the simple similarity search.
