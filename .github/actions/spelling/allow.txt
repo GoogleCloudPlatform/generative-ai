@@ -3,6 +3,7 @@ ANZ
 APIENTRY
 APSTUDIO
 Adidas
+Akihiro
 Aniston
 Arborio
 Arepa
@@ -62,6 +63,7 @@ Firestore
 Fishburne
 Flatform
 Flipkart
+Fujita
 GError
 GFile
 GObject
@@ -78,8 +80,13 @@ HIDPI
 HMO
 HREDRAW
 HSA
+HVDC
+Hamamoto
 Hamers
 Hickson
+Hida
+Hikaru
+Hisaki
 Hmmm
 Hogwarts
 Hubmann
@@ -95,6 +102,7 @@ Kaelen
 Kaggle
 Kamradt
 Kaufmanns
+Kawagoe
 Keanu
 Khanh
 Knopf
@@ -116,9 +124,12 @@ Maarten
 Mahindra
 Mamah
 Mandiri
+Masaru
 Memegen
 Mewgler
+Mitani
 Mosher
+Mvar
 NARI
 NCCREATE
 NDEBUG
@@ -127,10 +138,12 @@ NMT
 NOMINMAX
 NOZORDER
 NVIDIA
+Niitsuma
 Noogler
 OOTB
 Oberst
 Olgivanna
+Ollama
 Omnibox
 Onone
 Oort
@@ -157,6 +170,7 @@ SEO
 SKUs
 SNB
 SPII
+SPLADE
 SSRF
 SUBLANG
 SWP
@@ -185,6 +199,7 @@ Tbk
 Tbl
 Tencent
 Testables
+Tetsuo
 Tianli
 Topolino
 Trapp
@@ -193,6 +208,7 @@ Tricyle
 UDFs
 USERDATA
 Unimicron
+Upserting
 Urs
 Uszkoreit
 VFT
@@ -210,6 +226,7 @@ Wehn
 Wnd
 Womens
 XXE
+Yuzuru
 Zijin
 Zscaler
 Zuercher
@@ -247,6 +264,7 @@ codebase
 codebases
 codelab
 colab
+coldline
 coloraxis
 colorbar
 colorway
@@ -393,6 +411,7 @@ nmilitary
 notetaker
 nrows
 objc
+ollama
 onesie
 onesies
 osx
@@ -442,11 +461,13 @@ ragdemos
 rahhhrr
 ramen
 rapideval
+rarians
 ratelimit
 repreve
 ribeye
 ringspun
 rpet
+rrf
 rsp
 scattergl
 seaborn
@@ -469,10 +490,12 @@ streamlit
 strfreev
 stuffie
 subviews
+subword
 supima
 tagline
 tencel
 tfhub
+tfidf
 tgz
 thelook
 tiktoken
