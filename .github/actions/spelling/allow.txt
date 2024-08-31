@@ -417,7 +417,7 @@ nbfmt
 nbformat
 ncols
 ndarray
-ngram
+newaxisngram
 ngrams
 nlp
 nmade
@@ -554,4 +554,3 @@ ylabel
 ytd
 yticks
 zaxis
-newaxis
