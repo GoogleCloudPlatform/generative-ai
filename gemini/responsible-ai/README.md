@@ -21,7 +21,7 @@ These comprehensive learning notebooks dive deep into the critical world of LLM 
     - Obfuscation
     - Multimodal Attacks (Image, PDF & Video)
     - Model poisioning
-  - Protections & Mitigations with:
+  - Protections & Mitigation with:
     - Data Loss Prevention
     - Natural Language API (Category Check, Sentiment Analysis)
     - Malware checking
@@ -31,8 +31,9 @@ These comprehensive learning notebooks dive deep into the critical world of LLM 
 
 - [ReAct and RAG attacks and mitigation options](react_rag_attacks_mitigations_examples.ipynb)
 
-  - Simple ReAct applicaiton design
+  - Simple ReAct application design
   - Attacks using ReAct Agent
   - Mitigation using ReAct Agent information
-  - Simple RAG applicaiton
+  - Simple RAG application
   - Attacks and mitigation for RAG applications
+  
