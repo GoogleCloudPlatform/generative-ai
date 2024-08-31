@@ -223,8 +223,9 @@ VOS
 VREDRAW
 Vandamm
 Vaswani
+Ves
 Vijay
-WDIR
+VirusTotalWDIR
 WFH
 WNDCLASS
 Wakatipu
@@ -246,6 +247,7 @@ ainvoke
 airlume
 alloydb
 antiword
+apikey
 arXiv
 astype
 automl
@@ -258,6 +260,7 @@ barpolar
 baxis
 bbc
 bigquery
+bitcoin
 bpa
 bqml
 carbonara
@@ -298,8 +301,10 @@ drinkware
 dropna
 dwmapi
 ecommerce
+elous
 embs
 emojis
+epoc
 etf
 eur
 evals
@@ -427,6 +432,7 @@ paleo
 pancetta
 pantarba
 paracord
+passwort
 pastiched
 payslip
 paystub
@@ -454,6 +460,7 @@ protobuf
 pstotext
 pubspec
 pvc
+pybind
 pydantic
 pymupdf
 pypdf
@@ -475,6 +482,7 @@ ringspun
 rpet
 rrf
 rsp
+scann
 scattergl
 seaborn
 selectbox
@@ -520,6 +528,7 @@ usernames
 uvb
 vectordb
 vertexai
+vesselin
 wcslen
 websites
 welcom
@@ -542,18 +551,3 @@ ylabel
 ytd
 yticks
 zaxis
-apikey
-bitcoin
-elous
-epoc
-Frodo
-Gandalf
-GmbH
-Hbf
-passwort
-pybind
-scann
-Ves
-vesselin
-vertexai
-VirusTotal
