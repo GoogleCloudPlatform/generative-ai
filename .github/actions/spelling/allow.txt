@@ -76,6 +76,7 @@ GenTwo
 Genkit
 Gisting
 Glickman
+Gmb
 GmbH
 Googlers
 HDFC
@@ -225,7 +226,9 @@ Vandamm
 Vaswani
 Ves
 Vijay
-VirusTotalWDIR
+Viru
+VirusTotal
+WDIR
 WFH
 WNDCLASS
 Wakatipu

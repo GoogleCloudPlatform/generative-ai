@@ -36,4 +36,3 @@ These comprehensive learning notebooks dive deep into the critical world of LLM 
   - Mitigation using ReAct Agent information
   - Simple RAG application
   - Attacks and mitigation for RAG applications
-  
