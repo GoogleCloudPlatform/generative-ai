@@ -7,9 +7,7 @@ import os
 import uvicorn
 
 # Configure logging
-logging.basicConfig(
-    filename="eval.log", encoding="utf-8", level=logging.INFO
-)
+logging.basicConfig(filename="eval.log", encoding="utf-8", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()

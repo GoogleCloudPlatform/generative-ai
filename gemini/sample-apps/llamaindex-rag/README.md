@@ -29,9 +29,11 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 ## Demonstration
 
 ### Chat Interface
+
 ![QAChatbot](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/llamaindex-rag/QnA_Rag_v3.gif)
 
 ### Evaluation Metrics
+
 ![Eval](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/llamaindex-rag/Batch_RAG_EVAL_v3.gif)
 
 ## Components
@@ -62,6 +64,7 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
    - Vector index and endpoint names
 
 ### Prerequisites
+
 - Access to a VM machine (recommended for local indexing)
 - Docker installed
 - Google Cloud SDK installed and configured
@@ -115,6 +118,7 @@ gcloud run deploy fastapi-llamaindex-rag
 ```
 
 OR run locally:
+
 ```sh
 python backend/app/main.py
 ```
@@ -138,6 +142,7 @@ gcloud run deploy fastapi-streamlit-app
 ```
 
 OR run locally:
+
 ```sh
 streamlit run ui/🏠 Home.py
 ```

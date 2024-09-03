@@ -20,13 +20,17 @@ with open(config_path, "r") as config_file:
 
 fastapi_url = config["fastapi_url"]
 
+
 def fetch_vector_search_data():
     response = requests.get(f"{fastapi_url}/list_vector_search_indexes_and_endpoints")
     if response.status_code == 200:
         return response.json()
     else:
-        st.error("Failed to fetch Vector Search data. Please check the server connection.")
+        st.error(
+            "Failed to fetch Vector Search data. Please check the server connection."
+        )
         return None
+
 
 def fetch_firestore_databases():
     response = requests.get(f"{fastapi_url}/list_firestore_databases")
@@ -37,6 +41,7 @@ def fetch_firestore_databases():
             "Failed to fetch Firestore collections. Please check the server connection."
         )
         return []
+
 
 def fetch_firestore_collections(selected_database: str):
     response = requests.post(
@@ -50,6 +55,7 @@ def fetch_firestore_collections(selected_database: str):
             "Failed to fetch Firestore collections. Please check the server connection."
         )
         return []
+
 
 def update_index(
     base_index_name: str,
@@ -87,27 +93,29 @@ if vector_search_data:
     base_selected_index = st.selectbox(
         "Select a Base Vector Search Index",
         options=vector_search_data["base"]["indexes"],
-        index=0
+        index=0,
     )
     base_selected_endpoint = st.selectbox(
         "Select a Base Vector Search Endpoint",
         options=vector_search_data["base"]["endpoints"],
-        index=0
+        index=0,
     )
 
     st.divider()
 
     # QA Vector Search Section
-    st.subheader("Choose a Vector Search index and endpoint as the question answered augmented index.")
+    st.subheader(
+        "Choose a Vector Search index and endpoint as the question answered augmented index."
+    )
     qa_selected_index = st.selectbox(
         "Select a QA Vector Search Index",
         options=vector_search_data["qa"]["indexes"],
-        index=0
+        index=0,
     )
     qa_selected_endpoint = st.selectbox(
         "Select a QA Vector Search Endpoint",
         options=vector_search_data["qa"]["endpoints"],
-        index=0
+        index=0,
     )
 else:
     st.warning("Failed to fetch Vector Search data. Please try again later.")

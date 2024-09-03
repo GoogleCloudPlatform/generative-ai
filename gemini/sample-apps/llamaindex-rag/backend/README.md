@@ -1,7 +1,9 @@
 # RAG Backend
 
 ## Indexing and Storage
+
  `src/indexing/run_parse_embed_index.py` contains the master script for parsing documents from a cloud storage bucket using DocumentAI, creating LlamaIndex indices which manage relationships between chunks, source documents, and parent chunks and storing the resulting indices in GCP native storage modalities (e.g. Vector Search, Firestore, Vertex Search). Before running this script, adjust the `common/config.yaml` file to your specs.
+
 ```
 # Project and environment settings
 project_id: "<my-project>"
@@ -35,31 +37,38 @@ docai_processor_id: "f1713ecadbbf91ab"
 document_ai_processor_display_name: "layout-parser"
 create_docai_processor: false
 ```
+
 ### Indexing Methods
+
 There are two primary indexing methods used: `hierarchical` and `flat`. 
 - `hierarchical` will create a hierarchy of chunks based on chunk sizes where chunks lower in the hierarchy are smaller progressing to larger chunks up the hierarchy. The relationships among chunks are managed through metadata associated with each chunk. The leaf chunks are embedded and stored in the vector index while all chunks are stored in a Firestore document store. This index is created to be compatible with the `auto_merging` retrieval technique.
-- `flat` will chunk all documents to the specified chunk size and simply embed them in the vector store. It will then store all parsed documents in Firestore so they can be accessed by id as well. 
+- `flat` will chunk all documents to the specified chunk size and simply embed them in the vector store. It will then store all parsed documents in Firestore so they can be accessed by ID as well. 
 
 ### Firestore
-Firestore is used to store chunks and entire documents for retrieval via metadata or id. This is useful as a companion to vector search, as vector search can only query documents by vector similarity by design. By adding a docstore, retrieval techniques can augment vector search by retrieving additional chunks that surround the current set of retrieved chunks or through some other algorithm (e.g. BM25).
+
+Firestore is used to store chunks and entire documents for retrieval via metadata or ID. This is useful as a companion to vector search, as vector search can only query documents by vector similarity by design. By adding a docstore, retrieval techniques can augment vector search by retrieving additional chunks that surround the current set of retrieved chunks or through some other algorithm (e.g. BM25).
 
 ### "Questions-Answered" Index
-The parameters `qa_index_name` and `qa_endpoint_name` determine if an additional vector search index will be created based on LLM-generated questions which each document can answer. When these are set, each parsed document will be passed to Gemini who will generate a set of questions which that document can answer. The generated questions are then associated with the source_id of the parsed document, embedded and stored in a vector search index. At retrieval time, users can opt to query this vector index which will compare the user's query with the generated questions to obtain document ids which could potentially answers the users question. Then, those documents are retrieved from Firestore and returned to the LLM for response generation. 
+
+The parameters `qa_index_name` and `qa_endpoint_name` determine if an additional vector search index will be created based on LLM-generated questions which each document can answer. When these are set, each parsed document will be passed to Gemini who will generate a set of questions which that document can answer. The generated questions are then associated with the source_id of the parsed document, embedded and stored in a vector search index. At retrieval time, users can opt to query this vector index which will compare the user's query with the generated questions to obtain document ID's which could potentially answers the users question. Then, those documents are retrieved from Firestore and returned to the LLM for response generation. 
 
 ## RAG
+
 ## FastAPI Backend
-This FastAPI application provides an API for querying and evaluating a Retrieval-Augmented Generation (RAG) system. It includes endpoints for updating prompts, managing vector search indexes, querying the RAG system, and performing batch evaluations.
+
+This FastAPI application provides an API for querying and evaluating a Retrieval-Augmented Generation (RAG) system. It includes endpoints for updating prompts, managing vector search indices, querying the RAG system, and performing batch evaluations.
 - Query RAG system with customizable parameters
 - Update and manage prompts
-- List and update vector search indexes and endpoints
+- List and update vector search indices and endpoints
 - Perform batch evaluations using various metrics
 - Integration with Google Cloud services (Vertex AI, Firestore, Secret Manager)
+- 
 ### Endpoints
 
 1. `/`: Root endpoint
 2. `/get_all_prompts`: Retrieve all prompts
 3. `/update_prompt`: Update a specific prompt
-4. `/list_vector_search_indexes`: List available vector search indexes
+4. `/list_vector_search_indices`: List available vector search indices
 5. `/list_vector_search_endpoints`: List available vector search endpoints
 6. `/list_firestore_databases`: List Firestore databases
 7. `/list_firestore_collections`: List collections in a Firestore database
@@ -69,7 +78,8 @@ This FastAPI application provides an API for querying and evaluating a Retrieval
 11. `/eval_batch`: Perform batch evaluation of the RAG system
 
 ### Data Source and RAG Pipeline State Managment
-`rag.index_manager.IndexManager` is the main class which manages state for vector indexes, docstores, query engines and chat engines
+
+`rag.index_manager.IndexManager` is the main class which manages state for vector indices, docstores, query engines and chat engines
 across the app's lifecycle (e.g. through UI manipulations). The `index_manager` (instantiated)
 will be injected into all API routes that need to access its state or manipulate its state.
 
@@ -94,7 +104,7 @@ async def get_current_index_info(index_manager=Depends(get_index_manager)):
 @app.post("/update_index")
 async def update_index(index_update: IndexUpdate, index_manager=Depends(get_index_manager)):
     try:
-        index_manager.set_current_indexes(index_update.base_index_name,
+        index_manager.set_current_indices(index_update.base_index_name,
                                           index_update.base_endpoint_name,
                                           index_update.qa_index_name,
                                           index_update.qa_endpoint_name,
@@ -105,16 +115,19 @@ async def update_index(index_update: IndexUpdate, index_manager=Depends(get_inde
 ```
 
 ### Prompt State Management
+
 `rag.prompts.Prompts` is the main state management class for prompts throughout the app's lifecycle. It is injected into all API routes which
 require manipulating prompts or accessing their state (e.g. `QueryEngines` or `ChatEngines` in `IndexManager`).
 
 ### Asynchronous Execution
+
 `rag.async_extensions` contains classes which extend some of llamaindex's core primitives to be fully asynchronous. Some of llamaindex's classes 
 are not fully asynchronous (e.g. node postprocessing and query transformation) making operations like batch evaluation very slow.
 
 ### Retrieval Techniques
-`rag.index_manager.IndexManager.get_query_engine()` contains the core logic for setting up the llamaindex `QueryEngine` for RAG over the current set of indexes
-in `rag.index_manager.IndexManager`. A `QueryEngine` is a stateless interface to the RAG pipeline useful for one-shot Q&A over the current set of indexes.
+
+`rag.index_manager.IndexManager.get_query_engine()` contains the core logic for setting up the llamaindex `QueryEngine` for RAG over the current set of indices
+in `rag.index_manager.IndexManager`. A `QueryEngine` is a stateless interface to the RAG pipeline useful for one-shot Q&A over the current set of indices.
 
 There are three basic retrieval techniques: `baseline`, `auto_merging` and `parent` on top of which additional retrieval, query transformation, and re-ranking can be applied.
 | RAG Hyper-paramater | Description |
@@ -122,8 +135,8 @@ There are three basic retrieval techniques: `baseline`, `auto_merging` and `pare
 | `use_rerank` | make a call to an LLM to re-rank the retrieved nodes in order of relevance according to the `prompts.choice_select_prompt_tmpl` |
 | `use_hyde` | embed a hallucinated response to the initial query *without retrieved context* and retrieve chunks based on that hallucinated response |
 | `use_refine` | refine the initial answer by calling an LLM to critique the response's correctness according to `prompts.refine_prompt_tmpl` |
-| `qa_followup` |  In additon to the retrieval done in the base retriever, retrieves document ids based on "questions that document can answer" by performing vector similarity of the query agains the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_folloup_retriever` |
-| `hybrid_retrieval` | In additon to the retrieval done in the base retriever, retrieves document ids based on BM25 search algorithm | 
+| `qa_followup` |  In additon to the retrieval done in the base retriever, retrieves document ID's based on "questions that document can answer" by performing vector similarity of the query agains the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_folloup_retriever` |
+| `hybrid_retrieval` | In additon to the retrieval done in the base retriever, retrieves document ID's based on BM25 search algorithm | 
 
 ```
 def get_query_engine(self,
@@ -223,7 +236,9 @@ def get_query_engine(self,
 ```
 
 ## Running Tests
+
 `tests/` contains unit tests for the FastAPI backend. To run tests, simply run
+
 ```
 pytest -s 
 ```

@@ -11,6 +11,7 @@ import logging
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+
 @router.post("/query_rag")
 async def query_rag(
     rag_request: RAGRequest,
@@ -38,7 +39,7 @@ async def query_rag(
         response = await react_agent.achat(rag_request.query)
     else:
         response = await query_engine.aquery(rag_request.query)
-    
+
     if rag_request.evaluate_response:
         retrieved_contexts = [r.node.text for r in response.source_nodes]
         eval_df = pd.DataFrame(
@@ -50,9 +51,7 @@ async def query_rag(
         )
         eval_df_ds = Dataset.from_pandas(eval_df)
 
-        vertexai_llm = ChatVertexAI(
-            model_name=rag_request.eval_model_name
-        )
+        vertexai_llm = ChatVertexAI(model_name=rag_request.eval_model_name)
         vertexai_embeddings = VertexAIEmbeddings(
             model_name=rag_request.embedding_model_name
         )

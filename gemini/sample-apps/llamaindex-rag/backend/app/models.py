@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+
 class IndexUpdate(BaseModel):
     base_index_name: str
     base_endpoint_name: str

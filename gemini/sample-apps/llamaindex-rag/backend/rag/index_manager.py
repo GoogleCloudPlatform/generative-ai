@@ -121,9 +121,9 @@ class IndexManager(object):
             "firestore_namespace": self.firestore_namespace,
         }
 
-    def get_vertex_llm(self, llm_name: str, 
-                       temperature: float, 
-                       system_prompt: str) -> Vertex | ClaudeVertexLLM:
+    def get_vertex_llm(
+        self, llm_name: str, temperature: float, system_prompt: str
+    ) -> Vertex | ClaudeVertexLLM:
         if "gemini" in llm_name:
             llm = Vertex(
                 model=llm_name,

@@ -30,16 +30,19 @@ import os
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
 
+
 # Function to load the configuration
 def load_config():
     config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
     with open(config_path, "r") as config_file:
         return yaml.safe_load(config_file)
 
+
 # Load the configuration
 config = load_config()
 # Get the DATA_PATH from the config
 DATA_PATH = config["data_path"]
+
 
 class Blob:
     def __init__(self, path: str, mimetype: str):
@@ -69,8 +72,10 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
     blob = bucket.blob(source_blob_name)
     blob.download_to_filename(destination_file_name)
 
-    print(f"Downloaded storage object {source_blob_name} \
-          from bucket {bucket_name} to local file {destination_file_name}.")
+    print(
+        f"Downloaded storage object {source_blob_name} \
+          from bucket {bucket_name} to local file {destination_file_name}."
+    )
 
 
 def download_bucket_with_transfer_manager(
@@ -199,11 +204,11 @@ def upload_directory_to_gcs(local_dir_path: str, bucket_name: str, prefix: str):
             blob.upload_from_filename(local_file_path)
             print(f"File {local_file_path} uploaded to {gcs_blob_name}")
 
+
 def clean_text(text):
     """
     Clean and preprocess the extracted text.
     """
-
 
     # Remove extra whitespace
     text = re.sub(r"\s+", " ", text).strip()

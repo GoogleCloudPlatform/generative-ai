@@ -1,5 +1,6 @@
 from google.cloud import aiplatform
 
+
 def create_index(vector_index_name: str, approximate_neighbors_count: int):
     index_names = [
         index.resource_name

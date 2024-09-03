@@ -9,10 +9,15 @@ import logging
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+
 @router.get("/list_vector_search_indexes_and_endpoints")
-async def list_vector_search_indexes_and_endpoints(index_manager=Depends(get_index_manager)) -> dict:
+async def list_vector_search_indexes_and_endpoints(
+    index_manager=Depends(get_index_manager),
+) -> dict:
     index_list = [i.display_name for i in aiplatform.MatchingEngineIndex.list()]
-    endpoint_list = [e.display_name for e in aiplatform.MatchingEngineIndexEndpoint.list()]
+    endpoint_list = [
+        e.display_name for e in aiplatform.MatchingEngineIndexEndpoint.list()
+    ]
 
     def organize_list(items, active_item):
         if active_item is None:
@@ -25,13 +30,18 @@ async def list_vector_search_indexes_and_endpoints(index_manager=Depends(get_ind
     return {
         "qa": {
             "indexes": organize_list(index_list.copy(), index_manager.qa_index_name),
-            "endpoints": organize_list(endpoint_list.copy(), index_manager.qa_endpoint_name)
+            "endpoints": organize_list(
+                endpoint_list.copy(), index_manager.qa_endpoint_name
+            ),
         },
         "base": {
             "indexes": organize_list(index_list.copy(), index_manager.base_index_name),
-            "endpoints": organize_list(endpoint_list.copy(), index_manager.base_endpoint_name)
-        }
+            "endpoints": organize_list(
+                endpoint_list.copy(), index_manager.base_endpoint_name
+            ),
+        },
     }
+
 
 @router.get("/list_firestore_databases")
 async def list_firestore_databases(index_manager=Depends(get_index_manager)) -> dict:
@@ -54,6 +64,7 @@ async def list_firestore_databases(index_manager=Depends(get_index_manager)) -> 
     except ValueError as e:
         logger.info(f"Could not retrieve Firestore db: {e}")
         return []
+
 
 @router.post("/list_firestore_collections")
 async def list_firestore_collections(
@@ -89,15 +100,19 @@ async def list_firestore_collections(
             collection_info.insert(0, active_firestore_namespace)
         return collection_info
     except PermissionDenied:
-        logger.error(f"Permission denied. Make sure you have the necessary permissions to access Firestore in project {index_manager.project_id}")
+        logger.error(
+            f"Permission denied. Make sure you have the necessary permissions to access Firestore in project {index_manager.project_id}"
+        )
         return []
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         return []
 
+
 @router.get("/get_current_index_info")
 async def get_current_index_info(index_manager=Depends(get_index_manager)) -> dict:
     return index_manager.get_current_index_info()
+
 
 @router.post("/update_index")
 async def update_index(

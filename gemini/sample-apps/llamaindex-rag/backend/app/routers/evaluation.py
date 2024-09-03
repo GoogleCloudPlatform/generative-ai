@@ -33,6 +33,7 @@ ragas_metrics_dict = {
     "answer_correctness": answer_correctness,
 }
 
+
 @router.post("/eval_batch")
 def eval_batch(
     eval_batch_request: EvalRequest,
@@ -80,9 +81,7 @@ def eval_batch(
     else:
         eval_df = llm_evaluator.evaluate(query_engine.aquery, eval_df)
 
-    vertexai_llm = ChatVertexAI(
-        model_name=eval_batch_request.eval_model_name
-    )
+    vertexai_llm = ChatVertexAI(model_name=eval_batch_request.eval_model_name)
     vertexai_embeddings = VertexAIEmbeddings(
         model_name=eval_batch_request.embedding_model_name
     )

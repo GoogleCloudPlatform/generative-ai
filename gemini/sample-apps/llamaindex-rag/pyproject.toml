@@ -274,6 +274,7 @@ llama-index-retrievers-bm25 = "^0.2.2"
 google-cloud-logging = "^3.11.0"
 anthropic = {extras = ["vertex"], version = "^0.31.2"}
 weave = "^0.50.12"
+black = "^24.8.0"
 
 [build-system]
 requires = ["poetry-core"]
