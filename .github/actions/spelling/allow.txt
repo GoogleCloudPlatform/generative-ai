@@ -418,6 +418,7 @@ nbfmt
 nbformat
 ncols
 ndarray
+newaxis
 newaxisngram
 ngrams
 nlp
