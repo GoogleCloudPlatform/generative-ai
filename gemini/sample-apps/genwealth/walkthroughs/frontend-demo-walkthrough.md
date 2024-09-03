@@ -152,7 +152,7 @@ Click **Ask** and review the result. It should look similar to the output below.
 
 ![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/17-emailresult.png "Donya Bartle")
 
-How did we get such a personalized result? Click **View Query** to see how we injected Donya's user bio into the input of our [llm() function](../database-files/genwealth-demo_llm.sql), and click **See Prompt** to view the enriched prompt that our llm() function generated on the user's behalf before sending it to the Vertex AI LLM for text completion. Here we are using the data we already have about our users to ground the prompt, and we are inferencing an LLM directly from the database using a simple SQL function.
+How did we get such a personalized result? Click **View Query** to see how we injected Donya's user bio into the input of our [llm() function](../database-files/llm.sql), and click **See Prompt** to view the enriched prompt that our llm() function generated on the user's behalf before sending it to the Vertex AI LLM for text completion. Here we are using the data we already have about our users to ground the prompt, and we are inferencing an LLM directly from the database using a simple SQL function.
 
 Now you can rinse and repeat for each user who emailed you while you were on vacation. For example, update the prompt with a new email from Geoffrey Folmer. He heard about your new Bitcoin ETF and proactively reached out to you to learn more.
 
