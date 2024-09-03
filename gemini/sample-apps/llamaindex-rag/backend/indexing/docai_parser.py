@@ -13,9 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 class DocAIParser:
-    '''
+    """
     Class for interfacing with DocAIParser
-    '''
+    """
+
     def __init__(
         self,
         project_id: str,
@@ -33,8 +34,7 @@ class DocAIParser:
         options = ClientOptions(
             api_endpoint=f"{self.location}-documentai.googleapis.com"
         )
-        return documentai\
-            .DocumentProcessorServiceClient(client_options=options)
+        return documentai.DocumentProcessorServiceClient(client_options=options)
 
     def batch_parse(
         self,
@@ -49,9 +49,7 @@ class DocAIParser:
                 blobs, chunk_size, include_ancestor_headings
             )
             print(f"Number of operations started: {len(operations)}")
-            self._wait_for_operations(operations, 
-                                      timeout_sec, 
-                                      check_in_interval_sec)
+            self._wait_for_operations(operations, timeout_sec, check_in_interval_sec)
             print("Operations completed successfully")
 
             for i, operation in enumerate(operations):
@@ -66,15 +64,12 @@ class DocAIParser:
             print(f"Error in batch_parse: {str(e)}")
 
             traceback.print_exc()
-            # Return any successfully parsed documents 
+            # Return any successfully parsed documents
             # instead of raising an exception
             return [], []
 
     def _start_batch_process(
-        self, 
-        blobs: List[Blob], 
-        chunk_size: int, 
-        include_ancestor_headings: bool
+        self, blobs: List[Blob], chunk_size: int, include_ancestor_headings: bool
     ):
         input_config = documentai.BatchDocumentsInputConfig(
             gcs_documents=documentai.GcsDocuments(
@@ -96,12 +91,11 @@ class DocAIParser:
 
         layout_config = documentai.ProcessOptions.LayoutConfig(
             chunking_config=documentai.ProcessOptions.LayoutConfig.ChunkingConfig(
-                    chunk_size=chunk_size,
-                    include_ancestor_headings=include_ancestor_headings,
+                chunk_size=chunk_size,
+                include_ancestor_headings=include_ancestor_headings,
             )
         )
-        process_options = documentai\
-            .ProcessOptions(layout_config=layout_config)
+        process_options = documentai.ProcessOptions(layout_config=layout_config)
 
         request = documentai.BatchProcessRequest(
             name=self.processor_name,
@@ -119,10 +113,7 @@ class DocAIParser:
             print(f"Error starting batch process: {str(e)}")
             raise
 
-    def _wait_for_operations(self, 
-                             operations, 
-                             timeout_sec, 
-                             check_in_interval_sec):
+    def _wait_for_operations(self, operations, timeout_sec, check_in_interval_sec):
         time_elapsed = 0
         while any(not operation.done() for operation in operations):
             time.sleep(check_in_interval_sec)
@@ -214,12 +205,14 @@ class DocAIParser:
 
 
 class DocAIParsingResults:
-    '''
+    """
     DocAI Parsing Results
-    '''
+    """
+
     def __init__(self, source_path: str, parsed_path: str):
         self.source_path = source_path
         self.parsed_path = parsed_path
+
 
 def get_or_create_docai_processor(
     project_id: str,
@@ -233,8 +226,7 @@ def get_or_create_docai_processor(
         api_endpoint=f"{location}-documentai.googleapis.com",
         quota_project_id=project_id,
     )
-    client = documentai\
-        .DocumentProcessorServiceClient(client_options=client_options)
+    client = documentai.DocumentProcessorServiceClient(client_options=client_options)
 
     if not create_new:
         if processor_id:

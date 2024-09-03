@@ -19,22 +19,16 @@ from typing import Dict, List, Optional, Sequence
 
 from llama_index.core.base.response.schema import RESPONSE_TYPE
 from llama_index.core.callbacks import CallbackManager
-from llama_index.core.indices.query.query_transform.base import (
-    BaseQueryTransform
-)
+from llama_index.core.indices.query.query_transform.base import BaseQueryTransform
 from llama_index.core.prompts import BasePromptTemplate
 from llama_index.core.prompts.default_prompts import DEFAULT_HYDE_PROMPT
-from llama_index.core.prompts.mixin import (
-    PromptDictType,  PromptMixinType
-)
+from llama_index.core.prompts.mixin import PromptDictType, PromptMixinType
 from llama_index.core.query_engine import (
     BaseQueryEngine,
     RetrieverQueryEngine,
 )
 from llama_index.core.schema import NodeWithScore, QueryBundle, QueryType
-from llama_index.core.service_context_elements.llm_predictor import (
-    LLMPredictorType
-)
+from llama_index.core.service_context_elements.llm_predictor import LLMPredictorType
 from llama_index.core.settings import Settings
 from pydantic import Field
 
@@ -80,8 +74,7 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
             "query_engine": self._query_engine,
         }
 
-    async def aretrieve(self, 
-                        query_bundle: QueryBundle) -> List[NodeWithScore]:
+    async def aretrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
         query_bundle = await self._query_transform._arun(
             query_bundle, metadata=self._transform_metadata
         )
@@ -117,8 +110,7 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
         else:
             query_bundle = query_bundle_or_str
 
-        return await self._query_transform._arun(query_bundle, 
-                                                 metadata=metadata)
+        return await self._query_transform._arun(query_bundle, metadata=metadata)
 
     async def asynthesize(
         self,
@@ -156,7 +148,7 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
     It uses an LLM to generate hypothetical answer(s) to a given query,
     and use the resulting documents as embedding strings.
 
-    As described in 
+    As described in
     `[Precise Zero-Shot Dense Retrieval without Relevance Labels]
     (https://arxiv.org/abs/2212.10496)`
     """
@@ -195,8 +187,7 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
         """Run query transform."""
         # TODO: support generating multiple hypothetical docs
         query_str = query_bundle.query_str
-        hypothetical_doc = self._llm.predict(self._hyde_prompt, 
-                                             context_str=query_str)
+        hypothetical_doc = self._llm.predict(self._hyde_prompt, context_str=query_str)
         embedding_strs = [hypothetical_doc]
         if self._include_original:
             embedding_strs.extend(query_bundle.embedding_strs)
@@ -231,10 +222,8 @@ class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
             )
         return nodes
 
-    async def aretrieve(self, 
-                        query_bundle: QueryBundle) -> List[NodeWithScore]:
+    async def aretrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
         nodes = await self._retriever.aretrieve(query_bundle)
         num_nodes = len(nodes)
         logger.info(f"Total nodes retrieved {num_nodes}")
-        return await self._apply_node_postprocessors(nodes, 
-                                                     query_bundle=query_bundle)
+        return await self._apply_node_postprocessors(nodes, query_bundle=query_bundle)

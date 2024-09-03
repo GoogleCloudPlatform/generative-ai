@@ -11,16 +11,8 @@ from common.utils import (
 )
 from google.cloud import aiplatform
 from google.cloud import documentai_v1 as documentai
-from llama_index.core import (
-    Document, 
-    Settings, 
-    StorageContext, 
-    VectorStoreIndex
-)
-from llama_index.core.extractors import (
-    QuestionsAnsweredExtractor, 
-    SummaryExtractor
-)
+from llama_index.core import Document, Settings, StorageContext, VectorStoreIndex
+from llama_index.core.extractors import QuestionsAnsweredExtractor, SummaryExtractor
 from llama_index.core.node_parser import (
     HierarchicalNodeParser,
     get_leaf_nodes,
@@ -87,9 +79,7 @@ def main():
 
     # Creating Vector Search Index
     vs_index, vs_endpoint = get_or_create_existing_index(
-        VECTOR_INDEX_NAME, 
-        INDEX_ENDPOINT_NAME, 
-        APPROXIMATE_NEIGHBORS_COUNT
+        VECTOR_INDEX_NAME, INDEX_ENDPOINT_NAME, APPROXIMATE_NEIGHBORS_COUNT
     )
 
     # Vertex Vector Search Vector DB and Firestore Docstore
@@ -102,9 +92,7 @@ def main():
     )
 
     docstore = FirestoreDocumentStore.from_database(
-        project=PROJECT_ID, 
-        database=FIRESTORE_DB_NAME, 
-        namespace=FIRESTORE_NAMESPACE
+        project=PROJECT_ID, database=FIRESTORE_DB_NAME, namespace=FIRESTORE_NAMESPACE
     )
 
     # Setup embedding model and LLM
@@ -175,7 +163,7 @@ def main():
             project_id=PROJECT_ID,
             region=LOCATION,
             index_id=qa_index.name,  # Use .name instead of .resource_name
-            endpoint_id=qa_endpoint.name,  
+            endpoint_id=qa_endpoint.name,
             gcs_bucket_name=DOCSTORE_BUCKET_NAME,
         )
         qa_extractor = QuestionsAnsweredExtractor(
@@ -292,7 +280,7 @@ def main():
             node.metadata.pop("excluded_embed_metadata_keys", None)
             node.metadata.pop("excluded_llm_metadata_keys", None)
 
-        # Creating an index automatically embeds and creates the 
+        # Creating an index automatically embeds and creates the
         # vector db collection
         index = VectorStoreIndex(
             nodes=nodes,

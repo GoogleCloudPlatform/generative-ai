@@ -13,6 +13,7 @@ from backend.rag.prompts import Prompts
 def client():
     return TestClient(app)
 
+
 # Define parameter combinations for query_rag
 query_rag_params = [
     {
