@@ -275,6 +275,7 @@ cmap
 codebase
 codebases
 codelab
+codelabs
 colab
 coldline
 coloraxis
