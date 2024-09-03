@@ -25,7 +25,7 @@ As LLMs continue to explode in power and popularity, it has become increasingly 
 These retrieval tools allow you to efficiently fetch information from your own data and insert the most relevant extracts directly into LLM prompts. This allows you to ground Generative AI output in data that you know to be relevant, validated and up to date.
 
 Most approaches to retrieval typically require the creation of embeddings from documents and the set up of a vector search engine. Custom solutions such as these are time consuming and complex to create, maintain and host. In contrast, Vertex AI Search is a turnkey search engine which provides Google-quality results as a managed service.
-A python [retriever](https://python.langchain.com/docs/modules/data_connection/retrievers.html) class has been provided in `/utils/retriever.py` which allows you to run searches against a Vertex AI Search engine.
+A python [retriever](https://python.langchain.com/v0.2/docs/concepts/#retrievers) class has been provided in `/utils/retriever.py` which allows you to run searches against a Vertex AI Search engine.
 
 ## Table of Contents
 

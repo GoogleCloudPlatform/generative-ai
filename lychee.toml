@@ -1,0 +1,12 @@
+exclude = [ 
+    'https://fonts.gstatic.com/',
+    'https://fonts.googleapis.com/',
+    'http://go/github',
+    'http://go/github-googlecloudplatform',
+]
+exclude_path = [
+    "gemini/sample-apps/photo-discovery/app/web/index.html",
+    "search/web-app/templates",
+]
+
+max_retries = 0
