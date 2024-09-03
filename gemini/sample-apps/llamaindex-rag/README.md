@@ -71,31 +71,23 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 ## Steps
 
 1. Clone the repository:
-
 ```bash
 git clone https://github.com/GoogleCloudPlatform/generative-ai
 cd gemini/sample-apps/llamaindex-rag
 ```
-
 2. Set up the environment:
-
 ```bash
 conda create -n llamaindex-rag python=3.10
 poetry install
 ```
-
 3. Configure the application:
    - Modify the parameters in `common/config.yaml` as needed
-
 4. Run the indexing job:
-
 ```bash
 export PYTHONPATH="." (in the parent directory llamaindex-rag)
 python src/indexing/run_parse_embed_index.py
 ```
-
 5. Build and deploy the FastAPI application:
-
 ```sh
 export PROJECT_ID=your-project-id
 export SERVICE_ACCOUNT=your-service-account@your-project.iam.gserviceaccount.com
@@ -114,15 +106,11 @@ gcloud run deploy fastapi-llamaindex-rag \
 --memory 4Gi \
 --max-instances 1
 ```
-
 OR run locally:
-
 ```sh
 python backend/app/main.py
 ```
-
 6. Build and deploy the Streamlit UI:
-
 ```sh
 docker build -f ui/Dockerfile -t fastapi-streamlit-app .
 docker tag fastapi-streamlit-app gcr.io/${PROJECT_ID}/fastapi-streamlit-app
@@ -138,13 +126,10 @@ gcloud run deploy fastapi-streamlit-app \
 --memory 4Gi \
 --max-instances 1
 ```
-
 OR run locally:
-
 ```sh
 streamlit run ui/🏠 Home.py
 ```
-
 Note: Replace `your-project-id` and `your-service-account@your-project.iam.gserviceaccount.com` with your actual Google Cloud project ID and service account email.
 
 ## Advanced Features

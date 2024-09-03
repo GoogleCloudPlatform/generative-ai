@@ -86,6 +86,7 @@ across the app's lifecycle (e.g. through UI manipulations). The `index_manager` 
 will be injected into all API routes that need to access its state or manipulate its state.
 
 This includes:
+
 - Switching out vector indices or docstores
 - Changing retrieval parameters (e.g. temperature, llm model, etc.)
 
