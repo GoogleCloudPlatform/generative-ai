@@ -5,15 +5,22 @@ import traceback
 from typing import List
 
 from common.utils import (
-    download_blob,
     create_pdf_blob_list,
     download_bucket_with_transfer_manager,
     link_nodes,
 )
 from google.cloud import aiplatform
 from google.cloud import documentai_v1 as documentai
-from llama_index.core import Document, Settings, StorageContext, VectorStoreIndex
-from llama_index.core.extractors import QuestionsAnsweredExtractor, SummaryExtractor
+from llama_index.core import (
+    Document, 
+    Settings, 
+    StorageContext, 
+    VectorStoreIndex
+)
+from llama_index.core.extractors import (
+    QuestionsAnsweredExtractor, 
+    SummaryExtractor
+)
 from llama_index.core.node_parser import (
     HierarchicalNodeParser,
     get_leaf_nodes,
@@ -26,7 +33,7 @@ from llama_index.llms.vertex import Vertex
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
 from pydantic import BaseModel
-from backend.indexing.docai_parser import DocAIParser, get_or_create_docai_processor
+from backend.indexing.docai_parser import DocAIParser
 from backend.indexing.prompts import qa_extraction_prompt, qa_parser_prompt
 from backend.indexing.vector_search_utils import *
 from tqdm.asyncio import tqdm_asyncio
@@ -80,7 +87,9 @@ def main():
 
     # Creating Vector Search Index
     vs_index, vs_endpoint = get_or_create_existing_index(
-        VECTOR_INDEX_NAME, INDEX_ENDPOINT_NAME, APPROXIMATE_NEIGHBORS_COUNT
+        VECTOR_INDEX_NAME, 
+        INDEX_ENDPOINT_NAME, 
+        APPROXIMATE_NEIGHBORS_COUNT
     )
 
     # Vertex Vector Search Vector DB and Firestore Docstore
@@ -93,7 +102,9 @@ def main():
     )
 
     docstore = FirestoreDocumentStore.from_database(
-        project=PROJECT_ID, database=FIRESTORE_DB_NAME, namespace=FIRESTORE_NAMESPACE
+        project=PROJECT_ID, 
+        database=FIRESTORE_DB_NAME, 
+        namespace=FIRESTORE_NAMESPACE
     )
 
     # Setup embedding model and LLM
@@ -164,7 +175,7 @@ def main():
             project_id=PROJECT_ID,
             region=LOCATION,
             index_id=qa_index.name,  # Use .name instead of .resource_name
-            endpoint_id=qa_endpoint.name,  # Use .name instead of .resource_name
+            endpoint_id=qa_endpoint.name,  
             gcs_bucket_name=DOCSTORE_BUCKET_NAME,
         )
         qa_extractor = QuestionsAnsweredExtractor(
@@ -281,7 +292,8 @@ def main():
             node.metadata.pop("excluded_embed_metadata_keys", None)
             node.metadata.pop("excluded_llm_metadata_keys", None)
 
-        # Creating an index automatically embeds and creates the vector db collection
+        # Creating an index automatically embeds and creates the 
+        # vector db collection
         index = VectorStoreIndex(
             nodes=nodes,
             storage_context=storage_context,

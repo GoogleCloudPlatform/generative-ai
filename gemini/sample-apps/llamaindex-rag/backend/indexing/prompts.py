@@ -12,4 +12,5 @@ that this context can answer.
 
 """
 
-qa_parser_prompt = """Parse the following list of questions: {questions_list}"""
+qa_parser_prompt = """Parse the following list of questions:\
+      {questions_list}"""

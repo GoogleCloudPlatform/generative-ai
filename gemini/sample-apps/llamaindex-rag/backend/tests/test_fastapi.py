@@ -13,21 +13,6 @@ from backend.rag.prompts import Prompts
 def client():
     return TestClient(app)
 
-
-# @pytest.fixture
-# def index_manager():
-#     index_manager = IndexManager()
-
-# @pytest.fixture
-# def prompts():
-#     prompts = Prompts()
-
-# Override the dependencies in your app
-# @pytest.fixture(autouse=True)
-# def override_dependencies(app, index_manager, prompts):
-#     app.dependency_overrides[get_index_manager] = lambda: index_manager
-#     app.dependency_overrides[get_prompts] = lambda: prompts
-
 # Define parameter combinations for query_rag
 query_rag_params = [
     {
