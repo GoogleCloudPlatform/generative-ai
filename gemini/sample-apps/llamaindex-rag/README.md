@@ -4,7 +4,6 @@
 
 This project implements an advanced Retrieval-Augmented Generation (RAG) system using LlamaIndex and Google Cloud Vertex AI. It primarily focuses on rapid prototyping and experimentation of different combinations of indexing strategies, retrieval algorithms, and LLMs in order to attain the best performing combination for your problem. It covers RAG design, indexing, retrieval, evaluation metrics, and deployment on Google Cloud, emphasizing rapid experimentation and evaluation. It features a FastAPI backend for query processing and a Streamlit frontend for user interaction. The system leverages Google Gemini models for natural language processing and Vertex AI Vector Search for efficient document retrieval.
 
-
 ## Authors
 
 - Sagar Kewalramani (`saaagesh`)
@@ -18,7 +17,7 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 
 ## Key Features
 
-- **Advanced RAG Techniques**: Implements various retrieval strategies including auto-merging, parent retrieval, and baseline approaches. 
+- **Advanced RAG Techniques**: Implements various retrieval strategies including auto-merging, parent retrieval, and baseline approaches.
 - **Flexible LLM Integration**: Supports multiple Gemini models (`gemini-1.5-pro`, `gemini-1.5-flash`) and Claude models (`claude-3.5-sonnet`) with configurable parameters.
 - **Vector Search**: Utilizes Vertex AI Vector Search for efficient document indexing and retrieval.
 - **Firestore**: Utilizes Firestore for document retrieval and auxiliary retrieval techniques
@@ -73,30 +72,29 @@ This project implements an advanced Retrieval-Augmented Generation (RAG) system 
 
 1. Clone the repository:
 
-```
+```bash
 git clone https://github.com/GoogleCloudPlatform/generative-ai
 cd gemini/sample-apps/llamaindex-rag
 ```
 
 2. Set up the environment:
 
-```
+```bash
 conda create -n llamaindex-rag python=3.10
 poetry install
 ```
 
-
 3. Configure the application:
-- Modify the parameters in `common/config.yaml` as needed
+   - Modify the parameters in `common/config.yaml` as needed
 
+4. Run the indexing job:
 
-1. Run the indexing job:
-```
+```bash
 export PYTHONPATH="." (in the parent directory llamaindex-rag)
 python src/indexing/run_parse_embed_index.py
 ```
 
-1. Build and deploy the FastAPI application:
+5. Build and deploy the FastAPI application:
 
 ```sh
 export PROJECT_ID=your-project-id
@@ -104,16 +102,16 @@ export SERVICE_ACCOUNT=your-service-account@your-project.iam.gserviceaccount.com
 docker build -t fastapi-llamaindex-rag .
 docker tag fastapi-llamaindex-rag gcr.io/${PROJECT_ID}/fastapi-llamaindex-rag
 docker push gcr.io/${PROJECT_ID}/fastapi-llamaindex-rag
-gcloud run deploy fastapi-llamaindex-rag 
---image gcr.io/${PROJECT_ID}/fastapi-llamaindex-rag 
---platform managed 
---region us-central1 
---allow-unauthenticated 
---port 8080 
---set-env-vars=CONFIG_PATH=/app/common/config.yaml 
---service-account=${SERVICE_ACCOUNT} 
---cpu 2 
---memory 4Gi 
+gcloud run deploy fastapi-llamaindex-rag \
+--image gcr.io/${PROJECT_ID}/fastapi-llamaindex-rag \
+--platform managed \
+--region us-central1 \
+--allow-unauthenticated \
+--port 8080 \
+--set-env-vars=CONFIG_PATH=/app/common/config.yaml \
+--service-account=${SERVICE_ACCOUNT} \
+--cpu 2 \
+--memory 4Gi \
 --max-instances 1
 ```
 
@@ -129,15 +127,15 @@ python backend/app/main.py
 docker build -f ui/Dockerfile -t fastapi-streamlit-app .
 docker tag fastapi-streamlit-app gcr.io/${PROJECT_ID}/fastapi-streamlit-app
 docker push gcr.io/${PROJECT_ID}/fastapi-streamlit-app
-gcloud run deploy fastapi-streamlit-app 
---image gcr.io/${PROJECT_ID}/fastapi-streamlit-app 
---platform managed 
---region us-central1 
---allow-unauthenticated 
---port 8080 
---service-account=${SERVICE_ACCOUNT} 
---cpu 2 
---memory 4Gi 
+gcloud run deploy fastapi-streamlit-app \
+--image gcr.io/${PROJECT_ID}/fastapi-streamlit-app \
+--platform managed \
+--region us-central1 \
+--allow-unauthenticated \
+--port 8080 \
+--service-account=${SERVICE_ACCOUNT} \
+--cpu 2 \
+--memory 4Gi \
 --max-instances 1
 ```
 
@@ -159,6 +157,7 @@ Note: Replace `your-project-id` and `your-service-account@your-project.iam.gserv
 ## Evaluation
 
 The system provides real-time evaluation metrics for each query:
+
 - Answer Relevancy
 - Faithfulness
 - Context Relevancy
@@ -187,7 +186,7 @@ This project is licensed under the standard Google Apache-2.0 license.
 
 ## Get in Touch
 
-Please file any Github issues if you have any questions or suggestions. 
+Please file any GitHub issues if you have any questions or suggestions.
 
 - Sagar Kewalramani (`saaagesh`)
 - Ken H Lee (`kenleejr`)

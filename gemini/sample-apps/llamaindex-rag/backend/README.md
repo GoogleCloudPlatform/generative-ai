@@ -2,9 +2,9 @@
 
 ## Indexing and Storage
 
- `src/indexing/run_parse_embed_index.py` contains the master script for parsing documents from a cloud storage bucket using DocumentAI, creating LlamaIndex indices which manage relationships between chunks, source documents, and parent chunks and storing the resulting indices in GCP native storage modalities (e.g. Vector Search, Firestore, Vertex Search). Before running this script, adjust the `common/config.yaml` file to your specs.
+`src/indexing/run_parse_embed_index.py` contains the master script for parsing documents from a cloud storage bucket using DocumentAI, creating LlamaIndex indices which manage relationships between chunks, source documents, and parent chunks and storing the resulting indices in GCP native storage modalities (e.g. Vector Search, Firestore, Vertex Search). Before running this script, adjust the `common/config.yaml` file to your specs.
 
-```
+```yaml
 # Project and environment settings
 project_id: "<my-project>"
 location: "us-central1"
@@ -40,9 +40,10 @@ create_docai_processor: false
 
 ### Indexing Methods
 
-There are two primary indexing methods used: `hierarchical` and `flat`. 
+There are two primary indexing methods used: `hierarchical` and `flat`.
+
 - `hierarchical` will create a hierarchy of chunks based on chunk sizes where chunks lower in the hierarchy are smaller progressing to larger chunks up the hierarchy. The relationships among chunks are managed through metadata associated with each chunk. The leaf chunks are embedded and stored in the vector index while all chunks are stored in a Firestore document store. This index is created to be compatible with the `auto_merging` retrieval technique.
-- `flat` will chunk all documents to the specified chunk size and simply embed them in the vector store. It will then store all parsed documents in Firestore so they can be accessed by ID as well. 
+- `flat` will chunk all documents to the specified chunk size and simply embed them in the vector store. It will then store all parsed documents in Firestore so they can be accessed by ID as well.
 
 ### Firestore
 
@@ -50,19 +51,20 @@ Firestore is used to store chunks and entire documents for retrieval via metadat
 
 ### "Questions-Answered" Index
 
-The parameters `qa_index_name` and `qa_endpoint_name` determine if an additional vector search index will be created based on LLM-generated questions which each document can answer. When these are set, each parsed document will be passed to Gemini who will generate a set of questions which that document can answer. The generated questions are then associated with the source_id of the parsed document, embedded and stored in a vector search index. At retrieval time, users can opt to query this vector index which will compare the user's query with the generated questions to obtain document ID's which could potentially answers the users question. Then, those documents are retrieved from Firestore and returned to the LLM for response generation. 
+The parameters `qa_index_name` and `qa_endpoint_name` determine if an additional vector search index will be created based on LLM-generated questions which each document can answer. When these are set, each parsed document will be passed to Gemini who will generate a set of questions which that document can answer. The generated questions are then associated with the source_id of the parsed document, embedded and stored in a vector search index. At retrieval time, users can opt to query this vector index which will compare the user's query with the generated questions to obtain document IDs which could potentially answers the users question. Then, those documents are retrieved from Firestore and returned to the LLM for response generation.
 
 ## RAG
 
 ## FastAPI Backend
 
 This FastAPI application provides an API for querying and evaluating a Retrieval-Augmented Generation (RAG) system. It includes endpoints for updating prompts, managing vector search indices, querying the RAG system, and performing batch evaluations.
+
 - Query RAG system with customizable parameters
 - Update and manage prompts
 - List and update vector search indices and endpoints
 - Perform batch evaluations using various metrics
 - Integration with Google Cloud services (Vertex AI, Firestore, Secret Manager)
-- 
+
 ### Endpoints
 
 1. `/`: Root endpoint
@@ -88,7 +90,8 @@ This includes:
 - Changing retrieval parameters (e.g. temperature, llm model, etc.)
 
 Users can set/get the index state through making API calls to:
-```
+
+```python
 class IndexUpdate(BaseModel):
     base_index_name: str
     base_endpoint_name: str
@@ -121,7 +124,7 @@ require manipulating prompts or accessing their state (e.g. `QueryEngines` or `C
 
 ### Asynchronous Execution
 
-`rag.async_extensions` contains classes which extend some of llamaindex's core primitives to be fully asynchronous. Some of llamaindex's classes 
+`rag.async_extensions` contains classes which extend some of llamaindex's core primitives to be fully asynchronous. Some of llamaindex's classes
 are not fully asynchronous (e.g. node postprocessing and query transformation) making operations like batch evaluation very slow.
 
 ### Retrieval Techniques
@@ -135,10 +138,10 @@ There are three basic retrieval techniques: `baseline`, `auto_merging` and `pare
 | `use_rerank` | make a call to an LLM to re-rank the retrieved nodes in order of relevance according to the `prompts.choice_select_prompt_tmpl` |
 | `use_hyde` | embed a hallucinated response to the initial query *without retrieved context* and retrieve chunks based on that hallucinated response |
 | `use_refine` | refine the initial answer by calling an LLM to critique the response's correctness according to `prompts.refine_prompt_tmpl` |
-| `qa_followup` |  In additon to the retrieval done in the base retriever, retrieves document ID's based on "questions that document can answer" by performing vector similarity of the query agains the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_folloup_retriever` |
-| `hybrid_retrieval` | In additon to the retrieval done in the base retriever, retrieves document ID's based on BM25 search algorithm | 
+| `qa_followup` |  In additon to the retrieval done in the base retriever, retrieves document IDs based on "questions that document can answer" by performing vector similarity of the query agains the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_folloup_retriever` |
+| `hybrid_retrieval` | In additon to the retrieval done in the base retriever, retrieves document IDs based on BM25 search algorithm |
 
-```
+```python
 def get_query_engine(self,
                         prompts: Prompts,
                         llm_name: str = "gemini-1.5-flash", 
@@ -239,6 +242,6 @@ def get_query_engine(self,
 
 `tests/` contains unit tests for the FastAPI backend. To run tests, simply run
 
-```
-pytest -s 
+```bash
+pytest -s
 ```

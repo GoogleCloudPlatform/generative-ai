@@ -1,12 +1,17 @@
 FROM python:3.10-slim
 
 WORKDIR /app
-RUN pip install poetry
-RUN apt-get update && apt-get install --yes --no-install-recommends gcc g++
+
+# Combine RUN instructions and address warnings
+RUN pip install --no-cache-dir poetry==1.5.1 && \
+    apt-get update && \
+    apt-get install --yes --no-install-recommends gcc=4:10.2.1-1 g++=4:10.2.1-1 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY poetry.lock pyproject.toml ./
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-dev
 
 # Copy 
 COPY common /app/common
