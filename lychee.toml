@@ -5,7 +5,10 @@ exclude = [
     'http://go/github-googlecloudplatform',
 ]
 exclude_path = [
+    ".github/actions/spelling",
+    "conversation/chat-app/src/app.html",
     "gemini/sample-apps/photo-discovery/app/web/index.html",
+    "gemini/sample-apps/genwealth/ui/src/app/research",
     "search/web-app/templates",
 ]
 
