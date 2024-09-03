@@ -200,9 +200,9 @@ Use pgAdmin to run the commands below against the `ragdemos` database to registe
 
 ### Create the llm_local() Function
 
-Use pgAdmin to run the commands below against the `ragdemos` database to create the llm_local() function. 
+Use pgAdmin to run the commands below against the `ragdemos` database to create the llm_local() function.
 
-1. Copy and paste the function code from [genwealth-demo_llm_local.sql](../database-files/genwealth-demo_llm_local.sql) into a pgAdmin query window and run the query to create the function.
+1. Copy and paste the function code from [llm_local.sql](../database-files/llm_local.sql) into a pgAdmin query window and run the query to create the function.
 
 1. Run the test query below to make sure the function is working as expected.
 
