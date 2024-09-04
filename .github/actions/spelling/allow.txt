@@ -305,10 +305,8 @@ drinkware
 dropna
 dwmapi
 ecommerce
-elous
 embs
 emojis
-epoc
 etf
 eur
 evals

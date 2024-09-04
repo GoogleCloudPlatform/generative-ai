@@ -20,7 +20,7 @@ These comprehensive learning notebooks dive deep into the critical world of LLM 
     - Virtualization
     - Obfuscation
     - Multimodal Attacks (Image, PDF & Video)
-    - Model poisioning
+    - Model poisoning
   - Protections & Mitigation with:
     - Data Loss Prevention
     - Natural Language API (Category Check, Sentiment Analysis)
