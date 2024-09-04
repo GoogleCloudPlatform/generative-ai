@@ -194,7 +194,7 @@
 \b(?!LangServe\b)(?!langserve\b)[Ll]ang\s?[Ss]erve?\b
 
 # Should be LlamaIndex
-\b(?!LlamaIndex\b)[Ll]lama\s?[Ii]ndex?\b
+\b(?!LlamaIndex\b)[Ll][Ll]ama\s?[Ii]ndex?\s
 
 # Should be Hugging Face
 \s(?!Hugging Face\b)[Hh]ugging\s?[Ff]ace?\b
@@ -260,9 +260,7 @@
 \bVertex\s?Search\b
 
 # Should be Colab
-\scolabs?\b
-\b[Cc]ollabs?\b
-\b[Cc]oLabs?\b
+\s(?!Colab)[Cc]o[Ll][Ll]?abs?\b
 
 # Should be Kaggle
 \skaggle\b
@@ -295,4 +293,4 @@
 \ban\s+(?![FHLMNRSX][A-Z0-9]+\b)(?!hour\b)(?!honest\b)([b-df-hj-np-tv-zB-DF-HJ-NP-TV-Z]{1}\w*)
 
 # Don't use Google internal links
-((corp|prod).google.com|googleplex.com|https?://[0-9a-z][0-9a-z-]+/|(?:^|[^/.-])\b(?:go|b|cl|cr)/[a-z0-9_.-]+\b)
+((corp|prod|sandbox).google.com|googleplex.com|https?://[0-9a-z][0-9a-z-]+/|(?:^|[^/.-])\b(?:go|b|cl|cr)/[a-z0-9_.-]+\b)
