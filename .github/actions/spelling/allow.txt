@@ -308,7 +308,8 @@ ecommerce
 elous
 embs
 emojis
-epocetf
+epoc
+etf
 eur
 evals
 faiss
