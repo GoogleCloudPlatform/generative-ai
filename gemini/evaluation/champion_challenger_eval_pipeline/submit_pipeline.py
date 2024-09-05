@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+""" Submit Vertex Pipeline run"""
+
 from google.cloud import aiplatform
 
 PROJECT_ID = "YOUR_PROJECT_ID"

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Champion Challenger Auto Side-by-side Evaluation Vertex Pipelines """
+""" Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
 
 from typing import NamedTuple
 
@@ -22,7 +22,9 @@ from kfp.dsl import Artifact, Dataset, Input, Output, component
 PIPELINE_TEMPLATE = "champion_challenger_pipeline.yaml"
 
 
-# Component to retrieve model config from GCS
+""" Component to retrieve model config from GCS """
+
+
 @component(base_image="python:3.12", packages_to_install=["google-cloud-storage"])
 def get_model_config(
     model_config_path: str,
@@ -77,7 +79,9 @@ def get_model_config(
         print("Missing model config json")
 
 
-# Component to get and store model responses in BQ
+""" Component to get and store model responses in BQ """
+
+
 @component(
     base_image="python:3.12",
     packages_to_install=["google-cloud-aiplatform", "pandas", "pandas-gbq"],
@@ -108,7 +112,7 @@ def get_model_response(
             text,
             model_id,
             system_instruction,
-            prompt_template,
+            input_prompt_template,
             temperature,
             max_output_tokens,
             top_p,
@@ -138,7 +142,7 @@ def get_model_response(
                 "top_p": top_p,
             }
 
-            prompt_template = prompt_template
+            prompt_template = input_prompt_template
             prompt = f"{prompt_template} \n{text}"
 
             model = GenerativeModel(model_id, system_instruction=[system_instruction])
@@ -182,7 +186,9 @@ def get_model_response(
         model_response_summary.path = f"https://console.cloud.google.com/bigquery?project={project_id}&ws=!1m5!1m4!4m3!1s{project_id}!2s{bq_dataset}!3s{bq_model_response_table}"
 
 
-# Component to create champion challenger response evaluation table in BQ
+""" Component to create champion challenger response evaluation table in BQ """
+
+
 @component(base_image="python:3.12", packages_to_install=["pandas", "pandas-gbq"])
 def eval_dataset(
     current_model_response: Input[Dataset],
@@ -231,9 +237,11 @@ def eval_dataset(
     evaluation_dataset.path = f"https://console.cloud.google.com/bigquery?project={project_id}&ws=!1m5!1m4!4m3!1s{project_id}!2s{bq_dataset}!3s{bq_eval_table}"
 
 
-# Component to run auto_sxs
+""" Component to run auto_sxs """
+
+
 @component(
-    base_image="us-docker.pkg.dev/vertex-ai/training/tf-cpu.2-12.py310:latest",  # TODO: Find Better Base Image
+    base_image="us-docker.pkg.dev/vertex-ai/training/tf-cpu.2-12.py310:latest",
     packages_to_install=["google-cloud-aiplatform", "pandas"],
 )
 def auto_sxs_eval(
@@ -312,7 +320,9 @@ def auto_sxs_eval(
     summary_metrics_df.to_csv(summary_metrics.path, index=False)
 
 
-# Component to check if challenger win rate is greater than current champion model
+""" Component to check if challenger win rate is greater than current champion model """
+
+
 @component(base_image="python:3.12", packages_to_install=["pandas"])
 def challenger_model_better(summary_metrics: Input[Dataset]) -> bool:
     import pandas as pd
@@ -374,7 +384,9 @@ def update_current_model_config(
     champion_model_config.metadata = {"model_id": champion_model_id}
 
 
-# Kubeflow Pipeline to orchestrate all the components
+""" Kubeflow Pipeline to orchestrate all the components """
+
+
 @dsl.pipeline
 def pipeline():
     # gs://genops/model-config/summarization.json
