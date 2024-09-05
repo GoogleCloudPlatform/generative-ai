@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from google.cloud import aiplatform
+
 PROJECT_ID = "YOUR_PROJECT_ID"
 REGION = "PIPELINE_REGION"
 PIPELINE_TEMPLATE = "champion_challenger_pipeline.yaml"
 PIPELINE_BUCKET_URI = "gs://genops-eval-pipelines"
 PIPELINE_NAME = "champion-challenger-evaluation"
 
-from google.cloud import aiplatform
+""" Submit compiled pipeline """
 
 
 def submit_pipeline():
