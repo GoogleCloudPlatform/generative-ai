@@ -242,7 +242,7 @@ alloydb
 antiword
 arXiv
 arun
-arunastype
+astype
 automl
 autoptr
 autosxs
