@@ -241,6 +241,7 @@ airlume
 alloydb
 antiword
 arXiv
+arun
 arunastype
 automl
 autoptr
@@ -538,5 +539,3 @@ ylabel
 ytd
 yticks
 zaxis
-termcolor
-arun
