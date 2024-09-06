@@ -49,15 +49,15 @@ gsutil mb -l $LOCATION -p $PROJECT_ID $BUCKET_URI
 
 - The pipeline example leverages current champion model for summarisation Associated model and other config parameters are stored in `summarization.json` with following schema in the GCS Bucket:
 
-``` JSON
- {
-    "model": "MODEL_NAME",
-    "system_instruction": "Your system isntructions. ",
-    "prompt_template": "Prompt template",
-    "temperature": TEMPERATURE,
-    "max_output_tokens": OUTPUT_TOKENS,
-    "top_p": TOP_P
-}
+```json
+{
+  "model": "MODEL_NAME",
+  "system_instruction": "Your system isntructions. ",
+  "prompt_template": "Prompt template",
+  "temperature": TEMPERATURE,
+  "max_output_tokens": OUTPUT_TOKENS,
+  "top_p": TOP_P
+  }
 ```
 
 - You can find sample config files under [sample_model_config](sample_model_config). Copy to the `genops` bucket using
