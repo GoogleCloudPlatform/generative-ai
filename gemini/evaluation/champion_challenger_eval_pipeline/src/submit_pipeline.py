@@ -16,10 +16,10 @@
 
 from google.cloud import aiplatform
 
-project_id = "cloud-llm-preview1"
+project_id = "YOUR_PROJECT_ID"
 region = "us-central1"
 PIPELINE_TEMPLATE = "champion_challenger_pipeline.yaml"
-pipeline_bucket_uri = "gs://meghaag-genops-eval-pipelines"
+pipeline_bucket_uri = "gs://genops-eval-pipelines"
 PIPELINE_NAME = "champion-challenger-evaluation"
 
 """ Submit compiled pipeline """

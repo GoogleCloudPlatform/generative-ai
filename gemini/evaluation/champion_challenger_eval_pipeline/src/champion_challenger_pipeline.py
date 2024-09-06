@@ -393,11 +393,11 @@ def update_current_model_config(
 @dsl.pipeline
 def pipeline():
     # Expects a model config file gs://genops/model-config/summarization.json
-    project_id = "cloud-llm-preview1"
+    project_id = "YOUR_PROJECT_ID"
     region_autosxs = "us-central1"
-    bucket_name = "meghaag_genops"
+    bucket_name = "genops"
     model_config_blob = "model-config"
-    bq_dataset = "meghaag_genops"
+    bq_dataset = "genops"
     bq_source_table = "summarizer_data"
 
     challenger_param_file = "challenger_summarization.json"
