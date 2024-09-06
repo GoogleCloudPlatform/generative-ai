@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: disable=import-outside-toplevel,too-many-arguments, inconsistent-return-statements
+
 """ Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
 
 from typing import NamedTuple
@@ -76,7 +78,7 @@ def get_model_config(
             model_params["top_p"],
         )
     else:
-        print("Missing model config json")
+        raise Exception("Missing current champion model config json")
 
 
 """ Component to get and store model responses in BQ """
