@@ -488,7 +488,4 @@ def pipeline():
 
 
 if __name__ == "__main__":
-    compiler.Compiler().compile(
-        pipeline_func=pipeline, 
-        package_path=PIPELINE_TEMPLATE
-    )
+    compiler.Compiler().compile(pipeline_func=pipeline, package_path=PIPELINE_TEMPLATE)
