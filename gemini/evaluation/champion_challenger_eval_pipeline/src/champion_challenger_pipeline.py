@@ -392,12 +392,12 @@ def update_current_model_config(
 # Kubeflow Pipeline to orchestrate all the components """
 @dsl.pipeline
 def pipeline():
-    # gs://genops/model-config/summarization.json
-    project_id = "YOUR_PROJECT_ID"
-    region_autosxs = "europe-west4"
-    bucket_name = "genops"
+    # Expects a model config file gs://genops/model-config/summarization.json
+    project_id = "cloud-llm-preview1"
+    region_autosxs = "us-central1"
+    bucket_name = "meghaag_genops"
     model_config_blob = "model-config"
-    bq_dataset = "genops"
+    bq_dataset = "meghaag_genops"
     bq_source_table = "summarizer_data"
 
     challenger_param_file = "challenger_summarization.json"
@@ -488,4 +488,7 @@ def pipeline():
 
 
 if __name__ == "__main__":
-    compiler.Compiler().compile(pipeline_func=pipeline, package_path=PIPELINE_TEMPLATE)
+    compiler.Compiler().compile(
+        pipeline_func=pipeline, 
+        package_path=PIPELINE_TEMPLATE
+    )

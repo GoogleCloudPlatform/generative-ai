@@ -22,20 +22,34 @@ Google Cloud Services Used: Cloud Build, Vertex AI Pipelines, Auto SxS, Google C
 - Before promoting the challenger model config, the champion model config is version controlled and then updated with winning model config params
 - Cloud Build: Configure the Vertex AI Pipeline with Cloud Build
 - Trigger Champion Challenger Vertex AI Pipeline with ([Git triggers](https://cloud.google.com/build/docs/triggers#github)) or trigger manually by running following in terminal/ [add triggers](https://cloud.google.com/build/docs/triggers):
-  - `!gcloud builds submit evaluation_pipelines --config=genops_champion_challenger_eval_pipeline/pipelinebuild.yaml`
+  - `gcloud builds submit src --config=pipelinebuild.yaml`
 - Add GCS [Pub Sub triggers](https://cloud.google.com/build/docs/automate-builds-pubsub-events#gcs_build_trigger) so that whenever challenger model config is updated, associated cloud build trigger can kickstart evaluation pipeline to evaluate whether the new candidate model is better and if champion model needs updating
 
 ### Champion Challenger Pipeline
 
 ![# Champion Challenger - evaluation pipelines](images/champion-challenger-eval.gif)
 
-### Pre-Requisites / Background
+### Pre-Requisites:
 
 This champion challenger pipeline is built in context of a Summarisation app.
 
-Current champion model for summarisation leverages `gemini_1.5_pro` and the config parameters is stored in `summarization.json` with following schema:
-
+1. Create pipeline GCS bucket `genops-eval-pipelines` if it doesn't exist
+``` BASH
+PROJECT_ID="[your-project-id]"
+LOCATION="us-central1"
+PIPELINE_BUCKET_URI="gs://genops-eval-pipelines"
+gsutil mb -l $LOCATION -p $PROJECT_ID $PIPELINE_BUCKET_URI
 ```
+
+2. Create `genops/model-config` GCS bucket if it doesn't exist to persist current and candidate model configs
+``` BASH
+BUCKET_URI="gs://genops"
+gsutil mb -l $LOCATION -p $PROJECT_ID $BUCKET_URI
+```
+
+- The pipeline example leverages current champion model for summarisation Associated model and other config parameters are stored in `summarization.json` with following schema in the GCS Bucket:
+
+``` JSON
  {
     "model": "MODEL_NAME",
     "system_instruction": "Your system isntructions. ",
@@ -46,22 +60,35 @@ Current champion model for summarisation leverages `gemini_1.5_pro` and the conf
 }
 ```
 
-After further exploration, if data scientists make a new  `challenger_summarization.json` file available in the GCS Bucket, the  config params for candidate models also follow the above schema; the above pipeline can be triggered.
+- You can find sample config files under [sample_model_config](sample_model_config). Copy to the `genops` bucket using
 
-You can use the following ddl to create BQ schema pipeline expects:
+``` BASH
+gsutil cp -r sample_model_config/summarization.json $BUCKET_URI/model-config/summarization.json
+```
 
--- Ground Truth Dataset table summarizer_data containing raw text articles and golden summaries
+- After further exploration, data scientists can make a new  `challenger_summarization.json` file available in this GCS Bucket, the  config params for candidate models also follow the above schema; the above pipeline can be triggered.
 
-CREATE TABLE `{YOUR_PROJECT_ID}.summarizer_data`
+``` BASH
+gsutil cp -r sample_model_config/challenger_summarization.json $BUCKET_URI/model-config/challenger_summarization.json
+```
+
+3. You can use the following ddl to create BQ schema pipeline expects. At first create a dataset called `genops` in your BQ project in the same regions. Replace `[your-project-id]` placeholder with relevant project id below.
+
+``` SQL
+-- Ground Truth Dataset table summarizer_data containing raw text articles and golden summaries. 
+
+CREATE TABLE `[your-project-id].genops.summarizer_data`
 (
   id INT64,
   article STRING,
   golden_summary STRING
 );
 
+-- Insert/Load your articles to be summarised along with (optional) golden summary 
+
 -- Champion model response against summarizer_data articles
 
-CREATE TABLE `genops.summarizer_champion_model`
+CREATE TABLE `[your-project-id].genops.summarizer_champion_model`
 (
   id INT64,
   prompt STRING,
@@ -70,7 +97,7 @@ CREATE TABLE `genops.summarizer_champion_model`
 
 -- Challenger model response against summarizer_data articles
 
-CREATE TABLE `{YOUR_PROJECT_ID}.genops.summarizer_challenger_model`
+CREATE TABLE `[your-project-id].genops.summarizer_challenger_model`
 (
   id INT64,
   prompt STRING,
@@ -79,10 +106,16 @@ CREATE TABLE `{YOUR_PROJECT_ID}.genops.summarizer_challenger_model`
 
 -- Champion Challenger response evaluation set for AutoSxS pipelines
 
-CREATE TABLE `{YOUR_PROJECT_ID}.summarizer_champion_challenger_eval`
+CREATE TABLE `[your-project-id].genops.summarizer_champion_challenger_eval`
 (
   id INT64,
   article STRING,
   current_model_summary STRING,
   challenger_model_summary STRING
 );
+```
+
+4. Trigger Cloud Build Pipeline:
+``` BASH
+gcloud builds submit src --config=pipelinebuild.yaml
+```
