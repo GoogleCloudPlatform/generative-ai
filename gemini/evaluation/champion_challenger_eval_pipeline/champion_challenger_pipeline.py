@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=import-outside-toplevel,too-many-arguments, inconsistent-return-statements
+# pylint: disable=import-outside-toplevel, inconsistent-return-statements, missing-function-docstring
+# pylint: disable=no-member, no-value-for-parameter, redefined-outer-name
+# pylint: disable=too-many-arguments, too-many-locals, undefined-loop-variable
 
 """ Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
 
@@ -29,7 +31,6 @@ PIPELINE_TEMPLATE = "champion_challenger_pipeline.yaml"
 
 @component(base_image="python:3.12", packages_to_install=["google-cloud-storage"])
 def get_model_config(
-    model_config_path: str,
     bucket_name: str,
     model_config_blob: str,
     param_file_name: str,
@@ -77,13 +78,10 @@ def get_model_config(
             model_params["max_output_tokens"],
             model_params["top_p"],
         )
-    else:
-        raise Exception("Missing current champion model config json")
+    raise RuntimeError("Missing current champion model config json")
 
 
-""" Component to get and store model responses in BQ """
-
-
+# Component to get and store model responses in BQ
 @component(
     base_image="python:3.12",
     packages_to_install=["google-cloud-aiplatform", "pandas", "pandas-gbq"],
@@ -179,18 +177,24 @@ def get_model_response(
         model_response_summary.metadata = {
             "bq_table_id": f"{project_id}.{bq_dataset}.{bq_model_response_table}"
         }
-        model_response_summary.path = f"https://console.cloud.google.com/bigquery?project={project_id}&ws=!1m5!1m4!4m3!1s{project_id}!2s{bq_dataset}!3s{bq_model_response_table}"
+        model_response_summary.path = (
+            f"https://console.cloud.google.com/bigquery?"
+            f"project={project_id}&ws=!1m5!1m4!4m3!1s"
+            f"{project_id}!2s{bq_dataset}!3s{bq_model_response_table}"
+        )
 
     else:
         model_response_summary.metadata = {
             "bq_table_id": f"{project_id}.{bq_dataset}.{bq_model_response_table}"
         }
-        model_response_summary.path = f"https://console.cloud.google.com/bigquery?project={project_id}&ws=!1m5!1m4!4m3!1s{project_id}!2s{bq_dataset}!3s{bq_model_response_table}"
+        model_response_summary.path = (
+            f"https://console.cloud.google.com/bigquery?"
+            f"project={project_id}&ws=!1m5!1m4!4m3!1s"
+            f"{project_id}!2s{bq_dataset}!3s{bq_model_response_table}"
+        )
 
 
-""" Component to create champion challenger response evaluation table in BQ """
-
-
+# Component to create champion challenger response evaluation table in BQ
 @component(base_image="python:3.12", packages_to_install=["pandas", "pandas-gbq"])
 def eval_dataset(
     current_model_response: Input[Dataset],
@@ -236,19 +240,20 @@ def eval_dataset(
     evaluation_dataset.metadata = {
         "bq_table_id": f"{project_id}.{bq_dataset}.{bq_eval_table}"
     }
-    evaluation_dataset.path = f"https://console.cloud.google.com/bigquery?project={project_id}&ws=!1m5!1m4!4m3!1s{project_id}!2s{bq_dataset}!3s{bq_eval_table}"
+    evaluation_dataset.path = (
+        f"https://console.cloud.google.com/bigquery?"
+        f"project={project_id}&ws=!1m5!1m4!4m3!1s"
+        f"{project_id}!2s{bq_dataset}!3s{bq_eval_table}"
+    )
 
 
-""" Component to run auto_sxs """
-
-
+# Component to run auto_sxs
 @component(
     base_image="us-docker.pkg.dev/vertex-ai/training/tf-cpu.2-12.py310:latest",
     packages_to_install=["google-cloud-aiplatform", "pandas"],
 )
 def auto_sxs_eval(
     eval_dataset: Input[Dataset],
-    bq_dataset: str,
     project_id: str,
     id_column: str,
     inference_context_column: str,
@@ -322,9 +327,7 @@ def auto_sxs_eval(
     summary_metrics_df.to_csv(summary_metrics.path, index=False)
 
 
-""" Component to check if challenger win rate is greater than current champion model """
-
-
+# Component to check if challenger win rate is greater than current champion model
 @component(base_image="python:3.12", packages_to_install=["pandas"])
 def challenger_model_better(summary_metrics: Input[Dataset]) -> bool:
     import pandas as pd
@@ -386,29 +389,22 @@ def update_current_model_config(
     champion_model_config.metadata = {"model_id": champion_model_id}
 
 
-""" Kubeflow Pipeline to orchestrate all the components """
-
-
+# Kubeflow Pipeline to orchestrate all the components """
 @dsl.pipeline
 def pipeline():
     # gs://genops/model-config/summarization.json
-    PROJECT_ID = "YOUR_PROJECT_ID"
-    REGION = "PIPELINE_REGION"
-    REGION_autosxs = "europe-west4"
-    BUCKET_NAME = "genops"
-    MODEL_CONFIG_BLOB = "model-config"
+    project_id = "YOUR_PROJECT_ID"
+    region_autosxs = "europe-west4"
+    bucket_name = "genops"
+    model_config_blob = "model-config"
     bq_dataset = "genops"
     bq_source_table = "summarizer_data"
 
-    CHALLENGER_PARAM_FILE = "challenger_summarization.json"
-    model_params_config_path = (
-        f"gs://{BUCKET_NAME}/{MODEL_CONFIG_BLOB}/{CHALLENGER_PARAM_FILE}"
-    )
+    challenger_param_file = "challenger_summarization.json"
     challenger_model_config = get_model_config(
-        model_config_path=model_params_config_path,
-        bucket_name=BUCKET_NAME,
-        model_config_blob=MODEL_CONFIG_BLOB,
-        param_file_name=CHALLENGER_PARAM_FILE,
+        bucket_name=bucket_name,
+        model_config_blob=model_config_blob,
+        param_file_name=challenger_param_file,
     ).set_display_name("challenger_model_config")
 
     bq_challenger_model_response_table = "summarizer_challenger_model"
@@ -419,21 +415,17 @@ def pipeline():
         temperature=challenger_model_config.outputs["temperature"],
         max_output_tokens=challenger_model_config.outputs["max_output_tokens"],
         top_p=challenger_model_config.outputs["top_p"],
-        project_id=PROJECT_ID,  # YOUR_PROJECT_ID.genops.summarizer_data
+        project_id=project_id,  # YOUR_PROJECT_ID.genops.summarizer_data
         bq_dataset=bq_dataset,  # YOUR_PROJECT_ID.genops.summarizer_champion_model
         bq_source_table=bq_source_table,
         bq_model_response_table=bq_challenger_model_response_table,
     ).set_display_name("challenger_model_summary")
 
-    CURRENT_PARAM_FILE = "summarization.json"
-    model_params_config_path = (
-        f"gs://{BUCKET_NAME}/{MODEL_CONFIG_BLOB}/{CURRENT_PARAM_FILE}"
-    )
+    current_param_file = "summarization.json"
     current_model_config = get_model_config(
-        model_config_path=model_params_config_path,
-        bucket_name=BUCKET_NAME,
-        model_config_blob=MODEL_CONFIG_BLOB,
-        param_file_name=CURRENT_PARAM_FILE,
+        bucket_name=bucket_name,
+        model_config_blob=model_config_blob,
+        param_file_name=current_param_file,
     ).set_display_name("current_model_config")
 
     bq_current_model_response_table = "summarizer_champion_model"
@@ -444,7 +436,7 @@ def pipeline():
         temperature=current_model_config.outputs["temperature"],
         max_output_tokens=current_model_config.outputs["max_output_tokens"],
         top_p=current_model_config.outputs["top_p"],
-        project_id=PROJECT_ID,  # YOUR_PROJECT_ID.genops.summarizer_data
+        project_id=project_id,  # YOUR_PROJECT_ID.genops.summarizer_data
         bq_dataset=bq_dataset,  # YOUR_PROJECT_ID.genops.summarizer_champion_model
         bq_source_table=bq_source_table,
         bq_model_response_table=bq_current_model_response_table,
@@ -459,20 +451,19 @@ def pipeline():
         bq_dataset=bq_dataset,
         bq_eval_table=bq_eval_table_name,
         bq_source_table=bq_source_table,
-        project_id=PROJECT_ID,
+        project_id=project_id,
     ).set_display_name("evaluation_data")
 
-    PIPELINE_BUCKET_URI = "gs://genops-eval-pipelines"
+    pipeline_bucket_uri = "gs://genops-eval-pipelines"
     eval_results = auto_sxs_eval(
         eval_dataset=eval_responses.outputs["evaluation_dataset"],
         id_column="id",
         inference_context_column="article",
         response_a_column="current_model_summary",
         response_b_column="challenger_model_summary",
-        project_id=PROJECT_ID,
-        bq_dataset=bq_dataset,
-        region_id=REGION_autosxs,
-        bucket_uri=PIPELINE_BUCKET_URI,
+        project_id=project_id,
+        region_id=region_autosxs,
+        bucket_uri=pipeline_bucket_uri,
     )
 
     challenger_winning = challenger_model_better(
@@ -480,9 +471,9 @@ def pipeline():
     )
     with dsl.If(challenger_winning.output == True):
         update_current_model_config(
-            bucket_name=BUCKET_NAME,
-            model_config_blob=MODEL_CONFIG_BLOB,
-            param_file=CURRENT_PARAM_FILE,
+            bucket_name=bucket_name,
+            model_config_blob=model_config_blob,
+            param_file=current_param_file,
             champion_model_id=challenger_model_config.outputs["model"],
             champion_system_instruction=challenger_model_config.outputs[
                 "system_instruction"

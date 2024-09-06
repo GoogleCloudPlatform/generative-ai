@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Submit Vertex Pipeline run"""
+""" Submit Vertex AI Pipeline run"""
 
 from google.cloud import aiplatform
 
-PROJECT_ID = "YOUR_PROJECT_ID"
-REGION = "PIPELINE_REGION"
+project_id = "YOUR_PROJECT_ID"
+region = "PIPELINE_REGION"
 PIPELINE_TEMPLATE = "champion_challenger_pipeline.yaml"
-PIPELINE_BUCKET_URI = "gs://genops-eval-pipelines"
+pipeline_bucket_uri = "gs://genops-eval-pipelines"
 PIPELINE_NAME = "champion-challenger-evaluation"
 
 """ Submit compiled pipeline """
@@ -27,9 +27,9 @@ PIPELINE_NAME = "champion-challenger-evaluation"
 
 def submit_pipeline():
     aiplatform.init(
-        project=PROJECT_ID, staging_bucket=PIPELINE_BUCKET_URI, location=REGION
+        project=project_id, staging_bucket=pipeline_bucket_uri, location=region
     )
-    PIPELINE_ROOT = PIPELINE_BUCKET_URI
+    PIPELINE_ROOT = pipeline_bucket_uri
 
     job = aiplatform.PipelineJob(
         display_name=PIPELINE_NAME,
