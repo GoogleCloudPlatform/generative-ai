@@ -30,7 +30,7 @@
   "devDependencies": {
     "firebase-functions-test": "^3.1.0",
     "genkit": "^1.0.0",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.0"
   },
   "private": true
 }
