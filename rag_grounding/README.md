@@ -52,7 +52,7 @@ for a walkthrough.
   Showcase specific RAG use cases
 - **[search_data_blending_with_gemini_summarization.ipynb](../search/search_data_blending_with_gemini_summarization.ipynb)**:
   Demonstrates calling a search app that blends information from multiple stores
-  (GCS, BQ, Website) and summarizes search snippets and responses using the
+  (GCS, BQ, site) and summarizes search snippets and responses using the
   Gemini Pro model.
 - **[vertexai_search_options.ipynb](../search/vertexai-search-options/vertexai_search_options.ipynb)**:
   Shows how to use Vertex AI Search in conjunction with the Gemini Pro model to
@@ -82,8 +82,8 @@ existing RAG and Grounding solution.
 
 ### Search
 
-Vertex AI Search is an end to end Search engine which delivers high quality
-grounded generation and RAG at scale, built in.
+Vertex AI Search is an end-to-end Search engine which delivers high quality
+grounded generation and RAG at scale, built-in.
 
 Vertex AI Vector Search is a extremely performant Vector Database which powers
 Vertex AI Search. Other database like AlloyDB and BigQuery also have vector
