@@ -1,2 +1,2 @@
 functions-framework==3.*
-google-cloud-discoveryengine==0.11.11
+google-cloud-discoveryengine==0.12.2
