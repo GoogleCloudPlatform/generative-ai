@@ -15,13 +15,13 @@ indexed here for your convenience.
   hallucinations when it doesn't have all the right facts
 - **Grounding** a LLM with relevant facts provides fresh and potentially private
   data to the model as part of it's input or prompt
-- **RAG** is a technique which retrievs relevant facts, often via search, and
+- **RAG** is a technique which retrieves relevant facts, often via search, and
   provides them to the LLM
 
 Using RAG and Grounding to improve generations and reduce hallucinations is
 becoming commonplace. Doing so well and generating extremely high quality
 results which are entirely grounded on the most relevant facts, potentially from
-a very large corpus of information and at high scale - is an art. Vertex
+a very large corpus of information and at high scale - is an art. Vertex AI
 provides a platform of tools and APIs which help you build and maintain a great
 search engine and RAG application, and the evaluations needed to hill climb
 "quality".
@@ -37,7 +37,7 @@ for a walkthrough.
 - **[ragas_with_gemini.ipynb](../use-cases/retrieval-augmented-generation/rag-evaluation/ragas_with_gemini.ipynb)**:
   Use Case - using Ragas with Gemini for Eval.
 - **[deepeval_with_gemini.ipynb](../use-cases/retrieval-augmented-generation/rag-evaluation/deepeval_with_gemini.ipynb)**:
-  Use Case - using Deepeval with Gemini for Eval.
+  Use Case - using DeepEval with Gemini for Eval.
 
 ## Out of the Box RAG/Grounding
 
@@ -82,12 +82,12 @@ existing RAG and Grounding solution.
 
 ### Search
 
-Vertex AI Search is an end to end Search engine which has it's own grounded
-generation and RAG built in.
+Vertex AI Search is an end to end Search engine which delivers high quality
+grounded generation and RAG at scale, built in.
 
-Vertex AI Vector Search is a extremely perfomant Vector Database which powers
+Vertex AI Vector Search is a extremely performant Vector Database which powers
 Vertex AI Search. Other database like AlloyDB and BigQuery also have vector
-searches, each with different performance characterstics and retrieval
+searches, each with different performance characteristics and retrieval
 perormance.
 
 ### Embeddings
