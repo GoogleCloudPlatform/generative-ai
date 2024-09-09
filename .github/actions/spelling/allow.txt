@@ -535,6 +535,7 @@ uvb
 vectordb
 vertexai
 vesselin
+vtotal
 wcslen
 websites
 welcom
