@@ -12,4 +12,4 @@ pytomlpp
 streamlit
 streamlit-drawable-canvas
 vertexai
-google-cloud-storage==2.17.0
+google-cloud-storage==2.18.2
