@@ -5,6 +5,7 @@ import magika
 import datetime
 from vertexai.preview.generative_models import GenerativeModel
 from vertexai.preview import caching
+import re
 
 PROJECT_ID = "document-ai-test-337818"  # @param {type:"string"}
 LOCATION = "us-central1"  # @param {type:"string"}
@@ -42,29 +43,37 @@ def extract_code(repo_dir: str) -> Tuple[List, str]:
     return code_index, "".join(code_text)
 
 
-def gemini(code_index: List[str], code_text: str) -> str:
+def gemini(code_index: List[str], code_text: str, directory: str) -> str:
     MODEL_ID = "gemini-1.5-pro-001"  # @param {type:"string"}
 
     contents = f"""
         Context:
-        - The entire codebase is provided below.
-        - Here is an index of all of the files in the codebase:
+        - Here is an index of all of the files in the directory {directory}:
         \n\n{code_index}\n\n.
-        - Then each of the files are concatenated together. You will find all of the code you need:
-        \n\n{code_text}\n\n
     """
+    print("Code Index", code_index)
+    # cached_content = caching.CachedContent.create(
+    #     model_name=MODEL_ID,
+    #     system_instruction="You are an expert software engineer, proficient in GitHub, Generative AI and Google Cloud.",
+    #     contents=contents,
+    #     ttl=datetime.timedelta(minutes=60),
+    #     display_name="example-cache",
+    # )
 
-    cached_content = caching.CachedContent.create(
+    prompt = f"""Context:
+    {contents}
+    
+    Write a GitHub README.md file for the directory in the context.
+    Give an outline of the files in the directory with links and descriptions of files.
+
+    Just output the markdown, don't include the ``` code fences."""
+
+    # model = GenerativeModel.from_cached_content(cached_content=cached_content)
+
+    model = GenerativeModel(
         model_name=MODEL_ID,
         system_instruction="You are an expert software engineer, proficient in GitHub, Generative AI and Google Cloud.",
-        contents=contents,
-        ttl=datetime.timedelta(minutes=60),
-        display_name="example-cache",
     )
-
-    prompt = "Write a GitHub README.md file for the directory in the context."
-
-    model = GenerativeModel.from_cached_content(cached_content=cached_content)
 
     response = model.generate_content(prompt)
 
@@ -77,13 +86,20 @@ def update_readme() -> None:
     top_level_dirs = [
         d for d in os.listdir(".") if os.path.isdir(d) and not d.startswith(".")
     ]
-
     for directory in top_level_dirs:
         readme_path = os.path.join(directory, "README.md")
         mode = "w+" if not os.path.exists(readme_path) else "a+"
 
         code_index, code_text = extract_code(directory)
-        readme_content = gemini(code_index, code_text)
+        readme_content = gemini(code_index, code_text, directory)
+
+        # # Regex pattern to match the format provided
+        # pattern = r"```(.*?)```"
+
+        # matches = re.findall(pattern, readme_content, re.DOTALL)[0]
+
+        # file_content = matches[0].strip()
+        # print(file_content)
 
         with open(readme_path, mode, encoding="utf-8") as f:
             f.seek(0)  # Move to the beginning of the file for 'a+' mode
