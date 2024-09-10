@@ -69,15 +69,15 @@ def get_extract_entities_prompt():
 
 
 def get_compare_entities_prompt():
-    return """
-    **Analyze and compare the following two outputs, one from DocAI and the other from Gemini. Identify and list the following:**
+    return  """
+    **Analyze and compare the following two outputs, one from DocumentAI and the other from Gemini. Identify and list the following:**
 
     * **Similarities:** Entities or data points that are present and have the same values in both outputs. 
     * **Differences:**
         * Entities present in one output but missing in the other.
         * Entities present in both but with differing values. 
 
-    **DocAI output:**
+    **DocumentAI output:**
     ```{docai_output}```
 
     **Gemini output:**
