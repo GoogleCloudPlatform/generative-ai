@@ -2,6 +2,7 @@ import json
 import logging
 import time
 from typing import List, Optional, Tuple
+
 import traceback
 from google.api_core.client_options import ClientOptions
 from google.cloud import documentai, storage
@@ -43,7 +44,21 @@ class DocAIParser:
         include_ancestor_headings: bool = True,
         timeout_sec: int = 3600,
         check_in_interval_sec: int = 60,
-    ) -> Tuple[List[str], List[str]]:
+    ) -> Tuple[List[Document], List["DocAIParsingResults"]]:  # noqa: F821
+        """
+        Parses a list of blobs using Document AI.
+
+        Args:
+            blobs: List of GCS Blobs to parse.
+            chunk_size: Chunk size for Document AI processing.
+            include_ancestor_headings: Whether to include ancestor headings.
+            timeout_sec: Timeout in seconds for the operation.
+            check_in_interval_sec: Check-in interval in seconds.
+
+        Returns:
+            A tuple containing a list of parsed documents and a list of
+            DocAIParsingResults.
+        """
         try:
             operations = self._start_batch_process(
                 blobs, chunk_size, include_ancestor_headings
@@ -126,7 +141,7 @@ class DocAIParser:
             if operation.exception():
                 raise KeyError(f"Operation failed: {operation.exception()}")
 
-    def _get_results(self, operations):
+    def _get_results(self, operations) -> List["DocAIParsingResults"]:  # noqa: F821
         results = []
         for operation in operations:
             metadata = operation.metadata
@@ -142,19 +157,19 @@ class DocAIParser:
                 print(f"Warning: Unexpected metadata structure: {metadata}")
         return results
 
-    def _parse_from_results(self, results):
+    def _parse_from_results(self, results: List["DocAIParsingResults"]):  # noqa: F821
         documents = []
         storage_client = storage.Client()
 
         for result in results:
             print(
-                f"Processing result: source_path={result.source_path}, \
-                    parsed_path={result.parsed_path}"
+                f"Processing result: source_path={result.source_path}, "
+                f"parsed_path={result.parsed_path}"
             )
             if not result.parsed_path:
                 print(
-                    f"Warning: Empty parsed_path for source\
-                          {result.source_path}. Skipping."
+                    "Warning: Empty parsed_path for source "
+                    f"{result.source_path}. Skipping."
                 )
                 continue
 
@@ -194,8 +209,8 @@ class DocAIParser:
                                 documents.append(doc)
                         else:
                             print(
-                                f"Warning: Expected 'chunkedDocument'\
-                                      structure not found in {blob.name}"
+                                "Warning: Expected 'chunkedDocument' "
+                                f"structure not found in {blob.name}"
                             )
                     except Exception as e:
                         print(f"Error processing blob {blob.name}: {str(e)}")
@@ -250,8 +265,8 @@ def get_or_create_docai_processor(
             return processors[0]
         elif not create_new:
             raise ValueError(
-                f"No processor found with display name\
-                      '{processor_display_name}' and create_new is False"
+                f"No processor found with display name "
+                f"'{processor_display_name}' and create_new is False"
             )
 
     # If we reach here, we need to create a new processor

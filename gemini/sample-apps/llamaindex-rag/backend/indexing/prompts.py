@@ -1,4 +1,4 @@
-qa_extraction_prompt = """\
+QA_EXTRACTION_PROMPT = """\
 Here is the context:
 {context_str}
 
@@ -12,5 +12,5 @@ that this context can answer.
 
 """
 
-qa_parser_prompt = """Parse the following list of questions:\
+QA_PARSER_PROMPT = """Parse the following list of questions:\
       {questions_list}"""

@@ -1,22 +1,21 @@
+"""Master script for parsing, embedding 
+and indexing data living in a GCS bucket"""
 import asyncio
 import logging
 import os
-import traceback
 from typing import List
-
-from common.utils import (
-    create_pdf_blob_list,
-    download_bucket_with_transfer_manager,
-    link_nodes,
+from tqdm.asyncio import tqdm_asyncio
+import yaml
+from llama_index.core import (
+    Document,
+    Settings,
+    StorageContext,
+    VectorStoreIndex
 )
-from google.cloud import aiplatform
-from google.cloud import documentai_v1 as documentai
-from llama_index.core import Document, Settings, StorageContext, VectorStoreIndex
-from llama_index.core.extractors import QuestionsAnsweredExtractor, SummaryExtractor
+from llama_index.core.extractors import QuestionsAnsweredExtractor
 from llama_index.core.node_parser import (
-    HierarchicalNodeParser,
-    get_leaf_nodes,
-    get_root_nodes,
+    HierarchicalNodeParser, 
+    SentenceSplitter
 )
 from llama_index.core.program import LLMTextCompletionProgram
 from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
@@ -25,11 +24,18 @@ from llama_index.llms.vertex import Vertex
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
 from pydantic import BaseModel
+from google.cloud import aiplatform
+
+from common.utils import (
+    create_pdf_blob_list,
+    download_bucket_with_transfer_manager,
+    link_nodes
+)
 from backend.indexing.docai_parser import DocAIParser
-from backend.indexing.prompts import qa_extraction_prompt, qa_parser_prompt
-from backend.indexing.vector_search_utils import *
-from tqdm.asyncio import tqdm_asyncio
-import yaml
+from backend.indexing.prompts import QA_EXTRACTION_PROMPT, QA_PARSER_PROMPT
+from backend.indexing.vector_search_utils import (  # noqa: E501
+    get_or_create_existing_index,
+)
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
@@ -92,7 +98,9 @@ def main():
     )
 
     docstore = FirestoreDocumentStore.from_database(
-        project=PROJECT_ID, database=FIRESTORE_DB_NAME, namespace=FIRESTORE_NAMESPACE
+        project=PROJECT_ID, 
+        database=FIRESTORE_DB_NAME, 
+        namespace=FIRESTORE_NAMESPACE
     )
 
     # Setup embedding model and LLM
@@ -104,12 +112,14 @@ def main():
     Settings.embed_model = embed_model
 
     # Initialize Document AI parser
-    GCS_OUTPUT_PATH = f"gs://{DOCSTORE_BUCKET_NAME}/{VECTOR_DATA_PREFIX}/docai_output/"
+    GCS_OUTPUT_PATH = (
+        f"gs://{DOCSTORE_BUCKET_NAME}/{VECTOR_DATA_PREFIX}/docai_output/"
+    )
 
     parser = DocAIParser(
         project_id=PROJECT_ID,
         location=DOCAI_LOCATION,
-        processor_name=f"projects/{PROJECT_ID}/locations/{DOCAI_LOCATION}/processors/{DOCAI_PROCESSOR_ID}",
+        processor_name=f"projects/{PROJECT_ID}/locations/{DOCAI_LOCATION}/processors/{DOCAI_PROCESSOR_ID}",  # noqa: E501
         gcs_output_path=GCS_OUTPUT_PATH,
     )
 
@@ -119,7 +129,9 @@ def main():
     blobs = create_pdf_blob_list(INPUT_BUCKET_NAME, BUCKET_PREFIX)
     logger.info("downloading data")
     download_bucket_with_transfer_manager(
-        INPUT_BUCKET_NAME, prefix=BUCKET_PREFIX, destination_directory=local_data_path
+        INPUT_BUCKET_NAME, 
+        prefix=BUCKET_PREFIX, 
+        destination_directory=local_data_path
     )
 
     # Parse documents using DocAI
@@ -130,7 +142,7 @@ def main():
         print(f"Number of documents parsed by Document AI: {len(parsed_docs)}")
         if parsed_docs:
             print(
-                f"First parsed document text (first 100 chars): {parsed_docs[0].text[:100]}..."
+                f"First parsed document text (first 100 chars): {parsed_docs[0].text[:100]}..."  # noqa: E501
             )
         else:
             print("No documents were parsed by Document AI.")
@@ -144,7 +156,6 @@ def main():
         print(f"Error processing single document: {str(e)}")
         parsed_docs = []
         raw_results = []
-        traceback.print_exc()
 
     # Turn each parsed document into a llamaindex Document
     li_docs = [Document(text=doc.text, metadata=doc.metadata) for doc in parsed_docs]
@@ -167,7 +178,7 @@ def main():
             gcs_bucket_name=DOCSTORE_BUCKET_NAME,
         )
         qa_extractor = QuestionsAnsweredExtractor(
-            llm, questions=5, prompt_template=qa_extraction_prompt
+            llm, questions=5, prompt_template=QA_EXTRACTION_PROMPT
         )
 
         async def extract_batch(li_docs):
@@ -180,7 +191,7 @@ def main():
 
         program = LLMTextCompletionProgram.from_defaults(
             output_cls=QuesionsAnswered,
-            prompt_template_str=qa_parser_prompt,
+            prompt_template_str=QA_PARSER_PROMPT,
             verbose=True,
         )
 
@@ -211,7 +222,7 @@ def main():
         storage_context = StorageContext.from_defaults(
             docstore=docstore, vector_store=qa_vector_store
         )
-        qa_vs_index = VectorStoreIndex(
+        VectorStoreIndex(
             nodes=q_docs,
             storage_context=storage_context,
             embed_model=embed_model,
@@ -220,11 +231,11 @@ def main():
 
     if INDEXING_METHOD == "hierarchical":
         # Let hierarchical node parser take care of granular chunking
-        node_parser = HierarchicalNodeParser.from_defaults(chunk_sizes=CHUNK_SIZES)
+        node_parser = HierarchicalNodeParser\
+            .from_defaults(chunk_sizes=CHUNK_SIZES)
         nodes = node_parser.get_nodes_from_documents(li_docs)
 
-        leaf_nodes = get_leaf_nodes(nodes)
-        root_nodes = get_root_nodes(nodes)
+        leaf_nodes = node_parser.get_leaf_nodes(nodes)
         num_leaf_nodes = len(leaf_nodes)
         num_nodes = len(nodes)
         logger.info(
@@ -234,7 +245,7 @@ def main():
         storage_context = StorageContext.from_defaults(
             docstore=docstore, vector_store=vector_store
         )
-        index = VectorStoreIndex(
+        VectorStoreIndex(
             nodes=leaf_nodes,
             storage_context=storage_context,
             embed_model=embed_model,
@@ -242,18 +253,14 @@ def main():
         )
 
     elif INDEXING_METHOD == "flat":
+        sentence_splitter = SentenceSplitter(chunk_size=CHUNK_OVERLAP)
         # Chunk into granular chunks manually
         node_chunk_list = []
         for doc in li_docs:
             doc_dict = doc.to_dict()
             metadata = doc_dict.pop("metadata")
             doc_dict.update(metadata)
-            chunks = split_to_chunks(
-                doc_dict,
-                target_heading_level=0,
-                target_chunk_size=512,
-                max_chunk_size=750,
-            )
+            chunks = sentence_splitter.get_nodes_from_documents([doc])
 
             # Create nodes with relationships and flatten
             nodes = []
@@ -282,7 +289,7 @@ def main():
 
         # Creating an index automatically embeds and creates the
         # vector db collection
-        index = VectorStoreIndex(
+        VectorStoreIndex(
             nodes=nodes,
             storage_context=storage_context,
             embed_model=embed_model,
