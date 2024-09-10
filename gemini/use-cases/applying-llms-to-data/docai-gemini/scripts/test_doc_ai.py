@@ -1,25 +1,18 @@
-from typing import Optional
-
-from google.api_core.client_options import ClientOptions
-from google.api_core.exceptions import InternalServerError
-from google.api_core.exceptions import RetryError
-from google.cloud import documentai
-from google.cloud import storage
-
 import re
+from typing import Optional
 import uuid
 
-from extractor import BatchDocumentExtractor
-from extractor import OnlineDocumentExtractor
-
 from entity_processor import DocumentAIEntityExtractor, ModelBasedEntityExtractor
-
-from prompts_module import get_extract_entities_prompt,get_compare_entities_prompt
+from extractor import BatchDocumentExtractor, OnlineDocumentExtractor
+from google.api_core.client_options import ClientOptions
+from google.api_core.exceptions import InternalServerError, RetryError
+from google.cloud import documentai, storage
+from prompts_module import get_compare_entities_prompt, get_extract_entities_prompt
 from temp_file_uploader import TempFileUploader
-# Batch processing
-
 import vertexai
 from vertexai.generative_models import GenerativeModel
+
+# Batch processing
 
 
 project_id = "project-id"
@@ -59,18 +52,22 @@ docai_entities = docai_entity_extractor.extract_entities()
 
 
 # 2. Using ModelBasedEntityExtractor
-temp_file_uploader= TempFileUploader(gcs_temp_uri)        
-gcs_input_uri = temp_file_uploader.upload_file(file_path)    
+temp_file_uploader = TempFileUploader(gcs_temp_uri)
+gcs_input_uri = temp_file_uploader.upload_file(file_path)
 
-prompt_extract=get_extract_entities_prompt()
-model_extractor = ModelBasedEntityExtractor("gemini-1.5-flash-001", prompt_extract, gcs_input_uri)
+prompt_extract = get_extract_entities_prompt()
+model_extractor = ModelBasedEntityExtractor(
+    "gemini-1.5-flash-001", prompt_extract, gcs_input_uri
+)
 gemini_entities = model_extractor.extract_entities()
 
 temp_file_uploader.delete_file()
 
 compare_prompt = get_compare_entities_prompt()
-compare_prompt = compare_prompt.format(docai_output=str(docai_entities), gemini_output=str(gemini_entities))
-                                                        
-model = GenerativeModel("gemini-1.5-flash-001")                                                        
+compare_prompt = compare_prompt.format(
+    docai_output=str(docai_entities), gemini_output=str(gemini_entities)
+)
+
+model = GenerativeModel("gemini-1.5-flash-001")
 docai_gemini_response_analysis = model.generate_content(compare_prompt)
 print(docai_gemini_response_analysis.text)

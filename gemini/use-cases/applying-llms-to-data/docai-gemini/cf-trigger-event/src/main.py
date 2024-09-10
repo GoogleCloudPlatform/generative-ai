@@ -13,65 +13,55 @@
 # limitations under the License.
 
 import base64
-import os
 import json
+import os
 import re
-import uuid 
-
 from typing import Optional
-
-from google.api_core.client_options import ClientOptions
-from google.api_core.exceptions import InternalServerError
-from google.api_core.exceptions import RetryError
-from google.cloud import documentai
-from google.cloud import storage
-from google.api_core.exceptions import NotFound
-
-
-from extractor import BatchDocumentExtractor
-from extractor import OnlineDocumentExtractor
+import uuid
 
 from entity_processor import DocumentAIEntityExtractor, ModelBasedEntityExtractor
-
-from prompts_module import get_extract_entities_prompt,get_compare_entities_prompt
+from extractor import BatchDocumentExtractor, OnlineDocumentExtractor
+from google.api_core.client_options import ClientOptions
+from google.api_core.exceptions import InternalServerError, NotFound, RetryError
+from google.cloud import documentai, storage
+from prompts_module import get_compare_entities_prompt, get_extract_entities_prompt
 from temp_file_uploader import TempFileUploader
-# Batch processing
-
-
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part
+
+# Batch processing
 
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 REGION = os.getenv("GCP_REGION")
-MODEL_NAME="gemini-1.5-flash-001"
+MODEL_NAME = "gemini-1.5-flash-001"
 LOCATION = REGION.split("-")[0]
-PROCESSOR_ID  = os.getenv("PROCESSOR_ID")
-PROCESSOR_VERSION_ID  = os.getenv("PROCESSOR_VERSION_ID")
+PROCESSOR_ID = os.getenv("PROCESSOR_ID")
+PROCESSOR_VERSION_ID = os.getenv("PROCESSOR_VERSION_ID")
 TEMP_BUCKET = os.getenv("TEMP_BUCKET")
 OUTPUT_BUCKET = os.getenv("OUTPUT_BUCKET")
 
 vertexai.init(project=PROJECT_ID, location=REGION)
 storage_client = storage.Client(project=PROJECT_ID)
 
-def download_storage_tmp(src_bucket,src_fname):
+
+def download_storage_tmp(src_bucket, src_fname):
     input_bucket = storage_client.bucket(src_bucket)
     input_blob = input_bucket.blob(src_fname)
-    input_file_name = os.path.basename(src_fname) 
+    input_file_name = os.path.basename(src_fname)
     try:
         input_blob.download_to_filename(input_file_name)
     except NotFound as e:
-        raise FileNotFoundError(f"File not found in bucket: {e}") from e    
+        raise FileNotFoundError(f"File not found in bucket: {e}") from e
     return input_file_name
+
 
 def on_document_added(event, context):
     pubsub_message = json.loads(base64.b64decode(event["data"]).decode("utf-8"))
 
-    
     src_bucket = pubsub_message["bucket"]
     src_fname = pubsub_message["name"]
     mime_type = pubsub_message["contentType"]
-
 
     file_path = download_storage_tmp(src_bucket, src_fname)
 
@@ -79,7 +69,7 @@ def on_document_added(event, context):
         project_id=PROJECT_ID,
         location=LOCATION,
         processor_id=PROCESSOR_ID,
-        processor_version_id=PROCESSOR_VERSION_ID
+        processor_version_id=PROCESSOR_VERSION_ID,
     )
     online_document = online_extractor.process_document(file_path, mime_type)
 
@@ -87,22 +77,23 @@ def on_document_added(event, context):
     docai_entity_extractor = DocumentAIEntityExtractor(online_document)
     docai_entities = docai_entity_extractor.extract_entities()
 
-
     # 2. Using ModelBasedEntityExtractor
-    temp_file_uploader= TempFileUploader(TEMP_BUCKET)        
-    gcs_input_uri = temp_file_uploader.upload_file(file_path)    
+    temp_file_uploader = TempFileUploader(TEMP_BUCKET)
+    gcs_input_uri = temp_file_uploader.upload_file(file_path)
 
-    prompt_extract=get_extract_entities_prompt()
-    model_extractor = ModelBasedEntityExtractor(MODEL_NAME, prompt_extract, gcs_input_uri)
+    prompt_extract = get_extract_entities_prompt()
+    model_extractor = ModelBasedEntityExtractor(
+        MODEL_NAME, prompt_extract, gcs_input_uri
+    )
     gemini_entities = model_extractor.extract_entities()
 
     temp_file_uploader.delete_file()
 
     compare_prompt = get_compare_entities_prompt()
-    compare_prompt = compare_prompt.format(docai_output=str(docai_entities), gemini_output=str(gemini_entities))
-                                                            
-    model = GenerativeModel(MODEL_NAME)                                                        
+    compare_prompt = compare_prompt.format(
+        docai_output=str(docai_entities), gemini_output=str(gemini_entities)
+    )
+
+    model = GenerativeModel(MODEL_NAME)
     docai_gemini_response_analysis = model.generate_content(compare_prompt)
     print(docai_gemini_response_analysis.text)
-    
- 
