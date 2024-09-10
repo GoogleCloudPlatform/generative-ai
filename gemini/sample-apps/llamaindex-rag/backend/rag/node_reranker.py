@@ -1,19 +1,4 @@
-# Copyright 2024 Google, LLC. This software is provided as-is, without
-# warranty or representation for any use or purpose. Your use of it is
-# subject to your agreement with Google.
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#    http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+"""Node Re-ranker class for async execution"""
 import logging
 from typing import Callable, List, Optional
 
@@ -28,11 +13,13 @@ from llama_index.core.indices.utils import (
 from llama_index.core.llms.llm import LLM
 from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.prompts import BasePromptTemplate
-from llama_index.core.prompts.default_prompts import DEFAULT_CHOICE_SELECT_PROMPT
+from llama_index.core.prompts.default_prompts import (
+    DEFAULT_CHOICE_SELECT_PROMPT
+)
 from llama_index.core.prompts.mixin import PromptDictType
-from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
+from llama_index.core.schema import NodeWithScore, TextNode
 from llama_index.core.service_context import ServiceContext
-from llama_index.core.settings import Settings, llm_from_settings_or_context
+from llama_index.core.settings import llm_from_settings_or_context
 from llama_index.llms.vertex import Vertex
 import requests
 
@@ -104,7 +91,9 @@ class GoogleReRankerSecretSauce(BaseNodePostprocessor):
                     "content": node_wscore.node.text,
                 }
             )
-        response_json = call_reranker(query_bundle.query_str, records, google_token)
+        response_json = call_reranker(query_bundle.query_str, 
+                                      records, 
+                                      google_token)
 
         records = response_json["records"]
         new_nodes_wscores = []
@@ -113,7 +102,9 @@ class GoogleReRankerSecretSauce(BaseNodePostprocessor):
             node_wscore = NodeWithScore(node=node, score=r["score"])
             new_nodes_wscores.append(node_wscore)
 
-        return sorted(new_nodes_wscores, key=lambda x: x.score or 0.0, reverse=True)
+        return sorted(new_nodes_wscores, 
+                      key=lambda x: x.score or 0.0, 
+                      reverse=True)
 
 
 class CustomLLMRerank(BaseNodePostprocessor):
@@ -217,7 +208,7 @@ class CustomLLMRerank(BaseNodePostprocessor):
                     raw_response, len(nodes_batch)
                 )
             # Try again
-            except IndexError as e:
+            except IndexError:
                 raw_response = await self.llm.apredict(
                     self.choice_select_prompt,
                     context_str=fmt_batch_str,

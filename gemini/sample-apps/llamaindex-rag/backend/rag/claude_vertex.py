@@ -1,8 +1,7 @@
-from typing import Any, List, Mapping, Optional
-
+"""Llamaindex LLM implementation of Claude Vertex"""
+from typing import Any
+from pydantic import Field, PrivateAttr
 from anthropic import AnthropicVertex, AsyncAnthropicVertex
-from llama_index.core import Settings
-from llama_index.core.callbacks import CallbackManager
 from llama_index.core.llms import (
     CompletionResponse,
     CompletionResponseGen,
@@ -10,15 +9,13 @@ from llama_index.core.llms import (
     LLMMetadata,
 )
 from llama_index.core.llms.callbacks import llm_completion_callback
-from llama_index.core.llms.function_calling import FunctionCallingLLM
-from pydantic import Field, PrivateAttr
-
 
 class ClaudeVertexLLM(CustomLLM):
     project_id: str = Field(description="The project ID for Vertex AI")
     region: str = Field(description="The region for Vertex AI")
     model_name: str = Field(description="The name of the Claude model to use")
-    max_tokens: int = Field(description="The maximum number of tokens to generate")
+    max_tokens: int = Field(description="The maximum number \
+                            of tokens to generate")
     system_prompt: str = Field(description="The system prompt to use")
 
     client: Any = PrivateAttr()
@@ -26,7 +23,8 @@ class ClaudeVertexLLM(CustomLLM):
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.client = AnthropicVertex(project_id=self.project_id, region=self.region)
+        self.client = AnthropicVertex(project_id=self.project_id, 
+                                      region=self.region)
         self.async_client = AsyncAnthropicVertex(
             project_id=self.project_id, region=self.region
         )

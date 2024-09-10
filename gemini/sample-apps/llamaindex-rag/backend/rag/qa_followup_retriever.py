@@ -1,19 +1,5 @@
-# Copyright 2024 Google, LLC. This software is provided as-is, without
-# warranty or representation for any use or purpose. Your use of it is
-# subject to your agreement with Google.
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#    http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+"""Custom retriever which implements
+retrieval based on hypothetical questions"""
 import logging
 from typing import List
 
@@ -21,9 +7,7 @@ from llama_index.core import QueryBundle
 from llama_index.core.retrievers import BaseRetriever, VectorIndexRetriever
 from llama_index.core.schema import (
     NodeRelationship,
-    NodeWithScore,
-    RelatedNodeInfo,
-    TextNode,
+    NodeWithScore
 )
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 
@@ -42,7 +26,8 @@ class QARetriever(BaseRetriever):
         docstore: FirestoreDocumentStore,
     ) -> None:
         """
-        This retriever uses a vector store to do initial node retriever and a documentstore to retrieve nodes by id
+        This retriever uses a vector store to do 
+        initial node retriever and a documentstore to retrieve nodes by id
         """
 
         self._qa_vector_retriever = qa_vector_retriever
@@ -84,14 +69,16 @@ class QARetriever(BaseRetriever):
 
 
 class QAFollowupRetriever(BaseRetriever):
-    """Custom retriever which automerging retrieval and then follows that up with another vector-based retrieval
+    """Custom retriever which automerging retrieval and then follows that up 
+    with another vector-based retrieval
     into an index storing questions answered per docs"""
 
     def __init__(
         self, qa_retriever: QARetriever, base_retriever: BaseRetriever
     ) -> None:
         """
-        This retriever uses a vector store to do initial node retriever and a documentstore to retrieve nodes by id
+        This retriever uses a vector store to do initial node retriever 
+        and a documentstore to retrieve nodes by id
         """
 
         self._qa_retriever = qa_retriever

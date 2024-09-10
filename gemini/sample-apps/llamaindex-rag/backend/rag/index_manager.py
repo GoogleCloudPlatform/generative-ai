@@ -1,19 +1,5 @@
-# Copyright 2024 Google, LLC. This software is provided as-is, without
-# warranty or representation for any use or purpose. Your use of it is
-# subject to your agreement with Google.
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#    http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+"""Main state management class for indicies and prompts for
+experimentation UI"""
 import logging
 from typing import Optional
 
@@ -25,15 +11,11 @@ from llama_index.core import (
     StorageContext,
     VectorStoreIndex,
     get_response_synthesizer,
-    load_index_from_storage,
 )
 from llama_index.core.agent import ReActAgent
-from llama_index.core.chat_engine import ContextChatEngine
 from llama_index.core.retrievers import (
     AutoMergingRetriever,
-    BaseRetriever,
-    QueryFusionRetriever,
-    VectorIndexRetriever,
+    QueryFusionRetriever
 )
 from llama_index.core.tools import QueryEngineTool, ToolMetadata
 from llama_index.embeddings.vertex import VertexTextEmbedding
@@ -41,7 +23,6 @@ from llama_index.llms.vertex import Vertex
 from llama_index.retrievers.bm25 import BM25Retriever
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
-import pandas as pd
 from backend.rag.async_extensions import (
     AsyncHyDEQueryTransform,
     AsyncRetrieverQueryEngine,
@@ -59,9 +40,11 @@ logger = logging.getLogger(__name__)
 
 class IndexManager(object):
     """
-    This class manages state for vector indexes, docstores, query engines and chat engines
-    across the app's lifecycle (e.g. through UI manipulations). The index_manager (instantiated)
-    will be injected into all API calls that need to access its state or manipulate its state.
+    This class manages state for vector indexes,
+    docstores, query engines and chat engines
+    across the app's lifecycle (e.g. through UI manipulations).
+    The index_manager (instantiated) will be injected into all API calls
+    that need to access its state or manipulate its state.
     This includes:
     - Switching out vector indices or docstores
     - Changing retrieval parameters (e.g. temperature, llm model, etc.)
@@ -112,6 +95,7 @@ class IndexManager(object):
             self.qa_index = None
 
     def get_current_index_info(self) -> dict:
+        """Return the indices currently being used"""
         return {
             "base_index_name": self.base_index_name,
             "base_endpoint_name": self.base_endpoint_name,
@@ -124,6 +108,7 @@ class IndexManager(object):
     def get_vertex_llm(
         self, llm_name: str, temperature: float, system_prompt: str
     ) -> Vertex | ClaudeVertexLLM:
+        """Return the LLM currently being used"""
         if "gemini" in llm_name:
             llm = Vertex(
                 model=llm_name,
@@ -151,6 +136,7 @@ class IndexManager(object):
         firestore_db_name: Optional[str],
         firestore_namespace: Optional[str],
     ) -> None:
+        """Set the current indices to be used for the RAG"""
         self.base_index_name = base_index_name
         self.base_endpoint_name = base_endpoint_name
         self.qa_index_name = qa_index_name
@@ -240,7 +226,8 @@ class IndexManager(object):
         hybrid_retrieval: bool = True,
     ) -> AsyncRetrieverQueryEngine:
         """
-        Creates a llamaindex QueryEngine given a VectorStoreIndex and hyperparameters
+        Creates a llamaindex QueryEngine given a 
+        VectorStoreIndex and hyperparameters
         """
         llm = self.get_vertex_llm(
             llm_name=llm_name,
@@ -261,10 +248,13 @@ class IndexManager(object):
             )
         else:
             synth = get_response_synthesizer(
-                text_qa_template=qa_prompt, response_mode="compact", use_async=True
+                text_qa_template=qa_prompt, 
+                response_mode="compact", 
+                use_async=True
             )
 
-        base_retriever = self.base_index.as_retriever(similarity_top_k=similarity_top_k)
+        base_retriever = self.base_index\
+            .as_retriever(similarity_top_k=similarity_top_k)
         if self.qa_index:
             qa_vector_retriever = self.qa_index.as_retriever(
                 similarity_top_k=similarity_top_k
@@ -288,7 +278,8 @@ class IndexManager(object):
 
         if qa_followup:
             qa_retriever = QARetriever(
-                qa_vector_retriever=qa_vector_retriever, docstore=self.qa_index.docstore
+                qa_vector_retriever=qa_vector_retriever, 
+                docstore=self.qa_index.docstore
             )
             retriever = QAFollowupRetriever(
                 qa_retriever=qa_retriever, base_retriever=retriever
@@ -298,9 +289,6 @@ class IndexManager(object):
             bm25_retriever = BM25Retriever.from_defaults(
                 docstore=self.base_index.docstore,
                 similarity_top_k=similarity_top_k,
-                # Optional: We can pass in the stemmer and set the language for stopwords
-                # This is important for removing stopwords and stemming the query + text
-                # The default is english for both
                 stemmer=Stemmer.Stemmer("english"),
                 language="english",
             )
@@ -311,7 +299,8 @@ class IndexManager(object):
                 mode="reciprocal_rerank",
                 use_async=True,
                 verbose=True,
-                # query_gen_prompt="...",  # we could override the query generation prompt here
+                # query_gen_prompt="...",  # we could override the 
+                # query generation prompt here
             )
 
         if use_node_rerank:
@@ -377,16 +366,9 @@ class IndexManager(object):
         )
         Settings.llm = llm
         agent = ReActAgent.from_tools(
-            query_engine_tools, llm=llm, verbose=True, context=prompts.system_prompt
+            query_engine_tools, 
+            llm=llm, 
+            verbose=True, 
+            context=prompts.system_prompt
         )
         return agent
-
-    def get_chat_engine(
-        self,
-        retriever: BaseRetriever,
-        prompts: Prompts,
-        llm_name: str,
-        temperature: float,
-    ):
-        pass
-        # TODO

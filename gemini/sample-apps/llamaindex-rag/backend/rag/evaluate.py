@@ -1,19 +1,4 @@
-# Copyright 2024 Google, LLC. This software is provided as-is, without
-# warranty or representation for any use or purpose. Your use of it is
-# subject to your agreement with Google.
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#    http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+"""Custom LLM Evaluator"""
 import asyncio
 import logging
 import re
@@ -23,19 +8,26 @@ from google.cloud import bigquery
 from llama_index.core.base.response.schema import Response
 from llama_index.core.chat_engine.types import AgentChatResponse
 import pandas as pd
-from backend.rag.claude_vertex import ClaudeVertexLLM
 from vertexai.generative_models import (
     GenerationConfig,
     GenerativeModel,
     HarmBlockThreshold,
     HarmCategory,
 )
+from backend.rag.claude_vertex import ClaudeVertexLLM
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
 
 
-class LLMEvaluator(object):
+class LLMEvaluator:
+    """
+    LLMEvaluator.evaluate
+    LLMEvaluator.async_eval_retrieval
+    LLMEvaluator.extract_score
+    LLMEvaluator.async_eval_question_answer_pair
+    LLMEvaluator.async_eval_answer
+    """
     def __init__(
         self,
         system_prompt: str,
@@ -79,6 +71,9 @@ class LLMEvaluator(object):
         ground_truth: str,
         retrieved_context: str,
     ) -> str:
+        """
+        LLMEvaluator.async_eval_answer
+        """
         logger.info(f"Evaluating question: {question}")
         # Stop sequence to cut the model off after outputting an integer
         result = await generative_model.generate_content_async(
@@ -100,6 +95,9 @@ class LLMEvaluator(object):
         question: str,
         ground_truth: str,
     ) -> Tuple:
+        """
+        LLMEvaluator.async_eval_question_answer_pair
+        """
         response = await retrieval_qa_func(question)
         if (type(response) == Response) or (type(response) == AgentChatResponse):
             answer = response.response
@@ -115,6 +113,9 @@ class LLMEvaluator(object):
 
     @staticmethod
     def extract_score(text: str) -> Optional[str]:
+        """
+        LLMEvaluator.extract_score
+        """
         """Extracts a number (0-100) from the first line of a string.
 
         Args:
@@ -133,6 +134,9 @@ class LLMEvaluator(object):
     async def async_eval_retrieval(
         self, retrieval_qa_func: Callable, eval_df: pd.DataFrame
     ) -> pd.DataFrame:
+        """
+        LLMEvaluator.async_eval_retrieval
+        """
         results = await asyncio.gather(
             *[
                 self.async_eval_question_answer_pair(
@@ -151,13 +155,21 @@ class LLMEvaluator(object):
     def evaluate(
         self, retrieval_qa_func: Callable, eval_df: pd.DataFrame
     ) -> pd.DataFrame:
-        eval_df = asyncio.run(self.async_eval_retrieval(retrieval_qa_func, eval_df))
+        """
+        LLMEvaluator.evaluate
+        """
+        eval_df = asyncio.run(self.async_eval_retrieval(retrieval_qa_func, 
+                                                        eval_df))
         return eval_df
 
 
 def write_results_to_bq(
-    pd_dataframe: pd.DataFrame, table_id: str = "eval_results.eval_results_table"
+    pd_dataframe: pd.DataFrame, 
+    table_id: str = "eval_results.eval_results_table"
 ):
+    """
+    write_results_to_bq
+    """
     logger.info("Writing results to BQ...")
     client = bigquery.Client()
 

@@ -98,8 +98,8 @@ def main():
     )
 
     docstore = FirestoreDocumentStore.from_database(
-        project=PROJECT_ID, 
-        database=FIRESTORE_DB_NAME, 
+        project=PROJECT_ID,
+        database=FIRESTORE_DB_NAME,
         namespace=FIRESTORE_NAMESPACE
     )
 
