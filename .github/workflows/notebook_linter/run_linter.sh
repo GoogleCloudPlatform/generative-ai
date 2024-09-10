@@ -66,10 +66,12 @@ fi
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
+  script_dir="$(dirname "$0")"
   for notebook in "${notebooks[@]}"; do
     if [ -f "$notebook" ]; then
       echo "Checking notebook: ${notebook}"
 
+      LINK_RTN="0"
       NBFMT_RTN="0"
       BLACK_RTN="0"
       BLACKEN_DOCS_RTN="0"
@@ -79,6 +81,9 @@ if [ ${#notebooks[@]} -gt 0 ]; then
       MYPY_RTN="0"
 
       if [ "$is_test" = true ]; then
+        echo "Running link checker..."
+        python3 "$script_dir/check_links.py" "$notebook"
+        LINK_RTN=$?
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --check --profile black
         ISORT_RTN=$?
@@ -95,12 +100,15 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
         NBFMT_RTN=$?
         echo "Running flake8..."
-        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
+        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291,I100
         FLAKE8_RTN=$?
         echo "Running mypy..."
         python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await --disable-error-code=attr-defined
         MYPY_RTN=$?
       else
+        echo "Running link checker..."
+        python3 "$script_dir/check_links.py" "$notebook"
+        LINK_RTN=$?
         echo "Running isort..."
         python3 -m nbqa isort --fss "$notebook" --profile black
         ISORT_RTN=$?
@@ -117,7 +125,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m tensorflow_docs.tools.nbfmt "$notebook"
         NBFMT_RTN=$?
         echo "Running flake8..."
-        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
+        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291,I100
         FLAKE8_RTN=$?
         echo "Running mypy..."
         python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await --disable-error-code=attr-defined
@@ -125,6 +133,11 @@ if [ ${#notebooks[@]} -gt 0 ]; then
       fi
 
       NOTEBOOK_RTN="0"
+
+      if [ "$LINK_RTN" != "0" ]; then
+        NOTEBOOK_RTN="$LINK_RTN"
+        printf "link: Failed\n"
+      fi
 
       if [ "$NBFMT_RTN" != "0" ]; then
         NOTEBOOK_RTN="$NBFMT_RTN"

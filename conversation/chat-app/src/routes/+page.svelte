@@ -4,8 +4,8 @@
   import { Heading } from "flowbite-svelte";
   import { onMount } from "svelte";
 
-  var text = ""
-  var time = 0
+  var text = "";
+  var time = 0;
 
   function send_input(text, time) {
     setTimeout(function () {
@@ -21,7 +21,8 @@
         .querySelector("df-messenger")
         .querySelector("df-messenger-chat")
         .shadowRoot.querySelector("df-messenger-user-input")
-        .shadowRoot.querySelector("textarea").dispatchEvent(new Event("input"));
+        .shadowRoot.querySelector("textarea")
+        .dispatchEvent(new Event("input"));
     }, time + 100);
 
     setTimeout(function () {
@@ -36,9 +37,9 @@
 
   onMount(() => {
     // Write and send sample questions to chatbot
-    send_input("Hello", 2000)
-    send_input("Does the Pixel 7 Pro support fast charging?", 6000)
-    send_input("Which colors is the Pixel Watch available in?", 11000)
+    send_input("Hello", 2000);
+    send_input("Does the Pixel 7 Pro support fast charging?", 6000);
+    send_input("Which colors is the Pixel Watch available in?", 11000);
   });
 </script>
 
@@ -107,7 +108,7 @@
           language-code="en"
           storage-option="none"
           class="drop-shadow-lg"
-          max-query-length=-1>
+          max-query-length="-1">
           <df-messenger-chat
             chat-title="Google Store - Vertex AI Conversation"
             bot-writing-text="..."

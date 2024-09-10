@@ -31,7 +31,7 @@ Assuming that you have Visual Studio Code and the Cloud Code plugin setup, click
 
 - Click on New Application
 - Select Custom Application
-- When asked for the Git Repository URL, enter the URL of this repository: [https://github.com/GoogleCloudPlatform/generative-ai/language/sample-apps](https://github.com/GoogleCloudPlatform/generative-ai/language/sample-apps)
+- When asked for the Git Repository URL, enter the URL of this repository: `https://github.com/GoogleCloudPlatform/generative-ai/language/sample-apps`
 - You will shown all the projects. Select one of your choice.
 - Complete the rest of the steps to import the projects into Visual Studio Code.
 

@@ -63,17 +63,21 @@ Firestore
 Fishburne
 Flatform
 Flipkart
+Frodo
 Fujita
 GError
 GFile
 GObject
 GWLP
 Gameplay
+Gandalf
 Gatace
 GenTwo
 Genkit
 Gisting
 Glickman
+Gmb
+GmbH
 Googlers
 HDFC
 HIDPI
@@ -83,6 +87,7 @@ HSA
 HVDC
 Hamamoto
 Hamers
+Hbf
 Hickson
 Hida
 Hikaru
@@ -104,6 +109,7 @@ Kamradt
 Kaufmanns
 Kawagoe
 Keanu
+Ketamine
 Khanh
 Knopf
 Kudrow
@@ -122,6 +128,7 @@ MSGSEND
 MTL
 Maarten
 Mahindra
+Malware
 Mamah
 Mandiri
 Masaru
@@ -217,7 +224,10 @@ VOS
 VREDRAW
 Vandamm
 Vaswani
+Ves
 Vijay
+Viru
+VirusTotal
 WDIR
 WFH
 WNDCLASS
@@ -240,6 +250,7 @@ ainvoke
 airlume
 alloydb
 antiword
+apikey
 arXiv
 astype
 automl
@@ -252,6 +263,7 @@ barpolar
 baxis
 bbc
 bigquery
+bitcoin
 bpa
 bqml
 carbonara
@@ -263,6 +275,7 @@ cmap
 codebase
 codebases
 codelab
+codelabs
 colab
 coldline
 coloraxis
@@ -292,8 +305,10 @@ drinkware
 dropna
 dwmapi
 ecommerce
+elous
 embs
 emojis
+epoc
 etf
 eur
 evals
@@ -403,7 +418,8 @@ nbfmt
 nbformat
 ncols
 ndarray
-ngram
+newaxis
+newaxisngram
 ngrams
 nlp
 nmade
@@ -421,6 +437,7 @@ paleo
 pancetta
 pantarba
 paracord
+passwort
 pastiched
 payslip
 paystub
@@ -448,6 +465,7 @@ protobuf
 pstotext
 pubspec
 pvc
+pybind
 pydantic
 pymupdf
 pypdf
@@ -463,12 +481,14 @@ ramen
 rapideval
 rarians
 ratelimit
+redef
 repreve
 ribeye
 ringspun
 rpet
 rrf
 rsp
+scann
 scattergl
 seaborn
 selectbox
@@ -514,6 +534,8 @@ usernames
 uvb
 vectordb
 vertexai
+vesselin
+vtotal
 wcslen
 websites
 welcom

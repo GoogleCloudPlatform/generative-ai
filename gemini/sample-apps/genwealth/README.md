@@ -157,7 +157,7 @@ The GenWealth demo application leverages a simple schema, shown below.
 
 #### Data
 
-The `investment` and `user_profiles` tables are pre-populated with synthetic test data. The data was generated using a combination of Vertex AI LLM text completion models and simple algorithmic techniques. The `langchain_vector_store` table is used by the Document Ingestion Pipeline to store document text chunks and metadata, and the `conversation_history` table is optionally used by the [`llm()`](./database-files/genwealth-demo_llm.sql) function when the `enable_history` parameter is set to `true`.
+The `investment` and `user_profiles` tables are pre-populated with synthetic test data. The data was generated using a combination of Vertex AI LLM text completion models and simple algorithmic techniques. The `langchain_vector_store` table is used by the Document Ingestion Pipeline to store document text chunks and metadata, and the `conversation_history` table is optionally used by the [`llm()`](./database-files/llm.sql) function when the `enable_history` parameter is set to `true`.
 
 ### Document Ingestion Pipeline
 

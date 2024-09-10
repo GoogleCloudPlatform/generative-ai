@@ -79,13 +79,13 @@ Please submit additional resources via a PR.
   - [Responsible AI: Applying AI Principles with Google Cloud](https://www.cloudskillsboost.google/paths/118/course_templates/388)
 
 - [Intermediate: Gemini for Google Cloud Learning Path](https://www.cloudskillsboost.google/paths/236): The Gemini for Google Cloud learning path provides examples of how Gemini can help make engineers of all types more efficient in their daily activities.
-  - [Gemini for Application Developers](https://www.cloudskillsboost.google/paths/236/course_sessions/7024601/labs/448290)
+  - [Gemini for Application Developers](https://www.cloudskillsboost.google/course_templates/881)
   - [Gemini for Cloud Architects](https://www.cloudskillsboost.google/paths/236/course_templates/878)
   - [Gemini for Data Scientists and Analysts](https://www.cloudskillsboost.google/paths/236/course_templates/879)
   - [Gemini for Network Engineers](https://www.cloudskillsboost.google/paths/236/course_templates/884)
   - [Gemini for Security Engineers](https://www.cloudskillsboost.google/paths/236/course_templates/886)
   - [Gemini for DevOps Engineers](https://www.cloudskillsboost.google/paths/236/course_templates/882)
-  - [Gemini for end-to-end SDLC](https://www.cloudskillsboost.google/paths/236/course_sessions/11762414/labs/448528)
+  - [Gemini for end-to-end SDLC](https://www.cloudskillsboost.google/course_templates/885)
   - [Develop Gen AI Apps with Gemini and Streamlit](https://www.cloudskillsboost.google/paths/236/course_templates/978)
 
 - [Advanced: Generative AI for Developers Learning Path](https://www.cloudskillsboost.google/paths/183): A Generative AI Learning Path with a technical focus, built for App Developers, Machine Learning Engineers, and Data Scientists. Recommended prerequisite: Introduction to Generative AI learning path.
