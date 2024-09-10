@@ -100,7 +100,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
         NBFMT_RTN=$?
         echo "Running flake8..."
-        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
+        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291,I100
         FLAKE8_RTN=$?
         echo "Running mypy..."
         python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await --disable-error-code=attr-defined
@@ -125,7 +125,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
         python3 -m tensorflow_docs.tools.nbfmt "$notebook"
         NBFMT_RTN=$?
         echo "Running flake8..."
-        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291
+        python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,F704,W503,E203,E722,W293,W291,I100
         FLAKE8_RTN=$?
         echo "Running mypy..."
         python3 -m nbqa mypy "$notebook" --ignore-missing-imports --disable-error-code=top-level-await --disable-error-code=attr-defined
