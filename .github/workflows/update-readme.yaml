@@ -27,7 +27,7 @@ jobs:
         run: python3 -m pip install -U -r .github/workflows/update_readme/requirements.txt
 
       - name: Create or Update README Files
-        run: python update_readme.py
+        run: python .github/workflows/update_readme/update_readme.py
 
       - name: Commit changes
         run: |
