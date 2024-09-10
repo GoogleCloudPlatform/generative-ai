@@ -7,7 +7,7 @@ top_level_dirs = [
 
 for directory in top_level_dirs:
     readme_path = os.path.join(directory, "README.md")
-    mode = "w" if not os.path.exists(readme_path) else "a+"
+    mode = "w+" if not os.path.exists(readme_path) else "a+"
 
     with open(readme_path, mode, encoding="utf-8") as f:
         f.seek(0)  # Move to the beginning of the file for 'a+' mode
