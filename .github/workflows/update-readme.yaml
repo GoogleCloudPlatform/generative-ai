@@ -23,8 +23,8 @@ jobs:
         with:
           python-version: '3.x' 
 
-      - name: Install dependencies (if needed)
-        run: pip install -r requirements.txt
+      - name: Install requirements
+        run: python3 -m pip install -U -r .github/workflows/update_readme/requirements.txt
 
       - name: Create or Update README Files
         run: python update_readme.py
