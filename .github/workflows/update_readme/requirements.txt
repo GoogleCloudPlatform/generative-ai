@@ -1,1 +1,2 @@
 google-cloud-aiplatform
+magika
