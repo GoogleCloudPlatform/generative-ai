@@ -27,7 +27,7 @@ This repository contains a Cloud Function that demonstrates a pipeline for proce
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/ulises-jimenez07/docai-gemini.git
+   git clone https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/use-cases/applying-llms-to-data/docai-gemini.git
    cd docai-gemini/cf-trigger-event/
    ```
 
