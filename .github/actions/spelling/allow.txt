@@ -253,6 +253,7 @@ alloydb
 antiword
 apikey
 arXiv
+arun
 astype
 automl
 autoptr
@@ -518,6 +519,7 @@ supima
 sxs
 tagline
 tencel
+termcolor
 tfhub
 tfidf
 tgz
