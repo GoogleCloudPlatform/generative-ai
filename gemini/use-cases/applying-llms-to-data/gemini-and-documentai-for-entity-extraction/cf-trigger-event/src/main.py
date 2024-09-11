@@ -15,6 +15,7 @@
 import base64
 import json
 import os
+
 from entity_processor import DocumentAIEntityExtractor, ModelBasedEntityExtractor
 from extractor import OnlineDocumentExtractor
 from google.api_core.exceptions import NotFound
@@ -23,7 +24,6 @@ from prompts_module import get_compare_entities_prompt, get_extract_entities_pro
 from temp_file_uploader import TempFileUploader
 import vertexai
 from vertexai.generative_models import GenerativeModel
-
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 REGION = os.getenv("GCP_REGION")
