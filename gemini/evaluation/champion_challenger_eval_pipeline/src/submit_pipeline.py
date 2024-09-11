@@ -39,6 +39,8 @@ def submit_pipeline():
 
     job.submit()
 
+    return None
+
 
 if __name__ == "__main__":
     submit_pipeline()

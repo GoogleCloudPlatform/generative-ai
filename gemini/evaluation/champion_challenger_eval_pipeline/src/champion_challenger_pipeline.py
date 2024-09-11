@@ -13,8 +13,10 @@
 # limitations under the License.
 
 # pylint: disable=import-outside-toplevel, inconsistent-return-statements, missing-function-docstring
-# pylint: disable=no-member, no-value-for-parameter, redefined-outer-name
-# pylint: disable=too-many-arguments, too-many-locals, undefined-loop-variable
+# pylint: disable=no-member, no-value-for-parameter, no-untyped-def
+# pylint: disable=redefined-outer-name, too-many-arguments, singleton-comparison
+# pylint: disable=too-many-locals, undefined-loop-variable, var-annotated
+
 
 """ Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
 
