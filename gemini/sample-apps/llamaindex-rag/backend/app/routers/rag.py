@@ -71,7 +71,7 @@ async def query_rag(
             .iloc[0]
             .to_dict()
         )
-        retrieved_context_dict = {"retreived_chunks": response.source_nodes}
+        retrieved_context_dict = {"retrieved_chunks": response.source_nodes}
         logger.info(result_dict)
         return {"response": response.response} | result_dict | retrieved_context_dict
     else:

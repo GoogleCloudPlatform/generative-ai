@@ -10,17 +10,10 @@ from google.cloud.logging.handlers import CloudLoggingHandler
 import pandas as pd
 import requests
 import streamlit as st
+import yaml
 
 # Set up Google Cloud Storage client
 client = storage.Client()
-
-import yaml
-
-# # Get the directory of the current script
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# # Construct the path to the config file
-# config_path = os.path.join(current_dir, '..', '..', 'common', 'config.yaml')
 
 config_path = os.environ.get(
     "CONFIG_PATH",
@@ -248,7 +241,8 @@ if uploaded_file is not None:
 
             # Add a note about normalization
             st.info(
-                "Note: Overall Score has been normalized to a 0-1 range for consistency with other metrics."
+                "Note: Overall Score has been normalized to a \
+                    0-1 range for consistency with other metrics."
             )
 
             # Individual results

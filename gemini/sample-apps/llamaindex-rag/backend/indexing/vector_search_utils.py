@@ -10,28 +10,25 @@ def create_index(vector_index_name: str, approximate_neighbors_count: int):
             filter=f"display_name={vector_index_name}"
         )
     ]
-
-    if len(index_names) == 0:
-        print(f"Creating Vector Search index {vector_index_name} ...")
-        vs_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
-            display_name=vector_index_name,
-            dimensions=768,
-            distance_measure_type="DOT_PRODUCT_DISTANCE",
-            shard_size="SHARD_SIZE_SMALL",
-            index_update_method="STREAM_UPDATE",
-            approximate_neighbors_count=approximate_neighbors_count,
-        )
-        print(
-            f"Vector Search index {vs_index.display_name} "
-            f"created with resource name {vs_index.resource_name}"
-        )
-        return vs_index, True
+    print(f"Creating Vector Search index {vector_index_name} ...")
+    vs_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
+        display_name=vector_index_name,
+        dimensions=768,
+        distance_measure_type="DOT_PRODUCT_DISTANCE",
+        shard_size="SHARD_SIZE_SMALL",
+        index_update_method="STREAM_UPDATE",
+        approximate_neighbors_count=approximate_neighbors_count,
+    )
+    print(
+        f"Vector Search index {vs_index.display_name} "
+        f"created with resource name {vs_index.resource_name}"
+    )
     vs_index = aiplatform.MatchingEngineIndex(index_name=index_names[0])
     print(
         f"Vector Search index {vs_index.display_name} "
         f"exists with resource name {vs_index.resource_name}"
     )
-    return vs_index, False
+    return vs_index
 
 
 def create_endpoint(index_endpoint_name: str):
@@ -42,17 +39,14 @@ def create_endpoint(index_endpoint_name: str):
             filter=f"display_name={index_endpoint_name}"
         )
     ]
-
-    if len(endpoint_names) == 0:
-        print(f"Creating Vector Search index endpoint {index_endpoint_name} ...")
-        vs_endpoint = aiplatform.MatchingEngineIndexEndpoint.create(
-            display_name=index_endpoint_name, public_endpoint_enabled=True
-        )
-        print(
-            f"Vector Search index endpoint {vs_endpoint.display_name} "
-            f"created with resource name {vs_endpoint.resource_name}"
-        )
-        return vs_endpoint
+    print(f"Creating Vector Search index endpoint {index_endpoint_name} ...")
+    vs_endpoint = aiplatform.MatchingEngineIndexEndpoint.create(
+        display_name=index_endpoint_name, public_endpoint_enabled=True
+    )
+    print(
+        f"Vector Search index endpoint {vs_endpoint.display_name} "
+        f"created with resource name {vs_endpoint.resource_name}"
+    )
     vs_endpoint = aiplatform.MatchingEngineIndexEndpoint(
         index_endpoint_name=endpoint_names[0]
     )
@@ -142,8 +136,8 @@ def get_or_create_existing_index(
 
     print("Creating new index and/or endpoint")
     if not vs_index:
-        vs_index, _ = create_index(vector_index_name,
-                                   approximate_neighbors_count)
+        vs_index = create_index(vector_index_name,
+                                approximate_neighbors_count)
     if not vs_endpoint:
         vs_endpoint = create_endpoint(index_endpoint_name)
     deploy_index(vs_index, vs_endpoint, vector_index_name)

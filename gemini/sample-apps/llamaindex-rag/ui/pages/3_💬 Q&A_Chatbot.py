@@ -8,18 +8,10 @@ import requests
 import streamlit as st
 import yaml
 
-# # Get the directory of the current script
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# # Construct the path to the config file
-# config_path = os.path.join(current_dir, '..', '..', 'common', 'config.yaml')
-
-
 config_path = os.environ.get(
     "CONFIG_PATH",
     os.path.join(os.path.dirname(__file__), "..", "..", "common", "config.yaml"),
 )
-
 
 # Load the config file
 with open(config_path, "r") as file:
@@ -126,9 +118,9 @@ def query_fastapi(
 
 
 def extract_top_titles_and_content(response, num_chunks=3):
-    if response and "retreived_chunks" in response:
+    if response and "retrieved_chunks" in response:
         chunks = []
-        for chunk in response["retreived_chunks"][:num_chunks]:
+        for chunk in response["retrieved_chunks"][:num_chunks]:
             source = chunk["node"]["metadata"].get("source", "No source available")
             title = source.split("/")[-1] if source else "No title available"
             text = chunk["node"].get("text", "No content available")
@@ -439,13 +431,6 @@ with metrics_col:
                 unsafe_allow_html=True,
             )
 
-        # # Display top titles
-        # if hasattr(st.session_state, 'top_titles'):
-        #     st.markdown('<div class="top-docs">', unsafe_allow_html=True)
-        #     st.markdown("<h4>Top Retrieved Documents</h4>", unsafe_allow_html=True)
-        #     for i, title in enumerate(st.session_state.top_titles, 1):
-        #         st.markdown(f'<div class="doc-title">{i}. {title}</div>', unsafe_allow_html=True)
-        #     st.markdown('</div>', unsafe_allow_html=True)
         # Display top titles and expandable chunks
         if hasattr(st.session_state, "chunks"):
             st.markdown('<div class="top-docs">', unsafe_allow_html=True)
@@ -457,6 +442,3 @@ with metrics_col:
                         unsafe_allow_html=True,
                     )
             st.markdown("</div>", unsafe_allow_html=True)
-
-# Display a warning if the FastAPI server might not be running
-# st.sidebar.warning("Powered by Google's Gemini Models !!")

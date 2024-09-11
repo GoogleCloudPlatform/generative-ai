@@ -79,7 +79,144 @@ QA_INDEX_NAME = config.get("qa_index_name")
 QA_ENDPOINT_NAME = config.get("qa_endpoint_name")
 
 
+class QuesionsAnswered(BaseModel):
+    """List of Questions Answered by Document"""
+
+    questions_list: List[str]
+
+
+def create_qa_index(li_docs, docstore, embed_model, llm):
+    """creates index of hypothetical questions"""
+    qa_index, qa_endpoint = get_or_create_existing_index(
+            QA_INDEX_NAME, QA_ENDPOINT_NAME, APPROXIMATE_NEIGHBORS_COUNT
+        )
+    qa_vector_store = VertexAIVectorStore(
+        project_id=PROJECT_ID,
+        region=LOCATION,
+        index_id=qa_index.name,  # Use .name instead of .resource_name
+        endpoint_id=qa_endpoint.name,
+        gcs_bucket_name=DOCSTORE_BUCKET_NAME,
+    )
+    qa_extractor = QuestionsAnsweredExtractor(
+        llm, questions=5, prompt_template=QA_EXTRACTION_PROMPT
+    )
+
+    async def extract_batch(li_docs):
+        return await tqdm_asyncio.gather(
+            *[qa_extractor._aextract_questions_from_node(doc) for doc in li_docs]
+        )
+
+    loop = asyncio.get_event_loop()
+    metadata_list = loop.run_until_complete(extract_batch(li_docs))
+
+    program = LLMTextCompletionProgram.from_defaults(
+        output_cls=QuesionsAnswered,
+        prompt_template_str=QA_PARSER_PROMPT,
+        verbose=True,
+    )
+
+    async def parse_batch(metadata_list):
+        return await asyncio.gather(
+            *[program.acall(questions_list=x) for x in metadata_list],
+            return_exceptions=True,
+        )
+
+    parsed_questions = loop.run_until_complete(parse_batch(metadata_list))
+
+    loop.close()
+
+    q_docs = []
+    for doc, questions in zip(li_docs, parsed_questions):
+        if isinstance(questions, Exception):
+            logger.info(f"Unparsable questions exception {questions}")
+            continue
+        else:
+            for q in questions.questions_list:
+                logger.info(f"Question extracted: {q}")
+                q_doc = Document(text=q)
+                q_doc.relationships[NodeRelationship.SOURCE] = RelatedNodeInfo(
+                    node_id=doc.doc_id
+                )
+                q_docs.append(q_doc)
+    docstore.add_documents(li_docs)
+    storage_context = StorageContext.from_defaults(
+        docstore=docstore, vector_store=qa_vector_store
+    )
+    VectorStoreIndex(
+        nodes=q_docs,
+        storage_context=storage_context,
+        embed_model=embed_model,
+        llm=llm,
+    )
+
+def create_hierarchical_index(li_docs, docstore, vector_store, embed_model, llm):
+    # Let hierarchical node parser take care of granular chunking
+    node_parser = HierarchicalNodeParser.from_defaults(chunk_sizes=CHUNK_SIZES)
+    nodes = node_parser.get_nodes_from_documents(li_docs)
+
+    leaf_nodes = node_parser.get_leaf_nodes(nodes)
+    num_leaf_nodes = len(leaf_nodes)
+    num_nodes = len(nodes)
+    logger.info(
+        f"There are {num_leaf_nodes} leaf_nodes and {num_nodes} total nodes"
+    )
+    docstore.add_documents(nodes)
+    storage_context = StorageContext.from_defaults(
+        docstore=docstore, vector_store=vector_store
+    )
+    VectorStoreIndex(
+        nodes=leaf_nodes,
+        storage_context=storage_context,
+        embed_model=embed_model,
+        llm=llm,
+    )
+
+def create_flat_index(li_docs, docstore, vector_store, embed_model, llm):
+    sentence_splitter = SentenceSplitter(chunk_size=CHUNK_OVERLAP)
+    # Chunk into granular chunks manually
+    node_chunk_list = []
+    for doc in li_docs:
+        doc_dict = doc.to_dict()
+        metadata = doc_dict.pop("metadata")
+        doc_dict.update(metadata)
+        chunks = sentence_splitter.get_nodes_from_documents([doc])
+
+        # Create nodes with relationships and flatten
+        nodes = []
+        for chunk in chunks:
+            text = chunk.pop("text")
+            doc_source_id = doc.doc_id
+            node = TextNode(text=text, metadata=chunk)
+            node.relationships[NodeRelationship.SOURCE] = RelatedNodeInfo(
+                node_id=doc_source_id
+            )
+            nodes.append(node)
+
+        nodes = link_nodes(nodes)
+        node_chunk_list.extend(nodes)
+
+    nodes = node_chunk_list
+    logger.info("embedding...")
+    docstore.add_documents(li_docs)
+    storage_context = StorageContext.from_defaults(
+        docstore=docstore, vector_store=vector_store
+    )
+
+    for node in nodes:
+        node.metadata.pop("excluded_embed_metadata_keys", None)
+        node.metadata.pop("excluded_llm_metadata_keys", None)
+
+    # Creating an index automatically embeds and creates the
+    # vector db collection
+    VectorStoreIndex(
+        nodes=nodes,
+        storage_context=storage_context,
+        embed_model=embed_model,
+        llm=llm,
+    )
+
 def main():
+    """Main parsing, embedding and indexing logic for data living in GCS"""
     # Initialize Vertex AI and create index and endpoint
     aiplatform.init(project=PROJECT_ID, location=LOCATION)
 
@@ -161,140 +298,15 @@ def main():
     li_docs = [Document(text=doc.text, metadata=doc.metadata) for doc in parsed_docs]
 
     if QA_INDEX_NAME or QA_ENDPOINT_NAME:
-
-        class QuesionsAnswered(BaseModel):
-            """List of Questions Answered by Document"""
-
-            questions_list: List[str]
-
-        qa_index, qa_endpoint = get_or_create_existing_index(
-            QA_INDEX_NAME, QA_ENDPOINT_NAME, APPROXIMATE_NEIGHBORS_COUNT
-        )
-        qa_vector_store = VertexAIVectorStore(
-            project_id=PROJECT_ID,
-            region=LOCATION,
-            index_id=qa_index.name,  # Use .name instead of .resource_name
-            endpoint_id=qa_endpoint.name,
-            gcs_bucket_name=DOCSTORE_BUCKET_NAME,
-        )
-        qa_extractor = QuestionsAnsweredExtractor(
-            llm, questions=5, prompt_template=QA_EXTRACTION_PROMPT
-        )
-
-        async def extract_batch(li_docs):
-            return await tqdm_asyncio.gather(
-                *[qa_extractor._aextract_questions_from_node(doc) for doc in li_docs]
-            )
-
-        loop = asyncio.get_event_loop()
-        metadata_list = loop.run_until_complete(extract_batch(li_docs))
-
-        program = LLMTextCompletionProgram.from_defaults(
-            output_cls=QuesionsAnswered,
-            prompt_template_str=QA_PARSER_PROMPT,
-            verbose=True,
-        )
-
-        async def parse_batch(metadata_list):
-            return await asyncio.gather(
-                *[program.acall(questions_list=x) for x in metadata_list],
-                return_exceptions=True,
-            )
-
-        parsed_questions = loop.run_until_complete(parse_batch(metadata_list))
-
-        loop.close()
-
-        q_docs = []
-        for doc, questions in zip(li_docs, parsed_questions):
-            if isinstance(questions, Exception):
-                logger.info(f"Unparsable questions exception {questions}")
-                continue
-            else:
-                for q in questions.questions_list:
-                    logger.info(f"Question extracted: {q}")
-                    q_doc = Document(text=q)
-                    q_doc.relationships[NodeRelationship.SOURCE] = RelatedNodeInfo(
-                        node_id=doc.doc_id
-                    )
-                    q_docs.append(q_doc)
-        docstore.add_documents(li_docs)
-        storage_context = StorageContext.from_defaults(
-            docstore=docstore, vector_store=qa_vector_store
-        )
-        VectorStoreIndex(
-            nodes=q_docs,
-            storage_context=storage_context,
-            embed_model=embed_model,
-            llm=llm,
-        )
+        create_qa_index(li_docs, docstore, embed_model, llm)
 
     if INDEXING_METHOD == "hierarchical":
-        # Let hierarchical node parser take care of granular chunking
-        node_parser = HierarchicalNodeParser\
-            .from_defaults(chunk_sizes=CHUNK_SIZES)
-        nodes = node_parser.get_nodes_from_documents(li_docs)
-
-        leaf_nodes = node_parser.get_leaf_nodes(nodes)
-        num_leaf_nodes = len(leaf_nodes)
-        num_nodes = len(nodes)
-        logger.info(
-            f"There are {num_leaf_nodes} leaf_nodes and {num_nodes} total nodes"
-        )
-        docstore.add_documents(nodes)
-        storage_context = StorageContext.from_defaults(
-            docstore=docstore, vector_store=vector_store
-        )
-        VectorStoreIndex(
-            nodes=leaf_nodes,
-            storage_context=storage_context,
-            embed_model=embed_model,
-            llm=llm,
+        create_hierarchical_index(
+            li_docs, docstore, vector_store, embed_model, llm
         )
 
     elif INDEXING_METHOD == "flat":
-        sentence_splitter = SentenceSplitter(chunk_size=CHUNK_OVERLAP)
-        # Chunk into granular chunks manually
-        node_chunk_list = []
-        for doc in li_docs:
-            doc_dict = doc.to_dict()
-            metadata = doc_dict.pop("metadata")
-            doc_dict.update(metadata)
-            chunks = sentence_splitter.get_nodes_from_documents([doc])
-
-            # Create nodes with relationships and flatten
-            nodes = []
-            for chunk in chunks:
-                text = chunk.pop("text")
-                doc_source_id = doc.doc_id
-                node = TextNode(text=text, metadata=chunk)
-                node.relationships[NodeRelationship.SOURCE] = RelatedNodeInfo(
-                    node_id=doc_source_id
-                )
-                nodes.append(node)
-
-            nodes = link_nodes(nodes)
-            node_chunk_list.extend(nodes)
-
-        nodes = node_chunk_list
-        logger.info("embedding...")
-        docstore.add_documents(li_docs)
-        storage_context = StorageContext.from_defaults(
-            docstore=docstore, vector_store=vector_store
-        )
-
-        for node in nodes:
-            node.metadata.pop("excluded_embed_metadata_keys", None)
-            node.metadata.pop("excluded_llm_metadata_keys", None)
-
-        # Creating an index automatically embeds and creates the
-        # vector db collection
-        VectorStoreIndex(
-            nodes=nodes,
-            storage_context=storage_context,
-            embed_model=embed_model,
-            llm=llm,
-        )
+        create_flat_index(li_docs, docstore, vector_store, embed_model, llm)
 
 
 if __name__ == "__main__":
