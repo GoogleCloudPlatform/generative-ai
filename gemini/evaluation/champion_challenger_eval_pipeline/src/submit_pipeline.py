@@ -16,20 +16,20 @@
 
 from google.cloud import aiplatform
 
-project_id = "YOUR_PROJECT_ID"
-region = "us-central1"
+PROJECT_ID = "YOUR_PROJECT_ID"
+REGION = "us-central1"
 PIPELINE_TEMPLATE = "champion_challenger_pipeline.yaml"
-pipeline_bucket_uri = "gs://genops-eval-pipelines"
+PIPELINE_BUCKET_URI = "gs://genops-eval-pipelines"
 PIPELINE_NAME = "champion-challenger-evaluation"
 
-""" Submit compiled pipeline """
+""" Submit compiled Vertex AI pipeline job """
 
 
 def submit_pipeline():
     aiplatform.init(
-        project=project_id, staging_bucket=pipeline_bucket_uri, location=region
+        project=PROJECT_ID, staging_bucket=PIPELINE_BUCKET_URI, location=REGION
     )
-    PIPELINE_ROOT = pipeline_bucket_uri
+    PIPELINE_ROOT = PIPELINE_BUCKET_URI
 
     job = aiplatform.PipelineJob(
         display_name=PIPELINE_NAME,

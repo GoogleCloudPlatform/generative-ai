@@ -29,11 +29,12 @@ Google Cloud Services Used: Cloud Build, Vertex AI Pipelines, Auto SxS, Google C
 
 ![# Champion Challenger - evaluation pipelines](images/champion-challenger-eval.gif)
 
-### Pre-Requisites:
+### Pre-Requisites
 
-This champion challenger pipeline is built in context of a Summarisation app.
+This champion challenger pipeline is built-in context of a Summarisation app.
 
-1. Create pipeline GCS bucket `genops-eval-pipelines` if it doesn't exist
+- Create pipeline GCS bucket `genops-eval-pipelines` if it doesn't exist
+
 ``` BASH
 PROJECT_ID="[your-project-id]"
 LOCATION="us-central1"
@@ -41,7 +42,8 @@ PIPELINE_BUCKET_URI="gs://genops-eval-pipelines"
 gsutil mb -l $LOCATION -p $PROJECT_ID $PIPELINE_BUCKET_URI
 ```
 
-2. Create `genops/model-config` GCS bucket if it doesn't exist to persist current and candidate model configs
+- Create `genops/model-config` GCS bucket if it doesn't exist to persist current and candidate model configs
+
 ``` BASH
 BUCKET_URI="gs://genops"
 gsutil mb -l $LOCATION -p $PROJECT_ID $BUCKET_URI
@@ -72,7 +74,7 @@ gsutil cp -r sample_model_config/summarization.json $BUCKET_URI/model-config/sum
 gsutil cp -r sample_model_config/challenger_summarization.json $BUCKET_URI/model-config/challenger_summarization.json
 ```
 
-3. You can use the following ddl to create BQ schema pipeline expects. At first create a dataset called `genops` in your BQ project in the same regions. Replace `[your-project-id]` placeholder with relevant project id below.
+- You can use the following ddl to create BQ schema pipeline expects. At first create a dataset called `genops` in your BQ project in the same regions. Replace `[your-project-id]` placeholder with relevant project ID below.
 
 ``` SQL
 -- Ground Truth Dataset table summarizer_data containing raw text articles and golden summaries. 
@@ -115,7 +117,8 @@ CREATE TABLE `[your-project-id].genops.summarizer_champion_challenger_eval`
 );
 ```
 
-4. Trigger Cloud Build Pipeline:
+- Trigger Cloud Build Pipeline:
+
 ``` BASH
 gcloud builds submit src --config=pipelinebuild.yaml
 ```
