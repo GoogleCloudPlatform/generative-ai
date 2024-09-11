@@ -52,8 +52,6 @@ def get_model_config(
 
     from google.cloud import storage
 
-    params = {}
-
     bucket = storage.Client().get_bucket(bucket_name)
     model_param_blob = bucket.blob(f"{model_config_blob}/{param_file_name}")
     if model_param_blob.exists():
