@@ -30,7 +30,7 @@ class TempFileUploader:
         return gcs_destination_uri
 
     def delete_file(self):
-        if self.destination_blob_name != "":
+        if self.destination_blob_name:
             bucket = self.storage_client.bucket(self.temp_bucket_name)
             blob = bucket.blob(self.destination_blob_name)
             blob.delete()
