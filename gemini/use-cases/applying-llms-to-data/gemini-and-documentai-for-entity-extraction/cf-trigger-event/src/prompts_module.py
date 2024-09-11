@@ -77,7 +77,7 @@ def get_compare_entities_prompt():
         * Entities present in one output but missing in the other.
         * Entities present in both but with differing values. 
 
-    **DocumentAI output:**
+    **Document AI output:**
     ```{document_ai_output}```
 
     **Gemini output:**
