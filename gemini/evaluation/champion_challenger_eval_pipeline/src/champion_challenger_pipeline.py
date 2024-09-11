@@ -15,7 +15,7 @@
 # pylint: disable=import-outside-toplevel, inconsistent-return-statements, missing-function-docstring
 # pylint: disable=no-member, no-value-for-parameter, redefined-outer-name
 # pylint: disable=too-many-arguments, singleton-comparison, too-many-locals
-# pylint: disable=undefined-loop-variable, 
+# pylint: disable=undefined-loop-variable,
 
 
 """ Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
