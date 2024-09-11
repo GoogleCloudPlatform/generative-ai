@@ -1,6 +1,5 @@
 import re
 from typing import Optional
-import uuid
 
 from google.api_core.client_options import ClientOptions
 from google.api_core.exceptions import InternalServerError, RetryError

@@ -1,8 +1,6 @@
 import json
 import mimetypes
 from typing import Dict, List
-
-import vertexai
 from vertexai.generative_models import GenerativeModel, Part
 
 

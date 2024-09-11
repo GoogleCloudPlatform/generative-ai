@@ -15,21 +15,14 @@
 import base64
 import json
 import os
-import re
-from typing import Optional
-import uuid
-
 from entity_processor import DocumentAIEntityExtractor, ModelBasedEntityExtractor
-from extractor import BatchDocumentExtractor, OnlineDocumentExtractor
-from google.api_core.client_options import ClientOptions
-from google.api_core.exceptions import InternalServerError, NotFound, RetryError
-from google.cloud import documentai, storage
+from extractor import OnlineDocumentExtractor
+from google.api_core.exceptions import NotFound
+from google.cloud import storage
 from prompts_module import get_compare_entities_prompt, get_extract_entities_prompt
 from temp_file_uploader import TempFileUploader
 import vertexai
-from vertexai.generative_models import GenerativeModel, Part
-
-# Batch processing
+from vertexai.generative_models import GenerativeModel
 
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
