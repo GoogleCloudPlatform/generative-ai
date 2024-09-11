@@ -43,6 +43,15 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/nature_people/default/40px.svg"  alt="RAG Grounding">
+      <br>
+      <a href="rag-grounding/"><code>rag-grounding/</code></a>
+    </td>
+    <td>Use this folder for information on Retrieval Augmented Generation (RAG) and Grounding with Vertex AI. This is an index of notebooks and samples across other directories focused on this topic.</td>
+    <td><a href="rag-grounding">Sample apps, use cases</a></td>
+  </tr>
+  <tr>
+    <td>
       <img src="https://www.gstatic.com/images/branding/gcpiconscolors/dialogflow_cx/v1/24px.svg" width="40px" alt="Conversation">
       <br>
       <a href="conversation/"><code>conversation/</code></a>
