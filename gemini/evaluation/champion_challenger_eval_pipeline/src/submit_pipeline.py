@@ -23,23 +23,18 @@ PIPELINE_BUCKET_URI = "gs://genops-eval-pipelines"
 PIPELINE_NAME = "champion-challenger-evaluation"
 
 """ Submit compiled Vertex AI pipeline job """
-
-
 def submit_pipeline():
     aiplatform.init(
         project=PROJECT_ID, staging_bucket=PIPELINE_BUCKET_URI, location=REGION
     )
-    PIPELINE_ROOT = PIPELINE_BUCKET_URI
 
     job = aiplatform.PipelineJob(
         display_name=PIPELINE_NAME,
         template_path=PIPELINE_TEMPLATE,
-        pipeline_root=PIPELINE_ROOT,
+        pipeline_root=PIPELINE_BUCKET_URI,
     )
 
     job.submit()
-
-    return None
 
 
 if __name__ == "__main__":

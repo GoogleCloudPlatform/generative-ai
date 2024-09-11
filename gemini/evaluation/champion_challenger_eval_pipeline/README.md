@@ -35,7 +35,7 @@ This champion challenger pipeline is built-in context of a Summarisation app.
 
 - Create pipeline GCS bucket `genops-eval-pipelines` if it doesn't exist
 
-``` BASH
+```BASH
 PROJECT_ID="[your-project-id]"
 LOCATION="us-central1"
 PIPELINE_BUCKET_URI="gs://genops-eval-pipelines"
@@ -44,7 +44,7 @@ gsutil mb -l $LOCATION -p $PROJECT_ID $PIPELINE_BUCKET_URI
 
 - Create `genops/model-config` GCS bucket if it doesn't exist to persist current and candidate model configs
 
-``` BASH
+```BASH
 BUCKET_URI="gs://genops"
 gsutil mb -l $LOCATION -p $PROJECT_ID $BUCKET_URI
 ```
@@ -64,20 +64,20 @@ gsutil mb -l $LOCATION -p $PROJECT_ID $BUCKET_URI
 
 - You can find sample config files under [sample_model_config](sample_model_config). Copy to the `genops` bucket using
 
-``` BASH
+```BASH
 gsutil cp -r sample_model_config/summarization.json $BUCKET_URI/model-config/summarization.json
 ```
 
-- After further exploration, data scientists can make a new  `challenger_summarization.json` file available in this GCS Bucket, the  config params for candidate models also follow the above schema; the above pipeline can be triggered.
+- After further exploration, data scientists can make a new `challenger_summarization.json` file available in this GCS Bucket, the config params for candidate models also follow the above schema; the above pipeline can be triggered.
 
-``` BASH
+```BASH
 gsutil cp -r sample_model_config/challenger_summarization.json $BUCKET_URI/model-config/challenger_summarization.json
 ```
 
 - You can use the following ddl to create BQ schema pipeline expects. At first create a dataset called `genops` in your BQ project in the same regions. Replace `[your-project-id]` placeholder with relevant project ID below.
 
-``` SQL
--- Ground Truth Dataset table summarizer_data containing raw text articles and golden summaries. 
+```SQL
+-- Ground Truth Dataset table summarizer_data containing raw text articles and golden summaries.
 
 CREATE TABLE `[your-project-id].genops.summarizer_data`
 (
@@ -86,7 +86,7 @@ CREATE TABLE `[your-project-id].genops.summarizer_data`
   golden_summary STRING
 );
 
--- Insert/Load your articles to be summarised along with (optional) golden summary 
+-- Insert/Load your articles to be summarised along with (optional) golden summary
 
 -- Champion model response against summarizer_data articles
 
@@ -119,6 +119,6 @@ CREATE TABLE `[your-project-id].genops.summarizer_champion_challenger_eval`
 
 - Trigger Cloud Build Pipeline:
 
-``` BASH
+```BASH
 gcloud builds submit src --config=pipelinebuild.yaml
 ```
