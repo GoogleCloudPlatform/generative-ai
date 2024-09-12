@@ -1,4 +1,5 @@
 AFX
+AIP
 ANZ
 APIENTRY
 APSTUDIO
@@ -35,6 +36,8 @@ Colm
 Cowabunga
 Crossbody
 D'orsay
+DLC
+DLCs
 DWMWA
 Dataform
 DeepEval
@@ -67,6 +70,7 @@ Frodo
 Fujita
 GError
 GFile
+GKE
 GObject
 GWLP
 Gameplay
@@ -112,6 +116,7 @@ Keanu
 Ketamine
 Khanh
 Knopf
+Kubeflow
 Kudrow
 LCEL
 LLMs
@@ -197,6 +202,7 @@ Storrer
 Strappy
 Surampudi
 TARG
+TGI
 TOKENLIST
 TPU
 TPUs
@@ -304,6 +310,7 @@ dpi
 draig
 drinkware
 dropna
+dsl
 dwmapi
 ecommerce
 elous
@@ -385,6 +392,7 @@ jupyter
 kaggle
 keras
 keychain
+kfp
 kickstart
 kotlin
 lakecolor
@@ -513,6 +521,7 @@ stuffie
 subviews
 subword
 supima
+sxs
 tagline
 tencel
 termcolor
