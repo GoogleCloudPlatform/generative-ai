@@ -10,6 +10,7 @@ This repository explores various techniques and use-cases for embedding in Machi
 - **[vector-search-quickstart.ipynb](vector-search-quickstart.ipynb):** Offers a quickstart guide to setting up and using vector search for finding semantically similar items.
 - **[intro_multimodal_embeddings.ipynb](intro_multimodal_embeddings.ipynb):** Introduces the concept of multimodal embeddings, which combine information from different modalities like text and images.
 - **[intro_embeddings_tuning.ipynb](intro_embeddings_tuning.ipynb):** Explores techniques for fine-tuning pre-trained embedding models to specific domains and tasks.
+- **[task-type-embedding.ipynb](task-type-embedding.ipynb):** Explores techniques for creating embeddings specialized for different tasks.
 
 ## Use Cases
 
