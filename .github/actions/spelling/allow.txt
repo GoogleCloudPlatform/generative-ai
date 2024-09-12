@@ -201,6 +201,7 @@ Storrer
 Strappy
 Surampudi
 TARG
+TGI
 TOKENLIST
 TPU
 TPUs
@@ -211,7 +212,6 @@ Tbl
 Tencent
 Testables
 Tetsuo
-TGI
 Tianli
 Topolino
 Trapp
