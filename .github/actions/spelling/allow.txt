@@ -151,6 +151,7 @@ NOMINMAX
 NOZORDER
 NVIDIA
 Niitsuma
+Nintendo
 Noogler
 OOTB
 Oberst
@@ -421,7 +422,9 @@ memes
 metadatas
 mgrs
 miranda
+morty
 mpn
+mrr
 nbconvert
 nbfmt
 nbformat
