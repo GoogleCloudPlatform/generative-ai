@@ -116,6 +116,7 @@ Keanu
 Ketamine
 Khanh
 Knopf
+Kubeflow
 Kudrow
 LCEL
 LLMs
@@ -309,6 +310,7 @@ dpi
 draig
 drinkware
 dropna
+dsl
 dwmapi
 ecommerce
 elous
@@ -390,6 +392,7 @@ jupyter
 kaggle
 keras
 keychain
+kfp
 kickstart
 kotlin
 lakecolor
@@ -518,6 +521,7 @@ stuffie
 subviews
 subword
 supima
+sxs
 tagline
 tencel
 termcolor
