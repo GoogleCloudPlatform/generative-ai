@@ -34,9 +34,9 @@ for a walkthrough.
 
 - **[evaluate_rag_gen_ai_evaluation_service_sdk.ipynb](../gemini/evaluation/evaluate_rag_gen_ai_evaluation_service_sdk.ipynb)**:
   Evaluates RAG systems using the Gen AI Evaluation Service SDK.
-- **[ragas_with_gemini.ipynb](../use-cases/retrieval-augmented-generation/rag-evaluation/ragas_with_gemini.ipynb)**:
+- **[ragas_with_gemini.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag-evaluation/ragas_with_gemini.ipynb)**:
   Use Case - using Ragas with Gemini for Eval.
-- **[deepeval_with_gemini.ipynb](../use-cases/retrieval-augmented-generation/rag-evaluation/deepeval_with_gemini.ipynb)**:
+- **[deepeval_with_gemini.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag-evaluation/deepeval_with_gemini.ipynb)**:
   Use Case - using DeepEval with Gemini for Eval.
 
 ## Out of the Box RAG/Grounding
@@ -86,9 +86,9 @@ Vertex AI Search is an end-to-end Search engine which delivers high quality
 grounded generation and RAG at scale, built-in.
 
 Vertex AI Vector Search is a extremely performant Vector Database which powers
-Vertex AI Search. Other database like AlloyDB and BigQuery also have vector
+Vertex AI Search. Other databases like AlloyDB and BigQuery also have vector
 searches, each with different performance characteristics and retrieval
-perormance.
+performance.
 
 ### Embeddings
 
@@ -147,15 +147,15 @@ notebooks that pique your interest and start building your own RAG-powered
 solutions.
 
 - Examples of RAG in different domains
-  - **[Document_QnA_using_gemini_and_vector_search.ipynb](../use-cases/retrieval-augmented-generation/Document_QnA_using_gemini_and_vector_search.ipynb)**
-  - **[NLP2SQL_using_dynamic_RAG.ipynb](../use-cases/retrieval-augmented-generation/NLP2SQL_using_dynamic_RAG.ipynb)**
-  - **[RAG_Based_on_Sensitive_Data_Protection_using_Faker.ipynb](../use-cases/retrieval-augmented-generation/RAG_Based_on_Sensitive_Data_Protection_using_Faker.ipynb)**
-  - **[code_rag.ipynb](../use-cases/retrieval-augmented-generation/code_rag.ipynb)**
-  - **[intra_knowledge_qna.ipynb](../use-cases/retrieval-augmented-generation/intra_knowledge_qna.ipynb)**
-  - **[intro_multimodal_rag.ipynb](../use-cases/retrieval-augmented-generation/intro_multimodal_rag.ipynb)**
-  - **[llamaindex_rag.ipynb](../use-cases/retrieval-augmented-generation/llamaindex_rag.ipynb)**
-  - **[multimodal_rag_langchain.ipynb](../use-cases/retrieval-augmented-generation/multimodal_rag_langchain.ipynb)**
-  - **[small_to_big_rag.ipynb](../use-cases/retrieval-augmented-generation/small_to_big_rag/small_to_big_rag.ipynb)**
+  - **[Document_QnA_using_gemini_and_vector_search.ipynb](../gemini/use-cases/retrieval-augmented-generation/Document_QnA_using_gemini_and_vector_search.ipynb)**
+  - **[NLP2SQL_using_dynamic_RAG.ipynb](../gemini/use-cases/retrieval-augmented-generation/NLP2SQL_using_dynamic_RAG.ipynb)**
+  - **[RAG_Based_on_Sensitive_Data_Protection_using_Faker.ipynb](../gemini/use-cases/retrieval-augmented-generation/RAG_Based_on_Sensitive_Data_Protection_using_Faker.ipynb)**
+  - **[code_rag.ipynb](../gemini/use-cases/retrieval-augmented-generation/code_rag.ipynb)**
+  - **[intra_knowledge_qna.ipynb](../gemini/use-cases/retrieval-augmented-generation/intra_knowledge_qna.ipynb)**
+  - **[intro_multimodal_rag.ipynb](../gemini/use-cases/retrieval-augmented-generation/intro_multimodal_rag.ipynb)**
+  - **[llamaindex_rag.ipynb](../gemini/use-cases/retrieval-augmented-generation/llamaindex_rag.ipynb)**
+  - **[multimodal_rag_langchain.ipynb](../gemini/use-cases/retrieval-augmented-generation/multimodal_rag_langchain.ipynb)**
+  - **[small_to_big_rag.ipynb](../gemini/use-cases/retrieval-augmented-generation/small_to_big_rag/small_to_big_rag.ipynb)**
 - Build RAG systems using BigQuery
-  - **[rag_qna_with_bq_and_featurestore.ipynb](../use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb)**
-  - **[rag_vector_embedding_in_bigquery.ipynb](../use-cases/retrieval-augmented-generation/rag_vector_embedding_in_bigquery.ipynb)**
+  - **[rag_qna_with_bq_and_featurestore.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb)**
+  - **[rag_vector_embedding_in_bigquery.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag_vector_embedding_in_bigquery.ipynb)**
