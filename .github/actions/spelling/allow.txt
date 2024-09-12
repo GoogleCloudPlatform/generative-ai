@@ -1,4 +1,5 @@
 AFX
+AIP
 ANZ
 APIENTRY
 APSTUDIO
@@ -35,6 +36,8 @@ Colm
 Cowabunga
 Crossbody
 D'orsay
+DLC
+DLCs
 DWMWA
 Dataform
 DeepEval
@@ -67,6 +70,7 @@ Frodo
 Fujita
 GError
 GFile
+GKE
 GObject
 GWLP
 Gameplay
@@ -198,6 +202,7 @@ Storrer
 Strappy
 Surampudi
 TARG
+TGI
 TOKENLIST
 TPU
 TPUs
