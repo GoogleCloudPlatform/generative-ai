@@ -14,7 +14,7 @@ class DocumentAIEntityExtractor(EntityExtractor):
     def __init__(self, document):
         self.document = document
 
-    def extract_entities(self) -> List[Dict]:
+    def extract_entities(self) -> Dict:
         entities = {}
         for entity in self.document.entities:
             entities[entity.type_] = entity.mention_text

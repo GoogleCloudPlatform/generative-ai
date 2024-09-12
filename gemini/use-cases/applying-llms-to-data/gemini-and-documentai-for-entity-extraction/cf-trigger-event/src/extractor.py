@@ -48,7 +48,7 @@ class OnlineDocumentExtractor(DocumentExtractor):
     Processes documents using the online Document AI API.
     """
 
-    def process_document(self, file_path: str, mime_type: str) -> documentai.Document:
+    def process_document(self, file_path: str, mime_type: str ="application/pdf") -> documentai.Document:
         with open(file_path, "rb") as image:
             image_content = image.read()
 
