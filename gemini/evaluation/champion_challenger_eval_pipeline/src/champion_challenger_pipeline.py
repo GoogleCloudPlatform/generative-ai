@@ -29,9 +29,7 @@ from kfp.dsl import Artifact, Dataset, Input, Output, component
 PIPELINE_TEMPLATE = "champion_challenger_pipeline.yaml"
 
 
-""" Component to retrieve model config from GCS """
-
-
+# Component to retrieve model config from GCS
 @component(base_image="python:3.12", packages_to_install=["google-cloud-storage"])
 def get_model_config(
     bucket_name: str,
