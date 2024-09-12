@@ -1,4 +1,5 @@
 AFX
+AIP
 ANZ
 APIENTRY
 APSTUDIO
@@ -40,6 +41,8 @@ Dataform
 DeepEval
 Depatmint
 Disturbia
+DLC
+DLCs
 Doogler
 Dreesen
 Durafast
@@ -67,6 +70,7 @@ Frodo
 Fujita
 GError
 GFile
+GKE
 GObject
 GWLP
 Gameplay
