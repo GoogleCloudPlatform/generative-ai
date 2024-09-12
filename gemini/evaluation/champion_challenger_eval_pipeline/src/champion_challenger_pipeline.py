@@ -16,6 +16,7 @@
 # pylint: disable=no-member, no-value-for-parameter, redefined-outer-name
 # pylint: disable=too-many-arguments, singleton-comparison, too-many-locals
 # pylint: disable=undefined-loop-variable,
+# mypy: ignore[untyped-def, valid-type, no-untyped-def, assignment]
 
 
 """ Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
@@ -415,8 +416,8 @@ def pipeline():
         temperature=challenger_model_config.outputs["temperature"],
         max_output_tokens=challenger_model_config.outputs["max_output_tokens"],
         top_p=challenger_model_config.outputs["top_p"],
-        project_id=project_id,  # YOUR_PROJECT_ID.genops.summarizer_data
-        bq_dataset=bq_dataset,  # YOUR_PROJECT_ID.genops.summarizer_champion_model
+        project_id=project_id,
+        bq_dataset=bq_dataset,
         bq_source_table=bq_source_table,
         bq_model_response_table=bq_challenger_model_response_table,
     ).set_display_name("challenger_model_summary")
@@ -436,8 +437,8 @@ def pipeline():
         temperature=current_model_config.outputs["temperature"],
         max_output_tokens=current_model_config.outputs["max_output_tokens"],
         top_p=current_model_config.outputs["top_p"],
-        project_id=project_id,  # YOUR_PROJECT_ID.genops.summarizer_data
-        bq_dataset=bq_dataset,  # YOUR_PROJECT_ID.genops.summarizer_champion_model
+        project_id=project_id,
+        bq_dataset=bq_dataset,
         bq_source_table=bq_source_table,
         bq_model_response_table=bq_current_model_response_table,
     ).set_display_name("current_model_summary")
@@ -469,7 +470,7 @@ def pipeline():
     challenger_winning = challenger_model_better(
         summary_metrics=eval_results.outputs["summary_metrics"]
     )
-    with dsl.If(challenger_winning.output == True):
+    with dsl.If(challenger_winning.output == True):  # noqa: E712
         update_current_model_config(
             bucket_name=bucket_name,
             model_config_blob=model_config_blob,
