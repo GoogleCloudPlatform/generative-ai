@@ -16,7 +16,7 @@
 # pylint: disable=no-member, no-value-for-parameter, redefined-outer-name
 # pylint: disable=too-many-arguments, singleton-comparison, too-many-locals
 # pylint: disable=undefined-loop-variable,
-# mypy: ignore[untyped-def, valid-type, no-untyped-def, assignment]
+# mypy: disable-error-code="no-untyped-def, valid-type, no-untyped-def, assignment"
 
 
 """ Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
