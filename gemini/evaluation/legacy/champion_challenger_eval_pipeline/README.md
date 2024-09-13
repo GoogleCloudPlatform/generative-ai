@@ -27,7 +27,7 @@ Google Cloud Services Used: Cloud Build, Vertex AI Pipelines, Auto SxS, Google C
 
 ### Champion Challenger Pipeline
 
-![# Champion Challenger - evaluation pipelines](images/champion-challenger-eval.gif)
+![# Champion Challenger - evaluation pipelines](images/pipeline.png)
 
 ### Pre-Requisites
 
