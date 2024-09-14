@@ -7,5 +7,5 @@ google-cloud-storage==2.18.2
 langchain==0.2.16
 langchain-core==0.2.38
 langchain-google-alloydb-pg==0.6.0
-langchain-google-vertexai==1.0.10
+langchain-google-vertexai==2.0.0
 langchain-text-splitters==0.2.4
