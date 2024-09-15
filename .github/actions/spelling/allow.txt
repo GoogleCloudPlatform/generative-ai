@@ -298,6 +298,7 @@ constexpr
 corpuses
 csa
 cupertino
+dask
 dataframe
 datname
 dbadmin
