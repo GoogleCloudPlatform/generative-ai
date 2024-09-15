@@ -320,6 +320,7 @@ ecommerce
 elous
 embs
 emojis
+ename
 epoc
 etf
 eur
