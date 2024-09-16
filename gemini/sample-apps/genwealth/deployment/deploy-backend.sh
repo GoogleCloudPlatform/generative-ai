@@ -151,8 +151,8 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/artifactregistry.admin"
 
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
- --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
- --role="roles/cloudbuild.builds.builder"
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/cloudbuild.builds.builder"
 
 # Create Firewall Rule
 echo "Creating firewall rule for pgAdmin instance"
