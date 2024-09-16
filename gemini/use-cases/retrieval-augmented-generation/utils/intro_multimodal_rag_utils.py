@@ -152,14 +152,14 @@ def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
     if isinstance(text_data, dict):
         # Process each chunk
         for chunk_number, chunk_value in text_data.items():
-            embeddings_dict[
-                chunk_number
-            ] = get_text_embedding_from_text_embedding_model(text=chunk_value)
+            embeddings_dict[chunk_number] = (
+                get_text_embedding_from_text_embedding_model(text=chunk_value)
+            )
     else:
         # Process the first 1000 characters of the page text
-        embeddings_dict[
-            "text_embedding"
-        ] = get_text_embedding_from_text_embedding_model(text=text_data)
+        embeddings_dict["text_embedding"] = (
+            get_text_embedding_from_text_embedding_model(text=text_data)
+        )
 
     return embeddings_dict
 
