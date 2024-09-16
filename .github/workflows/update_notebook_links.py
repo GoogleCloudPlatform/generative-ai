@@ -76,7 +76,7 @@ def fix_links_in_notebook(notebook_path: str) -> int:
     return 0
 
 
-def process_directory(directory_path: str):
+def process_directory(directory_path: str) -> None:
     """Recursively processes all notebooks in a directory."""
     for root, _, files in os.walk(directory_path):
         for filename in files:
