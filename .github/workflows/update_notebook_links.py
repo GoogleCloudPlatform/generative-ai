@@ -28,7 +28,7 @@ def fix_markdown_links(
 
     for line in cell_source.splitlines():
         for key, prefix in LINK_PREFIXES.items():
-            if prefix not in line:
+            if prefix not in line or "**NOTE:**" in line:
                 continue
 
             start_index = line.find(prefix) + len(prefix)
@@ -45,7 +45,7 @@ def fix_markdown_links(
             elif key == "workbench_link":
                 correct_link = f"{RAW_URL_PREFIX}{relative_notebook_path}"
 
-            if correct_link not in line:
+            if correct_link.lower() not in line.lower():
                 print(f"Incorrect link in {relative_notebook_path}: {line}\n")
                 print(f"Should be: {correct_link}\n")
                 line = line.replace(line[start_index:end_index], correct_link)
@@ -61,7 +61,7 @@ def fix_links_in_notebook(notebook_path: str) -> int:
     with open(notebook_path, "r", encoding="utf-8") as f:
         notebook = nbformat.read(f, as_version=4)
 
-    relative_notebook_path = os.path.relpath(notebook_path, start=os.getcwd())
+    relative_notebook_path = os.path.relpath(notebook_path, start=os.getcwd()).lower()
 
     for cell in notebook.cells:
         if cell.cell_type == "markdown" and "<table" in cell.source:
@@ -76,9 +76,17 @@ def fix_links_in_notebook(notebook_path: str) -> int:
     return 0
 
 
+def process_directory(directory_path: str) -> None:
+    """Recursively processes all notebooks in a directory."""
+    for root, _, files in os.walk(directory_path):
+        for filename in files:
+            if filename.endswith(".ipynb"):
+                notebook_path = os.path.join(root, filename)
+                fix_links_in_notebook(notebook_path)
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python check_links.py <notebook_path>")
+        print("Usage: python update_notebook_links.py <directory_path>")
         sys.exit(1)
-
-    fix_links_in_notebook(sys.argv[1])
+    process_directory(sys.argv[1])
