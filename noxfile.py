@@ -32,9 +32,9 @@ BLACK_VERSION = "black[jupyter]==23.7.0"
 ISORT_VERSION = "isort==5.11.0"
 LINT_PATHS = ["."]
 
-DEFAULT_PYTHON_VERSION = "3.8"
+DEFAULT_PYTHON_VERSION = "3.10"
 
-UNIT_TEST_PYTHON_VERSIONS: List[str] = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+UNIT_TEST_PYTHON_VERSIONS: List[str] = ["3.10", "3.11", "3.12"]
 UNIT_TEST_STANDARD_DEPENDENCIES = [
     "mock",
     "asyncmock",
@@ -125,10 +125,39 @@ def format(session):
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
-def lint_setup_py(session):
-    """Verify that setup.py is valid (including RST check)."""
-    session.install("docutils", "pygments")
-    session.run("python", "setup.py", "check", "--restructuredtext", "--strict")
+def format_notebooks(session):
+    """
+    Run isort to sort imports. Then run black
+    to format code to uniform standard.
+    """
+    session.install(
+        "git+https://github.com/tensorflow/docs",
+        "ipython",
+        "jupyter",
+        "nbconvert",
+        "types-requests",
+        "black",
+        "blacken-docs",
+        "pyupgrade",
+        "isort",
+        "nbqa",
+        "autoflake",
+    )
+    session.run(
+        "nbqa", "pyupgrade", "--exit-zero-even-if-changed", "--py310-plus", *LINT_PATHS
+    )
+    session.run("nbqa", "autoflake", "-i", "--remove-all-unused-imports", *LINT_PATHS)
+    session.run(
+        "nbqa",
+        "isort",
+        "--fss",
+        *LINT_PATHS,
+        "--profile",
+        "black",
+    )
+    session.run("nbqa", "black", *LINT_PATHS)
+    session.run("nbqa", "blacken-docs", "--nbqa-md", *LINT_PATHS)
+    session.run("python3", "-m", "tensorflow_docs.tools.nbfmt", *LINT_PATHS)
 
 
 def install_unittest_dependencies(session, *constraints):

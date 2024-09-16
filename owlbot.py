@@ -33,6 +33,8 @@ s.replace(
 
 s.shell.run(["nox", "-s", "format"], hide_output=False)
 
+s.shell.run(["nox", "-s", "format_notebooks"], hide_output=False)
+
 # Sort Spelling Allowlist
 spelling_allow_file = ".github/actions/spelling/allow.txt"
 
