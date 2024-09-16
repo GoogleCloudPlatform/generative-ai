@@ -142,7 +142,9 @@ def format_notebooks(session):
         "isort",
         "nbqa",
         "autoflake",
+        "nbformat",
     )
+    session.run("python3", ".github/workflows/update_notebook_links.py", ".")
     session.run(
         "nbqa", "pyupgrade", "--exit-zero-even-if-changed", "--py310-plus", *LINT_PATHS
     )

@@ -87,6 +87,6 @@ def process_directory(directory_path: str):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python check_links.py <directory_path>")
+        print("Usage: python update_notebook_links.py <directory_path>")
         sys.exit(1)
     process_directory(sys.argv[1])
