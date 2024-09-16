@@ -26,7 +26,7 @@ jobs:
 
     - name: Check links
       run: |
-        python update_notebook_links.py .
+        python .github/workflows/update_notebook_links.py .
 
     - name: Commit changes
       run: |
