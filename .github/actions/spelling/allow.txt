@@ -153,6 +153,7 @@ LSum
 LTRB
 LUVBPTK
 Ladhak
+LangGraph
 Lego
 Llion
 Logrus
@@ -202,6 +203,7 @@ Oort
 PDFs
 PEFT
 PLOTLYENV
+PYINK
 Parmar
 Persero
 Phaidon
@@ -270,6 +272,7 @@ Testables
 Tetsuo
 Tianli
 Topolino
+Traceloop
 Trapp
 Tribbiani
 Tricyle
@@ -361,6 +364,9 @@ chatbots
 chromadb
 cimg
 claude
+cicd
+cimg
+claude
 clickable
 cmap
 codebase
@@ -368,6 +374,7 @@ codebases
 codefile
 codelab
 codelabs
+codespell
 colab
 coldline
 coloraxis
@@ -429,6 +436,7 @@ figsize
 fillmode
 fillna
 firestore
+fixmycar
 flac
 floormat
 fmeasure
@@ -475,6 +483,7 @@ gsutil
 gtk
 guanciale
 gunicorn
+hadolint
 hashtag
 hashtags
 hdlr
@@ -678,6 +687,7 @@ terraform
 textno
 tfhub
 tfidf
+tfvars
 tgz
 thelook
 tiktoken
@@ -685,7 +695,9 @@ timechart
 titlebar
 tobytes
 toself
+toset
 tqdm
+traceloop
 tritan
 tsv
 ubuntu
