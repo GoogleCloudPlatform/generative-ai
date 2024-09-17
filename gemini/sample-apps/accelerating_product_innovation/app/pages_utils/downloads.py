@@ -90,7 +90,7 @@ def download_button(object_to_download: bytes, download_filename: str) -> str:
     b64 = base64.b64encode(zip_content).decode()
 
     # Read the HTML template file
-    with open("app/download_link.html", "r", encoding="utf8") as f:
+    with open("app/download_link.html", encoding="utf8") as f:
         html_template = f.read()
 
     # Replace placeholders in the HTML template

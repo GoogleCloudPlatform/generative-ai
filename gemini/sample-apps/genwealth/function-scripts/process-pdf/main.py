@@ -3,7 +3,6 @@
 import os
 from pathlib import Path
 import re
-from typing import List, Optional
 import uuid
 
 import functions_framework
@@ -23,13 +22,13 @@ def batch_process_documents(
     location: str,
     processor_id: str,
     gcs_output_uri: str,
-    processor_version_id: Optional[str] = None,
-    gcs_input_uri: Optional[str] = None,
-    input_mime_type: Optional[str] = None,
-    gcs_input_prefix: Optional[str] = None,
-    field_mask: Optional[str] = None,
+    processor_version_id: str | None = None,
+    gcs_input_uri: str | None = None,
+    input_mime_type: str | None = None,
+    gcs_input_prefix: str | None = None,
+    field_mask: str | None = None,
     timeout: int = 400,
-) -> List[storage.Blob]:
+) -> list[storage.Blob]:
     """Function to batch process documents"""
     # You must set the `api_endpoint` if you use a location other than "us".
     opts = ClientOptions(api_endpoint=f"{location}-documentai.googleapis.com")
@@ -298,8 +297,6 @@ def process_pdf(cloud_event):
     ticker = Path(source_file).stem
     publisher = pubsub_v1.PublisherClient()
     topic_name = f"projects/{project_id}/topics/{project_id}-doc-ready"
-    future = publisher.publish(
-        topic_name, bytes(f"{ticker}".encode("utf-8")), spam="done"
-    )
+    future = publisher.publish(topic_name, bytes(f"{ticker}".encode()), spam="done")
     future.result()
     print("Sent message to pubsub")
