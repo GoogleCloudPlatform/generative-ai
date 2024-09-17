@@ -145,13 +145,9 @@ def download_bucket_with_transfer_manager(
         # the input list, in order.
 
         if isinstance(result, Exception):
-            logger.info(
-                f"Failed to download {name} due to exception: {result}"
-            )
+            logger.info(f"Failed to download {name} due to exception: {result}")
         else:
-            logger.info(
-                f"Downloaded {name} to {destination_directory + name}."
-            )
+            logger.info(f"Downloaded {name} to {destination_directory + name}.")
 
 
 def link_nodes(node_list):

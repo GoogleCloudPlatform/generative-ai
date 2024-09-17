@@ -1,6 +1,6 @@
 """Node Re-ranker class for async execution"""
-import logging
 from collections.abc import Callable
+import logging
 
 import google.auth
 import google.auth.transport.requests

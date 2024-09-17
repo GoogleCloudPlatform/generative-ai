@@ -1,8 +1,8 @@
 """Custom LLM Evaluator"""
 import asyncio
+from collections.abc import Callable
 import logging
 import re
-from collections.abc import Callable
 
 from backend.rag.claude_vertex import ClaudeVertexLLM
 from google.cloud import bigquery

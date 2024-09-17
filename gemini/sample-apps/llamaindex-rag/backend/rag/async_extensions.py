@@ -1,6 +1,6 @@
 """Extensions to Llamaindex Base classes to allow for asynchronous execution"""
-import logging
 from collections.abc import Sequence
+import logging
 
 from llama_index.core.base.response.schema import RESPONSE_TYPE
 from llama_index.core.callbacks import CallbackManager
