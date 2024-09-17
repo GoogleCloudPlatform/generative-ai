@@ -2,7 +2,7 @@
 
 ## Indexing and Storage
 
-`src/indexing/run_parse_embed_index.py` contains the master script for parsing documents from a cloud storage bucket using DocumentAI, creating LlamaIndex indices which manage relationships between chunks, source documents, and parent chunks and storing the resulting indices in GCP native storage modalities (e.g. Vector Search, Firestore, Vertex Search). Before running this script, adjust the `common/config.yaml` file to your specs.
+`src/indexing/run_parse_embed_index.py` contains the master script for parsing documents from a cloud storage bucket using Document AI, creating LlamaIndex indices which manage relationships between chunks, source documents, and parent chunks and storing the resulting indices in Google Cloud native storage modalities (e.g. Vector Search, Firestore, Vertex AI Search). Before running this script, adjust the `common/config.yaml` file to your specs.
 
 ```yaml
 # Project and environment settings

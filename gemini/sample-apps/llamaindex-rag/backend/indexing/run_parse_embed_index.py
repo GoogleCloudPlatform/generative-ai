@@ -1,5 +1,6 @@
 """Master script for parsing, embedding 
 and indexing data living in a GCS bucket"""
+
 import asyncio
 import logging
 import os
@@ -218,7 +219,7 @@ def main():
         VECTOR_INDEX_NAME, INDEX_ENDPOINT_NAME, APPROXIMATE_NEIGHBORS_COUNT
     )
 
-    # Vertex Vector Search Vector DB and Firestore Docstore
+    # Vertex AI Vector Search Vector DB and Firestore Docstore
     vector_store = VertexAIVectorStore(
         project_id=PROJECT_ID,
         region=LOCATION,
@@ -258,7 +259,7 @@ def main():
         INPUT_BUCKET_NAME, prefix=BUCKET_PREFIX, destination_directory=local_data_path
     )
 
-    # Parse documents using DocAI
+    # Parse documents using Document AI
     try:
         parsed_docs, raw_results = parser.batch_parse(
             blobs, chunk_size=CHUNK_SIZE, include_ancestor_headings=True

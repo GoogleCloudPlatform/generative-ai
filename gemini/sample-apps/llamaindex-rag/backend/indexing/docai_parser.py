@@ -221,7 +221,7 @@ class DocAIParser:
 
 class DocAIParsingResults:
     """
-    DocAI Parsing Results
+    Document AI Parsing Results
     """
 
     def __init__(self, source_path: str, parsed_path: str):
