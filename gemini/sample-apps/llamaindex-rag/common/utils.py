@@ -22,8 +22,7 @@ import os
 import re
 
 from google.cloud import storage
-from llama_index.core import Document
-from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
+from llama_index.core.schema import NodeRelationship, RelatedNodeInfo
 import yaml
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
@@ -33,7 +32,7 @@ logger = logging.getLogger(__name__)
 # Function to load the configuration
 def load_config():
     config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
-    with open(config_path, "r") as config_file:
+    with open(config_path) as config_file:
         return yaml.safe_load(config_file)
 
 
@@ -147,11 +146,11 @@ def download_bucket_with_transfer_manager(
 
         if isinstance(result, Exception):
             logger.info(
-                "Failed to download {} due to exception: {}".format(name, result)
+                f"Failed to download {name} due to exception: {result}"
             )
         else:
             logger.info(
-                "Downloaded {} to {}.".format(name, destination_directory + name)
+                f"Downloaded {name} to {destination_directory + name}."
             )
 
 

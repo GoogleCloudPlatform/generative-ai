@@ -12,7 +12,7 @@ location: "us-central1"
 # Data and storage settings
 input_bucket_name: "ken-rag-datasets"
 docstore_bucket_name: "ken-rag-datasets"
-bucket_prefix: "raw_pdfs/"  # Where raw data files to be indexed live
+bucket_prefix: "raw_pdfs/" # Where raw data files to be indexed live
 vector_data_prefix: "vector_data"
 rag_eval_dataset: "ken-rag-datasets"
 
@@ -137,15 +137,15 @@ There are three basic retrieval techniques: `baseline`, `auto_merging` and `pare
 | RAG Hyper-paramater | Description |
 | ------------------- | ----------- |
 | `use_rerank` | make a call to an LLM to re-rank the retrieved nodes in order of relevance according to the `prompts.choice_select_prompt_tmpl` |
-| `use_hyde` | embed a hallucinated response to the initial query *without retrieved context* and retrieve chunks based on that hallucinated response |
+| `use_hyde` | embed a hallucinated response to the initial query _without retrieved context_ and retrieve chunks based on that hallucinated response |
 | `use_refine` | refine the initial answer by calling an LLM to critique the response's correctness according to `prompts.refine_prompt_tmpl` |
-| `qa_followup` |  In addition to the retrieval done in the base retriever, retrieves document IDs based on "questions that document can answer" by performing vector similarity of the query against the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_followup_retriever` |
+| `qa_followup` | In addition to the retrieval done in the base retriever, retrieves document IDs based on "questions that document can answer" by performing vector similarity of the query against the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_followup_retriever` |
 | `hybrid_retrieval` | In addition to the retrieval done in the base retriever, retrieves document IDs based on BM25 search algorithm |
 
 ```python
 def get_query_engine(self,
                         prompts: Prompts,
-                        llm_name: str = "gemini-1.5-flash", 
+                        llm_name: str = "gemini-1.5-flash",
                         temperature: float = 0.0,
                         similarity_top_k: int = 5,
                         retrieval_strategy: str = "auto_merging",
@@ -157,8 +157,8 @@ def get_query_engine(self,
         '''
         Creates a llamaindex QueryEngine for single-shot Q&A over data
         '''
-        llm = self.get_vertex_llm(llm_name=llm_name, 
-                                  temperature=temperature, 
+        llm = self.get_vertex_llm(llm_name=llm_name,
+                                  temperature=temperature,
                                   system_prompt=Prompts.system_prompt)
         Settings.llm = llm
 
@@ -166,23 +166,23 @@ def get_query_engine(self,
         refine_prompt = PromptTemplate(prompts.refine_prompt_tmpl)
 
         if use_refine:
-            synth = get_response_synthesizer(text_qa_template=qa_prompt, 
+            synth = get_response_synthesizer(text_qa_template=qa_prompt,
                                             refine_template=refine_prompt,
                                             response_mode="compact",
                                             use_async=True)
         else:
-            synth = get_response_synthesizer(text_qa_template=qa_prompt, 
+            synth = get_response_synthesizer(text_qa_template=qa_prompt,
                                             response_mode="compact",
                                             use_async=True)
-        
+
         base_retriever = self.base_index.as_retriever(similarity_top_k=similarity_top_k)
         qa_vector_retriever = self.qa_index.as_retriever(similarity_top_k=similarity_top_k)
         query_engine = None  # Default initialization
 
-        # Choose between retrieval strategies and configurations. 
+        # Choose between retrieval strategies and configurations.
         if retrieval_strategy == "auto_merging":
             logger.info(self.base_index.storage_context.docstore)
-            retriever = AutoMergingRetriever(base_retriever, 
+            retriever = AutoMergingRetriever(base_retriever,
                                                 self.base_index.storage_context,
                                                 verbose=True)
         elif retrieval_strategy == "parent":
@@ -205,7 +205,7 @@ def get_query_engine(self,
                 # The default is english for both
                 stemmer=Stemmer.Stemmer("english"),
                 language="english",
-            )   
+            )
             retriever = QueryFusionRetriever(
                 [retriever, bm25_retriever],
                 similarity_top_k=similarity_top_k,
@@ -217,24 +217,24 @@ def get_query_engine(self,
             )
 
         if use_node_rerank:
-            reranker_llm = Vertex(model="gemini-1.5-flash", 
-                                max_tokens=8192, 
-                                temperature=temperature, 
+            reranker_llm = Vertex(model="gemini-1.5-flash",
+                                max_tokens=8192,
+                                temperature=temperature,
                                 system_prompt=prompts.system_prompt)
             choice_select_prompt = PromptTemplate(prompts.choice_select_prompt_tmpl)
             llm_reranker = CustomLLMRerank(choice_batch_size=10, top_n=5, choice_select_prompt=choice_select_prompt, llm=reranker_llm)
         else:
             llm_reranker = None
-        
-        query_engine = AsyncRetrieverQueryEngine.from_args(retriever, 
-                                                            response_synthesizer=synth, 
+
+        query_engine = AsyncRetrieverQueryEngine.from_args(retriever,
+                                                            response_synthesizer=synth,
                                                             node_postprocessors=[llm_reranker] if llm_reranker else None)
 
         if use_hyde:
             hyde_prompt = PromptTemplate(prompts.hyde_prompt_tmpl)
             hyde = AsyncHyDEQueryTransform(include_original=True, hyde_prompt=hyde_prompt)
             query_engine = AsyncTransformQueryEngine(query_engine=query_engine, query_transform=hyde)
-        
+
         self.query_engine = query_engine
         return query_engine
 ```

@@ -1,6 +1,5 @@
 """Prompt management class"""
 from dataclasses import asdict, dataclass, field
-from typing import Dict
 
 SYSTEM_PROMPT = "You are an expert assistant specializing in \
     financial products and services. Your primary goal is to help users\
@@ -193,6 +192,6 @@ class Prompts:
         else:
             raise ValueError(f"Invalid prompt name: {prompt_name}")
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """return prompts as dict"""
         return asdict(self)

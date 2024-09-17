@@ -1,6 +1,6 @@
 """Node Re-ranker class for async execution"""
 import logging
-from typing import Callable, List, Optional
+from collections.abc import Callable
 
 import google.auth
 import google.auth.transport.requests
@@ -76,8 +76,8 @@ def call_reranker(query, records, google_token):
 
 class GoogleReRankerSecretSauce(BaseNodePostprocessor):
     def _postprocess_nodes(
-        self, nodes: List[NodeWithScore], query_bundle: Optional[QueryBundle]
-    ) -> List[NodeWithScore]:
+        self, nodes: list[NodeWithScore], query_bundle: QueryBundle | None
+    ) -> list[NodeWithScore]:
         google_token = authenticate_google()
 
         records = []
@@ -116,12 +116,12 @@ class CustomLLMRerank(BaseNodePostprocessor):
 
     def __init__(
         self,
-        llm: Optional[LLM] = None,
-        choice_select_prompt: Optional[BasePromptTemplate] = None,
+        llm: LLM | None = None,
+        choice_select_prompt: BasePromptTemplate | None = None,
         choice_batch_size: int = 10,
-        format_node_batch_fn: Optional[Callable] = None,
-        parse_choice_select_answer_fn: Optional[Callable] = None,
-        service_context: Optional[ServiceContext] = None,
+        format_node_batch_fn: Callable | None = None,
+        parse_choice_select_answer_fn: Callable | None = None,
+        service_context: ServiceContext | None = None,
         top_n: int = 10,
     ) -> None:
         choice_select_prompt = choice_select_prompt or DEFAULT_CHOICE_SELECT_PROMPT
@@ -158,10 +158,10 @@ class CustomLLMRerank(BaseNodePostprocessor):
 
     async def postprocess_nodes(
         self,
-        nodes: List[NodeWithScore],
-        query_bundle: Optional[QueryBundle] = None,
-        query_str: Optional[str] = None,
-    ) -> List[NodeWithScore]:
+        nodes: list[NodeWithScore],
+        query_bundle: QueryBundle | None = None,
+        query_str: str | None = None,
+    ) -> list[NodeWithScore]:
         """Postprocess nodes."""
         if query_str is not None and query_bundle is not None:
             raise ValueError("Cannot specify both query_str and query_bundle")
@@ -173,15 +173,15 @@ class CustomLLMRerank(BaseNodePostprocessor):
 
     async def _postprocess_nodes(
         self,
-        nodes: List[NodeWithScore],
-        query_bundle: Optional[QueryBundle] = None,
-    ) -> List[NodeWithScore]:
+        nodes: list[NodeWithScore],
+        query_bundle: QueryBundle | None = None,
+    ) -> list[NodeWithScore]:
         if query_bundle is None:
             raise ValueError("Query bundle must be provided.")
         if len(nodes) == 0:
             return []
 
-        initial_results: List[NodeWithScore] = []
+        initial_results: list[NodeWithScore] = []
         for idx in range(0, len(nodes), self.choice_batch_size):
             nodes_batch = [
                 node.node for node in nodes[idx : idx + self.choice_batch_size]

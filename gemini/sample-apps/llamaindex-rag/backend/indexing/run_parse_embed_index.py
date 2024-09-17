@@ -4,7 +4,6 @@ and indexing data living in a GCS bucket"""
 import asyncio
 import logging
 import os
-from typing import List
 
 from backend.indexing.docai_parser import DocAIParser
 from backend.indexing.prompts import QA_EXTRACTION_PROMPT, QA_PARSER_PROMPT
@@ -39,7 +38,7 @@ def load_config():
     config_path = os.path.join(
         os.path.dirname(__file__), "..", "..", "common", "config.yaml"
     )
-    with open(config_path, "r") as config_file:
+    with open(config_path) as config_file:
         return yaml.safe_load(config_file)
 
 
@@ -75,7 +74,7 @@ QA_ENDPOINT_NAME = config.get("qa_endpoint_name")
 class QuesionsAnswered(BaseModel):
     """List of Questions Answered by Document"""
 
-    questions_list: List[str]
+    questions_list: list[str]
 
 
 def create_qa_index(li_docs, docstore, embed_model, llm):

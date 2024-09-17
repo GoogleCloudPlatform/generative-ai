@@ -7,7 +7,7 @@ import yaml
 config_path = os.path.join(
     os.path.dirname(__file__), "..", "..", "common", "config.yaml"
 )
-with open(config_path, "r") as config_file:
+with open(config_path) as config_file:
     config = yaml.safe_load(config_file)
 
 PROJECT_ID = config["project_id"]

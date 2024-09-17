@@ -1,6 +1,5 @@
 """Custom retriever which implements parent retrieval"""
 import logging
-from typing import List
 
 from llama_index.core import QueryBundle
 from llama_index.core.retrievers import BaseRetriever, VectorIndexRetriever
@@ -28,7 +27,7 @@ class ParentRetriever(BaseRetriever):
         self._docstore = docstore
         super().__init__()
 
-    def _retrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+    def _retrieve(self, query_bundle: QueryBundle) -> list[NodeWithScore]:
         """Expand retrieved nodes into all their source documents"""
         initial_nodes = self._vector_retriever.retrieve(query_bundle)
         node_source_id_score_df = pd.DataFrame(

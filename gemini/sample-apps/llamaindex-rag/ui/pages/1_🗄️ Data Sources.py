@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Optional
 
 import requests
 import streamlit as st
@@ -16,7 +15,7 @@ config_path = os.environ.get(
     "CONFIG_PATH",
     os.path.join(os.path.dirname(__file__), "..", "..", "common", "config.yaml"),
 )
-with open(config_path, "r") as config_file:
+with open(config_path) as config_file:
     config = yaml.safe_load(config_file)
 
 fastapi_url = config["fastapi_url"]
@@ -61,10 +60,10 @@ def fetch_firestore_collections(selected_database: str):
 def update_index(
     base_index_name: str,
     base_endpoint_name: str,
-    qa_index_name: Optional[str],
-    qa_endpoint_name: Optional[str],
-    firestore_db_name: Optional[str],
-    firestore_namespace: Optional[str],
+    qa_index_name: str | None,
+    qa_endpoint_name: str | None,
+    firestore_db_name: str | None,
+    firestore_namespace: str | None,
 ):
     response = requests.post(
         f"{fastapi_url}/update_index",

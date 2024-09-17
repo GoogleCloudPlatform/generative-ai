@@ -2,7 +2,7 @@
 import asyncio
 import logging
 import re
-from typing import Callable, Optional, Tuple
+from collections.abc import Callable
 
 from backend.rag.claude_vertex import ClaudeVertexLLM
 from google.cloud import bigquery
@@ -95,7 +95,7 @@ class LLMEvaluator:
         eval_model: GenerativeModel,
         question: str,
         ground_truth: str,
-    ) -> Tuple:
+    ) -> tuple:
         """
         LLMEvaluator.async_eval_question_answer_pair
         """
@@ -113,7 +113,7 @@ class LLMEvaluator:
         return answer, score, retrieved_context
 
     @staticmethod
-    def extract_score(text: str) -> Optional[str]:
+    def extract_score(text: str) -> str | None:
         """
         LLMEvaluator.extract_score
         """

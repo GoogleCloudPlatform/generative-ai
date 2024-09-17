@@ -3,7 +3,7 @@ project_id: "<your-project-id>"
 location: "<your-region>"
 
 # Data and storage settings
-data_path: '{base_path}/data/data'
+data_path: "{base_path}/data/data"
 input_bucket_name: "ken-rag-datasets"
 docstore_bucket_name: "ken-rag-datasets"
 bucket_prefix: "raw_pdfs/"
@@ -11,7 +11,6 @@ vector_data_prefix: "vector_data"
 rag_eval_dataset: "ken-rag-datasets"
 firestore_db_name: "rag-docstore"
 firestore_namespace: "hierarchical_docs"
-
 
 # Index settings
 index_id: "llamaindex_rag"

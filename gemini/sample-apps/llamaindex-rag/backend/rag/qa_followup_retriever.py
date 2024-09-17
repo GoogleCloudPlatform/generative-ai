@@ -1,7 +1,6 @@
 """Custom retriever which implements
 retrieval based on hypothetical questions"""
 import logging
-from typing import List
 
 from llama_index.core import QueryBundle
 from llama_index.core.retrievers import BaseRetriever, VectorIndexRetriever
@@ -31,7 +30,7 @@ class QARetriever(BaseRetriever):
         self._docstore = docstore
         super().__init__()
 
-    def _retrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+    def _retrieve(self, query_bundle: QueryBundle) -> list[NodeWithScore]:
         qa_nodes = self._qa_vector_retriever.retrieve(query_bundle)
         og_docs = []
         for nodewscore in qa_nodes:
@@ -48,7 +47,7 @@ class QARetriever(BaseRetriever):
 
         return og_docs
 
-    async def _aretrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+    async def _aretrieve(self, query_bundle: QueryBundle) -> list[NodeWithScore]:
         qa_nodes = await self._qa_vector_retriever.aretrieve(query_bundle)
         og_docs = []
         for nodewscore in qa_nodes:
@@ -82,7 +81,7 @@ class QAFollowupRetriever(BaseRetriever):
         self._base_retriever = base_retriever
         super().__init__()
 
-    def _retrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+    def _retrieve(self, query_bundle: QueryBundle) -> list[NodeWithScore]:
         am_nodes = self._base_retriever.retrieve(query_bundle)
         qa_nodes = self._qa_retriever.retrieve(query_bundle)
 
@@ -98,7 +97,7 @@ class QAFollowupRetriever(BaseRetriever):
         retrieve_nodes = [combined_dict[rid] for rid in retrieve_ids]
         return retrieve_nodes
 
-    async def _aretrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+    async def _aretrieve(self, query_bundle: QueryBundle) -> list[NodeWithScore]:
         am_nodes = await self._base_retriever.aretrieve(query_bundle)
         qa_nodes = await self._qa_retriever.aretrieve(query_bundle)
 

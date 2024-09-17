@@ -2,7 +2,6 @@ import json
 import logging
 import time
 import traceback
-from typing import List, Optional, Tuple
 
 from google.api_core.client_options import ClientOptions
 from google.cloud import documentai, storage
@@ -39,12 +38,12 @@ class DocAIParser:
 
     def batch_parse(
         self,
-        blobs: List[Blob],
+        blobs: list[Blob],
         chunk_size: int = 500,
         include_ancestor_headings: bool = True,
         timeout_sec: int = 3600,
         check_in_interval_sec: int = 60,
-    ) -> Tuple[List[Document], List["DocAIParsingResults"]]:  # noqa: F821
+    ) -> tuple[list[Document], list["DocAIParsingResults"]]:  # noqa: F821
         """
         Parses a list of blobs using Document AI.
 
@@ -84,7 +83,7 @@ class DocAIParser:
             return [], []
 
     def _start_batch_process(
-        self, blobs: List[Blob], chunk_size: int, include_ancestor_headings: bool
+        self, blobs: list[Blob], chunk_size: int, include_ancestor_headings: bool
     ):
         input_config = documentai.BatchDocumentsInputConfig(
             gcs_documents=documentai.GcsDocuments(
@@ -141,7 +140,7 @@ class DocAIParser:
             if operation.exception():
                 raise KeyError(f"Operation failed: {operation.exception()}")
 
-    def _get_results(self, operations) -> List["DocAIParsingResults"]:  # noqa: F821
+    def _get_results(self, operations) -> list["DocAIParsingResults"]:  # noqa: F821
         results = []
         for operation in operations:
             metadata = operation.metadata
@@ -157,7 +156,7 @@ class DocAIParser:
                 print(f"Warning: Unexpected metadata structure: {metadata}")
         return results
 
-    def _parse_from_results(self, results: List["DocAIParsingResults"]):  # noqa: F821
+    def _parse_from_results(self, results: list["DocAIParsingResults"]):  # noqa: F821
         documents = []
         storage_client = storage.Client()
 
@@ -233,7 +232,7 @@ def get_or_create_docai_processor(
     project_id: str,
     location: str,
     processor_display_name: str,
-    processor_id: Optional[str] = None,
+    processor_id: str | None = None,
     create_new: bool = False,
     processor_type: str = "LAYOUT_PARSER_PROCESSOR",
 ) -> documentai.Processor:

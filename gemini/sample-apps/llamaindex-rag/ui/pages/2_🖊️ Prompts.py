@@ -9,7 +9,7 @@ config_path = os.environ.get(
     "CONFIG_PATH",
     os.path.join(os.path.dirname(__file__), "..", "..", "common", "config.yaml"),
 )
-with open(config_path, "r") as config_file:
+with open(config_path) as config_file:
     config = yaml.safe_load(config_file)
 
 fastapi_url = config["fastapi_url"]

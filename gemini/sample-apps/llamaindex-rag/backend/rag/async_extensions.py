@@ -1,6 +1,6 @@
 """Extensions to Llamaindex Base classes to allow for asynchronous execution"""
 import logging
-from typing import Dict, List, Optional, Sequence
+from collections.abc import Sequence
 
 from llama_index.core.base.response.schema import RESPONSE_TYPE
 from llama_index.core.callbacks import CallbackManager
@@ -41,8 +41,8 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
         self,
         query_engine: BaseQueryEngine,
         query_transform: BaseQueryTransform,
-        transform_metadata: Optional[dict] = None,
-        callback_manager: Optional[CallbackManager] = None,
+        transform_metadata: dict | None = None,
+        callback_manager: CallbackManager | None = None,
     ) -> None:
         self._query_engine = query_engine
         self._query_transform = query_transform
@@ -56,7 +56,7 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
             "query_engine": self._query_engine,
         }
 
-    async def aretrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+    async def aretrieve(self, query_bundle: QueryBundle) -> list[NodeWithScore]:
         query_bundle = await self._query_transform._arun(
             query_bundle, metadata=self._transform_metadata
         )
@@ -65,8 +65,8 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
     def synthesize(
         self,
         query_bundle: QueryBundle,
-        nodes: List[NodeWithScore],
-        additional_source_nodes: Optional[Sequence[NodeWithScore]] = None,
+        nodes: list[NodeWithScore],
+        additional_source_nodes: Sequence[NodeWithScore] | None = None,
     ) -> RESPONSE_TYPE:
         query_bundle = self._query_transform.run(
             query_bundle, metadata=self._transform_metadata
@@ -80,7 +80,7 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
     async def arun(
         self,
         query_bundle_or_str: QueryType,
-        metadata: Optional[Dict] = None,
+        metadata: dict | None = None,
     ) -> QueryBundle:
         """Run query transform."""
         metadata = metadata or {}
@@ -97,8 +97,8 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
     async def asynthesize(
         self,
         query_bundle: QueryBundle,
-        nodes: List[NodeWithScore],
-        additional_source_nodes: Optional[Sequence[NodeWithScore]] = None,
+        nodes: list[NodeWithScore],
+        additional_source_nodes: Sequence[NodeWithScore] | None = None,
     ) -> RESPONSE_TYPE:
         query_bundle = await self._query_transform._arun(
             query_bundle, metadata=self._transform_metadata
@@ -137,8 +137,8 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
 
     def __init__(
         self,
-        llm: Optional[LLMPredictorType] = None,
-        hyde_prompt: Optional[BasePromptTemplate] = None,
+        llm: LLMPredictorType | None = None,
+        hyde_prompt: BasePromptTemplate | None = None,
         include_original: bool = True,
     ) -> None:
         """Initialize HyDEQueryTransform.
@@ -165,7 +165,7 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
         if "hyde_prompt" in prompts:
             self._hyde_prompt = prompts["hyde_prompt"]
 
-    def _run(self, query_bundle: QueryBundle, metadata: Dict) -> QueryBundle:
+    def _run(self, query_bundle: QueryBundle, metadata: dict) -> QueryBundle:
         """Run query transform."""
         # TODO: support generating multiple hypothetical docs
         query_str = query_bundle.query_str
@@ -199,8 +199,8 @@ class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
     to allow for asynchronous post-processing"""
 
     async def _apply_node_postprocessors(
-        self, nodes: List[NodeWithScore], query_bundle: QueryBundle
-    ) -> List[NodeWithScore]:
+        self, nodes: list[NodeWithScore], query_bundle: QueryBundle
+    ) -> list[NodeWithScore]:
         """Apply node postprocessors."""
         for node_postprocessor in self._node_postprocessors:
             nodes = await node_postprocessor.postprocess_nodes(
@@ -208,7 +208,7 @@ class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
             )
         return nodes
 
-    async def aretrieve(self, query_bundle: QueryBundle) -> List[NodeWithScore]:
+    async def aretrieve(self, query_bundle: QueryBundle) -> list[NodeWithScore]:
         """Retrieve nodes"""
         nodes = await self._retriever.aretrieve(query_bundle)
         num_nodes = len(nodes)

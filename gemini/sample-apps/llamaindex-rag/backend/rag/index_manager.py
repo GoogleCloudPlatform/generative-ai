@@ -2,7 +2,6 @@
 experimentation UI"""
 
 import logging
-from typing import Optional
 
 import Stemmer
 from backend.rag.async_extensions import (
@@ -36,7 +35,7 @@ logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
 
 
-class IndexManager(object):
+class IndexManager:
     """
     This class manages state for vector indexes,
     docstores, query engines and chat engines
@@ -54,11 +53,11 @@ class IndexManager(object):
         location: str,
         base_index_name: str,
         base_endpoint_name: str,
-        qa_index_name: Optional[str],
-        qa_endpoint_name: Optional[str],
+        qa_index_name: str | None,
+        qa_endpoint_name: str | None,
         embeddings_model_name: str,
-        firestore_db_name: Optional[str],
-        firestore_namespace: Optional[str],
+        firestore_db_name: str | None,
+        firestore_namespace: str | None,
         vs_bucket_name: str,
     ):
         self.project_id = project_id
@@ -129,10 +128,10 @@ class IndexManager(object):
         self,
         base_index_name,
         base_endpoint_name,
-        qa_index_name: Optional[str],
-        qa_endpoint_name: Optional[str],
-        firestore_db_name: Optional[str],
-        firestore_namespace: Optional[str],
+        qa_index_name: str | None,
+        qa_endpoint_name: str | None,
+        firestore_db_name: str | None,
+        firestore_namespace: str | None,
     ) -> None:
         """Set the current indices to be used for the RAG"""
         self.base_index_name = base_index_name
@@ -161,8 +160,8 @@ class IndexManager(object):
         self,
         index_name: str,
         endpoint_name: str,
-        firestore_db_name: Optional[str],
-        firestore_namespace: Optional[str],
+        firestore_db_name: str | None,
+        firestore_namespace: str | None,
     ) -> VectorStoreIndex:
         """
         Returns a llamaindex VectorStoreIndex object which contains a storage context,
