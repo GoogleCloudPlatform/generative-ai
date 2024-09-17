@@ -1,4 +1,3 @@
-
 from backend.rag.index_manager import IndexManager
 from backend.rag.prompts import Prompts
 from common.utils import load_config
