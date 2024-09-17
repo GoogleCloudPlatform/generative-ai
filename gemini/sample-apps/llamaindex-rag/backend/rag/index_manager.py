@@ -1,5 +1,6 @@
-"""Main state management class for indicies and prompts for
+"""Main state management class for indices and prompts for
 experimentation UI"""
+
 import logging
 from typing import Optional
 
@@ -13,10 +14,7 @@ from llama_index.core import (
     get_response_synthesizer,
 )
 from llama_index.core.agent import ReActAgent
-from llama_index.core.retrievers import (
-    AutoMergingRetriever,
-    QueryFusionRetriever
-)
+from llama_index.core.retrievers import AutoMergingRetriever, QueryFusionRetriever
 from llama_index.core.tools import QueryEngineTool, ToolMetadata
 from llama_index.embeddings.vertex import VertexTextEmbedding
 from llama_index.llms.vertex import Vertex
@@ -226,7 +224,7 @@ class IndexManager(object):
         hybrid_retrieval: bool = True,
     ) -> AsyncRetrieverQueryEngine:
         """
-        Creates a llamaindex QueryEngine given a 
+        Creates a llamaindex QueryEngine given a
         VectorStoreIndex and hyperparameters
         """
         llm = self.get_vertex_llm(
@@ -248,13 +246,10 @@ class IndexManager(object):
             )
         else:
             synth = get_response_synthesizer(
-                text_qa_template=qa_prompt, 
-                response_mode="compact", 
-                use_async=True
+                text_qa_template=qa_prompt, response_mode="compact", use_async=True
             )
 
-        base_retriever = self.base_index\
-            .as_retriever(similarity_top_k=similarity_top_k)
+        base_retriever = self.base_index.as_retriever(similarity_top_k=similarity_top_k)
         if self.qa_index:
             qa_vector_retriever = self.qa_index.as_retriever(
                 similarity_top_k=similarity_top_k
@@ -278,8 +273,7 @@ class IndexManager(object):
 
         if qa_followup:
             qa_retriever = QARetriever(
-                qa_vector_retriever=qa_vector_retriever, 
-                docstore=self.qa_index.docstore
+                qa_vector_retriever=qa_vector_retriever, docstore=self.qa_index.docstore
             )
             retriever = QAFollowupRetriever(
                 qa_retriever=qa_retriever, base_retriever=retriever
@@ -299,7 +293,7 @@ class IndexManager(object):
                 mode="reciprocal_rerank",
                 use_async=True,
                 verbose=True,
-                # query_gen_prompt="...",  # we could override the 
+                # query_gen_prompt="...",  # we could override the
                 # query generation prompt here
             )
 
@@ -366,9 +360,6 @@ class IndexManager(object):
         )
         Settings.llm = llm
         agent = ReActAgent.from_tools(
-            query_engine_tools, 
-            llm=llm, 
-            verbose=True, 
-            context=prompts.system_prompt
+            query_engine_tools, llm=llm, verbose=True, context=prompts.system_prompt
         )
         return agent

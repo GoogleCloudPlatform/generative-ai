@@ -79,7 +79,7 @@ This FastAPI application provides an API for querying and evaluating a Retrieval
 10. `/query_rag`: Query the RAG system in one-shot mode
 11. `/eval_batch`: Perform batch evaluation of the RAG system
 
-### Data Source and RAG Pipeline State Managment
+### Data Source and RAG Pipeline State Management
 
 `rag.index_manager.IndexManager` is the main class which manages state for vector indices, docstores, query engines and chat engines
 across the app's lifecycle (e.g. through UI manipulations). The `index_manager` (instantiated)
@@ -139,8 +139,8 @@ There are three basic retrieval techniques: `baseline`, `auto_merging` and `pare
 | `use_rerank` | make a call to an LLM to re-rank the retrieved nodes in order of relevance according to the `prompts.choice_select_prompt_tmpl` |
 | `use_hyde` | embed a hallucinated response to the initial query *without retrieved context* and retrieve chunks based on that hallucinated response |
 | `use_refine` | refine the initial answer by calling an LLM to critique the response's correctness according to `prompts.refine_prompt_tmpl` |
-| `qa_followup` |  In additon to the retrieval done in the base retriever, retrieves document IDs based on "questions that document can answer" by performing vector similarity of the query agains the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_folloup_retriever` |
-| `hybrid_retrieval` | In additon to the retrieval done in the base retriever, retrieves document IDs based on BM25 search algorithm |
+| `qa_followup` |  In addition to the retrieval done in the base retriever, retrieves document IDs based on "questions that document can answer" by performing vector similarity of the query against the "questions answered" vector store. It will then retrieve the full document content from the associated collection in Firestore. Logic for this retriever is contained in `rag.qa_followup_retriever` |
+| `hybrid_retrieval` | In addition to the retrieval done in the base retriever, retrieves document IDs based on BM25 search algorithm |
 
 ```python
 def get_query_engine(self,
@@ -200,8 +200,8 @@ def get_query_engine(self,
             bm25_retriever = BM25Retriever.from_defaults(
                 docstore=self.base_index.docstore,
                 similarity_top_k=similarity_top_k,
-                # Optional: We can pass in the stemmer and set the language for stopwords
-                # This is important for removing stopwords and stemming the query + text
+                # Optional: We can pass in the stemmer and set the language for stop words
+                # This is important for removing stop words and stemming the query + text
                 # The default is english for both
                 stemmer=Stemmer.Stemmer("english"),
                 language="english",

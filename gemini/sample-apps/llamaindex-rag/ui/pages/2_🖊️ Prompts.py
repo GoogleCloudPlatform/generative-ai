@@ -20,7 +20,7 @@ prompt_instructions = {
     query_str  - the query from the user""",
     "refine_prompt_tmpl": """This prompt instructs the LLM to refine an existing answer to a given question and given the context supplied by the retriever:\n
     existing_answer - the current answer to the query. \n
-    context_msg - the set of nodes retrievd from the retriever, concatenated as a string. \n
+    context_msg - the set of nodes retrieved from the retriever, concatenated as a string. \n
     query_str - the query from the user""",
     "hyde_prompt_tmpl": """This prompt asks the LLM to hallucinate a response to the question.\n
     context_str - the query from the user""",

@@ -121,7 +121,7 @@ else:
     st.warning("Failed to fetch Vector Search data. Please try again later.")
 
 # Firestore Collections Section
-st.subheader("Choose a Firstore database (if applicable)")
+st.subheader("Choose a Firestore database (if applicable)")
 firestore_databases = fetch_firestore_databases()
 logger.info(firestore_databases)
 if firestore_databases:
