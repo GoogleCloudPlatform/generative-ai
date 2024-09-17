@@ -42,13 +42,12 @@ from google.cloud import discoveryengine_v1 as discoveryengine
 
 SEARCH_ENGINE_ID = "<YOUR SEARCH ENGINE ID>"
 
-search_client_options = ClientOptions(api_endpoint=f"us-discoveryengine.googleapis.com")
+search_client_options = ClientOptions(api_endpoint="us-discoveryengine.googleapis.com")
 search_client = discoveryengine.SearchServiceClient(
     client_options=search_client_options
 )
 search_serving_config = f"projects/{PROJECT_ID}/locations/us/collections/default_collection/dataStores/{SEARCH_ENGINE_ID}/servingConfigs/default_search:search"
 
-import json
 
 
 def search_gms(search_query, rows):

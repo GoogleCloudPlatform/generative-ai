@@ -110,7 +110,7 @@ def format(session):
     Run isort to sort imports. Then run black
     to format code to uniform standard.
     """
-    session.install(BLACK_VERSION, ISORT_VERSION, "autoflake")
+    session.install(BLACK_VERSION, ISORT_VERSION, "autoflake", "ruff")
     # Use the --fss option to sort imports using strict alphabetical order.
     # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
     session.run(
@@ -118,6 +118,12 @@ def format(session):
         "-i",
         "-r",
         "--remove-all-unused-imports",
+        *LINT_PATHS,
+    )
+    session.run(
+        "ruff",
+        "check",
+        "--fix",
         *LINT_PATHS,
     )
     session.run(
