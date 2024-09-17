@@ -1,9 +1,7 @@
-from fastapi import FastAPI
-from backend.app.routers import prompts, indexes, rag, evaluation
-from common.utils import load_config
 import logging
-import yaml
-import os
+
+from backend.app.routers import evaluation, indexes, prompts, rag
+from fastapi import FastAPI
 import uvicorn
 
 # Configure logging

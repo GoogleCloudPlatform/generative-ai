@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends
-from backend.app.models import RAGRequest
-from backend.app.dependencies import get_index_manager, get_prompts
-from ragas.metrics import answer_relevancy, faithfulness, context_relevancy
-from datasets import Dataset
-from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
-from ragas import evaluate
-import pandas as pd
 import logging
+
+from backend.app.dependencies import get_index_manager, get_prompts
+from backend.app.models import RAGRequest
+from datasets import Dataset
+from fastapi import APIRouter, Depends
+from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
+import pandas as pd
+from ragas import evaluate
+from ragas.metrics import answer_relevancy, context_relevancy, faithfulness
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

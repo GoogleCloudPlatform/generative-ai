@@ -1,22 +1,16 @@
 """Extensions to Llamaindex Base classes to allow for asynchronous execution"""
-from typing import Dict, List, Optional, Sequence
 import logging
+from typing import Dict, List, Optional, Sequence
+
 from llama_index.core.base.response.schema import RESPONSE_TYPE
 from llama_index.core.callbacks import CallbackManager
-from llama_index.core.indices.query.query_transform.base import (
-    BaseQueryTransform
-)
+from llama_index.core.indices.query.query_transform.base import BaseQueryTransform
 from llama_index.core.prompts import BasePromptTemplate
 from llama_index.core.prompts.default_prompts import DEFAULT_HYDE_PROMPT
 from llama_index.core.prompts.mixin import PromptDictType, PromptMixinType
-from llama_index.core.query_engine import (
-    BaseQueryEngine,
-    RetrieverQueryEngine,
-)
+from llama_index.core.query_engine import BaseQueryEngine, RetrieverQueryEngine
 from llama_index.core.schema import NodeWithScore, QueryBundle, QueryType
-from llama_index.core.service_context_elements.llm_predictor import (
-    LLMPredictorType
-)
+from llama_index.core.service_context_elements.llm_predictor import LLMPredictorType
 from llama_index.core.settings import Settings
 from pydantic import Field
 
@@ -98,8 +92,7 @@ class AsyncTransformQueryEngine(BaseQueryEngine):
         else:
             query_bundle = query_bundle_or_str
 
-        return await self._query_transform._arun(query_bundle, 
-                                                 metadata=metadata)
+        return await self._query_transform._arun(query_bundle, metadata=metadata)
 
     async def asynthesize(
         self,
@@ -202,8 +195,9 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
 
 
 class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
-    """Async Extension of the ReterieverQueryEngine 
+    """Async Extension of the ReterieverQueryEngine
     to allow for asynchronous post-processing"""
+
     async def _apply_node_postprocessors(
         self, nodes: List[NodeWithScore], query_bundle: QueryBundle
     ) -> List[NodeWithScore]:
@@ -219,5 +213,4 @@ class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
         nodes = await self._retriever.aretrieve(query_bundle)
         num_nodes = len(nodes)
         logger.info(f"Total nodes retrieved {num_nodes}")
-        return await self._apply_node_postprocessors(nodes, 
-                                                     query_bundle=query_bundle)
+        return await self._apply_node_postprocessors(nodes, query_bundle=query_bundle)

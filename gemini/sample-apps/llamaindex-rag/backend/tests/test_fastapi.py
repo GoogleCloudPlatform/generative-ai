@@ -1,12 +1,7 @@
-import glob
-import json
 
-from fastapi.testclient import TestClient
-import pandas as pd
-import pytest
 from backend.app.main import app
-from backend.rag.index_manager import IndexManager
-from backend.rag.prompts import Prompts
+from fastapi.testclient import TestClient
+import pytest
 
 
 @pytest.fixture

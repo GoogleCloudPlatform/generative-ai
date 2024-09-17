@@ -1,8 +1,6 @@
-import os
 
 from backend.rag.index_manager import IndexManager
 from backend.rag.prompts import Prompts
-import yaml
 from common.utils import load_config
 
 config = load_config()

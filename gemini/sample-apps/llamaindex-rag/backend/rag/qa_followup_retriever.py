@@ -5,10 +5,7 @@ from typing import List
 
 from llama_index.core import QueryBundle
 from llama_index.core.retrievers import BaseRetriever, VectorIndexRetriever
-from llama_index.core.schema import (
-    NodeRelationship,
-    NodeWithScore
-)
+from llama_index.core.schema import NodeRelationship, NodeWithScore
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 
 # Set the desired logging level
@@ -26,7 +23,7 @@ class QARetriever(BaseRetriever):
         docstore: FirestoreDocumentStore,
     ) -> None:
         """
-        This retriever uses a vector store to do 
+        This retriever uses a vector store to do
         initial node retriever and a documentstore to retrieve nodes by id
         """
 
@@ -69,7 +66,7 @@ class QARetriever(BaseRetriever):
 
 
 class QAFollowupRetriever(BaseRetriever):
-    """Custom retriever which automerging retrieval and then follows that up 
+    """Custom retriever which automerging retrieval and then follows that up
     with another vector-based retrieval
     into an index storing questions answered per docs"""
 
@@ -77,7 +74,7 @@ class QAFollowupRetriever(BaseRetriever):
         self, qa_retriever: QARetriever, base_retriever: BaseRetriever
     ) -> None:
         """
-        This retriever uses a vector store to do initial node retriever 
+        This retriever uses a vector store to do initial node retriever
         and a documentstore to retrieve nodes by id
         """
 

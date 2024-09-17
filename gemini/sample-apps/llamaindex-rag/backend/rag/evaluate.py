@@ -4,6 +4,7 @@ import logging
 import re
 from typing import Callable, Optional, Tuple
 
+from backend.rag.claude_vertex import ClaudeVertexLLM
 from google.cloud import bigquery
 from llama_index.core.base.response.schema import Response
 from llama_index.core.chat_engine.types import AgentChatResponse
@@ -14,7 +15,6 @@ from vertexai.generative_models import (
     HarmBlockThreshold,
     HarmCategory,
 )
-from backend.rag.claude_vertex import ClaudeVertexLLM
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
@@ -28,6 +28,7 @@ class LLMEvaluator:
     LLMEvaluator.async_eval_question_answer_pair
     LLMEvaluator.async_eval_answer
     """
+
     def __init__(
         self,
         system_prompt: str,
@@ -158,14 +159,12 @@ class LLMEvaluator:
         """
         LLMEvaluator.evaluate
         """
-        eval_df = asyncio.run(self.async_eval_retrieval(retrieval_qa_func, 
-                                                        eval_df))
+        eval_df = asyncio.run(self.async_eval_retrieval(retrieval_qa_func, eval_df))
         return eval_df
 
 
 def write_results_to_bq(
-    pd_dataframe: pd.DataFrame, 
-    table_id: str = "eval_results.eval_results_table"
+    pd_dataframe: pd.DataFrame, table_id: str = "eval_results.eval_results_table"
 ):
     """
     write_results_to_bq

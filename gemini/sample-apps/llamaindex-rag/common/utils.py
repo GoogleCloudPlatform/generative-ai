@@ -25,7 +25,6 @@ from google.cloud import storage
 from llama_index.core import Document
 from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
 import yaml
-import os
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)

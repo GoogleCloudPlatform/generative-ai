@@ -1,9 +1,7 @@
 import streamlit as st
 
 # Set up Streamlit page configuration
-st.set_page_config(
-    layout="wide", page_title="LlamaIndex RAG Evaluation", page_icon="🏠"
-)
+st.set_page_config(layout="wide", page_title="LlamaIndex RAG Evaluation", page_icon="🏠")
 
 
 # Custom CSS for styling

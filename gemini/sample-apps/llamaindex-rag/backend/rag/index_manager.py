@@ -5,6 +5,16 @@ import logging
 from typing import Optional
 
 import Stemmer
+from backend.rag.async_extensions import (
+    AsyncHyDEQueryTransform,
+    AsyncRetrieverQueryEngine,
+    AsyncTransformQueryEngine,
+)
+from backend.rag.claude_vertex import ClaudeVertexLLM
+from backend.rag.node_reranker import CustomLLMRerank
+from backend.rag.parent_retriever import ParentRetriever
+from backend.rag.prompts import Prompts
+from backend.rag.qa_followup_retriever import QAFollowupRetriever, QARetriever
 from google.cloud import aiplatform
 from llama_index.core import (
     PromptTemplate,
@@ -21,16 +31,6 @@ from llama_index.llms.vertex import Vertex
 from llama_index.retrievers.bm25 import BM25Retriever
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
-from backend.rag.async_extensions import (
-    AsyncHyDEQueryTransform,
-    AsyncRetrieverQueryEngine,
-    AsyncTransformQueryEngine,
-)
-from backend.rag.claude_vertex import ClaudeVertexLLM
-from backend.rag.node_reranker import CustomLLMRerank
-from backend.rag.parent_retriever import ParentRetriever
-from backend.rag.prompts import Prompts
-from backend.rag.qa_followup_retriever import QAFollowupRetriever, QARetriever
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)

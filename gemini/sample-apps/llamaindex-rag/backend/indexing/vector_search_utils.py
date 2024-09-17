@@ -96,8 +96,7 @@ def deploy_index(
     return vs_deployed_index
 
 
-def get_existing_index_and_endpoint(vector_index_name: str,
-                                    index_endpoint_name: str):
+def get_existing_index_and_endpoint(vector_index_name: str, index_endpoint_name: str):
     """Gets existing index and endpoint."""
     # Check for existing index
     index = None
@@ -121,8 +120,7 @@ def get_existing_index_and_endpoint(vector_index_name: str,
 
 
 def get_or_create_existing_index(
-    vector_index_name: str, index_endpoint_name: str,
-    approximate_neighbors_count: int
+    vector_index_name: str, index_endpoint_name: str, approximate_neighbors_count: int
 ):
     """Gets or creates existing index."""
     # Creating Vector Search Index
@@ -136,8 +134,7 @@ def get_or_create_existing_index(
 
     print("Creating new index and/or endpoint")
     if not vs_index:
-        vs_index = create_index(vector_index_name,
-                                approximate_neighbors_count)
+        vs_index = create_index(vector_index_name, approximate_neighbors_count)
     if not vs_endpoint:
         vs_endpoint = create_endpoint(index_endpoint_name)
     deploy_index(vs_index, vs_endpoint, vector_index_name)

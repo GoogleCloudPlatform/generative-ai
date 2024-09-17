@@ -1,9 +1,15 @@
-from fastapi import APIRouter, Depends
-from backend.app.models import EvalRequest
+from datetime import datetime
+import logging
+import uuid
+
 from backend.app.dependencies import get_index_manager, get_prompts
-from common.utils import download_blob
+from backend.app.models import EvalRequest
 from backend.rag.evaluate import LLMEvaluator
+from common.utils import download_blob
+from datasets import Dataset
+from fastapi import APIRouter, Depends
 from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
+import pandas as pd
 from ragas import evaluate
 from ragas.metrics import (
     answer_correctness,
@@ -14,11 +20,6 @@ from ragas.metrics import (
     context_relevancy,
     faithfulness,
 )
-from datasets import Dataset
-import pandas as pd
-import logging
-from datetime import datetime
-import uuid
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

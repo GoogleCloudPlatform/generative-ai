@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
-from google.api_core.exceptions import PermissionDenied
-from google.api_core.client_options import ClientOptions
-from google.cloud import aiplatform, firestore, firestore_admin_v1
-from backend.app.models import IndexUpdate
-from backend.app.dependencies import get_index_manager
 import logging
+
+from backend.app.dependencies import get_index_manager
+from backend.app.models import IndexUpdate
+from fastapi import APIRouter, Depends, HTTPException
+from google.api_core.client_options import ClientOptions
+from google.api_core.exceptions import PermissionDenied
+from google.cloud import aiplatform, firestore, firestore_admin_v1
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

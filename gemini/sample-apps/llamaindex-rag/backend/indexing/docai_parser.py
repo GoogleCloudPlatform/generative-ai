@@ -1,9 +1,9 @@
 import json
 import logging
 import time
+import traceback
 from typing import List, Optional, Tuple
 
-import traceback
 from google.api_core.client_options import ClientOptions
 from google.cloud import documentai, storage
 from google.cloud.storage import Blob

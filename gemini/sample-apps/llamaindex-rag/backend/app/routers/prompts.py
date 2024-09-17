@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
-from backend.app.models import PromptUpdate
 from backend.app.dependencies import get_prompts
+from backend.app.models import PromptUpdate
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
 

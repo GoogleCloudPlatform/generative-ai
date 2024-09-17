@@ -1,4 +1,5 @@
 import logging
+
 from backend.app.shared_state import index_manager, prompts
 from shared_state import IndexManager, Prompts
 

@@ -4,19 +4,21 @@ import asyncio
 import logging
 import os
 from typing import List
-from tqdm.asyncio import tqdm_asyncio
-import yaml
-from llama_index.core import (
-    Document,
-    Settings,
-    StorageContext,
-    VectorStoreIndex
+
+from backend.indexing.docai_parser import DocAIParser
+from backend.indexing.prompts import QA_EXTRACTION_PROMPT, QA_PARSER_PROMPT
+from backend.indexing.vector_search_utils import (
+    get_or_create_existing_index,
+)  # noqa: E501
+from common.utils import (
+    create_pdf_blob_list,
+    download_bucket_with_transfer_manager,
+    link_nodes,
 )
+from google.cloud import aiplatform
+from llama_index.core import Document, Settings, StorageContext, VectorStoreIndex
 from llama_index.core.extractors import QuestionsAnsweredExtractor
-from llama_index.core.node_parser import (
-    HierarchicalNodeParser, 
-    SentenceSplitter
-)
+from llama_index.core.node_parser import HierarchicalNodeParser, SentenceSplitter
 from llama_index.core.program import LLMTextCompletionProgram
 from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
 from llama_index.embeddings.vertex import VertexTextEmbedding
@@ -24,18 +26,8 @@ from llama_index.llms.vertex import Vertex
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 from llama_index.vector_stores.vertexaivectorsearch import VertexAIVectorStore
 from pydantic import BaseModel
-from google.cloud import aiplatform
-
-from common.utils import (
-    create_pdf_blob_list,
-    download_bucket_with_transfer_manager,
-    link_nodes
-)
-from backend.indexing.docai_parser import DocAIParser
-from backend.indexing.prompts import QA_EXTRACTION_PROMPT, QA_PARSER_PROMPT
-from backend.indexing.vector_search_utils import (  # noqa: E501
-    get_or_create_existing_index,
-)
+from tqdm.asyncio import tqdm_asyncio
+import yaml
 
 logging.basicConfig(level=logging.INFO)  # Set the desired logging level
 logger = logging.getLogger(__name__)
@@ -88,8 +80,8 @@ class QuesionsAnswered(BaseModel):
 def create_qa_index(li_docs, docstore, embed_model, llm):
     """creates index of hypothetical questions"""
     qa_index, qa_endpoint = get_or_create_existing_index(
-            QA_INDEX_NAME, QA_ENDPOINT_NAME, APPROXIMATE_NEIGHBORS_COUNT
-        )
+        QA_INDEX_NAME, QA_ENDPOINT_NAME, APPROXIMATE_NEIGHBORS_COUNT
+    )
     qa_vector_store = VertexAIVectorStore(
         project_id=PROJECT_ID,
         region=LOCATION,
@@ -149,6 +141,7 @@ def create_qa_index(li_docs, docstore, embed_model, llm):
         llm=llm,
     )
 
+
 def create_hierarchical_index(li_docs, docstore, vector_store, embed_model, llm):
     # Let hierarchical node parser take care of granular chunking
     node_parser = HierarchicalNodeParser.from_defaults(chunk_sizes=CHUNK_SIZES)
@@ -157,9 +150,7 @@ def create_hierarchical_index(li_docs, docstore, vector_store, embed_model, llm)
     leaf_nodes = node_parser.get_leaf_nodes(nodes)
     num_leaf_nodes = len(leaf_nodes)
     num_nodes = len(nodes)
-    logger.info(
-        f"There are {num_leaf_nodes} leaf_nodes and {num_nodes} total nodes"
-    )
+    logger.info(f"There are {num_leaf_nodes} leaf_nodes and {num_nodes} total nodes")
     docstore.add_documents(nodes)
     storage_context = StorageContext.from_defaults(
         docstore=docstore, vector_store=vector_store
@@ -170,6 +161,7 @@ def create_hierarchical_index(li_docs, docstore, vector_store, embed_model, llm)
         embed_model=embed_model,
         llm=llm,
     )
+
 
 def create_flat_index(li_docs, docstore, vector_store, embed_model, llm):
     sentence_splitter = SentenceSplitter(chunk_size=CHUNK_OVERLAP)
@@ -215,6 +207,7 @@ def create_flat_index(li_docs, docstore, vector_store, embed_model, llm):
         llm=llm,
     )
 
+
 def main():
     """Main parsing, embedding and indexing logic for data living in GCS"""
     # Initialize Vertex AI and create index and endpoint
@@ -235,9 +228,7 @@ def main():
     )
 
     docstore = FirestoreDocumentStore.from_database(
-        project=PROJECT_ID,
-        database=FIRESTORE_DB_NAME,
-        namespace=FIRESTORE_NAMESPACE
+        project=PROJECT_ID, database=FIRESTORE_DB_NAME, namespace=FIRESTORE_NAMESPACE
     )
 
     # Setup embedding model and LLM
@@ -249,9 +240,7 @@ def main():
     Settings.embed_model = embed_model
 
     # Initialize Document AI parser
-    GCS_OUTPUT_PATH = (
-        f"gs://{DOCSTORE_BUCKET_NAME}/{VECTOR_DATA_PREFIX}/docai_output/"
-    )
+    GCS_OUTPUT_PATH = f"gs://{DOCSTORE_BUCKET_NAME}/{VECTOR_DATA_PREFIX}/docai_output/"
 
     parser = DocAIParser(
         project_id=PROJECT_ID,
@@ -266,9 +255,7 @@ def main():
     blobs = create_pdf_blob_list(INPUT_BUCKET_NAME, BUCKET_PREFIX)
     logger.info("downloading data")
     download_bucket_with_transfer_manager(
-        INPUT_BUCKET_NAME, 
-        prefix=BUCKET_PREFIX, 
-        destination_directory=local_data_path
+        INPUT_BUCKET_NAME, prefix=BUCKET_PREFIX, destination_directory=local_data_path
     )
 
     # Parse documents using DocAI
@@ -301,9 +288,7 @@ def main():
         create_qa_index(li_docs, docstore, embed_model, llm)
 
     if INDEXING_METHOD == "hierarchical":
-        create_hierarchical_index(
-            li_docs, docstore, vector_store, embed_model, llm
-        )
+        create_hierarchical_index(li_docs, docstore, vector_store, embed_model, llm)
 
     elif INDEXING_METHOD == "flat":
         create_flat_index(li_docs, docstore, vector_store, embed_model, llm)

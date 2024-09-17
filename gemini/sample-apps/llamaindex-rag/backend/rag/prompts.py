@@ -177,6 +177,7 @@ EVAL_PROMPT_WCONTEXT_USER = (
 @dataclass
 class Prompts:
     """Prompt management class"""
+
     qa_prompt_tmpl: str = field(default=QA_PROMPT_TMPL)
     refine_prompt_tmpl: str = field(default=REFINE_PROMPT_TMPL)
     hyde_prompt_tmpl: str = field(default=HYDE_PROMPT_TMPL)

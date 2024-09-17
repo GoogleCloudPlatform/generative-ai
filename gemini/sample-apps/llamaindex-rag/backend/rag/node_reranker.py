@@ -13,9 +13,7 @@ from llama_index.core.indices.utils import (
 from llama_index.core.llms.llm import LLM
 from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.prompts import BasePromptTemplate
-from llama_index.core.prompts.default_prompts import (
-    DEFAULT_CHOICE_SELECT_PROMPT
-)
+from llama_index.core.prompts.default_prompts import DEFAULT_CHOICE_SELECT_PROMPT
 from llama_index.core.prompts.mixin import PromptDictType
 from llama_index.core.schema import NodeWithScore, TextNode
 from llama_index.core.service_context import ServiceContext
@@ -91,9 +89,7 @@ class GoogleReRankerSecretSauce(BaseNodePostprocessor):
                     "content": node_wscore.node.text,
                 }
             )
-        response_json = call_reranker(query_bundle.query_str, 
-                                      records, 
-                                      google_token)
+        response_json = call_reranker(query_bundle.query_str, records, google_token)
 
         records = response_json["records"]
         new_nodes_wscores = []
@@ -102,9 +98,7 @@ class GoogleReRankerSecretSauce(BaseNodePostprocessor):
             node_wscore = NodeWithScore(node=node, score=r["score"])
             new_nodes_wscores.append(node_wscore)
 
-        return sorted(new_nodes_wscores, 
-                      key=lambda x: x.score or 0.0, 
-                      reverse=True)
+        return sorted(new_nodes_wscores, key=lambda x: x.score or 0.0, reverse=True)
 
 
 class CustomLLMRerank(BaseNodePostprocessor):
