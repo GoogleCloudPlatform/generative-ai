@@ -175,6 +175,7 @@ ROOTSPAN
 RRF
 RTN
 RYDE
+Reranking
 Resona
 Rizzoli
 Robeco
@@ -190,6 +191,7 @@ SUBLANG
 SWP
 SYMED
 SYSROOT
+Sagar
 Sahel
 Schwimmer
 Selam
@@ -251,7 +253,11 @@ Zscaler
 Zuercher
 aadd
 aaxis
+acall
+achat
+acomplete
 aexecute
+aextract
 afrom
 agentic
 ainit
@@ -260,7 +266,10 @@ airlume
 alloydb
 antiword
 apikey
+apredict
+aquery
 arXiv
+aretrieve
 argmax
 arun
 astype
@@ -282,6 +291,7 @@ carbonara
 caxis
 cfbundle
 chatbots
+claude
 clickable
 cmap
 codebase
@@ -318,6 +328,7 @@ drinkware
 dropdown
 dropna
 dsl
+dtypes
 dwmapi
 ecommerce
 elous
@@ -384,6 +395,7 @@ iban
 icudtl
 idk
 idks
+idxs
 iloc
 imdb
 imshow
@@ -398,11 +410,13 @@ jegadesh
 jetbrains
 jupyter
 kaggle
+kenleejr
 keras
 keychain
 kfp
 kickstart
 kotlin
+kpi
 lakecolor
 landcolor
 langchain
@@ -504,11 +518,13 @@ rarians
 ratelimit
 redef
 repreve
+reranker
 ribeye
 ringspun
 rpet
 rrf
 rsp
+saaagesh
 scann
 scattergl
 seaborn
@@ -559,6 +575,7 @@ vectordb
 vertexai
 vesselin
 vtotal
+wcontext
 wcslen
 websites
 welcom
@@ -568,6 +585,8 @@ winres
 wishlist
 workarounds
 wparam
+wscore
+wscores
 wstring
 xaxis
 xcassets
