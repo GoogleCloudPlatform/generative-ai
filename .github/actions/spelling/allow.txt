@@ -144,6 +144,7 @@ Kohli
 Kraizt
 Kubeflow
 Kudrow
+LangGraph
 LCEL
 LLMs
 LOOKBACK
@@ -202,6 +203,7 @@ Oort
 PDFs
 PEFT
 PLOTLYENV
+PYINK
 Parmar
 Persero
 Phaidon
@@ -270,6 +272,7 @@ Testables
 Tetsuo
 Tianli
 Topolino
+Traceloop
 Trapp
 Tribbiani
 Tricyle
@@ -360,6 +363,7 @@ cfbundle
 chatbots
 chromadb
 claude
+cicd
 clickable
 cmap
 codebase
@@ -367,6 +371,7 @@ codebases
 codefile
 codelab
 codelabs
+codespell
 colab
 coldline
 coloraxis
@@ -473,6 +478,7 @@ gsutil
 gtk
 guanciale
 gunicorn
+hadolint
 hashtag
 hashtags
 hdlr
@@ -671,11 +677,13 @@ sxs
 tabular
 tagline
 tencel
+terraform
 termcolor
 terraform
 textno
 tfhub
 tfidf
+tfvars
 tgz
 thelook
 tiktoken
@@ -683,7 +691,9 @@ timechart
 titlebar
 tobytes
 toself
+toset
 tqdm
+traceloop
 tritan
 tsv
 ubuntu
@@ -698,6 +708,7 @@ usernames
 uvb
 uvicorn
 vapo
+uvicorn
 vectordb
 vertexai
 vesselin

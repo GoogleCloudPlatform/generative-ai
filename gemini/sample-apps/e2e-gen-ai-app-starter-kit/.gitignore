@@ -142,12 +142,9 @@ dmypy.json
 .idea
 
 # User-specific files
-language/examples/prompt-design/train.csv
-README-TOC*.md
-gemini/sample-apps/e2e-gen-ai-app-starter-kit/deployment/terraform/terraform.tfstate*
-
 .terraform*
 .Terraform*
+
 
 tmp*
 
@@ -187,3 +184,11 @@ testem.log
 .DS_Store
 Thumbs.db
 *.vscode*
+
+.persist_vector_store
+tests/load_test/.results/*.html
+tests/load_test/.results/*.csv
+locust_env
+my_env.tfvars
+.streamlit_chats
+.saved_chats
