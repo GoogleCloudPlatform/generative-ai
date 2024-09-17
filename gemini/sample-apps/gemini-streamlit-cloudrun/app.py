@@ -25,9 +25,7 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 @st.cache_resource
 def load_models() -> Tuple[GenerativeModel, GenerativeModel]:
     """Load Gemini 1.5 Flash and Pro models."""
-    return GenerativeModel("gemini-1.5-flash-001"), GenerativeModel(
-        "gemini-1.5-pro-001"
-    )
+    return GenerativeModel("gemini-1.5-flash"), GenerativeModel("gemini-1.5-pro")
 
 
 def get_gemini_response(

@@ -1,3 +1,4 @@
+# pylint: skip-file
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +33,8 @@ s.replace(
 # ----------------------------------------------------------------------------
 
 s.shell.run(["nox", "-s", "format"], hide_output=False)
+
+s.shell.run(["nox", "-s", "format_notebooks"], hide_output=False)
 
 # Sort Spelling Allowlist
 spelling_allow_file = ".github/actions/spelling/allow.txt"

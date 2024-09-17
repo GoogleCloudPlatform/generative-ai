@@ -1,4 +1,5 @@
 AFX
+AIP
 ANZ
 APIENTRY
 APSTUDIO
@@ -35,6 +36,8 @@ Colm
 Cowabunga
 Crossbody
 D'orsay
+DLC
+DLCs
 DWMWA
 Dataform
 DeepEval
@@ -67,6 +70,7 @@ Frodo
 Fujita
 GError
 GFile
+GKE
 GObject
 GWLP
 Gameplay
@@ -112,6 +116,7 @@ Keanu
 Ketamine
 Khanh
 Knopf
+Kubeflow
 Kudrow
 LCEL
 LLMs
@@ -133,6 +138,7 @@ Mamah
 Mandiri
 Masaru
 Memegen
+Meteo
 Mewgler
 Mitani
 Mosher
@@ -146,6 +152,7 @@ NOMINMAX
 NOZORDER
 NVIDIA
 Niitsuma
+Nintendo
 Noogler
 OOTB
 Oberst
@@ -197,6 +204,7 @@ Storrer
 Strappy
 Surampudi
 TARG
+TGI
 TOKENLIST
 TPU
 TPUs
@@ -252,7 +260,9 @@ alloydb
 antiword
 apikey
 arXiv
+arun
 astype
+autogen
 automl
 autoptr
 autosxs
@@ -287,6 +297,7 @@ constexpr
 corpuses
 csa
 cupertino
+dask
 dataframe
 datname
 dbadmin
@@ -303,11 +314,13 @@ dpi
 draig
 drinkware
 dropna
+dsl
 dwmapi
 ecommerce
 elous
 embs
 emojis
+ename
 epoc
 etf
 eur
@@ -384,6 +397,7 @@ jupyter
 kaggle
 keras
 keychain
+kfp
 kickstart
 kotlin
 lakecolor
@@ -412,7 +426,9 @@ memes
 metadatas
 mgrs
 miranda
+morty
 mpn
+mrr
 nbconvert
 nbfmt
 nbformat
@@ -426,6 +442,7 @@ nmade
 nmilitary
 notetaker
 nrows
+oai
 objc
 ollama
 onesie
@@ -465,6 +482,7 @@ protobuf
 pstotext
 pubspec
 pvc
+pyautogen
 pybind
 pydantic
 pymupdf
@@ -512,8 +530,10 @@ stuffie
 subviews
 subword
 supima
+sxs
 tagline
 tencel
+termcolor
 tfhub
 tfidf
 tgz
@@ -540,6 +560,7 @@ wcslen
 websites
 welcom
 wiffle
+windspeed
 winres
 wishlist
 workarounds
