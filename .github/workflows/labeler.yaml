@@ -3,7 +3,7 @@ on:
   # Do not use pull_request_target with actions/cache or actions/checkout.
   pull_request_target:
 
-permissions: { }
+permissions: {}
 
 jobs:
   labeler:
@@ -11,4 +11,4 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@v5
+      - uses: actions/labeler@v5
