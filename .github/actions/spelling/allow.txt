@@ -226,6 +226,7 @@ Unimicron
 Upserting
 Urs
 Uszkoreit
+VAPO
 VFT
 VMs
 VOS
@@ -259,6 +260,7 @@ airlume
 alloydb
 antiword
 apikey
+argmax
 arXiv
 arun
 astype
@@ -313,6 +315,7 @@ docai
 dpi
 draig
 drinkware
+dropdown
 dropna
 dsl
 dwmapi
