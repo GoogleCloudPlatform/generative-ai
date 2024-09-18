@@ -271,6 +271,7 @@ arXiv
 aretrieve
 arun
 astype
+autoflake
 autogen
 automl
 autoptr
@@ -343,6 +344,7 @@ ffi
 figsize
 fillmode
 flac
+fontdict
 forno
 freedraw
 freopen
@@ -441,6 +443,7 @@ metadatas
 mgrs
 miranda
 morty
+moviepy
 mpn
 mrr
 nbconvert
@@ -495,6 +498,7 @@ projectid
 protobuf
 pstotext
 pubspec
+putdata
 pvc
 pyautogen
 pybind
@@ -598,5 +602,3 @@ ylabel
 ytd
 yticks
 zaxis
-autoflake
-putdata
