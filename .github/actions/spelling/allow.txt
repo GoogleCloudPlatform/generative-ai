@@ -107,6 +107,7 @@ Jang
 Jedi
 Joji
 KNN
+KPIs
 Kaelen
 Kaggle
 Kamradt
@@ -248,6 +249,7 @@ Womens
 XXE
 Yuzuru
 Zijin
+Zom
 Zscaler
 Zuercher
 aadd
@@ -261,6 +263,7 @@ afrom
 agentic
 ainit
 ainvoke
+aip
 airlume
 alloydb
 antiword
@@ -307,6 +310,7 @@ colwidth
 constexpr
 corpuses
 csa
+cse
 cupertino
 dask
 dataframe
@@ -321,6 +325,7 @@ deskmates
 dino
 diy
 docai
+docstore
 dpi
 draig
 drinkware
@@ -329,7 +334,9 @@ dsl
 dtypes
 dwmapi
 ecommerce
+ekg
 elous
+emb
 embs
 emojis
 ename
@@ -338,17 +345,20 @@ etf
 eur
 evals
 faiss
+fastapi
 fect
 fewshot
 ffi
 figsize
 fillmode
+firestore
 flac
 fontdict
 forno
 freedraw
 freopen
 fromarray
+fromiter
 fts
 fulltext
 funtion
@@ -396,6 +406,7 @@ idk
 idks
 idxs
 iloc
+imageno
 imdb
 imshow
 iostream
@@ -407,6 +418,7 @@ itables
 iterrows
 jegadesh
 jetbrains
+jsonify
 jupyter
 kaggle
 kenleejr
@@ -467,6 +479,7 @@ onesies
 osx
 owlbot
 oxml
+pagemap
 paleo
 pancetta
 pantarba
@@ -554,6 +567,7 @@ sxs
 tagline
 tencel
 termcolor
+textno
 tfhub
 tfidf
 tgz
@@ -561,14 +575,17 @@ thelook
 tiktoken
 timechart
 titlebar
+tobytes
 toself
 tqdm
 tritan
 ubuntu
+undst
 unigram
 unrtf
 upsell
 urandom
+usecases
 username
 usernames
 uvb
