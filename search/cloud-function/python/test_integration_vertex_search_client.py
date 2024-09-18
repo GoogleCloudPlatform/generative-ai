@@ -19,8 +19,8 @@ Vertex AI Search API. These tests require proper configuration of
 environment variables and access to the Vertex AI Search service.
 """
 
+from collections.abc import Generator
 import os
-from typing import Generator
 
 import pytest
 from vertex_ai_search_client import VertexAISearchClient, VertexAISearchConfig

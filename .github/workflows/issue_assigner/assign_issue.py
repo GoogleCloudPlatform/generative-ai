@@ -12,7 +12,7 @@ from github import Github
 def get_issue_number(event_path: str) -> int:
     """Retrieves the issue number from GitHub event data."""
     # Load event data
-    with open(event_path, "r", encoding="utf-8") as f:
+    with open(event_path, encoding="utf-8") as f:
         event_data = json.load(f)
 
     # Determine the issue number based on the event
