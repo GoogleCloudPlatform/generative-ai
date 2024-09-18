@@ -3,7 +3,7 @@ Cloud function to make calls to Imagen API.
 """
 
 import os
-from typing import Any, Dict
+from typing import Any
 
 from dotenv import load_dotenv
 import functions_framework
@@ -46,5 +46,5 @@ def get_images(request: Any) -> bytes:
     Returns:
         Response: A Flask Response object containing the generated image.
     """
-    request_json: Dict = request.get_json(silent=True)
+    request_json: dict = request.get_json(silent=True)
     return image_generation(request_json["img_prompt"])
