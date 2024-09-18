@@ -123,7 +123,7 @@ def format(session):
     session.run(
         "ruff",
         "check",
-        "--fix",
+        "--fix-only",
         *LINT_PATHS,
     )
     session.run(
