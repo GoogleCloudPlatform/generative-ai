@@ -23,7 +23,7 @@ please refer to the README.md file.
 """
 
 import os
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from flask import Flask, Request, jsonify, request
 import functions_framework
@@ -53,7 +53,7 @@ vertex_ai_search_client = VertexAISearchClient(config)
 
 
 @functions_framework.http
-def vertex_ai_search(http_request: Request) -> Tuple[Any, int, Dict[str, str]]:
+def vertex_ai_search(http_request: Request) -> tuple[Any, int, dict[str, str]]:
     """
     Handle HTTP requests for Vertex AI Search.
 
@@ -88,7 +88,7 @@ def vertex_ai_search(http_request: Request) -> Tuple[Any, int, Dict[str, str]]:
 
     def create_error_response(
         message: str, status_code: int
-    ) -> Tuple[Any, int, Dict[str, str]]:
+    ) -> tuple[Any, int, dict[str, str]]:
         """Standardize the error responses with common headers."""
         return (jsonify({"error": message}), status_code, headers)
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     app = Flask(__name__)
 
     @app.route("/", methods=["POST"])
-    def index() -> Tuple[Any, int, Dict[str, str]]:
+    def index() -> tuple[Any, int, dict[str, str]]:
         """
         Flask route for handling POST requests when running locally.
 

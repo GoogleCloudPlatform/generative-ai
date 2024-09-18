@@ -115,7 +115,7 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"].replace("$", "\$"))  # noqa: W605
+        st.markdown(message["content"].replace("$", r"\$"))  # noqa: W605
         try:
             with st.expander("Function calls, parameters, and responses"):
                 st.markdown(message["backend_details"])
@@ -257,7 +257,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
         full_response = response.text
         with message_placeholder.container():
-            st.markdown(full_response.replace("$", "\$"))  # noqa: W605
+            st.markdown(full_response.replace("$", r"\$"))  # noqa: W605
             with st.expander("Function calls, parameters, and responses:"):
                 st.markdown(backend_details)
 
