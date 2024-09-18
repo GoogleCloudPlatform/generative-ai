@@ -49,7 +49,6 @@ search_client = discoveryengine.SearchServiceClient(
 search_serving_config = f"projects/{PROJECT_ID}/locations/us/collections/default_collection/dataStores/{SEARCH_ENGINE_ID}/servingConfigs/default_search:search"
 
 
-
 def search_gms(search_query, rows):
     # build a search request
     request = discoveryengine.SearchRequest(

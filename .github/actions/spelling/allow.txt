@@ -271,6 +271,7 @@ arXiv
 aretrieve
 arun
 astype
+autoflake
 autogen
 automl
 autoptr
@@ -497,6 +498,7 @@ projectid
 protobuf
 pstotext
 pubspec
+putdata
 pvc
 pyautogen
 pybind
@@ -600,5 +602,3 @@ ylabel
 ytd
 yticks
 zaxis
-autoflake
-putdata
