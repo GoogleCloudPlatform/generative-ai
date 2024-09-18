@@ -344,6 +344,7 @@ figsize
 fillmode
 flac
 forno
+fontdict
 freedraw
 freopen
 fromarray
@@ -441,6 +442,7 @@ metadatas
 mgrs
 miranda
 morty
+moviepy
 mpn
 mrr
 nbconvert
