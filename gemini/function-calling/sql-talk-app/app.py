@@ -1,6 +1,7 @@
 import time
-import streamlit as st
+
 from google.cloud import bigquery
+import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
@@ -184,7 +185,9 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                                     str(
                                         [
                                             column["name"]
-                                            for column in api_response["schema"]["fields"]
+                                            for column in api_response["schema"][
+                                                "fields"
+                                            ]
                                         ]
                                     ),
                                 ],
@@ -203,10 +206,14 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                                 .replace("\n", "")
                                 .replace("\\", "")
                             )
-                            query_job = client.query(cleaned_query, job_config=job_config)
+                            query_job = client.query(
+                                cleaned_query, job_config=job_config
+                            )
                             api_response = query_job.result()
                             api_response = str([dict(row) for row in api_response])
-                            api_response = api_response.replace("\\", "").replace("\n", "")
+                            api_response = api_response.replace("\\", "").replace(
+                                "\n", ""
+                            )
                             api_requests_and_responses.append(
                                 [response.function_call.name, params, api_response]
                             )
