@@ -229,6 +229,7 @@ Unimicron
 Upserting
 Urs
 Uszkoreit
+VAPO
 VFT
 VMs
 VOS
@@ -272,6 +273,7 @@ apredict
 aquery
 arXiv
 aretrieve
+argmax
 arun
 astype
 autoflake
@@ -329,6 +331,7 @@ docstore
 dpi
 draig
 drinkware
+dropdown
 dropna
 dsl
 dtypes
