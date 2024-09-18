@@ -1,6 +1,7 @@
 import time
-import streamlit as st
+
 from google.cloud import bigquery
+import streamlit as st
 from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
