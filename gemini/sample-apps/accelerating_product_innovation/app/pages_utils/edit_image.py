@@ -121,7 +121,7 @@ def handle_image_upload() -> None:
             filename = "uploaded_image0.png"
             image.save(filename)
             st.session_state.start_editing = True
-        except (IOError, PIL.UnidentifiedImageError) as e:
+        except (OSError, PIL.UnidentifiedImageError) as e:
             st.error(f"Error opening image: {e}")
 
 
