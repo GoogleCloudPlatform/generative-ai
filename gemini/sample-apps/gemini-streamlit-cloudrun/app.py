@@ -4,7 +4,6 @@ This module demonstrates the usage of the Vertex AI Gemini 1.5 API within a Stre
 """
 
 import os
-from typing import List, Tuple, Union
 
 import streamlit as st
 import vertexai
@@ -23,16 +22,14 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 
 @st.cache_resource
-def load_models() -> Tuple[GenerativeModel, GenerativeModel]:
+def load_models() -> tuple[GenerativeModel, GenerativeModel]:
     """Load Gemini 1.5 Flash and Pro models."""
-    return GenerativeModel("gemini-1.5-flash-001"), GenerativeModel(
-        "gemini-1.5-pro-001"
-    )
+    return GenerativeModel("gemini-1.5-flash"), GenerativeModel("gemini-1.5-pro")
 
 
 def get_gemini_response(
     model: GenerativeModel,
-    contents: Union[str, List],
+    contents: str | list,
     generation_config: GenerationConfig = GenerationConfig(
         temperature=0.1, max_output_tokens=2048
     ),

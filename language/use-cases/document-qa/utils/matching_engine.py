@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 import json
 import logging
-from typing import Any, Iterable, List, Optional, Type
+from typing import Any
 import uuid
 
 import google.auth
@@ -47,7 +48,7 @@ class MatchingEngine(VectorStore):
         index_client: aiplatform_v1.IndexServiceClient,
         index_endpoint_client: aiplatform_v1.IndexEndpointServiceClient,
         gcs_bucket_name: str,
-        credentials: Credentials = None,
+        credentials: Credentials | None = None,
     ):
         """Vertex AI Matching Engine implementation of the vector store.
 
@@ -106,9 +107,9 @@ class MatchingEngine(VectorStore):
     def add_texts(
         self,
         texts: Iterable[str],
-        metadatas: Optional[Iterable[dict]],
+        metadatas: Iterable[dict] | None,
         **kwargs: Any,
-    ) -> List[str]:
+    ) -> list[str]:
         """Run more texts through the embeddings and add to the vectorstore.
 
         Args:
@@ -169,7 +170,7 @@ class MatchingEngine(VectorStore):
 
     def get_matches(
         self,
-        embeddings: List[str],
+        embeddings: list[str],
         n_matches: int,
         index_endpoint: MatchingEngineIndexEndpoint,
         filters: dict,
@@ -214,7 +215,7 @@ class MatchingEngine(VectorStore):
         search_distance: float = 0.65,
         filters={},
         **kwargs: Any,
-    ) -> List[Document]:
+    ) -> list[Document]:
         """Return docs most similar to query.
 
         Args:
@@ -314,12 +315,12 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def from_texts(
-        cls: Type["MatchingEngine"],
-        texts: List[str],
+        cls: type[MatchingEngine],
+        texts: list[str],
         embedding: Embeddings,
-        metadatas: Optional[List[dict]] = None,
+        metadatas: list[dict] | None = None,
         **kwargs: Any,
-    ) -> "MatchingEngine":
+    ) -> MatchingEngine:
         """Use from components instead."""
         raise NotImplementedError(
             "This method is not implemented. Instead, you should initialize the class"
@@ -329,12 +330,12 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def from_documents(
-        cls: Type["MatchingEngine"],
-        documents: List[str],
+        cls: type[MatchingEngine],
+        documents: list[str],
         embedding: Embeddings,
-        metadatas: Optional[List[dict]] = None,
+        metadatas: list[dict] | None = None,
         **kwargs: Any,
-    ) -> "MatchingEngine":
+    ) -> MatchingEngine:
         """Use from components instead."""
         raise NotImplementedError(
             "This method is not implemented. Instead, you should initialize the class"
@@ -344,15 +345,15 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def from_components(
-        cls: Type["MatchingEngine"],
+        cls: type[MatchingEngine],
         project_id: str,
         region: str,
         gcs_bucket_name: str,
         index_id: str,
         endpoint_id: str,
-        credentials_path: Optional[str] = None,
-        embedding: Optional[Embeddings] = None,
-    ) -> "MatchingEngine":
+        credentials_path: str | None = None,
+        embedding: Embeddings | None = None,
+    ) -> MatchingEngine:
         """Takes the object creation out of the constructor.
 
         Args:
@@ -427,8 +428,8 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def _create_credentials_from_file(
-        cls, json_credentials_path: Optional[str]
-    ) -> Optional[Credentials]:
+        cls, json_credentials_path: str | None
+    ) -> Credentials | None:
         """Creates credentials for Google Cloud.
 
         Args:
@@ -452,7 +453,7 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def _create_index_by_id(
-        cls, index_id: str, project_id: str, region: str, credentials: "Credentials"
+        cls, index_id: str, project_id: str, region: str, credentials: Credentials
     ) -> MatchingEngineIndex:
         """Creates a MatchingEngineIndex object by id.
 
@@ -472,7 +473,7 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def _create_endpoint_by_id(
-        cls, endpoint_id: str, project_id: str, region: str, credentials: "Credentials"
+        cls, endpoint_id: str, project_id: str, region: str, credentials: Credentials
     ) -> MatchingEngineIndexEndpoint:
         """Creates a MatchingEngineIndexEndpoint object by id.
 
@@ -498,8 +499,8 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def _get_gcs_client(
-        cls, credentials: "Credentials", project_id: str
-    ) -> "storage.Client":
+        cls, credentials: Credentials, project_id: str
+    ) -> storage.Client:
         """Lazily creates a GCS client.
 
         Returns:
@@ -512,8 +513,8 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def _get_index_client(
-        cls, project_id: str, region: str, credentials: "Credentials"
-    ) -> "storage.Client":
+        cls, project_id: str, region: str, credentials: Credentials
+    ) -> storage.Client:
         """Lazily creates a Matching Engine Index client.
 
         Returns:
@@ -530,8 +531,8 @@ class MatchingEngine(VectorStore):
 
     @classmethod
     def _get_index_endpoint_client(
-        cls, project_id: str, region: str, credentials: "Credentials"
-    ) -> "storage.Client":
+        cls, project_id: str, region: str, credentials: Credentials
+    ) -> storage.Client:
         """Lazily creates a Matching Engine Index Endpoint client.
 
         Returns:
@@ -552,7 +553,7 @@ class MatchingEngine(VectorStore):
         project_id: str,
         region: str,
         gcs_bucket_name: str,
-        credentials: "Credentials",
+        credentials: Credentials,
     ) -> None:
         """Configures the aiplatform library.
 
