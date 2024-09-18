@@ -28,6 +28,7 @@
 /generative-ai/language/grounding                           @koverholt @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/orchestration/langchain             @kweinmeister @RajeshThallam @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/prompts                             @polong-lin @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/prompts/prompt_optimizer            @nhootan @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/sample-apps                         @rominirani @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/translation                         @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/tuning                              @erwinh85 @GoogleCloudPlatform/generative-ai-devrel
