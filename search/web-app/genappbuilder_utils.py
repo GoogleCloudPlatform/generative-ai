@@ -14,7 +14,6 @@
 
 """Vertex AI Search Utilities"""
 from os.path import basename
-from typing import Dict, List, Optional, Tuple
 
 from google.cloud import discoveryengine_v1alpha as discoveryengine
 
@@ -25,7 +24,7 @@ def list_documents(
     project_id: str,
     location: str,
     datastore_id: str,
-) -> List[Dict[str, str]]:
+) -> list[dict[str, str]]:
     client = discoveryengine.DocumentServiceClient()
 
     parent = client.branch_path(
@@ -48,15 +47,15 @@ def list_documents(
 def search_enterprise_search(
     project_id: str,
     location: str,
-    data_store_id: Optional[str] = None,
-    engine_id: Optional[str] = None,
+    data_store_id: str | None = None,
+    engine_id: str | None = None,
     page_size: int = 50,
-    search_query: Optional[str] = None,
-    image_bytes: Optional[bytes] = None,
-    params: Optional[Dict] = None,
-    summary_model: Optional[str] = None,
-    summary_preamble: Optional[str] = None,
-) -> Tuple[List[Dict[str, str | List]], str, str, str, str]:
+    search_query: str | None = None,
+    image_bytes: bytes | None = None,
+    params: dict | None = None,
+    summary_model: str | None = None,
+    summary_preamble: str | None = None,
+) -> tuple[list[dict[str, str | list]], str, str, str, str]:
     if bool(search_query) == bool(image_bytes):
         raise ValueError("Cannot provide both search_query and image_bytes")
 
@@ -157,14 +156,14 @@ def search_enterprise_search(
 
 def get_enterprise_search_results(
     response: discoveryengine.SearchResponse,
-) -> List[Dict[str, str | List]]:
+) -> list[dict[str, str | list]]:
     """
     Extract Results from Enterprise Search Response
     """
 
     ROBOT = "https://www.google.com/images/errors/robot.png"
 
-    def get_thumbnail_image(data: Dict) -> str:
+    def get_thumbnail_image(data: dict) -> str:
         cse_thumbnail = data.get("pagemap", {}).get("cse_thumbnail")
         image_link = data.get("image", {}).get("thumbnailLink")
 
@@ -174,7 +173,7 @@ def get_enterprise_search_results(
             return image_link
         return ROBOT
 
-    def get_formatted_link(data: Dict) -> str:
+    def get_formatted_link(data: dict) -> str:
         html_formatted_url = data.get("htmlFormattedUrl")
         image_context_link = data.get("image", {}).get("contextLink")
         link = data.get("link")
@@ -220,9 +219,9 @@ def recommend_personalize(
     datastore_id: str,
     serving_config_id: str,
     document_id: str,
-    user_pseudo_id: Optional[str] = "xxxxxxxxxxx",
-    attribution_token: Optional[str] = None,
-) -> Tuple:
+    user_pseudo_id: str | None = "xxxxxxxxxxx",
+    attribution_token: str | None = None,
+) -> tuple:
     # Create a client
     client = discoveryengine.RecommendationServiceClient()
 
@@ -271,7 +270,7 @@ def get_storage_link(uri: str) -> str:
 
 def get_personalize_results(
     response: discoveryengine.RecommendResponse,
-) -> List[Dict]:
+) -> list[dict]:
     """
     Extract Results from Personalize Response
     """

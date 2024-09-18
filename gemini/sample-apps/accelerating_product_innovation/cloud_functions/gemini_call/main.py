@@ -3,7 +3,7 @@ Cloud Function for getting text response from Gemini API.
 """
 
 import os
-from typing import Any, Dict, Tuple, Union
+from typing import Any
 
 from dotenv import load_dotenv
 import functions_framework
@@ -41,7 +41,7 @@ def generate_text(prompt: str) -> str:
 
 
 @functions_framework.http
-def get_llm_response(request: Any) -> Union[Dict, Tuple]:
+def get_llm_response(request: Any) -> dict | tuple:
     """HTTP Cloud Function that generates text using the Gemini-Pro model.
 
     Args:
@@ -53,7 +53,7 @@ def get_llm_response(request: Any) -> Union[Dict, Tuple]:
         Response object using `make_response`
         <http://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
-    request_json: Dict = request.get_json(silent=True)
+    request_json: dict = request.get_json(silent=True)
     if not request_json or "text_prompt" not in request_json:
         return {"error": "Request body must contain 'text_prompt' field."}, 400
 
