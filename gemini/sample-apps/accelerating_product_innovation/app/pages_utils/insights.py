@@ -11,7 +11,6 @@ relevant information from uploaded data.
 import json
 import os
 import re
-from typing import Optional
 
 from app.pages_utils.embedding_model import embedding_model_with_backoff
 from app.pages_utils.get_llm_response import generate_gemini
@@ -77,7 +76,7 @@ def get_suggestions(state_key: str) -> None:
     st.session_state[state_key] = extract_bullet_points(gen_suggestions)
 
 
-def get_stored_embeddings_as_df() -> Optional[pd.DataFrame]:
+def get_stored_embeddings_as_df() -> pd.DataFrame | None:
     """Retrieves and processes stored embeddings from cloud storage.
 
     Returns:

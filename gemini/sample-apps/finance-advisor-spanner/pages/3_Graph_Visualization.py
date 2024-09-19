@@ -13,7 +13,7 @@ st.logo(
 )
 graph_viz.generate_graph()
 
-with open("graph_viz.html", "r", encoding="utf-8") as html_file:
+with open("graph_viz.html", encoding="utf-8") as html_file:
     source_code = html_file.read()
 components.html(source_code, height=950, width=900)
 

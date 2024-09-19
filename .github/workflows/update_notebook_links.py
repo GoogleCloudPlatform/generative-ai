@@ -2,7 +2,6 @@
 
 import os
 import sys
-from typing import Tuple
 import urllib.parse
 
 import nbformat
@@ -21,7 +20,7 @@ RAW_URL_PREFIX = (
 
 def fix_markdown_links(
     cell_source: str, relative_notebook_path: str
-) -> Tuple[str, bool]:
+) -> tuple[str, bool]:
     """Fixes links in a markdown cell and returns the updated source."""
     new_lines = []
     changes_made = False
@@ -58,7 +57,7 @@ def fix_markdown_links(
 
 def fix_links_in_notebook(notebook_path: str) -> int:
     """Fixes specific types of links in a Jupyter notebook."""
-    with open(notebook_path, "r", encoding="utf-8") as f:
+    with open(notebook_path, encoding="utf-8") as f:
         notebook = nbformat.read(f, as_version=4)
 
     relative_notebook_path = os.path.relpath(notebook_path, start=os.getcwd()).lower()
