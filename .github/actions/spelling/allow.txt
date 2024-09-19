@@ -27,6 +27,7 @@ CHECKOV
 COCOAPODS
 COINIT
 CONOUT
+CVD
 CZE
 Caprese
 Codelab
@@ -38,6 +39,7 @@ Crossbody
 D'orsay
 DLC
 DLCs
+DRV
 DWMWA
 Dataform
 DeepEval
@@ -534,6 +536,7 @@ rapideval
 rarians
 ratelimit
 redef
+rembg
 repreve
 reranker
 ribeye
@@ -622,6 +625,3 @@ ylabel
 ytd
 yticks
 zaxis
-CVD
-DRV
-rembg
