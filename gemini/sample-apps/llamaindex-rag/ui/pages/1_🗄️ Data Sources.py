@@ -77,7 +77,7 @@ def update_index(
         },
     )
     if response.status_code == 200:
-        st.success(f"Updated data source(s) successfully!")
+        st.success("Updated data source(s) successfully!")
     else:
         st.error("Error updating index.")
 
