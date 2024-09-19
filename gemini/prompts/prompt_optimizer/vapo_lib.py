@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility functions and classes for the VAPO colab."""
+"""Utility functions and classes for the VAPO notebook."""
 import io
 import json
 import re
@@ -102,7 +102,7 @@ def validate_prompt_and_data(
             f" var: {_TARGET_KEY}"
         )
       if not ex[_TARGET_KEY]:
-        raise ValueError(f"The followig example has an empty target: {ex}")
+        raise ValueError(f"The following example has an empty target: {ex}")
     if missing_keys:
       raise ValueError(
           f"The example {ex} doesn't have a key corresponding to following"
@@ -110,7 +110,7 @@ def validate_prompt_and_data(
       )
   if extra_keys:
     raise Warning(
-        "Warning: exrta keys in the examples not used in the context/task"
+        "Warning: extra keys in the examples not used in the context/task"
         f" template {extra_keys}"
     )
 
@@ -356,7 +356,7 @@ class ProgressForm:
         HTML(f"<span>Job State: {job.state.name}</span>")
     )
 
-    # Initial display of the dataframe
+    # Initial display of the templates.
     instruction_templates_file = (
         f"{self.output_path}/instruction/templates.json"
     )
@@ -403,7 +403,7 @@ class ProgressForm:
           f" {self.output_path}"
       )
       errors.append(
-          "Please consider reruning to make sure the failure is intransient."
+          "Please consider rerunning to make sure the failure is intransient."
       )
       err = "\n".join(errors)
       self.status_display.update(
@@ -521,10 +521,10 @@ class ResultsUI:
     runs = find_directories_with_files(path, required_files)
 
     self.run_label = widgets.Label("Select Run:")
-    self.run_dropdrown = widgets.Dropdown(
+    self.run_dropdown = widgets.Dropdown(
         options=runs, value=runs[0], layout=widgets.Layout(width="200px")
     )
-    self.run_dropdrown.observe(self.display_run_handler, names="value")
+    self.run_dropdown.observe(self.display_run_handler, names="value")
 
     # Create a label widget for the description
     self.dropdown_description = widgets.Label("Select Template:")
@@ -558,7 +558,7 @@ class ResultsUI:
 
   def display_run(self, path: str) -> None:
     """Display the results of a VAPO run."""
-    self.run_dropdrown.disabled = True
+    self.run_dropdown.disabled = True
     filename = f"{path}/eval_results.json"
     eval_results = json.loads(read_file_from_gcs(filename))
 
@@ -598,7 +598,7 @@ class ResultsUI:
 
     self.template_dropdown.disabled = False
     self.template_dropdown.options = options
-    self.run_dropdrown.disabled = False
+    self.run_dropdown.disabled = False
 
   def display_eval_results(self, index: int) -> None:
     """Display the evaluation results for a specific template."""
@@ -612,7 +612,7 @@ class ResultsUI:
     """Get the container widget for the results UI."""
     return widgets.VBox([
         self.run_label,
-        self.run_dropdrown,
+        self.run_dropdown,
         self.dropdown_description,
         self.template_dropdown,
         self.results_output,
