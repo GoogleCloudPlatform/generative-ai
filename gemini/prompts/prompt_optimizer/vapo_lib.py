@@ -35,13 +35,8 @@ from tensorflow.io import gfile
 output.enable_custom_widget_manager()
 
 
-def authenticate():
-  auth.authenticate_user()
-  creds, _ = google_auth.default()
-  return gspread.authorize(creds)
-
-
 def is_target_required_metric(eval_metric: str) -> bool:
+  """Check if the metric requires the target label."""
   return eval_metric in [
       "bleu",
       "exact_match",
@@ -60,6 +55,7 @@ def is_target_required_metric(eval_metric: str) -> bool:
 def is_run_target_required(
     eval_metric_types: list[str], source_model: str
 ) -> bool:
+  """Check if the run requires the target label."""
   if source_model:
     return False
 
@@ -201,11 +197,9 @@ def generate_dataframe(filename: str) -> pd.DataFrame:
     return pd.DataFrame()
 
   with gfile.GFile(filename, "r") as f:
-    try:
-      data = json.load(f)
-    except:
-      return pd.DataFrame()
-    return pd.json_normalize(data)
+    data = json.load(f)
+
+  return pd.json_normalize(data)
 
 
 def left_aligned_df_html(df: pd.DataFrame) -> HTML:
@@ -227,6 +221,7 @@ def left_aligned_df_html(df: pd.DataFrame) -> HTML:
 
 
 def extract_top_level_function_name(source_code: str) -> str | None:
+  """Extract the top level function name from the source code."""
   match = re.search(r"^def\s+([a-zA-Z_]\w*)\s*\(", source_code, re.MULTILINE)
   if match:
     return match.group(1)
@@ -235,8 +230,9 @@ def extract_top_level_function_name(source_code: str) -> str | None:
 
 class ProgressForm:
   """A class to display the progress of the optimization job."""
+  # pylint: disable=too-many-instance-attributes
 
-  def __init__(self):
+  def __init__(self) -> None:
     self.instruction_progress_bar = None
     self.instruction_display = None
     self.instruction_best = None
@@ -253,8 +249,11 @@ class ProgressForm:
     self.demo_df = None
 
     self.started = False
+    self.status_display = None
+    self.eval_metric = None
+    self.output_path = None
 
-  def init(self, params: dict[str, str]):
+  def init(self, params: dict[str, str]) -> None:
     """Initialize the progress form."""
     self.job_state_display = display(
         HTML("<span>Job State: Not Started!</span>"), display_id=True
@@ -287,6 +286,7 @@ class ProgressForm:
     self.output_path = params["output_path"]
     self.started = True
 
+  # pylint: disable=too-many-arguments
   def update_progress(
       self,
       progress_bar: widgets.IntProgress,
@@ -296,7 +296,7 @@ class ProgressForm:
       best_textarea: widgets.Textarea,
       best_score: widgets.Label,
       eval_metric: str,
-  ):
+  ) -> pd.DataFrame:
     """Update the progress of the optimization job."""
 
     def get_last_step(df: pd.DataFrame):
@@ -347,7 +347,7 @@ class ProgressForm:
 
     return progress_bar, templates_display, best_textarea, best_score
 
-  def monitor_progress(self, job: aiplatform.CustomJob, params: dict[str, str]):
+  def monitor_progress(self, job: aiplatform.CustomJob, params: dict[str, str]) -> bool:
     """Monitor the progress of the optimization job."""
     if not self.started:
       self.init(params)
@@ -441,8 +441,8 @@ def split_gcs_path(gcs_path: str) -> tuple[str, str]:
     bucket_name = parts[0]
     prefix = parts[1] if len(parts) > 1 else ""
     return bucket_name, prefix
-  else:
-    raise ValueError("Invalid GCS path. Must start with 'gs://'")
+
+  raise ValueError("Invalid GCS path. Must start with 'gs://'")
 
 
 def list_gcs_objects(full_gcs_path: str) -> list[str]:
@@ -485,14 +485,16 @@ def find_directories_with_files(
   return list(directories)
 
 
-def extract_metric_name(metric_string: str):
+def extract_metric_name(metric_string: str) -> str:
+  """Extract the metric name from a string."""
   # Use a regular expression to find the metric name
   match = re.search(r"\.(\w+)/", metric_string)
   # Return the matched group if found
   return match.group(1) if match else metric_string
 
 
-def read_file_from_gcs(filename: str):
+def read_file_from_gcs(filename: str) -> str:
+  """Read a file from GCS."""
   with gfile.GFile(filename, "r") as f:
     return f.read()
 
@@ -516,7 +518,8 @@ def process_results(df: pd.DataFrame) -> pd.DataFrame:
 class ResultsUI:
   """A UI to display the results of a VAPO run."""
 
-  def __init__(self, path: str):
+  def __init__(self, path: str) -> None:
+    """Initialize the UI."""
     required_files = ["eval_results.json", "templates.json"]
     runs = find_directories_with_files(path, required_files)
 
