@@ -525,7 +525,7 @@ class ResultsUI:
         )
         self.display_run(runs[0])
 
-    def display_template_handler(self, change: Optional[dict[str, str]]) -> None:
+    def display_template_handler(self, change: dict[str, str]) -> None:
         """Display the template and the corresponding evaluation results."""
         if change["new"] is None:
             return
@@ -533,7 +533,7 @@ class ResultsUI:
         df_index = int(change["new"].split(" ")[1])
         self.display_eval_results(df_index)
 
-    def display_run_handler(self, change: Optional[dict[str, str]]) -> None:
+    def display_run_handler(self, change: dict[str, str]) -> None:
         """Display the run and the corresponding templates."""
         if change["new"] is None:
             return
