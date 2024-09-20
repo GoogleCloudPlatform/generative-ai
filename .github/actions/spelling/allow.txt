@@ -604,6 +604,7 @@ usecases
 username
 usernames
 uvb
+vapo
 vectordb
 vertexai
 vesselin
