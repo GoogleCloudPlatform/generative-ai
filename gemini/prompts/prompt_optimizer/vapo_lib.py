@@ -266,7 +266,7 @@ def generate_dataframe(filename: str) -> pd.DataFrame:
     with gfile.GFile(filename, "r") as f:
         try:
             data = json.load(f)
-        except:  # pylint: disable=bare-except
+        except json.JSONDecodeError:
             return pd.DataFrame()
     return pd.json_normalize(data)
 
