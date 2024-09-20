@@ -144,7 +144,7 @@ def validate_prompt_and_data(
 ) -> None:
     """Validates the prompt template and the dataset."""
     data = load_dataset(dataset_path)
-    placeholder_to_content = json.loads(placeholder_to_content)
+    placeholder_to_content_json = json.loads(placeholder_to_content)
     template = re.sub(r"(?<!{){(?!{)", "{{", template)
     template = re.sub(r"(?<!})}(?!})", "}}", template)
     env = jinja2.Environment()
@@ -156,7 +156,7 @@ def validate_prompt_and_data(
     template_variables = jinja2.meta.find_undeclared_variables(parsed_content)
     extra_keys = set()
     for ex in data:
-        ex.update(placeholder_to_content)
+        ex.update(placeholder_to_content_json)
         missing_keys = [key for key in template_variables if key not in ex]
         extra_keys.update([key for key in ex if key not in template_variables])
         if label_enforced:
