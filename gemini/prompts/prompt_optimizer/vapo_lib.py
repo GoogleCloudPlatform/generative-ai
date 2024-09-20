@@ -231,30 +231,8 @@ class ProgressForm:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self) -> None:
-        self.instruction_progress_bar = None
-        self.instruction_display = None
-        self.instruction_best = None
-        self.instruction_score = None
-
-        self.demo_progress_bar = None
-        self.demo_display = None
-        self.demo_best = None
-        self.demo_score = None
-
-        self.job_state_display = None
-
-        self.instruction_df = None
-        self.demo_df = None
-
-        self.started = False
-        self.status_display = None
-        self.eval_metric = ""
-        self.output_path = ""
-
-    def init(self, params: dict[str, str]) -> None:
+    def __init__(self, params: dict[str, str]) -> None:
         """Initialize the progress form."""
-        # pylint: disable=attr-defined
         self.job_state_display = display(
             HTML("<span>Job State: Not Started!</span>"), display_id=True
         )
@@ -284,7 +262,8 @@ class ProgressForm:
             self.eval_metric = "composite_metric"
 
         self.output_path = params["output_path"]
-        self.started = True
+        self.instruction_df = None
+        self.demo_df = None
 
     # pylint: disable=too-many-arguments
     def update_progress(
@@ -348,13 +327,9 @@ class ProgressForm:
         return progress_bar, templates_display, best_textarea, best_score
 
     def monitor_progress(
-        self, job: aiplatform.CustomJob, params: dict[str, str]
+        self, job: aiplatform.CustomJob
     ) -> bool:
         """Monitor the progress of the optimization job."""
-        if not self.started:
-            self.init(params)
-
-        # pylint: disable=attr-defined
         self.job_state_display.update(
             HTML(f"<span>Job State: {job.state.name}</span>")
         )
@@ -365,7 +340,6 @@ class ProgressForm:
         )
         demo_templates_file = f"{self.output_path}/demonstration/templates.json"
 
-        assert self.eval_metric is not None
         if not job.done():
             self.instruction_df = self.update_progress(
                 self.instruction_progress_bar,
@@ -410,12 +384,10 @@ class ProgressForm:
                 "Please consider rerunning to make sure the failure is intransient."
             )
             err = "\n".join(errors)
-            # pylint: disable=attr-defined
             self.status_display.update(
                 HTML(f'<span style="color: red;">{err}</span>')
             )
         else:
-            # pylint: disable=attr-defined
             self.status_display.update(
                 HTML(
                     '<span style="color: green;">Job succeeded!</span> <span>All the'
