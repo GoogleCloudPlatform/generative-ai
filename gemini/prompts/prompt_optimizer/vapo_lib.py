@@ -16,6 +16,7 @@
 import io
 import json
 import re
+from typing import Optional
 
 from google.cloud import aiplatform
 from google.cloud import storage
@@ -401,7 +402,7 @@ def display_dataframe(df: pd.DataFrame) -> None:
     """Display a pandas dataframe in Colab."""
 
     # Function to wrap text in a scrollable div
-    def wrap_in_scrollable_div(text):
+    def wrap_in_scrollable_div(text: str) -> str:
         return f'<div class="scrollable">{text}</div>'
 
     # Apply the function to every cell using the format method
@@ -524,7 +525,7 @@ class ResultsUI:
         )
         self.display_run(runs[0])
 
-    def display_template_handler(self, change: dict[str, str]) -> None:
+    def display_template_handler(self, change: Optional[dict[str, str]]) -> None:
         """Display the template and the corresponding evaluation results."""
         if change["new"] is None:
             return
@@ -532,7 +533,7 @@ class ResultsUI:
         df_index = int(change["new"].split(" ")[1])
         self.display_eval_results(df_index)
 
-    def display_run_handler(self, change) -> None:
+    def display_run_handler(self, change: Optional[dict[str, str]]) -> None:
         """Display the run and the corresponding templates."""
         if change["new"] is None:
             return
