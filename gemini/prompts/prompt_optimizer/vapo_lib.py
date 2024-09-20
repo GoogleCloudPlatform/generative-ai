@@ -18,12 +18,10 @@ import io
 import json
 import re
 
-from google.cloud import aiplatform
-from google.cloud import storage
-from google.colab import output
 from IPython.core.display import DisplayHandle
-from IPython.display import display
-from IPython.display import HTML
+from IPython.display import HTML, display
+from google.cloud import aiplatform, storage
+from google.colab import output
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
