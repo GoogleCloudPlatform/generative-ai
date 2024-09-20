@@ -171,7 +171,7 @@ def update_best_display(
     best_score = df.loc[df["score"].argmax(), "score"]
     original_score = df.loc[0, "score"]
 
-    def placeholder_llm():
+    def placeholder_llm() -> str:
         return "{{llm()}}"
 
     env = jinja2.Environment(loader=jinja2.BaseLoader())
@@ -249,11 +249,12 @@ class ProgressForm:
 
         self.started = False
         self.status_display = None
-        self.eval_metric = None
-        self.output_path = None
+        self.eval_metric = ""
+        self.output_path = ""
 
     def init(self, params: dict[str, str]) -> None:
         """Initialize the progress form."""
+        # pylint: disable=attr-defined
         self.job_state_display = display(
             HTML("<span>Job State: Not Started!</span>"), display_id=True
         )
@@ -298,7 +299,7 @@ class ProgressForm:
     ) -> pd.DataFrame:
         """Update the progress of the optimization job."""
 
-        def get_last_step(df: pd.DataFrame):
+        def get_last_step(df: pd.DataFrame) -> int:
             if df.empty:
                 return -1
             return int(df["step"].max())
@@ -353,6 +354,7 @@ class ProgressForm:
         if not self.started:
             self.init(params)
 
+        # pylint: disable=attr-defined
         self.job_state_display.update(
             HTML(f"<span>Job State: {job.state.name}</span>")
         )
@@ -363,6 +365,7 @@ class ProgressForm:
         )
         demo_templates_file = f"{self.output_path}/demonstration/templates.json"
 
+        assert self.eval_metric is not None
         if not job.done():
             self.instruction_df = self.update_progress(
                 self.instruction_progress_bar,
@@ -407,10 +410,12 @@ class ProgressForm:
                 "Please consider rerunning to make sure the failure is intransient."
             )
             err = "\n".join(errors)
+            # pylint: disable=attr-defined
             self.status_display.update(
                 HTML(f'<span style="color: red;">{err}</span>')
             )
         else:
+            # pylint: disable=attr-defined
             self.status_display.update(
                 HTML(
                     '<span style="color: green;">Job succeeded!</span> <span>All the'
@@ -551,6 +556,7 @@ class ResultsUI:
         """Display the template and the corresponding evaluation results."""
         if change["new"] is None:
             return
+
         df_index = int(change["new"].split(" ")[1])
         self.display_eval_results(df_index)
 
