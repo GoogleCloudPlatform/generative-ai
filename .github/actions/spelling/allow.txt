@@ -46,13 +46,16 @@ Disturbia
 Doogler
 Dreesen
 Durafast
+Durmus
 EDB
 EHsc
 EIP
+EMNLP
 ENU
 ESG
 Embs
 Envane
+Esin
 Eventarc
 FAISS
 FILEFLAGS
@@ -114,6 +117,7 @@ Kamradt
 Kaufmanns
 Kawagoe
 Keanu
+Keown
 Ketamine
 Khanh
 Knopf
@@ -126,6 +130,7 @@ LRESULT
 LSTATUS
 LSum
 LTRB
+Ladhak
 Lego
 Llion
 Lottry
@@ -163,6 +168,7 @@ Omnibox
 Onone
 Oort
 PDFs
+PEFT
 PLOTLYENV
 Parmar
 Persero
@@ -356,6 +362,7 @@ figsize
 fillmode
 firestore
 flac
+fmeasure
 fontdict
 forno
 freedraw
@@ -422,6 +429,7 @@ iterrows
 jegadesh
 jetbrains
 jsonify
+jsonlines
 jupyter
 kaggle
 kenleejr
@@ -546,6 +554,7 @@ scann
 scattergl
 seaborn
 selectbox
+sft
 showlakes
 showland
 showor
@@ -609,6 +618,7 @@ wparam
 wscore
 wscores
 wstring
+xaxes
 xaxis
 xcassets
 xcconfig
@@ -617,6 +627,7 @@ xcscheme
 xctest
 xlabel
 xticks
+yaxes
 yaxis
 ylabel
 ytd
