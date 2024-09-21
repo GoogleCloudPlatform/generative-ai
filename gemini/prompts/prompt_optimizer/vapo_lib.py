@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Utility functions and classes for the VAPO notebook."""
+import csv
 import io
 import json
 import re
@@ -61,6 +62,78 @@ def is_run_target_required(eval_metric_types: list[str], source_model: str) -> b
 _TARGET_KEY = "target"
 
 
+def load_file_from_gcs(dataset: str) -> str:
+    """Loads the file from GCS and returns it as a string."""
+    if dataset.startswith("gs://"):
+        with gfile.GFile(dataset, "r") as f:
+            return f.read()
+    else:
+        raise ValueError(
+            "Unsupported file location. Only GCS paths starting with 'gs://' are"
+            " supported."
+        )
+
+
+def parse_jsonl(data_str: str) -> list[dict[str, str]]:
+    """Parses the content of a JSONL file and returns a list of dictionaries."""
+    data = []
+    lines = data_str.splitlines()
+    for line in lines:
+        if line:
+            try:
+                data.append(json.loads(line))
+            except json.JSONDecodeError as e:
+                raise ValueError(
+                    f"Error decoding JSON on line: {line}. Error: {e}"
+                ) from e
+    return data
+
+
+def parse_and_validate_csv(data_str: str) -> list[dict[str, str]]:
+    """Parses and validates the content of a CSV file and returns a list of dictionaries."""
+    data = []
+    csv_reader = csv.reader(io.StringIO(data_str))
+
+    # Extract and validate headers
+    try:
+        headers = next(csv_reader)
+        if not headers:
+            raise ValueError("The CSV file has an empty or invalid header row.")
+    except StopIteration as e:
+        raise ValueError("The CSV file is empty.") from e
+
+    # Validate and process rows
+    for row_number, row in enumerate(csv_reader, start=2):
+        if len(row) != len(headers):
+            raise ValueError(
+                f"Row {row_number} has an inconsistent number of fields. "
+                f"Expected {len(headers)} fields but found {len(row)}."
+            )
+        # Create dictionary for each row using headers as keys
+        item = dict(zip(headers, row))
+        data.append(item)
+
+    return data
+
+
+def load_dataset(dataset: str) -> list[dict[str, str]]:
+    """Loads and parses the dataset based on its file type ('.jsonl' or '.csv')."""
+    # Load the file from GCS
+    data_str = load_file_from_gcs(dataset)
+
+    # Parse based on file type
+    if dataset.endswith(".jsonl"):
+        return parse_jsonl(data_str)
+
+    if dataset.endswith(".csv"):
+        return parse_and_validate_csv(data_str)
+
+    raise ValueError(
+        "Unsupported file type. Please provide a file with '.jsonl' or '.csv'"
+        " extension."
+    )
+
+
 def validate_prompt_and_data(
     template: str,
     dataset_path: str,
@@ -68,10 +141,10 @@ def validate_prompt_and_data(
     label_enforced: bool,
 ) -> None:
     """Validates the prompt template and the dataset."""
-    placeholder_to_content = json.loads(placeholder_to_content)
-    with gfile.GFile(dataset_path, "r") as f:
-        data = [json.loads(line) for line in f.readlines()]
-
+    data = load_dataset(dataset_path)
+    placeholder_to_content_json = json.loads(placeholder_to_content)
+    template = re.sub(r"(?<!{){(?!{)", "{{", template)
+    template = re.sub(r"(?<!})}(?!})", "}}", template)
     env = jinja2.Environment()
     try:
         parsed_content = env.parse(template)
@@ -81,7 +154,7 @@ def validate_prompt_and_data(
     template_variables = jinja2.meta.find_undeclared_variables(parsed_content)
     extra_keys = set()
     for ex in data:
-        ex.update(placeholder_to_content)
+        ex.update(placeholder_to_content_json)
         missing_keys = [key for key in template_variables if key not in ex]
         extra_keys.update([key for key in ex if key not in template_variables])
         if label_enforced:
@@ -99,7 +172,7 @@ def validate_prompt_and_data(
             )
     if extra_keys:
         raise Warning(
-            "Warning: extra keys in the examples not used in the context/task"
+            "Warning: extra keys in the examples not used in the prompt template"
             f" template {extra_keys}"
         )
 
@@ -189,8 +262,10 @@ def generate_dataframe(filename: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     with gfile.GFile(filename, "r") as f:
-        data = json.load(f)
-
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            return pd.DataFrame()
     return pd.json_normalize(data)
 
 
@@ -227,6 +302,15 @@ class ProgressForm:
 
     def __init__(self, params: dict[str, str]) -> None:
         """Initialize the progress form."""
+        self.instruction_progress_bar = None
+        self.instruction_display = None
+        self.instruction_best = None
+        self.instruction_score = None
+        self.demo_progress_bar = None
+        self.demo_display = None
+        self.demo_best = None
+        self.demo_score = None
+
         self.job_state_display = display(
             HTML("<span>Job State: Not Started!</span>"), display_id=True
         )
@@ -262,7 +346,7 @@ class ProgressForm:
     # pylint: disable=too-many-arguments
     def update_progress(
         self,
-        progress_bar: widgets.IntProgress,
+        progress_bar: widgets.IntProgress | None,
         templates_file: str,
         df: pd.DataFrame | None,
         df_display: DisplayHandle,
