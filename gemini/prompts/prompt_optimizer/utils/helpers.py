@@ -29,7 +29,11 @@ import plotly.graph_objects as go
 
 def get_id(length: int = 8) -> str:
     """Generate a uuid of a specified length (default=8)."""
-    return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
+    return "".join(
+        random.choices(
+            string.ascii_lowercase +
+            string.digits,
+            k=length))
 
 
 @retry(wait=wait_random_exponential(multiplier=1, max=120))
@@ -42,8 +46,14 @@ async def async_generate(prompt, model):
     return response.text
 
 
-def evaluate_task(df: pd.DataFrame, prompt_col: str, reference_col: str, response_col: str, experiment_name: str,
-                  eval_metrics: List[str], eval_sample_n: int):
+def evaluate_task(
+        df: pd.DataFrame,
+        prompt_col: str,
+        reference_col: str,
+        response_col: str,
+        experiment_name: str,
+        eval_metrics: List[str],
+        eval_sample_n: int):
     """Evaluate task using Vertex AI Evaluation."""
 
     # Generate a unique id for the experiment run
@@ -177,7 +187,11 @@ def plot_eval_metrics(eval_results, metrics=None):
     fig.show()
 
 
-def get_results_file_uris(output_uri, required_files=["eval_results.json", "templates.json"]):
+def get_results_file_uris(
+    output_uri,
+    required_files=[
+        "eval_results.json",
+        "templates.json"]):
     """Finds directories containing specific files under the given full GCS path."""
 
     # Create a path object for the given output URI
@@ -202,13 +216,27 @@ def get_best_template(template_uri):
 
     # Define the metrics to consider for sorting
     METRICS = [
-        'bleu', 'coherence', 'exact_match', 'fluidity', 'fulfillment',
-        'groundedness', 'rouge_1', 'rouge_2', 'rouge_l', 'rouge_l_sum',
-        'safety', 'question_answering_correctness', 'question_answering_helpfulness',
-        'question_answering_quality', 'question_answering_relevance',
-        'summarization_helpfulness', 'summarization_quality', 'summarization_verbosity',
-        'tool_name_match', 'tool_parameter_key_match', 'tool_parameter_kv_match'
-    ]
+        'bleu',
+        'coherence',
+        'exact_match',
+        'fluidity',
+        'fulfillment',
+        'groundedness',
+        'rouge_1',
+        'rouge_2',
+        'rouge_l',
+        'rouge_l_sum',
+        'safety',
+        'question_answering_correctness',
+        'question_answering_helpfulness',
+        'question_answering_quality',
+        'question_answering_relevance',
+        'summarization_helpfulness',
+        'summarization_quality',
+        'summarization_verbosity',
+        'tool_name_match',
+        'tool_parameter_key_match',
+        'tool_parameter_kv_match']
     COMPOSITE_METRIC = 'composite_metric'
 
     # Load templates from the URI
@@ -218,12 +246,16 @@ def get_best_template(template_uri):
     # Process metrics for each template
     for template in templates:
         template['metrics'] = {
-            key.split('/')[0]: value for key, value in template['metrics'].items()}
+            key.split('/')[0]: value for key,
+            value in template['metrics'].items()}
 
     # Sort templates based on composite metric or highest metric value
-    if any(template['metrics'].get(COMPOSITE_METRIC) for template in templates):
+    if any(template['metrics'].get(COMPOSITE_METRIC)
+           for template in templates):
         sorted_templates = sorted(
-            templates, key=lambda x: x['metrics'][COMPOSITE_METRIC], reverse=True)
+            templates,
+            key=lambda x: x['metrics'][COMPOSITE_METRIC],
+            reverse=True)
     elif any(metric in template['metrics'] for template in templates for metric in METRICS):
         sorted_metrics = sorted(templates, key=lambda x: max(
             x['metrics'].values()), reverse=True)
