@@ -421,7 +421,7 @@ idk
 idks
 idxs
 iloc
-imagefront
+imagefont
 imageno
 imdb
 imshow
