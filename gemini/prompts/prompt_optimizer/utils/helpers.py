@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import random
 import string
-from typing import List
-
-from IPython.display import HTML, Markdown, display
-from etils import epath
-import pandas as pd
-import plotly.graph_objects as go
 from tenacity import retry, wait_random_exponential
+from typing import List
+from IPython.display import display, Markdown, HTML
+from etils import epath
+import json
+
+import pandas as pd
 from vertexai import generative_models
-from vertexai.evaluation import EvalTask
 from vertexai.generative_models import GenerativeModel
+from vertexai.evaluation import EvalTask
+import plotly.graph_objects as go
 
 
 def get_id(length: int = 8) -> str:
@@ -42,36 +42,26 @@ async def async_generate(prompt, model):
     return response.text
 
 
-def evaluate_task(
-    df: pd.DataFrame,
-    prompt_col: str,
-    reference_col: str,
-    response_col: str,
-    experiment_name: str,
-    eval_metrics: List[str],
-    eval_sample_n: int,
-):
+def evaluate_task(df: pd.DataFrame, prompt_col: str, reference_col: str, response_col: str, experiment_name: str,
+                  eval_metrics: List[str], eval_sample_n: int):
     """Evaluate task using Vertex AI Evaluation."""
 
     # Generate a unique id for the experiment run
     id = get_id()
 
     # Rename the columns to match the expected format
-    eval_dataset = df[[prompt_col, reference_col, response_col]].rename(
-        columns={
-            prompt_col: "prompt",
-            reference_col: "reference",
-            response_col: "response",
-        }
-    )
+    eval_dataset = df[[prompt_col, reference_col, response_col]].rename(columns={
+        prompt_col: 'prompt',
+        reference_col: 'reference',
+        response_col: 'response'
+    })
 
     # Drop rows with missing values
     eval_dataset = eval_dataset.dropna()
 
     # Sample a subset of the dataset
-    eval_dataset = eval_dataset.sample(n=eval_sample_n, random_state=8).reset_index(
-        drop=True
-    )
+    eval_dataset = eval_dataset.sample(
+        n=eval_sample_n, random_state=8).reset_index(drop=True)
 
     # Create an EvalTask object
     eval_task = EvalTask(
@@ -81,7 +71,7 @@ def evaluate_task(
     )
 
     # Evaluate the task
-    result = eval_task.evaluate(experiment_run_name=f"{experiment_name}-{id}")
+    result = eval_task.evaluate(experiment_run_name=f'{experiment_name}-{id}')
 
     # Return the summary metrics
     return result.summary_metrics
@@ -96,9 +86,7 @@ def print_df_rows(df: pd.DataFrame, columns: List[str] = None, n: int = 3):
     )
 
     # Define the header style for the text
-    header_style = (
-        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
-    )
+    header_style = "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
 
     # If columns are specified, filter the DataFrame
     if columns:
@@ -110,7 +98,8 @@ def print_df_rows(df: pd.DataFrame, columns: List[str] = None, n: int = 3):
     # Iterate over the rows of the DataFrame
     for _, row in df.iterrows():
         for field in df.columns:
-            display(HTML(f"<span style='{header_style}'>{field.capitalize()}:</span>"))
+            display(HTML(f"<span style='{header_style}'>{
+                    field.capitalize()}:</span>"))
             display(HTML("<br>"))
             value = row[field]
             display(HTML(f"<span style='{base_style}'>{value}</span>"))
@@ -156,7 +145,10 @@ def plot_eval_metrics(eval_results, metrics=None):
                 if any(selected_metric in k for selected_metric in metrics)
             }
 
-        summary_metrics = {k: v for k, v in summary_metrics.items() if "mean" in k}
+        summary_metrics = {
+            k: v
+            for k, v in summary_metrics.items() if 'mean' in k
+        }
         data.append(
             go.Bar(
                 x=list(summary_metrics.keys()),
@@ -170,9 +162,12 @@ def plot_eval_metrics(eval_results, metrics=None):
 
     # Add the title
     fig.update_layout(
-        title=go.layout.Title(text="Evaluation Metrics", x=0.5),
+        title=go.layout.Title(
+            text="Evaluation Metrics",
+            x=0.5
+        ),
         xaxis_title="Metric Name",
-        yaxis_title="Mean Value",
+        yaxis_title="Mean Value"
     )
 
     # Change the bar mode
@@ -182,9 +177,7 @@ def plot_eval_metrics(eval_results, metrics=None):
     fig.show()
 
 
-def get_results_file_uris(
-    output_uri, required_files=["eval_results.json", "templates.json"]
-):
+def get_results_file_uris(output_uri, required_files=["eval_results.json", "templates.json"]):
     """Finds directories containing specific files under the given full GCS path."""
 
     # Create a path object for the given output URI
@@ -197,7 +190,7 @@ def get_results_file_uris(
     for directory in path.iterdir():
         for file in directory.iterdir():
             if file.name in required_files:
-                file_key = directory.name + "_" + file.stem
+                file_key = directory.name + '_' + file.stem
                 results_file_uris[file_key] = str(directory / file)
 
     # Return the results file URIs
@@ -209,29 +202,14 @@ def get_best_template(template_uri):
 
     # Define the metrics to consider for sorting
     METRICS = [
-        "bleu",
-        "coherence",
-        "exact_match",
-        "fluidity",
-        "fulfillment",
-        "groundedness",
-        "rouge_1",
-        "rouge_2",
-        "rouge_l",
-        "rouge_l_sum",
-        "safety",
-        "question_answering_correctness",
-        "question_answering_helpfulness",
-        "question_answering_quality",
-        "question_answering_relevance",
-        "summarization_helpfulness",
-        "summarization_quality",
-        "summarization_verbosity",
-        "tool_name_match",
-        "tool_parameter_key_match",
-        "tool_parameter_kv_match",
+        'bleu', 'coherence', 'exact_match', 'fluidity', 'fulfillment',
+        'groundedness', 'rouge_1', 'rouge_2', 'rouge_l', 'rouge_l_sum',
+        'safety', 'question_answering_correctness', 'question_answering_helpfulness',
+        'question_answering_quality', 'question_answering_relevance',
+        'summarization_helpfulness', 'summarization_quality', 'summarization_verbosity',
+        'tool_name_match', 'tool_parameter_key_match', 'tool_parameter_kv_match'
     ]
-    COMPOSITE_METRIC = "composite_metric"
+    COMPOSITE_METRIC = 'composite_metric'
 
     # Load templates from the URI
     with epath.Path(template_uri).open() as f:
@@ -239,25 +217,19 @@ def get_best_template(template_uri):
 
     # Process metrics for each template
     for template in templates:
-        template["metrics"] = {
-            key.split("/")[0]: value for key, value in template["metrics"].items()
-        }
+        template['metrics'] = {
+            key.split('/')[0]: value for key, value in template['metrics'].items()}
 
     # Sort templates based on composite metric or highest metric value
-    if any(template["metrics"].get(COMPOSITE_METRIC) for template in templates):
+    if any(template['metrics'].get(COMPOSITE_METRIC) for template in templates):
         sorted_templates = sorted(
-            templates, key=lambda x: x["metrics"][COMPOSITE_METRIC], reverse=True
-        )
-    elif any(
-        metric in template["metrics"] for template in templates for metric in METRICS
-    ):
-        sorted_metrics = sorted(
-            templates, key=lambda x: max(x["metrics"].values()), reverse=True
-        )
-        top_metric = list(sorted_metrics[0]["metrics"].keys())[0]
+            templates, key=lambda x: x['metrics'][COMPOSITE_METRIC], reverse=True)
+    elif any(metric in template['metrics'] for template in templates for metric in METRICS):
+        sorted_metrics = sorted(templates, key=lambda x: max(
+            x['metrics'].values()), reverse=True)
+        top_metric = list(sorted_metrics[0]['metrics'].keys())[0]
         sorted_templates = sorted(
-            templates, key=lambda x: x["metrics"][top_metric], reverse=True
-        )
+            templates, key=lambda x: x['metrics'][top_metric], reverse=True)
     else:
         raise ValueError("No valid metrics found in templates.")
 
@@ -265,13 +237,12 @@ def get_best_template(template_uri):
     best_template_df = pd.DataFrame([sorted_templates[0]])
 
     # Add metrics as separate columns
-    for metric in best_template_df["metrics"].iloc[0]:
-        best_template_df[f"metrics_{metric}"] = best_template_df["metrics"].apply(
-            lambda x: x[metric]
-        )
+    for metric in best_template_df['metrics'].iloc[0]:
+        best_template_df[f'metrics_{metric}'] = best_template_df['metrics'].apply(
+            lambda x: x[metric])
 
     # Drop the 'metrics' column
-    best_template_df = best_template_df.drop("metrics", axis=1)
+    best_template_df = best_template_df.drop('metrics', axis=1)
 
     return best_template_df
 
@@ -284,16 +255,16 @@ def get_best_evaluation(best_template_df, eval_result_uri):
         evaluations = json.load(f)
 
     # Get the best index from the best template DataFrame
-    best_index = best_template_df["step"].iloc[0]
+    best_index = best_template_df['step'].iloc[0]
 
     # Retrieve the best evaluation based on the index
     best_evaluation = evaluations[best_index]
 
     # Create a DataFrame from the summary results
-    summary_df = pd.DataFrame([best_evaluation["summary_results"]])
+    summary_df = pd.DataFrame([best_evaluation['summary_results']])
 
     # Load the metrics table from the best evaluation
-    metrics_table = json.loads(best_evaluation["metrics_table"])
+    metrics_table = json.loads(best_evaluation['metrics_table'])
 
     # Create a DataFrame from the metrics table
     metrics_df = pd.DataFrame(metrics_table)
@@ -308,12 +279,13 @@ def get_optimization_result(template_uri, eval_result_uri):
     best_template_df = get_best_template(template_uri)
 
     # Get the summary and metrics DataFrames for the best evaluation
-    summary_df, metrics_df = get_best_evaluation(best_template_df, eval_result_uri)
+    summary_df, metrics_df = get_best_evaluation(
+        best_template_df, eval_result_uri)
 
     return best_template_df, summary_df, metrics_df
 
 
-def display_eval_report(eval_result, prompt_component="instruction"):
+def display_eval_report(eval_result, prompt_component='instruction'):
     """Displays evaluation results with optional filtering by metrics."""
 
     # Unpack the evaluation result
@@ -323,22 +295,21 @@ def display_eval_report(eval_result, prompt_component="instruction"):
     display(Markdown("## APD - Report"))
 
     # Display the prompt component title
-    if prompt_component == "instruction":
+    if prompt_component == 'instruction':
         display(Markdown("### Best Instruction"))
-    elif prompt_component == "demonstration":
+    elif prompt_component == 'demonstration':
         display(Markdown("### Best Demonstration"))
     else:
         raise ValueError(
-            "Invalid prompt_component value. Must be 'instruction' or 'demonstration'."
-        )
+            "Invalid prompt_component value. Must be 'instruction' or 'demonstration'.")
 
     # Display the best template DataFrame
-    display(best_template_df.style.hide(axis="index"))
+    display(best_template_df.style.hide(axis='index'))
 
     # Display the summary metrics title
     display(Markdown("### Summary Metrics"))
-    display(summary_df.style.hide(axis="index"))
+    display(summary_df.style.hide(axis='index'))
 
     # Display the report metrics title
     display(Markdown("### Report Metrics"))
-    display(metrics_df.style.hide(axis="index"))
+    display(metrics_df.style.hide(axis='index'))
