@@ -28,6 +28,7 @@
 /generative-ai/language/grounding                           @koverholt @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/orchestration/langchain             @kweinmeister @RajeshThallam @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/prompts                             @polong-lin @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/prompts/prompt_optimizer            @nhootan @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/sample-apps                         @rominirani @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/translation                         @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/tuning                              @erwinh85 @GoogleCloudPlatform/generative-ai-devrel
@@ -38,7 +39,7 @@
 /generative-ai/language/use-cases/prod-catalog-enrichment   @slatawa @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/sql-code-generation       @rarsan @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/use-cases/sql-code-generation/sql_code_generation_langchain.ipynb @rarsan @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/search                                       @holtskinner @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/search                                       @agarwal22megha @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/search/retrieval-augmented-generation        @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/getting-started                       @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/use-cases/storytelling                @holtskinner @GoogleCloudPlatform/generative-ai-devrel
@@ -67,3 +68,7 @@
 /generative-ai/gemini/evaluation/evaluate_langchain_chains.ipynb           @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb           @eliasecchig @lspatarog @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/tuning/gemini_supervised_finetuning_text_classification.ipynb           @gabrielahrlr @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving         @polong-lin @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb       @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving/vertex_ai_text_generation_inference_gemma.ipynb  @alvarobartt @philschmid @pagezyhf @jeffboudier
+/generative-ai/gemini/use-cases/applying-llms-to-data/semantic-search-in-bigquery/stackoverflow_questions_semantic_search.ipynb     @sethijaideep @GoogleCloudPlatform/generative-ai-devrel

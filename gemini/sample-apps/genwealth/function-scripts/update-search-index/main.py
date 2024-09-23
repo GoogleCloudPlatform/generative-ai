@@ -1,7 +1,6 @@
 """Function to update the Vertex AI Search and Conversion index"""
 
 import os
-from typing import Optional
 
 import functions_framework
 from google.api_core.client_options import ClientOptions
@@ -12,9 +11,9 @@ def import_documents_sample(
     project_id: str,
     location: str,
     data_store_id: str,
-    gcs_uri: Optional[str] = None,
-    bigquery_dataset: Optional[str] = None,
-    bigquery_table: Optional[str] = None,
+    gcs_uri: str | None = None,
+    bigquery_dataset: str | None = None,
+    bigquery_table: str | None = None,
 ) -> str:
     """Function to import documents"""
     #  For more information, refer to:

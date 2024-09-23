@@ -150,6 +150,10 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
   --role="roles/artifactregistry.admin"
 
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/cloudbuild.builds.builder"
+
 # Create Firewall Rule
 echo "Creating firewall rule for pgAdmin instance"
 gcloud compute firewall-rules create pgadmin-firewall --project="${PROJECT_ID}" --direction=INGRESS --priority=1000 --network="${VPC_NAME}" --action=ALLOW --rules=tcp:80,tcp:22 --source-ranges="${LOCAL_IPV4}/32",35.235.240.0/20 --target-tags="${GCE_INSTANCE}"

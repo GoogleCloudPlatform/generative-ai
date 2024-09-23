@@ -12,7 +12,7 @@ def get_chat_response(user_prompt: str, messages: []) -> str:
     request = {"prompt": user_prompt}
     response = requests.post(backend_url + "/chat", json=request)
     if response.status_code != 200:
-        raise Exception("Bad response from backend: {}".format(response.text))
+        raise Exception(f"Bad response from backend: {response.text}")
     return response.json()["response"]
 
 

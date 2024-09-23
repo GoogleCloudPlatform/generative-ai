@@ -4,7 +4,7 @@ Cloud function to generate embedding of given file.
 
 import json
 import os
-from typing import Any, List
+from typing import Any
 
 from dotenv import load_dotenv
 import functions_framework
@@ -20,7 +20,7 @@ LOCATION = os.getenv("LOCATION")
 embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko@003")
 
 
-def get_embeddings(instances: list[str]) -> List[List[float]]:
+def get_embeddings(instances: list[str]) -> list[list[float]]:
     """
     Generates embeddings for given text.
 

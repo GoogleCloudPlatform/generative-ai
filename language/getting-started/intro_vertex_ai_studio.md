@@ -32,7 +32,7 @@ Upon clicking, the following page will be presented.
 
 Create Prompt lets you designs prompts for tasks relevant to your business use case including code generation. To get started, click on the **+ TEXT PROMPT** button as shown in the image below
 
-![Create Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_prompt.jpg)
+![Create Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click-create-prompt.jpg)
 
 Upon clicking, you will be redirected to the following page. You can hover or click on **?** buttons to find out more about each field and parameter. Also, the following image has been annotated to provide a quick overview of the interface.
 
@@ -143,7 +143,7 @@ The saved prompt will appear at the **MY PROMPTS** tab.
 
 Go back to the **Language** page and click on the **+ TEXT CHAT** button to create a new chat prompt.
 
-![Text Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_chat_prompt.jpg)
+![Text Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_chat_prompt.png)
 
 You will see the new chat prompt page. It's relatively similar to the new prompt page that you went through earlier.
 
