@@ -432,6 +432,7 @@ ipynb
 isa
 itables
 iterrows
+ivf
 jegadesh
 jetbrains
 jsonify
