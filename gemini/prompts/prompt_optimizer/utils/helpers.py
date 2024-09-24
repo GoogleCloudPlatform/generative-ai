@@ -15,7 +15,7 @@
 import random
 import string
 from tenacity import retry, wait_random_exponential
-from typing import List
+from typing import List, Tuple, Union
 from IPython.display import display, Markdown, HTML
 from etils import epath
 import json
@@ -37,7 +37,7 @@ def get_id(length: int = 8) -> str:
 
 
 @retry(wait=wait_random_exponential(multiplier=1, max=120))
-async def async_generate(prompt, model):
+async def async_generate(prompt: str, model: str) -> str:
     """Generate a response from the model."""
     response = await model.generate_content_async(
         [prompt],
@@ -53,7 +53,7 @@ def evaluate_task(
         response_col: str,
         experiment_name: str,
         eval_metrics: List[str],
-        eval_sample_n: int):
+        eval_sample_n: int) -> dict:
     """Evaluate task using Vertex AI Evaluation."""
 
     # Generate a unique id for the experiment run
@@ -87,7 +87,7 @@ def evaluate_task(
     return result.summary_metrics
 
 
-def print_df_rows(df: pd.DataFrame, columns: List[str] = None, n: int = 3):
+def print_df_rows(df: pd.DataFrame, columns: List[str] = None, n: int = 3) -> None:
     """Print a subset of rows from a DataFrame."""
 
     # Define the base style for the text
@@ -120,7 +120,7 @@ def print_df_rows(df: pd.DataFrame, columns: List[str] = None, n: int = 3):
             break
 
 
-def init_new_model(model_name):
+def init_new_model(model_name: str) -> vertexai.generative_models.GenerativeModel:
     """Initialize a new model."""
 
     # Initialize the model
@@ -141,7 +141,7 @@ def init_new_model(model_name):
     return model
 
 
-def plot_eval_metrics(eval_results, metrics=None):
+def plot_eval_metrics(eval_results: list, metrics=None)->None:
     """Plot a bar plot for the evaluation results."""
 
     # Create data for the bar plot
@@ -188,10 +188,10 @@ def plot_eval_metrics(eval_results, metrics=None):
 
 
 def get_results_file_uris(
-    output_uri,
-    required_files=[
+    output_uri: str,
+    required_files: List[str] = [
         "eval_results.json",
-        "templates.json"]):
+        "templates.json"]) -> List[str]:
     """Finds directories containing specific files under the given full GCS path."""
 
     # Create a path object for the given output URI
@@ -211,7 +211,7 @@ def get_results_file_uris(
     return results_file_uris
 
 
-def get_best_template(template_uri):
+def get_best_template(template_uri: str) -> pd.DataFrame:
     """Retrieves and processes the best template."""
 
     # Define the metrics to consider for sorting
@@ -279,7 +279,7 @@ def get_best_template(template_uri):
     return best_template_df
 
 
-def get_best_evaluation(best_template_df, eval_result_uri):
+def get_best_evaluation(best_template_df: pd.DataFrame, eval_result_uri: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Retrieves and processes the best evaluation."""
 
     # Load the evaluations from the URI
@@ -304,7 +304,7 @@ def get_best_evaluation(best_template_df, eval_result_uri):
     return summary_df, metrics_df
 
 
-def get_optimization_result(template_uri, eval_result_uri):
+def get_optimization_result(template_uri: str, eval_result_uri: str) -> Union[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Retrieves and processes the best template and evaluation results."""
 
     # Get the best template DataFrame
@@ -317,14 +317,14 @@ def get_optimization_result(template_uri, eval_result_uri):
     return best_template_df, summary_df, metrics_df
 
 
-def display_eval_report(eval_result, prompt_component='instruction'):
+def display_eval_report(eval_result: Union[pd.DataFrame, pd.DataFrame, pd.DataFrame], prompt_component: str ='instruction') -> None:
     """Displays evaluation results with optional filtering by metrics."""
 
     # Unpack the evaluation result
     best_template_df, summary_df, metrics_df = eval_result
 
     # Display the report title
-    display(Markdown("## APD - Report"))
+    display(Markdown("## Vertex AI Prompt Optimizer - Report"))
 
     # Display the prompt component title
     if prompt_component == 'instruction':
