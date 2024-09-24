@@ -27,6 +27,31 @@ from vertexai.evaluation import EvalTask
 import plotly.graph_objects as go
 
 
+METRICS = [
+        'bleu',
+        'coherence',
+        'exact_match',
+        'fluidity',
+        'fulfillment',
+        'groundedness',
+        'rouge_1',
+        'rouge_2',
+        'rouge_l',
+        'rouge_l_sum',
+        'safety',
+        'question_answering_correctness',
+        'question_answering_helpfulness',
+        'question_answering_quality',
+        'question_answering_relevance',
+        'summarization_helpfulness',
+        'summarization_quality',
+        'summarization_verbosity',
+        'tool_name_match',
+        'tool_parameter_key_match',
+        'tool_parameter_kv_match']
+COMPOSITE_METRIC = 'composite_metric'
+
+
 def get_id(length: Union[int, None] = 8) -> str:
     """Generate a uuid of a specified length (default=8)."""
     if length is None:
@@ -215,31 +240,6 @@ def get_results_file_uris(
 
 def get_best_template(template_uri: str) -> pd.DataFrame:
     """Retrieves and processes the best template."""
-
-    # Define the metrics to consider for sorting
-    METRICS = [
-        'bleu',
-        'coherence',
-        'exact_match',
-        'fluidity',
-        'fulfillment',
-        'groundedness',
-        'rouge_1',
-        'rouge_2',
-        'rouge_l',
-        'rouge_l_sum',
-        'safety',
-        'question_answering_correctness',
-        'question_answering_helpfulness',
-        'question_answering_quality',
-        'question_answering_relevance',
-        'summarization_helpfulness',
-        'summarization_quality',
-        'summarization_verbosity',
-        'tool_name_match',
-        'tool_parameter_key_match',
-        'tool_parameter_kv_match']
-    COMPOSITE_METRIC = 'composite_metric'
 
     # Load templates from the URI
     with epath.Path(template_uri).open() as f:
