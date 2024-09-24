@@ -14,11 +14,11 @@ Ashish
 Aspeed
 Autechre
 Autorater
+BIKBEAR
 BITCODE
 Benno
 Bettes
 Biden
-BIKBEAR
 Bitcoin
 Borthwick
 Boyz
@@ -29,6 +29,8 @@ CHECKOV
 COCOAPODS
 COINIT
 CONOUT
+CUCUONAR
+CWLEY
 CZE
 Caprese
 Codelab
@@ -37,8 +39,6 @@ Colab
 Colm
 Cowabunga
 Crossbody
-CUCUONAR
-CWLEY
 D'orsay
 DLC
 DLCs
@@ -134,11 +134,11 @@ LRESULT
 LSTATUS
 LSum
 LTRB
+LUVBPTK
 Ladhak
 Lego
 Llion
 Lottry
-LUVBPTK
 MSCHF
 MSGSEND
 MTL
