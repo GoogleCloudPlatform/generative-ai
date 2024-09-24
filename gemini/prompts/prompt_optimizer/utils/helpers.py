@@ -15,6 +15,7 @@
 import random
 import string
 from tenacity import retry, wait_random_exponential
+from typing import List, Tuple, Union, Dict, Optional
 from IPython.display import display, Markdown, HTML
 from etils import epath
 import json
@@ -26,33 +27,37 @@ from vertexai.evaluation import EvalTask
 import plotly.graph_objects as go
 
 
-def get_id(length =8) -> str:
+def get_id(length: Union[int, None] = 8) -> str:
     """Generate a uuid of a specified length (default=8)."""
+    if length is None:
+        length = 8
     return "".join(
         random.choices(
             string.ascii_lowercase +
             string.digits,
-            k=length))
-
+            k=length
+        )
+    )
 
 @retry(wait=wait_random_exponential(multiplier=1, max=120))
-async def async_generate(prompt, model):
+async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None]:
     """Generate a response from the model."""
     response = await model.generate_content_async(
         [prompt],
         stream=False,
     )
-    return response.text
+    return response.text[0] if response.text else None
 
 
 def evaluate_task(
-        df,
-        prompt_col,
-        reference_col,
-        response_col,
-        experiment_name,
-        eval_metrics:,
-        eval_sample_n):
+        df: pd.DataFrame,
+        prompt_col: str,
+        reference_col: str,
+        response_col: str,
+        experiment_name: str,
+        eval_metrics: List[str],
+        eval_sample_n: int) -> Dict[str, float]:
+    
     """Evaluate task using Vertex AI Evaluation."""
 
     # Generate a unique id for the experiment run
@@ -86,7 +91,7 @@ def evaluate_task(
     return result.summary_metrics
 
 
-def print_df_rows(df, columns = None, n = 3):
+def print_df_rows(df: pd.DataFrame, columns: Optional[List[str]] = None, n: int = 3) -> None:
     """Print a subset of rows from a DataFrame."""
 
     # Define the base style for the text
@@ -107,8 +112,7 @@ def print_df_rows(df, columns = None, n = 3):
     # Iterate over the rows of the DataFrame
     for _, row in df.iterrows():
         for field in df.columns:
-            display(HTML(f"<span style='{header_style}'>{
-                    field.capitalize()}:</span>"))
+            display(HTML(f"<span style='{header_style}'>{field.capitalize()}:</span>"))
             display(HTML("<br>"))
             value = row[field]
             display(HTML(f"<span style='{base_style}'>{value}</span>"))
@@ -118,8 +122,7 @@ def print_df_rows(df, columns = None, n = 3):
         if printed_samples >= n:
             break
 
-
-def init_new_model(model_name):
+def init_new_model(model_name: str) -> GenerativeModel:
     """Initialize a new model."""
 
     # Initialize the model
@@ -140,7 +143,7 @@ def init_new_model(model_name):
     return model
 
 
-def plot_eval_metrics(eval_results, metrics = None):
+def plot_eval_metrics(eval_results: List[tuple[str, Dict[str, float]]], metrics: Optional[List[str]] = None) -> None:
     """Plot a bar plot for the evaluation results."""
 
     # Create data for the bar plot
@@ -149,7 +152,7 @@ def plot_eval_metrics(eval_results, metrics = None):
         title, summary_metrics = eval_result
         if metrics:
             summary_metrics = {
-                k: eval_result[k]
+                k: summary_metrics[k]
                 for k, v in summary_metrics.items()
                 if any(selected_metric in k for selected_metric in metrics)
             }
@@ -187,17 +190,17 @@ def plot_eval_metrics(eval_results, metrics = None):
 
 
 def get_results_file_uris(
-    output_uri,
-    required_files=[
+    output_uri: str,
+    required_files: List[str] = [
         "eval_results.json",
-        "templates.json"]):
+        "templates.json"]) -> Dict[str, str]:
     """Finds directories containing specific files under the given full GCS path."""
 
     # Create a path object for the given output URI
     path = epath.Path(output_uri)
 
     # Initialize a dictionary to store the results file URIs
-    results_file_uris = {}
+    results_file_uris: Dict[str, str] = {}
 
     # Iterate over the directories and files in the path
     for directory in path.iterdir():
@@ -210,11 +213,11 @@ def get_results_file_uris(
     return results_file_uris
 
 
-def get_best_template(template_uri):
+def get_best_template(template_uri: str) -> pd.DataFrame:
     """Retrieves and processes the best template."""
 
     # Define the metrics to consider for sorting
-    METRICS = [
+    METRICS: List[str] = [
         'bleu',
         'coherence',
         'exact_match',
@@ -236,11 +239,11 @@ def get_best_template(template_uri):
         'tool_name_match',
         'tool_parameter_key_match',
         'tool_parameter_kv_match']
-    COMPOSITE_METRIC = 'composite_metric'
+    COMPOSITE_METRIC: str = 'composite_metric'
 
     # Load templates from the URI
     with epath.Path(template_uri).open() as f:
-        templates = json.load(f)
+        templates: List[Dict] = json.load(f)
 
     # Process metrics for each template
     for template in templates:
@@ -278,18 +281,18 @@ def get_best_template(template_uri):
     return best_template_df
 
 
-def get_best_evaluation(best_template_df, eval_result_uri):
+def get_best_evaluation(best_template_df: pd.DataFrame, eval_result_uri: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Retrieves and processes the best evaluation."""
 
     # Load the evaluations from the URI
     with epath.Path(eval_result_uri).open() as f:
-        evaluations = json.load(f)
+        evaluations: Dict = json.load(f)
 
     # Get the best index from the best template DataFrame
     best_index = best_template_df['step'].iloc[0]
 
     # Retrieve the best evaluation based on the index
-    best_evaluation = evaluations[best_index]
+    best_evaluation: Dict = evaluations[best_index]
 
     # Create a DataFrame from the summary results
     summary_df = pd.DataFrame([best_evaluation['summary_results']])
@@ -303,7 +306,7 @@ def get_best_evaluation(best_template_df, eval_result_uri):
     return summary_df, metrics_df
 
 
-def get_optimization_result(template_uri, eval_result_uri):
+def get_optimization_result(template_uri: str, eval_result_uri: str) -> Union[Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame], None]:
     """Retrieves and processes the best template and evaluation results."""
 
     # Get the best template DataFrame
@@ -316,14 +319,14 @@ def get_optimization_result(template_uri, eval_result_uri):
     return best_template_df, summary_df, metrics_df
 
 
-def display_eval_report(eval_result, prompt_component='instruction'):
+def display_eval_report(eval_result: Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]], prompt_component: str ='instruction') -> None:
     """Displays evaluation results with optional filtering by metrics."""
 
     # Unpack the evaluation result
     best_template_df, summary_df, metrics_df = eval_result
 
     # Display the report title
-    display(Markdown("## APD - Report"))
+    display(Markdown("## Vertex AI Prompt Optimizer - Report"))
 
     # Display the prompt component title
     if prompt_component == 'instruction':
