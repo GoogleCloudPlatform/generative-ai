@@ -26,30 +26,30 @@ from vertexai import generative_models
 from vertexai.evaluation import EvalTask
 from vertexai.generative_models import GenerativeModel
 
-
 METRICS = [
-        'bleu',
-        'coherence',
-        'exact_match',
-        'fluidity',
-        'fulfillment',
-        'groundedness',
-        'rouge_1',
-        'rouge_2',
-        'rouge_l',
-        'rouge_l_sum',
-        'safety',
-        'question_answering_correctness',
-        'question_answering_helpfulness',
-        'question_answering_quality',
-        'question_answering_relevance',
-        'summarization_helpfulness',
-        'summarization_quality',
-        'summarization_verbosity',
-        'tool_name_match',
-        'tool_parameter_key_match',
-        'tool_parameter_kv_match']
-COMPOSITE_METRIC = 'composite_metric'
+    "bleu",
+    "coherence",
+    "exact_match",
+    "fluidity",
+    "fulfillment",
+    "groundedness",
+    "rouge_1",
+    "rouge_2",
+    "rouge_l",
+    "rouge_l_sum",
+    "safety",
+    "question_answering_correctness",
+    "question_answering_helpfulness",
+    "question_answering_quality",
+    "question_answering_relevance",
+    "summarization_helpfulness",
+    "summarization_quality",
+    "summarization_verbosity",
+    "tool_name_match",
+    "tool_parameter_key_match",
+    "tool_parameter_kv_match",
+]
+COMPOSITE_METRIC = "composite_metric"
 
 
 def get_id(length: Union[int, None] = 8) -> str:
