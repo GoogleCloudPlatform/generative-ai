@@ -217,7 +217,7 @@ def get_best_template(template_uri: str) -> pd.DataFrame:
     """Retrieves and processes the best template."""
 
     # Define the metrics to consider for sorting
-    METRICS: List[str] = [
+    METRICS = [
         'bleu',
         'coherence',
         'exact_match',
@@ -239,11 +239,11 @@ def get_best_template(template_uri: str) -> pd.DataFrame:
         'tool_name_match',
         'tool_parameter_key_match',
         'tool_parameter_kv_match']
-    COMPOSITE_METRIC: str = 'composite_metric'
+    COMPOSITE_METRIC = 'composite_metric'
 
     # Load templates from the URI
     with epath.Path(template_uri).open() as f:
-        templates: List[Dict] = json.load(f)
+        templates = json.load(f)
 
     # Process metrics for each template
     for template in templates:
@@ -286,7 +286,7 @@ def get_best_evaluation(best_template_df: pd.DataFrame, eval_result_uri: str) ->
 
     # Load the evaluations from the URI
     with epath.Path(eval_result_uri).open() as f:
-        evaluations: Dict = json.load(f)
+        evaluations = json.load(f)
 
     # Get the best index from the best template DataFrame
     best_index = best_template_df['step'].iloc[0]
