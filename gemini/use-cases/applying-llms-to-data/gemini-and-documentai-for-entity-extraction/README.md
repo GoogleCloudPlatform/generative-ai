@@ -1,4 +1,4 @@
-## Document AI and Gemini: Unlocking Entity Extraction Power
+# Document AI and Gemini: Unlocking Entity Extraction Power
 
 This repository contains a Python script that demonstrates how to harness the combined capabilities of Google Cloud's Document AI and Gemini API to extract entities from PDF documents. Explore the strengths and nuances of each API through a side-by-side comparison of their outputs, gaining valuable insights into their performance.
 
@@ -22,7 +22,7 @@ Document AI is a specialized at extracting data from a wide variety of documents
 
 Gemini is a family of large language models known for its capabilities in natural language understanding and generation. It excels at comprehending the nuances of human language, enabling it to perform tasks such as summarization, translation, question answering, and even creative writing.
 
-#### Gemini Use Cases:
+#### Gemini Use Cases
 
 - **Creating Chatbots and Virtual Assistants**: Gemini's natural language processing prowess empowers it to engage in dynamic conversations, providing personalized customer support or acting as an intelligent assistant across various applications.
 - **Generating Content**: Whether it's drafting emails, writing articles, or composing creative stories, Gemini can generate high-quality text based on given prompts or contexts.
@@ -38,13 +38,13 @@ While both tools offer entity extraction capabilities, their focus and strengths
 By comparing their results in entity extraction tasks, you gain insights into their unique approaches and potential trade-offs, enabling you to choose the right tool for specific needs.
 Moreover, combining the power of Document AI and Gemini can lead to innovative solutions. For instance, you can use Document AI to extract structured information from documents and then leverage Gemini to generate natural language summaries or insights based on the extracted data.
 
-## What You'll Gain:
+## What You'll Gain
 
 - Hands-on Experience: The included Python script provides a practical example of integrating Document AI and Gemini, allowing you to experiment with both APIs and explore their capabilities firsthand.
 - Deeper Understanding: The comparison of API results will shed light on the strengths and potential trade-offs of each tool, helping you make informed decisions for future projects.
 - Customization: The code serves as a foundation that you can adapt and extend for your own entity extraction needs, tailoring it to specific document types and entity types.
 
-## Key Features:
+## Key Features
 
 - Document AI Integration: The script utilizes Document AI's robust entity extraction capabilities, showcasing its ability to identify and classify key information within PDF documents.
 - Gemini API Interaction: The script leverages Gemini's natural language understanding to extract entities based on a carefully crafted prompt, demonstrating its versatility.
@@ -52,7 +52,7 @@ Moreover, combining the power of Document AI and Gemini can lead to innovative s
 
 ## Setup
 
-1. **Install Dependencies:**
+1. **Install Dependencies**
 
    ```bash
    pip install --upgrade google-cloud-aiplatform
@@ -61,7 +61,7 @@ Moreover, combining the power of Document AI and Gemini can lead to innovative s
 
    ```
 
-2. **Assumption:**
+2. **Assumption**
 
 This repository assumes, that this [codelab](https://www.cloudskillsboost.google/focuses/67855?parent=catalog) has been completed, that a dataset with the test documents is available and there exists a Document AI extractor.
 
