@@ -77,11 +77,11 @@ OUT_BUCKET_URI = f"gs://documentai-temp-{TEMP_BUCKET_URI}-unique"
 gsutil mb -l {LOCATION} -p {PROJECT_ID} {OUT_BUCKET_URI}
 ```
 
-# Diagram
+## Diagram
 
 ![alt text](diagram.png)
 
-# Code Overview
+## Code Overview
 
 - `test_doc_ai.py`: This script orchestrates the entire process:
 
@@ -97,7 +97,7 @@ gsutil mb -l {LOCATION} -p {PROJECT_ID} {OUT_BUCKET_URI}
 
 - `temp_file_uploader.py`: Handles uploading files to a temporary Google Cloud Storage location for processing.
 
-# Notes
+## Notes
 
 - Ensure that your Google Cloud project has the necessary APIs enabled (Document AI, Vertex AI, etc.).
 - The script is configured to process a single PDF file. You can modify it to process multiple files or handle different input sources.
