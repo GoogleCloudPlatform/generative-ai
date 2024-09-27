@@ -8,6 +8,8 @@ from temp_file_uploader import TempFileUploader
 
 
 class DocumentExtractor:
+    """Abstract base class for document extraction."""
+
     def __init__(
         self,
         project_id: str,
@@ -20,9 +22,7 @@ class DocumentExtractor:
         self.processor_id = processor_id
         self.processor_version_id = processor_version_id
         self.client = documentai.DocumentProcessorServiceClient(
-            client_options=ClientOptions(
-                api_endpoint=f"{location}-documentai.googleapis.com"
-            )
+            client_options=ClientOptions(api_endpoint=f"{location}-documentai.googleapis.com")
         )
         self.processor_name = self._get_proccessor_name()
 
@@ -35,9 +35,7 @@ class DocumentExtractor:
                 self.processor_version_id,
             )
         else:
-            return self.client.processor_path(
-                self.project_id, self.location, self.processor_id
-            )
+            return self.client.processor_path(self.project_id, self.location, self.processor_id)
 
     def process_document(self, file_path: str, mime_type: str) -> documentai.Document:
         raise NotImplementedError
@@ -56,9 +54,7 @@ class OnlineDocumentExtractor(DocumentExtractor):
 
         request = documentai.ProcessRequest(
             name=self.processor_name,
-            raw_document=documentai.RawDocument(
-                content=image_content, mime_type=mime_type
-            ),
+            raw_document=documentai.RawDocument(content=image_content, mime_type=mime_type),
         )
 
         result = self.client.process_document(request=request)
@@ -92,21 +88,15 @@ class BatchDocumentExtractor(DocumentExtractor):
         self.temp_file_uploader.delete_file()
         return document
 
-    def _process_document_batch(
-        self, gcs_input_uri: str, mime_type: str
-    ) -> documentai.Document:
-        gcs_document = documentai.GcsDocument(
-            gcs_uri=gcs_input_uri, mime_type=mime_type
-        )
+    def _process_document_batch(self, gcs_input_uri: str, mime_type: str) -> documentai.Document:
+        gcs_document = documentai.GcsDocument(gcs_uri=gcs_input_uri, mime_type=mime_type)
         gcs_documents = documentai.GcsDocuments(documents=[gcs_document])
         input_config = documentai.BatchDocumentsInputConfig(gcs_documents=gcs_documents)
 
         gcs_output_config = documentai.DocumentOutputConfig.GcsOutputConfig(
             gcs_uri=self.gcs_output_uri
         )
-        output_config = documentai.DocumentOutputConfig(
-            gcs_output_config=gcs_output_config
-        )
+        output_config = documentai.DocumentOutputConfig(gcs_output_config=gcs_output_config)
 
         request = documentai.BatchProcessRequest(
             name=self.processor_name,
@@ -136,9 +126,7 @@ class BatchDocumentExtractor(DocumentExtractor):
                 continue
 
             output_bucket, output_prefix = matches.groups()
-            output_blobs = self.storage_client.list_blobs(
-                output_bucket, prefix=output_prefix
-            )
+            output_blobs = self.storage_client.list_blobs(output_bucket, prefix=output_prefix)
             for blob in output_blobs:
                 if blob.content_type == "application/json":
                     print(f"Fetching {blob.name}")

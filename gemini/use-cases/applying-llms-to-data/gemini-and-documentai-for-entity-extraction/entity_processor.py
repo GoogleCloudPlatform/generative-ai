@@ -6,11 +6,15 @@ from vertexai.generative_models import GenerativeModel, Part
 
 
 class EntityExtractor:
-    def extract_entities(self) -> List[Dict]:
+    """abstract class representing an entity"""
+
+    def extract_entities(self) -> Dict:
         raise NotImplementedError()
 
 
 class DocumentAIEntityExtractor(EntityExtractor):
+    """Class for Document AI entity extraction"""
+
     def __init__(self, document):
         self.document = document
 
@@ -22,6 +26,8 @@ class DocumentAIEntityExtractor(EntityExtractor):
 
 
 class ModelBasedEntityExtractor(EntityExtractor):
+    """Class for Gemini entity extraction"""
+
     def __init__(self, model_version, prompt, file_path):
         self.model = GenerativeModel(model_version)
         self.prompt = prompt
@@ -30,7 +36,7 @@ class ModelBasedEntityExtractor(EntityExtractor):
             raise ValueError("Only PDF files are supported, aborting")
         self.file_path = file_path
 
-    def extract_entities(self) -> List[Dict]:
+    def extract_entities(self) -> Dict:
         pdf_file = Part.from_uri(self.file_path, mime_type="application/pdf")
         contents = [pdf_file, self.prompt]
         response = self.model.generate_content(contents)
