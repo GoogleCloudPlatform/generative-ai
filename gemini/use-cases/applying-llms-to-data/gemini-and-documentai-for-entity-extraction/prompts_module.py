@@ -45,7 +45,7 @@ def get_extract_entities_prompt():
       "Employer Identification Number (EIN)": "**-*******",
       "Employee's Name": "John Doe",
       "Employer's Name": "Acme Corporation",
-      "Employer's Address": "123 Main Street, Anytown, USA",
+      "Employer's Address": "123 Main Street, Town, USA",
       "Control Number": "12345",
       "Wages, Tips, and Other Compensation (Box 1)": "50000.00",
       "Federal Income Tax Withheld (Box 2)": "5000.00",
