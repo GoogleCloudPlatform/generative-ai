@@ -558,6 +558,7 @@ rarians
 ratelimit
 redef
 repreve
+reranked
 reranker
 reranking
 reranks
@@ -653,7 +654,3 @@ ylabel
 ytd
 yticks
 zaxis
-reranker
-reranking
-reranks
-reranked
