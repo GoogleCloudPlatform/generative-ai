@@ -1,4 +1,5 @@
 AFX
+AGG
 AIP
 AMNOSH
 ANZ
@@ -583,6 +584,7 @@ subviews
 subword
 supima
 sxs
+tabular
 tagline
 tencel
 termcolor
