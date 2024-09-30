@@ -559,6 +559,8 @@ ratelimit
 redef
 repreve
 reranker
+reranking
+reranks
 ribeye
 ringspun
 rpet
