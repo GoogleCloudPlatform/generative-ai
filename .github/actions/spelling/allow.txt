@@ -559,6 +559,8 @@ ratelimit
 redef
 repreve
 reranker
+reranking
+reranks
 ribeye
 ringspun
 rpet
@@ -651,6 +653,3 @@ ylabel
 ytd
 yticks
 zaxis
-reranker
-reranking
-reranks
