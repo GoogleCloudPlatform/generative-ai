@@ -1,4 +1,5 @@
 AFX
+AGG
 AIP
 AMNOSH
 ANZ
@@ -300,11 +301,13 @@ baxis
 bbc
 bigquery
 bitcoin
+boundings
 bpa
 bqml
 carbonara
 caudatus
 caxis
+cctv
 cfbundle
 chatbots
 claude
@@ -346,6 +349,7 @@ drinkware
 dropdown
 dropna
 dsl
+dtype
 dtypes
 dwmapi
 ecommerce
@@ -368,6 +372,7 @@ figsize
 fillmode
 firestore
 flac
+floormat
 fmeasure
 fontdict
 forno
@@ -378,6 +383,7 @@ fromiter
 fts
 fulltext
 funtion
+gapic
 gboolean
 gchar
 gcloud
@@ -422,6 +428,7 @@ idk
 idks
 idxs
 iloc
+imagefont
 imageno
 imdb
 imshow
@@ -529,6 +536,7 @@ projectid
 protobuf
 pstotext
 pubspec
+putalpha
 putdata
 pvc
 pyautogen
@@ -569,6 +577,7 @@ siglap
 sittin
 sklearn
 sku
+snowboard
 sourced
 srlimit
 ssd
@@ -583,6 +592,7 @@ subviews
 subword
 supima
 sxs
+tabular
 tagline
 tencel
 termcolor
