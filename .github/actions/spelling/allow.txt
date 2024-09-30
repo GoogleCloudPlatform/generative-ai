@@ -1,5 +1,6 @@
 AFX
 AIP
+AMNOSH
 ANZ
 APIENTRY
 APSTUDIO
@@ -13,6 +14,7 @@ Ashish
 Aspeed
 Autechre
 Autorater
+BIKBEAR
 BITCODE
 Benno
 Bettes
@@ -27,6 +29,8 @@ CHECKOV
 COCOAPODS
 COINIT
 CONOUT
+CUCUONAR
+CWLEY
 CZE
 Caprese
 Codelab
@@ -130,6 +134,7 @@ LRESULT
 LSTATUS
 LSum
 LTRB
+LUVBPTK
 Ladhak
 Lego
 Llion
@@ -299,6 +304,7 @@ boundings
 bpa
 bqml
 carbonara
+caudatus
 caxis
 cctv
 cfbundle
