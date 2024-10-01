@@ -72,3 +72,4 @@
 /generative-ai/open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb       @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/open-models/serving/vertex_ai_text_generation_inference_gemma.ipynb  @alvarobartt @philschmid @pagezyhf @jeffboudier
 /generative-ai/gemini/use-cases/applying-llms-to-data/semantic-search-in-bigquery/stackoverflow_questions_semantic_search.ipynb     @sethijaideep @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/raw_with_bigquery.ipynb @jeffonelson @GoogleCloudPlatform/generative-ai-devrel
