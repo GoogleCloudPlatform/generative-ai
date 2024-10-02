@@ -309,13 +309,15 @@ with tab3:
         horizontal=True,
     )
 
-    image_undst, screens_undst, diagrams_undst, recommendations, sim_diff = st.tabs([
-        "Furniture recommendation",
-        "Oven instructions",
-        "ER diagrams",
-        "Glasses recommendation",
-        "Math reasoning",
-    ])
+    image_undst, screens_undst, diagrams_undst, recommendations, sim_diff = st.tabs(
+        [
+            "Furniture recommendation",
+            "Oven instructions",
+            "ER diagrams",
+            "Glasses recommendation",
+            "Math reasoning",
+        ]
+    )
 
     with image_undst:
         st.markdown(

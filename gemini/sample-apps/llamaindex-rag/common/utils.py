@@ -43,7 +43,6 @@ DATA_PATH = config["data_path"]
 
 
 class Blob:
-
     def __init__(self, path: str, mimetype: str):
         self.path = path
         self.mimetype = mimetype

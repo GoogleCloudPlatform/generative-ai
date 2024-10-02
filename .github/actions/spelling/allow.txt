@@ -476,6 +476,7 @@ lexer
 linalg
 linecolor
 linted
+linting
 llm
 llms
 logprobs

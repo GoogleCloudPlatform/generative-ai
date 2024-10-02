@@ -42,16 +42,20 @@ CUSTOM_UI_DATASTORE_IDS = [
 ]
 
 
-IMAGE_SEARCH_DATASTORE_IDs = [{
-    "name": "Google Merchandise Store",
-    "engine_id": "google-merch-store",
-}]
+IMAGE_SEARCH_DATASTORE_IDs = [
+    {
+        "name": "Google Merchandise Store",
+        "engine_id": "google-merch-store",
+    }
+]
 
-RECOMMENDATIONS_DATASTORE_IDs = [{
-    "name": "arXiv Natural Language Papers",
-    "datastore_id": "arxiv",
-    "engine_id": "arxiv-personalize",
-}]
+RECOMMENDATIONS_DATASTORE_IDs = [
+    {
+        "name": "arXiv Natural Language Papers",
+        "datastore_id": "arxiv",
+        "engine_id": "arxiv-personalize",
+    }
+]
 
 # iso639-1 code
 # First Index will be default selection

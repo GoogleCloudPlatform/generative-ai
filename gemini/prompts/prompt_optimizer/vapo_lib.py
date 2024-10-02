@@ -183,16 +183,18 @@ def run_custom_job(
     container_args: dict[str, str],
 ) -> str:
     """A sample to create custom jobs."""
-    worker_pool_specs = [{
-        "replica_count": 1,
-        "container_spec": {
-            "image_uri": container_uri,
-            "args": [f"--{k}={v}" for k, v in container_args.items()],
-        },
-        "machine_spec": {
-            "machine_type": "n1-standard-4",
-        },
-    }]
+    worker_pool_specs = [
+        {
+            "replica_count": 1,
+            "container_spec": {
+                "image_uri": container_uri,
+                "args": [f"--{k}={v}" for k, v in container_args.items()],
+            },
+            "machine_spec": {
+                "machine_type": "n1-standard-4",
+            },
+        }
+    ]
 
     custom_job = aiplatform.CustomJob(
         display_name=display_name,
@@ -653,10 +655,12 @@ class ResultsUI:
 
     def get_container(self) -> widgets.Output:
         """Get the container widget for the results UI."""
-        return widgets.VBox([
-            self.run_label,
-            self.run_dropdown,
-            self.dropdown_description,
-            self.template_dropdown,
-            self.results_output,
-        ])
+        return widgets.VBox(
+            [
+                self.run_label,
+                self.run_dropdown,
+                self.dropdown_description,
+                self.template_dropdown,
+                self.results_output,
+            ]
+        )

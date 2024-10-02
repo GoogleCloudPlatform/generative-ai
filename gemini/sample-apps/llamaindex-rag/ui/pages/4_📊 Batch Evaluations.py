@@ -174,12 +174,14 @@ if uploaded_file is not None:
             questions = response.get("question", [])
 
             # Create a DataFrame for easier manipulation
-            df = pd.DataFrame({
-                "Question": questions,
-                "Overall Score": scores,
-                "Faithfulness": faithfulness_scores,
-                "Answer Relevancy": answer_relevancy_scores,
-            })
+            df = pd.DataFrame(
+                {
+                    "Question": questions,
+                    "Overall Score": scores,
+                    "Faithfulness": faithfulness_scores,
+                    "Answer Relevancy": answer_relevancy_scores,
+                }
+            )
 
             # Create an ordered list of questions
             ordered_questions = df["Question"].tolist()
