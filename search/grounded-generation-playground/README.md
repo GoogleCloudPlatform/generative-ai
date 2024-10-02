@@ -58,7 +58,7 @@ With RAG, we can retrieve relevant information from external sources (like Googl
 
    Modify the `.env` file with your project details.
 
-   ```
+   ```bash
    PROJECT_ID=your-google-cloud-project-id
    PROJECT_NUMBER=your-google-cloud-project-number
    LOCATION=your-google-cloud-project-location (e.g., us-central1)
