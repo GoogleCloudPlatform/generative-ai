@@ -1,4 +1,4 @@
-def get_extract_entities_prompt():
+def get_extract_entities_prompt() -> str:
     return """
     Task: Extract W-2 Tax Form Information
 
@@ -63,12 +63,12 @@ def get_extract_entities_prompt():
         "State Income Tax Withheld": "2000.00",
         "Local Wages, Tips, Etc.": "0.00",
         "Local Income Tax Withheld": "0.00",
-        "Locality Name":"" 
+        "Locality Name":""
     }
     """
 
 
-def get_compare_entities_prompt():
+def get_compare_entities_prompt() -> str:
     return """
     **Analyze and compare the following two outputs, one from DocumentAI and the other from Gemini. Identify and list the following:**
 

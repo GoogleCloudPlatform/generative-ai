@@ -15,7 +15,7 @@ class EntityExtractor:
 class DocumentAIEntityExtractor(EntityExtractor):
     """Class for Document AI entity extraction"""
 
-    def __init__(self, document):
+    def __init__(self, document) -> None:
         self.document = document
 
     def extract_entities(self) -> Dict:
@@ -28,7 +28,7 @@ class DocumentAIEntityExtractor(EntityExtractor):
 class ModelBasedEntityExtractor(EntityExtractor):
     """Class for Gemini entity extraction"""
 
-    def __init__(self, model_version, prompt, file_path):
+    def __init__(self, model_version, prompt, file_path) -> None:
         self.model = GenerativeModel(model_version)
         self.prompt = prompt
         mime_type = mimetypes.guess_type(file_path)[0]

@@ -6,7 +6,7 @@ from google.cloud import storage
 class TempFileUploader:
     """Class with methods to work with files in GCS"""
 
-    def __init__(self, gcs_temp_uri):
+    def __init__(self, gcs_temp_uri) -> None:
         path_parts = gcs_temp_uri.replace("gs://", "").split("/")
         self.temp_bucket_name = path_parts[0]
         self.temp_file_path_gcs = "/".join(path_parts[1:])
@@ -19,19 +19,17 @@ class TempFileUploader:
         destination_blob_name = f"{self.temp_file_path_gcs}{file_id}.{file_extension}"
         return destination_blob_name
 
-    def upload_file(self, file_path: str):
+    def upload_file(self, file_path: str) -> str:
         self.destination_blob_name = self._get_destination_blob_name(file_path)
 
         bucket = self.storage_client.bucket(self.temp_bucket_name)
         blob = bucket.blob(self.destination_blob_name)
         blob.upload_from_filename(file_path)
 
-        gcs_destination_uri = (
-            f"gs://{self.temp_bucket_name}/{self.destination_blob_name}"
-        )
+        gcs_destination_uri = f"gs://{self.temp_bucket_name}/{self.destination_blob_name}"
         return gcs_destination_uri
 
-    def delete_file(self):
+    def delete_file(self) -> None:
         if self.destination_blob_name:
             bucket = self.storage_client.bucket(self.temp_bucket_name)
             blob = bucket.blob(self.destination_blob_name)
