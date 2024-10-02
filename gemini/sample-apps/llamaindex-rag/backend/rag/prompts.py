@@ -1,4 +1,5 @@
 """Prompt management class"""
+
 from dataclasses import asdict, dataclass, field
 
 SYSTEM_PROMPT = "You are an expert assistant specializing in \
