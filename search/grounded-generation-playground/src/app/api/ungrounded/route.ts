@@ -19,12 +19,12 @@
  *
  *
  */
-import { NextRequest, NextResponse } from "next/server";
-import { VertexAI } from "@google-cloud/vertexai";
+import { NextRequest, NextResponse } from 'next/server';
+import { VertexAI } from '@google-cloud/vertexai';
 
 const PROJECT_ID = process.env.PROJECT_ID;
 const LOCATION = process.env.LOCATION;
-const MODEL = "gemini-1.5-flash-001";
+const MODEL = 'gemini-1.5-flash-001';
 
 export async function POST(req: NextRequest) {
   const { query, model, googleGrounding, vertexGrounding } = await req.json();
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   const request = {
     contents: [
       {
-        role: "user",
+        role: 'user',
         parts: [{ text: query }],
       },
     ],
@@ -49,10 +49,10 @@ export async function POST(req: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      console.log("Received POST request to /api/ungrounded");
+      console.log('Received POST request to /api/ungrounded');
       const result = await generativeModel.generateContentStream(request);
       for await (const item of result.stream) {
-        const chunk = item.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+        const chunk = item.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
         controller.enqueue(new TextEncoder().encode(chunk));
       }
       controller.close();

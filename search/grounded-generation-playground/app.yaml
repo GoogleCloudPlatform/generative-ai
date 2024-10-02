@@ -16,8 +16,8 @@ runtime: nodejs
 env: flex
 
 runtime_config:
-  operating_system: "ubuntu22"
-  runtime_version: "20"
+  operating_system: 'ubuntu22'
+  runtime_version: '20'
 
 service: gg-demo-nextjs
 # Ensure all files are served
@@ -26,6 +26,6 @@ handlers:
     script: auto
 # Optional: Add env variables of your choice
 env_variables:
-  PROJECT_ID: "your-project-id"
-  LOCATION: "your-location"
-  PROJECT_NUMBER: "your-project-number"
+  PROJECT_ID: 'your-project-id'
+  LOCATION: 'your-location'
+  PROJECT_NUMBER: 'your-project-number'

@@ -15,14 +15,14 @@
  */
 
 /* accordion.css */
-@import url("/global.css");
+@import url('/global.css');
 
 :root {
   --accordion-bg-color: hsl(var(--background));
   --accordion-text-color: hsl(var(--foreground));
   --accordion-border-color: hsl(var(--border));
   --accordion-hover-bg-color: hsl(var(--muted));
-  --accordion-content-bg-color: hsl(var(--muted) / 50%);
+  --AccordionContent-bg-color: hsl(var(--muted) / 50%);
 }
 
 .dark {
@@ -30,26 +30,26 @@
   --accordion-text-color: hsl(var(--foreground));
   --accordion-border-color: hsl(var(--border));
   --accordion-hover-bg-color: hsl(var(--muted));
-  --accordion-content-bg-color: hsl(var(--muted) / 30%);
+  --AccordionContent-bg-color: hsl(var(--muted) / 30%);
 }
 
-.accordion-root {
+.AccordionRoot {
   @apply w-full rounded-md border border-[--accordion-border-color] bg-[--accordion-bg-color] shadow-sm;
 }
 
-.accordion-item {
+.AccordionItem {
   @apply overflow-hidden first:rounded-t-md last:rounded-b-md focus-within:relative focus-within:z-10 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;
 }
 
-.accordion-trigger {
+.AccordionTrigger {
   @apply flex w-full items-center justify-between bg-[--accordion-bg-color] px-4 py-4 font-medium transition-all hover:bg-[--accordion-hover-bg-color] [&[data-state=open]>svg]:rotate-180;
 }
 
-.accordion-content {
-  @apply overflow-hidden text-sm bg-[--accordion-content-bg-color] transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down;
+.AccordionContent {
+  @apply overflow-hidden text-sm bg-[--AccordionContent-bg-color] transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down;
 }
 
-.accordion-chevron {
+.AccordionChevron {
   @apply h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200;
 }
 
@@ -57,17 +57,15 @@
   from {
     height: 0;
   }
-
   to {
-    height: var(--radix-accordion-content-height);
+    height: var(--radix-AccordionContent-height);
   }
 }
 
 @keyframes accordion-up {
   from {
-    height: var(--radix-accordion-content-height);
+    height: var(--radix-AccordionContent-height);
   }
-
   to {
     height: 0;
   }
@@ -78,7 +76,6 @@
   .animate-accordion-down {
     animation: accordion-down 0.2s ease-out;
   }
-
   .animate-accordion-up {
     animation: accordion-up 0.2s ease-out;
   }

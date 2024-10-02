@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-"use client";
+'use client';
 
-import React, { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { Send, Trash2, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import Icon, { IconSpinner, IconGemini } from "@/components/ui/icons";
-import PageSidebar from "@/components/ui/page-sidebar";
-import AboutPageContent from "@/components/ui/about-page-content";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import GroundedTextBlock from "@/components/ui/grounded-text-block";
-import { makeExampleQuestions } from "@/lib/grounding_option_utils";
-import ExampleQuestionGreeting from "@/components/ui/example-question-greeting";
+import React, { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { Send, Trash2, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import Icon, { IconSpinner, IconGemini } from '@/components/ui/icons';
+import PageSidebar from '@/components/ui/page-sidebar';
+import AboutPageContent from '@/components/ui/about-page-content';
+import { Card, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+import GroundedTextBlock from '@/components/ui/grounded-text-block';
+import { makeExampleQuestions } from '@/lib/grounding_option_utils';
+import ExampleQuestionGreeting from '@/components/ui/example-question-greeting';
 
 interface Message {
-  role: "user" | "model";
+  role: 'user' | 'model';
   content: string;
   searchEntryPoint?: string;
   groundingSupport?: GroundingSupport[];
@@ -72,34 +72,33 @@ interface ExampleQuestion {
 
 export default function AppPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [exampleQuestions, setExampleQuestions] = useState<ExampleQuestion[]>(
-    makeExampleQuestions(),
-  );
+  const [exampleQuestions, setExampleQuestions] =
+    useState<ExampleQuestion[]>(makeExampleQuestions());
   const [googleGrounding, setGoogleGrounding] = useState(true);
   const [vertexGrounding, setVertexGrounding] = useState(false);
   const [groundingOptions, setGroundingOptionsState] = useState<string[]>([]);
   const [vertexConfigId, setVertexConfigId] = useState(
-    "projects/503991587623/locations/global/collections/default_collection/engines/test-gg_1724941548160/servingConfigs/default_search",
+    'projects/503991587623/locations/global/collections/default_collection/engines/test-gg_1724941548160/servingConfigs/default_search',
   );
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState("");
+  const [inputMessage, setInputMessage] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash-001");
+  const [selectedModel, setSelectedModel] = useState('gemini-1.5-flash-001');
   const [temperature, setTemperature] = useState(0.2);
   const [retrievalThreshold, setRetrievalThreshold] = useState(0.5);
-  const [activeTab, setActiveTab] = useState("chat");
-  const [activeAboutTab, setActiveAboutTab] = useState("javascript");
+  const [activeTab, setActiveTab] = useState('chat');
+  const [activeAboutTab, setActiveAboutTab] = useState('javascript');
   const [responses, setResponses] = useState<{
     grounded: ResponseData;
     ungrounded: ResponseData;
   }>({
     grounded: {
-      text: "",
+      text: '',
       groundingSupport: [],
       supportChunks: [],
-      searchEntryPoint: "",
+      searchEntryPoint: '',
     },
-    ungrounded: { text: "", groundingSupport: [], supportChunks: [] },
+    ungrounded: { text: '', groundingSupport: [], supportChunks: [] },
   });
   const [showResponses, setShowResponses] = useState(false);
 
@@ -110,7 +109,7 @@ export default function AppPage() {
 
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
@@ -121,15 +120,15 @@ export default function AppPage() {
   };
 
   const sendMessage = async (inputMessage: string) => {
-    const newUserMessage: Message = { role: "user", content: inputMessage };
+    const newUserMessage: Message = { role: 'user', content: inputMessage };
     setMessages((prevMessages) => [...prevMessages, newUserMessage]);
-    setInputMessage("");
+    setInputMessage('');
     setIsStreaming(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...messages, newUserMessage],
           model: selectedModel,
@@ -143,13 +142,13 @@ export default function AppPage() {
       });
 
       if (!response.body) {
-        throw new Error("Response body is null");
+        throw new Error('Response body is null');
       }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let accumulatedResponse = "";
-      let currentMessage: Message = { role: "model", content: "" };
+      let accumulatedResponse = '';
+      let currentMessage: Message = { role: 'model', content: '' };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -159,8 +158,8 @@ export default function AppPage() {
         accumulatedResponse += chunk;
 
         let jsonChunk;
-        while (accumulatedResponse.includes("\n")) {
-          const newlineIndex = accumulatedResponse.indexOf("\n");
+        while (accumulatedResponse.includes('\n')) {
+          const newlineIndex = accumulatedResponse.indexOf('\n');
           const jsonString = accumulatedResponse.slice(0, newlineIndex);
           accumulatedResponse = accumulatedResponse.slice(newlineIndex + 1);
 
@@ -180,14 +179,14 @@ export default function AppPage() {
             }
             setMessages((prevMessages) => {
               const lastMessage = prevMessages[prevMessages.length - 1];
-              if (lastMessage.role === "model") {
+              if (lastMessage.role === 'model') {
                 return [...prevMessages.slice(0, -1), { ...currentMessage }];
               } else {
                 return [...prevMessages, { ...currentMessage }];
               }
             });
           } catch (error) {
-            console.error("Error parsing JSON:", error);
+            console.error('Error parsing JSON:', error);
           }
         }
       }
@@ -210,20 +209,20 @@ export default function AppPage() {
           }
           setMessages((prevMessages) => {
             const lastMessage = prevMessages[prevMessages.length - 1];
-            if (lastMessage.role === "model") {
+            if (lastMessage.role === 'model') {
               return [...prevMessages.slice(0, -1), { ...currentMessage }];
             } else {
               return [...prevMessages, { ...currentMessage }];
             }
           });
         } catch (error) {
-          console.error("Error parsing JSON:", error);
+          console.error('Error parsing JSON:', error);
         }
       }
     } catch (error) {
-      console.error("Error in chat request:", error);
+      console.error('Error in chat request:', error);
     } finally {
-      console.log("setting isStreaming false");
+      console.log('setting isStreaming false');
       setIsStreaming(false);
     }
   };
@@ -238,19 +237,19 @@ export default function AppPage() {
     setIsStreaming(true);
     setResponses({
       grounded: {
-        text: "",
+        text: '',
         groundingSupport: [],
         supportChunks: [],
-        searchEntryPoint: "",
+        searchEntryPoint: '',
       },
-      ungrounded: { text: "", groundingSupport: [], supportChunks: [] },
+      ungrounded: { text: '', groundingSupport: [], supportChunks: [] },
     });
     setShowResponses(true);
 
     const fetchGroundedStream = async () => {
-      const response = await fetch("/api/grounded", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/grounded', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: inputMessage,
           model: selectedModel,
@@ -263,23 +262,23 @@ export default function AppPage() {
       });
 
       if (!response.body) {
-        console.error("Response body is null");
+        console.error('Response body is null');
         return {
-          text: "",
+          text: '',
           groundingSupport: [],
           supportChunks: [],
-          searchEntryPoint: "",
+          searchEntryPoint: '',
         };
       }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = "";
+      let buffer = '';
       let result: ResponseData = {
-        text: "",
+        text: '',
         groundingSupport: [],
         supportChunks: [],
-        searchEntryPoint: "",
+        searchEntryPoint: '',
       };
 
       while (true) {
@@ -289,7 +288,7 @@ export default function AppPage() {
         buffer += decoder.decode(value, { stream: true });
 
         let newlineIndex;
-        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+        while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
           const jsonString = buffer.slice(0, newlineIndex);
           buffer = buffer.slice(newlineIndex + 1);
 
@@ -314,7 +313,7 @@ export default function AppPage() {
               ];
             }
           } catch (error) {
-            console.error("Error parsing JSON:", error);
+            console.error('Error parsing JSON:', error);
           }
         }
 
@@ -347,7 +346,7 @@ export default function AppPage() {
             ];
           }
         } catch (error) {
-          console.error("Error parsing JSON in remaining buffer:", error);
+          console.error('Error parsing JSON in remaining buffer:', error);
         }
       }
 
@@ -355,9 +354,9 @@ export default function AppPage() {
     };
 
     const fetchUngroundedStream = async () => {
-      const response = await fetch("/api/ungrounded", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/ungrounded', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: inputMessage,
           model: selectedModel,
@@ -365,14 +364,14 @@ export default function AppPage() {
       });
 
       if (!response.body) {
-        console.error("Response body is null");
-        return { text: "", groundingSupport: [], supportChunks: [] };
+        console.error('Response body is null');
+        return { text: '', groundingSupport: [], supportChunks: [] };
       }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let result: ResponseData = {
-        text: "",
+        text: '',
         groundingSupport: [],
         supportChunks: [],
       };
@@ -426,7 +425,7 @@ export default function AppPage() {
                 className="text-2xl font-semibold text-transparent bg-clip-text"
                 style={{
                   backgroundImage:
-                    "linear-gradient(72.83deg, #4285F4 11.63%, #9b72cb 40.43%, #d96570 68.07%)",
+                    'linear-gradient(72.83deg, #4285F4 11.63%, #9b72cb 40.43%, #d96570 68.07%)',
                 }}
               >
                 Vertex Grounded Generation Playground
@@ -437,11 +436,7 @@ export default function AppPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-black">
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-              <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-              >
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-3 mb-6 bg-zinc-800">
                   <TabsTrigger
                     value="chat"
@@ -469,43 +464,36 @@ export default function AppPage() {
                       <div
                         key={index}
                         className={cn(
-                          "flex mb-4",
-                          message.role === "user"
-                            ? "justify-end"
-                            : "justify-start",
+                          'flex mb-4',
+                          message.role === 'user' ? 'justify-end' : 'justify-start',
                         )}
                       >
                         <div
                           className={cn(
-                            "flex on-hover-show items-start max-w-[80%]",
-                            message.role === "user"
-                              ? "flex-row-reverse"
-                              : "flex-row",
+                            'flex on-hover-show items-start max-w-[80%]',
+                            message.role === 'user' ? 'flex-row-reverse' : 'flex-row',
                           )}
                         >
                           <div
                             className={cn(
-                              "min-w-8 w-8 h-8 rounded-full flex items-center justify-center",
-                              message.role === "user"
-                                ? "bg-white ml-2"
-                                : "bg-zinc-700 mr-2",
+                              'min-w-8 w-8 h-8 rounded-full flex items-center justify-center',
+                              message.role === 'user'
+                                ? 'bg-white ml-2'
+                                : 'bg-zinc-700 mr-2',
                             )}
                           >
-                            <Icon
-                              type={message.role}
-                              className="h-7 w-7 text-black"
-                            />
+                            <Icon type={message.role} className="h-7 w-7 text-black" />
                           </div>
                           <Card
                             className={cn(
-                              "rounded-2xl",
-                              message.role === "user"
-                                ? "bg-zinc-200 text-black"
-                                : "bg-zinc-800 text-white",
+                              'rounded-2xl',
+                              message.role === 'user'
+                                ? 'bg-zinc-200 text-black'
+                                : 'bg-zinc-800 text-white',
                             )}
                           >
                             <CardContent className="p-3">
-                              {message.role === "user" ? (
+                              {message.role === 'user' ? (
                                 <ReactMarkdown
                                   remarkPlugins={[remarkGfm]}
                                   className="prose max-w-none text-sm text-black"
@@ -523,7 +511,7 @@ export default function AppPage() {
                               )}
                             </CardContent>
                           </Card>
-                          {message.role === "user" && (
+                          {message.role === 'user' && (
                             <div className="m-2 on-hover-show-this">
                               <Button
                                 className="p-2 bg-zinc-700 rounded-full"
@@ -544,16 +532,14 @@ export default function AppPage() {
                         onClick={sendMessage}
                       />
                     ) : (
-                      ""
+                      ''
                     )}
                     {isStreaming && (
                       <div className="flex items-center justify-center">
                         <div className="flex items-center space-x-2 bg-zinc-800 rounded-full px-4 py-2">
                           <IconGemini className="h-5 w-5 text-white" />
                           <IconSpinner className="h-4 w-4 text-white" />
-                          <span className="text-sm text-white">
-                            Thinking...
-                          </span>
+                          <span className="text-sm text-white">Thinking...</span>
                         </div>
                       </div>
                     )}
@@ -561,10 +547,7 @@ export default function AppPage() {
                     <div ref={messagesEndRef} />
                   </ScrollArea>
                   <div className="mt-4">
-                    <form
-                      onSubmit={handleMessageFormSubmit}
-                      className="flex space-x-2"
-                    >
+                    <form onSubmit={handleMessageFormSubmit} className="flex space-x-2">
                       <Input
                         type="text"
                         placeholder="Type your message..."
@@ -575,7 +558,7 @@ export default function AppPage() {
                       <Button
                         type="submit"
                         disabled={isStreaming || !inputMessage.trim()}
-                        className={` h-10 bg-blue-600 text-white hover:bg-blue-700 ${isStreaming || !inputMessage.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={` h-10 bg-blue-600 text-white hover:bg-blue-700 ${isStreaming || !inputMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <Send className="h-4 w-4" />
                       </Button>
@@ -611,7 +594,7 @@ export default function AppPage() {
                         <Button
                           type="submit"
                           disabled={isStreaming || !inputMessage.trim()}
-                          className={`h-10 bg-blue-600 text-white hover:bg-blue-700 ${isStreaming || !inputMessage.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
+                          className={`h-10 bg-blue-600 text-white hover:bg-blue-700 ${isStreaming || !inputMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           {isStreaming ? (
                             <div className="flex items-center">
@@ -640,21 +623,15 @@ export default function AppPage() {
                               <GroundedTextBlock
                                 role="model"
                                 content={responses.grounded.text}
-                                groundingSupport={
-                                  responses.grounded.groundingSupport
-                                }
+                                groundingSupport={responses.grounded.groundingSupport}
                                 supportChunks={responses.grounded.supportChunks}
-                                searchEntryPoint={
-                                  responses.grounded.searchEntryPoint
-                                }
+                                searchEntryPoint={responses.grounded.searchEntryPoint}
                               />
                             ) : (
                               <div className="flex items-center justify-center space-x-2">
                                 <IconGemini className="h-5 w-5 text-white" />
                                 <IconSpinner className="h-4 w-4 text-white" />
-                                <span className="text-sm text-white">
-                                  Thinking...
-                                </span>
+                                <span className="text-sm text-white">Thinking...</span>
                               </div>
                             )}
                           </div>
@@ -672,9 +649,7 @@ export default function AppPage() {
                               <div className="flex items-center justify-center space-x-2">
                                 <IconGemini className="h-5 w-5 text-white" />
                                 <IconSpinner className="h-4 w-4 text-white" />
-                                <span className="text-sm text-white">
-                                  Thinking...
-                                </span>
+                                <span className="text-sm text-white">Thinking...</span>
                               </div>
                             )}
                           </div>
@@ -688,8 +663,7 @@ export default function AppPage() {
                   <div className="space-y-6">
                     <div className="text-left mb-8">
                       <p className="text-xl text-gray-300 mb-6">
-                        API reference & Infromation about selected grounding
-                        sources.
+                        API reference & Infromation about selected grounding sources.
                         <a
                           href="https://cloud.google.com/generative-ai-app-builder/docs/grounded-gen"
                           target="_blank"

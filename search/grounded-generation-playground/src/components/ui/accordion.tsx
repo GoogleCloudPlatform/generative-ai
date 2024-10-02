@@ -15,12 +15,12 @@
  */
 
 // accordion.tsx
-"use client";
+'use client';
 
-import React from "react";
-import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import * as AccordionPrimitive from '@radix-ui/react-accordion';
+import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Accordion = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Root>,
@@ -29,30 +29,27 @@ const Accordion = React.forwardRef<
   <AccordionPrimitive.Root
     ref={ref}
     className={cn(
-      "rounded-md border border-[--accordion-border-color] bg-[--accordion-bg-color] shadow-sm",
+      'rounded-md border border-[--accordion-border-color] bg-[--accordion-bg-color] shadow-sm',
       className,
     )}
     {...props}
   />
 ));
-Accordion.displayName = "Accordion";
+Accordion.displayName = 'Accordion';
 
-const accordion-item = React.forwardRef<
+const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
   <AccordionPrimitive.Item
     ref={ref}
-    className={cn(
-      "border-b border-[--accordion-border-color] last:border-0",
-      className,
-    )}
+    className={cn('border-b border-[--accordion-border-color] last:border-0', className)}
     {...props}
   />
 ));
-accordion-item.displayName = "accordion-item";
+AccordionItem.displayName = 'AccordionItem';
 
-const accordion-trigger = React.forwardRef<
+const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => (
@@ -60,8 +57,8 @@ const accordion-trigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between px-4 py-4 font-medium transition-all hover:bg-[--accordion-hover-bg-color] [&[data-state=open]>svg]:rotate-180",
-        "text-[--accordion-text-color]",
+        'flex flex-1 items-center justify-between px-4 py-4 font-medium transition-all hover:bg-[--accordion-hover-bg-color] [&[data-state=open]>svg]:rotate-180',
+        'text-[--accordion-text-color]',
         className,
       )}
       {...props}
@@ -71,17 +68,17 @@ const accordion-trigger = React.forwardRef<
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));
-accordion-trigger.displayName = "accordion-trigger";
+AccordionTrigger.displayName = 'AccordionTrigger';
 
-const accordion-content = React.forwardRef<
+const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
-      "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
-      "bg-[--accordion-content-bg-color] text-[--accordion-text-color]",
+      'overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down',
+      'bg-[--AccordionContent-bg-color] text-[--accordion-text-color]',
       className,
     )}
     {...props}
@@ -89,45 +86,36 @@ const accordion-content = React.forwardRef<
     <div className="px-4 pb-4 pt-0">{children}</div>
   </AccordionPrimitive.Content>
 ));
-accordion-content.displayName = "accordion-content";
+AccordionContent.displayName = 'AccordionContent';
 
 const AccordionDemo = () => (
   <AccordionPrimitive.Root
-    className="accordion-root w-full"
+    className="AccordionRoot w-full"
     type="single"
     defaultValue="item-1"
     collapsible
   >
-    <accordion-item className="accordion-item" value="item-1">
-      <accordion-trigger>Is it accessible?</accordion-trigger>
-      <accordion-content>
-        Yes. It adheres to the WAI-ARIA design pattern.
-      </accordion-content>
-    </accordion-item>
+    <AccordionItem className="AccordionItem" value="item-1">
+      <AccordionTrigger>Is it accessible?</AccordionTrigger>
+      <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
+    </AccordionItem>
 
-    <accordion-item className="accordion-item" value="item-2">
-      <accordion-trigger>Is it unstyled?</accordion-trigger>
-      <accordion-content>
-        Yes. It's unstyled by default, giving you freedom over the look and
-        feel.
-      </accordion-content>
-    </accordion-item>
+    <AccordionItem className="AccordionItem" value="item-2">
+      <AccordionTrigger>Is it unstyled?</AccordionTrigger>
+      <AccordionContent>
+        Yes. It's unstyled by default, giving you freedom over the look and feel.
+      </AccordionContent>
+    </AccordionItem>
 
-    <accordion-item className="accordion-item" value="item-3">
-      <accordion-trigger>Can it be animated?</accordion-trigger>
-      <accordion-content className="accordion-content">
-        <div className="accordion-contentText">
+    <AccordionItem className="AccordionItem" value="item-3">
+      <AccordionTrigger>Can it be animated?</AccordionTrigger>
+      <AccordionContent className="AccordionContent">
+        <div className="AccordionContentText">
           Yes! You can animate the Accordion with CSS or JavaScript.
         </div>
-      </accordion-content>
-    </accordion-item>
+      </AccordionContent>
+    </AccordionItem>
   </AccordionPrimitive.Root>
 );
 
-export {
-  Accordion,
-  accordion-item,
-  accordion-trigger,
-  accordion-content,
-  AccordionDemo,
-};
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent, AccordionDemo };

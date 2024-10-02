@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface ModelSelectorProps {
   selectedModel: string;

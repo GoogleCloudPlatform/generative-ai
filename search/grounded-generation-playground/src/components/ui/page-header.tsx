@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Menu } from 'lucide-react';
 
 interface PageHeaderProps {
   toggleSidebar: () => void;
@@ -31,7 +31,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ toggleSidebar }) => {
             className="text-2xl font-semibold text-transparent bg-clip-text"
             style={{
               backgroundImage:
-                "linear-gradient(72.83deg, #4285F4 11.63%, #9b72cb 40.43%, #d96570 68.07%)",
+                'linear-gradient(72.83deg, #4285F4 11.63%, #9b72cb 40.43%, #d96570 68.07%)',
             }}
           >
             Vertex Grounded Generation Playground
