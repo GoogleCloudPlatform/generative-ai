@@ -28,7 +28,7 @@ class TempFileUploader:
 
         gcs_destination_uri = (
             f"gs://{self.temp_bucket_name}/{self.destination_blob_name}"
-        )        
+        )
         return gcs_destination_uri
 
     def delete_file(self) -> None:

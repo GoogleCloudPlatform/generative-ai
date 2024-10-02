@@ -24,7 +24,7 @@ class DocumentExtractor:
         self.client = documentai.DocumentProcessorServiceClient(
             client_options=ClientOptions(
                 api_endpoint=f"{location}-documentai.googleapis.com"
-                )
+            )
         )
         self.processor_name = self._get_proccessor_name()
 
@@ -38,7 +38,7 @@ class DocumentExtractor:
             )
         return self.client.processor_path(
             self.project_id, self.location, self.processor_id
-            )
+        )
 
     def process_document(self, file_path: str, mime_type: str) -> documentai.Document:
         raise NotImplementedError
@@ -59,7 +59,7 @@ class OnlineDocumentExtractor(DocumentExtractor):
             name=self.processor_name,
             raw_document=documentai.RawDocument(
                 content=image_content, mime_type=mime_type
-                )
+            ),
         )
 
         result = self.client.process_document(request=request)
@@ -94,11 +94,11 @@ class BatchDocumentExtractor(DocumentExtractor):
         return document
 
     def _process_document_batch(
-            self, gcs_input_uri: str, mime_type: str
-            ) -> documentai.Document:
+        self, gcs_input_uri: str, mime_type: str
+    ) -> documentai.Document:
         gcs_document = documentai.GcsDocument(
             gcs_uri=gcs_input_uri, mime_type=mime_type
-            )
+        )
         gcs_documents = documentai.GcsDocuments(documents=[gcs_document])
         input_config = documentai.BatchDocumentsInputConfig(gcs_documents=gcs_documents)
 
@@ -107,7 +107,7 @@ class BatchDocumentExtractor(DocumentExtractor):
         )
         output_config = documentai.DocumentOutputConfig(
             gcs_output_config=gcs_output_config
-            )
+        )
 
         request = documentai.BatchProcessRequest(
             name=self.processor_name,
@@ -139,7 +139,7 @@ class BatchDocumentExtractor(DocumentExtractor):
             output_bucket, output_prefix = matches.groups()
             output_blobs = self.storage_client.list_blobs(
                 output_bucket, prefix=output_prefix
-                )
+            )
             for blob in output_blobs:
                 if blob.content_type == "application/json":
                     print(f"Fetching {blob.name}")
