@@ -33,24 +33,24 @@ WIDGET_CONFIGS = [
 CUSTOM_UI_DATASTORE_IDS = [
     {
         "name": "Google Cloud Website",
-        "engine_id": "google-cloud-site-search_xxxxxxxx",
+        "engine_id": "google-cloud-site-search",
     },
     {
         "name": "Google Merchandise Store (Advanced Indexing)",
-        "engine_id": "google-merch-store_xxxxxxxx",
+        "engine_id": "google-merch-store",
     },
 ]
 
 
 IMAGE_SEARCH_DATASTORE_IDs = [{
     "name": "Google Merchandise Store",
-    "engine_id": "google-merch-store_xxxxxxx",
+    "engine_id": "google-merch-store",
 }]
 
 RECOMMENDATIONS_DATASTORE_IDs = [{
     "name": "arXiv Natural Language Papers",
-    "datastore_id": "arxiv_xxxxxxxxxx",
-    "engine_id": "arxiv-personalize_xxxxxxxx",
+    "datastore_id": "arxiv",
+    "engine_id": "arxiv-personalize",
 }]
 
 # iso639-1 code
