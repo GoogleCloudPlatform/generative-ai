@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import subprocess
 import json
 import random
 import string
+import subprocess
 from typing import Dict, List, Optional, Tuple, Union
 
 from IPython.display import HTML, Markdown, display
@@ -59,15 +59,21 @@ def get_id(length: Union[int, None] = 8) -> str:
         length = 8
     return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
+
 def get_auth_token() -> None:
     """A function to collect the authorization token"""
     try:
-        result = subprocess.run(['gcloud', 'auth', 'print-identity-token', '-q'],
-                                capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["gcloud", "auth", "print-identity-token", "-q"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         print(f"Error getting auth token: {e}")
         return None
+
 
 @retry(wait=wait_random_exponential(multiplier=1, max=120))
 async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None]:
@@ -130,7 +136,9 @@ def print_df_rows(
     """Print a subset of rows from a DataFrame."""
 
     # Define the base style for the text
-    base_style = "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
+    base_style = (
+        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
+    )
 
     # Define the header style for the text
     header_style = "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px; font-weight: bold;"
