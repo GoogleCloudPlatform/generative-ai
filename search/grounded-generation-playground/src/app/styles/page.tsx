@@ -31,9 +31,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import * as Accordion from "@radix-ui/react-accordion";
 import {
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
+  accordion-item,
+  accordion-trigger,
+  accordion-content,
   AccordionDemo,
 } from "@/components/ui/accordion";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
@@ -129,17 +129,17 @@ export default function StylesPage() {
           <AccordionDemo />
           <hr />
           <Accordion.Root
-            className="AccordionRoot"
+            className="accordion-root"
             type="single"
             defaultValue="item-1"
             collapsible
           >
-            <AccordionItem value="item-1">
-              <AccordionTrigger>Custom</AccordionTrigger>
-              <AccordionContent>
+            <accordion-item value="item-1">
+              <accordion-trigger>Custom</accordion-trigger>
+              <accordion-content>
                 Basic 2nd accordion direct implementation.
-              </AccordionContent>
-            </AccordionItem>
+              </accordion-content>
+            </accordion-item>
           </Accordion.Root>
 
           <Card className={cn("card-user")}>

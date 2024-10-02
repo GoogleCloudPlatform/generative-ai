@@ -37,7 +37,7 @@ const Accordion = React.forwardRef<
 ));
 Accordion.displayName = "Accordion";
 
-const AccordionItem = React.forwardRef<
+const accordion-item = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
@@ -50,9 +50,9 @@ const AccordionItem = React.forwardRef<
     {...props}
   />
 ));
-AccordionItem.displayName = "AccordionItem";
+accordion-item.displayName = "accordion-item";
 
-const AccordionTrigger = React.forwardRef<
+const accordion-trigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => (
@@ -71,9 +71,9 @@ const AccordionTrigger = React.forwardRef<
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));
-AccordionTrigger.displayName = "AccordionTrigger";
+accordion-trigger.displayName = "accordion-trigger";
 
-const AccordionContent = React.forwardRef<
+const accordion-content = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
@@ -89,45 +89,45 @@ const AccordionContent = React.forwardRef<
     <div className="px-4 pb-4 pt-0">{children}</div>
   </AccordionPrimitive.Content>
 ));
-AccordionContent.displayName = "AccordionContent";
+accordion-content.displayName = "accordion-content";
 
 const AccordionDemo = () => (
   <AccordionPrimitive.Root
-    className="AccordionRoot w-full"
+    className="accordion-root w-full"
     type="single"
     defaultValue="item-1"
     collapsible
   >
-    <AccordionItem className="AccordionItem" value="item-1">
-      <AccordionTrigger>Is it accessible?</AccordionTrigger>
-      <AccordionContent>
+    <accordion-item className="accordion-item" value="item-1">
+      <accordion-trigger>Is it accessible?</accordion-trigger>
+      <accordion-content>
         Yes. It adheres to the WAI-ARIA design pattern.
-      </AccordionContent>
-    </AccordionItem>
+      </accordion-content>
+    </accordion-item>
 
-    <AccordionItem className="AccordionItem" value="item-2">
-      <AccordionTrigger>Is it unstyled?</AccordionTrigger>
-      <AccordionContent>
+    <accordion-item className="accordion-item" value="item-2">
+      <accordion-trigger>Is it unstyled?</accordion-trigger>
+      <accordion-content>
         Yes. It's unstyled by default, giving you freedom over the look and
         feel.
-      </AccordionContent>
-    </AccordionItem>
+      </accordion-content>
+    </accordion-item>
 
-    <AccordionItem className="AccordionItem" value="item-3">
-      <AccordionTrigger>Can it be animated?</AccordionTrigger>
-      <AccordionContent className="AccordionContent">
-        <div className="AccordionContentText">
+    <accordion-item className="accordion-item" value="item-3">
+      <accordion-trigger>Can it be animated?</accordion-trigger>
+      <accordion-content className="accordion-content">
+        <div className="accordion-contentText">
           Yes! You can animate the Accordion with CSS or JavaScript.
         </div>
-      </AccordionContent>
-    </AccordionItem>
+      </accordion-content>
+    </accordion-item>
   </AccordionPrimitive.Root>
 );
 
 export {
   Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
+  accordion-item,
+  accordion-trigger,
+  accordion-content,
   AccordionDemo,
 };
