@@ -66,7 +66,7 @@ async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None
         [prompt],
         stream=False,
     )
-    return response.text[0] if response.text else None
+    return response.text if response.text else None
 
 
 def evaluate_task(
