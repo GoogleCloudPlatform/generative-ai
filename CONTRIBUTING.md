@@ -17,7 +17,7 @@ again.
 
 ## Notebook Template
 
-If you're creating a Jupyter Notebook, use `/gemini/getting-started/intro_gemini_python.ipynb` as a template.
+If you're creating a Jupyter Notebook, use [`notebook_template.ipynb`](notebook_template.ipynb) as a template.
 
 ## Code Quality Checks
 
@@ -25,35 +25,10 @@ All notebooks in this project are checked for formatting and style, to ensure a
 consistent experience. To test notebooks prior to submitting a pull request,
 you can follow these steps.
 
-From a command-line terminal (e.g. from Vertex Workbench or locally), install
-the code analysis tools:
-
-```shell
-pip3 install --user -U nbqa black flake8 isort pyupgrade git+https://github.com/tensorflow/docs
-```
-
-You'll likely need to add the directory where these were installed to your PATH:
-
-```shell
-export PATH="$HOME/.local/bin:$PATH"
-```
-
-Then, set an environment variable for your notebook (or directory):
-
-```shell
-export notebook="your-notebook.ipynb"
-```
-
-Finally, run this code block to check for errors. Each step will attempt to
-automatically fix any issues. If the fixes can't be performed automatically,
+From a command-line terminal (e.g. from Vertex AI Workbench or locally),
+run this code block to format your code.
+If the fixes can't be performed automatically,
 then you will need to manually address them before submitting your PR.
-
-Note: For official, only submit one notebook per PR.
-
-```shell
-python3 -m pip install -U -r .github/workflows/notebook_linter/requirements.txt
-.github/workflows/notebook_linter/run_linter.sh
-```
 
 ```shell
 python3 -m pip install --upgrade nox
@@ -69,8 +44,7 @@ information on using pull requests.
 
 ## Community Guidelines
 
-This project follows [Google's Open Source Community
-Guidelines](https://opensource.google/conduct/).
+This project follows [Google's Open Source Community Guidelines](https://opensource.google/conduct/).
 
 ## Contributor Guide
 
