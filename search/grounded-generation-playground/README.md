@@ -52,10 +52,6 @@ With RAG, we can retrieve relevant information from external sources (like Googl
 
    ```bash
    npm install
-   # or
-   yarn install
-   # or
-   pnpm install
    ```
 
 4. **Set environment variables:**
@@ -74,12 +70,6 @@ With RAG, we can retrieve relevant information from external sources (like Googl
 
    ```bash
    npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   # or
-   bun dev
    ```
 
    The app will be accessible at [http://localhost:3000](http://localhost:3000).
