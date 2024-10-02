@@ -1,4 +1,4 @@
-"""Master script for parsing, embedding 
+"""Master script for parsing, embedding
 and indexing data living in a GCS bucket"""
 
 import asyncio

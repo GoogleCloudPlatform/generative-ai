@@ -43,13 +43,11 @@ async def query_rag(
 
     if rag_request.evaluate_response:
         retrieved_contexts = [r.node.text for r in response.source_nodes]
-        eval_df = pd.DataFrame(
-            {
-                "question": rag_request.query,
-                "answer": [response.response],
-                "contexts": [retrieved_contexts],
-            }
-        )
+        eval_df = pd.DataFrame({
+            "question": rag_request.query,
+            "answer": [response.response],
+            "contexts": [retrieved_contexts],
+        })
         eval_df_ds = Dataset.from_pandas(eval_df)
 
         vertexai_llm = ChatVertexAI(model_name=rag_request.eval_model_name)

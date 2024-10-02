@@ -48,12 +48,10 @@ class ClaudeVertexLLM(CustomLLM):
             model=self.model_name,
             max_tokens=self.max_tokens,
             system=self.system_prompt,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
+            messages=[{
+                "role": "user",
+                "content": prompt,
+            }],
         )
         return CompletionResponse(text=message.content[0].text)
 
@@ -63,12 +61,10 @@ class ClaudeVertexLLM(CustomLLM):
             model=self.model_name,
             max_tokens=self.max_tokens,
             system=self.system_prompt,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
+            messages=[{
+                "role": "user",
+                "content": prompt,
+            }],
         )
         return CompletionResponse(text=message.content[0].text)
 

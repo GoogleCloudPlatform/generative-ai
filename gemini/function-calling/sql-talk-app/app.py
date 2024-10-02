@@ -176,23 +176,19 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                     if response.function_call.name == "get_table":
                         api_response = client.get_table(params["table_id"])
                         api_response = api_response.to_api_repr()
-                        api_requests_and_responses.append(
+                        api_requests_and_responses.append([
+                            response.function_call.name,
+                            params,
                             [
-                                response.function_call.name,
-                                params,
-                                [
-                                    str(api_response.get("description", "")),
-                                    str(
-                                        [
-                                            column["name"]
-                                            for column in api_response["schema"][
-                                                "fields"
-                                            ]
-                                        ]
-                                    ),
-                                ],
-                            ]
-                        )
+                                str(api_response.get("description", "")),
+                                str(
+                                    [
+                                        column["name"]
+                                        for column in api_response["schema"]["fields"]
+                                    ]
+                                ),
+                            ],
+                        ])
                         api_response = str(api_response)
 
                     if response.function_call.name == "sql_query":
@@ -230,12 +226,10 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                             api_requests_and_responses.append(
                                 [response.function_call.name, params, api_response]
                             )
-                            st.session_state.messages.append(
-                                {
-                                    "role": "assistant",
-                                    "content": error_message,
-                                }
-                            )
+                            st.session_state.messages.append({
+                                "role": "assistant",
+                                "content": error_message,
+                            })
 
                     print(api_response)
 
@@ -282,13 +276,11 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                 with st.expander("Function calls, parameters, and responses:"):
                     st.markdown(backend_details)
 
-            st.session_state.messages.append(
-                {
-                    "role": "assistant",
-                    "content": full_response,
-                    "backend_details": backend_details,
-                }
-            )
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": full_response,
+                "backend_details": backend_details,
+            })
         except Exception as e:
             print(e)
             error_message = f"""
@@ -298,9 +290,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
                 {str(e)}"""
             st.error(error_message)
-            st.session_state.messages.append(
-                {
-                    "role": "assistant",
-                    "content": error_message,
-                }
-            )
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": error_message,
+            })

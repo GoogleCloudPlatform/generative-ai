@@ -124,6 +124,7 @@ def format(session):
         "autoflake",
         "nbformat",
         "ruff",
+        "pyink",
     )
     # Use the --fss option to sort imports using strict alphabetical order.
     # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
@@ -147,6 +148,10 @@ def format(session):
     )
     session.run(
         "black",
+        *LINT_PATHS,
+    )
+    session.run(
+        "pyink",
         *LINT_PATHS,
     )
     session.run("python3", ".github/workflows/update_notebook_links.py", ".")
