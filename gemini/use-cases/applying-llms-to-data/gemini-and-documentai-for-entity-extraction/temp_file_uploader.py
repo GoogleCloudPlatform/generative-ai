@@ -16,9 +16,7 @@ class TempFileUploader:
     def _get_destination_blob_name(self, file_path: str) -> str:
         file_id = str(uuid.uuid4())
         file_extension = file_path.split(".")[-1]
-        destination_blob_name = (
-            f"{self.temp_file_path_gcs}{file_id}.{file_extension}"
-        )
+        destination_blob_name = f"{self.temp_file_path_gcs}{file_id}.{file_extension}"
         return destination_blob_name
 
     def upload_file(self, file_path: str) -> str:

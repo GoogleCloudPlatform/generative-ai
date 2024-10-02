@@ -40,9 +40,7 @@ class DocumentExtractor:
             self.project_id, self.location, self.processor_id
         )
 
-    def process_document(
-        self, file_path: str, mime_type: str
-    ) -> documentai.Document:
+    def process_document(self, file_path: str, mime_type: str) -> documentai.Document:
         raise NotImplementedError
 
 
@@ -83,17 +81,13 @@ class BatchDocumentExtractor(DocumentExtractor):
         processor_version_id: str,
         timeout: int = 400,
     ):
-        super().__init__(
-            project_id, location, processor_id, processor_version_id
-        )
+        super().__init__(project_id, location, processor_id, processor_version_id)
         self.gcs_output_uri = gcs_output_uri
         self.timeout = timeout
         self.storage_client = storage.Client()
         self.temp_file_uploader = TempFileUploader(gcs_temp_uri)
 
-    def process_document(
-        self, file_path: str, mime_type: str
-    ) -> documentai.Document:
+    def process_document(self, file_path: str, mime_type: str) -> documentai.Document:
         gcs_input_uri = self.temp_file_uploader.upload_file(file_path)
         document = self._process_document_batch(gcs_input_uri, mime_type)
         self.temp_file_uploader.delete_file()
@@ -106,9 +100,7 @@ class BatchDocumentExtractor(DocumentExtractor):
             gcs_uri=gcs_input_uri, mime_type=mime_type
         )
         gcs_documents = documentai.GcsDocuments(documents=[gcs_document])
-        input_config = documentai.BatchDocumentsInputConfig(
-            gcs_documents=gcs_documents
-        )
+        input_config = documentai.BatchDocumentsInputConfig(gcs_documents=gcs_documents)
 
         gcs_output_config = documentai.DocumentOutputConfig.GcsOutputConfig(
             gcs_uri=self.gcs_output_uri
@@ -125,9 +117,7 @@ class BatchDocumentExtractor(DocumentExtractor):
 
         operation = self.client.batch_process_documents(request)
         try:
-            print(
-                f"Waiting for operation ({operation.operation.name}) to complete..."
-            )
+            print(f"Waiting for operation ({operation.operation.name}) to complete...")
             operation.result(timeout=self.timeout)
         except (RetryError, InternalServerError) as e:
             print(e.message)
@@ -138,9 +128,7 @@ class BatchDocumentExtractor(DocumentExtractor):
 
         # Retrieve the processed document from GCS
         for process in list(metadata.individual_process_statuses):
-            matches = re.match(
-                r"gs://(.*?)/(.*)", process.output_gcs_destination
-            )
+            matches = re.match(r"gs://(.*?)/(.*)", process.output_gcs_destination)
             if not matches:
                 print(
                     "Could not parse output GCS destination:",
