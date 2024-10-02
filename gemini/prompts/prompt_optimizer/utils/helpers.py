@@ -126,7 +126,7 @@ def print_df_rows(
 
     # Define the header style for the text
     header_style = (
-        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
+        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px; font-weight: bold;"
     )
 
     # If columns are specified, filter the DataFrame
