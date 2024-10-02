@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-'use client';
+"use client";
 
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { transformGroundedContent } from '@/lib/grounded_content_citations';
-import { GroundingSupport, SupportChunk } from '@/app/page';
+} from "@/components/ui/tooltip";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { transformGroundedContent } from "@/lib/grounded_content_citations";
+import { GroundingSupport, SupportChunk } from "@/app/page";
 
 interface GroundedTextBlockProps {
-  role: 'user' | 'model';
+  role: "user" | "model";
   content: string;
   groundingSupport?: GroundingSupport[];
   supportChunks?: SupportChunk[];
@@ -70,7 +70,9 @@ const GroundedTextBlock: React.FC<GroundedTextBlockProps> = ({
     <div className="cited-text">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{citedContent}</ReactMarkdown>
       {isSourcesShown && (
-        <h3 className="text-sm font-semibold mt-2 mb-0 text-zinc-500">Sources:</h3>
+        <h3 className="text-sm font-semibold mt-2 mb-0 text-zinc-500">
+          Sources:
+        </h3>
       )}
       {searchEntryPoint && searchEntryPoint.length > 0 && (
         <div className="mt-2 rounded">
@@ -85,10 +87,14 @@ const GroundedTextBlock: React.FC<GroundedTextBlockProps> = ({
                 <TooltipTrigger asChild>
                   <Card className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700 transition-colors duration-200">
                     <CardContent className="flex items-center p-2 pl-3 cursor-pointer">
-                      {source == 'Google Search' ? (
+                      {source == "Google Search" ? (
                         <span className="text-xs prose prose-invert truncate">
-                          [{chunkIndex + 1}]{' '}
-                          <a href={uri} target="_blank" rel="noopener noreferrer">
+                          [{chunkIndex + 1}]{" "}
+                          <a
+                            href={uri}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             {title}
                           </a>
                         </span>
@@ -104,7 +110,7 @@ const GroundedTextBlock: React.FC<GroundedTextBlockProps> = ({
                 <TooltipContent className="max-w-4/5 max-w-600px">
                   <p className="text-sm text-gray-300 truncate">{title}</p>
                   <p className="text-xs prose prose-invert">
-                    {text ? text.substring(0, truncateAfter) : ''}
+                    {text ? text.substring(0, truncateAfter) : ""}
                     ...
                   </p>
                   <p className="text-xs mt-2 prose prose-invert">
@@ -121,7 +127,7 @@ const GroundedTextBlock: React.FC<GroundedTextBlockProps> = ({
 };
 
 const niceUri = (uri: string) => {
-  if (!uri) return '';
+  if (!uri) return "";
   return uri;
 };
 

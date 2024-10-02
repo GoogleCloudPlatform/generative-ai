@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import Link from 'next/link';
+import Link from "next/link";
 
 interface PageNavTabsProps {
   pathname: string;
@@ -28,9 +28,9 @@ const PageNavTabs: React.FC<PageNavTabsProps> = ({ pathname }) => {
           <Link
             href="/comparison"
             className={`flex-1 text-center py-4 text-sm font-medium border-b-2 ${
-              pathname === '/comparison'
-                ? 'border-blue-500 text-blue-500'
-                : 'border-transparent text-gray-600 hover:text-white hover:border-gray-300'
+              pathname === "/comparison"
+                ? "border-blue-500 text-blue-500"
+                : "border-transparent text-gray-600 hover:text-white hover:border-gray-300"
             }`}
           >
             <h2 className="text-4xl font-semibold mb-0">Comparison Mode</h2>
@@ -38,9 +38,9 @@ const PageNavTabs: React.FC<PageNavTabsProps> = ({ pathname }) => {
           <Link
             href="/chat"
             className={`flex-1 text-center py-4 text-sm font-medium border-b-2 ${
-              pathname === '/chat'
-                ? 'border-blue-500 text-blue-500'
-                : 'border-transparent text-gray-600 hover:text-white hover:border-gray-300'
+              pathname === "/chat"
+                ? "border-blue-500 text-blue-500"
+                : "border-transparent text-gray-600 hover:text-white hover:border-gray-300"
             }`}
           >
             <h2 className="text-4xl font-semibold mb-0">Chat interface</h2>

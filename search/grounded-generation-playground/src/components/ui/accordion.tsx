@@ -15,12 +15,12 @@
  */
 
 // accordion.tsx
-'use client';
+"use client";
 
-import React from 'react';
-import * as AccordionPrimitive from '@radix-ui/react-accordion';
-import { ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const Accordion = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Root>,
@@ -29,13 +29,13 @@ const Accordion = React.forwardRef<
   <AccordionPrimitive.Root
     ref={ref}
     className={cn(
-      'rounded-md border border-[--accordion-border-color] bg-[--accordion-bg-color] shadow-sm',
+      "rounded-md border border-[--accordion-border-color] bg-[--accordion-bg-color] shadow-sm",
       className,
     )}
     {...props}
   />
 ));
-Accordion.displayName = 'Accordion';
+Accordion.displayName = "Accordion";
 
 const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
@@ -43,11 +43,14 @@ const AccordionItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AccordionPrimitive.Item
     ref={ref}
-    className={cn('border-b border-[--accordion-border-color] last:border-0', className)}
+    className={cn(
+      "border-b border-[--accordion-border-color] last:border-0",
+      className,
+    )}
     {...props}
   />
 ));
-AccordionItem.displayName = 'AccordionItem';
+AccordionItem.displayName = "AccordionItem";
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
@@ -57,8 +60,8 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        'flex flex-1 items-center justify-between px-4 py-4 font-medium transition-all hover:bg-[--accordion-hover-bg-color] [&[data-state=open]>svg]:rotate-180',
-        'text-[--accordion-text-color]',
+        "flex flex-1 items-center justify-between px-4 py-4 font-medium transition-all hover:bg-[--accordion-hover-bg-color] [&[data-state=open]>svg]:rotate-180",
+        "text-[--accordion-text-color]",
         className,
       )}
       {...props}
@@ -68,7 +71,7 @@ const AccordionTrigger = React.forwardRef<
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));
-AccordionTrigger.displayName = 'AccordionTrigger';
+AccordionTrigger.displayName = "AccordionTrigger";
 
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
@@ -77,8 +80,8 @@ const AccordionContent = React.forwardRef<
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
-      'overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down',
-      'bg-[--accordion-content-bg-color] text-[--accordion-text-color]',
+      "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+      "bg-[--accordion-content-bg-color] text-[--accordion-text-color]",
       className,
     )}
     {...props}
@@ -86,7 +89,7 @@ const AccordionContent = React.forwardRef<
     <div className="px-4 pb-4 pt-0">{children}</div>
   </AccordionPrimitive.Content>
 ));
-AccordionContent.displayName = 'AccordionContent';
+AccordionContent.displayName = "AccordionContent";
 
 const AccordionDemo = () => (
   <AccordionPrimitive.Root
@@ -97,13 +100,16 @@ const AccordionDemo = () => (
   >
     <AccordionItem className="AccordionItem" value="item-1">
       <AccordionTrigger>Is it accessible?</AccordionTrigger>
-      <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
+      <AccordionContent>
+        Yes. It adheres to the WAI-ARIA design pattern.
+      </AccordionContent>
     </AccordionItem>
 
     <AccordionItem className="AccordionItem" value="item-2">
       <AccordionTrigger>Is it unstyled?</AccordionTrigger>
       <AccordionContent>
-        Yes. It's unstyled by default, giving you freedom over the look and feel.
+        Yes. It's unstyled by default, giving you freedom over the look and
+        feel.
       </AccordionContent>
     </AccordionItem>
 
@@ -118,4 +124,10 @@ const AccordionDemo = () => (
   </AccordionPrimitive.Root>
 );
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent, AccordionDemo };
+export {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+  AccordionDemo,
+};

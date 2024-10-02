@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import Icon from '@/components/ui/icons';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import React from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import Icon from "@/components/ui/icons";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-import { grounding_options } from '@/lib/grounding_options';
+import { grounding_options } from "@/lib/grounding_options";
 
 interface GroundingOptionProps {
   // this option our of all of them.
@@ -47,7 +47,7 @@ const GroundingOption: React.FC<GroundingOptionProps> = ({
     }
   };
   const config = grounding_options[groundingKey];
-  const vertexConfigId = '';
+  const vertexConfigId = "";
   return (
     <div className="space-y-2 select-grounding-option">
       <div className="flex items-center space-x-2">
@@ -65,7 +65,9 @@ const GroundingOption: React.FC<GroundingOptionProps> = ({
         <div className="space-y-2">
           <div className="text-zinc-400">{config.retriever}</div>
           <div className="text-zinc-500 text-sm">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{config.subtext}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {config.subtext}
+            </ReactMarkdown>
           </div>
         </div>
       )}

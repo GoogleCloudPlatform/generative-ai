@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import ModelSelector from '@/components/ModelSelector';
-import { Slider } from '@/components/ui/slider';
-import { X } from 'lucide-react';
-import Icon from '@/components/ui/icons';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import ModelSelector from "@/components/ModelSelector";
+import { Slider } from "@/components/ui/slider";
+import { X } from "lucide-react";
+import Icon from "@/components/ui/icons";
 
 interface PageSidebarProps {
   toggleSidebar: () => void;
@@ -56,11 +56,13 @@ const PageSidebar: React.FC<PageSidebarProps> = ({
   return (
     <div
       className={`fixed inset-y-0 left-0 transform ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
       } lg:relative lg:translate-x-0 transition duration-200 ease-in-out z-30 w-64 bg-zinc-900 overflow-y-auto border-r border-zinc-700`}
     >
       <div className="flex items-center justify-between p-4">
-        <h2 className="text-xl font-semibold text-white">Configure Grounding</h2>
+        <h2 className="text-xl font-semibold text-white">
+          Configure Grounding
+        </h2>
         <Button
           variant="ghost"
           size="icon"
@@ -103,10 +105,14 @@ const PageSidebar: React.FC<PageSidebarProps> = ({
                 max={1}
                 step={0.01}
                 value={[retrievalThreshold]}
-                onValueChange={(value: number[]) => setRetrievalThreshold(value[0])}
+                onValueChange={(value: number[]) =>
+                  setRetrievalThreshold(value[0])
+                }
                 className="w-full"
               />
-              <div className="text-sm text-gray-400">{retrievalThreshold.toFixed(2)}</div>
+              <div className="text-sm text-gray-400">
+                {retrievalThreshold.toFixed(2)}
+              </div>
             </div>
           )}
         </div>

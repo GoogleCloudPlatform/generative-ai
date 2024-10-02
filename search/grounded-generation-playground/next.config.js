@@ -15,9 +15,9 @@
  */
 
 module.exports = {
-  async redirects() {
+  async redirects () {
     return [
       // Make sure there are no conflicting redirects for /chat
-    ];
-  },
-};
+    ]
+  }
+}

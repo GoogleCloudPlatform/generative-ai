@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 import {
   ChartLine,
@@ -36,9 +36,9 @@ import {
   Trash2,
   User,
   Youtube,
-} from 'lucide-react';
+} from "lucide-react";
 
-const IconGemini = ({ className, ...props }: React.ComponentProps<'svg'>) => {
+const IconGemini = ({ className, ...props }: React.ComponentProps<"svg">) => {
   return (
     <svg
       width="453"
@@ -46,7 +46,7 @@ const IconGemini = ({ className, ...props }: React.ComponentProps<'svg'>) => {
       viewBox="0 0 453 452"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn('size-6', className)}
+      className={cn("size-6", className)}
       {...props}
     >
       <path
@@ -76,14 +76,14 @@ const IconGemini = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   );
 };
 
-const IconVertexAi = ({ className, ...props }: React.ComponentProps<'svg'>) => {
+const IconVertexAi = ({ className, ...props }: React.ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 32 32"
       fill="currentColor"
       version="1.1"
-      className={cn('h-4 w-4', className)}
+      className={cn("h-4 w-4", className)}
       {...props}
     >
       <g id="bounding_box" data-name="bounding box">
@@ -115,7 +115,7 @@ const IconVertexAi = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   );
 };
 
-const IconElastic = ({ className, ...props }: React.ComponentProps<'svg'>) => {
+const IconElastic = ({ className, ...props }: React.ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +123,7 @@ const IconElastic = ({ className, ...props }: React.ComponentProps<'svg'>) => {
       viewBox="0 0 256 256"
       fill="currentColor"
       version="1.1"
-      className={cn('h-4 w-4', className)}
+      className={cn("h-4 w-4", className)}
       {...props}
     >
       <path
@@ -158,13 +158,13 @@ const IconElastic = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   );
 };
 
-const IconSpinner = ({ className, ...props }: React.ComponentProps<'svg'>) => {
+const IconSpinner = ({ className, ...props }: React.ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 256 256"
       fill="currentColor"
-      className={cn('h-4 w-4 animate-spin', className)}
+      className={cn("h-4 w-4 animate-spin", className)}
       {...props}
     >
       <path d="M232 128a104 104 0 0 1-208 0c0-41 23.81-78.36 60.66-95.27a8 8 0 0 1 6.68 14.54C60.15 61.59 40 93.27 40 128a88 88 0 0 0 176 0c0-34.73-20.15-66.41-51.34-80.73a8 8 0 0 1 6.68-14.54C208.19 49.64 232 87 232 128Z" />
@@ -172,14 +172,14 @@ const IconSpinner = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   );
 };
 
-const IconGoogle = ({ className, ...props }: React.ComponentProps<'svg'>) => {
+const IconGoogle = ({ className, ...props }: React.ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 -960 960 960"
       fill="currentColor"
       // fill="#5f6368"
-      className={cn('h-4 w-4', className)}
+      className={cn("h-4 w-4", className)}
       {...props}
     >
       <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q76 0 143.5 26.5T748-776L634-665q-31-29-70.5-44.5T480-725q-100 0-170 71.5T240-480q0 102 70 173.5T480-235q85 0 146.5-47.5T700-404H480v-149h374q5 23 7.5 41.5T864-471q0 175-106 283T480-80Z" />
@@ -190,9 +190,13 @@ const IconGoogle = ({ className, ...props }: React.ComponentProps<'svg'>) => {
 interface DynamicIconProps {
   className?: string;
   type: string;
-  props?: React.ComponentProps<'svg'>;
+  props?: React.ComponentProps<"svg">;
 }
-const DynamicIcon: React.FC<DynamicIconProps> = ({ type, className, ...props }) => {
+const DynamicIcon: React.FC<DynamicIconProps> = ({
+  type,
+  className,
+  ...props
+}) => {
   const iconMap = {
     google: IconGoogle,
     model: IconGemini,
@@ -221,12 +225,15 @@ const DynamicIcon: React.FC<DynamicIconProps> = ({ type, className, ...props }) 
   if (type in iconMap) {
     const IconComponent = iconMap[type as keyof typeof iconMap];
     return (
-      <IconComponent className={cn('inline-flex items-baseline', className)} {...props} />
+      <IconComponent
+        className={cn("inline-flex items-baseline", className)}
+        {...props}
+      />
     );
   }
   return <span>⚠️ Bad Icon {type}</span>;
 };
-DynamicIcon.displayName = 'Icon';
+DynamicIcon.displayName = "Icon";
 
 export { DynamicIcon, IconGemini, IconSpinner, IconVertexAi, IconElastic };
 export default DynamicIcon;

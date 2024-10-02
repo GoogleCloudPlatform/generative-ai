@@ -15,10 +15,10 @@
  */
 
 /* accordion.css */
-@import url('/global.css');
+@import url("/global.css");
 
 /* accordion.css */
-@import url('/global.css');
+@import url("/global.css");
 
 :root {
   --accordion-bg-color: hsl(var(--background));

@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-'use client';
+"use client";
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
-import * as Accordion from '@radix-ui/react-accordion';
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import * as Accordion from "@radix-ui/react-accordion";
 import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
   AccordionDemo,
-} from '@/components/ui/accordion';
-import { ChevronDownIcon } from '@radix-ui/react-icons';
+} from "@/components/ui/accordion";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 
 export default function StylesPage() {
   return (
@@ -47,22 +47,28 @@ export default function StylesPage() {
           <h2 className="text-2xl font-semibold mb-4">Colors</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { name: 'Background', class: 'bg-background' },
-              { name: 'Foreground', class: 'bg-foreground text-background' },
-              { name: 'Card', class: 'bg-card' },
-              { name: 'Card Foreground', class: 'bg-card-foreground text-background' },
-              { name: 'Popover', class: 'bg-popover' },
+              { name: "Background", class: "bg-background" },
+              { name: "Foreground", class: "bg-foreground text-background" },
+              { name: "Card", class: "bg-card" },
               {
-                name: 'Popover Foreground',
-                class: 'bg-popover-foreground text-background',
+                name: "Card Foreground",
+                class: "bg-card-foreground text-background",
               },
-              { name: 'Primary', class: 'bg-primary text-primary-foreground' },
-              { name: 'Secondary', class: 'bg-secondary text-secondary-foreground' },
-              { name: 'Muted', class: 'bg-muted text-muted-foreground' },
-              { name: 'Accent', class: 'bg-accent text-accent-foreground' },
+              { name: "Popover", class: "bg-popover" },
               {
-                name: 'Destructive',
-                class: 'bg-destructive text-destructive-foreground',
+                name: "Popover Foreground",
+                class: "bg-popover-foreground text-background",
+              },
+              { name: "Primary", class: "bg-primary text-primary-foreground" },
+              {
+                name: "Secondary",
+                class: "bg-secondary text-secondary-foreground",
+              },
+              { name: "Muted", class: "bg-muted text-muted-foreground" },
+              { name: "Accent", class: "bg-accent text-accent-foreground" },
+              {
+                name: "Destructive",
+                class: "bg-destructive text-destructive-foreground",
               },
             ].map((color) => (
               <div
@@ -92,12 +98,14 @@ export default function StylesPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Default Card</CardTitle>
-                <CardDescription>This is the default card style</CardDescription>
+                <CardDescription>
+                  This is the default card style
+                </CardDescription>
               </CardHeader>
               <CardContent>Default card content</CardContent>
             </Card>
 
-            <Card className={cn('card-user')}>
+            <Card className={cn("card-user")}>
               <CardHeader>
                 <CardTitle>User Card</CardTitle>
                 <CardDescription>This card uses the user style</CardDescription>
@@ -105,10 +113,12 @@ export default function StylesPage() {
               <CardContent>User card content</CardContent>
             </Card>
 
-            <Card className={cn('card-system')}>
+            <Card className={cn("card-system")}>
               <CardHeader>
                 <CardTitle>System Card</CardTitle>
-                <CardDescription>This card uses the system style</CardDescription>
+                <CardDescription>
+                  This card uses the system style
+                </CardDescription>
               </CardHeader>
               <CardContent>System card content</CardContent>
             </Card>
@@ -132,7 +142,7 @@ export default function StylesPage() {
             </AccordionItem>
           </Accordion.Root>
 
-          <Card className={cn('card-user')}>
+          <Card className={cn("card-user")}>
             <CardHeader>
               <CardTitle>Card with Accordian</CardTitle>
             </CardHeader>
@@ -143,7 +153,7 @@ export default function StylesPage() {
             </CardContent>
           </Card>
 
-          <Card className={cn('card-system')}>
+          <Card className={cn("card-system")}>
             <CardHeader>
               <CardTitle>System Card</CardTitle>
               <CardDescription>This card uses the system style</CardDescription>

@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import Icon from '@/components/ui/icons';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import { mapOptionsToGroundedGenerationRequest, GroundedGenerationRequestBody } from '@/lib/apiutils';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import React from "react";
+import Icon from "@/components/ui/icons";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  mapOptionsToGroundedGenerationRequest,
+  GroundedGenerationRequestBody,
+} from "@/lib/apiutils";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface AboutPageContentProps {
   selectedModel: string;
@@ -45,8 +48,8 @@ const AboutPageContent: React.FC<AboutPageContentProps> = ({
   setActiveAboutTab,
 }) => {
   const requestObj: RequestObject = mapOptionsToGroundedGenerationRequest({
-    systemInstruction: { parts: { text: 'Your system instruction here' } },
-    contents: [{ role: 'user', parts: [{ text: 'Your query here' }] }],
+    systemInstruction: { parts: { text: "Your system instruction here" } },
+    contents: [{ role: "user", parts: [{ text: "Your query here" }] }],
     model: selectedModel,
     googleGrounding,
     vertexGrounding,
@@ -54,7 +57,11 @@ const AboutPageContent: React.FC<AboutPageContentProps> = ({
   });
 
   return (
-    <Tabs value={activeAboutTab} onValueChange={setActiveAboutTab} className="w-full">
+    <Tabs
+      value={activeAboutTab}
+      onValueChange={setActiveAboutTab}
+      className="w-full"
+    >
       <TabsList className="grid w-full grid-cols-4 mb-6 bg-zinc-800">
         <TabsTrigger
           value="javascript"
@@ -111,9 +118,9 @@ const AboutPageContent: React.FC<AboutPageContentProps> = ({
                 <div className="text-zinc-400 text-sm">
                   <p>Search results provided by Google Search.</p>
                   <p>
-                    Dynamic Retrieval can be enabled along with a threshold to only do a
-                    Google Search when we think it's needed. Fewer searches saves you cost
-                    and speeds up the response.
+                    Dynamic Retrieval can be enabled along with a threshold to
+                    only do a Google Search when we think it's needed. Fewer
+                    searches saves you cost and speeds up the response.
                   </p>
                 </div>
               </CardContent>
@@ -128,7 +135,7 @@ const AboutPageContent: React.FC<AboutPageContentProps> = ({
                 </h3>
                 <p>Enter your own Vertex AI Search project path.</p>
                 <p>
-                  An example would look like:{' '}
+                  An example would look like:{" "}
                   <code>
                     projects/555555555555/locations/global/collections/default_collection/engines/VERTEX_AI_SEARCH_APP_ID/servingConfigs/default_search
                   </code>

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Card, CardContent } from '@/components/ui/card';
-import Icon from '@/components/ui/icons';
+} from "@/components/ui/tooltip";
+import { Card, CardContent } from "@/components/ui/card";
+import Icon from "@/components/ui/icons";
 
 interface ExampleQuestion {
   text: string;
@@ -53,8 +53,15 @@ const ExampleQuestionGreeting: React.FC<ExampleQuestionGreetingProps> = ({
                     className="flex items-center p-4 cursor-pointer"
                     onClick={() => onClick(query.text)}
                   >
-                    {query.icon && <Icon type={query.icon} className="h-6 w-6 mr-2 text-gray-400" />}
-                    <p className="text-sm text-gray-300 truncate">{query.text}</p>
+                    {query.icon && (
+                      <Icon
+                        type={query.icon}
+                        className="h-6 w-6 mr-2 text-gray-400"
+                      />
+                    )}
+                    <p className="text-sm text-gray-300 truncate">
+                      {query.text}
+                    </p>
                   </CardContent>
                 </Card>
               </TooltipTrigger>
