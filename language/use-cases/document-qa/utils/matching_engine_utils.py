@@ -12,6 +12,7 @@ logger = logging.getLogger()
 
 
 class MatchingEngineUtils:
+
     def __init__(
         self,
         project_id: str,

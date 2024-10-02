@@ -76,6 +76,7 @@ def call_reranker(query, records, google_token):
 
 
 class GoogleReRankerSecretSauce(BaseNodePostprocessor):
+
     def _postprocess_nodes(
         self, nodes: list[NodeWithScore], query_bundle: QueryBundle | None
     ) -> list[NodeWithScore]:
@@ -83,13 +84,11 @@ class GoogleReRankerSecretSauce(BaseNodePostprocessor):
 
         records = []
         for node_wscore in nodes:
-            records.append(
-                {
-                    "id": node_wscore.node.id_,
-                    "title": node_wscore.node.metadata["title"],
-                    "content": node_wscore.node.text,
-                }
-            )
+            records.append({
+                "id": node_wscore.node.id_,
+                "title": node_wscore.node.metadata["title"],
+                "content": node_wscore.node.text,
+            })
         response_json = call_reranker(query_bundle.query_str, records, google_token)
 
         records = response_json["records"]

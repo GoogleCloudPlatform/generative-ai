@@ -232,18 +232,16 @@ async def generate_product_content() -> None:
                     st.session_state.assorted_prod_content.append(text_result_arr[i])
 
                 # Build data for display elements
-                elements[i].append(
-                    {
-                        "title": f"{title.strip()}",
-                        "text": (
-                            st.session_state.product_content[i][0].strip()
-                            if i < len(st.session_state.product_content)
-                            else st.session_state.assorted_prod_content[0]
-                        ),
-                        "interval": None,
-                        "img": f"gen_image{st.session_state.num_drafts*i+1}.png",
-                    }
-                )
+                elements[i].append({
+                    "title": f"{title.strip()}",
+                    "text": (
+                        st.session_state.product_content[i][0].strip()
+                        if i < len(st.session_state.product_content)
+                        else st.session_state.assorted_prod_content[0]
+                    ),
+                    "interval": None,
+                    "img": f"gen_image{st.session_state.num_drafts*i+1}.png",
+                })
                 i += 1
 
     # Store elements for display purposes

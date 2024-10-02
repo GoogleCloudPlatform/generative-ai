@@ -136,9 +136,7 @@ def test_build_search_request(search_client: VertexAISearchClient) -> None:
     query = "test query"
     page_size = 5
     # Access to protected member is necessary for testing
-    request = search_client.build_search_request(
-        query, page_size
-    )  # pylint: disable=protected-access
+    request = search_client.build_search_request(query, page_size)  # pylint: disable=protected-access
 
     assert isinstance(request, discoveryengine.SearchRequest)
     assert request.serving_config == search_client.serving_config
@@ -177,9 +175,7 @@ def test_map_search_pager_to_dict_basic(search_client: VertexAISearchClient) -> 
     mock_pager = create_mock_search_pager_result()
 
     # Access to protected member is necessary for testing
-    result = search_client.map_search_pager_to_dict(
-        mock_pager
-    )  # pylint: disable=protected-access
+    result = search_client.map_search_pager_to_dict(mock_pager)  # pylint: disable=protected-access
 
     assert "results" in result
     assert len(result["results"]) == 1
@@ -197,9 +193,7 @@ def test_map_search_pager_to_dict_document_content(
     mock_pager = create_mock_search_pager_result()
 
     # Access to protected member is necessary for testing
-    result = search_client.map_search_pager_to_dict(
-        mock_pager
-    )  # pylint: disable=protected-access
+    result = search_client.map_search_pager_to_dict(mock_pager)  # pylint: disable=protected-access
 
     document = result["results"][0]["document"]
     assert document["derived_struct_data"]["title"] == "Employee Benefits Summary"
@@ -227,9 +221,7 @@ def test_parse_chunk_result(search_client: VertexAISearchClient) -> None:
     }
 
     # Access to protected member is necessary for testing
-    result = search_client._parse_chunk_result(
-        chunk
-    )  # pylint: disable=protected-access
+    result = search_client._parse_chunk_result(chunk)  # pylint: disable=protected-access
 
     assert result["page_content"] == "Test content"
     assert result["metadata"]["chunk_id"] == "chunk1"
@@ -245,9 +237,7 @@ def test_strip_content() -> None:
     input_text = "<p>Test <strong>content</strong> with &quot;quotes&quot;</p>"
     expected_output = 'Test content with "quotes"'
     # Access to protected member is necessary for testing
-    assert (
-        VertexAISearchClient._strip_content(input_text) == expected_output
-    )  # pylint: disable=protected-access
+    assert VertexAISearchClient._strip_content(input_text) == expected_output  # pylint: disable=protected-access
 
 
 def test_simplify_search_results_mixed_chunk_and_segments(
@@ -262,9 +252,7 @@ def test_simplify_search_results_mixed_chunk_and_segments(
     }
 
     # Access to protected member is necessary for testing
-    result = search_client.simplify_search_results(
-        input_dict
-    )  # pylint: disable=protected-access
+    result = search_client.simplify_search_results(input_dict)  # pylint: disable=protected-access
 
     assert "simplified_results" in result
     assert len(result["simplified_results"]) == 2
@@ -278,26 +266,20 @@ def test_parse_document_result(search_client: VertexAISearchClient) -> None:
         "id": "doc1",
         "derived_struct_data": {
             "title": "Employee Benefits Summary",
-            "extractive_answers": [
-                {
-                    "content": "Test content",
-                    "page_number": "3",
-                }
-            ],
-            "snippets": [
-                {
-                    "snippet_status": "SUCCESS",
-                    "snippet": "Test snippet",
-                }
-            ],
+            "extractive_answers": [{
+                "content": "Test content",
+                "page_number": "3",
+            }],
+            "snippets": [{
+                "snippet_status": "SUCCESS",
+                "snippet": "Test snippet",
+            }],
             "link": "gs://company-docs/Employee_Benefits_Summary.pdf",
         },
     }
 
     # Access to protected member is necessary for testing
-    result = search_client._parse_document_result(
-        document
-    )  # pylint: disable=protected-access
+    result = search_client._parse_document_result(document)  # pylint: disable=protected-access
 
     assert result["metadata"]["title"] == "Employee Benefits Summary"
     assert (
