@@ -1,4 +1,5 @@
 """Extensions to Llamaindex Base classes to allow for asynchronous execution"""
+
 from collections.abc import Sequence
 import logging
 

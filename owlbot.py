@@ -33,14 +33,3 @@ s.replace(
 # ----------------------------------------------------------------------------
 
 s.shell.run(["nox", "-s", "format"], hide_output=False)
-
-s.shell.run(["nox", "-s", "format_notebooks"], hide_output=False)
-
-# Sort Spelling Allowlist
-spelling_allow_file = ".github/actions/spelling/allow.txt"
-
-with open(spelling_allow_file, encoding="utf-8") as file:
-    unique_words = sorted(set(file))
-
-with open(spelling_allow_file, "w", encoding="utf-8") as file:
-    file.writelines(unique_words)

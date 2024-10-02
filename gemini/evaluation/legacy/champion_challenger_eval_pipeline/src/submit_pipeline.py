@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Submit Vertex AI Pipeline run"""
+"""Submit Vertex AI Pipeline run"""
 
 from google.cloud import aiplatform
 
