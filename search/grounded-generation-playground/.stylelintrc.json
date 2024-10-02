@@ -1,12 +1,12 @@
-{ "extends": ["stylelint-config-standard", "stylelint-config-tailwindcss"],
-"rules": {
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-tailwindcss"],
+  "rules": {
     "at-rule-no-unknown": null,
     "scss/at-rule-no-unknown": [
-        true,
-        {
-            "ignoreAtRules": ["tailwind"]
-        }
+      true,
+      {
+        "ignoreAtRules": ["tailwind"]
+      }
     ]
-}
-
+  }
 }
