@@ -90,7 +90,7 @@ AccordionContent.displayName = 'AccordionContent';
 
 const AccordionDemo = () => (
   <AccordionPrimitive.Root
-    className="AccordionRoot w-full"
+    className="accordion-root w-full"
     type="single"
     defaultValue="item-1"
     collapsible

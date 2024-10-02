@@ -27,10 +27,10 @@ search engine and RAG application, and the evaluations needed to hill climb
 "quality".
 
 ## Building a Grounded Generation Application
-Grounded generation is crucial for enhancing the accuracy, factuality, and relevance of large language models (LLMs). By connecting LLMs to real-time data sources, including private enterprise data, grounding minimizes hallucinations and enables access to the latest information.  
 
-The [Vertex Grounded Generation Playground](../search/grounded-generation-playground/README.md) showcases this by offering a Next.js-based interface for experimenting with Vertex AI's Grounded Generation API.  It differentiates itself through features like a chat interface with multi-turn grounding, side-by-side comparison of grounded and ungrounded responses, dynamic retrieval with an adjustable threshold for cost optimization, and support for various grounding sources, including Google Search, Vertex AI Search, and custom integrations.  Explore the playground to experience the power of grounded generation and learn how to integrate it into your own applications. For detailed instructions and setup, refer to the [grounded-generation-playground setup instructions](../search/grounded-generation-playground/README.md).
+Grounded generation is crucial for enhancing the accuracy, factuality, and relevance of large language models (LLMs). By connecting LLMs to real-time data sources, including private enterprise data, grounding minimizes hallucinations and enables access to the latest information.
 
+The [Vertex Grounded Generation Playground](../search/grounded-generation-playground/README.md) showcases this by offering a Next.js-based interface for experimenting with Vertex AI's Grounded Generation API. It differentiates itself through features like a chat interface with multi-turn grounding, side-by-side comparison of grounded and ungrounded responses, dynamic retrieval with an adjustable threshold for cost optimization, and support for various grounding sources, including Google Search, Vertex AI Search, and custom integrations. Explore the playground to experience the power of grounded generation and learn how to integrate it into your own applications. For detailed instructions and setup, refer to the [grounded-generation-playground setup instructions](../search/grounded-generation-playground/README.md).
 
 ## Measuring RAG/Grounding Quality
 
