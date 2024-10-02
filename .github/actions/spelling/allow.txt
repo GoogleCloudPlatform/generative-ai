@@ -618,8 +618,8 @@ usecases
 username
 usernames
 uvb
-vectordb
 vapo
+vectordb
 vertexai
 vesselin
 vtotal
