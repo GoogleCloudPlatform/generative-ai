@@ -10,6 +10,7 @@ Akihiro
 Aniston
 Arborio
 Arepa
+Arjen
 Arsan
 Ashish
 Aspeed
@@ -17,9 +18,11 @@ Autechre
 Autorater
 BIKBEAR
 BITCODE
+Beckham
 Benno
 Bettes
 Biden
+Bigtable
 Bitcoin
 Borthwick
 Boyz
@@ -33,6 +36,7 @@ CONOUT
 CUCUONAR
 CWLEY
 CZE
+Caitlyn
 Caprese
 Codelab
 Codey
@@ -48,6 +52,7 @@ Dataform
 DeepEval
 Depatmint
 Disturbia
+Doaa
 Doogler
 Dreesen
 Durafast
@@ -58,6 +63,7 @@ EIP
 EMNLP
 ENU
 ESG
+Eliud
 Embs
 Envane
 Esin
@@ -69,6 +75,7 @@ FLX
 FMWK
 FPDF
 FTPS
+Federer
 Finvest
 Firestore
 Fishburne
@@ -81,6 +88,7 @@ GFile
 GKE
 GObject
 GWLP
+Gabeira
 Gameplay
 Gandalf
 Gatace
@@ -98,7 +106,9 @@ HREDRAW
 HSA
 HVDC
 Hamamoto
+Hamblin
 Hamers
+Harvick
 Hbf
 Hickson
 Hida
@@ -107,10 +117,12 @@ Hisaki
 Hmmm
 Hogwarts
 Hubmann
+Hyperdisk
 ICICI
 ICML
 INFOPLIST
 IVF
+Isner
 Jang
 Jedi
 Joji
@@ -119,13 +131,17 @@ KPIs
 Kaelen
 Kaggle
 Kamradt
+Katelyn
 Kaufmanns
 Kawagoe
 Keanu
 Keown
 Ketamine
 Khanh
+Kipchoge
 Knopf
+Kohli
+Kraizt
 Kubeflow
 Kudrow
 LCEL
@@ -141,6 +157,7 @@ Lego
 Llion
 Logrus
 Lottry
+MLB
 MSCHF
 MSGSEND
 MTL
@@ -150,9 +167,12 @@ Malware
 Mamah
 Mandiri
 Masaru
+Meawad
 Memegen
 Meteo
 Mewgler
+Milito
+Mirai
 Mitani
 Mosher
 Mvar
@@ -161,15 +181,19 @@ NCCREATE
 NDEBUG
 NGRAM
 NGRAMS
+NICOLAS
 NMT
 NOMINMAX
 NOZORDER
 NVIDIA
+Nagasu
 Niitsuma
 Nintendo
 Noogler
 OOTB
 Oberst
+Ohashi
+Ohtani
 Olgivanna
 Ollama
 Omnibox
@@ -182,6 +206,8 @@ Parmar
 Persero
 Phaidon
 Pharma
+Pistorius
+Priyanka
 QPM
 Qwiklabs
 RAGAS
@@ -190,13 +216,18 @@ ROOTSPAN
 RRF
 RTN
 RYDE
+Raducanu
 Reranking
 Resona
 Rizzoli
+Robben
 Robeco
+Ronaldo
+Rousey
 SDKROOT
 SEK
 SEO
+SIMONE
 SKUs
 SNB
 SPII
@@ -213,11 +244,13 @@ Selam
 Sestero
 Shazeer
 Shenzhou
+Shohei
 Simpsons
 Siri
 Skaffold
 Sketchfab
 Smartbuy
+Statcast
 Storrer
 Strappy
 Surampudi
@@ -243,6 +276,7 @@ USERDATA
 Unimicron
 Upserting
 Urs
+Usain
 Uszkoreit
 VAPO
 VFT
@@ -251,8 +285,10 @@ VOS
 VREDRAW
 Vandamm
 Vaswani
+Vergadia
 Ves
 Vijay
+Virat
 Viru
 VirusTotal
 WDIR
@@ -304,6 +340,7 @@ barmode
 barpolar
 baxis
 bbc
+bff
 bigframes
 bigquery
 bitcoin
@@ -313,6 +350,7 @@ bqml
 carbonara
 caudatus
 caxis
+cce
 cctv
 cfbundle
 chatbots
@@ -342,6 +380,7 @@ dataframe
 datname
 dbadmin
 dbln
+ddbb
 ddl
 deepeval
 dente
@@ -376,6 +415,7 @@ eur
 evals
 faiss
 fastapi
+fda
 fect
 fewshot
 ffi
@@ -397,6 +437,7 @@ fts
 fulltext
 funtion
 gapic
+gauff
 gboolean
 gbq
 gchar
@@ -453,6 +494,7 @@ iphoneos
 ipykernel
 ipynb
 isa
+itable
 itables
 iterrows
 ivf
@@ -473,6 +515,7 @@ lakecolor
 landcolor
 langchain
 langgraph
+lebron
 lenzing
 levelname
 lexer
@@ -486,6 +529,7 @@ logprobs
 lparam
 lxml
 lycra
+mahut
 makeover
 mapbox
 maxcold
@@ -500,6 +544,7 @@ morty
 moviepy
 mpn
 mrr
+mwouts
 nbconvert
 nbfmt
 nbformat
@@ -513,6 +558,7 @@ nmade
 nmilitary
 notetaker
 nrows
+nunique
 oai
 objc
 ollama
@@ -641,6 +687,7 @@ usecases
 username
 usernames
 uvb
+uvicorn
 vapo
 vectordb
 vertexai
@@ -667,11 +714,13 @@ xcodeproj
 xcscheme
 xctest
 xlabel
+xsi
 xticks
 xxxxxxxx
 yaxes
 yaxis
 ylabel
+youtube
 ytd
 yticks
 zaxis
