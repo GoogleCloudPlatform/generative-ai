@@ -110,9 +110,21 @@ def format(session):
     Run isort to sort imports. Then run black
     to format code to uniform standard.
     """
-    session.install(BLACK_VERSION, ISORT_VERSION, "autoflake", "ruff")
-    # Use the --fss option to sort imports using strict alphabetical order.
-    # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
+    session.install(
+        "git+https://github.com/tensorflow/docs",
+        "ipython",
+        "jupyter",
+        "nbconvert",
+        "types-requests",
+        BLACK_VERSION,
+        "blacken-docs",
+        "pyupgrade",
+        ISORT_VERSION,
+        "nbqa",
+        "autoflake",
+        "nbformat",
+        "ruff",
+    )
     session.run(
         "autoflake",
         "-i",
@@ -126,6 +138,8 @@ def format(session):
         "--fix-only",
         *LINT_PATHS,
     )
+    # Use the --fss option to sort imports using strict alphabetical order.
+    # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
     session.run(
         "isort",
         "--fss",
@@ -134,28 +148,6 @@ def format(session):
     session.run(
         "black",
         *LINT_PATHS,
-    )
-
-
-@nox.session(python=DEFAULT_PYTHON_VERSION)
-def format_notebooks(session):
-    """
-    Run isort to sort imports. Then run black
-    to format code to uniform standard.
-    """
-    session.install(
-        "git+https://github.com/tensorflow/docs",
-        "ipython",
-        "jupyter",
-        "nbconvert",
-        "types-requests",
-        "black",
-        "blacken-docs",
-        "pyupgrade",
-        "isort",
-        "nbqa",
-        "autoflake",
-        "nbformat",
     )
     session.run("python3", ".github/workflows/update_notebook_links.py", ".")
     session.run(
@@ -175,6 +167,15 @@ def format_notebooks(session):
     session.run("nbqa", "black", *LINT_PATHS)
     session.run("nbqa", "blacken-docs", "--nbqa-md", *LINT_PATHS)
     session.run("python3", "-m", "tensorflow_docs.tools.nbfmt", *LINT_PATHS)
+
+    # Sort Spelling Allowlist
+    spelling_allow_file = ".github/actions/spelling/allow.txt"
+
+    with open(spelling_allow_file, encoding="utf-8") as file:
+        unique_words = sorted(set(file))
+
+    with open(spelling_allow_file, "w", encoding="utf-8") as file:
+        file.writelines(unique_words)
 
 
 def install_unittest_dependencies(session, *constraints):
