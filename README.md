@@ -105,12 +105,12 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/mic/default/40px.svg"  alt="Speech">
       <br>
-      <a href="speech/"><code>speech/</code></a>
+      <a href="audio/"><code>audio/</code></a>
     </td>
     <td>
       Use this folder if you're interested in building your own solutions from scratch using features from Chirp, a version of Google's Universal Speech Model (USM) on Vertex AI (Vertex AI Chirp API).
     </td>
-    <td><a href="speech/">Sample notebooks, apps, use cases</a></td>
+    <td><a href="audio/">Sample notebooks, apps, use cases</a></td>
   </tr>
   <tr>
     <td>
