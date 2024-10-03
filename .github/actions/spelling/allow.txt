@@ -182,6 +182,7 @@ Parmar
 Persero
 Phaidon
 Pharma
+qna
 QPM
 Qwiklabs
 RAGAS
