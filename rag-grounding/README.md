@@ -125,7 +125,6 @@ performance.
   Demonstrate summarizing large documents.
 - **[llamaindex_workflows.ipynb](../gemini/orchestration/llamaindex_workflows.ipynb)** Using LlamaIndex Workflows to build an event driven RAG flow.
 
-
 ### Open Models
 
 - **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
