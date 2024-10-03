@@ -182,7 +182,6 @@ Parmar
 Persero
 Phaidon
 Pharma
-qna
 QPM
 Qwiklabs
 RAGAS
@@ -565,6 +564,7 @@ pypdf
 pyplot
 pysftp
 pyvis
+qna
 qubit
 qubits
 ragas
