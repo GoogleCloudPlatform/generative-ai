@@ -1,4 +1,4 @@
-"""This file is for database operations done by the application """
+"""This file is for database operations done by the application"""
 
 # pylint: disable=line-too-long
 import os
