@@ -15,6 +15,7 @@
 import json
 import random
 import string
+import subprocess
 from typing import Dict, List, Optional, Tuple, Union
 
 from IPython.display import HTML, Markdown, display
@@ -59,6 +60,21 @@ def get_id(length: Union[int, None] = 8) -> str:
     return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
 
+def get_auth_token() -> None:
+    """A function to collect the authorization token"""
+    try:
+        result = subprocess.run(
+            ["gcloud", "auth", "print-identity-token", "-q"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting auth token: {e}")
+        return None
+
+
 @retry(wait=wait_random_exponential(multiplier=1, max=120))
 async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None]:
     """Generate a response from the model."""
@@ -66,7 +82,7 @@ async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None
         [prompt],
         stream=False,
     )
-    return response.text[0] if response.text else None
+    return response.text if response.text else None
 
 
 def evaluate_task(
@@ -81,7 +97,7 @@ def evaluate_task(
     """Evaluate task using Vertex AI Evaluation."""
 
     # Generate a unique id for the experiment run
-    id = get_id()
+    idx = get_id()
 
     # Rename the columns to match the expected format
     eval_dataset = df[[prompt_col, reference_col, response_col]].rename(
@@ -108,7 +124,7 @@ def evaluate_task(
     )
 
     # Evaluate the task
-    result = eval_task.evaluate(experiment_run_name=f"{experiment_name}-{id}")
+    result = eval_task.evaluate(experiment_run_name=f"{experiment_name}-{idx}")
 
     # Return the summary metrics
     return result.summary_metrics
@@ -125,9 +141,7 @@ def print_df_rows(
     )
 
     # Define the header style for the text
-    header_style = (
-        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
-    )
+    header_style = "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px; font-weight: bold;"
 
     # If columns are specified, filter the DataFrame
     if columns:
