@@ -637,6 +637,7 @@ usecases
 username
 usernames
 uvb
+uvicorn
 vapo
 vectordb
 vertexai
@@ -663,6 +664,7 @@ xcodeproj
 xcscheme
 xctest
 xlabel
+xsi
 xticks
 xxxxxxxx
 yaxes
