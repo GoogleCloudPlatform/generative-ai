@@ -368,8 +368,10 @@ embs
 embvs
 emojis
 ename
+epath
 epoc
 etf
+etils
 eur
 evals
 faiss
@@ -390,6 +392,7 @@ freedraw
 freopen
 fromarray
 fromiter
+fsspec
 fts
 fulltext
 funtion
