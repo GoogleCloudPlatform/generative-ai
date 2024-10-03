@@ -19,7 +19,7 @@
 # mypy: disable-error-code="no-untyped-def, valid-type, no-untyped-def, assignment"
 
 
-""" Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines """
+"""Champion Challenger Auto Side-by-side Evaluation Vertex AI Pipelines"""
 
 from typing import NamedTuple
 
