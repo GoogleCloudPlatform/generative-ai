@@ -128,7 +128,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
       <a href="RESOURCES.md"><code>RESOURCES.md</code></a>
     </td>
     <td>Learning resources (e.g. blogs, YouTube playlists) about Generative AI on Google Cloud</td>
-    <td><a href="RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
+    <td><a href="RESOURCES.md">Resources (e.g. videos, blog posts, learning paths)</a></td>
   </tr>
 </table>
 <!-- markdownlint-enable MD033 -->
