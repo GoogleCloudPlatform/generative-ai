@@ -726,3 +726,10 @@ youtube
 ytd
 yticks
 zaxis
+cer
+ipd
+jiwer
+pydub
+RNNs
+stt
+cer
