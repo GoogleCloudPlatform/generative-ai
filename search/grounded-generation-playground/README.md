@@ -1,4 +1,4 @@
-# Vertex Grounded Generation Playground
+# Vertex AI Search Grounded Generation Playground
 
 This demo showcases how to use Vertex AI [Grounded Generation API](https://cloud.google.com/generative-ai-app-builder/docs/grounded-gen) with a Next.js frontend. It provides a user-friendly interface for exploring both chat-based and side-by-side comparisons of grounded and ungrounded responses. This allows you to test different models and grounding sources, including [Google Search](https://cloud.google.com/generative-ai-app-builder/docs/grounded-gen#web-grounding) and [Vertex AI Search](https://cloud.google.com/generative-ai-app-builder/docs/grounded-gen#inline-vais).
 

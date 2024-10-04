@@ -142,7 +142,7 @@ export default function StylesPage() {
 
           <Card className={cn('card-user')}>
             <CardHeader>
-              <CardTitle>Card with Accordian</CardTitle>
+              <CardTitle>Card with Accordion</CardTitle>
             </CardHeader>
             <CardContent>
               User card content.
