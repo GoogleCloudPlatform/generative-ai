@@ -25,7 +25,6 @@ Boyz
 Buckleys
 Buffay
 CALIPSO
-CCTV
 CHECKOV
 COCOAPODS
 COINIT
@@ -65,7 +64,6 @@ Eventarc
 FAISS
 FILEFLAGS
 FILEOS
-Floormat
 FLX
 FMWK
 FPDF
@@ -77,7 +75,6 @@ Flatform
 Flipkart
 Frodo
 Fujita
-GAPIC
 GError
 GFile
 GKE
@@ -200,7 +197,6 @@ SEK
 SEO
 SKUs
 SNB
-Snowboard
 SPII
 SPLADE
 SSRF
