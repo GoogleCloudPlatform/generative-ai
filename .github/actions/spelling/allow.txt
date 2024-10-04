@@ -344,6 +344,7 @@ bff
 bigframes
 bigquery
 bitcoin
+blogs
 boundings
 bpa
 bqml
@@ -586,6 +587,7 @@ pietra
 pii
 pixmap
 pkl
+playlists
 plotly
 plpgsql
 plt
