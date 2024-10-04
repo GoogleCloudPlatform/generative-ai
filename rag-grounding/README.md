@@ -129,6 +129,7 @@ performance.
 - **[summarization_large_documents.ipynb](../language/use-cases/document-summarization/summarization_large_documents.ipynb)**,
   **[summarization_large_documents_langchain.ipynb](../language/use-cases/document-summarization/summarization_large_documents_langchain.ipynb)**:
   Demonstrate summarizing large documents.
+- **[llamaindex_workflows.ipynb](../gemini/orchestration/llamaindex_workflows.ipynb)** Using LlamaIndex Workflows to build an event driven RAG flow.
 
 ### Open Models
 

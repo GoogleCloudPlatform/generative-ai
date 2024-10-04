@@ -344,6 +344,7 @@ bff
 bigframes
 bigquery
 bitcoin
+blogs
 boundings
 bpa
 bqml
@@ -586,6 +587,7 @@ pietra
 pii
 pixmap
 pkl
+playlists
 plotly
 plpgsql
 plt
@@ -610,6 +612,7 @@ pypdf
 pyplot
 pysftp
 pyvis
+qna
 qubit
 qubits
 ragas
@@ -621,7 +624,10 @@ rarians
 ratelimit
 redef
 repreve
+reranked
 reranker
+reranking
+reranks
 ribeye
 ringspun
 rpet
