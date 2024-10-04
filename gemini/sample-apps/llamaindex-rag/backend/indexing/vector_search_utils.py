@@ -1,4 +1,5 @@
 """Module for vector search utils."""
+
 from google.cloud import aiplatform
 
 
