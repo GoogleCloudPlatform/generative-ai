@@ -3,6 +3,7 @@ exclude = [
     'https://fonts.googleapis.com/',
     'http://go/github',
     'http://go/github-googlecloudplatform',
+    'https://medium.com/',
 ]
 exclude_path = [
     ".github/actions/spelling",
