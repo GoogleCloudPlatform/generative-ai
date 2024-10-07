@@ -82,6 +82,7 @@
 ^\.github/actions/spelling/
 ^\Q.github/workflows/spelling.yaml\E$
 ^\Q.github/workflows/notebook_linter/run_linter.sh\E$
+^\Q.github/workflows/linter.yaml\E$
 ^\Qgemini/function-calling/use_case_company_news_and_insights.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_1_5_pro.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_pro_vision_python.ipynb\E$
