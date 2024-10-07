@@ -212,6 +212,7 @@ QPM
 Qwiklabs
 RAGAS
 RLHF
+RNNs
 ROOTSPAN
 RRF
 RTN
@@ -353,6 +354,7 @@ caudatus
 caxis
 cce
 cctv
+cer
 cfbundle
 chatbots
 chromadb
@@ -491,6 +493,7 @@ imageno
 imdb
 imshow
 iostream
+ipd
 iphoneos
 ipykernel
 ipynb
@@ -501,6 +504,7 @@ iterrows
 ivf
 jegadesh
 jetbrains
+jiwer
 jsonify
 jsonlines
 jupyter
@@ -607,6 +611,7 @@ pvc
 pyautogen
 pybind
 pydantic
+pydub
 pymupdf
 pypdf
 pyplot
@@ -656,6 +661,7 @@ stdcall
 strdupv
 streamlit
 strfreev
+stt
 stuffie
 subviews
 subword
