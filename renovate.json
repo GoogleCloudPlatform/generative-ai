@@ -25,7 +25,6 @@
       "extends": ["schedule:quarterly"]
     },
     {
-      "matchDepTypes": ["all"],
       "excludePaths": ["gemini/sample-apps/genwealth/**"]
     }
   ],
