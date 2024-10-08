@@ -1,0 +1,43 @@
+name: Update README Files
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  update_readme:
+    runs-on: ubuntu-latest
+
+    permissions:
+        contents: write
+        pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' 
+
+      - name: Install requirements
+        run: python3 -m pip install -U -r .github/workflows/update_readme/requirements.txt
+
+      - name: Create or Update README Files
+        run: python .github/workflows/update_readme/update_readme.py
+
+      - name: Commit changes
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add .
+          git commit -m "Updated README"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event.pull_request.head.ref }}
