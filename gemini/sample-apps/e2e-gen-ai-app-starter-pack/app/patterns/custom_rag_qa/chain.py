@@ -16,6 +16,14 @@
 import logging
 from typing import Any, Dict, Iterator, List
 
+import google
+import vertexai
+from langchain.schema import Document
+from langchain.tools import tool
+from langchain_core.messages import ToolMessage
+from langchain_google_community.vertex_rank import VertexAIRank
+from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
+
 from app.patterns.custom_rag_qa.templates import (
     inspect_conversation_template,
     rag_template,
@@ -23,13 +31,6 @@ from app.patterns.custom_rag_qa.templates import (
 )
 from app.patterns.custom_rag_qa.vector_store import get_vector_store
 from app.utils.output_types import OnChatModelStreamEvent, OnToolEndEvent, custom_chain
-import google
-from langchain.schema import Document
-from langchain.tools import tool
-from langchain_core.messages import ToolMessage
-from langchain_google_community.vertex_rank import VertexAIRank
-from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
-import vertexai
 
 # Configuration
 EMBEDDING_MODEL = "text-embedding-004"

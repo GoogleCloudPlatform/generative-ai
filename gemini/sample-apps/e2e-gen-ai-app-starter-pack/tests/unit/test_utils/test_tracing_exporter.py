@@ -15,11 +15,12 @@
 from typing import Any, Generator
 from unittest.mock import Mock, patch
 
-from app.utils.tracing import CloudTraceLoggingSpanExporter
+import pytest
 from google.cloud import logging as google_cloud_logging
 from google.cloud import storage
 from opentelemetry.sdk.trace import ReadableSpan
-import pytest
+
+from app.utils.tracing import CloudTraceLoggingSpanExporter
 
 
 @pytest.fixture
