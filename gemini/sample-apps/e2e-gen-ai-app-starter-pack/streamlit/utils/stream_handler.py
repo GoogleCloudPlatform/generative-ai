@@ -17,14 +17,13 @@ from typing import Any, Dict, Generator, List, Optional
 from urllib.parse import urljoin
 
 import google.auth
+from google.auth.exceptions import DefaultCredentialsError
 import google.auth.transport.requests
 import google.oauth2.id_token
-import requests
-from google.auth.exceptions import DefaultCredentialsError
 from langchain_core.messages import AIMessage, ToolMessage
-from utils.multimodal_utils import format_content
-
+import requests
 import streamlit as st
+from utils.multimodal_utils import format_content
 
 
 @st.cache_resource()

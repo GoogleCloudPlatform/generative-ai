@@ -18,6 +18,9 @@ import os
 from typing import AsyncGenerator
 import uuid
 
+## Import the chain to be used
+from app.chain import chain
+
 # ruff: noqa: I001
 from app.utils.input_types import Feedback, Input, InputChat, default_serialization
 from app.utils.output_types import EndEvent, Event
@@ -26,9 +29,6 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse, StreamingResponse
 from google.cloud import logging as google_cloud_logging
 from traceloop.sdk import Instruments, Traceloop
-
-## Import the chain to be used
-from app.chain import chain
 
 # Or choose one of the following pattern chains to test by uncommenting it:
 

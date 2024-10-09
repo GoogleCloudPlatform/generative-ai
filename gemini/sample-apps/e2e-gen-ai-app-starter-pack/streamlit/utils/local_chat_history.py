@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from datetime import datetime
+import os
 from typing import Dict
 
-import yaml
 from langchain_core.chat_history import BaseChatMessageHistory
 from utils.title_summary import chain_title
+import yaml
 
 
 class LocalChatMessageHistory(BaseChatMessageHistory):
@@ -93,7 +93,6 @@ class LocalChatMessageHistory(BaseChatMessageHistory):
             None
         """
         if session["messages"]:
-
             messages = session["messages"] + [
                 {
                     "type": "human",

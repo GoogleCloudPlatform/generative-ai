@@ -18,8 +18,8 @@ import subprocess
 import sys
 import threading
 import time
-import uuid
 from typing import Any, Iterator
+import uuid
 
 import pytest
 import requests
