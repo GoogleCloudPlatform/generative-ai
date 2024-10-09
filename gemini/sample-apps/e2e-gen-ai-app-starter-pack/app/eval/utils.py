@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
 import glob
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 from typing import Any, Callable, Dict, Iterator, List
 
 import nest_asyncio
 import pandas as pd
-from tqdm import tqdm
 import yaml
+from tqdm import tqdm
 
 nest_asyncio.apply()
 

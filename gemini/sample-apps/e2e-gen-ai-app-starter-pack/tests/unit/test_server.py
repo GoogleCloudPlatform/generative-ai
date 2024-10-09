@@ -4,11 +4,12 @@ import os
 from typing import Any, Generator
 from unittest.mock import MagicMock, patch
 
-from app.utils.input_types import InputChat
+import pytest
 from google.auth.credentials import Credentials
 from httpx import AsyncClient
 from langchain_core.messages import HumanMessage
-import pytest
+
+from app.utils.input_types import InputChat
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -70,8 +71,9 @@ def test_redirect_root_to_docs() -> None:
     """
     Test that the root endpoint (/) redirects to the Swagger UI documentation.
     """
-    from app.server import app
     from fastapi.testclient import TestClient
+
+    from app.server import app
 
     client = TestClient(app)
     response = client.get("/")

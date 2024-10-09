@@ -12,20 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from functools import partial
 import json
-from typing import Any, Dict, List
 import uuid
+from functools import partial
+from typing import Any, Dict, List
 
 from langchain_core.messages import HumanMessage
 from side_bar import SideBar
-import streamlit as st
 from streamlit_feedback import streamlit_feedback
 from style.app_markdown import markdown_str
 from utils.local_chat_history import LocalChatMessageHistory
 from utils.message_editing import MessageEditing
 from utils.multimodal_utils import format_content, get_parts_from_files
 from utils.stream_handler import Client, StreamHandler, get_chain_response
+
+import streamlit as st
 
 USER = "my_user"
 EMPTY_CHAT_NAME = "Empty chat"

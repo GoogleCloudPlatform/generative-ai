@@ -14,10 +14,11 @@
 
 import logging
 
+import pytest
+from langchain_core.messages import AIMessageChunk, HumanMessage
+
 from app.patterns.custom_rag_qa.chain import chain
 from app.utils.output_types import OnToolEndEvent
-from langchain_core.messages import AIMessageChunk, HumanMessage
-import pytest
 
 CHAIN_NAME = "Rag QA"
 
