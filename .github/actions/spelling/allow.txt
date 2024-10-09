@@ -144,7 +144,6 @@ Kohli
 Kraizt
 Kubeflow
 Kudrow
-LangGraph
 LCEL
 LLMs
 LOOKBACK
@@ -154,6 +153,7 @@ LSum
 LTRB
 LUVBPTK
 Ladhak
+LangGraph
 Lego
 Llion
 Logrus
@@ -362,8 +362,8 @@ cer
 cfbundle
 chatbots
 chromadb
-claude
 cicd
+claude
 clickable
 cmap
 codebase
@@ -678,7 +678,6 @@ sxs
 tabular
 tagline
 tencel
-terraform
 termcolor
 terraform
 textno
@@ -709,7 +708,6 @@ usernames
 uvb
 uvicorn
 vapo
-uvicorn
 vectordb
 vertexai
 vesselin
