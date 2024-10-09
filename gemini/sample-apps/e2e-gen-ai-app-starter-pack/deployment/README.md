@@ -6,7 +6,7 @@ The application leverages [**Terraform**](http://terraform.io) to define and pro
 
 ## Deployment Workflow
 
-![Deployment Workflow](../images/deployment_workflow.png)
+![Deployment Workflow](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/deployment_workflow.png)
 
 **Description:**
 
@@ -50,7 +50,7 @@ The application leverages [**Terraform**](http://terraform.io) to define and pro
 2. **Connect Your Repository to Cloud Build**
    For detailed instructions, visit: [Cloud Build Repository Setup](https://cloud.google.com/build/docs/repositories#whats_next).<br>
 
-   ![Alt text](../images/connection_cb.gif)
+   ![Alt text](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/connection_cb.gif)
 
 3. **Configure Terraform Variables**
 
@@ -111,6 +111,6 @@ gcloud run deploy genai-app-sample --source . --project $YOUR_DEV_PROJECT_ID --s
 
 ### End-to-end Demo video
 
-<a href="https://storage.googleapis.com/test-elia-us-central1/template%20deployment%20demo.mp4">
-  <img src="../images/preview_video.png" alt="Watch the video" width="300"/>
+<a href="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/template_deployment_demo.mp4">
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/preview_video.png" alt="Watch the video" width="300"/>
 </a>

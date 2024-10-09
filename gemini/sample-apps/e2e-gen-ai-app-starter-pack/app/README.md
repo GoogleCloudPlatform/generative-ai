@@ -39,7 +39,7 @@ All chains have the same interface, allowing for seamless swapping without chang
 
 ## Monitoring and Observability
 
-![monitoring_flow](../images/monitoring_flow.png)
+![monitoring_flow](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/monitoring_flow.png)
 
 ### Trace and Log Capture
 
