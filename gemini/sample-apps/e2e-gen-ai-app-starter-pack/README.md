@@ -4,13 +4,13 @@
 
 | | |
 |-|-|
-| Authors | [Elia Secchi](https://github.com/eliasecchig) [Lorenzo Spataro](https://github.com/lspataroG) |
+| Authors | [Elia Secchi](https://github.com/eliasecchig), [Lorenzo Spataro](https://github.com/lspataroG) |
 
 This repository provides a template starter pack for building a Generative AI application on Google Cloud. 
 
 We provide a comprehensive set of resources to guide you through the entire development process, from prototype to production.
 
-This is a suggested approach, and **you can adapt it to fit your specific needs and preferences**. There are multiple ways to build Gen AI applications on Google Cloud, and this template serves as a starting point and example. 
+This is a suggested approach, and **you can adapt it to fit your specific needs and preferences**. There are multiple ways to build Gen AI applications on Google Cloud, and this template serves as a starting point and example.
 
 ## High-Level Architecture
 
@@ -25,7 +25,7 @@ This starter pack covers all aspects of Generative AI app development, from prot
 
 | Description                                                                                                                                                                                       | Visualization                            |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| The starter pack includes a production-ready FastAPI server with real-time chat interface, event streaming, auto-generated docs. Designed for scalability and easy integration with monitoring tools. | ![FastAPI docs](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/fastapi_docs.png) |
+| The starter pack includes a production-ready FastAPI server with a real-time chat interface, event streaming, and auto-generated docs. It is designed for scalability and easy integration with monitoring tools. | ![FastAPI docs](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/fastapi_docs.png) |
 
 </details>
 
@@ -34,7 +34,7 @@ This starter pack covers all aspects of Generative AI app development, from prot
 
 | Description                                                                                                                                                                                                                                                                                                                                             | Visualization                                        |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Start with a variety of common patterns: this repository offers examples including a basic conversational chain, a production-ready RAG (Retrieval-Augmented Generation) chain developed with python, and a LangGraph agent implementation. Use them in the application by changing one line of code. See the [Readme](app/README.md) for more details. | ![patterns available](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/patterns_available.png) |
+| Start with a variety of common patterns: this repository offers examples including a basic conversational chain, a production-ready RAG (Retrieval-Augmented Generation) chain developed with Python, and a LangGraph agent implementation. Use them in the application by changing one line of code. See the [README](app/README.md) for more details. | ![patterns available](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/patterns_available.png) |
 
 </details>
 
@@ -52,27 +52,26 @@ This starter pack covers all aspects of Generative AI app development, from prot
 
 | Description                                                                                                         | Visualization                                  |
 | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Seamlessly integrate with OpenTelemetry, Cloud Trace, Cloud Logging and BigQuery for comprehensive data collection and log every step of your Gen AI application to unlock powerful insights. | ![Tracing Preview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/tracing_preview.png) |
+| Seamlessly integrate with OpenTelemetry, Cloud Trace, Cloud Logging, and BigQuery for comprehensive data collection, and log every step of your Gen AI application to unlock powerful insights. | ![Tracing Preview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/tracing_preview.png) |
 
 </details>
 
 <details>
-
 <summary><b>Monitor Responses from the application</b></summary>
 
 | Description                                                                                                                                                                                                                                        | Visualization                         |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| Monitor your Generative AI Application's performance. We provide a Looker Studio [dashboard](https://lookerstudio.google.com/u/0/reporting/fa742264-4b4b-4c56-81e6-a667dd0f853f) to monitor application conversation statistics and user feedback. | ![Dashboard1](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/dashboard_1.png) |
-| We can also drill down to individual conversations and view the messages exchanged                                                                                                                                                                 | ![Dashboard2](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/dashboard_2.png) |
+| Monitor your Generative AI application's performance. We provide a Looker Studio [dashboard](https://lookerstudio.google.com/u/0/reporting/fa742264-4b4b-4c56-81e6-a667dd0f853f) to monitor application conversation statistics and user feedback. | ![Dashboard1](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/dashboard_1.png) |
+| We can also drill down to individual conversations and view the messages exchanged.                                                                                                                                                                 | ![Dashboard2](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/dashboard_2.png) |
 
 </details>
 
 <details>
-<summary><b>CICD and Terraform </b></summary>
+<summary><b>CICD and Terraform</b></summary>
 
 | Description                                                                                                                                                                                                                                                                       | Visualization            |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| Streamline your deployments with Cloud Build. Enhance reliability through automated testing. The template includes implementation of unit, integration and load tests and a set of terraform resources for you to setup your own Google Cloud project in a matter of minutes. | ![cicd](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/cicd.png) |
+| Streamline your deployments with Cloud Build. Enhance reliability through automated testing. The template includes implementation of unit, integration, and load tests, and a set of Terraform resources for you to set up your own Google Cloud project in a matter of minutes. | ![cicd](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/cicd.png) |
 
 </details>
 
@@ -81,7 +80,7 @@ This starter pack covers all aspects of Generative AI app development, from prot
 
 | Description                                                                                                                                                 | Visualization                                |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Experiment with your Generative AI Application in a feature-rich playground, including chat curation, user feedback collection, multimodal input, and more! | ![Streamlit View](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/streamlit_view.png) |
+| Experiment with your Generative AI application in a feature-rich playground, including chat curation, user feedback collection, multimodal input, and more! | ![Streamlit View](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/streamlit_view.png) |
 
 </details>
 
@@ -90,7 +89,7 @@ This starter pack covers all aspects of Generative AI app development, from prot
 ### Prerequisites
 
 - Python 3.10+
-- Google Cloud SDK installed and configured.
+- Google Cloud SDK installed and configured
 - [Poetry](https://python-poetry.org/docs/#installation) for dependency management
 
 ### Download the starter pack
@@ -113,7 +112,7 @@ poetry install --with streamlit,jupyter
 
 Set your default Google Cloud project and region:
 
-```commandline
+```bash
 export PROJECT_ID="YOUR_PROJECT_ID"
 export REGION="YOUR_REGION"
 gcloud config set project $PROJECT_ID
@@ -133,9 +132,9 @@ For full command options and usage, refer to the [Makefile](Makefile).
 
 ## Usage
 
-1. **Prototype Your Chain:** Build your Generative AI Application using different methodologies and frameworks. Use Vertex AI Evaluation for assessing the performances of your application and relative chain of steps. **See [`notebooks/getting_started.ipynb`](notebooks/getting_started.ipynb) for a tutorial to get started building and evaluating your chain.**
-2. **Integrate into the App:** Import your chain into the app. Edit `app/chain.py` file to add your chain.
-3. **Playground Testing:** Explore your chain's functionality using the Streamlit playground. Take advantage of the comprehensive playground features, such as chat history management, user feedback mechanisms, support for various input types, and additional capabilities. You can run the playground locally with `make playground` command.
+1. **Prototype Your Chain:** Build your Generative AI application using different methodologies and frameworks. Use Vertex AI Evaluation for assessing the performance of your application and its chain of steps. **See [`notebooks/getting_started.ipynb`](notebooks/getting_started.ipynb) for a tutorial to get started building and evaluating your chain.**
+2. **Integrate into the App:** Import your chain into the app. Edit the `app/chain.py` file to add your chain.
+3. **Playground Testing:** Explore your chain's functionality using the Streamlit playground. Take advantage of the comprehensive playground features, such as chat history management, user feedback mechanisms, support for various input types, and additional capabilities. You can run the playground locally with the `make playground` command.
 4. **Deploy with CI/CD:** Configure and trigger the CI/CD pipelines. Edit tests if needed. See the [deployment section](#deployment) below for more details.
 5. **Monitor in Production:** Track performance and gather insights using Cloud Logging, Tracing, and the Looker Studio dashboard. Use the gathered data to iterate on your Generative AI application.
 
@@ -149,7 +148,7 @@ You can test deployment towards a Dev Environment using the following command:
 gcloud run deploy genai-app-sample --source . --project YOUR_DEV_PROJECT_ID
 ```
 
-The repository includes a Terraform configuration for setup of the Dev Google Cloud project.
+The repository includes a Terraform configuration for the setup of the Dev Google Cloud project.
 See [deployment/README.md](deployment/README.md) for instructions.
 
 ### Production Deployment with Terraform
