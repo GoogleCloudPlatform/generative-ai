@@ -208,6 +208,7 @@ The best explanation of embeddings I've seen
     Demonstrates three LangChain methods (Stuffing, MapReduce, Refine) for
     summarizing large documents using Vertex AI models, comparing their
     effectiveness and limitations.
+-   **[llamaindex_workflows.ipynb](../gemini/orchestration/llamaindex_workflows.ipynb)** Using LlamaIndex Workflows to build an event driven RAG flow.
 
 ### Open Models
 
