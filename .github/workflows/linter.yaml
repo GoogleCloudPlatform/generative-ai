@@ -27,6 +27,9 @@ on:
 jobs:
   lint:
     name: Lint Code Base
+    permissions:
+      contents: write
+      statuses: write
     runs-on: ubuntu-latest
 
     ##################
@@ -55,31 +58,17 @@ jobs:
           LOG_LEVEL: WARN
           SHELLCHECK_OPTS: -e SC1091 -e 2086
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_CHECKOV: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_PYTHON_PYINK: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_TYPESCRIPT_STANDARD: false # super-linter/super-linter#4445
-          VALIDATE_CHECKOV: false
-          VALIDATE_JAVASCRIPT_STANDARD: false
-  fix-lint-issues:
-    permissions:
-      contents: write
-      statuses: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Fix Lint Errors
-        uses: super-linter/super-linter/slim@v7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIX_CSS: true
           FIX_CSS_PRETTIER: true
           FIX_GOOGLE_JAVA_FORMAT: true
           FIX_HTML_PRETTIER: true
           FIX_JAVASCRIPT_ES: true
           FIX_JAVASCRIPT_PRETTIER: true
-          FIX_JAVASCRIPT_STANDARD: true
           FIX_JSON_PRETTIER: true
           FIX_JSON: true
           FIX_MARKDOWN_PRETTIER: true
@@ -89,7 +78,6 @@ jobs:
           FIX_TERRAFORM_FMT: true
           FIX_TYPESCRIPT_ES: true
           FIX_TYPESCRIPT_PRETTIER: true
-          FIX_TYPESCRIPT_STANDARD: true
           FIX_YAML_PRETTIER: true
       - name: Commit and push linting fixes
         # Run only on:
