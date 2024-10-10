@@ -1,32 +1,13 @@
----
-#################################
-#################################
-## Super Linter GitHub Actions ##
-#################################
-#################################
 name: Lint Code Base
 
-#
-# Documentation:
-# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
-#
-
-#############################
-# Start the job on all push #
-#############################
-on:
-  push:
-    branches-ignore: [main]
-    # Remove the line above to run when pushing to main
+on: # yamllint disable-line rule:truthy
+  push: null
   pull_request:
     branches: [main]
-  
+
 permissions:
   contents: read
 
-###############
-# Set the Job #
-###############
 jobs:
   lint:
     name: Lint Code Base
@@ -74,7 +55,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Super-Linter
-        uses: super-linter/super-linter/slim@v7
+        uses: super-linter/super-linter@v7.1.0 # x-release-please-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIX_CSS: true
