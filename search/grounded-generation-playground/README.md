@@ -44,7 +44,7 @@ With RAG, we can retrieve relevant information from external sources (like Googl
 2. **Clone the repository:**
 
    ```bash
-   git clone <>
+   git clone REPOSITORY
    cd grounded-generation-playground
    ```
 
