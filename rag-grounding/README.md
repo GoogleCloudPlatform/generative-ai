@@ -30,7 +30,7 @@ search engine and RAG application, and the evaluations needed to hill climb
 
 Grounded generation is crucial for enhancing the accuracy, factuality, and relevance of large language models (LLMs). By connecting LLMs to real-time data sources, including private enterprise data, grounding minimizes hallucinations and enables access to the latest information.
 
-The [Vertex Grounded Generation Playground](../search/grounded-generation-playground/README.md) showcases this by offering a Next.js-based interface for experimenting with Vertex AI's Grounded Generation API. It differentiates itself through features like a chat interface with multi-turn grounding, side-by-side comparison of grounded and ungrounded responses, dynamic retrieval with an adjustable threshold for cost optimization, and support for various grounding sources, including Google Search, Vertex AI Search, and custom integrations. Explore the playground to experience the power of grounded generation and learn how to integrate it into your own applications. For detailed instructions and setup, refer to the [grounded-generation-playground setup instructions](../search/grounded-generation-playground/README.md).
+The [Vertex AI Search Grounded Generation Playground](../search/grounded-generation-playground/README.md) showcases this by offering a Next.js-based interface for experimenting with the Vertex AI Search Grounded Generation API. It differentiates itself through features like a chat interface with multi-turn grounding, side-by-side comparison of grounded and ungrounded responses, dynamic retrieval with an adjustable threshold for cost optimization, and support for various grounding sources, including Google Search, Vertex AI Search, and custom integrations. Explore the playground to experience the power of grounded generation and learn how to integrate it into your own applications. For detailed instructions and setup, refer to the [grounded-generation-playground setup instructions](../search/grounded-generation-playground/README.md).
 
 ## Measuring RAG/Grounding Quality
 
@@ -179,14 +179,12 @@ The best explanation of embeddings I've seen
   Demonstrates grounding LLM responses in Google Search and Vertex AI Search
   using Gemini, improving response accuracy and reducing hallucinations.
 - **[intro-grounding.ipynb](../language/grounding/intro-grounding.ipynb)**:
-  Demonstrates using Vertex AI's grounding feature to improve LLM response
-  accuracy and relevance by grounding them in Google Search or custom Vertex
-  AI Search data stores.
+  Demonstrates using the Vertex AI grounding feature to improve LLM response
+  accuracy and relevance by grounding them in Google Search or custom Vertex AI Search data stores.
 - **[building_DIY_multimodal_qa_system_with_mRAG.ipynb](../gemini/qa-ops/building_DIY_multimodal_qa_system_with_mRAG.ipynb)**:
   Builds a custom multimodal question-answering system using mRAG.
 - **[code_retrieval_augmented_generation.ipynb](../language/code/code_retrieval_augmented_generation.ipynb)**:
-  Demonstrates RAG for code using Gemini, LangChain, FAISS, and Vertex AI's
-  Embeddings API to enhance code generation by incorporating external
+  Demonstrates RAG for code using Gemini, LangChain, FAISS, and the Vertex AI Embeddings API to enhance code generation by incorporating external
   knowledge from the Google Cloud Generative AI GitHub repository.
 - **[langchain_bigquery_data_loader.ipynb](../language/orchestration/langchain/langchain_bigquery_data_loader.ipynb)**:
   Demonstrates using LangChain's BigQuery Data Loader to query BigQuery data,
@@ -197,18 +195,16 @@ The best explanation of embeddings I've seen
   embeddings) for building a question-answering system using the Vertex AI
   PaLM API to efficiently handle large document datasets.
 - **[question_answering_documents_langchain.ipynb](../language/use-cases/document-qa/question_answering_documents_langchain.ipynb)**:
-  Demonstrates building a question-answering system using LangChain and Vertex
-  AI's PaLM API, comparing different methods (stuffing, map-reduce, refine)
+  Demonstrates building a question-answering system using LangChain and the Vertex AI PaLM API, comparing different methods (stuffing, map-reduce, refine)
   for handling large documents, and showcasing the improved efficiency of
   using similarity search with embeddings.
 - **[question_answering_documents_langchain_matching_engine.ipynb](../language/use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb)**:
-  Demonstrates a question-answering system using LangChain, Vertex AI's PaLM
-  API, and Matching Engine for retrieval-augmented generation, enabling
+  Demonstrates a question-answering system using LangChain, the Vertex AI PaLM API, and Matching Engine for retrieval-augmented generation, enabling
   fact-grounded responses with source citations.
 - **[summarization_large_documents.ipynb](../language/use-cases/document-summarization/summarization_large_documents.ipynb)**:
   Demonstrates four methods (stuffing, MapReduce, MapReduce with overlapping
   chunks, and MapReduce with rolling summaries) for summarizing large
-  documents using Vertex AI's generative models, addressing challenges of
+  documents using Vertex AI generative models, addressing challenges of
   exceeding context length limits.
 - **[summarization_large_documents_langchain.ipynb](../language/use-cases/document-summarization/summarization_large_documents_langchain.ipynb)**:
   Demonstrates three LangChain methods (Stuffing, MapReduce, Refine) for
@@ -225,8 +221,7 @@ The best explanation of embeddings I've seen
 ## Agents on top of RAG
 
 - **[tutorial_vertex_ai_search_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_vertex_ai_search_rag_agent.ipynb)**:
-  Demonstrates building and deploying a conversational search agent on Vertex
-  AI using LangChain, a reasoning engine, and RAG with Vertex AI Search to
+  Demonstrates building and deploying a conversational search agent on Vertex AI using LangChain, a reasoning engine, and RAG with Vertex AI Search to
   query a movie dataset.
 - **[tutorial_alloydb_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_alloydb_rag_agent.ipynb)**:
   Demonstrates deploying a RAG application using LangChain, AlloyDB for
