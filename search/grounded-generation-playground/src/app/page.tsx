@@ -558,7 +558,11 @@ export default function AppPage() {
                       <Button
                         type="submit"
                         disabled={isStreaming || !inputMessage.trim()}
-                        className={` h-10 bg-blue-600 text-white hover:bg-blue-700 ${isStreaming || !inputMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={` h-10 bg-blue-600 text-white hover:bg-blue-700 ${
+                          isStreaming || !inputMessage.trim()
+                            ? 'opacity-50 cursor-not-allowed'
+                            : ''
+                        }`}
                       >
                         <Send className="h-4 w-4" />
                       </Button>
@@ -594,7 +598,11 @@ export default function AppPage() {
                         <Button
                           type="submit"
                           disabled={isStreaming || !inputMessage.trim()}
-                          className={`h-10 bg-blue-600 text-white hover:bg-blue-700 ${isStreaming || !inputMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`h-10 bg-blue-600 text-white hover:bg-blue-700 ${
+                            isStreaming || !inputMessage.trim()
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                          }`}
                         >
                           {isStreaming ? (
                             <div className="flex items-center">

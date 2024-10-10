@@ -87,7 +87,9 @@ export function transformGroundedContent({
       supportChunksByIndex.get(index) !== supportChunk
     ) {
       console.error(
-        `Clobbered supportChunk at ${index}, new ${JSON.stringify(supportChunk)}, old ${JSON.stringify(supportChunksByIndex.get(index))}`,
+        `Clobbered supportChunk at ${index}, new ${JSON.stringify(
+          supportChunk,
+        )}, old ${JSON.stringify(supportChunksByIndex.get(index))}`,
       );
     }
     supportChunksByIndex.set(index, supportChunk);
