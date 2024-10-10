@@ -125,7 +125,7 @@ const PageSidebar: React.FC<PageSidebarProps> = ({
           {vertexGrounding && (
             <div className="space-y-2">
               <Label htmlFor="vertex-serving-config" className="text-white">
-                Vertex Serving Config
+                Vertex AI Search Serving Config
               </Label>
               <Input
                 id="vertex-serving-config"
@@ -134,7 +134,7 @@ const PageSidebar: React.FC<PageSidebarProps> = ({
                   setVertexConfigId(e.target.value)
                 }
                 className="bg-zinc-800 text-white border-zinc-700"
-                placeholder="Enter your Vertex Serving Config"
+                placeholder="Enter your Vertex AI Search Serving Config"
               />
             </div>
           )}

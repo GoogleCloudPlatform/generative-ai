@@ -34,7 +34,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ toggleSidebar }) => {
                 'linear-gradient(72.83deg, #4285F4 11.63%, #9b72cb 40.43%, #d96570 68.07%)',
             }}
           >
-            Vertex Grounded Generation Playground
+            Vertex AI Search Grounded Generation Playground
           </h1>
           <Button
             variant="ghost"
