@@ -25,7 +25,7 @@ The default chain is a simple conversational bot that produces recipes based on 
 
 A RAG (Retrieval-Augmented Generation) chain using Python for orchestration and base LangChain components. The chain demonstrates how to create a production-grade application with full control over the orchestration process.
 
-This approach offers maximum flexibility in the orchestration of steps and allows for seamless integration with other SDK frameworks such as [Vertex AI SDK](https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk) and [LangChain](https://python.langchain.com/), retaining the support to emit `astream_events` [API compatible events](https://python.langchain.com/docs/how_to/streaming/#using-stream-events). 
+This approach offers maximum flexibility in the orchestration of steps and allows for seamless integration with other SDK frameworks such as [Vertex AI SDK](https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk) and [LangChain](https://python.langchain.com/), retaining the support to emit `astream_events` [API compatible events](https://python.langchain.com/docs/how_to/streaming/#using-stream-events).
 
 ### 3. LangGraph Dummy Agent
 
