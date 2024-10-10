@@ -1,0 +1,27 @@
+steps:
+  - name: "python:3.10"
+    id: install-dependencies
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        pip install poetry==1.8.3 --user && python -m poetry install
+
+  - name: "python:3.10"
+    id: unit-tests
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        python -m poetry run pytest tests/unit
+
+  # Run integration tests
+  - name: "python:3.10"
+    id: integration-tests
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        python -m poetry run pytest tests/integration
+options:
+  logging: CLOUD_LOGGING_ONLY

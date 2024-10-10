@@ -1,2 +1,5 @@
+[MASTER]
+extension-pkg-allow-list=streamlit
+
 [MESSAGES CONTROL]
-disable=E0401,C0301
+disable=E0401,C0301,R0903,R1710
