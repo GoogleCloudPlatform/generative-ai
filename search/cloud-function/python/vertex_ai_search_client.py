@@ -35,7 +35,7 @@ from dataclasses import dataclass
 import html
 import json
 import re
-from typing import Any, Dict, List, Literal, Union
+from typing import Any, Literal
 
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine_v1alpha as discoveryengine
@@ -61,9 +61,9 @@ class VertexAISearchConfig:
     project_id: str
     location: str
     data_store_id: str
-    engine_data_type: Union[EngineDataTypeStr, str]
-    engine_chunk_type: Union[EngineChunkTypeStr, str]
-    summary_type: Union[SummaryTypeStr, str]
+    engine_data_type: EngineDataTypeStr | str
+    engine_chunk_type: EngineChunkTypeStr | str
+    summary_type: SummaryTypeStr | str
 
     def __post_init__(self) -> None:
         """Validate and convert string inputs to appropriate types."""
@@ -85,7 +85,7 @@ class VertexAISearchConfig:
         print(f"Warning: Invalid value '{value}'. Using default: '{default}'")
         return default
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Convert the config to a dictionary."""
         return {
             "project_id": self.project_id,
@@ -144,7 +144,7 @@ class VertexAISearchClient:
             serving_config="default_config",
         )
 
-    def search(self, query: str, page_size: int = 10) -> Dict[str, Any]:
+    def search(self, query: str, page_size: int = 10) -> dict[str, Any]:
         """
         Perform a search query using Vertex AI Search.
 
@@ -218,7 +218,7 @@ class VertexAISearchClient:
             ),
         )
 
-    def map_search_pager_to_dict(self, pager: SearchPager) -> Dict[str, Any]:
+    def map_search_pager_to_dict(self, pager: SearchPager) -> dict[str, Any]:
         """
         Maps a SearchPager to a dictionary structure, iterativly requesting results.
 
@@ -230,7 +230,7 @@ class VertexAISearchClient:
         Returns:
             Dict[str, Any]: A dictionary containing the search results and metadata.
         """
-        output: Dict[str, Any] = {
+        output: dict[str, Any] = {
             "results": [
                 SearchResponse.SearchResult.to_dict(result) for result in pager
             ],
@@ -267,7 +267,7 @@ class VertexAISearchClient:
 
         return output
 
-    def simplify_search_results(self, response: Dict[str, Any]) -> Dict[str, Any]:
+    def simplify_search_results(self, response: dict[str, Any]) -> dict[str, Any]:
         """
         Simplify the search results by parsing documents and chunks.
 
@@ -290,7 +290,7 @@ class VertexAISearchClient:
         response["simplified_results"] = simplified_results
         return response
 
-    def _parse_document_result(self, document: Dict[str, Any]) -> Dict[str, Any]:
+    def _parse_document_result(self, document: dict[str, Any]) -> dict[str, Any]:
         """
         Parse a single document result from the search response.
 
@@ -317,7 +317,7 @@ class VertexAISearchClient:
                 json_data = {}
 
         metadata.update(json_data)
-        result: Dict[str, Any] = {"metadata": metadata}
+        result: dict[str, Any] = {"metadata": metadata}
 
         if self.config.engine_data_type == "STRUCTURED":
             structured_data = (
@@ -337,7 +337,7 @@ class VertexAISearchClient:
 
         return result
 
-    def _parse_segments(self, segments: List[Dict[str, Any]]) -> str:
+    def _parse_segments(self, segments: list[dict[str, Any]]) -> str:
         """
         Parse extractive segments from a single document of search results.
 
@@ -361,7 +361,7 @@ class VertexAISearchClient:
             for segment in parsed_segments
         )
 
-    def _parse_snippets(self, snippets: List[Dict[str, Any]]) -> str:
+    def _parse_snippets(self, snippets: list[dict[str, Any]]) -> str:
         """
         Parse snippets from a single document of search results.
 
@@ -377,7 +377,7 @@ class VertexAISearchClient:
             if snippet.get("snippetStatus") == "SUCCESS"
         )
 
-    def _parse_chunk_result(self, chunk: Dict[str, Any]) -> Dict[str, Any]:
+    def _parse_chunk_result(self, chunk: dict[str, Any]) -> dict[str, Any]:
         """
         Parse a single chunk result from the search response.
 

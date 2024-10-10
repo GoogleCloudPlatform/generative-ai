@@ -1,7 +1,8 @@
+from collections.abc import Iterable
 import glob
 import os
 import time
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any
 
 from IPython.display import display
 import PIL
@@ -30,7 +31,7 @@ multimodal_embedding_model = MultiModalEmbeddingModel.from_pretrained(
 
 def get_text_embedding_from_text_embedding_model(
     text: str,
-    return_array: Optional[bool] = False,
+    return_array: bool | None = False,
 ) -> list:
     """
     Generates a numerical text embedding from a provided text input using a text embedding model.
@@ -58,8 +59,8 @@ def get_text_embedding_from_text_embedding_model(
 def get_image_embedding_from_multimodal_embedding_model(
     image_uri: str,
     embedding_size: int = 512,
-    text: Optional[str] = None,
-    return_array: Optional[bool] = False,
+    text: str | None = None,
+    return_array: bool | None = False,
 ) -> list:
     """Extracts an image embedding from a multimodal embedding model.
     The function can optionally utilize contextual text to refine the embedding.
@@ -129,7 +130,7 @@ def get_text_overlapping_chunk(
     return chunked_text_dict
 
 
-def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
+def get_page_text_embedding(text_data: dict | str) -> dict:
     """
     * Generates embeddings for each text chunk using a specified embedding model.
     * Takes a dictionary of text chunks and an embedding size as input.
@@ -219,7 +220,7 @@ def get_image_for_gemini(
     image_save_dir: str,
     file_name: str,
     page_num: int,
-) -> Tuple[Image, str]:
+) -> tuple[Image, str]:
     """
     Extracts an image from a PDF document, converts it to JPEG format, saves it to a specified directory,
     and loads it as a PIL Image Object.
@@ -260,12 +261,12 @@ def get_image_for_gemini(
 
 def get_gemini_response(
     generative_multimodal_model,
-    model_input: List[str],
+    model_input: list[str],
     stream: bool = True,
-    generation_config: Optional[GenerationConfig] = GenerationConfig(
-        temperature=0.2, max_output_tokens=2048
-    ),
-    safety_settings: Optional[dict] = {
+    generation_config: GenerationConfig
+    | None = GenerationConfig(temperature=0.2, max_output_tokens=2048),
+    safety_settings: dict
+    | None = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
@@ -306,7 +307,7 @@ def get_gemini_response(
 
 
 def get_text_metadata_df(
-    filename: str, text_metadata: Dict[Union[int, str], Dict]
+    filename: str, text_metadata: dict[int | str, dict]
 ) -> pd.DataFrame:
     """
     This function takes a filename and a text metadata dictionary as input,
@@ -322,11 +323,11 @@ def get_text_metadata_df(
         A Pandas DataFrame with the extracted text, chunk text, and chunk embeddings for each page.
     """
 
-    final_data_text: List[Dict] = []
+    final_data_text: list[dict] = []
 
     for key, values in text_metadata.items():
         for chunk_number, chunk_text in values["chunked_text_dict"].items():
-            data: Dict = {}
+            data: dict = {}
             data["file_name"] = filename
             data["page_num"] = int(key) + 1
             data["text"] = values["text"]
@@ -345,7 +346,7 @@ def get_text_metadata_df(
 
 
 def get_image_metadata_df(
-    filename: str, image_metadata: Dict[Union[int, str], Dict]
+    filename: str, image_metadata: dict[int | str, dict]
 ) -> pd.DataFrame:
     """
     This function takes a filename and an image metadata dictionary as input,
@@ -361,10 +362,10 @@ def get_image_metadata_df(
         A Pandas DataFrame with the extracted image path, image description, and image embeddings for each image.
     """
 
-    final_data_image: List[Dict] = []
+    final_data_image: list[dict] = []
     for key, values in image_metadata.items():
         for _, image_values in values.items():
-            data: Dict = {}
+            data: dict = {}
             data["file_name"] = filename
             data["page_num"] = int(key) + 1
             data["img_num"] = int(image_values["img_num"])
@@ -392,10 +393,10 @@ def get_document_metadata(
     image_save_dir: str,
     image_description_prompt: str,
     embedding_size: int = 128,
-    generation_config: Optional[GenerationConfig] = GenerationConfig(
-        temperature=0.2, max_output_tokens=2048
-    ),
-    safety_settings: Optional[dict] = {
+    generation_config: GenerationConfig
+    | None = GenerationConfig(temperature=0.2, max_output_tokens=2048),
+    safety_settings: dict
+    | None = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
@@ -403,7 +404,7 @@ def get_document_metadata(
     },
     add_sleep_after_page: bool = False,
     sleep_time_after_page: int = 2,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     This function takes a PDF path, an image save directory, an image description prompt, an embedding size, and a text embedding text limit as input.
 
@@ -435,8 +436,8 @@ def get_document_metadata(
 
         file_name = pdf_path.split("/")[-1]
 
-        text_metadata: Dict[Union[int, str], Dict] = {}
-        image_metadata: Dict[Union[int, str], Dict] = {}
+        text_metadata: dict[int | str, dict] = {}
+        image_metadata: dict[int | str, dict] = {}
 
         for page_num, page in enumerate(doc):
             print(f"Processing page: {page_num + 1}")
@@ -582,7 +583,7 @@ def get_cosine_score(
 
 
 def print_text_to_image_citation(
-    final_images: Dict[int, Dict[str, Any]], print_top: bool = True
+    final_images: dict[int, dict[str, Any]], print_top: bool = True
 ) -> None:
     """
     Prints a formatted citation for each matched image in a dictionary.
@@ -633,7 +634,7 @@ def print_text_to_image_citation(
 
 
 def print_text_to_text_citation(
-    final_text: Dict[int, Dict[str, Any]],
+    final_text: dict[int, dict[str, Any]],
     print_top: bool = True,
     chunk_text: bool = True,
 ) -> None:
@@ -694,7 +695,7 @@ def get_similar_image_from_query(
     image_emb: bool = True,
     top_n: int = 3,
     embedding_size: int = 128,
-) -> Dict[int, Dict[str, Any]]:
+) -> dict[int, dict[str, Any]]:
     """
     Finds the top N most similar images from a metadata DataFrame based on a text query or an image query.
 
@@ -737,7 +738,7 @@ def get_similar_image_from_query(
     top_n_cosine_values = cosine_scores.nlargest(top_n).values.tolist()
 
     # Create a dictionary to store matched images and their information
-    final_images: Dict[int, Dict[str, Any]] = {}
+    final_images: dict[int, dict[str, Any]] = {}
 
     for matched_imageno, indexvalue in enumerate(top_n_cosine_scores):
         # Create a sub-dictionary for each matched image
@@ -798,7 +799,7 @@ def get_similar_text_from_query(
     top_n: int = 3,
     chunk_text: bool = True,
     print_citation: bool = False,
-) -> Dict[int, Dict[str, Any]]:
+) -> dict[int, dict[str, Any]]:
     """
     Finds the top N most similar text passages from a metadata DataFrame based on a text query.
 
@@ -838,7 +839,7 @@ def get_similar_text_from_query(
     top_n_scores = cosine_scores.nlargest(top_n).values.tolist()
 
     # Create a dictionary to store matched text and their information
-    final_text: Dict[int, Dict[str, Any]] = {}
+    final_text: dict[int, dict[str, Any]] = {}
 
     for matched_textno, index in enumerate(top_n_indices):
         # Create a sub-dictionary for each matched text
@@ -879,7 +880,7 @@ def get_similar_text_from_query(
 
 
 def display_images(
-    images: Iterable[Union[str, PIL.Image.Image]], resize_ratio: float = 0.5
+    images: Iterable[str | PIL.Image.Image], resize_ratio: float = 0.5
 ) -> None:
     """
     Displays a series of images provided as paths or PIL Image objects.

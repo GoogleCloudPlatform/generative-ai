@@ -43,6 +43,15 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
   </tr>
   <tr>
     <td>
+      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/nature_people/default/40px.svg"  alt="RAG Grounding">
+      <br>
+      <a href="rag-grounding/"><code>rag-grounding/</code></a>
+    </td>
+    <td>Use this folder for information on Retrieval Augmented Generation (RAG) and Grounding with Vertex AI. This is an index of notebooks and samples across other directories focused on this topic.</td>
+    <td><a href="rag-grounding">Sample apps, use cases</a></td>
+  </tr>
+  <tr>
+    <td>
       <img src="https://www.gstatic.com/images/branding/gcpiconscolors/dialogflow_cx/v1/24px.svg" width="40px" alt="Conversation">
       <br>
       <a href="conversation/"><code>conversation/</code></a>
@@ -96,12 +105,12 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/mic/default/40px.svg"  alt="Speech">
       <br>
-      <a href="speech/"><code>speech/</code></a>
+      <a href="audio/"><code>audio/</code></a>
     </td>
     <td>
       Use this folder if you're interested in building your own solutions from scratch using features from Chirp, a version of Google's Universal Speech Model (USM) on Vertex AI (Vertex AI Chirp API).
     </td>
-    <td><a href="speech/">Sample notebooks, apps, use cases</a></td>
+    <td><a href="audio/">Sample notebooks, apps, use cases</a></td>
   </tr>
   <tr>
     <td>
@@ -119,7 +128,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
       <a href="RESOURCES.md"><code>RESOURCES.md</code></a>
     </td>
     <td>Learning resources (e.g. blogs, YouTube playlists) about Generative AI on Google Cloud</td>
-    <td><a href="RESOURCES.md">Resources (e.g. videos, blogposts, learning paths)</a></td>
+    <td><a href="RESOURCES.md">Resources (e.g. videos, blog posts, learning paths)</a></td>
   </tr>
 </table>
 <!-- markdownlint-enable MD033 -->

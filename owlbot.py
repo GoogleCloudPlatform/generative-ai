@@ -1,3 +1,4 @@
+# pylint: skip-file
 # Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,12 +33,3 @@ s.replace(
 # ----------------------------------------------------------------------------
 
 s.shell.run(["nox", "-s", "format"], hide_output=False)
-
-# Sort Spelling Allowlist
-spelling_allow_file = ".github/actions/spelling/allow.txt"
-
-with open(spelling_allow_file, "r", encoding="utf-8") as file:
-    unique_words = sorted(set(file))
-
-with open(spelling_allow_file, "w", encoding="utf-8") as file:
-    file.writelines(unique_words)

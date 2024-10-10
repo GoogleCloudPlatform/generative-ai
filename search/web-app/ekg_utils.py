@@ -13,8 +13,8 @@
 # limitations under the License.
 
 """Enterprise Knowledge Graph Utilities"""
+from collections.abc import Sequence
 import json
-from typing import List, Optional, Sequence, Tuple
 
 from google.cloud import enterpriseknowledgegraph as ekg
 
@@ -26,10 +26,10 @@ def search_public_kg(
     project_id: str,
     location: str,
     search_query: str,
-    languages: Optional[Sequence[str]] = None,
-    types: Optional[Sequence[str]] = None,
-    limit: Optional[int] = None,
-) -> Tuple:
+    languages: Sequence[str] | None = None,
+    types: Sequence[str] | None = None,
+    limit: int | None = None,
+) -> tuple:
     """
     Make API Request to Public Knowledge Graph.
     """
@@ -58,7 +58,7 @@ def search_public_kg(
     return entities, request_url, request_json, response_json
 
 
-def get_entities(response: ekg.SearchPublicKgResponse) -> List:
+def get_entities(response: ekg.SearchPublicKgResponse) -> list:
     """
     Extract Entities from Knowledge Graph Response
     """

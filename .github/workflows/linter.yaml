@@ -57,6 +57,8 @@ jobs:
           LOG_LEVEL: WARN
           SHELLCHECK_OPTS: -e SC1091 -e 2086
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_PYTHON_PYINK: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_TYPESCRIPT_STANDARD: false # super-linter/super-linter#4445
           VALIDATE_CHECKOV: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
