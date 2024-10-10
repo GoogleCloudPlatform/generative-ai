@@ -20,6 +20,9 @@ on:
     # Remove the line above to run when pushing to main
   pull_request:
     branches: [main]
+  
+permissions:
+  contents: read
 
 ###############
 # Set the Job #
@@ -27,9 +30,6 @@ on:
 jobs:
   lint:
     name: Lint Code Base
-    permissions:
-      contents: write
-      statuses: write
     runs-on: ubuntu-latest
 
     ##################
@@ -54,7 +54,6 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_EXCLUDE: 'gemini/sample-apps/finance-advisor-spanner/.*\.sql'
-          JAVASCRIPT_DEFAULT_STYLE: prettier
           LOG_LEVEL: WARN
           SHELLCHECK_OPTS: -e SC1091 -e 2086
           VALIDATE_ALL_CODEBASE: false
@@ -63,6 +62,21 @@ jobs:
           VALIDATE_PYTHON_PYINK: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_TYPESCRIPT_STANDARD: false # super-linter/super-linter#4445
+
+  fix-lint-issues:
+    name: Fix Lint Issues
+    permissions:
+      contents: write
+      statuses: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Super-Linter
+        uses: super-linter/super-linter/slim@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIX_CSS: true
           FIX_CSS_PRETTIER: true
           FIX_GOOGLE_JAVA_FORMAT: true
