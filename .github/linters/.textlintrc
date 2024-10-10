@@ -1,0 +1,10 @@
+{
+    "rules": {
+      "terminology": {
+        "defaultTerms": true, 
+        "exclude": [
+          "README" 
+        ]
+      }
+    }
+}
