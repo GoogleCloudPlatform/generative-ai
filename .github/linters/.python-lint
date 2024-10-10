@@ -1,2 +1,3 @@
 [MESSAGES CONTROL]
 disable=E0401,C0301,R0903,R1710
+extension-pkg-allow-list=streamlit
