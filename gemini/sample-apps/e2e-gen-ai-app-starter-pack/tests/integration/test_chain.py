@@ -14,10 +14,9 @@
 
 import logging
 
-import pytest
-from langchain_core.messages import AIMessageChunk, HumanMessage
-
 from app.chain import chain
+from langchain_core.messages import AIMessageChunk, HumanMessage
+import pytest
 
 CHAIN_NAME = "Default"
 
