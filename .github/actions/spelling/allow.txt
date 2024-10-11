@@ -362,6 +362,7 @@ cer
 cfbundle
 chatbots
 chromadb
+cimg
 claude
 clickable
 clsx
@@ -382,6 +383,7 @@ constexpr
 corpuses
 csa
 cse
+ctd
 cupertino
 cva
 dask
