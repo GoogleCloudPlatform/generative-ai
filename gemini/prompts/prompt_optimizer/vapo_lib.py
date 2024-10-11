@@ -21,14 +21,11 @@ import re
 from IPython.core.display import DisplayHandle
 from IPython.display import HTML, display
 from google.cloud import aiplatform, storage
-from google.colab import output
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
 import pandas as pd
 from tensorflow.io import gfile
-
-output.enable_custom_widget_manager()
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
