@@ -24,8 +24,6 @@ grpcio = "1.64.1"
 langgraph = "^0.2.21"
 uvicorn = {extras = ["standard"], version = "^0.30.5"}
 immutabledict = "^4.2.0"
-types-pyyaml = "^6.0.12.20240917"
-types-requests = "^2.32.0.20240914"
 langchain-core = "^0.3.9"
 
 
@@ -61,7 +59,9 @@ flake8-pyproject = "^1.2.3"
 mypy = "^1"
 codespell = "^2.2.0"
 black = "^24.8.0"
-
+pylint = "^3.3.1"
+types-pyyaml = "^6.0.12.20240917"
+types-requests = "^2.32.0.20240914"
 
 [tool.mypy]
 disallow_untyped_calls = true
