@@ -362,8 +362,6 @@ cer
 cfbundle
 chatbots
 chromadb
-cimg
-claude
 cicd
 cimg
 claude
