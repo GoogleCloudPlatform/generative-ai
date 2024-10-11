@@ -359,6 +359,7 @@ cer
 cfbundle
 chatbots
 chromadb
+cimg
 claude
 clickable
 cmap
@@ -378,6 +379,7 @@ constexpr
 corpuses
 csa
 cse
+ctd
 cupertino
 dask
 dataframe
