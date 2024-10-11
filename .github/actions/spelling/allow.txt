@@ -365,6 +365,9 @@ chromadb
 cicd
 cimg
 claude
+cicd
+cimg
+claude
 clickable
 cmap
 codebase
