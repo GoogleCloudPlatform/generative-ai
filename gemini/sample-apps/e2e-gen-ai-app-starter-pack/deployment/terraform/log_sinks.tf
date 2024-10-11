@@ -10,7 +10,7 @@ module "log_export_to_bigquery" {
   for_each = local.project_ids
 
   source  = "terraform-google-modules/log-export/google"
-  version = "8.1.0"
+  version = "10.0.0"
 
   log_sink_name          = var.telemetry_sink_name
   parent_resource_type   = "project"
@@ -37,7 +37,7 @@ module "feedback_export_to_bigquery" {
   for_each = local.project_ids
 
   source                 = "terraform-google-modules/log-export/google"
-  version                = "8.1.0"
+  version                = "10.0.0"
   log_sink_name          = var.feedback_sink_name
   parent_resource_type   = "project"
   parent_resource_id     = each.value

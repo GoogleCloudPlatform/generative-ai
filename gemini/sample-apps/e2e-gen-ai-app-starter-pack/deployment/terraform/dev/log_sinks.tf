@@ -9,7 +9,7 @@ resource "google_project_iam_member" "bigquery_data_editor" {
 module "log_export_to_bigquery" {
 
   source  = "terraform-google-modules/log-export/google"
-  version = "8.1.0"
+  version = "10.0.0"
 
   log_sink_name          = var.telemetry_sink_name
   parent_resource_type   = "project"
@@ -31,7 +31,7 @@ resource "google_bigquery_dataset" "feedback_dataset" {
 
 module "feedback_export_to_bigquery" {
   source                 = "terraform-google-modules/log-export/google"
-  version                = "8.1.0"
+  version                = "10.0.0"
   log_sink_name          = var.feedback_sink_name
   parent_resource_type   = "project"
   parent_resource_id     = var.dev_project_id
