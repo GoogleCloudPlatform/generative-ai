@@ -94,6 +94,7 @@ Gandalf
 Gatace
 GenTwo
 Genkit
+Gfm
 Gisting
 Glickman
 Gmb
@@ -116,6 +117,7 @@ Hikaru
 Hisaki
 Hmmm
 Hogwarts
+Hossain
 Hubmann
 Hyperdisk
 ICICI
@@ -296,6 +298,7 @@ Vijay
 Virat
 Viru
 VirusTotal
+WAI
 WDIR
 WFH
 WNDCLASS
@@ -366,6 +369,7 @@ cicd
 cimg
 claude
 clickable
+clsx
 cmap
 codebase
 codebases
@@ -386,6 +390,7 @@ csa
 cse
 ctd
 cupertino
+cva
 dask
 dataframe
 datname
@@ -647,6 +652,7 @@ ribeye
 ringspun
 rpet
 rrf
+rsc
 rsp
 saaagesh
 scann
