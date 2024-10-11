@@ -63,7 +63,7 @@ const AboutPageContent: React.FC<AboutPageContentProps> = ({
           value="javascript"
           className="data-[state=active]:bg-zinc-700 data-[state=active]:text-white text-white"
         >
-          Javascript
+          JavaScript
         </TabsTrigger>
         <TabsTrigger
           value="python"
@@ -177,6 +177,7 @@ ${requestStr}
 });`;
 };
 
+// TODO: abhishekbhgwt@: Update to client library when available
 const makePython = (requestObj: RequestObject): string => {
   const PROJECT_NUMBER = process.env.PROJECT_NUMBER;
   const API_ENDPOINT = `https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_NUMBER}/locations/global:streamGenerateGroundedContent`;

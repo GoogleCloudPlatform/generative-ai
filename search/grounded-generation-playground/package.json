@@ -26,6 +26,7 @@
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@types/react-helmet": "^6.1.11",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "gaxios": "^6.7.1",

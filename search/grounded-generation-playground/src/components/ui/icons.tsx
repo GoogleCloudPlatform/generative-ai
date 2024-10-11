@@ -79,42 +79,62 @@ const IconGemini = ({ className, ...props }: React.ComponentProps<'svg'>) => {
 const IconVertexAi = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   return (
     <svg
+      id="Standard_product_Icon"
+      data-name="Standard product Icon"
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 32 32"
-      fill="currentColor"
       version="1.1"
+      viewBox="0 0 512 512"
       className={cn('h-4 w-4', className)}
       {...props}
     >
+      <defs>
+        <style>
+          {`
+          .cls-1 {
+            fill: none;
+          }
+          .cls-1, .cls-2, .cls-3, .cls-4, .cls-5 {
+            stroke-width: 0px;
+          }
+          .cls-2 {
+            fill: #34a853;
+          }
+          .cls-3 {
+            fill: #4285f4;
+          }
+          .cls-4 {
+            fill: #ea4335;
+          }
+          .cls-5 {
+            fill: #fbbc04;
+          }
+          `}
+        </style>
+      </defs>
       <g id="bounding_box" data-name="bounding box">
-        <rect width="32" height="32" fill="none" strokeWidth="0" />
+        <rect id="bounding_box-2" data-name="bounding box-2" className="cls-1" width="512" height="512"/>
       </g>
       <g id="art_layer" data-name="art layer">
-        <path
-          d="M9,19c-.6,0-1-.5-1-1V4c0-.5.4-1,1-1s1,.5,1,1v14c0,.5-.4,1-1,1Z"
-          fill="#ea4335"
-          strokeWidth="0"
-        />
-        <path
-          d="M23,19c-.5,0-1-.5-1-1V4c0-.5.5-1,1-1s1,.5,1,1v14c0,.5-.5,1-1,1Z"
-          fill="#4285f4"
-          strokeWidth="0"
-        />
-        <path
-          d="M16,29c-.2,0-.4,0-.5-.2l-11-7c-.5-.3-.6-.9-.3-1.4.3-.5.9-.6,1.4-.3l10.5,6.7,10.5-6.7c.5-.3,1.1-.2,1.4.3s.2,1.1-.3,1.4l-11,7c-.2.1-.4.2-.5.2h-.2Z"
-          fill="#fbbc04"
-          strokeWidth="0"
-        />
-        <path
-          d="M16,23c-.6,0-1-.5-1-1v-14c0-.6.4-1,1-1s1,.4,1,1v14c0,.5-.5,1-1,1Z"
-          fill="#34a853"
-          strokeWidth="0"
-        />
+        <path className="cls-4" d="M128,249c-8.8,0-16-7.2-16-16v-105c0-8.8,7.2-16,16-16s16,7.2,16,16v105c0,8.8-7.2,16-16,16Z"/>
+        <path className="cls-5" d="M256,464c-3,0-6-.8-8.6-2.5l-176-112c-7.5-4.7-9.7-14.6-4.9-22.1,4.8-7.5,14.6-9.6,22.1-4.9l167.4,106.5,167.4-106.5c7.5-4.7,17.3-2.5,22.1,4.9,4.7,7.5,2.5,17.3-4.9,22.1l-176,112c-2.6,1.7-5.6,2.5-8.6,2.5h0Z"/>
+        <path className="cls-2" d="M256,394c-8.8,0-16-7.2-16-16v-73.1c0-8.8,7.2-16,16-16s16,7.2,16,16v73.1c0,8.8-7.2,16-16,16Z"/>
+        <circle className="cls-4" cx="128" cy="64" r="16"/>
+        <circle className="cls-4" cx="128" cy="297" r="16"/>
+        <path className="cls-3" d="M384.2,314c-8.8,0-16-7.1-16-16l-.2-106c0-8.8,7.1-16,16-16h0c8.8,0,16,7.1,16,16l.2,106c0,8.8-7.1,16-16,16h0Z"/>
+        <circle className="cls-3" cx="384" cy="64" r="16"/>
+        <circle className="cls-3" cx="384" cy="128" r="16"/>
+        <path className="cls-5" d="M320,225c-8.8,0-16-7.2-16-16v-103c0-8.8,7.2-16,16-16s16,7.2,16,16v103c0,8.8-7.2,16-16,16Z"/>
+        <circle className="cls-2" cx="256" cy="177" r="16"/>
+        <circle className="cls-2" cx="256" cy="241" r="16"/>
+        <circle className="cls-5" cx="320" cy="273" r="16"/>
+        <circle className="cls-5" cx="320" cy="337" r="16"/>
+        <path className="cls-5" d="M192,225c-8.8,0-16-7.2-16-16v-103c0-8.8,7.2-16,16-16s16,7.2,16,16v103c0,8.8-7.2,16-16,16Z"/>
+        <circle className="cls-5" cx="192" cy="273" r="16"/>
+        <circle className="cls-5" cx="192" cy="337" r="16"/>
       </g>
     </svg>
   );
 };
-
 const IconElastic = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   return (
     <svg
