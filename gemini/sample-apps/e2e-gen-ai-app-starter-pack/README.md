@@ -117,6 +117,7 @@ export PROJECT_ID="YOUR_PROJECT_ID"
 export REGION="YOUR_REGION"
 gcloud config set project $PROJECT_ID
 gcloud config set region $REGION
+gcloud auth application-default set-quota-project $PROJECT_ID
 ```
 
 ## Commands
