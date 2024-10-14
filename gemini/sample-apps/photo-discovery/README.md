@@ -2,20 +2,19 @@
 
 ![Vertex AI Agent Builder & Flutter Multi-platform Demo – Fallingwater](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/showcase.png)
 
-This project is a demo that integrates a Vertex AI Agent with a multiplatform Flutter app. Flutter is used as the client app framework, Vertex AI Search is used as a vector DB, and Reasoning Engine helps us build and deploy an agent with LangChain on Vertex AI.
+This project is a demo that integrates a Vertex AI Agent with a multi-platform Flutter app. Flutter is used as the client app framework, Vertex AI Search is used as a vector DB, and Reasoning Engine helps us build and deploy an agent with LangChain on Vertex AI.
 
-
-
-Users can run the Flutter app and take or upload a photo of a landmark. The app identifies the subject name and provides a brief description. 
+Users can run the Flutter app and take or upload a photo of a landmark. The app identifies the subject name and provides a brief description.
 
 To learn more about the subject of the photo, tap "tell me more" to chat with Khanh, an AI agent build built with Vertex AI Agent Builder, and ask follow-up questions about the history of subject in the photo based on information Wikipedia.
 
-The agent can also identify merchandise from the [Google Merchandise Store](https://your.googlemerchandisestore.com) and provide product name, description, pricing, and purchase link by referencing a Google Merchandise store dataset.
+The agent can also identify merchandise from the [Google Merchandise Store](https://your.merch.google/) and provide product name, description, pricing, and purchase link by referencing a Google Merchandise store dataset.
 
 > [!NOTE]
 Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI agents with Vertex AI Agent Builder and Flutter](https://youtu.be/V8P_S9OLI_I?si=N2QMBs7HNZL6mKU0).
 
 ## Demo
+
 [Try the live demo app](https://photo-discovery-demo.web.app/)
 
 ![Chat UI - Lake Wakatipu](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/demo.gif)

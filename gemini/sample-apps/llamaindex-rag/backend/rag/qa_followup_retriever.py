@@ -1,5 +1,6 @@
 """Custom retriever which implements
 retrieval based on hypothetical questions"""
+
 import logging
 
 from llama_index.core import QueryBundle

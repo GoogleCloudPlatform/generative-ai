@@ -1,4 +1,5 @@
 """Node Re-ranker class for async execution"""
+
 from collections.abc import Callable
 import logging
 

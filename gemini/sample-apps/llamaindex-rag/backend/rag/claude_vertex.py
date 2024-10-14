@@ -1,4 +1,5 @@
 """Llamaindex LLM implementation of Claude Vertex AI"""
+
 from typing import Any
 
 from anthropic import AnthropicVertex, AsyncAnthropicVertex
