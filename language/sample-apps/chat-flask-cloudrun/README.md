@@ -17,7 +17,7 @@ To deploy the Flask Application in [Cloud Run](https://cloud.google.com/run/docs
 
 1. Your Cloud Function requires access to two environment variables:
 
-   - `GCP_PROJECT` : This the Google Cloud Project Id.
+   - `GCP_PROJECT` : This is the Google Cloud Project Id.
    - `GCP_REGION` : This is the region in which you are deploying your Cloud Function. For e.g. us-central1.
 
    These variables are needed since the Vertex AI initialization needs the Google Cloud Project Id and the region. The specific code line from the `main.py` function is shown here:
