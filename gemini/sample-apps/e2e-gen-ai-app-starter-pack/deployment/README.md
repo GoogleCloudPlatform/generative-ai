@@ -39,7 +39,7 @@ The application leverages [**Terraform**](http://terraform.io) to define and pro
 3. Enable required APIs in the CI/CD project. This will be required for the Terraform deployment:
 
    ```bash
-   gcloud config set project YOUR_CI_CD_PROJECT_ID
+   gcloud config set project $YOUR_CI_CD_PROJECT_ID
    gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com
    ```
 
