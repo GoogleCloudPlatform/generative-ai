@@ -88,7 +88,7 @@ This starter pack covers all aspects of Generative AI app development, from prot
 
 ### Prerequisites
 
-- Python 3.10+
+- Python >=3.10,<3.13
 - Google Cloud SDK installed and configured
 - [Poetry](https://python-poetry.org/docs/#installation) for dependency management
 
@@ -114,9 +114,7 @@ Set your default Google Cloud project and region:
 
 ```bash
 export PROJECT_ID="YOUR_PROJECT_ID"
-export REGION="YOUR_REGION"
 gcloud config set project $PROJECT_ID
-gcloud config set region $REGION
 gcloud auth application-default login
 gcloud auth application-default set-quota-project $PROJECT_ID
 ```

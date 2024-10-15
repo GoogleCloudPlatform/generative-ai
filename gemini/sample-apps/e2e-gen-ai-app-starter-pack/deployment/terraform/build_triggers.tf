@@ -20,9 +20,7 @@ resource "google_cloudbuild_trigger" "pr_checks" {
     "deployment/**",
     "poetry.lock"
   ]
-
-  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
-  depends_on         = [resource.google_project_service.cicd_services, resource.google_project_service.shared_services]
+  depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.shared_services]
 }
 
 # b. Create CD pipeline trigger
@@ -54,9 +52,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _ARTIFACT_REGISTRY_REPO_NAME   = var.artifact_registry_repo_name
     _CLOUD_RUN_APP_SA_NAME         = var.cloud_run_app_sa_name
   }
-
-  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
-  depends_on         = [resource.google_project_service.cicd_services, resource.google_project_service.shared_services]
+  depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.shared_services]
 
 }
 
@@ -70,8 +66,7 @@ resource "google_cloudbuild_trigger" "deploy_to_prod_pipeline" {
   repository_event_config {
     repository = "projects/${var.cicd_runner_project_id}/locations/${var.region}/connections/${var.host_connection_name}/repositories/${var.repository_name}"
   }
-  filename           = "deployment/cd/deploy-to-prod.yaml"
-  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
+  filename = "deployment/cd/deploy-to-prod.yaml"
   approval_config {
     approval_required = true
   }
