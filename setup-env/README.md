@@ -73,7 +73,7 @@ git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 Install the latest Python SDK:
 
 ```sh
-!pip install google-cloud-aiplatform --upgrade
+%pip install google-cloud-aiplatform --upgrade
 ```
 
 You will need to initialize `vertexai` with your `project_id` and `location`:
