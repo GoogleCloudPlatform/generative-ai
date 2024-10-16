@@ -303,6 +303,7 @@ WDIR
 WFH
 WNDCLASS
 Wakatipu
+Weaviate
 Wehn
 Wnd
 Womens
