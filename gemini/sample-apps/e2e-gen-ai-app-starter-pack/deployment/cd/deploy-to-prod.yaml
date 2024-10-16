@@ -31,6 +31,6 @@ substitutions:
   _CONTAINER_NAME: genai-app-sample
   _ARTIFACT_REGISTRY_REPO_NAME: genai-containers
   _CLOUD_RUN_APP_SA_NAME: genai-app-sample-cr-sa
-  _REGION: YOUR_REGION
+  _REGION: us-central1
 options:
   logging: CLOUD_LOGGING_ONLY
