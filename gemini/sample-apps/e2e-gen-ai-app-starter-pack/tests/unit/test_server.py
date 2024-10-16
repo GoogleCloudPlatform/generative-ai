@@ -22,6 +22,7 @@ from unittest.mock import MagicMock, patch
 
 from app.utils.input_types import InputChat
 from google.auth.credentials import Credentials
+from google.auth import exceptions as google_auth_exceptions
 from httpx import AsyncClient
 from langchain_core.messages import HumanMessage
 import pytest
@@ -76,7 +77,7 @@ def mock_dependencies() -> Generator[None, None, None]:
 
     try:
         importlib.util.find_spec("app.chain.VertexAIEmbeddings")
-    except ModuleNotFoundError:
+    except (ModuleNotFoundError, google_auth_exceptions.DefaultCredentialsError):
         pass
     else:
         patches.append(patch("app.chain.VertexAIEmbeddings"))
