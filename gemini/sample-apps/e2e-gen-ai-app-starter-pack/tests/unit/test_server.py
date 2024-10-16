@@ -74,7 +74,9 @@ def mock_dependencies() -> Generator[None, None, None]:
     patches = []
 
     try:
-        from app.chain import VertexAIEmbeddings  # type: ignore # noqa: F401 # pylint: disable=W0611
+        from app.chain import (
+            VertexAIEmbeddings,
+        )  # type: ignore # noqa: F401 # pylint: disable=W0611
 
         patches.append(patch("app.chain.VertexAIEmbeddings"))
     except ImportError:
