@@ -751,3 +751,4 @@ youtube
 ytd
 yticks
 zaxis
+Weaviate
