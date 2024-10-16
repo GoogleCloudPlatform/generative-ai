@@ -74,16 +74,15 @@ def mock_dependencies() -> Generator[None, None, None]:
     Patches VertexAIEmbeddings (if defined) and ChatVertexAI.
     """
     patches = []
-
     try:
-        importlib.util.find_spec("app.chain.VertexAIEmbeddings")
-    except (ModuleNotFoundError,google_auth_exceptions.DefaultCredentialsError):
-        pass
-    else:
-        patches.append(patch("app.chain.VertexAIEmbeddings"))
-    patches.append(patch("app.chain.ChatVertexAI"))
+        try:
+            importlib.util.find_spec("app.chain.VertexAIEmbeddings")
+        except (ModuleNotFoundError,google_auth_exceptions.DefaultCredentialsError):
+            pass
+        else:
+            patches.append(patch("app.chain.VertexAIEmbeddings"))
+        patches.append(patch("app.chain.ChatVertexAI"))
 
-    try:
         for patch_item in patches:
             mock = patch_item.start()
             mock.return_value = MagicMock()
