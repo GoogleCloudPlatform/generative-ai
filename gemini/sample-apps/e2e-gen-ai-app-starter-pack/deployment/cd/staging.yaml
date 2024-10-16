@@ -5,14 +5,14 @@ steps:
       [
         "build",
         "-t",
-        "us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
+        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
         ".",
       ]
   - name: "gcr.io/cloud-builders/docker"
     args:
       [
         "push",
-        "us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
+        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
       ]
 
   # Deploy to Staging
@@ -24,9 +24,9 @@ steps:
       - "deploy"
       - "genai-app-sample"
       - "--image"
-      - "us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME"
+      - "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME"
       - "--region"
-      - "us-central1"
+      - "${_REGION}"
       - "--project"
       - "${_STAGING_PROJECT_ID}"
       - "--min-instances"
@@ -51,7 +51,7 @@ steps:
       - "-c"
       - |
         echo $(gcloud run services describe genai-app-sample \
-        --region us-central1 --project ${_STAGING_PROJECT_ID} --format="value(status.url)") > staging_url.txt
+        --region ${_REGION} --project ${_STAGING_PROJECT_ID} --format="value(status.url)") > staging_url.txt
 
   # Fetch ID Token
   - name: gcr.io/cloud-builders/gcloud
@@ -108,7 +108,7 @@ steps:
       - "--project"
       - "$PROJECT_ID"
       - "--substitutions"
-      - "_PROD_PROJECT_ID=${_PROD_PROJECT_ID},_ARTIFACT_REGISTRY_REPO_NAME=${_ARTIFACT_REGISTRY_REPO_NAME},_CONTAINER_NAME=${_CONTAINER_NAME},_CLOUD_RUN_APP_SA_NAME=${_CLOUD_RUN_APP_SA_NAME}"
+      - "_PROD_PROJECT_ID=${_PROD_PROJECT_ID},_ARTIFACT_REGISTRY_REPO_NAME=${_ARTIFACT_REGISTRY_REPO_NAME},_CONTAINER_NAME=${_CONTAINER_NAME},_CLOUD_RUN_APP_SA_NAME=${_CLOUD_RUN_APP_SA_NAME},_REGION=${_REGION}"
       - "--sha"
       - $COMMIT_SHA
 
@@ -130,6 +130,7 @@ substitutions:
   _CONTAINER_NAME: genai-app-sample
   _ARTIFACT_REGISTRY_REPO_NAME: genai-containers
   _CLOUD_RUN_APP_SA_NAME: genai-app-sample-cr-sa
+  _REGION: YOUR_REGION
 
 options:
   substitutionOption: ALLOW_LOOSE

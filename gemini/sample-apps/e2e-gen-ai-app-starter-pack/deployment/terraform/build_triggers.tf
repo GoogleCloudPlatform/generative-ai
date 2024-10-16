@@ -51,6 +51,7 @@ resource "google_cloudbuild_trigger" "cd_pipeline" {
     _BUCKET_NAME_LOAD_TEST_RESULTS = resource.google_storage_bucket.bucket_load_test_results.name
     _ARTIFACT_REGISTRY_REPO_NAME   = var.artifact_registry_repo_name
     _CLOUD_RUN_APP_SA_NAME         = var.cloud_run_app_sa_name
+    _REGION                        = var.region
   }
   depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.shared_services]
 
