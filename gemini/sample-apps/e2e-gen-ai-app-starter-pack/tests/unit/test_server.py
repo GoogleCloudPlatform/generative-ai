@@ -77,7 +77,7 @@ def mock_dependencies() -> Generator[None, None, None]:
     try:
         try:
             importlib.util.find_spec("app.chain.VertexAIEmbeddings")
-        except (ModuleNotFoundError,google_auth_exceptions.DefaultCredentialsError):
+        except (ModuleNotFoundError, google_auth_exceptions.DefaultCredentialsError):
             pass
         else:
             patches.append(patch("app.chain.VertexAIEmbeddings"))
@@ -89,7 +89,7 @@ def mock_dependencies() -> Generator[None, None, None]:
 
         yield
     except google_auth_exceptions.GoogleAuthError:
-        pass
+        yield 
 
 
 class AsyncIterator:
