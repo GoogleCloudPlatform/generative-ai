@@ -89,7 +89,7 @@ def mock_dependencies() -> Generator[None, None, None]:
 
         yield
     except google_auth_exceptions.GoogleAuthError:
-        pass
+        yield 
 
 
 class AsyncIterator:
