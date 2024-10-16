@@ -26,7 +26,7 @@
 /generative-ai/language                                     @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/getting-started                     @polong-lin @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/grounding                           @koverholt @holtskinner @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/language/orchestration/langchain             @kweinmeister @RajeshThallam @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/language/orchestration                       @koverholt @kweinmeister @RajeshThallam @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/prompts                             @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/prompts/prompt_optimizer            @nhootan @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/sample-apps                         @rominirani @GoogleCloudPlatform/generative-ai-devrel
