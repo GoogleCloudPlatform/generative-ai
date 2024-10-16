@@ -77,7 +77,9 @@ def mock_dependencies() -> Generator[None, None, None]:
 
     try:
         importlib.util.find_spec("app.chain.VertexAIEmbeddings")
-    except (ModuleNotFoundError, google_auth_exceptions.DefaultCredentialsError):
+    except (ModuleNotFoundError,
+            google_auth_exceptions.DefaultCredentialsError,
+            google_auth_exceptions.GoogleAuthError):
         pass
     else:
         patches.append(patch("app.chain.VertexAIEmbeddings"))
