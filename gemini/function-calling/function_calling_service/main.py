@@ -57,7 +57,7 @@ location_tool = Tool(
 )
 
 model = GenerativeModel(
-    "gemini-1.5-flash-001",
+    "gemini-1.5-flash",
     generation_config=GenerationConfig(temperature=0),
     tools=[location_tool],
 )

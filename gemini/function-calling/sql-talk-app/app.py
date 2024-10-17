@@ -76,7 +76,7 @@ sql_query_tool = Tool(
 )
 
 model = GenerativeModel(
-    "gemini-1.5-pro-001",
+    "gemini-1.5-pro",
     generation_config={"temperature": 0},
     tools=[sql_query_tool],
 )
