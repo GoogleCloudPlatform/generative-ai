@@ -6,19 +6,19 @@
 
 Before you begin, you'll need to set up a few things:
 
-1. **Install and set up [clasp](https://github.com/google/clasp):** Clasp is a command-line tool that helps you manage Google Apps Script projects.
+### Install and set up [clasp](https://github.com/google/clasp): Clasp is a command-line tool that helps you manage Google Apps Script projects.
 
 - Install clasp globally: `npm install -g @google/clasp`
 - Enable the Google Apps Script API: Visit [https://script.google.com/home/usersettings](https://script.google.com/home/usersettings) and enable the API.
 - Log in with clasp: Run `clasp login` and follow the instructions to authenticate.
 
-2. **Prepare a Google Cloud project and set up the OAuth2 consent screen:**
+### Prepare a Google Cloud project and set up the OAuth2 consent screen
 
 - Create a new project in Google Cloud Console or select an existing one.
 - Navigate to "APIs & Services" > "OAuth consent screen".
 - Configure the consent screen with the necessary information and publish it.
 
-3. **Enable Google Drive API:**
+### Enable Google Drive API
 
 - Navigate to "APIs & Services" > "Library"
 - Search "Google Drive API" and hit "Enable"
@@ -26,7 +26,7 @@ Before you begin, you'll need to set up a few things:
 
 ## Create a spreadsheet with HEY_LLM and IMAGEN
 
-1. **Create the spreadsheet and deploy the script:**
+### Create the spreadsheet and deploy the script
 
 - Navigate to this directory and run the following command to create a spreadsheet with `HEY_LLM` and `IMAGEN` installed. Replace `YOUR_SHEET_NAME` with the name you want for your spreadsheet (e.g., "My Awesome LLM Sheet").
 
@@ -34,7 +34,7 @@ Before you begin, you'll need to set up a few things:
 clasp create --type=sheets --rootDir=./src --title="YOUR_SPRINT_NAME" && mv ./src/.clasp.json . && clasp push -f
 ```
 
-2. **Get the Spreadsheet ID and Script ID:**
+### Get the Spreadsheet ID and Script ID
 
 - After running the command, you'll see URLs for the created spreadsheet and the GAS script:
 
@@ -48,7 +48,7 @@ Created new Google Sheets Add-on script: https://script.google.com/d/YYYYYY/edit
   - `scriptId` is the Script ID.
   - `parentId` contains the Spreadsheet ID.
 
-3. **Set up OAuth2 Client ID and Secret:**
+### Set up OAuth2 Client ID and Secret
 
 - Open the created spreadsheet.
 - Go to "Extensions" > "YOUR_SPRINT_NAME" > "Use in this spreadsheet".
@@ -63,7 +63,7 @@ Created new Google Sheets Add-on script: https://script.google.com/d/YYYYYY/edit
 - Go back to the spreadsheet menu and click "Authorize".
 - You will see the success message if authorization is successful.
 
-4. **Start using the functions:**
+### Start using the functions
 
 - You can now use the `HEY_LLM` and `IMAGEN` functions in your spreadsheet!
 
