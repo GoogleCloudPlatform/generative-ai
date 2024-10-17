@@ -74,4 +74,4 @@ This extension uses the [apps-script-oauth2](https://github.com/googleworkspace/
 
 ## Author
 
-Shuhei Iitsuka ([@tushuhei](https://github.com/tushuhei))
+[@tushuhei](https://github.com/tushuhei)

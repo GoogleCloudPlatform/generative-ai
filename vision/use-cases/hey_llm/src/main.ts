@@ -28,9 +28,9 @@ const PROP_KEY = {
 };
 
 /**
- * Gets GCP Project Number from OAuth Client ID stored in Document Properties.
+ * Gets Google Cloud Project Number from OAuth Client ID stored in Document Properties.
  * @private
- * @returns GCP Project Number.
+ * @returns Google Cloud Project Number.
  */
 function getProjectNumber_() {
   return PropertiesService.getDocumentProperties()
