@@ -7,6 +7,7 @@ APIENTRY
 APSTUDIO
 Adidas
 Akihiro
+Akkaoui
 Aniston
 Arborio
 Arepa
@@ -24,6 +25,7 @@ Bettes
 Biden
 Bigtable
 Bitcoin
+Borregas
 Borthwick
 Boyz
 Buckleys
@@ -38,6 +40,7 @@ CWLEY
 CZE
 Caitlyn
 Caprese
+Chocolat
 Codelab
 Codey
 Colab
@@ -129,6 +132,7 @@ JPY
 Jang
 Jedi
 Joji
+KFBI
 KNN
 KPIs
 Kaelen
@@ -193,7 +197,9 @@ NVIDIA
 Nagasu
 Niitsuma
 Nintendo
+Nominatim
 Noogler
+ODb
 OOTB
 Oberst
 Ohashi
@@ -203,6 +209,7 @@ Ollama
 Omnibox
 Onone
 Oort
+PDEs
 PDFs
 PEFT
 PLOTLYENV
@@ -246,6 +253,7 @@ SYMED
 SYSROOT
 Sagar
 Sahel
+Schlenoff
 Schwimmer
 Selam
 Sestero
@@ -427,6 +435,7 @@ emojis
 ename
 epath
 epoc
+erty
 etf
 etils
 eur
@@ -466,6 +475,7 @@ gcsfs
 gdk
 gdkx
 genai
+geocoded
 getdata
 getexif
 getparent
@@ -578,14 +588,18 @@ ngrams
 nlp
 nmade
 nmilitary
+nobserved
+norigin
 notetaker
 nrows
+ntheory
 nunique
 oai
 objc
 ollama
 onesie
 onesies
+osm
 osx
 owlbot
 oxml
