@@ -68,3 +68,6 @@ This is not an officially supported Google product.
 `HEY_LLM` and `IMAGEN` use Google's Vertex AI platform, and sharing your spreadsheet with others could result in unexpected charges on your account.
 
 This extension uses the [apps-script-oauth2](https://github.com/googleworkspace/apps-script-oauth2) library to manage OAuth2 tokens, and the tokens are stored as document properties following the recommendations of the library. Granting edit permissions to others lets them retrieve these tokens.
+
+## Author
+Shuhei Iitsuka ([@tushuhei](https://github.com/tushuhei))
