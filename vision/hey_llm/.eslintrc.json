@@ -1,0 +1,13 @@
+{
+  "extends": "./node_modules/gts/",
+  "rules": {
+    "n/no-unpublished-import": [
+      "error",
+      {
+        "allowModules": [
+          "@google-cloud/vertexai"
+        ]
+      }
+    ]
+  }
+}
