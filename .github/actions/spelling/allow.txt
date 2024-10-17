@@ -125,6 +125,7 @@ ICML
 INFOPLIST
 IVF
 Isner
+JPY
 Jang
 Jedi
 Joji
