@@ -6,7 +6,7 @@
 
 Before you begin, you'll need to set up a few things:
 
-### Install and set up [clasp](https://github.com/google/clasp): Clasp is a command-line tool that helps you manage Google Apps Script projects.
+### Install and set up [clasp](https://github.com/google/clasp): Clasp is a command-line tool that helps you manage Google Apps Script projects
 
 - Install clasp globally: `npm install -g @google/clasp`
 - Enable the Google Apps Script API: Visit [https://script.google.com/home/usersettings](https://script.google.com/home/usersettings) and enable the API.
