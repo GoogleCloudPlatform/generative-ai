@@ -32,7 +32,8 @@ Before you begin, you'll need to set up a few things:
 
 2. **Get the Spreadsheet ID and Script ID:**
     - After running the command, you'll see URLs for the created spreadsheet and the GAS script:
-    ```
+
+    ```bash
     Created new Google Sheet: https://drive.google.com/open?id=XXXXXX
     Created new Google Sheets Add-on script: https://script.google.com/d/YYYYYY/edit
     ```
@@ -60,9 +61,11 @@ Before you begin, you'll need to set up a few things:
     You can now use the `HEY_LLM` and `IMAGEN` functions in your spreadsheet!
 
 ## Disclaimer
+
 This is not an officially supported Google product.
 
 ## Caveat
+
 *Be cautious about who you grant edit access to this spreadsheet!*
 
 `HEY_LLM` and `IMAGEN` use Google's Vertex AI platform, and sharing your spreadsheet with others could result in unexpected charges on your account.
@@ -70,4 +73,5 @@ This is not an officially supported Google product.
 This extension uses the [apps-script-oauth2](https://github.com/googleworkspace/apps-script-oauth2) library to manage OAuth2 tokens, and the tokens are stored as document properties following the recommendations of the library. Granting edit permissions to others lets them retrieve these tokens.
 
 ## Author
+
 Shuhei Iitsuka ([@tushuhei](https://github.com/tushuhei))
