@@ -268,25 +268,26 @@ function uploadImageToDrive_(
     mimeType: mimeType,
     parents: [parentFolderID],
   };
-  const payload = `--foo_bar_baz
+  const boundary = 'UploadImageRequestBoundary';
+  const payload = `--${boundary}
 Content-Type: application/json; charset=UTF-8
 
 ${JSON.stringify(metadata)}
 
---foo_bar_baz
+--${boundary}
 Content-Type: ${mimeType}
 Content-Transfer-Encoding: base64
 
 ${base64image}
 
---foo_bar_baz--`;
+--${boundary}--`;
   const uploadRes = UrlFetchApp.fetch(
     'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=thumbnailLink',
     {
       method: 'post',
       headers: {
         Authorization: 'Bearer ' + oauth.getAccessToken(),
-        'Content-Type': 'multipart/related; boundary=foo_bar_baz',
+        'Content-Type': `multipart/related; boundary=${boundary}`,
       },
       payload: payload,
       muteHttpExceptions: true,
