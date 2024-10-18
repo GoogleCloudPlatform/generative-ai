@@ -174,7 +174,7 @@ class RAGWorkflow(Workflow):
     ) -> QueryBundle:
         """Combine queries using StepDecomposeQueryTransform."""
         transform_metadata = {"prev_reasoning": prev_reasoning}
-        return StepDecomposeQueryTransform(llm=llm)(
+        return StepDecomposeQueryTransform(llm=llm_inner)(
             query_bundle, metadata=transform_metadata
         )
 
@@ -227,25 +227,16 @@ class RAGWorkflow(Workflow):
 
         index = self.create_index(dirname)
 
-        state = {
-            "prev_reasoning": "",
-            "cur_response": None,
-            "should_stop": False,
-            "cur_steps": 0,
-            "text_chunks": [],
-            "source_nodes": [],
-        }
-
-        # prev_reasoning = ""
-        # cur_response = None
-        # should_stop = False
-        # cur_steps = 0
+        prev_reasoning = ""
+        cur_response = None
+        should_stop = False
+        cur_steps = 0
 
         # use response
         final_response_metadata: Dict[str, Any] = {"sub_qa": []}
 
-        # text_chunks = []
-        # source_nodes = []
+        text_chunks = []
+        source_nodes = []
 
         stop_fn = self.default_stop_fn
 
@@ -266,55 +257,55 @@ class RAGWorkflow(Workflow):
         print(num_steps)
         query_engine = index.as_query_engine()
 
-        while not state["should_stop"]:
-            if num_steps is not None and state["cur_steps"] >= num_steps:
-                state["should_stop"] = True
+        while not should_stop:
+            if num_steps is not None and cur_steps >= num_steps:
+                should_stop = True
                 break
 
             print(llm)
             updated_query_bundle = self.combine_queries(
                 QueryBundle(query_str=query),
-                state["prev_reasoning"],
-                llm=Settings.llm,
+                prev_reasoning,
+                llm_inner=Settings.llm,
             )
 
             print(
-                f"Created query for the step - {state["cur_steps"]} is: {updated_query_bundle}"
+                f"Created query for the step - {cur_steps} is: {updated_query_bundle}"
             )
 
             stop_dict = {"query_bundle": updated_query_bundle}
             if stop_fn(stop_dict):
-                state["should_stop"] = True
+                should_stop = True
                 break
 
-            state["cur_response"] = query_engine.query(updated_query_bundle)
+            cur_response = query_engine.query(updated_query_bundle)
 
             # append to response builder
             cur_qa_text = (
                 f"\nQuestion: {updated_query_bundle.query_str}\n"
-                f"Answer: {state["cur_response"]!s}"
+                f"Answer: {cur_response!s}"
             )
             state["text_chunks"].append(cur_qa_text)
-            for source_node in state["cur_response"].source_nodes:
+            for source_node in cur_response.source_nodes:
                 print(source_node)
-                state["source_nodes"].append(source_node)
+                source_node.append(source_node)
 
             # update metadata
             final_response_metadata["sub_qa"].append(
-                (updated_query_bundle.query_str, state["cur_response"])
+                (updated_query_bundle.query_str, cur_response)
             )
 
-            state["prev_reasoning"] += (
-                f"- {updated_query_bundle.query_str}\n" f"- {state["cur_response"]!s}\n"
+            prev_reasoning += (
+                f"- {updated_query_bundle.query_str}\n" f"- {cur_response!s}\n"
             )
-            state["cur_steps"] += 1
+            cur_steps += 1
 
         nodes = [
-            NodeWithScore(node=TextNode(text=text_chunk)) for text_chunk in state["text_chunks"]
+            NodeWithScore(node=TextNode(text=text_chunk)) for text_chunk in text_chunks
         ]
         return QueryMultiStepEvent(
             nodes=nodes,
-            source_nodes=state["source_nodes"],
+            source_nodes=source_nodes,
             final_response_metadata=final_response_metadata,
         )
 
@@ -373,11 +364,11 @@ class RAGWorkflow(Workflow):
 
             print(node)
 
-            state["text_chunks"] = text_splitter.split_text(
+            text_chunks = text_splitter.split_text(
                 node.node.get_content(metadata_mode=MetadataMode.NONE)
             )
 
-            for text_chunk in state["text_chunks"]:
+            for text_chunk in text_chunks:
                 text = f"Source {len(new_nodes)+1}:\n{text_chunk}\n"
 
                 new_node = NodeWithScore(
