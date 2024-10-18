@@ -95,7 +95,7 @@ Before running this application on Cloud Run, make sure you have the following:
    ```bash
    gcloud builds submit —region=us-west2 —tag us-west2-docker.pkg.dev/[YOUR_PROJECT_ID]]/my-docker-repo/llama-workflows-app:first
    ```
-   
+
 3. Deploy the Docker Image to Cloud Run:
 
    ```bash

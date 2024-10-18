@@ -312,7 +312,7 @@ class RAGWorkflow(Workflow):
     @step()
     async def rerank(self, ctx: Context, ev: QueryMultiStepEvent) -> RerankEvent:
         """Reranking the nodes based on the initial query."""
-        
+
         print("Entered the rerank event")
         # Rerank the nodes
         ranker = LLMRerank(choice_batch_size=5, top_n=10, llm=Settings.llm)
