@@ -89,6 +89,7 @@ Before running this application on Cloud Run, make sure you have the following:
        --location=us-west2 \
        --description="Docker repository for Llama workflow app"
    ```
+
 2. Build the Docker image on Artifact Registry:
 
    ```bash

@@ -62,7 +62,6 @@ safety_config = [
     ),
 ]
 embedding_model = VertexTextEmbedding("text-embedding-004", credentials=credentials)
-# embedding_model = VertexTextEmbedding("text-embedding-004")
 llm = Vertex(
     model="gemini-pro",
     temperature=0.2,
@@ -70,7 +69,6 @@ llm = Vertex(
     safety_settings=safety_config,
     credentials=credentials,
 )
-# llm = Vertex(model="gemini-1.5-pro", temperature=0.0, max_tokens=3000, safety_settings=safety_config)
 
 Settings.embed_model = embedding_model
 Settings.llm = llm
@@ -166,6 +164,8 @@ DEFAULT_CITATION_CHUNK_OVERLAP = 20
 
 
 class RAGWorkflow(Workflow):
+    """Defines Workflow class that architects complex Retrieval Augmented Generation (RAG) workflow using Gemini models and Firestore databases."""
+
     def combine_queries(
         self,
         query_bundle: QueryBundle,
@@ -186,7 +186,7 @@ class RAGWorkflow(Workflow):
 
         return "none" in query_bundle.query_str.lower()
 
-    def create_index(self, dirname: str) -> VectorStoreIndex:
+    def create_index(self, dirname: str | None) -> VectorStoreIndex:
         """Create Vector Store Index from documents in Firestore Database"""
 
         if not dirname:
@@ -311,6 +311,8 @@ class RAGWorkflow(Workflow):
 
     @step()
     async def rerank(self, ctx: Context, ev: QueryMultiStepEvent) -> RerankEvent:
+        """Reranking the nodes based on the initial query."""
+        
         print("Entered the rerank event")
         # Rerank the nodes
         ranker = LLMRerank(choice_batch_size=5, top_n=10, llm=Settings.llm)
@@ -319,8 +321,9 @@ class RAGWorkflow(Workflow):
             new_nodes = ranker.postprocess_nodes(
                 ev.nodes, query_str=await ctx.get("query", default=None)
             )
-        except Exception as ex:
-            # re ranker is not guaranteed to create parsable output
+        except IndexError as ex:
+            print(f"IndexError occurred during reranking: {ex}")
+            print("Using previous nodes instead.")
             new_nodes = ev.nodes
 
         print(f"Reranked nodes to {len(new_nodes)}")
@@ -400,6 +403,7 @@ class RAGWorkflow(Workflow):
 
 
 async def main() -> None:
+    """Deploys Workflow service."""
 
     print("starting deploy workflow creation")
     await deploy_workflow(

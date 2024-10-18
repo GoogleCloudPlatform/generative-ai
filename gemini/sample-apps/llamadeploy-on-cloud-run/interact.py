@@ -6,7 +6,8 @@ app = Flask(__name__)
 
 @app.route("/", methods=["POST"])
 async def run() -> jsonify:
-
+    """Provides a Flask application to interact with the deployed workflow."""
+    
     data = request.get_json()
     workflow_name = data.get("workflow", "my_workflow")  # Default to 'my_workflow'
     print(workflow_name)
