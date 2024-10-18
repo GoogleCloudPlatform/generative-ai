@@ -219,7 +219,7 @@ class RAGWorkflow(Workflow):
     @step(pass_context=True)
     async def query_multistep(
         self, ctx: Context, ev: StartEvent
-    ) -> QueryMultiStepEvent:
+    ) -> QueryMultiStepEvent | None:
         """Entry point for RAG, triggered by a StartEvent with `query`. Execute multi-step query process."""
 
         query = ev.get("query")
@@ -260,8 +260,6 @@ class RAGWorkflow(Workflow):
         while not should_stop:
             if num_steps is not None and cur_steps >= num_steps:
                 should_stop = True
-                break
-            elif should_stop:
                 break
 
             print(llm)
@@ -321,7 +319,7 @@ class RAGWorkflow(Workflow):
             new_nodes = ranker.postprocess_nodes(
                 ev.nodes, query_str=await ctx.get("query", default=None)
             )
-        except:
+        except Exception as ex:
             # re ranker is not guaranteed to create parsable output
             new_nodes = ev.nodes
 
@@ -401,7 +399,7 @@ class RAGWorkflow(Workflow):
         return StopEvent(result=response)
 
 
-async def main():
+async def main() -> None:
 
     print("starting deploy workflow creation")
     await deploy_workflow(
