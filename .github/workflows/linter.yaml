@@ -28,10 +28,16 @@ jobs:
   format:
     name: Format Code
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       # Step 2: Set up Python environment
       - name: Set up Python
@@ -69,7 +75,7 @@ jobs:
         if: success() && steps.changes.outputs.CHANGES_PRESENT == 'true'
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
 
   build:
     name: Lint Code Base
