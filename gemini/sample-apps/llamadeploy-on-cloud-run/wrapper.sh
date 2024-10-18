@@ -40,18 +40,41 @@ python3 interact.py &
 interact_pid=$!
 echo "interact.py started with PID: $interact_pid"
 
+# # Wait for any process to exit OR a signal
+# while wait -n; do 
+#   # Check if a signal was received
+#   if [ $? -gt 128 ]; then 
+#     echo "Signal received. Exiting..."
+#     exit 0 
+#   fi
+# done
+
+# # Log the exit status of the process that exited first
+# exit_status=$?
+# echo "Process with PID $! exited with status $exit_status"
+
+# # Exit with the exit status of the process that exited first
+# exit $exit_status
+
 # Wait for any process to exit OR a signal
-while wait -n; do 
+while true; do
+  # Wait for a child process to exit
+  wait -n
+
+  # Store the PID of the exited process
+  exited_pid=$!
+
   # Check if a signal was received
-  if [ $? -gt 128 ]; then 
+  if [ $? -gt 128 ]; then
     echo "Signal received. Exiting..."
-    exit 0 
+    exit 0
+  fi
+
+  # Check the exit status of the exited process
+  if wait $exited_pid; then
+    echo "Process $exited_pid exited successfully."
+  else
+    echo "Process $exited_pid failed with exit code $?"
+    exit 1  # Or handle the error appropriately
   fi
 done
-
-# Log the exit status of the process that exited first
-exit_status=$?
-echo "Process with PID $! exited with status $exit_status"
-
-# Exit with the exit status of the process that exited first
-exit $exit_status
