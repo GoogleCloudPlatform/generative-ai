@@ -217,7 +217,7 @@ class RAGWorkflow(Workflow):
         print("Vector Store Index created")
         return index
 
-    #pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
     async def multi_query_inner_loop(self, query_engine: BaseQueryEngine, query: str, num_steps: int, cur_steps: int) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
         """Helper function to execute the query loop."""
 
@@ -274,7 +274,7 @@ class RAGWorkflow(Workflow):
             cur_steps += 1
 
         return text_chunks, source_nodes, final_response_metadata
-    # pylint: enable=too-many-locals 
+    # pylint: enable=too-many-locals
 
     @step(pass_context=True)
     async def query_multistep(
