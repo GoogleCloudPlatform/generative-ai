@@ -3,6 +3,17 @@
 # Set -e to exit immediately if a command exits with a non-zero status.
 set -e
 
+# Function to handle signals (e.g., SIGTERM, SIGINT)
+function handle_signal() {
+  echo "Received signal. Stopping processes..."
+  kill $core_pid $workflow_pid $interact_pid
+  wait
+  exit 0
+}
+
+# Trap signals to gracefully stop processes
+trap handle_signal SIGTERM SIGINT
+
 # Start core.py in the background and log its PID
 echo "Starting core.py..."
 python3 core.py &
@@ -29,19 +40,14 @@ python3 interact.py &
 interact_pid=$!
 echo "interact.py started with PID: $interact_pid"
 
-# Function to handle signals (e.g., SIGTERM, SIGINT)
-function handle_signal() {
-  echo "Received signal. Stopping processes..."
-  kill $core_pid $workflow_pid $interact_pid
-  wait
-  exit 0
-}
-
-# Trap signals to gracefully stop processes
-trap handle_signal SIGTERM SIGINT
-
-# Wait for any process to exit
-wait -n
+# Wait for any process to exit OR a signal
+while wait -n; do 
+  # Check if a signal was received
+  if [ $? -gt 128 ]; then 
+    echo "Signal received. Exiting..."
+    exit 0 
+  fi
+done
 
 # Log the exit status of the process that exited first
 exit_status=$?
