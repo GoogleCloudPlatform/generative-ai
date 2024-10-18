@@ -197,6 +197,7 @@ NVIDIA
 Nagasu
 Niitsuma
 Nintendo
+noabe
 Nominatim
 Noogler
 ODb

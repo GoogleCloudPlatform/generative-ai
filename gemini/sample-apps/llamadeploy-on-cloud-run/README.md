@@ -1,6 +1,6 @@
 # Llama Deploy on Cloud Run
 
-This repository contains a Llama Index Workflow application that demonstrates how to deploy and interact with Llama workflows using the `llama-deploy` library and deploying the service on Cloud Run. 
+This repository contains a LlamaIndex Workflow application that demonstrates how to deploy and interact with Llama workflows using the `llama-deploy` library and deploying the service on Cloud Run. 
 
 The Workflow deployed on Cloud Run is a complex Retrieval Augmented Generation (RAG) workflow using Gemini models and Firestore databases.
 
