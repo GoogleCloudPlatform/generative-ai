@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 1rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        margin: 0 0 1rem;
+      }
+
+      .form-section {
+        margin-bottom: 1rem;
+      }
+
+      .form-section input {
+        box-sizing: border-box;
+        line-height: 1.5rem;
+        width: 100%;
+      }
+
+      .primary-button {
+        background: #1a73e8;
+        border-radius: 0.5rem;
+        color: #fff;
+        cursor: pointer;
+        display: inline-block;
+        line-height: 1.5rem;
+        padding: 0.25rem 0.75rem;
+        text-decoration: none;
+      }
+
+      .primary-button:hover {
+        background: #4285f4;
+      }
+
+      .primary-button.disabled {
+        background: #80868b;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>HEY_LLM</h1>
+    <div class="form-section">
+      <input
+        type="text"
+        name="client_id"
+        id="client_id"
+        placeholder="OAuth Client ID"
+      />
+    </div>
+    <div class="form-section">
+      <input
+        type="text"
+        name="client_secret"
+        id="client_secret"
+        placeholder="OAuth Client Secret"
+      />
+    </div>
+    <div>
+      <a href="#" id="authorize" target="_blank" class="primary-button disabled"
+        >Authorize</a
+      >
+    </div>
+
+    <script>
+      const clientIDInput = document.getElementById('client_id');
+      const clientSecretInput = document.getElementById('client_secret');
+      const authorizeButton = document.getElementById('authorize');
+
+      const checkIfReadyToAuthorize = () => {
+        google.script.run
+          .withSuccessHandler(value => {
+            if (value) {
+              authorizeButton.classList.remove('disabled');
+              authorizeButton.setAttribute('href', value);
+            } else {
+              authorizeButton.classList.add('disabled');
+              authorizeButton.setAttribute('href', 'javascript:void(0)');
+            }
+            authorizeButton.textContent = 'Authorize';
+          })
+          .getAuthorizationUrl();
+      };
+
+      clientIDInput.addEventListener('input', () => {
+        authorizeButton.classList.add('disabled');
+        authorizeButton.setAttribute('href', 'javascript:void(0)');
+        authorizeButton.textContent = 'Checking...';
+        google.script.run
+          .withSuccessHandler(value => {
+            checkIfReadyToAuthorize();
+          })
+          .setClientID(clientIDInput.value);
+      });
+
+      clientSecretInput.addEventListener('input', () => {
+        authorizeButton.classList.add('disabled');
+        authorizeButton.setAttribute('href', 'javascript:void(0)');
+        authorizeButton.textContent = 'Checking...';
+        google.script.run
+          .withSuccessHandler(value => {
+            checkIfReadyToAuthorize();
+          })
+          .setClientSecret(clientSecretInput.value);
+      });
+    </script>
+  </body>
+</html>
