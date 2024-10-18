@@ -25,7 +25,7 @@ sleep 15
 
 # Start interact.py in the foreground and log its PID
 echo "Starting interact.py..."
-python3 interact.py 
+python3 interact.py &
 interact_pid=$!
 echo "interact.py started with PID: $interact_pid"
 
