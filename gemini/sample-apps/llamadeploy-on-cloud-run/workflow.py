@@ -36,7 +36,7 @@ from llama_index.storage.docstore.firestore import FirestoreDocumentStore
 import vertexai
 from vertexai.generative_models import HarmBlockThreshold, HarmCategory, SafetySetting
 
-# credentials will now have an api token
+# credentials will now have an API token
 
 project_id = os.environ.get("PROJECT_ID")
 location = os.environ.get("LOCATION")
