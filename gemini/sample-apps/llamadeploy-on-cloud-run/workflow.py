@@ -220,7 +220,7 @@ class RAGWorkflow(Workflow):
     async def multi_query_inner_loop(self, query_engine: BaseQueryEngine, query: str, num_steps: int, cur_steps: int) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
         """Helper function to execute the query loop."""
 
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-locals
         prev_reasoning = ""
         cur_response = None
         should_stop = False
