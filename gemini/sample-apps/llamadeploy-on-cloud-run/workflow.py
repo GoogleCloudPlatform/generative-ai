@@ -30,6 +30,7 @@ from llama_index.core.workflow import (
     Workflow,
     step,
 )
+from llama_index.core.base.base_query_engine import BaseQueryEngine
 from llama_index.embeddings.vertex import VertexTextEmbedding
 from llama_index.llms.vertex import Vertex
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
@@ -216,13 +217,12 @@ class RAGWorkflow(Workflow):
         print("Vector Store Index created")
         return index
 
-    async def multi_query_inner_loop(self, query_engine: BaseQueryEngine, query: str, num_steps: int) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
+    async def multi_query_inner_loop(self, query_engine: BaseQueryEngine, query: str, num_steps: int, cur_steps: int) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
         """Helper function to execute the query loop."""
 
         prev_reasoning = ""
         cur_response = None
         should_stop = False
-        cur_steps = 0
 
         final_response_metadata: Dict[str, Any] = {"sub_qa": []}
         text_chunks: list[str] = []
@@ -271,7 +271,7 @@ class RAGWorkflow(Workflow):
                 f"- {updated_query_bundle.query_str}\n" f"- {cur_response!s}\n"
             )
             cur_steps += 1
-        
+
         return text_chunks, source_nodes, final_response_metadata
 
     @step(pass_context=True)
@@ -288,12 +288,12 @@ class RAGWorkflow(Workflow):
         # prev_reasoning = ""
         # cur_response = None
         # should_stop = False
-        # cur_steps = 0
+        cur_steps = 0
 
         # # use response
         # final_response_metadata: Dict[str, Any] = {"sub_qa": []}
 
-        # text_chunks: list[str] = []  
+        # text_chunks: list[str] = []
         # source_nodes: list[NodeWithScore] = []
 
         # stop_fn = self.default_stop_fn
@@ -315,12 +315,12 @@ class RAGWorkflow(Workflow):
         print(num_steps)
         query_engine = index.as_query_engine()
 
-        result = await self.multi_query_inner_loop(query_engine, query, num_steps)
+        result = await self.multi_query_inner_loop(query_engine, query, num_steps, cur_steps)
         if result is None:
             return None
 
         text_chunks, source_nodes, final_response_metadata = result
-        
+
         nodes = [
             NodeWithScore(node=TextNode(text=text_chunk)) for text_chunk in text_chunks
         ]
