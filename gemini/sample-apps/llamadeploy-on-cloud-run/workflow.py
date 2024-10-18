@@ -216,7 +216,7 @@ class RAGWorkflow(Workflow):
         print("Vector Store Index created")
         return index
 
-    async def multi_query_inner_loop(self, query_engine, query, num_steps) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
+    async def multi_query_inner_loop(self, query_engine: BaseQueryEngine, query: str, num_steps: int) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
         """Helper function to execute the query loop."""
 
         prev_reasoning = ""
@@ -285,18 +285,18 @@ class RAGWorkflow(Workflow):
 
         index = self.create_index(dirname)
 
-        prev_reasoning = ""
-        cur_response = None
-        should_stop = False
-        cur_steps = 0
+        # prev_reasoning = ""
+        # cur_response = None
+        # should_stop = False
+        # cur_steps = 0
 
-        # use response
-        final_response_metadata: Dict[str, Any] = {"sub_qa": []}
+        # # use response
+        # final_response_metadata: Dict[str, Any] = {"sub_qa": []}
 
-        text_chunks: list[str] = []  
-        source_nodes: list[NodeWithScore] = []
+        # text_chunks: list[str] = []  
+        # source_nodes: list[NodeWithScore] = []
 
-        stop_fn = self.default_stop_fn
+        # stop_fn = self.default_stop_fn
 
         if not query:
             return None
