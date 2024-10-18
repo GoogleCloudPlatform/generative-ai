@@ -216,46 +216,18 @@ class RAGWorkflow(Workflow):
         print("Vector Store Index created")
         return index
 
-    @step(pass_context=True)
-    async def query_multistep(
-        self, ctx: Context, ev: StartEvent
-    ) -> QueryMultiStepEvent | None:
-        """Entry point for RAG, triggered by a StartEvent with `query`. Execute multi-step query process."""
-
-        query = ev.get("query")
-        dirname = os.environ.get("DATA_DIRECTORY")
-
-        index = self.create_index(dirname)
+    async def multi_query_inner_loop(self, query_engine, query, num_steps) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
+        """Helper function to execute the query loop."""
 
         prev_reasoning = ""
         cur_response = None
         should_stop = False
         cur_steps = 0
 
-        # use response
         final_response_metadata: Dict[str, Any] = {"sub_qa": []}
-
-        text_chunks = []
-        source_nodes = []
-
+        text_chunks: list[str] = []
+        source_nodes: list[NodeWithScore] = []
         stop_fn = self.default_stop_fn
-
-        if not query:
-            return None
-
-        print(f"Query the database with: {query}")
-
-        # store the query in the global context
-        await ctx.set("query", query)
-
-        # get the index from the global context
-        if index is None:
-            print("Index is empty, load some documents before querying!")
-            return None
-
-        num_steps = ev.get("num_steps")
-        print(num_steps)
-        query_engine = index.as_query_engine()
 
         while not should_stop:
             if num_steps is not None and cur_steps >= num_steps:
@@ -285,10 +257,10 @@ class RAGWorkflow(Workflow):
                 f"\nQuestion: {updated_query_bundle.query_str}\n"
                 f"Answer: {cur_response!s}"
             )
-            state["text_chunks"].append(cur_qa_text)
+            text_chunks.append(cur_qa_text)
             for source_node in cur_response.source_nodes:
                 print(source_node)
-                source_node.append(source_node)
+                source_nodes.append(source_node)
 
             # update metadata
             final_response_metadata["sub_qa"].append(
@@ -299,7 +271,56 @@ class RAGWorkflow(Workflow):
                 f"- {updated_query_bundle.query_str}\n" f"- {cur_response!s}\n"
             )
             cur_steps += 1
+        
+        return text_chunks, source_nodes, final_response_metadata
 
+    @step(pass_context=True)
+    async def query_multistep(
+        self, ctx: Context, ev: StartEvent
+    ) -> QueryMultiStepEvent | None:
+        """Entry point for RAG, triggered by a StartEvent with `query`. Execute multi-step query process."""
+
+        query = ev.get("query")
+        dirname = os.environ.get("DATA_DIRECTORY")
+
+        index = self.create_index(dirname)
+
+        prev_reasoning = ""
+        cur_response = None
+        should_stop = False
+        cur_steps = 0
+
+        # use response
+        final_response_metadata: Dict[str, Any] = {"sub_qa": []}
+
+        text_chunks: list[str] = []  
+        source_nodes: list[NodeWithScore] = []
+
+        stop_fn = self.default_stop_fn
+
+        if not query:
+            return None
+
+        print(f"Query the database with: {query}")
+
+        # store the query in the global context
+        await ctx.set("query", query)
+
+        # get the index from the global context
+        if index is None:
+            print("Index is empty, load some documents before querying!")
+            return None
+
+        num_steps = ev.get("num_steps")
+        print(num_steps)
+        query_engine = index.as_query_engine()
+
+        result = await self.multi_query_inner_loop(query_engine, query, num_steps)
+        if result is None:
+            return None
+
+        text_chunks, source_nodes, final_response_metadata = result
+        
         nodes = [
             NodeWithScore(node=TextNode(text=text_chunk)) for text_chunk in text_chunks
         ]
