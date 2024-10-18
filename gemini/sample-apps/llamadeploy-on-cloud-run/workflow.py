@@ -1,51 +1,40 @@
-from llama_index.core.workflow import Event
-from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode, MetadataMode
-from vertexai.generative_models import (
-    HarmCategory,
-    HarmBlockThreshold,
-    SafetySetting,
-)
+import os
+from typing import Any, Dict, List, cast
+
+import google.auth
+import google.auth.transport.requests
+from llama_deploy import ControlPlaneConfig, WorkflowServiceConfig, deploy_workflow
 from llama_index.core import (
-    SimpleDirectoryReader, 
-    VectorStoreIndex,
     Settings,
-    StorageContext
+    SimpleDirectoryReader,
+    StorageContext,
+    VectorStoreIndex,
 )
+from llama_index.core.indices.query.query_transform.base import (
+    StepDecomposeQueryTransform,
+)
+from llama_index.core.llms import LLM
+from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.postprocessor.llm_rerank import LLMRerank
+from llama_index.core.prompts import PromptTemplate
+from llama_index.core.response_synthesizers import (
+    ResponseMode,
+    get_response_synthesizer,
+)
+from llama_index.core.schema import MetadataMode, NodeWithScore, QueryBundle, TextNode
 from llama_index.core.workflow import (
     Context,
-    Workflow,
+    Event,
     StartEvent,
     StopEvent,
+    Workflow,
     step,
 )
 from llama_index.embeddings.vertex import VertexTextEmbedding
 from llama_index.llms.vertex import Vertex
-from llama_index.core.response_synthesizers import (
-    get_response_synthesizer,
-    ResponseMode
-)
-
-from llama_index.core.indices.query.query_transform.base import (
-    StepDecomposeQueryTransform,
-)
-from typing import Dict, List, Any, cast
-
-from llama_index.core.llms import LLM
-from llama_index.core.node_parser import SentenceSplitter
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
-from llama_index.core.prompts import PromptTemplate
-
-from llama_deploy import (
-    deploy_workflow,
-    ControlPlaneConfig,
-    WorkflowServiceConfig,
-)
-
-import google.auth
-import google.auth.transport.requests
-import os
 import vertexai
+from vertexai.generative_models import HarmBlockThreshold, HarmCategory, SafetySetting
 
 # credentials will now have an api token
 
@@ -69,22 +58,30 @@ safety_config = [
     ),
     SafetySetting(
         category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold=HarmBlockThreshold.BLOCK_NONE
-    )
+        threshold=HarmBlockThreshold.BLOCK_NONE,
+    ),
 ]
 embedding_model = VertexTextEmbedding("text-embedding-004", credentials=credentials)
 # embedding_model = VertexTextEmbedding("text-embedding-004")
-llm = Vertex(model="gemini-pro", temperature=0.2, max_tokens=3000, safety_settings=safety_config, credentials=credentials)
+llm = Vertex(
+    model="gemini-pro",
+    temperature=0.2,
+    max_tokens=3000,
+    safety_settings=safety_config,
+    credentials=credentials,
+)
 # llm = Vertex(model="gemini-1.5-pro", temperature=0.0, max_tokens=3000, safety_settings=safety_config)
 
 Settings.embed_model = embedding_model
-Settings.llm=llm
+Settings.llm = llm
+
 
 class RetrieverEvent(Event):
     """Result of running retrieval"""
 
     nodes: list[NodeWithScore]
-    
+
+
 class RerankEvent(Event):
     """Result of running reranking on retrieved nodes"""
 
@@ -92,9 +89,12 @@ class RerankEvent(Event):
     source_nodes: List[NodeWithScore]
     final_response_metadata: Dict[str, Any]
 
+
 class FirestoreIndexData(Event):
     """Result of indexing documents in Firestore"""
+
     status: str
+
 
 class QueryMultiStepEvent(Event):
     """
@@ -110,12 +110,14 @@ class QueryMultiStepEvent(Event):
     source_nodes: List[NodeWithScore]
     final_response_metadata: Dict[str, Any]
 
+
 class CreateCitationsEvent(Event):
     """Add citations to the nodes."""
 
     nodes: List[NodeWithScore]
     source_nodes: List[NodeWithScore]
     final_response_metadata: Dict[str, Any]
+
 
 CITATION_QA_TEMPLATE = PromptTemplate(
     "Your task is to answer the question based on the information given in the sources listed below."
@@ -162,12 +164,16 @@ CITATION_REFINE_TEMPLATE = PromptTemplate(
 DEFAULT_CITATION_CHUNK_SIZE = 512
 DEFAULT_CITATION_CHUNK_OVERLAP = 20
 
+
 class RAGWorkflow(Workflow):
-    def combine_queries(self, query_bundle: QueryBundle, prev_reasoning: str, llm: LLM,) -> QueryBundle:
+    def combine_queries(
+        self,
+        query_bundle: QueryBundle,
+        prev_reasoning: str,
+        llm: LLM,
+    ) -> QueryBundle:
         """Combine queries using StepDecomposeQueryTransform."""
-        transform_metadata = {
-            "prev_reasoning": prev_reasoning
-        }
+        transform_metadata = {"prev_reasoning": prev_reasoning}
         return StepDecomposeQueryTransform(llm=llm)(
             query_bundle, metadata=transform_metadata
         )
@@ -193,7 +199,7 @@ class RAGWorkflow(Workflow):
         # create (or load) docstore and add nodes
         docstore = FirestoreDocumentStore.from_database(
             project=os.environ.get("PROJECT_ID"),
-            database=os.environ.get("FIRESTORE_DATABASE_ID")
+            database=os.environ.get("FIRESTORE_DATABASE_ID"),
         )
 
         docstore.add_documents(documents)
@@ -204,17 +210,16 @@ class RAGWorkflow(Workflow):
 
         # setup index
         index = VectorStoreIndex.from_documents(
-            documents = documents, 
-            storage_context=storage_context
+            documents=documents, storage_context=storage_context
         )
 
         print("Vector Store Index created")
         return index
 
-
     @step(pass_context=True)
     async def query_multistep(
-        self, ctx: Context, ev: StartEvent) -> QueryMultiStepEvent:
+        self, ctx: Context, ev: StartEvent
+    ) -> QueryMultiStepEvent:
         """Entry point for RAG, triggered by a StartEvent with `query`. Execute multi-step query process."""
 
         query = ev.get("query")
@@ -263,7 +268,7 @@ class RAGWorkflow(Workflow):
             updated_query_bundle = self.combine_queries(
                 QueryBundle(query_str=query),
                 prev_reasoning,
-                llm = Settings.llm,
+                llm=Settings.llm,
             )
 
             print(
@@ -286,7 +291,7 @@ class RAGWorkflow(Workflow):
             for source_node in cur_response.source_nodes:
                 print(source_node)
                 source_nodes.append(source_node)
-            
+
             # update metadata
             final_response_metadata["sub_qa"].append(
                 (updated_query_bundle.query_str, cur_response)
@@ -298,35 +303,35 @@ class RAGWorkflow(Workflow):
             cur_steps += 1
 
         nodes = [
-            NodeWithScore(node=TextNode(text=text_chunk))
-            for text_chunk in text_chunks
+            NodeWithScore(node=TextNode(text=text_chunk)) for text_chunk in text_chunks
         ]
         return QueryMultiStepEvent(
             nodes=nodes,
             source_nodes=source_nodes,
             final_response_metadata=final_response_metadata,
         )
-    
+
     @step()
     async def rerank(self, ctx: Context, ev: QueryMultiStepEvent) -> RerankEvent:
         print("Entered the rerank event")
         # Rerank the nodes
-        ranker = LLMRerank(
-            choice_batch_size=5, top_n=10, llm=Settings.llm
-        )
+        ranker = LLMRerank(choice_batch_size=5, top_n=10, llm=Settings.llm)
         print(await ctx.get("query", default=None), flush=True)
         try:
             new_nodes = ranker.postprocess_nodes(
                 ev.nodes, query_str=await ctx.get("query", default=None)
             )
-        except: 
+        except:
             # re ranker is not guaranteed to create parsable output
             new_nodes = ev.nodes
 
         print(f"Reranked nodes to {len(new_nodes)}")
-        return RerankEvent(nodes=new_nodes, source_nodes=ev.source_nodes, final_response_metadata=ev.final_response_metadata)
+        return RerankEvent(
+            nodes=new_nodes,
+            source_nodes=ev.source_nodes,
+            final_response_metadata=ev.final_response_metadata,
+        )
 
-    
     @step()
     async def create_citation_nodes(self, ev: RerankEvent) -> CreateCitationsEvent:
         """
@@ -370,14 +375,18 @@ class RAGWorkflow(Workflow):
                 )
                 new_node.node.text = text
                 new_nodes.append(new_node)
-        return CreateCitationsEvent(nodes=new_nodes, source_nodes=ev.source_nodes, final_response_metadata=ev.final_response_metadata)
+        return CreateCitationsEvent(
+            nodes=new_nodes,
+            source_nodes=ev.source_nodes,
+            final_response_metadata=ev.final_response_metadata,
+        )
 
     @step()
     async def synthesize(self, ctx: Context, ev: CreateCitationsEvent) -> StopEvent:
         """Return a streaming response using reranked nodes."""
-        
+
         print("Synthesizing final result...")
-        
+
         response_synthesizer = get_response_synthesizer(
             llm=Vertex(model="gemini-1.0-pro", temperature=0.1, max_tokens=5000),
             text_qa_template=CITATION_QA_TEMPLATE,
@@ -386,8 +395,11 @@ class RAGWorkflow(Workflow):
             use_async=True,
         )
         query = await ctx.get("query", default=None)
-        response = await response_synthesizer.asynthesize(query, nodes=ev.nodes, additional_source_nodes = ev.source_nodes)
+        response = await response_synthesizer.asynthesize(
+            query, nodes=ev.nodes, additional_source_nodes=ev.source_nodes
+        )
         return StopEvent(result=response)
+
 
 async def main():
 
@@ -395,14 +407,16 @@ async def main():
     await deploy_workflow(
         workflow=RAGWorkflow(timeout=200),
         workflow_config=WorkflowServiceConfig(
-            host='0.0.0.0', port=8002, service_name="my_workflow" # This will make it accessible to all interfaces on the host
+            host="0.0.0.0",
+            port=8002,
+            service_name="my_workflow",  # This will make it accessible to all interfaces on the host
         ),
         control_plane_config=ControlPlaneConfig(),
     )
-    print('Created workflow successfully')
+    print("Created workflow successfully")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import asyncio
-    asyncio.run(main())
 
-    
+    asyncio.run(main())
