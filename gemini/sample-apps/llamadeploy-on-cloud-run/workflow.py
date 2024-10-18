@@ -10,6 +10,7 @@ from llama_index.core import (
     StorageContext,
     VectorStoreIndex,
 )
+from llama_index.core.base.base_query_engine import BaseQueryEngine
 from llama_index.core.indices.query.query_transform.base import (
     StepDecomposeQueryTransform,
 )
@@ -30,7 +31,6 @@ from llama_index.core.workflow import (
     Workflow,
     step,
 )
-from llama_index.core.base.base_query_engine import BaseQueryEngine
 from llama_index.embeddings.vertex import VertexTextEmbedding
 from llama_index.llms.vertex import Vertex
 from llama_index.storage.docstore.firestore import FirestoreDocumentStore
@@ -217,7 +217,9 @@ class RAGWorkflow(Workflow):
         print("Vector Store Index created")
         return index
 
-    async def multi_query_inner_loop(self, query_engine: BaseQueryEngine, query: str, num_steps: int, cur_steps: int) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
+    async def multi_query_inner_loop(
+        self, query_engine: BaseQueryEngine, query: str, num_steps: int, cur_steps: int
+    ) -> tuple[list[str], list[NodeWithScore], Dict[str, Any]] | None:
         """Helper function to execute the query loop."""
 
         # pylint: disable=too-many-locals
@@ -316,7 +318,9 @@ class RAGWorkflow(Workflow):
         print(num_steps)
         query_engine = index.as_query_engine()
 
-        result = await self.multi_query_inner_loop(query_engine, query, num_steps, cur_steps)
+        result = await self.multi_query_inner_loop(
+            query_engine, query, num_steps, cur_steps
+        )
         if result is None:
             return None
 
