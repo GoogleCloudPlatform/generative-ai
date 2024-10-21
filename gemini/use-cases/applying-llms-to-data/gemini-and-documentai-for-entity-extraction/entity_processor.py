@@ -2,6 +2,7 @@ import json
 import mimetypes
 from typing import Dict
 
+from google.cloud import documentai
 from vertexai.generative_models import GenerativeModel, Part
 
 
@@ -16,7 +17,7 @@ class EntityExtractor:
 class DocumentAIEntityExtractor(EntityExtractor):
     """Class for Document AI entity extraction"""
 
-    def __init__(self, document) -> None:
+    def __init__(self, document: documentai.Document) -> None:
         self.document = document
 
     def extract_entities(self) -> Dict:
@@ -29,7 +30,7 @@ class DocumentAIEntityExtractor(EntityExtractor):
 class ModelBasedEntityExtractor(EntityExtractor):
     """Class for Gemini entity extraction"""
 
-    def __init__(self, model_version, prompt, file_path) -> None:
+    def __init__(self, model_version: str, prompt: str, file_path: str) -> None:
         self.model = GenerativeModel(model_version)
         self.prompt = prompt
         mime_type = mimetypes.guess_type(file_path)[0]
