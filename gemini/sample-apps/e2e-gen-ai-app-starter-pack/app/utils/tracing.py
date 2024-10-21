@@ -57,7 +57,6 @@ class CloudTraceLoggingSpanExporter(CloudTraceSpanExporter):
         self.logger = self.logging_client.logger(__name__)
         self.storage_client = storage_client or storage.Client(project=self.project_id)
         self.bucket_name = bucket_name or f"{self.project_id}-logs-data"
-        self._ensure_bucket_exists()
         self.bucket = self.storage_client.bucket(self.bucket_name)
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
@@ -89,12 +88,6 @@ class CloudTraceLoggingSpanExporter(CloudTraceSpanExporter):
         # Export spans to Google Cloud Trace using the parent class method
         return super().export(spans)
 
-    def _ensure_bucket_exists(self) -> None:
-        """Ensure that the GCS bucket exists, creating it if necessary."""
-        if not self.storage_client.bucket(self.bucket_name).exists():
-            logging.info(f"Bucket {self.bucket_name} not detected. Creating it now.")
-            self.storage_client.create_bucket(self.bucket_name)
-
     def store_in_gcs(self, content: str, span_id: str) -> str:
         """
         Initiate storing large content in Google Cloud Storage/
@@ -103,6 +96,13 @@ class CloudTraceLoggingSpanExporter(CloudTraceSpanExporter):
         :param span_id: The ID of the span
         :return: The  GCS URI of the stored content
         """
+        if not self.storage_client.bucket(self.bucket_name).exists():
+            logging.warning(
+                f"Bucket {self.bucket_name} not found. "
+                "Unable to store span attributes in GCS."
+            )
+            return "GCS bucket not found"
+
         blob_name = f"spans/{span_id}.json"
         blob = self.bucket.blob(blob_name)
 
