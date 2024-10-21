@@ -15,6 +15,10 @@
         margin: 0 0 1rem;
       }
 
+      li {
+        margin-bottom: 1rem;
+      }
+
       .form-section {
         margin-bottom: 1rem;
       }
@@ -44,37 +48,77 @@
         background: #80868b;
         pointer-events: none;
       }
+
+      .redirect-url {
+        display: inline-block;
+        font-family: monospace;
+        font-weight: bold;
+        overflow-wrap: anywhere;
+      }
     </style>
   </head>
 
   <body>
-    <h1>HEY_LLM</h1>
-    <div class="form-section">
-      <input
-        type="text"
-        name="client_id"
-        id="client_id"
-        placeholder="OAuth Client ID"
-      />
-    </div>
-    <div class="form-section">
-      <input
-        type="text"
-        name="client_secret"
-        id="client_secret"
-        placeholder="OAuth Client Secret"
-      />
-    </div>
-    <div>
-      <a href="#" id="authorize" target="_blank" class="primary-button disabled"
-        >Authorize</a
-      >
-    </div>
+    <section>
+      <h1>HEY_LLM setup</h1>
+      <ol>
+        <li>
+          Visit
+          <a
+            href="https://console.cloud.google.com/apis/credentials/"
+            target="_blank"
+            >“API &amp; Services” &gt; “Credentials”</a
+          >
+          in Google Cloud Console.
+        </li>
+        <li>
+          Select the OAuth Client ID to use. The Application type should be “Web
+          Application”.
+        </li>
+        <li>
+          Add <span class="redirect-url">(loading...)</span> to Authorized
+          redirect URIs.
+        </li>
+        <li>
+          Copy and paste Client ID and Client secret to the input form below and
+          click “Authorize”.
+        </li>
+      </ol>
+      <div class="form-section">
+        <input
+          type="text"
+          name="client_id"
+          id="client_id"
+          placeholder="OAuth Client ID"
+        />
+      </div>
+      <div class="form-section">
+        <input
+          type="text"
+          name="client_secret"
+          id="client_secret"
+          placeholder="OAuth Client Secret"
+        />
+      </div>
+      <div>
+        <a
+          href="#"
+          id="authorize"
+          target="_blank"
+          class="primary-button disabled"
+          >Authorize</a
+        >
+      </div>
+    </section>
 
     <script>
       const clientIDInput = document.getElementById('client_id');
       const clientSecretInput = document.getElementById('client_secret');
       const authorizeButton = document.getElementById('authorize');
+      const BUTTON_LABEL = {
+        authorize: 'Authorize',
+        checking: 'Checking...',
+      };
 
       const checkIfReadyToAuthorize = () => {
         google.script.run
@@ -86,7 +130,7 @@
               authorizeButton.classList.add('disabled');
               authorizeButton.setAttribute('href', 'javascript:void(0)');
             }
-            authorizeButton.textContent = 'Authorize';
+            authorizeButton.textContent = BUTTON_LABEL.authorize;
           })
           .getAuthorizationUrl();
       };
@@ -94,7 +138,7 @@
       clientIDInput.addEventListener('input', () => {
         authorizeButton.classList.add('disabled');
         authorizeButton.setAttribute('href', 'javascript:void(0)');
-        authorizeButton.textContent = 'Checking...';
+        authorizeButton.textContent = BUTTON_LABEL.checking;
         google.script.run
           .withSuccessHandler(value => {
             checkIfReadyToAuthorize();
@@ -105,13 +149,22 @@
       clientSecretInput.addEventListener('input', () => {
         authorizeButton.classList.add('disabled');
         authorizeButton.setAttribute('href', 'javascript:void(0)');
-        authorizeButton.textContent = 'Checking...';
+        authorizeButton.textContent = BUTTON_LABEL.checking;
         google.script.run
           .withSuccessHandler(value => {
             checkIfReadyToAuthorize();
           })
           .setClientSecret(clientSecretInput.value);
       });
+
+      google.script.run
+        .withSuccessHandler(value => {
+          document.querySelectorAll('.redirect-url').forEach(el => {
+            el.textContent =
+              'https://script.google.com/macros/d/' + value + '/usercallback';
+          });
+        })
+        .getScriptId();
     </script>
   </body>
 </html>
