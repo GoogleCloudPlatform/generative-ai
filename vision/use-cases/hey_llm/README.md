@@ -73,7 +73,7 @@ You can now use the `HEY_LLM` and `IMAGEN` functions in your spreadsheet!
 
 ## Updating the script
 
-To update the existing spreadsheet and associated script file with the latest source code, create a `.clasp.json` file in the same directory as this README file with the following content and run `npm run push`.
+To update the existing spreadsheet and associated script file with the latest source code, create a `.clasp.json` file in the same directory as this readme file with the following content and run `npm run push`.
 
 ```json
 {"parentId": ["XXXXXX"], "scriptId": "YYYYYY", "rootDir": "./src"}
