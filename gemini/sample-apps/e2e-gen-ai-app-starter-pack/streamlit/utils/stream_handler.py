@@ -155,8 +155,8 @@ class EventProcessor:
             "end": self.handle_end,
             "on_tool_start": self.handle_tool_start,
             "on_retriever_start": self.handle_tool_start,
-            "on_tool_end": self.handle_tool_and_retriever_end,
-            "on_retriever_end": self.handle_tool_and_retriever_end,
+            "on_tool_end": self.handle_tool_end,
+            "on_retriever_end": self.handle_retriever_end,
             "on_chat_model_stream": self.handle_chat_model_stream,
         }
 
@@ -177,26 +177,37 @@ class EventProcessor:
         )
         self.stream_handler.new_status(msg)
 
-    def handle_tool_and_retriever_end(self, event: Dict[str, Any]) -> None:
+    def handle_retriever_end(self, event: Dict[str, Any]) -> None:
+        """Handle the end of retriever execution.
+
+        This method processes the completion of a retriever operation. Unlike the
+        handle_tool_end method, it doesn't append new messages to the session by default
+        as it wouldn't be supported by the server by default.
+        If appending messages is required, the approach used in handle_tool_end can be
+        replicated here.
+        """
+        data = event["data"]
+
+        tool_name = event.get("name", event["event"])
+        tool_output = {"tool_call_id": tool_name, "content": data["output"]}
+        tool_input = data["input"]
+        msg = (
+            f"\n\nEnding tool: `{tool_name}` with\n **args:**\n"
+            f"```\n{json.dumps(tool_input, indent=2)}\n```\n"
+            f"\n\n**output:**\n "
+            f"```\n{json.dumps(tool_output, indent=2)}\n```"
+        )
+        self.stream_handler.new_status(msg)
+
+    def handle_tool_end(self, event: Dict[str, Any]) -> None:
         """Handle the end of a tool execution."""
         data = event["data"]
 
-        # support for on_tool_end event
-        if isinstance(data["output"], dict):
-            tool_id = data["output"].get("tool_call_id")
-            tool_name = data["output"].get("name")
-            tool_output = data["output"]
-
-        # support for on_retriever_end event
-        elif isinstance(data["output"], list):
-            tool_id = event.get("id", "retriever")
-            tool_name = event.get("name", event["event"])
-            tool_output = {"tool_call_id": tool_name, "content": data["output"]}
-        else:
-            raise ValueError(
-                f"Unexpected data type for tool output: {type(data['output'])}"
-            )
+        tool_id = data["output"].get("tool_call_id")
+        tool_name = data["output"].get("name")
         tool_input = data["input"]
+        tool_output = data["output"]
+
         tool_call_input = AIMessage(
             content="",
             tool_calls=[{"id": tool_id, "name": tool_name, "args": tool_input}],

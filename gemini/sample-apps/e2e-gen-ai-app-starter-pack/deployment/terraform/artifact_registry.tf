@@ -1,5 +1,5 @@
 resource "google_artifact_registry_repository" "my-repo" {
-  location      = "us-central1"
+  location      = var.region
   repository_id = var.artifact_registry_repo_name
   description   = "Repo for Generative AI applications"
   format        = "DOCKER"

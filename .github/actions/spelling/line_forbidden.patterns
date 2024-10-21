@@ -221,7 +221,7 @@
 \b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
 
 # Should be DataFrame or DataFrames
-\b(?!DataFrames?\b)(?!.*[\(\)\{\}\.,=])[Dd]ata\s?[Ff]rames?\b
+\b(?!DataFrames?\b)(?!.*[\(\)\{\}\.,=])(?<!")\b[Dd]ata\s?[Ff]rames?\b(?!")
 
 # Should be Google Cloud
 \s[Gg][Cc][Pp]\s
@@ -294,3 +294,6 @@
 
 # Don't use Google internal links
 ((corp|prod|sandbox).google.com|googleplex.com|https?://[0-9a-z][0-9a-z-]+/|(?:^|[^/.-])\b(?:go|b|cl|cr)/[a-z0-9_.-]+\b)
+
+# Use `%pip` instead of `!pip` or `!pip3`
+!\s?pip3?
