@@ -20,18 +20,18 @@ class TempFileUploader:
         return destination_blob_name
 
     def upload_file(self, file_path: str) -> str:
+        """Function to upload file to GCS"""
         self.destination_blob_name = self._get_destination_blob_name(file_path)
 
         bucket = self.storage_client.bucket(self.temp_bucket_name)
         blob = bucket.blob(self.destination_blob_name)
         blob.upload_from_filename(file_path)
 
-        gcs_destination_uri = (
-            f"gs://{self.temp_bucket_name}/{self.destination_blob_name}"
-        )
+        gcs_destination_uri = f"gs://{self.temp_bucket_name}/{self.destination_blob_name}"
         return gcs_destination_uri
 
     def delete_file(self) -> None:
+        """Function to delete the temporary file from GCS"""
         if self.destination_blob_name:
             bucket = self.storage_client.bucket(self.temp_bucket_name)
             blob = bucket.blob(self.destination_blob_name)

@@ -1,4 +1,5 @@
 def get_extract_entities_prompt() -> str:
+    """Definition of prompt to extract data from a W-2 Tax Form"""
     return """
     Task: Extract W-2 Tax Form Information
 
@@ -69,6 +70,7 @@ def get_extract_entities_prompt() -> str:
 
 
 def get_compare_entities_prompt() -> str:
+    """Definition of prompt to compare output from DocumentAI and Gemini"""
     return """
     **Analyze and compare the following two outputs, one from DocumentAI and the other from Gemini. Identify and list the following:**
 

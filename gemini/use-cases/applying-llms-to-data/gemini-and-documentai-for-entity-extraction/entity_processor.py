@@ -9,6 +9,7 @@ class EntityExtractor:
     """abstract class representing an entity"""
 
     def extract_entities(self) -> Dict:
+    """abstract function"""
         raise NotImplementedError()
 
 
