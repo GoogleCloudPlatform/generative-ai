@@ -1,3 +1,4 @@
+AALR
 AFX
 AGG
 AIP
@@ -5,6 +6,7 @@ AMNOSH
 ANZ
 APIENTRY
 APSTUDIO
+AUVs
 Adidas
 Akihiro
 Akkaoui
@@ -19,6 +21,7 @@ Autechre
 Autorater
 BIKBEAR
 BITCODE
+Bao
 Beckham
 Benno
 Bettes
@@ -28,6 +31,7 @@ Bitcoin
 Borregas
 Borthwick
 Boyz
+Breazeal
 Buckleys
 Buffay
 CALIPSO
@@ -54,6 +58,7 @@ DWMWA
 Dataform
 DeepEval
 Depatmint
+Dexin
 Disturbia
 Doaa
 Doogler
@@ -78,7 +83,10 @@ FLX
 FMWK
 FPDF
 FTPS
+Fangming
 Federer
+Feitian
+Feng
 Finvest
 Firestore
 Fishburne
@@ -131,7 +139,10 @@ Isner
 JPY
 Jang
 Jedi
+Jian
+Jibo
 Joji
+Junzhe
 KFBI
 KNN
 KPIs
@@ -153,6 +164,7 @@ Kubeflow
 Kudrow
 LCEL
 LLMs
+LMPA
 LOOKBACK
 LRESULT
 LSTATUS
@@ -162,6 +174,7 @@ LUVBPTK
 Ladhak
 LangGraph
 Lego
+Leung
 Llion
 Logrus
 Lottry
@@ -209,12 +222,14 @@ Ollama
 Omnibox
 Onone
 Oort
+PBA
 PDEs
 PDFs
 PEFT
 PLOTLYENV
 PYINK
 Parmar
+Pengyu
 Persero
 Phaidon
 Pharma
@@ -236,6 +251,7 @@ Resona
 Rizzoli
 Robben
 Robeco
+Robo
 Ronaldo
 Rousey
 SDKROOT
@@ -282,6 +298,8 @@ Tencent
 Testables
 Tetsuo
 Tianli
+Tianxiang
+Tongsheng
 Topolino
 Traceloop
 Trapp
@@ -299,6 +317,8 @@ VFT
 VMs
 VOS
 VREDRAW
+VSJ
+VSPM
 Vandamm
 Vaswani
 Vergadia
@@ -317,7 +337,12 @@ Wehn
 Wnd
 Womens
 XXE
+Xiang
+Youxi
+Yuxuan
 Yuzuru
+Zhao
+Zhaohua
 Zijin
 Zom
 Zscaler
@@ -519,6 +544,7 @@ imagefont
 imageno
 imdb
 imshow
+informati
 iostream
 ipd
 iphoneos
@@ -601,6 +627,7 @@ onesie
 onesies
 osm
 osx
+outro
 owlbot
 oxml
 pagemap
@@ -635,6 +662,7 @@ preds
 projectid
 protobuf
 pstotext
+pubmed
 pubspec
 putalpha
 putdata
@@ -649,6 +677,7 @@ pyplot
 pysftp
 pyvis
 qna
+quadrotor
 qubit
 qubits
 ragas
@@ -710,6 +739,7 @@ tfidf
 tfvars
 tgz
 thelook
+throug
 tiktoken
 timechart
 titlebar
@@ -736,6 +766,7 @@ vectordb
 vertexai
 vesselin
 vtotal
+waterjet
 wcontext
 wcslen
 websites
@@ -757,6 +788,7 @@ xcodeproj
 xcscheme
 xctest
 xlabel
+xmltodict
 xsi
 xticks
 xxxxxxxx
