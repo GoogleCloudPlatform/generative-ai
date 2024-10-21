@@ -237,7 +237,9 @@ function checkDriveImage_(
 
   if (!response.files) {
     Logger.log(response);
-    throw new Error('no files included in the response');
+    throw new Error(
+      'No files included in the response. ' + res.getContentText(),
+    );
   }
 
   if (response.files.length > 0) {
@@ -281,7 +283,7 @@ Content-Transfer-Encoding: base64
 ${base64image}
 
 --${boundary}--`;
-  const uploadRes = UrlFetchApp.fetch(
+  const res = UrlFetchApp.fetch(
     'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=thumbnailLink',
     {
       method: 'post',
@@ -293,10 +295,24 @@ ${base64image}
       muteHttpExceptions: true,
     },
   );
-  const uploadResult: {thumbnailLink: string} = JSON.parse(
-    uploadRes.getContentText(),
-  );
-  return uploadResult.thumbnailLink;
+  const result: {thumbnailLink?: string} = JSON.parse(res.getContentText());
+  if (!result.thumbnailLink) {
+    Logger.log(payload, result);
+    throw new Error(
+      'Uploading image to Drive failed. Is Drive API enabled? ' +
+        res.getContentText(),
+    );
+  }
+  return result.thumbnailLink;
+}
+
+/**
+ * Gets the current GAS script ID.
+ * @returns The script ID
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getScriptId() {
+  return ScriptApp.getScriptId();
 }
 
 /**
@@ -308,13 +324,19 @@ ${base64image}
 function getScriptName_(oauth: GoogleAppsScriptOAuth2.OAuth2Service) {
   const scriptId = ScriptApp.getScriptId();
   const url = `https://www.googleapis.com/drive/v3/files/${scriptId}?fields=name`;
-  const response = UrlFetchApp.fetch(url, {
+  const res = UrlFetchApp.fetch(url, {
     headers: {
       Authorization: 'Bearer ' + oauth.getAccessToken(),
     },
   });
-  const data: {name: string} = JSON.parse(response.getContentText());
-  return data.name;
+  const result: {name?: string} = JSON.parse(res.getContentText());
+  if (!result.name) {
+    Logger.log(result);
+    throw new Error(
+      'Request to Drive failed. Is Drive API enabled? ' + res.getContentText(),
+    );
+  }
+  return result.name;
 }
 
 /**
@@ -339,8 +361,15 @@ function createDriveFolder_(oauth: GoogleAppsScriptOAuth2.OAuth2Service) {
     payload: payload,
     muteHttpExceptions: true,
   });
-  const response: {id: string} = JSON.parse(res.getContentText());
-  return response.id;
+  const result: {id?: string} = JSON.parse(res.getContentText());
+  if (!result.id) {
+    Logger.log(payload, result);
+    throw new Error(
+      'Creating a Driver folder failed. Is Drive API enabled? ' +
+        res.getContentText(),
+    );
+  }
+  return result.id;
 }
 
 /**
@@ -389,7 +418,10 @@ function requestImagen_(
   } = JSON.parse(res.getContentText());
   if (!result.predictions) {
     Logger.log(payload, result);
-    throw new Error('Request to Imagen failed.');
+    throw new Error(
+      'Request to Vertex AI failed. Is Vertex AI API enabled? ' +
+        res.getContentText(),
+    );
   }
   return result.predictions[0];
 }

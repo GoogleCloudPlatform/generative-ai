@@ -2,6 +2,8 @@
 
 `HEY_LLM` and `IMAGEN` are custom Google Sheets functions that bring the power of large language models (LLMs) and image generation right into your spreadsheets. `HEY_LLM` connects your spreadsheet to Gemini and makes useful inferences over values in your spreadsheet. `IMAGEN` lets you generate images from text prompts directly within your cells, which you can render with Sheet's `IMAGE` function.
 
+![Example](example.gif)
+
 ## Prerequisites
 
 Before you begin, you'll need to set up a few things:
@@ -28,25 +30,27 @@ Before you begin, you'll need to set up a few things:
 
 ### Create the spreadsheet and deploy the script
 
-- Navigate to this directory and run the following command to create a spreadsheet with `HEY_LLM` and `IMAGEN` installed. Replace `YOUR_SHEET_NAME` with the name you want for your spreadsheet (e.g., "My Awesome LLM Sheet").
+Navigate to this directory and run the following command to create a spreadsheet with `HEY_LLM` and `IMAGEN` installed. Replace `"YOUR_SHEET_NAME"` with the name you want for your spreadsheet (e.g., "My Awesome LLM Sheet").
 
 ```bash
-clasp create --type=sheets --rootDir=./src --title="YOUR_SPRINT_NAME" && mv ./src/.clasp.json . && clasp push -f
+TITLE="YOUR_SHEET_NAME" npm run create
 ```
 
 ### Get the Spreadsheet ID and Script ID
 
-- After running the command, you'll see URLs for the created spreadsheet and the GAS script:
+After running the command, you'll see URLs for the created spreadsheet and the GAS script:
 
 ```bash
 Created new Google Sheet: https://drive.google.com/open?id=XXXXXX
 Created new Google Sheets Add-on script: https://script.google.com/d/YYYYYY/edit
 ```
 
-- `XXXXXX` is your **Spreadsheet ID**, and `YYYYYY` is your **Script ID**.
-- You can also find these IDs in the `.clasp.json` file:
-  - `scriptId` is the Script ID.
-  - `parentId` contains the Spreadsheet ID.
+`XXXXXX` is your **Spreadsheet ID**, and `YYYYYY` is your **Script ID**.
+
+You can also find these IDs in the `.clasp.json` file:
+
+- `scriptId` is the Script ID.
+- `parentId` contains the Spreadsheet ID.
 
 ### Set up OAuth2 Client ID and Secret
 
@@ -65,7 +69,17 @@ Created new Google Sheets Add-on script: https://script.google.com/d/YYYYYY/edit
 
 ### Start using the functions
 
-- You can now use the `HEY_LLM` and `IMAGEN` functions in your spreadsheet!
+You can now use the `HEY_LLM` and `IMAGEN` functions in your spreadsheet!
+
+## Updating the script
+
+To update the existing spreadsheet and associated script file with the latest source code, create a `.clasp.json` file in the same directory as this readme file with the following content and run `npm run push`.
+
+```json
+{"parentId": ["XXXXXX"], "scriptId": "YYYYYY", "rootDir": "./src"}
+```
+
+where `XXXXXX` is the **Spreadsheet ID**, and `YYYYYY` is its associated **Script ID**.
 
 ## Disclaimer
 
