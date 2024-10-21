@@ -27,7 +27,9 @@ class TempFileUploader:
         blob = bucket.blob(self.destination_blob_name)
         blob.upload_from_filename(file_path)
 
-        gcs_destination_uri = f"gs://{self.temp_bucket_name}/{self.destination_blob_name}"
+        gcs_destination_uri = (
+            f"gs://{self.temp_bucket_name}/{self.destination_blob_name}"
+        )
         return gcs_destination_uri
 
     def delete_file(self) -> None:

@@ -6,10 +6,10 @@ from vertexai.generative_models import GenerativeModel, Part
 
 
 class EntityExtractor:
-    """abstract class representing an entity"""
+    """Abstract class representing an entity"""
 
     def extract_entities(self) -> Dict:
-    """abstract function"""
+        """Abstract function"""
         raise NotImplementedError()
 
 
