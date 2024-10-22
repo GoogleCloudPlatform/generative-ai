@@ -244,6 +244,7 @@ Photoshop
 Pistorius
 Priyanka
 QPM
+Qwiklab
 Qwiklabs
 RAGAS
 RLHF
@@ -613,6 +614,7 @@ morty
 moviepy
 mpn
 mrr
+multitool
 mwouts
 nbconvert
 nbfmt
