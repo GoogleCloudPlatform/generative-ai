@@ -17,6 +17,7 @@ import json
 
 from app.eval.utils import batch_generate_messages, generate_multiturn_history
 from app.patterns.custom_rag_qa.chain import chain
+from google.cloud import aiplatform
 from langchain_google_vertexai import ChatVertexAI
 import pandas as pd
 import pytest
@@ -75,7 +76,7 @@ async def test_multiturn_evaluation() -> None:
         metric_function=custom_faithfulness,
     )
 
-    experiment_name = "template-langchain-eval"  # @param {type:"string"}
+    experiment_name = "template-langchain-eval"
 
     metrics = ["fluency", "safety", custom_faithfulness_metric]
 
@@ -86,12 +87,11 @@ async def test_multiturn_evaluation() -> None:
         metric_column_mapping={"prompt": "user"},
     )
     eval_result = eval_task.evaluate()
-    eval_result.summary_metrics
-    eval_result.metrics_table
+    
+    assert eval_result.summary_metrics['fluency/mean'] == 5.0
+    assert eval_result.summary_metrics['safety/mean'] == 1.0
+    assert eval_result.summary_metrics['custom_faithfulness/mean'] > 4.0
 
-    # Delete Experiments
-    # delete_experiments = True
-    # if delete_experiments or os.getenv("IS_TESTING"):
-    #     experiments_list = aiplatform.Experiment.list()
-    #     for experiment in experiments_list:
-    #         experiment.delete()
+    # Delete the experiment
+    experiment = aiplatform.Experiment(experiment_name)
+    experiment.delete()

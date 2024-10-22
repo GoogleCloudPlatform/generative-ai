@@ -159,9 +159,12 @@ def batch_generate_messages(
 
         runnable (Callable[[List[Dict[str, Any]]], Dict[str, Any]]): Runnable object
           (e.g., LangChain Chain) used
-            for response generation. It should accept a list of messages in a `batch` function and return
-            a structure containing 'content' containing the AI's response and 'usage_metadata' with optional response metadata.
-            Note: for LangGraph chains, this method needs to be updated as the batch method doesn't return the AI's response, but the whole chat history per row.
+            for response generation. It should have a 'batch' function that takes a
+            dict with a key 'messages' containing a list of messages and returns
+            a structure containing 'content' containing the AI's response and
+            'usage_metadata' with optional response metadata.
+            Note: for LangGraph chains, this method needs to be updated as the
+            batch method doesn't return the AI's response, but the whole chat history per row.
 
         max_workers (int, optional): Number of worker processes for parallel
             prediction. Defaults to 4.
