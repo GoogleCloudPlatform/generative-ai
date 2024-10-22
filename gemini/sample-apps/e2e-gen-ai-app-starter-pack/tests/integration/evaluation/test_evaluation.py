@@ -30,6 +30,13 @@ async def test_multiturn_evaluation() -> None:
     y = yaml.safe_load(open("tests/integration/evaluation/ml_ops_chat.yaml"))
     df = pd.DataFrame(y)
     df = generate_multiturn_history(df)
+    
+    assert len(df) == 2
+    assert df['conversation_history'][0]== []
+    assert df['human_message'][0]['content'][0]['text']== "Explain what's MLOps"
+    assert len(df['conversation_history'][1]) == 4
+    assert df['human_message'][1]['content'][0]['text']== "How can I evaluate my models?"
+    
     scored_data = batch_generate_messages(df, chain)
     scored_data["user"] = scored_data["human_message"].apply(lambda x: x["content"])
     scored_data["reference"] = scored_data["ai_message"].apply(lambda x: x["content"])
