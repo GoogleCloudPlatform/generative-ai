@@ -21,6 +21,7 @@ Autechre
 Autorater
 BIKBEAR
 BITCODE
+BYOR
 Bao
 Beckham
 Benno
@@ -32,6 +33,7 @@ Borregas
 Borthwick
 Boyz
 Breazeal
+Broadoak
 Buckleys
 Buffay
 CALIPSO
@@ -47,6 +49,7 @@ Caprese
 Chocolat
 Codelab
 Codey
+Codicote
 Colab
 Colm
 Cowabunga
@@ -149,6 +152,7 @@ KPIs
 Kaelen
 Kaggle
 Kamradt
+Kanagawa
 Katelyn
 Kaufmanns
 Kawagoe
@@ -182,6 +186,7 @@ MLB
 MSCHF
 MSGSEND
 MTL
+Maa
 Maarten
 Mahindra
 Malware
@@ -202,6 +207,7 @@ NCCREATE
 NDEBUG
 NGRAM
 NGRAMS
+NHK
 NICOLAS
 NMT
 NOMINMAX
@@ -232,11 +238,13 @@ Parmar
 Pengyu
 Persero
 Phaidon
+Phanfone
 Pharma
 Photoshop
 Pistorius
 Priyanka
 QPM
+Qwiklab
 Qwiklabs
 RAGAS
 RLHF
@@ -253,6 +261,7 @@ Robben
 Robeco
 Robo
 Ronaldo
+Rosso
 Rousey
 SDKROOT
 SEK
@@ -285,6 +294,7 @@ Statcast
 Storrer
 Strappy
 Surampudi
+Suzaka
 TARG
 TGI
 TOKENLIST
@@ -334,6 +344,7 @@ WNDCLASS
 Wakatipu
 Weaviate
 Wehn
+Welwyn
 Wnd
 Womens
 XXE
@@ -603,6 +614,7 @@ morty
 moviepy
 mpn
 mrr
+multitool
 mwouts
 nbconvert
 nbfmt
@@ -626,6 +638,7 @@ objc
 ollama
 onesie
 onesies
+openai
 osm
 osx
 outro
@@ -800,14 +813,3 @@ youtube
 ytd
 yticks
 zaxis
-Broadoak
-BYOR
-Codicote
-Kanagawa
-Maa
-NHK
-openai
-Phanfone
-Rosso
-Suzaka
-Welwyn
