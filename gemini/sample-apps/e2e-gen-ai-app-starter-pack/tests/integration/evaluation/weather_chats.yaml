@@ -1,0 +1,306 @@
+- messages:
+  - additional_kwargs: {}
+    content:
+    - text: Hi!
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: Hello there! How can I help you today?
+    example: false
+    id: b4c3183a-f502-4e58-b983-f3da7842b5eb
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: What's the weather like in SF?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        query: weather in SF
+      id: 82ab1113-7185-4c2c-ba5c-b22803ee1d38
+      name: search
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: It's 60 degrees and foggy.
+    id: null
+    name: search
+    response_metadata: {}
+    status: success
+    tool_call_id: 82ab1113-7185-4c2c-ba5c-b22803ee1d38
+    type: tool
+  - additional_kwargs:
+      function_call:
+        arguments: '{"query": "weather in SF"}'
+        name: search
+    content: It's 60 degrees and foggy in San Francisco.
+    example: false
+    id: 2ef51290-ab61-49bb-b2c8-b9d5da3e5add
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: And what's the weather like in Milan?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        query: weather in Milan
+      id: 9dd7233e-79ad-4829-8c94-f078b94e85c2
+      name: search
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: It's 90 degrees and sunny.
+    id: null
+    name: search
+    response_metadata: {}
+    status: success
+    tool_call_id: 9dd7233e-79ad-4829-8c94-f078b94e85c2
+    type: tool
+  - additional_kwargs:
+      function_call:
+        arguments: '{"query": "weather in Milan"}'
+        name: search
+    content: It's 90 degrees and sunny in Milan.
+    example: false
+    id: 0fa56efa-8fae-477e-8df9-f06be5b39399
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: Thanks
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: You're welcome! Is there anything else I can help you with?
+    example: false
+    id: a8fc2d91-1bcc-4e4b-8c38-898a5b6f029a
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  title: Short Conversation
+  update_time: '2024-10-16T13:08:55.032257'
+- messages:
+  - additional_kwargs: {}
+    content:
+    - text: Hi!
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: Hello there! How can I help you today?
+    example: false
+    id: bae20877-2f4c-4aef-a2b7-2f5f455c5ad4
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: What's your name?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: I'm Gemini, a large language model created by Google.  I'm here to assist
+      you with a variety of tasks, from answering questions to generating creative
+      content. How can I help you today?
+    example: false
+    id: 342bbb80-b7be-4f95-8fde-002cd1b8b9f2
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: What's the weather like?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: Where are you located?  I'll need a location to give you a weather forecast.
+    example: false
+    id: 2b698c39-7d39-498e-9a5a-7e6e87e5d528
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: San Francisco
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        query: weather in San Francisco
+      id: 8de433db-02df-4b99-b7b5-5bec0b06a18e
+      name: search
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: It's 60 degrees and foggy.
+    id: null
+    name: search
+    response_metadata: {}
+    status: success
+    tool_call_id: 8de433db-02df-4b99-b7b5-5bec0b06a18e
+    type: tool
+  - additional_kwargs:
+      function_call:
+        arguments: '{"query": "weather in San Francisco"}'
+        name: search
+    content: It's 60 degrees and foggy in San Francisco.
+    example: false
+    id: e3112c24-cdfc-4153-8e0f-e4d872df80c3
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: What about in Chicago?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        query: weather in Chicago
+      id: 1bd20f64-3fa2-498e-8281-ee93368ce5bf
+      name: search
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: It's 90 degrees and sunny.
+    id: null
+    name: search
+    response_metadata: {}
+    status: success
+    tool_call_id: 1bd20f64-3fa2-498e-8281-ee93368ce5bf
+    type: tool
+  - additional_kwargs:
+      function_call:
+        arguments: '{"query": "weather in Chicago"}'
+        name: search
+    content: It's 90 degrees and sunny in Chicago.
+    example: false
+    id: 35741647-adf9-4a77-a151-e549d86cb97f
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: Thank you!
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: You're welcome! Is there anything else I can help you with today?
+    example: false
+    id: 47b960af-97d9-4c33-9c4a-df789119ec0d
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  title: Short Conversation
+  update_time: '2024-10-16T13:10:34.611394'

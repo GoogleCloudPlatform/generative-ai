@@ -13,20 +13,16 @@
 # limitations under the License.
 # pylint: disable=R0801
 
+import json
+
+from app.eval.utils import batch_generate_messages, generate_multiturn_history
 from app.patterns.custom_rag_qa.chain import chain
 from langchain_google_vertexai import ChatVertexAI
 import pandas as pd
 import pytest
-import yaml
-import json
-from typing import Any
-
-from app.eval.utils import batch_generate_messages, generate_multiturn_history
-from google.cloud import aiplatform
-import pandas as pd
 from vertexai.evaluation import CustomMetric, EvalTask
 import yaml
-import os
+
 
 @pytest.mark.asyncio
 async def test_multiturn_evaluation() -> None:
@@ -36,11 +32,12 @@ async def test_multiturn_evaluation() -> None:
     scored_data = batch_generate_messages(df, chain)
     scored_data["user"] = scored_data["human_message"].apply(lambda x: x["content"])
     scored_data["reference"] = scored_data["ai_message"].apply(lambda x: x["content"])
-    
+
     evaluator_llm = ChatVertexAI(
-    model_name="gemini-1.5-flash-001",
-    temperature=0,
-    response_mime_type="application/json")
+        model_name="gemini-1.5-flash-001",
+        temperature=0,
+        response_mime_type="application/json",
+    )
 
     def custom_faithfulness(instance):
         prompt = f"""You are examining written text content. Here is the text:
@@ -72,7 +69,6 @@ async def test_multiturn_evaluation() -> None:
         result = json.loads(result.content)
         return result
 
-
     # Register Custom Metric
     custom_faithfulness_metric = CustomMetric(
         name="custom_faithfulness",
@@ -92,7 +88,7 @@ async def test_multiturn_evaluation() -> None:
     eval_result = eval_task.evaluate()
     eval_result.summary_metrics
     eval_result.metrics_table
-    
+
     # Delete Experiments
     # delete_experiments = True
     # if delete_experiments or os.getenv("IS_TESTING"):

@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
 import glob
 import logging
 from typing import Any, Callable, Dict, Iterator, List
 
 import nest_asyncio
 import pandas as pd
-from tqdm import tqdm
 import yaml
 
 nest_asyncio.apply()
@@ -68,16 +65,18 @@ def _process_conversation(row: Dict[str, List[str]]) -> List[Dict[str, Any]]:
         if message["type"] == "human":
             messages_since_last_human_message = []
         messages_since_last_human_message.append(message)
-        if message["type"] == "ai" and ('tool_calls' not in message or len(message['tool_calls']) == 0):
-                # This ai message is the final answer to the human message
-                messages.append(
-                    {
-                        "human_message": messages_since_last_human_message[0],
-                        "ai_message": messages_since_last_human_message[-1],
-                        "conversation_history": conversation_history.copy(),
-                    }
-                )
-                conversation_history.extend(messages_since_last_human_message)
+        if message["type"] == "ai" and (
+            "tool_calls" not in message or len(message["tool_calls"]) == 0
+        ):
+            # This ai message is the final answer to the human message
+            messages.append(
+                {
+                    "human_message": messages_since_last_human_message[0],
+                    "ai_message": messages_since_last_human_message[-1],
+                    "conversation_history": conversation_history.copy(),
+                }
+            )
+            conversation_history.extend(messages_since_last_human_message)
     return messages
 
 
@@ -106,6 +105,7 @@ def generate_multiturn_history(df: pd.DataFrame) -> pd.DataFrame:
     processed_messages = df.apply(_process_conversation, axis=1).explode().tolist()
     return pd.DataFrame(processed_messages)
 
+
 def _retrieve_all_messages(row: tuple[int, Dict[str, Any]]) -> List[Any]:
     """Extracts conversation history and the current human message from the row,
     and appends the current human message to the history.
@@ -123,10 +123,12 @@ def _retrieve_all_messages(row: tuple[int, Dict[str, Any]]) -> List[Any]:
     """
     _, row_contents = row
     all_messages = (
-        row_contents["conversation_history"].copy() if "conversation_history" in row_contents else []
+        row_contents["conversation_history"].copy()
+        if "conversation_history" in row_contents
+        else []
     )
     all_messages.append(row_contents["human_message"])
-    return   {"messages": all_messages}
+    return {"messages": all_messages}
 
 
 def batch_generate_messages(
@@ -157,7 +159,7 @@ def batch_generate_messages(
 
         runnable (Callable[[List[Dict[str, Any]]], Dict[str, Any]]): Runnable object
           (e.g., LangChain Chain) used
-            for response generation. It should accept a list of messages in a `batch` function and return 
+            for response generation. It should accept a list of messages in a `batch` function and return
             a structure containing 'content' containing the AI's response and 'usage_metadata' with optional response metadata.
             Note: for LangGraph chains, this method needs to be updated as the batch method doesn't return the AI's response, but the whole chat history per row.
 
@@ -175,7 +177,7 @@ def batch_generate_messages(
 
 
         messages_df = pd.DataFrame({
-            "human_message": 
+            "human_message":
             [
                 {"type": "human", "content": "What's the weather today?"},
                 {"type": "human", "content": "What are the ingredients of pizza?"},
@@ -187,7 +189,7 @@ def batch_generate_messages(
                     {"type": "human", "content": "I don't know, why?"}
                 ],
                 []
-            ] 
+            ]
         })
 
         responses_df = batch_generate_messages(messages_df, my_runnable)
@@ -197,15 +199,16 @@ def batch_generate_messages(
     to_query = []
     for _, row_contents in messages.iterrows():
         all_messages = (
-            row_contents["conversation_history"].copy() if "conversation_history" in row_contents else []
+            row_contents["conversation_history"].copy()
+            if "conversation_history" in row_contents
+            else []
         )
         all_messages.append(row_contents["human_message"])
         to_query.append({"messages": all_messages})
     responses = runnable.batch(to_query)
-    print(responses)
     # Note: if nuning a LangGraph chain, this code needs to be modified to grab the last message from the message history:
-    # messages["response"] = [item.content for item in responses['messages'][-1]] 
-    # messages["response_obj"] = [item.usage_metadata for item in responses['messages'][-1]] 
-    messages["response"] = [item.content for item in responses] 
-    messages["response_obj"] = [item.usage_metadata for item in responses] 
+    # messages["response"] = [item.content for item in responses['messages'][-1]]
+    # messages["response_obj"] = [item.usage_metadata for item in responses['messages'][-1]]
+    messages["response"] = [item.content for item in responses]
+    messages["response_obj"] = [item.usage_metadata for item in responses]
     return messages

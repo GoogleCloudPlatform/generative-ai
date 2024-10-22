@@ -1,0 +1,220 @@
+- messages:
+  - additional_kwargs: {}
+    content:
+    - text: what's one plus two?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        a: 1.0
+        b: 2.0
+      id: add
+      name: add
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: '3'
+    id: null
+    name: add
+    response_metadata: {}
+    status: success
+    tool_call_id: add
+    type: tool
+  - additional_kwargs: {}
+    content: '3'
+    example: false
+    id: 90e54593-e91f-4e14-b068-4a6e8772d141
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: And what about 5 plus 9?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        a: 5.0
+        b: 9.0
+      id: add
+      name: add
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: '14'
+    id: null
+    name: add
+    response_metadata: {}
+    status: success
+    tool_call_id: add
+    type: tool
+  - additional_kwargs: {}
+    content: 'The result is 14'
+    example: false
+    id: 0b699851-3ebe-4c6f-ab03-f7d4529700c5
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: and -4 plus 3?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        a: -4.0
+        b: 3.0
+      id: add
+      name: add
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: '-1'
+    id: null
+    name: add
+    response_metadata: {}
+    status: success
+    tool_call_id: add
+    type: tool
+  - additional_kwargs: {}
+    content: '-1'
+    example: false
+    id: 0dcdd36a-e785-4c14-9f23-cc5118ee9938
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: Thank you!
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: 'You''re welcome! Is there anything else I can help you with?'
+    example: false
+    id: 1b1335fb-1a1b-4ff8-8d08-08f834db1673
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    content:
+    - text: That's all
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: 'Great! Have a wonderful day.'
+    example: false
+    id: 891eeae2-10ab-4b73-9917-b03041329429
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  title: One Plus Two
+  update_time: '2024-10-15T20:12:13.180331'
+- messages:
+  - additional_kwargs: {}
+    content:
+    - text: what's seven plus five?
+      type: text
+    example: false
+    id: null
+    name: null
+    response_metadata: {}
+    type: human
+  - additional_kwargs: {}
+    content: ''
+    example: false
+    id: null
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls:
+    - args:
+        a: 7.0
+        b: 5.0
+      id: add
+      name: add
+      type: tool_call
+    type: ai
+    usage_metadata: null
+  - additional_kwargs: {}
+    artifact: null
+    content: '12'
+    id: null
+    name: add
+    response_metadata: {}
+    status: success
+    tool_call_id: add
+    type: tool
+  - additional_kwargs: {}
+    content: '12'
+    example: false
+    id: 90e54593-e91f-4e14-b068-4a6e8772d141
+    invalid_tool_calls: []
+    name: null
+    response_metadata: {}
+    tool_calls: []
+    type: ai
+    usage_metadata: null
+  title: Seven plus Five
+  update_time: '2024-10-15T20:15:13.210331'
