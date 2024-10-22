@@ -57,15 +57,27 @@ def _process_conversation(row: Dict[str, List[str]]) -> List[Dict[str, Any]]:
     """Processes a single conversation row to extract messages and build conversation history."""
     conversation_history: List[Dict] = []
     messages = []
-    for human_message, ai_message in pairwise(row["messages"]):
-        messages.append(
-            {
-                "human_message": human_message,
-                "ai_message": ai_message,
-                "conversation_history": conversation_history.copy(),
-            }
-        )
-        conversation_history.extend([human_message, ai_message])
+    # Most human-ai interactions are composed of a human message followed by an ai message.
+    # But when there's a tool call, the interactions are as follows:
+    # - human message
+    # - ai message with empty content and tool_calls set
+    # - tool message with tool call arguments
+    # - ai message with non-empty content and tool_calls empty.
+    # In any case the human message is the first in the set and the final answer is the last in the set.
+    for message in row["messages"]:
+        if message["type"] == "human":
+            messages_since_last_human_message = []
+        messages_since_last_human_message.append(message)
+        if message["type"] == "ai" and ('tool_calls' not in message or len(message['tool_calls']) == 0):
+                # This ai message is the final answer to the human message
+                messages.append(
+                    {
+                        "human_message": messages_since_last_human_message[0],
+                        "ai_message": messages_since_last_human_message[-1],
+                        "conversation_history": conversation_history.copy(),
+                    }
+                )
+                conversation_history.extend(messages_since_last_human_message)
     return messages
 
 
@@ -94,43 +106,27 @@ def generate_multiturn_history(df: pd.DataFrame) -> pd.DataFrame:
     processed_messages = df.apply(_process_conversation, axis=1).explode().tolist()
     return pd.DataFrame(processed_messages)
 
-
-def generate_message(row: tuple[int, Dict[str, Any]], runnable: Any) -> Dict[str, Any]:
-    """Generates a response message using a given runnable and updates the row dictionary.
-
-    This function takes a row dictionary containing message data and a runnable object.
-    It extracts conversation history and the current human message from the row,
-    then uses the runnable to generate a response based on the conversation history.
-    The generated response content and usage metadata are then added to the original
-    message dictionary within the row.
+def _retrieve_all_messages(row: tuple[int, Dict[str, Any]]) -> List[Any]:
+    """Extracts conversation history and the current human message from the row,
+    and appends the current human message to the history.
 
     Args:
         row (tuple[int, Dict[str, Any]]): A tuple containing the index and a dictionary
           with message data, including:
                    - "conversation_history" (List[str]): Optional. List of previous
-                      messages
-                        in the conversation.
+                      messages in the conversation.
                    - "human_message" (str): The current human message.
-        runnable (Any): A runnable object that takes a dictionary with a "messages" key
-                        and returns a response object with "content" and
-                        "usage_metadata" attributes.
 
     Returns:
-        Dict[str, Any]: The updated row dictionary with the generated response added to the message.
-              The message will now contain:
-              - "response" (str): The generated response content.
-              - "response_obj" (Any): The usage metadata of the response from the runnable.
+        dict[str, Any]: A dict with a key 'messages' and a value containing a list of messages.
+        The list contains the conversation history and the current human message.
     """
-    _, message = row
-    messages = (
-        message["conversation_history"] if "conversation_history" in message else []
+    _, row_contents = row
+    all_messages = (
+        row_contents["conversation_history"].copy() if "conversation_history" in row_contents else []
     )
-    messages.append(message["human_message"])
-    input_runnable = {"messages": messages}
-    response = runnable.invoke(input_runnable)
-    message["response"] = response.content
-    message["response_obj"] = response.usage_metadata
-    return message
+    all_messages.append(row_contents["human_message"])
+    return   {"messages": all_messages}
 
 
 def batch_generate_messages(
@@ -144,37 +140,32 @@ def batch_generate_messages(
     the specified runnable to predict AI responses in parallel.
 
     Args:
-        messages (pd.DataFrame): DataFrame with a 'messages' column. Each row
-            represents a conversation and contains a list of dictionaries, where
-              each dictionary
-            represents a message turn in the format:
+        messages (pd.DataFrame): DataFrame with a 'conversation_history' and 'human_message' columns. Each row
+            represents a conversation. The 'conversation_history' column contains a list of messages in the format:
 
-            ```json
+            ```
             [
                 {"type": "human", "content": "user's message"},
                 {"type": "ai", "content": "AI's response"},
-                {"type": "human", "content": "current user's message"},
                 ...
             ]
             ```
+        The 'human_message' column has the following format:
+        ```
+        {"type": "human", "content": "current user's message"}
+        ```
 
         runnable (Callable[[List[Dict[str, Any]]], Dict[str, Any]]): Runnable object
           (e.g., LangChain Chain) used
-            for response generation. It should accept a list of message dictionaries
-            (as described above) and return a dictionary with the following structure:
-
-            ```json
-            {
-                "response": "AI's response",
-                "response_obj": { ... } # optional response metadata
-            }
-            ```
+            for response generation. It should accept a list of messages in a `batch` function and return 
+            a structure containing 'content' containing the AI's response and 'usage_metadata' with optional response metadata.
+            Note: for LangGraph chains, this method needs to be updated as the batch method doesn't return the AI's response, but the whole chat history per row.
 
         max_workers (int, optional): Number of worker processes for parallel
             prediction. Defaults to 4.
 
     Returns:
-        pd.DataFrame: DataFrame with the original 'messages' column and two new
+        pd.DataFrame: DataFrame with the original 'conversation_history' and 'human_message' columns and two new
             columns: 'response' containing the predicted AI responses, and
             'response_obj' containing optional response metadata.
 
@@ -182,28 +173,39 @@ def batch_generate_messages(
         ```python
         import pandas as pd
 
+
         messages_df = pd.DataFrame({
-            "messages": [
-                [
-                    {"type": "human", "content": "What's the weather today?"}
-                ],
-                [
+            "human_message": 
+            [
+                {"type": "human", "content": "What's the weather today?"},
+                {"type": "human", "content": "What are the ingredients of pizza?"},
+            ],
+            "conversation_history":
+            [   [
                     {"type": "human", "content": "Tell me a joke."},
                     {"type": "ai", "content": "Why did the scarecrow win an award?"},
                     {"type": "human", "content": "I don't know, why?"}
-                ]
-            ]
+                ],
+                []
+            ] 
         })
 
-        responses_df = batch_generate_messages(my_runnable, messages_df)
+        responses_df = batch_generate_messages(messages_df, my_runnable)
         ```
     """
-    logging.info("Executing batch scoring")
-    predicted_messages = []
-    with ThreadPoolExecutor(max_workers) as pool:
-        partial_func = partial(generate_message, runnable=runnable)
-        for message in tqdm(
-            pool.map(partial_func, messages.iterrows()), total=len(messages)
-        ):
-            predicted_messages.append(message)
-    return pd.DataFrame(predicted_messages)
+    logging.info("Executing batch invocation")
+    to_query = []
+    for _, row_contents in messages.iterrows():
+        all_messages = (
+            row_contents["conversation_history"].copy() if "conversation_history" in row_contents else []
+        )
+        all_messages.append(row_contents["human_message"])
+        to_query.append({"messages": all_messages})
+    responses = runnable.batch(to_query)
+    print(responses)
+    # Note: if nuning a LangGraph chain, this code needs to be modified to grab the last message from the message history:
+    # messages["response"] = [item.content for item in responses['messages'][-1]] 
+    # messages["response_obj"] = [item.usage_metadata for item in responses['messages'][-1]] 
+    messages["response"] = [item.content for item in responses] 
+    messages["response_obj"] = [item.usage_metadata for item in responses] 
+    return messages

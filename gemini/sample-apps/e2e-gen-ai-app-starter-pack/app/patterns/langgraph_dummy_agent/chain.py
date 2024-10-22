@@ -47,7 +47,7 @@ def should_continue(state: MessagesState) -> str:
     return "tools" if last_message.tool_calls else END
 
 
-async def call_model(
+def call_model(
     state: MessagesState, config: RunnableConfig
 ) -> Dict[str, BaseMessage]:
     """Calls the language model and returns the response."""

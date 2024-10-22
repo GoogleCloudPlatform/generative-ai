@@ -14,11 +14,17 @@
 
 from functools import wraps
 from types import GeneratorType
-from typing import Any, AsyncGenerator, Callable, Dict, Literal
+from typing import Any, AsyncGenerator, Callable, Dict, Literal, List, Union
 import uuid
 
 from langchain_core.messages import AIMessage, AIMessageChunk, ToolMessage
+from langchain_core.runnables.utils import Input
 from pydantic import BaseModel, Field
+
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+
+from tqdm import tqdm
 from traceloop.sdk import TracerWrapper
 from traceloop.sdk.decorators import workflow
 
@@ -124,6 +130,20 @@ class CustomChain:
         return AIMessage(
             content=response_content, additional_kwargs={"tool_calls_data": tool_calls}
         )
+    
+    def batch(self, inputs: List[Input], max_workers: Union[int, None] = None, *args: Any, **kwargs: Any) -> List[AIMessage]:
+        """
+        Invoke the wrapped function and process its events in batch.
+        Returns a List of AIMessage with content and relative tool calls.
+        """
+        predicted_messages = []
+        with ThreadPoolExecutor(max_workers) as pool:
+            for response in tqdm(
+                pool.map(self.invoke, inputs), total=len(inputs)
+            ):
+                predicted_messages.append(response)
+        return predicted_messages
+        
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         """Make the CustomChain instance callable, invoking the wrapped function."""
