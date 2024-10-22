@@ -7,7 +7,7 @@ set -euo pipefail
 source _common.sh
 
 if [ -f .envrc ]; then
-    source .envrc
+  source .envrc
 fi
 
 #PROJECT_ID='provided in .envrc'
@@ -20,10 +20,10 @@ REQUEST_FILE=.tmp.request-generic-2pix.json
 JQ_PATH_PLURAL=".[].candidates[0].content.parts[0].text" # PROD_URL_SELECTOR all answers
 
 function _usage() {
-    echo "Usage: $0 <IMAGE> <question on that image>"
-    echo "Example: $0 image.jpg \"what do you see here?\""
-    echo "Error: $1"
-    exit 1
+  echo "Usage: $0 <IMAGE> <question on that image>"
+  echo "Example: $0 image.jpg \"what do you see here?\""
+  echo "Error: $1"
+  exit 1
 }
 
 # function show_errors_and_exit() {
@@ -32,8 +32,8 @@ function _usage() {
 #     exit 42
 # }
 
-if [ $# -lt 2 ] ; then
-    _usage "Provide at least 2 arguments (TODO just 1)"
+if [ $# -lt 2 ]; then
+  _usage "Provide at least 2 arguments (TODO just 1)"
 
 fi
 
@@ -52,7 +52,7 @@ echo " 👀 Examining image1 $IMAGE1: $(_white "$(file "$IMAGE1")"). "
 echo " 👀 Examining image2 $IMAGE2: $(_white "$(file "$IMAGE2")"). "
 #echo "Find any errors in: $TMP_OUTPUT_FILE"
 
-cat > "$REQUEST_FILE" <<EOF
+cat >"$REQUEST_FILE" <<EOF
 {'contents': {
       'role': 'USER',
       'parts': [
@@ -85,23 +85,22 @@ EOF
 #STAGING_URL="https://${LOCATION}-autopush-aiplatform.sandbox.googleapis.com/v1beta1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-pro-vision:generateContent"
 PROD_URL="https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-pro-vision:streamGenerateContent"
 
-
 curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-    -H "Content-Type: application/json"  \
-    "$PROD_URL" -d \
-    @"$REQUEST_FILE" \
-    > $TMP_OUTPUT_FILE 2>t ||
-        show_errors_and_exit
+  -H "Content-Type: application/json" \
+  "$PROD_URL" -d \
+  @"$REQUEST_FILE" \
+  >$TMP_OUTPUT_FILE 2>t ||
+  show_errors_and_exit
 
 #echo "Written $TMP_OUTPUT_FILE. curl_ret=$?"
 
-OUTPUT=$(cat $TMP_OUTPUT_FILE | jq $JQ_PATH_PLURAL || echo  '""')
+OUTPUT=$(cat $TMP_OUTPUT_FILE | jq $JQ_PATH_PLURAL || echo '""')
 
 if [ "$OUTPUT" = '""' ]; then # empty answer
-    echo "# ‼️ Sorry, some error here. Dig into the JSON file more: $TMP_OUTPUT_FILE" >&2
-    cat $TMP_OUTPUT_FILE | jq >&2
+  echo "# ‼️ Sorry, some error here. Dig into the JSON file more: $TMP_OUTPUT_FILE" >&2
+  cat $TMP_OUTPUT_FILE | jq >&2
 else
-    N_CANDIDATES=$(cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | wc -l)
-    echo "# ♊️ Describing attached image ($N_CANDIDATES candidates):"
-    cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | xargs -0 | _lolcat
+  N_CANDIDATES=$(cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | wc -l)
+  echo "# ♊️ Describing attached image ($N_CANDIDATES candidates):"
+  cat $TMP_OUTPUT_FILE | jq "$JQ_PATH_PLURAL" -r | xargs -0 | _lolcat
 fi

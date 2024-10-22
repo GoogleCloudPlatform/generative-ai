@@ -1,0 +1,76 @@
+# -----------------------------------------------------------------------------
+# Global Configurations
+# -----------------------------------------------------------------------------
+[global]
+
+bucket_name = "product_innovation_bucket"
+
+
+# -----------------------------------------------------------------------------
+# Translation options
+# -----------------------------------------------------------------------------
+[translate_api]
+
+# Include or remove languages as needed. Use the this documentation as
+# reference: https://cloud.google.com/translate/docs/languages
+Spanish = "es"
+Chinese = "zh"
+German = "de"
+Japanese = "ja"
+Portuguese = "pt"
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: Home.py
+# -----------------------------------------------------------------------------
+[pages.home]
+
+page_title = "Gen AI for Product Innovation"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+home_img_1 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_1.png"
+home_img_2 = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/intro_home_2.png"
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: 1_Resources.py
+# -----------------------------------------------------------------------------
+[pages.1_Resources]
+
+page_title = "Resources"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+resources_img="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/resources_img.png"
+
+# -----------------------------------------------------------------------------
+# Configurations for page: 2_ Marketing_Insights.py
+# -----------------------------------------------------------------------------
+
+[pages.2_Marketing_Insights]
+page_title = "Marketing Insights"
+page_icon = "./images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+prod_insights_1="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/prod_insights_1.png"
+prod_insights_2="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/prod_insights_2.png"
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: 3_Generations.py
+# -----------------------------------------------------------------------------
+
+[pages.3_Generations]
+page_title = "Generations"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"
+prod_gen_img="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/prod_gen_img.png"
+
+
+
+# -----------------------------------------------------------------------------
+# Configurations for page: Editor.py
+# -----------------------------------------------------------------------------
+
+[pages.Editor]
+page_title = "Editor"
+page_icon = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/favicon.png"
+sidebar_image_path = "https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png"

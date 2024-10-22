@@ -25,7 +25,7 @@ export class Investments {
 
     async semanticSearch(prompt: string) {
         const query = `SELECT ticker, etf, rating, analysis, 
-            analysis_embedding <=> embedding('textembedding-gecko@003', '${safeString(prompt)}') AS distance
+            analysis_embedding <=> google_ml.embedding('textembedding-gecko@003', '${safeString(prompt)}')::vector AS distance
             FROM investments
             ORDER BY distance
             LIMIT 5;`;

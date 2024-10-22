@@ -1,8 +1,8 @@
 # SQL Talk: Natural Language to BigQuery with Gemini's Function Calling
 
-| | |
-|-|-|
-|Author(s) | [Kristopher Overholt](https://github.com/koverholt) |
+|           |                                                     |
+| --------- | --------------------------------------------------- |
+| Author(s) | [Kristopher Overholt](https://github.com/koverholt) |
 
 ## Overview
 
@@ -21,12 +21,14 @@ Try using the demo app now! [https://sql-talk-r5gdynozbq-uc.a.run.app/](https://
 
 ![SQL Talk Demo App](sql-talk.png)
 
+[![AI Data Agent with Gemini API | Build with Google AI](https://img.youtube.com/vi/pj5mRDy9lG8/0.jpg)](https://www.youtube.com/watch?v=pj5mRDy9lG8)
+
 ## Prerequisites
 
 - A Google Cloud project with billing enabled
 - A BigQuery dataset (we used the
   [`thelook_ecommerce` public dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce))
-- APIs for Vertex AI, BigQuery, and Cloud Run enabled
+- APIs for Vertex AI, BigQuery, BigQuery Data Transfer, and Cloud Run enabled
 - Familiarity with Python and SQL concepts
 
 ## Run and modify the app in Cloud Shell Editor

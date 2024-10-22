@@ -2,7 +2,6 @@
 from datetime import datetime
 import logging
 import time
-from typing import Optional
 
 from google.api_core.client_options import ClientOptions
 from google.cloud import aiplatform_v1 as aipv1
@@ -18,7 +17,7 @@ class MatchingEngineUtils:
         project_id: str,
         region: str,
         index_name: str,
-        index_endpoint_name: Optional[str] = None,
+        index_endpoint_name: str | None = None,
     ):
         self.project_id = project_id
         self.region = region
@@ -146,7 +145,7 @@ class MatchingEngineUtils:
                 f"Creating index with long running operation {r._operation.name}"
             )
 
-            # Poll the operation until it's done successfullly.
+            # Poll the operation until it's done successfully.
             logging.info("Poll the operation to create index ...")
             while True:
                 if r.done():
@@ -167,7 +166,7 @@ class MatchingEngineUtils:
         min_replica_count: int = 2,
         max_replica_count: int = 10,
         public_endpoint_enabled: bool = True,
-        network: Optional[str] = None,
+        network: str | None = None,
     ):
         try:
             # Get index if exists
@@ -253,7 +252,7 @@ class MatchingEngineUtils:
                 index_endpoint=index_endpoint.name, deployed_index=deployed_index
             )
 
-            # Poll the operation until it's done successfullly.
+            # Poll the operation until it's done successfully.
             logger.info("Poll the operation to deploy index ...")
             while True:
                 if r.done():

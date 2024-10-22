@@ -20,17 +20,17 @@ gcloud config set project "$PROJECT_ID"
 # PROD_URL="https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/$MODEL_ID:streamGenerateContent"
 
 curl -X POST \
-    -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-    -H "Content-Type: application/json"  \
-    https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/${MODEL_ID}:streamGenerateContent -d \
-    $'{
+  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  -H "Content-Type: application/json" \
+  https://us-central1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/${MODEL_ID}:streamGenerateContent -d \
+  $'{
       "contents": {
         "role": "USER",
         "parts": { "text": "Why is the sky blue?" }
       }
-    }'  1>"$TMP_OUTPUT_FILE" 2>/dev/null
+    }' 1>"$TMP_OUTPUT_FILE" 2>/dev/null
 
-CLEANED_OUTPUT="$(jq -r "$JQ_PATH_PLURAL" < "$TMP_OUTPUT_FILE" | xargs -0 )"
+CLEANED_OUTPUT="$(jq -r "$JQ_PATH_PLURAL" <"$TMP_OUTPUT_FILE" | xargs -0)"
 
 echo "# ♊ Input: 'Why is the sky blue?'"
 echo "# ♊ Output: '$CLEANED_OUTPUT'"

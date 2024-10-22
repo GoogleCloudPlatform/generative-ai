@@ -6,16 +6,16 @@
       {
          "path":"chat-flask-cloudrun",
          "name":"Python Flask-based Web Application on Cloud Run interacting with PaLM Vertex AI",
-         "description":"Cloud Run application utilzing Flask framework that demonstrates working with Vertex AI API"
+         "description":"Cloud Run application utilizing Flask framework that demonstrates working with Vertex AI API"
       },
       {
          "path":"chat-gradio",
-         "name":"Gradio Web Application on Cloud Run interacting with PaLM VerteX AI API",
+         "name":"Gradio Web Application on Cloud Run interacting with PaLM Vertex AI API",
          "description":"Cloud Run application utilizing Gradio Framework that demonstrates working with Vertex AI API"
       },
       {
          "path":"chat-streamlit",
-         "name":"Streamlit Web Application on cloud Run interacting with PaLM VerteX AI API",
+         "name":"Streamlit Web Application on cloud Run interacting with PaLM Vertex AI API",
          "description":"Cloud Run application utilizing Streamlit Framework that demonstrates working with Vertex AI API"
       },
       {

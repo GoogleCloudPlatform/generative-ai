@@ -10,7 +10,7 @@ body:
         Thanks for stopping by to let us know something could be better!
         **PLEASE READ**:
         - This repository is for [Generative AI with Vertex AI on Google Cloud](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview), not the [Google AI Gemini/PaLM APIs](https://ai.google.dev/)
-          - For issues with the Google AI Gemini API, refer to one of [these repositories](https://github.com/orgs/google/repositories?q=generative-ai) or the [Google Developers Community Discord `#gemini-api` channel](https://ai.google.dev/docs/discord).
+          - For issues with the Google AI Gemini API, refer to one of [these repositories](https://github.com/orgs/google/repositories?q=generative-ai) or the [Google Developers Community Discourse](https://discuss.ai.google.dev/).
         - If you have a support contract with Google, please create an issue in the [support console](https://cloud.google.com/support/) instead of filing on GitHub. This will ensure a timely response.
   - type: textarea
     id: problem

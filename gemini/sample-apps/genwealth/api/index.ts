@@ -52,7 +52,7 @@ app.get('/api/investments/search', async (req: express.Request, res: express.Res
   }
 });
 
-/** Find investments with naturual language prompts 
+/** Find investments with natural language prompts 
  *  i.e. /investments/semantic_search?prompt=hedge%20against%20%high%20inflation */
 app.get('/api/investments/semantic-search', async (req: express.Request, res: express.Response) => {
   try
@@ -69,7 +69,7 @@ app.get('/api/investments/semantic-search', async (req: express.Request, res: ex
     }    
 });
 
-/** Find prospects with naturual language prompt and optional filters
+/** Find prospects with natural language prompt and optional filters
  *  i.e. /prospects/search?prompt=young%20aggressive%20investor&risk_profile=low&min_age=25&max_age=40 */ 
  app.get('/api/prospects/search', async (req: express.Request, res: express.Response) => {
   try

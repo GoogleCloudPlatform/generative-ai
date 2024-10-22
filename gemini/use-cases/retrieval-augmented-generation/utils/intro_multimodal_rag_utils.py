@@ -1,14 +1,15 @@
+from collections.abc import Iterable
 import glob
 import os
 import time
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any
 
 from IPython.display import display
 import PIL
+from colorama import Fore, Style
 import fitz
 import numpy as np
 import pandas as pd
-import requests
 from vertexai.generative_models import (
     GenerationConfig,
     HarmBlockThreshold,
@@ -30,7 +31,7 @@ multimodal_embedding_model = MultiModalEmbeddingModel.from_pretrained(
 
 def get_text_embedding_from_text_embedding_model(
     text: str,
-    return_array: Optional[bool] = False,
+    return_array: bool | None = False,
 ) -> list:
     """
     Generates a numerical text embedding from a provided text input using a text embedding model.
@@ -49,7 +50,7 @@ def get_text_embedding_from_text_embedding_model(
     text_embedding = [embedding.values for embedding in embeddings][0]
 
     if return_array:
-        text_embedding = np.fromiter(text_embedding, dtype=float)
+        return np.fromiter(text_embedding, dtype=float)
 
     # returns 768 dimensional array
     return text_embedding
@@ -58,8 +59,8 @@ def get_text_embedding_from_text_embedding_model(
 def get_image_embedding_from_multimodal_embedding_model(
     image_uri: str,
     embedding_size: int = 512,
-    text: Optional[str] = None,
-    return_array: Optional[bool] = False,
+    text: str | None = None,
+    return_array: bool | None = False,
 ) -> list:
     """Extracts an image embedding from a multimodal embedding model.
     The function can optionally utilize contextual text to refine the embedding.
@@ -74,87 +75,15 @@ def get_image_embedding_from_multimodal_embedding_model(
     Returns:
         list: A list containing the image embedding values. If `return_array` is True, returns a NumPy array instead.
     """
-    # image = Image.load_from_file(image_uri)
     image = vision_model_Image.load_from_file(image_uri)
     embeddings = multimodal_embedding_model.get_embeddings(
         image=image, contextual_text=text, dimension=embedding_size
     )  # 128, 256, 512, 1408
-    image_embedding = embeddings.image_embedding
 
     if return_array:
-        image_embedding = np.fromiter(image_embedding, dtype=float)
+        return np.fromiter(embeddings.image_embedding, dtype=float)
 
-    return image_embedding
-
-
-def load_image_bytes(image_path):
-    """Loads an image from a URL or local file path.
-
-    Args:
-        image_uri (str): URL or local file path to the image.
-
-    Raises:
-        ValueError: If `image_uri` is not provided.
-
-    Returns:
-        bytes: Image bytes.
-    """
-    # Check if the image_uri is provided
-    if not image_path:
-        raise ValueError("image_uri must be provided.")
-
-    # Load the image from a weblink
-    if image_path.startswith("http://") or image_path.startswith("https://"):
-        response = requests.get(image_path, stream=True)
-        if response.status_code == 200:
-            return response.content
-
-    # Load the image from a local path
-    else:
-        return open(image_path, "rb").read()
-
-
-def get_pdf_doc_object(pdf_path: str) -> tuple[fitz.Document, int]:
-    """
-    Opens a PDF file using fitz.open() and returns the PDF document object and the number of pages.
-
-    Args:
-        pdf_path: The path to the PDF file.
-
-    Returns:
-        A tuple containing the `fitz.Document` object and the number of pages in the PDF.
-
-    Raises:
-        FileNotFoundError: If the provided PDF path is invalid.
-
-    """
-
-    # Open the PDF file
-    doc: fitz.Document = fitz.open(pdf_path)
-
-    # Get the number of pages in the PDF file
-    num_pages: int = len(doc)
-
-    return doc, num_pages
-
-
-# Add colors to the print
-class Color:
-    """
-    This class defines a set of color codes that can be used to print text in different colors.
-    This will be used later to print citations and results to make outputs more readable.
-    """
-
-    PURPLE: str = "\033[95m"
-    CYAN: str = "\033[96m"
-    DARKCYAN: str = "\033[36m"
-    BLUE: str = "\033[94m"
-    GREEN: str = "\033[92m"
-    YELLOW: str = "\033[93m"
-    RED: str = "\033[91m"
-    BOLD: str = "\033[1m"
-    UNDERLINE: str = "\033[4m"
-    END: str = "\033[0m"
+    return embeddings.image_embedding
 
 
 def get_text_overlapping_chunk(
@@ -201,7 +130,7 @@ def get_text_overlapping_chunk(
     return chunked_text_dict
 
 
-def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
+def get_page_text_embedding(text_data: dict | str) -> dict:
     """
     * Generates embeddings for each text chunk using a specified embedding model.
     * Takes a dictionary of text chunks and an embedding size as input.
@@ -218,16 +147,20 @@ def get_page_text_embedding(text_data: Union[dict, str]) -> dict:
 
     embeddings_dict = {}
 
+    if not text_data:
+        return embeddings_dict
+
     if isinstance(text_data, dict):
         # Process each chunk
-        # print(text_data)
         for chunk_number, chunk_value in text_data.items():
-            text_embd = get_text_embedding_from_text_embedding_model(text=chunk_value)
-            embeddings_dict[chunk_number] = text_embd
+            embeddings_dict[chunk_number] = (
+                get_text_embedding_from_text_embedding_model(text=chunk_value)
+            )
     else:
         # Process the first 1000 characters of the page text
-        text_embd = get_text_embedding_from_text_embedding_model(text=text_data)
-        embeddings_dict["text_embedding"] = text_embd
+        embeddings_dict["text_embedding"] = (
+            get_text_embedding_from_text_embedding_model(text=text_data)
+        )
 
     return embeddings_dict
 
@@ -272,11 +205,9 @@ def get_chunk_text_metadata(
 
     # Chunk the text with the given limit and overlap
     chunked_text_dict: dict = get_text_overlapping_chunk(text, character_limit, overlap)
-    # print(chunked_text_dict)
 
     # Get embeddings for the chunks
     chunk_embeddings_dict: dict = get_page_text_embedding(chunked_text_dict)
-    # print(chunk_embeddings_dict)
 
     # Return all extracted data
     return text, page_text_embeddings_dict, chunked_text_dict, chunk_embeddings_dict
@@ -289,7 +220,7 @@ def get_image_for_gemini(
     image_save_dir: str,
     file_name: str,
     page_num: int,
-) -> Tuple[Image, str]:
+) -> tuple[Image, str]:
     """
     Extracts an image from a PDF document, converts it to JPEG format, saves it to a specified directory,
     and loads it as a PIL Image Object.
@@ -330,12 +261,12 @@ def get_image_for_gemini(
 
 def get_gemini_response(
     generative_multimodal_model,
-    model_input: List[str],
+    model_input: list[str],
     stream: bool = True,
-    generation_config: Optional[GenerationConfig] = GenerationConfig(
+    generation_config: GenerationConfig | None = GenerationConfig(
         temperature=0.2, max_output_tokens=2048
     ),
-    safety_settings: Optional[dict] = {
+    safety_settings: dict | None = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
@@ -376,7 +307,7 @@ def get_gemini_response(
 
 
 def get_text_metadata_df(
-    filename: str, text_metadata: Dict[Union[int, str], Dict]
+    filename: str, text_metadata: dict[int | str, dict]
 ) -> pd.DataFrame:
     """
     This function takes a filename and a text metadata dictionary as input,
@@ -392,11 +323,11 @@ def get_text_metadata_df(
         A Pandas DataFrame with the extracted text, chunk text, and chunk embeddings for each page.
     """
 
-    final_data_text: List[Dict] = []
+    final_data_text: list[dict] = []
 
     for key, values in text_metadata.items():
         for chunk_number, chunk_text in values["chunked_text_dict"].items():
-            data: Dict = {}
+            data: dict = {}
             data["file_name"] = filename
             data["page_num"] = int(key) + 1
             data["text"] = values["text"]
@@ -415,7 +346,7 @@ def get_text_metadata_df(
 
 
 def get_image_metadata_df(
-    filename: str, image_metadata: Dict[Union[int, str], Dict]
+    filename: str, image_metadata: dict[int | str, dict]
 ) -> pd.DataFrame:
     """
     This function takes a filename and an image metadata dictionary as input,
@@ -431,10 +362,10 @@ def get_image_metadata_df(
         A Pandas DataFrame with the extracted image path, image description, and image embeddings for each image.
     """
 
-    final_data_image: List[Dict] = []
+    final_data_image: list[dict] = []
     for key, values in image_metadata.items():
         for _, image_values in values.items():
-            data: Dict = {}
+            data: dict = {}
             data["file_name"] = filename
             data["page_num"] = int(key) + 1
             data["img_num"] = int(image_values["img_num"])
@@ -462,10 +393,10 @@ def get_document_metadata(
     image_save_dir: str,
     image_description_prompt: str,
     embedding_size: int = 128,
-    generation_config: Optional[GenerationConfig] = GenerationConfig(
+    generation_config: GenerationConfig | None = GenerationConfig(
         temperature=0.2, max_output_tokens=2048
     ),
-    safety_settings: Optional[dict] = {
+    safety_settings: dict | None = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
@@ -473,7 +404,7 @@ def get_document_metadata(
     },
     add_sleep_after_page: bool = False,
     sleep_time_after_page: int = 2,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     This function takes a PDF path, an image save directory, an image description prompt, an embedding size, and a text embedding text limit as input.
 
@@ -500,17 +431,16 @@ def get_document_metadata(
             "\n\n",
         )
 
-        doc, num_pages = get_pdf_doc_object(pdf_path)
+        # Open the PDF file
+        doc: fitz.Document = fitz.open(pdf_path)
 
         file_name = pdf_path.split("/")[-1]
 
-        text_metadata: Dict[Union[int, str], Dict] = {}
-        image_metadata: Dict[Union[int, str], Dict] = {}
+        text_metadata: dict[int | str, dict] = {}
+        image_metadata: dict[int | str, dict] = {}
 
-        for page_num in range(num_pages):
+        for page_num, page in enumerate(doc):
             print(f"Processing page: {page_num + 1}")
-
-            page = doc[page_num]
 
             text = page.get_text()
             (
@@ -635,7 +565,7 @@ def get_user_query_image_embeddings(
 
 
 def get_cosine_score(
-    dataframe: pd.DataFrame, column_name: str, input_text_embd: np.ndarray
+    dataframe: pd.DataFrame, column_name: str, input_text_embed: np.ndarray
 ) -> float:
     """
     Calculates the cosine similarity between the user query embedding and the dataframe embedding for a specific column.
@@ -643,18 +573,17 @@ def get_cosine_score(
     Args:
         dataframe: The pandas DataFrame containing the data to compare against.
         column_name: The name of the column containing the embeddings to compare with.
-        input_text_embd: The NumPy array representing the user query embedding.
+        input_text_embed: The NumPy array representing the user query embedding.
 
     Returns:
         The cosine similarity score (rounded to two decimal places) between the user query embedding and the dataframe embedding.
     """
 
-    text_cosine_score = round(np.dot(dataframe[column_name], input_text_embd), 2)
-    return text_cosine_score
+    return round(np.dot(dataframe[column_name], input_text_embed), 2)
 
 
 def print_text_to_image_citation(
-    final_images: Dict[int, Dict[str, Any]], print_top: bool = True
+    final_images: dict[int, dict[str, Any]], print_top: bool = True
 ) -> None:
     """
     Prints a formatted citation for each matched image in a dictionary.
@@ -669,36 +598,33 @@ def print_text_to_image_citation(
         None (prints formatted citations to the console).
     """
 
-    color = Color()
-
     # Iterate through the matched image citations
     for imageno, image_dict in final_images.items():
         # Print the citation header
-        print(
-            color.RED + f"Citation {imageno + 1}:",
-            "Matched image path, page number and page text: \n" + color.END,
-        )
+        print(f"{Fore.RED}Citation {imageno + 1}:{Style.RESET_ALL}")
+        print("Matched image path, page number, and page text:")
 
         # Print the cosine similarity score
-        print(color.BLUE + "score: " + color.END, image_dict["cosine_score"])
+        print(f"{Fore.BLUE}Score:{Style.RESET_ALL}", image_dict["cosine_score"])
 
         # Print the file_name
-        print(color.BLUE + "file_name: " + color.END, image_dict["file_name"])
+        print(f"{Fore.BLUE}File name:{Style.RESET_ALL}", image_dict["file_name"])
 
         # Print the image path
-        print(color.BLUE + "path: " + color.END, image_dict["img_path"])
+        print(f"{Fore.BLUE}Path:{Style.RESET_ALL}", image_dict["img_path"])
 
         # Print the page number
-        print(color.BLUE + "page number: " + color.END, image_dict["page_num"])
+        print(f"{Fore.BLUE}Page number:{Style.RESET_ALL}", image_dict["page_num"])
 
         # Print the page text
         print(
-            color.BLUE + "page text: " + color.END, "\n".join(image_dict["page_text"])
+            f"{Fore.BLUE}Page text:{Style.RESET_ALL}",
+            "\n".join(image_dict["page_text"]),
         )
 
         # Print the image description
         print(
-            color.BLUE + "image description: " + color.END,
+            f"{Fore.BLUE}Image description:{Style.RESET_ALL}",
             image_dict["image_description"],
         )
 
@@ -708,7 +634,7 @@ def print_text_to_image_citation(
 
 
 def print_text_to_text_citation(
-    final_text: Dict[int, Dict[str, Any]],
+    final_text: dict[int, dict[str, Any]],
     print_top: bool = True,
     chunk_text: bool = True,
 ) -> None:
@@ -727,30 +653,33 @@ def print_text_to_text_citation(
         None (prints formatted citations to the console).
     """
 
-    color = Color()
-
     # Iterate through the matched text citations
     for textno, text_dict in final_text.items():
         # Print the citation header
-        print(color.RED + f"Citation {textno + 1}:", "Matched text: \n" + color.END)
+        print(f"{Fore.RED}Citation {textno + 1}: Matched text:{Style.RESET_ALL}")
 
         # Print the cosine similarity score
-        print(color.BLUE + "score: " + color.END, text_dict["cosine_score"])
+        print(f"{Fore.BLUE}Score:{Style.RESET_ALL}", text_dict["cosine_score"])
 
         # Print the file_name
-        print(color.BLUE + "file_name: " + color.END, text_dict["file_name"])
+        print(f"{Fore.BLUE}File name:{Style.RESET_ALL}", text_dict["file_name"])
 
         # Print the page number
-        print(color.BLUE + "page_number: " + color.END, text_dict["page_num"])
+        print(f"{Fore.BLUE}Page:{Style.RESET_ALL}", text_dict["page_num"])
+
+        # Print the page number
+        print(f"{Fore.BLUE}Page number:{Style.RESET_ALL}", text_dict["page_num"])
 
         # Print the matched text based on the chunk_text argument
         if chunk_text:
             # Print chunk number and chunk text
-            print(color.BLUE + "chunk_number: " + color.END, text_dict["chunk_number"])
-            print(color.BLUE + "chunk_text: " + color.END, text_dict["chunk_text"])
+            print(
+                f"{Fore.BLUE}Chunk number:{Style.RESET_ALL}", text_dict["chunk_number"]
+            )
+            print(f"{Fore.BLUE}Chunk text:{Style.RESET_ALL}", text_dict["chunk_text"])
         else:
             # Print page text
-            print(color.BLUE + "page text: " + color.END, text_dict["page_text"])
+            print(f"{Fore.BLUE}Page text:{Style.RESET_ALL}", text_dict["page_text"])
 
         # Only print the first citation if print_top is True
         if print_top and textno == 0:
@@ -766,7 +695,7 @@ def get_similar_image_from_query(
     image_emb: bool = True,
     top_n: int = 3,
     embedding_size: int = 128,
-) -> Dict[int, Dict[str, Any]]:
+) -> dict[int, dict[str, Any]]:
     """
     Finds the top N most similar images from a metadata DataFrame based on a text query or an image query.
 
@@ -809,7 +738,7 @@ def get_similar_image_from_query(
     top_n_cosine_values = cosine_scores.nlargest(top_n).values.tolist()
 
     # Create a dictionary to store matched images and their information
-    final_images: Dict[int, Dict[str, Any]] = {}
+    final_images: dict[int, dict[str, Any]] = {}
 
     for matched_imageno, indexvalue in enumerate(top_n_cosine_scores):
         # Create a sub-dictionary for each matched image
@@ -870,7 +799,7 @@ def get_similar_text_from_query(
     top_n: int = 3,
     chunk_text: bool = True,
     print_citation: bool = False,
-) -> Dict[int, Dict[str, Any]]:
+) -> dict[int, dict[str, Any]]:
     """
     Finds the top N most similar text passages from a metadata DataFrame based on a text query.
 
@@ -910,7 +839,7 @@ def get_similar_text_from_query(
     top_n_scores = cosine_scores.nlargest(top_n).values.tolist()
 
     # Create a dictionary to store matched text and their information
-    final_text: Dict[int, Dict[str, Any]] = {}
+    final_text: dict[int, dict[str, Any]] = {}
 
     for matched_textno, index in enumerate(top_n_indices):
         # Create a sub-dictionary for each matched text
@@ -951,7 +880,7 @@ def get_similar_text_from_query(
 
 
 def display_images(
-    images: Iterable[Union[str, PIL.Image.Image]], resize_ratio: float = 0.5
+    images: Iterable[str | PIL.Image.Image], resize_ratio: float = 0.5
 ) -> None:
     """
     Displays a series of images provided as paths or PIL Image objects.

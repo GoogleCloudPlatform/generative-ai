@@ -1,8 +1,8 @@
 # Getting started with Vertex AI Studio
 
-| | |
-|-|-|
-|Author(s) | [Thu Ya Kyaw](https://github.com/iamthuya) |
+|           |                                            |
+| --------- | ------------------------------------------ |
+| Author(s) | [Thu Ya Kyaw](https://github.com/iamthuya) |
 
 This guide provides instructions on how to use Vertex AI Studio through the Google Cloud console, without using the API or Python SDK.
 
@@ -32,7 +32,7 @@ Upon clicking, the following page will be presented.
 
 Create Prompt lets you designs prompts for tasks relevant to your business use case including code generation. To get started, click on the **+ TEXT PROMPT** button as shown in the image below
 
-![Create Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_prompt.jpg)
+![Create Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click-create-prompt.jpg)
 
 Upon clicking, you will be redirected to the following page. You can hover or click on **?** buttons to find out more about each field and parameter. Also, the following image has been annotated to provide a quick overview of the interface.
 
@@ -43,7 +43,7 @@ You can feed your desired input text, e.g. a question, to the model. The model w
 Currently, there is no best way to design the prompts yet. Generally, there are 3 methods that you can use to shape the model's response in a way that you desired.
 
 - **Zero-shot prompting** - This is a method where the LLM is given no additional data on the specific task that it is being asked to perform. Instead, it is only given a prompt that describes the task. For example, if you want the LLM to answer a question, you just prompt "what is prompt design?".
-- **One-shot prompting** - This is a method where the LLM is given a single example of the task that it is being asked to perform.  For example, if you want the LLM to write a poem, you might give it a single example poem.
+- **One-shot prompting** - This is a method where the LLM is given a single example of the task that it is being asked to perform. For example, if you want the LLM to write a poem, you might give it a single example poem.
 - **Few-shot prompting** - This is a method where the LLM is given a small number of examples of the task that it is being asked to perform. For example, if you want the LLM to write a news article, you might give it few news articles to read.
 
 You may also notice the **FREE-FORM** and **STRUCTURED** tabs in the image above. Those are the two modes that you can use while designing your prompt.
@@ -118,7 +118,7 @@ As you can see, the model did not have enough information to know whether you we
 Try adding these examples as shown in the image below:
 
 | **INPUT**                         | **OUTPUT** |
-|-----------------------------------|------------|
+| --------------------------------- | ---------- |
 | A well-made and entertaining film | positive   |
 | I fell asleep after 10 minutes    | negative   |
 | The movie was ok                  | neutral    |
@@ -143,7 +143,7 @@ The saved prompt will appear at the **MY PROMPTS** tab.
 
 Go back to the **Language** page and click on the **+ TEXT CHAT** button to create a new chat prompt.
 
-![Text Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_chat_prompt.jpg)
+![Text Prompt](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/click_create_chat_prompt.png)
 
 You will see the new chat prompt page. It's relatively similar to the new prompt page that you went through earlier.
 
@@ -153,11 +153,11 @@ For this section, you will add context to the chat and let the model respond bas
 
 - copy these context to **Context** field
 
->> Your name is Roy. <br/>
->> You are a support technician for an IT department. <br/>
->> You only respond with "Have you tried turning it off and on again?" to any queries.
+> > Your name is Roy. <br/>
+> > You are a support technician for an IT department. <br/>
+> > You only respond with "Have you tried turning it off and on again?" to any queries.
 
-- copy "my computer is so slow" to the chatbox and
+- copy "my computer is so slow" to the chat box and
 - press **Enter** key or click the send message button (the right arrow-head button)
 
 ![image](https://storage.googleapis.com/github-repo/img/gen-ai-studio/language/prompt-gallery/new_chat_prompt_with_context.jpg)

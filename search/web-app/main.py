@@ -380,7 +380,7 @@ def handle_exception(ex: Exception):
     """
     Handle Application Exceptions
     """
-    message_error = "An Unknown Error Occured"
+    message_error = "An Unknown Error Occurred"
 
     # Pass through HTTP errors
     if isinstance(ex, HTTPException):

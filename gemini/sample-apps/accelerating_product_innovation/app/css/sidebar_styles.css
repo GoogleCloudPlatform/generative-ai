@@ -1,0 +1,7 @@
+[data-testid="stSidebarNav"] {
+    background-image: url("https://storage.googleapis.com/github-repo/generative-ai/sample-apps/accelerating-product-innovation/app_images/main_logo.png");
+    background-repeat: no-repeat;
+    background-position: 50% 10%;
+    margin-top: 5%;
+    background-size:80%;
+}

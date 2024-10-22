@@ -2,15 +2,15 @@
 
 This demo will showcase how you can combine the data and documents you already have and the skills you already know with the power of AlloyDB AI, Vertex AI, Cloud Run, and Cloud Functions to build trustworthy Gen AI features into your existing applications.
 
-We’ll walk through an end-to-end “Knowledge Worker Assist” use case for a fictional Financial Services company called GenWealth. GenWealth, a subsidiary of Cymbal Investments, is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
+We'll walk through an end-to-end "Knowledge Worker Assist" use case for a fictional Financial Services company called GenWealth. GenWealth, a subsidiary of Cymbal Investments, is an investment advisory firm that combines personalized service with cutting-edge technology to deliver tailored investment strategies to their clients that aim to generate market-beating results.
 
-In this scenario, we’ll be adding 3 new Gen AI features to GenWealth’s existing Investment Advisory software:
+In this scenario, we'll be adding 3 new Gen AI features to GenWealth's existing Investment Advisory software:
 
-1. First, we’ll improve the Investment Search experience for GenWealth’s Financial Advisors with semantic search powered by AlloyDB AI.
+1. First, we'll improve the Investment Search experience for GenWealth's Financial Advisors with semantic search powered by AlloyDB AI.
 
-1. Second, we’ll build a Customer Segmentation feature for GenWealth’s Marketing Analysts to identify prospects for new products and services.
+1. Second, we'll build a Customer Segmentation feature for GenWealth's Marketing Analysts to identify prospects for new products and services.
 
-1. Third, we’ll build a Gen AI chatbot that will supercharge productivity for GenWealth’s Financial Advisors.
+1. Third, we'll build a Gen AI chatbot that will supercharge productivity for GenWealth's Financial Advisors.
 
 ## Walkthrough
 
@@ -34,25 +34,25 @@ You can simply drop that file into the `$PROJECT_ID-docs` bucket in GCS to kick 
 
 1. Write the generated results to the `investments` table in AlloyDB.
 
-The data for the `RDYE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
+The data for the `RYDE` prospectus and related tables looks something like this (results may vary slightly due to generated content).
 
 > NOTE: You can explore the application and document data yourself by logging into pgAdmin as described in the [Back End Demo Walkthrough](../walkthroughs/backend-demo-walkthrough.md) guide.
 
 1. Document chunks in the `langchain_vector_store` table:
 
-    ![Document Chunks](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/2-document-chunks.png "Document Chunks")
+   ![Document Chunks](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/2-document-chunks.png "Document Chunks")
 
 1. Generated `overview` and embeddings in the `investments` table:
 
-    ![Overview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/3-overview.png "Overview")
+   ![Overview](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/3-overview.png "Overview")
 
 1. Summary of buy ratings for > 8500 tickers in `investments` table:
 
-    ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
+   ![Investments](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/4-investment-table-summary.png "Investments")
 
-1. User profile data, including bios and embedings.
+1. User profile data, including bios and embeddings.
 
-    ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
+   ![User Profiles](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/5-user-profiles.png "User Profiles")
 
 So now that you've extracted all of this useful data from your prospectus, how can you use it to improve your existing Advisory Services software? Let's explore a few use cases in the GenWealth UI.
 
@@ -61,7 +61,7 @@ So now that you've extracted all of this useful data from your prospectus, how c
 Access the GenWealth Advisory Services UI by navigating to the Cloud Run endpoint you provisioned earlier with the [`install.sh`](../install.sh) script. You can retrieve the URL by running the following command in Cloud Shell.
 
 ```bash
-cd && cd gemini/sample-apps/genwealth/
+cd && cd generative-ai/gemini/sample-apps/genwealth/
 source ./env.sh
 gcloud run services describe genwealth --platform managed --region $REGION --format 'value(status.url)' --project $PROJECT_ID
 ```
@@ -128,9 +128,9 @@ With that, you have created your second Gen AI feature, and you now have a tailo
 
 ### Grounded Gen AI Email Responder
 
-Imagine you're a Financial Advisor again, and you took last week off. When you get back in on Monday, your inbox is flooded with questions from clients. GenWealth prides itself on personalized service, so you can’t just reply with a canned response. Each of these emails is going to require you to research the client’s portfolio, financial goals, and preferences before responding.
+Imagine you're a Financial Advisor again, and you took last week off. When you get back in on Monday, your inbox is flooded with questions from clients. GenWealth prides itself on personalized service, so you can't just reply with a canned response. Each of these emails is going to require you to research the client's portfolio, financial goals, and preferences before responding.
 
-For example, let’s say that you got an email from Donya Bartle asking a question about investing an inheritance she just received.
+For example, let's say that you got an email from Donya Bartle asking a question about investing an inheritance she just received.
 
 Refresh your screen and search for Donya Bartle in the Prospects interface to view her profile.
 
@@ -148,11 +148,11 @@ Navigate to the **Ask** interface and click the **Advanced** toggle. Click the a
 
 Click **Ask** and review the result. It should look similar to the output below.
 
-> NOTE: Your results may vary slightly due to the dyanamic nature of Gen AI text completion models.
+> NOTE: Your results may vary slightly due to the dynamic nature of Gen AI text completion models.
 
 ![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/17-emailresult.png "Donya Bartle")
 
-How did we get such a personalized result? Click **View Query** to see how we injected Donya's user bio into the input of our [llm() function](../database-files/genwealth-demo_llm.sql), and click **See Prompt** to view the enriched prompt that our llm() function generated on the user's behalf before sending it to the Vertex AI LLM for text completion. Here we are using the data we already have about our users to ground the prompt, and we are inferencing an LLM directly from the database using a simple SQL function.
+How did we get such a personalized result? Click **View Query** to see how we injected Donya's user bio into the input of our [llm() function](../database-files/llm.sql), and click **See Prompt** to view the enriched prompt that our llm() function generated on the user's behalf before sending it to the Vertex AI LLM for text completion. Here we are using the data we already have about our users to ground the prompt, and we are inferencing an LLM directly from the database using a simple SQL function.
 
 Now you can rinse and repeat for each user who emailed you while you were on vacation. For example, update the prompt with a new email from Geoffrey Folmer. He heard about your new Bitcoin ETF and proactively reached out to you to learn more.
 
@@ -161,7 +161,7 @@ Copy/paste the following email into the prompt, and update the User ID to `638`.
 ```text
 Hi Paul,
 
-I just heard about your new Bitcoin ETF. Do you think I should move some money out of my index funds and into that ETF? 
+I just heard about your new Bitcoin ETF. Do you think I should move some money out of my index funds and into that ETF?
 
 Thanks,
 Geoffrey Follmer
@@ -177,7 +177,7 @@ If you work in financial services, you know that chatbots aren't allowed to prov
 
 1. You will add response restrictions that instruct the model not to give financial advice.
 
-1. While the response restirctions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
+1. While the response restrictions are helpful, they still rely on the model to honor the request. This isn't deterministic enough for your regulators, so you will also append a deterministic legal disclaimer to the end of every response.
 
 Update your inputs as shown in the screenshot below, and review the results.
 
@@ -191,7 +191,7 @@ Finally, imagine you're now a Financial Analyst, and you want to ask natural lan
 
 Navigate to the **Research** tab. Select a ticker and ask a natural language question like, "How will the IPO proceeds be used?".
 
-Notice that this interface shows two results. On the left-hand side, you see a response generated by Vertex AI Search and Conversation - the easiest way to get started with document processing and understanding. On the right-hand side, you see a response that's directly querying the database and answering the question with Gemini. There are pros and cons to each approach, and you can use both together based on your use case.
+Notice that this interface shows two results. On the left-hand side, you see a response generated by Vertex AI Agent Builder - the easiest way to get started with document processing and understanding. On the right-hand side, you see a response that's directly querying the database and answering the question with Gemini. There are pros and cons to each approach, and you can use both together based on your use case.
 
 ## Summary
 

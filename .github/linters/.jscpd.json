@@ -1,9 +1,23 @@
 {
-  "threshold": 10,
+  "threshold": 2,
   "reporters": ["html", "markdown"],
   "ignore": [
     "**/node_modules/**",
     "**/.git/**",
-    "**/*.md"
+    "**/.rbenv/**",
+    "**/.venv/**",
+    "**/*cache*/**",
+    "**/*.json",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.md",
+    "**/*.html",
+    "**/*.xml",
+    "**/*.jpg",
+    "**/*.png",
+    "**/*.svg",
+    "**/*.zip",
+    "**/*.bin",
+    "noxfile.py"
   ]
 }

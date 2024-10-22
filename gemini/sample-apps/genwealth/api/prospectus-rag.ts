@@ -1,7 +1,7 @@
 import { Database } from "./database";
 import { VertexAI } from "@google-cloud/vertexai";
 
-/** Use retrieval augmented search of Prospectus using AlloyDb embeddings & Gemini Pro.
+/** Use retrieval augmented search of Prospectus using AlloyDB embeddings & Gemini Pro.
  */
 export class ProspectusRag {
 
@@ -15,8 +15,8 @@ export class ProspectusRag {
 
     private async getContext(prompt: string, ticker: string): Promise<string[]> {
         const query = `SELECT content,
-                embedding <=> embedding('textembedding-gecko@003', '${prompt}') AS distance
-            FROM  langchain_vector_store
+                embedding <=> google_ml.embedding('textembedding-gecko@003', '${prompt}')::vector AS distance
+            FROM langchain_vector_store
             WHERE ticker='${ticker}'
             ORDER BY distance
             LIMIT 5`;
@@ -28,7 +28,7 @@ export class ProspectusRag {
             if (rows.length == 0)
                 throw new Error(`No data for ticker: ${ticker}`);
 
-            return rows.map((row) => row.content);
+            return rows.map((row: { content: any; }) => row.content);
         }
         catch (error)
         {
@@ -37,7 +37,7 @@ export class ProspectusRag {
     }
 
     private async generateContent(userPrompt: string, context: string) {
-        const aiRole = 'AI ROLE: You are an experienced financial analyst. \nUSER ROLE: I am an employee of GenWealth, an Investment Advisory Firm serving clients in North America. \n\nINSTRUCTIONS: \n- Respond to the PROMPT using FEWER than 4000 characters, including white space. The PROMPT begins with "<PROMPT>" and ends with "</PROMPT>". \n- Use as many details as possible from the provided CONTEXT to improve your response. The context begins with "<CONTEXT>" and ends with "</CONTEXT>". \n- Use only plain language and bullet points in your response. Do not use programming markup or tags in your response. \n- If you cannot answer the question based on the provided context, do not make up an answer. you do not know the answer. Instead, simply respond by saying, "The provided context does not contain enough relevant information to answer the question."';
+        const aiRole = 'AI ROLE: You are an experienced financial analyst. \nUSER ROLE: I am an employee of GenWealth, an Investment Advisory Firm serving clients in North America. \n\nINSTRUCTIONS: \n- Respond to the PROMPT using FEWER than 4000 characters, including white space. The PROMPT begins with "<PROMPT>" and ends with "</PROMPT>". \n- Use as many details as possible from the provided CONTEXT to improve your response. The context begins with "<CONTEXT>" and ends with "</CONTEXT>". \n- Respond with a 1-2 sentence summary, followed by bullet points with specific details. \n- Do not use programming markup or tags in your response. \n- If you cannot answer the question based on the provided context, do not make up an answer. Instead, simply respond by saying, "The provided context does not contain enough relevant information to answer the question."';
         const prompt = `${aiRole}\n\nAnswer truthfully and only if you can find the answer for the following question in the context provided. \n\n<CONTEXT>${context}\n</CONTEXT>\n\n<PROMPT>${userPrompt}</PROMPT>`;
 
         const projectId = this.getProjectId();
@@ -45,17 +45,17 @@ export class ProspectusRag {
         
         if (!region) throw new Error('Missing REGION env variable.');
 
-        // Initialize Vertex with your Cloud project and location       
+        // Initialize Vertex AI with your Cloud project and location       
         const vertex_ai = new VertexAI({project: projectId, location: region});
         const model = process.env['RAG_MODEL'] ?? 'gemini-1.0-pro-001';
     
         // Instantiate the models
         const generativeModel = vertex_ai.preview.getGenerativeModel({
             model: model,
-            generation_config: {
-                "max_output_tokens": 2048,
+            generationConfig: {
+                "maxOutputTokens": 2048,
                 "temperature": 0.5,
-                "top_p": 1,
+                "topP": 1,
             },
         });
         
@@ -65,7 +65,7 @@ export class ProspectusRag {
 
         const streamingResp = await generativeModel.generateContentStream(request);
 
-        const text = (await streamingResp.response).candidates[0].content.parts[0].text;
+        const text = (await streamingResp.response).candidates![0].content.parts[0].text;
 
         var response = {query: prompt, data: [text]};
 
@@ -80,7 +80,7 @@ export class ProspectusRag {
         console.log('using projectid', projectId);
 
         if (!projectId)
-            throw new Error("Unable to load project id from PROJECT_ID env variable or GCP metadata");
+            throw new Error("Unable to load project id from PROJECT_ID env variable or Google Cloud metadata");
 
         return projectId;
     }

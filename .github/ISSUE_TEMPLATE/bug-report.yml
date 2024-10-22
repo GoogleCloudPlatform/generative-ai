@@ -8,15 +8,17 @@ body:
     attributes:
       value: |
         Thanks for stopping by to let us know something could be better!
+
         **PLEASE READ**:
         - This repository is for [Generative AI with Vertex AI on Google Cloud](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview), not the [Google AI Gemini/PaLM APIs](https://ai.google.dev/)
-          - For issues with the Google AI Gemini API, refer to one of [these repositories](https://github.com/orgs/google/repositories?q=generative-ai) or the [Google Developers Community Discord `#gemini-api` channel](https://ai.google.dev/docs/discord).
+          - For issues with the Google AI Gemini API, refer to the [google-gemini](https://github.com/google-gemini) organization or the [Google Developers Community Discourse](https://discuss.ai.google.dev/).
+        - For issues with the Vertex AI Python SDK, please report in the [googleapis/python-aiplatform](https://github.com/googleapis/python-aiplatform/) repository.
         - If you have a support contract with Google, please create an issue in the [support console](https://cloud.google.com/support/) instead of filing on GitHub. This will ensure a timely response.
   - type: input
     id: file-name
     attributes:
       label: File Name
-      description: Which notebook/code sample is the issue occuring in?
+      description: Which notebook/code sample is the issue occurring in?
       placeholder: ex. `gemini/getting-started/intro_gemini_python.ipynb`
     validations:
       required: true

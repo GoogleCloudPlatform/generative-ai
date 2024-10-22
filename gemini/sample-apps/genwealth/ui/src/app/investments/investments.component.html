@@ -6,7 +6,7 @@
     </mat-radio-group>    
     <mat-form-field>
         <input matInput [(ngModel)]="investmentSearch" (keydown.enter)="findInvestments()"
-            [placeholder]="searchType == searchTypes.KEYWORD ? KEYWORD_PLACHOLDER : SEMANTIC_PLACEHOLDER">
+            [placeholder]="searchType == searchTypes.KEYWORD ? KEYWORD_PLACEHOLDER : SEMANTIC_PLACEHOLDER">
         <mat-icon matTooltip="Sample suggestion" matSuffix fontSet="material-symbols-outlined"
                 (click)="investmentSearch = getSuggestion()">
             prompt_suggestion

@@ -3,7 +3,7 @@
 # VPC Network database is on
 export VPC_NETWORK=
 export VPC_SUBNET=$VPC_NETWORK
-## AlloyDB 
+## AlloyDB
 export ALLOYDB_IP=
 export PGADMIN_USER=
 export ALLOYDB_PASSWORD=
@@ -16,6 +16,6 @@ export PGPASSWORD=${ALLOYDB_PASSWORD}
 # shellcheck disable=SC2155
 export PROJECT_ID=$(gcloud config get-value project)
 # GCS Bucket for storing prospectus PDFs
-export PROSPECTUS_BUCKET= 
-# Datastore ID used by Vertex S&C
-export DATASTORE_ID= 
+export PROSPECTUS_BUCKET=
+# Datastore ID used by Vertex AI S&C
+export DATASTORE_ID=

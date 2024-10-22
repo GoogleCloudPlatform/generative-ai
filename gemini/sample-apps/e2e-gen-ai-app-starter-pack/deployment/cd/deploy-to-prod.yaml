@@ -1,0 +1,36 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: trigger-deployment
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "genai-app-sample"
+      - "--image"
+      - "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME"
+      - "--region"
+      - "$_REGION"
+      - "--project"
+      - $_PROD_PROJECT_ID
+      - "--min-instances"
+      - "1"
+      - "--no-cpu-throttling"
+      - "--cpu"
+      - "4"
+      - "--memory"
+      - "4Gi"
+      - "--concurrency"
+      - "40"
+      - "--service-account"
+      - "${_CLOUD_RUN_APP_SA_NAME}@${_PROD_PROJECT_ID}.iam.gserviceaccount.com"
+      - "--set-env-vars"
+      - "COMMIT_SHA=${COMMIT_SHA}"
+
+substitutions:
+  _PROD_PROJECT_ID: YOUR_PROD_PROJECT_ID # Replace with your prod project ID
+  _CONTAINER_NAME: genai-app-sample
+  _ARTIFACT_REGISTRY_REPO_NAME: genai-containers
+  _CLOUD_RUN_APP_SA_NAME: genai-app-sample-cr-sa
+  _REGION: us-central1
+options:
+  logging: CLOUD_LOGGING_ONLY
