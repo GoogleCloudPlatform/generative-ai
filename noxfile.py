@@ -111,19 +111,41 @@ def format(session):
     Run isort to sort imports. Then run black
     to format code to uniform standard.
     """
+    target_branch = "main"
+
     unstaged_files = subprocess.run(
-        ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB"],
+        ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB", target_branch],
         stdout=subprocess.PIPE,
         text=True,
     ).stdout.splitlines()
 
     staged_files = subprocess.run(
-        ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMRTUXB"],
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--name-only",
+            "--diff-filter=ACMRTUXB",
+            target_branch,
+        ],
         stdout=subprocess.PIPE,
         text=True,
     ).stdout.splitlines()
 
-    changed_files = sorted(set(unstaged_files + staged_files))
+    committed_files = subprocess.run(
+        [
+            "git",
+            "diff",
+            "HEAD",
+            target_branch,
+            "--name-only",
+            "--diff-filter=ACMRTUXB",
+        ],
+        stdout=subprocess.PIPE,
+        text=True,
+    ).stdout.splitlines()
+
+    changed_files = sorted(set(unstaged_files + staged_files + committed_files))
 
     lint_paths_py = [
         f for f in changed_files if f.endswith(".py") and f != "noxfile.py"
