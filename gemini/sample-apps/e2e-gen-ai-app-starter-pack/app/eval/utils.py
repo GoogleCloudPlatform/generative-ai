@@ -50,10 +50,10 @@ def pairwise(iterable: List[Any]) -> Iterator[tuple[Any, Any]]:
     return zip(a, a)
 
 
-def _process_conversation(row: Dict[str, List[str]]) -> List[Dict[str, Any]]:
+def _process_conversation(row: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
     """Processes a single conversation row to extract messages and build conversation history."""
     conversation_history: List[Dict] = []
-    messages = []
+    messages: List[Dict[str, Any]] = []
     # Most human-ai interactions are composed of a human message followed by an ai message.
     # But when there's a tool call, the interactions are as follows:
     # - human message
@@ -61,6 +61,7 @@ def _process_conversation(row: Dict[str, List[str]]) -> List[Dict[str, Any]]:
     # - tool message with tool call arguments
     # - ai message with non-empty content and tool_calls empty.
     # In any case the human message is the first in the set and the final answer is the last in the set.
+    messages_since_last_human_message: List[Dict[str, Any]] = []
     for message in row["messages"]:
         if message["type"] == "human":
             messages_since_last_human_message = []
@@ -106,7 +107,7 @@ def generate_multiturn_history(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(processed_messages)
 
 
-def _retrieve_all_messages(row: tuple[int, Dict[str, Any]]) -> List[Any]:
+def _retrieve_all_messages(row: tuple[int, Dict[str, Any]]) -> Dict[str, Any]:
     """Extracts conversation history and the current human message from the row,
     and appends the current human message to the history.
 
@@ -134,7 +135,6 @@ def _retrieve_all_messages(row: tuple[int, Dict[str, Any]]) -> List[Any]:
 def batch_generate_messages(
     messages: pd.DataFrame,
     runnable: Callable[[List[Dict[str, Any]]], Dict[str, Any]],
-    max_workers: int = 4,
 ) -> pd.DataFrame:
     """Generates AI responses to user messages using a provided runnable.
 
