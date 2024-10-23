@@ -1,4 +1,3 @@
----
 #################################
 #################################
 ## Super Linter GitHub Actions ##
@@ -43,6 +42,33 @@ jobs:
         with:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
+
+      ######################
+      # Set up Python and Nox #
+      ######################
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Nox
+        run: pip install nox
+
+      ######################
+      # Run Nox formatting #
+      ######################
+      - name: Run Nox format
+        run: nox -s format
+
+      ######################
+      # Commit Formatting Changes #
+      ######################
+      - name: Commit changes
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add .
+          git commit -m 'Apply formatting with Nox' || echo "No changes to commit"
 
       ################################
       # Run Linter against code base #
