@@ -49,7 +49,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install Nox
         run: pip install nox
@@ -82,12 +82,13 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_EXCLUDE: 'gemini/sample-apps/finance-advisor-spanner/.*\.sql'
-          JAVASCRIPT_DEFAULT_STYLE: prettier
           LOG_LEVEL: WARN
           SHELLCHECK_OPTS: -e SC1091 -e 2086
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_PYTHON_PYINK: false
           VALIDATE_PYTHON_ISORT: false
-          VALIDATE_TYPESCRIPT_STANDARD: false # super-linter/super-linter#4445
           VALIDATE_CHECKOV: false
+          VALIDATE_JAVASCRIPT_PRETTIER: true
+          VALIDATE_TYPESCRIPT_PRETTIER: true
           VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_TYPESCRIPT_STANDARD: false
