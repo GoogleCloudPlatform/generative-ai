@@ -123,7 +123,13 @@ def format(session):
         text=True,
     ).stdout.splitlines()
 
-    changed_files = sorted(set(unstaged_files + staged_files))
+    committed_files = subprocess.run(
+        ["git", "diff", "HEAD^", "HEAD", "--name-only", "--diff-filter=ACMRTUXB"],
+        stdout=subprocess.PIPE,
+        text=True,
+    ).stdout.splitlines()
+
+    changed_files = sorted(set(unstaged_files + staged_files + committed_files))
 
     lint_paths_py = [
         f for f in changed_files if f.endswith(".py") and f != "noxfile.py"
