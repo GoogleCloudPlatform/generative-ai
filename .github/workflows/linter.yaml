@@ -88,7 +88,7 @@ jobs:
           FIX_JAVASCRIPT_ES: true
           FIX_JAVASCRIPT_PRETTIER: true
           FIX_MARKDOWN: true
-          FIX_PYTHON_BLACK: true 
+          FIX_PYTHON_BLACK: true
           FIX_PYTHON_ISORT: true
           FIX_PYTHON_RUFF: true
           FIX_SHELL_SHFMT: true
