@@ -73,6 +73,13 @@ jobs:
           git add .
           git commit -m 'Apply formatting with Nox' || echo "No changes to commit"
 
+      ######################
+      # Push the changes back to the PR branch #
+      ######################
+      - name: Push changes
+        run: |
+          git push origin HEAD:${{ github.head_ref }}
+
       ################################
       # Run Linter against code base #
       ################################

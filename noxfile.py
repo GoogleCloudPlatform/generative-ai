@@ -111,20 +111,36 @@ def format(session):
     Run isort to sort imports. Then run black
     to format code to uniform standard.
     """
+    target_branch = "main"
+
     unstaged_files = subprocess.run(
-        ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB"],
+        ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB", target_branch],
         stdout=subprocess.PIPE,
         text=True,
     ).stdout.splitlines()
 
     staged_files = subprocess.run(
-        ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMRTUXB"],
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--name-only",
+            "--diff-filter=ACMRTUXB",
+            target_branch,
+        ],
         stdout=subprocess.PIPE,
         text=True,
     ).stdout.splitlines()
 
     committed_files = subprocess.run(
-        ["git", "diff", "HEAD^", "HEAD", "--name-only", "--diff-filter=ACMRTUXB"],
+        [
+            "git",
+            "diff",
+            f"HEAD",
+            target_branch,
+            "--name-only",
+            "--diff-filter=ACMRTUXB",
+        ],
         stdout=subprocess.PIPE,
         text=True,
     ).stdout.splitlines()
