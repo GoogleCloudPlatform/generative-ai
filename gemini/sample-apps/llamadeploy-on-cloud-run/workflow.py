@@ -288,18 +288,7 @@ class RAGWorkflow(Workflow):
 
         index = self.create_index(dirname)
 
-        # prev_reasoning = ""
-        # cur_response = None
-        # should_stop = False
         cur_steps = 0
-
-        # # use response
-        # final_response_metadata: Dict[str, Any] = {"sub_qa": []}
-
-        # text_chunks: list[str] = []
-        # source_nodes: list[NodeWithScore] = []
-
-        # stop_fn = self.default_stop_fn
 
         if not query:
             return None
