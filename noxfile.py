@@ -136,18 +136,12 @@ def format(session):
         return
 
     session.install(
-        "git+https://github.com/tensorflow/docs",
-        "ipython",
-        "jupyter",
-        "nbconvert",
         "types-requests",
         BLACK_VERSION,
         "blacken-docs",
         "pyupgrade",
         ISORT_VERSION,
-        "nbqa",
         "autoflake",
-        "nbformat",
         "ruff",
     )
 
@@ -177,6 +171,15 @@ def format(session):
         )
 
     if lint_paths_nb:
+        session.install(
+            "git+https://github.com/tensorflow/docs",
+            "ipython",
+            "jupyter",
+            "nbconvert",
+            "nbqa",
+            "nbformat",
+        )
+
         session.run("python3", ".github/workflows/update_notebook_links.py", ".")
 
         session.run(
