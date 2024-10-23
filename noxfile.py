@@ -23,6 +23,7 @@ import os
 import pathlib
 import re
 import shutil
+import subprocess
 import warnings
 
 import nox
@@ -110,63 +111,103 @@ def format(session):
     Run isort to sort imports. Then run black
     to format code to uniform standard.
     """
+    unstaged_files = subprocess.run(
+        ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB"],
+        stdout=subprocess.PIPE,
+        text=True,
+    ).stdout.splitlines()
+
+    staged_files = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMRTUXB"],
+        stdout=subprocess.PIPE,
+        text=True,
+    ).stdout.splitlines()
+
+    changed_files = sorted(set(unstaged_files + staged_files))
+
+    lint_paths_py = [
+        f for f in changed_files if f.endswith(".py") and f != "noxfile.py"
+    ]
+
+    lint_paths_nb = [f for f in changed_files if f.endswith(".ipynb")]
+
+    if not lint_paths_py and not lint_paths_nb:
+        session.log("No changed Python or notebook files to lint.")
+        return
+
     session.install(
-        "git+https://github.com/tensorflow/docs",
-        "ipython",
-        "jupyter",
-        "nbconvert",
         "types-requests",
         BLACK_VERSION,
         "blacken-docs",
         "pyupgrade",
         ISORT_VERSION,
-        "nbqa",
         "autoflake",
-        "nbformat",
         "ruff",
     )
-    session.run(
-        "autoflake",
-        "-i",
-        "-r",
-        "--remove-all-unused-imports",
-        *LINT_PATHS,
-    )
-    session.run(
-        "ruff",
-        "check",
-        "--fix-only",
-        *LINT_PATHS,
-    )
-    # Use the --fss option to sort imports using strict alphabetical order.
-    # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
-    session.run(
-        "isort",
-        "--fss",
-        *LINT_PATHS,
-    )
-    session.run(
-        "black",
-        *LINT_PATHS,
-    )
-    session.run("python3", ".github/workflows/update_notebook_links.py", ".")
-    session.run(
-        "nbqa", "pyupgrade", "--exit-zero-even-if-changed", "--py310-plus", *LINT_PATHS
-    )
-    session.run(
-        "nbqa", "autoflake", "-i", "--remove-all-unused-imports", "-r", *LINT_PATHS
-    )
-    session.run(
-        "nbqa",
-        "isort",
-        "--fss",
-        *LINT_PATHS,
-        "--profile",
-        "black",
-    )
-    session.run("nbqa", "black", *LINT_PATHS)
-    session.run("nbqa", "blacken-docs", "--nbqa-md", *LINT_PATHS)
-    session.run("python3", "-m", "tensorflow_docs.tools.nbfmt", *LINT_PATHS)
+
+    if lint_paths_py:
+        session.run(
+            "autoflake",
+            "-i",
+            "-r",
+            "--remove-all-unused-imports",
+            *lint_paths_py,
+        )
+        session.run(
+            "ruff",
+            "check",
+            "--fix-only",
+            *lint_paths_py,
+        )
+        # Use the --fss option to sort imports using strict alphabetical order.
+        session.run(
+            "isort",
+            "--fss",
+            *lint_paths_py,
+        )
+        session.run(
+            "black",
+            *lint_paths_py,
+        )
+
+    if lint_paths_nb:
+        session.install(
+            "git+https://github.com/tensorflow/docs",
+            "ipython",
+            "jupyter",
+            "nbconvert",
+            "nbqa",
+            "nbformat",
+        )
+
+        session.run("python3", ".github/workflows/update_notebook_links.py", ".")
+
+        session.run(
+            "nbqa",
+            "pyupgrade",
+            "--exit-zero-even-if-changed",
+            "--py310-plus",
+            *lint_paths_nb,
+        )
+        session.run(
+            "nbqa",
+            "autoflake",
+            "-i",
+            "--remove-all-unused-imports",
+            "-r",
+            *lint_paths_nb,
+        )
+        session.run(
+            "nbqa",
+            "isort",
+            "--fss",
+            *lint_paths_nb,
+            "--profile",
+            "black",
+        )
+        session.run("nbqa", "black", *lint_paths_nb)
+        session.run("nbqa", "blacken-docs", "--nbqa-md", *lint_paths_nb)
+        session.run("python3", "-m", "tensorflow_docs.tools.nbfmt", *lint_paths_nb)
 
     # Sort Spelling Allowlist
     spelling_allow_file = ".github/actions/spelling/allow.txt"
