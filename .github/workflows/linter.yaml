@@ -60,6 +60,7 @@ jobs:
           VALIDATE_TYPESCRIPT_STANDARD: false
 
   fix-lint-issues:
+    name: Fix Lint Issues
     permissions:
       contents: write
       statuses: write
