@@ -60,6 +60,9 @@ jobs:
       - name: Run Nox format
         run: nox -s format
 
+      - name: Remove Nox temp files
+        run: rm -rf .nox/
+
       ######################
       # Commit Formatting Changes #
       ######################
