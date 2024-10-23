@@ -110,4 +110,3 @@ ignore$
 ^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
 ^\Qnoxfile.py\E$
-^\Qgemini/sample-apps/llamadeploy-on-cloud-run/data/gatsby.txt\E$

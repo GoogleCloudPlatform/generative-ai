@@ -21,6 +21,15 @@ Before running this application on Cloud Run, make sure you have the following:
   - Artifact Registry API (or Container Registry API)
 - **Service Account:** A service account with the necessary permissions to access other Google Cloud resources used by your workflow (e.g., Firestore, Cloud Storage, Vertex AI). You can use the default Compute Engine service account or create a custom one.
 
+### Download Data
+We will be using The Great Gatbsy text by F. Scott Fitzgerald for this example.
+
+```bash
+!mkdir data
+
+!gcloud storage cp gs://github-repo/generative-ai/sample-apps/llamadeploy-on-cloud-run/gatsby.txt data
+```
+
 ## Files
 
 ### 1. `core.py`
