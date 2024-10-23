@@ -519,6 +519,7 @@ getparent
 gfile
 gidiyor
 github
+gitleaks
 gke
 glowin
 gms
