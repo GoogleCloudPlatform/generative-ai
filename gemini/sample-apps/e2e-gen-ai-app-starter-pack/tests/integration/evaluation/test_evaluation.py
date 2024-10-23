@@ -30,13 +30,15 @@ async def test_multiturn_evaluation() -> None:
     y = yaml.safe_load(open("tests/integration/evaluation/ml_ops_chat.yaml"))
     df = pd.DataFrame(y)
     df = generate_multiturn_history(df)
-    
+
     assert len(df) == 2
-    assert df['conversation_history'][0]== []
-    assert df['human_message'][0]['content'][0]['text']== "Explain what's MLOps"
-    assert len(df['conversation_history'][1]) == 4
-    assert df['human_message'][1]['content'][0]['text']== "How can I evaluate my models?"
-    
+    assert df["conversation_history"][0] == []
+    assert df["human_message"][0]["content"][0]["text"] == "Explain what's MLOps"
+    assert len(df["conversation_history"][1]) == 4
+    assert (
+        df["human_message"][1]["content"][0]["text"] == "How can I evaluate my models?"
+    )
+
     scored_data = batch_generate_messages(df, chain)
     scored_data["user"] = scored_data["human_message"].apply(lambda x: x["content"])
     scored_data["reference"] = scored_data["ai_message"].apply(lambda x: x["content"])
@@ -94,10 +96,10 @@ async def test_multiturn_evaluation() -> None:
         metric_column_mapping={"prompt": "user"},
     )
     eval_result = eval_task.evaluate()
-    
-    assert eval_result.summary_metrics['fluency/mean'] == 5.0
-    assert eval_result.summary_metrics['safety/mean'] == 1.0
-    assert eval_result.summary_metrics['custom_faithfulness/mean'] > 4.0
+
+    assert eval_result.summary_metrics["fluency/mean"] == 5.0
+    assert eval_result.summary_metrics["safety/mean"] == 1.0
+    assert eval_result.summary_metrics["custom_faithfulness/mean"] > 4.0
 
     # Delete the experiment
     experiment = aiplatform.Experiment(experiment_name)
