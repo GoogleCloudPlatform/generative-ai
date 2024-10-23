@@ -136,7 +136,7 @@ def format(session):
         [
             "git",
             "diff",
-            f"HEAD",
+            "HEAD",
             target_branch,
             "--name-only",
             "--diff-filter=ACMRTUXB",
