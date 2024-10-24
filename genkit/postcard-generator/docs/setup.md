@@ -4,7 +4,7 @@ To deploy this app successfully you will need to run some initial configuration.
 
 ## Option 1: Automated Configuration (Recommended)
 
-This repo includes the required terraform to configure and setup your project to run this demo.
+This repository includes the required terraform to configure and setup your project to run this demo.
 
 ### Terraform Config
 
@@ -46,7 +46,7 @@ You're done! Check out the [next steps](#post-setup) guide for what's next.
       * Store it in secrets manager with the name `GOOGLE_MAPS_API_SERVER_KEY`
    2. Client Key
       * Include the following restrictions:
-         * Javascript
+         * JavaScript
          * Places
       * Store it in secrets manager with the name `NEXT_PUBLIC_GOOGLE_MAPS_PUBLIC_API_KEY`
 2. In [the Firebase Console](https://console.firebase.google.com) enable this project as a Firebase project

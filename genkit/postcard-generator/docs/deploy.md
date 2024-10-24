@@ -2,7 +2,7 @@
 
 **Note:** By default this app has authentication disabled. This means anyone with the URL can use it. If you intend to leave it running, you should [enable authentication](#authentication).
 
-## Step 1: Push this repo to GitHub
+## Step 1: Push this to GitHub
 
 As of 2024-09-27 App Hosting only supports GitHub, so you will need to create a repository on GitHub and push this code there.
 
@@ -49,7 +49,7 @@ Now redeploy:
 terraform apply
 ```
 
-## Step 5: Rollout!
+## Step 5: Rollout
 
 You can now create a new rollout in the console. Navigate to [console.firebase.google.com](https://console.firebase.google.com) and then create a new rollout in App Hosting.
 
@@ -107,7 +107,7 @@ Edit `apphosting.yaml` and change the `AUTH_ENABLED` section to look like this:
       - BUILD
 ```
 
-### Step 5: Push your changes and it should then create a new rollout with auth enabled.
+### Step 5: Push your changes
 
 ## Maps Public API Key Security
 

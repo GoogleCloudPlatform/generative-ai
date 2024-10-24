@@ -6,7 +6,7 @@ If you are not familiar with [Firebase Genkit](https://firebase.google.com/docs/
 
 ## Overview
 
-This demo is built in two parts: a webapp and a Genkit development environment. Both use the same code, but have different aspects to demo. The most important thing is that it's the same codebase for both - just different tools to interact suitable for different personas and tasks.
+This demo has two parts: a webapp and a Genkit development environment. Both use the same code, but have different aspects to demo. The most important thing is that it's the same codebase for both - just different tools to interact suitable for different personas and tasks.
 
 ## Instructions
 
@@ -60,7 +60,7 @@ Refer to the [Setup Documentation](setup.md) to configure your project including
 
 Refer to the [Deployment Documentation](deploy.md) to deploy the App to Firebase App Hosting
 
-### Step 3 - Demo!
+### Step 3 - Demo
 
 Refer to the [Demo Guide](demo.md) for instructions on how to show this demo.
 

@@ -71,7 +71,7 @@ resource "google_secret_manager_secret" "maps_public" {
   }
 }
 resource "google_secret_manager_secret_version" "maps_public" {
-  secret = google_secret_manager_secret.maps_public.id
+  secret      = google_secret_manager_secret.maps_public.id
   secret_data = google_apikeys_key.maps_public.key_string
 }
 
@@ -85,7 +85,7 @@ resource "google_secret_manager_secret" "maps_server" {
   }
 }
 resource "google_secret_manager_secret_version" "maps_server" {
-  secret = google_secret_manager_secret.maps_server.id
+  secret      = google_secret_manager_secret.maps_server.id
   secret_data = google_apikeys_key.maps_server.key_string
 }
 

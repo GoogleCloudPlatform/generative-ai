@@ -12,7 +12,7 @@ This demo showcases [Firebase Genkit](https://firebase.google.com/docs/genkit) r
 
 ## Overview
 
-This demo is built in two parts: a webapp and a Genkit development environment. Both use the same code, but have different aspects to demo. The most important thing is that it's the same codebase for both - just different tools to interact suitable for different personas and tasks.
+This demo has two parts: a webapp and a Genkit development environment. Both use the same code, but have different aspects to demo. The most important thing is that it's the same codebase for both - just different tools to interact suitable for different personas and tasks.
 
 See [the documentation](docs/README.md) for more information on how to deploy this and also for an example demo script.
 
