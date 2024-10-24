@@ -1,10 +1,14 @@
-# Vertex AI Search Demo
+# Vertex AI Search Web App Demo
 
 > NOTE: Some of the features in this demo require allowlist access. If you would like early access, apply to become a [Trusted Tester for Google Cloud Generative AI][trustedtester].
 
 This demo illustrates how to search through a corpus of documents using [Vertex AI Search][enterprisesearch] (formerly known as Enterprise Search).
 
 Additional features include how to search the public Cloud Knowledge Graph using the [Enterprise Knowledge Graph][enterpriseknowledgegraph] API.
+
+## Video Walkthrough
+
+[![VAIS Web App Walkthrough](https://storage.googleapis.com/github-repo/search/web-app/vais_web_app_walkthrough.png)](https://storage.googleapis.com/github-repo/search/web-app/vais_web_app_walkthrough.mp4)
 
 ## Architecture
 
