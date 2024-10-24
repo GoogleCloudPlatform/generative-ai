@@ -5,6 +5,7 @@ AIP
 AMNOSH
 ANZ
 APIENTRY
+appspot
 APSTUDIO
 AUVs
 Adidas
@@ -65,6 +66,7 @@ Dexin
 Disturbia
 Doaa
 Doogler
+dotprompt
 Dreesen
 Durafast
 Durmus
@@ -107,7 +109,7 @@ Gameplay
 Gandalf
 Gatace
 GenTwo
-Genkit
+genkit
 Gfm
 Gisting
 Glickman
@@ -375,6 +377,7 @@ airlume
 alloydb
 antiword
 apikey
+apikeys
 apredict
 aquery
 arXiv
@@ -711,6 +714,7 @@ reranking
 reranks
 ribeye
 ringspun
+roboto
 rpet
 rrf
 rsc
@@ -734,6 +738,7 @@ srlimit
 ssd
 ssh
 ssn
+ssr
 stdcall
 strdupv
 streamlit
@@ -765,6 +770,7 @@ toset
 tqdm
 traceloop
 tritan
+tseslint
 tsv
 ubuntu
 undst
