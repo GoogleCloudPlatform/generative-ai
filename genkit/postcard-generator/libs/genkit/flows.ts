@@ -20,7 +20,15 @@ import { renderMap } from "@/libs/maps/maps";
 import { configureGenkit } from "@genkit-ai/core";
 import { promptRef } from "@genkit-ai/dotprompt";
 import { defineFlow, runFlow } from "@genkit-ai/flow";
-import { PostcardResult, PostcardFlow, PostcardFlowSchema, PostcardResultSchema, PostcardMapLLMRequest, PostcardImageLLMRequest, PostcardMapLLMResponseSchema } from "./schema";
+import {
+  PostcardResult,
+  PostcardFlow,
+  PostcardFlowSchema,
+  PostcardResultSchema,
+  PostcardMapLLMRequest,
+  PostcardImageLLMRequest,
+  PostcardMapLLMResponseSchema,
+} from "./schema";
 import { genkitConfig } from "./config";
 import { headers } from "next/headers";
 import { z } from "zod";
@@ -31,7 +39,7 @@ import { firebaseServerApp } from "@/libs/firebase/serverApp";
 configureGenkit(genkitConfig);
 
 // Is auth enabled?
-const authEnabled = (process.env.AUTH_ENABLED?.toLowerCase() !== "false");
+const authEnabled = process.env.AUTH_ENABLED?.toLowerCase() !== "false";
 
 /**
  * Create a postcard using Google Maps, Gemini, and Imagen3. Should not be called
@@ -49,14 +57,21 @@ const postcardFlow = defineFlow(
   },
   async (postcard: PostcardFlow) => {
     // Get a map image of the whole journey and store it as a data URL
-    const mapImage = await renderMap(postcard.start, postcard.end, postcard.stops);
+    const mapImage = await renderMap(
+      postcard.start,
+      postcard.end,
+      postcard.stops,
+    );
     const mapUrl = `data:image/png;base64,${mapImage}`;
 
     // Load postcard map multi-modal prompt (for map image & text)
     const mapPrompt = promptRef<PostcardMapLLMRequest>("postcard-map");
 
     // Send the map image and address details to the model and generate a response in the desired schema
-    const readMapResponse = await mapPrompt.generate<z.ZodTypeAny, typeof PostcardMapLLMResponseSchema>({
+    const readMapResponse = await mapPrompt.generate<
+      z.ZodTypeAny,
+      typeof PostcardMapLLMResponseSchema
+    >({
       input: {
         start: postcard.start,
         end: postcard.end,
@@ -97,7 +112,9 @@ const postcardFlow = defineFlow(
  * @param args Configuration for the postcard.
  * @returns The generated postcard image, story, and map
  */
-export async function callPostcardFlow(args: PostcardFlow): Promise<PostcardResult> {
+export async function callPostcardFlow(
+  args: PostcardFlow,
+): Promise<PostcardResult> {
   // Check auth headers
   if (authEnabled) {
     // We don't care about the return value here, just if it throws an error or not.

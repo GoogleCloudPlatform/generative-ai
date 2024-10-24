@@ -43,19 +43,23 @@ interface RouteRequest {
   destination: {
     address: string;
   };
-  intermediates: [{
-    address: string;
-  }];
+  intermediates: [
+    {
+      address: string;
+    },
+  ];
   travelMode: string;
 }
 
 // Route response from the maps routing API
 interface RouteReponse {
-  routes: [{
-    polyline: {
-      encodedPolyline: string;
-    };
-  }];
+  routes: [
+    {
+      polyline: {
+        encodedPolyline: string;
+      };
+    },
+  ];
 }
 
 // Series of points for the simplification API
@@ -70,7 +74,11 @@ interface Point {
  * @param stops An optional list of intermediate stops
  * @param end The end address (e.g. Tobacco Docks)
  */
-export async function renderMap(start: string, end: string, stops?: string[]): Promise<string> {
+export async function renderMap(
+  start: string,
+  end: string,
+  stops?: string[],
+): Promise<string> {
   // Obtain polyline for route between two points
   let polyline = await route(start, end, stops);
 
@@ -105,19 +113,24 @@ export async function renderMap(start: string, end: string, stops?: string[]): P
   try {
     const response = await fetch(mapURL);
     if (response.status != 200) {
-      throw new Error(`Error fetching map image. Status code: ${response.status}`);
+      throw new Error(
+        `Error fetching map image. Status code: ${response.status}`,
+      );
     }
     const mapImageBuffer = await response.arrayBuffer();
     // Convert the buffer to a data URL
     return Buffer.from(mapImageBuffer).toString("base64");
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error fetching map image:", error);
     throw error;
   }
 }
 // Calculate distance between two points. Will ultimately return a polyline
-async function route(start: string, end: string, stops?: string[]): Promise<string> {
+async function route(
+  start: string,
+  end: string,
+  stops?: string[],
+): Promise<string> {
   const intermediates: { address: string }[] = [];
   // Populate intermediate stops
   if (stops) {
@@ -154,8 +167,7 @@ async function route(start: string, end: string, stops?: string[]): Promise<stri
     );
     const mapsResponse = response.data as RouteReponse;
     return mapsResponse.routes[0].polyline.encodedPolyline;
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error fetching route data:", error);
     // console.error(error.response.data);
     throw error;

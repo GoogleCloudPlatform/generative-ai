@@ -40,15 +40,15 @@ You're done! Check out the [next steps](#post-setup) guide for what's next.
 
 1. Create two API keys:
    1. Server Key
-      * Include the following restrictions:
-         * Routes
-         * Static Maps
-      * Store it in secrets manager with the name `GOOGLE_MAPS_API_SERVER_KEY`
+      - Include the following restrictions:
+        - Routes
+        - Static Maps
+      - Store it in secrets manager with the name `GOOGLE_MAPS_API_SERVER_KEY`
    2. Client Key
-      * Include the following restrictions:
-         * JavaScript
-         * Places
-      * Store it in secrets manager with the name `NEXT_PUBLIC_GOOGLE_MAPS_PUBLIC_API_KEY`
+      - Include the following restrictions:
+        - JavaScript
+        - Places
+      - Store it in secrets manager with the name `NEXT_PUBLIC_GOOGLE_MAPS_PUBLIC_API_KEY`
 2. In [the Firebase Console](https://console.firebase.google.com) enable this project as a Firebase project
 3. Copy `.env.example` to `.env` in the root directory and populate it with appropraite values
 

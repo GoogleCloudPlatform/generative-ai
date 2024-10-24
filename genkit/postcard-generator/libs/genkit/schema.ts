@@ -45,7 +45,9 @@ export const PostcardMapLLMResponseSchema = z.object({
   story: z.string(),
 });
 
-export type PostcardMapLLMResponse = z.infer<typeof PostcardMapLLMResponseSchema>;
+export type PostcardMapLLMResponse = z.infer<
+  typeof PostcardMapLLMResponseSchema
+>;
 
 export const PostcardMapResult = z.object({
   description: z.string(),
@@ -58,7 +60,9 @@ export const PostcardImageLLMRequestSchema = z.object({
   story: z.string(),
 });
 
-export type PostcardImageLLMRequest = z.infer<typeof PostcardImageLLMRequestSchema>;
+export type PostcardImageLLMRequest = z.infer<
+  typeof PostcardImageLLMRequestSchema
+>;
 
 export const PostcardResultSchema = z.object({
   description: z.string(),

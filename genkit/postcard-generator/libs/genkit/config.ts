@@ -57,8 +57,9 @@ export const genkitConfig = {
     }),
     ollama({
       models: [{ name: process.env.OLLAMA_MODEL_NAME || "gemma2:9b" }],
-      serverAddress: process.env.OLLAMA_SERVER_ADDRESS || "http://127.0.0.1:8080",
-      requestHeaders: async params => ({
+      serverAddress:
+        process.env.OLLAMA_SERVER_ADDRESS || "http://127.0.0.1:8080",
+      requestHeaders: async (params) => ({
         Authorization: `Bearer ${await getIdToken(params.serverAddress)}`,
       }),
     }),

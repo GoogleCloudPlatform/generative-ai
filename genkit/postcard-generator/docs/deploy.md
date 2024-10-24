@@ -78,7 +78,7 @@ const firebaseConfig = {
   projectId: "postcards-demo",
   storageBucket: "postcards-demo.appspot.com",
   messagingSenderId: "1022638455307",
-  appId: "1:1022638455307:web:bc560683c150393541650e"
+  appId: "1:1022638455307:web:bc560683c150393541650e",
 };
 ```
 
@@ -91,7 +91,7 @@ export const firebaseConfig = {
   projectId: "postcards-demo",
   storageBucket: "postcards-demo.appspot.com",
   messagingSenderId: "1022638455307",
-  appId: "1:1022638455307:web:bc560683c150393541650e"
+  appId: "1:1022638455307:web:bc560683c150393541650e",
 };
 ```
 
@@ -100,11 +100,11 @@ export const firebaseConfig = {
 Edit `apphosting.yaml` and change the `AUTH_ENABLED` section to look like this:
 
 ```yaml
-  - variable: AUTH_ENABLED
-    value: "true"
-    availability:
-      - RUNTIME
-      - BUILD
+- variable: AUTH_ENABLED
+  value: "true"
+  availability:
+    - RUNTIME
+    - BUILD
 ```
 
 ### Step 5: Push your changes

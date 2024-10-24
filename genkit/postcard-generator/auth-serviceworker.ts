@@ -33,11 +33,19 @@ import { firebaseConfig } from "./libs/firebase/config";
 
 // Configure Service Worker
 self.addEventListener("install", () => {
-  if ((!firebaseConfig) || (!firebaseConfig.apiKey) || (firebaseConfig.apiKey === "")) {
-    console.warn("Warning - Firebase config not provided. Proxying will not be enabled");
+  if (
+    !firebaseConfig ||
+    !firebaseConfig.apiKey ||
+    firebaseConfig.apiKey === ""
+  ) {
+    console.warn(
+      "Warning - Firebase config not provided. Proxying will not be enabled",
+    );
   }
   // extract firebase config from query string
-  console.log(`Initialised service worker. Project: ${firebaseConfig.projectId}`);
+  console.log(
+    `Initialised service worker. Project: ${firebaseConfig.projectId}`,
+  );
 });
 
 function getOriginFromUrl(url: string) {
@@ -46,17 +54,21 @@ function getOriginFromUrl(url: string) {
   const protocol = pathArray[0];
   const host = pathArray[2];
   return protocol + "//" + host;
-};
+}
 
 // Intercept fetch events to setup Firebase auth headers
 self.addEventListener("fetch", (event) => {
   // Damned typescript...
   const e = event as FetchEvent;
   // Only append if doing request the same service and using https
-  if (self.location.origin === getOriginFromUrl(e.request.url) && (self.location.protocol === "https:" || self.location.hostname === "localhost")) {
+  if (
+    self.location.origin === getOriginFromUrl(e.request.url) &&
+    (self.location.protocol === "https:" ||
+      self.location.hostname === "localhost")
+  ) {
     e.respondWith(fetchWithFirebaseHeaders(e.request));
     return;
-  };
+  }
 });
 
 // Inject both Firebase token and Authz headers
@@ -85,6 +97,6 @@ async function getAuthIdToken(auth: Auth) {
   await auth.authStateReady();
   if (!auth.currentUser) {
     return;
-  };
+  }
   return await getIdToken(auth.currentUser);
 }

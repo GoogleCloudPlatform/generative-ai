@@ -23,8 +23,8 @@ import { firebaseConfig } from "./config";
 import { getAuth } from "firebase/auth";
 import { getApps, initializeApp } from "firebase-admin/app";
 
-export const firebaseServerApp
-  = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+export const firebaseServerApp =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 export async function getAuthenticatedAppForUser() {
   const idToken = headers().get("Authorization")?.split("Bearer ")[1];

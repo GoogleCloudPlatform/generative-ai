@@ -30,14 +30,14 @@ You can then navigate to [localhost:3000](http://localhost:3000) and send a demo
 ## AI Flow
 
 1. User inputs start and end addresses and the names of the recipient and sender for the postcard
-   * Addresses are autocompleted in the web app using the Maps API
+   - Addresses are autocompleted in the web app using the Maps API
 2. A map between the addresses is created using the [Google Maps routes API](https://developers.google.com/maps/documentation/routes) and [Google Maps static API](https://developers.google.com/maps/documentation/maps-static/overview)
 3. The map image is sent to Gemini alongside the rest of the data to generate highlights of a journey and a story for the back of the postcard
-   * The prompt can be seen in [prompts/postcard-map.prompt](prompts/postcard-map.prompt)
-   * This prompt requests Gemini returns the response in structured JSON, the schema of which can be seen in [libs/genkit/schema.ts](libs/genkit/schema.ts).
-   * An example [partial prompt](https://firebase.google.com/docs/genkit/dotprompt#partials) in [prompts/_example-highlights.prompt](prompts/_example-highlights.prompt)
+   - The prompt can be seen in [prompts/postcard-map.prompt](prompts/postcard-map.prompt)
+   - This prompt requests Gemini returns the response in structured JSON, the schema of which can be seen in [libs/genkit/schema.ts](libs/genkit/schema.ts).
+   - An example [partial prompt](https://firebase.google.com/docs/genkit/dotprompt#partials) in [prompts/\_example-highlights.prompt](prompts/_example-highlights.prompt)
 4. The highlights of the route alongside the start and end is sent to Imagen3
-   * This prompt can be seen in [prompts/postcard-image.prompt](prompts/postcard-image.prompt)
+   - This prompt can be seen in [prompts/postcard-image.prompt](prompts/postcard-image.prompt)
 5. The flow returns the generated image, the story created, and the map image
 
 ### Web App

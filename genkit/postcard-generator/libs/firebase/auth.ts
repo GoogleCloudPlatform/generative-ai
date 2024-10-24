@@ -34,8 +34,7 @@ export async function signInWithGoogle() {
 
   try {
     await signInWithPopup(firebaseAuth, provider);
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error signing in with Google", error);
   }
 }
@@ -43,8 +42,7 @@ export async function signInWithGoogle() {
 export async function signOut() {
   try {
     return firebaseAuth.signOut();
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error signing out with Google", error);
   }
 }

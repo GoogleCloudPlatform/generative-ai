@@ -1,8 +1,8 @@
 # Postcard Generator
 
-|           |                                           |
-| --------- | ----------------------------------------- |
-| Author(s) | [Matt Day](https://github.com/mattsday)   |
+|           |                                         |
+| --------- | --------------------------------------- |
+| Author(s) | [Matt Day](https://github.com/mattsday) |
 
 **Looking to get started?** Check out [the docs](docs/README.md) for setup, demo, and more!
 
