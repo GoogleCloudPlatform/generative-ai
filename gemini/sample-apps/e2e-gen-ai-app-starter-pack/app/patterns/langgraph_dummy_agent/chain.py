@@ -47,9 +47,7 @@ def should_continue(state: MessagesState) -> str:
     return "tools" if last_message.tool_calls else END
 
 
-async def call_model(
-    state: MessagesState, config: RunnableConfig
-) -> Dict[str, BaseMessage]:
+def call_model(state: MessagesState, config: RunnableConfig) -> Dict[str, BaseMessage]:
     """Calls the language model and returns the response."""
     system_message = "You are a helpful AI assistant."
     messages_with_system = [{"type": "system", "content": system_message}] + state[
