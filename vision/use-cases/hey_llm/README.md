@@ -4,6 +4,46 @@
 
 ![Example](example.gif)
 
+## Function usage
+
+### HEY_LLM
+
+```bash
+=HEY_LLM(instruction, input, [context], [model])
+```
+
+`instruction` is a text that describes the task you want the Large Language Model (LLM) to perform, for example, "Name of the highest mountain in each country."
+
+`input` is the input text you want to be processed according to the instruction, e.g. "Japan", "Canada".
+
+_Optional:_ `context` is an optional cell range you can provide as context. For example, if the instruction is "Write copy to sell," you can provide a list of ad copies you find inspiring to specify the desired style.
+
+_Optional:_ `model` is a Gemini model version to use. The default value is `gemini-1.5-flash`. See [Google models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models) for available models.
+
+If you don't need to specify `context` but want to specify `model`, pass an empty string to the third argument. For example, to use Gemini 1.5 Pro, the function would look like this:
+
+```bash
+=HEY_LLM(instruction, input, "", "gemini-1.5-pro")
+```
+
+### IMAGEN
+
+```bash
+=IMAGEN(prompt, [seed], [model])
+```
+
+`prompt` is a text that describes the image you want to generate.
+
+_Optional:_ `seed` is a random seed number. Try change this number if you want to get different images.
+
+_Optional:_ `model` is a Imagen model version to use. The default value is `imagen-3.0-fast-generate-001`. See [Generate images using text prompts](https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images) for available models.
+
+Combine with `=IMAGE` to render the generated image in the spreadsheet.
+
+```bash
+=IMAGE(IMAGEN("Mount Fuji", 2, "imagen-3.0-generate-001"))
+```
+
 ## Prerequisites
 
 Before you begin, you'll need to set up a few things:

@@ -17,9 +17,20 @@
 
 import type {GenerateContentResponse} from '@google-cloud/vertexai';
 
+/**
+ * Vertex AI location. Change this const if you want to use another location.
+ */
 const LOCATION = 'asia-northeast1';
-const IMAGEN_MODEL = 'imagen-3.0-fast-generate-001';
-const GEMINI_MODEL = 'gemini-1.5-flash';
+
+/**
+ * Default Gemini model to use.
+ */
+const DEFAULT_GEMINI_MODEL = 'gemini-1.5-flash';
+
+/**
+ * Default Imagen model to use.
+ */
+const DEFAULT_IMAGEN_MODEL = 'imagen-3.0-fast-generate-001';
 
 const PROP_KEY = {
   OAUTH_CLIENT_ID: 'client_id',
@@ -135,30 +146,37 @@ function setClientSecret(val: string) {
  * Asks Gemini for a response based on a provided context and input.
  * @param {string} instruction An instruction that describes the task.
  * @param {string} input The input data to process based on the instruction.
- * @param {string[][]} context The context that LLM should be aware of.
+ * @param {string[][]} context Optional context that LLM should be aware of.
+ *   You can specify a cell range that includes examples, reference data, etc.
+ * @param {string} model The Gemini model version to use (default: gemini-1.5-flash).
+ *   See https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models for available models.
  * @return {string} The LLM's response, trimmed and ready for use in a spreadsheet cell.
  * @customFunction
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function HEY_LLM(instruction: string, input: string, context: string[][] = []) {
+function HEY_LLM(
+  instruction: string,
+  input: string,
+  context: string[][] = [],
+  model = DEFAULT_GEMINI_MODEL,
+) {
   const prompt = `
 ## Instruction
 ${instruction}
 
-## Context (CSV formatted)
-${context ? context.map(row => row.join(', ')).join('\n') : ''}
+${context ? '## Context (CSV formatted)\n' + context.map(row => row.join(', ')).join('\n') : ''}
 
 ## Task
 Input: ${input}
 Output:`;
 
   const cache = CacheService.getDocumentCache();
-  const cacheKey = `hey_llm:${generateHashValue(prompt)}`;
+  const cacheKey = `hey_llm:${generateHashValue(prompt)}:${model}`;
   const cached = cache?.get(cacheKey);
   if (cached) return cached;
 
   const oauthService = getGoogleService_();
-  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${GEMINI_MODEL}:generateContent`;
+  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${model}:generateContent`;
 
   const payload = JSON.stringify({
     contents: [
@@ -378,14 +396,16 @@ function createDriveFolder_(oauth: GoogleAppsScriptOAuth2.OAuth2Service) {
  * @param oauth OAuth2 Service
  * @param prompt A prompt for image generation
  * @param seed A seed number
+ * @param {string} model The Imagen model version to use
  * @returns Generated result
  */
 function requestImagen_(
   oauth: GoogleAppsScriptOAuth2.OAuth2Service,
   prompt: string,
   seed: number,
+  model: string,
 ) {
-  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${IMAGEN_MODEL}:predict`;
+  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${model}:predict`;
 
   const payload = JSON.stringify({
     instances: [
@@ -418,10 +438,7 @@ function requestImagen_(
   } = JSON.parse(res.getContentText());
   if (!result.predictions) {
     Logger.log(payload, result);
-    throw new Error(
-      'Request to Vertex AI failed. Is Vertex AI API enabled? ' +
-        res.getContentText(),
-    );
+    throw new Error('Request to Vertex AI failed. ' + res.getContentText());
   }
   return result.predictions[0];
 }
@@ -430,12 +447,14 @@ function requestImagen_(
  * Generates an image out of a prompt using Vertex AI's Imagen.
  * @param {string} prompt A prompt for image generation
  * @param {number} seed A seed number
+ * @param {string} model The Imagen model version to use (default: imagen-3.0-fast-generate-001).
+ *   See https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images for available models.
  * @return {string} Generated image's URL
  * @customFunction
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function IMAGEN(prompt: string, seed = 1) {
-  const cacheKey = generateHashValue(`imagen:${prompt}:${seed}`);
+function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL) {
+  const cacheKey = generateHashValue(`imagen:${prompt}:${seed}:${model}`);
   const cache = CacheService.getDocumentCache();
   const cached = cache?.get(cacheKey);
   if (cached) {
@@ -457,7 +476,7 @@ function IMAGEN(prompt: string, seed = 1) {
   if (driveUrl) {
     return driveUrl;
   }
-  const pred = requestImagen_(oauthService, prompt, seed);
+  const pred = requestImagen_(oauthService, prompt, seed, model);
   const thumbnailLink = uploadImageToDrive_(
     oauthService,
     pred.bytesBase64Encoded,
