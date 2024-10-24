@@ -73,7 +73,7 @@ In the Project Settings area of [the Firebase Console](https://console.firebase.
 
 ```js
 const firebaseConfig = {
-  apiKey: "AIzaSyCToBt9y5zOkY9AdU5PirrZvYM1E2WLEog",
+  apiKey: "xx",
   authDomain: "postcards-demo.firebaseapp.com",
   projectId: "postcards-demo",
   storageBucket: "postcards-demo.appspot.com",
@@ -86,7 +86,7 @@ Open [libs/firebase/config.ts](../libs/firebase/config.ts) and replace it with y
 
 ```ts
 export const firebaseConfig = {
-  apiKey: "AIzaSyCToBt9y5zOkY9AdU5PirrZvYM1E2WLEog",
+  apiKey: "xx",
   authDomain: "postcards-demo.firebaseapp.com",
   projectId: "postcards-demo",
   storageBucket: "postcards-demo.appspot.com",
