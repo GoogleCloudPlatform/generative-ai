@@ -1,14 +1,12 @@
-# Deploy to App Hosting
+# Deploy to Firebase App Hosting
 
-**Note:** By default this app has authentication disabled. This means anyone with the URL can use it. It is strongly recommended you enable authentication with a blocking function. See [the authentication section below](#authentication) for instructions on how to do this.
+**Note:** By default this app has authentication disabled. This means anyone with the URL can use it. If you intend to leave it running, you should [enable authentication](#authentication).
 
-## Deploy to Firebase App Hosting
-
-### Step 1: Push this repo to GitHub
+## Step 1: Push this repo to GitHub
 
 As of 2024-09-27 App Hosting only supports GitHub, so you will need to create a repository on GitHub and push this code there.
 
-### Step 2: Configure your backend
+## Step 2: Configure your backend
 
 You can do this from the CLI:
 
@@ -17,9 +15,9 @@ export PROJECT_ID="my-project-id"
 npx firebase-tools@latest apphosting:backends:create --project="${PROJECT_ID}"
 ```
 
-Run through the wizard - but don't run a deployment just yet as it will fail without appropriate IAM configuration. Remember your backend ID you created earlier
+Run through the wizard - but don't run a deployment just yet as it will fail without appropriate IAM configuration. Remember the backend ID you created earlier
 
-### Step 3: Grant Secret Access
+## Step 3: Grant Secret Access
 
 App Hosting allows granular secret access and has a nifty way to manage this. Use the CLI to grant it access to our Maps API secret:
 
@@ -29,7 +27,7 @@ npx firebase-tools@latest apphosting:secrets:grantaccess NEXT_PUBLIC_GOOGLE_MAPS
 npx firebase-tools@latest apphosting:secrets:grantaccess GOOGLE_MAPS_API_SERVER_KEY --project "${PROJECT_ID}" --backend "${BACKEND_ID}"
 ```
 
-### Step 4: Configure IAM
+## Step 4: Configure IAM
 
 The Firebase App Hosting service account requires the following additional roles to work with this app:
 
@@ -51,7 +49,7 @@ Now redeploy:
 terraform apply
 ```
 
-### Step 5: Rollout!
+## Step 5: Rollout!
 
 You can now create a new rollout in the console. Navigate to [console.firebase.google.com](https://console.firebase.google.com) and then create a new rollout in App Hosting.
 
@@ -61,19 +59,7 @@ This should deploy your app ready for production!
 
 ### Step 1: Deploy Blocking Functions (Optional / Recommended)
 
-[Blocking functions](https://cloud.google.com/identity-platform/docs/blocking-functions) allow your app to control who can login. In general, you only want Googlers to login to this app. Deploying a blocking function makes this easy and simple.
-
-There is a [pre-prepared function](https://gitlab.com/google-cloud-ce/googlers/mattsday/auth-blocking) you can deploy:
-
-```sh
-git clone git@gitlab.com:google-cloud-ce/googlers/mattsday/auth-blocking.git
-cd auth-blocking
-npx firebase-tools@latest deploy --only=functions --project="${PROJECT_ID}"
-```
-
-This will create two functions - `beforecreated` and `beforesignedin`.
-
-**Note**: Org policies might block some deployment choices here - for example, public services and default service account permissions. TODO: address these limitations.
+[Blocking functions](https://cloud.google.com/identity-platform/docs/blocking-functions) allow you to control who can login. In general, you only want people in your org to use this app. Deploying a blocking function makes this easy and simple.
 
 ### Step 2: Configure Firebase Auth
 

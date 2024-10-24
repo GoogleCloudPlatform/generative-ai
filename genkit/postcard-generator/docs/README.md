@@ -1,4 +1,4 @@
-# Postcards Demo Documentation
+# Postcard Generator Documentation
 
 This guide walks you through how to demonstrate this app and showcase the Google Cloud & Firebase features that power it.
 

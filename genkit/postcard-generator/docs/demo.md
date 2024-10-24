@@ -42,9 +42,9 @@ You can then navigate to [localhost:3000](http://localhost:3000) and send a demo
 
 ### Web App
 
-This is a [Next.js](https://nextjs.org) app that uses both server and client-side rendering. It is protected with [Firebase Auth](https://firebase.google.com/docs/auth) to ensure only Googlers can access it. If you are deploying it yourself, I recommend using [this blocking function](https://gitlab.com/google-cloud-ce/googlers/mattsday/auth-blocking) to secure it.
+This is a [Next.js](https://nextjs.org) app that uses both server and client-side rendering. It is protected with [Firebase Auth](https://firebase.google.com/docs/auth) to ensure only Googlers can access it. If you are deploying it yourself, I recommend using [a blocking function](https://firebase.google.com/docs/auth/extend-with-blocking-functions) to secure it.
 
-The web app can be deployed with Firebase hosting and instructions to do so are further down in this document.
+The web app can be deployed with [Firebase App Hosting](https://firebase.google.com/docs/app-hosting) and instructions to do so are further down in this document.
 
 Quickstart:
 
