@@ -135,7 +135,7 @@ export default function PostcardForm() {
             {loginError}
           </Alert>
         )}
-        <Alert severity="warning" variant="outlined">You must be logged in to view this page</Alert>
+        <Alert severity="warning" variant="outlined">Only logged-in users may view this page.</Alert>
         <Button color="inherit" onClick={handleSignIn}>
           Login with Google
         </Button>
