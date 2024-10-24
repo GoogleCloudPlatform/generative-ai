@@ -96,7 +96,7 @@ This starter pack covers all aspects of Generative AI app development, from prot
 ### Download the starter pack
 
 ```bash
-gsutil cp gs://e2e-gen-ai-app-starter-pack/app-starter-pack.zip . && unzip app-starter-pack.zip && cd app-starter-pack
+gcloud storage cp gs://e2e-gen-ai-app-starter-pack/app-starter-pack.zip . && unzip app-starter-pack.zip && cd app-starter-pack
 ```
 
 Use the downloaded folder as a starting point for your own Generative AI application.
