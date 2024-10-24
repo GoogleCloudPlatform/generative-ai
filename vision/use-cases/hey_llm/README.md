@@ -2,6 +2,48 @@
 
 `HEY_LLM` and `IMAGEN` are custom Google Sheets functions that bring the power of large language models (LLMs) and image generation right into your spreadsheets. `HEY_LLM` connects your spreadsheet to Gemini and makes useful inferences over values in your spreadsheet. `IMAGEN` lets you generate images from text prompts directly within your cells, which you can render with Sheet's `IMAGE` function.
 
+![Example](example.gif)
+
+## Function usage
+
+### HEY_LLM
+
+```bash
+=HEY_LLM(instruction, input, [context], [model])
+```
+
+`instruction` is a text that describes the task you want the Large Language Model (LLM) to perform, for example, "Name of the highest mountain in each country."
+
+`input` is the input text you want to be processed according to the instruction, e.g. "Japan", "Canada".
+
+_Optional:_ `context` is an optional cell range you can provide as context. For example, if the instruction is "Write copy to sell," you can provide a list of ad copies you find inspiring to specify the desired style.
+
+_Optional:_ `model` is a Gemini model version to use. The default value is `gemini-1.5-flash`. See [Google models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models) for available models.
+
+If you don't need to specify `context` but want to specify `model`, pass an empty string to the third argument. For example, to use Gemini 1.5 Pro, the function would look like this:
+
+```bash
+=HEY_LLM(instruction, input, "", "gemini-1.5-pro")
+```
+
+### IMAGEN
+
+```bash
+=IMAGEN(prompt, [seed], [model])
+```
+
+`prompt` is a text that describes the image you want to generate.
+
+_Optional:_ `seed` is a random seed number. Try change this number if you want to get different images.
+
+_Optional:_ `model` is a Imagen model version to use. The default value is `imagen-3.0-fast-generate-001`. See [Generate images using text prompts](https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images) for available models.
+
+Combine with `=IMAGE` to render the generated image in the spreadsheet.
+
+```bash
+=IMAGE(IMAGEN("Mount Fuji", 2, "imagen-3.0-generate-001"))
+```
+
 ## Prerequisites
 
 Before you begin, you'll need to set up a few things:
@@ -28,25 +70,27 @@ Before you begin, you'll need to set up a few things:
 
 ### Create the spreadsheet and deploy the script
 
-- Navigate to this directory and run the following command to create a spreadsheet with `HEY_LLM` and `IMAGEN` installed. Replace `YOUR_SHEET_NAME` with the name you want for your spreadsheet (e.g., "My Awesome LLM Sheet").
+Navigate to this directory and run the following command to create a spreadsheet with `HEY_LLM` and `IMAGEN` installed. Replace `"YOUR_SHEET_NAME"` with the name you want for your spreadsheet (e.g., "My Awesome LLM Sheet").
 
 ```bash
-clasp create --type=sheets --rootDir=./src --title="YOUR_SPRINT_NAME" && mv ./src/.clasp.json . && clasp push -f
+TITLE="YOUR_SHEET_NAME" npm run create
 ```
 
 ### Get the Spreadsheet ID and Script ID
 
-- After running the command, you'll see URLs for the created spreadsheet and the GAS script:
+After running the command, you'll see URLs for the created spreadsheet and the GAS script:
 
 ```bash
 Created new Google Sheet: https://drive.google.com/open?id=XXXXXX
 Created new Google Sheets Add-on script: https://script.google.com/d/YYYYYY/edit
 ```
 
-- `XXXXXX` is your **Spreadsheet ID**, and `YYYYYY` is your **Script ID**.
-- You can also find these IDs in the `.clasp.json` file:
-  - `scriptId` is the Script ID.
-  - `parentId` contains the Spreadsheet ID.
+`XXXXXX` is your **Spreadsheet ID**, and `YYYYYY` is your **Script ID**.
+
+You can also find these IDs in the `.clasp.json` file:
+
+- `scriptId` is the Script ID.
+- `parentId` contains the Spreadsheet ID.
 
 ### Set up OAuth2 Client ID and Secret
 
@@ -65,7 +109,17 @@ Created new Google Sheets Add-on script: https://script.google.com/d/YYYYYY/edit
 
 ### Start using the functions
 
-- You can now use the `HEY_LLM` and `IMAGEN` functions in your spreadsheet!
+You can now use the `HEY_LLM` and `IMAGEN` functions in your spreadsheet!
+
+## Updating the script
+
+To update the existing spreadsheet and associated script file with the latest source code, create a `.clasp.json` file in the same directory as this readme file with the following content and run `npm run push`.
+
+```json
+{"parentId": ["XXXXXX"], "scriptId": "YYYYYY", "rootDir": "./src"}
+```
+
+where `XXXXXX` is the **Spreadsheet ID**, and `YYYYYY` is its associated **Script ID**.
 
 ## Disclaimer
 

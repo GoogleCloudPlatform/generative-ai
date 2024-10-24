@@ -65,6 +65,7 @@
 /generative-ai/vision/gradio/gradio_image_generation_sdk.ipynb  @jbrache @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb   @guruvittal @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/genkit/generate-synthetic-database           @aikozhaoz @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/genkit/postcard-generator                    @mattsday @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/evaluation/evaluate_langchain_chains.ipynb           @eliasecchig @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb           @eliasecchig @lspatarog @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/tuning/gemini_supervised_finetuning_text_classification.ipynb           @gabrielahrlr @eliasecchig @GoogleCloudPlatform/generative-ai-devrel

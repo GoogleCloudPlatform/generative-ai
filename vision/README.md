@@ -16,6 +16,7 @@ This directory contains examples and guides for using Google Cloud's Vision AI p
 - [Advanced Prompting for Imagen2](use-cases/advanced_prompting_for_imagen2.ipynb): Deep dive into advanced prompting techniques to enhance your Imagen2 image generation results.
 - [Creating High Quality Visual Assets with Gemini and Imagen](use-cases/creating_high_quality_visual_assets_with_gemini_and_imagen.ipynb): Learn to create high-quality visual assets by combining the power of Gemini and Imagen.
 - [Brochure Creation Using Imagen](use-cases/brochure-creation-using-imagen/brochure_creation_using_imagen.ipynb): Step-by-step guide on how to use Imagen for generating creative brochure designs.
+- [HEY_LLM / IMAGEN](use-cases/hey_llm/README.md): Custom Google Sheets functions that bring the power of Gemini and Imagen right into your spreadsheets.
 
 ## Gradio
 
