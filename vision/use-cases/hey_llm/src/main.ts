@@ -148,7 +148,7 @@ function setClientSecret(val: string) {
  * @param {string} input The input data to process based on the instruction.
  * @param {string[][]} context Optional context that LLM should be aware of.
  *   You can specify a cell range that includes examples, reference data, etc.
- * @param {string} model The Gemini model ID to use (default: gemini-1.5-flash).
+ * @param {string} model The Gemini model version to use (default: gemini-1.5-flash).
  *   See https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models for available models.
  * @return {string} The LLM's response, trimmed and ready for use in a spreadsheet cell.
  * @customFunction
@@ -396,7 +396,7 @@ function createDriveFolder_(oauth: GoogleAppsScriptOAuth2.OAuth2Service) {
  * @param oauth OAuth2 Service
  * @param prompt A prompt for image generation
  * @param seed A seed number
- * @param {string} model The Imagen model ID to use
+ * @param {string} model The Imagen model version to use
  * @returns Generated result
  */
 function requestImagen_(
@@ -447,7 +447,7 @@ function requestImagen_(
  * Generates an image out of a prompt using Vertex AI's Imagen.
  * @param {string} prompt A prompt for image generation
  * @param {number} seed A seed number
- * @param {string} model The Imagen model ID to use (default: imagen-3.0-fast-generate-001).
+ * @param {string} model The Imagen model version to use (default: imagen-3.0-fast-generate-001).
  *   See https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images for available models.
  * @return {string} Generated image's URL
  * @customFunction
