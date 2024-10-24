@@ -63,7 +63,7 @@ export const genkitConfig = {
       }),
     }),
   ],
-  // Log debug output to tbe console.
+  // Log debug output to the console.
   logLevel: "debug",
   enableTracingAndMetrics: true,
   telemetry: {
