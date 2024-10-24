@@ -174,9 +174,9 @@ function polylineToPoints(polyline: string): Point[] {
 
 // Converts a series of points into a polyline
 function pointsToPolyline(points: Point[]): string {
-  const llt: LatLngTuple[] = [];
+  const tuple: LatLngTuple[] = [];
   points.forEach((p) => {
-    llt.push([p.x, p.y]);
+    tuple.push([p.x, p.y]);
   });
-  return encode(llt);
+  return encode(tuple);
 }
