@@ -7,7 +7,7 @@ const nextConfig = {
     config.resolve.alias["handlebars"] = "handlebars/dist/handlebars.js";
     return config;
   },
-  // Workaround jaegar dependency errors
+  // Workaround dependency errors
   // https://github.com/open-telemetry/opentelemetry-js/pull/4214
   experimental: {
     instrumentationHook: true,
