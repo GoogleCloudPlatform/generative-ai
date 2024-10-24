@@ -164,8 +164,7 @@ function HEY_LLM(
 ## Instruction
 ${instruction}
 
-## Context (CSV formatted)
-${context ? context.map(row => row.join(', ')).join('\n') : ''}
+${context ? '## Context (CSV formatted)\n' + context.map(row => row.join(', ')).join('\n') : ''}
 
 ## Task
 Input: ${input}
