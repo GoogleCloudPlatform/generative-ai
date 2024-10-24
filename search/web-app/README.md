@@ -1,5 +1,4 @@
-# Vertex AI Search Demo
-
+# Vertex AI Search Web App Demo
 
 > NOTE: Some of the features in this demo require allowlist access. If you would like early access, apply to become a [Trusted Tester for Google Cloud Generative AI][trustedtester].
 
