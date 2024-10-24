@@ -131,7 +131,7 @@ export default function PostcardForm() {
       <>
         {loginError && !loading && (
           <Alert severity="error">
-            <AlertTitle>An Error Occured</AlertTitle>
+            <AlertTitle>An Error Occurred</AlertTitle>
             {loginError}
           </Alert>
         )}

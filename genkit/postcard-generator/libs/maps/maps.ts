@@ -162,7 +162,7 @@ async function route(start: string, end: string, stops?: string[]): Promise<stri
   }
 }
 
-// Converts a polyline into a series of points that can be simplfied
+// Converts a polyline into a series of points that can be simplified
 function polylineToPoints(polyline: string): Point[] {
   const decodedPoints = decode(polyline, 5);
   const newPoints: Point[] = [];
