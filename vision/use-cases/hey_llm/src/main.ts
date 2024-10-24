@@ -17,7 +17,7 @@
 
 import type {GenerateContentResponse} from '@google-cloud/vertexai';
 
-const LOCATION = 'asia-northeast1';
+const DEFAULT_LOCATION = 'asia-northeast1';
 const IMAGEN_MODEL = 'imagen-3.0-fast-generate-001';
 const GEMINI_MODEL = 'gemini-1.5-flash';
 
@@ -25,6 +25,7 @@ const PROP_KEY = {
   OAUTH_CLIENT_ID: 'client_id',
   OAUTH_CLIENT_SECRET: 'client_secret',
   DRIVE_FOLDER_ID: 'folder_id',
+  VERTEXAI_LOCATION: 'vertexai_location',
 };
 
 /**
@@ -132,6 +133,29 @@ function setClientSecret(val: string) {
 }
 
 /**
+ * Gets Vertex AI location from Document Properties.
+ */
+function getLocation() {
+  return (
+    PropertiesService.getDocumentProperties().getProperty(
+      PROP_KEY.VERTEXAI_LOCATION,
+    ) || DEFAULT_LOCATION
+  );
+}
+
+/**
+ * Sets Vertex AI location to Document Properties.
+ * @param val Location ID.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function setLocation(val: string) {
+  PropertiesService.getDocumentProperties().setProperty(
+    PROP_KEY.VERTEXAI_LOCATION,
+    val,
+  );
+}
+
+/**
  * Asks Gemini for a response based on a provided context and input.
  * @param {string} instruction An instruction that describes the task.
  * @param {string} input The input data to process based on the instruction.
@@ -158,7 +182,8 @@ Output:`;
   if (cached) return cached;
 
   const oauthService = getGoogleService_();
-  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${GEMINI_MODEL}:generateContent`;
+  const location = getLocation();
+  const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${location}/publishers/google/models/${GEMINI_MODEL}:generateContent`;
 
   const payload = JSON.stringify({
     contents: [
@@ -385,7 +410,8 @@ function requestImagen_(
   prompt: string,
   seed: number,
 ) {
-  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${IMAGEN_MODEL}:predict`;
+  const location = getLocation();
+  const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${location}/publishers/google/models/${IMAGEN_MODEL}:predict`;
 
   const payload = JSON.stringify({
     instances: [
