@@ -75,7 +75,6 @@ def exporter(
         storage_client=mock_storage_client,
         bucket_name="test-bucket",
     )
-    exporter._ensure_bucket_exists = Mock()  # type: ignore[method-assign]
     return exporter
 
 
