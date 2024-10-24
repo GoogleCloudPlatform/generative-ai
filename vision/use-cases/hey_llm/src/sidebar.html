@@ -130,11 +130,18 @@
         >
       </div>
     </section>
-    <hr>
+    <hr />
     <section>
       <h2>Settings</h2>
       <h3>Location</h3>
-      <p>Some models may not be available in specific locations. See <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank">Generative AI on Vertex AI locations </a>for more details.</p>
+      <p>
+        Some models may not be available in specific locations. See
+        <a
+          href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations"
+          target="_blank"
+          >Generative AI on Vertex AI locations </a
+        >for more details.
+      </p>
       <select id="location" disabled>
         <option value="asia-east1">Taiwan (asia-east1)</option>
         <option value="asia-east2">Hong Kong, China (asia-east2)</option>
@@ -142,12 +149,20 @@
         <option value="asia-northeast3">Seoul, Korea (asia-northeast3)</option>
         <option value="asia-south1">Mumbai, India (asia-south1)</option>
         <option value="asia-southeast1">Singapore (asia-southeast1)</option>
-        <option value="australia-southeast1">Sydney, Australia (australia-southeast1)</option>
-        <option value="europe-central2">Warsaw, Poland (europe-central2)</option>
+        <option value="australia-southeast1">
+          Sydney, Australia (australia-southeast1)
+        </option>
+        <option value="europe-central2">
+          Warsaw, Poland (europe-central2)
+        </option>
         <option value="europe-north1">Finland (europe-north1)</option>
-        <option value="europe-southwest1">Madrid, Spain (europe-southwest1)</option>
+        <option value="europe-southwest1">
+          Madrid, Spain (europe-southwest1)
+        </option>
         <option value="europe-west1">Belgium (europe-west1)</option>
-        <option value="europe-west2">London, United Kingdom (europe-west2)</option>
+        <option value="europe-west2">
+          London, United Kingdom (europe-west2)
+        </option>
         <option value="europe-west3">Frankfurt, Germany (europe-west3)</option>
         <option value="europe-west4">Netherlands (europe-west4)</option>
         <option value="europe-west6">Zürich, Switzerland (europe-west6)</option>
@@ -156,10 +171,16 @@
         <option value="me-central1">Doha, Qatar (me-central1)</option>
         <option value="me-central2">Dammam, Saudi Arabia (me-central2)</option>
         <option value="me-west1">Tel Aviv, Israel (me-west1)</option>
-        <option value="northamerica-northeast1">Montréal (northamerica-northeast1)</option>
-        <option value="southamerica-east1">São Paulo, Brazil (southamerica-east1)</option>
+        <option value="northamerica-northeast1">
+          Montréal (northamerica-northeast1)
+        </option>
+        <option value="southamerica-east1">
+          São Paulo, Brazil (southamerica-east1)
+        </option>
         <option value="us-central1">Iowa (us-central1)</option>
-        <option value="us-east1">Moncks Corner, South Carolina (us-east1)</option>
+        <option value="us-east1">
+          Moncks Corner, South Carolina (us-east1)
+        </option>
         <option value="us-east4">Northern Virginia (us-east4)</option>
         <option value="us-east5">Columbus, Ohio (us-east5)</option>
         <option value="us-south1">Dallas, Texas (us-south1)</option>
@@ -217,10 +238,11 @@
 
       locationSelect.addEventListener('change', () => {
         locationSelect.setAttribute('disabled', '');
-        google.script.run.withSuccessHandler(value => {
-          locationSelect.removeAttribute('disabled');
-        })
-        .setLocation(locationSelect.value);
+        google.script.run
+          .withSuccessHandler(value => {
+            locationSelect.removeAttribute('disabled');
+          })
+          .setLocation(locationSelect.value);
       });
 
       google.script.run
@@ -232,10 +254,12 @@
         })
         .getScriptId();
 
-      google.script.run.withSuccessHandler(value => {
-        locationSelect.value = value;
-        locationSelect.removeAttribute('disabled');
-      }).getLocation();
+      google.script.run
+        .withSuccessHandler(value => {
+          locationSelect.value = value;
+          locationSelect.removeAttribute('disabled');
+        })
+        .getLocation();
     </script>
   </body>
 </html>
