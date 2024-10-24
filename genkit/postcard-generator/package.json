@@ -56,7 +56,7 @@
     "eslint": "^9.11.1",
     "eslint-config-next": "14.2.11",
     "eslint-define-config": "^2.1.0",
-    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.6.2",
