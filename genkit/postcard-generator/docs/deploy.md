@@ -109,6 +109,6 @@ Edit `apphosting.yaml` and change the `AUTH_ENABLED` section to look like this:
 
 ### Step 5: Push your changes and it should then create a new rollout with auth enabled.
 
-## Maps Public API Key Lockdown
+## Maps Public API Key Security
 
 You should further lock your public API key down so it can only be accessed from your demo. You can modify its configuration to restrict use specifically to your deployed domain.
