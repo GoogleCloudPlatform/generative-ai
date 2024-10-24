@@ -49,7 +49,7 @@
     "@stylistic/eslint-plugin": "^2.8.0",
     "@types/dotenv-safe": "^8.1.6",
     "@types/google.maps": "^3.58.0",
-    "@types/node": "^20",
+    "@types/node": "^22.0.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "esbuild": "^0.23.1",
