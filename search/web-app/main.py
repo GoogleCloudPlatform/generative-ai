@@ -20,13 +20,13 @@ import re
 from urllib.parse import urlparse
 
 from consts import (
-    CUSTOM_UI_DATASTORE_IDS,
+    CUSTOM_UI_ENGINE_IDS,
     LOCATION,
     PROJECT_ID,
     SUMMARY_MODELS,
     VALID_LANGUAGES,
     WIDGET_CONFIGS,
-    IMAGE_SEARCH_DATASTORE_IDs,
+    IMAGE_SEARCH_ENGINE_IDs,
     RECOMMENDATIONS_DATASTORE_IDs,
 )
 from ekg_utils import search_public_kg
@@ -49,7 +49,7 @@ FORM_OPTIONS = {
     "default_language": VALID_LANGUAGES[0],
 }
 
-CUSTOM_UI_SEARCH_ENGINES = [d["name"] for d in CUSTOM_UI_DATASTORE_IDS]
+CUSTOM_UI_SEARCH_ENGINES = [d["name"] for d in CUSTOM_UI_ENGINE_IDS]
 
 NAV_LINKS = [
     {"link": "/", "name": "Widgets", "icon": "widgets"},
@@ -155,7 +155,7 @@ def search_genappbuilder() -> str:
     results, summary, request_url, raw_request, raw_response = search_enterprise_search(
         project_id=PROJECT_ID,
         location=LOCATION,
-        engine_id=CUSTOM_UI_DATASTORE_IDS[int(search_engine)]["engine_id"],
+        engine_id=CUSTOM_UI_ENGINE_IDS[int(search_engine)]["engine_id"],
         search_query=search_query,
         summary_model=summary_model,
         summary_preamble=summary_preamble,
@@ -232,7 +232,7 @@ def imagesearch_genappbuilder() -> str:
         results, _, request_url, raw_request, raw_response = search_enterprise_search(
             project_id=PROJECT_ID,
             location=LOCATION,
-            engine_id=IMAGE_SEARCH_DATASTORE_IDs[0]["engine_id"],
+            engine_id=IMAGE_SEARCH_ENGINE_IDs[0]["engine_id"],
             search_query=search_query,
             image_bytes=image_bytes,
             params={"search_type": 1},
