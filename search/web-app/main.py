@@ -31,7 +31,7 @@ from consts import (
 )
 from ekg_utils import search_public_kg
 from flask import Flask, render_template, request
-from genappbuilder_utils import (
+from vais_utils import (
     list_documents,
     recommend_personalize,
     search_enterprise_search,
@@ -119,8 +119,8 @@ def search() -> str:
     )
 
 
-@app.route("/search_genappbuilder", methods=["POST"])
-def search_genappbuilder() -> str:
+@app.route("/search_vais", methods=["POST"])
+def search_vais() -> str:
     """
     Handle Search Vertex AI Search Request
     """
@@ -188,8 +188,8 @@ def image_search() -> str:
     )
 
 
-@app.route("/imagesearch_genappbuilder", methods=["POST"])
-def imagesearch_genappbuilder() -> str:
+@app.route("/imagesearch_vais", methods=["POST"])
+def imagesearch_vais() -> str:
     """
     Handle Image Search Vertex AI Search Request
     """
@@ -270,8 +270,8 @@ def recommend() -> str:
     )
 
 
-@app.route("/recommend_genappbuilder", methods=["POST"])
-def recommend_genappbuilder() -> str:
+@app.route("/recommend_vais", methods=["POST"])
+def recommend_vais() -> str:
     """
     Handle Recommend Vertex AI Search Request
     """
