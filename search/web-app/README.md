@@ -72,7 +72,7 @@ Additional features include how to search the public Cloud Knowledge Graph using
      - ![configId](img/configId.png)
      - Be sure to set authorization type as `Public Access` and add your web application url to the `Allowed Domains` once it's deployed.
      - Add the `configId` for your Search Engines to `WIDGET_CONFIGS` in `consts.py`
-   - To use the Custom UI, add the engine id for your search engine to `CUSTOM_UI_DATASTORE_IDS` in `consts.py`
+   - To use the Custom UI, add the engine id for your search engine to `CUSTOM_UI_ENGINE_IDS` in `consts.py`
      - This is the string after `/engines/` in the Cloud Console URL.
        - `https://console.cloud.google.com/gen-app-builder/engines/website-search-engine_1681248733152/...`
        - Engine ID is `website-search-engine_1681248733152`
