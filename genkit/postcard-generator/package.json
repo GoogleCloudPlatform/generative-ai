@@ -54,7 +54,7 @@
     "@types/react-dom": "^18",
     "esbuild": "^0.23.1",
     "eslint": "^9.11.1",
-    "eslint-config-next": "14.2.11",
+    "eslint-config-next": "15.0.1",
     "eslint-define-config": "^2.1.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "postcss": "^8",
