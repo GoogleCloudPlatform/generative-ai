@@ -74,5 +74,5 @@
 /generative-ai/open-models/serving/vertex_ai_text_generation_inference_gemma.ipynb  @alvarobartt @philschmid @pagezyhf @jeffboudier
 /generative-ai/gemini/use-cases/applying-llms-to-data/semantic-search-in-bigquery/stackoverflow_questions_semantic_search.ipynb     @sethijaideep @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/raw_with_bigquery.ipynb @jeffonelson @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/sample-apps/e2e-gen-ai-app-starter-pack       @eliasecchig @lspatarog @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/e2e-gen-ai-app-starter-pack       @eliasecchig @lspatarog @mariagpuyol @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases/hey_llm                     @tushuhei @GoogleCloudPlatform/generative-ai-devrel
