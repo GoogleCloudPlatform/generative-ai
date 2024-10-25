@@ -1,0 +1,24 @@
+extend-exclude = [".venv"]
+
+[format]
+docstring-code-format = true
+
+[lint]
+select = [
+    "A",
+    "ASYNC",
+    "B",
+    "E",
+    "F",
+    "I",
+    "PIE",
+    "RUF200",
+    "T20",
+    "UP",
+    "W",
+]
+
+ignore = ["E501", "ASYNC230"]
+
+[lint.isort]
+combine-as-imports = true

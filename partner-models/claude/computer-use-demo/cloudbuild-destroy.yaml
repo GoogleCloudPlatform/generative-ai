@@ -1,0 +1,48 @@
+steps:
+- id: 'delete-k8s-resources'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      if gcloud container clusters describe ${_CLUSTER_NAME} \
+        --project=${PROJECT_ID} \
+        --region=${_REGION} --format="none" 2>/dev/null; then
+        gcloud container clusters get-credentials ${_CLUSTER_NAME} \
+          --project=${PROJECT_ID} \
+          --region=${_REGION}
+        
+        # Delete namespace (this will delete all resources in it)
+        kubectl delete namespace ${_NAMESPACE} --ignore-not-found
+      fi
+
+- id: 'cleanup-iam'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  waitFor: ['delete-k8s-resources']
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      # Remove IAM bindings
+      gcloud projects remove-iam-policy-binding ${PROJECT_ID} \
+        --member="serviceAccount:${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+        --role="roles/aiplatform.admin" \
+        --quiet || true
+
+      # Delete service account
+      gcloud iam service-accounts delete ${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+        --project=${PROJECT_ID} \
+        --quiet || true
+
+timeout: '1800s'
+options:
+  logging: CLOUD_LOGGING_ONLY
+  dynamicSubstitutions: true
+substitutions:
+  _REGION: us-east5
+  _CLUSTER_NAME: computer-use-demo-cluster
+  _NAMESPACE: computer-use-demo
+  _KSA_NAME: computer-use-ksa
+  _IAM_SA_NAME: computer-use-sa
+  _ARTIFACT_REGISTRY_ID: computer-use-ar-repo
+tags: ['gke-cleanup', '${_CLUSTER_NAME}']
