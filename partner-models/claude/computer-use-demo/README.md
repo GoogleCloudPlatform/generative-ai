@@ -1,4 +1,5 @@
-# Anthropic Computer Use Demo
+# Anthropic Computer Use Demo on Google Cloud
+[![Deploy in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2FGoogleCloudPlatform%2Fgenerative-ai&cloudshell_git_branch=main&cloudshell_workspace=partner-models%2Fclaude%2Fcomputer-use-demo&cloudshell_tutorial=partner-models%2Fclaude%2Fcomputer-use-demo%2FREADME.md)
 
 > [!CAUTION]
 > Computer use is a beta feature. Please be aware that computer use poses unique risks that are distinct from standard API features or chat interfaces. These risks are heightened when using computer use to interact with the internet. To minimize risks, consider taking precautions such as:
@@ -27,78 +28,37 @@ Please use [this form](https://forms.gle/BT1hpBrqDPDUrCqo7) to provide feedback 
 > [!IMPORTANT]
 > The components are weakly separated: the agent loop runs in the container being controlled by Claude, can only be used by one session at a time, and must be restarted or reset between sessions if necessary.
 
-## Quickstart: running the Docker container
+## Quickstart: Deploying the app on Google Cloud using GKE and Cloud Build
 
-### Anthropic API
+We provide a simplied way to deploy this app on Google Cloud using Google Kubernetes Engine (GKE). To set this up, follow the steps below.
 
-> [!TIP]
-> You can find your API key in the [Anthropic Console](https://console.anthropic.com/).
+1. Set up the environment variables
 
-```bash
-export ANTHROPIC_API_KEY=%your_api_key%
-docker run \
-    -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
+    ```bash
+    export PROJECT_ID=%your_project_id%
+    ```
 
-Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
+2. Authenticate with Google Cloud
 
-### Bedrock
+    ```bash
+    gcloud auth application-default login
+    ```
 
-> [!TIP]
-> To use the new Claude 3.5 Sonnet on Bedrock, you first need to [request model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html).
+3. Create a Cloud Build job to deploy the app
 
-You'll need to pass in AWS credentials with appropriate permissions to use Claude on Bedrock.
+    ```bash
+    gcloud builds submit --config cloudbuild.yaml
+    ```
 
-You have a few options for authenticating with Bedrock. See the [boto3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html#environment-variables) for more details and options.
+4. [Optional] Delete all created resources
 
-#### Option 1: (suggested) Use the host's AWS credentials file and AWS profile
+    ```bash
+    gcloud builds submit --config cloudbuild-destroy.yaml
+    ```
 
-```bash
-export AWS_PROFILE=<your_aws_profile>
-docker run \
-    -e API_PROVIDER=bedrock \
-    -e AWS_PROFILE=$AWS_PROFILE \
-    -e AWS_REGION=us-west-2 \
-    -v $HOME/.aws:/home/computeruse/.aws \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
+## Local development
 
-Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
-
-#### Option 2: Use an access key and secret
-
-```bash
-export AWS_ACCESS_KEY_ID=%your_aws_access_key%
-export AWS_SECRET_ACCESS_KEY=%your_aws_secret_access_key%
-export AWS_SESSION_TOKEN=%your_aws_session_token%
-docker run \
-    -e API_PROVIDER=bedrock \
-    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-    -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-    -e AWS_REGION=us-west-2 \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
-
-Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
-
-### Vertex
+### Running the app locally
 
 You'll need to pass in Google Cloud credentials with appropriate permissions to use Claude on Vertex.
 
@@ -143,15 +103,17 @@ Environment variables `WIDTH` and `HEIGHT` can be used to set the screen size. F
 
 ```bash
 docker run \
-    -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
+    -e API_PROVIDER=vertex \
+    -e CLOUD_ML_REGION=$VERTEX_REGION \
+    -e ANTHROPIC_VERTEX_PROJECT_ID=$VERTEX_PROJECT_ID \
+    -v $HOME/.config/gcloud/application_default_credentials.json:/home/computeruse/.config/gcloud/application_default_credentials.json \
     -p 5900:5900 \
     -p 8501:8501 \
     -p 6080:6080 \
     -p 8080:8080 \
     -e WIDTH=1920 \
     -e HEIGHT=1080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
+    -it computer-use-demo
 ```
 
 We do not recommend sending screenshots in resolutions above [XGA/WXGA](https://en.wikipedia.org/wiki/Display_resolution_standards#XGA) to avoid issues related to [image resizing](https://docs.anthropic.com/en/docs/build-with-claude/vision#evaluate-image-size).
