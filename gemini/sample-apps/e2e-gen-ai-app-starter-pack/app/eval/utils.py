@@ -13,13 +13,10 @@
 # limitations under the License.
 
 import glob
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, List
 
-import nest_asyncio
 import pandas as pd
 import yaml
-
-nest_asyncio.apply()
 
 
 def load_chats(path: str) -> List[Dict[str, Any]]:
@@ -41,41 +38,46 @@ def load_chats(path: str) -> List[Dict[str, Any]]:
     return chats
 
 
-def pairwise(iterable: List[Any]) -> Iterator[tuple[Any, Any]]:
-    """Creates an iterable with tuples paired together
-    e.g s -> (s0, s1), (s2, s3), (s4, s5), ...
-    """
-    a = iter(iterable)
-    return zip(a, a)
-
-
 def _process_conversation(row: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
-    """Processes a single conversation row to extract messages and build conversation history."""
+    """Processes a single conversation row to extract messages and build conversation history.
+    Most human-ai interactions are composed of a human message followed by an ai message.
+    But when there's a tool call, the interactions are as follows:
+    - human message
+    - ai message with empty content and tool_calls set
+    - tool message with tool call arguments
+    - ai message with non-empty content and tool_calls empty.
+    In any case the human message is the first in the set and the final answer is the last in the set.
+    """
     conversation_history: List[Dict] = []
     messages: List[Dict[str, Any]] = []
-    # Most human-ai interactions are composed of a human message followed by an ai message.
-    # But when there's a tool call, the interactions are as follows:
-    # - human message
-    # - ai message with empty content and tool_calls set
-    # - tool message with tool call arguments
-    # - ai message with non-empty content and tool_calls empty.
-    # In any case the human message is the first in the set and the final answer is the last in the set.
     messages_since_last_human_message: List[Dict[str, Any]] = []
+
     for message in row["messages"]:
         if message["type"] == "human":
+            # Reset for new human message
             messages_since_last_human_message = []
+
+        # Add current message to temporary storage
         messages_since_last_human_message.append(message)
+
+        # Check if this is a final AI response (not a tool call)
         if message["type"] == "ai" and (
             "tool_calls" not in message or len(message["tool_calls"]) == 0
         ):
-            # This ai message is the final answer to the human message
+            # Process the completed exchange
             messages.append(
                 {
-                    "human_message": messages_since_last_human_message[0],
-                    "ai_message": messages_since_last_human_message[-1],
-                    "conversation_history": conversation_history.copy(),
+                    "human_message": messages_since_last_human_message[
+                        0
+                    ],  # First message is human
+                    "ai_message": messages_since_last_human_message[
+                        -1
+                    ],  # Last message is AI's final response
+                    "conversation_history": conversation_history.copy(),  # Include previous conversation
                 }
             )
+
+            # Update overall conversation history
             conversation_history.extend(messages_since_last_human_message)
     return messages
 
@@ -100,7 +102,7 @@ def generate_multiturn_history(df: pd.DataFrame) -> pd.DataFrame:
                           - human_message: The human message in that turn.
                           - ai_message: The AI message in that turn.
                           - conversation_history: A list of all messages in the conversation
-                                                  up to and including the current turn.
+                                                  up to the current turn (excluded).
     """
     processed_messages = df.apply(_process_conversation, axis=1).explode().tolist()
     return pd.DataFrame(processed_messages)
