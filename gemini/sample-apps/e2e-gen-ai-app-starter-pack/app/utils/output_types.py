@@ -131,8 +131,8 @@ class CustomChain:
     def batch(
         self,
         inputs: List[Input],
-        max_workers: Union[int, None] = None,
         *args: Any,
+        max_workers: Union[int, None] = None,
         **kwargs: Any
     ) -> List[AIMessage]:
         """
@@ -141,7 +141,9 @@ class CustomChain:
         """
         predicted_messages = []
         with ThreadPoolExecutor(max_workers) as pool:
-            for response in tqdm(pool.map(self.invoke, inputs), total=len(inputs)):
+            for response in tqdm(
+                pool.map(self.invoke, inputs, *args, **kwargs), total=len(inputs)
+            ):
                 predicted_messages.append(response)
         return predicted_messages
 

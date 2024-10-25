@@ -308,7 +308,7 @@
         id: 8e6fcd4e-0379-4999-8196-93b635ab726d
         relevance_score: 0.5899999737739563
       page_content: "22\nThe data validation step can detect when data anomalies start\
-        \ occuring. \nThese anomalies can include new features, new feature domains,\
+        \ occurring. \nThese anomalies can include new features, new feature domains,\
         \ fea -\ntures that have disappeared, and drastic changes in feature distributions.\
         \ \nThe data validation step works by comparing the new training data to the\
         \ \nexpected data schema and reference statistics. For details about how data\
@@ -374,14 +374,14 @@
       the pipeline run are tracked in the metadata and artifact repository.\nAn orchestrated\
       \ and automated training pipeline mirrors the steps of the typical data science\
       \ process that runs in\n</Document 3>\n\n<Document 4>\n22\nThe data validation\
-      \ step can detect when data anomalies start occuring. \nThese anomalies can\
+      \ step can detect when data anomalies start occurring. \nThese anomalies can\
       \ include new features, new feature domains, fea -\ntures that have disappeared,\
       \ and drastic changes in feature distributions. \nThe data validation step works\
       \ by comparing the new training data to the \nexpected data schema and reference\
       \ statistics. For details about how data \nvalidation works, see Analyzing and\
       \ validating data at scale for machine \nlearning with TensorFlow Data Validation\
-      \ .\nThe model validation phase detects anomalies when a lack of improve -\n\
-      ment or even a degradation in performance of new model candidates is \nobserved.\
+      \ .\nThe model validation phase detects anomalies when a lack of improvement\
+      \ or even a degradation in performance of new model candidates is \nobserved.\
       \ The pipeline can apply complex validation logic in this step, \nincluding\
       \ several evaluation metrics, sensitivity analysis based on specific \ninputs,\
       \ calibration, and fairness indicators.\nAn important aspect of continuous training,\

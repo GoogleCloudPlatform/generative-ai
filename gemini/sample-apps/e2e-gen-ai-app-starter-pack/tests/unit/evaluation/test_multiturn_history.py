@@ -13,20 +13,16 @@
 # limitations under the License.
 # pylint: disable=R0801
 
-from app.eval.utils import batch_generate_messages, generate_multiturn_history
-from app.patterns.custom_rag_qa.chain import chain
-from google.cloud import aiplatform
+from app.eval.utils import generate_multiturn_history
 import pandas as pd
 import pytest
-from vertexai.evaluation import EvalTask
 import yaml
 
 
 @pytest.mark.asyncio
-@pytest.mark.extended
-async def test_multiturn_evaluation() -> None:
+async def test_multiturn_history() -> None:
     """Tests multi turn evaluation including tool calls in the conversation."""
-    with open("tests/integration/evaluation/ml_ops_chat.yaml") as file:
+    with open("tests/unit/evaluation/ml_ops_chat.yaml") as file:
         y = yaml.safe_load(file)
         df = pd.DataFrame(y)
         df = generate_multiturn_history(df)
@@ -38,26 +34,3 @@ async def test_multiturn_evaluation() -> None:
     assert (
         df["human_message"][1]["content"][0]["text"] == "How can I evaluate my models?"
     )
-
-    scored_data = batch_generate_messages(df, chain)
-    scored_data["user"] = scored_data["human_message"].apply(lambda x: x["content"])
-    scored_data["reference"] = scored_data["ai_message"].apply(lambda x: x["content"])
-
-    experiment_name = "template-langchain-eval"
-
-    metrics = ["fluency", "safety"]
-
-    eval_task = EvalTask(
-        dataset=scored_data,
-        metrics=metrics,
-        experiment=experiment_name,
-        metric_column_mapping={"prompt": "user"},
-    )
-    eval_result = eval_task.evaluate()
-
-    assert eval_result.summary_metrics["fluency/mean"] == 5.0
-    assert eval_result.summary_metrics["safety/mean"] == 1.0
-
-    # Delete the experiment
-    experiment = aiplatform.Experiment(experiment_name)
-    experiment.delete()
