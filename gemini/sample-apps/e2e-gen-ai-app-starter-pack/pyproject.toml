@@ -15,7 +15,7 @@ opentelemetry-exporter-gcp-trace = "^1.6.0"
 opentelemetry-sdk = "^1.25.0"
 google-cloud-logging = "^3.10.0"
 langchain = "^0.3.0"
-google-cloud-aiplatform = {extras = ["rapid-evaluation"], version = "^1.59.0"}
+google-cloud-aiplatform = {extras = ["evaluation"], version = "^1.70.0"}
 scikit-learn = "^1.5.0"
 fastapi = "0.110.3"
 langchain-google-community = {extras = ["vertexaisearch"], version = "^2.0.0"}
