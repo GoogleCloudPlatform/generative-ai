@@ -19,7 +19,6 @@ from app.eval.utils import generate_multiturn_history, load_chats
 import pandas as pd
 import pytest
 
-
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 

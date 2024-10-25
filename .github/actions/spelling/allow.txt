@@ -5,7 +5,6 @@ AIP
 AMNOSH
 ANZ
 APIENTRY
-appspot
 APSTUDIO
 AUVs
 Adidas
@@ -66,7 +65,6 @@ Dexin
 Disturbia
 Doaa
 Doogler
-dotprompt
 Dreesen
 Durafast
 Durmus
@@ -109,7 +107,6 @@ Gameplay
 Gandalf
 Gatace
 GenTwo
-genkit
 Gfm
 Gisting
 Glickman
@@ -206,6 +203,7 @@ Mosher
 Mvar
 NARI
 NCCREATE
+NDCG
 NDEBUG
 NGRAM
 NGRAMS
@@ -218,7 +216,6 @@ NVIDIA
 Nagasu
 Niitsuma
 Nintendo
-noabe
 Nominatim
 Noogler
 ODb
@@ -251,6 +248,7 @@ Qwiklab
 Qwiklabs
 RAGAS
 RLHF
+RMSE
 RNNs
 ROOTSPAN
 RRF
@@ -350,6 +348,7 @@ Wehn
 Welwyn
 Wnd
 Womens
+XSum
 XXE
 Xiang
 Youxi
@@ -378,6 +377,7 @@ alloydb
 antiword
 apikey
 apikeys
+appspot
 apredict
 aquery
 arXiv
@@ -457,6 +457,7 @@ dino
 diy
 docai
 docstore
+dotprompt
 dpi
 draig
 drinkware
@@ -474,6 +475,7 @@ embs
 embvs
 emojis
 ename
+engi
 epath
 epoc
 erty
@@ -484,6 +486,7 @@ evals
 faiss
 fastapi
 fda
+fea
 fect
 fewshot
 ffi
@@ -516,6 +519,7 @@ gcsfs
 gdk
 gdkx
 genai
+genkit
 geocoded
 getdata
 getexif
@@ -556,6 +560,7 @@ icudtl
 idk
 idks
 idxs
+ience
 iloc
 imagefont
 imageno
@@ -572,6 +577,7 @@ itable
 itables
 iterrows
 ivf
+ized
 jegadesh
 jetbrains
 jiwer
@@ -626,12 +632,14 @@ nbfmt
 nbformat
 ncols
 ndarray
+neering
 newaxis
 newaxisngram
 ngrams
 nlp
 nmade
 nmilitary
+noabe
 nobserved
 norigin
 notetaker
@@ -678,6 +686,7 @@ podfile
 podhelper
 powerups
 preds
+produc
 projectid
 protobuf
 pstotext
@@ -712,6 +721,7 @@ reranked
 reranker
 reranking
 reranks
+resil
 ribeye
 ringspun
 roboto
@@ -763,6 +773,7 @@ thelook
 throug
 tiktoken
 timechart
+tion
 titlebar
 tobytes
 toself
@@ -772,6 +783,7 @@ traceloop
 tritan
 tseslint
 tsv
+tures
 ubuntu
 undst
 unigram
@@ -821,4 +833,3 @@ youtube
 ytd
 yticks
 zaxis
-XSum
