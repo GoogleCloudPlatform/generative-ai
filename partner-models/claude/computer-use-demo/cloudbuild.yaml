@@ -76,7 +76,7 @@ steps:
             --display-name="${_IAM_SA_DISPLAY_NAME}"
         fi
 
-        # Add IAM roles (idempotent)
+        # Add IAM roles
         gcloud projects add-iam-policy-binding ${PROJECT_ID} \
           --member="serviceAccount:${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
           --role="roles/aiplatform.admin" \
@@ -101,21 +101,25 @@ steps:
     args:
       - '-c'
       - |
+        # Install gettext package which contains envsubst
+        apt-get update && apt-get install -y gettext-base
+
         gcloud container clusters get-credentials ${_CLUSTER_NAME} \
           --project=${PROJECT_ID} \
           --region=${_REGION}
         
-        # Replace variables in deployment.yaml and apply
-        cat deployment.yaml | \
-        sed "s|\${_REGION}|${_REGION}|g; \
-            s|\${PROJECT_ID}|${PROJECT_ID}|g; \
-            s|\${_ARTIFACT_REGISTRY_ID}|${_ARTIFACT_REGISTRY_ID}|g; \
-            s|\${_IMAGE_NAME}|${_IMAGE_NAME}|g; \
-            s|\${_IMAGE_TAG}|${_IMAGE_TAG}|g; \
-            s|\${_NAMESPACE}|${_NAMESPACE}|g; \
-            s|\${_KSA_NAME}|${_KSA_NAME}|g; \
-            s|\${_IAM_SA_NAME}|${_IAM_SA_NAME}|g" | \
-        kubectl apply -f -
+        # Export all variables that will be used in envsubst
+        export _REGION=${_REGION}
+        export PROJECT_ID=${PROJECT_ID}
+        export _ARTIFACT_REGISTRY_ID=${_ARTIFACT_REGISTRY_ID}
+        export _IMAGE_NAME=${_IMAGE_NAME}
+        export _IMAGE_TAG=${_IMAGE_TAG}
+        export _NAMESPACE=${_NAMESPACE}
+        export _KSA_NAME=${_KSA_NAME}
+        export _IAM_SA_NAME=${_IAM_SA_NAME}
+        
+        envsubst < deployment.yaml | kubectl apply -f -
+
 
   - id: 'get-service-ip'
     name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -126,11 +130,13 @@ steps:
       - |
         echo "Waiting for LoadBalancer IP assignment..."
         
-        # Function to get External IP
+        # Debug current state
+        echo "Checking service in namespace ${_NAMESPACE}..."
+        kubectl get services -n ${_NAMESPACE}
+        
         get_external_ip() {
-          kubectl get service -n ${_NAMESPACE} \
-            --selector=app=${_IMAGE_NAME} \
-            -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}'
+          kubectl get service ${_IMAGE_NAME} -n ${_NAMESPACE} \
+            -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
         }
         
         # Wait for IP with timeout
@@ -140,6 +146,8 @@ steps:
         
         until [ -n "$$(get_external_ip)" ] || [ $$ELAPSED -ge $$TIMEOUT ]; do
           echo "Waiting for external IP... ($$ELAPSED seconds elapsed)"
+          # Debug service state
+          kubectl get service ${_IMAGE_NAME} -n ${_NAMESPACE}
           sleep $$INTERVAL
           ELAPSED=$$((ELAPSED + INTERVAL))
         done
@@ -159,11 +167,15 @@ steps:
           echo "###################################################"
         else
           echo "❌ Timeout waiting for external IP"
-          echo "Please check the service status manually:"
-          echo "kubectl get service -n ${_NAMESPACE} --selector=app=${_IMAGE_NAME}"
+          echo "Debug information:"
+          echo "Current services in namespace:"
+          kubectl get services -n ${_NAMESPACE}
+          echo "Service details:"
+          kubectl describe service ${_IMAGE_NAME} -n ${_NAMESPACE}
+          echo "Pod status:"
+          kubectl get pods -n ${_NAMESPACE}
           exit 1
         fi
-
 
 timeout: '3600s'
 options:
