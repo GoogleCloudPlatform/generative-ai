@@ -34,6 +34,34 @@ steps:
         --project=${PROJECT_ID} \
         --quiet || true
 
+- id: 'delete-cluster'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  waitFor: ['cleanup-iam']
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      # Delete GKE cluster
+      echo "Deleting GKE cluster..."
+      gcloud container clusters delete ${_CLUSTER_NAME} \
+        --project=${PROJECT_ID} \
+        --region=${_REGION} \
+        --quiet || true
+
+- id: 'delete-registry'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  waitFor: ['delete-cluster']
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      # Delete Artifact Registry repository
+      echo "Deleting Artifact Registry repository..."
+      gcloud artifacts repositories delete ${_ARTIFACT_REGISTRY_ID} \
+        --project=${PROJECT_ID} \
+        --location=${_REGION} \
+        --quiet || true
+
 timeout: '1800s'
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -42,7 +70,6 @@ substitutions:
   _REGION: us-east5
   _CLUSTER_NAME: computer-use-demo-cluster
   _NAMESPACE: computer-use-demo
-  _KSA_NAME: computer-use-ksa
   _IAM_SA_NAME: computer-use-sa
-  _ARTIFACT_REGISTRY_ID: computer-use-ar-repo
+  _ARTIFACT_REGISTRY_ID: computer-use-ar-repo  # Added this
 tags: ['gke-cleanup', '${_CLUSTER_NAME}']
