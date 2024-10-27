@@ -19,7 +19,7 @@
     "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.7.3",
-    "uuid": "^9.0.1"
+    "uuid": "^11.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
