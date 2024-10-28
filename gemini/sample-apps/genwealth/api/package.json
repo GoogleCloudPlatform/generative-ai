@@ -10,6 +10,7 @@
     "clean": "(rm -rf ./dist && rm -rf ./node_modules)"
   },
   "dependencies": {
+    "@angular/cli": "^18.2.4",
     "@google-cloud/discoveryengine": "^1.4.1",
     "@google-cloud/storage": "^7.9.0",
     "@google-cloud/vertexai": "^1.0.0",
@@ -22,7 +23,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
+    "@types/express": "^5.0.0",
     "@types/lodash": "^4.17.0",
     "@types/multer": "^1.4.11",
     "@types/pg": "^8.11.2",

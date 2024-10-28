@@ -19,41 +19,55 @@ LOCATION = "global"
 
 WIDGET_CONFIGS = [
     {
-        "name": "Contracts (Unstructured)",
+        "name": "Google Cloud Website",
+        "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "placeholder": "Vertex AI",
+    },
+    {
+        "name": "Contracts",
         "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         "placeholder": "What is the SLA?",
     },
     {
-        "name": "Alphabet Earnings Reports (Unstructured)",
+        "name": "Alphabet Earnings Reports",
         "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         "placeholder": "What was Google's revenue in 2021?",
     },
+    {
+        "name": "Kaggle Movies",
+        "config_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "placeholder": "Harry Potter",
+    },
 ]
 
-CUSTOM_UI_DATASTORE_IDS = [
+CUSTOM_UI_ENGINE_IDS = [
     {
         "name": "Google Cloud Website",
-        "engine_id": "google-cloud-site-search_xxxxxxxx",
+        "engine_id": "google-cloud-site-search",
     },
     {
         "name": "Google Merchandise Store (Advanced Indexing)",
-        "engine_id": "google-merch-store_xxxxxxxx",
+        "engine_id": "google-merch-store",
+    },
+    {
+        "name": "Cymbal Bank",
+        "engine_id": "cymbal-bank-onboarding",
     },
 ]
 
 
-IMAGE_SEARCH_DATASTORE_IDs = [
+IMAGE_SEARCH_ENGINE_IDs = [
     {
         "name": "Google Merchandise Store",
-        "engine_id": "google-merch-store_xxxxxxx",
+        "engine_id": "google-merch-store",
     }
 ]
 
 RECOMMENDATIONS_DATASTORE_IDs = [
     {
         "name": "arXiv Natural Language Papers",
-        "datastore_id": "arxiv_xxxxxxxxxx",
-        "engine_id": "arxiv-personalize_xxxxxxxx",
+        "datastore_id": "arxiv",
+        "engine_id": "arxiv-personalize",
     }
 ]
 

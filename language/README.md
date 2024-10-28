@@ -1,6 +1,6 @@
 # Generative AI - Language
 
-Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Language repository.
+> **NOTE:** This directory uses the PaLM generative model, which will reach its [discontinuation date in October 2024](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text#model_versions). Please refer to [this directory](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/) for samples which use the latest Gemini model.
 
 ## Table of Contents
 
@@ -36,9 +36,9 @@ language/
 │   └── <a href="sample-apps/summarization-gcs-cloudfunction/">Cloud Function that does summarization using Vertex AI PaLM Text Model</a>
 │   └── <a href="sample-apps/text-predict-cloudfunction/">Cloud Function that wraps the Vertex AI PaLM Text Model</a>
 ├── <a href="translation">translation/</a>
-│   └── <a href="intro_translation.ipynb">[Notebook] Intro to Translation</a>
+│   └── <a href="translation/intro_translation.ipynb">[Notebook] Intro to Translation</a>
 ├── <a href="tuning">tuning/</a>
-│   └── <a href="tuning_text_bison.ipynb">[Notebook] Tuning and deploy a foundation model</a>
+│   └── <a href="tuning/tuning_text_bison.ipynb">[Notebook] Tuning and deploy a foundation model</a>
 └── <a href="use-cases">use-cases/</a>
     ├── <a href="use-cases/chatbots">chatbots/</a>
     │   └── <a href="use-cases/chatbots/grocerybot_assistant.ipynb">[Notebook] GroceryBot, a sample grocery and recipe assistant - RAG + ReAct</a>
@@ -49,7 +49,7 @@ language/
     │   ├── <a href="use-cases/description-generation/product_description_generator_attributes_to_text.ipynb">[Notebook] DescriptionGen: SEO-optimized product description generation for retail using LangChain 🦜🔗</a>
     │   └── <a href="use-cases/description-generation/product_description_generator_image.ipynb">[Notebook] Product Description Generator From Image</a>
     ├── <a href="use-cases/document-qa">document-qa/</a>
-    │   ├── <a href="use-cases/document-qa/question_answering_documentai_matching_engine_palm.ipynb">[Notebook] Question answering with Documents using Document AI, Matching Engine, and PaLM</a>
+    │   ├── <a href="use-cases/document-qa/question_answering_documentai_vector_store_palm.ipynb">[Notebook] Question answering with Documents using Document AI, Matching Engine, and PaLM</a>
     │   ├── <a href="use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb">[Notebook] Question Answering with Documents using LangChain 🦜️🔗 and Vertex AI Matching Engine</a>
     │   ├── <a href="use-cases/document-qa/question_answering_documents.ipynb">[Notebook] Question Answering with Large Documents</a>
     │   └── <a href="use-cases/document-qa/question_answering_documents_langchain.ipynb">[Notebook] Question Answering with Large Documents using LangChain 🦜🔗</a>
