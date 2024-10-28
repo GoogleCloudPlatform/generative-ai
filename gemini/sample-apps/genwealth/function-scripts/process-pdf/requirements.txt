@@ -1,6 +1,6 @@
 functions-framework==3.*
 google-api-core==2.19.2
-google-cloud-documentai==2.32.0
+google-cloud-documentai==3.0.0
 google-cloud-core==2.4.1
 google-cloud-pubsub==2.23.0
 google-cloud-storage==2.18.2
