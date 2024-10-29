@@ -116,6 +116,7 @@ Googlers
 Hadoop
 HDFC
 HDFS
+hdfs
 HIDPI
 HMO
 HREDRAW
@@ -138,6 +139,7 @@ Hyperdisk
 ICICI
 ICML
 INFOPLIST
+IOMGR
 IVF
 Isner
 JPY
@@ -411,6 +413,7 @@ bigframes
 bigquery
 bitcoin
 blogs
+bml
 boundings
 bpa
 bpd
@@ -445,6 +448,7 @@ colvis
 colwidth
 constexpr
 corpuses
+countplot
 csa
 cse
 ctd
@@ -614,6 +618,7 @@ linted
 linting
 llm
 llms
+logparser
 logprobs
 lparam
 lxml
