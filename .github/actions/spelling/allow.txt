@@ -183,6 +183,7 @@ Lego
 Leung
 Llion
 Loghub
+loghub
 Logrus
 Lottry
 MLB
@@ -321,6 +322,8 @@ Traceloop
 Trapp
 Tribbiani
 Tricyle
+TSNE
+tsne
 UDFs
 USERDATA
 Unimicron
@@ -839,3 +842,4 @@ youtube
 ytd
 yticks
 zaxis
+Zhu
