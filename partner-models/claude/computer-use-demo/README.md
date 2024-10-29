@@ -4,6 +4,7 @@
 
 > [!CAUTION]
 > Computer use is a beta feature. Please be aware that computer use poses unique risks that are distinct from standard API features or chat interfaces. These risks are heightened when using computer use to interact with the internet. To minimize risks, consider taking precautions such as:
+>
 > 1. Use a dedicated virtual machine or container with minimal privileges to prevent direct system attacks or accidents.
 > 2. Avoid giving the model access to sensitive data, such as account login information, to prevent information theft.
 > 3. Limit internet access to an allowlist of domains to reduce exposure to malicious content.
@@ -22,8 +23,6 @@ Please use [this form](https://forms.gle/BT1hpBrqDPDUrCqo7) to provide feedback 
 
 > [!IMPORTANT]
 > The Beta API used in this reference implementation is subject to change. Please refer to the [API release notes](https://docs.anthropic.com/en/release-notes/api) for the most up-to-date information.
-
-> [!IMPORTANT]
 > The components are weakly separated: the agent loop runs in the container being controlled by Claude, can only be used by one session at a time, and must be restarted or reset between sessions if necessary.
 
 ## Quickstart: Deploying the app on Google Cloud using GKE and Cloud Build

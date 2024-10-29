@@ -63,6 +63,14 @@ spec:
               value: "6080"
             - name: WEBSOCKIFY_OPTIONS
               value: "--web /opt/noVNC --cert=/opt/noVNC/self.pem"
+            - name: EXTERNAL_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: SERVICE_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           ports:
             - containerPort: 5900
               name: vnc
@@ -75,17 +83,17 @@ spec:
           readinessProbe:
             tcpSocket:
               port: streamlit
-            initialDelaySeconds: 90
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 6
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 8
           livenessProbe:
             tcpSocket:
               port: web
-            initialDelaySeconds: 120
-            periodSeconds: 20
-            timeoutSeconds: 5
-            failureThreshold: 6
+            initialDelaySeconds: 150
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 8
 ---
 apiVersion: v1
 kind: Service
@@ -109,3 +117,37 @@ spec:
       name: web
   selector:
     app: ${_IMAGE_NAME}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${_IMAGE_NAME}-ingress
+  namespace: ${_NAMESPACE}
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${_IMAGE_NAME}
+                port:
+                  number: 8080
+          - path: /streamlit
+            pathType: Prefix
+            backend:
+              service:
+                name: ${_IMAGE_NAME}
+                port:
+                  number: 8501
+          - path: /novnc
+            pathType: Prefix
+            backend:
+              service:
+                name: ${_IMAGE_NAME}
+                port:
+                  number: 6080
