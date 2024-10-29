@@ -1,4 +1,6 @@
+
 # Anthropic Computer Use Demo on Google Cloud
+
 [![Deploy in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2FGoogleCloudPlatform%2Fgenerative-ai&cloudshell_git_branch=main&cloudshell_workspace=partner-models%2Fclaude%2Fcomputer-use-demo&cloudshell_tutorial=partner-models%2Fclaude%2Fcomputer-use-demo%2FREADME.md)
 
 > [!CAUTION]
@@ -15,10 +17,10 @@
 
 This repository helps you get started with computer use on Claude, with reference implementations of:
 
-* Build files to create a Docker container with all necessary dependencies
-* A computer use agent loop using the Vertex AI and GKE to access the updated Claude 3.5 Sonnet model
-* Anthropic-defined computer use tools
-* A streamlit app for interacting with the agent loop
+- Build files to create a Docker container with all necessary dependencies
+- A computer use agent loop using the Vertex AI and GKE to access the updated Claude 3.5 Sonnet model
+- Anthropic-defined computer use tools
+- A streamlit app for interacting with the agent loop
 
 Please use [this form](https://forms.gle/BT1hpBrqDPDUrCqo7) to provide feedback on the quality of the model responses, the API itself, or the quality of the documentation - we cannot wait to hear from you!
 
@@ -34,33 +36,33 @@ We provide a simplified way to deploy this app on Google Cloud using Google Kube
 
 1. Set up the environment variables
 
-    ```bash
-    export PROJECT_ID=%your_project_id%
-    ```
+   ```bash
+   export PROJECT_ID=%your_project_id%
+   ```
 
 2. Authenticate with Google Cloud
 
-    ```bash
-    gcloud auth application-default login
-    ```
+   ```bash
+   gcloud auth application-default login
+   ```
 
 3. Create a Cloud Build job to deploy the app
 
-    ```bash
-    gcloud builds submit --config cloudbuild.yaml
-    ```
+   ```bash
+   gcloud builds submit --config cloudbuild.yaml
+   ```
 
 4. [Optional] Delete all created resources
 
-    ```bash
-    gcloud builds submit --config cloudbuild-destroy.yaml
-    ```
+   ```bash
+   gcloud builds submit --config cloudbuild-destroy.yaml
+   ```
 
 ## Local development
 
 ### Running the app locally
 
-You'll need to pass in Google Cloud credentials with appropriate permissions to use Claude on Vertex.
+You'll need to pass in Google Cloud credentials with appropriate permissions to use Claude on Vertex AI.
 
 ```bash
 docker build . -t computer-use-demo
@@ -81,7 +83,7 @@ docker run \
 
 Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
 
-This example shows how to use the Google Cloud Application Default Credentials to authenticate with Vertex.
+This example shows how to use the Google Cloud Application Default Credentials to authenticate with Vertex AI.
 
 You can also set `GOOGLE_APPLICATION_CREDENTIALS` to use an arbitrary credential file, see the [Google Cloud Authentication documentation](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) for more details.
 
@@ -93,9 +95,9 @@ The container stores settings like the API key and custom system prompt in `~/.a
 
 Alternative access points:
 
-* Streamlit interface only: [http://localhost:8501](http://localhost:8501)
-* Desktop view only: [http://localhost:6080/vnc.html](http://localhost:6080/vnc.html)
-* Direct VNC connection: `vnc://localhost:5900` (for VNC clients)
+- Streamlit interface only: [http://localhost:8501](http://localhost:8501)
+- Desktop view only: [http://localhost:6080/vnc.html](http://localhost:6080/vnc.html)
+- Direct VNC connection: `vnc://localhost:5900` (for VNC clients)
 
 ## Screen size
 
@@ -136,4 +138,4 @@ docker run \
     -it computer-use-demo:local  # can also use ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
 ```
 
-The docker run command above mounts the repo inside the docker image, such that you can edit files from the host. Streamlit is already configured with auto reloading.
+The docker run command above mounts the repository inside the docker image, such that you can edit files from the host. Streamlit is already configured with auto reloading.
