@@ -30,7 +30,7 @@ Please use [this form](https://forms.gle/BT1hpBrqDPDUrCqo7) to provide feedback 
 
 ## Quickstart: Deploying the app on Google Cloud using GKE and Cloud Build
 
-We provide a simplied way to deploy this app on Google Cloud using Google Kubernetes Engine (GKE). To set this up, follow the steps below.
+We provide a simplified way to deploy this app on Google Cloud using Google Kubernetes Engine (GKE). To set this up, follow the steps below.
 
 1. Set up the environment variables
 
@@ -93,9 +93,9 @@ The container stores settings like the API key and custom system prompt in `~/.a
 
 Alternative access points:
 
-- Streamlit interface only: [http://localhost:8501](http://localhost:8501)
-- Desktop view only: [http://localhost:6080/vnc.html](http://localhost:6080/vnc.html)
-- Direct VNC connection: `vnc://localhost:5900` (for VNC clients)
+* Streamlit interface only: [http://localhost:8501](http://localhost:8501)
+* Desktop view only: [http://localhost:6080/vnc.html](http://localhost:6080/vnc.html)
+* Direct VNC connection: `vnc://localhost:5900` (for VNC clients)
 
 ## Screen size
 
