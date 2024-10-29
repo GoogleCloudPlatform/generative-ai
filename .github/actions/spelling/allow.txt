@@ -114,6 +114,7 @@ Gmb
 GmbH
 Googlers
 Hadoop
+HBox
 HDFC
 HDFS
 hdfs
@@ -257,6 +258,7 @@ RAGAS
 RLHF
 RMSE
 RNNs
+RNN
 ROOTSPAN
 RRF
 RTN
@@ -430,9 +432,11 @@ chromadb
 cicd
 cimg
 claude
+clf
 clickable
 clsx
 cmap
+cnf
 codebase
 codebases
 codefile
@@ -449,6 +453,7 @@ colwidth
 constexpr
 corpuses
 countplot
+COUNTIF
 csa
 cse
 ctd
@@ -465,6 +470,7 @@ deepeval
 dente
 descgen
 deskmates
+dfs
 dino
 diy
 docai
@@ -634,8 +640,10 @@ memes
 metadatas
 mgrs
 miranda
+millis
 morty
 moviepy
+mpld
 mpn
 mrr
 multitool
@@ -643,6 +651,7 @@ mwouts
 nbconvert
 nbfmt
 nbformat
+nbviewer
 ncols
 ndarray
 neering
@@ -772,6 +781,7 @@ stuffie
 subviews
 subword
 supima
+svm
 sxs
 tabular
 tagline
@@ -794,6 +804,7 @@ toself
 toset
 tqdm
 traceloop
+treeah
 tritan
 tseslint
 tsv
