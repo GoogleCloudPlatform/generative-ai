@@ -16,7 +16,7 @@
 This repository helps you get started with computer use on Claude, with reference implementations of:
 
 * Build files to create a Docker container with all necessary dependencies
-* A computer use agent loop using the Anthropic API, Bedrock, or Vertex to access the updated Claude 3.5 Sonnet model
+* A computer use agent loop using the Vertex AI and GKE to access the updated Claude 3.5 Sonnet model
 * Anthropic-defined computer use tools
 * A streamlit app for interacting with the agent loop
 

@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Terminal
-Comment=Open Terminal
-Exec=xterm
-Icon=utilities-terminal
-Terminal=false
-Type=Application
-Categories=System;TerminalEmulator;

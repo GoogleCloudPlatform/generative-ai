@@ -1,6 +1,0 @@
-[server]
-fileWatcherType = "auto"
-runOnSave = true
-
-[browser]
-gatherUsageStats = false

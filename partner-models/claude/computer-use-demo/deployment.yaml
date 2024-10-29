@@ -6,6 +6,88 @@ metadata:
   annotations:
     iam.gke.io/gcp-service-account: ${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: ${_NAMESPACE}
+data:
+  nginx.conf: |
+    events {
+      worker_connections 1024;
+    }
+    http {
+      server {
+        listen 8080;
+        
+        # Enable localhost redirects
+        server_name localhost 127.0.0.1;
+        
+        # Serve the main app files
+        location / {
+          root /usr/share/nginx/html;
+          index index.html;
+          sub_filter 'http://localhost:8501' '';
+          sub_filter 'http://127.0.0.1:6080' '';
+          sub_filter_once off;
+          sub_filter_types *;
+        }
+        
+        # Handle direct localhost:8501 access
+        location = /8501 {
+          return 302 $scheme://$host:8080/streamlit/;
+        }
+        
+        # Handle direct localhost:6080 access
+        location = /6080 {
+          return 302 $scheme://$host:8080/vnc/;
+        }
+        
+        # Proxy for Streamlit
+        location /streamlit/ {
+          proxy_pass http://127.0.0.1:8501/;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_read_timeout 86400;
+        }
+        
+        # Rewrite localhost:8501 to /streamlit/
+        location ~ ^http://localhost:8501/(.*)$ {
+          return 302 $scheme://$host:8080/streamlit/$1;
+        }
+        
+        # Proxy for noVNC
+        location /vnc/ {
+          proxy_pass http://127.0.0.1:6080/;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_read_timeout 86400;
+        }
+        
+        # Rewrite localhost:6080 to /vnc/
+        location ~ ^http://127.0.0.1:6080/(.*)$ {
+          return 302 $scheme://$host:8080/vnc/$1;
+        }
+
+        # Proxy for main app
+        location /app/ {
+          proxy_pass http://127.0.0.1:8088/;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_read_timeout 86400;
+        }
+      }
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,7 +104,19 @@ spec:
         app: ${_IMAGE_NAME}
     spec:
       serviceAccountName: ${_KSA_NAME}
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
       containers:
+      - name: nginx-proxy
+        image: nginx:alpine
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
       - name: ${_IMAGE_NAME}
         image: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}
         resources:
@@ -49,6 +143,8 @@ spec:
           value: "6080"
         - name: WEBSOCKIFY_OPTIONS
           value: "--web /opt/noVNC --cert=/opt/noVNC/self.pem"
+        - name: HTTP_SERVER_PORT
+          value: "8088"
         ports:
         - containerPort: 5900
           name: vnc
@@ -56,7 +152,7 @@ spec:
           name: streamlit
         - containerPort: 6080
           name: novnc
-        - containerPort: 8080
+        - containerPort: 8088
           name: web
         readinessProbe:
           tcpSocket:
@@ -81,17 +177,8 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 5900
-    targetPort: vnc
-    name: vnc
-  - port: 8501
-    targetPort: streamlit
-    name: streamlit
-  - port: 6080
-    targetPort: novnc
-    name: novnc
   - port: 8080
-    targetPort: web
+    targetPort: 8080
     name: web
   selector:
     app: ${_IMAGE_NAME}
