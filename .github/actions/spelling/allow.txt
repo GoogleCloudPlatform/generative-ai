@@ -113,7 +113,11 @@ Glickman
 Gmb
 GmbH
 Googlers
+Hadoop
+HBox
 HDFC
+HDFS
+hdfs
 HIDPI
 HMO
 HREDRAW
@@ -136,6 +140,7 @@ Hyperdisk
 ICICI
 ICML
 INFOPLIST
+IOMGR
 IVF
 Isner
 JPY
@@ -171,6 +176,7 @@ LMPA
 LOOKBACK
 LRESULT
 LSTATUS
+LSTM
 LSum
 LTRB
 LUVBPTK
@@ -179,6 +185,8 @@ LangGraph
 Lego
 Leung
 Llion
+Loghub
+loghub
 Logrus
 Lottry
 MLB
@@ -250,6 +258,7 @@ RAGAS
 RLHF
 RMSE
 RNNs
+RNN
 ROOTSPAN
 RRF
 RTN
@@ -269,6 +278,7 @@ SEK
 SEO
 SIMONE
 SKUs
+SNE
 SNB
 SPII
 SPLADE
@@ -316,6 +326,8 @@ Traceloop
 Trapp
 Tribbiani
 Tricyle
+TSNE
+tsne
 UDFs
 USERDATA
 Unimicron
@@ -403,6 +415,7 @@ bigframes
 bigquery
 bitcoin
 blogs
+bml
 boundings
 bpa
 bpd
@@ -419,9 +432,11 @@ chromadb
 cicd
 cimg
 claude
+clf
 clickable
 clsx
 cmap
+cnf
 codebase
 codebases
 codefile
@@ -437,6 +452,8 @@ colvis
 colwidth
 constexpr
 corpuses
+countplot
+COUNTIF
 csa
 cse
 ctd
@@ -453,6 +470,7 @@ deepeval
 dente
 descgen
 deskmates
+dfs
 dino
 diy
 docai
@@ -606,6 +624,7 @@ linted
 linting
 llm
 llms
+logparser
 logprobs
 lparam
 lxml
@@ -621,8 +640,10 @@ memes
 metadatas
 mgrs
 miranda
+millis
 morty
 moviepy
+mpld
 mpn
 mrr
 multitool
@@ -630,6 +651,7 @@ mwouts
 nbconvert
 nbfmt
 nbformat
+nbviewer
 ncols
 ndarray
 neering
@@ -715,6 +737,7 @@ ramen
 rapideval
 rarians
 ratelimit
+rbf
 redef
 repreve
 reranked
@@ -732,6 +755,7 @@ rsp
 saaagesh
 scann
 scattergl
+scikit
 seaborn
 selectbox
 sft
@@ -758,6 +782,7 @@ stuffie
 subviews
 subword
 supima
+svm
 sxs
 tabular
 tagline
@@ -780,6 +805,7 @@ toself
 toset
 tqdm
 traceloop
+treeah
 tritan
 tseslint
 tsv
@@ -833,3 +859,4 @@ youtube
 ytd
 yticks
 zaxis
+Zhu
