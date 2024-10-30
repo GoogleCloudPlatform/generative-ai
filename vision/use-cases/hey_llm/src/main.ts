@@ -32,11 +32,91 @@ const DEFAULT_GEMINI_MODEL = 'gemini-1.5-flash';
  */
 const DEFAULT_IMAGEN_MODEL = 'imagen-3.0-fast-generate-001';
 
-const PROP_KEY = {
-  OAUTH_CLIENT_ID: 'client_id',
-  OAUTH_CLIENT_SECRET: 'client_secret',
-  DRIVE_FOLDER_ID: 'folder_id',
-};
+/**
+ * Preset OAuth Client ID. If null, users must enter it in the sidebar.
+ */
+const PRESET_OAUTH_CLIENT_ID = null;
+
+/**
+ * Preset OAuth Client Secret. If null, users must enter it in the sidebar.
+ */
+const PRESET_OAUTH_CLIENT_SECRET = null;
+
+/**
+ * Preset Google Drive Folder ID to store generated images.
+ * If null, a new folder will be created.
+ */
+const PRESET_DRIVE_FOLDER_ID = null;
+
+/**
+ * Property service middleware.
+ * - If the value is preset, always returns it. The value is not writable.
+ * - Otherwise, reads from / write to GAS PropertiesService.
+ */
+class PropService {
+  static OAUTH_CLIENT_ID_KEY = 'client_id';
+  static OAUTH_CLIENT_SECRET_KEY = 'client_secret';
+  static DRIVE_FOLDER_ID_KEY = 'folder_id';
+
+  /** OAuth Client ID */
+  static get clientID() {
+    return PRESET_OAUTH_CLIENT_ID
+      ? PRESET_OAUTH_CLIENT_ID
+      : PropertiesService.getDocumentProperties().getProperty(
+          PropService.OAUTH_CLIENT_ID_KEY,
+        );
+  }
+
+  static set clientID(value) {
+    if (PRESET_OAUTH_CLIENT_ID) return;
+    if (!value) return;
+    PropertiesService.getDocumentProperties().setProperty(
+      PropService.OAUTH_CLIENT_ID_KEY,
+      value,
+    );
+  }
+
+  /** OAuth Client Secret */
+  static get clientSecret() {
+    return PRESET_OAUTH_CLIENT_SECRET
+      ? PRESET_OAUTH_CLIENT_SECRET
+      : PropertiesService.getDocumentProperties().getProperty(
+          PropService.OAUTH_CLIENT_SECRET_KEY,
+        );
+  }
+
+  static set clientSecret(value) {
+    if (PRESET_OAUTH_CLIENT_SECRET) return;
+    if (!value) return;
+    PropertiesService.getDocumentProperties().setProperty(
+      PropService.OAUTH_CLIENT_SECRET_KEY,
+      value,
+    );
+  }
+
+  /** Google Drive Folder ID to store generated images */
+  static get driveFolderID() {
+    return PRESET_DRIVE_FOLDER_ID
+      ? PRESET_DRIVE_FOLDER_ID
+      : PropertiesService.getDocumentProperties().getProperty(
+          PropService.DRIVE_FOLDER_ID_KEY,
+        );
+  }
+
+  static set driveFolderID(value) {
+    if (PRESET_DRIVE_FOLDER_ID) return;
+    if (!value) return;
+    PropertiesService.getDocumentProperties().setProperty(
+      PropService.DRIVE_FOLDER_ID_KEY,
+      value,
+    );
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function isOAuthClientPreset() {
+  return PRESET_OAUTH_CLIENT_ID && PRESET_OAUTH_CLIENT_SECRET;
+}
 
 /**
  * Gets Google Cloud Project Number from OAuth Client ID stored in Document Properties.
@@ -44,9 +124,7 @@ const PROP_KEY = {
  * @returns Google Cloud Project Number.
  */
 function getProjectNumber_() {
-  return PropertiesService.getDocumentProperties()
-    .getProperty(PROP_KEY.OAUTH_CLIENT_ID)
-    ?.split('-')[0];
+  return PropService.clientID?.split('-')[0];
 }
 
 /**
@@ -92,16 +170,10 @@ function use() {
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getAuthorizationUrl() {
-  const clientID = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_ID,
-  );
-  const clientSecret = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_SECRET,
-  );
-  if (clientID && clientSecret) {
-    return getGoogleService_().getAuthorizationUrl();
-  }
-  return undefined;
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) return null;
+  return getGoogleService_(clientID, clientSecret).getAuthorizationUrl();
 }
 
 /**
@@ -111,23 +183,28 @@ function getAuthorizationUrl() {
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function authCallback(request: object) {
-  const isAuthorized = getGoogleService_().handleCallback(request);
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) {
+    return HtmlService.createHtmlOutput('Client ID / Secret not set.');
+  }
+  const isAuthorized = getGoogleService_(clientID, clientSecret).handleCallback(
+    request,
+  );
   if (isAuthorized) {
     return HtmlService.createHtmlOutput('Success! You can close this tab.');
   } else {
     return HtmlService.createHtmlOutput('Denied. You can close this tab');
   }
 }
+
 /**
  * Sets OAuth Client ID to Document Properties.
  * @param val OAuth Client ID
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setClientID(val: string) {
-  PropertiesService.getDocumentProperties().setProperty(
-    PROP_KEY.OAUTH_CLIENT_ID,
-    val,
-  );
+  PropService.clientID = val;
 }
 
 /**
@@ -136,10 +213,7 @@ function setClientID(val: string) {
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setClientSecret(val: string) {
-  PropertiesService.getDocumentProperties().setProperty(
-    PROP_KEY.OAUTH_CLIENT_SECRET,
-    val,
-  );
+  PropService.clientSecret = val;
 }
 
 /**
@@ -175,7 +249,12 @@ Output:`;
   const cached = cache?.get(cacheKey);
   if (cached) return cached;
 
-  const oauthService = getGoogleService_();
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) {
+    throw new Error('OAuth client ID / Secret not set.');
+  }
+  const oauthService = getGoogleService_(clientID, clientSecret);
   const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${model}:generateContent`;
 
   const payload = JSON.stringify({
@@ -460,19 +539,21 @@ function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL) {
   if (cached) {
     return cached;
   }
-  const oauthService = getGoogleService_();
-  let parentFolderID = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.DRIVE_FOLDER_ID,
-  );
-  if (!parentFolderID) {
-    parentFolderID = createDriveFolder_(oauthService);
-    PropertiesService.getDocumentProperties().setProperty(
-      PROP_KEY.DRIVE_FOLDER_ID,
-      parentFolderID,
-    );
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) {
+    throw new Error('OAuth client ID / Secret not set.');
+  }
+  const oauthService = getGoogleService_(clientID, clientSecret);
+  if (!PropService.driveFolderID) {
+    PropService.driveFolderID = createDriveFolder_(oauthService);
   }
   const filename = sanitizeFileName(`${cacheKey}:${prompt.slice(0, 64)}.png`);
-  const driveUrl = checkDriveImage_(oauthService, filename, parentFolderID);
+  const driveUrl = checkDriveImage_(
+    oauthService,
+    filename,
+    PropService.driveFolderID,
+  );
   if (driveUrl) {
     return driveUrl;
   }
@@ -482,7 +563,7 @@ function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL) {
     pred.bytesBase64Encoded,
     filename,
     pred.mimeType,
-    parentFolderID,
+    PropService.driveFolderID,
   );
 
   // Trim resize parameters that comes after the equal mark.
@@ -500,19 +581,7 @@ function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL) {
  * @private
  * @returns OAuth2 service
  */
-function getGoogleService_() {
-  const clientID = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_ID,
-  );
-  const clientSecret = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_SECRET,
-  );
-  if (!clientID || !clientSecret) {
-    throw new Error(
-      'OAuth info is missing. Complete authorization from the "Extensions" menu',
-    );
-  }
-
+function getGoogleService_(clientID: string, clientSecret: string) {
   // Create a new service with the given name. The name will be used when
   // persisting the authorized token, so ensure it is unique within the
   // scope of the property store.
