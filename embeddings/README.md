@@ -14,4 +14,7 @@ This repository explores various techniques and use-cases for embedding in Machi
 
 ## Use Cases
 
-- **[use-cases/outlier-detection/bq-vector-search-log-outlier-detection.ipynb](use-cases/outlier-detection/bq-vector-search-log-outlier-detection.ipynb):** Shows how to utilize vector search and BigQuery to identify outlier log entries based on their semantic similarity to other logs.
+### Outlier Detection
+
+- **[bq-vector-search-outlier-detection-audit-logs.ipynb](use-cases/outlier-detection/bq-vector-search-outlier-detection-audit-logs.ipynb):** Shows how to detect and investigate anomalies in audit logs using BigQuery vector search and Cloud Audit logs as an example dataset.
+- **[bq-vector-search-outlier-detection-infra-logs.ipynb](use-cases/outlier-detection/bq-vector-search-outlier-detection-infra-logs.ipynb):** Demonstrates building a real-world outlier detection using Gemini and BigQuery vector search. Also shows how to tune hyperparameters and evaluate performance using a public HDFS logs dataset.
