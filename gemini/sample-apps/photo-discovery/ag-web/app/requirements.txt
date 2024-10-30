@@ -1,6 +1,6 @@
 Flask==3.0.3
 flask-cors
 gunicorn==23.0.0
-Werkzeug==3.0.4
+Werkzeug==3.0.6
 google-cloud-aiplatform[langchain,reasoningengine]==1.68.0
 google-cloud-discoveryengine==0.12.2
