@@ -37,18 +37,26 @@ steps:
             --quiet
         fi
 
-  - id: "build-push-image"
+  - id: "pull-tag-push-image"
     name: "gcr.io/cloud-builders/docker"
     waitFor: ["setup-artifact-registry"]
+    entrypoint: "bash"
     args:
-      - "build"
-      - "-t"
-      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}"
-      - "."
+      - "-c"
+      - |
+        # Pull the prebuilt image
+        docker pull ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
+
+        # Tag for Artifact Registry
+        docker tag ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest \
+          ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}
+
+        # Push to Artifact Registry
+        docker push ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}
 
   - id: "setup-k8s-iam"
     name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    waitFor: ["build-push-image"]
+    waitFor: ["pull-tag-push-image"]
     entrypoint: "bash"
     args:
       - "-c"
