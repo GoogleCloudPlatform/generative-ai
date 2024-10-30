@@ -19,8 +19,21 @@
         margin-bottom: 1rem;
       }
 
+      .instruction {
+        display: none;
+      }
+
+      .require-input .instruction {
+        display: block;
+      }
+
       .form-section {
+        display: none;
         margin-bottom: 1rem;
+      }
+
+      .require-input .form-section {
+        display: block;
       }
 
       .form-section input {
@@ -61,7 +74,7 @@
   <body>
     <section>
       <h1>HEY_LLM setup</h1>
-      <ol>
+      <ol class="instruction">
         <li>
           Visit
           <a
@@ -165,6 +178,17 @@
           });
         })
         .getScriptId();
+
+      google.script.run
+        .withSuccessHandler(value => {
+          if (value) {
+            authorizeButton.textContent = BUTTON_LABEL.checking;
+            checkIfReadyToAuthorize();
+          } else {
+            document.body.classList.add('require-input');
+          }
+        })
+        .isOAuthClientPreset();
     </script>
   </body>
 </html>

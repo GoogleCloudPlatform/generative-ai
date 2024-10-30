@@ -1,0 +1,89 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+steps:
+  - id: "delete-k8s-resources"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        if gcloud container clusters describe ${_CLUSTER_NAME} \
+          --project=${PROJECT_ID} \
+          --region=${_REGION} --format="none" 2>/dev/null; then
+          gcloud container clusters get-credentials ${_CLUSTER_NAME} \
+            --project=${PROJECT_ID} \
+            --region=${_REGION}
+          
+          # Delete namespace (this will delete all resources in it)
+          kubectl delete namespace ${_NAMESPACE} --ignore-not-found
+        fi
+
+  - id: "cleanup-iam"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    waitFor: ["delete-k8s-resources"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        # Remove IAM bindings
+        gcloud projects remove-iam-policy-binding ${PROJECT_ID} \
+          --member="serviceAccount:${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+          --role="roles/aiplatform.admin" \
+          --quiet || true
+
+        # Delete service account
+        gcloud iam service-accounts delete ${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+          --project=${PROJECT_ID} \
+          --quiet || true
+
+  - id: "delete-cluster"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    waitFor: ["cleanup-iam"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        # Delete GKE cluster
+        echo "Deleting GKE cluster..."
+        gcloud container clusters delete ${_CLUSTER_NAME} \
+          --project=${PROJECT_ID} \
+          --region=${_REGION} \
+          --quiet || true
+
+  - id: "delete-registry"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    waitFor: ["delete-cluster"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        # Delete Artifact Registry repository
+        echo "Deleting Artifact Registry repository..."
+        gcloud artifacts repositories delete ${_ARTIFACT_REGISTRY_ID} \
+          --project=${PROJECT_ID} \
+          --location=${_REGION} \
+          --quiet || true
+
+timeout: "1800s"
+options:
+  logging: CLOUD_LOGGING_ONLY
+  dynamicSubstitutions: true
+substitutions:
+  _REGION: us-east5
+  _CLUSTER_NAME: computer-use-demo-cluster
+  _NAMESPACE: computer-use-demo
+  _IAM_SA_NAME: computer-use-sa
+  _ARTIFACT_REGISTRY_ID: computer-use-ar-repo # Added this
+tags: ["gke-cleanup", "${_CLUSTER_NAME}"]
