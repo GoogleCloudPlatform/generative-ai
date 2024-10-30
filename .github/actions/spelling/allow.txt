@@ -77,6 +77,7 @@ ESG
 Eliud
 Embs
 Envane
+envsubst
 Esin
 Eventarc
 FAISS
@@ -119,6 +120,7 @@ HDFC
 HDFS
 hdfs
 HIDPI
+HIGHCPU
 HMO
 HREDRAW
 HSA
@@ -168,6 +170,7 @@ Kipchoge
 Knopf
 Kohli
 Kraizt
+KSA
 Kubeflow
 Kudrow
 LCEL
@@ -226,6 +229,7 @@ Niitsuma
 Nintendo
 Nominatim
 Noogler
+novnc
 ODb
 OOTB
 Oberst
@@ -825,11 +829,13 @@ vapo
 vectordb
 vertexai
 vesselin
+vnc
 vtotal
 waterjet
 wcontext
 wcslen
 websites
+webpages
 welcom
 wiffle
 windspeed
@@ -840,6 +846,7 @@ wparam
 wscore
 wscores
 wstring
+WXGA
 xaxes
 xaxis
 xcassets
@@ -847,6 +854,7 @@ xcconfig
 xcodeproj
 xcscheme
 xctest
+XGA
 xlabel
 xmltodict
 xsi

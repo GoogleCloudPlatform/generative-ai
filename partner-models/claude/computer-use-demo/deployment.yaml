@@ -1,0 +1,111 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${_KSA_NAME}
+  namespace: ${_NAMESPACE}
+  annotations:
+    iam.gke.io/gcp-service-account: ${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${_IMAGE_NAME}
+  namespace: ${_NAMESPACE}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${_IMAGE_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${_IMAGE_NAME}
+    spec:
+      serviceAccountName: ${_KSA_NAME}
+      containers:
+        - name: ${_IMAGE_NAME}
+          image: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1000m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          env:
+            - name: API_PROVIDER
+              value: "vertex"
+            - name: CLOUD_ML_REGION
+              value: "${_REGION}"
+            - name: ANTHROPIC_VERTEX_PROJECT_ID
+              value: "${PROJECT_ID}"
+            - name: WIDTH
+              value: "1024"
+            - name: HEIGHT
+              value: "768"
+            - name: VNC_PORT
+              value: "5900"
+            - name: NOVNC_PORT
+              value: "6080"
+            - name: WEBSOCKIFY_OPTIONS
+              value: "--web /opt/noVNC --cert=/opt/noVNC/self.pem"
+          ports:
+            - containerPort: 5900
+              name: vnc
+            - containerPort: 8501
+              name: streamlit
+            - containerPort: 6080
+              name: novnc
+            - containerPort: 8080
+              name: web
+          readinessProbe:
+            tcpSocket:
+              port: streamlit
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: web
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${_IMAGE_NAME}
+  namespace: ${_NAMESPACE}
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5900
+      targetPort: vnc
+      name: vnc
+    - port: 8501
+      targetPort: streamlit
+      name: streamlit
+    - port: 6080
+      targetPort: novnc
+      name: novnc
+    - port: 8080
+      targetPort: web
+      name: web
+  selector:
+    app: ${_IMAGE_NAME}
