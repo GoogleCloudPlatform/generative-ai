@@ -142,21 +142,9 @@ dmypy.json
 .idea
 
 # User-specific files
-language/examples/prompt-design/train.csv
-README-TOC*.md
-
-## gemini/sample-apps/e2e-gen-ai-app-starter-pack specific
-gemini/sample-apps/e2e-gen-ai-app-starter-pack/**/.persist_vector_store
-gemini/sample-apps/e2e-gen-ai-app-starter-pack/.saved_chats/
-gemini/sample-apps/e2e-gen-ai-app-starter-pack/.streamlit_chats/
-gemini/sample-apps/e2e-gen-ai-app-starter-pack/**/my_env.tfvars
-gemini/sample-apps/e2e-gen-ai-app-starter-pack/tests/load_test/.results
-gemini/sample-apps/e2e-gen-ai-app-starter-pack/tests/load_test/.results
-
-# Terraform
-terraform.tfstate**
 .terraform*
 .Terraform*
+
 
 tmp*
 
@@ -196,3 +184,11 @@ testem.log
 .DS_Store
 Thumbs.db
 *.vscode*
+
+.persist_vector_store
+tests/load_test/.results/*.html
+tests/load_test/.results/*.csv
+locust_env
+my_env.tfvars
+.streamlit_chats
+.saved_chats

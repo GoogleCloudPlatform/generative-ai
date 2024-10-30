@@ -1,7 +1,0 @@
-llama-index==0.11.8
-llama-index-embeddings-vertex==0.2.0
-llama-index-utils-workflow==0.2.1
-llama-index-llms-vertex==0.3.4
-llama-index-storage-docstore-firestore==0.2.0
-llama_deploy
-flask[async]
