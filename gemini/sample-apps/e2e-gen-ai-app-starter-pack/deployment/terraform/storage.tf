@@ -8,14 +8,6 @@ terraform {
   }
 }
 
-locals {
-  all_projects = [
-    var.cicd_runner_project_id,
-    var.prod_project_id,
-    var.staging_project_id
-  ]
-}
-
 resource "google_storage_bucket" "bucket_load_test_results" {
   name                        = "${var.cicd_runner_project_id}-${var.suffix_bucket_name_load_test_results}"
   location                    = var.region
@@ -26,7 +18,7 @@ resource "google_storage_bucket" "bucket_load_test_results" {
 }
 
 resource "google_storage_bucket" "logs_data_bucket" {
-  for_each                    = toset(local.all_projects)
+  for_each                    = toset(local.all_project_ids)
   name                        = "${each.value}-logs-data"
   location                    = var.region
   project                     = each.value
@@ -35,3 +27,4 @@ resource "google_storage_bucket" "logs_data_bucket" {
 
   depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.shared_services]
 }
+

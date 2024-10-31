@@ -11,6 +11,7 @@ This folder implements a chatbot application using FastAPI, and Google Cloud ser
 ├── patterns/           # Conversation pattern implementations
 │   ├── custom_rag_qa/
 │   └── langgraph_dummy_agent/
+│   └── agent_builder_search/
 ├── utils/              # Utility functions and classes
 └── eval/               # Evaluation tools and data
 ```
@@ -30,6 +31,10 @@ This approach offers maximum flexibility in the orchestration of steps and allow
 ### 3. LangGraph Dummy Agent
 
 A simple agent implemented using LangGraph, a framework for building agent and multi-agent workflows.
+
+### 4. RAG with Vertex AI Agent Builder Search
+
+A RAG (Retrieval-Augmented Generation) pattern using Vertex AI Agent Builder Search for the retrieval of information. It includes a data ingestion pipeline to automate the update of your data. For more details on how to set it up please review the related readme file under the respective folder.
 
 ### Switching Between Patterns
 

@@ -1,0 +1,31 @@
+provider "google" {
+  alias                 = "dev_billing_override"
+  billing_project       = var.dev_project_id
+  user_project_override = true
+}
+
+resource "google_discovery_engine_data_store" "data_store_dev" {
+  location                    = var.region_vertex_ai_search
+  project                     = var.dev_project_id
+  data_store_id               = "${var.datastore_name}"
+  display_name                = "${var.datastore_name}"
+  industry_vertical           = "GENERIC"
+  content_config              = "NO_CONTENT"
+  solution_types              = ["SOLUTION_TYPE_SEARCH"]
+  create_advanced_site_search = false
+  provider                    = google.dev_billing_override
+  depends_on             = [resource.google_project_service.services]
+}
+
+resource "google_discovery_engine_search_engine" "search_engine_dev" {
+  project        = var.dev_project_id
+  engine_id      = "${var.search_engine_name}"
+  collection_id  = "default_collection"
+  location       = google_discovery_engine_data_store.data_store_dev.location
+  display_name   = "Search Engine App Staging"
+  data_store_ids = [google_discovery_engine_data_store.data_store_dev.data_store_id]
+  search_engine_config {
+    search_tier = "SEARCH_TIER_ENTERPRISE"
+  }
+  provider      = google.dev_billing_override
+}

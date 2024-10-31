@@ -1,0 +1,63 @@
+steps:
+  - name: "python:3.10"
+    id: deploy-data-ingestion-pipeline-prod
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        cd data_processing && pip install poetry==1.8.3 --user && python -m poetry install && \
+        python -m poetry run python data_processing_pipeline/submit_pipeline.py
+    env:
+      - "PIPELINE_ROOT=${_PIPELINE_GCS_ROOT}"
+      - "REGION=${_REGION}"
+      - "REGION_VERTEX_AI_SEARCH=${_REGION_VERTEX_AI_SEARCH}"
+      - "DATA_STORE_ID=${_DATA_STORE_ID}"
+      - "PROJECT_ID=${_PROD_PROJECT_ID}"
+      - "SERVICE_ACCOUNT=${_PIPELINE_SA_EMAIL}"
+      - "PIPELINE_NAME=${_PIPELINE_NAME}"
+      - "CRON_SCHEDULE=${_PIPELINE_CRON_SCHEDULE}"
+      - "DISABLE_CACHING=TRUE"
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: trigger-deployment
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "genai-app-sample"
+      - "--image"
+      - "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME"
+      - "--region"
+      - "$_REGION"
+      - "--project"
+      - $_PROD_PROJECT_ID
+      - "--min-instances"
+      - "1"
+      - "--no-cpu-throttling"
+      - "--cpu"
+      - "4"
+      - "--memory"
+      - "4Gi"
+      - "--concurrency"
+      - "40"
+      - "--service-account"
+      - "${_CLOUD_RUN_APP_SA_NAME}@${_PROD_PROJECT_ID}.iam.gserviceaccount.com"
+      - "--set-env-vars"
+      - "COMMIT_SHA=${COMMIT_SHA},DATA_STORE_ID=${_DATA_STORE_ID},REGION=${_REGION},REGION_VERTEX_AI_SEARCH=${_REGION_VERTEX_AI_SEARCH}"
+
+substitutions:
+  _PROD_PROJECT_ID: YOUR_PROD_PROJECT_ID
+  _CONTAINER_NAME: genai-app-sample
+  _ARTIFACT_REGISTRY_REPO_NAME: genai-containers
+  _CLOUD_RUN_APP_SA_NAME: genai-app-sample-cr-sa
+  _REGION: us-central1
+
+  _REGION_VERTEX_AI_SEARCH: us
+  _PIPELINE_GCS_ROOT: _PIPELINE_GCS_ROOT
+  _PIPELINE_SA_EMAIL: YOUR_PIPELINE_SA_EMAIL
+  _DATA_STORE_ID: PROD_DATASTORE_ID
+  _PIPELINE_NAME: genai_sample_data_processing
+  _PIPELINE_CRON_SCHEDULE: YOUR_CRON_SCHEDULE
+
+options:
+  logging: CLOUD_LOGGING_ONLY

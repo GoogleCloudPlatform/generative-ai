@@ -34,8 +34,9 @@ from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
 import vertexai
 
 # Configuration
+LOCATION = "us-central1"
 EMBEDDING_MODEL = "text-embedding-004"
-LLM_MODEL = "gemini-1.5-flash-002"
+LLM = "gemini-1.5-flash-002"
 TOP_K = 5
 
 # Initialize logging
@@ -43,7 +44,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Initialize Google Cloud and Vertex AI
 credentials, project_id = google.auth.default()
-vertexai.init(project=project_id)
+vertexai.init(project=project_id, location=LOCATION)
 
 # Set up embedding model and vector store
 embedding = VertexAIEmbeddings(model_name=EMBEDDING_MODEL)
@@ -86,7 +87,7 @@ def should_continue() -> None:
 
 
 # Initialize language model
-llm = ChatVertexAI(model=LLM_MODEL, temperature=0, max_tokens=1024)
+llm = ChatVertexAI(model=LLM, temperature=0, max_tokens=1024)
 
 # Set up conversation inspector
 inspect_conversation = inspect_conversation_template | llm.bind_tools(
