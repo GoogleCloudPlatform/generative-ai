@@ -2,10 +2,11 @@
 
 > **From Prototype to Production in Minutes.**
 
-|                             |                                                                                                                                                                                                                                                                                                                |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Authors**                 | [Elia Secchi](https://github.com/eliasecchig), [Lorenzo Spataro](https://github.com/lspataroG)                                                                                                                                                                                                                 |
-| **1-Minute Video Overview** | [<img src="https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/starter-pack-overview-thumbnail.png" width="200" alt="Preview Video">](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/starter-pack-overview.mp4) |
+|                                                                 |                                                                                                                                      |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Authors**                                                     | [Elia Secchi](https://github.com/eliasecchig), [Lorenzo Spataro](https://github.com/lspataroG)                                       |
+| [**1-Minute Video Overview**](https://youtu.be/D_VQYTczBpc)     | [<img src="https://img.youtube.com/vi/D_VQYTczBpc/maxresdefault.jpg" width="100" alt="Preview Video">](https://youtu.be/D_VQYTczBpc) |
+| [**20-Minute Video Walkthrough**](https://youtu.be/kwRG7cnqSu0) | [<img src="https://img.youtube.com/vi/kwRG7cnqSu0/maxresdefault.jpg" width="100" alt="Preview Video">](https://youtu.be/kwRG7cnqSu0) |
 
 This repository provides a template starter pack for building a Generative AI application on Google Cloud.
 

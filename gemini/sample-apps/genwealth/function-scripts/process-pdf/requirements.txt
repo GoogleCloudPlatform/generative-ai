@@ -4,7 +4,7 @@ google-cloud-documentai==2.32.0
 google-cloud-core==2.4.1
 google-cloud-pubsub==2.23.0
 google-cloud-storage==2.18.2
-langchain==0.2.16
+langchain==0.3.0
 langchain-core==0.2.38
 langchain-google-alloydb-pg==0.6.0
 langchain-google-vertexai==1.0.10

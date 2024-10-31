@@ -41,6 +41,7 @@ CHECKOV
 COCOAPODS
 COINIT
 CONOUT
+COUNTIF
 CUCUONAR
 CWLEY
 CZE
@@ -113,16 +114,16 @@ Glickman
 Gmb
 GmbH
 Googlers
-Hadoop
 HBox
 HDFC
 HDFS
-hdfs
 HIDPI
+HIGHCPU
 HMO
 HREDRAW
 HSA
 HVDC
+Hadoop
 Hamamoto
 Hamblin
 Hamers
@@ -153,6 +154,7 @@ Junzhe
 KFBI
 KNN
 KPIs
+KSA
 Kaelen
 Kaggle
 Kamradt
@@ -186,7 +188,6 @@ Lego
 Leung
 Llion
 Loghub
-loghub
 Logrus
 Lottry
 MLB
@@ -257,8 +258,8 @@ Qwiklabs
 RAGAS
 RLHF
 RMSE
-RNNs
 RNN
+RNNs
 ROOTSPAN
 RRF
 RTN
@@ -278,8 +279,8 @@ SEK
 SEO
 SIMONE
 SKUs
-SNE
 SNB
+SNE
 SPII
 SPLADE
 SSRF
@@ -311,6 +312,7 @@ TGI
 TOKENLIST
 TPU
 TPUs
+TSNE
 Tadao
 Tafel
 Tbk
@@ -326,8 +328,6 @@ Traceloop
 Trapp
 Tribbiani
 Tricyle
-TSNE
-tsne
 UDFs
 USERDATA
 Unimicron
@@ -354,12 +354,14 @@ WAI
 WDIR
 WFH
 WNDCLASS
+WXGA
 Wakatipu
 Weaviate
 Wehn
 Welwyn
 Wnd
 Womens
+XGA
 XSum
 XXE
 Xiang
@@ -368,6 +370,7 @@ Yuxuan
 Yuzuru
 Zhao
 Zhaohua
+Zhu
 Zijin
 Zom
 Zscaler
@@ -453,7 +456,6 @@ colwidth
 constexpr
 corpuses
 countplot
-COUNTIF
 csa
 cse
 ctd
@@ -494,6 +496,7 @@ embvs
 emojis
 ename
 engi
+envsubst
 epath
 epoc
 erty
@@ -565,6 +568,7 @@ gunicorn
 hadolint
 hashtag
 hashtags
+hdfs
 hdlr
 heatmap
 heatmapgl
@@ -624,6 +628,7 @@ linted
 linting
 llm
 llms
+loghub
 logparser
 logprobs
 lparam
@@ -639,8 +644,8 @@ meme
 memes
 metadatas
 mgrs
-miranda
 millis
+miranda
 morty
 moviepy
 mpld
@@ -665,6 +670,7 @@ noabe
 nobserved
 norigin
 notetaker
+novnc
 nrows
 ntheory
 nunique
@@ -808,6 +814,7 @@ traceloop
 treeah
 tritan
 tseslint
+tsne
 tsv
 tures
 ubuntu
@@ -825,10 +832,12 @@ vapo
 vectordb
 vertexai
 vesselin
+vnc
 vtotal
 waterjet
 wcontext
 wcslen
+webpages
 websites
 welcom
 wiffle
@@ -859,4 +868,3 @@ youtube
 ytd
 yticks
 zaxis
-Zhu
