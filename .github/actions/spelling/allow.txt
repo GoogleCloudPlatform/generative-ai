@@ -41,6 +41,7 @@ CHECKOV
 COCOAPODS
 COINIT
 CONOUT
+COUNTIF
 CUCUONAR
 CWLEY
 CZE
@@ -77,7 +78,6 @@ ESG
 Eliud
 Embs
 Envane
-envsubst
 Esin
 Eventarc
 FAISS
@@ -114,17 +114,16 @@ Glickman
 Gmb
 GmbH
 Googlers
-Hadoop
 HBox
 HDFC
 HDFS
-hdfs
 HIDPI
 HIGHCPU
 HMO
 HREDRAW
 HSA
 HVDC
+Hadoop
 Hamamoto
 Hamblin
 Hamers
@@ -155,6 +154,7 @@ Junzhe
 KFBI
 KNN
 KPIs
+KSA
 Kaelen
 Kaggle
 Kamradt
@@ -170,7 +170,6 @@ Kipchoge
 Knopf
 Kohli
 Kraizt
-KSA
 Kubeflow
 Kudrow
 LCEL
@@ -189,7 +188,6 @@ Lego
 Leung
 Llion
 Loghub
-loghub
 Logrus
 Lottry
 MLB
@@ -229,7 +227,6 @@ Niitsuma
 Nintendo
 Nominatim
 Noogler
-novnc
 ODb
 OOTB
 Oberst
@@ -261,8 +258,8 @@ Qwiklabs
 RAGAS
 RLHF
 RMSE
-RNNs
 RNN
+RNNs
 ROOTSPAN
 RRF
 RTN
@@ -282,8 +279,8 @@ SEK
 SEO
 SIMONE
 SKUs
-SNE
 SNB
+SNE
 SPII
 SPLADE
 SSRF
@@ -315,6 +312,7 @@ TGI
 TOKENLIST
 TPU
 TPUs
+TSNE
 Tadao
 Tafel
 Tbk
@@ -330,8 +328,6 @@ Traceloop
 Trapp
 Tribbiani
 Tricyle
-TSNE
-tsne
 UDFs
 USERDATA
 Unimicron
@@ -358,12 +354,14 @@ WAI
 WDIR
 WFH
 WNDCLASS
+WXGA
 Wakatipu
 Weaviate
 Wehn
 Welwyn
 Wnd
 Womens
+XGA
 XSum
 XXE
 Xiang
@@ -372,6 +370,7 @@ Yuxuan
 Yuzuru
 Zhao
 Zhaohua
+Zhu
 Zijin
 Zom
 Zscaler
@@ -457,7 +456,6 @@ colwidth
 constexpr
 corpuses
 countplot
-COUNTIF
 csa
 cse
 ctd
@@ -498,6 +496,7 @@ embvs
 emojis
 ename
 engi
+envsubst
 epath
 epoc
 erty
@@ -569,6 +568,7 @@ gunicorn
 hadolint
 hashtag
 hashtags
+hdfs
 hdlr
 heatmap
 heatmapgl
@@ -628,6 +628,7 @@ linted
 linting
 llm
 llms
+loghub
 logparser
 logprobs
 lparam
@@ -643,8 +644,8 @@ meme
 memes
 metadatas
 mgrs
-miranda
 millis
+miranda
 morty
 moviepy
 mpld
@@ -669,6 +670,7 @@ noabe
 nobserved
 norigin
 notetaker
+novnc
 nrows
 ntheory
 nunique
@@ -812,6 +814,7 @@ traceloop
 treeah
 tritan
 tseslint
+tsne
 tsv
 tures
 ubuntu
@@ -834,8 +837,8 @@ vtotal
 waterjet
 wcontext
 wcslen
-websites
 webpages
+websites
 welcom
 wiffle
 windspeed
@@ -846,7 +849,6 @@ wparam
 wscore
 wscores
 wstring
-WXGA
 xaxes
 xaxis
 xcassets
@@ -854,7 +856,6 @@ xcconfig
 xcodeproj
 xcscheme
 xctest
-XGA
 xlabel
 xmltodict
 xsi
@@ -867,4 +868,3 @@ youtube
 ytd
 yticks
 zaxis
-Zhu
