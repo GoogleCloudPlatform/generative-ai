@@ -120,6 +120,14 @@ def get_existing_index_and_endpoint(vector_index_name: str, index_endpoint_name:
     return index, endpoint
 
 
+def is_index_deployed(vs_index: aiplatform.MatchingEngineIndex):
+    """Checks if index is deployed."""
+    return (
+        len(vs_index.deployed_indexes) > 0
+        and vs_index.deployed_indexes[0].display_name == vs_index.display_name
+    )
+
+
 def get_or_create_existing_index(
     vector_index_name: str, index_endpoint_name: str, approximate_neighbors_count: int
 ):
@@ -130,8 +138,12 @@ def get_or_create_existing_index(
     )
 
     if vs_index and vs_endpoint:
-        print("Using existing index and endpoint")
-        return vs_index, vs_endpoint
+        # Check if the existing index is deployed
+        if is_index_deployed(vs_index):
+            print("Using existing deployed index and endpoint")
+            return vs_index, vs_endpoint
+        else:
+            print("Existing index found, but it is not deployed.")
 
     print("Creating new index and/or endpoint")
     if not vs_index:
