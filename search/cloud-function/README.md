@@ -97,7 +97,7 @@ SUMMARY_TYPE = VERTEX_AI_SEARCH
 
 ```mermaid
 flowchart LR
-    A[fa:fa-search Vertex Search AI] --> B(Google Cloud Function)
+    A[fa:fa-search Vertex AI Search] --> B(Google Cloud Function)
     B --> C[My App Server]
     C -->|One| D[fa:fa-laptop web]
     C -->|Two| E[fa:fa-mobile mobile]

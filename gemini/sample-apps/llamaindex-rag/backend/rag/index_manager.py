@@ -165,7 +165,7 @@ class IndexManager:
     ) -> VectorStoreIndex:
         """
         Returns a llamaindex VectorStoreIndex object which contains a storage context,
-        with an accompanying local document store from google cloud storage.
+        with an accompanying local document store from Google Cloud Storage.
         """
         # Initialize Vertex AI
         aiplatform.init(project=self.project_id, location=self.location)
