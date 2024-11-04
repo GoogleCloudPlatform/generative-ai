@@ -110,6 +110,7 @@ jobs:
             cspell:data-science/dict/data-science-models.txt
             cspell:data-science/dict/data-science.txt
             cspell:data-science/dict/data-science-tools.txt
+            cspell:dart/src/dart.txt
             cspell:de_DE/src/German_de_DE.dic
             cspell:django/requirements.txt
             cspell:django/dict/django.txt
@@ -128,6 +129,7 @@ jobs:
             cspell:java/src/java.txt
             cspell:k8s/dict/k8s.txt
             cspell:mnemonics/dict/mnemonics.txt
+            cspell:monkeyc/src/monkeyc_keywords.txt
             cspell:node/dict/node.txt
             cspell:npm/dict/npm.txt
             cspell:people-names/src/names.txt
