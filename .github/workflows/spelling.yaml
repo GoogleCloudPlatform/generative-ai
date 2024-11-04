@@ -103,7 +103,7 @@ jobs:
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
           experimental_apply_changes_via_bot: 1
           dictionary_source_prefixes: '{"cspell": "https://raw.githubusercontent.com/streetsidesoftware/cspell-dicts/main/dictionaries/"}'
-          extra_dictionaries:
+          extra_dictionaries: |
             cspell:software-terms/dict/softwareTerms.txt
             cspell:software-terms/dict/webServices.txt
             cspell:aws/aws.txt
@@ -139,10 +139,10 @@ jobs:
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
             cspell:people-names/src/names.txt
           ignore-pattern: "[^'a-záéíóúñçüA-ZÁÉÍÓÚÑÇÜ]"
-          upper-pattern: '[A-ZÁÉÍÓÚÑÇÜ]'
-          lower-pattern: '[a-záéíóúñçü]'
-          not-lower-pattern: '[^a-záéíóúñçü]'
-          not-upper-or-lower-pattern: '[^A-ZÁÉÍÓÚÑÇÜa-záéíóúñçü]'
+          upper-pattern: "[A-ZÁÉÍÓÚÑÇÜ]"
+          lower-pattern: "[a-záéíóúñçü]"
+          not-lower-pattern: "[^a-záéíóúñçü]"
+          not-upper-or-lower-pattern: "[^A-ZÁÉÍÓÚÑÇÜa-záéíóúñçü]"
           punctuation-pattern: "'"
           only_check_changed_files: false
           longest_word: "10"
