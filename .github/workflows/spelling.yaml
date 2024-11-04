@@ -106,7 +106,8 @@ jobs:
           extra_dictionaries: |
             cspell:software-terms/dict/softwareTerms.txt
             cspell:software-terms/dict/webServices.txt
-            cspell:aws/aws.txt
+            cspell:aws/dict/aws.txt
+            cspell:google/dict/google.txt
             cspell:bash/src/bash-words.txt
             cspell:data-science/src/data-science-models.txt
             cspell:data-science/src/data-science-terms.txt
@@ -117,8 +118,8 @@ jobs:
             cspell:npm/dict/npm.txt
             cspell:shell/dict/shell-all-words.txt
             cspell:k8s/dict/k8s.txt
-            cspell:filetypes/filetypes.txt
-            cspell:fonts/fonts.txt
+            cspell:filetypes/src/filetypes.txt
+            cspell:fonts/dict/fonts.txt
             cspell:node/dict/node.txt
             cspell:typescript/dict/typescript.txt
             cspell:golang/dict/go.txt
