@@ -91,17 +91,18 @@ jobs:
     steps:
       - name: check-spelling
         id: spelling
-        uses: check-spelling/check-spelling@prerelease
+        uses: check-spelling/check-spelling@main
         with:
           suppress_push_for_open_pull_request: ${{ github.actor != 'dependabot[bot]' && 1 }}
           checkout: true
           check_file_names: 1
-          spell_check_this: check-spelling/spell-check-this@prerelease
+          spell_check_this: check-spelling/spell-check-this@main
           post_comment: 0
           use_magic_file: 1
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
           experimental_apply_changes_via_bot: 1
+          dictionary_source_prefixes: '{"cspell": "https://raw.githubusercontent.com/streetsidesoftware/cspell-dicts/cspell-dicts@28.1.0/dictionaries/"}'
           extra_dictionaries:
             cspell:software-terms/dict/softwareTerms.txt
             cspell:software-terms/dict/webServices.txt
@@ -144,3 +145,4 @@ jobs:
           not-upper-or-lower-pattern: '[^A-ZÁÉÍÓÚÑÇÜa-záéíóúñçü]'
           punctuation-pattern: "'"
           only_check_changed_files: false
+          longest_word: "10"
