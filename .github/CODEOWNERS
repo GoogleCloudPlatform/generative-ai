@@ -76,3 +76,4 @@
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/raw_with_bigquery.ipynb @jeffonelson @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/e2e-gen-ai-app-starter-pack       @eliasecchig @lspatarog @mariagpuyol @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases/hey_llm                     @tushuhei @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/llamaindex-rag/backend/indexing/ @Lionel-Lim @GoogleCloudPlatform/generative-ai-devrel
