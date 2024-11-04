@@ -104,41 +104,41 @@ jobs:
           experimental_apply_changes_via_bot: 1
           dictionary_source_prefixes: '{"cspell": "https://raw.githubusercontent.com/streetsidesoftware/cspell-dicts/main/dictionaries/"}'
           extra_dictionaries: |
-            cspell:software-terms/dict/softwareTerms.txt
-            cspell:software-terms/dict/webServices.txt
             cspell:aws/dict/aws.txt
-            cspell:google/dict/google.txt
-            cspell:bash/src/bash-words.txt
-            cspell:data-science/src/data-science-models.txt
-            cspell:data-science/src/data-science-terms.txt
-            cspell:data-science/src/data-science-tools.txt
-            cspell:html/dict/html.txt
-            cspell:fullstack/dict/fullstack.txt
-            cspell:java/src/java.txt
-            cspell:npm/dict/npm.txt
-            cspell:shell/dict/shell-all-words.txt
-            cspell:k8s/dict/k8s.txt
-            cspell:filetypes/src/filetypes.txt
-            cspell:fonts/dict/fonts.txt
-            cspell:node/dict/node.txt
-            cspell:typescript/dict/typescript.txt
-            cspell:golang/dict/go.txt
-            cspell:php/dict/php.txt
+            cspell:bash/src/bash-words.txt    
             cspell:companies/dict/companies.txt
+            cspell:data-science/dict/data-science-models.txt
+            cspell:data-science/dict/data-science.txt
+            cspell:data-science/dict/data-science-tools.txt
+            cspell:de_DE/src/German_de_DE.dic
             cspell:django/requirements.txt
             cspell:django/dict/django.txt
             cspell:docker/src/docker-words.txt
-            cspell:mnemonics/src/mnemonics.txt
-            cspell:python/src/additional_words.txt
-            cspell:python/src/common/extra.txt
-            cspell:python/src/python/python-lib.txt
-            cspell:python/src/python/python.txt
-            cspell:svelte/dict/svelte.txt
             cspell:en_GB/src/hunspell/en_GB.dic
-            cspell:en_US/src/hunspell/en_US-large.dic
-            cspell:de_DE/src/German_de_DE.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
+            cspell:en_US/src/hunspell/en_US-large.dic
+            cspell:filetypes/src/filetypes.txt
+            cspell:flutter/src/flutter.txt
+            cspell:fonts/dict/fonts.txt
+            cspell:fullstack/dict/fullstack.txt
+            cspell:golang/dict/go.txt
+            cspell:google/dict/google.txt
+            cspell:html/dict/html.txt
+            cspell:it_IT/dict/it-it.trie
+            cspell:java/src/java.txt
+            cspell:k8s/dict/k8s.txt
+            cspell:mnemonics/dict/mnemonics.txt
+            cspell:node/dict/node.txt
+            cspell:npm/dict/npm.txt
             cspell:people-names/src/names.txt
+            cspell:php/dict/php.txt
+            cspell:python/dict/python.txt
+            cspell:python/dict/python-common.txt
+            cspell:shell/dict/shell-all-words.txt
+            cspell:software-terms/dict/softwareTerms.txt
+            cspell:software-terms/dict/webServices.txt
+            cspell:svelte/dict/svelte.txt
+            cspell:typescript/dict/typescript.txt
           ignore-pattern: "[^'a-záéíóúñçüA-ZÁÉÍÓÚÑÇÜ]"
           upper-pattern: "[A-ZÁÉÍÓÚÑÇÜ]"
           lower-pattern: "[a-záéíóúñçü]"
