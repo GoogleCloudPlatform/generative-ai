@@ -102,15 +102,17 @@ jobs:
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
           experimental_apply_changes_via_bot: 1
-          check_extra_dictionaries: ""
-          extra_dictionaries: |
+          extra_dictionaries:
             cspell:software-terms/dict/softwareTerms.txt
             cspell:software-terms/dict/webServices.txt
             cspell:aws/aws.txt
+            cspell:bash/src/bash-words.txt
+            cspell:data-science/src/data-science-models.txt
+            cspell:data-science/src/data-science-terms.txt
+            cspell:data-science/src/data-science-tools.txt
             cspell:html/dict/html.txt
             cspell:fullstack/dict/fullstack.txt
             cspell:java/src/java.txt
-            cspell:python/src/common/extra.txt
             cspell:npm/dict/npm.txt
             cspell:shell/dict/shell-all-words.txt
             cspell:k8s/dict/k8s.txt
@@ -130,6 +132,15 @@ jobs:
             cspell:python/src/python/python-lib.txt
             cspell:python/src/python/python.txt
             cspell:svelte/dict/svelte.txt
+            cspell:en_GB/src/hunspell/en_GB.dic
+            cspell:en_US/src/hunspell/en_US-large.dic
             cspell:de_DE/src/German_de_DE.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
-          only_check_changed_files: true
+            cspell:people-names/src/names.txt
+          ignore-pattern: "[^'a-záéíóúñçüA-ZÁÉÍÓÚÑÇÜ]"
+          upper-pattern: '[A-ZÁÉÍÓÚÑÇÜ]'
+          lower-pattern: '[a-záéíóúñçü]'
+          not-lower-pattern: '[^a-záéíóúñçü]'
+          not-upper-or-lower-pattern: '[^A-ZÁÉÍÓÚÑÇÜa-záéíóúñçü]'
+          punctuation-pattern: "'"
+          only_check_changed_files: false
