@@ -972,6 +972,7 @@ showlakes
 showland
 showor
 showtime
+showtimes
 siglap
 signings
 simage
