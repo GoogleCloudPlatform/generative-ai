@@ -17,15 +17,106 @@
 
 import type {GenerateContentResponse} from '@google-cloud/vertexai';
 
+/**
+ * Vertex AI location. Change this const if you want to use another location.
+ */
 const LOCATION = 'asia-northeast1';
-const IMAGEN_MODEL = 'imagen-3.0-fast-generate-001';
-const GEMINI_MODEL = 'gemini-1.5-flash';
 
-const PROP_KEY = {
-  OAUTH_CLIENT_ID: 'client_id',
-  OAUTH_CLIENT_SECRET: 'client_secret',
-  DRIVE_FOLDER_ID: 'folder_id',
-};
+/**
+ * Default Gemini model to use.
+ */
+const DEFAULT_GEMINI_MODEL = 'gemini-1.5-flash';
+
+/**
+ * Default Imagen model to use.
+ */
+const DEFAULT_IMAGEN_MODEL = 'imagen-3.0-fast-generate-001';
+
+/**
+ * Preset OAuth Client ID. If null, users must enter it in the sidebar.
+ */
+const PRESET_OAUTH_CLIENT_ID = null;
+
+/**
+ * Preset OAuth Client Secret. If null, users must enter it in the sidebar.
+ */
+const PRESET_OAUTH_CLIENT_SECRET = null;
+
+/**
+ * Preset Google Drive Folder ID to store generated images.
+ * If null, a new folder will be created.
+ */
+const PRESET_DRIVE_FOLDER_ID = null;
+
+/**
+ * Property service middleware.
+ * - If the value is preset, always returns it. The value is not writable.
+ * - Otherwise, reads from / write to GAS PropertiesService.
+ */
+class PropService {
+  static OAUTH_CLIENT_ID_KEY = 'client_id';
+  static OAUTH_CLIENT_SECRET_KEY = 'client_secret';
+  static DRIVE_FOLDER_ID_KEY = 'folder_id';
+
+  /** OAuth Client ID */
+  static get clientID() {
+    return PRESET_OAUTH_CLIENT_ID
+      ? PRESET_OAUTH_CLIENT_ID
+      : PropertiesService.getDocumentProperties().getProperty(
+          PropService.OAUTH_CLIENT_ID_KEY,
+        );
+  }
+
+  static set clientID(value) {
+    if (PRESET_OAUTH_CLIENT_ID) return;
+    if (!value) return;
+    PropertiesService.getDocumentProperties().setProperty(
+      PropService.OAUTH_CLIENT_ID_KEY,
+      value,
+    );
+  }
+
+  /** OAuth Client Secret */
+  static get clientSecret() {
+    return PRESET_OAUTH_CLIENT_SECRET
+      ? PRESET_OAUTH_CLIENT_SECRET
+      : PropertiesService.getDocumentProperties().getProperty(
+          PropService.OAUTH_CLIENT_SECRET_KEY,
+        );
+  }
+
+  static set clientSecret(value) {
+    if (PRESET_OAUTH_CLIENT_SECRET) return;
+    if (!value) return;
+    PropertiesService.getDocumentProperties().setProperty(
+      PropService.OAUTH_CLIENT_SECRET_KEY,
+      value,
+    );
+  }
+
+  /** Google Drive Folder ID to store generated images */
+  static get driveFolderID() {
+    return PRESET_DRIVE_FOLDER_ID
+      ? PRESET_DRIVE_FOLDER_ID
+      : PropertiesService.getDocumentProperties().getProperty(
+          PropService.DRIVE_FOLDER_ID_KEY,
+        );
+  }
+
+  static set driveFolderID(value) {
+    if (PRESET_DRIVE_FOLDER_ID) return;
+    if (!value) return;
+    PropertiesService.getDocumentProperties().setProperty(
+      PropService.DRIVE_FOLDER_ID_KEY,
+      value,
+    );
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function isOAuthClientPreset() {
+  return PRESET_OAUTH_CLIENT_ID && PRESET_OAUTH_CLIENT_SECRET;
+}
 
 /**
  * Gets Google Cloud Project Number from OAuth Client ID stored in Document Properties.
@@ -33,9 +124,7 @@ const PROP_KEY = {
  * @returns Google Cloud Project Number.
  */
 function getProjectNumber_() {
-  return PropertiesService.getDocumentProperties()
-    .getProperty(PROP_KEY.OAUTH_CLIENT_ID)
-    ?.split('-')[0];
+  return PropService.clientID?.split('-')[0];
 }
 
 /**
@@ -81,16 +170,10 @@ function use() {
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getAuthorizationUrl() {
-  const clientID = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_ID,
-  );
-  const clientSecret = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_SECRET,
-  );
-  if (clientID && clientSecret) {
-    return getGoogleService_().getAuthorizationUrl();
-  }
-  return undefined;
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) return null;
+  return getGoogleService_(clientID, clientSecret).getAuthorizationUrl();
 }
 
 /**
@@ -100,23 +183,28 @@ function getAuthorizationUrl() {
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function authCallback(request: object) {
-  const isAuthorized = getGoogleService_().handleCallback(request);
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) {
+    return HtmlService.createHtmlOutput('Client ID / Secret not set.');
+  }
+  const isAuthorized = getGoogleService_(clientID, clientSecret).handleCallback(
+    request,
+  );
   if (isAuthorized) {
     return HtmlService.createHtmlOutput('Success! You can close this tab.');
   } else {
     return HtmlService.createHtmlOutput('Denied. You can close this tab');
   }
 }
+
 /**
  * Sets OAuth Client ID to Document Properties.
  * @param val OAuth Client ID
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setClientID(val: string) {
-  PropertiesService.getDocumentProperties().setProperty(
-    PROP_KEY.OAUTH_CLIENT_ID,
-    val,
-  );
+  PropService.clientID = val;
 }
 
 /**
@@ -125,40 +213,49 @@ function setClientID(val: string) {
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setClientSecret(val: string) {
-  PropertiesService.getDocumentProperties().setProperty(
-    PROP_KEY.OAUTH_CLIENT_SECRET,
-    val,
-  );
+  PropService.clientSecret = val;
 }
 
 /**
  * Asks Gemini for a response based on a provided context and input.
  * @param {string} instruction An instruction that describes the task.
  * @param {string} input The input data to process based on the instruction.
- * @param {string[][]} context The context that LLM should be aware of.
+ * @param {string[][]} context Optional context that LLM should be aware of.
+ *   You can specify a cell range that includes examples, reference data, etc.
+ * @param {string} model The Gemini model version to use (default: gemini-1.5-flash).
+ *   See https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models for available models.
  * @return {string} The LLM's response, trimmed and ready for use in a spreadsheet cell.
  * @customFunction
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function HEY_LLM(instruction: string, input: string, context: string[][] = []) {
+function HEY_LLM(
+  instruction: string,
+  input: string,
+  context: string[][] = [],
+  model = DEFAULT_GEMINI_MODEL,
+) {
   const prompt = `
 ## Instruction
 ${instruction}
 
-## Context (CSV formatted)
-${context ? context.map(row => row.join(', ')).join('\n') : ''}
+${context ? '## Context (CSV formatted)\n' + context.map(row => row.join(', ')).join('\n') : ''}
 
 ## Task
 Input: ${input}
 Output:`;
 
   const cache = CacheService.getDocumentCache();
-  const cacheKey = `hey_llm:${generateHashValue(prompt)}`;
+  const cacheKey = `hey_llm:${generateHashValue(prompt)}:${model}`;
   const cached = cache?.get(cacheKey);
   if (cached) return cached;
 
-  const oauthService = getGoogleService_();
-  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${GEMINI_MODEL}:generateContent`;
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) {
+    throw new Error('OAuth client ID / Secret not set.');
+  }
+  const oauthService = getGoogleService_(clientID, clientSecret);
+  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${model}:generateContent`;
 
   const payload = JSON.stringify({
     contents: [
@@ -378,14 +475,16 @@ function createDriveFolder_(oauth: GoogleAppsScriptOAuth2.OAuth2Service) {
  * @param oauth OAuth2 Service
  * @param prompt A prompt for image generation
  * @param seed A seed number
+ * @param {string} model The Imagen model version to use
  * @returns Generated result
  */
 function requestImagen_(
   oauth: GoogleAppsScriptOAuth2.OAuth2Service,
   prompt: string,
   seed: number,
+  model: string,
 ) {
-  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${IMAGEN_MODEL}:predict`;
+  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${model}:predict`;
 
   const payload = JSON.stringify({
     instances: [
@@ -418,10 +517,7 @@ function requestImagen_(
   } = JSON.parse(res.getContentText());
   if (!result.predictions) {
     Logger.log(payload, result);
-    throw new Error(
-      'Request to Vertex AI failed. Is Vertex AI API enabled? ' +
-        res.getContentText(),
-    );
+    throw new Error('Request to Vertex AI failed. ' + res.getContentText());
   }
   return result.predictions[0];
 }
@@ -430,40 +526,44 @@ function requestImagen_(
  * Generates an image out of a prompt using Vertex AI's Imagen.
  * @param {string} prompt A prompt for image generation
  * @param {number} seed A seed number
+ * @param {string} model The Imagen model version to use (default: imagen-3.0-fast-generate-001).
+ *   See https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images for available models.
  * @return {string} Generated image's URL
  * @customFunction
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function IMAGEN(prompt: string, seed = 1) {
-  const cacheKey = generateHashValue(`imagen:${prompt}:${seed}`);
+function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL) {
+  const cacheKey = generateHashValue(`imagen:${prompt}:${seed}:${model}`);
   const cache = CacheService.getDocumentCache();
   const cached = cache?.get(cacheKey);
   if (cached) {
     return cached;
   }
-  const oauthService = getGoogleService_();
-  let parentFolderID = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.DRIVE_FOLDER_ID,
-  );
-  if (!parentFolderID) {
-    parentFolderID = createDriveFolder_(oauthService);
-    PropertiesService.getDocumentProperties().setProperty(
-      PROP_KEY.DRIVE_FOLDER_ID,
-      parentFolderID,
-    );
+  const clientID = PropService.clientID;
+  const clientSecret = PropService.clientSecret;
+  if (!clientID || !clientSecret) {
+    throw new Error('OAuth client ID / Secret not set.');
+  }
+  const oauthService = getGoogleService_(clientID, clientSecret);
+  if (!PropService.driveFolderID) {
+    PropService.driveFolderID = createDriveFolder_(oauthService);
   }
   const filename = sanitizeFileName(`${cacheKey}:${prompt.slice(0, 64)}.png`);
-  const driveUrl = checkDriveImage_(oauthService, filename, parentFolderID);
+  const driveUrl = checkDriveImage_(
+    oauthService,
+    filename,
+    PropService.driveFolderID,
+  );
   if (driveUrl) {
     return driveUrl;
   }
-  const pred = requestImagen_(oauthService, prompt, seed);
+  const pred = requestImagen_(oauthService, prompt, seed, model);
   const thumbnailLink = uploadImageToDrive_(
     oauthService,
     pred.bytesBase64Encoded,
     filename,
     pred.mimeType,
-    parentFolderID,
+    PropService.driveFolderID,
   );
 
   // Trim resize parameters that comes after the equal mark.
@@ -481,19 +581,7 @@ function IMAGEN(prompt: string, seed = 1) {
  * @private
  * @returns OAuth2 service
  */
-function getGoogleService_() {
-  const clientID = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_ID,
-  );
-  const clientSecret = PropertiesService.getDocumentProperties().getProperty(
-    PROP_KEY.OAUTH_CLIENT_SECRET,
-  );
-  if (!clientID || !clientSecret) {
-    throw new Error(
-      'OAuth info is missing. Complete authorization from the "Extensions" menu',
-    );
-  }
-
+function getGoogleService_(clientID: string, clientSecret: string) {
   // Create a new service with the given name. The name will be used when
   // persisting the authorized token, so ensure it is unique within the
   // scope of the property store.

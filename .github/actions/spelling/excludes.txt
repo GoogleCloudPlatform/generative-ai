@@ -83,6 +83,11 @@
 ^\Q.github/workflows/spelling.yaml\E$
 ^\Q.github/workflows/notebook_linter/run_linter.sh\E$
 ^\Q.github/workflows/linter.yaml\E$
+^\Qgemini/use-cases/education/use_cases_for_education.ipynb\E$
+^\Qgemini/evaluation/legacy/evaluate_gemini_with_autosxs_custom_task.ipynb\E$
+^\Qgemini/sample-apps/image-bash-jam/gemini-explain-image-italian.sh\E$
+^\Qgemini/sample-apps/image-bash-jam/tts.sh\E$
+^\Qgemini/use-cases/document-processing/sheet_music.ipynb\E$
 ^\Qgemini/function-calling/use_case_company_news_and_insights.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_1_5_pro.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_pro_vision_python.ipynb\E$
@@ -97,7 +102,6 @@
 ^\Qgemini/use-cases/intro_multimodal_use_cases.ipynb\E$
 ^\Qgemini/use-cases/retrieval-augmented-generation/intro_multimodal_rag.ipynb\E$
 ^\Qgemini/use-cases/retail/product_attributes_extraction.ipynb\E$
-^\Qlanguage/use-cases/document-qa/utils/__init__.py\E$
 ^\Qlanguage/use-cases/marketing-image-overlay/marketing_image_overlay.ipynb\E$
 ^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
 ^\Qvision/getting-started/image_editing_maskmode.ipynb\E$
@@ -107,6 +111,5 @@
 ^\Qgemini/orchestration/llamaindex_workflows.ipynb\E$
 ignore$
 ^\Qowlbot.py\E$
-^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
 ^\Qnoxfile.py\E$

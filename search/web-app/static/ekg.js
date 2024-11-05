@@ -33,7 +33,7 @@ const typesTextField = new MDCTextField(document.querySelector(".mdc-text-field.
 const select = new MDCSelect(document.querySelector(".mdc-select"));
 const tabBar = new MDCTabBar(document.querySelector(".mdc-tab-bar"));
 
-const chipset = new MDCChipSet(document.querySelector(".mdc-chip-set"));
+const chipSet = new MDCChipSet(document.querySelector(".mdc-chip-set"));
 const chip = new MDCChipSet(document.querySelector(".mdc-chip"));
 
 const jsonTabSelector = document.querySelector("#json-tab-selector");

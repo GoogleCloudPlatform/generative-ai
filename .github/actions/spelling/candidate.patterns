@@ -491,8 +491,6 @@ content: (['"])[-a-zA-Z=;:/0-9+]*=\g{-1}
 \.match\(/[^/\s"]{3,}/[gim]*\s*
 # javascript match regex
 \.match\(/\\[b].{3,}?/[gim]*\s*\)(?:;|$)
-# javascript regex
-^\s*/\\[b]{3,}*/[gim]*\s*(?:\)(?:;|$)|,$)
 # javascript replace regex
 \.replace\(/[^/\s"]{3,}/[gim]*\s*,
 # assign regex

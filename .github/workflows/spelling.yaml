@@ -91,45 +91,74 @@ jobs:
     steps:
       - name: check-spelling
         id: spelling
-        uses: check-spelling/check-spelling@prerelease
+        uses: check-spelling/check-spelling@main
         with:
           suppress_push_for_open_pull_request: ${{ github.actor != 'dependabot[bot]' && 1 }}
           checkout: true
           check_file_names: 1
-          spell_check_this: check-spelling/spell-check-this@prerelease
+          spell_check_this: check-spelling/spell-check-this@main
           post_comment: 0
           use_magic_file: 1
           report-timing: 1
           warnings: bad-regex,binary-file,deprecated-feature,ignored-expect-variant,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check,unclosed-block-ignore-begin,unclosed-block-ignore-end
           experimental_apply_changes_via_bot: 1
-          check_extra_dictionaries: ""
+          dictionary_source_prefixes: '{"cspell": "https://raw.githubusercontent.com/streetsidesoftware/cspell-dicts/main/dictionaries/"}'
           extra_dictionaries: |
-            cspell:software-terms/dict/softwareTerms.txt
-            cspell:software-terms/dict/webServices.txt
-            cspell:aws/aws.txt
-            cspell:html/dict/html.txt
-            cspell:fullstack/dict/fullstack.txt
-            cspell:java/src/java.txt
-            cspell:python/src/common/extra.txt
-            cspell:npm/dict/npm.txt
-            cspell:shell/dict/shell-all-words.txt
-            cspell:k8s/dict/k8s.txt
-            cspell:filetypes/filetypes.txt
-            cspell:fonts/fonts.txt
-            cspell:node/dict/node.txt
-            cspell:typescript/dict/typescript.txt
-            cspell:golang/dict/go.txt
-            cspell:php/dict/php.txt
+            cspell:aws/dict/aws.txt
+            cspell:bash/src/bash-words.txt    
             cspell:companies/dict/companies.txt
+            cspell:css/dict/css.txt
+            cspell:data-science/dict/data-science-models.txt
+            cspell:data-science/dict/data-science.txt
+            cspell:data-science/dict/data-science-tools.txt
+            cspell:dart/src/dart.txt
+            cspell:de_DE/src/German_de_DE.dic
             cspell:django/requirements.txt
             cspell:django/dict/django.txt
             cspell:docker/src/docker-words.txt
-            cspell:mnemonics/src/mnemonics.txt
-            cspell:python/src/additional_words.txt
-            cspell:python/src/common/extra.txt
-            cspell:python/src/python/python-lib.txt
-            cspell:python/src/python/python.txt
-            cspell:svelte/dict/svelte.txt
-            cspell:de_DE/src/German_de_DE.dic
+            cspell:en_GB/src/hunspell/en_GB.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
+            cspell:en_US/src/hunspell/en_US-large.dic
+            cspell:filetypes/src/filetypes.txt
+            cspell:flutter/src/flutter.txt
+            cspell:fonts/dict/fonts.txt
+            cspell:fr_FR/fr-fr.trie
+            cspell:fullstack/dict/fullstack.txt
+            cspell:golang/dict/go.txt
+            cspell:google/dict/google.txt
+            cspell:html/dict/html.txt
+            cspell:it_IT/dict/it-it.trie
+            cspell:java/src/java.txt
+            cspell:k8s/dict/k8s.txt
+            cspell:mnemonics/dict/mnemonics.txt
+            cspell:monkeyc/src/monkeyc_keywords.txt
+            cspell:node/dict/node.txt
+            cspell:npm/dict/npm.txt
+            cspell:people-names/dict/people-names.txt
+            cspell:php/dict/php.txt
+            cspell:python/dict/python.txt
+            cspell:python/dict/python-common.txt
+            cspell:shell/dict/shell-all-words.txt
+            cspell:software-terms/dict/softwareTerms.txt
+            cspell:software-terms/dict/webServices.txt
+            cspell:sql/src/common-terms.txt
+            cspell:sql/src/sql.txt
+            cspell:sql/src/tsql.txt
+            cspell:svelte/dict/svelte.txt
+            cspell:terraform/dict/terraform.txt
+            cspell:typescript/dict/typescript.txt
+          check_extra_dictionaries:
+            cspell:cryptocurrencies/dict/cryptocurrencies.txt
+            cspell:gaming-terms/dict/gaming-terms.txt
+            cspell:latex/dict/latex.txt
+            cspell:public-licenses/src/additional-licenses.txt
+            cspell:public-licenses/src/generated/public-licenses.txt
+            cspell:scientific_terms_US/custom_scientific_US.trie
+          ignore-pattern: "[^'a-záéíóúñçüA-ZÁÉÍÓÚÑÇÜ]"
+          upper-pattern: "[A-ZÁÉÍÓÚÑÇÜ]"
+          lower-pattern: "[a-záéíóúñçü]"
+          not-lower-pattern: "[^a-záéíóúñçü]"
+          not-upper-or-lower-pattern: "[^A-ZÁÉÍÓÚÑÇÜa-záéíóúñçü]"
+          punctuation-pattern: "'"
           only_check_changed_files: true
+          longest_word: "10"

@@ -19,8 +19,21 @@
         margin-bottom: 1rem;
       }
 
+      .instruction {
+        display: none;
+      }
+
+      .require-input .instruction {
+        display: block;
+      }
+
       .form-section {
+        display: none;
         margin-bottom: 1rem;
+      }
+
+      .require-input .form-section {
+        display: block;
       }
 
       .form-section input {
@@ -61,19 +74,19 @@
   <body>
     <section>
       <h1>HEY_LLM setup</h1>
-      <ol>
+      <ol class="instruction">
         <li>
           Visit
           <a
             href="https://console.cloud.google.com/apis/credentials/"
             target="_blank"
-            >“API &amp; Services” &gt; “Credentials”</a
+            >"API &amp; Services" &gt; "Credentials"</a
           >
           in Google Cloud Console.
         </li>
         <li>
-          Select the OAuth Client ID to use. The Application type should be “Web
-          Application”.
+          Select the OAuth Client ID to use. The Application type should be "Web
+          Application".
         </li>
         <li>
           Add <span class="redirect-url">(loading...)</span> to Authorized
@@ -81,7 +94,7 @@
         </li>
         <li>
           Copy and paste Client ID and Client secret to the input form below and
-          click “Authorize”.
+          click "Authorize".
         </li>
       </ol>
       <div class="form-section">
@@ -165,6 +178,17 @@
           });
         })
         .getScriptId();
+
+      google.script.run
+        .withSuccessHandler(value => {
+          if (value) {
+            authorizeButton.textContent = BUTTON_LABEL.checking;
+            checkIfReadyToAuthorize();
+          } else {
+            document.body.classList.add('require-input');
+          }
+        })
+        .isOAuthClientPreset();
     </script>
   </body>
 </html>
