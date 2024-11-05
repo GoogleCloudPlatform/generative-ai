@@ -53,7 +53,7 @@ def create_endpoint(index_endpoint_name: str):
             filter=f"display_name={index_endpoint_name}"
         )
     ]
-    
+
     vs_endpoint = aiplatform.MatchingEngineIndexEndpoint(
         index_endpoint_name=endpoint_names[0]
     )
