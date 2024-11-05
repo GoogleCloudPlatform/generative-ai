@@ -18,7 +18,7 @@ In this scenario, we'll be adding 3 new Gen AI features to GenWealth's existing 
 
 Imagine you are a Financial Analyst, and you need to analyze a Prospectus [like this](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/sample-prospectus/RYDE.pdf) for an upcoming IPO.
 
-You're expected to create a company overview, a stock analysis, and determine a buy/sell/ or hold rating for this new security. You could comb through the 191-page prospectus and draft something from scratch, or you can use Gen AI to jumpstart your effort.
+You're expected to create a company overview, a stock analysis, and determine a buy/sell/ or hold rating for this new security. You could comb through the 191-page prospectus and draft something from scratch, or you can use Gen AI to jump-start your effort.
 
 You can simply drop that file into the `$PROJECT_ID-docs` bucket in GCS to kick off a pipeline of Cloud Functions that perform the steps listed below.
 

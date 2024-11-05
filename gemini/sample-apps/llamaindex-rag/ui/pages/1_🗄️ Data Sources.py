@@ -128,7 +128,7 @@ if firestore_databases:
     selected_database = st.selectbox(
         "Select a Firestore Databases", index=0, options=firestore_databases + [None]
     )
-    st.subheader("Choose a FireStore document store to accompany Vector Search.")
+    st.subheader("Choose a Firestore document store to accompany Vector Search.")
     firestore_collections = fetch_firestore_collections(selected_database)
     if firestore_collections:
         selected_collection_namespace = st.selectbox(
