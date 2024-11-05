@@ -5,12 +5,6 @@ from google.cloud import aiplatform
 
 def create_index(vector_index_name: str, approximate_neighbors_count: int):
     """Creates a vector search index."""
-    index_names = [
-        index.resource_name
-        for index in aiplatform.MatchingEngineIndex.list(
-            filter=f"display_name={vector_index_name}"
-        )
-    ]
     print(f"Creating Vector Search index {vector_index_name} ...")
     vs_index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
         display_name=vector_index_name,
@@ -24,6 +18,15 @@ def create_index(vector_index_name: str, approximate_neighbors_count: int):
         f"Vector Search index {vs_index.display_name} "
         f"created with resource name {vs_index.resource_name}"
     )
+
+    # Get the list of index names after creating the index
+    index_names = [
+        index.resource_name
+        for index in aiplatform.MatchingEngineIndex.list(
+            filter=f"display_name={vector_index_name}"
+        )
+    ]
+
     vs_index = aiplatform.MatchingEngineIndex(index_name=index_names[0])
     print(
         f"Vector Search index {vs_index.display_name} "
@@ -34,12 +37,6 @@ def create_index(vector_index_name: str, approximate_neighbors_count: int):
 
 def create_endpoint(index_endpoint_name: str):
     """Creates an index endpoint."""
-    endpoint_names = [
-        endpoint.resource_name
-        for endpoint in aiplatform.MatchingEngineIndexEndpoint.list(
-            filter=f"display_name={index_endpoint_name}"
-        )
-    ]
     print(f"Creating Vector Search index endpoint {index_endpoint_name} ...")
     vs_endpoint = aiplatform.MatchingEngineIndexEndpoint.create(
         display_name=index_endpoint_name, public_endpoint_enabled=True
@@ -48,6 +45,15 @@ def create_endpoint(index_endpoint_name: str):
         f"Vector Search index endpoint {vs_endpoint.display_name} "
         f"created with resource name {vs_endpoint.resource_name}"
     )
+
+    # Get the list of endpoints names after creating the index
+    endpoint_names = [
+        endpoint.resource_name
+        for endpoint in aiplatform.MatchingEngineIndexEndpoint.list(
+            filter=f"display_name={index_endpoint_name}"
+        )
+    ]
+
     vs_endpoint = aiplatform.MatchingEngineIndexEndpoint(
         index_endpoint_name=endpoint_names[0]
     )
