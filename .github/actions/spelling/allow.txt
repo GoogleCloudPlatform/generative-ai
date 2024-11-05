@@ -48,6 +48,7 @@ CWLEY
 CZE
 Caitlyn
 Caprese
+Carreras
 Chocolat
 Codelab
 Codey
@@ -68,6 +69,7 @@ Disturbia
 Doaa
 Doogler
 Dreesen
+Duh
 Durafast
 Durmus
 EDB
@@ -95,6 +97,7 @@ Feng
 Finvest
 Firestore
 Fishburne
+Flahs
 Flatform
 Flipkart
 Frodo
@@ -147,6 +150,7 @@ IVF
 Isner
 JPY
 Jang
+Jax
 Jedi
 Jian
 Jibo
@@ -190,6 +194,7 @@ Leung
 Llion
 Loghub
 Logrus
+Lopyrev
 Lottry
 MLB
 MSCHF
@@ -252,6 +257,7 @@ Phanfone
 Pharma
 Photoshop
 Pistorius
+Pranav
 Priyanka
 QPM
 Qwiklab
@@ -266,6 +272,7 @@ RRF
 RTN
 RYDE
 Raducanu
+Rajpurkar
 Reranking
 Resona
 Rizzoli
@@ -285,6 +292,7 @@ SNE
 SPII
 SPLADE
 SSRF
+STIX
 SUBLANG
 SWP
 SYMED
@@ -420,6 +428,7 @@ bigquery
 bitcoin
 blogs
 bml
+booktitle
 boundings
 bpa
 bpd
@@ -478,6 +487,7 @@ dino
 diy
 docai
 docstore
+doi
 dotprompt
 dpi
 draig
@@ -691,6 +701,7 @@ paleo
 pancetta
 pantarba
 paracord
+parcoords
 passwort
 pastiched
 payslip
@@ -766,6 +777,7 @@ scikit
 seaborn
 selectbox
 sft
+showarrow
 showlakes
 showland
 showor
@@ -850,6 +862,7 @@ wparam
 wscore
 wscores
 wstring
+xanchor
 xaxes
 xaxis
 xcassets
@@ -862,10 +875,12 @@ xmltodict
 xsi
 xticks
 xxxxxxxx
+yanchor
 yaxes
 yaxis
 ylabel
 youtube
+yref
 ytd
 yticks
 zaxis
