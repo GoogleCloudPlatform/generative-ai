@@ -791,6 +791,7 @@ lexer
 linalg
 linecolor
 linestyle
+linkedin
 linted
 linting
 llm
@@ -1086,6 +1087,7 @@ webpages
 websites
 weightage
 welcom
+whatsapp
 wiffle
 wikipedia
 wil
