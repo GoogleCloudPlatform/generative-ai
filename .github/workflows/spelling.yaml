@@ -134,7 +134,7 @@ jobs:
             cspell:monkeyc/src/monkeyc_keywords.txt
             cspell:node/dict/node.txt
             cspell:npm/dict/npm.txt
-            cspell:people-names/dict/names.txt
+            cspell:people-names/dict/people-names.txt
             cspell:php/dict/php.txt
             cspell:python/dict/python.txt
             cspell:python/dict/python-common.txt
