@@ -33,6 +33,11 @@ const DEFAULT_GEMINI_MODEL = 'gemini-1.5-flash';
 const DEFAULT_IMAGEN_MODEL = 'imagen-3.0-fast-generate-001';
 
 /**
+ * Default aspect ratio for image generation
+ */
+const DEFAULT_ASPECT_RATIO = '1:1';
+
+/**
  * Preset OAuth Client ID. If null, users must enter it in the sidebar.
  */
 const PRESET_OAUTH_CLIENT_ID = null;
@@ -231,14 +236,18 @@ function setClientSecret(val: string) {
 function HEY_LLM(
   instruction: string,
   input: string,
-  context: string[][] = [],
+  context: string[][] | string = [],
   model = DEFAULT_GEMINI_MODEL,
 ) {
+  const formattedContext =
+    typeof context === 'string'
+      ? context
+      : context.map(row => row.join(', ')).join('\n');
   const prompt = `
 ## Instruction
 ${instruction}
 
-${context ? '## Context (CSV formatted)\n' + context.map(row => row.join(', ')).join('\n') : ''}
+${formattedContext ? '## Context (CSV formatted)\n' + formattedContext : ''}
 
 ## Task
 Input: ${input}
@@ -475,7 +484,8 @@ function createDriveFolder_(oauth: GoogleAppsScriptOAuth2.OAuth2Service) {
  * @param oauth OAuth2 Service
  * @param prompt A prompt for image generation
  * @param seed A seed number
- * @param {string} model The Imagen model version to use
+ * @param model The Imagen model version to use
+ * @param aspectRatio Aspect ratio of the generated image
  * @returns Generated result
  */
 function requestImagen_(
@@ -483,6 +493,7 @@ function requestImagen_(
   prompt: string,
   seed: number,
   model: string,
+  aspectRatio: string,
 ) {
   const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${getProjectNumber_()}/locations/${LOCATION}/publishers/google/models/${model}:predict`;
 
@@ -498,6 +509,7 @@ function requestImagen_(
       addWatermark: false,
       safetySetting: 'block_few',
       language: 'auto',
+      aspectRatio,
     },
   });
   const res = UrlFetchApp.fetch(url, {
@@ -532,8 +544,15 @@ function requestImagen_(
  * @customFunction
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL) {
-  const cacheKey = generateHashValue(`imagen:${prompt}:${seed}:${model}`);
+function IMAGEN(
+  prompt: string,
+  seed = 1,
+  model = DEFAULT_IMAGEN_MODEL,
+  aspectRatio = DEFAULT_ASPECT_RATIO,
+) {
+  const cacheKey = generateHashValue(
+    `imagen:${prompt}:${seed}:${model}:${aspectRatio}`,
+  );
   const cache = CacheService.getDocumentCache();
   const cached = cache?.get(cacheKey);
   if (cached) {
@@ -557,7 +576,7 @@ function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL) {
   if (driveUrl) {
     return driveUrl;
   }
-  const pred = requestImagen_(oauthService, prompt, seed, model);
+  const pred = requestImagen_(oauthService, prompt, seed, model, aspectRatio);
   const thumbnailLink = uploadImageToDrive_(
     oauthService,
     pred.bytesBase64Encoded,

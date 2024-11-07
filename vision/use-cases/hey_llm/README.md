@@ -29,7 +29,7 @@ If you don't need to specify `context` but want to specify `model`, pass an empt
 ### IMAGEN
 
 ```bash
-=IMAGEN(prompt, [seed], [model])
+=IMAGEN(prompt, [seed], [model], [aspectRatio])
 ```
 
 `prompt` is a text that describes the image you want to generate.
@@ -38,10 +38,12 @@ _Optional:_ `seed` is a random seed number. Try change this number if you want t
 
 _Optional:_ `model` is a Imagen model version to use. The default value is `imagen-3.0-fast-generate-001`. See [Generate images using text prompts](https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images) for available models.
 
+_Optional:_ `aspectRatio` is the aspect ratio of the generated image. The default value is `1:1`. See [Generate images using text prompts](https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images) for available aspect ratio options.
+
 Combine with `=IMAGE` to render the generated image in the spreadsheet.
 
 ```bash
-=IMAGE(IMAGEN("Mount Fuji", 2, "imagen-3.0-generate-001"))
+=IMAGE(IMAGEN("Mount Fuji", 2, "imagen-3.0-generate-001", "16:9"))
 ```
 
 ## Prerequisites
