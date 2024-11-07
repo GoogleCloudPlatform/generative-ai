@@ -236,14 +236,18 @@ function setClientSecret(val: string) {
 function HEY_LLM(
   instruction: string,
   input: string,
-  context: string[][] = [],
+  context: string[][] | string = [],
   model = DEFAULT_GEMINI_MODEL,
 ) {
+  const formattedContext =
+    typeof context === 'string'
+      ? context
+      : context.map(row => row.join(', ')).join('\n');
   const prompt = `
 ## Instruction
 ${instruction}
 
-${context ? '## Context (CSV formatted)\n' + context.map(row => row.join(', ')).join('\n') : ''}
+${formattedContext ? '## Context (CSV formatted)\n' + formattedContext : ''}
 
 ## Task
 Input: ${input}
