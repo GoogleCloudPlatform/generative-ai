@@ -822,6 +822,7 @@ mrr
 multitool
 mvn
 mvnw
+mvp
 mwouts
 myaccount
 mydb
@@ -1033,6 +1034,7 @@ tts
 tures
 typehints
 ubuntu
+uids
 undst
 unigram
 unrtf
@@ -1042,6 +1044,7 @@ usebackq
 usecases
 username
 usernames
+uuids
 uvb
 uvicorn
 vais
@@ -1062,6 +1065,7 @@ webclient
 webpage
 webpages
 websites
+weightage
 welcom
 wiffle
 wikipedia
