@@ -540,8 +540,15 @@ function requestImagen_(
  * @customFunction
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function IMAGEN(prompt: string, seed = 1, model = DEFAULT_IMAGEN_MODEL, aspectRatio = DEFAULT_ASPECT_RATIO) {
-  const cacheKey = generateHashValue(`imagen:${prompt}:${seed}:${model}:${aspectRatio}`);
+function IMAGEN(
+  prompt: string,
+  seed = 1,
+  model = DEFAULT_IMAGEN_MODEL,
+  aspectRatio = DEFAULT_ASPECT_RATIO,
+) {
+  const cacheKey = generateHashValue(
+    `imagen:${prompt}:${seed}:${model}:${aspectRatio}`,
+  );
   const cache = CacheService.getDocumentCache();
   const cached = cache?.get(cacheKey);
   if (cached) {
