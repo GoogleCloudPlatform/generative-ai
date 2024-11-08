@@ -3,7 +3,7 @@ import mimetypes
 from typing import Dict
 
 from google.cloud import documentai
-from vertexai.generative_models import GenerativeModel, Part
+from vertexai.generative_models import GenerativeModel, Part, GenerationConfig
 
 
 class EntityExtractor:
@@ -31,7 +31,22 @@ class ModelBasedEntityExtractor(EntityExtractor):
     """Class for Gemini entity extraction"""
 
     def __init__(self, model_version: str, prompt: str, file_path: str) -> None:
-        self.model = GenerativeModel(model_version)
+        self.config = GenerationConfig(
+            temperature = 0.0,
+            top_p = 0.8,
+            top_k = 32,
+            candidate_count = 1,
+            max_output_tokens = 2048,
+            responseMimeType = "application/json" 
+        )
+        self.safety_config = {
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+        }
+        self.model = GenerativeModel(model_version, safety_settings = self.safety_config, generation_config = self.config)
         self.prompt = prompt
         mime_type = mimetypes.guess_type(file_path)[0]
         if (mime_type is None) or (mime_type != "application/pdf"):
