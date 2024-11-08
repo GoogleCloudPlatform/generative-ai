@@ -540,6 +540,7 @@ function requestImagen_(
  * @param {number} seed A seed number
  * @param {string} model The Imagen model version to use (default: imagen-3.0-fast-generate-001).
  *   See https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images for available models.
+ * @param {string} aspectRatio The aspect ratio of the generated image
  * @return {string} Generated image's URL
  * @customFunction
  */
@@ -550,6 +551,9 @@ function IMAGEN(
   model = DEFAULT_IMAGEN_MODEL,
   aspectRatio = DEFAULT_ASPECT_RATIO,
 ) {
+  // If user specifies a blank string for model, it falls back to the default model.
+  model = model ? model : DEFAULT_IMAGEN_MODEL;
+
   const cacheKey = generateHashValue(
     `imagen:${prompt}:${seed}:${model}:${aspectRatio}`,
   );
