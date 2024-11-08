@@ -12,7 +12,6 @@ class EntityExtractor(ABC):
     @abstractmethod
     def extract_entities(self) -> Dict:
         """Abstract method to extract entities."""
-        pass
 
 
 class DocumentAIEntityExtractor(EntityExtractor):
