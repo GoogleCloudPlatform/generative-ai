@@ -1,17 +1,18 @@
 import json
 import mimetypes
 from typing import Dict
-
+from abc import ABC, abstractmethod
 from google.cloud import documentai
 from vertexai.generative_models import GenerativeModel, Part, GenerationConfig
 
 
-class EntityExtractor:
-    """Abstract class representing an entity"""
+class EntityExtractor(ABC):
+    """Abstract Base Class for entity extraction."""
 
+    @abstractmethod
     def extract_entities(self) -> Dict:
-        """Abstract function"""
-        raise NotImplementedError()
+        """Abstract method to extract entities."""
+        pass
 
 
 class DocumentAIEntityExtractor(EntityExtractor):
