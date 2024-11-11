@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import field
 from typing import TypedDict
 
-from dataclasses import field
 from dataclasses_json import dataclass_json
-
 import mesop as me
 
 
@@ -29,13 +28,13 @@ page_json = [
     {"display": "Generate story", "route": "/"},
     {"display": "Marketing campaign", "route": "/marketing"},
     {"display": "Image playground", "route": "/images"},
-    {"display": "Video playground", "route": "/videos"}
+    {"display": "Video playground", "route": "/videos"},
 ]
 
 
 @dataclass_json
 @me.stateclass
-class State():
+class State:
     pages: list[Page] = field(default_factory=lambda: page_json)
     current_page: str
 
@@ -56,15 +55,12 @@ _DEFAULT_BORDER = me.Border.all(
 )
 
 _STYLE_MAIN_HEADER = me.Style(
-  border=_DEFAULT_BORDER,
-  padding=me.Padding.all(5),
+    border=_DEFAULT_BORDER,
+    padding=me.Padding.all(5),
 )
 
-_STYLE_CURRENT_NAV = me.Style(
-    color="#99000",
-    border_radius=0,
-    font_weight="bold"
-)
+_STYLE_CURRENT_NAV = me.Style(color="#99000", border_radius=0, font_weight="bold")
+
 
 def page_navigation_menu(url: str) -> None:
     state = me.state(State)
@@ -81,7 +77,7 @@ def page_navigation_menu(url: str) -> None:
                     disabled=disabled,
                     style=_STYLE_CURRENT_NAV if disabled else me.Style(),
                     # type="flat" if disabled else "stroked"
-                    )
+                )
 
 
 @me.content_component
