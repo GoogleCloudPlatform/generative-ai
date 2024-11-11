@@ -10,7 +10,7 @@ Sample screenshots and video demos of the application are shown below:
 
 ## Application screenshots
 
-![image playground](images/imageplayground.png)
+![image playground](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/mesop-cloudrun/imageplayground.png)
 
 ## Run the Application locally (on Cloud Shell)
 
