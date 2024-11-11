@@ -48,10 +48,10 @@ def navigate_to(e: me.ClickEvent):
 
 _DEFAULT_BORDER = me.Border.all(
     me.BorderSide(
-        color="#e0e0e0", 
-        width=1, 
+        color="#e0e0e0",
+        width=1,
         style="solid",
-    )   
+    )
 )
 
 _STYLE_MAIN_HEADER = me.Style(
@@ -65,23 +65,21 @@ _STYLE_CURRENT_NAV = me.Style(
     font_weight="bold"
 )
 
-def page_navigation_menu(url: str):
+def page_navigation_menu(url: str) -> None:
     state = me.state(State)
     with me.box(style=_STYLE_MAIN_HEADER):
         with me.box(style=me.Style(display="flex", flex_direction="row", gap=12)):
-            #print(f"current page: {state.current_page}")
             for page in state.pages:
-                #print(f" route: {page.get('route')}")
                 disabled = False
                 if state.current_page == page.get("route"):
                     disabled = True
                 me.button(
-                    page.get("display"), 
+                    page.get("display"),
                     key=f"{page.get('route')}", 
-                    on_click=navigate_to, 
+                    on_click=navigate_to,
                     disabled=disabled,
                     style=_STYLE_CURRENT_NAV if disabled else me.Style(),
-                    #type="flat" if disabled else "stroked"
+                    # type="flat" if disabled else "stroked"
                     )
 
 
@@ -89,6 +87,7 @@ def page_navigation_menu(url: str):
 def navmenu(url: str) -> str:
     page_navigation_menu(url=url)
     me.slot()
-    
+
     state = me.state(State)
     return state.current_page
+
