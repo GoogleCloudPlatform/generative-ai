@@ -14,10 +14,10 @@
 
 import mesop as me
 
-from dataclasses import dataclass, field
+from dataclasses import field
 from dataclasses_json import dataclass_json
 
-from typing import List, TypedDict, Any
+from typing import TypedDict
 
 
 class Page(TypedDict):
