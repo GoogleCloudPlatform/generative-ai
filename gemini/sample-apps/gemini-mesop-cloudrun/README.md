@@ -1,10 +1,10 @@
-# Cloud Run application utilizing Mesop that demonstrates working with Vertex AI Gemini API
+# Mesop application using Vertex AI Gemini API on Cloud Run
 
 |           |                                                |
 | --------- | ---------------------------------------------- |
 | Author(s) | [Hussain Chinoy](https://github.com/ghchinoy) |
 
-This application demonstrates a Cloud Run application that uses the [Mesop](https://github.com/google/mesop) UI framework.
+This application demonstrates a [Mesop](https://github.com/google/mesop) UI framework application running on Cloud Run.
 
 Sample screenshots and video demos of the application are shown below:
 
@@ -17,7 +17,7 @@ Sample screenshots and video demos of the application are shown below:
 > NOTE: **Before you move forward, ensure that you have followed the instructions in [SETUP.md](../SETUP.md).**
 > Additionally, ensure that you have cloned this repository and you are currently in the `gemini-mesop-cloudrun` folder. This should be your active working directory for the rest of the commands.
 
-To run the Mesop application locally (on cloud shell), we need to perform the following steps:
+To run the Mesop application locally (on Cloud Shell), we need to perform the following steps:
 
 1. Setup the Python virtual environment and install the dependencies:
 
