@@ -72,7 +72,7 @@ class State():
     marketing_campaign_progress: bool = False
     marketing_campaign_output: str = ""
 
-    # Image playround
+    # Image playground
     image_tab: str = "furniture"
     
     furniture_recommendation_output: str = ""
@@ -859,7 +859,7 @@ def page():
                     marketing_campaign_goal_options.append(me.SelectOption(label=c.title(), value=c))
                 me.select(
                     style=me.Style(width="50vh"),
-                    key="marketing_camapign_goal",
+                    key="marketing_campaign_goal",
                     label="Campaign goal",
                     options=marketing_campaign_goal_options,
                     multiple=True,
