@@ -52,7 +52,7 @@ class State():
     story_length_value: str = "short"
     story_progress: bool = False
     story_output: str = ""
-    
+
     # Marketing
     marketing_product: str = "ZomZoo"
     marketing_product_categories: list[str] = field(default_factory=lambda: ["clothing", "electronics", "food", "health & beauty", "home & garden"])
@@ -73,7 +73,7 @@ class State():
 
     # Image playground
     image_tab: str = "furniture"
-    
+
     furniture_recommendation_output: str = ""
     oven_instructions_output: str = ""
     er_doc_output: str = ""
@@ -81,12 +81,12 @@ class State():
     image_glasses_output_radio_value: str = "text"
     glasses_rec_output: str = ""
     math_answers_output: str = ""
-    
+
     image_progress_spinner: bool = False
-    
+
     # Video playground
     video_tab: str = "desc"
-    
+
     video_spinner_progress: bool = False
     video_description_content: str = ""
     video_tags_content: str = ""
@@ -112,28 +112,26 @@ def on_input(e: me.InputEvent) -> None:
     print(f"{e}")
     state = me.state(State)
     setattr(state, e.key, e.value)
-    
+
 
 ## Story events
 def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
     s = me.state(State)
     s.story_selected_premises = e.values
     print(f"selected: {s.story_selected_premises}")
-    
+
 
 def on_click_clear_story(e: me.ClickEvent) -> None:
     """Click event for clearing story text."""
     state = me.state(State)
     state.story_output = 0
-    
 
-## TODO I don't think this is working correctly
+
 def on_radio_change(event: me.RadioChangeEvent) -> None:
     s = me.state(State)
     s.radio_value = event.value
 
 
-## TODO I don't think this is working like I expect
 def on_length_radio_change(event: me.RadioChangeEvent) -> None:
     s = me.state(State)
     s.story_length_value = event.value
@@ -163,7 +161,7 @@ def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
     The book should have prologue and epilogue.
     """
     print(f"prompt: {prompt}")
-    
+
     model = GenerativeModel(s.model)
     config = GenerationConfig(temperature=temp, max_output_tokens=2048)
     safety_settings = {
@@ -173,7 +171,7 @@ def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
     }
     response = model.generate_content(
-        prompt, 
+        prompt,
         generation_config=config,
         safety_settings=safety_settings,
         )
@@ -250,7 +248,7 @@ def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
    Be very succinct and to the point.
     """
     print(f"prompt: {prompt}")
-    
+
     config = {
         "temperature": 0.8,
         "max_output_tokens": 2048,
@@ -264,7 +262,7 @@ def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
     }
     response = model.generate_content(
-        prompt, 
+        prompt,
         generation_config=config,
         safety_settings=safety_settings,
         )
@@ -295,7 +293,7 @@ IMAGE_MATH = "gs://github-repo/img/gemini/multimodality_usecases_overview/math_b
 def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
-    
+
     room_image_part = Part.from_uri(ROOM_IMAGE_URI, mime_type="image/jpeg")
     chair_1_image_part = Part.from_uri(CHAIR_1_IMAGE_URI, mime_type="image/jpeg")
     chair_2_image_part = Part.from_uri(CHAIR_2_IMAGE_URI, mime_type="image/jpeg")
@@ -320,10 +318,9 @@ def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
         ]
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
-    
-    
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
@@ -348,7 +345,7 @@ def on_click_clear_furniture_recommendation(e: me.ClickEvent) -> None:
 def generate_oven_instructions(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
-    
+
     oven_image = Part.from_uri(IMAGE_OVEN, mime_type="image/jpeg")
 
     content = [
@@ -358,9 +355,9 @@ If instructions include buttons, also explain where those buttons are physically
         ]
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
-    
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
@@ -384,7 +381,7 @@ def on_click_clear_oven_instructions(e: me.ClickEvent) -> None:
 def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
-    
+
     er_image = Part.from_uri(IMAGE_ER_DIAGRAM, mime_type="image/jpeg")
 
     content = [
@@ -393,9 +390,9 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:
         ]
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
-    
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
@@ -419,7 +416,7 @@ def on_click_clear_er_doc(e: me.ClickEvent) -> None:
 def generate_glasses_rec(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
-    
+
     glasses_1 = Part.from_uri(IMAGE_GLASSES_1, mime_type="image/jpeg")
     glasses_2 = Part.from_uri(IMAGE_GLASSES_2, mime_type="image/jpeg")
 
@@ -436,9 +433,9 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
         ]
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
-    
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
@@ -471,7 +468,7 @@ def on_click_clear_glasses_rec(e: me.ClickEvent) -> None:
 def generate_math_answers(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
-    
+
     math_image = Part.from_uri(IMAGE_MATH, mime_type="image/jpeg")
 
     content = [
@@ -489,9 +486,9 @@ INSTRUCTIONS:
         ]
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
-    
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
@@ -522,7 +519,7 @@ VIDEO_GEOLOCATION = "gs://github-repo/img/gemini/multimodality_usecases_overview
 def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
-    
+
     video_part = Part.from_uri(VIDEO_DESCRIPTION, mime_type="video/mp4")
 
     prompt = """Describe what is happening in the video and answer the following questions: \n
@@ -532,16 +529,16 @@ def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
     """
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
     print(f"video url: {VIDEO_DESCRIPTION}")
     print(f"prompt: {prompt}")
-    
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
     }
-    
+
     model = GenerativeModel(model_name=model_name,
         generation_config=config,
         # safety_settings=safety_settings,
@@ -551,8 +548,8 @@ def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
     print(response)
     s.video_description_content = response.text
     s.video_spinner_progress = False
-    
-    
+
+
 def on_click_clear_video_description(e: me.ClickEvent) -> None:
     """Click event for clearing video description text."""
     state = me.state(State)
@@ -562,10 +559,10 @@ def on_click_clear_video_description(e: me.ClickEvent) -> None:
 def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
-    
+
     video_part = Part.from_uri(VIDEO_TAGS, mime_type="video/mp4")
 
-    prompt = """Answer the following questions using the video only: 
+    prompt = """Answer the following questions using the video only:
     1. What is in the video? 
     2. What objects are in the video? 
     3. What is the action in the video? 
@@ -575,16 +572,16 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
     """
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
-    
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
     }
-    
+
     model = GenerativeModel(model_name=model_name,
         generation_config=config,
         # safety_settings=safety_settings,
@@ -594,7 +591,7 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
     print(response)
     s.video_tags_content = response.text
     s.video_spinner_progress = False
-    
+
 
 def on_click_clear_video_tags(e: me.ClickEvent) -> None:
     """Click event for clearing video tags text."""
@@ -605,18 +602,18 @@ def on_click_clear_video_tags(e: me.ClickEvent) -> None:
 def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
-    
+
     video_part = Part.from_uri(VIDEO_HIGHLIGHTS, mime_type="video/mp4")
 
     prompt = """Answer the following questions using the video only: What is the profession of the girl in this video? Which all features of the phone are highlighted here? Summarize the video in one paragraph. Provide the answer in table format.
     """
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
-      
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
@@ -642,10 +639,10 @@ def on_click_clear_video_highlights(e: me.ClickEvent) -> None:
 def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
-    
+
     video_part = Part.from_uri(VIDEO_GEOLOCATION, mime_type="video/mp4")
 
-    prompt = """Answer the following questions using the video only: 
+    prompt = """Answer the following questions using the video only:
     
     What is this video about? 
     How do you know which city it is? 
@@ -656,11 +653,11 @@ def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
     """
 
     model_name = s.model
-    
+
     print(f"using model: {model_name}")
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
-      
+
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
@@ -694,7 +691,9 @@ def on_load(e: me.LoadEvent) -> None:
 def vertex_gemini_header() -> None:
     with me.box(style=_STYLE_MAIN_HEADER):
         with me.box(style=_STYLE_TITLE_BOX):
-            with me.box(style=me.Style(display="flex", flex_direction="row", gap=5, align_content="center")):
+            with me.box(
+                style=me.Style(display="flex",flex_direction="row", gap=5, align_content="center"),
+            ):
                 me.text("Vertex AI Gemini ", type="headline-5", style=FANCY_TEXT_GRADIENT)
                 me.text("with Mesop", type="headline-5" )
 
@@ -712,14 +711,14 @@ def app() -> None:
     state = me.state(State)
     # Main header
     vertex_gemini_header()
-       
-    # Nav header    
+
+    # Nav header
     navmenu(state)
-              
+
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
         me.text(text="Generate a story", type="headline-6")
-        
+
         with me.box(style=me.Style(display="flex", flex_direction="row", gap=15)):
             with me.box(style=me.Style(display="flex", flex_direction="column", gap=2)):
                 me.input(key="story_character_name", label="Character name", value="Mittens", on_input=on_input, style=_STORY_INPUT_STYLE)
@@ -771,7 +770,7 @@ def app() -> None:
                         on_click=on_click_clear_story,
                     )
                     me.button("Generate my story", color="primary", type="flat", on_click=generate_story)
-    
+
             with me.box(style=_BOX_STYLE):
                 me.text("Output", style=me.Style(font_weight=500))
                 if state.story_progress:
@@ -788,11 +787,11 @@ def app() -> None:
                     ):
                         me.markdown(key="story_output", text=state.story_output,
                             style=me.Style(width="100%", margin=me.Margin(top=10)),)
-                    
+
 
 ### Marketing page
 @me.page(
-    path="/marketing", 
+    path="/marketing",
     title="Vertex AI Gemini with Mesop",
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
@@ -802,13 +801,13 @@ def marketing_page() -> None:
     state = me.state(State)
     # Main header
     vertex_gemini_header()
-    
-    # Nav header     
+
+    # Nav header
     navmenu(state.current_page)
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
         me.text(text="Generate your marketing campaign", type="headline-6")
-        
+
         with me.box(style=me.Style(display="flex", flex_direction="row", gap=15)):
             with me.box(style=me.Style(display="flex", flex_direction="column", gap=2)):
                 # product name
@@ -829,7 +828,7 @@ def marketing_page() -> None:
                 marketing_target_age_options = []
                 for c in state.marketing_target_audiences:
                     marketing_target_age_options.append(me.RadioOption(label=c.title(), value=c))
-                    
+
                 me.radio(
                     on_change=on_change_marketing_target,
                     options=marketing_target_age_options,
@@ -885,7 +884,12 @@ def marketing_page() -> None:
                         type="stroked",
                         on_click=on_click_clear_marketing_campaign,
                     )
-                    me.button("Generate my campaign", color="primary", type="flat", on_click=generate_marketing_campaign)
+                    me.button(
+                        "Generate my campaign",
+                        color="primary",
+                        type="flat",
+                        on_click=generate_marketing_campaign,
+                    )
 
             with me.box(style=_BOX_STYLE):
                 me.text("Output", style=me.Style(font_weight=500))
@@ -897,8 +901,11 @@ def marketing_page() -> None:
                             justify_items="center",
                         )
                     ):
-                        me.markdown(key="marketing_campaign_output", text=state.marketing_campaign_output,
-                            style=me.Style(width="100%", margin=me.Margin(top=10)),)
+                        me.markdown(
+                            key="marketing_campaign_output",
+                            text=state.marketing_campaign_output,
+                            style=me.Style(width="100%", margin=me.Margin(top=10)),
+                        )
 
 
 ### Image playground page
@@ -914,16 +921,16 @@ def image_playground_page() -> None:
     # Main header
     vertex_gemini_header()
 
-    # Nav header     
+    # Nav header
     navmenu(state.current_page)
 
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
         me.text(text="Image playground", type="headline-6")
-        
+
         image_playground_page_tabber()
 
-        
+
 image_tabs_json = [
     {"display": "Furniture Recommendation", "name": "furniture"},
     {"display": "Oven Instructions", "name": "oven"},
@@ -939,7 +946,7 @@ def image_switch_tab(e: me.ClickEvent) -> None:
 
 def image_playground_page_tabber() -> None:
     state = me.state(State)
-    
+
     with me.box(
         style=me.Style(
             padding=me.Padding(top=0, right=0, left=0, bottom=2),
@@ -955,8 +962,8 @@ def image_playground_page_tabber() -> None:
                 if state.image_tab == tab.get("name"):
                     disabled = True
                 me.button(
-                    tab.get("display"), 
-                    key=f"{tab.get('name')}", 
+                    tab.get("display"),
+                    key=f"{tab.get('name')}",
                     on_click=image_switch_tab,
                     disabled=disabled,
                     style=_STYLE_CURRENT_TAB if disabled else _STYLE_OTHER_TAB,
@@ -983,12 +990,12 @@ def image_math_reasoning_tab() -> None:
     me.box(style=me.Style(height=12))
     me.text("Math Reasoning", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
-    
+
     me.text("Gemini 1.5 Pro can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below.")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")):
-        
+
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2,)):
             me.image(
                 src=gcsurl_to_httpurl(IMAGE_MATH),
@@ -998,10 +1005,10 @@ def image_math_reasoning_tab() -> None:
             with me.box(style=me.Style(align_content="center", flex_grow=1, display="flex")):
                 me.text("image of a math equation", style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"))
     me.box(style=me.Style(height=12))
-    
+
     me.text("Our expectation: Ask questions about the math equation as follows:")
     me.markdown(text="* Extract the formula.\n* What is the symbol right before Pi? What does it mean?\n* Is this a famous formula? Does it have a name?")
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1026,17 +1033,17 @@ def image_math_reasoning_tab() -> None:
                 me.markdown(key="math_answers_output",
                     text=state.math_answers_output,
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
-  
+
 
 def image_glasses_recommendations_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Glasses Recommendation", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
-    
+
     me.text("Gemini 1.5 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(style=me.Style(margin=me.Margin.all(15))):
         me.text("What is your face shape?")
         me.radio(
@@ -1062,9 +1069,9 @@ def image_glasses_recommendations_tab() -> None:
             ],
             value=state.image_glasses_output_radio_value,
         )
-    
+
     with me.box(style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")):
-        
+
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2,)):
             me.image(
                 src=gcsurl_to_httpurl(IMAGE_GLASSES_1),
@@ -1081,12 +1088,12 @@ def image_glasses_recommendations_tab() -> None:
             )
             with me.box(style=me.Style(align_content="center", flex_grow=1, display="flex")):
                 me.text("Glasses type 2", style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"))
-    
+
     me.box(style=me.Style(height=12))
-    
+
     me.text(f"Our expectation: Suggest which glasses type is better for the {state.image_glasses_shape_radio_value} face shape")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1111,17 +1118,17 @@ def image_glasses_recommendations_tab() -> None:
                 me.markdown(key="glasses_rec_output",
                     text=state.glasses_rec_output,
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
-    
+
 
 def image_er_diagrams_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("ER Diagrams", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
-    
+
     me.text("Gemini 1.5 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini 1.0 can decipher an Entity Relationship (ER) diagram.")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
         me.image(
             src=gcsurl_to_httpurl(IMAGE_ER_DIAGRAM),
@@ -1129,12 +1136,16 @@ def image_er_diagrams_tab() -> None:
             style=me.Style(width="350px"),
         )
         with me.box(style=me.Style(align_content="center", flex_grow=1, display="flex")):
-            me.text("Image of an ER diagram", style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"))
+            me.text(
+                "Image of an ER diagram",
+                style=me.Style(color="rgba(49, 51, 63, 0.6)",
+                font_size="14px"),
+            )
     me.box(style=me.Style(height=12))
-        
+
     me.text("Our expectation: Document the entities and relationships in this ER diagram.")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1166,10 +1177,10 @@ def image_oven_tab() -> None:
     me.box(style=me.Style(height=12))
     me.text("Oven Instructions", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
-    
+
     me.text("Equipped with the ability to extract information from visual elements on screens, Gemini 1.5 Pro can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene.")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
         me.image(
             src="https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/stove.jpg",
@@ -1179,10 +1190,10 @@ def image_oven_tab() -> None:
         with me.box(style=me.Style(align_content="center", flex_grow=1, display="flex")):
             me.text("Image of an oven", style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"))
     me.box(style=me.Style(height=12))
-        
+
     me.text("Our expectation: Provide instructions for resetting the clock on this appliance in English")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1214,16 +1225,16 @@ def image_furniture_tab() -> None:
     me.box(style=me.Style(height=12))
     me.text("Furniture Recommendation", style=me.Style(font_weight="bold"))
     me.box(style=me.Style(height=12))
-    
+
     me.text("In this example, you'll be presented with a scene (e.g. a living room) and will use the Gemini model to perform visual understanding. You will see how Gemini can be used to recommend an item (e.g., a chair) from a list of furniture options as input. You can use Gemini to recommend a chair that would complement the given scene and will be provided with its rationale for such selections from the provided list.")
     me.box(style=me.Style(height=12))
-    
+
     room_image_urls = gcsurl_to_httpurl(ROOM_IMAGE_URI)
     chair_1_image_urls = gcsurl_to_httpurl(CHAIR_1_IMAGE_URI)
     chair_2_image_urls = gcsurl_to_httpurl(CHAIR_2_IMAGE_URI)
     chair_3_image_urls = gcsurl_to_httpurl(CHAIR_3_IMAGE_URI)
     chair_4_image_urls = gcsurl_to_httpurl(CHAIR_4_IMAGE_URI)
-    
+
     with me.box(style=me.Style(display="flex", flex_direction="column", gap=2)):
         me.image(
             src=room_image_urls,
@@ -1231,12 +1242,15 @@ def image_furniture_tab() -> None:
             style=me.Style(width="350px"),
         )
         with me.box(style=me.Style(align_content="center", flex_grow=1, display="flex")):
-            me.text("Image of a living room", style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"))
-    
+            me.text(
+                "Image of a living room",
+                style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"),
+            )
+
     me.box(style=me.Style(height=12))
-    
+
     with me.box(style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")):
-        
+
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2,)):
             me.image(
                 src=chair_1_image_urls,
@@ -1269,9 +1283,9 @@ def image_furniture_tab() -> None:
             )
             with me.box(style=me.Style(align_content="center", flex_grow=1, display="flex")):
                 me.text("Chair 4", style=me.Style(color="rgba(49, 51, 63, 0.6)", font_size="14px"))
-        
+
     me.box(style=me.Style(height=12))
-        
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1281,7 +1295,12 @@ def image_furniture_tab() -> None:
             type="stroked",
             on_click=on_click_clear_furniture_recommendation,
         )
-        me.button("Generate a recommendation", color="primary", type="flat", on_click=generate_furniture_recommendation)
+        me.button(
+            "Generate a recommendation",
+            color="primary",
+            type="flat",
+            on_click=generate_furniture_recommendation,
+        )
 
     with me.box(style=_BOX_STYLE):
         me.text("Recommendation", style=me.Style(font_weight=500))
@@ -1300,7 +1319,7 @@ def image_furniture_tab() -> None:
 
 ### Video playground page
 @me.page(
-    path="/videos", 
+    path="/videos",
     title="Vertex AI Gemini with Mesop",
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
@@ -1313,13 +1332,13 @@ def video_playground_page() -> None:
 
     # Nav header     
     navmenu(state.current_page)
-                
+
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
         me.text(text="Video playground", type="headline-6")
-        
+
         video_playground_page_tabber()
-        
+
 
 video_tabs_json = [
     {"display": "Video Description", "name": "desc"},
@@ -1331,10 +1350,11 @@ video_tabs_json = [
 def video_switch_tab(e: me.ClickEvent) -> None:
     s = me.state(State)
     s.video_tab = e.key
-    
+
+
 def video_playground_page_tabber() -> None:
     state = me.state(State)
-    
+
     with me.box(
         style=me.Style(
             padding=me.Padding(top=0, right=0, left=0, bottom=2),
@@ -1350,8 +1370,8 @@ def video_playground_page_tabber() -> None:
                 if state.image_tab == tab.get("name"):
                     disabled = True
                 me.button(
-                    tab.get("display"), 
-                    key=f"{tab.get('name')}", 
+                    tab.get("display"),
+                    key=f"{tab.get('name')}",
                     on_click=image_switch_tab,
                     disabled=disabled,
                     style=_STYLE_CURRENT_TAB if disabled else _STYLE_OTHER_TAB,
@@ -1376,7 +1396,7 @@ def video_description_tab() -> None:
     me.box(style=me.Style(height=24))
     me.text("Gemini can provide a description of what's happening in a video:")
     me.box(style=me.Style(height=12))
-    
+
     video_desc_url = "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
     state.video_url = video_desc_url
     video_desc_url = gcsurl_to_httpurl(video_desc_url)
@@ -1386,7 +1406,7 @@ def video_description_tab() -> None:
         style=me.Style( width=704),
     )
     me.box(style=me.Style(height=12))
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1396,7 +1416,12 @@ def video_description_tab() -> None:
             type="stroked",
             on_click=on_click_clear_video_description,
         )
-        me.button("Generate a description", color="primary", type="flat", on_click=generate_video_description)
+        me.button(
+            "Generate a description",
+            color="primary",
+            type="flat",
+            on_click=generate_video_description,
+        )
 
     with me.box(style=_BOX_STYLE):
         me.text("Description", style=me.Style(font_weight=500))
@@ -1416,20 +1441,20 @@ def video_description_tab() -> None:
 def video_tags_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
-    
+
     me.text("Gemini 1.5 can also extract tags throughout a video, as shown below:")
     me.box(style=me.Style(height=12))
-    
+
     me.video(
         key="tags",
         src=gcsurl_to_httpurl(VIDEO_TAGS),
         style=me.Style( width=704),
     )
     me.box(style=me.Style(height=12))
-    
+
     me.text("Our expectation: Generate the tags for the video.")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1455,24 +1480,24 @@ def video_tags_tab() -> None:
                     text=state.video_tags_content,
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
 
-    
+
 def video_highlights_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
-    
+
     me.text("Another example of using Gemini 1.5 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:")
     me.box(style=me.Style(height=12))
-    
+
     me.video(
         key="highlights",
         src=gcsurl_to_httpurl(VIDEO_HIGHLIGHTS),
-        style=me.Style( width=704),
+        style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
-    
+
     me.text("Our expectation: Generate the highlights for the video.")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
@@ -1482,7 +1507,12 @@ def video_highlights_tab() -> None:
             type="stroked",
             on_click=on_click_clear_video_tags,
         )
-        me.button("Generate highlights", color="primary", type="flat", on_click=generate_video_highlights)
+        me.button(
+            "Generate highlights",
+            color="primary",
+            type="flat",
+            on_click=generate_video_highlights,
+        )
 
     with me.box(style=_BOX_STYLE):
         me.text("Highlights", style=me.Style(font_weight=500))
@@ -1497,15 +1527,15 @@ def video_highlights_tab() -> None:
                 me.markdown(key="video_highlights_content",
                     text=state.video_highlights_content,
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
-    
+
 
 def video_geolocation_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
-    
+
     me.text("Even in short, detail-packed videos, Gemini 1.5 can identify the locations.")
     me.box(style=me.Style(height=12))
-    
+
     me.video(
         key="geo",
         src=gcsurl_to_httpurl(VIDEO_GEOLOCATION),
@@ -1515,7 +1545,7 @@ def video_geolocation_tab() -> None:
 
     me.text("Our expectation: answers about the location of the video")
     me.box(style=me.Style(height=12))
-    
+
     with me.box(
         style=me.Style(display="flex", gap=10, padding=me.Padding(bottom=20))
     ):
