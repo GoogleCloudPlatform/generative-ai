@@ -95,7 +95,7 @@ class State():
 
 
 # Helpers
-def gcsurl_to_httpurl(gcsuri: str):
+def gcsurl_to_httpurl(gcsuri: str) -> str:
     """given a GCS URI, return the HTTPS URL
 
     Args:
@@ -108,38 +108,38 @@ def gcsurl_to_httpurl(gcsuri: str):
 
 # Events
 
-def on_input(e: me.InputEvent):
+def on_input(e: me.InputEvent) -> None:
     print(f"{e}")
     state = me.state(State)
     setattr(state, e.key, e.value)
     
 
 ## Story events
-def on_selection_change(e: me.SelectSelectionChangeEvent):
+def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
     s = me.state(State)
     s.story_selected_premises = e.values
     print(f"selected: {s.story_selected_premises}")
     
 
-def on_click_clear_story(e: me.ClickEvent):
+def on_click_clear_story(e: me.ClickEvent) -> None:
     """Click event for clearing story text."""
     state = me.state(State)
     state.story_output = 0
     
 
 ## TODO I don't think this is working correctly
-def on_radio_change(event: me.RadioChangeEvent):
+def on_radio_change(event: me.RadioChangeEvent) -> None:
     s = me.state(State)
     s.radio_value = event.value
 
 
 ## TODO I don't think this is working like I expect
-def on_length_radio_change(event: me.RadioChangeEvent):
+def on_length_radio_change(event: me.RadioChangeEvent) -> None:
     s = me.state(State)
     s.story_length_value = event.value
 
 
-def generate_story(e: me.ClickEvent | me.EnterEvent):
+def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.story_output = "" # clear any existing story
     s.story_progress = True
@@ -184,38 +184,38 @@ def generate_story(e: me.ClickEvent | me.EnterEvent):
 
 
 ## Marketing events
-def on_change_marketing_category(e: me.RadioChangeEvent):
+def on_change_marketing_category(e: me.RadioChangeEvent) -> None:
     state = me.state(State)
     state.marketing_product_category = e.value
 
 
-def on_change_marketing_target(e: me.RadioChangeEvent):
+def on_change_marketing_target(e: me.RadioChangeEvent) -> None:
     state = me.state(State)
     state.marketing_target_audience = e.value
 
 
-def on_change_marketing_location(e: me.RadioChangeEvent):
+def on_change_marketing_location(e: me.RadioChangeEvent) -> None:
     state = me.state(State)
     state.marketing_target_location = e.value
 
 
-def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent):
+def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> None:
     s = me.state(State)
     s.marketing_campaign_selected_goals = e.values
     print(f"selected: {s.marketing_campaign_selected_goals}")
 
 
-def on_change_marketing_brand_voice(e: me.RadioChangeEvent):
+def on_change_marketing_brand_voice(e: me.RadioChangeEvent) -> None:
     state = me.state(State)
     state.marketing_brand_voice = e.value
 
 
-def on_change_marketing_budget(e: me.RadioChangeEvent):
+def on_change_marketing_budget(e: me.RadioChangeEvent) -> None:
     state = me.state(State)
     state.marketing_budget = e.value
 
 
-def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent):
+def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.marketing_campaign_progress = True
     prompt = f"""Generate a marketing campaign for {s.marketing_product}, a {s.marketing_product_category} designed for the age group: {s.marketing_target_audience}.
@@ -273,7 +273,7 @@ def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent):
     s.marketing_campaign_progress = False
 
 
-def on_click_clear_marketing_campaign(e: me.ClickEvent):
+def on_click_clear_marketing_campaign(e: me.ClickEvent) -> None:
     """Click event for clearing marketing text."""
     state = me.state(State)
     state.marketing_campaign_output = 0
@@ -292,7 +292,7 @@ image_glasses_1 = "gs://github-repo/img/gemini/multimodality_usecases_overview/g
 image_glasses_2 = "gs://github-repo/img/gemini/multimodality_usecases_overview/glasses2.jpg"
 image_math = "gs://github-repo/img/gemini/multimodality_usecases_overview/math_beauty.jpg"
 
-def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent):
+def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
     
@@ -339,13 +339,13 @@ def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent):
     s.image_progress_spinner = False
 
 
-def on_click_clear_furniture_recommendation(e: me.ClickEvent):
+def on_click_clear_furniture_recommendation(e: me.ClickEvent) -> None:
     """Click event for clearing furniture recommendation text."""
     state = me.state(State)
     state.furniture_recommendation_output = 0
 
 
-def generate_oven_instructions(e: me.ClickEvent | me.EnterEvent):
+def generate_oven_instructions(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
     
@@ -375,13 +375,13 @@ If instructions include buttons, also explain where those buttons are physically
     s.image_progress_spinner = False
 
 
-def on_click_clear_oven_instructions(e: me.ClickEvent):
+def on_click_clear_oven_instructions(e: me.ClickEvent) -> None:
     """Click event for clearing oven instructions text."""
     state = me.state(State)
     state.oven_instructions_output = 0
 
 
-def generate_er_doc(e: me.ClickEvent | me.EnterEvent):
+def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
     
@@ -410,13 +410,13 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent):
     s.image_progress_spinner = False
 
 
-def on_click_clear_er_doc(e: me.ClickEvent):
+def on_click_clear_er_doc(e: me.ClickEvent) -> None:
     """Click event for clearing er documentation text."""
     state = me.state(State)
     state.er_doc_output = 0
 
 
-def generate_glasses_rec(e: me.ClickEvent | me.EnterEvent):
+def generate_glasses_rec(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
     
@@ -453,7 +453,7 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
     s.image_progress_spinner = False
 
 
-def on_change_image_glasses(e: me.RadioChangeEvent):
+def on_change_image_glasses(e: me.RadioChangeEvent) -> None:
   s = me.state(State)
   
   value_name = f"image_{e.key}_radio_value"
@@ -462,13 +462,13 @@ def on_change_image_glasses(e: me.RadioChangeEvent):
   setattr(s, value_name, e.value)
 
 
-def on_click_clear_glasses_rec(e: me.ClickEvent):
+def on_click_clear_glasses_rec(e: me.ClickEvent) -> None:
     """Click event for clearing glasses documentation text."""
     state = me.state(State)
     state.glasses_rec_output = 0
 
 
-def generate_math_answers(e: me.ClickEvent | me.EnterEvent):
+def generate_math_answers(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.image_progress_spinner = True
     
@@ -506,7 +506,7 @@ INSTRUCTIONS:
     s.image_progress_spinner = False
 
 
-def on_click_clear_math(e: me.ClickEvent):
+def on_click_clear_math(e: me.ClickEvent) -> None:
     """Click event for clearing math documentation text."""
     state = me.state(State)
     state.math_answers_output = 0
@@ -519,7 +519,7 @@ video_highlights = "gs://github-repo/img/gemini/multimodality_usecases_overview/
 video_geolocation = "gs://github-repo/img/gemini/multimodality_usecases_overview/bus.mp4"
 
 
-def generate_video_description(e: me.ClickEvent | me.EnterEvent):
+def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
     
@@ -553,13 +553,13 @@ def generate_video_description(e: me.ClickEvent | me.EnterEvent):
     s.video_spinner_progress = False
     
     
-def on_click_clear_video_description(e: me.ClickEvent):
+def on_click_clear_video_description(e: me.ClickEvent) -> None:
     """Click event for clearing video description text."""
     state = me.state(State)
     state.video_description_content = 0
 
 
-def generate_video_tags(e: me.ClickEvent | me.EnterEvent):
+def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
     
@@ -596,13 +596,13 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent):
     s.video_spinner_progress = False
     
 
-def on_click_clear_video_tags(e: me.ClickEvent):
+def on_click_clear_video_tags(e: me.ClickEvent) -> None:
     """Click event for clearing video tags text."""
     state = me.state(State)
     state.video_tags_content = 0
 
 
-def generate_video_highlights(e: me.ClickEvent | me.EnterEvent):
+def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
     
@@ -633,13 +633,13 @@ def generate_video_highlights(e: me.ClickEvent | me.EnterEvent):
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_highlights(e: me.ClickEvent):
+def on_click_clear_video_highlights(e: me.ClickEvent) -> None:
     """Click event for clearing video highlights text."""
     state = me.state(State)
     state.video_highlights_content = 0
 
 
-def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent):
+def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
     s = me.state(State)
     s.video_spinner_progress = True
     
@@ -677,7 +677,7 @@ def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent):
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_geolocation(e: me.ClickEvent):
+def on_click_clear_video_geolocation(e: me.ClickEvent) -> None:
     """Click event for clearing video geolocation text."""
     state = me.state(State)
     state.video_geolocation_content = 0
@@ -685,13 +685,13 @@ def on_click_clear_video_geolocation(e: me.ClickEvent):
 
 # Pages
 
-def on_load(e: me.LoadEvent):
+def on_load(e: me.LoadEvent) -> None:
     s = me.state(State)
     s.current_page = "/"
 
 
 @me.component
-def vertex_gemini_header():
+def vertex_gemini_header() -> None:
     with me.box(style=_STYLE_MAIN_HEADER):
         with me.box(style=_STYLE_TITLE_BOX):
             with me.box(style=me.Style(display="flex", flex_direction="row", gap=5, align_content="center")):
@@ -708,7 +708,7 @@ def vertex_gemini_header():
     ),
     on_load=on_load,
 )
-def app():
+def app() -> None:
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -798,7 +798,7 @@ def app():
         allowed_iframe_parents=["https://google.github.io"]
     ),
 )
-def marketing_page():
+def marketing_page() -> None:
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -909,7 +909,7 @@ def marketing_page():
         allowed_iframe_parents=["https://google.github.io"]
     ),
 )
-def image_playground_page():
+def image_playground_page() -> None:
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -932,12 +932,12 @@ image_tabs_json = [
     {"display": "Math Reasoning", "name": "math"},
 ]
 
-def image_switch_tab(e: me.ClickEvent):
+def image_switch_tab(e: me.ClickEvent) -> None:
     s = me.state(State)
     s.image_tab = e.key
 
 
-def image_playground_page_tabber():
+def image_playground_page_tabber() -> None:
     state = me.state(State)
     
     with me.box(
@@ -978,7 +978,7 @@ def image_playground_page_tabber():
             image_furniture_tab()
 
 
-def image_math_reasoning_tab():
+def image_math_reasoning_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Math Reasoning", style=me.Style(font_weight="bold"))
@@ -1028,7 +1028,7 @@ def image_math_reasoning_tab():
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
   
 
-def image_glasses_recommendations_tab():
+def image_glasses_recommendations_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Glasses Recommendation", style=me.Style(font_weight="bold"))
@@ -1113,7 +1113,7 @@ def image_glasses_recommendations_tab():
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
     
 
-def image_er_diagrams_tab():
+def image_er_diagrams_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("ER Diagrams", style=me.Style(font_weight="bold"))
@@ -1161,7 +1161,7 @@ def image_er_diagrams_tab():
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
 
 
-def image_oven_tab():
+def image_oven_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Oven Instructions", style=me.Style(font_weight="bold"))
@@ -1209,7 +1209,7 @@ def image_oven_tab():
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
 
 
-def image_furniture_tab():
+def image_furniture_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Furniture Recommendation", style=me.Style(font_weight="bold"))
@@ -1306,7 +1306,7 @@ def image_furniture_tab():
         allowed_iframe_parents=["https://google.github.io"]
     ),
 )
-def video_playground_page():
+def video_playground_page() -> None:
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1328,11 +1328,11 @@ video_tabs_json = [
     {"display": "Video Geolocation", "name": "geo"},
 ]
 
-def video_switch_tab(e: me.ClickEvent):
+def video_switch_tab(e: me.ClickEvent) -> None:
     s = me.state(State)
     s.video_tab = e.key
     
-def video_playground_page_tabber():
+def video_playground_page_tabber() -> None:
     state = me.state(State)
     
     with me.box(
@@ -1371,7 +1371,7 @@ def video_playground_page_tabber():
             video_description_tab()
 
 
-def video_description_tab():
+def video_description_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
     me.text("Gemini can provide a description of what's happening in a video:")
@@ -1413,7 +1413,7 @@ def video_description_tab():
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
 
 
-def video_tags_tab():
+def video_tags_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
     
@@ -1456,7 +1456,7 @@ def video_tags_tab():
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
 
     
-def video_highlights_tab():
+def video_highlights_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
     
@@ -1499,7 +1499,7 @@ def video_highlights_tab():
                     style=me.Style(width="100%", margin=me.Margin(top=10)),)
     
 
-def video_geolocation_tab():
+def video_geolocation_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
     
