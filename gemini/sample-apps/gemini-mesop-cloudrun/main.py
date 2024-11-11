@@ -1460,7 +1460,7 @@ def video_highlights_tab():
     state = me.state(State)
     me.box(style=me.Style(height=24))
     
-    me.text("Another example of using Gemini 1.5 ist to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:")
+    me.text("Another example of using Gemini 1.5 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:")
     me.box(style=me.Style(height=12))
     
     me.video(
