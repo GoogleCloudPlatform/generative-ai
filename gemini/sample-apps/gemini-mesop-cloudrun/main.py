@@ -122,16 +122,16 @@ class State:
 
 
 # Helpers
-def gcsurl_to_httpurl(gcsuri: str) -> str:
+def gcs_to_http(gcs_uri: str) -> str:
     """given a GCS URI, return the HTTPS URL
 
     Args:
-        gcsuri (str): Google Cloud Storage URI
+        gcs_uri (str): Google Cloud Storage URI
 
     Returns:
         string: the HTTPS URL equivalent
     """
-    return "https://storage.googleapis.com/" + gcsuri.split("gs://")[1]
+    return "https://storage.googleapis.com/" + gcs_uri.split("gs://")[1]
 
 
 # Events
@@ -143,7 +143,7 @@ def on_input(e: me.InputEvent) -> None:
     setattr(state, e.key, e.value)
 
 
-## Story events
+# Story events
 def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
     s = me.state(State)
     s.story_selected_premises = e.values
@@ -278,10 +278,8 @@ def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
     """
     print(f"prompt: {prompt}")
 
-    config = {
-        "temperature": 0.8,
-        "max_output_tokens": 2048,
-    }
+    config = GenerationConfig(temperature=0.8, max_output_tokens=2048)
+
     model = GenerativeModel(s.model)
 
     safety_settings = {
@@ -367,10 +365,8 @@ def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
 
     print(f"using model: {model_name}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
+
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -405,10 +401,8 @@ If instructions include buttons, also explain where those buttons are physically
 
     print(f"using model: {model_name}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
+
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -441,10 +435,8 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:
 
     print(f"using model: {model_name}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
+
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -485,10 +477,7 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
 
     print(f"using model: {model_name}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -539,10 +528,7 @@ INSTRUCTIONS:
 
     print(f"using model: {model_name}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -594,11 +580,7 @@ def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
     print(f"video url: {VIDEO_DESCRIPTION}")
     print(f"prompt: {prompt}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
-
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -638,11 +620,7 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
-
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -676,11 +654,7 @@ def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
-
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -721,11 +695,7 @@ def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = {
-        "temperature": 0.3,
-        "max_output_tokens": 2048,
-    }
-
+    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
     model = GenerativeModel(
         model_name=model_name,
         generation_config=config,
@@ -1135,7 +1105,7 @@ def image_math_reasoning_tab() -> None:
             )
         ):
             me.image(
-                src=gcsurl_to_httpurl(IMAGE_MATH),
+                src=gcs_to_http(IMAGE_MATH),
                 alt="math equation ",
                 style=me.Style(width="350px"),
             )
@@ -1230,7 +1200,7 @@ def image_glasses_recommendations_tab() -> None:
             )
         ):
             me.image(
-                src=gcsurl_to_httpurl(IMAGE_GLASSES_1),
+                src=gcs_to_http(IMAGE_GLASSES_1),
                 alt="glasses 1",
                 style=me.Style(width="350px"),
             )
@@ -1243,7 +1213,7 @@ def image_glasses_recommendations_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=gcsurl_to_httpurl(IMAGE_GLASSES_2),
+                src=gcs_to_http(IMAGE_GLASSES_2),
                 alt="glasses 2",
                 style=me.Style(width="350px"),
             )
@@ -1306,7 +1276,7 @@ def image_er_diagrams_tab() -> None:
 
     with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
         me.image(
-            src=gcsurl_to_httpurl(IMAGE_ER_DIAGRAM),
+            src=gcs_to_http(IMAGE_ER_DIAGRAM),
             alt="image of an entity relationship diagram",
             style=me.Style(width="350px"),
         )
@@ -1425,11 +1395,11 @@ def image_furniture_tab() -> None:
     )
     me.box(style=me.Style(height=12))
 
-    room_image_urls = gcsurl_to_httpurl(ROOM_IMAGE_URI)
-    chair_1_image_urls = gcsurl_to_httpurl(CHAIR_1_IMAGE_URI)
-    chair_2_image_urls = gcsurl_to_httpurl(CHAIR_2_IMAGE_URI)
-    chair_3_image_urls = gcsurl_to_httpurl(CHAIR_3_IMAGE_URI)
-    chair_4_image_urls = gcsurl_to_httpurl(CHAIR_4_IMAGE_URI)
+    room_image_urls = gcs_to_http(ROOM_IMAGE_URI)
+    chair_1_image_urls = gcs_to_http(CHAIR_1_IMAGE_URI)
+    chair_2_image_urls = gcs_to_http(CHAIR_2_IMAGE_URI)
+    chair_3_image_urls = gcs_to_http(CHAIR_3_IMAGE_URI)
+    chair_4_image_urls = gcs_to_http(CHAIR_4_IMAGE_URI)
 
     with me.box(style=me.Style(display="flex", flex_direction="column", gap=2)):
         me.image(
@@ -1628,7 +1598,7 @@ def video_description_tab() -> None:
 
     video_desc_url = "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
     state.video_url = video_desc_url
-    video_desc_url = gcsurl_to_httpurl(video_desc_url)
+    video_desc_url = gcs_to_http(video_desc_url)
 
     me.video(
         src=video_desc_url,
@@ -1676,7 +1646,7 @@ def video_tags_tab() -> None:
 
     me.video(
         key="tags",
-        src=gcsurl_to_httpurl(VIDEO_TAGS),
+        src=gcs_to_http(VIDEO_TAGS),
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
@@ -1726,7 +1696,7 @@ def video_highlights_tab() -> None:
 
     me.video(
         key="highlights",
-        src=gcsurl_to_httpurl(VIDEO_HIGHLIGHTS),
+        src=gcs_to_http(VIDEO_HIGHLIGHTS),
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
@@ -1776,7 +1746,7 @@ def video_geolocation_tab() -> None:
 
     me.video(
         key="geo",
-        src=gcsurl_to_httpurl(VIDEO_GEOLOCATION),
+        src=gcs_to_http(VIDEO_GEOLOCATION),
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
