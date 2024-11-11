@@ -210,7 +210,7 @@ def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
     yield
 
 
-## Marketing events
+# Marketing events
 def on_change_marketing_category(e: me.RadioChangeEvent) -> None:
     state = me.state(State)
     state.marketing_product_category = e.value
@@ -304,7 +304,7 @@ def on_click_clear_marketing_campaign(e: me.ClickEvent) -> None:
     state.marketing_campaign_output = 0
 
 
-## Image Events
+# Image Events
 
 ROOM_IMAGE_URI = (
     "gs://github-repo/img/gemini/retail-recommendations/rooms/living_room.jpeg"
@@ -546,7 +546,7 @@ def on_click_clear_math(e: me.ClickEvent) -> None:
     state.math_answers_output = 0
 
 
-## Video Events
+# Video Events
 
 VIDEO_DESCRIPTION = (
     "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
@@ -737,7 +737,7 @@ def vertex_gemini_header() -> None:
                 me.text("with Mesop", type="headline-5")
 
 
-### Generate a story page / main
+# Generate a story page / main
 @me.page(
     path="/",
     title="Vertex AI Gemini with Mesop",
@@ -862,7 +862,7 @@ def app() -> None:
                         )
 
 
-### Marketing page
+# Marketing page
 @me.page(
     path="/marketing",
     title="Vertex AI Gemini with Mesop",
@@ -1002,7 +1002,7 @@ def marketing_page() -> None:
                         )
 
 
-### Image playground page
+# Image playground page
 @me.page(
     path="/images",
     title="Vertex AI Gemini with Mesop",
@@ -1513,7 +1513,7 @@ def image_furniture_tab() -> None:
                 )
 
 
-### Video playground page
+# Video playground page
 @me.page(
     path="/videos",
     title="Vertex AI Gemini with Mesop",
