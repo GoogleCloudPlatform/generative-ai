@@ -17,7 +17,7 @@ import os
 
 from dataclasses_json import dataclass_json
 import mesop as me
-from shared.navmenu import navmenu
+from shared.nav_menu import navmenu
 import vertexai
 from vertexai.generative_models import (
     GenerationConfig,
