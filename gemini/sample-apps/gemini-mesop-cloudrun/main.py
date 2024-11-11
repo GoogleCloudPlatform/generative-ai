@@ -26,9 +26,8 @@ from vertexai.generative_models import (
     Part,
 )
 
-from dataclasses import dataclass, field
+from dataclasses import  field
 from dataclasses_json import dataclass_json
-from typing import List, TypedDict, Any
 
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
@@ -400,12 +399,6 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent):
     config = {
         "temperature": 0.3,
         "max_output_tokens": 2048,
-    }
-    safety_settings = {
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
     }
     model = GenerativeModel(model_name=model_name,
         generation_config=config,
@@ -805,7 +798,7 @@ def app():
         allowed_iframe_parents=["https://google.github.io"]
     ),
 )
-def page():
+def marketing_page():
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -916,7 +909,7 @@ def page():
         allowed_iframe_parents=["https://google.github.io"]
     ),
 )
-def page():
+def image_playground_page():
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1313,7 +1306,7 @@ def image_furniture_tab():
         allowed_iframe_parents=["https://google.github.io"]
     ),
 )
-def page():
+def video_playground_page():
     state = me.state(State)
     # Main header
     vertex_gemini_header()
