@@ -81,7 +81,7 @@ def page_navigation_menu(url: str) -> None:
 
 
 @me.content_component
-def navmenu(url: str) -> str:
+def nav_menu(url: str) -> str:
     page_navigation_menu(url=url)
     me.slot()
 

@@ -17,7 +17,7 @@ import os
 
 from dataclasses_json import dataclass_json
 import mesop as me
-from shared.nav_menu import navmenu
+from shared.nav_menu import nav_menu
 import vertexai
 from vertexai.generative_models import (
     GenerationConfig,
@@ -752,7 +752,7 @@ def app() -> None:
     vertex_gemini_header()
 
     # Nav header
-    navmenu(state)
+    nav_menu(state)
 
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
@@ -876,7 +876,7 @@ def marketing_page() -> None:
     vertex_gemini_header()
 
     # Nav header
-    navmenu(state.current_page)
+    nav_menu(state.current_page)
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
         me.text(text="Generate your marketing campaign", type="headline-6")
@@ -1016,7 +1016,7 @@ def image_playground_page() -> None:
     vertex_gemini_header()
 
     # Nav header
-    navmenu(state.current_page)
+    nav_menu(state.current_page)
 
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
@@ -1527,7 +1527,7 @@ def video_playground_page() -> None:
     vertex_gemini_header()
 
     # Nav header
-    navmenu(state.current_page)
+    nav_menu(state.current_page)
 
     # Main content
     with me.box(style=_STYLE_MAIN_COLUMN):
