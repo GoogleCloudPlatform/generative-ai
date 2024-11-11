@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mesop as me
+from typing import TypedDict
 
 from dataclasses import field
 from dataclasses_json import dataclass_json
 
-from typing import TypedDict
+import mesop as me
 
 
 class Page(TypedDict):
@@ -38,6 +38,7 @@ page_json = [
 class State():
     pages: list[Page] = field(default_factory=lambda: page_json)
     current_page: str
+
 
 def navigate_to(e: me.ClickEvent):
     s = me.state(State)
@@ -75,7 +76,7 @@ def page_navigation_menu(url: str) -> None:
                     disabled = True
                 me.button(
                     page.get("display"),
-                    key=f"{page.get('route')}", 
+                    key=f"{page.get('route')}",
                     on_click=navigate_to,
                     disabled=disabled,
                     style=_STYLE_CURRENT_NAV if disabled else me.Style(),
@@ -90,4 +91,3 @@ def navmenu(url: str) -> str:
 
     state = me.state(State)
     return state.current_page
-
