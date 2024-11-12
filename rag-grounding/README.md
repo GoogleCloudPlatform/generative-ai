@@ -46,7 +46,7 @@ for a more in-depth walkthrough.
   for Q&A tasks.
 - **[deepeval_with_gemini.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag-evaluation/deepeval_with_gemini.ipynb)**:
   Evaluates Gemini Pro's performance on a question-answering task using
-  DeepEval and the Vertex AI Gemini API, including Pytest integration.
+  DeepEval and the Gemini API in Vertex AI, including Pytest integration.
 
 ## Out of the Box RAG/Grounding
 

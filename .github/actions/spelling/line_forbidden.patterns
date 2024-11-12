@@ -211,8 +211,14 @@
 # Gemini Size should be capitalized (e.g. `Gemini 1.0 Pro`)
 \bGemini\s?\d\.\d\s(pro|flash|ultra)\b
 
+# Don't say "Google Gemini" or "Google Gemini"
+\b[Gg]oogle(?: [Cc]loud| [Dd]eep[Mm]ind)?'s [Gg]emini\b
+
 # Don't say "Powered by Gemini", instead say "with Gemini"
-\b[Pp]owered\sby\s[Gg]emini\b
+\b[Pp]owered\s[Bb]y\s[Gg]emini\b
+
+# Should be Gemini API in Vertex AI
+\bVertex AI Gemini API\b
 
 # Should be Imagen
 \simagen\s\w

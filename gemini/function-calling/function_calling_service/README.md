@@ -6,12 +6,12 @@ It wraps the address lookup tool in the [Introduction to Function Calling notebo
 
 ## Prerequisites
 
-* Set your Google Cloud Project through an environment variable `GOOGLE_CLOUD_PROJECT`.
+- Set your Google Cloud Project through an environment variable `GOOGLE_CLOUD_PROJECT`.
 
 ## Test
 
-* Install the dependencies with `pip install -r requirements.txt`
-* Run `python main.py` to locally run the development server to run this Flask application.
+- Install the dependencies with `pip install -r requirements.txt`
+- Run `python main.py` to locally run the development server to run this Flask application.
 
 ## Deployment
 

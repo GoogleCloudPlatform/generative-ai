@@ -15,7 +15,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member "serviceAccount:${GSA_MEMBER}" \
   --role "roles/discoveryengine.editor"
 
-# IAM Role: Vertex AI Gemini API
+# IAM Role: Gemini API in Vertex AI
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member "serviceAccount:${GSA_MEMBER}" \
   --role "roles/aiplatform.user"

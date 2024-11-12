@@ -62,7 +62,7 @@ class Order {
     age: number,
     gender: string,
     customerRating: number,
-    customerReview: string
+    customerReview: string,
   ) {
     this.orderId = orderId;
     this.userId = userId;
@@ -113,22 +113,22 @@ const boneAppetitSalesDatabaseSchema = z.object({
   status: z
     .string()
     .describe(
-      'Status of the order such as "Pending," "Processing," "Shipped," "Delivered," "Cancelled"'
+      'Status of the order such as "Pending," "Processing," "Shipped," "Delivered," "Cancelled"',
     ),
   createdAt: z
     .string()
     .describe(
-      "Date and time when the order was placed, NULL if not yet created. The date and time must be after the year 2022."
+      "Date and time when the order was placed, NULL if not yet created. The date and time must be after the year 2022.",
     ),
   shippedAt: z
     .string()
     .describe(
-      "Date and time when the order was shipped, NULL if not yet shipped. The date and time must be after the year 2022."
+      "Date and time when the order was shipped, NULL if not yet shipped. The date and time must be after the year 2022.",
     ),
   deliveredAt: z
     .string()
     .describe(
-      "Date and time when the order was delivered, NULL if not yet delivered. The date and time must be after the year 2022."
+      "Date and time when the order was delivered, NULL if not yet delivered. The date and time must be after the year 2022.",
     ),
   gender: z
     .string()
@@ -139,7 +139,7 @@ const boneAppetitSalesDatabaseSchema = z.object({
   customerReview: z
     .string()
     .describe(
-      "Authentic, insightful, fun, honest and unique review from a valued customer based on the given rating."
+      "Authentic, insightful, fun, honest and unique review from a valued customer based on the given rating.",
     ),
 });
 
@@ -156,7 +156,7 @@ const createBoneAppetitSalesRowSchema = defineFlow(
       config: { temperature: 0.3, maxOutputTokens: 8192 },
       prompt: `Generate one unique row of a dataset table at a time. Dataset description: This is a dog food sales database with reviews. Here is the item and its price: ${input}. The customer rating is: ${getRandomIntInclusive(
         0,
-        5
+        5,
       )}. Please ensure the customer review matches the given rating. If the rating is less than 3, please give an honest bad review.`,
       output: { format: "json", schema: boneAppetitSalesDatabaseSchema },
     });
@@ -173,7 +173,7 @@ const createBoneAppetitSalesRowSchema = defineFlow(
 
     // 3. Return valid row data
     return boneAppetitSaleRowItem; // This now aligns with the expected schema
-  }
+  },
 );
 
 // Interface defining the structure of the resolved response from the AI generation.
@@ -192,7 +192,7 @@ interface ResolvedResponse {
 
 // Rate-Limited Generator Function (yields Promises at a controlled rate).
 function* rateLimitedRunFlowGenerator(
-  maxRequestsPerMinute: number = 60
+  maxRequestsPerMinute: number = 60,
 ): Generator<Promise<ResolvedResponse>, void, unknown> {
   let startTime = Date.now();
   let requestsThisMinute = 0;
@@ -210,7 +210,7 @@ function* rateLimitedRunFlowGenerator(
       requestsThisMinute++;
       yield runFlow(
         createBoneAppetitSalesRowSchema,
-        menuItems[getRandomIntInclusive(0, 5)]
+        menuItems[getRandomIntInclusive(0, 5)],
       );
     } else {
       const timeToWait = 60 * 1000 - elapsedTime;
@@ -269,7 +269,7 @@ export const createBoneAppetitSalesDatabase = onRequest(
         getRandomIntInclusive(21, 53),
         structuredResponse["gender"],
         structuredResponse["customerRating"],
-        structuredResponse["customerReview"]
+        structuredResponse["customerReview"],
       );
       const orderData = orderToPlainObject(orderObj);
       logger.log("This is the current order: " + orderObj.orderId);
@@ -277,13 +277,13 @@ export const createBoneAppetitSalesDatabase = onRequest(
       batch.set(orderRef, orderData);
       batchCount++;
       logger.log(
-        "Successfully added Order: " + orderObj.orderId + " to Batch."
+        "Successfully added Order: " + orderObj.orderId + " to Batch.",
       );
       // If batch size limit is reached, commit the batch and start a new one.
       if (batchCount >= BATCH_SIZE) {
         await batch.commit(); // Commit the batch
         logger.log(
-          "Successfully committed a full batch of orders to Firestore."
+          "Successfully committed a full batch of orders to Firestore.",
         );
         batch = db.batch(); // Create a new batch
         batchCount = 0;
@@ -293,5 +293,5 @@ export const createBoneAppetitSalesDatabase = onRequest(
     if (batchCount > 0) {
       await batch.commit();
     }
-  }
+  },
 );
