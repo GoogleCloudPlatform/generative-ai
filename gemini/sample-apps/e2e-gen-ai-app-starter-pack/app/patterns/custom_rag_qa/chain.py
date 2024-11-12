@@ -15,15 +15,16 @@
 # pylint: disable=W0613, W0622
 
 import logging
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, AsyncIterator, List
 
 from app.patterns.custom_rag_qa.templates import (
     inspect_conversation_template,
     rag_template,
     template_docs,
 )
+from app.utils.decorators import custom_chain
 from app.patterns.custom_rag_qa.vector_store import get_vector_store
-from app.utils.output_types import OnChatModelStreamEvent, OnToolEndEvent, custom_chain
+from app.utils.output_types import OnChatModelStreamEvent, OnToolEndEvent
 import google
 from langchain.schema import Document
 from langchain.tools import tool
@@ -97,9 +98,9 @@ response_chain = rag_template | llm
 
 
 @custom_chain
-def chain(
+async def chain(
     input: Dict[str, Any], **kwargs: Any
-) -> Iterator[OnToolEndEvent | OnChatModelStreamEvent]:
+) -> AsyncIterator[OnToolEndEvent | OnChatModelStreamEvent]:
     """
     Implement a RAG QA chain with tool calls.
 
@@ -137,5 +138,5 @@ def chain(
     )
 
     # Stream LLM response
-    for chunk in response_chain.stream(input=input):
+    async for chunk in response_chain.astream(input=input):
         yield OnChatModelStreamEvent(data={"chunk": chunk})
