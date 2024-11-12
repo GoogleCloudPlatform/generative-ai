@@ -6,7 +6,7 @@
 
 ## Overview
 
-This repo provides an example of how to use [Gemini](https://blog.google/technology/ai/gemini-api-developers-cloud/), Google's largest and most capable AI model, to analyze your BigQuery data. BigQuery and [Remote Functions](https://cloud.google.com/bigquery/docs/remote-functions) can be used to analyze images and text input using the [Vertex AI Gemini API](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/quickstart-multimodal) on Google Cloud. The following instructions should help you get started.
+This repo provides an example of how to use [Gemini](https://blog.google/technology/ai/gemini-api-developers-cloud/), Google's largest and most capable AI model, to analyze your BigQuery data. BigQuery and [Remote Functions](https://cloud.google.com/bigquery/docs/remote-functions) can be used to analyze images and text input using the [Gemini API in Vertex AI](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/quickstart-multimodal) on Google Cloud. The following instructions should help you get started.
 
 ## Calling Gemini using SQL
 
@@ -18,7 +18,7 @@ This repo allows you to pass requests to Gemini using SQL and get the results ba
 
 ## About this demo
 
-We've created a Terraform module that deploys all the necessary resources to call the [Vertex AI Gemini API](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/quickstart-multimodal) using SQL in BigQuery.
+We've created a Terraform module that deploys all the necessary resources to call the [Gemini API in Vertex AI](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/quickstart-multimodal) using SQL in BigQuery.
 
 After the module is deployed, you will have access to two [BigQuery Remote Functions](https://cloud.google.com/bigquery/docs/remote-functions):
 
@@ -119,9 +119,9 @@ Gemini will analyze the prewritten text prompts when you invoke the `text_query_
 
 <ol>
   <li>Sample images are uploaded to a Cloud Storage bucket and a GCS object table is created in BigQuery</li>
-  <li>Cloud Workflows creates a stored procedure in BigQuery that contains the sample query, which references the object table created in step 1 to pass images to the remote function for analysis using the Vertex AI Gemini API</li>
+  <li>Cloud Workflows creates a stored procedure in BigQuery that contains the sample query, which references the object table created in step 1 to pass images to the remote function for analysis using the Gemini API in Vertex AI</li>
   <li>The stored procedure from step 2 is used to invoke the Cloud Function through a BigQuery connection</li>
-  <li>The Cloud Function analyzes the sample images by passing them to the Vertex AI Gemini API (step 5) to get a brief description of the sample images and returns results from the Vertex AI Gemini API as query results</li>
+  <li>The Cloud Function analyzes the sample images by passing them to the Gemini API in Vertex AI (step 5) to get a brief description of the sample images and returns results from the Gemini API in Vertex AI as query results</li>
 </ol>
 
 #### Text analysis
@@ -130,9 +130,9 @@ Gemini will analyze the prewritten text prompts when you invoke the `text_query_
   <img src="https://storage.googleapis.com/github-repo/bigquery-remote-functions/architecture/text_analysis_diagram.png" alt="Architecture Diagram for analyzing images" width=800px>
 </p>
 <ol>
-  <li>Cloud Workflows creates a stored procedure in BigQuery that contains the sample query and provisions the <code>sample_text_prompts</code> table, which contains sample text prompts to describe various landmarks. The sample query passes these prompts to the remote function for analysis using the Vertex AI Gemini API</li>
+  <li>Cloud Workflows creates a stored procedure in BigQuery that contains the sample query and provisions the <code>sample_text_prompts</code> table, which contains sample text prompts to describe various landmarks. The sample query passes these prompts to the remote function for analysis using the Gemini API in Vertex AI</li>
   <li>The stored procedure from step 2 is used to invoke the Cloud Function through a BigQuery connection</li>
-  <li>The Cloud Function analyzes the text input from the sample text by passing them to the Vertex AI Gemini API (step 4) to get generate a text response to each prompt and returns results from the Vertex AI Gemini API as query results</li>
+  <li>The Cloud Function analyzes the text input from the sample text by passing them to the Gemini API in Vertex AI (step 4) to get generate a text response to each prompt and returns results from the Gemini API in Vertex AI as query results</li>
 </ol>
 
 ## Pricing Estimation

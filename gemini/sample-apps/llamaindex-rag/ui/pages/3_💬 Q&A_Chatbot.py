@@ -321,7 +321,7 @@ qa_followup = st.sidebar.checkbox("Query Questions Answered Index", value=True)
 hybrid_retrieval = st.sidebar.checkbox("Hybrid Retrieval", value=True)
 
 st.sidebar.markdown("---")
-st.sidebar.warning("🚀 Powered by Google's Gemini ♊ Models & LlamaIndex🦙📊!")
+st.sidebar.warning("🚀 Powered by Google Gemini ♊ Models & LlamaIndex🦙📊!")
 
 
 # Initialize metrics in session state

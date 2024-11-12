@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-const location = 'us';
-const datasetId = 'genai_demo';
-const connectionId = 'genai-connection';
-const modelId = 'genai-model';
-const tableName = 'genai-data'
-const modelName = 'gemini-pro';
+const location = "us";
+const datasetId = "genai_demo";
+const connectionId = "genai-connection";
+const modelId = "genai-model";
+const tableName = "genai-data";
+const modelName = "gemini-pro";
 
 function setup() {
   projectId = setProjectId();
   if (projectId == null) {
-    SpreadsheetApp.getUi().alert("A valid project ID must be provided to set up the project.");
+    SpreadsheetApp.getUi().alert(
+      "A valid project ID must be provided to set up the project.",
+    );
     return;
   }
 
@@ -40,25 +42,27 @@ function setup() {
 
   endpoint = createEndpoint(projectId);
   if (endpoint) {
-    SpreadsheetApp.getActiveSpreadsheet().toast("Setup completed successfully.");
+    SpreadsheetApp.getActiveSpreadsheet().toast(
+      "Setup completed successfully.",
+    );
   }
-
 }
 
 function createDataset(projectId) {
-  var query = `SELECT * FROM \`${projectId}\`.INFORMATION_SCHEMA.SCHEMATA ` +
+  var query =
+    `SELECT * FROM \`${projectId}\`.INFORMATION_SCHEMA.SCHEMATA ` +
     `WHERE schema_name = '${datasetId}'`;
-  response = runQuery(query)
+  response = runQuery(query);
 
   if (response.totalRows == 1) {
     return response.queryId;
   }
-  query = `CREATE SCHEMA \`${projectId}.${datasetId}\`\n` +
-    `  OPTIONS ( location = '${location}' );`
+  query =
+    `CREATE SCHEMA \`${projectId}.${datasetId}\`\n` +
+    `  OPTIONS ( location = '${location}' );`;
   try {
     return runQuery(query).queryId;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error.details.message);
     SpreadsheetApp.getUi().alert(error);
     return null;
@@ -69,38 +73,38 @@ function createDataset(projectId) {
  * Create BigQuery table if it doesn't exist already
  */
 function createTable(projectId) {
-  var query = `SELECT * FROM \`${projectId}.${datasetId}.INFORMATION_SCHEMA.TABLES\` ` +
+  var query =
+    `SELECT * FROM \`${projectId}.${datasetId}.INFORMATION_SCHEMA.TABLES\` ` +
     `WHERE table_name = '${tableName}'`;
-  response = runQuery(query)
+  response = runQuery(query);
 
   if (response.totalRows == 1) {
     return response.queryId;
   }
-  query = `CREATE TABLE \`${projectId}.${datasetId}.${tableName}\` ` +
+  query =
+    `CREATE TABLE \`${projectId}.${datasetId}.${tableName}\` ` +
     "(prompt STRING, response STRING);";
   try {
     return runQuery(query).queryId;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error.details.message);
     SpreadsheetApp.getUi().alert(error);
     return null;
   }
 }
 
-
 function createEndpoint(projectId) {
   try {
     model = BigQuery.Models.get(projectId, datasetId, modelId);
     return model;
   } catch {
-    const query = `CREATE MODEL \`${projectId}.${datasetId}.${modelId}\`\n` +
+    const query =
+      `CREATE MODEL \`${projectId}.${datasetId}.${modelId}\`\n` +
       `REMOTE WITH CONNECTION \`${projectId}.${location}.${connectionId}\`\n` +
-      `OPTIONS(ENDPOINT = "${modelName}")`
+      `OPTIONS(ENDPOINT = "${modelName}")`;
     try {
       return runQuery(query).queryId;
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error.details.message);
       SpreadsheetApp.getUi().alert(error);
       return null;
@@ -111,11 +115,15 @@ function createEndpoint(projectId) {
 function query() {
   projectId = getProjectId();
   if (projectId == null) {
-    SpreadsheetApp.getUi().alert("A Google Cloud project must be selected using the Setup menu item.");
+    SpreadsheetApp.getUi().alert(
+      "A Google Cloud project must be selected using the Setup menu item.",
+    );
   }
   const numColumns = SpreadsheetApp.getActiveRange().getNumColumns();
   if (numColumns != 1) {
-    SpreadsheetApp.getUi().alert("Exactly one column of prompts must be selected.");
+    SpreadsheetApp.getUi().alert(
+      "Exactly one column of prompts must be selected.",
+    );
     return null;
   }
 
@@ -123,9 +131,10 @@ function query() {
   const prompts = sanitizePrompts(SpreadsheetApp.getActiveRange().getValues());
   populateTable(prompts);
 
-  const query = `SELECT * FROM ML.GENERATE_TEXT( MODEL \`${datasetId}.${modelId}\`, ` +
+  const query =
+    `SELECT * FROM ML.GENERATE_TEXT( MODEL \`${datasetId}.${modelId}\`, ` +
     `(SELECT * FROM \`${projectId}.${datasetId}.${tableName}\`), ` +
-    `STRUCT(${getMaxOutputTokens()} AS max_output_tokens, ${getTemperature()} AS temperature));`
+    `STRUCT(${getMaxOutputTokens()} AS max_output_tokens, ${getTemperature()} AS temperature));`;
   console.log(`Query: ${query}`);
 
   try {
@@ -163,12 +172,14 @@ function query() {
   }
 
   if (invalidResponses) {
-    SpreadsheetApp.getActiveSpreadsheet().toast("Some prompts did not return a response. Check prompts and safety settings.");
+    SpreadsheetApp.getActiveSpreadsheet().toast(
+      "Some prompts did not return a response. Check prompts and safety settings.",
+    );
   }
 
   // Responses come back in any order.
   // Put these in the same order as the selected cells.
-  responses = []; 
+  responses = [];
   for (const prompt of prompts) {
     responses.push(responseMap[prompt]);
   }
@@ -176,14 +187,16 @@ function query() {
   writeResponses(responses);
 }
 
-function sanitizePrompts(prompts) {    
+function sanitizePrompts(prompts) {
   // Sanitize each prompt in the array
-  return prompts.map(row => row.map(prompt => {
-    if (typeof prompt !== 'string') return prompt;
+  return prompts.map((row) =>
+    row.map((prompt) => {
+      if (typeof prompt !== "string") return prompt;
 
-    // Keep only letters, numbers, and whitespace
-    return prompt.replace(/[^a-zA-Z0-9\s]/g, '');
-  }));
+      // Keep only letters, numbers, and whitespace
+      return prompt.replace(/[^a-zA-Z0-9\s]/g, "");
+    }),
+  );
 }
 
 /**
@@ -200,28 +213,34 @@ function writeResponses(responses) {
   const numColumns = activeRange.getNumColumns();
 
   if (responses.length !== numRows) {
-    SpreadsheetApp.getUi().alert("Number of columns selected does not match number of responses returned.");
+    SpreadsheetApp.getUi().alert(
+      "Number of columns selected does not match number of responses returned.",
+    );
   }
 
   // Calculate the new range and write the values
   const newRange = sheet.getRange(startRow, startColumn, numRows, numColumns);
-  newRange.setValues(responses.map(response => [response]));
+  newRange.setValues(responses.map((response) => [response]));
 }
 
 function getProjectId(name = "project ID", defaultValue = null) {
-  return PropertiesService.getUserProperties().getProperty(name) || defaultValue;
+  return (
+    PropertiesService.getUserProperties().getProperty(name) || defaultValue
+  );
 }
 
 function setProjectId(name = "project ID") {
   newValue = setParameter(name, getProjectId());
   if (newValue != null) {
-    PropertiesService.getUserProperties().setProperty(name, newValue)
+    PropertiesService.getUserProperties().setProperty(name, newValue);
   }
   return newValue;
 }
 
 function getTemperature(name = "temperature", defaultValue = 0) {
-  return Number(PropertiesService.getUserProperties().getProperty(name) || defaultValue);
+  return Number(
+    PropertiesService.getUserProperties().getProperty(name) || defaultValue,
+  );
 }
 
 function setTemperature(name = "temperature", min = 0, max = 1) {
@@ -233,7 +252,9 @@ function setTemperature(name = "temperature", min = 0, max = 1) {
 }
 
 function getMaxOutputTokens(name = "max output tokens", defaultValue = 128) {
-  return Number(PropertiesService.getUserProperties().getProperty(name) || defaultValue);
+  return Number(
+    PropertiesService.getUserProperties().getProperty(name) || defaultValue,
+  );
 }
 
 function setMaxOutputTokens(name = "max output tokens", min = 1, max = 8192) {
@@ -244,9 +265,9 @@ function setMaxOutputTokens(name = "max output tokens", min = 1, max = 8192) {
   return newValue;
 }
 
-function setParameter(name, value=null, min=null, max=null) {
+function setParameter(name, value = null, min = null, max = null) {
   const ui = SpreadsheetApp.getUi();
-  const isNumeric = ((min != null) && (max != null));
+  const isNumeric = min != null && max != null;
 
   let promptText = `Enter ${name}:`;
   if (isNumeric) {
@@ -258,20 +279,20 @@ function setParameter(name, value=null, min=null, max=null) {
     prompt = ui.prompt(
       promptText,
       `Current value is ${value}.`,
-      ui.ButtonSet.OK_CANCEL
+      ui.ButtonSet.OK_CANCEL,
     );
   } else {
-      prompt = ui.prompt(
-      promptText,
-      ui.ButtonSet.OK_CANCEL
-    );
+    prompt = ui.prompt(promptText, ui.ButtonSet.OK_CANCEL);
   }
 
   if (prompt.getSelectedButton() == ui.Button.OK) {
     const inputText = prompt.getResponseText().trim();
     const inputValue = isNumeric ? Number(inputText) : inputText;
 
-    if ((inputValue != null) && (!isNumeric || (inputValue >= min && inputValue <= max))) {
+    if (
+      inputValue != null &&
+      (!isNumeric || (inputValue >= min && inputValue <= max))
+    ) {
       console.log(`User updated ${name} to ${inputValue}.`);
       return inputValue;
     } else {
@@ -291,7 +312,7 @@ function setParameter(name, value=null, min=null, max=null) {
 function runQuery(query) {
   const request = {
     query: query,
-    useLegacySql: false
+    useLegacySql: false,
   };
 
   let queryResults = BigQuery.Jobs.query(request, projectId);
@@ -333,7 +354,7 @@ function getValuesStr(inputs) {
   const values = [];
   for (let i = 0; i < inputs.length; i++) {
     input = inputs[i];
-    values.push('(' + inputs[i].map((x) => '\'' + x + '\'').join() + ')');
+    values.push("(" + inputs[i].map((x) => "'" + x + "'").join() + ")");
   }
   return values.join();
 }
@@ -343,12 +364,14 @@ function getValuesStr(inputs) {
  */
 function onOpen() {
   SpreadsheetApp.getUi()
-    .createMenu('Gemini')
-    .addItem('Query', 'query')
-    .addItem('Setup', 'setup')
+    .createMenu("Gemini")
+    .addItem("Query", "query")
+    .addItem("Setup", "setup")
     .addSubMenu(
-      SpreadsheetApp.getUi().createMenu('Configure')
-        .addItem('Temperature', 'setTemperature')
-        .addItem('Max Output Tokens', 'setMaxOutputTokens')
-    ).addToUi();
+      SpreadsheetApp.getUi()
+        .createMenu("Configure")
+        .addItem("Temperature", "setTemperature")
+        .addItem("Max Output Tokens", "setMaxOutputTokens"),
+    )
+    .addToUi();
 }
