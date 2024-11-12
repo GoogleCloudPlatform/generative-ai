@@ -1,19 +1,12 @@
 {
-  "extends": [
-    "group:allNonMajor"
-  ],
+  "extends": ["group:allNonMajor"],
   "prConcurrentLimit": 0,
   "lockFileMaintenance": {
     "enabled": false
   },
   "packageRules": [
     {
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "lockFileMaintenance",
-        "bump"
-      ],
+      "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance", "bump"],
       "automerge": true
     },
     {
