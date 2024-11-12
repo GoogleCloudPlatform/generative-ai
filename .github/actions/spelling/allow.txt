@@ -936,6 +936,7 @@ pysftp
 pyvis
 qna
 qrel
+qrels
 quadrotor
 qubit
 qubits
