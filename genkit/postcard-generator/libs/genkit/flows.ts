@@ -42,7 +42,7 @@ configureGenkit(genkitConfig);
 const authEnabled = process.env.AUTH_ENABLED?.toLowerCase() !== "false";
 
 /**
- * Create a postcard using Google Maps, Gemini, and Imagen3. Should not be called
+ * Create a postcard using Google Maps, Gemini, and Imagen 3. Should not be called
  * directly from clients, instead route through callPostcardFlow
  *
  * @see callPostcardFlow

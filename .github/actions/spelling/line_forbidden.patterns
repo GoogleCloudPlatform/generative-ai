@@ -224,7 +224,7 @@
 \simagen\s\w
 
 # Should be Imagen 2 or Imagen 3
-\b[Ii]magen\d\b
+\bImagen\d\b
 
 # Should be BigQuery
 \b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
