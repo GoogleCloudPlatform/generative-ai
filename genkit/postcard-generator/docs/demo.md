@@ -36,7 +36,7 @@ You can then navigate to [localhost:3000](http://localhost:3000) and send a demo
    - The prompt can be seen in [prompts/postcard-map.prompt](prompts/postcard-map.prompt)
    - This prompt requests Gemini returns the response in structured JSON, the schema of which can be seen in [libs/genkit/schema.ts](libs/genkit/schema.ts).
    - An example [partial prompt](https://firebase.google.com/docs/genkit/dotprompt#partials) in [prompts/\_example-highlights.prompt](prompts/_example-highlights.prompt)
-4. The highlights of the route alongside the start and end is sent to Imagen3
+4. The highlights of the route alongside the start and end is sent to Imagen 3
    - This prompt can be seen in [prompts/postcard-image.prompt](prompts/postcard-image.prompt)
 5. The flow returns the generated image, the story created, and the map image
 

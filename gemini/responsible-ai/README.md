@@ -2,9 +2,9 @@
 
 These comprehensive learning notebooks dive deep into the critical world of LLM security, equipping you with the knowledge and skills to build, deploy, and maintain secure and trustworthy AI solutions. From understanding the latest attack vectors to implementing cutting-edge defenses, these notebooks are your guide to navigating the evolving landscape of LLM security.
 
-- [Responsible AI with Vertex AI Gemini API: Safety ratings and thresholds](gemini_safety_ratings.ipynb)
+- [Responsible AI with Gemini API in Vertex AI: Safety ratings and thresholds](gemini_safety_ratings.ipynb)
 
-  - Call the Vertex AI Gemini API and inspect safety ratings of the responses
+  - Call the Gemini API in Vertex AI and inspect safety ratings of the responses
   - Define a threshold for filtering safety ratings according to your needs
 
 - [LLM Prompt attacks and mitigation](gemini_prompt_attacks_mitigation_examples.ipynb)
