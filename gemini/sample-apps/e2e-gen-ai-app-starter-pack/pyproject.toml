@@ -9,7 +9,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-traceloop-sdk = "^0.30.1"
+traceloop-sdk = "^0.33.12"
 langchain-google-vertexai = "^2.0.4"
 opentelemetry-exporter-gcp-trace = "^1.6.0"
 opentelemetry-sdk = "^1.25.0"
