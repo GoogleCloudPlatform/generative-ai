@@ -46,6 +46,7 @@
 /generative-ai/speech/use-cases/storytelling                @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases                             @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/getting-started                       @iamthuya @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/vision/use-cases/advertisement-creation-using-gemini-and-imagen3    @ankuljain09 @koyelguha
 /generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb        @saeedaghabozorgi @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/genwealth/                @paulramsey @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/finance-advisor-spanner/  @anirbanbagchi1979 @GoogleCloudPlatform/generative-ai-devrel
