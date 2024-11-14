@@ -72,6 +72,7 @@ Please submit additional resources via a PR.
 ## Cloud Skills Boost
 
 - [Beginner: Introduction to Generative AI Learning Path](https://www.cloudskillsboost.google/paths/118): This learning path provides an overview of generative AI concepts, from the fundamentals of large language models to responsible AI principles. This learning path currently has several courses listed below:
+
   - [Introduction to Generative AI](https://www.cloudskillsboost.google/course_templates/536)
   - [Introduction to Large Language Models](https://www.cloudskillsboost.google/course_templates/539)
   - [Introduction to Responsible AI](https://www.cloudskillsboost.google/course_templates/554)
@@ -79,6 +80,7 @@ Please submit additional resources via a PR.
   - [Responsible AI: Applying AI Principles with Google Cloud](https://www.cloudskillsboost.google/paths/118/course_templates/388)
 
 - [Intermediate: Gemini for Google Cloud Learning Path](https://www.cloudskillsboost.google/paths/236): The Gemini for Google Cloud learning path provides examples of how Gemini can help make engineers of all types more efficient in their daily activities.
+
   - [Gemini for Application Developers](https://www.cloudskillsboost.google/course_templates/881)
   - [Gemini for Cloud Architects](https://www.cloudskillsboost.google/paths/236/course_templates/878)
   - [Gemini for Data Scientists and Analysts](https://www.cloudskillsboost.google/paths/236/course_templates/879)
@@ -100,7 +102,7 @@ Please submit additional resources via a PR.
   - [Responsible AI for Developers: Fairness and Bias](https://www.cloudskillsboost.google/paths/183/course_templates/985)
   - [Responsible AI for Developers: Interpretability & Transparency](https://www.cloudskillsboost.google/paths/183/course_templates/989)
   - [Machine Learning Operations (MLOps) for Generative AI](https://www.cloudskillsboost.google/paths/183/course_templates/927)
-  
+
 ## Google Cloud Playlists/Videos
 
 - [Generative AI - Google Cloud Next 2024](https://www.youtube.com/watch?v=PyM3Vt6s1GI&list=PLIivdWyY5sqLHERDVwseyPGka96mCiwpq)

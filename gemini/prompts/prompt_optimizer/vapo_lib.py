@@ -140,8 +140,7 @@ def validate_prompt_and_data(
     """Validates the prompt template and the dataset."""
     data = load_dataset(dataset_path)
     placeholder_to_content_json = json.loads(placeholder_to_content)
-    template = re.sub(r"(?<!{){(?!{)", "{{", template)
-    template = re.sub(r"(?<!})}(?!})", "}}", template)
+    template = re.sub(r"(?<!{){(?!{)(\s*\w+\s*)(?<!})}(?!})", r"{{\1}}", template)
     env = jinja2.Environment()
     try:
         parsed_content = env.parse(template)

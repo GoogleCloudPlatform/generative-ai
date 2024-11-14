@@ -1,4 +1,4 @@
-# FixMyCar 
+# FixMyCar
 
 FixMyCar is a retrieval-augmented generation (RAG) sample application, powered by Google Cloud, including: Gemini on Vertex AI, Vertex AI Agent Builder, Google Kubernetes Engine (GKE), Java (Spring), and Python (Streamlit). This doc guides you through deploying this app to your Google Cloud project.
 
