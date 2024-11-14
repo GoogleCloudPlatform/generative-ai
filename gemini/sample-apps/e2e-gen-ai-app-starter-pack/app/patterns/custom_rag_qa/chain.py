@@ -15,15 +15,15 @@
 # pylint: disable=W0613, W0622
 
 import logging
-from typing import Any, Dict, AsyncIterator, List
+from typing import Any, AsyncIterator, Dict, List
 
 from app.patterns.custom_rag_qa.templates import (
     inspect_conversation_template,
     rag_template,
     template_docs,
 )
-from app.utils.decorators import custom_chain
 from app.patterns.custom_rag_qa.vector_store import get_vector_store
+from app.utils.decorators import custom_chain
 from app.utils.output_types import OnChatModelStreamEvent, OnToolEndEvent
 import google
 from langchain.schema import Document
