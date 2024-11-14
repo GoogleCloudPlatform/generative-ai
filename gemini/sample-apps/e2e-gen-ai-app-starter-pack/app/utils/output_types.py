@@ -12,18 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from concurrent.futures import ThreadPoolExecutor
-from functools import wraps
-from types import GeneratorType
-from typing import Any, AsyncGenerator, Callable, Dict, List, Literal, Union
+from typing import Dict, Literal
 import uuid
 
-from langchain_core.messages import AIMessage, AIMessageChunk, ToolMessage
-from langchain_core.runnables.utils import Input
+from langchain_core.messages import AIMessageChunk, ToolMessage
 from pydantic import BaseModel, Field
-from tqdm import tqdm
-from traceloop.sdk import TracerWrapper
-from traceloop.sdk.decorators import workflow
 
 
 class BaseCustomChainEvent(BaseModel):
@@ -84,81 +77,3 @@ class EndEvent(BaseModel):
     """Event representing the end of a stream."""
 
     event: Literal["end"] = "end"
-
-
-class CustomChain:
-    """A custom chain class that wraps a callable function."""
-
-    def __init__(self, func: Callable):
-        """Initialize the CustomChain with a callable function."""
-        self.func = func
-
-    async def astream_events(self, *args: Any, **kwargs: Any) -> AsyncGenerator:
-        """
-        Asynchronously stream events from the wrapped function.
-        Applies Traceloop workflow decorator if Traceloop SDK is initialized.
-        """
-
-        if hasattr(TracerWrapper, "instance"):
-            func = workflow()(self.func)
-        else:
-            func = self.func
-
-        gen: GeneratorType = func(*args, **kwargs)
-
-        for event in gen:
-            yield event.model_dump()
-
-    def invoke(self, *args: Any, **kwargs: Any) -> AIMessage:
-        """
-        Invoke the wrapped function and process its events.
-        Returns an AIMessage with content and relative tool calls.
-        """
-        events = self.func(*args, **kwargs)
-        response_content = ""
-        tool_calls = []
-        for event in events:
-            if isinstance(event, OnChatModelStreamEvent):
-                if not isinstance(event.data.chunk.content, str):
-                    raise ValueError("Chunk content must be a string")
-                response_content += event.data.chunk.content
-            elif isinstance(event, OnToolEndEvent):
-                tool_calls.append(event.data.model_dump())
-        return AIMessage(
-            content=response_content, additional_kwargs={"tool_calls_data": tool_calls}
-        )
-
-    def batch(
-        self,
-        inputs: List[Input],
-        *args: Any,
-        max_workers: Union[int, None] = None,
-        **kwargs: Any
-    ) -> List[AIMessage]:
-        """
-        Invoke the wrapped function and process its events in batch.
-        Returns a List of AIMessage with content and relative tool calls.
-        """
-        predicted_messages = []
-        with ThreadPoolExecutor(max_workers) as pool:
-            for response in tqdm(
-                pool.map(self.invoke, inputs, *args, **kwargs), total=len(inputs)
-            ):
-                predicted_messages.append(response)
-        return predicted_messages
-
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        """Make the CustomChain instance callable, invoking the wrapped function."""
-        return self.func(*args, **kwargs)
-
-
-def custom_chain(func: Callable) -> CustomChain:
-    """
-    Decorator function that wraps a callable in a CustomChain instance.
-    """
-
-    @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
-        return func(*args, **kwargs)
-
-    return CustomChain(wrapper)
