@@ -1021,6 +1021,7 @@ svm
 sxs
 tabular
 tagline
+tavily
 tencel
 termcolor
 terraform
