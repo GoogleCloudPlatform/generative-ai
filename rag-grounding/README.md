@@ -90,6 +90,18 @@ data.
 <!-- Link to Talk2Docs -->
 <!-- Link to Examples from Hossain -->
 
+## Orchestration with RAG Engine
+
+[RAG Engine on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/rag-overview) is a data framework for developing context-augmented large language model (LLM) applications. Context augmentation occurs when you apply an LLM to your data. This implements retrieval-augmented generation (RAG).
+
+- **[intro_rag_engine.ipynb](../gemini/rag-engine/intro_rag_engine.ipynb)**: Introduction to RAG Engine
+- Vector Database Choices
+  - **[rag_engine_feature_store.ipynb](../gemini/rag-engine/rag_engine_feature_store.ipynb)**: How to use RAG Engine with [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore/latest/overview)
+  - **[rag_engine_pinecone.ipynb](../gemini/rag-engine/rag_engine_pinecone.ipynb)**: How to use RAG Engine with [Pinecone](https://www.pinecone.io/)
+  - **[rag_engine_vector_search.ipynb](../gemini/rag-engine/rag_engine_weaviate.ipynb)**: How to use RAG Engine with [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview)
+  - **[rag_engine_weaviate.ipynb](../gemini/rag-engine/rag_engine_weaviate.ipynb)**: How to use RAG Engine with [Weaviate](https://weaviate.io/)
+- **[rag_engine_evaluation.ipynb](../gemini/rag-engine/rag_engine_evaluation.ipynb)**: Advanced RAG Techniques and Evaluation with RAG Engine
+
 ## Bring your own Search for RAG/Grounding
 
 The Vertex AI Search - Grounded Generation API allows you to use a custom search
@@ -115,9 +127,9 @@ of your own.
 - [Vertex AI APIs for building search and RAG](https://cloud.google.com/generative-ai-app-builder/docs/builder-apis)
   has a list of several APIs you can use in isolation or in combination
 
-We have a managed service to assemble component using LlamaIndex style SDK.
+We have a managed service to assemble component using a LlamaIndex style SDK.
 
-- [LlamaIndex on Vertex](https://cloud.google.com/vertex-ai/generative-ai/docs/rag-overview)
+- [RAG Engine](https://cloud.google.com/vertex-ai/generative-ai/docs/rag-overview)
   allows you to assemble a RAG search using popular OSS framework and
   components from Google or Open Source
 
