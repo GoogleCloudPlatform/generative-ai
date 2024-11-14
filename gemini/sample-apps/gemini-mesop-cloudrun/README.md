@@ -92,7 +92,7 @@ To deploy the Mesop Application in [Cloud Run](https://cloud.google.com/run/docs
       --port=8080 --allow-unauthenticated \
       --project=$GOOGLE_CLOUD_PROJECT --region=$GOOGLE_CLOUD_REGION \
       --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT \
-      --set-env-vars=GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION 
+      --set-env-vars=GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION
    ```
 
 On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.
