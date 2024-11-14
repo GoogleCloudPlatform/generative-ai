@@ -15,6 +15,7 @@
 /generative-ai/gemini/function-calling                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/rag-engine                            @edtsoi430 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/reasoning-engine                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/reasoning-engine/tutorial_alloydb_rag_agent.ipynb @averikitsch
 /generative-ai/gemini/reasoning-engine/tutorial_cloud_sql_pg_rag_agent.ipynb @averikitsch

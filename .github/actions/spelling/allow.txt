@@ -505,8 +505,10 @@ appuser
 apredict
 aquery
 arXiv
+arange
 aretrieve
 argmax
+arguana
 arun
 arxiv
 astype
@@ -523,6 +525,7 @@ barmode
 barpolar
 baxis
 bbc
+beir
 bff
 bigframes
 bigquery
@@ -590,6 +593,7 @@ dataframe
 datname
 dbadmin
 dbln
+dcg
 ddbb
 ddl
 deepeval
@@ -651,6 +655,7 @@ ffi
 figsize
 fillmode
 fillna
+fiqa
 firestore
 fixmycar
 flac
@@ -721,12 +726,14 @@ heatmap
 heatmapgl
 hexsha
 hnsw
+hotpotqa
 hovermode
 https
 httpx
 hwnd
 iban
 icudtl
+idcg
 idk
 idks
 idxs
@@ -811,6 +818,7 @@ metadatas
 mgrs
 millis
 miranda
+mmarco
 mmr
 morty
 moviepy
@@ -819,6 +827,8 @@ mpld
 mpn
 mrag
 mrr
+mrtydi
+msmarco
 multitool
 mvn
 mvnw
@@ -836,10 +846,12 @@ nbviewer
 nce
 ncols
 ndarray
+ndcg
 neering
 netif
 newaxis
 newaxisngram
+nfcorpus
 ngram
 ngrams
 nlp
@@ -923,6 +935,8 @@ pyplot
 pysftp
 pyvis
 qna
+qrel
+qrels
 quadrotor
 qubit
 qubits
@@ -959,6 +973,8 @@ saaagesh
 saveddir
 scann
 scattergl
+scidocs
+scifact
 scikit
 seaborn
 seatback
