@@ -17,15 +17,24 @@ import csv
 import io
 import json
 import re
+import random
+import string
+import subprocess
+from typing import Dict, List, Optional, Tuple, Union
 
 from IPython.core.display import DisplayHandle
-from IPython.display import HTML, display
+from IPython.display import HTML, Markdown, display
 from google.cloud import aiplatform, storage
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
 import pandas as pd
 from tensorflow.io import gfile
+import plotly.graph_objects as go
+from tenacity import retry, wait_random_exponential
+from vertexai import generative_models
+from vertexai.evaluation import EvalTask
+from vertexai.generative_models import GenerativeModel
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
@@ -661,3 +670,189 @@ class ResultsUI:
                 self.results_output,
             ]
         )
+
+
+def get_id(length: Union[int, None] = 8) -> str:
+    """Generate a uuid of a specified length (default=8)."""
+    if length is None:
+        length = 8
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
+
+
+def get_auth_token() -> None:
+    """A function to collect the authorization token"""
+    try:
+        result = subprocess.run(
+            ["gcloud", "auth", "print-identity-token", "-q"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting auth token: {e}")
+        return None
+
+
+@retry(wait=wait_random_exponential(multiplier=1, max=120))
+async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None]:
+    """Generate a response from the model."""
+    response = await model.generate_content_async(
+        [prompt],
+        stream=False,
+    )
+    return response.text if response.text else None
+
+
+def evaluate_task(
+    df: pd.DataFrame,
+    prompt_col: str,
+    reference_col: str,
+    response_col: str,
+    experiment_name: str,
+    eval_metrics: List[str],
+    eval_sample_n: int,
+) -> Dict[str, float]:
+    """Evaluate task using Vertex AI Evaluation."""
+
+    # Generate a unique id for the experiment run
+    idx = get_id()
+
+    # Rename the columns to match the expected format
+    eval_dataset = df[[prompt_col, reference_col, response_col]].rename(
+        columns={
+            prompt_col: "prompt",
+            reference_col: "reference",
+            response_col: "response",
+        }
+    )
+
+    # Drop rows with missing values
+    eval_dataset = eval_dataset.dropna()
+
+    # Sample a subset of the dataset
+    eval_dataset = eval_dataset.sample(n=eval_sample_n, random_state=8).reset_index(
+        drop=True
+    )
+
+    # Create an EvalTask object
+    eval_task = EvalTask(
+        dataset=eval_dataset,
+        metrics=eval_metrics,
+        experiment=experiment_name,
+    )
+
+    # Evaluate the task
+    result = eval_task.evaluate(experiment_run_name=f"{experiment_name}-{idx}")
+
+    # Return the summary metrics
+    return result.summary_metrics
+
+
+def print_df_rows(
+    df: pd.DataFrame, columns: Optional[List[str]] = None, n: int = 3
+) -> None:
+    """Print a subset of rows from a DataFrame."""
+
+    # Define the base style for the text
+    base_style = (
+        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
+    )
+
+    # Define the header style for the text
+    header_style = "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px; font-weight: bold;"
+
+    # If columns are specified, filter the DataFrame
+    if columns:
+        df = df[columns]
+
+    # Initialize the counter for printed samples
+    printed_samples = 0
+
+    # Iterate over the rows of the DataFrame
+    for _, row in df.iterrows():
+        for field in df.columns:
+            display(HTML(f"<span style='{header_style}'>{field.capitalize()}:</span>"))
+            display(HTML("<br>"))
+            value = row[field]
+            display(HTML(f"<span style='{base_style}'>{value}</span>"))
+            display(HTML("<br>"))
+
+        printed_samples += 1
+        if printed_samples >= n:
+            break
+
+            
+            
+def init_new_model(
+    model_name: str, 
+    generation_config: Dict = None, 
+    safety_settings: Dict = None
+) -> GenerativeModel:
+    """Initialize a new model with configurable generation and safety settings."""
+
+    # Use default configurations if none are provided
+    if generation_config is None:
+        generation_config = {
+            "candidate_count": 1,
+            "max_output_tokens": 2048,
+            "temperature": 0.5,
+        }
+    if safety_settings is None:
+        safety_settings = {
+            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
+            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
+        }
+
+    # Initialize the model
+    model = GenerativeModel(
+        model_name=model_name,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+    )
+    return model
+
+
+def plot_eval_metrics(
+    eval_results: List[tuple[str, Dict[str, float]]],
+    metrics: Optional[List[str]] = None,
+) -> None:
+    """Plot a bar plot for the evaluation results."""
+
+    # Create data for the bar plot
+    data = []
+    for eval_result in eval_results:
+        title, summary_metrics = eval_result
+        if metrics:
+            summary_metrics = {
+                k: summary_metrics[k]
+                for k, v in summary_metrics.items()
+                if any(selected_metric in k for selected_metric in metrics)
+            }
+
+        summary_metrics = {k: v for k, v in summary_metrics.items() if "mean" in k}
+        data.append(
+            go.Bar(
+                x=list(summary_metrics.keys()),
+                y=list(summary_metrics.values()),
+                name=title,
+            )
+        )
+
+    # Update the figure with the data
+    fig = go.Figure(data=data)
+
+    # Add the title
+    fig.update_layout(
+        title=go.layout.Title(text="Evaluation Metrics", x=0.5),
+        xaxis_title="Metric Name",
+        yaxis_title="Mean Value",
+    )
+
+    # Change the bar mode
+    fig.update_layout(barmode="group")
+
+    # Show the plot
+    fig.show()
