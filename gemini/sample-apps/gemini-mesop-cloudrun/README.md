@@ -1,4 +1,4 @@
-# Mesop application using Vertex AI Gemini API on Cloud Run
+# Mesop application using Gemini API in Vertex AI on Cloud Run
 
 |           |                                                |
 | --------- | ---------------------------------------------- |
@@ -53,7 +53,7 @@ To run the Mesop application locally (on Cloud Shell), we need to perform the fo
    mesop --port 8080 main.py
    ```
 
-The application will startup and you will be provided a URL to the application. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) function to launch the preview page. You may also visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.
+The application will startup and you will be provided a URL to the application. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) function to launch the preview page. You may also visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Gemini API in Vertex AI and display the responses.
 
 ## Build and Deploy the Application to Cloud Run
 
@@ -95,6 +95,6 @@ To deploy the Mesop Application in [Cloud Run](https://cloud.google.com/run/docs
       --set-env-vars=GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION
    ```
 
-On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.
+On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed. Choose the functionality that you would like to check out and the application will prompt the Gemini API in Vertex AI and display the responses.
 
 Congratulations!
