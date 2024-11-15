@@ -34,7 +34,7 @@ import plotly.graph_objects as go
 from tenacity import retry, wait_random_exponential
 from vertexai import generative_models
 from vertexai.evaluation import EvalTask
-from vertexai.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel, GenerationConfig
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
@@ -672,7 +672,7 @@ class ResultsUI:
         )
 
 
-def get_id(length: Union[int, None] = 8) -> str:
+def get_id(length: int = 8) -> str:
     """Generate a uuid of a specified length (default=8)."""
     if length is None:
         length = 8
@@ -766,11 +766,8 @@ def print_df_rows(
     if columns:
         df = df[columns]
 
-    # Initialize the counter for printed samples
-    printed_samples = 0
-
     # Iterate over the rows of the DataFrame
-    for _, row in df.iterrows():
+    for index, row in df.iterrows():
         for field in df.columns:
             display(HTML(f"<span style='{header_style}'>{field.capitalize()}:</span>"))
             display(HTML("<br>"))
@@ -778,26 +775,25 @@ def print_df_rows(
             display(HTML(f"<span style='{base_style}'>{value}</span>"))
             display(HTML("<br>"))
 
-        printed_samples += 1
-        if printed_samples >= n:
+        if index >= n:
             break
 
             
             
 def init_new_model(
     model_name: str, 
-    generation_config: Dict = None, 
+    generation_config: GenerationConfig = None, 
     safety_settings: Dict = None
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
 
     # Use default configurations if none are provided
     if generation_config is None:
-        generation_config = {
-            "candidate_count": 1,
-            "max_output_tokens": 2048,
-            "temperature": 0.5,
-        }
+        generation_config = GenerationConfig(
+            candidate_count = 1,
+            max_output_tokens = 2048,
+            temperature = 0.5
+        )
     if safety_settings is None:
         safety_settings = {
             generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
