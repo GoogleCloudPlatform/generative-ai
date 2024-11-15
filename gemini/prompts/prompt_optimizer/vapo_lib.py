@@ -20,10 +20,10 @@ import re
 import random
 import string
 import subprocess
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 from IPython.core.display import DisplayHandle
-from IPython.display import HTML, Markdown, display
+from IPython.display import HTML, display
 from google.cloud import aiplatform, storage
 import ipywidgets as widgets
 import jinja2
