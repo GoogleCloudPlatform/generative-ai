@@ -783,7 +783,7 @@ def print_df_rows(
 def init_new_model(
     model_name: str,
     generation_config: GenerationConfig = None,
-    safety_settings: Dict = None,
+    safety_settings: Dict = {},
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
 
@@ -792,7 +792,7 @@ def init_new_model(
         generation_config = GenerationConfig(
             candidate_count=1, max_output_tokens=2048, temperature=0.5
         )
-    if safety_settings is None:
+    if not safety_settings:
         safety_settings = {
             generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
             generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
