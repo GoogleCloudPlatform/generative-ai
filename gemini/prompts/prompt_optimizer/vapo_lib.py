@@ -681,11 +681,11 @@ def get_id(length: int = 8) -> str:
 def get_auth_token() -> str:
     """A function to collect the authorization token"""
     result = subprocess.run(
-            ["gcloud", "auth", "print-identity-token", "-q"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
+        ["gcloud", "auth", "print-identity-token", "-q"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
     return result.stdout.strip()
 
 
