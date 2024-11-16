@@ -776,7 +776,7 @@ def print_df_rows(
             display(HTML(f"<span style='{base_style}'>{value}</span>"))
             display(HTML("<br>"))
 
-        if index >= n:
+        if index + 1 >= n:
             break
 
 
