@@ -680,16 +680,13 @@ def get_id(length: int = 8) -> str:
 
 def get_auth_token() -> str:
     """A function to collect the authorization token"""
-    try:
-        result = subprocess.run(
+    result = subprocess.run(
             ["gcloud", "auth", "print-identity-token", "-q"],
             capture_output=True,
             text=True,
             check=True,
         )
-        return result.stdout.strip()
-    except subprocess.CalledProcessError as e:
-        print(f"Error getting auth token: {e}")
+    return result.stdout.strip()
 
 
 @retry(wait=wait_random_exponential(multiplier=1, max=120))
