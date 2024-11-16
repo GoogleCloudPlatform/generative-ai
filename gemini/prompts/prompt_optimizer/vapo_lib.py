@@ -675,8 +675,6 @@ class ResultsUI:
 
 def get_id(length: int = 8) -> str:
     """Generate a uuid of a specified length (default=8)."""
-    if length is None:
-        length = 8
     return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
 
@@ -692,7 +690,6 @@ def get_auth_token() -> None:
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         print(f"Error getting auth token: {e}")
-        return None
 
 
 @retry(wait=wait_random_exponential(multiplier=1, max=120))
