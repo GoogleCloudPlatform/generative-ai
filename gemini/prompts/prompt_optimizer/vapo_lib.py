@@ -104,7 +104,8 @@ def parse_and_validate_csv(data_str: str) -> list[dict[str, str]]:
     try:
         headers = next(csv_reader)
         if not headers:
-            raise ValueError("The CSV file has an empty or invalid header row.")
+            raise ValueError(
+                "The CSV file has an empty or invalid header row.")
     except StopIteration as e:
         raise ValueError("The CSV file is empty.") from e
 
@@ -166,14 +167,17 @@ def validate_prompt_and_data(
         if label_enforced:
             if _TARGET_KEY not in ex:
                 raise ValueError(
-                    f"The example {ex} doesn't have a key corresponding to the target"
+                    f"The example {
+                        ex} doesn't have a key corresponding to the target"
                     f" var: {_TARGET_KEY}"
                 )
             if not ex[_TARGET_KEY]:
-                raise ValueError(f"The following example has an empty target: {ex}")
+                raise ValueError(
+                    f"The following example has an empty target: {ex}")
         if missing_keys:
             raise ValueError(
-                f"The example {ex} doesn't have a key corresponding to following"
+                f"The example {
+                    ex} doesn't have a key corresponding to following"
                 f" template vars: {missing_keys}"
             )
     if extra_keys:
@@ -258,7 +262,8 @@ def update_best_display(
     improvement = best_score - original_score
     no_improvement_str = "\nNo better template is found yet." if not improvement else ""
     best_score_label.value = (
-        f"Score: {best_score}" f" Improvement: {improvement: .3f} {no_improvement_str}"
+        f"Score: {best_score}" f" Improvement: {
+            improvement: .3f} {no_improvement_str}"
     )
 
 
@@ -391,7 +396,8 @@ class ProgressForm:
         )
         display(progress_bar)
         print("\nGenerated Templates:")
-        templates_display = display("No template is evaluated yet!", display_id=True)
+        templates_display = display(
+            "No template is evaluated yet!", display_id=True)
 
         print("\nBest Template so far:")
         best_textarea = widgets.Textarea(
@@ -408,11 +414,14 @@ class ProgressForm:
 
     def monitor_progress(self, job: aiplatform.CustomJob) -> bool:
         """Monitor the progress of the optimization job."""
-        self.job_state_display.update(HTML(f"<span>Job State: {job.state.name}</span>"))
+        self.job_state_display.update(
+            HTML(f"<span>Job State: {job.state.name}</span>"))
 
         # Initial display of the templates.
-        instruction_templates_file = f"{self.output_path}/instruction/templates.json"
-        demo_templates_file = f"{self.output_path}/demonstration/templates.json"
+        instruction_templates_file = f"{
+            self.output_path}/instruction/templates.json"
+        demo_templates_file = f"{
+            self.output_path}/demonstration/templates.json"
 
         if not job.done():
             self.instruction_df = self.update_progress(
@@ -446,7 +455,8 @@ class ProgressForm:
                         error_json = json.load(f)
                     errors.append(f"Detailed error: {error_json}")
                     errors.append(
-                        f"Please feel free to send {err_file} to the VAPO team to help"
+                        f"Please feel free to send {
+                            err_file} to the VAPO team to help"
                         " resolving the issue."
                     )
 
@@ -458,7 +468,8 @@ class ProgressForm:
                 "Please consider rerunning to make sure the failure is intransient."
             )
             err = "\n".join(errors)
-            self.status_display.update(HTML(f'<span style="color: red;">{err}</span>'))
+            self.status_display.update(
+                HTML(f'<span style="color: red;">{err}</span>'))
         else:
             self.status_display.update(
                 HTML(
@@ -518,7 +529,8 @@ def find_directories_with_files(
     # Create a dictionary to track files found in each directory
     file_presence: dict[str, set[str]] = {}
     for path in all_paths:
-        directory = "/".join(path.split("/")[:-1])  # Get the directory part of the path
+        # Get the directory part of the path
+        directory = "/".join(path.split("/")[:-1])
         filename = path.split("/")[-1]  # Get the filename part of the path
         if directory:
             if directory not in file_presence:
@@ -585,7 +597,8 @@ class ResultsUI:
             layout=widgets.Layout(width="400px"),
             disabled=True,
         )
-        self.template_dropdown.observe(self.display_template_handler, names="value")
+        self.template_dropdown.observe(
+            self.display_template_handler, names="value")
         self.results_output = widgets.Output(
             layout=widgets.Layout(
                 height="600px", overflow="auto", margin="20px 0px 0px 0px"
@@ -631,7 +644,8 @@ class ResultsUI:
         self.templates = [
             pd.json_normalize(template) for template in templates[offset:]
         ]
-        metric_columns = [col for col in self.templates[0].columns if "metric" in col]
+        metric_columns = [
+            col for col in self.templates[0].columns if "metric" in col]
 
         self.eval_results = [
             process_results(pd.read_json(io.StringIO(result["metrics_table"])))
@@ -654,7 +668,8 @@ class ResultsUI:
     def display_eval_results(self, index: int) -> None:
         """Display the evaluation results for a specific template."""
         with self.results_output:
-            self.results_output.clear_output(wait=True)  # Clear previous output
+            self.results_output.clear_output(
+                wait=True)  # Clear previous output
             display_dataframe(self.templates[index])
             print()
             display_dataframe(self.eval_results[index])
@@ -769,7 +784,8 @@ def print_df_rows(
     # Iterate over the rows of the DataFrame
     for index, row in df.iterrows():
         for field in df.columns:
-            display(HTML(f"<span style='{header_style}'>{field.capitalize()}:</span>"))
+            display(HTML(f"<span style='{header_style}'>{
+                    field.capitalize()}:</span>"))
             display(HTML("<br>"))
             value = row[field]
             display(HTML(f"<span style='{base_style}'>{value}</span>"))
@@ -778,11 +794,10 @@ def print_df_rows(
         if index >= n:
             break
 
-            
-            
+
 def init_new_model(
-    model_name: str, 
-    generation_config: GenerationConfig = None, 
+    model_name: str,
+    generation_config: GenerationConfig = None,
     safety_settings: Dict = None
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
@@ -790,9 +805,9 @@ def init_new_model(
     # Use default configurations if none are provided
     if generation_config is None:
         generation_config = GenerationConfig(
-            candidate_count = 1,
-            max_output_tokens = 2048,
-            temperature = 0.5
+            candidate_count=1,
+            max_output_tokens=2048,
+            temperature=0.5
         )
     if safety_settings is None:
         safety_settings = {
@@ -828,7 +843,8 @@ def plot_eval_metrics(
                 if any(selected_metric in k for selected_metric in metrics)
             }
 
-        summary_metrics = {k: v for k, v in summary_metrics.items() if "mean" in k}
+        summary_metrics = {k: v for k,
+                           v in summary_metrics.items() if "mean" in k}
         data.append(
             go.Bar(
                 x=list(summary_metrics.keys()),
