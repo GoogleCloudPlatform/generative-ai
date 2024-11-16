@@ -678,7 +678,7 @@ def get_id(length: int = 8) -> str:
     return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
 
-def get_auth_token() -> None:
+def get_auth_token() -> str:
     """A function to collect the authorization token"""
     try:
         result = subprocess.run(
