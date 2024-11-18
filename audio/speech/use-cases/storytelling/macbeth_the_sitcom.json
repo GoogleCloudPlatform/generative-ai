@@ -1,0 +1,119 @@
+{
+  "title": "Macbeth: The Sitcom",
+  "characters": [
+    {
+      "name": "Narrator",
+      "gender": "Male"
+    },
+    {
+      "name": "Macbeth",
+      "gender": "Male"
+    },
+    {
+      "name": "Lady Macbeth",
+      "gender": "Female"
+    },
+    {
+      "name": "King Duncan",
+      "gender": "Male"
+    },
+    {
+      "name": "Banquo",
+      "gender": "Male"
+    },
+    {
+      "name": "Macduff",
+      "gender": "Male"
+    },
+    {
+      "name": "Three Witches",
+      "gender": "Female"
+    }
+  ],
+  "scenes": [
+    {
+      "setting": "A bustling modern-day office breakroom, complete with a water cooler, microwave, and a table littered with coffee mugs.",
+      "dialogue": [
+        {
+          "speaker": "Narrator",
+          "line": "Our story begins with Macbeth, a mid-level manager with a serious ambition problem, and a penchant for misinterpreting fortune cookie messages."
+        },
+        {
+          "speaker": "Macbeth",
+          "line": "You know, Banquo, this cookie says I'm destined for great things...like, maybe a corner office?"
+        },
+        {
+          "speaker": "Banquo",
+          "line": "Macbeth, it also says \"Help, I'm trapped in a cookie factory!\""
+        },
+        {
+          "speaker": "Macbeth",
+          "line": "Details, details."
+        }
+      ]
+    },
+    {
+      "setting": "Macbeth's apartment. Lady Macbeth is on the phone, pacing back and forth.",
+      "dialogue": [
+        {
+          "speaker": "Narrator",
+          "line": "Enter Lady Macbeth, Macbeth's even more ambitious wife, who enjoys power yoga and reality TV."
+        },
+        {
+          "speaker": "Lady Macbeth",
+          "line": "Macbeth, honey, it's King Duncan! He's coming over for a dinner party... TONIGHT?! Okay, don't panic, I just ordered a new self-cleaning tablecloth."
+        },
+        {
+          "speaker": "Macbeth",
+          "line": "But, darling, King Duncan? Dinner? Tonight?"
+        },
+        {
+          "speaker": "Lady Macbeth",
+          "line": "Think of the promotion possibilities, Macbeth! Think of the corner office!"
+        }
+      ]
+    },
+    {
+      "setting": "Back in the breakroom, Macbeth looks pale and jittery as he stirs sugar into his coffee.",
+      "dialogue": [
+        {
+          "speaker": "Narrator",
+          "line": "The dinner party was a smashing success. Until, that is, it wasn't."
+        },
+        {
+          "speaker": "Macbeth",
+          "line": "He's gone? Duncan is gone?"
+        },
+        {
+          "speaker": "Banquo",
+          "line": "You mean promoted? To the big office in the sky?"
+        },
+        {
+          "speaker": "Macbeth",
+          "line": "No, Banquo. I meant... well, never mind. Pass the sugar."
+        }
+      ]
+    },
+    {
+      "setting": "The office, years later. Macbeth, now CEO, sits at his desk looking stressed and paranoid. Lady Macbeth is applying hand cream, staring out the window.",
+      "dialogue": [
+        {
+          "speaker": "Narrator",
+          "line": "Macbeth's reign of corporate terror was short-lived. Karma, it seems, has a nasty habit of biting back. With a stapler."
+        },
+        {
+          "speaker": "Macduff",
+          "line": "Macbeth! We know about the sugar! And the stapler! It's time for your performance review."
+        },
+        {
+          "speaker": "Macbeth",
+          "line": "You can't fire me! I quit! I'm going to go find myself...at the beach...with a good book...and no staplers!"
+        },
+        {
+          "speaker": "Lady Macbeth",
+          "line": "I always preferred paperclips anyway."
+        }
+      ]
+    }
+  ]
+}
