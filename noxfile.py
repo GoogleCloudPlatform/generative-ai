@@ -148,10 +148,14 @@ def format(session):
     changed_files = sorted(set(unstaged_files + staged_files + committed_files))
 
     lint_paths_py = [
-        f for f in changed_files if f.endswith(".py") and f != "noxfile.py"
+        f
+        for f in changed_files
+        if f.endswith(".py") and f != "noxfile.py" and os.path.isfile(f)
     ]
 
-    lint_paths_nb = [f for f in changed_files if f.endswith(".ipynb")]
+    lint_paths_nb = [
+        f for f in changed_files if f.endswith(".ipynb") and os.path.isfile(f)
+    ]
 
     if not lint_paths_py and not lint_paths_nb:
         session.log("No changed Python or notebook files to lint.")
