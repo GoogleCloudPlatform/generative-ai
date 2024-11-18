@@ -119,7 +119,7 @@ use_refine = st.sidebar.checkbox("🔬 Use Refine", value=True)
 use_node_rerank = st.sidebar.checkbox("🔄 Use Node Rerank", value=True)
 
 st.sidebar.markdown("---")
-st.sidebar.warning("🚀 Powered by Google's Gemini ♊ Models & LlamaIndex🦙📊!")
+st.sidebar.warning("🚀 Powered by Google Gemini ♊ Models & LlamaIndex🦙📊!")
 
 # Batch Evaluation Page Content
 st.title("RAG Batch Evaluation")

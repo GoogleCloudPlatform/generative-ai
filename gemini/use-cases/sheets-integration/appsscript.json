@@ -1,21 +1,20 @@
 {
-    "timeZone": "America/Chicago",
-    "dependencies": {
-      "enabledAdvancedServices": [
-        {
-          "userSymbol": "BigQuery",
-          "version": "v2",
-          "serviceId": "bigquery"
-        }
-      ]
-    },
-    "exceptionLogging": "STACKDRIVER",
-    "runtimeVersion": "V8",
-    "oauthScopes": [
-      "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/cloud-platform",
-      "https://www.googleapis.com/auth/script.container.ui"
+  "timeZone": "America/Chicago",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "BigQuery",
+        "version": "v2",
+        "serviceId": "bigquery"
+      }
     ]
-  }
-  
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/bigquery",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/cloud-platform",
+    "https://www.googleapis.com/auth/script.container.ui"
+  ]
+}

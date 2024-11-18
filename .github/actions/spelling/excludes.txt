@@ -110,6 +110,7 @@
 ^\Qvision/use-cases/creating_high_quality_visual_assets_with_gemini_and_imagen.ipynb\E$
 ^\Qgemini/orchestration/llamaindex_workflows.ipynb\E$
 ignore$
+^\Qworkshops/ai-agents/ai_agents_for_engineers.ipynb\E$
 ^\Qowlbot.py\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
 ^\Qnoxfile.py\E$

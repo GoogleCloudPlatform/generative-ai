@@ -52,7 +52,8 @@ body {
   margin: 20px auto;
 }
 
-.query-field, .summary-preamble-field {
+.query-field,
+.summary-preamble-field {
   margin: 1rem auto 2rem;
 }
 
@@ -224,7 +225,8 @@ a:active {
   justify-content: center;
 }
 
-.search-form .search-engine-radio, .search-form .summary-model-radio {
+.search-form .search-engine-radio,
+.search-form .summary-model-radio {
   text-align: center;
   margin: 1rem auto;
   height: 8rem;
