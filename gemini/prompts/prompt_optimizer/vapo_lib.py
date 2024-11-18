@@ -32,8 +32,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
-from vertexai.generative_models import GenerativeModel
 from vertexai.evaluation import EvalTask
+from vertexai.generative_models import GenerativeModel
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
