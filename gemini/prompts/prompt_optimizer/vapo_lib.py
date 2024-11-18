@@ -778,13 +778,13 @@ def init_new_model(
     model_name: str,
     generation_config: Optional[
         Union[
-            vertexai.generative_models._generative_models.GenerationConfig,
+            generative_models._generative_models.GenerationConfig,
             Dict[str, Any],
         ]
     ] = None,
     safety_settings: Optional[
         Union[
-            List[vertexai.generative_models._generative_models.SafetySetting],
+            List[generative_models._generative_models.SafetySetting],
             Dict[
                 aiplatform_v1beta1.types.content.HarmCategory,
                 aiplatform_v1beta1.types.content.SafetySetting.HarmBlockThreshold,
