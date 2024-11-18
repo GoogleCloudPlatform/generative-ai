@@ -16,7 +16,11 @@
 import csv
 import io
 import json
+import random
 import re
+import string
+import subprocess
+from typing import Dict, List, Optional, Union
 
 from IPython.core.display import DisplayHandle
 from IPython.display import HTML, display
@@ -25,7 +29,11 @@ import ipywidgets as widgets
 import jinja2
 import jinja2.meta
 import pandas as pd
+import plotly.graph_objects as go
+from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
+from vertexai.evaluation import EvalTask
+from vertexai.generative_models import GenerativeModel
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
@@ -140,7 +148,8 @@ def validate_prompt_and_data(
     """Validates the prompt template and the dataset."""
     data = load_dataset(dataset_path)
     placeholder_to_content_json = json.loads(placeholder_to_content)
-    template = re.sub(r"(?<!{){(?!{)(\s*\w+\s*)(?<!})}(?!})", r"{{\1}}", template)
+    template = re.sub(r"(?<!{){(?!{)", "{{", template)
+    template = re.sub(r"(?<!})}(?!})", "}}", template)
     env = jinja2.Environment()
     try:
         parsed_content = env.parse(template)
@@ -508,7 +517,8 @@ def find_directories_with_files(
     # Create a dictionary to track files found in each directory
     file_presence: dict[str, set[str]] = {}
     for path in all_paths:
-        directory = "/".join(path.split("/")[:-1])  # Get the directory part of the path
+        # Get the directory part of the path
+        directory = "/".join(path.split("/")[:-1])
         filename = path.split("/")[-1]  # Get the filename part of the path
         if directory:
             if directory not in file_presence:
@@ -660,3 +670,147 @@ class ResultsUI:
                 self.results_output,
             ]
         )
+
+
+def get_id(length: int = 8) -> str:
+    """Generate a uuid of a specified length (default=8)."""
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
+
+
+def get_auth_token() -> str:
+    """A function to collect the authorization token"""
+    result = subprocess.run(
+        ["gcloud", "auth", "print-identity-token", "-q"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
+@retry(wait=wait_random_exponential(multiplier=1, max=120))
+async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None]:
+    """Generate a response from the model."""
+    response = await model.generate_content_async(
+        [prompt],
+        stream=False,
+    )
+    return response.text if response.text else None
+
+
+def evaluate_task(
+    df: pd.DataFrame,
+    prompt_col: str,
+    reference_col: str,
+    response_col: str,
+    experiment_name: str,
+    eval_metrics: List[str],
+    eval_sample_n: int,
+) -> Dict[str, float]:
+    """Evaluate task using Vertex AI Evaluation."""
+
+    # Generate a unique id for the experiment run
+    idx = get_id()
+
+    # Rename the columns to match the expected format
+    eval_dataset = df[[prompt_col, reference_col, response_col]].rename(
+        columns={
+            prompt_col: "prompt",
+            reference_col: "reference",
+            response_col: "response",
+        }
+    )
+
+    # Drop rows with missing values
+    eval_dataset = eval_dataset.dropna()
+
+    # Sample a subset of the dataset
+    eval_dataset = eval_dataset.sample(n=eval_sample_n, random_state=8).reset_index(
+        drop=True
+    )
+
+    # Create an EvalTask object
+    eval_task = EvalTask(
+        dataset=eval_dataset,
+        metrics=eval_metrics,
+        experiment=experiment_name,
+    )
+
+    # Evaluate the task
+    result = eval_task.evaluate(experiment_run_name=f"{experiment_name}-{idx}")
+
+    # Return the summary metrics
+    return result.summary_metrics
+
+
+def print_df_rows(
+    df: pd.DataFrame, columns: Optional[List[str]] = None, n: int = 3
+) -> None:
+    """Print a subset of rows from a DataFrame."""
+
+    # Define the base style for the text
+    base_style = (
+        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
+    )
+
+    # Define the header style for the text
+    header_style = "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px; font-weight: bold;"
+
+    # If columns are specified, filter the DataFrame
+    if columns:
+        df = df[columns]
+
+    # Iterate over the rows of the DataFrame
+    for index, row in df.iterrows():
+        for field in df.columns:
+            display(HTML(f"<span style='{header_style}'>{field.capitalize()}:</span>"))
+            display(HTML("<br>"))
+            value = row[field]
+            display(HTML(f"<span style='{base_style}'>{value}</span>"))
+            display(HTML("<br>"))
+
+        if index + 1 >= n:
+            break
+
+
+def plot_eval_metrics(
+    eval_results: List[tuple[str, Dict[str, float]]],
+    metrics: Optional[List[str]] = None,
+) -> None:
+    """Plot a bar plot for the evaluation results."""
+
+    # Create data for the bar plot
+    data = []
+    for eval_result in eval_results:
+        title, summary_metrics = eval_result
+        if metrics:
+            summary_metrics = {
+                k: summary_metrics[k]
+                for k, v in summary_metrics.items()
+                if any(selected_metric in k for selected_metric in metrics)
+            }
+
+        summary_metrics = {k: v for k, v in summary_metrics.items() if "mean" in k}
+        data.append(
+            go.Bar(
+                x=list(summary_metrics.keys()),
+                y=list(summary_metrics.values()),
+                name=title,
+            )
+        )
+
+    # Update the figure with the data
+    fig = go.Figure(data=data)
+
+    # Add the title
+    fig.update_layout(
+        title=go.layout.Title(text="Evaluation Metrics", x=0.5),
+        xaxis_title="Metric Name",
+        yaxis_title="Mean Value",
+    )
+
+    # Change the bar mode
+    fig.update_layout(barmode="group")
+
+    # Show the plot
+    fig.show()
