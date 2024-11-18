@@ -20,11 +20,11 @@ import random
 import re
 import string
 import subprocess
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from IPython.core.display import DisplayHandle
 from IPython.display import HTML, display
-from google.cloud import aiplatform, storage
+from google.cloud import aiplatform, aiplatform_v1beta1, storage
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
@@ -34,7 +34,7 @@ from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
 from vertexai import generative_models
 from vertexai.evaluation import EvalTask
-from vertexai.generative_models import GenerationConfig, GenerativeModel, SafetySetting
+from vertexai.generative_models import GenerationConfig, GenerativeModel
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
@@ -776,8 +776,21 @@ def print_df_rows(
 
 def init_new_model(
     model_name: str,
-    generation_config: Optional[GenerationConfig] = None,
-    safety_settings: Optional[SafetySetting] = None,
+    generation_config: Optional[
+        Union[
+            vertexai.generative_models._generative_models.GenerationConfig,
+            Dict[str, Any],
+        ]
+    ] = None,
+    safety_settings: Optional[
+        Union[
+            List[vertexai.generative_models._generative_models.SafetySetting],
+            Dict[
+                aiplatform_v1beta1.types.content.HarmCategory,
+                aiplatform_v1beta1.types.content.SafetySetting.HarmBlockThreshold,
+            ],
+        ]
+    ] = None,
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
 
@@ -787,26 +800,28 @@ def init_new_model(
             candidate_count=1, max_output_tokens=2048, temperature=0.5
         )
     if not safety_settings:
-        safety_settings = [generative_models.SafetySetting(
-        category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        method=generative_models.HarmBlockMethod.SEVERITY,
-        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-    ),
-    generative_models.SafetySetting(
-        category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        method=generative_models.HarmBlockMethod.SEVERITY,
-        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-    ),
-    generative_models.SafetySetting(
-        category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        method=generative_models.HarmBlockMethod.SEVERITY,
-        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-    ),
-    generative_models.SafetySetting(
-        category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
-        method=generative_models.HarmBlockMethod.SEVERITY,
-        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
-    )
+        safety_settings = [
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                method=generative_models.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                method=generative_models.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                method=generative_models.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                method=generative_models.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+        ]
 
     # Initialize the model
     model = GenerativeModel(
