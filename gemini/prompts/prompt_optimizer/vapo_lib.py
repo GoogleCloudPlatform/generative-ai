@@ -24,7 +24,7 @@ from typing import Dict, List, Optional, Union
 
 from IPython.core.display import DisplayHandle
 from IPython.display import HTML, display
-from google.cloud import aiplatform, aiplatform_v1beta1, storage
+from google.cloud import aiplatform, storage
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
@@ -32,6 +32,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
+from vertexai.generative_models import GenerativeModel
 from vertexai.evaluation import EvalTask
 
 
