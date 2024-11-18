@@ -532,6 +532,7 @@ bigframes
 bigquery
 bitcoin
 blogs
+bluesky
 bml
 bnb
 booktitle
@@ -791,6 +792,7 @@ lexer
 linalg
 linecolor
 linestyle
+linkedin
 linted
 linting
 llm
@@ -953,6 +955,7 @@ rarians
 ratelimit
 rbc
 rbf
+reddit
 redef
 rembg
 repreve
@@ -1086,6 +1089,7 @@ webpages
 websites
 weightage
 welcom
+whatsapp
 wiffle
 wikipedia
 wil

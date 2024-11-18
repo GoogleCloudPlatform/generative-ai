@@ -11,8 +11,14 @@ LINK_PREFIXES = {
     "colab_enterprise_link": "https://console.cloud.google.com/vertex-ai/colab/import/",
     "github_link": "https://github.com/GoogleCloudPlatform/generative-ai/blob/main/",
     "workbench_link": "https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=",
+    "linkedin_link": "https://www.linkedin.com/sharing/share-offsite/?url=",
+    "bluesky_link": "https://bsky.app/intent/compose?text=",
+    "twitter_link": "https://twitter.com/intent/tweet?url=",
+    "reddit_link": "https://reddit.com/submit?url=",
+    "facebook_link": "https://www.facebook.com/sharer/sharer.php?u=",
 }
 
+GITHUB_URL_PREFIX = LINK_PREFIXES["github_link"]
 RAW_URL_PREFIX = (
     "https://raw.githubusercontent.com/GoogleCloudPlatform/generative-ai/main/"
 )
@@ -24,6 +30,8 @@ def fix_markdown_links(
     """Fixes links in a markdown cell and returns the updated source."""
     new_lines = []
     changes_made = False
+
+    encoded_url = urllib.parse.quote(f"{GITHUB_URL_PREFIX}{relative_notebook_path}")
 
     for line in cell_source.splitlines():
         for key, prefix in LINK_PREFIXES.items():
@@ -43,6 +51,14 @@ def fix_markdown_links(
                 )
             elif key == "workbench_link":
                 correct_link = f"{RAW_URL_PREFIX}{relative_notebook_path}"
+            elif key in {
+                "linkedin_link",
+                "bluesky_link",
+                "twitter_link",
+                "reddit_link",
+                "facebook_link",
+            }:
+                correct_link = encoded_url
 
             if correct_link.lower() not in line.lower():
                 print(f"Incorrect link in {relative_notebook_path}: {line}\n")
