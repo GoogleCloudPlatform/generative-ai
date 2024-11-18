@@ -34,7 +34,7 @@ from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
 from vertexai import generative_models
 from vertexai.evaluation import EvalTask
-from vertexai.generative_models import GenerationConfig, GenerativeModel
+from vertexai.generative_models import GenerationConfig, GenerativeModel, SafetySetting
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
@@ -776,8 +776,8 @@ def print_df_rows(
 
 def init_new_model(
     model_name: str,
-    generation_config: GenerationConfig = None,
-    safety_settings: Dict = {},
+    generation_config: Optional[GenerationConfig] = None,
+    safety_settings: Optional[SafetySetting] = None,
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
 
@@ -787,12 +787,26 @@ def init_new_model(
             candidate_count=1, max_output_tokens=2048, temperature=0.5
         )
     if not safety_settings:
-        safety_settings = {
-            generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_NONE,
-            generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
-            generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_NONE,
-            generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_NONE,
-        }
+        safety_settings = [generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        method=generative_models.HarmBlockMethod.SEVERITY,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+    ),
+    generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        method=generative_models.HarmBlockMethod.SEVERITY,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+    ),
+    generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        method=generative_models.HarmBlockMethod.SEVERITY,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+    ),
+    generative_models.SafetySetting(
+        category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+        method=generative_models.HarmBlockMethod.SEVERITY,
+        threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+    )
 
     # Initialize the model
     model = GenerativeModel(
