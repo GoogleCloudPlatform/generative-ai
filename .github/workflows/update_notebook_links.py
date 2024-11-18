@@ -11,6 +11,7 @@ LINK_PREFIXES = {
     "colab_enterprise_link": "https://console.cloud.google.com/vertex-ai/colab/import/",
     "github_link": "https://github.com/GoogleCloudPlatform/generative-ai/blob/main/",
     "workbench_link": "https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=",
+    "bigquery_studio_link": "https://console.cloud.google.com/bigquery/import?url=",
     "linkedin_link": "https://www.linkedin.com/sharing/share-offsite/?url=",
     "bluesky_link": "https://bsky.app/intent/compose?text=",
     "twitter_link": "https://twitter.com/intent/tweet?url=",
@@ -51,6 +52,8 @@ def fix_markdown_links(
                 )
             elif key == "workbench_link":
                 correct_link = f"{RAW_URL_PREFIX}{relative_notebook_path}"
+            elif key == "bigquery_studio_link":
+                correct_link = f"{GITHUB_URL_PREFIX}{relative_notebook_path}"
             elif key in {
                 "linkedin_link",
                 "bluesky_link",
