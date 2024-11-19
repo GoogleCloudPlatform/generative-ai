@@ -20,7 +20,7 @@ import random
 import re
 import string
 import subprocess
-from typing import Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from IPython.core.display import DisplayHandle
 from IPython.display import HTML, display
@@ -28,12 +28,22 @@ from google.cloud import aiplatform, storage
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
+from jsonschema import ValidationError, validate
 import pandas as pd
 import plotly.graph_objects as go
 from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
+from vertexai import generative_models
 from vertexai.evaluation import EvalTask
-from vertexai.generative_models import GenerativeModel
+from vertexai.generative_models import (
+    Content,
+    GenerationConfig,
+    GenerativeModel,
+    Part,
+    SafetySetting,
+    Tool,
+    ToolConfig,
+)
 
 
 def is_target_required_metric(eval_metric: str) -> bool:
@@ -148,8 +158,7 @@ def validate_prompt_and_data(
     """Validates the prompt template and the dataset."""
     data = load_dataset(dataset_path)
     placeholder_to_content_json = json.loads(placeholder_to_content)
-    template = re.sub(r"(?<!{){(?!{)", "{{", template)
-    template = re.sub(r"(?<!})}(?!})", "}}", template)
+    template = re.sub(r"(?<!{){(?!{)(\s*\w+\s*)(?<!})}(?!})", r"{{\1}}", template)
     env = jinja2.Environment()
     try:
         parsed_content = env.parse(template)
@@ -688,14 +697,117 @@ def get_auth_token() -> str:
     return result.stdout.strip()
 
 
-@retry(wait=wait_random_exponential(multiplier=1, max=120))
-async def async_generate(prompt: str, model: GenerativeModel) -> Union[str, None]:
-    """Generate a response from the model."""
-    response = await model.generate_content_async(
-        [prompt],
-        stream=False,
+def init_new_model(
+    model_name: str,
+    generation_config: GenerationConfig = None,
+    safety_settings: List[SafetySetting] = None,
+    **kwargs,
+) -> GenerativeModel:
+    """Initialize a new model with configurable generation and safety settings."""
+
+    if generation_config is None:
+        generation_config = GenerationConfig(
+            candidate_count=1, max_output_tokens=2048, temperature=0
+        )
+    if safety_settings is None:
+        safety_settings = [
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                method=generative_models.SafetySetting.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                method=generative_models.SafetySetting.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                method=generative_models.SafetySetting.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            generative_models.SafetySetting(
+                category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                method=generative_models.SafetySetting.HarmBlockMethod.SEVERITY,
+                threshold=generative_models.HarmBlockThreshold.BLOCK_NONE,
+            ),
+        ]
+
+    model = GenerativeModel(
+        model_name=model_name,
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        **kwargs,
     )
-    return response.text if response.text else None
+    return model
+
+
+@retry(wait=wait_random_exponential(multiplier=1, max=120))
+async def async_generate(
+    prompt: str,
+    model: GenerativeModel,
+    function_handler: Optional[Dict[str, Callable]] = None,
+    tools: Optional[Tool] = None,
+    tool_config: Optional[ToolConfig] = None,
+    **kwargs,
+) -> Union[str, None]:
+    """Generates a response from the model, optionally handling function calls."""
+
+    user_prompt_content = Content(role="user", parts=[Part.from_text(prompt)])
+
+    try:
+        # Initial generation - potentially calling a function.
+        response = await model.generate_content_async(
+            prompt,
+            tools=[tools] if tools else None,  # Only provide tools if they exist
+            tool_config=tool_config if tool_config else None,  # Same for tool_config
+            **kwargs,
+        )
+
+        # Handle function calls if applicable
+        if (
+            function_handler
+            and response
+            and response.candidates
+            and response.candidates[0].content.parts[0].function_call
+        ):
+            while response.candidates[0].content.parts[0].function_call:
+                function_call = response.candidates[0].content.parts[0].function_call
+                function_name = function_call.name
+
+                if function_name in function_handler:
+                    function_args = function_call.args  # No need for manual conversion
+                    api_response = function_handler[function_name](function_args)
+
+                    response = await model.generate_content_async(
+                        [
+                            user_prompt_content,
+                            response.candidates[0].content,
+                            Content(
+                                parts=[
+                                    Part.from_function_response(
+                                        name=function_name,
+                                        response={"content": api_response},
+                                    )
+                                ]
+                            ),
+                        ],
+                        tools=[tools] if tools else None,  # Conditional tool passing
+                        tool_config=tool_config if tool_config else None,
+                    )
+                else:
+                    break  # Exit loop if function not found
+
+        # Extract and return text if generation was successful
+        if response and response.candidates and response.candidates[0].content.parts:
+            return (
+                response.candidates[0].content.parts[0].text
+            )  # More robust text extraction
+        return None
+
+    except Exception as e:
+        print(f"Error calling the model: {e}")  # Include the actual error message
+        return "Could not call the model. Please try it again in a few minutes."
 
 
 def evaluate_task(
@@ -748,29 +860,27 @@ def print_df_rows(
 ) -> None:
     """Print a subset of rows from a DataFrame."""
 
-    # Define the base style for the text
-    base_style = (
-        "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px;"
-    )
-
-    # Define the header style for the text
-    header_style = "white-space: pre-wrap; width: 800px; overflow-x: auto; font-size: 16px; font-weight: bold;"
-
-    # If columns are specified, filter the DataFrame
+    # Apply column filtering if specified
     if columns:
         df = df[columns]
 
-    # Iterate over the rows of the DataFrame
-    for index, row in df.iterrows():
-        for field in df.columns:
-            display(HTML(f"<span style='{header_style}'>{field.capitalize()}:</span>"))
-            display(HTML("<br>"))
-            value = row[field]
-            display(HTML(f"<span style='{base_style}'>{value}</span>"))
-            display(HTML("<br>"))
+    # Style definitions for improved readability
+    base_style = "font-family: monospace; font-size: 14px; white-space: pre-wrap; width: auto; overflow-x: auto;"
+    header_style = base_style + "font-weight: bold;"
 
-        if index + 1 >= n:
-            break
+    # Iterate through the specified number of rows
+    for _, row in df.head(n).iterrows():
+        # Display each column name as a bold header
+        for column in df.columns:
+            display(
+                HTML(
+                    f"<span style='{header_style}'>{column.replace('_', ' ').title()}: </span>"
+                )
+            )
+            display(
+                HTML(f"<span style='{base_style}'>{row[column]}</span><br>")
+            )  # Display value and line break
+        display(HTML("<hr>"))  # Add separator between rows for clarity
 
 
 def plot_eval_metrics(
@@ -814,3 +924,116 @@ def plot_eval_metrics(
 
     # Show the plot
     fig.show()
+
+
+def create_target_column(row: Dict[str, Any]) -> str:
+    """Creates a JSON string representing tool calls from input row."""
+
+    tool_calls = (
+        [{"name": row["tool_names"], "arguments": row["tool_arguments"]}]
+        if row.get("tool_names")
+        else []
+    )
+
+    return json.dumps({"content": "", "tool_calls": tool_calls})
+
+
+def tool_config_to_dict(tool_config: Optional[ToolConfig]) -> Optional[Dict[str, Any]]:
+    """Converts a ToolConfig object to a dictionary."""
+
+    if tool_config is None:
+        return None
+
+    config = tool_config._gapic_tool_config.function_calling_config
+    return {
+        "function_calling_config": {
+            "mode": config.mode.name,
+            "allowed_function_names": list(config.allowed_function_names),
+        }
+    }
+
+
+def replace_type_key(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Recursively replaces "type_" with "type" in a dictionary or list."""
+
+    return {"type" if k == "type_" else k: replace_type_key(v) for k, v in data.items()}
+
+
+def validate_tools(spec: str) -> None:
+    """Validates the tools specification."""
+    # Define the JSON schema for validation
+    schema = {
+        "type": "object",
+        "properties": {
+            "tools": {
+                "type": "array",
+                "minItems": 1,  # Ensures that 'tools' is not an empty array
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "function_declarations": {
+                            "type": "array",
+                            # Ensures this is not an empty array
+                            "minItems": 1,
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "description": {"type": "string"},
+                                    "parameters": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {"type": "string"},
+                                            "properties": {"type": "object"},
+                                            "required": {
+                                                "type": "array",
+                                                "items": {"type": "string"},
+                                            },
+                                        },
+                                        "required": ["type", "properties"],
+                                    },
+                                },
+                                "required": ["name", "description", "parameters"],
+                            },
+                        }
+                    },
+                    "required": ["function_declarations"],
+                },
+            }
+        },
+        "required": ["tools"],
+    }
+
+    json_spec = json.loads(spec)
+    try:
+        # Validate the JSON specification against the schema
+        validate(instance=json_spec, schema=schema)
+    except ValidationError as e:
+        raise ValueError(f"Invalid Tools specification: {e}") from e
+
+
+def validate_tool_config(tool_config: str) -> None:
+    """Validates the format of the tool_config."""
+
+    schema = {
+        "type": "object",
+        "properties": {
+            "function_calling_config": {
+                "type": "object",
+                "properties": {
+                    "mode": {"type": "string", "enum": ["AUTO", "ANY", "NONE"]},
+                    "allowed_function_names": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
+                },
+                "required": ["mode"],
+            }
+        },
+        "required": ["function_calling_config"],
+    }
+
+    try:
+        validate(instance=json.loads(tool_config), schema=schema)
+    except ValidationError as e:
+        raise ValueError(f"Invalid tool_config: {tool_config}") from e

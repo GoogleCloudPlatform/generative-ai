@@ -5,11 +5,11 @@ AGG
 AIP
 AMNOSH
 ANZ
-AOT
 APAC
 APIENTRY
 APSTUDIO
 ASF
+ASML
 AUVs
 Adidas
 Akihiro
@@ -56,6 +56,7 @@ COCOAPODS
 COINIT
 CONOUT
 COUNTIF
+CRM
 CUAD
 CUCUONAR
 CVD
@@ -358,11 +359,13 @@ Rosberg
 Rosso
 Rousey
 Ruchika
+SAOT
 SDKROOT
 SEK
 SEO
 SIMONE
 SKUs
+SMSN
 SNB
 SNE
 SPII
@@ -400,11 +403,14 @@ Surampudi
 Suzaka
 Syunik
 TARG
+TCEHY
 TGI
 TLDR
 TOKENLIST
 TPU
 TPUs
+TSLA
+TSMC
 TSNE
 Tadao
 Tafel
@@ -553,6 +559,7 @@ cctv
 cer
 cfbundle
 chatbots
+chipsets
 chromadb
 cicd
 cimg
@@ -819,6 +826,7 @@ mec
 meme
 memes
 metadatas
+metaverse
 mgrs
 millis
 miranda
@@ -883,6 +891,7 @@ openfda
 osm
 osx
 outro
+overwiew
 owlbot
 oxml
 pagemap
