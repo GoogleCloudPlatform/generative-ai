@@ -20,8 +20,7 @@ import random
 import re
 import string
 import subprocess
-from typing import Any, Dict, List, Union, Optional, Callable
-from jsonschema import validate, ValidationError
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from IPython.core.display import DisplayHandle
 from IPython.display import HTML, display
@@ -29,13 +28,23 @@ from google.cloud import aiplatform, storage
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
+from jsonschema import ValidationError, validate
 import pandas as pd
 import plotly.graph_objects as go
 from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
-from vertexai.evaluation import EvalTask
 from vertexai import generative_models
-from vertexai.generative_models import GenerativeModel, GenerationConfig, SafetySetting, HarmCategory, HarmBlockThreshold, FunctionDeclaration, Tool, ToolConfig, Content, Part
+from vertexai.evaluation import EvalTask
+from vertexai.generative_models import (
+    Content,
+    GenerationConfig,
+    GenerativeModel,
+    Part,
+    SafetySetting,
+    Tool,
+    ToolConfig,
+)
+
 
 def is_target_required_metric(eval_metric: str) -> bool:
     """Check if the metric requires the target label."""
@@ -688,11 +697,12 @@ def get_auth_token() -> str:
     )
     return result.stdout.strip()
 
+
 def init_new_model(
     model_name: str,
     generation_config: GenerationConfig = None,
     safety_settings: List[SafetySetting] = None,
-    **kwargs
+    **kwargs,
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
 
@@ -728,7 +738,7 @@ def init_new_model(
         model_name=model_name,
         generation_config=generation_config,
         safety_settings=safety_settings,
-        **kwargs
+        **kwargs,
     )
     return model
 
@@ -740,7 +750,7 @@ async def async_generate(
     function_handler: Optional[Dict[str, Callable]] = None,
     tools: Optional[Tool] = None,
     tool_config: Optional[ToolConfig] = None,
-    **kwargs
+    **kwargs,
 ) -> Union[str, None]:
     """Generates a response from the model, optionally handling function calls."""
 
@@ -749,13 +759,18 @@ async def async_generate(
     try:
         # Initial generation - potentially calling a function.
         response = await model.generate_content_async(
-            prompt, 
-            tools=[tools] if tools else None, # Only provide tools if they exist
-            tool_config=tool_config if tool_config else None # Same for tool_config
+            prompt,
+            tools=[tools] if tools else None,  # Only provide tools if they exist
+            tool_config=tool_config if tool_config else None,  # Same for tool_config
         )
 
         # Handle function calls if applicable
-        if function_handler and response and response.candidates and response.candidates[0].content.parts[0].function_call:
+        if (
+            function_handler
+            and response
+            and response.candidates
+            and response.candidates[0].content.parts[0].function_call
+        ):
             while response.candidates[0].content.parts[0].function_call:
                 function_call = response.candidates[0].content.parts[0].function_call
                 function_name = function_call.name
@@ -771,27 +786,29 @@ async def async_generate(
                             Content(
                                 parts=[
                                     Part.from_function_response(
-                                        name=function_name, response={"content": api_response}
+                                        name=function_name,
+                                        response={"content": api_response},
                                     )
                                 ]
                             ),
                         ],
-                        tools=[tools] if tools else None, #Conditional tool passing
+                        tools=[tools] if tools else None,  # Conditional tool passing
                         tool_config=tool_config if tool_config else None,
                     )
                 else:
                     break  # Exit loop if function not found
 
-
         # Extract and return text if generation was successful
         if response and response.candidates and response.candidates[0].content.parts:
-            return response.candidates[0].content.parts[0].text # More robust text extraction
+            return (
+                response.candidates[0].content.parts[0].text
+            )  # More robust text extraction
         return None
-
 
     except Exception as e:
         print(f"Error calling the model: {e}")  # Include the actual error message
         return "Could not call the model. Please try it again in a few minutes."
+
 
 def evaluate_task(
     df: pd.DataFrame,
@@ -855,8 +872,14 @@ def print_df_rows(
     for index, row in df.head(n).iterrows():
         # Display each column name as a bold header
         for column in df.columns:
-            display(HTML(f"<span style='{header_style}'>{column.replace('_', ' ').title()}: </span>"))
-            display(HTML(f"<span style='{base_style}'>{row[column]}</span><br>"))  # Display value and line break
+            display(
+                HTML(
+                    f"<span style='{header_style}'>{column.replace('_', ' ').title()}: </span>"
+                )
+            )
+            display(
+                HTML(f"<span style='{base_style}'>{row[column]}</span><br>")
+            )  # Display value and line break
         display(HTML("<hr>"))  # Add separator between rows for clarity
 
 
@@ -902,15 +925,18 @@ def plot_eval_metrics(
     # Show the plot
     fig.show()
 
+
 def create_target_column(row: Dict[str, Any]) -> str:
     """Creates a JSON string representing tool calls from input row."""
 
-    tool_calls = [{
-        "name": row['tool_names'],
-        "arguments": row['tool_arguments']
-    }] if row.get('tool_names') else []
+    tool_calls = (
+        [{"name": row["tool_names"], "arguments": row["tool_arguments"]}]
+        if row.get("tool_names")
+        else []
+    )
 
     return json.dumps({"content": "", "tool_calls": tool_calls})
+
 
 def tool_config_to_dict(tool_config: Optional[ToolConfig]) -> Optional[Dict[str, Any]]:
     """Converts a ToolConfig object to a dictionary."""
@@ -926,93 +952,94 @@ def tool_config_to_dict(tool_config: Optional[ToolConfig]) -> Optional[Dict[str,
         }
     }
 
-def replace_type_key(data: Dict[str, Any])-> Dict[str, Any]:
+
+def replace_type_key(data: Dict[str, Any]) -> Dict[str, Any]:
     """Recursively replaces "type_" with "type" in a dictionary or list."""
 
     if isinstance(data, dict):
         return {
-            "type" if k == "type_" else k: replace_type_key(v)
-            for k, v in data.items()
+            "type" if k == "type_" else k: replace_type_key(v) for k, v in data.items()
         }
     elif isinstance(data, list):
         return [replace_type_key(item) for item in data]
     return data
 
+
 def validate_tools(spec: str) -> None:
-  """Validates the tools specification."""
-  # Define the JSON schema for validation
-  schema = {
-      "type": "object",
-      "properties": {
-          "tools": {
-              "type": "array",
-              "minItems": 1,  # Ensures that 'tools' is not an empty array
-              "items": {
-                  "type": "object",
-                  "properties": {
-                      "function_declarations": {
-                          "type": "array",
-                          # Ensures this is not an empty array
-                          "minItems": 1,
-                          "items": {
-                              "type": "object",
-                              "properties": {
-                                  "name": {"type": "string"},
-                                  "description": {"type": "string"},
-                                  "parameters": {
-                                      "type": "object",
-                                      "properties": {
-                                          "type": {"type": "string"},
-                                          "properties": {"type": "object"},
-                                          "required": {
-                                              "type": "array",
-                                              "items": {"type": "string"},
-                                          },
-                                      },
-                                      "required": ["type", "properties"],
-                                  },
-                              },
-                              "required": ["name", "description", "parameters"],
-                          },
-                      }
-                  },
-                  "required": ["function_declarations"],
-              },
-          }
-      },
-      "required": ["tools"],
-  }
+    """Validates the tools specification."""
+    # Define the JSON schema for validation
+    schema = {
+        "type": "object",
+        "properties": {
+            "tools": {
+                "type": "array",
+                "minItems": 1,  # Ensures that 'tools' is not an empty array
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "function_declarations": {
+                            "type": "array",
+                            # Ensures this is not an empty array
+                            "minItems": 1,
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "description": {"type": "string"},
+                                    "parameters": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {"type": "string"},
+                                            "properties": {"type": "object"},
+                                            "required": {
+                                                "type": "array",
+                                                "items": {"type": "string"},
+                                            },
+                                        },
+                                        "required": ["type", "properties"],
+                                    },
+                                },
+                                "required": ["name", "description", "parameters"],
+                            },
+                        }
+                    },
+                    "required": ["function_declarations"],
+                },
+            }
+        },
+        "required": ["tools"],
+    }
 
-  json_spec = json.loads(spec)
-  try:
-    # Validate the JSON specification against the schema
-    validate(instance=json_spec, schema=schema)
-  except ValidationError as e:
-    raise ValueError(f"Invalid Tools specification: {e}") from e
+    json_spec = json.loads(spec)
+    try:
+        # Validate the JSON specification against the schema
+        validate(instance=json_spec, schema=schema)
+    except ValidationError as e:
+        raise ValueError(f"Invalid Tools specification: {e}") from e
 
 
-def validate_tool_config(tool_config: str)-> None:
-  """Validates the format of the tool_config."""
+def validate_tool_config(tool_config: str) -> None:
+    """Validates the format of the tool_config."""
 
-  schema = {
-      "type": "object",
-      "properties": {
-          "function_calling_config": {
-              "type": "object",
-              "properties": {
-                  "mode": {"type": "string", "enum": ["AUTO", "ANY", "NONE"]},
-                  "allowed_function_names": {
-                      "type": "array",
-                      "items": {"type": "string"},
-                  },
-              },
-              "required": ["mode"],
-          }
-      },
-      "required": ["function_calling_config"],
-  }
+    schema = {
+        "type": "object",
+        "properties": {
+            "function_calling_config": {
+                "type": "object",
+                "properties": {
+                    "mode": {"type": "string", "enum": ["AUTO", "ANY", "NONE"]},
+                    "allowed_function_names": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
+                },
+                "required": ["mode"],
+            }
+        },
+        "required": ["function_calling_config"],
+    }
 
-  try:
-    validate(instance=json.loads(tool_config), schema=schema)
-  except ValidationError as e:
-    raise ValueError(f"Invalid tool_config: {tool_config}") from e
+    try:
+        validate(instance=json.loads(tool_config), schema=schema)
+    except ValidationError as e:
+        raise ValueError(f"Invalid tool_config: {tool_config}") from e
