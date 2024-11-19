@@ -5,7 +5,16 @@ AGG
 AIP
 AMNOSH
 ANZ
-AOT
+ASML
+chipsets
+CRM
+metaverse
+overwiew
+SMSN
+TCEHY
+TSLA
+TSMC
+SAOT
 APAC
 APIENTRY
 APSTUDIO
