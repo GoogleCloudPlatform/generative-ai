@@ -10,7 +10,7 @@
     "clean": "(rm -rf ./dist && rm -rf ./node_modules)"
   },
   "dependencies": {
-    "@angular/cli": "^18.2.4",
+    "@angular/cli": "^19.0.0",
     "@google-cloud/discoveryengine": "^1.4.1",
     "@google-cloud/storage": "^7.9.0",
     "@google-cloud/vertexai": "^1.0.0",
