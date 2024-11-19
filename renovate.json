@@ -18,6 +18,7 @@
       "extends": ["schedule:quarterly"]
     },
     {
+      "matchUpdateTypes": ["major", "minor", "patch", "lockFileMaintenance", "bump", "pin", "digest"],
       "excludePaths": ["gemini/sample-apps/genwealth/**"]
     }
   ],
