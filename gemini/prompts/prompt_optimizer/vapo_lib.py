@@ -762,6 +762,7 @@ async def async_generate(
             prompt,
             tools=[tools] if tools else None,  # Only provide tools if they exist
             tool_config=tool_config if tool_config else None,  # Same for tool_config
+            **kwargs,
         )
 
         # Handle function calls if applicable
@@ -869,7 +870,7 @@ def print_df_rows(
     header_style = base_style + "font-weight: bold;"
 
     # Iterate through the specified number of rows
-    for index, row in df.head(n).iterrows():
+    for _, row in df.head(n).iterrows():
         # Display each column name as a bold header
         for column in df.columns:
             display(
@@ -956,13 +957,7 @@ def tool_config_to_dict(tool_config: Optional[ToolConfig]) -> Optional[Dict[str,
 def replace_type_key(data: Dict[str, Any]) -> Dict[str, Any]:
     """Recursively replaces "type_" with "type" in a dictionary or list."""
 
-    if isinstance(data, dict):
-        return {
-            "type" if k == "type_" else k: replace_type_key(v) for k, v in data.items()
-        }
-    elif isinstance(data, list):
-        return [replace_type_key(item) for item in data]
-    return data
+    return {"type" if k == "type_" else k: replace_type_key(v) for k, v in data.items()}
 
 
 def validate_tools(spec: str) -> None:
