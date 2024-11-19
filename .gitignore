@@ -5,3 +5,46 @@ __pycache__/
 env
 bin
 lib
+
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Compiled output
+/quick-bot-app-frontend/dist
+/quick-bot-app-frontend/tmp
+/quick-bot-app-frontend/out-tsc
+/quick-bot-app-frontend/bazel-out
+
+# Node
+/quick-bot-app-frontend/node_modules
+/quick-bot-app-frontend/npm-debug.log
+/quick-bot-app-frontend/yarn-error.log
+
+# IDEs and editors
+/quick-bot-app-frontend/.idea/
+/quick-bot-app-frontend/.project
+/quick-bot-app-frontend/.classpath
+/quick-bot-app-frontend/.c9/
+/quick-bot-app-frontend/*.launch
+/quick-bot-app-frontend/.settings/
+/quick-bot-app-frontend/*.sublime-workspace
+
+# Visual Studio Code
+/quick-bot-app-frontend/.vscode/*
+/quick-bot-app-frontend/!.vscode/settings.json
+/quick-bot-app-frontend/!.vscode/tasks.json
+/quick-bot-app-frontend/!.vscode/launch.json
+/quick-bot-app-frontend/!.vscode/extensions.json
+/quick-bot-app-frontend/.history/*
+
+# Miscellaneous
+quick-bot-app-frontend/.angular/cache
+quick-bot-app-frontend/.sass-cache/
+quick-bot-app-frontend/connect.lock
+quick-bot-app-frontend/coverage
+quick-bot-app-frontend/libpeerconnection.log
+quick-bot-app-frontend/testem.log
+quick-bot-app-frontend/typings
+
+# System files
+quick-bot-app-frontend/.DS_Store
+quick-bot-app-frontend/Thumbs.db
