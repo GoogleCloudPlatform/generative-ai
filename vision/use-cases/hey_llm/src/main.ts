@@ -54,6 +54,12 @@ const PRESET_OAUTH_CLIENT_SECRET = null;
 const PRESET_DRIVE_FOLDER_ID = null;
 
 /**
+ * Maximum cache duration for GAS CacheService.
+ * Reference: https://developers.google.com/apps-script/reference/cache/cache
+ */
+const CACHE_EXPIRATION_IN_SECONDS = 21600;
+
+/**
  * Property service middleware.
  * - If the value is preset, always returns it. The value is not writable.
  * - Otherwise, reads from / write to GAS PropertiesService.
@@ -300,7 +306,7 @@ Output:`;
     throw new Error('Request to Gemini failed. ' + res.getContentText());
   }
   const out = result.candidates[0].content.parts[0].text.trim();
-  cache?.put(cacheKey, out);
+  cache?.put(cacheKey, out, CACHE_EXPIRATION_IN_SECONDS);
   return out;
 }
 
@@ -594,7 +600,7 @@ function IMAGEN(
     thumbnailLink.indexOf('=') > -1
       ? thumbnailLink.split('=').slice(0, -1).join('')
       : thumbnailLink;
-  cache?.put(cacheKey, url);
+  cache?.put(cacheKey, url, CACHE_EXPIRATION_IN_SECONDS);
   return url;
 }
 

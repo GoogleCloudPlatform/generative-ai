@@ -111,6 +111,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
 
 ## Related Repositories
 
+- [Gemini Cookbook](https://github.com/google-gemini/cookbook/)
 - [Google Cloud Applied AI Engineering](https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples)
 - [Generative AI for Marketing using Google Cloud](https://github.com/GoogleCloudPlatform/genai-for-marketing)
 - [Generative AI for Developer Productivity](https://github.com/GoogleCloudPlatform/genai-for-developers)
