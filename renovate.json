@@ -6,19 +6,9 @@
   },
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance", "bump"],
-      "automerge": true
-    },
-    {
-      "matchUpdateTypes": ["minor"],
-      "extends": ["schedule:monthly"]
-    },
-    {
-      "matchUpdateTypes": ["patch"],
-      "extends": ["schedule:quarterly"]
-    },
-    {
       "matchUpdateTypes": ["major", "minor", "patch", "lockFileMaintenance", "bump", "pin", "digest"],
+      "extends": ["schedule:quarterly"],
+      "automerge": true,
       "excludePaths": ["gemini/sample-apps/genwealth/**"]
     }
   ],

@@ -302,7 +302,7 @@ Output:`;
   });
   const result: GenerateContentResponse = JSON.parse(res.getContentText());
   if (!(result.candidates && result.candidates[0].content.parts[0].text)) {
-    Logger.log(result);
+    Logger.log(payload, result);
     throw new Error('Request to Gemini failed. ' + res.getContentText());
   }
   const out = result.candidates[0].content.parts[0].text.trim();
@@ -316,7 +316,7 @@ Output:`;
  * @returns Sanitized file name
  */
 function sanitizeFileName(filename: string) {
-  return filename.replace(/[/\\?%*:|'"<>]/g, '_');
+  return filename.replace(/[/\\?%*:|'"<>#]/g, '_');
 }
 
 /**
@@ -348,7 +348,7 @@ function checkDriveImage_(
   } = JSON.parse(res.getContentText());
 
   if (!response.files) {
-    Logger.log(response);
+    Logger.log(url, response);
     throw new Error(
       'No files included in the response. ' + res.getContentText(),
     );
@@ -409,7 +409,7 @@ ${base64image}
   );
   const result: {thumbnailLink?: string} = JSON.parse(res.getContentText());
   if (!result.thumbnailLink) {
-    Logger.log(payload, result);
+    Logger.log(JSON.stringify(metadata), result);
     throw new Error(
       'Uploading image to Drive failed. Is Drive API enabled? ' +
         res.getContentText(),
@@ -440,12 +440,13 @@ function getScriptName_(oauth: GoogleAppsScriptOAuth2.OAuth2Service) {
     headers: {
       Authorization: 'Bearer ' + oauth.getAccessToken(),
     },
+    muteHttpExceptions: true,
   });
   const result: {name?: string} = JSON.parse(res.getContentText());
   if (!result.name) {
-    Logger.log(result);
+    Logger.log(url, result);
     throw new Error(
-      'Request to Drive failed. Is Drive API enabled? ' + res.getContentText(),
+      'Script name not found. Is Drive API enabled? ' + res.getContentText(),
     );
   }
   return result.name;
@@ -557,6 +558,8 @@ function IMAGEN(
   model = DEFAULT_IMAGEN_MODEL,
   aspectRatio = DEFAULT_ASPECT_RATIO,
 ) {
+  if (!prompt) return '';
+
   // If user specifies a blank string for model, it falls back to the default model.
   model = model ? model : DEFAULT_IMAGEN_MODEL;
 
@@ -577,7 +580,7 @@ function IMAGEN(
   if (!PropService.driveFolderID) {
     PropService.driveFolderID = createDriveFolder_(oauthService);
   }
-  const filename = sanitizeFileName(`${cacheKey}:${prompt.slice(0, 64)}.png`);
+  const filename = sanitizeFileName(`${cacheKey}_${prompt.slice(0, 64)}.png`);
   const driveUrl = checkDriveImage_(
     oauthService,
     filename,
@@ -600,7 +603,9 @@ function IMAGEN(
     thumbnailLink.indexOf('=') > -1
       ? thumbnailLink.split('=').slice(0, -1).join('')
       : thumbnailLink;
-  cache?.put(cacheKey, url, CACHE_EXPIRATION_IN_SECONDS);
+
+  // Short cache duration is set intentionally because the thumbnail link might expire.
+  cache?.put(cacheKey, url);
   return url;
 }
 
