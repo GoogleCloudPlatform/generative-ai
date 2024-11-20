@@ -19,7 +19,7 @@
     "@angular/material": "^17.2.2",
     "@angular/platform-browser": "^17.3.0",
     "@angular/platform-browser-dynamic": "^17.3.0",
-    "@angular/router": "^17.3.0",
+    "@angular/router": "^19.0.0",
     "@openapitools/openapi-generator-cli": "^2.13.5",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
