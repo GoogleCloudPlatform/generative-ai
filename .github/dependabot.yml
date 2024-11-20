@@ -4,16 +4,22 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+
+  - package-ecosystem: "pip"
+    directory: "/gemini/sample-apps/genwealth"
+    schedule:
+      interval: "monthly"
     ignore:
       - dependency-name: "*"
-        paths:
-          - "gemini/sample-apps/genwealth/**"
 
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "monthly"
+
+  - package-ecosystem: "maven"
+    directory: "/gemini/sample-apps/genwealth"
+    schedule:
+      interval: "monthly"
     ignore:
       - dependency-name: "*"
-        paths:
-          - "gemini/sample-apps/genwealth/**"
