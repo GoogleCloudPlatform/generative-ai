@@ -8,7 +8,10 @@
     {
       "matchUpdateTypes": ["major", "minor", "patch", "lockFileMaintenance", "bump", "pin", "digest"],
       "extends": ["schedule:quarterly"],
-      "automerge": true,
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["major", "minor", "patch", "lockFileMaintenance", "bump", "pin", "digest"],
       "excludePaths": ["gemini/sample-apps/genwealth/**"]
     }
   ],
