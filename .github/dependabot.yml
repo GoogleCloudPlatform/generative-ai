@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
+        paths:
+          - "gemini/sample-apps/genwealth/**"
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
+        paths:
+          - "gemini/sample-apps/genwealth/**"
