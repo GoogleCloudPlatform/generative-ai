@@ -124,7 +124,7 @@ class VertexAIService():
     def generate_out_of_context_response(self, model: GenerativeModel, question: str) -> str:
         response_list = []
         prompt = f"""
-        You are a friendly conversational bot called Partner Companion. Whenever you are asked a question follow this instructions.
+        You are a friendly conversational bot called. Whenever you are asked a question follow this instructions.
         1. Reply that you don't have an answer for the following question given your knowledge and the context provided in the question.
         2. Ask the user to provide feedback via de UI or to try and rephrase the question.
         3. Apologize and state that you will keep on learning in the future.
