@@ -5,11 +5,11 @@ AGG
 AIP
 AMNOSH
 ANZ
-AOT
 APAC
 APIENTRY
 APSTUDIO
 ASF
+ASML
 AUVs
 Adidas
 Akihiro
@@ -56,6 +56,7 @@ COCOAPODS
 COINIT
 CONOUT
 COUNTIF
+CRM
 CUAD
 CUCUONAR
 CVD
@@ -358,11 +359,13 @@ Rosberg
 Rosso
 Rousey
 Ruchika
+SAOT
 SDKROOT
 SEK
 SEO
 SIMONE
 SKUs
+SMSN
 SNB
 SNE
 SPII
@@ -400,11 +403,14 @@ Surampudi
 Suzaka
 Syunik
 TARG
+TCEHY
 TGI
 TLDR
 TOKENLIST
 TPU
 TPUs
+TSLA
+TSMC
 TSNE
 Tadao
 Tafel
@@ -496,6 +502,7 @@ ainvoke
 aip
 airlume
 akka
+alisal
 alloydb
 antiword
 apikey
@@ -553,6 +560,7 @@ cctv
 cer
 cfbundle
 chatbots
+chipsets
 chromadb
 cicd
 cimg
@@ -707,6 +715,7 @@ glowin
 gms
 googler
 goooooood
+gozo
 gpg
 gpt
 gpu
@@ -819,6 +828,7 @@ mec
 meme
 memes
 metadatas
+metaverse
 mgrs
 millis
 miranda
@@ -883,6 +893,7 @@ openfda
 osm
 osx
 outro
+overwiew
 owlbot
 oxml
 pagemap
@@ -1020,6 +1031,7 @@ stt
 stuffie
 subviews
 subword
+sunner
 supima
 svm
 sxs
@@ -1097,6 +1109,7 @@ windspeed
 winres
 wip
 wishlist
+womens
 workarounds
 wparam
 wscore
@@ -1110,6 +1123,7 @@ xcconfig
 xcodeproj
 xcscheme
 xctest
+xcvi
 xdg
 xlabel
 xmltodict
