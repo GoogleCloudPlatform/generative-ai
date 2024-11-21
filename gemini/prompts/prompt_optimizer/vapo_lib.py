@@ -359,7 +359,7 @@ class ProgressForm:
         self.instruction_df = None
         self.demo_df = None
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments,too-many-arguments
     def update_progress(
         self,
         progress_bar: widgets.IntProgress | None,
@@ -809,11 +809,12 @@ async def async_generate(
             )  # More robust text extraction
         return None
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print(f"Error calling the model: {e}")  # Include the actual error message
         return "Could not call the model. Please try it again in a few minutes."
 
 
+# pylint: disable=too-many-positional-arguments,too-many-arguments
 def evaluate_task(
     df: pd.DataFrame,
     prompt_col: str,
@@ -953,7 +954,7 @@ def tool_config_to_dict(tool_config: ToolConfig | None) -> dict[str, Any] | None
     if tool_config is None:
         return None
 
-    config = tool_config._gapic_tool_config.function_calling_config
+    config = tool_config._gapic_tool_config.function_calling_config  # pylint: disable=protected-access
     return {
         "function_calling_config": {
             "mode": config.mode.name,
