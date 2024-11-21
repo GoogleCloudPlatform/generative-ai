@@ -44,6 +44,3 @@ class IndexEndpointService:
     def endpoint_has_deployed_indexes(self, name: str) -> bool:
         index_endpoint = self.get_endpoint(name)
         return len(index_endpoint.deployed_indexes) > 0
-    
-    def standarize_name(self, name: str) -> str:
-        return name.lower().replace(" ", "-").replace("_", "-")

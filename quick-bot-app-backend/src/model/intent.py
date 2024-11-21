@@ -53,6 +53,9 @@ class Intent(BaseModel):
 
     def is_active(self) -> bool:
         return self.status == "5"
+    
+    def get_standard_name(self) -> str:
+        return self.name.lower().replace(" ", "-").replace("_", "-")
 
 class CreateIntentRequest(BaseModel):
     name: str

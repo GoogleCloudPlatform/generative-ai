@@ -31,14 +31,14 @@ class VertexAIService():
             for intent in intents:
                 if not intent.gcp_bucket: continue
                 ixs = MatchingEngineIndexEndpoint.list(
-                    filter=f'display_name="{intent.name}"',
+                    filter=f'display_name="{intent.get_standard_name()}"',
                 )
                 if len(ixs) == 0:
                     print(f"Intent {intent.name} is not yet initialized. Please run load_indexes.py to create an index for the intent")
                     continue
-                INDEX_ENDPOINTS[intent.name] = ixs[0]
+                INDEX_ENDPOINTS[intent.get_standard_name()] = ixs[0]
                 # Configure Vector Search client
-                INDEX_ENDPOINTS_CLIENTS[intent.name] =  MatchServiceClient(
+                INDEX_ENDPOINTS_CLIENTS[intent.get_standard_name()] =  MatchServiceClient(
                     client_options={
                         "api_endpoint": ixs[0].public_endpoint_domain_name,
                     },
@@ -163,8 +163,8 @@ class VertexAIService():
         """
         model = GenerativeModel(intent.ai_model)
         if intent.gcp_bucket:
-            index_endpoint = INDEX_ENDPOINTS[intent.name]
-            match_engine_client = INDEX_ENDPOINTS_CLIENTS[intent.name]
+            index_endpoint = INDEX_ENDPOINTS[intent.get_standard_name()]
+            match_engine_client = INDEX_ENDPOINTS_CLIENTS[intent.get_standard_name()]
             similarity_results = self.vector_search_query(
                 index_endpoint,
                 match_engine_client,
