@@ -38,7 +38,7 @@ async def create_intent(intent: CreateIntentRequest):
     try:
         saved_intent = intent_service.create(intent.to_intent())
         if intent.gcp_bucket:
-            index_endpoint = index_endpoint_service.create_endpoint(saved_intent.name.lower().replace(" ", "-").replace("_", "-"))
+            index_endpoint = index_endpoint_service.create_endpoint(saved_intent.name)
             task_repository.create(
                 IntentCreateEvent(
                     intent_name=intent.name,

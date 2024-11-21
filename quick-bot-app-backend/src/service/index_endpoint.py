@@ -20,7 +20,7 @@ class IndexEndpointService:
 
     def get_endpoint(self, name: str) -> MatchingEngineIndexEndpoint:
         index_endpoints = MatchingEngineIndexEndpoint.list(
-            filter=f'display_name="{name}"',
+            filter=f'display_name="{self.standarize_name(name)}"',
         )
 
         if index_endpoints:
@@ -30,7 +30,7 @@ class IndexEndpointService:
 
     def create_endpoint(self, name: str) -> MatchingEngineIndexEndpoint:
         return MatchingEngineIndexEndpoint.create(
-            display_name=name,
+            display_name=self.standarize_name(name),
             description=name,
             public_endpoint_enabled=True,
         )
@@ -44,3 +44,6 @@ class IndexEndpointService:
     def endpoint_has_deployed_indexes(self, name: str) -> bool:
         index_endpoint = self.get_endpoint(name)
         return len(index_endpoint.deployed_indexes) > 0
+    
+    def standarize_name(name: str) -> str:
+        return name.lower().replace(" ", "-").replace("_", "-")
