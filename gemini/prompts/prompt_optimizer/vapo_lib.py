@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: disable=too-many-lines
+
 """Utility functions and classes for the VAPO notebook."""
 import csv
 import io
@@ -20,7 +22,7 @@ import random
 import re
 import string
 import subprocess
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Union
 
 from IPython.core.display import DisplayHandle
 from IPython.display import HTML, display
@@ -701,9 +703,9 @@ def get_auth_token() -> str:
 
 def init_new_model(
     model_name: str,
-    generation_config: GenerationConfig = None,
-    safety_settings: List[SafetySetting] = None,
-    **kwargs,
+    generation_config: GenerationConfig | None = None,
+    safety_settings: list[SafetySetting] | None = None,
+    **kwargs: Any,
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
 
@@ -748,10 +750,10 @@ def init_new_model(
 async def async_generate(
     prompt: str,
     model: GenerativeModel,
-    function_handler: Optional[Dict[str, Callable]] = None,
-    tools: Optional[Tool] = None,
-    tool_config: Optional[ToolConfig] = None,
-    **kwargs,
+    function_handler: dict[str, Callable] | None = None,
+    tools: Tool | None = None,
+    tool_config: ToolConfig | None = None,
+    **kwargs: Any,
 ) -> Union[str, None]:
     """Generates a response from the model, optionally handling function calls."""
 
@@ -818,9 +820,9 @@ def evaluate_task(
     reference_col: str,
     response_col: str,
     experiment_name: str,
-    eval_metrics: List[str],
+    eval_metrics: list[str],
     eval_sample_n: int,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Evaluate task using Vertex AI Evaluation."""
 
     # Generate a unique id for the experiment run
@@ -858,7 +860,7 @@ def evaluate_task(
 
 
 def print_df_rows(
-    df: pd.DataFrame, columns: Optional[List[str]] = None, n: int = 3
+    df: pd.DataFrame, columns: list[str] | None = None, n: int = 3
 ) -> None:
     """Print a subset of rows from a DataFrame."""
 
@@ -867,7 +869,10 @@ def print_df_rows(
         df = df[columns]
 
     # Style definitions for improved readability
-    base_style = "font-family: monospace; font-size: 14px; white-space: pre-wrap; width: auto; overflow-x: auto;"
+    base_style = (
+        "font-family: monospace; font-size: 14px; white-space: pre-wrap; width:"
+        " auto; overflow-x: auto;"
+    )
     header_style = base_style + "font-weight: bold;"
 
     # Iterate through the specified number of rows
@@ -876,7 +881,9 @@ def print_df_rows(
         for column in df.columns:
             display(
                 HTML(
-                    f"<span style='{header_style}'>{column.replace('_', ' ').title()}: </span>"
+                    "<span"
+                    f" style='{header_style}'>{column.replace('_', ' ').title()}:"
+                    " </span>"
                 )
             )
             display(
@@ -886,8 +893,8 @@ def print_df_rows(
 
 
 def plot_eval_metrics(
-    eval_results: List[tuple[str, Dict[str, float]]],
-    metrics: Optional[List[str]] = None,
+    eval_results: list[tuple[str, dict[str, float]]],
+    metrics: list[str] | None = None,
 ) -> None:
     """Plot a bar plot for the evaluation results."""
 
@@ -928,7 +935,7 @@ def plot_eval_metrics(
     fig.show()
 
 
-def create_target_column(row: Dict[str, Any]) -> str:
+def create_target_column(row: dict[str, Any]) -> str:
     """Creates a JSON string representing tool calls from input row."""
 
     tool_calls = (
@@ -940,7 +947,7 @@ def create_target_column(row: Dict[str, Any]) -> str:
     return json.dumps({"content": "", "tool_calls": tool_calls})
 
 
-def tool_config_to_dict(tool_config: Optional[ToolConfig]) -> Optional[Dict[str, Any]]:
+def tool_config_to_dict(tool_config: ToolConfig | None) -> dict[str, Any] | None:
     """Converts a ToolConfig object to a dictionary."""
 
     if tool_config is None:
@@ -955,7 +962,7 @@ def tool_config_to_dict(tool_config: Optional[ToolConfig]) -> Optional[Dict[str,
     }
 
 
-def replace_type_key(data: Dict[str, Any]) -> Dict[str, Any]:
+def replace_type_key(data: dict[str, Any]) -> dict[str, Any]:
     """Recursively replaces "type_" with "type" in a dictionary or list."""
 
     return {"type" if k == "type_" else k: replace_type_key(v) for k, v in data.items()}
