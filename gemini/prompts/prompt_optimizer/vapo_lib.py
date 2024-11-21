@@ -448,11 +448,12 @@ class ProgressForm:
             for err_file in [
                 f"{self.output_path}/instruction/error.json",
                 f"{self.output_path}/demonstration/error.json",
+                f"{self.output_path}/error.json",
             ]:
                 if gfile.exists(err_file):
                     with gfile.GFile(err_file, "r") as f:
                         error_json = json.load(f)
-                    errors.append(f"Detailed error: {error_json}")
+                    errors.append(f"Detailed error: {error_json['Error']}")
                     errors.append(
                         f"Please feel free to send {err_file} to the VAPO team to help"
                         " resolving the issue."
@@ -466,6 +467,7 @@ class ProgressForm:
                 "Please consider rerunning to make sure the failure is intransient."
             )
             err = "\n".join(errors)
+            err = err.replace("\n", "<br>")
             self.status_display.update(HTML(f'<span style="color: red;">{err}</span>'))
         else:
             self.status_display.update(
