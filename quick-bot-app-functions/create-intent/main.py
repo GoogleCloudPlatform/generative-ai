@@ -49,7 +49,7 @@ def create_intent_index(request: Request):
         chunk_service = ChunkService(big_query_repository.client.project, intent.gcp_bucket)
         embeddings = []
             
-        index_unique_name = f"{intent.name.replace('_','-')}-{uuid4()}"
+        index_unique_name = f"{intent.name.lower().replace(' ', '-').replace('_','-')}-{uuid4()}"
         chunks = chunk_service.generate_chunks()
 
         for index, chunk in enumerate(chunks):
