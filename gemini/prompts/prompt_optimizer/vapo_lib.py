@@ -954,7 +954,8 @@ def tool_config_to_dict(tool_config: ToolConfig | None) -> dict[str, Any] | None
     if tool_config is None:
         return None
 
-    config = tool_config._gapic_tool_config.function_calling_config  # pylint: disable=protected-access
+    # pylint: disable=protected-access
+    config = tool_config._gapic_tool_config.function_calling_config
     return {
         "function_calling_config": {
             "mode": config.mode.name,
