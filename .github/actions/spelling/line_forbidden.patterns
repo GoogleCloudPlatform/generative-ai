@@ -286,6 +286,9 @@
 # Should be GCS
 \sgcs\s
 
+# Should be Dataflow ML
+\b[Dd]ataflowML\b
+
 # Should be API
 \s(?!API)(?!.*[\(\)\{\},=#]+)[Aa][Pp][Ii]\s
 
