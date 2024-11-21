@@ -1,11 +1,9 @@
-import { Component, ViewChild, TemplateRef, OnDestroy } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnDestroy } from '@angular/core';
 import { IntentService, IntentDetails, Model } from '../../services/intent.service';
 import { ToastMessageComponent } from '../shared/toast-message/toast-message.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { takeUntil, ReplaySubject, take } from 'rxjs';
+import { takeUntil, ReplaySubject } from 'rxjs';
 import { FormGroup, FormBuilder, FormArray, FormControl, Validators } from "@angular/forms";
-import { MatDialogRef } from '@angular/material/dialog';
 import { ModelsService } from 'src/app/services/models.service';
 
 @Component({
@@ -15,17 +13,13 @@ import { ModelsService } from 'src/app/services/models.service';
 })
 export class ManageIntentComponent implements OnDestroy {
 
+  intents: IntentDetails[];
   showSpinner: boolean[] = [];
   showSavedSectionSpinner: boolean[] = [];
   showMainSpinner = false;
   showDialogSpinner = false;
   models: Model[] = [];
   gcsPath: boolean[] = [];
-
-  @ViewChild('deleteDialogRef', { static: true })
-  deleteDialogRef!: TemplateRef<{}>;
-
-  deleteIntentDialogRef?: MatDialogRef<{}>;
 
   private readonly destroyed = new ReplaySubject<void>(1);
   interval: any;
@@ -49,6 +43,8 @@ export class ManageIntentComponent implements OnDestroy {
   });
   disabledSavedIntentList: boolean[] = [];
   showGCSField = false;
+
+  createMode: boolean = false;
 
   getNewForm(i: number) {
     const form = new FormGroup({});
@@ -83,7 +79,6 @@ export class ManageIntentComponent implements OnDestroy {
 
 
   constructor(
-    private readonly dialog: MatDialog,
     private intentService: IntentService,
     private _snackBar: MatSnackBar,
     private fb: FormBuilder,
@@ -94,6 +89,28 @@ export class ManageIntentComponent implements OnDestroy {
       this.models = response;
     });
     this.fetchIntentDataAtIntervals();
+  }
+
+  getAllIntent() {
+    this.showMainSpinner = true;
+    this.intentService.getAllIntent().pipe(takeUntil(this.destroyed)).subscribe({
+      next: (response) => {
+        this.showMainSpinner = false;
+        this.intents = response;
+      },
+      error: () => {
+        this.showMainSpinner = false;
+        console.log('error');
+      }
+    });
+  }
+
+  enterCreateMode() {
+    this.createMode = true;
+  }
+
+  exitCreateMode() {
+    this.createMode = false;
   }
 
   get getFormArray(): FormArray {
@@ -113,23 +130,6 @@ export class ManageIntentComponent implements OnDestroy {
     this.intentCount++;
   }
 
-  addSavedIntentSection(intent: IntentDetails, i: number) {
-    this.disabledSavedIntentList[i] = true;
-    const form = this.getSavedIntentForm(intent, i);
-    this.savedIntentSectionQuestionList[i] = 0;
-    this.savedIntentSectionQuestionIndexList[i.toString()] = [i + '_0'];
-    for (let q = 1; q < intent.questions.length; q++) {
-      this.savedIntentSectionQuestionIndexList[i.toString()].push(i + '_' + q);
-      form.addControl('question_' + i + '_' + q, new FormControl(intent.questions[q], [Validators.required]));
-      this.savedIntentSectionQuestionList[i]++;
-    }
-    form.disable();
-    const intentSection = this.savedIntentSectionForm.get('intentSection') as FormArray;
-    intentSection.push(form);
-    this.savedIntentSectionList.push(this.savedIntentCount);
-    this.savedIntentCount++;
-  }
-
   addQuestionField(i: number) {
     const intentSection = this.intentSectionForm.get('intentSection') as FormArray;
     const form = intentSection.at(i) as FormGroup;
@@ -138,61 +138,10 @@ export class ManageIntentComponent implements OnDestroy {
     this.intentSectionQuestionList[i]++;
   }
 
-  addQuestionFieldInSavedIntent(i: number) {
-    const intentSection = this.savedIntentSectionForm.get('intentSection') as FormArray;
-    const form = intentSection.at(i) as FormGroup;
-    this.savedIntentSectionQuestionIndexList[i.toString()].push(i + '_' + (this.savedIntentSectionQuestionList[i] + 1));
-    form.addControl('question_' + i + '_' + (this.savedIntentSectionQuestionList[i] + 1), new FormControl('', Validators.required));
-    this.savedIntentSectionQuestionList[i]++;
-  }
-
-
-  getAllIntent() {
-    this.showMainSpinner = true;
-    this.intentService.getAllIntent().pipe(takeUntil(this.destroyed)).subscribe({
-      next: (response) => {
-        this.showMainSpinner = false;
-        this.handleIntent(response);
-      },
-      error: () => {
-        this.showMainSpinner = false;
-        console.log('error');
-      }
-    });
-  }
-
-  handleIntent(intentList: IntentDetails[]) {
-    for (let i = 0; i < intentList.length; i++) {
-      this.addSavedIntentSection(intentList[i], i);
-    }
-  }
 
   ngOnDestroy() {
     this.destroyed.next();
     this.destroyed.complete();
-  }
-
-  protected syntaxHighlight(json: string) {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-      var cls = 'number';
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          cls = 'key';
-        } else {
-          cls = 'string';
-        }
-      } else if (/true|false/.test(match)) {
-        cls = 'boolean';
-      } else if (/null/.test(match)) {
-        cls = 'null';
-      }
-      return '<span class="' + cls + '">' + match + '</span>';
-    });
-  }
-
-  createRange(i: number) {
-    return i == 0 ? [0] : [...Array(i).keys(), i];
   }
 
   discardIntentSection(i: number) {
@@ -212,14 +161,13 @@ export class ManageIntentComponent implements OnDestroy {
       name: name.toLocaleLowerCase().replaceAll(" ", "_"),
       gcp_bucket: intentDetailsForm.get('gcp_bucket_' + i)?.value,
       ai_model: intentDetailsForm.get('ai_model_' + i)?.value,
-      ai_temperature: 1,
+      ai_temperature: "1",
       description: intentDetailsForm.get('description_' + i)?.value,
       prompt: intentDetailsForm.get('prompt_' + i)?.value,
       questions: this.getQuestionsList(intentDetailsForm, i),
       status: "1",
     };
     this.showSpinner[i] = true;
-    this.disableIntentForm(i);
     this.intentService.saveIntent(reqObj)
       .pipe(takeUntil(this.destroyed))
       .subscribe({
@@ -250,51 +198,6 @@ export class ManageIntentComponent implements OnDestroy {
       });
   }
 
-  updateIntent(event: any, i: number) {
-    event.stopPropagation();
-    console.log(this.savedIntentSectionQuestionIndexList);
-    const intentSection = this.savedIntentSectionForm.get('intentSection') as FormArray;
-    const intentDetailsForm = intentSection.at(i) as FormGroup;
-    const reqObj: IntentDetails = {
-      name: intentDetailsForm.get('intent_' + i)?.value,
-      gcp_bucket: intentDetailsForm.get('gcp_bucket_' + i)?.value,
-      ai_model: intentDetailsForm.get('ai_model_' + i)?.value,
-      ai_temperature: intentDetailsForm.get('ai_temperature' + i)?.value,
-      description: intentDetailsForm.get('description_' + i)?.value,
-      prompt: intentDetailsForm.get('prompt_' + i)?.value,
-      questions: this.getSavedIntentQuestionList(intentDetailsForm, i),
-      status: intentDetailsForm.get('status' + i)?.value,
-    };
-    this.showSavedSectionSpinner[i] = true;
-    this.intentService.updateIntent(reqObj)
-      .pipe(takeUntil(this.destroyed))
-      .subscribe({
-        next: () => {
-          this.showSavedSectionSpinner[i] = false;
-          this.disableSavedIntentForm(i);
-          this.discardIntentSection(i);
-          this._snackBar.openFromComponent(ToastMessageComponent, {
-            panelClass: ["green-toast"],
-            verticalPosition: "top",
-            horizontalPosition: "right",
-            duration: 5000,
-            data: { text: 'Intent Saved', icon: "tick-with-circle" },
-          });
-        },
-        error: () => {
-          this.showSavedSectionSpinner[i] = false;
-          this._snackBar.openFromComponent(ToastMessageComponent, {
-            panelClass: ["red-toast"],
-            verticalPosition: "top",
-            horizontalPosition: "right",
-            duration: 5000,
-            data: { text: 'failed to save intent', icon: "cross-in-circle-white" },
-          });
-
-        }
-      });
-  }
-
   getQuestionsList(intentDetails: FormGroup, i: number): string[] {
     const question = [];
     for (const questionIndex of this.intentSectionQuestionIndexList[i]) {
@@ -303,93 +206,12 @@ export class ManageIntentComponent implements OnDestroy {
     return question;
   }
 
-  getSavedIntentQuestionList(intentDetails: FormGroup, i: number): string[] {
-    const question = [];
-    for (const questionIndex of this.savedIntentSectionQuestionIndexList[i]) {
-      question.push(intentDetails.get('question_' + questionIndex)?.value);
-    }
-    return question;
-  }
 
   removeQuestionField(i: number, j: string) {
     const intentSection = this.intentSectionForm.get('intentSection') as FormArray;
     const form = intentSection.at(i) as FormGroup;
     form.removeControl('question_' + j);
     this.intentSectionQuestionIndexList[i] = this.intentSectionQuestionIndexList[i].filter((x: string) => x != j);
-  }
-
-  removeSavedIntentQuestionField(i: number, j: string) {
-    const intentSection = this.savedIntentSectionForm.get('intentSection') as FormArray;
-    const form = intentSection.at(i) as FormGroup;
-    form.removeControl('question_' + j);
-    this.savedIntentSectionQuestionIndexList[i] = this.savedIntentSectionQuestionIndexList[i].filter((x: string) => x != j);
-  }
-
-  discardSavedIntentSection(i: number) {
-    this.showDialogSpinner = true;
-    const intentSection = this.savedIntentSectionForm.get('intentSection') as FormArray;
-    const intentDetailsForm = intentSection.at(i) as FormGroup;
-    const name = intentDetailsForm.get('intent_' + i)?.value;
-    this.intentService.deleteIntent(name).pipe(takeUntil(this.destroyed)).subscribe({
-      next: () => {
-        this.showDialogSpinner = false;
-        this.deleteIntentDialogRef?.close();
-        intentSection.removeAt(i);
-        this.savedIntentSectionQuestionList[i] = 0;
-        this.savedIntentCount--;
-        this._snackBar.openFromComponent(ToastMessageComponent, {
-          panelClass: ["green-toast"],
-          verticalPosition: "top",
-          horizontalPosition: "right",
-          duration: 5000,
-          data: { text: 'Intent deleted', icon: "tick-with-circle" },
-        });
-      },
-      error: () => {
-        this.showDialogSpinner = false;
-        this._snackBar.openFromComponent(ToastMessageComponent, {
-          panelClass: ["red-toast"],
-          verticalPosition: "top",
-          horizontalPosition: "right",
-          duration: 5000,
-          data: { text: 'failed to delete intent', icon: "cross-in-circle-white" },
-        });
-
-      }
-    });
-  }
-
-  showDeleteIntentDialog(event: any, i: number) {
-    event.stopPropagation();
-    this.deleteIntentDialogRef = this.dialog.open(this.deleteDialogRef, { data: i, width: '60%', maxWidth: '700px' });
-  }
-
-  enableSavedIntent(event: any, i: number) {
-    event.stopPropagation();
-    this.disabledSavedIntentList[i] = false;
-    const intentSection = this.savedIntentSectionForm.get('intentSection') as FormArray;
-    const form = intentSection.at(i) as FormGroup;
-    form.enable();
-    form.get('intent_' + i)?.disable();
-    form.get('gcp_bucket_' + i)?.disable();
-
-  }
-
-  disableSavedIntentForm(i: number) {
-    this.disabledSavedIntentList[i] = true;
-    const intentSection = this.savedIntentSectionForm.get('intentSection') as FormArray;
-    const form = intentSection.at(i) as FormGroup;
-    form.disable();
-  }
-
-  disableIntentForm(i: number) {
-    const intentSection = this.intentSectionForm.get('intentSection') as FormArray;
-    const form = intentSection.at(i) as FormGroup;
-    form.disable();
-  }
-
-  getHumanReadablestring(s: string) {
-    return s.replace("_", " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
   }
 
   openGCSPathTutorial() {

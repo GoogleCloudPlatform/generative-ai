@@ -15,9 +15,9 @@ export type Intent = {
 
 export interface IntentDetails {
   name: string,
-  gcp_bucket: string,
+  gcp_bucket?: string,
   ai_model: string,
-  ai_temperature: number,
+  ai_temperature: string,
   description: string,
   prompt: string,
   questions: string[],

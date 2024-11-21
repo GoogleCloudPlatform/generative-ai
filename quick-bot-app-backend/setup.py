@@ -3,9 +3,10 @@ from scripts.gcs_setup import create_bucket, BUCKET
 from src.model.chats import Chat
 from src.model.embedding import Embedding
 from src.model.intent import Intent
-from src.repository.big_query import BIG_QUERY_DATASET, CHATS_TABLE, EMBEDDINGS_TABLE
+from src.repository.big_query import CHATS_TABLE, EMBEDDINGS_TABLE
 from src.service.intent import INTENTS_TABLE, IntentService
 
+BIG_QUERY_DATASET=""
 
 DEFAULT_INTENTS = [
     Intent(
@@ -29,9 +30,9 @@ print("\nSuccess!\n")
 print("Setting up BigQuery... \n")
 
 create_dataset(BIG_QUERY_DATASET)
-create_table(CHATS_TABLE, Chat.__schema__())
-create_table(EMBEDDINGS_TABLE, Embedding.__schema__())
-create_table(INTENTS_TABLE, Intent.__schema__())
+create_table(BIG_QUERY_DATASET, CHATS_TABLE, Chat.__schema__())
+create_table(BIG_QUERY_DATASET, EMBEDDINGS_TABLE, Embedding.__schema__())
+create_table(BIG_QUERY_DATASET, INTENTS_TABLE, Intent.__schema__())
 
 for intent in DEFAULT_INTENTS:
     try:

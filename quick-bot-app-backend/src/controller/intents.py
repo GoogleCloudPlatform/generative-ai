@@ -62,16 +62,7 @@ async def delete_intent(intent_name: str):
     intent = service.get(intent_name)
     if intent.gcp_bucket:
         index_endpoint_service = IndexEndpointService()
-        bq_repository = BigQueryRepository()
-
         endpoint = index_endpoint_service.get_endpoint(intent_name)
-
-        if len(endpoint.deployed_indexes) > 0:
-            bq_repository.delete_row_by_id(
-                EMBEDDINGS_TABLE,
-                EMBEDDINGS_INDEX_COLUMN,
-                endpoint.deployed_indexes[0].id.replace("_", "-")
-            )
         index_endpoint_service.delete_endpoint(endpoint)
     service.delete(intent_name)
     return

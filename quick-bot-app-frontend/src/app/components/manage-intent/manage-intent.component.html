@@ -1,209 +1,39 @@
 <div class="root-container">
   <div class="max-width-container">
-<div class="buttons-container">
-    <div class="heading-container"><span>Intent Management</span></div>
-    <div class="button-child-container">
-        <button mat-raised-button class="submit-button" (click)="addIntentSection()">
-            <mat-icon>add</mat-icon>
-            <span class="mat-button-wrapper">Create new Intent</span>
+    <div class="buttons-container">
+      <div class="heading-container"><span>Playbooks Management</span></div>
+      <div class="button-child-container">
+        <button
+          mat-raised-button
+          class="submit-button"
+          (click)="this.enterCreateMode()"
+        >
+          <mat-icon>add</mat-icon>
+          <span class="mat-button-wrapper">Create new Playbook</span>
         </button>
+      </div>
     </div>
-</div>
-
-<div class="table-container">
-    <mat-accordion class="example-headers-align" multi>
-        <div [formGroup]="intentSectionForm">
-            <div formArrayName="intentSection">
-                <mat-expansion-panel *ngFor="let item of getFormArray?.controls; index as i" [expanded]="i==0">
-                    <mat-expansion-panel-header class="panel-heading-container">
-                      <mat-panel-description>
-                        <span class="configure-title">Configure Intent</span>
-                        <div class="intent-buttons-container">
-                            <button mat-raised-button class="reset-button" *ngIf="!showSpinner[i]" (click)="discardIntentSection(i)">
-                                <span class="mat-button-wrapper"> Discard </span>
-                            </button>
-                            <button mat-raised-button class="submit-button" *ngIf="!showSpinner[i]" (click)="saveIntent($event, i)">
-                                <span class="mat-button-wrapper"> Save </span>
-                            </button>
-                            <div class="spinner-container" *ngIf="showSpinner[i]"><mat-spinner style="width: 60px;height: 60px;"></mat-spinner></div>
-                        </div>
-                      </mat-panel-description>
-                    </mat-expansion-panel-header>
-
-                    <div [formGroupName]="i">
-                      <div class="input-field-container">
-                        <mat-checkbox
-                        class="checkbox-margin"
-                        (change)="gcsPath[i]=!gcsPath[i]"
-                      >
-                      Add my own datasource.
-                        </mat-checkbox>
-                      </div>
-                      <div class="input-field-container">
-                        <mat-form-field class="intent-field" [ngStyle]="{'width': gcsPath[i]? '50%': '49%'}" appearance="outline" [floatLabel]='"always"'>
-                          <mat-label>Intent</mat-label>
-                          <input matInput [formControlName]="'intent_'+i" placeholder="Enter Intent" type="text">
-                        </mat-form-field>
-                        <mat-form-field class="intent-field" *ngIf="gcsPath[i]" appearance="outline" [floatLabel]='"always"'>
-                          <mat-label>GCS Path to files</mat-label>
-                          <input matInput [formControlName]="'gcp_bucket_'+i" placeholder="gs://your-bucket/your-folder" type="text">
-                          <button mat-button (click)="this.openGCSPathTutorial()" matSuffix class="my-icon">How to get my GCS path</button>
-                        </mat-form-field>
-                      </div>
-                      <div class="input-field-container">
-                        <mat-form-field class="intent-field" appearance="outline" [floatLabel]='"always"'>
-                          <mat-label>Description</mat-label>
-                          <input matInput [formControlName]="'description_'+i" placeholder="Enter a short description" type="text">
-                        </mat-form-field>
-                        <mat-form-field class="intent-field" appearance="outline" [floatLabel]='"always"'>
-                          <mat-label>AI Model</mat-label>
-                          <mat-select [formControlName]="'ai_model_'+i" [disabled]="true" placeholder="AI Model" >
-                            <mat-optgroup *ngFor="let model of models" [label]="model.name">
-                              <mat-option *ngFor="let model_name of model.models" [value]="model_name">{{model_name}}</mat-option>
-                            </mat-optgroup>
-                          </mat-select>
-                        </mat-form-field>
-                      </div>
-                        <div class="input-field-container">
-                          <mat-form-field class="prompt-field" appearance="outline" [floatLabel]='"always"'>
-                              <mat-label>Prompt</mat-label>
-                              <textarea matInput [formControlName]="'prompt_'+i" placeholder="Enter Prompt here" rows="3" wrap="soft"> </textarea>
-                          </mat-form-field>
-                        </div>
-                        <div class="input-field-container" *ngFor="let j of intentSectionQuestionIndexList[i]">
-                            <mat-form-field class="search-question-field" appearance="outline" [floatLabel]='"always"'>
-                                <mat-label>Question</mat-label>
-                                <input matInput [formControlName]="'question_'+j" placeholder="Enter a Question" type="text">
-                                <mat-icon matSuffix (click)="removeQuestionField(i,j)">delete</mat-icon>
-                            </mat-form-field>
-                        </div>
-                        <div class="input-field-container">
-                            <button mat-button class="add-question-button" type="button" (click)="addQuestionField(i);">
-                                <mat-icon>add</mat-icon>
-                                Add Question</button>
-                        </div>
-                    </div>
-                </mat-expansion-panel>
-            </div>
-        </div>
+    <div class="table-container">
+      <mat-accordion class="example-headers-align" multi>
+        <app-create-intent-form
+          (discardFormCreation)="this.exitCreateMode()"
+          *ngIf="this.createMode"
+          [models]="this.models"
+        ></app-create-intent-form>
 
         <div class="saved-intents-container">
-            <div class="heading-container"><span>Saved Intents</span></div>
+          <div class="heading-container"><span>Saved Playbooks</span></div>
         </div>
 
-        <div [formGroup]="savedIntentSectionForm">
-            <div formArrayName="intentSection">
-                <mat-expansion-panel *ngFor="let item of getSavedFormArray?.controls; index as i" [expanded]="i==0">
-                    <mat-expansion-panel-header class="panel-heading-container">
-                        <div class="configure-title">
-                          <span>{{getHumanReadablestring(item.get('intent_'+i)?.value)}}</span>
-                          <button mat-button class="inactive-button" disabled="true" *ngIf="item.get('status_'+i)?.value !=='5'">
-                            <span>In progress</span>
-                          </button>
-                          <button mat-button class="active-button" disabled="true" *ngIf="item.get('status_'+i)?.value =='5'">
-                            <span>Active</span>
-                          </button>
-                        </div>
-                        <div class="intent-buttons-container">
-                          <button mat-icon-button class="reset-button" *ngIf="!showSavedSectionSpinner[i] && disabledSavedIntentList[i]" (click)="enableSavedIntent($event, i)">
-                              <mat-icon>edit</mat-icon>
-                          </button>
-                          <button mat-icon-button class="reset-button" *ngIf="!showSavedSectionSpinner[i] && disabledSavedIntentList[i]" (click)="showDeleteIntentDialog($event, i)">
-                              <mat-icon>delete</mat-icon>
-                          </button>
-                          <button mat-raised-button class="reset-button" *ngIf="!showSavedSectionSpinner[i] && !disabledSavedIntentList[i]" (click)="disableSavedIntentForm(i)">
-                            <span class="mat-button-wrapper"> Discard Changes </span>
-                        </button>
-                          <button mat-raised-button class="reset-button" *ngIf="!showSavedSectionSpinner[i] && !disabledSavedIntentList[i]" (click)="updateIntent($event, i)">
-                              <span class="mat-button-wrapper"> Save </span>
-                          </button>
-                          <div class="spinner-container" *ngIf="showSavedSectionSpinner[i]"><mat-spinner style="width: 60px;height: 60px;"></mat-spinner></div>
-                        </div>
-                    </mat-expansion-panel-header>
-
-                    <div [formGroupName]="i">
-                        <div class="input-field-container">
-                          <mat-stepper class="stepper" *ngIf="item.get('status_'+i)?.value !=='5'">
-                            <mat-step [completed]="item.get('status_'+i)?.value >= '1'" [editable]="false">
-                              <ng-template matStepLabel>Index endpoint created</ng-template>
-                            </mat-step>
-                            <mat-step [errorMessage]="'There was a problem creating an index with your data'" [hasError]="item.get('status_'+i)?.value == '2'" [completed]="item.get('status_'+i)?.value >= '3'" [editable]="false">
-                              <ng-template matStepLabel>Index created</ng-template>
-                            </mat-step>
-                            <mat-step [errorMessage]="'There was a problem deploying your index'" [hasError]="item.get('status_'+i)?.value == '4'" [completed]="item.get('status_'+i)?.value >= '5'" [editable]="false">
-                              <ng-template matStepLabel>Index deployed</ng-template>
-                            </mat-step>
-                          </mat-stepper>
-                        </div>
-                        <div class="input-field-container">
-                          <mat-form-field class="intent-field" appearance="outline" [floatLabel]='"always"'>
-                            <mat-label>Name</mat-label>
-                            <input matInput [formControlName]="'intent_'+i" [disabled]="true" placeholder="Intent name" type="text">
-                          </mat-form-field>
-                          <mat-form-field class="intent-field" appearance="outline" [floatLabel]='"always"'>
-                              <mat-label>GCS Path to files</mat-label>
-                              <input matInput [formControlName]="'gcp_bucket_'+i" [disabled]="true" placeholder="gs://your-bucket/your-folder" type="text">
-                          </mat-form-field>
-                        </div>
-                        <div class="input-field-container">
-                          <mat-form-field class="intent-field" appearance="outline" [floatLabel]='"always"'>
-                            <mat-label>Description</mat-label>
-                            <input matInput [formControlName]="'description_'+i" placeholder="Enter a short description" type="text">
-                          </mat-form-field>
-                          <mat-form-field class="intent-field" appearance="outline" [floatLabel]='"always"'>
-                            <mat-label>AI Model</mat-label>
-                            <mat-select [formControlName]="'ai_model_'+i" [disabled]="true" placeholder="AI Model" >
-                              <mat-optgroup *ngFor="let model of models" [label]="model.name">
-                                <mat-option *ngFor="let model_name of model.models" [value]="model_name">{{model_name}}</mat-option>
-                              </mat-optgroup>
-                            </mat-select>
-                          </mat-form-field>
-                        </div>
-                        <div class="input-field-container">
-                            <mat-form-field class="prompt-field" appearance="outline" [floatLabel]='"always"'>
-                                <mat-label>Prompt</mat-label>
-                                <textarea matInput [formControlName]="'prompt_'+i"  placeholder="Enter Prompt here" rows="3" wrap="soft"> </textarea>
-                            </mat-form-field>
-                        </div>
-                        <div class="input-field-container" *ngFor="let j of savedIntentSectionQuestionIndexList[i]">
-                            <mat-form-field class="search-question-field" appearance="outline" [floatLabel]='"always"'>
-                                <mat-label>Question</mat-label>
-                                <input matInput [formControlName]="'question_'+j"   placeholder="Enter a Question" type="text">
-                                <mat-icon matSuffix (click)="removeSavedIntentQuestionField(i,j)" *ngIf="!disabledSavedIntentList[i]">delete</mat-icon>
-                            </mat-form-field>
-                        </div>
-                        <div class="input-field-container">
-                            <button mat-button class="add-question-button" [disabled]="disabledSavedIntentList[i]"  type="button" (click)="addQuestionFieldInSavedIntent(i);">
-                                <mat-icon>add</mat-icon>
-                                Add Question</button>
-                        </div>
-                    </div>
-                </mat-expansion-panel>
-            </div>
-        </div>
-
-    </mat-accordion>
-</div>
-<div class="spinner-container" *ngIf="showMainSpinner"><mat-spinner style="width: 60px;height: 60px;"></mat-spinner></div>
-</div>
-</div>
-
-<ng-template #deleteDialogRef let-data>
-    <div class="dialog-wrapper">
-        <mat-dialog-content>
-            <div class="image-container"><img src="../../../assets/images/delete_notification_dialog_image.png" /></div>
-            <span class="delete-confirmation-text">Are you sure you wanna delete this Intent?</span>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <div class="dialog-actions-container" *ngIf="!showDialogSpinner" style="justify-content: center;">
-                <button mat-raised-button class="discard-button" mat-dialog-close>
-                    Cancel</button>
-                <button mat-raised-button class="dialog-delete-button" (click)="discardSavedIntentSection(data)">
-                    Delete</button>
-            </div>
-            <div class="spinner-dialog-container" *ngIf="showDialogSpinner">
-                <mat-spinner style="width: 60px;height: 60px;"></mat-spinner>
-            </div>
-        </mat-dialog-actions>
+        <app-intent-form
+          *ngFor="let intent of this.intents"
+          [intent]="intent"
+          [models]="this.models"
+        ></app-intent-form>
+      </mat-accordion>
     </div>
-</ng-template>
+  </div>
+  <div class="spinner-container" *ngIf="showMainSpinner">
+    <mat-spinner style="width: 60px; height: 60px"></mat-spinner>
+  </div>
+</div>
