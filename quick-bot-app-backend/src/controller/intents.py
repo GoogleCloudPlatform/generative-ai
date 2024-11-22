@@ -62,7 +62,7 @@ async def delete_intent(intent_name: str):
     intent = service.get(intent_name)
     if intent.gcp_bucket:
         index_endpoint_service = IndexEndpointService()
-        endpoint = index_endpoint_service.get_endpoint(intent_name)
+        endpoint = index_endpoint_service.get_endpoint(intent.get_standard_name())
         index_endpoint_service.delete_endpoint(endpoint)
     service.delete(intent_name)
     return
