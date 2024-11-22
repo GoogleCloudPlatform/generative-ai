@@ -20,7 +20,7 @@ class IndexEndpointService:
 
     def get_endpoint(self, name: str) -> MatchingEngineIndexEndpoint:
         index_endpoints = MatchingEngineIndexEndpoint.list(
-            filter=f'display_name="{self.standarize_name(name)}"',
+            filter=f'display_name="{name}"',
         )
 
         if index_endpoints:
@@ -30,7 +30,7 @@ class IndexEndpointService:
 
     def create_endpoint(self, name: str) -> MatchingEngineIndexEndpoint:
         return MatchingEngineIndexEndpoint.create(
-            display_name=self.standarize_name(name),
+            display_name=name,
             description=name,
             public_endpoint_enabled=True,
         )
