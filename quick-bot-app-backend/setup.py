@@ -1,11 +1,12 @@
-from scripts.big_query_setup import create_dataset, create_table
+from scripts.big_query_setup import create_dataset, create_table, insert_intent
 from scripts.gcs_setup import create_bucket, BUCKET
 from src.model.chats import Chat
 from src.model.embedding import Embedding
 from src.model.intent import Intent
-from src.repository.big_query import BIG_QUERY_DATASET, CHATS_TABLE, EMBEDDINGS_TABLE
-from src.service.intent import INTENTS_TABLE, IntentService
+from src.repository.big_query import CHATS_TABLE, EMBEDDINGS_TABLE
+from src.service.intent import INTENTS_TABLE
 
+BIG_QUERY_DATASET=""
 
 DEFAULT_INTENTS = [
     Intent(
@@ -18,7 +19,6 @@ DEFAULT_INTENTS = [
         status="5",
     ),
 ]
-INTENT_SERVICE = IntentService()
 
 print("Setting up GCS... \n")
 
@@ -29,13 +29,13 @@ print("\nSuccess!\n")
 print("Setting up BigQuery... \n")
 
 create_dataset(BIG_QUERY_DATASET)
-create_table(CHATS_TABLE, Chat.__schema__())
-create_table(EMBEDDINGS_TABLE, Embedding.__schema__())
-create_table(INTENTS_TABLE, Intent.__schema__())
+create_table(BIG_QUERY_DATASET, CHATS_TABLE, Chat.__schema__())
+create_table(BIG_QUERY_DATASET, EMBEDDINGS_TABLE, Embedding.__schema__())
+create_table(BIG_QUERY_DATASET, INTENTS_TABLE, Intent.__schema__())
 
 for intent in DEFAULT_INTENTS:
     try:
-        INTENT_SERVICE.create(intent)
+        insert_intent(BIG_QUERY_DATASET, INTENTS_TABLE, intent.to_insert_string())
     except Exception as e:
         print(e)
 

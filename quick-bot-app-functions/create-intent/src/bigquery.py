@@ -4,7 +4,7 @@ import logging
 
 from src.models import Embedding
 
-BIG_QUERY_DATASET= "quick_bot"
+BIG_QUERY_DATASET=""
 
 EMBEDDINGS_TABLE = "embeddings"
 EMBEDDINGS_ID_COLUMN = "id"

@@ -21,7 +21,7 @@ async def get_intents():
     for intent in intents:
         if not intent.is_active():
             index_endpoint_service = IndexEndpointService()
-            if index_endpoint_service.endpoint_has_deployed_indexes(intent.name):
+            if index_endpoint_service.endpoint_has_deployed_indexes(intent.get_standard_name()):
                 intent.status = "5"
                 service.update(intent.name, intent)
 
@@ -38,7 +38,7 @@ async def create_intent(intent: CreateIntentRequest):
     try:
         saved_intent = intent_service.create(intent.to_intent())
         if intent.gcp_bucket:
-            index_endpoint = index_endpoint_service.create_endpoint(saved_intent.name)
+            index_endpoint = index_endpoint_service.create_endpoint(saved_intent.get_standard_name())
             task_repository.create(
                 IntentCreateEvent(
                     intent_name=intent.name,
@@ -62,16 +62,7 @@ async def delete_intent(intent_name: str):
     intent = service.get(intent_name)
     if intent.gcp_bucket:
         index_endpoint_service = IndexEndpointService()
-        bq_repository = BigQueryRepository()
-
-        endpoint = index_endpoint_service.get_endpoint(intent_name)
-
-        if len(endpoint.deployed_indexes) > 0:
-            bq_repository.delete_row_by_id(
-                EMBEDDINGS_TABLE,
-                EMBEDDINGS_INDEX_COLUMN,
-                endpoint.deployed_indexes[0].id.replace("_", "-")
-            )
+        endpoint = index_endpoint_service.get_endpoint(intent.get_standard_name())
         index_endpoint_service.delete_endpoint(endpoint)
     service.delete(intent_name)
     return
