@@ -1,3 +1,6 @@
+paligemma
+pytorch
+VLM
 AALR
 ADMA
 AFX
