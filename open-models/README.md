@@ -12,3 +12,7 @@ This repository contains examples for deploying and fine-tuning open source mode
 ### Fine-tuning
 
 - [fine-tuning/vertex_ai_trl_fine_tuning_gemma.ipynb](./fine-tuning/vertex_ai_trl_fine_tuning_gemma.ipynb) - This notebooks provides steps and code to fine-tune Google Gemma with TRL via the Hugging Face PyTorch DLC for Training on Vertex AI.
+
+### Use cases
+
+- [use-cases/guess_app.ipynb](./use-cases/guess_app.ipynb) - This notebook shows how you can use Vertex AI and Hugging Face Deep Learning container to create a simple "Guess who or what" application which combines an image generation open model with Gemini to answer and represent subjects of Guess who or what riddles.
