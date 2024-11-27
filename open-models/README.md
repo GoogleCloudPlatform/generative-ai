@@ -16,4 +16,3 @@ This repository contains examples for deploying and fine-tuning open source mode
 ### Use cases
 
 - [use-cases/guess_app.ipynb](./use-cases/guess_app.ipynb) - This notebook shows how to build a "Guess Who" app using FLUX and Gemini.
-
