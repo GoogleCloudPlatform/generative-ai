@@ -15,4 +15,4 @@ This repository contains examples for deploying and fine-tuning open source mode
 
 ### Use cases
 
-- [use-cases/guess_app.ipynb](./use-cases/guess_app.ipynb) - This notebook shows how you can use Vertex AI and Hugging Face Deep Learning containers (HF DLCs) to create a simple "Guess who or what" application which combines an image generation open model with Gemini to answer and represent subjects of Guess who or what riddles.
+- [use-cases/guess_app.ipynb](./use-cases/guess_app.ipynb) - This notebook shows how you can use Vertex AI and Hugging Face Deep Learning containers to create a simple "Guess who or what" application which combines an image generation open model with Gemini to answer and represent subjects of Guess who or what riddles.
