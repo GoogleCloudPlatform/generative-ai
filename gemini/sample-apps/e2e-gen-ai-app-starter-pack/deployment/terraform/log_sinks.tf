@@ -1,5 +1,5 @@
 resource "google_project_iam_member" "bigquery_data_editor" {
-  for_each = local.project_ids
+  for_each = local.deploy_project_ids
 
   project = each.value
   role    = "roles/bigquery.dataEditor"
@@ -7,7 +7,7 @@ resource "google_project_iam_member" "bigquery_data_editor" {
 }
 
 module "log_export_to_bigquery" {
-  for_each = local.project_ids
+  for_each = local.deploy_project_ids
 
   source  = "terraform-google-modules/log-export/google"
   version = "10.0.0"
@@ -24,7 +24,7 @@ module "log_export_to_bigquery" {
 }
 
 resource "google_bigquery_dataset" "feedback_dataset" {
-  for_each      = local.project_ids
+  for_each      = local.deploy_project_ids
   project       = each.value
   dataset_id    = var.feedback_bigquery_dataset_id
   friendly_name = var.feedback_bigquery_dataset_id
@@ -34,7 +34,7 @@ resource "google_bigquery_dataset" "feedback_dataset" {
 }
 
 module "feedback_export_to_bigquery" {
-  for_each = local.project_ids
+  for_each = local.deploy_project_ids
 
   source                 = "terraform-google-modules/log-export/google"
   version                = "10.0.0"
@@ -50,7 +50,7 @@ module "feedback_export_to_bigquery" {
 
 resource "google_bigquery_dataset" "telemetry_logs_dataset" {
   depends_on    = [module.log_export_to_bigquery, module.feedback_export_to_bigquery, resource.google_project_service.shared_services]
-  for_each      = local.project_ids
+  for_each      = local.deploy_project_ids
   project       = each.value
   dataset_id    = var.telemetry_bigquery_dataset_id
   friendly_name = var.telemetry_bigquery_dataset_id

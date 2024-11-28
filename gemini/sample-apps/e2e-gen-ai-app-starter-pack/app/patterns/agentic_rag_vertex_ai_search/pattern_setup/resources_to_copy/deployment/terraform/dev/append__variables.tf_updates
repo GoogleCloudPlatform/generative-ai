@@ -1,0 +1,39 @@
+
+# ! Specific to Vertex AI Search pattern
+
+variable "vertexai_pipeline_sa_name" {
+  description = "Service account name to be used for the Vertex AI service"
+  type        = string
+  default     = "data-ingestion-vertexai-sa"
+}
+
+variable "region_vertex_ai_search" {
+  type        = string
+  description = "Google Cloud region for resource deployment."
+  default     = "us"
+}
+
+variable "pipelines_roles" {
+  description = "List of roles to assign to the Vertex AI runner service account"
+  type        = list(string)
+  default = [
+    "roles/storage.admin",
+    "roles/run.invoker",
+    "roles/aiplatform.user",
+    "roles/discoveryengine.admin",
+    "roles/logging.logWriter",
+    "roles/artifactregistry.writer",
+  ]
+}
+
+variable "datastore_name" {
+  description = "The name of the datastore"
+  type = string
+  default = "my-datastore"
+}
+
+variable "search_engine_name" {
+  description = "The name of the search engine"
+  type = string
+  default = "my-search-engine"
+}

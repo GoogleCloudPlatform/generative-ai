@@ -6,7 +6,7 @@ resource "google_service_account" "cicd_runner_sa" {
 }
 
 resource "google_service_account" "cloud_run_app_sa" {
-  for_each = local.project_ids
+  for_each = local.deploy_project_ids
 
   account_id   = var.cloud_run_app_sa_name
   display_name = "Cloud Run Generative AI app SA"
