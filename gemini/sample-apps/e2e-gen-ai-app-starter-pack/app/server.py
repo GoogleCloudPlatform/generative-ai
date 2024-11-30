@@ -40,6 +40,8 @@ from traceloop.sdk import Instruments, Traceloop
 # LangGraph dummy agent
 # from app.patterns.langgraph_dummy_agent.chain import chain
 
+# Or explore other patterns in the 'app/patterns' folder
+
 # The events that are supported by the UI Frontend
 SUPPORTED_EVENTS = [
     "on_tool_start",
