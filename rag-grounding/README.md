@@ -98,7 +98,7 @@ data.
 - Vector Database Choices
   - **[rag_engine_feature_store.ipynb](../gemini/rag-engine/rag_engine_feature_store.ipynb)**: How to use RAG Engine with [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore/latest/overview)
   - **[rag_engine_pinecone.ipynb](../gemini/rag-engine/rag_engine_pinecone.ipynb)**: How to use RAG Engine with [Pinecone](https://www.pinecone.io/)
-  - **[rag_engine_vector_search.ipynb](../gemini/rag-engine/rag_engine_weaviate.ipynb)**: How to use RAG Engine with [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview)
+  - **[rag_engine_vector_search.ipynb](../gemini/rag-engine/rag_engine_vector_search.ipynb)**: How to use RAG Engine with [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview)
   - **[rag_engine_weaviate.ipynb](../gemini/rag-engine/rag_engine_weaviate.ipynb)**: How to use RAG Engine with [Weaviate](https://weaviate.io/)
 - **[rag_engine_evaluation.ipynb](../gemini/rag-engine/rag_engine_evaluation.ipynb)**: Advanced RAG Techniques and Evaluation with RAG Engine
 
