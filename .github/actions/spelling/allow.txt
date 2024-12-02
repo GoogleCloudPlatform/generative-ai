@@ -199,6 +199,7 @@ JPY
 Jang
 Jax
 Jedi
+Jhamtani
 Jian
 Jibo
 Joji
@@ -440,6 +441,7 @@ Uszkoreit
 Utik
 VAPO
 VFT
+VLM
 VMs
 VOS
 VQA
@@ -899,6 +901,7 @@ owlbot
 oxml
 pagemap
 paleo
+paligemma
 pancetta
 pantarba
 paracord
@@ -949,6 +952,7 @@ pymupdf
 pypdf
 pyplot
 pysftp
+pytorch
 pyvis
 qna
 qrel
