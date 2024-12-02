@@ -16,11 +16,11 @@ import { ModelsService } from 'src/app/services/models.service';
 })
 export class CreateIntentFormComponent {
 
-  @Input() models: Model[]
   @Output() discardFormCreation: EventEmitter<boolean> = new EventEmitter()
 
   hasExternalDataSource: boolean = false;
   showSpinner: boolean = false;
+  models: Model[] = [];
 
   intentForm = new FormGroup({
     name: new FormControl<string>('', Validators.required),
