@@ -162,7 +162,7 @@
         </div>
         <div class="button-container">
           <button mat-button class="cancel-button" matStepperPrevious>Back</button>
-          <button mat-button class="submit-button" [disabled]="!this.intentForm.valid" (click)="saveForm()">Save</button>
+          <button mat-button class="submit-button" this.intentForm.valid (click)="saveForm()">Save</button>
         </div>
       </mat-step>
     </mat-stepper>
