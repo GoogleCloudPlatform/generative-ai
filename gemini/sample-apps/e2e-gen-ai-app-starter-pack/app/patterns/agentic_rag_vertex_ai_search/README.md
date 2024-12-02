@@ -4,12 +4,13 @@ This pattern enhances the Gen AI App Starter Pack with a production-ready data i
 
 The pattern provides the infrastructure to create a Vertex AI Pipeline with your custom code. Because it's built on Vertex AI Pipelines, you benefit from features like scheduled runs, recurring executions, and on-demand triggers. For processing terabyte-scale data, we recommend combining Vertex AI Pipelines with data analytics tools like BigQuery or Dataflow.
 
+![search pattern demo](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/starter-pack-search-pattern.gif)
+
 ## Architecture
 
 The pattern implements the following architecture:
 
 ![architecture diagram](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/e2e-gen-ai-app-starter-pack/agentic_rag_vertex_ai_search_architecture.png)
-The main addition to the base pattern is the addition of the ingestion components.
 
 ### Key Features
 
