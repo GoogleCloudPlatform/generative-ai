@@ -126,10 +126,11 @@
 .buttons-container {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: flex-start;
     width: 100%;
     padding-top: 1%;
     padding-bottom: 1%;
+    padding-left: 3%;
 }
 
 .saved-intents-container {

@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { IntentDetails, IntentService, Model } from 'src/app/services/intent.service';
 import { ToastMessageComponent } from '../../shared/toast-message/toast-message.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-intent-form',
@@ -36,6 +37,7 @@ export class IntentFormComponent implements OnChanges {
     private dialog: MatDialog,
     private service: IntentService,
     private snackbar: MatSnackBar,
+    private router: Router
   ) {
     this.intentForm.disable()
     this.intentForm.controls.questions.disable()
@@ -97,7 +99,7 @@ export class IntentFormComponent implements OnChanges {
           duration: 5000,
           data: { text: 'Intent deleted', icon: "tick-with-circle" },
         });
-        window.location.reload();
+        this.router.navigateByUrl('/');
       },
       error: () => {
         this.showSpinner = false;

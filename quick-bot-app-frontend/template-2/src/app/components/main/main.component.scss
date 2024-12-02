@@ -235,7 +235,6 @@ h2 {
         border-radius: 30px;
         width: 66%;
         // box-shadow: 5px 4px 24px rgba(66, 133, 244, 0.15);
-        background: #F0F4F9;
 
         .chat-textarea {
             flex-grow: 1;
@@ -258,7 +257,6 @@ h2 {
                 font-size: 0.95rem;
                 line-height: 1.1rem;
                 color: #534646;
-                background: #F0F4F9;
             }
 
             input::-webkit-scrollbar {
@@ -414,6 +412,7 @@ h2 {
     flex-direction: row;
     gap: 1%;
     align-items: center;
+    justify-content: center;
 }
 
 @keyframes effect {
@@ -486,7 +485,8 @@ h2 {
     padding-bottom: 1%;
     opacity: 0.5;
     animation: typing 2s steps(22), blink .5s step-end infinite alternate;
-    width: 22ch;
+    justify-content: center;
+    display: flex;
 }
 
 @keyframes typing {
@@ -595,7 +595,6 @@ h2 {
     box-sizing: border-box;
     width: 239px;
     height: 239px;
-    background: #F0F4F9 !important;
     border-radius: 14px;
     transition-delay: 2s;
     transition: width 8s;
@@ -699,6 +698,12 @@ h2 {
       width: 100%;
       max-width: 180px;
     }
+  }
+
+  .suggested-question-chip:hover {
+    background: linear-gradient(92.1deg, #9EBCED 19.16%, rgba(164, 136, 245, 0.9) 79%);
+    border-radius: 41px;
+    color: #FFFFFF;
   }
 }
 

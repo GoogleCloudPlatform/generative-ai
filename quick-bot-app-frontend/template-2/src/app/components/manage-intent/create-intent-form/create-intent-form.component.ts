@@ -3,6 +3,10 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { IntentDetails, IntentService, Model } from 'src/app/services/intent.service';
 import { ToastMessageComponent } from '../../shared/toast-message/toast-message.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  MatDialogRef,
+} from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-intent-form',
@@ -30,6 +34,8 @@ export class CreateIntentFormComponent {
   constructor(
     private snackbar: MatSnackBar,
     private service: IntentService,
+    private readonly dialogRef: MatDialogRef<CreateIntentFormComponent>,
+    private readonly router: Router
   ) {}
 
   toggleHasExternalDataSource() {
@@ -82,7 +88,8 @@ export class CreateIntentFormComponent {
           duration: 5000,
           data: { text: 'Intent Saved', icon: "tick-with-circle" },
         });
-        window.location.reload()
+        this.dialogRef.close();
+        this.router.navigateByUrl('/');
       },
       error: (response) => {
         const message = response.error && response.error.detail ? response.error.detail : "Error creating intent"

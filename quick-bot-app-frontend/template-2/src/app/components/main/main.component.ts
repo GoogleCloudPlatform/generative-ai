@@ -1,4 +1,5 @@
-import { IntentDetails, IntentService } from './../../services/intent.service';
+import { IntentService, IntentDetails, Model } from '../../services/intent.service';
+import { ModelsService } from 'src/app/services/models.service';
 import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BroadcastService } from 'src/app/services/broadcast.service';
@@ -11,6 +12,7 @@ import { ReplaySubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { animate, sequence, state, style, transition, trigger } from '@angular/animations';
 import { SpeechToTextService } from '../../services/speech-to-text';
+import { CreateIntentFormComponent } from '../manage-intent/create-intent-form/create-intent-form.component';
 
 @Component({
   selector: 'app-main',
@@ -60,7 +62,10 @@ export class MainComponent {
 
   private readonly destroyed = new ReplaySubject<void>(1);
   toolTipText: string | undefined;
-  tooltipTextTimeout: undefined | ReturnType<typeof setTimeout>;;
+  tooltipTextTimeout: undefined | ReturnType<typeof setTimeout>;
+  models: Model[] = [];
+  createIntentComponentInstance:any;
+
 
   constructor(private router: Router,
     private broadcastService: BroadcastService,
@@ -71,9 +76,16 @@ export class MainComponent {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private speechToTextService: SpeechToTextService,
+    private modelsService: ModelsService,
   ) {
     this.intentsService.getAllIntent().subscribe(response => {
-      this.intents = response.filter((i) => i.status === "5");
+      if(response.length > 0) this.intents = response.filter((i) => i.status === "5");
+      else {
+        this.modelsService.getAll().subscribe(response => {
+          this.models = response;
+          this.openCreateIntentForm();
+        });
+      }
     });
     this.searchForm = this.fb.group({
       searchTerm: this.fb.control('')
@@ -81,6 +93,11 @@ export class MainComponent {
     this.savedUser = userService.getUserDetails();
     this.sessionService.createSession();
     this.setTimeoutForToolTipText();
+  }
+
+  openCreateIntentForm(){
+    this.createIntentComponentInstance = this.dialog.open(CreateIntentFormComponent, { disableClose: true });
+    this.createIntentComponentInstance.models = this.models;
   }
 
   navigate() {
