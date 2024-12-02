@@ -7,6 +7,7 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ModelsService } from 'src/app/services/models.service';
 
 @Component({
   selector: 'app-create-intent-form',
@@ -35,8 +36,13 @@ export class CreateIntentFormComponent {
     private snackbar: MatSnackBar,
     private service: IntentService,
     private readonly dialogRef: MatDialogRef<CreateIntentFormComponent>,
-    private readonly router: Router
-  ) {}
+    private readonly router: Router,
+    private readonly modelsService: ModelsService,
+  ) {
+    this.modelsService.getAll().subscribe(response => {
+      this.models = response;
+    });
+  }
 
   toggleHasExternalDataSource() {
     this.hasExternalDataSource = !this.hasExternalDataSource;

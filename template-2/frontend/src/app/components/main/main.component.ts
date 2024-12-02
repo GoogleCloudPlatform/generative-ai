@@ -76,16 +76,10 @@ export class MainComponent {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private speechToTextService: SpeechToTextService,
-    private modelsService: ModelsService,
   ) {
     this.intentsService.getAllIntent().subscribe(response => {
       if(response.length > 0) this.intents = response.filter((i) => i.status === "5");
-      else {
-        this.modelsService.getAll().subscribe(response => {
-          this.models = response;
-          this.openCreateIntentForm();
-        });
-      }
+      else this.openCreateIntentForm();
     });
     this.searchForm = this.fb.group({
       searchTerm: this.fb.control('')
@@ -97,7 +91,6 @@ export class MainComponent {
 
   openCreateIntentForm(){
     this.createIntentComponentInstance = this.dialog.open(CreateIntentFormComponent, { disableClose: true });
-    this.createIntentComponentInstance.models = this.models;
   }
 
   navigate() {
