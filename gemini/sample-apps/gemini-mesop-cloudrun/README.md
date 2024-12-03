@@ -2,7 +2,7 @@
 
 |           |                                                |
 | --------- | ---------------------------------------------- |
-| Author(s) | [Hussain Chinoy](https://github.com/ghchinoy) |
+| Author(s) | [Hussain Chinoy](https://github.com/ghchinoy)  |
 
 This application demonstrates a [Mesop](https://github.com/google/mesop) UI framework application running on Cloud Run.
 
@@ -82,7 +82,6 @@ To deploy the Mesop Application in [Cloud Run](https://cloud.google.com/run/docs
    ```bash
    export SERVICE_NAME='mesop-gemini' # this is the name of our Application and Cloud Run service. Change this if you'd like to.
    ```
-
 
    In Cloud Shell, execute the following command:
 
