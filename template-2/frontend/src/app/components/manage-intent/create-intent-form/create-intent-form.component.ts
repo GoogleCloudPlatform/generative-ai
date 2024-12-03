@@ -18,18 +18,14 @@ export class CreateIntentFormComponent {
 
   @Output() discardFormCreation: EventEmitter<boolean> = new EventEmitter()
 
-  hasExternalDataSource: boolean = false;
-  showSpinner: boolean = false;
   models: Model[] = [];
 
   intentForm = new FormGroup({
     name: new FormControl<string>('', Validators.required),
     gcp_bucket: new FormControl<string>(''),
-    description: new FormControl<string>('', Validators.required),
     prompt: new FormControl<string>('', Validators.required),
     ai_model: new FormControl<string>('', Validators.required),
     ai_temperature: new FormControl<string>('', Validators.required),
-    questions: new FormArray<FormControl<string|null>>([new FormControl<string>({value: '', disabled: false}, Validators.required)])
   })
 
   constructor(
@@ -44,24 +40,12 @@ export class CreateIntentFormComponent {
     });
   }
 
-  toggleHasExternalDataSource() {
-    this.hasExternalDataSource = !this.hasExternalDataSource;
-  }
-
-  removeQuestion(i: number) {
-    this.intentForm.controls.questions.removeAt(i);
-  }
-
-  addQuestion() {
-    this.intentForm.controls.questions.push(new FormControl<string>({value: '', disabled: false}, Validators.required));
-  }
-
   discardForm() {
     this.discardFormCreation.emit()
   }
 
   saveForm() {
-    if (!this.intentForm.valid || !this.intentForm.controls.questions.valid || (this.hasExternalDataSource && this.intentForm.controls.gcp_bucket.value === "")){
+    if (!this.intentForm.valid){
       this.snackbar.openFromComponent(ToastMessageComponent, {
         panelClass: ["red-toast"],
         verticalPosition: "top",
@@ -72,21 +56,17 @@ export class CreateIntentFormComponent {
       return;
     };
 
-    this.showSpinner = true;
     let intent: IntentDetails = {
       name: this.intentForm.controls.name.value!,
       gcp_bucket: this.intentForm.controls.gcp_bucket.value!,
-      description: this.intentForm.controls.description.value!,
       prompt: this.intentForm.controls.prompt.value!,
       ai_model: this.intentForm.controls.ai_model.value!,
       ai_temperature: this.intentForm.controls.ai_temperature.value!,
-      questions: (this.intentForm.controls.questions.value) as string[],
       status: "1",
     }
 
     this.service.saveIntent(intent).subscribe({
       next: () => {
-        this.showSpinner = false;
         this.snackbar.openFromComponent(ToastMessageComponent, {
           panelClass: ["green-toast"],
           verticalPosition: "top",
@@ -99,7 +79,6 @@ export class CreateIntentFormComponent {
       },
       error: (response) => {
         const message = response.error && response.error.detail ? response.error.detail : "Error creating intent"
-        this.showSpinner = false;
         this.snackbar.openFromComponent(ToastMessageComponent, {
           panelClass: ["red-toast"],
           verticalPosition: "top",

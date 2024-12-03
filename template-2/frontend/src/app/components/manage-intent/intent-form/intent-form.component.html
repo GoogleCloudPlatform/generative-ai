@@ -159,21 +159,6 @@
         appearance="outline"
         [floatLabel]="'always'"
       >
-        <mat-label>Description</mat-label>
-        <input
-          matInput
-          [formControl]="this.intentForm.controls.description"
-          placeholder="Enter a short description"
-          type="text"
-        />
-      </mat-form-field>
-    </div>
-    <div class="input-field-container">
-      <mat-form-field
-        class="prompt-field"
-        appearance="outline"
-        [floatLabel]="'always'"
-      >
         <mat-label>Prompt</mat-label>
         <textarea
           matInput
@@ -185,38 +170,6 @@
         </textarea>
       </mat-form-field>
     </div>
-    <mat-list>
-      <mat-list-item
-        class="questions-field-container"
-        style="height: 100%"
-        *ngFor="
-          let control of this.intentForm.controls.questions.controls;
-          let i = index
-        "
-      >
-        <mat-form-field
-          class="search-question-field"
-          appearance="outline"
-          [floatLabel]="'always'"
-        >
-          <input
-            matInput
-            placeholder="Enter a Question"
-            [formControl]="control"
-            type="text"
-          />
-          <mat-icon *ngIf="this.editMode" matSuffix (click)="removeQuestion(i)">delete</mat-icon>
-        </mat-form-field>
-      </mat-list-item>
-      <button
-        *ngIf="this.editMode"
-        mat-button
-        class="add-question-button"
-        (click)="addQuestion()"
-      >
-        Add Question
-      </button>
-    </mat-list>
   </div>
 </mat-expansion-panel>
 

@@ -26,11 +26,9 @@ export class IntentFormComponent implements OnChanges {
   intentForm = new FormGroup({
     name: new FormControl<string>('', Validators.required),
     gcp_bucket: new FormControl<string>('', Validators.required),
-    description: new FormControl<string>('', Validators.required),
     prompt: new FormControl<string>('', Validators.required),
     ai_model: new FormControl<string>('', Validators.required),
     ai_temperature: new FormControl<string>('', Validators.required),
-    questions: new FormArray<FormControl<string|null>>([])
   })
 
   constructor(
@@ -40,20 +38,14 @@ export class IntentFormComponent implements OnChanges {
     private router: Router
   ) {
     this.intentForm.disable()
-    this.intentForm.controls.questions.disable()
   }
 
   ngOnChanges(): void {
     this.intentForm.controls.name.setValue(this.intent.name);
     this.intentForm.controls.gcp_bucket.setValue(this.intent.gcp_bucket || '');
-    this.intentForm.controls.description.setValue(this.intent.description);
     this.intentForm.controls.prompt.setValue(this.intent.prompt);
     this.intentForm.controls.ai_model.setValue(this.intent.ai_model);
     this.intentForm.controls.ai_temperature.setValue(this.intent.ai_temperature);
-    this.intentForm.controls.questions = new FormArray<FormControl<string|null>>([])
-    for(let question of this.intent.questions) {
-      this.intentForm.controls.questions.push(new FormControl<string>({value: question, disabled: true}, Validators.required))
-    }
   }
 
   getHumanReadablestring(s: string) {
@@ -64,21 +56,11 @@ export class IntentFormComponent implements OnChanges {
     this.editMode = !this.editMode;
     if(this.editMode) {
       this.intentForm.enable();
-      this.intentForm.controls.questions.enable();
       this.intentForm.controls.name.disable();
       this.intentForm.controls.gcp_bucket.disable();
     } else {
       this.intentForm.disable();
-      this.intentForm.controls.questions.disable();
     }
-  }
-
-  removeQuestion(i: number) {
-    this.intentForm.controls.questions.removeAt(i);
-  }
-
-  addQuestion() {
-    this.intentForm.controls.questions.push(new FormControl<string>({value: '', disabled: false}, Validators.required));
   }
 
   showDeleteDialog(event: any) {
@@ -116,7 +98,7 @@ export class IntentFormComponent implements OnChanges {
   }
 
   saveForm() {
-    if (!this.intentForm.valid || !this.intentForm.controls.questions.valid){
+    if (!this.intentForm.valid){
       this.snackbar.openFromComponent(ToastMessageComponent, {
         panelClass: ["red-toast"],
         verticalPosition: "top",
@@ -130,11 +112,9 @@ export class IntentFormComponent implements OnChanges {
     this.showSpinner = true;
     this.intent.name = this.intentForm.controls.name.value!
     this.intent.gcp_bucket = this.intentForm.controls.gcp_bucket.value!
-    this.intent.description = this.intentForm.controls.description.value!
     this.intent.prompt = this.intentForm.controls.prompt.value!
     this.intent.ai_model = this.intentForm.controls.ai_model.value!
     this.intent.ai_temperature = this.intentForm.controls.ai_temperature.value!
-    this.intent.questions = (this.intentForm.controls.questions.value) as string[]
 
     this.service.updateIntent(this.intent)
       .subscribe({

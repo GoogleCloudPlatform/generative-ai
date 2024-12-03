@@ -8,7 +8,6 @@ class Chat(BaseModel):
     question: str
     answer: str
     intent: str
-    suggested_questions: List[str]
     timestamp: Optional[str] = None
 
     def __schema__() -> List[SchemaField]:
@@ -17,7 +16,6 @@ class Chat(BaseModel):
             SchemaField("question", "STRING", mode="REQUIRED"),
             SchemaField("answer", "STRING", mode="REQUIRED"),
             SchemaField("intent", "STRING", mode="REQUIRED"),
-            SchemaField("suggested_questions", "STRING", mode="REPEATED"),
             SchemaField("timestamp", "TIMESTAMP", mode="REQUIRED"),
         ]
 
@@ -27,12 +25,11 @@ class Chat(BaseModel):
             "question": self.question,
             "answer": self.answer,
             "intent": self.intent,
-            "suggested_questions": self.suggested_questions,
             "timestamp": self.timestamp,
         }
     
     def to_insert_string(self):
-        return f'"{self.id}", """{self.question}""", """{self.answer}""", "{self.intent}", {str(self.suggested_questions)}, CURRENT_TIMESTAMP()'
+        return f'"{self.id}", """{self.question}""", """{self.answer}""", "{self.intent}", CURRENT_TIMESTAMP()'
 
 class CreateChatRequest(BaseModel):
     text: str

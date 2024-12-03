@@ -7,9 +7,7 @@ class Intent(BaseModel):
     name: str
     ai_model: str
     ai_temperature: float
-    description: str
     prompt: str
-    questions: List[str]
     status: str
     gcp_bucket: str = ""
 
@@ -18,9 +16,7 @@ class Intent(BaseModel):
             SchemaField("name", "STRING", mode="REQUIRED"),
             SchemaField("ai_model", "STRING", mode="REQUIRED"),
             SchemaField("ai_temperature", "NUMERIC", mode="REQUIRED"),
-            SchemaField("description", "STRING", mode="REQUIRED"),
             SchemaField("prompt", "STRING", mode="REQUIRED"),
-            SchemaField("questions", "STRING", mode="REPEATED"),
             SchemaField("status", "STRING", mode="REQUIRED"),
             SchemaField("gcp_bucket", "STRING", mode="REQUIRED"),
         ]
@@ -30,26 +26,22 @@ class Intent(BaseModel):
             name=row[0],
             ai_model=row[1],
             ai_temperature=row[2],
-            description=row[3],
-            prompt=row[4],
-            questions=row[5],
-            status=row[6],
-            gcp_bucket=row[7],
+            prompt=row[3],
+            status=row[4],
+            gcp_bucket=row[5],
         )
 
     def to_dict(self):
         return {
             "name": self.name,
             "ai_model": self.ai_model,
-            "description": self.description,
             "prompt": self.prompt,
-            "questions": self.questions,
             "status": self.status,
             "gcp_bucket": self.gcp_bucket,
         }
     
     def to_insert_string(self):
-        return f'"{self.name}", "{self.ai_model}", {self.ai_temperature},"{self.description}","""{self.prompt}""", {str(self.questions)}, "{self.status}", "{self.gcp_bucket}"'
+        return f'"{self.name}", "{self.ai_model}", {self.ai_temperature},"""{self.prompt}""", "{self.status}", "{self.gcp_bucket}"'
 
     def is_active(self) -> bool:
         return self.status == "5"
@@ -62,9 +54,7 @@ class CreateIntentRequest(BaseModel):
     gcp_bucket: str = ""
     ai_model: str
     ai_temperature: float
-    description: str
     prompt: str
-    questions: List[str]
 
     def to_dict(self):
         return {
@@ -72,9 +62,7 @@ class CreateIntentRequest(BaseModel):
             "gcp_bucket": self.gcp_bucket,
             "ai_model": self.ai_model,
             "ai_temperature": self.ai_temperature,
-            "description": self.description,
             "prompt": self.prompt,
-            "questions": self.questions,
         }
     
     def to_intent(self) -> Intent:
@@ -82,9 +70,7 @@ class CreateIntentRequest(BaseModel):
             name=self.name,
             ai_model=self.ai_model,
             ai_temperature=self.ai_temperature,
-            description=self.description,
             prompt=self.prompt,
-            questions=self.questions,
             status="1",
             gcp_bucket=self.gcp_bucket,
         )

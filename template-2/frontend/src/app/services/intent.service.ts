@@ -18,9 +18,7 @@ export interface IntentDetails {
   gcp_bucket?: string,
   ai_model: string,
   ai_temperature: string,
-  description: string,
   prompt: string,
-  questions: string[],
   status: string,
 }
 

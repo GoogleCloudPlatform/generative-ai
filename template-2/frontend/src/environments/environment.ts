@@ -4,7 +4,7 @@ export const environment = {
     authDomain: "",
     projectId: "",
   },
-  requiredLogin: "",
-  backendURL: "",
-  chatbotName: "",
+  requiredLogin: "false",
+  backendURL: "http://localhost:8080/api",
+  chatbotName: "Eren",
 };

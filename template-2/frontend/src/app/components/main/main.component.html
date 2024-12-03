@@ -38,24 +38,12 @@
         </div>
       </div>
     </div>
-
-    <div *ngIf="this.intents" class="container main-div margin-div journey-chips">
       <div class="cards-outer-container">
         <div class="cards-container"
             [ngClass]="this.intents.length >= 5 ? 'cards-container-all-categories':'cards-container-few-categories'">
           <div
             class="intent-container-box">
             <div class="card-detail-container" *ngIf="this.intents.length > 0">
-              <div class="suggested-question-container">
-                <div *ngFor="let question of this.intents[0].questions">
-                  <mat-chip-row class="suggested-question-chip-row" [highlighted]="this.chipSelected == question" (click)="assignQToChatQuery(question)">
-                    <span class="suggested-question-chip">
-                      <mat-icon class="suggested-question-icon">chat</mat-icon>
-                      <span class="suggested-question-text">{{question}}</span>
-                    </span>
-                  </mat-chip-row>
-                </div>
-              </div>
             </div>
           </div>
         </div>
