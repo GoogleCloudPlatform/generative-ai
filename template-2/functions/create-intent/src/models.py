@@ -7,9 +7,7 @@ class Intent(BaseModel):
     name: str
     ai_model: str
     ai_temperature: float
-    description: str
     prompt: str
-    questions: List[str]
     is_active: bool
     gcp_bucket: str = ""
 
@@ -18,9 +16,7 @@ class Intent(BaseModel):
             SchemaField("name", "STRING", mode="REQUIRED"),
             SchemaField("ai_model", "STRING", mode="REQUIRED"),
             SchemaField("ai_temperature", "NUMBER", mode="REQUIRED"),
-            SchemaField("description", "STRING", mode="REQUIRED"),
             SchemaField("prompt", "STRING", mode="REQUIRED"),
-            SchemaField("questions", "STRING", mode="REPEATED"),
             SchemaField("is_active", "BOOLEAN", mode="REQUIRED"),
             SchemaField("gcp_bucket", "STRING", mode="REQUIRED"),
         ]
@@ -30,11 +26,9 @@ class Intent(BaseModel):
             name=row[0],
             ai_model=row[1],
             ai_temperature=row[2],
-            description=row[3],
-            prompt=row[4],
-            questions=row[5],
-            is_active=row[6],
-            gcp_bucket=row[7],
+            prompt=row[3],
+            is_active=row[4],
+            gcp_bucket=row[5],
         )
 
     def to_dict(self):
@@ -42,9 +36,7 @@ class Intent(BaseModel):
             "name": self.name,
             "ai_model": self.ai_model,
             "ai_temperature": self.ai_temperature,
-            "description": self.description,
             "prompt": self.prompt,
-            "questions": self.questions,
             "is_active": self.is_active,
             "gcp_bucket": self.gcp_bucket,
         }
