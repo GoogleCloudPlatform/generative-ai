@@ -45,6 +45,7 @@ class IntentService:
             'ai_model': f'"{intent.ai_model}"',
             'ai_temperature': f'{intent.ai_temperature}',
             'prompt': f'"""{intent.prompt}"""',
+            'questions': f'{str(intent.questions)}',
             'status': f'"{intent.status}"',
         }
         self.repository.update_row_by_id(INTENTS_TABLE, INTENTS_TABLE_ID_COLUMN, intent_name, update_dict)
