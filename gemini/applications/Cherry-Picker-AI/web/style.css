@@ -1,0 +1,143 @@
+body {
+  margin: 24px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  --accent-color: #076EFF;
+  color: #202124;
+}
+
+main {
+  width: 100%;
+  padding: 24px;
+  max-width: 460px;
+  margin: 0 auto;
+  border-radius: 20px;
+}
+
+* {
+  outline-color: var(--accent-color);
+}
+
+main {
+  background-color: #fff;
+}
+
+h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  font-size: 24px;
+}
+
+h1::before {
+  content: '';
+  display: inline-block;
+  background: url(gemini.svg);
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+}
+
+form {
+  margin: 0;
+}
+
+.image-picker {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.image-choice {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.image-choice:has(:checked)::before {
+  pointer-events: none;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 1;
+  color: white;
+  content: '✓';
+  background-color: var(--accent-color);
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  border-radius: 100px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.image-choice:has(:checked)::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 2px var(--accent-color) inset,
+    0 0 0 4px #fff inset;
+}
+
+.image-choice img {
+  width: 100%;
+}
+
+.image-choice input {
+  opacity: 0;
+  position: absolute;
+}
+
+.image-choice:focus-within::after {
+  box-shadow: 0 0 0 4px var(--accent-color) inset;
+}
+
+.prompt-box {
+  margin: 24px 0;
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+label {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+}
+
+input,
+button {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: unset;
+  font-size: 16px;
+}
+
+button {
+  border-color: var(--accent-color);
+  background-color: var(--accent-color);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 1;
+}
+
+button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -4px;
+}
+
+button:hover {
+  opacity: 0.95;
+}

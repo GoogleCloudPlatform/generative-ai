@@ -1,0 +1,13 @@
+# Dev environment
+pip
+autopep8
+
+# App
+google-generativeai # Client library for the Gemini API
+Pillow # PIL image-loading library
+flask
+chromadb
+pymupdf
+langchain==0.1.20
+google-generativeai
+google-cloud-aiplatform
