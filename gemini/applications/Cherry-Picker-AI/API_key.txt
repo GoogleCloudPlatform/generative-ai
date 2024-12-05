@@ -1,1 +1,3 @@
 Please add your Gemini API Key Here!
+
+<Or Utilize Google Secret Manager for production>
