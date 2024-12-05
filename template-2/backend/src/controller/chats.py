@@ -18,11 +18,10 @@ async def chat(
         response: Response,
         background_tasks: BackgroundTasks
     ):
-    intents = IntentService().get_all()
     intent_matching_service = IntentMatchingService()
+    intents = IntentService().get_all()
     intent = intents[0]
     
-    intent = intent_matching_service.get_intent_from_query(item.text)
     suggested_questions = intent_matching_service.get_suggested_questions(item.text, intent)
     
     model_response = VertexAIService(intents).generate_text_from_model(
