@@ -4,7 +4,7 @@
 
 ## Description
 
-This app is a machine learning tool that can analyze images of produce and provide feedback on its quality. It also will generate a personalized advertisements for poorly rated produce based on sponsor grocery stores (based on the type of produce they are looking for).
+This app is a Gemini application that can analyze images of produce and provide feedback on its quality. It also will generate a personalized advertisements for poorly rated produce based on sponsor grocery stores (based on the type of produce they are looking for).
 
 * Here is a link to a video demo of the application. (Send to Github Generative AI Team to create shareable link)
 * This application was originally demo'ed on [November 5th, 2024](https://www.youtube.com/live/MJBqVVkRbNM?si=DdZK_Ry3cCj1p1-T).
