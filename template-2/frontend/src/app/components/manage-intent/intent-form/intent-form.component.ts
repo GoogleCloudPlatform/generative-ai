@@ -29,6 +29,7 @@ export class IntentFormComponent implements OnChanges {
     prompt: new FormControl<string>('', Validators.required),
     ai_model: new FormControl<string>('', Validators.required),
     ai_temperature: new FormControl<string>('', Validators.required),
+    questions: new FormArray<FormControl<string|null>>([])
   })
 
   constructor(
@@ -46,6 +47,9 @@ export class IntentFormComponent implements OnChanges {
     this.intentForm.controls.prompt.setValue(this.intent.prompt);
     this.intentForm.controls.ai_model.setValue(this.intent.ai_model);
     this.intentForm.controls.ai_temperature.setValue(this.intent.ai_temperature);
+    for(let question of this.intent.questions) {
+      this.intentForm.controls.questions.push(new FormControl<string>({value: question, disabled: true}, Validators.required))
+    }
   }
 
   getHumanReadablestring(s: string) {
@@ -61,6 +65,13 @@ export class IntentFormComponent implements OnChanges {
     } else {
       this.intentForm.disable();
     }
+  }
+
+  removeQuestion(i: number) {
+    this.intentForm.controls.questions.removeAt(i);
+  }
+  addQuestion() {
+    this.intentForm.controls.questions.push(new FormControl<string>({value: '', disabled: false}, Validators.required));
   }
 
   showDeleteDialog(event: any) {
@@ -98,7 +109,7 @@ export class IntentFormComponent implements OnChanges {
   }
 
   saveForm() {
-    if (!this.intentForm.valid){
+    if (!this.intentForm.valid  || !this.intentForm.controls.questions.valid){
       this.snackbar.openFromComponent(ToastMessageComponent, {
         panelClass: ["red-toast"],
         verticalPosition: "top",
@@ -115,6 +126,7 @@ export class IntentFormComponent implements OnChanges {
     this.intent.prompt = this.intentForm.controls.prompt.value!
     this.intent.ai_model = this.intentForm.controls.ai_model.value!
     this.intent.ai_temperature = this.intentForm.controls.ai_temperature.value!
+    this.intent.questions = (this.intentForm.controls.questions.value) as string[]
 
     this.service.updateIntent(this.intent)
       .subscribe({

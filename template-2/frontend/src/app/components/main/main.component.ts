@@ -90,7 +90,12 @@ export class MainComponent {
   }
 
   openCreateIntentForm(){
-    this.createIntentComponentInstance = this.dialog.open(CreateIntentFormComponent, { disableClose: true });
+    this.createIntentComponentInstance = this.dialog.open(CreateIntentFormComponent, 
+      { disableClose: true,
+        height: '600px',
+        width: '1120px'
+    });
+    this.createIntentComponentInstance.models = this.models;
   }
 
   navigate() {

@@ -1,13 +1,10 @@
-<mat-expansion-panel [expanded]="true" [disabled]="true">
-  <mat-expansion-panel-header class="panel-heading-container">
     <div class="configure-title">
       <span>Configure new Playbook</span>
     </div>
-  </mat-expansion-panel-header>
 
   <div [formGroup]="this.intentForm">
 
-    <mat-stepper [linear]="true" #stepper>
+    <mat-stepper [linear]="false" #stepper>
       <mat-step>
           <ng-template matStepLabel>Intent</ng-template>
           <div class="input-field-container">
@@ -115,11 +112,60 @@
         </div>
         <div class="button-container">
           <button mat-button class="cancel-button" matStepperPrevious>Back</button>
-          <button mat-button class="submit-button" (click)="saveForm()">Save</button>
+          <button mat-button class="submit-button"
+          [disabled]="!this.intentForm.controls.prompt.valid"
+          matStepperNext>Next</button>
+        </div>
+      </mat-step>
+      <mat-step>
+        <ng-template matStepLabel>Questions</ng-template>
+        <div class="question-container">
+          <mat-list>
+            <mat-list-item
+              class="questions-field-container"
+              style="height: 100%"
+              *ngFor="
+                let control of this.intentForm.controls.questions.controls;
+                let i = index
+              "
+            >
+              <mat-form-field
+                class="search-question-field"
+                appearance="outline"
+                [floatLabel]="'always'"
+              >
+                <input
+                  matInput
+                  placeholder="Enter a Question"
+                  [formControl]="control"
+                  type="text"
+                />
+                <mat-icon matSuffix (click)="removeQuestion(i)">delete</mat-icon>
+              </mat-form-field>
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <div class="button-container">
+          <div>          
+            <button
+            mat-button
+            *ngIf="!this.showSpinner"
+            class="add-question-button"
+            (click)="addQuestion()"
+          >
+            Add Question
+          </button>
+          </div>
+          <button mat-button             
+          *ngIf="!this.showSpinner"
+          class="cancel-button" matStepperPrevious>Back</button>
+          <button mat-button
+          *ngIf="!this.showSpinner"
+          class="submit-button" [disabled]="!this.intentForm.valid" (click)="saveForm()">Save</button>
+          <div class="spinner-container" *ngIf="this.showSpinner">
+            <mat-spinner style="width: 60px; height: 60px"></mat-spinner>
+          </div>
         </div>
       </mat-step>
     </mat-stepper>
-
-
   </div>
-</mat-expansion-panel>

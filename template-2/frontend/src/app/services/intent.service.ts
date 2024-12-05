@@ -20,6 +20,7 @@ export interface IntentDetails {
   ai_temperature: string,
   prompt: string,
   status: string,
+  questions: string[],
 }
 
 export interface Model {

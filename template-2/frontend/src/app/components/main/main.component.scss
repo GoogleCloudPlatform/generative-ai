@@ -975,3 +975,8 @@ h2 {
 .dismiss-container:hover {
     text-decoration: underline;
 }
+
+.journey-chips {
+    max-height: 300px;
+    overflow-y: auto;
+}
