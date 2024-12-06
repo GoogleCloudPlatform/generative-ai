@@ -1,0 +1,7 @@
+__pycache__/
+.idea/
+.vscode/
+.venv/
+env
+bin
+lib
