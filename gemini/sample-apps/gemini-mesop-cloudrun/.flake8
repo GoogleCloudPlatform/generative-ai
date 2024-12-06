@@ -1,1 +1,2 @@
 ignore = W291, W293
+max-line-length = 100
