@@ -111,7 +111,7 @@ def format(session):
     Run isort to sort imports. Then run black
     to format code to uniform standard.
     """
-    target_branch = "main"
+    target_branch = "origin/main"
 
     unstaged_files = subprocess.run(
         ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB", target_branch],
