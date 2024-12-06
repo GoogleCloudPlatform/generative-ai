@@ -21,8 +21,8 @@ from dataclasses_json import dataclass_json
 import mesop as me
 from shared.nav_menu import nav_menu
 from shared.prompts import (
-    video_tags_prompt,
-    video_geolocation_prompt,
+    VIDEO_TAGS_PROMPT,
+    VIDEO_GEOLOCATION_PROMPT,
 )
 
 import vertexai
@@ -43,6 +43,8 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 @dataclass_json
 @me.stateclass
 class State:
+    """Mesop state class"""
+
     model: str = "gemini-1.5-flash-002"
     current_page: str = "/"
 
@@ -590,7 +592,7 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
 
     video_part = Part.from_uri(VIDEO_TAGS, mime_type="video/mp4")
 
-    prompt = video_tags_prompt
+    prompt = VIDEO_TAGS_PROMPT
 
     model_name = s.model
 
@@ -657,7 +659,7 @@ def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
 
     video_part = Part.from_uri(VIDEO_GEOLOCATION, mime_type="video/mp4")
 
-    prompt = video_geolocation_prompt
+    prompt = VIDEO_GEOLOCATION_PROMPT
 
     model_name = s.model
 
@@ -1519,11 +1521,13 @@ video_tabs_json = [
 
 
 def video_switch_tab(e: me.ClickEvent) -> None:
+    """Event to switch video tab"""
     s = me.state(State)
     s.video_tab = e.key
 
 
 def video_playground_page_tabber() -> None:
+    """Page tabber for video playground"""
     state = me.state(State)
 
     with me.box(
@@ -1565,6 +1569,7 @@ def video_playground_page_tabber() -> None:
 
 
 def video_description_tab() -> None:
+    """Show the video description tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
     me.text("Gemini can provide a description of what's happening in a video:")
@@ -1612,6 +1617,7 @@ def video_description_tab() -> None:
 
 
 def video_tags_tab() -> None:
+    """Show the video tags tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
@@ -1660,6 +1666,7 @@ def video_tags_tab() -> None:
 
 
 def video_highlights_tab() -> None:
+    """Show the video highlights tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
@@ -1710,6 +1717,7 @@ def video_highlights_tab() -> None:
 
 
 def video_geolocation_tab() -> None:
+    """Show the video geolocation tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
