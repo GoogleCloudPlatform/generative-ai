@@ -24,6 +24,17 @@ from shared.prompts import (
     VIDEO_TAGS_PROMPT,
     VIDEO_GEOLOCATION_PROMPT,
 )
+from shared.styles import (
+    _BOX_STYLE,
+    _SPINNER_STYLE,
+    _STORY_INPUT_STYLE,
+    _STYLE_MAIN_COLUMN,
+    _STYLE_MAIN_HEADER,
+    _STYLE_TITLE_BOX,
+    FANCY_TEXT_GRADIENT,
+    _STYLE_CURRENT_TAB,
+    _STYLE_OTHER_TAB,
+)
 
 import vertexai
 from vertexai.generative_models import (
@@ -54,7 +65,7 @@ class State:
     story_character_type: str = "Cat"
     story_character_personality: str = "Mitten is a very friendly cat."
     story_character_location: str = "Andromeda Galaxy"
-    story_selected_premises: list[str] = field(default_factory=lambda: ["adventure"])
+    story_selected_premises: list[str] = field(default_factory=lambda: ["adventure"]) 
     story_temp_value: str = "low"
     story_length_value: str = "short"
     story_progress: bool = False
@@ -1765,82 +1776,3 @@ def video_geolocation_tab() -> None:
                     text=state.video_geolocation_content,
                     style=me.Style(width="100%", margin=me.Margin(top=10)),
                 )
-
-
-# Styles
-
-_DEFAULT_BORDER = me.Border.all(
-    me.BorderSide(
-        color="#e0e0e0",
-        width=1,
-        style="solid",
-    )
-)
-
-_STYLE_CONTAINER = me.Style(
-    display="grid",
-    grid_template_columns="5fr 2fr",
-    grid_template_rows="auto 5fr",
-    height="100vh",
-)
-
-_STYLE_MAIN_HEADER = me.Style(
-    border=_DEFAULT_BORDER, padding=me.Padding(top=15, left=15, right=15, bottom=5)
-)
-
-_STYLE_MAIN_COLUMN = me.Style(
-    border=_DEFAULT_BORDER,
-    padding=me.Padding.all(15),
-    overflow_y="scroll",
-)
-
-_STYLE_TITLE_BOX = me.Style(display="inline-block")
-
-_STORY_INPUT_STYLE = me.Style(
-    width="500px"
-    # display="flex",
-    # flex_basis="max(100vh, calc(50% - 48px))",
-)
-
-_BOX_STYLE = me.Style(
-    flex_basis="max(100vh, calc(50% - 48px))",
-    background="#fff",
-    border_radius=12,
-    box_shadow=("0 3px 1px -2px #0003, 0 2px 2px #00000024, 0 1px 5px #0000001f"),
-    padding=me.Padding(top=16, left=16, right=16, bottom=16),
-    display="flex",
-    flex_direction="column",
-)
-
-_SPINNER_STYLE = me.Style(
-    display="flex",
-    flex_direction="row",
-    padding=me.Padding.all(16),
-    align_items="center",
-    gap=10,
-)
-
-FANCY_TEXT_GRADIENT = me.Style(
-    color="transparent",
-    background=(
-        "linear-gradient(72.83deg,#4285f4 11.63%,#9b72cb 40.43%,#d96570 68.07%)" " text"
-    ),
-)
-
-_STYLE_CURRENT_TAB = me.Style(
-    color="#99000",
-    border_radius=0,
-    font_weight="bold",
-    border=me.Border(
-        bottom=me.BorderSide(color="#000", width=2, style="solid"),
-        top=None,
-        right=None,
-        left=None,
-    ),
-)
-
-_STYLE_OTHER_TAB = me.Style(
-    color="#8d8e9d",
-    border_radius=0,
-    # font_weight="bold",
-)

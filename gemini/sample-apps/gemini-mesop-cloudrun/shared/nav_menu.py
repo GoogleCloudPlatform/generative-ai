@@ -19,6 +19,10 @@ from dataclasses_json import dataclass_json
 
 import mesop as me
 
+from .styles import (
+    _STYLE_CURRENT_NAV,
+    _STYLE_MAIN_HEADER,
+)
 
 class Page(TypedDict):
     """Page class"""
@@ -54,20 +58,6 @@ def navigate_to(e: me.ClickEvent) -> Generator[None, Any, None]:
     yield
 
 
-_DEFAULT_BORDER = me.Border.all(
-    me.BorderSide(
-        color="#e0e0e0",
-        width=1,
-        style="solid",
-    )
-)
-
-_STYLE_MAIN_HEADER = me.Style(
-    border=_DEFAULT_BORDER,
-    padding=me.Padding.all(5),
-)
-
-_STYLE_CURRENT_NAV = me.Style(color="#99000", border_radius=0, font_weight="bold")
 
 
 def page_navigation_menu(url: str) -> None:
