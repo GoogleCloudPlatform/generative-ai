@@ -1,0 +1,163 @@
+steps:
+  # Build and Push
+  - name: "python:3.10"
+    id: deploy-data-ingestion-pipeline-staging
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        cd data_processing && pip install poetry==1.8.3 --user && python -m poetry install && \
+        python -m poetry run python data_processing_pipeline/submit_pipeline.py
+    env:
+      - "PIPELINE_ROOT=${_PIPELINE_GCS_ROOT}"
+      - "REGION=${_REGION}"
+      - "REGION_VERTEX_AI_SEARCH=${_REGION_VERTEX_AI_SEARCH}"
+      - "DATA_STORE_ID=${_DATA_STORE_ID}"
+      - "PROJECT_ID=${_STAGING_PROJECT_ID}"
+      - "SERVICE_ACCOUNT=${_PIPELINE_SA_EMAIL}"
+      - "PIPELINE_NAME=${_PIPELINE_NAME}"
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: build-backend-service-container
+    args:
+      [
+        "build",
+        "-t",
+        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME",
+      ]
+
+  # Deploy to Staging
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: deploy-staging
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "genai-app-sample"
+      - "--image"
+      - "$_REGION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPO_NAME/$_CONTAINER_NAME"
+      - "--region"
+      - "${_REGION}"
+      - "--project"
+      - "${_STAGING_PROJECT_ID}"
+      - "--min-instances"
+      - "1"
+      - "--no-cpu-throttling"
+      - "--cpu"
+      - "4"
+      - "--memory"
+      - "4Gi"
+      - "--concurrency"
+      - "40"
+      - "--service-account"
+      - "${_CLOUD_RUN_APP_SA_NAME}@${_STAGING_PROJECT_ID}.iam.gserviceaccount.com"
+      - "--set-env-vars"
+      - "COMMIT_SHA=${COMMIT_SHA},DATA_STORE_ID=${_DATA_STORE_ID},REGION=${_REGION},REGION_VERTEX_AI_SEARCH=${_REGION_VERTEX_AI_SEARCH}"
+
+  # Fetch Staging Service URL
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: fetch-staging-url
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        echo $(gcloud run services describe genai-app-sample \
+        --region ${_REGION} --project ${_STAGING_PROJECT_ID} --format="value(status.url)") > staging_url.txt
+
+  # Fetch ID Token
+  - name: gcr.io/cloud-builders/gcloud
+    id: fetch-id-token
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        echo $(gcloud auth print-identity-token -q) > id_token.txt
+
+  # Load Testing
+  - name: "python:3.10"
+    id: load_test
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        export _ID_TOKEN=$(cat id_token.txt)
+        export _STAGING_URL=$(cat staging_url.txt)
+        pip install locust==2.31.1
+        python -m locust -f tests/load_test/load_test.py \
+        -H $$_STAGING_URL \
+        --headless \
+        -t 30s -u 10 -r 0.5 \
+        --csv=tests/load_test/.results/results \
+        --html=tests/load_test/.results/report.html
+
+  # Export Load Test Results to GCS
+  - name: gcr.io/cloud-builders/gcloud
+    id: export-results-to-gcs
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        export _TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+        gsutil -m cp -r tests/load_test/.results gs://${_BUCKET_NAME_LOAD_TEST_RESULTS}/results-$${_TIMESTAMP}
+        echo "_________________________________________________________________________"
+        echo "Load test results copied to gs://${_BUCKET_NAME_LOAD_TEST_RESULTS}/results-$${_TIMESTAMP}"
+        echo "HTTP link: https://console.cloud.google.com/storage/browser/${_BUCKET_NAME_LOAD_TEST_RESULTS}/results-$${_TIMESTAMP}"
+        echo "_________________________________________________________________________"
+
+  # # Trigger Prod Deployment
+  - name: gcr.io/cloud-builders/gcloud
+    id: trigger-prod-deployment
+    entrypoint: gcloud
+    args:
+      - "beta"
+      - "builds"
+      - "triggers"
+      - "run"
+      - "deploy-to-prod-pipeline"
+      - "--region"
+      - "$_REGION"
+      - "--project"
+      - "$PROJECT_ID"
+      - "--substitutions"
+      - "_CONTAINER_NAME=${_CONTAINER_NAME}"
+      - "--sha"
+      - $COMMIT_SHA
+
+  - name: gcr.io/cloud-builders/gcloud
+    id: echo-view-build-trigger-link
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        echo "_________________________________________________________________________"
+        echo "Production deployment triggered. View progress and / or approve on the Cloud Build Console:"
+        echo "https://console.cloud.google.com/cloud-build/builds;region=$_REGION"
+        echo "_________________________________________________________________________"
+
+substitutions:
+  _STAGING_PROJECT_ID: YOUR_STAGING_PROJECT_ID # Replace with your staging project ID
+  _BUCKET_NAME_LOAD_TEST_RESULTS: YOUR_CICD_PROJECT_ID-cicd-load-test-results # Replace with your GCS bucket name
+  _CONTAINER_NAME: genai-app-sample
+  _ARTIFACT_REGISTRY_REPO_NAME: genai-containers
+  _CLOUD_RUN_APP_SA_NAME: genai-app-sample-cr-sa
+  _REGION: us-central1
+
+  _REGION_VERTEX_AI_SEARCH: us
+  _PIPELINE_GCS_ROOT: _PIPELINE_GCS_ROOT
+  _PIPELINE_SA_EMAIL: YOUR_PIPELINE_SA_EMAIL
+  _DATA_STORE_ID: STAGING_DATASTORE_ID
+  _PIPELINE_NAME: genai_sample_data_processing
+  _PIPELINE_CRON_SCHEDULE: YOUR_CRON_SCHEDULE
+
+options:
+  substitutionOption: ALLOW_LOOSE
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+serviceAccount: projects/${PROJECT_ID}/serviceAccounts/cicd-runner@${PROJECT_ID}.iam.gserviceaccount.com

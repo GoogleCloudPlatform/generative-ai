@@ -211,11 +211,20 @@
 # Gemini Size should be capitalized (e.g. `Gemini 1.0 Pro`)
 \bGemini\s?\d\.\d\s(pro|flash|ultra)\b
 
+# Don't say "Google Gemini" or "Google Gemini"
+\b[Gg]oogle(?: [Cc]loud| [Dd]eep[Mm]ind)?'s [Gg]emini\b
+
 # Don't say "Powered by Gemini", instead say "with Gemini"
-\b[Pp]owered\sby\s[Gg]emini\b
+\b[Pp]owered\s[Bb]y\s[Gg]emini\b
+
+# Should be Gemini API in Vertex AI
+\b[Vv]ertex\s[Aa][Ii]\s[Gg]emini\s[Aa][Pp][Ii]\b
 
 # Should be Imagen
 \simagen\s\w
+
+# Should be Imagen 2 or Imagen 3
+\bImagen\d\b
 
 # Should be BigQuery
 \b(?!BigQuery\b)(?!bigquery\b)[Bb]ig\s?[Qq]uery\b
@@ -259,6 +268,9 @@
 # Should be Vertex AI Search
 \bVertex\s?Search\b
 
+# Should be Vertex AI Vector Search
+\bVertex\sVector\sSearch\b
+
 # Should be Colab
 \s(?!Colab)[Cc]o[Ll][Ll]?abs?\b
 
@@ -273,6 +285,9 @@
 
 # Should be GCS
 \sgcs\s
+
+# Should be Dataflow ML
+\b[Dd]ataflowML\b
 
 # Should be API
 \s(?!API)(?!.*[\(\)\{\},=#]+)[Aa][Pp][Ii]\s

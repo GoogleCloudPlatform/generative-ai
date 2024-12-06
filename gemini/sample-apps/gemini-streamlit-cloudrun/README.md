@@ -1,4 +1,4 @@
-# Cloud Run application utilizing Streamlit Framework that demonstrates working with Vertex AI Gemini API
+# Cloud Run application utilizing Streamlit Framework that demonstrates working with Gemini API in Vertex AI
 
 |           |                                                |
 | --------- | ---------------------------------------------- |
@@ -57,7 +57,7 @@ To run the Streamlit Application locally (on Cloud Shell), we need to perform th
      --server.port 8080
    ```
 
-The application will startup and you will be provided a URL to the application. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) function to launch the preview page. You may also visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.
+The application will startup and you will be provided a URL to the application. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) function to launch the preview page. You may also visit that in the browser to view the application. Choose the functionality that you would like to check out and the application will prompt the Gemini API in Vertex AI and display the responses.
 
 ## Build and Deploy the Application to Cloud Run
 
@@ -102,6 +102,6 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
      --set-env-vars=GCP_PROJECT=$GCP_PROJECT,GCP_REGION=$GCP_REGION
    ```
 
-On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed. Choose the functionality that you would like to check out and the application will prompt the Vertex AI Gemini API and display the responses.
+On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed. Choose the functionality that you would like to check out and the application will prompt the Gemini API in Vertex AI and display the responses.
 
 Congratulations!

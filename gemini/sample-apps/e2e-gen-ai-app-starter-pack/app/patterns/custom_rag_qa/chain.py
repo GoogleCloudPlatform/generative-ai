@@ -15,7 +15,7 @@
 # pylint: disable=W0613, W0622
 
 import logging
-from typing import Any, Dict, Iterator, List
+from typing import Any, AsyncIterator, Dict, List
 
 from app.patterns.custom_rag_qa.templates import (
     inspect_conversation_template,
@@ -23,7 +23,8 @@ from app.patterns.custom_rag_qa.templates import (
     template_docs,
 )
 from app.patterns.custom_rag_qa.vector_store import get_vector_store
-from app.utils.output_types import OnChatModelStreamEvent, OnToolEndEvent, custom_chain
+from app.utils.decorators import custom_chain
+from app.utils.output_types import OnChatModelStreamEvent, OnToolEndEvent
 import google
 from langchain.schema import Document
 from langchain.tools import tool
@@ -33,8 +34,9 @@ from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
 import vertexai
 
 # Configuration
+LOCATION = "us-central1"
 EMBEDDING_MODEL = "text-embedding-004"
-LLM_MODEL = "gemini-1.5-flash-002"
+LLM = "gemini-1.5-flash-002"
 TOP_K = 5
 
 # Initialize logging
@@ -42,7 +44,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Initialize Google Cloud and Vertex AI
 credentials, project_id = google.auth.default()
-vertexai.init(project=project_id)
+vertexai.init(project=project_id, location=LOCATION)
 
 # Set up embedding model and vector store
 embedding = VertexAIEmbeddings(model_name=EMBEDDING_MODEL)
@@ -85,7 +87,7 @@ def should_continue() -> None:
 
 
 # Initialize language model
-llm = ChatVertexAI(model=LLM_MODEL, temperature=0, max_tokens=1024)
+llm = ChatVertexAI(model=LLM, temperature=0, max_tokens=1024)
 
 # Set up conversation inspector
 inspect_conversation = inspect_conversation_template | llm.bind_tools(
@@ -97,9 +99,9 @@ response_chain = rag_template | llm
 
 
 @custom_chain
-def chain(
+async def chain(
     input: Dict[str, Any], **kwargs: Any
-) -> Iterator[OnToolEndEvent | OnChatModelStreamEvent]:
+) -> AsyncIterator[OnToolEndEvent | OnChatModelStreamEvent]:
     """
     Implement a RAG QA chain with tool calls.
 
@@ -137,5 +139,5 @@ def chain(
     )
 
     # Stream LLM response
-    for chunk in response_chain.stream(input=input):
+    async for chunk in response_chain.astream(input=input):
         yield OnChatModelStreamEvent(data={"chunk": chunk})

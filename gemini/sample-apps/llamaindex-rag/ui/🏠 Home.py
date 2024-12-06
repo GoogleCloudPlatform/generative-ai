@@ -51,7 +51,7 @@ st.markdown(
 Welcome to the LlamaIndex RAG Evaluation application. This application leverages:
 - **LlamaIndex**: LlamaIndex is a powerful LLM orchestration framework designed for building advanced Large Language Model (LLM) applications, with a particular focus on Retrieval-Augmented Generation (RAG). It provides a comprehensive set of tools and abstractions that simplify the process of ingesting, structuring, and querying various data sources..
 - **RAGAS**: RAGAS is a framework which provides some out of the box, heuristic metrics which can be computed given this triple, namely answer faithfulness, answer relevancy, and context relevancy. We compute these on the fly with each chat interaction and display them for the user.
-- **Google's Gemini Models**: Gemini models are state-of-the-art AI models which excel in natural language understanding and generation, making them useful for a wide range of applications, from chatbots to content creation..
+- **Google Gemini Models**: Gemini models are state-of-the-art AI models which excel in natural language understanding and generation, making them useful for a wide range of applications, from chatbots to content creation..
 - **Cloud Run**: Google Cloud Run is a fully managed compute platform that automatically scales your stateless containers. It abstracts away the underlying infrastructure, allowing developers to focus on writing code without worrying about server management.
 
 ![Architecture](https://i.imgur.com/YjhCWzu.png)
