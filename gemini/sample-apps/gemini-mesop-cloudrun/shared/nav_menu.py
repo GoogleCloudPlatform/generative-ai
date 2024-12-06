@@ -12,34 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import field
+from dataclasses import dataclass, field
+from dataclasses_json import dataclass_json
+
 from typing import TypedDict
 
-from dataclasses_json import dataclass_json
 import mesop as me
 
 
 class Page(TypedDict):
+    """Page class"""
     display: str
     route: str
 
 
-page_json = [
+page_data = [
     {"display": "Generate story", "route": "/"},
     {"display": "Marketing campaign", "route": "/marketing"},
     {"display": "Image playground", "route": "/images"},
     {"display": "Video playground", "route": "/videos"},
 ]
 
+page_json = [Page(**data) for data in page_data]
+
 
 @dataclass_json
 @me.stateclass
 class State:
+    """Mesop state class"""
     pages: list[Page] = field(default_factory=lambda: page_json)
-    current_page: str
+    current_page: str = ""
 
 
 def navigate_to(e: me.ClickEvent):
+    """Navigate to a page event"""
     s = me.state(State)
     s.current_page = e.key
     me.navigate(e.key)
@@ -63,6 +69,8 @@ _STYLE_CURRENT_NAV = me.Style(color="#99000", border_radius=0, font_weight="bold
 
 
 def page_navigation_menu(url: str) -> None:
+    """Page navigation menu creation"""
+    print(f"url: {url}")
     state = me.state(State)
     with me.box(style=_STYLE_MAIN_HEADER):
         with me.box(style=me.Style(display="flex", flex_direction="row", gap=12)):
@@ -82,6 +90,7 @@ def page_navigation_menu(url: str) -> None:
 
 @me.content_component
 def nav_menu(url: str) -> str:
+    """Navigation menu component"""
     page_navigation_menu(url=url)
     me.slot()
 
