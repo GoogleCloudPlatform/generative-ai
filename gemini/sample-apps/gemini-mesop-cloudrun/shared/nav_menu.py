@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass, field
+from dataclasses import field
 from dataclasses_json import dataclass_json
 
-from typing import TypedDict
+from typing import Any, Generator, TypedDict
 
 import mesop as me
 
@@ -44,7 +44,7 @@ class State:
     current_page: str = ""
 
 
-def navigate_to(e: me.ClickEvent):
+def navigate_to(e: me.ClickEvent) -> Generator[None, Any, None]:
     """Navigate to a page event"""
     s = me.state(State)
     s.current_page = e.key
