@@ -1,6 +1,6 @@
 
 ALTER MODEL EmbeddingsModel SET OPTIONS (
-endpoint = '//aiplatform.googleapis.com/projects/<project-name>/locations/<location>/publishers/google/models/text-embedding-003'
+endpoint = '//aiplatform.googleapis.com/projects/<project-name>/locations/<location>/publishers/google/models/textembedding-gecko@003'
 )
 ;
 ALTER TABLE EU_MutualFunds ADD COLUMN  fund_name_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(fund_name)) HIDDEN;
