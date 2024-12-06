@@ -47,7 +47,7 @@ page_json = [Page(**data) for data in page_data]  # type: ignore[typeddict-item]
 class State:
     """Mesop state class"""
 
-    pages: list[Page] = field(default_factory=lambda: page_json)
+    pages: list[Page] = field(default_factory=lambda: page_json) # pylint: disable=E3701
     current_page: str = ""
 
 

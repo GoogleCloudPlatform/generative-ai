@@ -181,7 +181,7 @@ def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
     print(f"selected: {s.story_selected_premises}")
 
 
-def on_click_clear_story(e: me.ClickEvent) -> None:  # pylint: disable=W0613
+def on_click_clear_story(e: me.ClickEvent) -> None: # pylint: disable=W0613
     """Click event for clearing story text."""
     state = me.state(State)
     state.story_output = 0
@@ -194,7 +194,7 @@ def on_story_radio_change(e: me.RadioChangeEvent) -> None:
 
 
 def generate_story(
-    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> Generator[Any, Any, Any]:
     """Generate story"""
     s = me.state(State)
@@ -256,7 +256,7 @@ def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> Non
 
 
 def generate_marketing_campaign(
-    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:
     """Generate marketing campaign"""
     s = me.state(State)
@@ -315,7 +315,7 @@ def generate_marketing_campaign(
 
 
 def on_click_clear_marketing_campaign(
-    e: me.ClickEvent, # pylint: disable=W0613
+    e: me.ClickEvent,  # pylint: disable=W0613
 ) -> None:
     """Click event for clearing marketing text."""
     state = me.state(State)
@@ -352,7 +352,9 @@ IMAGE_MATH = (
 )
 
 
-def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
+def generate_furniture_recommendation(
+    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+) -> None:
     """Generate furniture recommendation"""
     s = me.state(State)
     s.image_progress_spinner = True
@@ -398,13 +400,17 @@ def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
     s.image_progress_spinner = False
 
 
-def on_click_clear_furniture_recommendation(e: me.ClickEvent) -> None: # pylint: disable=W0613
+def on_click_clear_furniture_recommendation(
+    e: me.ClickEvent,
+) -> None: # pylint: disable=W0613
     """Click event for clearing furniture recommendation text."""
     state = me.state(State)
     state.furniture_recommendation_output = 0
 
 
-def generate_oven_instructions(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
+def generate_oven_instructions(
+    e: me.ClickEvent | me.EnterEvent,
+) -> None: # pylint: disable=W0613
     """Generate oven instructions"""
     s = me.state(State)
     s.image_progress_spinner = True
@@ -475,7 +481,9 @@ def on_click_clear_er_doc(e: me.ClickEvent) -> None: # pylint: disable=W0613
     state.er_doc_output = 0
 
 
-def generate_glasses_rec(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
+def generate_glasses_rec(
+    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+) -> None:
     """Generate glasses recommendation"""
     s = me.state(State)
     s.image_progress_spinner = True
@@ -527,7 +535,9 @@ def on_click_clear_glasses_rec(e: me.ClickEvent) -> None: # pylint: disable=W061
     state.glasses_rec_output = 0
 
 
-def generate_math_answers(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
+def generate_math_answers(
+    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+) -> None:
     """Generate math answers"""
     s = me.state(State)
     s.image_progress_spinner = True
@@ -586,7 +596,9 @@ VIDEO_GEOLOCATION = (
 )
 
 
-def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
+def generate_video_description(
+    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+) -> None:
     """Generate video description info"""
     s = me.state(State)
     s.video_spinner_progress = True
@@ -624,7 +636,9 @@ def on_click_clear_video_description(e: me.ClickEvent) -> None: # pylint: disabl
     state.video_description_content = 0
 
 
-def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
+def generate_video_tags(
+    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+) -> None:
     """Generate video tags info"""
     s = me.state(State)
     s.video_spinner_progress = True
@@ -652,13 +666,15 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: dis
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_tags(e: me.ClickEvent) -> None:
+def on_click_clear_video_tags(e: me.ClickEvent) -> None: # pylint: disable=W0613
     """Click event for clearing video tags text."""
     state = me.state(State)
     state.video_tags_content = 0
 
 
-def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_video_highlights(
+    e: me.ClickEvent | me.EnterEvent,
+) -> None: # pylint: disable=W0613
     """Generate video highlights info"""
     s = me.state(State)
     s.video_spinner_progress = True
@@ -687,13 +703,15 @@ def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_highlights(e: me.ClickEvent) -> None:
+def on_click_clear_video_highlights(e: me.ClickEvent) -> None: # pylint: disable=W0613
     """Click event for clearing video highlights text."""
     state = me.state(State)
     state.video_highlights_content = 0
 
 
-def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
+def generate_video_geolocation(
+    e: me.ClickEvent | me.EnterEvent, # pylint: disable=W0613
+) -> None:
     """Generate video geolocation info"""
     s = me.state(State)
     s.video_spinner_progress = True
