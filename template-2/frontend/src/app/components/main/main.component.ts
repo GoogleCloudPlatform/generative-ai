@@ -78,7 +78,7 @@ export class MainComponent {
     private speechToTextService: SpeechToTextService,
   ) {
     this.intentsService.getAllIntent().subscribe(response => {
-      if(response.length > 0) this.intents = response.filter((i) => i.status === "5");
+      if(response.length > 0) this.intents = response;
       else this.openCreateIntentForm();
     });
     this.searchForm = this.fb.group({
@@ -90,7 +90,7 @@ export class MainComponent {
   }
 
   openCreateIntentForm(){
-    this.createIntentComponentInstance = this.dialog.open(CreateIntentFormComponent, 
+    this.createIntentComponentInstance = this.dialog.open(CreateIntentFormComponent,
       { disableClose: true,
         height: '600px',
         width: '1120px'

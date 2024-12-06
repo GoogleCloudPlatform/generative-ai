@@ -47,6 +47,7 @@ export class IntentFormComponent implements OnChanges {
     this.intentForm.controls.prompt.setValue(this.intent.prompt);
     this.intentForm.controls.ai_model.setValue(this.intent.ai_model);
     this.intentForm.controls.ai_temperature.setValue(this.intent.ai_temperature);
+    this.intentForm.controls.questions = new FormArray<FormControl<string|null>>([])
     for(let question of this.intent.questions) {
       this.intentForm.controls.questions.push(new FormControl<string>({value: question, disabled: true}, Validators.required))
     }
@@ -60,16 +61,19 @@ export class IntentFormComponent implements OnChanges {
     this.editMode = !this.editMode;
     if(this.editMode) {
       this.intentForm.enable();
+      this.intentForm.controls.questions.enable();
       this.intentForm.controls.name.disable();
       this.intentForm.controls.gcp_bucket.disable();
     } else {
       this.intentForm.disable();
+      this.intentForm.controls.questions.disable();
     }
   }
 
   removeQuestion(i: number) {
     this.intentForm.controls.questions.removeAt(i);
   }
+
   addQuestion() {
     this.intentForm.controls.questions.push(new FormControl<string>({value: '', disabled: false}, Validators.required));
   }

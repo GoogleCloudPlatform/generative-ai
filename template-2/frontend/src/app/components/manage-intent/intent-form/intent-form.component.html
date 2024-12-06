@@ -171,6 +171,38 @@
       </mat-form-field>
     </div>
   </div>
+  <mat-list>
+    <mat-list-item
+      class="questions-field-container"
+      style="height: 100%"
+      *ngFor="
+        let control of this.intentForm.controls.questions.controls;
+        let i = index
+      "
+    >
+      <mat-form-field
+        class="search-question-field"
+        appearance="outline"
+        [floatLabel]="'always'"
+      >
+        <input
+          matInput
+          placeholder="Enter a Question"
+          [formControl]="control"
+          type="text"
+        />
+        <mat-icon *ngIf="this.editMode" matSuffix (click)="removeQuestion(i)">delete</mat-icon>
+      </mat-form-field>
+    </mat-list-item>
+    <button
+      *ngIf="this.editMode"
+      mat-button
+      class="add-question-button"
+      (click)="addQuestion()"
+    >
+      Add Question
+    </button>
+  </mat-list>
 </mat-expansion-panel>
 
 <ng-template #deleteDialogRef let-data>

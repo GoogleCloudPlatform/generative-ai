@@ -31,7 +31,7 @@ export class CreateIntentFormComponent {
     prompt: new FormControl<string>('', Validators.required),
     ai_model: new FormControl<string>('', Validators.required),
     ai_temperature: new FormControl<string>('', Validators.required),
-    questions: new FormArray<FormControl<string|null>>([new FormControl<string>({value: '', disabled: false}, Validators.required)]),
+    questions: new FormArray<FormControl<string|null>>([new FormControl<string>({value: '', disabled: false}, Validators.required)])
   })
 
   constructor(
@@ -89,7 +89,6 @@ export class CreateIntentFormComponent {
           data: { text: 'Intent Saved', icon: "tick-with-circle" },
         });
         this.showSpinner = false;
-        this.dialogRef.close();
         this.router.navigateByUrl('/');
       },
       error: (response) => {
