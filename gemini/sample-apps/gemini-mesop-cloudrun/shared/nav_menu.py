@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any, Generator, TypedDict
+
 from dataclasses import field
 from dataclasses_json import dataclass_json
-
-from typing import Any, Generator, TypedDict
 
 import mesop as me
 
@@ -33,7 +33,7 @@ page_data = [
     {"display": "Video playground", "route": "/videos"},
 ]
 
-page_json = [Page(**data) for data in page_data]
+page_json = [Page(**data) for data in page_data] # type: ignore[typeddict-item]
 
 
 @dataclass_json

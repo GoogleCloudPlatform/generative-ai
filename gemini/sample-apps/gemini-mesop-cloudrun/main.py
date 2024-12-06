@@ -12,12 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import field
 import os
+from typing import Any, Generator
 
+from dataclasses import field
 from dataclasses_json import dataclass_json
+
 import mesop as me
 from shared.nav_menu import nav_menu
+from shared.prompts import (
+    video_tags_prompt,
+    video_geolocation_prompt,
+)
+
 import vertexai
 from vertexai.generative_models import (
     GenerationConfig,
@@ -26,6 +33,7 @@ from vertexai.generative_models import (
     HarmCategory,
     Part,
 )
+
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")  # Your Google Cloud Project Region
@@ -161,7 +169,7 @@ def on_story_radio_change(e: me.RadioChangeEvent) -> None:
     setattr(s, e.key, e.value)
 
 
-def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_story(e: me.ClickEvent | me.EnterEvent) -> Generator[Any, Any, Any]:
     s = me.state(State)
     s.story_output = ""  # clear any existing story
     s.story_progress = True
@@ -582,14 +590,7 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
 
     video_part = Part.from_uri(VIDEO_TAGS, mime_type="video/mp4")
 
-    prompt = """Answer the following questions using the video only:
-    1. What is in the video? 
-    2. What objects are in the video? 
-    3. What is the action in the video? 
-    4. Provide 5 best tags for this video? 
-    
-    Give the answer in the table format with question and answer as columns.
-    """
+    prompt = video_tags_prompt
 
     model_name = s.model
 
@@ -656,15 +657,7 @@ def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
 
     video_part = Part.from_uri(VIDEO_GEOLOCATION, mime_type="video/mp4")
 
-    prompt = """Answer the following questions using the video only:
-    
-    What is this video about? 
-    How do you know which city it is? 
-    What street is this? 
-    What is the nearest intersection? 
-    
-    Answer the questions in a table format with question and answer as columns.
-    """
+    prompt = video_geolocation_prompt
 
     model_name = s.model
 
@@ -1771,7 +1764,11 @@ def video_geolocation_tab() -> None:
 
 # Styles
 
-_DEFAULT_BORDER = me.Border.all(me.BorderSide(color="#e0e0e0", width=1, style="solid"))
+_DEFAULT_BORDER = me.Border.all(
+    me.BorderSide(
+        color="#e0e0e0", width=1, style="solid",
+    )
+)
 
 _STYLE_CONTAINER = me.Style(
     display="grid",
@@ -1781,7 +1778,8 @@ _STYLE_CONTAINER = me.Style(
 )
 
 _STYLE_MAIN_HEADER = me.Style(
-    border=_DEFAULT_BORDER, padding=me.Padding(top=15, left=15, right=15, bottom=5)
+    border=_DEFAULT_BORDER,
+    padding=me.Padding(top=15, left=15, right=15, bottom=5)
 )
 
 _STYLE_MAIN_COLUMN = me.Style(
