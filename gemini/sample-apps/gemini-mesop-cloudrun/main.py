@@ -1073,7 +1073,6 @@ def image_math_reasoning_tab() -> None:
     with me.box(
         style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")
     ):
-
         with me.box(
             style=me.Style(
                 display="grid",
@@ -1168,7 +1167,6 @@ def image_glasses_recommendations_tab() -> None:
     with me.box(
         style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")
     ):
-
         with me.box(
             style=me.Style(
                 display="grid",
@@ -1397,7 +1395,6 @@ def image_furniture_tab() -> None:
     with me.box(
         style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")
     ):
-
         with me.box(
             style=me.Style(
                 display="grid",
@@ -1766,7 +1763,9 @@ def video_geolocation_tab() -> None:
 
 _DEFAULT_BORDER = me.Border.all(
     me.BorderSide(
-        color="#e0e0e0", width=1, style="solid",
+        color="#e0e0e0",
+        width=1,
+        style="solid",
     )
 )
 
@@ -1778,8 +1777,7 @@ _STYLE_CONTAINER = me.Style(
 )
 
 _STYLE_MAIN_HEADER = me.Style(
-    border=_DEFAULT_BORDER,
-    padding=me.Padding(top=15, left=15, right=15, bottom=5)
+    border=_DEFAULT_BORDER, padding=me.Padding(top=15, left=15, right=15, bottom=5)
 )
 
 _STYLE_MAIN_COLUMN = me.Style(

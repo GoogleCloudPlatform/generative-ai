@@ -22,6 +22,7 @@ import mesop as me
 
 class Page(TypedDict):
     """Page class"""
+
     display: str
     route: str
 
@@ -33,13 +34,14 @@ page_data = [
     {"display": "Video playground", "route": "/videos"},
 ]
 
-page_json = [Page(**data) for data in page_data] # type: ignore[typeddict-item]
+page_json = [Page(**data) for data in page_data]  # type: ignore[typeddict-item]
 
 
 @dataclass_json
 @me.stateclass
 class State:
     """Mesop state class"""
+
     pages: list[Page] = field(default_factory=lambda: page_json)
     current_page: str = ""
 

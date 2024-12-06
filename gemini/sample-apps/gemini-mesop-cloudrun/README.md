@@ -83,7 +83,6 @@ To deploy the Mesop Application in [Cloud Run](https://cloud.google.com/run/docs
    export SERVICE_NAME='mesop-gemini' # this is the name of our Application and Cloud Run service. Change this if you'd like to.
    ```
 
-
    In Cloud Shell, execute the following command:
 
    ```bash
