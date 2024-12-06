@@ -24,6 +24,7 @@ from .styles import (
     _STYLE_MAIN_HEADER,
 )
 
+
 class Page(TypedDict):
     """Page class"""
 
@@ -56,8 +57,6 @@ def navigate_to(e: me.ClickEvent) -> Generator[None, Any, None]:
     s.current_page = e.key
     me.navigate(e.key)
     yield
-
-
 
 
 def page_navigation_menu(url: str) -> None:

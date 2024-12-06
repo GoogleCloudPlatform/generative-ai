@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This is a Mesop application designed to show the use of
+Gemini API in Vertex AI in a UX
+"""
+
 import os
 from typing import Any, Generator
 
@@ -19,6 +24,16 @@ from dataclasses import field
 from dataclasses_json import dataclass_json
 
 import mesop as me
+
+import vertexai
+from vertexai.generative_models import (
+    GenerationConfig,
+    GenerativeModel,
+    HarmBlockThreshold,
+    HarmCategory,
+    Part,
+)
+
 from shared.nav_menu import nav_menu
 from shared.prompts import (
     VIDEO_TAGS_PROMPT,
@@ -34,15 +49,6 @@ from shared.styles import (
     FANCY_TEXT_GRADIENT,
     _STYLE_CURRENT_TAB,
     _STYLE_OTHER_TAB,
-)
-
-import vertexai
-from vertexai.generative_models import (
-    GenerationConfig,
-    GenerativeModel,
-    HarmBlockThreshold,
-    HarmCategory,
-    Part,
 )
 
 
@@ -65,7 +71,7 @@ class State:
     story_character_type: str = "Cat"
     story_character_personality: str = "Mitten is a very friendly cat."
     story_character_location: str = "Andromeda Galaxy"
-    story_selected_premises: list[str] = field(default_factory=lambda: ["adventure"]) 
+    story_selected_premises: list[str] = field(default_factory=lambda: ["adventure"])
     story_temp_value: str = "low"
     story_length_value: str = "short"
     story_progress: bool = False
@@ -159,6 +165,7 @@ def gcs_to_http(gcs_uri: str) -> str:
 
 
 def on_input(e: me.InputEvent) -> None:
+    """On input, set key to event value"""
     print(f"{e}")
     state = me.state(State)
     setattr(state, e.key, e.value)
@@ -166,6 +173,7 @@ def on_input(e: me.InputEvent) -> None:
 
 # Story events
 def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
+    """Story selection change event"""
     s = me.state(State)
     s.story_selected_premises = e.values
     print(f"selected: {s.story_selected_premises}")
@@ -178,11 +186,13 @@ def on_click_clear_story(e: me.ClickEvent) -> None:
 
 
 def on_story_radio_change(e: me.RadioChangeEvent) -> None:
+    """Story radio button change event"""
     s = me.state(State)
     setattr(s, e.key, e.value)
 
 
 def generate_story(e: me.ClickEvent | me.EnterEvent) -> Generator[Any, Any, Any]:
+    """Generate story"""
     s = me.state(State)
     s.story_output = ""  # clear any existing story
     s.story_progress = True
@@ -235,12 +245,14 @@ def on_change_marketing_radio_choice(e: me.RadioChangeEvent) -> None:
 
 
 def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> None:
+    """Set marking goals, multiselect"""
     s = me.state(State)
     s.marketing_campaign_selected_goals = e.values
     print(f"selected: {s.marketing_campaign_selected_goals}")
 
 
 def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate marketing campaign"""
     s = me.state(State)
     s.marketing_campaign_progress = True
     prompt = f"""Generate a marketing campaign for {s.marketing_product}, a {s.marketing_product_category} designed for the age group: {s.marketing_target_audience}.
@@ -333,6 +345,7 @@ IMAGE_MATH = (
 
 
 def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate furniture recommendation"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -384,6 +397,7 @@ def on_click_clear_furniture_recommendation(e: me.ClickEvent) -> None:
 
 
 def generate_oven_instructions(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate oven instructions"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -419,6 +433,7 @@ def on_click_clear_oven_instructions(e: me.ClickEvent) -> None:
 
 
 def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate ER diagram documentation"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -453,6 +468,7 @@ def on_click_clear_er_doc(e: me.ClickEvent) -> None:
 
 
 def generate_glasses_rec(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate glasses recommendation"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -488,6 +504,7 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
 
 
 def on_change_image_glasses(e: me.RadioChangeEvent) -> None:
+    """Sets radio button choice to state key"""
     s = me.state(State)
 
     value_name = f"image_{e.key}_radio_value"
@@ -503,6 +520,7 @@ def on_click_clear_glasses_rec(e: me.ClickEvent) -> None:
 
 
 def generate_math_answers(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate math answers"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -561,6 +579,7 @@ VIDEO_GEOLOCATION = (
 
 
 def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate video description info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -598,6 +617,7 @@ def on_click_clear_video_description(e: me.ClickEvent) -> None:
 
 
 def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate video tags info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -631,6 +651,7 @@ def on_click_clear_video_tags(e: me.ClickEvent) -> None:
 
 
 def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate video highlights info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -665,6 +686,7 @@ def on_click_clear_video_highlights(e: me.ClickEvent) -> None:
 
 
 def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
+    """Generate video geolocation info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -701,12 +723,14 @@ def on_click_clear_video_geolocation(e: me.ClickEvent) -> None:
 
 
 def on_load(e: me.LoadEvent) -> None:
+    """On load event"""
     s = me.state(State)
     s.current_page = "/"
 
 
 @me.component
 def vertex_gemini_header() -> None:
+    """Vertex AI Gemini Header component"""
     with me.box(style=_STYLE_MAIN_HEADER):
         with me.box(style=_STYLE_TITLE_BOX):
             with me.box(
@@ -730,6 +754,7 @@ def vertex_gemini_header() -> None:
     on_load=on_load,
 )
 def app() -> None:
+    """Main Mesop App"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -856,6 +881,7 @@ def app() -> None:
     ),
 )
 def marketing_page() -> None:
+    """Marketing page"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1001,6 +1027,7 @@ def marketing_page() -> None:
     ),
 )
 def image_playground_page() -> None:
+    """Image playground page"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1025,11 +1052,13 @@ image_tabs_json = [
 
 
 def image_switch_tab(e: me.ClickEvent) -> None:
+    """Image switch tab event"""
     s = me.state(State)
     s.image_tab = e.key
 
 
 def image_playground_page_tabber() -> None:
+    """Image playground page tabber"""
     state = me.state(State)
 
     with me.box(
@@ -1073,6 +1102,7 @@ def image_playground_page_tabber() -> None:
 
 
 def image_math_reasoning_tab() -> None:
+    """Image math reasoning tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Math Reasoning", style=me.Style(font_weight="bold"))
@@ -1141,6 +1171,7 @@ def image_math_reasoning_tab() -> None:
 
 
 def image_glasses_recommendations_tab() -> None:
+    """Image glasses recommendations tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Glasses Recommendation", style=me.Style(font_weight="bold"))
@@ -1252,6 +1283,7 @@ def image_glasses_recommendations_tab() -> None:
 
 
 def image_er_diagrams_tab() -> None:
+    """Image ER diagrams tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("ER Diagrams", style=me.Style(font_weight="bold"))
@@ -1311,6 +1343,7 @@ def image_er_diagrams_tab() -> None:
 
 
 def image_oven_tab() -> None:
+    """Image oven tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Oven Instructions", style=me.Style(font_weight="bold"))
@@ -1373,6 +1406,7 @@ def image_oven_tab() -> None:
 
 
 def image_furniture_tab() -> None:
+    """Image furniture tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Furniture Recommendation", style=me.Style(font_weight="bold"))
@@ -1509,6 +1543,7 @@ def image_furniture_tab() -> None:
     ),
 )
 def video_playground_page() -> None:
+    """Video playground page"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
