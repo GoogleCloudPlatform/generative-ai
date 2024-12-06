@@ -689,18 +689,9 @@ h2 {
 
     .suggested-question-text {
       margin-left: 0.25rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      word-wrap: break-word;
-      width: 100%;
-      max-width: 180px;
-    }
-  }
 
-  .suggested-question-chip:hover {
-    background: linear-gradient(92.1deg, #9EBCED 19.16%, rgba(164, 136, 245, 0.9) 79%);
-    border-radius: 41px;
-    color: #FFFFFF;
+      width: 100%;
+    }
   }
 }
 
@@ -976,4 +967,13 @@ h2 {
 .journey-chips {
     max-height: 300px;
     overflow-y: auto;
+}
+
+::ng-deep .mat-mdc-standard-chip:hover {
+    background: linear-gradient(92.1deg, #9EBCED 19.16%, rgba(164, 136, 245, 0.9) 79%) !important;
+    --mdc-chip-label-text-color: #fff;
+}
+
+.suggested-question-container {
+    width: 60%;
 }

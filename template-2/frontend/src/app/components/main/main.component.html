@@ -41,13 +41,14 @@
 
     <div *ngIf="this.intents.length > 0" class="container main-div margin-div journey-chips">
       <div class="suggested-question-container">
-        <div *ngFor="let question of this.intents[0].questions">
-          <mat-chip-row class="suggested-question-chip-row" [highlighted]="this.chipSelected == question" (click)="assignQToChatQuery(question)">
-            <span class="suggested-question-chip">
-              <mat-icon class="suggested-question-icon">chat</mat-icon>
-              <span class="suggested-question-text">{{question}}</span>
-            </span>
-          </mat-chip-row>
+          <mat-chip-set>
+            <mat-chip *ngFor="let question of this.intents[0].questions" class="suggested-question-chip-row" (click)="assignQToChatQuery(question)">            
+              <span class="suggested-question-chip">
+                <mat-icon class="suggested-question-icon">subdirectory_arrow_left</mat-icon>
+                <span class="suggested-question-text">{{question}}</span>
+              </span>
+            </mat-chip>
+          </mat-chip-set>
         </div>
       </div>
   </div>
