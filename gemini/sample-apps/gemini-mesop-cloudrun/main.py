@@ -87,7 +87,7 @@ class State:
             "health & beauty",
             "home & garden",
         ]
-    )
+    ) # pylint: disable=E3701
     marketing_product_category: str = "clothing"
     marketing_target_audiences: list[str] = field(
         default_factory=lambda: ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
@@ -95,7 +95,7 @@ class State:
     marketing_target_audience: str = "18-24"
     marketing_target_locations: list[str] = field(
         default_factory=lambda: ["urban", "suburban", "rural"]
-    )
+    ) # pylint: disable=E3701
     marketing_target_location: str = "urban"
     marketing_campaign_goals: list[str] = field(
         default_factory=lambda: [
@@ -104,14 +104,14 @@ class State:
             "drive sales",
             "improve brand sentiment",
         ]
-    )
+    ) # pylint: disable=E3701
     marketing_campaign_goal: str = "increase brand awareness"
     marketing_campaign_selected_goals: list[str] = field(
         default_factory=lambda: ["increase brand awareness", "generate leads"]
-    )
+    ) # pylint: disable=E3701
     marketing_brand_voices: list[str] = field(
         default_factory=lambda: ["formal", "informal", "serious", "humorous", "casual"]
-    )
+    ) # pylint: disable=E3701
     marketing_brand_voice: str = "formal"
     marketing_budgets: list[str] = field(
         default_factory=lambda: [
@@ -120,7 +120,7 @@ class State:
             "10,000 - 20,000",
             "20,000+",
         ]
-    )
+    ) # pylint: disable=E3701
     marketing_budget: str = "1,000 - 5,000"
     marketing_campaign_progress: bool = False
     marketing_campaign_output: str = ""
@@ -179,19 +179,19 @@ def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
     print(f"selected: {s.story_selected_premises}")
 
 
-def on_click_clear_story(e: me.ClickEvent) -> None:
+def on_click_clear_story(e: me.ClickEvent) -> None: # pylint: disable=W0613
     """Click event for clearing story text."""
     state = me.state(State)
     state.story_output = 0
 
 
-def on_story_radio_change(e: me.RadioChangeEvent) -> None:
+def on_story_radio_change(e: me.RadioChangeEvent) -> None: 
     """Story radio button change event"""
     s = me.state(State)
     setattr(s, e.key, e.value)
 
 
-def generate_story(e: me.ClickEvent | me.EnterEvent) -> Generator[Any, Any, Any]:
+def generate_story(e: me.ClickEvent | me.EnterEvent) -> Generator[Any, Any, Any]: # pylint: disable=W0613
     """Generate story"""
     s = me.state(State)
     s.story_output = ""  # clear any existing story
@@ -251,7 +251,7 @@ def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> Non
     print(f"selected: {s.marketing_campaign_selected_goals}")
 
 
-def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None: # pylint: disable=W0613
     """Generate marketing campaign"""
     s = me.state(State)
     s.marketing_campaign_progress = True
@@ -308,7 +308,7 @@ def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
     s.marketing_campaign_progress = False
 
 
-def on_click_clear_marketing_campaign(e: me.ClickEvent) -> None:
+def on_click_clear_marketing_campaign(e: me.ClickEvent) -> None: # pylint: disable=W0613
     """Click event for clearing marketing text."""
     state = me.state(State)
     state.marketing_campaign_output = 0
