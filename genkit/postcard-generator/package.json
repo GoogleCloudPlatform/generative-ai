@@ -32,7 +32,7 @@
     "@opentelemetry/sdk-trace-base": "^1.26.0",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "firebase": "^11.0.0",
     "firebase-admin": "^12.4.0",
     "genkitx-ollama": "^0.5.13",
