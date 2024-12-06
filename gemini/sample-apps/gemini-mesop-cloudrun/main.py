@@ -156,14 +156,9 @@ def on_click_clear_story(e: me.ClickEvent) -> None:
     state.story_output = 0
 
 
-def on_radio_change(event: me.RadioChangeEvent) -> None:
+def on_story_radio_change(e: me.RadioChangeEvent) -> None:
     s = me.state(State)
-    s.radio_value = event.value
-
-
-def on_length_radio_change(event: me.RadioChangeEvent) -> None:
-    s = me.state(State)
-    s.story_length_value = event.value
+    setattr(s, e.key, e.value)
 
 
 def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
@@ -211,35 +206,17 @@ def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
 
 
 # Marketing events
-def on_change_marketing_category(e: me.RadioChangeEvent) -> None:
+def on_change_marketing_radio_choice(e: me.RadioChangeEvent) -> None:
+    """Sets radio button choice to state key"""
     state = me.state(State)
-    state.marketing_product_category = e.value
-
-
-def on_change_marketing_target(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_target_audience = e.value
-
-
-def on_change_marketing_location(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_target_location = e.value
+    print(f"{e.key}: {e.value}")
+    setattr(state, e.key, e.value)
 
 
 def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> None:
     s = me.state(State)
     s.marketing_campaign_selected_goals = e.values
     print(f"selected: {s.marketing_campaign_selected_goals}")
-
-
-def on_change_marketing_brand_voice(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_brand_voice = e.value
-
-
-def on_change_marketing_budget(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_budget = e.value
 
 
 def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
@@ -807,7 +784,8 @@ def app() -> None:
                 )
                 me.text("Story creativity")
                 me.radio(
-                    on_change=on_radio_change,
+                    key="story_temp_value",
+                    on_change=on_story_radio_change,
                     options=[
                         me.RadioOption(label="Low", value="low"),
                         me.RadioOption(label="High", value="high"),
@@ -816,7 +794,8 @@ def app() -> None:
                 )
                 me.text("Length of story")
                 me.radio(
-                    on_change=on_length_radio_change,
+                    key="story_length_value",
+                    on_change=on_story_radio_change,
                     options=[
                         me.RadioOption(label="Short", value="short"),
                         me.RadioOption(label="Long", value="long"),
@@ -899,7 +878,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_category,
+                    key="marketing_product_category",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_product_category_options,
                     value=state.marketing_product_category,
                 )
@@ -913,7 +893,8 @@ def marketing_page() -> None:
                     )
 
                 me.radio(
-                    on_change=on_change_marketing_target,
+                    key="marketing_target_audience",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_target_age_options,
                     value=state.marketing_target_audience,
                 )
@@ -924,7 +905,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_location,
+                    key="marketing_target_location",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_target_location_options,
                     value=state.marketing_target_location,
                 )
@@ -952,7 +934,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_brand_voice,
+                    key="marketing_brand_voice",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_brand_voice_options,
                     value=state.marketing_brand_voice,
                 )
@@ -963,7 +946,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_budget,
+                    key="marketing_budget",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_budget_options,
                     value=state.marketing_budget,
                 )
