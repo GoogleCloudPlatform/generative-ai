@@ -50,10 +50,10 @@ page_json = [Page(**data) for data in page_data]  # type: ignore[typeddict-item]
 class State:
     """Mesop state class"""
 
-    pages: list[Page] = field(
-        default_factory=lambda: page_json  # pylint: disable=E3701
-    )
+    # pylint: disable=E3701
+    pages: list[Page] = field(default_factory=lambda: page_json)
     current_page: str = ""
+    # pylint: disable=E3701
 
 
 def navigate_to(e: me.ClickEvent) -> Generator[None, Any, None]:
