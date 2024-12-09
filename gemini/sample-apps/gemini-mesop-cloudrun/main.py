@@ -401,7 +401,7 @@ def generate_furniture_recommendation(
 
 
 def on_click_clear_furniture_recommendation(
-    e: me.ClickEvent,  # pylint: disable=W0613
+    e: me.ClickEvent,  # pylint: disable=unused-argument
 ) -> None:
     """Click event for clearing furniture recommendation text."""
     state = me.state(State)
@@ -409,7 +409,7 @@ def on_click_clear_furniture_recommendation(
 
 
 def generate_oven_instructions(
-    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=unused-argument
 ) -> None:
     """Generate oven instructions"""
     s = me.state(State)
@@ -673,8 +673,8 @@ def on_click_clear_video_tags(e: me.ClickEvent) -> None:  # pylint: disable=W061
 
 
 def generate_video_highlights(
-    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
-) -> None:  # pylint: disable=W0613
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=unused-argument
+) -> None:
     """Generate video highlights info"""
     s = me.state(State)
     s.video_spinner_progress = True
@@ -1091,9 +1091,9 @@ def image_playground_page_tabber() -> None:
         style=me.Style(
             padding=me.Padding(top=0, right=0, left=0, bottom=2),
             border=me.Border(
-                bottom=me.BorderSide(color="#e5e5e5", width=1, style="solid"),
                 top=None,
                 right=None,
+                bottom=me.BorderSide(color="#e5e5e5", width=1, style="solid"),
                 left=None,
             ),
         ),
