@@ -3,7 +3,7 @@
         <div class="left-heading" [matTooltip]="'Home'">
             <span class="logo-text gradient-text" (click)="navigate()">{{headerTitle}}</span>
         </div>
-        <div class="chat-footer">
+        <div class="chat-footer" *ngIf="showSearchhBox">
           <div class="chat-textarea">
             <mat-chip-grid class="intent-chip-textarea"
               style="width: 100%;" #chipGrid aria-label="Enter intent">
@@ -53,14 +53,6 @@
         </div>
         <div class="action-item-container">
           <br>
-            <div class="logout" (click)="goToManageIntentPage()">
-              <div class="logout-container">
-                <span class="material-symbols-rounded logo">feedback</span>
-                <div class="text">
-                  <span class="sub-title">Manage Playbook</span>
-                </div>
-              </div>
-            </div>
             <div class="logout logout-button" (click)="logout()" *ngIf="requiredLogin === 'True'">
               <div class="logout-container">
                 <span class="material-symbols-rounded logo logout-button-text">exit_to_app</span>

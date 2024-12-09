@@ -56,12 +56,11 @@ import 'prismjs/plugins/line-highlight/prism-line-highlight.js';
 import { ToastMessageComponent } from './components/shared/toast-message/toast-message.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DialogueBoxComponent } from './dialogue-box/dialogue-box.component';
-import { ManageIntentComponent } from './components/manage-intent/manage-intent.component';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatStepperModule } from '@angular/material/stepper';
-import { IntentFormComponent } from './components/manage-intent/intent-form/intent-form.component';
-import { CreateIntentFormComponent } from './components/manage-intent/create-intent-form/create-intent-form.component';
-import { SearchResultComponent } from './components/search-result/search-result.component'
+import { CreateIntentFormComponent } from './components/create-intent-form/create-intent-form.component';
+import { SearchResultComponent } from './components/search-result/search-result.component';
+import { DisplayDetailedResultComponent } from './components/display-detailed-result/display-detailed-result.component'
 
 @NgModule({
   declarations: [
@@ -75,10 +74,9 @@ import { SearchResultComponent } from './components/search-result/search-result.
     SuggestionCardComponent,
     ToastMessageComponent,
     DialogueBoxComponent,
-    ManageIntentComponent,
-    IntentFormComponent,
     CreateIntentFormComponent,
-    SearchResultComponent
+    SearchResultComponent,
+    DisplayDetailedResultComponent
   ],
   imports: [
     BrowserModule,

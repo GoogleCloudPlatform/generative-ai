@@ -16,11 +16,11 @@ export type Intent = {
 export interface IntentDetails {
   name: string,
   gcp_bucket?: string,
-  ai_model: string,
-  ai_temperature: string,
-  prompt: string,
+  ai_model?: string,
+  ai_temperature?: string,
+  prompt?: string,
   status: string,
-  questions: string[],
+  questions?: string[],
 }
 
 export interface Model {

@@ -12,7 +12,7 @@ import { ReplaySubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { animate, sequence, state, style, transition, trigger } from '@angular/animations';
 import { SpeechToTextService } from '../../services/speech-to-text';
-import { CreateIntentFormComponent } from '../manage-intent/create-intent-form/create-intent-form.component';
+import { CreateIntentFormComponent } from '../create-intent-form/create-intent-form.component';
 
 @Component({
   selector: 'app-main',

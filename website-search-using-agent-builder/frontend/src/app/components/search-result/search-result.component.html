@@ -1,1 +1,30 @@
-<p>search-result works!</p>
+<div class="overview-container">
+    <div class="overview-sub-container">
+        <div class="overview-text"><mat-icon>auto_awesome</mat-icon> AI Overview</div>
+        <div *ngIf="overView" class="overview-content"> {{overView}}</div>
+        <div class="overview-button">
+            <button mat-button>Learn more</button>
+        </div>
+    </div>
+</div>
+<div class="overview-container padding-top">
+    <div class="header-container">
+        Links
+    </div>
+</div>
+<div class="overview-container padding-top">
+    <div class="search-result-parent-container">
+        <div class="search-result" *ngFor="let result of serachResult">
+            <div class="title-container">
+                <mat-icon>{{result.icon}}</mat-icon>
+                {{result.title}}
+            </div>
+            <div class="description-container">
+                {{result.description}}
+            </div>
+            <div class="overview-button">
+                <button mat-button>View</button>
+            </div>
+        </div>
+    </div>
+</div>

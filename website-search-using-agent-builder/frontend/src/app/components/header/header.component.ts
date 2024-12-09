@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
-import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user/user.service';
 import { AuthService } from '../../services/login/auth.service';
 import { MatDialog } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
 import { IntentDetails, IntentService } from 'src/app/services/intent.service';
+import { Router, NavigationEnd, Event as NavigationEvent } from '@angular/router';
 
 const GOOGLE_CLOUD_ICON =
   `<svg width="694px" height="558px" viewBox="0 0 694 558" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -35,7 +35,7 @@ export class HeaderComponent {
   transcribedText = '';
   mediaRecorder: MediaRecorder;
   audioChunks: Blob[] = [];
-  
+  showSearchhBox = false;  
 
   constructor(iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
@@ -48,7 +48,17 @@ export class HeaderComponent {
     iconRegistry.addSvgIconLiteral('google-cloud-icon', sanitizer.bypassSecurityTrustHtml(GOOGLE_CLOUD_ICON));
     this.intentsService.getAllIntent().subscribe(allIntents => {
       this.intentsInProgress = allIntents.filter(i => i.status === "1" || i.status === "3")
-    })
+    });
+    this.router.events.subscribe((event: NavigationEvent) => {
+      if(event instanceof NavigationEnd){
+        if(event.url.includes('result'))
+          {
+            this.showSearchhBox = true;
+          }else {
+            this.showSearchhBox = false;
+          }
+      }
+    });
   }
 
   navigate() {
