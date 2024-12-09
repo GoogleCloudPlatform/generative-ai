@@ -1,9 +1,10 @@
+from abc import ABC, abstractmethod
 import json
 import mimetypes
 from typing import Dict
-from abc import ABC, abstractmethod
+
 from google.cloud import documentai
-from vertexai.generative_models import GenerativeModel, Part, GenerationConfig
+from vertexai.generative_models import GenerationConfig, GenerativeModel, Part
 
 
 class EntityExtractor(ABC):

@@ -14,6 +14,7 @@
 
 import os
 from unittest.mock import MagicMock
+
 from langchain_google_community import VertexAISearchRetriever
 from langchain_google_community.vertex_rank import VertexAIRank
 from langchain_google_vertexai import VertexAIEmbeddings
