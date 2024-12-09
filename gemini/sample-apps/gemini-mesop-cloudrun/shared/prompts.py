@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 # video
 
+# noqa: E261, W291
 VIDEO_TAGS_PROMPT = """Answer the following questions using the video only:
 1. What is in the video? 
 2. What objects are in the video? 
@@ -23,6 +25,7 @@ VIDEO_TAGS_PROMPT = """Answer the following questions using the video only:
 Give the answer in the table format with question and answer as columns.
 """
 
+# noqa: E261, W291
 VIDEO_GEOLOCATION_PROMPT = """Answer the following questions using the video only:
 
 What is this video about? 
