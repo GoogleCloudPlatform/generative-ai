@@ -1,4 +1,3 @@
-tgi
 AALR
 ADMA
 AFX
@@ -1054,6 +1053,7 @@ textno
 tfhub
 tfidf
 tfvars
+tgi
 tgz
 thelook
 throug

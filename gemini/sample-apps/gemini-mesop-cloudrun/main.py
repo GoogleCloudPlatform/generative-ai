@@ -18,14 +18,26 @@ This is a Mesop application designed to show the use of
 Gemini API in Vertex AI in a UX
 """
 
+from dataclasses import field
 import os
 from typing import Any, Generator
 
-from dataclasses import field
 from dataclasses_json import dataclass_json
-
 import mesop as me
-
+from shared.nav_menu import nav_menu
+from shared.prompts import VIDEO_GEOLOCATION_PROMPT, VIDEO_TAGS_PROMPT
+from shared.styles import (
+    _BOX_STYLE,
+    _SPINNER_STYLE,
+    _STORY_INPUT_STYLE,
+    _STYLE_CURRENT_TAB,
+    _STYLE_MAIN_COLUMN,
+    _STYLE_MAIN_HEADER,
+    _STYLE_OTHER_TAB,
+    _STYLE_TITLE_BOX,
+    _TABBER_STYLE,
+    FANCY_TEXT_GRADIENT,
+)
 import vertexai
 from vertexai.generative_models import (
     GenerationConfig,
@@ -34,25 +46,6 @@ from vertexai.generative_models import (
     HarmCategory,
     Part,
 )
-
-from shared.nav_menu import nav_menu
-from shared.prompts import (
-    VIDEO_TAGS_PROMPT,
-    VIDEO_GEOLOCATION_PROMPT,
-)
-from shared.styles import (
-    _BOX_STYLE,
-    _SPINNER_STYLE,
-    _STORY_INPUT_STYLE,
-    _STYLE_MAIN_COLUMN,
-    _STYLE_MAIN_HEADER,
-    _STYLE_TITLE_BOX,
-    FANCY_TEXT_GRADIENT,
-    _STYLE_CURRENT_TAB,
-    _STYLE_OTHER_TAB,
-    _TABBER_STYLE,
-)
-
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")  # Your Google Cloud Project Region

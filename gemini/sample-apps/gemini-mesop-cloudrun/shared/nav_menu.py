@@ -12,18 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import field
 from typing import Any, Generator, TypedDict
 
-from dataclasses import field
 from dataclasses_json import dataclass_json
-
 import mesop as me
 
 # pylint: disable=E0402
-from .styles import (
-    _STYLE_CURRENT_NAV,
-    _STYLE_MAIN_HEADER,
-)
+from .styles import _STYLE_CURRENT_NAV, _STYLE_MAIN_HEADER
 
 # pylint: disable=E0402
 

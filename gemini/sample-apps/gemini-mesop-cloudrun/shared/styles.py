@@ -14,7 +14,6 @@
 
 import mesop as me
 
-
 _DEFAULT_BORDER = me.Border.all(
     me.BorderSide(
         color="#e0e0e0",
