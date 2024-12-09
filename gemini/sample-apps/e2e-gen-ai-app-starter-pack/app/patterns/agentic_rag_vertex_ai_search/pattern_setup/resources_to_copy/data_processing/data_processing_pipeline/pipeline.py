@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from data_processing_pipeline.components import ingest_data_in_datastore, process_data
 from kfp import dsl
-from data_processing_pipeline.components import process_data, ingest_data_in_datastore
 
 
 @dsl.pipeline(description="A pipeline to run ingestion of new data into the datastore")
