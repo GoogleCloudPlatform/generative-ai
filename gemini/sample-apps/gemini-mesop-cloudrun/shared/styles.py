@@ -106,3 +106,13 @@ _STYLE_OTHER_TAB = me.Style(
     border_radius=0,
     # font_weight="bold",
 )
+
+_TABBER_STYLE = me.Style(
+    padding=me.Padding(top=0, right=0, left=0, bottom=2),
+    border=me.Border(
+        bottom=me.BorderSide(color="#e5e5e5", width=1, style="solid"),
+        top=None,
+        right=None,
+        left=None,
+    ),
+)

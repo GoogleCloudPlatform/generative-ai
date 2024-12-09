@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# pylint: disable=too-many-lines
 
 """
 This is a Mesop application designed to show the use of
@@ -49,6 +50,7 @@ from shared.styles import (
     FANCY_TEXT_GRADIENT,
     _STYLE_CURRENT_TAB,
     _STYLE_OTHER_TAB,
+    _TABBER_STYLE,
 )
 
 
@@ -1087,17 +1089,7 @@ def image_playground_page_tabber() -> None:
     """Image playground page tabber"""
     state = me.state(State)
 
-    with me.box(
-        style=me.Style(
-            padding=me.Padding(top=0, right=0, left=0, bottom=2),
-            border=me.Border(
-                top=None,
-                right=None,
-                bottom=me.BorderSide(color="#e5e5e5", width=1, style="solid"),
-                left=None,
-            ),
-        ),
-    ):
+    with me.box(style=_TABBER_STYLE):
         with me.box(style=me.Style(display="flex", flex_direction="row", gap=5)):
             for tab in image_tabs_json:
                 disabled = False
@@ -1603,15 +1595,7 @@ def video_playground_page_tabber() -> None:
     state = me.state(State)
 
     with me.box(
-        style=me.Style(
-            padding=me.Padding(top=0, right=0, left=0, bottom=2),
-            border=me.Border(
-                bottom=me.BorderSide(color="#e5e5e5", width=1, style="solid"),
-                top=None,
-                right=None,
-                left=None,
-            ),
-        ),
+        style=_TABBER_STYLE,
     ):
         with me.box(style=me.Style(display="flex", flex_direction="row", gap=5)):
             for tab in video_tabs_json:
