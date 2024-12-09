@@ -24,6 +24,7 @@ from .styles import (
     _STYLE_CURRENT_NAV,
     _STYLE_MAIN_HEADER,
 )
+
 # pylint: disable=E0402
 
 
@@ -49,7 +50,9 @@ page_json = [Page(**data) for data in page_data]  # type: ignore[typeddict-item]
 class State:
     """Mesop state class"""
 
-    pages: list[Page] = field(default_factory=lambda: page_json) # pylint: disable=E3701
+    pages: list[Page] = field(
+        default_factory=lambda: page_json
+    )  # pylint: disable=E3701
     current_page: str = ""
 
 

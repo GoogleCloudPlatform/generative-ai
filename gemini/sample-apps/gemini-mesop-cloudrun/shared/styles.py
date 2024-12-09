@@ -94,8 +94,7 @@ _STYLE_CURRENT_TAB = me.Style(
     border_radius=0,
     font_weight="bold",
     border=me.Border(
-        bottom=me.BorderSide(
-            color="#000", width=2, style="solid"),
+        bottom=me.BorderSide(color="#000", width=2, style="solid"),
         top=None,
         right=None,
         left=None,
