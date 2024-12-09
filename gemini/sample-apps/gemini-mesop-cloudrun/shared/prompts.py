@@ -26,7 +26,7 @@ VIDEO_TAGS_PROMPT = """Answer the following questions using the video only:
 4. Provide 5 best tags for this video? 
 
 Give the answer in the table format with question and answer as columns.
-"""
+"""  # noqa: E261, W291
 
 # noqa: E261, W291
 VIDEO_GEOLOCATION_PROMPT = """Answer the following questions using the video only:

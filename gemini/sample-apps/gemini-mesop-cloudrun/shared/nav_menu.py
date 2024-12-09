@@ -51,8 +51,8 @@ class State:
     """Mesop state class"""
 
     pages: list[Page] = field(
-        default_factory=lambda: page_json
-    )  # pylint: disable=E3701
+        default_factory=lambda: page_json  # pylint: disable=E3701
+    )
     current_page: str = ""
 
 
