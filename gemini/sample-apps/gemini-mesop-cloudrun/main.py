@@ -401,16 +401,16 @@ def generate_furniture_recommendation(
 
 
 def on_click_clear_furniture_recommendation(
-    e: me.ClickEvent,
-) -> None:  # pylint: disable=W0613
+    e: me.ClickEvent,  # pylint: disable=W0613
+) -> None:
     """Click event for clearing furniture recommendation text."""
     state = me.state(State)
     state.furniture_recommendation_output = 0
 
 
 def generate_oven_instructions(
-    e: me.ClickEvent | me.EnterEvent,
-) -> None:  # pylint: disable=W0613
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
     """Generate oven instructions"""
     s = me.state(State)
     s.image_progress_spinner = True
@@ -673,7 +673,7 @@ def on_click_clear_video_tags(e: me.ClickEvent) -> None:  # pylint: disable=W061
 
 
 def generate_video_highlights(
-    e: me.ClickEvent | me.EnterEvent,
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
 ) -> None:  # pylint: disable=W0613
     """Generate video highlights info"""
     s = me.state(State)

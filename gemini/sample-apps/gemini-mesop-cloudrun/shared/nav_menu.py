@@ -19,10 +19,12 @@ from dataclasses_json import dataclass_json
 
 import mesop as me
 
+# pylint: disable=E0402
 from .styles import (
     _STYLE_CURRENT_NAV,
     _STYLE_MAIN_HEADER,
 )
+# pylint: disable=E0402
 
 
 class Page(TypedDict):

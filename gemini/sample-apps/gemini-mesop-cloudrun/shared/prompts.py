@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This is a set of prompts used in the Mesop app
+"""
 
 # video
 
