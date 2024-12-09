@@ -95,6 +95,13 @@ After completing these steps, your infrastructure will be set up and ready for d
 
 For End-to-end testing of the application, including tracing and feedback sinking to BigQuery, without the need to trigger a CI/CD pipeline.
 
+First, enable required Google Cloud APIs:
+
+```bash
+gcloud config set project $YOUR_DEV_PROJECT
+gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com
+```
+
 After you edited the relative [`env.tfvars` file](../terraform/dev/vars/env.tfvars), follow the following instructions:
 
 ```bash

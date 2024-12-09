@@ -32,4 +32,3 @@ resource "google_project_iam_member" "default_compute_sa_storage_object_creator"
   member     = "serviceAccount:${data.google_project.dev_project.number}-compute@developer.gserviceaccount.com"
   depends_on = [resource.google_project_service.services]
 }
-

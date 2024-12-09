@@ -12,12 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import field
-import os
+"""
+This is a Mesop application designed to show the use of
+Gemini API in Vertex AI in a UX
+"""
 
+import os
+from typing import Any, Generator
+
+from dataclasses import field
 from dataclasses_json import dataclass_json
+
 import mesop as me
-from shared.nav_menu import nav_menu
+
 import vertexai
 from vertexai.generative_models import (
     GenerationConfig,
@@ -27,6 +34,24 @@ from vertexai.generative_models import (
     Part,
 )
 
+from shared.nav_menu import nav_menu
+from shared.prompts import (
+    VIDEO_TAGS_PROMPT,
+    VIDEO_GEOLOCATION_PROMPT,
+)
+from shared.styles import (
+    _BOX_STYLE,
+    _SPINNER_STYLE,
+    _STORY_INPUT_STYLE,
+    _STYLE_MAIN_COLUMN,
+    _STYLE_MAIN_HEADER,
+    _STYLE_TITLE_BOX,
+    FANCY_TEXT_GRADIENT,
+    _STYLE_CURRENT_TAB,
+    _STYLE_OTHER_TAB,
+)
+
+
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")  # Your Google Cloud Project Region
 vertexai.init(project=PROJECT_ID, location=LOCATION)
@@ -35,9 +60,12 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 @dataclass_json
 @me.stateclass
 class State:
+    """Mesop state class"""
+
     model: str = "gemini-1.5-flash-002"
     current_page: str = "/"
 
+    # pylint: disable=E3701
     # Story
     input: str = ""
     story_character_name: str
@@ -119,6 +147,7 @@ class State:
     video_tags_content: str = ""
     video_highlights_content: str = ""
     video_geolocation_content: str = ""
+    # pylint: disable=E3701
 
 
 # Helpers
@@ -138,6 +167,7 @@ def gcs_to_http(gcs_uri: str) -> str:
 
 
 def on_input(e: me.InputEvent) -> None:
+    """On input, set key to event value"""
     print(f"{e}")
     state = me.state(State)
     setattr(state, e.key, e.value)
@@ -145,28 +175,28 @@ def on_input(e: me.InputEvent) -> None:
 
 # Story events
 def on_selection_change(e: me.SelectSelectionChangeEvent) -> None:
+    """Story selection change event"""
     s = me.state(State)
     s.story_selected_premises = e.values
     print(f"selected: {s.story_selected_premises}")
 
 
-def on_click_clear_story(e: me.ClickEvent) -> None:
+def on_click_clear_story(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing story text."""
     state = me.state(State)
     state.story_output = 0
 
 
-def on_radio_change(event: me.RadioChangeEvent) -> None:
+def on_story_radio_change(e: me.RadioChangeEvent) -> None:
+    """Story radio button change event"""
     s = me.state(State)
-    s.radio_value = event.value
+    setattr(s, e.key, e.value)
 
 
-def on_length_radio_change(event: me.RadioChangeEvent) -> None:
-    s = me.state(State)
-    s.story_length_value = event.value
-
-
-def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_story(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> Generator[Any, Any, Any]:
+    """Generate story"""
     s = me.state(State)
     s.story_output = ""  # clear any existing story
     s.story_progress = True
@@ -211,38 +241,24 @@ def generate_story(e: me.ClickEvent | me.EnterEvent) -> None:
 
 
 # Marketing events
-def on_change_marketing_category(e: me.RadioChangeEvent) -> None:
+def on_change_marketing_radio_choice(e: me.RadioChangeEvent) -> None:
+    """Sets radio button choice to state key"""
     state = me.state(State)
-    state.marketing_product_category = e.value
-
-
-def on_change_marketing_target(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_target_audience = e.value
-
-
-def on_change_marketing_location(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_target_location = e.value
+    print(f"{e.key}: {e.value}")
+    setattr(state, e.key, e.value)
 
 
 def on_selection_change_marketing_goals(e: me.SelectSelectionChangeEvent) -> None:
+    """Set marking goals, multiselect"""
     s = me.state(State)
     s.marketing_campaign_selected_goals = e.values
     print(f"selected: {s.marketing_campaign_selected_goals}")
 
 
-def on_change_marketing_brand_voice(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_brand_voice = e.value
-
-
-def on_change_marketing_budget(e: me.RadioChangeEvent) -> None:
-    state = me.state(State)
-    state.marketing_budget = e.value
-
-
-def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_marketing_campaign(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
+    """Generate marketing campaign"""
     s = me.state(State)
     s.marketing_campaign_progress = True
     prompt = f"""Generate a marketing campaign for {s.marketing_product}, a {s.marketing_product_category} designed for the age group: {s.marketing_target_audience}.
@@ -298,7 +314,9 @@ def generate_marketing_campaign(e: me.ClickEvent | me.EnterEvent) -> None:
     s.marketing_campaign_progress = False
 
 
-def on_click_clear_marketing_campaign(e: me.ClickEvent) -> None:
+def on_click_clear_marketing_campaign(
+    e: me.ClickEvent,  # pylint: disable=W0613
+) -> None:
     """Click event for clearing marketing text."""
     state = me.state(State)
     state.marketing_campaign_output = 0
@@ -334,7 +352,10 @@ IMAGE_MATH = (
 )
 
 
-def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_furniture_recommendation(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
+    """Generate furniture recommendation"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -379,13 +400,18 @@ def generate_furniture_recommendation(e: me.ClickEvent | me.EnterEvent) -> None:
     s.image_progress_spinner = False
 
 
-def on_click_clear_furniture_recommendation(e: me.ClickEvent) -> None:
+def on_click_clear_furniture_recommendation(
+    e: me.ClickEvent,
+) -> None:  # pylint: disable=W0613
     """Click event for clearing furniture recommendation text."""
     state = me.state(State)
     state.furniture_recommendation_output = 0
 
 
-def generate_oven_instructions(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_oven_instructions(
+    e: me.ClickEvent | me.EnterEvent,
+) -> None:  # pylint: disable=W0613
+    """Generate oven instructions"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -414,13 +440,14 @@ If instructions include buttons, also explain where those buttons are physically
     s.image_progress_spinner = False
 
 
-def on_click_clear_oven_instructions(e: me.ClickEvent) -> None:
+def on_click_clear_oven_instructions(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing oven instructions text."""
     state = me.state(State)
     state.oven_instructions_output = 0
 
 
-def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:  # pylint: disable=W0613
+    """Generate ER diagram documentation"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -448,13 +475,16 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:
     s.image_progress_spinner = False
 
 
-def on_click_clear_er_doc(e: me.ClickEvent) -> None:
+def on_click_clear_er_doc(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing er documentation text."""
     state = me.state(State)
     state.er_doc_output = 0
 
 
-def generate_glasses_rec(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_glasses_rec(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
+    """Generate glasses recommendation"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -490,6 +520,7 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
 
 
 def on_change_image_glasses(e: me.RadioChangeEvent) -> None:
+    """Sets radio button choice to state key"""
     s = me.state(State)
 
     value_name = f"image_{e.key}_radio_value"
@@ -498,13 +529,16 @@ def on_change_image_glasses(e: me.RadioChangeEvent) -> None:
     setattr(s, value_name, e.value)
 
 
-def on_click_clear_glasses_rec(e: me.ClickEvent) -> None:
+def on_click_clear_glasses_rec(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing glasses documentation text."""
     state = me.state(State)
     state.glasses_rec_output = 0
 
 
-def generate_math_answers(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_math_answers(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
+    """Generate math answers"""
     s = me.state(State)
     s.image_progress_spinner = True
 
@@ -540,7 +574,7 @@ INSTRUCTIONS:
     s.image_progress_spinner = False
 
 
-def on_click_clear_math(e: me.ClickEvent) -> None:
+def on_click_clear_math(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing math documentation text."""
     state = me.state(State)
     state.math_answers_output = 0
@@ -562,7 +596,10 @@ VIDEO_GEOLOCATION = (
 )
 
 
-def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_video_description(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
+    """Generate video description info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -593,26 +630,22 @@ def generate_video_description(e: me.ClickEvent | me.EnterEvent) -> None:
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_description(e: me.ClickEvent) -> None:
+def on_click_clear_video_description(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video description text."""
     state = me.state(State)
     state.video_description_content = 0
 
 
-def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_video_tags(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
+    """Generate video tags info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
     video_part = Part.from_uri(VIDEO_TAGS, mime_type="video/mp4")
 
-    prompt = """Answer the following questions using the video only:
-    1. What is in the video? 
-    2. What objects are in the video? 
-    3. What is the action in the video? 
-    4. Provide 5 best tags for this video? 
-    
-    Give the answer in the table format with question and answer as columns.
-    """
+    prompt = VIDEO_TAGS_PROMPT
 
     model_name = s.model
 
@@ -633,13 +666,16 @@ def generate_video_tags(e: me.ClickEvent | me.EnterEvent) -> None:
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_tags(e: me.ClickEvent) -> None:
+def on_click_clear_video_tags(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video tags text."""
     state = me.state(State)
     state.video_tags_content = 0
 
 
-def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_video_highlights(
+    e: me.ClickEvent | me.EnterEvent,
+) -> None:  # pylint: disable=W0613
+    """Generate video highlights info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
@@ -667,27 +703,22 @@ def generate_video_highlights(e: me.ClickEvent | me.EnterEvent) -> None:
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_highlights(e: me.ClickEvent) -> None:
+def on_click_clear_video_highlights(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video highlights text."""
     state = me.state(State)
     state.video_highlights_content = 0
 
 
-def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
+def generate_video_geolocation(
+    e: me.ClickEvent | me.EnterEvent,  # pylint: disable=W0613
+) -> None:
+    """Generate video geolocation info"""
     s = me.state(State)
     s.video_spinner_progress = True
 
     video_part = Part.from_uri(VIDEO_GEOLOCATION, mime_type="video/mp4")
 
-    prompt = """Answer the following questions using the video only:
-    
-    What is this video about? 
-    How do you know which city it is? 
-    What street is this? 
-    What is the nearest intersection? 
-    
-    Answer the questions in a table format with question and answer as columns.
-    """
+    prompt = VIDEO_GEOLOCATION_PROMPT
 
     model_name = s.model
 
@@ -708,7 +739,7 @@ def generate_video_geolocation(e: me.ClickEvent | me.EnterEvent) -> None:
     s.video_spinner_progress = False
 
 
-def on_click_clear_video_geolocation(e: me.ClickEvent) -> None:
+def on_click_clear_video_geolocation(e: me.ClickEvent) -> None:  # pylint: disable=W0613
     """Click event for clearing video geolocation text."""
     state = me.state(State)
     state.video_geolocation_content = 0
@@ -717,13 +748,15 @@ def on_click_clear_video_geolocation(e: me.ClickEvent) -> None:
 # Pages
 
 
-def on_load(e: me.LoadEvent) -> None:
+def on_load(e: me.LoadEvent) -> None:  # pylint: disable=W0613
+    """On load event"""
     s = me.state(State)
     s.current_page = "/"
 
 
 @me.component
 def vertex_gemini_header() -> None:
+    """Vertex AI Gemini Header component"""
     with me.box(style=_STYLE_MAIN_HEADER):
         with me.box(style=_STYLE_TITLE_BOX):
             with me.box(
@@ -747,6 +780,7 @@ def vertex_gemini_header() -> None:
     on_load=on_load,
 )
 def app() -> None:
+    """Main Mesop App"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -807,7 +841,8 @@ def app() -> None:
                 )
                 me.text("Story creativity")
                 me.radio(
-                    on_change=on_radio_change,
+                    key="story_temp_value",
+                    on_change=on_story_radio_change,
                     options=[
                         me.RadioOption(label="Low", value="low"),
                         me.RadioOption(label="High", value="high"),
@@ -816,7 +851,8 @@ def app() -> None:
                 )
                 me.text("Length of story")
                 me.radio(
-                    on_change=on_length_radio_change,
+                    key="story_length_value",
+                    on_change=on_story_radio_change,
                     options=[
                         me.RadioOption(label="Short", value="short"),
                         me.RadioOption(label="Long", value="long"),
@@ -871,6 +907,7 @@ def app() -> None:
     ),
 )
 def marketing_page() -> None:
+    """Marketing page"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -899,7 +936,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_category,
+                    key="marketing_product_category",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_product_category_options,
                     value=state.marketing_product_category,
                 )
@@ -913,7 +951,8 @@ def marketing_page() -> None:
                     )
 
                 me.radio(
-                    on_change=on_change_marketing_target,
+                    key="marketing_target_audience",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_target_age_options,
                     value=state.marketing_target_audience,
                 )
@@ -924,7 +963,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_location,
+                    key="marketing_target_location",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_target_location_options,
                     value=state.marketing_target_location,
                 )
@@ -952,7 +992,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_brand_voice,
+                    key="marketing_brand_voice",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_brand_voice_options,
                     value=state.marketing_brand_voice,
                 )
@@ -963,7 +1004,8 @@ def marketing_page() -> None:
                         me.RadioOption(label=c.title(), value=c)
                     )
                 me.radio(
-                    on_change=on_change_marketing_budget,
+                    key="marketing_budget",
+                    on_change=on_change_marketing_radio_choice,
                     options=marketing_budget_options,
                     value=state.marketing_budget,
                 )
@@ -1011,6 +1053,7 @@ def marketing_page() -> None:
     ),
 )
 def image_playground_page() -> None:
+    """Image playground page"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1035,11 +1078,13 @@ image_tabs_json = [
 
 
 def image_switch_tab(e: me.ClickEvent) -> None:
+    """Image switch tab event"""
     s = me.state(State)
     s.image_tab = e.key
 
 
 def image_playground_page_tabber() -> None:
+    """Image playground page tabber"""
     state = me.state(State)
 
     with me.box(
@@ -1083,6 +1128,7 @@ def image_playground_page_tabber() -> None:
 
 
 def image_math_reasoning_tab() -> None:
+    """Image math reasoning tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Math Reasoning", style=me.Style(font_weight="bold"))
@@ -1096,7 +1142,6 @@ def image_math_reasoning_tab() -> None:
     with me.box(
         style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")
     ):
-
         with me.box(
             style=me.Style(
                 display="grid",
@@ -1152,6 +1197,7 @@ def image_math_reasoning_tab() -> None:
 
 
 def image_glasses_recommendations_tab() -> None:
+    """Image glasses recommendations tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Glasses Recommendation", style=me.Style(font_weight="bold"))
@@ -1191,7 +1237,6 @@ def image_glasses_recommendations_tab() -> None:
     with me.box(
         style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")
     ):
-
         with me.box(
             style=me.Style(
                 display="grid",
@@ -1264,6 +1309,7 @@ def image_glasses_recommendations_tab() -> None:
 
 
 def image_er_diagrams_tab() -> None:
+    """Image ER diagrams tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("ER Diagrams", style=me.Style(font_weight="bold"))
@@ -1323,6 +1369,7 @@ def image_er_diagrams_tab() -> None:
 
 
 def image_oven_tab() -> None:
+    """Image oven tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Oven Instructions", style=me.Style(font_weight="bold"))
@@ -1385,6 +1432,7 @@ def image_oven_tab() -> None:
 
 
 def image_furniture_tab() -> None:
+    """Image furniture tab"""
     state = me.state(State)
     me.box(style=me.Style(height=12))
     me.text("Furniture Recommendation", style=me.Style(font_weight="bold"))
@@ -1420,7 +1468,6 @@ def image_furniture_tab() -> None:
     with me.box(
         style=me.Style(display="grid", gap=0, grid_template_columns="repeat(4, 1fr)")
     ):
-
         with me.box(
             style=me.Style(
                 display="grid",
@@ -1522,6 +1569,7 @@ def image_furniture_tab() -> None:
     ),
 )
 def video_playground_page() -> None:
+    """Video playground page"""
     state = me.state(State)
     # Main header
     vertex_gemini_header()
@@ -1545,11 +1593,13 @@ video_tabs_json = [
 
 
 def video_switch_tab(e: me.ClickEvent) -> None:
+    """Event to switch video tab"""
     s = me.state(State)
     s.video_tab = e.key
 
 
 def video_playground_page_tabber() -> None:
+    """Page tabber for video playground"""
     state = me.state(State)
 
     with me.box(
@@ -1591,6 +1641,7 @@ def video_playground_page_tabber() -> None:
 
 
 def video_description_tab() -> None:
+    """Show the video description tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
     me.text("Gemini can provide a description of what's happening in a video:")
@@ -1638,6 +1689,7 @@ def video_description_tab() -> None:
 
 
 def video_tags_tab() -> None:
+    """Show the video tags tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
@@ -1686,6 +1738,7 @@ def video_tags_tab() -> None:
 
 
 def video_highlights_tab() -> None:
+    """Show the video highlights tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
@@ -1736,6 +1789,7 @@ def video_highlights_tab() -> None:
 
 
 def video_geolocation_tab() -> None:
+    """Show the video geolocation tab"""
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
@@ -1783,76 +1837,3 @@ def video_geolocation_tab() -> None:
                     text=state.video_geolocation_content,
                     style=me.Style(width="100%", margin=me.Margin(top=10)),
                 )
-
-
-# Styles
-
-_DEFAULT_BORDER = me.Border.all(me.BorderSide(color="#e0e0e0", width=1, style="solid"))
-
-_STYLE_CONTAINER = me.Style(
-    display="grid",
-    grid_template_columns="5fr 2fr",
-    grid_template_rows="auto 5fr",
-    height="100vh",
-)
-
-_STYLE_MAIN_HEADER = me.Style(
-    border=_DEFAULT_BORDER, padding=me.Padding(top=15, left=15, right=15, bottom=5)
-)
-
-_STYLE_MAIN_COLUMN = me.Style(
-    border=_DEFAULT_BORDER,
-    padding=me.Padding.all(15),
-    overflow_y="scroll",
-)
-
-_STYLE_TITLE_BOX = me.Style(display="inline-block")
-
-_STORY_INPUT_STYLE = me.Style(
-    width="500px"
-    # display="flex",
-    # flex_basis="max(100vh, calc(50% - 48px))",
-)
-
-_BOX_STYLE = me.Style(
-    flex_basis="max(100vh, calc(50% - 48px))",
-    background="#fff",
-    border_radius=12,
-    box_shadow=("0 3px 1px -2px #0003, 0 2px 2px #00000024, 0 1px 5px #0000001f"),
-    padding=me.Padding(top=16, left=16, right=16, bottom=16),
-    display="flex",
-    flex_direction="column",
-)
-
-_SPINNER_STYLE = me.Style(
-    display="flex",
-    flex_direction="row",
-    padding=me.Padding.all(16),
-    align_items="center",
-    gap=10,
-)
-
-FANCY_TEXT_GRADIENT = me.Style(
-    color="transparent",
-    background=(
-        "linear-gradient(72.83deg,#4285f4 11.63%,#9b72cb 40.43%,#d96570 68.07%)" " text"
-    ),
-)
-
-_STYLE_CURRENT_TAB = me.Style(
-    color="#99000",
-    border_radius=0,
-    font_weight="bold",
-    border=me.Border(
-        bottom=me.BorderSide(color="#000", width=2, style="solid"),
-        top=None,
-        right=None,
-        left=None,
-    ),
-)
-
-_STYLE_OTHER_TAB = me.Style(
-    color="#8d8e9d",
-    border_radius=0,
-    # font_weight="bold",
-)

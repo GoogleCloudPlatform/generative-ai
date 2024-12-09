@@ -1,3 +1,4 @@
+tgi
 AALR
 ADMA
 AFX
@@ -5,11 +6,11 @@ AGG
 AIP
 AMNOSH
 ANZ
-AOT
 APAC
 APIENTRY
 APSTUDIO
 ASF
+ASML
 AUVs
 Adidas
 Akihiro
@@ -56,6 +57,7 @@ COCOAPODS
 COINIT
 CONOUT
 COUNTIF
+CRM
 CUAD
 CUCUONAR
 CVD
@@ -70,6 +72,7 @@ Codey
 Codicote
 Colab
 Colm
+Coursera
 Cowabunga
 Crossbody
 D'orsay
@@ -197,6 +200,7 @@ JPY
 Jang
 Jax
 Jedi
+Jhamtani
 Jian
 Jibo
 Joji
@@ -359,11 +363,13 @@ Rosberg
 Rosso
 Rousey
 Ruchika
+SAOT
 SDKROOT
 SEK
 SEO
 SIMONE
 SKUs
+SMSN
 SNB
 SNE
 SPII
@@ -401,11 +407,14 @@ Surampudi
 Suzaka
 Syunik
 TARG
+TCEHY
 TGI
 TLDR
 TOKENLIST
 TPU
 TPUs
+TSLA
+TSMC
 TSNE
 Tadao
 Tafel
@@ -434,6 +443,7 @@ Uszkoreit
 Utik
 VAPO
 VFT
+VLM
 VMs
 VOS
 VQA
@@ -497,6 +507,7 @@ ainvoke
 aip
 airlume
 akka
+alisal
 alloydb
 antiword
 apikey
@@ -533,6 +544,7 @@ bigframes
 bigquery
 bitcoin
 blogs
+bluesky
 bml
 bnb
 booktitle
@@ -541,6 +553,7 @@ bpa
 bpd
 bqdf
 bqml
+breakroom
 btn
 byor
 carbonara
@@ -552,6 +565,7 @@ cctv
 cer
 cfbundle
 chatbots
+chipsets
 chromadb
 cicd
 cimg
@@ -706,6 +720,7 @@ glowin
 gms
 googler
 goooooood
+gozo
 gpg
 gpt
 gpu
@@ -791,6 +806,7 @@ lexer
 linalg
 linecolor
 linestyle
+linkedin
 linted
 linting
 llm
@@ -818,6 +834,7 @@ meme
 memes
 mesop
 metadatas
+metaverse
 mgrs
 millis
 miranda
@@ -882,10 +899,12 @@ openfda
 osm
 osx
 outro
+overwiew
 owlbot
 oxml
 pagemap
 paleo
+paligemma
 pancetta
 pantarba
 paracord
@@ -936,6 +955,7 @@ pymupdf
 pypdf
 pyplot
 pysftp
+pytorch
 pyvis
 qna
 qrel
@@ -954,6 +974,7 @@ rarians
 ratelimit
 rbc
 rbf
+reddit
 redef
 rembg
 repreve
@@ -1018,6 +1039,7 @@ stt
 stuffie
 subviews
 subword
+sunner
 supima
 svm
 sxs
@@ -1087,6 +1109,7 @@ webpages
 websites
 weightage
 welcom
+whatsapp
 wiffle
 wikipedia
 wil
@@ -1094,6 +1117,7 @@ windspeed
 winres
 wip
 wishlist
+womens
 workarounds
 wparam
 wscore
@@ -1107,6 +1131,7 @@ xcconfig
 xcodeproj
 xcscheme
 xctest
+xcvi
 xdg
 xlabel
 xmltodict

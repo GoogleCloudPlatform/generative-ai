@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
+    "@types/express": "^4.17.21",
     "@types/lodash": "^4.17.0",
     "@types/multer": "^1.4.11",
     "@types/pg": "^8.11.2",
