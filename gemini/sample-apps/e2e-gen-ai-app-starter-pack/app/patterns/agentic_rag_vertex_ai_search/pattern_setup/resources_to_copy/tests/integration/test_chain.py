@@ -13,11 +13,11 @@
 # limitations under the License.
 # pylint: disable=R0801,C0415
 from unittest.mock import patch
-import pytest
 
 from app.utils.output_types import OnToolEndEvent
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessageChunk, HumanMessage
+import pytest
 
 CHAIN_NAME = "Agentic RAG Vertex AI Search agent"
 

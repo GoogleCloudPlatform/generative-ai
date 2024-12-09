@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from langchain_core.prompts import (
-    PromptTemplate,
     ChatPromptTemplate,
     MessagesPlaceholder,
+    PromptTemplate,
 )
 
 format_docs = PromptTemplate.from_template(
