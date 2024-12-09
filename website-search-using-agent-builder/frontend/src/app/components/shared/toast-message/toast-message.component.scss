@@ -1,0 +1,21 @@
+.toast-content{
+    color: #FFFFFF;
+    font-family: 'Google Sans', sans-serif !important;
+}
+
+.close-toast{
+    margin-left: auto;
+    align-self: baseline;
+    cursor: pointer;
+}
+
+.red-toast {
+    background-color: #ED0C0C !important;
+}
+.green-toast {
+    background-color: #06865e !important;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__surface{
+    background-color: transparent !important;
+}
