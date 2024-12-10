@@ -3,6 +3,8 @@ ADMA
 AFX
 AGG
 AIP
+ALCS
+ALDS
 AMNOSH
 ANZ
 APAC
@@ -44,10 +46,12 @@ Bottas
 Boyz
 Breazeal
 Broadoak
+Brusdar
 Btn
 Buckleys
 Buffay
 CALIPSO
+CAMQAA
 CHECKOV
 CLA
 CLASSPATH
@@ -121,6 +125,7 @@ FILEOS
 FLX
 FMWK
 FPDF
+FREDDIE
 FTPS
 Fangming
 Federer
@@ -146,12 +151,15 @@ Gandalf
 Gatace
 GenTwo
 Gfm
+Giancarlo
 Gisting
+Gleyber
 Glickman
 Gmb
 GmbH
 Godzilla
 Googlers
+Graterol
 Guardiola
 Gundogan
 HBox
@@ -177,6 +185,7 @@ Hikaru
 Hisaki
 Hmmm
 Hogwarts
+Homesley
 Hossain
 Hubmann
 Hyperdisk
@@ -244,6 +253,7 @@ Ladhak
 LangGraph
 Lego
 Leung
+Leventer
 Llion
 Loghub
 Logrus
@@ -274,6 +284,7 @@ Milito
 Mirai
 Mitani
 Molaison
+Mookie
 Mosher
 Mvar
 NADPH
@@ -332,6 +343,7 @@ Photoshop
 Pistorius
 Pranav
 Priyanka
+Pzk
 QLo
 QPM
 Qwiklab
@@ -459,6 +471,7 @@ Vayots
 Vergadia
 Verilog
 Ves
+Vesia
 Vettel
 Vijay
 Virat
@@ -492,6 +505,7 @@ Zijin
 Zom
 Zscaler
 Zuercher
+Zuv
 aadd
 aaxis
 acall
@@ -866,6 +880,7 @@ nce
 ncols
 ndarray
 ndcg
+nec
 neering
 netif
 newaxis
@@ -1044,6 +1059,7 @@ svm
 sxs
 tabular
 tagline
+tastetest
 tavily
 tencel
 termcolor
