@@ -4,15 +4,6 @@ from google.cloud.bigquery import Client
 
 BIG_QUERY_DATASET= getenv("BIG_QUERY_DATASET")
 
-CHATS_TABLE = 'chats'
-CHATS_ID_COLUMN = "id"
-
-EMBEDDINGS_TABLE = "embeddings"
-EMBEDDINGS_ID_COLUMN = "id"
-EMBEDDINGS_TEXT_COLUMN = "text"
-EMBEDDINGS_INDEX_COLUMN = "index"
-
-
 class BigQueryRepository:
 
     def __init__(self):

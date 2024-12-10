@@ -58,4 +58,4 @@ class ResponseModel(BaseModel):
     totalSize: Optional[int]
 
 class CreateSearchRequest(BaseModel):
-    search: str
+    term: str

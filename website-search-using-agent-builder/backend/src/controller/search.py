@@ -3,7 +3,7 @@ from src.model.search import CreateSearchRequest, ResponseModel
 import requests
 
 router = APIRouter(
-    prefix="/api/searches",
+    prefix="/api/search",
     tags=["searches"],
     responses={404: {"description": "Not found"}},
 )
@@ -12,7 +12,8 @@ router = APIRouter(
 async def search(item: CreateSearchRequest):
     try:
         final_response = searchViaAgent(item)
-        final_response['search'] = item.search 
+        final_response['term'] = item.term 
+        print(final_response)
         return ResponseModel(**final_response) 
     except Exception as e: 
         print(f"Error during search: {e}") 
@@ -23,12 +24,12 @@ def searchViaAgent(item):
     api_url = "https://discoveryengine.googleapis.com/v1alpha/projects/318457139342/locations/global/collections/default_collection/engines/robin-search-app-2_1733237288232/servingConfigs/default_search:search"
     token = get_token()
     headers = {
-        'Authorization': f'Bearer {token}',
+        "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
     }
 
     data = {
-        "query": item.search,
+        "query": item.term,
         "pageSize": 10,
         "queryExpansionSpec": {"condition": "AUTO"},
         "spellCorrectionSpec": {"mode": "AUTO"},

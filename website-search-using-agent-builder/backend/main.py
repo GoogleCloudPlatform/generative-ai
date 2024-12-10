@@ -1,21 +1,19 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from src.controller.searches import router as search_router
-from src.controller.intents import router as intent_router
-from src.controller.models import router as model_router
+from src.controller.search import router as search_router
 from google.cloud import speech
 from os import getenv
 
 app = FastAPI()
 
 def configure_cors(app):
-    # url = getenv("FRONTEND_URL")
-    # if not url:
-    #     raise ValueError("FRONTEND_URL environment variable not set")
+    url = getenv("FRONTEND_URL")
+    if not url:
+        raise ValueError("FRONTEND_URL environment variable not set")
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=[url],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -61,5 +59,3 @@ async def audio_chat(audio_file: UploadFile = File(...)):
 configure_cors(app)
 
 app.include_router(search_router)
-app.include_router(intent_router)
-app.include_router(model_router)
