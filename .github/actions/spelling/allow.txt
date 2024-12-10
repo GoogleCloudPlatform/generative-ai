@@ -774,7 +774,9 @@ imagefont
 imageno
 imagetext
 imdb
+imread
 imshow
+imwrite
 inbox
 informati
 iostream
