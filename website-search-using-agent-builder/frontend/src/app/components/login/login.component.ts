@@ -3,8 +3,8 @@ import { Auth, signInWithPopup, GoogleAuthProvider } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/login/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ToastMessageComponent } from '../shared/toast-message/toast-message.component';
 import { environment } from 'src/environments/environment';
+import { ToastMessageComponent } from '../toast-message/toast-message.component';
 
 const HOME_ROUTE = '/'
 

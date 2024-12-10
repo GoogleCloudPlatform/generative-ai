@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SuggestionCardComponent } from './suggestion-card.component';
+import { ChatInputComponent } from './chat-input.component';
 
-describe('SuggestionCardComponent', () => {
-  let component: SuggestionCardComponent;
-  let fixture: ComponentFixture<SuggestionCardComponent>;
+describe('ChatInputComponent', () => {
+  let component: ChatInputComponent;
+  let fixture: ComponentFixture<ChatInputComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SuggestionCardComponent ]
+      declarations: [ ChatInputComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SuggestionCardComponent);
+    fixture = TestBed.createComponent(ChatInputComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
