@@ -7,13 +7,13 @@ import { Message } from '../models/messegeType.model';
 })
 export class BroadcastService {
   initialChatQuery = '';
-  chatQuery$: BehaviorSubject<Message>;
+  chatQuery$: BehaviorSubject<string>;
   
   constructor() { 
-    this.chatQuery$  = new BehaviorSubject<Message>({'body':'Ask me anything ?','type':'bot', shareable: false,});
+    this.chatQuery$  = new BehaviorSubject<string>('');
   }
 
-  nextChatQuery(chatQuery: Message) {
+  nextChatQuery(chatQuery: string) {
     this.chatQuery$.next(chatQuery);
   }
 }

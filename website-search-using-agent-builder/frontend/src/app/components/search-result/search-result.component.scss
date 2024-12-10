@@ -76,6 +76,8 @@
 
 .search-result {
     padding: 1%;
+    padding-top: 2%;
+    cursor: pointer;
 
     .title-container {
         display: flex;
@@ -84,10 +86,9 @@
         font-style: normal;
         font-weight: 500;
         font-size: 16px;
-        line-height: 24px;
+        line-height: 31px;
         color: #161A1D;
         display: flex;
-        gap: 10px;
     }
 
     .description-container {
@@ -99,11 +100,11 @@
         color: #161A1D;
         opacity: 0.8;
         padding: 2%;
-        padding-left: 0%;
+        padding-left: 22px;
     }
 
     .overview-button {
-
+        padding-left: 22px;
         button {
             font-family: 'Roboto';
             font-style: normal;

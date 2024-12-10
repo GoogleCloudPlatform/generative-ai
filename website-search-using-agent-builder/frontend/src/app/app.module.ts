@@ -5,7 +5,6 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { MainComponent } from './components/main/main.component';
-import { ChatComponent } from './components/main/chat/chat.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -20,7 +19,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ChatbarComponent } from './components/main/chat/chatbar/chatbar.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LoginComponent } from './components/login/login.component';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -48,6 +46,8 @@ import { SuggestionCardComponent } from './components/elements/suggestion-card/s
 import { MatSidenavModule } from '@angular/material/sidenav';
 import {NgIdleModule} from '@ng-idle/core';
 import {ClipboardModule} from '@angular/cdk/clipboard';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+
 
 import 'prismjs';
 import 'prismjs/components/prism-typescript.min.js';
@@ -68,8 +68,6 @@ import { DisplayDetailedResultComponent } from './components/display-detailed-re
     HeaderComponent,
     FooterComponent,
     MainComponent,
-    ChatComponent,
-    ChatbarComponent,
     LoginComponent,
     SuggestionCardComponent,
     ToastMessageComponent,
@@ -122,6 +120,7 @@ import { DisplayDetailedResultComponent } from './components/display-detailed-re
     NgIdleModule.forRoot(),
     ClipboardModule,
     MatStepperModule,
+    MatProgressBarModule
   ],
   providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
   bootstrap: [AppComponent]

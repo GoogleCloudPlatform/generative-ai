@@ -1,13 +1,9 @@
 export type CreateChatRequest = {
-    text: string,
+    search: string,
 }
 
-export type Chat = {
-    id: string,
-    question: string,
-    answer: string,
-    intent: string,
-    suggested_questions: string[],
+export type result = {
+    [key: string]: any
 }
 
 export type DialogQuestion = {

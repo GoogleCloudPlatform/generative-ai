@@ -14,16 +14,16 @@
 </div>
 <div class="overview-container padding-top">
     <div class="search-result-parent-container">
-        <div class="search-result" *ngFor="let result of serachResult">
+        <div class="search-result" *ngFor="let result of serachResult" (click)="openNewWindow(result?.document?.derivedStructData?.link)">
             <div class="title-container">
-                <mat-icon>{{result.icon}}</mat-icon>
-                {{result.title}}
+                <img src="{{result?.document?.derivedStructData?.pagemap?.cse_thumbnail[0]?.src}}" height="30" width="54"/>
+                {{result?.document?.derivedStructData?.title}}
             </div>
             <div class="description-container">
-                {{result.description}}
+                {{result?.document?.derivedStructData?.snippets[0]?.snippet}}
             </div>
             <div class="overview-button">
-                <button mat-button>View</button>
+                <button mat-button (click)="openNewWindow(result?.document?.derivedStructData?.link)">View</button>
             </div>
         </div>
     </div>

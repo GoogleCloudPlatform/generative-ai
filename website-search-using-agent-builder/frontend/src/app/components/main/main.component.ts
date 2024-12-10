@@ -99,12 +99,7 @@ export class MainComponent {
   }
 
   navigate() {
-    let userMessage: Message = {
-      body: this.chatQuery,
-      type: 'user',
-      shareable: false,
-    }
-    this.chatQuery && this.broadcastService.nextChatQuery(userMessage);
+    if(this.chatQuery) this.broadcastService.nextChatQuery(this.chatQuery);
     this.router.navigateByUrl('/' + this.selectedType);
   };
 
@@ -122,13 +117,7 @@ export class MainComponent {
   }
 
   assignQToChatQuery(question: string) {
-    this.chatQuery = question;
-    let userMessage: Message = {
-      body: this.chatQuery,
-      type: 'user',
-      shareable: false,
-    }
-    this.chatQuery && this.broadcastService.nextChatQuery(userMessage);
+    if(this.chatQuery) this.broadcastService.nextChatQuery(this.chatQuery);
     this.router.navigateByUrl('/' + this.selectedType);
   }
 
