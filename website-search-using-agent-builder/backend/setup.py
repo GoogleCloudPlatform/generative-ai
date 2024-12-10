@@ -1,4 +1,4 @@
-from scripts.big_query_setup import create_dataset, create_table
+from scripts.big_query_setup import create_dataset
 
 BIG_QUERY_DATASET=""
 
