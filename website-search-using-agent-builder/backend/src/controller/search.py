@@ -13,7 +13,6 @@ async def search(item: CreateSearchRequest):
     try:
         final_response = searchViaAgent(item)
         final_response['term'] = item.term 
-        print(final_response)
         return ResponseModel(**final_response) 
     except Exception as e: 
         print(f"Error during search: {e}") 
