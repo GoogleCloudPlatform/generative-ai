@@ -59,3 +59,10 @@ class ResponseModel(BaseModel):
 
 class CreateSearchRequest(BaseModel):
     search: str
+
+class SearchRequest(BaseModel):
+    search: str
+    project_id: Optional[str]
+    location: Optional[str]
+    engine_id: Optional[str]
+    serving_config: Optional[str]
