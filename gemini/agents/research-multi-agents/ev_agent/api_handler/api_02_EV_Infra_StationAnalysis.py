@@ -1,20 +1,18 @@
-#@title Helper Functions
+# @title Helper Functions
 
-from typing import Optional, Dict, Any, List, Tuple, Union
-from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
-from enum import Enum
-import json
-from math import sin, cos, sqrt, atan2, radians
+from math import atan2, cos, radians, sin, sqrt
+from typing import Any, Dict, List, Optional, Union
+
+from pydantic import BaseModel
 import requests
-from rich import print as rich_print
-from rich.markdown import Markdown as rich_Markdown
 
 # Constants
 DEFAULT_TIMEOUT = 30
 DEFAULT_RADIUS = 25.0
 DEFAULT_STATIONS_PER_PAGE = 200
 EARTH_RADIUS_MILES = 3956
+
 
 # Data Models
 class ChargingSpeed(BaseModel):
@@ -23,16 +21,19 @@ class ChargingSpeed(BaseModel):
     max_power: float = 0.0
     percentage: float = 0.0
 
+
 class ConnectorDistribution(BaseModel):
     connector_type: str
     count: int
     percentage: float
     ports_per_station: float
 
+
 class NetworkInfo(BaseModel):
     name: str
     station_count: int
     percentage: float
+
 
 class FacilityTypeCount(BaseModel):
     parking_garage: int = 0
@@ -40,54 +41,57 @@ class FacilityTypeCount(BaseModel):
     workplace: int = 0
     other: int = 0
 
+
 class GeographicAnalysis(BaseModel):
     total_stations_per_square_mile: float
     stations_by_facility_type: FacilityTypeCount
-    highway_proximity: Dict[str, int] = {
-        "near_highway": 0,
-        "city_center": 0
-    }
+    highway_proximity: Dict[str, int] = {"near_highway": 0, "city_center": 0}
+
 
 class ChargingCapabilities(BaseModel):
     by_type: Dict[str, ChargingSpeed]
     connector_distribution: List[ConnectorDistribution]
     total_ports: int = 0
 
+
 class AccessibilityMetrics(BaseModel):
     access_type: Dict[str, Dict[str, Union[int, float]]] = {
         "24_7_access": {"count": 0, "percentage": 0.0},
         "restricted": {"count": 0, "percentage": 0.0},
-        "public": {"count": 0, "percentage": 0.0}
+        "public": {"count": 0, "percentage": 0.0},
     }
     payment_methods: Dict[str, Dict[str, Union[int, float]]] = {
         "credit_card": {"count": 0, "percentage": 0.0},
         "mobile_pay": {"count": 0, "percentage": 0.0},
-        "network_card": {"count": 0, "percentage": 0.0}
+        "network_card": {"count": 0, "percentage": 0.0},
     }
     operational_status: Dict[str, Dict[str, Union[int, float]]] = {
         "operational": {"count": 0, "percentage": 0.0},
-        "non_operational": {"count": 0, "percentage": 0.0}
+        "non_operational": {"count": 0, "percentage": 0.0},
     }
+
 
 class NetworkAnalysis(BaseModel):
     networks: List[NetworkInfo]
     pricing_types: Dict[str, Dict[str, Union[int, float]]] = {
         "free": {"count": 0, "percentage": 0.0},
         "paid": {"count": 0, "percentage": 0.0},
-        "variable": {"count": 0, "percentage": 0.0}
+        "variable": {"count": 0, "percentage": 0.0},
     }
+
 
 class StationAge(BaseModel):
     age_distribution: Dict[str, Dict[str, Union[int, float]]] = {
         "less_than_1_year": {"count": 0, "percentage": 0.0},
         "1_to_3_years": {"count": 0, "percentage": 0.0},
-        "more_than_3_years": {"count": 0, "percentage": 0.0}
+        "more_than_3_years": {"count": 0, "percentage": 0.0},
     }
     last_verified: Dict[str, Dict[str, Union[int, float]]] = {
         "last_30_days": {"count": 0, "percentage": 0.0},
         "last_90_days": {"count": 0, "percentage": 0.0},
-        "older": {"count": 0, "percentage": 0.0}
+        "older": {"count": 0, "percentage": 0.0},
     }
+
 
 class StationAnalysis(BaseModel):
     metadata: Dict[str, Any]
@@ -97,31 +101,33 @@ class StationAnalysis(BaseModel):
     network_analysis: NetworkAnalysis
     station_age: StationAge
 
+
 def analyze_facility_types(stations: List[Dict]) -> FacilityTypeCount:
     """Analyze facility types from station data"""
     counts = FacilityTypeCount()
 
     for station in stations:
         # Handle potential None values properly
-        facility_type = (station.get('facility_type') or '').lower()
+        facility_type = (station.get("facility_type") or "").lower()
 
-        if 'parking' in facility_type or 'garage' in facility_type:
+        if "parking" in facility_type or "garage" in facility_type:
             counts.parking_garage += 1
-        elif 'retail' in facility_type or 'shopping' in facility_type:
+        elif "retail" in facility_type or "shopping" in facility_type:
             counts.retail += 1
-        elif 'workplace' in facility_type or 'office' in facility_type:
+        elif "workplace" in facility_type or "office" in facility_type:
             counts.workplace += 1
         else:
             counts.other += 1
 
     return counts
 
+
 def analyze_charging_capabilities(stations: List[Dict]) -> ChargingCapabilities:
     """Analyze charging capabilities from station data"""
     speeds = {
         "dc_fast": ChargingSpeed(),
         "level2": ChargingSpeed(),
-        "level1": ChargingSpeed()
+        "level1": ChargingSpeed(),
     }
 
     connector_types = {}
@@ -133,14 +139,14 @@ def analyze_charging_capabilities(stations: List[Dict]) -> ChargingCapabilities:
         l2_ports = int(station.get("ev_level2_evse_num") or 0)
         l1_ports = int(station.get("ev_level1_evse_num") or 0)
 
-        total_ports += (dc_ports + l2_ports + l1_ports)
+        total_ports += dc_ports + l2_ports + l1_ports
 
         if dc_ports:
             speeds["dc_fast"].count += 1
             speeds["dc_fast"].total_ports += dc_ports
             speeds["dc_fast"].max_power = max(
                 speeds["dc_fast"].max_power,
-                float(station.get("ev_power_level_dc_max") or 0)
+                float(station.get("ev_power_level_dc_max") or 0),
             )
 
         if l2_ports:
@@ -148,7 +154,7 @@ def analyze_charging_capabilities(stations: List[Dict]) -> ChargingCapabilities:
             speeds["level2"].total_ports += l2_ports
             speeds["level2"].max_power = max(
                 speeds["level2"].max_power,
-                float(station.get("ev_power_level_l2_max") or 0)
+                float(station.get("ev_power_level_l2_max") or 0),
             )
 
         if l1_ports:
@@ -156,7 +162,7 @@ def analyze_charging_capabilities(stations: List[Dict]) -> ChargingCapabilities:
             speeds["level1"].total_ports += l1_ports
             speeds["level1"].max_power = max(
                 speeds["level1"].max_power,
-                float(station.get("ev_power_level_l1_max") or 0)
+                float(station.get("ev_power_level_l1_max") or 0),
             )
 
         # Analyze connector types
@@ -168,15 +174,21 @@ def analyze_charging_capabilities(stations: List[Dict]) -> ChargingCapabilities:
     # Calculate percentages
     total_stations = len(stations)
     for speed in speeds.values():
-        speed.percentage = round((speed.count / total_stations * 100), 2) if total_stations > 0 else 0
+        speed.percentage = (
+            round((speed.count / total_stations * 100), 2) if total_stations > 0 else 0
+        )
 
     # Create connector distribution list
     connector_distribution = [
         ConnectorDistribution(
             connector_type=c_type,
             count=count,
-            percentage=round((count / total_stations * 100), 2) if total_stations > 0 else 0,
-            ports_per_station=round(count / total_stations, 2) if total_stations > 0 else 0
+            percentage=(
+                round((count / total_stations * 100), 2) if total_stations > 0 else 0
+            ),
+            ports_per_station=(
+                round(count / total_stations, 2) if total_stations > 0 else 0
+            ),
         )
         for c_type, count in connector_types.items()
     ]
@@ -184,8 +196,9 @@ def analyze_charging_capabilities(stations: List[Dict]) -> ChargingCapabilities:
     return ChargingCapabilities(
         by_type=speeds,
         connector_distribution=connector_distribution,
-        total_ports=total_ports
+        total_ports=total_ports,
     )
+
 
 def analyze_accessibility(stations: List[Dict]) -> AccessibilityMetrics:
     """Analyze accessibility metrics from station data"""
@@ -221,7 +234,6 @@ def analyze_accessibility(stations: List[Dict]) -> AccessibilityMetrics:
             # For non-networked stations that mention payment
             metrics.payment_methods["credit_card"]["count"] += 1
 
-
         # Operational status
         if station.get("status_code") == "E":
             metrics.operational_status["operational"]["count"] += 1
@@ -230,14 +242,22 @@ def analyze_accessibility(stations: List[Dict]) -> AccessibilityMetrics:
 
     # Calculate percentages
     if total_stations > 0:
-        for category in [metrics.access_type, metrics.payment_methods, metrics.operational_status]:
+        for category in [
+            metrics.access_type,
+            metrics.payment_methods,
+            metrics.operational_status,
+        ]:
             for metric in category.values():
-                metric["percentage"] = round((metric["count"] / total_stations * 100), 2)
+                metric["percentage"] = round(
+                    (metric["count"] / total_stations * 100), 2
+                )
 
     return metrics
 
 
-def process_station_data(data: Dict, city_area: float, debug: bool = False) -> StationAnalysis:
+def process_station_data(
+    data: Dict, city_area: float, debug: bool = False
+) -> StationAnalysis:
     """Process station data with enhanced metrics"""
     try:
         stations = data["stations"]
@@ -251,12 +271,20 @@ def process_station_data(data: Dict, city_area: float, debug: bool = False) -> S
         # Geographic Analysis
         facility_counts = analyze_facility_types(stations)
         geographic = GeographicAnalysis(
-            total_stations_per_square_mile=round(total_stations / city_area, 2) if city_area > 0 else 0,
+            total_stations_per_square_mile=(
+                round(total_stations / city_area, 2) if city_area > 0 else 0
+            ),
             stations_by_facility_type=facility_counts,
             highway_proximity={
-                "near_highway": sum(1 for s in stations if s.get("intersection_directions")),
-                "city_center": sum(1 for s in stations if "downtown" in (s.get("city_center", "") or "").lower())
-            }
+                "near_highway": sum(
+                    1 for s in stations if s.get("intersection_directions")
+                ),
+                "city_center": sum(
+                    1
+                    for s in stations
+                    if "downtown" in (s.get("city_center", "") or "").lower()
+                ),
+            },
         )
 
         # Charging Capabilities
@@ -287,24 +315,27 @@ def process_station_data(data: Dict, city_area: float, debug: bool = False) -> S
             NetworkInfo(
                 name=name,
                 station_count=count,
-                percentage=round((count/total_stations*100), 2)
+                percentage=round((count / total_stations * 100), 2),
             )
-            for name, count in sorted(networks.items(), key=lambda x: x[1], reverse=True)
+            for name, count in sorted(
+                networks.items(), key=lambda x: x[1], reverse=True
+            )
         ]
 
         network_analysis = NetworkAnalysis(
             networks=network_info,
             pricing_types={
-                k: {
-                    "count": v,
-                    "percentage": round((v/total_stations*100), 2)
-                }
+                k: {"count": v, "percentage": round((v / total_stations * 100), 2)}
                 for k, v in pricing_types.items()
-            }
+            },
         )
 
         now = datetime.now()
-        age_distribution = {"less_than_1_year": 0, "1_to_3_years": 0, "more_than_3_years": 0}
+        age_distribution = {
+            "less_than_1_year": 0,
+            "1_to_3_years": 0,
+            "more_than_3_years": 0,
+        }
         last_verified = {"last_30_days": 0, "last_90_days": 0, "older": 0}
 
         for station in stations:
@@ -326,7 +357,9 @@ def process_station_data(data: Dict, city_area: float, debug: bool = False) -> S
                     age_distribution["more_than_3_years"] += 1
 
             # Last verified - Fixed to handle date_last_confirmed field
-            date_last_verified = station.get("date_last_confirmed")  # Changed from date_last_verified
+            date_last_verified = station.get(
+                "date_last_confirmed"
+            )  # Changed from date_last_verified
             if date_last_verified:
                 try:
                     verified_date = datetime.strptime(date_last_verified, "%Y-%m-%d")
@@ -339,26 +372,22 @@ def process_station_data(data: Dict, city_area: float, debug: bool = False) -> S
                         last_verified["older"] += 1
                 except:
                     if debug:
-                        print(f"Debug: Could not parse verification date: {date_last_verified}")
+                        print(
+                            f"Debug: Could not parse verification date: {date_last_verified}"
+                        )
                     last_verified["older"] += 1
             else:
                 last_verified["older"] += 1
 
         station_age = StationAge(
             age_distribution={
-                k: {
-                    "count": v,
-                    "percentage": round((v/total_stations*100), 2)
-                }
+                k: {"count": v, "percentage": round((v / total_stations * 100), 2)}
                 for k, v in age_distribution.items()
             },
             last_verified={
-                k: {
-                    "count": v,
-                    "percentage": round((v/total_stations*100), 2)
-                }
+                k: {"count": v, "percentage": round((v / total_stations * 100), 2)}
                 for k, v in last_verified.items()
-            }
+            },
         )
 
         return StationAnalysis(
@@ -371,7 +400,7 @@ def process_station_data(data: Dict, city_area: float, debug: bool = False) -> S
             charging_capabilities=charging,
             accessibility=accessibility,
             network_analysis=network_analysis,
-            station_age=station_age
+            station_age=station_age,
         )
 
     except Exception as e:
@@ -379,7 +408,10 @@ def process_station_data(data: Dict, city_area: float, debug: bool = False) -> S
             print(f"Debug: Error processing station data: {str(e)}")
         raise
 
-def get_city_coordinates(city: str, state: str, debug: bool = False) -> Dict[str, float]:
+
+def get_city_coordinates(
+    city: str, state: str, debug: bool = False
+) -> Dict[str, float]:
     """Get city coordinates and metadata"""
     try:
         url = "https://nominatim.openstreetmap.org/search"
@@ -388,16 +420,16 @@ def get_city_coordinates(city: str, state: str, debug: bool = False) -> Dict[str
             "state": state,
             "country": "USA",
             "format": "json",
-            "limit": 1
+            "limit": 1,
         }
-        headers = {
-            "User-Agent": "EVChargingStationFinder/1.0"
-        }
+        headers = {"User-Agent": "EVChargingStationFinder/1.0"}
 
         if debug:
             print(f"\nDebug: Getting coordinates for {city}, {state}")
 
-        response = requests.get(url, params=params, headers=headers, timeout=DEFAULT_TIMEOUT)
+        response = requests.get(
+            url, params=params, headers=headers, timeout=DEFAULT_TIMEOUT
+        )
         response.raise_for_status()
 
         data = response.json()
@@ -420,7 +452,7 @@ def get_city_coordinates(city: str, state: str, debug: bool = False) -> Dict[str
             "lon": float(location["lon"]),
             "city_area": area if area > 0 else 100.0,
             "bbox": bbox,
-            "display_name": location.get("display_name", f"{city}, {state}")
+            "display_name": location.get("display_name", f"{city}, {state}"),
         }
 
     except Exception as e:
@@ -428,10 +460,17 @@ def get_city_coordinates(city: str, state: str, debug: bool = False) -> Dict[str
             print(f"Debug: Error getting coordinates: {str(e)}")
         raise
 
-def get_station_data_filtered(lat: float, lon: float, radius: float, state: str,
-                            api_key: str, max_stations: Optional[int] = None,
-                            stations_per_page: int = DEFAULT_STATIONS_PER_PAGE,
-                            debug: bool = False) -> Dict:
+
+def get_station_data_filtered(
+    lat: float,
+    lon: float,
+    radius: float,
+    state: str,
+    api_key: str,
+    max_stations: Optional[int] = None,
+    stations_per_page: int = DEFAULT_STATIONS_PER_PAGE,
+    debug: bool = False,
+) -> Dict:
     """Get charging station data with proper location filtering"""
     url = "https://developer.nrel.gov/api/alt-fuel-stations/v1.json"
 
@@ -445,7 +484,7 @@ def get_station_data_filtered(lat: float, lon: float, radius: float, state: str,
         "country": "US",
         "status": "E",
         "access": "public",
-        "limit": stations_per_page
+        "limit": stations_per_page,
     }
 
     try:
@@ -453,13 +492,13 @@ def get_station_data_filtered(lat: float, lon: float, radius: float, state: str,
         response.raise_for_status()
         data = response.json()
 
-        total_available = data.get('total_results', 0)
+        total_available = data.get("total_results", 0)
         if debug:
             print(f"Debug: Found {total_available} stations in {state}")
 
         # Validate and collect stations
         stations = []
-        for station in data.get('fuel_stations', []):
+        for station in data.get("fuel_stations", []):
             if validate_station_location(station, lat, lon, radius):
                 stations.append(station)
 
@@ -470,12 +509,14 @@ def get_station_data_filtered(lat: float, lon: float, radius: float, state: str,
         if max_stations:
             stations = stations[:max_stations]
             if debug:
-                print(f"Debug: Limited to {len(stations)} stations due to max_stations setting")
+                print(
+                    f"Debug: Limited to {len(stations)} stations due to max_stations setting"
+                )
 
         return {
             "stations": stations,
             "total_available": len(stations),
-            "stations_processed": len(stations)
+            "stations_processed": len(stations),
         }
 
     except Exception as e:
@@ -483,17 +524,20 @@ def get_station_data_filtered(lat: float, lon: float, radius: float, state: str,
             print(f"Debug: Error fetching station data: {str(e)}")
         raise
 
-def validate_station_location(station: Dict, center_lat: float, center_lon: float,
-                            radius_miles: float) -> bool:
+
+def validate_station_location(
+    station: Dict, center_lat: float, center_lon: float, radius_miles: float
+) -> bool:
     """Validate if a station is within the specified radius"""
-    station_lat = station.get('latitude')
-    station_lon = station.get('longitude')
+    station_lat = station.get("latitude")
+    station_lon = station.get("longitude")
 
     if not station_lat or not station_lon:
         return False
 
     distance = calculate_distance(center_lat, center_lon, station_lat, station_lon)
     return distance <= radius_miles
+
 
 def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Calculate distance between two points in miles using Haversine formula"""
@@ -503,10 +547,11 @@ def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     dlat = lat2 - lat1
     dlon = lon2 - lon1
 
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
     return EARTH_RADIUS_MILES * c
+
 
 def get_charging_stations(config: Dict) -> Dict:
     """Main function to get and analyze charging station data"""
@@ -535,23 +580,22 @@ def get_charging_stations(config: Dict) -> Dict:
             api_key,
             config.get("max_total_stations"),
             config.get("stations_per_page", DEFAULT_STATIONS_PER_PAGE),
-            debug
+            debug,
         )
 
         # Process and analyze the data
         result = process_station_data(station_data, coords["city_area"], debug)
 
         # Add location metadata
-        result.metadata.update({
-            "city": config["city"],
-            "state": config["state"],
-            "radius_miles": radius_miles,
-            "coordinates": {
-                "latitude": coords["lat"],
-                "longitude": coords["lon"]
-            },
-            "display_name": coords.get("display_name")
-        })
+        result.metadata.update(
+            {
+                "city": config["city"],
+                "state": config["state"],
+                "radius_miles": radius_miles,
+                "coordinates": {"latitude": coords["lat"], "longitude": coords["lon"]},
+                "display_name": coords.get("display_name"),
+            }
+        )
 
         return result
 
@@ -560,10 +604,10 @@ def get_charging_stations(config: Dict) -> Dict:
             print(f"Error: {str(e)}")
         raise
 
+
 class LocationError(Exception):
     """Custom exception for location-related errors"""
-    pass
+
 
 class ChargingError(Exception):
     """Custom exception for charging station-related errors"""
-    pass

@@ -1,16 +1,14 @@
 # @title Helper Functions
 
-from enum import Enum
-from typing import Optional, Dict, Any, Union
-from pydantic import BaseModel
-from datetime import datetime
-from termcolor import colored
-from rich import print as rich_print
-from rich.markdown import Markdown as rich_Markdown
+from typing import Any, Dict, Optional, Union
+
 from ev_agent.agent_handler.agent_02_PlanningAgent import *
 from ev_agent.agent_handler.agent_04_DataGatherAgent import *
 from ev_agent.agent_handler.agent_05_ReportAgent import *
 from ev_agent.agent_handler.agent_06_VisualizeAgent import *
+from pydantic import BaseModel
+from rich import print as rich_print
+from termcolor import colored
 
 
 class ExecutionAgent(BaseModel):
