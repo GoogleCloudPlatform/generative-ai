@@ -13,58 +13,32 @@ router = APIRouter(
 @router.get("")
 async def get_agent_configs():
     service = AgentConfigService()
-    intents = service.get_all()
-
-    for intent in intents:
-        if not intent.is_active():
-            index_endpoint_service = IndexEndpointService()
-            if index_endpoint_service.endpoint_has_deployed_indexes(intent.get_standard_name()):
-                intent.status = "5"
-                service.update(intent.name, intent)
-
-    return intents
+    agent_configs = service.get_all()
+    return agent_configs
 
 @router.post("")
-async def create_intent(intent: CreateIntentRequest):
-    intent_service = IntentService()
-    index_endpoint_service = IndexEndpointService()
-    task_repository = TaskRepository()
-
-    saved_intent = None
-    index_endpoint = None
+async def create_agent_config(agent_config: CreateAgentConfigRequest):
+    agent_config_service = AgentConfigService()
+    saved_agent_config = None
     try:
-        saved_intent = intent_service.create(intent.to_intent())
-        if intent.gcp_bucket:
-            index_endpoint = index_endpoint_service.create_endpoint(saved_intent.get_standard_name())
-            task_repository.create(
-                IntentCreateEvent(
-                    intent_name=intent.name,
-                    index_endpoint_resource=index_endpoint.resource_name,
-                ),
-            )
+        saved_agent_config = agent_config_service.create(agent_config.to_agent_config())
     except BadRequest as e:
         raise HTTPException(status_code=400, detail=e.detail)
     except Exception as e:
         print(e)
-        if saved_intent:
-            intent_service.delete(saved_intent.name)
-        if index_endpoint:
-            index_endpoint_service.delete_endpoint(index_endpoint)
+        if saved_agent_config:
+            agent_config_service.delete(saved_agent_config.name)
         
-    return saved_intent
+    return saved_agent_config
 
-@router.delete("/{intent_name}")
-async def delete_intent(intent_name: str):
-    service = IntentService()
-    intent = service.get(intent_name)
-    if intent.gcp_bucket:
-        index_endpoint_service = IndexEndpointService()
-        endpoint = index_endpoint_service.get_endpoint(intent.get_standard_name())
-        index_endpoint_service.delete_endpoint(endpoint)
-    service.delete(intent_name)
+@router.delete("/{agent_config_name}")
+async def delete_agent_config(agent_config_name: str):
+    service = AgentConfigService()
+    agent_config = service.get(agent_config_name)
+    service.delete(agent_config)
     return
 
-@router.put("/{intent_name}")
-async def update_intent(intent_name: str, intent: Intent):
-    service = IntentService()
-    return service.update(intent_name, intent)
+@router.put("/{agent_config_name}")
+async def update_agent_config(agent_config_name: str, agent_config: AgentConfig):
+    service = AgentConfigService()
+    return service.update(agent_config_name, agent_config)

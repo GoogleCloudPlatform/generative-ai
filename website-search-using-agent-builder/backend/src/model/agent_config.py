@@ -47,7 +47,7 @@ class CreateAgentConfigRequest(BaseModel):
             "url": self.url,
         }
     
-    def to_intent(self) -> AgentConfig:
+    def to_agent_config(self) -> AgentConfig:
         return AgentConfig(
             name=self.name,
             url=self.url,
