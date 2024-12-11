@@ -3,6 +3,9 @@ ADMA
 AFX
 AGG
 AIP
+AIphone
+ALCS
+ALDS
 AMNOSH
 ANZ
 APAC
@@ -16,6 +19,7 @@ Akihiro
 Akkaoui
 Aktu
 Aniston
+Aphone
 Arborio
 Arepa
 Arjen
@@ -44,10 +48,12 @@ Bottas
 Boyz
 Breazeal
 Broadoak
+Brusdar
 Btn
 Buckleys
 Buffay
 CALIPSO
+CAMQAA
 CHECKOV
 CLA
 CLASSPATH
@@ -71,6 +77,7 @@ Codey
 Codicote
 Colab
 Colm
+Connectez
 Coursera
 Cowabunga
 Crossbody
@@ -121,6 +128,7 @@ FILEOS
 FLX
 FMWK
 FPDF
+FREDDIE
 FTPS
 Fangming
 Federer
@@ -146,12 +154,15 @@ Gandalf
 Gatace
 GenTwo
 Gfm
+Giancarlo
 Gisting
+Gleyber
 Glickman
 Gmb
 GmbH
 Godzilla
 Googlers
+Graterol
 Guardiola
 Gundogan
 HBox
@@ -177,6 +188,7 @@ Hikaru
 Hisaki
 Hmmm
 Hogwarts
+Homesley
 Hossain
 Hubmann
 Hyperdisk
@@ -230,6 +242,7 @@ Kubeflow
 Kudrow
 Kvyat
 Kylian
+L'avenir
 LCEL
 LLMs
 LMPA
@@ -244,6 +257,7 @@ Ladhak
 LangGraph
 Lego
 Leung
+Leventer
 Llion
 Loghub
 Logrus
@@ -274,6 +288,7 @@ Milito
 Mirai
 Mitani
 Molaison
+Mookie
 Mosher
 Mvar
 NADPH
@@ -332,6 +347,8 @@ Photoshop
 Pistorius
 Pranav
 Priyanka
+Pré
+Pzk
 QLo
 QPM
 Qwiklab
@@ -415,8 +432,10 @@ TPUs
 TSLA
 TSMC
 TSNE
+TTFT
 Tadao
 Tafel
+Takeaways
 Tbk
 Tbl
 Tencent
@@ -459,6 +478,7 @@ Vayots
 Vergadia
 Verilog
 Ves
+Vesia
 Vettel
 Vijay
 Virat
@@ -492,6 +512,7 @@ Zijin
 Zom
 Zscaler
 Zuercher
+Zuv
 aadd
 aaxis
 acall
@@ -503,6 +524,7 @@ afrom
 agentic
 ainit
 ainvoke
+aio
 aip
 airlume
 akka
@@ -523,6 +545,7 @@ arguana
 arun
 arxiv
 astype
+aujourd'hui
 autoflake
 autogen
 automerge
@@ -530,6 +553,7 @@ automl
 autoptr
 autorater
 autosxs
+avec
 aworkflow
 backticks
 bagchi
@@ -556,6 +580,7 @@ breakroom
 btn
 byor
 carbonara
+cashify
 catus
 caudatus
 caxis
@@ -564,6 +589,7 @@ cctv
 cer
 cfbundle
 chatbots
+chipset
 chipsets
 chromadb
 cicd
@@ -667,6 +693,7 @@ fea
 fect
 fewshot
 ffi
+fibonacci
 figsize
 fillmode
 fillna
@@ -678,6 +705,7 @@ floormat
 fmeasure
 fontdict
 footwell
+forbes
 forno
 fos
 freedraw
@@ -690,6 +718,7 @@ fulltext
 fullurl
 functiona
 funtion
+futur
 gapic
 gauff
 gboolean
@@ -760,7 +789,9 @@ imagefont
 imageno
 imagetext
 imdb
+imread
 imshow
+imwrite
 inbox
 informati
 iostream
@@ -793,6 +824,7 @@ kfp
 kickstart
 kotlin
 kpi
+l'harmonie
 lakecolor
 landcolor
 langchain
@@ -822,6 +854,7 @@ lycra
 magika
 mahut
 makeover
+manquez
 mapbox
 maskmode
 mavenrc
@@ -835,6 +868,7 @@ mesop
 metadatas
 metaverse
 mgrs
+mic
 millis
 miranda
 mmarco
@@ -866,6 +900,7 @@ nce
 ncols
 ndarray
 ndcg
+nec
 neering
 netif
 newaxis
@@ -908,6 +943,7 @@ pancetta
 pantarba
 paracord
 parcoords
+parfaite
 passwort
 pastiched
 payslip
@@ -1044,6 +1080,7 @@ svm
 sxs
 tabular
 tagline
+tastetest
 tavily
 tencel
 termcolor
@@ -1077,6 +1114,7 @@ tures
 typehints
 ubuntu
 uids
+ultrawide
 undst
 unigram
 unrtf
@@ -1096,6 +1134,9 @@ vectordb
 vertexai
 vesselin
 vnc
+voiceover
+vos
+votre
 vtotal
 vulnz
 waterjet
@@ -1103,6 +1144,7 @@ wcontext
 wcslen
 wdir
 weaviate
+webcam
 webclient
 webpage
 webpages
@@ -1143,6 +1185,7 @@ yanchor
 yaxes
 yaxis
 ylabel
+yougov
 youtube
 yref
 ytd
