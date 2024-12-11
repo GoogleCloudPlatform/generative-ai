@@ -633,6 +633,7 @@ ctd
 cupertino
 cva
 cycleway
+cycleways
 cygpath
 darkgrid
 dask
