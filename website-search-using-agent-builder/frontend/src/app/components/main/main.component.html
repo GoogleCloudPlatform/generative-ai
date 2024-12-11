@@ -8,11 +8,23 @@
         <div class="helper-container">How can I help you today?</div>
       </div>
     </div>
+</div>
 
-    <div class="chat-footer-outer">
-      <app-chat-input (emitSearch)="searchTerm($event)"></app-chat-input>
+<div class="chat-footer-outer">
+  <div class="chat-footer">
+    <div class="chat-textarea">
+      <mat-chip-grid class="intent-chip-textarea category-chip"
+        style="width: 100%;" #chipGrid aria-label="Enter intent">
+        <input [matChipInputFor]="chipGrid"
+          placeholder="Ask your question here"
+          [(ngModel)]="chatQuery" 
+          (keydown.enter)="navigate()" />
+      </mat-chip-grid>
     </div>
-    <div class="search-results-outer"  *ngIf="this.showResults">
-      <app-search-results [searchResults]="searchResults"></app-search-results>
+    <div class="micIcon">
+      <button mat-icon-button (click)="navigate()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
   </div>
 </div>

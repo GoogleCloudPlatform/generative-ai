@@ -4,6 +4,21 @@
         <div class="left-heading" [matTooltip]="'Home'">
             <span class="logo-text gradient-text">{{headerTitle}}</span>
         </div>
+        <div class="chat-footer" *ngIf="showSearchhBox">
+          <div class="chat-textarea">
+            <mat-chip-grid class="intent-chip-textarea"
+              style="width: 100%;" #chipGrid aria-label="Enter intent">
+              <input [matChipInputFor]="chipGrid"
+                placeholder="Ask your question here"
+                [(ngModel)]="chatQuery" (keydown.enter)="searchQuery()" />
+            </mat-chip-grid>
+          </div>
+          <div class="micIcon">
+            <button mat-icon-button (click)="searchQuery()">
+              <mat-icon>send</mat-icon>
+            </button>
+          </div>
+        </div>
         <div class="right-menu-items">
             <div *ngIf="authService.isUserLoggedIn()" class="profile-container" [matMenuTriggerFor]="userAccountMenu">
                 <div class="circle" *ngIf="_UserService.getUserDetails().photoURL && requiredLogin === 'True'"><img referrerpolicy="no-referrer"

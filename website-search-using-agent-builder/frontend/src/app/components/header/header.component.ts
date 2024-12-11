@@ -4,7 +4,9 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { UserService } from 'src/app/services/user/user.service';
 import { AuthService } from '../../services/login/auth.service';
 import { environment } from 'src/environments/environment';
-
+import { Router, NavigationEnd, Event as NavigationEvent } from '@angular/router';
+import {firstValueFrom} from 'rxjs';
+import { SearchService } from 'src/app/services/search.service';
 
 const GOOGLE_CLOUD_ICON =
   `<svg width="694px" height="558px" viewBox="0 0 694 558" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -28,17 +30,52 @@ export class HeaderComponent {
   requiredLogin: string = environment.requiredLogin;
 
   showLoading = false;
+  chatQuery = '';
+  isRecording = false;
+  transcribedText = '';
+  mediaRecorder: MediaRecorder;
+  audioChunks: Blob[] = [];
+  showSearchhBox = false; 
 
   constructor(iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
     public _UserService: UserService,
     public authService: AuthService,
+    private router: Router,
+    private searchService: SearchService,
   ) {
     iconRegistry.addSvgIconLiteral('google-cloud-icon', sanitizer.bypassSecurityTrustHtml(GOOGLE_CLOUD_ICON));
+    this.router.events.subscribe(async (event: NavigationEvent) => {
+      if(event instanceof NavigationEnd){
+        if(event.url.includes('result'))
+          {
+            this.chatQuery = await firstValueFrom(this.searchService.chatQuery$);
+            this.showSearchhBox = true;
+          }else {
+            this.showSearchhBox = false;
+          }
+      }
+    });
     this._UserService.loadingSubject.subscribe((loading)=>{
       this.showLoading = loading;
     })
   }
+
+  startRecording() {
+    this.isRecording = true;
+    this.audioChunks = [];
+    this.mediaRecorder.start();
+  }
+
+  stopRecording() {
+    this.isRecording = false;
+    this.mediaRecorder.stop();
+  }
+
+  searchQuery(){
+    if(this.chatQuery) this.searchService.nextChatQuery(this.chatQuery);
+  }
+
 
   logout() {
     this.authService.logout();

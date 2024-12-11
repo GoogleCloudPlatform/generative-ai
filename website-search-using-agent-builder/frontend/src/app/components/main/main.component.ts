@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { UserService } from 'src/app/services/user/user.service';
 import { SearchService } from 'src/app/services/search.service';
 import { SearchResponse } from 'src/app/models/search.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -13,20 +14,20 @@ export class MainComponent {
   showResults: boolean = false;
   searchResults: SearchResponse
   savedUser;
+  chatQuery: string = '';
 
   constructor(
     private service: SearchService,
     public userService: UserService,
+    private router: Router,
   ) {
     this.savedUser = userService.getUserDetails();
   }
 
-  searchTerm(term: string) {
-    this.service.search(term).subscribe(response => {
-      if (response) {
-        this.showResults = true;
-        this.searchResults = response
-      }
-    })
+  navigate() {
+    if(this.chatQuery) this.service.nextChatQuery(this.chatQuery);
+    this.router.navigateByUrl('/result');
   };
+
+
 }

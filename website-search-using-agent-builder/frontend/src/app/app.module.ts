@@ -58,6 +58,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { ChatInputComponent } from './components/main/chat-input/chat-input.component';
 import { SearchResultsComponent } from './components/main/search-results/search-results.component';
 import { ToastMessageComponent } from './components/toast-message/toast-message.component';
+import { AddAgentBuilderComponent } from './components/add-agent-builder/add-agent-builder.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { ToastMessageComponent } from './components/toast-message/toast-message.
     ChatInputComponent,
     SearchResultsComponent,
     ToastMessageComponent,
+    AddAgentBuilderComponent,
   ],
   imports: [
     BrowserModule,
