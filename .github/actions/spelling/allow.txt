@@ -868,6 +868,7 @@ mesop
 metadatas
 metaverse
 mgrs
+mic
 millis
 miranda
 mmarco
@@ -1143,6 +1144,7 @@ wcontext
 wcslen
 wdir
 weaviate
+webcam
 webclient
 webpage
 webpages
