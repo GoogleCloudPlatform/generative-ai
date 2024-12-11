@@ -6,6 +6,7 @@
 > - [Intro to Gemini 2.0 Flash REST API](gemini/getting-started/intro_gemini_2_0_flash_rest_api.ipynb)
 > - [Intro to Google Gen AI SDK](gemini/getting-started/intro_genai_sdk.ipynb)
 > - [Multimodal Live API Demo App](gemini/multimodal-live-api/websocket-demo-app/)
+> - [Real-Time RAG with Multimodal Live API](gemini/multimodal-live-api/real_time_rag_retail_gemini_2_0.ipynb)
 > - [Creating Marketing Assets using Gemini 2.0](gemini/use-cases/marketing/creating_marketing_assets_gemini_2_0.ipynb)
 
 <!-- markdownlint-disable MD033 -->
