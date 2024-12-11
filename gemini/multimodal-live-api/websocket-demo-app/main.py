@@ -1,17 +1,19 @@
 import asyncio
-import websockets
 import json
-from websockets.legacy.server import WebSocketServerProtocol
+
+import websockets
 from websockets.legacy.protocol import WebSocketCommonProtocol
+from websockets.legacy.server import WebSocketServerProtocol
 
-
-HOST = 'us-central1-aiplatform.googleapis.com'
-SERVICE_URL = f'wss://{HOST}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent'
+HOST = "us-central1-aiplatform.googleapis.com"
+SERVICE_URL = f"wss://{HOST}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent"
 
 DEBUG = False
 
 
-async def proxy_task(client_websocket: WebSocketCommonProtocol, server_websocket: WebSocketCommonProtocol) -> None:
+async def proxy_task(
+    client_websocket: WebSocketCommonProtocol, server_websocket: WebSocketCommonProtocol
+) -> None:
     """
     Forwards messages from one WebSocket connection to another.
 
@@ -23,16 +25,17 @@ async def proxy_task(client_websocket: WebSocketCommonProtocol, server_websocket
         try:
             data = json.loads(message)
             if DEBUG:
-                print('proxying: ', data)
+                print("proxying: ", data)
             await server_websocket.send(json.dumps(data))
         except Exception as e:
-             print(f"Error processing message: {e}")
+            print(f"Error processing message: {e}")
 
     await server_websocket.close()
 
 
-
-async def create_proxy(client_websocket: WebSocketCommonProtocol, bearer_token: str) -> None:
+async def create_proxy(
+    client_websocket: WebSocketCommonProtocol, bearer_token: str
+) -> None:
     """
     Establishes a WebSocket connection to the server and creates two tasks for
     bidirectional message forwarding between the client and the server.
@@ -43,11 +46,13 @@ async def create_proxy(client_websocket: WebSocketCommonProtocol, bearer_token: 
     """
 
     headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {bearer_token}'
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {bearer_token}",
     }
 
-    async with websockets.connect(SERVICE_URL, additional_headers=headers) as server_websocket:
+    async with websockets.connect(
+        SERVICE_URL, additional_headers=headers
+    ) as server_websocket:
         client_to_server_task = asyncio.create_task(
             proxy_task(client_websocket, server_websocket)
         )
@@ -55,7 +60,6 @@ async def create_proxy(client_websocket: WebSocketCommonProtocol, bearer_token: 
             proxy_task(server_websocket, client_websocket)
         )
         await asyncio.gather(client_to_server_task, server_to_client_task)
-
 
 
 async def handle_client(client_websocket: WebSocketServerProtocol) -> None:
@@ -81,7 +85,6 @@ async def handle_client(client_websocket: WebSocketServerProtocol) -> None:
     await create_proxy(client_websocket, bearer_token)
 
 
-
 async def main() -> None:
     """
     Starts the WebSocket server and listens for incoming client connections.
@@ -89,8 +92,7 @@ async def main() -> None:
     async with websockets.serve(handle_client, "localhost", 8080):
         print("Running websocket server localhost:8080...")
         # Run forever
-        await asyncio.Future()  
-
+        await asyncio.Future()
 
 
 if __name__ == "__main__":
