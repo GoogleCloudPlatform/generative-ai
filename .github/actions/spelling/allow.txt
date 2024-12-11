@@ -113,6 +113,7 @@ EMFU
 EMNLP
 ENU
 ESG
+EVs
 Edunov
 Eleuther
 Eliud
@@ -301,8 +302,10 @@ NGRAMS
 NHK
 NICOLAS
 NMT
+NOMINATIM
 NOMINMAX
 NOZORDER
+NREL
 NVIDIA
 NVL
 Nagasu
@@ -545,6 +548,7 @@ arguana
 arun
 arxiv
 astype
+atms
 aujourd'hui
 autoflake
 autogen
@@ -571,6 +575,7 @@ bluesky
 bml
 bnb
 booktitle
+boop
 boundings
 bpa
 bpd
@@ -627,6 +632,7 @@ cse
 ctd
 cupertino
 cva
+cycleway
 cygpath
 darkgrid
 dask
@@ -646,6 +652,8 @@ dfs
 dino
 direnv
 diy
+dlat
+dlon
 dlp
 docai
 docstore
@@ -685,6 +693,7 @@ etf
 etils
 eur
 evals
+evse
 expl
 faiss
 fastapi
@@ -827,6 +836,7 @@ kpi
 l'harmonie
 lakecolor
 landcolor
+landuse
 langchain
 langgraph
 lebron
@@ -932,6 +942,7 @@ openai
 openfda
 osm
 osx
+outdir
 outro
 overwiew
 owlbot
@@ -940,10 +951,12 @@ pagemap
 paleo
 paligemma
 pancetta
+pandoc
 pantarba
 paracord
 parcoords
 parfaite
+parseable
 passwort
 pastiched
 payslip
@@ -1012,6 +1025,7 @@ rbf
 reddit
 redef
 rembg
+reoffice
 repreve
 requestz
 reranked
@@ -1053,11 +1067,13 @@ siglap
 signings
 simage
 sittin
+skillsets
 sklearn
 sku
 slf
 snowboard
 sourced
+sqkm
 srlimit
 ssd
 ssh
@@ -1080,6 +1096,7 @@ svm
 sxs
 tabular
 tagline
+takeaways
 tastetest
 tavily
 tencel

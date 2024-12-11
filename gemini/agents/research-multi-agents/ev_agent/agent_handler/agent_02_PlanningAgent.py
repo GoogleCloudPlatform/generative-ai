@@ -47,7 +47,7 @@ class ExecutionPlan(BaseModel):
 
 
 def detect_visualization_need(query: str) -> bool:
-    """Analyze if query mentions any specific keyoword for visualization.
+    """Analyze if query mentions any specific keyword for visualization.
 
     Look for:
     - Explicit visualization requests: "plot", "chart", "graph", "visualize"
