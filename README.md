@@ -1,6 +1,12 @@
 # Generative AI
 
-Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai) repository.
+> NOTE: [Gemini 2.0 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) has been released! Here are the latest notebooks and demos using the new model:
+>
+> - [Intro to Gemini 2.0 Flash](gemini/getting-started/intro_gemini_2_0_flash.ipynb)
+> - [Intro to Gemini 2.0 Flash REST API](gemini/getting-started/intro_gemini_2_0_flash_rest_api.ipynb)
+> - [Intro to Google Gen AI SDK](gemini/getting-started/intro_genai_sdk.ipynb)
+> - [Multimodal Live API Demo App](gemini/multimodal-live-api/websocket-demo-app/)
+> - [Creating Marketing Assets using Gemini 2.0](gemini/use-cases/marketing/creating_marketing_assets_gemini_2_0.ipynb)
 
 <!-- markdownlint-disable MD033 -->
 
