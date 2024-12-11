@@ -59,3 +59,7 @@ class ResponseModel(BaseModel):
 
 class CreateSearchRequest(BaseModel):
     term: str
+
+class SearchApplication(BaseModel):
+    region: str
+    engine_id: str

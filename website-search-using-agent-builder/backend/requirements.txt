@@ -22,3 +22,4 @@ google-cloud-bigquery==3.26.0
 google-cloud-tasks==2.16.5
 google-cloud-logging==3.11.2
 google-cloud-speech==2.27.0
+google-cloud-discoveryengine==0.13.4

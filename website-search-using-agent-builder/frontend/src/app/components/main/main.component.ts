@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { UserService } from 'src/app/services/user/user.service';
-import { SearchService } from 'src/app/services/search.service';
-import { SearchResponse } from 'src/app/models/search.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -10,24 +8,16 @@ import { Router } from '@angular/router';
   styleUrls: ['./main.component.scss'],
 })
 export class MainComponent {
-  term: string = '';
-  showResults: boolean = false;
-  searchResults: SearchResponse
   savedUser;
-  chatQuery: string = '';
 
   constructor(
-    private service: SearchService,
     public userService: UserService,
-    private router: Router,
+    private router: Router
   ) {
     this.savedUser = userService.getUserDetails();
   }
 
-  navigate() {
-    if(this.chatQuery) this.service.nextChatQuery(this.chatQuery);
-    this.router.navigateByUrl('/result');
-  };
-
-
+  goToResults(term: string) {
+    this.router.navigate(['/search'], { queryParams: { q: term }});
+  }
 }

@@ -8,12 +8,12 @@ import { SearchResultsComponent } from './components/main/search-results/search-
 const routes: Routes = [
   {path: '', component: MainComponent, canActivate: [AuthGuard]},
   {path: 'login', component: LoginComponent},
-  {path:'result', component:SearchResultsComponent, canActivate:[AuthGuard]}
+  {path: 'search', component: SearchResultsComponent, canActivate:[AuthGuard]}
 ];
 
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { onSameUrlNavigation: 'reload' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

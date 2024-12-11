@@ -1,6 +1,7 @@
+<app-header></app-header>
 <div class="parent-container">
   <div class="wrapping-container">
-    <div class="main-div" *ngIf="!this.showResults">
+    <div class="main-div">
       <div class="sub-heading">
         <div class="name-container">
           Hey, {{savedUser.name ? savedUser.name!.split(" ")[0]+'!' : ''}}
@@ -11,20 +12,5 @@
 </div>
 
 <div class="chat-footer-outer">
-  <div class="chat-footer">
-    <div class="chat-textarea">
-      <mat-chip-grid class="intent-chip-textarea category-chip"
-        style="width: 100%;" #chipGrid aria-label="Enter intent">
-        <input [matChipInputFor]="chipGrid"
-          placeholder="Ask your question here"
-          [(ngModel)]="chatQuery" 
-          (keydown.enter)="navigate()" />
-      </mat-chip-grid>
-    </div>
-    <div class="micIcon">
-      <button mat-icon-button (click)="navigate()">
-        <mat-icon>send</mat-icon>
-      </button>
-    </div>
-  </div>
+  <app-chat-input (emitSearch)="this.goToResults($event)"></app-chat-input>
 </div>

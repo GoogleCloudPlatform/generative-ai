@@ -2,8 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { SearchService } from 'src/app/services/search.service';
 import {ReplaySubject} from 'rxjs';
 import { UserService } from 'src/app/services/user/user.service';
-import {  takeUntil, switchMap
-} from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-search-results',
@@ -15,11 +14,15 @@ export class SearchResultsComponent implements OnDestroy {
   private readonly destroyed = new ReplaySubject<void>(1);
   serachResult : any = [];
 
-  constructor(private service : SearchService, private userService: UserService){
-    this.service.chatQuery$.pipe(takeUntil(this.destroyed), switchMap((query)=>{
-      this.userService.showLoading();
-      return this.service.search(query)
-    })).subscribe({
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private service : SearchService,
+    private userService: UserService,
+  ){
+    const query = this.route.snapshot.queryParamMap.get('q');
+
+    this.service.search(query!).subscribe({
       next : (searchRespone: any)=>{
       this.serachResult = searchRespone?.results;
       this.summary = searchRespone?.summary.text;
@@ -30,6 +33,21 @@ export class SearchResultsComponent implements OnDestroy {
       this.userService.hideLoading();
     }
   });
+  }
+
+  searchTerm(term: string) {
+    this.router.navigate(['/search'], { queryParams: { q: term }});
+
+    this.service.search(term).subscribe({
+      next : (searchRespone: any)=>{
+      this.serachResult = searchRespone?.results;
+      this.summary = searchRespone?.summary.text;
+      console.log(searchRespone, "searchRespone");
+      this.userService.hideLoading();
+    },
+    error : ()=>{
+      this.userService.hideLoading();
+    }});
   }
 
   openNewWindow(link: string) {

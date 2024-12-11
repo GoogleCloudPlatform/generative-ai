@@ -1,12 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { UserService } from 'src/app/services/user/user.service';
 import { AuthService } from '../../services/login/auth.service';
 import { environment } from 'src/environments/environment';
-import { Router, NavigationEnd, Event as NavigationEvent } from '@angular/router';
-import {firstValueFrom} from 'rxjs';
-import { SearchService } from 'src/app/services/search.service';
+import { Router } from '@angular/router';
 
 const GOOGLE_CLOUD_ICON =
   `<svg width="694px" height="558px" viewBox="0 0 694 558" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -30,52 +28,24 @@ export class HeaderComponent {
   requiredLogin: string = environment.requiredLogin;
 
   showLoading = false;
-  chatQuery = '';
-  isRecording = false;
-  transcribedText = '';
-  mediaRecorder: MediaRecorder;
-  audioChunks: Blob[] = [];
-  showSearchhBox = false; 
+  @Output() emitSearch: EventEmitter<string> = new EventEmitter()
 
   constructor(iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
     public _UserService: UserService,
     public authService: AuthService,
     private router: Router,
-    private searchService: SearchService,
   ) {
     iconRegistry.addSvgIconLiteral('google-cloud-icon', sanitizer.bypassSecurityTrustHtml(GOOGLE_CLOUD_ICON));
-    this.router.events.subscribe(async (event: NavigationEvent) => {
-      if(event instanceof NavigationEnd){
-        if(event.url.includes('result'))
-          {
-            this.chatQuery = await firstValueFrom(this.searchService.chatQuery$);
-            this.showSearchhBox = true;
-          }else {
-            this.showSearchhBox = false;
-          }
-      }
-    });
-    this._UserService.loadingSubject.subscribe((loading)=>{
-      this.showLoading = loading;
-    })
   }
 
-  startRecording() {
-    this.isRecording = true;
-    this.audioChunks = [];
-    this.mediaRecorder.start();
+  isSearchRoute(): boolean {
+    return this.router.url.startsWith('/search');
   }
 
-  stopRecording() {
-    this.isRecording = false;
-    this.mediaRecorder.stop();
+  searchTerm(term: string) {
+    this.emitSearch.emit(term);
   }
-
-  searchQuery(){
-    if(this.chatQuery) this.searchService.nextChatQuery(this.chatQuery);
-  }
-
 
   logout() {
     this.authService.logout();

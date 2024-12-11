@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SpeechToTextService } from 'src/app/services/speech-to-text';
 
 @Component({
@@ -16,7 +17,15 @@ export class ChatInputComponent {
   term: string = ''
   @Output() emitSearch: EventEmitter<string> = new EventEmitter()
 
-  constructor(private speechToTextService: SpeechToTextService) {}
+  constructor(
+    private speechToTextService: SpeechToTextService,
+    private route: ActivatedRoute,
+  ) {
+    const query = this.route.snapshot.queryParamMap.get('q');
+    if(query) {
+      this.term = query;
+    }
+  }
 
   ngOnInit() {
     navigator.mediaDevices.getUserMedia({ audio: true })

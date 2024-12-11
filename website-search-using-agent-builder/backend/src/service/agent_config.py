@@ -10,14 +10,6 @@ class AgentConfigService:
 
     def __init__(self):
         self.repository = BigQueryRepository()
-
-    def get(self, name: str):
-        agent_config = None
-        results = self.repository.run_query(f'SELECT * FROM `{BIG_QUERY_DATASET}.{AGENT_CONFIG_TABLE}` WHERE name = "{name}"')
-        for row in results:
-            agent_config = AgentConfig.__from_row__(row)
-
-        return agent_config
     
     def get_all(self) -> List[AgentConfig]:
         agent_configs = []
