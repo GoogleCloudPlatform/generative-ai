@@ -8,13 +8,13 @@ from os import getenv
 app = FastAPI()
 
 def configure_cors(app):
-    # url = getenv("FRONTEND_URL")
-    # if not url:
-    #     raise ValueError("FRONTEND_URL environment variable not set")
+    url = getenv("FRONTEND_URL")
+    if not url:
+        raise ValueError("FRONTEND_URL environment variable not set")
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=[url],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
