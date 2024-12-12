@@ -28,6 +28,14 @@
         </div>
         <div class="action-item-container">
           <br>
+          <div class="logout" (click)="goToManageConfig()">
+            <div class="logout-container">
+              <span class="material-symbols-rounded logo">settings</span>
+              <div class="text">
+                <span class="sub-title">Manage AgentBuilder Config</span>
+              </div>
+            </div>
+          </div>
             <div class="logout logout-button" (click)="logout()" *ngIf="requiredLogin === 'True'">
               <div class="logout-container">
                 <span class="material-symbols-rounded logo logout-button-text">exit_to_app</span>

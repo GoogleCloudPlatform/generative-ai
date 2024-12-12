@@ -47,6 +47,10 @@ export class HeaderComponent {
     this.emitSearch.emit(term);
   }
 
+  goToManageConfig(){
+    this.router.navigateByUrl('/manage-config');
+  }
+
   logout() {
     this.authService.logout();
   }

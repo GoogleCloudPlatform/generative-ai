@@ -1,0 +1,105 @@
+<div class="buttons-container">
+    <button
+    mat-raised-button
+    class="inactive-button"
+    *ngIf="this.disableBuilderForm"
+    (click)="navigateToMain()"
+  >
+    <mat-icon>keyboard_backspace</mat-icon>
+    Back
+  </button>
+</div>
+<div class="root-container">
+    <div class="max-width-container">
+      <div class="buttons-container">
+        <div class="heading-container"><span>Manage Agent Builder Config</span></div>
+      </div>
+      <div class="table-container">
+        <form [formGroup]="agentBuilderForm">
+                <div class="row">
+                    <mat-form-field
+                    class="agent-field"
+                    appearance="outline"
+                    [floatLabel]="'always'"
+                    >
+                    <mat-label>Agent Builder URL</mat-label>
+                    <input
+                    matInput
+                    [formControl]="this.agentBuilderForm.controls.url"
+                    placeholder="agent builder url"
+                    type="text"
+                    />
+                    </mat-form-field>
+                </div>
+                <div class="intent-buttons-container">
+                    <button
+                      mat-raised-button
+                      class="reset-button"
+                      *ngIf="this.disableBuilderForm"
+                      (click)="enableForm()"
+                    >
+                      <mat-icon>edit</mat-icon>
+                      Edit
+                    </button>
+                    <button
+                      mat-icon-button
+                      class="reset-button"
+                      *ngIf="this.disableBuilderForm"
+                      (click)="showDeleteDialog()"
+                    >
+                      <mat-icon>delete</mat-icon>
+                      Delete
+                    </button>
+                    <button
+                      mat-raised-button
+                      class="reset-button"
+                      *ngIf="!this.disableBuilderForm"
+                      (click)="disableForm()"
+                    >
+                      <span> Discard Changes </span>
+                    </button>
+                    <button
+                      mat-raised-button
+                      class="reset-button"
+                      *ngIf="!this.disableBuilderForm"
+                      (click)="saveForm()"
+                    >
+                      <span>Save</span>
+                    </button>
+                </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <ng-template #deleteDialogRef let-data>
+    <div>
+      <mat-dialog-content>
+        <div class="image-container">
+          <img
+            src="../../../../assets/images/delete_notification_dialog_image.png"
+          />
+        </div>
+        <span class="delete-confirmation-text"
+          >Are you sure you wanna delete this Intent?</span
+        >
+      </mat-dialog-content>
+      <mat-dialog-actions>
+        <div
+          class="dialog-actions-container"
+        >
+          <button mat-raised-button class="discard-button" mat-dialog-close>
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            class="dialog-delete-button"
+            (click)="deleteConfig()"
+          >
+            Delete
+          </button>
+        </div>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>

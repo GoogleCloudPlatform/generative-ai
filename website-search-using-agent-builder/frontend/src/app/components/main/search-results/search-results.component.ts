@@ -24,8 +24,8 @@ export class SearchResultsComponent implements OnDestroy {
 
     this.service.search(query!).subscribe({
       next : (searchRespone: any)=>{
-      this.serachResult = searchRespone?.results;
-      this.summary = searchRespone?.summary.text;
+      this.serachResult = searchRespone;
+      this.summary = searchRespone?.summary?.text;
       console.log(searchRespone, "searchRespone");
       this.userService.hideLoading();
     },
