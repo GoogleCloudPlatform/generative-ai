@@ -9,6 +9,6 @@ equations or processes text.
 
 ## Sample notebooks and apps
 
-| Description                                                                    | Sample Name                                              |
-| ------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| Intro to Generating and Executing Python Code with Gemini 2.0                  | [intro_code_execution.ipynb](intro_code_execution.ipynb) |
+| Description                                                   | Sample Name                                              |
+| ------------------------------------------------------------- | -------------------------------------------------------- |
+| Intro to Generating and Executing Python Code with Gemini 2.0 | [intro_code_execution.ipynb](intro_code_execution.ipynb) |
