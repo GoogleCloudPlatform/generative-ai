@@ -1,3 +1,4 @@
+<app-header></app-header>
 <div class="parent-container">
   <div class="wrapping-container">
     <div class="main-div">
@@ -8,37 +9,8 @@
         <div class="helper-container">How can I help you today?</div>
       </div>
     </div>
-
-    <div class="chat-footer-outer">
-      <div class="chat-footer">
-        <div class="chat-textarea">
-          <mat-chip-grid class="intent-chip-textarea category-chip"
-            style="width: 100%;" #chipGrid aria-label="Enter intent">
-            <input [matChipInputFor]="chipGrid"
-              placeholder="Ask your question here"
-              [(ngModel)]="chatQuery" 
-              (keydown.enter)="navigate()" />
-          </mat-chip-grid>
-        </div>
-        <div class="micIcon">
-          <button mat-icon-button (click)="startRecording()" matTooltip="Record"
-            *ngIf="!isRecording"><mat-icon>mic_none</mat-icon>
-          </button>
-          <span class="recording-container" *ngIf="isRecording">
-            <span class="blue-dot">&nbsp;</span>
-            <span class="green-dot">&nbsp;</span>
-            <span class="yellow-dot">&nbsp;</span>
-            <button (click)="stopRecording()" style="color: red;" class="reset-button initial" mat-icon-button
-              matTooltip="Stop Recording" aria-label="record button">
-              <mat-icon class="material-icons-outlined">stop_circle</mat-icon>
-            </button>
-          </span>
-          <button mat-icon-button (click)="navigate()">
-            <mat-icon>send</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
+<div class="chat-footer-outer">
+  <app-chat-input (emitSearch)="this.goToResults($event)"></app-chat-input>
+</div>

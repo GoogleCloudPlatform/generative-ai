@@ -1,0 +1,122 @@
+.overview-container {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 1%;
+  padding-top: 2%;
+  padding-right: 1.5%;
+
+  .overview-sub-container {
+      width: 66%;
+      background: linear-gradient(92.1deg, #9ebcedb2 19.16%, rgba(163, 136, 245, 0.651) 79%, rgba(234, 68, 53, 0.493) 135.24%);
+      border-radius: 12px;
+      .overview-text {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 500;
+          font-size: 20px;
+          line-height: 24px;
+          color: #5C5F61;
+          padding: 2%;
+      }
+      .overview-content {
+
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 19px;
+          line-height: 30px;
+          color: #161A1D;
+          padding-left: 2%;
+          padding-right: 2%;
+          padding-bottom: 2%;
+
+      }
+
+      .overview-button {
+          padding-left: 2%;
+          padding-right: 2%;
+          padding-bottom: 2%;
+
+          button {
+              font-family: 'Roboto';
+              font-style: normal;
+              font-weight: 400;
+              font-size: 20px;
+              line-height: 24px;
+              color: #4285F4;
+          }
+      }
+  }
+
+}
+
+.header-container {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+  color: #5F6368;
+  display: flex;
+  justify-content: flex-start;
+  width: 66%;
+}
+
+.search-result:hover {
+  border: 1px solid #DFE0E2;
+  border-radius: 10px;
+}
+
+.search-result-parent-container{
+  display: flex;
+  flex-direction: column;
+  width: 66%;
+  gap: 15px;
+}
+
+.search-result {
+  padding: 1%;
+  padding-top: 2%;
+  cursor: pointer;
+
+  .title-container {
+      display: flex;
+      flex-direction: row;
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 31px;
+      color: #161A1D;
+      display: flex;
+  }
+
+  .description-container {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+      color: #161A1D;
+      opacity: 0.8;
+      padding: 2%;
+      padding-left: 22px;
+  }
+
+  .overview-button {
+      padding-left: 22px;
+      button {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 16px;
+          line-height: 24px;
+          color: #4285F4;
+      }
+  }
+
+}
+
+.padding-top {
+  padding-top: 0;
+}

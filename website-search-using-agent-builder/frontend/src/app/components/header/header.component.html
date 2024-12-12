@@ -2,35 +2,9 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light top-nav fixed-top">
     <div class="parent-container">
         <div class="left-heading" [matTooltip]="'Home'">
-            <span class="logo-text gradient-text" (click)="navigate()">{{headerTitle}}</span>
+            <span class="logo-text gradient-text">{{headerTitle}}</span>
         </div>
-        <div class="chat-footer" *ngIf="showSearchhBox">
-          <div class="chat-textarea">
-            <mat-chip-grid class="intent-chip-textarea"
-              style="width: 100%;" #chipGrid aria-label="Enter intent">
-              <input [matChipInputFor]="chipGrid"
-                placeholder="Ask your question here"
-                [(ngModel)]="chatQuery" (keydown.enter)="searchQuery()" />
-            </mat-chip-grid>
-          </div>
-          <div class="micIcon">
-            <button mat-icon-button (click)="startRecording()" matTooltip="Record"
-              *ngIf="!isRecording"><mat-icon>mic_none</mat-icon>
-            </button>
-            <span class="recording-container" *ngIf="isRecording">
-              <span class="blue-dot">&nbsp;</span>
-              <span class="green-dot">&nbsp;</span>
-              <span class="yellow-dot">&nbsp;</span>
-              <button (click)="stopRecording()" style="color: red;" class="reset-button initial" mat-icon-button
-                matTooltip="Stop Recording" aria-label="record button">
-                <mat-icon class="material-icons-outlined">stop_circle</mat-icon>
-              </button>
-            </span>
-            <button mat-icon-button (click)="navigate()">
-              <mat-icon>send</mat-icon>
-            </button>
-          </div>
-        </div>
+        <app-chat-input (emitSearch)="this.searchTerm($event)" *ngIf="this.isSearchRoute()"></app-chat-input>
         <div class="right-menu-items">
             <div *ngIf="authService.isUserLoggedIn()" class="profile-container" [matMenuTriggerFor]="userAccountMenu">
                 <div class="circle" *ngIf="_UserService.getUserDetails().photoURL && requiredLogin === 'True'"><img referrerpolicy="no-referrer"
@@ -54,6 +28,14 @@
         </div>
         <div class="action-item-container">
           <br>
+          <div class="logout" (click)="goToManageConfig()">
+            <div class="logout-container">
+              <span class="material-symbols-rounded logo">settings</span>
+              <div class="text">
+                <span class="sub-title">Manage AgentBuilder Config</span>
+              </div>
+            </div>
+          </div>
             <div class="logout logout-button" (click)="logout()" *ngIf="requiredLogin === 'True'">
               <div class="logout-container">
                 <span class="material-symbols-rounded logo logout-button-text">exit_to_app</span>
@@ -66,10 +48,3 @@
         </div>
     </mat-menu>
 </nav>
-
-<div *ngFor="let i of intentsInProgress" class="notification-banner-container blue-border">
-  <div class="notification-text">
-      <mat-icon class="blue">info_outline</mat-icon>
-      <span>New intent is being created! Prepare to be able to chat with me about {{i.name}}</span>
-  </div>
-</div>

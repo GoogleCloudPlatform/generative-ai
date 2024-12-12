@@ -1,17 +1,10 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { UserService } from 'src/app/services/user/user.service';
 import { AuthService } from '../../services/login/auth.service';
-import { MatDialog } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
-import { IntentDetails, IntentService } from 'src/app/services/intent.service';
-import { Router, NavigationEnd, Event as NavigationEvent } from '@angular/router';
-import { BroadcastService } from 'src/app/services/broadcast.service';
-import {  take, takeUntil, 
-} from 'rxjs/operators';
-import {ReplaySubject, firstValueFrom} from 'rxjs';
-
+import { Router } from '@angular/router';
 
 const GOOGLE_CLOUD_ICON =
   `<svg width="694px" height="558px" viewBox="0 0 694 558" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -30,79 +23,35 @@ const GOOGLE_CLOUD_ICON =
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnDestroy {
+export class HeaderComponent {
   headerTitle: string = environment.chatbotName;
-  intentsInProgress: IntentDetails[] = [];
   requiredLogin: string = environment.requiredLogin;
-  private readonly destroyed = new ReplaySubject<void>(1);
 
-  chatQuery = '';
-  isRecording = false;
-  transcribedText = '';
-  mediaRecorder: MediaRecorder;
-  audioChunks: Blob[] = [];
-  showSearchhBox = false;  
   showLoading = false;
+  @Output() emitSearch: EventEmitter<string> = new EventEmitter()
 
   constructor(iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
-    private router: Router,
     public _UserService: UserService,
     public authService: AuthService,
-    public dialog: MatDialog,
-    private intentsService: IntentService,
-    private broadcastService: BroadcastService,
+    private router: Router,
   ) {
     iconRegistry.addSvgIconLiteral('google-cloud-icon', sanitizer.bypassSecurityTrustHtml(GOOGLE_CLOUD_ICON));
-    this.router.events.subscribe(async (event: NavigationEvent) => {
-      if(event instanceof NavigationEnd){
-        if(event.url.includes('result'))
-          {
-            this.chatQuery = await firstValueFrom(this.broadcastService.chatQuery$);
-            this.showSearchhBox = true;
-          }else {
-            this.showSearchhBox = false;
-          }
-      }
-    });
-    this._UserService.loadingSubject.pipe(takeUntil(this.destroyed)).subscribe((loading)=>{
-      this.showLoading = loading;
-    })
   }
 
-  navigate() {
-    this.router.navigateByUrl('/');
-  };
-
-  searchQuery(){
-    if(this.chatQuery) this.broadcastService.nextChatQuery(this.chatQuery);
+  isSearchRoute(): boolean {
+    return this.router.url.startsWith('/search');
   }
 
-  goToManageIntentPage(){
-    this.router.navigateByUrl('/intent-management');
+  searchTerm(term: string) {
+    this.emitSearch.emit(term);
+  }
+
+  goToManageConfig(){
+    this.router.navigateByUrl('/manage-config');
   }
 
   logout() {
     this.authService.logout();
-  }
-
-  openURL(link: string) {
-    (window as any).open(link, "_blank");
-  }
-
-  startRecording() {
-    this.isRecording = true;
-    this.audioChunks = [];
-    this.mediaRecorder.start();
-  }
-
-  stopRecording() {
-    this.isRecording = false;
-    this.mediaRecorder.stop();
-  }
-
-  ngOnDestroy(){
-    this.destroyed.next();
-    this.destroyed.complete();
   }
 }

@@ -42,7 +42,6 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { SuggestionCardComponent } from './components/elements/suggestion-card/suggestion-card.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import {NgIdleModule} from '@ng-idle/core';
 import {ClipboardModule} from '@angular/cdk/clipboard';
@@ -53,14 +52,14 @@ import 'prismjs';
 import 'prismjs/components/prism-typescript.min.js';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.js';
 import 'prismjs/plugins/line-highlight/prism-line-highlight.js';
-import { ToastMessageComponent } from './components/shared/toast-message/toast-message.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { DialogueBoxComponent } from './dialogue-box/dialogue-box.component';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatStepperModule } from '@angular/material/stepper';
-import { CreateIntentFormComponent } from './components/create-intent-form/create-intent-form.component';
-import { SearchResultComponent } from './components/search-result/search-result.component';
-import { DisplayDetailedResultComponent } from './components/display-detailed-result/display-detailed-result.component'
+import { ChatInputComponent } from './components/main/chat-input/chat-input.component';
+import { SearchResultsComponent } from './components/main/search-results/search-results.component';
+import { ToastMessageComponent } from './components/toast-message/toast-message.component';
+import { AddAgentBuilderComponent } from './components/agent-builder/add-agent-builder/add-agent-builder.component';
+import { ManageAgentBuilderComponent } from './components/agent-builder/manage-agent-builder/manage-agent-builder.component';
 
 @NgModule({
   declarations: [
@@ -69,12 +68,11 @@ import { DisplayDetailedResultComponent } from './components/display-detailed-re
     FooterComponent,
     MainComponent,
     LoginComponent,
-    SuggestionCardComponent,
+    ChatInputComponent,
+    SearchResultsComponent,
     ToastMessageComponent,
-    DialogueBoxComponent,
-    CreateIntentFormComponent,
-    SearchResultComponent,
-    DisplayDetailedResultComponent
+    AddAgentBuilderComponent,
+    ManageAgentBuilderComponent,
   ],
   imports: [
     BrowserModule,

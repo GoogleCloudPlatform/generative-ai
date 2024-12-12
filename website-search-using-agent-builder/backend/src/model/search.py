@@ -50,7 +50,7 @@ class Result(BaseModel):
     id: Optional[str]
 
 class ResponseModel(BaseModel):
-    search: Optional[str]
+    term: Optional[str]
     attributionToken: Optional[str]
     guidedSearchResult: Optional[Dict]
     results: List[Result]
@@ -58,11 +58,8 @@ class ResponseModel(BaseModel):
     totalSize: Optional[int]
 
 class CreateSearchRequest(BaseModel):
-    search: str
+    term: str
 
-class SearchRequest(BaseModel):
-    search: str
-    project_id: Optional[str]
-    location: Optional[str]
-    engine_id: Optional[str]
-    serving_config: Optional[str]
+class SearchApplication(BaseModel):
+    region: str
+    engine_id: str
