@@ -22,7 +22,7 @@ class AgentConfigService:
 
     def create(self, agent_config: AgentConfig) -> AgentConfig:
         if self.get(agent_config.name):
-            raise BadRequest(detail=f"Intent with name {agent_config.name} already exists")
+            raise BadRequest(detail=f"AgentConfig with name {agent_config.name} already exists")
         self.repository.insert_row(AGENT_CONFIG_TABLE, agent_config.to_insert_string())
         return agent_config
     
