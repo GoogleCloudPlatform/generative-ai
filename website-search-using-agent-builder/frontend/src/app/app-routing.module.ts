@@ -8,7 +8,8 @@ import { SearchResultsComponent } from './components/main/search-results/search-
 const routes: Routes = [
   {path: '', component: MainComponent, canActivate: [AuthGuard]},
   {path: 'login', component: LoginComponent},
-  {path: 'search', component: SearchResultsComponent, canActivate:[AuthGuard]}
+  {path: 'search', component: SearchResultsComponent, canActivate:[AuthGuard]},
+  // TODO: Add new AddNewAgentComponent
 ];
 
 

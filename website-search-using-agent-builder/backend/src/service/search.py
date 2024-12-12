@@ -44,6 +44,7 @@ class SearchService():
         response: SearchResponse = self.client.search(request)
         results = []
         for r in response.results:
+            # TODO: Do a proper mapping of results to Python classes
             print(r.document)
 
         return results

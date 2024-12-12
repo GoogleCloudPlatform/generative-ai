@@ -12,6 +12,7 @@ router = APIRouter(
 @router.post("")
 async def search(item: CreateSearchRequest):
     service = SearchService(
+        # TODO: Try hitting agent with region="global" and engine_id="genai_1733945255176"
         SearchApplication(
             region="us",
             engine_id="investor_1733324880354"

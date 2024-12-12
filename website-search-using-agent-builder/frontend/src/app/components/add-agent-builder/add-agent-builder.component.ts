@@ -6,6 +6,7 @@ import {
 import { Router } from '@angular/router';
 import { SearchService } from 'src/app/services/search.service';
 
+// TODO: Complete this component with a proper form.
 @Component({
   selector: 'app-add-agent-builder',
   templateUrl: './add-agent-builder.component.html',
@@ -22,7 +23,7 @@ export class AddAgentBuilderComponent {
     name: new FormControl<string>('', Validators.required),
   });
 
-  constructor(   
+  constructor(
     private readonly dialogRef: MatDialogRef<AddAgentBuilderComponent>,
     private readonly router: Router,
     private readonly service: SearchService){
@@ -30,7 +31,7 @@ export class AddAgentBuilderComponent {
     }
 
     saveForm() {
-  
+
     }
 
 }
