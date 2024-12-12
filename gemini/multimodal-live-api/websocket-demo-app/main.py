@@ -8,9 +8,6 @@ from websockets.legacy.server import WebSocketServerProtocol
 import ssl
 import certifi
 
-ssl_context = ssl.create_default_context()
-ssl_context.load_verify_locations(certifi.where())
-
 HOST = "us-central1-aiplatform.googleapis.com"
 SERVICE_URL = f"wss://{HOST}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent"
 
@@ -55,6 +52,9 @@ async def create_proxy(
         "Content-Type": "application/json",
         "Authorization": f"Bearer {bearer_token}",
     }
+
+    ssl_context = ssl.create_default_context()
+    ssl_context.load_verify_locations(certifi.where())
 
     async with websockets.connect(
         SERVICE_URL, additional_headers=headers, ssl=ssl_context
