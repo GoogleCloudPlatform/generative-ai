@@ -5,6 +5,12 @@ import websockets
 from websockets.legacy.protocol import WebSocketCommonProtocol
 from websockets.legacy.server import WebSocketServerProtocol
 
+import ssl
+import certifi
+
+ssl_context = ssl.create_default_context()
+ssl_context.load_verify_locations(certifi.where())
+
 HOST = "us-central1-aiplatform.googleapis.com"
 SERVICE_URL = f"wss://{HOST}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent"
 
@@ -51,7 +57,7 @@ async def create_proxy(
     }
 
     async with websockets.connect(
-        SERVICE_URL, additional_headers=headers
+        SERVICE_URL, additional_headers=headers, ssl=ssl_context
     ) as server_websocket:
         client_to_server_task = asyncio.create_task(
             proxy_task(client_websocket, server_websocket)
