@@ -7,6 +7,7 @@ class SearchResult:
     document_id: str
     title: str
     snippet: str
+    img: Optional[str] = None
     link: Optional[str] = None
     formatted_url: Optional[str] = None
 
@@ -64,6 +65,7 @@ class SearchService:
                 snippet=snippet_text,
                 link=derived_data.get("link"),
                 formatted_url=derived_data.get("formattedUrl"),
+                img=derived_data.get("pagemap").get("cse_thumbnail")[0].get("src")
             )
             results.append(mapped_result)
 
