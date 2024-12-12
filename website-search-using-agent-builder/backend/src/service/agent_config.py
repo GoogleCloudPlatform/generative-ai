@@ -19,6 +19,14 @@ class AgentConfigService:
             agent_configs.append(agent_config)
 
         return agent_configs
+    
+    def get(self, name: str):
+        agent_config = None
+        results = self.repository.run_query(f'SELECT * FROM `{BIG_QUERY_DATASET}.{AGENT_CONFIG_TABLE}` WHERE name = "{name}"')
+        for row in results:
+            agent_config = AgentConfig.__from_row__(row)
+
+        return agent_config
 
     def create(self, agent_config: AgentConfig) -> AgentConfig:
         if self.get(agent_config.name):

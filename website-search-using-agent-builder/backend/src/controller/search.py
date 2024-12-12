@@ -15,17 +15,12 @@ router = APIRouter(
 async def search(item: CreateSearchRequest):
     service = AgentConfigService()
     agent_configs = service.get_all()
+    agent_config = None
     if agent_configs:
         agent_config = agent_configs[0]  # Extract the first element
         print(f"Agent config: {agent_config}")
     else:
         print("agent_configs is empty.")
     
-    service = SearchService(
-        # TODO: Try hitting agent with region="global" and engine_id="genai_1733945255176"
-        SearchApplication(
-            region="global",
-            engine_id="robin-search-app-2_1733237288232"
-        )
-    )
+    service = SearchService(agent_config.url)
     return service.search(item.term)
