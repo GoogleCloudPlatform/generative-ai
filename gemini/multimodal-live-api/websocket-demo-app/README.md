@@ -1,75 +1,78 @@
 # Multimodal Live API Demo
 
-In this tutorial, you will be building a web application that enables you to use your voice and camera to talk to Gemini 2.0 through the [Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
-
-The [Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live) is a low-latency bidirectional streaming API that supports audio and video streaming inputs and can output audio.
-
-## Architecture
-
-- **Backend (Python WebSockets Server):** Handles authentication and acts as an intermediary between your frontend and the Gemini API.
-- **Frontend (HTML/JavaScript):** Provides the user interface and interacts with the backend via WebSockets.
+This tutorial guides you through building a web application that allows you to interact with [Gemini 2.0 Flash Experimental](https://blog.google/technology/google-deepmind/google-gemini-ai-update-december-2024/#ceo-message) using your voice and camera. This is achieved through the [Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live), a low-latency bidirectional streaming API that supports audio and video input and can output audio.
 
 ## Pre-requisites
 
-Some web development experience is required to follow this tutorial, especially working with localhost, understanding port numbers, and the difference between websockets and http requests.
+* A Google Cloud project
+* Foundational knowledge of Web development
+
+**Note:** Familiarity with web development concepts, including localhost, port numbers, and the distinctions between websockets and HTTP requests, is beneficial for those interested in contributing code. However, it is not mandatory for completing the tutorial.
+
+## Demo Architecture
+
+* **Frontend (HTML/JavaScript):** A web page that serves as the user interface and communicates with the backend through WebSockets.
+* **Backend (Python WebSockets Server):** Manages user authentication and acts as a bridge between the frontend and the Gemini API.
 
 ### File Structure
 
-- main.py: The Python backend code
-- index.html: The frontend HTML+JS+CSS app
-- pcm-processor.js: Script for processing audio
-- requirements.txt: Lists the required Python dependencies
+- [index.html](/gemini/multimodal-live-api/websocket-demo-app/index.html): The frontend HTML+JS+CSS app
+- [pcm-processor.js](/gemini/multimodal-live-api/websocket-demo-app/pcm-processor.js): Script used by `index.html` page for processing audio
+- [main.py](/gemini/multimodal-live-api/websocket-demo-app/main.py): The Python backend code
+- [requirements.txt](/gemini/multimodal-live-api/websocket-demo-app/requirements.txt): Lists the required Python dependencies
 
 ![Demo](https://storage.googleapis.com/cloud-samples-data/generative-ai/image/demo-UI.png)
 
 ## Setup instructions
 
-You can set up this app locally or via Cloud Shell.
+You can set up this app in your local environment or use [Cloud Shell Editor](https://shell.cloud.google.com/).
 
-### Setup locally
+### Preparation
 
 1. Clone the repository and cd into the correct directory
 
-```sh
-git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd gemini/multimodal-live-api/websocket-demo-app
-```
+   ```sh
+   git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+   cd generative-ai/gemini/multimodal-live-api/websocket-demo-app
+   ```
 
 1. Create a new virtual environment and activate it:
 
-```sh
-python3 -m venv env
-source env/bin/activate
-```
+   ```sh
+   python3 -m venv env
+   source env/bin/activate
+   ```
 
 1. Install dependencies:
 
-```sh
-pip3 install -r requirements.txt
-```
-
-1. Start the Python WebSocket server:
-
-```sh
-python3 main.py
-```
-
-1. Start the frontend:
-   Make sure to open a **new** terminal window to run this command. Keep the backend server running in the first terminal.
-
-```sh
-python3 -m http.server
-```
-
-1. Point your browser to the demo app UI based on the output of the terminal. (E.g., it may be http://localhost:8000, or it may use a different port.)
+   ```sh
+   pip3 install -r requirements.txt
+   ```
 
 1. Get your Google Cloud access token:
    Run the following command in a terminal with gcloud installed to set your project, and to retrieve your access token.
 
-```sh
-gcloud config set project YOUR-PROJECT-ID
-gcloud auth print-access-token
-```
+   ```sh
+   gcloud config set project YOUR-PROJECT-ID
+   gcloud auth print-access-token
+   ```
+
+### Running locally
+
+1. Start the Python WebSocket server:
+
+   ```sh
+   python3 main.py
+   ```
+
+1. Start the frontend:
+   Make sure to open a **new** terminal window to run this command. Keep the backend server running in the first terminal.
+
+   ```sh
+   python3 -m http.server
+   ```
+
+1. Point your browser to the demo app UI based on the output of the terminal. (E.g., it may be http://localhost:8000, or it may use a different port.)
 
 1. Copy the access token from the previous step into the UI that you have open in your browser.
 
@@ -86,31 +89,13 @@ gcloud auth print-access-token
 - Voice input: Press the pink microphone button and start speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
 - Video input: The model will also capture your camera input and send it to Gemini. You can ask questions about current or previous video footage. For more details on how this works, visit the [documentation page for the Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
 
-### Setup in Cloud Shell
+### Running in Cloud Shell
 
-1. Open [Cloud Shell](https://cloud.google.com/shell/docs/editor-overview)
+1. In a new terminal window run following command to Start the Python WebSocket server in one terminal.
 
-1. Upload `main.py`, `index.html`, `pcm-processor.js`, and `requirements.txt` to your Cloud Shell Editor project. Alternatively, you can clone the repository and cd into the correct directory:
-
-```sh
-git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd gemini/multimodal-live-api/websocket-demo-app
-```
-
-1. Open two new terminal windows.
-1. Navigate to whichever folder in Cloud Shell you uploaded the code files to (i.e., using `cd your_folder_name`)
-
-1. Install dependencies: In one of the terminal windows run:
-
-```sh
-pip3 install -r requirements.txt
-```
-
-1. Start the Python WebSocket server in one terminal.
-
-```sh
-python3 main.py
-```
+   ```sh
+   python3 main.py
+   ```
 
 1. In order for index.html to work properly, you will need to update the app URL inside index.html to point to the correct proxy server URL you just set up in the previous step. To do so:
 
