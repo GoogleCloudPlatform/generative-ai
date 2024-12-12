@@ -53,6 +53,7 @@ class SearchService:
         for r in data.get("results", []):
             document = r.get("document", {})
             derived_data = document.get("derivedStructData", {})
+            if derived_data.get("pagemap").get("metatags")[0].get("og:locale") != "en": continue
 
             # Extract snippet safely
             snippets = derived_data.get("snippets", [])
