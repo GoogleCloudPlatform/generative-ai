@@ -35,8 +35,14 @@ class SearchService:
             }
         }
 
+        token = get_token()
+        headers = {
+            'Authorization': f'Bearer {token}',
+            "Content-Type": "application/json"
+        }
+
         # Perform the HTTP POST request
-        response = requests.post(self.api_url, json=payload)
+        response = requests.post(self.api_url, headers=headers, json=payload)
         response.raise_for_status()  # Raise an error if the request fails
 
         data = response.json()  # Parse JSON response
