@@ -45,7 +45,7 @@ class SearchService:
         response = requests.post(self.api_url, headers=headers, json=payload)
         response.raise_for_status()  # Raise an error if the request fails
 
-        data = response.json()  # Parse JSON response
+        data = response.json()
         results = []
 
         # Process results
