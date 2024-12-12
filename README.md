@@ -8,6 +8,7 @@
 > - [Multimodal Live API Demo App](gemini/multimodal-live-api/websocket-demo-app/)
 > - [Real-Time RAG with Multimodal Live API](gemini/multimodal-live-api/real_time_rag_retail_gemini_2_0.ipynb)
 > - [Creating Marketing Assets using Gemini 2.0](gemini/use-cases/marketing/creating_marketing_assets_gemini_2_0.ipynb)
+> - [Vertex AI Gemini Research Multi Agent Demo Research Agent for EV Industry](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/agents/research-multi-agents)
 
 <!-- markdownlint-disable MD033 -->
 
