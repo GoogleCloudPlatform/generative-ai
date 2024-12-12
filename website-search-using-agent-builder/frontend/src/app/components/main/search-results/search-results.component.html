@@ -15,16 +15,16 @@
 </div>
 <div class="overview-container padding-top">
   <div class="search-result-parent-container">
-      <div class="search-result" *ngFor="let result of serachResult" (click)="openNewWindow(result?.formatted_url)">
+      <div class="search-result" *ngFor="let result of serachResult" (click)="openNewWindow(result.formatted_url)">
           <div class="title-container">
-              <img src="{{result?.document?.derivedStructData?.pagemap?.cse_thumbnail[0]?.src}}" height="30" width="54"/>
-              {{result?.title}}
+              <img src="{{result.img}}" height="30" width="54"/>
+              {{result.title}}
           </div>
           <div class="description-container">
-              {{result?.snippet}}
+              {{result.snippet}}
           </div>
           <div class="overview-button">
-              <button mat-button (click)="openNewWindow(result?.document?.derivedStructData?.link)">View</button>
+              <button mat-button (click)="openNewWindow(result.formatted_url)">View</button>
           </div>
       </div>
   </div>
