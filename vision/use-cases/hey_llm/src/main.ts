@@ -20,7 +20,7 @@ import type {GenerateContentResponse} from '@google-cloud/vertexai';
 /**
  * Vertex AI location. Change this const if you want to use another location.
  */
-const LOCATION = 'asia-northeast1';
+const LOCATION = 'us-central1';
 
 /**
  * Default Gemini model to use.
