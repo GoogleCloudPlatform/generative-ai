@@ -25,13 +25,12 @@ export class SearchResultsComponent implements OnDestroy {
     this.service.search(query!).subscribe({
       next : (searchRespone: any)=>{
       this.serachResult = searchRespone;
-      console.log(searchRespone, "searchRespone");
       this.userService.hideLoading();
-    },
-    error : ()=>{
-      this.userService.hideLoading();
-    }
-  });
+      },
+      error : ()=>{
+        this.userService.hideLoading();
+      }
+    });
   }
 
   searchTerm(term: string) {
@@ -39,12 +38,13 @@ export class SearchResultsComponent implements OnDestroy {
 
     this.service.search(term).subscribe({
       next : (searchRespone: any)=>{
-      this.serachResult = searchRespone?.results;
+      this.serachResult = searchRespone;
       this.userService.hideLoading();
-    },
-    error : ()=>{
-      this.userService.hideLoading();
-    }});
+      },
+      error : ()=>{
+        this.userService.hideLoading();
+      }
+    });
   }
 
   openNewWindow(link: string) {
