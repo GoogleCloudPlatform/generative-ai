@@ -18,8 +18,16 @@
       <div class="search-result" *ngFor="let result of serachResult" (click)="openNewWindow(result.formatted_url)">
           <div class="title-container">
               <img src="{{result.img}}" height="30" width="54"/>
-              {{result.title}}
+              <div>
+                <div>
+                  {{result.title}}
+                </div>
+                <div class="link-container">
+                  {{result.displayLink}}
+                </div>
+              </div>
           </div>
+
           <div class="description-container">
               {{result.snippet}}
           </div>

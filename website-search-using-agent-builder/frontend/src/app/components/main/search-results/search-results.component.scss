@@ -89,6 +89,12 @@
       line-height: 31px;
       color: #161A1D;
       display: flex;
+
+      .link-container {
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        color: #676c6f !important;
+      }
   }
 
   .description-container {
@@ -99,7 +105,7 @@
       line-height: 24px;
       color: #161A1D;
       opacity: 0.8;
-      padding: 2%;
+      padding: 1%;
       padding-left: 22px;
   }
 
