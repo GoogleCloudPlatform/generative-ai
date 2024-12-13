@@ -92,7 +92,7 @@ export class MainComponent {
       { disableClose: true,
         height: '600px',
         width: '1120px'
-    });
+    }).afterClosed().subscribe(() => window.location.reload())
   }
 
   navigate() {
