@@ -19,6 +19,7 @@ import type {GenerateContentResponse} from '@google-cloud/vertexai';
 
 /**
  * Vertex AI location. Change this const if you want to use another location.
+ * us-central1 is chosen as default to provide the most model availability.
  */
 const LOCATION = 'us-central1';
 
