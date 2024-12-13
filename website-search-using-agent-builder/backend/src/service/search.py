@@ -66,7 +66,8 @@ class SearchService:
                 snippet=snippet_text,
                 link=derived_data.get("link"),
                 formatted_url=derived_data.get("formattedUrl"),
-                img=derived_data.get("pagemap").get("cse_thumbnail")[0].get("src")
+                img=derived_data.get("pagemap").get("cse_thumbnail")[0].get("src"),
+                displayLink=derived_data.get("displayLink"),
             )
             results.append(mapped_result)
 
