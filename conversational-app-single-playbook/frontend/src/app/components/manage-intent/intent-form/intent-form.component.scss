@@ -226,3 +226,14 @@
     border: 1px solid #f70808;
 }
 }
+
+.stepper-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+
+  ::ng-deep .mat-stepper-horizontal-line{
+    min-width: 151px !important;
+  }
+}

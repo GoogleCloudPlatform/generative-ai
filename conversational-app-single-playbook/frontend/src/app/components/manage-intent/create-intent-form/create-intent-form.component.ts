@@ -89,6 +89,7 @@ export class CreateIntentFormComponent {
           data: { text: 'Intent Saved', icon: "tick-with-circle" },
         });
         this.showSpinner = false;
+        this.dialogRef.close()!;
         this.router.navigateByUrl('/');
       },
       error: (response) => {

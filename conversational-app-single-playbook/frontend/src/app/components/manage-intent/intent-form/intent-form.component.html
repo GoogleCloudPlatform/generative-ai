@@ -59,7 +59,7 @@
   </mat-expansion-panel-header>
 
   <div [formGroup]="this.intentForm">
-    <div class="input-field-container">
+    <div class="stepper-container">
       <mat-stepper class="stepper" *ngIf="this.intent.status !== '5'">
         <mat-step [completed]="this.intent.status >= '1'" [editable]="false">
           <ng-template matStepLabel>Index endpoint created</ng-template>
