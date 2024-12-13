@@ -13,10 +13,6 @@ import { ModelsService } from 'src/app/services/models.service';
   selector: 'app-create-intent-form',
   templateUrl: './create-intent-form.component.html',
   styleUrls: ['./create-intent-form.component.scss'],
-  providers: [     {
-    provide: MatDialogRef,
-    useValue: {}
-  }],
 })
 export class CreateIntentFormComponent {
 
@@ -91,6 +87,7 @@ export class CreateIntentFormComponent {
         this.showSpinner = false;
         this.dialogRef.close()!;
         this.router.navigateByUrl('/');
+        this.dialogRef.close()
       },
       error: (response) => {
         this.showSpinner = false;
