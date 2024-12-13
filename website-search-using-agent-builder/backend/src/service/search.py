@@ -10,6 +10,7 @@ class SearchResult:
     img: Optional[str] = None
     link: Optional[str] = None
     formatted_url: Optional[str] = None
+    displayLink: Optional[str] = None
 
 class SearchService:
 
