@@ -1,5 +1,4 @@
 import { IntentService, IntentDetails, Model } from '../../services/intent.service';
-import { ModelsService } from 'src/app/services/models.service';
 import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BroadcastService } from 'src/app/services/broadcast.service';
@@ -63,7 +62,6 @@ export class MainComponent {
   private readonly destroyed = new ReplaySubject<void>(1);
   toolTipText: string | undefined;
   tooltipTextTimeout: undefined | ReturnType<typeof setTimeout>;
-  models: Model[] = [];
   createIntentComponentInstance:any;
 
 
@@ -94,8 +92,7 @@ export class MainComponent {
       { disableClose: true,
         height: '600px',
         width: '1120px'
-    });
-    this.createIntentComponentInstance.models = this.models;
+    }).afterClosed().subscribe(() => window.location.reload())
   }
 
   navigate() {
