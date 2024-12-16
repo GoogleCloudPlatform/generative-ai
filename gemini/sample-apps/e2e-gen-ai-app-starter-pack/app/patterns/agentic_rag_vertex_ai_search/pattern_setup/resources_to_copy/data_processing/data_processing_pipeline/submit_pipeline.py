@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import argparse
+import os
 import sys
+
+from data_processing_pipeline.pipeline import pipeline
 from google.cloud import aiplatform
 from kfp import compiler
-from data_processing_pipeline.pipeline import pipeline
-
 
 PIPELINE_FILE_NAME = "data_processing_pipeline.json"
 
