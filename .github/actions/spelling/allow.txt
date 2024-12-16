@@ -878,6 +878,7 @@ memes
 mesop
 metadatas
 metaverse
+metricx
 mgrs
 mic
 millis
@@ -1210,4 +1211,3 @@ ytd
 yticks
 zakarid
 zaxis
-metricx
