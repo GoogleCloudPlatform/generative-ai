@@ -3,7 +3,6 @@ class PCMProcessor extends AudioWorkletProcessor {
         super();
         this.buffer = new Float32Array();
 
-        // Correct way to handle messages in AudioWorklet
         this.port.onmessage = (e) => {
             const newData = e.data;
             const newBuffer = new Float32Array(this.buffer.length + newData.length);
