@@ -8,6 +8,7 @@ ALCS
 ALDS
 AMNOSH
 ANZ
+AOT
 APAC
 APIENTRY
 APSTUDIO
@@ -116,6 +117,7 @@ ENU
 ESG
 EVs
 Edunov
+Einhalt
 Eleuther
 Eliud
 Embs
@@ -408,6 +410,7 @@ Sahel
 Sauron
 Sca
 Schlenoff
+Schulen
 Schwimmer
 Selam
 Sestero
@@ -744,6 +747,7 @@ gcs
 gcsfs
 gdk
 gdkx
+geboten
 genai
 genkit
 genwealth
@@ -835,6 +839,7 @@ keras
 keychain
 kfp
 kickstart
+konnte
 kotlin
 kpi
 l'harmonie
@@ -1137,6 +1142,7 @@ typehints
 ubuntu
 uids
 ultrawide
+und
 undst
 unigram
 unrtf
@@ -1173,6 +1179,7 @@ webpages
 websites
 weightage
 welcom
+werden
 whatsapp
 wiffle
 wikipedia
@@ -1187,6 +1194,7 @@ wparam
 wscore
 wscores
 wstring
+wurden
 xanchor
 xaxes
 xaxis
