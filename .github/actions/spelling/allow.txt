@@ -8,12 +8,14 @@ ALCS
 ALDS
 AMNOSH
 ANZ
+AOT
 APAC
 APIENTRY
 APSTUDIO
 ASF
 ASML
 AUVs
+Adhaar
 Adidas
 Akihiro
 Akkaoui
@@ -115,6 +117,7 @@ ENU
 ESG
 EVs
 Edunov
+Einhalt
 Eleuther
 Eliud
 Embs
@@ -197,6 +200,7 @@ ICICI
 ICML
 IFI
 INFOPLIST
+INR
 IOMGR
 IRAs
 ITDMs
@@ -238,6 +242,7 @@ Kimi
 Kipchoge
 Knopf
 Kohli
+Koushik
 Kraizt
 Kubeflow
 Kudrow
@@ -405,6 +410,7 @@ Sahel
 Sauron
 Sca
 Schlenoff
+Schulen
 Schwimmer
 Selam
 Sestero
@@ -741,6 +747,7 @@ gcs
 gcsfs
 gdk
 gdkx
+geboten
 genai
 genkit
 genwealth
@@ -832,6 +839,7 @@ keras
 keychain
 kfp
 kickstart
+konnte
 kotlin
 kpi
 l'harmonie
@@ -878,6 +886,7 @@ memes
 mesop
 metadatas
 metaverse
+metricx
 mgrs
 mic
 millis
@@ -1133,6 +1142,7 @@ typehints
 ubuntu
 uids
 ultrawide
+und
 undst
 unigram
 unrtf
@@ -1169,6 +1179,7 @@ webpages
 websites
 weightage
 welcom
+werden
 whatsapp
 wiffle
 wikipedia
@@ -1183,6 +1194,7 @@ wparam
 wscore
 wscores
 wstring
+wurden
 xanchor
 xaxes
 xaxis
@@ -1210,4 +1222,3 @@ ytd
 yticks
 zakarid
 zaxis
-metricx
