@@ -1,65 +1,53 @@
-from fastapi import APIRouter
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional, Dict
+from dataclasses import dataclass
+from typing import List, Optional
+from pydantic import BaseModel
+from google.cloud.bigquery import SchemaField
+from google.api_core.client_options import ClientOptions
+import google.auth
 
-class CseImage(BaseModel):
-    src: HttpUrl
-
-class CseThumbnail(BaseModel):
-    src: HttpUrl
-    height: str
-    width: str
-
-class DocumentMetaTag(BaseModel):
-    google_signin_client_id: Optional[str]
-    google_signin_scope: Optional[str]
-    og_description: Optional[str]
-    og_image: Optional[HttpUrl]
-    og_image_height: Optional[str]
-    og_image_width: Optional[str]
-    og_locale: Optional[str]
-    og_site_name: Optional[str]
-    og_title: Optional[str]
-    og_type: Optional[str]
-    og_url: Optional[HttpUrl]
-    theme_color: Optional[str]
-    twitter_card: Optional[str]
-    viewport: Optional[str]
-
-class Snippet(BaseModel):
-    htmlSnippet: Optional[str]
-    snippet: Optional[str]
-
-class DerivedStructData(BaseModel):
-    displayLink: Optional[str]
-    formattedUrl: Optional[HttpUrl]
-    htmlFormattedUrl: Optional[HttpUrl]
-    htmlTitle: Optional[str]
-    link: Optional[HttpUrl]
-    pagemap: Optional[Dict[str, List]]
-    snippets: Optional[List[Snippet]]
-    title: Optional[str]
-
-class Document(BaseModel):
-    derivedStructData: Optional[DerivedStructData]
-    id: Optional[str]
-    name: Optional[str]
-
-class Result(BaseModel):
-    document: Document
-    id: Optional[str]
-
-class ResponseModel(BaseModel):
-    term: Optional[str]
-    attributionToken: Optional[str]
-    guidedSearchResult: Optional[Dict]
-    results: List[Result]
-    summary: Optional[Dict]
-    totalSize: Optional[int]
+_, PROJECT_ID = google.auth.default()
 
 class CreateSearchRequest(BaseModel):
     term: str
 
 class SearchApplication(BaseModel):
-    region: str
     engine_id: str
+    region: str
+
+    def __schema__() -> List[SchemaField]:
+        return [
+            SchemaField("engine_id", "STRING", mode="REQUIRED"),
+            SchemaField("region", "STRING", mode="REQUIRED")
+        ]
+    
+    def __from_row__(row):
+        return SearchApplication(
+            engine_id=row[0],
+            region=row[1]
+        )
+
+    def to_dict(self):
+        return {
+            "engine_id": self.engine_id,
+            "region": self.region,
+        }
+    
+    def to_insert_string(self):
+        return f'"{self.engine_id}", "{self.region}"'
+    
+    def get_client_options(self) -> Optional[ClientOptions]:
+        return ClientOptions(api_endpoint=f"{self.region}-discoveryengine.googleapis.com") if self.region != "global" else None
+    
+    def get_serving_config(self) -> str:
+        return f"projects/{PROJECT_ID}/locations/{self.region}/collections/default_collection/engines/{self.engine_id}/servingConfigs/default_config"
+
+
+@dataclass
+class SearchResult:
+    document_id: str
+    title: str
+    snippet: str
+    img: Optional[str] = None
+    link: Optional[str] = None
+    formatted_url: Optional[str] = None
+    displayLink: Optional[str] = None
