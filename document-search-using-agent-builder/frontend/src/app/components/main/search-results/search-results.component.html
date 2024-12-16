@@ -1,0 +1,39 @@
+<app-header (emitSearch)="this.searchTerm($event)"></app-header>
+<div class="overview-container" *ngIf="summary">
+  <div class="overview-sub-container">
+      <div class="overview-text"><mat-icon>auto_awesome</mat-icon> AI Overview</div>
+      <div class="overview-content"> {{summary}}</div>
+      <div class="overview-button">
+          <button mat-button>Learn more</button>
+      </div>
+  </div>
+</div>
+<div class="overview-container" *ngIf="serachResult?.length > 0">
+  <div class="header-container">
+      Links
+  </div>
+</div>
+<div class="overview-container padding-top">
+  <div class="search-result-parent-container">
+      <div class="search-result" *ngFor="let result of serachResult" (click)="openNewWindow(result.formatted_url)">
+          <div class="title-container">
+              <img src="{{result.img}}" height="30" width="54"/>
+              <div>
+                <div>
+                  {{result.title}}
+                </div>
+                <div class="link-container">
+                  {{result.displayLink}}
+                </div>
+              </div>
+          </div>
+
+          <div class="description-container">
+              {{result.snippet}}
+          </div>
+          <div class="overview-button">
+              <button mat-button (click)="openNewWindow(result.formatted_url)">View</button>
+          </div>
+      </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+.container {
+    padding-left: 4rem;
+    padding-right: 4rem;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+}
+
+
+.genAI {
+	background: linear-gradient(86.95deg, #34A853 -65.34%, #FBBC05 -12.75%, #EA4335 25.15%, #1A73E8 103.88%);
+	-webkit-background-clip: text;
+	-moz-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+:host ::ng-deep .mat-toolbar.mat-primary {
+	background-color: transparent;
+    color: #504747;
+    box-shadow: none;
+    justify-content: center;
+}
+
+.line-spacer {
+    flex: 1 1 auto;
+}
+
+.links-weight {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.links-bold {
+    margin-right: 10px;
+    color: #5f6368;
+    font-family: 'Google Sans', sans-serif !important;
+    .blue{
+        color: #4285f4;
+    }
+    .red{
+        color: #ea4335;
+    }
+    .yellow{
+        color: #fbbc04;
+    }
+    .green{
+        color: #34a853;
+    }
+}
