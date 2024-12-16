@@ -14,7 +14,8 @@
 # pylint: disable=C0415,R0917,R0913,R0914
 
 from typing import Optional
-from kfp.dsl import component, Dataset, Output, Input
+
+from kfp.dsl import Dataset, Input, Output, component
 
 
 @component(
@@ -35,14 +36,15 @@ def process_data(
     """Processes PDF document by splitting into chunks and generating embeddings."""
     import json
     import logging
+    from typing import List
     import uuid
-    import vertexai
+
     from langchain.text_splitter import RecursiveCharacterTextSplitter
     from langchain_community.document_loaders import PyPDFLoader
     from langchain_core.documents import Document
     from langchain_core.embeddings import Embeddings
     from langchain_google_vertexai import VertexAIEmbeddings
-    from typing import List
+    import vertexai
 
     vertexai.init()
     embedding = VertexAIEmbeddings(model_name=embedding_model)
@@ -133,6 +135,7 @@ def ingest_data_in_datastore(
     """
     import json
     import logging
+
     from google.api_core.client_options import ClientOptions
     from google.cloud import discoveryengine
 

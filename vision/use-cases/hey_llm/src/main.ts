@@ -19,8 +19,9 @@ import type {GenerateContentResponse} from '@google-cloud/vertexai';
 
 /**
  * Vertex AI location. Change this const if you want to use another location.
+ * us-central1 is chosen as default to currently provide the most model availability. See [Vertex AI locations documentation](https://cloud.google.com/vertex-ai/docs/general/locations) for more details.
  */
-const LOCATION = 'asia-northeast1';
+const LOCATION = 'us-central1';
 
 /**
  * Default Gemini model to use.

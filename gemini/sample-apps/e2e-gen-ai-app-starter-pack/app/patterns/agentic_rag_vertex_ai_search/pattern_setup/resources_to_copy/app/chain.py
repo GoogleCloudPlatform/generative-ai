@@ -16,9 +16,9 @@
 import os
 from typing import Dict, List
 
+from app.retrievers import get_compressor, get_retriever
+from app.templates import format_docs, inspect_conversation_template, rag_template
 import google
-import vertexai
-
 from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage
 from langchain_core.runnables import RunnableConfig
@@ -26,8 +26,7 @@ from langchain_core.tools import tool
 from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
-from app.templates import rag_template, format_docs, inspect_conversation_template
-from app.retrievers import get_retriever, get_compressor
+import vertexai
 
 EMBEDDING_MODEL = "text-embedding-004"
 LLM_MODEL = "gemini-1.5-flash-002"

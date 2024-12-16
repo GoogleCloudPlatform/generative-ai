@@ -3,6 +3,9 @@ ADMA
 AFX
 AGG
 AIP
+AIphone
+ALCS
+ALDS
 AMNOSH
 ANZ
 APAC
@@ -16,6 +19,7 @@ Akihiro
 Akkaoui
 Aktu
 Aniston
+Aphone
 Arborio
 Arepa
 Arjen
@@ -44,10 +48,12 @@ Bottas
 Boyz
 Breazeal
 Broadoak
+Brusdar
 Btn
 Buckleys
 Buffay
 CALIPSO
+CAMQAA
 CHECKOV
 CLA
 CLASSPATH
@@ -71,6 +77,7 @@ Codey
 Codicote
 Colab
 Colm
+Connectez
 Coursera
 Cowabunga
 Crossbody
@@ -106,6 +113,7 @@ EMFU
 EMNLP
 ENU
 ESG
+EVs
 Edunov
 Eleuther
 Eliud
@@ -121,6 +129,7 @@ FILEOS
 FLX
 FMWK
 FPDF
+FREDDIE
 FTPS
 Fangming
 Federer
@@ -146,12 +155,15 @@ Gandalf
 Gatace
 GenTwo
 Gfm
+Giancarlo
 Gisting
+Gleyber
 Glickman
 Gmb
 GmbH
 Godzilla
 Googlers
+Graterol
 Guardiola
 Gundogan
 HBox
@@ -177,6 +189,7 @@ Hikaru
 Hisaki
 Hmmm
 Hogwarts
+Homesley
 Hossain
 Hubmann
 Hyperdisk
@@ -230,6 +243,7 @@ Kubeflow
 Kudrow
 Kvyat
 Kylian
+L'avenir
 LCEL
 LLMs
 LMPA
@@ -244,6 +258,7 @@ Ladhak
 LangGraph
 Lego
 Leung
+Leventer
 Llion
 Loghub
 Logrus
@@ -267,12 +282,14 @@ Mbappe
 Meawad
 Mega
 Memegen
+Mesop
 Meteo
 Mewgler
 Milito
 Mirai
 Mitani
 Molaison
+Mookie
 Mosher
 Mvar
 NADPH
@@ -285,8 +302,10 @@ NGRAMS
 NHK
 NICOLAS
 NMT
+NOMINATIM
 NOMINMAX
 NOZORDER
+NREL
 NVIDIA
 NVL
 Nagasu
@@ -331,6 +350,8 @@ Photoshop
 Pistorius
 Pranav
 Priyanka
+Pré
+Pzk
 QLo
 QPM
 Qwiklab
@@ -414,8 +435,10 @@ TPUs
 TSLA
 TSMC
 TSNE
+TTFT
 Tadao
 Tafel
+Takeaways
 Tbk
 Tbl
 Tencent
@@ -458,6 +481,7 @@ Vayots
 Vergadia
 Verilog
 Ves
+Vesia
 Vettel
 Vijay
 Virat
@@ -491,6 +515,7 @@ Zijin
 Zom
 Zscaler
 Zuercher
+Zuv
 aadd
 aaxis
 acall
@@ -502,6 +527,7 @@ afrom
 agentic
 ainit
 ainvoke
+aio
 aip
 airlume
 akka
@@ -522,6 +548,8 @@ arguana
 arun
 arxiv
 astype
+atms
+aujourd'hui
 autoflake
 autogen
 automerge
@@ -529,6 +557,7 @@ automl
 autoptr
 autorater
 autosxs
+avec
 aworkflow
 backticks
 bagchi
@@ -546,6 +575,7 @@ bluesky
 bml
 bnb
 booktitle
+boop
 boundings
 bpa
 bpd
@@ -555,6 +585,7 @@ breakroom
 btn
 byor
 carbonara
+cashify
 catus
 caudatus
 caxis
@@ -563,6 +594,7 @@ cctv
 cer
 cfbundle
 chatbots
+chipset
 chipsets
 chromadb
 cicd
@@ -600,6 +632,8 @@ cse
 ctd
 cupertino
 cva
+cycleway
+cycleways
 cygpath
 darkgrid
 dask
@@ -619,6 +653,8 @@ dfs
 dino
 direnv
 diy
+dlat
+dlon
 dlp
 docai
 docstore
@@ -658,6 +694,7 @@ etf
 etils
 eur
 evals
+evse
 expl
 faiss
 fastapi
@@ -666,6 +703,7 @@ fea
 fect
 fewshot
 ffi
+fibonacci
 figsize
 fillmode
 fillna
@@ -677,6 +715,7 @@ floormat
 fmeasure
 fontdict
 footwell
+forbes
 forno
 fos
 freedraw
@@ -689,6 +728,7 @@ fulltext
 fullurl
 functiona
 funtion
+futur
 gapic
 gauff
 gboolean
@@ -759,7 +799,9 @@ imagefont
 imageno
 imagetext
 imdb
+imread
 imshow
+imwrite
 inbox
 informati
 iostream
@@ -792,8 +834,10 @@ kfp
 kickstart
 kotlin
 kpi
+l'harmonie
 lakecolor
 landcolor
+landuse
 langchain
 langgraph
 lebron
@@ -821,6 +865,7 @@ lycra
 magika
 mahut
 makeover
+manquez
 mapbox
 maskmode
 mavenrc
@@ -830,9 +875,12 @@ mdc
 mec
 meme
 memes
+mesop
 metadatas
 metaverse
+metricx
 mgrs
+mic
 millis
 miranda
 mmarco
@@ -864,6 +912,7 @@ nce
 ncols
 ndarray
 ndcg
+nec
 neering
 netif
 newaxis
@@ -895,6 +944,7 @@ openai
 openfda
 osm
 osx
+outdir
 outro
 overwiew
 owlbot
@@ -903,9 +953,12 @@ pagemap
 paleo
 paligemma
 pancetta
+pandoc
 pantarba
 paracord
 parcoords
+parfaite
+parseable
 passwort
 pastiched
 payslip
@@ -974,6 +1027,7 @@ rbf
 reddit
 redef
 rembg
+reoffice
 repreve
 requestz
 reranked
@@ -1015,11 +1069,13 @@ siglap
 signings
 simage
 sittin
+skillsets
 sklearn
 sku
 slf
 snowboard
 sourced
+sqkm
 srlimit
 ssd
 ssh
@@ -1042,6 +1098,8 @@ svm
 sxs
 tabular
 tagline
+takeaways
+tastetest
 tavily
 tencel
 termcolor
@@ -1051,6 +1109,7 @@ textno
 tfhub
 tfidf
 tfvars
+tgi
 tgz
 thelook
 throug
@@ -1074,6 +1133,7 @@ tures
 typehints
 ubuntu
 uids
+ultrawide
 undst
 unigram
 unrtf
@@ -1093,6 +1153,9 @@ vectordb
 vertexai
 vesselin
 vnc
+voiceover
+vos
+votre
 vtotal
 vulnz
 waterjet
@@ -1100,6 +1163,7 @@ wcontext
 wcslen
 wdir
 weaviate
+webcam
 webclient
 webpage
 webpages
@@ -1140,6 +1204,7 @@ yanchor
 yaxes
 yaxis
 ylabel
+yougov
 youtube
 yref
 ytd
