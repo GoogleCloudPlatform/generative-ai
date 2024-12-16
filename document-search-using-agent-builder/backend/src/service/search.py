@@ -7,10 +7,8 @@ class SearchResult:
     document_id: str
     title: str
     snippet: str
-    img: Optional[str] = None
     link: Optional[str] = None
-    formatted_url: Optional[str] = None
-    displayLink: Optional[str] = None
+    content: Optional[str] = None
 
 class SearchService:
 
@@ -59,16 +57,15 @@ class SearchService:
             # Extract snippet safely
             snippets = derived_data.get("snippets", [])
             snippet_text = snippets[0].get("snippet", "No snippet available") if snippets else "No snippet available"
-
+            extractive_answers = derived_data.get("extractive_answers", [])
+            content_text = extractive_answers[0].get("content", "No content available") if extractive_answers else "No content available"
             # Map to SearchResult
             mapped_result = SearchResult(
                 document_id=document.get("id", "Unknown"),
                 title=derived_data.get("title", "Untitled"),
                 snippet=snippet_text,
                 link=derived_data.get("link"),
-                formatted_url=derived_data.get("formattedUrl"),
-                img=derived_data.get("pagemap").get("cse_thumbnail")[0].get("src"),
-                displayLink=derived_data.get("displayLink"),
+                content=content_text
             )
             results.append(mapped_result)
 
