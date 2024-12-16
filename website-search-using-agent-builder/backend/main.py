@@ -1,6 +1,5 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from src.controller.agent_config import router as agent_config_router
 from src.controller.search import router as search_router
 from google.cloud import speech
 from os import getenv
@@ -59,5 +58,4 @@ async def audio_chat(audio_file: UploadFile = File(...)):
 
 configure_cors(app)
 
-app.include_router(agent_config_router)
 app.include_router(search_router)
