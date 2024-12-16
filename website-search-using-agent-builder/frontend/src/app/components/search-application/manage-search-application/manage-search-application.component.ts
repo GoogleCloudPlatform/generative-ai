@@ -1,6 +1,6 @@
 import { Component, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ConfigurationService } from 'src/app/services/configuration.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { SearchApplicationService } from 'src/app/services/search_application.service';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UserService } from 'src/app/services/user/user.service';
@@ -8,46 +8,46 @@ import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-manage-agent-builder',
-  templateUrl: './manage-agent-builder.component.html',
-  styleUrls: ['./manage-agent-builder.component.scss']
+  selector: 'app-manage-search-application',
+  templateUrl: './manage-search-application.component.html',
+  styleUrls: ['./manage-search-application.component.scss']
 })
-export class ManageAgentBuilderComponent implements OnDestroy{
+export class ManageSearchApplicationComponent implements OnDestroy{
 
   @ViewChild('deleteDialogRef', { static: true })
   deleteDialogRef!: TemplateRef<{}>;
   deleteAgentDialogRef?: MatDialogRef<{}>;
 
-  disableBuilderForm = true;
-  agentBuilderForm = new FormGroup({
-    url: new FormControl<string>('', Validators.required),
+  form = new FormGroup({
+    engine_id: new FormControl<string>('', Validators.required),
+    region: new FormControl<string>('', Validators.required),
   });
   private readonly destroyed = new ReplaySubject<void>(1);
 
-  constructor(private readonly configService: ConfigurationService, 
-    private readonly userService: UserService, 
+  constructor(
+    private readonly searchApplicationService: SearchApplicationService,
+    private readonly userService: UserService,
     private readonly router : Router,
     private dialog: MatDialog,
     ){
-    this.agentBuilderForm.controls.url.disable();
+    this.disableForm();
     this.getConfigData();
   }
 
-  enableForm(){
-    this.disableBuilderForm = false;
-    this.agentBuilderForm.controls.url.enable();
+  disableForm(){
+    this.form.disable();
   }
 
-  disableForm(){
-    this.disableBuilderForm = true;
-    this.agentBuilderForm.controls.url.disable();
+  enableForm(){
+    this.form.enable();
   }
 
   getConfigData(){
     this.userService.showLoading();
-    this.configService.getConfiguration().pipe(takeUntil(this.destroyed)).subscribe({
+    this.searchApplicationService.get().pipe(takeUntil(this.destroyed)).subscribe({
       next: (response)=>{
-        if(response[0].url) this.agentBuilderForm.controls.url.setValue(response[0].url);
+        this.form.controls.engine_id.setValue(response.engine_id);
+        this.form.controls.region.setValue(response.region);
         this.userService.hideLoading();
       },
       error: ()=>{
@@ -58,7 +58,12 @@ export class ManageAgentBuilderComponent implements OnDestroy{
 
   saveForm(){
     this.userService.showLoading();
-    this.configService.updateConfig(this.agentBuilderForm.controls.url.value!).subscribe({
+    let searchApplication = {
+      engine_id: this.form.controls.engine_id.value!,
+      region: this.form.controls.region.value!,
+    }
+
+    this.searchApplicationService.update(searchApplication).subscribe({
       next: ()=>{
         this.userService.hideLoading();
         this.disableForm();
@@ -76,7 +81,13 @@ export class ManageAgentBuilderComponent implements OnDestroy{
 
   deleteConfig(){
     this.userService.showLoading();
-    this.configService.deleteConfiguration().subscribe({
+
+    let searchApplication = {
+      engine_id: this.form.controls.engine_id.value!,
+      region: this.form.controls.region.value!,
+    }
+
+    this.searchApplicationService.delete(searchApplication).subscribe({
       next: ()=>{
         this.userService.hideLoading();
         this.deleteAgentDialogRef?.close();
