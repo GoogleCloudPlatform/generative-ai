@@ -16,10 +16,10 @@ class ExtractiveAnswer:
 class DerivedStructData:
     link: Optional[str]
     source_type: Optional[str]
-    extractive_answers: List[ExtractiveAnswer] = field(default_factory=list)
     title: Optional[str]
-    snippets: List[Snippet] = field(default_factory=list)
     entity_type: Optional[str]
+    extractive_answers: List[ExtractiveAnswer] = field(default_factory=list)
+    snippets: List[Snippet] = field(default_factory=list)
 
 @dataclass
 class Document:
