@@ -22,11 +22,7 @@ export class SearchApplicationService {
     return this.http.post(configURL, searchApplication);
   }
 
-  update(searchApplication: SearchApplication){
-    return this.http.put(`${configURL}/${searchApplication.engine_id}`, searchApplication);
-  }
-
-  delete(searchApplication: SearchApplication){
-    return this.http.delete(`${configURL}/${searchApplication.engine_id}`);
+  update(engine_id:string, searchApplication: SearchApplication){
+    return this.http.put(`${configURL}/${engine_id}`, searchApplication);
   }
 }

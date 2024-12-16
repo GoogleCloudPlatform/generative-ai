@@ -20,7 +20,7 @@ SPELL_CORRECTION_SPEC = SearchRequest.SpellCorrectionSpec(
 class SearchService:
 
     def __init__(self, search_application: SearchApplication):
-        self.client = SearchServiceClient(
+        self.search_client = SearchServiceClient(
             client_options=search_application.get_client_options()
         )
         self.serving_config = search_application.get_serving_config()
@@ -36,7 +36,7 @@ class SearchService:
             spell_correction_spec=SPELL_CORRECTION_SPEC,
         )
 
-        data = self.client.search(request)
+        data = self.search_client.search(request)
         results = []
 
         # Process results

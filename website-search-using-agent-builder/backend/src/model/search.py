@@ -41,6 +41,10 @@ class SearchApplication(BaseModel):
     def get_serving_config(self) -> str:
         return f"projects/{PROJECT_ID}/locations/{self.region}/collections/default_collection/engines/{self.engine_id}/servingConfigs/default_config"
 
+class Engine(BaseModel):
+    name: str
+    engine_id: str
+    region: str
 
 @dataclass
 class SearchResult:

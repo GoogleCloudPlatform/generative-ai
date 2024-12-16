@@ -30,6 +30,3 @@ class SearchApplicationService:
             'region': f'"{search_application.region}"',
         }
         self.repository.update_row_by_id(SEARCH_APPLICATION_TABLE, SEARCH_APPLICATION_TABLE_ID_COLUMN, engine_id, update_dict)
-
-    def delete(self, engine_id: str):
-        self.repository.delete_row_by_id(SEARCH_APPLICATION_TABLE, SEARCH_APPLICATION_TABLE_ID_COLUMN, engine_id)
