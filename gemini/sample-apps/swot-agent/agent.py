@@ -194,11 +194,12 @@ async def fetch_website_content(_ctx: RunContext[SwotAgentDeps], url: str) -> st
             raise
 
 
+# pylint: disable=W0718
 @swot_agent.tool(prepare=report_tool_usage)
 async def analyze_competition(
     ctx: RunContext[SwotAgentDeps],
     product_name: str,
-    product_description: str,  # noqa: W0613
+    product_description: str,
 ) -> str:
     """Analyzes the competition for the given product using the Gemini model."""
     logging.info(f"Analyzing competition for: {product_name}")
@@ -225,7 +226,7 @@ async def analyze_competition(
         )
 
         return response.text
-    except Exception as e:  # noqa: W0718
+    except Exception as e:
         logging.info(f"Error analyzing competition: {e}")
         return f"Error analyzing competition: {e}"
 
@@ -260,6 +261,7 @@ async def get_reddit_insights(
         return f"Error fetching Reddit data: {e}"
 
 
+# pylint: disable=W0718
 async def run_agent(
     url: str = ANALYZE_URL,
     deps: SwotAgentDeps = SwotAgentDeps(),
@@ -288,7 +290,7 @@ async def run_agent(
             await deps.update_status_func(deps.request, "Analysis Complete")
 
         return result.data
-    except Exception as e:  # noqa: W0718
+    except Exception as e:
         logging.exception(f"Error during agent run: {e}")
 
         # Send the error to the UI via update_status_func
