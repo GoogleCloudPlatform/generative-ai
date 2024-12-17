@@ -22,7 +22,7 @@ While some web development experience, particularly with localhost, port numbers
 - frontend/index.html: The frontend HTML app
 - frontend/script.js: Main frontend JavaScript code
 - frontend/gemini-live-api.js: Script for interacting with the Gemini API
-- frontend/live-media-manager.js: Script for handleing media input and output
+- frontend/live-media-manager.js: Script for handling media input and output
 - frontend/pcm-processor.js: Script for processing PCM audio
 - frontend/cookieJar.js: Script for managing cookies
 
