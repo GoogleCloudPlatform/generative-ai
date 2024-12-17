@@ -11,7 +11,7 @@ The [Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/
 
 ## Pre-requisites
 
-While some web development experience, particularly with localhost, port numbers, and the distinctions between websockets and HTTP requests, can be beneficial for this tutorial, don't worry if you're not familiar with these concepts. We'll provide guidance along the way to ensure you can successfully follow along.
+While some web development experience, particularly with localhost, port numbers, and the distinction between WebSockets and HTTP requests, can be beneficial for this tutorial, don't worry if you're not familiar with these concepts. We'll provide guidance along the way to ensure you can successfully follow along.
 
 ### File Structure
 
