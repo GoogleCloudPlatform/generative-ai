@@ -6,7 +6,7 @@ window.addEventListener("load", (event) => {
 });
 
 
-const PROXY_URL = "wss://your websocket server";
+const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";
 const PROJECT_ID = "your project id";
 const MODEL = "gemini-2.0-flash-exp";
 const API_HOST = "us-central1-aiplatform.googleapis.com";
