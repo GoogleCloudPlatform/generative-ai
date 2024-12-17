@@ -5,6 +5,7 @@ The [Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/
 ## Demo
 
 The following video demonstrating the Multimodal Live API shows an example use case of conversing with the model. This demo app can be run locally or via Cloud Shell so that you can test your own use cases. Instructions to get this application running are in the `websocket-demo-app` directory.
+
 [![Demo Video](https://img.youtube.com/vi/_vc8sXog2ek/hqdefault.jpg)](https://www.youtube.com/watch?v=_vc8sXog2ek&t=1s)
 
 ## Getting Started
