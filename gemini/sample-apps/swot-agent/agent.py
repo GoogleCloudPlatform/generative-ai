@@ -25,6 +25,7 @@ import httpx
 import praw
 from bs4 import BeautifulSoup
 from google import genai
+from google.genai import errors
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.vertexai import VertexAIModel
@@ -142,7 +143,7 @@ swot_agent = Agent(
 
 @swot_agent.result_validator
 def validate_analysis(
-    ctx: RunContext[SwotAgentDeps], value: SwotAnalysis
+    _ctx: RunContext[SwotAgentDeps], value: SwotAnalysis
 ) -> SwotAnalysis:
     """Validates the SWOT analysis for completeness and quality."""
     issues = []

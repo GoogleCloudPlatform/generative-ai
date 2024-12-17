@@ -30,7 +30,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 # Configure logging
-logging.basicConfig(level=logging.info)
+logging.basicConfig(level=logging.INFO)
 
 # Constants
 ANALYZING_MESSAGE: Final = "Analyzing..."

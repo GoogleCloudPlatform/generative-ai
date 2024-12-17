@@ -15,9 +15,8 @@
 # limitations under the License.
 
 import pytest
-from pydantic_ai import models
-
 from agent import SwotAgentDeps, SwotAnalysis
+from pydantic_ai import models
 
 # Prevent accidental model requests during testing
 models.ALLOW_MODEL_REQUESTS = False
@@ -26,7 +25,7 @@ models.ALLOW_MODEL_REQUESTS = False
 class TestSWOTAnalysis:
     """Test the SWOT Analysis data model"""
 
-    def test_swot_analysis_model(self):
+    def test_swot_analysis_model(self) -> None:
         """Test that the SWOT Analysis model can be instantiated with valid data"""
         analysis = SwotAnalysis(
             strengths=["Strong brand"],
@@ -47,27 +46,27 @@ class TestSwotAgentDeps:
     """Test the SWOT Agent Dependencies"""
 
     @pytest.fixture
-    def agent_deps(self):
+    def agent_deps(self) -> SwotAgentDeps:
         """Create a basic SwotAgentDeps instance for testing"""
         return SwotAgentDeps()
 
-    def test_agent_initialization(self, agent_deps):
+    def test_agent_initialization(self, agent_deps: SwotAgentDeps) -> None:
         """Test that the agent dependencies are properly initialized"""
         assert agent_deps.tool_history == []
         assert agent_deps.request is None
         assert agent_deps.update_status_func is None
 
-    def test_gemini_client_initialization(self, agent_deps):
+    def test_gemini_client_initialization(self, agent_deps: SwotAgentDeps) -> None:
         """Test Gemini client initialization"""
         # Just verify that the Gemini client exists (could be None or initialized)
         assert hasattr(agent_deps, "client")
 
-    def test_reddit_client_initialization(self, agent_deps):
+    def test_reddit_client_initialization(self, agent_deps: SwotAgentDeps) -> None:
         """Test Reddit client initialization"""
         # Just verify that the reddit client exists (could be None or initialized)
         assert hasattr(agent_deps, "reddit")
 
-    def test_mock_analysis(self, agent_deps):
+    def test_mock_analysis(self, agent_deps: SwotAgentDeps) -> None:
         """Test that the required attributes exist for analysis"""
         # Test SwotAnalysis model structure using model_fields
         required_fields = {

@@ -16,13 +16,12 @@
 
 import pytest
 from fastapi.testclient import TestClient
-
 from main import app
 
 client = TestClient(app)
 
 
-def test_read_root():
+def test_read_root() -> None:
     """Test the root endpoint returns the index page."""
     response = client.get("/")
     assert response.status_code == 200
@@ -30,7 +29,7 @@ def test_read_root():
     assert "SWOT Analysis" in response.text
 
 
-def test_analyze_endpoint():
+def test_analyze_endpoint() -> None:
     """Test the analyze endpoint with a valid URL."""
     test_url = "https://example.com"
     response = client.post("/analyze", data={"url": test_url})
@@ -38,7 +37,7 @@ def test_analyze_endpoint():
     assert response.headers["content-type"] == "text/html; charset=utf-8"
 
 
-def test_analyze_invalid_url():
+def test_analyze_invalid_url() -> None:
     """Test the analyze endpoint with an invalid URL."""
     test_url = "not-a-valid-url"
     response = client.post("/analyze", data={"url": test_url})
@@ -46,21 +45,21 @@ def test_analyze_invalid_url():
     assert response.headers["content-type"] == "text/html; charset=utf-8"
 
 
-def test_analyze_empty_url():
+def test_analyze_empty_url() -> None:
     """Test the analyze endpoint with an empty URL."""
     response = client.post("/analyze", data={"url": ""})
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/html; charset=utf-8"
 
 
-def test_status_endpoint():
+def test_status_endpoint() -> None:
     """Test the status endpoint."""
     response = client.get("/status")
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/html; charset=utf-8"
 
 
-def test_result_endpoint_no_result():
+def test_result_endpoint_no_result() -> None:
     """Test the result endpoint when no analysis is complete."""
     response = client.get("/result")
     assert response.status_code == 200
@@ -68,7 +67,7 @@ def test_result_endpoint_no_result():
 
 
 @pytest.mark.asyncio
-async def test_full_analysis_flow():
+async def test_full_analysis_flow() -> None:
     """Test the complete analysis flow from submission to result."""
     # 1. Submit URL for analysis
     test_url = "https://google.com"
@@ -84,7 +83,7 @@ async def test_full_analysis_flow():
     assert result_response.status_code == 200
 
 
-def test_concurrent_requests():
+def test_concurrent_requests() -> None:
     """Test handling of concurrent analysis requests."""
     test_url = "https://google.com"
     # Submit multiple requests in quick succession
