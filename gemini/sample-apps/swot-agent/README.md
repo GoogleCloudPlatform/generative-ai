@@ -69,7 +69,7 @@ The agent includes three tools:
    - Extract content from the provided URL
    - Process the content using Gemini 2.0
    - Generate structured SWOT insights
-   - Present results in a organized format
+   - Present results in an organized format
 1. View the SWOT analysis results
 
 ## Deployment

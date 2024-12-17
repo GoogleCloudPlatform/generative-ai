@@ -72,7 +72,7 @@ class SwotAgentDeps:
     except Exception:
         client = None
         logging.info(
-            "Gemini client not initialized. Please set the GOOGLE_APPLICATION_PROJECT and GOOGLE_APPLICATION_CREDENTIALS environment variables."
+            "Gemini client not initialized. Please set the GOOGLE_CLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS environment variables."
         )
 
 
@@ -257,7 +257,7 @@ async def get_reddit_insights(
 async def run_agent(
     url: str = ANALYZE_URL,
     deps: SwotAgentDeps = SwotAgentDeps(),
-) -> tuple[SwotAnalysis | Exception]:
+) -> SwotAnalysis | Exception:
 
     try:
         deps.tool_history = []

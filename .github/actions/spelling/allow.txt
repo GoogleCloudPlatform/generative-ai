@@ -194,6 +194,7 @@ Hmmm
 Hogwarts
 Homesley
 Hossain
+HTMX
 Hubmann
 Hyperdisk
 ICICI
@@ -992,6 +993,7 @@ podcasts
 podfile
 podhelper
 powerups
+Praw
 prcntg
 preds
 produc
@@ -1062,6 +1064,7 @@ scikit
 seaborn
 seatback
 selectbox
+selftext
 selkirk
 seo
 setlocal

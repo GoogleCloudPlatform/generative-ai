@@ -10,4 +10,3 @@ pytest==8.3.4
 httpx==0.28.1
 google-genai==0.2.2
 google-cloud-aiplatform==1.74.0
-
