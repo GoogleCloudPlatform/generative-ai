@@ -10,30 +10,67 @@
 </div>
 <div class="overview-container" *ngIf="serachResult?.length > 0">
   <div class="header-container">
-      Links
+      Search results
   </div>
 </div>
 <div class="overview-container padding-top">
-  <div class="search-result-parent-container">
-      <div class="search-result" *ngFor="let result of serachResult" (click)="openNewWindow(result.formatted_url)">
-          <div class="title-container">
-              <img src="{{result.img}}" height="30" width="54"/>
+  <div class="search-result-parent-container" *ngIf="documents.length>0">
+    <div class="header-container">
+      Documents
+    </div>
+    <div class="search-result-row-container">
+      <div class="search-result" *ngFor="let result of documents" (click)="openNewWindow(result.link)">
+        <div class="title-container">
+            <img src="{{result.link.includes(pdf) ? imageName.get('pdf'): imageName.get('doc')}}" height="30" width="30"/>
+            <div>
               <div>
-                <div>
-                  {{result.title}}
-                </div>
-                <div class="link-container">
-                  {{result.displayLink}}
-                </div>
+                {{result.title}}
               </div>
-          </div>
+              <div class="link-container">
+                {{result.displayLink}}
+              </div>
+            </div>
+        </div>
 
-          <div class="description-container">
-              {{result.snippet}}
-          </div>
-          <div class="overview-button">
-              <button mat-button (click)="openNewWindow(result.formatted_url)">View</button>
-          </div>
-      </div>
+        <div class="description-container">
+            {{result.snippet}}
+        </div>
+
+        <div class="overview-button">
+          <button mat-button (click)="openNewWindow(result.link)">View</button>
+        </div>
+    </div>
+    </div>
+  </div>
+</div>
+<div class="overview-container padding-top">
+  <div class="search-result-parent-container" *ngIf="images.length>0">
+    <div class="header-container">
+      Images
+    </div>
+    <div class="search-result-row-container">
+      <div class="search-result" *ngFor="let result of images" (click)="openNewWindow(result.link)">
+        <div class="title-container">
+            <img src="assets/images/img.png" height="30" width="30"/>
+            <div>
+              <div>
+                {{result.title}}
+              </div>
+              <div class="link-container">
+                {{result.displayLink}}
+              </div>
+            </div>
+        </div>
+
+        <div class="description-container">
+            {{result.snippet}}
+        </div>
+
+        <div class="overview-button">
+          <button mat-button (click)="openNewWindow(result.link)">View</button>
+        </div>
+    </div>
+    </div>
+
   </div>
 </div>

@@ -74,10 +74,18 @@
   gap: 15px;
 }
 
+.search-result-row-container {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
 .search-result {
   padding: 1%;
   padding-top: 2%;
   cursor: pointer;
+  border: 1px solid transparent;
+  width: 25%;
 
   .title-container {
       display: flex;
@@ -89,6 +97,7 @@
       line-height: 31px;
       color: #161A1D;
       display: flex;
+      gap: 15px;
 
       .link-container {
         font-size: 14px !important;
@@ -106,11 +115,11 @@
       color: #161A1D;
       opacity: 0.8;
       padding: 1%;
-      padding-left: 22px;
+      padding-top: 4%;
   }
 
   .overview-button {
-      padding-left: 22px;
+      padding-top: 2%;
       button {
           font-family: 'Roboto';
           font-style: normal;
