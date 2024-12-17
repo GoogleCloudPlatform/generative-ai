@@ -101,7 +101,7 @@ gcloud auth print-access-token
 
 ```sh
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd gemini/multimodal-live-api/websocket-demo-app
+cd generative-ai/gemini/multimodal-live-api/websocket-demo-app
 ```
 
 3. Open two new terminal windows.
