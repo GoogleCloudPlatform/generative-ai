@@ -1,6 +1,6 @@
 # Multimodal Live API
 
-The [Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live) is a low-latency bidirectional streaming API that supports text, audio and video input, with audio and text output. This capability allows for natual, human-like conversations, giving you the option to interrupt the model at any point in the interaction. The model's abilities are further enhanced through video understanding, enabling you to share live video input and screencasts so that Gemini can reason across this information and respond to questions. You can also provide system instructions to better control the model's output.
+The [Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live) is a low-latency bidirectional streaming API that supports text, audio and video input, with audio and text output. This capability allows for natural, human-like conversations, giving you the option to interrupt the model at any point in the interaction. The model's abilities are further enhanced through video understanding, enabling you to share live video input and screencasts so that Gemini can reason across this information and respond to questions. You can also provide system instructions to better control the model's output.
 
 ## Demo
 
