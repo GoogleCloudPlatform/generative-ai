@@ -4,25 +4,28 @@ import json
 import os
 from threading import Event
 
+from dotenv import load_dotenv
 import gradio as gr
+from gradio_webrtc import StreamHandler, WebRTC
 import numpy as np
 import websockets.sync.client
-from dotenv import load_dotenv
-from gradio_webrtc import StreamHandler, WebRTC
 
 load_dotenv()
 
+# mypy: disable-error-code="error-code-1, error-code-2"
 
 class GeminiConfig:
-    def __init__(self, api_key):
+    def __init__(self, api_key: str) -> None:
         self.api_key = api_key
         self.host = "generativelanguage.googleapis.com"
         self.model = "models/gemini-2.0-flash-exp"
         self.ws_url = f"wss://{self.host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key={self.api_key}"
 
+
 class AudioProcessor:
     @staticmethod
-    def encode_audio(data, sample_rate):
+    def encode_audio(data: np.ndarray, sample_rate: int) -> None:
+        """Encode Audio data to send to the server"""
         encoded = base64.b64encode(data.tobytes()).decode("UTF-8")
         return {
             "realtimeInput": {
@@ -36,7 +39,8 @@ class AudioProcessor:
         }
 
     @staticmethod
-    def process_audio_response(data):
+    def process_audio_response(data: str) -> np.ndarray:
+        """Decode Audio data received from the server"""
         audio_data = base64.b64decode(data)
         return np.frombuffer(audio_data, dtype=np.int16)
 
@@ -57,14 +61,14 @@ class GeminiHandler(StreamHandler):
         self.audio_processor = AudioProcessor()
         self.args_set = Event()
 
-    def copy(self):
+    def copy(self) -> "GeminiHandler":
         return GeminiHandler(
             expected_layout=self.expected_layout,
             output_sample_rate=self.output_sample_rate,
             output_frame_size=self.output_frame_size,
         )
 
-    def _initialize_websocket(self):
+    def _initialize_websocket(self) -> None:
         assert self.config, "Config not set"
         try:
             self.ws = websockets.sync.client.connect(self.config.ws_url, timeout=30)
@@ -85,11 +89,11 @@ class GeminiHandler(StreamHandler):
 
     async def fetch_args(
         self,
-    ):
+    ) -> None:
         if self.channel:
             self.channel.send("tick")
 
-    def set_args(self, args):
+    def set_args(self, args) -> None:
         super().set_args(args)
         self.args_set.set()
 
@@ -99,7 +103,6 @@ class GeminiHandler(StreamHandler):
         if not self.config:
             asyncio.run_coroutine_threadsafe(self.fetch_args(), self.loop)
             self.args_set.wait()
-            print("api_key", self.latest_args[-1])
             self.config = GeminiConfig(self.latest_args[-1])
         try:
             if not self.ws:
@@ -195,13 +198,15 @@ class GeminiVoiceChat:
 
     def _create_interface(self):
         with gr.Blocks() as demo:
-            gr.HTML("""
+            gr.HTML(
+                """
                 <div style='text-align: center'>
                     <h1>Gemini 2.0 Voice Chat</h1>
                     <p>Speak with Gemini using real-time audio streaming</p>
                     <p>Get a Gemini API key from <a href="https://ai.google.dev/gemini-api/docs/api-key">Google</a></p>
                 </div>
-            """)
+            """
+            )
 
             with gr.Row(visible=True) as api_key_row:
                 api_key = gr.Textbox(
