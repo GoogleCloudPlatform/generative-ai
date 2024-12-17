@@ -71,7 +71,7 @@ class SwotAgentDeps:
         )
     try:
         client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
-    except Exception as e:
+    except ValueError as e:
         client = None
         logging.info(
             f"Gemini client not initialized. Please set the GOOGLE_CLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS environment variables: {e}"
@@ -178,9 +178,7 @@ def validate_analysis(
 
 # --- Tools ---
 @swot_agent.tool(prepare=report_tool_usage)
-async def fetch_website_content(
-    ctx: RunContext[SwotAgentDeps], url: str
-) -> str:  # noqa: W0613
+async def fetch_website_content(_ctx: RunContext[SwotAgentDeps], url: str) -> str:
     """Fetches the HTML content of the given URL."""
     logging.info(f"Fetching website content for: {url}")
     async with httpx.AsyncClient(follow_redirects=True) as http_client:
@@ -227,7 +225,7 @@ async def analyze_competition(
         )
 
         return response.text
-    except Exception as e:  # noqa: W0718
+    except Exception as e:
         logging.info(f"Error analyzing competition: {e}")
         return f"Error analyzing competition: {e}"
 
@@ -257,7 +255,7 @@ async def get_reddit_insights(
                 f"Content: {post.selftext[:REDDIT_MAX_INSIGHT_LENGTH]}...\n"
             )
         return "\n".join(insights)
-    except Exception as e:  # noqa: W0718
+    except praw.exceptions.PRAWException as e:
         logging.info(f"Error fetching Reddit data: {e}")
         return f"Error fetching Reddit data: {e}"
 
