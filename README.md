@@ -9,6 +9,7 @@
 > - [Intro to Multimodal Live API with Gen AI SDK](gemini/multimodal-live-api/intro_multimodal_live_api_genai_sdk.ipynb)
 > - [Multimodal Live API Demo App](gemini/multimodal-live-api/websocket-demo-app/)
 > - [Intro to Google Gen AI SDK](gemini/getting-started/intro_genai_sdk.ipynb)
+> - [Patents Document Understanding](gemini/use-cases/document-processing/patents_understanding.ipynb)
 > - [Real-Time RAG with Multimodal Live API](gemini/multimodal-live-api/real_time_rag_retail_gemini_2_0.ipynb)
 > - [Creating Marketing Assets using Gemini 2.0](gemini/use-cases/marketing/creating_marketing_assets_gemini_2_0.ipynb)
 > - [Vertex AI Gemini Research Multi Agent Demo Research Agent for EV Industry](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/agents/research-multi-agents)
