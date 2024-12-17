@@ -38,13 +38,13 @@ The agent includes three tools:
    # Google Cloud settings
    export GOOGLE_CLOUD_PROJECT=your_project_id
    export GOOGLE_APPLICATION_CREDENTIALS=path_to_service_account.json
-   
+
    # (Optional) Reddit API credentials
    export REDDIT_CLIENT_ID=your_reddit_client_id
    export REDDIT_CLIENT_SECRET=your_reddit_client_secret
-   
+
    # (Optional) Application settings
-   export APP_SECRET_KEY=your_secret_key  
+   export APP_SECRET_KEY=your_secret_key
    ```
 
 1. Run the application:
