@@ -125,8 +125,9 @@ python3 backend/main.py
 - Click "Preview on port 8080" (the port where you've setup the proxy server in the previous step)
 - Copy the URL, but make sure to discard everything at the end after "cloudshell.dev/"
 - Navigate to `const URL = "ws://localhost:8080";` in `index.html` on line 116
-- Replace `ws://localhost:8080` with `wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]`. For example, it should look like: `const URL = "wss://8080-cs-123456789-default.cs-us-central1-abcd.cloudshell.dev";`
-- save the changes you've made to index.html
+- Navigate to `const PROXY_URL = "wss://your websocket server";` in `script.js`
+- Replace `wss://your websocket server` with `wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]`. For example, it should look like: `const PROXY_URL = "wss://8080-cs-123456789-default.cs-us-central1-abcd.cloudshell.dev";`
+- save the changes you've made to script.js
 
 8. Start the frontend:
    In the second terminal window, run the command below. Keep the backend server running in the first terminal.
