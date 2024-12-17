@@ -3,7 +3,6 @@ from typing import Dict, List
 from google.cloud.bigquery import Client
 
 BIG_QUERY_DATASET= getenv("BIG_QUERY_DATASET")
-# BIG_QUERY_DATASET= "document_search_builder"
 
 class BigQueryRepository:
 

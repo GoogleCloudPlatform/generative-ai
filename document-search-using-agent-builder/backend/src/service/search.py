@@ -1,6 +1,5 @@
 import requests
-from typing import List, Optional
-from dataclasses import dataclass
+from typing import List
 from typing import List
 from google.cloud.discoveryengine_v1 import SearchRequest, SearchServiceClient
 from src.model.search import SearchApplication, SearchResult
@@ -41,38 +40,6 @@ class SearchService:
         data = self.search_client.search(request)
         results = []
 
-        # payload = {
-        #     "query": term,
-        #     "page_size": 10,
-        #     "query_expansion_spec": {
-        #         "condition": "AUTO"
-        #     },
-        #     "spell_correction_spec": {
-        #         "mode": "AUTO"
-        #     },
-        #     "content_search_spec": {
-        #         "extractive_content_spec": {
-        #             "max_extractive_answer_count": 1
-        #         },
-        #         "snippet_spec": {
-        #             "return_snippet": True
-        #         }
-        #     }
-        # }
-
-        # token = get_token()
-        # headers = {
-        #     'Authorization': f'Bearer {token}',
-        #     "Content-Type": "application/json"
-        # }
-
-        # # Perform the HTTP POST request
-        # response = requests.post(self.api_url, headers=headers, json=payload)
-        # response.raise_for_status()  # Raise an error if the request fails
-
-        # data = response.json()
-        # results = []
-
         # Process results
         for r in data.results:
             document = r.document
@@ -94,25 +61,3 @@ class SearchService:
             results.append(mapped_result)
 
         return results
-
-
-# def get_token():
-#     """
-#     Fetches an authentication token from the metadata server.
-#     """
-    
-#     metadata_server_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
-#     headers = {
-#         'Metadata-Flavor': 'Google'
-#     }
-
-#     try:
-#         response = requests.get(metadata_server_url, headers=headers)
-#         response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
-#         token_data = response.json()  # Parse the JSON response
-#         access_token = token_data['access_token'].strip()  # Extract the access_token
-#         return access_token
-
-#     except requests.exceptions.RequestException as e:
-#         print(f"Error fetching token: {e}")
-#         raise
