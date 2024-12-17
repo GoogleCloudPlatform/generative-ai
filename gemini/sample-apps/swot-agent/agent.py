@@ -25,7 +25,6 @@ import httpx
 import praw
 from bs4 import BeautifulSoup
 from google import genai
-from google.genai import errors
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.vertexai import VertexAIModel
@@ -226,7 +225,7 @@ async def analyze_competition(
         )
 
         return response.text
-    except Exception as e:
+    except Exception as e:  # noqa: W0718
         logging.info(f"Error analyzing competition: {e}")
         return f"Error analyzing competition: {e}"
 

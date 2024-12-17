@@ -67,13 +67,13 @@ templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
+async def read_root(request: Request) -> HTMLResponse:
     """Serves the index page."""
     return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/analyze", response_class=HTMLResponse)
-async def analyze_url(request: Request, url: str = Form(...)):
+async def analyze_url(request: Request, url: str = Form(...)) -> HTMLResponse:
     """Analyzes the given URL using the SWOT analysis agent."""
     # Generate a unique ID for this analysis session
     session_id = str(id(request))
@@ -101,7 +101,7 @@ async def analyze_url(request: Request, url: str = Form(...)):
 
 
 @app.get("/status", response_class=HTMLResponse)
-async def get_status(request: Request):
+async def get_status(request: Request) -> HTMLResponse:
     """Returns the current status messages."""
     session_id = request.session.get("analysis_id")
     if not session_id:
@@ -129,7 +129,7 @@ async def get_status(request: Request):
 
 
 @app.get("/result", response_class=HTMLResponse)
-async def get_result(request: Request):
+async def get_result(request: Request) -> HTMLResponse:
     """Returns the SWOT analysis result."""
     session_id = request.session.get("analysis_id")
 
@@ -144,7 +144,7 @@ async def get_result(request: Request):
     )
 
 
-async def run_agent_with_progress(session_id: str, url: str):
+async def run_agent_with_progress(session_id: str, url: str) -> None:
     """Runs the agent and provides progress updates."""
     try:
         # Create a custom deps object that uses the session_id
@@ -164,7 +164,7 @@ async def run_agent_with_progress(session_id: str, url: str):
         raise
 
 
-def emulate_tool_completion(session_id: str, message: str):
+def emulate_tool_completion(session_id: str, message: str) -> None:
     """Pydantic AI doesn't provide a post-processing hook, so we need to emulate one."""
 
     # Sleep a random amount of time between 0 and 5 seconds
@@ -172,7 +172,7 @@ def emulate_tool_completion(session_id: str, message: str):
     status_store[session_id].append(message)
 
 
-async def update_status(session_id: str, message: Any):
+async def update_status(session_id: str, message: Any) -> None:
     """Updates status messages and handles SWOT analysis results."""
     logging.info(f"Updating status for session {session_id}: {message}")
 
