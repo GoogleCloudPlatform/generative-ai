@@ -178,7 +178,9 @@ def validate_analysis(
 
 # --- Tools ---
 @swot_agent.tool(prepare=report_tool_usage)
-async def fetch_website_content(ctx: RunContext[SwotAgentDeps], url: str) -> str:
+async def fetch_website_content(
+    ctx: RunContext[SwotAgentDeps], url: str
+) -> str:  # noqa: W0613
     """Fetches the HTML content of the given URL."""
     logging.info(f"Fetching website content for: {url}")
     async with httpx.AsyncClient(follow_redirects=True) as http_client:
@@ -196,7 +198,9 @@ async def fetch_website_content(ctx: RunContext[SwotAgentDeps], url: str) -> str
 
 @swot_agent.tool(prepare=report_tool_usage)
 async def analyze_competition(
-    ctx: RunContext[SwotAgentDeps], product_name: str, product_description: str
+    ctx: RunContext[SwotAgentDeps],
+    product_name: str,
+    product_description: str,  # noqa: W0613
 ) -> str:
     """Analyzes the competition for the given product using the Gemini model."""
     logging.info(f"Analyzing competition for: {product_name}")
@@ -223,7 +227,7 @@ async def analyze_competition(
         )
 
         return response.text
-    except Exception as e:
+    except Exception as e:  # noqa: W0718
         logging.info(f"Error analyzing competition: {e}")
         return f"Error analyzing competition: {e}"
 
@@ -253,7 +257,7 @@ async def get_reddit_insights(
                 f"Content: {post.selftext[:REDDIT_MAX_INSIGHT_LENGTH]}...\n"
             )
         return "\n".join(insights)
-    except Exception as e:
+    except Exception as e:  # noqa: W0718
         logging.info(f"Error fetching Reddit data: {e}")
         return f"Error fetching Reddit data: {e}"
 
@@ -286,7 +290,7 @@ async def run_agent(
             await deps.update_status_func(deps.request, "Analysis Complete")
 
         return result.data
-    except Exception as e:
+    except Exception as e:  # noqa: W0718
         logging.exception(f"Error during agent run: {e}")
 
         # Send the error to the UI via update_status_func
