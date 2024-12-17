@@ -13,23 +13,23 @@ class LiveAudioOutputManager {
 
 
     async playAudioChunk(base64AudioChunk) {
-        try {
-            if (!this.initalized) {
-                await this.initializeAudioContext.bind(this)();
-            }
-
-            if (this.audioInputContext.state === "suspended") {
-                await this.audioInputContext.resume();
-            }
-
-            const arrayBuffer = LiveAudioOutputManager.base64ToArrayBuffer(base64AudioChunk);
-            const float32Data = LiveAudioOutputManager.convertPCM16LEToFloat32(arrayBuffer);
-
-            this.workletNode.port.postMessage(float32Data);
-        } catch (error) {
-            console.error("Error processing audio chunk:", error);
+    try {
+        if (!this.initalized) {
+            await this.initializeAudioContext();
         }
+
+        if (this.audioInputContext.state === "suspended") {
+            await this.audioInputContext.resume();
+        }
+
+        const arrayBuffer = LiveAudioOutputManager.base64ToArrayBuffer(base64AudioChunk);
+        const float32Data = LiveAudioOutputManager.convertPCM16LEToFloat32(arrayBuffer);
+
+        this.workletNode.port.postMessage(float32Data);
+    } catch (error) {
+        console.error("Error processing audio chunk:", error);
     }
+}
 
     async initializeAudioContext() {
 
@@ -149,7 +149,7 @@ class LiveAudioInputManager {
             this.processor.disconnect();
             this.audioContext.close();
         } catch {
-
+            console.error("Error disconnecting microphone");
         }
 
         clearInterval(this.interval);

@@ -1,8 +1,8 @@
 window.addEventListener("load", (event) => {
     console.log("Hello Gemini Realtime Demo!");
 
-    setAvalibleCamerasOptions();
-    setAvalibleMicrophoneOptions();
+  setAvailableCamerasOptions();
+  setAvailableMicrophoneOptions();
 });
 
 
@@ -236,13 +236,13 @@ function setMaterialSelect(allOptions, selectElement) {
     });
 }
 
-async function setAvalibleCamerasOptions() {
+async function setAvailableCamerasOptions() {
     const cameras = await getAvalibleCameras();
     const videoSelect = document.getElementById("cameraSource");
     setMaterialSelect(cameras, videoSelect);
 }
 
-async function setAvalibleMicrophoneOptions() {
+async function setAvailableMicrophoneOptions() {
     const mics = await getAvalibleAudioInputs();
     const audioSelect = document.getElementById("audioSource");
     setMaterialSelect(mics, audioSelect);
