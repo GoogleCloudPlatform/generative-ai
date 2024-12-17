@@ -40,7 +40,7 @@ class GeminiLiveAPI {
         this.serviceUrl = `wss://${this.apiHost}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent`
 
         this.onReceiveResponse = (message) => {
-            console.log("Default message recieved callback", message)
+            console.log("Default message received callback", message)
         }
 
         this.onConnectionStarted = () => {
@@ -81,7 +81,7 @@ class GeminiLiveAPI {
     }
 
     onReceiveMessage(messageEvent) {
-        console.log("Message recieved: ", messageEvent)
+        console.log("Message received: ", messageEvent)
         const messageData = JSON.parse(messageEvent.data);
         const message = new GeminiLiveResponseMessage(messageData);
         console.log("onReceiveMessageCallBack this ", this)
