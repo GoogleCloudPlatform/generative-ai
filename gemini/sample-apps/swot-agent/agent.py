@@ -52,6 +52,8 @@ REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET")
 
 @dataclass
 class SwotAgentDeps:
+    """Dependencies for the SwotAgent."""
+
     request: Optional[Any] = None
     update_status_func: Optional[Callable] = None
     tool_history: List[str] = field(default_factory=list)
@@ -62,21 +64,23 @@ class SwotAgentDeps:
             user_agent=USER_AGENT,
             check_for_async=False,
         )
-    except Exception:
+    except praw.exceptions.PRAWException as e:
         reddit = None
         logging.info(
-            "Reddit client not initialized. Please set the REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET environment variables."
+            f"Reddit client not initialized. Please set the REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET environment variables: {e}"
         )
     try:
         client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
-    except Exception:
+    except Exception as e:
         client = None
         logging.info(
-            "Gemini client not initialized. Please set the GOOGLE_CLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS environment variables."
+            f"Gemini client not initialized. Please set the GOOGLE_CLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS environment variables: {e}"
         )
 
 
 class SwotAnalysis(BaseModel):
+    """Represents a SWOT analysis with strengths, weaknesses, opportunities, threats, and an overall analysis."""
+
     strengths: List[str] = Field(
         description="Internal strengths of the product/service"
     )
@@ -258,6 +262,16 @@ async def run_agent(
     url: str = ANALYZE_URL,
     deps: SwotAgentDeps = SwotAgentDeps(),
 ) -> SwotAnalysis | Exception:
+    """
+    Runs the SWOT analysis agent.
+
+    Args:
+        url: The URL to analyze.
+        deps: The dependencies for the agent.
+
+    Returns:
+        The SWOT analysis result or an exception if an error occurred.
+    """
 
     try:
         deps.tool_history = []

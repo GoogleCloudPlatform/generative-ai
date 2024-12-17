@@ -23,12 +23,11 @@ from collections import defaultdict
 from typing import Any, Dict, Final
 
 import uvicorn
+from agent import SwotAgentDeps, SwotAnalysis, run_agent
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-
-from agent import SwotAgentDeps, SwotAnalysis, run_agent
 
 # Configure logging
 logging.basicConfig(level=logging.info)
@@ -159,9 +158,10 @@ async def run_agent_with_progress(session_id: str, url: str):
             logging.info(f"Successfully analyzed URL: {url}")
             result_store[session_id] = result
 
-    except Exception as e:
+    except Exception as e:  # noqa: W0718
         logging.error(f"An unexpected error occurred: {e}")
         await update_status(session_id, f"Unexpected error: {e}")
+        raise
 
 
 def emulate_tool_completion(session_id: str, message: str):
