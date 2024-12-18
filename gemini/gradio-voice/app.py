@@ -14,6 +14,7 @@ load_dotenv()
 
 # mypy: disable-error-code="error-code-1, error-code-2"
 
+
 class GeminiConfig:
     def __init__(self, api_key: str) -> None:
         self.api_key = api_key
