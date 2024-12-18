@@ -64,7 +64,7 @@ The agent includes three tools:
 ## Usage
 
 1. Enter a valid URL in the input field
-1. Click "Analyze" to initiate the AI-powered SWOT analysis
+1. Click **"Analyze"** to initiate the AI SWOT analysis
 1. The AI agent will:
    - Extract content from the provided URL
    - Process the content using Gemini 2.0
