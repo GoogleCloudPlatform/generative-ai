@@ -40,7 +40,6 @@ Bao
 Beckham
 Benno
 Bettes
-bgswap
 Biden
 Bigtable
 Bitcoin
@@ -574,6 +573,7 @@ baxis
 bbc
 beir
 bff
+bgswap
 bigframes
 bigquery
 bitcoin
