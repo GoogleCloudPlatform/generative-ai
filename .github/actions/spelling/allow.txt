@@ -177,6 +177,7 @@ HIGHCPU
 HMO
 HREDRAW
 HSA
+HTMX
 HVDC
 HZN
 Hadoop
@@ -993,6 +994,7 @@ podcasts
 podfile
 podhelper
 powerups
+praw
 prcntg
 preds
 produc
@@ -1063,6 +1065,7 @@ scikit
 seaborn
 seatback
 selectbox
+selftext
 selkirk
 seo
 setlocal
