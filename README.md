@@ -11,7 +11,8 @@
 > - [Intro to Google Gen AI SDK](gemini/getting-started/intro_genai_sdk.ipynb)
 > - [Real-Time RAG with Multimodal Live API](gemini/multimodal-live-api/real_time_rag_retail_gemini_2_0.ipynb)
 > - [Creating Marketing Assets using Gemini 2.0](gemini/use-cases/marketing/creating_marketing_assets_gemini_2_0.ipynb)
-> - [Vertex AI Gemini Research Multi Agent Demo Research Agent for EV Industry](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/agents/research-multi-agents)
+> - [Vertex AI Gemini Research Multi Agent Demo Research Agent for EV Industry](gemini/agents/research-multi-agents)
+> - [Create a Multi-Speaker Podcast with Gemini 2.0 & Text-to-Speech](audio/speech/use-cases/podcast/multi-speaker-podcast.ipynb)
 
 <!-- markdownlint-disable MD033 -->
 
