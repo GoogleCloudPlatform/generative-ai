@@ -1,3 +1,9 @@
+byod
+crewai
+drilldown
+dumpd
+runnning
+usb
 AALR
 ADMA
 AFX
