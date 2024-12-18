@@ -19,7 +19,7 @@
       Documents
     </div>
     <div class="search-result-row-container">
-      <div class="search-result" *ngFor="let result of documents">
+      <div class="search-result" *ngFor="let result of documents" (click)="openNewWindow(result.link)">
         <div class="title-container">
             <img src="{{result.link.includes(pdf) ? imageName.get('pdf'): imageName.get('doc')}}" height="30" width="30"/>
             <div>
@@ -37,7 +37,7 @@
         </div>
 
         <div class="overview-button">
-          <button mat-button (click)="previewDocument(result); $event.preventDefault()">View</button>
+          <button mat-button (click)="$event.preventDefault(); previewDocument(result)">View</button>
         </div>
     </div>
     </div>
@@ -67,26 +67,10 @@
         </div>
 
         <div class="overview-button">
-          <button mat-button (click)="previewDocument(result); $event.preventDefault()">View</button>
+          <button mat-button (click)="$event.preventDefault(); previewDocument(result)">View</button>
         </div>
     </div>
     </div>
 
   </div>
 </div>
-
-
-<ng-template #preview let-data>
-  <div *ngIf="data.link.includes(pdf)">
-    <pdf-viewer 
-    *ngIf="data.link.includes(pdf)"
-    [src]="documentURL"
-    [render-text]="true"
-    [original-size]="false"
-    style="width: 400px; height: 500px"
-    ></pdf-viewer>
-  </div>
-  <div *ngIf="!data.link.includes(pdf)">
-    <img [src]="documentURL"/>
-  </div>
-</ng-template>

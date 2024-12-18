@@ -5,6 +5,6 @@ export const environment = {
     projectId: "",
   },
   requiredLogin: "",
-  backendURL: "https://document-search-service-318457139342.us-central1.run.app/api",
-  chatbotName: "test",
+  backendURL: "",
+  chatbotName: "",
 };
