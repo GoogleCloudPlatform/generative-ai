@@ -8,16 +8,16 @@ class GeminiLiveResponseMessage {
 
         const parts = data?.serverContent?.modelTurn?.parts
 
-        if (parts.length && parts[0].text) {
+        if (data?.setupComplete) {
+            this.type = "SETUP COMPLETE"
+        }
+        else if (parts?.length && parts[0].text) {
             this.data = parts[0].text;
             this.type = "TEXT"
         }
-        else if (parts.length && parts[0].inlineData) {
+        else if (parts?.length && parts[0].inlineData) {
             this.data = parts[0].inlineData.data;
             this.type = "AUDIO"
-        }
-        else if (data?.setupComplete) {
-            this.type = "SETUP COMPLETE"
         }
     }
 }

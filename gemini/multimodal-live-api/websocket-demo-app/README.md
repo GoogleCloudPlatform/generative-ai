@@ -15,7 +15,6 @@ While some web development experience, particularly with localhost, port numbers
 
 ### File Structure
 
-
 - backend/main.py: The Python backend code
 - backend/requirements.txt: Lists the required Python dependencies
 
@@ -61,7 +60,11 @@ python3 backend/main.py
 ```
 
 5. Start the frontend:
-   Make sure to open a **new** terminal window to run this command. Keep the backend server running in the first terminal.
+
+- Navigate to `script.js` on line 9, `const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";` and replace `PROXY_URL` value with `ws://localhost:8000`. It should look like: `const PROXY_URL = "ws://localhost:8000;";`. Note the absence of the second "s" in "wss" as "ws" indicates a non-secure WebSocket connection.
+- Right below on line 10, update `PROJECT_ID` with your Google Cloud project ID.
+- Save the changes you've made to `script.js`
+- Now make sure to open a **separate** terminal window from the backend to run this command (keep the backend server running in the first terminal).
 
 ```sh
 cd frontend
@@ -74,6 +77,8 @@ python3 -m http.server
    Run the following command in a terminal with gcloud installed to set your project, and to retrieve your access token.
 
 ```sh
+gcloud components update
+gcloud components install beta
 gcloud config set project YOUR-PROJECT-ID
 gcloud auth print-access-token
 ```
@@ -81,7 +86,7 @@ gcloud auth print-access-token
 8. Copy the access token from the previous step into the UI that you have open in your browser.
 
 9. Enter the model ID in the UI:
-   Replace `YOUR-PROJECT-ID` in the input with your credentials
+   Replace `YOUR-PROJECT-ID` in the input with your Google Cloud project ID.
 
 10. Connect and interact with the demo:
 
@@ -90,7 +95,7 @@ gcloud auth print-access-token
 11. To interact with the app, you can do the following:
 
 - Text input: You can write a text prompt to send to the model by entering your message in the box and pressing the send arrow. The model will then respond via audio (turn up your volume!).
-- Voice input: Press the pink microphone button and start speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
+- Voice input: Press the microphone button to stop speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
 - Video input: The model will also capture your camera input and send it to Gemini. You can ask questions about current or previous video footage. For more details on how this works, visit the [documentation page for the Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
 
 ### Setup in Cloud Shell

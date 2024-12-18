@@ -15,12 +15,6 @@ class PCMProcessor extends AudioWorkletProcessor {
             newBuffer.set(newData, this.buffer.length);
             this.buffer = newBuffer;
         };
-            const newData = e.data;
-            const newBuffer = new Float32Array(this.buffer.length + newData.length);
-            newBuffer.set(this.buffer);
-            newBuffer.set(newData, this.buffer.length);
-            this.buffer = newBuffer;
-        };
     }
 
     process(inputs, outputs, parameters) {
