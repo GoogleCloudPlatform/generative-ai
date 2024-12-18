@@ -6,6 +6,8 @@ from src.model.search import CreateSearchRequest, SearchApplication
 from src.service.engine import EngineService
 from src.service.search import SearchService
 from src.service.search_application import SearchApplicationService
+from google.cloud import storage
+import datetime
 
 router = APIRouter(
     prefix="/api/search",
@@ -43,3 +45,35 @@ async def create_search_application(search_application: SearchApplication):
 async def update_search_application(engine_id: str, search_application: SearchApplication):
     service = SearchApplicationService()
     return service.update(engine_id, search_application)
+
+
+@router.get("/signed-url")
+async def get_signed_url(gcs_url: str, expiration_hours: int = 1):
+    """
+    Generates a signed URL for a file in Google Cloud Storage.
+
+    Args:
+        gcs_url: The full GCS URL of the file 
+                 (e.g., "gs://your-bucket-name/your-file.pdf").
+        expiration_hours: The number of hours the signed URL should be valid for.
+                          Defaults to 1 hour.
+    """
+    try:
+        # Extract bucket name and object name from the GCS URL
+        bucket_name = gcs_url.split("/")[2]  
+        object_name = "/".join(gcs_url.split("/")[3:])  
+
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(object_name)
+
+        url = blob.generate_signed_url(
+            version="v4",
+            expiration=datetime.timedelta(hours=expiration_hours),
+            method="GET",
+        )
+
+        return {"signed_url": url}
+
+    except Exception as e:
+        return {"error": str(e)}
