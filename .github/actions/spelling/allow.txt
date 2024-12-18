@@ -591,6 +591,7 @@ bqdf
 bqml
 breakroom
 btn
+byod
 byor
 carbonara
 cashify
@@ -635,6 +636,7 @@ constexpr
 corpuses
 countplot
 cpet
+crewai
 csa
 cse
 ctd
@@ -671,6 +673,7 @@ doi
 dotprompt
 dpi
 draig
+drilldown
 drinkware
 dropdown
 dropna
@@ -678,6 +681,7 @@ dsl
 dtype
 dtypes
 dumfries
+dumpd
 dwmapi
 ecommerce
 ekg
@@ -1152,6 +1156,7 @@ unigram
 unrtf
 upsell
 urandom
+usb
 usebackq
 usecases
 username
