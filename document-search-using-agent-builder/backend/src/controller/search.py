@@ -1,5 +1,4 @@
-from requests import Request
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from src.model.search import CreateSearchRequest, SearchApplication
 from src.model.http_status import BadRequest
 from src.model.search import CreateSearchRequest, SearchApplication
@@ -9,6 +8,12 @@ from src.service.search import SearchService
 from src.service.search_application import SearchApplicationService
 from google.cloud import storage
 import datetime
+from pydantic import BaseModel
+
+
+class SignedUrlRequest(BaseModel):
+    gcs_url: str
+    expiration_hours: int = 1
 
 router = APIRouter(
     prefix="/api/search",
@@ -49,7 +54,7 @@ async def update_search_application(engine_id: str, search_application: SearchAp
 
 
 @router.get("/signed-url")
-async def get_signed_url(request: Request):
+async def get_signed_url(request: Request, response_model=None):
     """
     Generates a signed URL for a file in Google Cloud Storage.
 
@@ -61,8 +66,9 @@ async def get_signed_url(request: Request):
     """
     try:
         req_body = await request.json()
-        gcs_url = req_body.get("gcs_url")
-        expiration_hours = req_body.get("expiration_hours", 1)  
+        signed_url_request = SignedUrlRequest(**req_body)
+        gcs_url = signed_url_request.gcs_url
+        expiration_hours = signed_url_request.expiration_hours
 
         # Extract bucket name and object name
         bucket_name = gcs_url.split("/")[2]
