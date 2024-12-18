@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request
+from requests import Response
+from fastapi import APIRouter, Request, HTTPException
 from src.model.search import CreateSearchRequest, SearchApplication
 from src.model.http_status import BadRequest
 from src.model.search import CreateSearchRequest, SearchApplication
@@ -14,6 +15,8 @@ from pydantic import BaseModel
 class SignedUrlRequest(BaseModel):
     gcs_url: str
     expiration_hours: int = 1
+
+storage_client = storage.Client()    
 
 router = APIRouter(
     prefix="/api/search",
@@ -68,23 +71,19 @@ async def get_signed_url(request: Request, response_model=None):
         req_body = await request.json()
         signed_url_request = SignedUrlRequest(**req_body)
         gcs_url = signed_url_request.gcs_url
-        expiration_hours = signed_url_request.expiration_hours
 
-        # Extract bucket name and object name
         bucket_name = gcs_url.split("/")[2]
         object_name = "/".join(gcs_url.split("/")[3:])
 
-        storage_client = storage.Client()
+        # Get a reference to the blob (PDF file)
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(object_name)
 
-        url = blob.generate_signed_url(
-            version="v4",
-            expiration=datetime.timedelta(hours=expiration_hours),
-            method="GET",
-        )
+        # Download the blob content as bytes
+        pdf_content = blob.download_as_bytes()
 
-        return {"signed_url": url}
+        # Return the PDF content with appropriate headers
+        return Response(content=pdf_content, media_type="application/pdf")
 
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=f"Error fetching PDF: {str(e)}")
