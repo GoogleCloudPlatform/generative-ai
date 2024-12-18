@@ -1,5 +1,4 @@
-from requests import Response
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Response
 from src.model.search import CreateSearchRequest, SearchApplication
 from src.model.http_status import BadRequest
 from src.model.search import CreateSearchRequest, SearchApplication
