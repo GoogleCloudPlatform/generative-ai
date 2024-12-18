@@ -177,6 +177,7 @@ HIGHCPU
 HMO
 HREDRAW
 HSA
+HTMX
 HVDC
 HZN
 Hadoop
@@ -194,7 +195,6 @@ Hmmm
 Hogwarts
 Homesley
 Hossain
-HTMX
 Hubmann
 Hyperdisk
 ICICI

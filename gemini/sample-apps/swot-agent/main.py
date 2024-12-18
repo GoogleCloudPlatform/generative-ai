@@ -15,19 +15,19 @@
 # limitations under the License.
 
 import asyncio
+from collections import defaultdict
 import logging
 import os
 import random
 import time
-from collections import defaultdict
 from typing import Any, Dict, Final
 
-import uvicorn
 from agent import SwotAgentDeps, SwotAnalysis, run_agent
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+import uvicorn
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

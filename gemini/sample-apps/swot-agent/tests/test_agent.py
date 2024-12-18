@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from agent import SwotAgentDeps, SwotAnalysis
 from pydantic_ai import models
+import pytest
 
 # Prevent accidental model requests during testing
 models.ALLOW_MODEL_REQUESTS = False
