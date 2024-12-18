@@ -53,7 +53,7 @@ async def update_search_application(engine_id: str, search_application: SearchAp
     return service.update(engine_id, search_application)
 
 
-@router.get("/signed-url")
+@router.post("/signed-url")
 async def get_signed_url(request: Request, response_model=None):
     """
     Generates a signed URL for a file in Google Cloud Storage.
