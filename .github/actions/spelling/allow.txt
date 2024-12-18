@@ -8,12 +8,14 @@ ALCS
 ALDS
 AMNOSH
 ANZ
+AOT
 APAC
 APIENTRY
 APSTUDIO
 ASF
 ASML
 AUVs
+Adhaar
 Adidas
 Akihiro
 Akkaoui
@@ -113,7 +115,9 @@ EMFU
 EMNLP
 ENU
 ESG
+EVs
 Edunov
+Einhalt
 Eleuther
 Eliud
 Embs
@@ -196,6 +200,7 @@ ICICI
 ICML
 IFI
 INFOPLIST
+INR
 IOMGR
 IRAs
 ITDMs
@@ -237,6 +242,7 @@ Kimi
 Kipchoge
 Knopf
 Kohli
+Koushik
 Kraizt
 Kubeflow
 Kudrow
@@ -301,8 +307,10 @@ NGRAMS
 NHK
 NICOLAS
 NMT
+NOMINATIM
 NOMINMAX
 NOZORDER
+NREL
 NVIDIA
 NVL
 Nagasu
@@ -402,6 +410,7 @@ Sahel
 Sauron
 Sca
 Schlenoff
+Schulen
 Schwimmer
 Selam
 Sestero
@@ -545,6 +554,7 @@ arguana
 arun
 arxiv
 astype
+atms
 aujourd'hui
 autoflake
 autogen
@@ -571,6 +581,7 @@ bluesky
 bml
 bnb
 booktitle
+boop
 boundings
 bpa
 bpd
@@ -627,6 +638,8 @@ cse
 ctd
 cupertino
 cva
+cycleway
+cycleways
 cygpath
 darkgrid
 dask
@@ -646,6 +659,8 @@ dfs
 dino
 direnv
 diy
+dlat
+dlon
 dlp
 docai
 docstore
@@ -685,6 +700,7 @@ etf
 etils
 eur
 evals
+evse
 expl
 faiss
 fastapi
@@ -731,6 +747,7 @@ gcs
 gcsfs
 gdk
 gdkx
+geboten
 genai
 genkit
 genwealth
@@ -822,11 +839,13 @@ keras
 keychain
 kfp
 kickstart
+konnte
 kotlin
 kpi
 l'harmonie
 lakecolor
 landcolor
+landuse
 langchain
 langgraph
 lebron
@@ -867,6 +886,7 @@ memes
 mesop
 metadatas
 metaverse
+metricx
 mgrs
 mic
 millis
@@ -932,6 +952,7 @@ openai
 openfda
 osm
 osx
+outdir
 outro
 overwiew
 owlbot
@@ -940,10 +961,12 @@ pagemap
 paleo
 paligemma
 pancetta
+pandoc
 pantarba
 paracord
 parcoords
 parfaite
+parseable
 passwort
 pastiched
 payslip
@@ -1012,6 +1035,7 @@ rbf
 reddit
 redef
 rembg
+reoffice
 repreve
 requestz
 reranked
@@ -1053,11 +1077,13 @@ siglap
 signings
 simage
 sittin
+skillsets
 sklearn
 sku
 slf
 snowboard
 sourced
+sqkm
 srlimit
 ssd
 ssh
@@ -1080,6 +1106,7 @@ svm
 sxs
 tabular
 tagline
+takeaways
 tastetest
 tavily
 tencel
@@ -1115,6 +1142,7 @@ typehints
 ubuntu
 uids
 ultrawide
+und
 undst
 unigram
 unrtf
@@ -1151,6 +1179,7 @@ webpages
 websites
 weightage
 welcom
+werden
 whatsapp
 wiffle
 wikipedia
@@ -1165,6 +1194,7 @@ wparam
 wscore
 wscores
 wstring
+wurden
 xanchor
 xaxes
 xaxis

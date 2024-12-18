@@ -202,6 +202,9 @@
 # Should be Vertex AI
 \b(?!Vertex AI\b)(?!.*[\(\)\{\},])(?<!import\s)(?<!\.)(?<!,\s)Vertex\s?[Aa]?[Ii]?\b
 
+# Should be Vertex AI
+\b[Vv]ertext\b
+
 # Should be Gemini
 \sgemini\s\w
 

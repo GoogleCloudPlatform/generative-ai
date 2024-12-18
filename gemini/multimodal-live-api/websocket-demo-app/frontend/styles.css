@@ -1,0 +1,127 @@
+:root {
+  --container-bg: rgb(224, 224, 224);
+}
+
+body {
+  font-family: "Roboto";
+  text-align: center;
+}
+h1 {
+  margin-bottom: 0;
+}
+
+#video-preview {
+  height: 200px;
+  width: 250px;
+  border-radius: 30px;
+  background-color: var(--container-bg);
+  padding: 50px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#model-input {
+  display: inline-block;
+}
+
+.icon-text {
+  vertical-align: super;
+}
+
+.state {
+  border-radius: 50px;
+  padding: 10px;
+  text-align: center;
+  background-color: rgb(203, 203, 203);
+}
+
+#disconnected {
+  background-color: #ffebee; /* Light red background */
+  color: #b71c1c; /* Dark red text */
+}
+
+#disconnected .material-symbols-outlined {
+  color: #b71c1c;
+}
+
+#connecting {
+  background-color: #fffde7; /* Light yellow background */
+  color: #f57f17; /* Dark yellow text */
+  animation: throb 1s infinite ease-in-out;
+}
+
+#connecting .material-symbols-outlined {
+  color: #f57f17;
+}
+
+#connected {
+  background-color: #e8f5e9; /* Light green background */
+  color: #2e7d32; /* Dark green text */
+}
+
+#connected .material-symbols-outlined {
+  color: #2e7d32;
+}
+
+#speaking {
+  background-color: #e3f2fd; /* Light blue background */
+  color: #1565c0; /* Dark blue text */
+  animation: throb 1s infinite ease-in-out;
+}
+
+#speaking .material-symbols-outlined {
+  color: #1565c0;
+}
+
+@keyframes throb {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.spread {
+  display: flex;
+  justify-content: space-around;
+}
+
+#model-config-container {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column; /* Stack elements vertically on mobile */
+}
+
+#user-input-container {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column; /* Stack elements vertically on mobile */
+}
+
+@media (min-width: 768px) {
+  /* Adjust breakpoint as needed */
+  #model-config-container {
+    flex-direction: row; /* Revert to horizontal layout on larger screens */
+  }
+
+  #user-input-container {
+    flex-direction: row; /* Revert to horizontal layout on larger screens */
+  }
+
+  body {
+    text-align: left;
+  }
+}
+
+#video {
+  width: 100%;
+  height: 100%;
+}
+
+#canvas {
+  display: none;
+}
