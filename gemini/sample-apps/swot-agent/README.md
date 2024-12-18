@@ -74,7 +74,7 @@ The agent includes three tools:
 
 ## Deployment
 
-To deploy the application to Google Cloud Run, run the following command:
+To deploy the application to [Google Cloud Run](https://cloud.google.com/run), run the following command:
 
 ```bash
 gcloud run deploy swot-agent --source . --region us-central1 --allow-unauthenticated
