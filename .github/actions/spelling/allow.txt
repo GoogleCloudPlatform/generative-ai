@@ -177,6 +177,7 @@ HIGHCPU
 HMO
 HREDRAW
 HSA
+HTMX
 HVDC
 HZN
 Hadoop
@@ -573,6 +574,7 @@ baxis
 bbc
 beir
 bff
+bgswap
 bigframes
 bigquery
 bitcoin
@@ -996,6 +998,7 @@ podcasts
 podfile
 podhelper
 powerups
+praw
 prcntg
 preds
 produc
@@ -1067,6 +1070,7 @@ scikit
 seaborn
 seatback
 selectbox
+selftext
 selkirk
 seo
 setlocal
