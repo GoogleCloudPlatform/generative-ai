@@ -573,6 +573,7 @@ baxis
 bbc
 beir
 bff
+bgswap
 bigframes
 bigquery
 bitcoin
