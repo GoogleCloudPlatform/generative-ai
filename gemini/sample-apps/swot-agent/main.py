@@ -1,6 +1,7 @@
-# Copyright 2024 Google, LLC. This software is provided as-is, without
-# warranty or representation for any use or purpose. Your use of it is
-# subject to your agreement with Google.
+# Copyright 2024 Google, LLC.
+# This software is provided as-is, without warranty 
+# or representation for any use or purpose.
+# Your use of it is subject to your agreement with Google.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
