@@ -9,7 +9,7 @@ class CloudStorageRepository:
     def __init__(self):
         self.client = GCSClient()
     
-    def extract_bucket_name(gcs_url):
+    def extract_bucket_name(self, gcs_url):
         """
         Extract the bucket name from a GCS URL.
         """
