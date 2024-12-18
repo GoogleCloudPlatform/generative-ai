@@ -34,6 +34,7 @@
     "ionic-emoji-rating": "^1.0.15",
     "marked": "^4.3.0",
     "moment": "^2.30.1",
+    "ng2-pdf-viewer": "^7.0.2",
     "ngx-markdown": "^15.1.2",
     "prismjs": "^1.29.0",
     "rxfire": "6.0.3",

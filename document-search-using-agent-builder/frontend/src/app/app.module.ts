@@ -48,7 +48,7 @@ import {ClipboardModule} from '@angular/cdk/clipboard';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { ManageSearchApplicationComponent } from './components/search-application/manage-search-application/manage-search-application.component';
 import { SearchApplicationFormComponent } from './components/search-application/search-application-form/search-application-form.component';
-
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 
 import 'prismjs';
@@ -119,7 +119,8 @@ import { ToastMessageComponent } from './components/toast-message/toast-message.
     NgIdleModule.forRoot(),
     ClipboardModule,
     MatStepperModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    PdfViewerModule,
   ],
   providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
   bootstrap: [AppComponent]
