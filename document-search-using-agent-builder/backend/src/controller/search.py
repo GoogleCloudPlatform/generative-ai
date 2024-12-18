@@ -1,3 +1,4 @@
+from requests import Request
 from fastapi import APIRouter
 from src.model.search import CreateSearchRequest, SearchApplication
 from src.model.http_status import BadRequest
@@ -48,7 +49,7 @@ async def update_search_application(engine_id: str, search_application: SearchAp
 
 
 @router.get("/signed-url")
-async def get_signed_url(gcs_url: str, expiration_hours: int = 1):
+async def get_signed_url(request: Request):
     """
     Generates a signed URL for a file in Google Cloud Storage.
 
@@ -59,9 +60,13 @@ async def get_signed_url(gcs_url: str, expiration_hours: int = 1):
                           Defaults to 1 hour.
     """
     try:
-        # Extract bucket name and object name from the GCS URL
-        bucket_name = gcs_url.split("/")[2]  
-        object_name = "/".join(gcs_url.split("/")[3:])  
+        req_body = await request.json()
+        gcs_url = req_body.get("gcs_url")
+        expiration_hours = req_body.get("expiration_hours", 1)  
+
+        # Extract bucket name and object name
+        bucket_name = gcs_url.split("/")[2]
+        object_name = "/".join(gcs_url.split("/")[3:])
 
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
