@@ -111,6 +111,15 @@ def format(session):
     Run isort to sort imports. Then run black
     to format code to uniform standard.
     """
+    # Sort Spelling Allowlist
+    spelling_allow_file = ".github/actions/spelling/allow.txt"
+
+    with open(spelling_allow_file, encoding="utf-8") as file:
+        unique_words = sorted(set(file))
+
+    with open(spelling_allow_file, "w", encoding="utf-8") as file:
+        file.writelines(unique_words)
+
     target_branch = "main"
 
     unstaged_files = subprocess.run(
@@ -236,15 +245,6 @@ def format(session):
         session.run("nbqa", "black", *lint_paths_nb)
         session.run("nbqa", "blacken-docs", "--nbqa-md", *lint_paths_nb)
         session.run("python3", "-m", "tensorflow_docs.tools.nbfmt", *lint_paths_nb)
-
-    # Sort Spelling Allowlist
-    spelling_allow_file = ".github/actions/spelling/allow.txt"
-
-    with open(spelling_allow_file, encoding="utf-8") as file:
-        unique_words = sorted(set(file))
-
-    with open(spelling_allow_file, "w", encoding="utf-8") as file:
-        file.writelines(unique_words)
 
 
 def install_unittest_dependencies(session, *constraints):
