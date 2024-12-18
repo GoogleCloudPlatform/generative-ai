@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.6+-green.svg)](https://fastapi.tiangolo.com)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A web application that performs automated [SWOT analysis](https://en.wikipedia.org/wiki/SWOT_analysis) (Strengths, Weaknesses, Opportunities, Threats) analysis using the Google's [Gemini 2.0 model](https://ai.google.dev/gemini-api/docs/models/gemini-v2) and the [Pydantic AI](https://ai.pydantic.dev/) agent framework. The application is built with FastAPI, HTMX, and Tailwind CSS.
+A web application that performs automated [SWOT analysis](https://en.wikipedia.org/wiki/SWOT_analysis) (Strengths, Weaknesses, Opportunities, Threats) analysis using the [Gemini 2.0 Flash model](https://ai.google.dev/gemini-api/docs/models/gemini-v2) and the [Pydantic AI](https://ai.pydantic.dev/) agent framework. The application is built with [FastAPI](https://fastapi.tiangolo.com/), [HTMX](https://htmx.org/), and [Tailwind CSS](https://tailwindcss.com/).
 
 ![SWOT Analysis Demo](swot-agent.gif)
 
