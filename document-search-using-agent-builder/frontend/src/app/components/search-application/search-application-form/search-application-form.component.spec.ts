@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddAgentBuilderComponent } from './add-agent-builder.component';
+import { SearchApplicationFormComponent } from './search-application-form.component';
 
 describe('AddAgentBuilderComponent', () => {
-  let component: AddAgentBuilderComponent;
-  let fixture: ComponentFixture<AddAgentBuilderComponent>;
+  let component: SearchApplicationFormComponent;
+  let fixture: ComponentFixture<SearchApplicationFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AddAgentBuilderComponent ]
+      declarations: [ SearchApplicationFormComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AddAgentBuilderComponent);
+    fixture = TestBed.createComponent(SearchApplicationFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManageAgentBuilderComponent } from './manage-agent-builder.component';
+import { ManageSearchApplicationComponent } from './manage-search-application.component';
 
 describe('ManageAgentBuilderComponent', () => {
-  let component: ManageAgentBuilderComponent;
-  let fixture: ComponentFixture<ManageAgentBuilderComponent>;
+  let component: ManageSearchApplicationComponent;
+  let fixture: ComponentFixture<ManageSearchApplicationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ManageAgentBuilderComponent ]
+      declarations: [ ManageSearchApplicationComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ManageAgentBuilderComponent);
+    fixture = TestBed.createComponent(ManageSearchApplicationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

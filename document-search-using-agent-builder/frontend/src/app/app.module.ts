@@ -46,6 +46,9 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import {NgIdleModule} from '@ng-idle/core';
 import {ClipboardModule} from '@angular/cdk/clipboard';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { ManageSearchApplicationComponent } from './components/search-application/manage-search-application/manage-search-application.component';
+import { SearchApplicationFormComponent } from './components/search-application/search-application-form/search-application-form.component';
+
 
 
 import 'prismjs';
@@ -58,8 +61,6 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { ChatInputComponent } from './components/main/chat-input/chat-input.component';
 import { SearchResultsComponent } from './components/main/search-results/search-results.component';
 import { ToastMessageComponent } from './components/toast-message/toast-message.component';
-import { AddAgentBuilderComponent } from './components/agent-builder/add-agent-builder/add-agent-builder.component';
-import { ManageAgentBuilderComponent } from './components/agent-builder/manage-agent-builder/manage-agent-builder.component';
 
 @NgModule({
   declarations: [
@@ -71,8 +72,8 @@ import { ManageAgentBuilderComponent } from './components/agent-builder/manage-a
     ChatInputComponent,
     SearchResultsComponent,
     ToastMessageComponent,
-    AddAgentBuilderComponent,
-    ManageAgentBuilderComponent,
+    SearchApplicationFormComponent,
+    ManageSearchApplicationComponent,
   ],
   imports: [
     BrowserModule,

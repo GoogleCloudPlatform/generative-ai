@@ -1,0 +1,58 @@
+<div class="buttons-container">
+  <button mat-raised-button class="inactive-button" (click)="navigateToMain()">
+    <mat-icon>keyboard_backspace</mat-icon>
+    Back
+  </button>
+</div>
+<div class="root-container">
+  <div class="max-width-container">
+    <div class="buttons-container">
+      <div class="heading-container">
+        <span>Manage Agent Builder Config</span>
+      </div>
+    </div>
+    <div class="table-container">
+      <form>
+        <mat-form-field
+          class="form-field"
+          appearance="outline"
+          [floatLabel]="'always'"
+        >
+          <mat-label>Choose an Engine</mat-label>
+          <mat-select [disabled]="!this.editMode" [(ngModel)]="selectedEngine" name="engine">
+            <mat-option *ngFor="let engine of this.engines" [value]="engine">{{
+              engine.name
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="intent-buttons-container">
+          <button
+            mat-raised-button
+            class="reset-button"
+            *ngIf="!this.editMode"
+            (click)="enableForm()"
+          >
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+          <button
+            mat-raised-button
+            class="reset-button"
+            *ngIf="this.editMode"
+            (click)="disableForm()"
+          >
+            <span> Discard Changes </span>
+          </button>
+          <button
+            mat-raised-button
+            class="reset-button"
+            *ngIf="this.editMode"
+            (click)="saveForm()"
+          >
+            <span>Save</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

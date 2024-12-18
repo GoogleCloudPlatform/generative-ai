@@ -30,7 +30,6 @@ export class SearchResultsComponent implements OnDestroy {
     this.service.search(query!).subscribe({
       next : (searchRespone: any)=>{
       this.serachResult = searchRespone;
-      searchRespone[3].link = 'text.jpeg'
       searchRespone.forEach((element: any) => {
         if(search_document_type.includes(element.link.split(".")[1])){
           this.documents.push(element);

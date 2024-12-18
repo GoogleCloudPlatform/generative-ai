@@ -14,7 +14,7 @@
     color: #161A1D;
 }
 
-.agent-field {
+.form-field {
     width: 70%;
 
     .my-icon {
@@ -31,7 +31,7 @@
     gap: 10px;
     margin-bottom: -30px;
     padding-top: 3%;
-  
+
     .submit-button {
       width: 7%;
       background: #4285F4;
@@ -59,7 +59,7 @@
       transform: translate3d(0, 0, 0);
       transition: background 400ms cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .cancel-button {
       width: 7%;
       background: white;
