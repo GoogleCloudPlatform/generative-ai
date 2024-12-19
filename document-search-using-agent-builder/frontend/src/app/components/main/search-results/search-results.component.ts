@@ -77,8 +77,10 @@ export class SearchResultsComponent implements OnDestroy {
 
   previewDocument(event: any, document: any){
     event.stopPropagation();
-    this.selectedDocument = document;
-    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDocument.link);
+    if(document.link.endsWith(".pdf") || document.link.endsWith(".docx")) {
+      this.selectedDocument = document;
+      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDocument.link);
+    }
   }
 
   closePreview() {
