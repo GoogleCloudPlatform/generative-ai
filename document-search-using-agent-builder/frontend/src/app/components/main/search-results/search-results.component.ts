@@ -40,9 +40,7 @@ export class SearchResultsComponent implements OnDestroy {
       next : (searchRespone: any)=>{
       this.serachResult = searchRespone;
       searchRespone.forEach((element: any) => {
-        if(search_document_type.includes(element.link.split(".")[1])){
-          this.documents.push(element);
-        }
+        this.documents.push(element);
         if(search_image_type.includes(element.link.split(".")[1])){
           this.images.push(element);
         }

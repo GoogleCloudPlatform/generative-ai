@@ -3,7 +3,6 @@ from typing import List
 from typing import List
 from google.cloud.discoveryengine_v1 import SearchRequest, SearchServiceClient
 from src.model.search import SearchApplication, SearchResult
-from src.repository.cloud_storage import CloudStorageRepository
 
 CONTENT_SEARCH_SPEC = SearchRequest.ContentSearchSpec(
     snippet_spec=SearchRequest.ContentSearchSpec.SnippetSpec(
@@ -27,7 +26,6 @@ class SearchService:
             client_options=search_application.get_client_options()
         )
         self.serving_config = search_application.get_serving_config()
-        self.repository = CloudStorageRepository()
 
     def search(self, term: str) -> List[SearchResult]:
         request = SearchRequest(
@@ -46,9 +44,7 @@ class SearchService:
         for r in data.results:
             document = r.document
             derived_data = document.derived_struct_data
-
-            gcs_link = derived_data.get("link")
-            self.repository.configure_bucket_cors(gcs_link)
+            gcs_link = derived_data.get("link").replace("gs://", "https://storage.cloud.google.com/")
 
             # Extract snippet safely
             snippets = derived_data.get("snippets", [])
@@ -60,7 +56,7 @@ class SearchService:
                 document_id=document.id,
                 title=derived_data.get("title", "Untitled"),
                 snippet=snippet_text,
-                link=derived_data.get("link"),
+                link=gcs_link,
                 content=content_text
             )
             results.append(mapped_result)
