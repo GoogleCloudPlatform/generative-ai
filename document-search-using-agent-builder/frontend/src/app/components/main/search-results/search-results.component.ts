@@ -4,7 +4,7 @@ import {ReplaySubject, takeUntil} from 'rxjs';
 import { UserService } from 'src/app/services/user/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { search_document_type, search_image_type, PDF, image_name } from 'src/environments/constant';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
@@ -24,6 +24,10 @@ export class SearchResultsComponent implements OnDestroy {
   imageName = image_name;
   documentURL: SafeResourceUrl;
   openPreviewDocument: any;
+  currentPage = 0;
+  pageSize = 3;
+  selectedDocument: any;
+  safeUrl: SafeUrl;
 
   constructor(
     private router: Router,
@@ -31,6 +35,7 @@ export class SearchResultsComponent implements OnDestroy {
     private service : SearchService,
     private userService: UserService,
     private dialog : MatDialog,
+    private sanitizer: DomSanitizer,
   ){
     const query = this.route.snapshot.queryParamMap.get('q');
 
@@ -70,16 +75,40 @@ export class SearchResultsComponent implements OnDestroy {
     window.open(link, "_blank")
   }
 
-  previewDocument(data: any){
-    this.dialog.open(this.previewRef, {data: data,
-      height: '650px',
-      width: '1400px'
-   });
+  previewDocument(event: any, document: any){
+    event.stopPropagation();
+    this.selectedDocument = document;
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDocument.link);
+  }
 
+  closePreview() {
+    this.selectedDocument = undefined;
   }
 
   ngOnDestroy(){
     this.destroyed.next();
     this.destroyed.complete();
   }
+
+  get pagedDocuments() {
+    const startIndex = this.currentPage * this.pageSize;
+    return this.documents.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.documents.length / this.pageSize);
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+    }
+  }
+
 }
