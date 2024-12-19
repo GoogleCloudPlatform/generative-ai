@@ -13,7 +13,6 @@ from pydantic import BaseModel
 
 class SignedUrlRequest(BaseModel):
     gcs_url: str
-    expiration_hours: int = 1
 
 storage_client = storage.Client()    
 
