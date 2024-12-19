@@ -135,3 +135,17 @@
 .padding-top {
   padding-top: 0;
 }
+
+.close-container {
+ display: flex;
+ justify-content: end;
+}
+
+.pdf-display{
+    display: flex;
+    justify-content: center;
+}
+
+.overview {
+  z-index: 1000;
+}

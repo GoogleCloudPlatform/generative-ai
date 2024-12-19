@@ -37,7 +37,7 @@
         </div>
 
         <div class="overview-button">
-          <button mat-button (click)="$event.preventDefault(); previewDocument(result)">View</button>
+          <button mat-button (click)="previewDocument(result); $event.stopImmediatePropagation();">View</button>
         </div>
     </div>
     </div>
@@ -67,10 +67,27 @@
         </div>
 
         <div class="overview-button">
-          <button mat-button (click)="$event.preventDefault(); previewDocument(result)">View</button>
+          <button class="overview" mat-button (click)="previewDocument(result); $event.stopImmediatePropagation();">View</button>
         </div>
     </div>
     </div>
 
   </div>
 </div>
+
+<ng-template #preview let-data>
+<div class="close-container">
+  <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+  <div *ngIf="data.link.includes(pdf)" class="pdf-display">
+    <iframe [src]="data.link"
+      height='600px'
+      width='1300px'
+    ></iframe>
+  </div>
+  <div *ngIf="!data.link.includes(pdf)">
+    <img [src]="documentURL"/>
+  </div>
+</ng-template>

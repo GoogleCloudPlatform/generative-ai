@@ -4,7 +4,6 @@ import {ReplaySubject, takeUntil} from 'rxjs';
 import { UserService } from 'src/app/services/user/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { search_document_type, search_image_type, PDF, image_name } from 'src/environments/constant';
-import { DocumentService } from 'src/services/document.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -15,7 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class SearchResultsComponent implements OnDestroy {
   @ViewChild('preview', { static: true })
-  preview!: TemplateRef<{}>;
+  previewRef!: TemplateRef<{}>;
   summary: string = '';
   private readonly destroyed = new ReplaySubject<void>(1);
   serachResult : any = [];
@@ -24,14 +23,13 @@ export class SearchResultsComponent implements OnDestroy {
   pdf = PDF;
   imageName = image_name;
   documentURL: SafeResourceUrl;
+  openPreviewDocument: any;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private service : SearchService,
     private userService: UserService,
-    private documentService: DocumentService,
-    private sanitizer: DomSanitizer,
     private dialog : MatDialog,
   ){
     const query = this.route.snapshot.queryParamMap.get('q');
@@ -73,16 +71,11 @@ export class SearchResultsComponent implements OnDestroy {
   }
 
   previewDocument(data: any){
-    this.documentService.getDocument(data.link).pipe(takeUntil(this.destroyed)).subscribe({
-      next: (blob: Blob) => {
-        const url = URL.createObjectURL(blob);
-        this.documentURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        this.dialog.open(this.preview, {data: data});
-      },
-      error : (error) => {
-        console.error('Error loading Document:', error);
-      }
-    });
+    this.dialog.open(this.previewRef, {data: data,
+      height: '650px',
+      width: '1400px'
+   });
+
   }
 
   ngOnDestroy(){
