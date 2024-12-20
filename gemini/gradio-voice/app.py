@@ -67,6 +67,7 @@ class GeminiHandler(AsyncStreamHandler):
     async def emit(self):
         if not self.args_set.is_set():
             if not self.channel:
+                await asyncio.sleep(0.1)
                 return
             await self.wait_for_args()
             asyncio.create_task(self.generator())
