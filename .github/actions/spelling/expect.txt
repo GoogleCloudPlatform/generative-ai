@@ -1,0 +1,14 @@
+CTHH
+HHH
+HHT
+HTH
+HTT
+HTTH
+nconst
+neq
+THH
+THHH
+THT
+THTH
+TTH
+TTT
