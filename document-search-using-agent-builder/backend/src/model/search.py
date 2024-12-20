@@ -52,4 +52,9 @@ class SearchResult:
     title: str
     snippet: str
     link: Optional[str] = None
-    content: Optional[str] = None    
+    content: Optional[str] = None
+
+@dataclass
+class SearchResultsWithSummary:
+    results: List[SearchResult]
+    summary: Optional[str] = None        
