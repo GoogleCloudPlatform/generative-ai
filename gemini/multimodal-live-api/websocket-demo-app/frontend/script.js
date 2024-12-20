@@ -1,8 +1,8 @@
 window.addEventListener("load", (event) => {
     console.log("Hello Gemini Realtime Demo!");
 
-  setAvailableCamerasOptions();
-  setAvailableMicrophoneOptions();
+    setAvailableCamerasOptions();
+    setAvailableMicrophoneOptions();
 });
 
 
@@ -13,8 +13,7 @@ const API_HOST = "us-central1-aiplatform.googleapis.com";
 
 const accessTokenInput = document.getElementById("token");
 const projectInput = document.getElementById("project");
-const systemInstructionsInput =
-    document.getElementById("systemInstructions");
+const systemInstructionsInput = document.getElementById("systemInstructions");
 
 CookieJar.init("token");
 CookieJar.init("project");
@@ -42,7 +41,7 @@ const geminiLiveApi = new GeminiLiveAPI(
 
 geminiLiveApi.onErrorMessage = (message) => {
     showDialogWithMessage(message);
-    setAppSatus("disconnected");
+    setAppStatus("disconnected");
 };
 
 function getSelectedResponseModality() {
@@ -66,13 +65,13 @@ function getSystemInstructions() {
 }
 
 function connectBtnClick() {
-    setAppSatus("connecting");
+    setAppStatus("connecting");
 
     geminiLiveApi.responseModalities = getSelectedResponseModality();
     geminiLiveApi.systemInstructions = getSystemInstructions();
 
     geminiLiveApi.onConnectionStarted = () => {
-        setAppSatus("connected");
+        setAppStatus("connected");
         startAudioInput();
     };
 
@@ -188,7 +187,7 @@ function newMicSelected() {
 }
 
 function disconnectBtnClick() {
-    setAppSatus("disconnected");
+    setAppStatus("disconnected");
     geminiLiveApi.disconnect();
     stopAudioInput();
 }
@@ -200,7 +199,7 @@ function showDialogWithMessage(messageText) {
     dialog.show();
 }
 
-async function getAvalibleDevices(deviceType) {
+async function getAvailableDevices(deviceType) {
     const allDevices = await navigator.mediaDevices.enumerateDevices();
     const devices = [];
     allDevices.forEach((device) => {
@@ -214,12 +213,12 @@ async function getAvalibleDevices(deviceType) {
     return devices;
 }
 
-async function getAvalibleCameras() {
-    return await this.getAvalibleDevices("videoinput");
+async function getAvailableCameras() {
+    return await this.getAvailableDevices("videoinput");
 }
 
-async function getAvalibleAudioInputs() {
-    return await this.getAvalibleDevices("audioinput");
+async function getAvailableAudioInputs() {
+    return await this.getAvailableDevices("audioinput");
 }
 
 function setMaterialSelect(allOptions, selectElement) {
@@ -237,18 +236,18 @@ function setMaterialSelect(allOptions, selectElement) {
 }
 
 async function setAvailableCamerasOptions() {
-    const cameras = await getAvalibleCameras();
+    const cameras = await getAvailableCameras();
     const videoSelect = document.getElementById("cameraSource");
     setMaterialSelect(cameras, videoSelect);
 }
 
 async function setAvailableMicrophoneOptions() {
-    const mics = await getAvalibleAudioInputs();
+    const mics = await getAvailableAudioInputs();
     const audioSelect = document.getElementById("audioSource");
     setMaterialSelect(mics, audioSelect);
 }
 
-function setAppSatus(status) {
+function setAppStatus(status) {
     disconnected.hidden = true;
     connecting.hidden = true;
     connected.hidden = true;

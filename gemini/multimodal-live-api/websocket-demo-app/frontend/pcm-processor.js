@@ -3,7 +3,6 @@
  * @extends AudioWorkletProcessor
  * @description Processes PCM audio data in a Web Audio API context
  */
-
 class PCMProcessor extends AudioWorkletProcessor {
   constructor() {
     super();

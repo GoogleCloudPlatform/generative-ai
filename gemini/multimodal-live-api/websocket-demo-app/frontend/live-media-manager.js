@@ -3,7 +3,7 @@ class LiveAudioOutputManager {
     constructor() {
         this.audioInputContext
         this.workletNode
-        this.initalized = false
+        this.initialized = false
 
         this.audioQueue = [];
         this.isPlaying = false;
@@ -13,27 +13,27 @@ class LiveAudioOutputManager {
 
 
     async playAudioChunk(base64AudioChunk) {
-    try {
-        if (!this.initalized) {
-            await this.initializeAudioContext();
+        try {
+            if (!this.initialized) {
+                await this.initializeAudioContext();
+            }
+
+            if (this.audioInputContext.state === "suspended") {
+                await this.audioInputContext.resume();
+            }
+
+            const arrayBuffer = LiveAudioOutputManager.base64ToArrayBuffer(base64AudioChunk);
+            const float32Data = LiveAudioOutputManager.convertPCM16LEToFloat32(arrayBuffer);
+
+            this.workletNode.port.postMessage(float32Data);
+        } catch (error) {
+            console.error("Error processing audio chunk:", error);
         }
-
-        if (this.audioInputContext.state === "suspended") {
-            await this.audioInputContext.resume();
-        }
-
-        const arrayBuffer = LiveAudioOutputManager.base64ToArrayBuffer(base64AudioChunk);
-        const float32Data = LiveAudioOutputManager.convertPCM16LEToFloat32(arrayBuffer);
-
-        this.workletNode.port.postMessage(float32Data);
-    } catch (error) {
-        console.error("Error processing audio chunk:", error);
     }
-}
 
     async initializeAudioContext() {
 
-        if (this.initalized) return;
+        if (this.initialized) return;
 
         console.log("initializeAudioContext...")
 
@@ -43,7 +43,7 @@ class LiveAudioOutputManager {
         this.workletNode = new AudioWorkletNode(this.audioInputContext, "pcm-processor");
         this.workletNode.connect(this.audioInputContext.destination);
 
-        this.initalized = true;
+        this.initialized = true;
         console.log("initializeAudioContext end")
     }
 
@@ -91,7 +91,7 @@ class LiveAudioInputManager {
             sampleRate: 16000,
         });
 
-        let contraints = {
+        let constraints = {
             audio: {
                 channelCount: 1,
                 sampleRate: 16000,
@@ -99,11 +99,11 @@ class LiveAudioInputManager {
         }
 
         if (this.deviceId) {
-            contraints.audio.deviceId = { exact: this.deviceId }
+            constraints.audio.deviceId = { exact: this.deviceId }
         }
 
         this.stream = await navigator.mediaDevices.getUserMedia(
-            contraints
+            constraints
         );
 
         const source = this.audioContext.createMediaStreamSource(this.stream);
@@ -232,7 +232,7 @@ class LiveVideoManager {
     }
 
     newFrame() {
-        console.log("capturinng new frame")
+        console.log("capturing new frame")
         const frameData = this.captureFrameB64()
         this.onNewFrame(frameData)
     }
@@ -291,7 +291,7 @@ class LiveScreenManager {
     }
 
     newFrame() {
-        console.log("capturinng new frame")
+        console.log("capturing new frame")
         const frameData = this.captureFrameB64()
         this.onNewFrame(frameData)
     }
