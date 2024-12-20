@@ -49,6 +49,8 @@ class SearchService:
         data = self.search_client.search(request)
         results = []
 
+        print(data)
+
         # Process results
         for r in data.results:
             document = r.document
