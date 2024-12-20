@@ -49,11 +49,13 @@ class SearchService:
 
         data = self.search_client.search(request)
         results = []
-
-        json_str = json.dumps(data, indent=2)  
     
         # Print the formatted JSON string to the console
-        print(json_str) 
+        print(data)
+
+        summary_text = (
+            data.summary.summary_text if data.summary and data.summary.summary_text else "No summary available"
+        ) 
 
         # Process results
         for r in data.results:
@@ -77,7 +79,7 @@ class SearchService:
             results.append(mapped_result)
 
         response_result = SearchResultsWithSummary(
-            summary=data.summary.summary_text,
+            summary=summary_text,
             results=results
         )
 
