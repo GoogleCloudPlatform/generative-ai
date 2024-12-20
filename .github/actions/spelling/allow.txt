@@ -65,6 +65,7 @@ COINIT
 CONOUT
 COUNTIF
 CRM
+CTHH
 CUAD
 CUCUONAR
 CVD
@@ -172,11 +173,17 @@ Gundogan
 HBox
 HDFC
 HDFS
+HHH
+HHT
 HIDPI
 HIGHCPU
 HMO
 HREDRAW
 HSA
+HTH
+HTMX
+HTT
+HTTH
 HVDC
 HZN
 Hadoop
@@ -434,6 +441,10 @@ Syunik
 TARG
 TCEHY
 TGI
+THH
+THHH
+THT
+THTH
 TLDR
 TOKENLIST
 TPU
@@ -442,6 +453,8 @@ TSLA
 TSMC
 TSNE
 TTFT
+TTH
+TTT
 Tadao
 Tafel
 Takeaways
@@ -590,6 +603,7 @@ bqdf
 bqml
 breakroom
 btn
+byod
 byor
 carbonara
 cashify
@@ -634,6 +648,7 @@ constexpr
 corpuses
 countplot
 cpet
+crewai
 csa
 cse
 ctd
@@ -670,6 +685,7 @@ doi
 dotprompt
 dpi
 draig
+drilldown
 drinkware
 dropdown
 dropna
@@ -677,6 +693,7 @@ dsl
 dtype
 dtypes
 dumfries
+dumpd
 dwmapi
 ecommerce
 ekg
@@ -919,14 +936,17 @@ nbformat
 nbviewer
 nce
 ncols
+nconst
 ndarray
 ndcg
 nec
 neering
+neq
 netif
 newaxis
 newaxisngram
 nfcorpus
+nfl
 ngram
 ngrams
 nlp
@@ -993,6 +1013,7 @@ podcasts
 podfile
 podhelper
 powerups
+praw
 prcntg
 preds
 produc
@@ -1063,6 +1084,7 @@ scikit
 seaborn
 seatback
 selectbox
+selftext
 selkirk
 seo
 setlocal
@@ -1149,6 +1171,7 @@ unigram
 unrtf
 upsell
 urandom
+usb
 usebackq
 usecases
 username
