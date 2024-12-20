@@ -71,7 +71,7 @@ cd frontend
 python3 -m http.server
 ```
 
-1. Point your browser to the demo app UI based on the output of the terminal. (E.g., it may be http://localhost:8000, or it may use a different port.)
+1. Point your browser to the demo app UI based on the output of the terminal. (e.g., it may be `http://localhost:8000`, or it may use a different port.)
 
 1. Get your Google Cloud access token:
    Run the following command in a terminal with gcloud installed to set your project, and to retrieve your access token.
@@ -88,7 +88,7 @@ gcloud auth print-access-token
 1. Enter the model ID in the UI:
    Replace `YOUR-PROJECT-ID` in the input with your Google Cloud Project ID.
 
-2. Connect and interact with the demo:
+1. Connect and interact with the demo:
 
 - After entering your Access Token and Model ID, press the connect button to connect your web app. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
 
@@ -149,7 +149,7 @@ python3 -m http.server
 - Click on "Change port"
 - Change Preview Port to 8000, and then click on "Change and Preview". This should open up a new tab with the UI.
 
-10. Going back to the tab with the Cloud Shell Editor, connect to the application by running the following command in a new terminal window:
+1. Going back to the tab with the Cloud Shell Editor, connect to the application by running the following command in a new terminal window:
 
 ```sh
 gcloud config set project YOUR-PROJECT-ID
@@ -161,7 +161,7 @@ gcloud auth print-access-token
   For example, it should look like: `projects/my-project-id/locations/us-central1/publishers/google/models/gemini-2.0-flash-exp`
 - Press the "Connect" button. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
 
-11. To interact with the app, you can do the following:
+1. To interact with the app, you can do the following:
 
 - Text input: You can write a text prompt to send to the model by entering your message in the box and pressing the send arrow. The model will then respond via audio (turn up your volume!).
 - Voice input: Press the pink microphone button and start speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
