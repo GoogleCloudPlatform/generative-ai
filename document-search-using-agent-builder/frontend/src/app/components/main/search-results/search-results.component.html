@@ -30,7 +30,9 @@
             <img src="{{result.link.includes(pdf) ? imageName.get('pdf'): imageName.get('doc')}}" height="30" width="30"/>
             <span class="card-title">{{ result.title | truncate }}</span>
           </div>
-          <p class="card-description">{{ result.content | truncate }}</p>
+          <div class="card-description"><p>
+            {{ result.content | truncate }}
+          </p></div>
           <div class="overview-button">
             <button mat-button (click)="previewDocument($event, result)">Preview</button>
           </div>
