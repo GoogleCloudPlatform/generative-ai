@@ -10,7 +10,16 @@ CONTENT_SEARCH_SPEC = SearchRequest.ContentSearchSpec(
     ),
     extractive_content_spec=SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
         max_extractive_answer_count=1
-    )
+    ),
+    summary_spec = SearchRequest.ContentSearchSpec.SummarySpec(
+        summary_result_count=5,
+        include_citations=True,
+        ignore_adversarial_query=True,
+        ignore_non_summary_seeking_query=True,
+        model_spec = SearchRequest.ContentSearchSpec.SummarySpec.ModelSpec(
+                version="stable",
+        ),
+    ),
 )
 QUERY_EXPANSION_SPEC = SearchRequest.QueryExpansionSpec(
     condition=SearchRequest.QueryExpansionSpec.Condition.AUTO,
