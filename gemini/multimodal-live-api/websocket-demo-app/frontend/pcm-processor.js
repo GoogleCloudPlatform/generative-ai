@@ -1,20 +1,14 @@
+/**
+ * @class PCMProcessor
+ * @extends AudioWorkletProcessor
+ * @description Processes PCM audio data in a Web Audio API context
+ */
 class PCMProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
         this.buffer = new Float32Array();
 
-/**
- * @class PCMProcessor
- * @extends AudioWorkletProcessor
- * @description Processes PCM audio data.
- */
         this.port.onmessage = (e) => {
-            const newData = e.data;
-            const newBuffer = new Float32Array(this.buffer.length + newData.length);
-            newBuffer.set(this.buffer);
-            newBuffer.set(newData, this.buffer.length);
-            this.buffer = newBuffer;
-        };
             const newData = e.data;
             const newBuffer = new Float32Array(this.buffer.length + newData.length);
             newBuffer.set(this.buffer);
