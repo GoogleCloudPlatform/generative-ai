@@ -40,11 +40,11 @@ class GeminiHandler(AsyncStreamHandler):
             audio = await self.input_queue.get()
             yield audio
 
-    async def connect(self, api_key: str):
-        client = genai.Client(api_key=api_key)
+    async def connect(self, project_id: str, location: str):
+        client = genai.Client(vertexai=True, project=project_id, location=location)
         config = {"response_modalities": ["AUDIO"]}
         async with client.aio.live.connect(
-            model="models/gemini-2.0-flash-exp", config=config
+            model="gemini-2.0-flash-exp", config=config
         ) as session:
             async for audio in session.start_stream(
                 stream=self.stream(), mime_type="audio/pcm"
@@ -60,7 +60,7 @@ class GeminiHandler(AsyncStreamHandler):
 
     async def generator(self):
         async for audio_response in async_aggregate_bytes_to_16bit(
-            self.connect(self.latest_args[1])
+            self.connect(*self.latest_args[1:])
         ):
             self.output_queue.put_nowait(audio_response)
 
@@ -83,23 +83,37 @@ class GeminiHandler(AsyncStreamHandler):
         self.quit.set()
 
 
-with gr.Blocks() as demo:
+css = """
+#api-form {
+    width: 80%;
+    margin: auto;
+}
+"""
+
+with gr.Blocks(css=css) as demo:
     gr.HTML(
         """
         <div style='text-align: center'>
-            <h1>Gemini 2.0 Voice Chat</h1>
+            <h1>GenAI SDK Voice Chat</h1>
             <p>Speak with Gemini using real-time audio streaming</p>
-            <p>Get a Gemini API key from <a href="https://ai.google.dev/gemini-api/docs/api-key">Google</a></p>
+            <p>You will need to enable VertexAI <a href="https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com">here</a></p>
+            <p>Also make sure you have enabled default credentials <a href="https://cloud.google.com/docs/authentication/provide-credentials-adc#how-to">here</a></p>
         </div>
     """
     )
 
-    with gr.Row(visible=True) as api_key_row:
-        api_key = gr.Textbox(
-            label="Gemini API Key",
-            placeholder="Enter your Gemini API Key",
-            type="password",
-        )
+    with gr.Group(visible=True, elem_id="api-form") as api_key_row:
+        with gr.Row():
+            project_id = gr.Textbox(
+                label="Project ID",
+                placeholder="Enter your Google Cloud Project ID",
+            )
+            location = gr.Textbox(
+                label="Location",
+                placeholder="Enter the location of your project, e.g. us-central1",
+            )
+        with gr.Row():
+            submit = gr.Button(value="Submit")
     with gr.Row(visible=False) as row:
         webrtc = WebRTC(
             label="Conversation",
@@ -112,12 +126,12 @@ with gr.Blocks() as demo:
 
         webrtc.stream(
             GeminiHandler(),
-            inputs=[webrtc, api_key],
+            inputs=[webrtc, project_id, location],
             outputs=[webrtc],
             time_limit=90,
             concurrency_limit=2,
         )
-    api_key.submit(
+    submit.click(
         lambda: (gr.update(visible=False), gr.update(visible=True)),
         None,
         [api_key_row, row],
