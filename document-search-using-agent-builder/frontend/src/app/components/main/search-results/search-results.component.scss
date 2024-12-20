@@ -1,7 +1,6 @@
 .overview-container {
   display: flex;
   justify-content: center;
-  padding-bottom: 1%;
   padding-top: 2%;
   padding-right: 1.5%;
 
@@ -40,6 +39,7 @@
               font-size: 20px;
               line-height: 24px;
               color: #4285F4;
+              padding: 40px;
           }
       }
   }
@@ -68,6 +68,7 @@
   flex-direction: column;
   width: 66%;
   gap: 15px;
+  padding-bottom: 5%;
 }
 
 .search-result-row-container {

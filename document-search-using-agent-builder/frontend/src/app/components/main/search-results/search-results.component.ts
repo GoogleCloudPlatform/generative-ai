@@ -41,8 +41,9 @@ export class SearchResultsComponent implements OnDestroy {
 
     this.service.search(query!).subscribe({
       next : (searchRespone: any)=>{
-      this.serachResult = searchRespone;
-      searchRespone.forEach((element: any) => {
+      this.summary = searchRespone.summary;
+      this.serachResult = searchRespone.results;
+      this.serachResult.forEach((element: any) => {
         this.documents.push(element);
         if(search_image_type.includes(element.link.split(".")[1])){
           this.images.push(element);
@@ -62,7 +63,8 @@ export class SearchResultsComponent implements OnDestroy {
 
     this.service.search(term).subscribe({
       next : (searchRespone: any)=>{
-      this.serachResult = searchRespone;
+      this.serachResult = searchRespone.results;
+      this.summary = searchRespone.summary;
       this.userService.hideLoading();
       },
       error : ()=>{
