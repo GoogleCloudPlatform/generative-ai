@@ -86,7 +86,7 @@ gcloud auth print-access-token
 8. Copy the access token from the previous step into the UI that you have open in your browser.
 
 9. Enter the model ID in the UI:
-   Replace `YOUR-PROJECT-ID` in the input with your Google Cloud project ID.
+   Replace `YOUR-PROJECT-ID` in the input with your Google Cloud Project ID.
 
 10. Connect and interact with the demo:
 
