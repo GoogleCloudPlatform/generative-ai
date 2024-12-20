@@ -55,8 +55,8 @@ class GeminiHandler(AsyncStreamHandler):
     async def receive(self, frame: tuple[int, np.ndarray]) -> None:
         _, array = frame
         array = array.squeeze()
-        auio_message = encode_audio(array, self.output_sample_rate)
-        self.input_queue.put_nowait(auio_message)
+        audio_message = encode_audio(array, self.output_sample_rate)
+        self.input_queue.put_nowait(audio_message)
 
     async def generator(self):
         async for audio_response in async_aggregate_bytes_to_16bit(
@@ -94,9 +94,9 @@ with gr.Blocks(css=css) as demo:
     gr.HTML(
         """
         <div style='text-align: center'>
-            <h1>GenAI SDK Voice Chat</h1>
+            <h1>Gen AI SDK Voice Chat</h1>
             <p>Speak with Gemini using real-time audio streaming</p>
-            <p>You will need to enable VertexAI <a href="https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com">here</a></p>
+            <p>You will need to enable Vertex AI <a href="https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com">here</a></p>
             <p>Also make sure you have enabled default credentials <a href="https://cloud.google.com/docs/authentication/provide-credentials-adc#how-to">here</a></p>
         </div>
     """
