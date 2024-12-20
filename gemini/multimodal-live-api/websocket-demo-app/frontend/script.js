@@ -5,7 +5,6 @@ window.addEventListener("load", (event) => {
     setAvailableMicrophoneOptions();
 });
 
-
 const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";
 const PROJECT_ID = "your project id";
 const MODEL = "gemini-2.0-flash-exp";
@@ -32,12 +31,7 @@ const screenBtn = document.getElementById("screenBtn");
 const cameraSelect = document.getElementById("cameraSource");
 const micSelect = document.getElementById("audioSource");
 
-const geminiLiveApi = new GeminiLiveAPI(
-    PROXY_URL,
-    PROJECT_ID,
-    MODEL,
-    API_HOST
-);
+const geminiLiveApi = new GeminiLiveAPI(PROXY_URL, PROJECT_ID, MODEL, API_HOST);
 
 geminiLiveApi.onErrorMessage = (message) => {
     showDialogWithMessage(message);
@@ -47,7 +41,7 @@ geminiLiveApi.onErrorMessage = (message) => {
 function getSelectedResponseModality() {
     // return "AUDIO";
     const radioButtons = document.querySelectorAll(
-        'md-radio[name="responseModality"]'
+        'md-radio[name="responseModality"]',
     );
 
     let selectedValue;
@@ -143,10 +137,7 @@ const canvasElement = document.getElementById("canvas");
 
 const liveVideoManager = new LiveVideoManager(videoElement, canvasElement);
 
-const liveScreenManager = new LiveScreenManager(
-    videoElement,
-    canvasElement
-);
+const liveScreenManager = new LiveScreenManager(videoElement, canvasElement);
 
 liveVideoManager.onNewFrame = (b64Image) => {
     geminiLiveApi.sendImageMessage(b64Image);
