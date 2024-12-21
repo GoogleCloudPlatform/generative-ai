@@ -1,0 +1,616 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Copy/Paste Detector Report</title><link href="styles/tailwind.css" rel="stylesheet"><link href="styles/prism.css" rel="stylesheet"></head><body class="bg-gray-100"><header class="bg-white shadow py-4"><div class="container mx-auto px-4"><h1 class="text-3xl font-semibold text-gray-800">jscpd - copy/paste report</h1></div></header><main class="container mx-auto my-8 p-4 bg-white shadow rounded"><section class="mb-8" id="dashboard"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Dashboard</h2><div class="grid grid-cols-4 gap-4"><div class="bg-blue-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-blue-800 mb-2">Total Files</h3><span class="text-4xl font-bold text-blue-800">353</span></div><div class="bg-green-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-green-800 mb-2">Total Lines of Code</h3><span class="text-4xl font-bold text-green-800">35154</span></div><div class="bg-yellow-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-yellow-800 mb-2">Number of Clones</h3><span class="text-4xl font-bold text-yellow-800">32</span></div><div class="bg-red-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-red-800 mb-2">Duplicated Lines</h3><span class="text-4xl font-bold text-red-800">614 (1.75%)</span></div></div></section><section class="mb-8" id="formats"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Formats with Duplications</h2><table class="w-full table-auto"><thead><tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Format</th><th class="py-3 px-6 text-left">Files</th><th class="py-3 px-6 text-left">Lines</th><th class="py-3 px-6 text-left">Clones</th><th class="py-3 px-6 text-left">Duplicated Lines</th><th class="py-3 px-6 text-left">Duplicated Tokens</th></tr></thead><tbody><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#kotlin-clones">kotlin</a></td><td class="py-3 px-6">1</td><td class="py-3 px-6">4</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#java-clones">java</a></td><td class="py-3 px-6">6</td><td class="py-3 px-6">356</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#typescript-clones">typescript</a></td><td class="py-3 px-6">38</td><td class="py-3 px-6">3263</td><td class="py-3 px-6">4</td><td class="py-3 px-6">90</td><td class="py-3 px-6">733</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#scss-clones">scss</a></td><td class="py-3 px-6">10</td><td class="py-3 px-6">280</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#sql-clones">sql</a></td><td class="py-3 px-6">9</td><td class="py-3 px-6">792</td><td class="py-3 px-6">5</td><td class="py-3 px-6">185</td><td class="py-3 px-6">2325</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#dart-clones">dart</a></td><td class="py-3 px-6">14</td><td class="py-3 px-6">1191</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#properties-clones">properties</a></td><td class="py-3 px-6">1</td><td class="py-3 px-6">4</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#python-clones">python</a></td><td class="py-3 px-6">128</td><td class="py-3 px-6">19812</td><td class="py-3 px-6">14</td><td class="py-3 px-6">192</td><td class="py-3 px-6">1607</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#c-header-clones">c-header</a></td><td class="py-3 px-6">7</td><td class="py-3 px-6">173</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#cpp-clones">cpp</a></td><td class="py-3 px-6">8</td><td class="py-3 px-6">594</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#markdown-clones">markdown</a></td><td class="py-3 px-6">24</td><td class="py-3 px-6">1833</td><td class="py-3 px-6">1</td><td class="py-3 px-6">14</td><td class="py-3 px-6">75</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#swift-clones">swift</a></td><td class="py-3 px-6">6</td><td class="py-3 px-6">75</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#groovy-clones">groovy</a></td><td class="py-3 px-6">3</td><td class="py-3 px-6">96</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#bash-clones">bash</a></td><td class="py-3 px-6">31</td><td class="py-3 px-6">1786</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#javascript-clones">javascript</a></td><td class="py-3 px-6">35</td><td class="py-3 px-6">1527</td><td class="py-3 px-6">3</td><td class="py-3 px-6">64</td><td class="py-3 px-6">446</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#tsx-clones">tsx</a></td><td class="py-3 px-6">24</td><td class="py-3 px-6">2827</td><td class="py-3 px-6">4</td><td class="py-3 px-6">64</td><td class="py-3 px-6">586</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#css-clones">css</a></td><td class="py-3 px-6">7</td><td class="py-3 px-6">524</td><td class="py-3 px-6">1</td><td class="py-3 px-6">5</td><td class="py-3 px-6">67</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#ini-clones">ini</a></td><td class="py-3 px-6">1</td><td class="py-3 px-6">17</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr></tbody></table></section><section class="mb-8" id="txt-clones"><a name="kotlin-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">kotlin</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="java-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">java</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="typescript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">typescript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/app/api/chat/route.ts (Line 21:1 - Line 34:37), search/grounded-generation-playground/src/app/api/grounded/route.ts (Line 21:1 - Line 34:41)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup0"><code class="language-typescript text-sm text-gray-800">import { NextRequest, NextResponse } from 'next/server';
+import { GoogleAuth } from 'google-auth-library';
+import {
+  responseCandidateToResult,
+  iteratorToStream,
+  processApiResponse,
+  mapOptionsToGroundedGenerationRequest,
+} from '@/lib/apiutils';
+
+const PROJECT_NUMBER = process.env.PROJECT_NUMBER;
+const API_ENDPOINT = `https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_NUMBER}/locations/global:streamGenerateGroundedContent`;
+
+export async function POST(req: NextRequest) {
+  console.log('Received POST request to /api/chat'</code></pre></div><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/app/api/chat/route.ts (Line 56:12 - Line 70:45), search/grounded-generation-playground/src/app/api/grounded/route.ts (Line 46:15 - Line 59:43)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup1"><code class="language-typescript text-sm text-gray-800">,
+  });
+
+  // Use Google Auth Library to get the access token
+  const auth = new GoogleAuth({
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+  });
+  const client = await auth.getClient();
+  const accessToken = await client.getAccessToken();
+
+  if (!accessToken.token) {
+    throw new Error('Failed to obtain access token');
+  }
+
+  // Map the session history to contents parts</code></pre></div><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/app/api/chat/route.ts (Line 81:119 - Line 134:2), search/grounded-generation-playground/src/app/api/grounded/route.ts (Line 68:58 - Line 121:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup2"><code class="language-typescript text-sm text-gray-800">,
+    },
+  };
+  const requestBody = mapOptionsToGroundedGenerationRequest({
+    systemInstruction,
+    contents,
+    model,
+    googleGrounding,
+    vertexGrounding,
+    vertexConfigId,
+  });
+
+  console.log('Sending request to Discovery Engine API');
+  console.log('Request body:', JSON.stringify([requestBody]));
+
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([requestBody]),
+    });
+
+    console.log('Received response from Discovery Engine API');
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response from API:', errorText);
+      throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+    }
+
+    const iterator = processApiResponse(response);
+    const stream = iteratorToStream(iterator);
+
+    return new NextResponse(stream, {
+      headers: {
+        'Content-Type': 'text/plain',
+        'Transfer-Encoding': 'chunked',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Accel-Buffering': 'no',
+      },
+    });
+  } catch (error) {
+    console.error('Error in POST handler:', error);
+    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}</code></pre></div><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/lib/apiutils.ts (Line 117:14 - Line 127:42), search/grounded-generation-playground/src/lib/apiutils.ts (Line 94:11 - Line 103:22)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup16"><code class="language-typescript text-sm text-gray-800">);
+        if (jsonObject.candidates &amp;&amp; jsonObject.candidates[0]) {
+          const candidate = jsonObject.candidates[0];
+          const result = responseCandidateToResult(candidate);
+          if (Object.keys(result).length &gt; 0) {
+            yield JSON.stringify(result) + '\n';
+          }
+        }
+      } catch (error) {
+        console.error(
+          'Error parsing JSON in remaining buffer:'</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="scss-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">scss</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="sql-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">sql</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">gemini/sample-apps/genwealth/database-files/llm.sql (Line 67:5 - Line 116:30), gemini/sample-apps/genwealth/database-files/llm_local.sql (Line 61:2 - Line 110:25)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup21"><code class="language-sql text-sm text-gray-800">-- Define user and AI roles
+    IF llm_role IS NOT null THEN SELECT CONCAT(llm_prompt, 'AI ROLE: ', llm_role, E'.\n') INTO llm_prompt; END IF;
+    IF mission IS NOT null THEN SELECT CONCAT(llm_prompt, 'AI MISSION: ', mission, E'.\n') INTO llm_prompt; END IF;
+    IF user_role IS NOT null THEN SELECT CONCAT(llm_prompt, 'USER ROLE: ', user_role, E' \n\n') INTO llm_prompt; END IF;
+    
+    -- Define the task/prompt
+    IF prompt IS NOT null THEN SELECT CONCAT(llm_prompt, E'INSTRUCTIONS: \n- Respond to the PROMPT using FEWER than ', CAST (ROUND(max_output_tokens * 3) AS TEXT), E' characters, including white space. The PROMPT begins with &quot;&lt;PROMPT&gt;&quot; and ends with &quot;&lt;/PROMPT&gt;&quot;. \n- Use available CONTEXT to improve your response, and tell the user specifically which CONTEXT you used in plain language (do not use programming markup or tags). The context begins with &quot;&lt;CONTEXT&gt;&quot; and ends with &quot;&lt;/CONTEXT&gt;&quot;. \n- Strictly comply with all response restrictions. Response restrictions start with &lt;RESPONSE_RESTRICTIONS&gt; and end with &lt;/RESPONSE_RESTRICTIONS&gt;. \n\n&lt;PROMPT&gt;\n ', prompt, E'\n&lt;/PROMPT&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Enforce response restrictions
+    IF response_restrictions IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;RESPONSE_RESTRICTIONS&gt;\n\n ', response_restrictions, E' \n\n&lt;/RESPONSE_RESTRICTIONS&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Open the context tag
+    SELECT CONCAT(llm_prompt, E'&lt;CONTEXT&gt;\n\n') INTO llm_prompt;
+    
+    -- Add conversation history
+    IF enable_history is true THEN
+        -- Check if this is the first interaction from this user
+        SELECT COUNT(*) FROM conversation_history WHERE user_id = uid INTO interaction_history_count;
+        
+        -- Add last interaction to prompt
+        SELECT CONCAT(llm_prompt, E'&lt;LATEST_INTERACTION&gt;\n==========\n',
+            CASE
+                WHEN interaction_history_count = 0 THEN E' First interaction\n'
+                ELSE (SELECT CONCAT(E'**TIME**\n', datetime, E'\n\n**USER**\n', user_prompt, E'\n\n**AI**\n', ai_response, E'\n') FROM conversation_history WHERE user_id = uid ORDER BY datetime DESC LIMIT 1)
+            END,
+            E'\n==========\n&lt;/LATEST_INTERACTION&gt;\n\n') INTO llm_prompt;
+        
+        -- Add other relevant interaction history to prompt
+        IF interaction_history_count &gt; 1 THEN
+            WITH ch AS (
+                SELECT * FROM conversation_history
+                WHERE user_id = uid
+                AND id &lt; (SELECT id FROM conversation_history WHERE user_id = uid ORDER BY datetime DESC LIMIT 1)
+                ORDER BY user_prompt_embedding &lt;=&gt; google_ml.embedding('textembedding-gecko@003', prompt)::vector
+                LIMIT 3
+            )
+            SELECT CONCAT(llm_prompt, E'&lt;OTHER_INTERACTION_HISTORY&gt;\n==========\n', STRING_AGG(CONCAT(E'**TIME**\n', datetime, E'\n\n**USER**\n ', user_prompt, E'\n\n**AI**\n', ai_response), E'\n==========\n&lt;\OTHER_INTERACTION_HISTORY&gt;\n\n'))
+            INTO llm_prompt FROM ch;
+        END IF;
+    END IF;
+    
+    -- Add additional_context and examples
+    IF additional_context IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;ADDITIONAL_CONTEXT&gt; Use the following CONTEXT to respond to the PROMPT, and tell me specifically which pieces of CONTEXT you used to improve your response:\n\n ', additional_context, E' &lt;/ADDITIONAL_CONTEXT&gt;\n\n') INTO llm_prompt; END IF;
+    IF examples IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;EXAMPLES&gt; Use the following EXAMPLES to improve your OUTPUT.\n==========\n', examples, E' \n==========\n&lt;/EXAMPLES&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Add output instructions, format, and length constraints
+    IF output_instructions IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;OUTPUT_INSTRUCTIONS&gt; \nRe-write your OUTPUT using the following instructions:\n', output_instructions, E' \n&lt;/OUTPUT_INSTRUCTIONS&gt;\n\n') INTO llm_prompt; END IF;
+    IF output_format IS NOT null THEN SELECT CONCAT(llm_prompt, '&lt;OUTPUT_FORMAT&gt; Complete the TASK using the following OUTPUT FORMAT: ', output_format, E' &lt;/OUTPUT_FORMAT&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Do stock lookup if enabled</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/genwealth/database-files/llm.sql (Line 174:3 - Line 186:2), gemini/sample-apps/genwealth/database-files/llm_local.sql (Line 122:13 - Line 134:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup22"><code class="language-sql text-sm text-gray-800">;
+    
+    -- Record conversation history
+    IF enable_history is true THEN
+        INSERT INTO conversation_history (user_id, user_prompt, ai_response)
+        VALUES (uid, prompt, llm_response);
+    END IF;
+    
+    -- Add disclaimer
+    IF disclaimer IS NOT null THEN SELECT CONCAT(llm_response, E'\n\n', disclaimer) INTO llm_response; END IF;
+    
+    -- Return the response
+    RETURN QUERY SELECT llm_prompt, LENGTH(llm_prompt), llm_response, LENGTH(llm_response),</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/genwealth/database-files/llm-text-bison.sql (Line 31:17 - Line 119:7), gemini/sample-apps/genwealth/database-files/llm.sql (Line 31:9 - Line 119:10)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup23"><code class="language-sql text-sm text-gray-800">,
+    user_role TEXT DEFAULT 'I am a generic user',
+    llm_role TEXT DEFAULT ' You are a helpful AI Assistant',
+    mission TEXT DEFAULT null,
+    additional_context TEXT DEFAULT null,
+    output_format TEXT DEFAULT null,
+    examples TEXT DEFAULT null,
+    prompt TEXT DEFAULT 'Tell me I need to pass in a prompt parameter.',
+    output_instructions TEXT DEFAULT null,
+    response_restrictions TEXT DEFAULT 'You have no response restrictions for this prompt.',
+    disclaimer TEXT DEFAULT null,
+    max_output_tokens INT DEFAULT 512,
+    temperature DECIMAL DEFAULT 0.0,
+    top_p DECIMAL DEFAULT 0.95,
+    top_k DECIMAL DEFAULT 40
+)
+RETURNS TABLE (
+    llm_prompt TEXT,
+    llm_prompt_len INT,
+    llm_response TEXT,
+    llm_response_len INT,
+    extractive_prompt TEXT,
+    extractive_response TEXT,
+    recommended_tickers TEXT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    llm_prompt TEXT := '';
+    llm_prompt_len INT := null;
+    llm_response TEXT := null;
+    interaction_history_count INT := 0;
+    extractive_prompt TEXT := '';
+    extractive_response TEXT := '';
+    recommended_tickers TEXT := '';
+BEGIN
+    -- Define user and AI roles
+    IF llm_role IS NOT null THEN SELECT CONCAT(llm_prompt, 'AI ROLE: ', llm_role, E'.\n') INTO llm_prompt; END IF;
+    IF mission IS NOT null THEN SELECT CONCAT(llm_prompt, 'AI MISSION: ', mission, E'.\n') INTO llm_prompt; END IF;
+    IF user_role IS NOT null THEN SELECT CONCAT(llm_prompt, 'USER ROLE: ', user_role, E' \n\n') INTO llm_prompt; END IF;
+    
+    -- Define the task/prompt
+    IF prompt IS NOT null THEN SELECT CONCAT(llm_prompt, E'INSTRUCTIONS: \n- Respond to the PROMPT using FEWER than ', CAST (ROUND(max_output_tokens * 3) AS TEXT), E' characters, including white space. The PROMPT begins with &quot;&lt;PROMPT&gt;&quot; and ends with &quot;&lt;/PROMPT&gt;&quot;. \n- Use available CONTEXT to improve your response, and tell the user specifically which CONTEXT you used in plain language (do not use programming markup or tags). The context begins with &quot;&lt;CONTEXT&gt;&quot; and ends with &quot;&lt;/CONTEXT&gt;&quot;. \n- Strictly comply with all response restrictions. Response restrictions start with &lt;RESPONSE_RESTRICTIONS&gt; and end with &lt;/RESPONSE_RESTRICTIONS&gt;. \n\n&lt;PROMPT&gt;\n ', prompt, E'\n&lt;/PROMPT&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Enforce response restrictions
+    IF response_restrictions IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;RESPONSE_RESTRICTIONS&gt;\n\n ', response_restrictions, E' \n\n&lt;/RESPONSE_RESTRICTIONS&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Open the context tag
+    SELECT CONCAT(llm_prompt, E'&lt;CONTEXT&gt;\n\n') INTO llm_prompt;
+    
+    -- Add conversation history
+    IF enable_history is true THEN
+        -- Check if this is the first interaction from this user
+        SELECT COUNT(*) FROM conversation_history WHERE user_id = uid INTO interaction_history_count;
+        
+        -- Add last interaction to prompt
+        SELECT CONCAT(llm_prompt, E'&lt;LATEST_INTERACTION&gt;\n==========\n',
+            CASE
+                WHEN interaction_history_count = 0 THEN E' First interaction\n'
+                ELSE (SELECT CONCAT(E'**TIME**\n', datetime, E'\n\n**USER**\n', user_prompt, E'\n\n**AI**\n', ai_response, E'\n') FROM conversation_history WHERE user_id = uid ORDER BY datetime DESC LIMIT 1)
+            END,
+            E'\n==========\n&lt;/LATEST_INTERACTION&gt;\n\n') INTO llm_prompt;
+        
+        -- Add other relevant interaction history to prompt
+        IF interaction_history_count &gt; 1 THEN
+            WITH ch AS (
+                SELECT * FROM conversation_history
+                WHERE user_id = uid
+                AND id &lt; (SELECT id FROM conversation_history WHERE user_id = uid ORDER BY datetime DESC LIMIT 1)
+                ORDER BY user_prompt_embedding &lt;=&gt; google_ml.embedding('textembedding-gecko@003', prompt)::vector
+                LIMIT 3
+            )
+            SELECT CONCAT(llm_prompt, E'&lt;OTHER_INTERACTION_HISTORY&gt;\n==========\n', STRING_AGG(CONCAT(E'**TIME**\n', datetime, E'\n\n**USER**\n ', user_prompt, E'\n\n**AI**\n', ai_response), E'\n==========\n&lt;\OTHER_INTERACTION_HISTORY&gt;\n\n'))
+            INTO llm_prompt FROM ch;
+        END IF;
+    END IF;
+    
+    -- Add additional_context and examples
+    IF additional_context IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;ADDITIONAL_CONTEXT&gt; Use the following CONTEXT to respond to the PROMPT, and tell me specifically which pieces of CONTEXT you used to improve your response:\n\n ', additional_context, E' &lt;/ADDITIONAL_CONTEXT&gt;\n\n') INTO llm_prompt; END IF;
+    IF examples IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;EXAMPLES&gt; Use the following EXAMPLES to improve your OUTPUT.\n==========\n', examples, E' \n==========\n&lt;/EXAMPLES&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Add output instructions, format, and length constraints
+    IF output_instructions IS NOT null THEN SELECT CONCAT(llm_prompt, E'&lt;OUTPUT_INSTRUCTIONS&gt; \nRe-write your OUTPUT using the following instructions:\n', output_instructions, E' \n&lt;/OUTPUT_INSTRUCTIONS&gt;\n\n') INTO llm_prompt; END IF;
+    IF output_format IS NOT null THEN SELECT CONCAT(llm_prompt, '&lt;OUTPUT_FORMAT&gt; Complete the TASK using the following OUTPUT FORMAT: ', output_format, E' &lt;/OUTPUT_FORMAT&gt;\n\n') INTO llm_prompt; END IF;
+    
+    -- Do stock lookup if enabled
+    IF enable_stock_lookup is true THEN
+        SELECT CONCAT(E'List 3 words that best describe the type of investment this person is looking for based on their QUESTION, RISK_PROFILE, and BIO. \n\nQUESTION:\n', prompt, E'\n\nRISK_PROFILE: \n', risk_profile, E'\n\nBIO: \n', bio) INTO extractive_prompt FROM user_profiles WHERE id = uid;
+        SELECT public</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/genwealth/database-files/llm-text-bison.sql (Line 131:2 - Line 152:7), gemini/sample-apps/genwealth/database-files/llm.sql (Line 135:2 - Line 156:10)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup24"><code class="language-sql text-sm text-gray-800">INTO extractive_response;
+        
+        WITH inv AS (
+            SELECT ticker, analysis
+            FROM investments
+            WHERE rating = 'BUY'
+            ORDER BY analysis_embedding &lt;=&gt; google_ml.embedding('textembedding-gecko@003',extractive_response)::vector
+            LIMIT 3
+        )
+        SELECT
+            CONCAT(llm_prompt, E'&lt;SUGGESTED_STOCKS&gt; Recommend these specific stock tickers to me, and tell me why they are a good fit for me based on my BIO and personal details: ', STRING_AGG(ticker, ', '), E'\n\nTicker Details: ', STRING_AGG(CONCAT(E'\n========\n**STOCK TICKER**: ', ticker, E'\n\n', analysis), E'\n'), E'\n========\n&lt;/SUGGESTED_STOCKS&gt;\n\n'),
+            CONCAT('Tickers: ', STRING_AGG(ticker, ', '))
+        FROM inv
+        INTO llm_prompt, recommended_tickers;
+    END IF;
+    
+    -- Close the context tag
+    SELECT CONCAT(llm_prompt, E'&lt;/CONTEXT&gt;\n\n') INTO llm_prompt;
+    
+    -- Send enriched prompt to LLM
+    IF set_debug is false THEN
+        SELECT public</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/genwealth/database-files/llm-text-bison.sql (Line 164:2 - Line 179:2), gemini/sample-apps/genwealth/database-files/llm.sql (Line 172:2 - Line 188:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup25"><code class="language-sql text-sm text-gray-800">INTO llm_response;
+    END IF;
+    
+    -- Record conversation history
+    IF enable_history is true THEN
+        INSERT INTO conversation_history (user_id, user_prompt, ai_response)
+        VALUES (uid, prompt, llm_response);
+    END IF;
+    
+    -- Add disclaimer
+    IF disclaimer IS NOT null THEN SELECT CONCAT(llm_response, E'\n\n', disclaimer) INTO llm_response; END IF;
+    
+    -- Return the response
+    RETURN QUERY SELECT llm_prompt, LENGTH(llm_prompt), llm_response, LENGTH(llm_response), extractive_prompt, extractive_response, recommended_tickers;
+END;
+$$;</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="dart-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">dart</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="properties-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">properties</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="python-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">python</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions/function/image/main.py (Line 48:9 - Line 58:16), gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions/function/text/main.py (Line 42:10 - Line 52:16)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup3"><code class="language-python text-sm text-gray-800">.text.strip().split(&quot;\n&quot;))
+    print(output)
+    return output
+
+
+def run_it(request) -&gt; str | tuple[str, int]:
+    try:
+        project_id = os.environ.get(&quot;PROJECT_ID&quot;)
+        region = os.environ.get(&quot;REGION&quot;)
+        vertexai.init(project=project_id, location=region)
+        file_to_analyze</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/e2e-gen-ai-app-starter-pack/tests/integration/patterns/test_langgraph_dummy_agent.py (Line 32:5 - Line 62:2), gemini/sample-apps/e2e-gen-ai-app-starter-pack/tests/integration/patterns/test_rag_qa.py (Line 32:5 - Line 63:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup4"><code class="language-python text-sm text-gray-800">user_message = HumanMessage(f&quot;Test message for {CHAIN_NAME} chain&quot;)
+    input_dict = {&quot;messages&quot;: [user_message]}
+
+    events = [event async for event in chain.astream_events(input_dict, version=&quot;v2&quot;)]
+
+    assert len(events) &gt; 1, (
+        f&quot;Expected multiple events for {CHAIN_NAME} chain, &quot; f&quot;got {len(events)}&quot;
+    )
+    on_tool_end_events = [event for event in events if event[&quot;event&quot;] == &quot;on_tool_end&quot;]
+    assert len(on_tool_end_events) == 1, (
+        f&quot;Expected exactly one on_tool_end event for {CHAIN_NAME} chain, &quot;
+        f&quot;got {len(on_tool_end_events)}&quot;
+    )
+    assert isinstance(
+        OnToolEndEvent.model_validate(on_tool_end_events[0]), OnToolEndEvent
+    )
+
+    on_chain_stream_events = [
+        event for event in events if event[&quot;event&quot;] == &quot;on_chat_model_stream&quot;
+    ]
+
+    assert on_chain_stream_events, (
+        f&quot;Expected at least one on_chat_model_stream event&quot; f&quot; for {CHAIN_NAME} chain&quot;
+    )
+
+    for event in on_chain_stream_events:
+        assert AIMessageChunk.model_validate(
+            event[&quot;data&quot;][&quot;chunk&quot;]
+        ), f&quot;Invalid AIMessageChunk for {CHAIN_NAME} chain: {event['data']['chunk']}&quot;
+
+    logging.info(f&quot;All assertions passed for {CHAIN_NAME} chain&quot;)</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/llamaindex-rag/ui/pages/3_💬 Q&amp;A_Chatbot.py (Line 10:1 - Line 21:33), gemini/sample-apps/llamaindex-rag/ui/pages/4_📊 Batch Evaluations.py (Line 18:1 - Line 28:12)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup8"><code class="language-python text-sm text-gray-800">config_path = os.environ.get(
+    &quot;CONFIG_PATH&quot;,
+    os.path.join(os.path.dirname(__file__), &quot;..&quot;, &quot;..&quot;, &quot;common&quot;, &quot;config.yaml&quot;),
+)
+
+# Load the config file
+with open(config_path) as file:
+    config = yaml.safe_load(file)
+
+fastapi_url = config[&quot;fastapi_url&quot;]
+
+# Configure Google Cloud Logging</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/llamaindex-rag/ui/pages/1_🗄️ Data Sources.py (Line 13:1 - Line 24:4), gemini/sample-apps/llamaindex-rag/ui/pages/2_🖊️ Prompts.py (Line 7:1 - Line 17:20)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup9"><code class="language-python text-sm text-gray-800"># Load configuration
+config_path = os.environ.get(
+    &quot;CONFIG_PATH&quot;,
+    os.path.join(os.path.dirname(__file__), &quot;..&quot;, &quot;..&quot;, &quot;common&quot;, &quot;config.yaml&quot;),
+)
+with open(config_path) as config_file:
+    config = yaml.safe_load(config_file)
+
+fastapi_url = config[&quot;fastapi_url&quot;]
+
+
+def</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/llamaindex-rag/backend/rag/qa_followup_retriever.py (Line 103:10 - Line 115:15), gemini/sample-apps/llamaindex-rag/backend/rag/qa_followup_retriever.py (Line 87:9 - Line 99:15)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup10"><code class="language-python text-sm text-gray-800">(query_bundle)
+
+        am_ids = {n.node.node_id for n in am_nodes}
+        qa_ids = {n.node.node_id for n in qa_nodes}
+        num_qa_ids = len(qa_ids)
+        num_am_ids = len(am_ids)
+        logger.info(f&quot;number of nodes found with question matching {num_qa_ids}&quot;)
+        logger.info(f&quot;number of nodes found with base retriever: {num_am_ids}&quot;)
+        combined_dict = {n.node.node_id: n for n in am_nodes}
+        combined_dict.update({n.node.node_id: n for n in qa_nodes})
+        retrieve_ids = am_ids.union(qa_ids)
+        retrieve_nodes = [combined_dict[rid] for rid in retrieve_ids]
+        return retrieve_nodes</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/llamaindex-rag/backend/rag/index_manager.py (Line 143:9 - Line 159:17), gemini/sample-apps/llamaindex-rag/backend/rag/index_manager.py (Line 78:9 - Line 94:23)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup11"><code class="language-python text-sm text-gray-800">self.base_index = self.get_vector_index(
+            index_name=self.base_index_name,
+            endpoint_name=self.base_endpoint_name,
+            firestore_db_name=self.firestore_db_name,
+            firestore_namespace=self.firestore_namespace,
+        )
+        if self.qa_endpoint_name and self.qa_index_name:
+            self.qa_index = self.get_vector_index(
+                index_name=self.qa_index_name,
+                endpoint_name=self.qa_endpoint_name,
+                firestore_db_name=self.firestore_db_name,
+                firestore_namespace=self.firestore_namespace,
+            )
+        else:
+            self.qa_index = None
+
+    def get_vector_index</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/llamaindex-rag/backend/rag/claude_vertex.py (Line 62:13 - Line 76:4), gemini/sample-apps/llamaindex-rag/backend/rag/claude_vertex.py (Line 47:7 - Line 61:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup12"><code class="language-python text-sm text-gray-800">.messages.create(
+            model=self.model_name,
+            max_tokens=self.max_tokens,
+            system=self.system_prompt,
+            messages=[
+                {
+                    &quot;role&quot;: &quot;user&quot;,
+                    &quot;content&quot;: prompt,
+                }
+            ],
+        )
+        return CompletionResponse(text=message.content[0].text)
+
+    @llm_completion_callback()
+    def</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/llamaindex-rag/backend/app/shared_state.py (Line 5:2 - Line 22:42), gemini/sample-apps/llamaindex-rag/backend/tests/test_index_manager.py (Line 11:12 - Line 29:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup13"><code class="language-python text-sm text-gray-800">)
+
+PROJECT_ID = config[&quot;project_id&quot;]
+LOCATION = config[&quot;location&quot;]
+DOCSTORE_BUCKET_NAME = config[&quot;docstore_bucket_name&quot;]
+VECTOR_INDEX_NAME = config[&quot;vector_index_name&quot;]
+INDEX_ENDPOINT_NAME = config[&quot;index_endpoint_name&quot;]
+EMBEDDINGS_MODEL_NAME = config[&quot;embeddings_model_name&quot;]
+VECTOR_DATA_PREFIX = config[&quot;vector_data_prefix&quot;]
+FIRESTORE_DB_NAME = config[&quot;firestore_db_name&quot;]
+FIRESTORE_NAMESPACE = config[&quot;firestore_namespace&quot;]
+QA_INDEX_NAME = config.get(&quot;qa_index_name&quot;)
+QA_ENDPOINT_NAME = config.get(&quot;qa_endpoint_name&quot;)
+FIRESTORE_DB_NAME = config.get(&quot;firestore_db_name&quot;)
+FIRESTORE_NAMESPACE = config.get(&quot;firestore_namespace&quot;)
+BUCKET_NAME = config.get(&quot;docstore_bucket_name&quot;)
+
+# Initialize State of Prompts and Indexes</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/genwealth/function-scripts/update-search-index/main.py (Line 79:20 - Line 100:11), gemini/sample-apps/genwealth/function-scripts/write-metadata/main.py (Line 12:15 - Line 33:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup14"><code class="language-python text-sm text-gray-800">(cloud_event):
+    &quot;&quot;&quot;Main function&quot;&quot;&quot;
+    # Set event vars
+    data = cloud_event.data
+    event_id = cloud_event[&quot;id&quot;]
+    event_type = cloud_event[&quot;type&quot;]
+    bucket = data[&quot;bucket&quot;]
+    name = data[&quot;name&quot;]
+    metageneration = data[&quot;metageneration&quot;]
+    timeCreated = data[&quot;timeCreated&quot;]
+    updated = data[&quot;updated&quot;]
+
+    # Print event vars to log
+    print(f&quot;Event ID: {event_id}&quot;)
+    print(f&quot;Event type: {event_type}&quot;)
+    print(f&quot;Bucket: {bucket}&quot;)
+    print(f&quot;File: {name}&quot;)
+    print(f&quot;Metageneration: {metageneration}&quot;)
+    print(f&quot;Created: {timeCreated}&quot;)
+    print(f&quot;Updated: {updated}&quot;)
+
+    project_id</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/e2e-gen-ai-app-starter-pack/tests/integration/test_chain.py (Line 38:5 - Line 53:2), gemini/sample-apps/e2e-gen-ai-app-starter-pack/tests/integration/patterns/test_rag_qa.py (Line 48:5 - Line 63:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup15"><code class="language-python text-sm text-gray-800">)
+
+    on_chain_stream_events = [
+        event for event in events if event[&quot;event&quot;] == &quot;on_chat_model_stream&quot;
+    ]
+
+    assert on_chain_stream_events, (
+        f&quot;Expected at least one on_chat_model_stream event&quot; f&quot; for {CHAIN_NAME} chain&quot;
+    )
+
+    for event in on_chain_stream_events:
+        assert AIMessageChunk.model_validate(
+            event[&quot;data&quot;][&quot;chunk&quot;]
+        ), f&quot;Invalid AIMessageChunk for {CHAIN_NAME} chain: {event['data']['chunk']}&quot;
+
+    logging.info(f&quot;All assertions passed for {CHAIN_NAME} chain&quot;)</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/use-cases/retrieval-augmented-generation/utils/intro_multimodal_rag_utils.py (Line 395:4 - Line 405:21), gemini/use-cases/retrieval-augmented-generation/utils/intro_multimodal_rag_utils.py (Line 265:5 - Line 275:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup20"><code class="language-python text-sm text-gray-800">,
+    generation_config: GenerationConfig | None = GenerationConfig(
+        temperature=0.2, max_output_tokens=2048
+    ),
+    safety_settings: dict | None = {
+        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+    },
+    add_sleep_after_page</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/sample-apps/e2e-gen-ai-app-starter-pack/streamlit/side_bar.py (Line 120:2 - Line 128:5), gemini/sample-apps/e2e-gen-ai-app-starter-pack/streamlit/side_bar.py (Line 111:19 - Line 119:5)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup26"><code class="language-python text-sm text-gray-800">]:
+                    if self.st.button(chat[&quot;title&quot;], key=chat_id):
+                        self.st.session_state.run_id = None
+                        self.st.session_state[&quot;session_id&quot;] = chat_id
+                        self.st.session_state.session_db.get_session(
+                            session_id=self.st.session_state[&quot;session_id&quot;],
+                        )
+
+            self</code></pre></div><div class="py-4"><p class="text-gray-600">gemini/function-calling/sql-talk-app/app.py (Line 125:46 - Line 133:5), gemini/sample-apps/fixmycar/frontend/streamlit-backend.py (Line 33:1 - Line 41:39)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup30"><code class="language-python text-sm text-gray-800">):
+    st.session_state.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt})
+    with st.chat_message(&quot;user&quot;):
+        st.markdown(prompt)
+
+    with st.chat_message(&quot;assistant&quot;):
+        message_placeholder = st.empty()
+        full_response = &quot;&quot;
+        chat</code></pre></div><div class="py-4"><p class="text-gray-600">noxfile.py (Line 460:9 - Line 469:28), noxfile.py (Line 414:9 - Line 423:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup31"><code class="language-python text-sm text-gray-800">&quot;-b&quot;,
+        &quot;html&quot;,
+        &quot;-d&quot;,
+        os.path.join(&quot;docs&quot;, &quot;_build&quot;, &quot;doctrees&quot;, &quot;&quot;),
+        os.path.join(&quot;docs&quot;, &quot;&quot;),
+        os.path.join(&quot;docs&quot;, &quot;_build&quot;, &quot;html&quot;, &quot;&quot;),
+    )
+
+
+@nox.session(python=SYSTEM_TEST_PYTHON_VERSIONS</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="c-header-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">c-header</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="cpp-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">cpp</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="markdown-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">markdown</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">gemini/sample-apps/photo-discovery/app/linux/CMakeLists.txt (Line 128:28 - Line 142:7), gemini/sample-apps/photo-discovery/app/windows/CMakeLists.txt (Line 92:28 - Line 106:14)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup7"><code class="language-markdown text-sm text-gray-800">lutter tool portions of the build. This must not be removed.
+add_dependencies(${BINARY_NAME} flutter_assemble)
+
+# Only the install-generated bundle's copy of the executable will launch
+# correctly, since the resources must in the right relative locations. To avoid
+# people trying to run the unbundled copy, put it in a subdirectory instead of
+# the default top-level location.
+set_</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="swift-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">swift</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="groovy-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">groovy</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="bash-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">bash</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="javascript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">javascript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">search/web-app/static/recommend.js (Line 30:1 - Line 51:2), search/web-app/static/search.js (Line 37:1 - Line 58:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup27"><code class="language-javascript text-sm text-gray-800">const jsonTabSelector = document.querySelector(&quot;#json-tab-selector&quot;);
+const entitiesTabSelector = document.querySelector(&quot;#entities-tab-selector&quot;);
+
+const tabContent = document.querySelector(&quot;.tab-content&quot;);
+const jsonTab = document.querySelector(&quot;#json-tab&quot;);
+const entitiesTab = document.querySelector(&quot;#entities-tab&quot;);
+
+if (jsonTabSelector) {
+  jsonTabSelector.onclick = () =&gt; {
+    jsonTab.classList.replace(&quot;tab-hidden&quot;, &quot;tab-visible&quot;);
+    entitiesTab.classList.replace(&quot;tab-visible&quot;, &quot;tab-hidden&quot;);
+    entitiesTab.replaceWith(jsonTab);
+  };
+}
+
+if (entitiesTabSelector) {
+  entitiesTabSelector.onclick = () =&gt; {
+    entitiesTab.classList.replace(&quot;tab-hidden&quot;, &quot;tab-visible&quot;);
+    jsonTab.classList.replace(&quot;tab-visible&quot;, &quot;tab-hidden&quot;);
+    jsonTab.replaceWith(entitiesTab);
+  };
+}</code></pre></div><div class="py-4"><p class="text-gray-600">search/web-app/static/ekg.js (Line 1:1 - Line 25:6), search/web-app/static/recommend.js (Line 1:1 - Line 26:10)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup28"><code class="language-javascript text-sm text-gray-800">/**
+ * Copyright 2023 Google LLC
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+hljs.highlightAll();
+hljs.addPlugin(new CopyButtonPlugin());
+
+mdc.autoInit();
+
+const MDCRipple = mdc.ripple.MDCRipple;
+const MDCTextField = mdc.textField.MDCTextField;
+const MDCSelect = mdc.select.MDCSelect;
+const MDCTabBar = mdc.tabBar.MDCTabBar;
+const</code></pre></div><div class="py-4"><p class="text-gray-600">search/web-app/static/ekg.js (Line 40:25 - Line 59:2), search/web-app/static/search.js (Line 40:15 - Line 58:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup29"><code class="language-javascript text-sm text-gray-800">);
+
+const jsonTab = document.querySelector(&quot;#json-tab&quot;);
+const entitiesTab = document.querySelector(&quot;#entities-tab&quot;);
+
+if (jsonTabSelector) {
+  jsonTabSelector.onclick = () =&gt; {
+    jsonTab.classList.replace(&quot;tab-hidden&quot;, &quot;tab-visible&quot;);
+    entitiesTab.classList.replace(&quot;tab-visible&quot;, &quot;tab-hidden&quot;);
+    entitiesTab.replaceWith(jsonTab);
+  };
+}
+
+if (entitiesTabSelector) {
+  entitiesTabSelector.onclick = () =&gt; {
+    entitiesTab.classList.replace(&quot;tab-hidden&quot;, &quot;tab-visible&quot;);
+    jsonTab.classList.replace(&quot;tab-visible&quot;, &quot;tab-hidden&quot;);
+    jsonTab.replaceWith(entitiesTab);
+  };
+}</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="tsx-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">tsx</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/app/styles/page.tsx (Line 151:13 - Line 161:8), search/grounded-generation-playground/src/app/styles/page.tsx (Line 113:8 - Line 123:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup6"><code class="language-tsx text-sm text-gray-800">&lt;/CardContent&gt;
+          &lt;/Card&gt;
+
+          &lt;Card className={cn('card-system')}&gt;
+            &lt;CardHeader&gt;
+              &lt;CardTitle&gt;System Card&lt;/CardTitle&gt;
+              &lt;CardDescription&gt;This card uses the system style&lt;/CardDescription&gt;
+            &lt;/CardHeader&gt;
+            &lt;CardContent&gt;System card content&lt;/CardContent&gt;
+          &lt;/Card&gt;
+        &lt;/section</code></pre></div><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/app/page.tsx (Line 197:20 - Line 222:6), search/grounded-generation-playground/src/app/page.tsx (Line 167:11 - Line 194:33)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup17"><code class="language-tsx text-sm text-gray-800">);
+          if (jsonChunk.text) {
+            currentMessage.content += jsonChunk.text;
+          }
+          if (jsonChunk.searchEntryPoint) {
+            currentMessage.searchEntryPoint = jsonChunk.searchEntryPoint;
+          }
+          if (jsonChunk.groundingSupport) {
+            currentMessage.groundingSupport = jsonChunk.groundingSupport;
+          }
+          if (jsonChunk.supportChunks) {
+            currentMessage.supportChunks = jsonChunk.supportChunks;
+          }
+          setMessages((prevMessages) =&gt; {
+            const lastMessage = prevMessages[prevMessages.length - 1];
+            if (lastMessage.role === 'model') {
+              return [...prevMessages.slice(0, -1), { ...currentMessage }];
+            } else {
+              return [...prevMessages, { ...currentMessage }];
+            }
+          });
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
+      }
+    } catch</code></pre></div><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/app/page.tsx (Line 329:7 - Line 349:42), search/grounded-generation-playground/src/app/page.tsx (Line 296:11 - Line 316:22)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup18"><code class="language-tsx text-sm text-gray-800">);
+          if (jsonObject.text) {
+            result.text += jsonObject.text;
+          }
+          if (jsonObject.searchEntryPoint) {
+            result.searchEntryPoint = jsonObject.searchEntryPoint;
+          }
+          if (jsonObject.groundingSupport) {
+            result.groundingSupport = [
+              ...(result.groundingSupport || []),
+              ...(jsonObject.groundingSupport as GroundingSupport[]),
+            ];
+          }
+          if (jsonObject.supportChunks) {
+            result.supportChunks = [
+              ...(result.supportChunks || []),
+              ...(jsonObject.supportChunks as SupportChunk[]),
+            ];
+          }
+        } catch (error) {
+          console.error('Error parsing JSON in remaining buffer:'</code></pre></div><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/app/page.tsx (Line 656:29 - Line 665:3), search/grounded-generation-playground/src/app/page.tsx (Line 638:29 - Line 647:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup19"><code class="language-tsx text-sm text-gray-800">) : (
+                              &lt;div className=&quot;flex items-center justify-center space-x-2&quot;&gt;
+                                &lt;IconGemini className=&quot;h-5 w-5 text-white&quot; /&gt;
+                                &lt;IconSpinner className=&quot;h-4 w-4 text-white&quot; /&gt;
+                                &lt;span className=&quot;text-sm text-white&quot;&gt;Thinking...&lt;/span&gt;
+                              &lt;/div&gt;
+                            )}
+                          &lt;/div&gt;
+                        &lt;/div&gt;
+                      &lt;/</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="css-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">css</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">search/grounded-generation-playground/src/components/ui/accordion.css (Line 28:2 - Line 33:4), search/grounded-generation-playground/src/components/ui/accordion.css (Line 20:2 - Line 25:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup5"><code class="language-css text-sm text-gray-800">{
+  --accordion-bg-color: hsl(var(--background));
+  --accordion-text-color: hsl(var(--foreground));
+  --accordion-border-color: hsl(var(--border));
+  --accordion-hover-bg-color: hsl(var(--muted));
+  --accordion-content-bg-color: hsl(var(--muted) / 30%</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="ini-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">ini</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div></section><!-- Add more sections for other formats and clone groups as needed--></main><footer class="bg-white shadow mt-8 py-4"><div class="container mx-auto px-4 text-center"><p class="text-sm text-gray-600">This report is generated by jscpd, an open-source copy/paste detector.</p><p class="text-sm text-gray-600">jscpd is licensed under the MIT License.</p><a class="text-blue-500 text-sm" href="https://github.com/kucherenko/jscpd" target="_blank" rel="noopener noreferrer">View jscpd on GitHub</a></div></footer><script src="js/prism.js"></script><script>function toggleCodeBlock(codeBlockId, expandBtnId, collapseBtnId) {
+  const codeBlock = document.getElementById(codeBlockId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const collapseBtn = document.getElementById(collapseBtnId);
+
+  codeBlock.classList.toggle('hidden');
+  expandBtn.classList.toggle('hidden');
+  collapseBtn.classList.toggle('hidden');
+}</script></body></html>
