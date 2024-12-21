@@ -33,7 +33,7 @@
 \b[Cc]an not\b
 
 # Should be `GitHub`
-(?<![&*.]|// |\btype )\bGithub\b(?![{)])
+(?<![&*.]|// |\btype |\bimport )\bGithub\b(?![{()])
 \b[Gg]it\s[Hh]ub\b
 
 # Should be `GitLab`
