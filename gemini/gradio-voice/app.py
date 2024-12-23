@@ -22,7 +22,6 @@ class GeminiHandler(AsyncStreamHandler):
             output_frame_size,
             input_sample_rate=16000,
         )
-        self.all_output_data = None
         self.client: genai.Client | None = None
         self.input_queue = asyncio.Queue()
         self.output_queue = asyncio.Queue()
@@ -66,19 +65,11 @@ class GeminiHandler(AsyncStreamHandler):
 
     async def emit(self):
         if not self.args_set.is_set():
-            if not self.channel:
-                await asyncio.sleep(0.1)
-                return
             await self.wait_for_args()
             asyncio.create_task(self.generator())
 
         array = await self.output_queue.get()
         return (self.output_sample_rate, array)
-
-    def reset(self) -> None:
-        if hasattr(self, "_generator"):
-            delattr(self, "_generator")
-        self.all_output_data = None
 
     def shutdown(self) -> None:
         self.quit.set()
