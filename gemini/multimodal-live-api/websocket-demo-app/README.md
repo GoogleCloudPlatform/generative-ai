@@ -35,53 +35,53 @@ You can set up this app locally or via Cloud Shell.
 
 1. Clone the repository and cd into the correct directory
 
-```sh
-git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd generative-ai/gemini/multimodal-live-api/websocket-demo-app
-```
+    ```sh
+    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+    cd generative-ai/gemini/multimodal-live-api/websocket-demo-app
+    ```
 
 1. Create a new virtual environment and activate it:
 
-```sh
-python3 -m venv env
-source env/bin/activate
-```
+    ```sh
+    python3 -m venv env
+    source env/bin/activate
+    ```
 
 1. Install dependencies:
 
-```sh
-pip3 install -r backend/requirements.txt
-```
+    ```sh
+    pip3 install -r backend/requirements.txt
+    ```
 
 1. Start the Python WebSocket server:
 
-```sh
-python3 backend/main.py
-```
+    ```sh
+    python3 backend/main.py
+    ```
 
 1. Start the frontend:
 
-- Navigate to `script.js` on line 9, `const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";` and replace `PROXY_URL` value with `ws://localhost:8000`. It should look like: `const PROXY_URL = "ws://localhost:8000;";`. Note the absence of the second "s" in "wss" as "ws" indicates a non-secure WebSocket connection.
-- Right below on line 10, update `PROJECT_ID` with your Google Cloud project ID.
-- Save the changes you've made to `script.js`
-- Now make sure to open a **separate** terminal window from the backend to run this command (keep the backend server running in the first terminal).
+    - Navigate to `script.js` on line 9, `const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";` and replace `PROXY_URL` value with `ws://localhost:8000`. It should look like: `const PROXY_URL = "ws://localhost:8000;";`. Note the absence of the second "s" in "wss" as "ws" indicates a non-secure WebSocket connection.
+    - Right below on line 10, update `PROJECT_ID` with your Google Cloud project ID.
+    - Save the changes you've made to `script.js`
+    - Now make sure to open a **separate** terminal window from the backend to run this command (keep the backend server running in the first terminal).
 
-```sh
-cd frontend
-python3 -m http.server
-```
+    ```sh
+    cd frontend
+    python3 -m http.server
+    ```
 
 1. Point your browser to the demo app UI based on the output of the terminal. (e.g., it may be `http://localhost:8000`, or it may use a different port.)
 
 1. Get your Google Cloud access token:
    Run the following command in a terminal with gcloud installed to set your project, and to retrieve your access token.
 
-```sh
-gcloud components update
-gcloud components install beta
-gcloud config set project YOUR-PROJECT-ID
-gcloud auth print-access-token
-```
+    ```sh
+    gcloud components update
+    gcloud components install beta
+    gcloud config set project YOUR-PROJECT-ID
+    gcloud auth print-access-token
+    ```
 
 1. Copy the access token from the previous step into the UI that you have open in your browser.
 
@@ -90,13 +90,13 @@ gcloud auth print-access-token
 
 1. Connect and interact with the demo:
 
-- After entering your Access Token and Model ID, press the connect button to connect your web app. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
+    - After entering your Access Token and Model ID, press the connect button to connect your web app. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
 
 1. To interact with the app, you can do the following:
 
-- Text input: You can write a text prompt to send to the model by entering your message in the box and pressing the send arrow. The model will then respond via audio (turn up your volume!).
-- Voice input: Press the microphone button to stop speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
-- Video input: The model will also capture your camera input and send it to Gemini. You can ask questions about current or previous video footage. For more details on how this works, visit the [documentation page for the Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
+    - Text input: You can write a text prompt to send to the model by entering your message in the box and pressing the send arrow. The model will then respond via audio (turn up your volume!).
+    - Voice input: Press the microphone button to stop speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
+    - Video input: The model will also capture your camera input and send it to Gemini. You can ask questions about current or previous video footage. For more details on how this works, visit the [documentation page for the Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
 
 ### Setup in Cloud Shell
 
@@ -104,65 +104,64 @@ gcloud auth print-access-token
 
 1. Upload the frontend and backend folders to your Cloud Shell Editor project. Alternatively, you can clone the repository and cd into the correct directory:
 
-```sh
-git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd generative-ai/gemini/multimodal-live-api/websocket-demo-app
-```
+    ```sh
+    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+    cd generative-ai/gemini/multimodal-live-api/websocket-demo-app
+    ```
 
 1. Open two new terminal windows.
 1. Navigate to whichever folder in Cloud Shell you uploaded the code files to (i.e., using `cd your_folder_name`)
 
 1. Install dependencies: In one of the terminal windows run:
 
-```sh
-pip3 install -r backend/requirements.txt
-```
+    ```sh
+    pip3 install -r backend/requirements.txt
+    ```
 
 1. Start the Python WebSocket server in one terminal.
 
-```sh
-python3 backend/main.py
-```
+    ```sh
+    python3 backend/main.py
+    ```
 
 1. In order for index.html to work properly, you will need to update the app URL inside script.js to point to the correct proxy server URL you just set up in the previous step. To do so:
 
-- Click on Web Preview (to the right of the Open Terminal button near the top)
-- Click "Preview on port 8080" (the port where you've setup the proxy server in the previous step)
-- Copy the URL, but make sure to discard everything at the end after "cloudshell.dev/"
-- Navigate to `const URL = "ws://localhost:8080";` in `index.html` on line 116
-- Navigate to `const PROXY_URL = "wss://your websocket server";` in `script.js`
-- Replace `wss://your websocket server` with `wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]`. For example, it should look like: `const PROXY_URL = "wss://8080-cs-123456789-default.cs-us-central1-abcd.cloudshell.dev";`
-- save the changes you've made to script.js
+    - Click on Web Preview (to the right of the Open Terminal button near the top)
+    - Click "Preview on port 8080" (the port where you've setup the proxy server in the previous step)
+    - Copy the URL, but make sure to discard everything at the end after "cloudshell.dev/"
+    - Navigate to `const URL = "ws://localhost:8080";` in `index.html` on line 116
+    - Navigate to `const PROXY_URL = "wss://your websocket server";` in `script.js`
+    - Replace `wss://your websocket server` with `wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]`. For example, it should look like: `const PROXY_URL = "wss://8080-cs-123456789-default.cs-us-central1-abcd.cloudshell.dev";`
+    - save the changes you've made to script.js
 
 1. Start the frontend:
    In the second terminal window, run the command below. Keep the backend server running in the first terminal.
    (Make sure you have navigated to the folder containing the code files, i.e. using `cd your_folder_name`)
 
-```sh
-cd frontend
-python3 -m http.server
-```
+    ```sh
+    cd frontend
+    python3 -m http.server
+    ```
 
 1. Test the demo app:
 
-- Navigate to the Web Preview button again
-- Click on "Change port"
-- Change Preview Port to 8000, and then click on "Change and Preview". This should open up a new tab with the UI.
+    - Navigate to the Web Preview button again
+    - Click on "Change port"
+    - Change Preview Port to 8000, and then click on "Change and Preview". This should open up a new tab with the UI.
 
 1. Going back to the tab with the Cloud Shell Editor, connect to the application by running the following command in a new terminal window:
 
-```sh
-gcloud config set project YOUR-PROJECT-ID
-gcloud auth print-access-token
-```
+    ```sh
+    gcloud config set project YOUR-PROJECT-ID
+    gcloud auth print-access-token
+    ```
 
-- Copy your access token and paste it in the Access Token field in the UI.
-- In the second field with the model ID, change `YOUR-PROJECT-ID` to your actual Google Cloud project ID.
-  For example, it should look like: `projects/my-project-id/locations/us-central1/publishers/google/models/gemini-2.0-flash-exp`
-- Press the "Connect" button. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
+    - Copy your access token and paste it in the Access Token field in the UI.
+    - In the second field with the model ID, change `YOUR-PROJECT-ID` to your actual Google Cloud project ID. For example, it should look like: `projects/my-project-id/locations/us-central1/publishers/google/models/gemini-2.0-flash-exp`
+    - Press the "Connect" button. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
 
 1. To interact with the app, you can do the following:
 
-- Text input: You can write a text prompt to send to the model by entering your message in the box and pressing the send arrow. The model will then respond via audio (turn up your volume!).
-- Voice input: Press the pink microphone button and start speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
-- Video input: The model will also capture your camera input and send it to Gemini. You can ask questions about current or previous video footage. For more details on how this works, visit the [documentation page for the Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
+    - Text input: You can write a text prompt to send to the model by entering your message in the box and pressing the send arrow. The model will then respond via audio (turn up your volume!).
+    - Voice input: Press the pink microphone button and start speaking. The model will respond via audio. If you would like to mute your microphone, press the button with a slash through the microphone.
+    - Video input: The model will also capture your camera input and send it to Gemini. You can ask questions about current or previous video footage. For more details on how this works, visit the [documentation page for the Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
