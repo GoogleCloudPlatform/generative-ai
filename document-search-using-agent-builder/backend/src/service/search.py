@@ -50,8 +50,6 @@ class SearchService:
         data = self.search_client.search(request)
         results = []
     
-        # Print the formatted JSON string to the console
-        print(data)
 
         summary_text = (
             data.summary.summary_text if data.summary and data.summary.summary_text else "No summary available"

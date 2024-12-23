@@ -10,7 +10,6 @@ class BigQueryRepository:
         self.client: Client = Client()
 
     def run_query(self, query: str):
-        print(query)
         return self.client.query(query).result()
     
     def get_row_by_id(self, table_id: str, id_column: str, id: str):
