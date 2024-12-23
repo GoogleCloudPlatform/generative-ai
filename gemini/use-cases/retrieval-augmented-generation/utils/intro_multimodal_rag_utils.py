@@ -20,7 +20,7 @@ from vertexai.language_models import TextEmbeddingModel
 from vertexai.vision_models import Image as vision_model_Image
 from vertexai.vision_models import MultiModalEmbeddingModel
 
-text_embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko@latest")
+text_embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko@003")
 multimodal_embedding_model = MultiModalEmbeddingModel.from_pretrained(
     "multimodalembedding@001"
 )
