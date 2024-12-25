@@ -1,7 +1,7 @@
 FROM nginx:alpine
 
 # install Python 3 and pip
-RUN apk add --no-cache python3=3.12.8-r1 py3-pip=24.0-r2
+RUN apk add --no-cache python3=3.12.8-r1 py3-pip=24.0-r2 supervisor=4.2.5-r5
 
 # copy the front end 
 COPY frontend/. /usr/share/nginx/html
@@ -10,8 +10,7 @@ COPY frontend/. /usr/share/nginx/html
 COPY backend/. /app
 
 # install supervisord
-RUN apk add --no-cache supervisor && \
-    pip3 install --no-cache-dir --break-system-packages -r app/requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r app/requirements.txt
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY nginx.conf /etc/nginx/nginx.conf

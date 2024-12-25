@@ -177,11 +177,11 @@ You can set up this app locally or via Cloud Shell.
 
 1. Modify the frontend code to point the WebSocket endpoint to the same container:
 
-    - Navigate to `script.js` on line 9, `const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";` and replace `PROXY_URL` value with `/ws`. It should look like: `const PROXY_URL = "/ws";`. Note the absence of the second "s" in "wss" as "ws" indicates a non-secure WebSocket connection. And there is no host part as it will use the same container as the frontend and backend.
+    - Navigate to the `script.js` file on line 9, `const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";` and replace `PROXY_URL` value with `/ws`. It should look like: `const PROXY_URL = "/ws";`. Note the absence of the second "s" in "wss" as "ws" indicates a non-secure WebSocket connection. And there is no host part as it will use the same container as the frontend and backend.
     - Right below on line 10, update `PROJECT_ID` with your Google Cloud project ID.
     - Save the changes you've made to `script.js`
 
-1. Start deploy the code into Cloud Run with following `gcloud` command:
+1. Deploy the code to Cloud Run using the following `gcloud` command:
 
     ```sh
     gcloud run deploy --project=YOUR-PROJECT-ID \
@@ -194,8 +194,7 @@ You can set up this app locally or via Cloud Shell.
 
 1. Last step command will output a link for the deployment if it run successfully. Copy the link to your browser and navigate to the demo app UI.
 
-1. Get your Google Cloud access token:
-   Run the following command in a terminal with gcloud installed to set your project, and to retrieve your access token.
+1. Get your Google Cloud access token: Run the following command in a terminal with gcloud installed to set your project, and to retrieve your access token.
 
     ```sh
     gcloud components update
