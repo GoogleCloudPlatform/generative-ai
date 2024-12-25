@@ -157,7 +157,7 @@ You can set up this app locally or via Cloud Shell.
     ```
 
     - Copy your access token and paste it in the Access Token field in the UI.
-    - In the second field of the UI, labeled Project ID, add your GCP Project ID
+    - In the second field of the UI, labeled Project ID, add your Google Cloud Project ID
     - Press the "Connect" button. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
 
 1. To interact with the app, you can do the following:
