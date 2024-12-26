@@ -61,7 +61,7 @@ You can set up this app locally or via Cloud Shell.
 
 1. Start the frontend:
 
-    - Navigate to `script.js` on line 9, `const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";` and replace `PROXY_URL` value with `ws://localhost:8000`. It should look like: `const PROXY_URL = "ws://localhost:8000;";`. Note the absence of the second "s" in "wss" as "ws" indicates a non-secure WebSocket connection.
+    - Navigate to `script.js` on line 9, `const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";` and replace `PROXY_URL` value with `ws://localhost:8000`. It should look like: `const PROXY_URL = "ws://localhost:8000";`. Note the absence of the second "s" in "wss" as "ws" indicates a non-secure WebSocket connection.
     - Right below on line 10, update `PROJECT_ID` with your Google Cloud project ID.
     - Save the changes you've made to `script.js`
     - Now make sure to open a **separate** terminal window from the backend to run this command (keep the backend server running in the first terminal).
