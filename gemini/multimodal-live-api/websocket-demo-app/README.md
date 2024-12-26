@@ -129,14 +129,14 @@ You can set up this app locally or via Cloud Shell.
     - Click on Web Preview (to the right of the Open Terminal button near the top)
     - Click "Preview on port 8080" (the port where you've setup the proxy server in the previous step)
     - Copy the URL, but make sure to discard everything at the end after "cloudshell.dev/"
-    - Navigate to `const URL = "ws://localhost:8080";` in `index.html` on line 116
-    - Navigate to `const PROXY_URL = "wss://your websocket server";` in `script.js`
+    - Navigate to `const PROXY_URL = "wss://your websocket server";` in `frontend/script.js` on line 8
     - Replace `wss://your websocket server` with `wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]`. For example, it should look like: `const PROXY_URL = "wss://8080-cs-123456789-default.cs-us-central1-abcd.cloudshell.dev";`
+    - Replace `your project id` with your project ID on line 9, for the `const PROJECT_ID`
     - save the changes you've made to script.js
 
 1. Start the frontend:
    In the second terminal window, run the command below. Keep the backend server running in the first terminal.
-   (Make sure you have navigated to the folder containing the code files, i.e. using `cd your_folder_name`)
+   (Make sure you have navigated to the folder containing the code files, i.e. using `cd frontend`)
 
     ```sh
     cd frontend
@@ -157,7 +157,7 @@ You can set up this app locally or via Cloud Shell.
     ```
 
     - Copy your access token and paste it in the Access Token field in the UI.
-    - In the second field with the model ID, change `YOUR-PROJECT-ID` to your actual Google Cloud project ID. For example, it should look like: `projects/my-project-id/locations/us-central1/publishers/google/models/gemini-2.0-flash-exp`
+    - In the second field of the UI, labeled Project ID, add your Google Cloud Project ID
     - Press the "Connect" button. Now you should be able to interact with Gemini 2.0 with the Multimodal Live API.
 
 1. To interact with the app, you can do the following:
