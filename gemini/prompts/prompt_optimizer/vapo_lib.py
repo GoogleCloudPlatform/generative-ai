@@ -1048,3 +1048,25 @@ def validate_tool_config(tool_config: str) -> None:
         validate(instance=json.loads(tool_config), schema=schema)
     except ValidationError as e:
         raise ValueError(f"Invalid tool_config: {tool_config}") from e
+
+
+def get_intelligent_defaults(prompt: str, model: GenerativeModel) -> dict[str, Any]:
+    """Get intelligent defaults from the LLM."""
+    response = model.generate_content(prompt)
+    return json.loads(response.text)
+
+
+def refactor_code_for_readability(source_code: str) -> str:
+    """Refactor code for readability using LLM."""
+    prompt = f"Refactor the following code for readability:\n\n{source_code}"
+    model = init_new_model("text-bison@001")
+    response = model.generate_content(prompt)
+    return response.text
+
+
+def remove_redundant_code(source_code: str) -> str:
+    """Remove redundant code using LLM."""
+    prompt = f"Remove redundant code from the following:\n\n{source_code}"
+    model = init_new_model("text-bison@001")
+    response = model.generate_content(prompt)
+    return response.text
