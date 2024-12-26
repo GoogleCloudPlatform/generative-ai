@@ -553,9 +553,9 @@ akka
 alisal
 alloydb
 antiword
-apk
 apikey
 apikeys
+apk
 appspot
 appuser
 apredict
