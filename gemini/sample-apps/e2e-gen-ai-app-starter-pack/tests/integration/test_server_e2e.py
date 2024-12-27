@@ -15,6 +15,7 @@
 
 import json
 import logging
+import os
 import subprocess
 import sys
 import threading
@@ -55,8 +56,15 @@ def start_server() -> subprocess.Popen[str]:
         "--port",
         "8000",
     ]
+    env = os.environ.copy()
+    env["INTEGRATION_TEST"] = "TRUE"
     process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+        env=env,
     )
 
     # Start threads to log stdout and stderr in real-time

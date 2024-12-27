@@ -108,7 +108,7 @@ steps:
       - "--project"
       - "$PROJECT_ID"
       - "--substitutions"
-      - "_PROD_PROJECT_ID=${_PROD_PROJECT_ID},_ARTIFACT_REGISTRY_REPO_NAME=${_ARTIFACT_REGISTRY_REPO_NAME},_CONTAINER_NAME=${_CONTAINER_NAME},_CLOUD_RUN_APP_SA_NAME=${_CLOUD_RUN_APP_SA_NAME},_REGION=${_REGION}"
+      - "_CONTAINER_NAME=${_CONTAINER_NAME}"
       - "--sha"
       - $COMMIT_SHA
 
@@ -125,7 +125,6 @@ steps:
 
 substitutions:
   _STAGING_PROJECT_ID: YOUR_STAGING_PROJECT_ID # Replace with your staging project ID
-  _PROD_PROJECT_ID: YOUR_PROD_PROJECT_ID # Replace with your prod project ID
   _BUCKET_NAME_LOAD_TEST_RESULTS: YOUR_CICD_PROJECT_ID-cicd-load-test-results # Replace with your GCS bucket name
   _CONTAINER_NAME: genai-app-sample
   _ARTIFACT_REGISTRY_REPO_NAME: genai-containers

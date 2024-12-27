@@ -12,6 +12,7 @@
 /generative-ai/embeddings/use-cases/outlier-detection       @rarsan @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini                                       @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/evaluation                            @jsondai @inardini @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/code-execution                        @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/function-calling                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
@@ -79,3 +80,4 @@
 /generative-ai/gemini/sample-apps/e2e-gen-ai-app-starter-pack       @eliasecchig @lspatarog @mariagpuyol @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases/hey_llm                     @tushuhei @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/llamaindex-rag/backend/indexing/ @Lionel-Lim @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/multimodal-live-api/websocket-demo-app/ @ZackAkil @GoogleCloudPlatform/generative-ai-devrel

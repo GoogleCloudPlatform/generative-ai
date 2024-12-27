@@ -1,0 +1,204 @@
+<head>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+  />
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+
+  <script src="gemini-live-api.js"></script>
+  <script src="live-media-manager.js"></script>
+  <script src="cookieJar.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <h1 class="md-typescale-display-medium">Multimodal Live API</h1>
+  <p class="md-typescale-body-medium">
+    The Multimodal Live API enables low-latency, two-way interactions that use
+    text, audio, and video input, with audio and text output.
+  </p>
+  <br />
+
+  <div id="model-config-container">
+    <div>
+      <md-outlined-text-field
+        id="token"
+        label="Access Token"
+        value=""
+        type="password"
+      ></md-outlined-text-field>
+      <br />
+      <br />
+      <md-outlined-text-field
+        id="project"
+        label="Project ID"
+        value=""
+      ></md-outlined-text-field>
+    </div>
+
+    <div class="modality-container">
+      <p class="md-typescale-body-medium" style="margin-top: 0">
+        Model response type
+      </p>
+
+      <form>
+        <md-radio
+          id="audio-radio"
+          name="responseModality"
+          value="AUDIO"
+          checked="checked"
+        ></md-radio>
+        <label for="audio-radio">
+          <span class="material-symbols-outlined"> volume_up </span>
+          <span class="icon-text">Audio</span>
+        </label>
+
+        <br /><br />
+
+        <md-radio
+          id="text-radio"
+          name="responseModality"
+          value="TEXT"
+        ></md-radio>
+        <label for="text-radio">
+          <span class="material-symbols-outlined"> text_fields </span>
+          <span class="icon-text">Text</span>
+        </label>
+      </form>
+    </div>
+
+    <md-outlined-text-field
+      id="systemInstructions"
+      type="textarea"
+      label="System Instructions"
+      rows="3"
+    >
+    </md-outlined-text-field>
+
+    <div>
+      <br />
+      <md-outlined-button onclick="connectBtnClick()"
+        >Connect</md-outlined-button
+      >
+      <br /><br />
+      <md-outlined-button onclick="disconnectBtnClick()"
+        >Disconnect</md-outlined-button
+      >
+    </div>
+  </div>
+  <br />
+
+  <div id="model-state">
+    <div id="disconnected" class="state">
+      <span class="material-symbols-outlined"> cloud_off </span>
+      <span class="icon-text">disconnected</span>
+    </div>
+    <div id="connecting" class="state" hidden>
+      <span class="material-symbols-outlined"> hourglass_empty </span>
+      <span class="icon-text">connecting...</span>
+    </div>
+    <div id="connected" class="state" hidden>
+      <span class="material-symbols-outlined"> cloud_done </span>
+      <span class="icon-text">connected</span>
+    </div>
+    <div id="speaking" class="state" hidden>
+      <span class="material-symbols-outlined"> graphic_eq </span>
+      <span class="icon-text">model speaking</span>
+    </div>
+  </div>
+
+  <br />
+
+  <div id="user-input-container">
+    <div>
+      <div>
+        <md-outlined-select
+          id="cameraSource"
+          label="Camera Input"
+          onchange="newCameraSelected()"
+        >
+        </md-outlined-select>
+      </div>
+
+      <br />
+
+      <div>
+        <md-outlined-select
+          id="audioSource"
+          label="Microphone Input"
+          onchange="newMicSelected()"
+        >
+        </md-outlined-select>
+      </div>
+
+      <br />
+      <div class="spread">
+        <span id="micBtn">
+          <md-filled-icon-button onclick="micBtnClick()">
+            <md-icon>mic</md-icon>
+          </md-filled-icon-button>
+        </span>
+
+        <span id="micOffBtn" hidden>
+          <md-filled-icon-button onclick="micOffBtnClick()">
+            <md-icon>mic_off</md-icon>
+          </md-filled-icon-button>
+        </span>
+
+        <span id="cameraBtn">
+          <md-filled-icon-button onclick="cameraBtnClick()">
+            <md-icon>videocam</md-icon>
+          </md-filled-icon-button>
+        </span>
+
+        <span id="screenBtn">
+          <md-filled-icon-button onclick="screenShareBtnClick()">
+            <md-icon>present_to_all</md-icon>
+          </md-filled-icon-button>
+        </span>
+      </div>
+    </div>
+
+    <div>
+      <div id="video-preview">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+    <div>
+      <md-outlined-text-field
+        id="text-message"
+        label="Text Message"
+        value=""
+      ></md-outlined-text-field>
+      <md-icon-button onclick="newUserMessage()">
+        <md-icon>send</md-icon>
+      </md-icon-button>
+      <br />
+      <div id="text-chat"></div>
+    </div>
+  </div>
+
+  <md-dialog id="dialog" close>
+    <div slot="content">
+      <span id="dialogMessage">A dialog that is opened by default.</span>
+    </div>
+  </md-dialog>
+</body>

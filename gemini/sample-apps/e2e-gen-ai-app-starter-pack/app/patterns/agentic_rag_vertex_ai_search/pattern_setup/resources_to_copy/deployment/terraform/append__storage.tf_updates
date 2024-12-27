@@ -1,0 +1,11 @@
+# ! Specific to Vertex AI Search pattern 
+resource "google_storage_bucket" "data_ingestion_pipeline_gcs_root" {
+  for_each                    = local.deploy_project_ids
+  name                        = "${each.value}-pipeline-artifacts"
+  location                    = var.region
+  project                     = each.value
+  uniform_bucket_level_access = true
+  force_destroy               = true
+
+  depends_on = [resource.google_project_service.cicd_services, resource.google_project_service.shared_services]
+}

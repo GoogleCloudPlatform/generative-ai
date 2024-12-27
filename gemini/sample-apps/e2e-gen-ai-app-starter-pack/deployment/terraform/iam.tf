@@ -1,13 +1,6 @@
-locals {
-  project_ids = {
-    prod    = var.prod_project_id
-    staging = var.staging_project_id
-  }
-}
-
 # Data source to get project numbers
 data "google_project" "projects" {
-  for_each   = local.project_ids
+  for_each   = local.deploy_project_ids
   project_id = each.value
 }
 
@@ -25,9 +18,9 @@ resource "google_project_iam_member" "cicd_project_roles" {
 # 2. Assign roles for the other two projects (prod and staging)
 resource "google_project_iam_member" "other_projects_roles" {
   for_each = {
-    for pair in setproduct(keys(local.project_ids), var.cicd_sa_deployment_required_roles) :
+    for pair in setproduct(keys(local.deploy_project_ids), var.cicd_sa_deployment_required_roles) :
     "${pair[0]}-${pair[1]}" => {
-      project_id = local.project_ids[pair[0]]
+      project_id = local.deploy_project_ids[pair[0]]
       role       = pair[1]
     }
   }
@@ -40,7 +33,7 @@ resource "google_project_iam_member" "other_projects_roles" {
 
 # 3. Allow Cloud Run service SA to pull containers stored in the CICD project
 resource "google_project_iam_member" "cicd_run_invoker_artifact_registry_reader" {
-  for_each = local.project_ids
+  for_each = local.deploy_project_ids
   project  = var.cicd_runner_project_id
 
   role       = "roles/artifactregistry.reader"
@@ -52,9 +45,9 @@ resource "google_project_iam_member" "cicd_run_invoker_artifact_registry_reader"
 # 4. Grant Cloud Run SA the required permissions to run the application
 resource "google_project_iam_member" "cloud_run_app_sa_roles" {
   for_each = {
-    for pair in setproduct(keys(local.project_ids), var.cloud_run_app_roles) :
+    for pair in setproduct(keys(local.deploy_project_ids), var.cloud_run_app_roles) :
     join(",", pair) => {
-      project = local.project_ids[pair[0]]
+      project = local.deploy_project_ids[pair[0]]
       role    = pair[1]
     }
   }
