@@ -328,7 +328,7 @@ Nintendo
 Nith
 Nominatim
 Noogler
-Ndjson
+ndjson
 ODb
 OLAP
 OOTB
