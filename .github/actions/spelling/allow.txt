@@ -1,3 +1,7 @@
+gguf
+magicoder
+nmy
+pth
 AALR
 ADMA
 AFX
