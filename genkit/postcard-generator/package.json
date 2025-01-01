@@ -39,7 +39,7 @@
     "google-auth-library": "^9.14.1",
     "next": "14.2.15",
     "react": "^18",
-    "react-dom": "^18",
+    "react-dom": "^19.0.0",
     "react-markdown": "^9.0.1",
     "simplify-js": "^1.2.4",
     "zod": "^3.23.8"
@@ -51,7 +51,7 @@
     "@types/google.maps": "^3.58.0",
     "@types/node": "^22.0.0",
     "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react-dom": "^19.0.0",
     "esbuild": "^0.23.1",
     "eslint": "^9.11.1",
     "eslint-config-next": "15.0.1",
