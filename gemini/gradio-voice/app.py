@@ -1,10 +1,10 @@
 import asyncio
 import base64
 
+from google import genai
 import gradio as gr
 from gradio_webrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_16bit
 import numpy as np
-from google import genai
 
 
 def encode_audio(data: np.ndarray, sample_rate: int) -> str:
