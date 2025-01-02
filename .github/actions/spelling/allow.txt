@@ -328,7 +328,6 @@ Nintendo
 Nith
 Nominatim
 Noogler
-ndjson
 ODb
 OLAP
 OOTB
@@ -941,6 +940,7 @@ ncols
 nconst
 ndarray
 ndcg
+ndjson
 nec
 neering
 neq
