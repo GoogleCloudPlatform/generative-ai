@@ -940,6 +940,7 @@ ncols
 nconst
 ndarray
 ndcg
+ndjson
 nec
 neering
 neq
