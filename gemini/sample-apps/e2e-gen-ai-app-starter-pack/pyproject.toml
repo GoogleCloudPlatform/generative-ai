@@ -8,21 +8,21 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
-fastapi = "0.110.3"
-pydantic = "2.9.2"
-uvicorn = {extras = ["standard"], version = "^0.30.5"}
+python = ">=3.13,<3.14"
+fastapi = "0.115.6"
+pydantic = "2.10.4"
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
 langchain-google-vertexai = "^2.0.7"
 langchain = "^0.3.0"
 langgraph = "^0.2.21"
 langchain-core = "^0.3.9"
 langchain-google-community = {extras = ["vertexaisearch"], version = "^2.0.2"}
-traceloop-sdk = "^0.33.12"
+traceloop-sdk = "^0.34.0"
 opentelemetry-exporter-gcp-trace = "^1.6.0"
 opentelemetry-sdk = "^1.25.0"
 google-cloud-logging = "^3.10.0"
 google-cloud-aiplatform = {extras = ["evaluation"], version = "^1.73.0"}
-grpcio = "1.64.1"
+grpcio = "1.68.1"
 scikit-learn = "^1.5.0"
 immutabledict = "^4.2.0"
 pypdf = "^4.3.1"
@@ -30,7 +30,7 @@ langchain-openai = "^0.2.10"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
-pytest-asyncio = "^0.23.8"
+pytest-asyncio = "^0.25.0"
 nest-asyncio = "^1.6.0"
 
 [tool.poetry.group.streamlit]
@@ -38,7 +38,7 @@ optional = true
 
 [tool.poetry.group.streamlit.dependencies]
 streamlit = "^1.35.0"
-streamlit-extras = "^0.4.3"
+streamlit-extras = "^0.5.0"
 extra-streamlit-components = "^0.1.71"
 streamlit-feedback = "^0.1.3"
 

@@ -32,7 +32,7 @@
   "dependencies": {
     "@floating-ui/dom": "^1.5.1",
     "flowbite": "^2.0.0",
-    "flowbite-svelte": "^0.46.0",
+    "flowbite-svelte": "^0.47.0",
     "tailwind-merge": "^2.0.0"
   }
 }
