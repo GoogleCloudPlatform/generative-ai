@@ -555,6 +555,7 @@ alloydb
 antiword
 apikey
 apikeys
+apk
 appspot
 appuser
 apredict
@@ -948,6 +949,7 @@ newaxis
 newaxisngram
 nfcorpus
 nfl
+nginx
 ngram
 ngrams
 nlp
