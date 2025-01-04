@@ -775,6 +775,7 @@ getdata
 getexif
 getparent
 gfile
+gguf
 gidiyor
 github
 gitleaks
@@ -888,6 +889,7 @@ lru
 lsb
 lxml
 lycra
+magicoder
 magika
 mahut
 makeover
@@ -953,6 +955,7 @@ ngrams
 nlp
 nmade
 nmilitary
+nmy
 noabe
 nobserved
 nodularis
@@ -1023,6 +1026,7 @@ projectid
 proname
 protobuf
 pstotext
+pth
 pubmed
 pubspec
 putalpha
