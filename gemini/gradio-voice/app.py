@@ -4,11 +4,10 @@ import pathlib
 from typing import AsyncGenerator
 
 from google import genai
+from google.genai.types import LiveConnectConfig
 import gradio as gr
 from gradio_webrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_16bit
 import numpy as np
-from google import genai
-from google.genai.types import LiveConnectConfig
 
 
 current_dir = pathlib.Path(__file__).parent
