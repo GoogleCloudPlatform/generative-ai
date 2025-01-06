@@ -1,13 +1,20 @@
 import asyncio
 import base64
+import pathlib
+from typing import AsyncGenerator
 
 from google import genai
 import gradio as gr
 from gradio_webrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_16bit
 import numpy as np
+from google import genai
+from google.genai.types import LiveConnectConfig
 
 
-def encode_audio(data: np.ndarray, sample_rate: int) -> str:
+current_dir = pathlib.Path(__file__).parent
+
+
+def encode_audio(data: np.ndarray) -> str:
     """Encode Audio data to send to the server"""
     return base64.b64encode(data.tobytes()).decode("UTF-8")
 
@@ -23,9 +30,9 @@ class GeminiHandler(AsyncStreamHandler):
             input_sample_rate=16000,
         )
         self.client: genai.Client | None = None
-        self.input_queue = asyncio.Queue()
-        self.output_queue = asyncio.Queue()
-        self.quit = asyncio.Event()
+        self.input_queue: asyncio.Queue = asyncio.Queue()
+        self.output_queue: asyncio.Queue = asyncio.Queue()
+        self.quit: asyncio.Event = asyncio.Event()
 
     def copy(self) -> "GeminiHandler":
         return GeminiHandler(
@@ -34,14 +41,17 @@ class GeminiHandler(AsyncStreamHandler):
             output_frame_size=self.output_frame_size,
         )
 
-    async def stream(self):
+    async def stream(self) -> AsyncGenerator[bytes, None]:
         while not self.quit.is_set():
             audio = await self.input_queue.get()
             yield audio
+        return
 
-    async def connect(self, project_id: str, location: str):
+    async def connect(
+        self, project_id: str, location: str
+    ) -> AsyncGenerator[bytes, None]:
         client = genai.Client(vertexai=True, project=project_id, location=location)
-        config = {"response_modalities": ["AUDIO"]}
+        config = LiveConnectConfig(response_modalities=["AUDIO"])
         async with client.aio.live.connect(
             model="gemini-2.0-flash-exp", config=config
         ) as session:
@@ -54,16 +64,16 @@ class GeminiHandler(AsyncStreamHandler):
     async def receive(self, frame: tuple[int, np.ndarray]) -> None:
         _, array = frame
         array = array.squeeze()
-        audio_message = encode_audio(array, self.output_sample_rate)
+        audio_message = encode_audio(array)
         self.input_queue.put_nowait(audio_message)
 
-    async def generator(self):
+    async def generator(self) -> None:
         async for audio_response in async_aggregate_bytes_to_16bit(
             self.connect(*self.latest_args[1:])
         ):
             self.output_queue.put_nowait(audio_response)
 
-    async def emit(self):
+    async def emit(self) -> tuple[int, np.ndarray]:
         if not self.args_set.is_set():
             await self.wait_for_args()
             asyncio.create_task(self.generator())
@@ -75,25 +85,11 @@ class GeminiHandler(AsyncStreamHandler):
         self.quit.set()
 
 
-css = """
-#api-form {
-    width: 80%;
-    margin: auto;
-}
-"""
+css = (current_dir / "style.css").read_text()
+header = (current_dir / "header.html").read_text()
 
 with gr.Blocks(css=css) as demo:
-    gr.HTML(
-        """
-        <div style='text-align: center'>
-            <h1>Gen AI SDK Voice Chat</h1>
-            <p>Speak with Gemini using real-time audio streaming</p>
-            <p>You will need to enable Vertex AI <a href="https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com">here</a></p>
-            <p>Also make sure you have enabled default credentials <a href="https://cloud.google.com/docs/authentication/provide-credentials-adc#how-to">here</a></p>
-        </div>
-    """
-    )
-
+    gr.HTML(header)
     with gr.Group(visible=True, elem_id="api-form") as api_key_row:
         with gr.Row():
             project_id = gr.Textbox(
