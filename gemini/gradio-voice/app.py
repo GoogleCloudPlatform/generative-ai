@@ -1,7 +1,7 @@
 import asyncio
 import base64
 import pathlib
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Literal
 
 from google import genai
 from google.genai.types import LiveConnectConfig
@@ -22,7 +22,10 @@ class GeminiHandler(AsyncStreamHandler):
     """Handler for the Gemini API"""
 
     def __init__(
-        self, expected_layout="mono", output_sample_rate=24000, output_frame_size=480
+        self,
+        expected_layout: Literal["mono"] = "mono",
+        output_sample_rate: int = 24000,
+        output_frame_size: int = 480,
     ) -> None:
         super().__init__(
             expected_layout,
