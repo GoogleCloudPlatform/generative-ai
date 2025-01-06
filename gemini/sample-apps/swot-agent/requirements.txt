@@ -1,0 +1,12 @@
+pydantic-ai==0.0.12
+beautifulsoup4==4.12.3
+praw==7.8.1
+grpcio==1.67.1
+grpcio-status==1.67.1
+fastapi[standard]==0.115.6
+itsdangerous==2.2.0
+pytest-asyncio==0.25.0
+pytest==8.3.4
+httpx==0.28.1
+google-genai==0.2.2
+google-cloud-aiplatform==1.74.0

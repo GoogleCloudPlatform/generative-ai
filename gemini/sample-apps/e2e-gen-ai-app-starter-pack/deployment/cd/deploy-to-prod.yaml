@@ -27,7 +27,7 @@ steps:
       - "COMMIT_SHA=${COMMIT_SHA}"
 
 substitutions:
-  _PROD_PROJECT_ID: YOUR_PROD_PROJECT_ID # Replace with your prod project ID
+  _PROD_PROJECT_ID: YOUR_PROD_PROJECT_ID
   _CONTAINER_NAME: genai-app-sample
   _ARTIFACT_REGISTRY_REPO_NAME: genai-containers
   _CLOUD_RUN_APP_SA_NAME: genai-app-sample-cr-sa

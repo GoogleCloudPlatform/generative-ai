@@ -22,6 +22,9 @@ from langchain_google_vertexai import ChatVertexAI
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 
+LOCATION = "us-central1"
+LLM = "gemini-1.5-pro-002"
+
 
 # 1. Define tools
 @tool
@@ -36,7 +39,7 @@ tools = [search]
 
 # 2. Set up the language model
 llm = ChatVertexAI(
-    model="gemini-1.5-pro-002", temperature=0, max_tokens=1024, streaming=True
+    model=LLM, location=LOCATION, temperature=0, max_tokens=1024, streaming=True
 ).bind_tools(tools)
 
 

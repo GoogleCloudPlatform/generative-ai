@@ -1,0 +1,7 @@
+# Additional variables required for the Vertex AI Search pattern
+search_engine_name = "sample-search-engine"
+datastore_name = "sample-datastore"
+vertexai_pipeline_sa_name = "vertexai-pipelines-sa"
+
+#The value can only be one of "global", "us" and "eu".
+region_vertex_ai_search = "us" 

@@ -1,0 +1,7 @@
+mesop
+Flask==3.0.0
+gunicorn==22.0.0
+Werkzeug==3.0.6
+dataclasses_json
+google-cloud-aiplatform
+google-cloud-logging
