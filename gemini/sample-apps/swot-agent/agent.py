@@ -221,11 +221,10 @@ async def analyze_competition(
         logging.info("Error: Gemini client not initialized.")
         return ""
     try:
-        response = await ctx.deps.client.generate_content_async(
+        response = await ctx.deps.client.aio.models.generate_content(
             model=MODEL,
             contents=prompt,
         )
-
         return response.text
     except Exception as e:
         logging.info(f"Error analyzing competition: {e}")
