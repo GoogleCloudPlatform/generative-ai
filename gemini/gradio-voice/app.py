@@ -9,7 +9,6 @@ import gradio as gr
 from gradio_webrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_16bit
 import numpy as np
 
-
 current_dir = pathlib.Path(__file__).parent
 
 
