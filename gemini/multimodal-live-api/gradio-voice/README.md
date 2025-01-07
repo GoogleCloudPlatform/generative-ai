@@ -25,16 +25,16 @@ Before running the application, you need to:
 
 1. Clone this repository:
 
-```bash
-git clone git@github.com:GoogleCloudPlatform/generative-ai.git
-cd generative-ai/gemini/multimodal-live-api/gradio-voice
-```
+    ```bash
+    git clone git@github.com:GoogleCloudPlatform/generative-ai.git
+    cd generative-ai/gemini/multimodal-live-api/gradio-voice
+    ```
 
 2. Install the required dependencies:
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 The main dependencies are:
 
@@ -46,11 +46,11 @@ The main dependencies are:
 
 1. Run the application:
 
-```bash
-python app.py
-```
+    ```bash
+    python app.py
+    ```
 
-2. Open your web browser and navigate to the local Gradio interface (typically http://localhost:7860)
+2. Open your web browser and navigate to the local Gradio interface (typically `http://localhost:7860`)
 
 3. Configure the application:
 
