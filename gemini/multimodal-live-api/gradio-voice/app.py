@@ -37,7 +37,6 @@ class GeminiHandler(AsyncStreamHandler):
             output_frame_size,
             input_sample_rate=16000,
         )
-        self.client: genai.Client | None = None
         self.input_queue: asyncio.Queue = asyncio.Queue()
         self.output_queue: asyncio.Queue = asyncio.Queue()
         self.quit: asyncio.Event = asyncio.Event()
@@ -124,8 +123,17 @@ with gr.Blocks(css=css) as demo:
                 label="Location",
                 choices=[
                     "us-central1",
+                    "us-east5",
+                    "us-south1",
+                    "us-central1",
+                    "us-west4",
+                    "us-east4",
+                    "us-east1",
+                    "us-west1",
                 ],
                 value="us-central1",
+                info="You can find additional locations [here](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#united-states)",
+                allow_custom_value=True,
             )
             voice_ = gr.Dropdown(
                 label="Voice",
