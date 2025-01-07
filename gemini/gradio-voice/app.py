@@ -4,7 +4,12 @@ import pathlib
 from typing import AsyncGenerator, Literal
 
 from google import genai
-from google.genai.types import LiveConnectConfig
+from google.genai.types import (
+    LiveConnectConfig,
+    PrebuiltVoiceConfig,
+    SpeechConfig,
+    VoiceConfig,
+)
 import gradio as gr
 from gradio_webrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_16bit
 import numpy as np
@@ -53,11 +58,20 @@ class GeminiHandler(AsyncStreamHandler):
         return
 
     async def connect(
-        self, project_id: str, location: str
+        self, project_id: str, location: str, voice_name: str | None = None
     ) -> AsyncGenerator[bytes, None]:
         """Connect to to genai server and start the stream"""
         client = genai.Client(vertexai=True, project=project_id, location=location)
-        config = LiveConnectConfig(response_modalities=["AUDIO"])
+        config = LiveConnectConfig(
+            response_modalities=["AUDIO"],
+            speech_config=SpeechConfig(
+                voice_config=VoiceConfig(
+                    prebuilt_voice_config=PrebuiltVoiceConfig(
+                        voice_name=voice_name,
+                    )
+                )
+            ),
+        )
         async with client.aio.live.connect(
             model="gemini-2.0-flash-exp", config=config
         ) as session:
@@ -106,9 +120,23 @@ with gr.Blocks(css=css) as demo:
                 label="Project ID",
                 placeholder="Enter your Google Cloud Project ID",
             )
-            location_ = gr.Textbox(
+            location_ = gr.Dropdown(
                 label="Location",
-                placeholder="Enter the location of your project, e.g. us-central1",
+                choices=[
+                    "us-central1",
+                ],
+                value="us-central1",
+            )
+            voice_ = gr.Dropdown(
+                label="Voice",
+                choices=[
+                    "Puck",
+                    "Charon",
+                    "Kore",
+                    "Fenrir",
+                    "Aoede",
+                ],
+                value="Puck",
             )
         with gr.Row():
             submit = gr.Button(value="Submit")
@@ -124,7 +152,7 @@ with gr.Blocks(css=css) as demo:
 
         webrtc.stream(
             GeminiHandler(),
-            inputs=[webrtc, project_id_, location_],
+            inputs=[webrtc, project_id_, location_, voice_],
             outputs=[webrtc],
             time_limit=90,
             concurrency_limit=2,
