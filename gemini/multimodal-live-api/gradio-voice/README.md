@@ -38,9 +38,9 @@ Before running the application, you need to:
 
 The main dependencies are:
 
-- gradio_webrtc>=0.0.27,<1.0
-- librosa
-- google-genai==0.3.0
+- `gradio_webrtc>=0.0.27,<1.0`
+- `librosa`
+- `google-genai==0.3.0`
 
 ## Usage
 
