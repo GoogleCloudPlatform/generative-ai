@@ -779,6 +779,7 @@ getdata
 getexif
 getparent
 gfile
+gguf
 gidiyor
 github
 gitleaks
@@ -893,6 +894,7 @@ lru
 lsb
 lxml
 lycra
+magicoder
 magika
 mahut
 makeover
@@ -960,6 +962,7 @@ ngrams
 nlp
 nmade
 nmilitary
+nmy
 noabe
 nobserved
 nodularis
@@ -1031,6 +1034,7 @@ projectid
 proname
 protobuf
 pstotext
+pth
 pubmed
 pubspec
 putalpha
@@ -1208,16 +1212,16 @@ wdir
 weaviate
 webcam
 webclient
+webfonts
 webpage
 webpages
-webfonts
 webrtc
 websites
 weightage
 welcom
 werden
-whatsapp
 wght
+whatsapp
 wiffle
 wikipedia
 wil
