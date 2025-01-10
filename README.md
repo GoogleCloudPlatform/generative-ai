@@ -1,6 +1,6 @@
 # Generative AI
 
-Owner : claiming [name] Alip-Abdullah
+Owner : claiming [name]Alip-Abdullah
 > NOTE: [Gemini 2.0 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) has been released! Here are the latest notebooks and demos using the new model:
 >
 > - [Intro to Gemini 2.0 Flash](gemini/getting-started/intro_gemini_2_0_flash.ipynb)
