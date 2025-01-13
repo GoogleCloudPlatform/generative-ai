@@ -1,5 +1,4 @@
 import asyncio
-import base64
 import pathlib
 from typing import AsyncGenerator, Literal
 
@@ -17,11 +16,6 @@ from gradio_webrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_1
 import numpy as np
 
 current_dir = pathlib.Path(__file__).parent
-
-
-def encode_audio(data: np.ndarray) -> str:
-    """Encode Audio data to send to the server"""
-    return base64.b64encode(data.tobytes()).decode("UTF-8")
 
 
 class GeminiHandler(AsyncStreamHandler):
@@ -92,7 +86,7 @@ class GeminiHandler(AsyncStreamHandler):
         """Receive audio from the user and put it in the input stream."""
         _, array = frame
         array = array.squeeze()
-        audio_message = encode_audio(array)
+        audio_message = array.tobytes()
         self.input_queue.put_nowait(audio_message)
 
     async def generator(self) -> None:
