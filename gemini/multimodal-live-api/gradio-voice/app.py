@@ -5,8 +5,10 @@ from typing import AsyncGenerator, Literal
 
 from google import genai
 from google.genai.types import (
+    Content,
     LiveConnectConfig,
     PrebuiltVoiceConfig,
+    Part,
     SpeechConfig,
     VoiceConfig,
 )
@@ -30,12 +32,13 @@ class GeminiHandler(AsyncStreamHandler):
         expected_layout: Literal["mono"] = "mono",
         output_sample_rate: int = 24000,
         output_frame_size: int = 480,
+        input_sample_rate: int = 16000,
     ) -> None:
         super().__init__(
             expected_layout,
             output_sample_rate,
             output_frame_size,
-            input_sample_rate=16000,
+            input_sample_rate=input_sample_rate,
         )
         self.input_queue: asyncio.Queue = asyncio.Queue()
         self.output_queue: asyncio.Queue = asyncio.Queue()
@@ -57,9 +60,13 @@ class GeminiHandler(AsyncStreamHandler):
         return
 
     async def connect(
-        self, project_id: str, location: str, voice_name: str | None = None
+        self,
+        project_id: str,
+        location: str,
+        voice_name: str | None = None,
+        system_instruction: str | None = None,
     ) -> AsyncGenerator[bytes, None]:
-        """Connect to to genai server and start the stream"""
+        """Connect to the Gemini server and start the stream."""
         client = genai.Client(vertexai=True, project=project_id, location=location)
         config = LiveConnectConfig(
             response_modalities=["AUDIO"],
@@ -70,6 +77,7 @@ class GeminiHandler(AsyncStreamHandler):
                     )
                 )
             ),
+            system_instruction=Content(parts=[Part.from_text(system_instruction)]),
         )
         async with client.aio.live.connect(
             model="gemini-2.0-flash-exp", config=config
@@ -115,27 +123,19 @@ with gr.Blocks(css=css) as demo:
     gr.HTML(header)
     with gr.Group(visible=True, elem_id="api-form") as api_key_row:
         with gr.Row():
-            project_id_ = gr.Textbox(
+            _project_id = gr.Textbox(
                 label="Project ID",
                 placeholder="Enter your Google Cloud Project ID",
             )
-            location_ = gr.Dropdown(
+            _location = gr.Dropdown(
                 label="Location",
                 choices=[
                     "us-central1",
-                    "us-east5",
-                    "us-south1",
-                    "us-central1",
-                    "us-west4",
-                    "us-east4",
-                    "us-east1",
-                    "us-west1",
                 ],
                 value="us-central1",
                 info="You can find additional locations [here](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#united-states)",
-                allow_custom_value=True,
             )
-            voice_ = gr.Dropdown(
+            _voice_name = gr.Dropdown(
                 label="Voice",
                 choices=[
                     "Puck",
@@ -145,6 +145,10 @@ with gr.Blocks(css=css) as demo:
                     "Aoede",
                 ],
                 value="Puck",
+            )
+            _system_instruction = gr.Textbox(
+                label="System Instruction",
+                placeholder="Talk like a pirate.",
             )
         with gr.Row():
             submit = gr.Button(value="Submit")
@@ -160,7 +164,7 @@ with gr.Blocks(css=css) as demo:
 
         webrtc.stream(
             GeminiHandler(),
-            inputs=[webrtc, project_id_, location_, voice_],
+            inputs=[webrtc, _project_id, _location, _voice_name, _system_instruction],
             outputs=[webrtc],
             time_limit=90,
             concurrency_limit=2,
