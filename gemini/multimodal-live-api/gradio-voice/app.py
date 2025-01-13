@@ -6,8 +6,8 @@ from google import genai
 from google.genai.types import (
     Content,
     LiveConnectConfig,
-    PrebuiltVoiceConfig,
     Part,
+    PrebuiltVoiceConfig,
     SpeechConfig,
     VoiceConfig,
 )
