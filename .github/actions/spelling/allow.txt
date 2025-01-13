@@ -353,6 +353,7 @@ PYINK
 Pakeman
 Paquete
 Parmar
+Pastra
 Pengyu
 Persero
 Phaidon
@@ -452,6 +453,7 @@ TPUs
 TSLA
 TSMC
 TSNE
+TTFB
 TTFT
 TTH
 TTT
@@ -555,6 +557,7 @@ alloydb
 antiword
 apikey
 apikeys
+apk
 appspot
 appuser
 apredict
@@ -719,6 +722,7 @@ etils
 eur
 evals
 evse
+evt
 expl
 faiss
 fastapi
@@ -775,6 +779,7 @@ getdata
 getexif
 getparent
 gfile
+gguf
 gidiyor
 github
 gitleaks
@@ -856,6 +861,7 @@ kenleejr
 keras
 keychain
 kfp
+khz
 kickstart
 konnte
 kotlin
@@ -888,6 +894,7 @@ lru
 lsb
 lxml
 lycra
+magicoder
 magika
 mahut
 makeover
@@ -921,6 +928,7 @@ mrag
 mrr
 mrtydi
 msmarco
+msr
 multitool
 mvn
 mvnw
@@ -948,11 +956,13 @@ newaxis
 newaxisngram
 nfcorpus
 nfl
+nginx
 ngram
 ngrams
 nlp
 nmade
 nmilitary
+nmy
 noabe
 nobserved
 nodularis
@@ -972,6 +982,7 @@ onesie
 onesies
 openai
 openfda
+opsz
 osm
 osx
 outdir
@@ -1023,6 +1034,7 @@ projectid
 proname
 protobuf
 pstotext
+pth
 pubmed
 pubspec
 putalpha
@@ -1150,6 +1162,7 @@ timechart
 tion
 titlebar
 tobytes
+toolcall
 toself
 toset
 tqdm
@@ -1199,12 +1212,15 @@ wdir
 weaviate
 webcam
 webclient
+webfonts
 webpage
 webpages
+webrtc
 websites
 weightage
 welcom
 werden
+wght
 whatsapp
 wiffle
 wikipedia
@@ -1215,6 +1231,7 @@ wip
 wishlist
 womens
 workarounds
+worklets
 wparam
 wscore
 wscores
