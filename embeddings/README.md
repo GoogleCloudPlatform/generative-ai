@@ -1,5 +1,15 @@
 # Embeddings
 
+<!-- markdownlint-disable MD036 -->
+**YouTube Video: What are text embeddings?**
+<!-- markdownlint-enable MD036 -->
+
+<!-- markdownlint-disable MD033 -->
+<a href="https://www.youtube.com/watch?v=vlcQV4j2kTo&list=PLIivdWyY5sqLvGdVLJZh2EMax97_T-OIB" target="_blank">
+  <img src="https://img.youtube.com/vi/vlcQV4j2kTo/maxresdefault.jpg" alt="What are text embeddings?" width="500">
+</a>
+<!-- markdownlint-enable MD033 -->
+
 This repository explores various techniques and use-cases for embedding in Machine Learning, with a particular focus on text embeddings and their applications.
 
 ## Notebooks
