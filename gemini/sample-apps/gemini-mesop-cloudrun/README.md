@@ -4,6 +4,18 @@
 | --------- | --------------------------------------------- |
 | Author(s) | [Hussain Chinoy](https://github.com/ghchinoy) |
 
+<!-- markdownlint-disable MD036 -->
+
+**YouTube Video: How to build a Gemini powered Mesop app**
+
+<!-- markdownlint-enable MD036 -->
+
+<!-- markdownlint-disable MD033 -->
+<a href="https://www.youtube.com/watch?v=KUfPiSUJrwE&list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx" target="_blank">
+  <img src="https://img.youtube.com/vi/KUfPiSUJrwE/maxresdefault.jpg" alt="How to build a Gemini powered Mesop app" width="500">
+</a>
+<!-- markdownlint-enable MD033 -->
+
 This application demonstrates a [Mesop](https://github.com/google/mesop) UI framework application running on Cloud Run.
 
 Sample screenshots and video demos of the application are shown below:
