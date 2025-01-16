@@ -1,5 +1,17 @@
 # RAG and Grounding
 
+<!-- markdownlint-disable MD036 -->
+
+**YouTube Video: Introduction to grounding with Gemini on Vertex AI**
+
+<!-- markdownlint-enable MD036 -->
+
+<!-- markdownlint-disable MD033 -->
+<a href="https://www.youtube.com/watch?v=Ph0g6dnsB4g&list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx" target="_blank">
+  <img src="https://img.youtube.com/vi/Ph0g6dnsB4g/maxresdefault.jpg" alt="Introduction to grounding with Gemini on Vertex AI" width="500">
+</a>
+<!-- markdownlint-enable MD033 -->
+
 This directory provides a curated list of examples that explore Retrieval
 Augmented Generation (RAG), grounding techniques, knowledge bases, grounded
 generation, and related topics like vector search and semantic search.
