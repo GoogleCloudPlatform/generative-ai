@@ -5,7 +5,9 @@
 | Author(s) | [Hussain Chinoy](https://github.com/ghchinoy) |
 
 <!-- markdownlint-disable MD036 -->
+
 **YouTube Video: How to build a Gemini powered Mesop app**
+
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD033 -->
