@@ -1,4 +1,6 @@
 # GenAI MLOps Tune and Evaluation
+Author: [Chris Willis](https://github.com/willisc7)
+
 This tutorial will take you through using Vertex AI Pipelines to automate tuning an LLM and evaluating it against a previously tuned LLM. The example used is an LLM that summarizes a week of glucose values for a diabetes patient.
 
 ![Diagram](./diagram.png)
