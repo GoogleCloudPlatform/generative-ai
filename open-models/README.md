@@ -21,5 +21,5 @@ This repository contains examples for deploying and fine-tuning open source mode
 
 ### Use cases
 
-- [serving/cloud_run_ollama_gemma2_rag_qa.ipynb](./serving/cloud_run_ollama_gemma2_rag_qa.ipynb) - This notebooks provides steps and code to deploy an open source RAG pipeline to Cloud Run using Ollama and the Gemma 2 model.
+- [use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb](./use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb) - This notebooks provides steps and code to deploy an open source RAG pipeline to Cloud Run using Ollama and the Gemma 2 model.
 - [use-cases/guess_app.ipynb](./use-cases/guess_app.ipynb) - This notebook shows how to build a "Guess Who or What" app using FLUX and Gemini.
