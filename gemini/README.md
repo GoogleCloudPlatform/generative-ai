@@ -3,7 +3,9 @@
 ## Gemini
 
 <!-- markdownlint-disable MD036 -->
+
 **YouTube Video: Introduction to Gemini on Vertex AI**
+
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD033 -->

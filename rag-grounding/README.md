@@ -1,7 +1,9 @@
 # RAG and Grounding
 
 <!-- markdownlint-disable MD036 -->
+
 **YouTube Video: Introduction to grounding with Gemini on Vertex AI**
+
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD033 -->

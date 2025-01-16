@@ -1,7 +1,9 @@
 # Function Calling in Gemini
 
 <!-- markdownlint-disable MD036 -->
+
 **YouTube Video: AI + your code: Function Calling**
+
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD033 -->

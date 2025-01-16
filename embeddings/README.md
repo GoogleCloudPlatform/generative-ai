@@ -1,7 +1,9 @@
 # Embeddings
 
 <!-- markdownlint-disable MD036 -->
+
 **YouTube Video: What are text embeddings?**
+
 <!-- markdownlint-enable MD036 -->
 
 <!-- markdownlint-disable MD033 -->
