@@ -1,0 +1,5 @@
+__pycache__
+pipeline.json
+venv
+local/local_outputs
+local/venv
