@@ -11,7 +11,7 @@ def gemini_tuning_component(
     location: str,
     source_model: str,
     train_dataset_uri: str,
-) -> str: # Output the tuned model name as a string
+) -> str:  # Output the tuned model name as a string
 
     import time
     import vertexai
