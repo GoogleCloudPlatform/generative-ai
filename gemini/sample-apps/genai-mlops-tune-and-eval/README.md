@@ -17,7 +17,7 @@ This step is optional because I've already prepared the data in `patient_1_gluco
   3. Press Alt + Shift + i to go to the end of each line
   4. Add a newline character (i.e. \n)
   5. Press Delete to squash it all to a single line
-* Copy glucose_examples_template.jsonl to patient_X_glucose_examples.jsonl
+* Copy `glucose_examples_template.jsonl` (or create it if it doesn't exist) to `patient_X_glucose_examples.jsonl`
 * Copy the flattened CSV and paste it into the patient_X_glucose_examples.jsonl
 * Flatten the contents of the patient_X_glucose_examples.jsonl file using a JSON to JSONL converter online
 
