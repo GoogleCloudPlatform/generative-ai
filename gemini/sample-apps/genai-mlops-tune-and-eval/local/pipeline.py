@@ -1,27 +1,27 @@
-from kfp import local
-from kfp import dsl
+from kfp import dsl, local
 
 local.init(runner=local.DockerRunner())
+
 
 @dsl.component(
     packages_to_install=["google-cloud-aiplatform", "vertexai"],
     base_image="localhost/python-3.9-gcloud:latest",
 )
-
 def gemini_tuning_component(
     project: str,
     location: str,
     source_model: str,
     train_dataset_uri: str,
-) -> str: # Output the tuned model name as a string
+) -> str:  # Output the tuned model name as a string
 
     import time
+
     import vertexai
     from vertexai.tuning import sft
 
     vertexai.init(project=project, location=location)
 
-    tuned_model_display_name=f"tuned-{source_model}-{int(time.time())}"
+    tuned_model_display_name = f"tuned-{source_model}-{int(time.time())}"
 
     sft_tuning_job = sft.train(
         source_model=source_model,
@@ -35,24 +35,24 @@ def gemini_tuning_component(
 
     return sft_tuning_job.tuned_model_endpoint_name
 
+
 @dsl.component(
-    packages_to_install=["google-cloud-aiplatform[evaluation]","bigframes"],
+    packages_to_install=["google-cloud-aiplatform[evaluation]", "bigframes"],
     base_image="localhost/python-3.9-gcloud:latest",
 )
 def model_comparison_component(
     project: str,
     location: str,
     baseline_model_endpoint: str,  # Baseline model name
-    candidate_model_endpoint: str, # Candidate model name
+    candidate_model_endpoint: str,  # Candidate model name
 ):
     import functools
     from functools import partial
     import uuid
 
-    from google.cloud import aiplatform
     import pandas as pd
     from vertexai.evaluation import EvalTask, MetricPromptTemplateExamples
-    from vertexai.generative_models import GenerationConfig, GenerativeModel
+    from vertexai.generative_models import GenerativeModel
 
     experiment_name = "qa-quality"
 
@@ -101,7 +101,8 @@ def model_comparison_component(
         ].to_dict("records")[0]
         choice = (
             baseline
-            if result["pairwise_question_answering_quality/pairwise_choice"] == "BASELINE"
+            if result["pairwise_question_answering_quality/pairwise_choice"]
+            == "BASELINE"
             else candidate
         )
         return (choice, result["pairwise_question_answering_quality/explanation"])
@@ -116,7 +117,7 @@ def model_comparison_component(
         if choice == a:
             return 1
         return -1
-    
+
     def pointwise_eval(
         instruction: str,
         context: str,
@@ -169,7 +170,9 @@ def model_comparison_component(
         cmp_greater = partial(greater, cmp_f)
 
         pairwise_best_response = max(responses, key=functools.cmp_to_key(cmp_greater))
-        pointwise_metric = pointwise_eval(instruction, context, [pairwise_best_response])
+        pointwise_metric = pointwise_eval(
+            instruction, context, [pairwise_best_response]
+        )
         qa_metrics = pointwise_metric.metrics_table[
             [
                 col
@@ -179,16 +182,22 @@ def model_comparison_component(
         ].to_dict("records")[0]
 
         return pairwise_best_response, qa_metrics
-        
+
     # Compare response from baseline model to candidate model to see which is better
     baseline_model = GenerativeModel(
         baseline_model_endpoint,
-        generation_config={"temperature": 0.4,"max_output_tokens": 512,}
-        )
+        generation_config={
+            "temperature": 0.4,
+            "max_output_tokens": 512,
+        },
+    )
     candidate_model = GenerativeModel(
         candidate_model_endpoint,
-        generation_config={"temperature": 0.4,"max_output_tokens": 512,}
-        )
+        generation_config={
+            "temperature": 0.4,
+            "max_output_tokens": 512,
+        },
+    )
 
     instruction_qa = "Analyze the glucose trends in the glucose values provided in the CSV contained in the context. Ensure the analysis you provide can easily be understood by a diabetes patient with no medical expertise."
     context_qa = (
@@ -212,13 +221,14 @@ def model_comparison_component(
 
     for ix, response in enumerate(responses, start=1):
         print(f"Response no. {ix}: \n {response}")
-    
+
     print(best_response)
     # metrics
 
+
 @dsl.pipeline
 def gemini_tuning_pipeline(
-    project: str = "genai-mlops-tune-and-eval", 
+    project: str = "genai-mlops-tune-and-eval",
     location: str = "us-central1",
     source_model_name: str = "gemini-1.5-pro-002",
     train_data_uri: str = "gs://glucose-test-bucket/glucose_examples.jsonl",
@@ -238,5 +248,6 @@ def gemini_tuning_pipeline(
         baseline_model_endpoint=baseline_model_endpoint,
         candidate_model_endpoint=tuning_task.output,
     )
+
 
 pipeline_task = gemini_tuning_pipeline()
