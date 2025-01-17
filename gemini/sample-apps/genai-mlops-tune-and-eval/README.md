@@ -28,7 +28,7 @@ This step is optional because I've already prepared the data in `patient_1_gluco
 
 ## Setup IAM, Tuning Examples, and Vertex AI Pipelines
 
-- Grant default compute svc acct IAM permissions
+- Grant Default Compute Service Account IAM permissions
 
   ```sh
   PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) --format="value(projectNumber)")
@@ -94,7 +94,7 @@ This step is optional because you can run the pipeline in Vertex AI Pipelines. H
   pip install kfp google-cloud-aiplatform vertexai plotly google-cloud-aiplatform[evaluation]
   ```
 
-- Create local docker image using podman or docker-cli that has gcloud ADC copied over (**IMPORTANT:** never push this container to a public repo)
+- Create local docker image using `podman` or `docker-cli` that has `gcloud` ADC copied over (**IMPORTANT:** never push this container to a public repo)
 
   ```sh
   gcloud auth application-default login
