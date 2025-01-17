@@ -52,7 +52,7 @@ def model_comparison_component(
 
     import pandas as pd
     from vertexai.evaluation import EvalTask, MetricPromptTemplateExamples
-    from vertexai.generative_models import GenerativeModel
+    from vertexai.generative_models import GenerativeModel, GenerationConfig
 
     experiment_name = "qa-quality"
 
@@ -184,19 +184,17 @@ def model_comparison_component(
         return pairwise_best_response, qa_metrics
 
     # Compare response from baseline model to candidate model to see which is better
+    generation_config = GenerationConfig(
+        temperature=0.4,
+        max_output_tokens=512,
+    )
     baseline_model = GenerativeModel(
         baseline_model_endpoint,
-        generation_config={
-            "temperature": 0.4,
-            "max_output_tokens": 512,
-        },
+        generation_config=generation_config,
     )
     candidate_model = GenerativeModel(
         candidate_model_endpoint,
-        generation_config={
-            "temperature": 0.4,
-            "max_output_tokens": 512,
-        },
+        generation_config=generation_config,
     )
 
     instruction_qa = "Analyze the glucose trends in the glucose values provided in the CSV contained in the context. Ensure the analysis you provide can easily be understood by a diabetes patient with no medical expertise."
