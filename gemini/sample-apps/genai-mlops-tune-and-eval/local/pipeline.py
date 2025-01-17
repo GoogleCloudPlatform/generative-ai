@@ -228,7 +228,7 @@ def model_comparison_component(
 
 @dsl.pipeline
 def gemini_tuning_pipeline(
-    project: str = "genai-mlops-tune-and-eval",
+    project: str = "YOUR_PROJECT_ID",
     location: str = "us-central1",
     source_model_name: str = "gemini-1.5-pro-002",
     train_data_uri: str = "gs://glucose-test-bucket/glucose_examples.jsonl",
