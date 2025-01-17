@@ -46,6 +46,8 @@ Please submit additional resources via a PR.
 
 ## Video Courses
 
+- [Real Terms for AI](https://goo.gle/AIwordsExplained)
+- [AI Guide for Cloud Developers](https://www.youtube.com/playlist?list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx)
 - [Intro to Gen AI - Playlist](https://www.youtube.com/playlist?list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK)
   - [Introduction to Generative AI](https://www.youtube.com/watch?v=cZaNf2rA30k&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=1&pp=iAQB)
   - [Introduction to Large Language Models](https://www.youtube.com/watch?v=RBzXsQHjptQ&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=2&pp=iAQB)
