@@ -12,7 +12,7 @@ job = aiplatform.PipelineJob(
         "project": "genai-mlops-tune-and-eval",
         "location": "us-central1",
         "source_model_name": "gemini-1.5-pro-002",
-        "train_data_uri": "gs://glucose-test-bucket-20250116/patient_1_glucose_examples.jsonl",
+        "train_data_uri": "gs://github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/patient_1_glucose_examples.jsonl",
     },  # Pass pipeline parameter values here
 )
 

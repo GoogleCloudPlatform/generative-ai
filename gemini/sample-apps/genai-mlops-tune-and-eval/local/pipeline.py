@@ -231,7 +231,7 @@ def gemini_tuning_pipeline(
     project: str = "YOUR_PROJECT_ID",
     location: str = "us-central1",
     source_model_name: str = "gemini-1.5-pro-002",
-    train_data_uri: str = "gs://glucose-test-bucket/glucose_examples.jsonl",
+    train_data_uri: str = "gs://github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/patient_1_glucose_examples.jsonl",
     baseline_model_endpoint: str = "projects/824264063118/locations/us-central1/endpoints/797393320253849600",
 ):
     # Comment out to speed up runs and use past tuned model

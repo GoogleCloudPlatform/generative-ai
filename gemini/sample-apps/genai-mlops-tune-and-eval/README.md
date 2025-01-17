@@ -8,7 +8,7 @@ This tutorial will take you through using Vertex AI Pipelines to automate tuning
 
 ## Optional: Prepare the data
 
-This step is optional because I've already prepared the data in `patient_1_glucose_examples.jsonl`.
+This step is optional because I've already prepared the data in `gs://github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/patient_1_glucose_examples.jsonl`.
 
 - Create a week of glucose sample data for one patient using the following prompt with Gemini:
 
@@ -42,13 +42,6 @@ This step is optional because I've already prepared the data in `patient_1_gluco
     --role="roles/storage.objectUser"
   ```
 
-- Create a GCS bucket and upload the JSONL with the glucose and analysis examples to tune the model:
-
-  ```sh
-  gsutil mb gs://glucose-test-bucket-$(date +%Y%m%d)
-  gsutil cp patient_1_glucose_examples.jsonl gs://glucose-test-bucket-<DATETIME>
-  ```
-
 - Create the pipeline root bucket
 
   ```sh
@@ -68,11 +61,11 @@ This step is optional because I've already prepared the data in `patient_1_gluco
 
 - Edit `pipeline.py` and change the following:
   - `project` - change to your project ID
-  - `train_data_uri` - change to `gs://glucose-test-bucket-<DATETIME>/patient_1_glucose_examples.jsonl`
+
 - Edit `submit_pipeline_job.py` and change the following:
   - `pipeline_root` - change to the `gs://vertex-ai-pipeline-root-<DATETIME>` bucket you created earlier
   - `project` - change to your project ID
-  - `train_data_uri` - change to `gs://glucose-test-bucket-<DATETIME>/patient_1_glucose_examples.jsonl`
+  
 - Create the pipeline run
 
   ```sh
@@ -105,7 +98,7 @@ This step is optional because you can run the pipeline in Vertex AI Pipelines. H
 
 - Edit `pipeline.py` and change the following:
   - `project` - change to your project ID
-  - `train_data_uri` - change to `gs://glucose-test-bucket-<DATETIME>/patient_1_glucose_examples.jsonl`
+
 - Create the pipeline run
 
   ```sh

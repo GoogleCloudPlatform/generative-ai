@@ -237,7 +237,7 @@ def gemini_tuning_pipeline(
     project: str = "genai-mlops-tune-and-eval",
     location: str = "us-central1",
     source_model_name: str = "gemini-1.5-pro-002",
-    train_data_uri: str = "gs://glucose-test-bucket-20250116/patient_1_glucose_examples.jsonl",
+    train_data_uri: str = "gs://github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/patient_1_glucose_examples.jsonl",
     # For first run, set baseline_model_endpoint to any tunable Gemini model
     # because a tuned model endpoint doesnt exist yet
     baseline_model_endpoint: str = "gemini-1.5-pro-002",
