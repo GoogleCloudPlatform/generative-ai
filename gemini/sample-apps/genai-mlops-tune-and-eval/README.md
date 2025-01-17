@@ -88,4 +88,4 @@ This step is optional because you can run the pipeline in Vertex AI Pipelines. H
   ```
   python pipeline.py
   ```
-* For subsequent runs, change `baseline_model_endpoint` in pipeline.py to a tuned model endpoint you want to compare against (typically the previously trained endpoint)
+* For subsequent runs, change `baseline_model_endpoint` in `submit_pipeline_job.py` to a tuned model endpoint you want to compare against (typically the previously trained endpoint)
