@@ -4,7 +4,7 @@ Author: [Chris Willis](https://github.com/willisc7)
 
 This tutorial will take you through using Vertex AI Pipelines to automate tuning an LLM and evaluating it against a previously tuned LLM. The example used is an LLM that summarizes a week of glucose values for a diabetes patient.
 
-![Diagram](./diagram.png)
+![Diagram](https://storage.googleapis.com/github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/diagram.png)
 
 ## Optional: Prepare the data
 
