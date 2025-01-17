@@ -63,7 +63,7 @@ This step is optional because I've already prepared the data in `patient_1_gluco
   ```
   python submit_pipeline_job.py
   ```
-* For subsequent runs, change `baseline_model_endpoint` in pipeline.py to a tuned model endpoint you want to compare against (typically the previously trained endpoint)
+* For subsequent runs, change `baseline_model_endpoint` in `submit_pipeline_job.py` to a tuned model endpoint you want to compare against (typically the previously trained endpoint)
 
 ## Optional: Run Locally Using Kubeflow Pipelines
 This step is optional because you can run the pipeline in Vertex AI Pipelines. However, if you're going to take this pipeline and develop on top of it, it's easier and faster to run the pipeline locally using Kubeflow.
