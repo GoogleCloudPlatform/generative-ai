@@ -1,0 +1,56 @@
+{
+  "name": "multimodal-live-api-web-console",
+  "version": "0.1.0",
+  "dependencies": {
+    "classnames": "^2.5.1",
+    "dotenv-flow": "^4.1.0",
+    "eventemitter3": "^5.0.1",
+    "lodash": "^4.17.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "react-scripts": "5.0.1",
+    "react-select": "^5.8.3",
+    "sass": "^1.80.6",
+    "vega": "^5.30.0",
+    "vega-embed": "^6.29.0",
+    "vega-lite": "^5.22.0",
+    "web-vitals": "^2.1.4",
+    "zustand": "^5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {},
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.119",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/lodash": "^4.17.13",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  },
+  "overrides": {
+    "typescript": "^5.6.3"
+  }
+}

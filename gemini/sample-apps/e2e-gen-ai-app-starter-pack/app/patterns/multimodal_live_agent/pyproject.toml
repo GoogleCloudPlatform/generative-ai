@@ -1,0 +1,92 @@
+[tool.poetry]
+name = "starter-app-sample"
+version = "0.2.0"
+description = ""
+authors = ["Your Name <your@email.com>"]
+packages = [
+    { include = "app" },
+]
+
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+fastapi = "^0.115.6"
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
+google-genai = "^0.3.0"
+google-cloud-aiplatform = "^1.75.0"
+langchain = "^0.3.13"
+langchain-google-vertexai = "^2.0.9"
+langchain-community = "^0.3.13"
+backoff = "^2.2.1"
+jinja2 = "^3.1.4"
+beautifulsoup4 = "^4.12.3"
+scikit-learn = "^1.6.0"
+google-cloud-logging = "^3.11.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+pytest-asyncio = "^0.23.8"
+nest-asyncio = "^1.6.0"
+
+
+[tool.poetry.group.lint]
+optional = true
+
+
+[tool.poetry.group.lint.dependencies]
+flake8 = "^7.1.1"
+flake8-pyproject = "^1.2.3"
+mypy = "^1"
+codespell = "^2.2.0"
+black = "^24.8.0"
+pylint = "^3.3.1"
+types-pyyaml = "^6.0.12.20240917"
+types-requests = "^2.32.0.20240914"
+
+
+[tool.mypy]
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+check_untyped_defs = true
+disallow_subclassing_any = true
+warn_incomplete_stub = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unreachable = true
+follow_imports = "silent"
+ignore_missing_imports = true
+explicit_package_bases = true
+disable_error_code = ["misc", "no-untyped-call", "no-any-return"]
+
+
+[tool.codespell]
+ignore-words-list = "rouge"
+skip = "./locust_env/*,poetry.lock,./frontend/package-lock.json,./frontend/node_modules"
+
+
+[tool.flake8]
+ignore = ["E501", "W503"]
+exclude = ["frontend/node_modules"]
+
+
+[tool.pylint]
+disable = [
+    "E0401",
+    "C0301",
+    "R0903",
+    "R1710",
+    "C0114",
+    "R0915",
+    "W1514",
+    "W1203",
+    "C0411",
+]
+ignore-paths = ["frontend/node_modules"]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
