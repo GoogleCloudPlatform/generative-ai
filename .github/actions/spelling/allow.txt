@@ -1,5 +1,3 @@
-kendall
-spearmanr
 AALR
 ADMA
 AFX
@@ -862,6 +860,7 @@ jsonlines
 jupyter
 jvm
 kaggle
+kendall
 kenleejr
 keras
 keychain
@@ -1125,6 +1124,7 @@ sku
 slf
 snowboard
 sourced
+spearmanr
 sqkm
 srlimit
 ssd
