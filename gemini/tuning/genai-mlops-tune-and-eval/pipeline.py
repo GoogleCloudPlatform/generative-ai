@@ -11,7 +11,8 @@ def gemini_tuning_component(
     location: str,
     source_model: str,
     train_dataset_uri: str,
-) -> str:  # Output the tuned model name as a string
+) -> str:
+    """Output the tuned model name as a string"""
 
     import time
 
@@ -52,6 +53,7 @@ def model_comparison_component(
     baseline_model_endpoint: str,  # Baseline model name
     candidate_model_endpoint: str,  # Candidate model name
 ):
+    """Compares base model to newly tuned model"""
     import functools
     from functools import partial
     import uuid
@@ -65,8 +67,6 @@ def model_comparison_component(
     def pairwise_greater(
         instructions: list,
         context: str,
-        project: str,
-        location: str,
         experiment_name: str,
         baseline: str,
         candidate: str,
@@ -135,8 +135,10 @@ def model_comparison_component(
         experiment_name: str = experiment_name,
     ) -> object:
         """
-        Takes the instruction, context and a variable number of corresponding generated responses, and returns the pointwise evaluation metrics
-        for each of the provided metrics. For this example the metrics are Q & A related, however the full list can be found on the website:
+        Takes the instruction, context and a variable number of corresponding 
+        generated responses, and returns the pointwise evaluation metrics
+        for each of the provided metrics. For this example the metrics are 
+        Q & A related, however the full list can be found on the website:
         https://cloud.google.com/vertex-ai/generative-ai/docs/models/online-pipeline-services
         """
 
@@ -159,16 +161,18 @@ def model_comparison_component(
             prompt_template="{instruction} \n {context}",
             experiment_run_name="gemini-qa-pointwise-" + str(uuid.uuid4()),
         )
-        (results.metrics_table.columns)
         return results
 
     def rank_responses(instruction: str, context: str, responses: list[str]) -> tuple:
         """
-        Takes the instruction, context and a variable number of responses as input, and returns the best performing response as well as its associated
+        Takes the instruction, context and a variable number of responses as 
+        input, and returns the best performing response as well as its associated
         human readable pointwise quality metrics for the configured criteria in the above functions.
         The process consists of two steps:
-        1. Selecting the best response by using Pairwise comparisons between the responses for the user specified metric ( e.g. Q & A)
-        2. Doing pointwise evaluation of the best response and returning human readable quality metrics and explanation along with the best response.
+        1. Selecting the best response by using Pairwise comparisons between the responses for 
+        the user specified metric ( e.g. Q & A)
+        2. Doing pointwise evaluation of the best response and returning human readable quality 
+        metrics and explanation along with the best response.
         """
         cmp_f = partial(
             pairwise_greater, instruction, context, project, location, experiment_name
@@ -226,14 +230,12 @@ def model_comparison_component(
     for ix, response in enumerate(responses, start=1):
         print(f"Response no. {ix}: \n {response}")
 
-    print(best_response)
-    # metrics
-
+    return best_response, metrics
 
 @dsl.pipeline(name="gemini-tuning-pipeline")
 def gemini_tuning_pipeline(
-    project: str = "YOUR_PROJECT_ID",
-    location: str = "REGION",
+    project: str = "genai-mlops-tune-and-eval",
+    location: str = "us-central1",
     source_model_name: str = "gemini-1.5-pro-002",
     train_data_uri: str = "gs://github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/patient_1_glucose_examples.jsonl",
     # For first run, set baseline_model_endpoint to any tunable Gemini model
@@ -242,6 +244,7 @@ def gemini_tuning_pipeline(
     # For subsequent runs, set baseline_model_endpoint to a tuned model endpoint
     # baseline_model_endpoint: str = "projects/824264063118/locations/us-central1/endpoints/797393320253849600",
 ):
+    """Defines the pipeline to tune a model and compare it to the previously tuned model"""
     tuning_task = gemini_tuning_component(
         project=project,
         location=location,
@@ -254,3 +257,4 @@ def gemini_tuning_pipeline(
         baseline_model_endpoint=baseline_model_endpoint,
         candidate_model_endpoint=tuning_task.output,
     )
+    print(comparison_task.output)
