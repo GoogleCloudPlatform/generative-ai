@@ -1,0 +1,173 @@
+/* stylelint-disable */
+:root {
+  --text: white;
+  --gray-200: #b4b8bb;
+  --gray-300: #80868b;
+  --gray-500: #5f6368;
+  --gray-600: #444444;
+  --gray-700: #202020;
+  --gray-800: #171717;
+  --gray-900: #111111;
+  --gray-1000: #0a0a0a;
+  --border-stroke: #444444;
+  --accent-blue: rgb(161, 228, 242);
+  --accent-blue-active-bg: #001233;
+  --accent-blue-active: #98beff;
+  --accent-blue-headers: #448dff;
+  --accent-green: rgb(168, 218, 181);
+
+  --midnight-blue: rgb(0, 18, 51);
+  --blue-30: #99beff;
+
+  --accent-red: #ff4600;
+
+  --background: var(--gray-900);
+  --color: var(--text);
+
+  scrollbar-color: var(--gray-600) var(--gray-900);
+  scrollbar-width: thin;
+
+  --font-family: "Space Mono", monospace;
+
+  /* */
+  --Neutral-00: #000;
+  --Neutral-5: #181a1b;
+  --Neutral-10: #1c1f21;
+  --Neutral-15: #232729;
+  --Neutral-20: #2a2f31;
+  --Neutral-30: #404547;
+  --Neutral-50: #707577;
+  --Neutral-60: #888d8f;
+  --Neutral-80: #c3c6c7;
+  --Neutral-90: #e1e2e3;
+
+  --Green-500: #0d9c53;
+  --Green-700: #025022;
+
+  --Blue-500: #1f94ff;
+  --Blue-800: #0f3557;
+
+  --Red-400: #ff9c7a;
+  --Red-500: #ff4600;
+  --Red-600: #e03c00;
+  --Red-700: #bd3000;
+}
+
+body {
+  font-family: "Space Mono", monospace;
+  background: var(--Neutral-30);
+}
+
+.material-symbols-outlined {
+  &.filled {
+    font-variation-settings:
+      "FILL" 1,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+}
+
+.space-mono-regular {
+  font-family: "Space Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.space-mono-bold {
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.space-mono-regular-italic {
+  font-family: "Space Mono", monospace;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.space-mono-bold-italic {
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.hidden {
+  display: none;
+}
+
+.flex {
+  display: flex;
+}
+
+.h-screen-full {
+  height: 100vh;
+}
+
+.w-screen-full {
+  width: 100vw;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+}
+
+.streaming-console {
+  background: var(--Neutral-5);
+  color: var(--gray-300);
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+
+  a,
+  a:visited,
+  a:active {
+    color: var(--gray-300);
+  }
+
+  .disabled {
+    pointer-events: none;
+
+    > * {
+      pointer-events: none;
+    }
+  }
+
+  main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    gap: 1rem;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .main-app-area {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .function-call {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 50%;
+    overflow-y: auto;
+  }
+}
+
+/* video player */
+.stream {
+  flex-grow: 1;
+  max-width: 90%;
+  border-radius: 32px;
+  max-height: fit-content;
+}

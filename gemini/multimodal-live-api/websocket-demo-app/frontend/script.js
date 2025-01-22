@@ -1,10 +1,9 @@
 window.addEventListener("load", (event) => {
     console.log("Hello Gemini Realtime Demo!");
 
-    setAvalibleCamerasOptions();
-    setAvalibleMicrophoneOptions();
+    setAvailableCamerasOptions();
+    setAvailableMicrophoneOptions();
 });
-
 
 const PROXY_URL = "wss://[THE_URL_YOU_COPIED_WITHOUT_HTTP]";
 const PROJECT_ID = "your project id";
@@ -13,8 +12,7 @@ const API_HOST = "us-central1-aiplatform.googleapis.com";
 
 const accessTokenInput = document.getElementById("token");
 const projectInput = document.getElementById("project");
-const systemInstructionsInput =
-    document.getElementById("systemInstructions");
+const systemInstructionsInput = document.getElementById("systemInstructions");
 
 CookieJar.init("token");
 CookieJar.init("project");
@@ -33,22 +31,17 @@ const screenBtn = document.getElementById("screenBtn");
 const cameraSelect = document.getElementById("cameraSource");
 const micSelect = document.getElementById("audioSource");
 
-const geminiLiveApi = new GeminiLiveAPI(
-    PROXY_URL,
-    PROJECT_ID,
-    MODEL,
-    API_HOST
-);
+const geminiLiveApi = new GeminiLiveAPI(PROXY_URL, PROJECT_ID, MODEL, API_HOST);
 
 geminiLiveApi.onErrorMessage = (message) => {
     showDialogWithMessage(message);
-    setAppSatus("disconnected");
+    setAppStatus("disconnected");
 };
 
 function getSelectedResponseModality() {
     // return "AUDIO";
     const radioButtons = document.querySelectorAll(
-        'md-radio[name="responseModality"]'
+        'md-radio[name="responseModality"]',
     );
 
     let selectedValue;
@@ -66,13 +59,13 @@ function getSystemInstructions() {
 }
 
 function connectBtnClick() {
-    setAppSatus("connecting");
+    setAppStatus("connecting");
 
     geminiLiveApi.responseModalities = getSelectedResponseModality();
     geminiLiveApi.systemInstructions = getSystemInstructions();
 
     geminiLiveApi.onConnectionStarted = () => {
-        setAppSatus("connected");
+        setAppStatus("connected");
         startAudioInput();
     };
 
@@ -144,10 +137,7 @@ const canvasElement = document.getElementById("canvas");
 
 const liveVideoManager = new LiveVideoManager(videoElement, canvasElement);
 
-const liveScreenManager = new LiveScreenManager(
-    videoElement,
-    canvasElement
-);
+const liveScreenManager = new LiveScreenManager(videoElement, canvasElement);
 
 liveVideoManager.onNewFrame = (b64Image) => {
     geminiLiveApi.sendImageMessage(b64Image);
@@ -188,7 +178,7 @@ function newMicSelected() {
 }
 
 function disconnectBtnClick() {
-    setAppSatus("disconnected");
+    setAppStatus("disconnected");
     geminiLiveApi.disconnect();
     stopAudioInput();
 }
@@ -200,7 +190,7 @@ function showDialogWithMessage(messageText) {
     dialog.show();
 }
 
-async function getAvalibleDevices(deviceType) {
+async function getAvailableDevices(deviceType) {
     const allDevices = await navigator.mediaDevices.enumerateDevices();
     const devices = [];
     allDevices.forEach((device) => {
@@ -214,12 +204,12 @@ async function getAvalibleDevices(deviceType) {
     return devices;
 }
 
-async function getAvalibleCameras() {
-    return await this.getAvalibleDevices("videoinput");
+async function getAvailableCameras() {
+    return await this.getAvailableDevices("videoinput");
 }
 
-async function getAvalibleAudioInputs() {
-    return await this.getAvalibleDevices("audioinput");
+async function getAvailableAudioInputs() {
+    return await this.getAvailableDevices("audioinput");
 }
 
 function setMaterialSelect(allOptions, selectElement) {
@@ -236,19 +226,19 @@ function setMaterialSelect(allOptions, selectElement) {
     });
 }
 
-async function setAvalibleCamerasOptions() {
-    const cameras = await getAvalibleCameras();
+async function setAvailableCamerasOptions() {
+    const cameras = await getAvailableCameras();
     const videoSelect = document.getElementById("cameraSource");
     setMaterialSelect(cameras, videoSelect);
 }
 
-async function setAvalibleMicrophoneOptions() {
-    const mics = await getAvalibleAudioInputs();
+async function setAvailableMicrophoneOptions() {
+    const mics = await getAvailableAudioInputs();
     const audioSelect = document.getElementById("audioSource");
     setMaterialSelect(mics, audioSelect);
 }
 
-function setAppSatus(status) {
+function setAppStatus(status) {
     disconnected.hidden = true;
     connecting.hidden = true;
     connected.hidden = true;

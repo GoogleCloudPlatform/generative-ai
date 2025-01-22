@@ -53,7 +53,7 @@ The agent includes three tools:
    python main.py
    ```
 
-   You can also use the [FastAPI CLI](https://fastapi.tiangolo.com/deployment/cli/):
+   You can also use the [FastAPI CLI](https://fastapi.tiangolo.com/fastapi-cli/):
 
    ```bash
    fastapi dev --port 8080
