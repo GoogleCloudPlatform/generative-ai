@@ -40,6 +40,7 @@ Boyz
 Broadoak
 Brusdar
 Btn
+Buckleys
 CALIPSO
 CAMQAA
 CHECKOV
@@ -112,6 +113,7 @@ FILEOS
 FLX
 FMWK
 FPDF
+FREDDIE
 FTPS
 Fangming
 Feitian
@@ -212,6 +214,7 @@ Kvyat
 Kylian
 L'avenir
 LCEL
+LEBRON
 LLMs
 LLa
 LMPA
@@ -232,6 +235,7 @@ Lottry
 MFU
 MICOA
 MLB
+MLOPs
 MMA
 MSCHF
 MSGSEND
@@ -239,6 +243,7 @@ MTL
 Maa
 Maarten
 Mahindra
+Malware
 Mamah
 Mandiri
 Masaru
@@ -263,6 +268,7 @@ NDEBUG
 NGRAM
 NGRAMS
 NHK
+NICOLAS
 NMT
 NOMINATIM
 NOMINMAX
@@ -312,6 +318,7 @@ Pré
 Pzk
 QLo
 QPM
+Qwiklabs
 RAGAS
 REPOURL
 RLHF
@@ -337,6 +344,7 @@ SAOT
 SDKROOT
 SEK
 SEO
+SIMONE
 SKUs
 SMSN
 SNB
@@ -479,6 +487,7 @@ aip
 airlume
 akka
 alisal
+alloydb
 antiword
 apikeys
 apk
@@ -653,10 +662,12 @@ fea
 fect
 fewshot
 ffi
+fibonacci
 figsize
 fillmode
 fillna
 fiqa
+firestore
 fixmycar
 flac
 floormat
@@ -749,6 +760,7 @@ imagefont
 imageno
 imagetext
 imdb
+importmap
 imread
 imshow
 imwrite
@@ -791,6 +803,8 @@ l'harmonie
 lakecolor
 landcolor
 landuse
+langgraph
+lego
 lenzing
 levelname
 lexer
@@ -1006,6 +1020,7 @@ rsp
 runjdwp
 saaagesh
 saveddir
+scann
 scattergl
 scidocs
 scifact
@@ -1137,6 +1152,7 @@ welcom
 werden
 wght
 wiffle
+wikipedia
 wil
 windspeed
 winres
@@ -1171,6 +1187,7 @@ yaxes
 yaxis
 ylabel
 yougov
+youtube
 yref
 ytd
 yticks
