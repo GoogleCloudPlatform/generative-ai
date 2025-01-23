@@ -160,5 +160,5 @@ jobs:
           not-lower-pattern: "[^a-záéíóúñçü]"
           not-upper-or-lower-pattern: "[^A-ZÁÉÍÓÚÑÇÜa-záéíóúñçü]"
           punctuation-pattern: "'"
-          only_check_changed_files: true
+          only_check_changed_files: false
           longest_word: "10"
