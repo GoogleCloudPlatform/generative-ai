@@ -60,12 +60,14 @@ This step is optional because I've already prepared the data in `gs://github-rep
   ```
 
 - Edit `pipeline.py` and change the following:
+
   - `project` - change to your project ID
 
 - Edit `submit_pipeline_job.py` and change the following:
+
   - `pipeline_root` - change to the `gs://vertex-ai-pipeline-root-<DATETIME>` bucket you created earlier
   - `project` - change to your project ID
-  
+
 - Create the pipeline run
 
   ```sh

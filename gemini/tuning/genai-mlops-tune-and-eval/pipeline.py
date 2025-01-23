@@ -1,3 +1,4 @@
+# pylint: disable=import-outside-toplevel,too-many-locals
 from kfp.v2 import dsl
 from kfp.v2.dsl import component
 
@@ -52,20 +53,21 @@ def model_comparison_component(
     location: str,
     baseline_model_endpoint: str,  # Baseline model name
     candidate_model_endpoint: str,  # Candidate model name
-) -> str:
+) -> tuple:
     """Compares base model to newly tuned model"""
     import functools
     from functools import partial
+    import typing
     import uuid
 
     import pandas as pd
-    from vertexai.evaluation import EvalTask, MetricPromptTemplateExamples
-    from vertexai.generative_models import GenerativeModel, GenerationConfig
+    from vertexai.evaluation import EvalResult, EvalTask, MetricPromptTemplateExamples
+    from vertexai.generative_models import GenerationConfig, GenerativeModel
 
     experiment_name = "qa-quality"
 
     def pairwise_greater(
-        instructions: list,
+        instructions: str,
         context: str,
         experiment_name: str,
         baseline: str,
@@ -113,12 +115,12 @@ def model_comparison_component(
         )
         return (choice, result["pairwise_question_answering_quality/explanation"])
 
-    def greater(cmp: callable, a: str, b: str) -> int:
+    def greater(cmp: typing.Callable, a: str, b: str) -> int:
         """
         A comparison function which takes the comparison function, and two variables as input
         and returns the one which is greater according to the logic defined inside the cmp function.
         """
-        choice, explanation = cmp(a, b)
+        choice, _ = cmp(a, b)
 
         if choice == a:
             return 1
@@ -128,12 +130,9 @@ def model_comparison_component(
         instruction: str,
         context: str,
         responses: list[str],
-        eval_metrics: list[object] = [
-            MetricPromptTemplateExamples.Pointwise.QUESTION_ANSWERING_QUALITY,
-            MetricPromptTemplateExamples.Pointwise.GROUNDEDNESS,
-        ],
+        eval_metrics: list[MetricPromptTemplateExamples.Pointwise] | None = None,
         experiment_name: str = experiment_name,
-    ) -> object:
+    ) -> EvalResult:
         """
         Takes the instruction, context and a variable number of corresponding
         generated responses, and returns the pointwise evaluation metrics
@@ -153,6 +152,11 @@ def model_comparison_component(
                 "response": responses,
             }
         )
+
+        eval_metrics = eval_metrics or [
+            MetricPromptTemplateExamples.Pointwise.QUESTION_ANSWERING_QUALITY,
+            MetricPromptTemplateExamples.Pointwise.GROUNDEDNESS,
+        ]
 
         eval_task = EvalTask(
             dataset=eval_dataset, metrics=eval_metrics, experiment=experiment_name
@@ -239,12 +243,12 @@ def gemini_tuning_pipeline(
     location: str = "us-central1",
     source_model_name: str = "gemini-1.5-pro-002",
     train_data_uri: str = "gs://github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/patient_1_glucose_examples.jsonl",
-    # For first run, set baseline_model_endpoint to any tunable Gemini model
-    # because a tuned model endpoint doesnt exist yet
+    # For first run, set `baseline_model_endpoint`` to any tunable Gemini model
+    # because a tuned model endpoint doesn't exist yet
     baseline_model_endpoint: str = "gemini-1.5-pro-002",
     # For subsequent runs, set baseline_model_endpoint to a tuned model endpoint
     # baseline_model_endpoint: str = "projects/824264063118/locations/us-central1/endpoints/797393320253849600",
-):
+) -> None:
     """Defines the pipeline to tune a model and compare it to the previously tuned model"""
     tuning_task = gemini_tuning_component(
         project=project,
