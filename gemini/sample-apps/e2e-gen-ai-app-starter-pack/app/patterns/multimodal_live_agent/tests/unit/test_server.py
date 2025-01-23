@@ -20,8 +20,8 @@ from typing import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi.testclient import TestClient
-import pytest
 from google.auth.credentials import Credentials
+import pytest
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
