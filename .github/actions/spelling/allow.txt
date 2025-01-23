@@ -213,6 +213,7 @@ Kylian
 L'avenir
 LCEL
 LLMs
+LLa
 LMPA
 LOOKBACK
 LRESULT
@@ -437,6 +438,8 @@ Vettel
 Vijay
 Virat
 Viru
+WAI
+WAU
 WDIR
 WFH
 WNDCLASS
@@ -675,6 +678,7 @@ functiona
 futur
 gapic
 gauff
+gbif
 gboolean
 gbq
 gce
@@ -773,6 +777,7 @@ jsonlines
 jupyter
 jvm
 kaggle
+kendall
 kenleejr
 keras
 keychain
@@ -831,6 +836,7 @@ millis
 miranda
 mmarco
 mmr
+modelfile
 morty
 moviepy
 mpe
@@ -1028,6 +1034,7 @@ sku
 slf
 snowboard
 sourced
+spearmanr
 sqkm
 srlimit
 ssd

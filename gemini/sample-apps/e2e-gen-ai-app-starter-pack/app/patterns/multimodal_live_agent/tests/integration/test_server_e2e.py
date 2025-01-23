@@ -13,19 +13,20 @@
 # limitations under the License.
 # pylint: disable=W0621, W0613, R0801, R1732, W0718, E1101, R0912
 
-import uuid
+import asyncio
 import json
 import logging
-import subprocess
 import os
-import asyncio
-from typing import Any, Dict, Iterator
+import subprocess
 import sys
 import threading
 import time
+from typing import Any, Dict, Iterator
+import uuid
+
 import pytest
-import websockets.client
 import requests
+import websockets.client
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
