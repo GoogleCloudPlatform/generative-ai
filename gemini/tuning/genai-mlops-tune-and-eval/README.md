@@ -55,7 +55,7 @@ This step is optional because I've already prepared the data in `gs://github-rep
   ```sh
   python3 -m venv venv
   source venv/bin/activate
-  pip install kfp google-cloud-aiplatform
+  pip install -r requirements.txt
   kfp dsl compile --py pipeline.py --output pipeline.json
   ```
 
