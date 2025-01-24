@@ -237,7 +237,9 @@ def model_comparison_component(
     for ix, response in enumerate(responses, start=1):
         print(f"Response no. {ix}: \n {response}")
 
-    print(best_response)
+    print(f"Best response: {best_response}")
+    print(f"Metrics: {metrics}")
+
 
 @dsl.pipeline(name="gemini-tuning-pipeline")
 def gemini_tuning_pipeline(
