@@ -53,22 +53,23 @@ def model_comparison_component(
     location: str,
     baseline_model_endpoint: str,  # Baseline model name
     candidate_model_endpoint: str,  # Candidate model name
-) -> tuple:
+) -> None:
     """Compares base model to newly tuned model"""
     import functools
     from functools import partial
-    import typing
     import uuid
 
     import pandas as pd
-    from vertexai.evaluation import EvalResult, EvalTask, MetricPromptTemplateExamples
-    from vertexai.generative_models import GenerationConfig, GenerativeModel
+    from vertexai.evaluation import EvalTask, MetricPromptTemplateExamples
+    from vertexai.generative_models import GenerativeModel, GenerationConfig
 
     experiment_name = "qa-quality"
 
     def pairwise_greater(
-        instructions: str,
+        instructions: list,
         context: str,
+        project: str,
+        location: str,
         experiment_name: str,
         baseline: str,
         candidate: str,
@@ -115,12 +116,12 @@ def model_comparison_component(
         )
         return (choice, result["pairwise_question_answering_quality/explanation"])
 
-    def greater(cmp: typing.Callable, a: str, b: str) -> int:
+    def greater(cmp: callable, a: str, b: str) -> int:
         """
         A comparison function which takes the comparison function, and two variables as input
         and returns the one which is greater according to the logic defined inside the cmp function.
         """
-        choice, _ = cmp(a, b)
+        choice, explanation = cmp(a, b)
 
         if choice == a:
             return 1
@@ -130,9 +131,12 @@ def model_comparison_component(
         instruction: str,
         context: str,
         responses: list[str],
-        eval_metrics: list[MetricPromptTemplateExamples.Pointwise] | None = None,
+        eval_metrics: list[object] = [
+            MetricPromptTemplateExamples.Pointwise.QUESTION_ANSWERING_QUALITY,
+            MetricPromptTemplateExamples.Pointwise.GROUNDEDNESS,
+        ],
         experiment_name: str = experiment_name,
-    ) -> EvalResult:
+    ) -> object:
         """
         Takes the instruction, context and a variable number of corresponding
         generated responses, and returns the pointwise evaluation metrics
@@ -152,11 +156,6 @@ def model_comparison_component(
                 "response": responses,
             }
         )
-
-        eval_metrics = eval_metrics or [
-            MetricPromptTemplateExamples.Pointwise.QUESTION_ANSWERING_QUALITY,
-            MetricPromptTemplateExamples.Pointwise.GROUNDEDNESS,
-        ]
 
         eval_task = EvalTask(
             dataset=eval_dataset, metrics=eval_metrics, experiment=experiment_name
@@ -234,8 +233,7 @@ def model_comparison_component(
     for ix, response in enumerate(responses, start=1):
         print(f"Response no. {ix}: \n {response}")
 
-    return best_response, metrics
-
+    print(best_response)
 
 @dsl.pipeline(name="gemini-tuning-pipeline")
 def gemini_tuning_pipeline(
@@ -262,4 +260,3 @@ def gemini_tuning_pipeline(
         baseline_model_endpoint=baseline_model_endpoint,
         candidate_model_endpoint=tuning_task.output,
     )
-    print(comparison_task.output)
