@@ -35,6 +35,7 @@ def gemini_tuning_component(
         time.sleep(60)
         sft_tuning_job.refresh()
 
+    print(f"Tuned Model Endpoint Name: {sft_tuning_job.tuned_model_endpoint_name}")
     return sft_tuning_job.tuned_model_endpoint_name
 
 
@@ -238,6 +239,8 @@ def model_comparison_component(
     for ix, response in enumerate(responses, start=1):
         print(f"Response no. {ix}: \n {response}")
 
+    print(f"Best response: {best_response}")
+    print(f"Metrics: {metrics}")
     outputs = NamedTuple("outputs", best_response=str, metrics=dict)
     return outputs(best_response, metrics)
 
