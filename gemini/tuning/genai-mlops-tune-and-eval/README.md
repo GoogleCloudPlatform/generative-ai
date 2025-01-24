@@ -42,6 +42,12 @@ This step is optional because I've already prepared the data in `gs://github-rep
     --role="roles/storage.objectUser"
   ```
 
+- Enable the Cloud Resource Manager API
+
+  ```
+  gcloud services enable cloudresourcemanager.googleapis.com
+  ```
+
 - Create the pipeline root bucket
 
   ```sh
