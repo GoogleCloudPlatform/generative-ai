@@ -25,9 +25,11 @@ The steps performed include:
 * Trajectory evaluation
 * Response evaluation
 
-Create a virtual environment and install prerquisites:
+Create a virtual environment and install prerequisites:
 
 ```
+python -m venv .venv
+source .venv/bin/activate
 pip install google-cloud-aiplatform[evaluation]>=1.78.0" "pandas>=2.2.3" "pydantic-ai-slim[vertexai]>=0.0.20"
 ```
 
@@ -66,7 +68,7 @@ agent = Agent(
 
 
 @agent.tool
-def get_product_details(ctx: RunContext[str], product_name: str):  # pylint: disable=unused-argument
+def get_product_details(ctx: RunContext[str], product_name: str) -> str:  # pylint: disable=unused-argument
     """Gathers basic details about a product."""
     details = {
         "smartphone": "A cutting-edge smartphone with advanced camera features and lightning-fast processing.",
@@ -79,7 +81,7 @@ def get_product_details(ctx: RunContext[str], product_name: str):  # pylint: dis
 
 
 @agent.tool
-def get_product_price(ctx: RunContext[str], product_name: str):  # pylint: disable=unused-argument
+def get_product_price(ctx: RunContext[str], product_name: str) -> str:  # pylint: disable=unused-argument
     """Gathers price about a product."""
     details = {
         "smartphone": 500,
@@ -359,7 +361,7 @@ def custom_metric() -> None:
     print(metrics_df)
 
 
-def delete_experiment(experiment_name: str):
+def delete_experiment(experiment_name: str) -> None:
     """Delete the experiment
     Used as a cleanup mechanism"""
     try:
@@ -369,7 +371,7 @@ def delete_experiment(experiment_name: str):
         print(e)
 
 
-def main():
+def main() -> None:
     """Main function"""
     single_tool_evaluation()
     trajectory_evaluation()
