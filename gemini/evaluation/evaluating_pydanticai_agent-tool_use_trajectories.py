@@ -27,7 +27,9 @@ The steps performed include:
 
 Create a virtual environment and install prerquisites:
 
+```
 pip install google-cloud-aiplatform[evaluation]>=1.78.0" "pandas>=2.2.3" "pydantic-ai-slim[vertexai]>=0.0.20"
+```
 
 Then, you'll be able to run this python script to exercise evaluating a PydanticAI agent with the Vertex AI Generative AI Evaluation Service SDK.
 
@@ -209,7 +211,8 @@ print(eval_sample_dataset.head(3))
 
 # Evaluation methodologies for tool calling
 
-def single_tool_evaluation():
+
+def single_tool_evaluation() -> None:
     """Single tool usage evaluation
     Determines of a single tool was appropriately selected
     """
@@ -217,7 +220,7 @@ def single_tool_evaluation():
     print("Single tool usage evaluation")
 
     single_tool_usage_metrics = [TrajectorySingleToolUse(tool_name="get_product_price")]
-    EXPERIMENT_RUN = f"single-metric-eval-{get_id()}"
+    experiment_run = f"single-metric-eval-{get_id()}"
 
     single_tool_call_eval_task = EvalTask(
         dataset=eval_sample_dataset,
@@ -227,7 +230,7 @@ def single_tool_evaluation():
 
     single_tool_call_eval_result = single_tool_call_eval_task.evaluate(
         runnable=agent_parsed_outcome,
-        experiment_run_name=EXPERIMENT_RUN,
+        experiment_run_name=experiment_run,
     )
 
     print("Summary metrics")
@@ -237,7 +240,7 @@ def single_tool_evaluation():
     print(metrics_df)
 
 
-def trajectory_evaluation():
+def trajectory_evaluation() -> None:
     """Trajectory evaluation
     Determines if the order of tool choice is reasonable
     """
@@ -252,7 +255,7 @@ def trajectory_evaluation():
         "trajectory_recall",
     ]
 
-    EXPERIMENT_RUN = f"trajectory-{get_id()}"
+    experiment_run = f"trajectory-{get_id()}"
 
     trajectory_eval_task = EvalTask(
         dataset=eval_sample_dataset,
@@ -261,7 +264,7 @@ def trajectory_evaluation():
     )
 
     trajectory_eval_result = trajectory_eval_task.evaluate(
-        runnable=agent_parsed_outcome, experiment_run_name=EXPERIMENT_RUN
+        runnable=agent_parsed_outcome, experiment_run_name=experiment_run
     )
 
     print("Summary metrics")
@@ -271,7 +274,7 @@ def trajectory_evaluation():
     print(metrics_df)
 
 
-def final_response_evaluation():
+def final_response_evaluation() -> None:
     """Final response evaluation
     Determine if the final response is correct
     """
@@ -280,7 +283,7 @@ def final_response_evaluation():
 
     response_metrics = ["safety", "coherence"]
 
-    EXPERIMENT_RUN = f"response-{get_id()}"
+    experiment_run = f"response-{get_id()}"
 
     response_eval_task = EvalTask(
         dataset=eval_sample_dataset,
@@ -289,7 +292,7 @@ def final_response_evaluation():
     )
 
     response_eval_result = response_eval_task.evaluate(
-        runnable=agent_parsed_outcome, experiment_run_name=EXPERIMENT_RUN
+        runnable=agent_parsed_outcome, experiment_run_name=experiment_run
     )
 
     print("Summary metrics")
@@ -299,7 +302,7 @@ def final_response_evaluation():
     print(metrics_df)
 
 
-def custom_metric():
+def custom_metric() -> None:
     """Custom metric evaluation - logical following
     Use a prompt as criteria for evaluation
     """
@@ -337,7 +340,7 @@ def custom_metric():
         "safety",
         response_follows_trajectory_metric,
     ]
-    EXPERIMENT_RUN = f"response-over-tools-{get_id()}"
+    experiment_run = f"response-over-tools-{get_id()}"
 
     response_eval_tool_task = EvalTask(
         dataset=eval_sample_dataset,
@@ -346,7 +349,7 @@ def custom_metric():
     )
 
     response_eval_tool_result = response_eval_tool_task.evaluate(
-        runnable=agent_parsed_outcome, experiment_run_name=EXPERIMENT_RUN
+        runnable=agent_parsed_outcome, experiment_run_name=experiment_run
     )
 
     print("Summary metrics")
@@ -372,7 +375,7 @@ def main():
     trajectory_evaluation()
     final_response_evaluation()
     custom_metric()
-    #delete_experiment(EXPERIMENT_NAME)
+    # delete_experiment(EXPERIMENT_NAME)
 
 
 if __name__ == "__main__":
