@@ -81,7 +81,7 @@ def get_product_details(ctx: RunContext[str], product_name: str) -> str:  # pyli
 
 
 @agent.tool
-def get_product_price(ctx: RunContext[str], product_name: str) -> str:  # pylint: disable=unused-argument
+def get_product_price(ctx: RunContext[str], product_name: str) -> int | str:  # pylint: disable=unused-argument
     """Gathers price about a product."""
     details = {
         "smartphone": 500,
@@ -138,7 +138,7 @@ def parse_messages_to_output_dictionary(result: RunResult) -> dict:
     return final_output
 
 
-def agent_parsed_outcome(prompt: str):
+def agent_parsed_outcome(prompt: str) -> dict:
     """Invoke agent and get tool outputs for evaluation
     Args:
         input prompt: str
@@ -367,7 +367,7 @@ def delete_experiment(experiment_name: str) -> None:
     try:
         experiment = aiplatform.Experiment(experiment_name)
         experiment.delete(delete_backing_tensorboard_runs=True)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print(e)
 
 
