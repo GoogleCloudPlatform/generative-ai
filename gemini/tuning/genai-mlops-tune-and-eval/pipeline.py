@@ -1,5 +1,6 @@
-# pylint: disable=import-outside-toplevel,too-many-locals
+# pylint: disable=import-outside-toplevel,too-many-locals,too-many-arguments,too-many-positional-arguments,unused-argument
 from typing import NamedTuple
+
 from kfp.v2 import dsl
 from kfp.v2.dsl import component
 
@@ -55,7 +56,7 @@ def model_comparison_component(
     location: str,
     baseline_model_endpoint: str,  # Baseline model name
     candidate_model_endpoint: str,  # Candidate model name
-) -> NamedTuple('outputs', best_response=str, metrics=dict):
+) -> NamedTuple("outputs", best_response=str, metrics=dict):  # type: ignore[valid-type]
     """Compares base model to newly tuned model"""
     import functools
     from functools import partial
@@ -241,8 +242,8 @@ def model_comparison_component(
 
     print(f"Best response: {best_response}")
     print(f"Metrics: {metrics}")
-    outputs = NamedTuple("outputs", best_response=str, metrics=dict)
-    return outputs(best_response, metrics)
+    outputs = NamedTuple("outputs", best_response=str, metrics=dict)  # type: ignore[misc]
+    return outputs(best_response, metrics)  # type: ignore[call-arg]
 
 
 @dsl.pipeline(name="gemini-tuning-pipeline")
@@ -264,7 +265,7 @@ def gemini_tuning_pipeline(
         source_model=source_model_name,
         train_dataset_uri=train_data_uri,
     )
-    comparison_task = model_comparison_component(
+    model_comparison_component(
         project=project,
         location=location,
         baseline_model_endpoint=baseline_model_endpoint,
