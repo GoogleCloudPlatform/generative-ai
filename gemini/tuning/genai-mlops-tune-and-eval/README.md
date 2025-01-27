@@ -44,7 +44,7 @@ This step is optional because I've already prepared the data in `gs://github-rep
 
 - Enable the Cloud Resource Manager API
 
-  ```
+  ```sh
   gcloud services enable cloudresourcemanager.googleapis.com
   ```
 
