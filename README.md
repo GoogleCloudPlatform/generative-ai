@@ -47,7 +47,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
       <br>
       <a href="search/"><code>search/</code></a>
     </td>
-    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/enterprise-search">Vertex AI Search</a>, a Google-managed solution to help you rapidly build search engines for websites and across enterprise data. (Formerly known as Enterprise Search on Generative AI App Builder)</td>
+    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/enterprise-search">Vertex AI Search</a>, a Google-managed solution to help you rapidly build search engines for websites and across enterprise data. (Formerly known as Enterprise Search on Generative AI App Builder).</td>
   </tr>
   <tr>
     <td>
@@ -63,7 +63,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
       <br>
       <a href="conversation/"><code>conversation/</code></a>
     </td>
-    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Conversation</a>, a Google-managed solution to help you rapidly build chat bots for websites and across enterprise data. (Formerly known as Chat Apps on Generative AI App Builder)</td>
+    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/generative-ai-app-builder">Vertex AI Conversation</a>, a Google-managed solution to help you rapidly build chat bots for websites and across enterprise data. (Formerly known as Chat Apps on Generative AI App Builder).</td>
   </tr>
   <tr>
     <td>
@@ -116,7 +116,7 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
       <br>
       <a href="RESOURCES.md"><code>RESOURCES.md</code></a>
     </td>
-    <td>Learning resources (e.g. blogs, YouTube playlists) about Generative AI on Google Cloud</td>
+    <td>Learning resources (e.g. blogs, YouTube playlists) about Generative AI on Google Cloud.</td>
   </tr>
 </table>
 <!-- markdownlint-enable MD033 -->
