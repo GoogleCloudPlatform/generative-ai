@@ -41,8 +41,8 @@ import os
 import random
 import string
 
-import pandas as pd
 from google.cloud import aiplatform
+import pandas as pd
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.vertexai import VertexAIModel
 from pydantic_ai.result import RunResult
@@ -68,7 +68,9 @@ agent = Agent(
 
 
 @agent.tool
-def get_product_details(ctx: RunContext[str], product_name: str) -> str:  # pylint: disable=unused-argument
+def get_product_details(
+    ctx: RunContext[str], product_name: str
+) -> str:  # pylint: disable=unused-argument
     """Gathers basic details about a product."""
     details = {
         "smartphone": "A cutting-edge smartphone with advanced camera features and lightning-fast processing.",
@@ -81,7 +83,9 @@ def get_product_details(ctx: RunContext[str], product_name: str) -> str:  # pyli
 
 
 @agent.tool
-def get_product_price(ctx: RunContext[str], product_name: str) -> int | str:  # pylint: disable=unused-argument
+def get_product_price(
+    ctx: RunContext[str], product_name: str
+) -> int | str:  # pylint: disable=unused-argument
     """Gathers price about a product."""
     details = {
         "smartphone": 500,
