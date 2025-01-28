@@ -199,6 +199,9 @@
 # Should be Hugging Face
 \s(?!Hugging Face\b)[Hh]ugging\s?[Ff]ace?\b
 
+# Should be DeepSeek
+\b(?!DeepSeek\b)(?!deepseek\b)[Dd]eep\s?[Ss]eek?\b
+
 # Should be Vertex AI
 \b(?!Vertex AI\b)(?!.*[\(\)\{\},])(?<!import\s)(?<!\.)(?<!,\s)Vertex\s?[Aa]?[Ii]?\b
 
