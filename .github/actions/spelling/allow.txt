@@ -1,3 +1,9 @@
+alligned
+deepseek
+Qwen
+Smol
+smolagent
+vllm
 AALR
 ADMA
 AFX
