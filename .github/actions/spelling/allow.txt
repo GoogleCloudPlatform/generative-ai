@@ -1,9 +1,3 @@
-alligned
-deepseek
-Qwen
-Smol
-smolagent
-vllm
 AALR
 ADMA
 AFX
@@ -324,6 +318,7 @@ Pré
 Pzk
 QLo
 QPM
+Qwen
 Qwiklabs
 RAGAS
 REPOURL
@@ -381,6 +376,7 @@ Skaffold
 Sketchfab
 Smartbuy
 Smaug
+Smol
 Statcast
 Storrer
 Strappy
@@ -607,6 +603,7 @@ dcg
 ddbb
 ddl
 deepeval
+deepseek
 demouser
 dente
 descgen
@@ -1056,6 +1053,7 @@ skillsets
 sklearn
 sku
 slf
+smolagent
 snowboard
 sourced
 spearmanr
@@ -1138,6 +1136,7 @@ vapo
 vectoral
 vectordb
 vesselin
+vllm
 vnc
 voiceover
 vos
