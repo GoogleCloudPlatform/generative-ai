@@ -18,22 +18,15 @@ import json
 import logging
 from typing import Any, Callable, Dict, Literal, Optional, Union
 
-from google.cloud import logging as google_cloud_logging
-from google.genai import types
-from google.genai.types import LiveServerToolCall
-
+from app.agent import MODEL_ID, genai_client, live_connect_config, tool_functions
 import backoff
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from google.cloud import logging as google_cloud_logging
+from google.genai import types
+from google.genai.types import LiveServerToolCall
 from pydantic import BaseModel
 from websockets.exceptions import ConnectionClosedError
-
-from app.agent import (
-    MODEL_ID,
-    genai_client,
-    live_connect_config,
-    tool_functions,
-)
 
 
 app = FastAPI()

@@ -48,6 +48,7 @@ embedding = VertexAIEmbeddings(model_name=EMBEDDING_MODEL)
 vector_store = get_vector_store(embedding=embedding, urls=URLS)
 retriever = vector_store.as_retriever()
 
+
 async def retrieve_docs(query: str) -> Dict[str, str]:
     """
     Retrieves pre-formatted documents about MLOps (Machine Learning Operations),
