@@ -66,7 +66,6 @@ Connectez
 Cowabunga
 Crossbody
 D'orsay
-Dedup
 DHH
 DLC
 DLCs
@@ -408,8 +407,6 @@ Takeaways
 Tbk
 Tbl
 Tencent
-Terabyte
-Terabytes
 Testables
 Tetsuo
 Tianli
@@ -523,7 +520,6 @@ barmode
 barpolar
 baxis
 bbc
-bbq
 beir
 bff
 bgswap
@@ -606,7 +602,6 @@ dbln
 dcg
 ddbb
 ddl
-dedup
 deepeval
 deepseek
 demouser
@@ -660,7 +655,6 @@ etf
 etils
 eur
 evals
-everytime
 evse
 evt
 expl
@@ -1090,8 +1084,6 @@ takeaways
 tastetest
 tavily
 tencel
-terabyte
-terabytes
 termcolor
 terraform
 texting
@@ -1123,7 +1115,6 @@ tts
 tures
 typehints
 ubuntu
-udf
 uids
 ultrawide
 und
