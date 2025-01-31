@@ -28,7 +28,6 @@ from google.genai.types import LiveServerToolCall
 from pydantic import BaseModel, ValidationError
 from websockets.exceptions import ConnectionClosedError
 
-
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
