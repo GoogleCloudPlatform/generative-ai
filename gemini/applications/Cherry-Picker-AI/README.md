@@ -1,6 +1,6 @@
 # CherryPicker.AI 🍒
 
-![Image of the Logo for the CherryPicker.AI Application: Perry the Cherry](https://media.licdn.com/dms/image/v2/D5622AQG9ymz2uaew4g/feedshare-shrink_800/feedshare-shrink_800/0/1730653525795?e=1735776000&v=beta&t=-ZTrGHhoqK1XDOTNJWcDrHHQMuVaOxaSWQIotsr7pBc)
+![Image of the Logo for the CherryPicker.AI Application: Perry the Cherry](frontend/src/assets/cherry.png)
 
 ## Description
 
@@ -57,7 +57,7 @@ Not all features were implemented as desired within the 24 hour time limit; Comm
 
 ## Backend
 
-![Backend Architecture of user flow]()
+![Backend Architecture of user flow](frontend/src/assets/backend-architecture.png)
 
 ## Contact
 
