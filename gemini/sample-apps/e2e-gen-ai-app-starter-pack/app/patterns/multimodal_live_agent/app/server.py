@@ -101,7 +101,9 @@ class GeminiSession:
                 response = await self._get_func(fc.name)(**fc.args)
                 tool_response = types.LiveClientToolResponse(
                     function_responses=[
-                        types.FunctionResponse(name=fc.name, id=fc.id, response=response)
+                        types.FunctionResponse(
+                            name=fc.name, id=fc.id, response=response
+                        )
                     ]
                 )
                 logging.debug(f"Tool response: {tool_response}")
@@ -115,7 +117,7 @@ class GeminiSession:
             while result := await self.session._ws.recv(decode=False):
                 # Send the message to the client immediately
                 await self.websocket.send_bytes(result)
-                
+
                 # Process any tool calls asynchronously
                 try:
                     message = types.LiveServerMessage.model_validate(json.loads(result))
@@ -128,6 +130,7 @@ class GeminiSession:
                     asyncio.create_task(self._handle_tool_call(self.session, tool_call))
         except Exception as e:
             logging.error(f"Error receiving from Gemini: {str(e)}")
+
 
 def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
     """Create a callable that handles Gemini connection with retry logic.
