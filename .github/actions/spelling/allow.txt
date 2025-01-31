@@ -1001,6 +1001,7 @@ quadrotor
 qubit
 qubits
 quippy
+rag
 ragas
 ragdemos
 rahhhrr
