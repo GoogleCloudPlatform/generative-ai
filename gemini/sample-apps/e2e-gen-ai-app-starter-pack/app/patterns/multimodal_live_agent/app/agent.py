@@ -48,12 +48,11 @@ embedding = VertexAIEmbeddings(model_name=EMBEDDING_MODEL)
 vector_store = get_vector_store(embedding=embedding, urls=URLS)
 retriever = vector_store.as_retriever()
 
-
-def retrieve_docs(query: str) -> Dict[str, str]:
+async def retrieve_docs(query: str) -> Dict[str, str]:
     """
     Retrieves pre-formatted documents about MLOps (Machine Learning Operations),
       Gen AI lifecycle, and production deployment best practices.
-
+    You should always warn the user that this tool might take few seconds.
     Args:
         query: Search query string related to MLOps, Gen AI, or production deployment.
 
