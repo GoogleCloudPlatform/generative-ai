@@ -199,6 +199,9 @@
 # Should be Hugging Face
 \s(?!Hugging Face\b)[Hh]ugging\s?[Ff]ace?\b
 
+# Should be DeepSeek
+\b(?!DeepSeek\b)(?!deepseek\b)[Dd]eep\s?[Ss]eek?\b
+
 # Should be Vertex AI
 \b(?!Vertex AI\b)(?!.*[\(\)\{\},])(?<!import\s)(?<!\.)(?<!,\s)Vertex\s?[Aa]?[Ii]?\b
 
@@ -222,6 +225,9 @@
 
 # Should be Gemini API in Vertex AI
 \b[Vv]ertex\s[Aa][Ii]\s[Gg]emini\s[Aa][Pp][Ii]\b
+
+# Should be Agentspace
+\b(?!Agentspace\b)[Aa]gent\s?[Ss]pace?\b
 
 # Should be Imagen
 \simagen\s\w

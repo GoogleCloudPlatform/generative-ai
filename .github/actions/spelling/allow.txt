@@ -318,6 +318,7 @@ Pré
 Pzk
 QLo
 QPM
+Qwen
 Qwiklabs
 RAGAS
 REPOURL
@@ -375,6 +376,7 @@ Skaffold
 Sketchfab
 Smartbuy
 Smaug
+Smol
 Statcast
 Storrer
 Strappy
@@ -601,6 +603,7 @@ dcg
 ddbb
 ddl
 deepeval
+deepseek
 demouser
 dente
 descgen
@@ -853,6 +856,7 @@ miranda
 mmarco
 mmr
 modelfile
+monty
 morty
 moviepy
 mpe
@@ -959,6 +963,7 @@ podcast
 podcasts
 podfile
 podhelper
+podman
 powerups
 praw
 prcntg
@@ -1050,6 +1055,7 @@ skillsets
 sklearn
 sku
 slf
+smolagent
 snowboard
 sourced
 spearmanr
@@ -1132,6 +1138,7 @@ vapo
 vectoral
 vectordb
 vesselin
+vllm
 vnc
 voiceover
 vos
