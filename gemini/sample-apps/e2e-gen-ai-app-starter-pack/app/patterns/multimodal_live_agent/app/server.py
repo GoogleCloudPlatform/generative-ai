@@ -25,7 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from google.cloud import logging as google_cloud_logging
 from google.genai import types
 from google.genai.types import LiveServerToolCall
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from websockets.exceptions import ConnectionClosedError
 
 
@@ -90,18 +90,11 @@ class GeminiSession:
     def _get_func(self, action_label: str) -> Optional[Callable]:
         """Get the tool function for a given action label."""
         return None if action_label == "" else self.tool_functions.get(action_label)
-
+    
     async def _handle_tool_call(
         self, session: Any, tool_call: LiveServerToolCall
     ) -> None:
         """Process tool calls from Gemini and send back responses."""
-        # Create a task for handling the tool call
-        asyncio.create_task(self._process_tool_call(session, tool_call))
-
-    async def _process_tool_call(
-        self, session: Any, tool_call: LiveServerToolCall
-    ) -> None:
-        """Process tool calls in a separate task."""
         try:
             for fc in tool_call.function_calls:
                 logging.debug(f"Calling tool function: {fc.name} with args: {fc.args}")
@@ -124,10 +117,15 @@ class GeminiSession:
                 await self.websocket.send_bytes(result)
                 
                 # Process any tool calls asynchronously
-                message = types.LiveServerMessage.model_validate(json.loads(result))
+                try:
+                    message = types.LiveServerMessage.model_validate(json.loads(result))
+                except ValidationError:
+                    continue
+                
                 if message.tool_call:
                     tool_call = LiveServerToolCall.model_validate(message.tool_call)
-                    await self._handle_tool_call(self.session, tool_call)
+                    # Create task for handling tool call
+                    asyncio.create_task(self._handle_tool_call(self.session, tool_call))
         except Exception as e:
             logging.error(f"Error receiving from Gemini: {str(e)}")
 
