@@ -53,7 +53,7 @@ async def retrieve_docs(query: str) -> Dict[str, str]:
     """
     Retrieves pre-formatted documents about MLOps (Machine Learning Operations),
       Gen AI lifecycle, and production deployment best practices.
-    You should always warn the user that this tool might take few seconds.
+
     Args:
         query: Search query string related to MLOps, Gen AI, or production deployment.
 
