@@ -90,7 +90,7 @@ class GeminiSession:
     def _get_func(self, action_label: str) -> Optional[Callable]:
         """Get the tool function for a given action label."""
         return None if action_label == "" else self.tool_functions.get(action_label)
-    
+
     async def _handle_tool_call(
         self, session: Any, tool_call: LiveServerToolCall
     ) -> None:
@@ -121,7 +121,7 @@ class GeminiSession:
                     message = types.LiveServerMessage.model_validate(json.loads(result))
                 except ValidationError:
                     continue
-                
+
                 if message.tool_call:
                     tool_call = LiveServerToolCall.model_validate(message.tool_call)
                     # Create task for handling tool call
