@@ -1,4 +1,4 @@
-# Non-blocking Gen AI app with Quart + Gemini Live API + Cloud Run
+# Non-blocking Chat app with Quart + Gemini Live API + Cloud Run
 
 |           |                                               |
 | --------- | --------------------------------------------- |
