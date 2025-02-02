@@ -217,8 +217,16 @@ The `app.py` file defines a Quart web application that facilitates real-time int
 
 While this is a minimal demo app, you could extend it to a production app by improving the following areas: 
 
+* **Handling audio and images:** The application can be extended to support audio and images. See [Getting Started with the Multimodal Live API using Gen AI SDK](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/multimodal-live-api/intro_multimodal_live_api_genai_sdk.ipynb) on how to process the multimodal content.
+
 * **Gemini Live API Rate Limits:** The application doesn't handle [the Gemini Live API rate limits](https://ai.google.dev/api/multimodal-live#rate-limits). In production you need a rate throttling mechanism for the `concurrent sessions per key` and `tokens per minute` for hanlding traffic from multiple clients.
 
 * **Security:** The `allow-unauthenticated` flag in `deploy.sh` makes the application publicly accessible. For production use, authentication and authorization should be implemented to control access. 
 
 * **Session Management:** While the current session management within the WebSocket handler is functional, more robust session handling could be explored for scenarios involving multiple users or persistent sessions.
+
+## References
+* [Gemini Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live)
+* [Googke Gen AI Python SDK](https://googleapis.github.io/python-genai/index.html)
+* [Getting Started with the Multimodal Live API using Gen AI SDK](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/multimodal-live-api/intro_multimodal_live_api_genai_sdk.ipynb)
+* [Quart documents](https://quart.palletsprojects.com/en/latest/) 
