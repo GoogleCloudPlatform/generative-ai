@@ -1139,6 +1139,7 @@ vapo
 vectoral
 vectordb
 vesselin
+veo
 vllm
 vnc
 voiceover
