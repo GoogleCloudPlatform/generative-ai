@@ -634,6 +634,7 @@ dumfries
 dumpd
 dwmapi
 ecommerce
+ein
 ekg
 elinks
 elous
@@ -946,6 +947,7 @@ pastiched
 payslip
 paystub
 pbxproj
+pcs
 pdfminer
 pdfs
 petabytes
