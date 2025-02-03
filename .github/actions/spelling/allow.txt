@@ -769,6 +769,7 @@ imshow
 imwrite
 inbox
 informati
+inpaint
 iostream
 ipd
 iphoneos
@@ -807,6 +808,7 @@ lakecolor
 landcolor
 landuse
 langgraph
+latte
 lego
 lenzing
 levelname
@@ -1009,6 +1011,7 @@ reddit
 redef
 rembg
 reoffice
+rephraser
 repreve
 requestz
 reranked
