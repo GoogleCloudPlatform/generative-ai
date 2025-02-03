@@ -775,6 +775,7 @@ imshow
 imwrite
 inbox
 informati
+inpaint
 iostream
 ipd
 iphoneos
@@ -813,6 +814,7 @@ lakecolor
 landcolor
 landuse
 langgraph
+latte
 lego
 lenzing
 levelname
