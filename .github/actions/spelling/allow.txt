@@ -1011,6 +1011,7 @@ reddit
 redef
 rembg
 reoffice
+rephraser
 repreve
 requestz
 reranked
