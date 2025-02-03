@@ -25,6 +25,5 @@ gcloud run deploy gemini-quart-cloudrun \
   --project=$PROJECT_ID --region=$LOCATION \
   --set-env-vars=PROJECT_ID=$PROJECT_ID \
   --set-env-vars=LOCATION=$LOCATION \
-# uncomment the following when using Gemini API key
-#  --set-env-vars=GEMINI_API_KEY=$GEMINI_API_KEY \
+  --set-env-vars=GEMINI_API_KEY=$GEMINI_API_KEY \
   --set-env-vars=QUART_DEBUG_MODE=$QUART_DEBUG_MODE
