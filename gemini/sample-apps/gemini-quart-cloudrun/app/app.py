@@ -47,7 +47,6 @@ gemini_client: Client = (
 )
 
 # Gemini API config
-gemini_config: Dict[str, list[str]] = {"response_modalities": ["TEXT"]}
 gemini_config = LiveConnectConfig(
     response_modalities=["TEXT"],
 )
