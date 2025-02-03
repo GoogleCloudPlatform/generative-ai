@@ -827,6 +827,7 @@ logparser
 logprobs
 lolcat
 lparam
+lro
 lru
 lsb
 lxml
