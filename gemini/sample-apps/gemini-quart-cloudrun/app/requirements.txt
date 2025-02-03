@@ -1,2 +1,2 @@
-google-genai==0.5.0
+google-genai==0.8.0
 quart==0.20.0
