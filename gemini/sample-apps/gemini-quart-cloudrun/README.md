@@ -103,6 +103,12 @@ sequenceDiagram
 |Performance|Lower throughput for I/O-bound tasks|Higher throughput for I/O-bound tasks|
 |Complexity|Simpler to write (initially)|Steeper learning curve (async/await)|
 
+## Raw WebSocket v. Quart
+
+In [Gemini Multimodal Live API Demo](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/multimodal-live-api/websocket-demo-app), it uses raw WebSockets API to provide a proxy function that connects the client with Gemini Live API. This is an alternative way to implement a scalable non-blocking Gen AI app with Gemini. You would typically choose this when you need maximum control, have very specific performance requirements, or are implementing a highly custom protocol.
+
+Compared to it, Quart offers a higher level of abstraction, making it easier to develop, manage, and scale real-time applications built with WebSockets. It simplifies common tasks, integrates well with HTTP, and benefits from the Python ecosystem. Especially, it fit smoothly with [Googke Gen AI Python SDK](https://googleapis.github.io/python-genai/index.html) and make it easier to take advantage of the high level API for handling multimodal conntent and function calling at the server side.
+
 # Run the demo app
 
 The following sections provide instructions to run the app on Cloud Shell and deploy to Cloud Run.
@@ -227,6 +233,7 @@ While this is a minimal demo app, you could extend it to a production app by imp
 
 ## References
 * [Gemini Multimodal Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live)
+* [Gemini Multimodal Live API Demo](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/multimodal-live-api/websocket-demo-app)
 * [Googke Gen AI Python SDK](https://googleapis.github.io/python-genai/index.html)
 * [Getting Started with the Multimodal Live API using Gen AI SDK](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/multimodal-live-api/intro_multimodal_live_api_genai_sdk.ipynb)
 * [Quart documents](https://quart.palletsprojects.com/en/latest/) 
