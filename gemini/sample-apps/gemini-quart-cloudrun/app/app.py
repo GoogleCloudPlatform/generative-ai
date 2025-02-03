@@ -13,15 +13,15 @@
 # limitations under the License.
 # pylint: disable=too-many-lines
 
+import asyncio
 import json
 import logging
-import asyncio
-from typing import Any, Dict
 import os
+from typing import Any, Dict
 
-from google.genai import types, Client
+from google.genai import Client
 from google.genai.live import AsyncSession
-from quart import Quart, websocket, send_from_directory, Websocket, Response
+from quart import Quart, Response, Websocket, send_from_directory, websocket
 
 logging.basicConfig(level=logging.INFO)
 
@@ -37,13 +37,14 @@ QUART_DEBUG_MODE: bool = os.environ.get("QUART_DEBUG_MODE") == "True"
 GEMINI_MODEL: str = "gemini-2.0-flash-exp"
 
 # Gemini API Client: Use either one of the following APIs
-gemini_client: Client = Client(vertexai=True, project=PROJECT_ID, location=LOCATION) if not GEMINI_API_KEY else \
-    Client(api_key=GEMINI_API_KEY, http_options={'api_version': 'v1alpha'})
-    
+gemini_client: Client = (
+    Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+    if not GEMINI_API_KEY
+    else Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1alpha"})
+)
+
 # Gemini API config
-gemini_config: Dict[str, list[str]] = {
-    "response_modalities": ["TEXT"]
-}
+gemini_config: Dict[str, list[str]] = {"response_modalities": ["TEXT"]}
 
 #
 # Quart
@@ -57,7 +58,9 @@ async def index() -> Response:
     return await send_from_directory("public", "index.html")
 
 
-async def upstream_worker(gemini_session: AsyncSession, client_websocket: Websocket) -> None:
+async def upstream_worker(
+    gemini_session: AsyncSession, client_websocket: Websocket
+) -> None:
     """
     Continuously read messages from the client WebSocket
     and forward them to Gemini.
@@ -65,10 +68,14 @@ async def upstream_worker(gemini_session: AsyncSession, client_websocket: Websoc
     while True:
         message: str = await client_websocket.receive()
         await gemini_session.send(input=message, end_of_turn=True)
-        logging.info(f"upstream_worker(): sent a message from client to Gemini: {message}")
+        logging.info(
+            f"upstream_worker(): sent a message from client to Gemini: {message}"
+        )
 
 
-async def downstream_worker(gemini_session: AsyncSession, client_websocket: Websocket) -> None:
+async def downstream_worker(
+    gemini_session: AsyncSession, client_websocket: Websocket
+) -> None:
     """
     Continuously read streaming responses from Gemini
     and send them directly to the client WebSocket.
@@ -93,16 +100,21 @@ async def live() -> None:
     """
 
     # Connect to Gemini in "live" (streaming) mode
-    async with gemini_client.aio.live.connect(model=GEMINI_MODEL, config=gemini_config) as gemini_session:  
-        upstream_task: asyncio.Task = asyncio.create_task(upstream_worker(gemini_session, websocket))
-        downstream_task: asyncio.Task = asyncio.create_task(downstream_worker(gemini_session, websocket))
+    async with gemini_client.aio.live.connect(
+        model=GEMINI_MODEL, config=gemini_config
+    ) as gemini_session:
+        upstream_task: asyncio.Task = asyncio.create_task(
+            upstream_worker(gemini_session, websocket)
+        )
+        downstream_task: asyncio.Task = asyncio.create_task(
+            downstream_worker(gemini_session, websocket)
+        )
         logging.info("live(): connected to Gemini, started workers.")
 
         try:
             # Wait until either task finishes or raises an exception
             done, pending = await asyncio.wait(
-                [downstream_task, upstream_task],
-                return_when=asyncio.FIRST_EXCEPTION
+                [downstream_task, upstream_task], return_when=asyncio.FIRST_EXCEPTION
             )
 
             # If one of them raised, re-raise that exception here
@@ -110,13 +122,13 @@ async def live() -> None:
                 if task.exception():
                     raise task.exception()
 
-        #Handle cancelled errors
+        # Handle cancelled errors
         except asyncio.CancelledError:
             logging.info("live(): client connection closed.")
 
-        #Handle other exceptions
+        # Handle other exceptions
         except Exception as e:
-            logging.exception(f"live(): error: %s", e)
+            logging.exception("live(): error: %s", e)
 
         finally:
             # Cancel any leftover tasks
