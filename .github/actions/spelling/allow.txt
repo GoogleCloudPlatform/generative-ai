@@ -676,6 +676,7 @@ flac
 floormat
 fmeasure
 fontdict
+frontside
 footwell
 forbes
 forno
@@ -1188,6 +1189,7 @@ xcscheme
 xctest
 xcvi
 xdg
+xgames
 xlabel
 xmltodict
 xsi
