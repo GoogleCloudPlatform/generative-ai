@@ -21,6 +21,9 @@ from typing import Any, Dict
 
 from google.genai import Client
 from google.genai.live import AsyncSession
+from google.genai.types import (
+    LiveConnectConfig,
+)
 from quart import Quart, Response, Websocket, send_from_directory, websocket
 
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +48,9 @@ gemini_client: Client = (
 
 # Gemini API config
 gemini_config: Dict[str, list[str]] = {"response_modalities": ["TEXT"]}
+gemini_config = LiveConnectConfig(
+    response_modalities=["TEXT"],
+)
 
 #
 # Quart

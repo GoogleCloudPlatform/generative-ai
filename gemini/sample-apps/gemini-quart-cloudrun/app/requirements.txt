@@ -1,3 +1,2 @@
-google-cloud-aiplatform==1.74.0
 google-genai==0.5.0
 quart==0.20.0
