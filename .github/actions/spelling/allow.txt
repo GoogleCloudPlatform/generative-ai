@@ -718,6 +718,7 @@ gfile
 gguf
 gidiyor
 github
+gitingest
 gitleaks
 gke
 glowin
