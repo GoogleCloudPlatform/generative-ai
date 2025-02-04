@@ -318,6 +318,7 @@ Pré
 Pzk
 QLo
 QPM
+Qwen
 Qwiklabs
 RAGAS
 REPOURL
@@ -375,6 +376,7 @@ Skaffold
 Sketchfab
 Smartbuy
 Smaug
+Smol
 Statcast
 Storrer
 Strappy
@@ -601,6 +603,7 @@ dcg
 ddbb
 ddl
 deepeval
+deepseek
 demouser
 dente
 descgen
@@ -630,6 +633,7 @@ dumfries
 dumpd
 dwmapi
 ecommerce
+ein
 ekg
 elinks
 elous
@@ -766,6 +770,7 @@ imshow
 imwrite
 inbox
 informati
+inpaint
 iostream
 ipd
 iphoneos
@@ -804,6 +809,7 @@ lakecolor
 landcolor
 landuse
 langgraph
+latte
 lego
 lenzing
 levelname
@@ -851,6 +857,7 @@ miranda
 mmarco
 mmr
 modelfile
+monty
 morty
 moviepy
 mpe
@@ -898,6 +905,7 @@ nmy
 noabe
 nobserved
 nodularis
+nohup
 norigin
 notetaker
 novnc
@@ -937,6 +945,7 @@ pastiched
 payslip
 paystub
 pbxproj
+pcs
 pdfminer
 pdfs
 petabytes
@@ -956,6 +965,7 @@ podcast
 podcasts
 podfile
 podhelper
+podman
 powerups
 praw
 prcntg
@@ -1003,6 +1013,7 @@ reddit
 redef
 rembg
 reoffice
+rephraser
 repreve
 requestz
 reranked
@@ -1047,6 +1058,7 @@ skillsets
 sklearn
 sku
 slf
+smolagent
 snowboard
 sourced
 spearmanr
@@ -1129,6 +1141,7 @@ vapo
 vectoral
 vectordb
 vesselin
+vllm
 vnc
 voiceover
 vos

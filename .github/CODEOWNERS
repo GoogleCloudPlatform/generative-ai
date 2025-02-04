@@ -81,3 +81,4 @@
 /generative-ai/vision/use-cases/hey_llm                     @tushuhei @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/llamaindex-rag/backend/indexing/ @Lionel-Lim @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/multimodal-live-api/websocket-demo-app/ @ZackAkil @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/genai-mlops-tune-and-eval                       @willisc7 @GoogleCloudPlatform/generative-ai-devrel
