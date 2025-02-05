@@ -127,6 +127,8 @@ async def live() -> None:
             )
 
             # If one of them raised, re-raise that exception here
+            for task in pending:
+                task.cancel()
             for task in done:
                 exc = task.exception()
                 if exc:
