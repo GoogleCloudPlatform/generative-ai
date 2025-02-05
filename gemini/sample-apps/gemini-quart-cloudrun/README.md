@@ -8,7 +8,7 @@ This application demonstrates a non-blocking communication with [Quart](https://
 
 ## Application screenshot
 
-![Demo animation](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/demo_anim.gif)
+![Demo animation](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/demo_anim.png)
 
 Interruption example with the demo chat app
 
