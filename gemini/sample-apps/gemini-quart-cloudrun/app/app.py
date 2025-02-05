@@ -122,7 +122,7 @@ async def live() -> None:
 
         try:
             # Wait until either task finishes or raises an exception
-            done = await asyncio.wait(
+            done, pending = await asyncio.wait(
                 [downstream_task, upstream_task], return_when=asyncio.FIRST_EXCEPTION
             )
 
