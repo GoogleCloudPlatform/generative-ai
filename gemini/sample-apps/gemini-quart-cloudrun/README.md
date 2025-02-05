@@ -8,7 +8,7 @@ This application demonstrates a non-blocking communication with [Quart](https://
 
 ## Application screenshot
 
-![Demo animation](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/demo_anim.gif)
+![Demo animation](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/demo_anim.png)
 
 Interruption example with the demo chat app
 
@@ -27,7 +27,7 @@ Interruption example with the demo chat app
 
 **Key Benefits building Gen AI app with Quart + Gemini Live API:**
 
-- **Responsiveness and Natural Conversation:** Quart supports non-blocking, full-duplex WebSocket communication natively, crucial for a truly interactive Gen AI experience. It doesn't halt while waiting for Gemini, ensuring quick replies and a smooth conversation flow, especially when the app supports multimodal interaction using audio and images and is network-latency sensitive. Users can send text or voice messages in quick succession, and Quart handles them and interrupts with less delays (as shown in the demo animation above).
+- **Responsiveness and Natural Conversation:** Quart supports non-blocking, full-duplex WebSocket communication natively, crucial for a truly interactive Gen AI experience. It doesn't halt while waiting for Gemini, ensuring quick replies and a smooth conversation flow, especially when the app supports multimodal interaction using audio and images and is network-latency sensitive. Users can send text or voice messages in quick succession, and Quart handles them and interrupts with less delays.
 - **Concurrency and Scalability:** Handles many users and their messages simultaneously. Quart can process multiple requests and replies with Gemini concurrently, making the gen AI app faster and more efficient. Quart makes better use of server resources with the single thread event-loop design, leading to lower operational costs and better scalability.
 
 ### Flask (blocking) v. Quart (non-blocking)
