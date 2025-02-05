@@ -16,8 +16,6 @@ Interruption example with the demo chat app
 
 ### Why Quart + Gemini Live API?
 
-Quart: An Asynchronous Framework for Real-Time Generative AI Applications
-
 [Quart](https://quart.palletsprojects.com/en/latest/) is an asynchronous Python web framework built upon the ASGI standard, designed to facilitate the development of high-performance, concurrent applications. Its architecture and feature set render it particularly well-suited for constructing sophisticated generative AI applications that leverage real-time communication technologies like WebSockets and [Gemini Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live).
 
 **Key Benefits of Quart:**
@@ -108,7 +106,7 @@ sequenceDiagram
 
 In [Gemini Multimodal Live API Demo](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/multimodal-live-api/websocket-demo-app), it uses raw WebSockets API to provide a proxy function that connects the client with Gemini Live API. This is an alternative way to implement a scalable non-blocking Gen AI app with Gemini. You would typically choose this when you need maximum control, have very specific performance requirements, or are implementing a highly custom protocol.
 
-Compared to it, Quart offers a higher level of abstraction, making it easier to develop, manage, and scale real-time applications built with WebSockets. It simplifies common tasks, integrates well with HTTP, and benefits from the Python ecosystem. Especially, it fit smoothly with [Google Gen AI Python SDK](https://googleapis.github.io/python-genai/index.html) and make it easier to take advantage of the high level API for handling multimodal content and function calling at the server side.
+Compared to it, Quart offers a higher level of abstraction, making it easier to develop, manage, and scale real-time applications built with WebSockets. It simplifies common tasks, integrates well with HTTP, and benefits from the Python ecosystem. Especially, it fit smoothly with [Google Gen AI Python SDK](https://googleapis.github.io/python-genai/index.html) and make it easier to take advantage of the high level API for handling multimodal content and function calling at the server-side.
 
 ## Run the demo app
 
@@ -128,7 +126,7 @@ cd gemini/sample-apps/gemini-quart-cloudrun
 
 To run the app on Cloud Shell locally, follow these steps:
 
-1. Set project id:
+1. Set project ID:
 
    In Cloud Shell, execute the following commands with replacing `YOUR_PROJECT_ID`:
 
@@ -160,7 +158,7 @@ The application will startup. Use Cloud Shell's [web preview](https://cloud.goog
 
 To deploy the Quart Application in [Cloud Run](https://cloud.google.com/run/docs/quickstarts/deploy-container), we need to perform the following steps:
 
-1. Set project id:
+1. Set project ID:
 
    In Cloud Shell, execute the following commands with replacing `YOUR_PROJECT_ID`:
 

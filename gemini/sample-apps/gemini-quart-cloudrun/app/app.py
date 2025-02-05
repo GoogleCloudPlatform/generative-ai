@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # pylint: disable=too-many-lines
+# pylint: disable=import-error
 
 import asyncio
 import json
@@ -20,10 +21,10 @@ import os
 from typing import Any, Dict
 
 from google.genai import Client
-from google.genai.live import AsyncSession # type: ignore
+from google.genai.live import AsyncSession
 from google.genai.types import (
     LiveConnectConfig,
-)
+) 
 from quart import Quart, Response, Websocket, send_from_directory, websocket
 
 logging.basicConfig(level=logging.INFO)
