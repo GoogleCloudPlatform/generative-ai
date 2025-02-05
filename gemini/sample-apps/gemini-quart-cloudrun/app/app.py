@@ -24,7 +24,7 @@ from google.genai import Client
 from google.genai.live import AsyncSession
 from google.genai.types import (
     LiveConnectConfig,
-) 
+)
 from quart import Quart, Response, Websocket, send_from_directory, websocket
 
 logging.basicConfig(level=logging.INFO)
@@ -128,8 +128,9 @@ async def live() -> None:
 
             # If one of them raised, re-raise that exception here
             for task in done:
-                if task.exception():
-                    raise task.exception()
+                exc = task.exception()
+                if exc:
+                    raise exc
 
         # Handle cancelled errors
         except asyncio.CancelledError:
