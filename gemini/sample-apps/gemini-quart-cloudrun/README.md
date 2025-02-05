@@ -12,7 +12,6 @@ This application demonstrates a non-blocking communication with [Quart](https://
 
 Interruption example with the demo chat app
 
-
 ## Design Concepts
 
 ### Why Quart + Gemini Live API?
