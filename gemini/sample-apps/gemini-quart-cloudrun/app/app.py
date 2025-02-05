@@ -20,7 +20,7 @@ import os
 from typing import Any, Dict
 
 from google.genai import Client
-from google.genai.live import AsyncSession
+from google.genai.live import AsyncSession # type: ignore
 from google.genai.types import (
     LiveConnectConfig,
 )
@@ -32,9 +32,9 @@ logging.basicConfig(level=logging.INFO)
 # Gemini API
 #
 
-PROJECT_ID: str = os.environ.get("PROJECT_ID")
+PROJECT_ID: str = os.environ.get("PROJECT_ID", "")
 LOCATION: str = os.environ.get("LOCATION", "us-central1")
-GEMINI_API_KEY: str = os.environ.get("GEMINI_API_KEY")
+GEMINI_API_KEY: str = os.environ.get("GEMINI_API_KEY", "")
 QUART_DEBUG_MODE: bool = os.environ.get("QUART_DEBUG_MODE") == "True"
 
 GEMINI_MODEL: str = "gemini-2.0-flash-exp"
@@ -60,6 +60,9 @@ app: Quart = Quart(__name__)
 
 @app.route("/")
 async def index() -> Response:
+    """
+    Serve index.html for the index access.
+    """
     return await send_from_directory("public", "index.html")
 
 
@@ -74,7 +77,7 @@ async def upstream_worker(
         message: str = await client_websocket.receive()
         await gemini_session.send(input=message, end_of_turn=True)
         logging.info(
-            f"upstream_worker(): sent a message from client to Gemini: {message}"
+            "upstream_worker(): sent a message from client to Gemini: %s", message
         )
 
 
@@ -95,7 +98,7 @@ async def downstream_worker(
                 "turn_complete": response.server_content.turn_complete,
             }
             await client_websocket.send(json.dumps(packet))
-            logging.info(f"downstream_worker(): sent response to client: {packet}")
+            logging.info("downstream_worker(): sent response to client: %s", packet)
 
 
 @app.websocket("/live")
@@ -118,7 +121,7 @@ async def live() -> None:
 
         try:
             # Wait until either task finishes or raises an exception
-            done, pending = await asyncio.wait(
+            done = await asyncio.wait(
                 [downstream_task, upstream_task], return_when=asyncio.FIRST_EXCEPTION
             )
 
@@ -130,10 +133,6 @@ async def live() -> None:
         # Handle cancelled errors
         except asyncio.CancelledError:
             logging.info("live(): client connection closed.")
-
-        # Handle other exceptions
-        except Exception as e:
-            logging.exception("live(): error: %s", e)
 
         finally:
             # Cancel any leftover tasks

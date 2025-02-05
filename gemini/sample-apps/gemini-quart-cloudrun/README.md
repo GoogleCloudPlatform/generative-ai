@@ -8,13 +8,13 @@ This application demonstrates a non-blocking communication with [Quart](https://
 
 ## Application screenshot
 
-![](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/demo_anim.gif)
+![Demo animation](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/demo_anim.gif)
 
-_Interruption example with the demo chat app_
+Interruption example with the demo chat app
 
-# Design Concepts
+## Design Concepts
 
-## Why Quart + Gemini Live API?
+### Why Quart + Gemini Live API?
 
 Quart: An Asynchronous Framework for Real-Time Generative AI Applications
 
@@ -32,14 +32,14 @@ Quart: An Asynchronous Framework for Real-Time Generative AI Applications
 - **Responsiveness and Natural Conversation:** Quart supports non-blocking, full-duplex WebSocket communication natively, crucial for a truly interactive Gen AI experience. It doesn't halt while waiting for Gemini, ensuring quick replies and a smooth conversation flow, especially when the app supports multimodal interaction using audio and images and is network-latency sensitive. Users can send text or voice messages in quick succession, and Quart handles them and interrupts with less delays (as shown in the demo animation above).
 - **Concurrency and Scalability:** Handles many users and their messages simultaneously. Quart can process multiple requests and replies with Gemini concurrently, making the gen AI app faster and more efficient. Quart makes better use of server resources with the single thread event-loop design, leading to lower operational costs and better scalability.
 
-## Flask (blocking) v. Quart (non-blocking)
+### Flask (blocking) v. Quart (non-blocking)
 
 **How Flask works:**
 
 - Blocking: Flask handles one request at a time. It blocks while waiting for Gemini, causing delays. The diagram shows Flask "blocked" while waiting for a response.
 - Sequential: The client must wait for each response before sending the next message, making the interaction slow.
 
-![](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/seq_flask.png)
+![Flask](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/seq_flask.png)
 
 <!-- mermaid code:
 sequenceDiagram
@@ -66,7 +66,7 @@ sequenceDiagram
 - Non-Blocking: Quart handles multiple requests concurrently. It doesn't wait for Gemini to respond before handling other messages.
 - Concurrent: The client can send messages continuously, and Quart processes them without blocking, leading to a smoother flow.
 
-![](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/seq_quart.png)
+![Quart](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/gemini-quart-cloudrun/seq_quart.png)
 
 <!-- mermaid code:
 sequenceDiagram
@@ -92,28 +92,29 @@ sequenceDiagram
 -->
 
 **Flask vs. Quart: Key Architectural Differences:**
-| | | |
-|-|-|-|
-|Feature|Flask (Synchronous)|Quart (Asynchronous)|
-|Request Handling|One at a time, blocking|Concurrent, non-blocking|
-|Server Interface|WSGI|ASGI|
-|Concurrency|Through multiple processes/threads (WSGI)|Single-threaded with event loop (asyncio)|
-|View Functions|Regular def functions|async def functions|
-|I/O Operations|Blocking|Non-blocking (using await)|
-|Performance|Lower throughput for I/O-bound tasks|Higher throughput for I/O-bound tasks|
-|Complexity|Simpler to write (initially)|Steeper learning curve (async/await)|
 
-## Raw WebSocket v. Quart
+|                  |                                           |                                           |
+| ---------------- | ----------------------------------------- | ----------------------------------------- |
+| Feature          | Flask (Synchronous)                       | Quart (Asynchronous)                      |
+| Request Handling | One at a time, blocking                   | Concurrent, non-blocking                  |
+| Server Interface | WSGI                                      | ASGI                                      |
+| Concurrency      | Through multiple processes/threads (WSGI) | Single-threaded with event loop (asyncio) |
+| View Functions   | Regular def functions                     | async def functions                       |
+| I/O Operations   | Blocking                                  | Non-blocking (using await)                |
+| Performance      | Lower throughput for I/O-bound tasks      | Higher throughput for I/O-bound tasks     |
+| Complexity       | Simpler to write (initially)              | Steeper learning curve (async/await)      |
+
+### Raw WebSocket v. Quart
 
 In [Gemini Multimodal Live API Demo](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/multimodal-live-api/websocket-demo-app), it uses raw WebSockets API to provide a proxy function that connects the client with Gemini Live API. This is an alternative way to implement a scalable non-blocking Gen AI app with Gemini. You would typically choose this when you need maximum control, have very specific performance requirements, or are implementing a highly custom protocol.
 
 Compared to it, Quart offers a higher level of abstraction, making it easier to develop, manage, and scale real-time applications built with WebSockets. It simplifies common tasks, integrates well with HTTP, and benefits from the Python ecosystem. Especially, it fit smoothly with [Google Gen AI Python SDK](https://googleapis.github.io/python-genai/index.html) and make it easier to take advantage of the high level API for handling multimodal content and function calling at the server side.
 
-# Run the demo app
+## Run the demo app
 
 The following sections provide instructions to run the app on Cloud Shell and deploy to Cloud Run.
 
-## Download the app on Cloud Shell
+### Download the app on Cloud Shell
 
 Download the source code on [Cloud Shell](https://cloud.google.com/shell/docs/using-cloud-shell), with the following steps:
 
@@ -123,7 +124,7 @@ git clone https://github.com/GoogleCloudPlatform/generative-ai.git \
 cd gemini/sample-apps/gemini-quart-cloudrun
 ```
 
-## Run the app on Cloud Shell locally
+### Run the app on Cloud Shell locally
 
 To run the app on Cloud Shell locally, follow these steps:
 
@@ -177,15 +178,15 @@ To deploy the Quart Application in [Cloud Run](https://cloud.google.com/run/docs
 
 On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed.
 
-## If you see `RESOURCE_EXHAUSTED` errors
+### If you see `RESOURCE_EXHAUSTED` errors
 
 While running the app using Vertex AI, you might occasionally encounter `RESOURCE_EXHAUSTED` errors on the Cloud Run logs tab. This typically means you've hit the quota limit on the number of concurrent sessions you can open with the Gemini API. If this happens, you have a couple of options: you can either wait a few minutes and try running the app again, or switch to using the Gemini Developer API by specifying your [Gemini API Key](https://aistudio.google.com/apikey) in the `run.sh` or `deploy.sh` script accordintly. This can provide a workaround.
 
 Congratulations!
 
-# How the demo app works
+## How the demo app works
 
-## How `app.py` works
+### How `app.py` works
 
 The `app.py` file defines a Quart web application that facilitates real-time interaction with the Google Gemini API for large language model processing. Here's a breakdown of the flow:
 
@@ -201,7 +202,7 @@ The `app.py` file defines a Quart web application that facilitates real-time int
 
 - **Session Management:** The `gemini_session` is established within an async with block, ensuring that the session is properly closed when the WebSocket connection is terminated. This prevents resource leaks and maintains a clean state.
 
-## How `index.html` works
+### How `index.html` works
 
 - **Structure of `index.html`**: The HTML sets up a basic page with a title, a heading ("Gemini Live API Test"), a message display area (messages div), and a form for sending messages.
 
@@ -215,7 +216,7 @@ The `app.py` file defines a Quart web application that facilitates real-time int
 
   - **`onclose`:** This handler is called when the WebSocket connection is closed. It disables the `Send` button, displays a `Connection closed` message, and initiates a timer to retry connecting to the server in 5 seconds.
 
-## Improvement for production deployment
+### Improvement for production deployment
 
 While this is a minimal demo app, you could extend it to a production app by improving the following areas:
 
