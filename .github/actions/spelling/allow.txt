@@ -638,6 +638,7 @@ dumfries
 dumpd
 dwmapi
 ecommerce
+ein
 ekg
 elinks
 elous
@@ -722,6 +723,7 @@ gfile
 gguf
 gidiyor
 github
+gitingest
 gitleaks
 gke
 glowin
@@ -950,6 +952,7 @@ pastiched
 payslip
 paystub
 pbxproj
+pcs
 pdfminer
 pdfs
 petabytes
@@ -1018,6 +1021,7 @@ reddit
 redef
 rembg
 reoffice
+rephraser
 repreve
 requestz
 reranked
