@@ -1,3 +1,4 @@
+# pylint: disable=invalid-name
 """
 This module demonstrates the usage of the Gemini API in Vertex AI within a Streamlit application.
 """

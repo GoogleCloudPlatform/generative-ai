@@ -35,16 +35,16 @@ To run the Streamlit Application locally (on Cloud Shell), we need to perform th
 
    - If you are using standard Vertex AI:
 
-    ```bash
-    export GOOGLE_CLOUD_PROJECT='<Your Google Cloud Project ID>'  # Change this
-    export GOOGLE_CLOUD_REGION='us-central1' # If you change this, make sure the region is supported.
-    ```
+   ```bash
+   export GOOGLE_CLOUD_PROJECT='<Your Google Cloud Project ID>'  # Change this
+   export GOOGLE_CLOUD_REGION='us-central1' # If you change this, make sure the region is supported.
+   ```
 
    - If you are using [Vertex AI in express mode](https://cloud.google.com/vertex-ai/generative-ai/docs/start/express-mode/overview):
 
-    ```bash
-    export VERTEX_AI_API_KEY='<Your Vertex AI API Key>'  # Change this
-    ```
+   ```bash
+   export VERTEX_AI_API_KEY='<Your Vertex AI API Key>'  # Change this
+   ```
 
 3. To run the application locally, execute the following command:
 
