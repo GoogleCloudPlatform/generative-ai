@@ -13,6 +13,7 @@ APAC
 APIENTRY
 APSTUDIO
 ASF
+ASGI
 ASML
 AUVs
 Aktu
@@ -717,6 +718,7 @@ gfile
 gguf
 gidiyor
 github
+gitingest
 gitleaks
 gke
 glowin
@@ -751,6 +753,7 @@ hovermode
 https
 httpx
 hwnd
+hypercorn
 iban
 icudtl
 idcg

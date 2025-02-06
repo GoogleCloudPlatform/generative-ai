@@ -1,18 +1,15 @@
 # Generative AI
 
-> NOTE: [Gemini 2.0 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) has been released! Here are the latest notebooks and demos using the new model:
+> NOTE: [Gemini 2.0 Flash-Lite and Gemini 2.0 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) have been released!
 >
+> Here are the latest notebooks and demos using the new models:
+> - [Intro to Gemini 2.0 Pro](gemini/getting-started/intro_gemini_2_0_pro.ipynb)
+> - [Intro to Gemini 2.0 Flash-Lite](gemini/getting-started/intro_gemini_2_0_flash_lite.ipynb)
 > - [Intro to Gemini 2.0 Flash](gemini/getting-started/intro_gemini_2_0_flash.ipynb)
 > - [Intro to Multimodal Live API with Gen AI SDK](gemini/multimodal-live-api/intro_multimodal_live_api_genai_sdk.ipynb)
 > - [Intro to Gemini 2.0 Thinking Mode](gemini/getting-started/intro_gemini_2_0_flash_thinking_mode.ipynb)
 > - [Intro to Code Execution](gemini/code-execution/intro_code_execution.ipynb)
 > - [Multimodal Live API Demo App](gemini/multimodal-live-api/websocket-demo-app/)
-> - [Intro to Google Gen AI SDK](gemini/getting-started/intro_genai_sdk.ipynb)
-> - [Real-Time RAG with Multimodal Live API](gemini/multimodal-live-api/real_time_rag_retail_gemini_2_0.ipynb)
-> - [Creating Marketing Assets using Gemini 2.0](gemini/use-cases/marketing/creating_marketing_assets_gemini_2_0.ipynb)
-> - [Vertex AI Gemini Research Multi Agent Demo Research Agent for EV Industry](gemini/agents/research-multi-agents)
-> - [Create a Multi-Speaker Podcast with Gemini 2.0 & Text-to-Speech](audio/speech/use-cases/podcast/multi-speaker-podcast.ipynb)
-> - [Intro to Gemini 2.0 Flash REST API](gemini/getting-started/intro_gemini_2_0_flash_rest_api.ipynb)
 
 <!-- markdownlint-disable MD033 -->
 
