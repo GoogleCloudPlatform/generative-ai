@@ -829,6 +829,7 @@ loghub
 logparser
 logprobs
 lolcat
+loras
 lparam
 lru
 lsb
@@ -927,6 +928,7 @@ openai
 openfda
 opsz
 osm
+oss
 osx
 outdir
 outro
