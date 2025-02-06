@@ -13,6 +13,7 @@ APAC
 APIENTRY
 APSTUDIO
 ASF
+ASGI
 ASML
 AUVs
 Aktu
@@ -757,6 +758,7 @@ hovermode
 https
 httpx
 hwnd
+hypercorn
 iban
 icudtl
 idcg
