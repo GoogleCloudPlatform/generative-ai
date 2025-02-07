@@ -4,7 +4,8 @@
         "defaultTerms": true, 
         "exclude": [
           "README",
-          "VS Code"
+          "VS Code",
+          "website"
         ]
       }
     }
