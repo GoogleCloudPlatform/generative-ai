@@ -834,6 +834,7 @@ loghub
 logparser
 logprobs
 lolcat
+loras
 lparam
 lru
 lsb
@@ -932,6 +933,7 @@ openai
 openfda
 opsz
 osm
+oss
 osx
 outdir
 outro
@@ -1117,6 +1119,7 @@ tion
 titlebar
 tobytes
 toolcall
+toolu
 toself
 toset
 tqdm
@@ -1158,6 +1161,7 @@ vnc
 voiceover
 vos
 votre
+vrtx
 vtotal
 vulnz
 waterjet

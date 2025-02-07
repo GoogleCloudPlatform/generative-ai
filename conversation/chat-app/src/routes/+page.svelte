@@ -45,7 +45,7 @@
 
 <Navbar let:hidden let:toggle class="bg-[#B1D6FC]">
   <NavBrand href="/">
-    <img src="vertex-ai-logo.png" class="mr-3 h-6 sm:h-9" alt="Vertex AI Conversation" />
+    <img src="https://storage.googleapis.com/github-repo/generative-ai/conversation/vertex-ai-logo.png" class="mr-3 h-6 sm:h-9" alt="Vertex AI Conversation" />
     <span class="self-center whitespace-nowrap text-xl font-semibold text-black dark:text-white"
       >Vertex AI Conversation Demo</span>
   </NavBrand>
@@ -85,7 +85,7 @@
         Watch, or Pixel Tablet.
 
         <img
-          src="how-chat-works.png"
+          src="https://storage.googleapis.com/github-repo/generative-ai/conversation/how-chat-works.png"
           alt="Lifecycle of a Data Store Agent Question"
           class="mx-auto mt-4" />
 

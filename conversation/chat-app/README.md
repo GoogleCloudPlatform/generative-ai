@@ -12,7 +12,7 @@ is a feature within
 that is built on top of functionality in
 [Dialogflow CX](https://cloud.google.com/dialogflow).
 
-![Vertex AI Conversation Demo](static/vertex-ai-conversation.png)
+![Vertex AI Conversation Demo](https://storage.googleapis.com/github-repo/generative-ai/conversation/vertex-ai-conversation.png)
 
 With a Data Store Agent, you can provide a website domain, structured data, or
 unstructured data, then the Data Store Agent parses your content and creates a
@@ -20,7 +20,7 @@ virtual agent that is powered by data stores and large language models. Your
 customers and end users can then have conversations with the agent and ask
 questions about the content. Refer to the
 [Data Store Agent documentation](https://cloud.google.com/generative-ai-app-builder/docs/agent-usage)
-and codelab to
+and Codelab to
 [Create a Generative Chat App with Vertex AI Conversation](https://codelabs.developers.google.com/codelabs/vertex-ai-conversation)
 for more information.
 
