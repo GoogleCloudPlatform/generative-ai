@@ -28,7 +28,7 @@ class QueryEntities(BaseModel):
     cities: List[str]
     states: List[str]
     # research_focus: ResearchFocus
-    research_theme: str = "Electronic Vehicle"
+    research_theme: str = "Electric Vehicle"
     output_type: OutputType
 
 
