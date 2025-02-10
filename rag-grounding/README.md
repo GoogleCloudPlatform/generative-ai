@@ -233,7 +233,7 @@ The best explanation of embeddings I've seen
 
 ### Open Models
 
-- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
+- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
   Demonstrates deploying Gemma 2 on Google Cloud Run with GPU acceleration
   using Ollama and LangChain, building a RAG question-answering application.
 
