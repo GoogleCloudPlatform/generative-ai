@@ -21,3 +21,6 @@ google-cloud-discoveryengine==0.13.4
 google-genai==0.8.0
 pylint
 black
+pytest
+pytest-cov
+pytest-watch

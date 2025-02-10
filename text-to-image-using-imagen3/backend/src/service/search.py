@@ -9,7 +9,6 @@ from src.model.search import CustomImageResult, ImageGenerationResult
 
 class ImagenSearchService:
     def generate_images(self, term: str):
-        print(f"user input term: {term}")
         _, PROJECT_ID = google.auth.default()
         LOCATION = "northamerica-northeast1"
         client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
