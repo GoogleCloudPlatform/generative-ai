@@ -29,7 +29,7 @@ export class UserService {
   showLoading() {
     this.loadingSubject.next(true);
   }
-
+  
   hideLoading(){
     this.loadingSubject.next(false);
   }

@@ -39,40 +39,16 @@ export class SearchResultsComponent implements OnDestroy {
     private sanitizer: DomSanitizer,
   ){
     const query = this.route.snapshot.queryParamMap.get('q');
+    this.userService.showLoading();
 
     this.service.search(query!).subscribe({
       next : (searchResponse: GeneratedImage[])=>{
-    // const getImage = () => {
-      //   [
-      //     {
-      //         "image": {
-      //             "gcsUri": null,
-      //             "imageBytes": "",
-      //             "mimeType": "image/png"
-      //         },
-      //         "raiFilteredReason": null,
-      //         "enhancedPrompt": null
-      //     }
-      // ]
-      // const searchResponse: any = this.service.search(query!)
-      console.log("[searchResponse]:", searchResponse)
-
       this.summary = searchResponse?.[0]?.enhancedPrompt || "";
       this.documents = searchResponse
       this.serachResult.forEach((element: GeneratedImage) => {
-        // this.documents.push(element);
         this.images.push(element.image?.encodedImage);
       });
 
-      // this.summary = searchResponse.summary;
-      // this.serachResult = searchResponse.results;
-      // this.serachResult.forEach((element: any) => {
-      //   this.documents.push(element);
-      //   if(search_image_type.includes(element.link.split(".")[1])){
-      //     this.images.push(element);
-      //   }
-      // });
-      // console.log(this.documents, this.images);
       this.userService.hideLoading();
       }
       ,
@@ -80,49 +56,25 @@ export class SearchResultsComponent implements OnDestroy {
         this.userService.hideLoading();
       }
     });
-    // getImage()
   }
 
   getImage = (term: string) => {
-    //   [
-    //     {
-    //         "image": {
-    //             "gcsUri": null,
-    //             "imageBytes": "",
-    //             "mimeType": "image/png"
-    //         },
-    //         "raiFilteredReason": null,
-    //         "enhancedPrompt": null
-    //     }
-    // ]
     const searchResponse: any = this.service.search(term)
     console.log("[searchResponse]:", searchResponse)
 
     this.summary = searchResponse?.[0]?.enhancedPrompt || "";
     this.documents = searchResponse
     this.serachResult.forEach((element: GeneratedImage) => {
-      // this.documents.push(element);
-      // const byteArray = element.image?.imageBytes
-      // const base64_encoded_image = base64.b64encode(image_bytes).decode('utf-8')  # Important: decode to string
-
       this.images.push(element.image?.encodedImage);
     });
 
-    // this.summary = searchResponse.summary;
-    // this.serachResult = searchResponse.results;
-    // this.serachResult.forEach((element: any) => {
-    //   this.documents.push(element);
-    //   if(search_image_type.includes(element.link.split(".")[1])){
-    //     this.images.push(element);
-    //   }
-    // });
-    // console.log(this.documents, this.images);
     this.userService.hideLoading();
     }
 
   searchTerm(term: string) {
+    this.userService.showLoading();
     this.router.navigate(['/search'], { queryParams: { q: term }});
-    // this.getImage(term)
+
     this.service.search(term).subscribe({
       next : (searchResponse: any)=>{
       this.serachResult = searchResponse.results;

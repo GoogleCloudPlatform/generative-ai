@@ -13,6 +13,8 @@ export class AppComponent {
   showHeader: boolean = true
   userInfo: any;
 
+  showLoading = false;
+
   constructor(
     private router: Router,
     private userService: UserService,
@@ -31,4 +33,11 @@ export class AppComponent {
         }
       });
   }
+
+  ngOnInit(): void {
+    this.userService.loadingSubject.subscribe(
+      loadingValue => this.showLoading = loadingValue
+    );
+  }
+
 }

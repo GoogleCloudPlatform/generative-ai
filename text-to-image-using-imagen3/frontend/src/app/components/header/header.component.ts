@@ -28,6 +28,7 @@ export class HeaderComponent {
   requiredLogin: string = environment.requiredLogin;
 
   showLoading = false;
+
   @Output() emitSearch: EventEmitter<string> = new EventEmitter()
 
   constructor(iconRegistry: MatIconRegistry,
@@ -37,6 +38,12 @@ export class HeaderComponent {
     private router: Router,
   ) {
     iconRegistry.addSvgIconLiteral('google-cloud-icon', sanitizer.bypassSecurityTrustHtml(GOOGLE_CLOUD_ICON));
+  }
+
+  ngOnInit(): void {
+    this._UserService.loadingSubject.subscribe(
+      loadingValue => this.showLoading = loadingValue
+    );
   }
 
   isSearchRoute(): boolean {

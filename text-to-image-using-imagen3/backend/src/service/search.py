@@ -14,7 +14,7 @@ class ImagenSearchService:
         client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
         generation_model = "imagen-3.0-generate-002"
-        # Imagen 3 image generation
+        # Imagen3 image generation
         images: types.GenerateImagesResponse = client.models.generate_images(
             model=generation_model,
             prompt=term,
@@ -42,5 +42,5 @@ class ImagenSearchService:
             )
             for generated_image in images.generated_images
         ]
-
+        
         return response
