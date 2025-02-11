@@ -9,7 +9,7 @@ from google import genai
 from google.genai.types import GenerateContentConfig, Part
 import streamlit as st
 
-API_KEY = os.environ.get("VERTEX_AI_API_KEY")
+API_KEY = os.environ.get("GOOGLE_API_KEY")
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")
 

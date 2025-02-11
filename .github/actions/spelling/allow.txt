@@ -76,6 +76,7 @@ DRV
 DVDs
 DWMWA
 Daniil
+Dedup
 DeepEval
 Depatmint
 Dexin
@@ -408,6 +409,8 @@ Takeaways
 Tbk
 Tbl
 Tencent
+Terabyte
+Terabytes
 Testables
 Tetsuo
 Tianli
@@ -521,6 +524,7 @@ barmode
 barpolar
 baxis
 bbc
+bbq
 beir
 bff
 bgswap
@@ -603,6 +607,7 @@ dbln
 dcg
 ddbb
 ddl
+dedup
 deepeval
 deepseek
 demouser
@@ -1004,6 +1009,7 @@ quadrotor
 qubit
 qubits
 quippy
+rag
 ragas
 ragdemos
 rahhhrr
@@ -1094,6 +1100,8 @@ takeaways
 tastetest
 tavily
 tencel
+terabyte
+terabytes
 termcolor
 terraform
 texting
@@ -1126,6 +1134,7 @@ tts
 tures
 typehints
 ubuntu
+udf
 uids
 ultrawide
 und
