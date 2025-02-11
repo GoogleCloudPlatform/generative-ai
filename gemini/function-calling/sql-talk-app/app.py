@@ -1,10 +1,12 @@
 import time
 
 from google.cloud import bigquery
+from google import genai
+from google.genai.types import FunctionDeclaration, GenerateContentConfig, Part, Tool
 import streamlit as st
-from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
+MODEL_ID = "gemini-2.0-flash-001"
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
@@ -75,11 +77,7 @@ sql_query_tool = Tool(
     ],
 )
 
-model = GenerativeModel(
-    "gemini-1.5-pro",
-    generation_config={"temperature": 0},
-    tools=[sql_query_tool],
-)
+client = genai.Client(vertexai=True)
 
 st.set_page_config(
     page_title="SQL Talk with BigQuery",
@@ -96,7 +94,7 @@ with col2:
 st.subheader("Powered by Function Calling in Gemini")
 
 st.markdown(
-    "[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)   •   [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)   •   [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)   •   [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"
+    "[Source Code](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/function-calling/sql-talk-app/)   •   [Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)   •   [Codelab](https://codelabs.developers.google.com/codelabs/gemini-function-calling)   •   [Sample Notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/function-calling/intro_function_calling.ipynb)"
 )
 
 with st.expander("Sample prompts", expanded=True):
@@ -130,7 +128,10 @@ if prompt := st.chat_input("Ask me about information in the database..."):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        chat = model.start_chat()
+        chat = client.chats.create(
+            model=MODEL_ID,
+            config=GenerateContentConfig(temperature=0, tools=[sql_query_tool]),
+        )
         client = bigquery.Client()
 
         prompt += """
