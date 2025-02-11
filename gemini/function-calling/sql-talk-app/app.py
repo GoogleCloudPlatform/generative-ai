@@ -1,3 +1,5 @@
+# pylint: disable=broad-exception-caught,invalid-name
+
 import time
 
 from google import genai
