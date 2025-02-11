@@ -9,6 +9,7 @@ import streamlit as st
 
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
 MODEL_ID = "gemini-1.5-pro"
+LOCATION = "us-central1"
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
@@ -79,7 +80,7 @@ sql_query_tool = Tool(
     ],
 )
 
-client = genai.Client(vertexai=True)
+client = genai.Client(vertexai=True, location=LOCATION)
 
 st.set_page_config(
     page_title="SQL Talk with BigQuery",

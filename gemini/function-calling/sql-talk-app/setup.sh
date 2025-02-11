@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Set default region
-export GOOGLE_CLOUD_LOCATION=us-central1
-
 # Enable Vertex AI and BigQuery
 gcloud services enable aiplatform.googleapis.com
 gcloud services enable bigquery.googleapis.com
