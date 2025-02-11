@@ -1,12 +1,12 @@
 import time
 
-from google.cloud import bigquery
 from google import genai
+from google.cloud import bigquery
 from google.genai.types import FunctionDeclaration, GenerateContentConfig, Part, Tool
 import streamlit as st
 
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
-MODEL_ID = "gemini-2.0-flash-001"
+MODEL_ID = "gemini-1.5-pro"
 
 list_datasets_func = FunctionDeclaration(
     name="list_datasets",
