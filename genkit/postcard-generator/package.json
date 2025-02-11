@@ -52,7 +52,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "esbuild": "^0.23.1",
+    "esbuild": "^0.25.0",
     "eslint": "^9.11.1",
     "eslint-config-next": "15.0.1",
     "eslint-define-config": "^2.1.0",
