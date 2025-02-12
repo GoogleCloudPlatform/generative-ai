@@ -168,18 +168,12 @@
 .top-nav {
     height: 60px;
     background-color: white;
-    // box-shadow: (0px 4px 16px rgba(195, 209, 226, 0.25));
-
 
     .parent-container {
-        // width: 1600px;
         display: flex;
-        margin: auto;
         justify-content: space-between;
-        /* border: 1px solid black; */
-        height: 100%;
         align-items: center;
-        padding: 0% 1.5%;
+        padding: 1rem 3rem;
 
         .left-heading {
             display: flex;
@@ -477,7 +471,6 @@
         flex-grow: 1;
         display: flex;
         align-items: center;
-        padding-left: 2%;
 
         input {
             width: 100%;
@@ -494,6 +487,7 @@
             font-size: 0.95rem;
             line-height: 1.1rem;
             color: #534646;
+            margin-left: 20px;
         }
 
         input::-webkit-scrollbar {

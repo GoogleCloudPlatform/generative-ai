@@ -80,3 +80,49 @@
 div {
     font-family: "Google Sans", sans-serif !important;
 }
+
+.video-embed-player {
+    position: fixed;
+    top: 20vh;
+    left: -50vw;
+    z-index: -10000;
+    overflow: hidden;
+    width: 200vw;
+}
+
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) { 
+    
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) { 
+    .video-embed-player {
+        top: 20vh;
+        width: 150vw;
+        left: -25vw;
+    }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) { 
+    .video-embed-player {
+        top: 10vh;
+    }
+}
+
+// X-Large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) { 
+    .video-embed-player {
+        left: 0;
+        width: 100vw;
+    }
+}
+
+// XX-Large devices (larger desktops, 1400px and up)
+@media (min-width: 1400px) { 
+    .video-embed-player {
+        top: 0;
+    }
+}

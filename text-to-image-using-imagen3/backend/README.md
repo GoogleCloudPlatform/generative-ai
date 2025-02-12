@@ -1,7 +1,7 @@
 # QuickBotApp text-to-image-using-imagen3
 
 ## Setting up
-### 1. Create virtualenv and install dependencies
+### 1. Create virtualenv inside the backend folder and install dependencies
 Create a virtual environment on the root of the application, activate it and install the requirements
 ```
 # check if you are already in the env
@@ -58,13 +58,7 @@ env
 You should see the new env variables set there
 
 
-
-### 4. Running the set up script
-```
-python3 setup.py
-```
-
-### 5. Run the application
+### 4. Run the application
 Finally run using uvicorn
 ```
 uvicorn main:app --reload --port 8080

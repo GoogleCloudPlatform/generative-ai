@@ -73,12 +73,20 @@ export class SearchResultsComponent implements OnDestroy {
 
   searchTerm(term: string) {
     this.userService.showLoading();
+    this.serachResult = [];
+    this.summary = '';
+    this.documents = [];
+    this.images = [];
     this.router.navigate(['/search'], { queryParams: { q: term }});
 
     this.service.search(term).subscribe({
       next : (searchResponse: any)=>{
-      this.serachResult = searchResponse.results;
-      this.summary = searchResponse.summary;
+      console.log("[searchTerm]:", searchResponse)
+      this.summary = searchResponse?.[0]?.enhancedPrompt || "";
+      this.documents = searchResponse
+      this.serachResult.forEach((element: GeneratedImage) => {
+      this.images.push(element.image?.encodedImage);
+    });
       this.userService.hideLoading();
       },
       error : ()=>{
@@ -109,7 +117,6 @@ export class SearchResultsComponent implements OnDestroy {
   }
 
   get pagedDocuments() {
-    console.log("[pagedDocuments] documents:", this.documents)
     const startIndex = this.currentPage * this.pageSize;
     return this.documents.slice(startIndex, startIndex + this.pageSize);
   }

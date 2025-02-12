@@ -46,18 +46,13 @@
 }
 
 .parent-container {
-    // background-position: bottom;
-    // background-image: url("../../../assets/images/footer.png");
-    // background-repeat: no-repeat;
-    // background-size: 30%;
-    // height: calc(100% - 60px);
-    // overflow: auto;
     display: flex;
     max-height: calc(100vh - 70px);
-    height: 100%;
+    height: 90vh;
     font-family: 'Google Sans', sans-serif !important;
     overflow-y: auto;
     flex-direction: column;
+    justify-content: center;
 
     .img-globe {
         // position:absolute;
@@ -66,16 +61,10 @@
 }
 
 .wrapping-container {
-    margin-top: 6%;
     width: 100%;
-    padding-bottom: 1.5%;
 }
 
 .main-div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
     font-family: 'Google Sans', sans-serif !important;
 }
 
@@ -195,9 +184,7 @@ h2 {
 
 .sub-heading {
     font-family: 'Google Sans', sans-serif;
-    width: 66%;
     color: #161A1D;
-    text-align: center;
     font-size: 30px;
     line-height: 40px;
     margin-top: -20px;
@@ -224,23 +211,19 @@ h2 {
     align-items: center;
     width: 100%;
     justify-content: center;
-    padding-bottom: 4.7%;
-    padding-top: 1.7%;
 
     .chat-footer {
-        min-height: 60px;
         display: flex;
         border: 1px solid #DDE6F6;
         box-shadow: 0px 4px 18px rgba(195, 209, 226, 0.25);
-        border-radius: 30px;
-        width: 66%;
-        // box-shadow: 5px 4px 24px rgba(66, 133, 244, 0.15);
+        border-radius: 20px;
+        width: 80%;
+        backdrop-filter: blur(10px);
 
         .chat-textarea {
             flex-grow: 1;
             display: flex;
             align-items: center;
-            padding-left: 2%;
 
             input {
                 width: 100%;
@@ -257,6 +240,7 @@ h2 {
                 font-size: 0.95rem;
                 line-height: 1.1rem;
                 color: #534646;
+                margin-left: 20px;
             }
 
             input::-webkit-scrollbar {
@@ -476,7 +460,7 @@ h2 {
 .helper-container {
     white-space: nowrap;
     overflow: hidden;
-    font-size: 3.5rem;
+    font-size: 1.5rem;
     font-weight: 400;
     line-height: 4rem;
     font-family: Google Sans, Helvetica Neue, sans-serif;
@@ -977,3 +961,39 @@ h2 {
 .suggested-question-container {
     width: 60%;
 }
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) { 
+    .helper-container {
+        font-size: 2rem;
+    }
+ }
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) { 
+    .chat-footer-outer {    
+        .chat-footer {
+            min-height: 60px;
+            width: 66%; 
+        }
+    }
+
+    .helper-container {
+        font-size: 3.5rem;
+    }
+ }
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) { 
+    
+ }
+
+// X-Large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) { 
+    
+ }
+
+// XX-Large devices (larger desktops, 1400px and up)
+@media (min-width: 1400px) { 
+    
+ }
