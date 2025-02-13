@@ -1,30 +1,31 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { 
-  height: 100%; 
-  margin: 0; 
-  font-family: 'Google Sans', sans-serif !important; 
-  overflow: hidden; 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Google Sans', sans-serif !important;
+  overflow: hidden;
 }
 
 .material-symbols-rounded {
-font-variation-settings:
-'FILL',
-'wght' 600,
-'GRAD' 0,
-'opsz' 48
+  font-variation-settings:
+    'FILL',
+    'wght' 600,
+    'GRAD' 0,
+    'opsz' 48;
 }
 
-.tooltip-list .mdc-tooltip__surface  {
-    white-space: pre;
-    max-width: unset !important;
+.tooltip-list .mdc-tooltip__surface {
+  white-space: pre;
+  max-width: unset !important;
 }
 
 .mat-mdc-slide-toggle.mat-accent {
-  --mdc-switch-selected-focus-state-layer-color: #4285F4;
-  --mdc-switch-selected-handle-color: #4285F4;
-  --mdc-switch-selected-hover-state-layer-color: #4285F4;
-  --mdc-switch-selected-pressed-state-layer-color: #4285F4;
+  --mdc-switch-selected-focus-state-layer-color: #4285f4;
+  --mdc-switch-selected-handle-color: #4285f4;
+  --mdc-switch-selected-hover-state-layer-color: #4285f4;
+  --mdc-switch-selected-pressed-state-layer-color: #4285f4;
   --mdc-switch-selected-focus-handle-color: #3f74e0;
   --mdc-switch-selected-hover-handle-color: #3f74e0;
   --mdc-switch-selected-pressed-handle-color: #3f74e0;
@@ -41,10 +42,10 @@ font-variation-settings:
 
 .mat-mdc-checkbox.mat-accent {
   --mdc-checkbox-selected-checkmark-color: #fff;
-  --mdc-checkbox-selected-focus-icon-color: #4285F4;
-  --mdc-checkbox-selected-hover-icon-color: #4285F4;
-  --mdc-checkbox-selected-icon-color: #4285F4;
-  --mdc-checkbox-selected-pressed-icon-color: #4285F4;
+  --mdc-checkbox-selected-focus-icon-color: #4285f4;
+  --mdc-checkbox-selected-hover-icon-color: #4285f4;
+  --mdc-checkbox-selected-icon-color: #4285f4;
+  --mdc-checkbox-selected-pressed-icon-color: #4285f4;
   --mdc-checkbox-unselected-focus-icon-color: #212121;
   --mdc-checkbox-unselected-hover-icon-color: #212121;
   --mdc-checkbox-disabled-selected-icon-color: rgba(0, 0, 0, 0.38);

@@ -1,5 +1,5 @@
-import { Component, Inject,ViewEncapsulation } from '@angular/core';
-import {MatSnackBar, MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
+import {Component, Inject, ViewEncapsulation} from '@angular/core';
+import {MatSnackBar, MAT_SNACK_BAR_DATA} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-toast-message',
@@ -8,19 +8,17 @@ import {MatSnackBar, MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
   encapsulation: ViewEncapsulation.None,
 })
 export class ToastMessageComponent {
-
-  text: string
-  icon: string
+  text: string;
+  icon: string;
   constructor(
     private _snackBar: MatSnackBar,
     @Inject(MAT_SNACK_BAR_DATA) public snackBarData: any
   ) {
-    this.text = snackBarData.text
-    this.icon = snackBarData.icon
+    this.text = snackBarData.text;
+    this.icon = snackBarData.icon;
   }
 
   closeToast() {
-    this._snackBar.dismiss()
+    this._snackBar.dismiss();
   }
-
 }

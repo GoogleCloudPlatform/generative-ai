@@ -1,12 +1,21 @@
-import { Component, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
-import { SearchService } from 'src/app/services/search.service';
+import {Component, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
+import {SearchService} from 'src/app/services/search.service';
 import {ReplaySubject, takeUntil} from 'rxjs';
-import { UserService } from 'src/app/services/user/user.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { search_document_type, search_image_type, PDF, image_name } from 'src/environments/constant';
-import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
-import { MatDialog } from '@angular/material/dialog';
-import { GeneratedImage } from 'src/app/models/generated-image.model';
+import {UserService} from 'src/app/services/user/user.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {
+  search_document_type,
+  search_image_type,
+  PDF,
+  image_name,
+} from 'src/environments/constant';
+import {
+  DomSanitizer,
+  SafeResourceUrl,
+  SafeUrl,
+} from '@angular/platform-browser';
+import {MatDialog} from '@angular/material/dialog';
+import {GeneratedImage} from 'src/app/models/generated-image.model';
 
 @Component({
   selector: 'app-search-results',
@@ -14,61 +23,60 @@ import { GeneratedImage } from 'src/app/models/generated-image.model';
   styleUrls: ['./search-results.component.scss'],
 })
 export class SearchResultsComponent implements OnDestroy {
-  @ViewChild('preview', { static: true })
+  @ViewChild('preview', {static: true})
   previewRef!: TemplateRef<{}>;
-  summary: string = '';
+  summary = '';
   private readonly destroyed = new ReplaySubject<void>(1);
-  serachResult : any = [];
-  documents : any = [];
-  images : any = [];
+  serachResult: any = [];
+  documents: any = [];
+  images: any = [];
   pdf = PDF;
   imageName = image_name;
-  documentURL: SafeResourceUrl;
+  documentURL: SafeResourceUrl | undefined;
   openPreviewDocument: any;
   currentPage = 0;
   pageSize = 4;
   selectedDocument: any;
-  safeUrl: SafeUrl;
+  safeUrl: SafeUrl | undefined;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private service : SearchService,
+    private service: SearchService,
     private userService: UserService,
-    private dialog : MatDialog,
-    private sanitizer: DomSanitizer,
-  ){
+    private dialog: MatDialog,
+    private sanitizer: DomSanitizer
+  ) {
     const query = this.route.snapshot.queryParamMap.get('q');
     this.userService.showLoading();
 
     this.service.search(query!).subscribe({
-      next : (searchResponse: GeneratedImage[])=>{
-      this.summary = searchResponse?.[0]?.enhancedPrompt || "";
-      this.documents = searchResponse
-      this.serachResult.forEach((element: GeneratedImage) => {
-        this.images.push(element.image?.encodedImage);
-      });
+      next: (searchResponse: GeneratedImage[]) => {
+        this.summary = searchResponse?.[0]?.enhancedPrompt || '';
+        this.documents = searchResponse;
+        this.serachResult.forEach((element: GeneratedImage) => {
+          this.images.push(element.image?.encodedImage);
+        });
 
-      this.userService.hideLoading();
-      }
-      ,
-      error : ()=>{
         this.userService.hideLoading();
-      }
+      },
+      error: () => {
+        this.userService.hideLoading();
+      },
     });
   }
 
   getImage = (term: string) => {
-    const searchResponse: any = this.service.search(term)
+    const searchResponse: any = this.service.search(term);
 
-    this.summary = searchResponse?.[0]?.enhancedPrompt || "";
-    this.documents = searchResponse
+    this.summary = searchResponse?.[0]?.enhancedPrompt || '';
+    this.documents = searchResponse;
     this.serachResult.forEach((element: GeneratedImage) => {
       this.images.push(element.image?.encodedImage);
     });
 
     this.userService.hideLoading();
-    }
+  };
 
   searchTerm(term: string) {
     this.userService.showLoading();
@@ -76,32 +84,34 @@ export class SearchResultsComponent implements OnDestroy {
     this.summary = '';
     this.documents = [];
     this.images = [];
-    this.router.navigate(['/search'], { queryParams: { q: term }});
+    this.router.navigate(['/search'], {queryParams: {q: term}});
 
     this.service.search(term).subscribe({
-      next : (searchResponse: any)=>{
-      this.summary = searchResponse?.[0]?.enhancedPrompt || "";
-      this.documents = searchResponse
-      this.serachResult.forEach((element: GeneratedImage) => {
-      this.images.push(element.image?.encodedImage);
-    });
-      this.userService.hideLoading();
-      },
-      error : ()=>{
+      next: (searchResponse: any) => {
+        this.summary = searchResponse?.[0]?.enhancedPrompt || '';
+        this.documents = searchResponse;
+        this.serachResult.forEach((element: GeneratedImage) => {
+          this.images.push(element.image?.encodedImage);
+        });
         this.userService.hideLoading();
-      }
+      },
+      error: () => {
+        this.userService.hideLoading();
+      },
     });
   }
 
   openNewWindow(link: string) {
-    window.open(link, "_blank")
+    window.open(link, '_blank');
   }
 
-  previewDocument(event: any, document: any){
+  previewDocument(event: any, document: any) {
     event.stopPropagation();
-    if(document.link.endsWith(".pdf") || document.link.endsWith(".docx")) {
+    if (document.link.endsWith('.pdf') || document.link.endsWith('.docx')) {
       this.selectedDocument = document;
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDocument.link);
+      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        this.selectedDocument.link
+      );
     }
   }
 
@@ -109,7 +119,7 @@ export class SearchResultsComponent implements OnDestroy {
     this.selectedDocument = undefined;
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.destroyed.next();
     this.destroyed.complete();
   }
@@ -134,5 +144,4 @@ export class SearchResultsComponent implements OnDestroy {
       this.currentPage--;
     }
   }
-
 }

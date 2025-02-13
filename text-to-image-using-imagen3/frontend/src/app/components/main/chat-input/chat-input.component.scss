@@ -20,7 +20,7 @@
       resize: none;
       outline: none;
       padding: 14px;
-      font-family: "Google Sans", sans-serif !important;
+      font-family: 'Google Sans', sans-serif !important;
       box-sizing: border-box;
       -ms-overflow-style: none;
       scrollbar-width: none;
@@ -68,14 +68,13 @@
   border-radius: 15px;
 
   /* Blue */
-  background: #4285F4;
+  background: #4285f4;
   animation: blue-transform 2s infinite;
-
 }
 
 .green-dot {
   content: '';
-  width:8px;
+  width: 8px;
   height: 8px;
   left: 1522px;
   top: 445px;
@@ -83,7 +82,7 @@
   border-radius: 15px;
 
   /* Green */
-  background: #0F9D58;
+  background: #0f9d58;
   animation: green-transform 2s infinite;
 }
 
@@ -97,36 +96,34 @@
   border-radius: 15px;
 
   /* Yellow */
-  background: #F4B400;
+  background: #f4b400;
   animation: yellow-transform 2s infinite;
 }
 
 // Small devices (landscape phones, 576px and up)
-@media (min-width: 576px) { 
-    
+@media (min-width: 576px) {
 }
 
 // Medium devices (tablets, 768px and up)
-@media (min-width: 768px) { 
+@media (min-width: 768px) {
   .chat-footer {
     min-width: 720px;
   }
 }
 
 // Large devices (desktops, 992px and up)
-@media (min-width: 992px) { 
+@media (min-width: 992px) {
   .chat-footer {
     width: 60vw;
   }
 }
 
 // X-Large devices (large desktops, 1200px and up)
-@media (min-width: 1200px) { 
-   
+@media (min-width: 1200px) {
 }
 
 // XX-Large devices (larger desktops, 1400px and up)
-@media (min-width: 1400px) { 
+@media (min-width: 1400px) {
   .chat-footer {
     width: 50vw;
   }

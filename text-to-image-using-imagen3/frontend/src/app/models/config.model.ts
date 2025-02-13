@@ -1,4 +1,4 @@
 export type config = {
-    name: string;
-    url: string;
-}
+  name: string;
+  url: string;
+};

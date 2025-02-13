@@ -4,13 +4,14 @@
     <div class="main-div">
       <div class="sub-heading">
         <div class="name-container">
-          Hey, {{savedUser.name ? savedUser.name!.split(" ")[0]+'!' : ''}}
+          Hey, {{ savedUser.name ? savedUser.name!.split(' ')[0] + '!' : '' }}
         </div>
         <div class="helper-container">How can I help you today?</div>
       </div>
     </div>
-</div>
+  </div>
 
-<div class="chat-footer-outer">
-  <app-chat-input (emitSearch)="this.goToResults($event)"></app-chat-input>
+  <div class="chat-footer-outer">
+    <app-chat-input (emitSearch)="this.goToResults($event)"></app-chat-input>
+  </div>
 </div>

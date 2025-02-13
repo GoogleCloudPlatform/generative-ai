@@ -1,19 +1,29 @@
 <app-header (emitSearch)="this.searchTerm($event)"></app-header>
 
-<mat-grid-list cols="1" rowHeight="75vh" *ngIf="documents.length>0">
-  <mat-grid-tile style="width: 60vw;">
+<mat-grid-list cols="1" rowHeight="75vh" *ngIf="documents.length > 0">
+  <mat-grid-tile style="width: 60vw">
     <div class="image-generation-container">
       <div class="image-preview">
-        <div style="display: flex; justify-content: space-between;">
-          <div class="thumbnail" *ngFor="let result of pagedDocuments" (click)="openNewWindow(result.link)">
+        <div style="display: flex; justify-content: space-between">
+          <div
+            class="thumbnail"
+            *ngFor="let result of pagedDocuments"
+            (click)="openNewWindow(result.link)"
+          >
             <div class="thumbnail-placeholder">
-              <img src="data:image/png;base64,{{result.image.encodedImage}}"/>
+              <img
+                src="data:image/png;base64,{{ result.image.encodedImage }}"
+              />
             </div>
           </div>
         </div>
         <div class="main-image">
           <div class="main-image-placeholder">
-            <img src="data:image/png;base64,{{pagedDocuments[3].image.encodedImage}}"/>
+            <img
+              src="data:image/png;base64,{{
+                pagedDocuments[3].image.encodedImage
+              }}"
+            />
           </div>
         </div>
       </div>
@@ -22,7 +32,9 @@
         <mat-form-field>
           <mat-label>Select Model</mat-label>
           <mat-select>
-            <mat-option value="model1" selected>imagen-3.0-generate-001</mat-option>
+            <mat-option value="model1" selected
+              >imagen-3.0-generate-001</mat-option
+            >
             <mat-option value="model2">imagen-3.0-fast-generate-001</mat-option>
             <mat-option value="model3">imagen-3.0-generate-002</mat-option>
             <mat-option value="model4">imagegeneration&#64;006</mat-option>
@@ -48,7 +60,7 @@
         </div>
 
         <div class="number-results">
-          <mat-label style="padding-right: 1rem;">Number of Results</mat-label>
+          <mat-label style="padding-right: 1rem">Number of Results</mat-label>
           <mat-slider min="1" max="5" step="1" thumbLabel></mat-slider>
         </div>
       </div>
