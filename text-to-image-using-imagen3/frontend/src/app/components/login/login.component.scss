@@ -22,15 +22,17 @@
         font-style: normal;
         font-weight: 500;
         line-height: 150.7%;
-        color: rgba(45, 44, 44, 0.7490196078);
+        color: white;
     }
 
     .left-container {
+        background-image: url("../../../assets/images/colibri_image_fx.jpg"), url("../../../assets/images/crane_image_fx.jpg");
+        background-repeat: no-repeat, repeat;
+        background-size: contain, contain;
         flex: 0 1 55%;
         min-height: 100%;
         max-width: 60%;
         align-items: center;
-        background: #fafcfe;
         padding: .5em;
         overflow: auto;
         display: flex;
@@ -76,6 +78,9 @@
     }
 
     .right-container {
+        background-image: url("../../../assets/images/hot_air_baloon_image_fx.jpg");
+        background-repeat: repeat;
+        background-size: cover;
         flex: 0 1 45%;
         min-height: 100%;
         max-width: 80%;
@@ -86,11 +91,13 @@
         scrollbar-width: thin;
 
         .login-card {
+            backdrop-filter: blur(10px);
             flex-direction: column;
             display: flex;
             max-width: 100%;
             padding: 3%;
             margin: auto;
+            text-align: center;
 
             .logo-icon {
                 height: 145px;

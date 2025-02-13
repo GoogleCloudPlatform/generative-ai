@@ -46,8 +46,6 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import {NgIdleModule} from '@ng-idle/core';
 import {ClipboardModule} from '@angular/cdk/clipboard';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
-import { ManageSearchApplicationComponent } from './components/search-application/manage-search-application/manage-search-application.component';
-import { SearchApplicationFormComponent } from './components/search-application/search-application-form/search-application-form.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 
@@ -73,8 +71,6 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     ChatInputComponent,
     SearchResultsComponent,
     ToastMessageComponent,
-    SearchApplicationFormComponent,
-    ManageSearchApplicationComponent,
     TruncatePipe,
   ],
   imports: [

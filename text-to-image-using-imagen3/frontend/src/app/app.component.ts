@@ -24,7 +24,6 @@ export class AppComponent {
     this.router.events.subscribe(
       (event: NavigationEvent) => {
         if (event instanceof NavigationEnd) {
-          console.log("event.url", event.url)
           if (event.url == "/") this.showVideo = true;
 
           if (event.url == '/login' || event.url == '/login/e2e' || (event.url.includes('login') && event.url.includes('email')) || (event.url.includes('login') && event.url.includes('tos')) || event.url.includes('reset-password') || event.url.includes('support-ticket')) {
@@ -42,8 +41,6 @@ export class AppComponent {
     this.userService.loadingSubject.subscribe(
       loadingValue => {
         this.showLoading = loadingValue;
-        console.log("this.showVideo", this.showVideo)
-        console.log("loadingValue", loadingValue)
         this.showVideo = loadingValue;
       }
     );

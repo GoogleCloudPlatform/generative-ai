@@ -56,15 +56,14 @@ export class ChatInputComponent {
 
   async sendAudioToGCP() {
     const audioBlob = new Blob(this.audioChunks);
-    // console.log(audioBlob);
     (await this.speechToTextService.transcribeAudio(audioBlob)).subscribe(
       (response: any) => {
-        // console.log(response)
         this.term = response[0]
         this.searchTerm()
       },
       (error: any) => {
         // Handle errors
+        console.error('Error transcribing audio:', error)
       }
     );
   }

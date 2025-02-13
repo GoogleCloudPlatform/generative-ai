@@ -60,7 +60,6 @@ export class SearchResultsComponent implements OnDestroy {
 
   getImage = (term: string) => {
     const searchResponse: any = this.service.search(term)
-    console.log("[searchResponse]:", searchResponse)
 
     this.summary = searchResponse?.[0]?.enhancedPrompt || "";
     this.documents = searchResponse
@@ -81,7 +80,6 @@ export class SearchResultsComponent implements OnDestroy {
 
     this.service.search(term).subscribe({
       next : (searchResponse: any)=>{
-      console.log("[searchTerm]:", searchResponse)
       this.summary = searchResponse?.[0]?.enhancedPrompt || "";
       this.documents = searchResponse
       this.serachResult.forEach((element: GeneratedImage) => {

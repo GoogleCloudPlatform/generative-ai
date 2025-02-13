@@ -36,6 +36,8 @@ export class LoginComponent {
 
   loginWithGoogle() {
     this.loader = true;
+    console.log("this.auth", this.auth)
+    console.log("this.provider", this.provider)
     signInWithPopup(this.auth, this.provider)
       .then((result: any) => {
         const user = result.user.toJSON();
