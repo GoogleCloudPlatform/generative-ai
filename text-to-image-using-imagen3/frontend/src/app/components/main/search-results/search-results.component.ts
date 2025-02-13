@@ -26,7 +26,7 @@ export class SearchResultsComponent implements OnDestroy {
   documentURL: SafeResourceUrl;
   openPreviewDocument: any;
   currentPage = 0;
-  pageSize = 3;
+  pageSize = 4;
   selectedDocument: any;
   safeUrl: SafeUrl;
 
