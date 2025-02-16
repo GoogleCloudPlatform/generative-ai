@@ -13,11 +13,9 @@ const searchURL = `${environment.backendURL}/search`;
 export class SearchService {
   constructor(private http: HttpClient) {}
 
-  search(term: string) {
-    const request: SearchRequest = {term: term};
-
+  search(searchRequest: SearchRequest) {
     return this.http
-      .post(searchURL, request)
+      .post(searchURL, searchRequest)
       .pipe(map(response => response as GeneratedImage[]));
   }
 }

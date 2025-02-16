@@ -293,7 +293,7 @@
 
 .image-generation-container {
   display: flex;
-  width: 50%;
+  width: 75%;
 
   .image-preview {
     flex: 1;
@@ -304,6 +304,7 @@
       width: 100px;
       height: 100px;
       margin-bottom: 10px;
+      cursor: pointer;
 
       .thumbnail-placeholder {
         width: 100%;
@@ -352,8 +353,31 @@
       margin-bottom: 20px;
 
       button {
-        margin-right: 10px;
+        margin: 0 10px 10px 0;
       }
     }
+  }
+}
+
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) { }
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) { }
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) { }
+
+// X-Large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+
+}
+
+// XX-Large devices (larger desktops, 1400px and up)
+@media (min-width: 1400px) {
+  .image-generation-container {
+    width: 60%;
+    padding-top: 10rem;
   }
 }

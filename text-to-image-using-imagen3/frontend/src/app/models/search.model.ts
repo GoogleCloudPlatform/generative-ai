@@ -1,5 +1,7 @@
 export type SearchRequest = {
   term: string;
+  model: string;
+  aspectRatio: string;
 };
 
 export type SearchResponse = {

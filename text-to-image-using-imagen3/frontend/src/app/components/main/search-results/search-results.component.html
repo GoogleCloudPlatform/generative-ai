@@ -1,4 +1,4 @@
-<app-header (emitSearch)="this.searchTerm($event)"></app-header>
+<app-header (emitSearch)="this.searchTerm({ term: $event })"></app-header>
 
 <mat-grid-list cols="1" rowHeight="75vh" *ngIf="documents.length > 0">
   <mat-grid-tile style="width: 60vw">
@@ -8,11 +8,16 @@
           <div
             class="thumbnail"
             *ngFor="let result of pagedDocuments"
-            (click)="openNewWindow(result.link)"
+            (click)="changeImageSelection(result)"
           >
             <div class="thumbnail-placeholder">
               <img
                 src="data:image/png;base64,{{ result.image.encodedImage }}"
+                *ngIf="!showDefaultDocuments && documents.length > 0"
+              />
+              <img
+                src="{{ result.image.encodedImage }}"
+                *ngIf="showDefaultDocuments"
               />
             </div>
           </div>
@@ -21,8 +26,13 @@
           <div class="main-image-placeholder">
             <img
               src="data:image/png;base64,{{
-                pagedDocuments[3].image.encodedImage
+                selectedResult?.image?.encodedImage || ''
               }}"
+              *ngIf="!showDefaultDocuments && documents.length > 0"
+            />
+            <img
+              src="{{ pagedDocuments[0]?.image?.encodedImage }}"
+              *ngIf="showDefaultDocuments"
             />
           </div>
         </div>
@@ -30,25 +40,18 @@
 
       <div class="configuration">
         <mat-form-field>
-          <mat-label>Select Model</mat-label>
-          <mat-select>
-            <mat-option value="model1" selected
-              >imagen-3.0-generate-001</mat-option
-            >
-            <mat-option value="model2">imagen-3.0-fast-generate-001</mat-option>
-            <mat-option value="model3">imagen-3.0-generate-002</mat-option>
-            <mat-option value="model4">imagegeneration&#64;006</mat-option>
-            <mat-option value="model5">imagegeneration&#64;005</mat-option>
-            <mat-option value="model6">imagegeneration&#64;002</mat-option>
+          <mat-label>AI Model</mat-label>
+          <mat-select [(value)]="selectedModel">
+              <mat-option *ngFor="let model of imagen3ModelsList" [value]="model.value" (click)="changeImagen3Model(model)">
+                {{model.viewValue}}
+              </mat-option>
           </mat-select>
         </mat-form-field>
 
         <div class="aspect-ratio">
-          <button mat-button class="aspect-button">1:1</button>
-          <button mat-button class="aspect-button">9:16</button>
-          <button mat-button class="aspect-button">16:9</button>
-          <button mat-button class="aspect-button">2:4</button>
-          <button mat-button class="aspect-button">4:1</button>
+          <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button class="aspect-button" (click)="changeAspectRatio(ratio)">
+            {{ratio?.value}}
+          </button>
         </div>
 
         <div class="image-style">
@@ -59,9 +62,12 @@
           <button mat-raised-button class="style-button">Fantasy</button>
         </div>
 
+
         <div class="number-results">
           <mat-label style="padding-right: 1rem">Number of Results</mat-label>
-          <mat-slider min="1" max="5" step="1" thumbLabel></mat-slider>
+          <mat-slider min="0" max="5" step="1" showTickMarks discrete>
+            <input matSliderThumb>
+          </mat-slider>
         </div>
       </div>
     </div>
