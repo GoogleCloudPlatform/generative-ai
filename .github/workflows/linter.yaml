@@ -10,9 +10,6 @@ name: Lint Code Base
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 #
 
-#############################
-# Start the job on all push #
-#############################
 on:
   push:
     branches-ignore: [main]
@@ -20,14 +17,15 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 ###############
 # Set the Job #
 ###############
 jobs:
-  build:
-    # Name the Job
+  lint:
     name: Lint Code Base
-    # Set the agent to run on
     runs-on: ubuntu-latest
 
     ##################
@@ -60,3 +58,57 @@ jobs:
           VALIDATE_CHECKOV: false
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+
+  fix-lint-issues:
+    name: Fix Lint Issues
+    permissions:
+      contents: write
+      statuses: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.LINTER_ACCESS_TOKEN }}
+
+      - name: Super-Linter
+        uses: super-linter/super-linter/slim@v7
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FILTER_REGEX_EXCLUDE: 'gemini/sample-apps/finance-advisor-spanner/.*\.sql'
+          SHELLCHECK_OPTS: -e SC1091 -e 2086
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_PYTHON_PYINK: false
+          VALIDATE_CHECKOV: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_TYPESCRIPT_STANDARD: false
+
+          FIX_CSS: true
+          FIX_GOOGLE_JAVA_FORMAT: true
+          FIX_JAVASCRIPT_ES: true
+          FIX_JAVASCRIPT_PRETTIER: true
+          FIX_MARKDOWN: true
+          FIX_PYTHON_BLACK: true
+          FIX_PYTHON_ISORT: true
+          FIX_PYTHON_RUFF: true
+          FIX_SHELL_SHFMT: true
+          FIX_TYPESCRIPT_ES: true
+          FIX_TYPESCRIPT_PRETTIER: true
+          FIX_YAML_PRETTIER: true
+          # To reuse the same Super-linter configuration that you use in the
+          # lint job without duplicating it, see
+          # https://github.com/super-linter/super-linter/blob/main/docs/run-linter-locally.md#share-environment-variables-between-environments
+      - name: Commit and push linting fixes
+        # Run only on:
+        # - Pull requests
+        # - Not on the default branch
+        if: >
+          github.event_name == 'pull_request' &&
+          github.ref_name != github.event.repository.default_branch
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: ${{ github.event.pull_request.head.ref || github.head_ref || github.ref }}
+          commit_message: "chore: fix linting issues"
+          commit_user_name: super-linter
+          commit_user_email: super-linter@super-linter.dev
