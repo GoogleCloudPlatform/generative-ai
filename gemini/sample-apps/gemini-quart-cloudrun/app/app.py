@@ -22,9 +22,7 @@ from typing import Any, Dict
 
 from google.genai import Client
 from google.genai.live import AsyncSession
-from google.genai.types import (
-    LiveConnectConfig,
-)
+from google.genai.types import LiveConnectConfig
 from quart import Quart, Response, Websocket, send_from_directory, websocket
 
 logging.basicConfig(level=logging.INFO)
