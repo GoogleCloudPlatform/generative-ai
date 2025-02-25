@@ -857,6 +857,7 @@ maxcold
 mbsdk
 mdc
 mec
+mediapy
 meme
 memes
 mesop
@@ -1160,6 +1161,7 @@ vais
 vapo
 vectoral
 vectordb
+veo
 vesselin
 vllm
 vnc
