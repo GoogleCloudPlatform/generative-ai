@@ -179,10 +179,6 @@ augmented generation (RAG).
 
 The best explanation of embeddings I've seen
 
-- **[intro_Vertex_AI_embeddings.ipynb](../gemini/qa-ops/intro_Vertex_AI_embeddings.ipynb)**:
-  Introduces Vertex AI's text and multimodal embeddings APIs and demonstrates
-  their use in building a simple e-commerce search application with text,
-  image, and video queries.
 - **[hybrid-search.ipynb](../embeddings/hybrid-search.ipynb)**: Demonstrates
   hybrid search (combining semantic and keyword search) using Vertex AI Vector
   Search.
@@ -206,8 +202,6 @@ The best explanation of embeddings I've seen
 - **[intro-grounding.ipynb](../language/grounding/intro-grounding.ipynb)**:
   Demonstrates using the Vertex AI grounding feature to improve LLM response
   accuracy and relevance by grounding them in Google Search or custom Vertex AI Search data stores.
-- **[building_DIY_multimodal_qa_system_with_mRAG.ipynb](../gemini/qa-ops/building_DIY_multimodal_qa_system_with_mRAG.ipynb)**:
-  Builds a custom multimodal question-answering system using mRAG.
 - **[code_retrieval_augmented_generation.ipynb](../language/code/code_retrieval_augmented_generation.ipynb)**:
   Demonstrates RAG for code using Gemini, LangChain, FAISS, and the Vertex AI Embeddings API to enhance code generation by incorporating external
   knowledge from the Google Cloud Generative AI GitHub repository.
@@ -239,7 +233,7 @@ The best explanation of embeddings I've seen
 
 ### Open Models
 
-- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
+- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
   Demonstrates deploying Gemma 2 on Google Cloud Run with GPU acceleration
   using Ollama and LangChain, building a RAG question-answering application.
 

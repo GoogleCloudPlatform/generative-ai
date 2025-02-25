@@ -97,14 +97,6 @@ On Google Cloud, the Gemini API in Vertex AI provides a unified interface for in
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/question_answer/default/40px.svg" alt="question_answer">
-      <br>
-      <a href="qa-ops/"><code>qa-ops/</code></a>
-    </td>
-    <td>Learn about the question-answer operations available in Gemini</td>
-  </tr>
-  <tr>
-    <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg" alt="build">
       <br>
       <a href="reasoning-engine/"><code>reasoning-engine/</code></a>
