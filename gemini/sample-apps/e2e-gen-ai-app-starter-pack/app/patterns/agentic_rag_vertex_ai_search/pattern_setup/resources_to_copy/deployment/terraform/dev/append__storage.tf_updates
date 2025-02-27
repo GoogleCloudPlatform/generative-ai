@@ -1,0 +1,10 @@
+# ! Specific to Vertex AI Search pattern 
+resource "google_storage_bucket" "data_ingestion_PIPELINE_GCS_ROOT" {
+  name                        = "${var.dev_project_id}-pipeline-artifacts"
+  location                    = var.region
+  project                     = var.dev_project_id
+  uniform_bucket_level_access = true
+  force_destroy               = true
+
+  depends_on = [resource.google_project_service.services]
+}

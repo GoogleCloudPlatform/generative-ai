@@ -31,13 +31,9 @@ from consts import (
 )
 from ekg_utils import search_public_kg
 from flask import Flask, render_template, request
-from vais_utils import (
-    list_documents,
-    recommend_personalize,
-    search_enterprise_search,
-)
 from google.api_core.exceptions import ResourceExhausted
 import requests
+from vais_utils import list_documents, recommend_personalize, search_enterprise_search
 from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)

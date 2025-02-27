@@ -1,5 +1,17 @@
 # Function Calling in Gemini
 
+<!-- markdownlint-disable MD036 -->
+
+**YouTube Video: AI + your code: Function Calling**
+
+<!-- markdownlint-enable MD036 -->
+
+<!-- markdownlint-disable MD033 -->
+<a href="https://www.youtube.com/watch?v=NbAGbXr4DME&list=PLIivdWyY5sqLvGdVLJZh2EMax97_T-OIB" target="_blank">
+  <img src="https://img.youtube.com/vi/NbAGbXr4DME/maxresdefault.jpg" alt="AI + your code: Function Calling" width="500">
+</a>
+<!-- markdownlint-enable MD033 -->
+
 [Function Calling in Gemini](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling)
 lets developers create a description of a function in their code, then pass that
 description to a language model in a request. The response from the model

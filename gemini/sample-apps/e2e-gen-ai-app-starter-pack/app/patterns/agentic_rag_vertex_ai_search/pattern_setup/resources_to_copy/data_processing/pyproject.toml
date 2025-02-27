@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "data-processing-pipeline"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <your@email.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+kfp = "^2.10.1"
+google-cloud-aiplatform = "^1.72.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

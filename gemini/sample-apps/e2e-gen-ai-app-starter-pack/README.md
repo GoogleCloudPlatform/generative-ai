@@ -4,7 +4,7 @@
 
 |                                                                 |                                                                                                                                      |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **Authors**                                                     | [Elia Secchi](https://github.com/eliasecchig), [Lorenzo Spataro](https://github.com/lspataroG)                                       |
+| 📧 **Contact**                                                  | [e2e-gen-ai-app-starter-pack@google.com](mailto:e2e-gen-ai-app-starter-pack@google.com)                                              |
 | [**1-Minute Video Overview**](https://youtu.be/D_VQYTczBpc)     | [<img src="https://img.youtube.com/vi/D_VQYTczBpc/maxresdefault.jpg" width="100" alt="Preview Video">](https://youtu.be/D_VQYTczBpc) |
 | [**20-Minute Video Walkthrough**](https://youtu.be/kwRG7cnqSu0) | [<img src="https://img.youtube.com/vi/kwRG7cnqSu0/maxresdefault.jpg" width="100" alt="Preview Video">](https://youtu.be/kwRG7cnqSu0) |
 
@@ -93,6 +93,7 @@ This starter pack covers all aspects of Generative AI app development, from prot
 - Python >=3.10,<3.13
 - Google Cloud SDK installed and configured
 - [Poetry](https://python-poetry.org/docs/#installation) for dependency management
+- A development environment (e.g. your local IDE or, when running remotely on Google Cloud, [Cloud Shell](https://cloud.google.com/shell) or [Cloud Workstations](https://cloud.google.com/workstations)).
 
 ### Download the starter pack
 
@@ -195,7 +196,7 @@ If you encounter any issues or have specific suggestions, please first consider 
 
 ### Share Your Experience
 
-For other types of feedback, or if you'd like to share a positive experience or success story using this starter pack, we'd love to hear from you! You can reach out to us at [e2e-gen-ai-app-starter-pack@google.com](mailto:e2e-gen-ai-app-starter-pack@google.com).
+For other types of feedback, or if you'd like to share a positive experience or success story using this starter pack, we'd love to hear from you! You can reach out to us at <a href="mailto:e2e-gen-ai-app-starter-pack@google.com">e2e-gen-ai-app-starter-pack@google.com</a>.
 
 Thank you for your contributions!
 

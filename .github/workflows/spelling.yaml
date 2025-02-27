@@ -105,7 +105,7 @@ jobs:
           dictionary_source_prefixes: '{"cspell": "https://raw.githubusercontent.com/streetsidesoftware/cspell-dicts/main/dictionaries/"}'
           extra_dictionaries: |
             cspell:aws/dict/aws.txt
-            cspell:bash/src/bash-words.txt    
+            cspell:bash/samples/bash-words.txt
             cspell:companies/dict/companies.txt
             cspell:css/dict/css.txt
             cspell:data-science/dict/data-science-models.txt

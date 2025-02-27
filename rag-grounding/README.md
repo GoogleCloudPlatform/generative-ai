@@ -1,5 +1,17 @@
 # RAG and Grounding
 
+<!-- markdownlint-disable MD036 -->
+
+**YouTube Video: Introduction to grounding with Gemini on Vertex AI**
+
+<!-- markdownlint-enable MD036 -->
+
+<!-- markdownlint-disable MD033 -->
+<a href="https://www.youtube.com/watch?v=Ph0g6dnsB4g&list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx" target="_blank">
+  <img src="https://img.youtube.com/vi/Ph0g6dnsB4g/maxresdefault.jpg" alt="Introduction to grounding with Gemini on Vertex AI" width="500">
+</a>
+<!-- markdownlint-enable MD033 -->
+
 This directory provides a curated list of examples that explore Retrieval
 Augmented Generation (RAG), grounding techniques, knowledge bases, grounded
 generation, and related topics like vector search and semantic search.
@@ -98,8 +110,9 @@ data.
 - Vector Database Choices
   - **[rag_engine_feature_store.ipynb](../gemini/rag-engine/rag_engine_feature_store.ipynb)**: How to use RAG Engine with [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore/latest/overview)
   - **[rag_engine_pinecone.ipynb](../gemini/rag-engine/rag_engine_pinecone.ipynb)**: How to use RAG Engine with [Pinecone](https://www.pinecone.io/)
-  - **[rag_engine_vector_search.ipynb](../gemini/rag-engine/rag_engine_weaviate.ipynb)**: How to use RAG Engine with [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview)
+  - **[rag_engine_vector_search.ipynb](../gemini/rag-engine/rag_engine_vector_search.ipynb)**: How to use RAG Engine with [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/vector-search/overview)
   - **[rag_engine_weaviate.ipynb](../gemini/rag-engine/rag_engine_weaviate.ipynb)**: How to use RAG Engine with [Weaviate](https://weaviate.io/)
+- **[rag_engine_vertex_ai_search.ipynb](../gemini/rag-engine/rag_engine_vertex_ai_search.ipynb)**: How to use RAG Engine with [Vertex AI Search](https://cloud.google.com/generative-ai-app-builder/docs/enterprise-search-introduction)
 - **[rag_engine_evaluation.ipynb](../gemini/rag-engine/rag_engine_evaluation.ipynb)**: Advanced RAG Techniques and Evaluation with RAG Engine
 
 ## Bring your own Search for RAG/Grounding
@@ -166,10 +179,6 @@ augmented generation (RAG).
 
 The best explanation of embeddings I've seen
 
-- **[intro_Vertex_AI_embeddings.ipynb](../gemini/qa-ops/intro_Vertex_AI_embeddings.ipynb)**:
-  Introduces Vertex AI's text and multimodal embeddings APIs and demonstrates
-  their use in building a simple e-commerce search application with text,
-  image, and video queries.
 - **[hybrid-search.ipynb](../embeddings/hybrid-search.ipynb)**: Demonstrates
   hybrid search (combining semantic and keyword search) using Vertex AI Vector
   Search.
@@ -193,8 +202,6 @@ The best explanation of embeddings I've seen
 - **[intro-grounding.ipynb](../language/grounding/intro-grounding.ipynb)**:
   Demonstrates using the Vertex AI grounding feature to improve LLM response
   accuracy and relevance by grounding them in Google Search or custom Vertex AI Search data stores.
-- **[building_DIY_multimodal_qa_system_with_mRAG.ipynb](../gemini/qa-ops/building_DIY_multimodal_qa_system_with_mRAG.ipynb)**:
-  Builds a custom multimodal question-answering system using mRAG.
 - **[code_retrieval_augmented_generation.ipynb](../language/code/code_retrieval_augmented_generation.ipynb)**:
   Demonstrates RAG for code using Gemini, LangChain, FAISS, and the Vertex AI Embeddings API to enhance code generation by incorporating external
   knowledge from the Google Cloud Generative AI GitHub repository.
@@ -226,7 +233,7 @@ The best explanation of embeddings I've seen
 
 ### Open Models
 
-- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
+- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
   Demonstrates deploying Gemma 2 on Google Cloud Run with GPU acceleration
   using Ollama and LangChain, building a RAG question-answering application.
 

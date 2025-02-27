@@ -3,7 +3,9 @@
       "terminology": {
         "defaultTerms": true, 
         "exclude": [
-          "README" 
+          "README",
+          "VS Code",
+          "website"
         ]
       }
     }
