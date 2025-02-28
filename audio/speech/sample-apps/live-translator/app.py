@@ -100,7 +100,7 @@ def get_audio_bytes(audio: np.ndarray, sample_rate: int) -> bytes | None:
                 wf.writeframes(audio_int16.tobytes())  # Write audio frames
             return buffer.getvalue()
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         st.error(f"Error converting audio to bytes: {e}")
         return None
 
