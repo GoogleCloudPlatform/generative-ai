@@ -12,15 +12,16 @@ import streamlit as st
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")
+VERTEX_AI = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", True)
 
 if PROJECT_ID and not LOCATION:
     LOCATION = "us-central1"
 
 MODELS = {
-    "gemini-2.0-flash-001": "Gemini 2.0 Flash",
-    "gemini-2.0-pro-exp-02-05": "Gemini 2.0 Pro",
-    "gemini-2.0-flash-lite-preview-02-05": "Gemini 2.0 Flash-Lite",
+    "gemini-2.0-flash": "Gemini 2.0 Flash",
+    "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
     "gemini-2.0-flash-thinking-exp-01-21": "Gemini 2.0 Flash Thinking",
+    "gemini-2.0-pro-exp-02-05": "Gemini 2.0 Pro",
     "gemini-1.5-flash": "Gemini 1.5 Flash",
     "gemini-1.5-pro": "Gemini 1.5 Pro",
 }
@@ -30,7 +31,10 @@ MODELS = {
 def load_client() -> genai.Client:
     """Load Google Gen AI Client."""
     return genai.Client(
-        vertexai=True, project=PROJECT_ID, location=LOCATION, api_key=API_KEY
+        vertexai=VERTEX_AI,
+        project=PROJECT_ID,
+        location=LOCATION,
+        api_key=API_KEY,
     )
 
 
@@ -147,7 +151,7 @@ with tab1:
                     st.write(response)
             with first_tab2:
                 st.markdown(
-                    f"""Parameters:\n- Temperature: `{temperature}`\n- Max Output Tokens: `{max_output_tokens}`\n"""
+                    f"""Parameters:\n- Model ID: `{selected_model}`\n- Temperature: `{temperature}`\n- Max Output Tokens: `{max_output_tokens}`\n"""
                 )
                 st.code(prompt, language="markdown")
 
