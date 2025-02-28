@@ -772,6 +772,7 @@ idks
 idxs
 ience
 ifidx
+iinfo
 iloc
 imagefont
 imageno
