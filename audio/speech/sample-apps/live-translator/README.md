@@ -32,11 +32,11 @@ To run the Streamlit Application locally (on Cloud Shell), we need to perform th
 
 3. Authenticate to your Google Cloud Project:
 
-    ```sh
-    gcloud config set project $GOOGLE_CLOUD_PROJECT
-    gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
-    gcloud auth application-default login -q
-    ```
+   ```sh
+   gcloud config set project $GOOGLE_CLOUD_PROJECT
+   gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
+   gcloud auth application-default login -q
+   ```
 
 4. To run the application locally, execute the following command:
 

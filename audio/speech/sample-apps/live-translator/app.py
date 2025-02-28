@@ -1,15 +1,15 @@
-import streamlit as st
-import sounddevice as sd
-import numpy as np
 import io
+import os
 import wave
 
-import os
 from google import genai
-from google.genai.types import GenerateContentConfig, Part
-from google.cloud import texttospeech_v1beta1 as texttospeech
 from google.api_core.client_options import ClientOptions
-
+from google.cloud import texttospeech_v1beta1 as texttospeech
+from google.genai.chats import Chat
+from google.genai.types import GenerateContentConfig, Part
+import numpy as np
+import sounddevice as sd
+import streamlit as st
 
 # Initialize session state for chat history
 if "chat_history" not in st.session_state:
@@ -36,7 +36,7 @@ LANGUAGE_MAP = {
 
 
 @st.cache_resource
-def load_chat():
+def load_chat() -> Chat:
     """Load Google Gen AI Client."""
     client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
@@ -49,7 +49,7 @@ def load_chat():
 
 
 @st.cache_resource
-def load_tts_client() -> genai.Client:
+def load_tts_client() -> texttospeech.TextToSpeechClient:
     """Load Text-to-Speech Client."""
     return texttospeech.TextToSpeechClient(
         client_options=ClientOptions(api_endpoint="us-texttospeech.googleapis.com")
@@ -61,7 +61,7 @@ chat = load_chat()
 tts_client = load_tts_client()
 
 
-def record_audio(duration, sample_rate):
+def record_audio(duration: int, sample_rate: int) -> np.ndarray | None:
     """Records audio from the microphone."""
     try:
         with st.spinner(f"Recording for {duration} seconds..."):
@@ -71,43 +71,50 @@ def record_audio(duration, sample_rate):
             sd.wait()  # Wait until recording is finished
         st.success("Recording complete!")
         return audio
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         st.error(f"Error during recording: {e}")
         return None
 
 
-def get_audio_bytes(audio, sample_rate):
-    """Converts the audio data to bytes in WAV format."""
+def get_audio_bytes(audio: np.ndarray, sample_rate: int) -> bytes | None:
+    """Converts the audio data to bytes in WAV format.
+
+    Args:
+        audio: A NumPy array representing the audio data (values typically between -1 and 1).
+        sample_rate: The sample rate of the audio data (e.g., 44100 Hz).
+
+    Returns:
+        The audio data as bytes in WAV format, or None if an error occurs.
+    """
     try:
-        # Convert to 16-bit PCM (required for most audio players)
-        audio_int16 = np.int16(audio * 32767)  # Scale to -32768 to 32767
+        # Scale audio to 16-bit PCM range
+        audio_int16 = np.int16(audio * np.iinfo(np.int16).max)
 
-        # Save as WAV file in memory
-        buffer = io.BytesIO()
-        with wave.open(buffer, "wb") as wf:
-            wf.setnchannels(1)  # Mono
-            wf.setsampwidth(2)  # 2 bytes for 16-bit PCM
-            wf.setframerate(sample_rate)
-            wf.writeframes(audio_int16.tobytes())
+        # Use BytesIO to store WAV data in memory
+        with io.BytesIO() as buffer:
+            with wave.open(buffer, "wb") as wf:
+                # pylint: disable=no-member
+                wf.setnchannels(1)  # Mono channel
+                wf.setsampwidth(2)  # 2 bytes for 16-bit PCM
+                wf.setframerate(sample_rate)
+                wf.writeframes(audio_int16.tobytes())  # Write audio frames
+            return buffer.getvalue()
 
-        buffer.seek(0)  # Reset to beginning of buffer
-        audio_bytes = buffer.read()  # Read the bytes from the buffer
-        return audio_bytes
     except Exception as e:
         st.error(f"Error converting audio to bytes: {e}")
         return None
 
 
-def play_audio(audio_bytes):
+def play_audio(audio_bytes: bytes) -> None:
     """Plays the audio from a byte stream."""
     if audio_bytes is not None:
         try:
             st.audio(audio_bytes, format="audio/wav", autoplay=True)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             st.error(f"Error playing audio: {e}")
 
 
-def generate_audio(text, voice_name, language_code) -> bytes:
+def generate_audio(text: str, voice_name: str, language_code: str) -> bytes:
     """Generates audio from text using Google Cloud Text-to-Speech."""
     # Perform the text-to-speech request on the text input with the selected
     # voice parameters and audio file type
@@ -124,13 +131,17 @@ def generate_audio(text, voice_name, language_code) -> bytes:
     return response.audio_content
 
 
-def main():
+def main() -> None:
+    """Main function to run the Streamlit app."""
     st.title("HCA Translator")
 
     # Add radio button for language direction
-    target_language = st.radio(
-        "**Output Language:**",
-        ("Spanish (Español)", "English (Inglés)"),
+    target_language = (
+        st.radio(
+            "**Output Language:**",
+            ("Spanish (Español)", "English (Inglés)"),
+        )
+        or "Spanish (Español)"
     )
 
     duration = st.slider("Recording duration (seconds)", 1, 10, 3)  # Default 3 seconds
