@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import requests
-import jwt
-import secrets
-import webbrowser
-import time
-import hashlib
 import base64
+import hashlib
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import urlparse, parse_qs
-from threading import Thread, Lock
 import json
+import secrets
+from threading import Lock, Thread
+import time
+from urllib.parse import parse_qs, urlparse
+import webbrowser
 
+import jwt
+import requests
 
 # --- Configuration (Replace with your actual values or environment variables) ---
 SALESFORCE_CLIENT_ID = "<Your Salesforce Client>"
@@ -32,16 +32,17 @@ SALESFORCE_REDIRECT_URI = "http://localhost:8000/callback"
 SALESFORCE_DOMAIN = "<your.my.salesforce.com>"
 WORKFORCE_POOL_ID = "<workforce-identity-federation-pool-id>"
 WORKFORCE_PROVIDER_ID = "<workforce-identity-federation-pool-provider-id>"
-BILLING_PROJECT_NUMBER = "<project-number>"  
+BILLING_PROJECT_NUMBER = "<project-number>"
 GOOGLE_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
-DISCOVERY_ENGINE_APP_ID="<your_app_id>" # For the API URL
-DISCOVERY_ENGINE_QUERY="Burlington Textiles Corp of America" # For the API call
+DISCOVERY_ENGINE_APP_ID = "<your_app_id>"  # For the API URL
+DISCOVERY_ENGINE_QUERY = "Burlington Textiles Corp of America"  # For the API call
 # --- Threading and State Management ---
 auth_code = None
 received_state = None
 server_lock = Lock()
 server_ready = False
 code_verifier = None
+
 
 # --- Callback Handler ---
 class CallbackHandler(BaseHTTPRequestHandler):
@@ -63,21 +64,25 @@ class CallbackHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b"Error: Missing code or state.")
 
+
 def run_server():
     global server_ready
-    httpd = HTTPServer(('localhost', 8000), CallbackHandler)
+    httpd = HTTPServer(("localhost", 8000), CallbackHandler)
     with server_lock:
         server_ready = True
     httpd.handle_request()
     httpd.server_close()
 
+
 # --- Helper Functions for PKCE ---
 def generate_code_verifier():
     return secrets.token_urlsafe(64)
 
+
 def generate_code_challenge(code_verifier):
-    hashed = hashlib.sha256(code_verifier.encode('utf-8')).digest()
-    return base64.urlsafe_b64encode(hashed).decode('utf-8').rstrip('=')
+    hashed = hashlib.sha256(code_verifier.encode("utf-8")).digest()
+    return base64.urlsafe_b64encode(hashed).decode("utf-8").rstrip("=")
+
 
 # --- Main Functions ---
 def get_salesforce_token():
@@ -151,7 +156,7 @@ def get_salesforce_token():
         print(f"Salesforce ID Token (decoded - no signature check): {decoded_token}")
 
         if decoded_token["nonce"] != nonce:
-             raise ValueError("Nonce mismatch.")
+            raise ValueError("Nonce mismatch.")
 
     except requests.exceptions.RequestException as e:
         raise ValueError(f"Salesforce token request failed: {e}")
@@ -180,7 +185,9 @@ def exchange_for_google_token(sf_id_token):
         response = requests.post(token_url, data=data)
         response.raise_for_status()
         google_token_response = response.json()
-        print("Google STS Response:", google_token_response)  # Print the entire response
+        print(
+            "Google STS Response:", google_token_response
+        )  # Print the entire response
         return google_token_response
     except requests.exceptions.RequestException as e:
         print("Google STS Request Data:", data)  # Print the request data
@@ -202,8 +209,9 @@ if __name__ == "__main__":
             print("Server response:", e.response.text)
 
     ##########
-    import requests
     import json
+
+    import requests
 
     # Assuming you have the google_token from the previous steps:
     google_access_token = google_token["access_token"]
@@ -211,7 +219,7 @@ if __name__ == "__main__":
     # Discovery Engine API endpoint and request data
     api_url = f"https://discoveryengine.googleapis.com/v1alpha/projects/{BILLING_PROJECT_NUMBER}/locations/global/collections/default_collection/engines/{DISCOVERY_ENGINE_APP_ID}/servingConfigs/default_search:search"
     request_data = {
-        "query": DISCOVERY_ENGINE_QUERY ,
+        "query": DISCOVERY_ENGINE_QUERY,
         "pageSize": 10,
         "spellCorrectionSpec": {"mode": "AUTO"},
         "contentSearchSpec": {"snippetSpec": {"returnSnippet": True}},
@@ -224,11 +232,13 @@ if __name__ == "__main__":
     }
     print("#################### Agent Builder Search Results ##################")
     try:
-        response = requests.post(api_url, headers=headers, json=request_data) # Use json= instead of data=
+        response = requests.post(
+            api_url, headers=headers, json=request_data
+        )  # Use json= instead of data=
         response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
         search_results = response.json()
         # print("Discovery Engine Results:", search_results)
-        print(json.dumps(search_results, indent=4)) 
+        print(json.dumps(search_results, indent=4))
 
     except requests.exceptions.RequestException as e:
         print(f"Discovery Engine API call failed: {e}")
