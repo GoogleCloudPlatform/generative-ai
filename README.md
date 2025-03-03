@@ -120,6 +120,9 @@ For more Vertex AI samples, please visit the [Vertex AI samples GitHub repositor
 
 ## Related Repositories
 
+- [🚀 Agent Starter Pack](https://github.com/GoogleCloudPlatform/agent-starter-pack)
+  - A collection of production-ready Generative AI Agent templates built for Google Cloud. 
+  - It accelerates development by providing a holistic, production-ready solution, addressing common challenges (Deployment & Operations, Evaluation, Customization, Observability) in building and deploying Gen AI agents.
 - [Gemini Cookbook](https://github.com/google-gemini/cookbook/)
 - [Google Cloud Applied AI Engineering](https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples)
 - [Generative AI for Marketing using Google Cloud](https://github.com/GoogleCloudPlatform/genai-for-marketing)
