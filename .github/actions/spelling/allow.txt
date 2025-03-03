@@ -772,6 +772,7 @@ idks
 idxs
 ience
 ifidx
+iinfo
 iloc
 imagefont
 imageno
@@ -851,6 +852,7 @@ mahut
 makeover
 manquez
 mapbox
+marp
 maskmode
 mavenrc
 maxcold

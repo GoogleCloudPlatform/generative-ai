@@ -78,7 +78,7 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
 
    ```bash
    export GOOGLE_CLOUD_PROJECT='<Your Google Cloud Project ID>'  # Change this
-   export GOOGLE_CLOUD_REGION='us-central1'             # If you change this, make sure the region is supported.
+   export GOOGLE_CLOUD_REGION='us-central1'                      # If you change this, make sure the region is supported.
    ```
 
 2. Build and deploy the service to Cloud Run:
