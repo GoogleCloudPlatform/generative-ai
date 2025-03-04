@@ -31,7 +31,7 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 - In `Configure your data store` page, choose `Location of your data store` as `us` and enter `Your data store name` as `gms`.
 - Click `CREATE`.
 
-2. Check the data store ID. Open `Data Stores` and click `gms`. Make sure the `Number of documents` is 204 items. Take a memo of the `Data store ID`. This will be the search engine ID.
+1. Check the data store ID. Open `Data Stores` and click `gms`. Make sure the `Number of documents` is 204 items. Take a memo of the `Data store ID`. This will be the search engine ID.
 
 1. Create a search app.
 
@@ -40,7 +40,7 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 - Enter `Your app name` as `gms_test`, `External name` as your company name, and `Location of your app` as `us`.
 - Click `CONTINUE`. On `Data Stores` page, choose `gms` and click `CREATE`. This will start building a search index with the gms data store which will take about 5 minutes.
 
-4. Preview the app. After 5 minutes, open `Preview` and type `Dino` on the search box. You should see the search results with Chrome Dino related items.
+1. Preview the app. After 5 minutes, open `Preview` and type `Dino` on the search box. You should see the search results with Chrome Dino related items.
 
 ### Building & deploying the agent with Vertex AI Agent Builder
 
@@ -63,7 +63,7 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 
 1. On the terminal, run `flutter pub get` to get all project dependencies.
 
-1. Run the app using `flutter run -d <device-id>` where `<device-id>` is the id for an available device.
+1. Run the app using `flutter run -d <device-id>` where `<device-id>` is the ID for an available device.
 
 > [!TIP]
 > Get available devices by running `flutter devices` ex: `AA8A7357`, `macos`, `chrome`.
@@ -74,17 +74,17 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 
 1. [Optional] Running the app on a mobile device with a camera? You can enable the feature for taking photos directly within the app. In `lib/functionality/adaptive/capabilities.dart` set `Capabilities.hasCamera` to `true` like so:
 
-**Before:**
+#### Before
 
-```
+```dart
 static bool get hasCamera {
   return false;
 }
 ```
 
-**After**
+#### After
 
-```
+```dart
 static bool get hasCamera {
   return true;
 }
