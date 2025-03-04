@@ -1,6 +1,6 @@
 # Cloud Run Streamlit Application with Gemini API in Vertex AI
 
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?revision=cloudrun-button)
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
 
 |           |                                                                                                |
 | --------- | ---------------------------------------------------------------------------------------------- |
