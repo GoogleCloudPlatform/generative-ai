@@ -1,11 +1,10 @@
 # Agent Engine in Vertex AI
 
 [Agent Engine](https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview)
-(LangChain on Vertex AI) is a managed service that helps you to build and deploy
-an agent reasoning framework. It gives you the flexibility to choose how much
-reasoning you want to delegate to the LLM and how much you want to handle with
-customized code. You can define Python functions that get used as tools via
-Gemini Function Calling.
+is a managed service that helps you to build and deploy agent reasoning
+frameworks. It gives you the flexibility to choose how much reasoning you want
+to delegate to the LLM and how much you want to handle with customized code. You
+can define Python functions that get used as tools via Gemini Function Calling.
 
 Agent Engine integrates closely with the Python SDK for the Gemini model in
 Vertex AI, and it can manage prompts, agents, and examples in a modular way.

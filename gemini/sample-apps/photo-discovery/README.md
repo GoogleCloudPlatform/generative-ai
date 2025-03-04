@@ -2,7 +2,7 @@
 
 ![Vertex AI Agent Builder & Flutter Multi-platform Demo – Fallingwater](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/showcase.png)
 
-This project is a demo that integrates a Vertex AI Agent with a multi-platform Flutter app. Flutter is used as the client app framework, Vertex AI Search is used as a vector DB, and Reasoning Engine helps us build and deploy an agent with LangChain on Vertex AI.
+This project is a demo that integrates a Vertex AI Agent with a multi-platform Flutter app. Flutter is used as the client app framework, Vertex AI Search is used as a vector DB, and Reasoning Engine helps us build and deploy an agent with Agent Engine.
 
 Users can run the Flutter app and take or upload a photo of a landmark. The app identifies the subject name and provides a brief description.
 
