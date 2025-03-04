@@ -17,8 +17,8 @@ def _project_id() -> str:
     """Use the Google Auth helper (via the metadata service) to get the Google Cloud Project"""
     try:
         _, project = google.auth.default()
-    except google.auth.exceptions.DefaultCredentialsError:
-        raise Exception("Could not automatically determine credentials")
+    except google.auth.exceptions.DefaultCredentialsError as e:
+        raise Exception("Could not automatically determine credentials") from e
     if not project:
         raise Exception("Could not determine project from credentials.")
     return project
@@ -33,7 +33,7 @@ def _region() -> str:
         )
         return resp.text.split("/")[-1]
     except httpx.RequestError as e:
-        raise Exception(f"Could not determine region. Error: {e}")
+        raise Exception(f"Could not determine region. Error: {e}") from e
 
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
