@@ -1,0 +1,9 @@
+{
+    "hooks": {
+        "precreate": {
+            "commands": [
+                "gcloud run deploy --port=8080 --source=. --allow-unauthenticated --project=$GOOGLE_CLOUD_PROJECT --region=$GOOGLE_CLOUD_REGION --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION"
+            ]
+        }
+    }
+}
