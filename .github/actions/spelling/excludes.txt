@@ -92,7 +92,7 @@
 ^\Qgemini/getting-started/intro_gemini_1_5_pro.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_pro_vision_python.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_python.ipynb\E$
-^\Qgemini/reasoning-engine/tutorial_google_maps_agent.ipynb\E$
+^\Qgemini/agent-engine/tutorial_google_maps_agent.ipynb\E$
 ^\Qgemini/sample-apps/image-bash-jam/images/.keep\E$
 ^\Qgemini/sample-apps/image-bash-jam/README.md\E$
 ^\Qgemini/sample-apps/photo-discovery/app/linux/CMakeLists.txt\E$
