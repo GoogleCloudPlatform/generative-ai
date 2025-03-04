@@ -9,9 +9,36 @@ from google import genai
 from google.genai.types import GenerateContentConfig, Part
 import streamlit as st
 
+import google.auth
+import httpx
+
+
+def _project_id() -> str:
+    """Use the Google Auth helper (via the metadata service) to get the Google Cloud Project"""
+    try:
+        _, project = google.auth.default()
+    except google.auth.exceptions.DefaultCredentialsError as e:
+        raise Exception("Could not automatically determine credentials") from e
+    if not project:
+        raise Exception("Could not determine project from credentials.")
+    return project
+
+
+def _region() -> str:
+    """Use the local metadata service to get the region"""
+    try:
+        resp = httpx.get(
+            "http://metadata.google.internal/computeMetadata/v1/instance/region",
+            headers={"Metadata-Flavor": "Google"},
+        )
+        return resp.text.split("/")[-1]
+    except httpx.RequestError as e:
+        raise Exception(f"Could not determine region. Error: {e}") from e
+
+
 API_KEY = os.environ.get("GOOGLE_API_KEY")
-PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
-LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")
+PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", _project_id())
+LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", _region())
 
 if PROJECT_ID and not LOCATION:
     LOCATION = "us-central1"
