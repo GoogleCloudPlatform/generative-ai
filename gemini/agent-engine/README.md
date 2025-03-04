@@ -16,8 +16,8 @@ frameworks.
 
 | Description                                                                          | Sample Name                                                                            |
 | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
-| Intro to Building and Deploying an Agent with Agent Engine in Vertex AI              | [intro_agent_engine.ipynb](intro_agent_engine.ipynb)                           |
-| Debugging and Optimizing Agents: A Guide to Tracing in Agent Engine                  | [tracing_agents_in_agent_engine.ipynb](tracing_agents_in_agent_engine.ipynb)   |
+| Intro to Building and Deploying an Agent with Agent Engine in Vertex AI              | [intro_agent_engine.ipynb](intro_agent_engine.ipynb)                                   |
+| Debugging and Optimizing Agents: A Guide to Tracing in Agent Engine                  | [tracing_agents_in_agent_engine.ipynb](tracing_agents_in_agent_engine.ipynb)           |
 | Building a Conversational Search Agent with Agent Engine and RAG on Vertex AI Search | [tutorial_vertex_ai_search_rag_agent.ipynb](tutorial_vertex_ai_search_rag_agent.ipynb) |
 | Building and Deploying a Google Maps API Agent with Agent Engine                     | [tutorial_google_maps_agent.ipynb](tutorial_google_maps_agent.ipynb)                   |
 | Building and Deploying a LangGraph Application with Agent Engine in Vertex AI        | [tutorial_langgraph.ipynb](tutorial_langgraph.ipynb)                                   |
