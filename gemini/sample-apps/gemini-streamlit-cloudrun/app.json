@@ -1,13 +1,4 @@
 {
-    "env": {
-        "GOOGLE_CLOUD_PROJECT": {
-            "description": "Your Google Cloud Project"
-        },
-        "GOOGLE_CLOUD_REGION": {
-            "description": "Region to run this app."
-            
-        }
-    },
     "options": {
         "allow-unauthenticated": true
     }
