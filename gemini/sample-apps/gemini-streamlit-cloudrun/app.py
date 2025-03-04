@@ -10,7 +10,6 @@ from google.genai.types import GenerateContentConfig, Part
 import streamlit as st
 
 import google.auth
-from googleapiclient.discovery import build
 import httpx
 
 

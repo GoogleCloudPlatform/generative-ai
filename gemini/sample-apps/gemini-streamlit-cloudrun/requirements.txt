@@ -1,3 +1,4 @@
 streamlit
 google-genai
 google-cloud-logging
+google-api-python-client
