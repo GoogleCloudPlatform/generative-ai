@@ -16,6 +16,7 @@ import os
 from config import WEAVE_PROJECT_NAME
 import pandas as pd
 import random
+import json
 
 os.environ["WEAVE_PRINT_CALL_LINK"] = "false"
 
@@ -412,99 +413,195 @@ class DatasetGenerator(weave.Model):
         
         return examples
 
-    @weave.op()
-    def generate_ecommerce_prompts(self, num_prompts: int = 10) -> List[str]:
-        """Generate realistic e-commerce customer support prompts based on available tools and data"""
-        if self.debug:
-            self.console.rule("[bold blue]Generating E-commerce Prompts")
+@weave.op()
+def generate_ecommerce_prompts(debug: bool = False, num_prompts: int = 10) -> List[str]:
+    """Generate realistic e-commerce customer support prompts based on available tools and data"""
+    console = Console()
+    
+    if debug:
+        console.rule("[bold blue]Generating E-commerce Prompts")
+    
+    # Load product and order data to generate realistic prompts
+    try:
+        products_df = pd.read_csv("data/products.csv")
+        orders_df = pd.read_csv("data/orders.csv")
         
-        # Load product and order data to generate realistic prompts
-        try:
-            products_df = pd.read_csv("data/products.csv")
-            orders_df = pd.read_csv("data/orders.csv")
-            
-            # Sample real product IDs, categories, and customer IDs
-            product_ids = products_df['product_id'].sample(min(10, len(products_df))).tolist()
-            categories = products_df['category'].drop_duplicates().sample(min(10, products_df['category'].nunique())).tolist()
-            customer_ids = orders_df['customer_id'].drop_duplicates().sample(min(10, orders_df['customer_id'].nunique())).tolist()
-            order_ids = orders_df['order_id'].sample(min(10, len(orders_df))).tolist()
-            
-            if self.debug:
-                self.console.print(f"Loaded {len(products_df)} products and {len(orders_df)} orders")
-                self.console.print(f"Sample product IDs: {product_ids[:3]}")
-                self.console.print(f"Sample categories: {categories[:3]}")
-        except Exception as e:
-            if self.debug:
-                self.console.print(f"[red]Error loading product/order data: {str(e)}")
-                self.console.print("[yellow]Falling back to simple prompts")
-            
-            # Fallback to simple prompts if data loading fails
-            return [
-                "What products do you sell?",
-                "How can I check my order status?",
-                "Tell me about your return policy",
-                "Do you have any electronics?",
-                "How do I contact customer support?",
-                "What payment methods do you accept?",
-                "Do you ship internationally?",
-                "How long does shipping take?",
-                "Can I cancel my order?",
-                "Do you offer gift wrapping?"
-            ][:num_prompts]
+        # Sample real product IDs, categories, and customer IDs
+        product_ids = products_df['product_id'].sample(min(10, len(products_df))).tolist()
+        categories = products_df['category'].drop_duplicates().sample(min(10, products_df['category'].nunique())).tolist()
+        customer_ids = orders_df['customer_id'].drop_duplicates().sample(min(10, orders_df['customer_id'].nunique())).tolist()
+        order_ids = orders_df['order_id'].sample(min(10, len(orders_df))).tolist()
         
-        # Create 10 specific prompts that test different agent capabilities
-        prompts = [
-            # 1. Basic product search by category
-            f"I'm looking for products in the {categories[0]} category. What do you have?",
-            
-            # 2. Order status check
-            f"Can you check the status of my order {order_ids[0]}?",
-            
-            # 3. Price check for specific product
-            f"How much does product {product_ids[0]} cost?",
-            
-            # 4. Customer order history lookup
-            f"Can you show me my recent orders? My customer ID is {customer_ids[0]}",
-            
-            # 5. Complex query combining product search and order status
-            f"I'm looking for {categories[1]} products and also want to check my order {order_ids[1]}",
-            
-            # 6. Product recommendation request
-            f"What's your best {categories[2]} product? I need something reliable.",
-            
-            # 7. Order tracking with specific concerns
-            f"I placed an order with ID {order_ids[2]} three days ago and haven't received any updates. Can you help?",
-            
-            # 8. Product comparison within category
-            f"I want to compare the top products in the {categories[3]} category. What options do you have?",
-            
-            # 9. Customer with specific product requirements
-            f"I need a {categories[4]} product that costs less than $50. What do you recommend?",
-            
-            # 10. Complex multi-tool query with order history and new purchase
-            f"I'm customer {customer_ids[1]} and I previously bought a {categories[5]} product. I'd like something similar but better. Also, when will my order {order_ids[3]} arrive?"
-        ]
+        if debug:
+            console.print(f"Loaded {len(products_df)} products and {len(orders_df)} orders")
+            console.print(f"Sample product IDs: {product_ids[:3]}")
+            console.print(f"Sample categories: {categories[:3]}")
+    except Exception as e:
+        if debug:
+            console.print(f"[red]Error loading product/order data: {str(e)}")
+            console.print("[yellow]Falling back to simple prompts")
         
-        if self.debug:
-            self.console.print(f"[green]Generated {len(prompts)} e-commerce prompts")
-            for i, prompt in enumerate(prompts, 1):
-                self.console.print(f"[cyan]Sample {i}:[/cyan] {prompt}")
+        # Fallback to simple prompts if data loading fails
+        return [
+            "What products do you sell?",
+            "How can I check my order status?",
+            "Tell me about your return policy",
+            "Do you have any electronics?",
+            "How do I contact customer support?",
+            "What payment methods do you accept?",
+            "Do you ship internationally?",
+            "How long does shipping take?",
+            "Can I cancel my order?",
+            "Do you offer gift wrapping?"
+        ][:num_prompts]
+    
+    # Create specific prompts that test different agent capabilities
+    prompts = [
+        # 1. Basic product search by category
+        f"I'm looking for products in the {categories[0]} category. What do you have?",
         
-        return prompts
+        # 2. Order status check
+        f"Can you check the status of my order {order_ids[0]}?",
+        
+        # 3. Price check for specific product
+        f"How much does product {product_ids[0]} cost?",
+        
+        # 4. Customer order history lookup
+        f"Can you show me my recent orders? My customer ID is {customer_ids[0]}",
+        
+        # 5. Complex query combining product search and order status
+        f"I'm looking for {categories[1]} products and also want to check my order {order_ids[1]}",
+        
+        # 6. Product recommendation request
+        f"What's your best {categories[2]} product? I need something reliable.",
+        
+        # 7. Order tracking with specific concerns
+        f"I placed an order with ID {order_ids[2]} three days ago and haven't received any updates. Can you help?",
+        
+        # 8. Product comparison within category
+        f"I want to compare the top products in the {categories[3]} category. What options do you have?",
+        
+        # 9. Customer with specific product requirements
+        f"I need a {categories[4]} product that costs less than $50. What do you recommend?",
+        
+        # 10. Complex multi-tool query with order history and new purchase
+        f"I'm customer {customer_ids[1]} and I previously bought a {categories[5]} product. I'd like something similar but better. Also, when will my order {order_ids[3]} arrive?"
+    ]
+    
+    # Limit to the requested number of prompts
+    prompts = prompts[:num_prompts]
+    
+    if debug:
+        console.print(f"[green]Generated {len(prompts)} e-commerce prompts")
+        for i, prompt in enumerate(prompts, 1):
+            console.print(f"[cyan]Sample {i}:[/cyan] {prompt}")
+    
+    return prompts
 
-    @weave.op()
-    def evaluate_customer_support_agent(self, agent: CodeAgent, num_prompts: int = 10) -> List[EvaluationExample]:
-        """Evaluate a customer support agent with realistic e-commerce prompts"""
-        if self.debug:
-            self.console.rule("[bold red]Evaluating Customer Support Agent")
-            self.console.print(f"Agent model: {agent.model.__class__.__name__}")
-            self.console.print(f"Available tools: {list(agent.tools.keys())}")
+@weave.op()
+def create_customer_support_agent_evaluation_dataset(generator: DatasetGenerator, agent: CodeAgent, num_prompts: int = 10) -> List[EvaluationExample]:
+    """Create a customer support agent evaluation dataset with realistic e-commerce prompts"""
+    if generator.debug:
+        generator.console.rule("[bold red]Creating Customer Support Agent Evaluation Dataset")
+        generator.console.print(f"Agent model: {agent.model.__class__.__name__}")
+        generator.console.print(f"Available tools: {list(agent.tools.keys())}")
+    
+    # Generate realistic e-commerce prompts
+    prompts = generate_ecommerce_prompts(debug=generator.debug, num_prompts=num_prompts)
+    
+    # Run evaluation on the prompts
+    return generator.generate_dataset(prompts)
+
+@weave.op()
+def export_evaluation_dataset(examples: List[EvaluationExample], output_path: str = "agent_evaluation_dataset.json") -> str:
+    """Export evaluation examples to a format compatible with the evaluator"""
+    if not examples:
+        raise ValueError("No examples to export")
+    
+    formatted_examples = []
+    
+    for example in examples:
+        # Extract tool usage from trajectory
+        tools_used = []
+        for step in example.trajectory.steps:
+            step_tools = []
+            if step.tool_name == "python_interpreter":
+                # For python interpreter, extract tools from code
+                if step.tool_args and "code" in step.tool_args:
+                    code = step.tool_args["code"]
+                    for tool in example.tools_available:
+                        if tool in code and tool != "python_interpreter":
+                            step_tools.append(tool)
+            elif step.tool_name:
+                step_tools.append(step.tool_name)
+            
+            tools_used.extend(step_tools)
         
-        # Generate realistic e-commerce prompts
-        prompts = self.generate_ecommerce_prompts(num_prompts)
+        # Remove duplicates while preserving order
+        unique_tools = []
+        for tool in tools_used:
+            if tool not in unique_tools:
+                unique_tools.append(tool)
         
-        # Run evaluation on the prompts
-        return self.generate_dataset(prompts)
+        # Format expected trajectory
+        expected_trajectory = []
+        for i, step in enumerate(example.trajectory.steps):
+            step_data = {
+                "step_number": i + 1,
+                "tool_name": step.tool_name,
+                "tool_input": step.tool_args,
+                "tool_output": step.tool_output,
+                "reasoning": step.llm_response
+            }
+            expected_trajectory.append(step_data)
+        
+        # Create validation criteria based on scores and reasoning
+        validation_criteria = {
+            "final_response": {
+                "min_score": example.scores.final_response,
+                "criteria": example.scores.reasoning["final_response"]
+            },
+            "tool_selection": {
+                "expected_tools": unique_tools,
+                "criteria": "Tools should be called in appropriate order with correct arguments"
+            },
+            "reasoning_quality": {
+                "criteria": example.scores.reasoning["trajectory"]
+            }
+        }
+        
+        # Determine difficulty based on number of steps and tools
+        difficulty = "easy" if len(example.trajectory.steps) <= 2 else "medium"
+        if len(example.trajectory.steps) > 4:
+            difficulty = "hard"
+            
+        # Create tags based on metadata and tools
+        tags = ["agent_evaluation"]
+        if example.metadata.get("has_planning", False):
+            tags.append("planning_enabled")
+        
+        # Add tool-specific tags
+        for tool in unique_tools:
+            tags.append(f"uses_{tool}")
+        
+        formatted_example = {
+            "input": example.prompt,
+            "expected_final_response": example.trajectory.final_response,
+            "tools_available": example.tools_available,
+            "expected_trajectory": expected_trajectory,
+            "validation_criteria": validation_criteria,
+            "difficulty": difficulty,
+            "tags": tags,
+            "metadata": example.metadata
+        }
+        
+        formatted_examples.append(formatted_example)
+    
+    # Write to JSON file
+    with open(output_path, "w") as f:
+        json.dump(formatted_examples, f, indent=2)
+    
+    return f"Exported {len(formatted_examples)} examples to {output_path}"
 
 if __name__ == "__main__":
     # Load environment variables from .env file
@@ -512,9 +609,15 @@ if __name__ == "__main__":
 
     weave.init(WEAVE_PROJECT_NAME)
 
+    # Create a rich console for pretty output
+    console = Console()
+    console.rule("[bold magenta]Customer Support Agent Evaluation")
+
     # Import the customer support agent
     from customer_support_agent import create_customer_support_agent
 
+    console.print("[bold blue]Creating Customer Support Agent...[/bold blue]")
+    
     # Create a customer support agent for evaluation
     agent = create_customer_support_agent(
         model_id="google/gemini-1.5-pro",
@@ -524,7 +627,11 @@ if __name__ == "__main__":
         max_steps=3  # Allow up to 3 steps for complex queries
     )
 
+    console.print("[bold green]✓[/bold green] Agent created successfully")
+    console.print(f"[dim]Model: google/gemini-1.5-pro | Planning: Enabled | Max Steps: 3[/dim]")
+    
     # Initialize dataset generator with debug mode
+    console.rule("[bold blue]Initializing Dataset Generator")
     generator = DatasetGenerator(
         agent=agent,
         judge_model="gemini/gemini-1.5-pro",
@@ -535,20 +642,36 @@ if __name__ == "__main__":
         },
         debug=True  # Enable debug output
     )
+    console.print("[bold green]✓[/bold green] Generator initialized with thresholds: [dim]final_response=0.7, single_step=0.7, trajectory=0.7[/dim]")
 
-    # Generate evaluation dataset with 10 examples
-    examples = generator.evaluate_customer_support_agent(agent, num_prompts=10)
+    # Generate evaluation dataset
+    console.rule("[bold blue]Generating Evaluation Dataset")
+    examples = create_customer_support_agent_evaluation_dataset(generator, agent, num_prompts=2)
 
-    # Print results
-    print(f"\nGenerated {len(examples)} evaluation examples:")
+    # Print results in a nice format
+    console.rule("[bold green]Results Summary")
+    console.print(f"[bold]Generated {len(examples)} evaluation examples[/bold]")
+    
     for i, example in enumerate(examples, 1):
-        print(f"\nExample {i}:")
-        print(f"Prompt: {example.prompt}")
-        print(f"Tools available: {example.tools_available}")
-        print(f"Number of steps: {example.metadata['num_steps']}")
-        print(f"Tools used: {example.metadata['tools_used']}")
-        print(f"Has planning: {example.metadata['has_planning']}")
-        print("\nScores:")
-        print(f"Final response: {example.scores.final_response:.2f}")
-        print(f"Step scores: {[f'{s:.2f}' for s in example.scores.steps]}")
-        print(f"Trajectory: {example.scores.trajectory:.2f}")
+        panel = Panel(
+            f"[bold cyan]Prompt:[/bold cyan] {example.prompt}\n\n"
+            f"[bold yellow]Metrics:[/bold yellow]\n"
+            f"  • Final response score: [magenta]{example.scores.final_response:.2f}[/magenta]\n"
+            f"  • Step scores: [magenta]{', '.join([f'{s:.2f}' for s in example.scores.steps])}[/magenta]\n"
+            f"  • Trajectory score: [magenta]{example.scores.trajectory:.2f}[/magenta]\n\n"
+            f"[bold yellow]Details:[/bold yellow]\n"
+            f"  • Tools available: [dim]{', '.join(example.tools_available)}[/dim]\n"
+            f"  • Tools used: [dim]{', '.join(example.metadata['tools_used'])}[/dim]\n"
+            f"  • Steps taken: [dim]{example.metadata['num_steps']}[/dim]\n"
+            f"  • Planning: [dim]{'Enabled' if example.metadata['has_planning'] else 'Disabled'}[/dim]",
+            title=f"[bold]Example {i}/{len(examples)}[/bold]",
+            border_style="blue"
+        )
+        console.print(panel)
+        
+    console.rule("[bold green]Evaluation Complete")
+    
+    # Export the dataset for evaluation
+    export_path = "synthetic_agent_dataset.json"
+    export_result = export_evaluation_dataset(examples, export_path)
+    console.print(f"[bold green]{export_result}")
