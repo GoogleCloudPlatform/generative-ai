@@ -312,6 +312,97 @@ class DatasetGenerator(weave.Model):
         }
 
     @weave.op()
+    def save_dataset(self, examples: List[EvaluationExample], output_path: str = "agent_evaluation_dataset.json") -> str:
+        """Export evaluation examples to a format compatible with the evaluator"""
+        if not examples:
+            raise ValueError("No examples to export")
+        
+        formatted_examples = []
+        
+        for example in examples:
+            # Extract tool usage from trajectory
+            tools_used = []
+            for step in example.trajectory.steps:
+                step_tools = []
+                if step.tool_name == "python_interpreter":
+                    # For python interpreter, extract tools from code
+                    if step.tool_args and "code" in step.tool_args:
+                        code = step.tool_args["code"]
+                        for tool in example.tools_available:
+                            if tool in code and tool != "python_interpreter":
+                                step_tools.append(tool)
+                elif step.tool_name:
+                    step_tools.append(step.tool_name)
+                
+                tools_used.extend(step_tools)
+            
+            # Remove duplicates while preserving order
+            unique_tools = []
+            for tool in tools_used:
+                if tool not in unique_tools:
+                    unique_tools.append(tool)
+            
+            # Format expected trajectory
+            expected_trajectory = []
+            for i, step in enumerate(example.trajectory.steps):
+                step_data = {
+                    "step_number": i + 1,
+                    "tool_name": step.tool_name,
+                    "tool_input": step.tool_args,
+                    "tool_output": step.tool_output,
+                    "reasoning": step.llm_response
+                }
+                expected_trajectory.append(step_data)
+            
+            # Create validation criteria based on scores and reasoning
+            validation_criteria = {
+                "final_response": {
+                    "min_score": example.scores.final_response,
+                    "criteria": example.scores.reasoning["final_response"]
+                },
+                "tool_selection": {
+                    "expected_tools": unique_tools,
+                    "criteria": "Tools should be called in appropriate order with correct arguments"
+                },
+                "reasoning_quality": {
+                    "criteria": example.scores.reasoning["trajectory"]
+                }
+            }
+            
+            # Determine difficulty based on number of steps and tools
+            difficulty = "easy" if len(example.trajectory.steps) <= 2 else "medium"
+            if len(example.trajectory.steps) > 4:
+                difficulty = "hard"
+            
+            # Create tags based on metadata and tools
+            tags = ["agent_evaluation"]
+            if example.metadata.get("has_planning", False):
+                tags.append("planning_enabled")
+            
+            # Add tool-specific tags
+            for tool in unique_tools:
+                tags.append(f"uses_{tool}")
+            
+            formatted_example = {
+                "input": example.prompt,
+                "expected_final_response": example.trajectory.final_response,
+                "tools_available": example.tools_available,
+                "expected_trajectory": expected_trajectory,
+                "validation_criteria": validation_criteria,
+                "difficulty": difficulty,
+                "tags": tags,
+                "metadata": example.metadata
+            }
+            
+            formatted_examples.append(formatted_example)
+        
+        # Write to JSON file
+        with open(output_path, "w") as f:
+            json.dump(formatted_examples, f, indent=2)
+        
+        return f"Exported {len(formatted_examples)} examples to {output_path}"
+
+    @weave.op()
     def generate_dataset(self, input_prompts: List[str]) -> List[EvaluationExample]:
         """Generate evaluation dataset from prompts"""
         examples = []
@@ -416,9 +507,9 @@ class DatasetGenerator(weave.Model):
 @weave.op()
 def generate_ecommerce_prompts(debug: bool = False, num_prompts: int = 10) -> List[str]:
     """Generate realistic e-commerce customer support prompts based on available tools and data"""
-    console = Console()
+    console = Console() if debug else None
     
-    if debug:
+    if debug and console:
         console.rule("[bold blue]Generating E-commerce Prompts")
     
     # Load product and order data to generate realistic prompts
@@ -432,12 +523,12 @@ def generate_ecommerce_prompts(debug: bool = False, num_prompts: int = 10) -> Li
         customer_ids = orders_df['customer_id'].drop_duplicates().sample(min(10, orders_df['customer_id'].nunique())).tolist()
         order_ids = orders_df['order_id'].sample(min(10, len(orders_df))).tolist()
         
-        if debug:
+        if debug and console:
             console.print(f"Loaded {len(products_df)} products and {len(orders_df)} orders")
             console.print(f"Sample product IDs: {product_ids[:3]}")
             console.print(f"Sample categories: {categories[:3]}")
     except Exception as e:
-        if debug:
+        if debug and console:
             console.print(f"[red]Error loading product/order data: {str(e)}")
             console.print("[yellow]Falling back to simple prompts")
         
@@ -512,97 +603,6 @@ def create_customer_support_agent_evaluation_dataset(generator: DatasetGenerator
     # Run evaluation on the prompts
     return generator.generate_dataset(prompts)
 
-@weave.op()
-def export_evaluation_dataset(examples: List[EvaluationExample], output_path: str = "agent_evaluation_dataset.json") -> str:
-    """Export evaluation examples to a format compatible with the evaluator"""
-    if not examples:
-        raise ValueError("No examples to export")
-    
-    formatted_examples = []
-    
-    for example in examples:
-        # Extract tool usage from trajectory
-        tools_used = []
-        for step in example.trajectory.steps:
-            step_tools = []
-            if step.tool_name == "python_interpreter":
-                # For python interpreter, extract tools from code
-                if step.tool_args and "code" in step.tool_args:
-                    code = step.tool_args["code"]
-                    for tool in example.tools_available:
-                        if tool in code and tool != "python_interpreter":
-                            step_tools.append(tool)
-            elif step.tool_name:
-                step_tools.append(step.tool_name)
-            
-            tools_used.extend(step_tools)
-        
-        # Remove duplicates while preserving order
-        unique_tools = []
-        for tool in tools_used:
-            if tool not in unique_tools:
-                unique_tools.append(tool)
-        
-        # Format expected trajectory
-        expected_trajectory = []
-        for i, step in enumerate(example.trajectory.steps):
-            step_data = {
-                "step_number": i + 1,
-                "tool_name": step.tool_name,
-                "tool_input": step.tool_args,
-                "tool_output": step.tool_output,
-                "reasoning": step.llm_response
-            }
-            expected_trajectory.append(step_data)
-        
-        # Create validation criteria based on scores and reasoning
-        validation_criteria = {
-            "final_response": {
-                "min_score": example.scores.final_response,
-                "criteria": example.scores.reasoning["final_response"]
-            },
-            "tool_selection": {
-                "expected_tools": unique_tools,
-                "criteria": "Tools should be called in appropriate order with correct arguments"
-            },
-            "reasoning_quality": {
-                "criteria": example.scores.reasoning["trajectory"]
-            }
-        }
-        
-        # Determine difficulty based on number of steps and tools
-        difficulty = "easy" if len(example.trajectory.steps) <= 2 else "medium"
-        if len(example.trajectory.steps) > 4:
-            difficulty = "hard"
-            
-        # Create tags based on metadata and tools
-        tags = ["agent_evaluation"]
-        if example.metadata.get("has_planning", False):
-            tags.append("planning_enabled")
-        
-        # Add tool-specific tags
-        for tool in unique_tools:
-            tags.append(f"uses_{tool}")
-        
-        formatted_example = {
-            "input": example.prompt,
-            "expected_final_response": example.trajectory.final_response,
-            "tools_available": example.tools_available,
-            "expected_trajectory": expected_trajectory,
-            "validation_criteria": validation_criteria,
-            "difficulty": difficulty,
-            "tags": tags,
-            "metadata": example.metadata
-        }
-        
-        formatted_examples.append(formatted_example)
-    
-    # Write to JSON file
-    with open(output_path, "w") as f:
-        json.dump(formatted_examples, f, indent=2)
-    
-    return f"Exported {len(formatted_examples)} examples to {output_path}"
-
 if __name__ == "__main__":
     # Load environment variables from .env file
     load_dotenv()
@@ -671,7 +671,7 @@ if __name__ == "__main__":
         
     console.rule("[bold green]Evaluation Complete")
     
-    # Export the dataset for evaluation
+    # Export the dataset for evaluation - now using the class method
     export_path = "synthetic_agent_dataset.json"
-    export_result = export_evaluation_dataset(examples, export_path)
+    export_result = generator.save_dataset(examples, export_path)
     console.print(f"[bold green]{export_result}")

@@ -279,7 +279,7 @@ class AgentEvaluator:
         eval_task = EvalTask(
             dataset=eval_dataset,
             metrics=metrics,
-            experiment="agent-evaluation"
+            experiment="agent-evaluation",
         )
         
         self.console.print(f"[bold blue]Starting evaluation with run ID: [/bold blue][cyan]{unique_id}[/cyan]")
@@ -287,7 +287,7 @@ class AgentEvaluator:
         # Run the evaluation
         eval_result = eval_task.evaluate(
             model=self.model,
-            experiment_run_name=f"agent-eval-run-{unique_id}"
+            experiment_run_name=f"agent-eval-run-{unique_id}",
         )
         
         # Debug: Inspect evaluation result structure

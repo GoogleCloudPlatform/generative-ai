@@ -1,0 +1,149 @@
+[
+  {
+    "input": "Can you check the status of my order OD678318?",
+    "expected_final_response": "The status of your order OD678318 is: delivered.",
+    "tools_available": [
+      "product_search",
+      "order_status",
+      "category_browse",
+      "price_check",
+      "customer_order_history",
+      "final_answer"
+    ],
+    "expected_trajectory": [
+      {
+        "step_number": 1,
+        "tool_name": "python_interpreter",
+        "tool_input": {
+          "code": "status = order_status(order_id='OD678318')\nprint(status)"
+        },
+        "tool_output": null,
+        "reasoning": "Thought:\nI will use the `order_status` tool to check the status of order ID 'OD678318'.\n\nCode:\n```py\nstatus = order_status(order_id='OD678318')\nprint(status)\n```"
+      },
+      {
+        "step_number": 2,
+        "tool_name": "python_interpreter",
+        "tool_input": {
+          "code": "response = f\"The status of your order OD678318 is: delivered.\"\nfinal_answer(response)"
+        },
+        "tool_output": "The status of your order OD678318 is: delivered.",
+        "reasoning": "Thought:\nThe `order_status` tool returned the status of order ID 'OD678318' as 'delivered'. I will format a response to the user including this information.\n\nCode:\n```py\nresponse = f\"The status of your order OD678318 is: delivered.\"\nfinal_answer(response)\n```"
+      }
+    ],
+    "validation_criteria": {
+      "final_response": {
+        "min_score": 1.0,
+        "criteria": "Correct and complete response. Used appropriate tools. Communicated clearly."
+      },
+      "tool_selection": {
+        "expected_tools": [
+          "order_status",
+          "final_answer"
+        ],
+        "criteria": "Tools should be called in appropriate order with correct arguments"
+      },
+      "reasoning_quality": {
+        "criteria": "The agent correctly used the `order_status` tool to retrieve the order status and presented it to the user. The thought process is clearly explained and the code is concise and effective. Overall, the agent demonstrated a good understanding of the task and the available tools."
+      }
+    },
+    "difficulty": "easy",
+    "tags": [
+      "agent_evaluation",
+      "planning_enabled",
+      "uses_order_status",
+      "uses_final_answer"
+    ],
+    "metadata": {
+      "model": "WeaveVertexAIServerModel",
+      "model_id": "google/gemini-1.5-pro",
+      "num_steps": 2,
+      "tools_used": [
+        "final_answer",
+        "order_status"
+      ],
+      "has_planning": true
+    }
+  },
+  {
+    "input": "Can you show me my recent orders? My customer ID is reviewer_en_0550916",
+    "expected_final_response": "[{'order_id': 'OD907349', 'date': '2024-12-06', 'status': 'delivered', 'product_id': 'product_en_0368207', 'delivery_date': '2024-12-13'}]",
+    "tools_available": [
+      "product_search",
+      "order_status",
+      "category_browse",
+      "price_check",
+      "customer_order_history",
+      "final_answer"
+    ],
+    "expected_trajectory": [
+      {
+        "step_number": 1,
+        "tool_name": "python_interpreter",
+        "tool_input": {
+          "code": "customer_id = 'reviewer_en_0550916'\norder_history = customer_order_history(customer_id=customer_id)\nprint(order_history)"
+        },
+        "tool_output": null,
+        "reasoning": "Thought:\nI need to retrieve the order history for the given customer ID. I can use the `customer_order_history` tool for this.\n\nCode:\n```py\ncustomer_id = 'reviewer_en_0550916'\norder_history = customer_order_history(customer_id=customer_id)\nprint(order_history)\n```"
+      },
+      {
+        "step_number": 2,
+        "tool_name": "python_interpreter",
+        "tool_input": {
+          "code": "recent_orders = json.loads(order_history)[\"recent_orders\"]\nfinal_answer(recent_orders)"
+        },
+        "tool_output": null,
+        "reasoning": "Thought:\nI have the order history for the customer. The most recent order was placed on 2024-12-06. I will assume this is the only \"recent\" order and return it as the answer.\n\nCode:\n```py\nrecent_orders = json.loads(order_history)[\"recent_orders\"]\nfinal_answer(recent_orders)\n```"
+      },
+      {
+        "step_number": 3,
+        "tool_name": "python_interpreter",
+        "tool_input": {
+          "code": "import json\nrecent_orders = json.loads(order_history)[\"recent_orders\"]\nfinal_answer(recent_orders)"
+        },
+        "tool_output": [
+          {
+            "order_id": "OD907349",
+            "date": "2024-12-06",
+            "status": "delivered",
+            "product_id": "product_en_0368207",
+            "delivery_date": "2024-12-13"
+          }
+        ],
+        "reasoning": "Thought:\nI need to import the `json` library to process the order history, which is in JSON format.\n\nCode:\n```py\nimport json\nrecent_orders = json.loads(order_history)[\"recent_orders\"]\nfinal_answer(recent_orders)\n```Calling tools:\n[{'id': 'call_4', 'type': 'function', 'function': {'name': 'python_interpreter', 'arguments': 'import json\\nrecent_orders = json.loads(order_history)[\"recent_orders\"]\\nfinal_answer(recent_orders)'}}]\n\n"
+      }
+    ],
+    "validation_criteria": {
+      "final_response": {
+        "min_score": 1.0,
+        "criteria": "Correct and complete response. Used appropriate tools. Communicated clearly."
+      },
+      "tool_selection": {
+        "expected_tools": [
+          "customer_order_history",
+          "final_answer"
+        ],
+        "criteria": "Tools should be called in appropriate order with correct arguments"
+      },
+      "reasoning_quality": {
+        "criteria": "The agent correctly uses the `customer_order_history` tool to retrieve the order history. It then extracts the recent orders and returns them. The agent misses importing the `json` library in the initial code and has to add it in the next step. Although this adds an extra step, it does not significantly impact the overall efficiency. The final answer is correct and relevant to the user's request."
+      }
+    },
+    "difficulty": "medium",
+    "tags": [
+      "agent_evaluation",
+      "planning_enabled",
+      "uses_customer_order_history",
+      "uses_final_answer"
+    ],
+    "metadata": {
+      "model": "WeaveVertexAIServerModel",
+      "model_id": "google/gemini-1.5-pro",
+      "num_steps": 3,
+      "tools_used": [
+        "final_answer",
+        "customer_order_history"
+      ],
+      "has_planning": true
+    }
+  }
+]
