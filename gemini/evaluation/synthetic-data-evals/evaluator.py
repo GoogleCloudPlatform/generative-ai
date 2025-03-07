@@ -2,18 +2,17 @@ import asyncio
 import json
 import os
 import time
+from typing import Dict, List
 import uuid
-from typing import Any, Dict, List, Optional, Union
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
-import weave
 from rich.console import Console
 from rich.table import Table
-from vertexai.evaluation import (EvalTask, PointwiseMetric,
-                                 PointwiseMetricPromptTemplate, constants)
+import seaborn as sns
+from vertexai.evaluation import EvalTask, PointwiseMetric, constants
 from vertexai.generative_models import GenerationConfig, GenerativeModel
+import weave
 
 
 class AgentEvaluator:
@@ -974,7 +973,7 @@ class AgentEvaluator:
                     )
                 )
                 if self.verbosity >= 1:
-                    self.console.print(f"[green]✓[/green] Weave evaluation complete")
+                    self.console.print("[green]✓[/green] Weave evaluation complete")
 
                 # Store Weave run ID
                 weave_run_id = (
@@ -1027,7 +1026,7 @@ class AgentEvaluator:
         reasoning = ""
 
         if hasattr(agent, "memory") and hasattr(agent.memory, "steps"):
-            from smolagents import ActionStep
+            pass
 
             reasoning_parts = []
 
@@ -1188,7 +1187,7 @@ class AgentEvaluator:
                     plt.savefig(f"{output_dir}/score_distribution.png")
                     if self.verbosity >= 1:
                         self.console.print(
-                            f"[green]✓[/green] Generated score distribution plot"
+                            "[green]✓[/green] Generated score distribution plot"
                         )
 
             # 2. Difficulty heatmap
@@ -1212,7 +1211,7 @@ class AgentEvaluator:
 
                         if self.verbosity >= 1:
                             self.console.print(
-                                f"[green]✓[/green] Generated difficulty heatmap"
+                                "[green]✓[/green] Generated difficulty heatmap"
                             )
 
                             # Create a rich table for difficulty breakdown
@@ -1273,7 +1272,7 @@ class AgentEvaluator:
 
                     if self.verbosity >= 1:
                         self.console.print(
-                            f"[green]✓[/green] Generated trajectory vs response plot"
+                            "[green]✓[/green] Generated trajectory vs response plot"
                         )
 
                         # Calculate correlation
@@ -1343,7 +1342,7 @@ def main():
     # Initialize evaluator with verbosity level
     console.print("[bold blue]Initializing evaluator...")
     evaluator = AgentEvaluator(verbosity=1)  # Default to normal verbosity
-    console.print(f"[green]✓[/green] Evaluator initialized")
+    console.print("[green]✓[/green] Evaluator initialized")
 
     # Format dataset for evaluation
     console.print("[bold blue]Formatting dataset for evaluation...")
@@ -1394,12 +1393,12 @@ def main():
     console.print(table)
 
     # Display path to results
-    console.print(f"\n[bold green]Evaluation complete![/bold green]")
+    console.print("\n[bold green]Evaluation complete![/bold green]")
     console.print(
-        f"[bold]Detailed results saved to:[/bold] [cyan]evaluation_results/[/cyan]"
+        "[bold]Detailed results saved to:[/bold] [cyan]evaluation_results/[/cyan]"
     )
     console.print(
-        f"[bold]Visualizations saved to:[/bold] [cyan]evaluation_results/score_distribution.png[/cyan] and other PNG files"
+        "[bold]Visualizations saved to:[/bold] [cyan]evaluation_results/score_distribution.png[/cyan] and other PNG files"
     )
 
 

@@ -2,11 +2,8 @@
 # setup_vertex_agent_resources.py
 
 import os
-import re
 import subprocess
-import sys
 
-import dotenv
 from google.auth import default
 from google.auth.exceptions import DefaultCredentialsError
 from google.cloud import aiplatform
@@ -117,7 +114,7 @@ def setup_vertex_resources():
         print(f"Found existing DeepSeek model: {model_display_name}")
         deepseek_model = models[0]
     else:
-        print(f"DeepSeek model not found. Would you like to register it? (y/n)")
+        print("DeepSeek model not found. Would you like to register it? (y/n)")
         response = input().lower()
 
         if response != "y":
@@ -181,7 +178,7 @@ def setup_vertex_resources():
             endpoint_id = deepseek_endpoint.name
 
             # Deploy model to endpoint
-            print(f"Deploying model to endpoint. This may take 15-20 minutes...")
+            print("Deploying model to endpoint. This may take 15-20 minutes...")
             deployed_model = deepseek_model.deploy(
                 endpoint=deepseek_endpoint,
                 machine_type="g2-standard-12",
@@ -222,8 +219,8 @@ def setup_vertex_resources():
     print("\nEnvironment variables updated in .env file:")
     print(f"VERTEX_PROJECT_ID: {project_id}")
     print(f"VERTEX_LOCATION: {location}")
-    print(f"VERTEX_MODEL_ID: google/gemini-1.5-flash")
-    print(f"VERTEX_ENDPOINT_ID: openapi")
+    print("VERTEX_MODEL_ID: google/gemini-1.5-flash")
+    print("VERTEX_ENDPOINT_ID: openapi")
     print(f"DEEPSEEK_ENDPOINT_ID: {endpoint_id_short}")
 
     return True

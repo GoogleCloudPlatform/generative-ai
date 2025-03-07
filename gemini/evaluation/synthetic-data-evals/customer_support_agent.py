@@ -1,23 +1,13 @@
-import glob
-import json
-import os
-import random
-import re
-import time
-import zipfile
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
-
-import numpy as np
-import pandas as pd
-import weave
-from datasets import load_dataset
-from dotenv import load_dotenv
-from smolagents import (ChatMessage, CodeAgent, DuckDuckGoSearchTool, Model,
-                        Tool)
+import json
+import time
 
 import config
+from dotenv import load_dotenv
+import pandas as pd
+from smolagents import CodeAgent, Tool
 from vertex_model import VertexAIServerModel, WeaveVertexAIServerModel
+import weave
 
 
 class ProductSearchTool(Tool):
@@ -374,7 +364,6 @@ def load_realistic_datasets(
     import re
     import zipfile
 
-    import numpy as np
     import pandas as pd
 
     # Create data directory if it doesn't exist
@@ -392,7 +381,7 @@ def load_realistic_datasets(
             os.makedirs(dataset_dir, exist_ok=True)
 
             # Download dataset using Kaggle API if needed
-            print(f"Downloading Amazon Reviews Multi dataset from Kaggle...")
+            print("Downloading Amazon Reviews Multi dataset from Kaggle...")
 
             try:
                 from kaggle.api.kaggle_api_extended import KaggleApi
@@ -446,7 +435,7 @@ def load_realistic_datasets(
             # Limit to a reasonable number of reviews for processing
             if len(reviews_df) > 1000:
                 reviews_df = reviews_df.sample(1000, random_state=42)
-                print(f"Sampled 1000 reviews for processing")
+                print("Sampled 1000 reviews for processing")
 
             # Extract product information
             product_data = []

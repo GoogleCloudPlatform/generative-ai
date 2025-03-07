@@ -2,23 +2,19 @@
 import inspect
 import json
 import os
-import random
 from typing import Any, ClassVar, Dict, List, Optional, Tuple, Union
 
-import instructor
-import pandas as pd
-import weave
+from config import WEAVE_PROJECT_NAME
 from dotenv import load_dotenv
-from instructor import patch
+import instructor
 from litellm import completion
+import pandas as pd
 from pydantic import BaseModel
-from rich import print as rprint
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from smolagents import ActionStep, CodeAgent, HfApiModel, Tool
-
-from config import WEAVE_PROJECT_NAME
+from smolagents import ActionStep, CodeAgent
+import weave
 
 os.environ["WEAVE_PRINT_CALL_LINK"] = "false"
 
@@ -745,7 +741,7 @@ if __name__ == "__main__":
 
     console.print("[bold green]✓[/bold green] Agent created successfully")
     console.print(
-        f"[dim]Model: google/gemini-1.5-pro | Planning: Enabled | Max Steps: 3[/dim]"
+        "[dim]Model: google/gemini-1.5-pro | Planning: Enabled | Max Steps: 3[/dim]"
     )
 
     # Initialize dataset generator with debug mode

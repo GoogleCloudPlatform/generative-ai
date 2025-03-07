@@ -1,11 +1,10 @@
 import re
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import seaborn as sns
 from rich.console import Console
 from rich.table import Table
+import seaborn as sns
 
 
 def render_model_comparison(all_results, console=None):

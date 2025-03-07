@@ -3,13 +3,11 @@ import threading
 import time
 from typing import Dict, List
 
-import openai
-import weave
-from dotenv import load_dotenv
-from smolagents import (ChatMessage, CodeAgent, DuckDuckGoSearchTool, Model,
-                        Tool)
-
 from config import WEAVE_PROJECT_NAME
+from dotenv import load_dotenv
+import openai
+from smolagents import ChatMessage, Model
+import weave
 
 
 class VertexAIServerModel(Model):
@@ -61,8 +59,7 @@ class VertexAIServerModel(Model):
                 completion_kwargs["stop"] = stop_sequences
 
         # Process messages using smolagents' role conversion mechanism
-        from smolagents.models import (get_clean_message_list,
-                                       tool_role_conversions)
+        from smolagents.models import get_clean_message_list, tool_role_conversions
 
         # Get clean message list with proper role conversions
         processed_messages = get_clean_message_list(
@@ -103,7 +100,7 @@ class VertexAIServerModel(Model):
             message_dict = message_data.model_dump(
                 include={"role", "content", "tool_calls"}
             )
-        except Exception as e:
+        except Exception:
             # Fallback: manually create a dict with available attributes
             message_data = response.choices[0].message
             message_dict = {
@@ -119,7 +116,6 @@ class VertexAIServerModel(Model):
     def _setup_auth(self):
         """Setup Google Cloud authentication with required permissions"""
         try:
-            import google.auth.transport.requests
             from google.auth import default
 
             # Initialize credentials with required scopes
