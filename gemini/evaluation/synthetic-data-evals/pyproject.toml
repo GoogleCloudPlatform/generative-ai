@@ -17,3 +17,8 @@ dependencies = [
     "smolagents>=1.9.2",
     "weave>=0.51.34",
 ]
+
+[dependency-groups]
+dev = [
+    "nox>=2025.2.9",
+]
