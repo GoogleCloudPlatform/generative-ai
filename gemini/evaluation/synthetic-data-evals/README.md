@@ -164,3 +164,7 @@ evaluator = AgentEvaluator(
 - Vertex AI API access
 - [Weights & Biases account](https://wandb.ai)
 - Required Python packages (see pyproject.toml)
+
+## Contributors
+
+- [Anish Shah](https://github.com/ash0ts)
