@@ -312,7 +312,7 @@ class DatasetGenerator(weave.Model):
         }
 
     @weave.op()
-    def save_dataset(self, examples: List[EvaluationExample], output_path: str = "agent_evaluation_dataset.json") -> str:
+    def save_dataset(self, examples: List[EvaluationExample], output_path: str = "agent_evaluation_dataset.json", save_to_weave: bool = True) -> str:
         """Export evaluation examples to a format compatible with the evaluator"""
         if not examples:
             raise ValueError("No examples to export")
@@ -400,7 +400,37 @@ class DatasetGenerator(weave.Model):
         with open(output_path, "w") as f:
             json.dump(formatted_examples, f, indent=2)
         
-        return f"Exported {len(formatted_examples)} examples to {output_path}"
+        result_message = f"Exported {len(formatted_examples)} examples to {output_path}"
+        
+        # Publish to Weave if requested
+        if save_to_weave and formatted_examples:
+            # Create a Weave dataset with the formatted examples
+            dataset_name = os.path.splitext(os.path.basename(output_path))[0]
+            
+            # Convert the formatted examples to the format expected by Weave Dataset
+            weave_rows = []
+            for example in formatted_examples:
+                weave_rows.append({
+                    "prompt": example["input"],
+                    "expected_response": example["expected_final_response"],
+                    "tools_available": example["tools_available"],
+                    "expected_trajectory": example["expected_trajectory"],
+                    "validation_criteria": example["validation_criteria"],
+                    "difficulty": example["difficulty"],
+                    "tags": example["tags"],
+                    "metadata": example["metadata"]
+                })
+            
+            # Create and publish the dataset
+            dataset = weave.Dataset(name=dataset_name, rows=weave_rows)
+            ref = weave.publish(dataset)
+            
+            result_message += f" and published to Weave as '{dataset_name}' (ref: {ref.uri()})"
+            
+            if self.debug:
+                self.console.print(f"[bold green]Dataset published to Weave:[/bold green] {ref.uri()}")
+        
+        return result_message
 
     @weave.op()
     def generate_dataset(self, input_prompts: List[str]) -> List[EvaluationExample]:
