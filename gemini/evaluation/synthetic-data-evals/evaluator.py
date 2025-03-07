@@ -707,7 +707,10 @@ class AgentEvaluator:
                 
                 # Get the Vertex AI score if available
                 vertex_metrics = model_output.get("vertex_metrics", {})
-                vertex_score = vertex_metrics.get("tool_selection_accuracy/score", {}).get("mean", 0.0)
+                vertex_score = vertex_metrics.get("tool_selection_accuracy/score", 0.0)
+                # If vertex_score is a dict, try to get the mean value
+                if isinstance(vertex_score, dict):
+                    vertex_score = vertex_score.get("mean", 0.0)
                 
                 # Get the tool usage data
                 tool_usage = model_output.get("tool_usage", [])
@@ -738,7 +741,10 @@ class AgentEvaluator:
                 
                 # Get the Vertex AI score if available
                 vertex_metrics = model_output.get("vertex_metrics", {})
-                vertex_score = vertex_metrics.get("response_correctness/score", {}).get("mean", 0.0)
+                vertex_score = vertex_metrics.get("response_correctness/score", 0.0)
+                # Fix: Handle the case where the metric is a float or dict
+                if isinstance(vertex_score, dict):
+                    vertex_score = vertex_score.get("mean", 0.0)
                 
                 # Get the response
                 response = model_output.get("final_response", "")
@@ -757,7 +763,10 @@ class AgentEvaluator:
                 
                 # Get the Vertex AI score if available
                 vertex_metrics = model_output.get("vertex_metrics", {})
-                vertex_score = vertex_metrics.get("trajectory_match/score", {}).get("mean", 0.0)
+                vertex_score = vertex_metrics.get("trajectory_match/score", 0.0)
+                # Fix: Handle the case where the metric is a float or dict
+                if isinstance(vertex_score, dict):
+                    vertex_score = vertex_score.get("mean", 0.0)
                 
                 # Get the trajectory data
                 trajectory = model_output.get("trajectory", [])
@@ -781,7 +790,10 @@ class AgentEvaluator:
                 
                 # Get the Vertex AI score if available
                 vertex_metrics = model_output.get("vertex_metrics", {})
-                vertex_score = vertex_metrics.get("reasoning_quality/score", {}).get("mean", 0.0)
+                vertex_score = vertex_metrics.get("reasoning_quality/score", 0.0)
+                # Fix: Handle the case where the metric is a float or dict
+                if isinstance(vertex_score, dict):
+                    vertex_score = vertex_score.get("mean", 0.0)
                 
                 # Get the reasoning
                 reasoning = model_output.get("reasoning", "")
@@ -800,7 +812,10 @@ class AgentEvaluator:
                 
                 # Get the Vertex AI score if available
                 vertex_metrics = model_output.get("vertex_metrics", {})
-                vertex_score = vertex_metrics.get("coherence/score", {}).get("mean", 0.0)
+                vertex_score = vertex_metrics.get("coherence/score", 0.0)
+                # Fix: Handle the case where the metric is a float or dict
+                if isinstance(vertex_score, dict):
+                    vertex_score = vertex_score.get("mean", 0.0)
                 
                 # Return the coherence score
                 return {
@@ -828,11 +843,41 @@ class AgentEvaluator:
                     reasoning_quality_scorer,
                     coherence_scorer
                 ]
+
             )
             
             # Run Weave evaluation with pass-through function
             try:
-                weave_results = asyncio.run(evaluation.evaluate(pass_through_function))
+                # Extract model information
+                model_info = "unknown"
+                temperature = 0.0  # Default temperature
+                
+                if hasattr(agent, 'model'):
+                    model = agent.model
+                    
+                    # Extract model name
+                    if hasattr(model, 'model_id'):
+                        model_info = model.model_id
+                    elif hasattr(model, 'name'):
+                        model_info = model.name
+                    
+                    # Extract temperature
+                    if hasattr(model, 'kwargs') and isinstance(model.kwargs, dict) and 'temperature' in model.kwargs:
+                        temperature = model.kwargs['temperature']
+                    elif hasattr(model, '_vertex_model') and hasattr(model._vertex_model, 'kwargs') and 'temperature' in model._vertex_model.kwargs:
+                        temperature = model._vertex_model.kwargs['temperature']
+                    elif hasattr(model, 'temperature'):
+                        temperature = model.temperature
+                
+                # Get planning_interval and max_steps
+                planning_interval = getattr(agent, 'planning_interval', 0)
+                max_steps = getattr(agent, 'max_steps', 0)
+                
+                # Create display name
+                model_name = model_info.split('/')[-1] if isinstance(model_info, str) and '/' in model_info else model_info
+                display_name = f"Agent-{model_name}-T{temperature}-PI{planning_interval}-Steps{max_steps}"
+                
+                weave_results = asyncio.run(evaluation.evaluate(pass_through_function, __weave={"display_name": display_name}))
                 if self.verbosity >= 1:
                     self.console.print(f"[green]✓[/green] Weave evaluation complete")
                 
