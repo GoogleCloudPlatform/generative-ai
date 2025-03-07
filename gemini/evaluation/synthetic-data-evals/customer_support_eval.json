@@ -1,7 +1,7 @@
 [
   {
-    "input": "Can you check the status of my order OD602752?",
-    "expected_final_response": "{\n  \"order_id\": \"OD602752\",\n  \"customer_id\": \"reviewer_en_0448316\",\n  \"product_id\": \"product_en_0534354\",\n  \"status\": \"delivered\",\n  \"order_date\": \"2025-01-11\",\n  \"delivery_date\": \"2025-01-13\",\n  \"estimated_delivery_date\": NaN,\n  \"tracking_number\": \"TRK88562456\",\n  \"tracking_info\": {\n    \"number\": \"TRK88562456\",\n    \"carrier\": \"Olist Logistics\",\n    \"tracking_url\": \"https://tracking.olist.com/TRK88562456\"\n  }\n}",
+    "input": "I'm looking for products in the shoes category. What do you have?",
+    "expected_final_response": "{\n  \"category\": \"shoes\",\n  \"product_count\": 1,\n  \"price_range\": \"$54.11 - $54.11\",\n  \"top_products\": [\n    {\n      \"product_id\": \"product_en_0090440\",\n      \"name\": \"Shoes Item 0440\",\n      \"price\": \"$54.11\",\n      \"stock\": 73\n    }\n  ]\n}",
     "tools_available": [
       "product_search",
       "order_status",
@@ -15,16 +15,81 @@
         "step_number": 1,
         "tool_name": "python_interpreter",
         "tool_input": {
-          "code": "order_id = \"OD602752\"\norder_information = order_status(order_id=order_id)\nfinal_answer(order_information)"
+          "code": "shoes_products = category_browse(category=\"shoes\")\nfinal_answer(shoes_products)"
         },
-        "tool_output": "{\n  \"order_id\": \"OD602752\",\n  \"customer_id\": \"reviewer_en_0448316\",\n  \"product_id\": \"product_en_0534354\",\n  \"status\": \"delivered\",\n  \"order_date\": \"2025-01-11\",\n  \"delivery_date\": \"2025-01-13\",\n  \"estimated_delivery_date\": NaN,\n  \"tracking_number\": \"TRK88562456\",\n  \"tracking_info\": {\n    \"number\": \"TRK88562456\",\n    \"carrier\": \"Olist Logistics\",\n    \"tracking_url\": \"https://tracking.olist.com/TRK88562456\"\n  }\n}",
-        "reasoning": "\n```python\norder_id = \"OD602752\"\norder_information = order_status(order_id=order_id)\nfinal_answer(order_information)\n```"
+        "tool_output": "{\n  \"category\": \"shoes\",\n  \"product_count\": 1,\n  \"price_range\": \"$54.11 - $54.11\",\n  \"top_products\": [\n    {\n      \"product_id\": \"product_en_0090440\",\n      \"name\": \"Shoes Item 0440\",\n      \"price\": \"$54.11\",\n      \"stock\": 73\n    }\n  ]\n}",
+        "reasoning": "\nCode:\n```py\nshoes_products = category_browse(category=\"shoes\")\nfinal_answer(shoes_products)\n```"
       }
     ],
     "validation_criteria": {
       "final_response": {
         "min_score": 1.0,
-        "criteria": "The agent correctly used the available tools to respond to the user prompt. It provided complete information about the order, including the status, dates, and tracking information. The response is also well-formatted and easy to understand."
+        "criteria": "Correct category, product count, price range, and product information are returned. Appropriate tools are used. The response is clearly communicated."
+      },
+      "tool_selection": {
+        "expected_tools": [
+          "category_browse",
+          "final_answer"
+        ],
+        "criteria": "Tools should be called in appropriate order with correct arguments"
+      },
+      "reasoning_quality": {
+        "criteria": "The agent correctly uses the `category_browse` tool with the \"shoes\" category and then the `final_answer` tool to display the results. The response is comprehensive and includes product count, price range, and top product details. The code is efficient and directly addresses the user prompt."
+      }
+    },
+    "difficulty": "easy",
+    "tags": [
+      "agent_evaluation",
+      "planning_enabled",
+      "uses_category_browse",
+      "uses_final_answer"
+    ],
+    "metadata": {
+      "model": "WeaveVertexAIServerModel",
+      "model_id": "google/gemini-2.0-flash",
+      "num_steps": 1,
+      "tools_used": [
+        "category_browse",
+        "final_answer"
+      ],
+      "has_planning": true
+    }
+  },
+  {
+    "input": "Can you check the status of my order OD179190?",
+    "expected_final_response": "The order status is processing, and the estimated delivery date is 2025-02-22.",
+    "tools_available": [
+      "product_search",
+      "order_status",
+      "category_browse",
+      "price_check",
+      "customer_order_history",
+      "final_answer"
+    ],
+    "expected_trajectory": [
+      {
+        "step_number": 1,
+        "tool_name": "python_interpreter",
+        "tool_input": {
+          "code": "order_id = \"OD179190\"\norder_information = order_status(order_id=order_id)\nprint(order_information)"
+        },
+        "tool_output": null,
+        "reasoning": "\nThought:I will use the `order_status` tool to check the status of the order with ID OD179190.\nCode:\n```py\norder_id = \"OD179190\"\norder_information = order_status(order_id=order_id)\nprint(order_information)\n```"
+      },
+      {
+        "step_number": 2,
+        "tool_name": "python_interpreter",
+        "tool_input": {
+          "code": "order_status_information = \"The order status is processing, and the estimated delivery date is 2025-02-22.\"\nfinal_answer(order_status_information)"
+        },
+        "tool_output": "The order status is processing, and the estimated delivery date is 2025-02-22.",
+        "reasoning": "Thought:The order status is \"processing\". I will use the `final_answer` tool to provide the order status to the user.\nCode:\n```py\norder_status_information = \"The order status is processing, and the estimated delivery date is 2025-02-22.\"\nfinal_answer(order_status_information)\n```"
+      }
+    ],
+    "validation_criteria": {
+      "final_response": {
+        "min_score": 1.0,
+        "criteria": "The agent successfully used the available tools to respond to the user query accurately and completely. The response is also easy to understand."
       },
       "tool_selection": {
         "expected_tools": [
@@ -34,7 +99,7 @@
         "criteria": "Tools should be called in appropriate order with correct arguments"
       },
       "reasoning_quality": {
-        "criteria": "The agent correctly used the available tool and provided the correct code to get the order information. The agent also used the final_answer tool correctly to respond to the user. Overall, the agent behaved as expected."
+        "criteria": "The agent correctly used the available tools to find the order status and return it to the user. The agent first used the `order_status` tool with the correct order ID, then used the `final_answer` tool to give the information back to the user."
       }
     },
     "difficulty": "easy",
@@ -47,17 +112,17 @@
     "metadata": {
       "model": "WeaveVertexAIServerModel",
       "model_id": "google/gemini-2.0-flash",
-      "num_steps": 1,
+      "num_steps": 2,
       "tools_used": [
-        "final_answer",
-        "order_status"
+        "order_status",
+        "final_answer"
       ],
       "has_planning": true
     }
   },
   {
-    "input": "Can you show me my recent orders? My customer ID is reviewer_en_0407362",
-    "expected_final_response": "{\n  \"customer_id\": \"reviewer_en_0407362\",\n  \"order_count\": 1,\n  \"recent_orders\": [\n    {\n      \"order_id\": \"OD861265\",\n      \"date\": \"2024-09-12\",\n      \"status\": \"delivered\",\n      \"product_id\": \"product_en_0198614\",\n      \"delivery_date\": \"2024-09-13\"\n    }\n  ]\n}",
+    "input": "Can you show me my recent orders? My customer ID is reviewer_en_0048495",
+    "expected_final_response": "{\n  \"customer_id\": \"reviewer_en_0048495\",\n  \"order_count\": 1,\n  \"recent_orders\": [\n    {\n      \"order_id\": \"OD349791\",\n      \"date\": \"2024-10-24\",\n      \"status\": \"delivered\",\n      \"product_id\": \"product_en_0818466\",\n      \"delivery_date\": \"2024-10-30\"\n    }\n  ]\n}",
     "tools_available": [
       "product_search",
       "order_status",
@@ -71,16 +136,16 @@
         "step_number": 1,
         "tool_name": "python_interpreter",
         "tool_input": {
-          "code": "customer_id = \"reviewer_en_0407362\"\norder_history = customer_order_history(customer_id=customer_id)\nfinal_answer(order_history)"
+          "code": "customer_id = \"reviewer_en_0048495\"\norder_history = customer_order_history(customer_id=customer_id)\nfinal_answer(order_history)"
         },
-        "tool_output": "{\n  \"customer_id\": \"reviewer_en_0407362\",\n  \"order_count\": 1,\n  \"recent_orders\": [\n    {\n      \"order_id\": \"OD861265\",\n      \"date\": \"2024-09-12\",\n      \"status\": \"delivered\",\n      \"product_id\": \"product_en_0198614\",\n      \"delivery_date\": \"2024-09-13\"\n    }\n  ]\n}",
-        "reasoning": "\nThought:\nI will use the `customer_order_history` tool to retrieve the order history for the customer with ID \"reviewer_en_0407362\".\nCode:\n```py\ncustomer_id = \"reviewer_en_0407362\"\norder_history = customer_order_history(customer_id=customer_id)\nfinal_answer(order_history)\n```"
+        "tool_output": "{\n  \"customer_id\": \"reviewer_en_0048495\",\n  \"order_count\": 1,\n  \"recent_orders\": [\n    {\n      \"order_id\": \"OD349791\",\n      \"date\": \"2024-10-24\",\n      \"status\": \"delivered\",\n      \"product_id\": \"product_en_0818466\",\n      \"delivery_date\": \"2024-10-30\"\n    }\n  ]\n}",
+        "reasoning": "\nCode:\n```py\ncustomer_id = \"reviewer_en_0048495\"\norder_history = customer_order_history(customer_id=customer_id)\nfinal_answer(order_history)\n```"
       }
     ],
     "validation_criteria": {
       "final_response": {
         "min_score": 1.0,
-        "criteria": "The agent correctly used the available tools to respond to the prompt. The response is correct, complete, and well-formatted. It also uses clear communication."
+        "criteria": "Correct answer. Used appropriate tools and communicated the information clearly."
       },
       "tool_selection": {
         "expected_tools": [
@@ -90,7 +155,7 @@
         "criteria": "Tools should be called in appropriate order with correct arguments"
       },
       "reasoning_quality": {
-        "criteria": "The agent correctly used the available tool and provided the order history. The code is also concise and efficient."
+        "criteria": "The agent correctly used the available tools and achieved the desired outcome. The agent correctly extracted the customer ID, used the tool to retrieve order history and displayed the result."
       }
     },
     "difficulty": "easy",
@@ -106,77 +171,6 @@
       "num_steps": 1,
       "tools_used": [
         "customer_order_history",
-        "final_answer"
-      ],
-      "has_planning": true
-    }
-  },
-  {
-    "input": "I'm looking for digital_ebook_purchase products and also want to check my order OD563365",
-    "expected_final_response": "{'products': '[\\n  {\\n    \"product_id\": \"product_en_0025873\",\\n    \"name\": \"Digital Ebook Purchase Item 5873\",\\n    \"category\": \"digital_ebook_purchase\",\\n    \"price\": \"$65.58\",\\n    \"stock\": 90,\\n    \"description\": \"Quality digital ebook purchase product with ID 5873.\",\\n    \"warranty\": \"1 year limited\",\\n    \"return_period\": \"14 days\"\\n  },\\n  {\\n    \"product_id\": \"product_en_0061764\",\\n    \"name\": \"Digital Ebook Purchase Item 1764\",\\n    \"category\": \"digital_ebook_purchase\",\\n    \"price\": \"$66.78\",\\n    \"stock\": 137,\\n    \"description\": \"Quality digital ebook purchase product with ID 1764.\",\\n    \"warranty\": \"1 year limited\",\\n    \"return_period\": \"14 days\"\\n  },\\n  {\\n    \"product_id\": \"product_en_0072152\",\\n    \"name\": \"Digital Ebook Purchase Item 2152\",\\n    \"category\": \"digital_ebook_purchase\",\\n    \"price\": \"$87.96\",\\n    \"stock\": 127,\\n    \"description\": \"Quality digital ebook purchase product with ID 2152.\",\\n    \"warranty\": \"1 year limited\",\\n    \"return_period\": \"14 days\"\\n  }\\n]', 'order': '{\\n  \"order_id\": \"OD563365\",\\n  \"customer_id\": \"reviewer_en_0201463\",\\n  \"product_id\": \"product_en_0703929\",\\n  \"status\": \"delivered\",\\n  \"order_date\": \"2024-12-26\",\\n  \"delivery_date\": \"2024-12-31\",\\n  \"estimated_delivery_date\": NaN,\\n  \"tracking_number\": \"TRK58440784\",\\n  \"tracking_info\": {\\n    \"number\": \"TRK58440784\",\\n    \"carrier\": \"Olist Logistics\",\\n    \"tracking_url\": \"https://tracking.olist.com/TRK58440784\"\\n  }\\n}'}",
-    "tools_available": [
-      "product_search",
-      "order_status",
-      "category_browse",
-      "price_check",
-      "customer_order_history",
-      "final_answer"
-    ],
-    "expected_trajectory": [
-      {
-        "step_number": 1,
-        "tool_name": "python_interpreter",
-        "tool_input": {
-          "code": "products = product_search(query=\"digital_ebook_purchase\")\nprint(products)\norder = order_status(order_id=\"OD563365\")\nprint(order)"
-        },
-        "tool_output": null,
-        "reasoning": "\nCode:\n```py\nproducts = product_search(query=\"digital_ebook_purchase\")\nprint(products)\norder = order_status(order_id=\"OD563365\")\nprint(order)\n```"
-      },
-      {
-        "step_number": 2,
-        "tool_name": "python_interpreter",
-        "tool_input": {
-          "code": "final_answer({\"products\": products, \"order\": order})"
-        },
-        "tool_output": {
-          "products": "[\n  {\n    \"product_id\": \"product_en_0025873\",\n    \"name\": \"Digital Ebook Purchase Item 5873\",\n    \"category\": \"digital_ebook_purchase\",\n    \"price\": \"$65.58\",\n    \"stock\": 90,\n    \"description\": \"Quality digital ebook purchase product with ID 5873.\",\n    \"warranty\": \"1 year limited\",\n    \"return_period\": \"14 days\"\n  },\n  {\n    \"product_id\": \"product_en_0061764\",\n    \"name\": \"Digital Ebook Purchase Item 1764\",\n    \"category\": \"digital_ebook_purchase\",\n    \"price\": \"$66.78\",\n    \"stock\": 137,\n    \"description\": \"Quality digital ebook purchase product with ID 1764.\",\n    \"warranty\": \"1 year limited\",\n    \"return_period\": \"14 days\"\n  },\n  {\n    \"product_id\": \"product_en_0072152\",\n    \"name\": \"Digital Ebook Purchase Item 2152\",\n    \"category\": \"digital_ebook_purchase\",\n    \"price\": \"$87.96\",\n    \"stock\": 127,\n    \"description\": \"Quality digital ebook purchase product with ID 2152.\",\n    \"warranty\": \"1 year limited\",\n    \"return_period\": \"14 days\"\n  }\n]",
-          "order": "{\n  \"order_id\": \"OD563365\",\n  \"customer_id\": \"reviewer_en_0201463\",\n  \"product_id\": \"product_en_0703929\",\n  \"status\": \"delivered\",\n  \"order_date\": \"2024-12-26\",\n  \"delivery_date\": \"2024-12-31\",\n  \"estimated_delivery_date\": NaN,\n  \"tracking_number\": \"TRK58440784\",\n  \"tracking_info\": {\n    \"number\": \"TRK58440784\",\n    \"carrier\": \"Olist Logistics\",\n    \"tracking_url\": \"https://tracking.olist.com/TRK58440784\"\n  }\n}"
-        },
-        "reasoning": "```Thought:\nI have successfully retrieved the digital_ebook_purchase products and the order status. Now I will combine the results and provide the final answer.\n```Code:\n```py\nfinal_answer({\"products\": products, \"order\": order})\n```"
-      }
-    ],
-    "validation_criteria": {
-      "final_response": {
-        "min_score": 1.0,
-        "criteria": "The agent successfully used the available tools to address both parts of the user's request. It provided product search results and order details. The response is well-formatted and easy to understand."
-      },
-      "tool_selection": {
-        "expected_tools": [
-          "product_search",
-          "order_status",
-          "final_answer"
-        ],
-        "criteria": "Tools should be called in appropriate order with correct arguments"
-      },
-      "reasoning_quality": {
-        "criteria": "The agent expertly used available tools to address the user prompt. It first searched for products matching the \"digital_ebook_purchase\" category and then retrieved the order status for the provided order ID. Finally, it combined and presented the retrieved information effectively.  The code is well-structured, efficient, and directly addresses all aspects of the user's request."
-      }
-    },
-    "difficulty": "easy",
-    "tags": [
-      "agent_evaluation",
-      "planning_enabled",
-      "uses_product_search",
-      "uses_order_status",
-      "uses_final_answer"
-    ],
-    "metadata": {
-      "model": "WeaveVertexAIServerModel",
-      "model_id": "google/gemini-2.0-flash",
-      "num_steps": 2,
-      "tools_used": [
-        "product_search",
-        "order_status",
         "final_answer"
       ],
       "has_planning": true
