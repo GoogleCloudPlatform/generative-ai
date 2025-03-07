@@ -12,11 +12,11 @@ resolution-markers = [
 
 [[package]]
 name = "aiohappyeyeballs"
-version = "2.4.8"
+version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/de/7c/79a15272e88d2563c9d63599fa59f05778975f35b255bf8f90c8b12b4ada/aiohappyeyeballs-2.4.8.tar.gz", hash = "sha256:19728772cb12263077982d2f55453babd8bec6a052a926cd5c0c42796da8bf62", size = 22337 }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/0c/458958007041f4b4de2d307e6b75d9e7554dad0baf26fe7a48b741aac126/aiohappyeyeballs-2.5.0.tar.gz", hash = "sha256:18fde6204a76deeabc97c48bdd01d5801cfda5d6b9c8bbeb1aaaee9d648ca191", size = 22494 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/52/0e/b187e2bb3eeb2644515109657c4474d65a84e7123de249bf1e8467d04a65/aiohappyeyeballs-2.4.8-py3-none-any.whl", hash = "sha256:6cac4f5dd6e34a9644e69cf9021ef679e4394f54e58a183056d12009e42ea9e3", size = 15005 },
+    { url = "https://files.pythonhosted.org/packages/1b/9a/e4886864ce06e1579bd428208127fbdc0d62049c751e4e9e3b509c0059dc/aiohappyeyeballs-2.5.0-py3-none-any.whl", hash = "sha256:0850b580748c7071db98bffff6d4c94028d0d3035acc20fd721a0ce7e8cac35d", size = 15128 },
 ]
 
 [[package]]
@@ -598,7 +598,7 @@ wheels = [
 
 [[package]]
 name = "google-cloud-aiplatform"
-version = "1.82.0"
+version = "1.83.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
@@ -614,9 +614,9 @@ dependencies = [
     { name = "shapely" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/82/f2/86f7c064b04415c61f1952c09e972a80054708e29f443c068d7410d4c71e/google_cloud_aiplatform-1.82.0.tar.gz", hash = "sha256:b7ea7379249cc1821aa46300a16e4b15aa64aa22665e2536b2bcb7e473d7438e", size = 8735542 }
+sdist = { url = "https://files.pythonhosted.org/packages/bf/e4/ab73a6dcf77d5ac0d245c5dd506e4494ad80fdb49193b1ea4c930708b1e9/google_cloud_aiplatform-1.83.0.tar.gz", hash = "sha256:cda870c2cce1682ef006f8b87f18cfa8927ff9daf3944aa4ff01f8e552e89928", size = 8756256 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cb/e9/f0ad7ef7e50eb2e98b48e087d321b1a1f765b97c6392f00cc3109ca98af0/google_cloud_aiplatform-1.82.0-py2.py3-none-any.whl", hash = "sha256:13368a961b2bfa8f46ccd10371bb19bd5f946d8f29c411726061ed1a140ce890", size = 7291872 },
+    { url = "https://files.pythonhosted.org/packages/c3/a7/440d4d1cac03e6cde2f432bc78e0b109b732d4d0b58e6ae5dda9666af423/google_cloud_aiplatform-1.83.0-py2.py3-none-any.whl", hash = "sha256:fa33932af5d88ccf42f901f6ffdf8abee87f6db82ea17df713062dd41707a154", size = 7311467 },
 ]
 
 [package.optional-dependencies]
@@ -745,14 +745,14 @@ wheels = [
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.69.0"
+version = "1.69.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c2/92/6bb11dad062ad7cc40665d0a8986193d54f1a0032b510e84e7182df9e661/googleapis_common_protos-1.69.0.tar.gz", hash = "sha256:5a46d58af72846f59009b9c4710425b9af2139555c71837081706b213b298187", size = 61264 }
+sdist = { url = "https://files.pythonhosted.org/packages/41/4f/d8be74b88621131dfd1ed70e5aff2c47f2bdf2289a70736bbf3eb0e7bc70/googleapis_common_protos-1.69.1.tar.gz", hash = "sha256:e20d2d8dda87da6fe7340afbbdf4f0bcb4c8fae7e6cadf55926c31f946b0b9b1", size = 144514 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1d/66/0025e2b7a2ae353acea03cf9d4a96ae32ef02c116944e2eb11f559cf4b7b/googleapis_common_protos-1.69.0-py2.py3-none-any.whl", hash = "sha256:17835fdc4fa8da1d61cfe2d4d5d57becf7c61d4112f8d81c67eaa9d7ce43042d", size = 169749 },
+    { url = "https://files.pythonhosted.org/packages/16/cb/2f4aa605b16df1e031dd7c322c597613eef933e8dd5b6a4414330b21e791/googleapis_common_protos-1.69.1-py2.py3-none-any.whl", hash = "sha256:4077f27a6900d5946ee5a369fab9c8ded4c0ef1c6e880458ea2f70c14f7b70d5", size = 293229 },
 ]
 
 [package.optional-dependencies]
@@ -762,7 +762,7 @@ grpc = [
 
 [[package]]
 name = "gql"
-version = "3.5.1"
+version = "3.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -770,9 +770,9 @@ dependencies = [
     { name = "graphql-core" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/6b/40b5e2191d6f7b3a22cbdc22fd1ae57f68f9cc479dbb93d69312a7af4d67/gql-3.5.1.tar.gz", hash = "sha256:6845cf92cabf885cfd3940211f74f63328ce1148a3e0156005f33eae8b73ac09", size = 180187 }
+sdist = { url = "https://files.pythonhosted.org/packages/49/ef/5298d9d628b6a54b3b810052cb5a935d324fe28d9bfdeb741733d5c2446b/gql-3.5.2.tar.gz", hash = "sha256:07e1325b820c8ba9478e95de27ce9f23250486e7e79113dbb7659a442dc13e74", size = 180502 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/ae/422da340e4daec7b2d33cbd1de3240147bd1abd6b429790e44715dc1492f/gql-3.5.1-py2.py3-none-any.whl", hash = "sha256:e58f23b7e2bc7239ffcf5950f43f978b27da27c348201ff8a68127a1f8ebd54c", size = 74200 },
+    { url = "https://files.pythonhosted.org/packages/ff/71/b028b937992056e721bbf0371e13819fcca0dacde7b3c821f775ed903917/gql-3.5.2-py2.py3-none-any.whl", hash = "sha256:c830ffc38b3997b2a146317b27758305ab3d0da3bde607b49f34e32affb23ba2", size = 74346 },
 ]
 
 [package.optional-dependencies]
@@ -786,11 +786,11 @@ requests = [
 
 [[package]]
 name = "graphql-core"
-version = "3.2.3"
+version = "3.2.4"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ee/a6/94df9045ca1bac404c7b394094cd06713f63f49c7a4d54d99b773ae81737/graphql-core-3.2.3.tar.gz", hash = "sha256:06d2aad0ac723e35b1cb47885d3e5c45e956a53bc1b209a9fc5369007fe46676", size = 529552 }
+sdist = { url = "https://files.pythonhosted.org/packages/66/9e/aa527fb09a9d7399d5d7d2aa2da490e4580707652d3b4fc156996ae88a5b/graphql-core-3.2.4.tar.gz", hash = "sha256:acbe2e800980d0e39b4685dd058c2f4042660b89ebca38af83020fd872ff1264", size = 504611 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/39/e5143e7ec70939d2076c1165ae9d4a3815597019c4d797b7f959cf778600/graphql_core-3.2.3-py3-none-any.whl", hash = "sha256:5766780452bd5ec8ba133f8bf287dc92713e3868ddd83aee4faab9fc3e303dc3", size = 202921 },
+    { url = "https://files.pythonhosted.org/packages/d1/33/cc72c4c658c6316f188a60bc4e5a91cd4ceaaa8c3e7e691ac9297e4e72c7/graphql_core-3.2.4-py3-none-any.whl", hash = "sha256:1604f2042edc5f3114f49cac9d77e25863be51b23a54a61a23245cf32f6476f0", size = 203179 },
 ]
 
 [[package]]
@@ -934,7 +934,7 @@ wheels = [
 
 [[package]]
 name = "instructor"
-version = "1.7.2"
+version = "1.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -949,21 +949,21 @@ dependencies = [
     { name = "tenacity" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/63/ba/692739c76959191aa7e5f0fccda871b36548355f4a09c8733687e64e62b0/instructor-1.7.2.tar.gz", hash = "sha256:6c01b2b159766df24865dc81f7bf8457cbda88a3c0bbc810da3467d19b185ed2", size = 66200177 }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/9d/4a2b7d4861df2a1b3cfc229fdeca242965783495deaf9d2b2d1f80847f30/instructor-1.7.3.tar.gz", hash = "sha256:5efb5d3d3afb0441513894b97bb9ab498daf88c2b5547a396c79c4d59d42563d", size = 66340621 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c5/82/fd319382c1a33d7021cf151007b4cbd5daddf09d9ca5fb670e476668f9fc/instructor-1.7.2-py3-none-any.whl", hash = "sha256:cb43d27f6d7631c31762b936b2fcb44d2a3f9d8a020430a0f4d3484604ffb95b", size = 71353 },
+    { url = "https://files.pythonhosted.org/packages/3a/66/0a2b9f44ba2ac749fad969e44245816ae5d084a85636770fa36c9c26160f/instructor-1.7.3-py3-none-any.whl", hash = "sha256:8c206f914445664bc52bcc3cc41468a284a347faaacefcdbc2922099feaa70ea", size = 79205 },
 ]
 
 [[package]]
 name = "jinja2"
-version = "3.1.5"
+version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markupsafe" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/af/92/b3130cbbf5591acf9ade8708c365f3238046ac7cb8ccba6e81abccb0ccff/jinja2-3.1.5.tar.gz", hash = "sha256:8fefff8dc3034e27bb80d67c671eb8a9bc424c0ef4c0826edbff304cceff43bb", size = 244674 }
+sdist = { url = "https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c72f3e33cef02e048281fec7ecec5f032d4aac52226b/jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d", size = 245115 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/0f/2ba5fbcd631e3e88689309dbe978c5769e883e4b84ebfe7da30b43275c5a/jinja2-3.1.5-py3-none-any.whl", hash = "sha256:aba0f4dc9ed8013c424088f68a5c226f7d6097ed89b246d7749c2ec4175c6adb", size = 134596 },
+    { url = "https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67", size = 134899 },
 ]
 
 [[package]]
@@ -1133,7 +1133,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.62.1"
+version = "1.63.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1148,9 +1148,22 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/05/a671625824733f3b0718f9a72ad16bd3074f76f988378b99c03165543593/litellm-1.62.1.tar.gz", hash = "sha256:eee9cc40dc9c1da7e411af2f4ef145a67bb61702ae4e1218c1bc15b9e6404daa", size = 6586623 }
+sdist = { url = "https://files.pythonhosted.org/packages/b8/58/ff02c75d9f7b0bcb414e54eb3a9994d5d29ceb46eb8f681e34d476f09d41/litellm-1.63.3.tar.gz", hash = "sha256:329fa60e2c93e95d28798c2fbc63aaca67d8da38b2256d015cb169e97e5382f3", size = 6589147 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/eb/090b227c8b81735226f311db732e7ad034720e787966511b298fdb892e13/litellm-1.62.1-py3-none-any.whl", hash = "sha256:f576358c72b477207d1f45ce5ac895ede7bd84377f6420a6b522909c829a79dc", size = 6895313 },
+    { url = "https://files.pythonhosted.org/packages/7d/13/bde5273a50ef03be4b517a3aadb4613284befb8c1e9c6792bf0e5053bb46/litellm-1.63.3-py3-none-any.whl", hash = "sha256:bbe56d3b4afa5dda1e9730071780601e03278bba003da1634c4a2dc93c83ae05", size = 6901557 },
+]
+
+[[package]]
+name = "loguru"
+version = "0.7.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "win32-setctime", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6", size = 63559 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0c/29/0348de65b8cc732daa3e33e67806420b2ae89bdce2b04af740289c5c6c8c/loguru-0.7.3-py3-none-any.whl", hash = "sha256:31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c", size = 61595 },
 ]
 
 [[package]]
@@ -1457,7 +1470,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.65.3"
+version = "1.65.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1469,9 +1482,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/32/4f/b34b6fad12e1f6b3f42922214c161d5ef74a50fa97d9ae7d680db0958ff4/openai-1.65.3.tar.gz", hash = "sha256:9b7cd8f79140d03d77f4ed8aeec6009be5dcd79bbc02f03b0e8cd83356004f71", size = 358821 }
+sdist = { url = "https://files.pythonhosted.org/packages/fa/8d/1f7aace801afbbe4d6b8c7fa89b76eb9a3a8eeff38b84d4005d47b226b30/openai-1.65.4.tar.gz", hash = "sha256:0b08c58625d556f5c6654701af1023689c173eb0989ce8f73c7fd0eb22203c76", size = 359365 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/86/d5/b8378be0f4cf192992aa3080eb9ddcdca3109b399be61984424aaa79f847/openai-1.65.3-py3-none-any.whl", hash = "sha256:a155fa5d60eccda516384d3d60d923e083909cc126f383fe4a350f79185c232a", size = 472758 },
+    { url = "https://files.pythonhosted.org/packages/ba/db/7bab832be24631a793492c1c61ecbf029018b99696f435db3b63d690bf1c/openai-1.65.4-py3-none-any.whl", hash = "sha256:15566d46574b94eae3d18efc2f9a4ebd1366d1d44bfc1bdafeea7a5cf8271bcb", size = 473523 },
 ]
 
 [[package]]
@@ -2287,6 +2300,19 @@ wheels = [
 ]
 
 [[package]]
+name = "set-env-colab-kaggle-dotenv"
+version = "0.1.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "loguru" },
+    { name = "python-dotenv" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/b6/f7c54f1f28dda8fa2299fb2bd962cfdc77d6db4fe700862ce34d56e88b3b/set_env_colab_kaggle_dotenv-0.1.4.tar.gz", hash = "sha256:91e0977a45ae4d776eac18bf887cbcfac8437921051c27cd58ae3c4caa571cab", size = 142227 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/ef/eb4a519f321b49d47faf8245442641aa27334dd5a82018bf11300bebc3a8/set_env_colab_kaggle_dotenv-0.1.4-py3-none-any.whl", hash = "sha256:090a1173644e9d6c23da47c0a1ec18cee13b38bacd79863ceabf68e21f69fdd7", size = 3884 },
+]
+
+[[package]]
 name = "setproctitle"
 version = "1.3.5"
 source = { registry = "https://pypi.org/simple" }
@@ -2446,6 +2472,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "seaborn" },
+    { name = "set-env-colab-kaggle-dotenv" },
     { name = "smolagents" },
     { name = "weave" },
 ]
@@ -2460,6 +2487,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "set-env-colab-kaggle-dotenv", specifier = ">=0.1.4" },
     { name = "smolagents", specifier = ">=1.9.2" },
     { name = "weave", specifier = ">=0.51.34" },
 ]
@@ -2655,7 +2683,7 @@ wheels = [
 
 [[package]]
 name = "weave"
-version = "0.51.35"
+version = "0.51.36"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "diskcache" },
@@ -2670,9 +2698,9 @@ dependencies = [
     { name = "uuid-utils" },
     { name = "wandb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/31/17/c95fabcb0f046870ffb9b76f58eb77a2f1c24acc7c28bd6734fa9c0edd47/weave-0.51.35.tar.gz", hash = "sha256:698203f875176302e21f88039dd715386405ae8fe528f39cf00dfffaf9af9d49", size = 302300 }
+sdist = { url = "https://files.pythonhosted.org/packages/05/ff/cdeb5abffc5732435f0dabd27f56bf80f80d3ab61d0bca4582047c4530b5/weave-0.51.36.tar.gz", hash = "sha256:a4cac959d24b3b2d68b3ef5ffe9720d48bef1567d5267e075c618ccf3fe1c77f", size = 312063 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/73/28435c5125d656d3f57a735ad8b0e2fba0aa5cefff7320bbda32af0e2dda/weave-0.51.35-py3-none-any.whl", hash = "sha256:4cbff571d5ce62a956d51f4d2b77140af2d117e06d5c111ca73ed38a212a3dd1", size = 391625 },
+    { url = "https://files.pythonhosted.org/packages/ab/b7/b12c912e0b6e7426cbd6c787c4df7c00b92cc81e9d59e13e8c68b69850a6/weave-0.51.36-py3-none-any.whl", hash = "sha256:e619a9c1059b49808e160613573c460184bab8b611d390279f5de6649b4428de", size = 401690 },
 ]
 
 [[package]]
@@ -2682,6 +2710,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923", size = 9721 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/24/2a3e3df732393fed8b3ebf2ec078f05546de641fe1b667ee316ec1dcf3b7/webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78", size = 11774 },
+]
+
+[[package]]
+name = "win32-setctime"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b3/8f/705086c9d734d3b663af0e9bb3d4de6578d08f46b1b101c2442fd9aecaa2/win32_setctime-1.2.0.tar.gz", hash = "sha256:ae1fdf948f5640aae05c511ade119313fb6a30d7eabe25fef9764dca5873c4c0", size = 4867 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/07/c6fe3ad3e685340704d314d765b7912993bcb8dc198f0e7a89382d37974b/win32_setctime-1.2.0-py3-none-any.whl", hash = "sha256:95d644c4e708aba81dc3704a116d8cbc974d70b3bdb8be1d150e36be6e9d1390", size = 4083 },
 ]
 
 [[package]]

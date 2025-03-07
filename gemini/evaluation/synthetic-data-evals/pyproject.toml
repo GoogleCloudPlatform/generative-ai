@@ -13,6 +13,7 @@ dependencies = [
     "pydantic>=2.10.6",
     "python-dotenv>=1.0.1",
     "seaborn>=0.13.2",
+    "set-env-colab-kaggle-dotenv>=0.1.4",
     "smolagents>=1.9.2",
     "weave>=0.51.34",
 ]
