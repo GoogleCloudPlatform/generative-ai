@@ -20,5 +20,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "nbqa>=1.9.1",
     "nox>=2025.2.9",
 ]
