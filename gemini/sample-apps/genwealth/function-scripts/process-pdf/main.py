@@ -226,7 +226,7 @@ def process_pdf(cloud_event):
 
     # Setup embeddings
     embedding = VertexAIEmbeddings(
-        model_name="textembedding-gecko@003", project=project_id
+        model_name="text-embedding-005", project=project_id
     )
 
     # AlloyDB Vars

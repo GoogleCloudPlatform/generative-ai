@@ -57,9 +57,9 @@ echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -
 sql=$(
   cat <<EOF
 CALL google_ml.create_model (
-	model_id => 'textembedding-gecko@003',
+	model_id => 'text-embedding-005',
 	model_provider => 'google',
-	model_qualified_name => 'textembedding-gecko@003',
+	model_qualified_name => 'text-embedding-005',
 	model_type => 'text_embedding',
 	model_auth_type => 'alloydb_service_agent_iam'
 );
@@ -68,7 +68,7 @@ EOF
 echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
 # Register Gemini model
-GEMINI_ENDPOINT="https://${REGION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${REGION}/publishers/google/models/gemini-1.0-pro:generateContent"
+GEMINI_ENDPOINT="https://${REGION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${REGION}/publishers/google/models/gemini-2.0-flash-001:generateContent"
 sql=$(
   cat <<EOF
 CALL
@@ -146,9 +146,9 @@ CREATE TABLE IF NOT EXISTS conversation_history (
     id SERIAL PRIMARY KEY,  
     user_id INTEGER, 
     user_prompt TEXT, 
-  user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (google_ml.embedding('textembedding-gecko@003', user_prompt)::vector) STORED,
+  user_prompt_embedding VECTOR(768) GENERATED ALWAYS AS (google_ml.embedding('text-embedding-005', user_prompt)::vector) STORED,
     ai_response TEXT,
-  ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (google_ml.embedding('textembedding-gecko@003', ai_response)::vector) STORED,
+  ai_response_embedding VECTOR(768) GENERATED ALWAYS AS (google_ml.embedding('text-embedding-005', ai_response)::vector) STORED,
     datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
 
@@ -242,7 +242,7 @@ sql=$(
   cat <<EOF
 CREATE OR REPLACE FUNCTION update_overview_embedding() RETURNS trigger AS \$\$
 BEGIN
-  NEW.overview_embedding := google_ml.embedding('textembedding-gecko@003', NEW.overview)::vector;
+  NEW.overview_embedding := google_ml.embedding('text-embedding-005', NEW.overview)::vector;
   RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
@@ -255,7 +255,7 @@ EXECUTE PROCEDURE update_overview_embedding();
 -- Analysis overview and function
 CREATE OR REPLACE FUNCTION update_analysis_embedding() RETURNS trigger AS \$\$
 BEGIN
-  NEW.analysis_embedding := google_ml.embedding('textembedding-gecko@003', NEW.analysis)::vector;
+  NEW.analysis_embedding := google_ml.embedding('text-embedding-005', NEW.analysis)::vector;
   RETURN NEW;
 END;
 \$\$ LANGUAGE plpgsql;
