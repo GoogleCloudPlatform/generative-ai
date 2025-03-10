@@ -239,13 +239,13 @@ The best explanation of embeddings I've seen
 
 ## Agents on top of RAG
 
-- **[tutorial_vertex_ai_search_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_vertex_ai_search_rag_agent.ipynb)**:
+- **[tutorial_vertex_ai_search_rag_agent.ipynb](../gemini/agent-engine/tutorial_vertex_ai_search_rag_agent.ipynb)**:
   Demonstrates building and deploying a conversational search agent on Vertex AI using LangChain, a reasoning engine, and RAG with Vertex AI Search to
   query a movie dataset.
-- **[tutorial_alloydb_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_alloydb_rag_agent.ipynb)**:
+- **[tutorial_alloydb_rag_agent.ipynb](../gemini/agent-engine/tutorial_alloydb_rag_agent.ipynb)**:
   Demonstrates deploying a RAG application using LangChain, AlloyDB for
   PostgreSQL, and Vertex AI, covering setup, deployment, and cleanup.
-- **[tutorial_cloud_sql_pg_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_cloud_sql_pg_rag_agent.ipynb)**:
+- **[tutorial_cloud_sql_pg_rag_agent.ipynb](../gemini/agent-engine/tutorial_cloud_sql_pg_rag_agent.ipynb)**:
   Demonstrates deploying a RAG application using LangChain, Vertex AI, and
   Cloud SQL for PostgreSQL, enabling semantic search and LLM-based responses.
 
