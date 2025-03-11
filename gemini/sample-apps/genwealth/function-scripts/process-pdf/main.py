@@ -225,9 +225,7 @@ def process_pdf(cloud_event):
     lc_doc_chunks = split_document(lc_doc)
 
     # Setup embeddings
-    embedding = VertexAIEmbeddings(
-        model_name="text-embedding-005", project=project_id
-    )
+    embedding = VertexAIEmbeddings(model_name="text-embedding-005", project=project_id)
 
     # AlloyDB Vars
     cluster = "alloydb-cluster"
