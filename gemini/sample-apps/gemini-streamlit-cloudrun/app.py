@@ -6,11 +6,10 @@ This module demonstrates the usage of the Gemini API in Vertex AI within a Strea
 import os
 
 from google import genai
-from google.genai.types import GenerateContentConfig, Part
-import streamlit as st
-
 import google.auth
+from google.genai.types import GenerateContentConfig, Part
 import httpx
+import streamlit as st
 
 
 def _project_id() -> str:
@@ -32,17 +31,13 @@ def _region() -> str:
             headers={"Metadata-Flavor": "Google"},
         )
         return resp.text.split("/")[-1]
-    except httpx.RequestError as e:
-        raise Exception(f"Could not determine region. Error: {e}") from e
+    except httpx.RequestError:
+        return "us-central1"
 
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", _project_id())
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", _region())
-
-if PROJECT_ID and not LOCATION:
-    LOCATION = "us-central1"
-
 MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
@@ -70,6 +65,11 @@ def get_model_name(name: str | None) -> str:
         return "Gemini"
     return MODELS.get(name, "Gemini")
 
+
+st.link_button(
+    "View on GitHub",
+    "https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/gemini-streamlit-cloudrun",
+)
 
 st.header(":sparkles: Gemini API in Vertex AI", divider="rainbow")
 client = load_client()
@@ -155,7 +155,6 @@ with freeform_tab:
                     f"""Parameters:\n- Model ID: `{selected_model}`\n- Temperature: `{temperature}`\n- Top P: `{top_p}`\n- Max Output Tokens: `{max_output_tokens}`\n"""
                 )
                 st.code(prompt, language="markdown")
-
 
 with tab1:
     st.subheader("Generate a story")
