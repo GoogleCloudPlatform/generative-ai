@@ -210,15 +210,15 @@ cd || echo "Could not cd into user profile root"
 mkdir -p /tmp/demo-data
 cd /tmp/demo-data || echo "Could not cd into user profile root"
 gsutil -m cp \
-  "gs://pr-public-demo-data/genwealth-demo/investments" \
-  "gs://pr-public-demo-data/genwealth-demo/user_profiles" \
+  "gs://pr-public-demo-data/genwealth-demo/investments-005" \
+  "gs://pr-public-demo-data/genwealth-demo/user_profiles-005" \
   "gs://pr-public-demo-data/genwealth-demo/llm-gemini.sql" .
 
 # Load the investments table
 echo "Loading the investments table"
 sql=$(
   cat <<EOF
-\copy investments FROM '/tmp/demo-data/investments' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
+\copy investments FROM '/tmp/demo-data/investments-005' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
 EOF
 )
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
@@ -227,7 +227,7 @@ echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres
 echo "Loading the user_profiles table"
 sql=$(
   cat <<EOF
-\copy user_profiles FROM '/tmp/demo-data/user_profiles' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
+\copy user_profiles FROM '/tmp/demo-data/user_profiles-005' WITH (FORMAT csv, DELIMITER '|', QUOTE "'", ESCAPE "'")
 EOF
 )
 echo "$sql" | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
