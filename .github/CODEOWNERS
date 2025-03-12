@@ -84,3 +84,5 @@
 /generative-ai/gemini/sample-apps/genai-mlops-tune-and-eval                       @willisc7 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/multimodal-sentiment-analysis/intro_to_multimodal_sentiment_analysis.ipynb                      @Mansari
 /generative-ai/gemini/use-cases/productivity/productivity_coaching_with_google_calendar_and_gmail.ipynb                      @Mansari
+/generative-ai/open-models/serving/cloud_run_ollama_gemma3_inference.ipynb     @vladkol @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb     @vladkol @GoogleCloudPlatform/generative-ai-devrel
