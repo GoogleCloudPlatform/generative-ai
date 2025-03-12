@@ -194,7 +194,7 @@ Follow the steps below to build the new Gen AI feature.
    -- Search for stocks that might perform well in a high inflation environment
    -- using semantic search with Gen AI embeddings
    SELECT ticker, etf, rating, analysis,
-       analysis_embedding <=> google_ml.embedding('textembedding-gecko@003', 'hedge against high inflation')::vector AS distance
+       analysis_embedding <=> google_ml.embedding('text-embedding-005', 'hedge against high inflation')::vector AS distance
    FROM investments
    ORDER BY distance
    LIMIT 5;
@@ -223,7 +223,7 @@ Follow the steps below to build the new Gen AI feature.
    ```SQL
    -- Use similarity search with Gen AI embeddings to find potential customers for a new Bitcoin ETF
    SELECT first_name, last_name, email, age, risk_profile, bio,
-       bio_embedding <=> google_ml.embedding('textembedding-gecko@003', 'young aggressive investor')::vector AS distance
+       bio_embedding <=> google_ml.embedding('text-embedding-005', 'young aggressive investor')::vector AS distance
    FROM user_profiles
    ORDER BY distance
    LIMIT 50;
@@ -244,7 +244,7 @@ Follow the steps below to build the new Gen AI feature.
    ```SQL
    -- Add a WHERE clause to narrow results using Hybrid Semantic + Keyword Search
    SELECT first_name, last_name, email, age, risk_profile, bio,
-       bio_embedding <=> google_ml.embedding('textembedding-gecko@003', 'young aggressive investor')::vector AS distance
+       bio_embedding <=> google_ml.embedding('text-embedding-005', 'young aggressive investor')::vector AS distance
    FROM user_profiles
    WHERE risk_profile = 'high'
        AND age BETWEEN 18 AND 50
