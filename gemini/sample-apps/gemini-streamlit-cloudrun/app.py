@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name
+# pylint: disable=broad-exception-raised,invalid-name
 """
 This module demonstrates the usage of the Gemini API in Vertex AI within a Streamlit application.
 """
@@ -31,7 +31,7 @@ def _region() -> str:
             headers={"Metadata-Flavor": "Google"},
         )
         return resp.text.split("/")[-1]
-    except httpx.RequestError:
+    except Exception:
         return "us-central1"
 
 
