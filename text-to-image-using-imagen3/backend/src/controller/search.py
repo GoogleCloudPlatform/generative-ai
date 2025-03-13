@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from typing import List
+from fastapi import APIRouter, HTTPException, status as Status
 
-from src.model.search import CreateSearchRequest
+from src.model.search import CreateSearchRequest, ImageGenerationResult
 from src.service.search import ImagenSearchService
 
 router = APIRouter(
@@ -11,6 +12,32 @@ router = APIRouter(
 
 
 @router.post("")
-async def search(item: CreateSearchRequest):
-    service = ImagenSearchService()
-    return service.generate_images(item.term)
+async def search(item: CreateSearchRequest) -> List[ImageGenerationResult]:
+    try:
+        # Access parameters from CreateSearchRequest
+        term = item.term
+        generation_model = item.generation_model
+        aspect_ratio = item.aspect_ratio
+        number_of_images = item.number_of_images
+        image_style = item.image_style
+
+        service = ImagenSearchService()
+        return service.generate_images(
+            term=term,
+            generation_model=generation_model,
+            aspect_ratio=aspect_ratio,
+            number_of_images=number_of_images,
+            image_style=image_style,
+        )
+    except HTTPException as http_exception:
+        raise http_exception
+    except ValueError as value_error:
+        raise HTTPException(
+            status_code=Status.HTTP_400_BAD_REQUEST,
+            detail=str(value_error),
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=Status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
