@@ -1,0 +1,75 @@
+<app-header (emitSearch)="this.searchTerm({ term: $event })"></app-header>
+
+<mat-grid-list cols="1" rowHeight="75vh" *ngIf="documents.length > 0">
+  <mat-grid-tile style="width: 60vw">
+    <div class="image-generation-container">
+      <div class="image-preview">
+        <div style="display: flex; justify-content: space-between">
+          <div
+            class="thumbnail"
+            *ngFor="let result of pagedDocuments"
+            (click)="changeImageSelection(result)"
+          >
+            <div class="thumbnail-placeholder">
+              <img
+                src="data:image/png;base64,{{ result.image.encodedImage }}"
+                *ngIf="!showDefaultDocuments && documents.length > 0"
+              />
+              <img
+                src="{{ result.image.encodedImage }}"
+                *ngIf="showDefaultDocuments"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="main-image">
+          <div class="main-image-placeholder">
+            <img
+              src="data:image/png;base64,{{
+                selectedResult?.image?.encodedImage || ''
+              }}"
+              *ngIf="!showDefaultDocuments && documents.length > 0"
+            />
+            <img
+              src="{{ pagedDocuments[0]?.image?.encodedImage }}"
+              *ngIf="showDefaultDocuments"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="configuration">
+        <mat-form-field>
+          <mat-label>AI Model</mat-label>
+          <mat-select [(value)]="selectedModel">
+              <mat-option *ngFor="let model of imagen3ModelsList" [value]="model.value" (click)="changeImagen3Model(model)">
+                {{model.viewValue}}
+              </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="aspect-ratio">
+          <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button class="aspect-button" (click)="changeAspectRatio(ratio)">
+            {{ratio?.value}}
+          </button>
+        </div>
+
+        <div class="image-style">
+          <button mat-raised-button class="style-button">Modern</button>
+          <button mat-raised-button class="style-button">Realistic</button>
+          <button mat-raised-button class="style-button">Vintage</button>
+          <button mat-raised-button class="style-button">Monochrome</button>
+          <button mat-raised-button class="style-button">Fantasy</button>
+        </div>
+
+
+        <div class="number-results">
+          <mat-label style="padding-right: 1rem">Number of Results</mat-label>
+          <mat-slider min="0" max="5" step="1" showTickMarks discrete>
+            <input matSliderThumb>
+          </mat-slider>
+        </div>
+      </div>
+    </div>
+  </mat-grid-tile>
+</mat-grid-list>
