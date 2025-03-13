@@ -120,57 +120,63 @@ def format(session):
     with open(spelling_allow_file, "w", encoding="utf-8") as file:
         file.writelines(unique_words)
 
-    target_branch = "main"
+    format_all = False
 
-    unstaged_files = subprocess.run(
-        ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB", target_branch],
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.splitlines()
+    if format_all:
+        lint_paths_py = ["."]
+        lint_paths_nb = ["."]
+    else:
+        target_branch = "main"
 
-    staged_files = subprocess.run(
-        [
-            "git",
-            "diff",
-            "--cached",
-            "--name-only",
-            "--diff-filter=ACMRTUXB",
-            target_branch,
-        ],
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.splitlines()
+        unstaged_files = subprocess.run(
+            ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB", target_branch],
+            stdout=subprocess.PIPE,
+            text=True,
+        ).stdout.splitlines()
 
-    committed_files = subprocess.run(
-        [
-            "git",
-            "diff",
-            "HEAD",
-            target_branch,
-            "--name-only",
-            "--diff-filter=ACMRTUXB",
-        ],
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.splitlines()
+        staged_files = subprocess.run(
+            [
+                "git",
+                "diff",
+                "--cached",
+                "--name-only",
+                "--diff-filter=ACMRTUXB",
+                target_branch,
+            ],
+            stdout=subprocess.PIPE,
+            text=True,
+        ).stdout.splitlines()
 
-    changed_files = sorted(
-        set(
-            file
-            for file in (unstaged_files + staged_files + committed_files)
-            if os.path.isfile(file)
+        committed_files = subprocess.run(
+            [
+                "git",
+                "diff",
+                "HEAD",
+                target_branch,
+                "--name-only",
+                "--diff-filter=ACMRTUXB",
+            ],
+            stdout=subprocess.PIPE,
+            text=True,
+        ).stdout.splitlines()
+
+        changed_files = sorted(
+            set(
+                file
+                for file in (unstaged_files + staged_files + committed_files)
+                if os.path.isfile(file)
+            )
         )
-    )
 
-    lint_paths_py = [
-        f for f in changed_files if f.endswith(".py") and f != "noxfile.py"
-    ]
+        lint_paths_py = [
+            f for f in changed_files if f.endswith(".py") and f != "noxfile.py"
+        ]
 
-    lint_paths_nb = [f for f in changed_files if f.endswith(".ipynb")]
+        lint_paths_nb = [f for f in changed_files if f.endswith(".ipynb")]
 
-    if not lint_paths_py and not lint_paths_nb:
-        session.log("No changed Python or notebook files to lint.")
-        return
+        if not lint_paths_py and not lint_paths_nb:
+            session.log("No changed Python or notebook files to lint.")
+            return
 
     session.install(
         "types-requests",
