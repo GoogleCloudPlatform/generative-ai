@@ -2,7 +2,7 @@
 
 alias gcurl='curl -H "Authorization: Bearer $(gcloud auth print-access-token)" -H "Content-Type: application/json"'
 
-TARGET=$(ls /workspace/generative-ai/gemini/getting-started)
+TARGET=$(cat .cloud-build/Notebooks.txt)
 
 current_date=$(date +%Y-%m-%d)
 current_time=$(date +%H-%M-%S)
