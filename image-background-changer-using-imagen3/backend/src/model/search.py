@@ -31,7 +31,7 @@ ImageStyleLiteral = Union[
 
 
 class CreateSearchRequest(BaseModel):
-    term: Annotated[str, Query(max_length=50)] = Field(
+    term: Annotated[Optional[str], Query(max_length=50)] = Field(
         description="Prompt term to be passed to the model"
     )
     generation_model: Annotated[
@@ -53,11 +53,11 @@ class CreateSearchRequest(BaseModel):
     ] = Field(description="User image to be used")
     
 
-    @field_validator("term")
-    def term_must_not_be_empty(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("Term cannot be empty or whitespace only")
-        return value
+    # @field_validator("term")
+    # def term_must_not_be_empty(cls, value: str) -> str:
+    #     if not value.strip():
+    #         raise ValueError("Term cannot be empty or whitespace only")
+    #     return value
 
 
 class BaseSchema(BaseModel):

@@ -19,7 +19,7 @@ class ImagenSearchService:
         generation_model: str = "imagen-3.0-capability-001",
         aspect_ratio: str = "1:1",
         number_of_images: int = 4,
-        image_style: str = "modern",
+        image_style: str = "Modern",
     ) -> List[ImageGenerationResult]:
         _, PROJECT_ID = google.auth.default()
         LOCATION = "northamerica-northeast1"
@@ -27,7 +27,7 @@ class ImagenSearchService:
 
         prompt = f"Change the background of the image, try a plain color, like black, white, blue or orange. Make it '{image_style}'. The user prompt is: {term}"
 
-        image_object = Image(image_bytes=test_image_bytes) #test_image or user_image bytes
+        image_object = Image(image_bytes=test_image_bytes) #REPLACE test_image with user_image bytes
 
         raw_reference_image = RawReferenceImage(reference_image=image_object, reference_id=0)
 
