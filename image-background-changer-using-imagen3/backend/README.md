@@ -1,4 +1,4 @@
-# QuickBot App Backend | product-catalog-image-generation-using-imagen3
+# QuickBot App Backend | image-background-changer-using-imagen3
 
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
 
