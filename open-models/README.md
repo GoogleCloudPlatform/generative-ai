@@ -10,6 +10,7 @@ This repository contains examples for deploying and fine-tuning open source mode
 - [serving/vertex_ai_pytorch_inference_paligemma_with_custom_handler.ipynb](./serving/vertex_ai_pytorch_inference_paligemma_with_custom_handler.ipynb) - This notebooks provides steps and code to deploy Google PaliGemma with the Hugging Face Python Inference DLC using a custom handler on Vertex AI.
 - [serving/vertex_ai_tgi_gemma_multi_lora_adapters_deployment.ipynb](./serving/vertex_ai_tgi_gemma_multi_lora_adapters_deployment.ipynb) - This notebook showcases how to deploy Gemma 2 from the Hugging Face Hub with multiple LoRA adapters fine-tuned for different purposes such as coding, or SQL using Hugging Face's Text Generation Inference (TGI) Deep Learning Container (DLC) in combination with a custom handler on Vertex AI.
 - [serving/vertex_ai_ollama_gemma2_rag_agent.ipynb](./serving/vertex_ai_ollama_gemma2_rag_agent.ipynb) - This notebooks provides steps and code to deploy an open source agentic RAG pipeline to Vertex AI Prediction using Ollama and a Gemma 2 model adapter.
+- [serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb](./serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb) - This notebook shows how to deploy Polish Large Language Model (PLLuM) from the Hugging Face Hub on Vertex AI using the Hugging Face Deep Learning Container (DLC) for Pytorch Inference in combination with a custom handler.
 
 ### Fine-tuning
 

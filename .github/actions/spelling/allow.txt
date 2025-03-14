@@ -307,6 +307,7 @@ PEFT
 PGHOST
 PGPORT
 PGUSER
+PLLu
 PLOTLYENV
 PPO
 PYINK
@@ -800,6 +801,7 @@ ixed
 ized
 javac
 jegadesh
+jesieni
 jetbrains
 jit
 jiwer
@@ -824,6 +826,7 @@ landcolor
 landuse
 langgraph
 latte
+lecie
 lego
 lenzing
 levelname
@@ -976,6 +979,7 @@ pincodes
 pixmap
 pkl
 playlists
+pllum
 plotly
 plpgsql
 plt
@@ -1189,6 +1193,7 @@ weightage
 welcom
 werden
 wght
+wiersz
 wiffle
 wikipedia
 wil
@@ -1231,3 +1236,5 @@ ytd
 yticks
 zakarid
 zaxis
+zimie
+Napisz
