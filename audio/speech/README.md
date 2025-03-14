@@ -7,7 +7,6 @@ This repository explores various use-cases and implementations of speech recogni
 Here's a breakdown of the content available:
 
 - **Getting Started:**
-  - [get_started_with_chirp_sdk.ipynb](getting-started/get_started_with_chirp_sdk.ipynb): This Jupyter Notebook provides a basic introduction to performing speech recognition using the Chirp model with Google Cloud's Speech-to-Text API.
   - [get_started_with_chirp_2_sdk.ipynb](getting-started/get_started_with_chirp_2_sdk.ipynb): This Jupyter Notebook provides a basic introduction to performing speech recognition using the Chirp 2 model with Google Cloud's Speech-to-Text API.
 - **Use Cases:**
   - **Storytelling:**
