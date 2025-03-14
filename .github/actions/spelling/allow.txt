@@ -1237,3 +1237,4 @@ yticks
 zakarid
 zaxis
 zimie
+Napisz

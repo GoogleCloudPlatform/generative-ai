@@ -119,7 +119,6 @@ jobs:
             cspell:en_GB/src/hunspell/en_GB.dic
             cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
             cspell:en_US/src/hunspell/en_US-large.dic
-            cspell:pl_PL/pl_pl.trie
             cspell:filetypes/src/filetypes.txt
             cspell:flutter/src/flutter.txt
             cspell:fonts/dict/fonts.txt
