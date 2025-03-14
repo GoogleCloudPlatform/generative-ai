@@ -1,4 +1,3 @@
-Apikey
 intro_gemini_1_5_flash.ipynb
 intro_gemini_1_5_pro.ipynb
 intro_gemini_2_0_flash.ipynb
