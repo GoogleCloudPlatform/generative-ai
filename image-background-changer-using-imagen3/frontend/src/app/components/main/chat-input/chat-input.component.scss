@@ -100,6 +100,72 @@
   animation: yellow-transform 2s infinite;
 }
 
+.file-input-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  .placeholder {
+    color: rgba(0, 0, 0, 0.54); // Material hint text color
+  }
+
+  .file-name {
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+.image-preview {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+
+  img {
+    max-width: 100%;
+    max-height: 300px; // Adjust as needed
+    display: block;
+  }
+}
+
+.card-input-wrapper {
+  //   min-width: 40vw;
+  width: 80%;
+  min-height: 10rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 4px dashed lightgrey;
+  margin: 2rem;
+  padding: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border 1s;
+  text-decoration: none;
+
+  &:hover {
+    border-color: rgba(66, 133, 244, 0.95);
+  }
+}
+
+.centered-mat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+  justify-self: center;
+  width: 40vw;
+}
+
+
 // Small devices (landscape phones, 576px and up)
 @media (min-width: 576px) {
 }

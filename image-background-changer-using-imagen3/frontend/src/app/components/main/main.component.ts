@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {ReplaySubject} from 'rxjs';
 import {SearchResponse} from 'src/app/models/search.model';
+import {ImageService} from 'src/app/services/image/image.service';
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -23,13 +24,17 @@ export class MainComponent implements OnDestroy {
   constructor(
     public userService: UserService,
     private router: Router,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private imageService: ImageService
   ) {
     this.savedUser = userService.getUserDetails();
   }
 
-  goToResults(term: string) {
-    this.router.navigate(['/search'], {queryParams: {q: term}});
+  goToResults(file: File) {
+    this.imageService.setImage(file); // Store the file in the service
+    this.router.navigate(['/search'], {
+      queryParams: {q: 'Generate a nice light wood countertop background for this product image', filename: file.name},
+    });
   }
 
   ngOnDestroy() {

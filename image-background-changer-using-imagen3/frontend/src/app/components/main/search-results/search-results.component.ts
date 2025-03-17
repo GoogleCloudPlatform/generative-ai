@@ -74,7 +74,7 @@ export class SearchResultsComponent implements OnDestroy {
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,
-    aspectRatio: '1:1',
+    aspectRatio: '1:1'
   };
 
   constructor(
@@ -119,7 +119,8 @@ export class SearchResultsComponent implements OnDestroy {
 
         this.userService.hideLoading();
       },
-      error: () => {
+      error: (error) => {
+        console.error('Search error:', error);
         this.userService.hideLoading();
       },
     });
@@ -158,7 +159,8 @@ export class SearchResultsComponent implements OnDestroy {
         this.selectedResult = searchResponse[0];
         this.userService.hideLoading();
       },
-      error: () => {
+      error: (error) => {
+        console.error('Search error:', error);
         this.userService.hideLoading();
       },
     });

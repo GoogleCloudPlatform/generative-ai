@@ -59,6 +59,7 @@ import {ChatInputComponent} from './components/main/chat-input/chat-input.compon
 import {SearchResultsComponent} from './components/main/search-results/search-results.component';
 import {ToastMessageComponent} from './components/toast-message/toast-message.component';
 import {TruncatePipe} from './pipes/truncate.pipe';
+import {BackgroundChangerInputComponent} from './components/background-changer-input/background-changer-input.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import {TruncatePipe} from './pipes/truncate.pipe';
     SearchResultsComponent,
     ToastMessageComponent,
     TruncatePipe,
+    BackgroundChangerInputComponent,
   ],
   imports: [
     BrowserModule,
