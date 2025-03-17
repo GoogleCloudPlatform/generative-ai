@@ -20,15 +20,19 @@ async def search(item: CreateSearchRequest) -> List[ImageGenerationResult]:
         aspect_ratio = item.aspect_ratio
         number_of_images = item.number_of_images
         image_style = item.image_style
+        user_image=item.user_image
 
         service = ImagenSearchService()
         return service.generate_images(
+            user_image=user_image, 
             term=term,
             generation_model=generation_model,
             aspect_ratio=aspect_ratio,
             number_of_images=number_of_images,
             image_style=image_style,
+            
         )
+        #return []
     except HTTPException as http_exception:
         raise http_exception
     except ValueError as value_error:
