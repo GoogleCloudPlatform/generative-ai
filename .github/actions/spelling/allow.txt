@@ -285,6 +285,7 @@ NVIDIA
 NVL
 Nagasu
 Nakoso
+Napisz
 Narnia
 Niitsuma
 Nith
@@ -1237,4 +1238,3 @@ yticks
 zakarid
 zaxis
 zimie
-Napisz
