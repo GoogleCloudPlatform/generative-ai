@@ -4,52 +4,56 @@ from typing import List
 import google.auth
 from google import genai
 from google.genai import types
-from google.genai.types import Image, RawReferenceImage, EditImageConfig, MaskReferenceImage, MaskReferenceConfig
+from google.genai.types import (
+    Image,
+    RawReferenceImage,
+    EditImageConfig,
+    MaskReferenceImage,
+    MaskReferenceConfig,
+)
 
-from src.model.search import CustomImageResult, ImageGenerationResult
+from src.model.search import (
+    CreateSearchRequest,
+    CustomImageResult,
+    ImageGenerationResult,
+)
 
-test_image = "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
-test_image_bytes = base64.b64decode(test_image) # Decode the base64 string
 
 class ImagenSearchService:
     def generate_images(
-        self,
-        user_image: bytes,
-        term: str,
-        generation_model: str = "imagen-3.0-capability-001",
-        aspect_ratio: str = "1:1",
-        number_of_images: int = 4,
-        image_style: str = "Modern",
+        self, searchRequest: CreateSearchRequest
     ) -> List[ImageGenerationResult]:
         _, PROJECT_ID = google.auth.default()
-        LOCATION = "northamerica-northeast1"
+        LOCATION = "us-central1"
         client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
-        prompt = f"Change the background of the image, try a plain color, like black, white, blue or orange. Make it '{image_style}'. The user prompt is: {term}"
+        prompt = f"""
+        The style of the image should go with a {searchRequest.image_style} theme
+        {searchRequest.term}"""
 
-        image_object = Image(image_bytes=test_image_bytes) #REPLACE test_image with user_image bytes
-
-        raw_reference_image = RawReferenceImage(reference_image=image_object, reference_id=0)
-
+        image_object = Image(image_bytes=searchRequest.user_image)
+        raw_reference_image = RawReferenceImage(
+            reference_image=image_object, reference_id=0
+        )
         mask_ref_image = MaskReferenceImage(
             reference_id=1,
             reference_image=None,
             config=MaskReferenceConfig(
                 mask_mode="MASK_MODE_BACKGROUND",
-                segmentation_classes=[2],
-                mask_dilation=0.01,
+                segmentation_classes=[1],
+                mask_dilation=searchRequest.mask_distilation,
             ),
         )
-        
+
         # Imagen3 image edition
         images: types.EditImageResponse = client.models.edit_image(
-            model=generation_model,
+            model=searchRequest.generation_model,
             prompt=prompt,
             reference_images=[raw_reference_image, mask_ref_image],
             config=EditImageConfig(
-                edit_mode="EDIT_MODE_BGSWAP", #EDIT_MODE_BGSWAP, EDIT_MODE_INPAINT_INSERTION, EDIT_MODE_INPAINT_INSERTION
-                number_of_images=1,
-                safety_filter_level="BLOCK_ONLY_HIGH", #BLOCK_MEDIUM_AND_ABOVE,
+                edit_mode="EDIT_MODE_BGSWAP",
+                number_of_images=searchRequest.number_of_images,
+                safety_filter_level="BLOCK_ONLY_HIGH",
                 person_generation="DONT_ALLOW",
             ),
         )
