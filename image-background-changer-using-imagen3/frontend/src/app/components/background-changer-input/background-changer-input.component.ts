@@ -34,7 +34,6 @@ export class BackgroundChangerInputComponent {
 
   onSubmit(): void {
     if (this.selectedFile) {
-      console.log('Submitting image:', this.selectedFile);
       this.emitSearch.emit(this.selectedFile); // Emit the file
     } else {
       console.log('No image selected to submit.');

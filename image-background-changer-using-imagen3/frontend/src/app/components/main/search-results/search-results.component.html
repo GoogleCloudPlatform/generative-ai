@@ -1,4 +1,4 @@
-<app-header (emitSearch)="this.searchTerm({ term: $event })"></app-header>
+<app-header (emitSearch)="this.searchTerm({term: $event})"></app-header>
 
 <mat-grid-list cols="1" rowHeight="75vh" *ngIf="documents.length > 0">
   <mat-grid-tile style="width: 60vw">
@@ -42,32 +42,58 @@
         <mat-form-field>
           <mat-label>AI Model</mat-label>
           <mat-select [(value)]="selectedModel">
-              <mat-option *ngFor="let model of imagen3ModelsList" [value]="model.value" (click)="changeImagen3Model(model)">
-                {{model.viewValue}}
-              </mat-option>
+            <mat-option
+              *ngFor="let model of imagen3ModelsList"
+              [value]="model.value"
+              (click)="changeImagen3Model(model)"
+            >
+              {{ model.viewValue }}
+            </mat-option>
           </mat-select>
         </mat-form-field>
 
-        <div class="aspect-ratio">
-          <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button class="aspect-button" (click)="changeAspectRatio(ratio)">
-            {{ratio?.value}}
-          </button>
-        </div>
-
-        <div class="image-style">
-          <button mat-raised-button class="style-button">Modern</button>
-          <button mat-raised-button class="style-button">Realistic</button>
-          <button mat-raised-button class="style-button">Vintage</button>
-          <button mat-raised-button class="style-button">Monochrome</button>
-          <button mat-raised-button class="style-button">Fantasy</button>
-        </div>
-
+        <mat-button-toggle-group
+          name="imageStyle"
+          aria-label="Image Style"
+          (change)="selectStyle($event)"
+          [value]="selectedStyle"
+          style="border: none"
+        >
+          <mat-button-toggle
+            *ngFor="let style of imageStylesList"
+            [value]="style.value"
+          >
+            {{ style.viewValue }}
+          </mat-button-toggle>
+        </mat-button-toggle-group>
 
         <div class="number-results">
           <mat-label style="padding-right: 1rem">Number of Results</mat-label>
-          <mat-slider min="0" max="5" step="1" showTickMarks discrete>
-            <input matSliderThumb>
+          <mat-slider min="1" max="4" step="1" showTickMarks discrete>
+            <input matSliderThumb (input)="onNumberOfResultsChange($event)" [value]="selectedNumberOfResults"/>
           </mat-slider>
+        </div>
+
+        <div class="number-results">
+          <mat-label style="padding-right: 1rem"
+            >Mask Dilation: {{ selectedMaskDistilation }}</mat-label
+          >
+          <mat-slider
+            min="0.005"
+            max="0.02"
+            step="0.0001"
+            showTickMarks
+            discrete
+            style="width: 100%"
+          >
+            <input matSliderThumb (input)="onSliderChange($event)" [value]="selectedMaskDistilation"/>
+          </mat-slider>
+        </div>
+
+        <div class="submit-changes">
+          <button mat-raised-button color="primary" (click)="submitChanges()">
+            Submit Changes
+          </button>
         </div>
       </div>
     </div>

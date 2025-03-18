@@ -16,14 +16,17 @@ import {
 } from '@angular/platform-browser';
 import {MatDialog} from '@angular/material/dialog';
 import {GeneratedImage} from 'src/app/models/generated-image.model';
-import { SearchRequest } from 'src/app/models/search.model';
+import {SearchRequest} from 'src/app/models/search.model';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastMessageComponent} from '../../toast-message/toast-message.component';
+import {MatButtonToggleChange} from '@angular/material/button-toggle';
 
 interface Imagen3Model {
   value: string;
   viewValue: string;
 }
 
-interface AspectRatio {
+interface ImageStylesModel {
   value: string;
   viewValue: string;
 }
@@ -52,29 +55,29 @@ export class SearchResultsComponent implements OnDestroy {
   safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
   imagen3ModelsList: Imagen3Model[] = [
-    {value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001'},
     {
-      value: 'imagen-3.0-fast-generate-001',
-      viewValue: 'imagen-3.0-fast-generate-001',
+      value: 'imagen-3.0-capability-001',
+      viewValue: 'Imagen 3: imagen-3.0-capability-001',
     },
-    {value: 'imagen-3.0-generate-002', viewValue: 'imagen-3.0-generate-002'},
-    {value: 'imagegeneration@006', viewValue: 'imagegeneration@006'},
-    {value: 'imagegeneration@005', viewValue: 'imagegeneration@005'},
-    {value: 'imagegeneration@002', viewValue: 'imagegeneration@002'},
+    // {value: 'imagegeneration@006', viewValue: 'Imagen 2: imagegeneration@006'},
   ];
   selectedModel = this.imagen3ModelsList[0].value;
-  aspectRatioList: AspectRatio[] = [
-    {value: '1:1', viewValue: '1:1'},
-    {value: '9:16', viewValue: '9:16'},
-    {value: '16:9', viewValue: '16:9'},
-    {value: '2:4', viewValue: '2:4'},
-    {value: '4:1', viewValue: '4:1'},
+  imageStylesList: ImageStylesModel[] = [
+    {value: 'Modern', viewValue: 'Modern'},
+    {value: 'Realistic', viewValue: 'Realistic'},
+    {value: 'Vintage', viewValue: 'Vintage'},
+    {value: 'Monochrome', viewValue: 'Monochrome'},
+    {value: 'Fantasy', viewValue: 'Fantasy'},
   ];
-  selectedAspectRatio = this.aspectRatioList[0];
+  selectedStyle: string = this.imageStylesList[0].value;
+  selectedNumberOfResults: number = 4;
+  selectedMaskDistilation: number = 0.005;
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,
-    aspectRatio: '1:1'
+    imageStyle: this.selectedStyle,
+    numberOfResults: this.selectedNumberOfResults,
+    maskDistilation: this.selectedMaskDistilation,
   };
 
   constructor(
@@ -83,7 +86,8 @@ export class SearchResultsComponent implements OnDestroy {
     private service: SearchService,
     private userService: UserService,
     private dialog: MatDialog,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private _snackBar: MatSnackBar
   ) {
     const query = this.route.snapshot.queryParamMap.get('q');
     this.userService.showLoading();
@@ -119,23 +123,54 @@ export class SearchResultsComponent implements OnDestroy {
 
         this.userService.hideLoading();
       },
-      error: (error) => {
+      error: error => {
         console.error('Search error:', error);
+
+        this.documents = [
+          {
+            enhancedPrompt: 'default enhaced prompt',
+            raiFilteredReason: null,
+            image: {
+              gcsUri: null,
+              mimeType: 'image/png',
+              encodedImage: 'assets/images/placeholder_image.png',
+            },
+          },
+        ];
+        this.showDefaultDocuments = true;
         this.userService.hideLoading();
+
+        this._snackBar.openFromComponent(ToastMessageComponent, {
+          panelClass: ['red-toast'],
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          duration: 5000,
+          data: {
+            text:
+              `${error?.error?.detail?.[0]?.msg} - ${error?.error?.detail?.[0]?.loc}` ||
+              error?.error?.detail ||
+              'Error sending request. Please try again later!',
+            icon: 'cross-in-circle-white',
+          },
+        });
       },
     });
   }
 
   searchTerm({
     term,
-    aspectRatio,
     model,
+    imageStyle,
+    numberOfResults,
+    maskDistilation,
   }: {
     term?: string | undefined;
-    aspectRatio?: string | undefined;
     model?: string | undefined;
+    imageStyle?: string | undefined;
+    numberOfResults?: number | undefined;
+    maskDistilation?: number | undefined;
   }) {
-    if (!term) return
+    if (!term) return;
 
     this.showDefaultDocuments = false;
     this.userService.showLoading();
@@ -143,10 +178,14 @@ export class SearchResultsComponent implements OnDestroy {
     this.summary = '';
     this.documents = [];
     this.images = [];
-    this.router.navigate(['/search'], {queryParams: {q: term}});
+    // this.router.navigate(['/search'], {queryParams: {q: term}});
+
     if (term) this.searchRequest.term = term;
-    if (aspectRatio) this.searchRequest.aspectRatio = aspectRatio;
     if (model) this.searchRequest.model = model;
+    if (imageStyle) this.searchRequest.imageStyle = imageStyle;
+    if (numberOfResults) this.searchRequest.numberOfResults = numberOfResults;
+    if (maskDistilation) this.searchRequest.maskDistilation = maskDistilation;
+
     const newSearchRequest = this.searchRequest;
 
     this.service.search(newSearchRequest).subscribe({
@@ -159,7 +198,7 @@ export class SearchResultsComponent implements OnDestroy {
         this.selectedResult = searchResponse[0];
         this.userService.hideLoading();
       },
-      error: (error) => {
+      error: error => {
         console.error('Search error:', error);
         this.userService.hideLoading();
       },
@@ -177,11 +216,6 @@ export class SearchResultsComponent implements OnDestroy {
   changeImagen3Model(model: Imagen3Model) {
     this.selectedModel = model.value;
     this.searchTerm({model: this.selectedModel});
-  }
-
-  changeAspectRatio(aspectRatio: AspectRatio) {
-    this.selectedAspectRatio = aspectRatio;
-    this.searchTerm({aspectRatio: aspectRatio.value});
   }
 
   previewDocument(event: any, document: any) {
@@ -222,5 +256,29 @@ export class SearchResultsComponent implements OnDestroy {
     if (this.currentPage > 0) {
       this.currentPage--;
     }
+  }
+
+  onNumberOfResultsChange(event: Event) {
+    this.selectedNumberOfResults =
+      Number((event.target as HTMLInputElement).value) || 0;
+  }
+
+  selectStyle(event: MatButtonToggleChange) {
+    this.selectedStyle = event.value;
+  }
+
+  onSliderChange(event: Event) {
+    this.selectedMaskDistilation =
+      Number((event.target as HTMLInputElement).value) || 0;
+  }
+
+  submitChanges() {
+    this.searchTerm({
+      term: this.searchRequest.term,
+      model: this.selectedModel,
+      imageStyle: this.selectedStyle,
+      numberOfResults: this.selectedNumberOfResults,
+      maskDistilation: this.selectedMaskDistilation,
+    });
   }
 }

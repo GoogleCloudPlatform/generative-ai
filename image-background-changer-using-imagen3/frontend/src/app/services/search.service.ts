@@ -23,7 +23,7 @@ export class SearchService {
   search(searchRequest: SearchRequest): Observable<GeneratedImage[]> {
     const userImage = this.imageService.getImage();
 
-    if (!userImage && searchRequest.term === '') {
+    if (!userImage) {
       // Redirect to homepage and alert that you need to upload an image first
       this.router.navigate(['/']);
       alert('Please upload an image first.');
@@ -33,11 +33,15 @@ export class SearchService {
     }
 
     const formData = new FormData();
-    if (userImage) formData.append('userImage', userImage, userImage.name);
-
     formData.append('term', searchRequest.term);
-    formData.append('model', searchRequest.model);
-    formData.append('aspectRatio', searchRequest.aspectRatio);
+    formData.append('generationModel', searchRequest.model);
+    formData.append('numberOfImages', searchRequest.numberOfResults.toString());
+    formData.append('imageStyle', searchRequest.imageStyle);
+    formData.append(
+      'maskDistilation',
+      searchRequest.maskDistilation.toString()
+    );
+    formData.append('userImage', userImage, userImage.name);
 
     return this.http
       .post(searchURL, formData)

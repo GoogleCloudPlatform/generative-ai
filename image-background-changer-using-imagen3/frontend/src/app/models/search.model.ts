@@ -1,7 +1,9 @@
 export type SearchRequest = {
   term: string;
   model: string;
-  aspectRatio: string;
+  imageStyle: string;
+  numberOfResults: number;
+  maskDistilation: number;
 };
 
 export type SearchResponse = {

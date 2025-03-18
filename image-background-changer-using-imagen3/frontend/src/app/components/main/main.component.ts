@@ -33,7 +33,7 @@ export class MainComponent implements OnDestroy {
   goToResults(file: File) {
     this.imageService.setImage(file); // Store the file in the service
     this.router.navigate(['/search'], {
-      queryParams: {q: 'Generate a nice light wood countertop background for this product image', filename: file.name},
+      queryParams: {q: 'Change just the background color for this image to white adding shadows if necessary', filename: file.name},
     });
   }
 
