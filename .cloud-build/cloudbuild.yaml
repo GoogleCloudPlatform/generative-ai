@@ -58,16 +58,16 @@ steps:
 # [END execute-notebooks]
 
 # [START github-notification]
-- name: google/cloud-sdk
-  id: 'github-notification'
-  entrypoint: bash
-  args:
-  - '-c'
-  - |
-    gcloud secrets versions access latest --secret=GH_token > GH_token.txt
+#- name: google/cloud-sdk
+#  id: 'github-notification'
+#  entrypoint: bash
+#  args:
+#  - '-c'
+#  - |
+#    gcloud secrets versions access latest --secret=GH_token > GH_token.txt
     
-    . .cloud-build/github-issue/ghcli-install.sh
-    . .cloud-build/github-issue/autoissuecreate.sh
+#    . .cloud-build/github-issue/ghcli-install.sh
+#    . .cloud-build/github-issue/autoissuecreate.sh
 
 # [END github-notification]
  
