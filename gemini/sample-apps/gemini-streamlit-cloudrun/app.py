@@ -42,7 +42,6 @@ MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
     "gemini-2.0-flash-thinking-exp-01-21": "Gemini 2.0 Flash Thinking",
-    "gemini-2.0-pro-exp-02-05": "Gemini 2.0 Pro",
 }
 
 
