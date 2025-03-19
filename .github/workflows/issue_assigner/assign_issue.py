@@ -5,6 +5,7 @@ import base64
 import json
 import os
 import re
+import yaml
 
 from github import Github
 
@@ -48,8 +49,8 @@ def main() -> None:
             print(f"No files found for {file_name}")
             return
     print(result[0])
-    file = str(base64.b64decode(result[0].content))[:4000]
-    match = re.search(r"Author.+https://github\.com/([^/\)]+)", file)
+    file = str(base64.b64decode(result[0].content))[:10000]
+    match = re.search(r"Author.+https://github\.com/([^/\)]+)", file, flags=re.DOTALL)
 
     if not match:
         print(f"No User Found for {file_name}")
