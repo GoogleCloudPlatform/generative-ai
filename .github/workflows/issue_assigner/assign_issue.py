@@ -5,7 +5,6 @@ import base64
 import json
 import os
 import re
-import yaml
 
 from github import Github
 
