@@ -47,6 +47,7 @@ def main() -> None:
         if result.totalCount == 0:
             print(f"No files found for {file_name}")
             return
+
     print(result[0])
     file = str(base64.b64decode(result[0].content))[:10000]
     match = re.search(r"Author.+https://github\.com/([^/\)]+)", file, flags=re.DOTALL)
