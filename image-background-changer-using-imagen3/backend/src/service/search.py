@@ -27,14 +27,28 @@ class ImagenSearchService:
         LOCATION = "us-central1"
         client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
-        prompt = f"""
-        The style of the image should go with a {searchRequest.image_style} theme
-        {searchRequest.term}"""
+        prompt = f""" {searchRequest.term}"""
 
-        image_object = Image(image_bytes=searchRequest.user_image)
+        original_image = Image(image_bytes=searchRequest.user_image)
+
         raw_reference_image = RawReferenceImage(
-            reference_image=image_object, reference_id=0
+            reference_image=original_image, reference_id=0
         )
+
+        # Imagen3 edition for just the entire image
+        images_entire_image: types.EditImageResponse = client.models.edit_image(
+            model=searchRequest.generation_model,
+            prompt=prompt,
+            reference_images=[raw_reference_image],
+            config=EditImageConfig(
+                edit_mode="EDIT_MODE_DEFAULT",
+                number_of_images=searchRequest.number_of_images,
+                safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
+                person_generation="DONT_ALLOW",
+            ),
+        )
+
+        # Imagen3 edition for just the background
         mask_ref_image = MaskReferenceImage(
             reference_id=1,
             reference_image=None,
@@ -44,9 +58,7 @@ class ImagenSearchService:
                 mask_dilation=searchRequest.mask_distilation,
             ),
         )
-
-        # Imagen3 image edition
-        images: types.EditImageResponse = client.models.edit_image(
+        images_just_background: types.EditImageResponse = client.models.edit_image(
             model=searchRequest.generation_model,
             prompt=prompt,
             reference_images=[raw_reference_image, mask_ref_image],
@@ -59,6 +71,10 @@ class ImagenSearchService:
         )
 
         # Make sure to convert the image from bytes to encoded string before sending to the frontend
+        all_generated_images = (
+            images_entire_image.generated_images
+            + images_just_background.generated_images
+        )
         response = [
             ImageGenerationResult(
                 enhanced_prompt=generated_image.enhanced_prompt,
@@ -71,7 +87,7 @@ class ImagenSearchService:
                     mime_type=generated_image.image.mime_type,
                 ),
             )
-            for generated_image in images.generated_images
+            for generated_image in all_generated_images
         ]
 
         return response

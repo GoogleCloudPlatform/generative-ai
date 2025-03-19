@@ -50,7 +50,7 @@ export class SearchResultsComponent implements OnDestroy {
   documentURL: SafeResourceUrl | undefined;
   openPreviewDocument: any;
   currentPage = 0;
-  pageSize = 4;
+  pageSize = 8;
   selectedDocument: any;
   safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
@@ -75,7 +75,6 @@ export class SearchResultsComponent implements OnDestroy {
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,
-    imageStyle: this.selectedStyle,
     numberOfResults: this.selectedNumberOfResults,
     maskDistilation: this.selectedMaskDistilation,
   };
@@ -124,9 +123,16 @@ export class SearchResultsComponent implements OnDestroy {
         this.userService.hideLoading();
       },
       error: error => {
-        console.error('Search error:', error);
-
         this.documents = [
+          {
+            enhancedPrompt: 'default enhaced prompt',
+            raiFilteredReason: null,
+            image: {
+              gcsUri: null,
+              mimeType: 'image/png',
+              encodedImage: 'assets/images/placeholder_image.png',
+            },
+          },
           {
             enhancedPrompt: 'default enhaced prompt',
             raiFilteredReason: null,
@@ -139,22 +145,47 @@ export class SearchResultsComponent implements OnDestroy {
         ];
         this.showDefaultDocuments = true;
         this.userService.hideLoading();
-
-        this._snackBar.openFromComponent(ToastMessageComponent, {
-          panelClass: ['red-toast'],
-          verticalPosition: 'top',
-          horizontalPosition: 'right',
-          duration: 5000,
-          data: {
-            text:
-              `${error?.error?.detail?.[0]?.msg} - ${error?.error?.detail?.[0]?.loc}` ||
-              error?.error?.detail ||
-              'Error sending request. Please try again later!',
-            icon: 'cross-in-circle-white',
-          },
-        });
+        this.showErrorSnackBar(error);
       },
     });
+  }
+
+  showErrorSnackBar(error: any): void {
+    console.error('Search error:', error);
+    console.error('Search typeof error:', typeof error);
+    console.error('Search error?.message:', error?.message);
+    console.error(
+      'Search typeof JSON.stringify:',
+      JSON.stringify(error, null, 2)
+    );
+
+    let errorMessage = '';
+    let triedToGeneratePersons = false;
+    if (error?.error?.detail?.[0]?.msg)
+      errorMessage = `${error?.error?.detail?.[0]?.msg} - ${error?.error?.detail?.[0]?.loc}`;
+    else if (error?.error?.detail)
+      if (
+        error.error.detail.includes(
+          "The image you want to edit contains content that has been blocked because you selected the 'Don't allow' option for Person Generation."
+        )
+      ) {
+        triedToGeneratePersons = true;
+        errorMessage =
+          'The image you want to edit contains content that has been blocked because there are persons in it. See the safety settings documentation for more details.';
+      } else errorMessage = error?.error?.detail;
+    else 'Error sending request. Please try again later!';
+
+    this._snackBar.openFromComponent(ToastMessageComponent, {
+      panelClass: ['red-toast'],
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+      duration: 10000,
+      data: {
+        text: errorMessage,
+        icon: 'cross-in-circle-white',
+      },
+    });
+    if (triedToGeneratePersons) this.goToHomePage();
   }
 
   searchTerm({
@@ -178,11 +209,9 @@ export class SearchResultsComponent implements OnDestroy {
     this.summary = '';
     this.documents = [];
     this.images = [];
-    // this.router.navigate(['/search'], {queryParams: {q: term}});
 
     if (term) this.searchRequest.term = term;
     if (model) this.searchRequest.model = model;
-    if (imageStyle) this.searchRequest.imageStyle = imageStyle;
     if (numberOfResults) this.searchRequest.numberOfResults = numberOfResults;
     if (maskDistilation) this.searchRequest.maskDistilation = maskDistilation;
 
@@ -201,6 +230,7 @@ export class SearchResultsComponent implements OnDestroy {
       error: error => {
         console.error('Search error:', error);
         this.userService.hideLoading();
+        this.showErrorSnackBar(error);
       },
     });
   }
@@ -280,5 +310,19 @@ export class SearchResultsComponent implements OnDestroy {
       numberOfResults: this.selectedNumberOfResults,
       maskDistilation: this.selectedMaskDistilation,
     });
+  }
+
+  goToHomePage() {
+    this.router.navigate(['/']);
+  }
+
+  get firstHalfPagedDocuments() {
+    const halfLength = Math.ceil(this.pagedDocuments.length / 2);
+    return this.pagedDocuments.slice(0, halfLength);
+  }
+
+  get secondHalfPagedDocuments() {
+    const halfLength = Math.ceil(this.pagedDocuments.length / 2);
+    return this.pagedDocuments.slice(halfLength);
   }
 }

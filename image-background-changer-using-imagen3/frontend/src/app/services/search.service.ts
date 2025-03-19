@@ -36,7 +36,6 @@ export class SearchService {
     formData.append('term', searchRequest.term);
     formData.append('generationModel', searchRequest.model);
     formData.append('numberOfImages', searchRequest.numberOfResults.toString());
-    formData.append('imageStyle', searchRequest.imageStyle);
     formData.append(
       'maskDistilation',
       searchRequest.maskDistilation.toString()

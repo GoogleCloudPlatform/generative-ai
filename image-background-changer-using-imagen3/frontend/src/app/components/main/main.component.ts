@@ -33,7 +33,10 @@ export class MainComponent implements OnDestroy {
   goToResults(file: File) {
     this.imageService.setImage(file); // Store the file in the service
     this.router.navigate(['/search'], {
-      queryParams: {q: 'Change just the background color for this image to white adding shadows if necessary', filename: file.name},
+      queryParams: {
+        q: 'Change the background to be minimalist, elegant, with a soft neutral color palette and subtle shadows, conveying a sense of sophistication and high quality.',
+        filename: file.name,
+      },
     });
   }
 

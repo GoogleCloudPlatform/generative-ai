@@ -4,7 +4,6 @@ from fastapi import APIRouter, HTTPException, status as Status
 from src.model.search import (
     CreateSearchRequest,
     GenerationModelOptionalLiteral,
-    ImageStyleLiteral,
 )
 from src.service.search import ImagenSearchService
 from fastapi import Form, File, UploadFile
@@ -29,11 +28,13 @@ async def search(
     numberOfImages: Annotated[
         Optional[int], Form(ge=1, le=4, description="Number of images to generate")
     ],
-    imageStyle: Annotated[
-        Optional[ImageStyleLiteral], Form(description="Style of the image")
-    ],
     maskDistilation: Annotated[
-        Optional[float], Form(ge=0, le=1, description="Dilation percentage of the mask provided. Float between 0 and 1.")
+        Optional[float],
+        Form(
+            ge=0,
+            le=1,
+            description="Dilation percentage of the mask provided. Float between 0 and 1.",
+        ),
     ],
 ):
     try:
@@ -47,16 +48,18 @@ async def search(
                 "term": term,
                 "generation_model": generationModel,
                 "number_of_images": numberOfImages,
-                "image_style": imageStyle,
                 "user_image": userImage.file.read(),
-                "mask_distilation": maskDistilation
+                "mask_distilation": maskDistilation,
             }
         )
 
         service = ImagenSearchService()
         return service.generate_images(createSearchRequest)
     except HTTPException as http_exception:
-        raise http_exception
+        raise HTTPException(
+            status_code=Status.HTTP_400_BAD_REQUEST,
+            detail=str(http_exception),
+        )
     except ValueError as value_error:
         raise HTTPException(
             status_code=Status.HTTP_400_BAD_REQUEST,
@@ -64,6 +67,8 @@ async def search(
         )
     except Exception as e:
         raise HTTPException(
-            status_code=Status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e),
+            status_code=(
+                e.code if hasattr(e, "code") else Status.HTTP_500_INTERNAL_SERVER_ERROR
+            ),
+            detail=str(e.message) if hasattr(e, "message") else str(e),
         )

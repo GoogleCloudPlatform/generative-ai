@@ -1,22 +1,12 @@
-from typing import Annotated, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
-from fastapi import Query, UploadFile, File
-import google.auth
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 
 # Create a Literal type from the list of valid models
 GenerationModelOptionalLiteral = Union[
     Literal["imagen-3.0-capability-001"], Literal["imagegeneration@006"]
-]
-
-ImageStyleLiteral = Union[
-    Literal["Modern"],
-    Literal["Realistic"],
-    Literal["Vintage"],
-    Literal["Monochrome"],
-    Literal["Fantasy"],
 ]
 
 
@@ -28,12 +18,10 @@ class CreateSearchRequest(BaseModel):
     number_of_images: Optional[int] = Field(
         4, description="Number of images to generate"
     )
-    image_style: Optional[ImageStyleLiteral] = Field(
-        default="Modern", description="Style of the image"
-    )
     user_image: bytes
     mask_distilation: Optional[float] = Field(
-        0.005, description="Dilation percentage of the mask provided. Float between 0 and 1."
+        0.005,
+        description="Dilation percentage of the mask provided. Float between 0 and 1.",
     )
 
 

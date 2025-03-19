@@ -1,7 +1,6 @@
 export type SearchRequest = {
   term: string;
   model: string;
-  imageStyle: string;
   numberOfResults: number;
   maskDistilation: number;
 };
