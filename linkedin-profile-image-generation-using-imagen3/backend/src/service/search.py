@@ -1,6 +1,5 @@
 import base64
 from io import BytesIO
-import json
 from typing import List
 
 import google.auth
@@ -13,7 +12,6 @@ from google.genai.types import (
     MaskReferenceImage,
     MaskReferenceConfig,
 )
-import requests
 
 from src.model.search import (
     CreateSearchRequest,
@@ -22,7 +20,7 @@ from src.model.search import (
 )
 
 import cv2
-from PIL import Image as PIL_Image, ImageDraw, ImageOps
+from PIL import Image as PIL_Image, ImageDraw
 import numpy as np
 
 
