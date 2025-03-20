@@ -8,4 +8,4 @@ COPY . /code/
 ENV FRONTEND_URL="http://localhost:4200"
 
 EXPOSE 8080
-ENTRYPOINT ["gunicorn", "main:app", "--workers=4", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000","--bind=0.0.0.0:8080"]
+ENTRYPOINT ["gunicorn", "main:app", "--workers=2", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000","--bind=0.0.0.0:8080"]
