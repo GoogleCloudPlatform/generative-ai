@@ -38,7 +38,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableModule} from '@angular/material/table';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatButtonToggle, MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
@@ -59,6 +59,7 @@ import {ChatInputComponent} from './components/main/chat-input/chat-input.compon
 import {SearchResultsComponent} from './components/main/search-results/search-results.component';
 import {ToastMessageComponent} from './components/toast-message/toast-message.component';
 import {TruncatePipe} from './pipes/truncate.pipe';
+import {BackgroundChangerInputComponent} from './components/background-changer-input/background-changer-input.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import {TruncatePipe} from './pipes/truncate.pipe';
     SearchResultsComponent,
     ToastMessageComponent,
     TruncatePipe,
+    BackgroundChangerInputComponent,
   ],
   imports: [
     BrowserModule,

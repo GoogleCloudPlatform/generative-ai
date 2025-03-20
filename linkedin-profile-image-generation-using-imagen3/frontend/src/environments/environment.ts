@@ -4,7 +4,9 @@ export const environment = {
     authDomain: '<your Auth Domain>',
     projectId: '<your Project ID>',
   },
-  requiredLogin: 'False',
+  // The requiredLogin needs to be set always to True to ensure 
+  // the user's picture is taken always by default the first time
+  requiredLogin: 'True',
   backendURL: 'http://localhost:8080/api',
-  chatbotName: 'Test 1',
+  chatbotName: 'LinkedIn Profile Image Generation Agent',
 };

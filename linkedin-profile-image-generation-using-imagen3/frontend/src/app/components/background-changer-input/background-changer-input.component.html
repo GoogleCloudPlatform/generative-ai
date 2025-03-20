@@ -1,0 +1,40 @@
+<mat-card class="centered-mat-card">
+  <mat-card-content class="card-input-wrapper" (mousedown)="fileInput.click()">
+    <div class="file-input-wrapper">
+      <button mat-stroked-button color="primary" (click)="fileInput.click()">
+        <mat-icon>add_a_photo</mat-icon>
+        <div *ngIf="!selectedFile">
+          Choose Image
+        </div>
+        <div *ngIf="selectedFile">
+          Change Image
+        </div>
+      </button>
+      <input
+        type="file"
+        #fileInput
+        accept="image/jpg, image/jpeg, image/png, image/webp"
+        (change)="onFileSelected($event)"
+        style="display: none"
+      />
+      <span *ngIf="selectedFile" class="file-name">
+        {{ selectedFile.name }}
+      </span>
+      <span *ngIf="!selectedFile" class="placeholder"> No image selected </span>
+    </div>
+
+    <div *ngIf="imageUrl" class="image-preview">
+      <img [src]="imageUrl" alt="Image Preview"/>
+    </div>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="!imageUrl"
+    >
+      Submit
+    </button>
+  </mat-card-actions>
+</mat-card>

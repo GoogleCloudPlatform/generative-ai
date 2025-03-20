@@ -1,6 +1,6 @@
 import {Component, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
 import {SearchService} from 'src/app/services/search.service';
-import {ReplaySubject, takeUntil} from 'rxjs';
+import {ReplaySubject, Subscription, takeUntil} from 'rxjs';
 import {UserService} from 'src/app/services/user/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
@@ -16,14 +16,18 @@ import {
 } from '@angular/platform-browser';
 import {MatDialog} from '@angular/material/dialog';
 import {GeneratedImage} from 'src/app/models/generated-image.model';
-import { SearchRequest } from 'src/app/models/search.model';
+import {SearchRequest} from 'src/app/models/search.model';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastMessageComponent} from '../../toast-message/toast-message.component';
+import {MatButtonToggleChange} from '@angular/material/button-toggle';
+import {ImageService} from 'src/app/services/image/image.service';
 
 interface Imagen3Model {
   value: string;
   viewValue: string;
 }
 
-interface AspectRatio {
+interface ImageStylesModel {
   value: string;
   viewValue: string;
 }
@@ -47,35 +51,36 @@ export class SearchResultsComponent implements OnDestroy {
   documentURL: SafeResourceUrl | undefined;
   openPreviewDocument: any;
   currentPage = 0;
-  pageSize = 4;
+  pageSize = 8;
   selectedDocument: any;
   safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
   imagen3ModelsList: Imagen3Model[] = [
-    {value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001'},
     {
-      value: 'imagen-3.0-fast-generate-001',
-      viewValue: 'imagen-3.0-fast-generate-001',
+      value: 'imagen-3.0-capability-001',
+      viewValue: 'Imagen 3: imagen-3.0-capability-001',
     },
-    {value: 'imagen-3.0-generate-002', viewValue: 'imagen-3.0-generate-002'},
-    {value: 'imagegeneration@006', viewValue: 'imagegeneration@006'},
-    {value: 'imagegeneration@005', viewValue: 'imagegeneration@005'},
-    {value: 'imagegeneration@002', viewValue: 'imagegeneration@002'},
+    // {value: 'imagegeneration@006', viewValue: 'Imagen 2: imagegeneration@006'},
   ];
   selectedModel = this.imagen3ModelsList[0].value;
-  aspectRatioList: AspectRatio[] = [
-    {value: '1:1', viewValue: '1:1'},
-    {value: '9:16', viewValue: '9:16'},
-    {value: '16:9', viewValue: '16:9'},
-    {value: '2:4', viewValue: '2:4'},
-    {value: '4:1', viewValue: '4:1'},
+  imageStylesList: ImageStylesModel[] = [
+    {value: 'Modern', viewValue: 'Modern'},
+    {value: 'Realistic', viewValue: 'Realistic'},
+    {value: 'Vintage', viewValue: 'Vintage'},
+    {value: 'Monochrome', viewValue: 'Monochrome'},
+    {value: 'Fantasy', viewValue: 'Fantasy'},
   ];
-  selectedAspectRatio = this.aspectRatioList[0];
+  selectedStyle: string = this.imageStylesList[0].value;
+  selectedNumberOfResults: number = 4;
+  selectedMaskDistilation: number = 0.005;
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,
-    aspectRatio: '1:1',
+    numberOfResults: this.selectedNumberOfResults,
+    maskDistilation: this.selectedMaskDistilation,
   };
+  isUserPhotoUrl: boolean = false;
+  private imageSubscription: Subscription;
 
   constructor(
     private router: Router,
@@ -83,8 +88,16 @@ export class SearchResultsComponent implements OnDestroy {
     private service: SearchService,
     private userService: UserService,
     private dialog: MatDialog,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private _snackBar: MatSnackBar,
+    private _ImageService: ImageService
   ) {
+    this.imageSubscription = this._ImageService.selectedImage$.subscribe(
+      image => {
+        if (image) this.isUserPhotoUrl = image.isUserPhotoUrl;
+      }
+    );
+
     const query = this.route.snapshot.queryParamMap.get('q');
     this.userService.showLoading();
 
@@ -119,22 +132,84 @@ export class SearchResultsComponent implements OnDestroy {
 
         this.userService.hideLoading();
       },
-      error: () => {
+      error: error => {
+        this.documents = [
+          {
+            enhancedPrompt: 'default enhaced prompt',
+            raiFilteredReason: null,
+            image: {
+              gcsUri: null,
+              mimeType: 'image/png',
+              encodedImage: 'assets/images/placeholder_image.png',
+            },
+          },
+          {
+            enhancedPrompt: 'default enhaced prompt',
+            raiFilteredReason: null,
+            image: {
+              gcsUri: null,
+              mimeType: 'image/png',
+              encodedImage: 'assets/images/placeholder_image.png',
+            },
+          },
+        ];
+        this.showDefaultDocuments = true;
         this.userService.hideLoading();
+        this.showErrorSnackBar(error);
       },
     });
   }
 
+  showErrorSnackBar(error: any): void {
+    console.error('Search error:', error);
+    console.error('Search typeof error:', typeof error);
+    console.error('Search error?.message:', error?.message);
+    console.error(
+      'Search typeof JSON.stringify:',
+      JSON.stringify(error, null, 2)
+    );
+
+    let errorMessage = '';
+    let triedToGeneratePersons = false;
+    if (error?.error?.detail?.[0]?.msg)
+      errorMessage = `${error?.error?.detail?.[0]?.msg} - ${error?.error?.detail?.[0]?.loc}`;
+    else if (error?.error?.detail)
+      if (
+        error.error.detail.includes(
+          "The image you want to edit contains content that has been blocked because you selected the 'Don't allow' option for Person Generation."
+        )
+      ) {
+        triedToGeneratePersons = true;
+        errorMessage =
+          'The image you want to edit contains content that has been blocked because there are persons in it. See the safety settings documentation for more details.';
+      } else errorMessage = error?.error?.detail;
+    else 'Error sending request. Please try again later!';
+
+    this._snackBar.openFromComponent(ToastMessageComponent, {
+      panelClass: ['red-toast'],
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+      duration: 10000,
+      data: {
+        text: errorMessage,
+        icon: 'cross-in-circle-white',
+      },
+    });
+    if (triedToGeneratePersons) this.goToHomePage();
+  }
+
   searchTerm({
     term,
-    aspectRatio,
     model,
+    numberOfResults,
+    maskDistilation,
   }: {
     term?: string | undefined;
-    aspectRatio?: string | undefined;
     model?: string | undefined;
+    numberOfResults?: number | undefined;
+    maskDistilation?: number | undefined;
   }) {
-    if (!term) return
+    if (!term) return;
 
     this.showDefaultDocuments = false;
     this.userService.showLoading();
@@ -142,10 +217,12 @@ export class SearchResultsComponent implements OnDestroy {
     this.summary = '';
     this.documents = [];
     this.images = [];
-    this.router.navigate(['/search'], {queryParams: {q: term}});
+
     if (term) this.searchRequest.term = term;
-    if (aspectRatio) this.searchRequest.aspectRatio = aspectRatio;
     if (model) this.searchRequest.model = model;
+    if (numberOfResults) this.searchRequest.numberOfResults = numberOfResults;
+    if (maskDistilation) this.searchRequest.maskDistilation = maskDistilation;
+
     const newSearchRequest = this.searchRequest;
 
     this.service.search(newSearchRequest).subscribe({
@@ -158,8 +235,10 @@ export class SearchResultsComponent implements OnDestroy {
         this.selectedResult = searchResponse[0];
         this.userService.hideLoading();
       },
-      error: () => {
+      error: error => {
+        console.error('Search error:', error);
         this.userService.hideLoading();
+        this.showErrorSnackBar(error);
       },
     });
   }
@@ -177,11 +256,6 @@ export class SearchResultsComponent implements OnDestroy {
     this.searchTerm({model: this.selectedModel});
   }
 
-  changeAspectRatio(aspectRatio: AspectRatio) {
-    this.selectedAspectRatio = aspectRatio;
-    this.searchTerm({aspectRatio: aspectRatio.value});
-  }
-
   previewDocument(event: any, document: any) {
     event.stopPropagation();
     if (document.link.endsWith('.pdf') || document.link.endsWith('.docx')) {
@@ -196,7 +270,10 @@ export class SearchResultsComponent implements OnDestroy {
     this.selectedDocument = undefined;
   }
 
+  ngOnInit(): void {}
+
   ngOnDestroy() {
+    this.imageSubscription.unsubscribe();
     this.destroyed.next();
     this.destroyed.complete();
   }
@@ -220,5 +297,43 @@ export class SearchResultsComponent implements OnDestroy {
     if (this.currentPage > 0) {
       this.currentPage--;
     }
+  }
+
+  onNumberOfResultsChange(event: Event) {
+    this.selectedNumberOfResults =
+      Number((event.target as HTMLInputElement).value) || 0;
+  }
+
+  selectStyle(event: MatButtonToggleChange) {
+    this.selectedStyle = event.value;
+  }
+
+  onSliderChange(event: Event) {
+    this.selectedMaskDistilation =
+      Number((event.target as HTMLInputElement).value) || 0;
+  }
+
+  submitChanges() {
+    this.searchTerm({
+      term: this.searchRequest.term,
+      model: this.selectedModel,
+      numberOfResults: this.selectedNumberOfResults,
+      maskDistilation: this.selectedMaskDistilation,
+    });
+  }
+
+  goToHomePage() {
+    this._ImageService.clearSelectedImage();
+    this.router.navigate(['/']);
+  }
+
+  get firstHalfPagedDocuments() {
+    const halfLength = Math.ceil(this.pagedDocuments.length / 2);
+    return this.pagedDocuments.slice(0, halfLength);
+  }
+
+  get secondHalfPagedDocuments() {
+    const halfLength = Math.ceil(this.pagedDocuments.length / 2);
+    return this.pagedDocuments.slice(halfLength);
   }
 }

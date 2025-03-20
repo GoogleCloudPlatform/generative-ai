@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {ReplaySubject} from 'rxjs';
 import {SearchResponse} from 'src/app/models/search.model';
+
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -28,8 +29,13 @@ export class MainComponent implements OnDestroy {
     this.savedUser = userService.getUserDetails();
   }
 
-  goToResults(term: string) {
-    this.router.navigate(['/search'], {queryParams: {q: term}});
+  goToResults(file: File) {
+    this.router.navigate(['/search'], {
+      queryParams: {
+        q: "Change the background by adding a beautiful, sprawling city with skyscrapers to this professional and elegant LinkedIn profile picture. It's dusk, and you can still see the sun before it sets.",
+        filename: file.name,
+      },
+    });
   }
 
   ngOnDestroy() {

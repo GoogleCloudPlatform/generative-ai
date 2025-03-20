@@ -293,7 +293,6 @@
 
 .image-generation-container {
   display: flex;
-  width: 75%;
 
   .image-preview {
     flex: 1;
@@ -319,13 +318,15 @@
 
     .main-image {
       flex: 1;
+      text-align: center;
 
       .main-image-placeholder {
         width: 100%;
-        background-color: #e0e0e0;
+        // background-color: #e0e0e0;
 
         img {
           width: 100%;
+          max-width: 25vw;
         }
       }
     }
@@ -375,9 +376,4 @@
 }
 
 // XX-Large devices (larger desktops, 1400px and up)
-@media (min-width: 1400px) {
-  .image-generation-container {
-    width: 60%;
-    padding-top: 10rem;
-  }
-}
+@media (min-width: 1400px) {}

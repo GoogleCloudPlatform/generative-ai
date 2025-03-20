@@ -120,6 +120,7 @@ div {
 // XX-Large devices (larger desktops, 1400px and up)
 @media (min-width: 1400px) {
   .video-embed-player {
-    top: 0;
+    top: -10vw;
+    width: 110vw;
   }
 }

@@ -1,4 +1,4 @@
-# QuickBot App Frontend | linkedin-profile-image-generation-using-imagen3
+# QuickBot App Frontend | image-background-changer-using-imagen3
 
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
