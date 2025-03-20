@@ -125,6 +125,10 @@ export class SearchResultsComponent implements OnDestroy {
     });
   }
 
+  goToResults(term: string) {
+    this.router.navigate(['/search'], {queryParams: {q: term}});  
+  }
+
   searchTerm({
     term,
     aspectRatio,
