@@ -30,7 +30,7 @@ ImageStyleLiteral = Union[
 
 
 class CreateSearchRequest(BaseModel):
-    term: Annotated[str, Query(max_length=50)] = Field(
+    term: Annotated[str, Query(max_length=150)] = Field(
         description="Prompt term to be passed to the model"
     )
     generation_model: Annotated[

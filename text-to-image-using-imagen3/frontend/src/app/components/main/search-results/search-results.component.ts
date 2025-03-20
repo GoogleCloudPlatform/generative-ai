@@ -17,6 +17,8 @@ import {
 import {MatDialog} from '@angular/material/dialog';
 import {GeneratedImage} from 'src/app/models/generated-image.model';
 import { SearchRequest } from 'src/app/models/search.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastMessageComponent } from '../../toast-message/toast-message.component';
 
 interface Imagen3Model {
   value: string;
@@ -83,7 +85,8 @@ export class SearchResultsComponent implements OnDestroy {
     private service: SearchService,
     private userService: UserService,
     private dialog: MatDialog,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private _snackBar: MatSnackBar
   ) {
     const query = this.route.snapshot.queryParamMap.get('q');
     this.userService.showLoading();
@@ -119,8 +122,67 @@ export class SearchResultsComponent implements OnDestroy {
 
         this.userService.hideLoading();
       },
-      error: () => {
+      error: error => {
+        this.documents = [
+          {
+            enhancedPrompt: 'default enhaced prompt',
+            raiFilteredReason: null,
+            image: {
+              gcsUri: null,
+              mimeType: 'image/png',
+              encodedImage: 'assets/images/placeholder_image.png',
+            },
+          },
+          {
+            enhancedPrompt: 'default enhaced prompt',
+            raiFilteredReason: null,
+            image: {
+              gcsUri: null,
+              mimeType: 'image/png',
+              encodedImage: 'assets/images/placeholder_image.png',
+            },
+          },
+        ];
+        this.showDefaultDocuments = true;
         this.userService.hideLoading();
+        this.showErrorSnackBar(error);
+      },
+    });
+  }
+
+  showErrorSnackBar(error: any): void {
+    console.error('Search error:', error);
+    console.error('Search typeof error:', typeof error);
+    console.error('Search error?.message:', error?.message);
+    console.error(
+      'Search typeof JSON.stringify:',
+      JSON.stringify(error, null, 2)
+    );
+
+    let errorMessage = '';
+    let triedToGeneratePersons = false;
+    if (error?.error?.detail?.[0]?.msg)
+      errorMessage = `${error?.error?.detail?.[0]?.msg} - ${error?.error?.detail?.[0]?.loc}`;
+    else if (error?.error?.detail)
+      if (
+        error.error.detail.includes(
+          "The image you want to edit contains content that has been blocked because you selected the 'Don't allow' option for Person Generation."
+        )
+      ) {
+        triedToGeneratePersons = true;
+        errorMessage =
+          'The image you want to edit contains content that has been blocked because there are persons in it. See the safety settings documentation for more details.';
+      } else errorMessage = error?.error?.detail;
+    else 'Error sending request. Please try again later!';
+
+    this._snackBar.openFromComponent(ToastMessageComponent, {
+      panelClass: ['red-toast'],
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+      duration: 10000,
+      data: {
+        text: errorMessage,
+        icon: 'cross-in-circle-white',
       },
     });
   }
@@ -162,8 +224,10 @@ export class SearchResultsComponent implements OnDestroy {
         this.selectedResult = searchResponse[0];
         this.userService.hideLoading();
       },
-      error: () => {
+      error: error => {
+        console.error('Search error:', error);
         this.userService.hideLoading();
+        this.showErrorSnackBar(error);
       },
     });
   }
