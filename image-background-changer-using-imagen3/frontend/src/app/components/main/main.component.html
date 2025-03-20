@@ -1,0 +1,15 @@
+<app-header></app-header>
+<div class="parent-container">
+  <div class="wrapping-container">
+    <div class="main-div">
+      <div class="sub-heading">
+        <div class="name-container">
+          Hey, {{ savedUser.name ? savedUser.name!.split(' ')[0] + '!' : '' }}
+        </div>
+        <div class="helper-container">Upload your photo and start now!</div>
+      </div>
+    </div>
+  </div>
+
+  <app-background-changer-input (emitSearch)="this.goToResults($event)"></app-background-changer-input>
+</div>

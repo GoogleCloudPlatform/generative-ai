@@ -1,0 +1,10 @@
+<div fxLayout="row" fxLayoutGap="2%">
+  <img src="assets/images/{{ icon }}.svg" alt="icon inside toast message" />
+  <span class="toast-content">{{ text }}</span>
+  <img
+    class="close-toast"
+    src="assets/images/cancel-toast.svg"
+    alt="cross icon inside toast message"
+    (click)="closeToast()"
+  />
+</div>
