@@ -51,7 +51,7 @@ interface UserStore {
 const oAuth2Client = new OAuth2Client(process.env.NEXT_PUBLIC_CLIENT_ID, process.env.CLIENT_SECRET, "postmessage");
 
 /**
- * Handles user sign-in and sets an http only cookie for the user
+ * Handles user sign-in and sets a http only cookie for the user
  *
  * @param payload The token to be encrypted
  * @param encryptionKey A 32 character string used for encryption
@@ -95,7 +95,7 @@ export async function processSignin(code: string): Promise<string> {
     throw e;
   }
 
-  // Store the ID token as an http only cookie (cannot be read by client-side Javascript)
+  // Store the ID token as a http only cookie (cannot be read by client-side Javascript)
   (await cookieStore).set({
     name: "id_token",
     value: tokens.id_token,

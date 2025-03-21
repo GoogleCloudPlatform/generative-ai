@@ -1,5 +1,5 @@
 /**
- * Copyright 2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  * Runs each time a user signs in or attempts to create an account.
  *
  * Checks their email address against a static allowList and returns either
- * an http 200 OK if all's good, or throws an HttpsError if not.
+ * a http 200 OK if all's good, or throws a HttpsError if not.
  *
  * See here for more details:
  * https://firebase.google.com/docs/auth/extend-with-blocking-functions?gen=2nd
