@@ -41,7 +41,7 @@ locals {
     "roles/storage.objectViewer"
   ]
 
-  # Auth blocking SAs
+  # Auth blocking Service Accounts
   auth_blocking_function_sa_roles = [
     "roles/datastore.user",
   ]

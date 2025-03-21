@@ -73,7 +73,7 @@ export default function UploadForm() {
       await uploadString(storageRef, screenshot.base64, "base64");
 
       // Payload to save
-      const supload: ScreenshotUpload = {
+      const screenshotUpload: ScreenshotUpload = {
         ID: docId,
         image: `gs://${firebaseConfig.storageBucket}/${filePath}`,
         type: screenshot.type,
@@ -89,7 +89,7 @@ export default function UploadForm() {
       const uploadDocRef = doc(clientFirestore, "state", docId).withConverter(processedScreenshotConverter);
       // Run as a transaction to update both collections at the same time
       await runTransaction(clientFirestore, async (transaction) => {
-        transaction.set(screenshotDocRef, supload);
+        transaction.set(screenshotDocRef, screenshotUpload);
         transaction.set(uploadDocRef, s);
       });
       setShowPreview(false);

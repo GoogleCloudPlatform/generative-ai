@@ -40,7 +40,7 @@ export async function addEvent(event: CalendarEvent): Promise<CalendarResponse> 
       Authorization: `Bearer ${token.token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ 
+    body: JSON.stringify({
       summary: event.summary,
       start: {
         dateTime: new Date(event.start).toISOString(),
