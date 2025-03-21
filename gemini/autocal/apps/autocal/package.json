@@ -1,0 +1,43 @@
+{
+  "name": "autocal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.7",
+    "@mui/material": "^6.4.5",
+    "@mui/material-nextjs": "^6.4.3",
+    "@mui/x-date-pickers": "^7.27.3",
+    "@react-oauth/google": "^0.12.1",
+    "dayjs": "^1.11.13",
+    "eslint-config-prettier": "^10.1.1",
+    "firebase": "^11.4.0",
+    "firebase-admin": "^13.2.0",
+    "google-auth-library": "^9.15.1",
+    "next": "15.2.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-firebase-hooks": "^5.1.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.2",
+    "typescript": "^5"
+  },
+  "prettier": {
+    "printWidth": 120
+  }
+}

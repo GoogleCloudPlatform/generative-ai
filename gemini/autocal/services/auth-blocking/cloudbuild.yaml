@@ -1,0 +1,44 @@
+# Most likely this is NOT the build file you're looking for.
+# See docs/SETUP.md for instructions on how to deploy this to your project.
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    entrypoint: "bash"
+    waitFor: ["-"]
+    args:
+      - "-c"
+      - |
+        gcloud functions deploy auth-blocking-before-signin \
+        --gen2 \
+        --runtime=nodejs22 \
+        --region=${_LOCATION} \
+        --source=. \
+        --entry-point=beforeSignIn \
+        --project=${PROJECT_ID} \
+        --build-service-account=projects/${PROJECT_ID}/serviceAccounts/auth-blocker-build@${PROJECT_ID}.iam.gserviceaccount.com \
+        --service-account=auth-blocker-function@${PROJECT_ID}.iam.gserviceaccount.com \
+        --trigger-http
+    id: BeforeSignin
+    dir: ${_ROOT_DIR}
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    entrypoint: "bash"
+    waitFor: ["-"]
+    args:
+      - "-c"
+      - |
+        gcloud functions deploy auth-blocking-before-create \
+        --gen2 \
+        --runtime=nodejs22 \
+        --region=${_LOCATION} \
+        --source=. \
+        --entry-point=beforeCreate \
+        --project=${PROJECT_ID} \
+        --build-service-account=projects/${PROJECT_ID}/serviceAccounts/auth-blocker-build@${PROJECT_ID}.iam.gserviceaccount.com \
+        --service-account=auth-blocker-function@${PROJECT_ID}.iam.gserviceaccount.com \
+        --trigger-http
+    id: BeforeCreate
+    dir: ${_ROOT_DIR}
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _ROOT_DIR: services/auth-blocking

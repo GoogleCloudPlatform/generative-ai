@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /apps/autocal
+    schedule:
+      interval: daily
+    rebase-strategy: all
+  - package-ecosystem: pip
+    directory: /apps/autocal-legacy
+    schedule:
+      interval: daily
+    rebase-strategy: all
+  - package-ecosystem: npm
+    directory: /services/auth-blocking
+    schedule:
+      interval: daily
+    rebase-strategy: all
+  - package-ecosystem: pip
+    directory: /services/image-processing
+    schedule:
+      interval: daily
+    rebase-strategy: all
+  - package-ecosystem: terraform
+    directory: /terraform
+    schedule:
+      interval: daily
+    rebase-strategy: all
+    
