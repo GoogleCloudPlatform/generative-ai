@@ -35,7 +35,7 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: "AutoCal",
-  description: "From Screenshot to Calendar - powered by Gemini 2.0",
+  description: "From Screenshot to Calendar",
 };
 
 export default function RootLayout({

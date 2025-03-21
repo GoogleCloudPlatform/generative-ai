@@ -8,7 +8,7 @@ Screenshot to Calendar Magic with Gemini 2.0 Flash
 
 ![AutoCal Preview](complete.webp)
 
-AutoCal is a web application that leverages the power of Google's Gemini 2.0 model to automatically extract event information from screenshots and add them to your calendar. It simplifies the process of scheduling by eliminating the need for manual data entry.
+AutoCal is a web application that leverages the power of Gemini 2.0 Flash to automatically extract event information from screenshots and add them to your calendar. It simplifies the process of scheduling by eliminating the need for manual data entry.
 
 ## Project Structure
 
@@ -23,7 +23,7 @@ There are two versions of Autocal:
 ## v2 Features
 
 - **Async Screenshot Processing:** Upload a screenshot of a schedule or event list and have it asynchronously processed in the background
-- **Gemini 2.0 Integration:** Uses Google's advanced Gemini 2.0 Flash model to intelligently parse and understand the event details within the screenshot.
+- **Gemini 2.0 Integration:** Uses Gemini 2.0 Flash to intelligently parse and understand the event details within the screenshot.
 - **Automatic Event Extraction:** Extracts key information like event name, date, time, and location.
 - **Calendar Integration:** The extracted information is added to your calendar
 

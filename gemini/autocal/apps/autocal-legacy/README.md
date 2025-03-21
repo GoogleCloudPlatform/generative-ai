@@ -2,12 +2,12 @@
 
 Automate Calendar Event Creation from Images
 
-AutoCal is a Streamlit application that leverages Google's Gemini AI model to automatically extract event details from images (like screenshots of event listings) and add them to your Google Calendar.
+AutoCal is a Streamlit application that leverages Gemini 2.0 Flash to automatically extract event details from images (like screenshots of event listings) and add them to your Google Calendar.
 
 ## Features
 
 - **Image Upload:** Upload images of event listings directly through the Streamlit interface.
-- **AI-Powered Analysis:** Uses Google's Gemini AI model to analyze the image and extract key event information, including:
+- **AI-Powered Analysis:** Uses Gemini 2.0 Flash to analyze the image and extract key event information, including:
   - Event summary
   - Location
   - Start time (with date and time zone)
