@@ -18,5 +18,5 @@
  */
 export const allowList = [
   // ".*@google\\.com$", // This would allow anyone @google.com
-  ".*" // allow anyone by default - you should consider locking this down for your use-case
+  ".*", // allow anyone by default - you should consider locking this down for your use-case
 ];
