@@ -57,7 +57,7 @@ export const beforeSignIn = beforeUserSignedIn(
 async function validate(user: AuthUserRecord): Promise<object> {
   const email = user.email;
 
-  // We need an email address to perform valiation
+  // We need an email address to perform validation
   if (!email) {
     logger.warn("Email not provided in session token");
     throw new HttpsError("invalid-argument", "User not found");

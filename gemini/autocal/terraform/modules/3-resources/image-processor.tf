@@ -72,7 +72,7 @@ resource "google_cloudfunctions2_function" "image_processor" {
   }
 }
 
-# Allow eventarc trigger to invoke image-processor
+# Allow Eventarc trigger to invoke image-processor
 resource "google_cloud_run_service_iam_member" "image_processor_trigger" {
   project  = data.google_project.project.project_id
   location = google_cloudfunctions2_function.image_processor.location

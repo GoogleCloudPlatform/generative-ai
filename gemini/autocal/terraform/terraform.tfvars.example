@@ -11,6 +11,6 @@ firestore_location = "eur3"
 bucket_location = "eu"
 
 # Whether to enable org policies.
-# You must be an org policy administrator to enable this and Terraform must run as a serice account.
+# You must be an org policy administrator to enable this and Terraform must run as a service account.
 # To run as a service account see ORG_POLICY.md
 org_policies = false

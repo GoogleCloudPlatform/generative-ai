@@ -93,8 +93,6 @@ main() {
 
   me="$(gcloud config list account --format "value(core.account)")"
   gcloud projects add-iam-policy-binding "${PROJECT_ID}" --member="user:${me}" --role="roles/iam.serviceAccountTokenCreator" --condition=None >/dev/null
-  gcloud projects add-iam-policy-binding "${PROJECT_ID}" --member="user:mattsday@2064896474474.altostrat.com" --role="roles/iam.serviceAccountTokenCreator" --condition=None >/dev/null
-
   info Complete. Before running terraform set your impersonate environment variable:
   echo 'export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT="'"${TERRAFORM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"'"'
 }

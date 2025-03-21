@@ -17,10 +17,6 @@
  * Admin Allow List - these folks are allowed to access the admin functions
  */
 export const allowList = [
-  "^mattsday@google\\.com$",
-  "^stephanieanani@google\\.com$",
-  ".*@google\\.com$",
-  ".*@.*\\.altostrat\\.com$",
-  ".*@altostrat\\.com$",
-  "^mattsday@gmail\\.com$",
+  // ".*@google\\.com$", // This would allow anyone @google.com
+  ".*" // allow anyone by default - you should consider locking this down for your use-case
 ];
