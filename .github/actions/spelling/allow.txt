@@ -1,4 +1,3 @@
-eula
 AALR
 ADMA
 AFX
@@ -668,6 +667,7 @@ erlang
 erty
 etf
 etils
+eula
 eur
 evals
 evse
