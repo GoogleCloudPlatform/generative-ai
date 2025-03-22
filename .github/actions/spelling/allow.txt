@@ -1,3 +1,4 @@
+eula
 AALR
 ADMA
 AFX
