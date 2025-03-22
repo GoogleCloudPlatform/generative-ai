@@ -5,6 +5,7 @@ This repository contains examples for deploying and fine-tuning open source mode
 ## Notebooks
 
 ### Serving
+
 - [serving/cloud_run_ollama_gemma3_inference.ipynb](./serving/cloud_run_ollama_gemma3_inference.ipynb) - This notebook showcase how to deploy Google Gemma 3 in Cloud Run using Ollama, with the objective to build a simple API for chat.
 - [serving/cloud_run_vllm_gemma3_inference.ipynb](./serving/cloud_run_vllm_gemma3_inference.ipynb) - This notebook showcase how to deploy Google Gemma 3 in Cloud Run using vLLM, with the objective to build a simple API for chat.
 - [serving/vertex_ai_ollama_gemma2_rag_agent.ipynb](./serving/vertex_ai_ollama_gemma2_rag_agent.ipynb) - This notebooks provides steps and code to deploy an open source agentic RAG pipeline to Vertex AI Prediction using Ollama and a Gemma 2 model adapter.
