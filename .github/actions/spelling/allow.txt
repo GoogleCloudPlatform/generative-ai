@@ -42,6 +42,7 @@ Broadoak
 Brusdar
 Btn
 Buckleys
+Bulmus
 CALIPSO
 CAMQAA
 CHECKOV
@@ -322,6 +323,7 @@ Phanfone
 Pharma
 Photoshop
 Pistorius
+Polong
 Pranav
 Pré
 Pzk
