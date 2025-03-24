@@ -16,9 +16,7 @@
 
 <a href="gemini"><img src="https://lh3.googleusercontent.com/eDr6pYKs1tT0iK0nt3pPhvVlP2Wn96fbGqbWgBAARRZ7isej037g_tWobjV8zQkxOsWzJuEH8p-fksczXUOeqxGZZIo_HUCdkn8q-a4fuwATD7Q9Xrs=w2456-l100-sg-rj-c0xffffff" style="width:35em" alt="Welcome to the Gemini era"></a>
 
-This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai), powered by [Vertex AI](https://cloud.google.com/vertex-ai).
-
-For more Vertex AI samples, please visit the [Vertex AI samples GitHub repository](https://github.com/GoogleCloudPlatform/vertex-ai-samples/).
+This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai) with [Vertex AI](https://cloud.google.com/vertex-ai).
 
 ## Using this repository
 
