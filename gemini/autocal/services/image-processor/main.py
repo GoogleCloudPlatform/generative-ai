@@ -57,14 +57,9 @@ from google.genai.types import (
 # from google.protobuf.json_format import MessageToDict
 import google.cloud.firestore
 
-
 # Initialize the Gemini model
-MODEL_ID = "gemini-2.0-flash-001"
-LOCATION = os.environ.get("LOCATION", "")
-
-# Default location if not specified
-if LOCATION == "" or LOCATION is None:
-    LOCATION = "europe-west1"
+MODEL_ID = os.environ.get("MODEL_ID", "gemini-2.0-flash-001")
+LOCATION = os.environ.get("LOCATION", "europe-west1")
 
 client = genai.Client(vertexai=True, location=LOCATION)
 
