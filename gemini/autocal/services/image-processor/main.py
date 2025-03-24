@@ -53,6 +53,7 @@ from google.genai.types import (
     GenerateContentConfig,
     Part,
 )
+
 # from google.protobuf.json_format import MessageToDict
 import google.cloud.firestore
 
