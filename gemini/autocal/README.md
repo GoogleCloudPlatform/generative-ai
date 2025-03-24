@@ -15,9 +15,9 @@ AutoCal is a web application that leverages the power of Gemini 2.0 Flash to aut
 There are two versions of Autocal:
 
 - [v1 - A streamlit app](apps/autocal-legacy/) - this is a standalone application
-- **v2** - A Nextjs and Python app - this comprises of a number of services:
+- **v2** - A Next.js and Python app - this comprises of a number of services:
   1. [Auth Blocking](services/auth-blocking/) - to control access to the app
-  2. [Frontend UI](apps/autocal/) - a Nextjs / MUI frontend for the user to interact with
+  2. [Frontend UI](apps/autocal/) - a Next.js / MUI frontend for the user to interact with
   3. [Backend Image Processor](services/image-processor/) - a Python Cloud Function to process and handle images
 
 ## v2 Features
@@ -68,13 +68,13 @@ For example:
 
 ```ts
 export const firebaseConfig = {
-  apiKey: "AIzaSyDYvf_kZcvo0ktBx8LjUQo3RKXFaCksl4U",
-  authDomain: "autocal-448710.firebaseapp.com",
-  projectId: "autocal-448710",
-  storageBucket: "autocal-448710-assets-bu84",
-  messagingSenderId: "406699036396",
-  appId: "1:406699036396:web:eb9f5e2b8ffa9457871fc9",
-  measurementId: "G-B9EK3RGL1S",
+  apiKey: "xxxx",
+  authDomain: "xxxx",
+  projectId: "xxxx",
+  storageBucket: "xxxx",
+  messagingSenderId: "xxxx",
+  appId: "xxxx",
+  measurementId: "xxxx",
 };
 ```
 
