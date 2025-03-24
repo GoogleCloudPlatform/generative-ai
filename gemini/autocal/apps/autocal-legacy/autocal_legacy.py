@@ -24,7 +24,9 @@ It requires a Google Calendar API key to run.
 import json
 import os
 import streamlit as st
+
 from dotenv import load_dotenv
+from typing import Any
 
 from PIL import Image
 from google.cloud import storage
@@ -63,7 +65,7 @@ client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 BUCKET_NAME = os.environ["BUCKET_NAME"]
 
 
-def upload_blob(destination_blob_name, file_content) -> str:
+def upload_blob(destination_blob_name: Any, file_content: Any) -> str:
     """Uploads a file to the bucket."""
 
     storage_client = storage.Client()
@@ -125,7 +127,7 @@ The response should have the following schema:
 """
 
 
-def create_calendar_event(event_data) -> None:
+def create_calendar_event(event_data: Any) -> None:
     """Creates a Google Calendar event."""
 
     creds = None
