@@ -6,11 +6,13 @@ This repository contains examples for deploying and fine-tuning open source mode
 
 ### Serving
 
-- [serving/vertex_ai_text_generation_inference_gemma.ipynb](./serving/vertex_ai_text_generation_inference_gemma.ipynb) - This notebooks provides steps and code to deploy Google Gemma with the Hugging Face DLC for Text Generation Inference (TGI) on Vertex AI.
-- [serving/vertex_ai_pytorch_inference_paligemma_with_custom_handler.ipynb](./serving/vertex_ai_pytorch_inference_paligemma_with_custom_handler.ipynb) - This notebooks provides steps and code to deploy Google PaliGemma with the Hugging Face Python Inference DLC using a custom handler on Vertex AI.
-- [serving/vertex_ai_tgi_gemma_multi_lora_adapters_deployment.ipynb](./serving/vertex_ai_tgi_gemma_multi_lora_adapters_deployment.ipynb) - This notebook showcases how to deploy Gemma 2 from the Hugging Face Hub with multiple LoRA adapters fine-tuned for different purposes such as coding, or SQL using Hugging Face's Text Generation Inference (TGI) Deep Learning Container (DLC) in combination with a custom handler on Vertex AI.
+- [serving/cloud_run_ollama_gemma3_inference.ipynb](./serving/cloud_run_ollama_gemma3_inference.ipynb) - This notebook showcase how to deploy Google Gemma 3 in Cloud Run using Ollama, with the objective to build a simple API for chat.
+- [serving/cloud_run_vllm_gemma3_inference.ipynb](./serving/cloud_run_vllm_gemma3_inference.ipynb) - This notebook showcase how to deploy Google Gemma 3 in Cloud Run using vLLM, with the objective to build a simple API for chat.
 - [serving/vertex_ai_ollama_gemma2_rag_agent.ipynb](./serving/vertex_ai_ollama_gemma2_rag_agent.ipynb) - This notebooks provides steps and code to deploy an open source agentic RAG pipeline to Vertex AI Prediction using Ollama and a Gemma 2 model adapter.
+- [serving/vertex_ai_pytorch_inference_paligemma_with_custom_handler.ipynb](./serving/vertex_ai_pytorch_inference_paligemma_with_custom_handler.ipynb) - This notebooks provides steps and code to deploy Google PaliGemma with the Hugging Face Python Inference DLC using a custom handler on Vertex AI.
 - [serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb](./serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb) - This notebook shows how to deploy Polish Large Language Model (PLLuM) from the Hugging Face Hub on Vertex AI using the Hugging Face Deep Learning Container (DLC) for Pytorch Inference in combination with a custom handler.
+- [serving/vertex_ai_text_generation_inference_gemma.ipynb](./serving/vertex_ai_text_generation_inference_gemma.ipynb) - This notebooks provides steps and code to deploy Google Gemma with the Hugging Face DLC for Text Generation Inference (TGI) on Vertex AI.
+- [serving/vertex_ai_tgi_gemma_multi_lora_adapters_deployment.ipynb](./serving/vertex_ai_tgi_gemma_multi_lora_adapters_deployment.ipynb) - This notebook showcases how to deploy Gemma 2 from the Hugging Face Hub with multiple LoRA adapters fine-tuned for different purposes such as coding, or SQL using Hugging Face's Text Generation Inference (TGI) Deep Learning Container (DLC) in combination with a custom handler on Vertex AI.
 
 ### Fine-tuning
 
@@ -25,3 +27,4 @@ This repository contains examples for deploying and fine-tuning open source mode
 - [use-cases/bigquery_ml_llama_inference.ipynb](./use-cases/bigquery_ml_llama_inference.ipynb) - This notebook showcases a simple end-to-end process for extracting entities and performing data analytics using BigQuery in conjunction with an open-source text-generation Large Language Model (LLM). We use Meta's Llama 3.3 70B model as an example.
 - [use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb](./use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb) - This notebooks provides steps and code to deploy an open source RAG pipeline to Cloud Run using Ollama and the Gemma 2 model.
 - [use-cases/guess_app.ipynb](./use-cases/guess_app.ipynb) - This notebook shows how to build a "Guess Who or What" app using FLUX and Gemini.
+- [vertex_ai_deepseek_smolagents.ipynb](./use-cases/vertex_ai_deepseek_smolagents.ipynb) - This notebook showcases how to deploy DeepSeek R1 Distill Qwen 7B from the Hugging Face Hub on Vertex AI using Vertex AI Model Garden. It also shows how to prototype and deploy a simple agent using HuggingFace's smol-agents library on Vertex AI Reasoning Engine.
