@@ -2,8 +2,8 @@
 ## Deploy Image Processor
 
 # Grant access to the Pub/Sub account
-resource "google_project_iam_member" "allow_firestore_eventarc" {
-  project = data.google_project.project.project_id
+resource "google_service_account_iam_member" "allow_firestore_eventarc" {
+  service_account_id = google_service_account.image_processor_trigger.id
   role    = "roles/iam.serviceAccountTokenCreator"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
