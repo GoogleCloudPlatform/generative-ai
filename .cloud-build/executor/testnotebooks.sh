@@ -12,9 +12,13 @@ OUTPUT_URI=$(cat OUTPUT_URI)
 SA=$(cat SA)
 PROJECT_ID=$(cat PROJECT_ID)
 REGION=$(cat REGION)
+PUBSUB_TOPIC=$(cat PS_TOPIC)
 
 failed_count=0
 failed_notebooks=()
+total_count=0 
+successful_notebooks=()
+successful_count=0 
 
 for x in $TARGET
 do
@@ -43,6 +47,7 @@ do
   if [[ $? -ne 0 ]]; then
     echo "Error describing execution for ${x##*/}. See logs for details."
     failed_count=$((failed_count + 1))
+    failed_notebooks+=("${x##*/}")
     continue
   else
     echo "Execution completed for ${x##*/}"
@@ -52,6 +57,8 @@ do
   JOB_STATE=$(echo "$EXECUTION_DETAILS" | grep "jobState:" | awk '{print $2}')
   if [[ "$JOB_STATE" == "JOB_STATE_SUCCEEDED" ]]; then
     echo "Notebook execution succeeded."
+    successful_count=$((successful_count + 1))
+    successful_notebooks+=("${x##*/}")
   else
     echo "Notebook execution failed. Job state: $JOB_STATE. Please use id $TRUNCATED_OPERATION_ID to troubleshoot notebook ${x##*/}. See log for details."
     failed_count=$((failed_count + 1))
@@ -71,6 +78,50 @@ fi
 
 if [[ $failed_count -gt 0 ]]; then
   echo "Total failed notebook executions: $failed_count"
+fi
+
+if [[ $successful_count -gt 0 ]]; then
+  echo "Total successful notebook executions: $successful_count"
+fi
+
+# Prep pub/sub message
+failed_notebooks_str=$(IFS=', '; echo "${failed_notebooks[*]}")
+
+# prep notebook name for pub/sub message
+if [[ -n "$failed_notebooks_str" ]]; then
+  IFS=',' read -ra failed_notebooks_array <<< "$failed_notebooks_str"
+  trimmed_notebooks=()
+  for notebook in "${failed_notebooks_array[@]}"; do
+    trimmed_notebooks+=("$(echo -n "$notebook" | sed 's/ *$//')")
+  done
+  failed_notebooks_str=$(IFS=', '; echo "${trimmed_notebooks[*]}")
+else
+    failed_notebooks_str="[]"
+fi
+
+successful_notebooks_str=$(IFS=', '; echo "${successful_notebooks[*]}")
+
+if [[ -n "$successful_notebooks_str" ]]; then
+  IFS=',' read -ra successful_notebooks_array <<< "$successful_notebooks_str"
+  trimmed_successful_notebooks=()
+  for notebook in "${successful_notebooks_array[@]}"; do
+    trimmed_successful_notebooks+=("$(echo -n "$notebook" | sed 's/ *$//')")
+  done
+  successful_notebooks_str=$(IFS=', '; echo "${trimmed_successful_notebooks[*]}")
+else
+    successful_notebooks_str="[]"
+fi
+
+# Construct the message to send to pub/sub topic
+message_data="{\"total_count\":$(($total_count+0)),\"failed_count\":$(($failed_count+0)),\"failed_notebooks\":\"${failed_notebooks_str}\",\"successful_notebooks\":\"${successful_notebooks_str}\",\"successful_count\":$(($successful_count+0))}"
+
+# Publish to Pub/Sub
+echo "$(date) - INFO - Publishing to Pub/Sub topic: $PUBSUB_TOPIC"
+gcloud pubsub topics publish "$PUBSUB_TOPIC" --message="$message_data" --project="$PROJECT_ID"
+
+if [[ $? -ne 0 ]]; then
+  echo "$(date) - ERROR - Failed to publish to Pub/Sub topic $PUBSUB_TOPIC. Check permissions and topic configuration."
+  #exit 1
 fi
 
 echo "All notebook executions completed."

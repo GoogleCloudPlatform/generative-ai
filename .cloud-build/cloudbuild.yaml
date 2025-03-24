@@ -54,6 +54,7 @@ steps:
     gcloud secrets versions access latest --secret=REGION > REGION
     gcloud secrets versions access latest --secret=SA_EMAIL > SA
     gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
+    gcloud secrets versions access latest --secret=PS_TOPIC > PS_TOPIC
     . .cloud-build/executor/testnotebooks.sh
 # [END execute-notebooks]
 
