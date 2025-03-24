@@ -834,6 +834,7 @@ kickstart
 konnte
 kotlin
 kpi
+kubectl
 l'harmonie
 lakecolor
 landcolor
