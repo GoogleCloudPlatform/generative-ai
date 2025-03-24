@@ -62,7 +62,7 @@ load_dotenv()
 BUCKET_NAME = os.environ["BUCKET_NAME"]
 
 
-def upload_blob(destination_blob_name, file_content):
+def upload_blob(destination_blob_name, file_content) -> str:
     """Uploads a file to the bucket."""
 
     storage_client = storage.Client()
@@ -124,7 +124,7 @@ The response should have the following schema:
 """
 
 
-def create_calendar_event(event_data):
+def create_calendar_event(event_data) -> None:
     """Creates a Google Calendar event."""
 
     creds = None
