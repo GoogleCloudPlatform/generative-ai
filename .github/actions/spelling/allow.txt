@@ -516,6 +516,7 @@ arxiv
 astype
 atms
 aujourd'hui
+autocal
 autoflake
 autogen
 automerge
@@ -1105,6 +1106,7 @@ subviews
 subword
 sunner
 supima
+svh
 svm
 sxs
 tabular
