@@ -64,6 +64,7 @@ resource "google_firebaserules_release" "storage_primary" {
       google_firebaserules_ruleset.storage
     ]
   }
+
   depends_on = [
     google_storage_bucket.firebase,
   ]
