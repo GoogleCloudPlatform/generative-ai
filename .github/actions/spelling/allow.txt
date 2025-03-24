@@ -333,6 +333,7 @@ Pré
 Pzk
 QLo
 QPM
+qqq
 Qwen
 Qwiklabs
 RAGAS
