@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Async Google Cloud Run function that is triggered through eventarc by a
+Async Google Cloud Run function that is triggered through Eventarc by a
 document written in the `screenshots` Firestore collection.
 
 The schema of the `screenshots` collection is:
@@ -26,8 +26,8 @@ The schema of the `screenshots` collection is:
 }
 
 Upon receiving an event, the image pointed to by the `image` field is processed
-through Gemini and the resulting calendar entry is written to the `state` collection
-with the following schema:
+through Gemini and the resulting calendar entry is written to the `state`
+collection with the following schema:
 
 {
   processed: boolean; // Whether the image has been processed
@@ -46,14 +46,14 @@ import datetime
 import os
 import functions_framework
 from cloudevents.http import CloudEvent
-from google.events.cloud import firestore
+from google.events.cloud import firestore as firestoredata
 from google import genai
 from google.api_core.exceptions import GoogleAPICallError
 from google.genai.types import (
     GenerateContentConfig,
     Part,
 )
-from google.protobuf.json_format import MessageToDict
+# from google.protobuf.json_format import MessageToDict
 import google.cloud.firestore
 
 
@@ -86,7 +86,7 @@ response_schema = {
 # Define the prompt for the analysis
 PROMPT_TEMPLATE = """ The current date and time is: {current_datetime}.
 
-Analyze the provided screenshot and extract the following information: 
+Analyze the provided screenshot and extract the following information:
 
 summary: A brief summary of the event.
 location: The location of the event.
@@ -115,26 +115,26 @@ The response should have the following schema:
 
 @functions_framework.cloud_event
 def image_processor(cloud_event: CloudEvent) -> None:
-    """Triggers by a change to a Firestore document.
+    """Triggered by a change to a Firestore document.
 
     Args:
         cloud_event: cloud event with information on the firestore event trigger
     """
-    firestore_payload = firestore.DocumentEventData()
+    firestore_payload = firestoredata.DocumentEventData()
+    # Not sure how to parse the protobuf without using this protected method
+    # pylint: disable=protected-access
+    firestore_payload._pb.ParseFromString(cloud_event.data)
 
     print(f"Function triggered by change to: {cloud_event['source']}")
 
-    print("\nNew  value:")
-    print(firestore_payload.value)
-
-    document_data = MessageToDict(firestore_payload.value)
-
-    gcs_url = document_data.get("fields", {}).get("image", {}).get("stringValue")
-    mime_type = document_data.get("fields", {}).get("type", {}).get("stringValue")
-    document_id = document_data.get("fields", {}).get("ID", {}).get("stringValue")
+    # Again, not sure how to do this without accessing the fields directly
+    # pylint: disable=no-member
+    gcs_url = firestore_payload.value.fields.get("image").string_value
+    mime_type = firestore_payload.value.fields.get("type").string_value
+    document_id = firestore_payload.value.fields.get("ID").string_value
 
     if not all([gcs_url, mime_type, document_id]):
-        print(f"Missing required fields in document: {document_data}")
+        print(f"Missing required fields in document: {cloud_event.data}")
         return
 
     # Get the current date and time
