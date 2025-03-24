@@ -23,7 +23,8 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 
-export const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+export const firebaseApp =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const firebaseAuth = getAuth(firebaseApp);
 export const firebaseStorage = getStorage(firebaseApp);
 export const clientFirestore = getFirestore(firebaseApp);

@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Timestamp, serverTimestamp, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import {
+  Timestamp,
+  serverTimestamp,
+  QueryDocumentSnapshot,
+  DocumentData,
+} from "firebase/firestore";
 
 export interface ScreenshotUpload {
   image: string; // Path to original screenshot in GCS

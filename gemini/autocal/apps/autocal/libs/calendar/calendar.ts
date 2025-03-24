@@ -23,7 +23,9 @@ interface CalendarResponse {
   error?: string;
 }
 
-export async function addEvent(event: CalendarEvent): Promise<CalendarResponse> {
+export async function addEvent(
+  event: CalendarEvent,
+): Promise<CalendarResponse> {
   // Get access token from session
   const token = await getAccessToken();
 
@@ -34,24 +36,27 @@ export async function addEvent(event: CalendarEvent): Promise<CalendarResponse> 
     };
   }
 
-  const response = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token.token}`,
-      "Content-Type": "application/json",
+  const response = await fetch(
+    "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        summary: event.summary,
+        start: {
+          dateTime: new Date(event.start).toISOString(),
+        },
+        end: {
+          dateTime: new Date(event.end).toISOString(),
+        },
+        location: event.location,
+        description: event.description,
+      }),
     },
-    body: JSON.stringify({
-      summary: event.summary,
-      start: {
-        dateTime: new Date(event.start).toISOString(),
-      },
-      end: {
-        dateTime: new Date(event.end).toISOString(),
-      },
-      location: event.location,
-      description: event.description,
-    }),
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json();

@@ -51,7 +51,7 @@ interface UserStore {
 const oAuth2Client = new OAuth2Client(
   process.env.NEXT_PUBLIC_CLIENT_ID,
   process.env.CLIENT_SECRET,
-  "postmessage"
+  "postmessage",
 );
 
 /**
@@ -92,7 +92,7 @@ export async function processSignin(code: string): Promise<string> {
         access_token: access,
         expires: new Date(tokens.expiry_date || 0),
       },
-      { merge: true }
+      { merge: true },
     );
   } catch (e) {
     console.error(e);
@@ -186,7 +186,7 @@ export async function getAccessToken(): Promise<GetAccessTokenResponse | null> {
  */
 async function encrypt(
   payload: string,
-  encryptionKey: string
+  encryptionKey: string,
 ): Promise<string> {
   // Create an initialization vector
   const iv = crypto.randomBytes(16);
@@ -195,7 +195,7 @@ async function encrypt(
   const cipher = crypto.createCipheriv(
     "aes-256-cbc",
     Buffer.from(encryptionKey),
-    iv
+    iv,
   );
 
   // Encrypt the payload
@@ -223,7 +223,7 @@ function decrypt(encryptedData: string, encryptionKey: string): string {
   const decipher = crypto.createDecipheriv(
     "aes-256-cbc",
     Buffer.from(encryptionKey),
-    iv
+    iv,
   );
 
   // Decrypt the ciphertext
