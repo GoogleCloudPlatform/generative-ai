@@ -23,11 +23,11 @@ It requires a Google Calendar API key to run.
 
 import json
 import os
-import streamlit as st
 
-from dotenv import load_dotenv
 from typing import Any
 
+import streamlit as st
+from dotenv import load_dotenv
 from PIL import Image
 from google.cloud import storage
 from google.auth.transport.requests import Request
