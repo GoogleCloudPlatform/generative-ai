@@ -34,7 +34,7 @@ const eslintConfig = [
     },
     settings: {
       react: {
-        version: "detect",
+        version: "19",
       },
     },
   }),
