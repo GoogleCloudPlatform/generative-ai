@@ -22,8 +22,6 @@
  *
  * See here for more details:
  * https://firebase.google.com/docs/auth/extend-with-blocking-functions?gen=2nd
- *
- * Author: mattsday@google.com
  */
 
 import {

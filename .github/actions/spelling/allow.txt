@@ -670,6 +670,7 @@ etf
 etils
 eur
 evals
+eventarc
 evse
 evt
 expl
