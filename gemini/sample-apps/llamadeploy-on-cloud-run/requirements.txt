@@ -1,4 +1,4 @@
-llama-index==0.12.3
+llama-index==0.12.9
 llama-index-embeddings-vertex==0.2.0
 llama-index-utils-workflow==0.2.1
 llama-index-llms-vertex==0.3.4
