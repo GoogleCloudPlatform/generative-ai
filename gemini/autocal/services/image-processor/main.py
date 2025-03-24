@@ -34,30 +34,15 @@ db = google.cloud.firestore.Client()
 
 # Define the response schema for the analysis
 response_schema = {
-  "type": "OBJECT",
-  "properties": {
-    "summary": {
-      "type": "STRING"
+    "type": "OBJECT",
+    "properties": {
+        "summary": {"type": "STRING"},
+        "location": {"type": "STRING"},
+        "description": {"type": "STRING"},
+        "start": {"type": "STRING"},
+        "end": {"type": "STRING"},
     },
-    "location": {
-      "type": "STRING"
-    },
-    "description": {
-      "type": "STRING"
-    },
-    "start": {
-      "type": "STRING"
-    },
-    "end": {
-      "type": "STRING"
-    }
-  },
-  "required": [
-    "summary",
-    "description",
-    "start",
-    "end"
-  ]
+    "required": ["summary", "description", "start", "end"],
 }
 
 # Define the prompt for the analysis
@@ -89,6 +74,7 @@ The response should have the following schema:
 
 """
 
+
 @functions_framework.cloud_event
 def image_processor(cloud_event: CloudEvent) -> None:
     """Triggers by a change to a Firestore document.
@@ -98,7 +84,6 @@ def image_processor(cloud_event: CloudEvent) -> None:
     """
     firestore_payload = firestore.DocumentEventData()
     firestore_payload._pb.ParseFromString(cloud_event.data)
-
 
     print(f"Function triggered by change to: {cloud_event['source']}")
 
@@ -117,15 +102,11 @@ def image_processor(cloud_event: CloudEvent) -> None:
     response = client.models.generate_content(
         model=MODEL_ID,
         contents=[
-            Part.from_uri(
-                file_uri=gcs_url,
-                mime_type=mime_type
-            ),
+            Part.from_uri(file_uri=gcs_url, mime_type=mime_type),
             prompt,
         ],
         config=GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=response_schema
+            response_mime_type="application/json", response_schema=response_schema
         ),
     )
 
@@ -134,12 +115,13 @@ def image_processor(cloud_event: CloudEvent) -> None:
     print(event_data)
 
     # firestore document
-    firestore_document = {"processed": True,
-                          "event": event_data}
+    firestore_document = {"processed": True, "event": event_data}
 
     # Write the event data to Firestore
     try:
-        doc_ref = db.collection("state").document(document_id) # Use cloud event ID to make document unique
+        doc_ref = db.collection("state").document(
+            document_id
+        )  # Use cloud event ID to make document unique
         doc_ref.set(firestore_document, merge=True)
         print(f"Successfully wrote data to Firestore document: {document_id}")
     except Exception as e:

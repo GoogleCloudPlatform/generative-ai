@@ -71,28 +71,13 @@ MODEL_ID = "gemini-2.0-flash-001"
 response_schema = {
     "type": "OBJECT",
     "properties": {
-        "summary": {
-            "type": "STRING"
-        },
-        "location": {
-            "type": "STRING"
-        },
-        "description": {
-            "type": "STRING"
-        },
-        "start time": {
-            "type": "STRING"
-        },
-        "end time": {
-            "type": "STRING"
-        }
+        "summary": {"type": "STRING"},
+        "location": {"type": "STRING"},
+        "description": {"type": "STRING"},
+        "start time": {"type": "STRING"},
+        "end time": {"type": "STRING"},
     },
-    "required": [
-        "summary",
-        "description",
-        "start time",
-        "end time"
-    ]
+    "required": ["summary", "description", "start time", "end time"],
 }
 
 # Define the prompt for the analysis
@@ -133,9 +118,7 @@ def create_calendar_event(event_data):
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
         with open("token.json", "w") as token:
             token.write(creds.to_json())
@@ -192,15 +175,11 @@ if submit and gcs_url:
     response = client.models.generate_content(
         model=MODEL_ID,
         contents=[
-            Part.from_uri(
-                file_uri=str(gcs_url),
-                mime_type="image/jpeg"
-            ),
+            Part.from_uri(file_uri=str(gcs_url), mime_type="image/jpeg"),
             prompt,
         ],
         config=GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=response_schema
+            response_mime_type="application/json", response_schema=response_schema
         ),
     )
     st.subheader("Analysis Result:")
