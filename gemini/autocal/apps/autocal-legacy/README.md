@@ -62,7 +62,7 @@ AutoCal is a Streamlit application that leverages Gemini 2.0 Flash to automatica
 4. **Run the app:**
 
    ```bash
-   streamlit run autocal-gemini-2.py
+   streamlit run autocal_legacy.py
    ```
 
 ## Usage

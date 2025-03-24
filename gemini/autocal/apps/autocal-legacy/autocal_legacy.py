@@ -44,6 +44,9 @@ from vertexai.generative_models import (
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
+# Load variables from .env file
+load_dotenv()
+
 # Your Google Cloud Project ID and region
 PROJECT_ID = os.environ.get("PROJECT_ID")
 
@@ -57,8 +60,6 @@ MODEL_ID = os.environ.get("MODEL_ID", "gemini-2.0-flash-001")
 
 client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
-# Load variables from .env file
-load_dotenv()
 BUCKET_NAME = os.environ["BUCKET_NAME"]
 
 
@@ -172,7 +173,7 @@ if __name__ == "__main__":
     # Add a file uploader for images
     uploaded_files = st.file_uploader("Choose a file", accept_multiple_files=True)
 
-    if uploaded_files.len == 0:
+    if len(uploaded_files) == 0:
         st.error("Please upload at least one file.")
         st.stop()
 
@@ -181,7 +182,7 @@ if __name__ == "__main__":
     # Reset the file pointer before opening with Pillow
     uploaded_file.seek(0)
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image.", use_column_width=True)
+    st.image(image, caption="Uploaded Image.", use_container_width=True)
 
     # Reset the file pointer before uploading to GCS
     uploaded_file.seek(0)
