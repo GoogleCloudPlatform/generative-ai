@@ -36,7 +36,7 @@ resource "google_storage_bucket" "build" {
 
 ## Auth Blocking Function
 locals {
-  auth_block_root    = "${path.root}/../services/auth-blocking"
+  auth_block_root = "${path.root}/../services/auth-blocking"
 }
 
 ## Package up blocking function for deployment
@@ -80,8 +80,8 @@ resource "google_cloudfunctions2_function" "before_signin" {
   }
 
   service_config {
-    available_memory = "256M"
-    available_cpu    = "1"
+    available_memory      = "256M"
+    available_cpu         = "1"
     service_account_email = google_service_account.auth_blocking_function.email
   }
 }
@@ -114,8 +114,8 @@ resource "google_cloudfunctions2_function" "before_create" {
   }
 
   service_config {
-    available_memory = "256M"
-    available_cpu    = "1"
+    available_memory      = "256M"
+    available_cpu         = "1"
     service_account_email = google_service_account.auth_blocking_function.email
   }
 }
