@@ -72,7 +72,7 @@
 
 .gsi-material-button .gsi-material-button-state {
   transition: opacity 0.218s;
-  inset: 0 0 0 0;
+  inset: 0;
   opacity: 0;
   position: absolute;
 }
