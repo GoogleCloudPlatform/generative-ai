@@ -33,7 +33,10 @@
   padding: 0 12px;
   position: relative;
   text-align: center;
-  transition: background-color 0.218s, border-color 0.218s, box-shadow 0.218s;
+  transition:
+    background-color 0.218s,
+    border-color 0.218s,
+    box-shadow 0.218s;
   vertical-align: middle;
   white-space: nowrap;
   width: auto;
@@ -51,8 +54,7 @@
 .gsi-material-button .gsi-material-button-content-wrapper {
   align-items: center;
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-flow: row nowrap;
   height: 100%;
   justify-content: space-between;
   position: relative;
@@ -61,7 +63,7 @@
 
 .gsi-material-button .gsi-material-button-contents {
   flex-grow: 1;
-  font-family: "Roboto", arial, sans-serif;
+  font-family: Roboto, arial, sans-serif;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -70,12 +72,9 @@
 
 .gsi-material-button .gsi-material-button-state {
   transition: opacity 0.218s;
-  bottom: 0;
-  left: 0;
+  inset: 0 0 0 0;
   opacity: 0;
   position: absolute;
-  right: 0;
-  top: 0;
 }
 
 .gsi-material-button:disabled {
@@ -102,12 +101,12 @@
 }
 
 .gsi-material-button:not(:disabled):hover {
-  -webkit-box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%),
+  box-shadow:
+    0 1px 2px 0 rgb(60 64 67 / 30%),
     0 1px 3px 1px rgb(60 64 67 / 15%);
-  box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
 }
 
 .gsi-material-button:not(:disabled):hover .gsi-material-button-state {
   background-color: #001d35;
-  opacity: 8%;
+  opacity: 0.08;
 }
