@@ -43,6 +43,7 @@ with the following schema:
 
 import json
 import datetime
+import os
 import functions_framework
 from cloudevents.http import CloudEvent
 from google.events.cloud import firestore
@@ -58,7 +59,12 @@ import google.cloud.firestore
 
 # Initialize the Gemini model
 MODEL_ID = "gemini-2.0-flash-001"
-LOCATION = "europe-west1"
+LOCATION = os.environ.get("LOCATION", "")
+
+# Default location if not specified
+if LOCATION == "" or LOCATION is None:
+    LOCATION = "europe-west1"
+
 client = genai.Client(vertexai=True, location=LOCATION)
 
 # Initialize Firestore client
