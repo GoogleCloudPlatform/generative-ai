@@ -22,6 +22,7 @@ successful_count=0
 
 for x in $TARGET
 do
+  total_count=$((total_count + 1))
   DISPLAY_NAME="${x##*/}-$current_date-$current_time"
   echo "Starting execution for ${x##*/}"
 
