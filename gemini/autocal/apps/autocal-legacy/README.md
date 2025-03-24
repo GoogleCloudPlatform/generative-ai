@@ -61,9 +61,9 @@ AutoCal is a Streamlit application that leverages Google's Gemini AI model to au
 
 4. **Run the app:**
 
-    ```bash
-    streamlit run autocal-gemini-2.py
-    ```
+   ```bash
+   streamlit run autocal-gemini-2.py
+   ```
 
 ## Usage
 
@@ -72,4 +72,3 @@ AutoCal is a Streamlit application that leverages Google's Gemini AI model to au
 3. Click the "Add to Calendar" button.
 4. The app will analyze the image, extract the event details, and create a new event in your Google Calendar.
 5. You will be prompted to authorize the app to access your Google Calendar.
-
