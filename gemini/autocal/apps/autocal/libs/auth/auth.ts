@@ -48,7 +48,11 @@ interface UserStore {
   expires: Date;
 }
 
-const oAuth2Client = new OAuth2Client(process.env.NEXT_PUBLIC_CLIENT_ID, process.env.CLIENT_SECRET, "postmessage");
+const oAuth2Client = new OAuth2Client(
+  process.env.NEXT_PUBLIC_CLIENT_ID,
+  process.env.CLIENT_SECRET,
+  "postmessage"
+);
 
 /**
  * Handles user sign-in and sets a http only cookie for the user
@@ -180,12 +184,19 @@ export async function getAccessToken(): Promise<GetAccessTokenResponse | null> {
  * @param encryptionKey A 32 character string used for encryption
  * @returns An encrypted string for safe storage in Firestore
  */
-async function encrypt(payload: string, encryptionKey: string): Promise<string> {
+async function encrypt(
+  payload: string,
+  encryptionKey: string
+): Promise<string> {
   // Create an initialization vector
   const iv = crypto.randomBytes(16);
 
   // Create a cipher object using AES-256-CBC algorithm
-  const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(encryptionKey), iv);
+  const cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    Buffer.from(encryptionKey),
+    iv
+  );
 
   // Encrypt the payload
   let encrypted = cipher.update(payload, "utf8", "hex");
@@ -209,7 +220,11 @@ function decrypt(encryptedData: string, encryptionKey: string): string {
   const iv = Buffer.from(ivHex, "hex");
 
   // Create a decipher object
-  const decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(encryptionKey), iv);
+  const decipher = crypto.createDecipheriv(
+    "aes-256-cbc",
+    Buffer.from(encryptionKey),
+    iv
+  );
 
   // Decrypt the ciphertext
   let decrypted = decipher.update(ciphertext, "hex", "utf8");

@@ -37,9 +37,6 @@
     "eslint-config-next": "15.2.2",
     "typescript": "^5"
   },
-  "prettier": {
-    "printWidth": 120
-  },
   "engines": {
     "node": ">=22.0.0"
   }
