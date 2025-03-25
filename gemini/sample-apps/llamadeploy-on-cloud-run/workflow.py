@@ -64,7 +64,7 @@ safety_config = [
 ]
 embedding_model = VertexTextEmbedding("text-embedding-004", credentials=credentials)
 llm = Vertex(
-    model="gemini-pro",
+    model="gemini-2.0-flash",
     temperature=0.2,
     max_tokens=3000,
     safety_settings=safety_config,
