@@ -18,7 +18,8 @@ See also:
          - /examples/manual
 """
 
-from opentelemetry.instrumentation.google_genai import GoogleGenAiSdkInstrumentor
+from opentelemetry.instrumentation.google_genai import \
+    GoogleGenAiSdkInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 

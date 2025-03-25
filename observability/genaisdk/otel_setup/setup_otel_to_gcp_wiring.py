@@ -23,35 +23,27 @@ https://cloud.google.com/stackdriver/docs/instrumentation/setup/python
 
 import logging
 import os
+
 import google.auth
 import google.auth.transport.grpc
 import google.auth.transport.requests
+import google.cloud.logging
 import grpc
 from google.auth.transport.grpc import AuthMetadataPlugin
-import google.cloud.logging
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
-    OTLPSpanExporter,
-)
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry import metrics
-from opentelemetry.exporter.cloud_monitoring import (
-    CloudMonitoringMetricsExporter,
-)
+from opentelemetry import metrics, trace
+from opentelemetry._logs import set_logger_provider
+from opentelemetry.exporter.cloud_logging import CloudLoggingExporter
+from opentelemetry.exporter.cloud_monitoring import \
+    CloudMonitoringMetricsExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
+    OTLPSpanExporter
+from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
-from opentelemetry.exporter.cloud_logging import (
-    CloudLoggingExporter,
-)
-from opentelemetry.sdk.resources import Resource
-from opentelemetry._logs import set_logger_provider
-from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
-from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
-
-
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 # Replace this with a better default for your service.
 _DEFAULT_SERVICE_NAME = 'genaisdk-observability-sample'
