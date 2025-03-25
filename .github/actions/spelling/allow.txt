@@ -194,6 +194,7 @@ JHome
 JPY
 Jax
 Jedi
+Jestem
 Jhamtani
 Jiacheng
 Jianfeng
@@ -258,6 +259,7 @@ Mbappe
 Meawad
 Mega
 Memegen
+Merhaba
 Mesop
 Meteo
 Mewgler
@@ -297,10 +299,12 @@ Ohashi
 Ohtani
 Olgivanna
 Ollama
+Olá
 Omnibox
 Onone
 Oort
 Orbelians
+Orus
 PBA
 PDEs
 PDFs
@@ -386,6 +390,7 @@ Sketchfab
 Smartbuy
 Smaug
 Smol
+Sono
 Statcast
 Storrer
 Strappy
@@ -469,6 +474,7 @@ Wakatipu
 Wehn
 Wehrlein
 Welwyn
+Witaj
 Wnd
 Womens
 XGA
@@ -576,6 +582,7 @@ cloudrun
 cloudveil
 clsx
 cmap
+cmn
 cnf
 codebase
 codebases
@@ -644,6 +651,7 @@ dtype
 dtypes
 dumfries
 dumpd
+dunia
 dwmapi
 ecommerce
 ein
@@ -822,6 +830,7 @@ kickstart
 konnte
 kotlin
 kpi
+kubectl
 l'harmonie
 lakecolor
 landcolor
@@ -891,6 +900,7 @@ mrtydi
 msmarco
 msr
 multitool
+mundo
 mvn
 mvnw
 mvp
@@ -1104,6 +1114,7 @@ stt
 stuffie
 subviews
 subword
+suis
 sunner
 supima
 svm
@@ -1194,6 +1205,7 @@ websites
 weightage
 welcom
 werden
+wereld
 wght
 wiersz
 wiffle
