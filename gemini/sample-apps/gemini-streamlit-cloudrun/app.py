@@ -1,4 +1,4 @@
-# pylint: disable=broad-exception-raised,invalid-name
+# pylint: disable=broad-exception-caught,broad-exception-raised,invalid-name
 """
 This module demonstrates the usage of the Gemini API in Vertex AI within a Streamlit application.
 """
