@@ -1,5 +1,5 @@
-from .setup_otel_instrumentationm import setup_otel_instrumentation
-from .setup_otel_to_gcp_wiring import setup_otel_gcp_wiring
+from .setup_otel_instrumentation import setup_otel_instrumentation
+from .setup_otel_to_gcp_wiring import setup_otel_to_gcp_wiring
 
 __all__ = [
     "setup_otel_instrumentation",

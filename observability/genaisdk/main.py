@@ -1,4 +1,6 @@
-from .otel_setup import (
+import logging
+from dotenv import load_dotenv
+from otel_setup import (
     setup_otel_instrumentation,
     setup_otel_to_gcp_wiring
 )
@@ -14,11 +16,17 @@ def use_google_genai_sdk():
     client = Client()
     response = client.models.generate_content(
         model="gemini-2.0-flash-lite-001",
-        content="Write a poem about Google GenAI SDK and observability.",
+        contents="Write a poem about Google GenAI SDK and observability.",
     )
     print(response.text)
 
 
 def main():
+    load_dotenv()
     setup_telemetry()
     use_google_genai_sdk()
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    main()

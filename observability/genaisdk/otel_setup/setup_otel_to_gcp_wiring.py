@@ -28,6 +28,7 @@ import google.auth.transport.grpc
 import google.auth.transport.requests
 import grpc
 from google.auth.transport.grpc import AuthMetadataPlugin
+import google.cloud.logging
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
     OTLPSpanExporter,
@@ -144,7 +145,8 @@ def _setup_cloud_monitoring(resource):
         MeterProvider(
             metric_readers=[
                 PeriodicExportingMetricReader(
-                    CloudMonitoringMetricsExporter(), export_interval_millis=5000
+                    CloudMonitoringMetricsExporter(add_unique_identifier=True),
+                    export_interval_millis=5000
                 )
             ],
             resource=resource,
@@ -153,12 +155,15 @@ def _setup_cloud_monitoring(resource):
 
 # Wire up Open Telemetry's logging APIs to talk to Cloud Logging.
 def _setup_cloud_logging(resource):
+    # Set up the OTel "LoggerProvider" API
     logger_provider = LoggerProvider(resource=resource)
-    set_logger_provider(logger_provider)
     exporter = CloudLoggingExporter(default_log_name=_get_default_log_name())
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
-    handler = LoggingHandler(level=logging.INFO, logger_provider=logger_provider)
-    logging.getLogger().addHandler(handler)
+    set_logger_provider(logger_provider)
+
+    # Set up the Python "logging" API
+    logging_client = google.cloud.logging.Client()
+    logging_client.setup_logging()
 
 
 def setup_otel_to_gcp_wiring():
