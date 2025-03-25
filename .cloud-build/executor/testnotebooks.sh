@@ -6,6 +6,7 @@ TARGET=$(cat .cloud-build/Notebooks.txt)
 
 current_date=$(date +%Y-%m-%d)
 current_time=$(date +%H-%M-%S)
+current_time_readable=$(date "+%B %d %Y %H:%M:%S")
 
 NOTEBOOK_RUNTIME_TEMPLATE=$(cat NOTEBOOK_RUNTIME_TEMPLATE)
 OUTPUT_URI=$(cat OUTPUT_URI)
@@ -89,6 +90,8 @@ fi
 failed_notebooks_str=$(IFS=', '; echo "${failed_notebooks[*]}")
 
 # prep notebook name for pub/sub message
+failed_notebooks_str=$(IFS=', '; echo "${failed_notebooks[*]}")
+
 if [[ -n "$failed_notebooks_str" ]]; then
   IFS=',' read -ra failed_notebooks_array <<< "$failed_notebooks_str"
   trimmed_notebooks=()
@@ -97,7 +100,7 @@ if [[ -n "$failed_notebooks_str" ]]; then
   done
   failed_notebooks_str=$(IFS=', '; echo "${trimmed_notebooks[*]}")
 else
-    failed_notebooks_str="[]"
+    failed_notebooks_str=""
 fi
 
 successful_notebooks_str=$(IFS=', '; echo "${successful_notebooks[*]}")
@@ -110,11 +113,11 @@ if [[ -n "$successful_notebooks_str" ]]; then
   done
   successful_notebooks_str=$(IFS=', '; echo "${trimmed_successful_notebooks[*]}")
 else
-    successful_notebooks_str="[]"
+    successful_notebooks_str=""
 fi
 
 # Construct the message to send to pub/sub topic
-message_data="{\"total_count\":$(($total_count+0)),\"failed_count\":$(($failed_count+0)),\"failed_notebooks\":\"${failed_notebooks_str}\",\"successful_notebooks\":\"${successful_notebooks_str}\",\"successful_count\":$(($successful_count+0))}"
+message_data="{\"total_count\":$(($total_count+0)),\"failed_count\":$(($failed_count+0)),\"failed_notebooks\":\"${failed_notebooks_str}\",\"successful_notebooks\":\"${successful_notebooks_str}\",\"successful_count\":$(($successful_count+0)),\"execution_date\":\"${current_time_readable}\"}"
 
 # Publish to Pub/Sub
 echo "$(date) - INFO - Publishing to Pub/Sub topic: $PUBSUB_TOPIC"
