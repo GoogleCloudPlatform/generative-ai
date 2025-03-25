@@ -23,7 +23,7 @@ This demo highlights [Spanner](https://cloud.google.com/spanner), integration wi
 The Finvest Spanner demo application was built using:
 
 - [Spanner](https://cloud.google.com/spanner)
-- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([textembeddings-gecko@004](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) )
+- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([text-embedding-005](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) )
 - [Cloud Run](https://cloud.google.com/run)
 - [Dataflow](https://cloud.google.com/dataflow?)
 - [Streamlit](https://streamlit.io/)
@@ -73,7 +73,7 @@ The Finvest Spanner demo application was built using:
 
    ```sql
    ALTER MODEL EmbeddingsModel SET OPTIONS (
-      endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/textembedding-gecko@003'
+      endpoint = '//aiplatform.googleapis.com/projects/'YOUR PROJECT ID HERE'/locations/'YOUR SPANNER INSTANCE LOCATION HERE'/publishers/google/models/text-embedding-005'
       )
       ;
    ```
