@@ -21,23 +21,20 @@ For best practices on integration with Cloud Observability, see:
 https://cloud.google.com/stackdriver/docs/instrumentation/setup/python
 """
 
-import logging
 import os
 
 import google.auth
 import google.auth.transport.grpc
+from google.auth.transport.grpc import AuthMetadataPlugin
 import google.auth.transport.requests
 import google.cloud.logging
 import grpc
-from google.auth.transport.grpc import AuthMetadataPlugin
 from opentelemetry import metrics, trace
 from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.cloud_logging import CloudLoggingExporter
-from opentelemetry.exporter.cloud_monitoring import \
-    CloudMonitoringMetricsExporter
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
-    OTLPSpanExporter
-from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+from opentelemetry.exporter.cloud_monitoring import CloudMonitoringMetricsExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk._logs import LoggerProvider
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
@@ -46,10 +43,10 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 # Replace this with a better default for your service.
-_DEFAULT_SERVICE_NAME = 'genaisdk-observability-sample'
+_DEFAULT_SERVICE_NAME = "genaisdk-observability-sample"
 
 # Replace this with a better default for your service.
-_DEFAULT_LOG_NAME = 'genaisdk-observability-sample'
+_DEFAULT_LOG_NAME = "genaisdk-observability-sample"
 
 
 # Allows the service name to be changed dynamically at runtime, using
@@ -58,7 +55,7 @@ _DEFAULT_LOG_NAME = 'genaisdk-observability-sample'
 # different names (e.g. to set a different service name in non-prod vs
 # in production environments, for example, to differentiate them).
 def _get_service_name():
-    from_env = os.getenv('OTEL_SERVICE_NAME')
+    from_env = os.getenv("OTEL_SERVICE_NAME")
     if from_env:
         return from_env
     return _DEFAULT_SERVICE_NAME
@@ -66,7 +63,7 @@ def _get_service_name():
 
 # Allows the default log name to be set dynamically.
 def _get_default_log_name():
-    from_env = os.getenv('GCP_DEFAULT_LOG_NAME')
+    from_env = os.getenv("GCP_DEFAULT_LOG_NAME")
     if from_env:
         return from_env
     return _DEFAULT_LOG_NAME
@@ -74,7 +71,7 @@ def _get_default_log_name():
 
 # Attempts to infer the project ID to use for writing.
 def _get_project_id():
-    env_vars = ['GOOGLE_CLOUD_PROJECT', 'GCLOUD_PROJECT', 'GCP_PROJECT']
+    env_vars = ["GOOGLE_CLOUD_PROJECT", "GCLOUD_PROJECT", "GCP_PROJECT"]
     for env_var in env_vars:
         from_env = os.getenv(env_var)
         if from_env:
@@ -102,10 +99,12 @@ def _create_resource():
     # function can auto-discover additional information about the
     # environment and can automatically inject attributes supplied via
     # the "OTEL_RESOURCE_ATTRIBUTES" environment variable.
-    return Resource.create({
-        'service.name': service_name,
-        'gcp.project_id': project_id,
-    })
+    return Resource.create(
+        {
+            "service.name": service_name,
+            "gcp.project_id": project_id,
+        }
+    )
 
 
 # Creates gRPC channel credentials which can be supplied to the OTLP
@@ -115,19 +114,19 @@ def _create_resource():
 def _create_otlp_creds():
     creds, _ = google.auth.default()
     request = google.auth.transport.requests.Request()
-    auth_metadata_plugin = AuthMetadataPlugin(
-        credentials=creds, request=request)
+    auth_metadata_plugin = AuthMetadataPlugin(credentials=creds, request=request)
     return grpc.composite_channel_credentials(
         grpc.ssl_channel_credentials(),
-        grpc.metadata_call_credentials(auth_metadata_plugin))
+        grpc.metadata_call_credentials(auth_metadata_plugin),
+    )
 
 
 # Wire up Open Telemetry's trace APIs to talk to Cloud Trace.
 def _setup_cloud_trace(resource, otlp_creds):
     tracer_provider = TracerProvider(resource=resource)
     tracer_provider.add_span_processor(
-        BatchSpanProcessor(OTLPSpanExporter(
-            credentials=otlp_creds)))
+        BatchSpanProcessor(OTLPSpanExporter(credentials=otlp_creds))
+    )
     trace.set_tracer_provider(tracer_provider)
 
 
@@ -138,12 +137,13 @@ def _setup_cloud_monitoring(resource):
             metric_readers=[
                 PeriodicExportingMetricReader(
                     CloudMonitoringMetricsExporter(add_unique_identifier=True),
-                    export_interval_millis=5000
+                    export_interval_millis=5000,
                 )
             ],
             resource=resource,
         )
     )
+
 
 # Wire up Open Telemetry's logging APIs to talk to Cloud Logging.
 def _setup_cloud_logging(resource):

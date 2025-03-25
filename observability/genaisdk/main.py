@@ -2,7 +2,6 @@ import logging
 
 from dotenv import load_dotenv
 from google.genai import Client
-
 from otel_setup import setup_otel_instrumentation, setup_otel_to_gcp_wiring
 
 
@@ -26,6 +25,6 @@ def main():
     use_google_genai_sdk()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     main()

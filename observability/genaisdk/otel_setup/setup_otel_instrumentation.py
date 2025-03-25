@@ -18,20 +18,19 @@ See also:
          - /examples/manual
 """
 
-from opentelemetry.instrumentation.google_genai import \
-    GoogleGenAiSdkInstrumentor
+from opentelemetry.instrumentation.google_genai import GoogleGenAiSdkInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 
 def setup_otel_instrumentation():
-   # Instrument the GenAI SDK library (PyPi: "google-genai"). This
-   # monkey-patches that library to inject Open Telemetry instrumentation.
-   GoogleGenAiSdkInstrumentor().instrument()
+    # Instrument the GenAI SDK library (PyPi: "google-genai"). This
+    # monkey-patches that library to inject Open Telemetry instrumentation.
+    GoogleGenAiSdkInstrumentor().instrument()
 
-   # Instrument the Python Requests library (PyPi: "requests"). This
-   # monkey-patches that library to inject Open Telemetry instrumentation.
-   # The requests library is a dependency of the GenAI SDK library; it is
-   # used to invoke the Vertex API or the Gemini API. Instrumenting this
-   # lower-level dependency of the GenAI SDK provides more information
-   # about the timing and operation at lower layers of the stack.
-   RequestsInstrumentor().instrument()
+    # Instrument the Python Requests library (PyPi: "requests"). This
+    # monkey-patches that library to inject Open Telemetry instrumentation.
+    # The requests library is a dependency of the GenAI SDK library; it is
+    # used to invoke the Vertex API or the Gemini API. Instrumenting this
+    # lower-level dependency of the GenAI SDK provides more information
+    # about the timing and operation at lower layers of the stack.
+    RequestsInstrumentor().instrument()
