@@ -1,4 +1,4 @@
-# pylint: disable=broad-exception-raised,invalid-name
+# pylint: disable=broad-exception-caught,broad-exception-raised,invalid-name
 """
 This module demonstrates the usage of the Gemini API in Vertex AI within a Streamlit application.
 """
@@ -42,6 +42,7 @@ MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
     "gemini-2.0-flash-thinking-exp-01-21": "Gemini 2.0 Flash Thinking",
+    "gemini-2.0-pro-exp-02-05": "Gemini 2.0 Pro",
 }
 
 
@@ -67,6 +68,13 @@ st.link_button(
     "View on GitHub",
     "https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/gemini-streamlit-cloudrun",
 )
+
+cloud_run_service = os.environ.get("K_SERVICE")
+if cloud_run_service:
+    st.link_button(
+        "Open in Cloud Run",
+        f"https://console.cloud.google.com/run/detail/us-central1/{cloud_run_service}/source",
+    )
 
 st.header(":sparkles: Gemini API in Vertex AI", divider="rainbow")
 client = load_client()
