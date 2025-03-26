@@ -43,16 +43,14 @@ from google import genai
 
 from google.genai.types import (
     GenerateContentConfig,
-    HarmBlockMethod,
-    HarmBlockThreshold,
-    HarmCategory,
     Part,
-    SafetySetting,
 )
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")  # Your Google Cloud Project Region
 client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+
+PAGE_TITLE = "Gemini in Vertex AI with Mesop"
 
 
 @dataclass_json
@@ -270,21 +268,12 @@ def generate_marketing_campaign(
     """
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.8, max_output_tokens=2048)
-
-    model = GenerativeModel(s.model)
-
-    safety_settings = {
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    }
-    response = model.generate_content(
-        prompt,
-        generation_config=config,
-        safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=prompt,
+        config=GenerateContentConfig(temperature=0.8, max_output_tokens=2048),
     )
+
     print(response)
     s.marketing_campaign_output = response.text
     s.marketing_campaign_progress = False
@@ -391,15 +380,12 @@ If instructions include buttons, also explain where those buttons are physically
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.oven_instructions_output = response.text
     s.image_progress_spinner = False
 
@@ -426,15 +412,12 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:  # pylint: disabl
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.er_doc_output = response.text
     s.image_progress_spinner = False
 
@@ -471,14 +454,12 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.glasses_rec_output = response.text
     s.image_progress_spinner = False
 
@@ -526,14 +507,12 @@ INSTRUCTIONS:
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.math_answers_output = response.text
     s.image_progress_spinner = False
 
@@ -573,14 +552,13 @@ def generate_video_description(
     print(f"video url: {VIDEO_DESCRIPTION}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
+
     print(response)
     s.video_description_content = response.text
     s.video_spinner_progress = False
@@ -609,14 +587,12 @@ def generate_video_tags(
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
     print(response)
     s.video_tags_content = response.text
     s.video_spinner_progress = False
@@ -646,14 +622,13 @@ def generate_video_highlights(
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
+
     print(response)
     s.video_highlights_content = response.text
     s.video_spinner_progress = False
@@ -682,14 +657,13 @@ def generate_video_geolocation(
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
+
     print(response)
     s.video_geolocation_content = response.text
     s.video_spinner_progress = False
@@ -721,7 +695,7 @@ def vertex_gemini_header() -> None:
                 ),
             ):
                 me.text(
-                    "Vertex AI Gemini ", type="headline-5", style=FANCY_TEXT_GRADIENT
+                    "Gemini in Vertex AI ", type="headline-5", style=FANCY_TEXT_GRADIENT
                 )
                 me.text("with Mesop", type="headline-5")
 
@@ -729,7 +703,7 @@ def vertex_gemini_header() -> None:
 # Generate a story page / main
 @me.page(
     path="/",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
@@ -857,7 +831,7 @@ def app() -> None:
 # Marketing page
 @me.page(
     path="/marketing",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
@@ -1003,7 +977,7 @@ def marketing_page() -> None:
 # Image playground page
 @me.page(
     path="/images",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
@@ -1503,7 +1477,7 @@ def image_furniture_tab() -> None:
 # Video playground page
 @me.page(
     path="/videos",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
