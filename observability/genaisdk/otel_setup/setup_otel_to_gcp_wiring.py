@@ -187,6 +187,7 @@ def _setup_cloud_logging(project_id, resource):
         project_id=project_id,
         default_log_name=_get_default_log_name())
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
+    _configure_logger_provider_debugging(logger_provider)
     set_logger_provider(logger_provider)
 
     # Set up the OTel "EventLoggerProvider" API
