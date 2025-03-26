@@ -43,9 +43,11 @@ from google import genai
 
 from google.genai.types import (
     GenerateContentConfig,
+    HarmBlockMethod,
     HarmBlockThreshold,
     HarmCategory,
     Part,
+    SafetySetting,
 )
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
@@ -203,23 +205,10 @@ def generate_story(
     The book should have prologue and epilogue.
     """
     print(f"prompt: {prompt}")
-
-    model = GenerativeModel(s.model)
-    config = GenerateContentConfig(
-        temperature=temp,
-        max_output_tokens=2048,
-    )
-    config = GenerationConfig(temperature=temp, max_output_tokens=2048)
-    safety_settings = {
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    }
-    response = model.generate_content(
-        prompt,
-        generation_config=config,
-        safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=prompt,
+        config=GenerateContentConfig(temperature=temp, max_output_tokens=2048),
     )
     print(response)
     s.story_output = response.text
@@ -330,11 +319,19 @@ def generate_furniture_recommendation(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    room_image_part = Part.from_uri(ROOM_IMAGE_URI, mime_type="image/jpeg")
-    chair_1_image_part = Part.from_uri(CHAIR_1_IMAGE_URI, mime_type="image/jpeg")
-    chair_2_image_part = Part.from_uri(CHAIR_2_IMAGE_URI, mime_type="image/jpeg")
-    chair_3_image_part = Part.from_uri(CHAIR_3_IMAGE_URI, mime_type="image/jpeg")
-    chair_4_image_part = Part.from_uri(CHAIR_4_IMAGE_URI, mime_type="image/jpeg")
+    room_image_part = Part.from_uri(file_uri=ROOM_IMAGE_URI, mime_type="image/jpeg")
+    chair_1_image_part = Part.from_uri(
+        file_uri=CHAIR_1_IMAGE_URI, mime_type="image/jpeg"
+    )
+    chair_2_image_part = Part.from_uri(
+        file_uri=CHAIR_2_IMAGE_URI, mime_type="image/jpeg"
+    )
+    chair_3_image_part = Part.from_uri(
+        file_uri=CHAIR_3_IMAGE_URI, mime_type="image/jpeg"
+    )
+    chair_4_image_part = Part.from_uri(
+        file_uri=CHAIR_4_IMAGE_URI, mime_type="image/jpeg"
+    )
 
     content = [
         "Consider the following chairs:",
@@ -357,15 +354,11 @@ def generate_furniture_recommendation(
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
-
-    response = model.generate_content(content)
     print(response)
     s.furniture_recommendation_output = response.text
     s.image_progress_spinner = False
@@ -386,7 +379,7 @@ def generate_oven_instructions(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    oven_image = Part.from_uri(IMAGE_OVEN, mime_type="image/jpeg")
+    oven_image = Part.from_uri(file_uri=IMAGE_OVEN, mime_type="image/jpeg")
 
     content = [
         oven_image,
@@ -422,7 +415,7 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:  # pylint: disabl
     s = me.state(State)
     s.image_progress_spinner = True
 
-    er_image = Part.from_uri(IMAGE_ER_DIAGRAM, mime_type="image/jpeg")
+    er_image = Part.from_uri(file_uri=IMAGE_ER_DIAGRAM, mime_type="image/jpeg")
 
     content = [
         er_image,
@@ -459,8 +452,8 @@ def generate_glasses_rec(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    glasses_1 = Part.from_uri(IMAGE_GLASSES_1, mime_type="image/jpeg")
-    glasses_2 = Part.from_uri(IMAGE_GLASSES_2, mime_type="image/jpeg")
+    glasses_1 = Part.from_uri(file_uri=IMAGE_GLASSES_1, mime_type="image/jpeg")
+    glasses_2 = Part.from_uri(file_uri=IMAGE_GLASSES_2, mime_type="image/jpeg")
 
     content = [
         f"Which of these glasses you recommend for me based on the shape of my face: {s.image_glasses_shape_radio_value} I have a {s.image_glasses_shape_radio_value} shaped face.\n",
@@ -513,7 +506,7 @@ def generate_math_answers(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    math_image = Part.from_uri(IMAGE_MATH, mime_type="image/jpeg")
+    math_image = Part.from_uri(file_uri=IMAGE_MATH, mime_type="image/jpeg")
 
     content = [
         math_image,
@@ -566,7 +559,7 @@ def generate_video_description(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_DESCRIPTION, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_DESCRIPTION, mime_type="video/mp4")
 
     prompt = """Describe what is happening in the video and answer the following questions: \n
     - What am I looking at? \n
@@ -606,7 +599,7 @@ def generate_video_tags(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_TAGS, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_TAGS, mime_type="video/mp4")
 
     prompt = VIDEO_TAGS_PROMPT
 
@@ -642,7 +635,7 @@ def generate_video_highlights(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_HIGHLIGHTS, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_HIGHLIGHTS, mime_type="video/mp4")
 
     prompt = """Answer the following questions using the video only: What is the profession of the girl in this video? Which all features of the phone are highlighted here? Summarize the video in one paragraph. Provide the answer in table format.
     """
@@ -679,7 +672,7 @@ def generate_video_geolocation(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_GEOLOCATION, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_GEOLOCATION, mime_type="video/mp4")
 
     prompt = VIDEO_GEOLOCATION_PROMPT
 
