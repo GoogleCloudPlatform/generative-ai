@@ -18,6 +18,7 @@ See also:
          - /examples/manual
 """
 
+# [START setup_otel_instrumentation_snippet]
 from opentelemetry.instrumentation.google_genai import GoogleGenAiSdkInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
@@ -34,3 +35,5 @@ def setup_otel_instrumentation():
     # lower-level dependency of the GenAI SDK provides more information
     # about the timing and operation at lower layers of the stack.
     RequestsInstrumentor().instrument()
+
+# [END setup_otel_instrumentation_snippet]

@@ -108,6 +108,7 @@ def _create_resource(project_id):
         })
     )
 
+# [START create_otlp_creds_snippet]
 
 # Creates gRPC channel credentials which can be supplied to the OTLP
 # exporter classes provided by Open Telemetry. These build on top
@@ -122,6 +123,10 @@ def _create_otlp_creds():
         grpc.metadata_call_credentials(auth_metadata_plugin),
     )
 
+# [END create_otlp_creds_snippet]
+
+
+# [START setup_cloud_trace_snippet]
 
 # Wire up Open Telemetry's trace APIs to talk to Cloud Trace.
 def _setup_cloud_trace(resource, otlp_creds):
@@ -131,6 +136,10 @@ def _setup_cloud_trace(resource, otlp_creds):
     )
     trace.set_tracer_provider(tracer_provider)
 
+# [END setup_cloud_trace_snippet]
+
+
+# [START setup_cloud_monitoring_snippet]
 
 # Wire up Open Telemetry's metric APIs to talk to Cloud Monitoring.
 def _setup_cloud_monitoring(project_id, resource):
@@ -148,6 +157,9 @@ def _setup_cloud_monitoring(project_id, resource):
         )
     )
 
+# [END setup_cloud_monitoring_snippet]
+
+# [START setup_cloud_logging_snippet]
 
 # Wire up Open Telemetry's logging APIs to talk to Cloud Logging.
 def _setup_cloud_logging(project_id, resource):
@@ -165,6 +177,10 @@ def _setup_cloud_logging(project_id, resource):
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
     set_logger_provider(logger_provider)
 
+# [END setup_cloud_logging_snippet]
+
+
+# [START setup_otel_to_gcp_wiring_snippet]
 
 def setup_otel_to_gcp_wiring():
     project_id = _get_project_id()
@@ -173,3 +189,5 @@ def setup_otel_to_gcp_wiring():
     _setup_cloud_trace(resource, otlp_creds)
     _setup_cloud_monitoring(project_id, resource)
     _setup_cloud_logging(project_id, resource)
+
+# [END setup_otel_to_gcp_wiring_snippet]
