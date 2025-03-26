@@ -38,10 +38,11 @@ from shared.styles import (
     _TABBER_STYLE,
     FANCY_TEXT_GRADIENT,
 )
-import vertexai
-from vertexai.generative_models import (
-    GenerationConfig,
-    GenerativeModel,
+
+from google import genai
+
+from google.genai.types import (
+    GenerateContentConfig,
     HarmBlockThreshold,
     HarmCategory,
     Part,
@@ -49,7 +50,7 @@ from vertexai.generative_models import (
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")  # Your Google Cloud Project Region
-vertexai.init(project=PROJECT_ID, location=LOCATION)
+client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
 
 @dataclass_json
@@ -57,7 +58,7 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 class State:
     """Mesop state class"""
 
-    model: str = "gemini-1.5-flash-002"
+    model: str = "gemini-2.0-flash"
     current_page: str = "/"
 
     # pylint: disable=E3701
@@ -145,19 +146,6 @@ class State:
     # pylint: disable=E3701
 
 
-# Helpers
-def gcs_to_http(gcs_uri: str) -> str:
-    """given a GCS URI, return the HTTPS URL
-
-    Args:
-        gcs_uri (str): Google Cloud Storage URI
-
-    Returns:
-        string: the HTTPS URL equivalent
-    """
-    return "https://storage.googleapis.com/" + gcs_uri.split("gs://")[1]
-
-
 # Events
 
 
@@ -217,6 +205,10 @@ def generate_story(
     print(f"prompt: {prompt}")
 
     model = GenerativeModel(s.model)
+    config = GenerateContentConfig(
+        temperature=temp,
+        max_output_tokens=2048,
+    )
     config = GenerationConfig(temperature=temp, max_output_tokens=2048)
     safety_settings = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
@@ -319,32 +311,16 @@ def on_click_clear_marketing_campaign(
 
 # Image Events
 
-ROOM_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/rooms/living_room.jpeg"
-)
-CHAIR_1_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair1.jpeg"
-)
-CHAIR_2_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair2.jpeg"
-)
-CHAIR_3_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair3.jpeg"
-)
-CHAIR_4_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair4.jpeg"
-)
-IMAGE_OVEN = "gs://github-repo/img/gemini/multimodality_usecases_overview/stove.jpg"
-IMAGE_ER_DIAGRAM = "gs://github-repo/img/gemini/multimodality_usecases_overview/er.png"
-IMAGE_GLASSES_1 = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/glasses1.jpg"
-)
-IMAGE_GLASSES_2 = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/glasses2.jpg"
-)
-IMAGE_MATH = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/math_beauty.jpg"
-)
+ROOM_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/rooms/living_room.jpeg"
+CHAIR_1_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair1.jpeg"
+CHAIR_2_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair2.jpeg"
+CHAIR_3_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair3.jpeg"
+CHAIR_4_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair4.jpeg"
+IMAGE_OVEN = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/stove.jpg"
+IMAGE_ER_DIAGRAM = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/er.png"
+IMAGE_GLASSES_1 = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/glasses1.jpg"
+IMAGE_GLASSES_2 = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/glasses2.jpg"
+IMAGE_MATH = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/math_beauty.jpg"
 
 
 def generate_furniture_recommendation(
@@ -577,18 +553,10 @@ def on_click_clear_math(e: me.ClickEvent) -> None:  # pylint: disable=W0613
 
 # Video Events
 
-VIDEO_DESCRIPTION = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
-)
-VIDEO_TAGS = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/photography.mp4"
-)
-VIDEO_HIGHLIGHTS = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/pixel8.mp4"
-)
-VIDEO_GEOLOCATION = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/bus.mp4"
-)
+VIDEO_DESCRIPTION = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
+VIDEO_TAGS = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/photography.mp4"
+VIDEO_HIGHLIGHTS = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/pixel8.mp4"
+VIDEO_GEOLOCATION = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/bus.mp4"
 
 
 def generate_video_description(
@@ -877,7 +845,7 @@ def app() -> None:
                 if state.story_progress:
                     with me.box(style=_SPINNER_STYLE):
                         me.progress_spinner()
-                        me.text("Generating story with Gemini 1.5 ...")
+                        me.text("Generating story with Gemini 2.0 ...")
                 if state.story_output:
                     with me.box(
                         style=me.Style(
@@ -1120,7 +1088,7 @@ def image_math_reasoning_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 1.5 Pro can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
+        "Gemini 2.0 Pro can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
     )
     me.box(style=me.Style(height=12))
 
@@ -1135,7 +1103,7 @@ def image_math_reasoning_tab() -> None:
             )
         ):
             me.image(
-                src=gcs_to_http(IMAGE_MATH),
+                src=IMAGE_MATH,
                 alt="math equation ",
                 style=me.Style(width="350px"),
             )
@@ -1189,7 +1157,7 @@ def image_glasses_recommendations_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 1.5 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
+        "Gemini 2.0 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
     )
     me.box(style=me.Style(height=12))
 
@@ -1230,7 +1198,7 @@ def image_glasses_recommendations_tab() -> None:
             )
         ):
             me.image(
-                src=gcs_to_http(IMAGE_GLASSES_1),
+                src=IMAGE_GLASSES_1,
                 alt="glasses 1",
                 style=me.Style(width="350px"),
             )
@@ -1243,7 +1211,7 @@ def image_glasses_recommendations_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=gcs_to_http(IMAGE_GLASSES_2),
+                src=IMAGE_GLASSES_2,
                 alt="glasses 2",
                 style=me.Style(width="350px"),
             )
@@ -1301,13 +1269,13 @@ def image_er_diagrams_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 1.5 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini 1.0 can decipher an Entity Relationship (ER) diagram."
+        "Gemini 2.0 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini 1.0 can decipher an Entity Relationship (ER) diagram."
     )
     me.box(style=me.Style(height=12))
 
     with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
         me.image(
-            src=gcs_to_http(IMAGE_ER_DIAGRAM),
+            src=IMAGE_ER_DIAGRAM,
             alt="image of an entity relationship diagram",
             style=me.Style(width="350px"),
         )
@@ -1361,7 +1329,7 @@ def image_oven_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Equipped with the ability to extract information from visual elements on screens, Gemini 1.5 Pro can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
+        "Equipped with the ability to extract information from visual elements on screens, Gemini 2.0 Pro can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
     )
     me.box(style=me.Style(height=12))
 
@@ -1428,15 +1396,9 @@ def image_furniture_tab() -> None:
     )
     me.box(style=me.Style(height=12))
 
-    room_image_urls = gcs_to_http(ROOM_IMAGE_URI)
-    chair_1_image_urls = gcs_to_http(CHAIR_1_IMAGE_URI)
-    chair_2_image_urls = gcs_to_http(CHAIR_2_IMAGE_URI)
-    chair_3_image_urls = gcs_to_http(CHAIR_3_IMAGE_URI)
-    chair_4_image_urls = gcs_to_http(CHAIR_4_IMAGE_URI)
-
     with me.box(style=me.Style(display="flex", flex_direction="column", gap=2)):
         me.image(
-            src=room_image_urls,
+            src=ROOM_IMAGE_URI,
             alt="living room",
             style=me.Style(width="350px"),
         )
@@ -1461,7 +1423,7 @@ def image_furniture_tab() -> None:
             )
         ):
             me.image(
-                src=chair_1_image_urls,
+                src=CHAIR_1_IMAGE_URI,
                 alt="chair1",
                 style=me.Style(width="200px"),
             )
@@ -1474,7 +1436,7 @@ def image_furniture_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=chair_2_image_urls,
+                src=CHAIR_2_IMAGE_URI,
                 alt="chair2",
                 style=me.Style(width="200px"),
             )
@@ -1487,7 +1449,7 @@ def image_furniture_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=chair_3_image_urls,
+                src=CHAIR_3_IMAGE_URI,
                 alt="chair3",
                 style=me.Style(width="200px"),
             )
@@ -1500,7 +1462,7 @@ def image_furniture_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=chair_4_image_urls,
+                src=CHAIR_4_IMAGE_URI,
                 alt="chair4",
                 style=me.Style(width="200px"),
             )
@@ -1624,9 +1586,8 @@ def video_description_tab() -> None:
     me.text("Gemini can provide a description of what's happening in a video:")
     me.box(style=me.Style(height=12))
 
-    video_desc_url = "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
+    video_desc_url = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
     state.video_url = video_desc_url
-    video_desc_url = gcs_to_http(video_desc_url)
 
     me.video(
         src=video_desc_url,
@@ -1670,12 +1631,12 @@ def video_tags_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
-    me.text("Gemini 1.5 can also extract tags throughout a video, as shown below:")
+    me.text("Gemini 2.0 can also extract tags throughout a video, as shown below:")
     me.box(style=me.Style(height=12))
 
     me.video(
         key="tags",
-        src=gcs_to_http(VIDEO_TAGS),
+        src=VIDEO_TAGS,
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
@@ -1720,13 +1681,13 @@ def video_highlights_tab() -> None:
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Another example of using Gemini 1.5 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
+        "Another example of using Gemini 2.0 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
     )
     me.box(style=me.Style(height=12))
 
     me.video(
         key="highlights",
-        src=gcs_to_http(VIDEO_HIGHLIGHTS),
+        src=VIDEO_HIGHLIGHTS,
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
@@ -1771,13 +1732,13 @@ def video_geolocation_tab() -> None:
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Even in short, detail-packed videos, Gemini 1.5 can identify the locations."
+        "Even in short, detail-packed videos, Gemini 2.0 can identify the locations."
     )
     me.box(style=me.Style(height=12))
 
     me.video(
         key="geo",
-        src=gcs_to_http(VIDEO_GEOLOCATION),
+        src=VIDEO_GEOLOCATION,
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
