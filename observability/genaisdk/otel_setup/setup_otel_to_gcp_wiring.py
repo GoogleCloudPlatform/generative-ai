@@ -30,18 +30,19 @@ import google.auth.transport.requests
 import google.cloud.logging
 import grpc
 from opentelemetry import metrics, trace
+from opentelemetry._events import set_event_logger_provider
 from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.cloud_logging import CloudLoggingExporter
 from opentelemetry.exporter.cloud_monitoring import CloudMonitoringMetricsExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.resourcedetector.gcp_resource_detector import GoogleCloudResourceDetector
+from opentelemetry.sdk._events import EventLoggerProvider
 from opentelemetry.sdk._logs import LoggerProvider
-from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
+from opentelemetry.sdk._logs.export import BatchLogRecordProcessor, ConsoleLogExporter, SimpleLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource, get_aggregated_resources, OTELResourceDetector, OsResourceDetector, ProcessResourceDetector
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor, ConsoleSpanExporter
 
 # Replace this with a better default for your service.
 _DEFAULT_SERVICE_NAME = "genaisdk-observability-sample"
@@ -100,7 +101,6 @@ def _create_resource(project_id):
             OTELResourceDetector(),
             ProcessResourceDetector(),
             OsResourceDetector(),
-            GoogleCloudResourceDetector(),
         ],
         initial_resource=Resource.create(attributes={
             "service.name": service_name,
@@ -126,6 +126,23 @@ def _create_otlp_creds():
 # [END create_otlp_creds_snippet]
 
 
+def _in_debug_mode():
+    debug_flag = os.getenv('VERBOSE_OTEL_SETUP_DEBUGGING') or ''
+    return debug_flag == 'true'
+
+
+def _configure_tracer_provider_debugging(tracer_provider):
+    if not _in_debug_mode():
+        return
+    tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+
+def _configure_logger_provider_debugging(logger_provider):
+    if not _in_debug_mode():
+        return
+    logger_provider.add_log_record_processor(SimpleLogRecordProcessor(ConsoleLogExporter()))
+
+
 # [START setup_cloud_trace_snippet]
 
 # Wire up Open Telemetry's trace APIs to talk to Cloud Trace.
@@ -134,6 +151,7 @@ def _setup_cloud_trace(resource, otlp_creds):
     tracer_provider.add_span_processor(
         BatchSpanProcessor(OTLPSpanExporter(credentials=otlp_creds))
     )
+    _configure_tracer_provider_debugging(tracer_provider)
     trace.set_tracer_provider(tracer_provider)
 
 # [END setup_cloud_trace_snippet]
@@ -163,19 +181,20 @@ def _setup_cloud_monitoring(project_id, resource):
 
 # Wire up Open Telemetry's logging APIs to talk to Cloud Logging.
 def _setup_cloud_logging(project_id, resource):
-    # Set up the Python "logging" API
-    project_id = _get_project_id()
-    logging_client = google.cloud.logging.Client(project=project_id)
-    logging_client.setup_logging()
-
     # Set up the OTel "LoggerProvider" API
     logger_provider = LoggerProvider(resource=resource)
     exporter = CloudLoggingExporter(
         project_id=project_id,
-        default_log_name=_get_default_log_name(),
-        client=logging_client)
+        default_log_name=_get_default_log_name())
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
     set_logger_provider(logger_provider)
+
+    # Set up the OTel "EventLoggerProvider" API
+    set_event_logger_provider(EventLoggerProvider(logger_provider=logger_provider))
+
+    # Set up the Python "logging" API
+    logging_client = google.cloud.logging.Client(project=project_id)
+    logging_client.setup_logging()
 
 # [END setup_cloud_logging_snippet]
 
@@ -186,8 +205,8 @@ def setup_otel_to_gcp_wiring():
     project_id = _get_project_id()
     resource = _create_resource(project_id)
     otlp_creds = _create_otlp_creds()
+    _setup_cloud_logging(project_id, resource)
     _setup_cloud_trace(resource, otlp_creds)
     _setup_cloud_monitoring(project_id, resource)
-    _setup_cloud_logging(project_id, resource)
 
 # [END setup_otel_to_gcp_wiring_snippet]
