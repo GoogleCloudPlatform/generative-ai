@@ -34,11 +34,12 @@ from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.cloud_logging import CloudLoggingExporter
 from opentelemetry.exporter.cloud_monitoring import CloudMonitoringMetricsExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.resourcedetector.gcp_resource_detector import GoogleCloudResourceDetector
 from opentelemetry.sdk._logs import LoggerProvider
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
-from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.resources import Resource, get_aggregated_resources, OTELResourceDetector, OsResourceDetector, ProcessResourceDetector
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
@@ -82,28 +83,29 @@ def _get_project_id():
 
 # Creates an Open Telemetry resource that contains sufficient information
 # to be able to successfully write to the Cloud Observability backends.
-def _create_resource():
-    # A valid service name is required for the resource.
+def _create_resource(project_id):
+    # A valid project is required for the resource.
+    assert project_id is not None
+    assert isinstance(project_id, str)
+    assert len(project_id) > 0
+
+    # A valid service name is also required for the resource.
     service_name = _get_service_name()
     assert service_name is not None
     assert isinstance(service_name, str)
     assert len(service_name) > 0
 
-    # A valid project is also required for the resource.
-    project_id = _get_project_id()
-    assert project_id is not None
-    assert isinstance(project_id, str)
-    assert len(project_id) > 0
-
-    # In addition to using the supplied keys here, the "Resource.create"
-    # function can auto-discover additional information about the
-    # environment and can automatically inject attributes supplied via
-    # the "OTEL_RESOURCE_ATTRIBUTES" environment variable.
-    return Resource.create(
-        {
+    return get_aggregated_resources(
+        detectors=[
+            OTELResourceDetector(),
+            ProcessResourceDetector(),
+            OsResourceDetector(),
+            GoogleCloudResourceDetector(),
+        ],
+        initial_resource=Resource.create(attributes={
             "service.name": service_name,
             "gcp.project_id": project_id,
-        }
+        })
     )
 
 
@@ -131,12 +133,14 @@ def _setup_cloud_trace(resource, otlp_creds):
 
 
 # Wire up Open Telemetry's metric APIs to talk to Cloud Monitoring.
-def _setup_cloud_monitoring(resource):
+def _setup_cloud_monitoring(project_id, resource):
     metrics.set_meter_provider(
         MeterProvider(
             metric_readers=[
                 PeriodicExportingMetricReader(
-                    CloudMonitoringMetricsExporter(add_unique_identifier=True),
+                    CloudMonitoringMetricsExporter(
+                        project_id=project_id,
+                        add_unique_identifier=True),
                     export_interval_millis=5000,
                 )
             ],
@@ -146,21 +150,26 @@ def _setup_cloud_monitoring(resource):
 
 
 # Wire up Open Telemetry's logging APIs to talk to Cloud Logging.
-def _setup_cloud_logging(resource):
+def _setup_cloud_logging(project_id, resource):
+    # Set up the Python "logging" API
+    project_id = _get_project_id()
+    logging_client = google.cloud.logging.Client(project=project_id)
+    logging_client.setup_logging()
+
     # Set up the OTel "LoggerProvider" API
     logger_provider = LoggerProvider(resource=resource)
-    exporter = CloudLoggingExporter(default_log_name=_get_default_log_name())
+    exporter = CloudLoggingExporter(
+        project_id=project_id,
+        default_log_name=_get_default_log_name(),
+        client=logging_client)
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
     set_logger_provider(logger_provider)
 
-    # Set up the Python "logging" API
-    logging_client = google.cloud.logging.Client()
-    logging_client.setup_logging()
-
 
 def setup_otel_to_gcp_wiring():
-    resource = _create_resource()
+    project_id = _get_project_id()
+    resource = _create_resource(project_id)
     otlp_creds = _create_otlp_creds()
     _setup_cloud_trace(resource, otlp_creds)
-    _setup_cloud_monitoring(resource)
-    _setup_cloud_logging(resource)
+    _setup_cloud_monitoring(project_id, resource)
+    _setup_cloud_logging(project_id, resource)
