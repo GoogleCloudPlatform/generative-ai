@@ -14,7 +14,7 @@ def use_google_genai_sdk():
     client = Client()
     response = client.models.generate_content(
         model="gemini-2.0-flash-lite-001",
-        contents="Write a poem about Google GenAI SDK and observability.",
+        contents="Write a poem about the Google Gen AI SDK and observability.",
     )
     print(response.text)
 

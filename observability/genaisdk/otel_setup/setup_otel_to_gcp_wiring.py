@@ -1,9 +1,9 @@
 """Configures Open Telemetry wiring to Google Cloud Observability.
 
-Configuring observability for the GenAI SDK involves two steps:
+Configuring observability for the Gen AI SDK involves two steps:
 
   1. Ensuring that data is written to Open Telemetry APIs when
-     the GenAI SDK is used.
+     the Gen AI SDK is used.
  
   2. Ensuring that the Open Telemetry APIs route data to some
      observability backend(s) for storing the data.
