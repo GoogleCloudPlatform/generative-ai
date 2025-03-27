@@ -36,8 +36,8 @@ def setup_otel_instrumentation() -> None:
 
     # Instrument the Python Requests library (PyPi: "requests"). This
     # monkey-patches that library to inject Open Telemetry instrumentation.
-    # The requests library is a dependency of the GenAI SDK library; it is
-    # used to invoke the Vertex API or the Gemini API. Instrumenting this
+    # The requests library is a dependency of the Gen AI SDK library; it is
+    # used to invoke the Vertex AI API or the Gemini API. Instrumenting this
     # lower-level dependency of the Gen AI SDK provides more information
     # about the timing and operation at lower layers of the stack.
     RequestsInstrumentor().instrument()
