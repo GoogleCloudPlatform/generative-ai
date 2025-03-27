@@ -24,22 +24,22 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 
 def setup_otel_instrumentation() -> None:
-   """Add telemetry collection and instrumentation to key libraries.
-   
-   This function is responsible for monkey-patching multiple libraries of
-   interest to inject telemetry collection and instrumentation, routing
-   relevant telemetry information to the Open Telemetry library.
-   """
-   # Instrument the Gen AI SDK library (PyPi: "google-genai"). This
-   # monkey-patches that library to inject Open Telemetry instrumentation.
-   GoogleGenAiSdkInstrumentor().instrument()
+    """Add telemetry collection and instrumentation to key libraries.
 
-   # Instrument the Python Requests library (PyPi: "requests"). This
-   # monkey-patches that library to inject Open Telemetry instrumentation.
-   # The requests library is a dependency of the GenAI SDK library; it is
-   # used to invoke the Vertex API or the Gemini API. Instrumenting this
-   # lower-level dependency of the Gen AI SDK provides more information
-   # about the timing and operation at lower layers of the stack.
-   RequestsInstrumentor().instrument()
+    This function is responsible for monkey-patching multiple libraries of
+    interest to inject telemetry collection and instrumentation, routing
+    relevant telemetry information to the Open Telemetry library.
+    """
+    # Instrument the Gen AI SDK library (PyPi: "google-genai"). This
+    # monkey-patches that library to inject Open Telemetry instrumentation.
+    GoogleGenAiSdkInstrumentor().instrument()
+
+    # Instrument the Python Requests library (PyPi: "requests"). This
+    # monkey-patches that library to inject Open Telemetry instrumentation.
+    # The requests library is a dependency of the GenAI SDK library; it is
+    # used to invoke the Vertex API or the Gemini API. Instrumenting this
+    # lower-level dependency of the Gen AI SDK provides more information
+    # about the timing and operation at lower layers of the stack.
+    RequestsInstrumentor().instrument()
 
 # [END setup_otel_instrumentation_snippet]

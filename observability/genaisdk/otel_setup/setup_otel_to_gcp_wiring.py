@@ -70,21 +70,22 @@ def _get_service_name() -> str:
     return _DEFAULT_SERVICE_NAME
 
 
-# Used to cache the instance ID so that repeated calls to "_get_service_instance()" below
-# return a consistent, predictable, stable output.
-_instance_id: Optional[str] = None
-
-def _get_service_instance() -> str:
-    """Retrieve the instance ID value to use in the 'service.instance.id' resource attribute."""
-    global _instance_id
-    if _instance_id is not None:
-        return _instance_id
+def _compute_service_instance_id() -> str:
+    """Determines the value to use for the 'service.instance.id' resource attribute."""
     # Implementation note: you may want to report something more meaningful, like the instance ID
     # of the host VM, the PID, or something else. Here we just use something random for expediency.
     # We need to supply something to provide this mandatory resource attribute, but there are
     # different ways that you could reasonably populate it, some more valuable than others.
-    _instance_id = uuid.uuid4().hex
-    return _instance_id
+    return uuid.uuid4().hex
+
+
+# Used to cache the instance ID so that repeated calls to "_get_service_instance()" below
+# return a consistent, predictable, stable output.
+_SERVICE_INSTANCE_ID = _compute_service_instance_id()
+
+def _get_service_instance() -> str:
+    """Retrieve the instance ID value to use in the 'service.instance.id' resource attribute."""
+    return _SERVICE_INSTANCE_ID
 
 
 # Allows the default log name to be set dynamically.
