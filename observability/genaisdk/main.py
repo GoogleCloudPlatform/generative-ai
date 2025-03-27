@@ -1,4 +1,5 @@
 import logging
+
 from dotenv import load_dotenv
 from google.genai import Client
 from otel_setup import setup_otel_instrumentation, setup_otel_to_gcp_wiring
@@ -29,6 +30,7 @@ def use_google_genai_sdk() -> None:
         contents="Write a poem about the Google Gen AI SDK and observability.",
     )
     print(response.text)
+
 
 # [END main_logic_support_snippet]
 

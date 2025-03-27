@@ -42,4 +42,5 @@ def setup_otel_instrumentation() -> None:
     # about the timing and operation at lower layers of the stack.
     RequestsInstrumentor().instrument()
 
+
 # [END setup_otel_instrumentation_snippet]

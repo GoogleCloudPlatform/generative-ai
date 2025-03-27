@@ -38,13 +38,26 @@ from opentelemetry.exporter.cloud_monitoring import CloudMonitoringMetricsExport
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk._events import EventLoggerProvider
 from opentelemetry.sdk._logs import LoggerProvider
-from opentelemetry.sdk._logs.export import BatchLogRecordProcessor, ConsoleLogExporter, SimpleLogRecordProcessor
+from opentelemetry.sdk._logs.export import (
+    BatchLogRecordProcessor,
+    ConsoleLogExporter,
+    SimpleLogRecordProcessor,
+)
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
-from opentelemetry.sdk.resources import Resource, get_aggregated_resources, OTELResourceDetector, OsResourceDetector, ProcessResourceDetector
+from opentelemetry.sdk.resources import (
+    OsResourceDetector,
+    OTELResourceDetector,
+    ProcessResourceDetector,
+    Resource,
+    get_aggregated_resources,
+)
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor, ConsoleSpanExporter
-
+from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
+    ConsoleSpanExporter,
+    SimpleSpanProcessor,
+)
 
 # Replace this with a better default for your service.
 _DEFAULT_SERVICE_NAMESPACE = "default"
@@ -139,12 +152,14 @@ def _create_resource(project_id: str) -> Resource:
             ProcessResourceDetector(),
             OsResourceDetector(),
         ],
-        initial_resource=Resource.create(attributes={
-            "service.namespace.name": _DEFAULT_SERVICE_NAMESPACE,
-            "service.name": _get_service_name(),
-            "service.instance.id": _get_service_instance(),
-            "gcp.project_id": project_id,
-        })
+        initial_resource=Resource.create(
+            attributes={
+                "service.namespace.name": _DEFAULT_SERVICE_NAMESPACE,
+                "service.name": _get_service_name(),
+                "service.instance.id": _get_service_instance(),
+                "gcp.project_id": project_id,
+            }
+        ),
     )
 
 
@@ -168,13 +183,14 @@ def _create_otlp_creds() -> grpc.ChannelCredentials:
         grpc.metadata_call_credentials(auth_metadata_plugin),
     )
 
+
 # [END create_otlp_creds_snippet]
 
 
 def _in_debug_mode() -> bool:
     """Returns whether to enable additional debugging."""
-    debug_flag = os.getenv('VERBOSE_OTEL_SETUP_DEBUGGING') or ''
-    return debug_flag == 'true'
+    debug_flag = os.getenv("VERBOSE_OTEL_SETUP_DEBUGGING") or ""
+    return debug_flag == "true"
 
 
 def _configure_tracer_provider_debugging(tracer_provider: TracerProvider) -> None:
@@ -200,10 +216,13 @@ def _configure_logger_provider_debugging(logger_provider: LoggerProvider) -> Non
     """
     if not _in_debug_mode():
         return
-    logger_provider.add_log_record_processor(SimpleLogRecordProcessor(ConsoleLogExporter()))
+    logger_provider.add_log_record_processor(
+        SimpleLogRecordProcessor(ConsoleLogExporter())
+    )
 
 
 # [START setup_cloud_trace_snippet]
+
 
 # Wire up Open Telemetry's trace APIs to talk to Cloud Trace.
 def _setup_cloud_trace(resource: Resource, otlp_creds: grpc.ChannelCredentials) -> None:
@@ -215,10 +234,12 @@ def _setup_cloud_trace(resource: Resource, otlp_creds: grpc.ChannelCredentials) 
     _configure_tracer_provider_debugging(tracer_provider)
     trace.set_tracer_provider(tracer_provider)
 
+
 # [END setup_cloud_trace_snippet]
 
 
 # [START setup_cloud_monitoring_snippet]
+
 
 # Wire up Open Telemetry's metric APIs to talk to Cloud Monitoring.
 def _setup_cloud_monitoring(project_id: str, resource: Resource) -> None:
@@ -228,14 +249,15 @@ def _setup_cloud_monitoring(project_id: str, resource: Resource) -> None:
             metric_readers=[
                 PeriodicExportingMetricReader(
                     CloudMonitoringMetricsExporter(
-                        project_id=project_id,
-                        add_unique_identifier=True),
+                        project_id=project_id, add_unique_identifier=True
+                    ),
                     export_interval_millis=5000,
                 )
             ],
             resource=resource,
         )
     )
+
 
 # [END setup_cloud_monitoring_snippet]
 
@@ -247,8 +269,8 @@ def _setup_cloud_logging(project_id: str, resource: Resource) -> None:
     # Set up the OTel "LoggerProvider" API
     logger_provider = LoggerProvider(resource=resource)
     exporter = CloudLoggingExporter(
-        project_id=project_id,
-        default_log_name=_get_default_log_name())
+        project_id=project_id, default_log_name=_get_default_log_name()
+    )
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
     _configure_logger_provider_debugging(logger_provider)
     set_logger_provider(logger_provider)
@@ -260,10 +282,12 @@ def _setup_cloud_logging(project_id: str, resource: Resource) -> None:
     logging_client = google.cloud.logging.Client(project=project_id)
     logging_client.setup_logging()
 
+
 # [END setup_cloud_logging_snippet]
 
 
 # [START setup_otel_to_gcp_wiring_snippet]
+
 
 def setup_otel_to_gcp_wiring() -> None:
     """Configures Open Telemetry to route telemetry to Cloud Observability."""
@@ -273,5 +297,6 @@ def setup_otel_to_gcp_wiring() -> None:
     _setup_cloud_logging(project_id, resource)
     _setup_cloud_trace(resource, otlp_creds)
     _setup_cloud_monitoring(project_id, resource)
+
 
 # [END setup_otel_to_gcp_wiring_snippet]
