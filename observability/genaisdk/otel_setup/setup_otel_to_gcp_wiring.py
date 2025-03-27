@@ -22,6 +22,7 @@ https://cloud.google.com/stackdriver/docs/instrumentation/setup/python
 """
 
 import os
+import uuid
 
 import google.auth
 import google.auth.transport.grpc
@@ -44,6 +45,10 @@ from opentelemetry.sdk.resources import Resource, get_aggregated_resources, OTEL
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor, ConsoleSpanExporter
 
+
+# Replace this with a better default for your service.
+_DEFAULT_SERVICE_NAMESPACE = "default"
+
 # Replace this with a better default for your service.
 _DEFAULT_SERVICE_NAME = "genaisdk-observability-sample"
 
@@ -61,6 +66,16 @@ def _get_service_name():
     if from_env:
         return from_env
     return _DEFAULT_SERVICE_NAME
+
+
+_instance_id = None
+
+def _get_service_instance():
+    global _instance_id
+    if _instance_id is not None:
+        return _instance_id
+    _instance_id = uuid.uuid4().hex
+    return _instance_id
 
 
 # Allows the default log name to be set dynamically.
@@ -103,7 +118,9 @@ def _create_resource(project_id):
             OsResourceDetector(),
         ],
         initial_resource=Resource.create(attributes={
+            "service.namespace.name": _DEFAULT_SERVICE_NAMESPACE,
             "service.name": service_name,
+            "service.instance.id": _get_service_instance(),
             "gcp.project_id": project_id,
         })
     )
