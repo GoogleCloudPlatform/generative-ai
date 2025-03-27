@@ -28,7 +28,7 @@ firestore_namespace: "hierarchical_docs"
 # Chunking and embedding settings
 chunk_sizes: [4096, 2048, 1024, 512] # For indexing_method == "hierarchical"
 chunk_size: 512
-embeddings_model_name: "text-embedding-004"
+embeddings_model_name: "text-embedding-005"
 approximate_neighbors_count: 100
 
 # Document AI settings
