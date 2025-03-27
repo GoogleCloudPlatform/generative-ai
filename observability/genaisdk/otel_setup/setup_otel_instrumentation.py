@@ -4,7 +4,7 @@ Configuring observability for the Gen AI SDK involves two steps:
 
   1. Ensuring that data is written to Open Telemetry APIs when
      the Gen AI SDK is used.
- 
+
   2. Ensuring that the Open Telemetry APIs route data to some
      observability backend(s) for storing the data.
 

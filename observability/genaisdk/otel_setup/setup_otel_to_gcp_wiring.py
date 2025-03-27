@@ -4,7 +4,7 @@ Configuring observability for the Gen AI SDK involves two steps:
 
   1. Ensuring that data is written to Open Telemetry APIs when
      the Gen AI SDK is used.
- 
+
   2. Ensuring that the Open Telemetry APIs route data to some
      observability backend(s) for storing the data.
 
@@ -21,7 +21,6 @@ For best practices on integration with Cloud Observability, see:
 https://cloud.google.com/stackdriver/docs/instrumentation/setup/python
 """
 
-from typing import Optional
 import os
 import uuid
 
@@ -83,6 +82,7 @@ def _compute_service_instance_id() -> str:
 # return a consistent, predictable, stable output.
 _SERVICE_INSTANCE_ID = _compute_service_instance_id()
 
+
 def _get_service_instance() -> str:
     """Retrieve the instance ID value to use in the 'service.instance.id' resource attribute."""
     return _SERVICE_INSTANCE_ID
@@ -91,7 +91,7 @@ def _get_service_instance() -> str:
 # Allows the default log name to be set dynamically.
 def _get_default_log_name() -> str:
     """Retrieve the default log name to use with Cloud Logging.
-    
+
     In Cloud Logging, every log has a "log name" which is part of the
     overall "LOG_ID", which identifies a stream of logs. The CloudLoggingExporter
     can derive the "log name" from a special "gcp.log_name" attribute if present.
@@ -123,7 +123,7 @@ def _get_project_id() -> str:
 # to be able to successfully write to the Cloud Observability backends.
 def _create_resource(project_id: str) -> Resource:
     """Creates an Open Telemetry resource for the given project ID.
-    
+
     Args:
       project_id: the project ID detected from the environment.
 
@@ -147,15 +147,15 @@ def _create_resource(project_id: str) -> Resource:
         })
     )
 
-# [START create_otlp_creds_snippet]
 
+# [START create_otlp_creds_snippet]
 # Creates gRPC channel credentials which can be supplied to the OTLP
 # exporter classes provided by Open Telemetry. These build on top
 # of the Google Application Default credentials. See also:
 # https://cloud.google.com/docs/authentication/application-default-credentials
 def _create_otlp_creds() -> grpc.ChannelCredentials:
     """Create gRPC credentials from Google Application Default credentials.
-    
+
     This returns credentials which can be used with the OTLP exporter. It
     uses the Google Application Default credentials -- ambient credentials
     found in the environment -- to construct the gRPC credentials.
@@ -179,7 +179,7 @@ def _in_debug_mode() -> bool:
 
 def _configure_tracer_provider_debugging(tracer_provider: TracerProvider) -> None:
     """Conditionally adds more debugging to the TracerProvider.
-    
+
     When additional debugging is requested, the TracerProvider will be configured to
     also dump traces to STDOUT. This makes it possible to triangulate whether issues
     are due to the instrumentation (spans not getting written to the Open Telemetry
@@ -192,7 +192,7 @@ def _configure_tracer_provider_debugging(tracer_provider: TracerProvider) -> Non
 
 def _configure_logger_provider_debugging(logger_provider: LoggerProvider) -> None:
     """Conditionally adds more debugging to the LoggerProvider.
-    
+
     When additional debugging is requested, the LoggerProvider will be configured to
     also dump logs to STDOUT. This makes it possible to triangulate whether issues
     are due to the instrumentation (logs not getting written to the Open Telemetry library)
