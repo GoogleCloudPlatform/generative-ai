@@ -293,6 +293,7 @@ Niitsuma
 Nith
 Nominatim
 ODb
+OIDC
 OLAP
 OOTB
 Ohashi
@@ -358,6 +359,7 @@ SAOT
 SDKROOT
 SEK
 SEO
+SFDC
 SIMONE
 SKUs
 SMSN
@@ -782,6 +784,7 @@ idk
 idks
 idxs
 ience
+ietf
 ifidx
 iinfo
 iloc
