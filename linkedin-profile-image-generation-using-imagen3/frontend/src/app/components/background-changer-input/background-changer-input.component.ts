@@ -21,33 +21,33 @@ export class BackgroundChangerInputComponent implements OnInit, OnDestroy {
   imageUrl: any;
   userPhotoUrl: string | null = null;
   isUserPhotoUrl: boolean = false;
-  private imageSubscription: Subscription;
+  // private imageSubscription: Subscription;
 
   constructor(
     private _UserService: UserService,
     private sanitizer: DomSanitizer,
     private _ImageService: ImageService
   ) {
-    this.imageSubscription = this._ImageService.selectedImage$.subscribe(
-      image => {
-        if (image) {
-          this.selectedFile = image.file;
-          this.imageUrl = image.imageUrl
-            ? this.sanitizer.bypassSecurityTrustUrl(image.imageUrl)
-            : null;
-          this.isUserPhotoUrl = image.isUserPhotoUrl;
-        }
-      }
-    );
+    // this.imageSubscription = this._ImageService.selectedImage$.subscribe(
+    //   image => {
+    //     if (image) {
+    //       this.selectedFile = image.file;
+    //       this.imageUrl = image.imageUrl
+    //         ? this.sanitizer.bypassSecurityTrustUrl(image.imageUrl)
+    //         : null;
+    //       this.isUserPhotoUrl = image.isUserPhotoUrl;
+    //     }
+    //   }
+    // );
   }
 
   ngOnInit(): void {
-    this.userPhotoUrl = this._UserService.getUserDetails().photoURL || null;
-    if (this.userPhotoUrl) this.loadImageFromUserUrl(this.userPhotoUrl);
+    // this.userPhotoUrl = this._UserService.getUserDetails().photoURL || null;
+    // if (this.userPhotoUrl) this.loadImageFromUserUrl(this.userPhotoUrl);
   }
 
   ngOnDestroy(): void {
-    this.imageSubscription.unsubscribe();
+    // this.imageSubscription.unsubscribe();
   }
 
   onFileSelected(event: any) {

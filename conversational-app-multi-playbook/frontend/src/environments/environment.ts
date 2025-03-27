@@ -1,10 +1,14 @@
 export const environment = {
   firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
+    apiKey: '<your API Key>',
+    authDomain: '<your Auth Domain>',
+    projectId: '<your Project ID>',
+    storageBucket: "<your storageBucket>",
+    messagingSenderId: "<your messagingSenderId>",
+    appId: "<your appId>",
+    measurementId: "<your measurementId>"
   },
-  requiredLogin: "",
-  backendURL: "",
-  chatbotName: "",
+  requiredLogin: 'False',
+  backendURL: 'http://localhost:8080/api',
+  chatbotName: 'My New Agent',
 };
