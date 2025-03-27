@@ -5,7 +5,6 @@ body {
   height: 100%;
   margin: 0;
   font-family: 'Google Sans', sans-serif !important;
-  overflow: hidden;
 }
 
 .material-symbols-rounded {
@@ -64,3 +63,7 @@ $tour-next-button-hover: black;
 $tour-back-button-color: white;
 $tour-shadow-color: gray;
 $tour-step-color: aliceblue;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

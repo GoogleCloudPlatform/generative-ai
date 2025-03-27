@@ -20,7 +20,8 @@
     Helvetica Neue,
     sans-serif;
   font-style: normal;
-  font-size: 30px;
+  font-size: 1.3rem;
+  text-align: center;
   line-height: 128.7%;
   letter-spacing: normal;
   background: linear-gradient(
@@ -172,15 +173,10 @@
 }
 
 .top-nav {
-  height: 60px;
   background-color: transparent;
+  padding: 2rem 1rem;
 
   .parent-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 3rem;
-
     .left-heading {
       display: flex;
       align-items: center;
@@ -208,6 +204,7 @@
     .right-menu-items {
       display: flex;
       align-items: center;
+      justify-content: center;
 
       .profile-container {
         margin-left: 1%;
