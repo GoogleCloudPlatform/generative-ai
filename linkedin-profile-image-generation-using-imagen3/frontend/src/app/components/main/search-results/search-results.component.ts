@@ -162,12 +162,6 @@ export class SearchResultsComponent implements OnDestroy {
 
   showErrorSnackBar(error: any): void {
     console.error('Search error:', error);
-    console.error('Search typeof error:', typeof error);
-    console.error('Search error?.message:', error?.message);
-    console.error(
-      'Search typeof JSON.stringify:',
-      JSON.stringify(error, null, 2)
-    );
 
     let errorMessage = '';
     let triedToGeneratePersons = false;
@@ -183,7 +177,9 @@ export class SearchResultsComponent implements OnDestroy {
         errorMessage =
           'The image you want to edit contains content that has been blocked because there are persons in it. See the safety settings documentation for more details.';
       } else errorMessage = error?.error?.detail;
-    else 'Error sending request. Please try again later!';
+    else if (error?.message) errorMessage = error?.message;
+    else if (error?.error) errorMessage = error?.error;
+    else errorMessage = 'Error sending request. Please try again later!';
 
     this._snackBar.openFromComponent(ToastMessageComponent, {
       panelClass: ['red-toast'],

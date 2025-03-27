@@ -3,14 +3,24 @@
   mode="indeterminate"
 ></mat-progress-bar>
 <nav class="navbar navbar-expand-lg navbar-light bg-light top-nav fixed-top">
-  <div class="parent-container">
-    <div class="left-heading" [matTooltip]="'Home'" [routerLink]="'/'">
+  <div
+    class="parent-container grid grid-flow-row-dense grid-cols-4 grid-rows-2 lg:grid-cols-10 lg:grid-rows-1 gap-2 lg:container lg:mx-auto"
+  >
+    <div
+      class="left-heading col-span-3"
+      [ngClass]="this.isSearchRoute() ? 'lg:col-span-3' : 'lg:col-span-9'"
+      [matTooltip]="'Home'"
+      [routerLink]="'/'"
+    >
       <span class="logo-text gradient-text">{{ headerTitle }}</span>
     </div>
+
     <app-chat-input
+      class="col-span-4 lg:col-span-6"
       (emitSearch)="this.searchTerm($event)"
       *ngIf="this.isSearchRoute()"
     ></app-chat-input>
+
     <div class="right-menu-items">
       <div
         *ngIf="authService.isUserLoggedIn()"

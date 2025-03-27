@@ -23,14 +23,14 @@ export class SearchService {
   search(searchRequest: SearchRequest): Observable<GeneratedImage[]> {
     const userImage = this.imageService.getSelectedImage();
 
-    // if (!userImage?.file) {
-    //   // Redirect to homepage and alert that you need to upload an image first
-    //   this.router.navigate(['/']);
-    //   alert('Please upload an image first.');
-    //   return throwError(
-    //     () => new Error('No image and no search term provided.')
-    //   );
-    // }
+    if (!userImage?.file) {
+      // Redirect to homepage and alert that you need to upload an image first
+      this.router.navigate(['/']);
+      alert('Please upload an image first.');
+      return throwError(
+        () => new Error('No image and no search term provided.')
+      );
+    }
 
     const formData = new FormData();
     formData.append('term', searchRequest.term);
@@ -40,7 +40,7 @@ export class SearchService {
       'maskDistilation',
       searchRequest.maskDistilation.toString()
     );
-    // formData.append('userImage', userImage.file, userImage.file.name);
+    formData.append('userImage', userImage.file, userImage.file.name);
 
     return this.http
       .post(searchURL, formData)
