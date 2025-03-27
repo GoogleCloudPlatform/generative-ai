@@ -21,6 +21,7 @@ For best practices on integration with Cloud Observability, see:
 https://cloud.google.com/stackdriver/docs/instrumentation/setup/python
 """
 
+from typing import Optional
 import os
 import uuid
 
@@ -61,25 +62,42 @@ _DEFAULT_LOG_NAME = "genaisdk-observability-sample"
 # can be useful to support different deployments of your service using
 # different names (e.g. to set a different service name in non-prod vs
 # in production environments, for example, to differentiate them).
-def _get_service_name():
+def _get_service_name() -> str:
+    """Retrieve the service name for use in the 'service.name' resource attribute."""
     from_env = os.getenv("OTEL_SERVICE_NAME")
     if from_env:
         return from_env
     return _DEFAULT_SERVICE_NAME
 
 
-_instance_id = None
+# Used to cache the instance ID so that repeated calls to "_get_service_instance()" below
+# return a consistent, predictable, stable output.
+_instance_id: Optional[str] = None
 
-def _get_service_instance():
+def _get_service_instance() -> str:
+    """Retrieve the instance ID value to use in the 'service.instance.id' resource attribute."""
     global _instance_id
     if _instance_id is not None:
         return _instance_id
+    # Implementation note: you may want to report something more meaningful, like the instance ID
+    # of the host VM, the PID, or something else. Here we just use something random for expediency.
+    # We need to supply something to provide this mandatory resource attribute, but there are
+    # different ways that you could reasonably populate it, some more valuable than others.
     _instance_id = uuid.uuid4().hex
     return _instance_id
 
 
 # Allows the default log name to be set dynamically.
-def _get_default_log_name():
+def _get_default_log_name() -> str:
+    """Retrieve the default log name to use with Cloud Logging.
+    
+    In Cloud Logging, every log has a "log name" which is part of the
+    overall "LOG_ID", which identifies a stream of logs. The CloudLoggingExporter
+    can derive the "log name" from a special "gcp.log_name" attribute if present.
+    However, when there is no "gcp.log_name" on the LogRecord, the CloudLoggingExporter
+    needs a value to use instead when writing the log. This is why there is a
+    function to select the default log name to fallback on for that.
+    """
     from_env = os.getenv("GCP_DEFAULT_LOG_NAME")
     if from_env:
         return from_env
@@ -87,30 +105,33 @@ def _get_default_log_name():
 
 
 # Attempts to infer the project ID to use for writing.
-def _get_project_id():
+def _get_project_id() -> str:
+    """Returns the project ID to which to write the telemetry data."""
     env_vars = ["GOOGLE_CLOUD_PROJECT", "GCLOUD_PROJECT", "GCP_PROJECT"]
     for env_var in env_vars:
         from_env = os.getenv(env_var)
         if from_env:
             return from_env
     _, project = google.auth.default()
+    assert project is not None
+    assert project
     return project
 
 
 # Creates an Open Telemetry resource that contains sufficient information
 # to be able to successfully write to the Cloud Observability backends.
-def _create_resource(project_id):
-    # A valid project is required for the resource.
-    assert project_id is not None
-    assert isinstance(project_id, str)
-    assert len(project_id) > 0
+def _create_resource(project_id: str) -> Resource:
+    """Creates an Open Telemetry resource for the given project ID.
+    
+    Args:
+      project_id: the project ID detected from the environment.
 
-    # A valid service name is also required for the resource.
-    service_name = _get_service_name()
-    assert service_name is not None
-    assert isinstance(service_name, str)
-    assert len(service_name) > 0
-
+    Returns:
+      An Open Telemetry "Resource" that contains attributes representing
+      various details about the source of the telemetry data. The resulting
+      resource includes the mandatory resource attributes "gcp.project_id"
+      and the various mandatory "service.*" resource attributes.
+    """
     return get_aggregated_resources(
         detectors=[
             OTELResourceDetector(),
@@ -119,7 +140,7 @@ def _create_resource(project_id):
         ],
         initial_resource=Resource.create(attributes={
             "service.namespace.name": _DEFAULT_SERVICE_NAMESPACE,
-            "service.name": service_name,
+            "service.name": _get_service_name(),
             "service.instance.id": _get_service_instance(),
             "gcp.project_id": project_id,
         })
@@ -131,7 +152,13 @@ def _create_resource(project_id):
 # exporter classes provided by Open Telemetry. These build on top
 # of the Google Application Default credentials. See also:
 # https://cloud.google.com/docs/authentication/application-default-credentials
-def _create_otlp_creds():
+def _create_otlp_creds() -> grpc.ChannelCredentials:
+    """Create gRPC credentials from Google Application Default credentials.
+    
+    This returns credentials which can be used with the OTLP exporter. It
+    uses the Google Application Default credentials -- ambient credentials
+    found in the environment -- to construct the gRPC credentials.
+    """
     creds, _ = google.auth.default()
     request = google.auth.transport.requests.Request()
     auth_metadata_plugin = AuthMetadataPlugin(credentials=creds, request=request)
@@ -143,18 +170,33 @@ def _create_otlp_creds():
 # [END create_otlp_creds_snippet]
 
 
-def _in_debug_mode():
+def _in_debug_mode() -> bool:
+    """Returns whether to enable additional debugging."""
     debug_flag = os.getenv('VERBOSE_OTEL_SETUP_DEBUGGING') or ''
     return debug_flag == 'true'
 
 
-def _configure_tracer_provider_debugging(tracer_provider):
+def _configure_tracer_provider_debugging(tracer_provider: TracerProvider) -> None:
+    """Conditionally adds more debugging to the TracerProvider.
+    
+    When additional debugging is requested, the TracerProvider will be configured to
+    also dump traces to STDOUT. This makes it possible to triangulate whether issues
+    are due to the instrumentation (spans not getting written to the Open Telemetry
+    library) or due to the wiring (e.g. failure to export to Cloud Trace).
+    """
     if not _in_debug_mode():
         return
     tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
 
 
-def _configure_logger_provider_debugging(logger_provider):
+def _configure_logger_provider_debugging(logger_provider: LoggerProvider) -> None:
+    """Conditionally adds more debugging to the LoggerProvider.
+    
+    When additional debugging is requested, the LoggerProvider will be configured to
+    also dump logs to STDOUT. This makes it possible to triangulate whether issues
+    are due to the instrumentation (logs not getting written to the Open Telemetry library)
+    or due to the wiring (e.g. failure to export to Cloud Logging).
+    """
     if not _in_debug_mode():
         return
     logger_provider.add_log_record_processor(SimpleLogRecordProcessor(ConsoleLogExporter()))
@@ -163,7 +205,8 @@ def _configure_logger_provider_debugging(logger_provider):
 # [START setup_cloud_trace_snippet]
 
 # Wire up Open Telemetry's trace APIs to talk to Cloud Trace.
-def _setup_cloud_trace(resource, otlp_creds):
+def _setup_cloud_trace(resource: Resource, otlp_creds: grpc.ChannelCredentials) -> None:
+    """Configures Open Telemetry to route spans to Cloud Trace."""
     tracer_provider = TracerProvider(resource=resource)
     tracer_provider.add_span_processor(
         BatchSpanProcessor(OTLPSpanExporter(credentials=otlp_creds))
@@ -177,7 +220,8 @@ def _setup_cloud_trace(resource, otlp_creds):
 # [START setup_cloud_monitoring_snippet]
 
 # Wire up Open Telemetry's metric APIs to talk to Cloud Monitoring.
-def _setup_cloud_monitoring(project_id, resource):
+def _setup_cloud_monitoring(project_id: str, resource: Resource) -> None:
+    """Configures Open Telemetry to route metrics to Cloud Monitoring."""
     metrics.set_meter_provider(
         MeterProvider(
             metric_readers=[
@@ -197,7 +241,8 @@ def _setup_cloud_monitoring(project_id, resource):
 # [START setup_cloud_logging_snippet]
 
 # Wire up Open Telemetry's logging APIs to talk to Cloud Logging.
-def _setup_cloud_logging(project_id, resource):
+def _setup_cloud_logging(project_id: str, resource: Resource) -> None:
+    """Configures Open Telemetry to route logs and events to Cloud Logging."""
     # Set up the OTel "LoggerProvider" API
     logger_provider = LoggerProvider(resource=resource)
     exporter = CloudLoggingExporter(
@@ -219,7 +264,8 @@ def _setup_cloud_logging(project_id, resource):
 
 # [START setup_otel_to_gcp_wiring_snippet]
 
-def setup_otel_to_gcp_wiring():
+def setup_otel_to_gcp_wiring() -> None:
+    """Configures Open Telemetry to route telemetry to Cloud Observability."""
     project_id = _get_project_id()
     resource = _create_resource(project_id)
     otlp_creds = _create_otlp_creds()
