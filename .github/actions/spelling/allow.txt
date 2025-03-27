@@ -782,6 +782,7 @@ idk
 idks
 idxs
 ience
+ifconfig
 ifidx
 iinfo
 iloc
