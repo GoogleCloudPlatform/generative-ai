@@ -295,6 +295,7 @@ Nominatim
 ODb
 OLAP
 OOTB
+OTLP
 Ohashi
 Ohtani
 Olgivanna
@@ -305,7 +306,6 @@ Onone
 Oort
 Orbelians
 Orus
-OTLP
 PBA
 PDEs
 PDFs
