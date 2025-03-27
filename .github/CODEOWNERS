@@ -17,9 +17,9 @@
 /generative-ai/gemini/getting-started                       @gericdong @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/rag-engine                            @edtsoi430 @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/reasoning-engine                      @koverholt @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/reasoning-engine/tutorial_alloydb_rag_agent.ipynb @averikitsch
-/generative-ai/gemini/reasoning-engine/tutorial_cloud_sql_pg_rag_agent.ipynb @averikitsch
+/generative-ai/gemini/agent-engine                          @koverholt @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/agent-engine/tutorial_alloydb_rag_agent.ipynb @averikitsch
+/generative-ai/gemini/agent-engine/tutorial_cloud_sql_pg_rag_agent.ipynb @averikitsch
 /generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/photo-discovery           @kazunori279 @KhanhNwin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
@@ -78,10 +78,12 @@
 /generative-ai/open-models/serving/vertex_ai_text_generation_inference_gemma.ipynb  @alvarobartt @philschmid @pagezyhf @jeffboudier
 /generative-ai/gemini/use-cases/applying-llms-to-data/semantic-search-in-bigquery/stackoverflow_questions_semantic_search.ipynb     @sethijaideep @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/raw_with_bigquery.ipynb @jeffonelson @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/sample-apps/e2e-gen-ai-app-starter-pack       @eliasecchig @lspatarog @mariagpuyol @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases/hey_llm                     @tushuhei @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/llamaindex-rag/backend/indexing/ @Lionel-Lim @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/multimodal-live-api/websocket-demo-app/ @ZackAkil @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/sample-apps/genai-mlops-tune-and-eval                       @willisc7 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/multimodal-sentiment-analysis/intro_to_multimodal_sentiment_analysis.ipynb                      @Mansari
 /generative-ai/gemini/use-cases/productivity/productivity_coaching_with_google_calendar_and_gmail.ipynb                      @Mansari
+/generative-ai/open-models/serving/cloud_run_ollama_gemma3_inference.ipynb     @vladkol @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb     @vladkol @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/open-models/serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb @rsamborski @GoogleCloudPlatform/generative-ai-devrel
