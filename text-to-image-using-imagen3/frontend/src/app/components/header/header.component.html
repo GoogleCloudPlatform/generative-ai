@@ -7,10 +7,6 @@
     <div class="left-heading" [matTooltip]="'Home'" [routerLink]="'/'">
       <span class="logo-text gradient-text">{{ headerTitle }}</span>
     </div>
-    <!-- <app-chat-input
-      (emitSearch)="this.searchTerm($event)"
-      *ngIf="this.isSearchRoute()"
-    ></app-chat-input> -->
     <div class="right-menu-items">
       <div
         *ngIf="authService.isUserLoggedIn()"

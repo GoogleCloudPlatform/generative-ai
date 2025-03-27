@@ -1,25 +1,28 @@
 <app-header (emitSearch)="this.searchTerm({ term: $event })"></app-header>
 
-<mat-grid-list cols="4" rowHeight="100px">
-  <mat-grid-tile class="header-image-generation" [colspan]="4" [rowspan]="1" [style.background]="'#DDE6F6'">
-    <h1 class="mat-h1 custom-heading">Image Generation</h1>
-  </mat-grid-tile>
-  <mat-grid-tile class="image-grid" [colspan]="3" [rowspan]="10" [style.background]="'white'" rowHeight= "80px">
-    <div class="image-generation-container">
-      <div class="image-preview">
-        <div class="main-image">
-          <div class="main-image-placeholder">
-            <img src="data:image/png;base64,{{ selectedResult?.image?.encodedImage || '' }}"
-              *ngIf="!showDefaultDocuments && documents.length > 0" />
-            <img src="{{ pagedDocuments[0]?.image?.encodedImage }}" *ngIf="showDefaultDocuments" />
+<div class="grid grid-cols-4 gap-0">
+  <div class="col-span-4 bg-custom-gray p-4">
+    <h1 class="text-2xl font-bold m-0">Image Generation</h1>
+  </div>
+  <div class="col-span-3 bg-white p-4">
+    <div class="flex flex-col items-center justify-center">
+      <div class="flex flex-col items-center justify-center w-full">
+        <div class="flex justify-center w-full">
+          <div class="w-full bg-light-gray">
+            <img [src]="'data:image/png;base64,' + (selectedResult?.image?.encodedImage || '')"
+              *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full h-[50vh] object-contain" />
+            <img [src]="pagedDocuments[0]?.image?.encodedImage" *ngIf="showDefaultDocuments"
+              class="w-full h-[50vh] object-contain" />
           </div>
         </div>
-        <div class="thumbnail-container">
-          <div class="thumbnail" *ngFor="let result of pagedDocuments" (click)="changeImageSelection(result)">
-            <div class="thumbnail-placeholder">
-              <img src="data:image/png;base64,{{ result.image.encodedImage }}"
-                *ngIf="!showDefaultDocuments && documents.length > 0" />
-              <img src="{{ result.image.encodedImage }}" *ngIf="showDefaultDocuments" />
+        <div class="flex justify-center mt-5 mb-5">
+          <div class="w-24 h-24 mx-2 cursor-pointer" *ngFor="let result of pagedDocuments"
+            (click)="changeImageSelection(result)">
+            <div class="w-full h-full bg-lighter-gray">
+              <img [src]="'data:image/png;base64,' + result.image.encodedImage"
+                *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full h-full object-contain" />
+              <img [src]="result.image.encodedImage" *ngIf="showDefaultDocuments"
+                class="w-full h-full object-contain" />
             </div>
           </div>
         </div>
@@ -28,11 +31,11 @@
         </div>
       </div>
     </div>
-  </mat-grid-tile>
-  <mat-grid-tile [colspan]="1" [rowspan]="10" [style.background]="'white'">
-    <div class="configuration">
-      <h2>Configuration</h2>
-      <mat-form-field>
+  </div>
+  <div class="col-span-1 bg-white p-5">
+    <div class="flex flex-col">
+      <h2 class="text-xl font-semibold mb-4">Configuration</h2>
+      <mat-form-field class="w-full">
         <mat-label>AI Model</mat-label>
         <mat-select [(value)]="selectedModel">
           <mat-option *ngFor="let model of imagen3ModelsList" [value]="model.value" (click)="changeImagen3Model(model)">
@@ -41,29 +44,29 @@
         </mat-select>
       </mat-form-field>
 
-      <h3>Aspect Ratio</h3>
-      <div class="aspect-ratio">
-        <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button class="aspect-button"
-          (click)="changeAspectRatio(ratio)">
+      <h3 class="text-lg font-medium mt-4">Aspect Ratio</h3>
+      <div class="mb-5">
+        <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button
+          class="aspect-button mx-2 mb-2" (click)="changeAspectRatio(ratio)">
           {{ ratio?.value }}
         </button>
       </div>
 
-      <h3>Image Style</h3>
-      <div class="image-style">
-        <button mat-raised-button class="style-button">Modern</button>
-        <button mat-raised-button class="style-button">Realistic</button>
-        <button mat-raised-button class="style-button">Vintage</button>
-        <button mat-raised-button class="style-button">Monochrome</button>
-        <button mat-raised-button class="style-button">Fantasy</button>
+      <h3 class="text-lg font-medium mt-4">Image Style</h3>
+      <div class="mb-5">
+        <button mat-raised-button class="style-button mx-2 mb-2">Modern</button>
+        <button mat-raised-button class="style-button mx-2 mb-2">Realistic</button>
+        <button mat-raised-button class="style-button mx-2 mb-2">Vintage</button>
+        <button mat-raised-button class="style-button mx-2 mb-2">Monochrome</button>
+        <button mat-raised-button class="style-button mx-2 mb-2">Fantasy</button>
       </div>
 
-      <div class="number-results">
-        <mat-label style="padding-right: 1rem">Number of Results</mat-label>
+      <div class="flex items-center">
+        <mat-label class="mr-4">Number of Results</mat-label>
         <mat-slider min="1" max="10" step="1" value="2" discrete>
           <input matSliderThumb>
         </mat-slider>
       </div>
     </div>
-  </mat-grid-tile>
-</mat-grid-list>
+  </div>
+</div>
