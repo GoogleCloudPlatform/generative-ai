@@ -35,7 +35,7 @@ def use_google_genai_sdk() -> None:
 
 def main() -> None:
     """Main program entrypoint.
-    
+
     This does the following:
 
       1. Loads relevant configuration, including

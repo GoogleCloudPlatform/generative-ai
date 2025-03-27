@@ -239,8 +239,8 @@ def _setup_cloud_monitoring(project_id: str, resource: Resource) -> None:
 
 # [END setup_cloud_monitoring_snippet]
 
-# [START setup_cloud_logging_snippet]
 
+# [START setup_cloud_logging_snippet]
 # Wire up Open Telemetry's logging APIs to talk to Cloud Logging.
 def _setup_cloud_logging(project_id: str, resource: Resource) -> None:
     """Configures Open Telemetry to route logs and events to Cloud Logging."""
