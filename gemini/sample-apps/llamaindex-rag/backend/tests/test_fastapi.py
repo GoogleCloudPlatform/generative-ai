@@ -24,7 +24,7 @@ query_rag_params = [
         "query": "What were Google's Q1 Earnings?",
         "evaluate_response": True,
         "eval_model_name": "gemini-1.5-flash",
-        "embedding_model_name": "text-embedding-004",
+        "embedding_model_name": "text-embedding-005",
     }
 ]
 
@@ -46,7 +46,7 @@ eval_batch_params = [
         "use_node_rerank": False,
         "use_react": False,
         "eval_model_name": "gemini-1.5-flash",
-        "embedding_model_name": "text-embedding-004",
+        "embedding_model_name": "text-embedding-005",
         "input_eval_dataset_bucket_uri": "rag-llm-bucket/test_ground_truth.csv",
         "bq_eval_results_table_id": "eval_results.eval_results_table",
         "ragas_metrics": ["faithfulness", "answer_relevancy"],

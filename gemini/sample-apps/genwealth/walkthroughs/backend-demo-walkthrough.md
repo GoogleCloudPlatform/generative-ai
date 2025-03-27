@@ -159,7 +159,7 @@ It's time to build your Gen AI Features! As a reminder, you are a SQL Developer 
 
 Today, Financial Analysts use a simple Query Builder interface like the one shown below to search through investments using basic keywords. The interface sends a SQL query to the database and returns basic and sometimes unreliable results.
 
-You will leverage AlloyDB AI's vector similarity search capabilities to enhance this experience with semantic search powered by the Google PaLM Gen AI [textembedding-gecko](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) model in Vertex AI.
+You will leverage AlloyDB AI's vector similarity search capabilities to enhance this experience with semantic search powered by the Google PaLM Gen AI [text-embedding-005](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) model in Vertex AI.
 
 ![Query Builder](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/11-querybuilder.png "Query Builder")
 
