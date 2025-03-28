@@ -1256,4 +1256,7 @@ Gemini
 VTT
 vertexai
 Part
+inputvtt
+vtt
+WEBVTT
 
