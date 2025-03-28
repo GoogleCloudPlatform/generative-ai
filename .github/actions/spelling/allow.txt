@@ -296,6 +296,7 @@ Nominatim
 ODb
 OLAP
 OOTB
+OTLP
 Ohashi
 Ohtani
 Olgivanna
@@ -960,6 +961,7 @@ opsz
 osm
 oss
 osx
+otlp
 outdir
 outro
 overwiew
