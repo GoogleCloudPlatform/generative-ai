@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { NgFor, PathLocationStrategy } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
@@ -24,6 +24,12 @@ import { ChatbarComponent } from './components/main/chat/chatbar/chatbar.compone
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LoginComponent } from './components/login/login.component';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import {
+  provideAnalytics,
+  getAnalytics,
+  ScreenTrackingService,
+  UserTrackingService,
+} from '@angular/fire/analytics';
 import { environment } from '../environments/environment';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { MatMenuModule } from '@angular/material/menu';
@@ -46,8 +52,8 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SuggestionCardComponent } from './components/elements/suggestion-card/suggestion-card.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import {NgIdleModule} from '@ng-idle/core';
-import {ClipboardModule} from '@angular/cdk/clipboard';
+import { NgIdleModule } from '@ng-idle/core';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 import 'prismjs';
 import 'prismjs/components/prism-typescript.min.js';
@@ -60,7 +66,7 @@ import { ManageIntentComponent } from './components/manage-intent/manage-intent.
 import { MatSliderModule } from '@angular/material/slider';
 import { MatStepperModule } from '@angular/material/stepper';
 import { IntentFormComponent } from './components/manage-intent/intent-form/intent-form.component';
-import { CreateIntentFormComponent } from './components/manage-intent/create-intent-form/create-intent-form.component'
+import { CreateIntentFormComponent } from './components/manage-intent/create-intent-form/create-intent-form.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +82,7 @@ import { CreateIntentFormComponent } from './components/manage-intent/create-int
     DialogueBoxComponent,
     ManageIntentComponent,
     IntentFormComponent,
-    CreateIntentFormComponent
+    CreateIntentFormComponent,
   ],
   imports: [
     BrowserModule,
@@ -117,13 +123,29 @@ import { CreateIntentFormComponent } from './components/manage-intent/create-int
     MatButtonToggleModule,
     MatSidenavModule,
     MatAutocompleteModule,
-    environment.requiredLogin == "True" ? [provideFirebaseApp(() => initializeApp(environment.firebase)), provideAuth(() => getAuth())] : [],
+    environment.requiredLogin == 'True'
+      ? [
+          provideFirebaseApp(() => initializeApp(environment.firebase)),
+          provideAuth(() => getAuth()),
+        ]
+      : [],
+    environment.requiredLogin == 'True'
+      ? [provideAnalytics(() => getAnalytics())]
+      : [],
     FlexLayoutModule,
     NgIdleModule.forRoot(),
     ClipboardModule,
     MatStepperModule,
   ],
-  providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: LocationStrategy, useClass: PathLocationStrategy },
+    environment.requiredLogin == 'True'
+      ? [
+          ScreenTrackingService, // Automatically track screen views
+          UserTrackingService, // Automatically track user interactions
+        ]
+      : [],
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

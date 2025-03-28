@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { NgFor, PathLocationStrategy } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
@@ -22,6 +22,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LoginComponent } from './components/login/login.component';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import {
+  provideAnalytics,
+  getAnalytics,
+  ScreenTrackingService,
+  UserTrackingService,
+} from '@angular/fire/analytics';
 import { environment } from '../environments/environment';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { MatMenuModule } from '@angular/material/menu';
@@ -43,10 +49,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import {NgIdleModule} from '@ng-idle/core';
-import {ClipboardModule} from '@angular/cdk/clipboard';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-
+import { NgIdleModule } from '@ng-idle/core';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import 'prismjs';
 import 'prismjs/components/prism-typescript.min.js';
@@ -113,14 +118,30 @@ import { SearchApplicationFormComponent } from './components/search-application/
     MatButtonToggleModule,
     MatSidenavModule,
     MatAutocompleteModule,
-    environment.requiredLogin == "True" ? [provideFirebaseApp(() => initializeApp(environment.firebase)), provideAuth(() => getAuth())] : [],
+    environment.requiredLogin == 'True'
+      ? [
+          provideFirebaseApp(() => initializeApp(environment.firebase)),
+          provideAuth(() => getAuth()),
+        ]
+      : [],
+    environment.requiredLogin == 'True'
+      ? [provideAnalytics(() => getAnalytics())]
+      : [],
     FlexLayoutModule,
     NgIdleModule.forRoot(),
     ClipboardModule,
     MatStepperModule,
-    MatProgressBarModule
+    MatProgressBarModule,
   ],
-  providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: LocationStrategy, useClass: PathLocationStrategy },
+    environment.requiredLogin == 'True'
+      ? [
+          ScreenTrackingService, // Automatically track screen views
+          UserTrackingService, // Automatically track user interactions
+        ]
+      : [],
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

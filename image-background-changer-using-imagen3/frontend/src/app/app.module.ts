@@ -22,6 +22,12 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {LoginComponent} from './components/login/login.component';
 import {initializeApp, provideFirebaseApp} from '@angular/fire/app';
+import {
+  provideAnalytics,
+  getAnalytics,
+  ScreenTrackingService,
+  UserTrackingService,
+} from '@angular/fire/analytics';
 import {environment} from '../environments/environment';
 import {provideAuth, getAuth} from '@angular/fire/auth';
 import {MatMenuModule} from '@angular/material/menu';
@@ -38,7 +44,10 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableModule} from '@angular/material/table';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatButtonToggle, MatButtonToggleModule} from '@angular/material/button-toggle';
+import {
+  MatButtonToggle,
+  MatButtonToggleModule,
+} from '@angular/material/button-toggle';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
@@ -113,11 +122,14 @@ import {BackgroundChangerInputComponent} from './components/background-changer-i
     MatButtonToggleModule,
     MatSidenavModule,
     MatAutocompleteModule,
-    environment.requiredLogin === 'True'
+    environment.requiredLogin == 'True'
       ? [
           provideFirebaseApp(() => initializeApp(environment.firebase)),
           provideAuth(() => getAuth()),
         ]
+      : [],
+    environment.requiredLogin == 'True'
+      ? [provideAnalytics(() => getAnalytics())]
       : [],
     FlexLayoutModule,
     NgIdleModule.forRoot(),
@@ -126,7 +138,15 @@ import {BackgroundChangerInputComponent} from './components/background-changer-i
     MatProgressBarModule,
     PdfViewerModule,
   ],
-  providers: [{provide: LocationStrategy, useClass: PathLocationStrategy}],
+  providers: [
+    {provide: LocationStrategy, useClass: PathLocationStrategy},
+    environment.requiredLogin == 'True'
+      ? [
+          ScreenTrackingService, // Automatically track screen views
+          UserTrackingService, // Automatically track user interactions
+        ]
+      : [],
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
