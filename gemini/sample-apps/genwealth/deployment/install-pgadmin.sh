@@ -53,7 +53,7 @@ EOF
 )
 echo $sql | PGPASSWORD=${ALLOYDB_PASSWORD} psql -h "${ALLOYDB_IP}" -U postgres -d ragdemos
 
-# Register textembedding-gecko embedding model
+# Register text-embedding-005 embedding model
 sql=$(
   cat <<EOF
 CALL google_ml.create_model (

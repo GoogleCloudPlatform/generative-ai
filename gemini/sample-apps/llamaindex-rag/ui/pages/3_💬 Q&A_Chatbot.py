@@ -90,7 +90,7 @@ def query_fastapi(
         "hybrid_retrieval": hybrid_retrieval,
         "evaluate_response": evaluate_response,
         "eval_model_name": "gemini-1.5-flash",
-        "embedding_model_name": "text-embedding-004",
+        "embedding_model_name": "text-embedding-005",
     }
     headers = {"accept": "application/json", "Content-Type": "application/json"}
 
