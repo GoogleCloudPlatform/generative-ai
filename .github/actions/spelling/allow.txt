@@ -1252,3 +1252,8 @@ yticks
 zakarid
 zaxis
 zimie
+Gemini
+VTT
+vertexai
+Part
+
