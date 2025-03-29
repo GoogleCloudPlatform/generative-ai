@@ -2,7 +2,7 @@
   {
     "origin": [
       "http://localhost:3000",
-      "https://CHANGEME.hosted.app"
+      "https://CHANGE-ME.hosted.app"
     ],
     "method": ["GET"],
     "responseHeader": ["Content-Type"],
