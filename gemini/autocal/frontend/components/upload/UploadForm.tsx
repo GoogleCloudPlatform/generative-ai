@@ -18,7 +18,11 @@
 import Button from "@mui/material/Button";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { styled } from "@mui/material/styles";
-import { clientFirestore, firebaseAuth, firebaseStorage } from "@/libs/firebase/client/clientApp";
+import {
+  clientFirestore,
+  firebaseAuth,
+  firebaseStorage,
+} from "@/libs/firebase/client/clientApp";
 import { doc, runTransaction } from "firebase/firestore";
 import { Status } from "../context/StatusContext";
 import { ref, uploadString } from "firebase/storage";
@@ -49,14 +53,21 @@ export default function UploadForm() {
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const { status, id, setError, screenshot, setScreenshot } = Status();
   const [user, userLoading] = useAuthState(firebaseAuth);
+  const [fileKey, setFileKey] = useState<Date | null>();
 
   const disabled = loading || userLoading;
 
   async function upload() {
     try {
       setLoading(true);
+
+      // Clear the current file selection so the same item can be re-uploaded
+      setFileKey(new Date());
+
       if (!user || !user.email) {
-        setError("You must be logged in with a valid email address to upload a screenshot");
+        setError(
+          "You must be logged in with a valid email address to upload a screenshot"
+        );
         return;
       }
       if (!screenshot) {
@@ -84,8 +95,14 @@ export default function UploadForm() {
         ...status,
       };
 
-      const screenshotDocRef = doc(clientFirestore, "screenshots", docId).withConverter(screenshotUploadConverter);
-      const uploadDocRef = doc(clientFirestore, "state", docId).withConverter(processedScreenshotConverter);
+      const screenshotDocRef = doc(
+        clientFirestore,
+        "screenshots",
+        docId
+      ).withConverter(screenshotUploadConverter);
+      const uploadDocRef = doc(clientFirestore, "state", docId).withConverter(
+        processedScreenshotConverter
+      );
       // Run as a transaction to update both collections at the same time
       await runTransaction(clientFirestore, async (transaction) => {
         transaction.set(screenshotDocRef, screenshotUpload);
@@ -107,7 +124,9 @@ export default function UploadForm() {
         return;
       }
       if (!user || !user.email) {
-        setError("You must be logged in with a valid email address to upload a screenshot");
+        setError(
+          "You must be logged in with a valid email address to upload a screenshot"
+        );
         return;
       }
       const file = files[0];
@@ -125,7 +144,11 @@ export default function UploadForm() {
 
   return (
     <>
-      <Preview open={showPreview} handleClose={() => setShowPreview(false)} upload={upload} />
+      <Preview
+        open={showPreview}
+        handleClose={() => setShowPreview(false)}
+        upload={upload}
+      />
       <Button
         component="label"
         role={undefined}
@@ -134,10 +157,14 @@ export default function UploadForm() {
         endIcon={<AutoAwesomeIcon />}
         disabled={disabled}
         loading={loading}
-        sx={{ mt: 2 }}
-      >
+        sx={{ mt: 2 }}>
         Process Screenshot with Gemini
-        <VisuallyHiddenInput type="file" onChange={(event) => preview(event.target.files)} multiple={false} />
+        <VisuallyHiddenInput
+          type="file"
+          key={fileKey?.toString() || ""}
+          onChange={(event) => preview(event.target.files)}
+          multiple={false}
+        />
       </Button>
     </>
   );

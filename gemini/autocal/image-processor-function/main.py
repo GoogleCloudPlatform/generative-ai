@@ -48,7 +48,13 @@ import functions_framework
 from cloudevents.http import CloudEvent
 from google.events.cloud import firestore as firestoredata
 from google import genai
-from google.api_core.exceptions import GoogleAPICallError
+from google.api_core.exceptions import (
+    GoogleAPICallError,
+    InvalidArgument,
+    PermissionDenied,
+    NotFound,
+    ResourceExhausted,
+)
 from google.genai.types import (
     GenerateContentConfig,
     Part,
@@ -138,17 +144,54 @@ def image_processor(cloud_event: CloudEvent) -> None:
 
     # Format the prompt with the current date and time
     prompt = PROMPT_TEMPLATE.format(current_datetime=current_datetime)
-
-    response = client.models.generate_content(
-        model=MODEL_ID,
-        contents=[
-            Part.from_uri(file_uri=gcs_url, mime_type=mime_type),
-            prompt,
-        ],
-        config=GenerateContentConfig(
-            response_mime_type="application/json", response_schema=response_schema
-        ),
-    )
+    try:
+        response = client.models.generate_content(
+            model=MODEL_ID,
+            contents=[
+                Part.from_uri(file_uri=gcs_url, mime_type=mime_type),
+                prompt,
+            ],
+            config=GenerateContentConfig(
+                response_mime_type="application/json", response_schema=response_schema
+            ),
+        )
+    except (InvalidArgument, PermissionDenied, NotFound, ResourceExhausted) as e:
+        # Handle Gemini API errors
+        print(f"Gemini API error: {e}")
+        doc_ref = db.collection("state").document(document_id)
+        firestore_document = {"error": True, "message": f"Gemini API error: {e}"}
+        doc_ref.set(firestore_document, merge=True)
+        raise e
+    except ValueError as e:
+        # Handle file/URI issues
+        print(f"Invalid file URI or MIME type: {e}")
+        doc_ref = db.collection("state").document(document_id)
+        firestore_document = {
+            "error": True,
+            "message": f"Invalid file URI or MIME type: {e}",
+        }
+        doc_ref.set(firestore_document, merge=True)
+        raise e
+    except GoogleAPICallError as e:
+        # Handle other Google API errors
+        print(f"General Google API error: {e}")
+        doc_ref = db.collection("state").document(document_id)
+        firestore_document = {
+            "error": True,
+            "message": f"General Google API error: {e}",
+        }
+        doc_ref.set(firestore_document, merge=True)
+        raise e
+    except Exception as e:
+        # Catch any other unexpected errors
+        print(f"An unexpected error occurred: {e}")
+        doc_ref = db.collection("state").document(document_id)
+        firestore_document = {
+            "error": True,
+            "message": f"An unexpected error occurred: {e}",
+        }
+        doc_ref.set(firestore_document, merge=True)
+        raise e
 
     print(f"Raw Gemini Response: {response.text}")
     event_data = json.loads(response.text)

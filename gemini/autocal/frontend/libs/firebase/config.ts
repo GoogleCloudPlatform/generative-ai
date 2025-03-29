@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-"use strict";
-"use client";
+/*
+Replace this with your Firebase config. Don't forget to include the export keyword.
+*/
 
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
-import { getFirestore } from "firebase/firestore";
-import { firebaseConfig } from "@/libs/firebase/config";
-
-export const firebaseApp =
-  getApps().length === 0
-    ? initializeApp(firebaseConfig)
-    : getApps()[0];
-export const firebaseAuth = getAuth(firebaseApp);
-export const firebaseStorage = getStorage(firebaseApp);
-export const clientFirestore = getFirestore(firebaseApp);
+export const firebaseConfig = {
+  apiKey: "AIzaSyDYvf_kZcvo0ktBx8LjUQo3RKXFaCksl4U",
+  authDomain: "autocal-448710.firebaseapp.com",
+  projectId: "autocal-448710",
+  storageBucket: "autocal-448710-assets-bu84",
+  messagingSenderId: "406699036396",
+  appId: "1:406699036396:web:eb9f5e2b8ffa9457871fc9",
+  measurementId: "G-B9EK3RGL1S",
+};

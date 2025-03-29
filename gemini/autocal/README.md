@@ -67,13 +67,33 @@ firebase apphosting:secrets:set CLIENT_SECRET --project "${PROJECT_ID}"
 firebase apphosting:secrets:set ENCRYPTION_KEY --project "${PROJECT_ID}"
 ```
 
-#### Part 3 - Deploy the App to Firebase App Hosting
+#### Part 3 - Configure Firebase
+
+You will need to update [frontend/libs/firebase/config.ts](frontend/libs/firebase/config.ts) to reflect your configuration, which you can find in [the Firebase console](https://console.firebase.google.com/) under Settings, "Your Apps".
+
+For example:
+
+```ts
+export const firebaseConfig = {
+  apiKey: "xxxx",
+  authDomain: "xxxx",
+  projectId: "xxxx",
+  storageBucket: "xxxx",
+  messagingSenderId: "xxxx",
+  appId: "xxxx",
+  measurementId: "xxxx",
+};
+```
+
+**Important:** Ensure the `export` keyword is there.
+
+#### Part 4 - Deploy the App to Firebase App Hosting
 
 ```sh
 firebase apphosting:backends:create --project "${PROJECT_ID}" --location europe-west4
 ```
 
-#### Part 4 - CORS Configuration
+#### Part 5 - CORS Configuration
 
 Finally, Google Cloud Storage uses [CORS](https://cloud.google.com/storage/docs/using-cors) to protect assets.
 

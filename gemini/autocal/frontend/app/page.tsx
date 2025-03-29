@@ -17,7 +17,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { clientFirestore, firebaseAuth } from "@/libs/firebase/client/clientApp";
+import {
+  clientFirestore,
+  firebaseAuth,
+} from "@/libs/firebase/client/clientApp";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
@@ -31,7 +34,9 @@ import { Status } from "@/components/context/StatusContext";
 import UploadForm from "@/components/upload/UploadForm";
 
 // Lazy load upload processor
-const UploadProcessor = dynamic(() => import("@/components/upload/UploadProgress"));
+const UploadProcessor = dynamic(
+  () => import("@/components/upload/UploadProgress")
+);
 const EditCalendar = dynamic(() => import("@/components/upload/EditCalendar"));
 
 export default function Home() {
@@ -46,7 +51,9 @@ export default function Home() {
       if (id && user?.email) {
         console.log(`Listening on ${user.email}-${id}`);
         const unsubscribe = onSnapshot(
-          doc(clientFirestore, "state", `${user.email}-${id}`).withConverter(processedScreenshotConverter),
+          doc(clientFirestore, "state", `${user.email}-${id}`).withConverter(
+            processedScreenshotConverter
+          ),
           (doc) => {
             if (doc.data()) {
               setStatus(doc.data()!);
@@ -79,20 +86,21 @@ export default function Home() {
           bgcolor: "background.paper",
           color: "foreground.paper",
           p: 4,
-        }}
-      >
+        }}>
         {/* <Typography variant="h2">Save Time</Typography> */}
         <Typography variant="body1">
           Upload your screenshot below and watch the magic of{" "}
           <Link
             href="https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2"
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             Gemini 2.0
           </Link>{" "}
           add it to your calendar! Powered by{" "}
-          <Link href="https://firebase.google.com/docs/app-hosting" target="_blank" rel="noopener noreferrer">
+          <Link
+            href="https://firebase.google.com/docs/app-hosting"
+            target="_blank"
+            rel="noopener noreferrer">
             Firebase App Hosting
           </Link>
           .
@@ -105,6 +113,15 @@ export default function Home() {
         )}
         {status && screenshot && !status.processed && <UploadProcessor />}
         {status && status.processed && !status.error && <EditCalendar />}
+        {status && status.error && (
+          <Alert severity="error" sx={{ m: 2 }}>
+            <AlertTitle>Image Processing Error</AlertTitle>
+            <>
+              {status.message ||
+                `An unknown error occurred processing this image`}
+            </>
+          </Alert>
+        )}
 
         <UploadForm />
       </Box>
