@@ -25,4 +25,4 @@ options:
   logging: CLOUD_LOGGING_ONLY
 substitutions:
   _SERVICE_NAME: image-processor
-  _ROOT_DIR: services/image-processor
+  _ROOT_DIR: image-processor-function

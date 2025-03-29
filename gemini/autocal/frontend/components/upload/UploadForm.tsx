@@ -30,7 +30,6 @@ import {
 } from "@/libs/schema/schema";
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { firebaseConfig } from "@/libs/firebase/config";
 import Preview from "./Preview";
 
 const VisuallyHiddenInput = styled("input")({
@@ -75,7 +74,7 @@ export default function UploadForm() {
       // Payload to save
       const screenshotUpload: ScreenshotUpload = {
         ID: docId,
-        image: `gs://${firebaseConfig.storageBucket}/${filePath}`,
+        image: `gs://${firebaseStorage.app.options.storageBucket}/${filePath}`,
         type: screenshot.type,
       };
       status.active = true;

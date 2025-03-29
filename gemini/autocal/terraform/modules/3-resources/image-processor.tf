@@ -14,7 +14,7 @@ data "archive_file" "image_processor" {
   output_path      = "${path.root}/resources/artifacts/image-processor.zip"
   output_file_mode = "0666"
 
-  source_dir = "${path.root}/../services/image-processor"
+  source_dir = "${path.root}/../image-processor-function"
 
   excludes = [
     ".env",

@@ -8,7 +8,7 @@ env:
   # https://console.cloud.google.com/apis/credentials
   # This can be saved in source control:
   - variable: NEXT_PUBLIC_CLIENT_ID
-    value: "406699036396-repomqrvvupcs9vrijfv5rh1e4u370vk.apps.googleusercontent.com"
+    value: "CHANGEME"
     availability:
       - BUILD
       - RUNTIME

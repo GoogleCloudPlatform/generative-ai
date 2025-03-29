@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-export const firebaseConfig = {
-  apiKey: "xxxx",
-  authDomain: "xxxx",
-  projectId: "xxxx",
-  storageBucket: "xxxx",
-  messagingSenderId: "xxxx",
-  appId: "xxxx",
-  measurementId: "xxxx",
-};
+"use strict";
+"use client";
+
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
+import { getFirestore } from "firebase/firestore";
+
+export const firebaseApp =
+  getApps().length === 0 ? initializeApp() : getApps()[0];
+export const firebaseAuth = getAuth(firebaseApp);
+export const firebaseStorage = getStorage(firebaseApp);
+export const clientFirestore = getFirestore(firebaseApp);

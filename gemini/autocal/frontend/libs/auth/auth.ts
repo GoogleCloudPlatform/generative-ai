@@ -19,7 +19,6 @@
 import { OAuth2Client } from "google-auth-library";
 import crypto from "crypto";
 import { Firestore, Timestamp } from "firebase-admin/firestore";
-import { firebaseConfig } from "../firebase/config";
 import { cookies } from "next/headers";
 import { GetAccessTokenResponse } from "google-auth-library/build/src/auth/oauth2client";
 
@@ -38,7 +37,6 @@ if (!process.env.ENCRYPTION_KEY) {
 
 // Init Firestore
 const db = new Firestore({
-  projectId: firebaseConfig.projectId,
   databaseId: "(default)",
 });
 

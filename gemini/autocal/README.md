@@ -6,26 +6,18 @@
 
 Screenshot to Calendar Magic with Gemini 2.0 Flash
 
-![AutoCal Preview](complete.webp)
+![Screenshot Preview](images/complete.webp)
 
 AutoCal is a web application that leverages the power of Gemini 2.0 Flash to automatically extract event information from screenshots and add them to your calendar. It simplifies the process of scheduling by eliminating the need for manual data entry.
 
+The app is event driven, using Firestore triggers to invoke Gemini 2.0 Flash in the backend, and snapshot listeners to update the frontend UI. It is designed to show the scalable combination of Python and Javascript to build a high-scale web app.
+
+![App Architecture](images/architecture.webp)
+
 ## Project Structure
 
-There are two versions of Autocal:
-
-- [v1 - A streamlit app](apps/autocal-legacy/) - this is a standalone application
-- **v2** - A Next.js and Python app - this comprises of a number of services:
-  1. [Auth Blocking](services/auth-blocking/) - to control access to the app
-  2. [Frontend UI](apps/autocal/) - a Next.js / MUI frontend for the user to interact with
-  3. [Backend Image Processor](services/image-processor/) - a Python Cloud Function to process and handle images
-
-## v2 Features
-
-- **Async Screenshot Processing:** Upload a screenshot of a schedule or event list and have it asynchronously processed in the background
-- **Gemini 2.0 Integration:** Uses Gemini 2.0 Flash to intelligently parse and understand the event details within the screenshot.
-- **Automatic Event Extraction:** Extracts key information like event name, date, time, and location.
-- **Calendar Integration:** The extracted information is added to your calendar
+1. [frontend/](frontend) - a Next.js / MUI frontend for the user to interact with
+2. [image-processor-function/](image-processor-function/) - a Python Cloud Function to process and handle images
 
 ## Getting Started
 
@@ -37,54 +29,37 @@ You will require a Google Cloud Project with billing enabled to use this app.
 
 #### Part 1 - Run Terraform
 
-Terraform will provision much of the underlying infrastructure and dependencies required by both v1 and v2 of this app.
+Terraform will provision much of the underlying infrastructure and dependencies.
 
 The `terraform` directory includes all of the steps you will need to provision the infrastructure and app.
 
 See [terraform/README.md](terraform/README.md) for instructions on how to do this.
 
-#### Part 2 - Configure Auth
+#### Part 2 - Configure The App
 
-You will need to create an OAuth 2 application in the Google Cloud console. You can do so here in the [Credentials](https://console.cloud.google.com/apis/credentials) page. Take a note of the `Client ID` and `Client Secret`.
+You will need to create an OAuth 2 Web application in the Google Cloud console. You can do so here in the [Credentials](https://console.cloud.google.com/apis/credentials) page under "OAuth 2.0 Client IDs".
 
-You will also need to create a 32-character secret key for use in Firestore to encrypt user sessions. This should be kept secret.
+You will also need to create a 32-character secret key for use in Firestore to encrypt user sessions. You can generate this with OpenSSL if you have it:
 
-Take a note of these for the [Deploying section](#part-4---deploy-the-app-to-firebase-app-hosting) below.
-
-Once created, you can edit the `.env` file in the autocal app directory.
-
-```sh
-cp .env.example .env
-# Make edits to .env as needed
-npm install
-npm run dev
+```bash
+openssl rand -hex 16
 ```
 
-#### Part 3 - Coinfigure Firebase
+| Field                   | Requirement                                             |
+| ----------------------- | ------------------------------------------------------- |
+| `CLIENT_SECRET`         | The Client Secret from your OAuth 2.0 Web Application.  |
+| `NEXT_PUBLIC_CLIENT_ID` | The Client ID from your OAuth 2.0 Web Application       |
+| `ENCRYPTION_KEY`        | A 32-character string used to encrypt data in Firestore |
 
-You will need to update [apps/autocal/libs/firebase/config.ts](apps/autocal/libs/firebase/config.ts) to reflect your configuration, which you can find in [the Firebase console](https://console.firebase.google.com/) under Settings, "Your Apps".
+You can then configure Firebase App Hosting.
 
-For example:
+##### Update apphosting.yaml
 
-```ts
-export const firebaseConfig = {
-  apiKey: "xxxx",
-  authDomain: "xxxx",
-  projectId: "xxxx",
-  storageBucket: "xxxx",
-  messagingSenderId: "xxxx",
-  appId: "xxxx",
-  measurementId: "xxxx",
-};
-```
+Change `NEXT_PUBLIC_CLIENT_ID` to the value from above.
 
-**Important:** Ensure the `export` keyword is there.
+##### Deploy Secrets
 
-#### Part 4 - Deploy the App to Firebase App Hosting
-
-Once setup, you can deploy the app using the following instructions.
-
-First supply your CLIENT_SECRET and ENCRYPTION_KEY secrets to Firebase App Hosting (you should have configured these in [Setup](#setup):
+The Client Secret and Encryption key should not be stored in files or checked into source control. Instead, use App Hosting's CLI to deploy them to secret manager
 
 ```sh
 export PROJECT_ID=PROJECT_ID
@@ -92,14 +67,14 @@ firebase apphosting:secrets:set CLIENT_SECRET --project "${PROJECT_ID}"
 firebase apphosting:secrets:set ENCRYPTION_KEY --project "${PROJECT_ID}"
 ```
 
-Then edit [apphosting.yaml](apphosting.yaml) and change your `NEXT_PUBLIC_CLIENT_ID` to the correct value.
-
-Finally. create the hosting backend:
+#### Part 3 - Deploy the App to Firebase App Hosting
 
 ```sh
 firebase apphosting:backends:create --project "${PROJECT_ID}" --location europe-west4
 ```
 
-#### Part 5 - CORS Configuration
+#### Part 4 - CORS Configuration
 
-Finally, Google Cloud Storage uses [CORS](https://cloud.google.com/storage/docs/using-cors) to protect assets. To update the configuration, take a note of your application URL created with Terraform and update [utils/cors/cors.json](utils/cors/cors.json). Then run the [cors.sh](utils/cors/cors.sh) script with the name of your firebase config bucket in the environment variable `BUCKET_NAME`.
+Finally, Google Cloud Storage uses [CORS](https://cloud.google.com/storage/docs/using-cors) to protect assets.
+
+To update the configuration, take a note of your application URL created with Terraform and update [utils/cors/cors.json](utils/cors/cors.json). Then run the [cors.sh](utils/cors/cors.sh) script with the name of your firebase config bucket in the environment variable `BUCKET_NAME`.
