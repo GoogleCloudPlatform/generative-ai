@@ -22,7 +22,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import FormGroup from "@mui/material/FormGroup";
 import TextField from "@mui/material/TextField";
 import { Status } from "../context/StatusContext";
-import Grid from "@mui/material/Grid2";
+import Grid from '@mui/material/Grid';
 import { useState } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
