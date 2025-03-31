@@ -62,7 +62,7 @@ safety_config = [
         threshold=HarmBlockThreshold.BLOCK_NONE,
     ),
 ]
-embedding_model = VertexTextEmbedding("text-embedding-004", credentials=credentials)
+embedding_model = VertexTextEmbedding("text-embedding-005", credentials=credentials)
 llm = Vertex(
     model="gemini-2.0-flash",
     temperature=0.2,
