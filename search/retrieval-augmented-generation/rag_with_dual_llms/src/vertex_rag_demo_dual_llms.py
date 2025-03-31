@@ -278,6 +278,9 @@ def initialize_models() -> Tuple[List[str], List[str]]:
     except requests.exceptions.RequestException as e:
         st.error(f"Ollama connection failed: {e}")
         logging.error(f"Ollama connection failed: {e}")
+    except requests.exceptions.RequestException as e:
+         st.error(f"Ollama connection failed: {e}")
+         logging.error(f"Ollama connection failed: {e}")
     except Exception as e:
          st.error(f"Error processing Ollama response: {e}")
          logging.error(f"Error processing Ollama response: {e}")
