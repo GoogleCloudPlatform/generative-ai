@@ -120,10 +120,10 @@ public class FixMyCarBackendController {
         + " Use the following grounding data as context. This came from the relevant vehicle"
         + " owner's manual: "
         + vectorSearchResults;
-    logger.info("🔮 Gemini Prompt: " + geminiPrompt);
+    logger.info("🔮 Geminimpt: " + geminiPrompt);
 
     String geminiLocation = "us-central1";
-    String modelName = "gemini-1.5-flash";
+    String modelName = "gemini-2.0-flash";
     try {
       VertexAI vertexAI = new VertexAI(projectId, geminiLocation);
       GenerateContentResponse response;
