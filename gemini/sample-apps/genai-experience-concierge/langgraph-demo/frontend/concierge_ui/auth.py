@@ -1,0 +1,68 @@
+# Copyright 2025 Google. This software is provided as-is, without warranty or
+# representation for any use or purpose. Your use of it is subject to your
+# agreement with Google.
+
+from google import auth
+from google.auth import compute_engine
+from google.auth.transport import requests
+from google.auth import impersonated_credentials
+
+from concierge_ui import settings
+
+
+def get_auth_headers(agent_config: settings.RemoteAgentConfig) -> dict[str, str]:
+    if not agent_config.fetch_id_token:
+        return {}
+
+    target_audience = f"{agent_config.base_url.scheme}://{agent_config.base_url.host}"
+
+    if agent_config.target_principal:
+        token = fetch_impersonated_id_token_credentials(
+            target_audience=target_audience,
+            target_principal=agent_config.target_principal,
+        ).token
+    else:
+        token = fetch_gce_id_token_credentials(target_audience=target_audience).token
+
+    headers = {"Authorization": f"Bearer {token}"}
+
+    return headers
+
+
+def fetch_gce_id_token_credentials(
+    target_audience: str | None = None,
+) -> compute_engine.IDTokenCredentials:
+    request = requests.Request()
+    creds = compute_engine.IDTokenCredentials(
+        request,
+        target_audience=target_audience,
+        use_metadata_identity_endpoint=True,
+    )
+    creds.refresh(request)
+
+    return creds
+
+
+def fetch_impersonated_id_token_credentials(
+    target_principal: str,
+    target_audience: str | None = None,
+) -> impersonated_credentials.IDTokenCredentials:
+    request = requests.Request()
+
+    source_credentials, _ = auth.default()
+    source_credentials.refresh(request)
+
+    target_credentials = impersonated_credentials.Credentials(
+        source_credentials=source_credentials,
+        target_principal=target_principal,
+        target_scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    )
+    target_credentials.refresh(request)
+
+    token_credentials = impersonated_credentials.IDTokenCredentials(
+        target_credentials=target_credentials,
+        target_audience=target_audience,
+    )
+    token_credentials.refresh(request)
+
+    return token_credentials
