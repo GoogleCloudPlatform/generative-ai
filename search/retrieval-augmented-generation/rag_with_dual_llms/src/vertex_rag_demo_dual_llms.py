@@ -105,6 +105,9 @@ def load_text_file(filename: str) -> Optional[str]:
     except Exception as e:
         logging.error(f"An unexpected error occurred loading {filename}: {e}")
         st.error("An unexpected error occurred loading a required file.")
+    except Exception as e:
+        logging.error(f"An unexpected error occurred loading {filename}: {e}")
+        st.error("An unexpected error occurred loading a required file.")
     return ""
 
 
