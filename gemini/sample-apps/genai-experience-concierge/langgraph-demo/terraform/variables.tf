@@ -28,12 +28,12 @@ variable "app_engine_users" {
 
 variable "org_id" {
   type     = string
-  nullable = true
+  default  = null
 }
 
 variable "folder_id" {
   type     = string
-  nullable = true
+  default  = null
 }
 
 variable "project_name" {
