@@ -144,13 +144,3 @@ Some development notebooks are provided to interactively test both the local imp
 
 * [notebooks/langgraph-agent.ipynb](./notebooks/langgraph-agent.ipynb): Build and compile a simple LangGraph graph, wrap it in a `LangGraphAgent` running locally within the notebook, display the graph visualization, and run some simple tests.
 * [notebooks/langgraph-remote-agent.ipynb](./notebooks/langgraph-remote-agent.ipynb): Query a remote instance of the "Gemini Chat" example agent server (either at localhost or a deployed endpoint). Display a visualization of the remote graph and run some simple tests.
-
-## License
-
-Copyright 2025 Google. This software is provided as-is, without warranty or
-representation for any use or purpose. Your use of it is subject to your
-agreement with Google.
-
-## Disclaimer
-
-This project is an example and may require further customization for production use.

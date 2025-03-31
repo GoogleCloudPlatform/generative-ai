@@ -123,3 +123,23 @@ Now that the seed project and configuration has been created, the demo can be de
 ```bash
 uv run --frozen concierge -f $CONFIG_YAML_FILE langgraph deploy
 ```
+
+## Authors
+
+[Enrique Chan](mailto:enriq@google.com): Project Lead
+
+[Pablo Gaeta](mailto:pablogaeta@google.com): Engineer Lead
+
+[Afshaan Mazagonwalla](mailto:afshaanmaz@google.com): Engineer
+
+[Aadila Jasmin](mailto:aadilajasmin@google.com): Engineer
+
+[Ahmad Khan](mailto:ahmadkh@google.com): Engineer
+
+## Contributing
+
+Contributions welcome! If you have any feedback or suggestions of agent design patterns to implement, please reach out to [genai-experience-concierge@google.com](mailto:genai-experience-concierge@google.com). See also the repo [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/CONTRIBUTING.md).
+
+## Disclaimer
+
+This demo is not an officially supported Google product. The code in this repository is for demonstrative purposes only.

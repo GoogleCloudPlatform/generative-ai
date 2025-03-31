@@ -65,13 +65,3 @@ The Streamlit demo code is located at `concierge_ui` and is composed of:
 * `demo_page.py`: A utility module for building the common layout and functionality of the agent demo pages.
 * `settings.py`: Configuration settings for the Streamlit application, including backend server URLs.
 * `auth.py`: Handles authentication with the backend server. It supports fetching Google Auth ID tokens from the GCE Metadata server or impersonating a service account to retrieve ID tokens.
-
-## License
-
-Copyright 2025 Google. This software is provided as-is, without warranty or
-representation for any use or purpose. Your use of it is subject to your
-agreement with Google.
-
-## Disclaimer
-
-This project is an example and may require further customization for production use.
