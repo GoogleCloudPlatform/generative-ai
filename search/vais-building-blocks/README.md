@@ -19,8 +19,7 @@ We will try to use REST APIs which will hopefully make the codes easier to
 understand without a need to read through documentations of different object
 types. For production use, many customer prefer Client libraries. Please consult
 
-the [official documentation](https://cloud.google.com/generative-ai-app-
-builder/docs/apis) for alternative ways of achieving the same goals.
+The [official documentation](https://cloud.google.com/generative-ai-app-builder/docs/apis) for alternative ways of achieving the same goals.
 
 ## List of Notebooks
 1. [Ingestion of Unstructured Documents with Metadata in Vertex AI Search]
