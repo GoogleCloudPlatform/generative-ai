@@ -19,7 +19,7 @@ This demo highlights AlloyDB AI's integration with [Vertex AI LLMs](https://clou
 The GenWealth demo application was built using:
 
 - [AlloyDB for PostgreSQL](https://cloud.google.com/alloydb?hl=en) 14+
-- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([gemini-2.0-flash-001](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini), [textembeddings-gecko@003](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) and [text-bison@002](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text))
+- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([gemini-2.0-flash-001](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini), [textembeddings-gecko@003](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings)
 - Vertex AI [Agent Builder](https://cloud.google.com/products/agent-builder?hl=en)
 - [Document AI](https://cloud.google.com/document-ai?hl=en) (OCR processor)
 - [Cloud Run](https://cloud.google.com/run?hl=en) (2nd generation)
