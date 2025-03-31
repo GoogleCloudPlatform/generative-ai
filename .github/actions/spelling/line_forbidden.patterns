@@ -324,3 +324,6 @@
 
 # Don't use embedded images, upload to Google Cloud Storage
 data:image/(?:jpeg|png);base64,[^{]
+
+# Don't use Gemini 1.X
+gemini-1\.[05]
