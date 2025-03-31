@@ -110,6 +110,7 @@ Eragon
 Esin
 Eventarc
 FAISS
+fastmcp
 FIA
 FILEFLAGS
 FILEOS
@@ -144,6 +145,7 @@ Gmb
 GmbH
 Godzilla
 Graterol
+gridpoint
 Gundogan
 HBox
 HDFC
@@ -442,6 +444,7 @@ Urs
 Usain
 Uszkoreit
 Utik
+uvx
 VAPO
 VFT
 VLM
