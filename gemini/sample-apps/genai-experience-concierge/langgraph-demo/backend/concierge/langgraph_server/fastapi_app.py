@@ -2,14 +2,13 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from typing import Any, AsyncIterator, Sequence, Union, Optional, TypeVar
-
-import fastapi
-import pydantic
-from fastapi import responses
-from langgraph_sdk import schema
+from typing import Any, AsyncIterator, Optional, Sequence, TypeVar, Union
 
 from concierge.langgraph_server import schemas
+import fastapi
+from fastapi import responses
+from langgraph_sdk import schema
+import pydantic
 
 _T = TypeVar("_T")
 

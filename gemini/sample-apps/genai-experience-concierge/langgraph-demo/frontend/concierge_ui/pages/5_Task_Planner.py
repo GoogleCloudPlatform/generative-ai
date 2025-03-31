@@ -2,9 +2,8 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+from concierge_ui import auth, demo_page, settings
 from langgraph.pregel import remote
-
-from concierge_ui import settings, demo_page, auth
 
 config = settings.RemoteAgentConfigs().task_planner
 

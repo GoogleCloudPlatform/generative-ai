@@ -2,11 +2,10 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+from concierge.agents.task_planner import schemas, utils
 from google import genai  # type: ignore[import-untyped]
 from google.genai import types as genai_types  # type: ignore[import-untyped]
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
-
-from concierge.agents.task_planner import schemas, utils
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 
 @retry(

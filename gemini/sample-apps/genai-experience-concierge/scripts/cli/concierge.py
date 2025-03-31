@@ -3,9 +3,8 @@
 # agreement with Google.
 
 import click
-import yaml
-
 from scripts.cli import langgraph_demo
+import yaml
 
 
 @click.group(help="GenAI Experience Concierge demo tool.")

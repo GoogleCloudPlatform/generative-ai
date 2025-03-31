@@ -3,14 +3,13 @@
 # agreement with Google.
 
 import aiosqlite
-import psycopg
-import psycopg_pool
-from psycopg.rows import DictRow
+from concierge.langgraph_server import schemas
 from langgraph.checkpoint import base, memory
 from langgraph.checkpoint.postgres import aio as postgres_aio
 from langgraph.checkpoint.sqlite import aio as sqlite_aio
-
-from concierge.langgraph_server import schemas
+import psycopg
+from psycopg.rows import DictRow
+import psycopg_pool
 
 
 def load_checkpointer(

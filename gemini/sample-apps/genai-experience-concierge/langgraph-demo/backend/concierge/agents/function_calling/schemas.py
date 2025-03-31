@@ -2,13 +2,12 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-import uuid
 import datetime
-from typing import Optional, Literal, TypedDict
+from typing import Literal, Optional, TypedDict
+import uuid
 
-import pydantic
 from google.genai import types as genai_types  # type: ignore[import-untyped]
-
+import pydantic
 
 # Agent config settings
 

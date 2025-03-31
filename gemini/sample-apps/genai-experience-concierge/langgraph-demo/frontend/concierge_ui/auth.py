@@ -2,12 +2,10 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from google import auth
-from google.auth import compute_engine
-from google.auth.transport import requests
-from google.auth import impersonated_credentials
-
 from concierge_ui import settings
+from google import auth
+from google.auth import compute_engine, impersonated_credentials
+from google.auth.transport import requests
 
 
 def get_auth_headers(agent_config: settings.RemoteAgentConfig) -> dict[str, str]:

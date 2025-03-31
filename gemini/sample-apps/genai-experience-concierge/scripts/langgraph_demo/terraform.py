@@ -5,7 +5,6 @@
 import json
 import subprocess
 
-
 from scripts.langgraph_demo import defaults
 
 

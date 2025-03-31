@@ -3,16 +3,10 @@
 # agreement with Google.
 
 import uuid
-import click
-import yaml
 
-from scripts.langgraph_demo import (
-    backend,
-    dataset,
-    frontend,
-    terraform,
-    defaults,
-)
+import click
+from scripts.langgraph_demo import backend, dataset, defaults, frontend, terraform
+import yaml
 
 
 @click.option(

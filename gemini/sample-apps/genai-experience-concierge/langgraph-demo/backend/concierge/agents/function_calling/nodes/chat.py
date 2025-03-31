@@ -4,19 +4,18 @@
 
 import logging
 
-from langgraph import types as lg_types
-from langgraph.config import get_stream_writer
-from langchain_core.runnables import config as lc_config
-from google import genai  # type: ignore[import-untyped]
-from google.genai import types as genai_types  # type: ignore[import-untyped]
-
 from concierge.agents.function_calling import schemas
-from concierge.agents.function_calling.utils import streaming
 from concierge.agents.function_calling.tools import (
+    find_inventory,
     find_products,
     find_stores,
-    find_inventory,
 )
+from concierge.agents.function_calling.utils import streaming
+from google import genai  # type: ignore[import-untyped]
+from google.genai import types as genai_types  # type: ignore[import-untyped]
+from langchain_core.runnables import config as lc_config
+from langgraph import types as lg_types
+from langgraph.config import get_stream_writer
 
 logger = logging.getLogger(__name__)
 

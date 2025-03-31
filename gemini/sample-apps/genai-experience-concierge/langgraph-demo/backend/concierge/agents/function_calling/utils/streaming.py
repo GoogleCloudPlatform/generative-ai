@@ -2,14 +2,14 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-import inspect
 import asyncio
+import inspect
 import logging
-from typing import Callable, Mapping, Any, AsyncIterator, AsyncGenerator, Awaitable
+from typing import Any, AsyncGenerator, AsyncIterator, Awaitable, Callable, Mapping
 
-import pydantic
 from google import genai  # type: ignore[import-untyped]
 from google.genai import types as genai_types  # type: ignore[import-untyped]
+import pydantic
 
 logger = logging.getLogger(__name__)
 
@@ -45,12 +45,12 @@ async def generate_content_stream(
         logger.warning("Maximum depth reached, stopping generation.")
         return
 
-    response: AsyncIterator[
-        genai_types.GenerateContentResponse
-    ] = await client.aio.models.generate_content_stream(
-        model=model,
-        contents=contents,
-        config=config,
+    response: AsyncIterator[genai_types.GenerateContentResponse] = (
+        await client.aio.models.generate_content_stream(
+            model=model,
+            contents=contents,
+            config=config,
+        )
     )
 
     # iterate over chunk in main request

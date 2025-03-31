@@ -2,9 +2,8 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from google.cloud import bigquery
-
 from concierge.agents.function_calling import schemas
+from google.cloud import bigquery
 
 
 def generate_find_inventory_handler(

@@ -3,9 +3,9 @@
 # agreement with Google.
 
 import json
-from langgraph.pregel import remote
 
-from concierge_ui import settings, demo_page, auth
+from concierge_ui import auth, demo_page, settings
+from langgraph.pregel import remote
 
 config = settings.RemoteAgentConfigs().function_calling
 

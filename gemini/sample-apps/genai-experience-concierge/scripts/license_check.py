@@ -2,10 +2,10 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-import re
-import sys
 import argparse
+import re
 import subprocess
+import sys
 
 _TF_FILE_PATTERN = r".*\.tf$"
 _PY_FILE_PATTERN = r".*\.py$"

@@ -4,17 +4,16 @@
 
 import contextlib
 
-import fastapi
-
 from concierge import settings
-from concierge.langgraph_server import langgraph_agent, fastapi_app
 from concierge.agents import (
+    function_calling,
     gemini_chat,
     gemini_chat_with_guardrails,
     semantic_router,
-    function_calling,
     task_planner,
 )
+from concierge.langgraph_server import fastapi_app, langgraph_agent
+import fastapi
 
 # Build compiled LangGraph agents with optional checkpointer based on config
 

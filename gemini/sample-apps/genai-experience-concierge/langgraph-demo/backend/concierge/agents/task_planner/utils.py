@@ -2,9 +2,8 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-import requests  # type: ignore[import-untyped]
-
 from google.genai import errors as genai_errors  # type: ignore[import-untyped]
+import requests  # type: ignore[import-untyped]
 
 
 def is_retryable_error(exception: BaseException) -> bool:

@@ -5,13 +5,12 @@
 import logging
 from typing import AsyncIterator
 
-from langgraph import types as lg_types
-from langgraph.config import get_stream_writer
-from langchain_core.runnables import config as lc_config
+from concierge.agents.gemini_chat_with_guardrails import schemas
 from google import genai  # type: ignore[import-untyped]
 from google.genai import types as genai_types  # type: ignore[import-untyped]
-
-from concierge.agents.gemini_chat_with_guardrails import schemas
+from langchain_core.runnables import config as lc_config
+from langgraph import types as lg_types
+from langgraph.config import get_stream_writer
 
 logger = logging.getLogger(__name__)
 
@@ -69,17 +68,17 @@ async def ainvoke(
 
     try:
         # generate streaming response
-        response: AsyncIterator[
-            genai_types.GenerateContentResponse
-        ] = await client.aio.models.generate_content_stream(
-            model=agent_config.chat_model_name,
-            contents=contents,
-            config=genai_types.GenerateContentConfig(
-                candidate_count=1,
-                temperature=0.2,
-                seed=0,
-                system_instruction=CHAT_SYSTEM_PROMPT,
-            ),
+        response: AsyncIterator[genai_types.GenerateContentResponse] = (
+            await client.aio.models.generate_content_stream(
+                model=agent_config.chat_model_name,
+                contents=contents,
+                config=genai_types.GenerateContentConfig(
+                    candidate_count=1,
+                    temperature=0.2,
+                    seed=0,
+                    system_instruction=CHAT_SYSTEM_PROMPT,
+                ),
+            )
         )
 
         # stream response text to custom stream writer

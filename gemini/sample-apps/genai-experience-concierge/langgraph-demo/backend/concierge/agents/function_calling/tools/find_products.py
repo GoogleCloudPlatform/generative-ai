@@ -4,9 +4,8 @@
 
 from typing import Optional
 
-from google.cloud import bigquery
-
 from concierge.agents.function_calling import schemas
+from google.cloud import bigquery
 
 MAX_PRODUCT_RESULTS = 10
 
@@ -64,12 +63,7 @@ def generate_find_products_handler(
             ProductSearchResult: The return value. Object including top matched products and/or an error message.
         """
 
-        nonlocal \
-            project, \
-            cymbal_dataset_location, \
-            cymbal_products_table_uri, \
-            cymbal_inventory_table_uri, \
-            cymbal_embedding_model_uri
+        nonlocal project, cymbal_dataset_location, cymbal_products_table_uri, cymbal_inventory_table_uri, cymbal_embedding_model_uri
 
         if max_results >= MAX_PRODUCT_RESULTS:
             print(

@@ -2,7 +2,7 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from concierge.agents.task_planner.graph import load_graph, FINAL_NODE
+from concierge.agents.task_planner.graph import FINAL_NODE, load_graph
 from concierge.agents.task_planner.schemas import AgentConfig
 
 __all__ = ["load_graph", "FINAL_NODE", "AgentConfig"]

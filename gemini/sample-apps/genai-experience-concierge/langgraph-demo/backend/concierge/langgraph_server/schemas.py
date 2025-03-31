@@ -2,11 +2,11 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from typing import Any, Optional, Union, Protocol, AsyncIterator, Sequence, Literal
+from typing import Any, AsyncIterator, Literal, Optional, Protocol, Sequence, Union
 
-import pydantic
-from langgraph_sdk import schema
 from langgraph.checkpoint.serde.base import SerializerProtocol
+from langgraph_sdk import schema
+import pydantic
 
 
 class MemoryBackendConfig(pydantic.BaseModel):

@@ -4,12 +4,11 @@
 
 import json
 import subprocess
-from typing import Callable, TypeVar, TypedDict
+from typing import Callable, TypedDict, TypeVar
 
-from scripts.langgraph_demo import defaults
-
-from google.cloud import bigquery
 from google.api_core import exceptions, retry
+from google.cloud import bigquery
+from scripts.langgraph_demo import defaults
 
 connection_permission_retry_config = retry.Retry(
     predicate=lambda exc: isinstance(exc, subprocess.CalledProcessError),

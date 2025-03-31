@@ -2,13 +2,12 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-import uuid
 import logging
 from typing import Generator, Protocol
-
-import streamlit as st
+import uuid
 
 from concierge_ui import settings
+import streamlit as st
 
 logger = logging.getLogger(__name__)
 

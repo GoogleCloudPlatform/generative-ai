@@ -2,18 +2,16 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-import pydantic
-import pydantic_settings
-
-from concierge.langgraph_server import schemas
-
 from concierge.agents import (
+    function_calling,
     gemini_chat,
     gemini_chat_with_guardrails,
-    function_calling,
     semantic_router,
     task_planner,
 )
+from concierge.langgraph_server import schemas
+import pydantic
+import pydantic_settings
 
 
 class AgentServerConfig(pydantic_settings.BaseSettings):

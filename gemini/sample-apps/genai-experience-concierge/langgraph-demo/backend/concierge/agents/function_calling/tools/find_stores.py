@@ -4,10 +4,9 @@
 
 from typing import Optional
 
-from thefuzz import fuzz  # type: ignore[import-untyped]
-from google.cloud import bigquery
-
 from concierge.agents.function_calling import schemas
+from google.cloud import bigquery
+from thefuzz import fuzz  # type: ignore[import-untyped]
 
 MAX_STORE_RESULTS = 10
 STORE_NAME_SIMILARITY_THRESHOLD = 90
@@ -65,13 +64,7 @@ def generate_find_stores_handler(
             StoreSearchResult: The return value. Object including top matched stores and/or an error message.
         """
 
-        nonlocal \
-            project, \
-            cymbal_dataset_location, \
-            cymbal_stores_table_uri, \
-            cymbal_inventory_table_uri, \
-            user_latitude, \
-            user_longitude
+        nonlocal project, cymbal_dataset_location, cymbal_stores_table_uri, cymbal_inventory_table_uri, user_latitude, user_longitude
 
         query_parameters = list[
             bigquery.ScalarQueryParameter | bigquery.ArrayQueryParameter
@@ -178,7 +171,9 @@ def generate_find_stores_handler(
                 or fuzz.partial_ratio(row["name"], store_name)
                 >= STORE_NAME_SIMILARITY_THRESHOLD
             )
-        ][:max_results]  # filter max results
+        ][
+            :max_results
+        ]  # filter max results
 
         return schemas.StoreSearchResult(stores=stores, query=query)
 
