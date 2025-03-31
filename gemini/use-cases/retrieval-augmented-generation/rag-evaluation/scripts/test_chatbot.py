@@ -26,7 +26,7 @@ safety_settings = {
 
 # Initialize the ChatVertexAI model
 custom_model_gemini = ChatVertexAI(
-    model_name="gemini-1.0-pro-002",
+    model_name="gemini-2.0-flash",
     safety_settings=safety_settings,
     project=PROJECT_ID,
     location=LOCATION,
