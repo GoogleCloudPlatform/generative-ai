@@ -109,7 +109,7 @@ langgraph:
     demo_users: ["group:test@email.com"]
 
     # (Optional) state bucket prefix
-    state_bucket_prefix: demo
+    state_bucket_prefix: concierge/langgraph
     # (Optional) organization ID to create the target project
     org_id: 000000000000
     # (Optional) folder ID to create the target project
