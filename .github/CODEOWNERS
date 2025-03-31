@@ -87,3 +87,4 @@
 /generative-ai/open-models/serving/cloud_run_ollama_gemma3_inference.ipynb     @vladkol @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb     @vladkol @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/open-models/serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb @rsamborski @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/sample-apps/genai-experience-concierge                       @pablofgaeta @GoogleCloudPlatform/generative-ai-devrel
