@@ -108,9 +108,17 @@ demo_page.build_demo_page(
     title="Function Calling Agent",
     page_icon="📞",
     description="""
-This demo illustrates an agent grounded on a synthetic BigQuery dataset for a fictional retail company named Cymbal.
-Gemini utilizes functions to construct structured SQL queries to retrieve live data during the conversation.
-Gemini can additionally use semantic search to rank and filter product search results.
+This demo utilizes a collection of function declarations to search over a synthetic BigQuery dataset for a fictional company named "Cymbal Retail". The dataset contains information about products, store locations, and product-store inventory. The function declarations allow for structured query generation to enable the LLM to query the database in a secure, controlled manner. In addition to exact filtering mechanisms like setting a maximum product price or store search radius, the demo utilizes integrated BQML embedding support ([reference](https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding#text-embedding)) to re-rank results using product name/description semantic similarity.
+
+This approach can be contrasted with Natural-Language-To-SQL (NL2SQL) which can generate and execute arbitrary SQL, making it more flexible but more prone to errors and security risks ([learn more about NL2SQL](https://cloud.google.com/blog/products/data-analytics/nl2sql-with-bigquery-and-gemini)).
+
+Retail Search Assistant Use Cases:
+
+1. **Store Search:** Filter by store name, search radius, product IDs, and number of results.
+
+1. **Product Search:** Filter by store IDs, price range, number of results, and rank by product name/description.
+
+1. **Inventory Search:** for a given product-store pair.
 """.strip(),
     chat_handler=chat_handler,
     config=config,

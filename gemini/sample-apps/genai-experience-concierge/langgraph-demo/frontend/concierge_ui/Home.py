@@ -19,7 +19,7 @@ The GenAI Experience Concierge demo consists of a few chat interfaces for some l
 
 Each agent server is compatible with the [LangGraph Cloud API](langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html). Not all functionality/endpoints are supported (especially the multi-assistant endpoints). A minimal subset of endpoints required by the [langgraph_sdk.RemoteGraph](https://langchain-ai.github.io/langgraph/reference/remote_graph/) interface. The `RemoteGraph` interface is an implementation of the `PregelProtocol`, the same protocol used by `CompiledGraph` (the local LangGraph class), making usage between locally built graphs and remote server graphs seamless.
 
-Source code can be found at: [https://gitlab.com/google-pso/ais/genai/genai-experience-concierge](https://gitlab.com/google-pso/ais/genai/genai-experience-concierge)
+Source code can be found at: [https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/genai-experience-concierge](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/genai-experience-concierge)
 
 **👈 Select a demo from the sidebar** to see some examples of what the GenAI Experience Concierge can do!
 """

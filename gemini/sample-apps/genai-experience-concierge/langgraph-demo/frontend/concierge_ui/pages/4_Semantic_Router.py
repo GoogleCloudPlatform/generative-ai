@@ -70,12 +70,9 @@ demo_page.build_demo_page(
     title="Semantic Router",
     page_icon="↗️",
     description="""
-This demo illustrates a semantic router agent. The router acts as a classifier that routes to sub-agent "experts".
-The router in this example can either reject the query, route to a retail assistant, or customer service agent.
-For the purposes of this demo the experts are just calls to a Gemini model with a simple system prompt.
+This demo uses an LLM-based intent detection classifier to route each user query to either a "Retail Search" or "Customer Support" expert assistant. The experts are mocked as simple Gemini calls with a system prompt for this demo, but represent an arbitrary actor that can share session history with all other sub-agents. For example, the customer support agent might be implemented with [Contact Center as a Service](https://cloud.google.com/solutions/contact-center-ai-platform) while the retail search assistant is built with Gemini and deployed on Cloud Run.
 
-This pattern can be particularly useful if you have multiple assistants (e.g. LangGraph, CCAI, Agent Builder)
-but want to offer a unified chat interface with shared session history across each assistant.
+The semantic router layer can provide a useful facade to enable a single interface for multiple drastically different agent backends.
 """.strip(),
     chat_handler=chat_handler,
     config=config,

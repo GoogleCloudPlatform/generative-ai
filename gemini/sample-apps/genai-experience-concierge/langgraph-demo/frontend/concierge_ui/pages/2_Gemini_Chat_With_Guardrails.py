@@ -73,11 +73,13 @@ demo_page.build_demo_page(
     title="Gemini Chat With Guardrails",
     page_icon="🛡️",
     description="""
-This demo illustrates an agent building upon the Gemini Chat demo.
-A pre-processing step is added to classify a response as allowed or
-blocked before beginning generation. The classification information is streamed
-along with the answer for the purpose of this demo. In practice, this can be
-ommitted for a consumer-facing application.
+This demo illustrates a Gemini-based chatbot protected with a custom guardrail classifier.
+
+Before generating a chat response, the user input and conversation history is passed to
+a smaller, faster Gemini model which classifies the response as allowed or blocked.
+
+* If the input is blocked, a fallback response is returned to the user.
+* Otherwise, a larger Gemini model is used to generate and stream a response.
 """.strip(),
     chat_handler=chat_handler,
     config=config,

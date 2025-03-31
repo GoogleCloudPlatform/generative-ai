@@ -16,8 +16,8 @@ Clone the repo and ensure that the Google Application Default Credentials are co
 
 ```bash
 # Clone repo and navigate to project root directory
-git clone git@gitlab.com:google-pso/ais/genai/genai-experience-concierge.git
-cd genai-experience-concierge
+git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+cd gemini/sample-apps/genai-experience-concierge
 
 # Set up Google Application Default Credentials
 gcloud auth login

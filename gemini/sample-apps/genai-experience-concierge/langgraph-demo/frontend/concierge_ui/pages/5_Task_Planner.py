@@ -128,15 +128,17 @@ demo_page.build_demo_page(
     title="Task Planner",
     page_icon="📝",
     description="""
-This demo illustrates a task planner agent. The task planner is built from multiple independent agents which
-are orchestrated to perform search before answering user questions or tasks.
+The task planner design pattern (similar to ["Deep Research"](https://gemini.google/overview/deep-research)) is a multi-agent architecture useful for tasks requiring more complex reasoning, planning, and multi-tool use. The task planner is built of three core agents:
 
-The agent is composed of a planner, executor, and reflector:
-* The **planner** accepts the user query and either
-    1. Generates a research plan (a series of tasks to execute with a high-level goal)
-    2. Responds directly to ask clarifying questions or respond to simple queries.
-* The **executor** receives the research plan and executes each task in sequence. For this demo, the executor is a Gemini model with access to the Google Search tool.
-* The **reflector** receives the executed research plan and decides whether to generate a final response for the user or generating a new plan to pass to the executor.
+1. A _Planner_ that receives user input and either (1) responds directly to simple queries (e.g. "Hi") or (2) generates a research plan, including list of tasks to execute.
+
+1. An _Executor_ that receives a plan and uses its tools to perform each task and update the plan with the executed task result.
+
+1. A _Reflector_ that reviews the executed plan and either (1) generates a final response to the user or (2) generates a new plan and jumps back to step 2.
+
+This architecture is often much slower than single-agent designs because a single turn can consist of a large number of LLM calls and tool usage. This demo is particularly slow because the "Executor" agent only supports linear plans and executes each task in parallel. There is research on alternative approaches such as [LLM Compiler](https://arxiv.org/abs/2312.04511) that attempt to improve this design by constructing DAGs to enable parallel task execution.
+
+The "Executor" agent in this demo is a Gemini model equipped with the Google Search Grounding Tool ([documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/ground-with-google-search)) to enable live web search while executing tasks.
 """.strip(),
     chat_handler=chat_handler,
     config=config,
