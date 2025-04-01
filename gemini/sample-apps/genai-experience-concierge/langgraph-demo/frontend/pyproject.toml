@@ -22,4 +22,5 @@ packages = ["concierge_ui"]
 dev = [
     "ipykernel>=6.29.5",
     "ipython>=9.0.2",
+    "mypy>=1.15.0",
 ]

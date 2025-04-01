@@ -6,7 +6,7 @@ import logging
 from typing import Generator, Protocol
 import uuid
 
-from concierge_ui import settings
+from concierge_ui import remote_settings as settings
 import streamlit as st
 
 logger = logging.getLogger(__name__)

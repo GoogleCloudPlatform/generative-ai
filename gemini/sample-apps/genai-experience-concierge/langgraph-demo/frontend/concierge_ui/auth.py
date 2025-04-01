@@ -2,7 +2,7 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from concierge_ui import settings
+from concierge_ui import remote_settings as settings
 from google import auth
 from google.auth import compute_engine, impersonated_credentials
 from google.auth.transport import requests
