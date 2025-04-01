@@ -12,10 +12,10 @@ This frontend offers a convenient way to test, demo, and explore the capabilitie
 
 ### Environment Setup
 
-Clone the repo and ensure that the Google Application Default Credentials are configured. You can do this by running the following commands:
+Clone the repository and ensure that the Google Application Default Credentials are configured. You can do this by running the following commands:
 
 ```bash
-# Clone repo and navigate to project root directory
+# Clone repository and navigate to project root directory
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 cd gemini/sample-apps/genai-experience-concierge
 

@@ -15,7 +15,7 @@
 
 When building agentic applications, additional guardrails beyond built-in safety settings are often necessary to constrain the scope of interactions and avoid off-topic or adversarial queries. This demo focuses on implementing an LLM-based guardrail classifier to determine whether to answer or reject every user input.
 
-There are two main approaches during implementation that result in a tradeoff between compute cost and latency. Running the classifier sequentially before response generation results in higher latency but lower cost due to the ability to prevent the answer generation phase. Running the classifier in parallel with generation results in lower latency but higher cost, since the guardrail classifier can interrupt generation and respond quicker in the case of a blocked response.
+There are two main approaches during implementation that result in a trade-off between compute cost and latency. Running the classifier sequentially before response generation results in higher latency but lower cost due to the ability to prevent the answer generation phase. Running the classifier in parallel with generation results in lower latency but higher cost, since the guardrail classifier can interrupt generation and respond quicker in the case of a blocked response.
 
 This demo uses the first approach, but could be modified to run in parallel in case latency is critical.
 

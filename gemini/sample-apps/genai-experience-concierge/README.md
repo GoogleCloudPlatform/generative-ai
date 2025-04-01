@@ -22,10 +22,10 @@ To demonstrate the portability of this approach, the Streamlit frontend demo hos
 
 ### Environment Setup
 
-Clone the repo and ensure that the Google Application Default Credentials are configured. You can do this by running the following commands:
+Clone the repository and ensure that the Google Application Default Credentials are configured. You can do this by running the following commands:
 
 ```bash
-# Clone repo and navigate to project root directory
+# Clone repository and navigate to project root directory
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 cd gemini/sample-apps/genai-experience-concierge
 
@@ -138,7 +138,7 @@ uv run --frozen concierge -f $CONFIG_YAML_FILE langgraph deploy
 
 ## Contributing
 
-Contributions welcome! If you have any feedback or suggestions of agent design patterns to implement, please reach out to [genai-experience-concierge@google.com](mailto:genai-experience-concierge@google.com). See also the repo [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/CONTRIBUTING.md).
+Contributions welcome! If you have any feedback or suggestions of agent design patterns to implement, please reach out to [genai-experience-concierge@google.com](mailto:genai-experience-concierge@google.com). See also the repository [Contributing Guide](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/CONTRIBUTING.md).
 
 ## Disclaimer
 
