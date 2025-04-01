@@ -5,7 +5,6 @@
 locals {
   concierge_vpc_name         = "concierge-vpc"
   concierge_subnet_name      = "concierge-subnet"
-  concierge_connector_name   = "concierge-connector"
   concierge_vpc_peering_name = "concierge-vpc-peering"
 }
 
