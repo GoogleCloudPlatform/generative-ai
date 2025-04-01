@@ -1,7 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
-"""Utilites to load LangGraph checkpointers from a supported config."""
+"""Utilities to load LangGraph checkpointers from a supported config."""
 
 import aiosqlite
 from concierge.langgraph_server import schemas

@@ -68,17 +68,17 @@ async def ainvoke(
 
     try:
         # generate streaming response
-        response: AsyncIterator[genai_types.GenerateContentResponse] = (
-            await client.aio.models.generate_content_stream(
-                model=agent_config.chat_model_name,
-                contents=contents,
-                config=genai_types.GenerateContentConfig(
-                    candidate_count=1,
-                    temperature=0.2,
-                    seed=0,
-                    system_instruction=CUSTOMER_SERVICE_SYSTEM_PROMPT,
-                ),
-            )
+        response: AsyncIterator[
+            genai_types.GenerateContentResponse
+        ] = await client.aio.models.generate_content_stream(
+            model=agent_config.chat_model_name,
+            contents=contents,
+            config=genai_types.GenerateContentConfig(
+                candidate_count=1,
+                temperature=0.2,
+                seed=0,
+                system_instruction=CUSTOMER_SERVICE_SYSTEM_PROMPT,
+            ),
         )
 
         # stream response text to custom stream writer
@@ -95,7 +95,7 @@ async def ainvoke(
     except Exception as e:
         logger.exception(e)
         # unexpected error, display it
-        response_text = f"An unexpected error occured during generation, please try again.\n\nError = {str(e)}"
+        response_text = f"An unexpected error occurred during generation, please try again.\n\nError = {str(e)}"
         stream_writer({"error": response_text})
         response_content = genai_types.Content(
             role="model",

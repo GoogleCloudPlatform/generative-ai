@@ -78,9 +78,9 @@ def generate_find_stores_handler(
         AssertionError: If only one of `user_latitude` or `user_longitude` is provided.
     """
 
-    assert not (
-        (user_latitude is None) ^ (user_longitude is None)
-    ), "Lat/lng must both be defined or both null"
+    assert not ((user_latitude is None) ^ (user_longitude is None)), (
+        "Latitude and longitude must both be defined or both null"
+    )
 
     def find_stores(
         product_ids: list[str] | None = None,
@@ -101,7 +101,13 @@ def generate_find_stores_handler(
             StoreSearchResult: The return value. Object including top matched stores and/or an error message.
         """
 
-        nonlocal project, cymbal_dataset_location, cymbal_stores_table_uri, cymbal_inventory_table_uri, user_latitude, user_longitude
+        nonlocal \
+            project, \
+            cymbal_dataset_location, \
+            cymbal_stores_table_uri, \
+            cymbal_inventory_table_uri, \
+            user_latitude, \
+            user_longitude
 
         product_ids = product_ids or []
 
@@ -210,9 +216,7 @@ def generate_find_stores_handler(
                 or fuzz.partial_ratio(row["name"], store_name)
                 >= STORE_NAME_SIMILARITY_THRESHOLD
             )
-        ][
-            :max_results
-        ]  # filter max results
+        ][:max_results]  # filter max results
 
         return schemas.StoreSearchResult(stores=stores, query=query)
 

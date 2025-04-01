@@ -2,7 +2,7 @@
 
 # LangGraph Agent Backend Server
 
-This directory demonstrates how to build each of the agent design patterns and host them on a server. This is accomplished using the `langgraph_server` module to convert any LangGraph `StateGraph` object into a FastAPI router that implements a subset of the [LangGraph Cloud API](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html) required to use the RemoteGraph protocol. This enables the usage of standard LangGraph clients to build agent frontends, including graph visualization, streaming, async/sync invocation, and all of the powerful state management and time-travel features of LangGraph.
+This directory demonstrates how to build each of the agent design patterns and host them on a server. This is accomplished using the `langgraph_server` module to convert any LangGraph `StateGraph` object into a FastAPI router that implements a subset of the [LangGraph Cloud API](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html) required to use the RemoteGraph protocol. This enables the usage of standard LangGraph clients to build agent UIs, including graph visualization, streaming, async/sync invocation, and all of the powerful state management and time-travel features of LangGraph.
 
 ## Getting Started
 
@@ -94,7 +94,7 @@ Each agent's route provides endpoints for invoking the agent, managing conversat
 
 - **LangGraph for Agent Orchestration:** LangGraph is used as the core framework for defining the interaction flows between agents. It enables the creation of robust, stateful, and multi-turn conversations.
 
-- **FastAPI Integration:** The project leverages FastAPI to expose the LangGraph agents as a set of RESTful API endpoints. This makes it easy to deploy and access the agents from other applications.
+- **FastAPI Integration:** The project leverages FastAPI to expose the LangGraph agents as a set of REST API endpoints. This makes it easy to deploy and access the agents from other applications.
 
 - **Modular Design:** Each agent folder (under [concierge/agents](./concierge/agents/)) is a self-contained LangGraph agent implementation with no other assumptions about the rest of this project. This means you're free to just copy any of those folders and use it as you would with any other LangGraph agent. The one requirement that we make to enable runtime configuration is that the `AgentConfig` for each respective agent is passed during invocation to configure project, models, tables, etc. See an example for the Gemini agent below:
 
