@@ -110,7 +110,7 @@ Eragon
 Esin
 Eventarc
 FAISS
-fastmcp
+Fastmcp
 FIA
 FILEFLAGS
 FILEOS
@@ -258,7 +258,7 @@ Mamah
 Mandiri
 Masaru
 Mbappe
-mcp
+Mcp
 Meawad
 Mega
 Memegen
@@ -445,7 +445,7 @@ Urs
 Usain
 Uszkoreit
 Utik
-uvx
+UVX
 VAPO
 VFT
 VLM
@@ -688,6 +688,7 @@ evt
 expl
 faiss
 fastapi
+fastmcp
 fda
 fea
 fect
@@ -877,6 +878,7 @@ maskmode
 mavenrc
 maxcold
 mbsdk
+mcp
 mdc
 mec
 mediapy
@@ -1182,6 +1184,7 @@ usernames
 uuids
 uvb
 uvicorn
+uvx
 vais
 vapo
 vectoral
