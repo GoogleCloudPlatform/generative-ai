@@ -1,7 +1,7 @@
 [project]
 name = "genai-experience-concierge-frontend"
 version = "0.1.0"
-description = "Frontend streamlit application for the GenAI Experience Concierge. Demonstrates usage of the standard LangGraph RemoteGraph client to access the deployed agents in Cloud Run."
+description = "Frontend streamlit application for the Gen AI Experience Concierge. Demonstrates usage of the standard LangGraph RemoteGraph client to access the deployed agents in Cloud Run."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

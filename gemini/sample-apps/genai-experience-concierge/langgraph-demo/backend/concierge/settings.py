@@ -33,7 +33,7 @@ class AgentServerConfig(pydantic_settings.BaseSettings):
     # sane default values, only configure as needed
     region: str = "us-central1"
     chat_model_name: str = "gemini-2.0-flash-001"
-    function_calling_model_name: str = "gemini-1.5-pro-002"
+    function_calling_model_name: str = "gemini-2.0-flash-001"
     router_model_name: str = "gemini-2.0-flash-001"
     guardrail_model_name: str = "gemini-2.0-flash-001"
     planner_model_name: str = "gemini-2.0-flash-001"

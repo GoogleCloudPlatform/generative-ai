@@ -1,10 +1,10 @@
 <!-- markdownlint-disable MD033 -->
 
-# GenAI Experience Concierge
+# Gen AI Experience Concierge
 
 ## Introduction
 
-GenAI Experience Concierge is a collection of agent design pattern implementations. All design patterns are built using the LangGraph framework for agent orchestration and session management.
+Gen AI Experience Concierge is a collection of agent design pattern implementations. All design patterns are built using the LangGraph framework for agent orchestration and session management.
 
 For more background on each agent architecture and standalone Jupyter notebook implementations, navigate to the [agent-design-patterns/](./agent-design-patterns/) folder.
 
@@ -81,7 +81,7 @@ The end-to-end deployment tool, `concierge langgraph deploy`, will create a new 
 ### Google Cloud Architecture
 
 <div align="center" width="100%">
-  <img src="./docs/images/langgraph-architecture.png" alt="GenAI Experience Concierge LangGraph Demo Architecture" width="75%" />
+  <img src="./docs/images/langgraph-architecture.png" alt="Gen AI Experience Concierge LangGraph Demo Architecture" width="75%" />
 </div>
 
 ### Setup a seed project

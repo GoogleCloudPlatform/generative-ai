@@ -38,12 +38,12 @@ variable "folder_id" {
 
 variable "project_name" {
   type    = string
-  default = "GenAI Concierge Demo"
+  default = "Gen AI Concierge Demo"
 }
 
 variable "application_title" {
   type    = string
-  default = "GenAI Experience Concierge Demo"
+  default = "Gen AI Experience Concierge Demo"
 }
 
 variable "region" {

@@ -47,7 +47,7 @@ def create_dataset(project_id: str, location: str = "US"):
 @click.option(
     "--demo-users",
     required=True,
-    help="Members to grant access to the hosted GenAI Concierge demo. Can specify multiple times. Each entry should include the kind of member (e.g. user:*, serviceAccount:*, group:*, etc).",
+    help="Members to grant access to the hosted Gen AI Concierge demo. Can specify multiple times. Each entry should include the kind of member (e.g. user:*, serviceAccount:*, group:*, etc).",
     multiple=True,
 )
 @click.option(

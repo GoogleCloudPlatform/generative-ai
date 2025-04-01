@@ -6,8 +6,51 @@ from typing import Optional
 
 from concierge.agents.function_calling import schemas
 from google.cloud import bigquery
+from google.genai import types as genai_types
 
 MAX_PRODUCT_RESULTS = 10
+
+find_products_fd = genai_types.FunctionDeclaration(
+    response=None,
+    description="Search for products with optional semantic search queries and filters.",
+    name="find_products",
+    parameters=genai_types.Schema(
+        properties={
+            "max_results": genai_types.Schema(
+                type=genai_types.Type.INTEGER,
+                default=3,
+                description="The max number of results to be returned.",
+            ),
+            "product_search_query": genai_types.Schema(
+                type=genai_types.Type.STRING,
+                nullable=True,
+                default=None,
+                description="Product text search for semantic similarity, can utilize name, description, brand or category.",
+            ),
+            "store_ids": genai_types.Schema(
+                type=genai_types.Type.ARRAY,
+                items=genai_types.Schema(type=genai_types.Type.STRING),
+                nullable=True,
+                default=None,
+                description="List of store IDs that must carry the returned products. Only include if store IDs are already known, otherwise the store search tool may be more useful.",
+            ),
+            "min_price": genai_types.Schema(
+                type=genai_types.Type.INTEGER,
+                nullable=True,
+                default=None,
+                description="Minimum price of products in dollars",
+            ),
+            "max_price": genai_types.Schema(
+                type=genai_types.Type.INTEGER,
+                nullable=True,
+                default=None,
+                description="Maximum price of products in dollars",
+            ),
+        },
+        required=[],
+        type=genai_types.Type.OBJECT,
+    ),
+)
 
 
 def generate_find_products_handler(
@@ -45,10 +88,10 @@ def generate_find_products_handler(
 
     def find_products(
         max_results: int = 3,
-        product_search_query: Optional[str] = None,
-        store_ids: Optional[list[str]] = None,
-        min_price: Optional[int] = None,
-        max_price: Optional[int] = None,
+        product_search_query: str | None = None,
+        store_ids: list[str] | None = None,
+        min_price: int | None = None,
+        max_price: int | None = None,
     ):
         """Search for products with optional semantic search queries and filters.
 

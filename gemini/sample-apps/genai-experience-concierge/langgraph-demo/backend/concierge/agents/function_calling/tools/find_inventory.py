@@ -4,6 +4,27 @@
 
 from concierge.agents.function_calling import schemas
 from google.cloud import bigquery
+from google.genai import types as genai_types
+
+find_inventory_fd = genai_types.FunctionDeclaration(
+    response=None,
+    description="Look up the inventory query for a given product at a certain store. The product ID and store ID must be known before calling this function. If either are not known, use the other tools to first find the right store and product IDs.",
+    name="find_inventory",
+    parameters=genai_types.Schema(
+        properties={
+            "store_id": genai_types.Schema(
+                type=genai_types.Type.INTEGER,
+                description="Unique identifier of the store.",
+            ),
+            "product_id": genai_types.Schema(
+                type=genai_types.Type.STRING,
+                description="Unique identifier of the product.",
+            ),
+        },
+        required=["store_id", "product_id"],
+        type=genai_types.Type.OBJECT,
+    ),
+)
 
 
 def generate_find_inventory_handler(

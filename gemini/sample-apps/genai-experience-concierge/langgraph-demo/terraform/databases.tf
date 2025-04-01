@@ -71,7 +71,7 @@ resource "google_bigquery_dataset" "cymbal_retail_dataset" {
   project       = module.project-factory.project_id
   dataset_id    = local.cymbal_dataset_id
   friendly_name = "Cymbal Retail Mock Dataset"
-  description   = "This is a mock dataset containing fake retail data. Used for grounding a GenAI chat application."
+  description   = "This is a mock dataset containing fake retail data. Used for grounding a Gen AI chat application."
   location      = var.bigquery_dataset_location
 
   access {

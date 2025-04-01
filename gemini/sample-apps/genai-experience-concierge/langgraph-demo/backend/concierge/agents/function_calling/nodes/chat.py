@@ -4,13 +4,12 @@
 
 import logging
 
-from concierge.agents.function_calling import schemas
+from concierge.agents.function_calling import schemas, utils
 from concierge.agents.function_calling.tools import (
     find_inventory,
     find_products,
     find_stores,
 )
-from concierge.agents.function_calling.utils import streaming
 from google import genai  # type: ignore[import-untyped]
 from google.genai import types as genai_types  # type: ignore[import-untyped]
 from langchain_core.runnables import config as lc_config
@@ -94,6 +93,11 @@ async def ainvoke(
             user_latitude=user_latitude,
             user_longitude=user_longitude,
         )
+        find_stores_fd = find_stores.find_stores_fd
+        assert (
+            find_stores_fd.name is not None
+        ), "Function name must be set for automatic function calling"
+
         find_products_handler = find_products.generate_find_products_handler(
             project=agent_config.project,
             cymbal_dataset_location=agent_config.cymbal_dataset_location,
@@ -101,22 +105,35 @@ async def ainvoke(
             cymbal_inventory_table_uri=agent_config.cymbal_inventory_table_uri,
             cymbal_embedding_model_uri=agent_config.cymbal_embedding_model_uri,
         )
+        find_products_fd = find_products.find_products_fd
+        assert (
+            find_products_fd.name is not None
+        ), "Function name must be set for automatic function calling"
+
         find_inventory_handler = find_inventory.generate_find_inventory_handler(
             project=agent_config.project,
             cymbal_dataset_location=agent_config.cymbal_dataset_location,
             cymbal_inventory_table_uri=agent_config.cymbal_inventory_table_uri,
         )
+        find_inventory_fd = find_inventory.find_inventory_fd
+        assert (
+            find_inventory_fd.name is not None
+        ), "Function name must be set for automatic function calling"
 
         # generate streaming response
-        response = streaming.generate_content_stream(
+        response = utils.generate_content_stream(
             model=agent_config.chat_model_name,
             contents=contents,
             config=genai_types.GenerateContentConfig(
                 system_instruction=CHAT_SYSTEM_PROMPT,
                 tools=[
-                    find_products_handler,
-                    find_stores_handler,
-                    find_inventory_handler,
+                    genai_types.Tool(
+                        function_declarations=[
+                            find_products_fd,
+                            find_stores_fd,
+                            find_inventory_fd,
+                        ]
+                    )
                 ],
                 temperature=0.6,
                 candidate_count=1,
@@ -126,9 +143,11 @@ async def ainvoke(
                 ),
             ),
             client=client,
-            find_products=find_products_handler,
-            find_stores=find_stores_handler,
-            find_inventory=find_inventory_handler,
+            fn_map={
+                find_products_fd.name: find_products_handler,
+                find_stores_fd.name: find_stores_handler,
+                find_inventory_fd.name: find_inventory_handler,
+            },
         )
 
         async for content in response:

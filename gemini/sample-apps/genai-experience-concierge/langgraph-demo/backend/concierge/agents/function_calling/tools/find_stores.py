@@ -6,10 +6,47 @@ from typing import Optional
 
 from concierge.agents.function_calling import schemas
 from google.cloud import bigquery
+from google.genai import types as genai_types
 from thefuzz import fuzz  # type: ignore[import-untyped]
 
 MAX_STORE_RESULTS = 10
 STORE_NAME_SIMILARITY_THRESHOLD = 90
+
+find_stores_fd = genai_types.FunctionDeclaration(
+    response=None,
+    description="Search for stores nearby, by name, or offering certain products.",
+    name="find_stores",
+    parameters=genai_types.Schema(
+        properties={
+            "max_results": genai_types.Schema(
+                type=genai_types.Type.INTEGER,
+                default=3,
+                description="The max number of results to be returned.",
+            ),
+            "store_name": genai_types.Schema(
+                type=genai_types.Type.STRING,
+                nullable=True,
+                default=None,
+                description="The name (or part of a name) of a store to search for. Will try to find stores that fuzzy match this name.",
+            ),
+            "product_ids": genai_types.Schema(
+                type=genai_types.Type.ARRAY,
+                items=genai_types.Schema(type=genai_types.Type.STRING),
+                nullable=True,
+                default=None,
+                description="List of product IDs that must exist at the given store. Leave empty if there is no product ID filtering.",
+            ),
+            "radius_km": genai_types.Schema(
+                type=genai_types.Type.INTEGER,
+                nullable=True,
+                default=None,
+                description="Radius in kilometers to restrict the nearby search around the user location. The user location doesn't have to be provided in the conversation context. This function can retrieve the user location from a backend database.",
+            ),
+        },
+        required=[],
+        type=genai_types.Type.OBJECT,
+    ),
+)
 
 
 def generate_find_stores_handler(
@@ -46,11 +83,11 @@ def generate_find_stores_handler(
     ), "Lat/lng must both be defined or both null"
 
     def find_stores(
-        product_ids: list[str],
+        product_ids: list[str] | None = None,
         max_results: int = 3,
         # Note: google-genai doesn't properly handle floats, so we just set this as an integer
-        radius_km: Optional[int] = None,
-        store_name: Optional[str] = None,
+        radius_km: int | None = None,
+        store_name: str | None = None,
     ):
         """Search for stores nearby, by name, or offering certain products.
 
@@ -65,6 +102,8 @@ def generate_find_stores_handler(
         """
 
         nonlocal project, cymbal_dataset_location, cymbal_stores_table_uri, cymbal_inventory_table_uri, user_latitude, user_longitude
+
+        product_ids = product_ids or []
 
         query_parameters = list[
             bigquery.ScalarQueryParameter | bigquery.ArrayQueryParameter

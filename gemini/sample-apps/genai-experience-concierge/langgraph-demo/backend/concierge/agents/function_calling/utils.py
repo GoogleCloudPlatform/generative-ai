@@ -20,7 +20,7 @@ async def generate_content_stream(
     config: genai_types.GenerateContentConfig,
     client: genai.Client,
     max_recursion_depth: int = 3,
-    **fn_map,
+    fn_map: dict[str, Callable] | None = None,
 ) -> AsyncGenerator[genai_types.Content, None]:
     """
     Streams generated content from a Gemini model, handling function calls within the stream.
@@ -35,11 +35,13 @@ async def generate_content_stream(
         config: The GenerateContentConfig for the model.
         client: The Gemini client.
         max_recursion_depth: The maximum depth of recursive function calls to prevent infinite loops.
-        **fn_map: A mapping of function names to their corresponding callable functions.
+        fn_map: A mapping of function names to their corresponding callable functions.
 
     Yields:
         Content objects representing the generated content, including text and function call responses.
     """
+
+    fn_map = fn_map or {}
 
     if max_recursion_depth < 0:
         logger.warning("Maximum depth reached, stopping generation.")
@@ -56,7 +58,7 @@ async def generate_content_stream(
     # iterate over chunk in main request
     async for chunk in response:
         if chunk.candidates is None or chunk.candidates[0].content is None:
-            logger.warning("no candidates or content, skipping chunk")
+            logger.warning("no candidates or content, skipping chunk.")
             continue
 
         # yield current chunk content (assume only one candidate)
@@ -80,7 +82,7 @@ async def generate_content_stream(
                 func = fn_map[function_call.name]
                 kwargs = function_call.args or {}
 
-                tasks.append(asyncio.create_task(_run_function_async(func, kwargs)))
+                tasks.append(asyncio.create_task(run_function_async(func, kwargs)))
 
             fn_results = await asyncio.gather(*tasks)
 
@@ -107,12 +109,12 @@ async def generate_content_stream(
                 config=config,
                 client=client,
                 max_recursion_depth=max_recursion_depth - 1,
-                **fn_map,
+                fn_map=fn_map,
             ):
                 yield content
 
 
-async def _run_function_async(
+async def run_function_async(
     function: Callable[..., pydantic.BaseModel | Awaitable[pydantic.BaseModel]],
     function_kwargs: Mapping[str, Any],
 ):

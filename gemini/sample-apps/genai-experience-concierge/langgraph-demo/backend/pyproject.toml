@@ -1,7 +1,7 @@
 [project]
 name = "genai-experience-concierge-backend"
 version = "0.1.0"
-description = "Backend server for the GenAI Experience Concierge demo. Hosts multiple LangGraph agents based on the agent design pattern notebooks."
+description = "Backend server for the Gen AI Experience Concierge demo. Hosts multiple LangGraph agents based on the agent design pattern notebooks."
 readme = "README.md"
 requires-python = "==3.12.*"
 dependencies = [

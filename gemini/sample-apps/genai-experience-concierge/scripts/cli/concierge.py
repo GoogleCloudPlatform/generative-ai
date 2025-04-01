@@ -7,7 +7,7 @@ from scripts.cli import langgraph_demo
 import yaml
 
 
-@click.group(help="GenAI Experience Concierge demo tool.")
+@click.group(help="Gen AI Experience Concierge demo tool.")
 @click.option(
     "-f",
     "--config-file",
@@ -34,7 +34,7 @@ def langgraph_demo_group():
 
 langgraph_group = concierge.group(
     name="langgraph",
-    help="GenAI Experience Concierge demo orchestrated with LangGraph.",
+    help="Gen AI Experience Concierge demo orchestrated with LangGraph.",
 )(langgraph_demo_group)
 
 langgraph_dataset_creation_cmd = langgraph_group.command(
