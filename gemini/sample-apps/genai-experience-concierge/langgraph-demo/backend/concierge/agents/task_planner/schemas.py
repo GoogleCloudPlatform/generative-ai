@@ -97,7 +97,7 @@ class PlanOrRespond(pydantic.BaseModel):
     """The next action can either be a direct response to the user or generate a new plan if you need to think more and use tools."""
 
 
-# Langgraph models
+# LangGraph models
 
 
 class Turn(TypedDict, total=False):

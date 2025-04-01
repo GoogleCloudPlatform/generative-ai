@@ -1,5 +1,4 @@
 repos:
-
   - repo: local
     hooks:
       - id: license-check
@@ -29,7 +28,7 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff
-        args: [ --fix ]
+        args: [--fix]
       # Run the formatter.
       - id: ruff-format
 

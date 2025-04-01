@@ -149,7 +149,7 @@ class InventorySearchResult(pydantic.BaseModel):
     """Error message, if any."""
 
 
-# Langgraph models
+# LangGraph models
 
 
 class Turn(TypedDict, total=False):

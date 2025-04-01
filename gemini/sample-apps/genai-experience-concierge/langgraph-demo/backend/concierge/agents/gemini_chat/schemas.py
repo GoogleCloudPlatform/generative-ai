@@ -37,7 +37,7 @@ POST_PROCESS_NODE_TARGET_LITERAL = Literal["POST_PROCESS"]
 END_NODE_TARGET_LITERAL = Literal["__end__"]
 """Literal type for the end node target."""
 
-# Langgraph models
+# LangGraph models
 
 
 class Turn(TypedDict, total=False):

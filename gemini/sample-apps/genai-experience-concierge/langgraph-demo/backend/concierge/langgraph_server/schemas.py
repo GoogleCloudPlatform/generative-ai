@@ -16,7 +16,7 @@ class MemoryBackendConfig(pydantic.BaseModel):
 
 
 class SQLiteBackendConfig(pydantic.BaseModel):
-    """Configuration for an SQLite checkpoint backend."""
+    """Configuration for a SQLite checkpoint backend."""
 
     type: Literal["sqlite"] = "sqlite"
     connection_string: str = ":memory:"

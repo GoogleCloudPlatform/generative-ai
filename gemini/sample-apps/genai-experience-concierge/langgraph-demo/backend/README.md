@@ -2,7 +2,7 @@
 
 # LangGraph Agent Backend Server
 
-This directory demonstrates how to build each of the agent design patterns and host them on a server. This is accomplished using the `langgraph_server` module to convert any LangGraph `StateGraph` object into a FastAPI router that implements a subset of the [Langgraph Cloud API](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html) required to use the RemoteGraph protocol. This enables the usage of standard LangGraph clients to build agent frontends, including graph visualization, streaming, async/sync invocation, and all of the powerful state management and time-travel features of LangGraph.
+This directory demonstrates how to build each of the agent design patterns and host them on a server. This is accomplished using the `langgraph_server` module to convert any LangGraph `StateGraph` object into a FastAPI router that implements a subset of the [LangGraph Cloud API](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html) required to use the RemoteGraph protocol. This enables the usage of standard LangGraph clients to build agent frontends, including graph visualization, streaming, async/sync invocation, and all of the powerful state management and time-travel features of LangGraph.
 
 ## Getting Started
 

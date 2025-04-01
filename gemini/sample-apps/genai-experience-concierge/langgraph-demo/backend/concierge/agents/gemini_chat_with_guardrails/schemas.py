@@ -72,7 +72,7 @@ class RequestClassification(pydantic.BaseModel):
     """A safe message to display to the user if their request is blocked."""
 
 
-# Langgraph models
+# LangGraph models
 
 
 class Turn(TypedDict, total=False):

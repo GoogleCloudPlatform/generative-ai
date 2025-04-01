@@ -83,7 +83,7 @@ class RouterClassification(pydantic.BaseModel):
     """Configuration to specify the ordering of properties in the JSON schema."""
 
 
-# Langgraph models
+# LangGraph models
 
 
 class Turn(TypedDict, total=False):

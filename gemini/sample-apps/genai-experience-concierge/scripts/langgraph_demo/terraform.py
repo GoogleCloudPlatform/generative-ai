@@ -57,19 +57,19 @@ def apply(
     auto_approve: bool = False,
 ):
     """
-    Apply Terraform configurations to create GCP resources.
+    Apply Terraform configurations to create Google Cloud resources.
 
     This command applies the Terraform configurations defined in the specified
-    directory to create or modify GCP resources for the Concierge demo.
+    directory to create or modify Google Cloud resources for the Concierge demo.
 
     Args:
         seed_project (str): Seed project ID used when creating the demo project.
         project_id (str): Target project ID to create for the demo.
-        billing_account (str): GCP billing account ID.
+        billing_account (str): Google Cloud billing account ID.
         support_email (str): Support email for the demo OAuth screen.
         demo_users (tuple[str]): Members to grant access to the demo.
-        org_id (str, optional): GCP organization ID. Defaults to None.
-        folder_id (str, optional): GCP folder ID. Defaults to None.
+        org_id (str, optional): Google Cloud organization ID. Defaults to None.
+        folder_id (str, optional): Google Cloud folder ID. Defaults to None.
         region (str): Default region to deploy resources in. Defaults to us-central1.
         random_project_suffix (bool): Add a random suffix to the project ID. Defaults to False.
         terraform_dir (str): Path to the Terraform module directory.
