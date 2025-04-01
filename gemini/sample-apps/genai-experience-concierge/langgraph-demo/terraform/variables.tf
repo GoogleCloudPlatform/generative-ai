@@ -27,13 +27,13 @@ variable "app_engine_users" {
 # OPTIONAL
 
 variable "org_id" {
-  type     = string
-  default  = null
+  type    = string
+  default = null
 }
 
 variable "folder_id" {
-  type     = string
-  default  = null
+  type    = string
+  default = null
 }
 
 variable "project_name" {
