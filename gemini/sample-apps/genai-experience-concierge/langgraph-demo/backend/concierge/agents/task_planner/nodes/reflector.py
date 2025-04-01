@@ -77,9 +77,10 @@ async def ainvoke(
             task.result = None
 
         # Add new tasks from plan reflection
-        current_turn["plan"].tasks += plan_reflection.action.tasks
+        plan.tasks += plan_reflection.action.tasks
+        current_turn["plan"] = plan
 
-        stream_writer({"plan": current_turn["plan"].model_dump(mode="json")})
+        stream_writer({"plan": plan.model_dump(mode="json")})
 
     elif isinstance(plan_reflection.action, schemas.Response):
         next_node = schemas.POST_PROCESS_NODE_NAME

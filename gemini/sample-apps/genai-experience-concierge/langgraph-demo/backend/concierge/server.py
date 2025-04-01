@@ -4,7 +4,7 @@
 
 import contextlib
 
-from concierge import settings
+from concierge import agent_settings as settings
 from concierge.agents import (
     function_calling,
     gemini_chat,

@@ -121,7 +121,7 @@ class StoreSearchResult(pydantic.BaseModel):
 
     stores: list[Store] = []
     """List of stores matching the search criteria."""
-    query: str
+    query: Optional[str] = None
     """The search query used."""
     error: Optional[str] = None
     """Error message, if any."""
@@ -132,7 +132,7 @@ class ProductSearchResult(pydantic.BaseModel):
 
     products: list[Product] = []
     """List of products matching the search criteria."""
-    query: str
+    query: Optional[str] = None
     """The search query used."""
     error: Optional[str] = None
     """Error message, if any."""
@@ -141,9 +141,9 @@ class ProductSearchResult(pydantic.BaseModel):
 class InventorySearchResult(pydantic.BaseModel):
     """Represents the result of an inventory search."""
 
-    inventory: Inventory
+    inventory: Optional[Inventory] = None
     """The inventory information for the product in the store."""
-    query: str
+    query: Optional[str] = None
     """The search query used."""
     error: Optional[str] = None
     """Error message, if any."""

@@ -4,7 +4,7 @@
 
 from concierge.agents.function_calling import schemas
 from google.cloud import bigquery
-from google.genai import types as genai_types
+from google.genai import types as genai_types  # type: ignore[import-untyped]
 
 find_inventory_fd = genai_types.FunctionDeclaration(
     response=None,
