@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""FastAPI router for the langgraph-server package."""
 
 from typing import Any, AsyncIterator, Optional, Sequence, TypeVar, Union
 
@@ -87,7 +88,10 @@ class StatelessRunBody(pydantic.BaseModel):
     multitask_strategy: Optional[schema.MultitaskStrategy] = pydantic.Field(
         default="reject",
         examples=["reject"],
-        description="Strategy for handling concurrent requests to the same thread. Only 'reject' is currently supported.",
+        description=(
+            "Strategy for handling concurrent requests to the same thread."
+            " Only 'reject' is currently supported."
+        ),
     )
     """Strategy for handling concurrent requests to the same thread."""
 

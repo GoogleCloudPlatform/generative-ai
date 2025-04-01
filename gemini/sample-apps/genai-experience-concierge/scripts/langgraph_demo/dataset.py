@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Tools for generating a mock Cymbal Retail dataset."""
 
 import json
 import subprocess
@@ -100,18 +101,164 @@ def create(
 
     Raises:
         Exception: If any BigQuery operation fails.
-    """
-
-    dataset_uri = f"{project}.{dataset_id}"
+    """  # pylint: disable=line-too-long
 
     bq_client = bigquery.Client(project=project, location=location)
+
+    setup_dataset(
+        client=bq_client,
+        project=project,
+        location=location,
+        dataset_id=dataset_id,
+        connection_id=connection_id,
+    )
+
+    connection_uri = (
+        f"projects/{project}/locations/{location}/connections/{connection_id}"
+    )
+
+    embedding_model_uri = create_embedding_model(
+        client=bq_client,
+        project=project,
+        dataset_id=dataset_id,
+        connection_uri=connection_uri,
+        embedding_model_name=defaults.EMBEDDING_MODEL_NAME,
+    )
+
+    product_only_table_uri = f"{project}.{dataset_id}.cymbal_product_only"
+    store_table_uri = f"{project}.{dataset_id}.{defaults.STORE_TABLE_NAME}"
+    inventory_table_uri = f"{project}.{dataset_id}.{defaults.INVENTORY_TABLE_NAME}"
+    products_table_uri = f"{project}.{dataset_id}.{defaults.PRODUCT_TABLE_NAME}"
+
+    load_table_from_parquet(
+        client=bq_client,
+        table_uri=store_table_uri,
+        source_path=store_path,
+    )
+
+    load_table_from_parquet(
+        client=bq_client,
+        table_uri=inventory_table_uri,
+        source_path=inventory_path,
+    )
+
+    load_table_from_parquet(
+        client=bq_client,
+        table_uri=product_only_table_uri,
+        source_path=product_path,
+    )
+
+    create_product_table_with_embeddings(
+        client=bq_client,
+        source_table_uri=product_only_table_uri,
+        products_table_uri=products_table_uri,
+        embedding_model_uri=embedding_model_uri,
+    )
+
+    return GeneratedDataset(
+        dataset_id=dataset_id,
+        products_table_uri=products_table_uri,
+        stores_table_uri=store_table_uri,
+        inventory_table_uri=inventory_table_uri,
+        embedding_model_uri=embedding_model_uri,
+        connection_uri=connection_uri,
+    )
+
+
+def load_table_from_parquet(
+    client: bigquery.Client,
+    table_uri: str,
+    source_path: str,
+):
+    """Load a Parquet file into a BigQuery table."""
+
+    job_config = bigquery.LoadJobConfig()
+    job_config.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE
+    job_config.source_format = bigquery.SourceFormat.PARQUET
+
+    with open(source_path, "rb") as f:
+        with_check(
+            f"Creating table: `{table_uri}`",
+            lambda: client.load_table_from_file(
+                file_obj=f,
+                destination=table_uri,
+                job_config=job_config,
+            ).result(),
+        )
+
+
+def create_product_table_with_embeddings(
+    client: bigquery.Client,
+    source_table_uri: str,
+    products_table_uri: str,
+    embedding_model_uri: str,
+):
+    """Create a table with embeddings for product semantic search."""
+
+    product_with_embedding_query = CREATE_PRODUCTS_WITH_EMBEDDINGS_QUERY.format(
+        product_with_embedding_table_uri=products_table_uri,
+        embedding_model_uri=embedding_model_uri,
+        product_table_uri=source_table_uri,
+    )
+
+    with_check(
+        f"Creating table: `{products_table_uri}`",
+        lambda: client.query_and_wait(product_with_embedding_query),
+    )
+
+
+def create_embedding_model(
+    client: bigquery.Client,
+    project: str,
+    dataset_id: str,
+    connection_uri: str,
+    embedding_model_name: str = defaults.EMBEDDING_MODEL_NAME,
+) -> str:
+    """Create a BigQuery embedding model in the dataset using the provided connection."""
+
+    embedding_endpoint = TEXT_EMBEDDING_MODEL
+    embedding_model_uri = f"{project}.{dataset_id}.{embedding_model_name}"
+
+    embedding_query = CREATE_EMBEDDING_MODEL_QUERY.format(
+        embedding_model_uri=embedding_model_uri,
+        connection_uri=connection_uri,
+        endpoint=embedding_endpoint,
+    )
+
+    try:
+        embedding_model_retry_config(
+            lambda: with_check(
+                f"Creating embedding model: `{embedding_model_uri}`",
+                lambda: client.query_and_wait(embedding_query),
+            )
+        )()
+    except exceptions.RetryError as e:
+        e.add_note(
+            "Please wait and try again if the error is permission-related."
+            " It is safe to re-run this command with the same inputs."
+        )
+        raise
+
+    return embedding_model_uri
+
+
+def setup_dataset(
+    client: bigquery.Client,
+    project: str,
+    location: str,
+    dataset_id: str,
+    connection_id: str,
+):
+    """Create a BigQuery dataset with a Cloud Resource connection."""
+
+    dataset_uri = f"{project}.{dataset_id}"
 
     dataset = bigquery.Dataset(dataset_uri)
     dataset.location = location
 
     with_check(
         "Creating dataset (if not exists)...",
-        lambda: bq_client.create_dataset(dataset, exists_ok=True),
+        lambda: client.create_dataset(dataset, exists_ok=True),
     )
 
     connection_service_account: str | None = None
@@ -169,76 +316,28 @@ def create(
         )
     )()
 
-    embedding_endpoint = TEXT_EMBEDDING_MODEL
-    embedding_model_uri = f"{dataset_uri}.{defaults.EMBEDDING_MODEL_NAME}"
-    connection_uri = (
-        f"projects/{project}/locations/{location}/connections/{connection_id}"
+
+def get_connection_service_account(project: str, location: str, connection_id: str):
+    """Retrieve the service account associated with a BigQuery connection."""
+
+    completed_process = subprocess.run(
+        [
+            "bq",
+            "show",
+            "--format",
+            "json",
+            "--connection",
+            f"{project}.{location}.{connection_id}",
+        ],
+        check=True,
+        capture_output=True,
     )
-    embedding_query = CREATE_EMBEDDING_MODEL_QUERY.format(
-        embedding_model_uri=embedding_model_uri,
-        connection_uri=connection_uri,
-        endpoint=embedding_endpoint,
-    )
-
-    try:
-        embedding_model_retry_config(
-            lambda: with_check(
-                f"Creating embedding model: `{embedding_model_uri}`",
-                lambda: bq_client.query_and_wait(embedding_query),
-            )
-        )()
-    except exceptions.RetryError as e:
-        e.add_note(
-            "Please wait and try again if the error is permission-related. It is safe to re-run this command with the same inputs."
-        )
-        raise
-
-    product_table_uri = f"{dataset_uri}.cymbal_product_only"
-    store_table_uri = f"{dataset_uri}.{defaults.STORE_TABLE_NAME}"
-    inventory_table_uri = f"{dataset_uri}.{defaults.INVENTORY_TABLE_NAME}"
-
-    source_to_table_mapping = {
-        product_table_uri: product_path,
-        store_table_uri: store_path,
-        inventory_table_uri: inventory_path,
-    }
-    for table_uri, source_path in source_to_table_mapping.items():
-        job_config = bigquery.LoadJobConfig()
-        job_config.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE
-        job_config.source_format = bigquery.SourceFormat.PARQUET
-
-        with open(source_path, "rb") as f:
-            with_check(
-                f"Creating table: `{table_uri}`",
-                lambda: bq_client.load_table_from_file(
-                    f,
-                    destination=table_uri,
-                    job_config=job_config,
-                ).result(),
-            )
-
-    product_with_embedding_uri = f"{dataset_uri}.{defaults.PRODUCT_TABLE_NAME}"
-    product_with_embedding_query = CREATE_PRODUCTS_WITH_EMBEDDINGS_QUERY.format(
-        product_with_embedding_table_uri=product_with_embedding_uri,
-        embedding_model_uri=embedding_model_uri,
-        product_table_uri=product_table_uri,
+    connection_details = json.loads(completed_process.stdout)
+    connection_service_account = str(
+        connection_details["cloudResource"]["serviceAccountId"]
     )
 
-    with_check(
-        f"Creating table: `{product_with_embedding_uri}`",
-        lambda: bq_client.query_and_wait(product_with_embedding_query),
-    )
-
-    generated_dataset = GeneratedDataset(
-        dataset_id=dataset_id,
-        products_table_uri=product_with_embedding_uri,
-        stores_table_uri=store_table_uri,
-        inventory_table_uri=inventory_table_uri,
-        embedding_model_uri=embedding_model_uri,
-        connection_uri=connection_uri,
-    )
-
-    return generated_dataset
+    return connection_service_account
 
 
 def with_check(start_message: str, fn: Callable[[], _T]) -> _T:
@@ -266,24 +365,3 @@ def with_check(start_message: str, fn: Callable[[], _T]) -> _T:
     except Exception:
         print("FAILURE")
         raise
-
-
-def get_connection_service_account(project: str, location: str, connection_id: str):
-    completed_process = subprocess.run(
-        [
-            "bq",
-            "show",
-            "--format",
-            "json",
-            "--connection",
-            f"{project}.{location}.{connection_id}",
-        ],
-        check=True,
-        capture_output=True,
-    )
-    connection_details = json.loads(completed_process.stdout)
-    connection_service_account = str(
-        connection_details["cloudResource"]["serviceAccountId"]
-    )
-
-    return connection_service_account

@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Schemas for the chat agent."""
 
 import datetime
 from typing import Literal, TypedDict
@@ -31,10 +32,10 @@ CHAT_NODE_NAME = "CHAT"
 POST_PROCESS_NODE_NAME = "POST_PROCESS"
 """The name of the post-processing node in the LangGraph."""
 
-POST_PROCESS_NODE_TARGET_LITERAL = Literal["POST_PROCESS"]
+PostProcessNodeTargetLiteral = Literal["POST_PROCESS"]
 """Literal type for the post-processing node target."""
 
-END_NODE_TARGET_LITERAL = Literal["__end__"]
+EndNodeTargetLiteral = Literal["__end__"]
 """Literal type for the end node target."""
 
 # LangGraph models

@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Schemas for the guardrail chat agent."""
 
 import datetime
 from typing import Literal, TypedDict
@@ -29,20 +30,20 @@ class AgentConfig(pydantic.BaseModel):
 
 CHAT_NODE_NAME = "CHAT"
 """The name of the chat node in the LangGraph."""
-CHAT_NODE_TARGET_LITERAL = Literal["CHAT"]
+ChatNodeTargetLiteral = Literal["CHAT"]
 """Literal type for the chat node target."""
 
 GUARDRAILS_NODE_NAME = "GUARDRAILS"
 """The name of the guardrails node in the LangGraph."""
-GUARDRAILS_NODE_TARGET_LITERAL = Literal["GUARDRAILS"]
+GuardrailsNodeTargetLiteral = Literal["GUARDRAILS"]
 """Literal type for the guardrails node target."""
 
 POST_PROCESS_NODE_NAME = "POST_PROCESS"
 """The name of the post-processing node in the LangGraph."""
-POST_PROCESS_NODE_TARGET_LITERAL = Literal["POST_PROCESS"]
+PostProcessNodeTargetLiteral = Literal["POST_PROCESS"]
 """Literal type for the post-processing node target."""
 
-END_NODE_TARGET_LITERAL = Literal["__end__"]
+EndNodeTargetLiteral = Literal["__end__"]
 """Literal type for the end node target."""
 
 # Guardrail models
@@ -56,7 +57,7 @@ class RequestClassification(pydantic.BaseModel):
         blocked: Indicates whether the request should be blocked.
         reason: The reason for the classification decision.
         guardrail_response: A fallback message to be displayed to the user if the request is blocked.
-    """
+    """  # pylint: disable=line-too-long
 
     blocked: bool = pydantic.Field(
         description="The classification decision on whether the request should be blocked.",
@@ -67,7 +68,10 @@ class RequestClassification(pydantic.BaseModel):
     )
     """Explanation of why the request was classified as blocked or allowed."""
     guardrail_response: str = pydantic.Field(
-        description="Guardrail fallback message if the response is blocked. Should be safe to surface to users.",
+        description=(
+            "Guardrail fallback message if the response is blocked."
+            " Should be safe to surface to users."
+        ),
     )
     """A safe message to display to the user if their request is blocked."""
 

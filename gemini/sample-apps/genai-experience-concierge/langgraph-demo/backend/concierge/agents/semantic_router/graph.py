@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""LangGraph graph for an agent with a semantic router."""
 
 from concierge.agents.semantic_router import schemas
 from concierge.agents.semantic_router.nodes import (

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 async def ainvoke(
     state: schemas.GraphSession,
     config: lc_config.RunnableConfig,
-) -> lg_types.Command[Literal[schemas.REFLECTOR_NODE_TARGET_LITERAL]]:
+) -> lg_types.Command[Literal[schemas.ReflectorNodeTargetLiteral]]:
     """
     Asynchronously executes a plan's tasks and updates the conversation state.
 

@@ -23,7 +23,7 @@ dev = [
     "types-requests>=2.32.0.20250306",
     "types-pyyaml>=6.0.12.20241230",
     "pip>=25.0.1",
-    "nox>=2025.2.9",
+    "pylint>=3.3.6",
 ]
 
 [build-system]
@@ -32,3 +32,10 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["./scripts"]
+
+# leave mypy checks to demo sub-projects
+[tool.mypy]
+packages = ["scripts"]
+
+[tool.pylint.messages_control]
+disable = ["too-many-arguments", "too-many-positional-arguments", "wrong-import-order"]

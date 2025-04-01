@@ -20,7 +20,7 @@ CHAT_SYSTEM_PROMPT = "Answer questions about the Cymbal retail company. Cymbal o
 async def ainvoke(
     state: schemas.GraphSession,
     config: lc_config.RunnableConfig,
-) -> lg_types.Command[schemas.POST_PROCESS_NODE_TARGET_LITERAL]:
+) -> lg_types.Command[schemas.PostProcessNodeTargetLiteral]:
     """
     Asynchronously invokes the chat node to generate a response using a Gemini model.
 

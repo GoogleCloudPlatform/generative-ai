@@ -21,31 +21,31 @@ You are an expert in classifying user queries for an agentic workflow for Cymbal
 First reason through how you will classify the query given the conversation history.
 Then, classify user queries to be sent to one of several AI assistants that can help the user.
 
-Classify every inputted query as: "{schemas.RouterTarget.customer_service.value}", "{schemas.RouterTarget.retail_search.value}", "{schemas.RouterTarget.unsupported.value}".
+Classify every inputted query as: "{schemas.RouterTarget.CUSTOMER_SERVICE.value}", "{schemas.RouterTarget.RETAIL_SEARCH.value}", "{schemas.RouterTarget.UNSUPPORTED.value}".
 
 Class target descriptions:
-- "{schemas.RouterTarget.retail_search.value}": Any pleasantries/general conversation or discussion of Cymbal retail products/stores/inventory, including live data.
-- "{schemas.RouterTarget.customer_service.value}": Queries related to customer service such as item returns, policies, complaints, FAQs, escalations, etc.
-- "{schemas.RouterTarget.unsupported.value}": Any query that is off topic or out of scope for one of the other agents.
+- "{schemas.RouterTarget.RETAIL_SEARCH.value}": Any pleasantries/general conversation or discussion of Cymbal retail products/stores/inventory, including live data.
+- "{schemas.RouterTarget.CUSTOMER_SERVICE.value}": Queries related to customer service such as item returns, policies, complaints, FAQs, escalations, etc.
+- "{schemas.RouterTarget.UNSUPPORTED.value}": Any query that is off topic or out of scope for one of the other agents.
 
 <examples>
 input: Is the Meinl Byzance Jazz Ride 18" available?
-output: {schemas.RouterTarget.retail_search.value}
+output: {schemas.RouterTarget.RETAIL_SEARCH.value}
 
 input: Recommend a good pair of running shoes.
-output: {schemas.RouterTarget.retail_search.value}
+output: {schemas.RouterTarget.RETAIL_SEARCH.value}
 
 input: How do i initiate a return?
-output: {schemas.RouterTarget.customer_service.value}
+output: {schemas.RouterTarget.CUSTOMER_SERVICE.value}
 
 input: you suck, why do you refuse to be useful!
-output: {schemas.RouterTarget.customer_service.value}
+output: {schemas.RouterTarget.CUSTOMER_SERVICE.value}
 
 input: How far is the earth from the sun?
-output: {schemas.RouterTarget.unsupported.value}
+output: {schemas.RouterTarget.UNSUPPORTED.value}
 
 input: What's the weather like today?
-output: {schemas.RouterTarget.unsupported.value}
+output: {schemas.RouterTarget.UNSUPPORTED.value}
 </examples>
 """.strip()
 
@@ -55,9 +55,9 @@ async def ainvoke(
     config: lc_config.RunnableConfig,
 ) -> lg_types.Command[
     Literal[
-        schemas.RETAIL_NODE_TARGET_LITERAL,
-        schemas.CUSTOMER_SERVICE_NODE_TARGET_LITERAL,
-        schemas.POST_PROCESS_NODE_TARGET_LITERAL,
+        schemas.RetailNodeTargetLiteral,
+        schemas.CustomerServiceNodeTargetLiteral,
+        schemas.PostProcessNodeTargetLiteral,
     ]
 ]:
     """
@@ -135,11 +135,11 @@ async def ainvoke(
 
     next_node = None
     match router_classification.target:
-        case schemas.RouterTarget.retail_search:
+        case schemas.RouterTarget.RETAIL_SEARCH:
             next_node = schemas.RETAIL_NODE_NAME
-        case schemas.RouterTarget.customer_service:
+        case schemas.RouterTarget.CUSTOMER_SERVICE:
             next_node = schemas.CUSTOMER_SERVICE_NODE_NAME
-        case schemas.RouterTarget.unsupported:
+        case schemas.RouterTarget.UNSUPPORTED:
             next_node = schemas.POST_PROCESS_NODE_NAME
             current_turn["response"] = UNSUPPORTED_FALLBACK_MESSAGE
             stream_writer({"text": current_turn["response"]})

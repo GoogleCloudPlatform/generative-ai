@@ -1,11 +1,19 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Tools for deploying the end-to-end Concierge demo."""
 
 import uuid
 
 import click
-from scripts.langgraph_demo import backend, dataset, defaults, frontend, terraform
+from scripts.langgraph_demo import (
+    backend,
+    cloudbuild,
+    dataset,
+    defaults,
+    frontend,
+    terraform,
+)
 import yaml
 
 
@@ -21,9 +29,12 @@ import yaml
     default="US",
 )
 def create_dataset(project_id: str, location: str = "US"):
+    """Create a mock Cymbal Retail dataset."""
+
     return dataset.create(project=project_id, location=location)
 
 
+# pylint: disable=too-many-locals
 @click.option(
     "--seed-project",
     required=True,
@@ -47,7 +58,10 @@ def create_dataset(project_id: str, location: str = "US"):
 @click.option(
     "--demo-users",
     required=True,
-    help="Members to grant access to the hosted Gen AI Concierge demo. Can specify multiple times. Each entry should include the kind of member (e.g. user:*, serviceAccount:*, group:*, etc).",
+    help=(
+        "Member(s) to grant access to the hosted Gen AI Concierge demo."
+        " Each entry should include the kind of member (e.g. user:*, group:*, etc)."
+    ),
     multiple=True,
 )
 @click.option(
@@ -105,6 +119,8 @@ def deploy(
     folder_id: str | None = None,
     auto_approve: bool = False,
 ):
+    """Deploy the end-to-end Concierge demo."""
+
     # only use default source dirs. Maybe enable user-provided in future?
     terraform_dir = str(defaults.TERRAFORM_DIR)
     backend_dir = str(defaults.BACKEND_DIR)
@@ -150,9 +166,9 @@ def deploy(
     artifact_registry_repository = tf_outputs["artifact-registry-repo"]["value"]
     artifact_registry_location = tf_outputs["artifact-registry-location"]["value"]
     network_id = str(tf_outputs["vpc-id"]["value"])
-    network_name = network_id.split("/")[-1]
+    network_name = network_id.rsplit("/", maxsplit=1)[0]
     subnetwork_id = str(tf_outputs["subnet-id"]["value"])
-    subnetwork_name = subnetwork_id.split("/")[-1]
+    subnetwork_name = subnetwork_id.rsplit("/", maxsplit=1)[0]
     alloydb_secret_name = tf_outputs["concierge-alloydb-connection-secret-name"][
         "value"
     ]
@@ -174,12 +190,16 @@ def deploy(
 
     log_section("Building backend agent server...")
 
-    backend_image_url = f"{artifact_registry_location}-docker.pkg.dev/{project_id}/{artifact_registry_repository}/backend:{tag_id.hex}"
-    backend.build(
+    backend_image_url = (
+        f"{artifact_registry_location}-docker.pkg.dev"
+        f"/{project_id}/{artifact_registry_repository}/"
+        f"backend:{tag_id.hex}"
+    )
+    cloudbuild.build(
         project=project_id,
         service_account=build_service_account_id,
         image_url=backend_image_url,
-        dir=backend_dir,
+        source_dir=backend_dir,
     )
 
     backend_service = "concierge"
@@ -221,13 +241,17 @@ def deploy(
 
     log_section("Building frontend demo server...")
 
-    frontend_image_url = f"{artifact_registry_location}-docker.pkg.dev/{project_id}/{artifact_registry_repository}/frontend:{tag_id.hex}"
+    frontend_image_url = (
+        f"{artifact_registry_location}-docker.pkg.dev"
+        f"/{project_id}/{artifact_registry_repository}/"
+        f"frontend:{tag_id.hex}"
+    )
 
-    frontend.build(
+    cloudbuild.build(
         project=project_id,
         service_account=build_service_account_id,
         image_url=frontend_image_url,
-        dir=frontend_dir,
+        source_dir=frontend_dir,
     )
 
     log_section("Deploying frontend demo...")
@@ -272,5 +296,10 @@ def deploy(
     click.echo(f"Displaying the key generated resources:\n\n{output_str}")
 
 
+# pylint: enable=too-many-locals
+
+
 def log_section(message: str):
+    """Log section with spacing and bold styling."""
+
     click.echo("\n\n" + click.style(message, bold=True) + "\n\n")

@@ -4,7 +4,8 @@
 
 import json
 
-from concierge_ui import auth, demo_page, remote_settings as settings
+from concierge_ui import auth, demo_page
+from concierge_ui import remote_settings as settings
 from langgraph.pregel import remote
 
 config = settings.RemoteAgentConfigs().function_calling
@@ -32,7 +33,7 @@ def chat_handler(message: str, thread_id: str):
         str: Formatted text chunks representing text responses, function calls, function responses, or errors.
     """
     current_source = last_source = None
-    for stream_mode, chunk in graph.stream(
+    for _, chunk in graph.stream(
         input={
             "current_turn": {
                 "user_input": message,

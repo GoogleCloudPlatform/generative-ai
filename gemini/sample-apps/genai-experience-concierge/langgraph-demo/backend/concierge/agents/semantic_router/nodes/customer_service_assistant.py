@@ -20,7 +20,7 @@ CUSTOMER_SERVICE_SYSTEM_PROMPT = "Answer customer service questions about the Cy
 async def ainvoke(
     state: schemas.GraphSession,
     config: lc_config.RunnableConfig,
-) -> lg_types.Command[schemas.POST_PROCESS_NODE_TARGET_LITERAL]:
+) -> lg_types.Command[schemas.PostProcessNodeTargetLiteral]:
     """
     Asynchronously invokes the customer service chat node to generate a response using a Gemini model.
 

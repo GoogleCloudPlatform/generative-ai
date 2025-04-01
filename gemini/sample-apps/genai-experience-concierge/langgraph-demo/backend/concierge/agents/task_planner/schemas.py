@@ -1,6 +1,9 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Schemas for the task planner agent."""
+
+# pylint: disable=line-too-long
 
 import datetime
 from typing import Literal, TypedDict
@@ -31,25 +34,25 @@ class AgentConfig(pydantic.BaseModel):
 
 REFLECTOR_NODE_NAME = "REFLECTOR"
 """The name of the reflector node in the LangGraph."""
-REFLECTOR_NODE_TARGET_LITERAL = Literal["REFLECTOR"]
+ReflectorNodeTargetLiteral = Literal["REFLECTOR"]
 """Literal type for the reflector node target."""
 
 EXECUTOR_NODE_NAME = "EXECUTOR"
 """The name of the executor node in the LangGraph."""
-EXECUTOR_NODE_TARGET_LITERAL = Literal["EXECUTOR"]
+ExecutorNodeTargetLiteral = Literal["EXECUTOR"]
 """Literal type for the executor node target."""
 
 PLANNER_NODE_NAME = "PLANNER"
 """The name of the planner node in the LangGraph."""
-PLANNER_NODE_TARGET_LITERAL = Literal["PLANNER"]
+PlannerNodeTargetLiteral = Literal["PLANNER"]
 """Literal type for the planner node target."""
 
 POST_PROCESS_NODE_NAME = "POST_PROCESS"
 """The name of the post-processing node in the LangGraph."""
-POST_PROCESS_NODE_TARGET_LITERAL = Literal["POST_PROCESS"]
+PostProcessNodeTargetLiteral = Literal["POST_PROCESS"]
 """Literal type for the post-processing node target."""
 
-END_NODE_TARGET_LITERAL = Literal["__end__"]
+EndNodeTargetLiteral = Literal["__end__"]
 """Literal type for the end node target."""
 
 # langgraph models
@@ -65,7 +68,10 @@ class Task(pydantic.BaseModel):
 
     result: str | None = pydantic.Field(
         default=None,
-        description="The result of this step determined by the plan executor. Always set this field to None",
+        description=(
+            "The result of this step determined by the plan executor."
+            " Always set this field to None"
+        ),
     )
     """The result of this step determined by the plan executor. Always set this field to None."""
 
@@ -76,7 +82,10 @@ class Plan(pydantic.BaseModel):
     goal: str = pydantic.Field(description="High level goal for plan to help user.")
     """High level goal for plan to help user."""
     tasks: list[Task] = pydantic.Field(
-        description="A list of individual tasks that will be executed in sequence before responding to the user. As the task gets more complex, you can add more steps.",
+        description=(
+            "A list of individual tasks that will be executed in sequence before responding to the user."
+            " As the task gets more complex, you can add more steps."
+        ),
     )
     """A list of individual tasks that will be executed in sequence before responding to the user. As the task gets more complex, you can add more steps."""
 

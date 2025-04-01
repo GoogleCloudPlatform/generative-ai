@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Schemas for the function calling agent."""
 
 import datetime
 from typing import Literal, Optional, TypedDict
@@ -13,7 +14,9 @@ import pydantic
 
 
 class AgentConfig(pydantic.BaseModel):
-    """Configuration settings for the agent, including project, region, model, and data locations."""
+    """
+    Configuration settings for the agent, including project, region, model, and data locations.
+    """
 
     project: str
     """The Google Cloud project ID."""
@@ -41,10 +44,10 @@ CHAT_NODE_NAME = "CHAT"
 POST_PROCESS_NODE_NAME = "POST_PROCESS"
 """The name of the post-processing node in the LangGraph."""
 
-POST_PROCESS_NODE_TARGET_LITERAL = Literal["POST_PROCESS"]
+PostProcessNodeTargetLiteral = Literal["POST_PROCESS"]
 """Literal type for the post-processing node target."""
 
-END_NODE_TARGET_LITERAL = Literal["__end__"]
+EndNodeTargetLiteral = Literal["__end__"]
 """Literal type for the end node target."""
 
 # DB Models

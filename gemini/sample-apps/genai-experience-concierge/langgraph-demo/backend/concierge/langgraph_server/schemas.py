@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Schemas and protocols for the langgraph-server package."""
 
 from typing import Any, AsyncIterator, Literal, Optional, Protocol, Sequence, Union
 
@@ -55,7 +56,6 @@ class LangGraphAgent(Protocol):
         Returns:
             A dictionary representing the graph structure.
         """
-        ...
 
     async def get_state_checkpoint(
         self,
@@ -74,7 +74,6 @@ class LangGraphAgent(Protocol):
         Returns:
             The thread state at the checkpoint.
         """
-        ...
 
     async def get_state(
         self,
@@ -92,7 +91,6 @@ class LangGraphAgent(Protocol):
         Returns:
             The current thread state.
         """
-        ...
 
     async def get_state_history(
         self,
@@ -111,7 +109,6 @@ class LangGraphAgent(Protocol):
         Returns:
             A list of thread states.
         """
-        ...
 
     async def update_state(
         self,
@@ -132,11 +129,10 @@ class LangGraphAgent(Protocol):
         Returns:
             The response from the state update operation.
         """
-        ...
 
     def stream(
         self,
-        input: Optional[dict] = None,
+        input: Optional[dict] = None,  # pylint: disable=redefined-builtin
         command: Optional[schema.Command] = None,
         stream_mode: Union[schema.StreamMode, Sequence[schema.StreamMode]] = "values",
         stream_subgraphs: bool = False,
@@ -163,7 +159,6 @@ class LangGraphAgent(Protocol):
         Returns:
             An asynchronous iterator yielding tuples of output and metadata.
         """
-        ...
 
 
 class SerializableLangGraphAgent(LangGraphAgent, Protocol):

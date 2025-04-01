@@ -1,54 +1,12 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Tools for managing the demo frontend application."""
 
 import subprocess
 import tempfile
 
 from scripts.langgraph_demo import defaults
-
-
-def build(
-    project: str,
-    service_account: str,
-    image_url: str,
-    dir: str = str(defaults.FRONTEND_DIR),
-):
-    """
-    Build and push a container image for the frontend application.
-
-    This command uses `gcloud builds submit` to build a container image from the
-    specified directory and push it to the given image URI. It is intended for
-    building the frontend application's container image.
-
-    Args:
-        project (str): Name of the Google Cloud project to run the build job in.
-        service_account (str): Service account for the build job to use.
-        image_url (str): Image URI (including tag) to push the built image to.
-        dir (str): Directory containing the Dockerfile and source code for the build.
-            Defaults to the frontend directory defined in `defaults.FRONTEND_DIR`.
-
-    Raises:
-        subprocess.CalledProcessError: If the `gcloud builds submit` command fails.
-    """
-
-    subprocess.run(
-        [
-            "gcloud",
-            "builds",
-            "submit",
-            "--project",
-            project,
-            "--service-account",
-            service_account,
-            "--default-buckets-behavior",
-            "REGIONAL_USER_OWNED_BUCKET",
-            "-t",
-            image_url,
-            dir,
-        ],
-        check=True,
-    )
 
 
 def deploy(

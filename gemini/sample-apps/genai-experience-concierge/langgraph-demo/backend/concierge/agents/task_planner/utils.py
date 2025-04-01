@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Utilities to check if an exception is retryable for Gen AI SDK generation."""
 
 from google.genai import errors as genai_errors  # type: ignore[import-untyped]
 import requests  # type: ignore[import-untyped]

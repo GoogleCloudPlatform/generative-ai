@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Schemas for the semantic router agent."""
 
 import datetime
 import enum
@@ -32,25 +33,25 @@ class AgentConfig(pydantic.BaseModel):
 
 ROUTER_NODE_NAME = "ROUTER"
 """The name of the router node in the LangGraph."""
-ROUTER_NODE_TARGET_LITERAL = Literal["ROUTER"]
+RouterNodeTargetLiteral = Literal["ROUTER"]
 """Literal type for the router node target."""
 
 RETAIL_NODE_NAME = "RETAIL"
 """The name of the retail node in the LangGraph."""
-RETAIL_NODE_TARGET_LITERAL = Literal["RETAIL"]
+RetailNodeTargetLiteral = Literal["RETAIL"]
 """Literal type for the retail node target."""
 
 CUSTOMER_SERVICE_NODE_NAME = "CUSTOMER_SERVICE"
 """The name of the customer service node in the LangGraph."""
-CUSTOMER_SERVICE_NODE_TARGET_LITERAL = Literal["CUSTOMER_SERVICE"]
+CustomerServiceNodeTargetLiteral = Literal["CUSTOMER_SERVICE"]
 """Literal type for the customer service node target."""
 
 POST_PROCESS_NODE_NAME = "POST_PROCESS"
 """The name of the post-processing node in the LangGraph."""
-POST_PROCESS_NODE_TARGET_LITERAL = Literal["POST_PROCESS"]
+PostProcessNodeTargetLiteral = Literal["POST_PROCESS"]
 """Literal type for the post-processing node target."""
 
-END_NODE_TARGET_LITERAL = Literal["__end__"]
+EndNodeTargetLiteral = Literal["__end__"]
 """Literal type for the end node target."""
 
 # Router classification
@@ -59,11 +60,11 @@ END_NODE_TARGET_LITERAL = Literal["__end__"]
 class RouterTarget(enum.Enum):
     """Enumeration representing the possible targets for routing user queries."""
 
-    customer_service = "Customer Support Assistant"
+    CUSTOMER_SERVICE = "Customer Support Assistant"
     """Target for customer service related queries."""
-    retail_search = "Conversational Retail Search Assistant"
+    RETAIL_SEARCH = "Conversational Retail Search Assistant"
     """Target for retail search related queries."""
-    unsupported = "Unsupported"
+    UNSUPPORTED = "Unsupported"
     """Target for unsupported queries."""
 
 

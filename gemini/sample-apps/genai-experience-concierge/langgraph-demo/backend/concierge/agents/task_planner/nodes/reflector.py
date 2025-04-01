@@ -18,7 +18,7 @@ async def ainvoke(
     state: schemas.GraphSession,
     config: lc_config.RunnableConfig,
 ) -> lg_types.Command[
-    Literal[schemas.EXECUTOR_NODE_TARGET_LITERAL, schemas.PLANNER_NODE_TARGET_LITERAL]
+    Literal[schemas.ExecutorNodeTargetLiteral, schemas.PlannerNodeTargetLiteral]
 ]:
     """
     Asynchronously reflects on the executed plan and determines the next action.

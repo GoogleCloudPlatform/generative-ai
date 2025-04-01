@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Tool to check licenses in source code and insert if specified."""
 
 import argparse
 import re
@@ -17,7 +18,8 @@ _HASH_LICENSE_HEADER = """
 
 
 def license_check(fix: bool = False):
-    ps = subprocess.run(["git", "ls-files"], capture_output=True, text=True)
+    """Check all relevant files for license headers."""
+    ps = subprocess.run(["git", "ls-files"], capture_output=True, text=True, check=True)
 
     found_invalid_file = False
 
@@ -32,11 +34,10 @@ def license_check(fix: bool = False):
             continue
 
         # open file and strip leading empty lines
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             contents = f.read().lstrip()
 
         # check if file starts with license header.
-        # note: if adding new file types that don't support hash-based comments, add additional cases.
         if contents.startswith(_HASH_LICENSE_HEADER):
             continue
 
@@ -50,9 +51,8 @@ def license_check(fix: bool = False):
             print("Adding license...", file_path)
 
             # update file with license inserted at the top
-            # note: may need additional case handling if hash license can't be used.
             contents = _HASH_LICENSE_HEADER + "\n\n" + contents
-            with open(file_path, "w") as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(contents)
 
     if found_invalid_file:
@@ -61,7 +61,10 @@ def license_check(fix: bool = False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Checks all python files for license headers. Can optionally choose to warn or fix the offending files."
+        description=(
+            "Checks all python files for license headers."
+            " Can optionally choose to warn or fix the offending files."
+        )
     )
 
     parser.add_argument("--fix", action=argparse.BooleanOptionalAction)

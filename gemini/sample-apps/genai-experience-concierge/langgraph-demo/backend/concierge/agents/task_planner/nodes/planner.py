@@ -18,9 +18,7 @@ async def ainvoke(
     state: schemas.GraphSession,
     config: lc_config.RunnableConfig,
 ) -> lg_types.Command[
-    Literal[
-        schemas.EXECUTOR_NODE_TARGET_LITERAL, schemas.POST_PROCESS_NODE_TARGET_LITERAL
-    ]
+    Literal[schemas.ExecutorNodeTargetLiteral, schemas.PostProcessNodeTargetLiteral]
 ]:
     """
     Asynchronously generates a plan or a direct response based on the current conversation state.

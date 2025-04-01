@@ -10,7 +10,7 @@ from langgraph import types as lg_types
 async def ainvoke(
     state: schemas.GraphSession,
     config: lc_config.RunnableConfig,
-) -> lg_types.Command[schemas.END_NODE_TARGET_LITERAL]:
+) -> lg_types.Command[schemas.EndNodeTargetLiteral]:
     """
     Asynchronously invokes the post-processing node to finalize the current conversation turn.
 

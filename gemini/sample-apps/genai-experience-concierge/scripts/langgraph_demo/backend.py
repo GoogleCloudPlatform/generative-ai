@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Tools for managing the demo backend service."""
 
 import json
 import subprocess
@@ -90,46 +91,6 @@ def deploy(
             ],
             check=True,
         )
-
-
-def build(
-    project: str,
-    service_account: str,
-    image_url: str,
-    dir: str = str(defaults.BACKEND_DIR),
-):
-    """
-    Build and push a container image to Google Container Registry or Artifact Registry.
-
-    This command uses `gcloud builds submit` to build a container image from the
-    specified directory and push it to the given image URI.
-
-    Args:
-        project (str): Name of the project to run the build job in.
-        service_account (str): Service account for build job.
-        image_url (str): Image URI (including tag) to push the built image to.
-        dir (str): Directory to call the build from. Defaults to backend directory.
-
-    Raises:
-        subprocess.CalledProcessError: If the `gcloud` command fails.
-    """
-    subprocess.run(
-        [
-            "gcloud",
-            "builds",
-            "submit",
-            "--project",
-            project,
-            "--service-account",
-            service_account,
-            "--default-buckets-behavior",
-            "REGIONAL_USER_OWNED_BUCKET",
-            "-t",
-            image_url,
-            dir,
-        ],
-        check=True,
-    )
 
 
 def describe(project: str, region: str, service: str):

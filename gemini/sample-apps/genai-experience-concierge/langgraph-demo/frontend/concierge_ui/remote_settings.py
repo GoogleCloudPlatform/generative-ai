@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Settings to configure connection to remote agents."""
 
 import pydantic
 import pydantic_settings
@@ -19,7 +20,7 @@ class RemoteAgentConfigs(pydantic_settings.BaseSettings):
     """Configuration for multiple remote agents.
 
     Provide configuration through environment variables or CLI: https://docs.pydantic.dev/latest/concepts/pydantic_settings/#usage
-    """
+    """  # pylint: disable=line-too-long
 
     gemini: RemoteAgentConfig = pydantic.Field(
         default_factory=lambda: RemoteAgentConfig(

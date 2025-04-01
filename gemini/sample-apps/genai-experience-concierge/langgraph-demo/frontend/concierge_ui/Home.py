@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Streamlit demo home page."""
 
 import streamlit as st
 
@@ -22,5 +23,5 @@ Each agent server is compatible with the [LangGraph Cloud API](langchain-ai.gith
 Source code can be found at: [https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/genai-experience-concierge](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/genai-experience-concierge)
 
 **👈 Select a demo from the sidebar** to see some examples of what the Gen AI Experience Concierge can do!
-"""
+"""  # pylint: disable=line-too-long
 )

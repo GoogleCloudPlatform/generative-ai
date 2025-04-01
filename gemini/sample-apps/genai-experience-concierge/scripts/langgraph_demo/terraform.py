@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Tools for provisioning infrastructure through terraform."""
 
 import json
 import subprocess
@@ -132,8 +133,8 @@ def outputs(terraform_dir: str = str(defaults.TERRAFORM_DIR)) -> dict:
     )
 
     terraform_state = json.loads(terraform_state_process.stdout)
-    outputs = terraform_state["values"]["outputs"]
+    tf_outputs = terraform_state["values"]["outputs"]
 
-    assert isinstance(outputs, dict)
+    assert isinstance(tf_outputs, dict)
 
-    return outputs
+    return tf_outputs

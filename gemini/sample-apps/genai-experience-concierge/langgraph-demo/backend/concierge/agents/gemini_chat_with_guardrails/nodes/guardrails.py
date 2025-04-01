@@ -49,7 +49,7 @@ async def ainvoke(
     state: schemas.GraphSession,
     config: lc_config.RunnableConfig,
 ) -> lg_types.Command[
-    Literal[schemas.CHAT_NODE_TARGET_LITERAL, schemas.POST_PROCESS_NODE_TARGET_LITERAL]
+    Literal[schemas.ChatNodeTargetLiteral, schemas.PostProcessNodeTargetLiteral]
 ]:
     """
     Asynchronously invokes the guardrails node to classify user input and determine the next action.

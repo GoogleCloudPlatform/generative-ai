@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Streamlit demo page builder to avoid duplicating code."""
 
 import logging
 from typing import Generator, Protocol
@@ -12,7 +13,7 @@ import streamlit as st
 logger = logging.getLogger(__name__)
 
 
-class ChatHandler(Protocol):
+class ChatHandler(Protocol):  # pylint: disable=too-few-public-methods
     """Protocol defining the interface for a chat handler."""
 
     def __call__(self, message: str, thread_id: str) -> Generator[str, None, None]:
@@ -26,11 +27,10 @@ class ChatHandler(Protocol):
         Returns:
             A generator yielding the response chunks.
         """
-        ...
 
 
 def build_demo_page(
-    id: str,
+    demo_id: str,
     title: str,
     page_icon: str,
     description: str,
@@ -41,7 +41,7 @@ def build_demo_page(
     Builds a demo page for a chat application using Streamlit.
 
     Args:
-        id: A unique identifier for the page.
+        demo_id: A unique identifier for the page.
         title: The title of the page.
         page_icon: The icon to display in the browser tab.
         description: A description of the chat application.
@@ -54,8 +54,8 @@ def build_demo_page(
     st.sidebar.header(title)
     st.markdown(description)
 
-    thread_key = f"{id}-thread"
-    messages_key = f"{id}-messages"
+    thread_key = f"{demo_id}-thread"
+    messages_key = f"{demo_id}-messages"
 
     # Set session ID
     if thread_key not in st.session_state:
@@ -72,7 +72,7 @@ def build_demo_page(
     st.markdown(f"Thread ID: {st.session_state[thread_key]}")
 
     # Display chat messages from history on app rerun
-    for idx, message in enumerate(st.session_state[messages_key]):
+    for message in st.session_state[messages_key]:
         with st.chat_message(message["role"]):
             st.write(message["content"])
 

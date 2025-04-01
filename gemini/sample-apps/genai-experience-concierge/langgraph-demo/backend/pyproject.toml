@@ -33,4 +33,12 @@ dev = [
     "ipykernel>=6.29.5",
     "ipython>=9.0.2",
     "mypy>=1.15.0",
+    "pylint>=3.3.6",
 ]
+
+# leave mypy checks to demo sub-projects
+[tool.mypy]
+packages = ["concierge"]
+
+[tool.pylint.messages_control]
+disable = ["too-many-arguments", "too-many-positional-arguments", "duplicate-code", "wrong-import-order"]

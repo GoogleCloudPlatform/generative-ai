@@ -1,6 +1,7 @@
 # Copyright 2025 Google. This software is provided as-is, without warranty or
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
+"""Implementation of LangGraphAgent given a StateGraph."""
 
 import logging
 from typing import Any, AsyncGenerator, Optional, Sequence, Union, cast
@@ -214,7 +215,7 @@ class LangGraphAgent:
 
     async def stream(
         self,
-        input: Optional[dict] = None,
+        input: Optional[dict] = None,  # pylint: disable=redefined-builtin
         command: Optional[schema.Command] = None,
         stream_mode: Union[schema.StreamMode, Sequence[schema.StreamMode]] = "values",
         stream_subgraphs: bool = False,
@@ -366,7 +367,7 @@ def _pregel_task_to_thread_task(task: lg_types.PregelTask) -> schema.ThreadTask:
                 value=interrupt.value,
                 when=interrupt.when,
                 resumable=interrupt.resumable,
-                ns=[ns for ns in interrupt.ns] if interrupt.ns else None,
+                ns=list(interrupt.ns) if interrupt.ns else None,
             )
             for interrupt in task.interrupts
         ],

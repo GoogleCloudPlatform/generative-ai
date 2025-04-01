@@ -2,7 +2,8 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from concierge_ui import auth, demo_page, remote_settings as settings
+from concierge_ui import auth, demo_page
+from concierge_ui import remote_settings as settings
 from langgraph.pregel import remote
 
 config = settings.RemoteAgentConfigs().guardrail
@@ -30,7 +31,7 @@ def chat_handler(message: str, thread_id: str):
         str: Formatted text chunks representing guardrail classifications, text responses, or errors.
     """
     current_source = last_source = None
-    for stream_mode, chunk in graph.stream(
+    for _, chunk in graph.stream(
         input={"current_turn": {"user_input": message}},
         config={"configurable": {"thread_id": thread_id}},
         stream_mode=["custom"],
