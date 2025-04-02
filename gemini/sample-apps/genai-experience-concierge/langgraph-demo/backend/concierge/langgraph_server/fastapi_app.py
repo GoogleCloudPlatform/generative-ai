@@ -452,7 +452,7 @@ async def async_iterator_to_list(async_iterable: AsyncIterator[_T]) -> list[_T]:
 async def stream_sse_chunk(
     stream_response: AsyncIterator[tuple[str, dict[str, Any]]],
     agent: schemas.SerializableLangGraphAgent,
-) -> AsyncGenerator[str]:
+) -> AsyncGenerator[str, None]:
     """
     Streams data from an asynchronous iterator as Server-Sent Events (SSE).
 

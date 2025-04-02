@@ -4,12 +4,12 @@
 
 ## Table of Contents
 
-| Section                                                   | Standalone Notebook                                        | Demo Source Code                                                                                       |
-| --------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| [Guardrail Classifier Agent](#guardrail-classifier-agent) | [guardrail-classifier.ipynb](./guardrail-classifier.ipynb) | [gemini_chat_with_guardrails](../langgraph-demo/backend/concierge/agents/gemini_chat_with_guardrails/) |
-| [Semantic Router Agent](#semantic-router-agent)           | [semantic-router.ipynb](./semantic-router.ipynb)           | [semantic_router](../langgraph-demo/backend/concierge/agents/semantic_router/)                         |
-| [Function Calling Agent](#function-calling-agent)         | [function-calling.ipynb](./function-calling.ipynb)         | [function_calling](../langgraph-demo/backend/concierge/agents/function_calling/)                       |
-| [Task Planner](#task-planner)                             | [task-planner.ipynb](./task-planner.ipynb)                 | [task_planner](../langgraph-demo/backend/concierge/agents/task_planner/)                               |
+| Section                                                   | Standalone Notebook                                        | Demo Source Code                                                                      |
+| --------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [Guardrail Classifier Agent](#guardrail-classifier-agent) | [guardrail-classifier.ipynb](./guardrail-classifier.ipynb) | [guardrails.py](../langgraph-demo/backend/concierge/agents/guardrails.py)             |
+| [Semantic Router Agent](#semantic-router-agent)           | [semantic-router.ipynb](./semantic-router.ipynb)           | [semantic_router.py](../langgraph-demo/backend/concierge/agents/semantic_router.py)   |
+| [Function Calling Agent](#function-calling-agent)         | [function-calling.ipynb](./function-calling.ipynb)         | [function_calling.py](../langgraph-demo/backend/concierge/agents/function_calling.py) |
+| [Task Planner](#task-planner)                             | [task-planner.ipynb](./task-planner.ipynb)                 | [task_planner.py](../langgraph-demo/backend/concierge/agents/task_planner.py)         |
 
 ## Guardrail Classifier Agent
 
@@ -23,7 +23,7 @@ This demo uses the first approach, but could be modified to run in parallel in c
   <img src="../docs/images/langgraph-guardrail-agent.png" alt="Guardrail Agent Architecture" width="50%" />
 </div>
 
-The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/gemini_chat_with_guardrails/).
+The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/guardrails.py).
 
 A standalone notebook to build the LangGraph agent without any deployment / server hosting is available [here](./guardrail-classifier.ipynb).
 
@@ -39,7 +39,7 @@ The semantic router layer can provide a useful facade to enable a single interfa
   <img src="../docs/images/langgraph-router-agent.png" alt="Semantic Router Agent Architecture" width="50%" />
 </div>
 
-The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/semantic_router/).
+The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/semantic_router.py).
 
 A standalone notebook to build the LangGraph agent without any deployment / server hosting is available [here](./semantic-router.ipynb).
 
@@ -71,7 +71,7 @@ Retail Search Assistant Use Cases:
   <img src="../docs/images/langgraph-fc-agent.png" alt="Function Calling Agent Architecture" width="50%" />
 </div>
 
-The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/function_calling/).
+The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/function_calling.py).
 
 A standalone notebook to build the LangGraph agent without any deployment / server hosting is available [here](./function-calling.ipynb).
 
@@ -93,6 +93,6 @@ The "Executor" agent in this demo is a Gemini model equipped with the Google Sea
   <img src="../docs/images/langgraph-planner-agent.png" alt="Task Planner Agent Architecture" width="50%" />
 </div>
 
-The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/task_planner/).
+The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/task_planner.py).
 
 A standalone notebook to build the LangGraph agent without any deployment / server hosting is available [here](./task-planner.ipynb).

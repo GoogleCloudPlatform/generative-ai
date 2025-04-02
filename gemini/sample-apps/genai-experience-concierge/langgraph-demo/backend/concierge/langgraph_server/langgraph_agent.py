@@ -14,7 +14,6 @@ from langgraph.checkpoint import base
 from langgraph.checkpoint.serde import jsonplus
 from langgraph.checkpoint.serde.base import SerializerProtocol
 from langgraph_sdk import schema
-import pydantic
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +31,8 @@ class LangGraphAgent:
     def __init__(
         self,
         state_graph: graph.StateGraph,
-        agent_config: Optional[pydantic.BaseModel] = None,
         serde: Optional[SerializerProtocol] = None,
+        default_configurable: Optional[dict] = None,
         checkpointer_config: Optional[schemas.CheckpointerConfig] = None,
     ):
         """
@@ -47,9 +46,7 @@ class LangGraphAgent:
         """
         self.state_graph = state_graph
 
-        default_configurable = {
-            "agent_config": agent_config.model_dump(mode="json") if agent_config else {}
-        }
+        default_configurable = default_configurable or {}
         self.config = lc_config.RunnableConfig(configurable=default_configurable)
 
         self.checkpointer = (
@@ -227,7 +224,7 @@ class LangGraphAgent:
         checkpoint: Optional[schema.Checkpoint] = None,
         interrupt_before: Optional[Union[schema.All, Sequence[str]]] = None,
         interrupt_after: Optional[Union[schema.All, Sequence[str]]] = None,
-    ) -> AsyncGenerator[tuple[str, Any]]:
+    ) -> AsyncGenerator[tuple[str, Any], None]:
         """
         Streams the output of the agent's execution.
 

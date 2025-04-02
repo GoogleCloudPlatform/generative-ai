@@ -26,7 +26,7 @@ gcloud auth application-default login
 
 Ensure you have access to a running backend server hosting LangGraph agents. See the [quickstart demo instructions](../../README.md#quickstart-demo-) for a quick setup of the backend server.
 
-By default, the Streamlit app will point to `http://localhost:3000` as the base URL for each agent as this is the default backend server config. You can modify this to any local or remote server using `pydantic-settings` configuration through environment variables or the command line using (see [setting options](./concierge_ui/settings.py)).
+By default, the Streamlit app will point to `http://localhost:3000` as the base URL for each agent as this is the default backend server config. You can modify this to any local or remote server using `pydantic-settings` configuration through environment variables or the command line using (see [setting options](./concierge_ui/remote_settings.py)).
 
 ### Running the Application
 
@@ -60,8 +60,9 @@ This will launch the Streamlit interface in your web browser.
 
 The Streamlit demo code is located at `concierge_ui` and is composed of:
 
-- `home.py`: The main page of the Streamlit application, providing an overview and navigation.
+- `server.py`: The entrypoint of the Streamlit application, setting up navigation.
+- `home.py`: The main page of the Streamlit application, providing an overview.
 - `agents/*.py`: Individual LangGraph agent handlers for streaming chat responses.
 - `demo_page.py`: A utility module for building the common layout and functionality of the agent demo pages.
-- `settings.py`: Configuration settings for the Streamlit application, including backend server URLs.
+- `remote_settings.py`: Configuration settings for the Streamlit application, including backend server URLs.
 - `auth.py`: Handles authentication with the backend server. It supports fetching Google Auth ID tokens from the GCE Metadata server or impersonating a service account to retrieve ID tokens.

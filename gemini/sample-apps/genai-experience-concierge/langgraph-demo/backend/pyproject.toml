@@ -36,10 +36,27 @@ dev = [
     "pylint>=3.3.6",
 ]
 
+[tool.pyright]
+typeCheckingMode = "off"
+reportInvalidTypeForm = false
+
 # leave mypy checks to demo sub-projects
 [tool.mypy]
 packages = ["concierge"]
-disable_error_code = ["import-untyped"]
+disable_error_code = ["misc", "import-untyped"]
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+check_untyped_defs = true
+disallow_subclassing_any = true
+warn_incomplete_stub = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unreachable = true
+follow_imports = "skip"
+ignore_missing_imports = true
+explicit_package_bases = true
 
 [tool.pylint.messages_control]
 disable=["wrong-import-order"]
