@@ -8,7 +8,7 @@ from google.genai.types import FunctionDeclaration, GenerateContentConfig, Part,
 import streamlit as st
 
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
-MODEL_ID = "gemini-1.5-pro"
+MODEL_ID = "gemini-2.0-flash"
 LOCATION = "us-central1"
 
 list_datasets_func = FunctionDeclaration(

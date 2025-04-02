@@ -1,8 +1,0 @@
-{
-  "model": "gemini-1.5-flash-001",
-  "system_instruction": "Summarize the given text. ",
-  "prompt_template": "Text: \n",
-  "temperature": 2,
-  "max_output_tokens": 5000,
-  "top_p": 0.95
-}

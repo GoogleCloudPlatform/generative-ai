@@ -1,8 +1,0 @@
-{
-  "model": "gemini-1.5-pro-001",
-  "system_instruction": "\n    <OBJECTIVE> Summarize the given article. </OBJECTIVE>\n    <INSTRUCTIONS> Keep it concise. </INSTRUCTIONS>\n",
-  "prompt_template": "Here is the Article: ",
-  "temperature": 1,
-  "max_output_tokens": 8192,
-  "top_p": 0.95
-}

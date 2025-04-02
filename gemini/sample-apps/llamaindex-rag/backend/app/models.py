@@ -16,7 +16,7 @@ class PromptUpdate(BaseModel):
 
 
 class RAGConfig(BaseModel):
-    llm_name: str = "gemini-1.5-flash"
+    llm_name: str = "gemini-2.0-flash"
     temperature: float = 0.2
     similarity_top_k: int = 5
     retrieval_strategy: str = "auto_merging"
@@ -31,12 +31,12 @@ class RAGConfig(BaseModel):
 class RAGRequest(RAGConfig):
     query: str = "What were Google's Q1 Earnings?"
     evaluate_response: bool
-    eval_model_name: str | None = "gemini-1.5-flash"
+    eval_model_name: str | None = "gemini-2.0-flash"
     embedding_model_name: str | None = "text-embedding-005"
 
 
 class EvalRequest(RAGConfig):
-    eval_model_name: str = "gemini-1.5-flash"
+    eval_model_name: str = "gemini-2.0-flash"
     embedding_model_name: str | None = "text-embedding-005"
     input_eval_dataset_bucket_uri: str = "test_rag_questions/test_ground_truth.csv"
     bq_eval_results_table_id: str = "eval_results.eval_results_table"

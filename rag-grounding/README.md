@@ -54,10 +54,10 @@ for a more in-depth walkthrough.
   Evaluates RAG systems using the Gen AI Evaluation Service SDK, offering both
   reference-free and reference-based evaluation methods with visualization.
 - **[ragas_with_gemini.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag-evaluation/ragas_with_gemini.ipynb)**:
-  Evaluates RAG pipelines using the RAGAS framework and the Gemini Pro model
+  Evaluates RAG pipelines using the RAGAS framework and the Gemini model
   for Q&A tasks.
 - **[deepeval_with_gemini.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag-evaluation/deepeval_with_gemini.ipynb)**:
-  Evaluates Gemini Pro's performance on a question-answering task using
+  Evaluates Gemini's performance on a question-answering task using
   DeepEval and the Gemini API in Vertex AI, including Pytest integration.
 
 ## Out of the Box RAG/Grounding
@@ -91,7 +91,7 @@ Search engine builder, giving you Google quality search for your own data.
 - **[search_data_blending_with_gemini_summarization.ipynb](../search/search_data_blending_with_gemini_summarization.ipynb)**:
   Demonstrates calling a search app that blends information from multiple
   stores (GCS, BQ, site) and summarizes search snippets and responses using
-  the Gemini Pro model.
+  the Gemini model.
 - **[vertexai_search_options.ipynb](../search/vertexai-search-options/vertexai_search_options.ipynb)**:
   Demonstrates three approaches for using Vertex AI Search: direct API usage,
   grounding with Gemini, and integration with LangChain.
