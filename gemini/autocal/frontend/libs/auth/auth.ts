@@ -97,7 +97,7 @@ export async function processSignin(code: string): Promise<string> {
     throw e;
   }
 
-  // Store the ID token as a http only cookie (cannot be read by client-side Javascript)
+  // Store the ID token as a http only cookie (cannot be read by client-side JavaScript)
   (await cookieStore).set({
     name: "id_token",
     value: tokens.id_token,
