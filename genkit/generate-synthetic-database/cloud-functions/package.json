@@ -16,7 +16,7 @@
     "node": "20"
   },
   "dependencies": {
-    "@genkit-ai/ai": "^0.9.0",
+    "@genkit-ai/ai": "^1.0.0",
     "@genkit-ai/core": "^1.0.0",
     "@genkit-ai/dotprompt": "^0.9.0",
     "@genkit-ai/firebase": "^1.0.0",
