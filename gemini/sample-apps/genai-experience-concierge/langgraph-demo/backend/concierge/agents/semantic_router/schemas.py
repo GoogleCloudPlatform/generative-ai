@@ -3,12 +3,15 @@
 # agreement with Google.
 """Schemas for the semantic router agent."""
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
 import datetime
 import enum
 from typing import Literal, TypedDict
 import uuid
 
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google.genai import types as genai_types
 import pydantic
 
 # Agent config settings

@@ -6,7 +6,7 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Gen AI Experience Concierge",
+    page_title="Concierge",
     page_icon="👋",
 )
 

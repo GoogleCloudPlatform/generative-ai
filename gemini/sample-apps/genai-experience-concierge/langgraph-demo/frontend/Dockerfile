@@ -28,4 +28,4 @@ WORKDIR /app
 
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0 STREAMLIT_SERVER_PORT=8080
 
-ENTRYPOINT [".venv/bin/streamlit", "run", "concierge_ui/Home.py"]
+ENTRYPOINT [".venv/bin/streamlit", "run", "concierge_ui/server.py"]

@@ -36,6 +36,7 @@ packages = ["./scripts"]
 # leave mypy checks to demo sub-projects
 [tool.mypy]
 packages = ["scripts"]
+disable_error_code = ["import-untyped"]
 
 [tool.pylint.messages_control]
-disable = ["too-many-arguments", "too-many-positional-arguments", "wrong-import-order"]
+disable = ["wrong-import-order"]

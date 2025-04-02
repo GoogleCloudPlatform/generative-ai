@@ -2,20 +2,20 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from concierge_ui import auth, demo_page
-from concierge_ui import remote_settings as settings
+# disable duplicate code since chat handlers for each agent may be very similar but not
+# exactly the same
+# pylint: disable=duplicate-code
+
+from typing import Generator
+
 from langgraph.pregel import remote
 
-config = settings.RemoteAgentConfigs().task_planner
 
-graph = remote.RemoteGraph(
-    config.name,
-    url=str(config.base_url),
-    headers=auth.get_auth_headers(config),
-)
-
-
-def chat_handler(message: str, thread_id: str):
+def chat_handler(
+    graph: remote.RemoteGraph,
+    message: str,
+    thread_id: str,
+) -> Generator[str, None, None]:
     """
     Handles chat interactions by streaming responses from a remote LangGraph.
 
@@ -122,25 +122,3 @@ def _stringify_task(task: dict, include_results: bool = True) -> str:
         output += f"\n\n**Result**: {task.get('result') or 'incomplete'}"
 
     return output
-
-
-demo_page.build_demo_page(
-    id="task-planner",
-    title="Task Planner",
-    page_icon="📝",
-    description="""
-The task planner design pattern (similar to ["Deep Research"](https://gemini.google/overview/deep-research)) is a multi-agent architecture useful for tasks requiring more complex reasoning, planning, and multi-tool use. The task planner is built of three core agents:
-
-1. A _Planner_ that receives user input and either (1) responds directly to simple queries (e.g. "Hi") or (2) generates a research plan, including list of tasks to execute.
-
-1. An _Executor_ that receives a plan and uses its tools to perform each task and update the plan with the executed task result.
-
-1. A _Reflector_ that reviews the executed plan and either (1) generates a final response to the user or (2) generates a new plan and jumps back to step 2.
-
-This architecture is often much slower than single-agent designs because a single turn can consist of a large number of LLM calls and tool usage. This demo is particularly slow because the "Executor" agent only supports linear plans and executes each task in parallel. There is research on alternative approaches such as [LLM Compiler](https://arxiv.org/abs/2312.04511) that attempt to improve this design by constructing DAGs to enable parallel task execution.
-
-The "Executor" agent in this demo is a Gemini model equipped with the Google Search Grounding Tool ([documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/ground-with-google-search)) to enable live web search while executing tasks.
-""".strip(),
-    chat_handler=chat_handler,
-    config=config,
-)

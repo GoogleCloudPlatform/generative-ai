@@ -39,6 +39,7 @@ CheckpointerConfig = MemoryBackendConfig | SQLiteBackendConfig | PostgresBackend
 """Union type for checkpoint backend configurations."""
 
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 class LangGraphAgent(Protocol):
     """Protocol defining the interface for a LangGraph agent."""
 
@@ -141,7 +142,7 @@ class LangGraphAgent(Protocol):
         checkpoint: Optional[schema.Checkpoint] = None,
         interrupt_before: Optional[Union[schema.All, Sequence[str]]] = None,
         interrupt_after: Optional[Union[schema.All, Sequence[str]]] = None,
-    ) -> AsyncIterator[tuple[Any, Any]]:
+    ) -> AsyncIterator[tuple[str, Any]]:
         """
         Streams the output of the agent's execution.
 
@@ -159,6 +160,9 @@ class LangGraphAgent(Protocol):
         Returns:
             An asynchronous iterator yielding tuples of output and metadata.
         """
+
+
+# pylint: enable=too-many-arguments,too-many-positional-arguments
 
 
 class SerializableLangGraphAgent(LangGraphAgent, Protocol):

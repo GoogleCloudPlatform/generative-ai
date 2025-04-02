@@ -33,7 +33,7 @@ By default, the Streamlit app will point to `http://localhost:3000` as the base 
 To start the frontend server, navigate to `langgraph-demo/frontend` and run:
 
 ```bash
-uv run --frozen streamlit run concierge_ui/Home.py \
+uv run --frozen streamlit run concierge_ui/server.py \
   --server.port 8080 \
   --server.runOnSave true
 ```
@@ -60,8 +60,8 @@ This will launch the Streamlit interface in your web browser.
 
 The Streamlit demo code is located at `concierge_ui` and is composed of:
 
-- `Home.py`: The main page of the Streamlit application, providing an overview and navigation.
-- `pages/*.py`: Individual Streamlit pages for each LangGraph agent demo (e.g., `Gemini_Chat.py`, `Function_Calling_Agent.py`).
+- `home.py`: The main page of the Streamlit application, providing an overview and navigation.
+- `agents/*.py`: Individual LangGraph agent handlers for streaming chat responses.
 - `demo_page.py`: A utility module for building the common layout and functionality of the agent demo pages.
 - `settings.py`: Configuration settings for the Streamlit application, including backend server URLs.
 - `auth.py`: Handles authentication with the backend server. It supports fetching Google Auth ID tokens from the GCE Metadata server or impersonating a service account to retrieve ID tokens.

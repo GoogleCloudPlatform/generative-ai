@@ -310,9 +310,9 @@ OLAP
 OOTB
 Ohashi
 Ohtani
-Olá
 Olgivanna
 Ollama
+Olá
 Omnibox
 Onone
 Oort

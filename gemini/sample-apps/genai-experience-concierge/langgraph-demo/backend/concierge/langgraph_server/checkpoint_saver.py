@@ -65,7 +65,7 @@ def load_checkpointer(
     return checkpointer
 
 
-async def setup_checkpointer(checkpointer: base.BaseCheckpointSaver):
+async def setup_checkpointer(checkpointer: base.BaseCheckpointSaver) -> None:
     """
     Sets up the checkpoint saver, performing any necessary initialization.
 
@@ -94,7 +94,7 @@ async def setup_checkpointer(checkpointer: base.BaseCheckpointSaver):
             print(f"Unknown checkpoint saver type: {type(checkpointer)}")
 
 
-async def cleanup_checkpointer(checkpointer: base.BaseCheckpointSaver):
+async def cleanup_checkpointer(checkpointer: base.BaseCheckpointSaver) -> None:
     """
     Cleans up the checkpoint saver, releasing any resources.
 

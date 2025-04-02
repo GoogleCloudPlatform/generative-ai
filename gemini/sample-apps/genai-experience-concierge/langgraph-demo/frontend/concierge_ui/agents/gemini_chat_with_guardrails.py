@@ -2,20 +2,20 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from concierge_ui import auth, demo_page
-from concierge_ui import remote_settings as settings
+# disable duplicate code since chat handlers for each agent may be very similar but not
+# exactly the same
+# pylint: disable=duplicate-code
+
+from typing import Generator
+
 from langgraph.pregel import remote
 
-config = settings.RemoteAgentConfigs().guardrail
 
-graph = remote.RemoteGraph(
-    config.name,
-    url=str(config.base_url),
-    headers=auth.get_auth_headers(config),
-)
-
-
-def chat_handler(message: str, thread_id: str):
+def chat_handler(
+    graph: remote.RemoteGraph,
+    message: str,
+    thread_id: str,
+) -> Generator[str, None, None]:
     """
     Handles chat interactions for a guardrail agent by streaming responses from a remote LangGraph.
 
@@ -67,21 +67,3 @@ def chat_handler(message: str, thread_id: str):
         last_source = current_source
 
         yield text
-
-
-demo_page.build_demo_page(
-    id="gemini-chat-with-guardrails",
-    title="Gemini Chat With Guardrails",
-    page_icon="🛡️",
-    description="""
-This demo illustrates a Gemini-based chatbot protected with a custom guardrail classifier.
-
-Before generating a chat response, the user input and conversation history is passed to
-a smaller, faster Gemini model which classifies the response as allowed or blocked.
-
-* If the input is blocked, a fallback response is returned to the user.
-* Otherwise, a larger Gemini model is used to generate and stream a response.
-""".strip(),
-    chat_handler=chat_handler,
-    config=config,
-)

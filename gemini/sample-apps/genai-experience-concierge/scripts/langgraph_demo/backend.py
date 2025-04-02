@@ -3,6 +3,8 @@
 # agreement with Google.
 """Tools for managing the demo backend service."""
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+
 import json
 import subprocess
 import tempfile
@@ -24,7 +26,7 @@ def deploy(
     cymbal_stores_table_uri: str,
     cymbal_inventory_table_uri: str,
     cymbal_embedding_model_uri: str,
-):
+) -> None:
     """
     Deploy a new Cloud Run revision.
 
@@ -93,7 +95,7 @@ def deploy(
         )
 
 
-def describe(project: str, region: str, service: str):
+def describe(project: str, region: str, service: str) -> dict:
     """
     Describe a Cloud Run service and print its details in JSON format.
 
@@ -129,14 +131,12 @@ def describe(project: str, region: str, service: str):
         capture_output=True,
     )
 
-    service_description_dict = json.loads(service_description_process.stdout)
-
-    print(json.dumps(service_description_dict, indent=2))
+    service_description_dict = dict(json.loads(service_description_process.stdout))
 
     return service_description_dict
 
 
-def add_invoker(service: str, project: str, region: str, invoker: str):
+def add_invoker(service: str, project: str, region: str, invoker: str) -> None:
     """
     Add the given member as a Cloud Run service invoker.
 

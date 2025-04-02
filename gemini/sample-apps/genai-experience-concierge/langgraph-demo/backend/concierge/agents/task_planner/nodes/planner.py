@@ -2,6 +2,9 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
 import logging
 from typing import Literal
 
@@ -83,7 +86,7 @@ async def ainvoke(
 
     else:
         raise TypeError(
-            "Unsupported plan reflection action: %s", type(plan_reflection.action)
+            f"Unsupported plan reflection action: {type(plan_reflection.action)}"
         )
 
     return lg_types.Command(

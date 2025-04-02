@@ -2,12 +2,15 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
 import logging
 from typing import AsyncIterator
 
 from concierge.agents.gemini_chat import schemas
-from google import genai  # type: ignore[import-untyped]
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google import genai
+from google.genai import types as genai_types
 from langchain_core.runnables import config as lc_config
 from langgraph import types as lg_types
 from langgraph.config import get_stream_writer
@@ -47,9 +50,6 @@ async def ainvoke(
     current_turn = state.get("current_turn")
     assert current_turn is not None, "current turn must be set"
 
-    user_input = current_turn.get("user_input")
-    assert user_input is not None, "user input must be set"
-
     # Initialize generate model
     client = genai.Client(
         vertexai=True,
@@ -57,28 +57,26 @@ async def ainvoke(
         location=agent_config.region,
     )
 
-    # Add new user input to history
-    turns = state.get("turns", [])
-    history = [content for turn in turns for content in turn.get("messages", [])]
-    user_content = genai_types.Content(
-        role="user",
-        parts=[genai_types.Part.from_text(text=user_input)],
-    )
-    contents = history + [user_content]
-
+    user_content = load_user_content(current_turn=current_turn)
+    new_contents = [user_content.model_copy(deep=True)]
     try:
         # generate streaming response
-        response: AsyncIterator[
-            genai_types.GenerateContentResponse
-        ] = await client.aio.models.generate_content_stream(
-            model=agent_config.chat_model_name,
-            contents=contents,
-            config=genai_types.GenerateContentConfig(
-                candidate_count=1,
-                temperature=0.2,
-                seed=0,
-                system_instruction=CHAT_SYSTEM_PROMPT,
-            ),
+        response: AsyncIterator[genai_types.GenerateContentResponse] = (
+            await client.aio.models.generate_content_stream(
+                model=agent_config.chat_model_name,
+                contents=[
+                    content
+                    for turn in state.get("turns", [])
+                    for content in turn.get("messages", [])
+                ]
+                + [user_content],
+                config=genai_types.GenerateContentConfig(
+                    candidate_count=1,
+                    temperature=0.2,
+                    seed=0,
+                    system_instruction=CHAT_SYSTEM_PROMPT,
+                ),
+            )
         )
 
         # stream response text to custom stream writer
@@ -87,26 +85,40 @@ async def ainvoke(
             response_text += chunk.text
             stream_writer({"text": chunk.text})
 
-        response_content = genai_types.Content(
-            role="model",
-            parts=[genai_types.Part.from_text(text=response_text)],
-        )
+            if chunk.candidates[0].content:
+                new_contents.append(chunk.candidates[0].content.model_copy(deep=True))
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         logger.exception(e)
         # unexpected error, display it
         response_text = f"An unexpected error occurred during generation, please try again.\n\nError = {str(e)}"
         stream_writer({"error": response_text})
 
-        response_content = genai_types.Content(
-            role="model",
-            parts=[genai_types.Part.from_text(text=response_text)],
+        new_contents.append(
+            genai_types.Content(
+                role="model",
+                parts=[genai_types.Part.from_text(text=response_text)],
+            )
         )
 
     current_turn["response"] = response_text.strip()
-    current_turn["messages"] = [user_content, response_content]
+    current_turn["messages"] = new_contents
 
     return lg_types.Command(
         update=schemas.GraphSession(current_turn=current_turn),
         goto=schemas.POST_PROCESS_NODE_NAME,
     )
+
+
+def load_user_content(current_turn: schemas.Turn) -> genai_types.Content:
+    """Load user input from current turn into a Content object."""
+
+    user_input = current_turn.get("user_input")
+    assert user_input is not None, "user input must be set"
+
+    user_content = genai_types.Content(
+        role="user",
+        parts=[genai_types.Part.from_text(text=user_input)],
+    )
+
+    return user_content

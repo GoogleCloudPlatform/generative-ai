@@ -2,25 +2,25 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from concierge_ui import auth, demo_page
-from concierge_ui import remote_settings as settings
+# disable duplicate code since chat handlers for each agent may be very similar but not
+# exactly the same
+# pylint: disable=duplicate-code
+
+from typing import Generator
+
 from langgraph.pregel import remote
 
-config = settings.RemoteAgentConfigs().gemini
 
-graph = remote.RemoteGraph(
-    config.name,
-    url=str(config.base_url),
-    headers=auth.get_auth_headers(config),
-)
-
-
-def chat_handler(message: str, thread_id: str):
+def chat_handler(
+    graph: remote.RemoteGraph,
+    message: str,
+    thread_id: str,
+) -> Generator[str, None, None]:
     """
-    Handles chat interactions for a basic Gemini chat agent by streaming responses from a remote LangGraph.
+    Handles chat interactions for a semantic router agent by streaming responses from a remote LangGraph.
 
     This function takes a user message and a thread ID, and streams responses from a remote LangGraph.
-    It parses the streamed chunks, which can contain text responses or errors,
+    It parses the streamed chunks, which can contain router classifications, text responses, or errors,
     and formats them into a human-readable text stream.
 
     Args:
@@ -28,9 +28,8 @@ def chat_handler(message: str, thread_id: str):
         thread_id (str): The ID of the chat thread.
 
     Yields:
-        str: Formatted text chunks representing text responses or errors.
+        str: Formatted text chunks representing router classifications, text responses, or errors.
     """
-
     current_source = last_source = None
     for _, chunk in graph.stream(
         input={"current_turn": {"user_input": message}},
@@ -41,7 +40,14 @@ def chat_handler(message: str, thread_id: str):
 
         text = ""
 
-        if "text" in chunk:
+        if "router_classification" in chunk:
+            target = chunk["router_classification"]["target"]
+            reason = chunk["router_classification"]["reason"]
+
+            text = f"Agent Classification: {target}\n\nReason: {reason}"
+            current_source = "router_classification"
+
+        elif "text" in chunk:
             text = chunk["text"]
             current_source = "text"
 
@@ -58,16 +64,3 @@ def chat_handler(message: str, thread_id: str):
         last_source = current_source
 
         yield text
-
-
-demo_page.build_demo_page(
-    id="gemini-chat",
-    title="Gemini Chat",
-    page_icon="⭐",
-    description="""
-This demo illustrates a simple "agent" which just consists of plain Gemini 2.0 Flash with conversation history.
-Response text is streamed using a custom [langgraph.config.get_stream_writer](https://langchain-ai.github.io/langgraph/reference/config/#langgraph.config.get_stream_writer).
-""".strip(),
-    chat_handler=chat_handler,
-    config=config,
-)

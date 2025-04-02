@@ -39,6 +39,7 @@ dev = [
 # leave mypy checks to demo sub-projects
 [tool.mypy]
 packages = ["concierge"]
+disable_error_code = ["import-untyped"]
 
 [tool.pylint.messages_control]
-disable = ["too-many-arguments", "too-many-positional-arguments", "duplicate-code", "wrong-import-order"]
+disable=["wrong-import-order"]

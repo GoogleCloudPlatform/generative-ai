@@ -2,9 +2,14 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
+from typing import Callable
+
 from concierge.agents.function_calling import schemas
 from google.cloud import bigquery
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google.genai import types as genai_types
 
 find_inventory_fd = genai_types.FunctionDeclaration(
     response=None,
@@ -31,7 +36,7 @@ def generate_find_inventory_handler(
     project: str,
     cymbal_inventory_table_uri: str,
     cymbal_dataset_location: str,
-):
+) -> Callable[[int, str], schemas.InventorySearchResult]:
     """Generates a handler function for finding inventory information.
 
     This function creates a callable that queries BigQuery to find inventory
@@ -49,7 +54,7 @@ def generate_find_inventory_handler(
     def find_inventory(
         store_id: int,
         product_id: str,
-    ):
+    ) -> schemas.InventorySearchResult:
         """Look up the inventory query for a given product at a certain store. The product ID and store ID must be known before calling this function. If either are not known, use the other tools to first find the right store and product IDs.
 
         Args:

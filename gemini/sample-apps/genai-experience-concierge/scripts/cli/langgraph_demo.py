@@ -3,6 +3,9 @@
 # agreement with Google.
 """Tools for deploying the end-to-end Concierge demo."""
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+
+from typing import Any
 import uuid
 
 import click
@@ -28,7 +31,7 @@ import yaml
     help="Multi-region location for the BigQuery dataset (US, EU, etc).",
     default="US",
 )
-def create_dataset(project_id: str, location: str = "US"):
+def create_dataset(project_id: str, location: str = "US") -> dataset.GeneratedDataset:
     """Create a mock Cymbal Retail dataset."""
 
     return dataset.create(project=project_id, location=location)
@@ -118,7 +121,7 @@ def deploy(
     org_id: str | None = None,
     folder_id: str | None = None,
     auto_approve: bool = False,
-):
+) -> dict[str, Any]:
     """Deploy the end-to-end Concierge demo."""
 
     # only use default source dirs. Maybe enable user-provided in future?
@@ -295,11 +298,13 @@ def deploy(
     output_str = yaml.safe_dump(outputs)
     click.echo(f"Displaying the key generated resources:\n\n{output_str}")
 
+    return outputs
+
 
 # pylint: enable=too-many-locals
 
 
-def log_section(message: str):
+def log_section(message: str) -> None:
     """Log section with spacing and bold styling."""
 
     click.echo("\n\n" + click.style(message, bold=True) + "\n\n")

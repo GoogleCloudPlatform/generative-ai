@@ -11,7 +11,7 @@ def build(
     service_account: str,
     image_url: str,
     source_dir: str,
-):
+) -> None:
     """
     Build and push a container image to Google Container Registry or Artifact Registry.
 

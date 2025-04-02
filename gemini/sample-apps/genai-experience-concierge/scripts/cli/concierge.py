@@ -18,7 +18,7 @@ import yaml
     default=None,
 )
 @click.pass_context
-def concierge(ctx: click.Context, config_file: str | None = None):
+def concierge(ctx: click.Context, config_file: str | None = None) -> None:
     """Gen AI Experience Concierge demo tool."""
 
     ctx.ensure_object(dict)
@@ -31,7 +31,7 @@ def concierge(ctx: click.Context, config_file: str | None = None):
         ctx.default_map = default_map
 
 
-def langgraph_demo_group():
+def langgraph_demo_group() -> None:
     """LangGraph demo group. No group-level operations currently."""
 
 

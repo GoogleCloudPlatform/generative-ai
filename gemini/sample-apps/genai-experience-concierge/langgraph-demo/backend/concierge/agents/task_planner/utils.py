@@ -3,8 +3,8 @@
 # agreement with Google.
 """Utilities to check if an exception is retryable for Gen AI SDK generation."""
 
-from google.genai import errors as genai_errors  # type: ignore[import-untyped]
-import requests  # type: ignore[import-untyped]
+from google.genai import errors as genai_errors
+import requests
 
 
 def is_retryable_error(exception: BaseException) -> bool:

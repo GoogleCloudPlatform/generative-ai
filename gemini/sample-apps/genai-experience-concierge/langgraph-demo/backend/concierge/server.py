@@ -4,6 +4,7 @@
 """FastAPI server for hosting LangGraph agents."""
 
 import contextlib
+from typing import AsyncGenerator
 
 from concierge import agent_settings as settings
 from concierge.agents import (
@@ -52,7 +53,7 @@ task_planner_agent = langgraph_agent.LangGraphAgent(
 
 
 @contextlib.asynccontextmanager
-async def lifespan(_app: fastapi.FastAPI):
+async def lifespan(_app: fastapi.FastAPI) -> AsyncGenerator[None]:
     """Setup each agent during server startup."""
     await gemini_agent.setup()
     await guardrail_agent.setup()
@@ -67,13 +68,13 @@ app = fastapi.FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
-async def root():
+async def root() -> int:
     """Root endpoint."""
     return 200
 
 
 @app.get("/health")
-async def health():
+async def health() -> int:
     """Health endpoint."""
     return 200
 

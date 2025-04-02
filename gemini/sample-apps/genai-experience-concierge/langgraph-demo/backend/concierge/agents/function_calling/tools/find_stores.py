@@ -2,12 +2,15 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from typing import Optional
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
+from typing import Callable, Optional
 
 from concierge.agents.function_calling import schemas
 from google.cloud import bigquery
-from google.genai import types as genai_types  # type: ignore[import-untyped]
-from thefuzz import fuzz  # type: ignore[import-untyped]
+from google.genai import types as genai_types
+from thefuzz import fuzz
 
 MAX_STORE_RESULTS = 10
 STORE_NAME_SIMILARITY_THRESHOLD = 90
@@ -54,9 +57,10 @@ def generate_find_stores_handler(
     cymbal_dataset_location: str,
     cymbal_stores_table_uri: str,
     cymbal_inventory_table_uri: str,
-    user_latitude: Optional[float] = None,
-    user_longitude: Optional[float] = None,
-):
+    user_coordinate: Optional[schemas.Coordinate] = None,
+) -> Callable[
+    [list[str] | None, int, int | None, str | None], schemas.StoreSearchResult
+]:
     """Generates a handler function for finding stores based on various criteria.
 
     This function creates a closure that encapsulates user location information (latitude and longitude)
@@ -73,14 +77,7 @@ def generate_find_stores_handler(
 
     Returns:
         Callable: A function that takes product IDs, max results, radius, and store name as input and returns a StoreSearchResult.
-
-    Raises:
-        AssertionError: If only one of `user_latitude` or `user_longitude` is provided.
     """
-
-    assert not ((user_latitude is None) ^ (user_longitude is None)), (
-        "Latitude and longitude must both be defined or both null"
-    )
 
     def find_stores(
         product_ids: list[str] | None = None,
@@ -88,7 +85,7 @@ def generate_find_stores_handler(
         # Note: google-genai doesn't properly handle floats, so we just set this as an integer
         radius_km: int | None = None,
         store_name: str | None = None,
-    ):
+    ) -> schemas.StoreSearchResult:
         """Search for stores nearby, by name, or offering certain products.
 
         Args:
@@ -101,13 +98,7 @@ def generate_find_stores_handler(
             StoreSearchResult: The return value. Object including top matched stores and/or an error message.
         """
 
-        nonlocal \
-            project, \
-            cymbal_dataset_location, \
-            cymbal_stores_table_uri, \
-            cymbal_inventory_table_uri, \
-            user_latitude, \
-            user_longitude
+        nonlocal project, cymbal_dataset_location, cymbal_stores_table_uri, cymbal_inventory_table_uri, user_coordinate
 
         product_ids = product_ids or []
 
@@ -123,7 +114,7 @@ def generate_find_stores_handler(
 
         radius_selector = None
         if radius_km:
-            if user_latitude is None or user_longitude is None:
+            if user_coordinate is None:
                 raise ValueError("User location is not known")
 
             radius_selector = "ST_DISTANCE(ST_GEOGPOINT(@longitude, @latitude), ST_GEOGPOINT(longitude, latitude)) <= @radius_meters"
@@ -133,12 +124,12 @@ def generate_find_stores_handler(
                     bigquery.ScalarQueryParameter(
                         name="latitude",
                         type_=bigquery.SqlParameterScalarTypes.FLOAT,
-                        value=user_latitude,
+                        value=user_coordinate.latitude,
                     ),
                     bigquery.ScalarQueryParameter(
                         name="longitude",
                         type_=bigquery.SqlParameterScalarTypes.FLOAT,
-                        value=user_longitude,
+                        value=user_coordinate.longitude,
                     ),
                     bigquery.ScalarQueryParameter(
                         name="radius_meters",
@@ -216,7 +207,9 @@ def generate_find_stores_handler(
                 or fuzz.partial_ratio(row["name"], store_name)
                 >= STORE_NAME_SIMILARITY_THRESHOLD
             )
-        ][:max_results]  # filter max results
+        ][
+            :max_results
+        ]  # filter max results
 
         return schemas.StoreSearchResult(stores=stores, query=query)
 

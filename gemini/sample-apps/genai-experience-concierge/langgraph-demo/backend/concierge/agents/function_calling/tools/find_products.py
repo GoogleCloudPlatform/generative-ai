@@ -2,11 +2,14 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-from typing import Optional
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
+from typing import Callable, Optional
 
 from concierge.agents.function_calling import schemas
 from google.cloud import bigquery
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google.genai import types as genai_types
 
 MAX_PRODUCT_RESULTS = 10
 
@@ -59,7 +62,10 @@ def generate_find_products_handler(
     cymbal_products_table_uri: str,
     cymbal_inventory_table_uri: str,
     cymbal_embedding_model_uri: str,
-):
+) -> Callable[
+    [int, str | None, list[str] | None, int | None, int | None],
+    schemas.ProductSearchResult,
+]:
     """
     Generates a function handler for finding products based on search queries and filters.
 
@@ -92,7 +98,7 @@ def generate_find_products_handler(
         store_ids: list[str] | None = None,
         min_price: int | None = None,
         max_price: int | None = None,
-    ):
+    ) -> schemas.ProductSearchResult:
         """Search for products with optional semantic search queries and filters.
 
         Args:
@@ -115,10 +121,7 @@ def generate_find_products_handler(
             max_results = MAX_PRODUCT_RESULTS
 
         if product_search_query:
-            query, query_job_config = build_query_with_vector_search(
-                cymbal_products_table_uri=cymbal_products_table_uri,
-                cymbal_inventory_table_uri=cymbal_inventory_table_uri,
-                cymbal_embedding_model_uri=cymbal_embedding_model_uri,
+            query, query_job_config = _build_query_with_vector_search(
                 max_results=max_results,
                 product_search_query=product_search_query,
                 store_ids=store_ids,
@@ -126,9 +129,7 @@ def generate_find_products_handler(
                 max_price=max_price,
             )
         else:
-            query, query_job_config = build_query_without_vector_search(
-                cymbal_products_table_uri=cymbal_products_table_uri,
-                cymbal_inventory_table_uri=cymbal_inventory_table_uri,
+            query, query_job_config = _build_query_without_vector_search(
                 max_results=max_results,
                 store_ids=store_ids,
                 min_price=min_price,
@@ -150,253 +151,255 @@ def generate_find_products_handler(
 
         return schemas.ProductSearchResult(products=products, query=query)
 
-    return find_products
+    def _build_query_without_vector_search(
+        max_results: int = 3,
+        store_ids: Optional[list[str]] = None,
+        min_price: Optional[int] = None,
+        max_price: Optional[int] = None,
+    ) -> tuple[str, bigquery.QueryJobConfig]:
+        """
+        Builds a BigQuery SQL query for product search without semantic vector search.
 
+        This function constructs a SQL query that filters products based on store availability and price range,
+        without using vector search for semantic similarity.
 
-def build_query_without_vector_search(
-    cymbal_products_table_uri: str,
-    cymbal_inventory_table_uri: str,
-    max_results: int = 3,
-    store_ids: Optional[list[str]] = None,
-    min_price: Optional[int] = None,
-    max_price: Optional[int] = None,
-):
-    """
-    Builds a BigQuery SQL query for product search without semantic vector search.
+        Args:
+            max_results: The maximum number of results to return.
+            store_ids: Optional list of store IDs to filter products by availability.
+            min_price: Optional minimum price to filter products.
+            max_price: Optional maximum price to filter products.
 
-    This function constructs a SQL query that filters products based on store availability and price range,
-    without using vector search for semantic similarity.
+        Returns:
+            A tuple containing the SQL query string and the BigQuery query job configuration.
+        """
+        nonlocal cymbal_dataset_location, cymbal_embedding_model_uri
 
-    Args:
-        max_results: The maximum number of results to return.
-        store_ids: Optional list of store IDs to filter products by availability.
-        min_price: Optional minimum price to filter products.
-        max_price: Optional maximum price to filter products.
+        where_conditions = list[str]()
+        query_parameters = list[
+            bigquery.ScalarQueryParameter | bigquery.ArrayQueryParameter
+        ]()
 
-    Returns:
-        A tuple containing the SQL query string and the BigQuery query job configuration.
-    """
-    where_conditions = list[str]()
-    query_parameters = list[
-        bigquery.ScalarQueryParameter | bigquery.ArrayQueryParameter
-    ]()
+        if min_price is not None:
+            min_price_selector = "@min_price <= IFNULL(sale_price, list_price)"
+            where_conditions.append(min_price_selector)
 
-    if min_price is not None:
-        min_price_selector = "@min_price <= IFNULL(sale_price, list_price)"
-        where_conditions.append(min_price_selector)
+            query_parameters.append(
+                bigquery.ScalarQueryParameter(
+                    name="min_price",
+                    type_=bigquery.SqlParameterScalarTypes.FLOAT,
+                    value=min_price,
+                )
+            )
+
+        if max_price is not None:
+            max_price_selector = "IFNULL(sale_price, list_price) <= @max_price"
+            where_conditions.append(max_price_selector)
+
+            query_parameters.append(
+                bigquery.ScalarQueryParameter(
+                    name="max_price",
+                    type_=bigquery.SqlParameterScalarTypes.FLOAT,
+                    value=max_price,
+                )
+            )
+
+        select_products_query = f"SELECT * FROM `{cymbal_products_table_uri}`"
+        filter_store_ids = store_ids is not None and len(store_ids) > 0
+        if filter_store_ids:
+            select_products_query = f"""
+    SELECT
+        product.*
+    FROM
+        `{cymbal_products_table_uri}` AS product,
+        (SELECT DISTINCT
+            uniq_id
+        FROM
+            `{cymbal_inventory_table_uri}`
+        WHERE
+            store_id IN UNNEST(@store_ids)
+        ) AS inventory
+    WHERE
+        product.uniq_id = inventory.uniq_id
+    """.strip()
+
+            query_parameters.append(
+                bigquery.ArrayQueryParameter(
+                    name="store_ids",
+                    array_type=bigquery.SqlParameterScalarTypes.STRING,
+                    values=store_ids,
+                )
+            )
+
+        where_clause = ""
+        if where_conditions:
+            where_clause = (
+                f"WHERE {'AND '.join(f'({cond})' for cond in where_conditions)}"
+            )
 
         query_parameters.append(
             bigquery.ScalarQueryParameter(
-                name="min_price",
-                type_=bigquery.SqlParameterScalarTypes.FLOAT,
-                value=min_price,
+                name="max_results",
+                type_=bigquery.SqlParameterScalarTypes.INTEGER,
+                value=max_results,
             )
         )
 
-    if max_price is not None:
-        max_price_selector = "IFNULL(sale_price, list_price) <= @max_price"
-        where_conditions.append(max_price_selector)
+        query = f"""
+    SELECT
+        product.uniq_id AS id,
+        product.product_name AS name,
+        product.product_url AS url,
+        product.product_description AS description,
+        product.brand,
+        product.category,
+        product.available,
+        product.list_price,
+        IF(product.sale_price <= product.list_price, product.sale_price, NULL) AS sale_price
+    FROM
+        ({select_products_query}) AS product
+    {where_clause}
+    LIMIT @max_results
+    """.strip()
 
-        query_parameters.append(
-            bigquery.ScalarQueryParameter(
-                name="max_price",
-                type_=bigquery.SqlParameterScalarTypes.FLOAT,
-                value=max_price,
+        query_job_config = bigquery.QueryJobConfig()
+        query_job_config.query_parameters = query_parameters
+
+        return query, query_job_config
+
+    def _build_query_with_vector_search(
+        product_search_query: str,
+        max_results: int = 3,
+        store_ids: Optional[list[str]] = None,
+        min_price: Optional[int] = None,
+        max_price: Optional[int] = None,
+    ) -> tuple[str, bigquery.QueryJobConfig]:
+        """
+        Builds a BigQuery SQL query for product search using semantic vector search.
+
+        This function constructs a SQL query that uses BigQuery's vector search capabilities to find products
+        based on semantic similarity to the provided search query. It also applies filters for store availability
+        and price range.
+
+        Args:
+            product_search_query: The text query for semantic product search.
+            max_results: The maximum number of results to return.
+            store_ids: Optional list of store IDs to filter products by availability.
+            min_price: Optional minimum price to filter products.
+            max_price: Optional maximum price to filter products.
+
+        Returns:
+            A tuple containing the SQL query string and the BigQuery query job configuration.
+        """
+        nonlocal cymbal_products_table_uri, cymbal_inventory_table_uri, cymbal_embedding_model_uri
+
+        where_conditions = list[str]()
+        query_parameters = list[
+            bigquery.ScalarQueryParameter | bigquery.ArrayQueryParameter
+        ]()
+
+        if min_price is not None:
+            min_price_selector = (
+                "@min_price <= IFNULL(base.sale_price, base.list_price)"
             )
-        )
+            where_conditions.append(min_price_selector)
 
-    select_products_query = f"SELECT * FROM `{cymbal_products_table_uri}`"
-    filter_store_ids = store_ids is not None and len(store_ids) > 0
-    if filter_store_ids:
-        select_products_query = f"""
-SELECT
-    product.*
-FROM
-    `{cymbal_products_table_uri}` AS product,
+            query_parameters.append(
+                bigquery.ScalarQueryParameter(
+                    name="min_price",
+                    type_=bigquery.SqlParameterScalarTypes.FLOAT,
+                    value=min_price,
+                )
+            )
+
+        if max_price is not None:
+            max_price_selector = (
+                "IFNULL(base.sale_price, base.list_price) <= @max_price"
+            )
+            where_conditions.append(max_price_selector)
+
+            query_parameters.append(
+                bigquery.ScalarQueryParameter(
+                    name="max_price",
+                    type_=bigquery.SqlParameterScalarTypes.FLOAT,
+                    value=max_price,
+                )
+            )
+
+        from_inventory_snippet = ""
+        filter_store_ids = store_ids is not None and len(store_ids) > 0
+        if filter_store_ids:
+            where_conditions.append("base.uniq_id = inventory.uniq_id")
+            from_inventory_snippet = f""",
     (SELECT DISTINCT
         uniq_id
     FROM
         `{cymbal_inventory_table_uri}`
     WHERE
         store_id IN UNNEST(@store_ids)
-    ) AS inventory
-WHERE
-    product.uniq_id = inventory.uniq_id
-""".strip()
+    ) AS inventory""".strip()
 
-        query_parameters.append(
-            bigquery.ArrayQueryParameter(
-                name="store_ids",
-                array_type=bigquery.SqlParameterScalarTypes.STRING,
-                values=store_ids,
-            )
-        )
-
-    where_clause = ""
-    if where_conditions:
-        where_clause = f"WHERE {'AND '.join(f'({cond})' for cond in where_conditions)}"
-
-    query_parameters.append(
-        bigquery.ScalarQueryParameter(
-            name="max_results",
-            type_=bigquery.SqlParameterScalarTypes.INTEGER,
-            value=max_results,
-        )
-    )
-
-    query = f"""
-SELECT
-    product.uniq_id AS id,
-    product.product_name AS name,
-    product.product_url AS url,
-    product.product_description AS description,
-    product.brand,
-    product.category,
-    product.available,
-    product.list_price,
-    IF(product.sale_price <= product.list_price, product.sale_price, NULL) AS sale_price
-FROM
-    ({select_products_query}) AS product
-{where_clause}
-LIMIT @max_results
-""".strip()
-
-    query_job_config = bigquery.QueryJobConfig()
-    query_job_config.query_parameters = query_parameters
-
-    return query, query_job_config
-
-
-def build_query_with_vector_search(
-    cymbal_products_table_uri: str,
-    cymbal_inventory_table_uri: str,
-    cymbal_embedding_model_uri: str,
-    product_search_query: str,
-    max_results: int = 3,
-    store_ids: Optional[list[str]] = None,
-    min_price: Optional[int] = None,
-    max_price: Optional[int] = None,
-):
-    """
-    Builds a BigQuery SQL query for product search using semantic vector search.
-
-    This function constructs a SQL query that uses BigQuery's vector search capabilities to find products
-    based on semantic similarity to the provided search query. It also applies filters for store availability
-    and price range.
-
-    Args:
-        product_search_query: The text query for semantic product search.
-        max_results: The maximum number of results to return.
-        store_ids: Optional list of store IDs to filter products by availability.
-        min_price: Optional minimum price to filter products.
-        max_price: Optional maximum price to filter products.
-
-    Returns:
-        A tuple containing the SQL query string and the BigQuery query job configuration.
-    """
-    where_conditions = list[str]()
-    query_parameters = list[
-        bigquery.ScalarQueryParameter | bigquery.ArrayQueryParameter
-    ]()
-
-    if min_price is not None:
-        min_price_selector = "@min_price <= IFNULL(base.sale_price, base.list_price)"
-        where_conditions.append(min_price_selector)
-
-        query_parameters.append(
-            bigquery.ScalarQueryParameter(
-                name="min_price",
-                type_=bigquery.SqlParameterScalarTypes.FLOAT,
-                value=min_price,
-            )
-        )
-
-    if max_price is not None:
-        max_price_selector = "IFNULL(base.sale_price, base.list_price) <= @max_price"
-        where_conditions.append(max_price_selector)
-
-        query_parameters.append(
-            bigquery.ScalarQueryParameter(
-                name="max_price",
-                type_=bigquery.SqlParameterScalarTypes.FLOAT,
-                value=max_price,
-            )
-        )
-
-    from_inventory_snippet = ""
-    filter_store_ids = store_ids is not None and len(store_ids) > 0
-    if filter_store_ids:
-        where_conditions.append("base.uniq_id = inventory.uniq_id")
-        from_inventory_snippet = f""",
-(SELECT DISTINCT
-    uniq_id
-FROM
-    `{cymbal_inventory_table_uri}`
-WHERE
-    store_id IN UNNEST(@store_ids)
-) AS inventory""".strip()
-
-        query_parameters.append(
-            bigquery.ArrayQueryParameter(
-                name="store_ids",
-                array_type=bigquery.SqlParameterScalarTypes.STRING,
-                values=store_ids,
-            )
-        )
-
-    where_clause = ""
-    if where_conditions:
-        where_clause = f"WHERE {'AND '.join(f'({cond})' for cond in where_conditions)}"
-
-    query_parameters.append(
-        bigquery.ScalarQueryParameter(
-            name="top_k",
-            type_=bigquery.SqlParameterScalarTypes.INTEGER,
-            value=max_results * 3,  # add some wiggle room for post-filtering
-        )
-    )
-
-    query_parameters.append(
-        bigquery.ScalarQueryParameter(
-            name="max_results",
-            type_=bigquery.SqlParameterScalarTypes.INTEGER,
-            value=max_results,
-        )
-    )
-
-    if product_search_query:
-        query = f"""
-SELECT
-    base.uniq_id AS id,
-    base.product_name AS name,
-    base.product_url AS url,
-    base.product_description AS description,
-    base.brand,
-    base.category,
-    base.available,
-    base.list_price,
-    IF(base.sale_price <= base.list_price, base.sale_price, NULL) AS sale_price
-FROM
-    VECTOR_SEARCH(
-        TABLE `{cymbal_products_table_uri}`,
-        'text_embedding',
-        (SELECT
-            text_embedding,
-            content AS query
-        FROM
-            ML.GENERATE_TEXT_EMBEDDING(
-                MODEL `{cymbal_embedding_model_uri}`,
-                (
-                    SELECT @semantic_search_query AS content
+            query_parameters.append(
+                bigquery.ArrayQueryParameter(
+                    name="store_ids",
+                    array_type=bigquery.SqlParameterScalarTypes.STRING,
+                    values=store_ids,
                 )
             )
-        ),
-        top_k => @top_k
-    ) as vector_search
-    {from_inventory_snippet}
-{where_clause}
-LIMIT @max_results
-""".strip()
+
+        where_clause = ""
+        if where_conditions:
+            where_clause = (
+                f"WHERE {'AND '.join(f'({cond})' for cond in where_conditions)}"
+            )
+
+        query_parameters.append(
+            bigquery.ScalarQueryParameter(
+                name="top_k",
+                type_=bigquery.SqlParameterScalarTypes.INTEGER,
+                value=max_results * 3,  # add some wiggle room for post-filtering
+            )
+        )
+
+        query_parameters.append(
+            bigquery.ScalarQueryParameter(
+                name="max_results",
+                type_=bigquery.SqlParameterScalarTypes.INTEGER,
+                value=max_results,
+            )
+        )
+
+        query = f"""
+    SELECT
+        base.uniq_id AS id,
+        base.product_name AS name,
+        base.product_url AS url,
+        base.product_description AS description,
+        base.brand,
+        base.category,
+        base.available,
+        base.list_price,
+        IF(base.sale_price <= base.list_price, base.sale_price, NULL) AS sale_price
+    FROM
+        VECTOR_SEARCH(
+            TABLE `{cymbal_products_table_uri}`,
+            'text_embedding',
+            (SELECT
+                text_embedding,
+                content AS query
+            FROM
+                ML.GENERATE_TEXT_EMBEDDING(
+                    MODEL `{cymbal_embedding_model_uri}`,
+                    (
+                        SELECT @semantic_search_query AS content
+                    )
+                )
+            ),
+            top_k => @top_k
+        ) as vector_search
+        {from_inventory_snippet}
+    {where_clause}
+    LIMIT @max_results
+    """.strip()
 
         query_parameters.append(
             bigquery.ScalarQueryParameter(
@@ -406,7 +409,9 @@ LIMIT @max_results
             )
         )
 
-    query_job_config = bigquery.QueryJobConfig()
-    query_job_config.query_parameters = query_parameters
+        query_job_config = bigquery.QueryJobConfig()
+        query_job_config.query_parameters = query_parameters
 
-    return query, query_job_config
+        return query, query_job_config
+
+    return find_products

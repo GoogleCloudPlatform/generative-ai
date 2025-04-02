@@ -3,6 +3,8 @@
 # agreement with Google.
 """Tools for managing the demo frontend application."""
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+
 import subprocess
 import tempfile
 
@@ -16,7 +18,7 @@ def deploy(
     service_account: str,
     concierge_host: str,
     frontend_image_url: str,
-):
+) -> None:
     """
     Deploy a new App Engine version for the Concierge frontend demo.
 

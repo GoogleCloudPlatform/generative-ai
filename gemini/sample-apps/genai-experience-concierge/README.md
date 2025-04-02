@@ -63,7 +63,7 @@ You can view the swagger documentation at [https://localhost:3000/docs](https://
 To start the frontend server, open a new terminal window, navigate to `langgraph-demo/frontend` and run:
 
 ```bash
-uv run --frozen streamlit run concierge_ui/Home.py \
+uv run --frozen streamlit run concierge_ui/server.py \
   --server.port 8080 \
   --server.runOnSave true
 ```

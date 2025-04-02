@@ -2,12 +2,15 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
 import logging
 from typing import Literal
 
 from concierge.agents.gemini_chat_with_guardrails import schemas
-from google import genai  # type: ignore[import-untyped]
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google import genai
+from google.genai import types as genai_types
 from langchain_core.runnables import config as lc_config
 from langgraph import types as lg_types
 from langgraph.config import get_stream_writer
@@ -75,25 +78,21 @@ async def ainvoke(
     stream_writer = get_stream_writer()
 
     current_turn = state.get("current_turn")
-    assert current_turn is not None, "Current turn must be set."
-
-    user_input = current_turn.get("user_input")
-    assert user_input is not None, "user input must be set"
+    assert current_turn is not None, "current turn must be set"
 
     # Initialize generate model
     client = genai.Client(
-        vertexai=True, project=agent_config.project, location=agent_config.region
+        vertexai=True,
+        project=agent_config.project,
+        location=agent_config.region,
     )
 
-    # Add new user input to history
-    turns = state.get("turns", [])
-    history = [content for turn in turns for content in turn.get("messages", [])]
-    user_content = genai_types.Content(
-        role="user",
-        parts=[genai_types.Part.from_text(text=user_input)],
-    )
-    contents = history + [user_content]
-
+    user_content = load_user_content(current_turn=current_turn)
+    contents = [
+        content
+        for turn in state.get("turns", [])
+        for content in turn.get("messages", [])
+    ] + [user_content]
     try:
         # generate streaming response
         response = await client.aio.models.generate_content(
@@ -113,7 +112,7 @@ async def ainvoke(
             response.text.strip()
         )
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         logger.exception(e)
         error_reason = str(e)
 
@@ -148,3 +147,17 @@ async def ainvoke(
         update=schemas.GraphSession(current_turn=current_turn),
         goto=next_node,
     )
+
+
+def load_user_content(current_turn: schemas.Turn) -> genai_types.Content:
+    """Load user input from current turn into a Content object."""
+
+    user_input = current_turn.get("user_input")
+    assert user_input is not None, "user input must be set"
+
+    user_content = genai_types.Content(
+        role="user",
+        parts=[genai_types.Part.from_text(text=user_input)],
+    )
+
+    return user_content

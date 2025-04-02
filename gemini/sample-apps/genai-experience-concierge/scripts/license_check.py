@@ -17,7 +17,7 @@ _HASH_LICENSE_HEADER = """
 """.strip()
 
 
-def license_check(fix: bool = False):
+def license_check(fix: bool = False) -> None:
     """Check all relevant files for license headers."""
     ps = subprocess.run(["git", "ls-files"], capture_output=True, text=True, check=True)
 

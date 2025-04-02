@@ -2,6 +2,9 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
 from concierge.agents.semantic_router import schemas
 from langchain_core.runnables import config as lc_config
 from langgraph import types as lg_types

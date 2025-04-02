@@ -3,11 +3,14 @@
 # agreement with Google.
 """Schemas for the function calling agent."""
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
 import datetime
 from typing import Literal, Optional, TypedDict
 import uuid
 
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google.genai import types as genai_types
 import pydantic
 
 # Agent config settings
@@ -51,6 +54,15 @@ EndNodeTargetLiteral = Literal["__end__"]
 """Literal type for the end node target."""
 
 # DB Models
+
+
+class Coordinate(pydantic.BaseModel):
+    """Represents a coordinate with its latitude and longitude."""
+
+    latitude: float
+    """Latitude of the coordinate."""
+    longitude: float
+    """Longitude of the coordinate."""
 
 
 class Store(pydantic.BaseModel):

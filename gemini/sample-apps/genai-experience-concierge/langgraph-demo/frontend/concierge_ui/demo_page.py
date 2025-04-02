@@ -7,7 +7,8 @@ import logging
 from typing import Generator, Protocol
 import uuid
 
-from concierge_ui import remote_settings as settings
+from concierge_ui import auth, remote_settings
+from langgraph.pregel import remote
 import streamlit as st
 
 logger = logging.getLogger(__name__)
@@ -16,11 +17,17 @@ logger = logging.getLogger(__name__)
 class ChatHandler(Protocol):  # pylint: disable=too-few-public-methods
     """Protocol defining the interface for a chat handler."""
 
-    def __call__(self, message: str, thread_id: str) -> Generator[str, None, None]:
+    def __call__(
+        self,
+        graph: remote.RemoteGraph,
+        message: str,
+        thread_id: str,
+    ) -> Generator[str, None, None]:
         """
         Handles a chat message.
 
         Args:
+            graph: The remote graph client to query the agent.
             message: The chat message.
             thread_id: The ID of the chat thread.
 
@@ -30,32 +37,36 @@ class ChatHandler(Protocol):  # pylint: disable=too-few-public-methods
 
 
 def build_demo_page(
-    demo_id: str,
     title: str,
-    page_icon: str,
+    icon: str,
     description: str,
     chat_handler: ChatHandler,
-    config: settings.RemoteAgentConfig,
-):
+    config: remote_settings.RemoteAgentConfig,
+) -> None:
     """
     Builds a demo page for a chat application using Streamlit.
 
     Args:
-        demo_id: A unique identifier for the page.
-        title: The title of the page.
-        page_icon: The icon to display in the browser tab.
-        description: A description of the chat application.
         chat_handler: A callable that handles chat messages.
         config: Configuration settings for the remote agent.
     """
-    st.set_page_config(page_title=title, page_icon=page_icon)
+
+    graph = remote.RemoteGraph(
+        title,
+        url=str(config.base_url),
+        headers=auth.get_auth_headers(config),
+    )
+
+    st.set_page_config(page_title=title, page_icon=icon)
     st.title(title)
     st.subheader(f"Server: [{config.base_url}]({config.base_url})")
     st.sidebar.header(title)
-    st.markdown(description)
 
-    thread_key = f"{demo_id}-thread"
-    messages_key = f"{demo_id}-messages"
+    if description:
+        st.markdown(description)
+
+    thread_key = f"{config.id.hex}-thread"
+    messages_key = f"{config.id.hex}-messages"
 
     # Set session ID
     if thread_key not in st.session_state:
@@ -89,6 +100,7 @@ def build_demo_page(
         with st.chat_message("assistant"):
             response = st.write_stream(
                 chat_handler(
+                    graph=graph,
                     message=prompt,
                     thread_id=st.session_state[thread_key],
                 )

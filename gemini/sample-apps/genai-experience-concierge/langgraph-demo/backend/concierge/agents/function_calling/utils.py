@@ -8,13 +8,14 @@ import inspect
 import logging
 from typing import Any, AsyncGenerator, AsyncIterator, Awaitable, Callable, Mapping
 
-from google import genai  # type: ignore[import-untyped]
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google import genai
+from google.genai import types as genai_types
 import pydantic
 
 logger = logging.getLogger(__name__)
 
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 async def generate_content_stream(
     model: str,
     contents: list[genai_types.Content],
@@ -117,10 +118,13 @@ async def generate_content_stream(
                 yield content
 
 
+# pylint: enable=too-many-arguments,too-many-positional-arguments
+
+
 async def run_function_async(
     function: Callable[..., pydantic.BaseModel | Awaitable[pydantic.BaseModel]],
     function_kwargs: Mapping[str, Any],
-):
+) -> dict[str, str | dict]:
     """
     Runs a function asynchronously and wraps the results for google-genai FunctionResponse.
 

@@ -2,9 +2,12 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
+# disable duplicate code to make it easier for copying a single agent folder
+# pylint: disable=duplicate-code
+
 from concierge.agents.task_planner import schemas, utils
-from google import genai  # type: ignore[import-untyped]
-from google.genai import types as genai_types  # type: ignore[import-untyped]
+from google import genai
+from google.genai import types as genai_types
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 

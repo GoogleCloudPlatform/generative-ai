@@ -3,6 +3,8 @@
 # agreement with Google.
 """Tools for generating a mock Cymbal Retail dataset."""
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+
 import json
 import subprocess
 from typing import Callable, TypedDict, TypeVar
@@ -76,7 +78,7 @@ def create(
     product_path: str = str(defaults.PRODUCT_DATASET_PATH),
     store_path: str = str(defaults.STORE_DATASET_PATH),
     inventory_path: str = str(defaults.INVENTORY_DATASET_PATH),
-):
+) -> GeneratedDataset:
     """
     Create the required Cymbal dataset models and tables.
 
@@ -169,7 +171,7 @@ def load_table_from_parquet(
     client: bigquery.Client,
     table_uri: str,
     source_path: str,
-):
+) -> None:
     """Load a Parquet file into a BigQuery table."""
 
     job_config = bigquery.LoadJobConfig()
@@ -192,7 +194,7 @@ def create_product_table_with_embeddings(
     source_table_uri: str,
     products_table_uri: str,
     embedding_model_uri: str,
-):
+) -> None:
     """Create a table with embeddings for product semantic search."""
 
     product_with_embedding_query = CREATE_PRODUCTS_WITH_EMBEDDINGS_QUERY.format(
@@ -248,8 +250,8 @@ def setup_dataset(
     location: str,
     dataset_id: str,
     connection_id: str,
-):
-    """Create a BigQuery dataset with a Cloud Resource connection."""
+) -> None:
+    """Ensure a BigQuery dataset with a Cloud Resource connection is correctly configured."""
 
     dataset_uri = f"{project}.{dataset_id}"
 
@@ -317,7 +319,11 @@ def setup_dataset(
     )()
 
 
-def get_connection_service_account(project: str, location: str, connection_id: str):
+def get_connection_service_account(
+    project: str,
+    location: str,
+    connection_id: str,
+) -> str:
     """Retrieve the service account associated with a BigQuery connection."""
 
     completed_process = subprocess.run(

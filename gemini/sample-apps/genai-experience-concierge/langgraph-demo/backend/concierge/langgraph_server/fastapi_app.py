@@ -3,7 +3,15 @@
 # agreement with Google.
 """FastAPI router for the langgraph-server package."""
 
-from typing import Any, AsyncIterator, Optional, Sequence, TypeVar, Union
+from typing import (
+    Any,
+    AsyncGenerator,
+    AsyncIterator,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+)
 
 from concierge.langgraph_server import schemas
 import fastapi
@@ -126,7 +134,7 @@ class ThreadRunBody(StatelessRunBody):
 def build_agent_router(
     agent: schemas.SerializableLangGraphAgent,
     router: fastapi.APIRouter,
-):
+) -> fastapi.APIRouter:
     """
     Builds a FastAPI router for a LangGraph agent.
 
@@ -143,11 +151,6 @@ def build_agent_router(
     """
 
     route_adaptor = LangGraphFastAPIRouteAdaptor(agent=agent)
-
-    async def route_to_docs():
-        return responses.RedirectResponse("/docs")
-
-    router.add_api_route("/", route_to_docs, methods=["GET"])
 
     router.add_api_route(
         "/assistants/{assistant_id}/graph",
@@ -449,7 +452,7 @@ async def async_iterator_to_list(async_iterable: AsyncIterator[_T]) -> list[_T]:
 async def stream_sse_chunk(
     stream_response: AsyncIterator[tuple[str, dict[str, Any]]],
     agent: schemas.SerializableLangGraphAgent,
-):
+) -> AsyncGenerator[str]:
     """
     Streams data from an asynchronous iterator as Server-Sent Events (SSE).
 
