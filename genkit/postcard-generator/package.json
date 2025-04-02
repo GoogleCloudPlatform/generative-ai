@@ -18,7 +18,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@genkit-ai/ai": "^0.9.0",
-    "@genkit-ai/core": "^0.9.0",
+    "@genkit-ai/core": "^1.0.0",
     "@genkit-ai/dotprompt": "^0.9.0",
     "@genkit-ai/flow": "^0.5.13",
     "@genkit-ai/google-cloud": "^0.9.0",
