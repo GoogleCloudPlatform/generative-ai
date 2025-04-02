@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@angular/cli": "^18.2.4",
-    "@google-cloud/discoveryengine": "^1.4.1",
+    "@google-cloud/discoveryengine": "^2.0.0",
     "@google-cloud/storage": "^7.9.0",
     "@google-cloud/vertexai": "^1.0.0",
     "cors": "^2.8.5",
