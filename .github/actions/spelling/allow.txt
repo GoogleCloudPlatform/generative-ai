@@ -16,6 +16,7 @@ ASF
 ASGI
 ASML
 AUVs
+Abhishek
 Aktu
 Aphone
 Arborio
@@ -31,6 +32,7 @@ BITCODE
 BYOR
 Benno
 Bettes
+Bhagwat
 Biden
 Bigtable
 Bitcoin
@@ -173,6 +175,7 @@ Hisaki
 Hmmm
 Hogwarts
 Homesley
+Hossein
 Hritik
 Hubmann
 Hyperdisk
@@ -192,6 +195,7 @@ JAVACMD
 JDK
 JHome
 JPY
+Jaival
 Jax
 Jedi
 Jestem
@@ -258,6 +262,7 @@ Masaru
 Mbappe
 Meawad
 Mega
+Meltem
 Memegen
 Merhaba
 Mesop
@@ -287,6 +292,7 @@ NREL
 NVIDIA
 NVL
 Nagasu
+Najim
 Nakoso
 Napisz
 Narnia
@@ -326,7 +332,9 @@ Phaidon
 Phanfone
 Pharma
 Photoshop
+Pichai
 Pistorius
+Porat
 Pranav
 Pré
 Pzk
@@ -858,6 +866,7 @@ logprobs
 lolcat
 loras
 lparam
+lro
 lru
 lsb
 lxml
@@ -1044,8 +1053,10 @@ rapideval
 rarian
 rarians
 ratelimit
+rawbytes
 rbc
 rbf
+recrawl
 reddit
 redef
 rembg
