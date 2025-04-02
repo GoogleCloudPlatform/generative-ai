@@ -2,14 +2,16 @@
 # representation for any use or purpose. Your use of it is subject to your
 # agreement with Google.
 
-# disable duplicate code since chat handlers for each agent may be very similar but not
-# exactly the same
+# disable duplicate code since chat handlers for each agent may be very similar
 # pylint: disable=duplicate-code
 
 import json
+import logging
 from typing import Generator
 
 from langgraph.pregel import remote
+
+logger = logging.getLogger(__name__)
 
 
 def chat_handler(
@@ -36,8 +38,7 @@ def chat_handler(
         input={
             "current_turn": {
                 "user_input": message,
-                "user_latitude": 44.6508262,
-                "user_longitude": -63.6408055,
+                "user_location": {"latitude": 44.6508262, "longitude": -63.6408055},
             }
         },
         config={"configurable": {"thread_id": thread_id}},
@@ -93,7 +94,7 @@ def chat_handler(
             current_source = "error"
 
         else:
-            print("unhandled chunk case:", chunk)
+            logger.warning(f"unhandled chunk case: {chunk}")
 
         if last_source is not None and last_source != current_source:
             text = "\n\n---\n\n" + text

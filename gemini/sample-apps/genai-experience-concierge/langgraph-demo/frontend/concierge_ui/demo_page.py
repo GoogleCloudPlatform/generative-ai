@@ -65,8 +65,8 @@ def build_demo_page(
     if description:
         st.markdown(description)
 
-    thread_key = f"{config.id.hex}-thread"
-    messages_key = f"{config.id.hex}-messages"
+    thread_key = f"{config.agent_id}-thread"
+    messages_key = f"{config.agent_id}-messages"
 
     # Set session ID
     if thread_key not in st.session_state:

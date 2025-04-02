@@ -16,7 +16,7 @@ The LangGraph Cloud API spec is used by the standard LangGraph client SDKs to in
 
 Currently, LangGraph only offers a solution for LangGraph Cloud API-compatible deployments on the managed LangGraph Platform. To enable this for self-hosted deployments, we wrote a small module ([source code](./langgraph-demo/backend/concierge/langgraph_server/)) to transform LangGraph agents into FastAPI routes. This doesn't support many of the premium features offered by the LangGraph Platform but is sufficient for using the `RemoteGraph` client.
 
-To demonstrate the portability of this approach, the Streamlit frontend demo hosts 5 different chat agents with the only dependency being the standard `langgraph` package for calling the remote agents. The frontend implementations for each agent can be found in [this folder](./langgraph-demo/frontend/concierge_ui/pages).
+To demonstrate the portability of this approach, the Streamlit frontend demo hosts 5 different chat agents with the only dependency being the standard `langgraph` package for calling the remote agents. The frontend implementations for each agent can be found in [this folder](./langgraph-demo/frontend/concierge_ui/agents).
 
 ## Quickstart Demo ✨
 

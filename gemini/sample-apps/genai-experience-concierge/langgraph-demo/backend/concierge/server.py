@@ -6,57 +6,35 @@
 import contextlib
 from typing import AsyncGenerator
 
-from concierge import agent_settings as settings
+from concierge import settings
 from concierge.agents import (
     function_calling,
-    gemini_chat,
-    gemini_chat_with_guardrails,
+    gemini,
+    guardrails,
     semantic_router,
     task_planner,
 )
-from concierge.langgraph_server import fastapi_app, langgraph_agent
+from concierge.langgraph_server import fastapi_app
 import fastapi
 
 # Build compiled LangGraph agents with optional checkpointer based on config
 
-gemini_agent = langgraph_agent.LangGraphAgent(
-    state_graph=gemini_chat.load_graph(),
-    agent_config=settings.gemini_config,
-    checkpointer_config=settings.checkpointer_config,
-)
-
-guardrail_agent = langgraph_agent.LangGraphAgent(
-    state_graph=gemini_chat_with_guardrails.load_graph(),
-    agent_config=settings.guardrail_config,
-    checkpointer_config=settings.checkpointer_config,
-)
-
-function_calling_agent = langgraph_agent.LangGraphAgent(
-    state_graph=function_calling.load_graph(),
-    agent_config=settings.fc_config,
-    checkpointer_config=settings.checkpointer_config,
-)
-
-semantic_router_agent = langgraph_agent.LangGraphAgent(
-    state_graph=semantic_router.load_graph(),
-    agent_config=settings.router_config,
-    checkpointer_config=settings.checkpointer_config,
-)
-
-task_planner_agent = langgraph_agent.LangGraphAgent(
-    state_graph=task_planner.load_graph(),
-    agent_config=settings.planner_config,
-    checkpointer_config=settings.checkpointer_config,
-)
+runtime_settings = settings.RuntimeSettings()
+gemini_agent = gemini.load_agent(runtime_settings=runtime_settings)
+guardrails_agent = guardrails.load_agent(runtime_settings=runtime_settings)
+function_calling_agent = function_calling.load_agent(runtime_settings=runtime_settings)
+semantic_router_agent = semantic_router.load_agent(runtime_settings=runtime_settings)
+task_planner_agent = task_planner.load_agent(runtime_settings=runtime_settings)
 
 # setup each agent during server startup
 
 
 @contextlib.asynccontextmanager
-async def lifespan(_app: fastapi.FastAPI) -> AsyncGenerator[None]:
+async def lifespan(_app: fastapi.FastAPI) -> AsyncGenerator[None, None]:
     """Setup each agent during server startup."""
+
     await gemini_agent.setup()
-    await guardrail_agent.setup()
+    await guardrails_agent.setup()
     await function_calling_agent.setup()
     await semantic_router_agent.setup()
     await task_planner_agent.setup()
@@ -93,7 +71,7 @@ app.include_router(
 
 app.include_router(
     router=fastapi_app.build_agent_router(
-        agent=guardrail_agent,
+        agent=guardrails_agent,
         router=fastapi.APIRouter(
             prefix="/gemini-with-guardrails",
             tags=["Gemini with Guardrails"],

@@ -4,7 +4,8 @@
 
 # Dynamic GCS backend configuration.
 terraform {
-  required_version = "~> 6.25"
+  required_version = "~> 1.11"
+
   backend "gcs" {}
 
   required_providers {
@@ -14,7 +15,7 @@ terraform {
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.7.1"
+      version = "~> 3.7"
     }
   }
 }

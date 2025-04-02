@@ -3,6 +3,8 @@
 # agreement with Google.
 """Utilities to load LangGraph checkpointers from a supported config."""
 
+import logging
+
 import aiosqlite
 from concierge.langgraph_server import schemas
 from langgraph.checkpoint import base, memory
@@ -11,6 +13,8 @@ from langgraph.checkpoint.sqlite import aio as sqlite_aio
 import psycopg
 from psycopg.rows import DictRow
 import psycopg_pool
+
+logger = logging.getLogger(__name__)
 
 
 def load_checkpointer(
@@ -91,7 +95,9 @@ async def setup_checkpointer(checkpointer: base.BaseCheckpointSaver) -> None:
             await checkpointer.setup()
 
         case _:
-            print(f"Unknown checkpoint saver type: {type(checkpointer)}")
+            logger.warning(
+                f"Ignoring unknown checkpoint saver type: {type(checkpointer)}"
+            )
 
 
 async def cleanup_checkpointer(checkpointer: base.BaseCheckpointSaver) -> None:
@@ -117,4 +123,6 @@ async def cleanup_checkpointer(checkpointer: base.BaseCheckpointSaver) -> None:
             await checkpointer.conn.close()
 
         case _:
-            print(f"Unknown checkpoint saver type: {type(checkpointer)}")
+            logger.warning(
+                f"Ignoring unknown checkpoint saver type: {type(checkpointer)}"
+            )
