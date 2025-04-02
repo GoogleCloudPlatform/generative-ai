@@ -268,8 +268,6 @@ def deploy(
         frontend_image_url=frontend_image_url,
     )
 
-    log_section("🚀 End-to-end deployment is complete! 🚀")
-
     outputs = {
         "project_id": real_project_id,
         "region": region,
@@ -297,6 +295,8 @@ def deploy(
 
     output_str = yaml.safe_dump(outputs)
     click.echo(f"Displaying the key generated resources:\n\n{output_str}")
+
+    log_section("🚀 End-to-end deployment is complete! 🚀")
 
     return outputs
 
