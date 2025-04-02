@@ -169,9 +169,9 @@ def deploy(
     artifact_registry_repository = tf_outputs["artifact-registry-repo"]["value"]
     artifact_registry_location = tf_outputs["artifact-registry-location"]["value"]
     network_id = str(tf_outputs["vpc-id"]["value"])
-    network_name = network_id.rsplit("/", maxsplit=1)[0]
+    network_name = network_id.rsplit("/", maxsplit=1)[-1]
     subnetwork_id = str(tf_outputs["subnet-id"]["value"])
-    subnetwork_name = subnetwork_id.rsplit("/", maxsplit=1)[0]
+    subnetwork_name = subnetwork_id.rsplit("/", maxsplit=1)[-1]
     alloydb_secret_name = tf_outputs["concierge-alloydb-connection-secret-name"][
         "value"
     ]
