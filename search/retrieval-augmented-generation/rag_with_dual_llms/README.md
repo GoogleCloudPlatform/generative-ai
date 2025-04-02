@@ -4,7 +4,7 @@ This demo illustrates how to compare responses from two LLMs through a corpus of
 Additional features include using a Judge model to evaluate the two responses and deliver a verdict on which model's response is better aligned with the query and the given context.
 
 This is how your final demo will look like once it is running
-![image1](./img/final_judge_comparator_screenshot.png)
+![final_judge_comparator](https://storage.googleapis.com/github-repo/generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_with_dual_llms/final_judge_comparator.png)
 
 # Instructions to run the demo:
 
