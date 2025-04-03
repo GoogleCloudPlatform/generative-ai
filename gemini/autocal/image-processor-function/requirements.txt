@@ -1,0 +1,6 @@
+cloudevents == 1.11.0
+functions-framework == 3.8.2
+google-events == 0.14.0
+google-api-core == 2.24.1
+google-genai == 1.2.0
+google-cloud-firestore == 2.20.1

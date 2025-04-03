@@ -528,6 +528,7 @@ arxiv
 astype
 atms
 aujourd'hui
+autocal
 autoflake
 autogen
 automerge
@@ -684,6 +685,7 @@ etils
 eula
 eur
 evals
+eventarc
 evse
 evt
 expl
@@ -1130,6 +1132,7 @@ subword
 suis
 sunner
 supima
+svh
 svm
 sxs
 tabular
