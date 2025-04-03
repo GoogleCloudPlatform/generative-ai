@@ -31,9 +31,9 @@ The Enhanced Vision Assistant is an AI-powered solution designed to help visuall
 
 ## Prerequisites
 
-- Google Cloud account with billing enabled.
-- The following APIs enabled:
-  - [Google AI (Generative AI) API](https://console.cloud.google.com/flows/enableapi?apiid=generativelanguage.googleapis.com)
+- Google Cloud account with billing enabled.  
+- The following APIs enabled:  
+  - [Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com)  
   - [Cloud Vision API](https://console.cloud.google.com/flows/enableapi?apiid=vision.googleapis.com)
   - [Cloud Text-to-Speech API](https://console.cloud.google.com/flows/enableapi?apiid=texttospeech.googleapis.com)
 - Python 3.8 or higher.
