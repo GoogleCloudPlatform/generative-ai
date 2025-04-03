@@ -54,7 +54,9 @@ def analyze_prospectus(cloud_event):
     sql = f"SELECT content FROM {table_name} WHERE ticker = '{ticker}' ORDER BY page, page_chunk"
 
     # Prep model and template
-    model = VertexAI(model_name="gemini-pro", max_output_tokens=1024, temperature=0.0)
+    model = VertexAI(
+        model_name="gemini-2.0-flash", max_output_tokens=1024, temperature=0.0
+    )
     template = """
 <MISSION>
  You are an experienced financial analyst. Your mission is to create a detailed

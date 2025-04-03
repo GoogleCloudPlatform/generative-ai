@@ -120,6 +120,7 @@ FPDF
 FREDDIE
 FTPS
 Fangming
+Fastmcp
 Feitian
 Finvest
 Fishburne
@@ -241,6 +242,7 @@ Loghub
 Logrus
 Lopyrev
 Lottry
+MCP
 MFU
 MICOA
 MLB
@@ -269,6 +271,7 @@ Mirai
 Mitani
 Molaison
 Mookie
+Mosi
 Mvar
 NADPH
 NARI
@@ -438,6 +441,7 @@ Tricyle
 UDF
 UDFs
 USERDATA
+UVX
 Unimicron
 Upserting
 Urs
@@ -686,6 +690,7 @@ evt
 expl
 faiss
 fastapi
+fastmcp
 fda
 fea
 fect
@@ -756,6 +761,8 @@ gpu
 gradio
 gradlew
 gridcolor
+gridpoint
+groupadd
 groupchat
 grpcio
 gshoe
@@ -786,6 +793,7 @@ idk
 idks
 idxs
 ience
+ifconfig
 ifidx
 iinfo
 iloc
@@ -875,6 +883,7 @@ maskmode
 mavenrc
 maxcold
 mbsdk
+mcp
 mdc
 mec
 mediapy
@@ -1180,6 +1189,7 @@ usernames
 uuids
 uvb
 uvicorn
+uvx
 vais
 vapo
 vectoral

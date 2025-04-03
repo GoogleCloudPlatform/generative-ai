@@ -62,9 +62,9 @@ safety_config = [
         threshold=HarmBlockThreshold.BLOCK_NONE,
     ),
 ]
-embedding_model = VertexTextEmbedding("text-embedding-004", credentials=credentials)
+embedding_model = VertexTextEmbedding("text-embedding-005", credentials=credentials)
 llm = Vertex(
-    model="gemini-pro",
+    model="gemini-2.0-flash",
     temperature=0.2,
     max_tokens=3000,
     safety_settings=safety_config,
@@ -404,7 +404,7 @@ class RAGWorkflow(Workflow):
         print("Synthesizing final result...")
 
         response_synthesizer = get_response_synthesizer(
-            llm=Vertex(model="gemini-1.0-pro", temperature=0.1, max_tokens=5000),
+            llm=Vertex(model="gemini-2.0-flash", temperature=0.1, max_tokens=5000),
             text_qa_template=CITATION_QA_TEMPLATE,
             refine_template=CITATION_REFINE_TEMPLATE,
             response_mode=ResponseMode.COMPACT,

@@ -15,7 +15,7 @@ def get_embedding_model() -> TextEmbeddingModel:
     """
     Loads embedding model (to be cached).
     """
-    embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko")
+    embedding_model = TextEmbeddingModel.from_pretrained("text-embedding-005")
     return embedding_model
 
 
