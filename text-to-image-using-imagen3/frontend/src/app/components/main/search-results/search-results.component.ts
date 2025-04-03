@@ -1,8 +1,8 @@
-import {Component, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
-import {SearchService} from 'src/app/services/search.service';
-import {ReplaySubject, takeUntil} from 'rxjs';
-import {UserService} from 'src/app/services/user/user.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import { Component, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { SearchService } from 'src/app/services/search.service';
+import { ReplaySubject, takeUntil } from 'rxjs';
+import { UserService } from 'src/app/services/user/user.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   search_document_type,
   search_image_type,
@@ -14,8 +14,8 @@ import {
   SafeResourceUrl,
   SafeUrl,
 } from '@angular/platform-browser';
-import {MatDialog} from '@angular/material/dialog';
-import {GeneratedImage} from 'src/app/models/generated-image.model';
+import { MatDialog } from '@angular/material/dialog';
+import { GeneratedImage } from 'src/app/models/generated-image.model';
 import { SearchRequest } from 'src/app/models/search.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ToastMessageComponent } from '../../toast-message/toast-message.component';
@@ -36,7 +36,7 @@ interface AspectRatio {
   styleUrls: ['./search-results.component.scss'],
 })
 export class SearchResultsComponent implements OnDestroy {
-  @ViewChild('preview', {static: true})
+  @ViewChild('preview', { static: true })
   previewRef!: TemplateRef<{}>;
   summary = '';
   private readonly destroyed = new ReplaySubject<void>(1);
@@ -54,23 +54,23 @@ export class SearchResultsComponent implements OnDestroy {
   safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
   imagen3ModelsList: Imagen3Model[] = [
-    {value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001'},
+    { value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001' },
     {
       value: 'imagen-3.0-fast-generate-001',
       viewValue: 'imagen-3.0-fast-generate-001',
     },
-    {value: 'imagen-3.0-generate-002', viewValue: 'imagen-3.0-generate-002'},
-    {value: 'imagegeneration@006', viewValue: 'imagegeneration@006'},
-    {value: 'imagegeneration@005', viewValue: 'imagegeneration@005'},
-    {value: 'imagegeneration@002', viewValue: 'imagegeneration@002'},
+    { value: 'imagen-3.0-generate-002', viewValue: 'imagen-3.0-generate-002' },
+    { value: 'imagegeneration@006', viewValue: 'imagegeneration@006' },
+    { value: 'imagegeneration@005', viewValue: 'imagegeneration@005' },
+    { value: 'imagegeneration@002', viewValue: 'imagegeneration@002' },
   ];
   selectedModel = this.imagen3ModelsList[0].value;
   aspectRatioList: AspectRatio[] = [
-    {value: '1:1', viewValue: '1:1'},
-    {value: '9:16', viewValue: '9:16'},
-    {value: '16:9', viewValue: '16:9'},
-    {value: '2:4', viewValue: '2:4'},
-    {value: '4:1', viewValue: '4:1'},
+    { value: '1:1', viewValue: '1:1' },
+    { value: '9:16', viewValue: '9:16' },
+    { value: '16:9', viewValue: '16:9' },
+    { value: '2:4', viewValue: '2:4' },
+    { value: '4:1', viewValue: '4:1' },
   ];
   selectedAspectRatio = this.aspectRatioList[0];
   searchRequest: SearchRequest = {
@@ -78,6 +78,19 @@ export class SearchResultsComponent implements OnDestroy {
     model: this.selectedModel,
     aspectRatio: '1:1',
   };
+  imageStyleList = [
+    { value: 'Modern' },
+    { value: 'Realistic' },
+    { value: 'Vintage' },
+    { value: 'Monochrome' },
+    { value: 'Fantasy' },
+  ];
+  selectedImageStyle: string | null = null;
+  changeImageStyle(style: { value: string }) {
+    this.selectedImageStyle = style.value;
+    console.log('Selected Image Style:', this.selectedImageStyle);
+  }
+
 
   constructor(
     private router: Router,
@@ -188,7 +201,7 @@ export class SearchResultsComponent implements OnDestroy {
   }
 
   goToResults(term: string) {
-    this.router.navigate(['/search'], {queryParams: {q: term}});  
+    this.router.navigate(['/search'], { queryParams: { q: term } });
   }
 
   searchTerm({
@@ -208,7 +221,7 @@ export class SearchResultsComponent implements OnDestroy {
     this.summary = '';
     this.documents = [];
     this.images = [];
-    this.router.navigate(['/search'], {queryParams: {q: term}});
+    this.router.navigate(['/search'], { queryParams: { q: term } });
     if (term) this.searchRequest.term = term;
     if (aspectRatio) this.searchRequest.aspectRatio = aspectRatio;
     if (model) this.searchRequest.model = model;
@@ -242,12 +255,13 @@ export class SearchResultsComponent implements OnDestroy {
 
   changeImagen3Model(model: Imagen3Model) {
     this.selectedModel = model.value;
-    this.searchTerm({model: this.selectedModel});
+    this.searchTerm({ model: this.selectedModel });
   }
 
   changeAspectRatio(aspectRatio: AspectRatio) {
     this.selectedAspectRatio = aspectRatio;
-    this.searchTerm({aspectRatio: aspectRatio.value});
+    this.searchTerm({ aspectRatio: aspectRatio.value });
+    console.log('Selected Aspect Ratio:', this.selectedAspectRatio);
   }
 
   previewDocument(event: any, document: any) {
