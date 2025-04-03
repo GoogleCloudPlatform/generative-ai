@@ -75,9 +75,9 @@ def create(
     location: str = "US",
     dataset_id: str = "cymbal_retail",
     connection_id: str = "cymbal_connection",
-    product_path: str = str(defaults.PRODUCT_DATASET_PATH),
-    store_path: str = str(defaults.STORE_DATASET_PATH),
-    inventory_path: str = str(defaults.INVENTORY_DATASET_PATH),
+    product_path: str = str(defaults.PRODUCT_GCS_DATASET_PATH),
+    store_path: str = str(defaults.STORE_GCS_DATASET_PATH),
+    inventory_path: str = str(defaults.INVENTORY_GCS_DATASET_PATH),
 ) -> GeneratedDataset:
     """
     Create the required Cymbal dataset models and tables.
@@ -178,15 +178,14 @@ def load_table_from_parquet(
     job_config.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE
     job_config.source_format = bigquery.SourceFormat.PARQUET
 
-    with open(source_path, "rb") as f:
-        with_check(
-            f"Creating table: `{table_uri}`",
-            lambda: client.load_table_from_file(
-                file_obj=f,
-                destination=table_uri,
-                job_config=job_config,
-            ).result(),
-        )
+    with_check(
+        f"Creating table: `{table_uri}`",
+        lambda: client.load_table_from_uri(
+            source_uris=source_path,
+            destination=table_uri,
+            job_config=job_config,
+        ).result(),
+    )
 
 
 def create_product_table_with_embeddings(

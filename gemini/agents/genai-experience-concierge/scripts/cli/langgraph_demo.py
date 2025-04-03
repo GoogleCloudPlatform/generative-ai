@@ -128,9 +128,9 @@ def deploy(
     terraform_dir = str(defaults.TERRAFORM_DIR)
     backend_dir = str(defaults.BACKEND_DIR)
     frontend_dir = str(defaults.FRONTEND_DIR)
-    cymbal_product_path = str(defaults.PRODUCT_DATASET_PATH)
-    cymbal_store_path = str(defaults.STORE_DATASET_PATH)
-    cymbal_inventory_path = str(defaults.INVENTORY_DATASET_PATH)
+    cymbal_product_path = str(defaults.PRODUCT_GCS_DATASET_PATH)
+    cymbal_store_path = str(defaults.STORE_GCS_DATASET_PATH)
+    cymbal_inventory_path = str(defaults.INVENTORY_GCS_DATASET_PATH)
 
     log_section("Initializing terraform module...")
 

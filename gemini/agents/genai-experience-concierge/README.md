@@ -34,8 +34,6 @@ langgraph-demo
 │   │   └── tools                  ; LLM tool definitions
 │   └── notebooks                  ; Notebooks to interact with agents
 │
-├── datasets                       ; Data for the mock retail dataset
-│
 ├── frontend                       ; Frontend Streamlit server
 │   └── concierge_ui
 │       └── agents                 ; Chat handlers for each agent
@@ -71,7 +69,7 @@ gcloud auth application-default login
 
 ### (Optional) Create the Cymbal Retail dataset
 
-The function calling demo agent requires a BigQuery dataset to exist to query a fictional retail dataset. This is automatically created during demo deployment, but must be manually created if the demo project doesn't exist. To manually create these tables, you can run this command:
+The function calling demo agent requires a BigQuery dataset and embedding model connection to exist to query a fictional retail dataset. This is automatically created during demo deployment, but must be manually created if the demo project doesn't exist. To manually create these tables and embedding model, you can run this command:
 
 ```bash
 uv run --frozen concierge langgraph create-dataset --project-id $PROJECT_ID
