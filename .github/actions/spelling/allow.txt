@@ -42,6 +42,7 @@ Broadoak
 Brusdar
 Btn
 Buckleys
+Bulmus
 CALIPSO
 CAMQAA
 CHECKOV
@@ -329,6 +330,7 @@ Phanfone
 Pharma
 Photoshop
 Pistorius
+Polong
 Pranav
 Pré
 Pzk
@@ -526,6 +528,7 @@ arxiv
 astype
 atms
 aujourd'hui
+autocal
 autoflake
 autogen
 automerge
@@ -682,6 +685,7 @@ etils
 eula
 eur
 evals
+eventarc
 evse
 evt
 expl
@@ -760,6 +764,7 @@ gradlew
 gridcolor
 gridpoint
 groupadd
+groupchat
 grpcio
 gshoe
 gspread
@@ -1036,6 +1041,7 @@ pysftp
 pytorch
 pyvis
 qna
+qqq
 qrel
 qrels
 quadrotor
@@ -1126,6 +1132,7 @@ subword
 suis
 sunner
 supima
+svh
 svm
 sxs
 tabular

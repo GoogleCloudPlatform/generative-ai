@@ -18,6 +18,7 @@
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/rag-engine                            @edtsoi430 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/agent-engine                          @koverholt @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/agent-engine/tutorial_ag2_on_agent_engine.ipynb @emmanuelawa
 /generative-ai/gemini/agent-engine/tutorial_alloydb_rag_agent.ipynb @averikitsch
 /generative-ai/gemini/agent-engine/tutorial_cloud_sql_pg_rag_agent.ipynb @averikitsch
 /generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
