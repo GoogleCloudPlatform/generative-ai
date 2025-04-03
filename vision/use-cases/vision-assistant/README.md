@@ -2,21 +2,20 @@
 
 ## Overview
 
-The Enhanced Vision Assistant is an AI-powered solution designed to help visually impaired individuals navigate their surroundings safely. By combining Google Cloud's Vision API, GenAI with Gemini Pro, and Text-to-Speech capabilities, this application provides real-time environmental awareness through audio guidance.
+The Enhanced Vision Assistant is an AI-powered solution designed to help visually impaired individuals navigate their surroundings safely. By combining Google Cloud's Vision API, Gen AI with Gemini Pro, and Text-to-Speech capabilities, this application provides real-time environmental awareness through audio guidance.
 
-| | |
-|-|-|
-|Author(s) | [Prajwal](https://github.com/iprajwaal) |
+|           |                                         |
+| --------- | --------------------------------------- |
+| Author(s) | [Prajwal](https://github.com/iprajwaal) |
 
 ## 🎥 Demo Video
 
-https://youtu.be/Jpili5kx3hA
-
+[YouTube Video](https://youtu.be/Jpili5kx3hA)
 
 ## Features
 
 - **Real-time object detection** using Google Cloud Vision API
-- **Intelligent scene analysis** with Google GenAI and Gemini Pro
+- **Intelligent scene analysis** with Google Gen AI and Gemini Pro
 - **Natural language navigation guidance** prioritized by urgency
 - **Audio feedback** through Google Text-to-Speech
 - **Obstacle tracking** and movement prediction
@@ -44,18 +43,22 @@ https://youtu.be/Jpili5kx3hA
 ## Installation
 
 1. Clone the repository:
+
    ```
+   bash
    git clone https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai
    cd vision/use-cases/vision-assistant
    ```
 
 2. Install dependencies:
+
    ```
+   bash
    pip install -r requirements.txt
    ```
 
 3. Set up your Google Cloud credentials:
-   - Create a service account with access to Vision API, Text-to-Speech API, and GenAI API
+   - Create a service account with access to Vision API, Text-to-Speech API, and Gen AI API
    - Download the service account key as JSON
    - Set the environment variable:
      ```
@@ -65,11 +68,14 @@ https://youtu.be/Jpili5kx3hA
 ## Usage
 
 1. Open the Jupyter notebook:
+
    ```
+   bash
    jupyter notebook enhanced_vision_assistant.ipynb
    ```
 
 2. Follow the cells in the notebook to:
+
    - Set up your Google Cloud project information
    - Initialize the necessary clients
    - Run the Enhanced Vision Assistant
@@ -92,7 +98,6 @@ The Enhanced Vision Assistant can be customized in several ways:
 - **Camera access issues**: Ensure your camera is properly connected and not in use by another application.
 - **API errors**: Verify that your Google Cloud APIs are enabled and your credentials are correctly set up.
 - **Audio problems**: Check that your audio output device is working and properly configured.
-
 
 ## Acknowledgments
 
