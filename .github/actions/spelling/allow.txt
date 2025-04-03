@@ -1271,6 +1271,7 @@ womens
 workarounds
 worklets
 wparam
+WRatio
 wscore
 wscores
 wstring
