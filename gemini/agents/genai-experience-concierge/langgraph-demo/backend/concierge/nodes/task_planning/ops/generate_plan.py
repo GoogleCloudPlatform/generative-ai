@@ -41,12 +41,9 @@ async def generate_plan(
     client = genai.Client(vertexai=True, project=project, location=region)
 
     contents = [
-        genai_types.Content(role=role, parts=[genai_types.Part.from_text(text=text)])
+        content
         for turn in history + [current_turn]
-        for role, text in (
-            ("user", turn.get("user_input")),
-            ("model", turn.get("response") or "EMPTY"),
-        )
+        for content in get_turn_contents(turn)
     ]
 
     content_response = await client.aio.models.generate_content(
@@ -77,3 +74,29 @@ Only add steps to the plan that still NEED to be done. Do not return previously 
     plan_reflection = schemas.PlanOrRespond.model_validate_json(content_response.text)
 
     return plan_reflection
+
+
+def get_turn_contents(
+    turn: schemas.PlannerTurn,
+) -> tuple[genai_types.Content, genai_types.Content]:
+    """Extract user and model contents for plan generation using the given turn."""
+
+    user_content = genai_types.UserContent(turn["user_input"])
+
+    model_parts = list[str]()
+
+    # add plan part if it exists
+    plan = turn.get("plan")
+    if plan is not None:
+        task_strings = "\n---\n".join(
+            f"Goal: {task.goal}\n\nResult: {task.result or ''}" for task in plan.tasks
+        )
+        plan_str = f"# Plan\nHigh Level Goal: {plan.goal}\n---\n{task_strings}"
+        model_parts.append(plan_str)
+
+    # add response or indicate response does not exist yet
+    model_parts.append(turn.get("response") or "RESPONSE NOT CREATED YET")
+
+    model_content = genai_types.ModelContent(model_parts)
+
+    return (user_content, model_content)
