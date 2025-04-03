@@ -6,9 +6,44 @@
 
 Gen AI Experience Concierge is a collection of agent design pattern implementations. All design patterns are built using the LangGraph framework for agent orchestration and session management.
 
-For more background on each agent architecture and standalone Jupyter notebook implementations, navigate to the [agent-design-patterns/](./agent-design-patterns/) folder.
+## Contents
 
-We have also packaged these implementations as a "click-to-deploy" application that serves each LangGraph agent on FastAPI Server, compatible with the [LangGraph Cloud API spec](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html), and hosts an IAP-protected frontend demo using Streamlit.
+For self-contained notebooks for interactively building each agent design pattern, navigate to the [agent-design-patterns/](./agent-design-patterns/) directory. The README provides background and visualizations of each design pattern, including:
+
+* A chat assistant with a guardrail classifier layer ([reference](./agent-design-patterns/README.md#guardrail-classifier-agent))
+* A multi-agent chat assistant with an intent detection layer to route to experts ([reference](./agent-design-patterns/README.md#semantic-router-agent)).
+* A chat assistant with function calling streaming capabilities, grounded on a mock retail dataset ([reference](./agent-design-patterns/README.md#function-calling-agent)).
+* A multi-agent chat assistant for generating research plans, executing them and reflecting on the results ([reference](./agent-design-patterns/README.md#task-planner))
+
+We have also packaged these implementations as a "click-to-deploy" application that serves each LangGraph agent on a FastAPI Server with a Streamlit frontend demo. The agent server is compatible with the [LangGraph Cloud API spec](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html) (to learn more about why this is useful, visit this [section](#why-use-the-langgraph-cloud-api-spec)).
+
+For instructions on deployment, please navigate to the [End to End Deployment](#end-to-end-deployment-) section. The CLI tool for automated deployment is defined in the [scripts/cli](./scripts/cli/) folder.
+
+The source code for the deployable demo is broken into the following structure:
+
+```bash
+langgraph-demo
+│
+├── backend                        ; Backend agent server
+│   ├── concierge
+│   │   ├── agents                 ; All agent definitions
+│   │   ├── langgraph_server       ; LangGraph -> fastapi.APIRouter adapter
+│   │   ├── nodes                  ; All LangGraph node definitions
+│   │   │   └── task_planning
+│   │   │       └── ops
+│   │   └── tools                  ; LLM tool definitions
+│   └── notebooks                  ; Notebooks to interact with agents
+│
+├── datasets                       ; Data for the mock retail dataset
+│
+├── frontend                       ; Frontend Streamlit server
+│   └── concierge_ui               
+│       └── agents                 ; Chat handlers for each agent
+│
+└── terraform                      ; Infrastructure code for deployment
+```
+
+The [backend](./langgraph-demo/backend/) and [frontend](./langgraph-demo/frontend/) directories each contain their own READMEs for a deeper dive on local environment setup.
 
 ## Why use the LangGraph Cloud API spec?
 
