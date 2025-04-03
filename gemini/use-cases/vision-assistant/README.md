@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Enhanced Vision Assistant is an AI-powered solution designed to help visually impaired individuals navigate their surroundings safely. By combining Google Cloud's Vision API, Gen AI with Gemini Pro, and Text-to-Speech capabilities, this application provides real-time environmental awareness through audio guidance.
+The Enhanced Vision Assistant is an AI-powered solution designed to help visually impaired individuals navigate their surroundings safely. By combining Google Cloud's Vision API, Gen AI with Gemini, and Text-to-Speech capabilities, this application provides real-time environmental awareness through audio guidance.
 
 |           |                                         |
 | --------- | --------------------------------------- |
@@ -15,7 +15,7 @@ The Enhanced Vision Assistant is an AI-powered solution designed to help visuall
 ## Features
 
 - **Real-time object detection** using Google Cloud Vision API
-- **Intelligent scene analysis** with Google Gen AI and Gemini Pro
+- **Intelligent scene analysis** with Google Gen AI and Gemini
 - **Natural language navigation guidance** prioritized by urgency
 - **Audio feedback** through Google Text-to-Speech
 - **Obstacle tracking** and movement prediction
@@ -26,14 +26,14 @@ The Enhanced Vision Assistant is an AI-powered solution designed to help visuall
 1. The camera captures the user's environment in real-time.
 2. Cloud Vision API detects objects and their positions.
 3. The system estimates depth and analyzes potential hazards.
-4. Gemini Pro processes the scene and generates natural language guidance.
+4. Gemini processes the scene and generates natural language guidance.
 5. Audio instructions are delivered through text-to-speech, prioritized by urgency.
 
 ## Prerequisites
 
-- Google Cloud account with billing enabled.  
-- The following APIs enabled:  
-  - [Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com)  
+- Google Cloud account with billing enabled.
+- The following APIs enabled:
+  - [Vertex AI API](https://console.cloud.google.com/flows/enableapi?apiid=aiplatform.googleapis.com)
   - [Cloud Vision API](https://console.cloud.google.com/flows/enableapi?apiid=vision.googleapis.com)
   - [Cloud Text-to-Speech API](https://console.cloud.google.com/flows/enableapi?apiid=texttospeech.googleapis.com)
 - Python 3.8 or higher.
@@ -61,9 +61,9 @@ The Enhanced Vision Assistant is an AI-powered solution designed to help visuall
    - Download the service account key as JSON.
    - Set the environment variable:
 
-     ```bash
-     export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your-service-account-key.json"
-     ```
+   ```bash
+   export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your-service-account-key.json"
+   ```
 
 ## Usage
 
