@@ -56,6 +56,7 @@ The Enhanced Vision Assistant is an AI-powered solution designed to help visuall
    ```
 
 3. Set up your Google Cloud credentials:
+
    - Create a service account with access to Vision API, Text-to-Speech API, and Gen AI API.
    - Download the service account key as JSON.
    - Set the environment variable:
@@ -73,6 +74,7 @@ The Enhanced Vision Assistant is an AI-powered solution designed to help visuall
    ```
 
 2. Follow the cells in the notebook to:
+
    - Set up your Google Cloud project information.
    - Initialize the necessary clients.
    - Run the Enhanced Vision Assistant.
