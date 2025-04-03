@@ -802,6 +802,7 @@ imagefont
 imageno
 imagetext
 imdb
+imencode
 importmap
 imread
 imshow
@@ -1268,4 +1269,3 @@ yticks
 zakarid
 zaxis
 zimie
-imencode
