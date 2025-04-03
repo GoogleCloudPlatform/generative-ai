@@ -802,6 +802,7 @@ imagefont
 imageno
 imagetext
 imdb
+imencode
 importmap
 imread
 imshow
