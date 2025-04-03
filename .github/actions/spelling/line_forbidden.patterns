@@ -327,3 +327,7 @@ data:image/(?:jpeg|png);base64,[^{]
 
 # Don't use Gemini 1.X
 gemini-1\.[05]
+
+# Use the Google Gen AI SDK `google-genai`
+google-generativeai
+from google import generativeai
