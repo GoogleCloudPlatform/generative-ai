@@ -699,6 +699,7 @@ envsubst
 epath
 epoc
 erlang
+errlog
 erty
 etf
 etils
@@ -811,6 +812,7 @@ hwnd
 hypercorn
 iap
 iban
+icd
 icudtl
 idcg
 idk
@@ -971,6 +973,7 @@ nfl
 nginx
 ngram
 ngrams
+nih
 nlp
 nmade
 nmilitary
