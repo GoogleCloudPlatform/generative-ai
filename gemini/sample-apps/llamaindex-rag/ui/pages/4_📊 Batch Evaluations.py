@@ -92,12 +92,12 @@ st.sidebar.markdown("#### 🛠️ Batch Evaluation Configurations")
 
 st.sidebar.markdown("#### 🤖 LLM Model")
 llm_name = st.sidebar.selectbox(
-    "Select a model:", ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"]
+    "Select a model:", ["gemini-2.0-flash", "gemini-2.0-flash-lite"]
 )
 
 st.sidebar.markdown("#### 🤖 Eval LLM Model")
 eval_model_name = st.sidebar.selectbox(
-    "Select Eval model:", ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"]
+    "Select Eval model:", ["gemini-2.0-flash", "gemini-2.0-flash-lite"]
 )
 
 st.sidebar.markdown("#### 🌡️ Temperature")
@@ -153,7 +153,7 @@ if uploaded_file is not None:
             "use_refine": use_refine,
             "use_node_rerank": use_node_rerank,
             "eval_model_name": eval_model_name,
-            "embedding_model_name": "text-embedding-004",
+            "embedding_model_name": "text-embedding-005",
             "input_eval_dataset_bucket_uri": gcs_uri,
             "bq_eval_results_table_id": "eval_results.eval_results_table",
             "ragas_metrics": ["faithfulness", "answer_relevancy"],

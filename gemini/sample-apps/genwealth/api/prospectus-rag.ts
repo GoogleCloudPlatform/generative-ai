@@ -1,7 +1,7 @@
 import { Database } from "./database";
 import { VertexAI } from "@google-cloud/vertexai";
 
-/** Use retrieval augmented search of Prospectus using AlloyDB embeddings & Gemini Pro.
+/** Use retrieval augmented search of Prospectus using AlloyDB embeddings & Gemini.
  */
 export class ProspectusRag {
 

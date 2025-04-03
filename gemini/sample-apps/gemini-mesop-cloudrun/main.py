@@ -23,6 +23,8 @@ import os
 from typing import Any, Generator
 
 from dataclasses_json import dataclass_json
+from google import genai
+from google.genai.types import GenerateContentConfig, Part
 import mesop as me
 from shared.nav_menu import nav_menu
 from shared.prompts import VIDEO_GEOLOCATION_PROMPT, VIDEO_TAGS_PROMPT
@@ -38,18 +40,12 @@ from shared.styles import (
     _TABBER_STYLE,
     FANCY_TEXT_GRADIENT,
 )
-import vertexai
-from vertexai.generative_models import (
-    GenerationConfig,
-    GenerativeModel,
-    HarmBlockThreshold,
-    HarmCategory,
-    Part,
-)
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID
 LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")  # Your Google Cloud Project Region
-vertexai.init(project=PROJECT_ID, location=LOCATION)
+client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+
+PAGE_TITLE = "Gemini in Vertex AI with Mesop"
 
 
 @dataclass_json
@@ -57,7 +53,7 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 class State:
     """Mesop state class"""
 
-    model: str = "gemini-1.5-flash-002"
+    model: str = "gemini-2.0-flash"
     current_page: str = "/"
 
     # pylint: disable=E3701
@@ -145,19 +141,6 @@ class State:
     # pylint: disable=E3701
 
 
-# Helpers
-def gcs_to_http(gcs_uri: str) -> str:
-    """given a GCS URI, return the HTTPS URL
-
-    Args:
-        gcs_uri (str): Google Cloud Storage URI
-
-    Returns:
-        string: the HTTPS URL equivalent
-    """
-    return "https://storage.googleapis.com/" + gcs_uri.split("gs://")[1]
-
-
 # Events
 
 
@@ -215,19 +198,10 @@ def generate_story(
     The book should have prologue and epilogue.
     """
     print(f"prompt: {prompt}")
-
-    model = GenerativeModel(s.model)
-    config = GenerationConfig(temperature=temp, max_output_tokens=2048)
-    safety_settings = {
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    }
-    response = model.generate_content(
-        prompt,
-        generation_config=config,
-        safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=prompt,
+        config=GenerateContentConfig(temperature=temp, max_output_tokens=2048),
     )
     print(response)
     s.story_output = response.text
@@ -289,21 +263,12 @@ def generate_marketing_campaign(
     """
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.8, max_output_tokens=2048)
-
-    model = GenerativeModel(s.model)
-
-    safety_settings = {
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    }
-    response = model.generate_content(
-        prompt,
-        generation_config=config,
-        safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=prompt,
+        config=GenerateContentConfig(temperature=0.8, max_output_tokens=2048),
     )
+
     print(response)
     s.marketing_campaign_output = response.text
     s.marketing_campaign_progress = False
@@ -319,32 +284,16 @@ def on_click_clear_marketing_campaign(
 
 # Image Events
 
-ROOM_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/rooms/living_room.jpeg"
-)
-CHAIR_1_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair1.jpeg"
-)
-CHAIR_2_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair2.jpeg"
-)
-CHAIR_3_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair3.jpeg"
-)
-CHAIR_4_IMAGE_URI = (
-    "gs://github-repo/img/gemini/retail-recommendations/furnitures/chair4.jpeg"
-)
-IMAGE_OVEN = "gs://github-repo/img/gemini/multimodality_usecases_overview/stove.jpg"
-IMAGE_ER_DIAGRAM = "gs://github-repo/img/gemini/multimodality_usecases_overview/er.png"
-IMAGE_GLASSES_1 = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/glasses1.jpg"
-)
-IMAGE_GLASSES_2 = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/glasses2.jpg"
-)
-IMAGE_MATH = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/math_beauty.jpg"
-)
+ROOM_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/rooms/living_room.jpeg"
+CHAIR_1_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair1.jpeg"
+CHAIR_2_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair2.jpeg"
+CHAIR_3_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair3.jpeg"
+CHAIR_4_IMAGE_URI = "https://storage.googleapis.com/github-repo/img/gemini/retail-recommendations/furnitures/chair4.jpeg"
+IMAGE_OVEN = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/stove.jpg"
+IMAGE_ER_DIAGRAM = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/er.png"
+IMAGE_GLASSES_1 = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/glasses1.jpg"
+IMAGE_GLASSES_2 = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/glasses2.jpg"
+IMAGE_MATH = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/math_beauty.jpg"
 
 
 def generate_furniture_recommendation(
@@ -354,11 +303,19 @@ def generate_furniture_recommendation(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    room_image_part = Part.from_uri(ROOM_IMAGE_URI, mime_type="image/jpeg")
-    chair_1_image_part = Part.from_uri(CHAIR_1_IMAGE_URI, mime_type="image/jpeg")
-    chair_2_image_part = Part.from_uri(CHAIR_2_IMAGE_URI, mime_type="image/jpeg")
-    chair_3_image_part = Part.from_uri(CHAIR_3_IMAGE_URI, mime_type="image/jpeg")
-    chair_4_image_part = Part.from_uri(CHAIR_4_IMAGE_URI, mime_type="image/jpeg")
+    room_image_part = Part.from_uri(file_uri=ROOM_IMAGE_URI, mime_type="image/jpeg")
+    chair_1_image_part = Part.from_uri(
+        file_uri=CHAIR_1_IMAGE_URI, mime_type="image/jpeg"
+    )
+    chair_2_image_part = Part.from_uri(
+        file_uri=CHAIR_2_IMAGE_URI, mime_type="image/jpeg"
+    )
+    chair_3_image_part = Part.from_uri(
+        file_uri=CHAIR_3_IMAGE_URI, mime_type="image/jpeg"
+    )
+    chair_4_image_part = Part.from_uri(
+        file_uri=CHAIR_4_IMAGE_URI, mime_type="image/jpeg"
+    )
 
     content = [
         "Consider the following chairs:",
@@ -381,15 +338,11 @@ def generate_furniture_recommendation(
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
-
-    response = model.generate_content(content)
     print(response)
     s.furniture_recommendation_output = response.text
     s.image_progress_spinner = False
@@ -410,7 +363,7 @@ def generate_oven_instructions(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    oven_image = Part.from_uri(IMAGE_OVEN, mime_type="image/jpeg")
+    oven_image = Part.from_uri(file_uri=IMAGE_OVEN, mime_type="image/jpeg")
 
     content = [
         oven_image,
@@ -422,15 +375,12 @@ If instructions include buttons, also explain where those buttons are physically
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.oven_instructions_output = response.text
     s.image_progress_spinner = False
 
@@ -446,7 +396,7 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:  # pylint: disabl
     s = me.state(State)
     s.image_progress_spinner = True
 
-    er_image = Part.from_uri(IMAGE_ER_DIAGRAM, mime_type="image/jpeg")
+    er_image = Part.from_uri(file_uri=IMAGE_ER_DIAGRAM, mime_type="image/jpeg")
 
     content = [
         er_image,
@@ -457,15 +407,12 @@ def generate_er_doc(e: me.ClickEvent | me.EnterEvent) -> None:  # pylint: disabl
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.er_doc_output = response.text
     s.image_progress_spinner = False
 
@@ -483,8 +430,8 @@ def generate_glasses_rec(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    glasses_1 = Part.from_uri(IMAGE_GLASSES_1, mime_type="image/jpeg")
-    glasses_2 = Part.from_uri(IMAGE_GLASSES_2, mime_type="image/jpeg")
+    glasses_1 = Part.from_uri(file_uri=IMAGE_GLASSES_1, mime_type="image/jpeg")
+    glasses_2 = Part.from_uri(file_uri=IMAGE_GLASSES_2, mime_type="image/jpeg")
 
     content = [
         f"Which of these glasses you recommend for me based on the shape of my face: {s.image_glasses_shape_radio_value} I have a {s.image_glasses_shape_radio_value} shaped face.\n",
@@ -502,14 +449,12 @@ Provide your recommendation based on my face shape, and reasoning for each in {s
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.glasses_rec_output = response.text
     s.image_progress_spinner = False
 
@@ -537,7 +482,7 @@ def generate_math_answers(
     s = me.state(State)
     s.image_progress_spinner = True
 
-    math_image = Part.from_uri(IMAGE_MATH, mime_type="image/jpeg")
+    math_image = Part.from_uri(file_uri=IMAGE_MATH, mime_type="image/jpeg")
 
     content = [
         math_image,
@@ -557,14 +502,12 @@ INSTRUCTIONS:
 
     print(f"using model: {model_name}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
+    response = client.models.generate_content(
+        model=s.model,
+        contents=content,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
     )
 
-    response = model.generate_content(content)
     s.math_answers_output = response.text
     s.image_progress_spinner = False
 
@@ -577,18 +520,10 @@ def on_click_clear_math(e: me.ClickEvent) -> None:  # pylint: disable=W0613
 
 # Video Events
 
-VIDEO_DESCRIPTION = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
-)
-VIDEO_TAGS = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/photography.mp4"
-)
-VIDEO_HIGHLIGHTS = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/pixel8.mp4"
-)
-VIDEO_GEOLOCATION = (
-    "gs://github-repo/img/gemini/multimodality_usecases_overview/bus.mp4"
-)
+VIDEO_DESCRIPTION = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
+VIDEO_TAGS = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/photography.mp4"
+VIDEO_HIGHLIGHTS = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/pixel8.mp4"
+VIDEO_GEOLOCATION = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/bus.mp4"
 
 
 def generate_video_description(
@@ -598,7 +533,7 @@ def generate_video_description(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_DESCRIPTION, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_DESCRIPTION, mime_type="video/mp4")
 
     prompt = """Describe what is happening in the video and answer the following questions: \n
     - What am I looking at? \n
@@ -612,14 +547,13 @@ def generate_video_description(
     print(f"video url: {VIDEO_DESCRIPTION}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
+
     print(response)
     s.video_description_content = response.text
     s.video_spinner_progress = False
@@ -638,7 +572,7 @@ def generate_video_tags(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_TAGS, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_TAGS, mime_type="video/mp4")
 
     prompt = VIDEO_TAGS_PROMPT
 
@@ -648,14 +582,12 @@ def generate_video_tags(
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
     print(response)
     s.video_tags_content = response.text
     s.video_spinner_progress = False
@@ -674,7 +606,7 @@ def generate_video_highlights(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_HIGHLIGHTS, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_HIGHLIGHTS, mime_type="video/mp4")
 
     prompt = """Answer the following questions using the video only: What is the profession of the girl in this video? Which all features of the phone are highlighted here? Summarize the video in one paragraph. Provide the answer in table format.
     """
@@ -685,14 +617,13 @@ def generate_video_highlights(
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
+
     print(response)
     s.video_highlights_content = response.text
     s.video_spinner_progress = False
@@ -711,7 +642,7 @@ def generate_video_geolocation(
     s = me.state(State)
     s.video_spinner_progress = True
 
-    video_part = Part.from_uri(VIDEO_GEOLOCATION, mime_type="video/mp4")
+    video_part = Part.from_uri(file_uri=VIDEO_GEOLOCATION, mime_type="video/mp4")
 
     prompt = VIDEO_GEOLOCATION_PROMPT
 
@@ -721,14 +652,13 @@ def generate_video_geolocation(
     print(f"video url: {VIDEO_TAGS}")
     print(f"prompt: {prompt}")
 
-    config = GenerationConfig(temperature=0.3, max_output_tokens=2048)
-    model = GenerativeModel(
-        model_name=model_name,
-        generation_config=config,
-        # safety_settings=safety_settings,
-    )
     contents = [video_part, prompt]
-    response = model.generate_content(contents)
+    response = client.models.generate_content(
+        model=s.model,
+        contents=contents,
+        config=GenerateContentConfig(temperature=0.3, max_output_tokens=2048),
+    )
+
     print(response)
     s.video_geolocation_content = response.text
     s.video_spinner_progress = False
@@ -760,7 +690,7 @@ def vertex_gemini_header() -> None:
                 ),
             ):
                 me.text(
-                    "Vertex AI Gemini ", type="headline-5", style=FANCY_TEXT_GRADIENT
+                    "Gemini in Vertex AI ", type="headline-5", style=FANCY_TEXT_GRADIENT
                 )
                 me.text("with Mesop", type="headline-5")
 
@@ -768,7 +698,7 @@ def vertex_gemini_header() -> None:
 # Generate a story page / main
 @me.page(
     path="/",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
@@ -877,7 +807,7 @@ def app() -> None:
                 if state.story_progress:
                     with me.box(style=_SPINNER_STYLE):
                         me.progress_spinner()
-                        me.text("Generating story with Gemini 1.5 ...")
+                        me.text("Generating story with Gemini 2.0 ...")
                 if state.story_output:
                     with me.box(
                         style=me.Style(
@@ -896,7 +826,7 @@ def app() -> None:
 # Marketing page
 @me.page(
     path="/marketing",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
@@ -1042,7 +972,7 @@ def marketing_page() -> None:
 # Image playground page
 @me.page(
     path="/images",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
@@ -1120,7 +1050,7 @@ def image_math_reasoning_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 1.5 Pro can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
+        "Gemini 2.0 Pro can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
     )
     me.box(style=me.Style(height=12))
 
@@ -1135,7 +1065,7 @@ def image_math_reasoning_tab() -> None:
             )
         ):
             me.image(
-                src=gcs_to_http(IMAGE_MATH),
+                src=IMAGE_MATH,
                 alt="math equation ",
                 style=me.Style(width="350px"),
             )
@@ -1189,7 +1119,7 @@ def image_glasses_recommendations_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 1.5 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
+        "Gemini 2.0 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
     )
     me.box(style=me.Style(height=12))
 
@@ -1230,7 +1160,7 @@ def image_glasses_recommendations_tab() -> None:
             )
         ):
             me.image(
-                src=gcs_to_http(IMAGE_GLASSES_1),
+                src=IMAGE_GLASSES_1,
                 alt="glasses 1",
                 style=me.Style(width="350px"),
             )
@@ -1243,7 +1173,7 @@ def image_glasses_recommendations_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=gcs_to_http(IMAGE_GLASSES_2),
+                src=IMAGE_GLASSES_2,
                 alt="glasses 2",
                 style=me.Style(width="350px"),
             )
@@ -1301,13 +1231,13 @@ def image_er_diagrams_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 1.5 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini 1.0 can decipher an Entity Relationship (ER) diagram."
+        "Gemini 2.0 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram."
     )
     me.box(style=me.Style(height=12))
 
     with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
         me.image(
-            src=gcs_to_http(IMAGE_ER_DIAGRAM),
+            src=IMAGE_ER_DIAGRAM,
             alt="image of an entity relationship diagram",
             style=me.Style(width="350px"),
         )
@@ -1361,7 +1291,7 @@ def image_oven_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Equipped with the ability to extract information from visual elements on screens, Gemini 1.5 Pro can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
+        "Equipped with the ability to extract information from visual elements on screens, Gemini 2.0 Pro can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
     )
     me.box(style=me.Style(height=12))
 
@@ -1428,15 +1358,9 @@ def image_furniture_tab() -> None:
     )
     me.box(style=me.Style(height=12))
 
-    room_image_urls = gcs_to_http(ROOM_IMAGE_URI)
-    chair_1_image_urls = gcs_to_http(CHAIR_1_IMAGE_URI)
-    chair_2_image_urls = gcs_to_http(CHAIR_2_IMAGE_URI)
-    chair_3_image_urls = gcs_to_http(CHAIR_3_IMAGE_URI)
-    chair_4_image_urls = gcs_to_http(CHAIR_4_IMAGE_URI)
-
     with me.box(style=me.Style(display="flex", flex_direction="column", gap=2)):
         me.image(
-            src=room_image_urls,
+            src=ROOM_IMAGE_URI,
             alt="living room",
             style=me.Style(width="350px"),
         )
@@ -1461,7 +1385,7 @@ def image_furniture_tab() -> None:
             )
         ):
             me.image(
-                src=chair_1_image_urls,
+                src=CHAIR_1_IMAGE_URI,
                 alt="chair1",
                 style=me.Style(width="200px"),
             )
@@ -1474,7 +1398,7 @@ def image_furniture_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=chair_2_image_urls,
+                src=CHAIR_2_IMAGE_URI,
                 alt="chair2",
                 style=me.Style(width="200px"),
             )
@@ -1487,7 +1411,7 @@ def image_furniture_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=chair_3_image_urls,
+                src=CHAIR_3_IMAGE_URI,
                 alt="chair3",
                 style=me.Style(width="200px"),
             )
@@ -1500,7 +1424,7 @@ def image_furniture_tab() -> None:
                 )
         with me.box(style=me.Style(display="grid", flex_direction="column", gap=2)):
             me.image(
-                src=chair_4_image_urls,
+                src=CHAIR_4_IMAGE_URI,
                 alt="chair4",
                 style=me.Style(width="200px"),
             )
@@ -1548,7 +1472,7 @@ def image_furniture_tab() -> None:
 # Video playground page
 @me.page(
     path="/videos",
-    title="Vertex AI Gemini with Mesop",
+    title=PAGE_TITLE,
     security_policy=me.SecurityPolicy(
         allowed_iframe_parents=["https://google.github.io"]
     ),
@@ -1624,9 +1548,8 @@ def video_description_tab() -> None:
     me.text("Gemini can provide a description of what's happening in a video:")
     me.box(style=me.Style(height=12))
 
-    video_desc_url = "gs://github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
+    video_desc_url = "https://storage.googleapis.com/github-repo/img/gemini/multimodality_usecases_overview/mediterraneansea.mp4"
     state.video_url = video_desc_url
-    video_desc_url = gcs_to_http(video_desc_url)
 
     me.video(
         src=video_desc_url,
@@ -1670,12 +1593,12 @@ def video_tags_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
-    me.text("Gemini 1.5 can also extract tags throughout a video, as shown below:")
+    me.text("Gemini 2.0 can also extract tags throughout a video, as shown below:")
     me.box(style=me.Style(height=12))
 
     me.video(
         key="tags",
-        src=gcs_to_http(VIDEO_TAGS),
+        src=VIDEO_TAGS,
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
@@ -1720,13 +1643,13 @@ def video_highlights_tab() -> None:
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Another example of using Gemini 1.5 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
+        "Another example of using Gemini 2.0 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
     )
     me.box(style=me.Style(height=12))
 
     me.video(
         key="highlights",
-        src=gcs_to_http(VIDEO_HIGHLIGHTS),
+        src=VIDEO_HIGHLIGHTS,
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
@@ -1771,13 +1694,13 @@ def video_geolocation_tab() -> None:
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Even in short, detail-packed videos, Gemini 1.5 can identify the locations."
+        "Even in short, detail-packed videos, Gemini 2.0 can identify the locations."
     )
     me.box(style=me.Style(height=12))
 
     me.video(
         key="geo",
-        src=gcs_to_http(VIDEO_GEOLOCATION),
+        src=VIDEO_GEOLOCATION,
         style=me.Style(width=704),
     )
     me.box(style=me.Style(height=12))
