@@ -208,7 +208,7 @@ def generate_find_stores_handler(
             # Filter by store names fuzzy matching the user input
             if (
                 store_name is None
-                or fuzz.partial_ratio(row["name"], store_name)
+                or fuzz.WRatio(row["name"], store_name)
                 >= STORE_NAME_SIMILARITY_THRESHOLD
             )
         ][

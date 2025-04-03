@@ -35,7 +35,7 @@ find_products_fd = genai_types.FunctionDeclaration(
             ),
             "store_ids": genai_types.Schema(
                 type=genai_types.Type.ARRAY,
-                items=genai_types.Schema(type=genai_types.Type.STRING),
+                items=genai_types.Schema(type=genai_types.Type.INTEGER),
                 nullable=True,
                 default=None,
                 description="List of store IDs that must carry the returned products. Only include if store IDs are already known, otherwise the store search tool may be more useful.",
@@ -66,7 +66,7 @@ def generate_find_products_handler(
     cymbal_inventory_table_uri: str,
     cymbal_embedding_model_uri: str,
 ) -> Callable[
-    [int, str | None, list[str] | None, int | None, int | None],
+    [int, str | None, list[int] | None, int | None, int | None],
     schemas.ProductSearchResult,
 ]:
     """
@@ -90,7 +90,7 @@ def generate_find_products_handler(
             The returned function accepts the following arguments:
             - max_results (int): The maximum number of products to return.
             - product_search_query (Optional[str]): A text query for semantic product search.
-            - store_ids (Optional[list[str]]): A list of store IDs to filter products by.
+            - store_ids (Optional[list[int]]): A list of store IDs to filter products by.
             - min_price (Optional[int]): The minimum price of the products.
             - max_price (Optional[int]): The maximum price of the products.
     """
@@ -98,7 +98,7 @@ def generate_find_products_handler(
     def find_products(
         max_results: int = 3,
         product_search_query: str | None = None,
-        store_ids: list[str] | None = None,
+        store_ids: list[int] | None = None,
         min_price: int | None = None,
         max_price: int | None = None,
     ) -> schemas.ProductSearchResult:
@@ -107,7 +107,7 @@ def generate_find_products_handler(
         Args:
             max_results (int): The max number of results to be returned.
             product_search_query (Optional[str]): Product text search for semantic similarity, can utilize name, description, brand or category.
-            store_ids (Optional[list[str]]): List of store IDs that must carry the returned products. Only include if store IDs are already known, otherwise the store search tool may be more useful.
+            store_ids (Optional[list[int]]): List of store IDs that must carry the returned products. Only include if store IDs are already known, otherwise the store search tool may be more useful.
             min_price (Optional[int]): Minimum price of products in dollars.
             max_price (Optional[int]): Maximum price of products in dollars.
 
@@ -167,7 +167,7 @@ def _build_query_without_vector_search(
     cymbal_products_table_uri: str,
     cymbal_inventory_table_uri: str,
     max_results: int = 3,
-    store_ids: Optional[list[str]] = None,
+    store_ids: Optional[list[int]] = None,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
 ) -> tuple[str, bigquery.QueryJobConfig]:
@@ -237,7 +237,7 @@ WHERE
         query_parameters.append(
             bigquery.ArrayQueryParameter(
                 name="store_ids",
-                array_type=bigquery.SqlParameterScalarTypes.STRING,
+                array_type=bigquery.SqlParameterScalarTypes.INTEGER,
                 values=store_ids,
             )
         )
@@ -287,7 +287,7 @@ def _build_query_with_vector_search(
     cymbal_embedding_model_uri: str,
     product_search_query: str,
     max_results: int = 3,
-    store_ids: Optional[list[str]] = None,
+    store_ids: Optional[list[int]] = None,
     min_price: Optional[int] = None,
     max_price: Optional[int] = None,
 ) -> tuple[str, bigquery.QueryJobConfig]:
@@ -356,7 +356,7 @@ WHERE
         query_parameters.append(
             bigquery.ArrayQueryParameter(
                 name="store_ids",
-                array_type=bigquery.SqlParameterScalarTypes.STRING,
+                array_type=bigquery.SqlParameterScalarTypes.INTEGER,
                 values=store_ids,
             )
         )
