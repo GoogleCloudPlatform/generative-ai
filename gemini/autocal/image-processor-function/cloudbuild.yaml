@@ -1,0 +1,28 @@
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        gcloud functions deploy ${_SERVICE_NAME} \
+        --gen2 \
+        --project ${PROJECT_ID} \
+        --runtime=python312 \
+        --region=europe-west1 \
+        --source=. \
+        --entry-point=image_processor \
+        --trigger-event-filters="type=google.cloud.firestore.document.v1.written" \
+        --trigger-event-filters="database=(default)" \
+        --trigger-event-filters-path-pattern="document=screenshots/*" \
+        --build-service-account=projects/${PROJECT_ID}/serviceAccounts/image-processor-build@${PROJECT_ID}.iam.gserviceaccount.com \
+        --service-account=image-processor-function@${PROJECT_ID}.iam.gserviceaccount.com \
+        --trigger-service-account=image-processor-trigger@${PROJECT_ID}.iam.gserviceaccount.com \
+        --trigger-location=eur3
+    id: Deploy
+    dir: ${_ROOT_DIR}
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _SERVICE_NAME: image-processor
+  _ROOT_DIR: image-processor-function
