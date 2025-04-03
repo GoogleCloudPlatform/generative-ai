@@ -41,7 +41,7 @@ uv run --frozen streamlit run concierge_ui/server.py \
 This will launch the Streamlit interface in your web browser.
 
 <div align="center" width="100%">
-  <img src="../../docs/images/langgraph-streamlit-home.png" alt="Example streamlit home page" width="75%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-streamlit-home.png" alt="Example streamlit home page" width="75%" />
 </div>
 
 ## Key Features

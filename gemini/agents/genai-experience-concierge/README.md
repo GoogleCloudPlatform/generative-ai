@@ -90,7 +90,7 @@ CONCIERGE_PROJECT=$PROJECT_ID uv run --frozen uvicorn concierge.server:app \
 You can view the swagger documentation at [https://localhost:3000/docs](https://localhost:3000/docs). The docs include separate sections for each agent's router.
 
 <div align="center" width="100%">
-  <img src="./docs/images/langgraph-fastapi.png" alt="Example agent server swagger docs" width="75%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-fastapi.png" alt="Example agent server swagger docs" width="75%" />
 </div>
 
 ### Start the Streamlit frontend server
@@ -106,7 +106,7 @@ uv run --frozen streamlit run concierge_ui/server.py \
 Navigate to [https://localhost:8080/](https://localhost:8080/) to use the Streamlit demos.
 
 <div align="center" width="100%">
-  <img src="./docs/images/langgraph-streamlit-home.png" alt="Example streamlit home page" width="75%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-streamlit-home.png" alt="Example streamlit home page" width="75%" />
 </div>
 
 ## End-to-End Deployment 🚀
@@ -116,7 +116,7 @@ The end-to-end deployment tool, `concierge langgraph deploy`, will create a new 
 ### Google Cloud Architecture
 
 <div align="center" width="100%">
-  <img src="./docs/images/langgraph-architecture.png" alt="Gen AI Experience Concierge LangGraph Demo Architecture" width="75%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-architecture.png" alt="Gen AI Experience Concierge LangGraph Demo Architecture" width="75%" />
 </div>
 
 ### Setup a seed project

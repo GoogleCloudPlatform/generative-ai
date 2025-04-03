@@ -20,7 +20,7 @@ There are two main approaches during implementation that result in a trade-off b
 This demo uses the first approach, but could be modified to run in parallel in case latency is critical.
 
 <div align="center" width="100%">
-  <img src="../docs/images/langgraph-guardrail-agent.png" alt="Guardrail Agent Architecture" width="50%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-guardrail-agent.png" alt="Guardrail Agent Architecture" width="50%" />
 </div>
 
 The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/guardrails.py).
@@ -36,7 +36,7 @@ This demo uses an LLM-based intent detection classifier to route each user query
 The semantic router layer can provide a useful facade to enable a single interface for multiple drastically different agent backends.
 
 <div align="center" width="100%">
-  <img src="../docs/images/langgraph-router-agent.png" alt="Semantic Router Agent Architecture" width="50%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-router-agent.png" alt="Semantic Router Agent Architecture" width="50%" />
 </div>
 
 The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/semantic_router.py).
@@ -68,7 +68,7 @@ Retail Search Assistant Use Cases:
 1. Inventory Search for a given product-store pair.
 
 <div align="center" width="100%">
-  <img src="../docs/images/langgraph-fc-agent.png" alt="Function Calling Agent Architecture" width="50%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-fc-agent.png" alt="Function Calling Agent Architecture" width="50%" />
 </div>
 
 The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/function_calling.py).
@@ -90,7 +90,7 @@ This architecture is often much slower than single-agent designs because a singl
 The "Executor" agent in this demo is a Gemini model equipped with the Google Search Grounding Tool ([documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/ground-with-google-search)) to enable live web search while executing tasks.
 
 <div align="center" width="100%">
-  <img src="../docs/images/langgraph-planner-agent.png" alt="Task Planner Agent Architecture" width="50%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-planner-agent.png" alt="Task Planner Agent Architecture" width="50%" />
 </div>
 
 The source code for this agent can be found [here](../langgraph-demo/backend/concierge/agents/task_planner.py).

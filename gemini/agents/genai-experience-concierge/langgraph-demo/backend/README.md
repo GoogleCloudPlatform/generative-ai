@@ -65,7 +65,7 @@ Each agent's route provides endpoints for invoking the agent, managing conversat
 - **`POST /threads/{thread_id}/runs/stream`**: This route initiates a run within a specific thread, identified by its `thread_id`, and streams the results. This can only be called if the agent is compiled **with a checkpointer**.
 
 <div align="center" width="100%">
-  <img src="../../docs/images/langgraph-fastapi.png" alt="Example agent server swagger docs" width="75%" />
+  <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-fastapi.png" alt="Example agent server swagger docs" width="75%" />
 </div>
 
 ## Key Features
