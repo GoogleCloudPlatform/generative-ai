@@ -23,8 +23,6 @@ Please submit additional resources via a PR.
 - Use [Vertex AI Search](https://cloud.google.com/products/agent-builder), to build and deploy AI agents grounded in their data
 - Google foundation models
   - [Gemini API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#gemini-models)
-  - [PaLM API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#palm-models)
-  - [Codey API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#codey-models)
   - [Imagen API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#imagen-models)
   - [MedLM API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#medlm-models)
 
