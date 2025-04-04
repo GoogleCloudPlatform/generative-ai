@@ -1,0 +1,16 @@
+.gcloudignore
+.git
+.gitignore
+
+# Python caches:
+__pycache__
+.env
+.venv
+.mypy_cache
+.ruff_cache
+
+/setup.cfg
+
+# cloud run doesn't need these files
+hidden
+.DS_Store
