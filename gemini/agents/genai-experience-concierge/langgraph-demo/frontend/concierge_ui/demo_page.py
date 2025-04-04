@@ -59,8 +59,7 @@ def build_demo_page(
 
     st.set_page_config(page_title=title, page_icon=icon)
     st.title(title)
-    # disable until proxy is setup for deployment to go to docs
-    # st.subheader(f"Server: [{config.base_url}]({config.base_url})")
+    # TODO: Add link to backend docs when proxy is setup
     st.sidebar.header(title)
 
     if description:
