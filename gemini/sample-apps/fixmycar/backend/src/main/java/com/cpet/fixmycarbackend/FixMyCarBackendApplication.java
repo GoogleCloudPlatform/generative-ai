@@ -35,7 +35,7 @@ public class FixMyCarBackendApplication {
   }
 
   public static void main(String[] args) {
-    logger.info("⭐ Starting server with grounding data store: Vertex AI Agent Builder");
+    logger.info("⭐ Starting server with grounding data store: Vertex AI Search");
     SpringApplication.run(FixMyCarBackendApplication.class, args);
   }
 }

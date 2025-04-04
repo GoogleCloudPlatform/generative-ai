@@ -68,7 +68,7 @@ public class FixMyCarBackendController {
     String servingConfigId = "default_search";
     String searchQuery = message.getPrompt();
     logger.info("⭐ Datastore query: " + searchQuery);
-    // Note - discoveryengine is the underlying API for Vertex AI Agent Builder
+    // Note - discoveryengine is the underlying API for Vertex AI Search
     String endpoint = String.format("discoveryengine.googleapis.com:443", location);
     String vectorSearchResults = "";
     try {
@@ -82,7 +82,7 @@ public class FixMyCarBackendController {
           .setPageSize(10)
           .build();
       SearchResponse response = searchServiceClient.search(request).getPage().getResponse();
-      // Note - the Vertex AI Agent Builder API response is tricky to parse because
+      // Note - the Vertex AI Search API response is tricky to parse because
       // it's a
       // proto-based object (not JSON / REST response)
       List<SearchResult> resultsList = response.getResultsList();
@@ -100,11 +100,11 @@ public class FixMyCarBackendController {
         vectorSearchResults += stringValue;
       }
     } catch (Exception e) {
-      logger.error("⚠️ Vertex AI Agent Builder Error: " + e);
+      logger.error("⚠️ Vertex AI Search Error: " + e);
     }
 
     // ⭐ Step 2 - Inference w/ augmented prompt
-    logger.info("🔍 Vertex AI Agent Builder results: " + vectorSearchResults);
+    logger.info("🔍 Vertex AI Search results: " + vectorSearchResults);
     String result = geminiInference(message.getPrompt(), vectorSearchResults);
     message.setResponse(result);
     return message;
