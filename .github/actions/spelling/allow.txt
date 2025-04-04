@@ -489,6 +489,7 @@ Viru
 WAI
 WAU
 WDIR
+WEBVTT
 WFH
 WNDCLASS
 WRatio
@@ -836,6 +837,7 @@ imwrite
 inbox
 informati
 inpaint
+inputvtt
 iostream
 ipd
 iphoneos
@@ -1242,6 +1244,7 @@ vos
 votre
 vrtx
 vtotal
+vtt
 vulnz
 waterjet
 wcontext
