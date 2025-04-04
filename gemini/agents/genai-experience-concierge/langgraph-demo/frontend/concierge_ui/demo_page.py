@@ -59,7 +59,8 @@ def build_demo_page(
 
     st.set_page_config(page_title=title, page_icon=icon)
     st.title(title)
-    st.subheader(f"Server: [{config.base_url}]({config.base_url})")
+    # disable until proxy is setup for deployment to go to docs
+    # st.subheader(f"Server: [{config.base_url}]({config.base_url})")
     st.sidebar.header(title)
 
     if description:
@@ -107,6 +108,4 @@ def build_demo_page(
             )
 
         # Add assistant response to chat history
-        st.session_state[messages_key].append(
-            {"role": "assistant", "content": response}
-        )
+        st.session_state[messages_key].append({"role": "assistant", "content": response})
