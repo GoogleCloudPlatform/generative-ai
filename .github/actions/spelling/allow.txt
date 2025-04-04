@@ -856,7 +856,8 @@ imwrite
 inbox
 informati
 inpaint
-inputvttiostream
+inputvtt
+iostream
 ipd
 iphoneos
 ipycanvas
@@ -1334,4 +1335,3 @@ yticks
 zakarid
 zaxis
 zimie
-inputvtt
