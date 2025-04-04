@@ -23,6 +23,8 @@ import os
 from typing import Any, Generator
 
 from dataclasses_json import dataclass_json
+from google import genai
+from google.genai.types import GenerateContentConfig, Part
 import mesop as me
 from shared.nav_menu import nav_menu
 from shared.prompts import VIDEO_GEOLOCATION_PROMPT, VIDEO_TAGS_PROMPT
@@ -37,13 +39,6 @@ from shared.styles import (
     _STYLE_TITLE_BOX,
     _TABBER_STYLE,
     FANCY_TEXT_GRADIENT,
-)
-
-from google import genai
-
-from google.genai.types import (
-    GenerateContentConfig,
-    Part,
 )
 
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")  # Your Google Cloud Project ID

@@ -471,6 +471,7 @@ Viru
 WAI
 WAU
 WDIR
+WEBVTT
 WFH
 WNDCLASS
 WXGA
@@ -804,7 +805,7 @@ imwrite
 inbox
 informati
 inpaint
-iostream
+inputvttiostream
 ipd
 iphoneos
 ipykernel
@@ -1199,6 +1200,7 @@ vos
 votre
 vrtx
 vtotal
+vtt
 vulnz
 waterjet
 wcontext
@@ -1261,6 +1263,3 @@ yticks
 zakarid
 zaxis
 zimie
-vtt
-WEBVTT
-inputvtt
