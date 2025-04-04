@@ -59,7 +59,6 @@ def build_demo_page(
 
     st.set_page_config(page_title=title, page_icon=icon)
     st.title(title)
-    # TODO: Add link to backend docs when proxy is setup
     st.sidebar.header(title)
 
     if description:
