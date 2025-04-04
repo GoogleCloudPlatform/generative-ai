@@ -491,6 +491,7 @@ WAU
 WDIR
 WFH
 WNDCLASS
+WRatio
 WXGA
 Wakatipu
 Wehn
@@ -1271,7 +1272,6 @@ womens
 workarounds
 worklets
 wparam
-WRatio
 wscore
 wscores
 wstring
