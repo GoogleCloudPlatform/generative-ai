@@ -1,6 +1,6 @@
 <app-header (emitSearch)="this.searchTerm({ term: $event })"></app-header>
 
-<div class="grid grid-cols-4 gap-0 m-7">
+<div class="grid grid-cols-4 gap-0 m-7" *ngIf="documents.length > 0">
   <div class="col-span-4 bg-custom-gray p-4" style="padding: 33px">
     <span class="text-3xl m-0">Image Generation</span>
   </div>
@@ -24,9 +24,9 @@
           <div class="w-3/4 p-4">
             <div class="w-full">
               <img [src]="'data:image/png;base64,' + (selectedResult?.image?.encodedImage || '')"
-                *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full h-[70vh] object-contain" />
+                *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full object-contain" />
               <img [src]="pagedDocuments[0]?.image?.encodedImage" *ngIf="showDefaultDocuments"
-                class="w-full h-[70vh] object-contain" />
+                class="w-full object-contain" />
             </div>
           </div>
         </div>
