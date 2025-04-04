@@ -2,9 +2,9 @@
 
 Vertex AI Search (VAIS) is a fully-managed platform, powered by large
 language models, that lets you build AI-enabled search and recommendation
-experiences for your public or private websites or mobile applications
+experiences for your public or private sites or mobile applications
 VAIS can handle a diverse set of data sources including structured,
-unstructured, and website data, as well as data from third-party applications
+unstructured, and site data, as well as data from third-party applications
 such as Jira, Salesforce, and Confluence.
 VAIS also has built-in integration with LLMs which enables you to provide
 answers to complex questions, grounded in your data
@@ -33,16 +33,16 @@ The [official documentation](https://cloud.google.com/generative-ai-app-builder/
    (./parsing_and_chunking_with_BYO.ipynb)
 
 3. [Defining custom attributes based on URL patterns in Vertex AI Search
-   Website Datastores](./custom_attributes_by_url_pattern.ipynb)
+   Site Datastores](./custom_attributes_by_url_pattern.ipynb)
 
-4. [Query-Level Boosting, Filtering, and Facets for Vertex AI Search Website
+4. [Query-Level Boosting, Filtering, and Facets for Vertex AI Search Site
    Datastores](./query_level_boosting_filtering_and_facets.ipynb)
 
 5. [Inline Ingestion of Documents into Vertex AI Search]
    (./inline_ingestion_of_documents.ipynb)
 
 6. [Event-based Triggering of Manual Recrawl for Vertex AI Search Advanced
-   Website Datastores](./manual_recrawl_urls_with_trigger.ipynb)
+   Site Datastores](./manual_recrawl_urls_with_trigger.ipynb)
 
 7. [Recording Real-Time User Events in Vertex AI Search Datastores]
    (./record_user_events.ipynb)
