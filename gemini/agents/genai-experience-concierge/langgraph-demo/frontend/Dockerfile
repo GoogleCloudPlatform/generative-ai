@@ -11,7 +11,7 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_CACHE_DIR=/root/.cache/uv
 WORKDIR /app
 
 # Copy the dependency code to the image.
-COPY .python-version pyproject.toml uv.lock README.md LICENSE.txt ./
+COPY pyproject.toml uv.lock README.md LICENSE.txt ./
 
 # Install dependencies.
 RUN uv sync --frozen --no-dev --no-install-project --no-editable --python-preference only-system

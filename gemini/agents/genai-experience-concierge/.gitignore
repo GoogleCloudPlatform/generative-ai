@@ -1,7 +1,7 @@
 # Application-specific paths
 .DS_Store
 hidden
-concierge.config.yaml
+concierge.*.yaml
 *.archive.zip
 
 # Byte-compiled / optimized / DLL files
