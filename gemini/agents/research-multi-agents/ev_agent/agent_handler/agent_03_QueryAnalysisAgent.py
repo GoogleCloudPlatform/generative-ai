@@ -177,20 +177,6 @@ class QueryAnalysisAgent:
                 debug=self.debug,
             )
 
-            function_response_part = types.Part.from_function_response(
-                name=function_call.name, response={"result": result}
-            )
-
-            # Final generation with context
-            final_response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=[
-                    types.Part.from_text(query),
-                    response.candidates[0].content.parts[0],
-                    function_response_part,
-                ],
-            )
-
             return QueryEntities(**result)
 
         except Exception as e:
