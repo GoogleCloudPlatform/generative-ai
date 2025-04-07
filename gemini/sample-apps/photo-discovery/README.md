@@ -1,17 +1,17 @@
-# Vertex AI Agent Builder & Flutter Demo
+# Vertex AI Search & Flutter Demo
 
-![Vertex AI Agent Builder & Flutter Multi-platform Demo – Fallingwater](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/showcase.png)
+![Vertex AI Search & Flutter Multi-platform Demo – Fallingwater](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/photo-discovery/showcase.png)
 
 This project is a demo that integrates a Vertex AI Agent with a multi-platform Flutter app. Flutter is used as the client app framework, Vertex AI Search is used as a vector DB, and Reasoning Engine helps us build and deploy an agent with Agent Engine.
 
 Users can run the Flutter app and take or upload a photo of a landmark. The app identifies the subject name and provides a brief description.
 
-To learn more about the subject of the photo, tap "tell me more" to chat with Khanh, an AI agent build built with Vertex AI Agent Builder, and ask follow-up questions about the history of subject in the photo based on information Wikipedia.
+To learn more about the subject of the photo, tap "tell me more" to chat with Khanh, an AI agent build built with Vertex AI Search, and ask follow-up questions about the history of subject in the photo based on information Wikipedia.
 
 The agent can also identify merchandise from the [Google Merchandise Store](https://your.merch.google/) and provide product name, description, pricing, and purchase link by referencing a Google Merchandise store dataset.
 
 > [!NOTE]
-> Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI agents with Vertex AI Agent Builder and Flutter](https://youtu.be/V8P_S9OLI_I?si=N2QMBs7HNZL6mKU0).
+> Check out the Google I/O 2024 talk for a full walkthrough: [Build generative AI agents with Vertex AI Search and Flutter](https://youtu.be/V8P_S9OLI_I?si=N2QMBs7HNZL6mKU0).
 
 ## Demo
 
@@ -42,7 +42,7 @@ The agent can also identify merchandise from the [Google Merchandise Store](http
 
 1. Preview the app. After 5 minutes, open `Preview` and type `Dino` on the search box. You should see the search results with Chrome Dino related items.
 
-### Building & deploying the agent with Vertex AI Agent Builder
+### Building & deploying the agent with Vertex AI Search
 
 1. Deploy a Cloud Run app: Edit `/ag-web/app/app.py` and `/ag-web/app/deploy.sh` and set the project ID, GCS bucket name and the search engine ID. Run `deploy.sh` to deploy the Run app. Open `ag-web` app on the Cloud Run console, and find the hostname (eg `ag-web-xxxxxx.a.run.app`).
 
@@ -92,7 +92,7 @@ static bool get hasCamera {
 
 ## Tech stack
 
-- Vertex AI Agent Builder
+- Vertex AI Search
 - Flutter
 - Cloud Run
 - Vertex AI for Firebase Dart SDK
