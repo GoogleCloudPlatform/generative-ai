@@ -23,6 +23,7 @@ WORKDIR /code
 COPY . /code/
 
 # Set the environment variable
+ENV ENVIRONMENT="development"
 ENV FRONTEND_URL="http://localhost:4200"
 
 # Expose the port

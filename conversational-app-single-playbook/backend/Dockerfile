@@ -5,6 +5,7 @@ RUN mkdir -p /code
 WORKDIR /code
 COPY . /code/
 
+ENV ENVIRONMENT="development"
 ENV BIG_QUERY_DATASET=""
 ENV FRONTEND_URL=""
 ENV FUNCTION_URL=""

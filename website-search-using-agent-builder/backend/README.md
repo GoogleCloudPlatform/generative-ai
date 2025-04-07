@@ -45,6 +45,7 @@ PATH="$VIRTUAL_ENV/bin:$PATH"
 export PATH
 
 # QUICKBOT ENV VARIABLES
+export ENVIRONMENT=development
 export FRONTEND_URL=http://localhost:4200
 export BIG_QUERY_DATASET=eren
 

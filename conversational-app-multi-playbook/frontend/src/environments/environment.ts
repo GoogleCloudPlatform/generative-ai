@@ -11,4 +11,5 @@ export const environment = {
   requiredLogin: 'False',
   backendURL: 'http://localhost:8080/api',
   chatbotName: 'My New Agent',
+  environment: 'development'
 };

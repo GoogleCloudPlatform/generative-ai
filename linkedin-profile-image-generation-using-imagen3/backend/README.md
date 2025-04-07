@@ -52,6 +52,7 @@ PATH="$VIRTUAL_ENV/bin:$PATH"
 export PATH
 
 # Quickbot env variables
+export ENVIRONMENT=development
 export FRONTEND_URL=http://localhost:4200
 
 ...
