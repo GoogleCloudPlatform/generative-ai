@@ -59,7 +59,6 @@ def build_demo_page(
 
     st.set_page_config(page_title=title, page_icon=icon)
     st.title(title)
-    st.subheader(f"Server: [{config.base_url}]({config.base_url})")
     st.sidebar.header(title)
 
     if description:
