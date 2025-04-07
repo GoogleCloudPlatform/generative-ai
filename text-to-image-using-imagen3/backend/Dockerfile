@@ -5,6 +5,7 @@ RUN mkdir -p /code
 WORKDIR /code
 COPY . /code/
 
+ENV ENVIRONMENT="development"
 ENV FRONTEND_URL="http://localhost:4200"
 
 EXPOSE 8080

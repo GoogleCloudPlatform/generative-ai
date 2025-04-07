@@ -12,7 +12,7 @@ app = FastAPI()
 
 def configure_cors(app):
     """Configures CORS middleware based on the environment."""
-    environment = getenv("ENVIRONMENT", "development")  # Default to 'development' if not set
+    environment = getenv("ENVIRONMENT")
     allowed_origins = []
 
     if environment == "production":
