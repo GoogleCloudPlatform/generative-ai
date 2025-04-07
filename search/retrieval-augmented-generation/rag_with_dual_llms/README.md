@@ -4,7 +4,7 @@ This demo illustrates how to compare responses from two LLMs through a corpus of
 Additional features include using a Judge model to evaluate the two responses and deliver a verdict on which model's response is better aligned with the query and the given context.
 
 This is how your final demo will look like once it is running
-![final_judge_comparator](https://storage.googleapis.com/github-repo/generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_with_dual_llms/final_judge_comparator.png)
+![image1](./img/final_judge_comparator_screenshot.png)
 
 # Instructions to run the demo:
 
@@ -23,7 +23,7 @@ gcloud auth application-default login
 
 5. Set the default project as follows:
 export GOOGLE_VERTEXAI="True"
-export PROJECT_ID="intel-common-dev-us"
+export PROJECT_ID="[project_id]"
 export LOCATION="us-central1"
 
 6. Now install the requirements file:
@@ -33,10 +33,10 @@ pip install -r requirements.txt
 cd src
 
 7. Now you are ready to run the demo from the source code folder:
-streamlit run vertex_rag_demo_dual_llms.py
+streamlit run vertex_rag_demo_dual_llms_with_judge.py
 
 If you want to run the demo with a judge model evaluating the two model responses, use this command:
-streamlit run vertex_rag_demo_dual_llms_with_judge.py
+streamlit run vertex_rag_demo_dual_llms_with_judge.py -- --judge
 
 8. To end the demo, press Control-C (^C) couple of times to kill it.
 
@@ -46,7 +46,7 @@ This demo runs using prompts created for a fictional Asian Chef Advisor use case
 9. Navigate to the prompts folder which is a sub folder under src folder:
 cd prompts
 
-10. You will see a list of prompts like this in text file format. Feel free to change them to suit your use case. 
+10. You will see a list of prompts like this in text file format. Feel free to change any of these to suit your use case. 
 system_instruction.txt
 rephraser.txt
 summarizer.txt
@@ -65,7 +65,7 @@ You need to change the system_instruction.txt and save the file in the same name
 
 12. You must then change the rephraser and summarizer prompts the same way to align with your new use case. Hope the above has given you a flavor for how to modify prompts.
 
-13. (Optional) If your use case changes, rerun the demo by changing to the src folder and running streamlit again:
+13. (Optional) If your prompt changes, rerun the demo by changing to the src folder and running streamlit again:
 cd src
 streamlit run vertex_rag_demo_dual_llms.py
 

@@ -25,7 +25,6 @@ import os
 import time
 import warnings
 from typing import Any, Dict, List, Optional, Tuple
-
 import google.generativeai
 import ollama  # Added missing import
 import requests
@@ -37,6 +36,9 @@ from google.genai import types
 from langchain.chains import RetrievalQA
 from langchain_google_community import VertexAISearchRetriever
 from langchain_google_vertexai import VertexAI
+import re
+import json
+import argparse
 
 # --- Configuration Constants ---
 DEBUG = False  # Set to False in production
@@ -67,9 +69,6 @@ logging.basicConfig(
 # Filter specific warnings if necessary, but use sparingly.
 import warnings
 warnings.filterwarnings("ignore")
-from sklearn.exceptions import DataConversionWarning
-
-warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
 
@@ -177,11 +176,13 @@ def get_rephraser_prompt(query: str) -> Optional[str]:
         The formatted prompt string, or None if loading fails.
     """
     prompt_template = _load_prompt_template(REPHRASER_PROMPT_FILE)
-    if prompt_template is None:
-        return None
 
     try:
-        formatted_prompt = prompt_template.format(query=query)
+        formatted_prompt = """Now, please rephrase the following customer query:
+   
+{query}
+"""
+        formatted_prompt = prompt_template + formatted_prompt.format(query=query)
         return _apply_system_prompt(formatted_prompt)
     except KeyError as e:
         logging.error(f"Error formatting rephraser prompt: Missing key {e}")
@@ -201,8 +202,6 @@ def get_summarizer_prompt(documents: List[str], query: str) -> Optional[str]:
         The formatted prompt string, or None if loading fails.
     """
     prompt_template = _load_prompt_template(SUMMARIZER_PROMPT_FILE)
-    if prompt_template is None:
-        return None
 
     document_vars = {}
     if documents:
@@ -220,8 +219,26 @@ def get_summarizer_prompt(documents: List[str], query: str) -> Optional[str]:
         key = f"Text_of_Document_{i}"
         format_args[key] = document_vars.get(key, "No document provided for this slot.")
 
+    formatted_prompt = """
+Now it's your turn! Here is the query and relevant documents:
+    Customer Search Query: {query}
+    
+    Document Texts:
+    [Start of Document 1]
+    {Text_of_Document_1}
+    [End of Document 1]
+    
+    [Start of Document 2]
+    {Text_of_Document_2}
+    [End of Document 2]
+    
+    [Start of Document 3]
+    {Text_of_Document_3}
+    [End of Document 3]    
+    """
+    
     try:
-        formatted_prompt = prompt_template.format(**format_args)
+        formatted_prompt = prompt_template + formatted_prompt.format(**format_args)
         return _apply_system_prompt(formatted_prompt)
     except KeyError as e:
         logging.error(f"Error formatting summarizer prompt: Missing key {e}")
@@ -298,6 +315,7 @@ def generate_gemini_response(
     Returns:
         The generated response text.
     """
+    start_time = (time.time())*1000.0
     model_name = model_config["name"]
     temperature = model_config.get("temperature", DEFAULT_GEMINI_TEMPERATURE)
     session_key = f"gemini_chat_client_{model_name}_{col}" # More specific key
@@ -352,6 +370,7 @@ def generate_gemini_response(
             
             #### This is a chat model ######
             response = client.send_message_stream(prompt)
+            time_taken = 1000.0*(time.time()) - start_time
             
             ### Both chat and text work the same way in extracting text ##
             for chunk in response:
@@ -359,11 +378,12 @@ def generate_gemini_response(
                 full_response += chunk_text
             # Remove RAG related additional text
             st.write(full_response.replace("++No RAG required++","").replace("<No RAG required>","")) 
+            st.write(f'\t\ttime taken = {time_taken:0.0f} ms')
             ### this is the input token count is the prompt token count
             st.write(f'\t\tinput token count = {chunk.usage_metadata.prompt_token_count}')
             # Directly provides output count
             st.write(f'\t\toutput token count = {chunk.usage_metadata.candidates_token_count}')
-        log_debug(f"Gemini Response: {full_response}") ## getting empty string
+        #log_debug(f"Gemini Response: {full_response}") ## getting empty string
         ## if getting error, add an exception clause
         log_debug(f'Usage meta data: total token count = {chunk.usage_metadata.total_token_count}') 
 
@@ -713,7 +733,7 @@ def list_documents(
     except Exception as e:
         st.error(f"Failed to list documents in data store {data_store_id}: {e}")
         logging.exception(f"Error listing documents in {data_store_id}:")
-        return []
+        return None
 
 
 def setup_retriever_sidebar() -> Optional[VertexAI]:
@@ -802,6 +822,42 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
             st.session_state.vector_store_retriever = None # Clear if no datastore selected
             return None # No LLM needed if no retriever
 
+def clean_json(respo):
+    # removing any markdown block that might appear
+    respo = respo.replace("{{","{").replace("}}","}")
+    
+    pattern = r"(?:^```.*)"
+    modified_text = re.sub(pattern, '', respo, 0, re.MULTILINE)
+    try:
+        #print(modified_text)
+        result = json.loads(modified_text)
+    except:
+        result = json.loads(f'{"intent":modified_text, "es_intent": modified_text, "is_trouble":"No", "cot": "None"}')
+    return result
+
+
+def process_rephraser_response(txt):
+    """
+    Replaced irrelevant chars before sending rephrased query to Retriever.
+
+    Args:
+        txt: The query string (potentially a JSON in string format).
+
+    Returns:
+        txt: The rephrased query string (potentially hidden in the JSON in string format).
+    """
+    try:
+        eval_txt = clean_json(txt)
+        log_debug(f"After cleaning of rephrased query: {eval_txt}")
+        if "es_intent" in txt:
+            return eval_txt["es_intent"]
+        elif "rephrased_query" in txt:
+            return eval_txt["rephrased_query"]
+        else:
+            return eval_txt
+    except:
+        log_debug(f"error: returning text as-is while processing rephrased query: {txt}")
+        return txt
 
 def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
     """
@@ -825,6 +881,7 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
 
 
     log_debug(f"Retrieving documents for query: {search_query}")
+    log_debug(f"Search query is of type: {type(search_query)}")
     start_time = time.time()
 
     try:
@@ -849,6 +906,7 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
                 documents_content.append(header + doc_content)
                 # Limit logging of content length
                 log_debug(f"Retrieved Doc {i+1}: {len(doc_content)} chars")
+                log_debug(f"First 200 chars in doc: {doc_content[:200]}")
 
         log_debug(f"Retrieved {len(documents_content)} documents.")
         return documents_content
@@ -858,7 +916,7 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
         logging.exception("Error during document retrieval:")
         return []
 
-
+    
 def judge_responses(left_question, left_response, left_context, right_question, right_response, right_context):
     """
     Judges the responses from two models (left and right) using a hardcoded Gemini model.
@@ -942,11 +1000,24 @@ def judge_responses(left_question, left_response, left_context, right_question, 
         return f"Error during judgment: {e}"
 ##################### MAIN APP BELOW ##################################
 # --- Main Application ---
-def main():
+def main(args: argparse.Namespace): # <-- Pass parsed args to main
     """Runs the main Streamlit application flow."""
-    st.set_page_config("Vertex RAG Compare: 2 LLM's", layout="wide")
-    st.title("📊 Vertex RAG: Compare 2 LLMs with Judge model")
-    st.caption("Compare LLM responses with Vertex AI Search RAG and a Judge Model")
+    st.set_page_config("Vertex RAG Compare with Dual LLMs", layout="wide")
+    st.title("📊 Vertex RAG Compare with 2 LLM's")
+    st.caption("Compare LLM responses using Vertex AI Search RAG")
+
+
+    # --- Initialization ---
+    if "app_initialized" not in st.session_state:
+        st.session_state.ollama_models, st.session_state.gemini_models = initialize_models()
+        st.session_state.chat_history = []
+        # Load system prompt only once
+        sys_prompt_path = os.path.join(PROMPT_FOLDER, SYSTEM_PROMPT_FILE)
+        st.session_state.system_prompt = load_text_file(sys_prompt_path) or "" # Ensure it's a string
+        if not st.session_state.system_prompt:
+             st.warning("System prompt file not loaded. Using default behavior.")
+        st.session_state.app_initialized = True
+
 
     # --- Sidebar Setup ---
     retriever_llm = setup_retriever_sidebar() # Sets up retriever and returns LLM if successful
@@ -961,19 +1032,6 @@ def main():
         if retriever_llm is None and use_rag:
              st.warning("RAG disabled: Vertex AI Search connection not configured.")
              use_rag = False # Force disable if setup failed
-
-    # --- Initialization ---
-    if "app_initialized" not in st.session_state:
-        st.session_state.ollama_models, st.session_state.gemini_models = initialize_models()
-        st.session_state.chat_history = []
-        # Load system prompt only once
-        sys_prompt_path = os.path.join(PROMPT_FOLDER, SYSTEM_PROMPT_FILE)
-        st.session_state.system_prompt = load_text_file(sys_prompt_path) or "" # Ensure it's a string
-        if not st.session_state.system_prompt:
-             st.warning("System prompt file not loaded. Using default behavior.")
-        st.session_state.app_initialized = True
-
-
 
     # --- Response Columns & Model Selection ---
     left_col, right_col = st.columns(2)
@@ -1008,9 +1066,14 @@ def main():
         left_rephrased = generate_rephraser_response(
             left_config, user_question, left_col
         )
+        
+        left_rephrased = process_rephraser_response(left_rephrased)
+        
         right_rephrased = generate_rephraser_response(
             right_config, user_question, right_col
         )
+
+        right_rephrased = process_rephraser_response(right_rephrased)
 
         # --- Step 2: Retrieve Context (Conditional RAG) ---
         left_context, right_context = [], [] # Default to empty context
@@ -1080,23 +1143,35 @@ def main():
                 "timestamp": time.time(),
             }
         )
-        
-        # Maybe add a button to clear history?
-        ## May be wait a couple of seconds to finish streaming?
-        time.sleep(1)
-        
-        # Generate the Judgment
-        judgement = judge_responses(left_final_query, left_response_data, left_context, right_final_query, right_response_data, right_context) # function calls that get the judge response!
 
-        # Display Chat history at the initialization, this part should remain before printing chat
-        full_response = ""
-        with st.container():
-            st.subheader("Judge's Analysis")
-            st.write(f"*{st.session_state.judge_name} is generating the final answer...*")
-            #st.write(left_response)
-            for chunk in judgement:
-                full_response += chunk.text
-            st.write(full_response) # add that line to print it to screen!            
+        # --- Step 5: Run Judge Model (Conditional) ---
+        if args.judge: # <-- Check the command-line argument flag for judge model
+            ## May be wait a couple of seconds to finish streaming?
+            time.sleep(1)
+            
+            # Generate the Judgment from judge model
+            judgement = judge_responses(left_final_query, left_response_data, left_context, right_final_query, right_response_data, right_context) # function calls that get the judge response!
+
+            # Display Chat history at the initialization, this part should remain before printing chat
+            full_response = ""
+            with st.container():
+                st.subheader("Judge's Analysis")
+                st.write(f"*{st.session_state.judge_name} is generating the final answer...*")
+                #st.write(left_response)
+                for chunk in judgement:
+                    full_response += chunk.text
+                st.write(full_response) # add that line to print it to screen!            
 ##################### MAIN APP COMPLETE ##################################
 if __name__ == "__main__":
-    main()
+    # --- Argument Parsing ---
+    parser = argparse.ArgumentParser(description="Vertex RAG Comparator with optional Judge Model.")
+    parser.add_argument(
+        "--judge",
+        action="store_true", # Makes it a flag: present=True, absent=False
+        help="Enable the Judge Model evaluation after each response pair.",
+    )
+    args = parser.parse_args() # Parse arguments from command line
+
+    # --- Run Main App ---
+    main(args) # Pass parsed arguments to the main function
+

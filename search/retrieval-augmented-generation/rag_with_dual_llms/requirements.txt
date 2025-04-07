@@ -17,4 +17,6 @@ langchain-google-community
 asynciolimiter
 asyncio
 tqdm
+re
+json
 
