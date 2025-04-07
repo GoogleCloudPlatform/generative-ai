@@ -151,7 +151,7 @@ class QueryAnalysisAgent:
                         - "Show gaps in..." -> GAPS
                         - "Where should we add..." -> PLANNING
                         - "How well are... performing" -> ASSESSMENT
-                        
+
                         Now extract entities from this query: """
                         + query
                     }
