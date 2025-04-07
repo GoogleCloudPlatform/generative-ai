@@ -10,7 +10,7 @@
         <div class="flex flex-row w-full">
           <div class="w-1/6 p-4">
             <div class="flex flex-col">
-              <div class="w-24 h-24 mb-2 mx-2 cursor-pointer" *ngFor="let result of pagedDocuments"
+              <div class="w-32 h-32 mb-2 mx-2 cursor-pointer" *ngFor="let result of pagedDocuments"
                 (click)="changeImageSelection(result)">
                 <div class="w-full h-full bg-lighter-gray">
                   <img [src]="'data:image/png;base64,' + result.image.encodedImage"
@@ -24,9 +24,9 @@
           <div class="w-3/4 p-4">
             <div class="w-full">
               <img [src]="'data:image/png;base64,' + (selectedResult?.image?.encodedImage || '')"
-                *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full object-contain" />
+                *ngIf="!showDefaultDocuments && documents.length > 0" class="max-height-image w-full object-contain" />
               <img [src]="pagedDocuments[0]?.image?.encodedImage" *ngIf="showDefaultDocuments"
-                class="w-full object-contain" />
+                class="max-height-image w-full object-contain" />
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@
 
       <div class="flex items-center">
         <mat-label class="text-2xl mr-4">Number of Results</mat-label>
-        <mat-slider min="1" max="10" step="1" value="2" discrete>
+        <mat-slider min="1" max="5" step="1" value="2" discrete>
           <input matSliderThumb>
         </mat-slider>
       </div>
