@@ -22,7 +22,7 @@
             </div>
           </div>
           <div class="w-3/4 p-4">
-            <div class="w-full">
+            <div class="w-full" style="display: flex;justify-content: center;">
               <img [src]="'data:image/png;base64,' + (selectedResult?.image?.encodedImage || '')"
                 *ngIf="!showDefaultDocuments && documents.length > 0" class="max-height-image w-full object-contain" />
               <img [src]="pagedDocuments[0]?.image?.encodedImage" *ngIf="showDefaultDocuments"
