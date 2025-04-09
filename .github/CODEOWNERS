@@ -26,7 +26,7 @@
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions @shanecglass @GoogleCloudPlatform/generative-ai-devrel
-/generative-ai/gemini/multimodal-datasets                   @fth @fthoele @cleop
+/generative-ai/gemini/multimodal-datasets                   @fth @fthoele @cleop @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language                                     @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/getting-started                     @polong-lin @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/grounding                           @koverholt @holtskinner @GoogleCloudPlatform/generative-ai-devrel
