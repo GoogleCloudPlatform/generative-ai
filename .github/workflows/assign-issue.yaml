@@ -1,8 +1,5 @@
-name: Assign Issue
-
-on:
-  issues:
-    types: [opened, edited]
+- name: Docker Setup Buildx
+  uses: docker/setup-buildx-action@v3.10.0
 
 jobs:
   assign:
