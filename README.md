@@ -1,6 +1,6 @@
 # Generative AI
 
-> NOTE: [Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) have been released!
+> NOTE: [Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) has been released!
 >
 > Here are the latest notebooks and demos using the new models:
 >
@@ -128,6 +128,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
   - [mis-ai-accelerator](https://github.com/GoogleCloudPlatform/mis-ai-accelerator)
   - [dataflow-opinion-analysis](https://github.com/GoogleCloudPlatform/dataflow-opinion-analysis)
   - [genai-beyond-basics](https://github.com/meteatamel/genai-beyond-basics)
+  - [Gemini by Example](https://geminibyexample.com)
 
 ## Contributing
 

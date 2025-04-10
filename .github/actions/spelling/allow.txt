@@ -16,6 +16,8 @@ ASF
 ASGI
 ASML
 AUVs
+Aadila
+Afshaan
 Aktu
 Aphone
 Arborio
@@ -43,6 +45,7 @@ Brusdar
 Btn
 Buckleys
 Bulmus
+Byzance
 CALIPSO
 CAMQAA
 CHECKOV
@@ -62,6 +65,7 @@ CWLEY
 CZE
 Caprese
 Chocolat
+Chrono
 Chunyuan
 Codicote
 Colm
@@ -78,6 +82,7 @@ DRV
 DVDs
 DWMWA
 Daniil
+DataFrame
 Dedup
 DeepEval
 Depatmint
@@ -100,6 +105,7 @@ EMFU
 EMNLP
 ENU
 ESG
+ESRB
 EVs
 Edunov
 Einhalt
@@ -111,6 +117,7 @@ Eragon
 Esin
 Eventarc
 FAISS
+FAQs
 FIA
 FILEFLAGS
 FILEOS
@@ -129,6 +136,7 @@ Flatform
 Flipkart
 Folmer
 Frodo
+GEOGPOINT
 GError
 GFile
 GKE
@@ -138,6 +146,7 @@ Gabeira
 Gameplay
 Gatace
 GenTwo
+Geralt
 Gfm
 Giancarlo
 Gisting
@@ -172,6 +181,7 @@ Hbf
 Hida
 Hikaru
 Hisaki
+Hlc
 Hmmm
 Hogwarts
 Homesley
@@ -248,6 +258,7 @@ MICOA
 MLB
 MLOPs
 MMA
+MMO
 MSCHF
 MSGSEND
 MTL
@@ -261,6 +272,7 @@ Masaru
 Mbappe
 Meawad
 Mega
+Meinl
 Memegen
 Merhaba
 Mesop
@@ -286,6 +298,7 @@ NMT
 NOMINATIM
 NOMINMAX
 NOZORDER
+NPCs
 NREL
 NVIDIA
 NVL
@@ -313,6 +326,7 @@ PBA
 PDEs
 PDFs
 PEFT
+PEGI
 PGHOST
 PGPORT
 PGUSER
@@ -349,11 +363,13 @@ RRF
 RTN
 RUNPATH
 RYDE
+Rabbids
 Raducanu
 Raikkonen
 Rajpurkar
 Reranking
 Resona
+Rivia
 Rizzoli
 Robeco
 Robo
@@ -440,6 +456,7 @@ Tricyle
 UDF
 UDFs
 USERDATA
+USK
 UVX
 Unimicron
 Upserting
@@ -475,6 +492,7 @@ WAU
 WDIR
 WFH
 WNDCLASS
+WRatio
 WXGA
 Wakatipu
 Wehn
@@ -517,6 +535,7 @@ antiword
 apikeys
 apk
 appuser
+appyaml
 apredict
 aquery
 arange
@@ -611,6 +630,7 @@ corpuses
 countplot
 cpet
 crewai
+crosstab
 csa
 cse
 ctd
@@ -621,7 +641,6 @@ cycleways
 cygpath
 darkgrid
 dask
-dataframe
 datname
 dbadmin
 dbln
@@ -654,11 +673,13 @@ drinkware
 dropdown
 dropna
 dsl
+dsn
 dtype
 dtypes
 dumfries
 dumpd
 dunia
+dvd
 dwmapi
 ecommerce
 ein
@@ -723,6 +744,7 @@ fulltext
 fullurl
 functiona
 futur
+gameplay
 gapic
 gauff
 gbif
@@ -763,6 +785,7 @@ gpu
 gradio
 gradlew
 gridcolor
+gridless
 gridpoint
 groupadd
 groupchat
@@ -788,6 +811,7 @@ https
 httpx
 hwnd
 hypercorn
+iap
 iban
 icd
 icudtl
@@ -833,6 +857,7 @@ jit
 jiwer
 jsonify
 jsonlines
+jsonplus
 jupyter
 jvm
 kaggle
@@ -843,6 +868,7 @@ keychain
 kfp
 khz
 kickstart
+knative
 konnte
 kotlin
 kpi
@@ -858,6 +884,7 @@ lego
 lenzing
 levelname
 lexer
+liberties
 linalg
 linecolor
 linestyle
@@ -1022,6 +1049,7 @@ powerups
 praw
 prcntg
 preds
+pregel
 produc
 programar
 projectid
@@ -1075,6 +1103,7 @@ reranker
 reranking
 reranks
 resil
+retryable
 ribeye
 ricc
 ringspun
@@ -1095,6 +1124,7 @@ selectbox
 selftext
 selkirk
 seo
+serde
 setlocal
 sft
 shortdesc
@@ -1119,6 +1149,7 @@ spearmanr
 sqkm
 srlimit
 ssd
+sse
 ssh
 ssml
 ssn
@@ -1189,6 +1220,7 @@ unrtf
 upsell
 urandom
 usb
+usd
 usebackq
 usecases
 username
