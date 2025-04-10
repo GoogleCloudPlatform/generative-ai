@@ -1,4 +1,5 @@
 AALR
+ADK
 ADMA
 AFX
 AGG
@@ -519,6 +520,7 @@ aaxis
 acall
 achat
 acomplete
+adk
 aexecute
 aextract
 afrom
