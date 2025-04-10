@@ -8,14 +8,14 @@ Screenshot:
   
 This example demonstrates how you can chat with the app to retrieve cocktail details from [The Cocktail DB](https://www.thecocktaildb.com/) website using a local MCP server
 
-### Create & Activate Virtual Environment (Recommended):
+## Create & Activate Virtual Environment (Recommended)
 
 ```sh
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-### Install ADK:
+## Install ADK
 
 ```sh
 pip install google-adk fastapi
@@ -35,7 +35,7 @@ your_project_folder/  # Project folder
         └── index.html
 ```
 
-### Run the app
+## Run the app
 
 Start the Fast API: Run the following command within the `adk_mcp_app` folder
 
@@ -53,7 +53,7 @@ GOOGLE_CLOUD_PROJECT="<your project id>"
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
 
-1.  Run the below command to start the app:
+1. Run the below command to start the app:
 
 ```sh
 uvicorn main:app --reload
