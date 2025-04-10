@@ -1,4 +1,5 @@
-from typing import Any, List, Dict, Optional
+from typing import Any, Dict, Optional
+
 import httpx
 from mcp.server.fastmcp import FastMCP
 

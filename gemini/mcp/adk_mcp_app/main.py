@@ -1,22 +1,20 @@
-import os
-import json
 import asyncio
+import json
 import logging
+import os
 from pathlib import Path
+
 from dotenv import load_dotenv
-from google.adk.runners import Runner
 from fastapi import FastAPI, WebSocket
-from starlette.websockets import WebSocketDisconnect
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from google.adk.tools.mcp_tool.mcp_toolset import (
-    MCPToolset,
-    StdioServerParameters,
-)
+from fastapi.staticfiles import StaticFiles
 from google.adk.agents.llm_agent import LlmAgent
-from google.adk.sessions import InMemorySessionService
-from google.genai import types
 from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
+from google.genai import types
+from starlette.websockets import WebSocketDisconnect
 
 load_dotenv()
 
@@ -43,6 +41,7 @@ async def get_agent_async(server_params):
         tools=tools,
     )
     return root_agent, exit_stack
+
 
 ct_server_params = StdioServerParameters(
     command="python",
@@ -89,16 +88,19 @@ async def run_adk_agent_async(websocket, server_params, session_id):
             ai_message = "\n".join(response)
             await websocket.send_text(json.dumps({"message": ai_message}))
             await asyncio.sleep(0)
-            
+
     except WebSocketDisconnect:
         # This block executes when the client disconnects
         logging.info(f"Client {session_id} disconnected.")
     except Exception as e:
         # Catch other potential errors in your agent logic
-        logging.error(f"Error in agent task for session {session_id}: {e}", exc_info=True)
+        logging.error(
+            f"Error in agent task for session {session_id}: {e}", exc_info=True
+        )
     finally:
         logging.info(f"Agent task ending for session {session_id}")
-       
+
+
 # FastAPI web app
 
 app = FastAPI()
