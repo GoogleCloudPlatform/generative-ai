@@ -44,7 +44,7 @@ GOOGLE_GENAI_USE_VERTEXAI=1
 # ML Dev backend config
 GOOGLE_API_KEY=YOUR_VALUE_HERE
 
-# Vertex backend config
+# Vertex AI backend config
 GOOGLE_CLOUD_PROJECT="<your project id>"
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
