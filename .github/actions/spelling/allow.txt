@@ -1,4 +1,5 @@
 AALR
+ADK
 ADMA
 AFX
 AGG
@@ -82,6 +83,7 @@ DRV
 DVDs
 DWMWA
 Daniil
+DataFrame
 Dedup
 DeepEval
 Depatmint
@@ -518,6 +520,7 @@ aaxis
 acall
 achat
 acomplete
+adk
 aexecute
 aextract
 afrom
@@ -640,7 +643,6 @@ cycleways
 cygpath
 darkgrid
 dask
-dataframe
 datname
 dbadmin
 dbln
