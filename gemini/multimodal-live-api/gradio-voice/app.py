@@ -71,10 +71,10 @@ class GeminiHandler(AsyncStreamHandler):
                     )
                 )
             ),
-            system_instruction=Content(parts=[Part.from_text(system_instruction)]),
+            system_instruction=Content(parts=[Part.from_text(text=system_instruction)]),
         )
         async with client.aio.live.connect(
-            model="gemini-2.0-flash-exp", config=config
+            model="gemini-2.0-flash-live-preview-04-09", config=config
         ) as session:
             async for audio in session.start_stream(
                 stream=self.stream(), mime_type="audio/pcm"
@@ -152,7 +152,7 @@ with gr.Blocks(css=css) as demo:
             modality="audio",
             mode="send-receive",
             # See for changes needed to deploy behind a firewall
-            # https://freddyaboulton.github.io/gradio-webrtc/deployment/
+            # https://fastrtc.org/deployment/
             rtc_configuration=None,
         )
 
