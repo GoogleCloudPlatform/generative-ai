@@ -34,9 +34,9 @@ your_project_folder/  # Project folder
 ```
 ### Run the app
 Start the Fast API: Run the following command within the `adk_mcp_app` folder
-1. Set up values in `.env ` file
 
-Create a .env file with the following contents:
+
+1. Create a .env file with the following contents:
 ```
 # Choose Model Backend: 0 -> ML Dev, 1 -> Vertex
 GOOGLE_GENAI_USE_VERTEXAI=1
@@ -49,6 +49,8 @@ GOOGLE_CLOUD_PROJECT="<your project id>"
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
 
+2. Set up values in `.env ` file  
+   
 If using Google API key:
 ```
 GOOGLE_GENAI_USE_VERTEXAI=0
@@ -62,7 +64,7 @@ GOOGLE_CLOUD_PROJECT=YOUR_VALUE_HERE
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
 
-2.  Run the below command to start the app:
+3.  Run the below command to start the app:
 
 ```
 uvicorn main:app --reload
