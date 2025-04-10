@@ -38,9 +38,9 @@ Before running the application, you need to:
 
 The main dependencies are:
 
-- `gradio_webrtc>=0.0.27,<1.0`
+- `fastrtc`
 - `librosa`
-- `google-genai==0.3.0`
+- `google-genai`
 
 ## Usage
 
@@ -107,4 +107,4 @@ The audio streaming implementation uses:
 
 ## Deployment Notes
 
-For deploying behind a firewall, you may need to modify the WebRTC configuration. See the [Gradio WebRTC deployment documentation](https://freddyaboulton.github.io/gradio-webrtc/deployment/) for more details.
+For deploying behind a firewall, you may need to modify the WebRTC configuration. See the [Gradio WebRTC deployment documentation](https://fastrtc.org/deployment/) for more details.
