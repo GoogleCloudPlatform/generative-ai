@@ -114,3 +114,4 @@ ignore$
 ^\Qowlbot.py\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
 ^\Qnoxfile.py\E$
+^\Qsearch/tuning/vertexai-search-tuning.ipynb
