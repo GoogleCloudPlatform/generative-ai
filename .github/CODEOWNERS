@@ -45,6 +45,7 @@
 /generative-ai/search/retrieval-augmented-generation        @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/getting-started                       @inardini @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/speech/use-cases/storytelling                @holtskinner @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/search/tuning			            @jincheolkim
 /generative-ai/vision/use-cases                             @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/getting-started                       @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/vision/use-cases/advertisement-creation-using-gemini-and-imagen3    @ankuljain09 @koyelguha
