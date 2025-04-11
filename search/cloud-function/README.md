@@ -123,6 +123,6 @@ system, you're always going to need search based RAG. The better the search
 quality the better the agent response based on your source data.
 
 For more on agents, check out
-[Vertex AI Agent Builder Use Cases](https://cloud.google.com/products/agent-builder?hl=en#common-uses)
+[Vertex AI Search Use Cases](https://cloud.google.com/products/agent-builder?hl=en#common-uses)
 and
 [https://github.com/GoogleCloudPlatform/generative-ai](https://github.com/GoogleCloudPlatform/generative-ai).

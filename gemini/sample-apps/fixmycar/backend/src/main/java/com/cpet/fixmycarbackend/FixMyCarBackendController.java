@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.cpet.fixmycarbackend;
 
 import com.google.cloud.discoveryengine.v1.SearchRequest;
@@ -68,7 +83,7 @@ public class FixMyCarBackendController {
     String servingConfigId = "default_search";
     String searchQuery = message.getPrompt();
     logger.info("⭐ Datastore query: " + searchQuery);
-    // Note - discoveryengine is the underlying API for Vertex AI Agent Builder
+    // Note - discoveryengine is the underlying API for Vertex AI Search
     String endpoint = String.format("discoveryengine.googleapis.com:443", location);
     String vectorSearchResults = "";
     try {
@@ -82,7 +97,7 @@ public class FixMyCarBackendController {
           .setPageSize(10)
           .build();
       SearchResponse response = searchServiceClient.search(request).getPage().getResponse();
-      // Note - the Vertex AI Agent Builder API response is tricky to parse because
+      // Note - the Vertex AI Search API response is tricky to parse because
       // it's a
       // proto-based object (not JSON / REST response)
       List<SearchResult> resultsList = response.getResultsList();
@@ -100,11 +115,11 @@ public class FixMyCarBackendController {
         vectorSearchResults += stringValue;
       }
     } catch (Exception e) {
-      logger.error("⚠️ Vertex AI Agent Builder Error: " + e);
+      logger.error("⚠️ Vertex AI Search Error: " + e);
     }
 
     // ⭐ Step 2 - Inference w/ augmented prompt
-    logger.info("🔍 Vertex AI Agent Builder results: " + vectorSearchResults);
+    logger.info("🔍 Vertex AI Search results: " + vectorSearchResults);
     String result = geminiInference(message.getPrompt(), vectorSearchResults);
     message.setResponse(result);
     return message;
@@ -120,7 +135,7 @@ public class FixMyCarBackendController {
         + " Use the following grounding data as context. This came from the relevant vehicle"
         + " owner's manual: "
         + vectorSearchResults;
-    logger.info("🔮 Geminimpt: " + geminiPrompt);
+    logger.info("🔮 Gemini Prompt: " + geminiPrompt);
 
     String geminiLocation = "us-central1";
     String modelName = "gemini-2.0-flash";

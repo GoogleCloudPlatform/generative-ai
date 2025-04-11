@@ -18,6 +18,7 @@
 /generative-ai/gemini/grounding                             @holtskinner @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/rag-engine                            @edtsoi430 @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/agent-engine                          @koverholt @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/agent-engine/tutorial_ag2_on_agent_engine.ipynb @emmanuelawa
 /generative-ai/gemini/agent-engine/tutorial_alloydb_rag_agent.ipynb @averikitsch
 /generative-ai/gemini/agent-engine/tutorial_cloud_sql_pg_rag_agent.ipynb @averikitsch
 /generative-ai/gemini/responsible-ai                        @iamthuya @GoogleCloudPlatform/generative-ai-devrel
@@ -25,6 +26,7 @@
 /generative-ai/gemini/use-cases/education                   @PicardParis @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/retail                      @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions @shanecglass @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/multimodal-datasets                   @fth @fthoele @cleop @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language                                     @polong-lin @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/getting-started                     @polong-lin @iamthuya @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/language/grounding                           @koverholt @holtskinner @GoogleCloudPlatform/generative-ai-devrel
@@ -89,3 +91,5 @@
 /generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb     @vladkol @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/open-models/serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb @rsamborski @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/gemini/mcp/intro_to_mcp.ipynb @wadave @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/agents/genai-experience-concierge @pablofgaeta @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/gemini/model-optimizer/intro_model_optimizer.ipynb @nardosalemu @GoogleCloudPlatform/generative-ai-devrel

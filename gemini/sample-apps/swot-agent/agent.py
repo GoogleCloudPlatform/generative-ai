@@ -42,7 +42,7 @@ sys.excepthook = lambda *args: None
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
 SERVICE_ACCOUNT_FILE = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 LOCATION = "us-central1"
-MODEL = "gemini-2.0-flash-exp"
+MODEL = "gemini-2.0-flash-live-preview-04-09"
 
 # --- Reddit API Configuration ---
 REDDIT_MAX_INSIGHTS = 5

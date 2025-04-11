@@ -1,0 +1,16 @@
+# Pre-deployed billing account and project ID
+project_id = "xxx"
+
+# Location for all services and apps
+location = "europe-west1"
+
+# Location for main Firestore database. Put this close to your users.
+firestore_location = "eur3"
+
+# Location for all storage buckets
+bucket_location = "eu"
+
+# Whether to enable org policies.
+# You must be an org policy administrator to enable this and Terraform must run as a service account.
+# To run as a service account see ORG_POLICY.md
+org_policies = false

@@ -19,7 +19,7 @@ The out-of-the-box solution can bring Google-Quality search to build end-to-end 
 - It provides users with LLM powered summaries with citations and is designed to scale to your search traffic. Vertex AI Search supports custom LLM instruction templates, making it easy to create powerful engaging search experiences with minimal effort.
 - Anyone can build a RAG search engine grounded on their own data in minutes with our console, developers can also use our API to programmatically build and test the OOTB agent.
 
-⭐ Explore [Part 1 of this notebook example](vertexai-search-options/vertexai_search_options.ipynb) to see Vertex AI Agent Builder SDK in action.
+⭐ Explore [Part 1 of this notebook example](vertexai-search-options/vertexai_search_options.ipynb) to see Vertex AI Search SDK in action.
 
 ## For greater customization
 
