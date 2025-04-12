@@ -101,15 +101,11 @@ def main() -> None:
         with st.chat_message("assistant"):
             st.markdown(assistant_response)
 
-        try:
-            output_audio_bytes = generate_audio(
-                assistant_response,
-                voice_name=LANGUAGE_MAP[target_language]["voice_name"],
-                language_code=LANGUAGE_MAP[target_language]["language_code"],
-            )
-        except Exception as e:
-            st.error(f"Error generating audio: {e}")
-            output_audio_bytes = None
+        output_audio_bytes = generate_audio(
+            assistant_response,
+            voice_name=LANGUAGE_MAP[target_language]["voice_name"],
+            language_code=LANGUAGE_MAP[target_language]["language_code"],
+        )
 
         if output_audio_bytes:
             play_audio(output_audio_bytes)
