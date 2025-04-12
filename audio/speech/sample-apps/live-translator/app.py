@@ -28,10 +28,12 @@ LANGUAGE_MAP = {
     },
 }
 
+
 @st.cache_resource
 def load_client() -> genai.Client:
     """Load Google Gen AI Client."""
     return genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+
 
 @st.cache_resource
 def load_tts_client() -> texttospeech.TextToSpeechClient:
@@ -40,9 +42,11 @@ def load_tts_client() -> texttospeech.TextToSpeechClient:
         client_options=ClientOptions(api_endpoint="us-texttospeech.googleapis.com")
     )
 
+
 client = load_client()
 
 tts_client = load_tts_client()
+
 
 def play_audio(audio_bytes: bytes) -> None:
     """Plays the audio from a byte stream."""
@@ -90,8 +94,6 @@ def main() -> None:
 
         instruction = f"Translate the audio into {target_language}."
 
-        print(instruction)
-
         assistant_response = client.models.generate_content(
             model=MODEL_ID, contents=[user_input, instruction]
         ).text
@@ -99,16 +101,21 @@ def main() -> None:
         with st.chat_message("assistant"):
             st.markdown(assistant_response)
 
-        output_audio_bytes = generate_audio(
-            assistant_response,
-            voice_name=LANGUAGE_MAP[target_language]["voice_name"],
-            language_code=LANGUAGE_MAP[target_language]["language_code"],
-        )
+        try:
+            output_audio_bytes = generate_audio(
+                assistant_response,
+                voice_name=LANGUAGE_MAP[target_language]["voice_name"],
+                language_code=LANGUAGE_MAP[target_language]["language_code"],
+            )
+        except Exception as e:
+            st.error(f"Error generating audio: {e}")
+            output_audio_bytes = None
 
         if output_audio_bytes:
             play_audio(output_audio_bytes)
 
         audio_input = None
+
 
 if __name__ == "__main__":
     main()
