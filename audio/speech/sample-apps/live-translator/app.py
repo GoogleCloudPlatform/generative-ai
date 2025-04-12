@@ -28,14 +28,12 @@ LANGUAGE_MAP = {
     },
 }
 
-
 @st.cache_resource
 def load_client() -> genai.Client:
     """Load Google Gen AI Client."""
     client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
     return client
-
 
 @st.cache_resource
 def load_tts_client() -> texttospeech.TextToSpeechClient:
@@ -44,11 +42,9 @@ def load_tts_client() -> texttospeech.TextToSpeechClient:
         client_options=ClientOptions(api_endpoint="us-texttospeech.googleapis.com")
     )
 
-
 client = load_client()
 
 tts_client = load_tts_client()
-
 
 def play_audio(audio_bytes: bytes) -> None:
     """Plays the audio from a byte stream."""
@@ -115,7 +111,6 @@ def main() -> None:
             play_audio(output_audio_bytes)
 
         audio_input = None
-
 
 if __name__ == "__main__":
     main()
