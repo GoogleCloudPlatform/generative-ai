@@ -31,9 +31,7 @@ LANGUAGE_MAP = {
 @st.cache_resource
 def load_client() -> genai.Client:
     """Load Google Gen AI Client."""
-    client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
-
-    return client
+    return genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
 @st.cache_resource
 def load_tts_client() -> texttospeech.TextToSpeechClient:
