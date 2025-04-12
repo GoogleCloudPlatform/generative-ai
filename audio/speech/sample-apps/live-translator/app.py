@@ -1,14 +1,8 @@
-import io
 import os
-import wave
-
 from google import genai
 from google.api_core.client_options import ClientOptions
 from google.cloud import texttospeech_v1beta1 as texttospeech
-from google.genai.chats import Chat
-from google.genai.types import GenerateContentConfig, Part
-import numpy as np
-import sounddevice as sd
+from google.genai.types import Part
 import streamlit as st
 
 # Initialize session state for chat history
@@ -34,12 +28,14 @@ LANGUAGE_MAP = {
     },
 }
 
+
 @st.cache_resource
-def load_client():
+def load_client() -> genai.Client:
     """Load Google Gen AI Client."""
     client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
     return client
+
 
 @st.cache_resource
 def load_tts_client() -> texttospeech.TextToSpeechClient:
@@ -48,9 +44,11 @@ def load_tts_client() -> texttospeech.TextToSpeechClient:
         client_options=ClientOptions(api_endpoint="us-texttospeech.googleapis.com")
     )
 
+
 client = load_client()
 
 tts_client = load_tts_client()
+
 
 def play_audio(audio_bytes: bytes) -> None:
     """Plays the audio from a byte stream."""
@@ -117,6 +115,7 @@ def main() -> None:
             play_audio(output_audio_bytes)
 
         audio_input = None
+
 
 if __name__ == "__main__":
     main()
