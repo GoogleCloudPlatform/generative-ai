@@ -74,6 +74,7 @@ Connectez
 Cowabunga
 Crossbody
 D'orsay
+DCR
 DHH
 DLC
 DLCs
@@ -561,6 +562,7 @@ avec
 aworkflow
 backticks
 bagchi
+bargap
 barmode
 barpolar
 baxis
@@ -1192,6 +1194,7 @@ tgi
 tgz
 thelook
 throug
+tickvals
 tiktoken
 timechart
 tion
@@ -1307,3 +1310,4 @@ yticks
 zakarid
 zaxis
 zimie
+zmin
