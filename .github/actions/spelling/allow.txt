@@ -1,3 +1,8 @@
+bargap
+coverted
+DCR
+tickvals
+zmin
 AALR
 ADK
 ADMA
