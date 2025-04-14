@@ -3,8 +3,9 @@ from google import genai
 from google.api_core.client_options import ClientOptions
 from google.cloud import texttospeech_v1beta1 as texttospeech
 from google.genai.types import GenerateContentConfig, Part
-import streamlit as st
 from google.genai.chats import Chat
+import streamlit as st
+
 
 # Initialize session state for chat history
 if "chat_history" not in st.session_state:
