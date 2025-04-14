@@ -2,8 +2,9 @@ import os
 from google import genai
 from google.api_core.client_options import ClientOptions
 from google.cloud import texttospeech_v1beta1 as texttospeech
-from google.genai.types import Part
+from google.genai.types import GenerateContentConfig, Part
 import streamlit as st
+from google.genai.chats import Chat
 
 # Initialize session state for chat history
 if "chat_history" not in st.session_state:
@@ -30,9 +31,16 @@ LANGUAGE_MAP = {
 
 
 @st.cache_resource
-def load_client() -> genai.Client:
+def load_chat() -> Chat:
     """Load Google Gen AI Client."""
-    return genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+    client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+
+    return client.chats.create(
+        model=MODEL_ID,
+        config=GenerateContentConfig(
+            system_instruction="You are an assistant tasked with translating between languages. Only respond with the translation.",
+        ),
+    )
 
 
 @st.cache_resource
@@ -43,7 +51,7 @@ def load_tts_client() -> texttospeech.TextToSpeechClient:
     )
 
 
-client = load_client()
+chat = load_chat()
 
 tts_client = load_tts_client()
 
@@ -94,9 +102,7 @@ def main() -> None:
 
         instruction = f"Translate the audio into {target_language}."
 
-        assistant_response = client.models.generate_content(
-            model=MODEL_ID, contents=[user_input, instruction]
-        ).text
+        assistant_response = chat.send_message(message=[instruction, user_input]).text
 
         with st.chat_message("assistant"):
             st.markdown(assistant_response)
