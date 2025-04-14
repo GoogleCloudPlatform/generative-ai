@@ -9,7 +9,7 @@
       <div class="grid grid-cols-1 w-full">
         <div class="flex flex-row w-full">
           <div class="w-1/6 p-4">
-            <div class="flex flex-col">
+            <div class="flex flex-col overflow-y-auto h-full">
               <div class="w-32 h-32 mb-2 mx-2 cursor-pointer" *ngFor="let result of pagedDocuments"
                 (click)="changeImageSelection(result)">
                 <div class="w-full h-full bg-lighter-gray">
@@ -31,7 +31,8 @@
           </div>
         </div>
         <div class="chat-footer-outer">
-          <app-chat-input (emitSearch)="this.goToResults($event)"></app-chat-input>
+          <app-chat-input [term]="currentSearchTerm" (emitSearch)="this.searchTerm({ term: $event })">
+          </app-chat-input>
         </div>
       </div>
     </div>
@@ -51,7 +52,7 @@
       <h3 class="text-2xl font-medium mt-4" style="font-size: 1.5rem;">Aspect Ratio</h3>
       <div class="mb-5">
         <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button class="aspect-button mx-2 mb-2"
-          (click)="changeAspectRatio(ratio)">
+          (click)="changeAspectRatio(ratio)" [class.active]="selectedAspectRatio === ratio">
           {{ ratio?.value }}
         </button>
       </div>
@@ -67,8 +68,9 @@
 
       <div class="flex items-center">
         <mat-label class="text-2xl mr-4">Number of Results</mat-label>
-        <mat-slider min="1" max="5" step="1" value="2" discrete>
-          <input matSliderThumb>
+        <mat-slider min="1" max="5" step="1" [(ngModel)]="numberOfResults" discrete
+          (change)="onNumberOfResultsChange($event)">
+          <input matSliderThumb value="{{numberOfResults}}">
         </mat-slider>
       </div>
     </div>

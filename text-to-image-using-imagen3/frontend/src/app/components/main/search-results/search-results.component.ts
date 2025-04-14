@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnDestroy, ViewChild, TemplateRef, NgModule } from '@angular/core';
 import { SearchService } from 'src/app/services/search.service';
 import { ReplaySubject, takeUntil } from 'rxjs';
 import { UserService } from 'src/app/services/user/user.service';
@@ -29,7 +29,9 @@ interface AspectRatio {
   value: string;
   viewValue: string;
 }
-
+interface Style {
+  value: string;
+}
 @Component({
   selector: 'app-search-results',
   templateUrl: './search-results.component.html',
@@ -40,7 +42,8 @@ export class SearchResultsComponent implements OnDestroy {
   previewRef!: TemplateRef<{}>;
   summary = '';
   private readonly destroyed = new ReplaySubject<void>(1);
-  serachResult: any = [];
+  searchResult: any = [];
+  isLoading: boolean = false;
   documents: any = [];
   showDefaultDocuments: boolean = false;
   images: any = [];
@@ -53,6 +56,9 @@ export class SearchResultsComponent implements OnDestroy {
   selectedDocument: any;
   safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
+  selectedImageStyle: string = 'Modern';
+  currentSearchTerm: string = '';
+  numberOfResults: number = 4;
   imagen3ModelsList: Imagen3Model[] = [
     { value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001' },
     {
@@ -76,20 +82,18 @@ export class SearchResultsComponent implements OnDestroy {
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,
-    aspectRatio: '1:1',
+    aspectRatio: this.selectedAspectRatio.value,
+    imageStyle: this.selectedImageStyle,
+    numberOfImages: this.numberOfResults,
   };
-  imageStyleList = [
+  imageStyleList: Style[] = [
     { value: 'Modern' },
     { value: 'Realistic' },
     { value: 'Vintage' },
     { value: 'Monochrome' },
     { value: 'Fantasy' },
   ];
-  selectedImageStyle: string | null = null;
-  changeImageStyle(style: { value: string }) {
-    this.selectedImageStyle = style.value;
-    console.log('Selected Image Style:', this.selectedImageStyle);
-  }
+  activatedRoute: ActivatedRoute | null | undefined;
 
 
   constructor(
@@ -122,13 +126,14 @@ export class SearchResultsComponent implements OnDestroy {
     }
 
     this.searchRequest.term = query || '';
+    this.currentSearchTerm = query;
     const newSearchRequest = this.searchRequest;
 
     this.service.search(newSearchRequest).subscribe({
       next: (searchResponse: GeneratedImage[]) => {
         this.summary = searchResponse?.[0]?.enhancedPrompt || '';
         this.documents = searchResponse;
-        this.serachResult.forEach((element: GeneratedImage) => {
+        this.searchResult.forEach((element: GeneratedImage) => {
           this.images.push(element.image?.encodedImage);
         });
         this.selectedResult = searchResponse[0];
@@ -201,6 +206,7 @@ export class SearchResultsComponent implements OnDestroy {
   }
 
   goToResults(term: string) {
+    console.log('test');
     this.router.navigate(['/search'], { queryParams: { q: term } });
   }
 
@@ -208,40 +214,56 @@ export class SearchResultsComponent implements OnDestroy {
     term,
     aspectRatio,
     model,
+    imageStyle,
+    numberOfImages
   }: {
     term?: string | undefined;
     aspectRatio?: string | undefined;
     model?: string | undefined;
+    imageStyle?: string | undefined;
+    numberOfImages?: number | undefined;
   }) {
     if (!term) return
 
     this.showDefaultDocuments = false;
     this.userService.showLoading();
-    this.serachResult = [];
+    this.searchResult = [];
     this.summary = '';
     this.documents = [];
     this.images = [];
-    this.router.navigate(['/search'], { queryParams: { q: term } });
-    if (term) this.searchRequest.term = term;
-    if (aspectRatio) this.searchRequest.aspectRatio = aspectRatio;
-    if (model) this.searchRequest.model = model;
+
+    this.searchRequest.term = term || this.searchRequest.term;
+    this.searchRequest.aspectRatio = aspectRatio || this.selectedAspectRatio.value;
+    this.searchRequest.model = model || this.selectedModel;
+    this.searchRequest.imageStyle = imageStyle || this.selectedImageStyle;
+    this.searchRequest.numberOfImages = numberOfImages || this.numberOfResults;
+
     const newSearchRequest = this.searchRequest;
+    console.log('Search request:', newSearchRequest);
+    this.currentSearchTerm = newSearchRequest.term;
 
     this.service.search(newSearchRequest).subscribe({
       next: (searchResponse: any) => {
         this.summary = searchResponse?.[0]?.enhancedPrompt || '';
         this.documents = searchResponse;
-        this.serachResult.forEach((element: GeneratedImage) => {
+        this.searchResult.forEach((element: GeneratedImage) => {
           this.images.push(element.image?.encodedImage);
         });
         this.selectedResult = searchResponse[0];
         this.userService.hideLoading();
+        console.log('Search response:', searchResponse);
       },
       error: error => {
         console.error('Search error:', error);
         this.userService.hideLoading();
         this.showErrorSnackBar(error);
       },
+    });
+
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { q: this.currentSearchTerm },
+      queryParamsHandling: '',
     });
   }
 
@@ -262,6 +284,16 @@ export class SearchResultsComponent implements OnDestroy {
     this.selectedAspectRatio = aspectRatio;
     this.searchTerm({ aspectRatio: aspectRatio.value });
     console.log('Selected Aspect Ratio:', this.selectedAspectRatio);
+  }
+
+  changeImageStyle(style: Style) {
+    this.selectedImageStyle = style.value;
+    console.log('Selected Image Style:', this.selectedImageStyle);
+  }
+
+  onNumberOfResultsChange(event: any) {
+    this.numberOfResults = event.target.value;
+    console.log('Selected Number of Results:', this.numberOfResults);
   }
 
   previewDocument(event: any, document: any) {
