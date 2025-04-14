@@ -716,6 +716,7 @@ expl
 faiss
 fastapi
 fastmcp
+fastrtc
 fda
 fea
 fect
