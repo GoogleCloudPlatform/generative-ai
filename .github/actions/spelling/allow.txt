@@ -119,6 +119,7 @@ Esin
 Eventarc
 FAISS
 FAQs
+FHIR
 FIA
 FILEFLAGS
 FILEOS
@@ -212,6 +213,7 @@ Jhamtani
 Jiacheng
 Jianfeng
 Jibo
+Jincheol
 Joji
 Jolyon
 Junzhe
@@ -1096,6 +1098,7 @@ rbc
 rbf
 reddit
 redef
+reidx
 rembg
 reoffice
 rephraser
@@ -1206,6 +1209,7 @@ traceloop
 treeah
 tritan
 trl
+tscore
 tseslint
 tsne
 tsv
@@ -1307,7 +1311,3 @@ yticks
 zakarid
 zaxis
 zimie
-FHIR
-Jincheol
-reidx
-tscore
