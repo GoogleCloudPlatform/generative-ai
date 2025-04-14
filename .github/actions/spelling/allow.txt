@@ -632,7 +632,6 @@ colwidth
 constexpr
 corpuses
 countplot
-coverted
 cpet
 crewai
 crosstab
