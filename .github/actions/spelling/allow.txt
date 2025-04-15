@@ -1,4 +1,5 @@
 AALR
+ADK
 ADMA
 AFX
 AGG
@@ -75,6 +76,7 @@ Connectez
 Cowabunga
 Crossbody
 D'orsay
+DCR
 DHH
 DLC
 DLCs
@@ -84,6 +86,7 @@ DRV
 DVDs
 DWMWA
 Daniil
+DataFrame
 Dedup
 DeepEval
 Depatmint
@@ -376,6 +379,7 @@ Raikkonen
 Rajpurkar
 Reranking
 Resona
+Rivertown
 Rivia
 Rizzoli
 Robeco
@@ -407,6 +411,7 @@ Schlenoff
 Schulen
 Selam
 Sestero
+Sha'carri
 Shazeer
 Shenzhou
 Shklovsky
@@ -527,6 +532,7 @@ aaxis
 acall
 achat
 acomplete
+adk
 aexecute
 aextract
 afrom
@@ -567,6 +573,7 @@ avec
 aworkflow
 backticks
 bagchi
+bargap
 barmode
 barpolar
 baxis
@@ -649,7 +656,6 @@ cycleways
 cygpath
 darkgrid
 dask
-dataframe
 datname
 dbadmin
 dbln
@@ -723,6 +729,7 @@ expl
 faiss
 fastapi
 fastmcp
+fastrtc
 fda
 fea
 fect
@@ -1201,6 +1208,7 @@ tgi
 tgz
 thelook
 throug
+tickvals
 tiktoken
 timechart
 tion
@@ -1318,5 +1326,4 @@ zaxis
 zimie
 groupadd
 byoc
-Recrawls
-usecase
+zmin

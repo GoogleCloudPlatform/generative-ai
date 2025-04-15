@@ -13,7 +13,7 @@ Clone the repository and ensure that the Google Application Default Credentials 
 ```bash
 # Clone repository and navigate to project root directory
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd gemini/agents/genai-experience-concierge
+cd generative-ai/gemini/agents/genai-experience-concierge
 
 # Set up Google Application Default Credentials
 gcloud auth login
