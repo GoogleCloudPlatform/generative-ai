@@ -17,8 +17,8 @@ ASF
 ASGI
 ASML
 AUVs
-Abhishek
 Aadila
+Abhishek
 Afshaan
 Aktu
 Aphone
@@ -278,8 +278,8 @@ Masaru
 Mbappe
 Meawad
 Mega
-Meltem
 Meinl
+Meltem
 Memegen
 Merhaba
 Mesop
@@ -353,8 +353,8 @@ Pharma
 Photoshop
 Pichai
 Pistorius
-Porat
 Polong
+Porat
 Pranav
 Pré
 Pzk
@@ -598,6 +598,7 @@ bqdf
 bqml
 breakroom
 btn
+byoc
 byod
 byor
 carbonara
@@ -1324,6 +1325,4 @@ yticks
 zakarid
 zaxis
 zimie
-groupadd
-byoc
 zmin
