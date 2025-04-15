@@ -74,6 +74,7 @@ Connectez
 Cowabunga
 Crossbody
 D'orsay
+DCR
 DHH
 DLC
 DLCs
@@ -370,6 +371,7 @@ Raikkonen
 Rajpurkar
 Reranking
 Resona
+Rivertown
 Rivia
 Rizzoli
 Robeco
@@ -401,6 +403,7 @@ Schlenoff
 Schulen
 Selam
 Sestero
+Sha'carri
 Shazeer
 Shenzhou
 Shklovsky
@@ -561,6 +564,7 @@ avec
 aworkflow
 backticks
 bagchi
+bargap
 barmode
 barpolar
 baxis
@@ -1192,6 +1196,7 @@ tgi
 tgz
 thelook
 throug
+tickvals
 tiktoken
 timechart
 tion
@@ -1307,3 +1312,4 @@ yticks
 zakarid
 zaxis
 zimie
+zmin

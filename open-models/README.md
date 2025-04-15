@@ -21,6 +21,7 @@ This repository contains examples for deploying and fine-tuning open source mode
 ### Evaluation
 
 - [evaluation/vertex_ai_tgi_gemma_with_genai_evaluation.ipynb](./evaluation/vertex_ai_tgi_gemma_with_genai_evaluation.ipynb) - This notebooks provides steps and code to use the Vertex AI Gen AI Evaluation framework to evaluate Gemma 2 in a summarization task.
+- [evaluation/vertex_ai_tgi_evaluate_llm_with_open_judge.ipynb](./evaluation/vertex_ai_tgi_evaluate_llm_with_open_judge.ipynb) - This notebooks shows how to use custom judge model to evaluate LLM-based application using the Autorater configuration in Gen AI Eval service.
 
 ### Use cases
 
