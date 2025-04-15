@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##############################################################################
-# Vertex RAG Comparator with Judge Model
+# Vertex AI RAG Comparator with Judge Model
 # Developed by Ram Seshadri
 # Last Updated: Feb 2025
 #
@@ -57,7 +57,8 @@ DEFAULT_DATA_STORE_LOCATION = "global"
 DEFAULT_BRANCH_NAME = "default_branch"
 DEFAULT_COLLECTION = "default_collection"
 RAG_SKIP_PHRASES = ["I am not able to answer this question", "No RAG required"]
-GEMINI_MODEL_PREFIXES = ["gemini-2.", "gemini-1.5"]
+GEMINI_MODEL_PREFIXES = ["gemini-2."]
+JUDGE_MODEL_NAME = "gemini-2.5-pro-001" # Added constant
 
 # --- Logging Setup ---
 logging.basicConfig(
@@ -98,7 +99,7 @@ def load_text_file(filename: str) -> Optional[str]:
             return file.read()
     except FileNotFoundError:
         logging.error(f"Error: File not found at {filename}.")
-        st.error(f"Error: Prompt file not found: {os.path.basename(filename)}")
+        st.error(f"Error: Prompt file not found: {filename}")
     except IOError as e:
         logging.error(f"Error: Could not read file {filename}. Reason: {e}")
         st.error(f"Error: Could not read prompt file: {os.path.basename(filename)}")
@@ -283,7 +284,7 @@ def initialize_models() -> Tuple[List[str], List[str]]:
         ollama_models = [model["name"] for model in response.json().get("models", [])]
         log_debug(f"Found Ollama models: {ollama_models}")
         if not ollama_models:
-             st.warning("Ollama server responded, but no models listed.")
+             st.warning("Ollama server responded, but no models listed. Ensure models are available on the Ollama server.")
     except requests.exceptions.ConnectionError:
         st.warning("🔴 Ollama server not reachable. Is it running?")
         logging.warning("Ollama connection failed: ConnectionError.")
@@ -961,14 +962,7 @@ def judge_responses(left_question, left_response, left_context, right_question, 
         Which one accurately responds to the question using the source of truth? Make sure your verdict is based on each model's strict adherence to the source of truth.
         """
         
-        # Initialize the Gemini model for judging (hardcoded)
-        prompt_folder = "prompts"
-        filename = "judge_model_name.txt"
-        filepath = os.path.join(prompt_folder, filename) 
-        ## for some reason a new line char creeps in and you must remove it
-        model_name = load_text_file(filepath).replace("\n","")
-        log_debug(f"judge model name = {model_name}")
-                
+        # Initialize the Gemini model for judging (from the judge model name constant above)               
         client = create_gemini_client()
         
         ### system instruction for judge model ###
@@ -986,18 +980,18 @@ def judge_responses(left_question, left_response, left_context, right_question, 
           )
           
         response = client.models.generate_content_stream(
-            model = model_name,
+            model = JUDGE_MODEL_NAME,
             contents = judge_prompt,
             config = generate_content_config,
             )
             
-        st.session_state.judge_name = model_name
+        st.session_state.judge_name = JUDGE_MODEL_NAME
         log_debug("Judge response: %s " %response)
         return response
 
     except Exception as e:
         log_debug(f"Error in judge_responses: {e}")
-        return f"Error during judgment: {e}"
+        return f"Error during judgment: {type(e).__name__} - {e}"
 ##################### MAIN APP BELOW ##################################
 # --- Main Application ---
 def main(args: argparse.Namespace): # <-- Pass parsed args to main

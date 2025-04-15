@@ -1,7 +1,6 @@
 streamlit
 ollama
 langchain
-google-generativeai
 requests
 PyPDF2
 tiktoken
@@ -9,7 +8,6 @@ faiss-cpu
 pandas 
 fsspec 
 gcsfs
-google-cloud-aiplatform>=1.74
 google-cloud-discoveryengine>=0.13.6
 google-genai>=1.5.0
 langchain-google-vertexai
