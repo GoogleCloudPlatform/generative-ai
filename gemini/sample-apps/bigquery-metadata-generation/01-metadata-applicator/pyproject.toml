@@ -1,0 +1,37 @@
+[project]
+name = "01-metadata-generator"
+version = "0.0.1"
+authors = [
+    { name = "Fabio Pancino", email = "pancinofabio@gmail.com" }
+]
+description = "BQ Metadata Generation"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "inquirer",
+    "pandas==2.*",
+    "db-dtypes==1.*",
+    "google-cloud-bigquery==3.*",
+    "google-cloud-datacatalog"
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "pylint",
+    "types-pytz",
+    "types-requests",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "src",
+    "src.data",
+    "src.dependencies",
+    "src.dependencies.bigquery",
+    "src.dependencies.metadata"
+]
