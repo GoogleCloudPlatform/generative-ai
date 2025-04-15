@@ -1,20 +1,21 @@
+from configparser import ConfigParser
 import re
+
+from dependencies.bigquery import BQClient
 from dependencies.metadata.data_catalog import DataCatalog
 from dependencies.utils import remove_null_fields
-from dependencies.bigquery import BQClient
-
-from configparser import ConfigParser
 
 config = ConfigParser()
 config.read("src/config.ini")
 
 bq_client = BQClient(project_id=config["GENERIC"]["PROJECT_ID"])
 catalog_client = DataCatalog(
-        project_id=config["GENERIC"]["PROJECT_ID"],
-        catalog_name=config["CATALOG"]["CATALOG_NAME"],
-        catalog_location=config["CATALOG"]["CATALOG_LOCATION"],
-        taxonomy_location=config["CATALOG"]["TAXONOMY_LOCATION"],
-    )
+    project_id=config["GENERIC"]["PROJECT_ID"],
+    catalog_name=config["CATALOG"]["CATALOG_NAME"],
+    catalog_location=config["CATALOG"]["CATALOG_LOCATION"],
+    taxonomy_location=config["CATALOG"]["TAXONOMY_LOCATION"],
+)
+
 
 def uniform_to_google(fields: dict):
     fields = remove_null_fields(fields)
@@ -23,11 +24,14 @@ def uniform_to_google(fields: dict):
             if field["fields"]:
                 field["fields"] = uniform_to_google(field["fields"])
         else:
-            field["policyTags"] = catalog_client.create_new_policy_tag(field.pop("policyTag", ""))
+            field["policyTags"] = catalog_client.create_new_policy_tag(
+                field.pop("policyTag", "")
+            )
     print()
 
-    #print(fields)
+    # print(fields)
     return fields
+
 
 def update_descriptions(table_id: str, show_json: dict):
     """Utility function to insert almost any* useful metadata for a table.
@@ -43,7 +47,9 @@ def update_descriptions(table_id: str, show_json: dict):
                     (This is not displayed on BigQuery but on Dataplex)
     """
 
-    show_json["schema"]["fields"] = uniform_to_google(fields=show_json["schema"]["fields"])
+    show_json["schema"]["fields"] = uniform_to_google(
+        fields=show_json["schema"]["fields"]
+    )
 
     print(show_json)
 
@@ -64,7 +70,9 @@ def update_descriptions(table_id: str, show_json: dict):
 
     # Update Table Overview
     if overview := show_json.get("overview", ""):
-        catalog_client.create_table_overview(overview, prj, dataset, table_name, is_sharded)#dataset di data catalog
+        catalog_client.create_table_overview(
+            overview, prj, dataset, table_name, is_sharded
+        )  # dataset di data catalog
 
     # Update Table Tags
     if tags := show_json.get("tags", ""):

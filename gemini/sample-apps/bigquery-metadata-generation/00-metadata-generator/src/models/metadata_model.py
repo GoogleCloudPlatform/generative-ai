@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class TableColumn(BaseModel):
@@ -8,10 +9,12 @@ class TableColumn(BaseModel):
     type: str
     mode: str
     policyTag: Optional[str] = None
-    fields: Optional[List['TableColumn']] = None
+    fields: Optional[List["TableColumn"]] = None
+
 
 class TableSchema(BaseModel):
     fields: List[TableColumn]
+
 
 class BQTable(BaseModel):
     description: str = Field(
@@ -23,7 +26,5 @@ class BQTable(BaseModel):
     schema: TableSchema
 
     def write_to_json(self, filename: str):
-        with open(f"{filename}.json", 'w', encoding='utf-8') as f:
+        with open(f"{filename}.json", "w", encoding="utf-8") as f:
             f.write(self.model_dump_json(indent=4))
-
-

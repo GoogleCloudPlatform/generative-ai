@@ -1,6 +1,7 @@
 from google.cloud import bigquery
 
-class BQClient():
+
+class BQClient:
     def __init__(self, project_id):
         self.project_id = project_id
         self._client = bigquery.Client(project=project_id)

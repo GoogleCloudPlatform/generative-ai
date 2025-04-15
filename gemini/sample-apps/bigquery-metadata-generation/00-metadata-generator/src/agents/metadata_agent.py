@@ -1,26 +1,32 @@
 from configparser import ConfigParser
 
-from google.oauth2 import service_account
 from google.cloud import aiplatform
-from vertexai.generative_models._generative_models import (
-    HarmBlockThreshold,
-    HarmCategory,
-)
+from google.oauth2 import service_account
 from llama_index.core import PromptTemplate
 from llama_index.core.output_parsers import PydanticOutputParser
 from llama_index.core.program import LLMTextCompletionProgram
 from llama_index.llms.vertex import Vertex
-
 from models import BQTable
+from vertexai.generative_models._generative_models import (
+    HarmBlockThreshold,
+    HarmCategory,
+)
 
 config = ConfigParser()
 config.read("src/config.ini")
 aiplatform.init(location=config["GENERIC"]["REGION"])
 
+
 class MetadataAgent:
     def __init__(self):
-        credentials = service_account.Credentials.from_service_account_file(config["GCP_JSON_CREDS_PATH"])
-        aiplatform.init(project=config["PROJECT_ID"], location=config["REGION"],credentials=credentials)
+        credentials = service_account.Credentials.from_service_account_file(
+            config["GCP_JSON_CREDS_PATH"]
+        )
+        aiplatform.init(
+            project=config["PROJECT_ID"],
+            location=config["REGION"],
+            credentials=credentials,
+        )
 
         self.llm = self._get_llm
         self.prompt_template_oneshot_interaction = config["METADATA_AGENT"][
@@ -47,7 +53,7 @@ class MetadataAgent:
             },
         )
 
-    def generate_metadata(self, metadata_example, table_data)->BQTable:
+    def generate_metadata(self, metadata_example, table_data) -> BQTable:
         """ """
         try:
             llm = self._get_llm()
@@ -71,7 +77,12 @@ class MetadataAgent:
                 input_table=table_data,
             )
 
-            return BQTable(description=output.description, overview=output.overview, tags=output.tags, schema=output.schema)
+            return BQTable(
+                description=output.description,
+                overview=output.overview,
+                tags=output.tags,
+                schema=output.schema,
+            )
 
         except Exception as e:
             print(e)
