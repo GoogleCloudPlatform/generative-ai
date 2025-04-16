@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 # Change the working directory to the `app` directory
 WORKDIR /app
-ADD . /app
+COPY . /app
 ENV PATH="/app/.venv/bin:$PATH"
 RUN uv sync --frozen
 
