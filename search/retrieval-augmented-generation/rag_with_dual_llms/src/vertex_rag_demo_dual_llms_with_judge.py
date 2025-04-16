@@ -20,25 +20,26 @@
 # Note: This is not an officially supported Google product.
 ##############################################################################
 
+import argparse
+import json
 import logging
 import os
+import re
 import time
-import warnings
 from typing import Any, Dict, List, Optional, Tuple
-import google.generativeai
-import ollama  # Added missing import
-import requests
-import streamlit as st
+import warnings
+
+from google import genai
 from google.api_core.client_options import ClientOptions
 from google.cloud import discoveryengine
-from google import genai
 from google.genai import types
+import google.generativeai
 from langchain.chains import RetrievalQA
 from langchain_google_community import VertexAISearchRetriever
 from langchain_google_vertexai import VertexAI
-import re
-import json
-import argparse
+import ollama  # Added missing import
+import requests
+import streamlit as st
 
 # --- Configuration Constants ---
 DEBUG = False  # Set to False in production
@@ -48,7 +49,7 @@ REPHRASER_PROMPT_FILE = "rephraser.txt"
 SUMMARIZER_PROMPT_FILE = "summarizer.txt"
 DEFAULT_OLLAMA_URL = "http://localhost:11434/api/tags"
 DEFAULT_OLLAMA_TIMEOUT = 10  # seconds
-DEFAULT_GEMINI_API_VERSION = "v1" # or 'v1alpha' if needed
+DEFAULT_GEMINI_API_VERSION = "v1"  # or 'v1alpha' if needed
 DEFAULT_GEMINI_TEMPERATURE = 0.3
 DEFAULT_GEMINI_MAX_TOKENS = 2048
 DEFAULT_GEMINI_TOP_P = 0.95
@@ -58,7 +59,7 @@ DEFAULT_BRANCH_NAME = "default_branch"
 DEFAULT_COLLECTION = "default_collection"
 RAG_SKIP_PHRASES = ["I am not able to answer this question", "No RAG required"]
 GEMINI_MODEL_PREFIXES = ["gemini-2."]
-JUDGE_MODEL_NAME = "gemini-2.5-pro-001" # Added constant
+JUDGE_MODEL_NAME = "gemini-2.5-pro-001"  # Added constant
 
 # --- Logging Setup ---
 logging.basicConfig(
@@ -68,7 +69,6 @@ logging.basicConfig(
 
 # --- Suppress Specific Warnings ---
 # Filter specific warnings if necessary, but use sparingly.
-import warnings
 warnings.filterwarnings("ignore")
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -210,13 +210,12 @@ def get_summarizer_prompt(documents: List[str], query: str) -> Optional[str]:
             document_vars[f"Text_of_Document_{i + 1}"] = doc
     else:
         # Provide placeholder if no documents are found
-         document_vars["Text_of_Document_1"] = "No relevant documents found."
-
+        document_vars["Text_of_Document_1"] = "No relevant documents found."
 
     # Prepare format arguments - ensure all expected keys are present
     # Assuming the template expects up to 3 docs, provide placeholders
     format_args = {"query": query}
-    for i in range(1, 4): # Adjust range if template expects different number
+    for i in range(1, 4):  # Adjust range if template expects different number
         key = f"Text_of_Document_{i}"
         format_args[key] = document_vars.get(key, "No document provided for this slot.")
 
@@ -237,7 +236,7 @@ Now it's your turn! Here is the query and relevant documents:
     {Text_of_Document_3}
     [End of Document 3]    
     """
-    
+
     try:
         formatted_prompt = prompt_template + formatted_prompt.format(**format_args)
         return _apply_system_prompt(formatted_prompt)
@@ -284,7 +283,9 @@ def initialize_models() -> Tuple[List[str], List[str]]:
         ollama_models = [model["name"] for model in response.json().get("models", [])]
         log_debug(f"Found Ollama models: {ollama_models}")
         if not ollama_models:
-             st.warning("Ollama server responded, but no models listed. Ensure models are available on the Ollama server.")
+            st.warning(
+                "Ollama server responded, but no models listed. Ensure models are available on the Ollama server."
+            )
     except requests.exceptions.ConnectionError:
         st.warning("🔴 Ollama server not reachable. Is it running?")
         logging.warning("Ollama connection failed: ConnectionError.")
@@ -295,9 +296,8 @@ def initialize_models() -> Tuple[List[str], List[str]]:
         st.error(f"Ollama connection failed: {e}")
         logging.error(f"Ollama connection failed: {e}")
     except Exception as e:
-         st.error(f"Error processing Ollama response: {e}")
-         logging.error(f"Error processing Ollama response: {e}")
-
+        st.error(f"Error processing Ollama response: {e}")
+        logging.error(f"Error processing Ollama response: {e}")
 
     return ollama_models, gemini_models
 
@@ -316,15 +316,13 @@ def generate_gemini_response(
     Returns:
         The generated response text.
     """
-    start_time = (time.time())*1000.0
+    start_time = (time.time()) * 1000.0
     model_name = model_config["name"]
     temperature = model_config.get("temperature", DEFAULT_GEMINI_TEMPERATURE)
-    session_key = f"gemini_chat_client_{model_name}_{col}" # More specific key
+    session_key = f"gemini_chat_client_{model_name}_{col}"  # More specific key
 
-    log_debug(
-        f"Calling Gemini API: model={model_name}, temp={temperature}"
-    )
-    log_debug(f"Full prompt for Gemini:\n{prompt[:500]}...") # Log truncated prompt
+    log_debug(f"Calling Gemini API: model={model_name}, temp={temperature}")
+    log_debug(f"Full prompt for Gemini:\n{prompt[:500]}...")  # Log truncated prompt
 
     full_response = ""
     system_instruction = st.session_state.get("system_prompt", "").strip()
@@ -332,7 +330,7 @@ def generate_gemini_response(
     # Configuration for the generation request
     # Note: system_instruction placement differs for chat vs. generate_content
     chat_content_config = {
-        "system_instruction":system_instruction,
+        "system_instruction": system_instruction,
         "temperature": temperature,
         "max_output_tokens": DEFAULT_GEMINI_MAX_TOKENS,
     }
@@ -342,47 +340,56 @@ def generate_gemini_response(
         if session_key not in st.session_state:
             log_debug(f'Setting genai model to {model_config["name"]}')
             client = create_gemini_client()
-            
+
             ### Use this if you are using a chat model. Otherwise, comment it out.
             client = client.chats.create(model=model_name, config=chat_content_config)
-            
-            st.session_state[session_key] = client #Set the session model object
 
-        else: #Retrieve the model from column instead.
+            st.session_state[session_key] = client  # Set the session model object
+
+        else:  # Retrieve the model from column instead.
             client = st.session_state[session_key]
-
 
         # Generate the response using the appropriate method
         with col, st.chat_message("ai"):
-            ### Use this only for a text model - not a chat model! 
-            #response = client.models.generate_content_stream(
+            ### Use this only for a text model - not a chat model!
+            # response = client.models.generate_content_stream(
             #    model = model_name,
             #    contents = prompt,
             #    config = generate_content_config,
             #    )
-            
+
             #### This is a chat model ######
             response = client.send_message_stream(prompt)
-            time_taken = 1000.0*(time.time()) - start_time
-            
+            time_taken = 1000.0 * (time.time()) - start_time
+
             ### Both chat and text work the same way in extracting text ##
             for chunk in response:
                 chunk_text = chunk.text
                 full_response += chunk_text
             # Remove RAG related additional text
-            st.write(full_response.replace("++No RAG required++","").replace("<No RAG required>","")) 
-            st.write(f'\t\ttime taken = {time_taken:0.0f} ms')
+            st.write(
+                full_response.replace("++No RAG required++", "").replace(
+                    "<No RAG required>", ""
+                )
+            )
+            st.write(f"\t\ttime taken = {time_taken:0.0f} ms")
             ### this is the input token count is the prompt token count
-            st.write(f'\t\tinput token count = {chunk.usage_metadata.prompt_token_count}')
+            st.write(
+                f"\t\tinput token count = {chunk.usage_metadata.prompt_token_count}"
+            )
             # Directly provides output count
-            st.write(f'\t\toutput token count = {chunk.usage_metadata.candidates_token_count}')
-        #log_debug(f"Gemini Response: {full_response}") ## getting empty string
+            st.write(
+                f"\t\toutput token count = {chunk.usage_metadata.candidates_token_count}"
+            )
+        # log_debug(f"Gemini Response: {full_response}") ## getting empty string
         ## if getting error, add an exception clause
-        log_debug(f'Usage meta data: total token count = {chunk.usage_metadata.total_token_count}') 
+        log_debug(
+            f"Usage meta data: total token count = {chunk.usage_metadata.total_token_count}"
+        )
 
     except Exception as e:
         st.error(f"Error calling Gemini API: {e}")
-        logging.exception("Error during Gemini API call:") # Log full traceback
+        logging.exception("Error during Gemini API call:")  # Log full traceback
         return f"Error generating response: {e}"
 
     return full_response
@@ -404,7 +411,7 @@ def generate_ollama_response(
     """
     model_name = model_config["name"]
     log_debug(f"Calling Ollama API: model={model_name} (Streaming)")
-    log_debug(f"Full prompt for Ollama:\n{prompt[:500]}...") # Log truncated prompt
+    log_debug(f"Full prompt for Ollama:\n{prompt[:500]}...")  # Log truncated prompt
 
     full_response = ""
 
@@ -422,17 +429,17 @@ def generate_ollama_response(
                 message_content = chunk.get("message", {}).get("content")
                 if message_content:
                     full_response += message_content
-                    chat_placeholder.write(full_response + "▌") # Indicate streaming
+                    chat_placeholder.write(full_response + "▌")  # Indicate streaming
                 # Log potential errors or empty chunks if needed
                 # elif chunk.get('error'):
                 #     logging.error(f"Ollama stream error: {chunk['error']}")
 
-            chat_placeholder.write(full_response) # Final response
+            chat_placeholder.write(full_response)  # Final response
             log_debug(f"Ollama Response: {full_response}")
 
     except Exception as e:
         st.error(f"Error calling Ollama API: {e}")
-        logging.exception("Error during Ollama API call:") # Log full traceback
+        logging.exception("Error during Ollama API call:")  # Log full traceback
         return f"Error generating response: {e}"
 
     return full_response
@@ -453,28 +460,30 @@ def generate_rephraser_response(
         The rephrased query string, or the original question if errors occur.
     """
     start_time = time.time()
-    rephrased_query = question # Default to original question
+    rephrased_query = question  # Default to original question
 
     try:
         log_debug(f"Generating rephrased query with config: {model_config}")
         rephraser_prompt = get_rephraser_prompt(question)
 
         if not rephraser_prompt:
-             st.warning("Could not load rephraser prompt. Using original question.")
-             return question # Return original if prompt loading failed
+            st.warning("Could not load rephraser prompt. Using original question.")
+            return question  # Return original if prompt loading failed
 
         model_type = model_config.get("type")
 
         # Display placeholder in the column
         with col, st.chat_message("ai"):
-             st.write(f"*{model_config.get('name', 'Model')} is rephrasing the query...*")
+            st.write(
+                f"*{model_config.get('name', 'Model')} is rephrasing the query...*"
+            )
 
         # Generate response (will be displayed within the respective functions)
         if model_type == "gemini":
             rephrased_query = generate_gemini_response(
                 rephraser_prompt, model_config, col
             )
-        elif model_type == "3p_models": # Change from "3p_models" to Ollama if needed
+        elif model_type == "3p_models":  # Change from "3p_models" to Ollama if needed
             rephrased_query = generate_ollama_response(
                 rephraser_prompt, model_config, col
             )
@@ -483,8 +492,7 @@ def generate_rephraser_response(
 
         # Clean up potential RAG skip phrases from the rephrased query itself
         for phrase in RAG_SKIP_PHRASES:
-             rephrased_query = rephrased_query.replace(phrase, "").strip()
-
+            rephrased_query = rephrased_query.replace(phrase, "").strip()
 
         log_debug(f"Rephrased Query: {rephrased_query}")
         elapsed_time = time.time() - start_time
@@ -505,8 +513,8 @@ def generate_rephraser_response(
 
 def generate_summarizer_response(
     model_config: Dict[str, Any],
-    question: str, # This is the potentially rephrased question
-    context: List[str], # Expecting list of strings now
+    question: str,  # This is the potentially rephrased question
+    context: List[str],  # Expecting list of strings now
     col: st.container,
 ) -> Dict[str, Any]:
     """
@@ -531,22 +539,24 @@ def generate_summarizer_response(
         summarizer_prompt = get_summarizer_prompt(context, question)
 
         if not summarizer_prompt:
-             st.warning("Could not load summarizer prompt. Cannot generate final answer.")
-             return {"text": "", "time": 0, "error": "Prompt loading failed"}
-
+            st.warning(
+                "Could not load summarizer prompt. Cannot generate final answer."
+            )
+            return {"text": "", "time": 0, "error": "Prompt loading failed"}
 
         model_type = model_config.get("type")
 
         # Display placeholder - response generation happens inside called functions
         with col, st.chat_message("ai"):
-             st.write(f"*{model_config.get('name', 'Model')} is generating the final answer...*")
-
+            st.write(
+                f"*{model_config.get('name', 'Model')} is generating the final answer...*"
+            )
 
         if model_type == "gemini":
             response_text = generate_gemini_response(
                 summarizer_prompt, model_config, col
             )
-        elif model_type == "3p_models": # Changed from "3p_models"
+        elif model_type == "3p_models":  # Changed from "3p_models"
             response_text = generate_ollama_response(
                 summarizer_prompt, model_config, col
             )
@@ -558,7 +568,7 @@ def generate_summarizer_response(
     except Exception as e:
         log_debug(f"Error generating summarizer response: {e}")
         st.error(f"Error generating final answer: {e}")
-        error_message = str(e) # Capture error message
+        error_message = str(e)  # Capture error message
 
     elapsed_time = time.time() - start_time
     log_debug(f"Summarization time: {elapsed_time:.1f} seconds")
@@ -586,56 +596,63 @@ def model_selection(column: st.container, key_prefix: str) -> Dict[str, Any]:
         st.subheader(f"{key_prefix.capitalize()} Model Config")
         model_type = st.radio(
             "Model Provider",
-            ["Gemini", "3P_Models"], # Change "" to "Ollama" if needed
-            index=0 if key_prefix == "left" else 1, # Default left=Gemini, right=3P_Models
+            ["Gemini", "3P_Models"],  # Change "" to "Ollama" if needed
+            index=(
+                0 if key_prefix == "left" else 1
+            ),  # Default left=Gemini, right=3P_Models
             key=f"{key_prefix}_type",
             horizontal=True,
         )
 
-        config = {"type": model_type.lower()} # Store type as lowercase
+        config = {"type": model_type.lower()}  # Store type as lowercase
 
         if model_type == "3P_Models":
             ### let's make this for Third Party  models
             available_models = st.session_state.get("ollama_models", [])
             if not available_models:
-                st.warning("No Third Party models found. Ensure 3P_Models are running and accessible.")
-                model_name = st.text_input("Enter Third Party Model Name Manually", key=f"{key_prefix}_ollama_model_manual")
+                st.warning(
+                    "No Third Party models found. Ensure 3P_Models are running and accessible."
+                )
+                model_name = st.text_input(
+                    "Enter Third Party Model Name Manually",
+                    key=f"{key_prefix}_ollama_model_manual",
+                )
             else:
-                 model_name = st.selectbox(
-                     "Select Third Party Model",
-                     available_models,
-                     key=f"{key_prefix}_ollama_model",
-                 )
+                model_name = st.selectbox(
+                    "Select Third Party Model",
+                    available_models,
+                    key=f"{key_prefix}_ollama_model",
+                )
             config["name"] = model_name
             # 3P_Models temperature is often handled differently or not via simple API param
-            config["temperature"] = 0.0 # Set a default, but may not be used directly
+            config["temperature"] = 0.0  # Set a default, but may not be used directly
 
-        else: # Gemini
+        else:  # Gemini
             available_models = st.session_state.get("gemini_models", [])
             if not available_models:
-                 st.error("No Gemini models found. Check configuration and permissions.")
-                 # Provide a default or allow manual entry if list fails
-                 model_name = "gemini-1.5-flash-latest" # Fallback default
+                st.error("No Gemini models found. Check configuration and permissions.")
+                # Provide a default or allow manual entry if list fails
+                model_name = "gemini-1.5-flash-latest"  # Fallback default
             else:
                 default_index = 0
                 try:
                     # Try to find a reasonable default like flash
                     default_index = available_models.index("gemini-1.5-flash-latest")
                 except ValueError:
-                    pass # Keep default_index 0 if not found
+                    pass  # Keep default_index 0 if not found
 
                 model_name = st.selectbox(
                     "Select Gemini Model",
                     available_models,
                     key=f"{key_prefix}_gemini_model",
-                    index=default_index
+                    index=default_index,
                 )
 
             config["name"] = model_name
             temperature = st.slider(
                 "Temperature",
                 min_value=0.0,
-                max_value=1.0, # Or 2.0 depending on model support
+                max_value=1.0,  # Or 2.0 depending on model support
                 value=DEFAULT_GEMINI_TEMPERATURE,
                 step=0.1,
                 key=f"{key_prefix}_temp",
@@ -645,14 +662,16 @@ def model_selection(column: st.container, key_prefix: str) -> Dict[str, Any]:
     log_debug(f"{key_prefix} config selected: {config}")
     return config
 
+
 def _get_discoveryengine_client_options(location: str) -> Optional[ClientOptions]:
-     """ Helper to create client options for Discovery Engine."""
-     if location != "global":
-         api_endpoint = f"{location}-discoveryengine.googleapis.com"
-         log_debug(f"Using Discovery Engine endpoint: {api_endpoint}")
-         return ClientOptions(api_endpoint=api_endpoint)
-     log_debug("Using global Discovery Engine endpoint.")
-     return None
+    """Helper to create client options for Discovery Engine."""
+    if location != "global":
+        api_endpoint = f"{location}-discoveryengine.googleapis.com"
+        log_debug(f"Using Discovery Engine endpoint: {api_endpoint}")
+        return ClientOptions(api_endpoint=api_endpoint)
+    log_debug("Using global Discovery Engine endpoint.")
+    return None
+
 
 def list_data_stores(
     project_id: str, location: str = DEFAULT_DATA_STORE_LOCATION
@@ -754,7 +773,9 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
         if not st.session_state.datastore_ids:
             st.warning("No data stores found or accessible.")
             # Allow manual entry maybe?
-            data_store_id = st.text_input("Enter Data Store ID manually", key="datastore_id_manual")
+            data_store_id = st.text_input(
+                "Enter Data Store ID manually", key="datastore_id_manual"
+            )
         else:
             data_store_id = st.selectbox(
                 "Select Data Store",
@@ -763,21 +784,20 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
                 index=0,
             )
 
-        st.session_state["selected_datastore_id"] = data_store_id # Store selection
+        st.session_state["selected_datastore_id"] = data_store_id  # Store selection
 
         if st.button("Test Connection"):
             if data_store_id:
                 docs = list_documents(
                     project_id, DEFAULT_DATA_STORE_LOCATION, data_store_id
                 )
-                if docs is not None: # Check if list_documents returned successfully
+                if docs is not None:  # Check if list_documents returned successfully
                     st.success(f"Success! Connected to '{data_store_id}'.")
                 else:
                     # Error displayed within list_documents
                     st.warning("Please select or enter a data store ID.")
             else:
                 st.warning("Please select or enter a data store ID.")
-
 
         # Define the LLM for the retriever (can be different from chat models)
         try:
@@ -787,44 +807,50 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
             logging.exception("VertexAI LLM init error:")
             return None
 
-
         # Create the retriever (only if a datastore is selected)
         if data_store_id:
             try:
                 retriever = VertexAISearchRetriever(
                     project_id=project_id,
-                    location_id=DEFAULT_DATA_STORE_LOCATION, # Assuming global for retriever
+                    location_id=DEFAULT_DATA_STORE_LOCATION,  # Assuming global for retriever
                     data_store_id=data_store_id,
-                    get_extractive_answers=False, # Configurable?
-                    max_documents=3, # Increased context slightly
+                    get_extractive_answers=False,  # Configurable?
+                    max_documents=3,  # Increased context slightly
                     # max_extractive_segment_count=1, # If get_extractive_answers=True
                     # max_extractive_answer_count=1, # If get_extractive_answers=True
                 )
                 # Store the retriever instance in session state
                 st.session_state.vector_store_retriever = retriever
                 log_debug(f"Vertex AI Search Retriever created for {data_store_id}")
-                return llm # Return LLM only if retriever setup is successful
+                return llm  # Return LLM only if retriever setup is successful
             except Exception as e:
-                 st.error(f"Failed to create Vertex AI Search retriever: {e}")
-                 logging.exception("Retriever creation error:")
-                 st.session_state.vector_store_retriever = None # Ensure it's cleared on error
-                 return None # Don't return LLM if retriever failed
+                st.error(f"Failed to create Vertex AI Search retriever: {e}")
+                logging.exception("Retriever creation error:")
+                st.session_state.vector_store_retriever = (
+                    None  # Ensure it's cleared on error
+                )
+                return None  # Don't return LLM if retriever failed
         else:
             st.info("Select a data store to enable RAG.")
-            st.session_state.vector_store_retriever = None # Clear if no datastore selected
-            return None # No LLM needed if no retriever
+            st.session_state.vector_store_retriever = (
+                None  # Clear if no datastore selected
+            )
+            return None  # No LLM needed if no retriever
+
 
 def clean_json(respo):
     # removing any markdown block that might appear
-    respo = respo.replace("{{","{").replace("}}","}")
-    
+    respo = respo.replace("{{", "{").replace("}}", "}")
+
     pattern = r"(?:^```.*)"
-    modified_text = re.sub(pattern, '', respo, 0, re.MULTILINE)
+    modified_text = re.sub(pattern, "", respo, 0, re.MULTILINE)
     try:
-        #print(modified_text)
+        # print(modified_text)
         result = json.loads(modified_text)
     except:
-        result = json.loads(f'{"intent":modified_text, "es_intent": modified_text, "is_trouble":"No", "cot": "None"}')
+        result = json.loads(
+            f'{"intent":modified_text, "es_intent": modified_text, "is_trouble":"No", "cot": "None"}'
+        )
     return result
 
 
@@ -848,8 +874,11 @@ def process_rephraser_response(txt):
         else:
             return eval_txt
     except:
-        log_debug(f"error: returning text as-is while processing rephrased query: {txt}")
+        log_debug(
+            f"error: returning text as-is while processing rephrased query: {txt}"
+        )
         return txt
+
 
 def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
     """
@@ -868,9 +897,8 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
         log_debug("No retriever found in session state. Skipping RAG.")
         return []
     if not search_query:
-         log_debug("Empty search query received. Skipping RAG.")
-         return []
-
+        log_debug("Empty search query received. Skipping RAG.")
+        return []
 
     log_debug(f"Retrieving documents for query: {search_query}")
     log_debug(f"Search query is of type: {type(search_query)}")
@@ -880,7 +908,7 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
         # Setup RetrievalQA chain
         retrieval_qa = RetrievalQA.from_chain_type(
             llm=llm,
-            chain_type="stuff", # Simplest chain type
+            chain_type="stuff",  # Simplest chain type
             retriever=retriever,
             return_source_documents=True,
         )
@@ -893,7 +921,7 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
         if results and "source_documents" in results:
             for i, doc in enumerate(results["source_documents"]):
                 header = f"{'-'*20} Document {i+1} {'-'*20}\n"
-                doc_content = getattr(doc, 'page_content', '')
+                doc_content = getattr(doc, "page_content", "")
                 # Maybe add metadata if useful? e.g., doc.metadata.get('source')
                 documents_content.append(header + doc_content)
                 # Limit logging of content length
@@ -908,8 +936,15 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
         logging.exception("Error during document retrieval:")
         return []
 
-    
-def judge_responses(left_question, left_response, left_context, right_question, right_response, right_context):
+
+def judge_responses(
+    left_question,
+    left_response,
+    left_context,
+    right_question,
+    right_response,
+    right_context,
+):
     """
     Judges the responses from two models (left and right) using a hardcoded Gemini model.
 
@@ -952,71 +987,77 @@ def judge_responses(left_question, left_response, left_context, right_question, 
 
         Which one accurately responds to the question using the source of truth? Make sure your verdict is based on each model's strict adherence to the source of truth.
         """
-        
-        # Initialize the Gemini model for judging (from the judge model name constant above)               
+
+        # Initialize the Gemini model for judging (from the judge model name constant above)
         client = create_gemini_client()
-        
+
         ### system instruction for judge model ###
         prompt_folder = "prompts"
         filename = "judge_prompt.txt"
-        filepath = os.path.join(prompt_folder, filename)        
+        filepath = os.path.join(prompt_folder, filename)
         si_text1 = load_text_file(filepath)
-        
+
         generate_content_config = types.GenerateContentConfig(
-            temperature = 0.5,
-            top_p = 0.95,
-            max_output_tokens = 2048,
-            response_modalities = ["TEXT"],
+            temperature=0.5,
+            top_p=0.95,
+            max_output_tokens=2048,
+            response_modalities=["TEXT"],
             system_instruction=[types.Part.from_text(text=si_text1)],
-          )
-          
+        )
+
         response = client.models.generate_content_stream(
-            model = JUDGE_MODEL_NAME,
-            contents = judge_prompt,
-            config = generate_content_config,
-            )
-            
+            model=JUDGE_MODEL_NAME,
+            contents=judge_prompt,
+            config=generate_content_config,
+        )
+
         st.session_state.judge_name = JUDGE_MODEL_NAME
-        log_debug("Judge response: %s " %response)
+        log_debug("Judge response: %s " % response)
         return response
 
     except Exception as e:
         log_debug(f"Error in judge_responses: {e}")
         return f"Error during judgment: {type(e).__name__} - {e}"
+
+
 ##################### MAIN APP BELOW ##################################
 # --- Main Application ---
-def main(args: argparse.Namespace): # <-- Pass parsed args to main
+def main(args: argparse.Namespace):  # <-- Pass parsed args to main
     """Runs the main Streamlit application flow."""
     st.set_page_config("Vertex RAG Compare with Dual LLMs", layout="wide")
     st.title("📊 Vertex RAG Compare with 2 LLM's")
     st.caption("Compare LLM responses using Vertex AI Search RAG")
 
-
     # --- Initialization ---
     if "app_initialized" not in st.session_state:
-        st.session_state.ollama_models, st.session_state.gemini_models = initialize_models()
+        st.session_state.ollama_models, st.session_state.gemini_models = (
+            initialize_models()
+        )
         st.session_state.chat_history = []
         # Load system prompt only once
         sys_prompt_path = os.path.join(PROMPT_FOLDER, SYSTEM_PROMPT_FILE)
-        st.session_state.system_prompt = load_text_file(sys_prompt_path) or "" # Ensure it's a string
+        st.session_state.system_prompt = (
+            load_text_file(sys_prompt_path) or ""
+        )  # Ensure it's a string
         if not st.session_state.system_prompt:
-             st.warning("System prompt file not loaded. Using default behavior.")
+            st.warning("System prompt file not loaded. Using default behavior.")
         st.session_state.app_initialized = True
 
-
     # --- Sidebar Setup ---
-    retriever_llm = setup_retriever_sidebar() # Sets up retriever and returns LLM if successful
+    retriever_llm = (
+        setup_retriever_sidebar()
+    )  # Sets up retriever and returns LLM if successful
 
     with st.sidebar:
         st.divider()
         use_rag = st.checkbox(
-             "🔗 Use Vertex AI Search RAG",
-             value=True, # Default to using RAG if available
-             disabled=(retriever_llm is None) # Disable if retriever setup failed
+            "🔗 Use Vertex AI Search RAG",
+            value=True,  # Default to using RAG if available
+            disabled=(retriever_llm is None),  # Disable if retriever setup failed
         )
         if retriever_llm is None and use_rag:
-             st.warning("RAG disabled: Vertex AI Search connection not configured.")
-             use_rag = False # Force disable if setup failed
+            st.warning("RAG disabled: Vertex AI Search connection not configured.")
+            use_rag = False  # Force disable if setup failed
 
     # --- Response Columns & Model Selection ---
     left_col, right_col = st.columns(2)
@@ -1034,7 +1075,6 @@ def main(args: argparse.Namespace): # <-- Pass parsed args to main
     #             # Add more details like time, rephrased q etc. if needed
     #     # Repeat for right_col...
 
-
     # --- User Input ---
     user_question = st.chat_input("Ask your question:")
 
@@ -1051,9 +1091,9 @@ def main(args: argparse.Namespace): # <-- Pass parsed args to main
         left_rephrased = generate_rephraser_response(
             left_config, user_question, left_col
         )
-        
+
         left_rephrased = process_rephraser_response(left_rephrased)
-        
+
         right_rephrased = generate_rephraser_response(
             right_config, user_question, right_col
         )
@@ -1061,7 +1101,7 @@ def main(args: argparse.Namespace): # <-- Pass parsed args to main
         right_rephrased = process_rephraser_response(right_rephrased)
 
         # --- Step 2: Retrieve Context (Conditional RAG) ---
-        left_context, right_context = [], [] # Default to empty context
+        left_context, right_context = [], []  # Default to empty context
         rag_active = use_rag and retriever_llm is not None
 
         if rag_active:
@@ -1069,29 +1109,37 @@ def main(args: argparse.Namespace): # <-- Pass parsed args to main
             # This check might be fragile based on exact model output
             left_skip_rag = any(phrase in left_rephrased for phrase in RAG_SKIP_PHRASES)
             if left_skip_rag and st.session_state.chat_history:
-                 log_debug("Left model indicates RAG skip, using previous context if available.")
-                 # Decide how to handle context reuse - e.g. use previous answer?
-                 # left_context = [st.session_state.chat_history[-1]["left"]["text"]] # Example
-                 left_context = [] # Or simply skip RAG for this turn
-                 left_final_query = user_question # Use original query if skipping RAG based on rephrase
+                log_debug(
+                    "Left model indicates RAG skip, using previous context if available."
+                )
+                # Decide how to handle context reuse - e.g. use previous answer?
+                # left_context = [st.session_state.chat_history[-1]["left"]["text"]] # Example
+                left_context = []  # Or simply skip RAG for this turn
+                left_final_query = user_question  # Use original query if skipping RAG based on rephrase
             else:
-                 with left_col: # Show status in the column
-                      with st.spinner("Retrieving context for Left Model..."):
-                           left_context = get_relevant_docs(left_rephrased, retriever_llm)
-                 left_final_query = left_rephrased # Use rephrased query
+                with left_col:  # Show status in the column
+                    with st.spinner("Retrieving context for Left Model..."):
+                        left_context = get_relevant_docs(left_rephrased, retriever_llm)
+                left_final_query = left_rephrased  # Use rephrased query
 
             # Repeat for right model
-            right_skip_rag = any(phrase in right_rephrased for phrase in RAG_SKIP_PHRASES)
+            right_skip_rag = any(
+                phrase in right_rephrased for phrase in RAG_SKIP_PHRASES
+            )
             if right_skip_rag and st.session_state.chat_history:
-                 log_debug("Right model indicates RAG skip, using previous context if available.")
-                 # right_context = [st.session_state.chat_history[-1]["right"]["text"]] # Example
-                 right_context = []
-                 right_final_query = user_question
+                log_debug(
+                    "Right model indicates RAG skip, using previous context if available."
+                )
+                # right_context = [st.session_state.chat_history[-1]["right"]["text"]] # Example
+                right_context = []
+                right_final_query = user_question
             else:
-                 with right_col:
-                      with st.spinner("Retrieving context for Right Model..."):
-                           right_context = get_relevant_docs(right_rephrased, retriever_llm)
-                 right_final_query = right_rephrased
+                with right_col:
+                    with st.spinner("Retrieving context for Right Model..."):
+                        right_context = get_relevant_docs(
+                            right_rephrased, retriever_llm
+                        )
+                right_final_query = right_rephrased
 
             # Display retrieved context (optional, can be verbose)
             # with st.expander("Retrieved Context (Left)"):
@@ -1100,11 +1148,10 @@ def main(args: argparse.Namespace): # <-- Pass parsed args to main
             #      st.json(right_context if right_context else "None")
 
         else:
-             log_debug("RAG is disabled or not configured. Skipping document retrieval.")
-             # Use original question if not rephrased, or rephrased if rephrasing always runs
-             left_final_query = left_rephrased
-             right_final_query = right_rephrased
-
+            log_debug("RAG is disabled or not configured. Skipping document retrieval.")
+            # Use original question if not rephrased, or rephrased if rephrasing always runs
+            left_final_query = left_rephrased
+            right_final_query = right_rephrased
 
         # --- Step 3: Generate Final Answer (Summarization) ---
         # Final answer generation happens *inside* generate_summarizer_response columns
@@ -1119,9 +1166,11 @@ def main(args: argparse.Namespace): # <-- Pass parsed args to main
         st.session_state.chat_history.append(
             {
                 "question": user_question,
-                "left_query_used": left_final_query, # Store the query actually used
+                "left_query_used": left_final_query,  # Store the query actually used
                 "right_query_used": right_final_query,
-                "left_context_used": bool(left_context), # Store if RAG context was provided
+                "left_context_used": bool(
+                    left_context
+                ),  # Store if RAG context was provided
                 "right_context_used": bool(right_context),
                 "left": left_response_data,
                 "right": right_response_data,
@@ -1130,33 +1179,45 @@ def main(args: argparse.Namespace): # <-- Pass parsed args to main
         )
 
         # --- Step 5: Run Judge Model (Conditional) ---
-        if args.judge: # <-- Check the command-line argument flag for judge model
+        if args.judge:  # <-- Check the command-line argument flag for judge model
             ## May be wait a couple of seconds to finish streaming?
             time.sleep(1)
-            
+
             # Generate the Judgment from judge model
-            judgement = judge_responses(left_final_query, left_response_data, left_context, right_final_query, right_response_data, right_context) # function calls that get the judge response!
+            judgement = judge_responses(
+                left_final_query,
+                left_response_data,
+                left_context,
+                right_final_query,
+                right_response_data,
+                right_context,
+            )  # function calls that get the judge response!
 
             # Display Chat history at the initialization, this part should remain before printing chat
             full_response = ""
             with st.container():
                 st.subheader("Judge's Analysis")
-                st.write(f"*{st.session_state.judge_name} is generating the final answer...*")
-                #st.write(left_response)
+                st.write(
+                    f"*{st.session_state.judge_name} is generating the final answer...*"
+                )
+                # st.write(left_response)
                 for chunk in judgement:
                     full_response += chunk.text
-                st.write(full_response) # add that line to print it to screen!            
+                st.write(full_response)  # add that line to print it to screen!
+
+
 ##################### MAIN APP COMPLETE ##################################
 if __name__ == "__main__":
     # --- Argument Parsing ---
-    parser = argparse.ArgumentParser(description="Vertex RAG Comparator with optional Judge Model.")
+    parser = argparse.ArgumentParser(
+        description="Vertex RAG Comparator with optional Judge Model."
+    )
     parser.add_argument(
         "--judge",
-        action="store_true", # Makes it a flag: present=True, absent=False
+        action="store_true",  # Makes it a flag: present=True, absent=False
         help="Enable the Judge Model evaluation after each response pair.",
     )
-    args = parser.parse_args() # Parse arguments from command line
+    args = parser.parse_args()  # Parse arguments from command line
 
     # --- Run Main App ---
-    main(args) # Pass parsed arguments to the main function
-
+    main(args)  # Pass parsed arguments to the main function
