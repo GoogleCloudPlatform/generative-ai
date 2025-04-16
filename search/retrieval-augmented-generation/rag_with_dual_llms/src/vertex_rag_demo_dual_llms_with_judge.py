@@ -838,16 +838,20 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
             return None  # No LLM needed if no retriever
 
 
-def clean_json(respo):
+def clean_json(response_text: str):
+    """Cleans potential markdown/JSON issues from a string."""
     # removing any markdown block that might appear
-    respo = respo.replace("{{", "{").replace("}}", "}")
+    response_text = response_text.replace("{{", "{").replace("}}", "}")
 
     pattern = r"(?:^```.*)"
-    modified_text = re.sub(pattern, "", respo, 0, re.MULTILINE)
+    modified_text = re.sub(pattern, "", response_text, 0, re.MULTILINE)
     try:
         # print(modified_text)
         result = json.loads(modified_text)
-    except:
+    except json.JSONDecodeError:
+        # Log warning
+        logger.warning(f"Failed to parse cleaned JSON, returning as simple dict: {modified_text[:100]}...") 
+        # Fallback for non-JSON input after cleaning
         result = json.loads(
             f'{"intent":modified_text, "es_intent": modified_text, "is_trouble":"No", "cot": "None"}'
         )
