@@ -541,6 +541,7 @@ ainit
 ainvoke
 aio
 aip
+airbnb
 airlume
 akka
 alisal
@@ -1005,6 +1006,7 @@ norigin
 notetaker
 novnc
 noxfile
+npx
 nrows
 ntheory
 nunique

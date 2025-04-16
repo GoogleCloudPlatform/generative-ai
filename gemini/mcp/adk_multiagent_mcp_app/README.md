@@ -103,12 +103,12 @@ Create a `.env` file in the `adk_multiagent_mcp_app` directory with the followin
 GOOGLE_GENAI_USE_VERTEXAI=1
 
 # --- ML Dev Backend Configuration (if GOOGLE_GENAI_USE_VERTEXAI=0) ---
-# Obtain your API key from Google AI Studio or GCP console
+# Obtain your API key from Google AI Studio or Google Cloud console
 GOOGLE_API_KEY=YOUR_GOOGLE_API_KEY
 
 # --- Vertex AI Backend Configuration (if GOOGLE_GENAI_USE_VERTEXAI=1) ---
 # Your Google Cloud Project ID
-GOOGLE_CLOUD_PROJECT="your-gcp-project-id"
+GOOGLE_CLOUD_PROJECT="your-project-id"
 # The location (region) for Vertex AI services
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
@@ -137,7 +137,7 @@ export SERVICE_NAME='adk-multiagent-mcp-app'
 export LOCATION='us-central1'
 
 # Replace with your Google Cloud Project ID
-export PROJECT_ID='your-gcp-project-id'
+export PROJECT_ID='your-project-id'
 ```
 
 In Cloud Shell, execute the following command:
