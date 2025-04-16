@@ -1,4 +1,4 @@
-# This is a Vertex Search RAG Dual LLM comparison and evaluation demo built using streamlit 
+# This is a Vertex AI Search RAG Dual LLM comparison and evaluation demo built using streamlit 
 This demo illustrates how to compare responses from two LLMs through a corpus of documents using Vertex AI Search 
 
 Additional features include using a Judge model to evaluate the two responses and deliver a verdict on which model's response is better aligned with the query and the given context.
@@ -8,7 +8,7 @@ This is how your final demo will look like once it is running
 
 # Instructions to run the demo:
 
-1. You need to have the latest google cloud SDK installed on your machine
+1. You need to have the latest Google Cloud SDK installed on your machine
 
 Follow these intructions at: https://cloud.google.com/sdk/docs/install to install the google cloud SDK and gcloud CLI. 
     
@@ -18,7 +18,7 @@ gcloud init
 ```
 3. Authenticate using your Google Cloud auth as follows:
 ```bash
-gloud auth login
+gcloud auth login
 ```
 4. In order to run apps, you need to authenticate at the app level:
 ```bash

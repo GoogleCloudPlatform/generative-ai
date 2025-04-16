@@ -331,14 +331,6 @@ def generate_gemini_response(
 
     # Configuration for the generation request
     # Note: system_instruction placement differs for chat vs. generate_content
-    generate_content_config = types.GenerateContentConfig(
-        temperature=temperature,
-        top_p=DEFAULT_GEMINI_TOP_P,
-        max_output_tokens=DEFAULT_GEMINI_MAX_TOKENS,
-        # response_modalities=["TEXT"], # Often not needed for text-only models
-        system_instruction=[types.Part.from_text(text=system_instruction)],
-    )
-
     chat_content_config = {
         "system_instruction":system_instruction,
         "temperature": temperature,
@@ -749,7 +741,6 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
         st.header("📁 Vertex AI Search RAG")
 
         project_id = st.session_state.get("project_id", os.getenv("PROJECT_ID"))
-        location = st.session_state.get("location", os.getenv("LOCATION"))
 
         if not project_id:
             st.warning("Set GOOGLE_CLOUD_PROJECT env var or configure via Gemini.")
