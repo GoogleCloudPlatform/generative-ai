@@ -122,7 +122,8 @@ uv run uvicorn main:app --reload
 ```
 The application should now be accessible, typically at http://127.0.0.1:8000.
 
-**4. Deploying to Cloud Run**
+**4. Deploying to Cloud Run**  
+
 Follow these steps to build and deploy the application as a containerized service on Google Cloud Run.
 
 Set Environment Variables for Deployment
