@@ -18,6 +18,7 @@ ASGI
 ASML
 AUVs
 Aadila
+Abhishek
 Afshaan
 Aktu
 Aphone
@@ -34,6 +35,7 @@ BITCODE
 BYOR
 Benno
 Bettes
+Bhagwat
 Biden
 Bigtable
 Bitcoin
@@ -74,6 +76,7 @@ Connectez
 Cowabunga
 Crossbody
 D'orsay
+DCR
 DHH
 DLC
 DLCs
@@ -187,6 +190,7 @@ Hlc
 Hmmm
 Hogwarts
 Homesley
+Hossein
 Hritik
 Hubmann
 Hyperdisk
@@ -206,6 +210,7 @@ JAVACMD
 JDK
 JHome
 JPY
+Jaival
 Jax
 Jedi
 Jestem
@@ -276,6 +281,7 @@ Mbappe
 Meawad
 Mega
 Meinl
+Meltem
 Memegen
 Merhaba
 Mesop
@@ -306,6 +312,7 @@ NREL
 NVIDIA
 NVL
 Nagasu
+Najim
 Nakoso
 Napisz
 Narnia
@@ -346,8 +353,10 @@ Phaidon
 Phanfone
 Pharma
 Photoshop
+Pichai
 Pistorius
 Polong
+Porat
 Pranav
 Pré
 Pzk
@@ -372,6 +381,7 @@ Raikkonen
 Rajpurkar
 Reranking
 Resona
+Rivertown
 Rivia
 Rizzoli
 Robeco
@@ -403,6 +413,7 @@ Schlenoff
 Schulen
 Selam
 Sestero
+Sha'carri
 Shazeer
 Shenzhou
 Shklovsky
@@ -449,6 +460,7 @@ Terabyte
 Terabytes
 Testables
 Tetsuo
+Thallam
 Tianli
 Tianxiang
 Tongsheng
@@ -563,6 +575,7 @@ avec
 aworkflow
 backticks
 bagchi
+bargap
 barmode
 barpolar
 baxis
@@ -587,6 +600,7 @@ bqdf
 bqml
 breakroom
 btn
+byoc
 byod
 byor
 carbonara
@@ -904,6 +918,7 @@ logprobs
 lolcat
 loras
 lparam
+lro
 lru
 lsb
 lxml
@@ -1095,8 +1110,10 @@ rapideval
 rarian
 rarians
 ratelimit
+rawbytes
 rbc
 rbf
+recrawl
 reddit
 redef
 reidx
@@ -1196,6 +1213,7 @@ tgi
 tgz
 thelook
 throug
+tickvals
 tiktoken
 timechart
 tion
@@ -1313,3 +1331,4 @@ yticks
 zakarid
 zaxis
 zimie
+zmin
