@@ -199,33 +199,7 @@ The best explanation of embeddings I've seen
 - **[intro-grounding-gemini.ipynb](../gemini/grounding/intro-grounding-gemini.ipynb)**:
   Demonstrates grounding LLM responses in Google Search and Vertex AI Search
   using Gemini, improving response accuracy and reducing hallucinations.
-- **[intro-grounding.ipynb](../language/grounding/intro-grounding.ipynb)**:
-  Demonstrates using the Vertex AI grounding feature to improve LLM response
-  accuracy and relevance by grounding them in Google Search or custom Vertex AI Search data stores.
-- **[code_retrieval_augmented_generation.ipynb](../language/code/code_retrieval_augmented_generation.ipynb)**:
-  Demonstrates RAG for code using Gemini, LangChain, FAISS, and the Vertex AI Embeddings API to enhance code generation by incorporating external
-  knowledge from the Google Cloud Generative AI GitHub repository.
-- **[langchain_bigquery_data_loader.ipynb](../language/orchestration/langchain/langchain_bigquery_data_loader.ipynb)**:
-  Demonstrates using LangChain's BigQuery Data Loader to query BigQuery data,
-  integrate it with a Vertex AI LLM, and build a chain to generate and execute
-  SQL queries for targeted customer analysis.
-- **[question_answering_documents.ipynb](../language/use-cases/document-qa/question_answering_documents.ipynb)**:
-  Demonstrates three methods (stuffing, map-reduce, and map-reduce with
-  embeddings) for building a question-answering system using the Vertex AI
-  PaLM API to efficiently handle large document datasets.
-- **[question_answering_documents_langchain.ipynb](../language/use-cases/document-qa/question_answering_documents_langchain.ipynb)**:
-  Demonstrates building a question-answering system using LangChain and the Vertex AI PaLM API, comparing different methods (stuffing, map-reduce, refine)
-  for handling large documents, and showcasing the improved efficiency of
-  using similarity search with embeddings.
-- **[question_answering_documents_langchain_matching_engine.ipynb](../language/use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb)**:
-  Demonstrates a question-answering system using LangChain, the Vertex AI PaLM API, and Matching Engine for retrieval-augmented generation, enabling
-  fact-grounded responses with source citations.
-- **[summarization_large_documents.ipynb](../language/use-cases/document-summarization/summarization_large_documents.ipynb)**:
-  Demonstrates four methods (stuffing, MapReduce, MapReduce with overlapping
-  chunks, and MapReduce with rolling summaries) for summarizing large
-  documents using Vertex AI generative models, addressing challenges of
-  exceeding context length limits.
-- **[summarization_large_documents_langchain.ipynb](../language/use-cases/document-summarization/summarization_large_documents_langchain.ipynb)**:
+- **[summarization_large_documents_langchain.ipynb](../gemini/use-cases/document-processing/summarization_large_documents_langchain.ipynb)**:
   Demonstrates three LangChain methods (Stuffing, MapReduce, Refine) for
   summarizing large documents using Vertex AI models, comparing their
   effectiveness and limitations.

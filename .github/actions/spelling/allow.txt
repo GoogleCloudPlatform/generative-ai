@@ -18,6 +18,7 @@ ASGI
 ASML
 AUVs
 Aadila
+Abhishek
 Afshaan
 Aktu
 Aphone
@@ -34,6 +35,7 @@ BITCODE
 BYOR
 Benno
 Bettes
+Bhagwat
 Biden
 Bigtable
 Bitcoin
@@ -120,6 +122,7 @@ Esin
 Eventarc
 FAISS
 FAQs
+FHIR
 FIA
 FILEFLAGS
 FILEOS
@@ -187,6 +190,7 @@ Hlc
 Hmmm
 Hogwarts
 Homesley
+Hossein
 Hritik
 Hubmann
 Hyperdisk
@@ -206,6 +210,7 @@ JAVACMD
 JDK
 JHome
 JPY
+Jaival
 Jax
 Jedi
 Jestem
@@ -213,6 +218,7 @@ Jhamtani
 Jiacheng
 Jianfeng
 Jibo
+Jincheol
 Joji
 Jolyon
 Junzhe
@@ -275,6 +281,7 @@ Mbappe
 Meawad
 Mega
 Meinl
+Meltem
 Memegen
 Merhaba
 Mesop
@@ -305,6 +312,7 @@ NREL
 NVIDIA
 NVL
 Nagasu
+Najim
 Nakoso
 Napisz
 Narnia
@@ -345,8 +353,10 @@ Phaidon
 Phanfone
 Pharma
 Photoshop
+Pichai
 Pistorius
 Polong
+Porat
 Pranav
 Pré
 Pzk
@@ -450,6 +460,7 @@ Terabyte
 Terabytes
 Testables
 Tetsuo
+Thallam
 Tianli
 Tianxiang
 Tongsheng
@@ -589,6 +600,7 @@ bqdf
 bqml
 breakroom
 btn
+byoc
 byod
 byor
 carbonara
@@ -846,6 +858,7 @@ inpaint
 iostream
 ipd
 iphoneos
+ipycanvas
 ipykernel
 ipynb
 isa
@@ -906,6 +919,7 @@ logprobs
 lolcat
 loras
 lparam
+lro
 lru
 lsb
 lxml
@@ -1031,6 +1045,7 @@ payslip
 paystub
 pbxproj
 pcs
+pdflatex
 pdfminer
 pdfs
 petabytes
@@ -1096,10 +1111,13 @@ rapideval
 rarian
 rarians
 ratelimit
+rawbytes
 rbc
 rbf
+recrawl
 reddit
 redef
+reidx
 rembg
 reoffice
 rephraser
@@ -1211,6 +1229,7 @@ traceloop
 treeah
 tritan
 trl
+tscore
 tseslint
 tsne
 tsv
@@ -1294,6 +1313,7 @@ xcscheme
 xctest
 xcvi
 xdg
+xelatex
 xlabel
 xmltodict
 xsi
