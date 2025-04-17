@@ -1,9 +1,10 @@
 import json
 from typing import Any, Dict, Optional
+
 import httpx
-from mcp.server.fastmcp import FastMCP
+from geopy.exc import GeocoderServiceError, GeocoderTimedOut
 from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server
 mcp = FastMCP("weather")
@@ -82,6 +83,7 @@ def format_forecast_period(period: Dict[str, Any]) -> str:
 
 
 # --- MCP Tools ---
+
 
 @mcp.tool()
 async def get_alerts(state: str) -> str:
@@ -164,6 +166,7 @@ async def get_forecast(latitude: float, longitude: float) -> str:
 
     return "\n---\n".join(forecasts)
 
+
 # --- NEW: get_forecast_by_city Tool ---
 @mcp.tool()
 async def get_forecast_by_city(city: str, state: str) -> str:
@@ -220,6 +223,7 @@ async def shutdown_event():
     """Gracefully close the httpx client."""
     await http_client.aclose()
     # print("HTTP client closed.") # Optional print statement if desired
+
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
