@@ -8,11 +8,11 @@ This document describes a web application demonstrating the integration of Googl
 
 The application utilizes a multi-agent architecture where a root agent delegates tasks to specialized agents (Cocktail and Booking) based on the user's query. These agents then interact with corresponding MCP servers.
 
-<img src="static/adk_multiagent.png" alt="ADK Multi-Agent Architecture Diagram" width="800" />
+![architecture](static/adk_multiagent.png)
 
 ### Application Screenshot
 
-<img src="static/app_screenshot.png" alt="Chatbot application screenshot showing user interaction" width="700" />
+![screenshot](static/app_screenshot.png)
 
 ## Core Components
 
@@ -20,9 +20,9 @@ The application utilizes a multi-agent architecture where a root agent delegates
 
 The application employs three distinct agents:
 
-1. **Root Agent:** The main entry point that receives user queries, determines the required task(s), and delegates to the appropriate specialized agent(s).
-1. **Cocktail Agent:** Handles requests related to cocktail recipes and ingredients by interacting with the Cocktail MCP server.
-2. **Booking Agent:** Manages requests related to weather forecasts and Airbnb bookings by interacting with the Weather and Airbnb MCP servers.
+- **Root Agent:** The main entry point that receives user queries, determines the required task(s), and delegates to the appropriate specialized agent(s).
+- **Cocktail Agent:** Handles requests related to cocktail recipes and ingredients by interacting with the Cocktail MCP server.
+- **Booking Agent:** Manages requests related to weather forecasts and Airbnb bookings by interacting with the Weather and Airbnb MCP servers.
 
 ### MCP Servers and Tools
 
@@ -68,11 +68,11 @@ Before running the application locally, ensure you have the following installed:
 
 Follow these steps to run the FastAPI application on your local machine.
 
-**1. Project Structure**
+## **1. Project Structure**
 
 Ensure your project follows this structure:
 
-```
+```bash
 Your_project_folder/
 └── adk_multiagent_mcp_app/  # App folder
 ├── Dockerfile
@@ -92,9 +92,10 @@ Your_project_folder/
 │   ├── robot1.png
 │   └── user_guide.md
 └── uv.lock              # Lock file for reproducible dependencies
+
 ```
 
-**2. Configure Environment Variables**
+## **2. Configure Environment Variables**
 
 Create a `.env` file in the `adk_multiagent_mcp_app` directory with the following content. Replace placeholders with your actual values.
 
@@ -113,17 +114,17 @@ GOOGLE_CLOUD_PROJECT="your-project-id"
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
 
-**3. Start the Application Locally**
+## **3. Start the Application Locally**
 
 Navigate to the adk_multiagent_mcp_app directory in your terminal and run the application using uv:
 
-```
+```bash
 uv run uvicorn main:app --reload
 ```
 
 The application should now be accessible, typically at <http://127.0.0.1:8000>.
 
-**4. Deploying to Cloud Run**
+## **4. Deploying to Cloud Run**
 
 Follow these steps to build and deploy the application as a containerized service on Google Cloud Run.
 
@@ -131,7 +132,7 @@ Set Environment Variables for Deployment
 
 In your Cloud Shell or local terminal (with gcloud CLI configured), set the following environment variables:
 
-```
+```bash
 # Define a name for your Cloud Run service
 export SERVICE_NAME='adk-multiagent-mcp-app'
 
