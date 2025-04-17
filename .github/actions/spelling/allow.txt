@@ -1029,6 +1029,7 @@ payslip
 paystub
 pbxproj
 pcs
+pdflatex
 pdfminer
 pdfs
 petabytes
@@ -1293,6 +1294,7 @@ xcscheme
 xctest
 xcvi
 xdg
+xelatex
 xlabel
 xmltodict
 xsi
