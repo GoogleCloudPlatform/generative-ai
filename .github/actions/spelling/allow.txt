@@ -858,6 +858,7 @@ inpaint
 iostream
 ipd
 iphoneos
+ipycanvas
 ipykernel
 ipynb
 isa
