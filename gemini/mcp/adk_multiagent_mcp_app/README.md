@@ -29,31 +29,31 @@ The application employs three distinct agents:
 The agents interact with the following MCP servers:
 
 1.  **Cocktail MCP Server** (Local Code)
-    * Provides 5 tools:
-        * `search cocktail by name`
-        * `list all cocktail by first letter`
-        * `search ingredient by name`
-        * `list random cocktails`
-        * `lookup full cocktail details by id`
+    - Provides 5 tools:
+      - `search cocktail by name`
+      - `list all cocktail by first letter`
+      - `search ingredient by name`
+      - `list random cocktails`
+      - `lookup full cocktail details by id`
 2.  **Weather MCP Server** (Local Code)
-    * Provides 3 tools:
-        * `get weather forecast by city name`
-        * `get weather forecast by coordinates`
-        * `get weather alert by state code`
+    - Provides 3 tools:
+      - `get weather forecast by city name`
+      - `get weather forecast by coordinates`
+      - `get weather alert by state code`
 3.  **AirBnB MCP Server** ([Public GitHub Repo](https://github.com/openbnb-org/mcp-server-airbnb) - Requires separate setup)
-    * Provides 2 tools:
-        * `search for Airbnb listings`
-        * `get detailed information about a specific Airbnb listing`
+    - Provides 2 tools:
+      - `search for Airbnb listings`
+      - `get detailed information about a specific Airbnb listing`
 
 ## Example Usage
 
 Here are some example questions you can ask the chatbot:
 
-* `Please get cocktail margarita id and then full detail of cocktail margarita`
-* `Please list a random cocktail`
-* `Please get weather forecast for New York`
-* `Please get weather forecast for 40.7128,-74.0060`
-* `I would like to know information about an airbnb condo in LA, CA for 2 nights. 04/28 - 04/30, 2025, two adults, no kid`
+- `Please get cocktail margarita id and then full detail of cocktail margarita`
+- `Please list a random cocktail`
+- `Please get weather forecast for New York`
+- `Please get weather forecast for 40.7128,-74.0060`
+- `I would like to know information about an airbnb condo in LA, CA for 2 nights. 04/28 - 04/30, 2025, two adults, no kid`
 
 ## Setup and Deployment
 
@@ -113,22 +113,24 @@ GOOGLE_CLOUD_PROJECT="your-project-id"
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
 
-
 **3. Start the Application Locally**
 
 Navigate to the adk_multiagent_mcp_app directory in your terminal and run the application using uv:
+
 ```
 uv run uvicorn main:app --reload
 ```
+
 The application should now be accessible, typically at http://127.0.0.1:8000.
 
-**4. Deploying to Cloud Run**  
+**4. Deploying to Cloud Run**
 
 Follow these steps to build and deploy the application as a containerized service on Google Cloud Run.
 
 Set Environment Variables for Deployment
 
 In your Cloud Shell or local terminal (with gcloud CLI configured), set the following environment variables:
+
 ```
 # Define a name for your Cloud Run service
 export SERVICE_NAME='adk-multiagent-mcp-app'
@@ -142,13 +144,13 @@ export PROJECT_ID='your-project-id'
 
 In Cloud Shell, execute the following command:
 
-   ```bash
-   gcloud run deploy $SERVICE_NAME \
-     --source . \
-     --region $LOCATION \
-     --project $PROJECT_ID \
-     --memory 4G \
-     --allow-unauthenticated 
-   ```
+```bash
+gcloud run deploy $SERVICE_NAME \
+  --source . \
+  --region $LOCATION \
+  --project $PROJECT_ID \
+  --memory 4G \
+  --allow-unauthenticated
+```
 
-On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed. 
+On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed.

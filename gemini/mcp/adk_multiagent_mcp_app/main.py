@@ -9,10 +9,12 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from google.adk.agents.llm_agent import LlmAgent
-from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
+from google.adk.artifacts.in_memory_artifact_service import \
+    InMemoryArtifactService
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
+from google.adk.tools.mcp_tool.mcp_toolset import (MCPToolset,
+                                                   StdioServerParameters)
 from google.genai import types
 from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect

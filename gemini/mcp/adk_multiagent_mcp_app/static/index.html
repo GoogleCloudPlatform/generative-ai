@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>ADK MCP App</title>
@@ -112,7 +112,9 @@
         font-size: 1em;
         font-weight: 500;
         color: var(--secondary-text-color); /* USE VARIABLE */
-        transition: background-color 0.2s ease, border-bottom-color 0.2s ease,
+        transition:
+          background-color 0.2s ease,
+          border-bottom-color 0.2s ease,
           color 0.2s ease;
       }
 
@@ -523,7 +525,7 @@
 
         // --- Function to Load and Render User Guide Markdown ---
         const userGuideContentDiv = document.getElementById(
-          "user-guide-markdown-content"
+          "user-guide-markdown-content",
         );
         const markdownFilePath = "user_guide.md"; // <<<--- MAKE SURE THIS FILE EXISTS!
 
@@ -546,7 +548,7 @@
             .then((response) => {
               if (!response.ok) {
                 throw new Error(
-                  `HTTP error ${response.status} - Could not fetch '${markdownFilePath}'.`
+                  `HTTP error ${response.status} - Could not fetch '${markdownFilePath}'.`,
                 );
               }
               return response.text();
@@ -556,7 +558,7 @@
                 userGuideContentDiv.innerHTML = marked.parse(markdownText);
                 console.log(
                   "User guide markdown loaded and rendered from file:",
-                  markdownFilePath
+                  markdownFilePath,
                 );
               } catch (parseError) {
                 console.error("Error parsing Markdown:", parseError);
@@ -583,7 +585,7 @@
 
         if (!messageForm || !messageInput || !messagesDiv || !sendButton) {
           console.error(
-            "CRITICAL: One or more required app DOM elements not found!"
+            "CRITICAL: One or more required app DOM elements not found!",
           );
           const appTab = document.getElementById("app-tab-content");
           const errorMsg =
@@ -594,7 +596,7 @@
             else appTab.innerHTML = errorMsg;
           } else {
             alert(
-              "Initialization Error: App UI elements missing and app tab not found."
+              "Initialization Error: App UI elements missing and app tab not found.",
             );
           }
           return;
@@ -635,7 +637,7 @@
           hideThinkingIndicator(); // Clear previous
           if (!messagesDiv) {
             console.error(
-              "Cannot show thinking indicator: messagesDiv not found."
+              "Cannot show thinking indicator: messagesDiv not found.",
             );
             return;
           }
@@ -665,7 +667,7 @@
 
         function hideThinkingIndicator() {
           const indicatorWrapper = document.getElementById(
-            "thinking-indicator-wrapper"
+            "thinking-indicator-wrapper",
           );
           if (indicatorWrapper) {
             indicatorWrapper.remove();
@@ -710,7 +712,7 @@
                 bubbleP.innerHTML = marked.parse(messageText);
               } else {
                 console.warn(
-                  "Marked library not loaded, displaying raw server message."
+                  "Marked library not loaded, displaying raw server message.",
                 );
                 bubbleP.textContent = messageText;
               }
@@ -719,7 +721,7 @@
               bubbleP.textContent = messageText; // Fallback
               addStatusMessage(
                 `Markdown parsing error: ${e.message}`,
-                "error-text"
+                "error-text",
               );
             }
           }
@@ -758,11 +760,11 @@
                 "Error parsing WebSocket message:",
                 parseError,
                 "Raw data:",
-                event.data
+                event.data,
               );
               addStatusMessage(
                 `Error processing server message: ${parseError.message}`,
-                "error-text"
+                "error-text",
               );
               addMessageToUI(`Received non-JSON data: ${event.data}`, "server");
             }
@@ -772,7 +774,7 @@
             console.warn(
               `WebSocket connection closed. Code: ${event.code}, Reason: '${
                 event.reason || "No reason given"
-              }', Was Clean: ${event.wasClean}`
+              }', Was Clean: ${event.wasClean}`,
             );
             hideThinkingIndicator();
             if (sendButton) sendButton.disabled = true;
@@ -783,20 +785,20 @@
               reconnectAttempts++;
               const reconnectDelay = Math.min(
                 30000,
-                reconnectBaseDelay * Math.pow(2, reconnectAttempts - 1)
+                reconnectBaseDelay * Math.pow(2, reconnectAttempts - 1),
               );
               addStatusMessage(
                 `Connection closed. Attempting reconnect ${reconnectAttempts}/${maxReconnectAttempts} in ${Math.round(
-                  reconnectDelay / 1000
+                  reconnectDelay / 1000,
                 )}s...`,
-                "connection-closed-text"
+                "connection-closed-text",
               );
               setTimeout(connectWebSocket, reconnectDelay);
             } else {
               console.error("Max reconnection attempts reached.");
               addStatusMessage(
                 "Connection lost permanently. Max reconnection attempts reached. Please reload the page.",
-                "error-text"
+                "error-text",
               );
             }
           };
@@ -806,13 +808,13 @@
             hideThinkingIndicator();
             addStatusMessage(
               "WebSocket error occurred. See browser console.",
-              "error-text"
+              "error-text",
             );
           };
 
           console.log(
             "WebSocket event handlers attached for:",
-            webSocketInstance.url
+            webSocketInstance.url,
           );
         }
 
@@ -822,13 +824,13 @@
             console.warn("Attempted send, but WebSocket is not open.");
             addStatusMessage(
               "Cannot send message - Connection is not active.",
-              "error-text"
+              "error-text",
             );
             return false;
           }
           if (!messageInput || !messagesDiv) {
             console.error(
-              "Cannot submit message: messageInput or messagesDiv not found."
+              "Cannot submit message: messageInput or messagesDiv not found.",
             );
             return false;
           }
@@ -847,10 +849,10 @@
               hideThinkingIndicator();
               addStatusMessage(
                 `Failed to send message: ${error.message}`,
-                "error-text"
+                "error-text",
               );
               const lastUserBubble = messagesDiv.querySelector(
-                ".message-wrapper.user:last-child .message-bubble"
+                ".message-wrapper.user:last-child .message-bubble",
               );
               if (lastUserBubble) {
                 const errorSpan = document.createElement("span");
@@ -883,13 +885,13 @@
           console.log(
             `Attempting WebSocket connect: ${ws_url} (Attempt: ${
               reconnectAttempts + 1
-            })`
+            })`,
           );
 
           try {
             if (ws && ws.readyState !== WebSocket.CLOSED) {
               console.log(
-                "Closing existing WebSocket connection before reconnecting."
+                "Closing existing WebSocket connection before reconnecting.",
               );
               ws.close();
             }
@@ -899,19 +901,19 @@
             console.error("Error creating WebSocket:", error);
             addStatusMessage(
               `Failed to initialize connection: ${error.message}`,
-              "error-text"
+              "error-text",
             );
             if (reconnectAttempts < maxReconnectAttempts) {
               reconnectAttempts++;
               const reconnectDelay = Math.min(
                 30000,
-                reconnectBaseDelay * Math.pow(2, reconnectAttempts - 1)
+                reconnectBaseDelay * Math.pow(2, reconnectAttempts - 1),
               );
               setTimeout(connectWebSocket, reconnectDelay);
             } else {
               addStatusMessage(
                 "Failed to initialize connection after multiple attempts. Please reload.",
-                "error-text"
+                "error-text",
               );
             }
           }
@@ -923,7 +925,7 @@
           connectWebSocket();
         } else {
           console.error(
-            "WebSocket connection not started due to missing UI elements."
+            "WebSocket connection not started due to missing UI elements.",
           );
         }
       }); // End DOMContentLoaded
