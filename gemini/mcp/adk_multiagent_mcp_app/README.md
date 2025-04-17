@@ -20,27 +20,27 @@ The application utilizes a multi-agent architecture where a root agent delegates
 
 The application employs three distinct agents:
 
-1.  **Root Agent:** The main entry point that receives user queries, determines the required task(s), and delegates to the appropriate specialized agent(s).
-2.  **Cocktail Agent:** Handles requests related to cocktail recipes and ingredients by interacting with the Cocktail MCP server.
-3.  **Booking Agent:** Manages requests related to weather forecasts and AirBnB bookings by interacting with the Weather and AirBnB MCP servers.
+1. **Root Agent:** The main entry point that receives user queries, determines the required task(s), and delegates to the appropriate specialized agent(s).
+1. **Cocktail Agent:** Handles requests related to cocktail recipes and ingredients by interacting with the Cocktail MCP server.
+2. **Booking Agent:** Manages requests related to weather forecasts and Airbnb bookings by interacting with the Weather and Airbnb MCP servers.
 
 ### MCP Servers and Tools
 
 The agents interact with the following MCP servers:
 
-1.  **Cocktail MCP Server** (Local Code)
+1. **Cocktail MCP Server** (Local Code)
     - Provides 5 tools:
       - `search cocktail by name`
       - `list all cocktail by first letter`
       - `search ingredient by name`
       - `list random cocktails`
       - `lookup full cocktail details by id`
-2.  **Weather MCP Server** (Local Code)
+2. **Weather MCP Server** (Local Code)
     - Provides 3 tools:
       - `get weather forecast by city name`
       - `get weather forecast by coordinates`
       - `get weather alert by state code`
-3.  **AirBnB MCP Server** ([Public GitHub Repo](https://github.com/openbnb-org/mcp-server-airbnb) - Requires separate setup)
+3. **Airbnb MCP Server** ([Public GitHub repository](https://github.com/openbnb-org/mcp-server-Airbnb) - Requires separate setup)
     - Provides 2 tools:
       - `search for Airbnb listings`
       - `get detailed information about a specific Airbnb listing`
@@ -53,7 +53,7 @@ Here are some example questions you can ask the chatbot:
 - `Please list a random cocktail`
 - `Please get weather forecast for New York`
 - `Please get weather forecast for 40.7128,-74.0060`
-- `I would like to know information about an airbnb condo in LA, CA for 2 nights. 04/28 - 04/30, 2025, two adults, no kid`
+- `I would like to know information about an Airbnb condo in LA, CA for 2 nights. 04/28 - 04/30, 2025, two adults, no kid`
 
 ## Setup and Deployment
 
@@ -61,8 +61,8 @@ Here are some example questions you can ask the chatbot:
 
 Before running the application locally, ensure you have the following installed:
 
-1.  **Node.js:** Required to run the AirBnB MCP server (if testing its functionality locally).
-2.  **uv:** The Python package management tool used in this project. Follow the installation guide: [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
+1. **Node.js:** Required to run the Airbnb MCP server (if testing its functionality locally).
+2. **uv:** The Python package management tool used in this project. Follow the installation guide: [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
 
 ### Running Locally
 
@@ -121,7 +121,7 @@ Navigate to the adk_multiagent_mcp_app directory in your terminal and run the ap
 uv run uvicorn main:app --reload
 ```
 
-The application should now be accessible, typically at http://127.0.0.1:8000.
+The application should now be accessible, typically at <http://127.0.0.1:8000>.
 
 **4. Deploying to Cloud Run**
 

@@ -75,7 +75,7 @@ def format_forecast_period(period: Dict[str, Any]) -> str:
     """Formats a single forecast period into a readable string."""
     return f"""
            {period.get('name', 'Unknown Period')}:
-             Temperature: {period.get('temperature', 'N/A')}°{period.get           ('temperatureUnit', 'F')}
+             Temperature: {period.get('temperature', 'N/A')}°{period.get('temperatureUnit', 'F')}
              Wind: {period.get('windSpeed', 'N/A')} {period.get('windDirection', 'N/A')}
              Short Forecast: {period.get('shortForecast', 'N/A')}
              Detailed Forecast: {period.get('detailedForecast', 'No detailed forecast            provided.').strip()}
@@ -219,7 +219,7 @@ async def get_forecast_by_city(city: str, state: str) -> str:
 
 
 # --- Server Execution & Shutdown ---
-async def shutdown_event():
+async def shutdown_event() -> None:
     """Gracefully close the httpx client."""
     await http_client.aclose()
     # print("HTTP client closed.") # Optional print statement if desired

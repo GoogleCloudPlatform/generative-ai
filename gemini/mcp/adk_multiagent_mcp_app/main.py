@@ -3,24 +3,23 @@ import contextlib
 import json
 import logging
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from google.adk.agents.llm_agent import LlmAgent
-from google.adk.artifacts.in_memory_artifact_service import \
-    InMemoryArtifactService
+from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
-from google.adk.tools.mcp_tool.mcp_toolset import (MCPToolset,
-                                                   StdioServerParameters)
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 from google.genai import types
 from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 
 
 class AllServerConfigs(BaseModel):
+    """Define a Pydantic model for server configurations."""
     configs: Dict[str, StdioServerParameters]
 
 
@@ -75,15 +74,15 @@ ROOT_AGENT_INSTRUCTION = """
 
 async def run_multi_agent(
     server_config_dict: AllServerConfigs, session_id: str, query: str
-):
-
+) -> List[str]:
+    """Run the multi-agent system."""
     logging.info("[user]: ", query)
     content = types.Content(role="user", parts=[types.Part(text=query)])
 
     all_tools = {}
     # Use a single ExitStack in the main task
     async with contextlib.AsyncExitStack() as stack:  # Master stack
-        # logging.info("Setting up MCP connections sequentially...")
+
         for key, value in server_config_dict.items():
             server_params = value
             individual_exit_stack = (
@@ -91,20 +90,17 @@ async def run_multi_agent(
             )
             try:
                 # 1. AWAIT the call to run the function and get its results
-                # logging.info(f"  Attempting connection for {server_params}...")
+            
                 tools, individual_exit_stack = await MCPToolset.from_server(
                     connection_params=server_params
                 )
-
                 # 2. Check if an exit stack was actually returned
                 if individual_exit_stack is None:
                     logging.info(
                         f"  Warning: No exit stack returned for {server_params}. Cannot manage cleanup."
                     )
-
                 # 3. Enter the *returned* individual_exit_stack into the master stack
                 #    This makes the master stack responsible for cleaning it up later.
-                # logging.info(f"  Registering cleanup stack for {server_params}...")
                 await stack.enter_async_context(individual_exit_stack)
 
                 # 4. Add the tools
@@ -120,9 +116,7 @@ async def run_multi_agent(
             except Exception as e:
                 # Catch other errors during the MCPToolset.from_server call itself
                 logging.error(f"Error setting up connection for {server_params}: {e}")
-                # Optionally re-raise if errors are critical: raise
 
-        # logging.info(f"Finished setup. Collected {len(all_tools)} servers.")
 
         # --- Agent Creation and Run (remains the same) ---
         if not all_tools:
@@ -187,7 +181,7 @@ async def run_multi_agent(
 
 
 async def run_adk_agent_async(
-    websocket: WebSocket, server_config_dict, session_id: str
+    websocket: WebSocket, server_config_dict: AllServerConfigs, session_id: str
 ):
     """Handles client-to-agent communication over WebSocket."""
     try:
@@ -224,7 +218,7 @@ STATIC_DIR = "static"  # Or your directory name
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(
     websocket: WebSocket, session_id: str
-):  # Use str for session_id
+) -> None:  # Use str for session_id
     """Client websocket endpoint"""
     try:
         await websocket.accept()
