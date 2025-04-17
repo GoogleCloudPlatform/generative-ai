@@ -117,7 +117,6 @@ async def run_multi_agent(
                 # Catch other errors during the MCPToolset.from_server call itself
                 logging.error(f"Error setting up connection for {server_params}: {e}")
 
-
         # --- Agent Creation and Run (remains the same) ---
         if not all_tools:
             logging.info(
