@@ -41,7 +41,7 @@ LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", _region())
 MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
-    "gemini-2.5-pro-exp-03-25": "Gemini 2.5 Pro Experimental",
+    "gemini-2.5-pro-preview-03-25": "Gemini 2.5 Pro",
 }
 
 
