@@ -243,7 +243,7 @@ async def run_multi_agent(
             logging.warning("No server configurations provided.")
             # Return empty or specific message based on requirements
             return ["No servers configured to connect to."]
-        elif not any(
+        if not any(
             all_tools.values()
         ):  # Check if all tool lists are empty after trying
             logging.warning("Tool collection resulted in empty tool lists.")
