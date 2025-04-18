@@ -8,27 +8,18 @@
   --border-color: #ccc;
   --light-border-color: #eee;
   --text-color: #333;
-
   --secondary-text-color: #495057;
-
   --tertiary-text-color: #6c757d;
-
   --tab-hover-text-color: #343a40;
   --accent-color: #007bff;
   --accent-hover-color: #0056b3;
-
   --accent-text-color: white;
-
   --disabled-bg: #6c757d;
   --disabled-text: #dee2e6;
   --bubble-bg: #e9ecef;
-
   --code-bg: #dee2e6;
-
   --pre-bg: #343a40;
-
   --pre-text: #f8f9fa;
-
   --blockquote-border: #adb5bd;
   --blockquote-bg: #f8f9fa;
   --guide-strong-color: #d9534f;
@@ -47,42 +38,24 @@
     --content-bg: #1e1e1e;
     --tab-bar-bg: #252526;
     --tab-hover-bg: #383838;
-
     --border-color: #444;
-
     --light-border-color: #333;
-
     --text-color: #e0e0e0;
     --secondary-text-color: #adb5bd;
     --tertiary-text-color: #999;
-
     --tab-hover-text-color: #f1f1f1;
     --accent-color: #3b82f6;
-
-    /* Slightly lighter blue for dark mode */
     --accent-hover-color: #60a5fa;
-
-    /* Lighter hover */
     --accent-text-color: #fff;
-
     --disabled-bg: #555;
-
     --disabled-text: #aaa;
-
     --bubble-bg: #3a3a3a;
-
-    /* Server/thinking bubble */
     --code-bg: #4a4a4a;
-
-    /* Inline code */
     --pre-bg: #2d2d2d;
-
-    /* Code block background */
     --pre-text: #d4d4d4;
 
     /* Code block text */
     --blockquote-border: #555;
-
     --blockquote-bg: #2a2a2a;
     --guide-strong-color: #f47272;
 
@@ -102,9 +75,6 @@
 }
 
 /* ----- BASE & ELEMENT STYLES ---------- */
-
-/* Apply Arial font & Variables to the whole page */
-
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
@@ -114,16 +84,13 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--body-bg);
-
   color: var(--text-color);
 }
 
 /* --- Tab Styles --- */
-
 .tab-nav {
   display: flex;
   border-bottom: 1px solid var(--border-color);
-
   flex-shrink: 0;
   background-color: var(--tab-bar-bg);
 }
@@ -134,13 +101,10 @@ body {
   border: none;
   background-color: transparent;
   border-bottom: 3px solid transparent;
-
   margin-bottom: -1px;
-
   font-size: 1em;
   font-weight: 500;
   color: var(--secondary-text-color);
-
   transition:
     background-color 0.2s ease,
     border-bottom-color 0.2s ease,
@@ -149,16 +113,13 @@ body {
 
 .tab-button.active {
   border-bottom-color: var(--accent-color);
-
   color: var(--accent-hover-color);
-
   font-weight: bold;
   background-color: var(--content-bg);
 }
 
 .tab-button:hover:not(.active) {
   background-color: var(--tab-hover-bg);
-
   color: var(--tab-hover-text-color);
 }
 
@@ -221,11 +182,9 @@ body {
   flex-shrink: 1;
   overflow-y: auto;
   border: 1px solid var(--border-color);
-
   border-radius: 4px;
   padding: 10px;
   background-color: var(--content-bg);
-
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -269,7 +228,6 @@ body {
 .message-icon.user-icon {
   font-size: 1.5em;
   padding-top: 0;
-
   color: var(--user-icon-color);
 }
 
@@ -438,19 +396,15 @@ body {
   flex-grow: 1;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
-
   border-radius: 4px;
   font-size: 1em;
   background-color: var(--content-bg);
-
   color: var(--text-color);
 }
 
 #send-button {
   background-color: var(--accent-color);
-
   color: var(--accent-text-color);
-
   border: none;
   padding: 8px 18px;
   border-radius: 4px;
@@ -461,9 +415,7 @@ body {
 
 #send-button:disabled {
   background-color: var(--disabled-bg);
-
   color: var(--disabled-text);
-
   cursor: not-allowed;
 }
 
@@ -488,7 +440,6 @@ body {
 #user-guide-markdown-content h3 {
   color: var(--accent-hover-color);
   border-bottom: 1px solid var(--light-border-color);
-
   padding-bottom: 5px;
   margin-top: 1.5em;
   margin-bottom: 0.8em;
@@ -500,9 +451,7 @@ body {
 
 #user-guide-markdown-content code {
   background-color: var(--code-bg);
-
   color: var(--text-color);
-
   padding: 3px 6px;
   border-radius: 3px;
   font-family: "Courier New", Courier, monospace;
@@ -510,9 +459,7 @@ body {
 
 #user-guide-markdown-content pre {
   background-color: var(--pre-bg);
-
   color: var(--pre-text);
-
   padding: 15px;
   border-radius: 4px;
   overflow-x: auto;
@@ -520,18 +467,14 @@ body {
 
 #user-guide-markdown-content blockquote {
   border-left: 5px solid var(--blockquote-border);
-
   padding-left: 15px;
   margin-left: 0;
   color: var(--secondary-text-color);
-
   background-color: var(--blockquote-bg);
-
   font-style: italic;
 }
 
 #user-guide-markdown-content a {
   color: var(--accent-hover-color);
-
   text-decoration: underline;
 }
