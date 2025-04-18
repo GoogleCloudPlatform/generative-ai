@@ -27,9 +27,9 @@ The Cocktail MCP server has 5 tools:
 
 The Weather MCP server has 3 tools:
 
-- 1.get weather forecast by city name
-- 2.get weather forecast by coordinates
-- 3.get weather alert by state code
+1. get weather forecast by city name
+1. get weather forecast by coordinates
+1. get weather alert by state code
 
 The Airbnb MCP server has 2 tools:
 
