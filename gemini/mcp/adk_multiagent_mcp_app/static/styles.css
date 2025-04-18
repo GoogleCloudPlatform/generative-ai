@@ -3,27 +3,39 @@
 /* ---------------------------------------- */
 
 /* Default (Light Mode) Variables */
+
 :root {
   --body-bg: #f4f4f4;
-  --content-bg: #ffffff;
+  --content-bg: #fff;
+  /* Fixed: color-hex-length */
   --tab-bar-bg: #e9ecef;
   --tab-hover-bg: #dee2e6;
-  /* --tab-active-bg: var(--content-bg); */ /* Active tab uses content bg */
+  /* --tab-active-bg: var(--content-bg); */
+  /* Active tab uses content bg */
   --border-color: #ccc;
   --light-border-color: #eee;
-  --text-color: #333333;
-  --secondary-text-color: #495057; /* Tab text, blockquote */
-  --tertiary-text-color: #6c757d; /* System status, thinking */
+  --text-color: #333;
+  /* Fixed: color-hex-length */
+  --secondary-text-color: #495057;
+  /* Tab text, blockquote */
+  --tertiary-text-color: #6c757d;
+  /* System status, thinking */
   --tab-hover-text-color: #343a40;
   --accent-color: #007bff;
-  --accent-hover-color: #0056b3; /* Also link, active tab text */
-  --accent-text-color: white; /* For text on accent bg (e.g., user bubble) */
+  --accent-hover-color: #0056b3;
+  /* Also link, active tab text */
+  --accent-text-color: white;
+  /* For text on accent bg (e.g., user bubble) */
   --disabled-bg: #6c757d;
   --disabled-text: #dee2e6;
-  --bubble-bg: #e9ecef; /* Server/thinking bubble */
-  --code-bg: #dee2e6; /* Inline code */
-  --pre-bg: #343a40; /* Code block background */
-  --pre-text: #f8f9fa; /* Code block text */
+  --bubble-bg: #e9ecef;
+  /* Server/thinking bubble */
+  --code-bg: #dee2e6;
+  /* Inline code */
+  --pre-bg: #343a40;
+  /* Code block background */
+  --pre-text: #f8f9fa;
+  /* Code block text */
   --blockquote-border: #adb5bd;
   --blockquote-bg: #f8f9fa;
   --guide-strong-color: #d9534f;
@@ -31,10 +43,12 @@
   --status-warning: #ffc107;
   --status-error: #dc3545;
   --user-icon-color: var(--accent-color);
-  --logo-filter: none; /* No filter for light mode */
+  --logo-filter: none;
+  /* No filter for light mode */
 }
 
 /* Dark Mode Variables */
+
 @media (prefers-color-scheme: dark) {
   :root {
     --body-bg: #121212;
@@ -42,30 +56,46 @@
     --tab-bar-bg: #252526;
     --tab-hover-bg: #383838;
     /* --tab-active-bg: var(--content-bg); */
-    --border-color: #444444;
-    --light-border-color: #333333;
+    --border-color: #444;
+    /* Fixed: color-hex-length */
+    --light-border-color: #333;
+    /* Fixed: color-hex-length */
     --text-color: #e0e0e0;
     --secondary-text-color: #adb5bd;
-    --tertiary-text-color: #999999;
+    --tertiary-text-color: #999;
+    /* Fixed: color-hex-length */
     --tab-hover-text-color: #f1f1f1;
-    --accent-color: #3b82f6; /* Slightly lighter blue for dark mode */
-    --accent-hover-color: #60a5fa; /* Lighter hover */
-    --accent-text-color: #ffffff;
-    --disabled-bg: #555555;
-    --disabled-text: #aaaaaa;
-    --bubble-bg: #3a3a3a; /* Server/thinking bubble */
-    --code-bg: #4a4a4a; /* Inline code */
-    --pre-bg: #2d2d2d; /* Code block background */
-    --pre-text: #d4d4d4; /* Code block text */
-    --blockquote-border: #555555;
+    --accent-color: #3b82f6;
+    /* Slightly lighter blue for dark mode */
+    --accent-hover-color: #60a5fa;
+    /* Lighter hover */
+    --accent-text-color: #fff;
+    /* Fixed: color-hex-length */
+    --disabled-bg: #555;
+    /* Fixed: color-hex-length */
+    --disabled-text: #aaa;
+    /* Fixed: color-hex-length */
+    --bubble-bg: #3a3a3a;
+    /* Server/thinking bubble */
+    --code-bg: #4a4a4a;
+    /* Inline code */
+    --pre-bg: #2d2d2d;
+    /* Code block background */
+    --pre-text: #d4d4d4;
+    /* Code block text */
+    --blockquote-border: #555;
+    /* Fixed: color-hex-length */
     --blockquote-bg: #2a2a2a;
-    --guide-strong-color: #f47272; /* Lighter red */
-    --status-success: #4ade80; /* Brighter green */
-    --status-warning: #facc15; /* Brighter yellow */
-    --status-error: #f87171; /* Brighter red */
-    --user-icon-color: var(
-      --accent-hover-color
-    ); /* Use slightly lighter blue */
+    --guide-strong-color: #f47272;
+    /* Lighter red */
+    --status-success: #4ade80;
+    /* Brighter green */
+    --status-warning: #facc15;
+    /* Brighter yellow */
+    --status-error: #f87171;
+    /* Brighter red */
+    --user-icon-color: var(--accent-hover-color);
+    /* Use slightly lighter blue */
     /* Invert logo if it's dark - adjust hue if needed */
     --logo-filter: invert(1) hue-rotate(180deg);
   }
@@ -76,24 +106,32 @@
 /* ---------------------------------------- */
 
 /* Apply Arial font & Variables to the whole page */
+
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
   margin: 0;
   height: 100vh;
   width: 100vw;
-  display: flex; /* Use flex for overall layout */
-  flex-direction: column; /* Stack tabs above content */
-  background-color: var(--body-bg); /* USE VARIABLE */
-  color: var(--text-color); /* Default text color */
+  display: flex;
+  /* Use flex for overall layout */
+  flex-direction: column;
+  /* Stack tabs above content */
+  background-color: var(--body-bg);
+  /* USE VARIABLE */
+  color: var(--text-color);
+  /* Default text color */
 }
 
 /* --- Tab Styles --- */
+
 .tab-nav {
   display: flex;
-  border-bottom: 1px solid var(--border-color); /* USE VARIABLE */
+  border-bottom: 1px solid var(--border-color);
+  /* USE VARIABLE */
   flex-shrink: 0;
-  background-color: var(--tab-bar-bg); /* USE VARIABLE */
+  background-color: var(--tab-bar-bg);
+  /* USE VARIABLE */
 }
 
 .tab-button {
@@ -101,11 +139,14 @@ body {
   cursor: pointer;
   border: none;
   background-color: transparent;
-  border-bottom: 3px solid transparent; /* For active indicator */
-  margin-bottom: -1px; /* Overlap border-bottom */
+  border-bottom: 3px solid transparent;
+  /* For active indicator */
+  margin-bottom: -1px;
+  /* Overlap border-bottom */
   font-size: 1em;
   font-weight: 500;
-  color: var(--secondary-text-color); /* USE VARIABLE */
+  color: var(--secondary-text-color);
+  /* USE VARIABLE */
   transition:
     background-color 0.2s ease,
     border-bottom-color 0.2s ease,
@@ -113,15 +154,20 @@ body {
 }
 
 .tab-button.active {
-  border-bottom-color: var(--accent-color); /* USE VARIABLE */
-  color: var(--accent-hover-color); /* USE VARIABLE (Brighter for active) */
+  border-bottom-color: var(--accent-color);
+  /* USE VARIABLE */
+  color: var(--accent-hover-color);
+  /* USE VARIABLE (Brighter for active) */
   font-weight: bold;
-  background-color: var(--content-bg); /* USE VARIABLE */
+  background-color: var(--content-bg);
+  /* USE VARIABLE */
 }
 
 .tab-button:hover:not(.active) {
-  background-color: var(--tab-hover-bg); /* USE VARIABLE */
-  color: var(--tab-hover-text-color); /* USE VARIABLE */
+  background-color: var(--tab-hover-bg);
+  /* USE VARIABLE */
+  color: var(--tab-hover-text-color);
+  /* USE VARIABLE */
 }
 
 .tab-content {
@@ -130,7 +176,8 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: var(--content-bg); /* USE VARIABLE */
+  background-color: var(--content-bg);
+  /* USE VARIABLE */
 }
 
 .tab-panel {
@@ -148,6 +195,7 @@ body {
 }
 
 /* --- Original App Styles (within .app-container) --- */
+
 .app-container {
   display: flex;
   flex-direction: column;
@@ -161,30 +209,35 @@ body {
   align-items: center;
   padding: 10px 0;
   margin-bottom: 1em;
-  border-bottom: 1px solid var(--light-border-color); /* USE VARIABLE */
+  border-bottom: 1px solid var(--light-border-color);
+  /* USE VARIABLE */
 }
 
 .logo {
   height: 40px;
   width: auto;
   margin-right: 15px;
-  filter: var(--logo-filter); /* Apply filter for dark mode */
+  filter: var(--logo-filter);
+  /* Apply filter for dark mode */
 }
 
 .header-container h1 {
   margin: 0;
   font-size: 1.5em;
-  color: var(--text-color); /* USE VARIABLE */
+  color: var(--text-color);
+  /* USE VARIABLE */
 }
 
 #messages {
   flex-grow: 1;
   flex-shrink: 1;
   overflow-y: auto;
-  border: 1px solid var(--border-color); /* USE VARIABLE */
+  border: 1px solid var(--border-color);
+  /* USE VARIABLE */
   border-radius: 4px;
   padding: 10px;
-  background-color: var(--content-bg); /* USE VARIABLE */
+  background-color: var(--content-bg);
+  /* USE VARIABLE */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -192,15 +245,18 @@ body {
 }
 
 /* Message Bubble Styles - Using Variables */
+
 .message-wrapper {
   display: flex;
   align-items: flex-start;
   gap: 8px;
 }
+
 .message-wrapper.user {
   width: 100%;
   flex-direction: row-reverse;
 }
+
 .message-wrapper.server,
 .message-wrapper.thinking {
   align-self: flex-start;
@@ -208,29 +264,38 @@ body {
   max-width: 85%;
   width: fit-content;
 }
+
 .message-icon {
   flex-shrink: 0;
   display: flex;
   align-items: center;
 }
+
 .message-icon.robot-icon img {
   width: 35px;
   height: 35px;
   display: block;
-  border-radius: 50%; /* background-color: var(--robot-icon-bg); optional bg */
+  border-radius: 50%;
+  /* background-color: var(--robot-icon-bg); optional bg */
 }
+
 .message-icon.user-icon {
   font-size: 1.5em;
-  padding-top: 0px;
-  color: var(--user-icon-color); /* USE VARIABLE */
+  padding-top: 0;
+  /* Fixed: length-zero-no-unit */
+  color: var(--user-icon-color);
+  /* USE VARIABLE */
 }
+
 .message-bubble {
   padding: 10px 15px;
   border-radius: 15px;
   word-wrap: break-word;
   margin: 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+  /* Fixed: color-function-notation, alpha-value-notation */
 }
+
 .message-bubble.user-message {
   background-color: var(--accent-color);
   color: var(--accent-text-color);
@@ -238,39 +303,48 @@ body {
   max-width: 85%;
   border-bottom-right-radius: 5px;
 }
+
 .message-bubble.server-message-block {
   background-color: var(--bubble-bg);
   color: var(--text-color);
   border-bottom-left-radius: 5px;
 }
+
 .message-bubble.thinking-bubble {
   background-color: var(--bubble-bg);
   color: var(--tertiary-text-color);
   font-style: italic;
   padding: 10px 15px;
 }
+
 .thinking-bubble .dots span {
   display: inline-block;
   opacity: 0;
   animation: blink 1.4s infinite;
 }
+
 .thinking-bubble .dots span:nth-child(2) {
   animation-delay: 0.2s;
 }
+
 .thinking-bubble .dots span:nth-child(3) {
   animation-delay: 0.4s;
 }
+
 @keyframes blink {
   0% {
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
 }
+
 #messages > .system-status-message {
   align-self: center;
   max-width: 90%;
@@ -283,20 +357,24 @@ body {
   margin: 5px 0;
   font-size: 0.9em;
 }
+
 .connection-open-text {
   color: var(--status-success);
   font-weight: bold;
 }
+
 .connection-closed-text {
   color: var(--status-warning);
   font-weight: bold;
 }
+
 .error-text {
   color: var(--status-error);
   font-weight: bold;
 }
 
 /* Styles for markdown content within bubbles - Using Variables */
+
 .message-bubble code {
   background-color: var(--code-bg);
   color: var(--text-color);
@@ -306,6 +384,7 @@ body {
   word-wrap: break-word;
   font-size: 0.9em;
 }
+
 .message-bubble pre {
   background-color: var(--pre-bg);
   color: var(--pre-text);
@@ -316,11 +395,15 @@ body {
   font-family: "Courier New", Courier, monospace;
   font-size: 0.9em;
 }
+
 .message-bubble pre code {
   background-color: transparent;
   color: inherit;
   padding: 0;
-} /* Inherit pre color */
+}
+
+/* Inherit pre color */
+
 .message-bubble blockquote {
   border-left: 4px solid var(--blockquote-border);
   padding-left: 12px;
@@ -329,6 +412,7 @@ body {
   font-style: italic;
   background-color: var(--blockquote-bg);
 }
+
 .message-bubble ul,
 .message-bubble ol {
   margin-left: 20px;
@@ -337,9 +421,11 @@ body {
   margin-top: 5px;
   margin-bottom: 5px;
 }
+
 .message-bubble li {
   margin-bottom: 4px;
 }
+
 .message-bubble h1,
 .message-bubble h2,
 .message-bubble h3 {
@@ -349,30 +435,41 @@ body {
   border-bottom: 1px solid var(--light-border-color);
   color: var(--text-color);
 }
+
 .message-bubble a {
   color: var(--accent-hover-color);
   text-decoration: underline;
 }
 
-#messageForm {
+#message-form {
+  /* Fixed: selector-id-pattern */
   flex-shrink: 0;
   padding: 10px 0;
   display: flex;
   gap: 10px;
-  border-top: 1px solid var(--light-border-color); /* USE VARIABLE */
+  border-top: 1px solid var(--light-border-color);
+  /* USE VARIABLE */
 }
+
 #message {
   flex-grow: 1;
   padding: 8px 12px;
-  border: 1px solid var(--border-color); /* USE VARIABLE */
+  border: 1px solid var(--border-color);
+  /* USE VARIABLE */
   border-radius: 4px;
   font-size: 1em;
-  background-color: var(--content-bg); /* USE VARIABLE */
-  color: var(--text-color); /* USE VARIABLE */
+  background-color: var(--content-bg);
+  /* USE VARIABLE */
+  color: var(--text-color);
+  /* USE VARIABLE */
 }
-#sendButton {
-  background-color: var(--accent-color); /* USE VARIABLE */
-  color: var(--accent-text-color); /* USE VARIABLE */
+
+#send-button {
+  /* Fixed: selector-id-pattern */
+  background-color: var(--accent-color);
+  /* USE VARIABLE */
+  color: var(--accent-text-color);
+  /* USE VARIABLE */
   border: none;
   padding: 8px 18px;
   border-radius: 4px;
@@ -380,59 +477,88 @@ body {
   font-weight: bold;
   transition: background-color 0.2s ease;
 }
-#sendButton:hover:not(:disabled) {
-  background-color: var(--accent-hover-color); /* USE VARIABLE */
-}
-#sendButton:disabled {
-  background-color: var(--disabled-bg); /* USE VARIABLE */
-  color: var(--disabled-text); /* USE VARIABLE */
+
+/* Fixed: no-descending-specificity - Swapped order */
+#send-button:disabled {
+  /* Fixed: selector-id-pattern */
+  background-color: var(--disabled-bg);
+  /* USE VARIABLE */
+  color: var(--disabled-text);
+  /* USE VARIABLE */
   cursor: not-allowed;
 }
 
+/* Fixed: no-descending-specificity - Swapped order */
+#send-button:hover:not(:disabled) {
+  /* Fixed: selector-id-pattern */
+  background-color: var(--accent-hover-color);
+  /* USE VARIABLE */
+}
+
 /* --- User Guide Tab Styles - Using Variables --- */
+
 #user-guide-tab-content {
   overflow-y: auto;
   line-height: 1.7;
-  color: var(--text-color); /* USE VARIABLE */
+  color: var(--text-color);
+  /* USE VARIABLE */
 }
+
 #user-guide-markdown-content {
   padding: 10px 20px;
 }
+
 #user-guide-markdown-content h1,
 #user-guide-markdown-content h2,
 #user-guide-markdown-content h3 {
-  color: var(--accent-hover-color); /* USE VARIABLE (e.g., accent) */
-  border-bottom: 1px solid var(--light-border-color); /* USE VARIABLE */
+  color: var(--accent-hover-color);
+  /* USE VARIABLE (e.g., accent) */
+  border-bottom: 1px solid var(--light-border-color);
+  /* USE VARIABLE */
   padding-bottom: 5px;
   margin-top: 1.5em;
   margin-bottom: 0.8em;
 }
+
 #user-guide-markdown-content strong {
-  color: var(--guide-strong-color); /* USE VARIABLE */
+  color: var(--guide-strong-color);
+  /* USE VARIABLE */
 }
+
 #user-guide-markdown-content code {
-  background-color: var(--code-bg); /* USE VARIABLE */
-  color: var(--text-color); /* USE VARIABLE */
+  background-color: var(--code-bg);
+  /* USE VARIABLE */
+  color: var(--text-color);
+  /* USE VARIABLE */
   padding: 3px 6px;
   border-radius: 3px;
   font-family: "Courier New", Courier, monospace;
 }
+
 #user-guide-markdown-content pre {
-  background-color: var(--pre-bg); /* USE VARIABLE */
-  color: var(--pre-text); /* USE VARIABLE */
+  background-color: var(--pre-bg);
+  /* USE VARIABLE */
+  color: var(--pre-text);
+  /* USE VARIABLE */
   padding: 15px;
   border-radius: 4px;
   overflow-x: auto;
 }
+
 #user-guide-markdown-content blockquote {
-  border-left: 5px solid var(--blockquote-border); /* USE VARIABLE */
+  border-left: 5px solid var(--blockquote-border);
+  /* USE VARIABLE */
   padding-left: 15px;
   margin-left: 0;
-  color: var(--secondary-text-color); /* USE VARIABLE */
-  background-color: var(--blockquote-bg); /* USE VARIABLE */
+  color: var(--secondary-text-color);
+  /* USE VARIABLE */
+  background-color: var(--blockquote-bg);
+  /* USE VARIABLE */
   font-style: italic;
 }
+
 #user-guide-markdown-content a {
-  color: var(--accent-hover-color); /* USE VARIABLE */
+  color: var(--accent-hover-color);
+  /* USE VARIABLE */
   text-decoration: underline;
 }

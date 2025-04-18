@@ -1,3 +1,5 @@
+/* global marked */ // <<<--- ADDED: Inform linter about the global 'marked' variable
+
 /* ==========================================================================
  IMPORTANT NOTE:
  For the 'fetch' command below to load the 'user_guide.md' file,
@@ -7,7 +9,8 @@
  `file:///...` will likely cause a security error preventing the fetch.
  ========================================================================== */
 
-document.addEventListener("DOMContentLoaded", (event) => {
+document.addEventListener("DOMContentLoaded", () => {
+  // <<<--- MODIFIED: Removed unused 'event' parameter
   console.log("DOM fully loaded and parsed");
 
   // --- Tab Switching Logic ---
@@ -44,6 +47,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
       console.error("User guide container div not found.");
       return;
     }
+    // Check if 'marked' exists (confirming the need for the /* global */ directive)
     if (typeof marked === "undefined") {
       console.error("Marked library not loaded. Cannot render markdown.");
       userGuideContentDiv.innerHTML =
@@ -64,6 +68,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
       })
       .then((markdownText) => {
         try {
+          // Use 'marked' which the linter now knows is global
           userGuideContentDiv.innerHTML = marked.parse(markdownText);
           console.log(
             "User guide markdown loaded and rendered from file:",
@@ -87,11 +92,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
   // --- Original WebSocket App Logic ---
   console.log("Initializing WebSocket application logic...");
-  const messageForm = document.getElementById("messageForm");
+  const messageForm = document.getElementById("message-form"); // Adjusted based on previous CSS fix
   const messageInput = document.getElementById("message");
   const messagesDiv = document.getElementById("messages");
-  const sendButton = document.getElementById("sendButton");
+  const sendButton = document.getElementById("send-button"); // Adjusted based on previous CSS fix
 
+  // Check elements using potentially updated IDs
   if (!messageForm || !messageInput || !messagesDiv || !sendButton) {
     console.error("CRITICAL: One or more required app DOM elements not found!");
     const appTab = document.getElementById("app-tab-content");
@@ -212,6 +218,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
       bubbleP.classList.add("server-message-block");
       try {
+        // Check if 'marked' exists and use it
         if (typeof marked !== "undefined") {
           // Render Markdown
           bubbleP.innerHTML = marked.parse(messageText);
