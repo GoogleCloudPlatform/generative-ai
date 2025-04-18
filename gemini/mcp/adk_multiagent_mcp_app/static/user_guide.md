@@ -12,10 +12,9 @@ It has three agents: root agent, cocktail agent, and booking agent.
 
 It interacts with the following MCP servers:
 
-- 1.Cocktail MCP server (Local code)
-- 2.Weather MCP server (Local code)
-
-- 3.Public Airbnb MCP server (Fetch code via Pypi)
+1. Cocktail MCP server (Local code)
+1. Weather MCP server (Local code)
+1. Public Airbnb MCP server (Fetch code via PyPi)
 
 The Cocktail MCP server has 5 tools:
 
