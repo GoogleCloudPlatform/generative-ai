@@ -1,41 +1,34 @@
-/* ---------------------------------------- */
-/* ----- COLOR VARIABLES (THEMING) ------ */
-/* ---------------------------------------- */
-
 /* Default (Light Mode) Variables */
 
 :root {
   --body-bg: #f4f4f4;
   --content-bg: #fff;
-  /* Fixed: color-hex-length */
   --tab-bar-bg: #e9ecef;
   --tab-hover-bg: #dee2e6;
-  /* --tab-active-bg: var(--content-bg); */
-  /* Active tab uses content bg */
   --border-color: #ccc;
   --light-border-color: #eee;
   --text-color: #333;
-  /* Fixed: color-hex-length */
+
   --secondary-text-color: #495057;
-  /* Tab text, blockquote */
+
   --tertiary-text-color: #6c757d;
-  /* System status, thinking */
+
   --tab-hover-text-color: #343a40;
   --accent-color: #007bff;
   --accent-hover-color: #0056b3;
-  /* Also link, active tab text */
+
   --accent-text-color: white;
-  /* For text on accent bg (e.g., user bubble) */
+
   --disabled-bg: #6c757d;
   --disabled-text: #dee2e6;
   --bubble-bg: #e9ecef;
-  /* Server/thinking bubble */
+
   --code-bg: #dee2e6;
-  /* Inline code */
+
   --pre-bg: #343a40;
-  /* Code block background */
+
   --pre-text: #f8f9fa;
-  /* Code block text */
+
   --blockquote-border: #adb5bd;
   --blockquote-bg: #f8f9fa;
   --guide-strong-color: #d9534f;
@@ -44,7 +37,6 @@
   --status-error: #dc3545;
   --user-icon-color: var(--accent-color);
   --logo-filter: none;
-  /* No filter for light mode */
 }
 
 /* Dark Mode Variables */
@@ -55,55 +47,61 @@
     --content-bg: #1e1e1e;
     --tab-bar-bg: #252526;
     --tab-hover-bg: #383838;
-    /* --tab-active-bg: var(--content-bg); */
+
     --border-color: #444;
-    /* Fixed: color-hex-length */
+
     --light-border-color: #333;
-    /* Fixed: color-hex-length */
+
     --text-color: #e0e0e0;
     --secondary-text-color: #adb5bd;
     --tertiary-text-color: #999;
-    /* Fixed: color-hex-length */
+
     --tab-hover-text-color: #f1f1f1;
     --accent-color: #3b82f6;
+
     /* Slightly lighter blue for dark mode */
     --accent-hover-color: #60a5fa;
+
     /* Lighter hover */
     --accent-text-color: #fff;
-    /* Fixed: color-hex-length */
+
     --disabled-bg: #555;
-    /* Fixed: color-hex-length */
+
     --disabled-text: #aaa;
-    /* Fixed: color-hex-length */
+
     --bubble-bg: #3a3a3a;
+
     /* Server/thinking bubble */
     --code-bg: #4a4a4a;
+
     /* Inline code */
     --pre-bg: #2d2d2d;
+
     /* Code block background */
     --pre-text: #d4d4d4;
+
     /* Code block text */
     --blockquote-border: #555;
-    /* Fixed: color-hex-length */
+
     --blockquote-bg: #2a2a2a;
     --guide-strong-color: #f47272;
+
     /* Lighter red */
     --status-success: #4ade80;
+
     /* Brighter green */
     --status-warning: #facc15;
+
     /* Brighter yellow */
     --status-error: #f87171;
+
     /* Brighter red */
     --user-icon-color: var(--accent-hover-color);
-    /* Use slightly lighter blue */
-    /* Invert logo if it's dark - adjust hue if needed */
     --logo-filter: invert(1) hue-rotate(180deg);
   }
 }
 
-/* ---------------------------------------- */
 /* ----- BASE & ELEMENT STYLES ---------- */
-/* ---------------------------------------- */
 
 /* Apply Arial font & Variables to the whole page */
 
@@ -114,13 +112,10 @@ body {
   height: 100vh;
   width: 100vw;
   display: flex;
-  /* Use flex for overall layout */
   flex-direction: column;
-  /* Stack tabs above content */
   background-color: var(--body-bg);
-  /* USE VARIABLE */
+
   color: var(--text-color);
-  /* Default text color */
 }
 
 /* --- Tab Styles --- */
@@ -128,10 +123,9 @@ body {
 .tab-nav {
   display: flex;
   border-bottom: 1px solid var(--border-color);
-  /* USE VARIABLE */
+
   flex-shrink: 0;
   background-color: var(--tab-bar-bg);
-  /* USE VARIABLE */
 }
 
 .tab-button {
@@ -140,13 +134,13 @@ body {
   border: none;
   background-color: transparent;
   border-bottom: 3px solid transparent;
-  /* For active indicator */
+
   margin-bottom: -1px;
-  /* Overlap border-bottom */
+
   font-size: 1em;
   font-weight: 500;
   color: var(--secondary-text-color);
-  /* USE VARIABLE */
+
   transition:
     background-color 0.2s ease,
     border-bottom-color 0.2s ease,
@@ -155,19 +149,17 @@ body {
 
 .tab-button.active {
   border-bottom-color: var(--accent-color);
-  /* USE VARIABLE */
+
   color: var(--accent-hover-color);
-  /* USE VARIABLE (Brighter for active) */
+
   font-weight: bold;
   background-color: var(--content-bg);
-  /* USE VARIABLE */
 }
 
 .tab-button:hover:not(.active) {
   background-color: var(--tab-hover-bg);
-  /* USE VARIABLE */
+
   color: var(--tab-hover-text-color);
-  /* USE VARIABLE */
 }
 
 .tab-content {
@@ -177,7 +169,6 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--content-bg);
-  /* USE VARIABLE */
 }
 
 .tab-panel {
@@ -210,7 +201,6 @@ body {
   padding: 10px 0;
   margin-bottom: 1em;
   border-bottom: 1px solid var(--light-border-color);
-  /* USE VARIABLE */
 }
 
 .logo {
@@ -218,14 +208,12 @@ body {
   width: auto;
   margin-right: 15px;
   filter: var(--logo-filter);
-  /* Apply filter for dark mode */
 }
 
 .header-container h1 {
   margin: 0;
   font-size: 1.5em;
   color: var(--text-color);
-  /* USE VARIABLE */
 }
 
 #messages {
@@ -233,11 +221,11 @@ body {
   flex-shrink: 1;
   overflow-y: auto;
   border: 1px solid var(--border-color);
-  /* USE VARIABLE */
+
   border-radius: 4px;
   padding: 10px;
   background-color: var(--content-bg);
-  /* USE VARIABLE */
+
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -276,15 +264,13 @@ body {
   height: 35px;
   display: block;
   border-radius: 50%;
-  /* background-color: var(--robot-icon-bg); optional bg */
 }
 
 .message-icon.user-icon {
   font-size: 1.5em;
   padding-top: 0;
-  /* Fixed: length-zero-no-unit */
+
   color: var(--user-icon-color);
-  /* USE VARIABLE */
 }
 
 .message-bubble {
@@ -293,7 +279,6 @@ body {
   word-wrap: break-word;
   margin: 0;
   box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
-  /* Fixed: color-function-notation, alpha-value-notation */
 }
 
 .message-bubble.user-message {
@@ -442,34 +427,30 @@ body {
 }
 
 #message-form {
-  /* Fixed: selector-id-pattern */
   flex-shrink: 0;
   padding: 10px 0;
   display: flex;
   gap: 10px;
   border-top: 1px solid var(--light-border-color);
-  /* USE VARIABLE */
 }
 
 #message {
   flex-grow: 1;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
-  /* USE VARIABLE */
+
   border-radius: 4px;
   font-size: 1em;
   background-color: var(--content-bg);
-  /* USE VARIABLE */
+
   color: var(--text-color);
-  /* USE VARIABLE */
 }
 
 #send-button {
-  /* Fixed: selector-id-pattern */
   background-color: var(--accent-color);
-  /* USE VARIABLE */
+
   color: var(--accent-text-color);
-  /* USE VARIABLE */
+
   border: none;
   padding: 8px 18px;
   border-radius: 4px;
@@ -478,21 +459,16 @@ body {
   transition: background-color 0.2s ease;
 }
 
-/* Fixed: no-descending-specificity - Swapped order */
 #send-button:disabled {
-  /* Fixed: selector-id-pattern */
   background-color: var(--disabled-bg);
-  /* USE VARIABLE */
+
   color: var(--disabled-text);
-  /* USE VARIABLE */
+
   cursor: not-allowed;
 }
 
-/* Fixed: no-descending-specificity - Swapped order */
 #send-button:hover:not(:disabled) {
-  /* Fixed: selector-id-pattern */
   background-color: var(--accent-hover-color);
-  /* USE VARIABLE */
 }
 
 /* --- User Guide Tab Styles - Using Variables --- */
@@ -501,7 +477,6 @@ body {
   overflow-y: auto;
   line-height: 1.7;
   color: var(--text-color);
-  /* USE VARIABLE */
 }
 
 #user-guide-markdown-content {
@@ -512,9 +487,8 @@ body {
 #user-guide-markdown-content h2,
 #user-guide-markdown-content h3 {
   color: var(--accent-hover-color);
-  /* USE VARIABLE (e.g., accent) */
   border-bottom: 1px solid var(--light-border-color);
-  /* USE VARIABLE */
+
   padding-bottom: 5px;
   margin-top: 1.5em;
   margin-bottom: 0.8em;
@@ -522,14 +496,13 @@ body {
 
 #user-guide-markdown-content strong {
   color: var(--guide-strong-color);
-  /* USE VARIABLE */
 }
 
 #user-guide-markdown-content code {
   background-color: var(--code-bg);
-  /* USE VARIABLE */
+
   color: var(--text-color);
-  /* USE VARIABLE */
+
   padding: 3px 6px;
   border-radius: 3px;
   font-family: "Courier New", Courier, monospace;
@@ -537,9 +510,9 @@ body {
 
 #user-guide-markdown-content pre {
   background-color: var(--pre-bg);
-  /* USE VARIABLE */
+
   color: var(--pre-text);
-  /* USE VARIABLE */
+
   padding: 15px;
   border-radius: 4px;
   overflow-x: auto;
@@ -547,18 +520,18 @@ body {
 
 #user-guide-markdown-content blockquote {
   border-left: 5px solid var(--blockquote-border);
-  /* USE VARIABLE */
+
   padding-left: 15px;
   margin-left: 0;
   color: var(--secondary-text-color);
-  /* USE VARIABLE */
+
   background-color: var(--blockquote-bg);
-  /* USE VARIABLE */
+
   font-style: italic;
 }
 
 #user-guide-markdown-content a {
   color: var(--accent-hover-color);
-  /* USE VARIABLE */
+
   text-decoration: underline;
 }
