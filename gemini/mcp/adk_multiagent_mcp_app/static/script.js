@@ -7,7 +7,7 @@
  *    http://www.apache.org/licenses/LICENSE-2.0
  **/
 
-/* global marked */ 
+/* global marked */
 
 document.addEventListener("DOMContentLoaded", () => {
   // <<<--- MODIFIED: Removed unused 'event' parameter
