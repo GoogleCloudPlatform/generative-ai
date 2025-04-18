@@ -1,8 +1,12 @@
+"""
+Main function to run FastAPI server.
+"""
+
 import asyncio
 import contextlib
 import json
 import logging
-from typing import Dict, List
+from typing import Dict, List, Any, Optional
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket
@@ -13,7 +17,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 from google.genai import types
-from pydantic import BaseModel  # type: ignore
+from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 
 
@@ -73,87 +77,183 @@ ROOT_AGENT_INSTRUCTION = """
 """
 
 
+async def _collect_tools(
+    server_config_dict: AllServerConfigs, master_stack: contextlib.AsyncExitStack
+) -> Dict[str, Any]:
+    """Connects to servers, collects tools, and manages resources.
+
+    Assumes MCPToolset.from_server exists and returns (tools, exit_stack).
+    """
+    all_tools: Dict[str, Any] = {}
+    # Ensure server_config_dict has the expected structure, e.g., a .configs attribute
+    if not hasattr(server_config_dict, "configs") or not isinstance(
+        server_config_dict.configs, dict
+    ):
+        logging.error("server_config_dict does not have a valid '.configs' dictionary.")
+        return {}  # Return empty if structure is wrong
+
+    for key, server_params in server_config_dict.configs.items():
+        individual_exit_stack: Optional[contextlib.AsyncExitStack] = None
+        try:
+            # *** Assumes MCPToolset is defined and imported ***
+            tools, individual_exit_stack = await MCPToolset.from_server(
+                connection_params=server_params
+            )
+
+            if individual_exit_stack:
+                # Enter the individual stack into the master stack for cleanup
+                await master_stack.enter_async_context(individual_exit_stack)
+            # Removed warning for no stack, as MCPToolset might legitimately not return one
+
+            if tools:
+                all_tools[key] = tools  # Use key directly
+            else:
+                logging.warning("Connection successful,but no tools returned.")
+
+        except FileNotFoundError as file_error:
+            logging.error("Command or script not found for %s", file_error)
+        except ConnectionRefusedError as conn_refused:
+            logging.error("Connection refused for %s", conn_refused)
+
+    # Handle case where no tools were collected at all
+    if not all_tools:
+        logging.warning(
+            "No tools were collected from any server. Agent may not function as expected."
+        )
+        all_tools = {"weather": [], "bnb": [], "ct": []}
+
+    # Ensure expected keys exist if downstream code requires them
+    expected_keys = ["weather", "bnb", "ct"]  # Adjust as needed
+    for k in expected_keys:
+        if k not in all_tools:
+            logging.info(
+                "Tools  were not collected. Ensuring key exists with empty list."
+            )
+            all_tools[k] = []
+
+    return all_tools
+
+
+# --- Helper Function for Agent Creation ---
+def _create_root_agent(all_tools: Dict[str, Any]) -> LlmAgent:
+    """Creates the hierarchy of agents based on the collected tools.
+
+    Assumes LlmAgent is defined and imported.
+    """
+
+    # Prepare tool lists, defensively accessing keys
+    booking_tools = all_tools.get("bnb", [])
+    weather_tools = all_tools.get("weather", [])
+    # Create a new list to avoid modifying the original list in all_tools if needed elsewhere
+    combined_booking_tools = list(booking_tools)
+    combined_booking_tools.extend(weather_tools)
+
+    ct_tools = all_tools.get("ct", [])
+
+    # --- Agent Creation ---
+    # *** Assumes LlmAgent is defined and imported ***
+    booking_agent = LlmAgent(
+        model=MODEL_ID,
+        name="booking_assistant",
+        instruction="Use booking_tools to handle inquiries related to booking accommodations (rooms, condos, \
+            houses, apartments, town-houses), and checking weather information. Format your response using Markdown",
+        tools=combined_booking_tools,
+    )
+
+    cocktail_agent = LlmAgent(
+        model=MODEL_ID,
+        name="cocktail_assistant",
+        instruction="Use ct_tools to handle all inquiries related to cocktails, drink recipes, ingredients, \
+            and mixology. Format your response using Markdown",
+        tools=ct_tools,
+    )
+
+    root_agent = LlmAgent(
+        model=MODEL_ID,
+        name="ai_assistant",
+        instruction=ROOT_AGENT_INSTRUCTION,
+        sub_agents=[cocktail_agent, booking_agent],
+    )
+    return root_agent
+
+
+# --- Helper Function for Running the Agent and Processing Results ---
+async def _run_agent_and_get_response(
+    runner: Any,  # Replace Any with imported Runner type
+    session_id: str,
+    content: types.Content,  # Assuming types.Content is correct
+) -> List[str]:
+    """Runs the agent asynchronously and collects model responses.
+
+    Assumes Runner is defined and imported, and has run_async method.
+    """
+    logging.info("Running agent for session %s", session_id)
+    # *** Assumes runner is an instance of the imported Runner class ***
+    events_async = runner.run_async(
+        session_id=session_id, user_id=session_id, new_message=content
+    )
+
+    response_parts = []
+    async for event in events_async:
+        # Refined event processing to be more robust
+        try:
+            if hasattr(event, "content") and event.content.role == "model":
+                if hasattr(event.content, "parts") and event.content.parts:
+                    # Check if the part has text before accessing it
+                    part_text = getattr(event.content.parts[0], "text", None)
+                    if (
+                        isinstance(part_text, str) and part_text
+                    ):  # Ensure it's a non-empty string
+                        response_parts.append(part_text)
+        except AttributeError as e:
+            logging.warning("Could not process event attribute: %s", e)
+
+    logging.info("Agent run finished.")
+    return response_parts
+
+
+# --- Main Function (Refactored) ---
 async def run_multi_agent(
     server_config_dict: AllServerConfigs, session_id: str, query: str
 ) -> List[str]:
-    """Run the multi-agent system."""
+    """
+    Runs the multi-agent system by collecting tools, creating agents,
+    and processing the query.
+
+    Assumes MCPToolset, LlmAgent, Runner, and necessary configurations/services
+    are available in the execution environment.
+    """
     content = types.Content(role="user", parts=[types.Part(text=query)])
+    response: List[str] = []  # Initialize clearly
 
-    all_tools = {}
-    # Use a single ExitStack in the main task
+    # Ensure necessary services are available (could also be passed as arguments)
+    if artifacts_service is None or session_service is None:
+        logging.error("Artifact or Session service is not initialized.")
+        # Depending on requirements, you might return an error or raise exception
+        return ["Error: Services not available."]
+
     async with contextlib.AsyncExitStack() as stack:  # Master stack
+        # 1. Collect tools from all servers
+        all_tools = await _collect_tools(server_config_dict, stack)
 
-        for key, value in server_config_dict.configs.items():
-            server_params = value
-            individual_exit_stack = (
-                None  # Define outside try for broader scope if needed
-            )
-            try:
-                # 1. AWAIT the call to run the function and get its results
+        # If tool collection fundamentally failed, might return early
+        if (
+            not all_tools and not server_config_dict.configs
+        ):  # Check if configs was empty to begin with
+            logging.warning("No server configurations provided.")
+            # Return empty or specific message based on requirements
+            return ["No servers configured to connect to."]
+        elif not any(
+            all_tools.values()
+        ):  # Check if all tool lists are empty after trying
+            logging.warning("Tool collection resulted in empty tool lists.")
+            # Decide if processing should continue with no tools
 
-                tools, individual_exit_stack = await MCPToolset.from_server(
-                    connection_params=server_params
-                )
-                # 2. Check if an exit stack was actually returned
-                if individual_exit_stack is None:
-                    logging.info(
-                        "Warning: No exit stack returned. Cannot manage cleanup."
-                    )
-                # 3. Enter the *returned* individual_exit_stack into the master stack
-                #    This makes the master stack responsible for cleaning it up later.
-                await stack.enter_async_context(individual_exit_stack)
+        # 2. Create the agent hierarchy
+        root_agent = _create_root_agent(all_tools)
 
-                # 4. Add the tools
-                # logging.info(f"  Connection established for {server_params}, got tools.")
-                # Check if tools is None or empty if connection might partially fail
-                if tools:
-                    all_tools.update({key: tools})
-                else:
-                    logging.info(
-                        "Warning: Connection successful but no tools returned."
-                    )
-            except FileNotFoundError as file_error:
-                logging.error("Command or script not found - %s", file_error)
-            except ConnectionRefusedError as conn_refused:
-                # Might occur if the server process starts but refuses connection
-                logging.error("Connection refused - %s", conn_refused)
-
-        # --- Agent Creation and Run (remains the same) ---
-        if not all_tools:
-            logging.info(
-                "Warning: No tools were collected. Agent may not function as expected."
-            )
-            # set tools to empty lists
-            all_tools = {" weather": [], "bnb": [], "ct": []}
-
-        booking_tools = all_tools["bnb"]
-        booking_tools.extend(all_tools["weather"])
-
-        ct_tools = all_tools["ct"]
-
-        booking_agent = LlmAgent(
-            model=MODEL_ID,
-            name="booking_assistant",
-            instruction="Use booking_tools to handle inquiries related to booking accommodations (rooms, condos, \
-                houses, apartments, town-houses), and checking weather information. Format your response using Markdown",
-            tools=booking_tools,
-        )
-
-        cocktail_agent = LlmAgent(
-            model=MODEL_ID,
-            name="cocktail_assistant",
-            instruction="Use ct_tools to handle all inquiries related to cocktails, drink recipes, ingredients, \
-                and mixology. Format your response using Markdown",
-            tools=ct_tools,
-        )
-
-        root_agent = LlmAgent(
-            model=MODEL_ID,
-            name="ai_assistant",
-            instruction=ROOT_AGENT_INSTRUCTION,
-            sub_agents=[cocktail_agent, booking_agent],
-        )
-
+        # 3. Set up the runner
+        # *** Assumes Runner is defined and imported ***
         runner = Runner(
             app_name=APP_NAME,
             agent=root_agent,
@@ -161,24 +261,13 @@ async def run_multi_agent(
             session_service=session_service,
         )
 
-        logging.info("Running agent...")
-        events_async = runner.run_async(
-            session_id=session_id, user_id=session_id, new_message=content
-        )
+        # 4. Run the agent and get the response
+        response = await _run_agent_and_get_response(runner, session_id, content)
 
-        response = []
-        async for event in events_async:
-            # Your event processing logic...
-            # if event.content.role == "user" and event.content.parts[0].text:
-            #     logging.info("[user]:", event.content.parts[0].text)
-            # if event.content.parts[0].function_response:
-            #     logging.info("[-tool_response-]", event.content.parts[0].function_response)
-            if event.content.role == "model" and event.content.parts[0].text:
-                response.append(event.content.parts[0].text)
-
-        # logging.info("Agent run finished. Exiting context stack...")
+        logging.info("Exiting context stack...")
         # Master stack cleanup happens automatically here
-    return response  # Or other appropriate return value
+
+    return response
 
 
 async def run_adk_agent_async(

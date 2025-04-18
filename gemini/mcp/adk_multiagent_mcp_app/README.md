@@ -29,21 +29,21 @@ The application employs three distinct agents:
 The agents interact with the following MCP servers:
 
 1. **Cocktail MCP Server** (Local Code)
-    - Provides 5 tools:
-      - `search cocktail by name`
-      - `list all cocktail by first letter`
-      - `search ingredient by name`
-      - `list random cocktails`
-      - `lookup full cocktail details by id`
+   - Provides 5 tools:
+     - `search cocktail by name`
+     - `list all cocktail by first letter`
+     - `search ingredient by name`
+     - `list random cocktails`
+     - `lookup full cocktail details by id`
 2. **Weather MCP Server** (Local Code)
-    - Provides 3 tools:
-      - `get weather forecast by city name`
-      - `get weather forecast by coordinates`
-      - `get weather alert by state code`
+   - Provides 3 tools:
+     - `get weather forecast by city name`
+     - `get weather forecast by coordinates`
+     - `get weather alert by state code`
 3. **Airbnb MCP Server** ([Public GitHub repository](https://github.com/openbnb-org/mcp-server-Airbnb) - Requires separate setup)
-    - Provides 2 tools:
-      - `search for Airbnb listings`
-      - `get detailed information about a specific Airbnb listing`
+   - Provides 2 tools:
+     - `search for Airbnb listings`
+     - `get detailed information about a specific Airbnb listing`
 
 ## Example Usage
 
