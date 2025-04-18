@@ -2,7 +2,6 @@ import asyncio
 import contextlib
 import json
 import logging
-from pathlib import Path
 from typing import Dict, List
 
 from dotenv import load_dotenv
@@ -14,19 +13,19 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 from google.genai import types
-from pydantic import BaseModel
+from pydantic import BaseModel  # type: ignore
 from starlette.websockets import WebSocketDisconnect
 
 
 class AllServerConfigs(BaseModel):
     """Define a Pydantic model for server configurations."""
+
     configs: Dict[str, StdioServerParameters]
 
 
 load_dotenv()
 
 APP_NAME = "ADK MCP App"
-STATIC_DIR = Path("static")
 
 session_service = InMemorySessionService()
 artifacts_service = InMemoryArtifactService()
@@ -46,11 +45,13 @@ bnb_server_params = StdioServerParameters(
     command="npx", args=["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"]
 )
 
-server_config_dict = {
-    "weather": weather_server_params,
-    "bnb": bnb_server_params,
-    "ct": ct_server_params,
-}
+server_configs_instance = AllServerConfigs(
+    configs={
+        "weather": weather_server_params,
+        "bnb": bnb_server_params,
+        "ct": ct_server_params,
+    }
+)
 
 MODEL_ID = "gemini-2.0-flash"
 
@@ -76,28 +77,27 @@ async def run_multi_agent(
     server_config_dict: AllServerConfigs, session_id: str, query: str
 ) -> List[str]:
     """Run the multi-agent system."""
-    logging.info("[user]: ", query)
     content = types.Content(role="user", parts=[types.Part(text=query)])
 
     all_tools = {}
     # Use a single ExitStack in the main task
     async with contextlib.AsyncExitStack() as stack:  # Master stack
 
-        for key, value in server_config_dict.items():
+        for key, value in server_config_dict.configs.items():
             server_params = value
             individual_exit_stack = (
                 None  # Define outside try for broader scope if needed
             )
             try:
                 # 1. AWAIT the call to run the function and get its results
-            
+
                 tools, individual_exit_stack = await MCPToolset.from_server(
                     connection_params=server_params
                 )
                 # 2. Check if an exit stack was actually returned
                 if individual_exit_stack is None:
                     logging.info(
-                        f"  Warning: No exit stack returned for {server_params}. Cannot manage cleanup."
+                        "Warning: No exit stack returned. Cannot manage cleanup."
                     )
                 # 3. Enter the *returned* individual_exit_stack into the master stack
                 #    This makes the master stack responsible for cleaning it up later.
@@ -110,12 +110,13 @@ async def run_multi_agent(
                     all_tools.update({key: tools})
                 else:
                     logging.info(
-                        f"  Warning: Connection successful but no tools returned for {server_params}."
+                        "Warning: Connection successful but no tools returned."
                     )
-
-            except Exception as e:
-                # Catch other errors during the MCPToolset.from_server call itself
-                logging.error(f"Error setting up connection for {server_params}: {e}")
+            except FileNotFoundError as file_error:
+                logging.error("Command or script not found - %s", file_error)
+            except ConnectionRefusedError as conn_refused:
+                # Might occur if the server process starts but refuses connection
+                logging.error("Connection refused - %s", conn_refused)
 
         # --- Agent Creation and Run (remains the same) ---
         if not all_tools:
@@ -133,14 +134,16 @@ async def run_multi_agent(
         booking_agent = LlmAgent(
             model=MODEL_ID,
             name="booking_assistant",
-            instruction="Use booking_tools to handle inquiries related to booking accommodations (rooms, condos, houses, apartments, town-houses), and checking weather information. Format your response using Markdown",
+            instruction="Use booking_tools to handle inquiries related to booking accommodations (rooms, condos, \
+                houses, apartments, town-houses), and checking weather information. Format your response using Markdown",
             tools=booking_tools,
         )
 
         cocktail_agent = LlmAgent(
             model=MODEL_ID,
             name="cocktail_assistant",
-            instruction="Use ct_tools to handle all inquiries related to cocktails, drink recipes, ingredients, and mixology. Format your response using Markdown",
+            instruction="Use ct_tools to handle all inquiries related to cocktails, drink recipes, ingredients, \
+                and mixology. Format your response using Markdown",
             tools=ct_tools,
         )
 
@@ -171,17 +174,16 @@ async def run_multi_agent(
             # if event.content.parts[0].function_response:
             #     logging.info("[-tool_response-]", event.content.parts[0].function_response)
             if event.content.role == "model" and event.content.parts[0].text:
-                logging.info("[agent]:", event.content.parts[0].text)
                 response.append(event.content.parts[0].text)
 
         # logging.info("Agent run finished. Exiting context stack...")
         # Master stack cleanup happens automatically here
-        return response  # Or other appropriate return value
+    return response  # Or other appropriate return value
 
 
 async def run_adk_agent_async(
     websocket: WebSocket, server_config_dict: AllServerConfigs, session_id: str
-):
+) -> None:
     """Handles client-to-agent communication over WebSocket."""
     try:
         # Your existing setup for the agent might be here
@@ -198,14 +200,9 @@ async def run_adk_agent_async(
 
     except WebSocketDisconnect:
         # This block executes when the client disconnects
-        logging.info(f"Client {session_id} disconnected.")
-    except Exception as e:
-        # Catch other potential errors in your agent logic
-        logging.error(
-            f"Error in agent task for session {session_id}: {e}", exc_info=True
-        )
+        logging.info("Client %s disconnected.", session_id)
     finally:
-        logging.info(f"Agent task ending for session {session_id}")
+        logging.info("Agent task ending for session")
 
 
 # FastAPI web app
@@ -229,17 +226,14 @@ async def websocket_endpoint(
         )
         # Start agent communication task
         agent_task = asyncio.create_task(
-            run_adk_agent_async(websocket, server_config_dict, session_id)
+            run_adk_agent_async(websocket, server_configs_instance, session_id)
         )
         # Keep the endpoint alive while the agent task runs.
         await agent_task
 
-    except Exception as e:
-        # Catch any other unexpected error
-        logging.error(
-            f"!!! EXCEPTION in websocket_endpoint for session {session_id}: {e}",
-            exc_info=True,
-        )
+    except WebSocketDisconnect:
+        # This block executes when the client disconnects
+        logging.info("Client %s disconnected.", session_id)
 
 
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

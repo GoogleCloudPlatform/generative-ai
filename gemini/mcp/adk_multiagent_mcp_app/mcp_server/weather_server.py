@@ -1,9 +1,9 @@
 import json
 from typing import Any, Dict, Optional
 
-import httpx
 from geopy.exc import GeocoderServiceError, GeocoderTimedOut
 from geopy.geocoders import Nominatim
+import httpx
 from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server
@@ -48,9 +48,6 @@ async def get_weather_response(endpoint: str) -> Optional[Dict[str, Any]]:
         return None
     except json.JSONDecodeError:
         # Response was not valid JSON
-        return None
-    except Exception:
-        # Any other unexpected errors
         return None
 
 
@@ -151,8 +148,6 @@ async def get_forecast(latitude: float, longitude: float) -> str:
         pass  # Error handled by returning None below
     except json.JSONDecodeError:
         pass  # Error handled by returning None below
-    except Exception:
-        pass  # Error handled by returning None below
 
     if forecast_data is None or "properties" not in forecast_data:
         return "Failed to retrieve detailed forecast data from NWS."
@@ -203,9 +198,6 @@ async def get_forecast_by_city(city: str, state: str) -> str:
         return f"Could not get coordinates for '{city_name}, {state_code}': The location service timed out."
     except GeocoderServiceError:
         return f"Could not get coordinates for '{city_name}, {state_code}': The location service returned an error."
-    except Exception:
-        # Catch any other unexpected errors during geocoding
-        return f"An unexpected error occurred while finding coordinates for '{city_name}, {state_code}'."
 
     # --- Handle Geocoding Result ---
     if location is None:

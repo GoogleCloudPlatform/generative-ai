@@ -38,9 +38,6 @@ async def make_cocktaildb_request(
     except httpx.RequestError as e:
         print(f"An error occurred while requesting {e.request.url!r}: {e}")
         return None
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return None
 
 
 def format_cocktail_summary(drink: Dict[str, Any]) -> str:
