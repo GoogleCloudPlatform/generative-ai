@@ -1,13 +1,11 @@
-/* global marked */ // <<<--- ADDED: Inform linter about the global 'marked' variable
-
-/* ==========================================================================
- IMPORTANT NOTE:
- For the 'fetch' command below to load the 'user_guide.md' file,
- you MUST run this HTML file from a local web server (e.g., using
- Python's `python -m http.server`, Node's `npx http-server`, or the
- Live Server extension in VS Code). Opening the HTML file directly via
- `file:///...` will likely cause a security error preventing the fetch.
- ========================================================================== */
+/**
+ * Copyright 2025 Google LLC
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ **/
 
 document.addEventListener("DOMContentLoaded", () => {
   // <<<--- MODIFIED: Removed unused 'event' parameter
