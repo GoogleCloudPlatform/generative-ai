@@ -155,16 +155,23 @@ def _create_root_agent(all_tools: Dict[str, Any]) -> LlmAgent:
     booking_agent = LlmAgent(
         model=MODEL_ID,
         name="booking_assistant",
-        instruction="Use booking_tools to handle inquiries related to booking accommodations (rooms, condos, \
-            houses, apartments, town-houses), and checking weather information. Format your response using Markdown",
+        instruction="""Use booking_tools to handle inquiries related to
+        booking accommodations (rooms, condos, houses, apartments, town-houses),
+        and checking weather information.
+        Format your response using Markdown.
+        If you don't know how to help, or none of your tools are appropriate for it,
+        call the function "agent_exit" hand over the task to other sub agent.""",
         tools=combined_booking_tools,
     )
 
     cocktail_agent = LlmAgent(
         model=MODEL_ID,
         name="cocktail_assistant",
-        instruction="Use ct_tools to handle all inquiries related to cocktails, drink recipes, ingredients, \
-            and mixology. Format your response using Markdown",
+        instruction="""Use ct_tools to handle all inquiries related to cocktails,
+        drink recipes, ingredients,and mixology.
+        Format your response using Markdown.
+        If you don't know how to help, or none of your tools are appropriate for it,
+        call the function "agent_exit" hand over the task to other sub agent.""",
         tools=ct_tools,
     )
 
