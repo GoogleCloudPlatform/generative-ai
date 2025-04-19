@@ -384,12 +384,14 @@ body {
   text-decoration: underline;
 }
 
-#message-form {
+#messageForm {
   flex-shrink: 0;
   padding: 10px 0;
   display: flex;
   gap: 10px;
   border-top: 1px solid var(--light-border-color);
+
+  /* USE VARIABLE */
 }
 
 #message {
@@ -402,9 +404,13 @@ body {
   color: var(--text-color);
 }
 
-#send-button {
+#sendButton {
   background-color: var(--accent-color);
+
+  /* USE VARIABLE */
   color: var(--accent-text-color);
+  
+  /* USE VARIABLE */
   border: none;
   padding: 8px 18px;
   border-radius: 4px;
