@@ -90,10 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Original WebSocket App Logic ---
   console.log("Initializing WebSocket application logic...");
-  const messageForm = document.getElementById("messageForm");
+  const messageForm = document.getElementById("message-form");
   const messageInput = document.getElementById("message");
   const messagesDiv = document.getElementById("messages");
-  const sendButton = document.getElementById("sendButton");
+  const sendButton = document.getElementById("send-button");
 
   if (!messageForm || !messageInput || !messagesDiv || !sendButton) {
     console.error("CRITICAL: One or more required app DOM elements not found!");

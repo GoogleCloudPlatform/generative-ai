@@ -384,7 +384,7 @@ body {
   text-decoration: underline;
 }
 
-#messageForm {
+#message-form {
   flex-shrink: 0;
   padding: 10px 0;
   display: flex;
@@ -404,12 +404,12 @@ body {
   color: var(--text-color);
 }
 
-#sendButton {
+#send-button {
   background-color: var(--accent-color);
 
   /* USE VARIABLE */
   color: var(--accent-text-color);
-  
+
   /* USE VARIABLE */
   border: none;
   padding: 8px 18px;
