@@ -159,8 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const iconSpan = document.createElement("span");
     iconSpan.classList.add("message-icon", "robot-icon");
     const robotImg = document.createElement("img");
-    // IMPORTANT: Ensure robot1.png is accessible relative to your HTML file
-    robotImg.src = "robot1.png"; // Make sure this path is correct
+    robotImg.src = "https://storage.googleapis.com/github-repo/generative-ai/gemini/mcp/adk-multiagent-app/robot1.png";
     robotImg.alt = "Agent icon";
     iconSpan.appendChild(robotImg);
 
@@ -212,8 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // server message
       iconSpan.classList.add("robot-icon");
       const robotImg = document.createElement("img");
-      // IMPORTANT: Ensure robot1.png is accessible from the HTML's location
-      robotImg.src = "robot1.png";
+      robotImg.src = "https://storage.googleapis.com/github-repo/generative-ai/gemini/mcp/adk-multiagent-app/robot1.png";
       robotImg.alt = "Agent icon";
       iconSpan.appendChild(robotImg);
 

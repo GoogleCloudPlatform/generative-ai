@@ -8,11 +8,11 @@ This document describes a web application demonstrating the integration of [Goog
 
 The application utilizes a multi-agent architecture where a root agent delegates tasks to specialized agents (Cocktail and Booking) based on the user's query. These agents then interact with corresponding MCP servers.
 
-![architecture](static/adk_multiagent.png)
+![architecture](https://storage.googleapis.com/github-repo/generative-ai/gemini/mcp/adk-multiagent-app/adk_multiagent.png)
 
 ### Application Screenshot
 
-![screenshot](static/app_screenshot.png)
+![screenshot](https://storage.googleapis.com/github-repo/generative-ai/gemini/mcp/adk-multiagent-app/app_screenshot.png)
 
 ## Core Components
 
@@ -86,10 +86,7 @@ Your_project_folder/
 ├── pyproject.toml       # Project dependencies and metadata
 ├── README.md            # This file
 ├── static/
-│   ├── adk_multiagent.png
-│   ├── app_screenshot.png
 │   ├── index.html
-│   ├── robot1.png
 │   └── user_guide.md
 └── uv.lock              # Lock file for reproducible dependencies
 

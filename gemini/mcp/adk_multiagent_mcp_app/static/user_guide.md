@@ -6,7 +6,7 @@ This chatbot demonstrates the use of the ADK Multi-Agent integrated with MCP Cli
 
 Architecture:
 
-![architecture](adk_multiagent.png)
+![architecture](https://storage.googleapis.com/github-repo/generative-ai/gemini/mcp/adk-multiagent-app/adk_multiagent.png)
 
 It has three agents: root agent, cocktail agent, and booking agent.
 
@@ -32,8 +32,8 @@ The Weather MCP server has 3 tools:
 
 The Airbnb MCP server has 2 tools:
 
-- 1.search for Airbnb listings
-- 2.get detailed information about a specific Airbnb listing
+1. search for Airbnb listings
+1. get detailed information about a specific Airbnb listing
 
 ## 2. Example questions
 
