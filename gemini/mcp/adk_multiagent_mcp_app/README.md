@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes a web application demonstrating the integration of Google's Agent Development Kit (ADK) for multi-agent orchestration with Model Context Protocol (MCP) clients. The application features a root agent coordinating tasks between specialized agents that interact with various MCP servers to fulfill user requests.
+This document describes a web application demonstrating the integration of [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/) for multi-agent orchestration with [Model Context Protocol (MCP)](https://github.com/modelcontextprotocol) clients. The application features a root agent coordinating tasks between specialized agents that interact with various MCP servers to fulfill user requests.
 
 ### Architecture
 
