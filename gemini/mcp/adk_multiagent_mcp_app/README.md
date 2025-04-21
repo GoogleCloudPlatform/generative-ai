@@ -72,7 +72,7 @@ Follow these steps to run the FastAPI application on your local machine.
 
 Ensure your project follows this structure:
 
-```bash
+```text
 Your_project_folder/
 └── adk_multiagent_mcp_app/  # App folder
 ├── Dockerfile
