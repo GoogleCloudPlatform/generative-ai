@@ -18,11 +18,11 @@ It interacts with the following MCP servers:
 
 The Cocktail MCP server has 5 tools:
 
-- 1.search cocktail by name
-- 2.list all cocktail by first letter
-- 3.search ingredient by name.
-- 4.list random cocktails
-- 5.lookup full cocktail details by ID
+1. search cocktail by name
+1. list all cocktail by first letter
+1. search ingredient by name.
+1. list random cocktails
+1. lookup full cocktail details by ID
 
 The Weather MCP server has 3 tools:
 
