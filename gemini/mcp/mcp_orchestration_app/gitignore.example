@@ -1,0 +1,34 @@
+# IDE and Editor specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment stuff
+.env
+.venv/
+venv/
+
+# Python cache/compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test results/coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Other common ignores
+*.log
+*.swp
+*~
