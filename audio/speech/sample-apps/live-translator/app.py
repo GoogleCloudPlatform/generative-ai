@@ -1,14 +1,10 @@
-import io
 import os
-import wave
 
 from google import genai
 from google.api_core.client_options import ClientOptions
 from google.cloud import texttospeech_v1beta1 as texttospeech
 from google.genai.chats import Chat
 from google.genai.types import GenerateContentConfig, Part
-import numpy as np
-import sounddevice as sd
 import streamlit as st
 
 # Initialize session state for chat history
@@ -61,50 +57,6 @@ chat = load_chat()
 tts_client = load_tts_client()
 
 
-def record_audio(duration: int, sample_rate: int) -> np.ndarray | None:
-    """Records audio from the microphone."""
-    try:
-        with st.spinner(f"Recording for {duration} seconds..."):
-            audio = sd.rec(
-                int(duration * sample_rate), samplerate=sample_rate, channels=1
-            )  # Force to mono
-            sd.wait()  # Wait until recording is finished
-        st.success("Recording complete!")
-        return audio
-    except Exception as e:  # pylint: disable=broad-except
-        st.error(f"Error during recording: {e}")
-        return None
-
-
-def get_audio_bytes(audio: np.ndarray, sample_rate: int) -> bytes | None:
-    """Converts the audio data to bytes in WAV format.
-
-    Args:
-        audio: A NumPy array representing the audio data (values typically between -1 and 1).
-        sample_rate: The sample rate of the audio data (e.g., 44100 Hz).
-
-    Returns:
-        The audio data as bytes in WAV format, or None if an error occurs.
-    """
-    try:
-        # Scale audio to 16-bit PCM range
-        audio_int16 = np.int16(audio * np.iinfo(np.int16).max)
-
-        # Use BytesIO to store WAV data in memory
-        with io.BytesIO() as buffer:
-            with wave.open(buffer, "wb") as wf:
-                # pylint: disable=no-member
-                wf.setnchannels(1)  # Mono channel
-                wf.setsampwidth(2)  # 2 bytes for 16-bit PCM
-                wf.setframerate(sample_rate)
-                wf.writeframes(audio_int16.tobytes())  # Write audio frames
-            return buffer.getvalue()
-
-    except Exception as e:  # pylint: disable=broad-except
-        st.error(f"Error converting audio to bytes: {e}")
-        return None
-
-
 def play_audio(audio_bytes: bytes) -> None:
     """Plays the audio from a byte stream."""
     if audio_bytes is not None:
@@ -144,34 +96,28 @@ def main() -> None:
         or "Spanish (Español)"
     )
 
-    duration = st.slider("Recording duration (seconds)", 1, 10, 3)  # Default 3 seconds
-    sample_rate = 44100  # Standard audio sample rate
+    audio_input = st.audio_input("Record a voice message")
 
-    if st.button("Start Recording"):
-        audio = record_audio(duration, sample_rate)
+    if audio_input:
+        user_input = Part.from_bytes(data=audio_input.getvalue(), mime_type="audio/wav")
 
-        if audio is not None:
-            audio_bytes = get_audio_bytes(audio, sample_rate)
+        instruction = f"Translate the audio into {target_language}."
 
-            user_input = Part.from_bytes(data=audio_bytes, mime_type="audio/wav")
+        assistant_response = chat.send_message(message=[instruction, user_input]).text
 
-            instruction = f"Translate the following audio into {target_language}."
+        with st.chat_message("assistant"):
+            st.markdown(assistant_response)
 
-            assistant_response = chat.send_message(
-                message=[instruction, user_input]
-            ).text
+        output_audio_bytes = generate_audio(
+            assistant_response,
+            voice_name=LANGUAGE_MAP[target_language]["voice_name"],
+            language_code=LANGUAGE_MAP[target_language]["language_code"],
+        )
 
-            with st.chat_message("assistant"):
-                st.markdown(assistant_response)
+        if output_audio_bytes:
+            play_audio(output_audio_bytes)
 
-            output_audio_bytes = generate_audio(
-                assistant_response,
-                voice_name=LANGUAGE_MAP[target_language]["voice_name"],
-                language_code=LANGUAGE_MAP[target_language]["language_code"],
-            )
-
-            if output_audio_bytes:
-                play_audio(output_audio_bytes)
+        audio_input = None
 
 
 if __name__ == "__main__":

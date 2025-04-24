@@ -1,16 +1,10 @@
 # Generative AI
 
-> NOTE: [Gemini 2.0 Flash-Lite and Gemini 2.0 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) have been released!
+> NOTE: [Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) has been released!
 >
 > Here are the latest notebooks and demos using the new models:
 >
-> - [Intro to Gemini 2.0 Pro](gemini/getting-started/intro_gemini_2_0_pro.ipynb)
-> - [Intro to Gemini 2.0 Flash-Lite](gemini/getting-started/intro_gemini_2_0_flash_lite.ipynb)
-> - [Intro to Gemini 2.0 Flash](gemini/getting-started/intro_gemini_2_0_flash.ipynb)
-> - [Intro to Multimodal Live API with Gen AI SDK](gemini/multimodal-live-api/intro_multimodal_live_api_genai_sdk.ipynb)
-> - [Intro to Gemini 2.0 Thinking](gemini/getting-started/intro_gemini_2_0_flash_thinking_mode.ipynb)
-> - [Intro to Code Execution](gemini/code-execution/intro_code_execution.ipynb)
-> - [Multimodal Live API Demo App](gemini/multimodal-live-api/websocket-demo-app/)
+> - [Intro to Gemini 2.5 Pro](gemini/getting-started/intro_gemini_2_5_pro.ipynb)
 
 <!-- markdownlint-disable MD033 -->
 
@@ -134,6 +128,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
   - [mis-ai-accelerator](https://github.com/GoogleCloudPlatform/mis-ai-accelerator)
   - [dataflow-opinion-analysis](https://github.com/GoogleCloudPlatform/dataflow-opinion-analysis)
   - [genai-beyond-basics](https://github.com/meteatamel/genai-beyond-basics)
+  - [Gemini by Example](https://geminibyexample.com)
 
 ## Contributing
 

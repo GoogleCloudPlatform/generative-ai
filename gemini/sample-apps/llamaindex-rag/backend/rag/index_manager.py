@@ -212,7 +212,7 @@ class IndexManager:
     def get_query_engine(
         self,
         prompts: Prompts,
-        llm_name: str = "gemini-1.5-flash",
+        llm_name: str = "gemini-2.0-flash",
         temperature: float = 0.0,
         similarity_top_k: int = 5,
         retrieval_strategy: str = "auto_merging",
@@ -298,7 +298,7 @@ class IndexManager:
 
         if use_node_rerank:
             reranker_llm = Vertex(
-                model="gemini-1.5-flash",
+                model="gemini-2.0-flash",
                 max_tokens=8192,
                 temperature=temperature,
                 system_prompt=prompts.system_prompt,
@@ -334,7 +334,7 @@ class IndexManager:
     def get_react_agent(
         self,
         prompts: Prompts,
-        llm_name: str = "gemini-1.5-flash",
+        llm_name: str = "gemini-2.0-flash",
         temperature: float = 0.2,
     ) -> ReActAgent:
         """

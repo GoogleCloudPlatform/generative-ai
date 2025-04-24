@@ -28,12 +28,12 @@ import warnings
 
 import nox
 
-FLAKE8_VERSION = "flake8==6.1.0"
-BLACK_VERSION = "black[jupyter]==24.8.0"
-ISORT_VERSION = "isort==5.13.2"
+FLAKE8_VERSION = "flake8==7.2.0"
+BLACK_VERSION = "black[jupyter]==25.1.0"
+ISORT_VERSION = "isort==6.0.1"
 LINT_PATHS = ["."]
 
-DEFAULT_PYTHON_VERSION = "3.10"
+DEFAULT_PYTHON_VERSION = "3.11"
 
 UNIT_TEST_PYTHON_VERSIONS: list[str] = ["3.10", "3.11", "3.12"]
 UNIT_TEST_STANDARD_DEPENDENCIES = [

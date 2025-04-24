@@ -1,0 +1,28 @@
+# Settings for Cloud Run
+runConfig:
+  minInstances: 0
+
+# Environment variables and secrets
+env:
+  # Your Client ID and Client Secret for OAuth2 - these can be found in the Google Cloud Console:
+  # https://console.cloud.google.com/apis/credentials
+  # This can be saved in source control:
+  - variable: NEXT_PUBLIC_CLIENT_ID
+    value: "CHANGE-ME"
+    availability:
+      - BUILD
+      - RUNTIME
+  # Note the client secret should be protected and NEVER checked into source control
+  - variable: CLIENT_SECRET
+    secret: CLIENT_SECRET
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # An encryption key to store tokens in Firestore
+  # This should be a 32-character string and NEVER checked into source control
+  - variable: ENCRYPTION_KEY
+    secret: ENCRYPTION_KEY
+    availability:
+      - BUILD
+      - RUNTIME
