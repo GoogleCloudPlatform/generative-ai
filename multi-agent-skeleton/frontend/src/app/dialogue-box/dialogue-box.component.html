@@ -1,0 +1,28 @@
+
+    <div class="forgot-password-container">
+        <div class="sub-parent-container">
+            <div class="heading-container">
+                <span class="heading-span">
+                    {{data?.title}}</span>
+                <button mat-icon-button class="close-button" (click)="getCallBackFunction(data?.cancelCallBackFunction)">
+                    <mat-icon class="close-icon" color="warn">close</mat-icon>
+                </button>
+            </div>
+            <div class="logo-container">
+                <mat-icon>{{data?.icon}}</mat-icon>
+            </div>
+            <div class="text-css">
+                <div class="forgot-password-subtext-container">
+                    <span> {{data?.description}}</span>
+                </div>
+            </div>
+            <div class="button-css">
+                <button class="ok-button" (click)="getCallBackFunction(data?.cancelCallBackFunction)">
+                    <span class="mat-button-wrapper"> {{data?.cancelBtnText ? data?.cancelBtnText : 'Cancel'}} </span>
+                </button>
+                <button class="login-button" *ngIf="data?.showConfirmBtn" (click)="getCallBackFunction(data?.confirmCallBackFunction)">
+                    <span class="mat-button-wrapper"> {{data?.confirmBtnText ? data.confirmBtnText : 'Ok'}} </span>
+                </button>
+            </div>
+        </div>
+    </div>
