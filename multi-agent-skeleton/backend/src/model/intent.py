@@ -2,6 +2,8 @@ from google.cloud.bigquery import SchemaField
 from pydantic import BaseModel
 from typing import List
 
+from setup import remote_agent_resource_id
+
 
 class Intent(BaseModel):
     name: str
@@ -12,6 +14,7 @@ class Intent(BaseModel):
     questions: List[str]
     status: str
     gcp_bucket: str = ""
+    remote_agent_resource_id: str
 
     def __schema__() -> List[SchemaField]:
         return [
@@ -23,8 +26,9 @@ class Intent(BaseModel):
             SchemaField("questions", "STRING", mode="REPEATED"),
             SchemaField("status", "STRING", mode="REQUIRED"),
             SchemaField("gcp_bucket", "STRING", mode="REQUIRED"),
+            SchemaField("remote_agent_resource_id", "STRING", mode="OPTIONAL"),
         ]
-    
+
     def __from_row__(row):
         return Intent(
             name=row[0],
@@ -35,6 +39,7 @@ class Intent(BaseModel):
             questions=row[5],
             status=row[6],
             gcp_bucket=row[7],
+            remote_agent_resource_id=row[8],
         )
 
     def to_dict(self):
@@ -47,15 +52,16 @@ class Intent(BaseModel):
             "status": self.status,
             "gcp_bucket": self.gcp_bucket,
         }
-    
+
     def to_insert_string(self):
         return f'"{self.name}", "{self.ai_model}", {self.ai_temperature},"{self.description}","""{self.prompt}""", {str(self.questions)}, "{self.status}", "{self.gcp_bucket}"'
 
     def is_active(self) -> bool:
         return self.status == "5"
-    
+
     def get_standard_name(self) -> str:
         return self.name.lower().replace(" ", "-").replace("_", "-")
+
 
 class CreateIntentRequest(BaseModel):
     name: str
@@ -65,6 +71,7 @@ class CreateIntentRequest(BaseModel):
     description: str
     prompt: str
     questions: List[str]
+    remote_agent_resource_id: str
 
     def to_dict(self):
         return {
@@ -75,8 +82,9 @@ class CreateIntentRequest(BaseModel):
             "description": self.description,
             "prompt": self.prompt,
             "questions": self.questions,
+            "remote_agent_resource_id": self.remote_agent_resource_id,
         }
-    
+
     def to_intent(self) -> Intent:
         return Intent(
             name=self.name,
@@ -87,4 +95,5 @@ class CreateIntentRequest(BaseModel):
             questions=self.questions,
             status="1",
             gcp_bucket=self.gcp_bucket,
+            remote_agent_resource_id=self.remote_agent_resource_id,
         )
