@@ -4,10 +4,11 @@ Main function to run FastAPI server.
 
 import asyncio
 import contextlib
+from contextlib import asynccontextmanager
 import json
 import logging
-from typing import Dict, List, Any, Optional, Tuple
-from contextlib import asynccontextmanager
+from typing import Any, Dict, List, Optional, Tuple
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
@@ -19,7 +20,6 @@ from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParamet
 from google.genai import types
 from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
-
 
 # --- Configuration & Global Setup ---
 load_dotenv()
