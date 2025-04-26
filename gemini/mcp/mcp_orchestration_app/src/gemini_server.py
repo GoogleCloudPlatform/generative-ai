@@ -1,4 +1,4 @@
-""" 
+"""
 Copyright 2025 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import nest_asyncio
-
-nest_asyncio.apply()
-import asyncio
-import json
 import logging
 import os
 
-from dotenv import load_dotenv
+import nest_asyncio
 
-# --- Hypothetical High-Level MCP Import ---
 try:
     # Using mcp server framework
-    from mcp.server.fastmcp import Context, FastMCP
+    from mcp.server.fastmcp import FastMCP
 except ImportError:
     print(
-        "Error: Failed to import a high-level MCP server class (tried 'mcp.host.MCPHost')."
+        "Error: Failed to import a high-level MCP server class "
+        "(tried 'mcp.host.MCPHost')."
     )
     print("Please check the documentation for your 'mcp' library version.")
     exit(1)
@@ -38,27 +33,29 @@ except ImportError:
 
 # --- Import Google Gen AI ---
 try:
-    # import google.generativeai as genai <- Use specific import below
-    import base64
-
     from google import genai
-    from google.api_core import (
-        exceptions as google_exceptions,
-    )  # For more specific error handling
-    from google.cloud import (
-        translate_v3 as translate,
-    )  # Import the Cloud Translation library
+    from google.api_core import exceptions as google_exceptions
+    from google.cloud import translate_v3 as translate
     from google.genai import types
 
 except ImportError:
-    print("Error: 'google-generativeai' or 'google-cloud-translate' library not found.")
-    print("Please install them: pip install google-generativeai google-cloud-translate")
+    print(
+        "Error: 'google-generativeai' or 'google-cloud-translate' "
+        "library not found."
+    )
+    print(
+        "Please install them: "
+        "pip install google-generativeai google-cloud-translate"
+    )
     exit(1)
 
-# Configure logging - Set default level higher (WARNING or ERROR)
+# Apply nest_asyncio
+nest_asyncio.apply()
+
+# Configure logging - Set default level to INFO
 logging.basicConfig(
-    level=logging.INFO,  # Set to WARNING to hide INFO messages
-    format="%(asctime)s - %(levelname)s [%(name)s] - %(message)s",  # Added logger name
+    level=logging.ERROR,
+    format="%(asctime)s - %(levelname)s [%(name)s] - %(message)s",
 )
 
 # --- Suppress Verbose Google API Logs ---
@@ -66,19 +63,21 @@ logging.basicConfig(
 logging.getLogger("google.api_core").setLevel(logging.WARNING)
 logging.getLogger("google.auth").setLevel(logging.WARNING)
 logging.getLogger("google.generativeai").setLevel(logging.WARNING)
-logging.getLogger("google.cloud").setLevel(logging.WARNING)  # Add others if needed
+logging.getLogger("google.cloud").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # --- Configuration ---
-GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "cloud-project-test")
-# Use the location from the example or environment variable
+GOOGLE_PROJECT_ID = os.environ.get(
+    "GOOGLE_CLOUD_PROJECT", "cloud-project-test"
+)
 GOOGLE_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
     logging.error(
-        "Environment variables GOOGLE_PROJECT_ID and GOOGLE_LOCATION must be set."
+        "Environment variables GOOGLE_PROJECT_ID and "
+        "GOOGLE_LOCATION must be set."
     )
     exit(1)
 
@@ -86,13 +85,12 @@ if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
 # --- Initialize Gemini Client ---
 try:
     genai_client = genai.Client(
-        vertexai=True,
-        project=GOOGLE_PROJECT_ID,
-        location=GOOGLE_LOCATION,
+        vertexai=True, project=GOOGLE_PROJECT_ID, location=GOOGLE_LOCATION
     )
     logging.info(
-        f"Gemini Client initialized for project '{GOOGLE_PROJECT_ID}' in location '{GOOGLE_LOCATION}'"
-    )  # Keep this INFO? Maybe change to debug
+        "Gemini Client initialized for project "
+        f"'{GOOGLE_PROJECT_ID}' in location '{GOOGLE_LOCATION}'"
+    )
 except Exception as e:
     logging.error(f"Failed to initialize Gemini Client: {e}")
     genai_client = None
@@ -100,7 +98,7 @@ except Exception as e:
 # --- Instantiate High-Level MCP Server ---
 try:
     mcp_host = FastMCP("gemini-complexity-server")
-except NameError:  # Handle case where MCPHost import failed silently
+except NameError:
     logging.error("MCPHost class not available. Cannot create MCP server.")
     exit(1)
 except Exception as e:
@@ -110,11 +108,22 @@ except Exception as e:
 
 # --- Common Gemini API Call Function ---
 async def call_gemini_model(model_name: str, prompt: str) -> str:
-    """Calls the specified Gemini model using the google-genai library."""
+    """Calls the specified Gemini model using the google-genai library.
+
+    Args:
+        model_name: The name of the Gemini model to call.
+        prompt: The prompt to send to the model.
+
+    Returns:
+        The text response from the Gemini model.
+
+    Raises:
+        RuntimeError: If the Gemini client is not initialized or
+        if there is an error calling the Gemini API.
+    """
     if not genai_client:
         raise RuntimeError("Gemini client not initialized.")
 
-    # Changed to debug level
     logging.debug(f"Calling model '{model_name}' for prompt: {prompt[:70]}...")
     contents = [types.Content(role="user", parts=[types.Part(text=prompt)])]
 
@@ -124,40 +133,43 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
         max_output_tokens=1024,
         response_modalities=["TEXT"],
         safety_settings=[
-            types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"),
+            types.SafetySetting(
+                category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"
+            ),
             types.SafetySetting(
                 category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="OFF"
             ),
             types.SafetySetting(
                 category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="OFF"
             ),
-            types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="OFF"),
+            types.SafetySetting(
+                category="HARM_CATEGORY_HARASSMENT", threshold="OFF"
+            ),
         ],
     )
 
     try:
         response = genai_client.models.generate_content(
-            model=model_name,  # Pass the model ID/path
-            contents=contents,
-            config=generate_content_config,  # Pass the config object
+            model=model_name, contents=contents, config=generate_content_config
         )
         if response:
             return response.text
         else:
             logging.warning(
                 f"Model '{model_name}' response candidate has no text parts."
-            )  # Keep warnings
-            return "Error: Model returned a response structure without text content."
+            )
+            return (
+                "Error: Model returned a response structure "
+                "without text content."
+            )
 
     except google_exceptions.GoogleAPIError as e:
-        logging.error(
-            f"Google API error calling model {model_name}: {e}"
-        )  # Keep errors
-        raise RuntimeError(f"Gemini API Error ({e.message or type(e).__name__})") from e
+        logging.error(f"Google API error calling model {model_name}: {e}")
+        raise RuntimeError(
+            f"Gemini API Error ({e.message or type(e).__name__})"
+        ) from e
     except Exception as e:
-        logging.exception(
-            f"Unexpected error calling model {model_name}: {e}"
-        )  # Keep errors/exceptions
+        logging.exception(f"Unexpected error calling model {model_name}: {e}")
         raise RuntimeError(
             f"Unexpected error in Gemini call ({type(e).__name__})"
         ) from e
@@ -170,7 +182,18 @@ def translate_text(
     target_language_code: str,
     source_text: str,
 ) -> str | None:
-    """Translates text using the Google Cloud Translation API."""
+    """Translates text using the Google Cloud Translation API.
+
+    Args:
+        project_id: The ID of the Google Cloud project.
+        location: The location of the project.
+        source_language_code: The language code of the source text.
+        target_language_code: The language code to translate to.
+        source_text: The text to translate.
+
+    Returns:
+        The translated text, or None if the translation failed.
+    """
     try:
         client = translate.TranslationServiceClient()
         parent = f"projects/{project_id}/locations/{location}"
@@ -197,23 +220,33 @@ def translate_text(
 # # --- Tool Definitions using Decorator ---
 @mcp_host.tool(
     name="translate_llm",
-    description="Calls this translate_llm tool for requests explicitly asking for language translation or meaning clarification of non-English text.  Ensure the text is not offensive or inappropriate.",
+    description=(
+        "Calls this translate_llm tool for requests explicitly asking "
+        "for language translation or "
+        "meaning clarification of non-English text. "
+        "Ensure the text is not offensive or inappropriate."
+    ),
 )
-async def call_translate(text: str, source_language: str, target_language: str) -> str:
-    """Executes a prompt using the Translation API."""
-    try:
-        PROJECT_ID = GOOGLE_PROJECT_ID
-        LOCATION = GOOGLE_LOCATION  # Or your specific region
-        SOURCE_LANG = source_language
-        TARGET_LANG = target_language
-        TEXT_TO_TRANSLATE = text
+async def call_translate(
+    text: str, source_language: str, target_language: str
+) -> str:
+    """Executes a prompt using the Translation API.
 
+    Args:
+        text: The text to translate.
+        source_language: The source language code.
+        target_language: The target language code.
+
+    Returns:
+        The translated text.
+    """
+    try:
         translated_result = translate_text(
-            project_id=PROJECT_ID,
-            location=LOCATION,
-            source_language_code=SOURCE_LANG,
-            target_language_code=TARGET_LANG,
-            source_text=TEXT_TO_TRANSLATE,
+            project_id=GOOGLE_PROJECT_ID,
+            location=GOOGLE_LOCATION,
+            source_language_code=source_language,
+            target_language_code=target_language,
+            source_text=text,
         )
 
         if translated_result:
@@ -223,6 +256,7 @@ async def call_translate(text: str, source_language: str, target_language: str) 
     except Exception as e:
         logging.exception("MCP Host run failed:")
         print(f"Error running MCP Host: {e}")
+        return "Error: translation failed"
 
 
 @mcp_host.tool(
@@ -230,27 +264,53 @@ async def call_translate(text: str, source_language: str, target_language: str) 
     description="Calls the Gemini 2.0 Flash Lite model for poetry prompts.",
 )
 async def call_gemini_flash_lite(prompt: str) -> str:
-    """Executes a prompt using the Gemini Pro model."""
+    """Executes a prompt using the Gemini Pro model.
+
+    Args:
+        prompt: The prompt to send to the model.
+
+    Returns:
+        The text response from the Gemini model.
+    """
     model_name = "gemini-2.0-flash-lite-001"
     return await call_gemini_model(model_name, prompt)
 
 
 @mcp_host.tool(
     name="gemini_flash_2_0",
-    description="Calls the Gemini 2.0 Flash Thinking model for prompts relating to science.",
+    description=(
+        "Calls the Gemini 2.0 Flash Thinking model "
+        "for prompts relating to science."),
 )
 async def call_gemini_flash(prompt: str) -> str:
-    """Executes a prompt using the Gemini Pro model."""
+    """Executes a prompt using the Gemini Pro model.
+
+    Args:
+        prompt: The prompt to send to the model.
+
+    Returns:
+        The text response from the Gemini model.
+    """
     model_name = "gemini-2.0-flash"
     return await call_gemini_model(model_name, prompt)
 
 
 @mcp_host.tool(
     name="gemini_pro_2_5",
-    description="Calls the Gemini 2.5 Pro Thinking model for complex prompts, code prompts, math prompts where thinking is needed.",
+    description=(
+        "Calls the Gemini 2.5 Pro Thinking model for complex prompts, "
+        "code prompts, math prompts where thinking is needed."
+    ),
 )
 async def call_gemini_pro(prompt: str) -> str:
-    """Executes a prompt using the Gemini 1.5 Pro model."""
+    """Executes a prompt using the Gemini 1.5 Pro model.
+
+    Args:
+        prompt: The prompt to send to the model.
+
+    Returns:
+        The text response from the Gemini model.
+    """
     model_name = "gemini-2.5-pro-exp-03-25"
     return await call_gemini_model(model_name, prompt)
 
@@ -259,16 +319,18 @@ async def call_gemini_pro(prompt: str) -> str:
 def main():
     """Sets up and runs the MCP server using the high-level host."""
     if not genai_client:
-        logging.error("Cannot start server: Gemini client failed to initialize.")
+        logging.error(
+            "Cannot start server: Gemini client failed to initialize."
+        )
         return
     if "mcp_host" not in globals():
         logging.error("Cannot start server: MCPHost failed to instantiate.")
         return
 
-    logging.info(f"Starting MCP server '{mcp_host.name}' with stdio transport...")
+    logging.info(
+        f"Starting MCP server '{mcp_host.name}' with stdio transport..."
+    )
     try:
-        # Call run() directly - it will start its own event loop (likely using anyio)
-        # Remove the explicit transport='stdio' argument unless required by your specific MCPHost class
         mcp_host.run()
     except Exception as e:
         logging.exception("MCP Host run failed:")
@@ -276,5 +338,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # Call the synchronous main function directly
     main()

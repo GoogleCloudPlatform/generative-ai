@@ -1,16 +1,8 @@
-# These are the core dependencies for the project.
-
-python-dotenv>=1.0.0  # For loading environment variables from a .env file
-requests>=2.31.0      # Potentially used for HTTP requests (keeping it as a dependency)
-mcp                   # The Message Channel Protocol library
-uvicorn>=0.32.1       # ASGI server for running the FastMCP application
-google-generativeai>=0.5.0 # Client library for accessing Google's generative AI models (older version)
-google-cloud-aiplatform # Client library for Google Cloud AI Platform (might be redundant with google-genai)
-google-genai          # Newer client library for Google's generative AI models (recommended)
-#spacy                 # Library for advanced Natural Language Processing
-nest_asyncio          # For running asyncio event loops within other event loops (likely needed by MCP)
-google-cloud-translate # Client library for Google Cloud Translation API
-
-# To use spaCy, you need to download a language model.
-# You would typically do this after installing requirements:
-# python -m spacy download en_core_web_sm
+python-dotenv>=1.0.0  
+requests>=2.31.0      
+mcp                  
+uvicorn>=0.32.1       
+google-genai         
+#spacy                 
+nest_asyncio         
+google-cloud-translate
