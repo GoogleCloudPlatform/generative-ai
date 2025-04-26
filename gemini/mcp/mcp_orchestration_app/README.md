@@ -4,6 +4,12 @@ Welcome to an exciting exploration of how we can harness the power of Google's c
 
 This cost-effective AI solution uses an MCP server-client architecture where affordable Gemini models act as clients and specialized models as servers, offering developers powerful yet affordable options for specific use cases.
 
+## Authors
+
+| Authors |
+| --- |
+| [KC Ayyagari](https://github.com/krishchyt) |
+| [Para S](https://github.com/paraluke23) |
 
 ## The Vision: Bridging the Gap with MCP
 
