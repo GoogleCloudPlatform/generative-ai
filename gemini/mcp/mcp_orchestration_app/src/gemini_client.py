@@ -340,8 +340,8 @@ class LLMClient:
 
         Args:
             model_name: The name of the LLM model.
-            project: The GCP project ID.
-            location: The GCP location.
+            project: The Google Cloud project ID.
+            location: The Google Cloud location.
         """
         self.model_name: str = model_name
         self.project: str = project
