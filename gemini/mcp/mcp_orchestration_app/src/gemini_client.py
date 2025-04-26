@@ -195,7 +195,7 @@ class Server:
 
     async def execute_tool(
         self,
-        tool_name: str,
+        tool_name: Optional[str],
         arguments: Dict[str, Any],
         retries: int = 1,
         delay: float = 1.0,
