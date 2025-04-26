@@ -59,6 +59,7 @@ Ready to get your hands dirty? Here's a step-by-step guide to setting up your lo
 5. **Reauthenticate gcloud if needed:**
     ```
     gcloud auth application-default login
+    gcloud auth application-default set-quota-project <your-google-cloud-project-id>
     ```
 6. **Enable Google Cloud APIs**
 

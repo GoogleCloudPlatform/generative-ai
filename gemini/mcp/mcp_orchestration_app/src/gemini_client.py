@@ -266,7 +266,7 @@ class Server:
     async def cleanup(self) -> None:
         """Clean up server resources."""
         async with self._cleanup_lock:
-            if self.session or self.exit_stack._exit_callbacks:
+            if self.session:
                 logging.debug(f"Cleaning up server {self.name}...")
                 try:
                     await self.exit_stack.aclose()
@@ -505,7 +505,7 @@ class LLMClient:
             )
             return None
 
-    def get_response(self, current_messages: List[Dict[str, str]]) -> str:
+    def get_response(self, current_message: str) -> str:
         """
         Sends the current conversation history to the LLM and
             returns the response text.
@@ -531,13 +531,13 @@ class LLMClient:
         if not self._client:  # Should be initialized if session exists
             raise ConnectionError("LLM Client not initialized.")
 
-        logging.debug(f"Sending messages to LLM: {current_messages}")
+        logging.debug(f"Sending messages to LLM: {current_message}")
         logging.debug(f"Using generation config: {self._generation_config}")
 
         try:
             # Pass generation_config if it's set
             response = self._chat_session.send_message(
-                current_messages,  # Pass the whole history
+                current_message  # Pass the whole history
             )
 
             response_text = response.text
@@ -740,7 +740,7 @@ class ChatSession:
             return False
 
     async def _execute_tool_and_get_result(
-        self, tool_name: str, arguments: Dict[str, Any]
+        self, tool_name: Optional[str], arguments: Dict[str, Any]
     ) -> str:
         """Finds the correct server and executes the tool.
 

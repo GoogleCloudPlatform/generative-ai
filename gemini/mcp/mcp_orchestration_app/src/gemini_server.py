@@ -316,7 +316,7 @@ async def call_gemini_pro(prompt: str) -> str:
 
 
 # --- Main Execution Function (Now Synchronous) ---
-def main():
+def main() -> None:
     """Sets up and runs the MCP server using the high-level host."""
     if not genai_client:
         logging.error(
