@@ -16,38 +16,14 @@ limitations under the License.
 
 import logging
 import os
+import sys
 
 import nest_asyncio
-
-try:
-    # Using mcp server framework
-    from mcp.server.fastmcp import FastMCP
-except ImportError:
-    print(
-        "Error: Failed to import a high-level MCP server class "
-        "(tried 'mcp.host.MCPHost')."
-    )
-    print("Please check the documentation for your 'mcp' library version.")
-    exit(1)
-
-
-# --- Import Google Gen AI ---
-try:
-    from google import genai
-    from google.api_core import exceptions as google_exceptions
-    from google.cloud import translate_v3 as translate
-    from google.genai import types
-
-except ImportError:
-    print(
-        "Error: 'google-generativeai' or 'google-cloud-translate' "
-        "library not found."
-    )
-    print(
-        "Please install them: "
-        "pip install google-generativeai google-cloud-translate"
-    )
-    exit(1)
+from mcp.server.fastmcp import FastMCP
+from google import genai
+from google.api_core import exceptions as google_exceptions
+from google.cloud import translate_v3 as translate
+from google.genai import types
 
 # Apply nest_asyncio
 nest_asyncio.apply()
@@ -84,7 +60,7 @@ if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
 
 # --- Initialize Gemini Client ---
 try:
-    genai_client = genai.Client(
+    GENAI_CLIENT = genai.Client(
         vertexai=True, project=GOOGLE_PROJECT_ID, location=GOOGLE_LOCATION
     )
     logging.info(
@@ -93,17 +69,17 @@ try:
     )
 except Exception as e:
     logging.error(f"Failed to initialize Gemini Client: {e}")
-    genai_client = None
+    GENAI_CLIENT = None
 
 # --- Instantiate High-Level MCP Server ---
 try:
     mcp_host = FastMCP("gemini-complexity-server")
 except NameError:
     logging.error("MCPHost class not available. Cannot create MCP server.")
-    exit(1)
+    sys.exit(1)
 except Exception as e:
     logging.error(f"Failed to instantiate MCPHost: {e}")
-    exit(1)
+    sys.exit(1)
 
 
 # --- Common Gemini API Call Function ---
@@ -121,7 +97,7 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
         RuntimeError: If the Gemini client is not initialized or
         if there is an error calling the Gemini API.
     """
-    if not genai_client:
+    if not GENAI_CLIENT:
         raise RuntimeError("Gemini client not initialized.")
 
     logging.debug(f"Calling model '{model_name}' for prompt: {prompt[:70]}...")
@@ -149,7 +125,7 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
     )
 
     try:
-        response = genai_client.models.generate_content(
+        response = GENAI_CLIENT.models.generate_content(
             model=model_name, contents=contents, config=generate_content_config
         )
         if response:
@@ -318,7 +294,7 @@ async def call_gemini_pro(prompt: str) -> str:
 # --- Main Execution Function (Now Synchronous) ---
 def main() -> None:
     """Sets up and runs the MCP server using the high-level host."""
-    if not genai_client:
+    if not GENAI_CLIENT:
         logging.error(
             "Cannot start server: Gemini client failed to initialize."
         )

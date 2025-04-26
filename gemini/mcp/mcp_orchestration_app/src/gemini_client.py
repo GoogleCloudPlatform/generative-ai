@@ -29,17 +29,9 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-# --- Corrected MCP Client Imports ---
-try:
-    # Ensure MCP library is installed: pip install mcp
-    from mcp import ClientSession, StdioServerParameters
-    from mcp.client.stdio import stdio_client
-
-except ImportError:
-    print("Error: Failed to import MCP client components.")
-    print("Please check the documentation for your 'mcp' library version.")
-    exit(1)
-
+# Ensure MCP library is installed: pip install mcp
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
 
 # Configure logging - Set default level to INFO
 # Change to logging.WARNING or logging.ERROR to hide more messages
