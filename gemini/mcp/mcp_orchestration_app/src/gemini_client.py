@@ -125,10 +125,50 @@ class Server:
             await session.initialize()
             self.session = session
             logging.info(f"Server '{self.name}' initialized successfully.")
-        except Exception as e:
-            logging.error(f"Error initializing server {self.name}: {e}")
+        # Errors during subprocess creation
+        # (by stdio_client or underlying OS calls)
+        except FileNotFoundError as e:
+            # This could occur if 'command' (python)
+            # is somehow not found despite shutil.which,
+            # or if mcp internals try to access
+            # a file that doesn't exist based on params.
+            logging.error(
+                f"Error initializing server {self.name}: "
+                "Command or script file not found. "
+                f"Command: {command}, Script: {server_script_path}. "
+                f"Error: {e}"
+            )
             await self.cleanup()
             raise
+        except PermissionError as e:
+            # Insufficient permissions to execute the
+            # python interpreter or the script.
+            logging.error(
+                f"Error initializing server {self.name}: "
+                "Permission denied for "
+                f"command '{command}' or script"
+                f" '{server_script_path}'. Error: {e}"
+            )
+            await self.cleanup()
+            raise
+        # Pipe/Connection errors if the server
+        # process dies unexpectedly or closes streams
+        except (BrokenPipeError,
+                ConnectionResetError,
+                EOFError) as e:
+            logging.error(
+                f"Error initializing server {self.name}: "
+                "Communication pipe broken, connection reset, or EOF. "
+                f"The server process for '{server_script_path}' "
+                "may have crashed or exited prematurely. "
+                f"Error: {type(e).__name__}: {e}"
+            )
+            await self.cleanup()
+            raise
+        # except Exception as e:
+        #     logging.error(f"Error initializing server {self.name}: {e}")
+        #     await self.cleanup()
+        #     raise
 
     async def list_tools(self) -> List["Tool"]:
         """List available tools from the server.
@@ -207,6 +247,19 @@ class Server:
         if not self.session:
             raise RuntimeError(f"Server {self.name} not initialized")
 
+        RETRYABLE_CALL_EXCEPTIONS = (
+            # General async timeout
+            asyncio.TimeoutError,
+            # Stdio pipe broke, server might have crashed
+            BrokenPipeError,
+            # Stdio pipe reset
+            ConnectionResetError,
+            # Stdio stream ended unexpectedly
+            EOFError,
+            # --- Add MCP-specific exceptions
+            # (check mcp documentation!) ---
+        )
+
         attempt = 0
         last_exception = None
         while attempt < retries + 1:
@@ -230,13 +283,14 @@ class Server:
                         f"{progress}/{total} ({percentage:.1f}%)")
                 return result
 
-            except Exception as e:
+            except RETRYABLE_CALL_EXCEPTIONS as e:
                 last_exception = e
                 attempt += 1
                 logging.warning(
-                    f"Error executing tool {tool_name} "
-                    f"on server {self.name}: {e}. "
-                    f"Attempt {attempt} of {retries + 1}."
+                    f"Error during tool {tool_name} "
+                    f"execution on server {self.name} "
+                    f"(Attempt {attempt} of {retries + 1}): "
+                    f"{type(e).__name__}: {e}."
                 )
                 if attempt < retries + 1:
                     logging.debug(f"Retrying in {delay} seconds...")
@@ -344,27 +398,21 @@ class LLMClient:
     def _initialize_client(self) -> None:
         """Initializes the Gen AI client if not already done."""
         if not self._client:
-            try:
-                default_api_error = (
-                    "--Missing API Key. "
-                    "Add API key here or in .env file. "
-                    "Use Secret Manager for production.--"
-                )
-                self._client = genai.Client(
-                    vertexai=False,
-                    # project=self.project,
-                    # location=self.location,
-                    api_key=os.getenv("GOOGLE_API_KEY", default_api_error),
-                )
-                logging.info(
-                    f"Gen AI client initialized for project "
-                    f"'{self.project}' in '{self.location}'."
-                )
-            except Exception as e:
-                logging.exception("Failed to initialize Gen AI client.")
-                raise ConnectionError(
-                    "Could not initialize connection to the LLM service."
-                ) from e
+            default_api_error = (
+                "--Missing API Key. "
+                "Add API key here or in .env file. "
+                "Use Secret Manager for production.--"
+            )
+            self._client = genai.Client(
+                vertexai=False,
+                # project=self.project,
+                # location=self.location,
+                api_key=os.getenv("GOOGLE_API_KEY", default_api_error),
+            )
+            logging.info(
+                f"Gen AI client initialized for project "
+                f"'{self.project}' in '{self.location}'."
+            )
 
     def set_generation_config(self,
                               config: types.GenerateContentConfig) -> None:
@@ -471,12 +519,12 @@ class LLMClient:
                     "validated tool call structure."
                 )
                 return loaded_json
-            else:
-                logging.debug(
-                    "Parsed JSON but it does not "
-                    "match expected tool call structure."
-                )
-                return None  # Not a valid tool call structure
+
+            logging.debug(
+                "Parsed JSON but it does not "
+                "match expected tool call structure."
+            )
+            return None  # Not a valid tool call structure
         except json.JSONDecodeError as e:
             logging.warning(
                 f"Error decoding JSON: {e}. String was: >>>{json_string}<<<"
@@ -716,7 +764,7 @@ class ChatSession:
                               f"during preparation:{e}")
             return False
 
-    async def _execute_tool_and_get_result(
+    async def _run_tool_and_get_result(
         self, tool_name: Optional[str], arguments: Dict[str, Any]
     ) -> str:
         """Finds the correct server and executes the tool.
@@ -747,11 +795,13 @@ class ChatSession:
             result = await self.gemini_server.execute_tool(tool_name,
                                                            arguments)
 
-            # Format the result for the LLM. Simple string conversion for now.
+            # Format the result for the LLM.
+            # Simple string conversion for now.
             # Could be JSON stringified if the result is complex.
-            result_str = (
-                json.dumps(result) if isinstance(result, (dict, list)) else str(result)
-            )
+            if isinstance(result, (dict, list)):
+                result_str = json.dumps(result)
+            else:
+                result_str = str(result)
             logging.info(
                 f"Tool '{tool_name}' execution "
                 f"successful. Result: {result_str}"
@@ -811,7 +861,7 @@ class ChatSession:
                     )
 
                     # 5. Execute the tool
-                    tool_result_content = await self._execute_tool_and_get_result(
+                    tool_result_content = await self._run_tool_and_get_result(
                         tool_name, arguments
                     )
 
@@ -830,7 +880,8 @@ class ChatSession:
                     # 7. Get the LLM's final response
                     # summarizing the tool result
                     logging.debug("Asking LLM to process tool result...")
-                    final_response = self.llm_client.get_response(tool_result_content)
+                    final_response = self.llm_client.get_response(
+                        tool_result_content)
 
                     # 8. Add final assistant response to history
                     self.messages.append(
@@ -867,7 +918,9 @@ class ChatSession:
                 )
                 break  # Exit loop on connection errors
             except Exception as e:
-                logging.exception("An unexpected error occurred in the main chat loop:")
+                logging.exception(
+                    "An unexpected error occurred "
+                    "in the main chat loop:")
                 print(
                     f"Assistant: Sorry, an unexpected error occurred ({e}). "
                     "Please try again."
@@ -891,12 +944,12 @@ async def main() -> None:
     except (FileNotFoundError, json.JSONDecodeError) as e:
         logging.error(f"Failed to load configuration: {e}. Exiting.")
         return
-    except Exception as e:
-        logging.error(f"Error during initial configuration loading: {e}. Exiting.")
-        return
 
     gemini_server_config_data = server_configs.get("geminiServer")
-    if not gemini_server_config_data or "config" not in gemini_server_config_data:
+    if (
+        not gemini_server_config_data
+        or "config" not in gemini_server_config_data
+    ):
         logging.error(
             "Configuration for 'geminiServer' is missing "
             "or incomplete in servers_config.json"
@@ -916,25 +969,23 @@ async def main() -> None:
     )  # Default model, more flexible
 
     # --- Initialize Components ---
-    try:
-        gemini_server = Server(
-            gemini_server_config_data.get("name", "gemini_llm_server"),
-            gemini_server_config_data["config"],
-        )
 
-        llm_client = LLMClient(
-            model_name=llm_model, project=llm_project, location=llm_location
-        )
+    gemini_server = Server(
+        gemini_server_config_data.get("name", "gemini_llm_server"),
+        gemini_server_config_data["config"],
+    )
 
-        # --- Start Chat ---
-        chat_session = ChatSession(gemini_server, llm_client)
-        await chat_session.start()
+    llm_client = LLMClient(
+        model_name=llm_model, project=llm_project, location=llm_location
+    )
 
-    except Exception as e:
-        logging.error(f"Failed to initialize components or start chat session: {e}")
-        # Perform cleanup if possible, although server might not be initialized
-        if "gemini_server" in locals() and gemini_server.session:
-            await gemini_server.cleanup()
+    # --- Start Chat ---
+    chat_session = ChatSession(gemini_server, llm_client)
+    await chat_session.start()
+
+    # Perform cleanup if possible, although server might not be initialized
+    if "gemini_server" in locals() and gemini_server.session:
+        await gemini_server.cleanup()
 
 
 if __name__ == "__main__":
