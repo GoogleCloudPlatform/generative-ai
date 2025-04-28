@@ -10,5 +10,5 @@ This is often useful for disabling specific functionalities in Jupyter Notebooks
 
 ## Usage
 
-1.  **Save the script:** Save the provided script as `check_and_comment.sh`.
-2.  **add script to step in pipeline:**
+1. **Save the script:** Save the provided script as `check_and_comment.sh`.
+2. **add script to step in pipeline:**

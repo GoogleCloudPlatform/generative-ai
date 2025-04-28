@@ -24,10 +24,10 @@ The script aims to:
 
 ## Usage
 
-1.  **Prepare Variable in secreate manager:** Create the following values in secret manager
-    - `PROJECT_ID`: Your Google Cloud Project ID.
-    - `REGION`: The Google Cloud region to use.
-    - `SA`: The service account to use for the executions.
-    - `OUTPUT_URI`: The GCS URI for storing execution outputs (e.g., `gs://your-bucket`).
-    - `NOTEBOOK_RUNTIME_TEMPLATE`: The full resource name of your Notebook Runtime Template.
-2.  **Add to your pipeline:**
+1. **Prepare Variable in secret manager:** Create the following values in secret manager
+   - `PROJECT_ID`: Your Google Cloud Project ID.
+   - `REGION`: The Google Cloud region to use.
+   - `SA`: The service account to use for the executions.
+   - `OUTPUT_URI`: The GCS URI for storing execution outputs (e.g., `gs://your-bucket`).
+   - `NOTEBOOK_RUNTIME_TEMPLATE`: The full resource name of your Notebook Runtime Template.
+2. **Add to your pipeline:**

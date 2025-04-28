@@ -13,6 +13,6 @@ The script aims to:
 
 ## Usage
 
-1.  **Save the script:** Save the provided Python script as `lint_notebooks.py`.
-2.  **Ensure Python Environment:** Make sure you have pull down a python container in your cloud-build file.
-3.  **Add script to pipeline:**
+1. **Save the script:** Save the provided Python script as `lint_notebooks.py`.
+2. **Ensure Python Environment:** Make sure you have pull down a python container in your cloud-build file.
+3. **Add script to pipeline:**
