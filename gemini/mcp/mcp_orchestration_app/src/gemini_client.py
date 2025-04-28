@@ -16,12 +16,12 @@ limitations under the License.
 """
 
 import asyncio
+from contextlib import AsyncExitStack
 import json
 import logging
 import os
 import re
 import shutil
-from contextlib import AsyncExitStack
 from typing import Any, Dict, List, Optional
 
 # Import necessary MCP components (ensure 'mcp' is installed)
@@ -102,9 +102,7 @@ class Server:
             )
         server_script_path = self.config.get("script_path")
         if not server_script_path:
-            raise ValueError(
-                f"Server config for '{self.name}' missing 'script_path'"
-            )
+            raise ValueError(f"Server config for '{self.name}' missing 'script_path'")
 
         server_params = StdioServerParameters(
             command=command,
@@ -154,8 +152,7 @@ class Server:
                 tool_spec_list = item[1]
                 if not isinstance(tool_spec_list, list):
                     logging.warning(
-                        f"Expected a list of tools, "
-                        f"but got: {type(tool_spec_list)}"
+                        f"Expected a list of tools, " f"but got: {type(tool_spec_list)}"
                     )
                     continue
 
@@ -180,9 +177,7 @@ class Server:
                             f"spec object: {tool_spec}"
                         )
 
-        logging.debug(
-            f"Parsed tools: {[t.name for t in tools]}"
-        )  # Added debug log
+        logging.debug(f"Parsed tools: {[t.name for t in tools]}")  # Added debug log
         return tools
 
     async def execute_tool(
@@ -228,9 +223,7 @@ class Server:
                     progress = result["progress"]
                     total = result["total"]
                     percentage = (progress / total) * 100 if total else 0
-                    logging.debug(
-                        f"Progress: {progress}/{total} ({percentage:.1f}%)"
-                    )
+                    logging.debug(f"Progress: {progress}/{total} ({percentage:.1f}%)")
                 return result
 
             except Exception as e:
@@ -266,9 +259,7 @@ class Server:
                     self.stdio_context = None
                     logging.debug(f"Server {self.name} cleaned up.")
                 except Exception as e:
-                    logging.error(
-                        f"Error during cleanup of server {self.name}: {e}"
-                    )
+                    logging.error(f"Error during cleanup of server {self.name}: {e}")
 
 
 # --- Tool Class (Simple local representation) ---
@@ -303,7 +294,7 @@ class Tool:
         required_args = self.input_schema.get("required", [])
 
         for param_name, param_info in properties.items():
-            description = param_info.get('description', 'No description')
+            description = param_info.get("description", "No description")
             arg_desc = f"- {param_name}: {description}"
             if param_name in required_args:
                 arg_desc += " (required)"
@@ -356,10 +347,7 @@ class LLMClient:
                     vertexai=False,
                     # project=self.project,
                     # location=self.location,
-                    api_key=os.getenv(
-                        "GOOGLE_API_KEY",
-                        default_api_error
-                    ),
+                    api_key=os.getenv("GOOGLE_API_KEY", default_api_error),
                 )
                 logging.info(
                     f"Gen AI client initialized for project "
@@ -371,9 +359,7 @@ class LLMClient:
                     "Could not initialize connection to the LLM service."
                 ) from e
 
-    def set_generation_config(
-        self, config: types.GenerateContentConfig
-    ) -> None:
+    def set_generation_config(self, config: types.GenerateContentConfig) -> None:
         """Sets the generation configuration for subsequent calls.
 
         Args:
@@ -393,15 +379,11 @@ class LLMClient:
                 if the chat session cannot be created.
         """
         self._initialize_client()  # Ensure client is ready
-        if (
-            not self._client
-        ):
+        if not self._client:
             raise ConnectionError("LLM Client not initialized.")
 
         try:
-            self._chat_session = self._client.chats.create(
-                model=self.model_name
-            )
+            self._chat_session = self._client.chats.create(model=self.model_name)
             self._chat_session.send_message(system_instruction)
             logging.info(
                 "LLM chat session initialized."
@@ -433,16 +415,12 @@ class LLMClient:
         """
         # Regex to find ```json ... ``` block
         # Using non-greedy matching .*? for the content
-        match = re.search(
-            r"```json\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE
-        )
+        match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
         json_string = None
 
         if match:
             json_string = match.group(1).strip()
-            logging.debug(
-                f"Extracted JSON string from ```json block:\n{json_string}"
-            )
+            logging.debug(f"Extracted JSON string from ```json block:\n{json_string}")
         else:
             # Fallback: If no ```json block, maybe the entire text is the JSON?
             # Be cautious with this, might parse unintended text.
@@ -476,14 +454,12 @@ class LLMClient:
                 and "arguments" in loaded_json
             ):
                 logging.debug(
-                    "Successfully parsed JSON and "
-                    "validated tool call structure."
+                    "Successfully parsed JSON and " "validated tool call structure."
                 )
                 return loaded_json
             else:
                 logging.debug(
-                    "Parsed JSON but it does not "
-                    "match expected tool call structure."
+                    "Parsed JSON but it does not " "match expected tool call structure."
                 )
                 return None  # Not a valid tool call structure
         except json.JSONDecodeError as e:
@@ -492,9 +468,7 @@ class LLMClient:
             )
             return None
         except Exception as e:  # Catch other potential errors during loading
-            logging.error(
-                f"An unexpected error occurred during JSON parsing: {e}"
-            )
+            logging.error(f"An unexpected error occurred during JSON parsing: {e}")
             return None
 
     def get_response(self, current_message: str) -> str:
@@ -540,9 +514,7 @@ class LLMClient:
             logging.exception("Error during LLM API call.")
             # More specific error handling could be added here
             # based on google.genai exceptions
-            raise ConnectionError(
-                f"Failed to get response from LLM: {e}"
-            ) from e
+            raise ConnectionError(f"Failed to get response from LLM: {e}") from e
 
 
 # --- Chat Session (Orchestrates interaction - Cleaned) ---
@@ -550,8 +522,7 @@ class ChatSession:
     """Orchestrates the interaction between user
     and Gemini tools via MCP server."""
 
-    def __init__(self, gemini_server: Server,
-                 llm_client: LLMClient) -> None:
+    def __init__(self, gemini_server: Server, llm_client: LLMClient) -> None:
         """Initializes the ChatSession instance.
 
         Args:
@@ -572,15 +543,12 @@ class ChatSession:
         """Clean up the Gemini server properly."""
         # Adjusted to only clean the single gemini_server
         if self.gemini_server:
-            logging.info(
-                f"Cleaning up server: {self.gemini_server.name}"
-            )
+            logging.info(f"Cleaning up server: {self.gemini_server.name}")
             try:
                 await self.gemini_server.cleanup()
             except Exception as e:
                 logging.warning(
-                    "Warning during server cleanup "
-                    f"({self.gemini_server.name}): {e}"
+                    "Warning during server cleanup " f"({self.gemini_server.name}): {e}"
                 )
 
     async def _prepare_llm(self) -> bool:
@@ -655,17 +623,16 @@ class ChatSession:
                 "starting 'As per tool-name': \n\n"
             )
             final_constraint = (
-                "Please use only the tools that "
-                "are explicitly defined above."
+                "Please use only the tools that " "are explicitly defined above."
             )
 
             system_instruction_content = (
-                introduction +
-                tool_format_instruction +
-                post_tool_processing +
-                translate_llm_instruction +
-                tool_response_prefix +
-                final_constraint
+                introduction
+                + tool_format_instruction
+                + post_tool_processing
+                + translate_llm_instruction
+                + tool_response_prefix
+                + final_constraint
             )
 
             # 5. Define Generation Configuration
@@ -676,8 +643,7 @@ class ChatSession:
                 response_modalities=["TEXT"],
                 safety_settings=[
                     types.SafetySetting(
-                        category="HARM_CATEGORY_HATE_SPEECH",
-                        threshold="OFF"
+                        category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"
                     ),
                     types.SafetySetting(
                         category="HARM_CATEGORY_DANGEROUS_CONTENT",
@@ -688,8 +654,7 @@ class ChatSession:
                         threshold="OFF",
                     ),
                     types.SafetySetting(
-                        category="HARM_CATEGORY_HARASSMENT",
-                        threshold="OFF"
+                        category="HARM_CATEGORY_HARASSMENT", threshold="OFF"
                     ),
                 ],
             )
@@ -726,9 +691,7 @@ class ChatSession:
             logging.error(f"Initialization failed: {e}")
             return False
         except Exception as e:
-            logging.exception(
-                f"An unexpected error occurred during preparation:{e}"
-            )
+            logging.exception(f"An unexpected error occurred during preparation:{e}")
             return False
 
     async def _execute_tool_and_get_result(
@@ -744,9 +707,7 @@ class ChatSession:
             The result of the tool execution or an error message.
         """
         # Simplified: Assumes the single gemini_server has the tool if listed
-        tool_exists = any(
-            tool.name == tool_name for tool in self.available_tools
-        )
+        tool_exists = any(tool.name == tool_name for tool in self.available_tools)
 
         if not tool_exists:
             error_msg = (
@@ -756,25 +717,18 @@ class ChatSession:
             logging.error(error_msg)
             return error_msg  # Return error message for LLM
 
-        logging.info(
-            f"Executing tool: {tool_name} with arguments: {arguments}"
-        )
+        logging.info(f"Executing tool: {tool_name} with arguments: {arguments}")
         try:
             # Use the gemini_server instance directly
-            result = await self.gemini_server.execute_tool(
-                tool_name, arguments
-            )
+            result = await self.gemini_server.execute_tool(tool_name, arguments)
 
             # Format the result for the LLM. Simple string conversion for now.
             # Could be JSON stringified if the result is complex.
             result_str = (
-                json.dumps(result)
-                if isinstance(result, (dict, list))
-                else str(result)
+                json.dumps(result) if isinstance(result, (dict, list)) else str(result)
             )
             logging.info(
-                f"Tool '{tool_name}' execution "
-                f"successful. Result: {result_str}"
+                f"Tool '{tool_name}' execution " f"successful. Result: {result_str}"
             )
             return result_str  # Return result string for LLM
 
@@ -831,10 +785,8 @@ class ChatSession:
                     )
 
                     # 5. Execute the tool
-                    tool_result_content = (
-                        await self._execute_tool_and_get_result(
-                            tool_name, arguments
-                        )
+                    tool_result_content = await self._execute_tool_and_get_result(
+                        tool_name, arguments
                     )
 
                     # 6. Add tool result to history
@@ -852,9 +804,7 @@ class ChatSession:
                     # 7. Get the LLM's final response
                     # summarizing the tool result
                     logging.debug("Asking LLM to process tool result...")
-                    final_response = self.llm_client.get_response(
-                       tool_result_content
-                    )
+                    final_response = self.llm_client.get_response(tool_result_content)
 
                     # 8. Add final assistant response to history
                     self.messages.append(
@@ -891,9 +841,7 @@ class ChatSession:
                 )
                 break  # Exit loop on connection errors
             except Exception as e:
-                logging.exception(
-                    "An unexpected error occurred in the main chat loop:"
-                )
+                logging.exception("An unexpected error occurred in the main chat loop:")
                 print(
                     f"Assistant: Sorry, an unexpected error occurred ({e}). "
                     "Please try again."
@@ -918,16 +866,11 @@ async def main() -> None:
         logging.error(f"Failed to load configuration: {e}. Exiting.")
         return
     except Exception as e:
-        logging.error(
-            f"Error during initial configuration loading: {e}. Exiting."
-        )
+        logging.error(f"Error during initial configuration loading: {e}. Exiting.")
         return
 
     gemini_server_config_data = server_configs.get("geminiServer")
-    if (
-        not gemini_server_config_data
-        or "config" not in gemini_server_config_data
-    ):
+    if not gemini_server_config_data or "config" not in gemini_server_config_data:
         logging.error(
             "Configuration for 'geminiServer' is missing "
             "or incomplete in servers_config.json"
@@ -962,9 +905,7 @@ async def main() -> None:
         await chat_session.start()
 
     except Exception as e:
-        logging.error(
-            f"Failed to initialize components or start chat session: {e}"
-        )
+        logging.error(f"Failed to initialize components or start chat session: {e}")
         # Perform cleanup if possible, although server might not be initialized
         if "gemini_server" in locals() and gemini_server.session:
             await gemini_server.cleanup()

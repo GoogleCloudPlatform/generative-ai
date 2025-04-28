@@ -6,4 +6,3 @@ google-genai
 #spacy                 
 nest_asyncio         
 google-cloud-translate
-nox

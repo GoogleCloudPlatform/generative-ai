@@ -18,12 +18,12 @@ import logging
 import os
 import sys
 
-import nest_asyncio
-from mcp.server.fastmcp import FastMCP
 from google import genai
 from google.api_core import exceptions as google_exceptions
 from google.cloud import translate_v3 as translate
 from google.genai import types
+from mcp.server.fastmcp import FastMCP
+import nest_asyncio
 
 # Apply nest_asyncio
 nest_asyncio.apply()
@@ -45,15 +45,12 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # --- Configuration ---
-GOOGLE_PROJECT_ID = os.environ.get(
-    "GOOGLE_CLOUD_PROJECT", "cloud-project-test"
-)
+GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "cloud-project-test")
 GOOGLE_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
     logging.error(
-        "Environment variables GOOGLE_PROJECT_ID and "
-        "GOOGLE_LOCATION must be set."
+        "Environment variables GOOGLE_PROJECT_ID and " "GOOGLE_LOCATION must be set."
     )
     exit(1)
 
@@ -109,18 +106,14 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
         max_output_tokens=1024,
         response_modalities=["TEXT"],
         safety_settings=[
-            types.SafetySetting(
-                category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"
-            ),
+            types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"),
             types.SafetySetting(
                 category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="OFF"
             ),
             types.SafetySetting(
                 category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="OFF"
             ),
-            types.SafetySetting(
-                category="HARM_CATEGORY_HARASSMENT", threshold="OFF"
-            ),
+            types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="OFF"),
         ],
     )
 
@@ -134,16 +127,11 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
             logging.warning(
                 f"Model '{model_name}' response candidate has no text parts."
             )
-            return (
-                "Error: Model returned a response structure "
-                "without text content."
-            )
+            return "Error: Model returned a response structure " "without text content."
 
     except google_exceptions.GoogleAPIError as e:
         logging.error(f"Google API error calling model {model_name}: {e}")
-        raise RuntimeError(
-            f"Gemini API Error ({e.message or type(e).__name__})"
-        ) from e
+        raise RuntimeError(f"Gemini API Error ({e.message or type(e).__name__})") from e
     except Exception as e:
         logging.exception(f"Unexpected error calling model {model_name}: {e}")
         raise RuntimeError(
@@ -203,9 +191,7 @@ def translate_text(
         "Ensure the text is not offensive or inappropriate."
     ),
 )
-async def call_translate(
-    text: str, source_language: str, target_language: str
-) -> str:
+async def call_translate(text: str, source_language: str, target_language: str) -> str:
     """Executes a prompt using the Translation API.
 
     Args:
@@ -255,8 +241,8 @@ async def call_gemini_flash_lite(prompt: str) -> str:
 @mcp_host.tool(
     name="gemini_flash_2_0",
     description=(
-        "Calls the Gemini 2.0 Flash Thinking model "
-        "for prompts relating to science."),
+        "Calls the Gemini 2.0 Flash Thinking model " "for prompts relating to science."
+    ),
 )
 async def call_gemini_flash(prompt: str) -> str:
     """Executes a prompt using the Gemini Pro model.
@@ -295,17 +281,13 @@ async def call_gemini_pro(prompt: str) -> str:
 def main() -> None:
     """Sets up and runs the MCP server using the high-level host."""
     if not GENAI_CLIENT:
-        logging.error(
-            "Cannot start server: Gemini client failed to initialize."
-        )
+        logging.error("Cannot start server: Gemini client failed to initialize.")
         return
     if "mcp_host" not in globals():
         logging.error("Cannot start server: MCPHost failed to instantiate.")
         return
 
-    logging.info(
-        f"Starting MCP server '{mcp_host.name}' with stdio transport..."
-    )
+    logging.info(f"Starting MCP server '{mcp_host.name}' with stdio transport...")
     try:
         mcp_host.run()
     except Exception as e:
