@@ -10,14 +10,12 @@ FAILURE_FILE="/workspace/Failure.txt"
 if [ -f "$FAILURE_FILE" ]; then
   ISSUE_BODY=$(cat "$FAILURE_FILE")
 
-  gh issue create \
+  if ! gh issue create \
     -t "$ISSUE_TITLE" \
     -b "$ISSUE_BODY" \
     -l "$ISSUE_LABELS" \
     -a "$ISSUE_ASSIGNEES" \
-    -R "$REPO_OWNER/$REPO_NAME"
-
-  if [ $? -ne 0 ]; then
+    -R "$REPO_OWNER/$REPO_NAME"; then
     echo "Error creating issue."
     exit 1
   fi

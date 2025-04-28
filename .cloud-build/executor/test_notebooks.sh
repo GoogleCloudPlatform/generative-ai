@@ -28,24 +28,23 @@ for x in $TARGET; do
 
   # Execute and get the operation ID
   OPERATION_ID=$(gcloud colab executions create \
-    --display-name=$DISPLAY_NAME \
-    --notebook-runtime-template=$NOTEBOOK_RUNTIME_TEMPLATE \
+    --display-name="$DISPLAY_NAME" \
+    --notebook-runtime-template="$NOTEBOOK_RUNTIME_TEMPLATE" \
     --gcs-notebook-uri="$OUTPUT_URI/generative-ai/gemini/getting-started/${x##*/}" \
-    --gcs-output-uri=$OUTPUT_URI \
-    --project=$PROJECT_ID \
-    --region=$REGION \
-    --service-account=$SA \
+    --gcs-output-uri="$OUTPUT_URI" \
+    --project="$PROJECT_ID" \
+    --region="$REGION" \
+    --service-account="$SA" \
     --verbosity=debug \
     --execution-timeout="1h30m" \
     --format="value(name)")
 
   echo "Operation ID: $OPERATION_ID"
-  TRUNCATED_OPERATION_ID=$(echo $OPERATION_ID | cut -c 67-85)
+  TRUNCATED_OPERATION_ID=$(echo "$OPERATION_ID" | cut -c 67-85)
 
   # check job status
   echo "Waiting for execution to complete..."
-  EXECUTION_DETAILS=$(gcloud colab executions describe $TRUNCATED_OPERATION_ID --region=$REGION)
-  if [[ $? -ne 0 ]]; then
+  if ! EXECUTION_DETAILS=$(gcloud colab executions describe "$TRUNCATED_OPERATION_ID" --region="$REGION"); then
     echo "Error describing execution for ${x##*/}. See logs for details."
     failed_count=$((failed_count + 1))
     failed_notebooks+=("${x##*/}")
@@ -131,13 +130,11 @@ else
 fi
 
 # Construct the message to send to pub/sub topic
-message_data="{\"total_count\":$(($total_count + 0)),\"failed_count\":$(($failed_count + 0)),\"failed_notebooks\":\"${failed_notebooks_str}\",\"successful_notebooks\":\"${successful_notebooks_str}\",\"successful_count\":$(($successful_count + 0)),\"execution_date\":\"${current_time_readable}\"}"
+message_data="{\"total_count\":$((total_count + 0)),\"failed_count\":$((failed_count + 0)),\"failed_notebooks\":\"${failed_notebooks_str}\",\"successful_notebooks\":\"${successful_notebooks_str}\",\"successful_count\":$((successful_count + 0)),\"execution_date\":\"${current_time_readable}\"}"
 
 # Publish to Pub/Sub
 echo "$(date) - INFO - Publishing to Pub/Sub topic: $PUBSUB_TOPIC"
-gcloud pubsub topics publish "$PUBSUB_TOPIC" --message="$message_data" --project="$PROJECT_ID"
-
-if [[ $? -ne 0 ]]; then
+if ! gcloud pubsub topics publish "$PUBSUB_TOPIC" --message="$message_data" --project="$PROJECT_ID"; then
   echo "$(date) - ERROR - Failed to publish to Pub/Sub topic $PUBSUB_TOPIC. Check permissions and topic configuration."
   #exit 1
 fi
