@@ -102,8 +102,9 @@ class Server:
             )
         server_script_path = self.config.get("script_path")
         if not server_script_path:
-            raise ValueError(f"Server config for '{self.name}' "
-                             "missing 'script_path'")
+            raise ValueError(
+                f"Server config for '{self.name}' " "missing 'script_path'"
+            )
 
         server_params = StdioServerParameters(
             command=command,
@@ -153,9 +154,7 @@ class Server:
             raise
         # Pipe/Connection errors if the server
         # process dies unexpectedly or closes streams
-        except (BrokenPipeError,
-                ConnectionResetError,
-                EOFError) as e:
+        except (BrokenPipeError, ConnectionResetError, EOFError) as e:
             logging.error(
                 f"Error initializing server {self.name}: "
                 "Communication pipe broken, connection reset, or EOF. "
@@ -193,8 +192,7 @@ class Server:
                 tool_spec_list = item[1]
                 if not isinstance(tool_spec_list, list):
                     logging.warning(
-                        "Expected a list of tools, "
-                        f"but got: {type(tool_spec_list)}"
+                        "Expected a list of tools, " f"but got: {type(tool_spec_list)}"
                     )
                     continue
 
@@ -278,9 +276,7 @@ class Server:
                     progress = result["progress"]
                     total = result["total"]
                     percentage = (progress / total) * 100 if total else 0
-                    logging.debug(
-                        "Progress:"
-                        f"{progress}/{total} ({percentage:.1f}%)")
+                    logging.debug("Progress:" f"{progress}/{total} ({percentage:.1f}%)")
                 return result
 
             except retryable_call_exceptions as e:
@@ -409,8 +405,7 @@ class LLMClient:
                 f"'{self.project}' in '{self.location}'."
             )
 
-    def set_generation_config(self,
-                              config: types.GenerateContentConfig) -> None:
+    def set_generation_config(self, config: types.GenerateContentConfig) -> None:
         """Sets the generation configuration for subsequent calls.
 
         Args:
@@ -433,9 +428,7 @@ class LLMClient:
         if not self._client:
             raise ConnectionError("LLM Client not initialized.")
 
-        self._chat_session = self._client.chats.create(
-            model=self.model_name
-            )
+        self._chat_session = self._client.chats.create(model=self.model_name)
         self._chat_session.send_message(system_instruction)
         logging.info(
             "LLM chat session initialized."
@@ -460,15 +453,14 @@ class LLMClient:
         """
         # Regex to find ```json ... ``` block
         # Using non-greedy matching .*? for the content
-        match = re.search(r"```json\s*(\{.*?\})\s*```",
-                          text,
-                          re.DOTALL | re.IGNORECASE)
+        match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
         json_string = None
 
         if match:
             json_string = match.group(1).strip()
-            logging.debug("Extracted JSON string "
-                          f"from ```json block:\n{json_string}")
+            logging.debug(
+                "Extracted JSON string " f"from ```json block:\n{json_string}"
+            )
         else:
             # Fallback: If no ```json block, maybe the entire text is the JSON?
             # Be cautious with this, might parse unintended text.
@@ -502,14 +494,12 @@ class LLMClient:
                 and "arguments" in loaded_json
             ):
                 logging.debug(
-                    "Successfully parsed JSON and "
-                    "validated tool call structure."
+                    "Successfully parsed JSON and " "validated tool call structure."
                 )
                 return loaded_json
 
             logging.debug(
-                "Parsed JSON but it does not "
-                "match expected tool call structure."
+                "Parsed JSON but it does not " "match expected tool call structure."
             )
             return None  # Not a valid tool call structure
         except json.JSONDecodeError as e:
@@ -658,8 +648,7 @@ class ChatSession:
                 "starting 'As per tool-name': \n\n"
             )
             final_constraint = (
-                "Please use only the tools that "
-                "are explicitly defined above."
+                "Please use only the tools that " "are explicitly defined above."
             )
 
             system_instruction_content = (
@@ -679,8 +668,7 @@ class ChatSession:
                 response_modalities=["TEXT"],
                 safety_settings=[
                     types.SafetySetting(
-                        category="HARM_CATEGORY_HATE_SPEECH",
-                        threshold="OFF"
+                        category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"
                     ),
                     types.SafetySetting(
                         category="HARM_CATEGORY_DANGEROUS_CONTENT",
@@ -691,8 +679,7 @@ class ChatSession:
                         threshold="OFF",
                     ),
                     types.SafetySetting(
-                        category="HARM_CATEGORY_HARASSMENT",
-                        threshold="OFF"
+                        category="HARM_CATEGORY_HARASSMENT", threshold="OFF"
                     ),
                 ],
             )
@@ -742,8 +729,7 @@ class ChatSession:
             The result of the tool execution or an error message.
         """
         # Simplified: Assumes the single gemini_server has the tool if listed
-        tool_exists = any(tool.name == tool_name
-                          for tool in self.available_tools)
+        tool_exists = any(tool.name == tool_name for tool in self.available_tools)
 
         if not tool_exists:
             error_msg = (
@@ -753,12 +739,10 @@ class ChatSession:
             logging.error(error_msg)
             return error_msg  # Return error message for LLM
 
-        logging.info(f"Executing tool: {tool_name} "
-                     f"with arguments: {arguments}")
+        logging.info(f"Executing tool: {tool_name} " f"with arguments: {arguments}")
         try:
             # Use the gemini_server instance directly
-            result = await self.gemini_server.execute_tool(tool_name,
-                                                           arguments)
+            result = await self.gemini_server.execute_tool(tool_name, arguments)
 
             # Format the result for the LLM.
             # Simple string conversion for now.
@@ -768,8 +752,7 @@ class ChatSession:
             else:
                 result_str = str(result)
             logging.info(
-                f"Tool '{tool_name}' execution "
-                f"successful. Result: {result_str}"
+                f"Tool '{tool_name}' execution " f"successful. Result: {result_str}"
             )
             return result_str  # Return result string for LLM
 
@@ -845,8 +828,7 @@ class ChatSession:
                     # 7. Get the LLM's final response
                     # summarizing the tool result
                     logging.debug("Asking LLM to process tool result...")
-                    final_response = self.llm_client.get_response(
-                        tool_result_content)
+                    final_response = self.llm_client.get_response(tool_result_content)
 
                     # 8. Add final assistant response to history
                     self.messages.append(
@@ -903,10 +885,7 @@ async def main() -> None:
         return
 
     gemini_server_config_data = server_configs.get("geminiServer")
-    if (
-        not gemini_server_config_data
-        or "config" not in gemini_server_config_data
-    ):
+    if not gemini_server_config_data or "config" not in gemini_server_config_data:
         logging.error(
             "Configuration for 'geminiServer' is missing "
             "or incomplete in servers_config.json"
