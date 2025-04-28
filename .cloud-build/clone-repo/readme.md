@@ -14,4 +14,4 @@ This script automates the process of cloning your notebook repository and will c
 1. **Create `OUTPUT_URI` secret:**
 
 2. **Run the script:**
-    Add script to pipeline
+   Add script to pipeline
