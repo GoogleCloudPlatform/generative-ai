@@ -11,7 +11,7 @@ check_and_comment() {
 
     if grep -q "$keyword" "$filename"; then
       # Keyword found, proceed with commenting it out
-      tr '\n' '\r' < "$filename" | sed 's/app.kernel.do_shutdown/#app.kernel.do_shutdown/g' | tr '\r' '\n' > "$filename.tmp"
+      tr '\n' '\r' <"$filename" | sed 's/app.kernel.do_shutdown/#app.kernel.do_shutdown/g' | tr '\r' '\n' >"$filename.tmp"
       mv "$filename.tmp" "$filename"
       echo "Commented out '$keyword' in '$filename'"
     else

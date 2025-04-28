@@ -17,12 +17,11 @@ PUBSUB_TOPIC=$(cat PS_TOPIC)
 
 failed_count=0
 failed_notebooks=()
-total_count=0 
+total_count=0
 successful_notebooks=()
-successful_count=0 
+successful_count=0
 
-for x in $TARGET
-do
+for x in $TARGET; do
   total_count=$((total_count + 1))
   DISPLAY_NAME="${x##*/}-$current_date-$current_time"
   echo "Starting execution for ${x##*/}"
@@ -64,7 +63,7 @@ do
   else
     echo "Notebook execution failed. Job state: $JOB_STATE. Please use id $TRUNCATED_OPERATION_ID to troubleshoot notebook ${x##*/}. See log for details."
     failed_count=$((failed_count + 1))
-    failed_notebooks+=("${x##*/}")  
+    failed_notebooks+=("${x##*/}")
     continue
   fi
 
@@ -87,37 +86,52 @@ if [[ $successful_count -gt 0 ]]; then
 fi
 
 # Prep pub/sub message
-failed_notebooks_str=$(IFS=', '; echo "${failed_notebooks[*]}")
+failed_notebooks_str=$(
+  IFS=', '
+  echo "${failed_notebooks[*]}"
+)
 
 # prep notebook name for pub/sub message
-failed_notebooks_str=$(IFS=', '; echo "${failed_notebooks[*]}")
+failed_notebooks_str=$(
+  IFS=', '
+  echo "${failed_notebooks[*]}"
+)
 
 if [[ -n "$failed_notebooks_str" ]]; then
-  IFS=',' read -ra failed_notebooks_array <<< "$failed_notebooks_str"
+  IFS=',' read -ra failed_notebooks_array <<<"$failed_notebooks_str"
   trimmed_notebooks=()
   for notebook in "${failed_notebooks_array[@]}"; do
     trimmed_notebooks+=("$(echo -n "$notebook" | sed 's/ *$//')")
   done
-  failed_notebooks_str=$(IFS=', '; echo "${trimmed_notebooks[*]}")
+  failed_notebooks_str=$(
+    IFS=', '
+    echo "${trimmed_notebooks[*]}"
+  )
 else
-    failed_notebooks_str=""
+  failed_notebooks_str=""
 fi
 
-successful_notebooks_str=$(IFS=', '; echo "${successful_notebooks[*]}")
+successful_notebooks_str=$(
+  IFS=', '
+  echo "${successful_notebooks[*]}"
+)
 
 if [[ -n "$successful_notebooks_str" ]]; then
-  IFS=',' read -ra successful_notebooks_array <<< "$successful_notebooks_str"
+  IFS=',' read -ra successful_notebooks_array <<<"$successful_notebooks_str"
   trimmed_successful_notebooks=()
   for notebook in "${successful_notebooks_array[@]}"; do
     trimmed_successful_notebooks+=("$(echo -n "$notebook" | sed 's/ *$//')")
   done
-  successful_notebooks_str=$(IFS=', '; echo "${trimmed_successful_notebooks[*]}")
+  successful_notebooks_str=$(
+    IFS=', '
+    echo "${trimmed_successful_notebooks[*]}"
+  )
 else
-    successful_notebooks_str=""
+  successful_notebooks_str=""
 fi
 
 # Construct the message to send to pub/sub topic
-message_data="{\"total_count\":$(($total_count+0)),\"failed_count\":$(($failed_count+0)),\"failed_notebooks\":\"${failed_notebooks_str}\",\"successful_notebooks\":\"${successful_notebooks_str}\",\"successful_count\":$(($successful_count+0)),\"execution_date\":\"${current_time_readable}\"}"
+message_data="{\"total_count\":$(($total_count + 0)),\"failed_count\":$(($failed_count + 0)),\"failed_notebooks\":\"${failed_notebooks_str}\",\"successful_notebooks\":\"${successful_notebooks_str}\",\"successful_count\":$(($successful_count + 0)),\"execution_date\":\"${current_time_readable}\"}"
 
 # Publish to Pub/Sub
 echo "$(date) - INFO - Publishing to Pub/Sub topic: $PUBSUB_TOPIC"
