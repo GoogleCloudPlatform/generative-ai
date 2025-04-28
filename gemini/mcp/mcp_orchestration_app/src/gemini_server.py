@@ -45,12 +45,12 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # --- Configuration ---
-GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "cloud-project-test")
+GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
 GOOGLE_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
     logging.error(
-        "Environment variables GOOGLE_PROJECT_ID and " "GOOGLE_LOCATION must be set."
+        "Environment variables `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION` must be set."
     )
     exit(1)
 
@@ -61,8 +61,7 @@ try:
         vertexai=True, project=GOOGLE_PROJECT_ID, location=GOOGLE_LOCATION
     )
     logging.info(
-        "Gemini Client initialized for project "
-        f"'{GOOGLE_PROJECT_ID}' in location '{GOOGLE_LOCATION}'"
+        f"Gemini Client initialized for project `{GOOGLE_PROJECT_ID}` in location `{GOOGLE_LOCATION}`"
     )
 except Exception as e:
     logging.error(f"Failed to initialize Gemini Client: {e}")
