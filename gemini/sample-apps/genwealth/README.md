@@ -19,7 +19,7 @@ This demo highlights AlloyDB AI's integration with [Vertex AI LLMs](https://clou
 The GenWealth demo application was built using:
 
 - [AlloyDB for PostgreSQL](https://cloud.google.com/alloydb?hl=en) 14+
-- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([gemini-2.0-flash-001](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini), [textembeddings-gecko@003](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings) and [text-bison@002](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text))
+- [Vertex AI](https://cloud.google.com/vertex-ai?hl=en) LLMs ([gemini-2.0-flash-001](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini), [textembeddings-gecko@003](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings)
 - Vertex AI [Agent Builder](https://cloud.google.com/products/agent-builder?hl=en)
 - [Document AI](https://cloud.google.com/document-ai?hl=en) (OCR processor)
 - [Cloud Run](https://cloud.google.com/run?hl=en) (2nd generation)
@@ -72,9 +72,9 @@ The GenWealth demo application was built using:
 
 1. Grab some coffee or tea. The script will provision all the necessary back-end resources, which usually takes about 30-35 minutes.
 
-1. When prompted (after about 30 minutes), enter the `configId` for the Vertex AI Agent Builder widget. Retrieve the `configId` by following these steps:
+1. When prompted (after about 30 minutes), enter the `configId` for the Vertex AI Search widget. Retrieve the `configId` by following these steps:
 
-   - Navigate to Vertex AI Agent Builder in the console.
+   - Navigate to Vertex AI Search in the console.
    - **IMPORTANT:** Click to accept terms and activate the API.
    - Click `Apps` in the left hand navigation to view the list of apps.
    - Click into the `search-prospectus` app.
@@ -100,7 +100,7 @@ The GenWealth demo application was built using:
    --member=allUsers --role=roles/storage.objectViewer
    ```
 
-1. If you get an error saying, `Configuration is not authorized on "genwealth-xxxxxxxxx-uc.a.run.app".` when trying to use the search widget in the Research interface, ensure the domain is allowed to access the widget in the Vertex AI Agent Builder Integrations page, and ensure you have accepted the usage terms and activated the API (see steps 11 and 12).
+1. If you get an error saying, `Configuration is not authorized on "genwealth-xxxxxxxxx-uc.a.run.app".` when trying to use the search widget in the Research interface, ensure the domain is allowed to access the widget in the Vertex AI Search Integrations page, and ensure you have accepted the usage terms and activated the API (see steps 11 and 12).
 
 ## Architecture
 
@@ -169,7 +169,7 @@ Simply drop a PDF into the `$PROJECT_ID-docs` bucket to start analyzing it (we r
 
 #### Pipeline Details
 
-The pipeline is triggered when a file is uploaded to the `$PROJECT_ID-docs` GCS bucket, and it executes two parallel branches to showcase the differences between out-of-the-box Vertex AI Agent Builder capabilities versus a custom Retrieval Augmented Generation (RAG) approach.
+The pipeline is triggered when a file is uploaded to the `$PROJECT_ID-docs` GCS bucket, and it executes two parallel branches to showcase the differences between out-of-the-box Vertex AI Search capabilities versus a custom Retrieval Augmented Generation (RAG) approach.
 
 ##### RAG Pipeline Branch
 
@@ -178,7 +178,7 @@ The RAG pipeline branch executes the following steps:
 1. The `process-pdf` Cloud Function extracts text from the pdf using Document AI (OCR), chunks the extracted text with LangChain, and writes the chunked text to the `langchain_vector_store` table in AlloyDB, leveraging [AlloyDB's LangChain vector store integration](https://python.langchain.com/docs/integrations/vectorstores/google_alloydb).
 1. The `analyze-prospectus` Cloud Function retrieves the document chunks from AlloyDB and iteratively builds a company overview, analysis, and buy/sell/hold rating using Vertex AI. Results are saved to the `investments` table in AlloyDB, where AlloyDB generates embeddings of the `overview` and `analysis` columns to enable vector similary search.
 
-##### Vertex AI Agent Builder Pipeline Branch
+##### Vertex AI Search Pipeline Branch
 
 The Vertex AI S&C pipeline branch executes the following steps:
 

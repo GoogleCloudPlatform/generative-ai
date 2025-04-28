@@ -39,7 +39,7 @@ def generate_gemini(text_prompt: str) -> str:
     Returns:
         The generated text.
     """
-    model = generative_models.GenerativeModel("gemini-pro")
+    model = generative_models.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(
         text_prompt,
         generation_config=st.session_state.generation_config,

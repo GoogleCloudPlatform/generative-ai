@@ -51,8 +51,8 @@ source ./deployment/deploy-backend.sh
 echo "Deploying the document ingestion pipeline."
 source ./deployment/deploy-pipeline.sh
 
-# Deploy Vertex AI Agent Builder
-echo "Deploying Vertex AI Agent Builder."
+# Deploy Vertex AI Search
+echo "Deploying Vertex AI Search."
 source ./deployment/deploy-search.sh
 
 # Deploy the registry

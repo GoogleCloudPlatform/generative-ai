@@ -35,7 +35,7 @@ def list_url(request) -> str | tuple[str, int]:
 
 
 def analyze_image(image_file) -> str | None:
-    gemini_pro_vision_model = GenerativeModel("gemini-1.0-pro-vision")
+    gemini_pro_vision_model = GenerativeModel("gemini-2.0-flash")
     print(gemini_pro_vision_model)
     image = Part.from_uri(image_file, mime_type="image/jpeg")
     print(image)

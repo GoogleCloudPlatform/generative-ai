@@ -18,7 +18,7 @@ _The architecture demonstrates a comprehensive flow from data ingestion to servi
 ## Key Features
 
 - **Advanced RAG Techniques**: Implements various retrieval strategies including auto-merging, parent retrieval, and baseline approaches.
-- **Flexible LLM Integration**: Supports multiple Gemini models (`gemini-1.5-pro`, `gemini-1.5-flash`) and Claude models (`claude-3.5-sonnet`) with configurable parameters.
+- **Flexible LLM Integration**: Supports multiple Gemini models (`gemini-2.0-flash`, `gemini-2.0-flash`) and Claude models (`claude-3.5-sonnet`) with configurable parameters.
 - **Vector Search**: Utilizes Vertex AI Vector Search for efficient document indexing and retrieval.
 - **Firestore**: Utilizes Firestore for document retrieval and auxiliary retrieval techniques
 - **Document AI Integration**: Incorporates Google Cloud Document AI for processing and parsing various document formats.

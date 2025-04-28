@@ -252,7 +252,7 @@ def process_pdf(cloud_event):
     if initialize_vector_store:
         engine.init_vectorstore_table(
             table_name=table_name,
-            vector_size=768,  # Vector size for VertexAI model(textembedding-gecko@latest)
+            vector_size=768,  # Vector size for VertexAI model(text-embedding-005)
             metadata_columns=[
                 Column("source", "VARCHAR", nullable=True),
                 Column("page", "INTEGER", nullable=True),

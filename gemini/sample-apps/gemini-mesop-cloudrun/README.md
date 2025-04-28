@@ -46,9 +46,7 @@ To run the Mesop application locally (on Cloud Shell), we need to perform the fo
    - `GOOGLE_CLOUD_PROJECT` : This the Google Cloud project ID.
    - `GOOGLE_CLOUD_REGION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
 
-   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region. The specific code line from the `main.py`
-   function is shown here:
-   `vertexai.init(project=PROJECT_ID, location=LOCATION)`
+   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region.
 
    In Cloud Shell, execute the following commands:
 
@@ -76,9 +74,7 @@ To deploy the Mesop Application in [Cloud Run](https://cloud.google.com/run/docs
    - `GOOGLE_CLOUD_PROJECT` : This the Google Cloud project ID.
    - `GOOGLE_CLOUD_REGION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
 
-   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region. The specific code line from the `main.py`
-   function is shown here:
-   `vertexai.init(project=PROJECT_ID, location=LOCATION)`
+   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region.
 
    In Cloud Shell, execute the following commands:
 

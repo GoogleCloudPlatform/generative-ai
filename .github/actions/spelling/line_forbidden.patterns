@@ -211,10 +211,10 @@
 # Should be Gemini
 \sgemini\s\w
 
-# Should be `Gemini Version Size` (e.g. `Gemini 1.0 Pro`)
+# Should be `Gemini Version Size` (e.g. `Gemini 2.0 Flash`)
 \bGemini\s(Pro|Flash|Ultra)\s?\d\.\d\b
 
-# Gemini Size should be capitalized (e.g. `Gemini 1.0 Pro`)
+# Gemini Size should be capitalized (e.g. `Gemini 2.0 Flash`)
 \bGemini\s?\d\.\d\s(pro|flash|ultra)\b
 
 # Don't say "Google Gemini" or "Google Gemini"
@@ -321,3 +321,13 @@
 
 # Use `%pip` instead of `!pip` or `!pip3`
 !\s?pip3?
+
+# Don't use embedded images, upload to Google Cloud Storage
+\(data:image/(?:jpeg|png);base64,[^{]
+
+# Don't use Gemini 1.X
+gemini-1\.[05]
+
+# Use the Google Gen AI SDK `google-genai`
+google-generativeai
+from google import generativeai

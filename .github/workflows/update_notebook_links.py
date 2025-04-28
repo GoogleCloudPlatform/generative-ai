@@ -82,7 +82,11 @@ def fix_links_in_notebook(notebook_path: str) -> int:
     relative_notebook_path = os.path.relpath(notebook_path, start=os.getcwd()).lower()
 
     for cell in notebook.cells:
-        if cell.cell_type == "markdown" and "<table" in cell.source:
+        if (
+            cell.cell_type == "markdown"
+            and "<table" in cell.source
+            and "colab" in cell.source
+        ):
             updated_source, changes_made = fix_markdown_links(
                 cell.source, relative_notebook_path
             )

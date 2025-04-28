@@ -1,4 +1,5 @@
 AALR
+ADK
 ADMA
 AFX
 AGG
@@ -16,7 +17,11 @@ ASF
 ASGI
 ASML
 AUVs
+Aadila
+Abhishek
+Afshaan
 Aktu
+Anant
 Aphone
 Arborio
 Arepa
@@ -31,6 +36,7 @@ BITCODE
 BYOR
 Benno
 Bettes
+Bhagwat
 Biden
 Bigtable
 Bitcoin
@@ -42,6 +48,8 @@ Broadoak
 Brusdar
 Btn
 Buckleys
+Bulmus
+Byzance
 CALIPSO
 CAMQAA
 CHECKOV
@@ -61,6 +69,7 @@ CWLEY
 CZE
 Caprese
 Chocolat
+Chrono
 Chunyuan
 Codicote
 Colm
@@ -68,6 +77,7 @@ Connectez
 Cowabunga
 Crossbody
 D'orsay
+DCR
 DHH
 DLC
 DLCs
@@ -77,6 +87,7 @@ DRV
 DVDs
 DWMWA
 Daniil
+DataFrame
 Dedup
 DeepEval
 Depatmint
@@ -99,6 +110,7 @@ EMFU
 EMNLP
 ENU
 ESG
+ESRB
 EVs
 Edunov
 Einhalt
@@ -110,6 +122,8 @@ Eragon
 Esin
 Eventarc
 FAISS
+FAQs
+FHIR
 FIA
 FILEFLAGS
 FILEOS
@@ -119,6 +133,7 @@ FPDF
 FREDDIE
 FTPS
 Fangming
+Fastmcp
 Feitian
 Finvest
 Fishburne
@@ -127,6 +142,7 @@ Flatform
 Flipkart
 Folmer
 Frodo
+GEOGPOINT
 GError
 GFile
 GKE
@@ -136,6 +152,7 @@ Gabeira
 Gameplay
 Gatace
 GenTwo
+Geralt
 Gfm
 Giancarlo
 Gisting
@@ -170,9 +187,11 @@ Hbf
 Hida
 Hikaru
 Hisaki
+Hlc
 Hmmm
 Hogwarts
 Homesley
+Hossein
 Hritik
 Hubmann
 Hyperdisk
@@ -192,12 +211,15 @@ JAVACMD
 JDK
 JHome
 JPY
+Jaival
 Jax
 Jedi
+Jestem
 Jhamtani
 Jiacheng
 Jianfeng
 Jibo
+Jincheol
 Joji
 Jolyon
 Junzhe
@@ -239,11 +261,13 @@ Loghub
 Logrus
 Lopyrev
 Lottry
+MCP
 MFU
 MICOA
 MLB
 MLOPs
 MMA
+MMO
 MSCHF
 MSGSEND
 MTL
@@ -257,7 +281,10 @@ Masaru
 Mbappe
 Meawad
 Mega
+Meinl
+Meltem
 Memegen
+Merhaba
 Mesop
 Meteo
 Mewgler
@@ -266,6 +293,7 @@ Mirai
 Mitani
 Molaison
 Mookie
+Mosi
 Mvar
 NADPH
 NARI
@@ -280,12 +308,16 @@ NMT
 NOMINATIM
 NOMINMAX
 NOZORDER
+NPCs
 NREL
 NVIDIA
 NVL
 Nagasu
+Najim
 Nakoso
+Napisz
 Narnia
+Nihonga
 Niitsuma
 Nith
 Nominatim
@@ -296,14 +328,17 @@ Ohashi
 Ohtani
 Olgivanna
 Ollama
+Olá
 Omnibox
 Onone
 Oort
 Orbelians
+Orus
 PBA
 PDEs
 PDFs
 PEFT
+PEGI
 PGHOST
 PGPORT
 PGUSER
@@ -320,7 +355,11 @@ Phaidon
 Phanfone
 Pharma
 Photoshop
+Pichai
 Pistorius
+Poirot
+Polong
+Porat
 Pranav
 Pré
 Pzk
@@ -339,11 +378,14 @@ RRF
 RTN
 RUNPATH
 RYDE
+Rabbids
 Raducanu
 Raikkonen
 Rajpurkar
 Reranking
 Resona
+Rivertown
+Rivia
 Rizzoli
 Robeco
 Robo
@@ -374,6 +416,7 @@ Schlenoff
 Schulen
 Selam
 Sestero
+Sha'carri
 Shazeer
 Shenzhou
 Shklovsky
@@ -385,6 +428,7 @@ Sketchfab
 Smartbuy
 Smaug
 Smol
+Sono
 Statcast
 Storrer
 Strappy
@@ -419,6 +463,7 @@ Terabyte
 Terabytes
 Testables
 Tetsuo
+Thallam
 Tianli
 Tianxiang
 Tongsheng
@@ -429,6 +474,9 @@ Tricyle
 UDF
 UDFs
 USERDATA
+USK
+UVX
+Ukiyo
 Unimicron
 Upserting
 Urs
@@ -463,11 +511,13 @@ WAU
 WDIR
 WFH
 WNDCLASS
+WRatio
 WXGA
 Wakatipu
 Wehn
 Wehrlein
 Welwyn
+Witaj
 Wnd
 Womens
 XGA
@@ -488,6 +538,7 @@ aaxis
 acall
 achat
 acomplete
+adk
 aexecute
 aextract
 afrom
@@ -496,6 +547,7 @@ ainit
 ainvoke
 aio
 aip
+airbnb
 airlume
 akka
 alisal
@@ -504,6 +556,7 @@ antiword
 apikeys
 apk
 appuser
+appyaml
 apredict
 aquery
 arange
@@ -515,6 +568,7 @@ arxiv
 astype
 atms
 aujourd'hui
+autocal
 autoflake
 autogen
 automerge
@@ -526,6 +580,7 @@ avec
 aworkflow
 backticks
 bagchi
+bargap
 barmode
 barpolar
 baxis
@@ -550,6 +605,7 @@ bqdf
 bqml
 breakroom
 btn
+byoc
 byod
 byor
 carbonara
@@ -575,6 +631,7 @@ cloudrun
 cloudveil
 clsx
 cmap
+cmn
 cnf
 codebase
 codebases
@@ -596,6 +653,7 @@ corpuses
 countplot
 cpet
 crewai
+crosstab
 csa
 cse
 ctd
@@ -606,7 +664,6 @@ cycleways
 cygpath
 darkgrid
 dask
-dataframe
 datname
 dbadmin
 dbln
@@ -639,10 +696,13 @@ drinkware
 dropdown
 dropna
 dsl
+dsn
 dtype
 dtypes
 dumfries
 dumpd
+dunia
+dvd
 dwmapi
 ecommerce
 ein
@@ -663,16 +723,21 @@ envsubst
 epath
 epoc
 erlang
+errlog
 erty
 etf
 etils
+eula
 eur
 evals
+eventarc
 evse
 evt
 expl
 faiss
 fastapi
+fastmcp
+fastrtc
 fda
 fea
 fect
@@ -703,6 +768,7 @@ fulltext
 fullurl
 functiona
 futur
+gameplay
 gapic
 gauff
 gbif
@@ -743,6 +809,10 @@ gpu
 gradio
 gradlew
 gridcolor
+gridless
+gridpoint
+groupadd
+groupchat
 grpcio
 gshoe
 gspread
@@ -765,13 +835,16 @@ https
 httpx
 hwnd
 hypercorn
+iap
 iban
+icd
 icudtl
 idcg
 idk
 idks
 idxs
 ience
+ifconfig
 ifidx
 iinfo
 iloc
@@ -779,6 +852,7 @@ imagefont
 imageno
 imagetext
 imdb
+imencode
 importmap
 imread
 imshow
@@ -789,6 +863,7 @@ inpaint
 iostream
 ipd
 iphoneos
+ipycanvas
 ipykernel
 ipynb
 isa
@@ -807,6 +882,7 @@ jit
 jiwer
 jsonify
 jsonlines
+jsonplus
 jupyter
 jvm
 kaggle
@@ -817,9 +893,11 @@ keychain
 kfp
 khz
 kickstart
+knative
 konnte
 kotlin
 kpi
+kubectl
 l'harmonie
 lakecolor
 landcolor
@@ -831,6 +909,7 @@ lego
 lenzing
 levelname
 lexer
+liberties
 linalg
 linecolor
 linestyle
@@ -845,6 +924,7 @@ logprobs
 lolcat
 loras
 lparam
+lro
 lru
 lsb
 lxml
@@ -860,6 +940,7 @@ maskmode
 mavenrc
 maxcold
 mbsdk
+mcp
 mdc
 mec
 mediapy
@@ -889,6 +970,7 @@ mrtydi
 msmarco
 msr
 multitool
+mundo
 mvn
 mvnw
 mvp
@@ -918,6 +1000,7 @@ nfl
 nginx
 ngram
 ngrams
+nih
 nlp
 nmade
 nmilitary
@@ -930,6 +1013,7 @@ norigin
 notetaker
 novnc
 noxfile
+npx
 nrows
 ntheory
 nunique
@@ -967,6 +1051,7 @@ payslip
 paystub
 pbxproj
 pcs
+pdflatex
 pdfminer
 pdfs
 petabytes
@@ -992,6 +1077,7 @@ powerups
 praw
 prcntg
 preds
+pregel
 produc
 programar
 projectid
@@ -1014,7 +1100,9 @@ pyplot
 pysftp
 pytorch
 pyvis
+qas
 qna
+qqq
 qrel
 qrels
 quadrotor
@@ -1030,10 +1118,13 @@ rapideval
 rarian
 rarians
 ratelimit
+rawbytes
 rbc
 rbf
+recrawl
 reddit
 redef
+reidx
 rembg
 reoffice
 rephraser
@@ -1044,6 +1135,7 @@ reranker
 reranking
 reranks
 resil
+retryable
 ribeye
 ricc
 ringspun
@@ -1061,9 +1153,11 @@ scifact
 scikit
 seatback
 selectbox
+selfie
 selftext
 selkirk
 seo
+serde
 setlocal
 sft
 shortdesc
@@ -1088,6 +1182,7 @@ spearmanr
 sqkm
 srlimit
 ssd
+sse
 ssh
 ssml
 ssn
@@ -1102,8 +1197,10 @@ stt
 stuffie
 subviews
 subword
+suis
 sunner
 supima
+svh
 svm
 sxs
 tabular
@@ -1125,6 +1222,7 @@ tgi
 tgz
 thelook
 throug
+tickvals
 tiktoken
 timechart
 tion
@@ -1139,6 +1237,7 @@ traceloop
 treeah
 tritan
 trl
+tscore
 tseslint
 tsne
 tsv
@@ -1156,6 +1255,7 @@ unrtf
 upsell
 urandom
 usb
+usd
 usebackq
 usecases
 username
@@ -1163,6 +1263,7 @@ usernames
 uuids
 uvb
 uvicorn
+uvx
 vais
 vapo
 vectoral
@@ -1192,6 +1293,7 @@ websites
 weightage
 welcom
 werden
+wereld
 wght
 wiersz
 wiffle
@@ -1219,6 +1321,7 @@ xcscheme
 xctest
 xcvi
 xdg
+xelatex
 xlabel
 xmltodict
 xsi
@@ -1237,4 +1340,4 @@ yticks
 zakarid
 zaxis
 zimie
-Napisz
+zmin
