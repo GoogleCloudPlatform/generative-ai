@@ -1,63 +1,59 @@
 timeout: 7200s
 
 steps:
-# [START copy-repo]
-- name: google/cloud-sdk
-  id: 'copy-repo'
-  entrypoint: bash
-  args:
-  - '-c'
-  - |
-    gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
-    . .cloud-build/clone-repo/clonerepobash.sh
-# [END copy-repo]
+  # [START copy-repo]
+  - name: google/cloud-sdk
+    id: "copy-repo"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
+        . .cloud-build/clone-repo/clonerepobash.sh
+  # [END copy-repo]
+  # [START prepare-data]
+  - name: google/cloud-sdk
+    id: "prepare-data"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        . .cloud-build/prepdata/preparenotebooks.sh
+  # [END prepare-data]
+  # [START push-to-gcs]
+  - name: google/cloud-sdk
+    id: "push-to-gcs"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
+        . .cloud-build/gcs/pushtogcs.sh
+  # [END push-to-gcs]
+  # [START run-lint]
+  - name: python:3.9
+    id: "run-lint"
+    entrypoint: python
+    args:
+      - .cloud-build/linting/lint.py
+  # [END run-lint]
 
-# [START prepare-data]
-- name: google/cloud-sdk
-  id: 'prepare-data'
-  entrypoint: bash
-  args:
-  - '-c'
-  - | 
-    . .cloud-build/prepdata/preparenotebooks.sh
-# [END prepare-data]
-
-# [START push-to-gcs]
-- name: google/cloud-sdk
-  id: 'push-to-gcs'
-  entrypoint: bash
-  args:
-  - '-c'
-  - |
-    gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
-    . .cloud-build/gcs/pushtogcs.sh
-# [END push-to-gcs]
-
-# [START run-lint]
-- name: python:3.9
-  id: 'run-lint'
-  entrypoint: python
-  args:
-  - .cloud-build/linting/lint.py
-# [END run-lint]
-
-# [START execute-notebooks]
-- name: google/cloud-sdk
-  id: 'execute-notebooks'
-  entrypoint: bash
-  timeout: 7200s #Because this step takes the longest. Avg runtime is 1 hour and 20 minutes.
-  args:
-  - '-c'
-  - |
-    gcloud secrets versions access latest --secret=NOTEBOOK_RUNTIME_TEMPLATE > NOTEBOOK_RUNTIME_TEMPLATE
-    gcloud secrets versions access latest --secret=PROJECT_ID > PROJECT_ID
-    gcloud secrets versions access latest --secret=REGION > REGION
-    gcloud secrets versions access latest --secret=SA_EMAIL > SA
-    gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
-    gcloud secrets versions access latest --secret=PS_TOPIC > PS_TOPIC
-    . .cloud-build/executor/testnotebooks.sh
+  # [START execute-notebooks]
+  - name: google/cloud-sdk
+    id: "execute-notebooks"
+    entrypoint: bash
+    timeout: 7200s #Because this step takes the longest. Avg runtime is 1 hour and 20 minutes.
+    args:
+      - "-c"
+      - |
+        gcloud secrets versions access latest --secret=NOTEBOOK_RUNTIME_TEMPLATE > NOTEBOOK_RUNTIME_TEMPLATE
+        gcloud secrets versions access latest --secret=PROJECT_ID > PROJECT_ID
+        gcloud secrets versions access latest --secret=REGION > REGION
+        gcloud secrets versions access latest --secret=SA_EMAIL > SA
+        gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
+        gcloud secrets versions access latest --secret=PS_TOPIC > PS_TOPIC
+        . .cloud-build/executor/testnotebooks.sh
 # [END execute-notebooks]
-
 # [START github-notification]
 #- name: google/cloud-sdk
 #  id: 'github-notification'
@@ -66,11 +62,10 @@ steps:
 #  - '-c'
 #  - |
 #    gcloud secrets versions access latest --secret=GH_token > GH_token.txt
-    
+
 #    . .cloud-build/github-issue/ghcli-install.sh
 #    . .cloud-build/github-issue/autoissuecreate.sh
 
 # [END github-notification]
- 
-    
+
 logsBucket: ${_LOG_BUCKET}
