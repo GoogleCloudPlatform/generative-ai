@@ -46,9 +46,9 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # --- Configuration ---
-GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", 
+GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT",
                                    "gcp-demoproject-id")
-GOOGLE_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", 
+GOOGLE_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION",
                                  "us-central1")
 
 if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
@@ -80,10 +80,6 @@ except google.auth.exceptions.DefaultCredentialsError as e:
 except google_exceptions.PermissionDenied as e:
     logging.error("Failed to initialize Gemini Client"
                   f" due to permission issues: {e}")
-    GENAI_CLIENT = None
-except google_exceptions.NotFound as e:
-    logging.error("Failed to initialize Gemini Client. "
-                  f"Project or location may not be found: {e}")
     GENAI_CLIENT = None
 except google_exceptions.GoogleAPIError as e:
     logging.error("Failed to initialize Gemini Client "
@@ -227,31 +223,9 @@ def translate_text(
             f"Check API key or service account. Details: {e}"
         )
         return None
-    except google_exceptions.PermissionDenied as e:
-        logging.error(
-            f"Permission denied for project '{project_id}'. "
-            "Ensure the service account "
-            f"has the 'Cloud Translation API User' role. Details: {e}"
-        )
-        return None
-    except google_exceptions.InvalidArgument as e:
-        logging.error(
-            "Invalid argument provided for "
-            f"translation (project: '{project_id}'). "
-            f"Check language codes, text content, "
-            f"or project/location format. Details: {e}"
-        )
-        return None
-    except google_exceptions.ResourceExhausted as e:
-        logging.error(
-            "Resource quota exceeded "
-            f"for project '{project_id}'. "
-            "This could be QPS or daily "
-            f"character limit. Details: {e}"
-        )
-        return None
     except (google_exceptions.ServiceUnavailable,
-            google_exceptions.DeadlineExceeded) as e:
+            google_exceptions.DeadlineExceeded,
+            google_exceptions.ResourceExhausted) as e:
         # Grouping errors that might be transient
         # and potentially retryable
         logging.warning(
