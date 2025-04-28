@@ -517,10 +517,6 @@ class LLMClient:
                 f"Error decoding JSON: {e}. String was: >>>{json_string}<<<"
             )
             return None
-        except Exception as e:  # Catch other potential errors during loading
-            logging.error("An unexpected error "
-                          f"occurred during JSON parsing: {e}")
-            return None
 
     def get_response(self, current_message: str) -> str:
         """
@@ -588,13 +584,7 @@ class ChatSession:
         # Adjusted to only clean the single gemini_server
         if self.gemini_server:
             logging.info(f"Cleaning up server: {self.gemini_server.name}")
-            try:
-                await self.gemini_server.cleanup()
-            except Exception as e:
-                logging.warning(
-                    "Warning during server cleanup "
-                    f"({self.gemini_server.name}): {e}"
-                )
+            await self.gemini_server.cleanup()
 
     async def _prepare_llm(self) -> bool:
         """Initializes the server, lists tools,
@@ -783,7 +773,7 @@ class ChatSession:
             )
             return result_str  # Return result string for LLM
 
-        except (RuntimeError, Exception) as e:
+        except RuntimeError as e:
             error_msg = f"Error executing tool '{tool_name}': {str(e)}"
             logging.error(error_msg)
             return error_msg  # Return error message for LLM

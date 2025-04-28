@@ -74,7 +74,7 @@ Ready to get your hands dirty? Here's a step-by-step guide to setting up your lo
 
     Go to below URL(s) and enable them:
 
-    - [Enable Google Translate API](https://console.developers.google.com/apis/api/translate.googleapis.com/overview)
+    - [Enable Google Translation API](https://console.developers.google.com/apis/api/translate.googleapis.com/overview)
 
 7. **(Optional) Fine-Tune Your Server:** If you're using a `servers_config.json` file for server settings, ensure it's in the root directory and points to the `gemini_server.py` script correctly.
 
