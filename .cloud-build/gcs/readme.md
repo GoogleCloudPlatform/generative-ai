@@ -55,4 +55,3 @@ Assuming you have a GCS bucket named `my-notebooks-bucket` and a notebook file n
 - The script assumes that the directory `/workspace/generative-ai/gemini/getting-started/` exists. If it doesn't, the script will not find any notebooks.
 - This script will overwrite files with the same name in the GCS bucket.
 - If you have a large number of notebooks, consider adding error handling and logging to the script.
-
