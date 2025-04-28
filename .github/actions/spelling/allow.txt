@@ -21,6 +21,7 @@ Aadila
 Abhishek
 Afshaan
 Aktu
+Anant
 Aphone
 Arborio
 Arepa
@@ -122,6 +123,7 @@ Esin
 Eventarc
 FAISS
 FAQs
+FHIR
 FIA
 FILEFLAGS
 FILEOS
@@ -217,6 +219,7 @@ Jhamtani
 Jiacheng
 Jianfeng
 Jibo
+Jincheol
 Joji
 Jolyon
 Junzhe
@@ -314,6 +317,7 @@ Najim
 Nakoso
 Napisz
 Narnia
+Nihonga
 Niitsuma
 Nith
 Nominatim
@@ -353,6 +357,7 @@ Pharma
 Photoshop
 Pichai
 Pistorius
+Poirot
 Polong
 Porat
 Pranav
@@ -471,6 +476,7 @@ UDFs
 USERDATA
 USK
 UVX
+Ukiyo
 Unimicron
 Upserting
 Urs
@@ -541,6 +547,7 @@ ainit
 ainvoke
 aio
 aip
+airbnb
 airlume
 akka
 alisal
@@ -856,6 +863,7 @@ inpaint
 iostream
 ipd
 iphoneos
+ipycanvas
 ipykernel
 ipynb
 isa
@@ -1005,6 +1013,7 @@ norigin
 notetaker
 novnc
 noxfile
+npx
 nrows
 ntheory
 nunique
@@ -1042,6 +1051,7 @@ payslip
 paystub
 pbxproj
 pcs
+pdflatex
 pdfminer
 pdfs
 petabytes
@@ -1090,6 +1100,7 @@ pyplot
 pysftp
 pytorch
 pyvis
+qas
 qna
 qqq
 qrel
@@ -1113,6 +1124,7 @@ rbf
 recrawl
 reddit
 redef
+reidx
 rembg
 reoffice
 rephraser
@@ -1141,6 +1153,7 @@ scifact
 scikit
 seatback
 selectbox
+selfie
 selftext
 selkirk
 seo
@@ -1224,6 +1237,7 @@ traceloop
 treeah
 tritan
 trl
+tscore
 tseslint
 tsne
 tsv
@@ -1307,6 +1321,7 @@ xcscheme
 xctest
 xcvi
 xdg
+xelatex
 xlabel
 xmltodict
 xsi
