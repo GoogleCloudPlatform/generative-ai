@@ -7,7 +7,7 @@ This script automates the process of cloning your notebook repository and will c
 - **Google Cloud SDK (gcloud) installed and configured:** You need to have the `gcloud` command-line tool installed and authenticated with your Google Cloud account.
 - **gsutil installed:** `gsutil` is part of the Google Cloud SDK and is used for interacting with GCS.
 - **Git installed:** Git is required to clone the repository.
-- **OUTPUT_URI:** A secret inject from secret manager in your Google cloud account
+- **OUTPUT_URI:** A secret inject from secret manager Google Cloud in your account.
 
 ## How to use
 
