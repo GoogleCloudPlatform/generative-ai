@@ -247,7 +247,7 @@ class Server:
         if not self.session:
             raise RuntimeError(f"Server {self.name} not initialized")
 
-        RETRYABLE_CALL_EXCEPTIONS = (
+        retryable_call_exceptions = (
             # General async timeout
             asyncio.TimeoutError,
             # Stdio pipe broke, server might have crashed
@@ -283,7 +283,7 @@ class Server:
                         f"{progress}/{total} ({percentage:.1f}%)")
                 return result
 
-            except RETRYABLE_CALL_EXCEPTIONS as e:
+            except retryable_call_exceptions as e:
                 last_exception = e
                 attempt += 1
                 logging.warning(
@@ -312,15 +312,10 @@ class Server:
         async with self._cleanup_lock:
             if self.session:
                 logging.debug(f"Cleaning up server {self.name}...")
-                try:
-                    await self.exit_stack.aclose()
-                    self.session = None
-                    self.stdio_context = None
-                    logging.debug(f"Server {self.name} cleaned up.")
-                except Exception as e:
-                    logging.error(
-                        "Error during cleanup "
-                        f"of server {self.name}: {e}")
+                await self.exit_stack.aclose()
+                self.session = None
+                self.stdio_context = None
+                logging.debug(f"Server {self.name} cleaned up.")
 
 
 # --- Tool Class (Simple local representation) ---
@@ -438,21 +433,13 @@ class LLMClient:
         if not self._client:
             raise ConnectionError("LLM Client not initialized.")
 
-        try:
-            self._chat_session = self._client.chats.create(
-                model=self.model_name
-                )
-            self._chat_session.send_message(system_instruction)
-            logging.info(
-                "LLM chat session initialized."
-            )  # System instruction set is implied
-
-        except Exception as e:
-            logging.exception(
-                "Failed to create LLM chat session or set system instruction."
+        self._chat_session = self._client.chats.create(
+            model=self.model_name
             )
-            self._chat_session = None  # Ensure session is None on failure
-            raise ConnectionError("Could not create LLM chat session.") from e
+        self._chat_session.send_message(system_instruction)
+        logging.info(
+            "LLM chat session initialized."
+        )  # System instruction set is implied
 
     @staticmethod
     def extract_tool_call_json(text: str) -> Optional[Dict[str, Any]]:
@@ -564,22 +551,14 @@ class LLMClient:
         logging.debug(f"Sending messages to LLM: {current_message}")
         logging.debug(f"Using generation config: {self._generation_config}")
 
-        try:
-            # Pass generation_config if it's set
-            response = self._chat_session.send_message(
-                current_message  # Pass the whole history
-            )
+        # Pass generation_config if it's set
+        response = self._chat_session.send_message(
+            current_message  # Pass the whole history
+        )
 
-            response_text = response.text
-            logging.debug(f"Received raw LLM response: {response_text}")
-            return response_text
-
-        except Exception as e:
-            logging.exception("Error during LLM API call.")
-            # More specific error handling could be added here
-            # based on google.genai exceptions
-            raise ConnectionError("Failed to get "
-                                  f"response from LLM: {e}") from e
+        response_text = response.text
+        logging.debug(f"Received raw LLM response: {response_text}")
+        return response_text
 
 
 # --- Chat Session (Orchestrates interaction - Cleaned) ---
@@ -759,10 +738,6 @@ class ChatSession:
         ) as e:
             logging.error(f"Initialization failed: {e}")
             return False
-        except Exception as e:
-            logging.exception("An unexpected error occurred "
-                              f"during preparation:{e}")
-            return False
 
     async def _run_tool_and_get_result(
         self, tool_name: Optional[str], arguments: Dict[str, Any]
@@ -917,14 +892,6 @@ class ChatSession:
                     "Please try again later."
                 )
                 break  # Exit loop on connection errors
-            except Exception as e:
-                logging.exception(
-                    "An unexpected error occurred "
-                    "in the main chat loop:")
-                print(
-                    f"Assistant: Sorry, an unexpected error occurred ({e}). "
-                    "Please try again."
-                )
                 # Optional: Clear last user message from history if needed?
                 # if self.messages and self.messages[-1]["role"] == "user":
                 #     self.messages.pop()
