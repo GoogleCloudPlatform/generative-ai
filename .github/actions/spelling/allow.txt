@@ -780,6 +780,7 @@ gcloud
 gcp
 gcs
 gcsfs
+gcurl
 gdk
 gdkx
 geboten
@@ -1342,4 +1343,3 @@ zakarid
 zaxis
 zimie
 zmin
-gcurl
