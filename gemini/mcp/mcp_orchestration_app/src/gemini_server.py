@@ -84,18 +84,12 @@ except google_exceptions.NotFound as e:
                   f"Project or location may not be found: {e}")
     GENAI_CLIENT = None
 except google_exceptions.GoogleAPIError as e:
-    logging.error("Failed to initialize Gemini Client ",
+    logging.error("Failed to initialize Gemini Client "
                   f"due to a Google API error: {e}")
     GENAI_CLIENT = None
 except RuntimeError as e:
     logging.error(f"Failed to initialize Gemini Client "
                   f"due to a runtime error: {e}")
-    GENAI_CLIENT = None
-except Exception as e:
-    logging.error(
-        f"An unexpected error of type {type(e).__name__}"
-        f" occurred during Gemini Client initialization: {e}"
-    )
     GENAI_CLIENT = None
 
 if GENAI_CLIENT:
@@ -111,9 +105,6 @@ try:
     mcp_host = FastMCP("gemini-complexity-server")
 except NameError:
     logging.error("MCPHost class not available. Cannot create MCP server.")
-    sys.exit(1)
-except Exception as e:
-    logging.error(f"Failed to instantiate MCPHost: {e}")
     sys.exit(1)
 
 
@@ -181,14 +172,6 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
         raise RuntimeError(
             "Gemini API Error "
             f"({e.message or type(e).__name__})") from e
-    except Exception as e:
-        logging.exception(
-            "Unexpected error "
-            f"calling model {model_name}: {e}")
-        raise RuntimeError(
-            "Unexpected error in "
-            f"Gemini call ({type(e).__name__})"
-        ) from e
 
 
 def translate_text(
@@ -197,7 +180,7 @@ def translate_text(
     source_language_code: str,
     target_language_code: str,
     source_text: str,
-) -> str | None:
+) -> str:
     """Translates text using the Google Cloud Translation API.
 
     Args:
@@ -228,8 +211,64 @@ def translate_text(
 
         logging.warning("Warning: No translations found in the response.")
         return None
-    except Exception as e:
-        logging.exception(f"Translation API call failed: {e}")
+    # --- More specific and common/critical exceptions first ---
+    except google.auth.exceptions.DefaultCredentialsError as e:
+        # This is more relevant if client instantiation is inside the try block
+        logging.error(
+            "Authentication failed: Could not "
+            f"find default credentials. Details: {e}"
+        )
+        return None
+    except google_exceptions.Unauthenticated as e:
+        logging.error(
+            f"Authentication failed for project '{project_id}'. "
+            f"Check API key or service account. Details: {e}"
+        )
+        return None
+    except google_exceptions.PermissionDenied as e:
+        logging.error(
+            f"Permission denied for project '{project_id}'. "
+            "Ensure the service account "
+            f"has the 'Cloud Translation API User' role. Details: {e}"
+        )
+        return None
+    except google_exceptions.InvalidArgument as e:
+        logging.error(
+            "Invalid argument provided for "
+            f"translation (project: '{project_id}'). "
+            f"Check language codes, text content, "
+            f"or project/location format. Details: {e}"
+        )
+        return None
+    except google_exceptions.ResourceExhausted as e:
+        logging.error(
+            "Resource quota exceeded "
+            f"for project '{project_id}'. "
+            "This could be QPS or daily "
+            f"character limit. Details: {e}"
+        )
+        return None
+    except (google_exceptions.ServiceUnavailable,
+            google_exceptions.DeadlineExceeded) as e:
+        # Grouping errors that might be transient
+        # and potentially retryable
+        logging.warning(
+            f"Translation service temporarily unavailable or "
+            f"request timed out for project '{project_id}'. "
+            f"Consider retrying. Details: {type(e).__name__}: {e}"
+        )
+        return None
+
+    # --- Catch-all for other Google API specific errors ---
+    except google_exceptions.GoogleAPIError as e:
+        # This will catch other errors from the Google API
+        # that weren't listed above
+        # like NotFound, AlreadyExists, InternalServerError, etc.
+        logging.error(
+            f"A Google API error occurred during "
+            f"translation for project '{project_id}'. "
+            f"Error type: {type(e).__name__}. Details: {e}"
+        )
         return None
 
 
@@ -256,23 +295,18 @@ async def call_translate(text: str,
     Returns:
         The translated text.
     """
-    try:
-        translated_result = translate_text(
-            project_id=GOOGLE_PROJECT_ID,
-            location=GOOGLE_LOCATION,
-            source_language_code=source_language,
-            target_language_code=target_language,
-            source_text=text,
-        )
+    translated_result = translate_text(
+        project_id=GOOGLE_PROJECT_ID,
+        location=GOOGLE_LOCATION,
+        source_language_code=source_language,
+        target_language_code=target_language,
+        source_text=text,
+    )
 
-        if translated_result:
-            return translated_result
+    if translated_result:
+        return translated_result
 
-        return "\nTranslation failed."
-    except Exception as e:
-        logging.exception("MCP Host run failed:")
-        print(f"Error running MCP Host: {e}")
-        return "Error: translation failed"
+    return "\nTranslation failed."
 
 
 @mcp_host.tool(
@@ -347,11 +381,7 @@ def main() -> None:
 
     logging.info(f"Starting MCP server '{mcp_host.name}' "
                  "with stdio transport...")
-    try:
-        mcp_host.run()
-    except Exception as e:
-        logging.exception("MCP Host run failed:")
-        print(f"Error running MCP Host: {e}")
+    mcp_host.run()
 
 
 if __name__ == "__main__":

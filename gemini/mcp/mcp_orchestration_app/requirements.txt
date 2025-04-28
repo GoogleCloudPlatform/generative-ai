@@ -6,3 +6,4 @@ google-genai
 #spacy                 
 nest_asyncio         
 google-cloud-translate
+google.auth
