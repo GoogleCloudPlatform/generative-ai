@@ -1342,3 +1342,4 @@ zakarid
 zaxis
 zimie
 zmin
+gcurl

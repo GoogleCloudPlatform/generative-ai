@@ -32,7 +32,7 @@ Before running this script, ensure you have the following:
    - Create a variable named `OUTPUT_URI` in the same directory as your script.
    - Add the full GCS URI of your destination bucket to this file. For example:
 
-     ```
+     ```none
      gs://your-bucket-name
      ```
 
