@@ -1,40 +1,45 @@
 <app-header (emitSearch)="this.searchTerm({ term: $event })"></app-header>
 
-<div class="grid grid-cols-4 gap-0">
-  <div class="col-span-4 bg-custom-gray p-4">
-    <h1 class="text-2xl font-bold m-0">Image Generation</h1>
+<div class="grid grid-cols-4 gap-0 m-7" *ngIf="documents.length > 0">
+  <div class="col-span-4 bg-custom-gray p-4" style="padding: 33px">
+    <span class="text-3xl m-0">Image Generation</span>
   </div>
-  <div class="col-span-3 bg-white p-4">
-    <div class="flex flex-col items-center justify-center">
-      <div class="flex flex-col items-center justify-center w-full">
-        <div class="flex justify-center w-full">
-          <div class="w-full bg-light-gray">
-            <img [src]="'data:image/png;base64,' + (selectedResult?.image?.encodedImage || '')"
-              *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full h-[50vh] object-contain" />
-            <img [src]="pagedDocuments[0]?.image?.encodedImage" *ngIf="showDefaultDocuments"
-              class="w-full h-[50vh] object-contain" />
+  <div class="col-span-3 bg-white p-4" style="border: solid #DEE6F6;">
+    <div class="grid items-center justify-center">
+      <div class="grid grid-cols-1 w-full">
+        <div class="flex flex-row w-full">
+          <div class="w-1/6 p-4">
+            <div class="flex flex-col overflow-y-auto h-full">
+              <div class="w-32 h-32 mb-2 mx-2 cursor-pointer" *ngFor="let result of pagedDocuments"
+                (click)="changeImageSelection(result)">
+                <div class="w-full h-full bg-lighter-gray">
+                  <img [src]="'data:image/png;base64,' + result.image.encodedImage"
+                    *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full h-full object-contain" />
+                  <img [src]="result.image.encodedImage" *ngIf="showDefaultDocuments"
+                    class="w-full h-full object-contain" />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="flex justify-center mt-5 mb-5">
-          <div class="w-24 h-24 mx-2 cursor-pointer" *ngFor="let result of pagedDocuments"
-            (click)="changeImageSelection(result)">
-            <div class="w-full h-full bg-lighter-gray">
-              <img [src]="'data:image/png;base64,' + result.image.encodedImage"
-                *ngIf="!showDefaultDocuments && documents.length > 0" class="w-full h-full object-contain" />
-              <img [src]="result.image.encodedImage" *ngIf="showDefaultDocuments"
-                class="w-full h-full object-contain" />
+          <div class="w-3/4 p-4">
+            <div class="w-full" style="display: flex;justify-content: center;">
+              <img [src]="'data:image/png;base64,' + (selectedResult?.image?.encodedImage || '')"
+                *ngIf="!showDefaultDocuments && documents.length > 0" class="max-height-image w-full object-contain" />
+              <img [src]="pagedDocuments[0]?.image?.encodedImage" *ngIf="showDefaultDocuments"
+                class="max-height-image w-full object-contain" />
             </div>
           </div>
         </div>
         <div class="chat-footer-outer">
-          <app-chat-input (emitSearch)="this.goToResults($event)"></app-chat-input>
+          <app-chat-input [term]="currentSearchTerm" (emitSearch)="this.searchTerm({ term: $event })">
+          </app-chat-input>
         </div>
       </div>
     </div>
   </div>
-  <div class="col-span-1 bg-white p-5">
+  <div class="col-span-1 bg-white p-5" style="border-right: solid #DEE6F6; border-bottom: solid #DEE6F6;">
     <div class="flex flex-col">
-      <h2 class="text-xl font-semibold mb-4">Configuration</h2>
+      <h2 class="text-2xl font-semibold mb-4" style="font-size: 1.5rem;">Configuration</h2>
       <mat-form-field class="w-full">
         <mat-label>AI Model</mat-label>
         <mat-select [(value)]="selectedModel">
@@ -44,27 +49,28 @@
         </mat-select>
       </mat-form-field>
 
-      <h3 class="text-lg font-medium mt-4">Aspect Ratio</h3>
+      <h3 class="text-2xl font-medium mt-4" style="font-size: 1.5rem;">Aspect Ratio</h3>
       <div class="mb-5">
-        <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button
-          class="aspect-button mx-2 mb-2" (click)="changeAspectRatio(ratio)">
+        <button *ngFor="let ratio of aspectRatioList" [value]="ratio.value" mat-button class="aspect-button mx-2 mb-2"
+          (click)="changeAspectRatio(ratio)" [class.active]="selectedAspectRatio === ratio">
           {{ ratio?.value }}
         </button>
       </div>
 
-      <h3 class="text-lg font-medium mt-4">Image Style</h3>
+      <h3 class="text-2xl font-medium mt-4" style="font-size: 1.5rem;">Image Style</h3>
       <div class="mb-5">
-        <button mat-raised-button class="style-button mx-2 mb-2">Modern</button>
-        <button mat-raised-button class="style-button mx-2 mb-2">Realistic</button>
-        <button mat-raised-button class="style-button mx-2 mb-2">Vintage</button>
-        <button mat-raised-button class="style-button mx-2 mb-2">Monochrome</button>
-        <button mat-raised-button class="style-button mx-2 mb-2">Fantasy</button>
+        <button *ngFor="let style of imageStyleList" [value]="style.value" mat-raised-button
+          class="style-button mx-2 mb-2" (click)="changeImageStyle(style)"
+          [class.active]="selectedImageStyle === style.value">
+          {{ style.value }}
+        </button>
       </div>
 
       <div class="flex items-center">
-        <mat-label class="mr-4">Number of Results</mat-label>
-        <mat-slider min="1" max="10" step="1" value="2" discrete>
-          <input matSliderThumb>
+        <mat-label class="text-2xl mr-4">Number of Results</mat-label>
+        <mat-slider min="1" max="5" step="1" [(ngModel)]="numberOfResults" discrete
+          (change)="onNumberOfResultsChange($event)">
+          <input matSliderThumb value="{{numberOfResults}}">
         </mat-slider>
       </div>
     </div>

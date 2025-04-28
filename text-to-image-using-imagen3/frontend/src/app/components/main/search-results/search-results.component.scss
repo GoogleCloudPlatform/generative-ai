@@ -90,3 +90,50 @@
     align-items: center;
   }
 }
+
+.aspect-button {
+  border: 1px solid #ccc;
+}
+
+.aspect-button.active {
+  background-color: #e0e0e0;
+  /* Example active background */
+  border-color: #a0a0a0;
+  /* Example active border */
+  font-weight: bold;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  /* Example inset shadow for pressed look */
+}
+
+.style-button.active {
+  background-color: #3f51b5;
+  /* Example primary color */
+  color: white;
+}
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) {}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+  .max-height-image {
+    width: auto;
+  }
+}
+
+// X-Large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+  .max-height-image {
+    width: auto;
+  }
+}
+
+// XX-Large devices (larger desktops, 1400px and up)
+@media (min-width: 1400px) {
+  .max-height-image {
+    width: auto;
+  }
+}
