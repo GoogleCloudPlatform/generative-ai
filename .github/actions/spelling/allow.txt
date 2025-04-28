@@ -21,7 +21,6 @@ Aadila
 Abhishek
 Afshaan
 Aktu
-Anant
 Aphone
 Arborio
 Arepa
@@ -317,7 +316,6 @@ Najim
 Nakoso
 Napisz
 Narnia
-Nihonga
 Niitsuma
 Nith
 Nominatim
@@ -348,6 +346,7 @@ PPO
 PYINK
 Pakeman
 Paquete
+Part
 Pastra
 Pengyu
 Persero
@@ -357,7 +356,6 @@ Pharma
 Photoshop
 Pichai
 Pistorius
-Poirot
 Polong
 Porat
 Pranav
@@ -476,7 +474,6 @@ UDFs
 USERDATA
 USK
 UVX
-Ukiyo
 Unimicron
 Upserting
 Urs
@@ -509,6 +506,7 @@ Viru
 WAI
 WAU
 WDIR
+WEBVTT
 WFH
 WNDCLASS
 WRatio
@@ -859,6 +857,7 @@ imwrite
 inbox
 informati
 inpaint
+inputvtt
 iostream
 ipd
 iphoneos
@@ -1098,7 +1097,6 @@ pyplot
 pysftp
 pytorch
 pyvis
-qas
 qna
 qqq
 qrel
@@ -1151,7 +1149,6 @@ scifact
 scikit
 seatback
 selectbox
-selfie
 selftext
 selkirk
 seo
@@ -1339,4 +1336,3 @@ yticks
 zakarid
 zaxis
 zimie
-zmin
