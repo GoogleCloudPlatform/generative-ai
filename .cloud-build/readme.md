@@ -1,4 +1,4 @@
-# This script is designed to automate the uploading of Jupyter Notebook files (`.ipynb`) from a local directory to a Google Cloud Storage (GCS) bucket.
+## This script is designed to automate the uploading of Jupyter Notebook files (`.ipynb`) from a local directory to a Google Cloud Storage (GCS) bucket
 
 ## Purpose
 

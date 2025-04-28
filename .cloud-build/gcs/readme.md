@@ -1,4 +1,4 @@
-This script is designed to automate the uploading of Jupyter Notebook files (`.ipynb`) from a local directory to a Google Cloud Storage (GCS) bucket.
+## This script is designed to automate the uploading of Jupyter Notebook files (`.ipynb`) from a local directory to a Google Cloud Storage (GCS) bucket.
 
 ## Purpose
 
@@ -44,10 +44,10 @@ Before running this script, ensure you have the following:
 
 Assuming you have a GCS bucket named `my-notebooks-bucket` and a notebook file named `example.ipynb` in the specified directory:
 
-1.  Create `OUTPUT_URI` variable the content: `gs://my-notebooks-bucket`
-2.  Place `example.ipynb` in `/workspace/generative-ai/gemini/getting-started/`
-3.  Run the script.
-4.  The `example.ipynb` will be copied to `gs://my-notebooks-bucket/generative-ai/gemini/getting-started/example.ipynb`.
+1. Create `OUTPUT_URI` variable the content: `gs://my-notebooks-bucket`
+2. Place `example.ipynb` in `/workspace/generative-ai/gemini/getting-started/`
+3. Run the script.
+4. The `example.ipynb` will be copied to `gs://my-notebooks-bucket/generative-ai/gemini/getting-started/example.ipynb`.
 
 ## Notes
 
