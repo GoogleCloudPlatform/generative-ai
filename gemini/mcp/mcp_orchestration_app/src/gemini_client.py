@@ -102,7 +102,8 @@ class Server:
             )
         server_script_path = self.config.get("script_path")
         if not server_script_path:
-            raise ValueError(f"Server config for '{self.name}' missing 'script_path'")
+            raise ValueError(f"Server config for '{self.name}' "
+                             "missing 'script_path'")
 
         server_params = StdioServerParameters(
             command=command,
@@ -152,7 +153,8 @@ class Server:
                 tool_spec_list = item[1]
                 if not isinstance(tool_spec_list, list):
                     logging.warning(
-                        f"Expected a list of tools, " f"but got: {type(tool_spec_list)}"
+                        "Expected a list of tools, "
+                        f"but got: {type(tool_spec_list)}"
                     )
                     continue
 
@@ -177,7 +179,7 @@ class Server:
                             f"spec object: {tool_spec}"
                         )
 
-        logging.debug(f"Parsed tools: {[t.name for t in tools]}")  # Added debug log
+        logging.debug(f"Parsed tools: {[t.name for t in tools]}")
         return tools
 
     async def execute_tool(
@@ -223,7 +225,9 @@ class Server:
                     progress = result["progress"]
                     total = result["total"]
                     percentage = (progress / total) * 100 if total else 0
-                    logging.debug(f"Progress: {progress}/{total} ({percentage:.1f}%)")
+                    logging.debug(
+                        "Progress:"
+                        f"{progress}/{total} ({percentage:.1f}%)")
                 return result
 
             except Exception as e:
@@ -244,7 +248,8 @@ class Server:
                         f"Exception: {last_exception}"
                     )
                     raise RuntimeError(
-                        f"Tool execution failed after {retries + 1} attempts "
+                        "Tool execution failed "
+                        f"after {retries + 1} attempts "
                         f"for tool '{tool_name}'"
                     ) from last_exception
 
@@ -259,7 +264,9 @@ class Server:
                     self.stdio_context = None
                     logging.debug(f"Server {self.name} cleaned up.")
                 except Exception as e:
-                    logging.error(f"Error during cleanup of server {self.name}: {e}")
+                    logging.error(
+                        "Error during cleanup "
+                        f"of server {self.name}: {e}")
 
 
 # --- Tool Class (Simple local representation) ---
@@ -359,7 +366,8 @@ class LLMClient:
                     "Could not initialize connection to the LLM service."
                 ) from e
 
-    def set_generation_config(self, config: types.GenerateContentConfig) -> None:
+    def set_generation_config(self,
+                              config: types.GenerateContentConfig) -> None:
         """Sets the generation configuration for subsequent calls.
 
         Args:
@@ -383,7 +391,9 @@ class LLMClient:
             raise ConnectionError("LLM Client not initialized.")
 
         try:
-            self._chat_session = self._client.chats.create(model=self.model_name)
+            self._chat_session = self._client.chats.create(
+                model=self.model_name
+                )
             self._chat_session.send_message(system_instruction)
             logging.info(
                 "LLM chat session initialized."
@@ -415,12 +425,15 @@ class LLMClient:
         """
         # Regex to find ```json ... ``` block
         # Using non-greedy matching .*? for the content
-        match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
+        match = re.search(r"```json\s*(\{.*?\})\s*```",
+                          text,
+                          re.DOTALL | re.IGNORECASE)
         json_string = None
 
         if match:
             json_string = match.group(1).strip()
-            logging.debug(f"Extracted JSON string from ```json block:\n{json_string}")
+            logging.debug("Extracted JSON string "
+                          f"from ```json block:\n{json_string}")
         else:
             # Fallback: If no ```json block, maybe the entire text is the JSON?
             # Be cautious with this, might parse unintended text.
@@ -454,12 +467,14 @@ class LLMClient:
                 and "arguments" in loaded_json
             ):
                 logging.debug(
-                    "Successfully parsed JSON and " "validated tool call structure."
+                    "Successfully parsed JSON and "
+                    "validated tool call structure."
                 )
                 return loaded_json
             else:
                 logging.debug(
-                    "Parsed JSON but it does not " "match expected tool call structure."
+                    "Parsed JSON but it does not "
+                    "match expected tool call structure."
                 )
                 return None  # Not a valid tool call structure
         except json.JSONDecodeError as e:
@@ -468,7 +483,8 @@ class LLMClient:
             )
             return None
         except Exception as e:  # Catch other potential errors during loading
-            logging.error(f"An unexpected error occurred during JSON parsing: {e}")
+            logging.error("An unexpected error "
+                          f"occurred during JSON parsing: {e}")
             return None
 
     def get_response(self, current_message: str) -> str:
@@ -514,7 +530,8 @@ class LLMClient:
             logging.exception("Error during LLM API call.")
             # More specific error handling could be added here
             # based on google.genai exceptions
-            raise ConnectionError(f"Failed to get response from LLM: {e}") from e
+            raise ConnectionError("Failed to get "
+                                  f"response from LLM: {e}") from e
 
 
 # --- Chat Session (Orchestrates interaction - Cleaned) ---
@@ -548,7 +565,8 @@ class ChatSession:
                 await self.gemini_server.cleanup()
             except Exception as e:
                 logging.warning(
-                    "Warning during server cleanup " f"({self.gemini_server.name}): {e}"
+                    "Warning during server cleanup "
+                    f"({self.gemini_server.name}): {e}"
                 )
 
     async def _prepare_llm(self) -> bool:
@@ -623,7 +641,8 @@ class ChatSession:
                 "starting 'As per tool-name': \n\n"
             )
             final_constraint = (
-                "Please use only the tools that " "are explicitly defined above."
+                "Please use only the tools that "
+                "are explicitly defined above."
             )
 
             system_instruction_content = (
@@ -643,7 +662,8 @@ class ChatSession:
                 response_modalities=["TEXT"],
                 safety_settings=[
                     types.SafetySetting(
-                        category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"
+                        category="HARM_CATEGORY_HATE_SPEECH",
+                        threshold="OFF"
                     ),
                     types.SafetySetting(
                         category="HARM_CATEGORY_DANGEROUS_CONTENT",
@@ -654,7 +674,8 @@ class ChatSession:
                         threshold="OFF",
                     ),
                     types.SafetySetting(
-                        category="HARM_CATEGORY_HARASSMENT", threshold="OFF"
+                        category="HARM_CATEGORY_HARASSMENT",
+                        threshold="OFF"
                     ),
                 ],
             )
@@ -691,7 +712,8 @@ class ChatSession:
             logging.error(f"Initialization failed: {e}")
             return False
         except Exception as e:
-            logging.exception(f"An unexpected error occurred during preparation:{e}")
+            logging.exception("An unexpected error occurred "
+                              f"during preparation:{e}")
             return False
 
     async def _execute_tool_and_get_result(
@@ -707,7 +729,8 @@ class ChatSession:
             The result of the tool execution or an error message.
         """
         # Simplified: Assumes the single gemini_server has the tool if listed
-        tool_exists = any(tool.name == tool_name for tool in self.available_tools)
+        tool_exists = any(tool.name == tool_name
+                          for tool in self.available_tools)
 
         if not tool_exists:
             error_msg = (
@@ -717,10 +740,12 @@ class ChatSession:
             logging.error(error_msg)
             return error_msg  # Return error message for LLM
 
-        logging.info(f"Executing tool: {tool_name} with arguments: {arguments}")
+        logging.info(f"Executing tool: {tool_name} "
+                     f"with arguments: {arguments}")
         try:
             # Use the gemini_server instance directly
-            result = await self.gemini_server.execute_tool(tool_name, arguments)
+            result = await self.gemini_server.execute_tool(tool_name,
+                                                           arguments)
 
             # Format the result for the LLM. Simple string conversion for now.
             # Could be JSON stringified if the result is complex.
@@ -728,7 +753,8 @@ class ChatSession:
                 json.dumps(result) if isinstance(result, (dict, list)) else str(result)
             )
             logging.info(
-                f"Tool '{tool_name}' execution " f"successful. Result: {result_str}"
+                f"Tool '{tool_name}' execution "
+                f"successful. Result: {result_str}"
             )
             return result_str  # Return result string for LLM
 

@@ -32,27 +32,27 @@ Before you can dive into this project, there are a few prerequisites you'll need
 
 Ready to get your hands dirty? Here's a step-by-step guide to setting up your local environment:
 
-1.  **Clone the Code:** First things first, you'll need to grab the project code from its repository:
+1. **Clone the Code:** First things first, you'll need to grab the project code from its repository:
 
     ```bash
     git clone <repository-url>
     cd <repository-name>
     ```
 
-2.  **Set up `venv`:**
+2. **Set up `venv`:**
 
     ```bash
     python3 -m venv .venv
     source .venv/bin/activate
     ```
 
-3.  **Install the Magic Ingredients:** Next, let's install all the necessary Python libraries using pip:
+3. **Install the Magic Ingredients:** Next, let's install all the necessary Python libraries using pip:
 
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Tell Us Your Secrets (Safely!):** We need to provide your Google Cloud Project details and potentially the specific Gemini model you want to use. Create a `.env` file in the root of the repository and add the following information, replacing the placeholders with your actual data:
+4. **Tell Us Your Secrets (Safely!):** We need to provide your Google Cloud Project details and potentially the specific Gemini model you want to use. Create a `.env` file in the root of the repository and add the following information, replacing the placeholders with your actual data:
 
     ```sh
     GOOGLE_CLOUD_PROJECT=your-google-cloud-project-id
@@ -63,20 +63,20 @@ Ready to get your hands dirty? Here's a step-by-step guide to setting up your lo
 
     **Important Note:** Make sure to add `.env` to your `.gitignore` file. You don't want to accidentally share your credentials!
 
-5.  **Reauthenticate gcloud if needed:**
+5. **Reauthenticate gcloud if needed:**
 
     ```sh
     gcloud auth application-default login
     gcloud auth application-default set-quota-project <your-google-cloud-project-id>
     ```
 
-6.  **Enable Google Cloud APIs**
+6. **Enable Google Cloud APIs**
 
     Go to below URL(s) and enable them:
 
-    - https://console.developers.google.com/apis/api/translate.googleapis.com/overview
+    - [Enable Google Translate API](https://console.developers.google.com/apis/api/translate.googleapis.com/overview)
 
-7.  **(Optional) Fine-Tune Your Server:** If you're using a `servers_config.json` file for server settings, ensure it's in the root directory and points to the `gemini_server.py` script correctly.
+7. **(Optional) Fine-Tune Your Server:** If you're using a `servers_config.json` file for server settings, ensure it's in the root directory and points to the `gemini_server.py` script correctly.
 
 ## Bringing the Application to Life
 

@@ -18,6 +18,7 @@ import logging
 import os
 import sys
 
+import google.auth
 from google import genai
 from google.api_core import exceptions as google_exceptions
 from google.cloud import translate_v3 as translate
@@ -50,22 +51,60 @@ GOOGLE_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
     logging.error(
-        "Environment variables `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION` must be set."
+        "Environment variables"
+        " `GOOGLE_CLOUD_PROJECT` and "
+        "`GOOGLE_CLOUD_LOCATION` must be set."
     )
-    exit(1)
+    sys.exit(1)
 
 
 # --- Initialize Gemini Client ---
 try:
     GENAI_CLIENT = genai.Client(
-        vertexai=True, project=GOOGLE_PROJECT_ID, location=GOOGLE_LOCATION
+        vertexai=True,
+        project=GOOGLE_PROJECT_ID,
+        location=GOOGLE_LOCATION
     )
     logging.info(
-        f"Gemini Client initialized for project `{GOOGLE_PROJECT_ID}` in location `{GOOGLE_LOCATION}`"
+        "Gemini Client initialized for "
+        f"project `{GOOGLE_PROJECT_ID}` in "
+        f"location `{GOOGLE_LOCATION}`"
     )
-except Exception as e:
-    logging.error(f"Failed to initialize Gemini Client: {e}")
+except google.auth.exceptions.DefaultCredentialsError as e:
+    logging.error(
+        "Failed to initialize Gemini Client "
+        f"due to authentication issues: {e}")
     GENAI_CLIENT = None
+except google_exceptions.PermissionDenied as e:
+    logging.error("Failed to initialize Gemini Client"
+                  f" due to permission issues: {e}")
+    GENAI_CLIENT = None
+except google_exceptions.NotFound as e:
+    logging.error("Failed to initialize Gemini Client. "
+                  f"Project or location may not be found: {e}")
+    GENAI_CLIENT = None
+except google_exceptions.GoogleAPIError as e:
+    logging.error("Failed to initialize Gemini Client ",
+                  f"due to a Google API error: {e}")
+    GENAI_CLIENT = None
+except RuntimeError as e:
+    logging.error(f"Failed to initialize Gemini Client "
+                  f"due to a runtime error: {e}")
+    GENAI_CLIENT = None
+except Exception as e:
+    logging.error(
+        f"An unexpected error of type {type(e).__name__}"
+        f" occurred during Gemini Client initialization: {e}"
+    )
+    GENAI_CLIENT = None
+
+if GENAI_CLIENT:
+    logging.info("GENAI_CLIENT is ready.")
+else:
+    logging.warning(
+        "GENAI_CLIENT could not be initialized. "
+        "Further operations depending on it may fail."
+    )
 
 # --- Instantiate High-Level MCP Server ---
 try:
@@ -105,14 +144,20 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
         max_output_tokens=1024,
         response_modalities=["TEXT"],
         safety_settings=[
-            types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"),
             types.SafetySetting(
-                category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="OFF"
+                category="HARM_CATEGORY_HATE_SPEECH",
+                threshold="OFF"),
+            types.SafetySetting(
+                category="HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold="OFF"
             ),
             types.SafetySetting(
-                category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="OFF"
+                category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                threshold="OFF"
             ),
-            types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="OFF"),
+            types.SafetySetting(
+                category="HARM_CATEGORY_HARASSMENT",
+                threshold="OFF"),
         ],
     )
 
@@ -122,19 +167,27 @@ async def call_gemini_model(model_name: str, prompt: str) -> str:
         )
         if response:
             return response.text
-        else:
-            logging.warning(
-                f"Model '{model_name}' response candidate has no text parts."
+
+        logging.warning(
+            f"Model '{model_name}' response candidate has no text parts."
+        )
+        return (
+            "Error: Model returned a response structure "
+            "without text content."
             )
-            return "Error: Model returned a response structure " "without text content."
 
     except google_exceptions.GoogleAPIError as e:
         logging.error(f"Google API error calling model {model_name}: {e}")
-        raise RuntimeError(f"Gemini API Error ({e.message or type(e).__name__})") from e
-    except Exception as e:
-        logging.exception(f"Unexpected error calling model {model_name}: {e}")
         raise RuntimeError(
-            f"Unexpected error in Gemini call ({type(e).__name__})"
+            "Gemini API Error "
+            f"({e.message or type(e).__name__})") from e
+    except Exception as e:
+        logging.exception(
+            "Unexpected error "
+            f"calling model {model_name}: {e}")
+        raise RuntimeError(
+            "Unexpected error in "
+            f"Gemini call ({type(e).__name__})"
         ) from e
 
 
@@ -172,9 +225,9 @@ def translate_text(
         )
         if response.translations:
             return response.translations[0].translated_text
-        else:
-            logging.warning("Warning: No translations found in the response.")
-            return None
+
+        logging.warning("Warning: No translations found in the response.")
+        return None
     except Exception as e:
         logging.exception(f"Translation API call failed: {e}")
         return None
@@ -190,7 +243,9 @@ def translate_text(
         "Ensure the text is not offensive or inappropriate."
     ),
 )
-async def call_translate(text: str, source_language: str, target_language: str) -> str:
+async def call_translate(text: str,
+                         source_language: str,
+                         target_language: str) -> str:
     """Executes a prompt using the Translation API.
 
     Args:
@@ -212,8 +267,8 @@ async def call_translate(text: str, source_language: str, target_language: str) 
 
         if translated_result:
             return translated_result
-        else:
-            return "\nTranslation failed."
+
+        return "\nTranslation failed."
     except Exception as e:
         logging.exception("MCP Host run failed:")
         print(f"Error running MCP Host: {e}")
@@ -240,7 +295,8 @@ async def call_gemini_flash_lite(prompt: str) -> str:
 @mcp_host.tool(
     name="gemini_flash_2_0",
     description=(
-        "Calls the Gemini 2.0 Flash Thinking model " "for prompts relating to science."
+        "Calls the Gemini 2.0 Flash Thinking model "
+        "for prompts relating to science."
     ),
 )
 async def call_gemini_flash(prompt: str) -> str:
@@ -280,13 +336,17 @@ async def call_gemini_pro(prompt: str) -> str:
 def main() -> None:
     """Sets up and runs the MCP server using the high-level host."""
     if not GENAI_CLIENT:
-        logging.error("Cannot start server: Gemini client failed to initialize.")
+        logging.error(
+            "Cannot start server: "
+            "Gemini client failed to initialize.")
         return
     if "mcp_host" not in globals():
-        logging.error("Cannot start server: MCPHost failed to instantiate.")
+        logging.error("Cannot start server: "
+                      "MCPHost failed to instantiate.")
         return
 
-    logging.info(f"Starting MCP server '{mcp_host.name}' with stdio transport...")
+    logging.info(f"Starting MCP server '{mcp_host.name}' "
+                 "with stdio transport...")
     try:
         mcp_host.run()
     except Exception as e:
