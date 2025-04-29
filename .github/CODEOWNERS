@@ -5,9 +5,7 @@
 # https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
 
 # @GoogleCloudPlatform/generative-ai-devrel are the default owners for changes in this repo
-
-
-*                                                                                                                                @GoogleCloudPlatform/generative-ai-devrel
+@GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/embeddings                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @kazunori279
 /generative-ai/gemini                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @polong-lin
 /generative-ai/gemini/agent-engine                                                                                               @GoogleCloudPlatform/generative-ai-devrel @koverholt
