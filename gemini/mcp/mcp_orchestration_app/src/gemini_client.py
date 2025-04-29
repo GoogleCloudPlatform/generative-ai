@@ -886,9 +886,7 @@ async def main() -> None:
 
     # Extract LLM specific config (adjust keys as needed in your config)
     # Example: Get project/location from env vars or config file
-    llm_project = os.getenv(
-        "GOOGLE_CLOUD_PROJECT"
-    )  # Default if not set
+    llm_project = os.getenv("GOOGLE_CLOUD_PROJECT")
     llm_location = os.getenv(
         "GOOGLE_CLOUD_LOCATION", "us-central1"
     )  # Default if not set
