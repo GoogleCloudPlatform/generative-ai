@@ -112,10 +112,7 @@ class Server:
             env={**os.environ, **self.config.get("env", {})},
         )
         try:
-            logging.debug(
-                f"Starting server '{self.name}' with"
-                f"command: {command} {server_script_path}"
-            )
+            logging.debug(f"Starting server '{self.name}'")
             stdio_transport = await self.exit_stack.enter_async_context(
                 stdio_client(server_params)
             )
@@ -146,7 +143,7 @@ class Server:
             # python interpreter or the script.
             logging.error(
                 f"Error initializing server {self.name}: "
-                "Permission denied for "
+                f"Permission denied for "
                 f"command '{command}' or script"
                 f" '{server_script_path}'. Error: {e}"
             )
@@ -494,14 +491,12 @@ class LLMClient:
                 and "arguments" in loaded_json
             ):
                 logging.debug(
-                    "Successfully parsed JSON and "
-                    "validated tool call structure."
+                    "Successfully parsed JSON and " "validated tool call structure."
                 )
                 return loaded_json
 
             logging.debug(
-                "Parsed JSON but it does not "
-                "match expected tool call structure."
+                "Parsed JSON but it does not " "match expected tool call structure."
             )
             return None  # Not a valid tool call structure
         except json.JSONDecodeError as e:
@@ -650,8 +645,7 @@ class ChatSession:
                 "starting 'As per tool-name': \n\n"
             )
             final_constraint = (
-                "Please use only the tools that "
-                "are explicitly defined above."
+                "Please use only the tools that " "are explicitly defined above."
             )
 
             system_instruction_content = (
@@ -889,10 +883,7 @@ async def main() -> None:
 
     gemini_server_config_data = server_configs.get("geminiServer")
     if not gemini_server_config_data or "config" not in gemini_server_config_data:
-        logging.error(
-            "Configuration for 'geminiServer' is missing "
-            "or incomplete in servers_config.json"
-        )
+        logging.error("Configuration for 'geminiServer' is missing")
         return
 
     # Extract LLM specific config (adjust keys as needed in your config)
