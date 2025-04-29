@@ -18,9 +18,9 @@ import logging
 import os
 import sys
 
-import google.auth
 from google import genai
 from google.api_core import exceptions as google_exceptions
+import google.auth
 from google.cloud import translate_v3 as translate
 from google.genai import types
 from mcp.server.fastmcp import FastMCP
