@@ -22,6 +22,7 @@ import logging
 import os
 import re
 import shutil
+import sys
 from typing import Any, Dict, List, Optional
 
 # Import necessary MCP components (ensure 'mcp' is installed)
@@ -886,13 +887,22 @@ async def main() -> None:
 
     # Extract LLM specific config (adjust keys as needed in your config)
     # Example: Get project/location from env vars or config file
-    llm_project = os.getenv("GOOGLE_CLOUD_PROJECT")
+    llm_project = os.getenv("GOOGLE_CLOUD_PROJECT", "")
     llm_location = os.getenv(
         "GOOGLE_CLOUD_LOCATION", "us-central1"
     )  # Default if not set
     llm_model = os.getenv(
         "LLM_MODEL_NAME", "gemma-3-27b-it"
     )  # Default model, more flexible
+
+    if not llm_project or not llm_location:
+        logging.error(
+            "Environment variables"
+            " `GOOGLE_CLOUD_PROJECT` and "
+            "`GOOGLE_CLOUD_LOCATION` must be set in client."
+        )
+        sys.exit(1)
+
 
     # --- Initialize Components ---
 

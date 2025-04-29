@@ -46,7 +46,7 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # --- Configuration ---
-GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
+GOOGLE_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
 GOOGLE_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 if not GOOGLE_PROJECT_ID or not GOOGLE_LOCATION:
