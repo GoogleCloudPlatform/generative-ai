@@ -490,14 +490,11 @@ class LLMClient:
                 and "tool" in loaded_json
                 and "arguments" in loaded_json
             ):
-                logging.debug(
-                    "Successfully validated JSON "
-                )
+                logging.debug("Successfully validated JSON ")
                 return loaded_json
 
             logging.debug(
-                "Parsed JSON but it does not " +
-                "match expected tool call structure."
+                "Parsed JSON but it does not " + "match expected tool call structure."
             )
             return None  # Not a valid tool call structure
         except json.JSONDecodeError as e:
@@ -646,8 +643,7 @@ class ChatSession:
                 "starting 'As per tool-name': \n\n"
             )
             final_constraint = (
-                "Please use only the tools that "
-                "are explicitly defined above."
+                "Please use only the tools that are explicitly defined above."
             )
 
             system_instruction_content = (
