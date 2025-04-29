@@ -1,8 +1,7 @@
-from google.cloud.bigquery import SchemaField
-from pydantic import BaseModel
 from typing import List
 
-from setup import remote_agent_resource_id
+from google.cloud.bigquery import SchemaField
+from pydantic import BaseModel
 
 
 class Intent(BaseModel):
@@ -26,7 +25,7 @@ class Intent(BaseModel):
             SchemaField("questions", "STRING", mode="REPEATED"),
             SchemaField("status", "STRING", mode="REQUIRED"),
             SchemaField("gcp_bucket", "STRING", mode="REQUIRED"),
-            SchemaField("remote_agent_resource_id", "STRING", mode="OPTIONAL"),
+            SchemaField("remote_agent_resource_id", "STRING"),
         ]
 
     def __from_row__(row):
@@ -51,10 +50,11 @@ class Intent(BaseModel):
             "questions": self.questions,
             "status": self.status,
             "gcp_bucket": self.gcp_bucket,
+            "remote_agent_resource_id": self.remote_agent_resource_id,
         }
 
     def to_insert_string(self):
-        return f'"{self.name}", "{self.ai_model}", {self.ai_temperature},"{self.description}","""{self.prompt}""", {str(self.questions)}, "{self.status}", "{self.gcp_bucket}"'
+        return f'"{self.name}", "{self.ai_model}", {self.ai_temperature},"{self.description}","""{self.prompt}""", {str(self.questions)}, "{self.status}", "{self.gcp_bucket}", "{self.remote_agent_resource_id}"'
 
     def is_active(self) -> bool:
         return self.status == "5"

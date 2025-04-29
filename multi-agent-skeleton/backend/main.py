@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from src.controller.chats import router as chat_router
@@ -6,9 +7,12 @@ from src.controller.models import router as model_router
 from google.cloud import speech
 from os import getenv
 
-
+print("loading env vars")
+load_dotenv("local.env")
+print("loaded env vars")
 
 app = FastAPI()
+
 
 def configure_cors(app):
     """Configures CORS middleware based on the environment."""
@@ -21,9 +25,11 @@ def configure_cors(app):
             raise ValueError("FRONTEND_URL environment variable not set in production")
         allowed_origins.append(frontend_url)
     elif environment == "development":
-        allowed_origins.append("*") # Allow all origins in development
+        allowed_origins.append("*")  # Allow all origins in development
     else:
-        raise ValueError(f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'")
+        raise ValueError(
+            f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'"
+        )
 
     app.add_middleware(
         CORSMiddleware,
@@ -33,15 +39,18 @@ def configure_cors(app):
         allow_headers=["*"],
     )
 
+
 # Create a route to handle GET requests on root
 @app.get("/")
 async def root():
-    return 'You are calling Quick Bot Backend'
+    return "You are calling Quick Bot Backend"
+
 
 # Create a route to handle GET requests on /version
 @app.get("/api/version")
 def version():
-    return 'v0.0.1'
+    return "v0.0.1"
+
 
 @app.post("/api/audio_chat")
 async def audio_chat(audio_file: UploadFile = File(...)):
@@ -69,6 +78,7 @@ async def audio_chat(audio_file: UploadFile = File(...)):
         text = result.alternatives[0].transcript
 
     return text, 200
+
 
 configure_cors(app)
 

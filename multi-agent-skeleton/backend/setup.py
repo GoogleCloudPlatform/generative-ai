@@ -1,12 +1,13 @@
 import os
 
 from dotenv import load_dotenv
+from google.cloud.bigquery import Client as BigQueryClient
+from google.cloud.storage import Client as GCSClient
 
 from deploy import setup_remote_agent
 from scripts.big_query_setup import create_dataset
 from scripts.big_query_setup import create_table
 from scripts.big_query_setup import insert_intent
-from scripts.gcs_setup import BUCKET
 from scripts.gcs_setup import create_bucket
 from src.model.chats import Chat
 from src.model.embedding import Embedding
@@ -15,11 +16,8 @@ from src.repository.big_query import CHATS_TABLE
 from src.repository.big_query import EMBEDDINGS_TABLE
 from src.service.intent import INTENTS_TABLE
 
-load_dotenv()
-
-BIG_QUERY_DATASET = ""
-
-os.system("./prepare_code.sh")
+load_dotenv("local.env")
+os.system("bash prepare_code.sh")
 
 remote_agent_resource_id = setup_remote_agent()
 
@@ -28,7 +26,7 @@ DEFAULT_INTENTS = [
         name="Travel concierge",
         ai_model="gemini-2.0-flash",
         ai_temperature=1,
-        description="ADK sample template",
+        description="",
         prompt="",
         questions=[],
         status="5",
@@ -40,20 +38,37 @@ print("Remote agent resource ID: " + remote_agent_resource_id + "\n")
 
 print("Setting up GCS... \n")
 
-bucket = create_bucket(BUCKET)
+project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+storage_client = GCSClient()
+
+bucket = create_bucket(f"quick-bot-{project_id}", "us-central1", storage_client)
 
 print("\nSuccess!\n")
 
 print("Setting up BigQuery... \n")
 
-create_dataset(BIG_QUERY_DATASET)
-create_table(BIG_QUERY_DATASET, CHATS_TABLE, Chat.__schema__())
-create_table(BIG_QUERY_DATASET, EMBEDDINGS_TABLE, Embedding.__schema__())
-create_table(BIG_QUERY_DATASET, INTENTS_TABLE, Intent.__schema__())
+bigquery_client = BigQueryClient()
+BIG_QUERY_DATASET = "quick_bot_app"
+create_dataset(BIG_QUERY_DATASET, bigquery_client)
+create_table(
+    BIG_QUERY_DATASET, CHATS_TABLE, Chat.__schema__(), project_id, bigquery_client
+)
+create_table(
+    BIG_QUERY_DATASET,
+    EMBEDDINGS_TABLE,
+    Embedding.__schema__(),
+    project_id,
+    bigquery_client,
+)
+create_table(
+    BIG_QUERY_DATASET, INTENTS_TABLE, Intent.__schema__(), project_id, bigquery_client
+)
 
 for intent in DEFAULT_INTENTS:
     try:
-        insert_intent(BIG_QUERY_DATASET, INTENTS_TABLE, intent.to_insert_string())
+        insert_intent(
+            BIG_QUERY_DATASET, INTENTS_TABLE, intent.to_insert_string(), bigquery_client
+        )
     except Exception as e:
         print(e)
 
