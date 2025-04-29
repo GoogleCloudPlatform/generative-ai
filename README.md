@@ -93,6 +93,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
 
 ## Related Repositories
 
+- ✨ [Agent Development Kit (ADK) Samples](https://github.com/google/adk-samples): This repo provides ready-to-use agents built on top of the Agent Development Kit, designed to accelerate your development process. These agents cover a range of common use cases and complexities, from simple conversational bots to complex multi-agent workflows.
 - [🚀 Agent Starter Pack](https://github.com/GoogleCloudPlatform/agent-starter-pack)
   - A collection of production-ready Generative AI Agent templates built for Google Cloud.
   - It accelerates development by providing a holistic, production-ready solution, addressing common challenges (Deployment & Operations, Evaluation, Customization, Observability) in building and deploying Gen AI agents.
