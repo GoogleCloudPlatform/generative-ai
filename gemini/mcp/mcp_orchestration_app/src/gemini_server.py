@@ -331,13 +331,22 @@ async def call_gemini_pro(prompt: str) -> str:
 def main() -> None:
     """Sets up and runs the MCP server using the high-level host."""
     if not GENAI_CLIENT:
-        logging.error("Cannot start server: " "Gemini client failed to initialize.")
+        logging.error(
+            "Cannot start server: "
+            "Gemini client failed to initialize."
+        )
         return
     if "mcp_host" not in globals():
-        logging.error("Cannot start server: " "MCPHost failed to instantiate.")
+        logging.error(
+            "Cannot start server: "
+            "MCPHost failed to instantiate."
+        )
         return
 
-    logging.info(f"Starting MCP server '{mcp_host.name}' " "with stdio transport...")
+    logging.info(
+        f"Starting MCP server '{mcp_host.name}' "
+        "with stdio transport..."
+    )
     mcp_host.run()
 
 
