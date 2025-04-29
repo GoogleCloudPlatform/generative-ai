@@ -545,6 +545,7 @@ ainit
 ainvoke
 aio
 aip
+airbnb
 airlume
 akka
 alisal
@@ -777,6 +778,7 @@ gcloud
 gcp
 gcs
 gcsfs
+gcurl
 gdk
 gdkx
 geboten
@@ -981,6 +983,7 @@ nas
 nbconvert
 nbfmt
 nbformat
+nbqa
 nbviewer
 nce
 ncols
@@ -1011,6 +1014,7 @@ norigin
 notetaker
 novnc
 noxfile
+npx
 nrows
 ntheory
 nunique

@@ -281,7 +281,7 @@
 \bVertex\sVector\sSearch\b
 
 # Should be Colab
-\s(?!Colab)[Cc]o[Ll][Ll]?abs?\b
+\s(?!Colab)Co[Ll][Ll]?abs?\b
 
 # Should be Kaggle
 \skaggle\b
