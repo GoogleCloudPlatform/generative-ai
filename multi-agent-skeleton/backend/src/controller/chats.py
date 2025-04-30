@@ -47,11 +47,15 @@ async def chat(
 
     remote_agent = agent_engines.get(remote_agent_resource_id)
     print(f"Trying remote agent: {remote_agent_resource_id}")
-    session = remote_agent.create_session(user_id="traveler0115")
+    session = remote_agent.create_session(
+        user_id="traveler0115"
+    )  # TODO: Do not create new session for each message, first retrieve existing session; user_id shouldn't be hardcoded, but should be an actual user_id
     print(f'Trying remote agent with session: {session["id"]}')
 
     answer = []
-    for event in remote_agent.stream_query(
+    for (
+        event
+    ) in remote_agent.stream_query(  # TODO: Streaming should be enabled on the frontend
         user_id="traveler0115",
         session_id=session["id"],
         message=message,
@@ -60,7 +64,9 @@ async def chat(
         if content:
             for part in event["content"]["parts"]:
                 if part.get("text"):
-                    answer.append(part["text"])
+                    answer.append(
+                        part["text"]
+                    )  # TODO: Currently getting only text out, but the whole thinking and function calls process is available here
 
     model_response = " ".join(answer)
 
