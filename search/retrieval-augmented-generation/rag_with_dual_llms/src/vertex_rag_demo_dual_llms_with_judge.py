@@ -850,7 +850,9 @@ def clean_json(response_text: str):
         result = json.loads(modified_text)
     except json.JSONDecodeError:
         # Log warning
-        logger.warning(f"Failed to parse cleaned JSON, returning as simple dict: {modified_text[:100]}...") 
+        logger.warning(
+            f"Failed to parse cleaned JSON, returning as simple dict: {modified_text[:100]}..."
+        )
         # Fallback for non-JSON input after cleaning
         result = json.loads(
             f'{"intent":modified_text, "es_intent": modified_text, "is_trouble":"No", "cot": "None"}'
