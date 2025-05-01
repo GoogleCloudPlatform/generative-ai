@@ -892,7 +892,7 @@ def get_relevant_docs(search_query: str, llm: VertexAI) -> List[str]:
 
     Args:
         search_query: The query string (potentially rephrased).
-        llm: The initialized VertexAI LLM instance.
+        llm: The initialized Vertex AI LLM instance.
 
     Returns:
         A list of document contents as strings. Returns empty list if error
@@ -1216,7 +1216,7 @@ def main(args: argparse.Namespace):  # <-- Pass parsed args to main
 if __name__ == "__main__":
     # --- Argument Parsing ---
     parser = argparse.ArgumentParser(
-        description="Vertex RAG Comparator with optional Judge Model."
+        description="Vertex AI RAG Comparator with optional Judge Model."
     )
     parser.add_argument(
         "--judge",

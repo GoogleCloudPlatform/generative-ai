@@ -11,7 +11,7 @@ This is how your final demo will look like once it is running
 
 1. You need to have the latest Google Cloud SDK installed on your machine
 
-Follow these intructions at: https://cloud.google.com/sdk/docs/install to install the google cloud SDK and gcloud CLI.
+Follow these instructions at: https://cloud.google.com/sdk/docs/install to install the Google Cloud SDK and gcloud CLI.
 
 2. Once the gcloud CLI is installed, test the gcloud cli using:
 
