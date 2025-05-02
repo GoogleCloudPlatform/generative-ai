@@ -13,7 +13,7 @@ export class ChatInputComponent {
   mediaRecorder: MediaRecorder | undefined;
   audioChunks: Blob[] = [];
 
-  @Input() term: string = '';
+  @Input() term = '';
   @Output() emitSearch: EventEmitter<string> = new EventEmitter();
 
   constructor(
@@ -28,7 +28,7 @@ export class ChatInputComponent {
 
   ngOnInit() {
     navigator.mediaDevices
-      .getUserMedia({ audio: true })
+      .getUserMedia({audio: true})
       .then(stream => this.setupMediaRecorder(stream))
       .catch(err => {
         console.error(err);
