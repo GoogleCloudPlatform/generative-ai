@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Output, Input} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {SpeechToTextService} from 'src/app/services/speech-to-text';
 
@@ -13,7 +13,7 @@ export class ChatInputComponent {
   mediaRecorder: MediaRecorder | undefined;
   audioChunks: Blob[] = [];
 
-  term = '';
+  @Input() term: string = '';
   @Output() emitSearch: EventEmitter<string> = new EventEmitter();
 
   constructor(
@@ -28,7 +28,7 @@ export class ChatInputComponent {
 
   ngOnInit() {
     navigator.mediaDevices
-      .getUserMedia({audio: true})
+      .getUserMedia({ audio: true })
       .then(stream => this.setupMediaRecorder(stream))
       .catch(err => {
         console.error(err);
@@ -36,7 +36,10 @@ export class ChatInputComponent {
   }
 
   searchTerm() {
-    this.emitSearch.emit(this.term);
+    if (this.term && this.term.trim()) {
+      this.emitSearch.emit(this.term.trim());
+    }
+    // this.emitSearch.emit(this.term);
   }
 
   setupMediaRecorder(stream: MediaStream) {

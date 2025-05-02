@@ -24,18 +24,21 @@ interface AspectRatio {
   value: string;
   viewValue: string;
 }
-
+interface Style {
+  value: string;
+}
 @Component({
   selector: 'app-search-results',
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.scss'],
 })
 export class SearchResultsComponent implements OnDestroy {
-  @ViewChild('preview', {static: true})
+  @ViewChild('preview', { static: true })
   previewRef!: TemplateRef<{}>;
   summary = '';
   private readonly destroyed = new ReplaySubject<void>(1);
-  serachResult: any = [];
+  searchResult: any = [];
+  isLoading: boolean = false;
   documents: any = [];
   showDefaultDocuments = false;
   images: any = [];
@@ -48,31 +51,45 @@ export class SearchResultsComponent implements OnDestroy {
   selectedDocument: any;
   safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
+  selectedImageStyle: string = 'Modern';
+  currentSearchTerm: string = '';
+  numberOfResults: number = 4;
   imagen3ModelsList: Imagen3Model[] = [
-    {value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001'},
+    { value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001' },
     {
       value: 'imagen-3.0-fast-generate-001',
       viewValue: 'imagen-3.0-fast-generate-001',
     },
-    {value: 'imagen-3.0-generate-002', viewValue: 'imagen-3.0-generate-002'},
-    {value: 'imagegeneration@006', viewValue: 'imagegeneration@006'},
-    {value: 'imagegeneration@005', viewValue: 'imagegeneration@005'},
-    {value: 'imagegeneration@002', viewValue: 'imagegeneration@002'},
+    { value: 'imagen-3.0-generate-002', viewValue: 'imagen-3.0-generate-002' },
+    { value: 'imagegeneration@006', viewValue: 'imagegeneration@006' },
+    { value: 'imagegeneration@005', viewValue: 'imagegeneration@005' },
+    { value: 'imagegeneration@002', viewValue: 'imagegeneration@002' },
   ];
   selectedModel = this.imagen3ModelsList[0].value;
   aspectRatioList: AspectRatio[] = [
-    {value: '1:1', viewValue: '1:1'},
-    {value: '9:16', viewValue: '9:16'},
-    {value: '16:9', viewValue: '16:9'},
-    {value: '2:4', viewValue: '2:4'},
-    {value: '4:1', viewValue: '4:1'},
+    { value: '1:1', viewValue: '1:1' },
+    { value: '9:16', viewValue: '9:16' },
+    { value: '16:9', viewValue: '16:9' },
+    { value: '2:4', viewValue: '2:4' },
+    { value: '4:1', viewValue: '4:1' },
   ];
   selectedAspectRatio = this.aspectRatioList[0];
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,
-    aspectRatio: '1:1',
+    aspectRatio: this.selectedAspectRatio.value,
+    imageStyle: this.selectedImageStyle,
+    numberOfImages: this.numberOfResults,
   };
+  imageStyleList: Style[] = [
+    { value: 'Modern' },
+    { value: 'Realistic' },
+    { value: 'Vintage' },
+    { value: 'Monochrome' },
+    { value: 'Fantasy' },
+  ];
+  activatedRoute: ActivatedRoute | null | undefined;
+
 
   constructor(
     private router: Router,
@@ -104,13 +121,14 @@ export class SearchResultsComponent implements OnDestroy {
     }
 
     this.searchRequest.term = query || '';
+    this.currentSearchTerm = query;
     const newSearchRequest = this.searchRequest;
 
     this.service.search(newSearchRequest).subscribe({
       next: (searchResponse: GeneratedImage[]) => {
         this.summary = searchResponse?.[0]?.enhancedPrompt || '';
         this.documents = searchResponse;
-        this.serachResult.forEach((element: GeneratedImage) => {
+        this.searchResult.forEach((element: GeneratedImage) => {
           this.images.push(element.image?.encodedImage);
         });
         this.selectedResult = searchResponse[0];
@@ -188,40 +206,56 @@ export class SearchResultsComponent implements OnDestroy {
     term,
     aspectRatio,
     model,
+    imageStyle,
+    numberOfImages
   }: {
     term?: string | undefined;
     aspectRatio?: string | undefined;
     model?: string | undefined;
+    imageStyle?: string | undefined;
+    numberOfImages?: number | undefined;
   }) {
     if (!term) return;
 
     this.showDefaultDocuments = false;
     this.userService.showLoading();
-    this.serachResult = [];
+    this.searchResult = [];
     this.summary = '';
     this.documents = [];
     this.images = [];
-    this.router.navigate(['/search'], {queryParams: {q: term}});
-    if (term) this.searchRequest.term = term;
-    if (aspectRatio) this.searchRequest.aspectRatio = aspectRatio;
-    if (model) this.searchRequest.model = model;
+
+    this.searchRequest.term = term || this.searchRequest.term;
+    this.searchRequest.aspectRatio = aspectRatio || this.selectedAspectRatio.value;
+    this.searchRequest.model = model || this.selectedModel;
+    this.searchRequest.imageStyle = imageStyle || this.selectedImageStyle;
+    this.searchRequest.numberOfImages = numberOfImages || this.numberOfResults;
+
     const newSearchRequest = this.searchRequest;
+    console.log('Search request:', newSearchRequest);
+    this.currentSearchTerm = newSearchRequest.term;
 
     this.service.search(newSearchRequest).subscribe({
       next: (searchResponse: any) => {
         this.summary = searchResponse?.[0]?.enhancedPrompt || '';
         this.documents = searchResponse;
-        this.serachResult.forEach((element: GeneratedImage) => {
+        this.searchResult.forEach((element: GeneratedImage) => {
           this.images.push(element.image?.encodedImage);
         });
         this.selectedResult = searchResponse[0];
         this.userService.hideLoading();
+        console.log('Search response:', searchResponse);
       },
       error: error => {
         console.error('Search error:', error);
         this.userService.hideLoading();
         this.showErrorSnackBar(error);
       },
+    });
+
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { q: this.currentSearchTerm },
+      queryParamsHandling: '',
     });
   }
 
@@ -235,12 +269,23 @@ export class SearchResultsComponent implements OnDestroy {
 
   changeImagen3Model(model: Imagen3Model) {
     this.selectedModel = model.value;
-    this.searchTerm({model: this.selectedModel});
+    this.searchTerm({ model: this.selectedModel });
   }
 
   changeAspectRatio(aspectRatio: AspectRatio) {
     this.selectedAspectRatio = aspectRatio;
-    this.searchTerm({aspectRatio: aspectRatio.value});
+    this.searchTerm({ aspectRatio: aspectRatio.value });
+    console.log('Selected Aspect Ratio:', this.selectedAspectRatio);
+  }
+
+  changeImageStyle(style: Style) {
+    this.selectedImageStyle = style.value;
+    console.log('Selected Image Style:', this.selectedImageStyle);
+  }
+
+  onNumberOfResultsChange(event: any) {
+    this.numberOfResults = event.target.value;
+    console.log('Selected Number of Results:', this.numberOfResults);
   }
 
   previewDocument(event: any, document: any) {
