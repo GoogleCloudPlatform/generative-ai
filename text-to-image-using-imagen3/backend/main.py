@@ -17,12 +17,16 @@ def configure_cors(app):
     if environment == "production":
         frontend_url = getenv("FRONTEND_URL")
         if not frontend_url:
-            raise ValueError("FRONTEND_URL environment variable not set in production")
+            raise ValueError(
+                "FRONTEND_URL environment variable not set in production"
+            )
         allowed_origins.append(frontend_url)
     elif environment == "development":
-        allowed_origins.append("*") # Allow all origins in development
+        allowed_origins.append("*")  # Allow all origins in development
     else:
-        raise ValueError(f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'")
+        raise ValueError(
+            f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'"
+        )
 
     app.add_middleware(
         CORSMiddleware,
@@ -63,7 +67,6 @@ async def audio_chat(audio_file: UploadFile = File(...)):
 
     print("Waiting for operation to complete...")
     response = operation.result(timeout=90)
-    print(response)
 
     text = ""
     for result in response.results:

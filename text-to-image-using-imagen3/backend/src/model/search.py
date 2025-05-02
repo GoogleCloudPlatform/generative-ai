@@ -17,7 +17,11 @@ GenerationModelOptionalLiteral = Union[
 ]
 
 AspectRatioLiteral = Union[
-    Literal["1:1"], Literal["9:16"], Literal["16:9"], Literal["2:4"], Literal["4:1"]
+    Literal["1:1"],
+    Literal["9:16"],
+    Literal["16:9"],
+    Literal["2:4"],
+    Literal["4:1"],
 ]
 
 ImageStyleLiteral = Union[
@@ -37,13 +41,16 @@ class CreateSearchRequest(BaseModel):
         Optional[GenerationModelOptionalLiteral],
         Query(description="Model used for image generation"),
     ] = Field(
-        default="imagen-3.0-generate-002", description="Model used for image generation"
+        default="imagen-3.0-generate-002",
+        description="Model used for image generation",
     )
     aspect_ratio: Annotated[
-        Optional[AspectRatioLiteral], Query(description="Aspect ratio of the image")
+        Optional[AspectRatioLiteral],
+        Query(description="Aspect ratio of the image"),
     ] = Field(default="1:1", description="Aspect ratio of the image")
     number_of_images: Annotated[
-        Optional[int], Field(ge=1, le=10, description="Number of images to generate")
+        Optional[int],
+        Field(ge=1, le=10, description="Number of images to generate"),
     ] = Field(4, description="Number of images to generate")
     image_style: Annotated[
         Optional[ImageStyleLiteral], Query(description="Style of the image")

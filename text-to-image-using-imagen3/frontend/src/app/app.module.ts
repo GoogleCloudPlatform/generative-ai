@@ -117,13 +117,13 @@ import {TruncatePipe} from './pipes/truncate.pipe';
     MatButtonToggleModule,
     MatSidenavModule,
     MatAutocompleteModule,
-    environment.requiredLogin == 'True'
+    environment.requiredLogin === 'True'
       ? [
           provideFirebaseApp(() => initializeApp(environment.firebase)),
           provideAuth(() => getAuth()),
         ]
       : [],
-    environment.requiredLogin == 'True'
+    environment.requiredLogin === 'True'
       ? [provideAnalytics(() => getAnalytics())]
       : [],
     FlexLayoutModule,
@@ -135,7 +135,7 @@ import {TruncatePipe} from './pipes/truncate.pipe';
   ],
   providers: [
     {provide: LocationStrategy, useClass: PathLocationStrategy},
-    environment.requiredLogin == 'True'
+    environment.requiredLogin === 'True'
       ? [
           ScreenTrackingService, // Automatically track screen views
           UserTrackingService, // Automatically track user interactions

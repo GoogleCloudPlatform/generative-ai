@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Output} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {SpeechToTextService} from 'src/app/services/speech-to-text';
 
 @Component({
@@ -30,7 +30,9 @@ export class ChatInputComponent {
     navigator.mediaDevices
       .getUserMedia({audio: true})
       .then(stream => this.setupMediaRecorder(stream))
-      .catch(err => {});
+      .catch(err => {
+        console.error(err);
+      });
   }
 
   searchTerm() {

@@ -1,14 +1,9 @@
 import {Component, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
 import {SearchService} from 'src/app/services/search.service';
-import {ReplaySubject, takeUntil} from 'rxjs';
+import {ReplaySubject} from 'rxjs';
 import {UserService} from 'src/app/services/user/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {
-  search_document_type,
-  search_image_type,
-  PDF,
-  image_name,
-} from 'src/environments/constant';
+import {PDF, image_name} from 'src/environments/constant';
 import {
   DomSanitizer,
   SafeResourceUrl,
@@ -16,9 +11,9 @@ import {
 } from '@angular/platform-browser';
 import {MatDialog} from '@angular/material/dialog';
 import {GeneratedImage} from 'src/app/models/generated-image.model';
-import { SearchRequest } from 'src/app/models/search.model';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ToastMessageComponent } from '../../toast-message/toast-message.component';
+import {SearchRequest} from 'src/app/models/search.model';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastMessageComponent} from '../../toast-message/toast-message.component';
 
 interface Imagen3Model {
   value: string;
@@ -42,7 +37,7 @@ export class SearchResultsComponent implements OnDestroy {
   private readonly destroyed = new ReplaySubject<void>(1);
   serachResult: any = [];
   documents: any = [];
-  showDefaultDocuments: boolean = false;
+  showDefaultDocuments = false;
   images: any = [];
   pdf = PDF;
   imageName = image_name;
@@ -160,7 +155,6 @@ export class SearchResultsComponent implements OnDestroy {
     );
 
     let errorMessage = '';
-    let triedToGeneratePersons = false;
     if (error?.error?.detail?.[0]?.msg)
       errorMessage = `${error?.error?.detail?.[0]?.msg} - ${error?.error?.detail?.[0]?.loc}`;
     else if (error?.error?.detail)
@@ -169,7 +163,6 @@ export class SearchResultsComponent implements OnDestroy {
           "The image you want to edit contains content that has been blocked because you selected the 'Don't allow' option for Person Generation."
         )
       ) {
-        triedToGeneratePersons = true;
         errorMessage =
           'The image you want to edit contains content that has been blocked because there are persons in it. See the safety settings documentation for more details.';
       } else errorMessage = error?.error?.detail;
@@ -188,7 +181,7 @@ export class SearchResultsComponent implements OnDestroy {
   }
 
   goToResults(term: string) {
-    this.router.navigate(['/search'], {queryParams: {q: term}});  
+    this.router.navigate(['/search'], {queryParams: {q: term}});
   }
 
   searchTerm({
@@ -200,7 +193,7 @@ export class SearchResultsComponent implements OnDestroy {
     aspectRatio?: string | undefined;
     model?: string | undefined;
   }) {
-    if (!term) return
+    if (!term) return;
 
     this.showDefaultDocuments = false;
     this.userService.showLoading();

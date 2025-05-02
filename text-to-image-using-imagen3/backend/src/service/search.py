@@ -19,7 +19,9 @@ class ImagenSearchService:
     ) -> List[ImageGenerationResult]:
         _, PROJECT_ID = google.auth.default()
         LOCATION = "northamerica-northeast1"
-        client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+        client = genai.Client(
+            vertexai=True, project=PROJECT_ID, location=LOCATION
+        )
 
         prompt = f"Make the image with a style '{image_style}'. The user prompt is: {term}"
         # Imagen3 image generation

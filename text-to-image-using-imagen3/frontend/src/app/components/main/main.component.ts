@@ -1,4 +1,4 @@
-import {Component, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {UserService} from 'src/app/services/user/user.service';
 import {Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
