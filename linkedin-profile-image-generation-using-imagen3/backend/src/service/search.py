@@ -30,7 +30,9 @@ class ImagenSearchService:
     ) -> List[ImageGenerationResult]:
         _, PROJECT_ID = google.auth.default()
         LOCATION = "us-central1"
-        client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+        client = genai.Client(
+            vertexai=True, project=PROJECT_ID, location=LOCATION
+        )
 
         prompt = f"""
           IMPORTANT! Create an image that is in UHD, 4k, hyper realistic, extremely detailed, professional, vibrant, not grainy, smooth.
@@ -62,7 +64,9 @@ class ImagenSearchService:
 
         # Convert the padded image back to bytes
         buffered = BytesIO()
-        padded_image.save(buffered, format="JPEG")  # Or PNG, depending on your needs
+        padded_image.save(
+            buffered, format="JPEG"
+        )  # Or PNG, depending on your needs
         padded_image_bytes = buffered.getvalue()
 
         original_image = Image(image_bytes=padded_image_bytes)
@@ -125,16 +129,18 @@ class ImagenSearchService:
             ),
         )
 
-        images_face_recognition: types.EditImageResponse = client.models.edit_image(
-            model=searchRequest.generation_model,
-            prompt=prompt,
-            reference_images=[raw_reference_image, mask_ref_image],
-            config=EditImageConfig(
-                edit_mode="EDIT_MODE_BGSWAP",
-                number_of_images=searchRequest.number_of_images,
-                safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
-                person_generation="ALLOW_ADULT",
-            ),
+        images_face_recognition: types.EditImageResponse = (
+            client.models.edit_image(
+                model=searchRequest.generation_model,
+                prompt=prompt,
+                reference_images=[raw_reference_image, mask_ref_image],
+                config=EditImageConfig(
+                    edit_mode="EDIT_MODE_BGSWAP",
+                    number_of_images=searchRequest.number_of_images,
+                    safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
+                    person_generation="ALLOW_ADULT",
+                ),
+            )
         )
 
         # Imagen3 edition for just the entire image

@@ -11,5 +11,5 @@ export const environment = {
   requiredLogin: 'True',
   backendURL: 'http://localhost:8080/api',
   chatbotName: 'LinkedIn Profile Image Generation Agent',
-  environment: 'development'
+  environment: 'development',
 };

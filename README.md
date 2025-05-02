@@ -1,5 +1,6 @@
 # 🚀 Quickbot
 
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
 Quickbot is an innovative, out-of-the-box solution enabling users to deploy sophisticated AI Agents as full-stack cloud applications on their own Google Cloud Platform (GCP) accounts, entirely without requiring any coding expertise. It empowers you to seamlessly integrate and customize Google's latest AI models and protocols through intuitive templates.

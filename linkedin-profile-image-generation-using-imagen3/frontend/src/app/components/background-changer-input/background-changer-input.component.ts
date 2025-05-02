@@ -7,8 +7,6 @@ import {
 } from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ImageService} from 'src/app/services/image/image.service';
-import {Subscription} from 'rxjs';
-import {UserService} from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-background-changer-input',
@@ -20,35 +18,16 @@ export class BackgroundChangerInputComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   imageUrl: any;
   userPhotoUrl: string | null = null;
-  isUserPhotoUrl: boolean = false;
-  // private imageSubscription: Subscription;
+  isUserPhotoUrl = false;
 
   constructor(
-    private _UserService: UserService,
     private sanitizer: DomSanitizer,
     private _ImageService: ImageService
-  ) {
-    // this.imageSubscription = this._ImageService.selectedImage$.subscribe(
-    //   image => {
-    //     if (image) {
-    //       this.selectedFile = image.file;
-    //       this.imageUrl = image.imageUrl
-    //         ? this.sanitizer.bypassSecurityTrustUrl(image.imageUrl)
-    //         : null;
-    //       this.isUserPhotoUrl = image.isUserPhotoUrl;
-    //     }
-    //   }
-    // );
-  }
+  ) {}
 
-  ngOnInit(): void {
-    // this.userPhotoUrl = this._UserService.getUserDetails().photoURL || null;
-    // if (this.userPhotoUrl) this.loadImageFromUserUrl(this.userPhotoUrl);
-  }
+  ngOnInit(): void {}
 
-  ngOnDestroy(): void {
-    // this.imageSubscription.unsubscribe();
-  }
+  ngOnDestroy(): void {}
 
   onFileSelected(event: any) {
     if (event) {

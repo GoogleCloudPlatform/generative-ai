@@ -1,10 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import { environment } from 'src/environments/environment';
-
-interface LooseObject {
-  [key: string]: any;
-}
+import {environment} from 'src/environments/environment';
 
 type UserStored = {
   uid?: string;
@@ -21,10 +17,8 @@ type UserStored = {
 export class UserService {
   readonly loadingSubject = new BehaviorSubject<boolean>(false);
   requiredLogin: string = environment.requiredLogin;
-  
-  constructor() {}
 
-  setUserDetails(userStored: UserStored) {}
+  constructor() {}
 
   showLoading() {
     this.loadingSubject.next(true);
@@ -35,7 +29,10 @@ export class UserService {
   }
 
   getUserDetails(): UserStored {
-    if (this.requiredLogin === 'True' && localStorage.getItem('USER_DETAILS') !== null) {
+    if (
+      this.requiredLogin === 'True' &&
+      localStorage.getItem('USER_DETAILS') !== null
+    ) {
       const userObj = localStorage.getItem('USER_DETAILS');
       return JSON.parse(userObj || '{}');
     } else {
