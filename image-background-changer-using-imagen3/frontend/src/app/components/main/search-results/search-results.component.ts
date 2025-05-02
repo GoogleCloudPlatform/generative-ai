@@ -1,14 +1,9 @@
 import {Component, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
 import {SearchService} from 'src/app/services/search.service';
-import {ReplaySubject, takeUntil} from 'rxjs';
+import {ReplaySubject} from 'rxjs';
 import {UserService} from 'src/app/services/user/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {
-  search_document_type,
-  search_image_type,
-  PDF,
-  image_name,
-} from 'src/environments/constant';
+import {PDF, image_name} from 'src/environments/constant';
 import {
   DomSanitizer,
   SafeResourceUrl,
@@ -43,7 +38,7 @@ export class SearchResultsComponent implements OnDestroy {
   private readonly destroyed = new ReplaySubject<void>(1);
   serachResult: any = [];
   documents: any = [];
-  showDefaultDocuments: boolean = false;
+  showDefaultDocuments = false;
   images: any = [];
   pdf = PDF;
   imageName = image_name;
@@ -70,8 +65,8 @@ export class SearchResultsComponent implements OnDestroy {
     {value: 'Fantasy', viewValue: 'Fantasy'},
   ];
   selectedStyle: string = this.imageStylesList[0].value;
-  selectedNumberOfResults: number = 4;
-  selectedMaskDistilation: number = 0.005;
+  selectedNumberOfResults = 4;
+  selectedMaskDistilation = 0.005;
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,

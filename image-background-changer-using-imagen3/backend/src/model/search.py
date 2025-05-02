@@ -13,7 +13,8 @@ GenerationModelOptionalLiteral = Union[
 class CreateSearchRequest(BaseModel):
     term: str = Field(description="Prompt term to be passed to the model")
     generation_model: Optional[GenerationModelOptionalLiteral] = Field(
-        default="imagen-3.0-capability-001", description="Model used for image edition"
+        default="imagen-3.0-capability-001",
+        description="Model used for image edition",
     )
     number_of_images: Optional[int] = Field(
         4, description="Number of images to generate"

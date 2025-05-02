@@ -25,7 +25,9 @@ class ImagenSearchService:
     ) -> List[ImageGenerationResult]:
         _, PROJECT_ID = google.auth.default()
         LOCATION = "us-central1"
-        client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+        client = genai.Client(
+            vertexai=True, project=PROJECT_ID, location=LOCATION
+        )
 
         prompt = f""" {searchRequest.term}"""
 
@@ -58,16 +60,18 @@ class ImagenSearchService:
                 mask_dilation=searchRequest.mask_distilation,
             ),
         )
-        images_just_background: types.EditImageResponse = client.models.edit_image(
-            model=searchRequest.generation_model,
-            prompt=prompt,
-            reference_images=[raw_reference_image, mask_ref_image],
-            config=EditImageConfig(
-                edit_mode="EDIT_MODE_BGSWAP",
-                number_of_images=searchRequest.number_of_images,
-                safety_filter_level="BLOCK_ONLY_HIGH",
-                person_generation="DONT_ALLOW",
-            ),
+        images_just_background: types.EditImageResponse = (
+            client.models.edit_image(
+                model=searchRequest.generation_model,
+                prompt=prompt,
+                reference_images=[raw_reference_image, mask_ref_image],
+                config=EditImageConfig(
+                    edit_mode="EDIT_MODE_BGSWAP",
+                    number_of_images=searchRequest.number_of_images,
+                    safety_filter_level="BLOCK_ONLY_HIGH",
+                    person_generation="DONT_ALLOW",
+                ),
+            )
         )
 
         # Make sure to convert the image from bytes to encoded string before sending to the frontend

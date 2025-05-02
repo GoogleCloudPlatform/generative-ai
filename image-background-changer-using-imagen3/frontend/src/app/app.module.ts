@@ -44,10 +44,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableModule} from '@angular/material/table';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {
-  MatButtonToggle,
-  MatButtonToggleModule,
-} from '@angular/material/button-toggle';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
@@ -122,13 +119,13 @@ import {BackgroundChangerInputComponent} from './components/background-changer-i
     MatButtonToggleModule,
     MatSidenavModule,
     MatAutocompleteModule,
-    environment.requiredLogin == 'True'
+    environment.requiredLogin === 'True'
       ? [
           provideFirebaseApp(() => initializeApp(environment.firebase)),
           provideAuth(() => getAuth()),
         ]
       : [],
-    environment.requiredLogin == 'True'
+    environment.requiredLogin === 'True'
       ? [provideAnalytics(() => getAnalytics())]
       : [],
     FlexLayoutModule,
@@ -140,7 +137,7 @@ import {BackgroundChangerInputComponent} from './components/background-changer-i
   ],
   providers: [
     {provide: LocationStrategy, useClass: PathLocationStrategy},
-    environment.requiredLogin == 'True'
+    environment.requiredLogin === 'True'
       ? [
           ScreenTrackingService, // Automatically track screen views
           UserTrackingService, // Automatically track user interactions

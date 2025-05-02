@@ -1,4 +1,10 @@
-import {Component, ViewChild, ElementRef, Output, EventEmitter} from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 
 @Component({
   selector: 'app-background-changer-input',
@@ -12,8 +18,6 @@ export class BackgroundChangerInputComponent {
 
   @Output() emitSearch: EventEmitter<File> = new EventEmitter();
 
-
-  
   constructor() {}
 
   onFileSelected(event: any): void {

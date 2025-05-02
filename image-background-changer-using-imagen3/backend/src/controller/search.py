@@ -26,7 +26,8 @@ async def search(
         Form(description="Model used for image edition"),
     ],
     numberOfImages: Annotated[
-        Optional[int], Form(ge=1, le=4, description="Number of images to generate")
+        Optional[int],
+        Form(ge=1, le=4, description="Number of images to generate"),
     ],
     maskDistilation: Annotated[
         Optional[float],
@@ -68,7 +69,9 @@ async def search(
     except Exception as e:
         raise HTTPException(
             status_code=(
-                e.code if hasattr(e, "code") else Status.HTTP_500_INTERNAL_SERVER_ERROR
+                e.code
+                if hasattr(e, "code")
+                else Status.HTTP_500_INTERNAL_SERVER_ERROR
             ),
             detail=str(e.message) if hasattr(e, "message") else str(e),
         )
