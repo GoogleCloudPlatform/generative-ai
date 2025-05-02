@@ -1,6 +1,7 @@
 """Tests for the search controller and service."""
 
 import base64
+from io import BytesIO
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,6 +10,7 @@ from google.genai import types
 
 from src.controller.search import router
 from src.model.search import (
+    CreateSearchRequest,
     ImageGenerationResult,
     CustomImageResult,
 )
@@ -22,23 +24,27 @@ client = TestClient(router)
 def fixture_mock_genai_client():
     """Provides a mock google.genai Client."""
     mock_client = MagicMock()
-    mock_response = types.GenerateImagesResponse()
+    mock_response = types.EditImageResponse()
 
     # Create mock generated images with base64 encoded placeholder image data
-    mock_image = types.GeneratedImage()
-    mock_image.enhanced_prompt = "Mock enhanced prompt"
-    mock_image.image = types.Image()
-    mock_image.image.gcs_uri = "gs://mock_bucket/mock_image.png"
-    mock_image.image.image_bytes = b"mock_image_bytes"  # Must be bytes
-    mock_image.image.mime_type = "image/png"
+    mock_image_data = types.Image(
+        gcs_uri="gs://mock_bucket/mock_image.png",
+        image_bytes=b"mock_image_bytes",  # Must be bytes
+        mime_type="image/png",
+    )
+    mock_generated_image = types.GeneratedImage(
+        enhanced_prompt="Mock enhanced prompt",
+        rai_filtered_reason=None,
+        image=mock_image_data,
+    )
     mock_response.generated_images = [
-        mock_image,
-        mock_image,
-        mock_image,
-        mock_image,
+        mock_generated_image,
+        mock_generated_image,
+        mock_generated_image,
+        mock_generated_image,
     ]
 
-    mock_client.models.generate_images.return_value = mock_response
+    mock_client.models.edit_image.return_value = mock_response
     return mock_client
 
 
@@ -52,6 +58,7 @@ def fixture_mock_imagen_search_service(mock_genai_client):
 
 class TestSearchController:
     """Tests for the /api/search endpoint."""
+
     def test_search_endpoint(self, monkeypatch, mock_imagen_search_service):
         # Mock the ImagenSearchService to avoid actual API calls
         # Mock the google.auth.default to avoid authentication issues
@@ -71,12 +78,23 @@ class TestSearchController:
                 "src.service.search.google.genai.Client", mock_client_class
             )
 
-            search_term = "test search term"
-            response = client.post("/api/search", json={"term": search_term})
+            search_term = "a cute cat wearing a hat"
+            image_content = b"fake_png_bytes_for_testing"
+            user_image = ("test_image.png", BytesIO(image_content), "image/png")
+            response = client.post(
+                "/api/search",
+                data={
+                    "term": search_term,
+                    "numberOfImages": 4,
+                    "maskDistilation": 0.005,
+                    "generationModel": "imagen-3.0-capability-001",
+                },
+                files={"userImage": user_image},
+            )
 
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 4
+        assert len(data) == 8
 
         for image_data in data:
             assert image_data["enhancedPrompt"] == "Mock enhanced prompt"
@@ -88,11 +106,11 @@ class TestSearchController:
             assert image_data["image"]["encodedImage"] == base64.b64encode(
                 b"mock_image_bytes"
             ).decode("utf-8")
-            # other assertions based on the model
 
 
 class TestImagenSearchService:
     """Tests for the ImagenSearchService class."""
+
     def test_imagen_search_service(
         self, monkeypatch, mock_imagen_search_service
     ):
@@ -110,11 +128,17 @@ class TestImagenSearchService:
                 "src.service.search.google.genai.Client", mock_client_class
             )
 
-            search_term = "test search term"
-            results = mock_imagen_search_service.generate_images(search_term)
+            search_request = CreateSearchRequest(
+                term="a dog playing fetch",
+                user_image=b"fake_user_image_bytes",
+                number_of_images=2,
+                mask_distilation=0.1,
+                generation_model="imagegeneration@006",
+            )
+            results = mock_imagen_search_service.generate_images(search_request)
 
         assert isinstance(results, list)
-        assert len(results) == 4  #  Number of mock images
+        assert len(results) == 8
         assert all(
             isinstance(result, ImageGenerationResult) for result in results
         )
