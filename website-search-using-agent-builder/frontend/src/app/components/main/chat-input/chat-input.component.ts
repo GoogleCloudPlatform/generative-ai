@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { SpeechToTextService } from 'src/app/services/speech-to-text';
+import {Component, EventEmitter, Output} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {SpeechToTextService} from 'src/app/services/speech-to-text';
 
 @Component({
   selector: 'app-chat-input',
@@ -8,29 +8,29 @@ import { SpeechToTextService } from 'src/app/services/speech-to-text';
   styleUrls: ['./chat-input.component.scss'],
 })
 export class ChatInputComponent {
-
   isRecording = false;
   transcribedText = '';
-  mediaRecorder: MediaRecorder;
+  mediaRecorder: MediaRecorder | undefined;
   audioChunks: Blob[] = [];
 
-  term: string = ''
-  @Output() emitSearch: EventEmitter<string> = new EventEmitter()
+  term = '';
+  @Output() emitSearch: EventEmitter<string> = new EventEmitter();
 
   constructor(
     private speechToTextService: SpeechToTextService,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute
   ) {
     const query = this.route.snapshot.queryParamMap.get('q');
-    if(query) {
+    if (query) {
       this.term = query;
     }
   }
 
   ngOnInit() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
+    navigator.mediaDevices
+      .getUserMedia({audio: true})
       .then(stream => this.setupMediaRecorder(stream))
-      .catch((err) => {});
+      .catch(err => console.error(err));
   }
 
   searchTerm() {
@@ -39,19 +39,20 @@ export class ChatInputComponent {
 
   setupMediaRecorder(stream: MediaStream) {
     this.mediaRecorder = new MediaRecorder(stream);
-    this.mediaRecorder.ondataavailable = event => this.audioChunks.push(event.data);
+    this.mediaRecorder.ondataavailable = event =>
+      this.audioChunks.push(event.data);
     this.mediaRecorder.onstop = () => this.sendAudioToGCP();
   }
 
   startRecording() {
     this.isRecording = true;
     this.audioChunks = [];
-    this.mediaRecorder.start();
+    if (this.mediaRecorder) this.mediaRecorder.start();
   }
 
   stopRecording() {
     this.isRecording = false;
-    this.mediaRecorder.stop();
+    if (this.mediaRecorder) this.mediaRecorder.stop();
   }
 
   async sendAudioToGCP() {
@@ -60,8 +61,8 @@ export class ChatInputComponent {
     (await this.speechToTextService.transcribeAudio(audioBlob)).subscribe(
       (response: any) => {
         // console.log(response)
-        this.term = response[0]
-        this.searchTerm()
+        this.term = response[0];
+        this.searchTerm();
       },
       (error: any) => {
         // Handle errors

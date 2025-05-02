@@ -12,33 +12,41 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post("")
 async def search(item: CreateSearchRequest):
     service = SearchApplicationService()
     search_application = service.get()
-    if not search_application: raise BadRequest(detail=f"No Search Application found on project") 
+    if not search_application:
+        raise BadRequest(detail=f"No Search Application found on project")
 
     service = SearchService(
         search_application,
     )
     return service.search(item.term)
 
+
 @router.get("/engines")
 async def get_all_engines():
     service = EngineService()
     return service.get_all()
+
 
 @router.get("/application")
 async def get_search_application():
     service = SearchApplicationService()
     return service.get()
 
+
 @router.post("/application")
 async def create_search_application(search_application: SearchApplication):
     service = SearchApplicationService()
     return service.create(search_application)
 
+
 @router.put("/application/{engine_id}")
-async def update_search_application(engine_id: str, search_application: SearchApplication):
+async def update_search_application(
+    engine_id: str, search_application: SearchApplication
+):
     service = SearchApplicationService()
     return service.update(engine_id, search_application)

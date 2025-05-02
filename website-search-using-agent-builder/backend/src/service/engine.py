@@ -1,5 +1,8 @@
 from typing import List
-from google.cloud.discoveryengine_v1 import EngineServiceClient, ListEnginesRequest
+from google.cloud.discoveryengine_v1 import (
+    EngineServiceClient,
+    ListEnginesRequest,
+)
 from google.api_core.client_options import ClientOptions
 
 from src.model.search import PROJECT_ID, Engine
@@ -9,13 +12,16 @@ LOCATIONS = [
     "us",
 ]
 
+
 class EngineService:
-    
+
     def get_all(self) -> List[Engine]:
         engines = []
         for location in LOCATIONS:
             client_options = (
-                ClientOptions(api_endpoint=f"{location}-discoveryengine.googleapis.com")
+                ClientOptions(
+                    api_endpoint=f"{location}-discoveryengine.googleapis.com"
+                )
                 if location != "global"
                 else None
             )

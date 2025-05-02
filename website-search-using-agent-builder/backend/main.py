@@ -6,6 +6,7 @@ from os import getenv
 
 app = FastAPI()
 
+
 def configure_cors(app):
     """Configures CORS middleware based on the environment."""
     environment = getenv("ENVIRONMENT")
@@ -14,12 +15,16 @@ def configure_cors(app):
     if environment == "production":
         frontend_url = getenv("FRONTEND_URL")
         if not frontend_url:
-            raise ValueError("FRONTEND_URL environment variable not set in production")
+            raise ValueError(
+                "FRONTEND_URL environment variable not set in production"
+            )
         allowed_origins.append(frontend_url)
     elif environment == "development":
-        allowed_origins.append("*") # Allow all origins in development
+        allowed_origins.append("*")  # Allow all origins in development
     else:
-        raise ValueError(f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'")
+        raise ValueError(
+            f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'"
+        )
 
     app.add_middleware(
         CORSMiddleware,
@@ -29,15 +34,18 @@ def configure_cors(app):
         allow_headers=["*"],
     )
 
+
 # Create a route to handle GET requests on root
 @app.get("/")
 async def root():
-    return 'You are calling Quick Bot Backend'
+    return "You are calling Quick Bot Backend"
+
 
 # Create a route to handle GET requests on /version
 @app.get("/api/version")
 def version():
-    return 'v0.0.1'
+    return "v0.0.1"
+
 
 @app.post("/api/audio_chat")
 async def audio_chat(audio_file: UploadFile = File(...)):
@@ -65,6 +73,7 @@ async def audio_chat(audio_file: UploadFile = File(...)):
         text = result.alternatives[0].transcript
 
     return text, 200
+
 
 configure_cors(app)
 

@@ -39,7 +39,6 @@ export class ChatInputComponent {
     if (this.term && this.term.trim()) {
       this.emitSearch.emit(this.term.trim());
     }
-    // this.emitSearch.emit(this.term);
   }
 
   setupMediaRecorder(stream: MediaStream) {
