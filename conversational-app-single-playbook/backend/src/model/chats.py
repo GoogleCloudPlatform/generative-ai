@@ -30,9 +30,10 @@ class Chat(BaseModel):
             "suggested_questions": self.suggested_questions,
             "timestamp": self.timestamp,
         }
-    
+
     def to_insert_string(self):
         return f'"{self.id}", """{self.question}""", """{self.answer}""", "{self.intent}", {str(self.suggested_questions)}, CURRENT_TIMESTAMP()'
+
 
 class CreateChatRequest(BaseModel):
     text: str

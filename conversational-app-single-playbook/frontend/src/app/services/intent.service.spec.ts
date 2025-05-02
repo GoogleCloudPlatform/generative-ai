@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { IntentService } from './intent.service';
+import {IntentService} from './intent.service';
 
 describe('IntentService', () => {
   let service: IntentService;

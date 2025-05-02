@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ManageIntentComponent } from './manage-intent.component';
+import {ManageIntentComponent} from './manage-intent.component';
 
 describe('ManageIntentComponent', () => {
   let component: ManageIntentComponent;
@@ -8,9 +8,8 @@ describe('ManageIntentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManageIntentComponent]
-    })
-    .compileComponents();
+      imports: [ManageIntentComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ManageIntentComponent);
     component = fixture.componentInstance;

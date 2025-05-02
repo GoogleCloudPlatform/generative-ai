@@ -1,4 +1,3 @@
-
 from google.cloud.bigquery import SchemaField
 from pydantic import BaseModel
 from typing import List, Optional
@@ -28,6 +27,6 @@ class Embedding(BaseModel):
             "author": self.author,
             "timestamp": self.timestamp,
         }
-    
+
     def to_insert_string(self):
         return f'"{self.id}", """{self.text}""", "{self.index}", "{self.author}", CURRENT_TIMESTAMP()'

@@ -1,22 +1,25 @@
-import { Component } from '@angular/core';
-import { IntentService, IntentDetails, Model } from '../../services/intent.service';
-import { ModelsService } from 'src/app/services/models.service';
+import {Component} from '@angular/core';
+import {
+  IntentService,
+  IntentDetails,
+  Model,
+} from '../../services/intent.service';
+import {ModelsService} from 'src/app/services/models.service';
 
 @Component({
   selector: 'app-manage-intent',
   templateUrl: './manage-intent.component.html',
-  styleUrls: ['./manage-intent.component.scss']
+  styleUrls: ['./manage-intent.component.scss'],
 })
 export class ManageIntentComponent {
-
   intents: IntentDetails[];
   showMainSpinner = false;
   models: Model[] = [];
-  createMode: boolean = false;
+  createMode = false;
 
   constructor(
     private intentService: IntentService,
-    private modelsService: ModelsService,
+    private modelsService: ModelsService
   ) {
     this.getAllIntent();
     this.modelsService.getAll().subscribe(response => {
@@ -27,14 +30,14 @@ export class ManageIntentComponent {
   getAllIntent() {
     this.showMainSpinner = true;
     this.intentService.getAllIntent().subscribe({
-      next: (response) => {
+      next: response => {
         this.showMainSpinner = false;
         this.intents = response;
       },
       error: () => {
         this.showMainSpinner = false;
         console.log('error');
-      }
+      },
     });
   }
 
@@ -46,4 +49,3 @@ export class ManageIntentComponent {
     this.createMode = false;
   }
 }
-

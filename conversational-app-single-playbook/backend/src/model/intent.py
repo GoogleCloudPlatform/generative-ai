@@ -22,7 +22,7 @@ class Intent(BaseModel):
             SchemaField("gcp_bucket", "STRING", mode="REQUIRED"),
             SchemaField("questions", "STRING", mode="REPEATED"),
         ]
-    
+
     def __from_row__(row):
         return Intent(
             name=row[0],
@@ -43,15 +43,16 @@ class Intent(BaseModel):
             "gcp_bucket": self.gcp_bucket,
             "questions": self.questions,
         }
-    
+
     def to_insert_string(self):
         return f'"{self.name}", "{self.ai_model}", {self.ai_temperature},"""{self.prompt}""", "{self.status}", "{self.gcp_bucket}", {str(self.questions)}'
 
     def is_active(self) -> bool:
         return self.status == "5"
-    
+
     def get_standard_name(self) -> str:
         return self.name.lower().replace(" ", "-").replace("_", "-")
+
 
 class CreateIntentRequest(BaseModel):
     name: str
@@ -70,7 +71,7 @@ class CreateIntentRequest(BaseModel):
             "prompt": self.prompt,
             "questions": self.questions,
         }
-    
+
     def to_intent(self) -> Intent:
         return Intent(
             name=self.name,

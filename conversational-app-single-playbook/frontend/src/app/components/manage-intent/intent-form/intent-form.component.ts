@@ -1,25 +1,41 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { IntentDetails, IntentService, Model } from 'src/app/services/intent.service';
-import { ToastMessageComponent } from '../../shared/toast-message/toast-message.component';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import {
+  Component,
+  Input,
+  OnChanges,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
+import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {
+  IntentDetails,
+  IntentService,
+  Model,
+} from 'src/app/services/intent.service';
+import {ToastMessageComponent} from '../../shared/toast-message/toast-message.component';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-intent-form',
   templateUrl: './intent-form.component.html',
-  styleUrls: ['./intent-form.component.scss']
+  styleUrls: ['./intent-form.component.scss'],
 })
 export class IntentFormComponent implements OnChanges {
+  @Input() models: Model[] = [];
+  @Input() intent: IntentDetails = {
+    name: '',
+    ai_model: '',
+    ai_temperature: '',
+    prompt: '',
+    status: '',
+    questions: [],
+  };
 
-  @Input() models: Model[]
-  @Input() intent: IntentDetails;
+  editMode = false;
+  showSpinner = false;
 
-  editMode: boolean = false;
-  showSpinner: boolean = false;
-
-  @ViewChild('deleteDialogRef', { static: true })
+  @ViewChild('deleteDialogRef', {static: true})
   deleteDialogRef!: TemplateRef<{}>;
   deleteIntentDialogRef?: MatDialogRef<{}>;
 
@@ -29,8 +45,8 @@ export class IntentFormComponent implements OnChanges {
     prompt: new FormControl<string>('', Validators.required),
     ai_model: new FormControl<string>('', Validators.required),
     ai_temperature: new FormControl<string>('', Validators.required),
-    questions: new FormArray<FormControl<string|null>>([])
-  })
+    questions: new FormArray<FormControl<string | null>>([]),
+  });
 
   constructor(
     private dialog: MatDialog,
@@ -38,7 +54,7 @@ export class IntentFormComponent implements OnChanges {
     private snackbar: MatSnackBar,
     private router: Router
   ) {
-    this.intentForm.disable()
+    this.intentForm.disable();
   }
 
   ngOnChanges(): void {
@@ -46,20 +62,31 @@ export class IntentFormComponent implements OnChanges {
     this.intentForm.controls.gcp_bucket.setValue(this.intent.gcp_bucket || '');
     this.intentForm.controls.prompt.setValue(this.intent.prompt);
     this.intentForm.controls.ai_model.setValue(this.intent.ai_model);
-    this.intentForm.controls.ai_temperature.setValue(this.intent.ai_temperature);
-    this.intentForm.controls.questions = new FormArray<FormControl<string|null>>([])
-    for(let question of this.intent.questions) {
-      this.intentForm.controls.questions.push(new FormControl<string>({value: question, disabled: true}, Validators.required))
+    this.intentForm.controls.ai_temperature.setValue(
+      this.intent.ai_temperature
+    );
+    this.intentForm.controls.questions = new FormArray<
+      FormControl<string | null>
+    >([]);
+    for (const question of this.intent.questions) {
+      this.intentForm.controls.questions.push(
+        new FormControl<string>(
+          {value: question, disabled: true},
+          Validators.required
+        )
+      );
     }
   }
 
   getHumanReadablestring(s: string) {
-    return s.replace("_", " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
+    return s
+      .replace('_', ' ')
+      .replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
   }
 
   toggleEditMode() {
     this.editMode = !this.editMode;
-    if(this.editMode) {
+    if (this.editMode) {
       this.intentForm.enable();
       this.intentForm.controls.questions.enable();
       this.intentForm.controls.name.disable();
@@ -75,12 +102,17 @@ export class IntentFormComponent implements OnChanges {
   }
 
   addQuestion() {
-    this.intentForm.controls.questions.push(new FormControl<string>({value: '', disabled: false}, Validators.required));
+    this.intentForm.controls.questions.push(
+      new FormControl<string>({value: '', disabled: false}, Validators.required)
+    );
   }
 
   showDeleteDialog(event: any) {
     event.stopPropagation();
-    this.deleteIntentDialogRef = this.dialog.open(this.deleteDialogRef, { width: '60%', maxWidth: '700px' });
+    this.deleteIntentDialogRef = this.dialog.open(this.deleteDialogRef, {
+      width: '60%',
+      maxWidth: '700px',
+    });
   }
 
   deleteIntent() {
@@ -90,70 +122,75 @@ export class IntentFormComponent implements OnChanges {
         this.showSpinner = false;
         this.deleteIntentDialogRef!.close();
         this.snackbar.openFromComponent(ToastMessageComponent, {
-          panelClass: ["green-toast"],
-          verticalPosition: "top",
-          horizontalPosition: "right",
+          panelClass: ['green-toast'],
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
           duration: 5000,
-          data: { text: 'Intent deleted', icon: "tick-with-circle" },
+          data: {text: 'Intent deleted', icon: 'tick-with-circle'},
         });
         this.router.navigateByUrl('/');
       },
       error: () => {
         this.showSpinner = false;
         this.snackbar.openFromComponent(ToastMessageComponent, {
-          panelClass: ["red-toast"],
-          verticalPosition: "top",
-          horizontalPosition: "right",
+          panelClass: ['red-toast'],
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
           duration: 5000,
-          data: { text: 'failed to delete intent', icon: "cross-in-circle-white" },
+          data: {
+            text: 'failed to delete intent',
+            icon: 'cross-in-circle-white',
+          },
         });
-
-      }
+      },
     });
   }
 
   saveForm() {
-    if (!this.intentForm.valid  || !this.intentForm.controls.questions.valid){
+    if (!this.intentForm.valid || !this.intentForm.controls.questions.valid) {
       this.snackbar.openFromComponent(ToastMessageComponent, {
-        panelClass: ["red-toast"],
-        verticalPosition: "top",
-        horizontalPosition: "right",
+        panelClass: ['red-toast'],
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
         duration: 5000,
-        data: { text: 'There is an error on the intent form', icon: "cross-in-circle-white" },
+        data: {
+          text: 'There is an error on the intent form',
+          icon: 'cross-in-circle-white',
+        },
       });
       return;
-    };
+    }
 
     this.showSpinner = true;
-    this.intent.name = this.intentForm.controls.name.value!
-    this.intent.gcp_bucket = this.intentForm.controls.gcp_bucket.value!
-    this.intent.prompt = this.intentForm.controls.prompt.value!
-    this.intent.ai_model = this.intentForm.controls.ai_model.value!
-    this.intent.ai_temperature = this.intentForm.controls.ai_temperature.value!
-    this.intent.questions = (this.intentForm.controls.questions.value) as string[]
+    this.intent.name = this.intentForm.controls.name.value!;
+    this.intent.gcp_bucket = this.intentForm.controls.gcp_bucket.value!;
+    this.intent.prompt = this.intentForm.controls.prompt.value!;
+    this.intent.ai_model = this.intentForm.controls.ai_model.value!;
+    this.intent.ai_temperature = this.intentForm.controls.ai_temperature.value!;
+    this.intent.questions = this.intentForm.controls.questions
+      .value as string[];
 
-    this.service.updateIntent(this.intent)
-      .subscribe({
-        next: () => {
-          this.showSpinner = false;
-          this.snackbar.openFromComponent(ToastMessageComponent, {
-            panelClass: ["green-toast"],
-            verticalPosition: "top",
-            horizontalPosition: "right",
-            duration: 5000,
-            data: { text: 'Intent Saved', icon: "tick-with-circle" },
-          });
-        },
-        error: () => {
-          this.showSpinner = false;
-          this.snackbar.openFromComponent(ToastMessageComponent, {
-            panelClass: ["red-toast"],
-            verticalPosition: "top",
-            horizontalPosition: "right",
-            duration: 5000,
-            data: { text: 'failed to save intent', icon: "cross-in-circle-white" },
-          });
-        }
-      });
+    this.service.updateIntent(this.intent).subscribe({
+      next: () => {
+        this.showSpinner = false;
+        this.snackbar.openFromComponent(ToastMessageComponent, {
+          panelClass: ['green-toast'],
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          duration: 5000,
+          data: {text: 'Intent Saved', icon: 'tick-with-circle'},
+        });
+      },
+      error: () => {
+        this.showSpinner = false;
+        this.snackbar.openFromComponent(ToastMessageComponent, {
+          panelClass: ['red-toast'],
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          duration: 5000,
+          data: {text: 'failed to save intent', icon: 'cross-in-circle-white'},
+        });
+      },
+    });
   }
 }
