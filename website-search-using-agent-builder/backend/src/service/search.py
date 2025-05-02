@@ -1,3 +1,11 @@
+"""
+Service layer for interacting with the Google Cloud Discovery Engine Search API.
+
+This module provides the SearchService class, which encapsulates the logic for
+constructing search requests, executing them against a configured 
+Discovery Engine, and processing the results into a standardized format.
+"""
+
 from typing import List
 from google.cloud.discoveryengine_v1 import SearchRequest, SearchServiceClient
 from src.model.search import SearchApplication, SearchResult
@@ -19,14 +27,53 @@ SPELL_CORRECTION_SPEC = SearchRequest.SpellCorrectionSpec(
 
 
 class SearchService:
+    """
+    Handles search operations using Google Cloud Discovery Engine.
+
+    This service takes a SearchApplication configuration, initializes the
+    necessary Discovery Engine client, and provides a method to perform
+    searches based on a given term.
+    """
 
     def __init__(self, search_application: SearchApplication):
+        """
+        Initializes the SearchService.
+
+        Sets up the Discovery Engine SearchServiceClient with appropriate
+        client options based on the region specified in the search_application.
+        It also stores the serving configuration path derived from the
+        search_application details.
+
+        Args:
+            search_application: The SearchApplication configuration containing
+                                engine ID, region, and other necessary details
+                                to connect to the correct Discovery Engine.
+        """
         self.search_client = SearchServiceClient(
             client_options=search_application.get_client_options()
         )
         self.serving_config = search_application.get_serving_config()
 
     def search(self, term: str) -> List[SearchResult]:
+        """
+        Performs a search query against the configured Discovery Engine.
+
+        Constructs a SearchRequest with the provided search term and predefined
+        configs for content search, query expansion and spell correction.
+        It then calls the Discovery Engine API, processes the results, filters
+        them (currently only keeping 'en' locale results), extracts relevant
+        information like title, snippet, link, and image, and maps them to
+        SearchResult objects.
+
+        Args:
+            term: The search query string entered by the user.
+
+        Returns:
+            A list of SearchResult objects representing the processed and
+            filtered search results. Returns an empty list if no relevant
+            results are found or if an error occurs during the API call
+            (though errors are not explicitly handled here beyond the client).
+        """
         request = SearchRequest(
             serving_config=self.serving_config,
             query=term,

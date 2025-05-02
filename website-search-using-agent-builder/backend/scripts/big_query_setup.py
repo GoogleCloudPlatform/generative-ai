@@ -10,8 +10,9 @@ PROJECT_ID = bigquery_client.project
 def create_dataset(dataset_name: str):
     """Deletes an existing BigQuery dataset and recreates it.
 
-    If the dataset already exists, it and all its contents will be deleted first.
-    Then, a new empty dataset with the specified name is created.
+    If the dataset already exists, it and all its contents 
+    will be deleted first. Then, a new empty dataset with 
+    the specified name is created.
 
     Args:
         dataset_name: The name for the BigQuery dataset.

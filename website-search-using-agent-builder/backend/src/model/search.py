@@ -1,3 +1,11 @@
+"""Defines data models for search operations and configurations.
+
+This module includes Pydantic models for API requests/responses related to
+search applications and engines, as well as dataclasses for representing
+search results internally. It also handles fetching the default Google Cloud
+Project ID.
+"""
+
 from dataclasses import dataclass
 from typing import List, Optional
 from pydantic import BaseModel
@@ -9,32 +17,54 @@ _, PROJECT_ID = google.auth.default()
 
 
 class CreateSearchRequest(BaseModel):
+    """Request model for initiating a search."""
     term: str
 
 
 class SearchApplication(BaseModel):
+    """Represents the configuration for a Discovery Engine
+    Search Application."""
     engine_id: str
     region: str
 
     def __schema__() -> List[SchemaField]:
+        """Defines the BigQuery schema for storing SearchApplication data."""
         return [
             SchemaField("engine_id", "STRING", mode="REQUIRED"),
             SchemaField("region", "STRING", mode="REQUIRED"),
         ]
 
     def __from_row__(row):
+        """Creates a SearchApplication instance from a BigQuery Row object.
+
+        Assumes the row contains 'engine_id' and 'region' in order.
+
+        Args:
+            row: The BigQuery Row object.
+
+        Returns:
+            A SearchApplication instance.
+        """
         return SearchApplication(engine_id=row[0], region=row[1])
 
     def to_dict(self):
+        """Converts the SearchApplication instance to a dictionary."""
         return {
             "engine_id": self.engine_id,
             "region": self.region,
         }
 
     def to_insert_string(self):
+        """Formats the application data as a string for SQL INSERT VALUES."""
         return f'"{self.engine_id}", "{self.region}"'
 
     def get_client_options(self) -> Optional[ClientOptions]:
+        """Generates API client options based on the application's region.
+
+        Returns:
+            ClientOptions configured with the regional endpoint, or None if
+            the region is 'global'.
+        """
         return (
             ClientOptions(
                 api_endpoint=f"{self.region}-discoveryengine.googleapis.com"
@@ -44,10 +74,18 @@ class SearchApplication(BaseModel):
         )
 
     def get_serving_config(self) -> str:
-        return f"projects/{PROJECT_ID}/locations/{self.region}/collections/default_collection/engines/{self.engine_id}/servingConfigs/default_config"
+        """Constructs the full serving config path for the Discovery Engine API.
 
+        Returns:
+            The formatted serving config string.
+        """
+        serving_config = f"projects/{PROJECT_ID}/locations/{self.region}"
+        serving_config += "/collections/default_collection/engines"
+        serving_config += f"/{self.engine_id}/servingConfigs/default_config"
+        return serving_config
 
 class Engine(BaseModel):
+    """Represents a discovered Discovery Engine instance."""
     name: str
     engine_id: str
     region: str
@@ -55,6 +93,7 @@ class Engine(BaseModel):
 
 @dataclass
 class SearchResult:
+    """Represents a website search result from a search query."""
     document_id: str
     title: str
     snippet: str
