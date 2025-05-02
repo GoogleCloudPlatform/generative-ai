@@ -18,8 +18,8 @@ from src.service.search import ImagenSearchService
 client = TestClient(router)
 
 
-@pytest.fixture(scope="function")
-def mock_genai_client():
+@pytest.fixture(scope="function", name="mock_genai_client")
+def fixture_mock_genai_client():
     """Provides a mock google.genai Client."""
     mock_client = MagicMock()
     mock_response = types.GenerateImagesResponse()
@@ -42,8 +42,8 @@ def mock_genai_client():
     return mock_client
 
 
-@pytest.fixture(scope="function")
-def mock_imagen_search_service(mock_genai_client):
+@pytest.fixture(scope="function", name="mock_imagen_search_service")
+def fixture_mock_imagen_search_service(mock_genai_client):
     """Provides a mock ImagenSearchService with a mock genai client."""
     service = ImagenSearchService()
     service.client = mock_genai_client  # Inject the mock client
