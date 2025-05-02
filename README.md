@@ -188,7 +188,7 @@ To maintain code quality and consistency:
 3.  **Check for linting issues with `pylint`:**
     Navigate to the `backend/` directory and run:
     ```bash
-    pylint **/*.py
+    pylint .
     ```
     (Or specify modules/packages: `pylint your_module_name`)
 4.  **Format code with `black`:**

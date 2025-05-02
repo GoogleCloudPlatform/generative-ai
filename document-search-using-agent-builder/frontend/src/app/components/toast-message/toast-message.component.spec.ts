@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ToastMessageComponent } from './toast-message.component';
+import {ToastMessageComponent} from './toast-message.component';
 
 describe('ToastMessageComponent', () => {
   let component: ToastMessageComponent;
@@ -8,9 +8,8 @@ describe('ToastMessageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ToastMessageComponent ]
-    })
-    .compileComponents();
+      declarations: [ToastMessageComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ToastMessageComponent);
     component = fixture.componentInstance;

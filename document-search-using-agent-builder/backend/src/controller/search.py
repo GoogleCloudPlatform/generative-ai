@@ -1,20 +1,22 @@
+"""API endpoints for managing and performing document searches."""
+
 from fastapi import APIRouter, Request, HTTPException, Response
-from src.model.search import CreateSearchRequest, SearchApplication
+from google.cloud import storage
+from pydantic import BaseModel
 from src.model.http_status import BadRequest
 from src.model.search import CreateSearchRequest, SearchApplication
-
 from src.service.engine import EngineService
 from src.service.search import SearchService
 from src.service.search_application import SearchApplicationService
-from google.cloud import storage
-import datetime
-from pydantic import BaseModel
 
 
 class SignedUrlRequest(BaseModel):
+    """Request model for fetching a document directly from GCS."""
+
     gcs_url: str
 
-storage_client = storage.Client()    
+
+storage_client = storage.Client()
 
 router = APIRouter(
     prefix="/api/search",
@@ -22,34 +24,76 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post("")
 async def search(item: CreateSearchRequest):
+    """
+    Performs a search using the configured Search Application.
+
+    Args:
+        item: The search request containing the search term.
+
+    Raises:
+        BadRequest: If no Search Application is configured for the project.
+
+    Returns:
+        The search results from the SearchService.
+    """
     service = SearchApplicationService()
     search_application = service.get()
-    if not search_application: raise BadRequest(detail=f"No Search Application found on project") 
+    if not search_application:
+        raise BadRequest(detail="No Search Application found on project")
 
     service = SearchService(
         search_application,
     )
     return service.search(item.term)
 
+
 @router.get("/engines")
 async def get_all_engines():
+    """Retrieves all available Search Engines."""
     service = EngineService()
     return service.get_all()
 
+
 @router.get("/application")
 async def get_search_application():
+    """Retrieves the currently configured Search Application."""
     service = SearchApplicationService()
     return service.get()
 
+
 @router.post("/application")
 async def create_search_application(search_application: SearchApplication):
+    """
+    Creates a new Search Application configuration.
+
+    Args:
+        search_application: The details of the Search Application to create.
+
+    Returns:
+        The created Search Application configuration.
+    """
     service = SearchApplicationService()
     return service.create(search_application)
 
+
 @router.put("/application/{engine_id}")
-async def update_search_application(engine_id: str, search_application: SearchApplication):
+async def update_search_application(
+    engine_id: str, search_application: SearchApplication
+):
+    """
+    Updates an existing Search Application configuration.
+
+    Args:
+        engine_id: The ID of the engine associated with 
+        the application to update.
+        search_application: The updated details for the Search Application.
+
+    Returns:
+        The updated Search Application configuration.
+    """
     service = SearchApplicationService()
     return service.update(engine_id, search_application)
 
@@ -57,13 +101,19 @@ async def update_search_application(engine_id: str, search_application: SearchAp
 @router.post("/doc")
 async def get_document(request: Request, response_model=None):
     """
-    Generates a signed URL for a file in Google Cloud Storage.
+    Fetches a document directly from GCS and returns its content.
+
+    Expects a JSON body with a 'gcs_url' field specifying the full GCS path
+    (e.g., "gs://your-bucket-name/your-file.pdf").
 
     Args:
-        gcs_url: The full GCS URL of the file 
-                 (e.g., "gs://your-bucket-name/your-file.pdf").
-        expiration_hours: The number of hours the signed URL should be valid for.
-                          Defaults to 1 hour.
+        request: The incoming FastAPI request object.
+
+    Raises:
+        HTTPException: If the GCS URL is invalid or the file cannot be fetched.
+
+    Returns:
+        A FastAPI Response object containing the raw PDF content.
     """
     try:
         req_body = await request.json()
@@ -84,4 +134,6 @@ async def get_document(request: Request, response_model=None):
         return Response(content=pdf_content, media_type="application/pdf")
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching PDF: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error fetching PDF: {str(e)}"
+        )

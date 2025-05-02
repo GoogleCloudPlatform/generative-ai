@@ -1,3 +1,12 @@
+"""
+Main FastAPI application entry point for the Quick Bot Backend.
+
+This module initializes the FastAPI application, configures CORS based on
+the environment, defines root and version endpoints, includes API routers
+(e.g., for search functionality), and provides an endpoint for audio
+transcription using Google Cloud Speech-to-Text.
+"""
+
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from src.controller.search import router as search_router
@@ -5,6 +14,7 @@ from google.cloud import speech
 from os import getenv
 
 app = FastAPI()
+
 
 def configure_cors(app):
     """Configures CORS middleware based on the environment."""
@@ -14,12 +24,17 @@ def configure_cors(app):
     if environment == "production":
         frontend_url = getenv("FRONTEND_URL")
         if not frontend_url:
-            raise ValueError("FRONTEND_URL environment variable not set in production")
+            raise ValueError(
+                "FRONTEND_URL environment variable not set in production"
+            )
         allowed_origins.append(frontend_url)
     elif environment == "development":
-        allowed_origins.append("*") # Allow all origins in development
+        allowed_origins.append("*")  # Allow all origins in development
     else:
-        raise ValueError(f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'")
+        raise ValueError(
+            f"""Invalid ENVIRONMENT: {environment}.
+            Must be 'production' or 'development'"""
+        )
 
     app.add_middleware(
         CORSMiddleware,
@@ -29,15 +44,18 @@ def configure_cors(app):
         allow_headers=["*"],
     )
 
+
 # Create a route to handle GET requests on root
 @app.get("/")
 async def root():
-    return 'You are calling Quick Bot Backend'
+    return "You are calling Quick Bot Backend"
+
 
 # Create a route to handle GET requests on /version
 @app.get("/api/version")
 def version():
-    return 'v0.0.1'
+    return "v0.0.1"
+
 
 @app.post("/api/audio_chat")
 async def audio_chat(audio_file: UploadFile = File(...)):
@@ -61,10 +79,11 @@ async def audio_chat(audio_file: UploadFile = File(...)):
 
     text = ""
     for result in response.results:
-        print("Transcript: {}".format(result.alternatives[0].transcript))
+        print(f"Transcript: {result.alternatives[0].transcript}")
         text = result.alternatives[0].transcript
 
     return text, 200
+
 
 configure_cors(app)
 

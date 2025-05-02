@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ManageSearchApplicationComponent } from './manage-search-application.component';
+import {ManageSearchApplicationComponent} from './manage-search-application.component';
 
 describe('ManageAgentBuilderComponent', () => {
   let component: ManageSearchApplicationComponent;
@@ -8,9 +8,8 @@ describe('ManageAgentBuilderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ManageSearchApplicationComponent ]
-    })
-    .compileComponents();
+      declarations: [ManageSearchApplicationComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ManageSearchApplicationComponent);
     component = fixture.componentInstance;
