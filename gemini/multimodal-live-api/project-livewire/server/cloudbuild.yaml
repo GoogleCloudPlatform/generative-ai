@@ -1,12 +1,12 @@
 steps:
 # Build the container image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/livewire-backend', '.']
+  args: ['build', '-t', 'gcr.io/$GOOGLE_CLOUD_PROJECT/livewire-backend', '.']
   dir: 'server'
 
 # Push the container image to Container Registry
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/livewire-backend']
+  args: ['push', 'gcr.io/$GOOGLE_CLOUD_PROJECT/livewire-backend']
 
 # Deploy container image to Cloud Run
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -15,7 +15,7 @@ steps:
   - 'deploy'
   - 'livewire-backend'
   - '--image'
-  - 'gcr.io/$PROJECT_ID/livewire-backend'
+  - 'gcr.io/$GOOGLE_CLOUD_PROJECT/livewire-backend'
   - '--region'
   - 'us-central1'
   - '--platform'
@@ -24,9 +24,9 @@ steps:
   - '--port'
   - '8081'
   - '--set-env-vars'
-  - 'PROJECT_ID=${PROJECT_ID},LOG_LEVEL=INFO'
+  - 'GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},LOG_LEVEL=INFO'
   - '--service-account'
-  - 'livewire-backend@${PROJECT_ID}.iam.gserviceaccount.com'
+  - 'livewire-backend@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com'
 
 images:
-- 'gcr.io/$PROJECT_ID/livewire-backend' 
+- 'gcr.io/$GOOGLE_CLOUD_PROJECT/livewire-backend' 

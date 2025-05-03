@@ -8,7 +8,7 @@ This guide provides step-by-step instructions for deploying the Project Livewire
 2.  **Google Cloud SDK (`gcloud`):** Installed and authenticated.
     *   [Install Guide](https://cloud.google.com/sdk/docs/install)
     *   Login: `gcloud auth login`
-    *   Set your project: `gcloud config set project YOUR_PROJECT_ID` (Replace `YOUR_PROJECT_ID`)
+    *   Set your project: `gcloud config set project YOUR_GOOGLE_CLOUD_PROJECT` (Replace `YOUR_GOOGLE_CLOUD_PROJECT`)
 3.  **Enabled APIs:** Ensure the following APIs are enabled in your project:
     *   Cloud Build API (`cloudbuild.googleapis.com`)
     *   Cloud Run API (`run.googleapis.com`)
@@ -35,7 +35,7 @@ The Cloud Run service for the backend needs an identity to securely access other
 ```bash
 # Define service account name (optional, adjust if needed)
 export BACKEND_SA_NAME="livewire-backend"
-export PROJECT_ID=$(gcloud config get-value project)
+export GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
 
 # Create the service account
 gcloud iam service-accounts create ${BACKEND_SA_NAME} \
@@ -43,13 +43,13 @@ gcloud iam service-accounts create ${BACKEND_SA_NAME} \
     --display-name="Livewire Backend SA"
 
 # Grant Secret Manager access to the service account
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member="serviceAccount:${BACKEND_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+    --member="serviceAccount:${BACKEND_SA_NAME}@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
 
 # (Optional) Grant Vertex AI User role if using Vertex endpoint
-# gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-#    --member="serviceAccount:${BACKEND_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+# gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+#    --member="serviceAccount:${BACKEND_SA_NAME}@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com" \
 #    --role="roles/aiplatform.user"
 ```
 
@@ -87,7 +87,7 @@ cd /path/to/project-livewire
 
 # Submit the build and deployment job
 # This uses the configuration in server/cloudbuild.yaml
-# It sets PROJECT_ID and the service account during deployment
+# It sets GOOGLE_CLOUD_PROJECT and the service account during deployment
 gcloud builds submit --config server/cloudbuild.yaml
 ```
 
@@ -98,7 +98,7 @@ gcloud builds submit --config server/cloudbuild.yaml
     *   Sets the region (default `us-central1` - modify YAML if needed).
     *   Allows unauthenticated access (for easy client connection - **consider restricting access in production**).
     *   Sets the container port to `8081`.
-    *   Sets environment variables (`PROJECT_ID`, `LOG_LEVEL`). You can add more here (like `VERTEX_API=true`, `VERTEX_LOCATION`, or Function URLs if not using secrets).
+    *   Sets environment variables (`GOOGLE_CLOUD_PROJECT`, `LOG_LEVEL`). You can add more here (like `GOOGLE_GENAI_USE_VERTEXAI=true`, `GOOGLE_CLOUD_LOCATION`, or Function URLs if not using secrets).
     *   Assigns the `livewire-backend` service account created earlier.
 
 ### 4. Get the Backend Service URL
@@ -165,7 +165,7 @@ Open the `FRONTEND_URL` in your web browser to use the deployed Project Livewire
     *   Ensure the Cloud Build service account has necessary permissions (e.g., to push to Container Registry, deploy to Cloud Run).
 *   **Cloud Run Service Errors:**
     *   Check the "Logs" tab for your `livewire-backend` and `livewire-ui` services in the Cloud Run section of the Google Cloud Console.
-    *   **Backend:** Look for errors related to Secret Manager access (check IAM roles), API key validity, connection issues to Gemini, or problems calling Cloud Functions. Ensure `PROJECT_ID` is correctly passed or available.
+    *   **Backend:** Look for errors related to Secret Manager access (check IAM roles), API key validity, connection issues to Gemini, or problems calling Cloud Functions. Ensure `GOOGLE_CLOUD_PROJECT` is correctly passed or available.
     *   **Frontend:** Look for nginx errors or issues serving files. Ensure the backend URL was correctly passed during the build and is accessible.
 *   **Connection Issues (Client <-> Server):**
     *   Verify the WebSocket URL used by the client correctly points to the `wss://` version of the `livewire-backend` service URL.

@@ -12,8 +12,8 @@ This directory contains various tools that are deployed as Google Cloud Function
 1. **Google Cloud Project Setup**:
    ```bash
    # Set your project ID
-   export PROJECT_ID=your-project-id
-   gcloud config set project $PROJECT_ID
+   export GOOGLE_CLOUD_PROJECT=your-project-id
+   gcloud config set project $GOOGLE_CLOUD_PROJECT
    ```
 
 2. **Enable Required APIs**:
@@ -37,8 +37,8 @@ This directory contains various tools that are deployed as Google Cloud Function
 2. **Grant Secret Manager Access**:
    ```bash
    # Grant access to weather function service account
-   gcloud projects add-iam-policy-binding $PROJECT_ID \
-       --member="serviceAccount:weather-function-sa@$PROJECT_ID.iam.gserviceaccount.com" \
+   gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
+       --member="serviceAccount:weather-function-sa@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com" \
        --role="roles/secretmanager.secretAccessor"
    ```
 
@@ -70,7 +70,7 @@ This directory contains various tools that are deployed as Google Cloud Function
        --runtime python310 \
        --trigger-http \
        --entry-point=get_weather \
-       --service-account="weather-function-sa@$PROJECT_ID.iam.gserviceaccount.com" \
+       --service-account="weather-function-sa@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com" \
        --source=cloud-functions/weather-tools/get-weather-tool \
        --region=us-central1
    ```

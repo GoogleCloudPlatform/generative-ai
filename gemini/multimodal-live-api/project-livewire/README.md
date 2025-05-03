@@ -78,7 +78,7 @@ These are the basic steps. For more detailed instructions, see the **[Local Setu
 This uses Cloud Build to containerize and deploy the client & server. For more detailed step-by-step instructions, refer to the **[Cloud Deployment Guide](./docs/cloud_deployment.md)**.
 
 1.  **Setup Google Cloud:**
-    *   Set your project: `gcloud config set project YOUR_PROJECT_ID`
+    *   Set your project: `gcloud config set project YOUR_GOOGLE_CLOUD_PROJECT`
     *   Enable APIs (Run, Cloud Build, Secret Manager, etc.).
     *   Create Secrets (`GOOGLE_API_KEY`, `OPENWEATHER_API_KEY`) in Secret Manager.
     *   Create a Service Account (`livewire-backend`) with Secret Accessor role.
@@ -86,7 +86,7 @@ This uses Cloud Build to containerize and deploy the client & server. For more d
 
 2.  **Deploy Backend:**
     ```bash
-    # Make sure PROJECT_ID is set in your environment or cloudbuild.yaml
+    # Make sure GOOGLE_CLOUD_PROJECT is set in your environment or cloudbuild.yaml
     gcloud builds submit --config server/cloudbuild.yaml
     ```
 

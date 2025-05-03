@@ -21,8 +21,8 @@ Before deploying and using these Cloud Functions, ensure you have the following 
    - Set your project ID in your gcloud configuration:
      ```bash
      # Set your project ID
-     export PROJECT_ID=your-project-id
-     gcloud config set project \$PROJECT_ID
+     export GOOGLE_CLOUD_PROJECT=your-project-id
+     gcloud config set project \$GOOGLE_CLOUD_PROJECT
      ```
 
 2. **Enable Required Google Cloud APIs**:
@@ -64,13 +64,13 @@ The Cloud Functions use Google Cloud Secret Manager to securely store API keys a
    - Give each service account the "Secret Manager Secret Accessor" role so they can retrieve secrets.
      ```bash
      # Grant access to weather function service account
-     gcloud projects add-iam-policy-binding \$PROJECT_ID \\
-         --member="serviceAccount:weather-function-sa@\$PROJECT_ID.iam.gserviceaccount.com" \\
+     gcloud projects add-iam-policy-binding \$GOOGLE_CLOUD_PROJECT \\
+         --member="serviceAccount:weather-function-sa@\$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com" \\
          --role="roles/secretmanager.secretAccessor"
 
      # Grant access to calendar function service account
-     gcloud projects add-iam-policy-binding \$PROJECT_ID \\
-         --member="serviceAccount:calendar-function-sa@\$PROJECT_ID.iam.gserviceaccount.com" \\
+     gcloud projects add-iam-policy-binding \$GOOGLE_CLOUD_PROJECT \\
+         --member="serviceAccount:calendar-function-sa@\$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com" \\
          --role="roles/secretmanager.secretAccessor"
      ```
 
@@ -107,7 +107,7 @@ Follow these steps to set up and deploy the Weather Cloud Functions.
          --runtime python310 \\
          --trigger-http \\
          --entry-point=get_weather \\
-         --service-account="weather-function-sa@\$PROJECT_ID.iam.gserviceaccount.com" \\
+         --service-account="weather-function-sa@\$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com" \\
          --source=get-weather-tool \\
          --region=us-central1
      ```
@@ -150,7 +150,7 @@ To use the Calendar Tool, you need to configure a service account, share your Go
          --runtime python310 \\
          --trigger-http \\
          --entry-point=get_calendar \\
-         --service-account="calendar-function-sa@\$PROJECT_ID.iam.gserviceaccount.com" \\
+         --service-account="calendar-function-sa@\$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com" \\
          --source=get-calendar-tool \\
          --region=us-central1 \\
          --set-env-vars CALENDAR_ID=your.calendar.id@gmail.com

@@ -50,9 +50,9 @@ Before you begin, ensure you have the following installed and configured:
         *   `CALENDAR_FUNCTION_URL`: **Required** for the calendar tool. Paste the trigger URL of your deployed `get-calendar-tool` function.
         *   `OPENWEATHER_API_KEY`: **Required** if *not* storing it in Secret Manager and accessing via ADC. Paste your OpenWeather API key here.
     *   **Optional/Advanced Configuration:**
-        *   `PROJECT_ID`: Your Google Cloud Project ID. Required if using Vertex AI or accessing secrets via ADC.
-        *   `VERTEX_LOCATION`: Google Cloud region (e.g., `us-central1`). Required if using Vertex AI.
-        *   `VERTEX_API=true`: Set to `true` to use the Vertex AI endpoint instead of the Google AI Developer endpoint. Requires `PROJECT_ID` and `VERTEX_LOCATION` to be set, and appropriate authentication (usually ADC).
+        *   `GOOGLE_CLOUD_PROJECT`: Your Google Cloud Project ID. Required if using Vertex AI or accessing secrets via ADC.
+        *   `GOOGLE_CLOUD_LOCATION`: Google Cloud region (e.g., `us-central1`). Required if using Vertex AI.
+        *   `GOOGLE_GENAI_USE_VERTEXAI=true`: Set to `true` to use the Vertex AI endpoint instead of the Google AI Developer endpoint. Requires `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION` to be set, and appropriate authentication (usually ADC).
         *   `GOOGLE_APPLICATION_CREDENTIALS`: Path to your service account key file (JSON). Use this for explicit service account authentication, often used with ADC for Secret Manager access. If `gcloud auth application-default login` was used, this might not be needed.
         *   `LOG_LEVEL`: Set logging verbosity (e.g., `DEBUG`, `INFO`, `WARNING`). Defaults to `INFO`.
 
@@ -109,7 +109,7 @@ Before you begin, ensure you have the following installed and configured:
 *   **`ModuleNotFoundError`:** Make sure you installed dependencies using `pip install -r requirements.txt` in the `server/` directory (and activated your virtual environment if you created one).
 *   **API Key Errors / Authentication Errors:**
     *   Double-check the `GOOGLE_API_KEY` in your `.env` file.
-    *   If using Vertex AI or ADC, ensure `PROJECT_ID` is correct and your environment is properly authenticated (`gcloud auth application-default login` or `GOOGLE_APPLICATION_CREDENTIALS`).
+    *   If using Vertex AI or ADC, ensure `GOOGLE_CLOUD_PROJECT` is correct and your environment is properly authenticated (`gcloud auth application-default login` or `GOOGLE_APPLICATION_CREDENTIALS`).
     *   Check server logs for specific authentication failure messages.
 *   **Tool Function Errors (e.g., Weather):**
     *   Verify the `*_FUNCTION_URL`s in your `.env` file are correct and point to your *deployed* Cloud Functions.

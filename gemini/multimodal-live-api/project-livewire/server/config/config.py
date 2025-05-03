@@ -34,10 +34,10 @@ class ConfigurationError(Exception):
 def get_secret(secret_id: str) -> str:
     """Get secret from Secret Manager."""
     client = secretmanager.SecretManagerServiceClient()
-    project_id = os.environ.get('PROJECT_ID')
+    project_id = os.environ.get('GOOGLE_CLOUD_PROJECT')
     
     if not project_id:
-        raise ConfigurationError("PROJECT_ID environment variable is not set")
+        raise ConfigurationError("GOOGLE_CLOUD_PROJECT environment variable is not set")
     
     name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
     
@@ -53,7 +53,7 @@ class ApiConfig:
     
     def __init__(self):
         # Determine if using Vertex AI
-        self.use_vertex = os.getenv('VERTEX_API', 'false').lower() == 'true'
+        self.use_vertex = os.getenv('GOOGLE_GENAI_USE_VERTEXAI', 'false').lower() == 'true'
         
         self.api_key: Optional[str] = None
         
@@ -84,8 +84,8 @@ api_config = ApiConfig()
 
 # Model configuration
 if api_config.use_vertex:
-    MODEL = os.getenv('MODEL_VERTEX_API', 'gemini-2.0-flash-exp')
-    VOICE = os.getenv('VOICE_VERTEX_API', 'Aoede')
+    MODEL = os.getenv('MODEL_GOOGLE_GENAI_USE_VERTEXAI', 'gemini-2.0-flash-exp')
+    VOICE = os.getenv('VOICE_GOOGLE_GENAI_USE_VERTEXAI', 'Aoede')
 else:
     MODEL = os.getenv('MODEL_DEV_API', 'models/gemini-2.0-flash-exp')
     VOICE = os.getenv('VOICE_DEV_API', 'Puck')

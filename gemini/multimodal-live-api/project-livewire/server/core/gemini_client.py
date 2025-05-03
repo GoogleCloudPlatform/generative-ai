@@ -31,11 +31,11 @@ async def create_gemini_session():
         
         if api_config.use_vertex:
             # Vertex AI configuration
-            location = os.getenv('VERTEX_LOCATION', 'us-central1')
-            project_id = os.environ.get('PROJECT_ID')
+            location = os.getenv('GOOGLE_CLOUD_LOCATION', 'us-central1')
+            project_id = os.environ.get('GOOGLE_CLOUD_PROJECT')
             
             if not project_id:
-                raise ConfigurationError("PROJECT_ID is required for Vertex AI")
+                raise ConfigurationError("GOOGLE_CLOUD_PROJECT is required for Vertex AI")
             
             logger.info(f"Initializing Vertex AI client with location: {location}, project: {project_id}")
             

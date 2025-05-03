@@ -20,7 +20,7 @@ from google.cloud import secretmanager
 def get_secret(secret_id):
     """Get secret from Secret Manager."""
     client = secretmanager.SecretManagerServiceClient()
-    project_id = os.environ.get('PROJECT_ID')
+    project_id = os.environ.get('GOOGLE_CLOUD_PROJECT')
     name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")

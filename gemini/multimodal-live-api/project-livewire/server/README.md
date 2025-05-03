@@ -27,7 +27,7 @@ This section guides you through setting up the server component for both local d
 2. **Google Cloud Setup (for Cloud Run deployment):**
    - **Google Cloud Project:**
      - Create a project at [Google Cloud Console](https://console.cloud.google.com).
-     - Set your project ID in gcloud CLI: `gcloud config set project YOUR_PROJECT_ID`
+     - Set your project ID in gcloud CLI: `gcloud config set project YOUR_GOOGLE_CLOUD_PROJECT`
    - **Enable Google Cloud APIs:**
      - Enable the following APIs in your Google Cloud project:
         - Secret Manager API
@@ -102,12 +102,12 @@ The server's configuration is managed through a combination of Google Cloud Secr
    - **Configuration File:** Create a `.env` file in the `server/` directory to define environment variables. Example `.env` content:
 
      ```
-     PROJECT_ID=your-gcp-project-id
+     GOOGLE_CLOUD_PROJECT=your-gcp-project-id
      LOG_LEVEL=INFO
 
      # Cloud Function URLs (replace with your actual function URLs)
-     WEATHER_FUNCTION_URL=https://REGION-PROJECT_ID.cloudfunctions.net/get-weather-tool
-     CALENDAR_FUNCTION_URL=https://REGION-PROJECT_ID.cloudfunctions.net/get-calendar-tool
+     WEATHER_FUNCTION_URL=https://REGION-GOOGLE_CLOUD_PROJECT.cloudfunctions.net/get-weather-tool
+     CALENDAR_FUNCTION_URL=https://REGION-GOOGLE_CLOUD_PROJECT.cloudfunctions.net/get-calendar-tool
 
      # Optional: API keys as fallbacks for local development (if not using Secret Manager locally)
      GOOGLE_API_KEY=your_gemini_api_key
