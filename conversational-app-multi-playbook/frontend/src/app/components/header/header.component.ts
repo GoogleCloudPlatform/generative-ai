@@ -1,15 +1,14 @@
-import { Component } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { MatIconRegistry } from '@angular/material/icon';
-import { Router } from '@angular/router';
-import { UserService } from 'src/app/services/user/user.service';
-import { AuthService } from '../../services/login/auth.service';
-import { MatDialog } from '@angular/material/dialog';
-import { environment } from 'src/environments/environment';
-import { IntentDetails, IntentService } from 'src/app/services/intent.service';
+import {Component} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
+import {MatIconRegistry} from '@angular/material/icon';
+import {Router} from '@angular/router';
+import {UserService} from 'src/app/services/user/user.service';
+import {AuthService} from '../../services/login/auth.service';
+import {MatDialog} from '@angular/material/dialog';
+import {environment} from 'src/environments/environment';
+import {IntentDetails, IntentService} from 'src/app/services/intent.service';
 
-const GOOGLE_CLOUD_ICON =
-  `<svg width="694px" height="558px" viewBox="0 0 694 558" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+const GOOGLE_CLOUD_ICON = `<svg width="694px" height="558px" viewBox="0 0 694 558" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
       <g id="google-cloud-1" fill-rule="nonzero">
           <path d="M440.545766,152.920305 L461.717489,152.920305 L522.033632,92.9270295 L525,67.4718307 C412.772422,-31.0513593 241.450145,-20.4353843 142.396729,91.1914478 C114.856041,122.200508 94.8766816,159.08162 84,199 C90.7179504,196.251996 98.1629517,195.8181 105.171723,197.72724 L225.774927,177.941608 C225.774927,177.941608 231.911237,167.846308 235.081179,168.482688 C288.737536,109.877878 379.037259,103.051256 440.981997,152.920305 L440.545766,152.920305 Z" id="Path" fill="#EA4335"></path>
@@ -28,27 +27,33 @@ const GOOGLE_CLOUD_ICON =
 export class HeaderComponent {
   headerTitle: string = environment.chatbotName;
   intentsInProgress: IntentDetails[] = [];
-  requiredLogin: string = environment.requiredLogin
+  requiredLogin: string = environment.requiredLogin;
 
-  constructor(iconRegistry: MatIconRegistry,
+  constructor(
+    iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
     private router: Router,
     public _UserService: UserService,
     public authService: AuthService,
     public dialog: MatDialog,
-    private intentsService: IntentService,
+    private intentsService: IntentService
   ) {
-    iconRegistry.addSvgIconLiteral('google-cloud-icon', sanitizer.bypassSecurityTrustHtml(GOOGLE_CLOUD_ICON));
+    iconRegistry.addSvgIconLiteral(
+      'google-cloud-icon',
+      sanitizer.bypassSecurityTrustHtml(GOOGLE_CLOUD_ICON)
+    );
     this.intentsService.getAllIntent().subscribe(allIntents => {
-      this.intentsInProgress = allIntents.filter(i => i.status === "1" || i.status === "3")
-    })
+      this.intentsInProgress = allIntents.filter(
+        i => i.status === '1' || i.status === '3'
+      );
+    });
   }
 
   navigate() {
     this.router.navigateByUrl('/');
-  };
+  }
 
-  goToManageIntentPage(){
+  goToManageIntentPage() {
     this.router.navigateByUrl('/intent-management');
   }
 
@@ -57,6 +62,6 @@ export class HeaderComponent {
   }
 
   openURL(link: string) {
-    (window as any).open(link, "_blank");
+    (window as any).open(link, '_blank');
   }
 }

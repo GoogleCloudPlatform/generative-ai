@@ -12,18 +12,21 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post("")
 async def chat(
-        item: CreateChatRequest,
-        response: Response,
-        background_tasks: BackgroundTasks
-    ):
+    item: CreateChatRequest,
+    response: Response,
+    background_tasks: BackgroundTasks,
+):
     intents = IntentService().get_all()
     intent_matching_service = IntentMatchingService(intents)
 
     intent = intent_matching_service.get_intent_from_query(item.text)
-    suggestedQuestion = intent_matching_service.get_suggested_questions(item.text, intent)
-    
+    suggestedQuestion = intent_matching_service.get_suggested_questions(
+        item.text, intent
+    )
+
     model_response = VertexAIService(intents).generate_text_from_model(
         item.text,
         intent,

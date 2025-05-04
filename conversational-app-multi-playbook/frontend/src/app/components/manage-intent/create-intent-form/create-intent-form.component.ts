@@ -1,21 +1,24 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { IntentDetails, IntentService, Model } from 'src/app/services/intent.service';
-import { ToastMessageComponent } from '../../shared/toast-message/toast-message.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
+import {
+  IntentDetails,
+  IntentService,
+  Model,
+} from 'src/app/services/intent.service';
+import {ToastMessageComponent} from '../../shared/toast-message/toast-message.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-create-intent-form',
   templateUrl: './create-intent-form.component.html',
-  styleUrls: ['./create-intent-form.component.scss']
+  styleUrls: ['./create-intent-form.component.scss'],
 })
 export class CreateIntentFormComponent {
+  @Input() models: Model[];
+  @Output() discardFormCreation: EventEmitter<boolean> = new EventEmitter();
 
-  @Input() models: Model[]
-  @Output() discardFormCreation: EventEmitter<boolean> = new EventEmitter()
-
-  hasExternalDataSource: boolean = false;
-  showSpinner: boolean = false;
+  hasExternalDataSource = false;
+  showSpinner = false;
 
   intentForm = new FormGroup({
     name: new FormControl<string>('', Validators.required),
@@ -24,12 +27,17 @@ export class CreateIntentFormComponent {
     prompt: new FormControl<string>('', Validators.required),
     ai_model: new FormControl<string>('', Validators.required),
     ai_temperature: new FormControl<string>('', Validators.required),
-    questions: new FormArray<FormControl<string|null>>([new FormControl<string>({value: '', disabled: false}, Validators.required)])
-  })
+    questions: new FormArray<FormControl<string | null>>([
+      new FormControl<string>(
+        {value: '', disabled: false},
+        Validators.required
+      ),
+    ]),
+  });
 
   constructor(
     private snackbar: MatSnackBar,
-    private service: IntentService,
+    private service: IntentService
   ) {}
 
   toggleHasExternalDataSource() {
@@ -41,62 +49,73 @@ export class CreateIntentFormComponent {
   }
 
   addQuestion() {
-    this.intentForm.controls.questions.push(new FormControl<string>({value: '', disabled: false}, Validators.required));
+    this.intentForm.controls.questions.push(
+      new FormControl<string>({value: '', disabled: false}, Validators.required)
+    );
   }
 
   discardForm() {
-    this.discardFormCreation.emit()
+    this.discardFormCreation.emit();
   }
 
   saveForm() {
-    if (!this.intentForm.valid || !this.intentForm.controls.questions.valid || (this.hasExternalDataSource && this.intentForm.controls.gcp_bucket.value === "")){
+    if (
+      !this.intentForm.valid ||
+      !this.intentForm.controls.questions.valid ||
+      (this.hasExternalDataSource &&
+        this.intentForm.controls.gcp_bucket.value === '')
+    ) {
       this.snackbar.openFromComponent(ToastMessageComponent, {
-        panelClass: ["red-toast"],
-        verticalPosition: "top",
-        horizontalPosition: "right",
+        panelClass: ['red-toast'],
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
         duration: 5000,
-        data: { text: 'There is an error on the intent creation form', icon: "cross-in-circle-white" },
+        data: {
+          text: 'There is an error on the intent creation form',
+          icon: 'cross-in-circle-white',
+        },
       });
       return;
-    };
+    }
 
     this.showSpinner = true;
-    let intent: IntentDetails = {
+    const intent: IntentDetails = {
       name: this.intentForm.controls.name.value!,
       gcp_bucket: this.intentForm.controls.gcp_bucket.value!,
       description: this.intentForm.controls.description.value!,
       prompt: this.intentForm.controls.prompt.value!,
       ai_model: this.intentForm.controls.ai_model.value!,
       ai_temperature: this.intentForm.controls.ai_temperature.value!,
-      questions: (this.intentForm.controls.questions.value) as string[],
-      status: "1",
-    }
+      questions: this.intentForm.controls.questions.value as string[],
+      status: '1',
+    };
 
     this.service.saveIntent(intent).subscribe({
       next: () => {
         this.showSpinner = false;
         this.snackbar.openFromComponent(ToastMessageComponent, {
-          panelClass: ["green-toast"],
-          verticalPosition: "top",
-          horizontalPosition: "right",
+          panelClass: ['green-toast'],
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
           duration: 5000,
-          data: { text: 'Intent Saved', icon: "tick-with-circle" },
+          data: {text: 'Intent Saved', icon: 'tick-with-circle'},
         });
-        window.location.reload()
+        window.location.reload();
       },
-      error: (response) => {
-        const message = response.error && response.error.detail ? response.error.detail : "Error creating intent"
+      error: response => {
+        const message =
+          response.error && response.error.detail
+            ? response.error.detail
+            : 'Error creating intent';
         this.showSpinner = false;
         this.snackbar.openFromComponent(ToastMessageComponent, {
-          panelClass: ["red-toast"],
-          verticalPosition: "top",
-          horizontalPosition: "right",
+          panelClass: ['red-toast'],
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
           duration: 5000,
-          data: { text: message, icon: "cross-in-circle-white" },
+          data: {text: message, icon: 'cross-in-circle-white'},
         });
-
-      }
-    })
+      },
+    });
   }
-
 }

@@ -4,7 +4,8 @@ from src.model.intent import Intent
 from src.service.vertex_ai import EMBEDDINGS_MODEL
 from typing import List
 
-class IntentMatchingService():
+
+class IntentMatchingService:
 
     def __init__(self, intents: List[Intent]):
         self.intents_map = {}
@@ -12,8 +13,9 @@ class IntentMatchingService():
 
         for intent in intents:
             self.intents_map[intent.name] = intent
-            self.questions_embeddings[intent.name] = EMBEDDINGS_MODEL.embed_documents(intent.questions)
-
+            self.questions_embeddings[intent.name] = (
+                EMBEDDINGS_MODEL.embed_documents(intent.questions)
+            )
 
     def get_intent_from_query(self, query: str) -> Intent:
         query_embeddings = EMBEDDINGS_MODEL.embed_query(query)
@@ -21,17 +23,20 @@ class IntentMatchingService():
         intent = None
 
         for intent_name, questions in self.questions_embeddings.items():
-            similarity = max(cosine_similarity([query_embeddings], questions)[0])
+            similarity = max(
+                cosine_similarity([query_embeddings], questions)[0]
+            )
             if m < similarity:
                 m = similarity
                 intent = self.intents_map[intent_name]
         return intent
 
-        
     def get_suggested_questions(self, query: str, intent: Intent) -> List[str]:
         questions = intent.questions
         query_embeddings = EMBEDDINGS_MODEL.embed_query(query)
-        similarity = cosine_similarity([query_embeddings], self.questions_embeddings[intent.name])[0]
+        similarity = cosine_similarity(
+            [query_embeddings], self.questions_embeddings[intent.name]
+        )[0]
         suggested_questions = []
         for ix in argsort(similarity)[-3:][::-1]:
             suggested_questions.append(questions[ix])

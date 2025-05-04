@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { DialogueBoxComponent } from './dialogue-box.component';
+import {DialogueBoxComponent} from './dialogue-box.component';
 
 describe('DialogueBoxComponent', () => {
   let component: DialogueBoxComponent;
@@ -8,9 +8,8 @@ describe('DialogueBoxComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogueBoxComponent ]
-    })
-    .compileComponents();
+      declarations: [DialogueBoxComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DialogueBoxComponent);
     component = fixture.componentInstance;
