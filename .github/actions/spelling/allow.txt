@@ -544,6 +544,7 @@ aexecute
 aextract
 afrom
 agentic
+agg
 ainit
 ainvoke
 aio
@@ -568,6 +569,7 @@ arun
 arxiv
 astype
 atms
+auc
 aujourd'hui
 autocal
 autoflake
@@ -1107,6 +1109,7 @@ pypdf
 pyplot
 pysftp
 pytorch
+pytrec
 pyvis
 qas
 qna
