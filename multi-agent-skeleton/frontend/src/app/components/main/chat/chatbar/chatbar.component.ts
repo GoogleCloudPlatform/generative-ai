@@ -54,6 +54,7 @@ export class ChatbarComponent implements OnDestroy {
 
   isSuggestedQuestion: string = '';
   chatQuery: string
+  currentChatId: string | null = null;
   chatQuery$: Observable<Message>;
   showLoader: boolean = false;
   startTimer: boolean = false;
@@ -227,7 +228,7 @@ export class ChatbarComponent implements OnDestroy {
     this.showLoader = true;
     this.setTimeoutForLoaderText();
     this.setCyclicBackgroundImages();
-    this.chatService.postChat(singleMessage.body).pipe(timeout(90000)).subscribe({
+    this.chatService.postChat(singleMessage.body, this.currentChatId).pipe(timeout(90000)).subscribe({
       next: (response: Chat) => this.handleBotResponse(response),
       error: (err) => {
         this.setErrorMessage();
@@ -284,6 +285,12 @@ export class ChatbarComponent implements OnDestroy {
   handleBotResponse(response: Chat) {
     let endTime = new Date().getTime();
     this.assignId(response?.id);
+
+    // --- Store the chat ID after the FIRST successful response ---
+    if (!this.currentChatId && response.id) {
+      this.currentChatId = response.id;
+      console.log("Stored Chat ID:", this.currentChatId); // For debugging
+    }
 
     let singleMesage: Message = {
       body: "",
@@ -356,6 +363,7 @@ export class ChatbarComponent implements OnDestroy {
   }
 
   resetBrowser() {
+    this.currentChatId = null;
     this.sessionService.createSession();
     this.router.navigateByUrl('/');
   }

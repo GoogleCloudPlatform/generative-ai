@@ -1,5 +1,6 @@
 export type CreateChatRequest = {
     text: string,
+    chat_id?: string
 }
 
 export type Chat = {

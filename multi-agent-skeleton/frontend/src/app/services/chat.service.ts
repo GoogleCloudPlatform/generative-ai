@@ -13,11 +13,14 @@ export class ChatService {
 
   constructor(private http: HttpClient) {}
 
-  postChat(query: string): Observable<Chat> {
+  postChat(query: string, chat_id?: string | null): Observable<Chat> {
     query = query.replace(/\s+/g, " ").trim();
     const body: CreateChatRequest = {
       text: query,
     };
+    if (chat_id) {
+      body.chat_id = chat_id;
+    }
     return this.http.post<Chat>(chatsUrl, body);
   }
 }
