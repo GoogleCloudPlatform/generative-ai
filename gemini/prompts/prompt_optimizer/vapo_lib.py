@@ -967,7 +967,25 @@ def tool_config_to_dict(tool_config: ToolConfig | None) -> dict[str, Any] | None
 def replace_type_key(data: dict[str, Any]) -> dict[str, Any]:
     """Recursively replaces "type_" with "type" in a dictionary or list."""
 
-    return {"type" if k == "type_" else k: replace_type_key(v) for k, v in data.items()}
+    def _recursive_replace(item: Any) -> Any:
+        if isinstance(item, dict):
+            return {
+                ("type" if k == "type_" else k): _recursive_replace(v)
+                for k, v in item.items()
+            }
+        elif isinstance(item, list):
+            return [_recursive_replace(elem) for elem in item]
+        else:
+            return item
+
+    new_data = {}
+    for key, value in data.items():
+        if key == "function_declarations" and isinstance(value, list):
+            new_data[key] = [_recursive_replace(tool) for tool in value]
+        else:
+            new_data[key] = value
+
+    return new_data
 
 
 def validate_tools(spec: str) -> None:
