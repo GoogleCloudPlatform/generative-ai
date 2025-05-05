@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from google.cloud.bigquery import Client as BigQueryClient
 from google.cloud.storage import Client as GCSClient
 
-from deploy import setup_remote_agent
+from deploy_agent_engine import setup_remote_agent
 from scripts.big_query_setup import create_dataset
 from scripts.big_query_setup import create_table
 from scripts.big_query_setup import insert_intent
