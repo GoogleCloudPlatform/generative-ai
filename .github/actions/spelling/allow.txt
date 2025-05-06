@@ -544,6 +544,7 @@ aexecute
 aextract
 afrom
 agentic
+agg
 ainit
 ainvoke
 aio
@@ -568,6 +569,7 @@ arun
 arxiv
 astype
 atms
+auc
 aujourd'hui
 autocal
 autoflake
@@ -585,6 +587,7 @@ bargap
 barmode
 barpolar
 baxis
+bayes
 bbc
 bbq
 beir
@@ -616,6 +619,7 @@ caudatus
 caxis
 cce
 cctv
+cdiv
 cer
 cfbundle
 chatbots
@@ -626,6 +630,7 @@ cicd
 cimg
 ckpts
 claude
+clearbox
 clf
 clickable
 cloudrun
@@ -745,7 +750,9 @@ fect
 fewshot
 ffi
 fibonacci
+figheight
 figsize
+figwidth
 fillmode
 fillna
 fiqa
@@ -1102,6 +1109,7 @@ pypdf
 pyplot
 pysftp
 pytorch
+pytrec
 pyvis
 qas
 qna
