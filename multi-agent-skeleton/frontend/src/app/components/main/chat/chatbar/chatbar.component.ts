@@ -1,8 +1,9 @@
+// /usr/local/google/home/switon/dev/quick-bot-app/multi-agent-skeleton/frontend/src/app/components/main/chat/chatbar/chatbar.component.ts
 import { Component, EventEmitter, Output, OnDestroy, OnInit } from '@angular/core';
 import { ChatService, ServerMessage, ConnectionStatus } from 'src/app/services/chat.service';
 import { UserService } from 'src/app/services/user/user.service';
 import { BroadcastService } from 'src/app/services/broadcast.service';
-import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { Observable, ReplaySubject, Subscription, firstValueFrom } from 'rxjs'; // Added firstValueFrom
 import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { SessionService } from 'src/app/services/user/session.service';
 import { Router } from '@angular/router';
@@ -204,22 +205,27 @@ export class ChatbarComponent implements OnInit, OnDestroy {
         console.log("ChatbarComponent - Received Server Message:", serverMessage);
 
         if (serverMessage.operation === 'start') {
-          if (!this.showLoader) {
+          if (!this.showLoader) { // If user hasn't sent a message yet
             this.loaderText = "Assistant is ready.";
-          } else {
+            // No loader needed if just connecting and no active query
+            this.showLoader = false;
+            this.isChatDisabled = false;
+          } else { // If user sent a message and this 'start' is the ack
             this.loaderText = "Assistant is processing your request...";
+            this.setCyclicBackgroundImages();
           }
-          this.clearTimeoutForLoaderText();
-          this.setCyclicBackgroundImages();
+          this.clearTimeoutForLoaderText(); // Stop generic loader text if any
           console.log("Chat session started by server.");
-          this.isChatDisabled = false;
+          // this.isChatDisabled = false; // Ensure chat is enabled
         } else if (serverMessage.operation === 'end_of_turn') {
           console.log("Server indicated end_of_turn.");
+          // UI updates (like hiding loader and enabling input) are handled by 'processing_complete' status
         } else if (serverMessage.error) {
           console.error("Error message from server:", serverMessage.error);
           this.setErrorMessage(serverMessage.error);
-        } else if (serverMessage.answer) {
-          this.clearTimeoutForLoaderText();
+        } else if (serverMessage.answer) { // This is a data/answer message
+          this.showLoader = false; // Hide loader once first actual answer part arrives
+          this.clearTimeoutForLoaderText(); // Stop generic loader text
           this.handleWebSocketDataMessage(serverMessage);
         } else {
           console.warn("Received unhandled server message structure:", serverMessage);
@@ -236,32 +242,60 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     console.log("ChatbarComponent - Handling WebSocket Data Message:", data);
     const endTime = new Date().getTime();
 
-    let bodyText: string = '';
-    if (data.answer && typeof data.answer.text === 'string') {
-      bodyText = data.answer.text;
-    }  else if (data.answer && data.answer.function_call) {
-      bodyText = `Calling function ${data.answer.function_call.name} with arguments: ${JSON.stringify(data.answer.function_call.args)}`;
-    } else if (data.answer && data.answer.function_response) {
-      bodyText = `Received response from function: ${data.answer.function_response.name}. Response: ${JSON.stringify(data.answer.function_response.response)}`;
-    } else if (typeof data.answer === 'string') {
-      bodyText = data.answer;
-    } else {
-      console.warn("Received answer part in unexpected format:", data.answer);
-      bodyText = "[Content received]";
-    }
-
     const botMessage: Message = {
-      body: bodyText,
+      body: '', // Initialize body, will be populated based on content type
       type: 'bot',
       responseTime: this.botStartTime ? ((endTime - this.botStartTime) / 1000).toString() : "N/A",
-      shareable: true,
+      shareable: true, // Assuming all bot messages are shareable by default
       categoryIntent: data.intent || this.categoryIntent,
       botStartTime: this.botStartTime ? this.botStartTime.toString() : "N/A",
       extras: { like: false, dislike: false, delete: false },
+      // functionCall and functionResponse will be set below
     };
 
-    console.log(`Received bot message part: ${botMessage.body}`);
-    this.conversation.unshift(botMessage);
+    if (data.answer && data.answer.function_call) {
+      botMessage.functionCall = {
+        name: data.answer.function_call.name,
+        args: data.answer.function_call.args,
+      };
+      // Optionally, set a placeholder or summary in the main body if desired
+      // botMessage.body = `Executing: ${data.answer.function_call.name}`;
+    } else if (data.answer && data.answer.function_response) {
+      botMessage.functionResponse = {
+        name: data.answer.function_response.name,
+        response: data.answer.function_response.response,
+      };
+      // botMessage.body = `Received result from: ${data.answer.function_response.name}`;
+    } else if (data.answer && typeof data.answer.text === 'string') {
+      botMessage.body = data.answer.text;
+    } else if (typeof data.answer === 'string') { // Fallback if answer is just a string
+      botMessage.body = data.answer;
+    } else if (Object.keys(data.answer || {}).length > 0) { // If answer is an object but not function call/response/text
+      console.warn("Received answer object with unknown structure:", data.answer);
+      // Attempt to stringify if it's a simple object, otherwise show placeholder
+      try {
+        const stringified = JSON.stringify(data.answer);
+        if (stringified.length < 200) { // Arbitrary length limit
+          botMessage.body = stringified;
+        } else {
+          botMessage.body = "[Structured content received]";
+        }
+      } catch (e) {
+        botMessage.body = "[Complex content received]";
+      }
+    } else {
+      console.warn("Received empty or unhandled answer content:", data.answer);
+      botMessage.body = ""; // Or a placeholder like "[Empty Response]"
+    }
+
+    // Only add message to conversation if it has a body or a function call/response
+    if (botMessage.body || botMessage.functionCall || botMessage.functionResponse) {
+      console.log(`Adding bot message to conversation. Body: "${botMessage.body}", FC: ${!!botMessage.functionCall}, FR: ${!!botMessage.functionResponse}`);
+      this.conversation.unshift(botMessage);
+    } else {
+      console.log("Skipping empty bot message from WS data:", data);
+    }
+
 
     if (data.suggested_questions && data.suggested_questions.length > 0) {
       this.setSuggestedQuestionInChat(data, endTime);
@@ -293,8 +327,8 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     // Use the stored currentConnectionStatus
     if (this.currentConnectionStatus === 'connected' || this.currentConnectionStatus === 'processing_complete') {
       this.showLoader = true;
-      this.loaderText = "Sending your message...";
-      this.setTimeoutForLoaderText();
+      this.loaderText = "Sending your message..."; // More accurate text
+      this.setTimeoutForLoaderText(); // Start loader text cycle
       this.setCyclicBackgroundImages();
       this.botStartTime = new Date().getTime();
       this.pushQuestion(queryToSend);
@@ -305,7 +339,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
       console.error("submitMessage: WebSocket not in a ready state to send message. Status:", this.currentConnectionStatus);
       this.setErrorMessage("Cannot send message. Connection not ready. Please try again.");
       if (this.currentConnectionStatus === 'disconnected' || this.currentConnectionStatus === 'error' || this.currentConnectionStatus === 'aborted') {
-        this.chatService.connect();
+        this.chatService.connect(); // Attempt to re-establish connection
       }
     }
     this.scrollToBottom();
@@ -332,7 +366,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     this.removeSuggestionElement();
     this.openSnackBar("Chat has been reset.", "success-snackbar");
 
-    setTimeout(() => this.chatService.connect(), 100);
+    setTimeout(() => this.chatService.connect(), 100); // Reconnect after reset
   }
 
   setupMediaRecorder(stream: MediaStream) {

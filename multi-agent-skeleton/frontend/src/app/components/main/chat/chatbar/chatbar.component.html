@@ -5,8 +5,8 @@
     <div class="bot-message" *ngIf="showSuggestion" class="bot-suggestion-container">
       <div class="bot-suggestion-container-child">
         <app-suggestion-card [data]="getSuggestionData(this.suggestedQuestionMessage)"
-          (raiseQuery)="getResponseforSuggestionQuery($event)"
-          (dismissSuggestionCard)="removeSuggestionElement()"></app-suggestion-card>
+                             (raiseQuery)="getResponseforSuggestionQuery($event)"
+                             (dismissSuggestionCard)="removeSuggestionElement()"></app-suggestion-card>
       </div>
     </div>
 
@@ -43,8 +43,8 @@
 
 
       <div class="bot-message"
-        *ngIf="message.type == 'bot' && (!message.suggestedQuestion?.length || 0 > 0)"
-        id="{{message.botStartTime}}">
+           *ngIf="message.type == 'bot' && (!message.suggestedQuestion?.length || 0 > 0)"
+           id="{{message.botStartTime}}">
         <div class="bot-message-wrapping-container">
           <div class="bot-message-action">
             <div></div>
@@ -52,12 +52,37 @@
           </div>
 
           <div class="bot-message-content">
-            <markdown clipboard class="variable-binding" [data]="message.body"></markdown>
-            <markdown *ngIf="message.botAnswer" clipboard class="variable-binding"
+            <!-- Function Call Dropdown -->
+            <details *ngIf="message.functionCall" class="thinking-dropdown">
+              <summary>Thinking...</summary>
+              <div class="function-details">
+                <strong>Function Call:</strong> {{ message.functionCall.name }} <br>
+                <strong>Arguments:</strong> <pre>{{ message.functionCall.args | json }}</pre>
+              </div>
+            </details>
+
+            <!-- Function Response Dropdown -->
+            <details *ngIf="message.functionResponse" class="thinking-dropdown">
+              <summary>Thinking...</summary>
+              <div class="function-details">
+                <strong>Function Response:</strong> {{ message.functionResponse.name }} <br>
+                <strong>Response:</strong> <pre>{{ message.functionResponse.response | json }}</pre>
+              </div>
+            </details>
+
+            <!-- Regular Text Body -->
+            <markdown *ngIf="message.body" clipboard class="variable-binding" [data]="message.body"></markdown>
+
+            <!-- The following block for message.botAnswer is likely redundant now
+                 as message.body should contain the primary text.
+                 Review if message.botAnswer was used for something else.
+            <markdown *ngIf="message.botAnswer && !message.functionCall && !message.functionResponse" clipboard class="variable-binding"
               [data]="getStringData(message.botAnswer)">
             </markdown>
+            -->
             <div class="action-content" *ngIf="message.shareable">
               <div class="action-message"></div>
+              <!-- The message.chat_id here was for HTTP sessions, may not be relevant for WS bot messages -->
               <div class="action-butons" *ngIf="message.chat_id">
               </div>
             </div>
@@ -74,22 +99,22 @@
     <div [ngStyle]="{'opacity':this.isChatDisabled ? '30%' : '100%' }" class="chat-footer">
       <div class="chat-textarea">
         <textarea [disabled]="this.isChatDisabled"
-          [placeholder]="!this.isChatDisabled ?  'Type your question here, make sure to add context' : ''"
-          [(ngModel)]="chatQuery" (keydown.enter)="submitMessage($event)"
-          (paste)="removeSuggestionElement();"
-          (keypress)="removeSuggestionElement();">
+                  [placeholder]="!this.isChatDisabled ?  'Type your question here, make sure to add context' : ''"
+                  [(ngModel)]="chatQuery" (keydown.enter)="submitMessage($event)"
+                  (paste)="removeSuggestionElement();"
+                  (keypress)="removeSuggestionElement();">
         </textarea>
       </div>
       <div class="micIcon">
         <button mat-icon-button (click)="startRecording()" matTooltip="Record"
-          *ngIf="!isRecording"><mat-icon>mic_none</mat-icon>
+                *ngIf="!isRecording"><mat-icon>mic_none</mat-icon>
         </button>
         <span (click)="stopRecording()" class="recording-container" *ngIf="isRecording">
           <span class="blue-dot">&nbsp;</span>
           <span class="green-dot">&nbsp;</span>
           <span class="yellow-dot">&nbsp;</span>
           <button (click)="stopRecording()" style="color: red;" class="reset-button initial" mat-icon-button
-            matTooltip="Stop Recording" aria-label="record button">
+                  matTooltip="Stop Recording" aria-label="record button">
             <mat-icon class="material-icons-outlined">stop_circle</mat-icon> </button>
         </span>
         <button (click)="resetBrowser()" class="reset-button initial" mat-icon-button aria-label="Share icon button">
