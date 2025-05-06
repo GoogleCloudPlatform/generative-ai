@@ -29,7 +29,7 @@ The `client` directory is structured into several key components:
     - **`api/`**:  Contains modules for API communication:
         - **`gemini-api.js`**:  Handles WebSocket connection and communication with the backend server. Manages sending different types of messages (audio, text, image, end signals) and receiving responses.
     - **`audio/`**:  Contains modules for audio processing:
-        - **`audio-recorder.js`**:  Handles audio recording from the microphone using WebAudio API, including starting, stopping, muting, and unmuting recording. Emits 'data' events with base64 encoded audio chunks.
+        - **`audio-recorder.js`**:  Handles audio recording from the microphone using WebAudio API, including starting, stopping, muting, and un-muting recording. Emits 'data' events with base64 encoded audio chunks.
         - **`audio-recording-worklet.js`**:  An AudioWorklet processor for efficient real-time audio processing and chunking.
         - **`audio-streamer.js`**:  Handles streaming and playback of audio received from the server using WebAudio API. Manages audio buffer queue, playback, and stopping/resuming audio.
         - **`audioworklet-registry.js`**:  Manages registration of AudioWorklet modules.
