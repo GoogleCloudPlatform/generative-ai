@@ -1,4 +1,4 @@
-from uuid import uuid4
+import json
 
 from fastapi import APIRouter
 from fastapi import BackgroundTasks
@@ -21,14 +21,55 @@ router = APIRouter(
 )
 
 
-@router.websocket_route("/ws")
-async def websocket_chat(websocket: WebSocket):
+@router.websocket("")
+async def websocket_chat(
+    *,
+    websocket: WebSocket,
+    background_tasks: BackgroundTasks,
+):
     await websocket.accept()
+    intent = get_default_intent()
+    remote_agent_resource_id = intent.remote_agent_resource_id
+    item_json = await websocket.receive_text()
+    print(f"Received item: {item_json}")
+    item = CreateChatRequest(**json.loads(item_json))
+
+    remote_agent = agent_engines.get(remote_agent_resource_id)
+    print(f"Trying remote agent: {remote_agent_resource_id}")
+    if item.chat_id:
+        session = remote_agent.get_session(
+            user_id=DEFAULT_USER_ID, session_id=item.chat_id
+        )
+    else:
+        session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
+    print(f'Trying remote agent with session: {session["id"]}')
+    await websocket.send_json({"operation": "start"})
+
     try:
         while True:
-            data = await websocket.receive_text()
-            print(f"Received text: {data}")
-            await websocket.send_text(f"Server received: {data}")
+            message = await websocket.receive_text()
+            for (
+                event
+            ) in remote_agent.stream_query(  # TODO: Streaming should be enabled on the frontend
+                user_id=DEFAULT_USER_ID,
+                session_id=session["id"],
+                message=message,
+            ):
+                content = event.get("content")
+                if content:
+                    for part in event["content"]["parts"]:
+                        await websocket.send_json(part)
+                        log_response(
+                            background_tasks,
+                            intent,
+                            message,
+                            json.dumps(part),
+                            session,
+                            [],
+                        )
+
+            else:
+                await websocket.send_json({"operation": "close"})
     except Exception as e:
         print(f"Error: {e}")
     finally:
@@ -39,15 +80,13 @@ async def websocket_chat(websocket: WebSocket):
 async def chat(
     item: CreateChatRequest, response: Response, background_tasks: BackgroundTasks
 ):
-    intents = IntentService().get_all()
-    intent_matching_service = IntentMatchingService(intents)
+    intent = get_default_intent()
     message = item.text
-
-    intent = intent_matching_service.get_intent_from_query(item.text)
     remote_agent_resource_id = intent.remote_agent_resource_id
 
     remote_agent = agent_engines.get(remote_agent_resource_id)
     print(f"Trying remote agent: {remote_agent_resource_id}")
+    session = None
     if item.chat_id:
         session = remote_agent.get_session(
             user_id=DEFAULT_USER_ID, session_id=item.chat_id
@@ -77,6 +116,19 @@ async def chat(
     # suggestedQuestion = intent_matching_service.get_suggested_questions(item.text, intent)
     suggested_questions = []
 
+    final_response = log_response(
+        background_tasks, intent, message, model_response, session, suggested_questions
+    )
+
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return final_response
+
+
+def log_response(
+    background_tasks, intent, message, model_response, session, suggested_questions
+):
     final_response = Chat(
         id=session["id"],
         question=message,
@@ -84,13 +136,15 @@ async def chat(
         intent=intent.name,
         suggested_questions=suggested_questions,
     )
-
     background_tasks.add_task(
         ChatsService().insert_chat,
         final_response,
     )
-
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
     return final_response
+
+
+def get_default_intent():
+    intents = IntentService().get_all()
+    intent_matching_service = IntentMatchingService(intents)
+    intent = intent_matching_service.get_intent_from_query("")
+    return intent

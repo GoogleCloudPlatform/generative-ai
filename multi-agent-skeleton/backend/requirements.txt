@@ -1,6 +1,7 @@
 poetry
 gunicorn
-uvicorn
+uvicorn[standard]
+websocket
 fastapi
 fastapi-utilities
 cloudpickle
