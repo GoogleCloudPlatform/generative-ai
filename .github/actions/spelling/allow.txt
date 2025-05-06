@@ -1219,6 +1219,7 @@ tagline
 takeaways
 tastetest
 tavily
+telework
 tencel
 terabyte
 terabytes
