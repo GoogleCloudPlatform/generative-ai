@@ -2,7 +2,7 @@
   <div class="chat-body">
 
     <!-- sugesstion along with a response -->
-    <div class="bot-message" *ngIf="showSuggesstion" class="bot-suggestion-container">
+    <div class="bot-message" *ngIf="showSuggestion" class="bot-suggestion-container">
       <div class="bot-suggestion-container-child">
         <app-suggestion-card [data]="getSuggestionData(this.suggestedQuestionMessage)"
           (raiseQuery)="getResponseforSuggestionQuery($event)"

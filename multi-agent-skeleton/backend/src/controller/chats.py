@@ -2,8 +2,9 @@ import json
 
 from fastapi import APIRouter
 from fastapi import BackgroundTasks
-from fastapi import Response
+from fastapi import Response  # This import is no longer needed if POST is removed
 from fastapi import WebSocket
+from starlette.websockets import WebSocketDisconnect
 from vertexai import agent_engines
 
 from src.model.chats import Chat
@@ -28,144 +29,113 @@ async def websocket_chat(
     background_tasks: BackgroundTasks,
 ):
     await websocket.accept()
-    intent = get_default_intent()
+    # Create a new session for this WebSocket connection
+    # This session will be used for the lifetime of this connection.
+    intent = get_default_intent()  # General intent for the connection
     remote_agent_resource_id = intent.remote_agent_resource_id
-    item_json = await websocket.receive_json()
-    print(f"Received item: {item_json}")
-    item = CreateChatRequest(**item_json)
-
     remote_agent = agent_engines.get(remote_agent_resource_id)
-    print(f"Trying remote agent: {remote_agent_resource_id}")
-    session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
-    print(f'Trying remote agent with session: {session["id"]}')
+    print(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
+
+    agent_session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
+    active_session_id = agent_session["id"]
+    print(f"Created new agent session for WebSocket connection: {active_session_id}")
+
+    # Notify client that the session has started, without sending the session ID
     await websocket.send_json({"operation": "start"})
 
     try:
         while True:
-            current_message_text: str
+            try:
+                item_json = await websocket.receive_json()
+                print(f"Received JSON from client: {item_json}")
+                # The CreateChatRequest might still have chat_id for HTTP,
+                # but we ignore it for WebSocket session management here.
+                current_item = CreateChatRequest(**item_json)
+            except WebSocketDisconnect:
+                print("Client disconnected.")
+                break  # Exit the main loop
+            except json.JSONDecodeError:
+                print("Failed to decode message as JSON. Sending error to client.")
+                await websocket.send_json({"error": "Invalid JSON format received."})
+                continue  # Wait for a new, valid message
+            except Exception as e:
+                print(f"Error receiving or parsing client message: {e}")
+                await websocket.send_json(
+                    {"error": f"Error processing your request: {str(e)}"}
+                )
+                break  # Exit on other receive/parse errors
 
-            if item:
-                # Process the initial message (or a message carried over)
-                current_message_text = item.text
-                item = None  # CHG: Crucial - Consume/reset item after processing
-                # This ensures the next loop iteration will wait for a new client message
-            else:
-                # Wait for a new message from the client
-                # This block will be hit on the second and subsequent iterations
-                # after the initial 'item' has been processed and set to None.
-                print("Waiting for next client message...")
-                try:
-                    # CHG: Expecting subsequent messages to also be JSON with a 'text' field
-                    next_item_json = await websocket.receive_json()
-                    print(f"Received subsequent item: {next_item_json}")
-                    # You might want to validate next_item_json structure here
-                    if "text" not in next_item_json:
-                        print(
-                            "Warning: Subsequent message does not contain 'text' field. Closing."
-                        )
-                        await websocket.send_json(
-                            {"error": "Invalid message format, 'text' field missing."}
-                        )
-                        await websocket.send_json({"operation": "closed"})
-                        break  # Exit the loop
-                    current_message_text = next_item_json["text"]
-                except (
-                    Exception
-                ) as e:  # Catch potential WebSocketDisconnect or JSON errors
-                    print(
-                        f"Error receiving subsequent message or client disconnected: {e}"
-                    )
-                    break  # Exit the loop if client disconnects or sends bad data
+            current_message_text = current_item.text
 
-            print(f"Processing message: {current_message_text}")
-            for (
-                event
-            ) in remote_agent.stream_query(  # TODO: Streaming should be enabled on the frontend
+            print(
+                f"Processing message: '{current_message_text}' for session: {active_session_id}"
+            )
+            for event in remote_agent.stream_query(
                 user_id=DEFAULT_USER_ID,
-                session_id=session["id"],
+                session_id=active_session_id,  # Use the session created for this connection
                 message=current_message_text,
             ):
                 content = event.get("content")
                 if content:
-                    print(f"Got content: {content}")
                     for part in event["content"]["parts"]:
-                        answer = {"answer": part}
-                        await websocket.send_json(answer)
+                        # Send only the answer part, no session ID needed by client here
+                        answer_part = {"answer": part}
+                        await websocket.send_json(answer_part)
                         log_response(
                             background_tasks,
                             intent,
                             current_message_text,
-                            json.dumps(answer),
-                            session,
-                            [],
+                            json.dumps(part),  # Log the streamed part
+                            agent_session,  # Pass the created agent_session object
+                            [],  # Suggested questions for this part
                         )
 
-            else:
-                await websocket.send_json({"operation": "close"})
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        await websocket.close()
+            # After streaming all parts for the current message's response
+            # Signal end of turn, no session ID needed by client here
+            await websocket.send_json({"operation": "end_of_turn"})
+            print(
+                f"Sent 'end_of_turn' for session: {active_session_id}. Waiting for next client message..."
+            )
 
-
-@router.post("")
-async def chat(
-    item: CreateChatRequest, response: Response, background_tasks: BackgroundTasks
-):
-    intent = get_default_intent()
-    message = item.text
-    remote_agent_resource_id = intent.remote_agent_resource_id
-
-    remote_agent = agent_engines.get(remote_agent_resource_id)
-    print(f"Trying remote agent: {remote_agent_resource_id}")
-    session = None
-    if item.chat_id:
-        session = remote_agent.get_session(
-            user_id=DEFAULT_USER_ID, session_id=item.chat_id
+    except WebSocketDisconnect:
+        print(
+            f"WebSocket disconnected during operation (session: {active_session_id})."
         )
-    else:
-        session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
-        print(f'Trying remote agent with session: {session["id"]}')
-
-    answer = []
-    for (
-        event
-    ) in remote_agent.stream_query(  # TODO: Streaming should be enabled on the frontend
-        user_id=DEFAULT_USER_ID,
-        session_id=session["id"],
-        message=message,
-    ):
-        content = event.get("content")
-        if content:
-            print(f"Got content: {content}")
-            for part in event["content"]["parts"]:
-                if part.get("text"):
-                    answer.append(
-                        part["text"]
-                    )  # TODO: Currently getting only text out, but the whole thinking and function calls process is available here
-
-    model_response = " ".join(answer)
-
-    # suggestedQuestion = intent_matching_service.get_suggested_questions(item.text, intent)
-    suggested_questions = []
-
-    final_response = log_response(
-        background_tasks, intent, message, model_response, session, suggested_questions
-    )
-
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return final_response
+    except Exception as e:
+        print(
+            f"An unhandled error occurred in WebSocket handler (session: {active_session_id}): {e}"
+        )
+        try:
+            if websocket.client_state == websocket.client_state.CONNECTED:
+                await websocket.send_json(
+                    {
+                        "error": "An unexpected server error occurred.",
+                        "operation": "fatal_error",
+                    }
+                )
+        except Exception as send_exc:
+            print(f"Could not send error to client: {send_exc}")
+    finally:
+        print(
+            f"Closing WebSocket connection from server-side finally block (session: {active_session_id})."
+        )
+        if websocket.client_state == websocket.client_state.CONNECTED:
+            await websocket.close()
 
 
+# The log_response and get_default_intent functions are still used by the websocket_chat endpoint.
 def log_response(
-    background_tasks, intent, message, model_response, session, suggested_questions
+    background_tasks,
+    intent,
+    message,
+    model_response_content,
+    session_details,
+    suggested_questions,
 ):
     final_response = Chat(
-        id=session["id"],
+        id=session_details["id"],  # The session_details will have the id
         question=message,
-        answer=model_response,
+        answer=model_response_content,
         intent=intent.name,
         suggested_questions=suggested_questions,
     )
