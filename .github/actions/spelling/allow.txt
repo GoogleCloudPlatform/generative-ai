@@ -21,6 +21,8 @@ Aadila
 Abhishek
 Afshaan
 Aktu
+Alibaba
+Anant
 Aphone
 Arborio
 Arepa
@@ -316,6 +318,7 @@ Najim
 Nakoso
 Napisz
 Narnia
+Nihonga
 Niitsuma
 Nith
 Nominatim
@@ -355,6 +358,7 @@ Pharma
 Photoshop
 Pichai
 Pistorius
+Poirot
 Polong
 Porat
 Pranav
@@ -473,6 +477,7 @@ UDFs
 USERDATA
 USK
 UVX
+Ukiyo
 Unimicron
 Upserting
 Urs
@@ -539,10 +544,12 @@ aexecute
 aextract
 afrom
 agentic
+agg
 ainit
 ainvoke
 aio
 aip
+airbnb
 airlume
 akka
 alisal
@@ -562,6 +569,7 @@ arun
 arxiv
 astype
 atms
+auc
 aujourd'hui
 autocal
 autoflake
@@ -579,6 +587,7 @@ bargap
 barmode
 barpolar
 baxis
+bayes
 bbc
 bbq
 beir
@@ -610,6 +619,7 @@ caudatus
 caxis
 cce
 cctv
+cdiv
 cer
 cfbundle
 chatbots
@@ -620,6 +630,7 @@ cicd
 cimg
 ckpts
 claude
+clearbox
 clf
 clickable
 cloudrun
@@ -739,7 +750,9 @@ fect
 fewshot
 ffi
 fibonacci
+figheight
 figsize
+figwidth
 fillmode
 fillna
 fiqa
@@ -775,6 +788,7 @@ gcloud
 gcp
 gcs
 gcsfs
+gcurl
 gdk
 gdkx
 geboten
@@ -978,6 +992,7 @@ nas
 nbconvert
 nbfmt
 nbformat
+nbqa
 nbviewer
 nce
 ncols
@@ -1008,6 +1023,7 @@ norigin
 notetaker
 novnc
 noxfile
+npx
 nrows
 ntheory
 nunique
@@ -1093,7 +1109,9 @@ pypdf
 pyplot
 pysftp
 pytorch
+pytrec
 pyvis
+qas
 qna
 qqq
 qrel
@@ -1146,6 +1164,7 @@ scifact
 scikit
 seatback
 selectbox
+selfie
 selftext
 selkirk
 seo
