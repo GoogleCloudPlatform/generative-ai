@@ -15,7 +15,7 @@ This guide provides step-by-step instructions for deploying the Project Livewire
     *   Secret Manager API (`secretmanager.googleapis.com`)
     *   IAM API (`iam.googleapis.com`)
     *   Container Registry API (`containerregistry.googleapis.com`) or Artifact Registry API (`artifactregistry.googleapis.com`)
-    *   (Optional) Vertex AI API (`aiplatform.googleapis.com`) - If using the Vertex endpoint.
+    *   (Optional) Vertex AI API (`aiplatform.googleapis.com`) - If using the Vertex AI endpoint.
     *   (Optional) Cloud Functions API (`cloudfunctions.googleapis.com`) - For deploying tools.
     *   (Optional) Google Calendar API (`calendar-json.googleapis.com`) - For the calendar tool function.
     ```bash
@@ -47,7 +47,7 @@ gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
     --member="serviceAccount:${BACKEND_SA_NAME}@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
 
-# (Optional) Grant Vertex AI User role if using Vertex endpoint
+# (Optional) Grant Vertex AI User role if using Vertex AI endpoint
 # gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
 #    --member="serviceAccount:${BACKEND_SA_NAME}@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com" \
 #    --role="roles/aiplatform.user"

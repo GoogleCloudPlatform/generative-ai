@@ -1,6 +1,6 @@
 # Project Livewire - Client Application
 
-This README provides details about the client-side component of Project Livewire. The client is a web application built with Vanilla JavaScript, HTML, and CSS, designed to interact with the backend server and Google's Gemini API to provide a multimodal chat experience.
+This README provides details about the client-side component of Project Livewire. The client is a web application built with Vanilla JavaScript, HTML, and CSS, designed to interact with the backend server and the Gemini API to provide a multimodal chat experience.
 
 ## Overview
 

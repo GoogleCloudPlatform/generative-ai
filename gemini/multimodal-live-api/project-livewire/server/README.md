@@ -1,6 +1,6 @@
 # Project Livewire - Server Component
 
-This README provides detailed information about the server-side component of Project Livewire. This server is a Python-based WebSocket application built using `websockets` and `google-genai` libraries. It acts as a proxy and tool handler for Google's Gemini 2.0 Flash (experimental) model and manages real-time communication between the client and the Gemini API.
+This README provides detailed information about the server-side component of Project Livewire. This server is a Python-based WebSocket application built using `websockets` and `google-genai` libraries. It acts as a proxy and tool handler for Gemini 2.0 Flash (experimental) model and manages real-time communication between the client and the Gemini API.
 
 ## Overview
 

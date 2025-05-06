@@ -1,6 +1,6 @@
 # Project Livewire 
 
-**Talk to AI like never before! Project Livewire is a real-time, multimodal chat application showcasing the power of Google's Gemini 2.0 Flash (experimental) Live API.**
+**Talk to AI like never before! Project Livewire is a real-time, multimodal chat application showcasing the power of Gemini 2.0 Flash (experimental) Live API.**
 
 Think "Star Trek computer" interaction – speak naturally, show your webcam, share your screen, and get instant, streamed audio responses. Livewire brings this futuristic experience to your devices today.
 
