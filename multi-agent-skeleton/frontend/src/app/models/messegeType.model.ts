@@ -1,32 +1,40 @@
 // /usr/local/google/home/switon/dev/quick-bot-app/multi-agent-skeleton/frontend/src/app/models/messegeType.model.ts
-export interface Message {
-  body: string,
-  botAnswer?: string, // This might become less relevant if body handles all text
-  type: string,
-  responseTime?: string
-  shareable: boolean,
-  categoryIntent?: string,
-  extras?: Extras,
-  suggestedQuestion?: string[],
-  botStartTime?: string;
-  chat_id?:string // This was for HTTP session, likely not used for WS bot messages now
+export interface ThinkingStep {
+  type: 'functionCall' | 'functionResponse';
+  name: string;
+  data: any; // For args in functionCall, or response in functionResponse
+}
 
-  // New properties for function calls and responses
-  functionCall?: {
-    name: string;
-    args: any;
-  };
-  functionResponse?: {
-    name: string;
-    response: any;
-  };
+export interface Message {
+  body: string; // This will now primarily hold the final textual answer
+  type: string;
+  responseTime?: string;
+  shareable: boolean;
+  categoryIntent?: string;
+  extras?: Extras;
+  suggestedQuestion?: string[];
+  botStartTime?: string;
+
+  // Array to store all intermediate thinking steps for a single bot turn
+  thinkingSteps?: ThinkingStep[];
+
+  // We can remove these if all function/response details go into thinkingSteps
+  // functionCall?: {
+  //   name: string;
+  //   args: any;
+  // };
+  // functionResponse?: {
+  //   name: string;
+  //   response: any;
+  // };
 }
+
 export type Extras = {
-  like:boolean,
-  dislike:boolean,
-  delete?: boolean
-}
+  like: boolean;
+  dislike: boolean;
+  delete?: boolean;
+};
 
 export interface SuggestionData {
-  suggestedQuestion: string[]
+  suggestedQuestion: string[];
 }
