@@ -1,8 +1,7 @@
 <div class="chat-container">
   <div class="chat-body">
 
-    <!-- Suggestion along with a response -->
-    <!-- This suggestion display might need to be re-evaluated if suggestions are part of the main message -->
+    <!-- Suggestion Card (Global or per message) -->
     <div class="bot-message" *ngIf="showSuggestion && suggestedQuestionMessage?.suggestedQuestion?.length" class="bot-suggestion-container">
       <div class="bot-suggestion-container-child">
         <app-suggestion-card [data]="getSuggestionData(this.suggestedQuestionMessage)"
@@ -31,7 +30,10 @@
       <div class="user-message" *ngIf="message.type == 'user'">
         <div class="user-message-wrapping-container">
           <div class="messageContent">
-            {{message.body}}
+            <!-- User messages will have one contentPart of type text -->
+            <ng-container *ngIf="message.contentParts && message.contentParts.length > 0 && message.contentParts[0].type === 'text'">
+              {{message.contentParts[0].text}}
+            </ng-container>
           </div>
           <div class="user-circle" *ngIf="requiredLogin === 'True' && userService.getUserDetails().photoURL">
             <img [src]="userService.getUserDetails().photoURL" class="logo-icon" />
@@ -52,23 +54,28 @@
           </div>
 
           <div class="bot-message-content">
-            <details *ngIf="message.thinkingSteps && message.thinkingSteps.length > 0" class="thinking-dropdown" open>
-              <summary>Thinking...</summary>
-              <div class="function-details-container">
-                <ng-container *ngFor="let step of message.thinkingSteps">
-                  <div *ngIf="step.type === 'functionCall'" class="function-step">
-                    <strong>Function Call:</strong> {{ step.name }} <br>
-                    <strong>Arguments:</strong> <pre>{{ step.data | json }}</pre>
-                  </div>
-                  <div *ngIf="step.type === 'functionResponse'" class="function-step">
-                    <strong>Function Response:</strong> {{ step.name }} <br>
-                    <strong>Response:</strong> <pre>{{ step.data | json }}</pre>
-                  </div>
-                </ng-container>
-              </div>
-            </details>
+            <!-- Iterate over content parts for bot messages -->
+            <ng-container *ngFor="let part of message.contentParts">
+              <!-- Thinking Block -->
+              <details *ngIf="part.type === 'thinking' && part.thinkingSteps && part.thinkingSteps.length > 0" class="thinking-dropdown">
+                <summary>Thinking...</summary>
+                <div class="function-details-container">
+                  <ng-container *ngFor="let step of part.thinkingSteps">
+                    <div *ngIf="step.type === 'functionCall'" class="function-step">
+                      <strong>Function Call:</strong> {{ step.name }} <br>
+                      <strong>Arguments:</strong> <pre>{{ step.data | json }}</pre>
+                    </div>
+                    <div *ngIf="step.type === 'functionResponse'" class="function-step">
+                      <strong>Function Response:</strong> {{ step.name }} <br>
+                      <strong>Response:</strong> <pre>{{ step.data | json }}</pre>
+                    </div>
+                  </ng-container>
+                </div>
+              </details>
 
-            <markdown *ngIf="message.body" clipboard class="variable-binding" [data]="message.body"></markdown>
+              <!-- Text Block -->
+              <markdown *ngIf="part.type === 'text' && part.text" clipboard class="variable-binding" [data]="part.text"></markdown>
+            </ng-container>
 
             <div class="action-content" *ngIf="message.shareable">
               <div class="action-message"></div>

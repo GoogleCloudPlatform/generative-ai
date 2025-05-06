@@ -1,12 +1,19 @@
-// /usr/local/google/home/switon/dev/quick-bot-app/multi-agent-skeleton/frontend/src/app/models/messegeType.model.ts
 export interface ThinkingStep {
   type: 'functionCall' | 'functionResponse';
   name: string;
   data: any; // For args in functionCall, or response in functionResponse
 }
 
+// New interface to represent a part of the message content
+export interface MessageContentPart {
+  type: 'text' | 'thinking';
+  text?: string; // For 'text' type
+  thinkingSteps?: ThinkingStep[]; // For 'thinking' type
+}
+
 export interface Message {
-  body: string; // This will now primarily hold the final textual answer
+  // body: string; // We might deprecate this or use it as a summary. For now, contentParts is primary.
+  contentParts: MessageContentPart[]; // Array to hold the sequence of text and thinking blocks
   type: string;
   responseTime?: string;
   shareable: boolean;
@@ -14,19 +21,6 @@ export interface Message {
   extras?: Extras;
   suggestedQuestion?: string[];
   botStartTime?: string;
-
-  // Array to store all intermediate thinking steps for a single bot turn
-  thinkingSteps?: ThinkingStep[];
-
-  // We can remove these if all function/response details go into thinkingSteps
-  // functionCall?: {
-  //   name: string;
-  //   args: any;
-  // };
-  // functionResponse?: {
-  //   name: string;
-  //   response: any;
-  // };
 }
 
 export type Extras = {

@@ -11,7 +11,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { animate, sequence, state, style, transition, trigger } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SpeechToTextService } from 'src/app/services/speech-to-text';
-import { Message, SuggestionData, ThinkingStep } from 'src/app/models/messegeType.model'; // Import ThinkingStep
+// Import MessageContentPart and ThinkingStep
+import { Message, SuggestionData, ThinkingStep, MessageContentPart } from 'src/app/models/messegeType.model';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -104,7 +105,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
   requiredLogin: string = environment.requiredLogin;
 
   private currentConnectionStatus: ConnectionStatus = 'disconnected';
-  private currentBotMessage: Message | null = null; // To hold the message being built
+  private currentBotMessage: Message | null = null;
 
   constructor(private router: Router,
               public dialog: MatDialog,
@@ -117,14 +118,14 @@ export class ChatbarComponent implements OnInit, OnDestroy {
   ) {
     this.chatQuery$ = this.broadcastService.chatQuery$;
     this.chatQuery$.pipe(takeUntil(this.destroyed)).subscribe((value: Message) => {
-      if (value && value.type === 'user' && value.body) {
+      if (value && value.type === 'user' && value.contentParts[0].text) { // Ensure body exists for user messages
         this.conversation.unshift(value);
         if (this.currentConnectionStatus === 'connected' || this.currentConnectionStatus === 'processing_complete') {
-          this.chatService.sendMessage(value.body);
+          this.chatService.sendMessage(value.contentParts[0].text);
         } else {
           console.warn("Broadcast message received, but WebSocket not in a ready state to send immediately. Ensure connect() is called.");
         }
-      } else if (value) {
+      } else if (value) { // Handle other broadcasted message types if necessary
         this.conversation.push(value);
       }
     });
@@ -174,7 +175,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
             this.clearTimeoutForLoaderText();
             this.loaderText = "Assistant is ready for your next message.";
             this.isChatDisabled = false;
-            this.currentBotMessage = null; // Current bot turn is complete
+            // currentBotMessage is finalized when 'end_of_turn' is received
             break;
           case 'closed_by_server':
           case 'closed_by_client':
@@ -207,38 +208,33 @@ export class ChatbarComponent implements OnInit, OnDestroy {
         console.log("ChatbarComponent - Received Server Message:", serverMessage);
 
         if (serverMessage.operation === 'start') {
-          // This confirms the backend is ready for the first message of a turn
-          // If a user message was just sent, showLoader would be true.
-          if (this.showLoader) {
+          if (this.showLoader) { // A user query is active
             this.loaderText = "Assistant is processing your request...";
             this.setCyclicBackgroundImages();
-          } else { // Auto-connected, no active query from user yet
+          } else { // Auto-connected, no active query
             this.loaderText = "Assistant is ready.";
-            this.showLoader = false; // Ensure loader is off if no query is active
+            this.showLoader = false;
             this.isChatDisabled = false;
           }
           this.clearTimeoutForLoaderText();
           console.log("Chat session turn started by server.");
         } else if (serverMessage.operation === 'end_of_turn') {
           console.log("Server indicated end_of_turn.");
-          // The 'processing_complete' status will handle UI changes like hiding loader.
-          // Finalize the currentBotMessage if it exists
           if (this.currentBotMessage) {
-            // If the body is still empty after all parts, set a placeholder
-            if (!this.currentBotMessage.body && (!this.currentBotMessage.thinkingSteps || this.currentBotMessage.thinkingSteps.length === 0)) {
-              this.currentBotMessage.body = "[Empty response from assistant]";
-            }
-            // Update timestamp or any final properties if needed
             const endTime = new Date().getTime();
             this.currentBotMessage.responseTime = this.botStartTime ? ((endTime - this.botStartTime) / 1000).toString() : "N/A";
+            // Ensure there's some content if nothing else was added
+            if (this.currentBotMessage.contentParts.length === 0) {
+              this.currentBotMessage.contentParts.push({type: 'text', text: "[Empty response]"});
+            }
           }
-          this.currentBotMessage = null; // Reset for the next turn
+          // The 'processing_complete' status will reset currentBotMessage
         } else if (serverMessage.error) {
           console.error("Error message from server:", serverMessage.error);
           this.setErrorMessage(serverMessage.error);
           this.currentBotMessage = null;
         } else if (serverMessage.answer) {
-          this.showLoader = false; // Hide main loader once first answer part arrives
+          this.showLoader = false;
           this.clearTimeoutForLoaderText();
           this.handleWebSocketDataMessage(serverMessage);
         } else {
@@ -256,63 +252,81 @@ export class ChatbarComponent implements OnInit, OnDestroy {
   private handleWebSocketDataMessage(data: ServerMessage): void {
     console.log("ChatbarComponent - Handling WebSocket Data Message:", data);
 
-    // Ensure there's a current bot message to append to, or create one
     if (!this.currentBotMessage || this.conversation[0] !== this.currentBotMessage) {
-      // This condition implies a new bot turn is starting
       this.currentBotMessage = {
-        body: '',
+        contentParts: [], // Initialize with contentParts
         type: 'bot',
         shareable: true,
         categoryIntent: data.intent || this.categoryIntent,
         botStartTime: this.botStartTime ? this.botStartTime.toString() : "N/A",
         extras: { like: false, dislike: false, delete: false },
-        thinkingSteps: [], // Initialize thinking steps
-        // responseTime will be set at end_of_turn
       };
       this.conversation.unshift(this.currentBotMessage);
     }
 
-    const activeBotMessage = this.currentBotMessage; // Use the message being built
+    const activeBotMessage = this.currentBotMessage;
+    let lastPart = activeBotMessage.contentParts.length > 0 ? activeBotMessage.contentParts[activeBotMessage.contentParts.length - 1] : null;
 
     if (data.answer && data.answer.function_call) {
-      activeBotMessage.thinkingSteps = activeBotMessage.thinkingSteps || [];
-      activeBotMessage.thinkingSteps.push({
+      const thinkingStep: ThinkingStep = {
         type: 'functionCall',
         name: data.answer.function_call.name,
         data: data.answer.function_call.args,
-      });
+      };
+      if (lastPart && lastPart.type === 'thinking') {
+        lastPart.thinkingSteps = lastPart.thinkingSteps || [];
+        lastPart.thinkingSteps.push(thinkingStep);
+      } else {
+        activeBotMessage.contentParts.push({ type: 'thinking', thinkingSteps: [thinkingStep] });
+      }
     } else if (data.answer && data.answer.function_response) {
-      activeBotMessage.thinkingSteps = activeBotMessage.thinkingSteps || [];
-      activeBotMessage.thinkingSteps.push({
+      const thinkingStep: ThinkingStep = {
         type: 'functionResponse',
         name: data.answer.function_response.name,
         data: data.answer.function_response.response,
-      });
+      };
+      if (lastPart && lastPart.type === 'thinking') {
+        lastPart.thinkingSteps = lastPart.thinkingSteps || [];
+        lastPart.thinkingSteps.push(thinkingStep);
+      } else {
+        // This case might be less common if a function_call always precedes a response
+        // but good to handle if a response can start a thinking block.
+        activeBotMessage.contentParts.push({ type: 'thinking', thinkingSteps: [thinkingStep] });
+      }
     } else if (data.answer && typeof data.answer.text === 'string') {
-      activeBotMessage.body = (activeBotMessage.body || '') + data.answer.text; // Append text parts
-    } else if (typeof data.answer === 'string') {
-      activeBotMessage.body = (activeBotMessage.body || '') + data.answer;
+      if (lastPart && lastPart.type === 'text') {
+        lastPart.text += data.answer.text; // Append to existing text part
+      } else {
+        activeBotMessage.contentParts.push({ type: 'text', text: data.answer.text });
+      }
+    } else if (typeof data.answer === 'string') { // Fallback for plain string answer
+      if (lastPart && lastPart.type === 'text') {
+        lastPart.text += data.answer;
+      } else {
+        activeBotMessage.contentParts.push({ type: 'text', text: data.answer });
+      }
     } else if (data.answer && Object.keys(data.answer).length > 0) {
-      console.warn("Received answer object with unknown structure, adding to thinking steps:", data.answer);
-      activeBotMessage.thinkingSteps = activeBotMessage.thinkingSteps || [];
-      activeBotMessage.thinkingSteps.push({
-        type: 'functionResponse', // Or a generic 'toolOutput' type
+      console.warn("Received answer object with unknown structure, adding as new thinking step:", data.answer);
+      const thinkingStep: ThinkingStep = {
+        type: 'functionResponse', // Treat as a generic tool output
         name: 'Unknown Tool Output',
         data: data.answer,
-      });
+      };
+      if (lastPart && lastPart.type === 'thinking') {
+        lastPart.thinkingSteps = lastPart.thinkingSteps || [];
+        lastPart.thinkingSteps.push(thinkingStep);
+      } else {
+        activeBotMessage.contentParts.push({ type: 'thinking', thinkingSteps: [thinkingStep] });
+      }
     } else {
       console.log("Received WS data part without actionable content for current message:", data);
     }
 
-    // Update intent if provided with any part
     if (data.intent) {
       activeBotMessage.categoryIntent = data.intent;
     }
-
     if (data.suggested_questions && data.suggested_questions.length > 0) {
-      // Suggested questions are usually at the end, associate with the completed message
       activeBotMessage.suggestedQuestion = data.suggested_questions;
-      // this.setSuggestedQuestionInChat(data, new Date().getTime()); // This might create a separate suggestion card
     }
     this.scrollToBottom();
   }
@@ -332,12 +346,12 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     this.chatQuery = '';
 
     const userMessage: Message = {
-      body: queryToSend,
+      contentParts: [{ type: 'text', text: queryToSend }], // User message is simple text
       type: 'user',
       shareable: false,
     };
     this.conversation.unshift(userMessage);
-    this.currentBotMessage = null; // Reset current bot message for the new turn
+    this.currentBotMessage = null;
 
     if (this.currentConnectionStatus === 'connected' || this.currentConnectionStatus === 'processing_complete') {
       this.showLoader = true;
@@ -434,20 +448,16 @@ export class ChatbarComponent implements OnInit, OnDestroy {
   clearTimeoutForLoaderText() { if (this.loaderTextTimeout) { clearInterval(this.loaderTextTimeout); this.loaderTextTimeout = undefined; } }
   setCyclicLoaderText() { this.loaderText = this.loaderTextArray[Math.floor(Math.random() * this.loaderTextArray.length)]; }
 
-  // This method might need adjustment if suggested questions are part of the main bot message object
   setSuggestedQuestionInChat(response: ServerMessage, endTime: number) {
     if (this.currentBotMessage && response.suggested_questions && response.suggested_questions.length > 0) {
       this.currentBotMessage.suggestedQuestion = response.suggested_questions;
-      // If you still want a separate suggestion card, this logic would need to be different
-      // For now, let's assume suggested questions are part of the currentBotMessage
-      this.showSuggestion = true; // This might control a global suggestion display area
-      this.suggestedQuestionMessage = this.currentBotMessage; // Or map to a specific structure
+      this.showSuggestion = true;
+      this.suggestedQuestionMessage = this.currentBotMessage;
       setTimeout(() => { this.scrollToBottom(); }, 100);
     } else if (response.suggested_questions && response.suggested_questions.length > 0) {
-      // Fallback if currentBotMessage isn't set, though it should be
       this.showSuggestion = true;
-      this.suggestedQuestionMessage = { // Create a temporary message for suggestions
-        body: "", // No body for this separate suggestion card
+      this.suggestedQuestionMessage = {
+        contentParts: [],
         type: 'bot',
         responseTime: this.botStartTime ? ((endTime - this.botStartTime) / 1000).toString() : "N/A",
         shareable: false,

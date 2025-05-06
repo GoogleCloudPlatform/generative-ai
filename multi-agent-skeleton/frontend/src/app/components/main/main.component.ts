@@ -85,7 +85,7 @@ export class MainComponent {
 
   navigate() {
     let userMessage: Message = {
-      body: this.chatQuery,
+      contentParts: [{'type': 'text', 'text': this.chatQuery}],
       type: 'user',
       shareable: false,
     }
@@ -109,7 +109,7 @@ export class MainComponent {
   assignQToChatQuery(question: string) {
     this.chatQuery = question;
     let userMessage: Message = {
-      body: this.chatQuery,
+      contentParts: [{'type': 'text', 'text': this.chatQuery}],
       type: 'user',
       shareable: false,
     }
