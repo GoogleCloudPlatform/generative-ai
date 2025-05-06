@@ -1,4 +1,0 @@
-functions-framework==3.*
-google-cloud-storage
-google-cloud-aiplatform >= 1.31.0
-google-cloud-logging==3.11.2

@@ -36,7 +36,7 @@ def list_text_input(request) -> str | tuple[str, int]:
 
 def generate_text_from_prompt(text_string) -> str | None:
     # this is the text-to-text model
-    text_model = GenerativeModel("gemini-1.0-pro")
+    text_model = GenerativeModel("gemini-2.0-flash")
     responses = text_model.generate_content(text_string, stream=False)
     print(responses)
     output = " ".join(responses.text.strip().split("\n"))

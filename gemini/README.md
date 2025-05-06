@@ -99,9 +99,9 @@ On Google Cloud, the Gemini API in Vertex AI provides a unified interface for in
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg" alt="build">
       <br>
-      <a href="reasoning-engine/"><code>reasoning-engine/</code></a>
+      <a href="agent-engine/"><code>agent-engine/</code></a>
     </td>
-    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/reasoning-engine/overview">Reasoning Engine</a> feature of Vertex AI</td>
+    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview">Agent Engine</a> feature of Vertex AI</td>
   </tr>
   <tr>
     <td>

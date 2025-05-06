@@ -22,9 +22,7 @@ from typing import Any, Dict
 
 from google.genai import Client
 from google.genai.live import AsyncSession
-from google.genai.types import (
-    LiveConnectConfig,
-)
+from google.genai.types import LiveConnectConfig
 from quart import Quart, Response, Websocket, send_from_directory, websocket
 
 logging.basicConfig(level=logging.INFO)
@@ -38,7 +36,7 @@ LOCATION: str = os.environ.get("LOCATION", "us-central1")
 GEMINI_API_KEY: str = os.environ.get("GEMINI_API_KEY", "")
 QUART_DEBUG_MODE: bool = os.environ.get("QUART_DEBUG_MODE") == "True"
 
-GEMINI_MODEL: str = "gemini-2.0-flash-exp"
+GEMINI_MODEL: str = "gemini-2.0-flash-live-preview-04-09"
 
 # Gemini API Client: Use either one of the following APIs
 gemini_client: Client = (

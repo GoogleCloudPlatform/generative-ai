@@ -97,7 +97,7 @@ BEGIN
                 SELECT * FROM conversation_history
                 WHERE user_id = uid
                 AND id < (SELECT id FROM conversation_history WHERE user_id = uid ORDER BY datetime DESC LIMIT 1)
-                ORDER BY user_prompt_embedding <=> google_ml.embedding('textembedding-gecko@003', prompt)::vector
+                ORDER BY user_prompt_embedding <=> google_ml.embedding('text-embedding-005', prompt)::vector
                 LIMIT 3
             )
             SELECT CONCAT(llm_prompt, E'<OTHER_INTERACTION_HISTORY>\n==========\n', STRING_AGG(CONCAT(E'**TIME**\n', datetime, E'\n\n**USER**\n ', user_prompt, E'\n\n**AI**\n', ai_response), E'\n==========\n<\OTHER_INTERACTION_HISTORY>\n\n'))
@@ -138,7 +138,7 @@ BEGIN
             SELECT ticker, analysis
             FROM investments
             WHERE rating = 'BUY'
-            ORDER BY analysis_embedding <=> google_ml.embedding('textembedding-gecko@003',extractive_response)::vector
+            ORDER BY analysis_embedding <=> google_ml.embedding('text-embedding-005',extractive_response)::vector
             LIMIT 3
         )
         SELECT

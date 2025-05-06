@@ -1,3 +1,0 @@
-google-cloud-storage
-transformers[torch]
-numpy

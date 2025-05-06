@@ -22,8 +22,8 @@ We've created a Terraform module that deploys all the necessary resources to cal
 
 After the module is deployed, you will have access to two [BigQuery Remote Functions](https://cloud.google.com/bigquery/docs/remote-functions):
 
-- Analyze images and text (multimodal input) using `gemini_bq_demo_image`: This remote function takes an image from GCS as an input and prompts the Gemini 1.0 Pro Vision model to create a brief description of the image
-- Analyze text using `gemini_bq_demo_text`: This remote function takes text in a BigQuery table and uses the text directly as prompts for the Gemini 1.0 Pro model to return a response
+- Analyze images and text (multimodal input) using `gemini_bq_demo_image`: This remote function takes an image from GCS as an input and prompts the Gemini model to create a brief description of the image
+- Analyze text using `gemini_bq_demo_text`: This remote function takes text in a BigQuery table and uses the text directly as prompts for the Gemini model to return a response
 
 You will also have access to two BigQuery stored procedures which allow you to easy test each remote function using real image and text data:
 

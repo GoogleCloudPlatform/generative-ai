@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Google Gen AI Python SDK
+    url: https://github.com/googleapis/python-genai
+    about: For issues with the Google Gen AI Python SDK, please report in the googleapis/python-genai repository.
   - name: Vertex AI Python SDK
     url: https://github.com/googleapis/python-aiplatform
     about: For issues with the Vertex AI Python SDK, please report in the googleapis/python-aiplatform repository.

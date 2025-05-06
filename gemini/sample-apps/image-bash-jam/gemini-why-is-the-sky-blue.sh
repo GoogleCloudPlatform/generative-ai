@@ -6,7 +6,7 @@
 # generateContent (used to work in staging, doesnt work in prod)
 # streamGenerateContent (works in PROD)
 
-MODEL_ID="gemini-pro"
+MODEL_ID="gemini-2.0-flash"
 LOCATION="us-central1"
 TMP_OUTPUT_FILE=".tmp.why-sky-blue.json"
 JQ_PATH_PLURAL=".[].candidates[0].content.parts[0].text" # PROD_URL_SELECTOR all answers from StreamGenerateContent

@@ -64,9 +64,9 @@ Use pgAdmin to connect to the `ragdemos` database in your new AlloyDB Omni clust
 
     ```sql
     CALL google_ml.create_model (
-        model_id => 'textembedding-gecko@003',
+        model_id => 'text-embedding-005',
         model_provider => 'google',
-        model_qualified_name => 'textembedding-gecko@003',
+        model_qualified_name => 'text-embedding-005',
         model_type => 'text_embedding',
         model_auth_type => 'alloydb_service_agent_iam'
     );

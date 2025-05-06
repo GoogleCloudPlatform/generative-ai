@@ -28,7 +28,7 @@ firestore_namespace: "hierarchical_docs"
 # Chunking and embedding settings
 chunk_sizes: [4096, 2048, 1024, 512] # For indexing_method == "hierarchical"
 chunk_size: 512
-embeddings_model_name: "text-embedding-004"
+embeddings_model_name: "text-embedding-005"
 approximate_neighbors_count: 100
 
 # Document AI settings
@@ -145,7 +145,7 @@ There are three basic retrieval techniques: `baseline`, `auto_merging` and `pare
 ```python
 def get_query_engine(self,
                         prompts: Prompts,
-                        llm_name: str = "gemini-1.5-flash",
+                        llm_name: str = "gemini-2.0-flash",
                         temperature: float = 0.0,
                         similarity_top_k: int = 5,
                         retrieval_strategy: str = "auto_merging",
@@ -217,7 +217,7 @@ def get_query_engine(self,
             )
 
         if use_node_rerank:
-            reranker_llm = Vertex(model="gemini-1.5-flash",
+            reranker_llm = Vertex(model="gemini-2.0-flash",
                                 max_tokens=8192,
                                 temperature=temperature,
                                 system_prompt=prompts.system_prompt)

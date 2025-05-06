@@ -1,3 +1,2 @@
 streamlit
 google-genai
-google-cloud-logging
