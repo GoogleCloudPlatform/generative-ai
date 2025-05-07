@@ -24,6 +24,13 @@ gcloud config list
 
 ### 3. Running the set up script
 
+Ensure the necessary APIs are enabled for your project.
+At a minimum, you will need: 
+**BigQuery API**
+**Discovery Engine API** (IAM roles to interact with Discovery Engine e.g.
+"Discovery Engine Viewer" or "Discovery Engine Admin")
+Then run
+
 ```
 python3 setup.py
 ```
