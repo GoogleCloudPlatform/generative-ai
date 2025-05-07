@@ -75,7 +75,13 @@ def setup_remote_agent() -> str | None:
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
     location = os.getenv("GOOGLE_CLOUD_LOCATION")
     bucket = os.getenv("GOOGLE_CLOUD_STORAGE_BUCKET")
-    initial_states_path = os.getenv("TRAVEL_CONCIERGE_SCENARIO")
+    # Sample Scenario Path - Default is an empty itinerary
+    # This will be loaded upon first user interaction.
+    #
+    # Uncomment one of the two, or create your own.
+    #
+    # TRAVEL_CONCIERGE_SCENARIO=eval/itinerary_seattle_example.json
+    initial_states_path = os.getenv("TRAVEL_CONCIERGE_SCENARIO") if os.getenv("TRAVEL_CONCIERGE_SCENARIO") else "eval/itinerary_empty_default.json"
     map_key = os.getenv("GOOGLE_PLACES_API_KEY")
 
     # Populate env_vars dictionary for the AdkApp

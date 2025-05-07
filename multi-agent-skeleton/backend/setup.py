@@ -1,6 +1,9 @@
 import os
 
 from dotenv import load_dotenv
+load_dotenv("local.env")
+os.system("bash prepare_code.sh")
+
 from google.cloud.bigquery import Client as BigQueryClient
 from google.cloud.storage import Client as GCSClient
 
@@ -15,9 +18,6 @@ from src.model.intent import Intent
 from src.repository.big_query import CHATS_TABLE
 from src.repository.big_query import EMBEDDINGS_TABLE
 from src.service.intent import INTENTS_TABLE
-
-load_dotenv("local.env")
-os.system("bash prepare_code.sh")
 
 remote_agent_resource_id = setup_remote_agent()
 
