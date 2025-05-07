@@ -19,7 +19,16 @@ from src.repository.big_query import CHATS_TABLE
 from src.repository.big_query import EMBEDDINGS_TABLE
 from src.service.intent import INTENTS_TABLE
 
-remote_agent_resource_id = setup_remote_agent()
+print("Setting up GCS... \n")
+
+project_id = os.getenv("_PROJECT_ID")
+location = os.getenv("_REGION")
+storage_client = GCSClient()
+
+bucket = create_bucket(f"quick-bot-{project_id}-travel-concierge-bucket", location, storage_client)
+
+print("Setting up Remote Agent... \n")
+remote_agent_resource_id = setup_remote_agent(bucket)
 
 DEFAULT_INTENTS = [
     Intent(
@@ -34,19 +43,9 @@ DEFAULT_INTENTS = [
     ),
 ]
 
-print("Remote agent resource ID: " + remote_agent_resource_id + "\n")
-
-print("Setting up GCS... \n")
-
-project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-storage_client = GCSClient()
-
-bucket = create_bucket(f"quick-bot-{project_id}", "us-central1", storage_client)
-
-print("\nSuccess!\n")
+print(f"Successfully setted Agent. Remote agent resource ID: {remote_agent_resource_id} \n")
 
 print("Setting up BigQuery... \n")
-
 bigquery_client = BigQueryClient()
 BIG_QUERY_DATASET = "quick_bot_app"
 create_dataset(BIG_QUERY_DATASET, bigquery_client)

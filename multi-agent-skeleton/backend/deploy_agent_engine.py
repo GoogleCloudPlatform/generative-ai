@@ -19,9 +19,9 @@ import os
 import vertexai
 from vertexai import agent_engines
 from vertexai.preview.reasoning_engines import AdkApp
-
-from travel_concierge.agent import root_agent
-
+from google.cloud.storage.bucket import Bucket
+# This root_agent comes after cloning the ADK repository by running prepare_code.sh
+from travel_concierge.agent import root_agent # type: ignore
 
 def create(env_vars: dict[str, str]) -> None:
     """Creates a new deployment."""
@@ -59,7 +59,7 @@ def delete(resource_id: str) -> None:
     return resource_id
 
 
-def setup_remote_agent() -> str | None:
+def setup_remote_agent(bucket: Bucket) -> str | None:
     """
     Sets up the Vertex AI Agent Engine deployment using environment variables.
 
@@ -72,23 +72,22 @@ def setup_remote_agent() -> str | None:
     env_vars = {}
 
     # Retrieve configuration directly from environment variables
-    project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-    location = os.getenv("GOOGLE_CLOUD_LOCATION")
-    bucket = os.getenv("GOOGLE_CLOUD_STORAGE_BUCKET")
+    project_id = os.getenv("_PROJECT_ID")
+    location = os.getenv("_REGION")
     # Sample Scenario Path - Default is an empty itinerary
     # This will be loaded upon first user interaction.
     #
     # Uncomment one of the two, or create your own.
     #
-    # TRAVEL_CONCIERGE_SCENARIO=eval/itinerary_seattle_example.json
-    initial_states_path = os.getenv("TRAVEL_CONCIERGE_SCENARIO") if os.getenv("TRAVEL_CONCIERGE_SCENARIO") else "eval/itinerary_empty_default.json"
-    map_key = os.getenv("GOOGLE_PLACES_API_KEY")
+    # _ADK_TRAVEL_CONCIERGE_SCENARIO=eval/itinerary_seattle_example.json
+    initial_states_path = os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") if os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") else "eval/itinerary_empty_default.json"
+    map_key = os.getenv("_ADK_GOOGLE_PLACES_API_KEY")
 
     # Populate env_vars dictionary for the AdkApp
     if initial_states_path:
-        env_vars["TRAVEL_CONCIERGE_SCENARIO"] = initial_states_path
+        env_vars["_ADK_TRAVEL_CONCIERGE_SCENARIO"] = initial_states_path
     if map_key:
-        env_vars["GOOGLE_PLACES_API_KEY"] = map_key
+        env_vars["_ADK_GOOGLE_PLACES_API_KEY"] = map_key
 
     # --- Validation ---
     missing_vars = []
@@ -96,23 +95,21 @@ def setup_remote_agent() -> str | None:
         missing_vars.append("GOOGLE_CLOUD_PROJECT")
     if not location:
         missing_vars.append("GOOGLE_CLOUD_LOCATION")
-    if not bucket:
-        missing_vars.append("GOOGLE_CLOUD_STORAGE_BUCKET")
     if not initial_states_path:
-        missing_vars.append("TRAVEL_CONCIERGE_SCENARIO")
+        missing_vars.append("_ADK_TRAVEL_CONCIERGE_SCENARIO")
     if not map_key:
-        missing_vars.append("GOOGLE_PLACES_API_KEY")
+        missing_vars.append("_ADK_GOOGLE_PLACES_API_KEY")
 
     if missing_vars:
         print("Error: Missing required environment variables:")
         for var in missing_vars:
             print(f"- {var}")
-        return None  # Indicate failure
+        return None
 
     # --- Print confirmation (mask sensitive keys) ---
     print(f"PROJECT: {project_id}")
     print(f"LOCATION: {location}")
-    print(f"BUCKET: {bucket}")
+    print(f"BUCKET: {bucket.name}")
     print(f"INITIAL_STATE: {initial_states_path}")
     print(f"MAP KEY (PARTIAL): {map_key[:5]}...")  # Mask most of the key
 
@@ -121,12 +118,12 @@ def setup_remote_agent() -> str | None:
         vertexai.init(
             project=project_id,
             location=location,
-            staging_bucket=f"gs://{bucket}",
+            staging_bucket=f"gs://{bucket.name}",
         )
         print("Vertex AI initialized successfully.")
     except Exception as e:
         print(f"Error initializing Vertex AI: {e}")
-        return None  # Indicate failure
+        return None
 
     # --- Create the deployment ---
     try:
