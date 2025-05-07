@@ -23,6 +23,8 @@ print("Setting up GCS... \n")
 
 project_id = os.getenv("_PROJECT_ID")
 location = os.getenv("_REGION")
+print("ENV project_id", project_id)
+print("ENV location", location)
 storage_client = GCSClient()
 
 bucket = create_bucket(f"quick-bot-{project_id}-travel-concierge-bucket", location, storage_client)
