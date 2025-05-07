@@ -1,10 +1,11 @@
-# Generative AI
+# Generative AI on Google Cloud
 
-> NOTE: [Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) has been released!
+> **[Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro) and [Gemini 2.5 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash) have been released!**
 >
 > Here are the latest notebooks and demos using the new models:
 >
 > - [Intro to Gemini 2.5 Pro](gemini/getting-started/intro_gemini_2_5_pro.ipynb)
+> - [Intro to Gemini 2.5 Flash](gemini/getting-started/intro_gemini_2_5_flash.ipynb)
 
 <!-- markdownlint-disable MD033 -->
 
