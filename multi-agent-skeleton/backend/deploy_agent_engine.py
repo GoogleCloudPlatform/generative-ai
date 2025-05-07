@@ -92,9 +92,9 @@ def setup_remote_agent(bucket: Bucket) -> str | None:
     # --- Validation ---
     missing_vars = []
     if not project_id:
-        missing_vars.append("GOOGLE_CLOUD_PROJECT")
+        missing_vars.append("_PROJECT_ID")
     if not location:
-        missing_vars.append("GOOGLE_CLOUD_LOCATION")
+        missing_vars.append("_REGION")
     if not initial_states_path:
         missing_vars.append("_ADK_TRAVEL_CONCIERGE_SCENARIO")
     if not map_key:

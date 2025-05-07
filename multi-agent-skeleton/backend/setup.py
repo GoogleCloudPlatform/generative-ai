@@ -19,58 +19,81 @@ from src.repository.big_query import CHATS_TABLE
 from src.repository.big_query import EMBEDDINGS_TABLE
 from src.service.intent import INTENTS_TABLE
 
-print("Setting up GCS... \n")
+try:
+    print("Setting up GCS... \n")
 
-project_id = os.getenv("_PROJECT_ID")
-location = os.getenv("_REGION")
-print("ENV project_id", project_id)
-print("ENV location", location)
-storage_client = GCSClient()
+    project_id = os.getenv("_PROJECT_ID")
+    location = os.getenv("_REGION")
+    print("ENV project_id", project_id)
+    print("ENV location", location)
+    storage_client = GCSClient()
 
-bucket = create_bucket(f"quick-bot-{project_id}-travel-concierge-bucket", location, storage_client)
+    bucket = create_bucket(f"quick-bot-{project_id}-travel-concierge-bucket", location, storage_client)
 
-print("Setting up Remote Agent... \n")
-remote_agent_resource_id = setup_remote_agent(bucket)
+    print("Setting up Remote Agent... \n")
+    remote_agent_resource_id = setup_remote_agent(bucket)
 
-DEFAULT_INTENTS = [
-    Intent(
-        name="Travel concierge",
-        ai_model="gemini-2.0-flash",
-        ai_temperature=1,
-        description="",
-        prompt="",
-        questions=[],
-        status="5",
-        remote_agent_resource_id=remote_agent_resource_id,
-    ),
-]
+    DEFAULT_INTENTS = [
+        Intent(
+            name="Travel concierge",
+            ai_model="gemini-2.0-flash",
+            ai_temperature=1,
+            description="",
+            prompt="",
+            questions=[],
+            status="5",
+            remote_agent_resource_id=remote_agent_resource_id,
+        ),
+    ]
 
-print(f"Successfully setted Agent. Remote agent resource ID: {remote_agent_resource_id} \n")
+    print(f"Successfully setted Agent. Remote agent resource ID: {remote_agent_resource_id} \n")
 
-print("Setting up BigQuery... \n")
-bigquery_client = BigQueryClient()
-BIG_QUERY_DATASET = "quick_bot_app"
-create_dataset(BIG_QUERY_DATASET, bigquery_client)
-create_table(
-    BIG_QUERY_DATASET, CHATS_TABLE, Chat.__schema__(), project_id, bigquery_client
-)
-create_table(
-    BIG_QUERY_DATASET,
-    EMBEDDINGS_TABLE,
-    Embedding.__schema__(),
-    project_id,
-    bigquery_client,
-)
-create_table(
-    BIG_QUERY_DATASET, INTENTS_TABLE, Intent.__schema__(), project_id, bigquery_client
-)
+    print("Setting up BigQuery... \n")
+    bigquery_client = BigQueryClient()
+    BIG_QUERY_DATASET = "quick_bot_app"
+    print(f"Setting up BigQuery Dataset {BIG_QUERY_DATASET}... \n")
+    create_dataset(BIG_QUERY_DATASET, bigquery_client)
 
-for intent in DEFAULT_INTENTS:
-    try:
-        insert_intent(
-            BIG_QUERY_DATASET, INTENTS_TABLE, intent.to_insert_string(), bigquery_client
-        )
-    except Exception as e:
-        print(e)
+    print(f"Setting up BigQuery Table {CHATS_TABLE}... \n")
+    create_table(
+        BIG_QUERY_DATASET, CHATS_TABLE, Chat.__schema__(), project_id, bigquery_client
+    )
+    print(f"Setting up BigQuery Table {EMBEDDINGS_TABLE}... \n")
+    create_table(
+        BIG_QUERY_DATASET,
+        EMBEDDINGS_TABLE,
+        Embedding.__schema__(),
+        project_id,
+        bigquery_client,
+    )
+    print(f"Setting up BigQuery Table {INTENTS_TABLE}... \n")
+    create_table(
+        BIG_QUERY_DATASET, INTENTS_TABLE, Intent.__schema__(), project_id, bigquery_client
+    )
 
-print("\nSuccess!\n")
+    for intent in DEFAULT_INTENTS:
+        try:
+            insert_intent(
+                BIG_QUERY_DATASET, INTENTS_TABLE, intent.to_insert_string(), bigquery_client
+            )
+            print(f"Intent 'Travel concierge' created successfully \n")
+        except Exception as e:
+            print(e)
+            print(f"An error occurred during the setup process: {e}")
+            print(f"ERROR: A command in the backend setup block failed with code {e.returncode}.")
+            if e.stdout: print(f"Stdout from failed command:\n{e.stdout}")
+            else: print("Stdout from failed command: <empty>")
+            if e.stderr: print(f"Stderr from failed command:\n{e.stderr}")
+            else: print("Stderr from failed command: <empty>")
+
+    print("\nSuccess!\n")
+except Exception as e:
+    print(f"An error occurred during the setup process: {e}")
+    print(f"ERROR: A command in the backend setup block failed with code {e.returncode}.")
+    if e.stdout: print(f"Stdout from failed command:\n{e.stdout}")
+    else: print("Stdout from failed command: <empty>")
+    if e.stderr: print(f"Stderr from failed command:\n{e.stderr}")
+    else: print("Stderr from failed command: <empty>")
+    # You could also include a traceback for more detailed error information:
+    import traceback
+    print(traceback.format_exc())
