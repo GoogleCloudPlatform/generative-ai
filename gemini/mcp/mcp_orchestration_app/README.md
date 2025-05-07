@@ -84,7 +84,7 @@ Now for the exciting part – running the application! This project has two main
 
 ### Starting the MCP Server
 
-First, we need to get the MCP server up and running. Open your terminal and navigate to the project directory. Then, execute the following command:
+Open your terminal and navigate to the project directory. Then, execute the following command:
 
 ```bash
 cd src
