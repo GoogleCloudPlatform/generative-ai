@@ -7,7 +7,7 @@ git clone https://github.com/google/adk-samples.git
 cp -r adk-samples/agents/travel-concierge/travel_concierge ./travel_concierge
 cp -r adk-samples/agents/travel-concierge/eval ./eval
 cp adk-samples/agents/travel-concierge/pyproject.toml . # TODO: Installing dependencies might be necessary only for local and not AE deployment
-cp adk-samples/agents/travel-concierge/poetry.lock .
+# cp adk-samples/agents/travel-concierge/poetry.lock . # TODO: Double check this, poetry.lock does not exist on the ADK repo
 poetry install --with deployment
 
 echo "Finished prepare_code.sh script."
