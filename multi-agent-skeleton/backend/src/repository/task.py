@@ -6,7 +6,7 @@ from os import getenv
 
 LOCATION="us-central1"
 INTENT_CREATION_QUEUE=getenv("TASK_QUEUE_NAME")
-URL=getenv("FUNCTION_URL")
+URL=getenv("FUNCTION_URL", "")
 
 def get_project_id():
     try:
