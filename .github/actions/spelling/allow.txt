@@ -31,6 +31,7 @@ Arsan
 Artsakh
 Ashish
 Aspeed
+Atulan
 Autorater
 BIKBEAR
 BITCODE
@@ -508,6 +509,7 @@ Vettel
 Vijay
 Virat
 Viru
+Visualise
 WAI
 WAU
 WDIR
@@ -592,6 +594,7 @@ bayes
 bbc
 bbq
 beir
+bert
 bff
 bgswap
 bigframes
