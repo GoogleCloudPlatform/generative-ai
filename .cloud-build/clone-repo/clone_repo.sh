@@ -19,4 +19,4 @@ shopt -s globstar
 # The '**/*.ipynb' glob will expand to all .ipynb files found recursively.
 # gsutil will preserve the relative path structure of the copied files under
 # the specified destination prefix.
-gsutil -m cp **/*.ipynb "$OUTPUT_URI/generative-ai/"
+gsutil -m cp ./**/*.ipynb "$OUTPUT_URI/generative-ai/"
