@@ -50,7 +50,7 @@ try:
 
     print("Setting up BigQuery... \n")
     bigquery_client = BigQueryClient()
-    BIG_QUERY_DATASET = "quick_bot_app"
+    BIG_QUERY_DATASET = os.getenv("BIG_QUERY_DATASET") if os.getenv("BIG_QUERY_DATASET") else os.getenv("_CHATBOT_NAME", "quickbot").lower().replace(" ", "_").replace("-","_")
     print(f"Setting up BigQuery Dataset {BIG_QUERY_DATASET}... \n")
     create_dataset(BIG_QUERY_DATASET, bigquery_client)
 
