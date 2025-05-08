@@ -1,9 +1,5 @@
 import os
 
-from dotenv import load_dotenv
-# load_dotenv("local.env")
-# os.system("bash prepare_code.sh")
-
 from google.cloud.bigquery import Client as BigQueryClient
 from google.cloud.storage import Client as GCSClient
 
