@@ -5,5 +5,3 @@ intro_gemini_2_5_flash.ipynb
 intro_gemini_2_5_pro.ipynb
 intro_gemini_chat.ipynb
 intro_gemini_curl.ipynb
-intro_gemini_express.ipynb
-intro_genai_sdk.ipynb
