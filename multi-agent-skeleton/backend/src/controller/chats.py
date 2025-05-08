@@ -109,7 +109,7 @@ async def websocket_chat(
             if websocket.client_state == websocket.client_state.CONNECTED:
                 await websocket.send_json(
                     {
-                        "error": "An unexpected server error occurred.",
+                        "error": f"An unexpected server error occurred in WebSocket handler (session: {active_session_id}): {e}",
                         "operation": "fatal_error",
                     }
                 )

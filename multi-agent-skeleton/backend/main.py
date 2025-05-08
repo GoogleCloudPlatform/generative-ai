@@ -1,3 +1,4 @@
+import sys
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from src.controller.chats import router as chat_router
@@ -5,6 +6,10 @@ from src.controller.intents import router as intent_router
 from src.controller.models import router as model_router
 from google.cloud import speech
 from os import getenv
+import logging
+
+logging.basicConfig(level=logging.INFO, stream=sys.stderr)
+logging.info("Test message")
 
 app = FastAPI()
 
