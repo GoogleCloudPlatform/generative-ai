@@ -49,12 +49,6 @@ def create(env_vars: dict[str, str]) -> None:
     )
     print(f"Created remote agent: {remote_agent.resource_name}")
 
-    for event in remote_agent.stream_query(
-        user_id="1234",
-        message="What places do you recommend me to go if I travel to New York?",
-    ):
-        print(event)
-
     return remote_agent.resource_name
 
 
