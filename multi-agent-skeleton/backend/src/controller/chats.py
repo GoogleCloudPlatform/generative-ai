@@ -1,4 +1,5 @@
 import json
+import logging
 
 from fastapi import APIRouter
 from fastapi import BackgroundTasks
@@ -35,10 +36,12 @@ async def websocket_chat(
     remote_agent_resource_id = intent.remote_agent_resource_id
     remote_agent = agent_engines.get(remote_agent_resource_id)
     print(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
+    logging.info(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
 
     agent_session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
     active_session_id = agent_session["id"]
     print(f"Created new agent session for WebSocket connection: {active_session_id}")
+    logging.info(f"Created new agent session for WebSocket connection: {active_session_id}")
 
     # Notify client that the session has started, without sending the session ID
     await websocket.send_json({"operation": "start"})
@@ -48,18 +51,22 @@ async def websocket_chat(
             try:
                 item_json = await websocket.receive_json()
                 print(f"Received JSON from client: {item_json}")
+                logging.info(f"Received JSON from client: {item_json}")
                 # The CreateChatRequest might still have chat_id for HTTP,
                 # but we ignore it for WebSocket session management here.
                 current_item = CreateChatRequest(**item_json)
             except WebSocketDisconnect:
                 print("Client disconnected.")
+                logging.info("Client disconnected.")
                 break  # Exit the main loop
             except json.JSONDecodeError:
                 print("Failed to decode message as JSON. Sending error to client.")
+                logging.error("Failed to decode message as JSON. Sending error to client.")
                 await websocket.send_json({"error": "Invalid JSON format received."})
                 continue  # Wait for a new, valid message
             except Exception as e:
                 print(f"Error receiving or parsing client message: {e}")
+                logging.error(f"Error receiving or parsing client message: {e}")
                 await websocket.send_json(
                     {"error": f"Error processing your request: {str(e)}"}
                 )
@@ -67,9 +74,8 @@ async def websocket_chat(
 
             current_message_text = current_item.text
 
-            print(
-                f"Processing message: '{current_message_text}' for session: {active_session_id}"
-            )
+            print(f"Processing message: '{current_message_text}' for session: {active_session_id}")
+            logging.info(f"Processing message: '{current_message_text}' for session: {active_session_id}")
             for event in remote_agent.stream_query(
                 user_id=DEFAULT_USER_ID,
                 session_id=active_session_id,  # Use the session created for this connection
@@ -93,18 +99,15 @@ async def websocket_chat(
             # After streaming all parts for the current message's response
             # Signal end of turn, no session ID needed by client here
             await websocket.send_json({"operation": "end_of_turn"})
-            print(
-                f"Sent 'end_of_turn' for session: {active_session_id}. Waiting for next client message..."
-            )
+            print(f"Sent 'end_of_turn' for session: {active_session_id}. Waiting for next client message...")
+            logging.info(f"Sent 'end_of_turn' for session: {active_session_id}. Waiting for next client message...")
 
     except WebSocketDisconnect:
-        print(
-            f"WebSocket disconnected during operation (session: {active_session_id})."
-        )
+        print(f"WebSocket disconnected during operation (session: {active_session_id}).")
+        logging.error(f"WebSocket disconnected during operation (session: {active_session_id}).")
     except Exception as e:
-        print(
-            f"An unhandled error occurred in WebSocket handler (session: {active_session_id}): {e}"
-        )
+        print(f"An unhandled error occurred in WebSocket handler (session: {active_session_id}): {e}")
+        logging.error(f"An unhandled error occurred in WebSocket handler (session: {active_session_id}): {e}")
         try:
             if websocket.client_state == websocket.client_state.CONNECTED:
                 await websocket.send_json(
@@ -116,9 +119,8 @@ async def websocket_chat(
         except Exception as send_exc:
             print(f"Could not send error to client: {send_exc}")
     finally:
-        print(
-            f"Closing WebSocket connection from server-side finally block (session: {active_session_id})."
-        )
+        print(f"Closing WebSocket connection from server-side finally block (session: {active_session_id}).")
+        logging.info(f"Closing WebSocket connection from server-side finally block (session: {active_session_id}).")
         if websocket.client_state == websocket.client_state.CONNECTED:
             await websocket.close()
 
