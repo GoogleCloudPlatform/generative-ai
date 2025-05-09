@@ -10,13 +10,14 @@ grpcio
 urllib3
 typing-inspect
 typing_extensions
-pydantic
-requests
+pydantic (>=2.10.6,<3.0.0)
+requests (>=2.32.3,<3.0.0)
 langchain
 langchain-community
 langchain-core
 langchain-google-vertexai
-google-cloud-aiplatform[adk,agent_engines]
+google-cloud-aiplatform[agent_engines] @ git+https://github.com/googleapis/python-aiplatform.git@copybara_738852226
+google-cloud-aiplatform[adk]
 google-cloud-bigquery
 google-cloud-tasks
 google-cloud-logging
