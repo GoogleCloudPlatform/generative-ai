@@ -10,4 +10,10 @@ cp adk-samples/agents/travel-concierge/pyproject.toml . # TODO: Installing depen
 # cp adk-samples/agents/travel-concierge/poetry.lock . # TODO: Double check this, poetry.lock does not exist on the ADK repo
 poetry install --with deployment
 
+# Install setup.py dependencies
+poetry add google-cloud-bigquery
+poetry add google-cloud-logging
+poetry add google-cloud-storage
+poetry add requests
+
 echo "Finished prepare_code.sh script."
