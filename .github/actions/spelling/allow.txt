@@ -929,6 +929,7 @@ linestyle
 linkedin
 linted
 linting
+litellm
 llm
 llms
 loghub
@@ -1124,6 +1125,7 @@ quadrotor
 qubit
 qubits
 quippy
+qwen
 rag
 ragas
 ragdemos
