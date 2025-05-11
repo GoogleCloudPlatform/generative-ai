@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 
@@ -15,6 +16,7 @@ from src.service.intent import IntentService
 from src.service.intent_matching import IntentMatchingService
 
 DEFAULT_USER_ID = "traveler0115"
+INACTIVITY_TIMEOUT_SECONDS = 10 * 60  # 10 minutes
 
 router = APIRouter(
     prefix="/api/chats",
@@ -49,23 +51,37 @@ async def websocket_chat(
     try:
         while True:
             try:
-                item_json = await websocket.receive_json()
+                item_json = await asyncio.wait_for(
+                    websocket.receive_json(),
+                    timeout=INACTIVITY_TIMEOUT_SECONDS
+                )
                 print(f"Received JSON from client: {item_json}")
-                logging.info(f"Received JSON from client: {item_json}")
+                logging.info(f"Received JSON from client (session: {active_session_id}): {item_json}")
                 # The CreateChatRequest might still have chat_id for HTTP,
                 # but we ignore it for WebSocket session management here.
                 current_item = CreateChatRequest(**item_json)
+            except asyncio.TimeoutError:
+                logging.warning(
+                    f"Client inactive for {INACTIVITY_TIMEOUT_SECONDS} seconds."
+                    f"Closing connection for session: {active_session_id}."
+                )
+                if websocket.client_state == websocket.client_state.CONNECTED:
+                    await websocket.send_json({
+                        "operation": "timeout",
+                        "message": "Connection closed due to inactivity."
+                    })
+                break
             except WebSocketDisconnect:
-                print("Client disconnected.")
+                print(f"Client disconnected (session: {active_session_id}).")
                 logging.info("Client disconnected.")
                 break  # Exit the main loop
             except json.JSONDecodeError:
-                print("Failed to decode message as JSON. Sending error to client.")
+                print(f"Failed to decode message as JSON (session: {active_session_id}). Sending error to client.")
                 logging.error("Failed to decode message as JSON. Sending error to client.")
                 await websocket.send_json({"error": "Invalid JSON format received."})
                 continue  # Wait for a new, valid message
             except Exception as e:
-                print(f"Error receiving or parsing client message: {e}")
+                print(f"Error receiving or parsing client message (session: {active_session_id}): {e}")
                 logging.error(f"Error receiving or parsing client message: {e}")
                 await websocket.send_json(
                     {"error": f"Error processing your request: {str(e)}"}

@@ -146,6 +146,18 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     this.chatService.close("ChatbarComponent destroyed");
   }
 
+  public getPlaceDisplayUrl(place: any): string {
+    // if (place && place.image_url) {
+    //   return place.image_url; // Prioritize the provided image_url
+    // }
+    
+    // Fallback to Unsplash Source if no image_url or if it's empty
+    // Use keywords from place_name. Adjust dimensions (100x100) as needed.
+    const keywords = place.place_name.split(' ').join(',').toLowerCase();
+    return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(keywords)}&zoom=14&size=200x200&key=${environment.googleMapsApiKey}`;
+    
+  }
+
   private subscribeToConnectionStatus(): void {
     this.chatService.getConnectionStatus()
       .pipe(

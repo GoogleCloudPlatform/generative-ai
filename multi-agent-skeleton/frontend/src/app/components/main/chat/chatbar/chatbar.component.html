@@ -44,7 +44,6 @@
         </div>
       </div>
 
-
       <div class="bot-message"
            *ngIf="message.type == 'bot'"
            [attr.id]="message.botStartTime">
@@ -58,7 +57,23 @@
             <ng-container *ngFor="let part of message.contentParts">
               <!-- Thinking Block -->
               <details *ngIf="part.type === 'thinking' && part.thinkingSteps && part.thinkingSteps.length > 0" class="thinking-dropdown">
-                <summary>Thinking...</summary>
+                <summary *ngIf="!['Memorize', 'Transfer To Agent'].includes((part.thinkingSteps?.[0]?.name | formatAgentName))" class="agent-chip-container" style="margin-bottom: 0.5em;">
+                  <mat-chip color="primary" selected>
+                    {{ (part.thinkingSteps?.[0]?.name | formatAgentName) }}
+                  </mat-chip>
+                </summary>
+                <summary *ngIf="(part.thinkingSteps?.[0]?.name | formatAgentName) === 'Transfer To Agent'">
+                  <mat-chip color="primary" selected>
+                    Travel Concierge
+                  </mat-chip>
+                   will transfer you to <b>{{ part.thinkingSteps?.[0]?.data?.agent_name | formatAgentName }}...</b>
+                </summary>
+                <summary *ngIf="(part.thinkingSteps?.[0]?.name | formatAgentName) === 'Memorize'">
+                  <mat-chip color="primary" selected>
+                    Travel Concierge
+                  </mat-chip> 
+                  is memorizing the input...
+                </summary>
                 <div class="function-details-container">
                   <ng-container *ngFor="let step of part.thinkingSteps">
                     <div *ngIf="step.type === 'functionCall'" class="function-step">
@@ -72,6 +87,35 @@
                   </ng-container>
                 </div>
               </details>
+
+              <ng-container *ngIf="part.type === 'thinking' && part.thinkingSteps?.[1]?.type === 'functionResponse' && 
+                ['Map Tool', 'Poi Agent'].includes((part.thinkingSteps?.[1]?.name  | formatAgentName))">
+                <!-- Custom Display for Map Tool Response -->
+                <h6 style="margin-top: 0.5em; margin-bottom: 0.5em;">Places Found:</h6>
+                <div *ngIf="part.thinkingSteps?.[1]?.data?.places?.length > 0" class="map-tool-response">
+                  <div *ngFor="let place of part.thinkingSteps?.[1]?.data.places" class="place-card" style="margin-bottom: 2rem;">
+                    <!-- TODO: Once the place.image_url returns valid images, change back to use this prop -->
+                    <!-- <img *ngIf="place.image_url" [src]="place.image_url" [alt]="place.place_name" class="place-image"> -->
+                    <img *ngIf="place.place_name || place.image_url"
+                        [src]="getPlaceDisplayUrl(place)"
+                        [alt]="place.place_name || 'Location image'"
+                        class="place-image">
+                    <div class="place-details">
+                      <h5>{{ place.place_name }}</h5>
+                      <p *ngIf="place.address"><strong>Address:</strong> {{ place.address }}</p>
+                      <p *ngIf="place.highlights"><strong>Highlights:</strong> {{ place.highlights }}</p>
+                      <p *ngIf="place.review_ratings"><strong>Rating:</strong> {{ place.review_ratings }} / 5</p>
+                      <a mat-stroked-button color="primary"
+                        [href]="'https://www.google.com/maps?q=' + place.lat + ',' + place.long"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="map-button">
+                        <mat-icon>map</mat-icon> View on Maps
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
 
               <!-- Text Block -->
               <markdown *ngIf="part.type === 'text' && part.text" clipboard class="variable-binding" [data]="part.text"></markdown>

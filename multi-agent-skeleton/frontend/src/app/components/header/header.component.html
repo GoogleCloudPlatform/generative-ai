@@ -25,15 +25,7 @@
           </div>
         </div>
         <div class="action-item-container">
-          <br>
-            <div class="logout" (click)="goToManageIntentPage()">
-              <div class="logout-container">
-                <span class="material-symbols-rounded logo">feedback</span>
-                <div class="text">
-                  <span class="sub-title">Manage Playbooks</span>
-                </div>
-              </div>
-            </div>
+            <br>
             <div class="logout logout-button" (click)="logout()" *ngIf="requiredLogin === 'True'">
               <div class="logout-container">
                 <span class="material-symbols-rounded logo logout-button-text">exit_to_app</span>

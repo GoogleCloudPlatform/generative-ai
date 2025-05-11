@@ -1,5 +1,12 @@
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined");
 
+pre {
+  text-wrap: auto;
+  font-size: 0.8rem;
+  color: white;
+  padding: 1rem;
+}
+
 .chat-container {
   display: flex;
   background-color: #fff;
@@ -103,7 +110,7 @@
         display: flex;
         border: 1px solid #E4EDFD;
         // box-shadow: 0px 4px 16px rgba(140, 140, 156, 0.25);
-        border-radius: 20px 0px 20px 0px;
+        border-radius: 0 20px 20px 0;
         padding: 0.0% 1%;
         background-color: #F6F9FE;
         color: #161A1D;
@@ -322,6 +329,7 @@
   margin-top: 2%;
   display: flex;
   color: #3E4245;
+  justify-content: center;
 }
 
 @keyframes rotate {
@@ -1134,4 +1142,83 @@ a.chat-help-link {
       height: 100%;
       object-fit: cover;
     }
+}
+
+
+
+.function-details-container {
+  padding-left: 1.5em; // Indent details a bit
+  border-left: 2px solid #eee; // Visual separator
+  margin-left: 10px; // Space from the summary arrow
+  padding-top: 0.5em;
+}
+
+.map-tool-response {
+  margin-bottom: 1em;
+  display: flex;
+  justify-content: center;
+
+  .place-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 0 .5rem;
+    margin-bottom: 12px;
+    background-color: #f9f9f9;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px; // Space between image and text
+
+    .place-image {
+      // width: 200px; // Adjust as needed
+      // height: 200px; // Adjust as needed
+      // object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0; // Prevent image from shrinking
+    }
+
+    .place-details {
+      flex-grow: 1; // Allow text details to take remaining space
+      h5 {
+        margin-top: 0;
+        margin-bottom: 0.3em;
+        font-size: 1.1em;
+        color: #333;
+      }
+      p {
+        font-size: 0.9em;
+        margin-bottom: 0;
+        color: #555;
+        strong {
+          color: #444;
+        }
+      }
+      .map-button {
+        margin-top: 0.5em;
+        .mat-icon {
+          margin-right: 4px; // Space between icon and text in button
+        }
+      }
+    }
+  }
+    // If no image, let details take full width
+  .place-card:not(:has(.place-image)) .place-details {
+      width: 100%;
+  }
+}
+
+.function-step {
+  // Your existing styles for function-step, or add new ones
+  margin-bottom: 0.5em;
+  padding: 0.5em;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+    background-color: #e9e9e9;
+    padding: 0.3em;
+    border-radius: 3px;
+  }
 }

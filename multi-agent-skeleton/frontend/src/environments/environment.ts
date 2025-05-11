@@ -11,5 +11,6 @@ export const environment = {
   requiredLogin: 'False',
   backendURL: 'http://localhost:8080/api',
   chatbotName: 'Travel Concierge',
-  environment: 'development'
+  environment: 'development',
+  googleMapsApiKey: '<your Google Maps Api Key>'
 };
