@@ -21,6 +21,7 @@ Aadila
 Abhishek
 Afshaan
 Aktu
+Anant
 Aphone
 Arborio
 Arepa
@@ -316,6 +317,7 @@ Najim
 Nakoso
 Napisz
 Narnia
+Nihonga
 Niitsuma
 Nith
 Nominatim
@@ -860,7 +862,6 @@ imwrite
 inbox
 informati
 inpaint
-inputvtt
 iostream
 ipd
 iphoneos
