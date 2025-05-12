@@ -1,7 +1,7 @@
 FROM nginx:alpine
 
 # install Python 3 and pip
-RUN apk add --no-cache python3=3.12.8-r1 py3-pip=24.0-r2 supervisor=4.2.5-r5
+RUN apk add --no-cache python3 py3-pip supervisor
 
 # copy the front end 
 COPY frontend/. /usr/share/nginx/html
