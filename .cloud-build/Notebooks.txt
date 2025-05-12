@@ -1,0 +1,7 @@
+intro_gemini_2_0_flash.ipynb
+intro_gemini_2_0_flash_lite.ipynb
+intro_gemini_2_0_image_gen.ipynb
+intro_gemini_2_5_flash.ipynb
+intro_gemini_2_5_pro.ipynb
+intro_gemini_chat.ipynb
+intro_gemini_curl.ipynb

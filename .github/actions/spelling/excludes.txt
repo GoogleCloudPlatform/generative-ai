@@ -114,3 +114,5 @@ ignore$
 ^\Qowlbot.py\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
 ^\Qnoxfile.py\E$
+py\.typed$
+^\Qaudio/speech/use-cases/storytelling/macbeth_the_sitcom.json\E$
