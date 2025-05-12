@@ -1,16 +1,19 @@
 import base64
 from typing import List
+from io import BytesIO
 
 import google.auth
 from google import genai
 from google.genai import types
 from google.genai.types import (
-    Image,
     RawReferenceImage,
     EditImageConfig,
     MaskReferenceImage,
     MaskReferenceConfig,
+    Image as GenaiImage # Keep this alias for Imagen if it expects this type
 )
+from PIL import Image as PilImage # Import PIL Image and alias it
+
 
 from src.model.search import (
     CreateSearchRequest,
@@ -29,13 +32,13 @@ class ImagenSearchService:
 
         prompt = f""" {searchRequest.term}"""
 
-        original_image = Image(image_bytes=searchRequest.user_image)
+        # Imagen3 part remains the same (using GenaiImage)
+        original_image = GenaiImage(image_bytes=searchRequest.user_image)
 
         raw_reference_image = RawReferenceImage(
             reference_image=original_image, reference_id=0
         )
 
-        # Imagen3 edition for just the entire image
         images_entire_image: types.EditImageResponse = client.models.edit_image(
             model=searchRequest.generation_model,
             prompt=prompt,
@@ -48,7 +51,6 @@ class ImagenSearchService:
             ),
         )
 
-        # Imagen3 edition for just the background
         mask_ref_image = MaskReferenceImage(
             reference_id=1,
             reference_image=None,
@@ -71,43 +73,71 @@ class ImagenSearchService:
         )
 
         ###Gemini response
-        user_image = Image(image_bytes=searchRequest.user_image)
-        
+        print(f"DEBUG: searchRequest.user_image_mime_type received: '{searchRequest.user_image_mime_type}' (Type: {type(searchRequest.user_image_mime_type)})")
+        print(f"DEBUG: searchRequest.user_image length: {len(searchRequest.user_image)} bytes")
+
+        # Convert raw image bytes to PIL Image object
         try:
-            gemini_responses = client.generate_content(
-                model="gemini-2.0-flash-exp-image-generation",
-                contents=[prompt, user_image],
-                generation_config=types.GenerateContentConfig(
-                    response_modalities=['Image']  # Expecting image responses
-                ),
-                safety_settings=[
-                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                ],
-                stream=False,  # Assuming you want the full response at once
+            pil_image_obj = PilImage.open(BytesIO(searchRequest.user_image))
+            print(f"DEBUG: Successfully created PIL Image object: {type(pil_image_obj)}")
+        except Exception as e:
+            print(f"ERROR: Could not open image bytes with PIL: {e}")
+            # Handle error, maybe return early or raise specific exception
+            raise
+
+        try:
+            gemini_model_name = "gemini-2.0-flash-preview-image-generation"
+            print(f"DEBUG: Attempting to call Gemini model: {gemini_model_name}")
+
+            gemini_response_object: types.GenerateContentResponse = client.models.generate_content(
+                model=gemini_model_name,
+                contents=[prompt, pil_image_obj], # Pass the PIL Image object directly
+                config=types.GenerateContentConfig(
+                    response_modalities=['TEXT', 'IMAGE']
+                )
             )
 
             gemini_generated_images: List[ImageGenerationResult] = []
-            for response in gemini_responses:
-                if response.parts:
-                    for part in response.parts:
-                        if isinstance(part.data, types.Blob) and part.data.mime_type.startswith("image/"):
-                            mime_type = part.data.mime_type
-                            image_bytes = part.data.data
-                            encoded_image = base64.b64encode(image_bytes).decode("utf-8")
-                            gemini_generated_images.append(
-                                ImageGenerationResult(
-                                    enhanced_prompt=response.prompt_feedback.text if response.prompt_feedback else prompt,
-                                    rai_filtered_reason=response.prompt_feedback.block_reason if response.prompt_feedback and response.prompt_feedback.blocked else None,
-                                    image=CustomImageResult(
-                                        gcs_uri=None,
-                                        mime_type=mime_type,
-                                        encoded_image=encoded_image,
-                                    ),
+
+            if gemini_response_object.prompt_feedback and gemini_response_object.prompt_feedback.blocked:
+                print(f"Gemini prompt blocked: {gemini_response_object.prompt_feedback.block_reason}")
+                gemini_generated_images.append(
+                    ImageGenerationResult(
+                        enhanced_prompt=prompt,
+                        rai_filtered_reason=gemini_response_object.prompt_feedback.block_reason,
+                        image=None
+                    )
+                )
+            elif gemini_response_object.candidates:
+                for candidate in gemini_response_object.candidates:
+                    if candidate.content and candidate.content.parts:
+                        for part in candidate.content.parts:
+                            if part.inline_data and isinstance(part.inline_data, types.Blob) and part.inline_data.mime_type.startswith("image/"):
+                                mime_type = part.inline_data.mime_type
+                                image_bytes = part.inline_data.data
+                                encoded_image = base64.b64encode(image_bytes).decode("utf-8")
+                                enhanced_prompt = prompt
+                                # Check if there's an enhanced text prompt from the candidate's parts
+                                # The prompt_feedback might be on the response object itself or candidate
+                                if candidate.content.parts and candidate.content.parts[0].text:
+                                    enhanced_prompt = candidate.content.parts[0].text
+                                
+                                gemini_generated_images.append(
+                                    ImageGenerationResult(
+                                        enhanced_prompt=enhanced_prompt,
+                                        rai_filtered_reason=candidate.finish_reason.name if candidate.finish_reason else None, # Check candidate-level finish reason
+                                        image=CustomImageResult(
+                                            gcs_uri=None,
+                                            mime_type=mime_type,
+                                            encoded_image=encoded_image, # This is already encoded
+                                        ),
+                                    )
                                 )
-                            )
+                            elif part.text is not None:
+                                print(f"DEBUG: Gemini Text Output: {part.text}")
+            else:
+                print("DEBUG: Gemini response had no candidates or content.")
+
         except Exception as e:
             print(f"Error during Gemini 2.0 Flash call: {e}")
             gemini_generated_images = []
@@ -115,22 +145,52 @@ class ImagenSearchService:
         # Make sure to convert the image from bytes to encoded string before sending to the frontend
         all_generated_images = (
             gemini_generated_images
-            + images_entire_image.generated_images
-            + images_just_background.generated_images
+            #+ images_entire_image.generated_images # These are types.ImageGenerationResponse objects
+            #+ images_just_background.generated_images # These are types.ImageGenerationResponse objects
         )
-        response = [
-            ImageGenerationResult(
-                enhanced_prompt=generated_image.enhanced_prompt,
-                rai_filtered_reason=generated_image.rai_filtered_reason,
-                image=CustomImageResult(
-                    gcs_uri=generated_image.image.gcs_uri,
-                    encoded_image=base64.b64encode(
-                        generated_image.image.image_bytes
-                    ).decode("utf-8"),
-                    mime_type=generated_image.image.mime_type,
-                ),
-            )
-            for generated_image in all_generated_images
-        ]
+        print("gemini_generated_images: ", len(gemini_generated_images))
+        print("images_entire_image: ", len(images_entire_image.generated_images))
+        print("images_just_background: ", len(images_just_background.generated_images))
 
-        return response
+        final_response: List[ImageGenerationResult] = []
+        for generated_item in all_generated_images:
+            # Case 1: The item is already an ImageGenerationResult (from Gemini processing)
+            if isinstance(generated_item, ImageGenerationResult):
+                final_response.append(generated_item)
+            
+            # Case 2: The item is from Imagen's response (likely types.ImageGenerationResponse)
+            # and needs to be converted to our CustomImageResult structure.
+            elif hasattr(generated_item, 'image') and hasattr(generated_item.image, 'image_bytes'):
+                imagen_enhanced_prompt = None
+                imagen_rai_filtered_reason = None
+                
+                # Extract enhanced_prompt and rai_filtered_reason from Imagen's response structure
+                # Imagen's generated_item.prompt_feedback might exist for the response object itself
+                if hasattr(generated_item, 'prompt_feedback') and generated_item.prompt_feedback and generated_item.prompt_feedback.text:
+                    imagen_enhanced_prompt = generated_item.prompt_feedback.text
+                if hasattr(generated_item, 'prompt_feedback') and generated_item.prompt_feedback and generated_item.prompt_feedback.blocked:
+                    imagen_rai_filtered_reason = generated_item.prompt_feedback.block_reason
+                
+                # Also check for finish_reason for RAI filtering specific to the generation
+                if hasattr(generated_item, 'finish_reason') and generated_item.finish_reason and generated_item.finish_reason.name:
+                    if imagen_rai_filtered_reason is None: # Only set if not already set by prompt_feedback
+                        imagen_rai_filtered_reason = generated_item.finish_reason.name
+                
+                final_response.append(
+                    ImageGenerationResult(
+                        enhanced_prompt=imagen_enhanced_prompt,
+                        rai_filtered_reason=imagen_rai_filtered_reason,
+                        image=CustomImageResult(
+                            gcs_uri=generated_item.image.gcs_uri,
+                            encoded_image=base64.b64encode(
+                                generated_item.image.image_bytes
+                            ).decode("utf-8"),
+                            mime_type=generated_item.image.mime_type,
+                        ),
+                    )
+                )
+            else:
+                print(f"WARNING: Skipping unexpected generated item type in all_generated_images: {type(generated_item)}. Item: {generated_item}")
+                # Add more robust error handling or a default result if necessary
+
+        return final_response # Return the newly constructed list

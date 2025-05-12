@@ -49,6 +49,7 @@ async def search(
                 "generation_model": generationModel,
                 "number_of_images": numberOfImages,
                 "user_image": userImage.file.read(),
+                "user_image_mime_type": userImage.content_type,
                 "mask_distilation": maskDistilation,
             }
         )

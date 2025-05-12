@@ -19,6 +19,7 @@ class CreateSearchRequest(BaseModel):
         4, description="Number of images to generate"
     )
     user_image: bytes
+    user_image_mime_type: str
     mask_distilation: Optional[float] = Field(
         0.005,
         description="Dilation percentage of the mask provided. Float between 0 and 1.",
