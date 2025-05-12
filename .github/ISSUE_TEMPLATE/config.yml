@@ -9,6 +9,9 @@ contact_links:
   - name: Google AI Gemini API
     url: https://github.com/google-gemini
     about: This repository is for Generative AI with Vertex AI on Google Cloud, not the Google AI Gemini/PaLM APIs. For issues with the Google AI Gemini API, report them in the appropriate repository in the google-gemini GitHub organization.
+  - name: Vertex AI API issue
+    url: https://issuetracker.google.com/issues/new?component=1130925&template=1637248&pli=1
+    about: For issues with the Vertex AI API, please report them in Google issue tracker.
   - name: Google Cloud Support
     url: https://cloud.google.com/support
     about: If you have a support contract with Google, please create a case in the support console instead of filing on GitHub. This will ensure a timely response.
