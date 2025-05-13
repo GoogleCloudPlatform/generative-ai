@@ -31,6 +31,7 @@ Arsan
 Artsakh
 Ashish
 Aspeed
+Atulan
 Autorater
 BIKBEAR
 BITCODE
@@ -238,6 +239,7 @@ Keanu
 Ketamine
 Khanh
 Kipchoge
+Koyel
 Kraizt
 Kubeflow
 Kvyat
@@ -258,6 +260,7 @@ LUVBPTK
 Ladhak
 Leventer
 Llion
+Lng
 Loghub
 Logrus
 Lopyrev
@@ -507,9 +510,11 @@ Vettel
 Vijay
 Virat
 Viru
+Visualise
 WAI
 WAU
 WDIR
+WEBVTT
 WFH
 WNDCLASS
 WRatio
@@ -591,6 +596,7 @@ bayes
 bbc
 bbq
 beir
+bert
 bff
 bgswap
 bigframes
@@ -1289,6 +1295,7 @@ vos
 votre
 vrtx
 vtotal
+vtt
 vulnz
 waterjet
 wcontext

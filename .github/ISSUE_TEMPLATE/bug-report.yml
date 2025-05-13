@@ -14,6 +14,7 @@ body:
           - For issues with the Google AI Gemini API, refer to the [google-gemini](https://github.com/google-gemini) organization or the [Google Developers Community Discourse](https://discuss.ai.google.dev/).
         - For issues with the Vertex AI Python SDK, please report in the [googleapis/python-aiplatform](https://github.com/googleapis/python-aiplatform/) repository.
         - If you have a support contract with Google, please create an issue in the [support console](https://cloud.google.com/support/) instead of filing on GitHub. This will ensure a timely response.
+        - For issues with the Vertex AI API, please report them in [Google issue tracker](https://issuetracker.google.com/issues/new?component=1130925&template=1637248&pli=1).
   - type: input
     id: file-name
     attributes:
