@@ -155,11 +155,11 @@ class ImagenSearchService:
         # Make sure to convert the image from bytes to encoded string before sending to the frontend
         all_generated_images = (
             gemini_generated_images[:num_requested_images] #limit to the asked number, API might duplicate.
-            + images_entire_image.generated_images # These are types.ImageGenerationResponse objects
+        #    + images_entire_image.generated_images # These are types.ImageGenerationResponse objects
             + images_just_background.generated_images # These are types.ImageGenerationResponse objects
         )
         print("gemini_generated_images: ", len(gemini_generated_images)) #total imgs gemini gave
-        print("images_entire_image: ", len(images_entire_image.generated_images))
+        #print("images_entire_image: ", len(images_entire_image.generated_images))
         print("images_just_background: ", len(images_just_background.generated_images))
 
         final_response: List[ImageGenerationResult] = []
