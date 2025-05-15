@@ -17,11 +17,6 @@ from src.service.intent import INTENTS_TABLE
 
 try:
     print("Setting up GCS... \n")
-
-    project_id = os.getenv("_PROJECT_ID")
-    location = os.getenv("_REGION")
-    print("ENV project_id", project_id)
-    print("ENV location", location)
     storage_client = GCSClient()
 
     bucket = create_bucket(f"quick-bot-{project_id}-travel-concierge-bucket", location, storage_client)
@@ -84,12 +79,10 @@ try:
 
     print("\nSuccess!\n")
 except Exception as e:
-    print(f"An error occurred during the setup process: {e}")
-    print(f"ERROR: A command in the backend setup block failed with code {e.returncode}.")
-    if e.stdout: print(f"Stdout from failed command:\n{e.stdout}")
-    else: print("Stdout from failed command: <empty>")
-    if e.stderr: print(f"Stderr from failed command:\n{e.stderr}")
-    else: print("Stderr from failed command: <empty>")
-    # You could also include a traceback for more detailed error information:
+    print(f"A critical error occurred during the setup process: {e}")
     import traceback
+    print("Detailed traceback:")
     print(traceback.format_exc())
+    # If running in Docker build, exiting with non-zero will fail the build
+    import sys
+    sys.exit(1)
