@@ -4,7 +4,7 @@ services:
       secrets:
         - gcp_credentials
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.local
       args:
         IS_FIRST_DEPLOYMENT: "False"
         _PROJECT_ID: my-project-id
