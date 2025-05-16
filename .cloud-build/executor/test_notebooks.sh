@@ -30,7 +30,7 @@ for x in $TARGET; do
   OPERATION_ID=$(gcloud colab executions create \
     --display-name="$DISPLAY_NAME" \
     --notebook-runtime-template="$NOTEBOOK_RUNTIME_TEMPLATE" \
-    --gcs-notebook-uri="$OUTPUT_URI/generative-ai/gemini/getting-started/${x##*/}" \
+    --gcs-notebook-uri="$OUTPUT_URI/$x" \
     --gcs-output-uri="$OUTPUT_URI" \
     --project="$PROJECT_ID" \
     --region="$REGION" \
