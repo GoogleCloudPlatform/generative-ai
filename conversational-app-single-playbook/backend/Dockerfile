@@ -26,4 +26,4 @@ ENV FUNCTION_URL=""
 ENV TASK_QUEUE_NAME=""
 
 EXPOSE 8080
-ENTRYPOINT ["gunicorn", "main:app", "--workers=4", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000","--bind=0.0.0.0:8080"]
+ENTRYPOINT ["gunicorn", "main:app", "--workers=4", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000", "--bind=0.0.0.0:8080"]

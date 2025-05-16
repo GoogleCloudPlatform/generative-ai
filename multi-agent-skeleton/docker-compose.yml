@@ -14,7 +14,7 @@ services:
         BIG_QUERY_DATASET: bigquery_quickbot_travel_concierge
         _CHATBOT_NAME: my_quickbot_travel_concierge
         _ADK_GOOGLE_PLACES_API_KEY: your-google-maps-places-apikey
-    container_name: quick-bot-app-backend
+    container_name: quickbot-multiagent-travel-concierge-backend
     ports:
       - "8080:8080"
     volumes:
@@ -30,7 +30,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: quick-bot-app-frontend
+    container_name: quickbot-multiagent-travel-concierge-frontend
     ports:
       - "4200:8080"
     volumes:

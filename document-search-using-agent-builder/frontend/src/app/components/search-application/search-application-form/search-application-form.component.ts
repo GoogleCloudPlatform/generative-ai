@@ -29,7 +29,7 @@ import {UserService} from 'src/app/services/user/user.service';
 })
 export class SearchApplicationFormComponent {
   showSpinner = false;
-  selectedEngine: Engine;
+  selectedEngine: Engine | undefined;
   engines: Engine[] = [];
 
   constructor(

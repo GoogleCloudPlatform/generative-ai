@@ -1,9 +1,17 @@
 services:
   backend:
     build:
+      secrets:
+        - gcp_credentials
       context: ./backend
-      dockerfile: Dockerfile
-    container_name: quickbot-text-to-imagen-backend
+      dockerfile: Dockerfile.local
+      args:
+        IS_FIRST_DEPLOYMENT: "True"
+        GCLOUD_PROJECT: premium-state-440714-u8
+        ENVIRONMENT: development
+        FRONTEND_URL: http://localhost:4200
+        BIG_QUERY_DATASET: bigquery_quickbot_document_search
+    container_name: quickbot-document-search-backend
     ports:
       - "8080:8080"
     volumes:
@@ -12,9 +20,6 @@ services:
       - ~/.config/gcloud/:/root/.config/gcloud:ro # Linux/macOS example:
       # - %APPDATA%/gcloud:/root/.config/gcloud:ro # Windows example:
     environment:
-      ENVIRONMENT: development
-      FRONTEND_URL: http://localhost:4200
-      GCLOUD_PROJECT: my-project-id
       GOOGLE_APPLICATION_CREDENTIALS: "/root/.config/gcloud/application_default_credentials.json"
     restart: unless-stopped
 
@@ -22,7 +27,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: quickbot-text-to-imagen-frontend
+    container_name: quickbot-document-search-frontend
     ports:
       - "4200:8080"
     volumes:
@@ -32,3 +37,11 @@ services:
       - /app/node_modules
     # To change the env variables in the frontend, change the environment.ts file
     restart: unless-stopped
+
+secrets:
+  gcp_credentials: # This ID must match the one used in services.backend.build.secrets
+    # Path to your Google Application Default Credentials JSON file on the HOST machine.
+    # Replace with the correct path for your OS if different.
+    file: ~/.config/gcloud/application_default_credentials.json
+    # Windows example (you might need to adjust the target path inside the container if it's a Linux container):
+    # - %APPDATA%/gcloud/application_default_credentials.json

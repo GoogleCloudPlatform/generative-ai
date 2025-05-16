@@ -30,11 +30,11 @@ COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Create working directory
-RUN mkdir -p /code
-WORKDIR /code
+RUN mkdir -p /app
+WORKDIR /app
 
 # Copy the rest of the application code
-COPY . /code/
+COPY . /app/
 
 # Set the environment variable
 ENV ENVIRONMENT="development"

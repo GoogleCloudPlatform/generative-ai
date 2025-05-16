@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.11
+FROM python:3.11-alpine
+
 COPY requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
-RUN mkdir -p /code
-WORKDIR /code
-COPY . /code/
+
+WORKDIR /app
+COPY . /app/
 
 ENV ENVIRONMENT="development"
 ENV BIG_QUERY_DATASET=""
 ENV FRONTEND_URL=""
 
 EXPOSE 8080
-ENTRYPOINT ["gunicorn", "main:app", "--workers=4", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000","--bind=0.0.0.0:8080"]
+ENTRYPOINT ["gunicorn", "main:app", "--workers=4", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000", "--bind=0.0.0.0:8080"]

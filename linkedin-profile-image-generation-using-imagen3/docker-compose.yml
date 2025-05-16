@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: quickbot-text-to-imagen-backend
+    container_name: quickbot-linkedin-image-generation-backend
     ports:
       - "8080:8080"
     volumes:
@@ -22,7 +22,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: quickbot-text-to-imagen-frontend
+    container_name: quickbot-linkedin-image-generation-frontend
     ports:
       - "4200:8080"
     volumes:

@@ -1,43 +1,44 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # syntax=docker/dockerfile:1.4
 FROM python:3.11 AS builder
 
 # Build arguments
 ARG IS_FIRST_DEPLOYMENT="False"
-# Add ARGs for variables needed by setup.py
-ARG _PROJECT_ID="your-default-project-id-for-build"
-ARG GCLOUD_PROJECT=$_PROJECT_ID
-ARG _REGION="your-default-region-for-build"
+ARG GCLOUD_PROJECT=""
 ARG ENVIRONMENT="development"
 ARG FRONTEND_URL=""
 ARG BIG_QUERY_DATASET=""
-ARG _CHATBOT_NAME=""
-ARG _ADK_GOOGLE_PLACES_API_KEY=""
-ARG GOOGLE_APPLICATION_CREDENTIALS=""
 
 # Environment variables for the build process
 ENV IS_FIRST_DEPLOYMENT=$IS_FIRST_DEPLOYMENT
-ENV _PROJECT_ID=$_PROJECT_ID
 ENV GCLOUD_PROJECT=$GCLOUD_PROJECT
-ENV _REGION=$_REGION
 ENV ENVIRONMENT=$ENVIRONMENT
 ENV FRONTEND_URL=$FRONTEND_URL
 ENV BIG_QUERY_DATASET=$BIG_QUERY_DATASET
-ENV _CHATBOT_NAME=$_CHATBOT_NAME
-ENV _ADK_GOOGLE_PLACES_API_KEY=$_ADK_GOOGLE_PLACES_API_KEY
-ENV GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
 
 WORKDIR /code
 
 COPY . .
-
-# --- Stage 1: Conditional First Deployment Setup ---
-COPY prepare_code.sh ./prepare_code.sh
 COPY setup.py ./setup.py
+RUN pip install --no-cache-dir -r /code/requirements.txt
 
 RUN --mount=type=secret,id=gcp_credentials,target=/tmp/gcp_adc.json,required=true \
     if [ "$IS_FIRST_DEPLOYMENT" = "True" ]; then \
         echo "--- Running first deployment setup (IS_FIRST_DEPLOYMENT=True) ---"; \
-        echo "Using _PROJECT_ID=${_PROJECT_ID} and _REGION=${_REGION} for setup"; \
+        echo "Using GCLOUD_PROJECT=${GCLOUD_PROJECT} for setup"; \
         \
         if [ ! -f /tmp/gcp_adc.json ]; then \
             echo "CRITICAL ERROR: GCP credentials secret was expected but not mounted to /tmp/gcp_adc.json" >&2; \
@@ -49,18 +50,9 @@ RUN --mount=type=secret,id=gcp_credentials,target=/tmp/gcp_adc.json,required=tru
         export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_adc.json; \
         echo "DEBUG: GOOGLE_APPLICATION_CREDENTIALS for setup is set to: $GOOGLE_APPLICATION_CREDENTIALS"; \
         \
-        echo "Installing Poetry..."; \
-        pip install poetry; \
-        export PATH="$HOME/.local/bin:$PATH"; \
-        poetry --version; \
-        \
-        echo "Executing prepare_code.sh..."; \
-        chmod +x /code/prepare_code.sh; \
-        bash /code/prepare_code.sh || { echo "prepare_code.sh failed!"; exit 1; }; \
-        \
-        echo "Executing setup.py with Poetry..."; \
-        # Now setup.py can access _PROJECT_ID and _REGION as environment variables
-        poetry run python /code/setup.py || { echo "setup.py with poetry failed!"; exit 1; }; \
+        echo "Executing setup.py ..."; \
+        # Now setup.py can make requests to GCP with provided credentials
+        python /code/setup.py || { echo "setup.py with failed!"; exit 1; }; \
         echo "--- First deployment setup finished ---"; \
     else \
         echo "--- IS_FIRST_DEPLOYMENT is False, skipping first deployment setup. ---"; \
@@ -69,26 +61,18 @@ RUN --mount=type=secret,id=gcp_credentials,target=/tmp/gcp_adc.json,required=tru
 
 FROM python:3.11-slim AS final
 
-ARG _PROJECT_ID="your-default-project-id-for-build" 
-ARG GCLOUD_PROJECT=$_PROJECT_ID
-ARG _REGION="your-default-region-for-build"
+ARG GCLOUD_PROJECT=""
+ARG GOOGLE_APPLICATION_CREDENTIALS=""
 ARG ENVIRONMENT="development"
 ARG FRONTEND_URL=""
 ARG BIG_QUERY_DATASET=""
-ARG _CHATBOT_NAME=""
-ARG _ADK_GOOGLE_PLACES_API_KEY=""
-ARG GOOGLE_APPLICATION_CREDENTIALS=""
 
 # Environment variables for the build process
-ENV _PROJECT_ID=$_PROJECT_ID
 ENV GCLOUD_PROJECT=$GCLOUD_PROJECT
-ENV _REGION=$_REGION
+ENV GOOGLE_APPLICATION_CREDENTIALS="/root/.config/gcloud/application_default_credentials.json"
 ENV ENVIRONMENT=$ENVIRONMENT
 ENV FRONTEND_URL=$FRONTEND_URL
 ENV BIG_QUERY_DATASET=$BIG_QUERY_DATASET
-ENV _CHATBOT_NAME=$_CHATBOT_NAME
-ENV _ADK_GOOGLE_PLACES_API_KEY=$_ADK_GOOGLE_PLACES_API_KEY
-ENV GOOGLE_APPLICATION_CREDENTIALS="/root/.config/gcloud/application_default_credentials.json"
 
 WORKDIR /app
 

@@ -29,7 +29,7 @@ import {EnginesService} from 'src/app/services/engines.service';
   styleUrls: ['./manage-search-application.component.scss'],
 })
 export class ManageSearchApplicationComponent implements OnDestroy {
-  selectedEngine: Engine;
+  selectedEngine: Engine | undefined;
   engines: Engine[] = [];
   editMode = false;
   savedEngineID = '';
@@ -78,15 +78,15 @@ export class ManageSearchApplicationComponent implements OnDestroy {
   saveForm() {
     this.userService.showLoading();
     const searchApplication = {
-      engine_id: this.selectedEngine.engine_id,
-      region: this.selectedEngine.region,
+      engine_id: this.selectedEngine?.engine_id || "",
+      region: this.selectedEngine?.region || "",
     };
 
     this.searchApplicationService
       .update(this.savedEngineID, searchApplication)
       .subscribe({
         next: () => {
-          this.savedEngineID = this.selectedEngine.engine_id;
+          this.savedEngineID = this.selectedEngine?.engine_id || "";
           this.userService.hideLoading();
           this.disableForm();
         },

@@ -13,9 +13,10 @@
 # limitations under the License.
 
 FROM python:3.11-alpine
+
 COPY requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
-RUN mkdir -p /app
+
 WORKDIR /app
 COPY . /app/
 
@@ -23,4 +24,4 @@ ENV ENVIRONMENT="development"
 ENV FRONTEND_URL="http://localhost:4200"
 
 EXPOSE 8080
-ENTRYPOINT ["gunicorn", "main:app", "--workers=4", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000","--bind=0.0.0.0:8080"]
+ENTRYPOINT ["gunicorn", "main:app", "--workers=4", "--worker-class=uvicorn.workers.UvicornWorker", "--timeout=36000", "--bind=0.0.0.0:8080"]
