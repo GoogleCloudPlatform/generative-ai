@@ -42,7 +42,7 @@ steps:
   - name: google/cloud-sdk
     id: "execute-notebooks"
     entrypoint: bash
-    timeout: 7200s #Because this step takes the longest. Avg runtime is 1 hour and 20 minutes.
+    timeout: 12600s #Because this step takes the longest. Avg runtime is 1 hour and 20 minutes.
     args:
       - "-c"
       - |
