@@ -9,6 +9,6 @@ export const environment = {
     measurementId: "<your measurementId>"
   },
   requiredLogin: 'False',
-  backendURL: 'https://quickbot-text-to-imagen-agent-backend-596315537962.southamerica-east1.run.app/api',
+  backendURL: 'http://localhost:8080/api',
   chatbotName: 'Test 1',
 };
