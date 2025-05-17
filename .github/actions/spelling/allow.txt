@@ -259,6 +259,7 @@ LTRB
 LUVBPTK
 Ladhak
 Leventer
+Livewire
 Llion
 Lng
 Loghub
@@ -477,6 +478,7 @@ Tribbiani
 Tricyle
 UDF
 UDFs
+UIs
 USERDATA
 USK
 UVX
@@ -763,6 +765,7 @@ fillmode
 fillna
 fiqa
 firestore
+firewalls
 fixmycar
 flac
 floormat
@@ -1326,6 +1329,7 @@ womens
 workarounds
 worklets
 wparam
+wscat
 wscore
 wscores
 wstring
