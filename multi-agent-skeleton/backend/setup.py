@@ -17,6 +17,8 @@ from src.service.intent import INTENTS_TABLE
 
 try:
     print("Setting up GCS... \n")
+    project_id = os.getenv("_PROJECT_ID")
+    location = os.getenv("_REGION")
     storage_client = GCSClient()
 
     bucket = create_bucket(f"quick-bot-{project_id}-travel-concierge-bucket", location, storage_client)
