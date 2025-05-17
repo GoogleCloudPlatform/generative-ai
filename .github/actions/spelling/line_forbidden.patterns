@@ -283,9 +283,6 @@
 # Should be Colab
 \s(?!Colab)Co[Ll][Ll]?abs?\b
 
-# Should be Kaggle
-\skaggle\b
-
 # Should be TPU or TPUs
 \btpus?\b
 
