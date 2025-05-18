@@ -46,7 +46,7 @@ def create(env_vars: dict[str, str]) -> None:
         ],
         extra_packages=[
             "./travel_concierge",  # The main package
-            "./eval",
+            "./profiles",
         ],
     )
     print(f"Created remote agent: {remote_agent.resource_name}")
@@ -81,8 +81,8 @@ def setup_remote_agent(bucket: Bucket) -> str | None:
     #
     # Uncomment one of the two, or create your own.
     #
-    # _ADK_TRAVEL_CONCIERGE_SCENARIO=eval/itinerary_seattle_example.json
-    initial_states_path = os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") if os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") else "eval/itinerary_empty_default.json"
+    # _ADK_TRAVEL_CONCIERGE_SCENARIO=profiles/itinerary_seattle_example.json
+    initial_states_path = os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") if os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") else "profiles/itinerary_empty_default.json"
     map_key = os.getenv("_ADK_GOOGLE_PLACES_API_KEY")
 
     # Populate env_vars dictionary for the AdkApp
