@@ -47,8 +47,7 @@ export PATH
 # QUICKBOT ENV VARIABLES
 export ENVIRONMENT=development
 export FRONTEND_URL=http://localhost:4200
-export BIG_QUERY_DATASET=eren
-
+export BIG_QUERY_DATASET=bigquery_quickbot_website_search
 ...
 ```
 

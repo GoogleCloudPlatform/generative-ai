@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.local
       args:
         IS_FIRST_DEPLOYMENT: "True"
-        GCLOUD_PROJECT: atc-maurocominotti-dev
+        GCLOUD_PROJECT: my-project-id
         ENVIRONMENT: development
         FRONTEND_URL: http://localhost:4200
         BIG_QUERY_DATASET: bigquery_quickbot_document_search

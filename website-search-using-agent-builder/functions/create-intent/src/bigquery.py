@@ -14,12 +14,12 @@
 
 """Provides a repository class for interacting with Google BigQuery."""
 import logging
+from os import getenv
 from typing import List
 from google.cloud.bigquery import Client
-
 from src.models import Embedding
 
-BIG_QUERY_DATASET = ""
+BIG_QUERY_DATASET = getenv("BIG_QUERY_DATASET", "bigquery_quickbot_website_search")
 
 EMBEDDINGS_TABLE = "embeddings"
 EMBEDDINGS_ID_COLUMN = "id"

@@ -25,7 +25,7 @@ from os import getenv
 from typing import Dict, List
 from google.cloud.bigquery import Client
 
-BIG_QUERY_DATASET = getenv("BIG_QUERY_DATASET")
+BIG_QUERY_DATASET = getenv("BIG_QUERY_DATASET", "bigquery_quickbot_website_search")
 
 
 class BigQueryRepository:

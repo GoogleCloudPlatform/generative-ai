@@ -86,7 +86,7 @@ def create_vertex_ai_engine(
     location: str,
     engine_id: str,
     engine_display_name: str,
-    datastore_ids_list: list[str], # Changed parameter name for clarity
+    datastore_ids_list: list[str],
 ):
     """Creates a Vertex AI Search Engine (App) if it doesn't exist."""
     client = discoveryengine.EngineServiceClient()
@@ -103,7 +103,7 @@ def create_vertex_ai_engine(
     engine_config = discoveryengine.Engine(
         display_name=engine_display_name,
         solution_type=discoveryengine.SolutionType.SOLUTION_TYPE_SEARCH,
-        data_store_ids=datastore_ids_list, # Use the passed list of datastore IDs
+        data_store_ids=datastore_ids_list,
         common_config=discoveryengine.Engine.CommonConfig(company_name="QuickBot App"),
         search_engine_config=discoveryengine.Engine.SearchEngineConfig(
             search_tier="SEARCH_TIER_STANDARD",
