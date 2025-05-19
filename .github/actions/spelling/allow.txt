@@ -21,6 +21,7 @@ Aadila
 Abhishek
 Afshaan
 Aktu
+Alibaba
 Anant
 Aphone
 Arborio
@@ -30,6 +31,7 @@ Arsan
 Artsakh
 Ashish
 Aspeed
+Atulan
 Autorater
 BIKBEAR
 BITCODE
@@ -237,6 +239,7 @@ Keanu
 Ketamine
 Khanh
 Kipchoge
+Koyel
 Kraizt
 Kubeflow
 Kvyat
@@ -257,6 +260,7 @@ LUVBPTK
 Ladhak
 Leventer
 Llion
+Lng
 Loghub
 Logrus
 Lopyrev
@@ -506,9 +510,11 @@ Vettel
 Vijay
 Virat
 Viru
+Visualise
 WAI
 WAU
 WDIR
+WEBVTT
 WFH
 WNDCLASS
 WRatio
@@ -543,10 +549,12 @@ aexecute
 aextract
 afrom
 agentic
+agg
 ainit
 ainvoke
 aio
 aip
+airbnb
 airlume
 akka
 alisal
@@ -566,6 +574,7 @@ arun
 arxiv
 astype
 atms
+auc
 aujourd'hui
 autocal
 autoflake
@@ -583,9 +592,11 @@ bargap
 barmode
 barpolar
 baxis
+bayes
 bbc
 bbq
 beir
+bert
 bff
 bgswap
 bigframes
@@ -614,6 +625,7 @@ caudatus
 caxis
 cce
 cctv
+cdiv
 cer
 cfbundle
 chatbots
@@ -624,6 +636,7 @@ cicd
 cimg
 ckpts
 claude
+clearbox
 clf
 clickable
 cloudrun
@@ -743,7 +756,9 @@ fect
 fewshot
 ffi
 fibonacci
+figheight
 figsize
+figwidth
 fillmode
 fillna
 fiqa
@@ -779,6 +794,7 @@ gcloud
 gcp
 gcs
 gcsfs
+gcurl
 gdk
 gdkx
 geboten
@@ -982,6 +998,7 @@ nas
 nbconvert
 nbfmt
 nbformat
+nbqa
 nbviewer
 nce
 ncols
@@ -1012,6 +1029,7 @@ norigin
 notetaker
 novnc
 noxfile
+npx
 nrows
 ntheory
 nunique
@@ -1097,6 +1115,7 @@ pypdf
 pyplot
 pysftp
 pytorch
+pytrec
 pyvis
 qas
 qna
@@ -1206,6 +1225,7 @@ tagline
 takeaways
 tastetest
 tavily
+telework
 tencel
 terabyte
 terabytes
@@ -1275,6 +1295,7 @@ vos
 votre
 vrtx
 vtotal
+vtt
 vulnz
 waterjet
 wcontext

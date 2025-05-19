@@ -43,7 +43,7 @@ export default function Home() {
   const { status, id, error, setStatus, screenshot } = Status();
 
   // Logged-in user
-  const [user, _, userError] = useAuthState(firebaseAuth);
+  const [user, loading, userError] = useAuthState(firebaseAuth);
 
   // Listen for changes in the uploaded document's status
   useEffect(() => {
@@ -65,6 +65,15 @@ export default function Home() {
     }
     updateStatus();
   }, [id, setStatus, user?.email]);
+
+  if (loading) {
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        <AlertTitle>Authentication</AlertTitle>
+        Loading user information...
+      </Alert>
+    );
+  }
 
   if (userError) {
     return (

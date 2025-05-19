@@ -1,10 +1,11 @@
-# Generative AI
+# Generative AI on Google Cloud
 
-> NOTE: [Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2) has been released!
+> **[Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro) and [Gemini 2.5 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash) have been released!**
 >
 > Here are the latest notebooks and demos using the new models:
 >
 > - [Intro to Gemini 2.5 Pro](gemini/getting-started/intro_gemini_2_5_pro.ipynb)
+> - [Intro to Gemini 2.5 Flash](gemini/getting-started/intro_gemini_2_5_flash.ipynb)
 
 <!-- markdownlint-disable MD033 -->
 
@@ -93,6 +94,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
 
 ## Related Repositories
 
+- ✨ [Agent Development Kit (ADK) Samples](https://github.com/google/adk-samples): This repository provides ready-to-use agents built on top of the Agent Development Kit, designed to accelerate your development process. These agents cover a range of common use cases and complexities, from simple conversational bots to complex multi-agent workflows.
 - [🚀 Agent Starter Pack](https://github.com/GoogleCloudPlatform/agent-starter-pack)
   - A collection of production-ready Generative AI Agent templates built for Google Cloud.
   - It accelerates development by providing a holistic, production-ready solution, addressing common challenges (Deployment & Operations, Evaluation, Customization, Observability) in building and deploying Gen AI agents.

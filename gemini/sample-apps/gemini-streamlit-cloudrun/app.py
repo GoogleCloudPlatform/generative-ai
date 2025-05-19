@@ -7,7 +7,7 @@ import os
 
 from google import genai
 import google.auth
-from google.genai.types import GenerateContentConfig, Part
+from google.genai.types import GenerateContentConfig, Part, ThinkingConfig
 import httpx
 import streamlit as st
 
@@ -35,19 +35,37 @@ def _region() -> str:
         return "us-central1"
 
 
-API_KEY = os.environ.get("GOOGLE_API_KEY")
-PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", _project_id())
-LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", _region())
 MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
-    "gemini-2.5-pro-preview-03-25": "Gemini 2.5 Pro",
+    "gemini-2.5-pro-preview-05-06": "Gemini 2.5 Pro",
+    "gemini-2.5-flash-preview-04-17": "Gemini 2.5 Flash",
+    "model-optimizer-exp-04-09": "Model Optimizer",
 }
+
+THINKING_BUDGET_MODELS = {"gemini-2.5-flash-preview-04-17"}
 
 
 @st.cache_resource
 def load_client() -> genai.Client:
     """Load Google Gen AI Client."""
+    API_KEY = os.environ.get("GOOGLE_API_KEY")
+    PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", _project_id())
+    LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", _region())
+
+    if not API_KEY and not PROJECT_ID:
+        st.error(
+            "🚨 Configuration Error: Please set either `GOOGLE_API_KEY` or ensure "
+            "Application Default Credentials (ADC) with a Project ID are configured."
+        )
+        st.stop()
+    if not LOCATION:
+        st.warning(
+            "⚠️ Could not determine Google Cloud Region. Using 'us-central1'. "
+            "Ensure GOOGLE_CLOUD_REGION environment variable is set or metadata service is accessible if needed."
+        )
+        LOCATION = "us-central1"
+
     return genai.Client(
         vertexai=True,
         project=PROJECT_ID,
@@ -78,27 +96,50 @@ if cloud_run_service:
 st.header(":sparkles: Gemini API in Vertex AI", divider="rainbow")
 client = load_client()
 
+selected_model = st.radio(
+    "Select Model:",
+    MODELS.keys(),
+    format_func=get_model_name,
+    key="selected_model",
+    horizontal=True,
+)
+
+thinking_budget = None
+if selected_model in THINKING_BUDGET_MODELS:
+    thinking_budget_mode = st.selectbox(
+        "Thinking budget",
+        ("Auto", "Manual", "Off"),
+        key="thinking_budget_mode_selectbox",
+    )
+
+    if thinking_budget_mode == "Manual":
+        thinking_budget = st.slider(
+            "Thinking budget token limit",
+            min_value=0,
+            max_value=24576,
+            step=1,
+            key="thinking_budget_manual_slider",
+        )
+    elif thinking_budget_mode == "Off":
+        thinking_budget = 0
+
+thinking_config = (
+    ThinkingConfig(thinking_budget=thinking_budget)
+    if thinking_budget is not None
+    else None
+)
 freeform_tab, tab1, tab2, tab3, tab4 = st.tabs(
     [
-        "Freeform",
-        "Generate story",
-        "Marketing campaign",
-        "Image Playground",
-        "Video Playground",
+        "✍️ Freeform",
+        "📖 Generate Story",
+        "📢 Marketing Campaign",
+        "🖼️ Image Playground",
+        "🎬 Video Playground",
     ]
 )
 
-
 with freeform_tab:
     st.subheader("Enter Your Own Prompt")
-
-    selected_model = st.radio(
-        "Select Model:",
-        MODELS.keys(),
-        format_func=get_model_name,
-        key="selected_model_freeform",
-        horizontal=True,
-    )
 
     temperature = st.slider(
         "Select the temperature (Model Randomness):",
@@ -137,6 +178,7 @@ with freeform_tab:
         temperature=temperature,
         max_output_tokens=max_output_tokens,
         top_p=top_p,
+        thinking_config=thinking_config,
     )
 
     generate_freeform = st.button("Generate", key="generate_freeform")
@@ -158,18 +200,12 @@ with freeform_tab:
                 st.markdown(
                     f"""Parameters:\n- Model ID: `{selected_model}`\n- Temperature: `{temperature}`\n- Top P: `{top_p}`\n- Max Output Tokens: `{max_output_tokens}`\n"""
                 )
+                if thinking_budget is not None:
+                    st.markdown(f"- Thinking Budget: `{thinking_budget}`\n")
                 st.code(prompt, language="markdown")
 
 with tab1:
     st.subheader("Generate a story")
-
-    selected_model = st.radio(
-        "Select Model:",
-        MODELS.keys(),
-        format_func=get_model_name,
-        key="selected_model_story",
-        horizontal=True,
-    )
 
     # Story premise
     character_name = st.text_input(
@@ -238,7 +274,9 @@ with tab1:
   The book should have prologue and epilogue.
   """
     config = GenerateContentConfig(
-        temperature=temperature, max_output_tokens=max_output_tokens
+        temperature=temperature,
+        max_output_tokens=max_output_tokens,
+        thinking_config=thinking_config,
     )
 
     generate_t2t = st.button("Generate my story", key="generate_t2t")
@@ -261,18 +299,12 @@ with tab1:
                 st.markdown(
                     f"""Parameters:\n- Model ID: `{selected_model}`\n- Temperature: `{temperature}`\n- Max Output Tokens: `{max_output_tokens}`\n"""
                 )
+                if thinking_budget is not None:
+                    st.markdown(f"- Thinking Budget: `{thinking_budget}`\n")
                 st.code(prompt, language="markdown")
 
 with tab2:
     st.subheader("Generate your marketing campaign")
-
-    selected_model = st.radio(
-        "Select Model:",
-        MODELS,
-        format_func=get_model_name,
-        key="selected_model_marketing",
-        horizontal=True,
-    )
 
     product_name = st.text_input(
         "What is the name of the product? \n\n", key="product_name", value="ZomZoo"
@@ -355,7 +387,11 @@ with tab2:
   Be very succinct and to the point.
   """
 
-    config = GenerateContentConfig(temperature=0.8, max_output_tokens=8192)
+    config = GenerateContentConfig(
+        temperature=0.8,
+        max_output_tokens=8192,
+        thinking_config=thinking_config,
+    )
 
     generate_t2t = st.button("Generate my campaign", key="generate_campaign")
     if generate_t2t and prompt:
@@ -378,22 +414,14 @@ with tab2:
 with tab3:
     st.subheader("Image Playground")
 
-    selected_model = st.radio(
-        "Select Model:",
-        MODELS,
-        format_func=get_model_name,
-        key="selected_model_image",
-        horizontal=True,
-    )
-
     furniture, oven, er_diagrams, glasses, math_reasoning = st.tabs(
         [
-            "Furniture recommendation",
-            "Oven instructions",
-            "ER diagrams",
-            "Glasses recommendation",
-            "Math reasoning",
-        ]
+            "🛋️ Furniture recommendation",
+            "🔥 Oven Instructions",
+            "📊 ER Diagrams",
+            "👓 Glasses",
+            "🧮 Math Reasoning",
+        ],
     )
 
     with furniture:
@@ -634,16 +662,13 @@ INSTRUCTIONS:
 with tab4:
     st.subheader("Video Playground")
 
-    selected_model = st.radio(
-        "Select Model:",
-        MODELS,
-        format_func=get_model_name,
-        key="selected_model_video",
-        horizontal=True,
-    )
-
     vide_desc, video_tags, video_highlights, video_geolocation = st.tabs(
-        ["Video description", "Video tags", "Video highlights", "Video geolocation"]
+        [
+            "📄 Description",
+            "🏷️ Tags",
+            "✨ Highlights",
+            "📍 Geolocation",
+        ]
     )
 
     with vide_desc:

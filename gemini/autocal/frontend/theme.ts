@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 "use client";
-import { createTheme } from "@mui/material/styles";
+import { createTheme, Theme } from "@mui/material/styles";
 
-const theme = createTheme({
+const theme: Theme = createTheme({
   colorSchemes: {
-    dark: true,
-    light: true,
+    dark: {
+      palette: {
+        mode: 'dark',
+      },
+    },
+    light: {
+      palette: {
+        mode: 'light',
+      },
+    },
   },
   cssVariables: true,
   typography: {
