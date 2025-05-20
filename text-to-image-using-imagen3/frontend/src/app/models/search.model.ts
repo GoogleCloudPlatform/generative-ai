@@ -16,7 +16,7 @@
 
 export type SearchRequest = {
   term: string;
-  model: string;
+  generationModel: string;
   aspectRatio: string;
   imageStyle: string;
   numberOfImages: number;

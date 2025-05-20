@@ -19,7 +19,7 @@ import {Injectable} from '@angular/core';
 import {environment} from 'src/environments/environment';
 import {map} from 'rxjs/operators';
 import {SearchRequest} from '../models/search.model';
-import {GeneratedImage} from '../models/generated-image.model';
+import {CombinedImageResults} from '../models/generated-image.model';
 
 const searchURL = `${environment.backendURL}/search`;
 
@@ -32,6 +32,6 @@ export class SearchService {
   search(searchRequest: SearchRequest) {
     return this.http
       .post(searchURL, searchRequest)
-      .pipe(map(response => response as GeneratedImage[]));
+      .pipe(map(response => response as CombinedImageResults));
   }
 }

@@ -143,13 +143,13 @@
 // X-Large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
   .max-height-image {
-    width: auto;
+    max-width: 40vw;
   }
 }
 
 // XX-Large devices (larger desktops, 1400px and up)
 @media (min-width: 1400px) {
   .max-height-image {
-    width: auto;
+    max-width: 30vw;
   }
 }

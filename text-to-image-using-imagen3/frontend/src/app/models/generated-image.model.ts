@@ -25,4 +25,10 @@ export type GeneratedImage = {
   image?: Image;
   raiFilteredReason?: string;
   enhancedPrompt?: string;
+  source?: string
 };
+
+export interface CombinedImageResults {
+  geminiResults: GeneratedImage[];
+  imagenResults: GeneratedImage[];
+}

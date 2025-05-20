@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Annotated, Literal, Optional, Union
+from typing import Annotated, List, Literal, Optional, Union
 
 from fastapi import Query
-import google.auth
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.alias_generators import to_camel
 
@@ -34,8 +33,8 @@ AspectRatioLiteral = Union[
     Literal["1:1"],
     Literal["9:16"],
     Literal["16:9"],
-    Literal["2:4"],
-    Literal["4:1"],
+    Literal["3:4"],
+    Literal["4:3"],
 ]
 
 ImageStyleLiteral = Union[
@@ -44,37 +43,8 @@ ImageStyleLiteral = Union[
     Literal["Vintage"],
     Literal["Monochrome"],
     Literal["Fantasy"],
+    Literal["Sketch"],
 ]
-
-
-class CreateSearchRequest(BaseModel):
-    term: Annotated[str, Query(max_length=150)] = Field(
-        description="Prompt term to be passed to the model"
-    )
-    generation_model: Annotated[
-        Optional[GenerationModelOptionalLiteral],
-        Query(description="Model used for image generation"),
-    ] = Field(
-        default="imagen-3.0-generate-002",
-        description="Model used for image generation",
-    )
-    aspect_ratio: Annotated[
-        Optional[AspectRatioLiteral],
-        Query(description="Aspect ratio of the image"),
-    ] = Field(default="1:1", description="Aspect ratio of the image")
-    number_of_images: Annotated[
-        Optional[int],
-        Field(ge=1, le=10, description="Number of images to generate"),
-    ] = Field(4, description="Number of images to generate")
-    image_style: Annotated[
-        Optional[ImageStyleLiteral], Query(description="Style of the image")
-    ] = Field(default="Modern", description="Style of the image")
-
-    @field_validator("term")
-    def term_must_not_be_empty(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("Term cannot be empty or whitespace only")
-        return value
 
 
 class BaseSchema(BaseModel):
@@ -83,6 +53,35 @@ class BaseSchema(BaseModel):
         populate_by_name=True,
         from_attributes=True,
     )
+
+
+class CreateSearchRequest(BaseSchema):
+    term: Annotated[str, Query(max_length=150)] = Field(
+        description="Prompt term to be passed to the model"
+    )
+    generation_model: Annotated[
+        Optional[GenerationModelOptionalLiteral],
+        Query(description="Model used for image generation"),
+    ] = Field(
+        description="Model used for image generation",
+    )
+    aspect_ratio: Annotated[
+        Optional[AspectRatioLiteral],
+        Query(description="Aspect ratio of the image"),
+    ] = Field(description="Aspect ratio of the image")
+    number_of_images: Annotated[
+        Optional[int],
+        Field(ge=1, le=4, description="Number of images to generate"),
+    ] = Field(description="Number of images to generate")
+    image_style: Annotated[
+        Optional[ImageStyleLiteral], Query(description="Style of the image")
+    ] = Field(description="Style of the image")
+
+    @field_validator("term")
+    def term_must_not_be_empty(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Term cannot be empty or whitespace only")
+        return value
 
 
 class CustomImageResult(BaseSchema):
@@ -95,3 +94,8 @@ class ImageGenerationResult(BaseSchema):
     enhanced_prompt: str
     rai_filtered_reason: Optional[str]
     image: CustomImageResult
+
+
+class SearchResponse(BaseSchema):
+    gemini_results: List[ImageGenerationResult]
+    imagen_results: List[ImageGenerationResult]

@@ -14,8 +14,9 @@
 
 from typing import List
 from fastapi import APIRouter, HTTPException, status as Status
+from pydantic import BaseModel
 
-from src.model.search import CreateSearchRequest, ImageGenerationResult
+from src.model.search import CreateSearchRequest, ImageGenerationResult, SearchResponse
 from src.service.search import ImagenSearchService
 
 router = APIRouter(
@@ -24,9 +25,10 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
 @router.post("")
-async def search(item: CreateSearchRequest) -> List[ImageGenerationResult]:
+async def search(
+    item: CreateSearchRequest,
+) -> SearchResponse:
     try:
         # Access parameters from CreateSearchRequest
         term = item.term
@@ -36,7 +38,7 @@ async def search(item: CreateSearchRequest) -> List[ImageGenerationResult]:
         image_style = item.image_style
 
         service = ImagenSearchService()
-        return service.generate_images(
+        return await service.generate_images(
             term=term,
             generation_model=generation_model,
             aspect_ratio=aspect_ratio,

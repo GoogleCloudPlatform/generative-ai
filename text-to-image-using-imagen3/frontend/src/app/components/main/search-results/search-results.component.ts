@@ -21,12 +21,9 @@ import {UserService} from 'src/app/services/user/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PDF, image_name} from 'src/environments/constant';
 import {
-  DomSanitizer,
-  SafeResourceUrl,
   SafeUrl,
 } from '@angular/platform-browser';
-import {MatDialog} from '@angular/material/dialog';
-import {GeneratedImage} from 'src/app/models/generated-image.model';
+import {CombinedImageResults, GeneratedImage} from 'src/app/models/generated-image.model';
 import {SearchRequest} from 'src/app/models/search.model';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ToastMessageComponent} from '../../toast-message/toast-message.component';
@@ -40,9 +37,11 @@ interface AspectRatio {
   value: string;
   viewValue: string;
 }
+
 interface Style {
   value: string;
 }
+
 @Component({
   selector: 'app-search-results',
   templateUrl: './search-results.component.html',
@@ -55,21 +54,18 @@ export class SearchResultsComponent implements OnDestroy {
   private readonly destroyed = new ReplaySubject<void>(1);
   searchResult: any = [];
   isLoading = false;
-  documents: any = [];
+  imagenDocuments: GeneratedImage[] = [];
+  geminiDocuments: GeneratedImage[] = [];
   showDefaultDocuments = false;
+  defaultPlaceholderImageUrl = 'assets/images/placeholder_image.png';
   images: any = [];
   pdf = PDF;
   imageName = image_name;
-  documentURL: SafeResourceUrl | undefined;
-  openPreviewDocument: any;
-  currentPage = 0;
-  pageSize = 4;
-  selectedDocument: any;
   safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
   selectedImageStyle = 'Modern';
   currentSearchTerm = '';
-  numberOfResults = 4;
+  numberOfResults = 2;
   imagen3ModelsList: Imagen3Model[] = [
     {value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001'},
     {
@@ -86,13 +82,13 @@ export class SearchResultsComponent implements OnDestroy {
     {value: '1:1', viewValue: '1:1'},
     {value: '9:16', viewValue: '9:16'},
     {value: '16:9', viewValue: '16:9'},
-    {value: '2:4', viewValue: '2:4'},
-    {value: '4:1', viewValue: '4:1'},
+    {value: '3:4', viewValue: '3:4'},
+    {value: '4:3', viewValue: '4:3'},
   ];
   selectedAspectRatio = this.aspectRatioList[0];
   searchRequest: SearchRequest = {
     term: '',
-    model: this.selectedModel,
+    generationModel: this.selectedModel,
     aspectRatio: this.selectedAspectRatio.value,
     imageStyle: this.selectedImageStyle,
     numberOfImages: this.numberOfResults,
@@ -103,6 +99,7 @@ export class SearchResultsComponent implements OnDestroy {
     {value: 'Vintage'},
     {value: 'Monochrome'},
     {value: 'Fantasy'},
+    {value: 'Sketch'},
   ];
   activatedRoute: ActivatedRoute | null | undefined;
 
@@ -111,25 +108,13 @@ export class SearchResultsComponent implements OnDestroy {
     private route: ActivatedRoute,
     private service: SearchService,
     private userService: UserService,
-    private dialog: MatDialog,
-    private sanitizer: DomSanitizer,
     private _snackBar: MatSnackBar
   ) {
     const query = this.route.snapshot.queryParamMap.get('q');
     this.userService.showLoading();
 
     if (!query) {
-      this.documents = [
-        {
-          enhancedPrompt: 'default enhaced prompt',
-          raiFilteredReason: null,
-          image: {
-            gcsUri: null,
-            mimeType: 'image/png',
-            encodedImage: 'assets/images/placeholder_image.png',
-          },
-        },
-      ];
+      this.selectedResult = undefined;
       this.showDefaultDocuments = true;
       this.userService.hideLoading();
       return;
@@ -140,42 +125,49 @@ export class SearchResultsComponent implements OnDestroy {
     const newSearchRequest = this.searchRequest;
 
     this.service.search(newSearchRequest).subscribe({
-      next: (searchResponse: GeneratedImage[]) => {
-        this.summary = searchResponse?.[0]?.enhancedPrompt || '';
-        this.documents = searchResponse;
-        this.searchResult.forEach((element: GeneratedImage) => {
-          this.images.push(element.image?.encodedImage);
-        });
-        this.selectedResult = searchResponse[0];
-
+      next: (searchResponse: CombinedImageResults) => {
+        this.processSearchResults(searchResponse);
         this.userService.hideLoading();
       },
       error: error => {
-        this.documents = [
-          {
-            enhancedPrompt: 'default enhaced prompt',
-            raiFilteredReason: null,
-            image: {
-              gcsUri: null,
-              mimeType: 'image/png',
-              encodedImage: 'assets/images/placeholder_image.png',
-            },
-          },
-          {
-            enhancedPrompt: 'default enhaced prompt',
-            raiFilteredReason: null,
-            image: {
-              gcsUri: null,
-              mimeType: 'image/png',
-              encodedImage: 'assets/images/placeholder_image.png',
-            },
-          },
-        ];
-        this.showDefaultDocuments = true;
-        this.userService.hideLoading();
-        this.showErrorSnackBar(error);
+        this.handleSearchError(error)
       },
     });
+  }
+
+  private handleSearchError(error: any) {
+    console.error('Search error:', error);
+    this.imagenDocuments = [];
+    this.geminiDocuments = [];
+    this.selectedResult = undefined;
+    this.showDefaultDocuments = true;
+    this.summary = 'An error occurred while generating images.';
+    this.userService.hideLoading();
+    this.showErrorSnackBar(error);
+  }
+
+  private processSearchResults(searchResponse: CombinedImageResults) {
+    this.imagenDocuments = (searchResponse.imagenResults || []).map(img => ({
+      ...img,
+      source: 'Imagen 3',
+    }));
+    this.geminiDocuments = (searchResponse.geminiResults || []).map(img => ({
+      ...img,
+      source: 'Gemini 2.0',
+    }));
+
+    const hasImagenResults = this.imagenDocuments.length > 0;
+    const hasGeminiResults = this.geminiDocuments.length > 0;
+
+    if (hasImagenResults || hasGeminiResults) {
+      this.showDefaultDocuments = false;
+      this.selectedResult = hasImagenResults ? this.imagenDocuments[0] : this.geminiDocuments[0];
+      this.summary = this.selectedResult?.enhancedPrompt || 'Image generation results displayed.';
+    } else {
+      this.showDefaultDocuments = true;
+      this.selectedResult = undefined;
+      this.summary = 'No images were generated for your prompt.';
+    }
   }
 
   showErrorSnackBar(error: any): void {
@@ -236,13 +228,14 @@ export class SearchResultsComponent implements OnDestroy {
     this.userService.showLoading();
     this.searchResult = [];
     this.summary = '';
-    this.documents = [];
+    this.imagenDocuments = [];
+    this.geminiDocuments = [];
     this.images = [];
 
     this.searchRequest.term = term || this.searchRequest.term;
     this.searchRequest.aspectRatio =
       aspectRatio || this.selectedAspectRatio.value;
-    this.searchRequest.model = model || this.selectedModel;
+    this.searchRequest.generationModel = model || this.selectedModel;
     this.searchRequest.imageStyle = imageStyle || this.selectedImageStyle;
     this.searchRequest.numberOfImages = numberOfImages || this.numberOfResults;
 
@@ -251,13 +244,8 @@ export class SearchResultsComponent implements OnDestroy {
     this.currentSearchTerm = newSearchRequest.term;
 
     this.service.search(newSearchRequest).subscribe({
-      next: (searchResponse: any) => {
-        this.summary = searchResponse?.[0]?.enhancedPrompt || '';
-        this.documents = searchResponse;
-        this.searchResult.forEach((element: GeneratedImage) => {
-          this.images.push(element.image?.encodedImage);
-        });
-        this.selectedResult = searchResponse[0];
+      next: (searchResponse: CombinedImageResults) => {
+        this.processSearchResults(searchResponse);
         this.userService.hideLoading();
         console.log('Search response:', searchResponse);
       },
@@ -275,12 +263,9 @@ export class SearchResultsComponent implements OnDestroy {
     });
   }
 
-  openNewWindow(link: string) {
-    window.open(link, '_blank');
-  }
-
   changeImageSelection(result: GeneratedImage) {
     this.selectedResult = result;
+    this.summary = result.enhancedPrompt || '';
   }
 
   changeImagen3Model(model: Imagen3Model) {
@@ -304,43 +289,8 @@ export class SearchResultsComponent implements OnDestroy {
     console.log('Selected Number of Results:', this.numberOfResults);
   }
 
-  previewDocument(event: any, document: any) {
-    event.stopPropagation();
-    if (document.link.endsWith('.pdf') || document.link.endsWith('.docx')) {
-      this.selectedDocument = document;
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        this.selectedDocument.link
-      );
-    }
-  }
-
-  closePreview() {
-    this.selectedDocument = undefined;
-  }
-
   ngOnDestroy() {
     this.destroyed.next();
     this.destroyed.complete();
-  }
-
-  get pagedDocuments() {
-    const startIndex = this.currentPage * this.pageSize;
-    return this.documents.slice(startIndex, startIndex + this.pageSize);
-  }
-
-  get totalPages() {
-    return Math.ceil(this.documents.length / this.pageSize);
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-    }
-  }
-
-  prevPage() {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-    }
   }
 }

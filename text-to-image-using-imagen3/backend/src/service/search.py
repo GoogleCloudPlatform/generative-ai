@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import base64
 from typing import List
 
@@ -19,52 +20,43 @@ import google.auth
 from google import genai
 from google.genai import types
 
-from src.model.search import CustomImageResult, ImageGenerationResult
+from src.model.search import (
+    CustomImageResult,
+    ImageGenerationResult,
+    SearchResponse,
+)
 
 
 class ImagenSearchService:
-    def generate_images(
+    async def _generate_with_imagen(
         self,
+        client: genai.Client,
         term: str,
-        generation_model: str = "imagen-3.0-generate-002",
-        aspect_ratio: str = "1:1",
-        number_of_images: int = 4,
-        image_style: str = "modern",
+        generation_model: str,
+        aspect_ratio: str,
+        number_of_images: int,
+        image_style: str,
     ) -> List[ImageGenerationResult]:
-        _, PROJECT_ID = google.auth.default()
-        LOCATION = "us-central1"
-        client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
-        print("generate_images method called!")
-        
-        response_imagen: List[ImageGenerationResult] = []
-        response_gemini: List[ImageGenerationResult] = []
-
-            # --- Imagen3 Image Generation ---
         try:
             prompt_imagen = f"Make the image with a style '{image_style}'. The user prompt is: {term}"
-            images_imagen: types.GenerateImagesResponse = client.models.generate_images(
-                model=generation_model,
-                prompt=prompt_imagen,
-                config=types.GenerateImagesConfig(
-                    number_of_images=number_of_images,
-                    aspect_ratio=aspect_ratio,
-                    enhance_prompt=True,
-                    safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
-                    person_generation="DONT_ALLOW",
-                ),
+            print(
+                f"Calling Imagen model: {generation_model} for '{term}' with style '{image_style}'"
             )
 
-            prompt = f"Make the image with a style '{image_style}'. The user prompt is: {term}"
-            images: types.GenerateImagesResponse = client.models.generate_images(
-                model=generation_model,
-                prompt=prompt,
-                config=types.GenerateImagesConfig(
-                    number_of_images=number_of_images,
-                    aspect_ratio=aspect_ratio,
-                    enhance_prompt=True,
-                    safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
-                    person_generation="DONT_ALLOW",
-                ),
+            # Run the synchronous SDK call in a separate thread
+            images_imagen_response: types.GenerateImagesResponse = (
+                await asyncio.to_thread(
+                    client.models.generate_images,
+                    model=generation_model,
+                    prompt=prompt_imagen,
+                    config=types.GenerateImagesConfig(
+                        number_of_images=number_of_images,
+                        aspect_ratio=aspect_ratio,
+                        enhance_prompt=True,
+                        safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
+                        person_generation="DONT_ALLOW",
+                    ),
+                )
             )
 
             response_imagen = [
@@ -79,49 +71,82 @@ class ImagenSearchService:
                         mime_type=generated_image.image.mime_type,
                     ),
                 )
-                for generated_image in images_imagen.generated_images
+                for generated_image in images_imagen_response.generated_images
             ]
             print(f"Number of images created by Imagen: {len(response_imagen)}")
-
+            return response_imagen
         except Exception as e:
             print(f"Error during Imagen3 generation: {e}")
+            return []
 
-            # --- Gemini Image Generation ---
+    async def _generate_with_gemini(
+        self,
+        client: genai.Client,
+        term: str,
+        number_of_images: int,
+        image_style: str,
+    ) -> List[ImageGenerationResult]:
+        response_gemini: List[ImageGenerationResult] = []
         try:
-            print("Initializing Gemini client")
-            gemini_client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+            gemini_prompt_text = f"Create an image with a style '{image_style}' based on this user prompt: {term}"
+            print(
+                f"Calling Gemini model for '{term}' with style '{image_style}'"
+            )
 
-            gemini_prompt_text = f"Create a 3d rendered image with a style '{image_style}' based on this user prompt: {term}"
-            
-            for _ in range(number_of_images):  # Loop as many times as images wanted
-                print(f"Calling Gemini model: gemini-2.0-flash-preview-image-generation with prompt: '{gemini_prompt_text}'")
-                gemini_api_response = gemini_client.models.generate_content(
+            for i in range(
+                number_of_images
+            ):  # Loop as many times as images wanted
+                # Run the synchronous SDK call in a separate thread
+                gemini_api_response = await asyncio.to_thread(
+                    client.models.generate_content,
                     model="gemini-2.0-flash-preview-image-generation",
                     contents=gemini_prompt_text,
                     config=types.GenerateContentConfig(
-                        response_modalities=['TEXT', 'IMAGE']
-                    )
+                        response_modalities=["TEXT", "IMAGE"]
+                    ),
                 )
 
-                # Process gemini_api_response as per the documentation and your needs
-                for candidate in gemini_api_response.candidates: # Iterate through candidates
+                for candidate in gemini_api_response.candidates:
                     for part in candidate.content.parts:
-                        if part.inline_data is not None and part.inline_data.mime_type.startswith("image/"):
-                            encoded_image_bytes = base64.b64encode(part.inline_data.data).decode("utf-8")
-                            # Determine enhanced_prompt and rai_filtered_reason from the response if available
+                        if (
+                            part.inline_data is not None
+                            and part.inline_data.mime_type.startswith("image/")
+                        ):
+                            encoded_image_bytes = base64.b64encode(
+                                part.inline_data.data
+                            ).decode("utf-8")
                             generated_text_for_prompt = ""
-                            for p_text in candidate.content.parts: # check for text part in the same candidate
+                            for p_text in candidate.content.parts:
                                 if p_text.text is not None:
-                                    generated_text_for_prompt += p_text.text + " "
-                            
-                            finish_reason_str = candidate.finish_reason.name if candidate.finish_reason else None
-                            if gemini_api_response.prompt_feedback and gemini_api_response.prompt_feedback.blocked:
-                                finish_reason_str = gemini_api_response.prompt_feedback.block_reason_message or gemini_api_response.prompt_feedback.block_reason.name
+                                    generated_text_for_prompt += (
+                                        p_text.text + " "
+                                    )
 
+                            finish_reason_str = (
+                                candidate.finish_reason.name
+                                if candidate.finish_reason
+                                else None
+                            )
+                            if (
+                                gemini_api_response.prompt_feedback
+                                and gemini_api_response.prompt_feedback.blocked
+                            ):
+                                block_reason = (
+                                    gemini_api_response.prompt_feedback.block_reason
+                                )
+                                block_reason_message = (
+                                    gemini_api_response.prompt_feedback.block_reason_message
+                                )
+                                finish_reason_str = block_reason_message or (
+                                    block_reason.name
+                                    if block_reason
+                                    else "Blocked"
+                                )
 
                             response_gemini.append(
                                 ImageGenerationResult(
-                                    enhanced_prompt=generated_text_for_prompt.strip() or gemini_prompt_text, 
+                                    enhanced_prompt=generated_text_for_prompt.strip()
+                                    or gemini_prompt_text,
                                     rai_filtered_reason=finish_reason_str,
                                     image=CustomImageResult(
                                         gcs_uri=None,
@@ -131,14 +156,68 @@ class ImagenSearchService:
                                 )
                             )
                         elif part.text is not None:
-                            print(f"Gemini Text Output: {part.text}")
-
+                            print(
+                                f"Gemini Text Output (not an image part): {part.text}"
+                            )
 
             print(f"Number of images created by Gemini: {len(response_gemini)}")
-            # Combine response_gemini with response_imagen
-            combined_response = response_imagen + response_gemini[:number_of_images]
-            return combined_response
-
+            return response_gemini
         except Exception as e:
-            print(f"111 Error during Image generation: {e}")
+            print(f"Error during Gemini generation: {e}")
             return []
+
+    async def generate_images(
+        self,
+        term: str,
+        generation_model: str = "imagen-3.0-generate-002",
+        aspect_ratio: str = "1:1",
+        number_of_images: int = 2,
+        image_style: str = "modern",
+    ) -> SearchResponse:
+        _, PROJECT_ID = google.auth.default()
+        LOCATION = "us-central1"
+
+        client = genai.Client(
+            vertexai=True, project=PROJECT_ID, location=LOCATION
+        )
+        print("Async generate_images method called! Init parallel generation.")
+
+        # Create tasks for concurrent execution
+        imagen_task = self._generate_with_imagen(
+            client=client,
+            term=term,
+            generation_model=generation_model,
+            aspect_ratio=aspect_ratio,
+            number_of_images=number_of_images,
+            image_style=image_style,
+        )
+
+        gemini_task = self._generate_with_gemini(
+            client=client,
+            term=term,
+            number_of_images=number_of_images,
+            image_style=image_style,
+        )
+
+        # Run tasks concurrently and gather results
+        # return_exceptions=True allows us to get results even if one task fails
+        results = await asyncio.gather(
+            imagen_task, gemini_task, return_exceptions=True
+        )
+
+        response_imagen: List[ImageGenerationResult] = []
+        response_gemini: List[ImageGenerationResult] = []
+
+        if isinstance(results[0], Exception):
+            print(f"Exception in Imagen generation task: {results[0]}")
+        elif results[0] is not None:
+            response_imagen = results[0]
+
+        if isinstance(results[1], Exception):
+            print(f"Exception in Gemini generation task: {results[1]}")
+        elif results[1] is not None:
+            response_gemini = results[1]
+
+        return SearchResponse(
+            gemini_results=response_gemini, imagen_results=response_imagen
+        )
