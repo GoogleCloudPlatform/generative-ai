@@ -944,6 +944,7 @@ lru
 lsb
 lxml
 lycra
+lyria
 magicoder
 magika
 mahut
