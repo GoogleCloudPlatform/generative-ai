@@ -39,11 +39,11 @@ MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
     "gemini-2.5-pro-preview-05-06": "Gemini 2.5 Pro",
-    "gemini-2.5-flash-preview-04-17": "Gemini 2.5 Flash",
+    "gemini-2.5-flash-preview-05-20": "Gemini 2.5 Flash",
     "model-optimizer-exp-04-09": "Model Optimizer",
 }
 
-THINKING_BUDGET_MODELS = {"gemini-2.5-flash-preview-04-17"}
+THINKING_BUDGET_MODELS = {"gemini-2.5-flash-preview-05-20"}
 
 
 @st.cache_resource
