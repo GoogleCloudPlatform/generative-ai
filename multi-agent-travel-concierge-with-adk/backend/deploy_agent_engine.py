@@ -46,7 +46,7 @@ def create(env_vars: dict[str, str]) -> None:
         ],
         extra_packages=[
             "./travel_concierge",  # The main package
-            "./profiles",
+            "./eval",
         ],
     )
     print(f"Created remote agent: {remote_agent.resource_name}")
