@@ -645,6 +645,7 @@ clsx
 cmap
 cmn
 cnf
+cocina
 codebase
 codebases
 codefile
@@ -716,6 +717,7 @@ dumpd
 dunia
 dvd
 dwmapi
+días
 ecommerce
 ein
 ekg
@@ -737,6 +739,7 @@ epoc
 erlang
 errlog
 erty
+escritas
 etf
 etils
 eula
@@ -766,6 +769,7 @@ firestore
 fixmycar
 flac
 floormat
+flowy
 fmeasure
 fontdict
 footwell
@@ -778,6 +782,7 @@ fromarray
 fromiter
 fsspec
 fts
+fuente
 fulltext
 fullurl
 functiona
@@ -1195,6 +1200,7 @@ sku
 slf
 smolagent
 snowboard
+sobre
 sourced
 spearmanr
 sqkm
@@ -1223,9 +1229,11 @@ svm
 sxs
 tabular
 tagline
+taglines
 takeaways
 tastetest
 tavily
+taza
 telework
 tencel
 terabyte
