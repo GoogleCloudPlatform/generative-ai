@@ -1,3 +1,26 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Main FastAPI application entry point for the Quick Bot Backend.
+
+This module initializes the FastAPI application, configures CORS based on
+the environment, defines root and version endpoints, includes API routers
+(e.g., for search functionality), and provides an endpoint for audio
+transcription using Google Cloud Speech-to-Text.
+"""
+
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from src.controller.chats import router as chat_router
@@ -7,31 +30,49 @@ from google.cloud import speech
 from os import getenv
 
 
-
 app = FastAPI()
 
+
 def configure_cors(app):
-    url = getenv("FRONTEND_URL")
-    if not url:
-        raise ValueError("FRONTEND_URL environment variable not set")
+    """Configures CORS middleware based on the environment."""
+    environment = getenv("ENVIRONMENT")
+    allowed_origins = []
+
+    if environment == "production":
+        frontend_url = getenv("FRONTEND_URL")
+        if not frontend_url:
+            raise ValueError(
+                "FRONTEND_URL environment variable not set in production"
+            )
+        allowed_origins.append(frontend_url)
+    elif environment == "development":
+        allowed_origins.append("*")  # Allow all origins in development
+    else:
+        raise ValueError(
+            f"""Invalid ENVIRONMENT: {environment}. 
+            Must be 'production' or 'development'"""
+        )
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[url],
+        allow_origins=allowed_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
+
 # Create a route to handle GET requests on root
 @app.get("/")
 async def root():
-    return 'You are calling Quick Bot Backend'
+    return "You are calling Quick Bot Backend"
+
 
 # Create a route to handle GET requests on /version
 @app.get("/api/version")
 def version():
-    return 'v0.0.1'
+    return "v0.0.1"
+
 
 @app.post("/api/audio_chat")
 async def audio_chat(audio_file: UploadFile = File(...)):
@@ -55,10 +96,11 @@ async def audio_chat(audio_file: UploadFile = File(...)):
 
     text = ""
     for result in response.results:
-        print("Transcript: {}".format(result.alternatives[0].transcript))
+        print(f"Transcript: {result.alternatives[0].transcript}")
         text = result.alternatives[0].transcript
 
     return text, 200
+
 
 configure_cors(app)
 

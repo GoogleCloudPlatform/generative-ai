@@ -1,9 +1,28 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Pydantic models for Intent and Embedding data structures."""
+from typing import List
 from google.cloud.bigquery import SchemaField
 from pydantic import BaseModel
-from typing import List
 
 
 class Intent(BaseModel):
+    """
+    Represents an intent configuration stored in BigQuery.
+    """
+
     name: str
     ai_model: str
     ai_temperature: float
@@ -22,8 +41,17 @@ class Intent(BaseModel):
             SchemaField("gcp_bucket", "STRING", mode="REQUIRED"),
             SchemaField("questions", "STRING", mode="REPEATED"),
         ]
-    
+
     def __from_row__(row):
+        """
+        Factory method to create an Intent object from a BigQuery Row.
+
+        Args:
+            row: A google.cloud.bigquery.Row object.
+
+        Returns:
+            An Intent instance.
+        """
         return Intent(
             name=row[0],
             ai_model=row[1],
@@ -35,6 +63,10 @@ class Intent(BaseModel):
         )
 
     def to_dict(self):
+        """
+        Converts the Intent object to a dictionary suitable for BigQuery insertion.
+        Handles datetime formatting.
+        """
         return {
             "name": self.name,
             "ai_model": self.ai_model,
@@ -43,8 +75,13 @@ class Intent(BaseModel):
             "gcp_bucket": self.gcp_bucket,
             "questions": self.questions,
         }
-    
+
+
 class Embedding(BaseModel):
+    """
+    Represents a text chunk and its associated metadata to be stored in BigQuery.
+    """
+
     id: str
     text: str
     index: str
@@ -61,6 +98,9 @@ class Embedding(BaseModel):
         ]
 
     def to_dict(self):
+        """
+        Converts the Embedding object to a dictionary suitable for BigQuery JSON insertion.
+        """
         return {
             "id": self.id,
             "text": self.text,

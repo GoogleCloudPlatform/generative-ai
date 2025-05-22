@@ -1,3 +1,17 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import base64
 from io import BytesIO
 from typing import List
@@ -30,7 +44,9 @@ class ImagenSearchService:
     ) -> List[ImageGenerationResult]:
         _, PROJECT_ID = google.auth.default()
         LOCATION = "us-central1"
-        client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+        client = genai.Client(
+            vertexai=True, project=PROJECT_ID, location=LOCATION
+        )
 
         prompt = f"""
           IMPORTANT! Create an image that is in UHD, 4k, hyper realistic, extremely detailed, professional, vibrant, not grainy, smooth.
@@ -62,7 +78,9 @@ class ImagenSearchService:
 
         # Convert the padded image back to bytes
         buffered = BytesIO()
-        padded_image.save(buffered, format="JPEG")  # Or PNG, depending on your needs
+        padded_image.save(
+            buffered, format="JPEG"
+        )  # Or PNG, depending on your needs
         padded_image_bytes = buffered.getvalue()
 
         original_image = Image(image_bytes=padded_image_bytes)
@@ -125,16 +143,18 @@ class ImagenSearchService:
             ),
         )
 
-        images_face_recognition: types.EditImageResponse = client.models.edit_image(
-            model=searchRequest.generation_model,
-            prompt=prompt,
-            reference_images=[raw_reference_image, mask_ref_image],
-            config=EditImageConfig(
-                edit_mode="EDIT_MODE_BGSWAP",
-                number_of_images=searchRequest.number_of_images,
-                safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
-                person_generation="ALLOW_ADULT",
-            ),
+        images_face_recognition: types.EditImageResponse = (
+            client.models.edit_image(
+                model=searchRequest.generation_model,
+                prompt=prompt,
+                reference_images=[raw_reference_image, mask_ref_image],
+                config=EditImageConfig(
+                    edit_mode="EDIT_MODE_BGSWAP",
+                    number_of_images=searchRequest.number_of_images,
+                    safety_filter_level="BLOCK_MEDIUM_AND_ABOVE",
+                    person_generation="ALLOW_ADULT",
+                ),
+            )
         )
 
         # Imagen3 edition for just the entire image

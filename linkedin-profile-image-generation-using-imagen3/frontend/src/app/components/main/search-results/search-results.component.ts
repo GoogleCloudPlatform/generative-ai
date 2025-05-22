@@ -1,20 +1,30 @@
+/**
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {Component, OnDestroy, ViewChild, TemplateRef} from '@angular/core';
 import {SearchService} from 'src/app/services/search.service';
-import {ReplaySubject, Subscription, takeUntil} from 'rxjs';
+import {ReplaySubject, Subscription} from 'rxjs';
 import {UserService} from 'src/app/services/user/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {
-  search_document_type,
-  search_image_type,
-  PDF,
-  image_name,
-} from 'src/environments/constant';
+import {PDF, image_name} from 'src/environments/constant';
 import {
   DomSanitizer,
   SafeResourceUrl,
   SafeUrl,
 } from '@angular/platform-browser';
-import {MatDialog} from '@angular/material/dialog';
 import {GeneratedImage} from 'src/app/models/generated-image.model';
 import {SearchRequest} from 'src/app/models/search.model';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -44,7 +54,7 @@ export class SearchResultsComponent implements OnDestroy {
   private readonly destroyed = new ReplaySubject<void>(1);
   serachResult: any = [];
   documents: any = [];
-  showDefaultDocuments: boolean = false;
+  showDefaultDocuments = false;
   images: any = [];
   pdf = PDF;
   imageName = image_name;
@@ -60,7 +70,6 @@ export class SearchResultsComponent implements OnDestroy {
       value: 'imagen-3.0-capability-001',
       viewValue: 'Imagen 3: imagen-3.0-capability-001',
     },
-    // {value: 'imagegeneration@006', viewValue: 'Imagen 2: imagegeneration@006'},
   ];
   selectedModel = this.imagen3ModelsList[0].value;
   imageStylesList: ImageStylesModel[] = [
@@ -71,15 +80,15 @@ export class SearchResultsComponent implements OnDestroy {
     {value: 'Fantasy', viewValue: 'Fantasy'},
   ];
   selectedStyle: string = this.imageStylesList[0].value;
-  selectedNumberOfResults: number = 4;
-  selectedMaskDistilation: number = 0.005;
+  selectedNumberOfResults = 4;
+  selectedMaskDistilation = 0.005;
   searchRequest: SearchRequest = {
     term: '',
     model: this.selectedModel,
     numberOfResults: this.selectedNumberOfResults,
     maskDistilation: this.selectedMaskDistilation,
   };
-  isUserPhotoUrl: boolean = false;
+  isUserPhotoUrl = false;
   private imageSubscription: Subscription;
 
   constructor(
@@ -87,7 +96,6 @@ export class SearchResultsComponent implements OnDestroy {
     private route: ActivatedRoute,
     private service: SearchService,
     private userService: UserService,
-    private dialog: MatDialog,
     private sanitizer: DomSanitizer,
     private _snackBar: MatSnackBar,
     private _ImageService: ImageService

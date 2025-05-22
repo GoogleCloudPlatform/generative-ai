@@ -1,3 +1,17 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from os import getenv
 
 from fastapi import FastAPI, File, UploadFile
@@ -10,13 +24,27 @@ app = FastAPI()
 
 
 def configure_cors(app):
-    url = getenv("FRONTEND_URL")
-    if not url:
-        raise ValueError("FRONTEND_URL environment variable not set")
+    """Configures CORS middleware based on the environment."""
+    environment = getenv("ENVIRONMENT")
+    allowed_origins = []
+
+    if environment == "production":
+        frontend_url = getenv("FRONTEND_URL")
+        if not frontend_url:
+            raise ValueError(
+                "FRONTEND_URL environment variable not set in production"
+            )
+        allowed_origins.append(frontend_url)
+    elif environment == "development":
+        allowed_origins.append("*")  # Allow all origins in development
+    else:
+        raise ValueError(
+            f"Invalid ENVIRONMENT: {environment}. Must be 'production' or 'development'"
+        )
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*", url],
+        allow_origins=allowed_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -53,7 +81,6 @@ async def audio_chat(audio_file: UploadFile = File(...)):
 
     print("Waiting for operation to complete...")
     response = operation.result(timeout=90)
-    print(response)
 
     text = ""
     for result in response.results:

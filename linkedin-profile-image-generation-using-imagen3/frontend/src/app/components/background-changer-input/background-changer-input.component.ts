@@ -1,3 +1,19 @@
+/**
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   Component,
   EventEmitter,
@@ -7,8 +23,6 @@ import {
 } from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ImageService} from 'src/app/services/image/image.service';
-import {Subscription} from 'rxjs';
-import {UserService} from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-background-changer-input',
@@ -20,35 +34,16 @@ export class BackgroundChangerInputComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   imageUrl: any;
   userPhotoUrl: string | null = null;
-  isUserPhotoUrl: boolean = false;
-  // private imageSubscription: Subscription;
+  isUserPhotoUrl = false;
 
   constructor(
-    private _UserService: UserService,
     private sanitizer: DomSanitizer,
     private _ImageService: ImageService
-  ) {
-    // this.imageSubscription = this._ImageService.selectedImage$.subscribe(
-    //   image => {
-    //     if (image) {
-    //       this.selectedFile = image.file;
-    //       this.imageUrl = image.imageUrl
-    //         ? this.sanitizer.bypassSecurityTrustUrl(image.imageUrl)
-    //         : null;
-    //       this.isUserPhotoUrl = image.isUserPhotoUrl;
-    //     }
-    //   }
-    // );
-  }
+  ) {}
 
-  ngOnInit(): void {
-    // this.userPhotoUrl = this._UserService.getUserDetails().photoURL || null;
-    // if (this.userPhotoUrl) this.loadImageFromUserUrl(this.userPhotoUrl);
-  }
+  ngOnInit(): void {}
 
-  ngOnDestroy(): void {
-    // this.imageSubscription.unsubscribe();
-  }
+  ngOnDestroy(): void {}
 
   onFileSelected(event: any) {
     if (event) {

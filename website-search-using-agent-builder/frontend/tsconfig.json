@@ -1,18 +1,12 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
+  "extends": "./node_modules/gts/tsconfig-google.json",
   "compileOnSave": false,
   "compilerOptions": {
     "ignoreDeprecations": "5.0",
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "sourceMap": true,
-    "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
@@ -24,8 +18,6 @@
       "ES2022",
       "dom"
     ],
-    "strictPropertyInitialization": false,
-    "resolveJsonModule": true,
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -34,5 +26,10 @@
     "strictTemplates": true,
     "suppressImplicitAnyIndexErrors": true,
     "strictPropertyInitialization": false,
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ]
 }
+

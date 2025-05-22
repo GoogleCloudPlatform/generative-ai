@@ -1,3 +1,17 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from typing import Annotated, Optional
 from fastapi import APIRouter, HTTPException, status as Status
 
@@ -26,7 +40,8 @@ async def search(
         Form(description="Model used for image edition"),
     ],
     numberOfImages: Annotated[
-        Optional[int], Form(ge=1, le=4, description="Number of images to generate")
+        Optional[int],
+        Form(ge=1, le=4, description="Number of images to generate"),
     ],
     maskDistilation: Annotated[
         Optional[float],
@@ -69,7 +84,9 @@ async def search(
     except Exception as e:
         raise HTTPException(
             status_code=(
-                e.code if hasattr(e, "code") else Status.HTTP_500_INTERNAL_SERVER_ERROR
+                e.code
+                if hasattr(e, "code")
+                else Status.HTTP_500_INTERNAL_SERVER_ERROR
             ),
             detail=str(e.message) if hasattr(e, "message") else str(e),
         )

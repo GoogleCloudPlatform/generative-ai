@@ -1,0 +1,18 @@
+<div class="heading-parent-container">
+  <div class="chips-container">
+    <mat-chip-listbox>
+      <mat-chip-row (click)="assignQToChatQuery(question)"
+      *ngFor="let question of data.suggestedQuestion">
+        <span class="text-span">
+          <mat-icon>keyboard_return</mat-icon>
+          {{question}}
+        </span>
+      </mat-chip-row>
+    </mat-chip-listbox>
+  </div>
+  <div class="close-button"> 
+    <button mat-icon-button aria-label="Example icon button with a vertical three dot icon" (click)="closeSuggestionCard()">
+    <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
