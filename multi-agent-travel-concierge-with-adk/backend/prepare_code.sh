@@ -2,12 +2,15 @@
 
 echo "Starting prepare_code.sh script..."
 
-# https://github.com/google/adk-samples.git/adk-samples/python/agents/travel-concierge/travel_concierge # TODO: Pass this as a template parameter to generalize solution for any ADK agent
+# TODO: Pass this as a template parameter to generalize solution for any ADK agent
+# https://github.com/google/adk-samples.git/adk-samples/python/agents/travel-concierge/travel_concierge
 git clone https://github.com/google/adk-samples.git
-cp -r adk-samples/python/agents/travel-concierge/travel_concierge ./travel_concierge
-cp -r adk-samples/python/agents/travel-concierge/eval ./eval
-cp adk-samples/python/agents/travel-concierge/pyproject.toml . # TODO: Installing dependencies might be necessary only for local and not AE deployment
-# cp adk-samples/python/agents/travel-concierge/poetry.lock . # TODO: Double check this, poetry.lock does not exist on the ADK repo
+cd adk-samples
+git checkout d6a944f # Go to a particular working commit as this changes quite regularly
+cp -r python/agents/travel-concierge/travel_concierge ./travel_concierge
+cp -r python/agents/travel-concierge/eval ./eval
+cp python/agents/travel-concierge/pyproject.toml .
+cd ..
 poetry install --with deployment
 
 # Install setup.py dependencies
