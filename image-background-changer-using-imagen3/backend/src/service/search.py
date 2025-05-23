@@ -33,6 +33,7 @@ from src.model.search import (
     CreateSearchRequest,
     CustomImageResult,
     ImageGenerationResult,
+    SearchResponse,
 )
 
 
@@ -48,13 +49,13 @@ class ImagenSearchService:
 
         prompt = f""" {searchRequest.term}"""
 
-        # Imagen3 part remains the same (using GenaiImage)
         original_image = GenaiImage(image_bytes=searchRequest.user_image)
 
         raw_reference_image = RawReferenceImage(
             reference_image=original_image, reference_id=0
         )
 
+        # Imagen3 edition for just the entire image
         images_entire_image: types.EditImageResponse = client.models.edit_image(
             model=searchRequest.generation_model,
             prompt=prompt,
@@ -67,6 +68,7 @@ class ImagenSearchService:
             ),
         )
 
+        # Imagen3 edition for just the background
         mask_ref_image = MaskReferenceImage(
             reference_id=1,
             reference_image=None,
@@ -140,7 +142,7 @@ class ImagenSearchService:
                                     enhanced_prompt = prompt
                                     if candidate.content.parts and candidate.content.parts[0].text:
                                         enhanced_prompt = candidate.content.parts[0].text
-                                    
+
                                     gemini_generated_images.append(
                                         ImageGenerationResult(
                                             enhanced_prompt=enhanced_prompt,
@@ -170,54 +172,42 @@ class ImagenSearchService:
                 )
 
         num_requested_images = searchRequest.number_of_images if searchRequest.number_of_images is not None else 4
+
         # Make sure to convert the image from bytes to encoded string before sending to the frontend
-        all_generated_images = (
-            gemini_generated_images[:num_requested_images] #limit to the asked number, API might duplicate.
-        #    + images_entire_image.generated_images # These are types.ImageGenerationResponse objects
-            + images_just_background.generated_images # These are types.ImageGenerationResponse objects
+        response_images_entire_image = [
+            ImageGenerationResult(
+                enhanced_prompt=generated_image.enhanced_prompt,
+                rai_filtered_reason=generated_image.rai_filtered_reason,
+                image=CustomImageResult(
+                    gcs_uri=generated_image.image.gcs_uri,
+                    encoded_image=base64.b64encode(
+                        generated_image.image.image_bytes
+                    ).decode("utf-8"),
+                    mime_type=generated_image.image.mime_type,
+                ),
+            )
+            for generated_image in images_entire_image.generated_images
+        ]
+
+        response_images_just_background = [
+            ImageGenerationResult(
+                enhanced_prompt=generated_image.enhanced_prompt,
+                rai_filtered_reason=generated_image.rai_filtered_reason,
+                image=CustomImageResult(
+                    gcs_uri=generated_image.image.gcs_uri,
+                    encoded_image=base64.b64encode(
+                        generated_image.image.image_bytes
+                    ).decode("utf-8"),
+                    mime_type=generated_image.image.mime_type,
+                ),
+            )
+            for generated_image in images_just_background.generated_images
+        ]
+
+        response_gemini_results = gemini_generated_images[:num_requested_images] #limit to the asked number, API might duplicate.
+
+        return SearchResponse(
+            gemini_results=response_gemini_results,
+            imagen_entire_img_results=response_images_entire_image,
+            imagen_background_img_results=response_images_just_background,
         )
-        print("gemini_generated_images: ", len(gemini_generated_images)) #total imgs gemini gave
-        #print("images_entire_image: ", len(images_entire_image.generated_images))
-        print("images_just_background: ", len(images_just_background.generated_images))
-
-        final_response: List[ImageGenerationResult] = []
-        for generated_item in all_generated_images:
-            # Case 1: The item is already an ImageGenerationResult (from Gemini processing)
-            if isinstance(generated_item, ImageGenerationResult):
-                final_response.append(generated_item)
-            
-            # Case 2: The item is from Imagen's response (likely types.ImageGenerationResponse)
-            # and needs to be converted to our CustomImageResult structure.
-            elif hasattr(generated_item, 'image') and hasattr(generated_item.image, 'image_bytes'):
-                imagen_enhanced_prompt = None
-                imagen_rai_filtered_reason = None
-                
-                # Extract enhanced_prompt and rai_filtered_reason from Imagen's response structure
-                # Imagen's generated_item.prompt_feedback might exist for the response object itself
-                if hasattr(generated_item, 'prompt_feedback') and generated_item.prompt_feedback and generated_item.prompt_feedback.text:
-                    imagen_enhanced_prompt = generated_item.prompt_feedback.text
-                if hasattr(generated_item, 'prompt_feedback') and generated_item.prompt_feedback and generated_item.prompt_feedback.blocked:
-                    imagen_rai_filtered_reason = generated_item.prompt_feedback.block_reason
-                
-                # Also check for finish_reason for RAI filtering specific to the generation
-                if hasattr(generated_item, 'finish_reason') and generated_item.finish_reason and generated_item.finish_reason.name:
-                    if imagen_rai_filtered_reason is None: # Only set if not already set by prompt_feedback
-                        imagen_rai_filtered_reason = generated_item.finish_reason.name
-                
-                final_response.append(
-                    ImageGenerationResult(
-                        enhanced_prompt=imagen_enhanced_prompt,
-                        rai_filtered_reason=imagen_rai_filtered_reason,
-                        image=CustomImageResult(
-                            gcs_uri=generated_item.image.gcs_uri,
-                            encoded_image=base64.b64encode(
-                                generated_item.image.image_bytes
-                            ).decode("utf-8"),
-                            mime_type=generated_item.image.mime_type,
-                        ),
-                    )
-                )
-            else:
-                print(f"WARNING: Skipping unexpected generated item type in all_generated_images: {type(generated_item)}. Item: {generated_item}")
-
-        return final_response

@@ -18,6 +18,7 @@ from fastapi import APIRouter, HTTPException, status as Status
 from src.model.search import (
     CreateSearchRequest,
     GenerationModelOptionalLiteral,
+    SearchResponse,
 )
 from src.service.search import ImagenSearchService
 from fastapi import Form, File, UploadFile
@@ -31,7 +32,7 @@ router = APIRouter(
 ALLOWED_IMAGE_TYPES = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
 
-@router.post("")
+@router.post("", response_model=SearchResponse)
 async def search(
     userImage: Annotated[UploadFile, File()],
     term: Annotated[Optional[str], Form(min_length=10, max_length=200)],
@@ -70,7 +71,7 @@ async def search(
         )
 
         service = ImagenSearchService()
-        return service.generate_images(createSearchRequest)
+        return await service.generate_images(createSearchRequest)
     except HTTPException as http_exception:
         raise HTTPException(
             status_code=Status.HTTP_400_BAD_REQUEST,

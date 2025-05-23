@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
@@ -59,3 +59,9 @@ class ImageGenerationResult(BaseSchema):
     enhanced_prompt: Optional[str]
     rai_filtered_reason: Optional[str]
     image: CustomImageResult
+
+
+class SearchResponse(BaseModel):
+    gemini_results: List[ImageGenerationResult]
+    imagen_entire_img_results: List[ImageGenerationResult]
+    imagen_background_img_results: List[ImageGenerationResult]
