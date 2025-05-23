@@ -229,6 +229,7 @@ KFBI
 KNN
 KPIs
 KSA
+KYC
 Kaelen
 Kalamang
 Kamradt
@@ -243,8 +244,6 @@ Koyel
 Kraizt
 Kubeflow
 Kvyat
-KYC
-kyc
 Kylian
 L'avenir
 LCEL
@@ -915,6 +914,7 @@ konnte
 kotlin
 kpi
 kubectl
+kyc
 l'harmonie
 lakecolor
 landcolor
