@@ -244,6 +244,7 @@ Kraizt
 Kubeflow
 Kvyat
 KYC
+kyc
 Kylian
 L'avenir
 LCEL
