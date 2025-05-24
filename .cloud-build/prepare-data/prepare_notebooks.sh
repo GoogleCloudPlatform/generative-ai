@@ -3,7 +3,12 @@
 check_and_comment() {
   local keyword="app.kernel.do_shutdown"
 
-  for filename in /workspace/generative-ai/gemini/getting-started/*.ipynb; do
+  # Read notebook paths from Notebooks.txt
+  TARGET=$(cat .cloud-build/Notebooks.txt)
+
+  for notebook_path_relative in $TARGET; do
+    local filename="/workspace/$notebook_path_relative"
+
     if [[ ! -f "$filename" ]]; then
       echo "Error: File not found: $filename" >&2
       continue
