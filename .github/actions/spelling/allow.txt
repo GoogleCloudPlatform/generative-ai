@@ -451,6 +451,7 @@ TLDR
 TOKENLIST
 TPU
 TPUs
+TRK
 TSLA
 TSMC
 TSNE
@@ -551,6 +552,7 @@ aextract
 afrom
 agentic
 agg
+aggfunc
 ainit
 ainvoke
 aio
@@ -610,6 +612,7 @@ bnb
 booktitle
 boop
 boundings
+boxplot
 bpa
 bpd
 bqdf
@@ -933,6 +936,7 @@ linestyle
 linkedin
 linted
 linting
+litellm
 llm
 llms
 loghub
@@ -1291,6 +1295,7 @@ vectoral
 vectordb
 veo
 vesselin
+viridis
 vllm
 vnc
 voiceover
