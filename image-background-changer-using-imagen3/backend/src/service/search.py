@@ -284,7 +284,6 @@ class ImagenSearchService:
                 if isinstance(res, ImageGenerationResult):
                     processed_results.append(res)
                 elif isinstance(res, Exception):
-                    # if isinstance(res, Exception):
                     print(f"Gemini task {i+1} failed: {res}")
                     processed_results.append(
                         ImageGenerationResult(
