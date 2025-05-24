@@ -18,7 +18,7 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {environment} from 'src/environments/environment';
 import {map} from 'rxjs/operators';
-import {SearchRequest} from '../models/search.model';
+import {CombinedBackgroundChangerResults, SearchRequest} from '../models/search.model';
 import {GeneratedImage} from '../models/generated-image.model';
 import {ImageService} from './image/image.service';
 import {Router} from '@angular/router';
@@ -36,7 +36,7 @@ export class SearchService {
     private router: Router
   ) {}
 
-  search(searchRequest: SearchRequest): Observable<GeneratedImage[]> {
+  search(searchRequest: SearchRequest): Observable<CombinedBackgroundChangerResults> {
     const userImage = this.imageService.getImage();
 
     if (!userImage) {
@@ -60,6 +60,6 @@ export class SearchService {
 
     return this.http
       .post(searchURL, formData)
-      .pipe(map(response => response as GeneratedImage[]));
+      .pipe(map(response => response as CombinedBackgroundChangerResults));
   }
 }

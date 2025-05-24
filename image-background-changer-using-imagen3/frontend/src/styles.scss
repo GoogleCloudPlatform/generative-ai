@@ -80,3 +80,7 @@ $tour-next-button-hover: black;
 $tour-back-button-color: white;
 $tour-shadow-color: gray;
 $tour-step-color: aliceblue;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

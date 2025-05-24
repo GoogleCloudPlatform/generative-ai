@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-type Image = {
-  gcsUri?: string;
-  imageBytes?: ArrayBuffer;
-  encodedImage?: string;
-  mimeType?: string;
-};
-
-export type GeneratedImage = {
-  image?: Image;
-  raiFilteredReason?: string;
-  enhancedPrompt?: string;
-  source?: string;
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{html,ts}'],
+  theme: {
+    extend: {
+      colors: {
+        'custom-gray': '#DDE6F6',
+        'light-gray': '#e0e0e0',
+        'lighter-gray': '#f0f0f0',
+      },
+    },
+  },
+  plugins: [],
 };

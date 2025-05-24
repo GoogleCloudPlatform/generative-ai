@@ -61,7 +61,7 @@ class ImageGenerationResult(BaseSchema):
     image: CustomImageResult
 
 
-class SearchResponse(BaseModel):
+class SearchResponse(BaseSchema):
     gemini_results: List[ImageGenerationResult]
     imagen_entire_img_results: List[ImageGenerationResult]
     imagen_background_img_results: List[ImageGenerationResult]

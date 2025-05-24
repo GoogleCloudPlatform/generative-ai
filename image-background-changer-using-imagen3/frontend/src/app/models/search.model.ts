@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { GeneratedImage } from "./generated-image.model";
+
 export type SearchRequest = {
   term: string;
   model: string;
@@ -26,6 +28,12 @@ export type SearchResponse = {
   results: SearchResult[];
   totalSize: number;
 };
+
+export interface CombinedBackgroundChangerResults {
+  geminiResults?: GeneratedImage[];
+  imagenEntireImgResults?: GeneratedImage[];
+  imagenBackgroundImgResults?: GeneratedImage[];
+}
 
 export type SearchResult = {
   document: Document;
