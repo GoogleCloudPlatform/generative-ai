@@ -25,7 +25,6 @@ from travel_concierge.agent import root_agent # type: ignore
 
 def create(env_vars: dict[str, str]) -> None:
     """Creates a new deployment."""
-    print(env_vars)
     app = AdkApp(
         agent=root_agent,
         enable_tracing=True,
@@ -37,7 +36,7 @@ def create(env_vars: dict[str, str]) -> None:
         # IMPORTANT!!! Define the SAME dependencies in the requirements, specially for
         # "google-cloud-aiplatform[agent_engines] @ git+https://github.com/googleapis/python-aiplatform.git@copybara_738852226" 
         requirements=[
-            "google-adk (>=0.0.2)",
+            "google-adk (==0.5.0)",
             "google-cloud-aiplatform[agent_engines]@git+https://github.com/googleapis/python-aiplatform.git@copybara_738852226",
             "google-genai (>=1.5.0,<2.0.0)",
             "pydantic (>=2.10.6,<3.0.0)",
@@ -82,7 +81,7 @@ def setup_remote_agent(bucket: Bucket) -> str | None:
     # Uncomment one of the two, or create your own.
     #
     # _ADK_TRAVEL_CONCIERGE_SCENARIO=profiles/itinerary_seattle_example.json
-    initial_states_path = os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") if os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") else "profiles/itinerary_empty_default.json"
+    initial_states_path = os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") if os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") else "eval/itinerary_empty_default.json"
     map_key = os.getenv("_ADK_GOOGLE_PLACES_API_KEY")
 
     # Populate env_vars dictionary for the AdkApp
