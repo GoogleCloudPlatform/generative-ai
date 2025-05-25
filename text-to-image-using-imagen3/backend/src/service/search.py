@@ -15,12 +15,10 @@
 import asyncio
 import base64
 from typing import List
-from io import BytesIO
 
 import google.auth
 from google import genai
 from google.genai import types
-from PIL import Image
 
 from src.model.search import (
     CustomImageResult,
@@ -184,17 +182,32 @@ class ImagenSearchService:
         )
         print("Async generate_images method called! Init parallel generation.")
 
-        # Create tasks for concurrent execution
-        imagen_task = self._generate_with_imagen(
-            client=client,
-            term=term,
-            generation_model=generation_model,
-            aspect_ratio=aspect_ratio,
-            number_of_images=number_of_images,
-            image_style=image_style,
-        )
+        # Create a list of coroutines for Imagen generation
+        if generation_model == "imagen-4.0-ultra-generate-exp-05-20":
+            imagen_coroutines = [
+                self._generate_with_imagen(
+                    client=client,
+                    term=term,
+                    generation_model=generation_model,
+                    aspect_ratio=aspect_ratio,
+                    number_of_images=1,  # Imagen 4 generates 1 image per call
+                    image_style=image_style,
+                )
+                for _ in range(number_of_images)
+            ]
+        else:
+            imagen_coroutines = [
+                self._generate_with_imagen(
+                    client=client,
+                    term=term,
+                    generation_model=generation_model,
+                    aspect_ratio=aspect_ratio,
+                    number_of_images=number_of_images,
+                    image_style=image_style,
+                )
+            ]
 
-        gemini_task = self._generate_with_gemini(
+        gemini_coroutine = self._generate_with_gemini(
             client=client,
             term=term,
             number_of_images=number_of_images,
@@ -203,22 +216,38 @@ class ImagenSearchService:
 
         # Run tasks concurrently and gather results
         # return_exceptions=True allows us to get results even if one task fails
+        all_tasks_to_gather = [*imagen_coroutines, gemini_coroutine]
         results = await asyncio.gather(
-            imagen_task, gemini_task, return_exceptions=True
+            *all_tasks_to_gather, return_exceptions=True
         )
 
         response_imagen: List[ImageGenerationResult] = []
         response_gemini: List[ImageGenerationResult] = []
 
-        if isinstance(results[0], Exception):
-            print(f"Exception in Imagen generation task: {results[0]}")
-        elif results[0] is not None:
-            response_imagen = results[0]
+        num_imagen_tasks = len(imagen_coroutines)
 
-        if isinstance(results[1], Exception):
-            print(f"Exception in Gemini generation task: {results[1]}")
-        elif results[1] is not None:
-            response_gemini = results[1]
+        for i in range(num_imagen_tasks):
+            imagen_task_result = results[i]
+            if isinstance(imagen_task_result, Exception):
+                print(
+                    f"Exception in Imagen generation task {i + 1}: {imagen_task_result}"
+                )
+            elif imagen_task_result is not None:
+                response_imagen.extend(imagen_task_result)
+
+        gemini_result_index = num_imagen_tasks
+        if gemini_result_index < len(results):
+            gemini_task_result = results[gemini_result_index]
+            if isinstance(gemini_task_result, Exception):
+                print(
+                    f"Exception in Gemini generation task: {gemini_task_result}"
+                )
+            elif gemini_task_result is not None:
+                response_gemini = gemini_task_result
+        else:
+            print(
+                "Gemini task result not found in the expected position in results list."
+            )
 
         return SearchResponse(
             gemini_results=response_gemini, imagen_results=response_imagen

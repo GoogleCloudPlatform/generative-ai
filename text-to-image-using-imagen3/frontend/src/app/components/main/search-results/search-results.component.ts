@@ -67,6 +67,7 @@ export class SearchResultsComponent implements OnDestroy {
   currentSearchTerm = '';
   numberOfResults = 2;
   imagen3ModelsList: Imagen3Model[] = [
+    {value: 'imagen-4.0-ultra-generate-exp-05-20', viewValue: 'Imagen 4.0-ultra-generate-exp-05-20'},
     {value: 'imagen-3.0-generate-001', viewValue: 'imagen-3.0-generate-001'},
     {
       value: 'imagen-3.0-fast-generate-001',
@@ -149,11 +150,11 @@ export class SearchResultsComponent implements OnDestroy {
   private processSearchResults(searchResponse: CombinedImageResults) {
     this.imagenDocuments = (searchResponse.imagenResults || []).map(img => ({
       ...img,
-      source: 'Imagen 3',
+      source: 'Imagen Model',
     }));
     this.geminiDocuments = (searchResponse.geminiResults || []).map(img => ({
       ...img,
-      source: 'Gemini 2.0',
+      source: 'Gemini 2.0 Model',
     }));
 
     const hasImagenResults = this.imagenDocuments.length > 0;

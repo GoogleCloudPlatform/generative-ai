@@ -21,6 +21,7 @@ from pydantic.alias_generators import to_camel
 
 # Create a Literal type from the list of valid models
 GenerationModelOptionalLiteral = Union[
+    Literal["imagen-4.0-ultra-generate-exp-05-20"],
     Literal["imagen-3.0-generate-001"],
     Literal["imagen-3.0-fast-generate-001"],
     Literal["imagen-3.0-generate-002"],

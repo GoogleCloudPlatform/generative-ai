@@ -16,17 +16,15 @@
 
 <app-header (emitSearch)="this.searchTerm({ term: $event })"></app-header>
 
-<!-- Main container: Show if there are any documents or if it's the default placeholder state -->
 <div class="container m-auto grid grid-cols-4 gap-0 m-7"
      *ngIf="imagenDocuments.length > 0 || geminiDocuments.length > 0 || showDefaultDocuments">
-  <div class="col-span-4 bg-custom-gray p-4" style="padding: 1rem"> <!-- Reduced padding for title bar -->
+  <div class="col-span-4 bg-custom-gray p-4" style="padding: 1rem">
     <span class="text-3xl m-0">Image Generation</span>
-    <!-- Optional: Display the summary (enhanced prompt of selected image) -->
     <p *ngIf="selectedResult?.enhancedPrompt && !showDefaultDocuments"
        class="text-sm text-gray-600 mt-1 truncate"
        matTooltip="{{selectedResult?.enhancedPrompt}}"
        matTooltipPosition="below"
-       aria-label="Full prompt text"> <!-- Good for accessibility -->
+       aria-label="Full prompt text">
       Prompt: {{ selectedResult?.enhancedPrompt }}
     </p>
     <p *ngIf="summary && (showDefaultDocuments || !selectedResult?.enhancedPrompt)" class="text-sm text-gray-600 mt-1">
@@ -63,7 +61,7 @@
 
       <!-- Column 1: Imagen Thumbnails -->
       <div class="flex flex-col h-full">
-        <h4 class="text-md font-semibold mb-2 text-center text-gray-700 sticky top-0 bg-white z-10 py-1">Imagen 3 Results</h4>
+        <h4 class="text-md font-semibold mb-2 text-center text-gray-700 sticky top-0 bg-white z-10 py-1">Imagen Model Results</h4>
         <div class="flex-grow overflow-y-auto p-1 bg-gray-50 rounded-lg custom-scrollbar">
           <div class="flex flex-wrap justify-center gap-2">
             <div class="w-24 h-24 cursor-pointer relative group border-2 hover:border-blue-500 rounded-md overflow-hidden shadow-sm"
@@ -73,11 +71,6 @@
                  (click)="changeImageSelection(result)">
               <img [src]="'data:image/png;base64,' + result.image?.encodedImage"
                    class="w-full h-full object-cover" alt="Imagen Thumbnail" />
-              <!-- Source span is optional as column header indicates source -->
-              <!-- <span *ngIf="result.source"
-                    class="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded-tl-md group-hover:bg-opacity-70">
-                {{ result.source }}
-              </span> -->
             </div>
             <div *ngIf="imagenDocuments.length === 0 && !showDefaultDocuments" class="text-center text-gray-400 text-sm p-4">
               No Imagen results.
@@ -105,14 +98,14 @@
           </div>
         </div>
       </div>
-    </div> <!-- End of two-column thumbnail grid -->
+    </div>
 
     <!-- Chat input remains below -->
-    <div class="chat-footer-outer mt-auto pt-4"> <!-- mt-auto pushes it to the bottom -->
+    <div class="chat-footer-outer mt-auto pt-4">
       <app-chat-input [term]="currentSearchTerm" (emitSearch)="this.searchTerm({ term: $event })">
       </app-chat-input>
     </div>
-  </div> <!-- End of col-span-3 -->
+  </div>
 
 
   <!-- Configuration panel remains the same -->
