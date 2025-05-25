@@ -5,12 +5,10 @@ echo "Starting prepare_code.sh script..."
 # TODO: Pass this as a template parameter to generalize solution for any ADK agent
 # https://github.com/google/adk-samples.git/adk-samples/python/agents/travel-concierge/travel_concierge
 git clone https://github.com/google/adk-samples.git
-cd adk-samples
 git checkout adf6402 # Go to a particular working commit as this changes quite regularly
-cp -r python/agents/travel-concierge/travel_concierge ./travel_concierge
-cp -r python/agents/travel-concierge/eval ./eval
-cp python/agents/travel-concierge/pyproject.toml .
-cd ..
+cp -r adk-samples/python/agents/travel-concierge/travel_concierge ./travel_concierge
+cp -r adk-samples/python/agents/travel-concierge/eval ./eval
+cp adk-samples/python/agents/travel-concierge/pyproject.toml .
 poetry install --with deployment
 
 # Install setup.py dependencies

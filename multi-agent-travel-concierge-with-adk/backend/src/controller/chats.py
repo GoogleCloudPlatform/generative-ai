@@ -40,7 +40,7 @@ async def websocket_chat(
     print(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
     logging.info(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
 
-    agent_session = asyncio.run(remote_agent.create_session(user_id=DEFAULT_USER_ID))
+    agent_session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
     active_session_id = agent_session["id"]
     print(f"Created new agent session for WebSocket connection: {active_session_id}")
     logging.info(f"Created new agent session for WebSocket connection: {active_session_id}")
