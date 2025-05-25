@@ -16,7 +16,8 @@ langchain
 langchain-community
 langchain-core
 langchain-google-vertexai
-google-cloud-aiplatform[adk,agent_engines]
+google-cloud-aiplatform[agent_engines]
+google-adk==0.5.0
 google-cloud-bigquery
 google-cloud-tasks
 google-cloud-logging

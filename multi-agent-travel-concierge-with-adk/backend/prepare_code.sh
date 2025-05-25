@@ -6,7 +6,7 @@ echo "Starting prepare_code.sh script..."
 # https://github.com/google/adk-samples.git/adk-samples/python/agents/travel-concierge/travel_concierge
 git clone https://github.com/google/adk-samples.git
 cd adk-samples
-git checkout d6a944f # Go to a particular working commit as this changes quite regularly
+git checkout adf6402 # Go to a particular working commit as this changes quite regularly
 cp -r python/agents/travel-concierge/travel_concierge ./travel_concierge
 cp -r python/agents/travel-concierge/eval ./eval
 cp python/agents/travel-concierge/pyproject.toml .
