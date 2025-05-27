@@ -1,4 +1,6 @@
-# This script is designed to automate the uploading of Jupyter Notebook files (`.ipynb`) from a local directory to a Google Cloud Storage (GCS) bucket
+# Notebook Testing
+
+This script is designed to automate the uploading of Jupyter Notebook files (`.ipynb`) from a local directory to a Google Cloud Storage (GCS) bucket
 
 ## Purpose
 
@@ -32,7 +34,9 @@ Before running this script, ensure you have the following:
    - Create a variable named `OUTPUT_URI` in the same directory as your script.
    - Add the full GCS URI of your destination bucket to this file. For example:
 
+     ```none
      gs://your-bucket-name
+     ```
 
 2. **Place Notebooks:**
 
