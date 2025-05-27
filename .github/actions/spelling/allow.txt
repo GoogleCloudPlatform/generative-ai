@@ -900,7 +900,8 @@ jit
 jiwer
 jsonify
 jsonlines
-jsonpathjsonplus
+jsonpath
+jsonplus
 jupyter
 jvm
 kaggle
