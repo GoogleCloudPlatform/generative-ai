@@ -20,13 +20,13 @@
     "@angular/platform-browser": "^17.3.0",
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
-    "@openapitools/openapi-generator-cli": "^2.13.5",
+    "@openapitools/openapi-generator-cli": "^2.20.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.0",
+    "@angular-devkit/build-angular": "^17.3.17",
     "@angular/cli": "^17.3.9",
     "@angular/compiler-cli": "^17.3.0",
     "@types/jasmine": "~5.1.0",
