@@ -221,7 +221,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
 
         if (serverMessage.operation === 'start') {
           if (this.showLoader) { // A user query is active
-            this.loaderText = "Assistant is processing your request...";
+            this.loaderText = "Ask a question and start your journey! 🚀🚀🚀";
             this.setCyclicBackgroundImages();
           } else { // Auto-connected, no active query
             this.loaderText = "Assistant is ready.";

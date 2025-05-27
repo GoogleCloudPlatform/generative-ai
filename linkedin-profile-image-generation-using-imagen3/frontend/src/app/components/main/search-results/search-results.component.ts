@@ -20,11 +20,6 @@ import {ReplaySubject, Subscription} from 'rxjs';
 import {UserService} from 'src/app/services/user/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PDF, image_name} from 'src/environments/constant';
-import {
-  DomSanitizer,
-  SafeResourceUrl,
-  SafeUrl,
-} from '@angular/platform-browser';
 import {GeneratedImage} from 'src/app/models/generated-image.model';
 import {SearchRequest} from 'src/app/models/search.model';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -58,12 +53,8 @@ export class SearchResultsComponent implements OnDestroy {
   images: any = [];
   pdf = PDF;
   imageName = image_name;
-  documentURL: SafeResourceUrl | undefined;
-  openPreviewDocument: any;
   currentPage = 0;
   pageSize = 8;
-  selectedDocument: any;
-  safeUrl: SafeUrl | undefined;
   selectedResult: GeneratedImage | undefined;
   imagen3ModelsList: Imagen3Model[] = [
     {
@@ -96,7 +87,6 @@ export class SearchResultsComponent implements OnDestroy {
     private route: ActivatedRoute,
     private service: SearchService,
     private userService: UserService,
-    private sanitizer: DomSanitizer,
     private _snackBar: MatSnackBar,
     private _ImageService: ImageService
   ) {
@@ -260,20 +250,6 @@ export class SearchResultsComponent implements OnDestroy {
     this.searchTerm({model: this.selectedModel});
   }
 
-  previewDocument(event: any, document: any) {
-    event.stopPropagation();
-    if (document.link.endsWith('.pdf') || document.link.endsWith('.docx')) {
-      this.selectedDocument = document;
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        this.selectedDocument.link
-      );
-    }
-  }
-
-  closePreview() {
-    this.selectedDocument = undefined;
-  }
-
   ngOnInit(): void {}
 
   ngOnDestroy() {
@@ -285,22 +261,6 @@ export class SearchResultsComponent implements OnDestroy {
   get pagedDocuments() {
     const startIndex = this.currentPage * this.pageSize;
     return this.documents.slice(startIndex, startIndex + this.pageSize);
-  }
-
-  get totalPages() {
-    return Math.ceil(this.documents.length / this.pageSize);
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-    }
-  }
-
-  prevPage() {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-    }
   }
 
   onNumberOfResultsChange(event: Event) {

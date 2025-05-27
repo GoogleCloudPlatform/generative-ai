@@ -33,8 +33,6 @@ def create(env_vars: dict[str, str]) -> None:
 
     remote_agent = agent_engines.create(
         app,
-        # IMPORTANT!!! Define the SAME dependencies in the requirements, specially for
-        # "google-cloud-aiplatform[agent_engines] @ git+https://github.com/googleapis/python-aiplatform.git@copybara_738852226" 
         requirements=[
             "google-adk (==0.5.0)",
             "google-cloud-aiplatform[agent_engines]@git+https://github.com/googleapis/python-aiplatform.git@copybara_738852226",
@@ -77,9 +75,7 @@ def setup_remote_agent(bucket: Bucket) -> str | None:
     location = os.getenv("_REGION")
     # Sample Scenario Path - Default is an empty itinerary
     # This will be loaded upon first user interaction.
-    #
     # Uncomment one of the two, or create your own.
-    #
     # _ADK_TRAVEL_CONCIERGE_SCENARIO=profiles/itinerary_seattle_example.json
     initial_states_path = os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") if os.getenv("_ADK_TRAVEL_CONCIERGE_SCENARIO") else "eval/itinerary_empty_default.json"
     map_key = os.getenv("_ADK_GOOGLE_PLACES_API_KEY")
