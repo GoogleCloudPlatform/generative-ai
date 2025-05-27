@@ -1,7 +1,12 @@
 # 🚀 Quickbot
 
-[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
-[![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
+![Angular](https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white)
+![Google Cloud](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white)
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen?style=for-the-badge)](https://github.com/pylint-dev/pylint)
+[![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg?style=for-the-badge)](https://github.com/google/gts)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 Quickbot is an innovative, out-of-the-box solution enabling users to deploy sophisticated AI Agents as full-stack cloud applications on their own Google Cloud Platform (GCP) accounts, entirely without requiring any coding expertise. It empowers you to seamlessly integrate and customize Google's latest AI models and protocols through intuitive templates.
 
@@ -35,8 +40,8 @@ This separation allows for clear development workflows and independent scaling o
 
 Quickbot provides a growing set of pre-built templates:
 
-* **ADK Travel Concierge Template (Coming Soon):** Leveraging the [ADK](https://google.github.io/adk-docs/) + [Agent Engine](https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview) capabilities, this MultiAgent orchestrates personalized travel experiences and provides support throughout the user’s journey, from initial planning to real-time itinerary alerts.
-* **Image Generation Template:** A custom AI Agent that integrates with Imagen for text-to-image generation.
+* **ADK Travel Concierge MultiAgent Template:** Leveraging the [ADK](https://google.github.io/adk-docs/) + [Agent Engine](https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview) capabilities, this [Travel MultiAgent](https://github.com/google/adk-samples/tree/main/python/agents/travel-concierge) orchestrates personalized travel experiences and provides support throughout the user’s journey, from initial planning to real-time itinerary alerts.
+* **Image Generation Template:** A custom AI Agent that integrates with <a href="https://deepmind.google/models/imagen/" target="_blank" class="underline font-bold">Imagen 4</a>, <a href="https://ai.google.dev/gemini-api/docs/imagen?hl=es-419" target="_blank" class="underline font-bold">Imagen 3</a> and <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash?hl=es-419" target="_blank" class="underline font-bold">Gemini 2.0</a> for text-to-image generation.
 * **LinkedIn Profile Image Generation Template:** A specialized AI Agent leveraging Imagen's latest features for image editing and recognition to help you create customized professional corporate profile photos.
 * **Background Changer Image Generation Template:** An AI Agent using Imagen's image editing capabilities to customize your product, graphic, car, or pet images, generating professional catalog-style photos with new backgrounds.
 * **Document Search Template:** An AI Agent that provides answers based on documents and information you provide beforehand. Integrated with Agent Builder, Cloud Storage, and Cloud Run.
@@ -60,79 +65,142 @@ Follow these general steps to get a Quickbot template running in your local envi
 5.  **Git:** For cloning the repository.
 6.  **(Optional) Docker and docker-compose:** Useful for containerized development and deployment.
 
-### Installation & Running a Template
-Every template has their own README.md with their considerations and particularities, but basically they all bootstrap in the same way:
+### Option 1: Using Docker Compose (Recommended for Quick Start)
 
-1.  **Clone the Repository:**
+This is the **simplest way to get the entire application (frontend and backend) up and running!** You just need to run `docker compose up` after initial setup. See the next steps:
+
+1.  **Ensure Docker and Docker Compose v2 are installed and running.**
+
+2.  **Authenticate with Google Cloud:**
+    Your template (agents with Agent Engine, Imagen 4, VertexAI Search, etc) will need to interact with Google Cloud services, so you need to provide Google Cloud credentials. For local development with ADC:
     ```bash
-    git clone https://github.com/GoogleCloudPlatform/quickbot.git
-    cd quickbot
+    gcloud auth application-default login
+    gcloud config set project <your-gcp-project-id> # If using a specific GCP project
+    gcloud auth application-default set-quota-project <your-gcp-project-id> # If using a specific GCP project
+
+    # Verify your configuration
+    gcloud auth list
+    gcloud config list project
+    ```
+    The `docker-compose.yml` file is configured to mount these local credentials into the backend container.
+    > **IMPORTANT!!** Update the `_PROJECT_ID` and `GCLOUD_PROJECT` in `docker-compose.yml` so it points to your project!
+
+    > **Windows Users:** The path to ADC might differ. Adjust volume mounts in `docker-compose.yml` if needed.
+
+    > **Note:** Ensure any required APIs are enabled in your Google Cloud project if used.    
+
+3.  **Run the application:**
+    Build the Docker images for the frontend and backend services, and start the services, all with one simple command:
+    ```bash
+    docker compose up
+    ```
+    The backend will be configured using environment variables (see "Environment Variables" section), including any necessary API keys for travel services, ADK configurations, or Agent Engine settings.
+
+    The frontend should typically be available at `http://localhost:4200` (or as configured) and the backend API at `http://localhost:8080`.
+
+### Option 2: Manual Setup (for Development and Customization)
+
+Follow these steps if you prefer to run the frontend and backend services manually on your local machine.
+
+**A. Backend Setup**
+
+1.  **Navigate to the `backend/` directory.**
+    ```bash
+    cd backend
     ```
 
-2.  **Navigate to a Template Folder:**
-    Each template resides in its own directory within the `quickbot/` folder. For example:
+2.  **Create a virtual environment and install dependencies:**
     ```bash
-    cd quickbot/text-to-image-generation-template
+    # Check if you are already in an environment
+    pip -V
+
+    # If not, create and activate (for Linux/macOS)
+    python3 -m venv .venv
+    source .venv/bin/activate
+
+    # Install requirements
+    pip3 install -r requirements.txt
+    ```
+    > **VS Code Tip:** If VS Code doesn't recognize your virtual environment, press `Ctrl + Shift + P` (or `Cmd + Shift + P` on Mac), type "Python: Select Interpreter", choose "Enter interpreter path...", and then find and select `.venv/bin/python` inside your `backend` directory.
+
+3.  **Setup Google Cloud (`gcloud`) credentials (if applicable):**
+    If your backend, agents, or Agent Engine interact with GCP, ensure you're authenticated.
+    ```bash
+    gcloud auth login # Login with your user account
+    gcloud config set project <your-gcp-project-id> # If using a specific GCP project
+
+    # For services using Application Default Credentials (ADC) locally
+    gcloud auth application-default login
+    gcloud auth application-default set-quota-project <your-gcp-project-id> # If using a specific GCP project
+
+    # Verify configuration
+    gcloud auth list
+    gcloud config list project
     ```
 
-3.  **Set Up the Backend:**
-    * Navigate to the backend directory:
-        ```bash
-        cd backend
-        ```
-    * Create and activate a Python virtual environment:
-        ```bash
-        python3 -m venv .venv
-        source .venv/bin/activate
-        ```
-        *(For Windows: `.\.venv\Scripts\activate`)*
-    * Install dependencies:
-        ```bash
-        pip3 install -r requirements.txt
-        ```
-    * **Authenticate with Google Cloud:**
-        ```bash
-        gcloud auth login
-        gcloud config set project YOUR_PROJECT_ID
-        # Grant application default credentials access to your project for quota and billing
-        gcloud auth application-default set-quota-project YOUR_PROJECT_ID
-        ```
-        Replace `YOUR_PROJECT_ID` with your actual Google Cloud Project ID.
-    * **Environment Variables:**
-        Many templates require environment variables (e.g., API keys, project settings). These are typically managed in a `.local.env` file in the `backend/` directory. Create this file if it doesn't exist, based on any provided `.env.example` or documentation.
-        To load them (on Mac/Linux with bash/zsh):
-        ```bash
-        . ./local.env
-        ```
-        Or, for Linux, you might add them to your `activate` script within the virtual environment.
-    * **Run Setup Script (if applicable):**
-        Some templates may have a `setup.py` script to provision necessary cloud resources.
-        ```bash
-        python3 setup.py
-        ```
-    * **Run the Backend Application:**
-        ```bash
-        uvicorn main:app --reload --port 8080
-        ```
-        The backend API documentation (Swagger UI) will typically be available at `http://localhost:8080/docs`.
+4.  **Configure Environment Variables:**
+    Backend configuration is managed via environment variables. Create a `.local.env` file in the `backend/` directory (copy from `.local.env.example` if one exists). This file should be in `.gitignore`.
 
-4.  **Set Up the Frontend:**
-    * Navigate to the frontend directory (from the template's root):
+    *   **For Mac/Windows (or zsh console on Linux):**
+        Source the variables directly (from the `backend/` directory):
         ```bash
-        cd ../frontend
+        . ./.local.env
         ```
-    * Install dependencies:
-        ```bash
-        npm install
-        ```
-    * **Configure Environment (if needed):**
-        Frontend configurations, like backend URLs or Firebase settings, are usually in `src/environments/environment.ts` and `src/environments/environment.prod.ts`.
-    * **Run the Frontend Application:**
-        ```bash
-        npm start
-        ```
-        The frontend application will typically be available at `http://localhost:4200`.
+    *   **For Linux (bash):**
+        Open `backend/.venv/bin/activate` and append the `export` commands from your `backend/.local.env` file after the `PATH` export section. For example:
+        ```sh
+        # ... existing activate script content ...
+        _OLD_VIRTUAL_PATH="$PATH"
+        PATH="$VIRTUAL_ENV/bin:$PATH"
+        export PATH
 
+        # Quickbot env variables (copied from .local.env)
+        export ENVIRONMENT="development"
+        export FRONTEND_URL="http://localhost:4200"
+        # ADK, Agent Engine, and Travel API variables
+        # export ADK_CONFIG_PATH="/path/to/adk_config.json"
+        # export AGENT_ENGINE_ENDPOINT="http://localhost:xxxx/api/agent-engine" # Or other config
+        # export FLIGHT_API_KEY="your_flight_api_key"
+        # export HOTEL_API_KEY="your_hotel_api_key"
+        # export WEATHER_API_KEY="your_weather_api_key"
+        # ... other necessary agent or backend variables ...
+        ```
+    Verify the variables are set by running `env` in your activated terminal.
+
+5.  **Run the setup script (if applicable):**
+    This script might perform initial configurations for the ADK, Agent Engine, or agent registration.
+    ```bash
+    # from the backend/ directory
+    python3 setup.py
+    ```
+
+6.  **Run the backend application:**
+    ```bash
+    # from the backend/ directory
+    uvicorn main:app --reload --port 8080
+    ```
+
+**B. Frontend Setup**
+
+(These instructions assume a typical TypeScript/Angular frontend. Adjust as necessary based on your `frontend/README.md`.)
+
+1.  **Navigate to the `frontend/` directory.**
+    ```bash
+    cd frontend
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Environment Variables (if applicable):**
+    The frontend might require its own environment configuration (e.g., via a `.env` file or Angular's `environment.ts` files for API endpoints). Check the `frontend/` directory or its `README.md` for specific instructions.
+4.  **Run the frontend application:**
+    ```bash
+    npm start
+    # Or, for many Angular projects:
+    # ng serve
+    ```
+    The application will typically be available at `http://localhost:4200`.
 ## Authentication
 
 Quickbot templates can be integrated with **Firebase Authentication** for user sign-up, sign-in, and management. Configuration details for Firebase are typically found in the frontend's `src/environments/environment.ts` file. You can use existing Firebase projects or set up new ones to connect with your deployed agents.
@@ -215,7 +283,7 @@ For more detailed contribution guidelines, please refer to the `CONTRIBUTING.md`
 
 ## Feedback
 
-* **Found an issue or have a suggestion?** Please [raise an issue](https://github.com/GoogleCloudPlatform/quickbot/issues) on our GitHub repository.
+* **Found an issue or have a suggestion?** Please [raise an issue](https://github.com/GoogleCloudPlatform/generative-ai/issues) on our GitHub repository.
 * **Share your experience!** We'd love to hear about how you're using Quickbot or any success stories. Feel free to reach out to us at quick-bot-team@google.com or discuss in the GitHub discussions.
 
 ## Contributors
