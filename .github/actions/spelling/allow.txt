@@ -200,6 +200,7 @@ Hyperdisk
 ICICI
 ICML
 IFI
+ILB
 INFOPLIST
 INR
 IOMGR
@@ -708,6 +709,7 @@ drilldown
 drinkware
 dropdown
 dropna
+dshm
 dsl
 dsn
 dtype
@@ -898,6 +900,7 @@ jit
 jiwer
 jsonify
 jsonlines
+jsonpath
 jsonplus
 jupyter
 jvm
