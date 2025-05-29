@@ -23,27 +23,6 @@ STATIC_DIR = Path("static")
 session_service = InMemorySessionService()
 artifacts_service = InMemoryArtifactService()
 
-
-async def get_tools_async(server_params):
-    """Gets tools from MCP Server."""
-    tools, exit_stack = await MCPToolset.from_server(connection_params=server_params)
-    # MCP requires maintaining a connection to the local MCP Server.
-    # Using exit_stack to clean up server connection before exit.
-    return tools, exit_stack
-
-
-async def get_agent_async(server_params):
-    """Creates an ADK Agent with tools from MCP Server."""
-    tools, exit_stack = await get_tools_async(server_params)
-    root_agent = LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
-        name="ai_assistant",
-        instruction="You're a helpful assistant. Use tools to get information to answer user questions, please format your answer in markdown format.",
-        tools=tools,
-    )
-    return root_agent, exit_stack
-
-
 ct_server_params = StdioServerParameters(
     command="python",
     args=["./mcp_server/cocktail.py"],
