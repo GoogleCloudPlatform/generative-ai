@@ -5,7 +5,7 @@ This web application was developed using Google ADK (Agent Development Kit) and 
 Screenshot:
 
 ![ADK Screenshot](https://storage.googleapis.com/github-repo/generative-ai/gemini/mcp/adk_app.png)
-  
+
 This example demonstrates how you can chat with the app to retrieve cocktail details from [The Cocktail DB](https://www.thecocktaildb.com/) site using a local MCP server
 
 ## Create & Activate Virtual Environment (Recommended)
@@ -41,7 +41,7 @@ your_project_folder/  # Project folder
 
 Start the Fast API: Run the following command within the `adk_mcp_app` folder
 
-1. Create a .env file with the following contents:
+- Create a .env file with the following contents:
 
 ```sh
 # Choose Model Backend: 0 -> Gemini Developer API, 1 -> Vertex AI
@@ -55,7 +55,7 @@ GOOGLE_CLOUD_PROJECT="<your project id>"
 GOOGLE_CLOUD_LOCATION="us-central1"
 ```
 
-1. Run the below command to start the app:
+- Run the below command to start the app:
 
 ```bash
 uvicorn main:app --reload
