@@ -1,4 +1,5 @@
 AALR
+ADK
 ADMA
 AFX
 AGG
@@ -17,8 +18,11 @@ ASGI
 ASML
 AUVs
 Aadila
+Abhishek
 Afshaan
 Aktu
+Alibaba
+Anant
 Aphone
 Arborio
 Arepa
@@ -27,12 +31,14 @@ Arsan
 Artsakh
 Ashish
 Aspeed
+Atulan
 Autorater
 BIKBEAR
 BITCODE
 BYOR
 Benno
 Bettes
+Bhagwat
 Biden
 Bigtable
 Bitcoin
@@ -73,6 +79,7 @@ Connectez
 Cowabunga
 Crossbody
 D'orsay
+DCR
 DHH
 DLC
 DLCs
@@ -82,6 +89,7 @@ DRV
 DVDs
 DWMWA
 Daniil
+DataFrame
 Dedup
 DeepEval
 Depatmint
@@ -117,6 +125,7 @@ Esin
 Eventarc
 FAISS
 FAQs
+FHIR
 FIA
 FILEFLAGS
 FILEOS
@@ -184,12 +193,14 @@ Hlc
 Hmmm
 Hogwarts
 Homesley
+Hossein
 Hritik
 Hubmann
 Hyperdisk
 ICICI
 ICML
 IFI
+ILB
 INFOPLIST
 INR
 IOMGR
@@ -203,6 +214,7 @@ JAVACMD
 JDK
 JHome
 JPY
+Jaival
 Jax
 Jedi
 Jestem
@@ -210,6 +222,7 @@ Jhamtani
 Jiacheng
 Jianfeng
 Jibo
+Jincheol
 Joji
 Jolyon
 Junzhe
@@ -217,6 +230,7 @@ KFBI
 KNN
 KPIs
 KSA
+KYC
 Kaelen
 Kalamang
 Kamradt
@@ -227,6 +241,7 @@ Keanu
 Ketamine
 Khanh
 Kipchoge
+Koyel
 Kraizt
 Kubeflow
 Kvyat
@@ -247,6 +262,7 @@ LUVBPTK
 Ladhak
 Leventer
 Llion
+Lng
 Loghub
 Logrus
 Lopyrev
@@ -272,6 +288,7 @@ Mbappe
 Meawad
 Mega
 Meinl
+Meltem
 Memegen
 Merhaba
 Mesop
@@ -302,9 +319,11 @@ NREL
 NVIDIA
 NVL
 Nagasu
+Najim
 Nakoso
 Napisz
 Narnia
+Nihonga
 Niitsuma
 Nith
 Nominatim
@@ -342,8 +361,11 @@ Phaidon
 Phanfone
 Pharma
 Photoshop
+Pichai
 Pistorius
+Poirot
 Polong
+Porat
 Pranav
 Pré
 Pzk
@@ -368,6 +390,7 @@ Raikkonen
 Rajpurkar
 Reranking
 Resona
+Rivertown
 Rivia
 Rizzoli
 Robeco
@@ -399,6 +422,7 @@ Schlenoff
 Schulen
 Selam
 Sestero
+Sha'carri
 Shazeer
 Shenzhou
 Shklovsky
@@ -445,6 +469,7 @@ Terabyte
 Terabytes
 Testables
 Tetsuo
+Thallam
 Tianli
 Tianxiang
 Tongsheng
@@ -457,6 +482,7 @@ UDFs
 USERDATA
 USK
 UVX
+Ukiyo
 Unimicron
 Upserting
 Urs
@@ -486,9 +512,11 @@ Vettel
 Vijay
 Virat
 Viru
+Visualise
 WAI
 WAU
 WDIR
+WEBVTT
 WFH
 WNDCLASS
 WRatio
@@ -518,14 +546,17 @@ aaxis
 acall
 achat
 acomplete
+adk
 aexecute
 aextract
 afrom
 agentic
+agg
 ainit
 ainvoke
 aio
 aip
+airbnb
 airlume
 akka
 alisal
@@ -545,6 +576,7 @@ arun
 arxiv
 astype
 atms
+auc
 aujourd'hui
 autocal
 autoflake
@@ -558,12 +590,15 @@ avec
 aworkflow
 backticks
 bagchi
+bargap
 barmode
 barpolar
 baxis
+bayes
 bbc
 bbq
 beir
+bert
 bff
 bgswap
 bigframes
@@ -582,6 +617,7 @@ bqdf
 bqml
 breakroom
 btn
+byoc
 byod
 byor
 carbonara
@@ -591,6 +627,7 @@ caudatus
 caxis
 cce
 cctv
+cdiv
 cer
 cfbundle
 chatbots
@@ -601,6 +638,7 @@ cicd
 cimg
 ckpts
 claude
+clearbox
 clf
 clickable
 cloudrun
@@ -640,7 +678,6 @@ cycleways
 cygpath
 darkgrid
 dask
-dataframe
 datname
 dbadmin
 dbln
@@ -672,6 +709,7 @@ drilldown
 drinkware
 dropdown
 dropna
+dshm
 dsl
 dsn
 dtype
@@ -714,13 +752,16 @@ expl
 faiss
 fastapi
 fastmcp
+fastrtc
 fda
 fea
 fect
 fewshot
 ffi
 fibonacci
+figheight
 figsize
+figwidth
 fillmode
 fillna
 fiqa
@@ -756,6 +797,7 @@ gcloud
 gcp
 gcs
 gcsfs
+gcurl
 gdk
 gdkx
 geboten
@@ -839,6 +881,7 @@ inpaint
 iostream
 ipd
 iphoneos
+ipycanvas
 ipykernel
 ipynb
 isa
@@ -857,6 +900,7 @@ jit
 jiwer
 jsonify
 jsonlines
+jsonpath
 jsonplus
 jupyter
 jvm
@@ -873,6 +917,7 @@ konnte
 kotlin
 kpi
 kubectl
+kyc
 l'harmonie
 lakecolor
 landcolor
@@ -899,10 +944,12 @@ logprobs
 lolcat
 loras
 lparam
+lro
 lru
 lsb
 lxml
 lycra
+lyria
 magicoder
 magika
 mahut
@@ -957,6 +1004,7 @@ nas
 nbconvert
 nbfmt
 nbformat
+nbqa
 nbviewer
 nce
 ncols
@@ -987,6 +1035,7 @@ norigin
 notetaker
 novnc
 noxfile
+npx
 nrows
 ntheory
 nunique
@@ -1024,6 +1073,7 @@ payslip
 paystub
 pbxproj
 pcs
+pdflatex
 pdfminer
 pdfs
 petabytes
@@ -1071,7 +1121,9 @@ pypdf
 pyplot
 pysftp
 pytorch
+pytrec
 pyvis
+qas
 qna
 qqq
 qrel
@@ -1089,10 +1141,13 @@ rapideval
 rarian
 rarians
 ratelimit
+rawbytes
 rbc
 rbf
+recrawl
 reddit
 redef
+reidx
 rembg
 reoffice
 rephraser
@@ -1121,6 +1176,7 @@ scifact
 scikit
 seatback
 selectbox
+selfie
 selftext
 selkirk
 seo
@@ -1175,6 +1231,7 @@ tagline
 takeaways
 tastetest
 tavily
+telework
 tencel
 terabyte
 terabytes
@@ -1189,6 +1246,7 @@ tgi
 tgz
 thelook
 throug
+tickvals
 tiktoken
 timechart
 tion
@@ -1203,6 +1261,7 @@ traceloop
 treeah
 tritan
 trl
+tscore
 tseslint
 tsne
 tsv
@@ -1242,6 +1301,7 @@ vos
 votre
 vrtx
 vtotal
+vtt
 vulnz
 waterjet
 wcontext
@@ -1286,6 +1346,7 @@ xcscheme
 xctest
 xcvi
 xdg
+xelatex
 xlabel
 xmltodict
 xsi
@@ -1304,3 +1365,4 @@ yticks
 zakarid
 zaxis
 zimie
+zmin
