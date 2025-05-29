@@ -23,7 +23,7 @@ pip install .
 
 Project Structure
 
-```none
+```bash
 your_project_folder/  # Project folder
 |── adk_mcp_app
     ├── main.py
@@ -43,7 +43,7 @@ Start the Fast API: Run the following command within the `adk_mcp_app` folder
 
 - Create a .env file with the following contents:
 
-```sh
+```bash
 # Choose Model Backend: 0 -> Gemini Developer API, 1 -> Vertex AI
 GOOGLE_GENAI_USE_VERTEXAI=1
 
