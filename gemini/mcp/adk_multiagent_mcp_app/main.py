@@ -2,6 +2,7 @@
 Main function to run FastAPI server.
 """
 
+<<<<<<< HEAD
 import asyncio
 import contextlib
 from contextlib import asynccontextmanager
@@ -13,14 +14,28 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from google.adk.agents.llm_agent import LlmAgent
+=======
+import json
+import logging
+from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket
+from fastapi.staticfiles import StaticFiles
+from google.adk.agents import LlmAgent
+>>>>>>> test2
 from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 from google.genai import types
+<<<<<<< HEAD
 from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 
+=======
+from starlette.websockets import WebSocketDisconnect
+
+
+>>>>>>> test2
 # --- Configuration & Global Setup ---
 load_dotenv()
 
@@ -32,6 +47,7 @@ STATIC_DIR = "static"
 session_service = InMemorySessionService()
 artifacts_service = InMemoryArtifactService()
 
+<<<<<<< HEAD
 
 class AllServerConfigs(BaseModel):
     """
@@ -45,6 +61,8 @@ class AllServerConfigs(BaseModel):
     configs: Dict[str, StdioServerParameters]
 
 
+=======
+>>>>>>> test2
 # --- Server Parameter Definitions ---
 weather_server_params = StdioServerParameters(
     command="python",
@@ -58,6 +76,7 @@ bnb_server_params = StdioServerParameters(
     command="npx", args=["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"]
 )
 
+<<<<<<< HEAD
 server_configs_instance = AllServerConfigs(
     configs={
         "weather": weather_server_params,
@@ -65,6 +84,8 @@ server_configs_instance = AllServerConfigs(
         "ct": ct_server_params,
     }
 )
+=======
+>>>>>>> test2
 
 # --- Agent Instructions ---
 ROOT_AGENT_INSTRUCTION = """
@@ -82,6 +103,7 @@ ROOT_AGENT_INSTRUCTION = """
 """
 
 
+<<<<<<< HEAD
 # --- Tool Collection ---
 async def _collect_tools_stack(
     server_config_dict: AllServerConfigs,
@@ -165,6 +187,10 @@ async def _collect_tools_stack(
 async def create_agent_with_preloaded_tools(
     loaded_mcp_tools: Dict[str, Any],
 ) -> LlmAgent:
+=======
+# --- Agent Creation ---
+async def create_agent() -> LlmAgent:
+>>>>>>> test2
     """
     Creates the root LlmAgent and its sub-agents using pre-loaded MCP tools.
 
@@ -176,12 +202,15 @@ async def create_agent_with_preloaded_tools(
     Returns:
         An LlmAgent instance representing the root agent, configured with sub-agents.
     """
+<<<<<<< HEAD
     booking_tools = loaded_mcp_tools.get("bnb", [])
     weather_tools = loaded_mcp_tools.get("weather", [])
     combined_booking_tools = list(booking_tools)
     combined_booking_tools.extend(weather_tools)
     ct_tools = loaded_mcp_tools.get("ct", [])
 
+=======
+>>>>>>> test2
     booking_agent = LlmAgent(
         model=MODEL_ID,
         name="booking_assistant",
@@ -191,7 +220,14 @@ async def create_agent_with_preloaded_tools(
         Format your response using Markdown.
         If you don't know how to help, or none of your tools are appropriate for it,
         call the function "agent_exit" hand over the task to other sub agent.""",
+<<<<<<< HEAD
         tools=combined_booking_tools,
+=======
+        tools=[
+            MCPToolset(connection_params=bnb_server_params),
+            MCPToolset(connection_params=weather_server_params),
+        ],
+>>>>>>> test2
     )
 
     cocktail_agent = LlmAgent(
@@ -202,7 +238,11 @@ async def create_agent_with_preloaded_tools(
         Format your response using Markdown.
         If you don't know how to help, or none of your tools are appropriate for it,
         call the function "agent_exit" hand over the task to other sub agent.""",
+<<<<<<< HEAD
         tools=ct_tools,
+=======
+        tools=[MCPToolset(connection_params=ct_server_params)],
+>>>>>>> test2
     )
 
     root_agent = LlmAgent(
@@ -214,6 +254,7 @@ async def create_agent_with_preloaded_tools(
     return root_agent
 
 
+<<<<<<< HEAD
 # --- Agent Execution Helpers ---
 async def _run_agent_and_get_response(
     runner: Runner,
@@ -233,10 +274,16 @@ async def _run_agent_and_get_response(
         A list of strings, where each string is a part of the model's response.
     """
     logging.info("Running agent for session %s", session_id)
+=======
+async def process_message_with_runner(runner: Runner, session_id: str, question: str):
+    """Processes a single message using the provided runner."""
+    content = types.Content(role="user", parts=[types.Part(text=question)])
+>>>>>>> test2
     events_async = runner.run_async(
         session_id=session_id, user_id=session_id, new_message=content
     )
 
+<<<<<<< HEAD
     response_parts: List[str] = []
     async for event in events_async:
         try:
@@ -282,12 +329,29 @@ async def _get_runner_async(
         return ["Error: Essential tools not loaded, cannot process request."]
 
     root_agent = await create_agent_with_preloaded_tools(loaded_mcp_tools)
+=======
+    response_parts = []
+    async for event in events_async:
+        if event.content.role == "model" and event.content.parts[0].text:
+            print("[agent]:", event.content.parts[0].text)
+            response_parts.append(event.content.parts[0].text)
+
+    return response_parts
+
+
+async def run_adk_agent_session(
+    websocket: WebSocket, server_params: StdioServerParameters, session_id: str
+):
+    """Handles client-to-agent communication over WebSocket for a session."""
+    root_agent = await create_agent()
+>>>>>>> test2
     runner = Runner(
         app_name=APP_NAME,
         agent=root_agent,
         artifact_service=artifacts_service,
         session_service=session_service,
     )
+<<<<<<< HEAD
     response = await _run_agent_and_get_response(runner, session_id, content)
     return response
 
@@ -432,4 +496,76 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str) -> None:
 
 
 # Mount static files (e.g., for a web UI)
+=======
+    logging.info(f"Agent session started for {session_id} with runner and agent.")
+
+    try:
+        while True:
+            text = await websocket.receive_text()
+            logging.info(f"Received from {session_id}: {text}")
+            response_parts = await process_message_with_runner(runner, session_id, text)
+            if not response_parts:
+                continue
+            # Send the text to the client
+            ai_message = "\n".join(response_parts)
+            logging.info(
+                f"Sending to {session_id}: {ai_message[:100]}..."
+            )  # Log snippet
+            await websocket.send_text(json.dumps({"message": ai_message}))
+
+    except WebSocketDisconnect:
+        # This block executes when the client disconnects
+        logging.info(f"Client {session_id} disconnected.")
+    except Exception as e:
+        # Catch other potential errors in your agent logic
+        logging.error(f"Error in agent session for {session_id}: {e}", exc_info=True)
+    finally:
+        logging.info(f"Closing runner for session {session_id}...")
+        await runner.close()
+        logging.info(f"Runner closed for session {session_id}. Agent session ending.")
+
+
+# FastAPI web app
+
+app = FastAPI()
+
+STATIC_DIR = "static"  # Or your directory name
+
+
+@app.websocket("/ws/{session_id}")
+async def websocket_endpoint(
+    websocket: WebSocket, session_id: str
+):  # Use str for session_id
+    """Client websocket endpoint"""
+    await websocket.accept()
+    logging.info(f"Client #{session_id} connected and WebSocket accepted.")
+
+    try:
+        # Start agent session
+        # Ensure session is created before starting the agent task
+        await session_service.create_session(
+            app_name=APP_NAME, user_id=session_id, session_id=session_id, state={}
+        )
+        logging.info(f"ADK Session created for {session_id}.")
+
+        # Start agent communication task
+        await run_adk_agent_session(websocket, ct_server_params, session_id)
+
+    except WebSocketDisconnect:
+        # This might be redundant if run_adk_agent_session handles it,
+        # but good for logging the endpoint's perspective.
+        logging.info(f"WebSocket endpoint for {session_id} detected disconnect.")
+    except Exception as e:
+        # Catch any other unexpected error
+        logging.error(
+            f"!!! EXCEPTION in websocket_endpoint for session {session_id}: {e}",
+            exc_info=True,
+        )
+        if not websocket.client_state == websocket.client_state.DISCONNECTED:
+            await websocket.close(code=1011)  # Internal Error
+    finally:
+        logging.info(f"WebSocket endpoint for session {session_id} is concluding.")
+
+
+>>>>>>> test2
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

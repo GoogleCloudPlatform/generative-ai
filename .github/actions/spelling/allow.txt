@@ -21,6 +21,8 @@ Aadila
 Abhishek
 Afshaan
 Aktu
+Alibaba
+Anant
 Aphone
 Arborio
 Arepa
@@ -29,6 +31,7 @@ Arsan
 Artsakh
 Ashish
 Aspeed
+Atulan
 Autorater
 BIKBEAR
 BITCODE
@@ -197,6 +200,7 @@ Hyperdisk
 ICICI
 ICML
 IFI
+ILB
 INFOPLIST
 INR
 IOMGR
@@ -226,6 +230,7 @@ KFBI
 KNN
 KPIs
 KSA
+KYC
 Kaelen
 Kalamang
 Kamradt
@@ -236,6 +241,7 @@ Keanu
 Ketamine
 Khanh
 Kipchoge
+Koyel
 Kraizt
 Kubeflow
 Kvyat
@@ -256,6 +262,7 @@ LUVBPTK
 Ladhak
 Leventer
 Llion
+Lng
 Loghub
 Logrus
 Lopyrev
@@ -316,6 +323,7 @@ Najim
 Nakoso
 Napisz
 Narnia
+Nihonga
 Niitsuma
 Nith
 Nominatim
@@ -355,6 +363,7 @@ Pharma
 Photoshop
 Pichai
 Pistorius
+Poirot
 Polong
 Porat
 Pranav
@@ -473,6 +482,7 @@ UDFs
 USERDATA
 USK
 UVX
+Ukiyo
 Unimicron
 Upserting
 Urs
@@ -502,9 +512,11 @@ Vettel
 Vijay
 Virat
 Viru
+Visualise
 WAI
 WAU
 WDIR
+WEBVTT
 WFH
 WNDCLASS
 WRatio
@@ -539,6 +551,7 @@ aexecute
 aextract
 afrom
 agentic
+agg
 ainit
 ainvoke
 aio
@@ -563,6 +576,7 @@ arun
 arxiv
 astype
 atms
+auc
 aujourd'hui
 autocal
 autoflake
@@ -580,9 +594,11 @@ bargap
 barmode
 barpolar
 baxis
+bayes
 bbc
 bbq
 beir
+bert
 bff
 bgswap
 bigframes
@@ -611,6 +627,7 @@ caudatus
 caxis
 cce
 cctv
+cdiv
 cer
 cfbundle
 chatbots
@@ -621,6 +638,7 @@ cicd
 cimg
 ckpts
 claude
+clearbox
 clf
 clickable
 cloudrun
@@ -691,6 +709,7 @@ drilldown
 drinkware
 dropdown
 dropna
+dshm
 dsl
 dsn
 dtype
@@ -740,7 +759,9 @@ fect
 fewshot
 ffi
 fibonacci
+figheight
 figsize
+figwidth
 fillmode
 fillna
 fiqa
@@ -776,6 +797,7 @@ gcloud
 gcp
 gcs
 gcsfs
+gcurl
 gdk
 gdkx
 geboten
@@ -878,6 +900,7 @@ jit
 jiwer
 jsonify
 jsonlines
+jsonpath
 jsonplus
 jupyter
 jvm
@@ -894,6 +917,7 @@ konnte
 kotlin
 kpi
 kubectl
+kyc
 l'harmonie
 lakecolor
 landcolor
@@ -925,6 +949,7 @@ lru
 lsb
 lxml
 lycra
+lyria
 magicoder
 magika
 mahut
@@ -979,6 +1004,7 @@ nas
 nbconvert
 nbfmt
 nbformat
+nbqa
 nbviewer
 nce
 ncols
@@ -1095,7 +1121,9 @@ pypdf
 pyplot
 pysftp
 pytorch
+pytrec
 pyvis
+qas
 qna
 qqq
 qrel
@@ -1148,6 +1176,7 @@ scifact
 scikit
 seatback
 selectbox
+selfie
 selftext
 selkirk
 seo
@@ -1202,6 +1231,7 @@ tagline
 takeaways
 tastetest
 tavily
+telework
 tencel
 terabyte
 terabytes
@@ -1271,6 +1301,7 @@ vos
 votre
 vrtx
 vtotal
+vtt
 vulnz
 waterjet
 wcontext

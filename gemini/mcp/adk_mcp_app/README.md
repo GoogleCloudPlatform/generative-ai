@@ -18,7 +18,7 @@ source .venv/bin/activate
 ## Install ADK
 
 ```sh
-pip install google-adk fastapi
+pip install .
 ```
 
 Project Structure
@@ -31,6 +31,8 @@ your_project_folder/  # Project folder
     ├── mcp_server
     │   └── cocktail.py
     ├── README.md
+    ├── pyproject.toml
+    ├── uv.lock
     └── static
         └── index.html
 ```
