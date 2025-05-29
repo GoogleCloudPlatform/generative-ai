@@ -113,11 +113,6 @@ async def run_adk_agent_session(
     except WebSocketDisconnect:
         # This block executes when the client disconnects
         logging.info(f"Client {session_id} disconnected.")
-    except Exception as e:
-        # Catch other potential errors in your agent logic
-        logging.error(
-            f"Error in agent session for {session_id}: {e}", exc_info=True
-        )
     finally:
         logging.info(f"Closing runner for session {session_id}...")
         await runner.close()
@@ -154,14 +149,6 @@ async def websocket_endpoint(
         # This might be redundant if run_adk_agent_session handles it,
         # but good for logging the endpoint's perspective.
         logging.info(f"WebSocket endpoint for {session_id} detected disconnect.")
-    except Exception as e:
-        # Catch any other unexpected error
-        logging.error(
-            f"!!! EXCEPTION in websocket_endpoint for session {session_id}: {e}",
-            exc_info=True,
-        )
-        if not websocket.client_state == websocket.client_state.DISCONNECTED:
-            await websocket.close(code=1011) # Internal Error
     finally:
         logging.info(f"WebSocket endpoint for session {session_id} is concluding.")
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

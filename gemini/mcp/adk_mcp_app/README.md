@@ -6,7 +6,7 @@ Screenshot:
 
 ![ADK Screenshot](https://storage.googleapis.com/github-repo/generative-ai/gemini/mcp/adk_app.png)
   
-This example demonstrates how you can chat with the app to retrieve cocktail details from [The Cocktail DB](https://www.thecocktaildb.com/) website using a local MCP server
+This example demonstrates how you can chat with the app to retrieve cocktail details from [The Cocktail DB](https://www.thecocktaildb.com/) site using a local MCP server
 
 ## Create & Activate Virtual Environment (Recommended)
 
