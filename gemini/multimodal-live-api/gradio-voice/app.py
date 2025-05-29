@@ -12,7 +12,7 @@ from google.genai.types import (
     VoiceConfig,
 )
 import gradio as gr
-from gradio_webrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_16bit
+from fastrtc import AsyncStreamHandler, WebRTC, async_aggregate_bytes_to_16bit
 import numpy as np
 
 current_dir = pathlib.Path(__file__).parent
@@ -41,7 +41,7 @@ class GeminiHandler(AsyncStreamHandler):
     def copy(self) -> "GeminiHandler":
         """Required implementation of the copy method for AsyncStreamHandler"""
         return GeminiHandler(
-            expected_layout=self.expected_layout,
+            expected_layout=self.expected_layout, # type: ignore
             output_sample_rate=self.output_sample_rate,
             output_frame_size=self.output_frame_size,
         )
@@ -71,7 +71,7 @@ class GeminiHandler(AsyncStreamHandler):
                     )
                 )
             ),
-            system_instruction=Content(parts=[Part.from_text(text=system_instruction)]),
+            system_instruction=Content(parts=[Part.from_text(text=system_instruction)]), # type: ignore
         )
         async with client.aio.live.connect(
             model="gemini-2.0-flash-live-preview-04-09", config=config
@@ -153,7 +153,7 @@ with gr.Blocks(css=css) as demo:
             mode="send-receive",
             # See for changes needed to deploy behind a firewall
             # https://fastrtc.org/deployment/
-            rtc_configuration=None,
+            rtc_configuration={},
         )
 
         webrtc.stream(
