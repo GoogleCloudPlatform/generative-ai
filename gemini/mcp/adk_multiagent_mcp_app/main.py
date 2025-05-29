@@ -20,7 +20,7 @@ from starlette.websockets import WebSocketDisconnect
 load_dotenv()
 
 APP_NAME = "ADK MCP App"
-MODEL_ID = "gemini-2.0-flash"
+MODEL_ID = "gemini-2.5-flash-preview-05-20"
 STATIC_DIR = "static"
 
 # Initialize services (globally or via dependency injection)

@@ -38,7 +38,7 @@ def create_agent(server_params: StdioServerParameters):
      - Please format your response using Markdown to make it easy to read and understand.
     """
     root_agent = LlmAgent(
-        model="gemini-2.0-flash",  # "gemini-2.5-pro-preview-05-06"
+        model="gemini-2.5-flash-preview-05-20",  
         name="ai_assistant",
         instruction=agent_instruction,
         tools=[MCPToolset(connection_params=server_params)],
