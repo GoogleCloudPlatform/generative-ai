@@ -10,14 +10,14 @@ This example demonstrates how you can chat with the app to retrieve cocktail det
 
 ## Create & Activate Virtual Environment (Recommended)
 
-```sh
+```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
 ## Install ADK
 
-```sh
+```bash
 pip install .
 ```
 
@@ -57,6 +57,6 @@ GOOGLE_CLOUD_LOCATION="us-central1"
 
 1. Run the below command to start the app:
 
-```sh
+```bash
 uvicorn main:app --reload
 ```
