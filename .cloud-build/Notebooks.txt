@@ -30,4 +30,4 @@ generative-ai/gemini/use-cases/document-processing/document_processing.ipynb
 generative-ai/gemini/use-cases/education/use_cases_for_education.ipynb
 generative-ai/gemini/use-cases/spatial-understanding/spatial_understanding.ipynb
 generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb
-generative-ai/vision/getting-started/imagen3_image_generation.ipynb
+generative-ai/vision/getting-started/imagen4_image_generation.ipynb
