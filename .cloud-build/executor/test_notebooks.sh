@@ -21,12 +21,14 @@ total_count=0
 successful_notebooks=()
 successful_count=0
 
+declare -A notebook_ops
+
 for x in $TARGET; do
   total_count=$((total_count + 1))
   # Use the full path from the repository for display name
   DISPLAY_NAME="${x##generative-ai/}"
   DISPLAY_NAME="${DISPLAY_NAME%.ipynb}-$current_date-$current_time"
-  echo "Starting execution for ${x}"
+  echo "Launching async execution for ${x}"
 
   # Execute and get the operation ID
   OPERATION_ID=$(gcloud colab executions create \
@@ -37,37 +39,36 @@ for x in $TARGET; do
     --project="$PROJECT_ID" \
     --region="$REGION" \
     --service-account="$SA" \
-    --verbosity=debug \
     --execution-timeout="1h30m" \
-    --format="value(name)")
+    --format="value(name)" \
+    --async)
 
   echo "Operation ID: $OPERATION_ID"
   TRUNCATED_OPERATION_ID=$(echo "$OPERATION_ID" | cut -c 67-85)
+  notebook_ops["$TRUNCATED_OPERATION_ID"]="$x"
+done
 
-  # check job status
-  echo "Waiting for execution to complete..."
-  if ! EXECUTION_DETAILS=$(gcloud colab executions describe "$TRUNCATED_OPERATION_ID" --region="$REGION"); then
-    echo "Error describing execution for ${x}. See logs for details."
-    failed_count=$((failed_count + 1))
-    failed_notebooks+=("${x}")
-    continue
-  else
-    echo "Execution completed for ${x}"
-  fi
+# Wait and collect results
+for op_id in "${!notebook_ops[@]}"; do
+  notebook="${notebook_ops[$op_id]}"
+  echo "Checking status for $notebook (operation ID: $op_id)"
+
+  until EXECUTION_DETAILS=$(gcloud colab executions describe "$op_id" --region="$REGION" 2>/dev/null); do
+    echo "Waiting for operation $op_id..."
+    sleep 10
+  done
 
   # Check the jobState
   JOB_STATE=$(echo "$EXECUTION_DETAILS" | grep "jobState:" | awk '{print $2}')
   if [[ "$JOB_STATE" == "JOB_STATE_SUCCEEDED" ]]; then
-    echo "Notebook execution succeeded."
+    echo "Notebook $notebook succeeded."
     successful_count=$((successful_count + 1))
-    successful_notebooks+=("${x}")
+    successful_notebooks+=("$notebook")
   else
-    echo "Notebook execution failed. Job state: $JOB_STATE. Please use id $TRUNCATED_OPERATION_ID to troubleshoot notebook ${x}. See log for details."
+    echo "Notebook $notebook failed. Job state: $JOB_STATE"
     failed_count=$((failed_count + 1))
-    failed_notebooks+=("${x}")
-    continue
+    failed_notebooks+=("$notebook")
   fi
-
 done
 
 # Print the final list of failed notebooks
