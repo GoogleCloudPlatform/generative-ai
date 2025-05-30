@@ -39,6 +39,7 @@ for x in $TARGET; do
     --project="$PROJECT_ID" \
     --region="$REGION" \
     --service-account="$SA" \
+    --verbosity=debug \
     --execution-timeout="1h30m" \
     --format="value(name)" \
     --async)
