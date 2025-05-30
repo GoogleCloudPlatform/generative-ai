@@ -64,3 +64,4 @@
 /generative-ai/vision/use-cases/hey_llm                                                                                          @GoogleCloudPlatform/generative-ai-devrel @tushuhei
 /generative-ai/search/custom-ranking/clearbox.ipynb                                                                              @GoogleCloudPlatform/generative-ai-devrel @andrei-papou
 /generative-ai/search/ranking-api/ranking_api_beir_evaluation.ipynb                                                              @GoogleCloudPlatform/generative-ai-devrel @puebster
+/generative-ai/genkit/genkit-python-gemini-2-0-chat-app-example                                                                  @GoogleCloudPlatform/generative-ai-devrel @molliemarie
