@@ -1139,6 +1139,7 @@ quadrotor
 qubit
 qubits
 quippy
+qwen
 rag
 ragas
 ragdemos
