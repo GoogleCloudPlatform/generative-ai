@@ -3,6 +3,8 @@
 
 This is an example of a simple chat webapp that uses the Gemini 2.0 Flash model and the Vertex AI SDK. 
 
+Author: [Mollie Pettit](https://github.com/molliemarie)
+
 ## The context
 
 You are a developer at a travel marketing company, and your sales department has decided that they need a new chat application to keep up with the bigger booking and search companies. They’ve also heard about generative AI, but they don’t know that much about it other than they’ve seen it do some trip generation in videos. Other departments have heard about this initiative, and they’re curious how this might also help their customer experience.
