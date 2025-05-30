@@ -54,7 +54,7 @@ for x in $TARGET; do
     continue
   fi
 
-  TRUNCATED_OPERATION_ID=$(echo "$OPERATION_ID" | cut -c 67-85)
+  TRUNCATED_OPERATION_ID=$(echo "$OPERATION_ID_FULL" | cut -c 67-85)
 
   echo "Launched execution for ${x}, Operation ID: $TRUNCATED_OPERATION_ID (Full Name: $OPERATION_ID_FULL)"
   launched_operation_details+=("$TRUNCATED_OPERATION_ID:${x}")
