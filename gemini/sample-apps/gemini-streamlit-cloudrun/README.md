@@ -2,9 +2,10 @@
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
 
-|           |                                                                                                |
-| --------- | ---------------------------------------------------------------------------------------------- |
-| Author(s) | [Lavi Nigam](https://github.com/lavinigam-gcp), [Holt Skinner](https://github.com/holtskinner) |
+| Authors                                        |
+|------------------------------------------------|
+| [Lavi Nigam](https://github.com/lavinigam-gcp) |
+| [Holt Skinner](https://github.com/holtskinner) |
 
 This application demonstrates a Cloud Run application that uses the [Streamlit](https://streamlit.io/) framework.
 
