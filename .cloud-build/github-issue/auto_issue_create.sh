@@ -2,9 +2,9 @@
 
 ISSUE_TITLE="Failed automated Notebook Testing"
 ISSUE_LABELS="bug"
-ISSUE_ASSIGNEES="CadillacBurgess1"
-REPO_OWNER="CadillacBurgess1"
-REPO_NAME="example-notebook-testing-repo"
+# ISSUE_ASSIGNEES="CadillacBurgess1"
+REPO_OWNER="GoogleCloudPlatform"
+REPO_NAME="generative-ai"
 FAILURE_FILE="/workspace/Failure.txt"
 
 if [ -f "$FAILURE_FILE" ]; then
