@@ -1,14 +1,14 @@
-import streamlit as st
 from google import genai
 from google.genai import types
+import streamlit as st
 
 # --- Defining parameters ---
 REGION = "us-west1"
-PROJECT_NAME = None # TO DO: INSERT PROJECT NAME
+PROJECT_NAME = None  # TO DO: INSERT PROJECT NAME
 GEMINI_MODEL_NAME = "gemini-2.0-flash-001"
 
 max_output_tokens = 8192
-temperature = .2
+temperature = 0.2
 top_p = 0.95
 
 system_instructions = """
@@ -45,9 +45,9 @@ You are a sophisticated travel assistant chatbot designed to provide comprehensi
 *   **Confidentiality:** Respect user privacy and handle personal information with the utmost confidentiality and in compliance with data protection regulations.
 **Example Interactions:**
 **User:** "I want to go on a beach vacation in the Caribbean. I have a budget of $2000 per person for a week."
-**Chatbot:** "Certainly! The Caribbean offers many beautiful beach destinations within your budget. Some popular options include Punta Cana in the Dominican Republic, Cancun in Mexico, and Montego Bay in Jamaica. These destinations offer stunning beaches, all-inclusive resorts, and various activities. Would you like me to search for flights and accommodations for these locations based on your travel dates?"
+**Chatbot:** "Certainly! The Caribbean offers many beautiful beach destinations within your budget. Some popular options include Punta Cana in the Dominican Republic and Cancun in Mexico. These destinations offer stunning beaches, all-inclusive resorts, and various activities. Would you like me to search for flights and accommodations for these locations based on your travel dates?"
 **User:** "My flight is delayed. What should I do?"
-**Chatbot:** "I'm sorry to hear about the delay. Please check with the airline for the updated departure time and any assistance they can offer. You may be entitled to compensation or rebooking options depending on the length of the delay and the airline's policy. Do you have your flight number handy so I can look up the current status for you?"
+**Chatbot:** "I'm sorry to hear about the delay. Please check with the airline for the updated departure time and any assistance they can offer. You may be entitled to compensation or re-booking options depending on the length of the delay and the airline's policy. Do you have your flight number handy so I can look up the current status for you?"
 **User:** "Tell me about the best time to visit Japan."
 **Chatbot:** "Japan is a fantastic destination with distinct seasons offering unique experiences. Spring (March-May) is famous for the beautiful cherry blossoms, while autumn (September-November) boasts stunning fall foliage. Both seasons have pleasant temperatures, making them ideal for sightseeing. Summer (June-August) can be hot and humid, but it's a great time for festivals and outdoor activities in the mountains. Winter (December-February) offers opportunities for skiing and snowboarding in the Japanese Alps, though some areas may experience heavy snowfall. To recommend the best time for you, could you tell me what you'd like to experience in Japan?"
 By following these instructions, you will be able to provide exceptional travel assistance and create a positive experience for every user.
@@ -60,25 +60,25 @@ client = genai.Client(
     location=REGION,
 )
 # --- Call the Model ---
-def call_model(prompt: str, model_name: str = None, system_instructions: str = None) -> str:
+def call_model(
+    prompt: str, model_name: str = None, system_instructions: str = None
+) -> str:
     """
-    This function interacts with a large language model (LLM) to generate text based on a given prompt and system instructions. 
-    It initializes a connection to the Gemini API, sends the prompt and configuration parameters 
-    (including temperature, top_p, output token limit, and system instructions) to the specified model, 
+    This function interacts with a large language model (LLM) to generate text based on a given prompt and system instructions.
+    It initializes a connection to the Gemini API, sends the prompt and configuration parameters
+    (including temperature, top_p, output token limit, and system instructions) to the specified model,
     and returns the generated text response. If any error occurs during the process, it returns an error message.
     """
     try:
         # Defining contents
         contents = [prompt]
 
-        #Initialize a confiburation object
+        # Initialize a confiburation object
         generate_content_config = types.GenerateContentConfig(
             temperature=temperature,
             top_p=top_p,
             max_output_tokens=max_output_tokens,
-            system_instruction=[
-                types.Part.from_text(text=system_instructions)
-            ],
+            system_instruction=[types.Part.from_text(text=system_instructions)],
         )
         # Define the response that will be returned to the user
         response = client.models.generate_content(
