@@ -6,6 +6,12 @@ Quickbot Conversational App Template is a powerful conversational application. I
 
 This project allows users to interact with a conversational agent. The backend uses a custom Google Cloud Function (e.g., `process-query-for-playbook`) for advanced information retrieval and generation, which is then integrated into a conversational flow managed by a Vertex AI Conversation agent and a single, configurable playbook. This README guides you through setting up the necessary cloud infrastructure (primarily the Cloud Function) and then running both the frontend and backend components.
 
+## Demo
+
+A quick demonstration of the Single Playbook Template:
+
+![Single Playbook Demo](./assets/quickbot-single-playbook.png)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

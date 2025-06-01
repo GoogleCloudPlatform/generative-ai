@@ -6,6 +6,12 @@ QuickBot Website Search Template is a powerful website search application. It fe
 
 This project allows users to perform intelligent searches over website content. The backend uses a custom Google Cloud Function (e.g., `create-intent-index`) for processing website data, generating embeddings, and managing the search index. This README guides you through setting up the necessary cloud infrastructure (primarily the Cloud Function) and then running both the frontend and backend components.
 
+## Demo
+
+See the Website Search Template in action, learning from a live website:
+
+![Website Search Demo](./assets/quickbot-website-search.png)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

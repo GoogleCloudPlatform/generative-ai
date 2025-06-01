@@ -7,6 +7,14 @@ This Template is taken from the official [Agent Garden samples](https://github.c
 
 This project provides an advanced framework for a travel concierge service powered by a multi-agent system. By utilizing an Agent Development Kit (ADK), developers can easily create, deploy, and manage specialized agents (e.g., for flights, accommodations, local activities, transportation, real-time alerts). The core Agent Engine orchestrates these agents, enabling them to collaborate and intelligently respond to user needs, offering personalized recommendations and proactive support. The architecture is designed with a decoupled frontend and backend, ensuring scalability and maintainability for a rich user experience.
 
+## Demo
+Here's a look at our Travel Concierge MultiAgent in action!
+
+<video controls autoplay loop muted width="100%" style="max-width: 1200px;">
+<source src="./assets/quickbot-adk-travel-multiagent.mp4" type="video/mp4">
+Your browser does not support the video tag. You can <a href="./assets/quickbot-adk-travel-multiagent.mp4">download the video here</a>.
+</video>
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

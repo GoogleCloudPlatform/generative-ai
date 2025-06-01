@@ -6,6 +6,12 @@ Quickbot Conversational App Template is a powerful conversational application. I
 
 This project allows users to interact with a conversational agent. The backend uses a custom Google Cloud Function (e.g., `process-query-for-rag`) for advanced information retrieval and generation. This RAG capability is integrated into conversational flows managed by a Vertex AI Conversation agent, which can orchestrate interactions across various playbooks. This README guides you through setting up the necessary cloud infrastructure (primarily the RAG Cloud Function) and then running the frontend, backend, and configuring the Agent Builder components.
 
+## Demo
+
+Watch how the Multi Playbook Template routes to specialized chatbots:
+
+![Multi Playbook Demo](./assets/quickbot-multi-playbook.png)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
