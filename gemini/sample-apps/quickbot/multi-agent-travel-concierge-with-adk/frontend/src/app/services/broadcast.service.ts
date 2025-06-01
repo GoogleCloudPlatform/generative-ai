@@ -26,7 +26,7 @@ export class BroadcastService {
   chatQuery$: BehaviorSubject<Message>;
 
   constructor() {
-    this.chatQuery$  = new BehaviorSubject<Message>({'type': 'bot', 'contentParts': [{'text':'Ask me anything!','type':'text'}], shareable: false,});
+    this.chatQuery$  = new BehaviorSubject<Message>({'type': 'bot', 'contentParts': [{'text':'Ask me anything and start your journey! 🚀🚀🚀','type':'text'}], shareable: false,});
   }
 
   nextChatQuery(chatQuery: Message) {

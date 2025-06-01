@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from src.repository.big_query import BigQueryRepository, CHATS_TABLE, CHATS_ID_COLUMN
+from src.repository.big_query import BigQueryRepository, CHATS_TABLE
 from src.model.chats import Chat
+import datetime
 
 class ChatsService:
 
@@ -21,5 +22,22 @@ class ChatsService:
         self.repository = BigQueryRepository()
 
     def insert_chat(self, chat: Chat):
-        values = chat.to_insert_string()
-        self.repository.insert_row(CHATS_TABLE, values)
+        schema_fields = Chat.__schema__()
+        column_names = [field.name for field in schema_fields]
+
+        # Prepare values as a tuple, matching the order of schema_fields
+        # If chat.timestamp is None, we'll insert the current UTC time.
+        # BigQueryRepository will handle the Python datetime object.
+        timestamp_value = chat.timestamp if chat.timestamp else datetime.datetime.now(datetime.timezone.utc)
+
+        # Ensure the order here matches the order in Chat.__schema__
+        values_tuple = (
+            chat.id,
+            chat.question,
+            chat.answer,
+            chat.intent,
+            chat.suggested_questions,
+            timestamp_value
+        )
+
+        self.repository.insert_row(CHATS_TABLE, column_names, values_tuple)

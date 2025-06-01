@@ -18,7 +18,6 @@ import logging
 
 from fastapi import APIRouter
 from fastapi import BackgroundTasks
-from fastapi import Response  # This import is no longer needed if POST is removed
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 from vertexai import agent_engines
@@ -46,23 +45,25 @@ async def websocket_chat(
     background_tasks: BackgroundTasks,
 ):
     await websocket.accept()
-    # Create a new session for this WebSocket connection
-    # This session will be used for the lifetime of this connection.
-    intent = get_default_intent()  # General intent for the connection
-    remote_agent_resource_id = intent.remote_agent_resource_id
-    remote_agent = agent_engines.get(remote_agent_resource_id)
-    print(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
-    logging.info(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
-
-    agent_session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
-    active_session_id = agent_session["id"]
-    print(f"Created new agent session for WebSocket connection: {active_session_id}")
-    logging.info(f"Created new agent session for WebSocket connection: {active_session_id}")
-
-    # Notify client that the session has started, without sending the session ID
-    await websocket.send_json({"operation": "start"})
+    active_session_id = "N/A (or setup phase)"
 
     try:
+        # Create a new session for this WebSocket connection
+        # This session will be used for the lifetime of this connection.
+        intent = get_default_intent()  # General intent for the connection
+        remote_agent_resource_id = intent.remote_agent_resource_id
+        remote_agent = agent_engines.get(remote_agent_resource_id)
+        print(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
+        logging.info(f"WebSocket connected. Agent resource: {remote_agent_resource_id}")
+
+        agent_session = remote_agent.create_session(user_id=DEFAULT_USER_ID)
+        active_session_id = agent_session["id"]
+        print(f"Created new agent session for WebSocket connection: {active_session_id}")
+        logging.info(f"Created new agent session for WebSocket connection: {active_session_id}")
+
+        # Notify client that the session has started, without sending the session ID
+        await websocket.send_json({"operation": "start"})
+
         while True:
             try:
                 item_json = await asyncio.wait_for(
