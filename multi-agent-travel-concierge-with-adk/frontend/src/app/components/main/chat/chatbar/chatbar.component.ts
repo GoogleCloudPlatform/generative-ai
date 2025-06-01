@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-// /usr/local/google/home/switon/dev/quick-bot-app/multi-agent-skeleton/frontend/src/app/components/main/chat/chatbar/chatbar.component.ts
 import { Component, EventEmitter, Output, OnDestroy, OnInit } from '@angular/core';
 import { ChatService, ServerMessage, ConnectionStatus } from 'src/app/services/chat.service';
 import { UserService } from 'src/app/services/user/user.service';
@@ -27,7 +26,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { animate, sequence, state, style, transition, trigger } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SpeechToTextService } from 'src/app/services/speech-to-text';
-// Import MessageContentPart and ThinkingStep
 import { Message, SuggestionData, ThinkingStep, MessageContentPart } from 'src/app/models/messegeType.model';
 import { environment } from 'src/environments/environment';
 
@@ -72,7 +70,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
 
   isSuggestedQuestion: string = '';
   chatQuery: string = '';
-  chatQuery$: Observable<Message>;
+  // chatQuery$: Observable<Message>;
   showLoader: boolean = false;
   startTimer: boolean = false;
   conversation: Message[] = [];
@@ -122,6 +120,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
 
   private currentConnectionStatus: ConnectionStatus = 'disconnected';
   private currentBotMessage: Message | null = null;
+  private pendingUserMessageFromBroadcast: Message | null = null;
 
   constructor(private router: Router,
               public dialog: MatDialog,
@@ -132,17 +131,24 @@ export class ChatbarComponent implements OnInit, OnDestroy {
               private _snackBar: MatSnackBar,
               private speechToTextService: SpeechToTextService,
   ) {
-    this.chatQuery$ = this.broadcastService.chatQuery$;
-    this.chatQuery$.pipe(takeUntil(this.destroyed)).subscribe((value: Message) => {
-      if (value && value.type === 'user' && value.contentParts[0].text) { // Ensure body exists for user messages
-        this.conversation.unshift(value);
-        if (this.currentConnectionStatus === 'connected' || this.currentConnectionStatus === 'processing_complete') {
-          this.chatService.sendMessage(value.contentParts[0].text);
-        } else {
-          console.warn("Broadcast message received, but WebSocket not in a ready state to send immediately. Ensure connect() is called.");
+    this.broadcastService.chatQuery$.pipe(takeUntil(this.destroyed)).subscribe((latestMessage: Message) => {
+      const isInitialBotGreetingFromService = latestMessage.type === 'bot' && latestMessage.contentParts[0]?.text === 'Ask me anything and start your journey! 🚀🚀🚀';
+
+      if (latestMessage.type === 'user' && latestMessage.contentParts[0]?.text) {
+        console.log("ChatbarComponent: Received user message via broadcast/initial value.", latestMessage);
+        // If it's a user message, it takes precedence.
+        // Add to UI if not already the head of the conversation
+        if (this.conversation.length === 0 || this.conversation[0] !== latestMessage) {
+            this.conversation.unshift(latestMessage);
         }
-      } else if (value) { // Handle other broadcasted message types if necessary
-        this.conversation.push(value);
+        this.pendingUserMessageFromBroadcast = latestMessage;
+        this.processPendingUserMessage(); // Attempt to process
+      } else if (isInitialBotGreetingFromService) {
+        // This is the default greeting from BroadcastService.
+        // Add it only if the conversation is empty (i.e., no user message took precedence).
+        if (this.conversation.length === 0) {
+            this.conversation.push(latestMessage);
+        }
       }
     });
     this.loaderText = this.loaderTextArray[Math.floor(Math.random() * this.loaderTextArray.length)];
@@ -162,16 +168,46 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     this.chatService.close("ChatbarComponent destroyed");
   }
 
+  private processPendingUserMessage(): void {
+    if (!this.pendingUserMessageFromBroadcast || !this.pendingUserMessageFromBroadcast.contentParts[0]?.text) {
+      return; // No pending message or message is empty
+    }
+
+    const queryToSend = this.pendingUserMessageFromBroadcast.contentParts[0].text;
+
+    if (this.currentConnectionStatus === 'connected' || this.currentConnectionStatus === 'processing_complete') {
+      console.log("ChatbarComponent: Processing pending user message via WebSocket.", queryToSend);
+
+      this.outOfContextAnswerResponseObject = { like: false, dislike: false };
+      this.removeSuggestionElement();
+
+      this.showLoader = true;
+      this.loaderText = "Sending your message...";
+      this.setTimeoutForLoaderText();
+      this.setCyclicBackgroundImages();
+      this.botStartTime = new Date().getTime();
+      this.pushQuestion(queryToSend);
+      this.currentBotMessage = null;
+
+      this.chatService.sendMessage(queryToSend);
+      this.pendingUserMessageFromBroadcast = null; // Clear after sending
+
+      this.scrollToBottom();
+    } else {
+      console.warn(`ChatbarComponent: Pending user message "${queryToSend}" cannot be sent yet. WS status: ${this.currentConnectionStatus}`);
+      // If disconnected, error, or aborted, and not already trying to connect, attempt to connect.
+      // chatService.connect() has internal guards against multiple simultaneous connection attempts.
+      if (this.currentConnectionStatus === 'disconnected' || this.currentConnectionStatus === 'error' || this.currentConnectionStatus === 'aborted') {
+         console.log("ChatbarComponent: Attempting to (re)connect to send pending message.");
+         this.chatService.connect();
+      }
+      // If 'connecting' or 'reconnecting', we just wait for the status update to trigger this method again.
+    }
+  }
+
   public getPlaceDisplayUrl(place: any): string {
-    // if (place && place.image_url) {
-    //   return place.image_url; // Prioritize the provided image_url
-    // }
-    
-    // Fallback to Unsplash Source if no image_url or if it's empty
-    // Use keywords from place_name. Adjust dimensions (100x100) as needed.
     const keywords = place.place_name.split(' ').join(',').toLowerCase();
     return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(keywords)}&zoom=14&size=200x200&key=${environment.googleMapsApiKey}`;
-    
   }
 
   private subscribeToConnectionStatus(): void {
@@ -194,7 +230,8 @@ export class ChatbarComponent implements OnInit, OnDestroy {
             break;
           case 'connected':
             this.loaderText = "Connection established. Assistant is ready.";
-            if (!this.showLoader) {
+            this.processPendingUserMessage(); // Send any pending message
+            if (!this.showLoader && !this.pendingUserMessageFromBroadcast) {
               this.isChatDisabled = false;
             }
             break;
@@ -203,6 +240,8 @@ export class ChatbarComponent implements OnInit, OnDestroy {
             this.clearTimeoutForLoaderText();
             this.loaderText = "Assistant is ready for your next message.";
             this.isChatDisabled = false;
+            this.currentBotMessage = null; // Ready for new interaction
+            this.processPendingUserMessage();
             // currentBotMessage is finalized when 'end_of_turn' is received
             break;
           case 'closed_by_server':
@@ -211,7 +250,7 @@ export class ChatbarComponent implements OnInit, OnDestroy {
           case 'aborted':
             this.showLoader = false;
             this.clearTimeoutForLoaderText();
-            if (status === 'disconnected' && this.conversation.length > 0 && this.conversation[0]?.type === 'user' && !this.showLoader) {
+            if (status === 'disconnected' && this.conversation.length > 0 && this.conversation[0]?.type === 'user' && !this.showLoader && !this.pendingUserMessageFromBroadcast) {
               this.setErrorMessage("Connection lost. Please try sending your message again.");
             } else if (status === 'closed_by_server') {
               this.loaderText = "Connection closed by server.";
@@ -225,6 +264,8 @@ export class ChatbarComponent implements OnInit, OnDestroy {
             this.setErrorMessage("An error occurred with the connection.");
             this.isChatDisabled = false;
             this.currentBotMessage = null;
+            // processPendingUserMessage might try to reconnect if a message is pending
+            this.processPendingUserMessage();
             break;
         }
       });
@@ -235,14 +276,13 @@ export class ChatbarComponent implements OnInit, OnDestroy {
       next: (serverMessage: ServerMessage) => {
         console.log("ChatbarComponent - Received Server Message:", serverMessage);
 
-        if (serverMessage.operation === 'start') {
-          if (this.showLoader) { // A user query is active
+        // 'start' means the backend session is ready.
+        if (serverMessage.operation === 'start') { // No active user query
+          if (this.showLoader && !this.botStartTime && !this.pendingUserMessageFromBroadcast) {
             this.loaderText = "Ask a question and start your journey! 🚀🚀🚀";
             this.setCyclicBackgroundImages();
-          } else { // Auto-connected, no active query
-            this.loaderText = "Assistant is ready.";
-            this.showLoader = false;
-            this.isChatDisabled = false;
+          } else if (this.showLoader){ // A user query is active or was just sent
+            this.loaderText = "Waiting for assistant's response...";
           }
           this.clearTimeoutForLoaderText();
           console.log("Chat session turn started by server.");
@@ -421,6 +461,8 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     this.clearTimeoutForLoaderText();
     this.removeSuggestionElement();
     this.currentBotMessage = null;
+    this.pendingUserMessageFromBroadcast = null;
+    this.botStartTime = 0;
     this.openSnackBar("Chat has been reset.", "success-snackbar");
 
     setTimeout(() => this.chatService.connect(), 100);
@@ -473,7 +515,13 @@ export class ChatbarComponent implements OnInit, OnDestroy {
     this.showLoaderLikeDislikeButtons = false;
     this.loaderTextTimeout = setInterval(() => { this.setCyclicLoaderText(); }, 3000);
   }
-  clearTimeoutForLoaderText() { if (this.loaderTextTimeout) { clearInterval(this.loaderTextTimeout); this.loaderTextTimeout = undefined; } }
+
+  clearTimeoutForLoaderText() { 
+    if (this.loaderTextTimeout) { 
+      clearInterval(this.loaderTextTimeout); 
+      this.loaderTextTimeout = undefined; 
+    } 
+  }
   setCyclicLoaderText() { this.loaderText = this.loaderTextArray[Math.floor(Math.random() * this.loaderTextArray.length)]; }
 
   setSuggestedQuestionInChat(response: ServerMessage, endTime: number) {

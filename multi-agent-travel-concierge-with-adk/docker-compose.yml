@@ -20,9 +20,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile.local
       args:
-        IS_FIRST_DEPLOYMENT: "False"
+        IS_FIRST_DEPLOYMENT: "True"
         _PROJECT_ID: my-project-id
-        _REGION: us-central-1
+        _REGION: us-central1
         ENVIRONMENT: development
         FRONTEND_URL: http://localhost:4200
         BIG_QUERY_DATASET: bigquery_quickbot_travel_concierge

@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 from src.model.http_status import BadRequest
 from src.model.intent import CreateIntentRequest, Intent
 from src.model.event import IntentCreateEvent
-from src.repository.big_query import EMBEDDINGS_TABLE, BigQueryRepository, EMBEDDINGS_INDEX_COLUMN
 from src.repository.task import TaskRepository
 from src.service.index_endpoint import IndexEndpointService
 from src.service.intent import IntentService
