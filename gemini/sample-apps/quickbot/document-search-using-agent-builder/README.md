@@ -6,6 +6,11 @@ Quickbot Document Search Template is a powerful document search application buil
 
 This project allows users to search through documents indexed by Google Cloud's Vertex AI Search (formerly Generative AI App Builder). It's designed with a decoupled frontend and backend architecture, suitable for scalable deployments.
 
+## Demo
+Here's how the Document Search Template provides answers from your documents:
+
+![Document Search Demo](./assets/quickbot-document-search.png)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

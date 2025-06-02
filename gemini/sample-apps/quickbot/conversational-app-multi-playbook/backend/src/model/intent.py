@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.cloud.bigquery import SchemaField
+from google.cloud.bigquery import SchemaField, Row
 from pydantic import BaseModel
 from typing import List
 
@@ -27,7 +27,8 @@ class Intent(BaseModel):
     status: str
     gcp_bucket: str = ""
 
-    def __schema__() -> List[SchemaField]:
+    @classmethod
+    def __schema__(cls) -> List[SchemaField]:
         return [
             SchemaField("name", "STRING", mode="REQUIRED"),
             SchemaField("ai_model", "STRING", mode="REQUIRED"),
@@ -39,16 +40,17 @@ class Intent(BaseModel):
             SchemaField("gcp_bucket", "STRING", mode="REQUIRED"),
         ]
 
-    def __from_row__(row):
-        return Intent(
-            name=row[0],
-            ai_model=row[1],
-            ai_temperature=row[2],
-            description=row[3],
-            prompt=row[4],
-            questions=row[5],
-            status=row[6],
-            gcp_bucket=row[7],
+    @classmethod
+    def __from_row__(cls, row: Row):
+        return cls(
+            name=row["name"],
+            ai_model=row["ai_model"],
+            ai_temperature=float(row["ai_temperature"]) if row["ai_temperature"] is not None else 0.0, # Ensure conversion from Decimal/Numeric
+            description=row["description"],
+            prompt=row["prompt"],
+            questions=list(row["questions"]) if row["questions"] is not None else [], # Ensure it's a list
+            status=row["status"],
+            gcp_bucket=row["gcp_bucket"],
         )
 
     def to_dict(self):

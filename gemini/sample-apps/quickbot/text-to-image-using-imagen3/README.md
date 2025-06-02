@@ -6,6 +6,15 @@ Quickbot Text-to-Image Template is an innovative application built with Google C
 
 This project allows users to generate images from text prompts using Google Cloud's Imagen3 model on Vertex AI. It's designed with a decoupled frontend and backend architecture, suitable for scalable deployments.
 
+## Demo
+
+Here's a quick look at the Image Generation Template in action:
+
+<video controls autoplay loop muted width="100%" style="max-width: 1200px;">
+<source src="./assets/quickbot-text-to-imagen.mp4" type="video/mp4">
+Your browser does not support the video tag. You can <a href="./assets/quickbot-text-to-imagen.mp4">download the video here</a>.
+</video>
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

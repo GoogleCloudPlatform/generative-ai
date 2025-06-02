@@ -43,8 +43,11 @@ class SearchApplicationService:
         """
         search_application = None
         results = self.repository.get_all_rows(SEARCH_APPLICATION_TABLE)
-        for row in results:
-            search_application = SearchApplication.__from_row__(row)
+        # Convert RowIterator to list to check if it's empty or get the last item
+        rows = list(results)
+        if rows:
+            # Assuming we take the last row if multiple exist, or the only one
+            search_application = SearchApplication.from_row(rows[-1])
 
         return search_application
 
@@ -70,8 +73,17 @@ class SearchApplicationService:
             raise BadRequest(
                 detail="Search Application for this project already exists"
             )
+        schema_fields = SearchApplication.__schema__()
+        column_names = [field.name for field in schema_fields]
+
+        # Prepare values as a tuple, matching the order of schema_fields
+        # Ensure the order here matches the order in SearchApplication.__schema__
+        values_tuple = (search_application.engine_id, search_application.region)
+
         self.repository.insert_row(
-            SEARCH_APPLICATION_TABLE, search_application.to_insert_string()
+            SEARCH_APPLICATION_TABLE,
+            column_names,
+            values_tuple,
         )
         return search_application
 

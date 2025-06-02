@@ -6,6 +6,11 @@ Quickbot Background Changer Template is an innovative application built with Goo
 
 This project allows users to modify or replace image backgrounds, leveraging the capabilities of Google Cloud's Imagen3 model on Vertex AI. It's designed with a decoupled frontend and backend architecture, suitable for scalable deployments.
 
+## Demo
+Watch the Background Changer Template transform images:
+
+![Background Changer Demo](./assets/quickbot-background-changer-photo.png)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

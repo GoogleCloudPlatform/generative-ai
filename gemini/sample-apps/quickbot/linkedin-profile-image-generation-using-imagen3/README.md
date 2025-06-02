@@ -6,6 +6,12 @@ Quickbot LinkedIn Templates is an innovative application built with Google Cloud
 
 This project allows users to create professional and eye-catching images for LinkedIn posts by combining text prompts with pre-designed templates, all powered by Google Cloud's Imagen3 model on Vertex AI. It's designed with a decoupled frontend and backend architecture, suitable for scalable deployments.
 
+## Demo
+
+See how the LinkedIn Profile Image Generation Template helps create professional photos:
+
+![LinkedIn Profile Image Demo](./assets/quickbot-linkedin-agent-photo.png)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:

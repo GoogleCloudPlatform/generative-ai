@@ -24,7 +24,7 @@ Quickbot addresses the challenge users face in independently building and deploy
 * **Standardized Architecture:** Every agent template includes an Angular frontend and a FastAPI Python backend, ensuring a consistent development experience.
 * **Google Cloud Authentication:** Uses your default Google Cloud credentials for seamless integration.
 * **Scalable Resources:** Deploys necessary Google Cloud resources based on each template's complexity.
-* **Latest AI Integration:** Easily leverage Google's cutting-edge AI models and protocols (e.g., Gemini, Imagen, Agent Builder).
+* **Latest AI Integration:** Easily leverage Google's cutting-edge AI models and protocols (e.g., Gemini, Imagen, Vertex AI Search (ex Agent Builder)).
 * **Diverse Template Ecosystem:** Utilizes a variety of Agentic Templates, including our own and inspirations from others like Agent Garden, A2A, etc.
 
 ## Architecture
@@ -40,14 +40,21 @@ This separation allows for clear development workflows and independent scaling o
 
 Quickbot provides a growing set of pre-built templates:
 
-* **ADK Travel Concierge MultiAgent Template:** Leveraging the [ADK](https://google.github.io/adk-docs/) + [Agent Engine](https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview) capabilities, this [Travel MultiAgent](https://github.com/google/adk-samples/tree/main/python/agents/travel-concierge) orchestrates personalized travel experiences and provides support throughout the user’s journey, from initial planning to real-time itinerary alerts.
-* **Image Generation Template:** A custom AI Agent that integrates with <a href="https://deepmind.google/models/imagen/" target="_blank" class="underline font-bold">Imagen 4</a>, <a href="https://ai.google.dev/gemini-api/docs/imagen?hl=es-419" target="_blank" class="underline font-bold">Imagen 3</a> and <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash?hl=es-419" target="_blank" class="underline font-bold">Gemini 2.0</a> for text-to-image generation.
-* **LinkedIn Profile Image Generation Template:** A specialized AI Agent leveraging Imagen's latest features for image editing and recognition to help you create customized professional corporate profile photos.
-* **Background Changer Image Generation Template:** An AI Agent using Imagen's image editing capabilities to customize your product, graphic, car, or pet images, generating professional catalog-style photos with new backgrounds.
-* **Document Search Template:** An AI Agent that provides answers based on documents and information you provide beforehand. Integrated with Agent Builder, Cloud Storage, and Cloud Run.
-* **Website Search Template:** An advanced AI Agent that learns from your website. Provide a URL, and it crawls your domain, extracts information, converts it to vectors stored in Vertex AI, and then generates answers based on a custom prompt, the vector database, and user questions.
-* **Single Playbook Template:** Generates an AI Agent that detects specific intents (keywords) in user questions and responds with a corresponding specialized Chatbot, providing a tailored experience.
-* **Multi Playbook Template:** An evolution of the Single Playbook, this agent detects intents and routes to one of several specialized Chatbots, offering a more nuanced and personalized experience for diverse user inquiries.
+* **[ADK Travel Concierge MultiAgent Template](./multi-agent-travel-concierge-with-adk/):** Leveraging the [ADK](https://google.github.io/adk-docs/) + [Agent Engine](https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview) capabilities, and taking advantage from the usage of [Agent Garden](https://console.cloud.google.com/vertex-ai/agents/agent-garden), this [Travel MultiAgent](https://github.com/google/adk-samples/tree/main/python/agents/travel-concierge) orchestrates personalized travel experiences and provides support throughout the user’s journey, from initial planning to real-time itinerary alerts.
+  
+  **Here's a look at our Travel Concierge MultiAgent in action!**
+
+    <video controls autoplay loop muted width="100%" style="max-width: 1200px;">
+      <source src="./multi-agent-travel-concierge-with-adk/assets/quickbot-adk-travel-multiagent.mp4" type="video/mp4">
+      Your browser does not support the video tag. You can <a href="./multi-agent-travel-concierge-with-adk/assets/quickbot-adk-travel-multiagent.mp4">download the video here</a>.
+    </video>
+* **[Image Generation Template](./image-generation-template/):** A custom AI Agent that integrates with <a href="https://deepmind.google/models/imagen/" target="_blank" class="underline font-bold">Imagen 4</a>, <a href="https://ai.google.dev/gemini-api/docs/imagen?hl=es-419" target="_blank" class="underline font-bold">Imagen 3</a> and <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-0-flash?hl=es-419" target="_blank" class="underline font-bold">Gemini 2.0</a> for text-to-image generation.
+* **[LinkedIn Profile Image Generation Template](./linkedin-profile-image-generation-template/):** A specialized AI Agent leveraging Imagen's latest features for image editing and recognition to help you create customized professional corporate profile photos.
+* **[Background Changer Image Generation Template](./background-changer-image-generation-template/):** An AI Agent using Imagen's image editing capabilities to customize your product, graphic, car, or pet images, generating professional catalog-style photos with new backgrounds.
+* **[Document Search Template](./document-search-template/):** An AI Agent that provides answers based on documents and information you provide beforehand. Integrated with Vertex AI Search (ex Agent Builder), Cloud Storage, and Cloud Run.
+* **[Website Search Template](./website-search-template/):** An advanced AI Agent that learns from your website. Provide a URL, and it crawls your domain, extracts information, converts it to vectors stored in Vertex AI, and then generates answers based on a custom prompt, the vector database, and user questions.
+* **[Single Playbook Template](./single-playbook-template/):** Generates an AI Agent that detects specific intents (keywords) in user questions and responds with a corresponding specialized Chatbot, providing a tailored experience.
+* **[Multi Playbook Template](./multi-playbook-template/):** An evolution of the Single Playbook, this agent detects intents and routes to one of several specialized Chatbots, offering a more nuanced and personalized experience for diverse user inquiries.
 
 ## Getting Started
 

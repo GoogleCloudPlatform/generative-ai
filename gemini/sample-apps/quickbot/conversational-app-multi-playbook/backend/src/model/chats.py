@@ -25,7 +25,8 @@ class Chat(BaseModel):
     suggested_questions: List[str]
     timestamp: Optional[str] = None
 
-    def __schema__() -> List[SchemaField]:
+    @classmethod
+    def __schema__(cls) -> List[SchemaField]:
         return [
             SchemaField("id", "STRING", mode="REQUIRED"),
             SchemaField("question", "STRING", mode="REQUIRED"),

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 from src.model.http_status import BadRequest
 from src.model.intent import CreateIntentRequest, Intent
