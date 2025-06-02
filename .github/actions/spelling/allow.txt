@@ -34,6 +34,7 @@ Aspeed
 Atulan
 Autorater
 BIKBEAR
+BGR
 BITCODE
 BYOR
 Benno
