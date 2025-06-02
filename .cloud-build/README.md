@@ -13,7 +13,7 @@ The script performs the following actions:
 1. **Reads Output URI variable:**
    - It reads the destination GCS bucket URI from a variable named `OUTPUT_URI` injected from secret manager. This allows for easy configuration of the destination.
 2. **Iterates Through Notebooks:**
-   - It loops through all `.ipynb` files located in the `/workspace/generative-ai/gemini/getting-started/` directory.
+   - It loops through all `.ipynb` files located in the `Notebooks.txt` file.
 3. **Copies Notebooks to GCS:**
    - For each notebook file, it extracts the filename using `basename`.
    - It then uses the `gcloud storage cp` command to copy the notebook file to the specified GCS bucket, maintaining the directory structure.
@@ -40,7 +40,7 @@ Before running this script, ensure you have the following:
 
 2. **Place Notebooks:**
 
-   - Ensure your `.ipynb` files are located in the `/workspace/generative-ai/gemini/getting-started/` directory.
+   - Ensure the names of the `.ipynb` files are located in the `Notebooks.txt` file.
 
 3. **Add the script as a step in your pipeline:**
 
