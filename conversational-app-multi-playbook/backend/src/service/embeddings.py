@@ -50,9 +50,14 @@ class EmbeddingService:
         Returns:
             The created Embedding object.
         """
-        self.repository.insert_row(
-            EMBEDDINGS_TABLE, embedding.to_insert_string()
-        )
+        schema_fields = Embedding.__schema__()
+        column_names = [field.name for field in schema_fields]
+
+        # Prepare values as a tuple, matching the order of schema_fields
+        # Ensure the order here matches the order in SearchApplication.__schema__
+        values_tuple = (embedding.id, embedding.text, embedding.index, embedding.author)
+        self.repository.insert_row(EMBEDDINGS_TABLE, column_names, values_tuple)
+
         return embedding
 
     def create_all(self, embeddings: List[Embedding]):

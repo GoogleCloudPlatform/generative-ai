@@ -14,7 +14,7 @@
 
 from src.model.http_status import BadRequest
 from src.model.intent import Intent
-from src.repository.big_query import BigQueryRepository # BIG_QUERY_DATASET is imported by BigQueryRepository
+from src.repository.big_query import BigQueryRepository
 from src.repository.cloud_storage import CloudStorageRepository
 from typing import List
 

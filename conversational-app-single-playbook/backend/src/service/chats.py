@@ -19,6 +19,7 @@ for persisting chat records (questions and answers) to the database.
 It interacts primarily with the BigQuery repository.
 """
 
+import datetime
 from src.repository.big_query import (
     BigQueryRepository,
     CHATS_TABLE,
@@ -46,5 +47,22 @@ class ChatsService:
         Args:
             chat: The Chat object containing the conversation details to save.
         """
-        values = chat.to_insert_string()
-        self.repository.insert_row(CHATS_TABLE, values)
+        schema_fields = Chat.__schema__()
+        column_names = [field.name for field in schema_fields]
+
+        # Prepare values as a tuple, matching the order of schema_fields
+        # If chat.timestamp is None, we'll insert the current UTC time.
+        # BigQueryRepository will handle the Python datetime object.
+        timestamp_value = chat.timestamp if chat.timestamp else datetime.datetime.now(datetime.timezone.utc)
+
+        # Ensure the order here matches the order in Chat.__schema__
+        values_tuple = (
+            chat.id,
+            chat.question,
+            chat.answer,
+            chat.intent,
+            chat.suggested_questions,
+            timestamp_value
+        )
+
+        self.repository.insert_row(CHATS_TABLE, column_names, values_tuple)

@@ -23,7 +23,7 @@ Project ID.
 from dataclasses import dataclass
 from typing import List, Optional
 from pydantic import BaseModel
-from google.cloud.bigquery import SchemaField
+from google.cloud.bigquery import SchemaField, Row
 from google.api_core.client_options import ClientOptions
 import google.auth
 
@@ -41,25 +41,26 @@ class SearchApplication(BaseModel):
     engine_id: str
     region: str
 
-    def __schema__() -> List[SchemaField]:
+    @classmethod
+    def __schema__(cls) -> List[SchemaField]:
         """Defines the BigQuery schema for storing SearchApplication data."""
         return [
             SchemaField("engine_id", "STRING", mode="REQUIRED"),
             SchemaField("region", "STRING", mode="REQUIRED"),
         ]
 
-    def __from_row__(row):
+    @classmethod
+    def from_row(cls, row: Row) -> 'SearchApplication':
         """Creates a SearchApplication instance from a BigQuery Row object.
 
-        Assumes the row contains 'engine_id' and 'region' in order.
-
         Args:
-            row: The BigQuery Row object.
+            row: The BigQuery Row object. Assumes row contains fields matching the schema.
 
         Returns:
             A SearchApplication instance.
         """
-        return SearchApplication(engine_id=row[0], region=row[1])
+        # Access by field name for robustness, assuming schema matches
+        return cls(engine_id=row["engine_id"], region=row["region"])
 
     def to_dict(self):
         """Converts the SearchApplication instance to a dictionary."""
@@ -67,10 +68,6 @@ class SearchApplication(BaseModel):
             "engine_id": self.engine_id,
             "region": self.region,
         }
-
-    def to_insert_string(self):
-        """Formats the application data as a string for SQL INSERT VALUES."""
-        return f'"{self.engine_id}", "{self.region}"'
 
     def get_client_options(self) -> Optional[ClientOptions]:
         """Generates API client options based on the application's region.
@@ -94,8 +91,8 @@ class SearchApplication(BaseModel):
             The formatted serving config string.
         """
         serving_config = f"projects/{PROJECT_ID}/locations/{self.region}"
-        serving_config += "/collections/default_collection/engines"
-        serving_config += f"/{self.engine_id}/servingConfigs/default_config"
+        serving_config += f"/collections/default_collection/engines/{self.engine_id}"
+        serving_config += "/servingConfigs/default_config"
         return serving_config
 
 class Engine(BaseModel):
@@ -107,11 +104,16 @@ class Engine(BaseModel):
 
 @dataclass
 class SearchResult:
-    """Represents a website search result from a search query."""
+    """Represents a single document result from a search query."""
     document_id: str
     title: str
     snippet: str
-    img: Optional[str] = None
     link: Optional[str] = None
-    formatted_url: Optional[str] = None
-    displayLink: Optional[str] = None
+    content: Optional[str] = None
+
+
+@dataclass
+class SearchResultsWithSummary:
+    """Represents the complete results of a search, including a summary."""
+    results: List[SearchResult]
+    summary: Optional[str] = None
