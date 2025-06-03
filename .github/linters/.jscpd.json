@@ -19,6 +19,6 @@
     "**/*.zip",
     "**/*.bin",
     "noxfile.py",
-    "gemini/sample-apps/quickbot/**"
+    "gemini/sample-apps/quickbot/**/*"
   ]
 }
