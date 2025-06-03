@@ -18,6 +18,8 @@
     "**/*.svg",
     "**/*.zip",
     "**/*.bin",
-    "noxfile.py"
+    "**/noxfile.py",
+    "**/quickbot/**/*.*",
+    "**/.nox/**"
   ]
 }

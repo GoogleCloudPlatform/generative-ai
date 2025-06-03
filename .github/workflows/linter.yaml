@@ -48,7 +48,7 @@ jobs:
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          FILTER_REGEX_EXCLUDE: 'gemini/sample-apps/finance-advisor-spanner/.*\.sql'
+          FILTER_REGEX_EXCLUDE: "^(.github/|gemini/sample-apps/finance-advisor-spanner/|gemini/sample-apps/quickbot/).*"
           LOG_LEVEL: WARN
           SHELLCHECK_OPTS: -e SC1091 -e 2086
           VALIDATE_ALL_CODEBASE: false
