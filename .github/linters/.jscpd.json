@@ -18,6 +18,7 @@
     "**/*.svg",
     "**/*.zip",
     "**/*.bin",
-    "noxfile.py"
+    "noxfile.py",
+    "gemini/sample-apps/quickbot/**"
   ]
 }
