@@ -13,6 +13,8 @@ AOT
 APAC
 APIENTRY
 APSTUDIO
+Arize
+arize
 ASF
 ASGI
 ASML
@@ -34,6 +36,7 @@ Aspeed
 Atulan
 Autorater
 BIKBEAR
+BGR
 BITCODE
 BYOR
 Benno
@@ -200,6 +203,7 @@ Hyperdisk
 ICICI
 ICML
 IFI
+ILB
 INFOPLIST
 INR
 IOMGR
@@ -229,6 +233,7 @@ KFBI
 KNN
 KPIs
 KSA
+KYC
 Kaelen
 Kalamang
 Kamradt
@@ -259,6 +264,7 @@ LTRB
 LUVBPTK
 Ladhak
 Leventer
+Livewire
 Llion
 Lng
 Loghub
@@ -399,6 +405,8 @@ SAOT
 SDKROOT
 SEK
 SEO
+SERPER
+serper
 SIMONE
 SKUs
 SMSN
@@ -450,6 +458,7 @@ TLDR
 TOKENLIST
 TPU
 TPUs
+TRK
 TSLA
 TSMC
 TSNE
@@ -477,6 +486,7 @@ Tribbiani
 Tricyle
 UDF
 UDFs
+UIs
 USERDATA
 USK
 UVX
@@ -550,6 +560,7 @@ aextract
 afrom
 agentic
 agg
+aggfunc
 ainit
 ainvoke
 aio
@@ -609,6 +620,7 @@ bnb
 booktitle
 boop
 boundings
+boxplot
 bpa
 bpd
 bqdf
@@ -707,6 +719,7 @@ drilldown
 drinkware
 dropdown
 dropna
+dshm
 dsl
 dsn
 dtype
@@ -763,6 +776,7 @@ fillmode
 fillna
 fiqa
 firestore
+firewalls
 fixmycar
 flac
 floormat
@@ -897,6 +911,7 @@ jit
 jiwer
 jsonify
 jsonlines
+jsonpath
 jsonplus
 jupyter
 jvm
@@ -913,6 +928,7 @@ konnte
 kotlin
 kpi
 kubectl
+kyc
 l'harmonie
 lakecolor
 landcolor
@@ -931,6 +947,7 @@ linestyle
 linkedin
 linted
 linting
+litellm
 llm
 llms
 loghub
@@ -944,6 +961,7 @@ lru
 lsb
 lxml
 lycra
+lyria
 magicoder
 magika
 mahut
@@ -1126,6 +1144,7 @@ quadrotor
 qubit
 qubits
 quippy
+qwen
 rag
 ragas
 ragdemos
@@ -1288,6 +1307,7 @@ vectoral
 vectordb
 veo
 vesselin
+viridis
 vllm
 vnc
 voiceover
@@ -1326,6 +1346,7 @@ womens
 workarounds
 worklets
 wparam
+wscat
 wscore
 wscores
 wstring
