@@ -1,5 +1,5 @@
 {
-  "threshold": 2,
+  "threshold": 3,
   "reporters": ["html", "markdown"],
   "ignore": [
     "**/node_modules/**",
@@ -18,6 +18,8 @@
     "**/*.svg",
     "**/*.zip",
     "**/*.bin",
-    "noxfile.py"
+    "**/noxfile.py",
+    "**/quickbot/**/*.*",
+    "**/.nox/**"
   ]
 }

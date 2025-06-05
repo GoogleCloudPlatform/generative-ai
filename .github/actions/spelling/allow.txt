@@ -36,6 +36,7 @@ Aspeed
 Atulan
 Autorater
 BIKBEAR
+BGR
 BITCODE
 BYOR
 Benno
@@ -202,6 +203,7 @@ Hyperdisk
 ICICI
 ICML
 IFI
+ILB
 INFOPLIST
 INR
 IOMGR
@@ -262,6 +264,7 @@ LTRB
 LUVBPTK
 Ladhak
 Leventer
+Livewire
 Llion
 Lng
 Loghub
@@ -455,6 +458,7 @@ TLDR
 TOKENLIST
 TPU
 TPUs
+TRK
 TSLA
 TSMC
 TSNE
@@ -482,6 +486,7 @@ Tribbiani
 Tricyle
 UDF
 UDFs
+UIs
 USERDATA
 USK
 UVX
@@ -555,6 +560,7 @@ aextract
 afrom
 agentic
 agg
+aggfunc
 ainit
 ainvoke
 aio
@@ -614,6 +620,7 @@ bnb
 booktitle
 boop
 boundings
+boxplot
 bpa
 bpd
 bqdf
@@ -712,6 +719,7 @@ drilldown
 drinkware
 dropdown
 dropna
+dshm
 dsl
 dsn
 dtype
@@ -768,6 +776,7 @@ fillmode
 fillna
 fiqa
 firestore
+firewalls
 fixmycar
 flac
 floormat
@@ -902,6 +911,7 @@ jit
 jiwer
 jsonify
 jsonlines
+jsonpath
 jsonplus
 jupyter
 jvm
@@ -937,6 +947,7 @@ linestyle
 linkedin
 linted
 linting
+litellm
 llm
 llms
 loghub
@@ -1133,6 +1144,7 @@ quadrotor
 qubit
 qubits
 quippy
+qwen
 rag
 ragas
 ragdemos
@@ -1295,6 +1307,7 @@ vectoral
 vectordb
 veo
 vesselin
+viridis
 vllm
 vnc
 voiceover
@@ -1333,6 +1346,7 @@ womens
 workarounds
 worklets
 wparam
+wscat
 wscore
 wscores
 wstring
