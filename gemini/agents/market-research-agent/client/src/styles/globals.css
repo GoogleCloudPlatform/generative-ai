@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
