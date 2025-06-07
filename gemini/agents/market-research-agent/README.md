@@ -1,5 +1,7 @@
 # AI-Powered Market Analyst
 
+[![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+
 > A multi-agent system that leverages LLMs to research companies and industries, generate tailored AI use cases, and provide implementation resources. Built with LangChain and LangGraph for intelligent workflow orchestration.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -19,14 +21,14 @@
 ### Prerequisites
 
 - Python 3.10+, Node.js 18+
-- API keys: [Google Gemini](https://aistudio.google.com/app/apikey), [SERP API](https://serpapi.com/)
+- API keys: [Google Gemini](https://makersuite.google.com/app/apikey), [SERP API](https://serpapi.com/)
 
 ### Installation
 
 ```bash
 # Clone the repository
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd generative-ai/gemini/agents/market-research-agent
+cd generative-ai/gemini/agents/ai-powered-market-analyst
 
 # Backend setup
 cd backend
@@ -34,7 +36,7 @@ python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\acti
 pip install -r requirements.txt
 
 # Frontend setup  
-cd ../frontend
+cd ../client
 npm install
 ```
 
@@ -44,20 +46,9 @@ Create `.env` file in backend/:
 ```env
 GEMINI_API_KEY=your_gemini_api_key
 SERPAPI_KEY=your_serpapi_key
-KAGGLE_USERNAME=your_kaggle_username
-KAGGLE_KEY=your_kaggle_key
-HUGGINGFACE_API_KEY=your_huggingface_api_key
-
-# Optional Langfuse Monitoring
-LANGFUSE_PUBLIC_KEY=pk-lf-your_langfuse_public_key
-LANGFUSE_SECRET_KEY=sk-lf-your_langfuse_secret_key
-
-# LLM Configuration
-LLM_PROVIDER=llm_provider # e.g., "gemini"
-LLM_MODEL=llm_model # e.g., "gemini-2.5-pro-preview-03-25"
 ```
 
-Create `.env.local` in frontend/:
+Create `.env.local` in client/:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
@@ -74,6 +65,83 @@ npm run dev
 
 Visit `http://localhost:3000` to use the application.
 
+## Deploy to Google Cloud ☁️
+
+Deploy the complete application with one click:
+
+[![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+
+**Architecture**: Backend deployed to Cloud Run, Frontend deployed to Firebase Hosting
+
+### Manual Deployment
+
+**Deploy Backend to Cloud Run:**
+
+```bash
+# Set environment variables
+export GOOGLE_CLOUD_PROJECT='your-project-id'
+export GOOGLE_CLOUD_REGION='us-central1'
+export SERVICE_NAME='market-analyst-backend'
+
+export GEMINI_API_KEY='your-gemini-api-key'
+export SERPAPI_KEY='your-serpapi-key'
+export KAGGLE_USERNAME='your-kaggle-username'
+export KAGGLE_KEY='your-kaggle-key'
+export HUGGINGFACE_API_KEY='your-huggingface-api-key'
+export LANGFUSE_PUBLIC_KEY='pk-lf-your_langfuse_public_key'
+export LANGFUSE_SECRET_KEY='sk-lf-your_langfuse_secret_key'
+```
+
+# Create .env file for backend
+```bash
+mkdir -p backend/credentials
+cat <<EOF > backend/credentials/.env
+```
+# Environment variables for backend
+```bash
+GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
+GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION
+
+# API keys 
+GEMINI_API_KEY=your_gemini_api_key
+SERPAPI_KEY=your_serpapi_key
+KAGGLE_USERNAME=your_kaggle_username
+KAGGLE_KEY=your_kaggle_key
+HUGGINGFACE_API_KEY=your_huggingface_api_key
+
+# Optional Langfuse Monitoring
+LANGFUSE_PUBLIC_KEY=pk-lf-your_langfuse_public_key
+LANGFUSE_SECRET_KEY=sk-lf-your_langfuse_secret_key
+```
+
+
+
+# Deploy to Cloud Run
+```bash
+cd backend
+gcloud run deploy "$SERVICE_NAME" \
+  --port=8000 \
+  --source=. \
+  --allow-unauthenticated \
+  --region=$GOOGLE_CLOUD_REGION \
+  --project=$GOOGLE_CLOUD_PROJECT \
+  --set-env-vars=GEMINI_API_KEY=$GEMINI_API_KEY,SERPAPI_KEY=$SERPAPI_KEY
+```
+
+**Deploy Frontend to Firebase:**
+
+```bash
+# Install Firebase CLI and login
+npm install -g firebase-tools
+firebase login
+
+# Initialize and deploy
+cd client
+npm run build
+firebase init hosting
+firebase deploy
+```
+
 ## How It Works
 
 ![Workflow](https://github.com/user-attachments/assets/940f3973-5b36-4af9-bc39-f501c53afc32)
@@ -86,9 +154,9 @@ Visit `http://localhost:3000` to use the application.
 ## Project Structure
 
 ```bash
-market-research-agent
+ai-powered-market-analyst
 │
-├── backend                       ; Core backend services
+├── backend                        ; Core backend services
 │   ├── config
 │   │   ├── settings.py           ; Environment and API configuration
 │   │   └── logging_config.py     ; Centralized logging setup
@@ -123,14 +191,12 @@ market-research-agent
 │   │   └── styles               ; Application styling
 │   └── package.json
 │
-└── credentials                  ; API keys and credentials (gitignored)
+└── credentials                   ; API keys and credentials (gitignored)
 ```
 
 ## Usage
 
-1. Enter company name (e.g., "Microsoft") or industry (e.g., "Technology")  
-   - For company analysis, use a specific company name
-   - For industry analysis, use a broader term like "Healthcare" or "Finance"
+1. Enter company name (e.g., "Microsoft") or industry (e.g., "Healthcare")
 2. Set number of AI use cases to generate
 3. Wait for analysis completion  
 4. Review generated use cases and resources
@@ -159,8 +225,17 @@ market-research-agent
 
 ## Examples
 
-**Company Analysis**: Analyze "Tesla" to get AI use cases for automotive industry  
-**Industry Analysis**: Research "Healthcare" to discover AI opportunities in medical sector
+### Company Analysis
+Input: `"Tesla"`
+- **Generated AI Use Cases**: Autonomous driving optimization, predictive maintenance for electric vehicles, supply chain optimization for battery production
+- **Resources Found**: Automotive datasets from Kaggle, computer vision models from HuggingFace, Tesla API documentation
+- **Business Value**: Cost reduction through predictive maintenance, improved safety through AI-powered driver assistance
+
+### Industry Analysis  
+Input: `"Healthcare"`
+- **Generated AI Use Cases**: Medical image analysis for diagnostics, drug discovery acceleration, patient risk prediction
+- **Resources Found**: Medical imaging datasets, pre-trained models for healthcare, clinical trial databases
+- **Business Value**: Faster diagnosis, reduced healthcare costs, improved patient outcomes
 
 ## License
 

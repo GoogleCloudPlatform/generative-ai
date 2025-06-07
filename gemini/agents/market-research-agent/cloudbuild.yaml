@@ -1,0 +1,27 @@
+steps:
+  # Build and deploy backend to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    dir: 'backend'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'market-analyst-backend'
+      - '--source=.'
+      - '--region=us-central1'
+      - '--allow-unauthenticated'
+      - '--port=8000'
+
+  # Build and deploy frontend to Firebase
+  - name: 'node:18'
+    dir: 'client'
+    entrypoint: 'npm'
+    args: ['install']
+  
+  - name: 'node:18'
+    dir: 'client'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+    
+  - name: 'gcr.io/$PROJECT_ID/firebase'
+    dir: 'client'
+    args: ['deploy', '--only=hosting', '--project=$PROJECT_ID']

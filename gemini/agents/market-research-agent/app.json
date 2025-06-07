@@ -1,0 +1,24 @@
+{
+  "name": "AI-Powered Market Analyst",
+  "description": "Multi-agent system for market analysis and AI use case generation",
+  "repository": "https://github.com/GoogleCloudPlatform/generative-ai",
+  "logo": "https://cloud.google.com/_static/cloud/images/social-icon-google-cloud-1200-630.png",
+  "keywords": ["ai", "market-analysis", "langgraph", "gemini"],
+  "success_url": "/",
+  "env": {
+    "GEMINI_API_KEY": {
+      "description": "Google Gemini API Key",
+      "required": true
+    },
+    "SERPAPI_KEY": {
+      "description": "SERP API Key for web search",
+      "required": true
+    }
+  },
+  "formation": {
+    "backend": {
+      "quantity": 1,
+      "size": "cloud-run-cpu-1"
+    }
+  }
+}
