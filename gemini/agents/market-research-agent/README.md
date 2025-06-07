@@ -1,5 +1,7 @@
 # AI-Powered Market Analyst
 
+Deploy the complete application with one click:
+
 [![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
 
 > A multi-agent system that leverages LLMs to research companies and industries, generate tailored AI use cases, and provide implementation resources. Built with LangChain and LangGraph for intelligent workflow orchestration.
