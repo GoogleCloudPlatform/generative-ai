@@ -58,7 +58,7 @@ API_CONFIG = {
 
 # Monitoring configurations
 MONITORING_CONFIG = {
-    "enabled": False,
+    "enabled": True,
     "langfuse_host": os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com"),
 }
 

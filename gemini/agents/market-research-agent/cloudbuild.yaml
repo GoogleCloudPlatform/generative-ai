@@ -30,7 +30,7 @@ steps:
             # Grant necessary permissions
             gcloud projects add-iam-policy-binding $PROJECT_ID \
                 --member="serviceAccount:$SA_EMAIL" \
-                --role="roles/aiplatform.user" --quiet
+                --role="roles/aiplatform.viewer" --quiet
         fi
     timeout: '180s'
 

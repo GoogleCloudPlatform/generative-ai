@@ -34,7 +34,7 @@ Deploy the complete application with one click:
 ```bash
 # Clone the repository
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd generative-ai/tree/ai-market-agent/gemini/agents/market-research-agent
+cd cd generative-ai/gemini/agents/market-research-agent
 
 # Backend setup
 cd backend
@@ -100,8 +100,7 @@ export LANGFUSE_SECRET_KEY='sk-lf-your_langfuse_secret_key'
 
 # Create .env file for backend
 ```bash
-mkdir -p backend/credentials
-cat <<EOF > backend/credentials/.env
+cat <<EOF > backend/.env
 
 # Environment variables for backend
 GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
@@ -130,7 +129,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --allow-unauthenticated \
   --region=$GOOGLE_CLOUD_REGION \
   --project=$GOOGLE_CLOUD_PROJECT \
-  --set-env-vars=GEMINI_API_KEY=$GEMINI_API_KEY,SERPAPI_KEY=$SERPAPI_KEY
+  --set-env-vars=GEMINI_API_KEY=$GEMINI_API_KEY,SERPAPI_KEY=$SERPAPI_KEY,KAGGLE_USERNAME=$KAGGLE_USERNAME,KAGGLE_KEY=$KAGGLE_KEY,HUGGINGFACE_API_KEY=$HUGGINGFACE_API_KEY,LANGFUSE_PUBLIC_KEY=$LANGFUSE_PUBLIC_KEY,LANGFUSE_SECRET_KEY=$LANGFUSE_SECRET_KEY
 ```
 
 **Deploy Frontend to Firebase:**
