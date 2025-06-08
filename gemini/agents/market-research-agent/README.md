@@ -10,6 +10,10 @@ Deploy the complete application with one click:
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org)
 
+| | |
+|-|-|
+|Author(s) | [Prajwal](https://github.com/iprajwaal) |
+
 ## Features
 
 - **🔍 Intelligent Research**: Automated company and industry analysis using web search
