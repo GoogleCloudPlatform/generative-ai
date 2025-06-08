@@ -78,15 +78,35 @@ steps:
         echo "✅ All permissions granted successfully!"
     timeout: '300s'
 
-  # Step 4: Deploy backend to Cloud Run
+  # Step 4: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    dir: 'backend'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/market-analyst-backend:$BUILD_ID'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+    timeout: '600s'
+
+  # Step 5: Push Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/market-analyst-backend:$BUILD_ID'
+    timeout: '300s'
+
+  # Step 6: Deploy backend to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'deploy-backend'
-    dir: 'backend'
     args:
       - 'run'
       - 'deploy'
       - 'market-analyst-backend'
-      - '--source=.'
+      - '--image=gcr.io/$PROJECT_ID/market-analyst-backend:$BUILD_ID'
       - '--region=us-central1'
       - '--allow-unauthenticated'
       - '--port=8000'
@@ -99,9 +119,9 @@ steps:
       - '--service-account=market-analyst-sa@$PROJECT_ID.iam.gserviceaccount.com'
       - '--execution-environment=gen2'
       - '--ingress=all'
-    timeout: '1200s'
+    timeout: '600s'
 
-  # Step 5: Wait for deployment and get backend URL
+  # Step 7: Wait for deployment and get backend URL
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'get-backend-url'
     entrypoint: 'bash'
@@ -125,7 +145,7 @@ steps:
         curl -f "$BACKEND_URL/health" || echo "⚠️  Health check failed, but continuing..."
     timeout: '300s'
 
-  # Step 6: Install frontend dependencies
+  # Step 8: Install frontend dependencies
   - name: 'node:18'
     id: 'install-frontend-deps'
     dir: 'client'
@@ -133,7 +153,7 @@ steps:
     args: ['ci', '--only=production']
     timeout: '600s'
   
-  # Step 7: Build frontend with backend URL
+  # Step 9: Build frontend with backend URL
   - name: 'node:18'
     id: 'build-frontend'
     dir: 'client'
@@ -157,7 +177,7 @@ steps:
         echo "✅ Frontend build completed successfully!"
     timeout: '600s'
     
-  # Step 8: Deploy frontend to Firebase Hosting
+  # Step 10: Deploy frontend to Firebase Hosting
   - name: 'node:18'
     id: 'deploy-frontend'
     dir: 'client'
@@ -174,7 +194,7 @@ steps:
         echo "✅ Frontend deployed successfully!"
     timeout: '600s'
 
-  # Step 9: Final verification and output
+  # Step 11: Final verification and output
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'final-verification'
     entrypoint: 'bash'
