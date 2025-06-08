@@ -1,7 +1,7 @@
 {
   "name": "AI-Powered Market Analyst",
   "description": "Multi-agent system for market analysis and AI use case generation",
-  "repository": "https://github.com/iprajwaal/generative-ai",
+  "repository": "https://github.com/GoogleCloudPlatform/generative-ai",
   "keywords": ["ai", "market-analysis", "langgraph", "gemini"],
   "env": {
     "GEMINI_API_KEY": {

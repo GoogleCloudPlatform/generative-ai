@@ -64,6 +64,22 @@ class Orchestrator:
         else:
             self.monitoring_enabled = False
 
+    def _safe_end_span(self, span, span_name: str):
+        """Safely end a Langfuse span with error handling."""
+        if span:
+            try:
+                span.end()
+            except Exception as e:
+                logger.error(f"Failed to end Langfuse span '{span_name}': {e}")
+
+    def _safe_end_trace(self, trace, trace_name: str):
+        """Safely end a Langfuse trace with error handling."""
+        if trace:
+            try:
+                trace.end()
+            except Exception as e:
+                logger.error(f"Failed to end Langfuse trace '{trace_name}': {e}")
+
     async def generate_use_cases(
         self,
         company_name: Optional[str] = None,
@@ -104,10 +120,11 @@ class Orchestrator:
 
         try:
             # Step 1: Research industry and company
-            span = None
+            logger.info("Step 1: Researching industry and company")
+            research_span = None
             if self.monitoring_enabled and trace:
                 try:
-                    span = trace.span(name="industry_research")
+                    research_span = trace.span(name="industry_research")
                 except Exception as e:
                     logger.error(f"Failed to create Langfuse span: {e}")
 
@@ -115,18 +132,16 @@ class Orchestrator:
                 company_name=company_name, industry_name=industry_name
             )
 
-            if self.monitoring_enabled and span:
-                try:
-                    if hasattr(span, "end"):
-                        span.end()
-                except Exception as e:
-                    logger.error(f"Failed to end Langfuse span: {e}")
+            self._safe_end_span(research_span, "industry_research")
 
             # Step 2: Generate use cases
             logger.info("Step 2: Generating use cases")
-            if self.monitoring_enabled:
-                span = trace.span(name="use_case_generation")
-                span.start()
+            use_case_span = None
+            if self.monitoring_enabled and trace:
+                try:
+                    use_case_span = trace.span(name="use_case_generation")
+                except Exception as e:
+                    logger.error(f"Failed to create Langfuse span: {e}")
 
             use_cases = await self.use_case_generation_agent.generate_use_cases(
                 company_info=company_info,
@@ -134,35 +149,31 @@ class Orchestrator:
                 num_use_cases=num_use_cases,
             )
 
-            if self.monitoring_enabled and trace:
-                try:
-                    if hasattr(trace, "end"):
-                        trace.end()
-                except Exception as e:
-                    logger.error(f"Failed to end Langfuse trace: {e}")
+            self._safe_end_span(use_case_span, "use_case_generation")
 
             # Step 3: Collect resources
             logger.info("Step 3: Collecting resources")
-            if self.monitoring_enabled:
-                span = trace.span(name="resource_collection")
-                span.start()
+            resource_span = None
+            if self.monitoring_enabled and trace:
+                try:
+                    resource_span = trace.span(name="resource_collection")
+                except Exception as e:
+                    logger.error(f"Failed to create Langfuse span: {e}")
 
             resources = await self.resource_collection_agent.collect_resources(
                 use_cases=use_cases
             )
 
-            if self.monitoring_enabled and trace:
-                try:
-                    if hasattr(trace, "end"):
-                        trace.end()
-                except Exception as e:
-                    logger.error(f"Failed to end Langfuse trace: {e}")
+            self._safe_end_span(resource_span, "resource_collection")
 
             # Step 4: Format results
             logger.info("Step 4: Formatting results")
-            if self.monitoring_enabled:
-                span = trace.span(name="document_generation")
-                span.start()
+            document_span = None
+            if self.monitoring_enabled and trace:
+                try:
+                    document_span = trace.span(name="document_generation")
+                except Exception as e:
+                    logger.error(f"Failed to create Langfuse span: {e}")
 
             markdown = self.document_tools.format_use_cases_markdown(
                 use_cases=use_cases,
@@ -183,9 +194,7 @@ class Orchestrator:
                 company_name=company_name or industry_name,
             )
 
-            if self.monitoring_enabled:
-                span.end()
-                trace.end()
+            self._safe_end_span(document_span, "document_generation")
 
             # Prepare results
             result = {
@@ -199,11 +208,25 @@ class Orchestrator:
                 "trace_id": trace_id,
             }
 
+            # End trace successfully
+            if self.monitoring_enabled and trace:
+                try:
+                    trace.update(output={"status": "success", "num_use_cases": len(use_cases)})
+                except Exception as e:
+                    logger.error(f"Failed to update Langfuse trace: {e}")
+
             return result
 
         except Exception as e:
             logger.error(f"Error in use case generation workflow: {e}")
-            if self.monitoring_enabled:
-                trace.update(error=str(e), status="error")
-                trace.end()
+            # Update trace with error information
+            if self.monitoring_enabled and trace:
+                try:
+                    trace.update(output={"status": "error", "error": str(e)})
+                except Exception as trace_error:
+                    logger.error(f"Failed to update Langfuse trace with error: {trace_error}")
             raise
+
+        finally:
+            # Always end the trace in the finally block
+            self._safe_end_trace(trace, "use_case_generation")

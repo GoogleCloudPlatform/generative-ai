@@ -2,12 +2,14 @@ import asyncio
 import json
 import logging
 import uuid
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from google.cloud import firestore
 
 from agents.orchestrator import Orchestrator
 from config.logging_config import setup_logging
@@ -23,6 +25,49 @@ from workflows.use_case_workflow import create_use_case_workflow
 
 # Setup logging
 logger = setup_logging()
+
+# Firestore persistent storage implementation
+class FirestoreAnalysisStore:
+    def __init__(self):
+        self.db = firestore.Client()
+        self.collection = self.db.collection('analyses')
+    
+    async def create_analysis(self, request_id: str, analysis_data: Dict[str, Any]) -> None:
+        """Create a new analysis record."""
+        doc_data = {
+            **analysis_data,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        await asyncio.get_event_loop().run_in_executor(
+            None, 
+            self.collection.document(request_id).set, 
+            doc_data
+        )
+    
+    async def update_analysis(self, request_id: str, updates: Dict[str, Any]) -> None:
+        """Update an existing analysis record."""
+        updates['updated_at'] = datetime.utcnow()
+        await asyncio.get_event_loop().run_in_executor(
+            None,
+            self.collection.document(request_id).update,
+            updates
+        )
+    
+    async def get_analysis(self, request_id: str) -> Optional[Dict[str, Any]]:
+        """Get an analysis by request ID."""
+        doc = await asyncio.get_event_loop().run_in_executor(
+            None,
+            self.collection.document(request_id).get
+        )
+        return doc.to_dict() if doc.exists else None
+    
+    async def set_status(self, request_id: str, status: str, error: Optional[str] = None) -> None:
+        """Update analysis status."""
+        updates = {'status': status, 'updated_at': datetime.utcnow()}
+        if error:
+            updates['error'] = error
+        await self.update_analysis(request_id, updates)
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -56,8 +101,9 @@ research_workflow = create_research_workflow(llm, search_tools)
 use_case_workflow = create_use_case_workflow(llm, analysis_tools)
 resource_workflow = create_resource_workflow(llm, dataset_tools)
 
-# Initialize orchestrator
+# Initialize orchestrator and Firestore store
 orchestrator = Orchestrator(llm)
+analysis_store = FirestoreAnalysisStore()
 
 
 # Define request and response models
@@ -97,10 +143,6 @@ class AnalysisResponse(BaseModel):
     markdown: Optional[str] = None
 
 
-# Store ongoing analyses
-analyses = {}
-
-
 async def run_analysis(
     request_id: str,
     company_name: Optional[str],
@@ -110,7 +152,7 @@ async def run_analysis(
     """Run the analysis workflow in the background."""
     try:
         # Update status to running
-        analyses[request_id]["status"] = "running"
+        await analysis_store.set_status(request_id, "running")
 
         # Run orchestrator
         result = await orchestrator.generate_use_cases(
@@ -120,24 +162,21 @@ async def run_analysis(
         )
 
         # Update analysis with results
-        analyses[request_id].update(
-            {
-                "status": "completed",
-                "company_info": result.get("company_info", {}),
-                "industry_info": result.get("industry_info", {}),
-                "use_cases": result.get("use_cases", []),
-                "resources": result.get("resources", {}),
-                "markdown": result.get("markdown", ""),
-                "markdown_path": result.get("markdown_path", ""),
-                "json_path": result.get("json_path", ""),
-                "completed_at": result.get("completed_at", ""),
-            }
-        )
+        await analysis_store.update_analysis(request_id, {
+            "status": "completed",
+            "company_info": result.get("company_info", {}),
+            "industry_info": result.get("industry_info", {}),
+            "use_cases": result.get("use_cases", []),
+            "resources": result.get("resources", {}),
+            "markdown": result.get("markdown", ""),
+            "markdown_path": result.get("markdown_path", ""),
+            "json_path": result.get("json_path", ""),
+            "completed_at": datetime.utcnow().isoformat(),
+        })
 
     except Exception as e:
         logger.error(f"Error running analysis: {e}")
-        analyses[request_id]["status"] = "failed"
-        analyses[request_id]["error"] = str(e)
+        await analysis_store.set_status(request_id, "failed", str(e))
 
 
 @app.post("/api/analyze", response_model=AnalysisResponse)
@@ -152,15 +191,14 @@ async def analyze(request: AnalysisRequest, background_tasks: BackgroundTasks):
     # Generate a request ID
     request_id = str(uuid.uuid4())
 
-    # Initialize analysis
-    analyses[request_id] = {
+    # Initialize analysis in Firestore
+    await analysis_store.create_analysis(request_id, {
         "request_id": request_id,
         "status": "pending",
         "company_name": request.company_name,
         "industry_name": request.industry_name,
         "num_use_cases": request.num_use_cases,
-        "created_at": None,
-    }
+    })
 
     # Start analysis in background
     background_tasks.add_task(
@@ -177,10 +215,10 @@ async def analyze(request: AnalysisRequest, background_tasks: BackgroundTasks):
 @app.get("/api/analysis/{request_id}", response_model=AnalysisResponse)
 async def get_analysis(request_id: str):
     """Get the status and results of an analysis."""
-    if request_id not in analyses:
+    analysis = await analysis_store.get_analysis(request_id)
+    
+    if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
-
-    analysis = analyses[request_id]
 
     return AnalysisResponse(
         request_id=analysis["request_id"],
@@ -196,10 +234,10 @@ async def get_analysis(request_id: str):
 @app.get("/api/markdown/{request_id}")
 async def get_markdown(request_id: str):
     """Get the markdown output for an analysis."""
-    if request_id not in analyses:
+    analysis = await analysis_store.get_analysis(request_id)
+    
+    if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
-
-    analysis = analyses[request_id]
 
     if analysis["status"] != "completed":
         raise HTTPException(status_code=400, detail="Analysis not yet completed")
