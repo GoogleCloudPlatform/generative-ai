@@ -7,9 +7,7 @@ steps:
       - 'enable'
       - 'run.googleapis.com'
       - 'cloudbuild.googleapis.com'
-      - 'iam.googleapis.com'
       - 'aiplatform.googleapis.com'
-      - 'firebase.googleapis.com'
     timeout: '300s'
 
   # Step 2: Create service account if it doesn't exist
@@ -22,176 +20,176 @@ steps:
         SA_NAME="market-analyst-sa"
         SA_EMAIL="$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"
         
-        echo "Checking if service account exists..."
         if gcloud iam service-accounts describe $SA_EMAIL 2>/dev/null; then
-            echo "✅ Service account $SA_EMAIL already exists."
+            echo "✅ Service account already exists."
         else
-            echo "🔧 Creating service account $SA_EMAIL..."
+            echo "🔧 Creating service account..."
             gcloud iam service-accounts create $SA_NAME \
-                --display-name="Market Analyst Service Account" \
-                --description="Service account for Market Analyst application"
-            echo "✅ Service account created successfully!"
+                --display-name="Market Analyst Service Account"
+            
+            # Grant necessary permissions
+            gcloud projects add-iam-policy-binding $PROJECT_ID \
+                --member="serviceAccount:$SA_EMAIL" \
+                --role="roles/aiplatform.user" --quiet
         fi
-    timeout: '120s'
+    timeout: '180s'
 
-  # Step 3: Grant necessary permissions to service account
+  # Step 3: Build and push backend image using gcloud builds submit (your preferred method)
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'grant-permissions'
+    id: 'build-push-backend'
+    dir: 'backend'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        SA_EMAIL="market-analyst-sa@$PROJECT_ID.iam.gserviceaccount.com"
+        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        SERVICE_NAME="market-analyst-backend"
+        IMAGE_NAME="gcr.io/$PROJECT_ID/$SERVICE_NAME:$TIMESTAMP"
         
-        echo "🔐 Granting necessary permissions to service account..."
+        echo "🔨 Building and pushing container image: $IMAGE_NAME"
+        gcloud builds submit --tag $IMAGE_NAME
         
-        # Cloud Run Invoker role
-        gcloud projects add-iam-policy-binding $PROJECT_ID \
-            --member="serviceAccount:$SA_EMAIL" \
-            --role="roles/run.invoker" \
-            --quiet
-        
-        # Storage Object Viewer
-        gcloud projects add-iam-policy-binding $PROJECT_ID \
-            --member="serviceAccount:$SA_EMAIL" \
-            --role="roles/storage.objectViewer" \
-            --quiet
-        
-        # Vertex AI User (for Gemini)
-        gcloud projects add-iam-policy-binding $PROJECT_ID \
-            --member="serviceAccount:$SA_EMAIL" \
-            --role="roles/aiplatform.user" \
-            --quiet
-        
-        # Logging Writer (for application logs)
-        gcloud projects add-iam-policy-binding $PROJECT_ID \
-            --member="serviceAccount:$SA_EMAIL" \
-            --role="roles/logging.logWriter" \
-            --quiet
-        
-        # Monitoring Metric Writer (for custom metrics)
-        gcloud projects add-iam-policy-binding $PROJECT_ID \
-            --member="serviceAccount:$SA_EMAIL" \
-            --role="roles/monitoring.metricWriter" \
-            --quiet
-        
-        echo "✅ All permissions granted successfully!"
-    timeout: '300s'
+        # Save image name for next step
+        echo $IMAGE_NAME > /workspace/backend_image.txt
+        echo $SERVICE_NAME > /workspace/backend_service.txt
+    timeout: '900s'
 
-  - name: 'gcr.io/buildpacks/pack'
-    id: 'buildpacks-build'
-    dir: 'backend'
-    entrypoint: 'pack'
-    args:
-      - 'build'
-      - 'gcr.io/$PROJECT_ID/market-analyst-backend:$BUILD_ID'
-      - '--builder'
-      - 'gcr.io/buildpacks/builder:latest'
-      - '--publish'
-
-  # Step 6: Deploy backend to Cloud Run
+  # Step 4: Deploy backend to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'deploy-backend'
+    entrypoint: 'bash'
     args:
-      - 'run'
-      - 'deploy'
-      - 'market-analyst-backend'
-      - '--image=gcr.io/$PROJECT_ID/market-analyst-backend:$BUILD_ID'
-      - '--region=us-central1'
-      - '--allow-unauthenticated'
-      - '--port=8000'
-      - '--memory=2Gi'
-      - '--cpu=2'
-      - '--min-instances=0'
-      - '--max-instances=5'
-      - '--timeout=900'
-      - '--set-env-vars=GEMINI_API_KEY=${_GEMINI_API_KEY},SERPAPI_KEY=${_SERPAPI_KEY},GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID,ENVIRONMENT=production'
-      - '--service-account=market-analyst-sa@$PROJECT_ID.iam.gserviceaccount.com'
-      - '--execution-environment=gen2'
-      - '--ingress=all'
+      - '-c'
+      - |
+        IMAGE_NAME=$(cat /workspace/backend_image.txt)
+        SERVICE_NAME=$(cat /workspace/backend_service.txt)
+        SA_EMAIL="market-analyst-sa@$PROJECT_ID.iam.gserviceaccount.com"
+        
+        echo "🚀 Deploying to Cloud Run: $SERVICE_NAME"
+        gcloud run deploy $SERVICE_NAME \
+          --image $IMAGE_NAME \
+          --platform managed \
+          --region us-central1 \
+          --memory 2Gi \
+          --cpu 2 \
+          --timeout 900 \
+          --min-instances 0 \
+          --max-instances 5 \
+          --port 8000 \
+          --set-env-vars="GEMINI_API_KEY=${_GEMINI_API_KEY},SERPAPI_KEY=${_SERPAPI_KEY},GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID,ENVIRONMENT=production" \
+          --service-account $SA_EMAIL \
+          --allow-unauthenticated
     timeout: '600s'
 
-  # Step 7: Wait for deployment and get backend URL
+  # Step 5: Get backend URL
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'get-backend-url'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "⏳ Waiting for backend service to be ready..."
-        gcloud run services wait market-analyst-backend --region=us-central1 --quiet
-        
-        # Get the service URL
-        BACKEND_URL=$(gcloud run services describe market-analyst-backend \
-          --region=us-central1 \
+        SERVICE_NAME=$(cat /workspace/backend_service.txt)
+        BACKEND_URL=$(gcloud run services describe $SERVICE_NAME \
+          --region us-central1 \
           --format="value(status.url)")
         
-        echo "🚀 Backend deployed successfully!"
+        echo "✅ Backend deployed successfully!"
         echo "📍 Backend URL: $BACKEND_URL"
+        echo "🏥 Health Check: $BACKEND_URL/health"
+        
+        # Save for frontend deployment
         echo $BACKEND_URL > /workspace/backend_url.txt
         
-        # Test the backend health endpoint
+        # Test backend health
         echo "🔍 Testing backend health..."
-        curl -f "$BACKEND_URL/health" || echo "⚠️  Health check failed, but continuing..."
+        curl -f "$BACKEND_URL/health" || echo "⚠️ Health check failed, but continuing..."
     timeout: '300s'
 
-  # Step 8: Install frontend dependencies
+  # Step 6: Install frontend dependencies
   - name: 'node:18'
     id: 'install-frontend-deps'
     dir: 'client'
     entrypoint: 'npm'
-    args: ['ci', '--only=production']
+    args: ['ci']
     timeout: '600s'
   
-  # Step 9: Build frontend with backend URL
-  - name: 'node:18'
-    id: 'build-frontend'
+  # Step 7: Build and push frontend image using gcloud builds submit
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'build-push-frontend'
     dir: 'client'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        # Read backend URL
         BACKEND_URL=$(cat /workspace/backend_url.txt)
-        echo "🔧 Building frontend with backend URL: $BACKEND_URL"
+        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        SERVICE_NAME="market-analyst-frontend"
+        IMAGE_NAME="gcr.io/$PROJECT_ID/$SERVICE_NAME:$TIMESTAMP"
         
-        # Set environment variable and build
-        export NEXT_PUBLIC_API_URL=$BACKEND_URL
+        # Create environment file for frontend
+        echo "NEXT_PUBLIC_API_URL=$BACKEND_URL" > .env.production
         
-        # Verify environment variable is set
-        echo "✅ NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL"
+        # Create Dockerfile if it doesn't exist
+        if [ ! -f Dockerfile ]; then
+          cat > Dockerfile << 'EOF'
+        FROM node:18-alpine
+        WORKDIR /app
+        COPY package*.json ./
+        RUN npm ci --only=production
+        COPY . .
+        RUN npm run build
+        EXPOSE 3000
+        CMD ["npm", "start"]
+        EOF
+        fi
         
-        # Build the application
-        npm run build
+        echo "🔨 Building and pushing frontend image: $IMAGE_NAME"
+        gcloud builds submit --tag $IMAGE_NAME
         
-        echo "✅ Frontend build completed successfully!"
-    timeout: '600s'
-    
-  # Step 10: Deploy frontend to Firebase Hosting
-  - name: 'node:18'
+        # Save image name for next step
+        echo $IMAGE_NAME > /workspace/frontend_image.txt
+        echo $SERVICE_NAME > /workspace/frontend_service.txt
+    timeout: '900s'
+
+  # Step 8: Deploy frontend to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
     id: 'deploy-frontend'
-    dir: 'client'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "🔧 Installing Firebase CLI..."
-        npm install -g firebase-tools
+        IMAGE_NAME=$(cat /workspace/frontend_image.txt)
+        SERVICE_NAME=$(cat /workspace/frontend_service.txt)
         
-        echo "🚀 Deploying to Firebase Hosting..."
-        firebase deploy --only hosting --project $PROJECT_ID --token ${_FIREBASE_TOKEN} --non-interactive
-        
-        echo "✅ Frontend deployed successfully!"
+        echo "🚀 Deploying frontend to Cloud Run: $SERVICE_NAME"
+        gcloud run deploy $SERVICE_NAME \
+          --image $IMAGE_NAME \
+          --platform managed \
+          --region us-central1 \
+          --memory 1Gi \
+          --cpu 1 \
+          --timeout 300 \
+          --min-instances 0 \
+          --max-instances 3 \
+          --port 3000 \
+          --allow-unauthenticated
     timeout: '600s'
 
-  # Step 11: Final verification and output
+  # Step 9: Final verification and output
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'final-verification'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        BACKEND_URL=$(cat /workspace/backend_url.txt)
+        BACKEND_SERVICE=$(cat /workspace/backend_service.txt)
+        FRONTEND_SERVICE=$(cat /workspace/frontend_service.txt)
+        
+        BACKEND_URL=$(gcloud run services describe $BACKEND_SERVICE \
+          --region us-central1 --format="value(status.url)")
+        
+        FRONTEND_URL=$(gcloud run services describe $FRONTEND_SERVICE \
+          --region us-central1 --format="value(status.url)")
         
         echo ""
         echo "🎉 =================================="
@@ -199,18 +197,14 @@ steps:
         echo "🎉 =================================="
         echo ""
         echo "📍 Backend URL: $BACKEND_URL"
+        echo "🌐 Frontend URL: $FRONTEND_URL"
         echo "🏥 Health Check: $BACKEND_URL/health"
-        echo "💬 API Endpoint: $BACKEND_URL/api/analyze"
         echo ""
-        echo "🌐 Frontend will be available at your Firebase Hosting URL"
-        echo ""
-        echo "📝 Next Steps:"
-        echo "1. Test your backend: curl $BACKEND_URL/health"
-        echo "2. Check your Firebase Hosting URL in the console"
-        echo "3. Test the complete application flow"
+        echo "🧪 Test your deployment:"
+        echo "curl $BACKEND_URL/health"
         echo ""
         echo "🔧 To update environment variables later:"
-        echo "gcloud run services update market-analyst-backend \\"
+        echo "gcloud run services update $BACKEND_SERVICE \\"
         echo "  --set-env-vars=\"NEW_VAR=value\" \\"
         echo "  --region=us-central1"
     timeout: '60s'
@@ -219,13 +213,11 @@ steps:
 substitutions:
   _GEMINI_API_KEY: ''     # Set this in your Cloud Build trigger
   _SERPAPI_KEY: ''        # Set this in your Cloud Build trigger
-  _FIREBASE_TOKEN: ''     # Get this from: firebase login:ci
 
 # Build configuration
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_HIGHCPU_8'
-  timeout: '3600s'
 
-# Optional: Define build timeout and resource allocation
+# Optional: Define build timeout
 timeout: '3600s'
