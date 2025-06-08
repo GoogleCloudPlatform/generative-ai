@@ -70,7 +70,7 @@ class Orchestrator:
         industry_name: Optional[str] = None,
         num_use_cases: int = 5,
     ) -> Dict[str, Any]:
-        """Generate AI/GenAI use cases for a company/industry.
+        """Generate AI/Gen AI use cases for a company/industry.
 
         Args:
             company_name: Optional name of the company.

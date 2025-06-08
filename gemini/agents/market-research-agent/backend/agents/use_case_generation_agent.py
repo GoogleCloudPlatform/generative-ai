@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class UseCaseGenerationAgent:
-    """Agent for generating AI and GenAI use cases."""
+    """Agent for generating AI and Gen AI use cases."""
 
     def __init__(self, llm: LLMInterface, analysis_tools: AnalysisTools):
         """Initialize the use case generation agent.
@@ -26,7 +26,7 @@ class UseCaseGenerationAgent:
         industry_info: Dict[str, Any],
         num_use_cases: int = 5,
     ) -> List[Dict[str, Any]]:
-        """Generate AI and GenAI use cases for a company.
+        """Generate AI and Gen AI use cases for a company.
 
         Args:
             company_info: Information about the company.
@@ -97,7 +97,7 @@ class UseCaseGenerationAgent:
 
         prompt = f"""
         
-        For each of the following AI and GenAI use cases, provide a list of 5-7 relevant keywords that would be useful for finding datasets, implementation resources, and research papers.
+        For each of the following AI and Gen AI use cases, provide a list of 5-7 relevant keywords that would be useful for finding datasets, implementation resources, and research papers.
         
         USE CASES: {use_cases_text}
         

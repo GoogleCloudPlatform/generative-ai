@@ -95,7 +95,7 @@ def create_use_case_workflow(llm: LLMInterface, analysis_tools: AnalysisTools):
         )
 
         prompt = f"""
-For each of the following AI and GenAI use cases, provide a list of 5-7 relevant keywords that would be useful for finding datasets, implementation resources, and research papers.
+For each of the following AI and Gen AI use cases, provide a list of 5-7 relevant keywords that would be useful for finding datasets, implementation resources, and research papers.
 
 USE CASES:
 {use_cases_text}

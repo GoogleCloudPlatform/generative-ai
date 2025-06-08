@@ -27,7 +27,7 @@ logger = setup_logging()
 # Initialize FastAPI app
 app = FastAPI(
     title="AI Market Analyst API",
-    description="API for generating AI and GenAI use cases for companies and industries",
+    description="API for generating AI and Gen AI use cases for companies and industries",
     version="1.0.0",
 )
 

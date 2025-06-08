@@ -81,7 +81,7 @@ class AnalysisTools:
 
         # Create the prompt for use case extraction
         prompt = f"""
-        You are an AI expert in Analyze the following information about a company and its industry to identify potential AI and GenAI use cases:
+        You are an AI expert in Analyze the following information about a company and its industry to identify potential AI and Gen AI use cases:
 
         Company Information:
             - Name: {company_info.get("name", "Unknown")}
@@ -98,7 +98,7 @@ class AnalysisTools:
             - Major Players: {", ".join(industry_info.get("major_players", []))}
             - Existing AI Applications: {" ".join(industry_info.get("ai_applications", []))}
 
-        Generate {num_use_cases} high-value, innovative AI and GenAI use cases that would benefit this company, focusing on:
+        Generate {num_use_cases} high-value, innovative AI and Gen AI use cases that would benefit this company, focusing on:
             1. Business operations improvement
             2. Customer experience enhancement
             3. Product/service innovation
@@ -111,7 +111,7 @@ class AnalysisTools:
         """
 
         system_prompt = """
-        You are an AI strategy consultant specializing in identifying high-value AI and GenAI implementation opportunities for companies across various industries. Your expertise includes understanding business operations, market dynamics, and how AI technologies can address specific challenges and create competitive advantages.
+        You are an AI strategy consultant specializing in identifying high-value AI and Gen AI implementation opportunities for companies across various industries. Your expertise includes understanding business operations, market dynamics, and how AI technologies can address specific challenges and create competitive advantages.
         """
 
         try:
@@ -184,7 +184,7 @@ class AnalysisTools:
         )
 
         prompt = f"""
-        Review and prioritize the following AI and GenAI use cases for {company_info.get("name", "this company")} in the {company_info.get("industry", "")} industry.
+        Review and prioritize the following AI and Gen AI use cases for {company_info.get("name", "this company")} in the {company_info.get("industry", "")} industry.
 
         COMPANY INFORMATION:
             - Description: {company_info.get("description", "")}
@@ -207,7 +207,7 @@ class AnalysisTools:
     """
 
         system_prompt = """
-        You are an AI implementation strategist who helps companies prioritize AI and GenAI initiatives based on business value, feasibility, and strategic alignment. You have extensive experience in technology roadmapping and resource allocation for AI projects.
+        You are an AI implementation strategist who helps companies prioritize AI and Gen AI initiatives based on business value, feasibility, and strategic alignment. You have extensive experience in technology roadmapping and resource allocation for AI projects.
         """
 
         try:

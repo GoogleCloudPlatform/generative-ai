@@ -131,7 +131,7 @@ class ResourceCollectionAgent:
             )
 
             prompt = f"""
-            Evaluate the relevance of the following resources for implementing this AI/GenAI use case:
+            Evaluate the relevance of the following resources for implementing this AI/Gen AI use case:
 
             {use_case_text}
 

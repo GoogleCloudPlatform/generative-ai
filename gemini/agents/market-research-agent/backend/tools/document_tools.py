@@ -38,14 +38,14 @@ class DocumentTools:
             Markdown formatted document.
         """
         # Generate document title
-        title = f"AI and GenAI Use Case Proposal for {company_info.get('name', 'Your Company')}"
+        title = f"AI and Gen AI Use Case Proposal for {company_info.get('name', 'Your Company')}"
 
         # Generate document header
         header = f"""# {title}
         
         ## Executive Summary
 
-        This proposal outlines strategic AI and Generative AI (GenAI) use cases for {company_info.get("name", "your company")} in the {company_info.get("industry", "")} industry. The proposed use cases are designed to enhance operational efficiency, improve customer experiences, and create competitive advantages.
+        This proposal outlines strategic AI and Generative AI (Gen AI) use cases for {company_info.get("name", "your company")} in the {company_info.get("industry", "")} industry. The proposed use cases are designed to enhance operational efficiency, improve customer experiences, and create competitive advantages.
 
         **Generated on:** {datetime.now().strftime("%B %d, %Y")}
 
@@ -67,7 +67,7 @@ class DocumentTools:
         #### Industry Challenges
         {self._format_bullet_list(industry_info.get("challenges", []))}
 
-        ## AI and GenAI Use Cases
+        ## AI and Gen AI Use Cases
 
         """
 
@@ -132,7 +132,7 @@ class DocumentTools:
         conclusion = f"""
         ## Conclusion
 
-        The proposed AI and GenAI use cases present significant opportunities for {company_info.get("name", "your company")} to enhance operations, improve customer experiences, and gain competitive advantages in the {company_info.get("industry", "")} industry. We recommend starting with the highest priority use cases and developing a phased implementation roadmap.
+        The proposed AI and Gen AI use cases present significant opportunities for {company_info.get("name", "your company")} to enhance operations, improve customer experiences, and gain competitive advantages in the {company_info.get("industry", "")} industry. We recommend starting with the highest priority use cases and developing a phased implementation roadmap.
 
         For each use case, we've provided relevant datasets and implementation resources to accelerate development and reduce implementation risks.
         """

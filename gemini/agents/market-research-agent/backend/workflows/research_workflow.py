@@ -94,7 +94,7 @@ def create_research_workflow(llm: LLMInterface, search_tools: SearchTools):
 
         prompt += """Provide additional insights in the following areas:
 1. Key operational challenges faced by companies in this industry
-2. Areas where AI and GenAI could provide significant value
+2. Areas where AI and Gen AI could provide significant value
 3. Industry-specific considerations for AI implementation
 4. Potential data sources within such companies that could be leveraged for AI
 
