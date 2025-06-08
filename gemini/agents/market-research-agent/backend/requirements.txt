@@ -26,7 +26,6 @@ dill==0.3.8
 diskcache==5.6.3
 distro==1.9.0
 docstring_parser==0.16
-dspy==2.6.14
 dspy-ai==2.6.17
 fastapi==0.115.12
 filelock==3.18.0
@@ -139,7 +138,6 @@ referencing==0.36.2
 regex==2024.11.6
 requests==2.32.3
 requests-toolbelt==1.0.0
-rich==14.0.0
 rpds-py==0.24.0
 rsa==4.9
 setuptools==78.1.0

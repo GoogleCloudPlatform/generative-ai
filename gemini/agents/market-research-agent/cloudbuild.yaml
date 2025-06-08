@@ -1,5 +1,5 @@
 steps:
-  # Build and deploy backend to Cloud Run
+  # Deploy backend to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     dir: 'backend'
     args:
@@ -10,18 +10,47 @@ steps:
       - '--region=us-central1'
       - '--allow-unauthenticated'
       - '--port=8000'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--min-instances=1'
+      - '--max-instances=5'
+      - '--set-env-vars=GEMINI_API_KEY=${_GEMINI_API_KEY},SERPAPI_KEY=${_SERPAPI_KEY}'
 
-  # Build and deploy frontend to Firebase
+  # Get backend URL for frontend
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'get-backend-url'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BACKEND_URL=$(gcloud run services describe market-analyst-backend --region=us-central1 --format="value(status.url)")
+        echo $BACKEND_URL > /workspace/backend_url.txt
+
+  # Install frontend dependencies
   - name: 'node:18'
     dir: 'client'
     entrypoint: 'npm'
     args: ['install']
   
+  # Build frontend with backend URL
   - name: 'node:18'
     dir: 'client'
-    entrypoint: 'npm'
-    args: ['run', 'build']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        export NEXT_PUBLIC_API_URL=$(cat /workspace/backend_url.txt)
+        npm run build
     
+  # Deploy frontend to Firebase Hosting
   - name: 'gcr.io/$PROJECT_ID/firebase'
     dir: 'client'
     args: ['deploy', '--only=hosting', '--project=$PROJECT_ID']
+
+substitutions:
+  _GEMINI_API_KEY: ''
+  _SERPAPI_KEY: ''
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'

@@ -4,7 +4,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 import httpx
-from langchain.utilities import SerpAPIWrapper
+from langchain_community.utilities import SerpAPIWrapper
 
 from config.settings import SEARCH_CONFIG, SERPAPI_KEY
 

@@ -1,24 +1,28 @@
 {
   "name": "AI-Powered Market Analyst",
   "description": "Multi-agent system for market analysis and AI use case generation",
-  "repository": "https://github.com/GoogleCloudPlatform/generative-ai",
-  "logo": "https://cloud.google.com/_static/cloud/images/social-icon-google-cloud-1200-630.png",
+  "repository": "https://github.com/iprajwaal/generative-ai",
   "keywords": ["ai", "market-analysis", "langgraph", "gemini"],
-  "success_url": "/",
   "env": {
     "GEMINI_API_KEY": {
-      "description": "Google Gemini API Key",
+      "description": "Google Gemini API Key from https://aistudio.google.com/app/apikey",
       "required": true
     },
     "SERPAPI_KEY": {
-      "description": "SERP API Key for web search",
+      "description": "SERP API Key for web search from https://serpapi.com/",
       "required": true
-    }
-  },
-  "formation": {
-    "backend": {
-      "quantity": 1,
-      "size": "cloud-run-cpu-1"
+    },
+    "KAGGLE_USERNAME": {
+      "description": "Kaggle username (optional)",
+      "required": false
+    },
+    "KAGGLE_KEY": {
+      "description": "Kaggle API key (optional)",
+      "required": false
+    },
+    "HUGGINGFACE_API_KEY": {
+      "description": "HuggingFace API key (optional)",
+      "required": false
     }
   }
 }

@@ -1,3 +1,5 @@
+/Users/prajwal/Developer/generative-ai/gemini/agents/market-research-agent/client/src/components/results/ResourceLinks.jsx
+
 import React from "react";
 
 export default function ResourceLinks({ title, resources }) {

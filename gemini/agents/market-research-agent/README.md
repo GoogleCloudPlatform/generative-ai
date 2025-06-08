@@ -61,7 +61,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 # Start backend (from backend/)
 uvicorn app:app --port 8000 --reload
 
-# Start frontend (from frontend/)
+# Start frontend (from client/)
 npm run dev
 ```
 
@@ -98,9 +98,8 @@ export LANGFUSE_SECRET_KEY='sk-lf-your_langfuse_secret_key'
 ```bash
 mkdir -p backend/credentials
 cat <<EOF > backend/credentials/.env
-```
+
 # Environment variables for backend
-```bash
 GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
 GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION
 
@@ -181,7 +180,7 @@ ai-powered-market-analyst
 │   │   └── resource_workflow.py
 │   └── app.py                    ; FastAPI application server
 │
-├── frontend                      ; Next.js web application
+├── client                        ; Next.js web application
 │   ├── src
 │   │   ├── components
 │   │   │   ├── layout           ; Application layout components
