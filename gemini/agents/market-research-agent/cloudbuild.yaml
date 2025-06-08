@@ -78,26 +78,16 @@ steps:
         echo "✅ All permissions granted successfully!"
     timeout: '300s'
 
-  # Step 4: Build Docker image
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'build-image'
+  - name: 'gcr.io/buildpacks/pack'
+    id: 'buildpacks-build'
     dir: 'backend'
+    entrypoint: 'pack'
     args:
       - 'build'
-      - '-t'
       - 'gcr.io/$PROJECT_ID/market-analyst-backend:$BUILD_ID'
-      - '-f'
-      - 'Dockerfile'
-      - '.'
-    timeout: '600s'
-
-  # Step 5: Push Docker image
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'push-image'
-    args:
-      - 'push'
-      - 'gcr.io/$PROJECT_ID/market-analyst-backend:$BUILD_ID'
-    timeout: '300s'
+      - '--builder'
+      - 'gcr.io/buildpacks/builder:latest'
+      - '--publish'
 
   # Step 6: Deploy backend to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
