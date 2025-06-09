@@ -10,7 +10,7 @@ logs_dir = BASE_DIR / "logs"
 logs_dir.mkdir(exist_ok=True)
 
 # Configure logging
-log_file_path = logs_dir / LOG_LEVEL
+log_file_path = logs_dir / LOG_FILE
 
 
 # Configure logging
