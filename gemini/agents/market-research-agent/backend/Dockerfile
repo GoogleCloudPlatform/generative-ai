@@ -33,5 +33,14 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Start the application
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
+# Start the application with optimized settings for FastAPI + Cloud Run
+CMD exec gunicorn app:app \
+    --bind :$PORT \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --workers 2 \
+    --worker-connections 1000 \
+    --timeout 900 \
+    --keep-alive 2 \
+    --max-requests 1000 \
+    --max-requests-jitter 50 \
+    --preload
