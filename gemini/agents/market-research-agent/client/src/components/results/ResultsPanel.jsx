@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Card from "../ui/Card";
 import Loader from "../ui/Loader";
 import UseCaseCard from "./UseCaseCard";
+import ResourceLinks from "./ResourceLinks"; // Add this import
 import Button from "../ui/Button";
 import { getAnalysis, getMarkdown } from "../../services/api";
 
@@ -319,12 +320,22 @@ export default function ResultsPanel({ requestId }) {
                   </div>
                   <div className="space-y-6">
                     {analysisData.use_cases.map((useCase, index) => (
-                      <UseCaseCard
-                        key={index}
-                        useCase={useCase}
-                        resources={analysisData.resources?.[useCase.title]}
-                        index={index}
-                      />
+                      <div key={index} className="space-y-4">
+                        <UseCaseCard
+                          useCase={useCase}
+                          resources={analysisData.resources?.[useCase.title]}
+                          index={index}
+                        />
+                        {/* Add ResourceLinks component here */}
+                        {analysisData.resources?.[useCase.title] && (
+                          <div className="ml-4 pl-4 border-l-2 border-gray-200">
+                            <ResourceLinks
+                              title="Additional Resources"
+                              resources={analysisData.resources[useCase.title]}
+                            />
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
