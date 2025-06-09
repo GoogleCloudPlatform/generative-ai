@@ -1,8 +1,14 @@
 # AI-Powered Market Analyst
 
-Deploy the complete application with one click:
+Get started with the Gemini API for intelligent market analysis and AI use case generation.
 
-[![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+<a href="https://idx.google.com/import?url=https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/agents/market-research-agent">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://cdn.idx.dev/btn/open_dark_32@2x.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://cdn.idx.dev/btn/open_light_32@2x.png">
+  <img height="32" alt="Open in IDX" src="https://cdn.idx.dev/btn/open_purple_32@2x.png">
+</picture>
+</a>
 
 > A multi-agent system that leverages LLMs to research companies and industries, generate tailored AI use cases, and provide implementation resources. Built with LangChain and LangGraph for intelligent workflow orchestration.
 
@@ -50,8 +56,20 @@ npm install
 
 Create `.env` file in backend/:
 ```env
+# API Keys
 GEMINI_API_KEY=your_gemini_api_key
 SERPAPI_KEY=your_serpapi_key
+KAGGLE_USERNAME=your_kaggle_username
+KAGGLE_KEY=your_kaggle_key
+HUGGINGFACE_API_KEY=your_huggingface_api_key
+
+# Optional Langfuse Monitoring
+LANGFUSE_PUBLIC_KEY=pk-lf-your_langfuse_public_key
+LANGFUSE_SECRET_KEY=sk-lf-your_langfuse_secret_key
+
+# LLM Configuration
+LLM_PROVIDER=llm_provider # e.g., "gemini"
+LLM_MODEL=llm_model # e.g., "gemini-2.5-pro-preview-03-25"
 ```
 
 Create `.env.local` in client/:
@@ -70,81 +88,6 @@ npm run dev
 ```
 
 Visit `http://localhost:3000` to use the application.
-
-## Deploy to Google Cloud ☁️
-
-Deploy the complete application with one click:
-
-[![Deploy to Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
-
-**Architecture**: Backend deployed to Cloud Run, Frontend deployed to Firebase Hosting
-
-### Manual Deployment
-
-**Deploy Backend to Cloud Run:**
-
-```bash
-# Set environment variables
-export GOOGLE_CLOUD_PROJECT='your-project-id'
-export GOOGLE_CLOUD_REGION='us-central1'
-export SERVICE_NAME='market-analyst-backend'
-
-export GEMINI_API_KEY='your-gemini-api-key'
-export SERPAPI_KEY='your-serpapi-key'
-export KAGGLE_USERNAME='your-kaggle-username'
-export KAGGLE_KEY='your-kaggle-key'
-export HUGGINGFACE_API_KEY='your-huggingface-api-key'
-export LANGFUSE_PUBLIC_KEY='pk-lf-your_langfuse_public_key'
-export LANGFUSE_SECRET_KEY='sk-lf-your_langfuse_secret_key'
-```
-
-# Create .env file for backend
-```bash
-cat <<EOF > backend/.env
-
-# Environment variables for backend
-GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
-GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION
-
-# API keys 
-GEMINI_API_KEY=your_gemini_api_key
-SERPAPI_KEY=your_serpapi_key
-KAGGLE_USERNAME=your_kaggle_username
-KAGGLE_KEY=your_kaggle_key
-HUGGINGFACE_API_KEY=your_huggingface_api_key
-
-# Optional Langfuse Monitoring
-LANGFUSE_PUBLIC_KEY=pk-lf-your_langfuse_public_key
-LANGFUSE_SECRET_KEY=sk-lf-your_langfuse_secret_key
-```
-
-
-
-# Deploy to Cloud Run
-```bash
-cd backend
-gcloud run deploy "$SERVICE_NAME" \
-  --port=8000 \
-  --source=. \
-  --allow-unauthenticated \
-  --region=$GOOGLE_CLOUD_REGION \
-  --project=$GOOGLE_CLOUD_PROJECT \
-  --set-env-vars=GEMINI_API_KEY=$GEMINI_API_KEY,SERPAPI_KEY=$SERPAPI_KEY,KAGGLE_USERNAME=$KAGGLE_USERNAME,KAGGLE_KEY=$KAGGLE_KEY,HUGGINGFACE_API_KEY=$HUGGINGFACE_API_KEY,LANGFUSE_PUBLIC_KEY=$LANGFUSE_PUBLIC_KEY,LANGFUSE_SECRET_KEY=$LANGFUSE_SECRET_KEY
-```
-
-**Deploy Frontend to Firebase:**
-
-```bash
-# Install Firebase CLI and login
-npm install -g firebase-tools
-firebase login
-
-# Initialize and deploy
-cd client
-npm run build
-firebase init hosting
-firebase deploy
-```
 
 ## How It Works
 
@@ -241,9 +184,6 @@ Input: `"Healthcare"`
 - **Resources Found**: Medical imaging datasets, pre-trained models for healthcare, clinical trial databases
 - **Business Value**: Faster diagnosis, reduced healthcare costs, improved patient outcomes
 
-## License
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
