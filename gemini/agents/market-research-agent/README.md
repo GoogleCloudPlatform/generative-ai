@@ -34,7 +34,7 @@ Deploy the complete application with one click:
 ```bash
 # Clone the repository
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-cd cd generative-ai/gemini/agents/market-research-agent
+cd generative-ai/gemini/agents/market-research-agent
 
 # Backend setup
 cd backend
