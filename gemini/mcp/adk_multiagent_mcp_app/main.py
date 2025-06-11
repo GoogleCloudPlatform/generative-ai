@@ -4,6 +4,7 @@ Main function to run FastAPI server.
 
 import json
 import logging
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
@@ -14,7 +15,6 @@ from google.adk.sessions import InMemorySessionService
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 from google.genai import types
 from starlette.websockets import WebSocketDisconnect
-
 
 # --- Configuration & Global Setup ---
 load_dotenv()
