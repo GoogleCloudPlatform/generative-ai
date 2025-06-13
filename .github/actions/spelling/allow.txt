@@ -1,4 +1,5 @@
 AALR
+ADAS
 ADK
 ADMA
 AFX
@@ -664,6 +665,7 @@ codefile
 codehaus
 codelab
 codelabs
+codenamed
 coderag
 codespell
 colab
@@ -1158,6 +1160,7 @@ ratelimit
 rawbytes
 rbc
 rbf
+rbm
 recrawl
 reddit
 redef
