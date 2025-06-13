@@ -13,8 +13,6 @@ AOT
 APAC
 APIENTRY
 APSTUDIO
-Arize
-arize
 ASF
 ASGI
 ASML
@@ -28,6 +26,7 @@ Anant
 Aphone
 Arborio
 Arepa
+Arize
 Arjen
 Arsan
 Artsakh
@@ -35,8 +34,8 @@ Ashish
 Aspeed
 Atulan
 Autorater
-BIKBEAR
 BGR
+BIKBEAR
 BITCODE
 BYOR
 Benno
@@ -406,7 +405,6 @@ SDKROOT
 SEK
 SEO
 SERPER
-serper
 SIMONE
 SKUs
 SMSN
@@ -581,6 +579,7 @@ arange
 aretrieve
 argmax
 arguana
+arize
 arun
 arxiv
 astype
@@ -1194,6 +1193,7 @@ selftext
 selkirk
 seo
 serde
+serper
 setlocal
 sft
 shortdesc
