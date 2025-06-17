@@ -38,12 +38,17 @@ def _region() -> str:
 MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
-    "gemini-2.5-pro-preview-05-06": "Gemini 2.5 Pro",
-    "gemini-2.5-flash-preview-05-20": "Gemini 2.5 Flash",
+    "gemini-2.5-flash-lite-preview-06-17": "Gemini 2.5 Flash-Lite",
+    "gemini-2.5-pro": "Gemini 2.5 Pro",
+    "gemini-2.5-flash": "Gemini 2.5 Flash",
     "model-optimizer-exp-04-09": "Model Optimizer",
 }
 
-THINKING_BUDGET_MODELS = {"gemini-2.5-flash-preview-05-20"}
+THINKING_BUDGET_MODELS = {
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite-preview-06-17",
+}
 
 
 @st.cache_resource
@@ -61,10 +66,10 @@ def load_client() -> genai.Client:
         st.stop()
     if not LOCATION:
         st.warning(
-            "⚠️ Could not determine Google Cloud Region. Using 'us-central1'. "
+            "⚠️ Could not determine Google Cloud Region. Using 'global'. "
             "Ensure GOOGLE_CLOUD_REGION environment variable is set or metadata service is accessible if needed."
         )
-        LOCATION = "us-central1"
+        LOCATION = "global"
 
     return genai.Client(
         vertexai=True,
