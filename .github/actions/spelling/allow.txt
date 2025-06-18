@@ -204,7 +204,6 @@ ICICI
 ICML
 IFI
 ILB
-Img
 INFOPLIST
 INR
 IOMGR
@@ -212,6 +211,7 @@ IRAs
 ITDMs
 IVF
 Ilkay
+Img
 Iosif
 J'aime
 JAVACMD
