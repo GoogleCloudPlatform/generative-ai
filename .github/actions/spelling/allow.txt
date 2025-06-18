@@ -1,4 +1,5 @@
 AALR
+ABG
 ADAS
 ADK
 ADMA
@@ -64,6 +65,7 @@ CLIs
 COCOAPODS
 COINIT
 CONOUT
+COPD
 COUNTIF
 CRM
 CTHH
@@ -73,6 +75,7 @@ CVD
 CWLEY
 CZE
 Caprese
+Cardizem
 Chocolat
 Chrono
 Chunyuan
@@ -84,6 +87,7 @@ Crossbody
 D'orsay
 DCR
 DHH
+DKA
 DLC
 DLCs
 DOCDB
@@ -102,6 +106,7 @@ Doaa
 Doogler
 Dreesen
 Duh
+Duonebs
 Durafast
 Durmus
 Dzor
@@ -120,6 +125,7 @@ EVs
 Edunov
 Einhalt
 Eleuther
+Eliquis
 Eliud
 Embs
 Envane
@@ -264,6 +270,7 @@ LSum
 LTRB
 LUVBPTK
 Ladhak
+Levaquin
 Leventer
 Livewire
 Llion
@@ -273,6 +280,7 @@ Logrus
 Lopyrev
 Lottry
 MCP
+MDD
 MFU
 MICOA
 MLB
@@ -320,6 +328,7 @@ NOMINATIM
 NOMINMAX
 NOZORDER
 NPCs
+NPO
 NREL
 NVIDIA
 NVL
@@ -389,6 +398,7 @@ ROOTSPAN
 RRF
 RTN
 RUNPATH
+RVR
 RYDE
 Rabbids
 Raducanu
@@ -499,6 +509,7 @@ Usain
 Uszkoreit
 Utik
 VAPO
+VBG
 VFT
 VLM
 VMs
@@ -548,6 +559,7 @@ Zakarids
 Zhaohua
 Zijin
 Zom
+Zosyn
 Zscaler
 Zuv
 aadd
@@ -573,6 +585,7 @@ alisal
 alloydb
 antiword
 apikeys
+apixaban
 apk
 appuser
 appyaml
@@ -625,6 +638,7 @@ boundings
 boxplot
 bpa
 bpd
+bpm
 bqdf
 bqml
 breakroom
@@ -705,6 +719,7 @@ dente
 descgen
 deskmates
 dfs
+diltiazem
 dino
 direnv
 diy
@@ -933,6 +948,7 @@ kpi
 kubectl
 kyc
 l'harmonie
+labetalol
 lakecolor
 landcolor
 landuse
@@ -992,6 +1008,7 @@ mics
 millis
 miranda
 mmarco
+mmol
 mmr
 modelfile
 monty
@@ -1110,6 +1127,7 @@ podcasts
 podfile
 podhelper
 podman
+postictal
 powerups
 praw
 prcntg
