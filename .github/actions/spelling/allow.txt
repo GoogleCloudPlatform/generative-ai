@@ -1417,6 +1417,7 @@ xzn
 yanchor
 yaxes
 yaxis
+ycol
 ycolylabel
 yougov
 youtube

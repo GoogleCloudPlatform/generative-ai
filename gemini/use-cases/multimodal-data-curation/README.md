@@ -62,7 +62,7 @@ This solution is tailor-made for customers relatively new to building proprietar
 * Educational content creators
 * Marketing agencies looking to leverage generative AI
 
-Our goal is to evangelize the power of Google Cloud's managed service offerings – including **Dataflow**, **BigQuery**, **Vector Search**, and **Gemini** – to demonstrate the tangible business value and productivity gains that migrating to GCP can unlock.
+Our goal is to evangelize the power of Google Cloud's managed service offerings – including **Dataflow**, **BigQuery**, **Vector Search**, and **Gemini** – to demonstrate the tangible business value and productivity gains that migrating to Google Cloud can unlock.
 
 **Who it's not for:** Advanced research organizations that have already settled on alternative orchestration frameworks (like Ray or Spark) for their existing, highly specialized pipelines.
 
