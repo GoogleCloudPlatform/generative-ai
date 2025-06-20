@@ -1,0 +1,3 @@
+streamlit
+google-genai
+gitingest
