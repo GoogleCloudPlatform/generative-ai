@@ -1418,7 +1418,7 @@ yanchor
 yaxes
 yaxis
 ycol
-ycolylabel
+ylabel
 yougov
 youtube
 yref
