@@ -6,6 +6,7 @@ This repository contains examples for deploying and fine-tuning open source mode
 
 ### Serving
 
+- [get_started_with_model_garden_sdk.ipynb](./get_started_with_model_garden_sdk.ipynb) - This notebook showcase how to deploy and serve open models on Vertex AI using the Model Garden SDK, with simplified setup and streamlined configs.
 - [serving/cloud_run_ollama_gemma3_inference.ipynb](./serving/cloud_run_ollama_gemma3_inference.ipynb) - This notebook showcase how to deploy Google Gemma 3 in Cloud Run using Ollama, with the objective to build a simple API for chat.
 - [serving/cloud_run_vllm_gemma3_inference.ipynb](./serving/cloud_run_vllm_gemma3_inference.ipynb) - This notebook showcase how to deploy Google Gemma 3 in Cloud Run using vLLM, with the objective to build a simple API for chat.
 - [serving/cloud_run_ollama_qwen3_inference.ipynb](./serving/cloud_run_ollama_qwen3_inference.ipynb) - This notebook shows how to deploy Qwen 3 in Cloud Run using Ollama, with the objective to build a simple AI Agent.
