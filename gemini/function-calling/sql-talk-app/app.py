@@ -2,13 +2,13 @@
 
 import time
 
+import streamlit as st
 from google import genai
 from google.cloud import bigquery
 from google.genai.types import FunctionDeclaration, GenerateContentConfig, Part, Tool
-import streamlit as st
 
 BIGQUERY_DATASET_ID = "thelook_ecommerce"
-MODEL_ID = "gemini-2.0-flash"
+MODEL_ID = "gemini-2.5-pro"
 LOCATION = "us-central1"
 
 list_datasets_func = FunctionDeclaration(
@@ -146,9 +146,9 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
         try:
             response = chat.send_message(prompt)
-            response = response.candidates[0].content.parts[0]
+            part = response.candidates[0].content.parts[0]
 
-            print(response)
+            print(part)
 
             api_requests_and_responses = []
             backend_details = ""
@@ -157,32 +157,32 @@ if prompt := st.chat_input("Ask me about information in the database..."):
             while function_calling_in_process:
                 try:
                     params = {}
-                    for key, value in response.function_call.args.items():
+                    for key, value in part.function_call.args.items():
                         params[key] = value
 
-                    print(response.function_call.name)
+                    print(part.function_call.name)
                     print(params)
 
-                    if response.function_call.name == "list_datasets":
+                    if part.function_call.name == "list_datasets":
                         api_response = client.list_datasets()
                         api_response = BIGQUERY_DATASET_ID
                         api_requests_and_responses.append(
-                            [response.function_call.name, params, api_response]
+                            [part.function_call.name, params, api_response]
                         )
 
-                    if response.function_call.name == "list_tables":
+                    if part.function_call.name == "list_tables":
                         api_response = client.list_tables(params["dataset_id"])
                         api_response = str([table.table_id for table in api_response])
                         api_requests_and_responses.append(
-                            [response.function_call.name, params, api_response]
+                            [part.function_call.name, params, api_response]
                         )
 
-                    if response.function_call.name == "get_table":
+                    if part.function_call.name == "get_table":
                         api_response = client.get_table(params["table_id"])
                         api_response = api_response.to_api_repr()
                         api_requests_and_responses.append(
                             [
-                                response.function_call.name,
+                                part.function_call.name,
                                 params,
                                 [
                                     str(api_response.get("description", "")),
@@ -199,7 +199,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                         )
                         api_response = str(api_response)
 
-                    if response.function_call.name == "sql_query":
+                    if part.function_call.name == "sql_query":
                         job_config = bigquery.QueryJobConfig(
                             maximum_bytes_billed=100000000
                         )  # Data limit per query job
@@ -219,7 +219,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                                 "\n", ""
                             )
                             api_requests_and_responses.append(
-                                [response.function_call.name, params, api_response]
+                                [part.function_call.name, params, api_response]
                             )
                         except Exception as e:
                             error_message = f"""
@@ -232,7 +232,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
                             st.error(error_message)
                             api_response = error_message
                             api_requests_and_responses.append(
-                                [response.function_call.name, params, api_response]
+                                [part.function_call.name, params, api_response]
                             )
                             st.session_state.messages.append(
                                 {
@@ -245,13 +245,13 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
                     response = chat.send_message(
                         Part.from_function_response(
-                            name=response.function_call.name,
+                            name=part.function_call.name,
                             response={
                                 "content": api_response,
                             },
                         ),
                     )
-                    response = response.candidates[0].content.parts[0]
+                    part = response.candidates[0].content.parts[0]
 
                     backend_details += "- Function call:\n"
                     backend_details += (
@@ -280,7 +280,7 @@ if prompt := st.chat_input("Ask me about information in the database..."):
 
             time.sleep(3)
 
-            full_response = response.text
+            full_response = part.text
             with message_placeholder.container():
                 st.markdown(full_response.replace("$", r"\$"))  # noqa: W605
                 with st.expander("Function calls, parameters, and responses:"):

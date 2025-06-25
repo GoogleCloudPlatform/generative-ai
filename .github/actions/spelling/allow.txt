@@ -67,6 +67,7 @@ COINIT
 CONOUT
 COPD
 COUNTIF
+CRF
 CRM
 CTHH
 CUAD
@@ -104,6 +105,7 @@ Dexin
 Disturbia
 Doaa
 Doogler
+Downscale
 Dreesen
 Duh
 Duonebs
@@ -257,6 +259,7 @@ Kubeflow
 Kvyat
 Kylian
 L'avenir
+LAION
 LCEL
 LEBRON
 LLMs
@@ -511,7 +514,10 @@ Utik
 VAPO
 VBG
 VFT
+VIDGEN
 VLM
+VLMs
+VMAF
 VMs
 VOS
 VQA
@@ -529,6 +535,7 @@ Verilog
 Ves
 Vesia
 Vettel
+Vid
 Vijay
 Virat
 Viru
@@ -599,6 +606,7 @@ arize
 arun
 arxiv
 astype
+atleast
 atms
 auc
 aujourd'hui
@@ -624,6 +632,7 @@ bbq
 beir
 bert
 bff
+bgr
 bgswap
 bigframes
 bigquery
@@ -699,6 +708,7 @@ csa
 cse
 ctd
 cupertino
+curating
 cva
 cycleway
 cycleways
@@ -711,6 +721,7 @@ dbln
 dcg
 ddbb
 ddl
+decord
 dedup
 deepeval
 deepseek
@@ -786,6 +797,7 @@ fea
 fect
 fewshot
 ffi
+ffprobe
 fibonacci
 figheight
 figsize
@@ -872,6 +884,7 @@ hashtag
 hashtags
 hdfs
 hdlr
+hdtv
 heatmap
 heatmapgl
 hexsha
@@ -927,6 +940,7 @@ jesieni
 jetbrains
 jit
 jiwer
+jsemer
 jsonify
 jsonlines
 jsonpath
@@ -1007,6 +1021,7 @@ mic
 mics
 millis
 miranda
+mlp
 mmarco
 mmol
 mmr
@@ -1063,6 +1078,7 @@ noabe
 nobserved
 nodularis
 nohup
+nokey
 norigin
 notetaker
 novnc
@@ -1074,6 +1090,7 @@ nunique
 nvidia
 oai
 objc
+oglevel
 ollama
 olleh
 onesie
@@ -1146,6 +1163,7 @@ putalpha
 putdata
 pvc
 pyautogen
+pyav
 pybind
 pydantic
 pydub
@@ -1254,6 +1272,7 @@ streamlit
 strfreev
 stt
 stuffie
+subclip
 subviews
 subword
 suis
@@ -1301,6 +1320,7 @@ tscore
 tseslint
 tsne
 tsv
+ttext
 tts
 tures
 typehints
@@ -1330,6 +1350,7 @@ vectoral
 vectordb
 veo
 vesselin
+vidgen
 viridis
 vllm
 vnc
@@ -1380,6 +1401,7 @@ xaxis
 xcassets
 xcconfig
 xcodeproj
+xcol
 xcscheme
 xctest
 xcvi
@@ -1391,9 +1413,11 @@ xsi
 xsum
 xticks
 xxxxxxxx
+xzn
 yanchor
 yaxes
 yaxis
+ycol
 ylabel
 yougov
 youtube
