@@ -1,4 +1,6 @@
 AALR
+ABG
+ADAS
 ADK
 ADMA
 AFX
@@ -63,7 +65,9 @@ CLIs
 COCOAPODS
 COINIT
 CONOUT
+COPD
 COUNTIF
+CRF
 CRM
 CTHH
 CUAD
@@ -72,6 +76,7 @@ CVD
 CWLEY
 CZE
 Caprese
+Cardizem
 Chocolat
 Chrono
 Chunyuan
@@ -83,6 +88,7 @@ Crossbody
 D'orsay
 DCR
 DHH
+DKA
 DLC
 DLCs
 DOCDB
@@ -99,8 +105,10 @@ Dexin
 Disturbia
 Doaa
 Doogler
+Downscale
 Dreesen
 Duh
+Duonebs
 Durafast
 Durmus
 Dzor
@@ -119,6 +127,7 @@ EVs
 Edunov
 Einhalt
 Eleuther
+Eliquis
 Eliud
 Embs
 Envane
@@ -210,6 +219,7 @@ IRAs
 ITDMs
 IVF
 Ilkay
+Img
 Iosif
 J'aime
 JAVACMD
@@ -249,6 +259,7 @@ Kubeflow
 Kvyat
 Kylian
 L'avenir
+LAION
 LCEL
 LEBRON
 LLMs
@@ -262,6 +273,7 @@ LSum
 LTRB
 LUVBPTK
 Ladhak
+Levaquin
 Leventer
 Livewire
 Llion
@@ -271,6 +283,7 @@ Logrus
 Lopyrev
 Lottry
 MCP
+MDD
 MFU
 MICOA
 MLB
@@ -318,6 +331,7 @@ NOMINATIM
 NOMINMAX
 NOZORDER
 NPCs
+NPO
 NREL
 NVIDIA
 NVL
@@ -372,6 +386,7 @@ Porat
 Pranav
 Pré
 Pzk
+QEDC
 QLo
 QPM
 Qwen
@@ -386,6 +401,7 @@ ROOTSPAN
 RRF
 RTN
 RUNPATH
+RVR
 RYDE
 Rabbids
 Raducanu
@@ -496,8 +512,12 @@ Usain
 Uszkoreit
 Utik
 VAPO
+VBG
 VFT
+VIDGEN
 VLM
+VLMs
+VMAF
 VMs
 VOS
 VQA
@@ -515,6 +535,7 @@ Verilog
 Ves
 Vesia
 Vettel
+Vid
 Vijay
 Virat
 Viru
@@ -545,6 +566,7 @@ Zakarids
 Zhaohua
 Zijin
 Zom
+Zosyn
 Zscaler
 Zuv
 aadd
@@ -570,6 +592,7 @@ alisal
 alloydb
 antiword
 apikeys
+apixaban
 apk
 appuser
 appyaml
@@ -583,6 +606,7 @@ arize
 arun
 arxiv
 astype
+atleast
 atms
 auc
 aujourd'hui
@@ -608,6 +632,7 @@ bbq
 beir
 bert
 bff
+bgr
 bgswap
 bigframes
 bigquery
@@ -622,6 +647,7 @@ boundings
 boxplot
 bpa
 bpd
+bpm
 bqdf
 bqml
 breakroom
@@ -662,6 +688,7 @@ codefile
 codehaus
 codelab
 codelabs
+codenamed
 coderag
 codespell
 colab
@@ -681,6 +708,7 @@ csa
 cse
 ctd
 cupertino
+curating
 cva
 cycleway
 cycleways
@@ -693,6 +721,7 @@ dbln
 dcg
 ddbb
 ddl
+decord
 dedup
 deepeval
 deepseek
@@ -701,6 +730,7 @@ dente
 descgen
 deskmates
 dfs
+diltiazem
 dino
 direnv
 diy
@@ -767,6 +797,7 @@ fea
 fect
 fewshot
 ffi
+ffprobe
 fibonacci
 figheight
 figsize
@@ -853,6 +884,7 @@ hashtag
 hashtags
 hdfs
 hdlr
+hdtv
 heatmap
 heatmapgl
 hexsha
@@ -908,6 +940,7 @@ jesieni
 jetbrains
 jit
 jiwer
+jsemer
 jsonify
 jsonlines
 jsonpath
@@ -929,6 +962,7 @@ kpi
 kubectl
 kyc
 l'harmonie
+labetalol
 lakecolor
 landcolor
 landuse
@@ -987,7 +1021,9 @@ mic
 mics
 millis
 miranda
+mlp
 mmarco
+mmol
 mmr
 modelfile
 monty
@@ -1042,6 +1078,7 @@ noabe
 nobserved
 nodularis
 nohup
+nokey
 norigin
 notetaker
 novnc
@@ -1053,6 +1090,7 @@ nunique
 nvidia
 oai
 objc
+oglevel
 ollama
 olleh
 onesie
@@ -1106,6 +1144,7 @@ podcasts
 podfile
 podhelper
 podman
+postictal
 powerups
 praw
 prcntg
@@ -1124,6 +1163,7 @@ putalpha
 putdata
 pvc
 pyautogen
+pyav
 pybind
 pydantic
 pydub
@@ -1156,6 +1196,7 @@ ratelimit
 rawbytes
 rbc
 rbf
+rbm
 recrawl
 reddit
 redef
@@ -1231,6 +1272,7 @@ streamlit
 strfreev
 stt
 stuffie
+subclip
 subviews
 subword
 suis
@@ -1278,6 +1320,7 @@ tscore
 tseslint
 tsne
 tsv
+ttext
 tts
 tures
 typehints
@@ -1307,6 +1350,7 @@ vectoral
 vectordb
 veo
 vesselin
+vidgen
 viridis
 vllm
 vnc
@@ -1357,6 +1401,7 @@ xaxis
 xcassets
 xcconfig
 xcodeproj
+xcol
 xcscheme
 xctest
 xcvi
@@ -1368,9 +1413,11 @@ xsi
 xsum
 xticks
 xxxxxxxx
+xzn
 yanchor
 yaxes
 yaxis
+ycol
 ylabel
 yougov
 youtube
