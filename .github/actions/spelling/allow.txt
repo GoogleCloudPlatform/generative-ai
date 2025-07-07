@@ -409,6 +409,7 @@ Rabbids
 Raducanu
 Raikkonen
 Rajpurkar
+Recontext
 Reranking
 Resona
 Rivertown
@@ -1190,6 +1191,7 @@ rag
 ragas
 ragdemos
 rahhhrr
+rai
 ramen
 rapideval
 rarian
@@ -1199,6 +1201,7 @@ rawbytes
 rbc
 rbf
 rbm
+recontext
 recrawl
 reddit
 redef
@@ -1410,6 +1413,7 @@ xcvi
 xdg
 xelatex
 xlabel
+xlim
 xmltodict
 xsi
 xsum
@@ -1421,6 +1425,7 @@ yaxes
 yaxis
 ycol
 ylabel
+ylim
 yougov
 youtube
 yref
