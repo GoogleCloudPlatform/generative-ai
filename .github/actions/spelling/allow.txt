@@ -617,6 +617,7 @@ autogen
 automerge
 automl
 autoptr
+autopush
 autorater
 autosxs
 avec
@@ -790,6 +791,7 @@ eventarc
 evse
 evt
 expl
+faa
 faiss
 fastapi
 fastmcp
@@ -976,6 +978,7 @@ lego
 lenzing
 levelname
 lexer
+lexers
 liberties
 linalg
 linecolor
@@ -991,6 +994,7 @@ logparser
 logprobs
 lolcat
 loras
+lookml
 lparam
 lro
 lru
@@ -1400,6 +1404,7 @@ wscore
 wscores
 wstring
 wurden
+wxyz
 xanchor
 xaxes
 xaxis
