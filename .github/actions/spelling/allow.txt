@@ -993,8 +993,8 @@ loghub
 logparser
 logprobs
 lolcat
-loras
 lookml
+loras
 lparam
 lro
 lru
