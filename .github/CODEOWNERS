@@ -23,7 +23,7 @@
 /generative-ai/gemini/grounding                                                                                                  @GoogleCloudPlatform/generative-ai-devrel @holtskinner
 /generative-ai/gemini/mcp/intro_to_mcp.ipynb                                                                                     @GoogleCloudPlatform/generative-ai-devrel @wadave
 /generative-ai/gemini/model-optimizer/intro_model_optimizer.ipynb                                                                @GoogleCloudPlatform/generative-ai-devrel @nardosalemu
-/generative-ai/gemini/multimodal-datasets                                                                                        @GoogleCloudPlatform/generative-ai-devrel @fthoele
+/generative-ai/gemini/multimodal-dataset                                                                                         @GoogleCloudPlatform/generative-ai-devrel @fthoele @cleop-google @diskontinuum
 /generative-ai/gemini/multimodal-live-api/websocket-demo-app/                                                                    @GoogleCloudPlatform/generative-ai-devrel @ZackAkil
 /generative-ai/gemini/rag-engine                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @edtsoi430
 /generative-ai/gemini/responsible-ai                                                                                             @GoogleCloudPlatform/generative-ai-devrel @iamthuya
