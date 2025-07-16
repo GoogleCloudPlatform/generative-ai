@@ -5,8 +5,12 @@ import websockets
 from websockets.legacy.protocol import WebSocketCommonProtocol
 from websockets.legacy.server import WebSocketServerProtocol
 
-HOST = "us-central1-aiplatform.googleapis.com"
+HOST = "us-central1-autopush-aiplatform.sandbox.googleapis.com"
+# !!! Need to change this as well to make the environment switch work.
+# HOST = "us-central1-staging-aiplatform.sandbox.googleapis.com"
+# HOST = "us-central1-aiplatform.googleapis.com"
 SERVICE_URL = f"wss://{HOST}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent"
+# SERVICE_URL = f"wss://{HOST}/ws/google.cloud.aiplatform.internal.LlmBidiService/BidiGenerateContent"
 
 DEBUG = False
 
