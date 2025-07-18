@@ -23,7 +23,7 @@
 /generative-ai/gemini/grounding                                                                                                  @GoogleCloudPlatform/generative-ai-devrel @holtskinner
 /generative-ai/gemini/mcp/intro_to_mcp.ipynb                                                                                     @GoogleCloudPlatform/generative-ai-devrel @wadave
 /generative-ai/gemini/model-optimizer/intro_model_optimizer.ipynb                                                                @GoogleCloudPlatform/generative-ai-devrel @nardosalemu
-/generative-ai/gemini/multimodal-datasets                                                                                        @GoogleCloudPlatform/generative-ai-devrel @fthoele
+/generative-ai/gemini/multimodal-dataset                                                                                         @GoogleCloudPlatform/generative-ai-devrel @fthoele @cleop-google @diskontinuum
 /generative-ai/gemini/multimodal-live-api/websocket-demo-app/                                                                    @GoogleCloudPlatform/generative-ai-devrel @ZackAkil
 /generative-ai/gemini/rag-engine                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @edtsoi430
 /generative-ai/gemini/responsible-ai                                                                                             @GoogleCloudPlatform/generative-ai-devrel @iamthuya
@@ -64,3 +64,4 @@
 /generative-ai/vision/use-cases/hey_llm                                                                                          @GoogleCloudPlatform/generative-ai-devrel @tushuhei
 /generative-ai/open-models/serving/cloud_run_ollama_qwen3_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/open-models/get_started_with_model_garden_sdk.ipynb                                                               @GoogleCloudPlatform/generative-ai-devrel @inardini @lizzij
+/generative-ai/open-models/use-cases/model_garden_litellm_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @lizzij

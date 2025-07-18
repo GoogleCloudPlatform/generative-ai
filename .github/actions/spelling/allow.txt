@@ -407,6 +407,7 @@ Rabbids
 Raducanu
 Raikkonen
 Rajpurkar
+Recontext
 Reranking
 Resona
 Rivertown
@@ -616,10 +617,12 @@ autogen
 automerge
 automl
 autoptr
+autopush
 autorater
 autosxs
 avec
 aworkflow
+backstory
 backticks
 bagchi
 bargap
@@ -788,6 +791,7 @@ eventarc
 evse
 evt
 expl
+faa
 faiss
 fastapi
 fastmcp
@@ -832,6 +836,7 @@ gauff
 gbif
 gboolean
 gbq
+gca
 gce
 gchar
 gcloud
@@ -973,6 +978,7 @@ lego
 lenzing
 levelname
 lexer
+lexers
 liberties
 linalg
 linecolor
@@ -987,6 +993,7 @@ loghub
 logparser
 logprobs
 lolcat
+lookml
 loras
 lparam
 lro
@@ -1188,6 +1195,7 @@ rag
 ragas
 ragdemos
 rahhhrr
+rai
 ramen
 rapideval
 rarian
@@ -1197,6 +1205,7 @@ rawbytes
 rbc
 rbf
 rbm
+recontext
 recrawl
 reddit
 redef
@@ -1395,6 +1404,7 @@ wscore
 wscores
 wstring
 wurden
+wxyz
 xanchor
 xaxes
 xaxis
@@ -1408,6 +1418,7 @@ xcvi
 xdg
 xelatex
 xlabel
+xlim
 xmltodict
 xsi
 xsum
@@ -1419,6 +1430,7 @@ yaxes
 yaxis
 ycol
 ylabel
+ylim
 yougov
 youtube
 yref
