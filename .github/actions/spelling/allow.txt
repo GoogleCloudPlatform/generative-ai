@@ -296,6 +296,7 @@ MTL
 Maa
 Maarten
 Mahindra
+Mahtre
 Malware
 Mamah
 Mandiri
@@ -371,6 +372,7 @@ PPO
 PYINK
 Pakeman
 Paquete
+Parag
 Pastra
 Pengyu
 Persero
@@ -417,6 +419,7 @@ Robeco
 Robo
 Rosberg
 Ruchika
+Rupjit
 SAOT
 SDKROOT
 SEK
@@ -444,6 +447,7 @@ Schulen
 Selam
 Sestero
 Sha'carri
+Sharmila
 Shazeer
 Shenzhou
 Shklovsky
@@ -491,6 +495,7 @@ Terabyte
 Terabytes
 Testables
 Tetsuo
+Tful
 Thallam
 Tianli
 Tianxiang
@@ -652,6 +657,7 @@ bpa
 bpd
 bpm
 bqdf
+bqds
 bqml
 breakroom
 btn
@@ -712,6 +718,7 @@ cse
 ctd
 cupertino
 curating
+cusagt
 cva
 cycleway
 cycleways
