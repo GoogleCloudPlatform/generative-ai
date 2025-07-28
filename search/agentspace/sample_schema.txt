@@ -229,13 +229,13 @@ CREATE TABLE Departments (
 
 -- For gender/status ENUMs in PostgreSQL, use CHECK constraints:
 gender VARCHAR(20),
-CONSTRAINT chk_gender CHECK (gender IN ('Male', 'Female', 'Other', 'Prefer not to say')),
+CONSTRAINT check_gender CHECK (gender IN ('Male', 'Female', 'Other', 'Prefer not to say')),
 
 status VARCHAR(20) DEFAULT 'Pending',
-CONSTRAINT chk_status CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+CONSTRAINT check_status CHECK (status IN ('Pending', 'Approved', 'Rejected')),
 
 proficiency_level VARCHAR(20),
-CONSTRAINT chk_proficiency_level CHECK (proficiency_level IN ('Beginner', 'Intermediate', 'Advanced', 'Expert')),
+CONSTRAINT check_proficiency_level CHECK (proficiency_level IN ('Beginner', 'Intermediate', 'Advanced', 'Expert')),
 
 -- To automatically update 'updated_at' in PostgreSQL, you typically use a trigger:
 CREATE OR REPLACE FUNCTION update_timestamp()
