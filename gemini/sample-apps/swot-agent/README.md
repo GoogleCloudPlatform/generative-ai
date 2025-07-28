@@ -6,7 +6,7 @@
 
 A web application that performs automated [SWOT analysis](https://en.wikipedia.org/wiki/SWOT_analysis) (Strengths, Weaknesses, Opportunities, Threats) analysis using the [Gemini 2.0 Flash model](https://ai.google.dev/gemini-api/docs/models/gemini-v2) and the [Pydantic AI](https://ai.pydantic.dev/) agent framework. The application is built with [FastAPI](https://fastapi.tiangolo.com/), [HTMX](https://htmx.org/), and [Tailwind CSS](https://tailwindcss.com/).
 
-![SWOT Analysis Demo](swot-agent.gif)
+![SWOT Analysis Demo](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/swot-agent/swot-agent.gif)
 
 The agent includes three tools:
 
@@ -53,7 +53,7 @@ The agent includes three tools:
    python main.py
    ```
 
-   You can also use the [FastAPI CLI](https://fastapi.tiangolo.com/deployment/cli/):
+   You can also use the [FastAPI CLI](https://fastapi.tiangolo.com/fastapi-cli/):
 
    ```bash
    fastapi dev --port 8080

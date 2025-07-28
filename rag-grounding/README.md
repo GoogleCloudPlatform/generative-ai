@@ -1,5 +1,17 @@
 # RAG and Grounding
 
+<!-- markdownlint-disable MD036 -->
+
+**YouTube Video: Introduction to grounding with Gemini on Vertex AI**
+
+<!-- markdownlint-enable MD036 -->
+
+<!-- markdownlint-disable MD033 -->
+<a href="https://www.youtube.com/watch?v=Ph0g6dnsB4g&list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx" target="_blank">
+  <img src="https://img.youtube.com/vi/Ph0g6dnsB4g/maxresdefault.jpg" alt="Introduction to grounding with Gemini on Vertex AI" width="500">
+</a>
+<!-- markdownlint-enable MD033 -->
+
 This directory provides a curated list of examples that explore Retrieval
 Augmented Generation (RAG), grounding techniques, knowledge bases, grounded
 generation, and related topics like vector search and semantic search.
@@ -42,10 +54,10 @@ for a more in-depth walkthrough.
   Evaluates RAG systems using the Gen AI Evaluation Service SDK, offering both
   reference-free and reference-based evaluation methods with visualization.
 - **[ragas_with_gemini.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag-evaluation/ragas_with_gemini.ipynb)**:
-  Evaluates RAG pipelines using the RAGAS framework and the Gemini Pro model
+  Evaluates RAG pipelines using the RAGAS framework and the Gemini model
   for Q&A tasks.
 - **[deepeval_with_gemini.ipynb](../gemini/use-cases/retrieval-augmented-generation/rag-evaluation/deepeval_with_gemini.ipynb)**:
-  Evaluates Gemini Pro's performance on a question-answering task using
+  Evaluates Gemini's performance on a question-answering task using
   DeepEval and the Gemini API in Vertex AI, including Pytest integration.
 
 ## Out of the Box RAG/Grounding
@@ -79,7 +91,7 @@ Search engine builder, giving you Google quality search for your own data.
 - **[search_data_blending_with_gemini_summarization.ipynb](../search/search_data_blending_with_gemini_summarization.ipynb)**:
   Demonstrates calling a search app that blends information from multiple
   stores (GCS, BQ, site) and summarizes search snippets and responses using
-  the Gemini Pro model.
+  the Gemini model.
 - **[vertexai_search_options.ipynb](../search/vertexai-search-options/vertexai_search_options.ipynb)**:
   Demonstrates three approaches for using Vertex AI Search: direct API usage,
   grounding with Gemini, and integration with LangChain.
@@ -167,10 +179,6 @@ augmented generation (RAG).
 
 The best explanation of embeddings I've seen
 
-- **[intro_Vertex_AI_embeddings.ipynb](../gemini/qa-ops/intro_Vertex_AI_embeddings.ipynb)**:
-  Introduces Vertex AI's text and multimodal embeddings APIs and demonstrates
-  their use in building a simple e-commerce search application with text,
-  image, and video queries.
 - **[hybrid-search.ipynb](../embeddings/hybrid-search.ipynb)**: Demonstrates
   hybrid search (combining semantic and keyword search) using Vertex AI Vector
   Search.
@@ -191,35 +199,7 @@ The best explanation of embeddings I've seen
 - **[intro-grounding-gemini.ipynb](../gemini/grounding/intro-grounding-gemini.ipynb)**:
   Demonstrates grounding LLM responses in Google Search and Vertex AI Search
   using Gemini, improving response accuracy and reducing hallucinations.
-- **[intro-grounding.ipynb](../language/grounding/intro-grounding.ipynb)**:
-  Demonstrates using the Vertex AI grounding feature to improve LLM response
-  accuracy and relevance by grounding them in Google Search or custom Vertex AI Search data stores.
-- **[building_DIY_multimodal_qa_system_with_mRAG.ipynb](../gemini/qa-ops/building_DIY_multimodal_qa_system_with_mRAG.ipynb)**:
-  Builds a custom multimodal question-answering system using mRAG.
-- **[code_retrieval_augmented_generation.ipynb](../language/code/code_retrieval_augmented_generation.ipynb)**:
-  Demonstrates RAG for code using Gemini, LangChain, FAISS, and the Vertex AI Embeddings API to enhance code generation by incorporating external
-  knowledge from the Google Cloud Generative AI GitHub repository.
-- **[langchain_bigquery_data_loader.ipynb](../language/orchestration/langchain/langchain_bigquery_data_loader.ipynb)**:
-  Demonstrates using LangChain's BigQuery Data Loader to query BigQuery data,
-  integrate it with a Vertex AI LLM, and build a chain to generate and execute
-  SQL queries for targeted customer analysis.
-- **[question_answering_documents.ipynb](../language/use-cases/document-qa/question_answering_documents.ipynb)**:
-  Demonstrates three methods (stuffing, map-reduce, and map-reduce with
-  embeddings) for building a question-answering system using the Vertex AI
-  PaLM API to efficiently handle large document datasets.
-- **[question_answering_documents_langchain.ipynb](../language/use-cases/document-qa/question_answering_documents_langchain.ipynb)**:
-  Demonstrates building a question-answering system using LangChain and the Vertex AI PaLM API, comparing different methods (stuffing, map-reduce, refine)
-  for handling large documents, and showcasing the improved efficiency of
-  using similarity search with embeddings.
-- **[question_answering_documents_langchain_matching_engine.ipynb](../language/use-cases/document-qa/question_answering_documents_langchain_matching_engine.ipynb)**:
-  Demonstrates a question-answering system using LangChain, the Vertex AI PaLM API, and Matching Engine for retrieval-augmented generation, enabling
-  fact-grounded responses with source citations.
-- **[summarization_large_documents.ipynb](../language/use-cases/document-summarization/summarization_large_documents.ipynb)**:
-  Demonstrates four methods (stuffing, MapReduce, MapReduce with overlapping
-  chunks, and MapReduce with rolling summaries) for summarizing large
-  documents using Vertex AI generative models, addressing challenges of
-  exceeding context length limits.
-- **[summarization_large_documents_langchain.ipynb](../language/use-cases/document-summarization/summarization_large_documents_langchain.ipynb)**:
+- **[summarization_large_documents_langchain.ipynb](../gemini/use-cases/document-processing/summarization_large_documents_langchain.ipynb)**:
   Demonstrates three LangChain methods (Stuffing, MapReduce, Refine) for
   summarizing large documents using Vertex AI models, comparing their
   effectiveness and limitations.
@@ -227,19 +207,19 @@ The best explanation of embeddings I've seen
 
 ### Open Models
 
-- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/serving/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
+- **[cloud_run_ollama_gemma2_rag_qa.ipynb](../open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb)**:
   Demonstrates deploying Gemma 2 on Google Cloud Run with GPU acceleration
   using Ollama and LangChain, building a RAG question-answering application.
 
 ## Agents on top of RAG
 
-- **[tutorial_vertex_ai_search_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_vertex_ai_search_rag_agent.ipynb)**:
+- **[tutorial_vertex_ai_search_rag_agent.ipynb](../gemini/agent-engine/tutorial_vertex_ai_search_rag_agent.ipynb)**:
   Demonstrates building and deploying a conversational search agent on Vertex AI using LangChain, a reasoning engine, and RAG with Vertex AI Search to
   query a movie dataset.
-- **[tutorial_alloydb_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_alloydb_rag_agent.ipynb)**:
+- **[tutorial_alloydb_rag_agent.ipynb](../gemini/agent-engine/tutorial_alloydb_rag_agent.ipynb)**:
   Demonstrates deploying a RAG application using LangChain, AlloyDB for
   PostgreSQL, and Vertex AI, covering setup, deployment, and cleanup.
-- **[tutorial_cloud_sql_pg_rag_agent.ipynb](../gemini/reasoning-engine/tutorial_cloud_sql_pg_rag_agent.ipynb)**:
+- **[tutorial_cloud_sql_pg_rag_agent.ipynb](../gemini/agent-engine/tutorial_cloud_sql_pg_rag_agent.ipynb)**:
   Demonstrates deploying a RAG application using LangChain, Vertex AI, and
   Cloud SQL for PostgreSQL, enabling semantic search and LLM-based responses.
 

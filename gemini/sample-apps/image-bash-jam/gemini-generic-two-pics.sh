@@ -11,7 +11,7 @@ if [ -f .envrc ]; then
 fi
 
 #PROJECT_ID='provided in .envrc'
-#MODEL_ID="gemini-pro-vision" # TODO parametrize into model :)
+MODEL_ID="gemini-2.0-flash" # TODO parametrize into model :)
 LOCATION=us-central1
 TMP_OUTPUT_FILE=.tmp.lastresponse-generic-2pix.json
 REQUEST_FILE=.tmp.request-generic-2pix.json
@@ -82,8 +82,8 @@ cat >"$REQUEST_FILE" <<EOF
 }
 EOF
 #"stopSequences": [".", "?", "!"]
-#STAGING_URL="https://${LOCATION}-autopush-aiplatform.sandbox.googleapis.com/v1beta1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-pro-vision:generateContent"
-PROD_URL="https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-pro-vision:streamGenerateContent"
+#STAGING_URL="https://${LOCATION}-autopush-aiplatform.sandbox.googleapis.com/v1beta1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/${MODEL_ID}:generateContent"
+PROD_URL="https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/${MODEL_ID}:streamGenerateContent"
 
 curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token)" \
   -H "Content-Type: application/json" \

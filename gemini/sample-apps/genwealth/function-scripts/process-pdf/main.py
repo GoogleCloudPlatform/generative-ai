@@ -225,9 +225,7 @@ def process_pdf(cloud_event):
     lc_doc_chunks = split_document(lc_doc)
 
     # Setup embeddings
-    embedding = VertexAIEmbeddings(
-        model_name="textembedding-gecko@003", project=project_id
-    )
+    embedding = VertexAIEmbeddings(model_name="text-embedding-005", project=project_id)
 
     # AlloyDB Vars
     cluster = "alloydb-cluster"
@@ -254,7 +252,7 @@ def process_pdf(cloud_event):
     if initialize_vector_store:
         engine.init_vectorstore_table(
             table_name=table_name,
-            vector_size=768,  # Vector size for VertexAI model(textembedding-gecko@latest)
+            vector_size=768,  # Vector size for VertexAI model(text-embedding-005)
             metadata_columns=[
                 Column("source", "VARCHAR", nullable=True),
                 Column("page", "INTEGER", nullable=True),

@@ -1,7 +1,7 @@
 import { Database } from "./database";
 import { VertexAI } from "@google-cloud/vertexai";
 
-/** Use retrieval augmented search of Prospectus using AlloyDB embeddings & Gemini Pro.
+/** Use retrieval augmented search of Prospectus using AlloyDB embeddings & Gemini.
  */
 export class ProspectusRag {
 
@@ -15,7 +15,7 @@ export class ProspectusRag {
 
     private async getContext(prompt: string, ticker: string): Promise<string[]> {
         const query = `SELECT content,
-                embedding <=> google_ml.embedding('textembedding-gecko@003', '${prompt}')::vector AS distance
+                embedding <=> google_ml.embedding('text-embedding-005', '${prompt}')::vector AS distance
             FROM langchain_vector_store
             WHERE ticker='${ticker}'
             ORDER BY distance
@@ -47,7 +47,7 @@ export class ProspectusRag {
 
         // Initialize Vertex AI with your Cloud project and location       
         const vertex_ai = new VertexAI({project: projectId, location: region});
-        const model = process.env['RAG_MODEL'] ?? 'gemini-1.0-pro-001';
+        const model = process.env['RAG_MODEL'] ?? 'gemini-2.0-flash-001';
     
         // Instantiate the models
         const generativeModel = vertex_ai.preview.getGenerativeModel({

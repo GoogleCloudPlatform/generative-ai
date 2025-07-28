@@ -42,7 +42,7 @@ sys.excepthook = lambda *args: None
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
 SERVICE_ACCOUNT_FILE = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 LOCATION = "us-central1"
-MODEL = "gemini-2.0-flash-exp"
+MODEL = "gemini-2.0-flash-live-preview-04-09"
 
 # --- Reddit API Configuration ---
 REDDIT_MAX_INSIGHTS = 5
@@ -221,11 +221,10 @@ async def analyze_competition(
         logging.info("Error: Gemini client not initialized.")
         return ""
     try:
-        response = await ctx.deps.client.generate_content_async(
+        response = await ctx.deps.client.aio.models.generate_content(
             model=MODEL,
             contents=prompt,
         )
-
         return response.text
     except Exception as e:
         logging.info(f"Error analyzing competition: {e}")

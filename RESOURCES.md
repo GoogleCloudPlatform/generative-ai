@@ -20,11 +20,9 @@ Please submit additional resources via a PR.
 - Use [Vertex AI](https://cloud.google.com/vertex-ai) to interact with, customize, and embed foundation models into your applications
 - Access foundation models on [Model Garden](https://cloud.google.com/model-garden)
 - Tune models via a simple UI on [Vertex AI Studio](https://cloud.google.com/generative-ai-studio)
-- Use [Vertex AI Agent Builder](https://cloud.google.com/products/agent-builder), to build and deploy AI agents grounded in their data
+- Use [Vertex AI Search](https://cloud.google.com/products/agent-builder), to build and deploy AI agents grounded in their data
 - Google foundation models
   - [Gemini API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#gemini-models)
-  - [PaLM API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#palm-models)
-  - [Codey API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#codey-models)
   - [Imagen API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#imagen-models)
   - [MedLM API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#medlm-models)
 
@@ -46,6 +44,8 @@ Please submit additional resources via a PR.
 
 ## Video Courses
 
+- [Real Terms for AI](https://goo.gle/AIwordsExplained)
+- [AI Guide for Cloud Developers](https://www.youtube.com/playlist?list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx)
 - [Intro to Gen AI - Playlist](https://www.youtube.com/playlist?list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK)
   - [Introduction to Generative AI](https://www.youtube.com/watch?v=cZaNf2rA30k&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=1&pp=iAQB)
   - [Introduction to Large Language Models](https://www.youtube.com/watch?v=RBzXsQHjptQ&list=PLBgogxgQVM9sl-KnKywVEhkb3QtLHU4OK&index=2&pp=iAQB)

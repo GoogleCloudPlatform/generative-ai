@@ -16,12 +16,12 @@
     "node": "20"
   },
   "dependencies": {
-    "@genkit-ai/ai": "^0.5.0",
-    "@genkit-ai/core": "^0.5.0",
-    "@genkit-ai/dotprompt": "^0.5.0",
-    "@genkit-ai/firebase": "^0.5.0",
+    "@genkit-ai/ai": "^1.0.0",
+    "@genkit-ai/core": "^1.0.0",
+    "@genkit-ai/dotprompt": "^0.9.0",
+    "@genkit-ai/firebase": "^1.0.0",
     "@genkit-ai/flow": "^0.5.0",
-    "@genkit-ai/vertexai": "^0.5.0",
+    "@genkit-ai/vertexai": "^1.0.0",
     "express": "^4.19.2",
     "firebase-admin": "^12.1.0",
     "firebase-functions": "^5.0.0",

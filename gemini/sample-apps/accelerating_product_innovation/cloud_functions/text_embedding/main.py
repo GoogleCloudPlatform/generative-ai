@@ -17,7 +17,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 
 
-embedding_model = TextEmbeddingModel.from_pretrained("textembedding-gecko@003")
+embedding_model = TextEmbeddingModel.from_pretrained("text-embedding-005")
 
 
 def get_embeddings(instances: list[str]) -> list[list[float]]:

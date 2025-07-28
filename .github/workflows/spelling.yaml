@@ -57,11 +57,6 @@ name: Check Spelling
 #     ... otherwise adjust the `with:` as you wish
 
 on:
-  push:
-    branches:
-      - "**"
-    tags-ignore:
-      - "**"
   pull_request:
     branches:
       - "**"
@@ -69,9 +64,6 @@ on:
       - "opened"
       - "reopened"
       - "synchronize"
-  issue_comment:
-    types:
-      - "created"
 
 jobs:
   spelling:
@@ -105,7 +97,7 @@ jobs:
           dictionary_source_prefixes: '{"cspell": "https://raw.githubusercontent.com/streetsidesoftware/cspell-dicts/main/dictionaries/"}'
           extra_dictionaries: |
             cspell:aws/dict/aws.txt
-            cspell:bash/src/bash-words.txt    
+            cspell:bash/samples/bash-words.txt
             cspell:companies/dict/companies.txt
             cspell:css/dict/css.txt
             cspell:data-science/dict/data-science-models.txt
@@ -116,9 +108,10 @@ jobs:
             cspell:django/requirements.txt
             cspell:django/dict/django.txt
             cspell:docker/src/docker-words.txt
-            cspell:en_GB/src/hunspell/en_GB.dic
-            cspell:en_US/src/aoo-mozilla-en-dict/en_US.dic
-            cspell:en_US/src/hunspell/en_US-large.dic
+            cspell:en_shared/dict/acronyms.txt
+            cspell:en_shared/dict/shared-additional-words.txt
+            cspell:en_GB/en_GB.trie
+            cspell:en_US/en_US.trie
             cspell:filetypes/src/filetypes.txt
             cspell:flutter/src/flutter.txt
             cspell:fonts/dict/fonts.txt

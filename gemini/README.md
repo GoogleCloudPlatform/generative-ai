@@ -1,23 +1,26 @@
-# Generative AI - Gemini
-
-Welcome to the Google Cloud [Generative AI](https://cloud.google.com/ai/generative-ai/) - Gemini folder.
+# [Generative AI](https://cloud.google.com/ai/generative-ai/)
 
 ## Gemini
 
+<!-- markdownlint-disable MD036 -->
+
+**YouTube Video: Introduction to Gemini on Vertex AI**
+
+<!-- markdownlint-enable MD036 -->
+
 <!-- markdownlint-disable MD033 -->
-<img src="https://lh3.googleusercontent.com/eDr6pYKs1tT0iK0nt3pPhvVlP2Wn96fbGqbWgBAARRZ7isej037g_tWobjV8zQkxOsWzJuEH8p-fksczXUOeqxGZZIo_HUCdkn8q-a4fuwATD7Q9Xrs=w2456-l100-sg-rj-c0xffffff" style="width:35em" alt="Welcome to the Gemini era">
+<a href="https://www.youtube.com/watch?v=YfiLUpNejpE&list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx" target="_blank">
+  <img src="https://img.youtube.com/vi/YfiLUpNejpE/maxresdefault.jpg" alt="Introduction to Gemini on Vertex AI" width="500">
+</a>
 <!-- markdownlint-enable MD033 -->
 
-Gemini is a family of generative AI models developed by Google DeepMind that is designed for multimodal use cases. The Gemini API gives you access to the Gemini Pro Vision and Gemini Pro models.
+[Gemini](https://deepmind.google/technologies/gemini) is a family of generative AI models developed by [Google DeepMind](https://deepmind.google) that is designed for multimodal use cases.
 
 ### Gemini API in Vertex AI
 
-On Google Cloud, the Gemini API in Vertex AI provides a unified interface for interacting with Gemini models. There are currently two models available in the Gemini API:
+On Google Cloud, the Gemini API in Vertex AI provides a unified interface for interacting with multimodal Gemini models, such as:
 
-- **Gemini Pro model** (`gemini-pro`): Designed to handle natural language tasks, multi-turn text and code chat, and code generation.
-- **Gemini Pro Vision model** (`gemini-pro-vision`): Supports multimodal prompts. You can include text, images, and video in your prompt requests and get text or code responses.
-
-The notebooks and samples in this folder focus on using the **Vertex AI SDK for Python** to call the Gemini API in Vertex AI.
+![Gemini Models](https://storage.googleapis.com/github-repo/GeminiModels.png)
 
 ## Using this repository
 
@@ -33,11 +36,7 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
       <br>
       <a href="getting-started/"><code>getting-started/</code></a>
     </td>
-    <td>Get started with the Gemini API in Vertex AI:
-      <ul>
-        <li><code>gemini-1.5-pro</code> model</li>
-        <li><code>gemini-1.5-flash</code> model</li>
-      </ul>
+    <td>Get started with the Gemini API in Vertex AI
     </td>
   </tr>
   <tr>
@@ -84,9 +83,9 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
     <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/neurology/default/40px.svg" alt="neurology">
       <br>
-      <a href="knowledge-engine/"><code>knowledge-engine/</code></a>
+      <a href="rag-engine/"><code>rag-engine/</code></a>
     </td>
-    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/rag-overview">Knowledge Engine</a> feature of Vertex AI</td>
+    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/rag-overview">RAG Engine</a> feature of Vertex AI</td>
   </tr>
   <tr>
     <td>
@@ -98,19 +97,11 @@ The notebooks and samples in this folder focus on using the **Vertex AI SDK for 
   </tr>
   <tr>
     <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/question_answer/default/40px.svg" alt="question_answer">
-      <br>
-      <a href="qa-ops/"><code>qa-ops/</code></a>
-    </td>
-    <td>Learn about the question-answer operations available in Gemini</td>
-  </tr>
-  <tr>
-    <td>
       <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg" alt="build">
       <br>
-      <a href="reasoning-engine/"><code>reasoning-engine/</code></a>
+      <a href="agent-engine/"><code>agent-engine/</code></a>
     </td>
-    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/reasoning-engine/overview">Reasoning Engine</a> feature of Vertex AI</td>
+    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview">Agent Engine</a> feature of Vertex AI</td>
   </tr>
   <tr>
     <td>

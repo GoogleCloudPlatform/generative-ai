@@ -1,8 +1,11 @@
-# Cloud Run application utilizing Streamlit Framework that demonstrates working with Gemini API in Vertex AI
+# Cloud Run Streamlit Application with Gemini API in Vertex AI
 
-|           |                                                |
-| --------- | ---------------------------------------------- |
-| Author(s) | [Lavi Nigam](https://github.com/lavinigam-gcp) |
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+
+| Authors                                        |
+|------------------------------------------------|
+| [Lavi Nigam](https://github.com/lavinigam-gcp) |
+| [Holt Skinner](https://github.com/holtskinner) |
 
 This application demonstrates a Cloud Run application that uses the [Streamlit](https://streamlit.io/) framework.
 
@@ -29,20 +32,19 @@ To run the Streamlit Application locally (on Cloud Shell), we need to perform th
    pip install -r requirements.txt
    ```
 
-2. Your application requires access to two environment variables:
+2. Your application requires the following environment variables:
 
-   - `GCP_PROJECT` : This the Google Cloud project ID.
-   - `GCP_REGION` : This is the region in which you are deploying your Cloud Run app. For example, `us-central1`.
-
-   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region. The specific code line from the `app.py`
-   function is shown here:
-   `vertexai.init(project=PROJECT_ID, location=LOCATION)`
-
-   In Cloud Shell, execute the following commands:
+   - If you are using standard Vertex AI:
 
    ```bash
-   export GCP_PROJECT='<Your Google Cloud Project ID>'  # Change this
-   export GCP_REGION='us-central1'             # If you change this, make sure the region is supported.
+   export GOOGLE_CLOUD_PROJECT='<Your Google Cloud Project ID>'  # Change this
+   export GOOGLE_CLOUD_REGION='us-central1' # If you change this, make sure the region is supported.
+   ```
+
+   - If you are using [Vertex AI in express mode](https://cloud.google.com/vertex-ai/generative-ai/docs/start/express-mode/overview):
+
+   ```bash
+   export GOOGLE_API_KEY='<Your Vertex AI API Key>'  # Change this
    ```
 
 3. To run the application locally, execute the following command:
@@ -68,18 +70,16 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
 
 1. Your Cloud Run app requires access to two environment variables:
 
-   - `GCP_PROJECT` : This the Google Cloud project ID.
-   - `GCP_REGION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
+   - `GOOGLE_CLOUD_PROJECT` : This the Google Cloud project ID.
+   - `GOOGLE_CLOUD_REGION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
 
-   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region. The specific code line from the `app.py`
-   function is shown here:
-   `vertexai.init(project=PROJECT_ID, location=LOCATION)`
+   These variables are needed since Vertex AI needs the Google Cloud Project ID and the region.
 
    In Cloud Shell, execute the following commands:
 
    ```bash
-   export GCP_PROJECT='<Your Google Cloud Project ID>'  # Change this
-   export GCP_REGION='us-central1'             # If you change this, make sure the region is supported.
+   export GOOGLE_CLOUD_PROJECT='<Your Google Cloud Project ID>'  # Change this
+   export GOOGLE_CLOUD_REGION='us-central1'                      # If you change this, make sure the region is supported.
    ```
 
 2. Build and deploy the service to Cloud Run:
@@ -97,9 +97,9 @@ To deploy the Streamlit Application in [Cloud Run](https://cloud.google.com/run/
      --port=8080 \
      --source=. \
      --allow-unauthenticated \
-     --region=$GCP_REGION \
-     --project=$GCP_PROJECT \
-     --set-env-vars=GCP_PROJECT=$GCP_PROJECT,GCP_REGION=$GCP_REGION
+     --region=$GOOGLE_CLOUD_REGION \
+     --project=$GOOGLE_CLOUD_PROJECT \
+     --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,GOOGLE_CLOUD_REGION=$GOOGLE_CLOUD_REGION
    ```
 
 On successful deployment, you will be provided a URL to the Cloud Run service. You can visit that in the browser to view the Cloud Run application that you just deployed. Choose the functionality that you would like to check out and the application will prompt the Gemini API in Vertex AI and display the responses.

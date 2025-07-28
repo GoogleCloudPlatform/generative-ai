@@ -92,7 +92,7 @@
 ^\Qgemini/getting-started/intro_gemini_1_5_pro.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_pro_vision_python.ipynb\E$
 ^\Qgemini/getting-started/intro_gemini_python.ipynb\E$
-^\Qgemini/reasoning-engine/tutorial_google_maps_agent.ipynb\E$
+^\Qgemini/agent-engine/tutorial_google_maps_agent.ipynb\E$
 ^\Qgemini/sample-apps/image-bash-jam/images/.keep\E$
 ^\Qgemini/sample-apps/image-bash-jam/README.md\E$
 ^\Qgemini/sample-apps/photo-discovery/app/linux/CMakeLists.txt\E$
@@ -106,6 +106,7 @@
 ^\Qsearch/bulk-question-answering/bulk_question_answering_output.tsv\E$
 ^\Qvision/getting-started/image_editing_maskmode.ipynb\E$
 ^\Qvision/getting-started/image_generation.ipynb\E$
+^\Qvision/getting-started/imagen4_image_generation.ipynb\E$
 ^\Qvision/getting-started/visual_captioning.ipynb\E$
 ^\Qvision/use-cases/creating_high_quality_visual_assets_with_gemini_and_imagen.ipynb\E$
 ^\Qgemini/orchestration/llamaindex_workflows.ipynb\E$
@@ -114,3 +115,5 @@ ignore$
 ^\Qowlbot.py\E$
 ^\Q.github/workflows/issue_assigner/assign_issue.py\E$
 ^\Qnoxfile.py\E$
+py\.typed$
+^\Qaudio/speech/use-cases/storytelling/macbeth_the_sitcom.json\E$

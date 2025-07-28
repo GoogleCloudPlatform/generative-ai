@@ -1,8 +1,8 @@
 # SQL Talk: Natural Language to BigQuery with Gemini's Function Calling
 
-|           |                                                     |
-| --------- | --------------------------------------------------- |
-| Author(s) | [Kristopher Overholt](https://github.com/koverholt) |
+| Author                                              |
+| --------------------------------------------------- |
+| [Kristopher Overholt](https://github.com/koverholt) |
 
 ## Overview
 
@@ -37,8 +37,7 @@ After you've tried out the live demo app, you can also run your own version of
 the SQL Talk app and make changes to the live app using the Cloud Shell Editor
 in your own Google Cloud project.
 
-[Open this repository and the sample app in the Cloud Shell
-Editor](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&cloudshell_workspace=gemini/function-calling/sql-talk-app/&cloudshell_tutorial=tutorial.md&cloudshell_open_in_editor=app.py),
+[Open this repository and the sample app in the Cloud Shell Editor](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/generative-ai.git&cloudshell_workspace=gemini/function-calling/sql-talk-app/&cloudshell_tutorial=tutorial.md&cloudshell_open_in_editor=app.py),
 then follow the steps displayed in the tutorial in the sidebar.
 
 ## Additional resources

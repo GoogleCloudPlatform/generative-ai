@@ -4,6 +4,18 @@
 | --------- | --------------------------------------------- |
 | Author(s) | [Hussain Chinoy](https://github.com/ghchinoy) |
 
+<!-- markdownlint-disable MD036 -->
+
+**YouTube Video: How to build a Gemini powered Mesop app**
+
+<!-- markdownlint-enable MD036 -->
+
+<!-- markdownlint-disable MD033 -->
+<a href="https://www.youtube.com/watch?v=KUfPiSUJrwE&list=PLIivdWyY5sqJio2yeg1dlfILOUO2FoFRx" target="_blank">
+  <img src="https://img.youtube.com/vi/KUfPiSUJrwE/maxresdefault.jpg" alt="How to build a Gemini powered Mesop app" width="500">
+</a>
+<!-- markdownlint-enable MD033 -->
+
 This application demonstrates a [Mesop](https://github.com/google/mesop) UI framework application running on Cloud Run.
 
 Sample screenshots and video demos of the application are shown below:
@@ -34,9 +46,7 @@ To run the Mesop application locally (on Cloud Shell), we need to perform the fo
    - `GOOGLE_CLOUD_PROJECT` : This the Google Cloud project ID.
    - `GOOGLE_CLOUD_REGION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
 
-   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region. The specific code line from the `main.py`
-   function is shown here:
-   `vertexai.init(project=PROJECT_ID, location=LOCATION)`
+   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region.
 
    In Cloud Shell, execute the following commands:
 
@@ -64,9 +74,7 @@ To deploy the Mesop Application in [Cloud Run](https://cloud.google.com/run/docs
    - `GOOGLE_CLOUD_PROJECT` : This the Google Cloud project ID.
    - `GOOGLE_CLOUD_REGION` : This is the region in which you are deploying your Cloud Run app. For e.g. us-central1.
 
-   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region. The specific code line from the `main.py`
-   function is shown here:
-   `vertexai.init(project=PROJECT_ID, location=LOCATION)`
+   These variables are needed since the Vertex AI initialization needs the Google Cloud project ID and the region.
 
    In Cloud Shell, execute the following commands:
 

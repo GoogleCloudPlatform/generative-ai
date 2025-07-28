@@ -28,7 +28,7 @@ class QueryEntities(BaseModel):
     cities: List[str]
     states: List[str]
     # research_focus: ResearchFocus
-    research_theme: str = "Electronic Vehicle"
+    research_theme: str = "Electric Vehicle"
     output_type: OutputType
 
 
@@ -151,7 +151,7 @@ class QueryAnalysisAgent:
                         - "Show gaps in..." -> GAPS
                         - "Where should we add..." -> PLANNING
                         - "How well are... performing" -> ASSESSMENT
-                        
+
                         Now extract entities from this query: """
                         + query
                     }
@@ -175,20 +175,6 @@ class QueryAnalysisAgent:
                 pattern_type=extracted["pattern_type"],
                 output_type=extracted["output_type"],
                 debug=self.debug,
-            )
-
-            function_response_part = types.Part.from_function_response(
-                name=function_call.name, response={"result": result}
-            )
-
-            # Final generation with context
-            final_response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=[
-                    types.Part.from_text(query),
-                    response.candidates[0].content.parts[0],
-                    function_response_part,
-                ],
             )
 
             return QueryEntities(**result)
