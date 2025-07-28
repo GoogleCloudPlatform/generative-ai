@@ -296,7 +296,6 @@ MTL
 Maa
 Maarten
 Mahindra
-Mhatre
 Malware
 Mamah
 Mandiri
@@ -311,6 +310,7 @@ Merhaba
 Mesop
 Meteo
 Mewgler
+Mhatre
 Milito
 Mirai
 Mitani
