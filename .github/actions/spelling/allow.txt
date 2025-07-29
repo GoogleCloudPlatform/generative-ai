@@ -853,6 +853,7 @@ gcsfs
 gcurl
 gdk
 gdkx
+gdp
 geboten
 genai
 genkit
