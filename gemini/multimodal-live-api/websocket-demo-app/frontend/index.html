@@ -286,6 +286,12 @@
     <label for="disableDetection">Disable Audio Endpointing Detection</label>
   </div>
   <div>
+    <b>Proactivity Configurations</b>
+    <br /><br />
+    <md-checkbox id="proactiveVideo" touch-target="wrapper"></md-checkbox>
+    <label for="proactiveVideo">Enable Proactive Video</label>
+  </div>
+  <div>
     <b>Automatic Detection Configurations</b>
     <br /><br />
     <md-outlined-select label="Start Sensitivity" id="startSensitivity">
@@ -380,6 +386,12 @@
         <span id="cameraBtn">
           <md-filled-icon-button onclick="cameraBtnClick()">
             <md-icon>videocam</md-icon>
+          </md-filled-icon-button>
+        </span>
+
+        <span id="cameraOffBtn" hidden>
+          <md-filled-icon-button onclick="cameraOffBtnClick()">
+            <md-icon>videocam_off</md-icon>
           </md-filled-icon-button>
         </span>
 

@@ -31,6 +31,7 @@ const speaking = document.getElementById("speaking");
 const micBtn = document.getElementById("micBtn");
 const micOffBtn = document.getElementById("micOffBtn");
 const cameraBtn = document.getElementById("cameraBtn");
+const cameraOffBtn = document.getElementById("cameraOffBtn");
 const screenBtn = document.getElementById("screenBtn");
 
 const cameraSelect = document.getElementById("cameraSource");
@@ -47,6 +48,8 @@ const disableInterruption = document.getElementById("disableInterruption");
 const disableDetection = document.getElementById("disableDetection");
 const startSensitivity = document.getElementById("startSensitivity");
 const endSensitivity = document.getElementById("endSensitivity");
+
+const proactiveVideo = document.getElementById("proactiveVideo");
 
 
 const geminiLiveApi = new GeminiLiveAPI(PROXY_URL, PROJECT_ID, MODEL, API_HOST);
@@ -97,6 +100,7 @@ function connectBtnClick() {
     geminiLiveApi.setVad(disableInterruption.checked, disableDetection.checked,
         startSensitivity.value, endSensitivity.value
     );
+    geminiLiveApi.setProactiveVideo(proactiveVideo.checked);
     
 
     geminiLiveApi.onConnectionStarted = () => {
@@ -223,8 +227,17 @@ function startScreenCapture() {
 }
 
 function cameraBtnClick() {
+    liveVideoManager.stopWebcam();
+    cameraBtn.hidden = true;
+    cameraOffBtn.hidden = false;
+    console.log("Camera turned off");
+}
+
+function cameraOffBtnClick() {
     startCameraCapture();
-    console.log("cameraBtnClick");
+    cameraBtn.hidden = false;
+    cameraOffBtn.hidden = true;
+    console.log("Camera turned on");
 }
 
 function screenShareBtnClick() {

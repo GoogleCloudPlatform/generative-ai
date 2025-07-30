@@ -85,6 +85,7 @@ class GeminiLiveAPI {
         this.disableInterruption = false;
         this.startSensitivity = "";
         this.endSensitivity = "";
+        this.enableProactiveVideo = false;
 
         console.log("Created Gemini Live API object: ", this);
     }
@@ -124,6 +125,10 @@ class GeminiLiveAPI {
         this.disableInterruption = disableInterruption;
         this.startSensitivity = startSen;
         this.endSensitivity = endSen;
+    }
+
+    setProactiveVideo(enable) {
+        this.enableProactiveVideo = enable;
     }
 
     connect(accessToken) {
@@ -195,9 +200,6 @@ class GeminiLiveAPI {
                 system_instruction: {
                     parts: [{ text: this.systemInstructions }],
                 },
-                proactivity :   {
-                        proactive_video: true,
-                },
             },
         };
 
@@ -235,6 +237,12 @@ class GeminiLiveAPI {
             sessionSetupMessage.setup.realtime_input_config.automatic_activity_detection.end_of_speech_sensitivity = 2;
         } else if (this.endSensitivity === "high") {
             sessionSetupMessage.setup.realtime_input_config.automatic_activity_detection.end_of_speech_sensitivity = 1;
+        }
+
+        if (this.enableProactiveVideo) {
+            sessionSetupMessage.setup.proactivity = {
+                proactive_video: true,
+            };
         }
 
         console.log("setup message: " + sessionSetupMessage);

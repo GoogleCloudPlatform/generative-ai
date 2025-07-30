@@ -107,6 +107,7 @@ class LiveAudioInputManager {
         this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
 
         this.processor.onaudioprocess = (e) => {
+            console.log("Audio data received from microphone.");
             const inputData = e.inputBuffer.getChannelData(0);
             // Convert float32 to int16
             const pcm16 = new Int16Array(inputData.length);
@@ -187,7 +188,7 @@ class LiveVideoManager {
             console.error("Error accessing the webcam: ", err);
         }
 
-        setInterval(this.newFrame.bind(this), 1000);
+        setInterval(this.newFrame.bind(this), 10000);
     }
 
     stopWebcam() {
@@ -253,12 +254,13 @@ class LiveScreenManager {
 
     async startCapture() {
         try {
+            console.log("Starting screen capture...");
             this.stream = await navigator.mediaDevices.getDisplayMedia();
             this.previewVideoElement.srcObject = this.stream;
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }
-        setInterval(this.newFrame.bind(this), 1000);
+        setInterval(this.newFrame.bind(this), 10000);
     }
 
     stopCapture() {
