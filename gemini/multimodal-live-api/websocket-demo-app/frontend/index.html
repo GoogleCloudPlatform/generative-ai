@@ -1,12 +1,7 @@
 <head>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <script type="importmap">
     {
       "imports": {
@@ -28,404 +23,283 @@
   <link rel="stylesheet" href="styles.css" />
   <script defer src="script.js"></script>
 </head>
+
 <body>
   <h1 class="md-typescale-display-medium">Multimodal Live API</h1>
-  <p class="md-typescale-body-medium">
+  <p class="md-typescale-body-medium description">
     The Multimodal Live API enables low-latency, two-way interactions that use
     text, audio, and video input, with audio and text output.
   </p>
-  <br />
 
-  <div id="model-config-container">
-    <div>
-      <md-outlined-text-field
-        id="token"
-        label="Access Token"
-        value=""
-        type="password"
-      ></md-outlined-text-field>
-      <br />
-      <br />
-      <md-outlined-text-field
-        id="project"
-        label="Project ID"
-        value=""
-      ></md-outlined-text-field>
-    </div>
+  <main class="main-layout">
+    <div class="config-column">
 
-    <div>
-      <md-outlined-select label="Env" id="envApiHost">
-        <md-select-option aria-label="blank"></md-select-option>
-        <md-select-option selected value="autopush">
-          <div slot="headline">autopush</div>
-        </md-select-option>
-        <md-select-option selected value="staging">
-          <div slot="headline">staging</div>
-        </md-select-option>
-        <md-select-option selected value="prod">
-          <div slot="headline">prod</div>
-        </md-select-option>
-      </md-outlined-select>
-    </div>
-
-    <div class="modality-container">
-      <p class="md-typescale-body-medium" style="margin-top: 0">
-        Model response type
-      </p>
-
-      <form>
-        <md-radio
-          id="audio-radio"
-          name="responseModality"
-          value="AUDIO"
-          checked="checked"
-        ></md-radio>
-        <label for="audio-radio">
-          <span class="material-symbols-outlined"> volume_up </span>
-          <span class="icon-text">Audio</span>
-        </label>
-
-        <br /><br />
-
-        <md-radio
-          id="text-radio"
-          name="responseModality"
-          value="TEXT"
-        ></md-radio>
-        <label for="text-radio">
-          <span class="material-symbols-outlined"> text_fields </span>
-          <span class="icon-text">Text</span>
-        </label>
-      </form>
-    </div>
-
-    <div>
-      <b>Transcription Configurations</b>
-      <br/><br/>
-      <md-checkbox id="inputTranscript" touch-target="wrapper"></md-checkbox>
-      <label for="inputTranscript">Input Audio Transcripts</label>
-    <br />
-      <md-checkbox id="outputTranscript" touch-target="wrapper"></md-checkbox>
-      <label for="outputTranscript">Output Audio Transcripts</label>
-    </div> 
-
-    <div>
-      <b>Resumption Configurations</b>
-      <br/><br/>
-      <md-checkbox id="resumption" touch-target="wrapper"></md-checkbox>
-      <label for="resumption">Enable session resumption</label>
-      <br/>
-      <md-outlined-text-field
-        id="handle"
-        label="Resumption Handle"
-      >
-    </md-outlined-text-field>
-    </div>
-
-    <div>
-      <b>Language Configurations</b>
-      <br/><br/>
-      <div>
-        <md-outlined-select label="Voice Name" id="voiceName">
-          <md-select-option aria-label="blank"></md-select-option>
-          <md-select-option selected value="puck">
-            <div slot="headline">puck</div>
+      <div class="config-card">
+        <h3>Connection</h3>
+        <div class="form-grid">
+          <md-outlined-text-field id="token" label="Access Token" type="password"></md-outlined-text-field>
+          <md-outlined-text-field id="project" label="Project ID"></md-outlined-text-field>
+        </div>
+        <md-outlined-select label="Environment" id="envApiHost" style="margin-top: 16px;">
+          <md-select-option selected value="autopush">
+            <div slot="headline">autopush</div>
           </md-select-option>
-          <md-select-option selected value="charon">
-            <div slot="headline">charon</div>
+          <md-select-option value="staging">
+            <div slot="headline">staging</div>
           </md-select-option>
-          <md-select-option selected value="kore">
-            <div slot="headline">kore</div>
-          </md-select-option>
-          <md-select-option selected value="fenrir">
-            <div slot="headline">fenrir</div>
-          </md-select-option>
-          <md-select-option selected value="aoede">
-            <div slot="headline">aoede</div>
-          </md-select-option>
-          <md-select-option selected value="orus">
-            <div slot="headline">orus</div>
-          </md-select-option>
-          <md-select-option selected value="zephyr">
-            <div slot="headline">zephyr</div>
-          </md-select-option>
-          <md-select-option selected value="leda">
-            <div slot="headline">leda</div>
+          <md-select-option value="prod">
+            <div slot="headline">prod</div>
           </md-select-option>
         </md-outlined-select>
-      </div>
-      <br/><br/>
-      <div>
-        <md-outlined-select label="Voice Locale" id="voiceLocale">
-          <md-select-option aria-label="blank"></md-select-option>
-          <md-select-option selected value="en-US">
-            <div slot="headline">en-US</div>
-          </md-select-option>
-          <md-select-option selected value="de-DE">
-            <div slot="headline">de-DE</div>
-          </md-select-option>
-          <md-select-option selected value="en-AU">
-            <div slot="headline">en-AU</div>
-          </md-select-option>
-          <md-select-option selected value="en-GB">
-            <div slot="headline">en-GB</div>
-          </md-select-option>
-          <md-select-option selected value="en-IN">
-            <div slot="headline">en-IN</div>
-          </md-select-option>
-          <md-select-option selected value="es-US">
-            <div slot="headline">es-US</div>
-          </md-select-option>
-          <md-select-option selected value="fr-FR">
-            <div slot="headline">fr-FR</div>
-          </md-select-option>
-          <md-select-option selected value="hi-IN">
-            <div slot="headline">hi-IN</div>
-          </md-select-option>
-          <md-select-option selected value="pt-BR">
-            <div slot="headline">pt-BR</div>
-          </md-select-option>
-          <md-select-option selected value="ar-XA">
-            <div slot="headline">ar-XA</div>
-          </md-select-option>
-          <md-select-option selected value="es-ES">
-            <div slot="headline">es-ES</div>
-          </md-select-option>
-          <md-select-option selected value="fr-CA">
-            <div slot="headline">fr-CA</div>
-          </md-select-option>
-          <md-select-option selected value="id-ID">
-            <div slot="headline">id-ID</div>
-          </md-select-option>
-          <md-select-option selected value="it-IT">
-            <div slot="headline">it-IT</div>
-          </md-select-option>
-          <md-select-option selected value="ja-JP">
-            <div slot="headline">ja-JP</div>
-          </md-select-option>
-          <md-select-option selected value="tr-TR">
-            <div slot="headline">tr-TR</div>
-          </md-select-option>
-          <md-select-option selected value="vi-VN">
-            <div slot="headline">vi-VN</div>
-          </md-select-option>
-          <md-select-option selected value="bn-IN">
-            <div slot="headline">bn-IN</div>
-          </md-select-option>
-          <md-select-option selected value="gu-IN">
-            <div slot="headline">gu-IN</div>
-          </md-select-option>
-          <md-select-option selected value="kn-IN">
-            <div slot="headline">kn-IN</div>
-          </md-select-option>
-          <md-select-option selected value="ml-IN">
-            <div slot="headline">ml-IN</div>
-          </md-select-option>
-          <md-select-option selected value="mr-IN">
-            <div slot="headline">mr-IN</div>
-          </md-select-option>
-          <md-select-option selected value="ta-IN">
-            <div slot="headline">ta-IN</div>
-          </md-select-option>
-          <md-select-option selected value="te-IN">
-            <div slot="headline">te-IN</div>
-          </md-select-option>
-          <md-select-option selected value="nl-NL">
-            <div slot="headline">nl-NL</div>
-          </md-select-option>
-          <md-select-option selected value="sw-KE">
-            <div slot="headline">sw-KE</div>
-          </md-select-option>
-          <md-select-option selected value="ko-KR">
-            <div slot="headline">ko-KR</div>
-          </md-select-option>
-          <md-select-option selected value="cmn-CN">
-            <div slot="headline">cmn-CN</div>
-          </md-select-option>
-          <md-select-option selected value="pl-PL">
-            <div slot="headline">pl-PL</div>
-          </md-select-option>
-          <md-select-option selected value="ru-RU">
-            <div slot="headline">ru-RU</div>
-          </md-select-option>
-          <md-select-option selected value="th-TH">
-            <div slot="headline">th-TH</div>
-          </md-select-option>
-        </md-outlined-select>
-      </div>
-    </div>
-    <md-outlined-text-field
-      id="systemInstructions"
-      type="textarea"
-      label="System Instructions"
-      rows="3"
-    >
-    </md-outlined-text-field>
-
-    <div>
-      <br />
-      <md-outlined-button onclick="connectBtnClick()"
-        >Connect</md-outlined-button
-      >
-      <br /><br />
-      <md-outlined-button onclick="disconnectBtnClick()"
-        >Disconnect</md-outlined-button
-      >
-    </div>
-  </div>
-  <br />
-
-  <div>
-    <b>VAD Configurations</b>
-    <br /><br />
-    <md-checkbox id="disableInterruption" touch-target="wrapper"></md-checkbox>
-    <label for="disableInterruption">Disable Interruption</label>
-
-    <br /><br />
-    <md-checkbox id="disableDetection" touch-target="wrapper"></md-checkbox>
-    <label for="disableDetection">Disable Audio Endpointing Detection</label>
-  </div>
-  <div>
-    <b>Proactivity Configurations</b>
-    <br /><br />
-    <md-checkbox id="proactiveVideo" touch-target="wrapper"></md-checkbox>
-    <label for="proactiveVideo">Enable Proactive Video</label>
-  </div>
-  <div>
-    <b>Automatic Detection Configurations</b>
-    <br /><br />
-    <md-outlined-select label="Start Sensitivity" id="startSensitivity">
-      <md-select-option aria-label="blank"></md-select-option>
-      <md-select-option selected value="low">
-        <div slot="headline">low</div>
-      </md-select-option>
-      <md-select-option selected value="high">
-        <div slot="headline">high</div>
-      </md-select-option>
-    </md-outlined-select>
-
-    <md-outlined-select label="End Sensitivity" id="endSensitivity">
-      <md-select-option aria-label="blank"></md-select-option>
-      <md-select-option selected value="low">
-        <div slot="headline">low</div>
-      </md-select-option>
-      <md-select-option selected value="high">
-        <div slot="headline">high</div>
-      </md-select-option>
-    </md-outlined-select>
-  </div>
-  <div>
-    <b>Manual Detection Triggers</b>
-    <br /><br />
-    <md-outlined-button onclick="audioStartButtonClick()"
-      >Start Audio Endpoint</md-outlined-button
-    >
-
-    <md-outlined-button onclick="audioEndButtonClick()"
-      >End Audio Endpoint</md-outlined-button
-    >
-  </div>
-
-  <div id="model-state">
-    <div id="disconnected" class="state">
-      <span class="material-symbols-outlined"> cloud_off </span>
-      <span class="icon-text">disconnected</span>
-    </div>
-    <div id="connecting" class="state" hidden>
-      <span class="material-symbols-outlined"> hourglass_empty </span>
-      <span class="icon-text">connecting...</span>
-    </div>
-    <div id="connected" class="state" hidden>
-      <span class="material-symbols-outlined"> cloud_done </span>
-      <span class="icon-text">connected</span>
-    </div>
-    <div id="speaking" class="state" hidden>
-      <span class="material-symbols-outlined"> graphic_eq </span>
-      <span class="icon-text">model speaking</span>
-    </div>
-  </div>
-
-  <br />
-
-  <div id="user-input-container">
-    <div>
-      <div>
-        <md-outlined-select
-          id="cameraSource"
-          label="Camera Input"
-          onchange="newCameraSelected()"
-        >
-        </md-outlined-select>
+        <div class="button-group">
+          <md-filled-button onclick="connectBtnClick()">Connect</md-filled-button>
+          <md-outlined-button onclick="disconnectBtnClick()">Disconnect</md-outlined-button>
+        </div>
       </div>
 
-      <br />
-
-      <div>
-        <md-outlined-select
-          id="audioSource"
-          label="Microphone Input"
-          onchange="newMicSelected()"
-        >
-        </md-outlined-select>
+      <div class="config-card">
+        <h3>Model Behavior</h3>
+        <p class="md-typescale-body-medium" style="margin-top: 0">Model response type</p>
+        <form>
+          <md-radio id="audio-radio" name="responseModality" value="AUDIO" checked></md-radio>
+          <label for="audio-radio">Audio</label>
+          <md-radio id="text-radio" name="responseModality" value="TEXT" style="margin-left: 24px;"></md-radio>
+          <label for="text-radio">Text</label>
+        </form>
+        <br />
+        <div class="form-grid">
+          <md-outlined-select label="Voice Name" id="voiceName">
+            <md-select-option selected value="puck">
+              <div slot="headline">puck</div>
+            </md-select-option>
+            <md-select-option selected value="charon">
+              <div slot="headline">charon</div>
+            </md-select-option>
+            <md-select-option selected value="kore">
+              <div slot="headline">kore</div>
+            </md-select-option>
+            <md-select-option selected value="fenrir">
+              <div slot="headline">fenrir</div>
+            </md-select-option>
+            <md-select-option selected value="aoede">
+              <div slot="headline">aoede</div>
+            </md-select-option>
+            <md-select-option selected value="orus">
+              <div slot="headline">orus</div>
+            </md-select-option>
+            <md-select-option selected value="zephyr">
+              <div slot="headline">zephyr</div>
+            </md-select-option>
+            <md-select-option selected value="leda">
+              <div slot="headline">leda</div>
+            </md-select-option>
+          </md-outlined-select>
+          <md-outlined-select label="Voice Locale" id="voiceLocale">
+            <md-select-option selected value="en-US">
+              <div slot="headline">en-US</div>
+            </md-select-option>
+            <md-select-option selected value="de-DE">
+              <div slot="headline">de-DE</div>
+            </md-select-option>
+            <md-select-option selected value="en-AU">
+              <div slot="headline">en-AU</div>
+            </md-select-option>
+            <md-select-option selected value="en-GB">
+              <div slot="headline">en-GB</div>
+            </md-select-option>
+            <md-select-option selected value="en-IN">
+              <div slot="headline">en-IN</div>
+            </md-select-option>
+            <md-select-option selected value="es-US">
+              <div slot="headline">es-US</div>
+            </md-select-option>
+            <md-select-option selected value="fr-FR">
+              <div slot="headline">fr-FR</div>
+            </md-select-option>
+            <md-select-option selected value="hi-IN">
+              <div slot="headline">hi-IN</div>
+            </md-select-option>
+            <md-select-option selected value="pt-BR">
+              <div slot="headline">pt-BR</div>
+            </md-select-option>
+            <md-select-option selected value="ar-XA">
+              <div slot="headline">ar-XA</div>
+            </md-select-option>
+            <md-select-option selected value="es-ES">
+              <div slot="headline">es-ES</div>
+            </md-select-option>
+            <md-select-option selected value="fr-CA">
+              <div slot="headline">fr-CA</div>
+            </md-select-option>
+            <md-select-option selected value="id-ID">
+              <div slot="headline">id-ID</div>
+            </md-select-option>
+            <md-select-option selected value="it-IT">
+              <div slot="headline">it-IT</div>
+            </md-select-option>
+            <md-select-option selected value="ja-JP">
+              <div slot="headline">ja-JP</div>
+            </md-select-option>
+            <md-select-option selected value="tr-TR">
+              <div slot="headline">tr-TR</div>
+            </md-select-option>
+            <md-select-option selected value="vi-VN">
+              <div slot="headline">vi-VN</div>
+            </md-select-option>
+            <md-select-option selected value="bn-IN">
+              <div slot="headline">bn-IN</div>
+            </md-select-option>
+            <md-select-option selected value="gu-IN">
+              <div slot="headline">gu-IN</div>
+            </md-select-option>
+            <md-select-option selected value="kn-IN">
+              <div slot="headline">kn-IN</div>
+            </md-select-option>
+            <md-select-option selected value="ml-IN">
+              <div slot="headline">ml-IN</div>
+            </md-select-option>
+            <md-select-option selected value="mr-IN">
+              <div slot="headline">mr-IN</div>
+            </md-select-option>
+            <md-select-option selected value="ta-IN">
+              <div slot="headline">ta-IN</div>
+            </md-select-option>
+            <md-select-option selected value="te-IN">
+              <div slot="headline">te-IN</div>
+            </md-select-option>
+            <md-select-option selected value="nl-NL">
+              <div slot="headline">nl-NL</div>
+            </md-select-option>
+            <md-select-option selected value="sw-KE">
+              <div slot="headline">sw-KE</div>
+            </md-select-option>
+            <md-select-option selected value="ko-KR">
+              <div slot="headline">ko-KR</div>
+            </md-select-option>
+            <md-select-option selected value="cmn-CN">
+              <div slot="headline">cmn-CN</div>
+            </md-select-option>
+            <md-select-option selected value="pl-PL">
+              <div slot="headline">pl-PL</div>
+            </md-select-option>
+            <md-select-option selected value="ru-RU">
+              <div slot="headline">ru-RU</div>
+            </md-select-option>
+            <md-select-option selected value="th-TH">
+              <div slot="headline">th-TH</div>
+            </md-select-option>
+          </md-outlined-select>
+        </div>
+        <md-outlined-text-field id="systemInstructions" type="textarea" label="System Instructions" rows="3"
+          style="margin-top: 16px;"></md-outlined-text-field>
       </div>
 
-      <br />
-      <div class="spread">
-        <span id="micBtn">
-          <md-filled-icon-button onclick="micBtnClick()">
-            <md-icon>mic</md-icon>
-          </md-filled-icon-button>
-        </span>
+      <details class="config-card">
+        <summary>
+          <h3>Advanced Settings</h3>
+        </summary>
+        <div class="details-content">
+          <b>Transcription</b><br />
+          <div class="checkbox-row">
+            <md-checkbox id="inputTranscript" touch-target="wrapper"></md-checkbox>
+            <label for="inputTranscript">Input Audio Transcripts</label><br />
+          </div>
+          <div class="checkbox-row">
+            <md-checkbox id="outputTranscript" touch-target="wrapper"></md-checkbox>
+            <label for="outputTranscript">Output Audio Transcripts</label><br /><br />
+          </div>
 
-        <span id="micOffBtn" hidden>
-          <md-filled-icon-button onclick="micOffBtnClick()">
-            <md-icon>mic_off</md-icon>
-          </md-filled-icon-button>
-        </span>
+          <b>Session Resumption</b><br />
+          <div class="checkbox-row">
+            <md-checkbox id="resumption" touch-target="wrapper"></md-checkbox>
+            <label for="resumption">Enable session resumption</label><br />
+          </div>
+          <md-outlined-text-field id="handle" label="Resumption Handle"></md-outlined-text-field><br /><br />
 
-        <span id="cameraBtn">
-          <md-filled-icon-button onclick="cameraBtnClick()">
-            <md-icon>videocam</md-icon>
-          </md-filled-icon-button>
-        </span>
+          <b>VAD & Proactivity</b><br />
+          <div class="checkbox-row">
+            <md-checkbox id="disableInterruption" touch-target="wrapper"></md-checkbox>
+            <label for="disableInterruption">Disable Interruption</label><br />
+          </div>
+          <div class="checkbox-row">
+            <md-checkbox id="disableDetection" touch-target="wrapper"></md-checkbox>
+            <label for="disableDetection">Disable Audio Endpointing Detection</label><br />
+          </div>
+          <div class="checkbox-row">
+            <md-checkbox id="proactiveVideo" touch-target="wrapper"></md-checkbox>
+            <label for="proactiveVideo">Enable Proactive Video</label><br /><br />
+          </div>
 
-        <span id="cameraOffBtn" hidden>
-          <md-filled-icon-button onclick="cameraOffBtnClick()">
-            <md-icon>videocam_off</md-icon>
-          </md-filled-icon-button>
-        </span>
+          <b class="settings-subtitle">Detection Sensitivity</b><br />
+          <div class="form-grid">
+            <md-outlined-select label="Start Sensitivity" id="startSensitivity">
+              <md-select-option selected value="low">
+                <div slot="headline">low</div>
+              </md-select-option>
+              <md-select-option value="high">
+                <div slot="headline">high</div>
+              </md-select-option>
+            </md-outlined-select>
+            <md-outlined-select label="End Sensitivity" id="endSensitivity">
+              <md-select-option selected value="low">
+                <div slot="headline">low</div>
+              </md-select-option>
+              <md-select-option value="high">
+                <div slot="headline">high</div>
+              </md-select-option>
+            </md-outlined-select>
+          </div>
+        </div>
+      </details>
 
-        <span id="screenBtn">
-          <md-filled-icon-button onclick="screenShareBtnClick()">
-            <md-icon>present_to_all</md-icon>
-          </md-filled-icon-button>
-        </span>
-      </div>
     </div>
 
-    <div>
-      <div id="video-preview">
+    <div class="interaction-column">
+      <div id="model-state">
+        <div id="disconnected" class="state"><span class="material-symbols-outlined">cloud_off</span><span
+            class="icon-text">disconnected</span></div>
+        <div id="connecting" class="state" hidden><span class="material-symbols-outlined">hourglass_empty</span><span
+            class="icon-text">connecting...</span></div>
+        <div id="connected" class="state" hidden><span class="material-symbols-outlined">cloud_done</span><span
+            class="icon-text">connected</span></div>
+        <div id="speaking" class="state" hidden><span class="material-symbols-outlined">graphic_eq</span><span
+            class="icon-text">model speaking</span></div>
+      </div>
+
+      <div id="video-preview-container">
         <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" style="display: none;"></canvas>
+      </div>
+
+      <div class="media-controls">
+        <md-outlined-select id="cameraSource" label="Camera" onchange="newCameraSelected()"></md-outlined-select>
+        <md-outlined-select id="audioSource" label="Microphone" onchange="newMicSelected()"></md-outlined-select>
+        <span id="micBtn"><md-filled-icon-button
+            onclick="micBtnClick()"><md-icon>mic</md-icon></md-filled-icon-button></span>
+        <span id="micOffBtn" hidden><md-filled-icon-button
+            onclick="micOffBtnClick()"><md-icon>mic_off</md-icon></md-filled-icon-button></span>
+        <span id="cameraBtn"><md-filled-icon-button
+            onclick="cameraBtnClick()"><md-icon>videocam</md-icon></md-filled-icon-button></span>
+        <span id="cameraOffBtn" hidden><md-filled-icon-button
+            onclick="cameraOffBtnClick()"><md-icon>videocam_off</md-icon></md-filled-icon-button></span>
+        <span id="screenBtn"><md-filled-icon-button
+            onclick="screenShareBtnClick()"><md-icon>present_to_all</md-icon></md-filled-icon-button></span>
+      </div>
+
+      <div id="chat-container">
+        <div id="text-chat"></div>
+        <div class="text-input-area">
+          <md-outlined-text-field id="text-message" label="Send a text message"></md-outlined-text-field>
+          <md-icon-button onclick="newUserMessage()"><md-icon>send</md-icon></md-icon-button>
+        </div>
       </div>
     </div>
-    <div>
-      <md-outlined-text-field
-        id="text-message"
-        label="Text Message"
-        value=""
-      ></md-outlined-text-field>
-      <md-icon-button onclick="newUserMessage()">
-        <md-icon>send</md-icon>
-      </md-icon-button>
-      <br />
-      <div id="text-chat"></div>
-    </div>
-  </div>
+  </main>
 
   <md-dialog id="dialog" close>
     <div slot="content">
       <span id="dialogMessage">A dialog that is opened by default.</span>
     </div>
   </md-dialog>
+
 </body>
