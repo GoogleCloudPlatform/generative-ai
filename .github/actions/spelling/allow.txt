@@ -9,6 +9,7 @@ AIP
 AIphone
 ALCS
 ALDS
+ALPHAFOLD
 AMNOSH
 ANZ
 AOT
@@ -58,6 +59,7 @@ Bulmus
 Byzance
 CALIPSO
 CAMQAA
+CASP
 CHECKOV
 CLA
 CLASSPATH
@@ -100,6 +102,7 @@ Daniil
 DataFrame
 Dedup
 DeepEval
+Demis
 Depatmint
 Dexin
 Disturbia
@@ -155,10 +158,12 @@ Flatform
 Flipkart
 Folmer
 Frodo
+GDM
 GEOGPOINT
 GError
 GFile
 GKE
+GOODALL
 GObject
 GWLP
 Gabeira
@@ -173,6 +178,7 @@ Gleyber
 Gmb
 GmbH
 Godzilla
+Gombe
 Graterol
 Gundogan
 HBox
@@ -265,6 +271,7 @@ LEBRON
 LLMs
 LLa
 LMPA
+LOMs
 LOOKBACK
 LRESULT
 LSTATUS
@@ -369,6 +376,7 @@ PGUSER
 PLLu
 PLOTLYENV
 PPO
+PTx
 PYINK
 Pakeman
 Paquete
@@ -565,6 +573,7 @@ XGA
 XSum
 XXE
 YAjjpd
+Ykb
 Youxi
 Yuxuan
 Yuzuru
@@ -872,6 +881,7 @@ gitleaks
 gke
 glowin
 gms
+goldmine
 googler
 goooooood
 gozo
@@ -1154,7 +1164,7 @@ pllum
 plotly
 plpgsql
 plt
-podcast
+pmbpodcast
 podcasts
 podfile
 podhelper
@@ -1281,6 +1291,7 @@ ssh
 ssml
 ssn
 ssr
+sss
 stdcall
 stext
 stp
@@ -1321,6 +1332,8 @@ throug
 tickvals
 tiktoken
 timechart
+timecoded
+timecodes
 tion
 titlebar
 tobytes
@@ -1448,17 +1461,3 @@ zakarid
 zaxis
 zimie
 zmin
-GDM
-GOODALL
-ALPHAFOLD
-Ykb
-timecodes
-sss
-Gombe
-PTx
-LOMs
-goldmine
-timecoded
-CASP
-Demis
-pmb
