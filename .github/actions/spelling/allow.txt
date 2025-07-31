@@ -1164,7 +1164,8 @@ pllum
 plotly
 plpgsql
 plt
-pmbpodcast
+pmb
+podcast
 podcasts
 podfile
 podhelper
