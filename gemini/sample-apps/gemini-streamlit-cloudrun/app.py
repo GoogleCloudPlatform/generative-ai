@@ -38,7 +38,7 @@ def _region() -> str:
 MODELS = {
     "gemini-2.0-flash": "Gemini 2.0 Flash",
     "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
-    "gemini-2.5-flash-lite-preview-06-17": "Gemini 2.5 Flash-Lite",
+    "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite",
     "gemini-2.5-pro": "Gemini 2.5 Pro",
     "gemini-2.5-flash": "Gemini 2.5 Flash",
     "model-optimizer-exp-04-09": "Model Optimizer",
@@ -47,7 +47,7 @@ MODELS = {
 THINKING_BUDGET_MODELS = {
     "gemini-2.5-pro",
     "gemini-2.5-flash",
-    "gemini-2.5-flash-lite-preview-06-17",
+    "gemini-2.5-flash-lite",
 }
 
 
