@@ -53,7 +53,7 @@ PAGE_TITLE = "Gemini in Vertex AI with Mesop"
 class State:
     """Mesop state class"""
 
-    model: str = "gemini-2.0-flash"
+    model: str = "gemini-2.5-flash"
     current_page: str = "/"
 
     # pylint: disable=E3701
