@@ -807,7 +807,7 @@ def app() -> None:
                 if state.story_progress:
                     with me.box(style=_SPINNER_STYLE):
                         me.progress_spinner()
-                        me.text("Generating story with Gemini 2.0 ...")
+                        me.text("Generating story with Gemini 2.5 ...")
                 if state.story_output:
                     with me.box(
                         style=me.Style(
@@ -1050,7 +1050,7 @@ def image_math_reasoning_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 2.0 Pro can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
+        "Gemini 2.5 can also recognize math formulas and equations and extract specific information from them. This capability is particularly useful for generating explanations for math problems, as shown below."
     )
     me.box(style=me.Style(height=12))
 
@@ -1119,7 +1119,7 @@ def image_glasses_recommendations_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 2.0 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
+        "Gemini 2.5 is capable of image comparison and providing recommendations. This may be useful in industries like e-commerce and retail. Below is an example of choosing which pair of glasses would be better suited to various face types:"
     )
     me.box(style=me.Style(height=12))
 
@@ -1231,7 +1231,7 @@ def image_er_diagrams_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Gemini 2.0 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram."
+        "Gemini 2.5 multimodal capabilities empower it to comprehend diagrams and take actionable steps, such as optimization or code generation. The following example demonstrates how Gemini can decipher an Entity Relationship (ER) diagram."
     )
     me.box(style=me.Style(height=12))
 
@@ -1291,7 +1291,7 @@ def image_oven_tab() -> None:
     me.box(style=me.Style(height=12))
 
     me.text(
-        "Equipped with the ability to extract information from visual elements on screens, Gemini 2.0 Pro can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
+        "Equipped with the ability to extract information from visual elements on screens, Gemini 2.5 can analyze screenshots, icons, and layouts to provide a holistic understanding of the depicted scene."
     )
     me.box(style=me.Style(height=12))
 
@@ -1593,7 +1593,7 @@ def video_tags_tab() -> None:
     state = me.state(State)
     me.box(style=me.Style(height=24))
 
-    me.text("Gemini 2.0 can also extract tags throughout a video, as shown below:")
+    me.text("Gemini 2.5 can also extract tags throughout a video, as shown below:")
     me.box(style=me.Style(height=12))
 
     me.video(
@@ -1643,7 +1643,7 @@ def video_highlights_tab() -> None:
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Another example of using Gemini 2.0 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
+        "Another example of using Gemini 2.5 is to ask questions about objects, people or the context, as shown in the video about Pixel 8 below:"
     )
     me.box(style=me.Style(height=12))
 
@@ -1694,7 +1694,7 @@ def video_geolocation_tab() -> None:
     me.box(style=me.Style(height=24))
 
     me.text(
-        "Even in short, detail-packed videos, Gemini 2.0 can identify the locations."
+        "Even in short, detail-packed videos, Gemini 2.5 can identify the locations."
     )
     me.box(style=me.Style(height=12))
 
