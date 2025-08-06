@@ -72,7 +72,7 @@ class LiveAudioInputManager {
     constructor() {
         this.audioContext;
         this.mediaRecorder;
-        this.processor = false;
+        this.processor = null;
         this.pcmData = [];
 
         this.deviceId = null;
@@ -104,21 +104,34 @@ class LiveAudioInputManager {
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
 
         const source = this.audioContext.createMediaStreamSource(this.stream);
-        this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+        // Load the worklet module.
+        await this.audioContext.audioWorklet.addModule('input-processor.js');
 
-        this.processor.onaudioprocess = (e) => {
-            console.log("Audio data received from microphone.");
-            const inputData = e.inputBuffer.getChannelData(0);
-            // Convert float32 to int16
-            const pcm16 = new Int16Array(inputData.length);
-            for (let i = 0; i < inputData.length; i++) {
-                pcm16[i] = inputData[i] * 0x7fff;
-            }
-            this.pcmData.push(...pcm16);
+        // Create an AudioWorkletNode.
+        this.processor = new AudioWorkletNode(this.audioContext, 'input-processor');
+
+        // Listen for messages (the PCM data) from the worklet.
+        this.processor.port.onmessage = (event) => {
+            this.pcmData.push(...event.data);
         };
 
+        // Connect the microphone source to the worklet.
         source.connect(this.processor);
-        this.processor.connect(this.audioContext.destination);
+        // this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+
+        // this.processor.onaudioprocess = (e) => {
+        //     console.log("Audio data received from microphone.");
+        //     const inputData = e.inputBuffer.getChannelData(0);
+        //     // Convert float32 to int16
+        //     const pcm16 = new Int16Array(inputData.length);
+        //     for (let i = 0; i < inputData.length; i++) {
+        //         pcm16[i] = inputData[i] * 0x7fff;
+        //     }
+        //     this.pcmData.push(...pcm16);
+        // };
+
+        // source.connect(this.processor);
+        // this.processor.connect(this.audioContext.destination);
 
         this.interval = setInterval(this.recordChunk.bind(this), 1000);
     }
@@ -144,8 +157,18 @@ class LiveAudioInputManager {
 
     disconnectMicrophone() {
         try {
-            this.processor.disconnect();
-            this.audioContext.close();
+            if (this.stream) {
+                this.stream.getTracks().forEach((track) => {
+                    track.stop();
+                });
+            }
+            if (this.processor) {
+                this.processor.disconnect();
+            }
+            if (this.audioContext) {
+                this.audioContext.close();
+            }
+            console.log("Microphone disconnected successfully.");
         } catch {
             console.error("Error disconnecting microphone");
         }
@@ -156,7 +179,7 @@ class LiveAudioInputManager {
     async updateMicrophoneDevice(deviceId) {
         this.deviceId = deviceId;
         this.disconnectMicrophone();
-        this.connectMicrophone();
+        await this.connectMicrophone();
     }
 }
 
@@ -167,15 +190,19 @@ class LiveVideoManager {
         this.ctx = this.previewCanvasElement.getContext("2d");
         this.stream = null;
         this.interval = null;
+        this.deviceId = null;
         this.onNewFrame = (newFrame) => {
             console.log("Default new frame trigger.");
         };
     }
 
     async startWebcam() {
+        if (this.stream) {
+            return; // Already started
+        }
         try {
             const constraints = {
-                video: true,
+                video: { deviceId: this.deviceId ? { exact: this.deviceId } : undefined }
                 // video: {
                 //     width: { max: 640 },
                 //     height: { max: 480 },
@@ -184,16 +211,23 @@ class LiveVideoManager {
             this.stream =
                 await navigator.mediaDevices.getUserMedia(constraints);
             this.previewVideoElement.srcObject = this.stream;
+            this.interval = setInterval(() => { this.onNewFrame() }, 1000);
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }
 
-        setInterval(this.newFrame.bind(this), 10000);
+        // setInterval(this.newFrame.bind(this), 10000);
     }
 
     stopWebcam() {
-        clearInterval(this.interval);
-        this.stopStream();
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+        if (this.stream) {
+            this.stopStream();
+            this.stream = null;
+        }
     }
 
     stopStream() {
@@ -207,11 +241,14 @@ class LiveVideoManager {
     }
 
     async updateWebcamDevice(deviceId) {
-        const constraints = {
-            video: { deviceId: { exact: deviceId } },
-        };
-        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-        this.previewVideoElement.srcObject = this.stream;
+        this.deviceId = deviceId;
+        this.stopWebcam();
+        await this.startWebcam();
+        // const constraints = {
+        //     video: { deviceId: { exact: deviceId } },
+        // };
+        // this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+        // this.previewVideoElement.srcObject = this.stream;
     }
 
     captureFrameB64() {
@@ -253,18 +290,26 @@ class LiveScreenManager {
     }
 
     async startCapture() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
+
         try {
             console.log("Starting screen capture...");
             this.stream = await navigator.mediaDevices.getDisplayMedia();
             this.previewVideoElement.srcObject = this.stream;
+
+            this.interval = setInterval(this.newFrame.bind(this), 1000);
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }
-        setInterval(this.newFrame.bind(this), 10000);
     }
 
     stopCapture() {
-        clearInterval(this.interval);
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
 
         if (!this.stream) return;
 
@@ -273,6 +318,9 @@ class LiveScreenManager {
         tracks.forEach((track) => {
             track.stop();
         });
+
+        this.previewVideoElement.srcObject = null;
+        this.stream = null;
     }
 
     captureFrameB64() {
