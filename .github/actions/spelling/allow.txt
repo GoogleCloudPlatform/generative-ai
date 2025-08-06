@@ -37,6 +37,7 @@ Ashish
 Aspeed
 Atulan
 Autorater
+BARSAC
 BGR
 BIKBEAR
 BITCODE
@@ -46,8 +47,6 @@ Bettes
 Bhagwat
 Biden
 Bigtable
-Bikeshare
-bikeshare
 Bitcoin
 Borregas
 Borussia
@@ -55,6 +54,7 @@ Bottas
 Boyz
 Broadoak
 Brusdar
+Brynner
 Btn
 Buckleys
 Bulmus
@@ -80,6 +80,7 @@ CVD
 CWLEY
 CZE
 Caprese
+Carcante
 Cardizem
 Chocolat
 Chrono
@@ -174,6 +175,7 @@ Gatace
 GenTwo
 Geralt
 Gfm
+Giallo
 Giancarlo
 Gisting
 Gleyber
@@ -255,16 +257,19 @@ Kaelen
 Kalamang
 Kamradt
 Kanagawa
+Katsura
 Kaufmanns
 Kawagoe
 Keanu
 Ketamine
 Khanh
 Kipchoge
+Kongre
 Koyel
 Kraizt
 Kubeflow
 Kvyat
+Kwanzan
 Kylian
 L'avenir
 LAION
@@ -303,6 +308,7 @@ MSCHF
 MSGSEND
 MTL
 Maa
+Maackia
 Maarten
 Mahindra
 Malware
@@ -359,6 +365,7 @@ OLAP
 OOTB
 Ohashi
 Ohtani
+Okame
 Olgivanna
 Ollama
 Olá
@@ -475,6 +482,7 @@ Storrer
 Strappy
 Surampudi
 Suzaka
+Sweetgum
 Syunik
 TARG
 TCEHY
@@ -576,6 +584,7 @@ XSum
 XXE
 YAjjpd
 Ykb
+Yoshino
 Youxi
 Yuxuan
 Yuzuru
@@ -607,6 +616,7 @@ airlume
 akka
 alisal
 alloydb
+amurensis
 antiword
 apikeys
 apixaban
@@ -650,11 +660,13 @@ bbc
 bbq
 beir
 bert
+betulus
 bff
 bgr
 bgswap
 bigframes
 bigquery
+biloba
 bitcoin
 blogs
 bluesky
@@ -675,6 +687,7 @@ btn
 byoc
 byod
 byor
+campestre
 carbonara
 cashify
 catus
@@ -716,9 +729,11 @@ coldline
 coloraxis
 colorbar
 colorway
+colurna
 colvis
 colwidth
 constexpr
+cordata
 corpuses
 countplot
 cpet
@@ -753,7 +768,9 @@ deskmates
 dfs
 diltiazem
 dino
+dioicus
 direnv
+distichum
 diy
 dlat
 dlon
@@ -802,6 +819,7 @@ errlog
 erty
 etf
 etils
+euchlora
 eula
 eur
 evals
@@ -876,7 +894,9 @@ getexif
 getparent
 gfile
 gguf
+giallo
 gidiyor
+ginnala
 github
 gitingest
 gitleaks
@@ -943,6 +963,8 @@ imread
 imshow
 imwrite
 inbox
+indica
+inermis
 informati
 inpaint
 iostream
@@ -959,6 +981,7 @@ ivf
 ivfflat
 ixed
 ized
+japonicum
 javac
 jegadesh
 jesieni
@@ -1133,9 +1156,11 @@ outro
 overwiew
 owlbot
 oxml
+padus
 pagemap
 paleo
 paligemma
+palustris
 pancetta
 pandoc
 pantarba
@@ -1156,6 +1181,7 @@ petabytes
 pfas
 pgadmin
 pgvector
+phellos
 pietra
 pii
 pincodes
@@ -1249,14 +1275,18 @@ rpet
 rrf
 rsc
 rsp
+rubra
+rubrum
 runjdwp
 saaagesh
+sargentii
 saveddir
 scann
 scattergl
 scidocs
 scifact
 scikit
+seabut
 seatback
 selectbox
 selfie
@@ -1265,6 +1295,8 @@ selkirk
 seo
 serde
 serper
+serrata
+serrulata
 setlocal
 sft
 shortdesc
@@ -1312,6 +1344,7 @@ supima
 svh
 svm
 sxs
+sylvatica
 tabular
 tagline
 takeaways
@@ -1340,6 +1373,7 @@ timecodes
 tion
 titlebar
 tobytes
+tomentosa
 toolcall
 toolu
 toself
@@ -1349,6 +1383,7 @@ traceloop
 treeah
 tritan
 trl
+truncatum
 tscore
 tseslint
 tsne
@@ -1360,6 +1395,7 @@ typehints
 ubuntu
 udf
 uids
+ulmoides
 ultrawide
 und
 undst
@@ -1453,6 +1489,7 @@ yanchor
 yaxes
 yaxis
 ycol
+yedoensis
 ylabel
 ylim
 yougov
