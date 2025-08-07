@@ -133,7 +133,7 @@ class LiveAudioInputManager {
         // source.connect(this.processor);
         // this.processor.connect(this.audioContext.destination);
 
-        this.interval = setInterval(this.recordChunk.bind(this), 1000);
+        this.interval = setInterval(this.recordChunk.bind(this), 5000);
     }
 
     newAudioRecording(b64AudioData) {
@@ -211,7 +211,7 @@ class LiveVideoManager {
             this.stream =
                 await navigator.mediaDevices.getUserMedia(constraints);
             this.previewVideoElement.srcObject = this.stream;
-            this.interval = setInterval(() => { this.onNewFrame() }, 1000);
+            this.interval = setInterval(() => { this.onNewFrame() }, 5000);
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }
@@ -299,7 +299,7 @@ class LiveScreenManager {
             this.stream = await navigator.mediaDevices.getDisplayMedia();
             this.previewVideoElement.srcObject = this.stream;
 
-            this.interval = setInterval(this.newFrame.bind(this), 1000);
+            this.interval = setInterval(this.newFrame.bind(this), 5000);
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }

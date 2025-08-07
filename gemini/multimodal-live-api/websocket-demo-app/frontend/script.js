@@ -105,7 +105,7 @@ function connectBtnClick() {
 
     geminiLiveApi.onConnectionStarted = () => {
         setAppStatus("connected");
-        startAudioInput();
+        // startAudioInput();
     };
 
     geminiLiveApi.setProjectId(projectInput.value);
