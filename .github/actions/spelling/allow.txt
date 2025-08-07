@@ -9,6 +9,7 @@ AIP
 AIphone
 ALCS
 ALDS
+ALPHAFOLD
 AMNOSH
 ANZ
 AOT
@@ -36,6 +37,7 @@ Ashish
 Aspeed
 Atulan
 Autorater
+BARSAC
 BGR
 BIKBEAR
 BITCODE
@@ -45,6 +47,7 @@ Bettes
 Bhagwat
 Biden
 Bigtable
+Bikeshare
 Bitcoin
 Borregas
 Borussia
@@ -52,12 +55,14 @@ Bottas
 Boyz
 Broadoak
 Brusdar
+Brynner
 Btn
 Buckleys
 Bulmus
 Byzance
 CALIPSO
 CAMQAA
+CASP
 CHECKOV
 CLA
 CLASSPATH
@@ -76,6 +81,7 @@ CVD
 CWLEY
 CZE
 Caprese
+Carcante
 Cardizem
 Chocolat
 Chrono
@@ -100,6 +106,7 @@ Daniil
 DataFrame
 Dedup
 DeepEval
+Demis
 Depatmint
 Dexin
 Disturbia
@@ -155,10 +162,12 @@ Flatform
 Flipkart
 Folmer
 Frodo
+GDM
 GEOGPOINT
 GError
 GFile
 GKE
+GOODALL
 GObject
 GWLP
 Gabeira
@@ -167,12 +176,14 @@ Gatace
 GenTwo
 Geralt
 Gfm
+Giallo
 Giancarlo
 Gisting
 Gleyber
 Gmb
 GmbH
 Godzilla
+Gombe
 Graterol
 Gundogan
 HBox
@@ -247,16 +258,19 @@ Kaelen
 Kalamang
 Kamradt
 Kanagawa
+Katsura
 Kaufmanns
 Kawagoe
 Keanu
 Ketamine
 Khanh
 Kipchoge
+Kongre
 Koyel
 Kraizt
 Kubeflow
 Kvyat
+Kwanzan
 Kylian
 L'avenir
 LAION
@@ -265,6 +279,7 @@ LEBRON
 LLMs
 LLa
 LMPA
+LOMs
 LOOKBACK
 LRESULT
 LSTATUS
@@ -294,6 +309,7 @@ MSCHF
 MSGSEND
 MTL
 Maa
+Maackia
 Maarten
 Mahindra
 Malware
@@ -310,6 +326,7 @@ Merhaba
 Mesop
 Meteo
 Mewgler
+Mhatre
 Milito
 Mirai
 Mitani
@@ -349,6 +366,7 @@ OLAP
 OOTB
 Ohashi
 Ohtani
+Okame
 Olgivanna
 Ollama
 Olá
@@ -368,9 +386,11 @@ PGUSER
 PLLu
 PLOTLYENV
 PPO
+PTx
 PYINK
 Pakeman
 Paquete
+Parag
 Pastra
 Pengyu
 Persero
@@ -417,6 +437,7 @@ Robeco
 Robo
 Rosberg
 Ruchika
+Rupjit
 SAOT
 SDKROOT
 SEK
@@ -444,6 +465,7 @@ Schulen
 Selam
 Sestero
 Sha'carri
+Sharmila
 Shazeer
 Shenzhou
 Shklovsky
@@ -461,6 +483,7 @@ Storrer
 Strappy
 Surampudi
 Suzaka
+Sweetgum
 Syunik
 TARG
 TCEHY
@@ -491,6 +514,7 @@ Terabyte
 Terabytes
 Testables
 Tetsuo
+Tful
 Thallam
 Tianli
 Tianxiang
@@ -560,6 +584,8 @@ XGA
 XSum
 XXE
 YAjjpd
+Ykb
+Yoshino
 Youxi
 Yuxuan
 Yuzuru
@@ -591,6 +617,7 @@ airlume
 akka
 alisal
 alloydb
+amurensis
 antiword
 apikeys
 apixaban
@@ -634,11 +661,14 @@ bbc
 bbq
 beir
 bert
+betulus
 bff
 bgr
 bgswap
 bigframes
 bigquery
+bikeshare
+biloba
 bitcoin
 blogs
 bluesky
@@ -652,12 +682,14 @@ bpa
 bpd
 bpm
 bqdf
+bqds
 bqml
 breakroom
 btn
 byoc
 byod
 byor
+campestre
 carbonara
 cashify
 catus
@@ -699,9 +731,11 @@ coldline
 coloraxis
 colorbar
 colorway
+colurna
 colvis
 colwidth
 constexpr
+cordata
 corpuses
 countplot
 cpet
@@ -712,6 +746,7 @@ cse
 ctd
 cupertino
 curating
+cusagt
 cva
 cycleway
 cycleways
@@ -735,7 +770,9 @@ deskmates
 dfs
 diltiazem
 dino
+dioicus
 direnv
+distichum
 diy
 dlat
 dlon
@@ -784,6 +821,7 @@ errlog
 erty
 etf
 etils
+euchlora
 eula
 eur
 evals
@@ -846,6 +884,7 @@ gcsfs
 gcurl
 gdk
 gdkx
+gdp
 geboten
 genai
 genkit
@@ -857,13 +896,16 @@ getexif
 getparent
 gfile
 gguf
+giallo
 gidiyor
+ginnala
 github
 gitingest
 gitleaks
 gke
 glowin
 gms
+goldmine
 googler
 goooooood
 gozo
@@ -923,6 +965,8 @@ imread
 imshow
 imwrite
 inbox
+indica
+inermis
 informati
 inpaint
 iostream
@@ -939,6 +983,7 @@ ivf
 ivfflat
 ixed
 ized
+japonicum
 javac
 jegadesh
 jesieni
@@ -993,8 +1038,8 @@ loghub
 logparser
 logprobs
 lolcat
-loras
 lookml
+loras
 lparam
 lro
 lru
@@ -1113,9 +1158,11 @@ outro
 overwiew
 owlbot
 oxml
+padus
 pagemap
 paleo
 paligemma
+palustris
 pancetta
 pandoc
 pantarba
@@ -1136,6 +1183,7 @@ petabytes
 pfas
 pgadmin
 pgvector
+phellos
 pietra
 pii
 pincodes
@@ -1146,6 +1194,7 @@ pllum
 plotly
 plpgsql
 plt
+pmb
 podcast
 podcasts
 podfile
@@ -1228,14 +1277,18 @@ rpet
 rrf
 rsc
 rsp
+rubra
+rubrum
 runjdwp
 saaagesh
+sargentii
 saveddir
 scann
 scattergl
 scidocs
 scifact
 scikit
+seabut
 seatback
 selectbox
 selfie
@@ -1244,6 +1297,8 @@ selkirk
 seo
 serde
 serper
+serrata
+serrulata
 setlocal
 sft
 shortdesc
@@ -1273,6 +1328,7 @@ ssh
 ssml
 ssn
 ssr
+sss
 stdcall
 stext
 stp
@@ -1290,6 +1346,7 @@ supima
 svh
 svm
 sxs
+sylvatica
 tabular
 tagline
 takeaways
@@ -1313,9 +1370,12 @@ throug
 tickvals
 tiktoken
 timechart
+timecoded
+timecodes
 tion
 titlebar
 tobytes
+tomentosa
 toolcall
 toolu
 toself
@@ -1325,6 +1385,7 @@ traceloop
 treeah
 tritan
 trl
+truncatum
 tscore
 tseslint
 tsne
@@ -1336,6 +1397,7 @@ typehints
 ubuntu
 udf
 uids
+ulmoides
 ultrawide
 und
 undst
@@ -1429,6 +1491,7 @@ yanchor
 yaxes
 yaxis
 ycol
+yedoensis
 ylabel
 ylim
 yougov
