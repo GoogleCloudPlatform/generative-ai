@@ -148,9 +148,19 @@ class LiveAudioInputManager {
             view.setInt16(index * 2, value, true);
         });
 
-        const base64 = btoa(
-            String.fromCharCode.apply(null, new Uint8Array(buffer)),
-        );
+        const uint8Array = new Uint8Array(buffer);
+        let binaryString = '';
+        const chunkSize = 8192; // Process in 8KB chunks
+        for (let i = 0; i < uint8Array.length; i += chunkSize) {
+            const chunk = uint8Array.subarray(i, i + chunkSize);
+            binaryString += String.fromCharCode.apply(null, chunk);
+        }
+
+        const base64 = btoa(binaryString);
+
+        // const base64 = btoa(
+        //     String.fromCharCode.apply(null, new Uint8Array(buffer)),
+        // );
         this.newAudioRecording(base64);
         this.pcmData = [];
     }
@@ -211,7 +221,7 @@ class LiveVideoManager {
             this.stream =
                 await navigator.mediaDevices.getUserMedia(constraints);
             this.previewVideoElement.srcObject = this.stream;
-            this.interval = setInterval(() => { this.onNewFrame() }, 5000);
+            this.interval = setInterval(() => { this.newFrame() }, 5000);
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }
