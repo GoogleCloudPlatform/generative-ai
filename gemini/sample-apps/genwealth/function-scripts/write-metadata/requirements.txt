@@ -1,2 +1,2 @@
 functions-framework==3.*
-google-cloud-storage==2.18.2
+google-cloud-storage==2.19.0
