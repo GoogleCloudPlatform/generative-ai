@@ -938,6 +938,7 @@ hexsha
 hnsw
 hotpotqa
 hovermode
+hparams
 https
 httpx
 hwnd
@@ -1503,4 +1504,3 @@ zakarid
 zaxis
 zimie
 zmin
-hparams
