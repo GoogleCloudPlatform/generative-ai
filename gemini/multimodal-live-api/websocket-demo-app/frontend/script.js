@@ -92,7 +92,9 @@ function connectBtnClick() {
     setAppStatus("connecting");
 
     geminiLiveApi.responseModalities = getSelectedResponseModality();
-    geminiLiveApi.systemInstructions = getSystemInstructions();
+    if (getSystemInstructions() !== "") {
+        geminiLiveApi.systemInstructions = getSystemInstructions();
+    }
     geminiLiveApi.setApiHost(getApiHost());
     geminiLiveApi.setTranscript(inputTranscript.checked, outputTranscript.checked);
     geminiLiveApi.setResumption(enableResumption.checked, resumptionHandle.value);

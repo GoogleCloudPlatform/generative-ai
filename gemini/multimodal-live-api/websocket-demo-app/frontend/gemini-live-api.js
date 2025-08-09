@@ -197,11 +197,14 @@ class GeminiLiveAPI {
                         language_code: this.voiceLocale
                     }
                 },
-                system_instruction: {
-                    parts: [{ text: this.systemInstructions }],
-                },
             },
         };
+
+        if (this.systemInstructions && this.systemInstructions.trim()) {
+            sessionSetupMessage.setup.system_instruction = {
+                parts: [{ text: this.systemInstructions }],
+            };
+        }
 
         if (this.enableInputTranscript) {
             sessionSetupMessage.setup.input_audio_transcription = {};
