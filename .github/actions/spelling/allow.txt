@@ -938,6 +938,7 @@ hexsha
 hnsw
 hotpotqa
 hovermode
+hparams
 https
 httpx
 hwnd
