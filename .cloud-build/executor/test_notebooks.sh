@@ -23,14 +23,16 @@ successful_count=0
 
 for x in $TARGET; do
   total_count=$((total_count + 1))
-  DISPLAY_NAME="${x##*/}-$current_date-$current_time"
-  echo "Starting execution for ${x##*/}"
+  # Use the full path from the repository for display name
+  DISPLAY_NAME="${x##generative-ai/}"
+  DISPLAY_NAME="${DISPLAY_NAME%.ipynb}-$current_date-$current_time"
+  echo "Starting execution for ${x}"
 
   # Execute and get the operation ID
   OPERATION_ID=$(gcloud colab executions create \
     --display-name="$DISPLAY_NAME" \
     --notebook-runtime-template="$NOTEBOOK_RUNTIME_TEMPLATE" \
-    --gcs-notebook-uri="$OUTPUT_URI/$x" \
+    --direct-content="$x" \
     --gcs-output-uri="$OUTPUT_URI" \
     --project="$PROJECT_ID" \
     --region="$REGION" \
@@ -45,12 +47,12 @@ for x in $TARGET; do
   # check job status
   echo "Waiting for execution to complete..."
   if ! EXECUTION_DETAILS=$(gcloud colab executions describe "$TRUNCATED_OPERATION_ID" --region="$REGION"); then
-    echo "Error describing execution for ${x##*/}. See logs for details."
+    echo "Error describing execution for ${x}. See logs for details."
     failed_count=$((failed_count + 1))
-    failed_notebooks+=("${x##*/}")
+    failed_notebooks+=("${x}")
     continue
   else
-    echo "Execution completed for ${x##*/}"
+    echo "Execution completed for ${x}"
   fi
 
   # Check the jobState
@@ -58,11 +60,11 @@ for x in $TARGET; do
   if [[ "$JOB_STATE" == "JOB_STATE_SUCCEEDED" ]]; then
     echo "Notebook execution succeeded."
     successful_count=$((successful_count + 1))
-    successful_notebooks+=("${x##*/}")
+    successful_notebooks+=("${x}")
   else
-    echo "Notebook execution failed. Job state: $JOB_STATE. Please use id $TRUNCATED_OPERATION_ID to troubleshoot notebook ${x##*/}. See log for details."
+    echo "Notebook execution failed. Job state: $JOB_STATE. Please use id $TRUNCATED_OPERATION_ID to troubleshoot notebook ${x}. See log for details."
     failed_count=$((failed_count + 1))
-    failed_notebooks+=("${x##*/}")
+    failed_notebooks+=("${x}")
     continue
   fi
 

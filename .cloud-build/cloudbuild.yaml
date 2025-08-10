@@ -8,41 +8,13 @@ steps:
     args:
       - "-c"
       - |
-        gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
         . .cloud-build/clone-repo/clone_repo.sh
   # [END copy-repo]
-  # [START prepare-data]
-  - name: google/cloud-sdk
-    id: "prepare-data"
-    entrypoint: bash
-    args:
-      - "-c"
-      - |
-        . .cloud-build/prepare-data/prepare_notebooks.sh
-  # [END prepare-data]
-  # [START push-to-gcs]
-  - name: google/cloud-sdk
-    id: "push-to-gcs"
-    entrypoint: bash
-    args:
-      - "-c"
-      - |
-        gcloud secrets versions access latest --secret=GCS_BUCKET > OUTPUT_URI
-        . .cloud-build/gcs/push_to_gcs.sh
-  # [END push-to-gcs]
-  # [START run-lint]
-  - name: python:3.9
-    id: "run-lint"
-    entrypoint: python
-    args:
-      - .cloud-build/linting/lint.py
-  # [END run-lint]
-
   # [START execute-notebooks]
   - name: google/cloud-sdk
     id: "execute-notebooks"
     entrypoint: bash
-    timeout: 7200s #Because this step takes the longest. Avg runtime is 1 hour and 20 minutes.
+    timeout: 7200s # Because this step takes the longest. Avg runtime is 1 hour and 20 minutes.
     args:
       - "-c"
       - |
