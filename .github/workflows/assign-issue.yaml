@@ -1,11 +1,11 @@
 name: ci
 
 on:
-  push:
+  push: [Alpha] 
 
 jobs:
   buildx:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-Alpine
     steps:
       -
         name: Checkout
