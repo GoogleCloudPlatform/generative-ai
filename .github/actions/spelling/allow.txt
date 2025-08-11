@@ -531,6 +531,7 @@ USK
 UVX
 Ukiyo
 Unimicron
+Unsloth
 Upserting
 Urs
 Usain
@@ -1404,6 +1405,7 @@ und
 undst
 unigram
 unrtf
+unsloth
 upsell
 urandom
 usb
