@@ -1506,3 +1506,11 @@ zakarid
 zaxis
 zimie
 zmin
+adamw
+convo
+convos
+getpid
+loftq
+omn
+rslora
+sharegpt
