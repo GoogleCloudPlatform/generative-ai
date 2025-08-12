@@ -2,7 +2,6 @@
 (?:^|/)(?i)COPYRIGHT
 (?:^|/)(?i)LICEN[CS]E
 (?:^|/)3rdparty/
-(?:^|/)chain_of_thought_react\.ipynb$
 (?:^|/)go\.sum$
 (?:^|/)package(?:-lock|)\.json$
 (?:^|/)Pipfile$
@@ -116,4 +115,4 @@ ignore$
 ^\Qnoxfile.py\E$
 py\.typed$
 ^\Qaudio/speech/use-cases/storytelling/macbeth_the_sitcom.json\E$
-^\.ruff.toml\E$
+.ruff.toml
