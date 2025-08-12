@@ -602,6 +602,7 @@ aaxis
 acall
 achat
 acomplete
+adamw
 adk
 aexecute
 aextract
@@ -736,6 +737,8 @@ colurna
 colvis
 colwidth
 constexpr
+convo
+convos
 cordata
 corpuses
 countplot
@@ -895,6 +898,7 @@ getconn
 getdata
 getexif
 getparent
+getpid
 gfile
 gguf
 giallo
@@ -1036,6 +1040,7 @@ linting
 litellm
 llm
 llms
+loftq
 loghub
 logparser
 logprobs
@@ -1147,6 +1152,7 @@ objc
 oglevel
 ollama
 olleh
+omn
 onesie
 onesies
 openai
@@ -1278,6 +1284,7 @@ ringspun
 rpet
 rrf
 rsc
+rslora
 rsp
 rubra
 rubrum
@@ -1303,6 +1310,7 @@ serrata
 serrulata
 setlocal
 sft
+sharegpt
 shortdesc
 showarrow
 showlakes
