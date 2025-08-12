@@ -29,7 +29,7 @@ nox.options.sessions = [
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
-def format(session):
+def format(session) -> None:
     """Formats Python files and Jupyter Notebooks.
 
     Pass '--all' to format all tracked files in the repository.
@@ -96,11 +96,11 @@ def format(session):
         ).stdout.splitlines()
 
         changed_files = sorted(
-            set(
+            {
                 file
                 for file in (unstaged_files + staged_files + committed_files)
                 if os.path.isfile(file)
-            )
+            }
         )
 
         lint_paths_py = [
@@ -160,7 +160,8 @@ def format(session):
             *lint_paths_nb,
         )
         session.run(
-            "nbqa", f"ruff check --fix-only {ruff_unsafe_fixes_flag}",
+            "nbqa",
+            f"ruff check --fix-only {ruff_unsafe_fixes_flag}",
             *lint_paths_nb,
         )
         session.run(
