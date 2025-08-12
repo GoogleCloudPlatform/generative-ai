@@ -26,6 +26,7 @@ DEFAULT_PYTHON_VERSION = "3.11"
 nox.options.sessions = [
     "format",
 ]
+nox.options.reuse_existing_virtualenvs = True
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
