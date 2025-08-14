@@ -33,7 +33,7 @@ pydantic==2.11.1
 pydantic_core==2.33.1
 python-dateutil==2.9.0.post0
 PyYAML==6.0.2
-requests==2.32.3
+requests==2.32.4
 requests-oauthlib==2.0.0
 requests-toolbelt==0.10.1
 rsa==4.9
