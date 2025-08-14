@@ -5,7 +5,7 @@ fastapi~=0.111.1
 fastapi-utilities==0.2.0
 cloudpickle==2.2.1
 grpcio==1.66.2
-urllib3==1.26.16
+urllib3==2.5.0
 typing-inspect==0.9.0
 typing_extensions==4.12.2
 pydantic==2.9.2
