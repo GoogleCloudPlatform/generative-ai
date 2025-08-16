@@ -1,6 +1,6 @@
 streamlit
 google-cloud-spanner 
-itables==2.2.5
+itables==2.4.4
 streamlit-navigation-bar
 streamlit-extras
 streamlit-agraph
