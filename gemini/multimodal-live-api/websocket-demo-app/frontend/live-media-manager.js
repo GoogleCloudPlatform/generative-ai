@@ -79,10 +79,18 @@ class LiveAudioInputManager {
 
         this.interval = null;
         this.stream = null;
+        this.intervalMs = 1000;
 
         this.onNewAudioRecordingChunk = (audioData) => {
             console.log("New audio recording ");
         };
+    }
+
+    // Update the audio interval in milliseconds (based on user input)
+    async updateAudioInterval(interval) {
+        this.intervalMs = parseInt(interval, 10);
+        this.disconnectMicrophone();
+        this.connectMicrophone();
     }
 
     async connectMicrophone() {
@@ -104,7 +112,6 @@ class LiveAudioInputManager {
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
 
         const source = this.audioContext.createMediaStreamSource(this.stream);
-        // Load the worklet module.
         await this.audioContext.audioWorklet.addModule('input-processor.js');
 
         // Create an AudioWorkletNode.
@@ -117,23 +124,8 @@ class LiveAudioInputManager {
 
         // Connect the microphone source to the worklet.
         source.connect(this.processor);
-        // this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
 
-        // this.processor.onaudioprocess = (e) => {
-        //     console.log("Audio data received from microphone.");
-        //     const inputData = e.inputBuffer.getChannelData(0);
-        //     // Convert float32 to int16
-        //     const pcm16 = new Int16Array(inputData.length);
-        //     for (let i = 0; i < inputData.length; i++) {
-        //         pcm16[i] = inputData[i] * 0x7fff;
-        //     }
-        //     this.pcmData.push(...pcm16);
-        // };
-
-        // source.connect(this.processor);
-        // this.processor.connect(this.audioContext.destination);
-
-        this.interval = setInterval(this.recordChunk.bind(this), 5000);
+        this.interval = setInterval(this.recordChunk.bind(this), this.intervalMs);
     }
 
     newAudioRecording(b64AudioData) {
@@ -157,10 +149,6 @@ class LiveAudioInputManager {
         }
 
         const base64 = btoa(binaryString);
-
-        // const base64 = btoa(
-        //     String.fromCharCode.apply(null, new Uint8Array(buffer)),
-        // );
         this.newAudioRecording(base64);
         this.pcmData = [];
     }
@@ -201,9 +189,16 @@ class LiveVideoManager {
         this.stream = null;
         this.interval = null;
         this.deviceId = null;
+        this.intervalMs = 5000; // Default interval in milliseconds
         this.onNewFrame = (newFrame) => {
             console.log("Default new frame trigger.");
         };
+    }
+
+    async updateVideoInterval(interval) {
+        this.intervalMs = parseInt(interval, 10);
+        this.stopWebcam();
+        this.startWebCam();
     }
 
     async startWebcam() {
@@ -221,12 +216,10 @@ class LiveVideoManager {
             this.stream =
                 await navigator.mediaDevices.getUserMedia(constraints);
             this.previewVideoElement.srcObject = this.stream;
-            this.interval = setInterval(() => { this.newFrame() }, 5000);
+            this.interval = setInterval(() => { this.newFrame() }, this.intervalMs);
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }
-
-        // setInterval(this.newFrame.bind(this), 10000);
     }
 
     stopWebcam() {
@@ -294,9 +287,16 @@ class LiveScreenManager {
         this.ctx = this.previewCanvasElement.getContext("2d");
         this.stream = null;
         this.interval = null;
+        this.intervalMs = 5000; // Default interval in milliseconds
         this.onNewFrame = (newFrame) => {
             console.log("Default new frame trigger: ", newFrame);
         };
+    }
+
+    updateVideoInterval(interval) {
+        this.intervalMs = parseInt(interval, 10);
+        this.stopCapture();
+        this.startCapture();
     }
 
     async startCapture() {
@@ -309,7 +309,7 @@ class LiveScreenManager {
             this.stream = await navigator.mediaDevices.getDisplayMedia();
             this.previewVideoElement.srcObject = this.stream;
 
-            this.interval = setInterval(this.newFrame.bind(this), 5000);
+            this.interval = setInterval(this.newFrame.bind(this), this.intervalMs);
         } catch (err) {
             console.error("Error accessing the webcam: ", err);
         }

@@ -51,6 +51,8 @@ const startSensitivity = document.getElementById("startSensitivity");
 const endSensitivity = document.getElementById("endSensitivity");
 
 const proactiveVideo = document.getElementById("proactiveVideo");
+const audioInterval = document.getElementById("audioInterval");
+const videoInterval = document.getElementById("videoInterval");
 
 
 const geminiLiveApi = new GeminiLiveAPI(PROXY_URL, PROJECT_ID, MODEL, API_HOST);
@@ -104,7 +106,7 @@ function connectBtnClick() {
         startSensitivity.value, endSensitivity.value
     );
     geminiLiveApi.setProactiveVideo(proactiveVideo.checked);
-    
+
 
     geminiLiveApi.onConnectionStarted = () => {
         setAppStatus("connected");
@@ -119,7 +121,7 @@ function connectBtnClick() {
 const liveAudioOutputManager = new LiveAudioOutputManager();
 
 geminiLiveApi.onReceiveResponse = (messageResponse) => {
-    console.log("message response type: "+messageResponse.type);
+    console.log("message response type: " + messageResponse.type);
     if (messageResponse.type === "AUDIO") {
         liveAudioOutputManager.playAudioChunk(messageResponse.data);
     } else if (messageResponse.type === "TEXT") {
@@ -127,13 +129,13 @@ geminiLiveApi.onReceiveResponse = (messageResponse) => {
         newModelMessage(messageResponse.data);
     } else if (messageResponse.type === "RESUMPTION") {
         console.log("Resumption handle received: ", messageResponse.data);
-        newModelMessage("New Resumption Handle ID: "+messageResponse.data);
+        newModelMessage("New Resumption Handle ID: " + messageResponse.data);
     } else if (messageResponse.type === "INPUT_TRANSCRIPTION") {
         console.log("Input transcription received: ", messageResponse.data);
-        newModelMessage("Input Transcription: "+messageResponse.data);
+        newModelMessage("Input Transcription: " + messageResponse.data);
     } else if (messageResponse.type === "OUTPUT_TRANSCRIPTION") {
         console.log("Output transcription received: ", messageResponse.data);
-        newModelMessage("Output Transcription: "+messageResponse.data);
+        newModelMessage("Output Transcription: " + messageResponse.data);
     } else if (messageResponse.type === "END_OF_TURN") {
         console.log("End of turn");
         newModelMessage("End of turn!");
@@ -172,7 +174,8 @@ function newUserMessage() {
 }
 
 function startAudioInput() {
-    liveAudioInputManager.connectMicrophone();
+    liveAudioInputManager.updateAudioInterval(audioInterval.value);
+    // liveAudioInputManager.connectMicrophone();
 }
 
 function stopAudioInput() {
@@ -221,12 +224,14 @@ liveScreenManager.onNewFrame = (b64Image) => {
 
 function startCameraCapture() {
     liveScreenManager.stopCapture();
-    liveVideoManager.startWebcam();
+    liveVideoManager.updateVideoInterval(videoInterval.value);
+    // liveVideoManager.startWebcam();
 }
 
 function startScreenCapture() {
     liveVideoManager.stopWebcam();
-    liveScreenManager.startCapture();
+    liveScreenManager.updateVideoInterval(videoInterval.value);
+    // liveScreenManager.startCapture();
 }
 
 function cameraBtnClick() {
