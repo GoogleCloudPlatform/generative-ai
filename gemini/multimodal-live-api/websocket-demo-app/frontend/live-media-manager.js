@@ -208,10 +208,6 @@ class LiveVideoManager {
         try {
             const constraints = {
                 video: { deviceId: this.deviceId ? { exact: this.deviceId } : undefined }
-                // video: {
-                //     width: { max: 640 },
-                //     height: { max: 480 },
-                // },
             };
             this.stream =
                 await navigator.mediaDevices.getUserMedia(constraints);

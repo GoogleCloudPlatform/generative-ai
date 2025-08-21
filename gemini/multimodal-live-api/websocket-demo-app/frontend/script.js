@@ -13,8 +13,8 @@ const PROJECT_ID = "visionai-testing-stable";
 // const MODEL = "gemini-2.5-flash-preview-native-audio";
 const MODEL = "gemini-live-2.5-flash-preview-native-audio";
 // const MODEL = "gemini-2.5-flash-preview-native-audio-dialog";
-// const API_HOST = "us-central1-aiplatform.googleapis.com";
-const API_HOST = "us-central1-autopush-aiplatform.sandbox.googleapis.com";
+const API_HOST = "us-central1-aiplatform.googleapis.com";
+// const API_HOST = "us-central1-autopush-aiplatform.sandbox.googleapis.com";
 // const API_HOST = "us-central1-staging-aiplatform.sandbox.googleapis.com";
 const accessTokenInput = document.getElementById("token");
 const projectInput = document.getElementById("project");
@@ -175,7 +175,6 @@ function newUserMessage() {
 
 function startAudioInput() {
     liveAudioInputManager.updateAudioInterval(audioInterval.value);
-    // liveAudioInputManager.connectMicrophone();
 }
 
 function stopAudioInput() {

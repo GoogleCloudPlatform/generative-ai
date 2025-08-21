@@ -25,14 +25,14 @@ class GeminiLiveResponseMessage {
             if (data?.serverContent?.inputTranscription?.text) {
                 this.data = data?.serverContent?.inputTranscription?.text;
             } else if (data?.serverContent?.inputTranscription?.finished) {
-                this.data = data?.serverContent?.inputTranscription?.finished
+                this.data = "Finished Inp Transcription: " + data?.serverContent?.inputTranscription?.finished
             }
         } else if (data?.serverContent?.outputTranscription) {
             this.type = "OUTPUT_TRANSCRIPTION";
             if (data?.serverContent?.outputTranscription?.text) {
                 this.data = data?.serverContent?.outputTranscription?.text;
             } else if (data?.serverContent?.outputTranscription?.finished) {
-                this.data = "Finished: "+data?.serverContent?.outputTranscription?.finished
+                this.data = "Finished Out Transcription: " + data?.serverContent?.outputTranscription?.finished
             }
         } else if (this.endOfTurn) {
             this.data = "END OF TURN";
@@ -192,7 +192,7 @@ class GeminiLiveAPI {
                     response_modalities: this.responseModalities,
                     speech_config: {
                         voice_config: {
-                            prebuilt_voice_config: {voice_name: this.voiceName},
+                            prebuilt_voice_config: { voice_name: this.voiceName },
                         },
                         language_code: this.voiceLocale
                     }
@@ -248,7 +248,7 @@ class GeminiLiveAPI {
             };
         }
 
-        console.log("setup message: " + sessionSetupMessage);
+        console.log("setup message: ", sessionSetupMessage);
         this.sendMessage(sessionSetupMessage);
     }
 
