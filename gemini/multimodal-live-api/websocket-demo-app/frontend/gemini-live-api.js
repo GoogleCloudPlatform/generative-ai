@@ -57,8 +57,7 @@ class GeminiLiveAPI {
         this.systemInstructions = "";
 
         this.apiHost = apiHost;
-        // this.serviceUrl = `wss://${this.apiHost}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent`;
-        this.serviceUrl = `wss://${this.apiHost}/ws/google.cloud.aiplatform.internal.LlmBidiService/BidiGenerateContent`;
+        this.serviceUrl = `wss://${this.apiHost}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent`;
 
         this.onReceiveResponse = (message) => {
             console.log("Default message received callback", message);
