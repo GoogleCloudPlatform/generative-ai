@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM node:18.17.1-alpine AS builder
+FROM node:18.20.8-alpine AS builder
 
 WORKDIR /app
 COPY . /app/

@@ -1,25 +1,25 @@
 gunicorn==20.1.0; python_version > '3.0'
 gunicorn==19.10.0; python_version < '3.0'
-uvicorn~=0.17.0
-fastapi~=0.111.1
-fastapi-utilities==0.2.0
+uvicorn~=0.35.0
+fastapi~=0.116.1
+fastapi-utilities==0.3.1
 cloudpickle==2.2.1
-grpcio==1.66.2
+grpcio==1.74.0
 urllib3==1.26.16
 typing-inspect==0.9.0
-typing_extensions==4.12.2
-pydantic==2.9.2
+typing_extensions==4.14.1
+pydantic==2.11.7
 requests==2.31.0
 opencv-python
-pillow==11.1.0
-numpy==2.2.4
+pillow==11.3.0
+numpy==2.3.2
 
-google-cloud-aiplatform==1.69.0
-google-cloud-bigquery==3.26.0
-google-cloud-tasks==2.16.5
-google-cloud-logging==3.11.2
-google-cloud-speech==2.27.0
-google-cloud-discoveryengine==0.13.4
+google-cloud-aiplatform==1.110.0
+google-cloud-bigquery==3.36.0
+google-cloud-tasks==2.19.3
+google-cloud-logging==3.12.1
+google-cloud-speech==2.33.0
+google-cloud-discoveryengine==0.13.11
 google-genai==0.8.0
 pylint
 black

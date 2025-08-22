@@ -20,7 +20,7 @@ resource "random_password" "alloy_db_password" {
 # Create an AlloyDB cluster and instance for session management.
 module "alloy-db" {
   source  = "GoogleCloudPlatform/alloy-db/google"
-  version = "~> 3.2.0"
+  version = "~> 3.3.0"
 
   cluster_id           = local.alloy_db_cluster_id
   cluster_location     = var.region

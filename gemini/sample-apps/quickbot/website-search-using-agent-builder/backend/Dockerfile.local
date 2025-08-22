@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # syntax=docker/dockerfile:1.4
-FROM python:3.11 AS builder
+FROM python:3.13 AS builder
 
 # Build arguments
 ARG IS_FIRST_DEPLOYMENT="False"
@@ -61,7 +61,7 @@ RUN --mount=type=secret,id=gcp_credentials,target=/tmp/gcp_adc.json,required=tru
     fi
 
 
-FROM python:3.11-slim AS final
+FROM python:3.13-slim AS final
 
 ARG GCLOUD_PROJECT=""
 ARG GOOGLE_APPLICATION_CREDENTIALS=""

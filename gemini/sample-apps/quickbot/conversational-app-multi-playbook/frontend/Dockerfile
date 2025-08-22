@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM node:18.17.1 as build
+FROM node:18.20.8 as build
 
 RUN mkdir -p /code
 WORKDIR /code

@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.13-slim
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Install bash alongside other dependencies

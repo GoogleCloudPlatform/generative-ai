@@ -20,7 +20,7 @@ RUN uv sync --frozen --no-dev --no-install-project --no-editable --python-prefer
 COPY concierge_ui ./concierge_ui/
 RUN uv sync --frozen --no-dev --no-editable --python-preference only-system
 
-FROM python:3.12-slim-bookworm AS server
+FROM python:3.13-slim-bookworm AS server
 COPY --from=builder /app/.venv /app/.venv
 COPY --from=builder /app/concierge_ui /app/concierge_ui
 

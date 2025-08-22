@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.12.8
+FROM python:3.13.7
 
 # Upgrade pip! Is a MUST for opencv-python to work properly
 RUN pip install --upgrade pip
