@@ -33,7 +33,7 @@ const galleryData = {
             },
             {
                 title: "Sequencing of Actions",
-                prompt: "A gloved hand carefully slices open the spine of an ancient, leather-bound book with a scalpel. The hand then delicately extracts a tiny, metallic data chip hidden within the binding. The character’s eyes, previously focused and calm, widen in a flash of alarm as a floorboard creaks off-screen. They quickly palm the chip, their head snapping up to scan the dimly lit room, their body tense and listening for any other sound.",
+                prompt: "A gloved hand carefully slices open the spine of an ancient, leather-bound book with a scalpel. The hand then delicately extracts a tiny, metallic data chip hidden within the binding. The character's eyes, previously focused and calm, widen in a flash of alarm as a floorboard creaks off-screen. They quickly palm the chip, their head snapping up to scan the dimly lit room, their body tense and listening for any other sound.",
                 youtubeId: "EbCAqMF2DBo"
             },
             {
