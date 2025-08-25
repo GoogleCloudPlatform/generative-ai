@@ -136,7 +136,7 @@ The application supports two methods for authenticating with the Google AI servi
 
 * **API Key (Default)**: The application uses the `API_KEY` configured in the `.env` file (for local development) or via Secret Manager (for Cloud Run). This is the simplest method for a deployed environment.
 
-* **gcloud Access Token**: Users can provide their own Google Cloud Platform Project ID and a temporary access token (obtained by running `gcloud auth print-access-token`). The backend will use this token to make calls to the Vertex AI API on behalf of the user. This is useful for users who want to use their own GCP project for billing and logging.
+* **gcloud Access Token**: Users can provide their own Google Cloud Platform Project ID and a temporary access token (obtained by running `gcloud auth print-access-token`). The backend will use this token to make calls to the Vertex AI API on behalf of the user. This is useful for users who want to use their own project for billing and logging.
 
 ## ⚠️ Disclaimer
 
