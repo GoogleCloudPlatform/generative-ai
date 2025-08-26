@@ -50,24 +50,28 @@ Follow these instructions to get a copy of the project up and running on your lo
 ### Installation
 
 1.  **Clone the repository:**
+
     ```bash
     git clone https://github.com/GoogleCloudPlatform/generative-ai.git
     cd vision/sample-apps/V-Start
     ```
 
 2.  **Install NPM packages:**
+
     ```bash
     npm install
     ```
 
 3.  **Set up your environment variables:**
     Create a file named `.env` in the root of the project by copying the example file.
+
     ```bash
     cp .env.example .env
     ```
     Now, open the `.env` file and add your Gemini API Key.
 
 4.  **Run the server:**
+
     ```bash
     npm start
     ```
