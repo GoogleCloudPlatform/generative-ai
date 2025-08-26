@@ -120,7 +120,8 @@ function initDarkMode() {
     console.log(`Theme system initialized. Current theme: ${currentTheme} (defaults to light mode)`);
 }
 
-function showMainTab(tabName) {
+// **MODIFIED**: This function is now async to handle fetching HTML templates.
+async function showMainTab(tabName) {
     const feature = tabs[tabName];
     if (!feature) {
         console.warn(`Tab ${tabName} not found`);
@@ -130,8 +131,8 @@ function showMainTab(tabName) {
     // Show/hide auth section based on feature needs
     authSectionContainer.style.display = feature.needsAuth ? 'block' : 'none';
     
-    // Load tab content
-    mainContent.innerHTML = feature.getContent();
+    // **MODIFIED**: Load tab content asynchronously.
+    mainContent.innerHTML = await feature.getContent();
     feature.init();
 
     // Update active tab styling
