@@ -64,6 +64,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 3.  **Set up your environment variables:**
     Create a file named `.env` in the root of the project by copying the example file.
+
     ```bash
     cp .env.example .env
     ```
