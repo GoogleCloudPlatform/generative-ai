@@ -70,6 +70,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     Now, open the `.env` file and add your Gemini API Key.
 
 4.  **Run the server:**
+
     ```bash
     npm start
     ```
