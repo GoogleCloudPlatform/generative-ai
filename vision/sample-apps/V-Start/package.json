@@ -1,0 +1,21 @@
+{
+  "name": "veostart",
+  "version": "1.0.0",
+  "description": "A web-based prompting assistant for Veo.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2"
+  }
+}
