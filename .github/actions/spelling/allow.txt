@@ -513,6 +513,8 @@ groupadd
 groupchat
 grpcio
 gshoe
+gsm
+GSM
 gspread
 gsutil
 gtk
@@ -641,6 +643,7 @@ JHome
 Jiacheng
 Jianfeng
 Jibo
+Jincheng
 Jincheol
 jit
 jiwer
@@ -736,6 +739,7 @@ logprobs
 Logrus
 lolcat
 LOMs
+Longhui
 LOOKBACK
 lookml
 Lopyrev
@@ -791,6 +795,8 @@ Merhaba
 mesop
 Mesop
 metadatas
+metamath
+METAMATH
 metaverse
 Meteo
 metricx
@@ -1432,6 +1438,7 @@ WEBVTT
 Wehn
 Wehrlein
 weightage
+Weiyang
 welcom
 Welwyn
 werden
@@ -1507,6 +1514,8 @@ zakarid
 Zakarids
 zaxis
 Zhaohua
+Zhenguo
+Zhengying
 Zijin
 zimie
 zmin
