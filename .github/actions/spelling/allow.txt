@@ -541,6 +541,7 @@ hdlr
 hdtv
 heatmap
 heatmapgl
+Herzing
 hexsha
 HHH
 HHT
