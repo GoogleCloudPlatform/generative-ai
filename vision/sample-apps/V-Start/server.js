@@ -19,7 +19,7 @@ const path = require('path');
 const fs = require('fs');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-// Import Google AI SDK 
+// Import Google AI SDK (only for API key auth)
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 require('dotenv').config();
@@ -218,8 +218,8 @@ app.post('/api/generate', async (req, res) => {
 
             console.log('Using Google AI SDK with API key');
             
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const generativeModel = genAI.getGenerativeModel({ model: model });
+            const generativeAIClient = new GoogleGenerativeAI(apiKey);
+            const generativeModel = generativeAIClient.getGenerativeModel({ model: model });
 
             // Prepare the content parts
             const parts = [
@@ -303,3 +303,4 @@ app.listen(port, '0.0.0.0', () => {
     console.log('  GET  /api/proxy-video');
     console.log('  GET  /api/study/veo-youtube-study');
 });
+
