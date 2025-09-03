@@ -127,7 +127,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     cp .env.example .env
     ```
     
-    Open the `.env` file and add your Gemini API Key (if using Method 1):
+    Open the `.env` file and add your Gemini API Key (if using Method 2):
     ```
     API_KEY=your_gemini_api_key_here
     ```

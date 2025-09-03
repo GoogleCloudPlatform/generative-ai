@@ -83,7 +83,6 @@
 ^\Q.github/workflows/notebook_linter/run_linter.sh\E$
 ^\Q.github/workflows/linter.yaml\E$
 ^\Qgemini/use-cases/education/use_cases_for_education.ipynb\E$
-^\Qgemini/evaluation/legacy/evaluate_gemini_with_autosxs_custom_task.ipynb\E$
 ^\Qgemini/sample-apps/image-bash-jam/gemini-explain-image-italian.sh\E$
 ^\Qgemini/sample-apps/image-bash-jam/tts.sh\E$
 ^\Qgemini/use-cases/document-processing/sheet_music.ipynb\E$
