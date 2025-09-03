@@ -64,7 +64,6 @@ function getScoreColor(score) {
 }
 
 function parsePromptsFromCSV(textContent) {
-    // For file uploads, splitting by newlines is the standard.
     return textContent
         .split(/\r?\n/)
         .map(line => line.trim())
@@ -240,38 +239,6 @@ function renderVideosList() {
 function renderFinalPairs() {
     const pairsContainer = document.getElementById('alignment-pairs-container');
     pairsContainer.innerHTML = '';
-    if (loadedPairs.length === 0) {
-        return;
-    }
-
-    const header = document.createElement('h4');
-    header.className = 'font-semibold text-gray-900 dark:text-gray-200 mb-3';
-    header.innerHTML = 'Final Paired Items (Ready for Evaluation)';
-    pairsContainer.appendChild(header);
-
-    const list = document.createElement('div');
-    list.className = 'space-y-2';
-    
-    loadedPairs.forEach((pair) => {
-        const pairDiv = document.createElement('div');
-        pairDiv.className = 'flex items-center gap-4 p-3 bg-green-50 dark:bg-green-900 rounded-lg border border-green-200 dark:border-green-700';
-        pairDiv.innerHTML = `
-            <div class="font-bold text-green-700 dark:text-green-300 flex-shrink-0">Pair ${pair.id}:</div>
-            <div class="flex-1 text-sm text-gray-800 dark:text-gray-200 min-w-0">
-                <span class="font-semibold">Prompt:</span> 
-                <span class="truncate inline-block max-w-full align-bottom" title="${pair.prompt}">
-                    ${pair.prompt.substring(0, 50)}${pair.prompt.length > 50 ? '...' : ''}
-                </span>
-            </div>
-            <div class="text-gray-600 dark:text-gray-400">→</div>
-            <div class="flex-1 text-sm text-gray-600 dark:text-gray-400 truncate text-right min-w-0" title="${pair.videoName}">
-                <span class="font-semibold">Video:</span> ${pair.videoName}
-            </div>
-        `;
-        list.appendChild(pairDiv);
-    });
-    
-    pairsContainer.appendChild(list);
 }
 
 export function initAlignmentEval() {
@@ -280,15 +247,15 @@ export function initAlignmentEval() {
     loadedPrompts = [];
     loadedVideos = [];
 
-    const loadInputsBtn = document.getElementById('load-inputs-btn');
+    const loadAndPairBtn = document.getElementById('load-and-pair-btn');
     const clearAllBtn = document.getElementById('clear-all-btn');
-    const createPairsBtn = document.getElementById('create-pairs-btn');
     const startEvalBtn = document.getElementById('start-alignment-eval-btn');
     const downloadBtn = document.getElementById('download-alignment-results-btn');
     const reorderSection = document.getElementById('reorder-section');
     const evalActionsContainer = document.getElementById('eval-actions-container');
 
-    const loadInputs = async () => {
+    // STEP 1: Load inputs and automatically create pairs
+    const loadAndCreatePairs = async () => {
         const csvInput = document.getElementById('prompts-csv-input');
         const textInput = document.getElementById('prompts-text-input');
         const videosFileInput = document.getElementById('batch-videos-input');
@@ -312,27 +279,23 @@ export function initAlignmentEval() {
             loadedVideos = urls.map(url => ({ source: url }));
         }
 
-        if (loadedPrompts.length === 0 || loadedVideos.length === 0) {
-            showToast('Please provide both prompts and videos.', 'error');
-            return;
-        }
-        if (loadedPrompts.length !== loadedVideos.length) {
-            showToast(`Warning: ${loadedPrompts.length} prompts and ${loadedVideos.length} videos. Please ensure they match.`, 'warning');
-        }
-        
-        renderPromptsList();
-        renderVideosList();
-        reorderSection.classList.remove('hidden');
-        
-        showToast(`Loaded ${loadedPrompts.length} prompts and ${loadedVideos.length} videos. Drag to reorder if needed.`, 'success');
-    };
-
-    const createPairs = () => {
-        if (loadedPrompts.length !== loadedVideos.length) {
-            showToast(`Cannot create pairs: ${loadedPrompts.length} prompts vs ${loadedVideos.length} videos`, 'error');
+        // Validation
+        if (loadedPrompts.length === 0) {
+            showToast('Please provide prompts either via CSV file or text input.', 'error');
             return;
         }
         
+        if (loadedVideos.length === 0) {
+            showToast('Please provide videos either via file upload or URL input.', 'error');
+            return;
+        }
+        
+        if (loadedPrompts.length !== loadedVideos.length) {
+            showToast(`Mismatch: ${loadedPrompts.length} prompts and ${loadedVideos.length} videos. Please ensure they match.`, 'error');
+            return;
+        }
+        
+        // Automatically create pairs
         loadedPairs = loadedPrompts.map((prompt, i) => {
             const video = loadedVideos[i];
             const name = (video.source instanceof File) ? video.source.name : video.source.split('/').pop();
@@ -344,11 +307,46 @@ export function initAlignmentEval() {
             };
         });
         
+        // Show reordering only if more than 1 pair
+        if (loadedPairs.length > 1) {
+            renderPromptsList();
+            renderVideosList();
+            reorderSection.classList.remove('hidden');
+            showToast(`Created ${loadedPairs.length} pairs. Drag to reorder if needed, then click "Start Evaluation".`, 'success');
+        } else {
+            reorderSection.classList.add('hidden');
+            showToast(`Created ${loadedPairs.length} pair. Ready for evaluation!`, 'success');
+        }
+        
         renderFinalPairs();
         evalActionsContainer.classList.remove('hidden');
-        reorderSection.classList.add('hidden');
         
-        showToast(`Created ${loadedPairs.length} prompt-video pairs successfully!`, 'success');
+        // Update pairs when reordering (only if more than 1 pair)
+        if (loadedPairs.length > 1) {
+            const updatePairsFromReorder = () => {
+                loadedPairs = loadedPrompts.map((prompt, i) => {
+                    const video = loadedVideos[i];
+                    const name = (video.source instanceof File) ? video.source.name : video.source.split('/').pop();
+                    return { 
+                        id: i + 1, 
+                        prompt, 
+                        videoSource: video.source, 
+                        videoName: name 
+                    };
+                });
+                renderFinalPairs();
+            };
+            
+            // Re-initialize drag and drop with the update callback
+            initDragAndDrop('prompts-list', loadedPrompts, () => {
+                renderPromptsList();
+                updatePairsFromReorder();
+            });
+            initDragAndDrop('videos-list', loadedVideos, () => {
+                renderVideosList(); 
+                updatePairsFromReorder();
+            });
+        }
     };
 
     const clearAll = () => {
@@ -374,6 +372,7 @@ export function initAlignmentEval() {
         showToast('All data cleared.', 'info');
     };
 
+    // STEP 2: Start evaluation
     const startAlignmentEvaluation = async () => {
         const btn = document.getElementById('start-alignment-eval-btn');
         const resultsContainer = document.getElementById('alignment-results-container');
@@ -504,7 +503,7 @@ Respond with a single, raw JSON object. Do not include any introductory text, cl
             document.getElementById('download-alignment-results-container').classList.remove('hidden');
         }
         btn.disabled = false;
-        btn.innerHTML = 'Evaluate All Loaded Pairs';
+        btn.innerHTML = 'Start Evaluation';
     };
 
     const downloadAlignmentResults = () => {
@@ -541,10 +540,9 @@ Respond with a single, raw JSON object. Do not include any introductory text, cl
         showToast("Results downloaded successfully!", "success");
     };
     
-    // Attach event listeners to the buttons
-    loadInputsBtn.addEventListener('click', loadInputs);
+    // Attach event listeners to the buttons 
+    loadAndPairBtn.addEventListener('click', loadAndCreatePairs);
     clearAllBtn.addEventListener('click', clearAll);
-    createPairsBtn.addEventListener('click', createPairs);
     startEvalBtn.addEventListener('click', startAlignmentEvaluation);
     downloadBtn.addEventListener('click', downloadAlignmentResults);
 }

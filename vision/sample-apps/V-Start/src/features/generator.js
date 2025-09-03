@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may not obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
  * https://www.apache.org/licenses/LICENSE-2.0
  *
@@ -104,7 +104,6 @@ function populateImageToVideoForm() {
     });
 }
 
-// --- HTML TEMPLATE ---
 export async function getGeneratorContent() {
     try {
         const response = await fetch('/src/features/templates/generator.html');
@@ -130,8 +129,17 @@ async function generateLongerPrompt(type) {
         showToast("Initial prompt is missing.", 'error');
         return;
     }
+    
+    const originalButtonHtml = generateBtn.innerHTML;
     generateBtn.disabled = true;
-    generateBtn.textContent = 'Enhancing...';
+    generateBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Enhancing...
+    `;
+
     longPromptSection.classList.remove('hidden');
     longPromptOutputElement.textContent = "Enhancing prompt with more cinematic detail...";
     const systemPrompt = `You are a video director. Enhance this prompt to be more cinematic for an AI video model: "${initialPrompt}". Output ONLY the final enhanced prompt.`;
@@ -142,12 +150,48 @@ async function generateLongerPrompt(type) {
     } catch (error) {
         showToast(error.message, 'error');
         longPromptOutputElement.textContent = `Error: ${error.message}`;
-        generateBtn.disabled = false;
-        generateBtn.textContent = 'Generate Longer Prompt';
+    } finally {
+        // We don't restore the button since it stays hidden on success.
+        // If there's an error, we can restore it.
+        if (!generateBtn.classList.contains('hidden')) {
+             generateBtn.disabled = false;
+             generateBtn.innerHTML = originalButtonHtml;
+        }
     }
 }
 
-// --- MAIN INITIALIZATION FUNCTION ---
+function clearForm(type) {
+    const prefix = type === 'image' ? 'image-' : '';
+    
+    // Clear text and textarea inputs
+    const inputs = document.querySelectorAll(`#${type}-to-video-content input[type="text"], #${type}-to-video-content textarea`);
+    inputs.forEach(input => input.value = '');
+
+    // Reset select elements
+    const selects = document.querySelectorAll(`#${type}-to-video-content select`);
+    selects.forEach(select => {
+        select.selectedIndex = 0;
+        // Hide any associated custom input fields
+        const customInput = document.getElementById(`${select.id}-custom`);
+        if (customInput) {
+            customInput.style.display = 'none';
+        }
+    });
+    
+    // Clear image-specific fields
+    if (type === 'image') {
+        const imageUpload = document.getElementById('image-upload');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        if(imageUpload) imageUpload.value = '';
+        if(imagePreviewContainer) imagePreviewContainer.classList.add('hidden');
+        document.getElementById('image-prompt-output-container').classList.add('hidden');
+    } else {
+        document.getElementById('text-prompt-output-container').classList.add('hidden');
+    }
+    
+    showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} form cleared!`, 'info');
+}
+
 export function initGenerator() {
     window.copyToClipboard = copyToClipboard;
     
@@ -165,6 +209,10 @@ export function initGenerator() {
     const imageUpload = document.getElementById('image-upload');
     const imagePreviewContainer = document.getElementById('image-preview-container');
     const imagePreview = document.getElementById('image-preview');
+    
+    const clearTextFormBtn = document.getElementById('clear-text-form-btn');
+    const clearImageFormBtn = document.getElementById('clear-image-form-btn');
+
 
     textTab.addEventListener('click', () => {
         textContent.classList.remove('hidden');
@@ -224,7 +272,13 @@ export function initGenerator() {
         const outputElement = document.getElementById('text-prompt-output');
         const originalButtonHtml = generateTextBtn.innerHTML;
         generateTextBtn.disabled = true;
-        generateTextBtn.innerHTML = 'Generating...';
+        generateTextBtn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating...
+        `;
         outputContainer.classList.remove('hidden');
         document.getElementById('text-long-prompt-section').classList.add('hidden');
         generateLongerTextBtn.classList.add('hidden');
@@ -233,6 +287,7 @@ export function initGenerator() {
             const result = await callGeminiApi(systemPrompt);
             outputElement.textContent = result;
             if (result && !result.toLowerCase().startsWith('error')) {
+                generateLongerTextBtn.innerHTML = 'Generate Longer Prompt'; // Reset button text
                 generateLongerTextBtn.classList.remove('hidden');
             }
         } catch (error) {
@@ -277,13 +332,20 @@ export function initGenerator() {
             if (value) keywords.push(value);
         });
         
-        const systemPrompt = `Based on the attached image, generate a cinematic video prompt that incorporates these keywords if provided: [${keywords.join(', ')}]. If no keywords are provided, describe the image cinematically. Output ONLY the final prompt.`;
+        const systemPrompt = `Based on the attached image, generate a cinematic video prompt that incorporates these keywords if provided: [${keywords.join(', ')}]. If no keywords are provided, describe the image cinematically. Output ONLY the final prompt string. Never use Markdown formatting like asterisks.`;
         const outputContainer = document.getElementById('image-prompt-output-container');
         const outputElement = document.getElementById('image-prompt-output');
         const originalButtonHtml = generateImageBtn.innerHTML;
 
         generateImageBtn.disabled = true;
-        generateImageBtn.innerHTML = 'Generating...';
+        generateImageBtn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating...
+        `;
+        
         outputContainer.classList.remove('hidden');
         document.getElementById('image-long-prompt-section').classList.add('hidden');
         generateLongerImageBtn.classList.add('hidden');
@@ -293,6 +355,8 @@ export function initGenerator() {
             const result = await callGeminiApi(systemPrompt, [imagePart]);
             outputElement.textContent = result;
             if (result && !result.toLowerCase().startsWith('error')) {
+                generateLongerImageBtn.innerHTML = 'Generate Longer Prompt'; 
+                generateLongerImageBtn.disabled = false;
                 generateLongerImageBtn.classList.remove('hidden');
             }
         } catch (error) {
@@ -306,4 +370,7 @@ export function initGenerator() {
 
     generateLongerTextBtn.addEventListener('click', () => generateLongerPrompt('text'));
     generateLongerImageBtn.addEventListener('click', () => generateLongerPrompt('image'));
+    clearTextFormBtn.addEventListener('click', () => clearForm('text'));
+    clearImageFormBtn.addEventListener('click', () => clearForm('image'));
 }
+

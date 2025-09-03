@@ -12,10 +12,13 @@
 
             <div id="text-to-video-content">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                <div class="mt-8">
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button id="generate-text-prompt-btn" class="w-full flex items-center justify-center bg-indigo-600 text-white py-3 px-4 rounded-lg font-bold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
                         Generate Prompt
+                    </button>
+                    <button id="clear-text-form-btn" class="w-full flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-4 rounded-lg font-bold hover:bg-gray-300 dark:hover:bg-gray-500">
+                        Clear All
                     </button>
                 </div>
                 <div id="text-prompt-output-container" class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hidden">
@@ -47,10 +50,13 @@
                  </div>
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mt-6 mb-2">2. Add Details</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="image-to-video-fields"></div>
-                <div class="mt-8">
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button id="generate-image-prompt-btn" class="w-full flex items-center justify-center bg-indigo-600 text-white py-3 px-4 rounded-lg font-bold hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 disabled:bg-indigo-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Generate Prompt
+                    </button>
+                    <button id="clear-image-form-btn" class="w-full flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-4 rounded-lg font-bold hover:bg-gray-300 dark:hover:bg-gray-500">
+                        Clear All
                     </button>
                 </div>
                 <div id="image-prompt-output-container" class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hidden">
@@ -76,3 +82,4 @@
         </div>
     </section>
 </div>
+

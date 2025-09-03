@@ -17,7 +17,6 @@
 import { callGeminiApi } from '../api.js';
 import { showToast, copyToClipboard } from '../ui.js';
 
-// This function now fetches the HTML from an external file.
 export async function getTimelineContent() {
     try {
         const response = await fetch('/src/features/templates/timeline.html');
@@ -40,9 +39,11 @@ export function initTimeline() {
     const addSegmentBtn = document.getElementById('add-timeline-segment-btn');
     const segmentsContainer = document.getElementById('timeline-segments-container');
     const generateBtn = document.getElementById('generate-timeline-prompt-btn');
+    const clearBtn = document.getElementById('clear-timeline-btn');
 
     const updateTimelineVisualizer = () => {
         const visualizer = document.getElementById('timeline-visualizer');
+        if (!visualizer) return;
         visualizer.innerHTML = '';
         const segments = Array.from(document.querySelectorAll('.timeline-segment'));
         let totalDuration = 0;
@@ -117,6 +118,14 @@ export function initTimeline() {
         updateTimelineVisualizer();
     };
 
+    const clearAll = () => {
+        segmentsContainer.innerHTML = '';
+        segmentIdCounter = 0;
+        addTimelineSegment(); // Add back one default segment
+        document.getElementById('timeline-output-container').classList.add('hidden');
+        showToast('Timeline cleared!', 'info');
+    };
+
     const generateTimelinePrompt = async () => {
         const segments = Array.from(document.querySelectorAll('.timeline-segment'));
         const segmentData = [];
@@ -150,9 +159,15 @@ export function initTimeline() {
         const originalButtonHtml = generateBtn.innerHTML;
 
         generateBtn.disabled = true;
-        generateBtn.innerHTML = 'Generating...';
+        generateBtn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating...
+        `;
         outputContainer.classList.remove('hidden');
-        outputElement.textContent = 'Asking AI to create a cinematic timeline...';
+        outputElement.textContent = 'Creating a cinematic timeline...';
         
         try {
             const systemPrompt = `You are an expert video prompt engineer. Your task is to take a series of timeline segments with simple descriptions and enhance them into a cinematic, ready-to-use prompt.
@@ -192,7 +207,9 @@ ${JSON.stringify(segmentData, null, 2)}`;
     // --- Attach Event Listeners ---
     addSegmentBtn.addEventListener('click', addTimelineSegment);
     generateBtn.addEventListener('click', generateTimelinePrompt);
+    clearBtn.addEventListener('click', clearAll);
 
     // Add the first segment by default
     addTimelineSegment();
 }
+

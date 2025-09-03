@@ -18,6 +18,10 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+// Import Google AI SDK 
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 require('dotenv').config();
 
 const app = express();
@@ -32,7 +36,6 @@ app.use(express.static(path.join(__dirname))); // Serves files like index.html, 
 // 1. Endpoint to securely load the YouTube study data from a private file
 app.get('/api/study/veo-youtube-study', (req, res) => {
     const filePath = path.join(__dirname, 'data', 'veo-youtube-study.json');
-
     fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
             console.error("Error reading study file:", err);
@@ -54,14 +57,18 @@ app.get('/api/proxy-video', async (req, res) => {
     if (!videoUrl) {
         return res.status(400).json({ error: 'URL query parameter is required.' });
     }
+
     try {
         console.log(`Proxying video from: ${videoUrl}`);
         const videoResponse = await fetch(videoUrl);
+        
         if (!videoResponse.ok) {
             throw new Error(`Failed to fetch video with status: ${videoResponse.statusText}`);
         }
+
         const contentType = videoResponse.headers.get('content-type');
         if (contentType) res.setHeader('Content-Type', contentType);
+        
         videoResponse.body.pipe(res);
     } catch (error) {
         console.error('Error proxying video:', error.message);
@@ -69,50 +76,44 @@ app.get('/api/proxy-video', async (req, res) => {
     }
 });
 
-// 3. Token validation endpoint
+// 3. Token validation endpoint (still using fetch for validation)
 app.post('/api/validate-token', async (req, res) => {
     const { projectId, accessToken } = req.body;
-    
     console.log('Validating token for project:', projectId);
-    
+
     if (!projectId || !accessToken) {
         return res.status(400).json({ 
             valid: false, 
             message: 'Project ID and Token are required.' 
         });
     }
-    
+
     // Use a simple endpoint to validate the token
-    // We'll try to list models which is a read-only operation
     const validationUrl = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/models`;
-    
+
     try {
         console.log('Making validation request to:', validationUrl);
-        
         const response = await fetch(validationUrl, {
             method: 'GET',
-            headers: { 
+            headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             }
         });
-        
+
         console.log('Validation response status:', response.status);
-        
+
         if (response.ok) {
-            // Token is valid and has permissions
             res.json({ 
                 valid: true, 
                 message: 'Access Token is valid and has permissions!' 
             });
         } else if (response.status === 401) {
-            // Token is invalid or expired
             res.json({ 
                 valid: false, 
                 message: 'Token is invalid or expired. Please run: gcloud auth print-access-token' 
             });
         } else if (response.status === 403) {
-            // Token is valid but lacks permissions
             res.json({ 
                 valid: false, 
                 message: 'Token is valid but lacks permissions. Ensure Vertex AI API is enabled.' 
@@ -128,7 +129,6 @@ app.post('/api/validate-token', async (req, res) => {
     } catch (error) {
         console.error('Validation error:', error);
         
-        // Check if it's a network error
         if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
             res.status(500).json({ 
                 valid: false, 
@@ -143,57 +143,129 @@ app.post('/api/validate-token', async (req, res) => {
     }
 });
 
-// 4. Main Gemini API proxy endpoint (handles both auth methods)
+// 4. Main Gemini API proxy endpoint (hybrid approach)
 app.post('/api/generate', async (req, res) => {
     console.log('Generate endpoint called');
     const { authMethod, accessToken, projectId, systemPrompt, contentParts } = req.body;
-    
     const model = 'gemini-2.5-pro';
-    let apiUrl;
-    const headers = { 'Content-Type': 'application/json' };
-    
-    if (authMethod === 'access-token') {
-        if (!projectId || !accessToken) {
-            return res.status(400).json({ error: "Project ID and Access Token are required for gcloud auth." });
-        }
-        apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${model}:generateContent`;
-        headers['Authorization'] = `Bearer ${accessToken}`;
-        console.log('Using gcloud auth for project:', projectId);
-    } else {
-        const apiKey = process.env.API_KEY;
-        if (!apiKey) {
-            return res.status(500).json({ error: 'API Key is not configured on the server. Please check your .env file.' });
-        }
-        apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        console.log('Using API key auth');
-    }
-    
-    const payload = {
-        contents: [{
-            role: "user",
-            parts: [ ...contentParts, { text: systemPrompt } ]
-        }]
-    };
-    
+
     try {
-        const apiResponse = await fetch(apiUrl, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(payload)
-        });
-        
-        const result = await apiResponse.json();
-        
-        if (!apiResponse.ok) {
-            console.error('API Error:', result);
-            return res.status(apiResponse.status).json({ error: result.error?.message || 'An unknown API error occurred.' });
+        if (authMethod === 'access-token') {
+            // Use manual HTTP call for access token auth 
+            if (!projectId || !accessToken) {
+                return res.status(400).json({ 
+                    error: "Project ID and Access Token are required for gcloud auth." 
+                });
+            }
+
+            console.log('Using manual HTTP call with access token for project:', projectId);
+            
+            const apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${model}:generateContent`;
+            
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        ...contentParts,
+                        { text: systemPrompt }
+                    ]
+                }]
+            };
+
+            const apiResponse = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await apiResponse.json();
+
+            if (!apiResponse.ok) {
+                console.error('Vertex AI API Error:', result);
+                
+                // Handle specific error cases
+                if (apiResponse.status === 401) {
+                    return res.status(401).json({ 
+                        error: 'Authentication failed. Please run: gcloud auth print-access-token' 
+                    });
+                }
+                
+                if (apiResponse.status === 403) {
+                    return res.status(403).json({ 
+                        error: 'Permission denied. Ensure Vertex AI API is enabled for your project.' 
+                    });
+                }
+
+                return res.status(apiResponse.status).json({ 
+                    error: result.error?.message || 'An unknown API error occurred.' 
+                });
+            }
+
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            res.json({ text: text.trim() });
+
+        } else {
+            // Use Google AI SDK for API key auth
+            const apiKey = process.env.API_KEY;
+            if (!apiKey) {
+                return res.status(500).json({ 
+                    error: 'API Key is not configured on the server. Please check your .env file.' 
+                });
+            }
+
+            console.log('Using Google AI SDK with API key');
+            
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const generativeModel = genAI.getGenerativeModel({ model: model });
+
+            // Prepare the content parts
+            const parts = [
+                ...contentParts,
+                { text: systemPrompt }
+            ];
+
+            // Generate content using the SDK
+            const result = await generativeModel.generateContent({
+                contents: [{
+                    role: "user",
+                    parts: parts
+                }]
+            });
+
+            const response = await result.response;
+            const text = response.text();
+
+            res.json({ text: text.trim() });
         }
-        
-        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        res.json({ text: text.trim() });
+
     } catch (error) {
-        console.error('Server error:', error);
-        res.status(500).json({ error: 'An internal server error occurred: ' + error.message });
+        console.error('Generation error:', error);
+
+        // Handle specific error types
+        if (error.message?.includes('API_KEY_INVALID')) {
+            return res.status(401).json({ 
+                error: 'Invalid API key. Please check your .env configuration.' 
+            });
+        }
+
+        if (error.message?.includes('quota')) {
+            return res.status(429).json({ 
+                error: 'API quota exceeded. Please try again later.' 
+            });
+        }
+
+        if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+            return res.status(500).json({ 
+                error: 'Cannot connect to Google services. Check your internet connection.' 
+            });
+        }
+
+        res.status(500).json({ 
+            error: 'An internal server error occurred: ' + error.message 
+        });
     }
 });
 
@@ -204,11 +276,14 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         endpoints: [
             '/api/health',
-            '/api/validate-token',
-            '/api/generate', 
+            '/api/validate-token', 
+            '/api/generate',
             '/api/proxy-video',
             '/api/study/veo-youtube-study'
-        ]
+        ],
+        sdkVersion: {
+            googleGenerativeAI: require('@google/generative-ai/package.json').version
+        }
     });
 });
 

@@ -18,10 +18,13 @@
                     </select>
                 </div>
             </div>
-            <div class="mt-6">
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button id="convert-format-btn" class="w-full flex items-center justify-center bg-teal-600 text-white py-3 px-4 rounded-lg font-bold hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:bg-teal-400 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M15.28 4.72a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 000 1.06l4.25 4.25a.75.75 0 11-1.06 1.06l-4.25-4.25a2.25 2.25 0 010-3.18l4.25-4.25a.75.75 0 011.06 0zm-8.56 0a.75.75 0 011.06 0l4.25 4.25a2.25 2.25 0 010 3.18l-4.25 4.25a.75.75 0 11-1.06-1.06l4.25-4.25a.75.75 0 000-1.06L4.72 5.78a.75.75 0 010-1.06z" clip-rule="evenodd" /></svg>
                     Convert Format
+                </button>
+                <button id="clear-converter-btn" class="w-full flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-4 rounded-lg font-bold hover:bg-gray-300 dark:hover:bg-gray-500">
+                    Clear All
                 </button>
             </div>
             <div id="converter-output-container" class="mt-6 p-4 bg-gray-900 dark:bg-gray-950 text-white dark:text-gray-100 rounded-lg border border-gray-700 dark:border-gray-600" style="display: none;">
@@ -36,3 +39,4 @@
         </div>
     </section>
 </div>
+

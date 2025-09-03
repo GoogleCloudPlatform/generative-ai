@@ -1,21 +1,23 @@
 {
-  "name": "veostart",
+  "name": "v-start",
   "version": "1.0.0",
-  "description": "A web-based prompting assistant for Veo.",
+  "description": "A toolkit for Veo prompting and evaluation.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "dotenv": "^17.2.1",
-    "express": "^4.21.2",
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "node-fetch": "^3.3.2"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "devDependencies": {
-    "@tailwindcss/aspect-ratio": "^0.4.2"
-  }
+  "keywords": [
+    "veo",
+    "gemini",
+    "generative-ai"
+  ],
+  "author": "Wafae Bakkali",
+  "license": "Apache-2.0",
+  "type": "commonjs"
 }

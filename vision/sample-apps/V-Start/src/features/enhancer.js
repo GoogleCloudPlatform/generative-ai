@@ -17,7 +17,6 @@
 import { callGeminiApi } from '../api.js';
 import { showToast, copyToClipboard } from '../ui.js';
 
-// This function now fetches the HTML from an external file.
 export async function getEnhancerContent() {
     try {
         const response = await fetch('/src/features/templates/enhancer.html');
@@ -37,9 +36,17 @@ export function initEnhancer() {
     window.copyToClipboard = copyToClipboard;
 
     const enhanceBtn = document.getElementById('enhance-prompt-btn');
+    const clearBtn = document.getElementById('clear-enhancer-btn');
     const enhancerInput = document.getElementById('enhancer-input');
     const outputContainer = document.getElementById('enhancer-output-container');
     const outputElement = document.getElementById('enhancer-output');
+
+    clearBtn.addEventListener('click', () => {
+        enhancerInput.value = '';
+        outputContainer.classList.add('hidden');
+        outputElement.textContent = '';
+        showToast('Enhancer form cleared!', 'info');
+    });
 
     enhanceBtn.addEventListener('click', async () => {
         const originalPrompt = enhancerInput.value;
@@ -55,7 +62,13 @@ Output ONLY the final, enhanced prompt string, without any introduction, explana
 
         const originalButtonHtml = enhanceBtn.innerHTML;
         enhanceBtn.disabled = true;
-        enhanceBtn.innerHTML = 'Enhancing...';
+        enhanceBtn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Enhancing...
+        `;
         outputContainer.classList.remove('hidden');
         outputElement.textContent = 'Generating a more cinematic version...';
 

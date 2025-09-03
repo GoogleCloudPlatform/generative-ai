@@ -37,6 +37,64 @@ The repository is organized as follows:
 
 <img src="./data/repo.png" alt="V-Start Project Structure" width="700">
 
+## Authentication Setup
+
+V-Start supports two authentication methods for flexibility:
+
+### Method 1: Google Cloud Access Token
+
+This method uses your own Google Cloud Project.
+
+1. **Set up a Google Cloud Project:**
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+   - Enable billing for your project
+
+2. **Enable required APIs:**
+   ```bash
+   # Set your project ID
+   export PROJECT_ID="your-gcp-project-id"
+   gcloud config set project $PROJECT_ID
+   
+   # Enable Vertex AI API
+   gcloud services enable aiplatform.googleapis.com
+   ```
+
+3. **Install and authenticate gcloud CLI:**
+   - Install the [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
+   - Authenticate with your Google account:
+     ```bash
+     gcloud auth login
+     ```
+   - Set your default project:
+     ```bash
+     gcloud config set project $PROJECT_ID
+     ```
+
+4. **Get your access token:**
+   ```bash
+   gcloud auth print-access-token
+   ```
+   
+   **Note:** Access tokens expire after 1 hour. You'll need to run this command again to get a new token when it expires.
+
+5. **Use in V-Start:**
+   - In the V-Start UI, select "gcloud Access Token" as your authentication method
+   - Enter your Project ID and the access token from step 4
+
+### Method 2: Google AI Studio API Key
+
+1. **Get your API Key:**
+   - Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - Sign in with your Google account
+   - Click "Create API Key"
+   - Choose "Create API key in new project" or select an existing project
+   - Copy the generated API key
+
+2. **Configure the application:**
+   - Add the API key to your `.env` file (see Installation section below)
+   - In the V-Start UI, select "API Key" as your authentication method
+
 ## 🚀 Getting Started (Local Development)
 
 Follow these instructions to get a copy of the project up and running on your local machine.
@@ -45,7 +103,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 * [Node.js](https://nodejs.org/) (v18 or later recommended)
 * npm (usually comes with Node.js)
-* A Google Gemini API Key. You can get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
+* Authentication setup (see Authentication Setup section above)
 
 ### Installation
 
@@ -68,7 +126,13 @@ Follow these instructions to get a copy of the project up and running on your lo
     ```bash
     cp .env.example .env
     ```
-    Now, open the `.env` file and add your Gemini API Key.
+    
+    Open the `.env` file and add your Gemini API Key (if using Method 1):
+    ```
+    API_KEY=your_gemini_api_key_here
+    ```
+    
+    **Note:** If you're only using the Access Token method, you can leave the API_KEY empty.
 
 4.  **Run the server:**
 
@@ -134,19 +198,7 @@ After deploying, make sure to enforce IAP by granting access permissions to auth
 
 **Official Guide**: [Securing Cloud Run services with IAP](https://cloud.google.com/iap/docs/enabling-cloud-run)
 
-## 🔐 Authentication Methods
-
-The application supports two methods for authenticating with the Google AI services, selectable from the UI:
-
-* **API Key (Default)**: The application uses the `API_KEY` configured in the `.env` file (for local development) or via Secret Manager (for Cloud Run). This is the simplest method for a deployed environment.
-
-* **gcloud Access Token**: Users can provide their own Google Cloud Platform Project ID and a temporary access token (obtained by running `gcloud auth print-access-token`). The backend will use this token to make calls to the Vertex AI API on behalf of the user. This is useful for users who want to use their own project for billing and logging.
-
-## ⚠️ Disclaimer
-
-This repository is for demonstrative purposes only and is not an officially supported Google product.
-
-## 📜 License
+## License
 
 This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for the full license text.
 
