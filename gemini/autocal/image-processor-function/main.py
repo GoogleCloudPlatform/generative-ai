@@ -41,27 +41,25 @@ collection with the following schema:
 }
 """
 
-import json
 import datetime
+import json
 import os
-import functions_framework
+
 from cloudevents.http import CloudEvent
-from google.events.cloud import firestore as firestoredata
+import functions_framework
 from google import genai
 from google.api_core.exceptions import (
     GoogleAPICallError,
     InvalidArgument,
-    PermissionDenied,
     NotFound,
+    PermissionDenied,
     ResourceExhausted,
-)
-from google.genai.types import (
-    GenerateContentConfig,
-    Part,
 )
 
 # from google.protobuf.json_format import MessageToDict
 import google.cloud.firestore
+from google.events.cloud import firestore as firestoredata
+from google.genai.types import GenerateContentConfig, Part
 
 # Initialize the Gemini model
 MODEL_ID = os.environ.get("MODEL_ID", "gemini-2.0-flash-001")

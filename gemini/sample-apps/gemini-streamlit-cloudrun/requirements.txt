@@ -1,2 +1,2 @@
-streamlit==1.44.1
-google-genai==1.9.0
+streamlit
+google-genai

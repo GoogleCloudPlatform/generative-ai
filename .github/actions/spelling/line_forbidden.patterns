@@ -281,10 +281,7 @@
 \bVertex\sVector\sSearch\b
 
 # Should be Colab
-\s(?!Colab)[Cc]o[Ll][Ll]?abs?\b
-
-# Should be Kaggle
-\skaggle\b
+\s(?!Colab)Co[Ll][Ll]?abs?\b
 
 # Should be TPU or TPUs
 \btpus?\b
@@ -331,3 +328,6 @@ gemini-1\.[05]
 # Use the Google Gen AI SDK `google-genai`
 google-generativeai
 from google import generativeai
+
+# Don't restart the kernel, use `%pip` when installing
+app\.kernel\.do_shutdown\(True\)

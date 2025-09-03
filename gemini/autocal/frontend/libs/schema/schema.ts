@@ -91,8 +91,6 @@ export const processedScreenshotConverter = {
   fromFirestore(snapshot: QueryDocumentSnapshot): ProcessedScreenshot {
     const data = snapshot.data();
 
-    console.log(data);
-
     return {
       image: data.image,
       ID: data.ID,
