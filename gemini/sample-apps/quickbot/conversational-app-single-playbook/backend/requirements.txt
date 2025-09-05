@@ -12,7 +12,7 @@ pydantic==2.9.2
 requests==2.31.0
 
 langchain==0.3.2
-langchain-community==0.3.1
+langchain-community==0.3.27
 langchain-core==0.3.9
 langchain-google-vertexai==2.0.4
 
