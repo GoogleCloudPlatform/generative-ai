@@ -35,7 +35,47 @@ V-Start is divided into two main categories: Prompting and Evaluation.
 
 The repository is organized as follows:
 
-<img src="./data/repo.png" alt="V-Start Project Structure" width="700">
+```none
+/
+├── .env.example       # Example environment file for new contributors
+├── .gitignore         # Specifies files to be ignored by Git
+├── CONTRIBUTING.md    # Guidelines for contributing to the project
+├── Dockerfile         # Defines the Docker container for the application
+├── index.html         # The main HTML file for the single-page application
+├── LICENSE            # The Apache 2.0 open-source license for the project
+├── package.json       # Lists project dependencies and scripts
+├── package-lock.json  # Records exact versions of dependencies
+├── README.md          # The project's readme file
+├── server.js          # The Node.js/Express backend server
+├── style.css          # Main stylesheet for the application
+│
+├── data/              # Contains static data and assets
+│   ├── V-Start.png      # Screenshot of the application UI
+│   └── veo-youtube-study.json # Data for the A/B evaluation study
+│
+└── src/               # Contains all frontend JavaScript source code
+    ├── api.js         # Handles the fetch call to the backend Gemini API
+    ├── main.js        # The main entry point for the frontend application logic
+    ├── ui.js          # Contains UI helper functions (e.g., notifications, toast:
+    │
+    ├── features/      # Each file represents a major feature/tab in the UI
+    │   ├── alignment-eval.js
+    │   ├── converter.js
+    │   ├── enhancer.js
+    │   ├── eval.js
+    │   ├── gallery.js
+    │   ├── generator.js
+    │   └── timeline.js
+    │
+    └── templates/     # Contains the HTML templates for each feature
+        ├── alignment-eval.html
+        ├── converter.html
+        ├── enhancer.html
+        ├── eval.html
+        ├── gallery.html
+        ├── generator.html
+        └── timeline.html
+```
 
 ## Authentication Setup
 
@@ -55,7 +95,7 @@ This method uses your own Google Cloud Project.
    # Set your project ID
    export PROJECT_ID="your-gcp-project-id"
    gcloud config set project $PROJECT_ID
-   
+
    # Enable Vertex AI API
    gcloud services enable aiplatform.googleapis.com
    ```
@@ -75,7 +115,7 @@ This method uses your own Google Cloud Project.
    ```bash
    gcloud auth print-access-token
    ```
-   
+
    **Note:** Access tokens expire after 1 hour. You'll need to run this command again to get a new token when it expires.
 
 5. **Use in V-Start:**
@@ -126,12 +166,12 @@ Follow these instructions to get a copy of the project up and running on your lo
     ```bash
     cp .env.example .env
     ```
-    
+
     Open the `.env` file and add your Gemini API Key (if using Method 2):
     ```
     API_KEY=your_gemini_api_key_here
     ```
-    
+
     **Note:** If you're only using the Access Token method, you can leave the API_KEY empty.
 
 4.  **Run the server:**
@@ -142,7 +182,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 5.  Open your browser and navigate to `http://localhost:8080`.
 
-## ☁️ Deployment to Cloud Run 
+## ☁️ Deployment to Cloud Run
 
 The recommended way to deploy this application is directly from source to Google Cloud Run, secured with Identity-Aware Proxy (IAP). When you deploy from source, Cloud Build automatically uses the `Dockerfile` in your repository to build and deploy your container.
 
