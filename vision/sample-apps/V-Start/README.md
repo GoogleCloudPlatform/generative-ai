@@ -1,6 +1,6 @@
 # V-Start: A Toolkit for Veo Prompting and Evaluation
 
-[![GitHub license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/vision/sample-apps/V-Start/LICENSE)
 
 **Author: [Wafae Bakkali](https://github.com/WafaeBakkali)**
 
@@ -28,14 +28,14 @@ V-Start is divided into two main categories: Prompting and Evaluation.
 * **Backend**: Node.js with Express.js
 * **Frontend**: HTML, CSS, and modern vanilla JavaScript (ES modules)
 * **Styling**: Tailwind CSS (via CDN) with a custom dark mode theme.
-* **Core AI**: Google Gemini API (specifically `gemini-2.5-pro`)
-* **Deployment**: The application also includes a `Dockerfile` for containerization.
+* **Core AI**: Google Gemini API (specifically gemini-2.5-pro)
+* **Deployment**: The application also includes a Dockerfile for containerization.
 
 ## 📂 Project Structure
 
 The repository is organized as follows:
 
-```none
+```
 /
 ├── .env.example       # Example environment file for new contributors
 ├── .gitignore         # Specifies files to be ignored by Git
@@ -106,16 +106,11 @@ This method uses your own Google Cloud Project.
      ```bash
      gcloud auth login
      ```
-   - Set your default project:
-     ```bash
-     gcloud config set project $PROJECT_ID
-     ```
 
 4. **Get your access token:**
    ```bash
    gcloud auth print-access-token
    ```
-
    **Note:** Access tokens expire after 1 hour. You'll need to run this command again to get a new token when it expires.
 
 5. **Use in V-Start:**
@@ -132,7 +127,7 @@ This method uses your own Google Cloud Project.
    - Copy the generated API key
 
 2. **Configure the application:**
-   - Add the API key to your `.env` file (see Installation section below)
+   - Add the API key to your .env file (see Installation section below)
    - In the V-Start UI, select "API Key" as your authentication method
 
 ## 🚀 Getting Started (Local Development)
@@ -147,64 +142,53 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 ### Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+   cd vision/sample-apps/V-Start
+   ```
 
-    ```bash
-    git clone https://github.com/GoogleCloudPlatform/generative-ai.git
-    cd vision/sample-apps/V-Start
-    ```
+2. **Install NPM packages:**
+   ```bash
+   npm install
+   ```
 
-2.  **Install NPM packages:**
+3. **Set up your environment variables:**
+   Create a file named `.env` in the root of the project by copying the example file.
+   ```bash
+   cp .env.example .env
+   ```
+   Open the `.env` file and add your Gemini API Key (if using Method 2):
+   ```
+   API_KEY=your_gemini_api_key_here
+   ```
+   **Note:** If you're only using the Access Token method, you can leave the API_KEY empty.
 
-    ```bash
-    npm install
-    ```
+4. **Run the server:**
+   ```bash
+   npm start
+   ```
 
-3.  **Set up your environment variables:**
-    Create a file named `.env` in the root of the project by copying the example file.
-
-    ```bash
-    cp .env.example .env
-    ```
-
-    Open the `.env` file and add your Gemini API Key (if using Method 2):
-    ```
-    API_KEY=your_gemini_api_key_here
-    ```
-
-    **Note:** If you're only using the Access Token method, you can leave the API_KEY empty.
-
-4.  **Run the server:**
-
-    ```bash
-    npm start
-    ```
-
-5.  Open your browser and navigate to `http://localhost:8080`.
+5. Open your browser and navigate to `http://localhost:8080`.
 
 ## ☁️ Deployment to Cloud Run
 
-The recommended way to deploy this application is directly from source to Google Cloud Run, secured with Identity-Aware Proxy (IAP). When you deploy from source, Cloud Build automatically uses the `Dockerfile` in your repository to build and deploy your container.
+The recommended way to deploy this application is directly from source to Google Cloud Run, secured with Identity-Aware Proxy (IAP). When you deploy from source, Cloud Build automatically uses the Dockerfile in your repository to build and deploy your container.
 
 ### Prerequisites
 
 * A Google Cloud Project with billing enabled.
-* The [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (`gcloud` CLI) installed and authenticated.
+* The [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (gcloud CLI) installed and authenticated.
+* Project ID already configured (see Authentication Setup section above)
 
-### Step 1: Project Setup (One-Time)
-
-Run these commands to set your project and enable the necessary APIs.
+### Step 1: Enable Required Services
 
 ```bash
-# Set your project ID
-export PROJECT_ID="your-gcp-project-id"
-gcloud config set project $PROJECT_ID
-
-# Enable required services
+# Enable required services (using the PROJECT_ID from Authentication Setup)
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com iap.googleapis.com
 ```
 
-### Step 2: Secure Your API Key (One-Time)
+### Step 2: Secure Your API Key
 
 Store your Gemini API key in Secret Manager.
 
@@ -216,7 +200,7 @@ gcloud secrets create gemini-api-key --replication-policy="automatic"
 printf "your_gemini_api_key_here" | gcloud secrets versions add gemini-api-key --data-file=-
 ```
 
-### Step 3: Configure OAuth Consent Screen (One-Time)
+### Step 3: Configure OAuth Consent Screen
 
 This is required for IAP. In the Google Cloud Console, navigate to **APIs & Services → OAuth consent screen** and complete the setup wizard.
 
@@ -240,7 +224,7 @@ After deploying, make sure to enforce IAP by granting access permissions to auth
 
 ## License
 
-This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for the full license text.
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/vision/sample-apps/V-Start/LICENSE) file for the full license text.
 
 ## 🤝 Contributing
 
