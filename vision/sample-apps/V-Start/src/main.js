@@ -152,25 +152,39 @@ async function showMainTab(tabName) {
     console.log(`Switched to ${tabName} tab`);
 }
 
-// Added location parameter to validation
+// Fast validation using Gemini Flash model
 async function validateAccessToken() {
     const accessToken = document.getElementById('access-token-input').value;
     const projectId = document.getElementById('project-id-input').value;
     const location = document.getElementById('location-input')?.value || 'us-central1';
     const statusElement = document.getElementById('access-token-status');
     const validateBtn = document.getElementById('validate-token-btn');
+    const authMethod = document.getElementById('auth-method-select').value;
 
+    // For API key mode, just do client-side check
+    if (authMethod === 'api-key') {
+        statusElement.textContent = '✅ Using server API key. Ready to generate!';
+        statusElement.className = 'text-xs mt-2 h-4 text-blue-600 dark:text-blue-400';
+        validateBtn.textContent = '✓ API Key Mode';
+        setTimeout(() => {
+            validateBtn.textContent = 'Validate';
+        }, 2000);
+        return;
+    }
+
+    // For access token mode, check fields first
     if (!projectId || !accessToken) {
         statusElement.textContent = 'Project ID and Token are required.';
         statusElement.className = 'text-xs mt-2 h-4 text-red-600 dark:text-red-400';
         return;
     }
 
-    // Show loading state
+    // Show loading state (should be quick with Flash)
     validateBtn.disabled = true;
     validateBtn.textContent = 'Validating...';
     validateBtn.classList.add('loading');
-    statusElement.textContent = '';
+    statusElement.textContent = 'Checking credentials...';
+    statusElement.className = 'text-xs mt-2 h-4 text-gray-500 dark:text-gray-400';
     
     try {
         const response = await fetch('/api/validate-token', {
@@ -182,13 +196,21 @@ async function validateAccessToken() {
         const result = await response.json();
         
         if (result.valid) {
-            statusElement.textContent = result.message;
+            statusElement.textContent = '✅ ' + result.message;
             statusElement.className = 'text-xs mt-2 h-4 text-green-600 dark:text-green-400';
+            validateBtn.textContent = '✓ Validated';
+            validateBtn.classList.add('bg-green-600', 'hover:bg-green-700');
             showNotification(`Token validated for ${location}!`, 'success');
+            
+            setTimeout(() => {
+                validateBtn.textContent = 'Validate';
+                validateBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            }, 3000);
         } else {
-            statusElement.textContent = `Invalid: ${result.message}`;
+            statusElement.textContent = `❌ ${result.message}`;
             statusElement.className = 'text-xs mt-2 h-4 text-red-600 dark:text-red-400';
-            showNotification('Token validation failed', 'error');
+            validateBtn.textContent = 'Retry';
+            showNotification('Validation failed', 'error');
         }
     } catch (error) {
         console.error('Token validation error:', error);
@@ -198,7 +220,9 @@ async function validateAccessToken() {
     } finally {
         // Reset button state
         validateBtn.disabled = false;
-        validateBtn.textContent = 'Validate';
+        if (validateBtn.textContent === 'Validating...') {
+            validateBtn.textContent = 'Validate';
+        }
         validateBtn.classList.remove('loading');
     }
 }
