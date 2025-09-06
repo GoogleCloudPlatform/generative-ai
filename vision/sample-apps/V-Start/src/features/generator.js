@@ -142,7 +142,9 @@ async function generateLongerPrompt(type) {
 
     longPromptSection.classList.remove('hidden');
     longPromptOutputElement.textContent = "Enhancing prompt with more cinematic detail...";
-    const systemPrompt = `You are a video director. Enhance this prompt to be more cinematic for an AI video model: "${initialPrompt}". Output ONLY the final enhanced prompt.`;
+    
+    const systemPrompt = `You are a Google Veo3 prompt engineer. Enhance this video prompt to be more cinematic and detailed: "${initialPrompt}". Output ONLY the enhanced video prompt text - no analysis, no markdown, no asterisks, no brackets, no explanations. Just the pure enhanced prompt text that will be sent to Veo3.`;
+    
     try {
         const result = await callGeminiApi(systemPrompt);
         longPromptOutputElement.textContent = result;
@@ -151,8 +153,6 @@ async function generateLongerPrompt(type) {
         showToast(error.message, 'error');
         longPromptOutputElement.textContent = `Error: ${error.message}`;
     } finally {
-        // We don't restore the button since it stays hidden on success.
-        // If there's an error, we can restore it.
         if (!generateBtn.classList.contains('hidden')) {
              generateBtn.disabled = false;
              generateBtn.innerHTML = originalButtonHtml;
@@ -163,30 +163,28 @@ async function generateLongerPrompt(type) {
 function clearForm(type) {
     const prefix = type === 'image' ? 'image-' : '';
     
-    // Clear text and textarea inputs
     const inputs = document.querySelectorAll(`#${type}-to-video-content input[type="text"], #${type}-to-video-content textarea`);
     inputs.forEach(input => input.value = '');
 
-    // Reset select elements
     const selects = document.querySelectorAll(`#${type}-to-video-content select`);
     selects.forEach(select => {
         select.selectedIndex = 0;
-        // Hide any associated custom input fields
         const customInput = document.getElementById(`${select.id}-custom`);
         if (customInput) {
             customInput.style.display = 'none';
         }
     });
     
-    // Clear image-specific fields
     if (type === 'image') {
         const imageUpload = document.getElementById('image-upload');
         const imagePreviewContainer = document.getElementById('image-preview-container');
         if(imageUpload) imageUpload.value = '';
         if(imagePreviewContainer) imagePreviewContainer.classList.add('hidden');
         document.getElementById('image-prompt-output-container').classList.add('hidden');
+        document.getElementById('image-long-prompt-section').classList.add('hidden');
     } else {
         document.getElementById('text-prompt-output-container').classList.add('hidden');
+        document.getElementById('text-long-prompt-section').classList.add('hidden');
     }
     
     showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} form cleared!`, 'info');
@@ -213,7 +211,6 @@ export function initGenerator() {
     const clearTextFormBtn = document.getElementById('clear-text-form-btn');
     const clearImageFormBtn = document.getElementById('clear-image-form-btn');
 
-
     textTab.addEventListener('click', () => {
         textContent.classList.remove('hidden');
         imageContent.classList.add('hidden');
@@ -222,6 +219,7 @@ export function initGenerator() {
         imageTab.classList.add('text-gray-500', 'dark:text-gray-400', 'border-transparent');
         imageTab.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-indigo-500');
     });
+    
     imageTab.addEventListener('click', () => {
         imageContent.classList.remove('hidden');
         textContent.classList.add('hidden');
@@ -245,6 +243,7 @@ export function initGenerator() {
         }
     });
 
+    // TEXT TO VIDEO GENERATION
     generateTextBtn.addEventListener('click', async () => {
         const keywords = [];
         ['subject-input', 'action-input', 'scene-input', 'dialogue-input'].forEach(id => {
@@ -267,7 +266,10 @@ export function initGenerator() {
             showToast("Please provide at least one keyword.", 'error');
             return;
         }
-        const systemPrompt = `You are an expert video prompt engineer. Construct a prompt using these keywords: [${keywords.join(', ')}]. Synthesize them into a cinematic instruction. Output ONLY the final prompt string. Never use Markdown formatting like asterisks.`;
+        
+        // PROMPT for Veo3
+        const systemPrompt = `You are a Google Veo3 prompt engineer. Create a cinematic video prompt using these keywords: [${keywords.join(', ')}]. Synthesize them into a single cohesive video instruction. Output ONLY the video prompt text - no analysis, no markdown, no asterisks, no explanations. Just the pure prompt text that will be sent to Veo3.`;
+        
         const outputContainer = document.getElementById('text-prompt-output-container');
         const outputElement = document.getElementById('text-prompt-output');
         const originalButtonHtml = generateTextBtn.innerHTML;
@@ -287,7 +289,7 @@ export function initGenerator() {
             const result = await callGeminiApi(systemPrompt);
             outputElement.textContent = result;
             if (result && !result.toLowerCase().startsWith('error')) {
-                generateLongerTextBtn.innerHTML = 'Generate Longer Prompt'; // Reset button text
+                generateLongerTextBtn.innerHTML = 'Generate Longer Prompt';
                 generateLongerTextBtn.classList.remove('hidden');
             }
         } catch (error) {
@@ -299,6 +301,7 @@ export function initGenerator() {
         }
     });
 
+    // IMAGE TO VIDEO GENERATION
     generateImageBtn.addEventListener('click', async () => {
         const imageFile = imageUpload.files[0];
         if (!imageFile) {
@@ -306,66 +309,108 @@ export function initGenerator() {
             return;
         }
 
+        // Read the file and ensure we get proper base64 data
         const reader = new FileReader();
-        const base64Data = await new Promise(resolve => {
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(imageFile);
-        });
-        
-        const imagePart = { inline_data: { mime_type: imageFile.type, data: base64Data } };
+        reader.onload = async (e) => {
+            try {
+                // Get the data URL and extract base64
+                const dataUrl = e.target.result;
+                const base64Data = dataUrl.split(',')[1];
+                
+                // Verify we have valid base64 data
+                if (!base64Data || typeof base64Data !== 'string') {
+                    showToast("Failed to read image data", 'error');
+                    console.error('Invalid base64 data:', typeof base64Data);
+                    return;
+                }
+                
+                console.log('Image loaded successfully:', {
+                    fileType: imageFile.type,
+                    fileSize: imageFile.size,
+                    base64Length: base64Data.length
+                });
+                
+                // Create the image part with proper structure
+                const imagePart = { 
+                    inlineData: { 
+                        mimeType: imageFile.type, 
+                        data: base64Data 
+                    } 
+                };
 
-        const keywords = [];
-        ['image-action-input', 'image-scene-input', 'image-dialogue-input'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element && element.value) {
-                keywords.push(id === 'image-dialogue-input' ? `A character says: '${element.value}'` : element.value);
-            }
-        });
-        Object.keys(textVideoSelectData).forEach(key => {
-            const select = document.getElementById(`image-${key}`);
-            if (!select) return;
-            let value = select.value;
-            if (value === 'custom') {
-                const customInput = document.getElementById(`image-${key}-custom`);
-                value = customInput ? customInput.value : '';
-            }
-            if (value) keywords.push(value);
-        });
-        
-        const systemPrompt = `Based on the attached image, generate a cinematic video prompt that incorporates these keywords if provided: [${keywords.join(', ')}]. If no keywords are provided, describe the image cinematically. Output ONLY the final prompt string. Never use Markdown formatting like asterisks.`;
-        const outputContainer = document.getElementById('image-prompt-output-container');
-        const outputElement = document.getElementById('image-prompt-output');
-        const originalButtonHtml = generateImageBtn.innerHTML;
+                // Collect keywords
+                const keywords = [];
+                ['image-action-input', 'image-scene-input', 'image-dialogue-input'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element && element.value) {
+                        keywords.push(id === 'image-dialogue-input' ? `A character says: '${element.value}'` : element.value);
+                    }
+                });
+                Object.keys(textVideoSelectData).forEach(key => {
+                    const select = document.getElementById(`image-${key}`);
+                    if (!select) return;
+                    let value = select.value;
+                    if (value === 'custom') {
+                        const customInput = document.getElementById(`image-${key}-custom`);
+                        value = customInput ? customInput.value : '';
+                    }
+                    if (value) keywords.push(value);
+                });
+                
+                // PROMPT for Veo3 
+                const systemPrompt = keywords.length > 0 
+                    ? `You are a Google Veo3 prompt engineer. Based on the uploaded image, create a cinematic video prompt that brings this exact scene to life with motion, incorporating these keywords: [${keywords.join(', ')}]. Output ONLY the video prompt text - no analysis, no markdown, no asterisks, no explanations. Just the pure prompt text that will be sent to Veo3.`
+                    : `You are a Google Veo3 prompt engineer. Based on the uploaded image, create a cinematic video prompt that brings this exact scene to life with motion and animation. Output ONLY the video prompt text - no analysis, no markdown, no asterisks, no explanations. Just the pure prompt text that will be sent to Veo3.`;
+                
+                const outputContainer = document.getElementById('image-prompt-output-container');
+                const outputElement = document.getElementById('image-prompt-output');
+                const originalButtonHtml = generateImageBtn.innerHTML;
 
-        generateImageBtn.disabled = true;
-        generateImageBtn.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Generating...
-        `;
-        
-        outputContainer.classList.remove('hidden');
-        document.getElementById('image-long-prompt-section').classList.add('hidden');
-        generateLongerImageBtn.classList.add('hidden');
-        outputElement.textContent = 'Processing...';
+                generateImageBtn.disabled = true;
+                generateImageBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating...
+                `;
+                
+                outputContainer.classList.remove('hidden');
+                document.getElementById('image-long-prompt-section').classList.add('hidden');
+                generateLongerImageBtn.classList.add('hidden');
+                outputElement.textContent = 'Processing image...';
 
-        try {
-            const result = await callGeminiApi(systemPrompt, [imagePart]);
-            outputElement.textContent = result;
-            if (result && !result.toLowerCase().startsWith('error')) {
-                generateLongerImageBtn.innerHTML = 'Generate Longer Prompt'; 
-                generateLongerImageBtn.disabled = false;
-                generateLongerImageBtn.classList.remove('hidden');
+                try {
+                    // Call the API with the image
+                    const result = await callGeminiApi(systemPrompt, [imagePart]);
+                    outputElement.textContent = result;
+                    if (result && !result.toLowerCase().startsWith('error')) {
+                        generateLongerImageBtn.innerHTML = 'Generate Longer Prompt'; 
+                        generateLongerImageBtn.disabled = false;
+                        generateLongerImageBtn.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    showToast(error.message, 'error');
+                    outputElement.textContent = `Error: ${error.message}`;
+                } finally {
+                    generateImageBtn.disabled = false;
+                    generateImageBtn.innerHTML = originalButtonHtml;
+                }
+            } catch (error) {
+                console.error('Error processing image:', error);
+                showToast('Failed to process image', 'error');
+                generateImageBtn.disabled = false;
+                generateImageBtn.innerHTML = originalButtonHtml;
             }
-        } catch (error) {
-            showToast(error.message, 'error');
-            outputElement.textContent = `Error: ${error.message}`;
-        } finally {
-            generateImageBtn.disabled = false;
-            generateImageBtn.innerHTML = originalButtonHtml;
-        }
+        };
+        
+        reader.onerror = () => {
+            showToast('Failed to read image file', 'error');
+            console.error('FileReader error');
+        };
+        
+        // Start reading the file
+        reader.readAsDataURL(imageFile);
     });
 
     generateLongerTextBtn.addEventListener('click', () => generateLongerPrompt('text'));
@@ -373,4 +418,3 @@ export function initGenerator() {
     clearTextFormBtn.addEventListener('click', () => clearForm('text'));
     clearImageFormBtn.addEventListener('click', () => clearForm('image'));
 }
-

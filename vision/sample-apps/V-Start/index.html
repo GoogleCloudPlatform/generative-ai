@@ -111,6 +111,33 @@
                                     <label for="project-id-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Google Cloud Project ID</label>
                                     <input type="text" id="project-id-input" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="e.g., my-gcp-project" autocomplete="off">
                                 </div>
+                                <div class="mb-4">
+                                    <label for="location-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vertex AI Location</label>
+                                    <select id="location-input" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                        <option value="us-central1" selected>us-central1 (Iowa)</option>
+                                        <option value="us-east1">us-east1 (South Carolina)</option>
+                                        <option value="us-east4">us-east4 (Virginia)</option>
+                                        <option value="us-west1">us-west1 (Oregon)</option>
+                                        <option value="us-west2">us-west2 (Los Angeles)</option>
+                                        <option value="us-west3">us-west3 (Salt Lake City)</option>
+                                        <option value="us-west4">us-west4 (Las Vegas)</option>
+                                        <option value="northamerica-northeast1">northamerica-northeast1 (Montreal)</option>
+                                        <option value="europe-west1">europe-west1 (Belgium)</option>
+                                        <option value="europe-west2">europe-west2 (London)</option>
+                                        <option value="europe-west3">europe-west3 (Frankfurt)</option>
+                                        <option value="europe-west4">europe-west4 (Netherlands)</option>
+                                        <option value="europe-west6">europe-west6 (Zurich)</option>
+                                        <option value="asia-east1">asia-east1 (Taiwan)</option>
+                                        <option value="asia-northeast1">asia-northeast1 (Tokyo)</option>
+                                        <option value="asia-northeast3">asia-northeast3 (Seoul)</option>
+                                        <option value="asia-south1">asia-south1 (Mumbai)</option>
+                                        <option value="asia-southeast1">asia-southeast1 (Singapore)</option>
+                                        <option value="australia-southeast1">australia-southeast1 (Sydney)</option>
+                                    </select>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Select the region where your Vertex AI API is enabled
+                                    </p>
+                                </div>
                                 <div>
                                     <label for="access-token-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your gcloud Access Token</label>
                                     <div class="flex items-center gap-2">
@@ -119,7 +146,7 @@
                                     </div>
                                     <div id="access-token-status" class="text-xs mt-2 h-4"></div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Run <code class="bg-gray-200 dar<k:bg-gray-600 p-1 rounded">gcloud auth print-access-token</code> in your terminal to get a new token.
+                                        Run <code class="bg-gray-200 dark:bg-gray-600 p-1 rounded">gcloud auth print-access-token</code> in your terminal to get a new token.
                                     </p>
                                 </div>
                             </div>
@@ -143,4 +170,3 @@
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
-

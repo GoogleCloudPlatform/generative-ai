@@ -19,8 +19,8 @@ const path = require('path');
 const fs = require('fs');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-// Import Google AI SDK (only for API key auth)
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+// Import the new Google Gen AI SDK
+const { GoogleGenAI } = require('@google/genai');
 
 require('dotenv').config();
 
@@ -29,7 +29,7 @@ const port = process.env.PORT || 8080;
 
 // Middleware & Static File Serving
 app.use(express.json({ limit: '50mb' }));
-app.use(express.static(path.join(__dirname))); // Serves files like index.html, src/, etc.
+app.use(express.static(path.join(__dirname)));
 
 // --- API ENDPOINTS ---
 
@@ -51,7 +51,7 @@ app.get('/api/study/veo-youtube-study', (req, res) => {
     });
 });
 
-// 2. Endpoint to proxy video URLs to avoid CORS issues for user-created studies
+// 2. Endpoint to proxy video URLs to avoid CORS issues
 app.get('/api/proxy-video', async (req, res) => {
     const videoUrl = req.query.url;
     if (!videoUrl) {
@@ -76,10 +76,11 @@ app.get('/api/proxy-video', async (req, res) => {
     }
 });
 
-// 3. Token validation endpoint (still using fetch for validation)
+// 3. Token validation endpoint with location support
 app.post('/api/validate-token', async (req, res) => {
-    const { projectId, accessToken } = req.body;
-    console.log('Validating token for project:', projectId);
+    const { projectId, accessToken, location } = req.body;
+    const validationLocation = location || 'us-central1';
+    console.log(`Validating token for project: ${projectId} in location: ${validationLocation}`);
 
     if (!projectId || !accessToken) {
         return res.status(400).json({ 
@@ -88,8 +89,7 @@ app.post('/api/validate-token', async (req, res) => {
         });
     }
 
-    // Use a simple endpoint to validate the token
-    const validationUrl = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/models`;
+    const validationUrl = `https://${validationLocation}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${validationLocation}/models`;
 
     try {
         console.log('Making validation request to:', validationUrl);
@@ -143,126 +143,192 @@ app.post('/api/validate-token', async (req, res) => {
     }
 });
 
-// 4. Main Gemini API proxy endpoint (hybrid approach)
+// 4. Main Gemini API proxy endpoint 
 app.post('/api/generate', async (req, res) => {
-    console.log('Generate endpoint called');
-    const { authMethod, accessToken, projectId, systemPrompt, contentParts } = req.body;
+    console.log('========== Generate endpoint called ==========');
+    const { authMethod, accessToken, projectId, location, systemPrompt, contentParts } = req.body;
     const model = 'gemini-2.5-pro';
 
+    // Debug logging
+    console.log('Request received with:', {
+        authMethod,
+        hasToken: !!accessToken,
+        hasProjectId: !!projectId,
+        location: location || 'us-central1',
+        systemPromptLength: systemPrompt?.length || 0,
+        contentPartsCount: contentParts?.length || 0
+    });
+
     try {
+        let ai;
+        let response;
+        
         if (authMethod === 'access-token') {
-            // Use manual HTTP call for access token auth 
+            // === ACCESS TOKEN PATH ===
             if (!projectId || !accessToken) {
                 return res.status(400).json({ 
                     error: "Project ID and Access Token are required for gcloud auth." 
                 });
             }
 
-            console.log('Using manual HTTP call with access token for project:', projectId);
+            const vertexLocation = location || 'us-central1';
+            console.log(`Using Gen AI SDK with access token for project: ${projectId} in location: ${vertexLocation}`);
             
-            const apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${model}:generateContent`;
+            // The SDK can use access tokens through environment variables
+            // Store the original value to restore later
+            const originalAuthToken = process.env.GOOGLE_AUTH_TOKEN;
             
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [
-                        ...contentParts,
-                        { text: systemPrompt }
-                    ]
-                }]
-            };
-
-            const apiResponse = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await apiResponse.json();
-
-            if (!apiResponse.ok) {
-                console.error('Vertex AI API Error:', result);
+            try {
+                // Set the access token as environment variable for the SDK
+                process.env.GOOGLE_AUTH_TOKEN = accessToken;
                 
-                // Handle specific error cases
-                if (apiResponse.status === 401) {
-                    return res.status(401).json({ 
-                        error: 'Authentication failed. Please run: gcloud auth print-access-token' 
-                    });
-                }
-                
-                if (apiResponse.status === 403) {
-                    return res.status(403).json({ 
-                        error: 'Permission denied. Ensure Vertex AI API is enabled for your project.' 
-                    });
-                }
-
-                return res.status(apiResponse.status).json({ 
-                    error: result.error?.message || 'An unknown API error occurred.' 
+                // Initialize SDK with Vertex AI configuration
+                // The SDK will automatically use the GOOGLE_AUTH_TOKEN we just set
+                ai = new GoogleGenAI({
+                    vertexai: true,
+                    project: projectId,
+                    location: vertexLocation
                 });
+                
+                // Build parts array
+                const parts = [];
+                
+                // Add text prompt first
+                if (systemPrompt) {
+                    parts.push({ text: systemPrompt });
+                    console.log('Added system prompt to parts');
+                }
+                
+                // Add any images from contentParts
+                if (contentParts && contentParts.length > 0) {
+                    contentParts.forEach((part, index) => {
+                        if (part.inlineData && part.inlineData.data && part.inlineData.mimeType) {
+                            parts.push({
+                                inlineData: {
+                                    mimeType: part.inlineData.mimeType,
+                                    data: part.inlineData.data
+                                }
+                            });
+                            console.log(`Added image to parts: ${part.inlineData.mimeType}`);
+                        }
+                    });
+                }
+                
+                console.log(`Sending ${parts.length} parts via SDK to Vertex AI in ${vertexLocation}`);
+                
+                // Generate content using the SDK
+                response = await ai.models.generateContent({
+                    model: model,
+                    contents: [{
+                        role: "user",
+                        parts: parts
+                    }]
+                });
+                
+                const text = response.text;
+                console.log('Response received, text length:', text.length);
+                res.json({ text: text.trim() });
+                
+            } finally {
+                // Always restore the original environment variable
+                if (originalAuthToken !== undefined) {
+                    process.env.GOOGLE_AUTH_TOKEN = originalAuthToken;
+                } else {
+                    delete process.env.GOOGLE_AUTH_TOKEN;
+                }
             }
-
-            const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            res.json({ text: text.trim() });
-
+            
         } else {
-            // Use Google AI SDK for API key auth
-            const apiKey = process.env.API_KEY;
+            // === API KEY PATH ===
+            const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
             if (!apiKey) {
                 return res.status(500).json({ 
                     error: 'API Key is not configured on the server. Please check your .env file.' 
                 });
             }
 
-            console.log('Using Google AI SDK with API key');
+            console.log('Using Gen AI SDK with API key');
             
-            const generativeAIClient = new GoogleGenerativeAI(apiKey);
-            const generativeModel = generativeAIClient.getGenerativeModel({ model: model });
-
-            // Prepare the content parts
-            const parts = [
-                ...contentParts,
-                { text: systemPrompt }
-            ];
-
+            // Initialize SDK with API key
+            ai = new GoogleGenAI({
+                vertexai: false,
+                apiKey: apiKey
+            });
+            
+            // Build parts array
+            const parts = [];
+            
+            // Add text prompt first
+            if (systemPrompt) {
+                parts.push({ text: systemPrompt });
+                console.log('Added system prompt to parts');
+            }
+            
+            // Add any images from contentParts
+            if (contentParts && contentParts.length > 0) {
+                contentParts.forEach((part, index) => {
+                    if (part.inlineData && part.inlineData.data && part.inlineData.mimeType) {
+                        parts.push({
+                            inlineData: {
+                                mimeType: part.inlineData.mimeType,
+                                data: part.inlineData.data
+                            }
+                        });
+                        console.log(`Added image to parts: ${part.inlineData.mimeType}`);
+                    }
+                });
+            }
+            
+            console.log(`Sending ${parts.length} parts via SDK to Gemini API`);
+            
             // Generate content using the SDK
-            const result = await generativeModel.generateContent({
+            response = await ai.models.generateContent({
+                model: model,
                 contents: [{
                     role: "user",
                     parts: parts
                 }]
             });
-
-            const response = await result.response;
-            const text = response.text();
-
+            
+            const text = response.text;
+            console.log('Response received, text length:', text.length);
             res.json({ text: text.trim() });
         }
 
     } catch (error) {
         console.error('Generation error:', error);
-
+        
         // Handle specific error types
-        if (error.message?.includes('API_KEY_INVALID')) {
+        if (error.message?.includes('API_KEY_INVALID') || error.message?.includes('invalid')) {
             return res.status(401).json({ 
-                error: 'Invalid API key. Please check your .env configuration.' 
+                error: 'Invalid API key or authentication. Please check your credentials.' 
             });
         }
-
+        
         if (error.message?.includes('quota')) {
             return res.status(429).json({ 
                 error: 'API quota exceeded. Please try again later.' 
             });
         }
-
+        
+        if (error.message?.includes('Permission denied') || error.message?.includes('403')) {
+            return res.status(403).json({ 
+                error: 'Permission denied. Ensure Vertex AI API is enabled for your project.' 
+            });
+        }
+        
+        if (authMethod === 'access-token' && (error.message?.includes('auth') || error.message?.includes('401'))) {
+            return res.status(401).json({ 
+                error: 'Authentication failed. Token may be expired. Please run: gcloud auth print-access-token' 
+            });
+        }
+        
         if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
             return res.status(500).json({ 
                 error: 'Cannot connect to Google services. Check your internet connection.' 
             });
         }
-
+        
         res.status(500).json({ 
             error: 'An internal server error occurred: ' + error.message 
         });
@@ -282,7 +348,7 @@ app.get('/api/health', (req, res) => {
             '/api/study/veo-youtube-study'
         ],
         sdkVersion: {
-            googleGenerativeAI: require('@google/generative-ai/package.json').version
+            '@google/genai': require('@google/genai/package.json').version
         }
     });
 });
@@ -295,12 +361,15 @@ app.get('/', (req, res) => {
 // --- Server Start ---
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server listening at http://localhost:${port}`);
-    console.log('API_KEY configured for fallback:', !!process.env.API_KEY);
+    console.log('Environment variables configured:');
+    console.log('  API_KEY/GEMINI_API_KEY:', !!(process.env.API_KEY || process.env.GEMINI_API_KEY));
+    console.log('  GOOGLE_CLOUD_PROJECT:', process.env.GOOGLE_CLOUD_PROJECT || 'Not set');
+    console.log('  GOOGLE_CLOUD_LOCATION:', process.env.GOOGLE_CLOUD_LOCATION || 'Not set (will use UI selection)');
     console.log('Available endpoints:');
     console.log('  GET  /api/health');
     console.log('  POST /api/validate-token');
     console.log('  POST /api/generate');
     console.log('  GET  /api/proxy-video');
     console.log('  GET  /api/study/veo-youtube-study');
+    console.log('Using @google/genai SDK for both authentication methods');
 });
-

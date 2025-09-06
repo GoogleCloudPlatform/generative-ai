@@ -120,7 +120,7 @@ function initDarkMode() {
     console.log(`Theme system initialized. Current theme: ${currentTheme} (defaults to light mode)`);
 }
 
-// **MODIFIED**: This function is now async to handle fetching HTML templates.
+// This function is async to handle fetching HTML templates.
 async function showMainTab(tabName) {
     const feature = tabs[tabName];
     if (!feature) {
@@ -131,7 +131,7 @@ async function showMainTab(tabName) {
     // Show/hide auth section based on feature needs
     authSectionContainer.style.display = feature.needsAuth ? 'block' : 'none';
     
-    // **MODIFIED**: Load tab content asynchronously.
+    // Load tab content asynchronously.
     mainContent.innerHTML = await feature.getContent();
     feature.init();
 
@@ -152,9 +152,11 @@ async function showMainTab(tabName) {
     console.log(`Switched to ${tabName} tab`);
 }
 
+// Added location parameter to validation
 async function validateAccessToken() {
     const accessToken = document.getElementById('access-token-input').value;
     const projectId = document.getElementById('project-id-input').value;
+    const location = document.getElementById('location-input')?.value || 'us-central1';
     const statusElement = document.getElementById('access-token-status');
     const validateBtn = document.getElementById('validate-token-btn');
 
@@ -174,7 +176,7 @@ async function validateAccessToken() {
         const response = await fetch('/api/validate-token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ projectId, accessToken })
+            body: JSON.stringify({ projectId, accessToken, location })  
         });
         
         const result = await response.json();
@@ -182,7 +184,7 @@ async function validateAccessToken() {
         if (result.valid) {
             statusElement.textContent = result.message;
             statusElement.className = 'text-xs mt-2 h-4 text-green-600 dark:text-green-400';
-            showNotification('Token validation successful!', 'success');
+            showNotification(`Token validated for ${location}!`, 'success');
         } else {
             statusElement.textContent = `Invalid: ${result.message}`;
             statusElement.className = 'text-xs mt-2 h-4 text-red-600 dark:text-red-400';
