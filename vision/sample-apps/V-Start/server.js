@@ -395,12 +395,4 @@ app.listen(port, '0.0.0.0', () => {
     console.log('  API_KEY/GEMINI_API_KEY:', !!(process.env.API_KEY || process.env.GEMINI_API_KEY));
     console.log('  GOOGLE_CLOUD_PROJECT:', process.env.GOOGLE_CLOUD_PROJECT || 'Not set');
     console.log('  GOOGLE_CLOUD_LOCATION:', process.env.GOOGLE_CLOUD_LOCATION || 'Not set (will use UI selection)');
-    console.log('Available endpoints:');
-    console.log('  GET  /api/health');
-    console.log('  POST /api/validate-token (using Gemini Flash for speed)');
-    console.log('  POST /api/generate (using Gemini Pro)');
-    console.log('  GET  /api/proxy-video');
-    console.log('  GET  /api/study/veo-youtube-study');
-    console.log('Using @google/genai SDK for all Gemini interactions');
-    console.log('Validation uses gemini-2.0-flash for speed, generation uses gemini-2.5-pro for quality');
 });
