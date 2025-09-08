@@ -108,6 +108,7 @@ bert
 Bettes
 betulus
 bff
+BFirst
 bgr
 BGR
 bgswap
@@ -245,6 +246,7 @@ cusagt
 cva
 CVD
 CWLEY
+cyberpunk
 cycleway
 cycleways
 cygpath
@@ -1421,6 +1423,7 @@ VSPM
 vtotal
 vtt
 vulnz
+wafaeb
 WAI
 Wakatipu
 waterjet
