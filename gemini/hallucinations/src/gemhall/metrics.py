@@ -15,15 +15,12 @@ class Record:
     score: float
 
 def score_item(answered: bool, correct: bool, t: float) -> float:
-    if not answered:
-        return 0.0
+    if not answered: return 0.0
     return 1.0 if correct else -t/(1.0 - t)
 
 def aggregate(records: List[Record]) -> Dict[float, Dict[str, Any]]:
     by_t: Dict[float, List[Record]] = defaultdict(list)
-    for r in records:
-        by_t[r.t].append(r)
-
+    for r in records: by_t[r.t].append(r)
     out: Dict[float, Dict[str, Any]] = {}
     for t, recs in by_t.items():
         n = len(recs)
@@ -51,9 +48,4 @@ def behavior_checks(metrics: Dict[float, Dict[str, Any]]) -> Dict[str, Any]:
     ts = sorted(metrics.keys())
     covs = [metrics[t]["coverage"] for t in ts]
     monotone_violations = sum(1 for i in range(1, len(covs)) if covs[i] > covs[i-1] + 1e-6)
-    return {
-        "thresholds": ts,
-        "coverage": covs,
-        "monotonic_coverage_expected": True,
-        "monotonicity_violations": monotone_violations,
-    }
+    return {"thresholds": ts, "coverage": covs, "monotonic_coverage_expected": True, "monotonicity_violations": monotone_violations}
