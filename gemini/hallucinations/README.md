@@ -138,7 +138,7 @@ We first try the unified `"all"` config and fall back to stitching per-subject c
 
 ---
 
-## Business mapping (use in your post/slide)
+## Business mapping
 
 - **t≈0.5: Drafting & triage** – high coverage, human-in-the-loop
 - **t≈0.75: Assistive answers** – support suggestions, FAQ with citations
