@@ -152,78 +152,112 @@ async function showMainTab(tabName) {
     console.log(`Switched to ${tabName} tab`);
 }
 
-// Fast validation using Gemini Flash model
-async function validateAccessToken() {
-    const accessToken = document.getElementById('access-token-input').value;
-    const projectId = document.getElementById('project-id-input').value;
-    const location = document.getElementById('location-input')?.value || 'us-central1';
-    const statusElement = document.getElementById('access-token-status');
-    const validateBtn = document.getElementById('validate-token-btn');
+// Fast validation using Gemini Flash model: it handles both API key and access token
+async function validateCredentials() {
     const authMethod = document.getElementById('auth-method-select').value;
-
-    // For API key mode, just do client-side check
-    if (authMethod === 'api-key') {
-        statusElement.textContent = '✅ Using server API key. Ready to generate!';
-        statusElement.className = 'text-xs mt-2 h-4 text-blue-600 dark:text-blue-400';
-        validateBtn.textContent = '✓ API Key Mode';
-        setTimeout(() => {
-            validateBtn.textContent = 'Validate';
-        }, 2000);
-        return;
-    }
-
-    // For access token mode, check fields first
-    if (!projectId || !accessToken) {
-        statusElement.textContent = 'Project ID and Token are required.';
-        statusElement.className = 'text-xs mt-2 h-4 text-red-600 dark:text-red-400';
-        return;
-    }
-
-    // Show loading state (should be quick with Flash)
-    validateBtn.disabled = true;
-    validateBtn.textContent = 'Validating...';
-    validateBtn.classList.add('loading');
-    statusElement.textContent = 'Checking credentials...';
-    statusElement.className = 'text-xs mt-2 h-4 text-gray-500 dark:text-gray-400';
     
-    try {
-        const response = await fetch('/api/validate-token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ projectId, accessToken, location })  
-        });
+    if (authMethod === 'api-key') {
+        // Validate API Key
+        const apiKey = document.getElementById('api-key-input').value;
+        const statusElement = document.getElementById('api-key-status');
+        const validateBtn = document.getElementById('validate-api-key-btn');
         
-        const result = await response.json();
+        if (!apiKey) {
+            statusElement.innerHTML = '<span class="text-red-600 dark:text-red-400">Please enter your API key</span>';
+            return;
+        }
         
-        if (result.valid) {
-            statusElement.textContent = '✅ ' + result.message;
-            statusElement.className = 'text-xs mt-2 h-4 text-green-600 dark:text-green-400';
-            validateBtn.textContent = '✓ Validated';
-            validateBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-            showNotification(`Token validated for ${location}!`, 'success');
+        // Show loading state
+        validateBtn.disabled = true;
+        validateBtn.textContent = 'Validating...';
+        statusElement.innerHTML = '<span class="text-blue-600 dark:text-blue-400">Checking API key...</span>';
+        
+        try {
+            const response = await fetch('/api/validate-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ apiKey })
+            });
             
-            setTimeout(() => {
+            const result = await response.json();
+            
+            if (result.valid) {
+                statusElement.innerHTML = '<span class="text-green-600 dark:text-green-400">✅ Valid API key</span>';
+                validateBtn.textContent = '✓ Validated';
+                validateBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                showNotification('API key validated successfully!', 'success');
+                
+                setTimeout(() => {
+                    validateBtn.textContent = 'Validate';
+                    validateBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                }, 3000);
+            } else {
+                statusElement.innerHTML = `<span class="text-red-600 dark:text-red-400">❌ ${result.message || 'Invalid API key'}</span>`;
+                validateBtn.textContent = 'Retry';
+                showNotification('API key validation failed', 'error');
+            }
+        } catch (error) {
+            console.error('API key validation error:', error);
+            statusElement.innerHTML = '<span class="text-red-600 dark:text-red-400">Validation failed. Check console.</span>';
+            showNotification('Network error during validation', 'error');
+        } finally {
+            validateBtn.disabled = false;
+            if (validateBtn.textContent === 'Validating...') {
                 validateBtn.textContent = 'Validate';
-                validateBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-            }, 3000);
-        } else {
-            statusElement.textContent = `❌ ${result.message}`;
-            statusElement.className = 'text-xs mt-2 h-4 text-red-600 dark:text-red-400';
-            validateBtn.textContent = 'Retry';
-            showNotification('Validation failed', 'error');
+            }
         }
-    } catch (error) {
-        console.error('Token validation error:', error);
-        statusElement.textContent = 'Validation failed. Check server console.';
-        statusElement.className = 'text-xs mt-2 h-4 text-red-600 dark:text-red-400';
-        showNotification('Network error during validation', 'error');
-    } finally {
-        // Reset button state
-        validateBtn.disabled = false;
-        if (validateBtn.textContent === 'Validating...') {
-            validateBtn.textContent = 'Validate';
+    } else {
+        // Validate Access Token
+        const accessToken = document.getElementById('access-token-input').value;
+        const projectId = document.getElementById('project-id-input').value;
+        const location = document.getElementById('location-input')?.value || 'us-central1';
+        const statusElement = document.getElementById('access-token-status');
+        const validateBtn = document.getElementById('validate-token-btn');
+        
+        if (!projectId || !accessToken) {
+            statusElement.innerHTML = '<span class="text-red-600 dark:text-red-400">Project ID and Token are required.</span>';
+            return;
         }
-        validateBtn.classList.remove('loading');
+        
+        // Show loading state
+        validateBtn.disabled = true;
+        validateBtn.textContent = 'Validating...';
+        statusElement.innerHTML = '<span class="text-blue-600 dark:text-blue-400">Checking credentials...</span>';
+        
+        try {
+            const response = await fetch('/api/validate-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ projectId, accessToken, location })
+            });
+            
+            const result = await response.json();
+            
+            if (result.valid) {
+                statusElement.innerHTML = '<span class="text-green-600 dark:text-green-400">✅ ' + result.message + '</span>';
+                validateBtn.textContent = '✓ Validated';
+                validateBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                showNotification(`Token validated for ${location}!`, 'success');
+                
+                setTimeout(() => {
+                    validateBtn.textContent = 'Validate';
+                    validateBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                }, 3000);
+            } else {
+                statusElement.innerHTML = `<span class="text-red-600 dark:text-red-400">❌ ${result.message}</span>`;
+                validateBtn.textContent = 'Retry';
+                showNotification('Validation failed', 'error');
+            }
+        } catch (error) {
+            console.error('Token validation error:', error);
+            statusElement.innerHTML = '<span class="text-red-600 dark:text-red-400">Validation failed. Check console.</span>';
+            showNotification('Network error during validation', 'error');
+        } finally {
+            validateBtn.disabled = false;
+            if (validateBtn.textContent === 'Validating...') {
+                validateBtn.textContent = 'Validate';
+            }
+        }
     }
 }
 
@@ -313,16 +347,18 @@ function initAnimations() {
 
 // Main initialization function
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('VeoStart application initializing...');
+    console.log('V-Start application initializing...');
     
     // Get DOM elements
     const authMethodSelect = document.getElementById('auth-method-select');
     const apiKeySection = document.getElementById('api-key-auth-section');
     const accessTokenSection = document.getElementById('access-token-auth-section');
     const validateTokenBtn = document.getElementById('validate-token-btn');
+    const validateApiKeyBtn = document.getElementById('validate-api-key-btn');
     const authHeader = document.getElementById('auth-header');
     const authContent = document.getElementById('auth-content');
     const authChevron = document.getElementById('auth-chevron');
+    const authToggleText = document.getElementById('auth-toggle-text');
 
     // Initialize dark mode first
     initDarkMode();
@@ -340,6 +376,11 @@ document.addEventListener('DOMContentLoaded', () => {
             authContent.classList.toggle('hidden');
             authChevron.classList.toggle('rotate-180');
             
+            // Update toggle text
+            if (authToggleText) {
+                authToggleText.textContent = isHidden ? '(Click to hide)' : '(Click to show)';
+            }
+            
             // Add smooth animation
             if (!prefersReducedMotion()) {
                 authChevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
@@ -353,12 +394,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const isApiKey = authMethodSelect.value === 'api-key';
             apiKeySection.style.display = isApiKey ? 'block' : 'none';
             accessTokenSection.style.display = isApiKey ? 'none' : 'block';
+            
+            if (isApiKey) {
+                showNotification('Please enter your Gemini API key', 'info');
+            } else {
+                showNotification('Please enter your gcloud credentials', 'info');
+            }
         });
     }
 
-    // Token validation
+    // Token validation buttons
     if (validateTokenBtn) {
-        validateTokenBtn.addEventListener('click', validateAccessToken);
+        validateTokenBtn.addEventListener('click', validateCredentials);
+    }
+    
+    if (validateApiKeyBtn) {
+        validateApiKeyBtn.addEventListener('click', validateCredentials);
     }
 
     // Tab navigation
@@ -378,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showNotification(`Welcome to V-Start! Currently in ${currentTheme} mode. Press Ctrl+Shift+D to toggle theme.`, 'info', 5000);
     }, 1000);
     
-    console.log('VeoStart application initialized successfully');
+    console.log('V-Start application initialized successfully');
 });
 
 // Handle page visibility changes

@@ -27,8 +27,61 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 8080;
 
+// Rate limiting configuration
+const rateLimits = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 50; // 50 requests per hour per IP
+
+// Clean up old entries periodically (every hour)
+setInterval(() => {
+    const now = Date.now();
+    for (const [ip, timestamps] of rateLimits.entries()) {
+        const recentRequests = timestamps.filter(time => now - time < RATE_LIMIT_WINDOW_MS);
+        if (recentRequests.length === 0) {
+            rateLimits.delete(ip);
+        } else {
+            rateLimits.set(ip, recentRequests);
+        }
+    }
+}, 60 * 60 * 1000);
+
+// Rate limiting middleware
+const rateLimitMiddleware = (req, res, next) => {
+    // Skip rate limiting for static files and health checks
+    if (req.path === '/api/health' || req.path === '/' || req.path.includes('.')) {
+        return next();
+    }
+
+    const ip = req.headers['x-forwarded-for'] || req.ip;
+    const now = Date.now();
+    
+    if (!rateLimits.has(ip)) {
+        rateLimits.set(ip, []);
+    }
+    
+    const requests = rateLimits.get(ip).filter(time => now - time < RATE_LIMIT_WINDOW_MS);
+    
+    if (requests.length >= MAX_REQUESTS_PER_WINDOW) {
+        return res.status(429).json({ 
+            error: `Rate limit exceeded. Maximum ${MAX_REQUESTS_PER_WINDOW} requests per hour.`,
+            message: 'To use without limits, deploy your own instance: https://github.com/GoogleCloudPlatform/generative-ai/tree/main/vision/sample-apps/V-Start'
+        });
+    }
+    
+    requests.push(now);
+    rateLimits.set(ip, requests);
+    
+    // Add rate limit headers
+    res.setHeader('X-RateLimit-Limit', MAX_REQUESTS_PER_WINDOW);
+    res.setHeader('X-RateLimit-Remaining', MAX_REQUESTS_PER_WINDOW - requests.length);
+    res.setHeader('X-RateLimit-Reset', new Date(now + RATE_LIMIT_WINDOW_MS).toISOString());
+    
+    next();
+};
+
 // Middleware & Static File Serving
 app.use(express.json({ limit: '50mb' }));
+app.use(rateLimitMiddleware); // Apply rate limiting
 app.use(express.static(path.join(__dirname)));
 
 // --- API ENDPOINTS ---
@@ -59,7 +112,6 @@ app.get('/api/proxy-video', async (req, res) => {
     }
 
     try {
-        console.log(`Proxying video from: ${videoUrl}`);
         const videoResponse = await fetch(videoUrl);
         
         if (!videoResponse.ok) {
@@ -78,103 +130,171 @@ app.get('/api/proxy-video', async (req, res) => {
 
 // 3. Fast validation endpoint using Gemini Flash model
 app.post('/api/validate-token', async (req, res) => {
-    const { projectId, accessToken, location } = req.body;
+    const { projectId, accessToken, location, apiKey } = req.body;
     const validationLocation = location || 'us-central1';
-    console.log(`Fast validation using Flash for project: ${projectId} in location: ${validationLocation}`);
-
-    if (projectId && !accessToken) {
-        return res.status(400).json({ 
-            valid: false, 
-            message: 'Access Token is required for validation.' 
-        });
-    }
-
-    // Store original env variable to restore later
-    const originalAuthToken = process.env.GOOGLE_AUTH_TOKEN;
     
-    try {
-        let ai;
+    // Determine which validation path to use
+    if (apiKey) {
+        // API KEY VALIDATION PATH
+        console.log('==========================================');
+        console.log('API KEY VALIDATION STARTING');
+        console.log('API Key length:', apiKey ? apiKey.length : 0);
+        console.log('First 10 chars:', apiKey ? apiKey.substring(0, 10) + '...' : 'none');
+        console.log('==========================================');
         
-        if (accessToken) {
-            // Access token validation
+        // Check if API key looks valid (basic format check)
+        if (!apiKey || apiKey.length < 20) {
+            console.log('API key too short or missing');
+            return res.json({ 
+                valid: false, 
+                message: 'Invalid API key format. Keys should be 39+ characters.' 
+            });
+        }
+        
+        try {
+            console.log('Creating GoogleGenAI instance...');
+            
+            // Create AI instance with user-provided API key
+            const ai = new GoogleGenAI({
+                vertexai: false,
+                apiKey: apiKey
+            });
+            
+            console.log('GoogleGenAI instance created, attempting API call...');
+            
+            // Try to make a real API call to validate the key
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: [{
+                    role: "user",
+                    parts: [{ text: "Say exactly: test" }]
+                }],
+                generationConfig: {
+                    maxOutputTokens: 10,
+                    temperature: 0
+                }
+            });
+            
+            console.log('API call completed, checking response...');
+            console.log('Response object exists:', !!response);
+            console.log('Response has text property:', !!response?.text);
+            
+            // Check if we actually got a valid response
+            if (!response) {
+                console.log('No response object received');
+                throw new Error('No response from API');
+            }
+            
+            const responseText = response.text;
+            console.log('Response text:', responseText);
+            
+            // Check if the response is what we expect
+            if (!responseText || responseText.length === 0) {
+                console.log('Empty response text');
+                throw new Error('Empty response from API');
+            }
+            
+            console.log('✅ API KEY IS VALID');
+            return res.json({ 
+                valid: true, 
+                message: 'API key validated successfully!' 
+            });
+            
+        } catch (error) {
+            console.log('==========================================');
+            console.log('❌ VALIDATION ERROR CAUGHT');
+            console.log('Error type:', error.constructor.name);
+            console.log('Error message:', error.message);
+            console.log('Error code:', error.code);
+            console.log('Error status:', error.status);
+            console.log('Full error:', error);
+            console.log('==========================================');
+            
+            // Parse the error to provide a clean message
+            let errorMessage = 'Invalid API key. Please check your key from Google AI Studio.';
+            
+            if (error.message?.includes('quota')) {
+                errorMessage = 'API quota exceeded for this key.';
+            } else if (error.message?.includes('API_KEY_INVALID')) {
+                errorMessage = 'Invalid API key. Please verify your key from Google AI Studio.';
+            }
+            
+            return res.json({ 
+                valid: false, 
+                message: errorMessage
+            });
+        }
+        
+    } else if (projectId && accessToken) {
+        // ACCESS TOKEN VALIDATION PATH
+        console.log(`Validating access token for project: ${projectId} in location: ${validationLocation}`);
+        
+        // Store original env variable to restore later
+        const originalAuthToken = process.env.GOOGLE_AUTH_TOKEN;
+        
+        try {
+            // Set access token temporarily
             process.env.GOOGLE_AUTH_TOKEN = accessToken;
             
-            ai = new GoogleGenAI({
+            // Create AI instance with access token
+            const ai = new GoogleGenAI({
                 vertexai: true,
                 project: projectId,
                 location: validationLocation
             });
-        } else {
-            // API key validation
-            const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
-            if (!apiKey) {
-                return res.json({ 
-                    valid: false, 
-                    message: 'No API key configured on server.' 
-                });
-            }
             
-            ai = new GoogleGenAI({
-                vertexai: false,
-                apiKey: apiKey
+            // Try to make a real API call to validate credentials
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: [{
+                    role: "user",
+                    parts: [{ text: "Say test" }]
+                }],
+                generationConfig: {
+                    maxOutputTokens: 10,
+                    temperature: 0
+                }
             });
-        }
-        
-        console.log('Running fast validation with gemini-2.0-flash...');
-        
-        // Use Flash model for much faster validation
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',  
-            contents: [{
-                role: "user",
-                parts: [{ text: "1+1" }]  // Minimal math question
-            }],
-            generationConfig: {
-                maxOutputTokens: 1,
-                temperature: 0
+            
+            // Check if we got a valid response
+            const result = response.text;
+            console.log('Access token validation successful, got response:', result);
+            
+            return res.json({ 
+                valid: true, 
+                message: 'Credentials validated successfully!' 
+            });
+            
+        } catch (error) {
+            console.error('Access token validation error:', error.message);
+            
+            return res.json({ 
+                valid: false, 
+                message: 'Invalid credentials. Please check your configuration.' 
+            });
+            
+        } finally {
+            // Always restore the original environment variable
+            if (originalAuthToken !== undefined) {
+                process.env.GOOGLE_AUTH_TOKEN = originalAuthToken;
+            } else {
+                delete process.env.GOOGLE_AUTH_TOKEN;
             }
-        });
-        
-        // If we get here, credentials are valid
-        console.log('Flash validation successful');
-        res.json({ 
-            valid: true, 
-            message: 'Credentials validated successfully!' 
-        });
-        
-    } catch (error) {
-        console.error('Validation error:', error.message);
-        
-        // Use a generic error message for all credential-related failures
-        res.json({ 
-            valid: false, 
-            message: 'Invalid credentials. Please check your configuration.' 
-        });
-    } finally {
-        // Always restore the original environment variable
-        if (originalAuthToken !== undefined) {
-            process.env.GOOGLE_AUTH_TOKEN = originalAuthToken;
-        } else {
-            delete process.env.GOOGLE_AUTH_TOKEN;
         }
+        
+    } else {
+        // Missing required fields
+        return res.json({ 
+            valid: false, 
+            message: 'Please provide either an API key or Project ID with Access Token.' 
+        });
     }
 });
 
 // 4. Main Gemini API proxy endpoint using SDK
 app.post('/api/generate', async (req, res) => {
-    console.log('========== Generate endpoint called ==========');
-    const { authMethod, accessToken, projectId, location, systemPrompt, contentParts } = req.body;
-    const model = 'gemini-2.5-pro';  
-
-    // Debug logging
-    console.log('Request received with:', {
-        authMethod,
-        hasToken: !!accessToken,
-        hasProjectId: !!projectId,
-        location: location || 'us-central1',
-        systemPromptLength: systemPrompt?.length || 0,
-        contentPartsCount: contentParts?.length || 0
-    });
+    const { authMethod, accessToken, projectId, location, systemPrompt, contentParts, apiKey } = req.body;
+    const model = 'gemini-2.5-pro';
 
     try {
         let ai;
@@ -190,7 +310,6 @@ app.post('/api/generate', async (req, res) => {
             }
 
             const vertexLocation = location || 'us-central1';
-            console.log(`Using Gen AI SDK with access token for project: ${projectId} in location: ${vertexLocation}`);
             
             // The SDK can use access tokens through environment variables
             // Store the original value to restore later
@@ -201,7 +320,6 @@ app.post('/api/generate', async (req, res) => {
                 process.env.GOOGLE_AUTH_TOKEN = accessToken;
                 
                 // Initialize SDK with Vertex AI configuration
-                // The SDK will automatically use the GOOGLE_AUTH_TOKEN we just set
                 ai = new GoogleGenAI({
                     vertexai: true,
                     project: projectId,
@@ -214,7 +332,6 @@ app.post('/api/generate', async (req, res) => {
                 // Add text prompt first
                 if (systemPrompt) {
                     parts.push({ text: systemPrompt });
-                    console.log('Added system prompt to parts');
                 }
                 
                 // Add any images/videos from contentParts
@@ -227,12 +344,9 @@ app.post('/api/generate', async (req, res) => {
                                     data: part.inlineData.data
                                 }
                             });
-                            console.log(`Added media to parts: ${part.inlineData.mimeType}`);
                         }
                     });
                 }
-                
-                console.log(`Sending ${parts.length} parts via SDK to Vertex AI in ${vertexLocation}`);
                 
                 // Generate content using the SDK
                 response = await ai.models.generateContent({
@@ -244,7 +358,6 @@ app.post('/api/generate', async (req, res) => {
                 });
                 
                 const text = response.text;
-                console.log('Response received, text length:', text.length);
                 res.json({ text: text.trim() });
                 
             } finally {
@@ -258,17 +371,15 @@ app.post('/api/generate', async (req, res) => {
             
         } else {
             // === API KEY PATH ===
-            const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+            // API key must be provided by the user 
             if (!apiKey) {
-                return res.status(500).json({ 
-                    error: 'API Key is not configured on the server. Please check your .env file.',
+                return res.status(400).json({ 
+                    error: 'API Key is required. Please enter your Gemini API key.',
                     validationError: true
                 });
             }
-
-            console.log('Using Gen AI SDK with API key');
             
-            // Initialize SDK with API key
+            // Initialize SDK with user-provided API key
             ai = new GoogleGenAI({
                 vertexai: false,
                 apiKey: apiKey
@@ -280,7 +391,6 @@ app.post('/api/generate', async (req, res) => {
             // Add text prompt first
             if (systemPrompt) {
                 parts.push({ text: systemPrompt });
-                console.log('Added system prompt to parts');
             }
             
             // Add any images/videos from contentParts
@@ -293,12 +403,9 @@ app.post('/api/generate', async (req, res) => {
                                 data: part.inlineData.data
                             }
                         });
-                        console.log(`Added media to parts: ${part.inlineData.mimeType}`);
                     }
                 });
             }
-            
-            console.log(`Sending ${parts.length} parts via SDK to Gemini API`);
             
             // Generate content using the SDK
             response = await ai.models.generateContent({
@@ -310,12 +417,11 @@ app.post('/api/generate', async (req, res) => {
             });
             
             const text = response.text;
-            console.log('Response received, text length:', text.length);
             res.json({ text: text.trim() });
         }
 
     } catch (error) {
-        console.error('Generation error:', error);
+        console.error('Generation error:', error.message);
         
         // Use generic error message for validation errors
         if (error.message?.includes('401') || error.message?.includes('Unauthorized') || error.message?.includes('invalid')) {
@@ -379,6 +485,10 @@ app.get('/api/health', (req, res) => {
         ],
         sdkVersion: {
             '@google/genai': require('@google/genai/package.json').version
+        },
+        rateLimit: {
+            windowMs: RATE_LIMIT_WINDOW_MS,
+            maxRequests: MAX_REQUESTS_PER_WINDOW
         }
     });
 });
@@ -391,8 +501,9 @@ app.get('/', (req, res) => {
 // --- Server Start ---
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server listening at http://localhost:${port}`);
-    console.log('Environment variables configured:');
-    console.log('  API_KEY/GEMINI_API_KEY:', !!(process.env.API_KEY || process.env.GEMINI_API_KEY));
+    console.log('Configuration:');
+    console.log('  Authentication: Users must provide their own API key or Access Token');
     console.log('  GOOGLE_CLOUD_PROJECT:', process.env.GOOGLE_CLOUD_PROJECT || 'Not set');
     console.log('  GOOGLE_CLOUD_LOCATION:', process.env.GOOGLE_CLOUD_LOCATION || 'Not set (will use UI selection)');
+    console.log(`  Rate limiting: ${MAX_REQUESTS_PER_WINDOW} requests per hour per IP`);
 });

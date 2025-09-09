@@ -87,7 +87,7 @@
                     <div id="auth-header" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
                         <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">Authentication</h3>
                         <div class="flex items-center">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 italic mr-2">(Click to hide)</p>
+                            <p id="auth-toggle-text" class="text-sm text-gray-500 dark:text-gray-400 italic mr-2">(Click to hide)</p>
                             <svg id="auth-chevron" class="h-6 w-6 text-gray-600 dark:text-gray-300 transform transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -103,8 +103,17 @@
                                 </select>
                             </div>
                             <div id="api-key-auth-section" style="display: none;">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">API Key Status</label>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 p-2">The application will securely use the API key configured on the server.</p>
+                                <div class="mb-4">
+                                    <label for="api-key-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Gemini API Key</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="password" id="api-key-input" class="flex-grow w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="Paste your API key" autocomplete="off">
+                                        <button id="validate-api-key-btn" class="py-2 px-4 bg-gray-600 dark:bg-gray-700 text-white rounded-md font-semibold hover:bg-gray-700 dark:hover:bg-gray-600">Validate</button>
+                                    </div>
+                                    <div id="api-key-status" class="text-xs mt-2 h-4"></div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-500 hover:text-indigo-400 underline">Google AI Studio</a>
+                                    </p>
+                                </div>
                             </div>
                             <div id="access-token-auth-section">
                                 <div class="mb-4">
