@@ -1,3 +1,6 @@
+nprint
+Shaoxiong
+VCPU
 aadd
 Aadila
 AALR
