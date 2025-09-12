@@ -48,13 +48,16 @@ def add_skip_to_param_lines(session: nox.Session, notebook_paths: list[str]) -> 
                 if cell.cell_type == "code":
                     source_lines = cell.source.split("\n")
                     new_source_lines = []
+                    cell_modified = False
                     for line in source_lines:
                         if "@param" in line and "# fmt: skip" not in line:
                             new_source_lines.append(line.rstrip() + "  # fmt: skip")
-                            modified = True
+                            cell_modified = True
                         else:
                             new_source_lines.append(line)
-                    cell.source = "\n".join(new_source_lines)
+                    if cell_modified:
+                        cell.source = "\n".join(new_source_lines)
+                        modified = True
 
             # If we modified the notebook, write the changes back to the file
             if modified:
