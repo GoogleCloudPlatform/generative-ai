@@ -31,7 +31,7 @@ class LLMJudge:
         self.model = model; self.temperature = temperature; self.seed = seed
     def judge(self, question: str, gold: str, pred: str, unknown_ok: bool) -> bool:
         if unknown_ok: return pred.strip().upper() == "IDK"
-        contents = PROMPT_TMPL.format(question=question, gold=gold, pred=pred)
+        contents = f"Question: {question}\nGold answer: {gold}\nCandidate answer: {pred}\nRespond strictly with YES or NO."
         cfg = types.GenerateContentConfig(temperature=self.temperature, seed=self.seed, max_output_tokens=4)
         resp = self.client.models.generate_content(model=self.model, contents=f"{SYSTEM}\n\n{contents}", config=cfg)
         return _postprocess(resp.text) == "YES"
