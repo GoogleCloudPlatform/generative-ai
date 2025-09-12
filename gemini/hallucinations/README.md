@@ -2,7 +2,7 @@
 
 Confidence-targeted, abstention-aware hallucination evaluator for Gemini via `google-genai`.
 
-- Implements the Kalai et al. idea in practice: **“Answer only if you’re > t confident; otherwise say `IDK`.”**
+- Implements the Kalai et al. idea in practice: **"Answer only if you're > t confident; otherwise say `IDK`."**
 - Scores with an abstention-aware loss: **correct = +1, wrong = −t/(1−t), IDK = 0**.
 - Produces a **risk–coverage curve** (conditional accuracy vs. coverage) with **labeled t-points**.
 - Works from **CSV** or directly from **MMLU** (Hugging Face), with **random sampling** and an **`--idk-frac`** mixer to create **IDK-only** items (tests true abstention).
@@ -24,11 +24,13 @@ pip install -e .
 ### Auth options
 
 **Gemini API (Developer API):**
+
 ```bash
 export GOOGLE_API_KEY=YOUR_KEY  # or GEMINI_API_KEY
 ```
 
 **Vertex AI:**
+
 ```bash
 export GOOGLE_GENAI_USE_VERTEXAI=true
 export GOOGLE_CLOUD_PROJECT=your-gcp-project
@@ -42,16 +44,19 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 ## Quickstart
 
 ### CSV mode
+
 ```bash
 gemhall run   --data examples/toy.csv   --thresholds 0.5 0.75 0.9   --model gemini-2.5-flash-lite   --progress   --out outputs
 ```
 
 ### MMLU (direct from HF Datasets)
+
 ```bash
 gemhall mmlu   --thresholds 0.5 0.75 0.9   --model gemini-2.5-flash-lite   --split test   --subjects all   --limit 200   --judge llm   --async --concurrency 16   --progress   --out outputs/mmlu
 ```
 
-**Mix in “IDK-only” items** (turns a fraction of sampled items into unanswerables so the only correct behavior is `IDK`):
+**Mix in "IDK-only" items** (turns a fraction of sampled items into unanswerables so the only correct behavior is `IDK`):
+
 ```bash
   --idk-frac 0.3
 ```
@@ -63,14 +68,14 @@ gemhall mmlu   --thresholds 0.5 0.75 0.9   --model gemini-2.5-flash-lite   --spl
 - `results.csv` – one row per (item × t): prediction, abstained flag, correctness, score
 - `metrics.json` – coverage, conditional accuracy (on answers), hallucination rate among answers, avg expected score
 - `behavior.json` – simple behavior checks (e.g., monotonic coverage as t increases)
-- `rc_curve.png` – **risk–coverage curve** with **“t=…”** labels on each point
+- `rc_curve.png` – **risk–coverage curve** with **"t=…"** labels on each point
 - `report.md` – short summary plus the chart embedded
 
 ---
 
 ## Interpreting the curve
 
-- **Coverage** (x-axis): fraction of items the model answered (didn’t say `IDK`).
+- **Coverage** (x-axis): fraction of items the model answered (didn't say `IDK`).
 - **Conditional accuracy** (y-axis): how often it was correct **when it did answer**.
 - As **t** rises ⇒ coverage falls, conditional accuracy should rise.
 - If **accuracy at t** is **well below t**, the model is **over-confident or non-compliant** → raise t, harden prompts, add retrieval/handoffs, or re-calibrate.
@@ -80,7 +85,8 @@ gemhall mmlu   --thresholds 0.5 0.75 0.9   --model gemini-2.5-flash-lite   --spl
 ## CLI reference
 
 Shared flags (both `run` and `mmlu`):
-```
+
+```sh
 --thresholds FLOAT...      Confidence thresholds (e.g., 0.5 0.75 0.9)  [required]
 --model TEXT               Gemini model id (default: gemini-2.5-flash)
 --temperature FLOAT        Sampling temperature (default: 0.0)
@@ -96,12 +102,14 @@ Shared flags (both `run` and `mmlu`):
 ```
 
 `run` (CSV):
-```
+
+```sh
 --data PATH                CSV with columns: id, question, gold, unknown_ok
 ```
 
-`mmlu` (Hugging Face “cais/mmlu”):
-```
+`mmlu` (Hugging Face "cais/mmlu"):
+
+```sh
 --split TEXT               Split (e.g., test, dev)  [default: test]
 --subjects STR...          Subject names or 'all'   [default: all]
 --limit INT                Randomly sample N items after filtering subjects
@@ -116,7 +124,7 @@ We first try the unified `"all"` config and fall back to stitching per-subject c
 ## Judges
 
 - **exact** – strict match for MCQ (letters A/B/C/D), or numerical/text equality for free-form.
-- **llm** – Gemini 2.5 Flash-Lite “YES/NO” grader; for `unknown_ok=1`, only `IDK` is considered correct (no LLM call).
+- **llm** – Gemini 2.5 Flash-Lite "YES/NO" grader; for `unknown_ok=1`, only `IDK` is considered correct (no LLM call).
 
 ---
 
@@ -152,4 +160,4 @@ We first try the unified `"all"` config and fall back to stitching per-subject c
 - **MMLU config error**: we now request `"all"` and fall back per-subject; ensure `datasets>=2.18.0`.
 - **Curly-brace crash in prompts**: fixed by using f-strings (brace-safe).
 - **429 quota**: use `--rpm-limit`, and/or lower `--concurrency`.
-- **Vertex vs API key**: set `GOOGLE_GENAI_USE_VERTEXAI=true` (+ project/location) to use Vertex; don’t set an API key at the same time.
+- **Vertex AI vs Gemini Developer API**: set `GOOGLE_GENAI_USE_VERTEXAI=true` (+ project/location) to use Vertex; don't set an API key at the same time.
