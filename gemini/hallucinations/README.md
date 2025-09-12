@@ -36,7 +36,7 @@ export GOOGLE_GENAI_USE_VERTEXAI=true
 export GOOGLE_CLOUD_PROJECT=your-gcp-project
 export GOOGLE_CLOUD_LOCATION=us-central1   # or europe-west1, etc.
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
-# Do NOT set GOOGLE_API_KEY when using Vertex mode.
+# Do NOT set GOOGLE_API_KEY when using Vertex AI mode.
 ```
 
 ---
