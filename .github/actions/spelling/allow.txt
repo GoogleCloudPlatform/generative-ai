@@ -155,6 +155,7 @@ byod
 byor
 BYOR
 Byzance
+cais
 CALIPSO
 campestre
 CAMQAA
@@ -224,9 +225,11 @@ convo
 convos
 COPD
 cordata
+coro
 corpuses
 COUNTIF
 countplot
+covs
 Cowabunga
 cpet
 crewai
@@ -461,6 +464,7 @@ gdkx
 GDM
 gdp
 geboten
+gemhall
 genai
 genkit
 GenTwo
@@ -526,6 +530,7 @@ gunicorn
 GWLP
 hadolint
 hahaha
+halluc
 Hamamoto
 Hamers
 Hannaneh
@@ -664,6 +669,7 @@ jupyter
 jvm
 Kaelen
 kaggle
+Kalai
 Kalamang
 Kamradt
 Kanagawa
@@ -784,6 +790,7 @@ Mbappe
 mbsdk
 mcp
 MCP
+MCQ
 mdc
 MDD
 Meawad
@@ -821,6 +828,8 @@ MLOPs
 mlp
 MMA
 mmarco
+mmlu
+MMLU
 MMO
 mmol
 mmr
@@ -978,6 +987,7 @@ Pastra
 payslip
 paystub
 PBA
+pbar
 pbxproj
 pcs
 PDEs
@@ -1023,6 +1033,7 @@ podhelper
 podman
 Poirot
 Polong
+popleft
 Porat
 postictal
 powerups
@@ -1344,6 +1355,7 @@ TTH
 tts
 TTT
 tures
+tval
 typehints
 ubuntu
 udf
@@ -1502,6 +1514,7 @@ XSum
 xticks
 XXE
 xxxxxxxx
+xytext
 xzn
 YAjjpd
 yanchor
