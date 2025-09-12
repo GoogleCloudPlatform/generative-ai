@@ -155,6 +155,7 @@ byod
 byor
 BYOR
 Byzance
+cais
 CALIPSO
 campestre
 CAMQAA
@@ -664,6 +665,7 @@ jupyter
 jvm
 Kaelen
 kaggle
+Kalai
 Kalamang
 Kamradt
 Kanagawa
@@ -821,6 +823,8 @@ MLOPs
 mlp
 MMA
 mmarco
+mmlu
+MMLU
 MMO
 mmol
 mmr
