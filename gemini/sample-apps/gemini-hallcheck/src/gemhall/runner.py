@@ -7,6 +7,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 
+
 class _AsyncRateLimiter:
     def __init__(self, rpm: int | None = None):
         self.rpm = rpm
@@ -28,6 +29,7 @@ class _AsyncRateLimiter:
                 sleep_for = self._win - (now - self._q[0]) + 0.01
             await asyncio.sleep(sleep_for)
 
+
 class _RateLimiter:
     def __init__(self, rpm: int | None = None):
         self.rpm = rpm
@@ -47,11 +49,23 @@ class _RateLimiter:
             sleep_for = self._win - (now - self._q[0]) + 0.01
             time.sleep(sleep_for)
 
+
 class GeminiRunner:
-    def __init__(self, model: str = "gemini-2.5-flash", *, temperature: float = 0.0, thinking_budget: int = 0,
-                 seed: int | None = 1234, rpm_limit: int | None = None, max_retries: int = 6):
+    def __init__(
+        self,
+        model: str = "gemini-2.5-flash",
+        *,
+        temperature: float = 0.0,
+        thinking_budget: int = 0,
+        seed: int | None = 1234,
+        rpm_limit: int | None = None,
+        max_retries: int = 6,
+    ):
         self.client = genai.Client()
-        self.model = model; self.temperature = temperature; self.thinking_budget = thinking_budget; self.seed = seed
+        self.model = model
+        self.temperature = temperature
+        self.thinking_budget = thinking_budget
+        self.seed = seed
         self.max_retries = max_retries
         self._rl = _RateLimiter(rpm_limit)
 
@@ -59,20 +73,31 @@ class GeminiRunner:
         cfg = types.GenerateContentConfig(
             temperature=self.temperature,
             seed=self.seed,
-            thinking_config=types.ThinkingConfig(thinking_budget=self.thinking_budget) if self.thinking_budget is not None else None,
-            max_output_tokens=128
+            thinking_config=types.ThinkingConfig(thinking_budget=self.thinking_budget)
+            if self.thinking_budget is not None
+            else None,
+            max_output_tokens=128,
         )
         backoff = 1.0
         for attempt in range(1, self.max_retries + 1):
             self._rl.acquire()
             try:
-                resp = self.client.models.generate_content(model=self.model, contents=prompt, config=cfg)
+                resp = self.client.models.generate_content(
+                    model=self.model, contents=prompt, config=cfg
+                )
                 return (resp.text or "").strip()
             except ClientError as e:
-                if getattr(e, "status_code", None) == 429 and attempt < self.max_retries:
+                if (
+                    getattr(e, "status_code", None) == 429
+                    and attempt < self.max_retries
+                ):
                     delay = None
                     try:
-                        details = (getattr(e, "response_json", {}) or {}).get("error", {}).get("details", [])
+                        details = (
+                            (getattr(e, "response_json", {}) or {})
+                            .get("error", {})
+                            .get("details", [])
+                        )
                         for d in details:
                             if d.get("@type", "").endswith("RetryInfo"):
                                 s = d.get("retryDelay", "0s")
@@ -88,11 +113,23 @@ class GeminiRunner:
                     continue
                 raise
 
+
 class AsyncGeminiRunner:
-    def __init__(self, model: str = "gemini-2.5-flash", *, temperature: float = 0.0, thinking_budget: int = 0,
-                 seed: int | None = 1234, rpm_limit: int | None = None, max_retries: int = 6):
+    def __init__(
+        self,
+        model: str = "gemini-2.5-flash",
+        *,
+        temperature: float = 0.0,
+        thinking_budget: int = 0,
+        seed: int | None = 1234,
+        rpm_limit: int | None = None,
+        max_retries: int = 6,
+    ):
         self.client = genai.Client()
-        self.model = model; self.temperature = temperature; self.thinking_budget = thinking_budget; self.seed = seed
+        self.model = model
+        self.temperature = temperature
+        self.thinking_budget = thinking_budget
+        self.seed = seed
         self.max_retries = max_retries
         self._rl = _AsyncRateLimiter(rpm_limit)
 
@@ -100,20 +137,31 @@ class AsyncGeminiRunner:
         cfg = types.GenerateContentConfig(
             temperature=self.temperature,
             seed=self.seed,
-            thinking_config=types.ThinkingConfig(thinking_budget=self.thinking_budget) if self.thinking_budget is not None else None,
-            max_output_tokens=128
+            thinking_config=types.ThinkingConfig(thinking_budget=self.thinking_budget)
+            if self.thinking_budget is not None
+            else None,
+            max_output_tokens=128,
         )
         backoff = 1.0
         for attempt in range(1, self.max_retries + 1):
             await self._rl.acquire()
             try:
-                resp = await self.client.aio.models.generate_content(model=self.model, contents=prompt, config=cfg)
+                resp = await self.client.aio.models.generate_content(
+                    model=self.model, contents=prompt, config=cfg
+                )
                 return (resp.text or "").strip()
             except ClientError as e:
-                if getattr(e, "status_code", None) == 429 and attempt < self.max_retries:
+                if (
+                    getattr(e, "status_code", None) == 429
+                    and attempt < self.max_retries
+                ):
                     delay = None
                     try:
-                        details = (getattr(e, "response_json", {}) or {}).get("error", {}).get("details", [])
+                        details = (
+                            (getattr(e, "response_json", {}) or {})
+                            .get("error", {})
+                            .get("details", [])
+                        )
                         for d in details:
                             if d.get("@type", "").endswith("RetryInfo"):
                                 s = d.get("retryDelay", "0s")

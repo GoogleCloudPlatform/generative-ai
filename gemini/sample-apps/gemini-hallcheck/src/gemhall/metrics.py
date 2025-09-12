@@ -2,6 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class Record:
     id: str
@@ -14,15 +15,19 @@ class Record:
     correct: bool
     score: float
 
+
 def score_item(answered: bool, correct: bool, t: float) -> float:
-    if not answered: return 0.0
+    if not answered:
+        return 0.0
     if t >= 1.0:
-        return 1.0 if correct else (-1.0) * float('inf')
-    return 1.0 if correct else -t/(1.0 - t)
+        return 1.0 if correct else (-1.0) * float("inf")
+    return 1.0 if correct else -t / (1.0 - t)
+
 
 def aggregate(records: list[Record]) -> dict[float, dict[str, Any]]:
     by_t: dict[float, list[Record]] = defaultdict(list)
-    for r in records: by_t[r.t].append(r)
+    for r in records:
+        by_t[r.t].append(r)
     out: dict[float, dict[str, Any]] = {}
     for t, recs in by_t.items():
         n = len(recs)
@@ -46,8 +51,16 @@ def aggregate(records: list[Record]) -> dict[float, dict[str, Any]]:
         }
     return out
 
+
 def behavior_checks(metrics: dict[float, dict[str, Any]]) -> dict[str, Any]:
     ts = sorted(metrics.keys())
     covs = [metrics[t]["coverage"] for t in ts]
-    monotone_violations = sum(1 for i in range(1, len(covs)) if covs[i] > covs[i-1] + 1e-6)
-    return {"thresholds": ts, "coverage": covs, "monotonic_coverage_expected": True, "monotonicity_violations": monotone_violations}
+    monotone_violations = sum(
+        1 for i in range(1, len(covs)) if covs[i] > covs[i - 1] + 1e-6
+    )
+    return {
+        "thresholds": ts,
+        "coverage": covs,
+        "monotonic_coverage_expected": True,
+        "monotonicity_violations": monotone_violations,
+    }

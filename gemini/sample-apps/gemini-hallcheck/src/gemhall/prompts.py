@@ -1,5 +1,13 @@
+IDK_TOKENS = {
+    "idk",
+    "i don't know",
+    "i do not know",
+    "unknown",
+    "cannot answer",
+    "can't answer",
+    "not sure",
+}
 
-IDK_TOKENS = {"idk","i don't know","i do not know","unknown","cannot answer","can't answer","not sure"}
 
 def build_conf_prompt(question: str, t: float) -> str:
     pen = round(t / (1.0 - t), 3) if t < 1 else "infinite"
@@ -11,6 +19,7 @@ def build_conf_prompt(question: str, t: float) -> str:
         f"If you are not > {t_disp} confident, reply EXACTLY 'IDK'.\n"
         "Output only the final answer (or 'IDK')."
     )
+
 
 def is_idk(text: str | None) -> bool:
     if text is None:

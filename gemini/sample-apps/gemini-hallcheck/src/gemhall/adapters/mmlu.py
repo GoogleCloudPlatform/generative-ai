@@ -6,27 +6,72 @@ from collections.abc import Iterable
 from datasets import concatenate_datasets, load_dataset
 
 SUBJECTS_ALL = [
-    "abstract_algebra","anatomy","astronomy","business_ethics","clinical_knowledge",
-    "college_biology","college_chemistry","college_computer_science","college_mathematics",
-    "college_medicine","college_physics","computer_security","conceptual_physics",
-    "econometrics","electrical_engineering","elementary_mathematics","formal_logic",
-    "global_facts","high_school_biology","high_school_chemistry","high_school_computer_science",
-    "high_school_european_history","high_school_geography","high_school_government_and_politics",
-    "high_school_macroeconomics","high_school_mathematics","high_school_microeconomics",
-    "high_school_physics","high_school_psychology","high_school_statistics",
-    "high_school_us_history","high_school_world_history","human_aging","human_sexuality",
-    "international_law","jurisprudence","logical_fallacies","machine_learning",
-    "management","marketing","medical_genetics","miscellaneous","moral_disputes",
-    "moral_scenarios","nutrition","philosophy","prehistory","professional_accounting",
-    "professional_law","professional_medicine","professional_psychology","public_relations",
-    "security_studies","sociology","us_foreign_policy","virology","world_religions"
+    "abstract_algebra",
+    "anatomy",
+    "astronomy",
+    "business_ethics",
+    "clinical_knowledge",
+    "college_biology",
+    "college_chemistry",
+    "college_computer_science",
+    "college_mathematics",
+    "college_medicine",
+    "college_physics",
+    "computer_security",
+    "conceptual_physics",
+    "econometrics",
+    "electrical_engineering",
+    "elementary_mathematics",
+    "formal_logic",
+    "global_facts",
+    "high_school_biology",
+    "high_school_chemistry",
+    "high_school_computer_science",
+    "high_school_european_history",
+    "high_school_geography",
+    "high_school_government_and_politics",
+    "high_school_macroeconomics",
+    "high_school_mathematics",
+    "high_school_microeconomics",
+    "high_school_physics",
+    "high_school_psychology",
+    "high_school_statistics",
+    "high_school_us_history",
+    "high_school_world_history",
+    "human_aging",
+    "human_sexuality",
+    "international_law",
+    "jurisprudence",
+    "logical_fallacies",
+    "machine_learning",
+    "management",
+    "marketing",
+    "medical_genetics",
+    "miscellaneous",
+    "moral_disputes",
+    "moral_scenarios",
+    "nutrition",
+    "philosophy",
+    "prehistory",
+    "professional_accounting",
+    "professional_law",
+    "professional_medicine",
+    "professional_psychology",
+    "public_relations",
+    "security_studies",
+    "sociology",
+    "us_foreign_policy",
+    "virology",
+    "world_religions",
 ]
 
 LETTERS = "ABCD"
 
+
 def _format_item(q: str, choices: list[str]) -> str:
     options = "\n".join(f"{LETTERS[i]}. {c}" for i, c in enumerate(choices[:4]))
     return f"{q}\n\nOptions:\n{options}\n\nReply with A, B, C, or D."
+
 
 def _gold_letter(answer_field) -> str:
     if isinstance(answer_field, int):
@@ -39,6 +84,7 @@ def _gold_letter(answer_field) -> str:
     except (ValueError, IndexError):
         raise ValueError(f"Invalid answer format: {answer_field}")
 
+
 def _answer_index(answer_field) -> int:
     if isinstance(answer_field, int):
         return int(answer_field)
@@ -47,8 +93,15 @@ def _answer_index(answer_field) -> int:
         return LETTERS.index(s)
     return int(s)
 
-def export_temp_csv(out_csv: str, split: str = "test", subjects: Iterable[str] | None = None,
-                    limit: int | None = None, seed: int = 1234, idk_frac: float = 0.0) -> str:
+
+def export_temp_csv(
+    out_csv: str,
+    split: str = "test",
+    subjects: Iterable[str] | None = None,
+    limit: int | None = None,
+    seed: int = 1234,
+    idk_frac: float = 0.0,
+) -> str:
     """Loads cais/mmlu from Hugging Face, filters subjects/split, optionally samples `limit` items,
     optionally converts a fraction into IDK-only, and writes a CSV for the evaluator.
     """
@@ -59,7 +112,9 @@ def export_temp_csv(out_csv: str, split: str = "test", subjects: Iterable[str] |
     try:
         ds = load_dataset("cais/mmlu", name="all")
         if split not in ds:
-            raise ValueError(f"Split '{split}' not found in cais/mmlu. Available: {list(ds.keys())}")
+            raise ValueError(
+                f"Split '{split}' not found in cais/mmlu. Available: {list(ds.keys())}"
+            )
         table = ds[split]
         if wanted_subjects != ["all"]:
             allowed = set(wanted_subjects)
@@ -69,7 +124,9 @@ def export_temp_csv(out_csv: str, split: str = "test", subjects: Iterable[str] |
                 raise RuntimeError("Unified config missing 'subject' column")
     except Exception:
         # Fallback: concat selected subjects
-        subjects_to_load = SUBJECTS_ALL if wanted_subjects == ["all"] else wanted_subjects
+        subjects_to_load = (
+            SUBJECTS_ALL if wanted_subjects == ["all"] else wanted_subjects
+        )
         parts = []
         for subj in subjects_to_load:
             d = load_dataset("cais/mmlu", name=subj)
@@ -80,7 +137,9 @@ def export_temp_csv(out_csv: str, split: str = "test", subjects: Iterable[str] |
                 ds_split = ds_split.map(lambda ex: {"subject": subj})
             parts.append(ds_split)
         if not parts:
-            raise ValueError(f"No data found for split '{split}' and subjects {subjects_to_load}")
+            raise ValueError(
+                f"No data found for split '{split}' and subjects {subjects_to_load}"
+            )
         table = concatenate_datasets(parts)
 
     # Random sampling after subject filtering
@@ -106,29 +165,37 @@ def export_temp_csv(out_csv: str, split: str = "test", subjects: Iterable[str] |
             gi = _answer_index(ex["answer"])  # correct option index 0..3
             distractors = [j for j in range(4) if j != gi]
             repl = rnd.choice(distractors)
-            choices[gi] = choices[repl]  # duplicate a distractor -> no true option remains
+            choices[gi] = choices[
+                repl
+            ]  # duplicate a distractor -> no true option remains
             question = _format_item(q, choices[:4])
-            rows.append({
-                "id": f"{subj}:{i}",
-                "question": question,
-                "gold": "",
-                "unknown_ok": 1,
-                "category": f"{subj}|unanswerable",
-            })
+            rows.append(
+                {
+                    "id": f"{subj}:{i}",
+                    "question": question,
+                    "gold": "",
+                    "unknown_ok": 1,
+                    "category": f"{subj}|unanswerable",
+                }
+            )
         else:
             ans = _gold_letter(ex["answer"])
             question = _format_item(q, choices[:4])
-            rows.append({
-                "id": f"{subj}:{i}",
-                "question": question,
-                "gold": ans,
-                "unknown_ok": 0,
-                "category": subj,
-            })
+            rows.append(
+                {
+                    "id": f"{subj}:{i}",
+                    "question": question,
+                    "gold": ans,
+                    "unknown_ok": 0,
+                    "category": subj,
+                }
+            )
 
     os.makedirs(os.path.dirname(out_csv) or ".", exist_ok=True)
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["id","question","gold","unknown_ok","category"])
+        w = csv.DictWriter(
+            f, fieldnames=["id", "question", "gold", "unknown_ok", "category"]
+        )
         w.writeheader()
         w.writerows(rows)
     return out_csv
