@@ -225,9 +225,11 @@ convo
 convos
 COPD
 cordata
+coro
 corpuses
 COUNTIF
 countplot
+covs
 Cowabunga
 cpet
 crewai
@@ -462,6 +464,7 @@ gdkx
 GDM
 gdp
 geboten
+gemhall
 genai
 genkit
 GenTwo
@@ -527,6 +530,7 @@ gunicorn
 GWLP
 hadolint
 hahaha
+halluc
 Hamamoto
 Hamers
 Hannaneh
@@ -786,6 +790,7 @@ Mbappe
 mbsdk
 mcp
 MCP
+MCQ
 mdc
 MDD
 Meawad
@@ -982,6 +987,7 @@ Pastra
 payslip
 paystub
 PBA
+pbar
 pbxproj
 pcs
 PDEs
@@ -1027,6 +1033,7 @@ podhelper
 podman
 Poirot
 Polong
+popleft
 Porat
 postictal
 powerups
@@ -1348,6 +1355,7 @@ TTH
 tts
 TTT
 tures
+tval
 typehints
 ubuntu
 udf
@@ -1506,6 +1514,7 @@ XSum
 xticks
 XXE
 xxxxxxxx
+xytext
 xzn
 YAjjpd
 yanchor
