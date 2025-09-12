@@ -67,7 +67,7 @@ def add_skip_to_param_lines(session: nox.Session, notebook_paths: list[str]) -> 
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
-def format(session) -> None:
+def format(session: nox.Session) -> None:
     """Formats Python files and Jupyter Notebooks.
 
     Pass '--all' to format all tracked files in the repository.
