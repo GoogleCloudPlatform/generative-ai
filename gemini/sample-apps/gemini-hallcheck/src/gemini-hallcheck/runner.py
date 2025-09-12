@@ -1,12 +1,14 @@
-from typing import Optional
+import asyncio
+import random
+import time
 from collections import deque
-import asyncio, time, random
+
 from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 
 class _AsyncRateLimiter:
-    def __init__(self, rpm: Optional[int] = None):
+    def __init__(self, rpm: int | None = None):
         self.rpm = rpm
         self._win = 60.0
         self._q = deque()
@@ -27,7 +29,7 @@ class _AsyncRateLimiter:
             await asyncio.sleep(sleep_for)
 
 class _RateLimiter:
-    def __init__(self, rpm: Optional[int] = None):
+    def __init__(self, rpm: int | None = None):
         self.rpm = rpm
         self._win = 60.0
         self._q = deque()
@@ -47,7 +49,7 @@ class _RateLimiter:
 
 class GeminiRunner:
     def __init__(self, model: str = "gemini-2.5-flash", *, temperature: float = 0.0, thinking_budget: int = 0,
-                 seed: Optional[int] = 1234, rpm_limit: Optional[int] = None, max_retries: int = 6):
+                 seed: int | None = 1234, rpm_limit: int | None = None, max_retries: int = 6):
         self.client = genai.Client()
         self.model = model; self.temperature = temperature; self.thinking_budget = thinking_budget; self.seed = seed
         self.max_retries = max_retries
@@ -88,7 +90,7 @@ class GeminiRunner:
 
 class AsyncGeminiRunner:
     def __init__(self, model: str = "gemini-2.5-flash", *, temperature: float = 0.0, thinking_budget: int = 0,
-                 seed: Optional[int] = 1234, rpm_limit: Optional[int] = None, max_retries: int = 6):
+                 seed: int | None = 1234, rpm_limit: int | None = None, max_retries: int = 6):
         self.client = genai.Client()
         self.model = model; self.temperature = temperature; self.thinking_budget = thinking_budget; self.seed = seed
         self.max_retries = max_retries

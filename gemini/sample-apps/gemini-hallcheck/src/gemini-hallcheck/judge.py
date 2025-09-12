@@ -1,7 +1,7 @@
 import re
-from typing import Optional, Callable
+from collections.abc import Callable
 
-def normalize(s: Optional[str]) -> str:
+def normalize(s: str | None) -> str:
     if s is None: return ""
     s = str(s).strip().lower()
     s = re.sub(r"\s+", " ", s)
@@ -17,7 +17,7 @@ def str_or_num_equal(a: str, b: str) -> bool:
     if A == B: return True
     return numbers_equal(A, B)
 
-def judge_validity(pred: str, gold: str, unknown_ok: bool, eq_fn: Optional[Callable[[str, str], bool]] = None) -> bool:
+def judge_validity(pred: str, gold: str, unknown_ok: bool, eq_fn: Callable[[str, str], bool] | None = None) -> bool:
     s = normalize(pred)
     if unknown_ok: return s == "idk"
     if eq_fn is None: eq_fn = str_or_num_equal

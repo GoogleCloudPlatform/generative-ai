@@ -1,24 +1,30 @@
-import csv, json, os, asyncio
-from typing import List, Dict, Any, Sequence, Optional
-from tqdm.auto import tqdm
-from .prompts import build_conf_prompt, is_idk
-from .metrics import Record, score_item, aggregate, behavior_checks
-from .judge import judge_validity as judge_validity_exact
-from .judge_llm import LLMJudge, AsyncLLMJudge
-from .runner import GeminiRunner, AsyncGeminiRunner
+import asyncio
+import csv
+import json
+import os
+from collections.abc import Sequence
+from typing import Any
 
-def load_data_csv(path: str) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
-    with open(path, newline='', encoding='utf-8') as f:
+from tqdm.auto import tqdm
+
+from .judge import judge_validity as judge_validity_exact
+from .judge_llm import AsyncLLMJudge, LLMJudge
+from .metrics import Record, aggregate, behavior_checks, score_item
+from .prompts import build_conf_prompt, is_idk
+from .runner import AsyncGeminiRunner, GeminiRunner
+
+def load_data_csv(path: str) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    with open(path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             rows.append(row)
     return rows
 
-def _write_artifacts(records: List[Record], out_dir: str) -> Dict[str, str]:
+def _write_artifacts(records: list[Record], out_dir: str) -> dict[str, str]:
     os.makedirs(out_dir, exist_ok=True)
     # results.csv
     results_csv = os.path.join(out_dir, "results.csv")
-    with open(results_csv, "w", newline='', encoding="utf-8") as f:
+    with open(results_csv, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["id", "t", "question", "gold", "unknown_ok", "pred", "abstained", "correct", "score"])
         for r in records:
@@ -41,7 +47,7 @@ def _write_artifacts(records: List[Record], out_dir: str) -> Dict[str, str]:
         acc = [metrics[t]["accuracy_conditioned_on_answering"] for t in ts]
         plt.figure()
         plt.plot(cov, acc, marker="o")
-        for x, y, tval in zip(cov, acc, ts):
+        for x, y, tval in zip(cov, acc, ts, strict=False):
             try: label = f"t={tval:g}"
             except Exception: label = f"t={tval}"
             plt.annotate(label, (x, y), textcoords="offset points", xytext=(6,6), ha="left")
@@ -79,7 +85,7 @@ def _write_artifacts(records: List[Record], out_dir: str) -> Dict[str, str]:
 def evaluate_sync(data_csv: str, thresholds: Sequence[float], out_dir: str,
                   model: str, temperature: float, thinking_budget: int, seed: int,
                   judge: str = "exact", show_progress: bool = False,
-                  rpm_limit: Optional[int] = None, max_retries: int = 6) -> Dict[str, Any]:
+                  rpm_limit: int | None = None, max_retries: int = 6) -> dict[str, Any]:
     rows = load_data_csv(data_csv)
     runner = GeminiRunner(model=model, temperature=temperature, thinking_budget=thinking_budget, seed=seed,
                           rpm_limit=rpm_limit, max_retries=max_retries)
@@ -88,7 +94,7 @@ def evaluate_sync(data_csv: str, thresholds: Sequence[float], out_dir: str,
     total = len(rows) * len(thresholds)
     pbar = tqdm(total=total, disable=not show_progress, desc="Evaluating (sync)")
 
-    records: List[Record] = []
+    records: list[Record] = []
     for row in rows:
         qid = row.get("id") or ""
         question = row.get("question") or ""
@@ -109,7 +115,7 @@ def evaluate_sync(data_csv: str, thresholds: Sequence[float], out_dir: str,
 async def evaluate_async(data_csv: str, thresholds: Sequence[float], out_dir: str,
                          model: str, temperature: float, thinking_budget: int, seed: int,
                          judge: str = "exact", concurrency: int = 8, show_progress: bool = False,
-                         rpm_limit: Optional[int] = None, max_retries: int = 6) -> Dict[str, Any]:
+                         rpm_limit: int | None = None, max_retries: int = 6) -> dict[str, Any]:
     rows = load_data_csv(data_csv)
     runner = AsyncGeminiRunner(model=model, temperature=temperature, thinking_budget=thinking_budget, seed=seed,
                                rpm_limit=rpm_limit, max_retries=max_retries)
@@ -119,7 +125,7 @@ async def evaluate_async(data_csv: str, thresholds: Sequence[float], out_dir: st
     sem = asyncio.Semaphore(concurrency)
     total = len(rows) * len(thresholds)
     pbar = tqdm(total=total, disable=not show_progress, desc="Evaluating (async)")
-    records: List[Record] = []
+    records: list[Record] = []
 
     async def one(qid, question, gold, unknown_ok, t):
         prompt = build_conf_prompt(question, float(t))
@@ -152,10 +158,9 @@ def evaluate(data_csv: str, thresholds: Sequence[float], out_dir: str,
              model: str = "gemini-2.5-flash", temperature: float = 0.0,
              thinking_budget: int = 0, seed: int = 1234, judge: str = "exact",
              use_async: bool = False, concurrency: int = 8, show_progress: bool = False,
-             rpm_limit: Optional[int] = None, max_retries: int = 6) -> Dict[str, Any]:
+             rpm_limit: int | None = None, max_retries: int = 6) -> dict[str, Any]:
     if use_async:
         return asyncio.run(evaluate_async(data_csv, thresholds, out_dir, model, temperature, thinking_budget, seed,
                                           judge, concurrency, show_progress, rpm_limit, max_retries))
-    else:
-        return evaluate_sync(data_csv, thresholds, out_dir, model, temperature, thinking_budget, seed,
-                             judge, show_progress, rpm_limit, max_retries)
+    return evaluate_sync(data_csv, thresholds, out_dir, model, temperature, thinking_budget, seed,
+                         judge, show_progress, rpm_limit, max_retries)

@@ -1,7 +1,11 @@
-import argparse, json, os
+import argparse
+import json
+import os
 from tempfile import NamedTemporaryFile
+
+from .adapters.mmlu import SUBJECTS_ALL
+from .adapters.mmlu import export_temp_csv as mmlu_export
 from .eval import evaluate
-from .adapters.mmlu import export_temp_csv as mmlu_export, SUBJECTS_ALL
 
 def add_common_args(ap: argparse.ArgumentParser):
     ap.add_argument("--thresholds", nargs="+", type=float, required=True, help="Confidence thresholds, e.g., 0.5 0.75 0.9")

@@ -1,6 +1,6 @@
-from dataclasses import dataclass
-from typing import List, Dict, Any
 from collections import defaultdict
+from dataclasses import dataclass
+from typing import Any
 
 @dataclass
 class Record:
@@ -20,10 +20,10 @@ def score_item(answered: bool, correct: bool, t: float) -> float:
         return 1.0 if correct else -float('inf')
     return 1.0 if correct else -t/(1.0 - t)
 
-def aggregate(records: List[Record]) -> Dict[float, Dict[str, Any]]:
-    by_t: Dict[float, List[Record]] = defaultdict(list)
+def aggregate(records: list[Record]) -> dict[float, dict[str, Any]]:
+    by_t: dict[float, list[Record]] = defaultdict(list)
     for r in records: by_t[r.t].append(r)
-    out: Dict[float, Dict[str, Any]] = {}
+    out: dict[float, dict[str, Any]] = {}
     for t, recs in by_t.items():
         n = len(recs)
         answered = sum(0 if r.abstained else 1 for r in recs)
@@ -46,7 +46,7 @@ def aggregate(records: List[Record]) -> Dict[float, Dict[str, Any]]:
         }
     return out
 
-def behavior_checks(metrics: Dict[float, Dict[str, Any]]) -> Dict[str, Any]:
+def behavior_checks(metrics: dict[float, dict[str, Any]]) -> dict[str, Any]:
     ts = sorted(metrics.keys())
     covs = [metrics[t]["coverage"] for t in ts]
     monotone_violations = sum(1 for i in range(1, len(covs)) if covs[i] > covs[i-1] + 1e-6)

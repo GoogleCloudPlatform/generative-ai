@@ -1,4 +1,4 @@
-from typing import Optional
+
 from google import genai
 from google.genai import types
 
@@ -19,14 +19,14 @@ PROMPT_TMPL = (
     "Respond strictly with YES or NO."
 )
 
-def _postprocess(text: Optional[str]) -> str:
+def _postprocess(text: str | None) -> str:
     s = (text or "").strip().upper()
     if "YES" in s and "NO" not in s: return "YES"
     if "NO" in s and "YES" not in s: return "NO"
     return "YES" if s.startswith("Y") else "NO"
 
 class LLMJudge:
-    def __init__(self, model: str = LLM_JUDGE_MODEL, temperature: float = 0.0, seed: Optional[int] = 1234):
+    def __init__(self, model: str = LLM_JUDGE_MODEL, temperature: float = 0.0, seed: int | None = 1234):
         self.client = genai.Client()
         self.model = model; self.temperature = temperature; self.seed = seed
     def judge(self, question: str, gold: str, pred: str, unknown_ok: bool) -> bool:
@@ -37,7 +37,7 @@ class LLMJudge:
         return _postprocess(resp.text) == "YES"
 
 class AsyncLLMJudge:
-    def __init__(self, model: str = LLM_JUDGE_MODEL, temperature: float = 0.0, seed: Optional[int] = 1234):
+    def __init__(self, model: str = LLM_JUDGE_MODEL, temperature: float = 0.0, seed: int | None = 1234):
         self.client = genai.Client()
         self.model = model; self.temperature = temperature; self.seed = seed
     async def judge(self, question: str, gold: str, pred: str, unknown_ok: bool) -> bool:

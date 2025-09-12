@@ -1,6 +1,9 @@
-from typing import Iterable, Optional, List, Dict
-from datasets import load_dataset, concatenate_datasets
-import csv, os, random
+import csv
+import os
+import random
+from collections.abc import Iterable
+
+from datasets import concatenate_datasets, load_dataset
 
 SUBJECTS_ALL = [
     "abstract_algebra","anatomy","astronomy","business_ethics","clinical_knowledge",
@@ -21,7 +24,7 @@ SUBJECTS_ALL = [
 
 LETTERS = "ABCD"
 
-def _format_item(q: str, choices: List[str]) -> str:
+def _format_item(q: str, choices: list[str]) -> str:
     options = "\n".join(f"{LETTERS[i]}. {c}" for i, c in enumerate(choices[:4]))
     return f"{q}\n\nOptions:\n{options}\n\nReply with A, B, C, or D."
 
@@ -44,10 +47,9 @@ def _answer_index(answer_field) -> int:
         return LETTERS.index(s)
     return int(s)
 
-def export_temp_csv(out_csv: str, split: str = "test", subjects: Optional[Iterable[str]] = None,
-                    limit: Optional[int] = None, seed: int = 1234, idk_frac: float = 0.0) -> str:
-    """
-    Loads cais/mmlu from Hugging Face, filters subjects/split, optionally samples `limit` items,
+def export_temp_csv(out_csv: str, split: str = "test", subjects: Iterable[str] | None = None,
+                    limit: int | None = None, seed: int = 1234, idk_frac: float = 0.0) -> str:
+    """Loads cais/mmlu from Hugging Face, filters subjects/split, optionally samples `limit` items,
     optionally converts a fraction into IDK-only, and writes a CSV for the evaluator.
     """
     wanted_subjects = list(subjects) if subjects else SUBJECTS_ALL
@@ -93,7 +95,7 @@ def export_temp_csv(out_csv: str, split: str = "test", subjects: Optional[Iterab
     k = int(round(max(0.0, min(1.0, idk_frac)) * n))
     idk_idxs = set(rnd.sample(range(n), k)) if k > 0 else set()
 
-    rows: List[Dict[str, str]] = []
+    rows: list[dict[str, str]] = []
     for i, ex in enumerate(table):
         q = ex["question"]
         choices = list(ex["choices"])
