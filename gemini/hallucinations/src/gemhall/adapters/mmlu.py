@@ -33,8 +33,8 @@ def _gold_letter(answer_field) -> str:
         return s
     try:
         return LETTERS[int(s)]
-    except Exception:
-        return "A"
+    except (ValueError, IndexError):
+        raise ValueError(f"Invalid answer format: {answer_field}")
 
 def _answer_index(answer_field) -> int:
     if isinstance(answer_field, int):
