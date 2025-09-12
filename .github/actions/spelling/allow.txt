@@ -915,6 +915,7 @@ noxfile
 NOZORDER
 NPCs
 NPO
+nprint
 npx
 NREL
 nrows
@@ -1176,6 +1177,7 @@ Sestero
 setlocal
 sft
 Sha'carri
+Shaoxiong
 sharegpt
 Sharmila
 Shazeer
@@ -1388,6 +1390,7 @@ VAPO
 Vaswani
 Vayots
 VBG
+VCPU
 vectoral
 vectordb
 veo
