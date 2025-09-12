@@ -19,6 +19,7 @@
 import os
 import subprocess
 
+import nbformat
 import nox
 
 DEFAULT_PYTHON_VERSION = "3.11"
@@ -27,6 +28,42 @@ nox.options.sessions = [
     "format",
 ]
 nox.options.reuse_existing_virtualenvs = True
+
+
+def add_skip_to_param_lines(session: nox.Session, notebook_paths: list[str]) -> None:
+    """Parses notebooks and adds '# fmt: skip' to lines containing '@param'.
+
+    This prevents ruff/black from formatting Google Colab form fields.
+    The function modifies files in-place.
+    """
+    session.log("Checking notebooks for '@param' lines to skip formatting...")
+    for path in notebook_paths:
+        try:
+            # Read the notebook using nbformat
+            with open(path, encoding="utf-8") as f:
+                notebook = nbformat.read(f, as_version=4)
+
+            modified = False
+            for cell in notebook.cells:
+                if cell.cell_type == "code":
+                    source_lines = cell.source.split("\n")
+                    new_source_lines = []
+                    for line in source_lines:
+                        if "@param" in line and "# fmt: skip" not in line:
+                            new_source_lines.append(line.rstrip() + "  # fmt: skip")
+                            modified = True
+                        else:
+                            new_source_lines.append(line)
+                    cell.source = "\n".join(new_source_lines)
+
+            # If we modified the notebook, write the changes back to the file
+            if modified:
+                session.log(f"  -> Added '# fmt: skip' to lines in {path}")
+                with open(path, "w", encoding="utf-8") as f:
+                    nbformat.write(notebook, f)
+
+        except Exception as e:
+            session.warn(f"Could not process notebook {path}. Error: {e}")
 
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
@@ -149,6 +186,8 @@ def format(session) -> None:
             "nbqa",
             "nbformat",
         )
+
+        add_skip_to_param_lines(session, lint_paths_nb)
 
         session.run("python3", ".github/workflows/update_notebook_links.py", ".")
 
