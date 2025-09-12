@@ -15,7 +15,7 @@ class _AsyncRateLimiter:
         self._q = deque()
         self._lock = asyncio.Lock()
 
-    async def acquire(self):
+    async def acquire(self) -> None:
         if not self.rpm:
             return
         while True:
@@ -36,7 +36,7 @@ class _RateLimiter:
         self._win = 60.0
         self._q = deque()
 
-    def acquire(self):
+    def acquire(self) -> None:
         if not self.rpm:
             return
         while True:
@@ -112,6 +112,7 @@ class GeminiRunner:
                     backoff *= 2
                     continue
                 raise
+        return None
 
 
 class AsyncGeminiRunner:
@@ -176,3 +177,4 @@ class AsyncGeminiRunner:
                     backoff *= 2
                     continue
                 raise
+        return None

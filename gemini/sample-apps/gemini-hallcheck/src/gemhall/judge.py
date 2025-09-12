@@ -7,8 +7,7 @@ def normalize(s: str | None) -> str:
         return ""
     s = str(s).strip().lower()
     s = re.sub(r"\s+", " ", s)
-    s = re.sub(r"[\s\.,;:!\?\-_/\\]+$", "", s)
-    return s
+    return re.sub(r"[\s\.,;:!\?\-_/\\]+$", "", s)
 
 
 def numbers_equal(a: str, b: str) -> bool:

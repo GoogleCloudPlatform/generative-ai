@@ -1,14 +1,15 @@
 import argparse
+import contextlib
 import json
 import os
 from tempfile import NamedTemporaryFile
 
-from .adapters.mmlu import SUBJECTS_ALL
-from .adapters.mmlu import export_temp_csv as mmlu_export
-from .eval import evaluate
+from gemhall.adapters.mmlu import SUBJECTS_ALL
+from gemhall.adapters.mmlu import export_temp_csv as mmlu_export
+from gemhall.eval import evaluate
 
 
-def add_common_args(ap: argparse.ArgumentParser):
+def add_common_args(ap: argparse.ArgumentParser) -> None:
     ap.add_argument(
         "--thresholds",
         nargs="+",
@@ -67,7 +68,7 @@ def add_common_args(ap: argparse.ArgumentParser):
     )
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser(
         prog="gemhall", description="Gemini confidence-targeted hallucination evaluator"
     )
@@ -132,10 +133,8 @@ def main():
             max_retries=args.max_retries,
         )
         print(json.dumps(res, indent=2))
-        try:
+        with contextlib.suppress(Exception):
             os.unlink(csv_path)
-        except Exception:
-            pass
         return
 
     if args.cmd == "run":

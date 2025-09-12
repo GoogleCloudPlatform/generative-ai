@@ -151,7 +151,7 @@ def export_temp_csv(
     # Decide which rows become IDK-only
     rnd = random.Random(seed)
     n = len(table)
-    k = int(round(max(0.0, min(1.0, idk_frac)) * n))
+    k = round(max(0.0, min(1.0, idk_frac)) * n)
     idk_idxs = set(rnd.sample(range(n), k)) if k > 0 else set()
 
     rows: list[dict[str, str]] = []

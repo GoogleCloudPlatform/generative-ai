@@ -7,11 +7,11 @@ from typing import Any
 
 from tqdm.auto import tqdm
 
-from .judge import judge_validity as judge_validity_exact
-from .judge_llm import AsyncLLMJudge, LLMJudge
-from .metrics import Record, aggregate, behavior_checks, score_item
-from .prompts import build_conf_prompt, is_idk
-from .runner import AsyncGeminiRunner, GeminiRunner
+from gemhall.judge import judge_validity as judge_validity_exact
+from gemhall.judge_llm import AsyncLLMJudge, LLMJudge
+from gemhall.metrics import Record, aggregate, behavior_checks, score_item
+from gemhall.prompts import build_conf_prompt, is_idk
+from gemhall.runner import AsyncGeminiRunner, GeminiRunner
 
 
 def load_data_csv(path: str) -> list[dict[str, Any]]:
