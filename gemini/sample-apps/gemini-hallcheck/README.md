@@ -35,7 +35,7 @@ export GOOGLE_API_KEY=YOUR_KEY  # or GEMINI_API_KEY
 export GOOGLE_GENAI_USE_VERTEXAI=true
 export GOOGLE_CLOUD_PROJECT=your-gcp-project
 export GOOGLE_CLOUD_LOCATION=us-central1   # or europe-west1, etc.
-# Do NOT set GOOGLE_API_KEY when using Vertex mode.
+# Do NOT set GOOGLE_API_KEY when using Vertex AI mode.
 ```
 
 ---
@@ -159,4 +159,4 @@ We first try the unified `"all"` config and fall back to stitching per-subject c
 - **MMLU config error**: we now request `"all"` and fall back per-subject; ensure `datasets>=2.18.0`.
 - **Curly-brace crash in prompts**: fixed by using f-strings (brace-safe).
 - **429 quota**: use `--rpm-limit`, and/or lower `--concurrency`.
-- **Vertex AI vs API key**: set `GOOGLE_GENAI_USE_VERTEXAI=true` (+ project/location) to use Vertex AI; don’t set an API key at the same time.
+- **Vertex AI vs API key**: set `GOOGLE_GENAI_USE_VERTEXAI=true` (+ project/location) to use Vertex AI; don't set an API key at the same time.
