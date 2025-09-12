@@ -17,7 +17,7 @@ class Record:
 def score_item(answered: bool, correct: bool, t: float) -> float:
     if not answered: return 0.0
     if t >= 1.0:
-        return 1.0 if correct else -float('inf')
+        return 1.0 if correct else (-1.0) * float('inf')
     return 1.0 if correct else -t/(1.0 - t)
 
 def aggregate(records: list[Record]) -> dict[float, dict[str, Any]]:
