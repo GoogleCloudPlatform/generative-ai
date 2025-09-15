@@ -61,6 +61,5 @@ def handle_extraction():
         logging.info(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An internal error occurred."}), 500
 
-
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
