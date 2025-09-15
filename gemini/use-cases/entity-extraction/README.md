@@ -3,14 +3,14 @@
 ## About
 
 This project provides a flexible solution for extracting structured information from
-documents using Google's Gemini family of models via the Vertex AI API. It exposes this
+documents using Gemini family of models via the Vertex AI API. It exposes this
 functionality through a simple Flask-based web server running on Cloud Run.
 
 ### When to use this solution
 
 The use of Gemini API for entity extraction is especially useful when the structure of
 the document varies from one document type to another or when it is unknown. For more
-structured documents like comple forms, we recommend taking a look into Document AI,
+structured documents like complex forms, we recommend taking a look into Document AI,
 that provides powerful mechanisms for entity extraction and layout parsing.
 
 ## Overview
