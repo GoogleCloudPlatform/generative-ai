@@ -167,4 +167,4 @@ We first try the unified `"all"` config and fall back to stitching per-subject c
 
 This project is based on the following paper.
 
-[arXiv:2509.04664 [cs.CL]](https://doi.org/10.48550/arXiv.2509.04664)
+[arXiv:2509.04664](https://arxiv.org/abs/2509.04664)
