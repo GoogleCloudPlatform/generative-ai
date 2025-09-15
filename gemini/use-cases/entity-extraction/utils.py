@@ -15,13 +15,14 @@
 """Utilities for entity extraction."""
 
 import json
+import logging
 
 from google.cloud import storage
 
 
 def load_config_from_gcs(bucket_name: str, file_name: str) -> dict:
     """Downloads a file from GCS and parses it as JSON."""
-    print(f"Loading config from GCS: gs://{bucket_name}/{file_name}")
+    logging.info(f"Loading config from GCS: gs://{bucket_name}/{file_name}")
     try:
         client = storage.Client()
         bucket = client.bucket(bucket_name)
@@ -29,17 +30,17 @@ def load_config_from_gcs(bucket_name: str, file_name: str) -> dict:
         config_data = blob.download_as_string()
         return json.loads(config_data)
     except Exception as e:
-        print(f"ERROR: Failed to load GCS config: {e}")
+        logging.info(f"ERROR: Failed to load GCS config: {e}")
         raise
 
 def load_config_from_local(file_path: str) -> dict:
     """Loads a config file from the local filesystem."""
-    print(f"Loading config from local file: {file_path}")
+    logging.info(f"Loading config from local file: {file_path}")
     try:
         with open(file_path, "r") as f:
             return json.load(f)
     except Exception as e:
-        print(f"ERROR: Failed to load local config {file_path}: {e}")
+        logging.info(f"ERROR: Failed to load local config {file_path}: {e}")
         raise
 
 def load_app_config(config_path: str) -> dict:
@@ -52,7 +53,7 @@ def load_app_config(config_path: str) -> dict:
             file_path = path_parts[1]
             return load_config_from_gcs(bucket_name, file_path)
         except Exception as e:
-            print(f"ERROR: Could not parse GCS path '{config_path}': {e}")
+            logging.info(f"ERROR: Could not parse GCS path '{config_path}': {e}")
             raise
     else:
         # Treat it as a local file path

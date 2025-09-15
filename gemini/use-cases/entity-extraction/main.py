@@ -16,6 +16,7 @@
 
 import os
 import json
+import logging
 
 from flask import Flask, request, jsonify
 
@@ -28,10 +29,10 @@ app = Flask(__name__)
 def handle_extraction():
     """HTTP endpoint to handle entity extraction requests."""
     data = request.get_json()
-    print(f"received data request: {data}")
+    logging.info(f"Received data request: {data}")
 
     if not data or "extract_config_id" not in data or "document_uri" not in data:
-        print("Invalid request data")
+        logging.warning("Invalid request data received. Missing required fields.")
         return (
             jsonify(
                 {"error": "Request must include 'extract_config_id' and 'document_uri'"}
@@ -49,10 +50,19 @@ def handle_extraction():
         print(f"Entity extraction result: {result_text}")
         return jsonify(json.loads(result_text)), 200
 
+    except KeyError:
+        error_msg = f"Configuration with data '{data}' not found."
+        logging.info(error_msg)
+        return jsonify({"error": error_msg}), 404
+    except json.JSONDecodeError:
+        error_msg = f"Failed to decode JSON from model response: {result_text}"
+        logging.info(error_msg)
+        return jsonify(
+            {"error": "Failed to parse response from the extraction model."}
+        ), 500
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logging.info(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An internal error occurred."}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

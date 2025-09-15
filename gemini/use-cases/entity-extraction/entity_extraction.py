@@ -36,6 +36,8 @@ PROMPT_TEMPLATE = """\
 
 dotenv.load_dotenv()
 project_id = os.environ.get("GEMINI_PROJECT_ID")
+if not project_id:
+    raise ValueError("GEMINI_PROJECT_ID environment variable must be set.")
 location = os.environ.get("GEMINI_LOCATION", "global")
 config_path = os.environ.get("CONFIG_PATH", "config.json")
 

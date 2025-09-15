@@ -1,5 +1,5 @@
 dotenv
 flask
 google-cloud-storage
-google-genai==1.31.0
+google-genai
 gunicorn

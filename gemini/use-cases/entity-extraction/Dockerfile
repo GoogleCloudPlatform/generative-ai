@@ -23,4 +23,4 @@ ENV PORT 8080
 EXPOSE $PORT
 
 # Define the command to run the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "main:app"]

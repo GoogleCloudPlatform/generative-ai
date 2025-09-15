@@ -1,4 +1,4 @@
-#!bash
+#!/bin/bash
 
 # Copyright 2025 Google LLC
 #
