@@ -160,3 +160,11 @@ We first try the unified `"all"` config and fall back to stitching per-subject c
 - **Curly-brace crash in prompts**: fixed by using f-strings (brace-safe).
 - **429 quota**: use `--rpm-limit`, and/or lower `--concurrency`.
 - **Vertex AI vs API key**: set `GOOGLE_GENAI_USE_VERTEXAI=true` (+ project/location) to use Vertex AI; don't set an API key at the same time.
+
+---
+
+## Citation
+
+This project is based on the following paper.
+
+[arXiv:2509.04664 [cs.CL]](https://doi.org/10.48550/arXiv.2509.04664)
