@@ -19,11 +19,9 @@ import json
 import entity_extraction
 
 
-def test_extract_from_document():
+def test_extract_from_document() -> None:
     extract_config_id = "exhibit_2021q1"
-    document_uri = (
-        "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs/2021Q1_alphabet_earnings_release.pdf"
-    )
+    document_uri = "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs/2021Q1_alphabet_earnings_release.pdf"
     expected_response = """\
         {
             "google_ceo": "Sundar Pichai",
@@ -31,13 +29,11 @@ def test_extract_from_document():
         }
     """
 
-    response = (
-        entity_extraction.extract_from_document(
-            extract_config_id=extract_config_id,
-            document_uri=document_uri
-        )
+    response = entity_extraction.extract_from_document(
+        extract_config_id=extract_config_id, document_uri=document_uri
     )
     assert json.loads(response) == json.loads(expected_response)
+
 
 if __name__ == "__main__":
     test_extract_from_document()

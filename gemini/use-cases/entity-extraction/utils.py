@@ -33,15 +33,17 @@ def load_config_from_gcs(bucket_name: str, file_name: str) -> dict:
         logging.info(f"ERROR: Failed to load GCS config: {e}")
         raise
 
+
 def load_config_from_local(file_path: str) -> dict:
     """Loads a config file from the local filesystem."""
     logging.info(f"Loading config from local file: {file_path}")
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             return json.load(f)
     except Exception as e:
         logging.info(f"ERROR: Failed to load local config {file_path}: {e}")
         raise
+
 
 def load_app_config(config_path: str) -> dict:
     """Loads entity extraction configurations from GCS or local based on path prefix."""

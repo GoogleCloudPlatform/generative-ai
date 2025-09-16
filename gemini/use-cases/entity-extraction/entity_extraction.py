@@ -18,11 +18,9 @@ import json
 import os
 
 import dotenv
+import utils
 from google import genai
 from google.genai import types
-
-import utils
-
 
 PROMPT_TEMPLATE = """\
     Based solely on this {document_name}, extract the following fields.
@@ -44,6 +42,7 @@ config_path = os.environ.get("CONFIG_PATH", "config.json")
 # Initialize Gemini client.
 client = genai.Client(vertexai=True, project=project_id, location=location)
 CONFIGS = utils.load_app_config(config_path)
+
 
 def extract_from_document(extract_config_id: str, document_uri: str) -> str:
     extract_config = CONFIGS[extract_config_id]

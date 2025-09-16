@@ -14,16 +14,15 @@
 
 """Main file for web server."""
 
-import os
 import json
 import logging
-
-from flask import Flask, request, jsonify
+import os
 
 import entity_extraction
-
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+
 
 @app.route("/extract", methods=["POST"])
 def handle_extraction():
@@ -37,15 +36,13 @@ def handle_extraction():
             jsonify(
                 {"error": "Request must include 'extract_config_id' and 'document_uri'"}
             ),
-            400
+            400,
         )
 
     try:
-        result_text = (
-            entity_extraction.extract_from_document(
-                extract_config_id=data["extract_config_id"],
-                document_uri=data["document_uri"],
-            )
+        result_text = entity_extraction.extract_from_document(
+            extract_config_id=data["extract_config_id"],
+            document_uri=data["document_uri"],
         )
         print(f"Entity extraction result: {result_text}")
         return jsonify(json.loads(result_text)), 200
@@ -63,6 +60,7 @@ def handle_extraction():
     except Exception as e:
         logging.info(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An internal error occurred."}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
