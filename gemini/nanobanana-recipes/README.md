@@ -59,7 +59,7 @@ This project uses `uv` for Python package and environment management.
 | ![Input](assets/4_image_editing/image_to_edit.png) | ![Output](outputs/4_edited_image.png) |
 
 ### 5. Style Transfer
-**Prompt:** `"Turn this into a Vincent Vahn Gogh style painting."`
+**Prompt:** `"Turn this into a Vincent Van Gogh style painting."`
 **Run:** `uv run python 5_style_transfer.py`
 | Content Input | Output |
 | :---: | :----: |

@@ -30,11 +30,11 @@ def main() -> None:
     # 2. Craft the scene description using a text model.
     user_ideas = [
         "The character is US president signing Artificial Intelligence Act act and showing it to the camera",
-        "The character is a Firefighter posing next to a firetruck in a city street.",
+        "The character is a Firefighter posing next to a fire truck in a city street.",
         "The character is a buddhist monk meditating on a mountain top during sunrise",
         "The character is a plumber posing next to a van with plumbing tools (his brand is Nemri Plumbing)",
         "The character is a pizza delivery guy (from Nemri Pizza) holding a pizza box and standing next to a red scooter in front of a house",
-        "The character is a Docteur posing in a hospital corridor with a stethoscope around his neck and a white coat. He is smiling and looking confident.",
+        "The character is a Doctor posing in a hospital corridor with a stethoscope around his neck and a white coat. He is smiling and looking confident.",
         "The character is a Police officer posing next to a police car in a city street. He is wearing a blue uniform with a badge and a hat. He is holding a walkie-talkie in one hand and giving a thumbs up with the other hand.",
         "The character is a school teacher standing in front of a classroom with a blackboard behind him. He is wearing glasses and a tie. He is holding a book in one hand and pointing to the blackboard with the other hand.",
         "The character is a soldier in a battlefield, wearing camouflage uniform and holding a rifle. The background shows a war zone with smoke and debris.",

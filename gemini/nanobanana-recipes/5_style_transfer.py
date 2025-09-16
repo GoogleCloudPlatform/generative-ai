@@ -26,7 +26,7 @@ def main() -> None:
 
     # 2. Generate the final image using the content image and the style description
     print("Generating the stylized image...")
-    final_prompt = "Turn this into a Vincent Vahn Gogh style painting."
+    final_prompt = "Turn this into a Vincent Van Gogh style painting."
 
     contents = [
         types.Content(

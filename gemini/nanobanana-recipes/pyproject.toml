@@ -1,7 +1,7 @@
 [project]
 name = "nano-banana"
 version = "0.1.0"
-description = "Add your description here"
+description = "Nano Banana recipes"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,6 +9,3 @@ dependencies = [
     "pillow>=11.3.0",
     "python-dotenv>=1.1.1",
 ]
-
-[dependency-groups]
-dev = []
