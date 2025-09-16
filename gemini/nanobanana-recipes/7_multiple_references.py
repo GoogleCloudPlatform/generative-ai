@@ -12,34 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.genai import types
-from utils.client import get_gemini_client
-from utils.image_utils import save_image_to_file, load_image_from_path, create_blank_canvas
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
 import os
 
-def main():
-    """
-    Creates a new image by combining elements from multiple reference images.
-    """
+from google.genai import types
+from utils.image_utils import (
+    create_blank_canvas,
+    load_image_from_path,
+    save_image_to_file,
+)
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
+
+def main() -> None:
+    """Creates a new image by combining elements from multiple reference images."""
     # Create a 16:9 canvas
     canvas = create_blank_canvas(aspect_ratio="16:9")
 
     # Load the reference images
     ref_paths = os.listdir("assets/7_multiple_references")
-    ref_images = [load_image_from_path(os.path.join("assets/7_multiple_references", path)) for path in ref_paths]
-    
+    ref_images = [
+        load_image_from_path(os.path.join("assets/7_multiple_references", path))
+        for path in ref_paths
+    ]
+
     prompt = "List all elements of the provided images, then create a new image that combines those elements into a consistent bedroom scene. Use empty bedroom as base preserving its camera angle. Render the final result on the provided blank canvas to ensure a 16:9 aspect ratio."
-    
+
     contents = [
         types.Content(
-            role="user",
-            parts=[
-                *ref_images,
-                canvas,
-                types.Part.from_text(text=prompt)
-            ]
+            role="user", parts=[*ref_images, canvas, types.Part.from_text(text=prompt)]
         )
     ]
 
@@ -50,6 +50,7 @@ def main():
         save_image_to_file(image_data, "outputs", "7_multiple_references.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

@@ -13,28 +13,21 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.client import get_gemini_client
-from utils.image_utils import save_image_to_file, load_image_from_path
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.image_utils import load_image_from_path, save_image_to_file
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Places a product image into a new, realistic context.
-    """
 
+def main() -> None:
+    """Places a product image into a new, realistic context."""
     # Load the product image
     product_path = "assets/9_product_recontext/product.png"
     product_image = load_image_from_path(product_path)
 
     prompt = "Take the product in this image and place it in a professionally styled kitchen setting, on a marble countertop next to a window with soft, natural light. The final image should look like a high-end advertisement."
-    
+
     contents = [
         types.Content(
-            role="user",
-            parts=[
-                product_image,
-                types.Part.from_text(text=prompt)
-            ]
+            role="user", parts=[product_image, types.Part.from_text(text=prompt)]
         )
     ]
 
@@ -45,6 +38,7 @@ def main():
         save_image_to_file(image_data, "outputs", "9_product_recontext.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

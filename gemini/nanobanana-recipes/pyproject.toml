@@ -5,8 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "black>=25.1.0",
     "google-genai>=1.35.0",
     "pillow>=11.3.0",
     "python-dotenv>=1.1.1",
 ]
+
+[dependency-groups]
+dev = []

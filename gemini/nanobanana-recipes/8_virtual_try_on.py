@@ -13,32 +13,25 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.client import get_gemini_client
-from utils.image_utils import save_image_to_file, load_image_from_path
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.image_utils import load_image_from_path, save_image_to_file
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Performs a virtual try-on, placing a garment onto a model.
-    """
 
+def main() -> None:
+    """Performs a virtual try-on, placing a garment onto a model."""
     # Load the model and garment images
     model_path = "assets/8_virtual_try_on/model.png"
     garment_path = "assets/8_virtual_try_on/garment.png"
-    
+
     model_image = load_image_from_path(model_path)
     garment_image = load_image_from_path(garment_path)
 
     prompt = "Take the garment from the second image and realistically place it on the person in the first image. Adjust the fit, lighting, and shadows to make it look natural."
-    
+
     contents = [
         types.Content(
             role="user",
-            parts=[
-                model_image,
-                garment_image,
-                types.Part.from_text(text=prompt)
-            ]
+            parts=[model_image, garment_image, types.Part.from_text(text=prompt)],
         )
     ]
 
@@ -49,6 +42,7 @@ def main():
         save_image_to_file(image_data, "outputs", "8_virtual_try_on.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

@@ -13,15 +13,12 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.client import get_gemini_client
 from utils.image_utils import save_image_to_file
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Generates an image that includes legible text.
-    """
 
+def main() -> None:
+    """Generates an image that includes legible text."""
     prompt = """
     Create a Pizzeria menu with the following content:
     The Artisan Crust Pizzeria
@@ -42,13 +39,8 @@ def main():
     Still or Sparkling.
     Order Online or Call: 555-123-4567
     """
-    
-    contents = [
-        types.Content(
-            role="user",
-            parts=[types.Part.from_text(text=prompt)]
-        )
-    ]
+
+    contents = [types.Content(role="user", parts=[types.Part.from_text(text=prompt)])]
 
     response = generate_image_from_prompt(contents)
     image_data = extract_image_from_response(response)
@@ -57,6 +49,7 @@ def main():
         save_image_to_file(image_data, "outputs", "10_images_with_text.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

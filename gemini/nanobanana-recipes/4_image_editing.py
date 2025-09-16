@@ -13,28 +13,21 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.client import get_gemini_client
-from utils.image_utils import save_image_to_file, load_image_from_path
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.image_utils import load_image_from_path, save_image_to_file
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Edits an existing image based on a text prompt.
-    """
 
+def main() -> None:
+    """Edits an existing image based on a text prompt."""
     # Load the image to be edited
     image_to_edit_path = "assets/4_image_editing/image_to_edit.png"
     source_image = load_image_from_path(image_to_edit_path)
 
     prompt = "Please add a red bow tie and a black top hat to the person in the image. Change the background to an elegant ballroom setting with chandeliers and ornate decorations. Ensure the additions look natural and blend seamlessly with the original image."
-    
+
     contents = [
         types.Content(
-            role="user",
-            parts=[
-                source_image,
-                types.Part.from_text(text=prompt)
-            ]
+            role="user", parts=[source_image, types.Part.from_text(text=prompt)]
         )
     ]
 
@@ -45,6 +38,7 @@ def main():
         save_image_to_file(image_data, "outputs", "4_edited_image.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

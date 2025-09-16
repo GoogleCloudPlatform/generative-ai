@@ -13,28 +13,21 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.client import get_gemini_client
-from utils.image_utils import save_image_to_file, load_image_from_path
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.image_utils import load_image_from_path, save_image_to_file
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Restores an old or damaged photograph.
-    """
 
+def main() -> None:
+    """Restores an old or damaged photograph."""
     # Load the damaged photo
     damaged_photo_path = "assets/6_photo_restoration/damaged_photo.png"
     damaged_photo = load_image_from_path(damaged_photo_path)
 
     prompt = "Restore and recolor this old photograph as if it was taken by a modern digital camera. Your output shall solely be extracted photograph. ignore surroundings and fill all canvas by the photograph"
-    
+
     contents = [
         types.Content(
-            role="user",
-            parts=[
-                damaged_photo,
-                types.Part.from_text(text=prompt)
-            ]
+            role="user", parts=[damaged_photo, types.Part.from_text(text=prompt)]
         )
     ]
 
@@ -45,6 +38,7 @@ def main():
         save_image_to_file(image_data, "outputs", "6_restored_photo.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

@@ -13,21 +13,24 @@
 # limitations under the License.
 
 import os
-from google import genai
+
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
+
 def get_gemini_client():
-    """
-    Initializes and returns the GenAI client, loading project and location
+    """Initializes and returns the GenAI client, loading project and location
     from a .env file or environment variables.
     """
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
     location = os.environ.get("GOOGLE_CLOUD_LOCATION", "global")
 
     if not project_id:
-        raise ValueError("The GOOGLE_CLOUD_PROJECT environment variable must be set. Please create a .env file from the .env.example.")
+        raise ValueError(
+            "The GOOGLE_CLOUD_PROJECT environment variable must be set. Please create a .env file from the .env.example."
+        )
 
     return genai.Client(
         vertexai=True,

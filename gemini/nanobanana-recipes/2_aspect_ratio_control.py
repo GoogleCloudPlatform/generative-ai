@@ -13,27 +13,19 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.image_utils import save_image_to_file, create_blank_canvas
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.image_utils import create_blank_canvas, save_image_to_file
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Generates an image with a specific aspect ratio by providing a canvas.
-    """
 
+def main() -> None:
+    """Generates an image with a specific aspect ratio by providing a canvas."""
     # Create a 16:9 canvas
     canvas = create_blank_canvas(aspect_ratio="16:9")
 
     prompt = "A cinematic, wide-angle shot of a lone astronaut standing on a desolate alien planet, looking up at a swirling, colorful nebula. The planet's surface is rocky and red, and two moons are visible in the sky. Render this scene on the provided canvas to match its 16:9 aspect ratio."
-    
+
     contents = [
-        types.Content(
-            role="user",
-            parts=[
-                canvas,
-                types.Part.from_text(text=prompt)
-            ]
-        )
+        types.Content(role="user", parts=[canvas, types.Part.from_text(text=prompt)])
     ]
 
     response = generate_image_from_prompt(contents)
@@ -43,6 +35,7 @@ def main():
         save_image_to_file(image_data, "outputs", "2_aspect_ratio.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

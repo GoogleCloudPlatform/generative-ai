@@ -13,24 +13,20 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.client import get_gemini_client
-from utils.image_utils import save_image_to_file, load_image_from_path
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.image_utils import load_image_from_path, save_image_to_file
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Generates an image from a specific camera perspective.
-    """
 
+def main() -> None:
+    """Generates an image from a specific camera perspective."""
     image_file = "assets/12_shifting_camera_perspective/original.png"
     image_part = load_image_from_path(image_file)
 
     prompt = "aerial perspective of a camera looking down at the stressed candidate"
-    
+
     contents = [
         types.Content(
-            role="user",
-            parts=[image_part, types.Part.from_text(text=prompt)]
+            role="user", parts=[image_part, types.Part.from_text(text=prompt)]
         )
     ]
 
@@ -41,6 +37,7 @@ def main():
         save_image_to_file(image_data, "outputs", "12_camera_perspective.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import os
+
 from PIL import Image
 from google.genai import types
+
 
 def load_image_from_path(path: str) -> types.Part:
     """Loads an image from a file path and returns it as a types.Part."""
@@ -22,7 +24,8 @@ def load_image_from_path(path: str) -> types.Part:
     mime_type = "image/png" if path.endswith(".png") else "image/jpeg"
     return types.Part.from_bytes(data=image_data, mime_type=mime_type)
 
-def save_image_to_file(image_data: bytes, folder: str, filename: str):
+
+def save_image_to_file(image_data: bytes, folder: str, filename: str) -> None:
     """Saves raw image data to a file."""
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -30,14 +33,14 @@ def save_image_to_file(image_data: bytes, folder: str, filename: str):
         f.write(image_data)
     print(f"Image saved to {os.path.join(folder, filename)}")
 
+
 def create_blank_canvas(
     aspect_ratio: str = "1:1",
-    width: int = None,
-    height: int = None,
+    width: int | None = None,
+    height: int | None = None,
     color: str = "white",
 ) -> types.Part:
-    """
-    Creates a blank image canvas based on an aspect ratio string or custom dimensions.
+    """Creates a blank image canvas based on an aspect ratio string or custom dimensions.
 
     Args:
         aspect_ratio (str): The desired aspect ratio. Supported values are "1:1",
@@ -64,12 +67,16 @@ def create_blank_canvas(
 
     if aspect_ratio == "custom":
         if not width or not height:
-            raise ValueError("Width and height must be provided for custom aspect ratio.")
+            raise ValueError(
+                "Width and height must be provided for custom aspect ratio."
+            )
         final_width, final_height = width, height
     elif aspect_ratio in aspect_ratios:
         final_width, final_height = aspect_ratios[aspect_ratio]
     else:
-        raise ValueError(f"Unsupported aspect ratio: {aspect_ratio}. Supported values are {list(aspect_ratios.keys())} and 'custom'.")
+        raise ValueError(
+            f"Unsupported aspect ratio: {aspect_ratio}. Supported values are {list(aspect_ratios.keys())} and 'custom'."
+        )
 
     image = Image.new("RGB", (final_width, final_height), color)
     buffer = io.BytesIO()

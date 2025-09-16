@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.genai import types, client
+from google.genai import client, types
+
 from .client import get_gemini_client
 
 client = get_gemini_client()
@@ -36,12 +37,12 @@ generate_content_config = types.GenerateContentConfig(
     ],
 )
 
+
 def generate_text(
     model: str,
     contents: list,
 ) -> types.GenerateContentResponse:
-    """
-    Makes a generate_content call to the model.
+    """Makes a generate_content call to the model.
 
     Args:
         model: The generative model client.
@@ -51,18 +52,16 @@ def generate_text(
     Returns:
         The response from the model.
     """
-
     return client.models.generate_content(
         model=model,
         contents=contents,
-)
+    )
 
 
 def generate_image_from_prompt(
     contents: list,
 ) -> types.GenerateContentResponse:
-    """
-    Makes a generate_content call to the model.
+    """Makes a generate_content call to the model.
 
     Args:
         model: The generative model client.
@@ -72,17 +71,15 @@ def generate_image_from_prompt(
     Returns:
         The response from the model.
     """
-
     return client.models.generate_content(
-        model=model,
-        contents=contents,
-        config=generate_content_config
+        model=model, contents=contents, config=generate_content_config
     )
 
 
-def extract_image_from_response(response: types.GenerateContentResponse) -> bytes | None:
-    """
-    Safely extracts the image data from a model's response.
+def extract_image_from_response(
+    response: types.GenerateContentResponse,
+) -> bytes | None:
+    """Safely extracts the image data from a model's response.
 
     Args:
         response: The response from the model.

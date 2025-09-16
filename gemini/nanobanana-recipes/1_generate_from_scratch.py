@@ -14,20 +14,14 @@
 
 from google.genai import types
 from utils.image_utils import save_image_to_file
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Generates an image from a text prompt and saves it.
-    """
+
+def main() -> None:
+    """Generates an image from a text prompt and saves it."""
     prompt = "A futuristic cityscape at sunset, with flying cars and towering, glowing skyscrapers."
-    
-    contents = [
-        types.Content(
-            role="user",
-            parts=[types.Part.from_text(text=prompt)]
-        )
-    ]
+
+    contents = [types.Content(role="user", parts=[types.Part.from_text(text=prompt)])]
 
     response = generate_image_from_prompt(contents)
     image_data = extract_image_from_response(response)
@@ -36,6 +30,7 @@ def main():
         save_image_to_file(image_data, "outputs", "1_from_scratch.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()

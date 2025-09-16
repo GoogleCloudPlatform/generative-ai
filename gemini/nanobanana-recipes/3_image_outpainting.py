@@ -13,14 +13,16 @@
 # limitations under the License.
 
 from google.genai import types
-from utils.image_utils import save_image_to_file, create_blank_canvas, load_image_from_path
-from utils.model_utils import generate_image_from_prompt, extract_image_from_response
+from utils.image_utils import (
+    create_blank_canvas,
+    load_image_from_path,
+    save_image_to_file,
+)
+from utils.model_utils import extract_image_from_response, generate_image_from_prompt
 
-def main():
-    """
-    Extends an existing image by placing it on a larger canvas and asking the model to fill in the rest.
-    """
 
+def main() -> None:
+    """Extends an existing image by placing it on a larger canvas and asking the model to fill in the rest."""
     # Load the source image
     source_image_path = "assets/3_image_outpainting/source_image.png"
     source_image = load_image_from_path(source_image_path)
@@ -29,7 +31,7 @@ def main():
     canvas = create_blank_canvas(aspect_ratio="16:9")
 
     prompt = "This is a creative outpainting task. Take the provided source image and seamlessly extend it to fill the entire blank canvas. The new areas should logically and stylistically continue the scene from the original image. Imagine what might exist just beyond the borders of the original photo and bring it to life."
-    
+
     contents = [
         types.Content(
             role="user",
@@ -38,8 +40,8 @@ def main():
                 source_image,
                 types.Part.from_text(text="And here is the canvas to extend it onto:"),
                 canvas,
-                types.Part.from_text(text=prompt)
-            ]
+                types.Part.from_text(text=prompt),
+            ],
         )
     ]
 
@@ -50,6 +52,7 @@ def main():
         save_image_to_file(image_data, "outputs", "3_outpainting.png")
     else:
         print("No image was generated.")
+
 
 if __name__ == "__main__":
     main()
