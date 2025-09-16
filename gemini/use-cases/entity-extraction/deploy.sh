@@ -14,6 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#
+# Builds and deploys the entity extraction service to Cloud Run.
+#
+
+# Exit immediately if a command fails, treat unset variables as an error, and cause
+# pipelines to fail if any command within them fails.
+set -euo pipefail
+
 # Load environment variables from .env file.
 if [ -f .env ]; then
   echo "Loading environment variables from .env"
