@@ -21,7 +21,7 @@ load_dotenv()
 
 
 def get_gemini_client():
-    """Initializes and returns the GenAI client, loading project and location
+    """Initializes and returns the Gen AI client, loading project and location
     from a .env file or environment variables.
     """
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")

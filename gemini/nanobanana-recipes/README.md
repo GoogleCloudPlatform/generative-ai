@@ -4,7 +4,7 @@
 
 **Author: [Chouaieb Nemri](https://github.com/cnemri)**
 
-Welcome to the Nano Banana Recipes repository! This collection provides a comprehensive set of examples and best practices for using Google's Gemini 2.5 Flash Image model (codename: Nano Banana) for a wide range of image generation and editing tasks.
+Welcome to the Nano Banana Recipes repository! This collection provides a comprehensive set of examples and best practices for using Gemini 2.5 Flash Image model (codename: Nano Banana) for a wide range of image generation and editing tasks.
 
 Each recipe is a self-contained Python script that demonstrates a specific capability of the model. The scripts are designed to be clear, easy to understand, and reusable for your own projects. Common functionalities have been abstracted into a `utils` module to keep the recipe code clean and focused.
 
