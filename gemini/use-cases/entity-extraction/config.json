@@ -1,0 +1,11 @@
+{
+  "exhibit_2021q1": {
+    "document_name": "Alphabet First Quarter 2021 Results",
+    "document_mime_type": "application/pdf",
+    "model": "gemini-2.5-flash",
+    "fields": {
+      "google_ceo": "CEO of Google",
+      "company_name": "Name of the company"
+    }
+  }
+}
