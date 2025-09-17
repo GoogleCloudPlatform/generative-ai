@@ -888,6 +888,7 @@ NDCG
 NDEBUG
 nec
 neering
+nemri
 neq
 netif
 newaxis
