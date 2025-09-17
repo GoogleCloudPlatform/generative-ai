@@ -1,4 +1,4 @@
-# Document Extraction with Gemini
+# Entity Extraction with Gemini
 
 ## About
 
@@ -10,8 +10,9 @@ functionality through a simple Flask-based web server running on Cloud Run.
 
 The use of Gemini API for entity extraction is especially useful when the structure of
 the document varies from one document type to another or when it is unknown. For more
-structured documents like complex forms, we recommend taking a look into Document AI,
-that provides powerful mechanisms for entity extraction and layout parsing.
+structured documents like complex forms, we recommend taking a look into 
+[Document AI](https://cloud.google.com/document-ai/docs/overview), which provides 
+powerful mechanisms for entity extraction and layout parsing.
 
 ## Overview
 
@@ -210,7 +211,7 @@ Future architecture:
 
 ## Authors
 
-[Ariel Jassan](https://github.com/arieljassan), [Ben Mizrahi](https://github.com/g-benmizrahi)
+[Ariel Jassan](https://github.com/arieljassan), [Ben Mizrahi](https://github.com/benmizrahi)
 
 ## Disclaimer
 
