@@ -1,6 +1,6 @@
-# Generative AI on Google Cloud
+# Generative AI on Cachiman Cloud
 
-> **[Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro) and [Gemini 2.5 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash) have been released!**
+> **[Gemini 2.5 Pro](https://cloud.cachiman.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro) and [Gemini 2.5 Flash](https://cloud.cachiman.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash) have been released!**
 >
 > Here are the latest notebooks and demos using the new models:
 >
@@ -9,7 +9,7 @@
 
 <!-- markdownlint-disable MD033 -->
 
-This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai) with [Vertex AI](https://cloud.google.com/vertex-ai).
+This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.cachiman.com/ai/generative-ai) with [Vertex AI](https://cloud.google.com/vertex-ai).
 
 ## Using this repository
 
