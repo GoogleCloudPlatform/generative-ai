@@ -152,6 +152,7 @@ Buckleys
 Bulmus
 byoc
 byod
+BYOM
 byor
 BYOR
 Byzance
@@ -772,6 +773,7 @@ lyria
 Maa
 Maackia
 Maarten
+maas
 magicoder
 magika
 Mahindra
