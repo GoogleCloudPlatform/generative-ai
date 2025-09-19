@@ -1,20 +1,21 @@
-# Sample Applications that demonstrate Gemini API in Vertex AI
+# Sample Applications
 
-The Sample Applications listed are provided as application templates that you can use. The key goal of these applications is to get you started quickly and help you understand how you can integrate the Gemini API in Vertex AI and the necessary commands to deploy these applications to Google Cloud.
+This directory contains sample applications that demonstrate how to use the Gemini API in Vertex AI.
 
-Click on the application name to see detailed documentation, sample template and instructions to deploy on Google Cloud.
+## Applications
 
-## Environment Setup
-
-We provide instructions for setting up your environment in [Cloud Shell](https://cloud.google.com/shell). Before you run any of the sample applications, ensure that you have followed the instructions in [SETUP.md](SETUP.md).
-
-## Sample Applications
-
-| Description                                                                                                                                                                                                                                                                                                                                                                                                                              | Application Name                                       | Technologies Used                                                          |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------- |
-| Develop a Gemini application using [Streamlit](https://streamlit.io/) framework and Gemini API in Vertex AI model.                                                                                                                                                                                                                                                                                                                       | [gemini-streamlit-cloudrun](gemini-streamlit-cloudrun) | Cloud Run, Streamlit, Python                                               |
-| Develop a Gemini application using [Mesop](https://mesop-dev.github.io/mesop/) framework and Gemini API in Vertex AI model. | [gemini-mesop-cloudrun](gemini-mesop-cloudrun) | Cloud Run, Mesop, Python                                               |
-| Deploy a RAG + Gemini sample application to troubleshoot your car using the owner's manual.                                                                                                                                                                                                                                                                                                                                              | [fixmycar/](fixmycar/)                                 | Chat, Grounding, RAG, Java, Streamlit                                      |
-| Try Gemini image recognition in `bash` and see Text-to-Speech read the description to you in ~any language. All from CLI!                                                                                                                                                                                                                                                                                                                | [image-bash-jam/](image-bash-jam/)                     | Text-to-Speech, Bash                                                       |
-| This demo showcases how you can combine the data and documents you already have and the skills you already know with the power of [AlloyDB AI](https://cloud.google.com/alloydb/ai?hl=en), [Vertex AI](https://cloud.google.com/vertex-ai?hl=en), [Cloud Run](https://cloud.google.com/run?hl=en), and [Cloud Functions](https://cloud.google.com/functions?hl=en) to build trustworthy Gen AI features into your existing applications. | [GenWealth](genwealth/)                                | Vertex AI, AlloyDB, Document AI, Cloud Run, Cloud Functions, Cloud Storage |
-| Non-blocking Chat app with [Quart](https://quart.palletsprojects.com/en/latest/) + Gemini Live API + Cloud Run                                                                                                                                                                                                                                                                                                                           | [gemini-quart-cloudrun](gemini-quart-cloudrun)         | Cloud Run, Quart, Python                                                   |
+- [accelerating_product_innovation/](accelerating_product_innovation/): A solution for product category and brand owners to accelerate product innovation using Generative AI.
+- [e2e-gen-ai-app-starter-pack/](e2e-gen-ai-app-starter-pack/): This project has moved to https://github.com/GoogleCloudPlatform/agent-starter-pack.
+- [finance-advisor-spanner/](finance-advisor-spanner/): A demo application that showcases how to use Spanner and Vertex AI to build a financial advisor application.
+- [fixmycar/](fixmycar/): A retrieval-augmented generation (RAG) sample application to troubleshoot your car using the owner's manual.
+- [gemini-hallcheck/](gemini-hallcheck/): A confidence-targeted, abstention-aware hallucination evaluator for Gemini.
+- [gemini-mesop-cloudrun/](gemini-mesop-cloudrun/): A sample application that demonstrates how to use the Mesop UI framework with the Gemini API on Cloud Run.
+- [gemini-quart-cloudrun/](gemini-quart-cloudrun/): A sample application that demonstrates non-blocking communication with Quart and the Gemini Live API on Cloud Run.
+- [gemini-streamlit-cloudrun/](gemini-streamlit-cloudrun/): A sample application that demonstrates how to use the Streamlit framework with the Gemini API on Cloud Run.
+- [genwealth/](genwealth/): A demo application for a fictional financial services company that showcases how to build trustworthy Gen AI features into existing applications using AlloyDB AI, Vertex AI, Cloud Run, and Cloud Functions.
+- [image-bash-jam/](image-bash-jam/): A collection of bash scripts to test Gemini from the command line, including image and audio examples.
+- [llamadeploy-on-cloud-run/](llamadeploy-on-cloud-run/): A LlamaIndex Workflow application that demonstrates how to deploy and interact with Llama workflows using the `llama-deploy` library and deploying the service on Cloud Run.
+- [llamaindex-rag/](llamaindex-rag/): An advanced Retrieval-Augmented Generation (RAG) system using LlamaIndex and Google Cloud Vertex AI for rapid prototyping and experimentation.
+- [photo-discovery/](photo-discovery/): A demo that integrates a Vertex AI Agent with a multi-platform Flutter app to identify landmarks and merchandise from photos.
+- [quickbot/](quickbot/): An innovative, out-of-the-box solution enabling users to deploy sophisticated AI Agents as full-stack cloud applications on their own Google Cloud Platform (GCP) accounts, entirely without requiring any coding expertise.
+- [swot-agent/](swot-agent/): A web application that performs automated SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) using the Gemini 2.0 Flash model and the Pydantic AI agent framework.

@@ -16,6 +16,8 @@ This repository explores various techniques and use-cases for embedding in Machi
 
 ## Notebooks
 
+- **[bigquery-import.ipynb](bigquery-import.ipynb):** Learn how to import vector embedding data from a BigQuery data source into a Vector Search index.
+- **[bigquery_ml_gemini_and_oss_text_embedding.ipynb](bigquery_ml_gemini_and_oss_text_embedding.ipynb):** Learn how to generate text embeddings using BigQuery in conjunction with both Gemini and OSS text embedding models.
 - **[vector-search-quickstart.ipynb](vector-search-quickstart.ipynb):** Offers a quickstart guide to setting up and using vector search for finding semantically similar items.
 - **[intro-textemb-vectorsearch.ipynb](intro-textemb-vectorsearch.ipynb):** Provides an introduction to text embeddings and their application in building vector search engines.
 - **[hybrid-search.ipynb](hybrid-search.ipynb):** Demonstrates building a hybrid search system leveraging both keyword-based search and semantic similarity search with embeddings.
