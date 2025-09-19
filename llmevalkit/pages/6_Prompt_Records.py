@@ -117,7 +117,6 @@ def main():
         scores_df = pd.json_normalize(prompt_df["scores"])
         scores_df.columns = [f"score.{col}" for col in scores_df.columns]
 
-        # Combine with the original dataframe
         comparison_df = pd.concat([prompt_df.reset_index(drop=True), scores_df], axis=1)
 
         # Clean up the view

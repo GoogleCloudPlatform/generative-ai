@@ -20,7 +20,7 @@ It handles the interaction with the Vertex AI SDK to manage prompt versions
 and uses Cloud Storage to persist prompt metadata.
 
 Key functionalities include:
-- Initializing a connection to GCP services (Vertex AI, Cloud Storage).
+- Initializing a connection to Google Cloud Platform services (Vertex AI, Cloud Storage).
 - Caching and refreshing a list of existing prompts.
 - Saving new or updated prompts, including their metadata, to both the
   Vertex AI prompt registry and a Cloud Storage bucket.
@@ -268,4 +268,3 @@ def escape_special_characters(text: str) -> str:
     text = text.replace('\t', '\\t')
     text = text.replace('"', '\\"')
     return text
-
