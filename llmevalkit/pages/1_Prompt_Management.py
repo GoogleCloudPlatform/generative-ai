@@ -374,8 +374,8 @@ def render_create_tab():
     st.text_input(
         "**Model Name**",
         key="new_model_name",
-        placeholder="gemini-1.5-pro-001",
-        help="The specific model version to use (e.g., gemini-1.5-pro-001).",
+        placeholder="gemini-2.5-pro-001",
+        help="The specific model version to use (e.g., gemini-2.5-pro).",
     )
     st.text_area(
         "**System Instructions**",

@@ -8,7 +8,7 @@
 
 ## 🚀 Getting Started
 
-Start with this [notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/llmevalkit/prompt-management-tutorial.ipynb) this walk you through, runnging the application on a colab server.
+Start with this [notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/llmevalkit/prompt-management-tutorial.ipynb) this walk you through, running the application on a colab server.
 
 
 ## Application Workflow
@@ -33,7 +33,7 @@ Follow these steps to create and save a new prompt using the Prompt Management p
     You will need to define the following attributes for each new prompt:
     *   **Prompt Name:** A unique name to identify your prompt.
     *   **Prompt Text:** The core text of your prompt. You can use curly braces `{}` to denote variables or placeholder text that will be filled in later.
-    *   **Model Name:** The specific Gemini model version you want to use for this prompt (e.g., `gemini-1.5-pro`).
+    *   **Model Name:** The specific Gemini model version you want to use for this prompt (e.g., `gemini-2.5-pro`).
     *   **System Instructions:** Optional instructions to guide the model's behavior and set its context before it processes the prompt.
     *   **Response Schema:** Define the desired structure for the model's output, such as a specific JSON format.
     *   **Generation Config:** A dictionary of generation parameters (like `temperature` or `max_output_tokens`) formatted as a string.

@@ -22,3 +22,4 @@ ipywidgets
 google-cloud-aiplatform
 tensorflow
 pylint
+google-genai
