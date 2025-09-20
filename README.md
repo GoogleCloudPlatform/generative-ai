@@ -101,7 +101,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
 - [Gemini Cookbook](https://github.com/google-gemini/cookbook/)
 - [Google Cloud Applied AI Engineering](https://github.com/GoogleCloudPlatform/applied-ai-engineering-samples)
 - [Vertex AI GenMedia Creative Studio](https://github.com/GoogleCloudPlatform/vertex-ai-creative-studio) - Experience Google’s generative media foundational models + custom workflows.
-- [MCP Servers for GenMedia](https://goo.gle/vertex-genmedia-mcp) - empower your agents with generative media tools
+- [MCP Servers for GenMedia](https://goo.gle/vertex-genmedia-mcp) - Empower your agents with generative media tools.
 - [Generative AI for Marketing using Google Cloud](https://github.com/GoogleCloudPlatform/genai-for-marketing)
 - [Generative AI for Developer Productivity](https://github.com/GoogleCloudPlatform/genai-for-developers)
 - Vertex AI Core
