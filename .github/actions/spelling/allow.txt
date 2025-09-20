@@ -436,6 +436,7 @@ freedraw
 freopen
 Frodo
 fromarray
+frombytes
 fromiter
 fsspec
 FTPS
@@ -798,6 +799,7 @@ mdc
 MDD
 Meawad
 mec
+MEDIANCUT
 mediapy
 Mega
 Meinl
@@ -1518,6 +1520,7 @@ XSum
 xticks
 XXE
 xxxxxxxx
+xycoords
 xytext
 xzn
 YAjjpd
