@@ -27,7 +27,7 @@
       <a href="../use-cases/media-generation/consistent_imagery_generation.ipynb">
         <img
           src="https://storage.googleapis.com/github-repo/generative-ai/gemini/use-cases/media-generation/consistent_imagery_generation/graph_animated.gif"
-          width="250px" alt="animation" />
+          width="250px" alt="animation showing the generation of consistent images" />
         <br />
         <code>../use-cases/media-generation/<br />consistent_imagery_generation.ipynb</code></a>
     </td>
