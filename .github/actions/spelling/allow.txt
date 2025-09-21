@@ -152,9 +152,11 @@ Buckleys
 Bulmus
 byoc
 byod
+BYOM
 byor
 BYOR
 Byzance
+cais
 CALIPSO
 campestre
 CAMQAA
@@ -170,6 +172,7 @@ caxis
 cce
 cctv
 cdiv
+ceo
 cer
 cfbundle
 chatbots
@@ -224,9 +227,11 @@ convo
 convos
 COPD
 cordata
+coro
 corpuses
 COUNTIF
 countplot
+covs
 Cowabunga
 cpet
 crewai
@@ -431,6 +436,7 @@ freedraw
 freopen
 Frodo
 fromarray
+frombytes
 fromiter
 fsspec
 FTPS
@@ -461,6 +467,7 @@ gdkx
 GDM
 gdp
 geboten
+gemhall
 genai
 genkit
 GenTwo
@@ -525,6 +532,8 @@ Gundogan
 gunicorn
 GWLP
 hadolint
+hahaha
+halluc
 Hamamoto
 Hamers
 Hannaneh
@@ -663,6 +672,7 @@ jupyter
 jvm
 Kaelen
 kaggle
+Kalai
 Kalamang
 Kamradt
 Kanagawa
@@ -764,6 +774,7 @@ lyria
 Maa
 Maackia
 Maarten
+maas
 magicoder
 magika
 Mahindra
@@ -783,10 +794,12 @@ Mbappe
 mbsdk
 mcp
 MCP
+MCQ
 mdc
 MDD
 Meawad
 mec
+MEDIANCUT
 mediapy
 Mega
 Meinl
@@ -820,6 +833,8 @@ MLOPs
 mlp
 MMA
 mmarco
+mmlu
+MMLU
 MMO
 mmol
 mmr
@@ -877,6 +892,7 @@ NDCG
 NDEBUG
 nec
 neering
+nemri
 neq
 netif
 newaxis
@@ -914,6 +930,7 @@ noxfile
 NOZORDER
 NPCs
 NPO
+nprint
 npx
 NREL
 nrows
@@ -976,6 +993,7 @@ Pastra
 payslip
 paystub
 PBA
+pbar
 pbxproj
 pcs
 PDEs
@@ -1021,6 +1039,7 @@ podhelper
 podman
 Poirot
 Polong
+popleft
 Porat
 postictal
 powerups
@@ -1175,6 +1194,7 @@ Sestero
 setlocal
 sft
 Sha'carri
+Shaoxiong
 sharegpt
 Sharmila
 Shazeer
@@ -1212,6 +1232,7 @@ SNE
 snowboard
 Sono
 sourced
+spamming
 spearmanr
 SPII
 SPLADE
@@ -1340,6 +1361,7 @@ TTH
 tts
 TTT
 tures
+tval
 typehints
 ubuntu
 udf
@@ -1386,6 +1408,7 @@ VAPO
 Vaswani
 Vayots
 VBG
+VCPU
 vectoral
 vectordb
 veo
@@ -1497,6 +1520,8 @@ XSum
 xticks
 XXE
 xxxxxxxx
+xycoords
+xytext
 xzn
 YAjjpd
 yanchor

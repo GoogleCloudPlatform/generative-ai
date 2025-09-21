@@ -19,9 +19,12 @@
 import os
 import subprocess
 
+import nbformat
 import nox
 
 DEFAULT_PYTHON_VERSION = "3.11"
+DEFAULT_RUFF_LINE_LENGTH = 88
+
 
 nox.options.sessions = [
     "format",
@@ -29,8 +32,56 @@ nox.options.sessions = [
 nox.options.reuse_existing_virtualenvs = True
 
 
+def add_skip_to_param_lines(
+    session: nox.Session,
+    notebook_paths: list[str],
+    max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
+) -> None:
+    """Parses notebooks and adds '# fmt: skip' to long lines containing '@param'.
+
+    This prevents ruff from formatting Google Colab form fields that
+    exceed the configured line length. The function modifies files in-place.
+    """
+    session.log(f"Checking for '@param' lines longer than {max_line_length} chars...")
+    for path in notebook_paths:
+        try:
+            with open(path, encoding="utf-8") as f:
+                notebook = nbformat.read(f, as_version=4)
+
+            notebook_modified = False
+            for cell in notebook.cells:
+                if cell.cell_type == "code":
+                    source_lines = cell.source.split("\n")
+                    new_source_lines = []
+                    cell_modified = False
+                    for line in source_lines:
+                        if (
+                            "@param" in line
+                            and len(line) > max_line_length
+                            and "# fmt: skip" not in line
+                        ):
+                            new_source_lines.append(line.rstrip() + "  # fmt: skip")
+                            cell_modified = True
+                        else:
+                            new_source_lines.append(line)
+
+                    if cell_modified:
+                        cell.source = "\n".join(new_source_lines)
+                        notebook_modified = True
+
+            if notebook_modified:
+                session.log(
+                    f"  -> Added '# fmt: skip' to long '@param' lines in {path}"
+                )
+                with open(path, "w", encoding="utf-8") as f:
+                    nbformat.write(notebook, f)
+
+        except Exception as e:
+            session.warn(f"Could not process notebook {path}. Error: {e}")
+
+
 @nox.session(python=DEFAULT_PYTHON_VERSION)
-def format(session) -> None:
+def format(session: nox.Session) -> None:
     """Formats Python files and Jupyter Notebooks.
 
     Pass '--all' to format all tracked files in the repository.
@@ -149,6 +200,8 @@ def format(session) -> None:
             "nbqa",
             "nbformat",
         )
+
+        add_skip_to_param_lines(session, lint_paths_nb)
 
         session.run("python3", ".github/workflows/update_notebook_links.py", ".")
 
