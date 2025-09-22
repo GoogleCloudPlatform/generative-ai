@@ -513,6 +513,7 @@ gpt
 gpu
 gradio
 gradlew
+graphrag
 Graterol
 gridcolor
 gridless
@@ -1086,6 +1087,8 @@ qrels
 quadrotor
 qubit
 qubits
+quickbot
+Quickbot
 quippy
 qwen
 Qwen
