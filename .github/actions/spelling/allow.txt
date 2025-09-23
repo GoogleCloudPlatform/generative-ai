@@ -226,6 +226,7 @@ constexpr
 convo
 convos
 COPD
+coq
 cordata
 coro
 corpuses
