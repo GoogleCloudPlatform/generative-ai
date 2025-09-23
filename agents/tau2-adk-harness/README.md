@@ -158,3 +158,4 @@ Extending the harness to support another Tau2 domain (e.g., `telecom`) is straig
     ```
 
 3.  **Create your ADK agent** with the tool signatures you defined (e.g., `adk_get_customer_by_phone`) and run the evaluation against the `telecom` domain.
+
