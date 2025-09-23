@@ -20,7 +20,7 @@ from tau2.utils.llm_utils import generate
 
 SYSTEM_PROMPT = """
 # Instruction
-You are an query interface agent that helps the developer interact with a database.
+You are a query interface agent that helps the developer interact with a database.
 You have access to tools that can be used to query the database.
 You will receive a query from the developer.
 You will need to make the appropriate tool calls to the database and return the result.

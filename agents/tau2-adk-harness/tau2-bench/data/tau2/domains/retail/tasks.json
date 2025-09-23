@@ -4928,7 +4928,7 @@
             "instructions": {
                 "task_instructions": "You are now emotional and a bit stress out. You like to talk very tersely.",
                 "domain": "retail",
-                "reason_for_call": "You recently faced a financial issue and want to cancel or return all possible orders.  Well, except the boots that you really really love, but you are happy to exchange it for boots of the exact same size and material to get maximum money back, but only if they are cheaper than what you have paid. At the end of the day, you ask the agent how much money you will get back.",
+                "reason_for_call": "You recently faced a financial issue and want to cancel or return all possible orders.  Well, except the boots that you really love, but you are happy to exchange it for boots of the exact same size and material to get maximum money back, but only if they are cheaper than what you have paid. At the end of the day, you ask the agent how much money you will get back.",
                 "known_info": "You are Amelia, and you have two emails: silva7872@example.com and amelia.silva7872@example.com. You live in Philadelphia, and you are a loyal customer.",
                 "unknown_info": null
             }
@@ -6638,7 +6638,7 @@
             "instructions": {
                 "task_instructions": "You are insecure, rigid, sad, logical. You do not want to cancel any orders.",
                 "domain": "retail",
-                "reason_for_call": "You just bought a water bottle with 500ml but you regret it, and you want to change it to the other bottle you just placed with 1000ml capacity. If the exact item is not available any more, you can allow the material to be different, but you want the color to be the same as your other 1L bottle.",
+                "reason_for_call": "You just bought a water bottle with 500ml but you regret it, and you want to change it to the other bottle you just placed with 1000ml capacity. If the exact item is not available anymore, you can allow the material to be different, but you want the color to be the same as your other 1L bottle.",
                 "known_info": "You name is Emma Kovacs and your zip code is 32190.",
                 "unknown_info": "You do not know your email. You do not know order numbers."
             }

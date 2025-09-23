@@ -298,7 +298,7 @@ def test_run_tasks_nl_assertions(domain_name: str):
     assert simulation.reward_info.nl_assertions[0].met is True
     assert simulation.reward_info.nl_assertions[1].met is True
 
-    # Add an nl_assertion that will fail and test that the reward is 0.0
+    # Add nl_assertion that will fail and test that the reward is 0.0
     task.evaluation_criteria.nl_assertions.append("The user is not complimented")
     simulation = run_task(
         domain=domain_name,
