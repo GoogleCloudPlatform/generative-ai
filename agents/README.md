@@ -29,3 +29,8 @@ The `gemini_data_analytics` directory contains notebooks that demonstrate how to
 
 - [Intro to Gemini Data Analytics (HTTP)](gemini_data_analytics/intro_gemini_data_analytics_http.ipynb): An introduction to using Gemini for data analytics with the HTTP API.
 - [Intro to Gemini Data Analytics (SDK)](gemini_data_analytics/intro_gemini_data_analytics_sdk.ipynb): An introduction to using Gemini for data analytics with the Python SDK.
+
+### tau2-adk-harness
+
+This directory contains a lightweight evaluation harness for running agents built with Google's Agent Development Kit (ADK) against the [Tau2 Bench](https://github.com/sierra-research/tau2-bench) benchmark. The harness acts as an adapter, allowing you to evaluate an ADK-developed agent using Tau2's user simulators, stateful environments, and evaluation metrics.
+

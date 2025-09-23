@@ -1,0 +1,51 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "tau2"
+version = "0.0.1"
+description = "The tau2 package"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Victor Barres", email = "victor.barres@gmail.com" },
+    { name = "Honghua Dong", email = "dhh19951@gmail.com" }
+]
+dependencies = [
+    "fs",
+    "rich",
+    "ruff>=0.9.1",
+    "watchdog>=6.0.0",
+    "plotly>=6.0.0",
+    "scikit-learn>=1.6.1",
+    "tabulate>=0.9.0",
+    "fastapi>=0.115.11",
+    "uvicorn>=0.34.0",
+    "pydantic-argparse>=0.10.0",
+    "pytest>=8.3.5",
+    "pandas>=2.2.3",
+    "psutil>=7.0.0",
+    "loguru>=0.7.3",
+    "docstring-parser>=0.16",
+    "litellm>=1.65.0",
+    "tenacity>=9.0.0",
+    "matplotlib>=3.10.1",
+    "seaborn>=0.13.2",
+    "redis>=5.2.1",
+    "deepdiff>=8.4.2",
+    "addict>=2.4.0",
+    "PyYAML>=6.0.2",
+    "toml>=0.10.2",
+    "langfuse>=2.60.7",
+]
+[project.scripts]
+tau2 = "tau2.cli:main"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E501", "F401", "F541"]
+
+[tool.ruff]
+line-length = 88

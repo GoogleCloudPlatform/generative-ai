@@ -1,0 +1,9 @@
+# Syntax: path  @github-username or @github-team
+# Example: Assign a user to all files
+*       @victorb-sierra
+
+# Assign a team to a folder
+# src/    @your-org/team-name
+
+# Assign a user to a specific file
+# README.md @your-username
