@@ -75,6 +75,14 @@ In essence, the harness acts as a **universal translator and middle-man for tool
     pip install -r requirements.txt
     ```
 
+3.  Install tau2:
+    ```bash
+    cd tau2-bench
+    pip install -e .
+    cd ..
+    ```
+
+
 ## Quick Start
 
 You can run an evaluation on the included sample agent against the Tau2 `airline` domain.
