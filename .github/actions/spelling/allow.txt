@@ -447,6 +447,7 @@ fullurl
 functiona
 futur
 Gabeira
+gaeta
 gameplay
 Gameplay
 gapic
@@ -511,6 +512,7 @@ googler
 goooooood
 gozo
 gpg
+gpp
 gpt
 gpu
 gradio
@@ -1092,6 +1094,7 @@ qubit
 qubits
 quickbot
 Quickbot
+quicktime
 quippy
 qwen
 Qwen
