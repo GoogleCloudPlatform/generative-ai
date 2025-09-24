@@ -1,6 +1,10 @@
 
 # LLM EvalKit
 
+## Summary
+
+LLMEvalKit is a tool designed to help developers evaluate and improve the performance of Large Language Models (LLMs) on specific tasks. It provides a comprehensive workflow to create, test, and optimize prompts, manage datasets, and analyze evaluation results. With LLMEvalKit, developers can conduct both human and model-based evaluations, compare results, and use automated processes to refine prompts for better accuracy and relevance. This toolkit streamlines the iterative process of prompt engineering and evaluation, enabling developers to build more effective and reliable LLM-powered applications.
+
 ![Image](assets/image.gif)
 
 **Authors: [Mike Santoro](https://github.com/Michael-Santoro), [Katherine Larson](https://github.com/larsonk)**

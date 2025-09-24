@@ -71,7 +71,8 @@ def _parse_json_input(json_string: str, field_name: str) -> dict[str, Any] | Non
     try:
         # Clean up common copy-paste issues like smart quotes and newlines
         json_string_cleaned = (
-            json_string.replace("\n", " ")
+            json_string.replace("’", "'")
+.replace("\n", " ")
             .replace("\t", " ")
             .replace("\r", "")
         )
