@@ -152,6 +152,7 @@ Buckleys
 Bulmus
 byoc
 byod
+BYOM
 byor
 BYOR
 Byzance
@@ -225,6 +226,7 @@ constexpr
 convo
 convos
 COPD
+coq
 cordata
 coro
 corpuses
@@ -435,6 +437,7 @@ freedraw
 freopen
 Frodo
 fromarray
+frombytes
 fromiter
 fsspec
 FTPS
@@ -444,6 +447,7 @@ fullurl
 functiona
 futur
 Gabeira
+gaeta
 gameplay
 Gameplay
 gapic
@@ -508,10 +512,12 @@ googler
 goooooood
 gozo
 gpg
+gpp
 gpt
 gpu
 gradio
 gradlew
+graphrag
 Graterol
 gridcolor
 gridless
@@ -772,6 +778,7 @@ lyria
 Maa
 Maackia
 Maarten
+maas
 magicoder
 magika
 Mahindra
@@ -796,6 +803,7 @@ mdc
 MDD
 Meawad
 mec
+MEDIANCUT
 mediapy
 Mega
 Meinl
@@ -888,6 +896,7 @@ NDCG
 NDEBUG
 nec
 neering
+nemri
 neq
 netif
 newaxis
@@ -1083,6 +1092,9 @@ qrels
 quadrotor
 qubit
 qubits
+quickbot
+Quickbot
+quicktime
 quippy
 qwen
 Qwen
@@ -1515,6 +1527,7 @@ XSum
 xticks
 XXE
 xxxxxxxx
+xycoords
 xytext
 xzn
 YAjjpd

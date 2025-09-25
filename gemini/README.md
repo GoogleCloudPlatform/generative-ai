@@ -25,101 +25,36 @@ On Google Cloud, the Gemini API in Vertex AI provides a unified interface for in
 ## Using this repository
 
 <!-- markdownlint-disable MD033 -->
-<table>
-  <tr>
-    <th></th>
-    <th style="text-align: center;">Description</th>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/flag/default/40px.svg" alt="flag">
-      <br>
-      <a href="getting-started/"><code>getting-started/</code></a>
-    </td>
-    <td>Get started with the Gemini API in Vertex AI
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/deployed_code/default/40px.svg" alt="deployed_code">
-      <br>
-      <a href="sample-apps/"><code>sample-apps/</code></a>
-    </td>
-    <td>Discover sample apps using Gemini</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/manufacturing/default/40px.svg" alt="manufacturing">
-      <br>
-      <a href="use-cases/"><code>use-cases/</code></a>
-    </td>
-    <td>Explore industry use-cases enabled by Gemini (e.g. retail, education)</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/radar/default/40px.svg" alt="radar">
-      <br>
-      <a href="evaluation/"><code>evaluation/</code></a>
-    </td>
-    <td>Learn how to evaluate Gemini with Vertex AI Model Evaluation for Generative AI</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/terminal/default/40px.svg" alt="terminal">
-      <br>
-      <a href="function-calling/"><code>function-calling/</code></a>
-    </td>
-    <td>Learn how to use the <a href="https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling">function calling</a> feature of Gemini</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/grass/default/40px.svg" alt="grass">
-      <br>
-      <a href="grounding/"><code>grounding/</code></a>
-    </td>
-    <td>Learn how to use the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/grounding/overview">grounding</a> feature of Gemini</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/neurology/default/40px.svg" alt="neurology">
-      <br>
-      <a href="rag-engine/"><code>rag-engine/</code></a>
-    </td>
-    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/rag-overview">RAG Engine</a> feature of Vertex AI</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/media_link/default/40px.svg" alt="media_link">
-      <br>
-      <a href="prompts/"><code>prompts/</code></a>
-    </td>
-    <td>Learn how to create and use effective prompts with Gemini.</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/build/default/40px.svg" alt="build">
-      <br>
-      <a href="agent-engine/"><code>agent-engine/</code></a>
-    </td>
-    <td>Discover how to utilize the <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview">Agent Engine</a> feature of Vertex AI</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/health_and_safety/default/40px.svg" alt="health_and_safety">
-      <br>
-      <a href="responsible-ai/"><code>responsible-ai/</code></a>
-    </td>
-    <td>Learn best practices for responsible AI and security with the Gemini API in Vertex AI.</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/tune/default/40px.svg" alt="tune">
-      <br>
-      <a href="tuning/"><code>tuning/</code></a>
-    </td>
-    <td>Learn how to tune and customize the Gemini models for specific use-cases.</td>
-  </tr>
-</table>
+- [agent-engine/](agent-engine/): Learn how to use the Agent Engine with Gemini.
+- [agents/](agents/): Samples of how to build agents with Gemini.
+- [autocal/](autocal/): Learn about Autocal with Gemini.
+- [batch-prediction/](batch-prediction/): Learn how to use batch prediction with Gemini.
+- [chat-completions/](chat-completions/): Learn about chat completions with the Gemini API.
+- [code-execution/](code-execution/): Learn about code execution with Gemini.
+- [context-caching/](context-caching/): Learn about context caching with Gemini.
+- [controlled-generation/](controlled-generation/): Learn about controlled generation with Gemini.
+- [evaluation/](evaluation/): Learn how to evaluate Gemini models.
+- [function-calling/](function-calling/): Learn how to use function calling with Gemini.
+- [getting-started/](getting-started/): Get started with the Gemini API.
+- [global-endpoint/](global-endpoint/): Learn how to use the global endpoint for Gemini.
+- [grounding/](grounding/): Learn about grounding with Gemini.
+- [logprobs/](logprobs/): Learn about logprobs with Gemini.
+- [long-context/](long-context/): Learn about long context with Gemini.
+- [mcp/](mcp/): Learn about the Multi-turn Conversation Platform (MCP) with Gemini.
+- [model-optimizer/](model-optimizer/): Learn about the Model Optimizer for Gemini.
+- [multimodal-dataset/](multimodal-dataset/): Learn how to work with multimodal datasets for Gemini.
+- [multimodal-live-api/](multimodal-live-api/): Learn how to use the Multimodal Live API with Gemini.
+- [nano-banana/](nano-banana/): Learn about Nano Banana with Gemini.
+- [orchestration/](orchestration/): Learn about orchestration with Gemini.
+- [prompts/](prompts/): Learn about prompt design for Gemini.
+- [rag-engine/](rag-engine/): Learn about the RAG Engine with Gemini.
+- [reasoning-engine/](reasoning-engine/): Learn about the Reasoning Engine with Gemini.
+- [responsible-ai/](responsible-ai/): Learn about responsible AI with Gemini.
+- [sample-apps/](sample-apps/): Sample applications using the Gemini API.
+- [thinking/](thinking/): Learn about the thinking process of Gemini.
+- [tuning/](tuning/): Learn how to tune Gemini models.
+- [url-context/](url-context/): Learn how to use URL context with Gemini.
+- [use-cases/](use-cases/): Explore various use cases for Gemini.
 <!-- markdownlint-enable MD033 -->
 
 ## Contributing
