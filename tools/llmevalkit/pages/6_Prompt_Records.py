@@ -49,14 +49,13 @@ def load_records_from_gcs(bucket_name: str, prefix: str) -> pd.DataFrame:
                 except json.JSONDecodeError:
                     logger.warning(f"Could not decode JSON from {blob.name}")
                 except Exception as e:
-                    logger.error(f"Failed to process blob {blob.name}: {e}")
+                    logger.exception(f"Failed to process blob {blob.name}: {e}")
 
         if not all_records:
             st.warning(f"No JSON records found at gs://{bucket_name}/{prefix}")
             return pd.DataFrame()
 
-        df = pd.json_normalize(all_records)
-        return df
+        return pd.json_normalize(all_records)
 
     except Exception as e:
         st.error(f"Failed to load or parse records from GCS: {e}")
@@ -64,7 +63,7 @@ def load_records_from_gcs(bucket_name: str, prefix: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def main():
+def main() -> None:
     """Renders the Prompt Records Leaderboard page."""
     st.set_page_config(
         layout="wide",
@@ -99,7 +98,7 @@ def main():
 
     prompt_names = st.session_state.leaderboard_df["prompt_name"].unique().tolist()
     selected_prompt = st.selectbox(
-        "Select a Prompt to Compare Versions", options=[None] + prompt_names
+        "Select a Prompt to Compare Versions", options=[None, *prompt_names]
     )
 
     if selected_prompt:

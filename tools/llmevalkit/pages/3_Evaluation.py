@@ -52,7 +52,7 @@ def get_metric_object_by_name(metric_name: str):
     try:
         return MetricPromptTemplateExamples._PROMPT_TEMPLATE_MAP[metric_name]
     except Exception as e:
-        logger.error(f"Failed to get metric object for {metric_name}: {e}")
+        logger.exception(f"Failed to get metric object for {metric_name}: {e}")
         raise
 
 
@@ -130,7 +130,7 @@ def get_autorater_pairwise_response(metric_prompt: str, model: str) -> dict:
     return response_json
 
 
-def main():
+def main() -> None:
     """Initializes and runs the Streamlit evaluation application.
 
     This function sets up the Streamlit page configuration, initializes session state
@@ -202,10 +202,10 @@ def main():
         )
         st.session_state.vertex_session_init = True
 
-    data_sets = list(set([i.split("/")[4] for i in st.session_state.data_uris]))
+    data_sets = list({i.split("/")[4] for i in st.session_state.data_uris})
     logger.info(f"Data Sets: {data_sets}")
     st.selectbox(
-        "Select an Existing Dataset", options=[None] + data_sets, key="selected_dataset"
+        "Select an Existing Dataset", options=[None, *data_sets], key="selected_dataset"
     )
 
     files_to_display_in_selectbox = []
@@ -234,7 +234,7 @@ def main():
                         current_dataset_files.append(filename)
 
             st.session_state.cached_data_files[st.session_state.selected_dataset] = (
-                sorted(list(set(current_dataset_files)))
+                sorted(set(current_dataset_files))
             )
             st.session_state.last_selected_dataset_for_cache = (
                 st.session_state.selected_dataset
@@ -255,7 +255,7 @@ def main():
 
         st.selectbox(
             "Select a file from this dataset:",
-            options=[None] + files_to_display_in_selectbox,
+            options=[None, *files_to_display_in_selectbox],
             key="selected_file_from_dataset",
         )
 
@@ -270,7 +270,7 @@ def main():
 
     st.selectbox(
         "Select Existing Prompt",
-        options=[None] + list(st.session_state.local_prompt.existing_prompts.keys()),
+        options=[None, *list(st.session_state.local_prompt.existing_prompts.keys())],
         placeholder="Select Prompt...",
         key="selected_prompt",
     )
@@ -464,7 +464,7 @@ def main():
             template_vars = re.findall(r"{(\w+)}", st.session_state.prompt_data)
             required_cols_for_generating_new = list(set(template_vars))
 
-            all_required_cols = required_cols_for_generating_new + [ground_truth_col]
+            all_required_cols = [*required_cols_for_generating_new, ground_truth_col]
             missing_generating_cols = [
                 col for col in all_required_cols if col not in df.columns
             ]
@@ -536,7 +536,7 @@ def main():
                             (idx + 1) / len(df), text=progress_text
                         )
                 except Exception as e:
-                    logger.error(
+                    logger.exception(
                         "Error generating response for row index %s (data: %s): %s",
                         idx,
                         current_user_input_item,
@@ -724,7 +724,7 @@ def main():
                     metric_object = get_metric_object_by_name(current_metric_name)
                     if isinstance(
                         metric_object,
-                        (PointwiseMetricPromptTemplate, PairwiseMetricPromptTemplate),
+                        PointwiseMetricPromptTemplate | PairwiseMetricPromptTemplate,
                     ):
                         st.text_area(
                             "Template Preview",
@@ -817,18 +817,18 @@ def main():
                         idx
                     ]
                     final_reference_str = ""
-                    if isinstance(reference_val, (int, float, bool)):
+                    if isinstance(reference_val, int | float | bool):
                         final_reference_str = json.dumps({"value": reference_val})
                     elif isinstance(reference_val, str):
                         try:
                             parsed_json = json.loads(reference_val)
-                            if isinstance(parsed_json, (int, float, bool)):
+                            if isinstance(parsed_json, int | float | bool):
                                 final_reference_str = json.dumps({"value": parsed_json})
                             else:
                                 final_reference_str = reference_val
                         except json.JSONDecodeError:
                             final_reference_str = reference_val
-                    elif isinstance(reference_val, (dict, list)):
+                    elif isinstance(reference_val, dict | list):
                         final_reference_str = json.dumps(reference_val)
                     else:
                         final_reference_str = str(reference_val)

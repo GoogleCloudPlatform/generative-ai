@@ -31,9 +31,9 @@ steps required for the prompt management and evaluation application.
 import io
 import logging
 import os
-from dotenv import load_dotenv
 
 import pandas as pd
+from dotenv import load_dotenv
 from google.cloud import storage
 
 logging.basicConfig(
@@ -45,6 +45,7 @@ load_dotenv("src/.env")
 
 
 PREFIX = "datasets_meta"
+
 
 def get_existing_datasets() -> list[str]:
     """Gets the list of existing dataset names from the GCS bucket.
@@ -65,8 +66,7 @@ def escape_special_characters(text: str) -> str:
     text = text.replace("\n", "\n")
     text = text.replace("\r", "\r")
     text = text.replace("\t", "\t")
-    text = text.replace('"', '"')
-    return text
+    return text.replace('"', '"')
 
 
 def process_csv_from_gcs(bucket_name: str, file_path: str) -> pd.DataFrame:

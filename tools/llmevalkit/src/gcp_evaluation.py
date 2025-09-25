@@ -60,8 +60,7 @@ def format_user_content(user_content: str, tokenizer: Any, **kwargs: Any) -> str
     kwargs.setdefault("add_generation_prompt", True)
 
     try:
-        formatted_input = tokenizer.apply_chat_template(message, **kwargs)
-        return formatted_input
+        return tokenizer.apply_chat_template(message, **kwargs)
     except Exception as e:
         print(
             f"Error applying chat template to content: '{user_content[:50]}...'. Error: {e}"
@@ -201,12 +200,14 @@ def plot_distribution_comparison(
         yaxis2_title="Count",
         xaxis1_type="category",
         xaxis2_type="category",
-        xaxis1=dict(
-            categoryorder="array", categoryarray=sorted(human_counts.index.unique())
-        ),
-        xaxis2=dict(
-            categoryorder="array", categoryarray=sorted(score_counts.index.unique())
-        ),
+        xaxis1={
+            "categoryorder": "array",
+            "categoryarray": sorted(human_counts.index.unique()),
+        },
+        xaxis2={
+            "categoryorder": "array",
+            "categoryarray": sorted(score_counts.index.unique()),
+        },
         height=400,
     )
     return fig
@@ -237,8 +238,16 @@ def plot_confusion_matrix(
         title="Confusion Matrix: Human Rating vs. Model Score (Completeness)",
         xaxis_title="Predicted (Model Score)",
         yaxis_title="True (Human Rating)",
-        yaxis=dict(type="category", categoryorder="array", categoryarray=cm_labels),
-        xaxis=dict(type="category", categoryorder="array", categoryarray=cm_labels),
+        yaxis={
+            "type": "category",
+            "categoryorder": "array",
+            "categoryarray": cm_labels,
+        },
+        xaxis={
+            "type": "category",
+            "categoryorder": "array",
+            "categoryarray": cm_labels,
+        },
         height=600,
         width=600,
     )
@@ -293,11 +302,11 @@ def plot_jitter_scatter(
             x=df_jitter[f"{score_col}_jitter"],
             y=df_jitter[f"{human_col}_jitter"],
             mode="markers",
-            marker=dict(
-                color="rgba(0, 100, 200, 0.7)",
-                size=10,
-                line=dict(width=1, color="DarkSlateGrey"),
-            ),
+            marker={
+                "color": "rgba(0, 100, 200, 0.7)",
+                "size": 10,
+                "line": {"width": 1, "color": "DarkSlateGrey"},
+            },
             text=[
                 f"HR: {hr:.1f}, Score: {s:.1f}"
                 for hr, s in zip(
@@ -315,7 +324,7 @@ def plot_jitter_scatter(
             y=plot_range,
             mode="lines",
             name="Ideal Alignment (Score = Human Rating)",
-            line=dict(color="red", dash="dash"),
+            line={"color": "red", "dash": "dash"},
         )
     )
 
@@ -323,8 +332,8 @@ def plot_jitter_scatter(
         title="Model Score vs. Human Rating (with Jitter)",
         xaxis_title="Model Score (Jittered)",
         yaxis_title="Human Rating (Jittered)",
-        xaxis=dict(range=plot_range, tickvals=list(tick_vals), ticktext=tick_text),
-        yaxis=dict(range=plot_range, tickvals=list(tick_vals), ticktext=tick_text),
+        xaxis={"range": plot_range, "tickvals": list(tick_vals), "ticktext": tick_text},
+        yaxis={"range": plot_range, "tickvals": list(tick_vals), "ticktext": tick_text},
         width=600,
         height=600,
         showlegend=True,

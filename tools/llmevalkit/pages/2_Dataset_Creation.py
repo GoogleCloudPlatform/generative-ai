@@ -69,7 +69,7 @@ def _handle_upload(
     bucket_name: str,
     dataset_name: str,
     uploaded_file: UploadedFile,
-):
+) -> None:
     """Handles the logic of uploading a file to GCS."""
     if not all([storage_client, bucket_name, dataset_name, uploaded_file]):
         st.warning("Missing required information for upload.")
@@ -104,7 +104,9 @@ def _handle_upload(
         logger.error(f"Error during GCS upload: {e}", exc_info=True)
 
 
-def _ensure_datasets_folder_exists(storage_client: storage.Client, bucket_name: str):
+def _ensure_datasets_folder_exists(
+    storage_client: storage.Client, bucket_name: str
+) -> None:
     """Ensures the 'datasets/' folder exists by creating a placeholder object if needed.
 
     This helps it appear in the GCS UI even when empty.
@@ -124,7 +126,7 @@ def _ensure_datasets_folder_exists(storage_client: storage.Client, bucket_name: 
         logger.warning(f"Could not ensure 'datasets/' folder exists: {e}")
 
 
-def main():
+def main() -> None:
     """Renders the Dataset Creation page."""
     st.set_page_config(
         layout="wide", page_title="Dataset Management", page_icon="assets/favicon.ico"

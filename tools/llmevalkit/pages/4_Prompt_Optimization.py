@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 TARGET_MODELS = ["gemini-2.0-flash-001", "gemini-2.0-flash-lite-001"]
 
 
-def initialize_session_state():
+def initialize_session_state() -> None:
     """Initializes the session state variables."""
     if "op_id" not in st.session_state:
         st.session_state.op_id = vapo_lib.get_id()
@@ -96,7 +96,7 @@ def refresh_bucket() -> list[str]:
     return data_uris
 
 
-def prompt_selection():
+def prompt_selection() -> None:
     """Handles the prompt selection and loading."""
     st.selectbox(
         "Select Existing Prompt",
@@ -170,12 +170,12 @@ def prompt_selection():
         ]
 
 
-def dataset_selection():
+def dataset_selection() -> None:
     """Handles the dataset selection and loading."""
     data_sets = list({i.split("/")[4] for i in st.session_state.data_uris})
     logger.info("Data Sets: %s", data_sets)
     st.selectbox(
-        "Select an Existing Dataset", options=[None] + data_sets, key="selected_dataset"
+        "Select an Existing Dataset", options=[None, *data_sets], key="selected_dataset"
     )
 
     files_to_display_in_selectbox = []
@@ -204,7 +204,7 @@ def dataset_selection():
                         current_dataset_files.append(filename)
 
             st.session_state.cached_data_files[st.session_state.selected_dataset] = (
-                sorted(list(set(current_dataset_files)))
+                sorted(set(current_dataset_files))
             )
             st.session_state.last_selected_dataset_for_cache = (
                 st.session_state.selected_dataset
@@ -225,7 +225,7 @@ def dataset_selection():
 
         st.selectbox(
             "Select a file from this dataset:",
-            options=[None] + files_to_display_in_selectbox,
+            options=[None, *files_to_display_in_selectbox],
             key="selected_file_from_dataset",
         )
 
@@ -310,7 +310,7 @@ def get_optimization_args(
     )
 
 
-def start_optimization():
+def start_optimization() -> None:
     """Starts the optimization job."""
     st.divider()
 
@@ -393,7 +393,7 @@ def start_optimization():
         st.success("Successfully Started Job!!")
 
 
-def main():
+def main() -> None:
     """Streamlit page for Prompt Optimization."""
     st.set_page_config(
         layout="wide", page_title="Prompt Optimization", page_icon="assets/favicon.ico"

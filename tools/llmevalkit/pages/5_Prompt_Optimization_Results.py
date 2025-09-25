@@ -139,7 +139,7 @@ def list_gcs_directories(
             name = p.replace(prefix, "").strip("/")
             if name:
                 dir_names.append(name)
-        return sorted(list(set(dir_names)))
+        return sorted(set(dir_names))
     except Exception as e:
         st.error(
             f"Error listing GCS directories under gs://{bucket_name}/{prefix}: {e}"
@@ -151,7 +151,7 @@ def list_gcs_directories(
         return []
 
 
-def _display_interactive_results(results_ui: vapo_lib.ResultsUI):
+def _display_interactive_results(results_ui: vapo_lib.ResultsUI) -> None:
     """Processes results from a VAPO run and displays them in an interactive
     Streamlit UI with tabs for each prompt version.
     """
@@ -356,7 +356,7 @@ def _display_interactive_results(results_ui: vapo_lib.ResultsUI):
         )
 
 
-def main():
+def main() -> None:
     """Renders the Streamlit page for viewing Prompt Optimization Results."""
     st.set_page_config(
         layout="wide",
@@ -398,7 +398,7 @@ def main():
         )
 
     selected_op_id = st.selectbox(
-        "Select an Operation ID:", options=[None] + op_ids, key="selected_op_id_results"
+        "Select an Operation ID:", options=[None, *op_ids], key="selected_op_id_results"
     )
     if not selected_op_id:
         st.write("Please select an Operation ID to see its optimization job runs.")
@@ -423,7 +423,7 @@ def main():
 
     selected_run = st.selectbox(
         "Select an Optimization Job Run:",
-        options=[None] + experiment_runs,
+        options=[None, *experiment_runs],
         key="selected_experiment_run",
     )
     if not selected_run:

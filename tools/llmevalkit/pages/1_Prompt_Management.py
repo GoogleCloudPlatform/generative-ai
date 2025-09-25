@@ -72,7 +72,7 @@ def _parse_json_input(json_string: str, field_name: str) -> dict[str, Any] | Non
         # Clean up common copy-paste issues like smart quotes and newlines
         json_string_cleaned = (
             json_string.replace("’", "'")
-.replace("\n", " ")
+            .replace("\n", " ")
             .replace("\t", " ")
             .replace("\r", "")
         )
@@ -105,7 +105,7 @@ def _apply_generation_config_typing(config: dict[str, Any]) -> dict[str, Any]:
 
 
 # --- Handlers for "Create New Prompt" Tab ---
-def _handle_save_new_prompt():
+def _handle_save_new_prompt() -> None:
     """Validates inputs and saves a new prompt.
 
     Retrieves all necessary data from the Streamlit session state for the
@@ -159,7 +159,7 @@ def _handle_save_new_prompt():
         st.error(f"Failed to save prompt: {e}")
 
 
-def _handle_generate_test_for_new():
+def _handle_generate_test_for_new() -> None:
     """Generates a test response for the new prompt form.
 
     Takes the user-provided sample input and the current prompt configuration
@@ -194,7 +194,7 @@ def _handle_generate_test_for_new():
 
 
 # --- Handlers for "Load & Edit Prompt" Tab ---
-def _populate_ui_from_prompt():
+def _populate_ui_from_prompt() -> None:
     """Populates session state for UI widgets from the loaded prompt object.
 
     After a prompt is loaded from the backend, this function takes the data
@@ -224,7 +224,7 @@ def _populate_ui_from_prompt():
     st.session_state.edit_sample_output = ""  # Clear previous output
 
 
-def _handle_load_prompt():
+def _handle_load_prompt() -> None:
     """Loads the selected prompt and version and populates the UI.
 
     Triggered by the 'Load Prompt' button. It retrieves the selected prompt
@@ -256,7 +256,7 @@ def _handle_load_prompt():
         st.error(f"Failed to load prompt: {e}")
 
 
-def _handle_save_edited_prompt():
+def _handle_save_edited_prompt() -> None:
     """Validates inputs and saves the current prompt config as a new version.
 
     Similar to saving a new prompt, but it takes the data from the "Edit" tab's
@@ -313,7 +313,7 @@ def _handle_save_edited_prompt():
         st.error(f"Failed to save prompt: {e}")
 
 
-def _handle_generate_test_for_edit():
+def _handle_generate_test_for_edit() -> None:
     """Generates a test response for the edited prompt.
 
     Allows users to test changes made in the "Edit" tab before saving them
@@ -351,7 +351,7 @@ def _handle_generate_test_for_edit():
 
 
 # --- UI Rendering Functions ---
-def render_create_tab():
+def render_create_tab() -> None:
     """Renders the UI components for the 'Create New Prompt' tab.
 
     This function defines and lays out all the Streamlit widgets (text inputs,
@@ -434,7 +434,7 @@ def render_create_tab():
     )
 
 
-def render_edit_tab():
+def render_edit_tab() -> None:
     """Renders the UI components for the 'Load & Edit Prompt' tab.
 
     This function defines and lays out all the Streamlit widgets for loading,
@@ -521,7 +521,7 @@ def render_edit_tab():
 
 
 # --- Main Application ---
-def main():
+def main() -> None:
     """Renders the main Prompt Management page.
 
     Sets the page configuration, initializes the session state (including the

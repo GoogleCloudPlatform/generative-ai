@@ -38,17 +38,13 @@ import json
 import logging
 import os
 from typing import Any
-import base64
-import io
 
-from google import genai
 from dotenv import load_dotenv
+from google import genai
 from google.cloud import aiplatform, storage
-from pydantic import BaseModel
 from vertexai.generative_models import GenerationConfig
 from vertexai.preview import prompts
 from vertexai.preview.prompts import Prompt
-from PIL import Image
 
 load_dotenv("src/.env")
 
@@ -67,10 +63,11 @@ aiplatform.init(
 # --- Constants ---
 PROMPT_PREFIX = os.getenv("PROMPT_PREFIX", "prompts_meta")
 
+
 class GcpPrompt:
     """A wrapper class for the Vertex AI Prompt Management service."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the GcpPrompt client."""
         self.storage_client = storage.Client()
 
@@ -83,11 +80,11 @@ class GcpPrompt:
         self.prompt_to_run: Prompt = Prompt()
         self.refresh_bucket_cache()
 
-    def refresh_prompt_cache(self):
+    def refresh_prompt_cache(self) -> None:
         """Refreshes the local cache of existing prompts from the service."""
         self.existing_prompts = {p.display_name: p.prompt_id for p in prompts.list()}
 
-    def refresh_bucket_cache(self):
+    def refresh_bucket_cache(self) -> None:
         """Refreshes the list of metadata files from GCS."""
         blobs = self.storage_client.list_blobs(
             os.getenv("BUCKET"), prefix=PROMPT_PREFIX
@@ -154,7 +151,7 @@ class GcpPrompt:
 
         return sdk_details
 
-    def load_prompt(self, prompt_id: str, prompt_name: str, version_id: str):
+    def load_prompt(self, prompt_id: str, prompt_name: str, version_id: str) -> None:
         """Loads a specific version of a prompt and its associated metadata."""
         self.prompt_to_run = prompts.get(prompt_id, version_id)
         self.prompt_to_run.prompt_name = prompt_name
@@ -187,7 +184,7 @@ class GcpPrompt:
                 f"version '{version_id}'. Looked for '{blob_name}' and '{none_blob_name}'."
             )
 
-    def write_to_bucket(self):
+    def write_to_bucket(self) -> None:
         """Writes the current prompt_meta to a GCS blob."""
         blob_name = self._get_metadata_blob_name()
         bucket = self.storage_client.bucket(os.getenv("BUCKET"))
@@ -204,7 +201,11 @@ class GcpPrompt:
         if not self.prompt_to_run.prompt_data:
             raise ValueError("Prompt data is not loaded. Cannot generate response.")
 
-        client = genai.Client(vertexai=True, project=os.getenv("PROJECT_ID"), location=os.getenv("LOCATION"))
+        client = genai.Client(
+            vertexai=True,
+            project=os.getenv("PROJECT_ID"),
+            location=os.getenv("LOCATION"),
+        )
         updated_contents: list[Any] = []
         for key, value in variables.items():
             logger.info("Iterating through variables")
@@ -214,15 +215,17 @@ class GcpPrompt:
                 elif "png" in value:
                     mime_type = "image/png"
                 else:
-                    logger.warning(f"Unsupported image type for {value}, attempting to process as is.")
+                    logger.warning(
+                        f"Unsupported image type for {value}, attempting to process as is."
+                    )
                     updated_contents.append(value)
                     continue
 
                 try:
                     # Create Image Part from URI
-                    updated_contents.append(genai.Part.from_uri(
-                        mime_type=mime_type, uri=value
-                    ))
+                    updated_contents.append(
+                        genai.Part.from_uri(mime_type=mime_type, uri=value)
+                    )
                 except Exception as e:
                     logger.error(
                         "Error creating Part from URI for variable '%s': %s",
@@ -236,15 +239,16 @@ class GcpPrompt:
 
         # Append the prompt text if it's not already included in variables
         prompt_text = self.prompt_to_run.prompt_data
-        if not any(isinstance(item, str) and item == prompt_text for item in updated_contents):
-             updated_contents.append(prompt_text)
+        if not any(
+            isinstance(item, str) and item == prompt_text for item in updated_contents
+        ):
+            updated_contents.append(prompt_text)
 
         logger.info("Generating response with contents: %s", updated_contents)
 
         model = self.prompt_to_run.model_name
         response = client.models.generate_content(
-            model=model,
-            contents=updated_contents
+            model=model, contents=updated_contents
         )
 
         return response.text if response and response.text else None
@@ -262,9 +266,8 @@ def escape_special_characters(text: str) -> str:
     """
     if not isinstance(text, str):
         return text
-    text = text.replace('\\', '\\\\')
-    text = text.replace('\n', '\\n')
-    text = text.replace('\r', '\\r')
-    text = text.replace('\t', '\\t')
-    text = text.replace('"', '\\"')
-    return text
+    text = text.replace("\\", "\\\\")
+    text = text.replace("\n", "\\n")
+    text = text.replace("\r", "\\r")
+    text = text.replace("\t", "\\t")
+    return text.replace('"', '\\"')

@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv("src/.env")
 
 
-def main():
+def main() -> None:
     """Renders the main landing page of the application."""
     st.set_page_config(
         page_title="LLM EvalKit",
