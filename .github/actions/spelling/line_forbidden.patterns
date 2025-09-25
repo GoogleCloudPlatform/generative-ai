@@ -308,7 +308,7 @@
 \w \w
 
 # Don't use "smart quotes"
-(?!'")[‘’“”]
+(?<!["'])[‘’“”](?!["'])
 
 # "an" should only be before vowels.
 \ban\s+(?![FHLMNRSX][A-Z0-9]+\b)(?!hour\b)(?!honest\b)([b-df-hj-np-tv-zB-DF-HJ-NP-TV-Z]{1}\w*)
