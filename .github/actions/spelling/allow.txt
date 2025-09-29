@@ -1330,6 +1330,7 @@ THT
 THTH
 Tianli
 Tianxiang
+ticktext
 tickvals
 tiktoken
 timechart
