@@ -10,229 +10,205 @@ LLMEvalKit is a tool designed to help developers evaluate and improve the perfor
 
 ## 🚀 Getting Started
 
-Start with this [notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/llmevalkit/prompt-management-tutorial.ipynb) this walk you through, running the application on a Colab server.
+There are two ways to work through a tutorial of this application one method is more stable one is less stable.
 
-## Application Workflow
+1. Scroll down to the Tutorial Section here.
 
-Once you launch the application, you'll be directed to a home screen with the following options on the left-hand side:
+2. Open this [notebook](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/tools/llmevalkit/prompt-management-tutorial.ipynb) in colab running the application on a colab server.
 
-- **New Prompt:** Create a new prompt.
-- **Existing Prompt:** Edit an existing prompt.
-- **Dataset Creation:** Upload and save datasets.
-- **Evaluation Setup:** Set-up and launch an evaluation.
-- **Evaluation Review:** Review Evaluation result.
+## Overview
 
----
+This tutorial provides a comprehensive guide to prompt engineering, covering the entire lifecycle from creation to evaluation and optimization. It's broken down into the following sections:
 
-## 1. New Prompt
+1.  **Prompt Management:** This section focuses on the core tasks of creating, editing, and managing prompts. You can:
+    -   **Create new prompts:** Define the prompt's name, text, the model it's designed for, and any system instructions.
+    -   **Load and edit existing prompts:** Browse a library of saved prompts, load a specific version, and make modifications.
+    -   **Test prompts:** Before saving, you can provide sample input and generate a response to see how the prompt performs.
+    -   **Versioning:** Each time you save a change to a prompt, a new version is created, allowing you to track its evolution and compare different iterations.
 
-### 📝 Creating a New Prompt
+2.  **Dataset Creation:** A crucial part of prompt engineering is having good data to test and evaluate your prompts. This section allows you to:
 
-Follow these steps to create and save a new prompt using the Prompt Management page.
+    -   **Create new datasets:** A dataset is essentially a folder in Google Cloud Storage where you can group related files.
+    -   **Upload data:** You can upload files in CSV, JSON, or JSONL format to your datasets. This data will be used for evaluating your prompts.
 
-1. **Define Prompt Details**
+3.  **Evaluation:** Once you have a prompt and a dataset, you need to see how well the prompt performs. The evaluation section helps you with this by:
 
-    You will need to define the following attributes for each new prompt:
-    - **Prompt Name:** A unique name to identify your prompt.
-    - **Prompt Text:** The core text of your prompt. You can use curly braces `{}` to denote variables or placeholder text that will be filled in later.
-    - **Model Name:** The specific Gemini model version you want to use for this prompt (e.g., `gemini-2.5-pro`).
-    - **System Instructions:** Optional instructions to guide the model's behavior and set its context before it processes the prompt.
-    - **Response Schema:** Define the desired structure for the model's output, such as a specific JSON format.
-    - **Generation Config:** A dictionary of generation parameters (like `temperature` or `max_output_tokens`) formatted as a string.
-    - **Prompt Task:** Select the most appropriate task type from the list: `Classification`, `Summarization`, `Translation`, `Creative Writing`, or `Q&A`.
+    -   **Running evaluations:** You can select a prompt and a dataset and run an evaluation. This will generate responses from the model for each item in your dataset.
+    -   **Human-in-the-loop rating:** For a more nuanced evaluation, you can manually review the model's responses and rate them.
+    -   **Automated metrics:** The tutorial also supports automated evaluation metrics to get a quantitative measure of your prompt's performance.
 
-    > **⚠️ Important:** After filling in the fields, you must click **Save Prompt** before proceeding.
+4.  **Prompt Optimization:** This section helps you automatically improve your prompts. It uses Vertex AI's prompt optimization capabilities to:
 
-2. **Test Your Prompt**
+    -   **Configure and launch optimization jobs:** You can set up and run a job that will take your prompt and a dataset and try to find a better-performing version of the prompt.
 
-    Once your prompt is saved, you can test it with sample data to see how the model responds.
+5.  **Prompt Optimization Results:** After an optimization job has run, this section allows you to:
 
-    Your test input must be a JSON object where the keys exactly match the variable names (the text inside the `{...}`) that you defined in your **Prompt Text**. The values will be substituted into the prompt before it's sent to the model.
+    -   **View the results:** You can see the different prompt versions that the optimizer came up with and how they performed.
+    -   **Compare versions:** The results are presented in a way that makes it easy to compare the different optimized prompts and choose the best one.
 
-    **For example:**
+6.  **Prompt Records:** This is a leaderboard that shows you the evaluation results of all your different prompt versions. It helps you to:
 
-    If your **Prompt Text** was:
-    `"Draft a professional follow-up email to {contact_name} from {company_name} about our {product_name} solution."`
+    -   **Track performance over time:** See how your prompts have improved with each new version.
+    -   **Compare different prompts:** You can compare the performance of different prompts for the same task.
 
-    Then, your sample user input should be a JSON object structured like this:
+In summary, this tutorial provides a complete and integrated environment for all your prompt engineering needs, from initial creation to sophisticated optimization and evaluation.
 
-    ```json
-    {
-      "contact_name": "Jon Doe",
-      "company_name": "Google",
-      "product_name": "Project Alpha"
-    }
-    ```
+## Tutorial: Step-by-Step
 
-## 2. Load Existing Prompt
+This section walks you through using the app.
 
-### Loading and Editing an Existing Prompt
+### 0. Startup
 
-This section allows you to load a previously saved prompt, make modifications, and save your changes as a new version using the Prompt Management page.
+First, clone the repository and set up the environment:
 
-1. **Load Prompt**
+```bash
+# Clone the repository
+git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 
-    - **Refresh List (Optional):** If you have recently created a new prompt and it doesn't appear in the dropdown, click the **Refresh List** button to update the list of available prompts.
-    - **Select Prompt & Version:** Choose your desired prompt from the "Select Existing Prompt" dropdown, then select a specific version from the "Select Version" dropdown.
-    - **Click Load Prompt:** Press the **Load Prompt** button. The page will populate with the details of the selected prompt version.
+# Navigate to the project directory
+cd generative-ai/tools/llmevalkit
 
-2. **Edit Prompt Details & Test**
+# Create a Python virtual environment
+python -m venv venv
 
-    - Once loaded, you can freely edit any of the fields, such as the **Prompt Text**, **System Instructions**, or **Generation Config**.
-    - You can test your modifications at any time using the **Test Your Prompt** section.
+# Activate the virtual environment
+source venv/bin/activate
 
-3. **Save as New Version**
+# Install the required packages
+pip install -r requirements.txt
 
-    - When you are satisfied with your changes, click the **Save as New Version** button.
-    - This action saves your edits as a new, incremental version of the prompt. For example, if you loaded `v2` and saved, your changes would be stored as `v3`, leaving the original `v2` untouched.
+# Run the Streamlit application
+streamlit run index.py
+```
 
----
+Next, `cp src/.env.example src/.env` open the file and set `BUCKET_NAME` and `PROJECT_ID`
 
-## 3. Dataset Creation
+### 1. Prompt Management
 
-### 📂 Creating and Managing Datasets
+In the Prompt Name field enter:
 
-This page allows you to upload your evaluation data to Google Cloud Storage (GCS). In this application, a **Dataset** is simply a folder within your GCS bucket that holds a collection of CSV documents.
+```
+math_prompt_test
+```
 
-#### Uploading a CSV File
+In the Prompt Data field enter:
 
-1. **Choose an Action:**
-    - Select **"Create a new dataset"** to make a new folder for your files.
-    - Select **"Add to an existing dataset"** to upload a file to a folder you've already created.
+```
+Problem: {{query}}
+Image: {{image}} @@@image/jpeg
+Answer: {{target}}
+```
 
-2. **Specify the Dataset:**
-    - If creating a new dataset, enter a unique name for it in the text box.
-        > **⚠️ Important:** After typing the name, you must press **Enter** for the application to register the new name.
-    - If adding to an existing one, simply select it from the dropdown list.
+In the Model Name field enter:
+```
+gemini-2.0-flash-001
+```
 
-3. **Upload the File:**
-    - Click "Browse files" to select a CSV file from your local machine.
-    - Press the **"Upload to Cloud Storage"** button to save the file. The page will automatically refresh to show the new dataset in the dropdown lists.
+In the System Instructions field enter:
+```
+Solve the problem given the image.
+```
 
-#### Viewing Existing Datasets
+Click `Save`
 
-The second section on the page allows you to browse the datasets you have already created.
+Copy this text for testing:
 
-- Select a dataset from the dropdown menu.
-- The application will then display a list of all the CSV filenames contained within that specific dataset folder.
+```
+{"query": "Hint: Please answer the question and provide the correct option letter, e.g., A, B, C, D, at the end.\nQuestion: As shown in the figure, CD is the diameter of \u2299O, chord DE \u2225 OA, if the degree of \u2220D is 50.0, then the degree of \u2220C is ()", "Choices":\n(A) 25\u00b0\n(B) 30\u00b0\n(C) 40\u00b0\n(D) 50\u00b0", "image": "gs://github-repo/prompts/prompt_optimizer/mathvista_dataset/images/643.jpg", "target": "25\u00b0"}
+```
 
-## 4. 📊 Using the Evaluation Workbench
+🖱️ Click `Generate`.
 
-This workbench is a powerful tool for conducting both human and model-based evaluations of your prompts. The process is broken down into four main stages within the workbench.
+### 2. Dataset Creation
 
-#### 1. Setup & Configuration
+Download a copy of the dataset. Then upload this file in the application.
 
-First, you need to configure your evaluation session.
+**Dataset Name:** `mathvista`
 
-- **Dataset Selection:** Choose your dataset and the specific CSV document you want to analyze.
-- **Sample Size:** Enter the number of samples from your dataset that you wish to evaluate manually.
-- **Prompt Selection:** Select an existing prompt and its corresponding version from the dropdown lists.
+You can preview the dataset at the bottom of the page.
 
-> **⚠️ Important:** You must click the **Load Prompt** button to populate the workbench with your selected configuration before proceeding.
+To download the dataset, run this command:
+```bash
+gsutil cp gs://github-repo/prompts/prompt_optimizer/mathvista_dataset/mathvista_input.jsonl .
+```
 
-- **Feedback Type:** Define the rating system you will use for manual evaluation. Your options are:
-  - `scale`: A numerical rating, typically 1-5.
-  - `boolean`: A simple pass/fail or true/false rating.
-  - `float`: A decimal rating between 0.0 and 1.0.
+### 3. Evaluation
 
----
+We will now run an evaluation, prior to doing any tweaking to get a baseline.
 
-#### 2. Manual Rating & Inference
+- **Existing Dataset:** 'mathvista'
+- **Dataset File:** 'mathvista_input.jsonl'
+- **Number of Samples:** '100'
+- **Ground Truth Column Name:** 'target'
+- **Existing Prompt:** 'math_prompt_test'
+- **Version:** '1'
 
-In this section, you will act as the human evaluator for the samples you selected.
+Click Load Prompt, and Upload and Get Response... ⏰ Wait!!
 
-You will be presented with a table containing the following columns for each sample:
+Review the responses.
 
-- `UserInput`: The original input data from your dataset.
-- `Ground Truth`: The ideal or correct response from your dataset.
-- `Assistant Response`: The actual response generated by the LLM using your selected prompt.
+- **Model-Based:** 'question-answering-quality'
 
-Your tasks are:
+Launch the Eval... ⏰ Wait!!
 
-1. **Rate each response:** For every row, compare the `Assistant Response` to the `Ground Truth` and assign a score based on the **Feedback Type** you chose during setup.
-2. **Exclude samples (optional):** If an LLM response is irrelevant or not useful, you can uncheck the **Include in evaluation** box for that row. This will remove it from the final analysis.
+View the Evaluation Results, and save to prompt records. This will save this initial version to the prompt records for the baseline.
 
-Once you have rated all your samples, you can click the **Save Ratings to GCS** button to store your work in Google Cloud Storage.
+### 4. Prompt Optimization
 
----
+🔧 Set-Up Prompt Optimization.
 
-#### 3. Auto-Rater Evaluation
+- **Target Model:** 'gemini-2.0-flash-001'
+- **Existing Prompt:** 'math_prompt_test'
+- **Version:** '1'
 
-This feature uses a separate "judge" model to automatically score the `Assistant Response` based on the `Ground Truth`, providing an objective, AI-driven perspective.
+🖱️ Click Load Prompt.
 
-- **Select a Judge Model:** Choose the model you want to use as the evaluator from the dropdown list.
-- **Customize the Judging Prompt:** A default prompt for the judge model is provided. You can modify this prompt to better align with your specific evaluation criteria if needed.
-- **Launch the Evaluation:** Click the **Launch Auto Rater Evaluation** button.
+- **Select Existing Dataset:** 'mathvista'
+- **Select the File:** 'mathvista_input.jsonl'
 
-The system will then process the samples and display the results, including a **Mean Gemini Judge Score** and your **Mean Human Score** for a side-by-side comparison.
+🖱️ Click Load Dataset.
 
----
+Preview the dataset.
 
-#### 4. Auto-Rater vs. Human Analysis
+🖱️ Click Start Optimization.
 
-The final section provides a detailed comparison between your manual ratings and the scores from the auto-rater.
+**Note:** If Interested in viewing the progress, Navigate to https://console.cloud.google.com/vertex-ai/training/custom-jobs
 
-This view includes a variety of metrics and visualizations (graphs) to help you analyze the results and understand how closely the LLM judge aligns with human evaluation.
+⏰ Wait!! This step will take about 20-min to run.
 
-## 5. 🚀 Launching Prompt Optimization
+### 5. Prompt Optimization Results
 
-This step allows you to use an automated process to refine and improve your existing prompts based on a sample dataset.
+View the Optimization Results.
 
-#### 1. Initial Setup
+The last run will be shown at the top of the screen. Pick this from the dropdown menu:
 
-First, configure the model and dataset for the optimization job.
+![image.png](assets/prompt_optimization_result.png)
 
-- **Target Model & Prompt:**
-  - Select the **target model** you want to optimize a prompt for.
-  - Choose the **existing prompt** you wish to improve from the dropdown list.
-  - Select the specific **version** of that prompt.
-    > 📌 **Action:** Click the **Load Prompt** button to confirm your selection.
+Review the results and select the highest scoring version and copy the instruction.
 
-- **Evaluation Dataset:**
-  - Select the CSV evaluation file. This file **must** contain `user_input` and `ground_truth` columns for the process to work.
-    > 📌 **Action:** Click the **Load Dataset** button.
+### 6. Navigate Back to Prompt for New Version
 
-#### 2. Baseline Performance Evaluation
+Load your existing prompt from before.
 
-After loading the dataset, you need to establish a baseline performance score for your original prompt.
+📋 Paste your new instructions from the prompt optimizer, and save new version.
 
-1. **Generate Responses:** A preview of your dataset will appear. Select the **number of samples** you want to test against and click the **Generate Responses** button.
+### 7. Run new Evaluation
 
-2. **Review and Refine:** This populates the **Baseline Evaluation** section. A new `equals` column will appear next to the `truth` and `ground_truth` columns.
-    - The tool will automatically count a response as "accurate" if it matches the ground truth.
-    - You can manually review these matches and **uncheck any rows** where you disagree with the tool's assessment of a correct match.
+Repeat step 3 with your new version.
 
-3. **Calculate Baseline:** Once you are satisfied with the review, click **Baseline Evaluation Results**. This will display the final performance metrics for your original prompt on this dataset.
+### 8. View the Records
 
-#### 3. Starting the Optimization Job
+Navigate to the leaderboard and load the results.
 
-With the baseline established, you are ready to start the automated optimization.
-
-1. **Launch:** Click the **Start Optimization Job** button.
-
-2. **Monitor:**
-    > **⚠️ Please Note:**
-    > - Prompt optimization is a long-running process that can take many minutes to complete.
-    > - A warning message will appear at the top of the screen to confirm the job has started.
-    > - To monitor the progress in real-time, **check the application's console logs**. You will find a direct URL to the detailed Google Cloud job logs there.
-
-You can use the logs to determine when the optimization job has successfully completed and view the results.
-Alternatively, by nagivating to Vertex AI > Model Development > Training in the console, you can also see the job status here. Make note of the job ID so you can reference in the last section.
-
-### Step 6: 🏆 Reviewing Optimization Results
-
-The **Results Browser** is where you can view and compare the outcomes of your completed prompt optimization jobs.
-
-To review your results, **select the optimization job** you wish to analyze from the dropdown menu. The jobs are identified by the unique **Job ID** generated in the previous step.
-
-After you select a job, the page will display the results. You will see a list of the different prompt versions created by the optimizer, along with the **percentage accuracy** each one achieved on the evaluation dataset. This allows you to easily identify the best-performing prompt.
-
-> **📌 Important Notes & Troubleshooting**
->
-> - **Job Duration:** Please be aware that a prompt optimization job can take **15-20 minutes** to complete.
->
-> - **Check Job Status:** You can monitor the live status of your job in the Google Cloud console here:
->     [Vertex AI Custom Jobs](https://console.cloud.google.com/vertex-ai/training/custom-jobs)
->
-> - **Troubleshooting Errors:** If an optimization job fails, you can find detailed logs in your GCS staging bucket. Look for an `error.json` file within the specific job's output directory. The path will be similar to this:
->     `gs://<your-gcs-bucket>/optimization/<job-id>/optimization_jobs/<detailed-job-name>/error.json`
+## License
+```
+Copyright 2025 Google LLC
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    https://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language
+```
