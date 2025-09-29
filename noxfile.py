@@ -23,6 +23,8 @@ import nbformat
 import nox
 
 DEFAULT_PYTHON_VERSION = "3.11"
+DEFAULT_RUFF_LINE_LENGTH = 88
+
 
 nox.options.sessions = [
     "format",
@@ -30,15 +32,18 @@ nox.options.sessions = [
 nox.options.reuse_existing_virtualenvs = True
 
 
-def wrap_param_cells_with_fmt_off_on(
-    session: nox.Session, notebook_paths: list[str]
+def wrap_param_blocks_with_fmt_off_on(
+    session: nox.Session,
+    notebook_paths: list[str],
+    max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
 ) -> None:
-    """Parses notebooks and wraps cells containing '@param' with '# fmt: off/on'.
+    """Parses notebooks and wraps '@param' blocks with '# fmt: off/on'.
 
-    This prevents ruff from formatting Google Colab form fields, which can break
-    their functionality. The function modifies files in-place.
+    This prevents ruff from formatting Google Colab form fields. The function
+    finds the first and last lines containing '@param' in a cell and inserts
+    the directives around that block. It modifies files in-place.
     """
-    session.log("Checking for '@param' cells to wrap with '# fmt: off/on'...")
+    session.log("Checking for '@param' blocks to wrap with '# fmt: off/on'...")
     for path in notebook_paths:
         try:
             with open(path, encoding="utf-8") as f:
@@ -46,18 +51,47 @@ def wrap_param_cells_with_fmt_off_on(
 
             notebook_modified = False
             for cell in notebook.cells:
-                # If a cell contains @param and is not already wrapped, wrap it
-                if (
-                    cell.cell_type == "code"
-                    and "@param" in cell.source
-                    and not cell.source.strip().startswith("# fmt: off")
-                ):
-                    cell.source = f"# fmt: off\n{cell.source.strip()}\n# fmt: on"
+                if cell.cell_type != "code" or "@param" not in cell.source:
+                    continue
+
+                source_lines = cell.source.split("\n")
+
+                clean_source_lines = [
+                    line
+                    for line in source_lines
+                    if line.strip() not in ["# fmt: off", "# fmt: on"]
+                ]
+
+                param_indices = [
+                    i
+                    for i, line in enumerate(clean_source_lines)
+                    if "@param" in line and len(line) >= max_line_length
+                ]
+
+                if not param_indices:
+                    continue
+
+                first_param_index = param_indices[0]
+                last_param_index = param_indices[-1]
+
+                # Reconstruct the cell source with new directives
+                new_source_lines = []
+                for i, line in enumerate(clean_source_lines):
+                    if i == first_param_index:
+                        new_source_lines.append("# fmt: off")
+                    new_source_lines.append(line)
+                    if i == last_param_index:
+                        new_source_lines.append("# fmt: on")
+
+                new_source = "\n".join(new_source_lines)
+
+                if new_source != cell.source:
+                    cell.source = new_source
                     notebook_modified = True
 
             if notebook_modified:
                 session.log(
-                    f"  -> Wrapped '@param' cells with '# fmt: off/on' in {path}"
+                    f"  -> Wrapped '@param' blocks with '# fmt: off/on' in {path}"
                 )
                 with open(path, "w", encoding="utf-8") as f:
                     nbformat.write(notebook, f)
@@ -187,7 +221,7 @@ def format(session: nox.Session) -> None:
             "nbformat",
         )
 
-        wrap_param_cells_with_fmt_off_on(session, lint_paths_nb)
+        wrap_param_blocks_with_fmt_off_on(session, lint_paths_nb)
 
         session.run("python3", ".github/workflows/update_notebook_links.py", ".")
 
