@@ -23,8 +23,6 @@ import nbformat
 import nox
 
 DEFAULT_PYTHON_VERSION = "3.11"
-DEFAULT_RUFF_LINE_LENGTH = 88
-
 
 nox.options.sessions = [
     "format",
@@ -32,17 +30,15 @@ nox.options.sessions = [
 nox.options.reuse_existing_virtualenvs = True
 
 
-def add_skip_to_param_lines(
-    session: nox.Session,
-    notebook_paths: list[str],
-    max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
+def wrap_param_cells_with_fmt_off_on(
+    session: nox.Session, notebook_paths: list[str]
 ) -> None:
-    """Parses notebooks and adds '# fmt: skip' to long lines containing '@param'.
+    """Parses notebooks and wraps cells containing '@param' with '# fmt: off/on'.
 
-    This prevents ruff from formatting Google Colab form fields that
-    exceed the configured line length. The function modifies files in-place.
+    This prevents ruff from formatting Google Colab form fields, which can break
+    their functionality. The function modifies files in-place.
     """
-    session.log(f"Checking for '@param' lines longer than {max_line_length} chars...")
+    session.log("Checking for '@param' cells to wrap with '# fmt: off/on'...")
     for path in notebook_paths:
         try:
             with open(path, encoding="utf-8") as f:
@@ -50,28 +46,18 @@ def add_skip_to_param_lines(
 
             notebook_modified = False
             for cell in notebook.cells:
-                if cell.cell_type == "code":
-                    source_lines = cell.source.split("\n")
-                    new_source_lines = []
-                    cell_modified = False
-                    for line in source_lines:
-                        if (
-                            "@param" in line
-                            and len(line) > max_line_length
-                            and "# fmt: skip" not in line
-                        ):
-                            new_source_lines.append(line.rstrip() + "  # fmt: skip")
-                            cell_modified = True
-                        else:
-                            new_source_lines.append(line)
-
-                    if cell_modified:
-                        cell.source = "\n".join(new_source_lines)
-                        notebook_modified = True
+                # If a cell contains @param and is not already wrapped, wrap it
+                if (
+                    cell.cell_type == "code"
+                    and "@param" in cell.source
+                    and not cell.source.strip().startswith("# fmt: off")
+                ):
+                    cell.source = f"# fmt: off\n{cell.source.strip()}\n# fmt: on"
+                    notebook_modified = True
 
             if notebook_modified:
                 session.log(
-                    f"  -> Added '# fmt: skip' to long '@param' lines in {path}"
+                    f"  -> Wrapped '@param' cells with '# fmt: off/on' in {path}"
                 )
                 with open(path, "w", encoding="utf-8") as f:
                     nbformat.write(notebook, f)
@@ -201,7 +187,7 @@ def format(session: nox.Session) -> None:
             "nbformat",
         )
 
-        add_skip_to_param_lines(session, lint_paths_nb)
+        wrap_param_cells_with_fmt_off_on(session, lint_paths_nb)
 
         session.run("python3", ".github/workflows/update_notebook_links.py", ".")
 
