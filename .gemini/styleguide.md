@@ -54,6 +54,7 @@ libraries and SDKs.
 - By default, use the following models when using `google-genai`:
   - **General Text & Multimodal Tasks:** `gemini-2.5-flash`
   - **Coding and Complex Reasoning Tasks:** `gemini-2.5-pro`
+  - **Latency-sensitive operations:** `gemini-2.5-flash-lite`
   - **Image Generation Tasks:** `imagen-4.0-fast-generate-001`,
         `imagen-4.0-generate-001` or `imagen-4.0-ultra-generate-001`
   - **Image Editing Tasks:** `gemini-2.5-flash-image-preview`
@@ -62,7 +63,7 @@ libraries and SDKs.
 
 - It is also acceptable to use following models if explicitly requested by the
     user:
-  - **Gemini 2.0 Series**: `gemini-2.0-flash`, `gemini-2.0-pro`
+  - **Gemini 2.0 Series**: `gemini-2.0-flash-lite`, `gemini-2.0-flash`, `gemini-2.0-pro`
 
 - Do not use the following deprecated models (or their variants like
     `gemini-1.5-flash-latest`):
