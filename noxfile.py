@@ -32,7 +32,7 @@ nox.options.sessions = [
 nox.options.reuse_existing_virtualenvs = True
 
 
-def wrap_param_blocks_with_fmt_off_on(
+def preprocess_notebook(
     session: nox.Session,
     notebook_paths: list[str],
     max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
@@ -51,6 +51,10 @@ def wrap_param_blocks_with_fmt_off_on(
 
             notebook_modified = False
             for cell in notebook.cells:
+                if "id" in cell:
+                    del cell["id"]
+                    notebook_modified = True
+
                 if cell.cell_type != "code" or "@param" not in cell.source:
                     continue
 
@@ -221,7 +225,7 @@ def format(session: nox.Session) -> None:
             "nbformat",
         )
 
-        wrap_param_blocks_with_fmt_off_on(session, lint_paths_nb)
+        preprocess_notebook(session, lint_paths_nb)
 
         session.run("python3", ".github/workflows/update_notebook_links.py", ".")
 
