@@ -32,17 +32,18 @@ nox.options.sessions = [
 nox.options.reuse_existing_virtualenvs = True
 
 
-def add_skip_to_param_lines(
+def wrap_param_blocks_with_fmt_off_on(
     session: nox.Session,
     notebook_paths: list[str],
     max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
 ) -> None:
-    """Parses notebooks and adds '# fmt: skip' to long lines containing '@param'.
+    """Parses notebooks and wraps '@param' blocks with '# fmt: off/on'.
 
-    This prevents ruff from formatting Google Colab form fields that
-    exceed the configured line length. The function modifies files in-place.
+    This prevents ruff from formatting Google Colab form fields. The function
+    finds the first and last lines containing '@param' in a cell and inserts
+    the directives around that block. It modifies files in-place.
     """
-    session.log(f"Checking for '@param' lines longer than {max_line_length} chars...")
+    session.log("Checking for '@param' blocks to wrap with '# fmt: off/on'...")
     for path in notebook_paths:
         try:
             with open(path, encoding="utf-8") as f:
@@ -50,28 +51,47 @@ def add_skip_to_param_lines(
 
             notebook_modified = False
             for cell in notebook.cells:
-                if cell.cell_type == "code":
-                    source_lines = cell.source.split("\n")
-                    new_source_lines = []
-                    cell_modified = False
-                    for line in source_lines:
-                        if (
-                            "@param" in line
-                            and len(line) > max_line_length
-                            and "# fmt: skip" not in line
-                        ):
-                            new_source_lines.append(line.rstrip() + "  # fmt: skip")
-                            cell_modified = True
-                        else:
-                            new_source_lines.append(line)
+                if cell.cell_type != "code" or "@param" not in cell.source:
+                    continue
 
-                    if cell_modified:
-                        cell.source = "\n".join(new_source_lines)
-                        notebook_modified = True
+                source_lines = cell.source.split("\n")
+
+                clean_source_lines = [
+                    line
+                    for line in source_lines
+                    if line.strip() not in ["# fmt: off", "# fmt: on"]
+                ]
+
+                param_indices = [
+                    i
+                    for i, line in enumerate(clean_source_lines)
+                    if "@param" in line and len(line) >= max_line_length
+                ]
+
+                if not param_indices:
+                    continue
+
+                first_param_index = param_indices[0]
+                last_param_index = param_indices[-1]
+
+                # Reconstruct the cell source with new directives
+                new_source_lines = []
+                for i, line in enumerate(clean_source_lines):
+                    if i == first_param_index:
+                        new_source_lines.append("# fmt: off")
+                    new_source_lines.append(line)
+                    if i == last_param_index:
+                        new_source_lines.append("# fmt: on")
+
+                new_source = "\n".join(new_source_lines)
+
+                if new_source != cell.source:
+                    cell.source = new_source
+                    notebook_modified = True
 
             if notebook_modified:
                 session.log(
-                    f"  -> Added '# fmt: skip' to long '@param' lines in {path}"
+                    f"  -> Wrapped '@param' blocks with '# fmt: off/on' in {path}"
                 )
                 with open(path, "w", encoding="utf-8") as f:
                     nbformat.write(notebook, f)
@@ -201,7 +221,7 @@ def format(session: nox.Session) -> None:
             "nbformat",
         )
 
-        add_skip_to_param_lines(session, lint_paths_nb)
+        wrap_param_blocks_with_fmt_off_on(session, lint_paths_nb)
 
         session.run("python3", ".github/workflows/update_notebook_links.py", ".")
 

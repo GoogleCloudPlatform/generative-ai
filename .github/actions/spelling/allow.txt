@@ -6,6 +6,7 @@ ABG
 Abhishek
 acall
 achat
+Achird
 acomplete
 adamw
 ADAS
@@ -173,6 +174,7 @@ cbp
 cce
 cctv
 cdiv
+ceb
 ceo
 cer
 cfbundle
@@ -369,6 +371,7 @@ envsubst
 epath
 epoc
 Eragon
+Erinome
 erlang
 errlog
 erty
@@ -449,6 +452,7 @@ fullurl
 functiona
 futur
 Gabeira
+Gacrux
 gaeta
 gameplay
 Gameplay
@@ -699,6 +703,7 @@ kickstart
 Kipchoge
 knative
 KNN
+kok
 Kongre
 konnte
 kotlin
@@ -723,6 +728,7 @@ lakecolor
 landcolor
 landuse
 langgraph
+Laomedeia
 latte
 LCEL
 LEBRON
@@ -785,6 +791,7 @@ magicoder
 magika
 Mahindra
 mahut
+mai
 makeover
 Malware
 Mamah
@@ -1563,6 +1570,7 @@ Zhenguo
 Zhengying
 Zijin
 zimie
+Zizu
 zmin
 Zom
 Zosyn
