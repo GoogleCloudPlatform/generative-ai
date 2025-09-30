@@ -2,6 +2,10 @@
 
 The current year is 2025.
 
+## Markdown Style
+
+- All code-like text should be enclosed in backticks.
+
 ## Golden Rule: Use the Correct and Current SDK
 
 Always use the Google Gen AI SDK to call the Gemini models, which became the
