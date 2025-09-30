@@ -51,6 +51,10 @@ def wrap_param_blocks_with_fmt_off_on(
 
             notebook_modified = False
             for cell in notebook.cells:
+                if "id" in cell:
+                    del cell["id"]
+                    notebook_modified = True
+
                 if cell.cell_type != "code" or "@param" not in cell.source:
                     continue
 
