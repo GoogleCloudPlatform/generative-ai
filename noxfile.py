@@ -30,7 +30,8 @@ nox.options.sessions = [
     "format",
 ]
 nox.options.reuse_existing_virtualenvs = True
-
+# Use system site packages to leverage existing pip installations
+nox.options.default_venv_backend = "none"
 
 def preprocess_notebook(
     session: nox.Session,
