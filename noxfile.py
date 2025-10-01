@@ -51,10 +51,6 @@ def preprocess_notebook(
 
             notebook_modified = False
             for cell in notebook.cells:
-                if "id" in cell:
-                    del cell["id"]
-                    notebook_modified = True
-
                 if cell.cell_type != "code" or "@param" not in cell.source:
                     continue
 
@@ -202,13 +198,13 @@ def format(session: nox.Session) -> None:
             "--remove-all-unused-imports",
             *lint_paths_py,
         )
-        session.run(
-            "ruff",
-            "check",
-            "--fix-only",
-            ruff_unsafe_fixes_flag,
-            *lint_paths_py,
-        )
+
+        ruff_check_command = ["ruff", "check", "--fix-only"]
+        if "--unsafe-fixes" in session.posargs:
+            ruff_check_command.append("--unsafe-fixes")
+        ruff_check_command.extend(lint_paths_py)
+        session.run(*ruff_check_command)
+
         session.run(
             "ruff",
             "format",
@@ -221,8 +217,8 @@ def format(session: nox.Session) -> None:
             "ipython",
             "jupyter",
             "nbconvert",
-            "nbqa",
-            "nbformat",
+            "nbqa>=1.9.1",
+            "nbformat>=5.10.4",
         )
 
         preprocess_notebook(session, lint_paths_nb)
