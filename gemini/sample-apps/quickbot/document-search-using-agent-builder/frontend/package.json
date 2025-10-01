@@ -25,7 +25,7 @@
     "@angular/animations": "^15.1.0",
     "@angular/cdk": "^15.2.9",
     "@angular/common": "^15.1.0",
-    "@angular/compiler": "^15.1.0",
+    "@angular/compiler": "^20.0.0",
     "@angular/core": "^15.1.0",
     "@angular/fire": "7.5",
     "@angular/flex-layout": "^15.0.0-beta.42",
