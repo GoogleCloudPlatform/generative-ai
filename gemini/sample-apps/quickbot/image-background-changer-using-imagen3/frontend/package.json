@@ -26,7 +26,7 @@
   "dependencies": {
     "@angular/animations": "^15.1.0",
     "@angular/cdk": "^15.2.9",
-    "@angular/common": "^15.1.0",
+    "@angular/common": "^20.0.0",
     "@angular/compiler": "^15.1.0",
     "@angular/core": "^15.1.0",
     "@angular/fire": "7.5",
