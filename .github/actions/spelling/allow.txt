@@ -92,6 +92,7 @@ autosxs
 AUVs
 avec
 aworkflow
+axs
 backstory
 backticks
 bagchi
@@ -140,6 +141,7 @@ Boyz
 bpa
 bpd
 bpm
+Bqbl
 bqdf
 bqds
 bqml
@@ -227,6 +229,7 @@ CONOUT
 constexpr
 convo
 convos
+coolwarm
 COPD
 coq
 cordata
@@ -699,6 +702,8 @@ Khanh
 khz
 kickstart
 Kipchoge
+kmeans
+KMEANS
 knative
 KNN
 kok
@@ -1280,6 +1285,7 @@ subword
 suis
 sunner
 supima
+suptitle
 Surampudi
 Suzaka
 svh
@@ -1488,6 +1494,7 @@ werden
 wereld
 WFH
 wght
+whitegrid
 wiersz
 wiffle
 wikipedia
