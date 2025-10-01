@@ -702,8 +702,8 @@ Khanh
 khz
 kickstart
 Kipchoge
-KMEANS
 kmeans
+KMEANS
 knative
 KNN
 kok
@@ -1280,12 +1280,12 @@ stt
 stuffie
 subclip
 SUBLANG
-suptitle
 subviews
 subword
 suis
 sunner
 supima
+suptitle
 Surampudi
 Suzaka
 svh
