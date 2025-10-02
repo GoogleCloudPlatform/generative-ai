@@ -6,7 +6,7 @@ LLMEvalKit is a tool designed to help developers evaluate and improve the perfor
 
 ![Image](assets/image.gif)
 
-**Authors: [Mike Santoro](https://github.com/Michael-Santoro), [Katherine Larson](https://github.com/larsonk)**
+**Authors: [Mike Santoro](https://github.com/Michael-Santoro), [Katherine Larson](https://github.com/kat-litinsky)**
 
 ## 🚀 Getting Started
 
