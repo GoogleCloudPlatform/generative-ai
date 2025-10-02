@@ -6,6 +6,7 @@ ABG
 Abhishek
 acall
 achat
+Achird
 acomplete
 adamw
 ADAS
@@ -91,6 +92,7 @@ autosxs
 AUVs
 avec
 aworkflow
+axs
 backstory
 backticks
 bagchi
@@ -139,6 +141,7 @@ Boyz
 bpa
 bpd
 bpm
+Bqbl
 bqdf
 bqds
 bqml
@@ -172,6 +175,7 @@ caxis
 cce
 cctv
 cdiv
+ceb
 ceo
 cer
 cfbundle
@@ -225,7 +229,9 @@ CONOUT
 constexpr
 convo
 convos
+coolwarm
 COPD
+coq
 cordata
 coro
 corpuses
@@ -366,6 +372,7 @@ envsubst
 epath
 epoc
 Eragon
+Erinome
 erlang
 errlog
 erty
@@ -446,6 +453,8 @@ fullurl
 functiona
 futur
 Gabeira
+Gacrux
+gaeta
 gameplay
 Gameplay
 gapic
@@ -510,10 +519,12 @@ googler
 goooooood
 gozo
 gpg
+gpp
 gpt
 gpu
 gradio
 gradlew
+graphrag
 Graterol
 gridcolor
 gridless
@@ -691,8 +702,11 @@ Khanh
 khz
 kickstart
 Kipchoge
+kmeans
+KMEANS
 knative
 KNN
+kok
 Kongre
 konnte
 kotlin
@@ -717,6 +731,7 @@ lakecolor
 landcolor
 landuse
 langgraph
+Laomedeia
 latte
 LCEL
 LEBRON
@@ -779,6 +794,7 @@ magicoder
 magika
 Mahindra
 mahut
+mai
 makeover
 Malware
 Mamah
@@ -1088,6 +1104,9 @@ qrels
 quadrotor
 qubit
 qubits
+quickbot
+Quickbot
+quicktime
 quippy
 qwen
 Qwen
@@ -1266,6 +1285,7 @@ subword
 suis
 sunner
 supima
+suptitle
 Surampudi
 Suzaka
 svh
@@ -1474,6 +1494,7 @@ werden
 wereld
 WFH
 wght
+whitegrid
 wiersz
 wiffle
 wikipedia
@@ -1549,6 +1570,7 @@ Zhenguo
 Zhengying
 Zijin
 zimie
+Zizu
 zmin
 Zom
 Zosyn
