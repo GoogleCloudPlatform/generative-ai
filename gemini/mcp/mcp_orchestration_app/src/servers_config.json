@@ -1,9 +1,0 @@
-{
-  "geminiServer": {
-    "name": "gemini_llm_server",
-    "config": {
-      "script_path": "gemini_server.py",
-      "env": {}
-    }
-  }
-}

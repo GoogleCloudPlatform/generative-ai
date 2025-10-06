@@ -1,8 +1,0 @@
-[MESSAGES CONTROL]
-disable=
-    E3701,
-    W0613,
-    C0302,
-    C0301,
-    R0903,
-    too-many-lines

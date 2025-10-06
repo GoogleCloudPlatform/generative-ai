@@ -1,7 +1,0 @@
-    __pycache__
-    *.pyc
-    *.pyo
-    .git
-    .gitignore
-    tests/
-    .pytest_cache/
