@@ -1,3 +1,0 @@
-google-genai==1.21.1
-google-cloud-bigquery==3.31.0
-streamlit==1.46.0

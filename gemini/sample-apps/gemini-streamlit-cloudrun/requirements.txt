@@ -1,2 +1,0 @@
-streamlit
-google-genai

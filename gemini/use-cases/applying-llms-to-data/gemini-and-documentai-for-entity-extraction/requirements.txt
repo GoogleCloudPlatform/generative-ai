@@ -1,3 +1,0 @@
-google-cloud-aiplatform
-google-cloud-documentai
-google-cloud-storage

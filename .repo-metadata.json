@@ -1,8 +1,0 @@
-{
-  "default_version": "v1",
-  "name": "generative-ai",
-  "name_pretty": "Google Cloud Generative AI Samples",
-  "issue_tracker": "https://github.com/GoogleCloudPlatform/generative-ai/issues",
-  "language": "python",
-  "repo": "GoogleCloudPlatform/generative-ai"
-}

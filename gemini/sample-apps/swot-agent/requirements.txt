@@ -1,9 +1,0 @@
-beautifulsoup4==4.13.3
-fastapi[standard]==0.115.12
-google-genai==0.8.0
-httpx==0.28.1
-itsdangerous==2.2.0
-praw==7.8.1
-pydantic-ai[vertexai]==0.0.49
-pytest-asyncio==0.26.0
-pytest==8.3.5
