@@ -1,0 +1,69 @@
+# Code owners file.
+# This file controls who is tagged for review for any given pull request.
+#
+# For syntax help see:
+# https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
+
+# @GoogleCloudPlatform/generative-ai-devrel are the default owners for changes in this repo
+
+
+*                                                                                                                                @GoogleCloudPlatform/generative-ai-devrel
+/generative-ai/embeddings                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @kazunori279
+/generative-ai/gemini                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @polong-lin
+/generative-ai/gemini/agent-engine                                                                                               @GoogleCloudPlatform/generative-ai-devrel @koverholt
+/generative-ai/gemini/agent-engine/tutorial_ag2_on_agent_engine.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @awaemmanuel
+/generative-ai/gemini/agent-engine/tutorial_alloydb_rag_agent.ipynb                                                              @GoogleCloudPlatform/generative-ai-devrel @averikitsch
+/generative-ai/gemini/agent-engine/tutorial_cloud_sql_pg_rag_agent.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @averikitsch
+/generative-ai/gemini/agents/genai-experience-concierge                                                                          @GoogleCloudPlatform/generative-ai-devrel @pablofgaeta
+/generative-ai/gemini/code-execution                                                                                             @GoogleCloudPlatform/generative-ai-devrel @koverholt
+/generative-ai/gemini/evaluation                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @inardini @jsondai
+/generative-ai/gemini/evaluation/evaluate_langchain_chains.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @eliasecchig
+/generative-ai/gemini/function-calling                                                                                           @GoogleCloudPlatform/generative-ai-devrel @koverholt
+/generative-ai/gemini/getting-started                                                                                            @GoogleCloudPlatform/generative-ai-devrel @gericdong @polong-lin
+/generative-ai/gemini/grounding                                                                                                  @GoogleCloudPlatform/generative-ai-devrel @holtskinner
+/generative-ai/gemini/mcp/intro_to_mcp.ipynb                                                                                     @GoogleCloudPlatform/generative-ai-devrel @wadave
+/generative-ai/gemini/model-optimizer/intro_model_optimizer.ipynb                                                                @GoogleCloudPlatform/generative-ai-devrel @nardosalemu
+/generative-ai/gemini/multimodal-dataset                                                                                         @GoogleCloudPlatform/generative-ai-devrel @fthoele @cleop-google @diskontinuum
+/generative-ai/gemini/multimodal-live-api/websocket-demo-app/                                                                    @GoogleCloudPlatform/generative-ai-devrel @ZackAkil
+/generative-ai/gemini/rag-engine                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @edtsoi430
+/generative-ai/gemini/responsible-ai                                                                                             @GoogleCloudPlatform/generative-ai-devrel @iamthuya
+/generative-ai/gemini/responsible-ai/gemini_safety_ratings.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @ghchinoy
+/generative-ai/gemini/sample-apps/finance-advisor-spanner/                                                                       @GoogleCloudPlatform/generative-ai-devrel @anirbanbagchi1979
+/generative-ai/gemini/sample-apps/genai-mlops-tune-and-eval                                                                      @GoogleCloudPlatform/generative-ai-devrel @willisc7
+/generative-ai/gemini/sample-apps/genwealth/                                                                                     @GoogleCloudPlatform/generative-ai-devrel @paulramsey
+/generative-ai/gemini/sample-apps/photo-discovery                                                                                @GoogleCloudPlatform/generative-ai-devrel @KhanhNwin @kazunori279
+/generative-ai/gemini/tuning/gemini_supervised_finetuning_text_classification.ipynb                                              @GoogleCloudPlatform/generative-ai-devrel @eliasecchig @gabrielahrlr
+/generative-ai/gemini/tuning/supervised_finetuning_using_gemini.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @dmoonat
+/generative-ai/gemini/use-cases/applying-llms-to-data/analyze-poster-images-in-bigquery/poster_image_analysis.ipynb              @GoogleCloudPlatform/generative-ai-devrel @aliciawilliams
+/generative-ai/gemini/use-cases/applying-llms-to-data/semantic-search-in-bigquery/stackoverflow_questions_semantic_search.ipynb  @GoogleCloudPlatform/generative-ai-devrel @sethijaideep
+/generative-ai/gemini/use-cases/applying-llms-to-data/using-gemini-with-bigquery-remote-functions                                @GoogleCloudPlatform/generative-ai-devrel @shanecglass
+/generative-ai/gemini/use-cases/education                                                                                        @GoogleCloudPlatform/generative-ai-devrel @PicardParis
+/generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @saeedaghabozorgi
+/generative-ai/gemini/use-cases/multimodal-sentiment-analysis/intro_to_multimodal_sentiment_analysis.ipynb                       @GoogleCloudPlatform/generative-ai-devrel @Mansari
+/generative-ai/gemini/use-cases/productivity/productivity_coaching_with_google_calendar_and_gmail.ipynb                          @GoogleCloudPlatform/generative-ai-devrel @Mansari
+/generative-ai/gemini/use-cases/retail                                                                                           @GoogleCloudPlatform/generative-ai-devrel @iamthuya
+/generative-ai/gemini/use-cases/retail/product_attributes_extraction.ipynb                                                       @GoogleCloudPlatform/generative-ai-devrel @tianli
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_pipeline_terabyte_scale_with_bigframes.ipynb                  @GoogleCloudPlatform/generative-ai-devrel @eliasecchig @lspatarog
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/rag_qna_with_bq_and_featurestore.ipynb                            @GoogleCloudPlatform/generative-ai-devrel @eliasecchig @lspatarog
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/raw_with_bigquery.ipynb                                           @GoogleCloudPlatform/generative-ai-devrel @jeffonelson
+/generative-ai/gemini/use-cases/retrieval-augmented-generation/retail_warranty_claim_chatbot.ipynb                               @GoogleCloudPlatform/generative-ai-devrel @zthor5
+/generative-ai/genkit/generate-synthetic-database                                                                                @GoogleCloudPlatform/generative-ai-devrel @aikozhaoz
+/generative-ai/genkit/postcard-generator                                                                                         @GoogleCloudPlatform/generative-ai-devrel @mattsday
+/generative-ai/open-models/serving                                                                                               @GoogleCloudPlatform/generative-ai-devrel @polong-lin
+/generative-ai/open-models/serving/cloud_run_ollama_gemma3_inference.ipynb                                                       @GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/open-models/serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb                                   @GoogleCloudPlatform/generative-ai-devrel @rsamborski
+/generative-ai/open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @eliasecchig
+/generative-ai/search                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @holtskinner
+/generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb                                            @GoogleCloudPlatform/generative-ai-devrel @guruvittal
+/generative-ai/speech/getting-started                                                                                            @GoogleCloudPlatform/generative-ai-devrel @inardini
+/generative-ai/speech/use-cases/storytelling                                                                                     @GoogleCloudPlatform/generative-ai-devrel @holtskinner
+/generative-ai/vision/getting-started                                                                                            @GoogleCloudPlatform/generative-ai-devrel @iamthuya
+/generative-ai/vision/gradio/gradio_image_generation_sdk.ipynb                                                                   @GoogleCloudPlatform/generative-ai-devrel @jbrache
+/generative-ai/vision/use-cases                                                                                                  @GoogleCloudPlatform/generative-ai-devrel @iamthuya
+/generative-ai/vision/use-cases/hey_llm                                                                                          @GoogleCloudPlatform/generative-ai-devrel @tushuhei
+/generative-ai/vision/sample-apps/V-Start                                                                                          @GoogleCloudPlatform/generative-ai-devrel @WafaeBakkali
+/generative-ai/open-models/serving/cloud_run_ollama_qwen3_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/open-models/get_started_with_model_garden_sdk.ipynb                                                               @GoogleCloudPlatform/generative-ai-devrel @inardini @lizzij
+/generative-ai/open-models/use-cases/model_garden_litellm_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @lizzij
+/generative-ai/llmevalkit                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @santoromike @lkatherine

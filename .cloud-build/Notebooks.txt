@@ -1,0 +1,15 @@
+generative-ai/gemini/getting-started/intro_gemini_2_0_flash.ipynb
+generative-ai/gemini/getting-started/intro_gemini_2_0_flash_lite.ipynb
+generative-ai/gemini/getting-started/intro_gemini_2_0_image_gen.ipynb
+generative-ai/gemini/getting-started/intro_gemini_2_5_flash.ipynb
+generative-ai/gemini/getting-started/intro_gemini_2_5_pro.ipynb
+generative-ai/gemini/getting-started/intro_gemini_chat.ipynb
+generative-ai/gemini/getting-started/intro_gemini_curl.ipynb
+generative-ai/gemini/chat-completions/intro_chat_completions_api.ipynb
+generative-ai/gemini/code-execution/intro_code_execution.ipynb
+generative-ai/gemini/controlled-generation/intro_controlled_generation.ipynb
+generative-ai/gemini/function-calling/intro_function_calling.ipynb
+generative-ai/gemini/global-endpoint/intro_global_endpoint.ipynb
+generative-ai/gemini/prompts/intro_prompt_design.ipynb
+generative-ai/gemini/use-cases/spatial-understanding/spatial_understanding.ipynb
+generative-ai/gemini/use-cases/intro_multimodal_use_cases.ipynb

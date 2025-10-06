@@ -1,0 +1,93 @@
+# Template taken from https://github.com/v8/v8/blob/master/.git-blame-ignore-revs.
+#
+# This file contains a list of git hashes of revisions to be ignored by git blame. These
+# revisions are considered "unimportant" in that they are unlikely to be what you are
+# interested in when blaming. Most of these will probably be commits related to linting
+# and code formatting.
+#
+# Instructions:
+# - Only large (generally automated) reformatting or renaming CLs should be
+#   added to this list. Do not put things here just because you feel they are
+#   trivial or unimportant. If in doubt, do not put it on this list.
+# - Precede each revision with a comment containing the PR title and number.
+#   For bulk work over many commits, place all commits in a block with a single
+#   comment at the top describing the work done in those commits.
+# - Only put full 40-character hashes on this list (not short hashes or any
+#   other revision reference).
+# - Append to the bottom of the file (revisions should be in chronological order
+#   from oldest to newest).
+# - Because you must use a hash, you need to append to this list in a follow-up
+#   PR to the actual reformatting PR that you are trying to ignore.
+3495535bb8a42cd96bb65058396c464611bf6eb9
+dbca58d5b3fe8bcb3a18b0708692545d4e13c70f
+6862d06d1bed3bfb73e4a15d6d22db70980fa345
+9ee2011ee29828b417b7ac9ac31c4a29643a16e7
+43626f81127ddba7a181df451455e103cebee3a5
+e32ff08d8f83a614f2b4206a15a5c8aa00adaa48
+d699c642fa8312e1a0bfc1ad2673bc17648a3c1a
+cac56b435fc03002ce6896eec78dff6876bc9dc1
+a27d6c3304d0c8fc5978da93e7c4e7bfebd2eba3
+401df3220d24516eac92f5b4539a76cd7d757814
+33c6bcca6009219efbf05746b9e634c7d4d7dcba
+08734ab993a4f5ac1a10561919b54c39ec3af04e
+3f89a238eb0b0077ec82544c4fdc1a3fa781416c
+a265634234d6c03c83dda1dd29484bdafbf98489
+dc699bc4cf3272a79a07ab93b0576d79afbe77de
+9c40a06d35cdb95ddbbf78018d0d87a2a945a35e
+418725cc5d10af3952179afa1ba9f9477c767ac2
+5a653d1d93f15995a306bfeb0c0c5d8f0b909242
+5742823bffccefce65087e6530649b4c9beddd67
+5742823bffccefce65087e6530649b4c9beddd67
+fc5d62431a71187ee6f92a8ccc492ca10e5dc2c3
+f35a605a4eaef3a8f0c65f598fe978294cf0e900
+5aec8dc940fa015601f1a9c727331291daffdc3d
+ff92e99df5faf575245b635a1accd87e56245149
+c867107284b92cc641e6d274f8088b764b9c2fa2
+d6572fcc7d5d602a96f87fe1754fae9c15b058e8
+f5e47957685ffdc4fd4c01385bb11152d8829232
+bccaf22a73e3965cb02ed7ca3022ca859c53f2b8
+eeced39d16e4638ba6df67a6401e15ca376cd73b
+7a5d55d1087fbf1617294281c0eebd212bf1e52c
+6ddf4cdd146b928452950408a8c4c1324351681b
+0c961fcb3c9cb7bfb5e1ab73acbb8fe7caebcbd4
+647a33fcaeb34ee456e4518b4ca443f82a92c501
+812b47dfb4c12a5621417a6da8cf5796b44e70d3
+a043e43746eea8aeca5dbfb17f2d496a2747b6a3
+aa073fe0b74e3813593476ff9a13496d24e2adab
+030647d76d06d3a69a0f4b716ad1035de6808653
+2b29d1d9a7418fa941709179a1f284be91f3195f
+94cace18604ef473e77e54a516b76ac263fae42b
+cb2d315aab7438ec45db9928536e7c4c3802fc49
+824b32b10f7c3701de214784307b4abb22e5fb0f
+b5c2d85557d877bc99bf18fdf549423dc54bb108
+8db09b75bdf1e2955f06fc77decfd06bfde13957
+f3fd6359f6424af47ba9d5f63145a69989e5c920
+221c0b03b29e4abf5a8d07daf2c47d7752a053a4
+12bea7f71729db4d19fa2eac5715d326cae39a22
+67f18b9c0b1beb1174bd55daa2069ab0f9b3e99d
+344921c7c585c5e4c54863a58f59efabdbfe06f6
+84ab588c313ddfd08aa6288ed2eef5bf784b1a1a
+8e28e0cfa5031892beaebecbe6308696964cc2e5
+6664dd984baa77f8358fa0ed8b57bde2b897e116
+7adb28cb68e34608e193bb47d123df7051714a46
+3e27e38b7eb154763d4c20d11d9c74a6dc08655a
+abf108d802b8f0230b38553d0413153a25a01b97
+cf0063a41156c362f0f9823a016343daf46ab46b
+b086ad4760a3437f0bf21a144b343e48bd0a015d
+96f901d9b1f52a2c2dc467679354cfa78b9cec4a
+cbc49cc90875655dcd26647835edfcb41c6b2caf
+800d05b4a3a28fe23b971e702e76df0c41e6d308
+3f0974fed57315c6123864fa2334609f3332029a
+afdcb95a39e574515a080cbe544fe35e7bf6d28b
+21d4430e8d4b1e2cc2d65b643f88465c81cb76bd
+b5dd69e1fc58a01c0c9bf07c4ed30aa132b77553
+a41f948147f9c16c9b1255038929ab1d1ac07def
+4d099b05aafd58ab6f3bfb816fd312d8d2c7ffcd
+6d74fa5d6d8a9a694951a8dac296c1cf314c9d5f
+38a81c39a9f2afa674eb89d76bfe5e7671eacf6f
+9b71a07da1a2824d108954d5155521ba465df1ef
+076464885ddf63d57d91cac830ff83f774d5c877
+ca7ceb9f8358a5d79c31d2511f705bcc55c24232
+0538e91f7c69c34174c722ae1ed1552261c8b805
+6ba714a7cf1d8d460f5518e5bf220b76088aec09
+e8cdc7edfeb79312ebe8dcdcf4662ab64ee5bbc7

@@ -1,0 +1,8 @@
+streamlit
+requests
+google-cloud-logging
+plotly
+google-cloud-aiplatform
+google-cloud-bigquery
+google-cloud-storage
+pyyaml

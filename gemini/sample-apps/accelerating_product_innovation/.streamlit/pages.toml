@@ -1,0 +1,20 @@
+
+[[pages]]
+path = "app/home_page.py"
+name = "Home Page"
+
+[[pages]]
+path = "app/pages/resources.py"
+name = "Resources"
+
+[[pages]]
+path = "app/pages/product_insights.py"
+name = "Product Insights"
+
+[[pages]]
+path = "app/pages/product_generation.py"
+name = "Product Generation"
+
+[[pages]]
+path = "app/pages/edit_image.py"
+name = "Edit Image"
