@@ -1,0 +1,16 @@
+mat-slide-toggle {
+    margin-bottom: 15px;
+}
+
+mat-slider {
+    width: 90%;
+}
+
+.filter-container {
+    padding: 5px;
+    margin-bottom: 15px;
+    display: grid;
+    grid-template-columns: 30% 70%;
+    grid-gap: 10px;
+    place-items: top;
+}

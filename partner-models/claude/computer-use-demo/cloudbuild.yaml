@@ -1,0 +1,202 @@
+steps:
+  - id: "check-cluster"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        if gcloud container clusters describe ${_CLUSTER_NAME} \
+          --project=${PROJECT_ID} \
+          --region=${_REGION} --format="none" 2>/dev/null; then
+          echo "Cluster exists, skipping creation"
+          exit 0
+        else
+          echo "Cluster not found, will create"
+          gcloud container clusters create-auto ${_CLUSTER_NAME} \
+            --project=${PROJECT_ID} \
+            --region=${_REGION} \
+            --quiet
+        fi
+
+  - id: "setup-artifact-registry"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    waitFor: ["check-cluster"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        if gcloud artifacts repositories describe ${_ARTIFACT_REGISTRY_ID} \
+          --project=${PROJECT_ID} \
+          --location=${_REGION} --format="none" 2>/dev/null; then
+          echo "Repository exists, skipping creation"
+        else
+          echo "Creating Artifact Registry repository"
+          gcloud artifacts repositories create ${_ARTIFACT_REGISTRY_ID} \
+            --repository-format=docker \
+            --location=${_REGION} \
+            --quiet
+        fi
+
+  - id: "pull-tag-push-image"
+    name: "gcr.io/cloud-builders/docker"
+    waitFor: ["setup-artifact-registry"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        # Pull the prebuilt image
+        docker pull ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
+
+        # Tag for Artifact Registry
+        docker tag ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest \
+          ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}
+
+        # Push to Artifact Registry
+        docker push ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}
+
+  - id: "setup-k8s-iam"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    waitFor: ["pull-tag-push-image"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        # Get cluster credentials
+        gcloud container clusters get-credentials ${_CLUSTER_NAME} \
+          --project=${PROJECT_ID} \
+          --region=${_REGION}
+
+        # Check and create namespace
+        if ! kubectl get namespace ${_NAMESPACE} 2>/dev/null; then
+          kubectl create namespace ${_NAMESPACE}
+        fi
+
+        # Check and create KSA
+        if ! kubectl get serviceaccount ${_KSA_NAME} -n ${_NAMESPACE} 2>/dev/null; then
+          kubectl create serviceaccount ${_KSA_NAME} -n ${_NAMESPACE}
+        fi
+
+        # Check and create IAM SA
+        if ! gcloud iam service-accounts describe ${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+          --project=${PROJECT_ID} 2>/dev/null; then
+          gcloud iam service-accounts create ${_IAM_SA_NAME} \
+            --project=${PROJECT_ID} \
+            --display-name="${_IAM_SA_DISPLAY_NAME}"
+        fi
+
+        # Add IAM roles
+        gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+          --member="serviceAccount:${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+          --role="roles/aiplatform.admin" \
+          --quiet
+
+        # Setup workload identity (idempotent)
+        gcloud iam service-accounts add-iam-policy-binding \
+          ${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+          --role roles/iam.workloadIdentityUser \
+          --member "serviceAccount:${PROJECT_ID}.svc.id.goog[${_NAMESPACE}/${_KSA_NAME}]" \
+          --quiet
+
+        kubectl annotate serviceaccount ${_KSA_NAME} \
+          --namespace ${_NAMESPACE} \
+          iam.gke.io/gcp-service-account=${_IAM_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
+          --overwrite
+
+  - id: "deploy-app"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    waitFor: ["setup-k8s-iam"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        # Install gettext package which contains envsubst
+        apt-get update && apt-get install -y gettext-base
+
+        gcloud container clusters get-credentials ${_CLUSTER_NAME} \
+          --project=${PROJECT_ID} \
+          --region=${_REGION}
+
+        # Export all variables that will be used in envsubst
+        export _REGION=${_REGION}
+        export PROJECT_ID=${PROJECT_ID}
+        export _ARTIFACT_REGISTRY_ID=${_ARTIFACT_REGISTRY_ID}
+        export _IMAGE_NAME=${_IMAGE_NAME}
+        export _IMAGE_TAG=${_IMAGE_TAG}
+        export _NAMESPACE=${_NAMESPACE}
+        export _KSA_NAME=${_KSA_NAME}
+        export _IAM_SA_NAME=${_IAM_SA_NAME}
+
+        envsubst < deployment.yaml | kubectl apply -f -
+
+  - id: "get-service-ip"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    waitFor: ["deploy-app"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "Waiting for LoadBalancer IP assignment..."
+
+        # Debug current state
+        echo "Checking service in namespace ${_NAMESPACE}..."
+        kubectl get services -n ${_NAMESPACE}
+
+        get_external_ip() {
+          kubectl get service ${_IMAGE_NAME} -n ${_NAMESPACE} \
+            -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+        }
+
+        # Wait for IP with timeout
+        TIMEOUT=300  # 5 minutes timeout
+        INTERVAL=10  # Check every 10 seconds
+        ELAPSED=0
+
+        until [ -n "$$(get_external_ip)" ] || [ $$ELAPSED -ge $$TIMEOUT ]; do
+          echo "Waiting for external IP... ($$ELAPSED seconds elapsed)"
+          # Debug service state
+          kubectl get service ${_IMAGE_NAME} -n ${_NAMESPACE}
+          sleep $$INTERVAL
+          ELAPSED=$$((ELAPSED + INTERVAL))
+        done
+
+        EXTERNAL_IP=$$(get_external_ip)
+
+        if [ -n "$$EXTERNAL_IP" ]; then
+          echo "✅ Service is ready!"
+          echo "###################################################"
+          echo "# Deployment complete! 🚀                          #"
+          echo "# External IP: $$EXTERNAL_IP                       #"
+          echo "# Services available at:                           #"
+          echo "# Streamlit UI: http://$$EXTERNAL_IP:8501         #"
+          echo "# VNC: $$EXTERNAL_IP:5900                         #"
+          echo "# noVNC Web UI: http://$$EXTERNAL_IP:6080        #"
+          echo "# Web: http://$$EXTERNAL_IP:8080                  #"
+          echo "###################################################"
+        else
+          echo "❌ Timeout waiting for external IP"
+          echo "Debug information:"
+          echo "Current services in namespace:"
+          kubectl get services -n ${_NAMESPACE}
+          echo "Service details:"
+          kubectl describe service ${_IMAGE_NAME} -n ${_NAMESPACE}
+          echo "Pod status:"
+          kubectl get pods -n ${_NAMESPACE}
+          exit 1
+        fi
+
+timeout: "3600s"
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: "E2_HIGHCPU_8"
+  dynamicSubstitutions: true
+substitutions:
+  _REGION: us-east5
+  _CLUSTER_NAME: computer-use-demo-cluster
+  _ARTIFACT_REGISTRY_ID: computer-use-ar-repo
+  _NAMESPACE: computer-use-demo
+  _KSA_NAME: computer-use-ksa
+  _IAM_SA_NAME: computer-use-sa
+  _IAM_SA_DISPLAY_NAME: Computer Use Demo SA
+  _IMAGE_NAME: computer-use-demo
+  _IMAGE_TAG: latest
+tags: ["gke-deployment", "${_CLUSTER_NAME}"]

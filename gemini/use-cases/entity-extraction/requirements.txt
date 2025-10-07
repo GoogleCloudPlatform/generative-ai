@@ -1,0 +1,5 @@
+dotenv
+flask
+google-cloud-storage
+google-genai
+gunicorn

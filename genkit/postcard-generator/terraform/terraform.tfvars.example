@@ -1,0 +1,4 @@
+# Replace this with your project ID
+project_id="MY_PROJECT_ID"
+# Set this to true AFTER you have configured App Hosting
+firebase_app_hosting=false

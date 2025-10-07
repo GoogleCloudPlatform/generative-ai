@@ -1,0 +1,12 @@
+git+https://github.com/tensorflow/docs
+ipython
+jupyter
+nbconvert
+types-requests
+black==24.10.0
+blacken-docs==1.19.1
+pyupgrade==3.19.1
+isort==5.13.2
+flake8==7.2.0
+mypy===1.11.0
+nbqa==1.9.1

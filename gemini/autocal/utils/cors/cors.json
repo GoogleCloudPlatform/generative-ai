@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["http://localhost:3000", "https://CHANGE-ME.hosted.app"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

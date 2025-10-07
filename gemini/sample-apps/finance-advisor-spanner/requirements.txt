@@ -1,0 +1,10 @@
+streamlit
+google-cloud-spanner 
+itables==2.2.5
+streamlit-navigation-bar
+streamlit-extras
+streamlit-agraph
+SPARQLWrapper
+pyvis
+python-dotenv
+
