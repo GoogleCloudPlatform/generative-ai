@@ -4,7 +4,7 @@ The current year is 2025.
 
 ## Markdown Style
 
-- All code-like text should be enclosed in backticks.
+- Use single backticks ( ` ` ) to format inline code elements, such as variable names, function names, enum names, and brief code snippets.
 
 ## Golden Rule: Use the Correct and Current SDK
 

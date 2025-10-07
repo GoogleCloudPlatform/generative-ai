@@ -172,6 +172,7 @@ CASP
 catus
 caudatus
 caxis
+cbp
 cce
 cctv
 cdiv
@@ -239,6 +240,7 @@ COUNTIF
 countplot
 covs
 Cowabunga
+cpb
 cpet
 crewai
 CRF
@@ -804,9 +806,11 @@ mapbox
 marp
 Masaru
 maskmode
+mathvista
 mavenrc
 maxcold
 Mbappe
+mbp
 mbsdk
 mcp
 MCP
@@ -861,6 +865,7 @@ Mookie
 morty
 Mosi
 moviepy
+mpb
 mpe
 mpegps
 mpga
@@ -1338,6 +1343,7 @@ THT
 THTH
 Tianli
 Tianxiang
+ticktext
 tickvals
 tiktoken
 timechart
@@ -1433,6 +1439,7 @@ vectoral
 vectordb
 veo
 Verilog
+versioned
 Ves
 Vesia
 vesselin
