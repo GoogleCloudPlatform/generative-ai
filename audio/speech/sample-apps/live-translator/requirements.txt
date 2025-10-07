@@ -1,4 +1,0 @@
-streamlit
-google-genai
-sounddevice
-google-cloud-texttospeech

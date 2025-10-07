@@ -1,7 +1,0 @@
-python-dotenv>=1.0.0
-requests>=2.31.0
-mcp
-uvicorn>=0.32.1
-google-genai
-nest_asyncio
-google-cloud-translate

@@ -1,4 +1,0 @@
-id,question,gold,unknown_ok,category
-1,How many Ds are in LADDER? Reply with a number only.,2,0,count_letters
-2,What is the chemical symbol for gold?,Au,0,common_facts
-3,"In the Python 'requests' library, what does the `enable_turbo_mode()` function do?",,1,api_nonexistent
