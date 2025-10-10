@@ -9,6 +9,7 @@ This repository contains a Python script (`web_agent.py`) that demonstrates a we
 ## Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
+
 * Python 3.9+
 * `pip` (Python package installer)
 * [Google Cloud SDK (`gcloud` CLI)](https://cloud.google.com/sdk/docs/install-sdk)
