@@ -69,12 +69,15 @@ gcloud auth application-default login
 This script requires a Google Cloud Project ID to be set as an environment variable.
 
 * **On macOS and Linux:**
+
     ```bash
-    export GOOGLE_PROJECT_ID="[your-project-id]"
+    export GOOGLE_CLOUD_PROJECT="[your-project-id]"
     ```
+
 * **On Windows (Command Prompt):**
+
     ```bash
-    set GOOGLE_PROJECT_ID="[your-project-id]"
+    set GOOGLE_CLOUD_PROJECT="[your-project-id]"
     ```
 
 Replace `[your-project-id]` with your actual Google Cloud Project ID. You only need to set this once per terminal session.
