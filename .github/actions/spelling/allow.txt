@@ -450,6 +450,7 @@ fromiter
 fsspec
 FTPS
 fts
+Fudd
 fulltext
 fullurl
 functiona
