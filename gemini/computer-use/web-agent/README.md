@@ -82,11 +82,11 @@ Replace `[your-project-id]` with your actual Google Cloud Project ID. You only n
 **7. Running the Agent**
 Once the setup is complete, you can run the agent with the following command:
 
-```Bash
+```bash
 python web_agent.py
 ```
 
-By default, the script will run with a pre-defined prompt. You can change the task by editing the prompt variable at the bottom of the agent.py file.
+By default, the script will run with a pre-defined prompt. You can change the task by editing the prompt variable at the bottom of the `web_agent.py` file.
 
 ## More Resources
 

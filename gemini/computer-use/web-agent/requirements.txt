@@ -1,2 +1,2 @@
-google-genai 
+google-genai
 playwright

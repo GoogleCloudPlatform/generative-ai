@@ -14,7 +14,6 @@
 
 import asyncio
 import os
-import time
 from typing import List, Tuple
 
 from google import genai
@@ -57,7 +56,7 @@ async def execute_function_calls(
     Extracts and executes function calls from the model response.
     """
     await asyncio.sleep(0.1)
-    
+
     function_calls = [
         part.function_call
         for part in response.candidates[0].content.parts
