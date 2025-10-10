@@ -1,4 +1,3 @@
-
 # Gemini Computer Use Web Agent Demo
 
 Authors: [Eric Dong](https://github.com/gericdong)
