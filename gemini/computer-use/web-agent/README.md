@@ -30,17 +30,10 @@ cd generative-ai/gemini/computer-use/web-agent
 It is highly recommended to use a virtual environment to manage project dependencies.
 
 * On macOS and Linux:
+
    ```bash
    python -m venv venv
    source venv/bin/activate
-   ```
-
-* On Windows:
-   ```bash
-   python -m venv venv
-   .\venv\Scripts\activate
-   ```
-
 **3. Install Python Dependencies**
 
 Install the required Python libraries from the requirements.txt file.
