@@ -8,11 +8,11 @@ exposes this functionality through a simple Flask-based web server running on Cl
 
 ### When to use this solution
 
-The use of Gemini API for entity extraction is especially useful when the structure of
-the document varies from one document type to another or when it is unknown. For more
-structured documents like complex forms, we recommend taking a look into
-[Document AI](https://cloud.google.com/document-ai/docs/overview), which provides
-powerful mechanisms for entity extraction and layout parsing.
+The use of Gemini API for document classification and entity extraction is especially
+useful when the structure of the document varies from one document type to another or
+when it is unknown. For more structured documents like complex forms, we recommend
+taking a look into [Document AI](https://cloud.google.com/document-ai/docs/overview),
+that provides powerful mechanisms for entity extraction and layout parsing.
 
 
 ## Overview
