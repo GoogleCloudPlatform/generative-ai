@@ -1,0 +1,2 @@
+google-genai>=1.42.0
+playwright

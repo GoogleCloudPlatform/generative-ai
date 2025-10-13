@@ -2,15 +2,34 @@
 
 The current year is 2025.
 
-## Markdown Style
+## Markdown Style (For `.md` files and `.ipynb` Markdown Cells)
 
 - Use single backticks ( ` ` ) to format inline code elements, such as variable names, function names, enum names, and brief code snippets.
+- Add documentation links to the appropriate Vertex AI pages when describing product features. e.g. https://cloud.google.com/vertex-ai/generative-ai/docs
+  - Do not reference documentation from the Gemini Developer API, e.g. https://ai.google.dev/ unless there is not a suitable page in the Vertex AI documentation.
+
+---
+
+The Author block in Notebooks and Markdown should be in a format like this:
+
+For one author:
+
+| Author |
+| --- |
+| [Firstname Lastname](https://github.com/username) |
+
+For multiple authors
+
+| Authors |
+| --- |
+| [Firstname Lastname](https://github.com/username) |
+| [Firstname Lastname](https://github.com/username) |
 
 ## Golden Rule: Use the Correct and Current SDK
 
 Always use the Google Gen AI SDK to call the Gemini models, which became the
 standard library for all Gemini API interactions as of 2025. Do not use legacy
-libraries and SDKs.
+libraries and SDKs. 3rd party integrations like LangGraph, LlamaIndex, LiteLLM are okay.
 
 - **Library Name:** Google Gen AI SDK
 - **Python Package:** `google-genai`
