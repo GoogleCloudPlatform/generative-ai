@@ -14,7 +14,6 @@
 
 import asyncio
 import os
-from typing import List, Tuple
 
 from google import genai
 from google.genai.types import (
@@ -27,8 +26,7 @@ from google.genai.types import (
     Part,
     Tool,
 )
-from playwright.async_api import async_playwright, Page
-
+from playwright.async_api import Page, async_playwright
 
 # --- CONFIGURATION ---
 # Load configuration from environment variables for best practice.
@@ -38,6 +36,7 @@ MODEL_ID = os.environ.get("MODEL_ID", "gemini-2.5-computer-use-preview-10-2025")
 
 
 # --- HELPER FUNCTIONS  ---
+
 
 def normalize_x(x: int, screen_width: int) -> int:
     """Convert normalized x coordinate (0-1000) to actual pixel coordinate."""
@@ -51,10 +50,8 @@ def normalize_y(y: int, screen_height: int) -> int:
 
 async def execute_function_calls(
     response, page: Page, screen_width: int, screen_height: int
-) -> Tuple[str, List[Tuple[str, str]]]:
-    """
-    Extracts and executes function calls from the model response.
-    """
+) -> tuple[str, list[tuple[str, str]]]:
+    """Extracts and executes function calls from the model response."""
     await asyncio.sleep(0.1)
 
     function_calls = [
@@ -92,7 +89,7 @@ async def execute_function_calls(
                 result = "success"
             elif function_call.name == "type_text_at":
                 text_to_type = function_call.args["text"]
-                print(f"[DEBUG] Typing text: \"{text_to_type}\"")
+                print(f'[DEBUG] Typing text: "{text_to_type}"')
                 actual_x = normalize_x(function_call.args["x"], screen_width)
                 actual_y = normalize_y(function_call.args["y"], screen_height)
                 await page.mouse.click(actual_x, actual_y)
@@ -105,16 +102,16 @@ async def execute_function_calls(
                 result = "unknown_function"
         except Exception as e:
             print(f"❗️ Error executing {function_call.name}: {e}")
-            result = f"error: {str(e)}"
+            result = f"error: {e!s}"
         results.append((function_call.name, result))
     return "CONTINUE", results
 
 
 # --- THE AGENT LOOP ---
 
-async def agent_loop(initial_prompt: str, max_turns: int = 5):
-    """Main agent loop for local execution with a browser."""
 
+async def agent_loop(initial_prompt: str, max_turns: int = 5) -> None:
+    """Main agent loop for local execution with a browser."""
     if not PROJECT_ID:
         raise ValueError("GOOGLE_PROJECT_ID environment variable not set.")
 
@@ -163,24 +160,31 @@ async def agent_loop(initial_prompt: str, max_turns: int = 5):
                     print("Full Response:", response)
                     break
 
-                print(f"[DEBUG] Model Finish Reason: {response.candidates[0].finish_reason}")
+                print(
+                    f"[DEBUG] Model Finish Reason: {response.candidates[0].finish_reason}"
+                )
                 contents.append(response.candidates[0].content)
                 print("[DEBUG] Appended model response to history.")
 
-                if not any(hasattr(part, "function_call") for part in response.candidates[0].content.parts):
-                     final_text = "".join(
+                if not any(
+                    hasattr(part, "function_call")
+                    for part in response.candidates[0].content.parts
+                ):
+                    final_text = "".join(
                         part.text
                         for part in response.candidates[0].content.parts
                         if hasattr(part, "text") and part.text is not None
                     )
-                     if final_text:
+                    if final_text:
                         print(f"✅ Agent Finished: {final_text}")
                         break
 
                 status, execution_results = await execute_function_calls(
                     response, page, sw, sh
                 )
-                print(f"[DEBUG] Execution Results: status='{status}', results={execution_results}")
+                print(
+                    f"[DEBUG] Execution Results: status='{status}', results={execution_results}"
+                )
 
                 if status == "NO_ACTION":
                     continue
@@ -209,6 +213,7 @@ async def agent_loop(initial_prompt: str, max_turns: int = 5):
         if browser:
             await browser.close()
             print("\n--- Browser closed. ---")
+
 
 # --- SCRIPT ENTRY POINT ---
 if __name__ == "__main__":
