@@ -42,7 +42,7 @@ deployment to a service in Cloud Run.
 
 ## Architecture
 
-The current solution includes the ability to classify documents and xtract entities
+The current solution includes the ability to classify documents and extract entities
 based on the specific document type and the fields specified in the configuration using
 the Gemini API (online).
 
@@ -86,7 +86,7 @@ the Gemini API (online).
 
 ## Testing
 
-A simple test case is provided in `entity_extraction_test.py`.
+A simple test case is provided in `document_processing_test.py`.
 
 To run the provided test:
 
@@ -95,7 +95,7 @@ python document_processing_test.py
 ```
 
 This will call the relevant functions from `document_processing.py` with sample
-documents and assert that the outputs matche the expected JSON.
+documents and assert that the outputs match the expected JSON.
 
 **Note:** Running the test will make live calls to the Vertex AI API and may incur
 costs.
@@ -277,7 +277,10 @@ Future architecture:
 
 ## Authors
 
-[Ariel Jassan](https://github.com/arieljassan), [Ben Mizrahi](https://github.com/benmizrahi)
+| Authors                                        |
+| ---------------------------------------------- |
+| [Ariel Jassan](https://github.com/arieljassan) |
+| [Ben Mizrahi](https://github.com/benmizrahi)   |
 
 ## Disclaimer
 

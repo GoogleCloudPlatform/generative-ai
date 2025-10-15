@@ -28,7 +28,7 @@ app = Flask(__name__)
 def handle_extraction():
     """HTTP endpoint to handle entity extraction requests."""
     data = request.get_json()
-    logging.info(f"Received data request: {data}")
+    logging.info(f"Received handle_extraction request.")
 
     if not data or "extract_config_id" not in data or "document_uri" not in data:
         logging.warning("Invalid request data received. Missing required fields.")
@@ -44,7 +44,7 @@ def handle_extraction():
             extract_config_id=data["extract_config_id"],
             document_uri=data["document_uri"],
         )
-        print(f"Entity extraction result: {result_text}")
+        logging.info(f"Entity extraction result: {result_text}")
         return jsonify(json.loads(result_text)), 200
 
     except KeyError:
@@ -79,7 +79,7 @@ def handle_classification():
         result_text = document_processing.classify_document(
             document_uri=data["document_uri"],
         )
-        print(f"Document classification result: {result_text}")
+        logging.info(f"Document classification result: {result_text}")
         return jsonify(json.loads(result_text)), 200
 
     except KeyError:
@@ -114,7 +114,7 @@ def handle_classification_and_extraction():
         result_text = document_processing.classify_and_extract_document(
             document_uri=data["document_uri"],
         )
-        print(f"Document classification and extraction result: {result_text}")
+        logging.info(f"Document classification and extraction result: {result_text}")
         return jsonify(json.loads(result_text)), 200
 
     except KeyError:
