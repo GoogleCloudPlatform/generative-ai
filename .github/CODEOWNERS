@@ -67,3 +67,4 @@
 /generative-ai/open-models/get_started_with_model_garden_sdk.ipynb                                                               @GoogleCloudPlatform/generative-ai-devrel @inardini @lizzij
 /generative-ai/open-models/use-cases/model_garden_litellm_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @lizzij
 /generative-ai/llmevalkit                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @santoromike @lkatherine
+/generative-ai/gemini/evaluation/evaluate_gemini_structured_output.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @stevie-p
