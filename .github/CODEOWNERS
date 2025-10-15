@@ -67,3 +67,7 @@
 /generative-ai/open-models/get_started_with_model_garden_sdk.ipynb                                                               @GoogleCloudPlatform/generative-ai-devrel @inardini @lizzij
 /generative-ai/open-models/use-cases/model_garden_litellm_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @lizzij
 /generative-ai/llmevalkit                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @santoromike @lkatherine
+/generative-ai/agents/gke/agents_with_memory/get_started_with_memory_for_adk_in_gke.ipynb
+@GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/agents/cloud_run/agents_with_memory/get_started_with_memory_for_adk_in_cloud_run.ipynb
+@GoogleCloudPlatform/generative-ai-devrel @vladkol
