@@ -264,6 +264,7 @@ cycleway
 cycleways
 cygpath
 CZE
+czf
 D'orsay
 Daniil
 darkgrid
