@@ -110,7 +110,7 @@ async def execute_function_calls(
 # --- THE AGENT LOOP ---
 
 
-async def agent_loop(initial_prompt: str, max_turns: int = 5) -> None:
+async def agent_loop(initial_prompt: str, max_turns: int = 10) -> None:
     """Main agent loop for local execution with a browser."""
     if not PROJECT_ID:
         raise ValueError("GOOGLE_PROJECT_ID environment variable not set.")
@@ -125,6 +125,7 @@ async def agent_loop(initial_prompt: str, max_turns: int = 5) -> None:
             page = await browser.new_page()
             sw, sh = 960, 1080
             await page.set_viewport_size({"width": sw, "height": sh})
+            await page.goto("https://www.google.com")
 
             print(f"🎬 Starting Agent Loop with prompt: '{initial_prompt}'")
             # ... (rest of the loop is fine and remains the same) ...
