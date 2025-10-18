@@ -1,3 +1,13 @@
+becuase
+ema
+kpis
+MACD
+macd
+OHLCV
+ohlcv
+RSI
+rsi
+toolsets
 aadd
 Aadila
 AALR
