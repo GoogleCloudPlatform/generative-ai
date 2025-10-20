@@ -62,12 +62,11 @@
 /generative-ai/vision/gradio/gradio_image_generation_sdk.ipynb                                                                   @GoogleCloudPlatform/generative-ai-devrel @jbrache
 /generative-ai/vision/use-cases                                                                                                  @GoogleCloudPlatform/generative-ai-devrel @iamthuya
 /generative-ai/vision/use-cases/hey_llm                                                                                          @GoogleCloudPlatform/generative-ai-devrel @tushuhei
-/generative-ai/vision/sample-apps/V-Start                                                                                          @GoogleCloudPlatform/generative-ai-devrel @WafaeBakkali
+/generative-ai/vision/sample-apps/V-Start                                                                                        @GoogleCloudPlatform/generative-ai-devrel @WafaeBakkali
 /generative-ai/open-models/serving/cloud_run_ollama_qwen3_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/open-models/get_started_with_model_garden_sdk.ipynb                                                               @GoogleCloudPlatform/generative-ai-devrel @inardini @lizzij
 /generative-ai/open-models/use-cases/model_garden_litellm_inference.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @lizzij
 /generative-ai/llmevalkit                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @santoromike @lkatherine
-/generative-ai/agents/gke/agents_with_memory/get_started_with_memory_for_adk_in_gke.ipynb
-@GoogleCloudPlatform/generative-ai-devrel @vladkol
-/generative-ai/agents/cloud_run/agents_with_memory/get_started_with_memory_for_adk_in_cloud_run.ipynb
-@GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/gemini/evaluation/evaluate_gemini_structured_output.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @stevie-p
+/generative-ai/agents/gke/agents_with_memory/get_started_with_memory_for_adk_in_gke.ipynb                                        @GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/agents/cloud_run/agents_with_memory/get_started_with_memory_for_adk_in_cloud_run.ipynb                            @GoogleCloudPlatform/generative-ai-devrel @vladkol
