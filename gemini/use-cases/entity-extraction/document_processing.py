@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main logic for entity extraction."""
+"""Main logic for classification and entity extraction."""
 
 import json
 import os
@@ -22,7 +22,7 @@ import utils
 from google import genai
 from google.genai import types
 
-PROMPT_TEMPLATE = """\
+EXTRACT_PROMPT_TEMPLATE = """\
     Based solely on this {document_name}, extract the following fields.
     If the information is missing, write "missing" next to the field.
     Output as JSON.
@@ -31,6 +31,15 @@ PROMPT_TEMPLATE = """\
     {fields}
 """
 
+CLASSIFY_PROMPT_TEMPLATE = """\
+    Based on the content of the document, classify it as one of the following classes.
+    Output as JSON in the following format:
+    "class": "class_name"
+
+
+    Classes:\n
+    {classes}
+"""
 
 dotenv.load_dotenv()
 project_id = os.environ.get("GEMINI_PROJECT_ID")
@@ -45,11 +54,12 @@ CONFIGS = utils.load_app_config(config_path)
 
 
 def extract_from_document(extract_config_id: str, document_uri: str) -> str:
-    extract_config = CONFIGS[extract_config_id]
+    """Extract entities from a document."""
+    extract_config = CONFIGS["extraction_configs"][extract_config_id]
 
-    prompt = PROMPT_TEMPLATE.format(
+    prompt = EXTRACT_PROMPT_TEMPLATE.format(
         document_name=extract_config["document_name"],
-        fields=json.dumps(extract_config["fields"], indent=2),
+        fields=json.dumps(extract_config["fields"], indent=4),
     )
 
     response = client.models.generate_content(
@@ -66,3 +76,38 @@ def extract_from_document(extract_config_id: str, document_uri: str) -> str:
         },
     )
     return response.text
+
+
+def classify_document(document_uri: str) -> str:
+    """Classify a document."""
+    classification_config = CONFIGS["classification_config"]
+
+    prompt = CLASSIFY_PROMPT_TEMPLATE.format(
+        classes=json.dumps(classification_config["classes"], indent=4),
+    )
+
+    response = client.models.generate_content(
+        model=classification_config["model"],
+        contents=[
+            types.Part.from_uri(
+                file_uri=document_uri,
+                mime_type=classification_config["document_mime_type"],
+            ),
+            prompt,
+        ],
+        config={
+            "response_mime_type": "application/json",
+        },
+    )
+    return response.text
+
+
+def classify_and_extract_document(document_uri: str) -> str:
+    """Classify a document and extract entities from it."""
+    classification_response = classify_document(document_uri)
+    classification_result = json.loads(classification_response)
+    document_class = classification_result.get("class")
+    if not document_class or document_class not in CONFIGS["extraction_configs"]:
+        raise ValueError("Document classification failed.")
+
+    return extract_from_document(document_class, document_uri)

@@ -2,17 +2,17 @@
 
 ## About
 
-This project provides a flexible solution for extracting structured information from
-documents using Gemini family of models via the Vertex AI API. It exposes this
-functionality through a simple Flask-based web server running on Cloud Run.
+This project provides a flexible solution for classifying and extracting structured
+information from documents using Gemini family of models via the Vertex AI API. It
+exposes this functionality through a simple Flask-based web server running on Cloud Run.
 
 ### When to use this solution
 
-The use of Gemini API for entity extraction is especially useful when the structure of
-the document varies from one document type to another or when it is unknown. For more
-structured documents like complex forms, we recommend taking a look into 
-[Document AI](https://cloud.google.com/document-ai/docs/overview), which provides 
-powerful mechanisms for entity extraction and layout parsing.
+The use of Gemini API for document classification and entity extraction is especially
+useful when the structure of the document varies from one document type to another or
+when it is unknown. For more structured documents like complex forms, we recommend
+taking a look into [Document AI](https://cloud.google.com/document-ai/docs/overview),
+that provides powerful mechanisms for entity extraction and layout parsing.
 
 ## Overview
 
@@ -20,7 +20,8 @@ The core of this project is a Python script that takes a document and a configur
 ID as input. The configuration specifies which Gemini model to use, the name of the
 document type, and a JSON schema of the fields to extract. The script then prompts the
 Gemini model to extract the requested information from the document and return it as a
-JSON object.
+JSON object. It also allows you to classify a document based on a description of the
+document type.
 
 This is wrapped in a Flask web application, allowing you to easily integrate document
 extraction capabilities into your own services via an HTTP API. We provide a script for
@@ -29,7 +30,7 @@ deployment to a service in Cloud Run.
 ## Features
 
 - **AI-Powered Extraction**: Leverages the multimodal capabilities of Gemini models to
-  understand and extract data from documents.
+  understand, classify and extract data from documents.
 - **Configurable Schemas**: Easily define different extraction schemas for various
   document types (e.g., reports, legal documents) in a central configuration file.
 - **JSON Output**: The model is prompted to return structured data in JSON format,
@@ -41,9 +42,9 @@ deployment to a service in Cloud Run.
 
 ## Architecture
 
-The current solution includes the ability to extract entities based on the specific
-document type and the fields specified in the configuration using the Gemini API
-(online).
+The current solution includes the ability to classify documents and extract entities
+based on the specific document type and the fields specified in the configuration using
+the Gemini API (online).
 
 ![Current Architecture](./images/current_architecture.png)
 
@@ -85,18 +86,18 @@ document type and the fields specified in the configuration using the Gemini API
 
 ## Testing
 
-A simple test case is provided in `entity_extraction_test.py`.
+A simple test case is provided in `document_processing_test.py`.
 
 To run the provided test:
 
 ```bash
-python entity_extraction_test.py
+python document_processing_test.py
 ```
 
-This will call the `extract_from_document` function with a sample document and assert
-that the output matches the expected JSON.
+This will call the relevant functions from `document_processing.py` with sample
+documents and assert that the outputs match the expected JSON.
 
-**Note:** Running the test will make a live call to the Vertex AI API and may incur
+**Note:** Running the test will make live calls to the Vertex AI API and may incur
 costs.
 
 ## Usage
@@ -130,7 +131,7 @@ curl -X POST https://YOUR-CLOUD-RUN-URL/extract \
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
 -d '{
-    "extract_config_id": "exhibit_2021q1",
+    "extract_config_id": "form_10_q",
     "document_uri": "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs/2021Q1_alphabet_earnings_release.pdf"
 }'
 ```
@@ -139,16 +140,70 @@ curl -X POST https://YOUR-CLOUD-RUN-URL/extract \
 
 ```json
 {
-  "google_ceo": "Sundar Pichai",
-  "company_name": "Alphabet Inc."
+  "year": "2021",
+  "quarter": "Q1",
+  "company_name": "Alphabet Inc.",
+  "ceo": "Sundar Pichai",
+  "net_income_millions": "17930"
 }
 ```
 
-## Configuration of entities for extraction and prompt
+### Sending a Classification Request
+
+You can send a POST request to the /classify endpoint with a JSON payload containing
+the document_uri (a GCS URI for the PDF).
+Here is an example using curl. Replace with the URL that you get after you deploy the
+service to Cloud Run,
+
+```bash
+curl -X POST https://YOUR-CLOUD-RUN-URL/classify
+-H "Content-Type: application/json"
+-H "Authorization: Bearer $(gcloud auth print-identity-token)"
+-d '{
+    "document_uri": "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs/2021Q1_alphabet_earnings_release.pdf"
+}'
+```
+
+**Expected Response:**
+
+```json
+{
+  "class": "form_10_q"
+}
+```
+
+### Sending a Classification and Extraction Request
+
+You can send a POST request to the `/classify_and_extract` endpoint with a JSON payload
+containing the document_uri. The service will first classify the document and then use
+the corresponding extraction configuration.
+
+```bash
+curl -X POST https://YOUR-CLOUD-RUN-URL/classify_and_extract
+-H "Content-Type: application/json"
+-H "Authorization: Bearer $(gcloud auth print-identity-token)"
+-d '{
+    "document_uri": "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs/2021Q1_alphabet_earnings_release.pdf"
+}'
+```
+
+**Expected Response:**
+
+```json
+{
+  "year": "2021",
+  "quarter": "Q1",
+  "company_name": "Alphabet Inc.",
+  "ceo": "Sundar Pichai",
+  "net_income_millions": "17930"
+}
+```
+
+## Configuration of entities for classification, extraction and prompts
 
 ### Entities
 
-The extraction behavior is controlled by the entity extraction configuration file
+The classification and extraction behavior is controlled by the configuration file
 `config.json`, which holds the configurations for different document types and the
 fields to extract. To add a new document type or field, simply add new key-value pairs.
 
@@ -173,14 +228,28 @@ look for it locally. Example:
 CONFIG_PATH="config.json"
 ```
 
+For classification, you can define the classes under the classification_config key.
+The model will use the descriptions to classify the document.
+
+```json
+"classification_config": {
+    "document_mime_type": "application/pdf",
+    "model": "gemini-2.5-flash",
+    "classes": {
+        "class_name_1": "Description of the first document class",
+        "class_name_2": "Description of the second document class"
+    }
+}
+```
+
 ### Prompt
 
-The constant `PROMPT_TEMPLATE` in `entity_extraction.py` is the template for the prompt
-sent to the Gemini model. You can customize it to improve extraction accuracy for your
-specific use case.
+The constants `EXTRACT_PROMPT_TEMPLATE` and `CLASSIFY_PROMPT_TEMPLATE` in
+`document_processing.py` are the templates for the prompts sent to the Gemini model.
+You can customize it to improve extraction accuracy for your specific use case.
 
 ```python
-PROMPT_TEMPLATE = """\
+EXTRACT_PROMPT_TEMPLATE = """\
     Based solely on this {document_name}, extract the following fields.
     If the information is missing, write "missing" next to the field.
     Output as JSON.
@@ -203,15 +272,15 @@ We are planning to add the following functionalities to this project:
   of an evaluation dataset. This feature will provide a robust method for evaluating
   model performance and fine-tuning prompts to achieve better results.
 
-- Document classification to detect the type of document instead of requiring from the
-  user to provide the document type before the step of entity extraction.
-
 Future architecture:
 ![Future Architecture](./images/future_architecture.png)
 
 ## Authors
 
-[Ariel Jassan](https://github.com/arieljassan), [Ben Mizrahi](https://github.com/benmizrahi)
+| Authors                                        |
+| ---------------------------------------------- |
+| [Ariel Jassan](https://github.com/arieljassan) |
+| [Ben Mizrahi](https://github.com/benmizrahi)   |
 
 ## Disclaimer
 
