@@ -32,8 +32,8 @@ It is highly recommended to use a virtual environment to manage project dependen
 * On macOS and Linux:
 
    ```bash
-   python -m venv venv
-   source venv/bin/activate
+   python -m venv .venv
+   source .venv/bin/activate
 **3. Install Python Dependencies**
 
 Install the required Python libraries from the requirements.txt file.

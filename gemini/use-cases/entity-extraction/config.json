@@ -1,11 +1,38 @@
 {
-  "exhibit_2021q1": {
-    "document_name": "Alphabet First Quarter 2021 Results",
-    "document_mime_type": "application/pdf",
-    "model": "gemini-2.5-flash",
-    "fields": {
-      "google_ceo": "CEO of Google",
-      "company_name": "Name of the company"
+    "extraction_configs": {
+        "form_10_k": {
+            "document_name": "Annual report of a company",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "year": "Year of the report",
+                "company_name": "Name of the company",
+                "ceo": "Name of the CEO of the company",
+                "net_income_millions": "Net income in million dollars"
+            }
+        },
+
+        "form_10_q": {
+            "document_name": "Quarter report of a company",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "year": "Year of the report",
+                "quarter": "Quarter of the report (Q1, Q2, Q3, Q4)",
+                "company_name": "Name of the company",
+                "ceo": "Name of the CEO of the company",
+                "net_income_millions": "Net income in million dollars"
+            }
+        }
+    },
+
+    "classification_config": {
+        "document_mime_type": "application/pdf",
+        "model": "gemini-2.5-flash",
+        "classes": {
+            "form_10_k": "Annual report of a company",
+            "form_10_q": "Quarter report of a company",
+            "other": "None of the above"
+        }
     }
-  }
 }
