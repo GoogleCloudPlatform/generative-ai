@@ -286,9 +286,6 @@
 # Should be TPU or TPUs
 \btpus?\b
 
-# Should be GKE
-\sgke\s
-
 # Should be GCS
 \sgcs\s
 
