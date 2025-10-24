@@ -643,6 +643,7 @@ iphoneos
 ipycanvas
 ipykernel
 ipynb
+ipywebrtc
 IRAs
 isa
 itable
