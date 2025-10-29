@@ -357,7 +357,7 @@ def start_optimization() -> None:
             input_optimization_data_file_uri, output_optimization_run_uri
         )
 
-        with st.expander("Prompt Otimization Config"):
+        with st.expander("Prompt Optimization Config"):
             st.json(vars(args))
 
         args = vars(args)

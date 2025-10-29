@@ -13,79 +13,99 @@
 # limitations under the License.
 
 import json
-from uuid import uuid4
-from src.chunk import ChunkService
-from langchain_google_vertexai import VertexAIEmbeddings
-from typing import List
-
-from google.cloud.aiplatform import MatchingEngineIndexEndpoint, MatchingEngineIndex
-from src.bigquery import EMBEDDINGS_TABLE, INTENTS_TABLE, INTENTS_TABLE_ID_COLUMN, BigQueryRepository
-from src.cloud_storage import EMBEDDINGS_FILE, EMBEDDINGS_FOLDER, CloudStorageRepository
-from src.models import Embedding, Intent
-from flask import Request, jsonify
 from datetime import datetime
 from threading import Thread
+from uuid import uuid4
 
-INDEX_DIMENSIONS=768
-INDEX_DISTANCE_MEASURE='DOT_PRODUCT_DISTANCE'
-INDEX_NEIGHBORS_COUNT=150
+from flask import Request, jsonify
+from google.cloud.aiplatform import MatchingEngineIndex, MatchingEngineIndexEndpoint
+from langchain_google_vertexai import VertexAIEmbeddings
+from src.bigquery import (
+    EMBEDDINGS_TABLE,
+    INTENTS_TABLE,
+    INTENTS_TABLE_ID_COLUMN,
+    BigQueryRepository,
+)
+from src.chunk import ChunkService
+from src.cloud_storage import EMBEDDINGS_FILE, EMBEDDINGS_FOLDER, CloudStorageRepository
+from src.models import Embedding, Intent
+
+INDEX_DIMENSIONS = 768
+INDEX_DISTANCE_MEASURE = "DOT_PRODUCT_DISTANCE"
+INDEX_NEIGHBORS_COUNT = 150
 
 TEXT_EMBEDDING_MODEL = "textembedding-gecko@003"
 EMBEDDINGS_MODEL = VertexAIEmbeddings(TEXT_EMBEDDING_MODEL)
 
-TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
 
 def create_intent_index(request: Request):
-    if request.method != 'POST':
-        return jsonify({'error': 'Method not allowed'}), 405
+    if request.method != "POST":
+        return jsonify({"error": "Method not allowed"}), 405
     try:
         request_json = request.get_json()
-        intent_name = request_json.get('intent_name')
-        index_resource = request_json.get('index_endpoint_resource')
-    except Exception as e:
-        return jsonify({'error': 'Bad Request'}), 400
-    
+        intent_name = request_json.get("intent_name")
+        index_resource = request_json.get("index_endpoint_resource")
+    except Exception:
+        return jsonify({"error": "Bad Request"}), 400
+
     print(f"Event decoded {request_json}", intent_name, index_resource)
     big_query_repository = BigQueryRepository()
     gcs_repository = CloudStorageRepository(big_query_repository.client.project)
-    
-    try:        
-        results = big_query_repository.get_row_by_id(INTENTS_TABLE, INTENTS_TABLE_ID_COLUMN, intent_name)
+
+    try:
+        results = big_query_repository.get_row_by_id(
+            INTENTS_TABLE, INTENTS_TABLE_ID_COLUMN, intent_name
+        )
         intent = None
         for row in results:
             intent = Intent.__from_row__(row)
-        
+
         index_endpoint = MatchingEngineIndexEndpoint(index_resource)
 
-        print(f"Everything has been corretly received")
+        print("Everything has been correctly received")
 
         index_embeddings = ""
-        chunk_service = ChunkService(big_query_repository.client.project, intent.gcp_bucket)
+        chunk_service = ChunkService(
+            big_query_repository.client.project, intent.gcp_bucket
+        )
         embeddings = []
-            
-        index_unique_name = f"{intent.name.lower().replace(' ', '-').replace('_','-')}-{uuid4()}"
+
+        index_unique_name = (
+            f"{intent.name.lower().replace(' ', '-').replace('_', '-')}-{uuid4()}"
+        )
         chunks = chunk_service.generate_chunks()
 
         for index, chunk in enumerate(chunks):
             embedding = create_embeddings(chunk)
 
             if embedding is not None:
-                doc_id=f"{intent.name}-{index}.txt"
-                embeddings.append(Embedding(
-                    id=doc_id,
-                    text=chunk,
-                    index=index_unique_name,
-                    author="system",
-                    timestamp=datetime.now().strftime(TIME_FORMAT),
-                ))
-                index_embeddings += json.dumps({
-                    "id": doc_id,
-                    "embedding": [str(value) for value in embedding],
-                }) + "\n"
+                doc_id = f"{intent.name}-{index}.txt"
+                embeddings.append(
+                    Embedding(
+                        id=doc_id,
+                        text=chunk,
+                        index=index_unique_name,
+                        author="system",
+                        timestamp=datetime.now().strftime(TIME_FORMAT),
+                    )
+                )
+                index_embeddings += (
+                    json.dumps(
+                        {
+                            "id": doc_id,
+                            "embedding": [str(value) for value in embedding],
+                        }
+                    )
+                    + "\n"
+                )
         print(f"Embeddings created for {[e.id for e in embeddings]}")
         print(f"Uploading embeddings {intent.name}/{EMBEDDINGS_FILE}")
-        gcs_repository.create(f"{EMBEDDINGS_FOLDER}/{intent.name}/{EMBEDDINGS_FILE}", index_embeddings)
-            
+        gcs_repository.create(
+            f"{EMBEDDINGS_FOLDER}/{intent.name}/{EMBEDDINGS_FILE}", index_embeddings
+        )
+
         index = create_index(
             index_unique_name,
             intent.name,
@@ -95,7 +115,7 @@ def create_intent_index(request: Request):
         print("Uploading text chunks to bigquery...")
         big_query_repository.insert_rows(EMBEDDINGS_TABLE, embeddings)
         Thread(target=deploy_index_endpoint, args=(index_endpoint, index)).start()
-        return jsonify({'message': 'JSON received and processed'}), 200
+        return jsonify({"message": "JSON received and processed"}), 200
 
     except Exception as e:
         if index:
@@ -103,11 +123,12 @@ def create_intent_index(request: Request):
         else:
             big_query_repository.update_intent_status(intent_name, "2")
         print(str(e))
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-def create_embeddings(chunk: str) -> List[float]:
+def create_embeddings(chunk: str) -> list[float]:
     return EMBEDDINGS_MODEL.embed_query(chunk)
+
 
 def create_index(index_unique_name: str, intent_name: str, bucket_name: str):
     print(f"Creating index: {index_unique_name}")
@@ -119,9 +140,12 @@ def create_index(index_unique_name: str, intent_name: str, bucket_name: str):
         contents_delta_uri=f"gs://{bucket_name}/{EMBEDDINGS_FOLDER}/{intent_name}",
     )
 
-def deploy_index_endpoint(index_endpoint: MatchingEngineIndexEndpoint, index: MatchingEngineIndex):
+
+def deploy_index_endpoint(
+    index_endpoint: MatchingEngineIndexEndpoint, index: MatchingEngineIndex
+):
     print("Deploying index...")
     index_endpoint.deploy_index(
         index=index,
-        deployed_index_id=index.display_name.replace('-','_'),
+        deployed_index_id=index.display_name.replace("-", "_"),
     )
