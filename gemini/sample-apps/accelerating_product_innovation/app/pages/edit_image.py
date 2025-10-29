@@ -33,7 +33,7 @@ import streamlit as st
 # Get the configuration for the edit page
 page_cfg = PAGES_CFG["Editor"]
 
-# Setup the general state of the app if uninitialized.
+# Set up the general state of the app if uninitialized.
 setup.page_setup(page_cfg)
 
 # Initialize the state of the edit page

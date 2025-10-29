@@ -33,7 +33,7 @@ Due to your familiarity with PostgreSQL, you would like to build the new Gen AI 
 
    ![pgAdmin Login Interface](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/pgadmin/1-login.png "pgAdmin Login Interface")
 
-1. Login to pgAdmin. The user name is `demouser@genwealth.com`. The password is the pgAdmin password you chose when you setup the environment. If you forgot the password, you can retrieve it from Secret Manager by running the following command in Cloud Shell.
+1. Login to pgAdmin. The user name is `demouser@genwealth.com`. The password is the pgAdmin password you chose when you set up the environment. If you forgot the password, you can retrieve it from Secret Manager by running the following command in Cloud Shell.
 
    ```bash
    cd && cd generative-ai/gemini/sample-apps/genwealth/

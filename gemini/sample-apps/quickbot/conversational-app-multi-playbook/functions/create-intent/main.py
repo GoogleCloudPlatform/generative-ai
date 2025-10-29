@@ -57,7 +57,7 @@ def create_intent_index(request: Request):
         
         index_endpoint = MatchingEngineIndexEndpoint(index_resource)
 
-        print(f"Everything has been corretly received")
+        print(f"Everything has been correctly received")
 
         index_embeddings = ""
         chunk_service = ChunkService(big_query_repository.client.project, intent.gcp_bucket)
