@@ -59,7 +59,7 @@ This should deploy your app ready for production!
 
 ### Step 1: Deploy Blocking Functions (Optional / Recommended)
 
-[Blocking functions](https://cloud.google.com/identity-platform/docs/blocking-functions) allow you to control who can login. In general, you only want people in your org to use this app. Deploying a blocking function makes this easy and simple.
+[Blocking functions](https://cloud.google.com/identity-platform/docs/blocking-functions) allow you to control who can log in. In general, you only want people in your org to use this app. Deploying a blocking function makes this easy and simple.
 
 ### Step 2: Configure Firebase Auth
 

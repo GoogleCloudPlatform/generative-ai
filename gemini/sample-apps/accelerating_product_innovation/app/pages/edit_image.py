@@ -1,5 +1,4 @@
-"""
-This module manages the image editing page within a Streamlit application.
+"""This module manages the image editing page within a Streamlit application.
 It provides the following features:
 
 * Image Upload Handling: Processes and stores uploaded images.
@@ -16,6 +15,7 @@ It provides the following features:
 
 import logging
 
+import streamlit as st
 from PIL import Image
 from app.pages_utils import setup
 from app.pages_utils.edit_image import (
@@ -28,12 +28,11 @@ from app.pages_utils.edit_image import (
 )
 from app.pages_utils.editor_ui import ImageEditor
 from app.pages_utils.pages_config import PAGES_CFG
-import streamlit as st
 
 # Get the configuration for the edit page
 page_cfg = PAGES_CFG["Editor"]
 
-# Setup the general state of the app if uninitialized.
+# Set up the general state of the app if uninitialized.
 setup.page_setup(page_cfg)
 
 # Initialize the state of the edit page
