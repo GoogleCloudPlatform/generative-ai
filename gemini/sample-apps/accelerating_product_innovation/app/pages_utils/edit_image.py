@@ -219,7 +219,7 @@ def save_image_for_editing(image_bytes: bytes, filename: str) -> None:
     Saves image for image editing by Imagen
 
     Args:
-        image_bytes (bytes): Image bytes for the image to saved.
+        image_bytes (bytes): Image bytes for the image to be saved.
         filename (str): Name of the saved file.
     """
     # Create a BytesIO object from the image bytes
