@@ -177,11 +177,11 @@ def model_comparison_component(
         """
         Takes the instruction, context and a variable number of responses as
         input, and returns the best performing response as well as its associated
-        human readable pointwise quality metrics for the configured criteria in the above functions.
+        human-readable pointwise quality metrics for the configured criteria in the above functions.
         The process consists of two steps:
         1. Selecting the best response by using Pairwise comparisons between the responses for
         the user specified metric ( e.g. Q & A)
-        2. Doing pointwise evaluation of the best response and returning human readable quality
+        2. Doing pointwise evaluation of the best response and returning human-readable quality
         metrics and explanation along with the best response.
         """
         cmp_f = partial(

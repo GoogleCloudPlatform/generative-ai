@@ -213,10 +213,10 @@ if st.session_state.temp_suggestions is not None:
     # Display divider
     st.divider()
 
-    # Display follow up questions
+    # Display follow-up questions
     st.write("**Follow up questions**")
 
-    # Display follow up question buttons
+    # Display follow-up question buttons
     for suggestion in st.session_state.temp_suggestions:
         if st.button(
             suggestion,
