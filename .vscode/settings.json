@@ -19,5 +19,8 @@
   "files.trimTrailingWhitespace": true,
   "editor.rulers": [
     88
-  ]
+  ],
+  "IDX.aI.showChatInEditorTab": true,
+  "IDX.agenticWorkspace": true,
+  "IDX.corgiMode": true
 }
