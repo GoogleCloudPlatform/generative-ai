@@ -654,6 +654,8 @@ itable
 itables
 ITDMs
 iterrows
+itl
+ITL
 ivf
 IVF
 ivfflat
@@ -1369,6 +1371,7 @@ tion
 titlebar
 TLDR
 tobytes
+tok
 TOKENLIST
 tomentosa
 Tongsheng
@@ -1378,6 +1381,8 @@ toolu
 Topolino
 toself
 toset
+tpot
+TPOT
 TPU
 TPUs
 tqdm
@@ -1399,6 +1404,7 @@ TSNE
 tsv
 ttext
 TTFB
+ttft
 TTFT
 TTH
 tts
