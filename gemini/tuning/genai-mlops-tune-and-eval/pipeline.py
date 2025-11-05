@@ -16,7 +16,6 @@ def gemini_tuning_component(
     train_dataset_uri: str,
 ) -> str:
     """Output the tuned model name as a string"""
-
     import time
 
     import vertexai
@@ -59,10 +58,10 @@ def model_comparison_component(
 ) -> NamedTuple("outputs", best_response=str, metrics=dict):  # type: ignore[valid-type]
     """Compares base model to newly tuned model"""
     import functools
-    from functools import partial
     import typing
-    from typing import Union
     import uuid
+    from functools import partial
+    from typing import Union
 
     import pandas as pd
     from vertexai.evaluation import EvalResult, EvalTask, MetricPromptTemplateExamples
@@ -79,8 +78,7 @@ def model_comparison_component(
         baseline: str,
         candidate: str,
     ) -> tuple:
-        """
-        Takes Instructions, Context and two different responses.
+        """Takes Instructions, Context and two different responses.
         Returns the response which best matches the instructions/Context for the given
         quality metric ( in this case question answering).
         More details on the web API and different quality metrics which this function
@@ -122,8 +120,7 @@ def model_comparison_component(
         return (choice, result["pairwise_question_answering_quality/explanation"])
 
     def greater(cmp: typing.Callable, a: str, b: str) -> int:
-        """
-        A comparison function which takes the comparison function, and two variables as input
+        """A comparison function which takes the comparison function, and two variables as input
         and returns the one which is greater according to the logic defined inside the cmp function.
         """
         choice, _ = cmp(a, b)
@@ -139,14 +136,12 @@ def model_comparison_component(
         eval_metrics: Union[list[MetricPromptTemplateExamples.Pointwise], None] = None,
         experiment_name: str = experiment_name,
     ) -> EvalResult:
-        """
-        Takes the instruction, context and a variable number of corresponding
+        """Takes the instruction, context and a variable number of corresponding
         generated responses, and returns the pointwise evaluation metrics
         for each of the provided metrics. For this example the metrics are
         Q & A related, however the full list can be found on the website:
         https://cloud.google.com/vertex-ai/generative-ai/docs/models/online-pipeline-services
         """
-
         instructions = [instruction] * len(responses)
 
         contexts = [context] * len(responses)
@@ -174,14 +169,13 @@ def model_comparison_component(
         return results
 
     def rank_responses(instruction: str, context: str, responses: list[str]) -> tuple:
-        """
-        Takes the instruction, context and a variable number of responses as
+        """Takes the instruction, context and a variable number of responses as
         input, and returns the best performing response as well as its associated
-        human readable pointwise quality metrics for the configured criteria in the above functions.
+        human-readable pointwise quality metrics for the configured criteria in the above functions.
         The process consists of two steps:
         1. Selecting the best response by using Pairwise comparisons between the responses for
         the user specified metric ( e.g. Q & A)
-        2. Doing pointwise evaluation of the best response and returning human readable quality
+        2. Doing pointwise evaluation of the best response and returning human-readable quality
         metrics and explanation along with the best response.
         """
         cmp_f = partial(
@@ -220,7 +214,7 @@ def model_comparison_component(
     instruction_qa = "Analyze the glucose trends in the glucose values provided in the CSV contained in the context. Ensure the analysis you provide can easily be understood by a diabetes patient with no medical expertise."
     context_qa = (
         "Context:\n"
-        + "```csv\ndate,time,patient ID,glucose\n2024-11-12,7:00 AM,1,80\n2024-11-12,8:00 AM,1,96\n2024-11-12,11:00 AM,1,90\n2024-11-12,12:00 PM,1,115\n2024-11-12,5:00 PM,1,77\n2024-11-12,6:00 PM,1,80\n2024-11-13,7:00 AM,1,94\n2024-11-13,8:00 AM,1,100\n2024-11-13,11:00 AM,1,87\n2024-11-13,12:00 PM,1,126\n2024-11-13,5:00 PM,1,71\n2024-11-13,6:00 PM,1,82\n2024-11-14,7:00 AM,1,84\n2024-11-14,8:00 AM,1,72\n2024-11-14,11:00 AM,1,96\n2024-11-14,12:00 PM,1,110\n2024-11-14,5:00 PM,1,99\n2024-11-14,6:00 PM,1,74\n2024-11-15,7:00 AM,1,96\n2024-11-15,8:00 AM,1,97\n2024-11-15,11:00 AM,1,99\n2024-11-15,12:00 PM,1,130\n2024-11-15,5:00 PM,1,99\n2024-11-15,6:00 PM,1,87\n2024-11-16,7:00 AM,1,89\n2024-11-16,8:00 AM,1,92\n2024-11-16,11:00 AM,1,77\n2024-11-16,12:00 PM,1,105\n2024-11-16,5:00 PM,1,79\n2024-11-16,6:00 PM,1,90\n2024-11-17,7:00 AM,1,74\n2024-11-17,8:00 AM,1,82\n2024-11-17,11:00 AM,1,74\n2024-11-17,12:00 PM,1,78\n2024-11-17,5:00 PM,1,95\n2024-11-17,6:00 PM,1,74\n2024-11-18,7:00 AM,1,95\n2024-11-18,8:00 AM,1,87\n2024-11-18,11:00 AM,1,79\n2024-11-18,12:00 PM,1,90\n2024-11-18,5:00 PM,1,79\n2024-11-18,6:00 PM,1,77\n"
+        "```csv\ndate,time,patient ID,glucose\n2024-11-12,7:00 AM,1,80\n2024-11-12,8:00 AM,1,96\n2024-11-12,11:00 AM,1,90\n2024-11-12,12:00 PM,1,115\n2024-11-12,5:00 PM,1,77\n2024-11-12,6:00 PM,1,80\n2024-11-13,7:00 AM,1,94\n2024-11-13,8:00 AM,1,100\n2024-11-13,11:00 AM,1,87\n2024-11-13,12:00 PM,1,126\n2024-11-13,5:00 PM,1,71\n2024-11-13,6:00 PM,1,82\n2024-11-14,7:00 AM,1,84\n2024-11-14,8:00 AM,1,72\n2024-11-14,11:00 AM,1,96\n2024-11-14,12:00 PM,1,110\n2024-11-14,5:00 PM,1,99\n2024-11-14,6:00 PM,1,74\n2024-11-15,7:00 AM,1,96\n2024-11-15,8:00 AM,1,97\n2024-11-15,11:00 AM,1,99\n2024-11-15,12:00 PM,1,130\n2024-11-15,5:00 PM,1,99\n2024-11-15,6:00 PM,1,87\n2024-11-16,7:00 AM,1,89\n2024-11-16,8:00 AM,1,92\n2024-11-16,11:00 AM,1,77\n2024-11-16,12:00 PM,1,105\n2024-11-16,5:00 PM,1,79\n2024-11-16,6:00 PM,1,90\n2024-11-17,7:00 AM,1,74\n2024-11-17,8:00 AM,1,82\n2024-11-17,11:00 AM,1,74\n2024-11-17,12:00 PM,1,78\n2024-11-17,5:00 PM,1,95\n2024-11-17,6:00 PM,1,74\n2024-11-18,7:00 AM,1,95\n2024-11-18,8:00 AM,1,87\n2024-11-18,11:00 AM,1,79\n2024-11-18,12:00 PM,1,90\n2024-11-18,5:00 PM,1,79\n2024-11-18,6:00 PM,1,77\n"
     )
     prompt_qa = instruction_qa + "\n" + context_qa + "\n\nAnswer:\n"
 

@@ -1,5 +1,4 @@
-"""
-This module manages the 'Insights' page of the Streamlit application.
+"""This module manages the 'Insights' page of the Streamlit application.
 It provides the following functionality:
 
 * Project Management: Displays currently selected project.
@@ -15,9 +14,9 @@ It provides the following functionality:
 * Follow-up Questions: Suggests follow-up questions based on previous queries.
 """
 
+import streamlit as st
 from app.pages_utils import insights, setup
 from app.pages_utils.pages_config import PAGES_CFG
-import streamlit as st
 
 # Get page configuration from config file
 page_cfg = PAGES_CFG["2_Marketing_Insights"]
@@ -31,8 +30,7 @@ if "temp_suggestions" not in st.session_state:
 # Cache the function to get insights images
 @st.cache_data
 def get_insights_img() -> None:
-    """
-    Loads, displays and cache header image for insights page.
+    """Loads, displays and cache header image for insights page.
 
     Returns:
         None
@@ -58,8 +56,8 @@ if st.session_state.embeddings_df is None or st.session_state.embeddings_df.empt
 
 # Function to display suggestion box
 def display_suggestion_box(key: str, suggestion_num: int) -> None:
-    """
-    Styles and displays the suggestion for insight generation.
+    """Styles and displays the suggestion for insight generation.
+
     Args:
         key: Unique key for suggestion.
         suggestion_num: Current suggestion number.
@@ -213,10 +211,10 @@ if st.session_state.temp_suggestions is not None:
     # Display divider
     st.divider()
 
-    # Display follow up questions
+    # Display follow-up questions
     st.write("**Follow up questions**")
 
-    # Display follow up question buttons
+    # Display follow-up question buttons
     for suggestion in st.session_state.temp_suggestions:
         if st.button(
             suggestion,

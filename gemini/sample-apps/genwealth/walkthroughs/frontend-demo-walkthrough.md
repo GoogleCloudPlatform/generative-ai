@@ -142,7 +142,7 @@ Notice that she has a low risk profile, and she has a goal of saving for a down 
 
 You could manually draft a response to the emails and all 200+ other emails like it that are waiting for you in your inbox, or you could use Gen AI to generate a personalized response for you.
 
-Navigate to the **Ask** interface and click the **Advanced** toggle. Click the arrows in each field shown below to auto-populate the prompt and a few parameters, as shown in the screenshot below.
+Navigate to the **Ask** interface and click the **Advanced** toggle. Click the arrows in each field shown below to autopopulate the prompt and a few parameters, as shown in the screenshot below.
 
 ![Donya Bartle](https://storage.googleapis.com/github-repo/generative-ai/sample-apps/genwealth/images/genwealth-ui/16-email.png "Donya Bartle")
 

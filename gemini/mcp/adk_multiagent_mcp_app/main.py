@@ -1,6 +1,4 @@
-"""
-Main function to run FastAPI server.
-"""
+"""Main function to run FastAPI server."""
 
 import json
 import logging
@@ -59,8 +57,7 @@ ROOT_AGENT_INSTRUCTION = """
 
 # --- Agent Creation ---
 async def create_agent() -> LlmAgent:
-    """
-    Creates the root LlmAgent and its sub-agents using pre-loaded MCP tools.
+    """Creates the root LlmAgent and its sub-agents using preloaded MCP tools.
 
     Args:
         loaded_mcp_tools: A dictionary of tools, typically populated at application

@@ -1,5 +1,4 @@
-"""
-This module provides functions for image processing and session state
+"""This module provides functions for image processing and session state
 management
 related to image editing.  This module:
 * process_foreground_image():
@@ -27,9 +26,9 @@ import io
 import logging
 
 import PIL
+import streamlit as st
 from PIL import Image
 from app.pages_utils.imagen import predict_edit_image
-import streamlit as st
 from vertexai.preview.vision_models import Image as vertex_image
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
@@ -40,8 +39,7 @@ def process_foreground_image(
     background_image: Image.Image,
     bg_editing: bool = False,
 ) -> bytes:
-    """
-    Processes a foreground image, optionally removing white regions,
+    """Processes a foreground image, optionally removing white regions,
     and prepares it for merging with a background image.
 
     Args:
@@ -55,7 +53,6 @@ def process_foreground_image(
     Returns:
         bytes: The processed and merged image data as bytes.
     """
-
     # Logic to edit background (invert mask)
     if bg_editing:
         # Get image foreground
@@ -84,15 +81,13 @@ def process_foreground_image(
 
 
 def initialize_edit_page_state() -> None:
-    """
-    Initializes the session state for the image editing page.
+    """Initializes the session state for the image editing page.
 
     This function checks if the session state has been initialized, and if not,
     it initializes it.
     It also checks if an image has been uploaded, and if so, it sets
     the session state accordingly.
     """
-
     # Check which image file prefix points to the image to be edited
     if "image_to_edit" not in st.session_state or st.session_state.image_to_edit == -1:
         st.session_state.image_to_edit = (
@@ -108,9 +103,7 @@ def initialize_edit_page_state() -> None:
 
 
 def handle_image_upload() -> None:
-    """
-    Handles an image upload, saving the image and updating session state.
-    """
+    """Handles an image upload, saving the image and updating session state."""
     # Upload button
     uploaded_file = st.file_uploader("Upload an image")
 
@@ -136,11 +129,10 @@ def save_draft_image(
         image (Image): The image object to be saved.
         draft_elements (dict): Dictionary holding the draft image elements.
     """
-
     st.session_state.content_edited = True  # Track whether image has been edited.
-    draft_elements[row][col][
-        "img"
-    ] = image  # Update the drafts to display updated image.
+    draft_elements[row][col]["img"] = (
+        image  # Update the drafts to display updated image.
+    )
 
     # Calculate unique image filename and save image.
     image_num = st.session_state.num_drafts * row + col + 1
@@ -151,15 +143,13 @@ def save_draft_image(
 
 
 def render_suggested_images(suggested_images: list[str]) -> None:
-    """
-    Renders suggested images in a grid layout with "Edit" and "Download"
+    """Renders suggested images in a grid layout with "Edit" and "Download"
     buttons.
 
     Args:
         suggested_images: A list of image paths or data to display as
         suggestions.
     """
-
     # Set number of images to be displayed per row.
     num_suggestions_per_row = 3
 
@@ -193,6 +183,7 @@ def render_suggested_images(suggested_images: list[str]) -> None:
 
 def _handle_edit_suggestion(image_index: int) -> None:
     """Handles the logic for when the 'Edit' button is clicked.
+
     Args:
         image_index (int): corresponding draft number of image being edited.
     """
@@ -215,11 +206,10 @@ def _handle_edit_suggestion(image_index: int) -> None:
 
 
 def save_image_for_editing(image_bytes: bytes, filename: str) -> None:
-    """
-    Saves image for image editing by Imagen
+    """Saves image for image editing by Imagen
 
     Args:
-        image_bytes (bytes): Image bytes for the image to saved.
+        image_bytes (bytes): Image bytes for the image to be saved.
         filename (str): Name of the saved file.
     """
     # Create a BytesIO object from the image bytes
@@ -238,8 +228,7 @@ def generate_suggested_images(
     mask_image: bytes,
     sample_count: int = 6,
 ) -> None:
-    """
-    Generates suggested images based on the provided prompt, image, and mask.
+    """Generates suggested images based on the provided prompt, image, and mask.
     Updates Streamlit session state with the generated images.
 
     Args:
