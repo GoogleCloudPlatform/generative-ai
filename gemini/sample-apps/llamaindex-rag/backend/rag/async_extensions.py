@@ -196,7 +196,7 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
 
 
 class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
-    """Async Extension of the ReterieverQueryEngine
+    """Async Extension of the RetrieverQueryEngine
     to allow for asynchronous post-processing"""
 
     async def _apply_node_postprocessors(

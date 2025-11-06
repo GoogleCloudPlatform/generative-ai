@@ -22,7 +22,7 @@ This is where you'll store your container images for the Streamlit frontend and 
 
 2. Click **Create Repository.**
 
-3. Name your repository `fixmycar`. Keep the default `Docker` option. Choose any region, eg. `us-central1`. Then click **Create.**
+3. Name your repository `fixmycar`. Keep the default `Docker` option. Choose any region, e.g. `us-central1`. Then click **Create.**
 
 ## Build and push container images.
 
@@ -70,11 +70,11 @@ You will deploy these two container images ("frontend" and "backend") to [Google
 
 2. From the Kubernetes Engine console, click **Create** to open the cluster-creation wizard.
 
-3. Keep all defaults (GKE Autopilot). Give your cluster any name you want, eg. `fixmycar`. Click **Create**.
+3. Keep all defaults (GKE Autopilot). Give your cluster any name you want, e.g. `fixmycar`. Click **Create**.
 
 This will take a few minutes to complete.
 
-4. When your cluster is ready, click on the name of the cluster, and click **Connect.** Copy the "Command line Access" command, eg.
+4. When your cluster is ready, click on the name of the cluster, and click **Connect.** Copy the "Command line Access" command, e.g.
 
 ```bash
 gcloud container clusters get-credentials fixmycar --region us-central1 --project my-project
@@ -108,7 +108,7 @@ Kubernetes control plane is running at https://34.69.121.152
 
 2. Click **Create Bucket.**
 
-3. Name your bucket something globally unique, eg. `<your-project-id>-fixmycar`. Keep all other default settings, then click **Create**. (You may see a notification about enforcing public access prevention - this is expected. Click "Confirm.")
+3. Name your bucket something globally unique, e.g. `<your-project-id>-fixmycar`. Keep all other default settings, then click **Create**. (You may see a notification about enforcing public access prevention - this is expected. Click "Confirm.")
 
 4. Copy the full name of your bucket by clicking the "copy" icon.
 

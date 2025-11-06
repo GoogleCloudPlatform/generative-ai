@@ -20,7 +20,7 @@ The customer support agent is built using the `smolagents` framework and provide
 - `PriceCheckTool` - Check product price by product ID
 - `CustomerOrderHistoryTool` - Get order history for a customer
 
-The agent can be configured with different LLM models, including Gemini 1.5 Pro, and supports planning capabilities to handle complex multi-step queries.
+The agent can be configured with different LLM models, including Gemini 1.5 Pro, and supports planning capabilities to handle complex multistep queries.
 
 ```python
 agent = create_customer_support_agent(
@@ -87,7 +87,7 @@ results = evaluator.run_evaluation(agent, eval_dataset)
    uv sync
    ```
 
-2. Set up environment variables (some of these will auto populate if you run `setup.py`):
+2. Set up environment variables (some of these will autopopulate if you run `setup.py`):
    ```
    # Create a .env file with your API keys or colab secrets
     GEMINI_API_KEY
