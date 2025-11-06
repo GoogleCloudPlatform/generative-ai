@@ -385,8 +385,10 @@ errlog
 erty
 ESG
 Esin
+ESPP
 ESRB
 etf
+ETFs
 etils
 euchlora
 eula
@@ -603,6 +605,7 @@ HVDC
 hwnd
 hypercorn
 Hyperdisk
+HYSA
 HZN
 iap
 iban
