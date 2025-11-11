@@ -25,6 +25,22 @@ For multiple authors
 | [Firstname Lastname](https://github.com/username) |
 | [Firstname Lastname](https://github.com/username) |
 
+## Code Requirements
+
+- Don't include hard-coded Google Cloud project IDs, always use a placeholder like `[your-project-id]`
+
+**Correct**
+
+```py
+PROJECT_ID = "[your-project-id]"
+```
+
+***Incorrect**
+
+```py
+PROJECT_ID = "actual-projectid-1234"
+```
+
 ## Golden Rule: Use the Correct and Current SDK
 
 Always use the Google Gen AI SDK to call the Gemini models, which became the

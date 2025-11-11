@@ -117,7 +117,7 @@ The end-to-end deployment tool, `concierge langgraph deploy`, will create a new 
   <img src="https://storage.googleapis.com/github-repo/generative-ai/gemini/agents/genai-experience-concierge/langgraph-architecture.png" alt="Gen AI Experience Concierge LangGraph Demo Architecture" width="75%" />
 </div>
 
-### Setup a seed project
+### Set up a seed project
 
 The click-to-deploy LangGraph demo uses the [project-factory](https://registry.terraform.io/modules/terraform-google-modules/project-factory/google/latest) terraform module to automate the creation of a demo project and infrastructure provisioning. The module provides a helper script ([documentation](https://github.com/terraform-google-modules/terraform-google-project-factory?tab=readme-ov-file#script-helper)) to check that the seed project is configured correctly. It is recommended to run this script before running the deployment to ensure there won't be any errors.
 
