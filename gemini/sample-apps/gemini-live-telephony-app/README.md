@@ -32,7 +32,7 @@ For a step-by-step guide on the implementation process, including project setup,
 2.  **Get a Gemini API Key:**
     - Go to [aistudio.google.com](https://aistudio.google.com) and get your API key.
 
-3.  **Authenticate with your GCP account:**
+3.  **Authenticate with your Google Cloud Platform account:**
     - In your local terminal, authenticate your Google Cloud account by running:
       ```bash
       gcloud auth login
