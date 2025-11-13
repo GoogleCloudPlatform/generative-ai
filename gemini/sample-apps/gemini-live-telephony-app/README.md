@@ -111,7 +111,7 @@ This project is implemented using Python 3.12.
 
 Now, wait for around 2 mins and call your Twilio number, Twilio will send the webhook to the public ngrok URL, which will forward it to your locally running application. This allows you to test the entire end-to-end flow and see logs in real-time in your local terminal for debugging.
 
-## Deployment on GCP
+## Deployment on Google Cloud Platform
 
 **Important Note on IAM Permissions:** Before deploying, ensure your Google Cloud account has the necessary IAM permissions for Cloud Run and Cloud Build Service account. Specifically, you will need roles such as `Cloud Run Invoker`,..etc
 

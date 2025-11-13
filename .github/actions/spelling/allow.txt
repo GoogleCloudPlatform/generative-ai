@@ -1037,7 +1037,7 @@ pbar
 pbxproj
 pcs
 PDEs
-pdflatex
+pdflatef
 pdfminer
 pdfs
 PDFs
@@ -1609,3 +1609,10 @@ Zom
 Zosyn
 Zscaler
 Zuv
+ulaw
+sid
+twiml
+authtoken
+sinc
+aistudio
+Vardhan
