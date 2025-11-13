@@ -64,6 +64,7 @@ arguana
 arize
 Arize
 Arjen
+Arrietty
 Arsan
 Artsakh
 arun
@@ -268,6 +269,7 @@ CZE
 czf
 D'orsay
 Daniil
+Darabont
 darkgrid
 dask
 DataFrame
@@ -285,6 +287,7 @@ deepeval
 DeepEval
 deepseek
 Demis
+Demme
 demouser
 dente
 Depatmint
@@ -312,6 +315,7 @@ DOCDB
 docstore
 docstores
 doi
+Donen
 Doogler
 dotprompt
 Downscale
@@ -450,6 +454,7 @@ FPDF
 FREDDIE
 freedraw
 freopen
+Friedkin
 Frodo
 fromarray
 frombytes
@@ -563,6 +568,7 @@ Harvick
 hashtag
 hashtags
 Hawkins'll
+Hayao
 Hbf
 HBox
 HDFC
@@ -580,6 +586,7 @@ Hida
 HIDPI
 HIGHCPU
 Hikaru
+Hiromasa
 Hisaki
 Hlc
 Hmmm
@@ -717,6 +724,7 @@ Khanh
 khz
 kickstart
 Kipchoge
+Kleiser
 kmeans
 KMEANS
 knative
@@ -792,12 +800,14 @@ Lottry
 lparam
 LRESULT
 lro
+LROs
 lru
 lsb
 LSTATUS
 LSTM
 LSum
 LTRB
+Lumet
 LUVBPTK
 lxml
 lycra
@@ -839,6 +849,7 @@ MEDIANCUT
 mediapy
 Mega
 Meinl
+Meirelles
 Meltem
 meme
 Memegen
@@ -987,6 +998,8 @@ Ohtani
 Okame
 Olá
 OLAP
+oldboy
+Oldboy
 Olgivanna
 ollama
 Ollama
@@ -1079,6 +1092,8 @@ podhelper
 podman
 Poirot
 Polong
+ponyo
+Ponyo
 popleft
 Porat
 postictal
@@ -1218,7 +1233,9 @@ Schlenoff
 Schulen
 scidocs
 scifact
+scifi
 scikit
+Scorsese
 SDKROOT
 seabut
 seatback
@@ -1239,9 +1256,11 @@ Sestero
 setlocal
 sft
 Sha'carri
+Shankman
 Shaoxiong
 sharegpt
 Sharmila
+Shawshank
 Shazeer
 Shenzhou
 Shklovsky
@@ -1254,11 +1273,13 @@ showor
 showtime
 showtimes
 Shubham
+Shyamalan
 siglap
 signings
 simage
 SIMONE
 Simpsons
+Singin
 sittin
 Skaffold
 Sketchfab
@@ -1464,6 +1485,7 @@ VCPU
 vectoral
 vectordb
 veo
+Verbinski
 Verilog
 versioned
 Ves
@@ -1541,6 +1563,7 @@ Wnd
 WNDCLASS
 womens
 Womens
+wook
 workarounds
 worklets
 wparam
@@ -1598,11 +1621,13 @@ Yuzuru
 zakarid
 Zakarids
 zaxis
+Zemeckis
 Zhaohua
 Zhenguo
 Zhengying
 Zijin
 zimie
+Zinnemann
 Zizu
 zmin
 Zom
