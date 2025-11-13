@@ -9,6 +9,7 @@
 
 *                                                                                                                                @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/embeddings                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @kazunori279
+/generative-ai/embeddings/vector-search-2-quickstart.ipynb                                                                       @GoogleCloudPlatform/generative-ai-devrel @ericgribkoff
 /generative-ai/gemini                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @polong-lin
 /generative-ai/gemini/agent-engine                                                                                               @GoogleCloudPlatform/generative-ai-devrel @koverholt
 /generative-ai/gemini/agent-engine/tutorial_ag2_on_agent_engine.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @awaemmanuel
