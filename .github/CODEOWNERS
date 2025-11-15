@@ -72,3 +72,4 @@
 /generative-ai/gemini/evaluation/evaluate_gemini_structured_output.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @stevie-p
 /generative-ai/agents/gke/agents_with_memory/get_started_with_memory_for_adk_in_gke.ipynb                                        @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/agents/cloud_run/agents_with_memory/get_started_with_memory_for_adk_in_cloud_run.ipynb                            @GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/gemini/sample-apps/gemini-live-telephony-app                                                                      @GoogleCloudPlatform/generative-ai-devrel @KVishnuVardhanR

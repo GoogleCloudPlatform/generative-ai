@@ -267,7 +267,6 @@ cycleways
 cygpath
 CZE
 czf
-D'orsay
 Daniil
 Darabont
 darkgrid
@@ -317,6 +316,7 @@ docstores
 doi
 Donen
 Doogler
+D'orsay
 dotprompt
 Downscale
 dpi
@@ -746,8 +746,6 @@ Kwanzan
 kyc
 KYC
 Kylian
-L'avenir
-l'harmonie
 labetalol
 Ladhak
 LAION
@@ -757,6 +755,7 @@ landuse
 langgraph
 Laomedeia
 latte
+L'avenir
 LCEL
 LEBRON
 lecie
@@ -767,6 +766,7 @@ levelname
 Leventer
 lexer
 lexers
+l'harmonie
 liberties
 linalg
 linecolor
@@ -1050,7 +1050,7 @@ pbar
 pbxproj
 pcs
 PDEs
-pdflatex
+pdflatef
 pdfminer
 pdfs
 PDFs
@@ -1634,3 +1634,11 @@ Zom
 Zosyn
 Zscaler
 Zuv
+ulaw
+sid
+twiml
+authtoken
+sinc
+aistudio
+Vardhan
+upsamples
