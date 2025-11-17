@@ -9,6 +9,7 @@
 
 *                                                                                                                                @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/embeddings                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @kazunori279
+/generative-ai/embeddings/vector-search-2-quickstart.ipynb                                                                       @GoogleCloudPlatform/generative-ai-devrel @ericgribkoff
 /generative-ai/gemini                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @polong-lin
 /generative-ai/gemini/agent-engine                                                                                               @GoogleCloudPlatform/generative-ai-devrel @koverholt
 /generative-ai/gemini/agent-engine/tutorial_ag2_on_agent_engine.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @awaemmanuel
@@ -49,6 +50,7 @@
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/retail_warranty_claim_chatbot.ipynb                               @GoogleCloudPlatform/generative-ai-devrel @zthor5
 /generative-ai/genkit/generate-synthetic-database                                                                                @GoogleCloudPlatform/generative-ai-devrel @aikozhaoz
 /generative-ai/genkit/postcard-generator                                                                                         @GoogleCloudPlatform/generative-ai-devrel @mattsday
+/generative-ai/open-models/fine-tuning                                                                                           @GoogleCloudPlatform/generative-ai-devrel @goudtho
 /generative-ai/open-models/serving                                                                                               @GoogleCloudPlatform/generative-ai-devrel @polong-lin
 /generative-ai/open-models/serving/cloud_run_ollama_gemma3_inference.ipynb                                                       @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @vladkol
