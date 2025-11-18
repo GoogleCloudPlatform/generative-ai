@@ -277,6 +277,7 @@ datname
 dbadmin
 dbln
 dcg
+dcl
 DCR
 ddbb
 ddl
