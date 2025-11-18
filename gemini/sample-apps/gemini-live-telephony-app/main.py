@@ -37,11 +37,15 @@ logging.getLogger('google.auth').setLevel(logging.WARNING)
 app = FastAPI(title="Gemini Live Health Demo")
 
 # --- CONFIGURATION ---
-MODEL_ID = "gemini-live-2.5-flash-preview"
+MODEL_ID = os.getenv("GOOGLE_GENAI_MODEL", "gemini-live-2.5-flash-preview-native-audio-09-2025")
+
+# Initialize Gemini Client
 try:
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    client = genai.Client(vertexai=True, project=os.getenv("GOOGLE_CLOUD_PROJECT"), 
+                          location=os.getenv("GOOGLE_CLOUD_LOCATION"))
+    # client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 except KeyError:
-    logger.fatal("GEMINI_API_KEY not set.")
+    logger.fatal("Google Cloud configuration not found in environment variables.")
     exit(1)
 
 
@@ -259,8 +263,8 @@ async def conversation_loop(in_q, out_q, call_state):
                 )
             ),
             generation_config=types.GenerationConfig(
-                temperature=0.01,
-                seed=123,
+                temperature=os.getenv("GOOGLE_GENAI_TEMPERATURE", 0.01),
+                seed=os.getenv("GOOGLE_GENAI_SEED", 123),
             ),
         )
 

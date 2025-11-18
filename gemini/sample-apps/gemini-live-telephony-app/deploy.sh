@@ -23,16 +23,15 @@
 # --- Step 1: Build and Push the Container Image ---
 # Replace [YOUR_PROJECT_ID] with your Google Cloud Project ID
 PROJECT_ID=[YOUR_PROJECT_ID]
+
 # Generate a unique tag based on the current time (Forces a fresh pull)
 # --- Step 2: Deploy to Cloud Run ---
-# Replace [YOUR_GEMINI_API_KEY] with your actual Gemini API Key
-GEMINI_API_KEY=[YOUR_GEMINI_API_KEY]
 
 
 SERVICE_NAME="gemini-live-health" # Cloud Run service name
 REGION="us-central1"              # Cloud Run region
 
-SERVICE_URL="" # Update with your deployed service URL after first deployment
+SERVICE_URL="" # Will be Updated with your deployed service URL after first deployment
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}:${TIMESTAMP}"
@@ -60,7 +59,7 @@ DEPLOY_OUTPUT=$(gcloud run deploy "${SERVICE_NAME}" \
   --concurrency=1 \
   --cpu=2 \
   --no-cpu-throttling \
-  --set-env-vars="GEMINI_API_KEY=${GEMINI_API_KEY},SERVICE_URL=${SERVICE_URL}" \
+  --set-env-vars="SERVICE_URL=${SERVICE_URL}" \
   --format="value(status.url)")
 
 if [ $? -ne 0 ]; then

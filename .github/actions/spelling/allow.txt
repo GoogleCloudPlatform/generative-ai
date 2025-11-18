@@ -30,6 +30,7 @@ AIP
 AIphone
 airbnb
 airlume
+aistudio
 akka
 Aktu
 ALCS
@@ -80,6 +81,7 @@ atms
 Atulan
 auc
 aujourd'hui
+authtoken
 autocal
 autoflake
 autogen
@@ -1274,11 +1276,13 @@ showtime
 showtimes
 Shubham
 Shyamalan
+sid
 siglap
 signings
 simage
 SIMONE
 Simpsons
+sinc
 Singin
 sittin
 Skaffold
@@ -1435,6 +1439,7 @@ tts
 TTT
 tures
 tval
+twiml
 typehints
 ubuntu
 udf
@@ -1443,6 +1448,7 @@ UDFs
 uids
 UIs
 Ukiyo
+ulaw
 ulmoides
 ultrawide
 und
@@ -1452,6 +1458,7 @@ Unimicron
 unrtf
 unsloth
 Unsloth
+upsamples
 upsell
 Upserting
 urandom
@@ -1478,6 +1485,7 @@ Vandamm
 Vandoorne
 vapo
 VAPO
+Vardhan
 Vaswani
 Vayots
 VBG
@@ -1634,11 +1642,3 @@ Zom
 Zosyn
 Zscaler
 Zuv
-ulaw
-sid
-twiml
-authtoken
-sinc
-aistudio
-Vardhan
-upsamples

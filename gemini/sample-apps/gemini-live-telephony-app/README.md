@@ -19,9 +19,7 @@ Key design decisions include the use of `python-samplerate` for high-quality str
 
 ## Special Notes
 
-For a detailed understanding of the system's architecture, including component breakdowns, data flow, and technical justifications, please refer to the `architecture.md` file.
-
-For a step-by-step guide on the implementation process, including project setup, code structure, and deployment instructions, please consult the `implementation_plan.md` file.
+For a detailed understanding of the system's architecture, including component breakdowns, data flow, technical justifications, step-by-step guide on the implementation process, including project setup, code structure, and deployment instructions, please refer to the `design_doc.md` file.
 
 ## Google Cloud and Gemini Setup
 
@@ -29,13 +27,11 @@ For a step-by-step guide on the implementation process, including project setup,
     - Go to the [Google Cloud Console](https://console.cloud.google.com/) and create a new project.
     - Make sure to enable the Vertex AI API for your project.
 
-2.  **Get a Gemini API Key:**
-    - Go to [aistudio.google.com](https://aistudio.google.com) and get your API key.
-
-3.  **Authenticate with your Google Cloud Platform account:**
+2.  **Authenticate with your Google Cloud Platform account:**
     - In your local terminal, authenticate your Google Cloud account by running:
       ```bash
       gcloud auth login
+      gcloud auth application-default login # for providing credentials to applications and code
       ```
 
 ## Quickstart (For local testing)
@@ -53,8 +49,8 @@ This project is implemented using Python 3.12.
     pip install -r requirements.txt
     ```
 
-3.  **Set the Gemini API Key:**
-    Set your Gemini API key as an environment variable. Replace `# your API key` with the key you obtained in **.env file**.
+3.  **Set environment variables:**
+    Set your environment variables by creating a **.env file** in the project directory by utilizing the **.env.example file**
 
 
 4.  **Install the ngrok:**
@@ -117,14 +113,12 @@ Now, wait for around 2 mins and call your Twilio number, Twilio will send the we
 
 The `deploy.sh` script automates the process of building the container image, pushing it to Google Container Registry, and deploying it to Cloud Run.
 
-**There is no need for .env file in your project directory for deploying since we are setting env variables directly in the gcloud deployement commands**
 
 1.  **Update `deploy.sh`:**
     - Open the `deploy.sh` file.
     - Replace `[YOUR_PROJECT_ID]` with your Google Cloud Project ID.
-    - Replace `[YOUR_GEMINI_API_KEY]` with your actual Gemini API Key.
 
-2.  **Configure Docker:**
+2.  **Configure Docker (optional):**
     - Ensure you have Docker configured to work with `gcloud`:
       ```bash
       gcloud auth configure-docker
@@ -133,7 +127,7 @@ The `deploy.sh` script automates the process of building the container image, pu
 3.  **Run the Deployment Script:**
     - Execute the `deploy.sh` script from your terminal:
       ```bash
-      ./deploy.sh
+      bash deploy.sh
       ```
     - The script will build and push the container, then deploy the service to Cloud Run. It will output the `Service URL` upon completion.
 
