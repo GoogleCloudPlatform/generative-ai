@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-WebSocket Proxy Server for Gemini Live API with Static File Serving
+"""WebSocket Proxy Server for Gemini Live API with Static File Serving
 Handles authentication, proxies WebSocket connections, and serves HTML/JS files
 
 This server acts as a bridge between the browser client and Gemini API,
@@ -8,24 +7,25 @@ handling Google Cloud authentication automatically using default credentials.
 """
 
 import asyncio
-import websockets
 import json
-import ssl
-import certifi
-import os
 import mimetypes
-from aiohttp import web
-from websockets.legacy.server import WebSocketServerProtocol
-from websockets.legacy.protocol import WebSocketCommonProtocol
-from websockets.exceptions import ConnectionClosed
+import os
+import ssl
+
+import certifi
 
 # Google auth imports
 import google.auth
+import websockets
+from aiohttp import web
 from google.auth.transport.requests import Request
+from websockets.exceptions import ConnectionClosed
+from websockets.legacy.protocol import WebSocketCommonProtocol
+from websockets.legacy.server import WebSocketServerProtocol
 
 DEBUG = False  # Set to True for verbose logging
 HTTP_PORT = 8000  # Port for HTTP server
-WS_PORT = 8080    # Port for WebSocket server
+WS_PORT = 8080  # Port for WebSocket server
 
 
 def generate_access_token():
@@ -46,8 +46,7 @@ async def proxy_task(
     destination_websocket: WebSocketCommonProtocol,
     is_server: bool,
 ) -> None:
-    """
-    Forwards messages from source_websocket to destination_websocket.
+    """Forwards messages from source_websocket to destination_websocket.
 
     Args:
         source_websocket: The WebSocket connection to receive messages from.
@@ -59,7 +58,9 @@ async def proxy_task(
             try:
                 data = json.loads(message)
                 if DEBUG:
-                    print(f"Proxying from {'server' if is_server else 'client'}: {data}")
+                    print(
+                        f"Proxying from {'server' if is_server else 'client'}: {data}"
+                    )
                 await destination_websocket.send(json.dumps(data))
             except Exception as e:
                 print(f"Error processing message: {e}")
@@ -76,8 +77,7 @@ async def proxy_task(
 async def create_proxy(
     client_websocket: WebSocketCommonProtocol, bearer_token: str, service_url: str
 ) -> None:
-    """
-    Establishes a WebSocket connection to the Gemini server and creates bidirectional proxy.
+    """Establishes a WebSocket connection to the Gemini server and creates bidirectional proxy.
 
     Args:
         client_websocket: The WebSocket connection of the client.
@@ -92,17 +92,15 @@ async def create_proxy(
     # Create SSL context with certifi certificates
     ssl_context = ssl.create_default_context(cafile=certifi.where())
 
-    print(f"Connecting to Gemini API...")
+    print("Connecting to Gemini API...")
     if DEBUG:
         print(f"Service URL: {service_url}")
 
     try:
         async with websockets.connect(
-            service_url,
-            additional_headers=headers,
-            ssl=ssl_context
+            service_url, additional_headers=headers, ssl=ssl_context
         ) as server_websocket:
-            print(f"✅ Connected to Gemini API")
+            print("✅ Connected to Gemini API")
 
             # Create bidirectional proxy tasks
             client_to_server_task = asyncio.create_task(
@@ -148,8 +146,7 @@ async def create_proxy(
 
 
 async def handle_websocket_client(client_websocket: WebSocketServerProtocol) -> None:
-    """
-    Handles a new WebSocket client connection.
+    """Handles a new WebSocket client connection.
 
     Expects first message with optional bearer_token and service_url.
     If no bearer_token provided, generates one using Google default credentials.
@@ -174,17 +171,13 @@ async def handle_websocket_client(client_websocket: WebSocketServerProtocol) -> 
             bearer_token = generate_access_token()
             if not bearer_token:
                 print("❌ Failed to generate access token")
-                await client_websocket.close(
-                    code=1008, reason="Authentication failed"
-                )
+                await client_websocket.close(code=1008, reason="Authentication failed")
                 return
             print("✅ Access token generated")
 
         if not service_url:
             print("❌ Error: Service URL is missing")
-            await client_websocket.close(
-                code=1008, reason="Service URL is required"
-            )
+            await client_websocket.close(code=1008, reason="Service URL is required")
             return
 
         await create_proxy(client_websocket, bearer_token, service_url)
@@ -204,19 +197,19 @@ async def handle_websocket_client(client_websocket: WebSocketServerProtocol) -> 
 # HTTP server for static files
 async def serve_static_file(request):
     """Serve static files from the frontend directory."""
-    path = request.match_info.get('path', 'index.html')
+    path = request.match_info.get("path", "index.html")
 
     # Security: prevent directory traversal
-    path = path.lstrip('/')
-    if '..' in path:
+    path = path.lstrip("/")
+    if ".." in path:
         return web.Response(text="Invalid path", status=400)
 
     # Default to index.html
-    if not path or path == '/':
-        path = 'index.html'
+    if not path or path == "/":
+        path = "index.html"
 
     # Get the full file path - serve from frontend folder
-    frontend_dir = os.path.join(os.path.dirname(__file__), 'frontend')
+    frontend_dir = os.path.join(os.path.dirname(__file__), "frontend")
     file_path = os.path.join(frontend_dir, path)
 
     # Check if file exists
@@ -226,11 +219,11 @@ async def serve_static_file(request):
     # Determine content type
     content_type, _ = mimetypes.guess_type(file_path)
     if content_type is None:
-        content_type = 'application/octet-stream'
+        content_type = "application/octet-stream"
 
     # Read and serve the file
     try:
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             content = f.read()
         return web.Response(body=content, content_type=content_type)
     except Exception as e:
@@ -241,12 +234,12 @@ async def serve_static_file(request):
 async def start_http_server():
     """Start the HTTP server for serving static files."""
     app = web.Application()
-    app.router.add_get('/', serve_static_file)
-    app.router.add_get('/{path:.*}', serve_static_file)
+    app.router.add_get("/", serve_static_file)
+    app.router.add_get("/{path:.*}", serve_static_file)
 
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', HTTP_PORT)
+    site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
     await site.start()
     print(f"🌐 HTTP server running on http://localhost:{HTTP_PORT}")
 
@@ -260,9 +253,7 @@ async def start_websocket_server():
 
 
 async def main():
-    """
-    Starts both HTTP and WebSocket servers.
-    """
+    """Starts both HTTP and WebSocket servers."""
     print(f"""
 ╔════════════════════════════════════════════════════════════╗
 ║     Gemini Live API Proxy Server with Web Interface       ║
@@ -284,10 +275,7 @@ async def main():
 """)
 
     # Start both servers concurrently
-    await asyncio.gather(
-        start_http_server(),
-        start_websocket_server()
-    )
+    await asyncio.gather(start_http_server(), start_websocket_server())
 
 
 if __name__ == "__main__":
