@@ -20,6 +20,9 @@ This section details the high-level architecture of the complete system, outlini
 
 The entire system is orchestrated as a series of handoffs, transitioning from a standard HTTP webhook model to a persistent, bidirectional WebSocket stream. The lifecycle of a single interaction is as follows:
 
+<img width="933" height="452" alt="image" src="https://github.com/user-attachments/assets/de89aa2b-c01f-4605-9cda-2ec8c32db994" />
+
+
 1.  **Initiation (HTTP):** A user dials the Twilio phone number provisioned for the service.
 2.  **Webhook Trigger:** Twilio's infrastructure receives the inbound call. Per its configuration, Twilio sends a synchronous HTTP POST request (a webhook) to the application's pre-defined HTTP endpoint (`/twiml`).
 3.  **TwiML Response (HTTP):** The FastAPI server, deployed on Cloud Run, receives this HTTP request. It dynamically generates and returns a TwiML (Twilio Markup Language) document.
