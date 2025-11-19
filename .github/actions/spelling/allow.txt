@@ -30,6 +30,7 @@ AIP
 AIphone
 airbnb
 airlume
+aistudio
 akka
 Aktu
 ALCS
@@ -80,6 +81,7 @@ atms
 Atulan
 auc
 aujourd'hui
+authtoken
 autocal
 autoflake
 autogen
@@ -267,7 +269,6 @@ cycleways
 cygpath
 CZE
 czf
-D'orsay
 Daniil
 Darabont
 darkgrid
@@ -318,6 +319,7 @@ docstores
 doi
 Donen
 Doogler
+D'orsay
 dotprompt
 Downscale
 dpi
@@ -747,8 +749,6 @@ Kwanzan
 kyc
 KYC
 Kylian
-L'avenir
-l'harmonie
 labetalol
 Ladhak
 LAION
@@ -758,6 +758,7 @@ landuse
 langgraph
 Laomedeia
 latte
+L'avenir
 LCEL
 LEBRON
 lecie
@@ -768,6 +769,7 @@ levelname
 Leventer
 lexer
 lexers
+l'harmonie
 liberties
 linalg
 linecolor
@@ -1051,7 +1053,7 @@ pbar
 pbxproj
 pcs
 PDEs
-pdflatex
+pdflatef
 pdfminer
 pdfs
 PDFs
@@ -1275,11 +1277,13 @@ showtime
 showtimes
 Shubham
 Shyamalan
+sid
 siglap
 signings
 simage
 SIMONE
 Simpsons
+sinc
 Singin
 sittin
 Skaffold
@@ -1436,6 +1440,7 @@ tts
 TTT
 tures
 tval
+twiml
 typehints
 ubuntu
 udf
@@ -1444,6 +1449,7 @@ UDFs
 uids
 UIs
 Ukiyo
+ulaw
 ulmoides
 ultrawide
 und
@@ -1453,6 +1459,7 @@ Unimicron
 unrtf
 unsloth
 Unsloth
+upsamples
 upsell
 Upserting
 urandom
@@ -1479,6 +1486,7 @@ Vandamm
 Vandoorne
 vapo
 VAPO
+Vardhan
 Vaswani
 Vayots
 VBG
