@@ -11,6 +11,7 @@ This directory contains notebooks that will help you get started with the Gemini
 - [Intro to Gemini 2.5 Flash](intro_gemini_2_5_flash.ipynb): Learn how to use the Gemini 2.5 Flash model, a hybrid reasoning model with extended thinking capabilities.
 - [Intro to Gemini 2.5 Flash-Lite](intro_gemini_2_5_flash_lite.ipynb): Learn how to use Gemini 2.5 Flash-Lite, Google's most cost-effective Gemini 2.5 model for high-volume workloads.
 - [Gemini 2.5 Flash Image (Nano Banana 🍌) Generation in Vertex AI](intro_gemini_2_5_image_gen.ipynb): Learn how to use Gemini 2.5 Flash Image for image generation and conversational image editing.
+- [Gemini 3 Pro Image (Nano Banana Pro 🍌) Generation in Vertex AI](intro_gemini_3_image_gen.ipynb): Learn how to use Gemini 3 Pro Image for image generation and multi-turn image editing.
 - [Intro to Gemini 2.5 Pro](intro_gemini_2_5_pro.ipynb): Learn how to use Gemini 2.5 Pro, Google's most advanced reasoning model, to solve complex problems.
 - [Getting Started with Chat with Gemini](intro_gemini_chat.ipynb): Learn how to send chat prompts to the Gemini model using the Google Gen AI SDK for Python and LangChain.
 - [Getting Started with the Gemini API in Vertex AI with cURL / REST API](intro_gemini_curl.ipynb): Learn how to use the Vertex AI REST API with cURL commands to interact with the Gemini 2.0 Flash model.
