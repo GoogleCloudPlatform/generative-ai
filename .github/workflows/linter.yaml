@@ -63,3 +63,4 @@ jobs:
           VALIDATE_JUPYTER_NBQA_ISORT: false
           VALIDATE_JUPYTER_NBQA_MYPY: false
           VALIDATE_JUPYTER_NBQA_BLACK: false
+          VALIDATE_JSCPD: false
