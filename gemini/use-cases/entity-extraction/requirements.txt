@@ -3,3 +3,6 @@ flask
 google-cloud-storage
 google-genai
 gunicorn
+pymupdf
+opencv-python
+numpy

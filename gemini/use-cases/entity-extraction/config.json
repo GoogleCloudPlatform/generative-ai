@@ -21,7 +21,8 @@
                 "quarter": "Quarter of the report (Q1, Q2, Q3, Q4)",
                 "company_name": "Name of the company",
                 "ceo": "Name of the CEO of the company",
-                "net_income_millions": "Net income in million dollars"
+                "net_income_millions": "Net income in million dollars",
+                "net_income_previous_year_millions": "Net income of previous year in million dollars"
             }
         }
     },

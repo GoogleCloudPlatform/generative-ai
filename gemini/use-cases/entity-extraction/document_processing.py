@@ -18,9 +18,11 @@ import json
 import os
 
 import dotenv
-import utils
 from google import genai
 from google.genai import types
+
+import utils
+import document_sanitizer
 
 EXTRACT_PROMPT_TEMPLATE = """\
     Based solely on this {document_name}, extract the following fields.
@@ -41,6 +43,7 @@ CLASSIFY_PROMPT_TEMPLATE = """\
     {classes}
 """
 
+# Load environment variables.
 dotenv.load_dotenv()
 project_id = os.environ.get("GEMINI_PROJECT_ID")
 if not project_id:
@@ -51,7 +54,6 @@ config_path = os.environ.get("CONFIG_PATH", "config.json")
 # Initialize Gemini client.
 client = genai.Client(vertexai=True, project=project_id, location=location)
 CONFIGS = utils.load_app_config(config_path)
-
 
 def extract_from_document(extract_config_id: str, document_uri: str) -> str:
     """Extract entities from a document."""
@@ -77,7 +79,6 @@ def extract_from_document(extract_config_id: str, document_uri: str) -> str:
     )
     return response.text
 
-
 def classify_document(document_uri: str) -> str:
     """Classify a document."""
     classification_config = CONFIGS["classification_config"]
@@ -101,7 +102,6 @@ def classify_document(document_uri: str) -> str:
     )
     return response.text
 
-
 def classify_and_extract_document(document_uri: str) -> str:
     """Classify a document and extract entities from it."""
     classification_response = classify_document(document_uri)
@@ -111,3 +111,28 @@ def classify_and_extract_document(document_uri: str) -> str:
         raise ValueError("Document classification failed.")
 
     return extract_from_document(document_class, document_uri)
+
+def evaluate_quality_and_extract(extract_config_id: str, document_uri: str):
+    image_quality = document_sanitizer.evaluate_document_quality(
+        document_uri=document_uri
+    )
+    print(f"image_quality: {image_quality}")
+
+    if image_quality == "good":
+        data = (
+            extract_from_document(
+                extract_config_id=extract_config_id,
+                document_uri=document_uri
+            )
+        )
+
+    if image_quality == "bad":
+        # TODO: Process multiple pages if needed, not only the first one.
+        enhanced_document_path = document_sanitizer.preprocess_file(document_uri)[0]
+        data = (
+            document_sanitizer.extract_data_from_low_quality_document(
+                extract_config_id=extract_config_id,
+                document_path=enhanced_document_path
+            )
+        )
+    return data
