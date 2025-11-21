@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""
-WebSocket Proxy Server for Gemini Live API
+"""WebSocket Proxy Server for Gemini Live API.
+
 Handles authentication and proxies WebSocket connections.
 
 This server acts as a bridge between the browser client and Gemini API,
@@ -8,21 +8,21 @@ handling Google Cloud authentication automatically using default credentials.
 """
 
 import asyncio
-import websockets
 import json
 import ssl
+
 import certifi
-import os
-from websockets.legacy.server import WebSocketServerProtocol
-from websockets.legacy.protocol import WebSocketCommonProtocol
-from websockets.exceptions import ConnectionClosed
 
 # Google auth imports
 import google.auth
+import websockets
 from google.auth.transport.requests import Request
+from websockets.exceptions import ConnectionClosed
+from websockets.legacy.protocol import WebSocketCommonProtocol
+from websockets.legacy.server import WebSocketServerProtocol
 
 DEBUG = False  # Set to True for verbose logging
-WS_PORT = 8080    # Port for WebSocket server
+WS_PORT = 8080  # Port for WebSocket server
 
 
 def generate_access_token():
@@ -43,8 +43,7 @@ async def proxy_task(
     destination_websocket: WebSocketCommonProtocol,
     is_server: bool,
 ) -> None:
-    """
-    Forwards messages from source_websocket to destination_websocket.
+    """Forwards messages from source_websocket to destination_websocket.
 
     Args:
         source_websocket: The WebSocket connection to receive messages from.
@@ -56,7 +55,9 @@ async def proxy_task(
             try:
                 data = json.loads(message)
                 if DEBUG:
-                    print(f"Proxying from {'server' if is_server else 'client'}: {data}")
+                    print(
+                        f"Proxying from {'server' if is_server else 'client'}: {data}"
+                    )
                 await destination_websocket.send(json.dumps(data))
             except Exception as e:
                 print(f"Error processing message: {e}")
@@ -73,8 +74,7 @@ async def proxy_task(
 async def create_proxy(
     client_websocket: WebSocketCommonProtocol, bearer_token: str, service_url: str
 ) -> None:
-    """
-    Establishes a WebSocket connection to the Gemini server and creates bidirectional proxy.
+    """Establishes a WebSocket connection to the Gemini server and creates bidirectional proxy.
 
     Args:
         client_websocket: The WebSocket connection of the client.
@@ -89,17 +89,15 @@ async def create_proxy(
     # Create SSL context with certifi certificates
     ssl_context = ssl.create_default_context(cafile=certifi.where())
 
-    print(f"Connecting to Gemini API...")
+    print("Connecting to Gemini API...")
     if DEBUG:
         print(f"Service URL: {service_url}")
 
     try:
         async with websockets.connect(
-            service_url,
-            additional_headers=headers,
-            ssl=ssl_context
+            service_url, additional_headers=headers, ssl=ssl_context
         ) as server_websocket:
-            print(f"✅ Connected to Gemini API")
+            print("✅ Connected to Gemini API")
 
             # Create bidirectional proxy tasks
             client_to_server_task = asyncio.create_task(
@@ -145,8 +143,7 @@ async def create_proxy(
 
 
 async def handle_websocket_client(client_websocket: WebSocketServerProtocol) -> None:
-    """
-    Handles a new WebSocket client connection.
+    """Handles a new WebSocket client connection.
 
     Expects first message with optional bearer_token and service_url.
     If no bearer_token provided, generates one using Google default credentials.
@@ -171,17 +168,13 @@ async def handle_websocket_client(client_websocket: WebSocketServerProtocol) -> 
             bearer_token = generate_access_token()
             if not bearer_token:
                 print("❌ Failed to generate access token")
-                await client_websocket.close(
-                    code=1008, reason="Authentication failed"
-                )
+                await client_websocket.close(code=1008, reason="Authentication failed")
                 return
             print("✅ Access token generated")
 
         if not service_url:
             print("❌ Error: Service URL is missing")
-            await client_websocket.close(
-                code=1008, reason="Service URL is required"
-            )
+            await client_websocket.close(code=1008, reason="Service URL is required")
             return
 
         await create_proxy(client_websocket, bearer_token, service_url)
@@ -198,7 +191,7 @@ async def handle_websocket_client(client_websocket: WebSocketServerProtocol) -> 
             await client_websocket.close(code=1011, reason="Internal error")
 
 
-async def start_websocket_server():
+async def start_websocket_server() -> None:
     """Start the WebSocket proxy server."""
     async with websockets.serve(handle_websocket_client, "0.0.0.0", WS_PORT):
         print(f"🔌 WebSocket proxy running on ws://localhost:{WS_PORT}")
@@ -206,10 +199,8 @@ async def start_websocket_server():
         await asyncio.Future()
 
 
-async def main():
-    """
-    Starts the WebSocket server.
-    """
+async def main() -> None:
+    """Starts the WebSocket server."""
     print(f"""
 ╔════════════════════════════════════════════════════════════╗
 ║     Gemini Live API Proxy Server                          ║
