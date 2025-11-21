@@ -1,5 +1,9 @@
 # Real-time Advisor Demo
 
+| Author |
+| --- |
+| [Zack Akil](https://github.com/zackakil) |
+
 A specialized React application demonstrating how to build a real-time AI advisor using Gemini Live API. This demo showcases advanced features like proactive audio, function calling, and precise interruption control.
 
 ![Advisor Demo](advisor-demo-screenshot.png)
