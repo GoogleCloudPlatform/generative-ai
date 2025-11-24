@@ -18,6 +18,7 @@
 
 import os
 import subprocess
+import urllib.parse
 
 import nbformat
 import nox
@@ -25,11 +26,120 @@ import nox
 DEFAULT_PYTHON_VERSION = "3.11"
 DEFAULT_RUFF_LINE_LENGTH = 88
 
+# --- Notebook Link Constants ---
+LINK_PREFIXES = {
+    "colab_link": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/",
+    "colab_enterprise_link": "https://console.cloud.google.com/vertex-ai/colab/import/",
+    "github_link": "https://github.com/GoogleCloudPlatform/generative-ai/blob/main/",
+    "workbench_link": "https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=",
+    "bigquery_studio_link": "https://console.cloud.google.com/bigquery/import?url=",
+    "linkedin_link": "https://www.linkedin.com/sharing/share-offsite/?url=",
+    "bluesky_link": "https://bsky.app/intent/compose?text=",
+    "twitter_link": "https://twitter.com/intent/tweet?url=",
+    "reddit_link": "https://reddit.com/submit?url=",
+    "facebook_link": "https://www.facebook.com/sharer/sharer.php?u=",
+}
+
+GITHUB_URL_PREFIX = LINK_PREFIXES["github_link"]
+RAW_URL_PREFIX = (
+    "https://raw.githubusercontent.com/GoogleCloudPlatform/generative-ai/main/"
+)
 
 nox.options.sessions = [
     "format",
 ]
 nox.options.reuse_existing_virtualenvs = True
+
+
+def fix_markdown_links(
+    cell_source: str, relative_notebook_path: str
+) -> tuple[str, bool]:
+    """Fixes links in a markdown cell and returns the updated source."""
+    new_lines = []
+    changes_made = False
+
+    encoded_url = urllib.parse.quote(f"{GITHUB_URL_PREFIX}{relative_notebook_path}")
+
+    for line in cell_source.splitlines():
+        for key, prefix in LINK_PREFIXES.items():
+            if prefix not in line or "**NOTE:**" in line:
+                continue
+
+            start_index = line.find(prefix) + len(prefix)
+            end_index = line.find(".ipynb", start_index) + len(".ipynb")
+            correct_link = ""
+
+            if key in {"colab_link", "github_link"}:
+                correct_link = relative_notebook_path
+            elif key == "colab_enterprise_link":
+                correct_link = urllib.parse.quote(
+                    f"{RAW_URL_PREFIX}{relative_notebook_path}",
+                    safe=":",
+                )
+            elif key == "workbench_link":
+                correct_link = f"{RAW_URL_PREFIX}{relative_notebook_path}"
+            elif key == "bigquery_studio_link":
+                correct_link = f"{GITHUB_URL_PREFIX}{relative_notebook_path}"
+            elif key in {
+                "linkedin_link",
+                "bluesky_link",
+                "twitter_link",
+                "reddit_link",
+                "facebook_link",
+            }:
+                correct_link = encoded_url
+
+            if correct_link.lower() not in line.lower():
+                line = line.replace(line[start_index:end_index], correct_link)
+                changes_made = True
+
+        new_lines.append(line)
+
+    return "\n".join(new_lines), changes_made
+
+
+def update_notebook_links(session: nox.Session, notebook_paths: list[str]) -> None:
+    """Checks and fixes specific types of links in the provided list of notebooks."""
+    session.log("Checking notebook links...")
+    links_updated_count = 0
+
+    for notebook_path in notebook_paths:
+        # False positive
+        if "vector-search-2-intro" in notebook_path:
+            continue
+        try:
+            with open(notebook_path, encoding="utf-8") as f:
+                notebook = nbformat.read(f, as_version=4)
+
+            relative_notebook_path = os.path.relpath(
+                notebook_path, start=os.getcwd()
+            ).lower()
+            notebook_modified = False
+
+            for cell in notebook.cells:
+                if (
+                    cell.cell_type == "markdown"
+                    and "<table" in cell.source
+                    and "colab" in cell.source
+                ):
+                    updated_source, changes_made = fix_markdown_links(
+                        cell.source, relative_notebook_path
+                    )
+                    if changes_made:
+                        cell.source = updated_source
+                        notebook_modified = True
+
+            if notebook_modified:
+                links_updated_count += 1
+                with open(notebook_path, "w", encoding="utf-8") as f:
+                    nbformat.write(notebook, f)
+                session.log(f"  -> Fixed links in {notebook_path}")
+
+        except Exception as e:
+            session.warn(f"Could not check links in {notebook_path}. Error: {e}")
+
+    if links_updated_count > 0:
+        session.log(f"Fixed links in {links_updated_count} notebooks.")
 
 
 def preprocess_notebook(
@@ -222,8 +332,7 @@ def format(session: nox.Session) -> None:
         )
 
         preprocess_notebook(session, lint_paths_nb)
-
-        session.run("python3", ".github/workflows/update_notebook_links.py", ".")
+        update_notebook_links(session, lint_paths_nb)
 
         session.run(
             "nbqa",
