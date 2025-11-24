@@ -30,6 +30,7 @@ AIP
 AIphone
 airbnb
 airlume
+aistudio
 akka
 Aktu
 ALCS
@@ -80,6 +81,7 @@ atms
 Atulan
 auc
 aujourd'hui
+authtoken
 autocal
 autoflake
 autogen
@@ -92,8 +94,11 @@ Autorater
 autosxs
 AUVs
 avec
+Avenir
 aworkflow
 axs
+Ayra
+Ayyappa
 backstory
 backticks
 bagchi
@@ -167,7 +172,10 @@ CAMQAA
 Caprese
 carbonara
 Carcante
+cardio
+Cardio
 Cardizem
+Casagrand
 cashify
 CASP
 catus
@@ -178,6 +186,7 @@ ccc
 cce
 cctv
 cdiv
+CDNs
 ceb
 ceo
 cer
@@ -277,6 +286,7 @@ datname
 dbadmin
 dbln
 dcg
+dcl
 DCR
 ddbb
 ddl
@@ -326,6 +336,7 @@ draig
 Dreesen
 drilldown
 drinkware
+dropbtn
 dropdown
 dropna
 DRV
@@ -435,6 +446,7 @@ fiqa
 firestore
 firewalls
 Fishburne
+FITNESSS
 fixmycar
 flac
 Flahs
@@ -523,6 +535,7 @@ gke
 GKE
 Gleyber
 glowin
+gmaps
 Gmb
 GmbH
 gms
@@ -575,6 +588,7 @@ HDFC
 hdfs
 HDFS
 hdlr
+hdone
 hdtv
 heatmap
 heatmapgl
@@ -594,6 +608,8 @@ HMO
 hnsw
 Hogwarts
 Homesley
+Hoodi
+Horamavu
 Hossein
 hotpotqa
 hovermode
@@ -694,6 +710,7 @@ jit
 jiwer
 Joji
 Jolyon
+Jostar
 JPY
 jsemer
 jsonify
@@ -828,6 +845,7 @@ Malware
 Mamah
 Mandiri
 manquez
+Manyata
 mapbox
 marp
 Masaru
@@ -917,6 +935,7 @@ myaccount
 mydb
 mydomain
 NADPH
+Nagar
 Nagasu
 Najim
 Nakoso
@@ -957,6 +976,7 @@ NICOLAS
 nih
 Nihonga
 Niitsuma
+nin
 Nith
 nlp
 nmade
@@ -1006,6 +1026,7 @@ Ollama
 olleh
 omn
 Omnibox
+OMR
 onesie
 onesies
 Onone
@@ -1031,6 +1052,7 @@ Pakeman
 paleo
 paligemma
 palustris
+Palya
 pancetta
 pandoc
 pantarba
@@ -1050,7 +1072,7 @@ pbar
 pbxproj
 pcs
 PDEs
-pdflatex
+pdflatef
 pdfminer
 pdfs
 PDFs
@@ -1073,6 +1095,8 @@ Photoshop
 Pichai
 pietra
 pii
+pilates
+Pilates
 pincodes
 Pistorius
 pixmap
@@ -1094,6 +1118,7 @@ Poirot
 Polong
 ponyo
 Ponyo
+Popken
 popleft
 Porat
 postictal
@@ -1115,6 +1140,7 @@ pth
 PTx
 pubmed
 pubspec
+Puram
 putalpha
 putdata
 pvc
@@ -1201,6 +1227,7 @@ RNN
 RNNs
 Robeco
 Robo
+Robotica
 ROOTSPAN
 Rosberg
 rpet
@@ -1256,6 +1283,7 @@ Sestero
 setlocal
 sft
 Sha'carri
+shalas
 Shankman
 Shaoxiong
 sharegpt
@@ -1263,6 +1291,7 @@ Sharmila
 Shawshank
 Shazeer
 Shenzhou
+Shibuya
 Shklovsky
 Shohei
 shortdesc
@@ -1274,11 +1303,13 @@ showtime
 showtimes
 Shubham
 Shyamalan
+sid
 siglap
 signings
 simage
 SIMONE
 Simpsons
+sinc
 Singin
 sittin
 Skaffold
@@ -1355,6 +1386,7 @@ tastetest
 tavily
 Tbk
 Tbl
+TBY
 TCEHY
 telework
 tencel
@@ -1435,6 +1467,7 @@ tts
 TTT
 tures
 tval
+twiml
 typehints
 ubuntu
 udf
@@ -1443,6 +1476,7 @@ UDFs
 uids
 UIs
 Ukiyo
+ulaw
 ulmoides
 ultrawide
 und
@@ -1452,6 +1486,7 @@ Unimicron
 unrtf
 unsloth
 Unsloth
+upsamples
 upsell
 Upserting
 urandom
@@ -1478,6 +1513,7 @@ Vandamm
 Vandoorne
 vapo
 VAPO
+Vardhan
 Vaswani
 Vayots
 VBG

@@ -1,11 +1,12 @@
 # Generative AI on Google Cloud
 
-> **[Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro) and [Gemini 2.5 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash) have been released!**
+> **[Gemini 3 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-pro) has been released!**
 >
 > Here are the latest notebooks and demos using the new models:
 >
-> - [Intro to Gemini 2.5 Pro](gemini/getting-started/intro_gemini_2_5_pro.ipynb)
-> - [Intro to Gemini 2.5 Flash](gemini/getting-started/intro_gemini_2_5_flash.ipynb)
+> - [Intro to Gemini 3 Pro](gemini/getting-started/intro_gemini_3_pro.ipynb)
+> - [Legacy Code Refactoring](gemini/use-cases/code/refactor_legacy_code.ipynb)
+> - [Retail AI Location Strategy: Autonomous Site Selection & Market Analysis](gemini/use-cases/retail/retail_ai_location_strategy_gemini_3.ipynb)
 
 <!-- markdownlint-disable MD033 -->
 
