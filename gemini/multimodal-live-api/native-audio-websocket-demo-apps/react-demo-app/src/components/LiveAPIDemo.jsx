@@ -16,11 +16,22 @@ const LiveAPIDemo = () => {
   const [setupJson, setSetupJson] = useState(null);
 
   // Configuration State
-  const [proxyUrl, setProxyUrl] = useState("ws://localhost:8080");
-  const [projectId, setProjectId] = useState("");
-  const [model, setModel] = useState(
-    "gemini-live-2.5-flash-preview-native-audio-09-2025"
+  const [proxyUrl, setProxyUrl] = useState(
+    localStorage.getItem("proxyUrl") || "ws://localhost:8080"
   );
+  const [projectId, setProjectId] = useState(
+    localStorage.getItem("projectId") || ""
+  );
+  const [model, setModel] = useState(
+    localStorage.getItem("model") ||
+      "gemini-live-2.5-flash-preview-native-audio-09-2025"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("proxyUrl", proxyUrl);
+    localStorage.setItem("projectId", projectId);
+    localStorage.setItem("model", model);
+  }, [proxyUrl, projectId, model]);
   const [systemInstructions, setSystemInstructions] = useState(
     "You are a helpful assistant. Be concise and friendly."
   );
@@ -97,14 +108,40 @@ const LiveAPIDemo = () => {
     }
   }, [chatMessages]);
 
-  const addMessage = (text, type, append = false) => {
+  const addMessage = (text, type, mode = "add", isFinished = false) => {
     setChatMessages((prev) => {
-      if (append && prev.length > 0 && prev[prev.length - 1].type === type) {
+      // Check if we can modify the last message
+      if (
+        mode !== "add" &&
+        prev.length > 0 &&
+        prev[prev.length - 1].type === type &&
+        !prev[prev.length - 1].isFinished
+      ) {
         const newMessages = [...prev];
-        newMessages[newMessages.length - 1].text += text;
+        // Create a shallow copy of the message to avoid mutating state directly
+        const target = { ...newMessages[newMessages.length - 1] };
+        newMessages[newMessages.length - 1] = target;
+
+        if (mode === "append") {
+          target.text += text;
+        } else if (mode === "replace") {
+          // Only replace if text is provided and not just whitespace
+          if (text && text.trim().length > 0) {
+            target.text = text;
+          }
+        }
+
+        if (isFinished) {
+          target.isFinished = true;
+        }
         return newMessages;
       }
-      return [...prev, { text, type }];
+
+      // Create new message
+      // Don't create empty messages
+      if ((!text || text.trim().length === 0) && !isFinished) return prev;
+
+      return [...prev, { text: text || "", type, isFinished }];
     });
   };
 
@@ -121,14 +158,20 @@ const LiveAPIDemo = () => {
         }
         break;
       case MultimodalLiveResponseType.INPUT_TRANSCRIPTION:
-        if (!message.data.finished) {
-          addMessage(message.data.text, "user-transcript", true);
-        }
+        addMessage(
+          message.data.text,
+          "user-transcript",
+          "append",
+          message.data.finished
+        );
         break;
       case MultimodalLiveResponseType.OUTPUT_TRANSCRIPTION:
-        if (!message.data.finished) {
-          addMessage(message.data.text, "assistant", true);
-        }
+        addMessage(
+          message.data.text,
+          "assistant",
+          "append",
+          message.data.finished
+        );
         break;
       case MultimodalLiveResponseType.SETUP_COMPLETE:
         addMessage("Ready!", "system");
@@ -591,7 +634,9 @@ const LiveAPIDemo = () => {
                     onChange={(e) => setStartSpeechSensitivity(e.target.value)}
                     disabled={connected}
                   >
-                    <option value="START_SENSITIVITY_UNSPECIFIED">Default</option>
+                    <option value="START_SENSITIVITY_UNSPECIFIED">
+                      Default
+                    </option>
                     <option value="START_SENSITIVITY_HIGH">High</option>
                     <option value="START_SENSITIVITY_LOW">Low</option>
                   </select>
@@ -721,8 +766,6 @@ const LiveAPIDemo = () => {
             </div>
           </div>
         </div>
-
-
       </div>
 
       {/* Debug Info Section */}
