@@ -267,6 +267,19 @@ You are a helpful assistant. Be concise and friendly.</textarea
                 </option>
               </select>
             </div>
+
+            <div>
+              <label for="activityHandling">Activity Handling:</label><br />
+              <select id="activityHandling">
+                <option value="ACTIVITY_HANDLING_UNSPECIFIED" selected>
+                  Default (Interrupts)
+                </option>
+                <option value="START_OF_ACTIVITY_INTERRUPTS">
+                  Interrupt (Barge-in)
+                </option>
+                <option value="NO_INTERRUPTION">No Interruption</option>
+              </select>
+            </div>
           </details>
 
           <br />

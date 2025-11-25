@@ -148,6 +148,8 @@ class GeminiLiveAPI {
       start_of_speech_sensitivity: "START_SENSITIVITY_UNSPECIFIED",
     };
 
+    this.activityHandling = "ACTIVITY_HANDLING_UNSPECIFIED";
+
     this.apiHost = "us-central1-aiplatform.googleapis.com";
     this.serviceUrl = `wss://${this.apiHost}/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent`;
 
@@ -319,6 +321,7 @@ class GeminiLiveAPI {
 
         realtime_input_config: {
           automatic_activity_detection: this.automaticActivityDetection,
+          activity_handling: this.activityHandling,
         },
       },
     };
