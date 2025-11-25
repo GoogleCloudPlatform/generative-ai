@@ -36,6 +36,7 @@ function initDOM() {
     "prefixPadding",
     "endSpeechSensitivity",
     "startSpeechSensitivity",
+    "activityHandling",
     "connectBtn",
     "disconnectBtn",
     "connectionStatus",
@@ -154,6 +155,9 @@ async function connect() {
       end_of_speech_sensitivity: elements.endSpeechSensitivity.value,
       start_of_speech_sensitivity: elements.startSpeechSensitivity.value,
     };
+
+    // Set activity handling
+    state.client.activityHandling = elements.activityHandling.value;
 
     // Add custom tools only if Google grounding is disabled
     const isGroundingEnabled = elements.enableGrounding.checked;
