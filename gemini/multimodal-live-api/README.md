@@ -22,6 +22,15 @@ The following video demonstrating the Multimodal Live API shows an example use c
 
 2. [Real-time RAG for Retail](real_time_rag_retail_gemini_2_0.ipynb): Users will learn to develop a real-time Retrieval Augmented Generation (RAG) system leveraging the Multimodal Live API for a retail use-case. This system will generate audio and text responses grounded in provided documents.
 
-### Demo App
+### Demo Applications
 
-1. [Demo Web Application](websocket-demo-app/README.md): Build a web application that enables you to use your voice and camera to talk to Gemini 2.0 through the Multimodal Live API.
+1. [Getting Started Web App](websocket-demo-app/): A basic web application to get started with voice and camera interactions.
+2. [React Demo App](native-audio-websocket-demo-apps/react-demo-app/): A comprehensive React client featuring real-time streaming, tool use, and media handling.
+3. [Plain JS Demo App](native-audio-websocket-demo-apps/plain-js-demo-app/): A simple, dependency-free JavaScript implementation for understanding core API mechanics.
+4. [Real-time Advisor](native-audio-websocket-demo-apps/realtime-advisor-demo-app/): A specialized advisor persona that can switch between silent and outspoken modes.
+5. [Customer Support Agent](native-audio-websocket-demo-apps/customer-support-demo-app/): An advanced agent with emotion detection, multimodal input, and tool execution.
+6. [Gaming Assistant](native-audio-websocket-demo-apps/gaming-assistant-demo-app/): A gaming companion with persona switching and screen sharing capabilities.
+
+### Tools
+
+1. [PCM Audio Debugger](pcm-audio-debugger/): A standalone tool for testing and debugging raw PCM audio streams and WebSocket connections.
