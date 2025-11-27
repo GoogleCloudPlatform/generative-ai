@@ -42,6 +42,8 @@ python server.py
 
 In a new terminal, start the React application:
 
+Ensure you have Node.js and npm installed. If not, download and install them from [nodejs.org](https://nodejs.org/en/download/).
+
 ```bash
 # Install Node modules
 npm install
