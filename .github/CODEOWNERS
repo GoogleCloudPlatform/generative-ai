@@ -51,6 +51,7 @@
 /generative-ai/genkit/generate-synthetic-database                                                                                @GoogleCloudPlatform/generative-ai-devrel @aikozhaoz
 /generative-ai/genkit/postcard-generator                                                                                         @GoogleCloudPlatform/generative-ai-devrel @mattsday
 /generative-ai/open-models/fine-tuning                                                                                           @GoogleCloudPlatform/generative-ai-devrel @goudtho
+/generative-ai/open-models/fine-tuning/fine_tuning_Gemma.ipynb                                                                   @Shiv-am-04
 /generative-ai/open-models/serving                                                                                               @GoogleCloudPlatform/generative-ai-devrel @polong-lin
 /generative-ai/open-models/serving/cloud_run_ollama_gemma3_inference.ipynb                                                       @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @vladkol

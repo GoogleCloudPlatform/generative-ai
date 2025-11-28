@@ -352,4 +352,4 @@ def format(session: nox.Session) -> None:
             "ruff format",
             *lint_paths_nb,
         )
-        session.run("python3", "-m", "tensorflow_docs.tools.nbfmt", *lint_paths_nb)
+        session.run("python", "-m", "tensorflow_docs.tools.nbfmt", *lint_paths_nb)
