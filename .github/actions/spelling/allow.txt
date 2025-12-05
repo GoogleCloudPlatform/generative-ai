@@ -343,6 +343,7 @@ DRV
 dshm
 dsl
 dsn
+DSQ
 dtype
 dtypes
 Duh
