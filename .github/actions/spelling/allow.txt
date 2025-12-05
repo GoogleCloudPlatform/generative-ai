@@ -1303,6 +1303,7 @@ showland
 showor
 showtime
 showtimes
+shrt
 Shubham
 Shyamalan
 sid
