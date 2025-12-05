@@ -2,9 +2,9 @@
 
 | Authors |
 | --- |
-| [Pouya Omran](https://github.com/pgomran) |
-| [Tanya Dixit](https://github.com/dixittanya) |
-| [Jingyi Wang](https://github.com/jingyiwa) |
+| [Pouya Omran](https://github.com/PouyaOmran) |
+| [Tanya Dixit](https://github.com/coderkhaleesi) |
+| [Jingyi Wang](https://github.com/Jingyi-Wang-jessie) |
 
 ## TL;DR - Quick Start
 
@@ -404,6 +404,22 @@ The only requirement is maintaining this JSON structure:
   }
 }
 ```
+
+### Note
+
+While RAG-Crusher employs an intelligent, LLM-infused methodology to automatically generate high-quality benchmarks, the
+generated Q&A pairs should be treated with caution. Despite the multi-stage quality control and multi-agent review process,
+the ultimate validity and accuracy of the generated benchmarks should be verified by human domain experts who are familiar with
+the subject matter.
+We recommend:
+
+Having subject matter experts review the generated Q&A pairs before using them in production evaluations
+Treating the generated benchmark as a starting point that requires human validation
+Being particularly careful with answers related to critical, safety-sensitive, or highly specialized domains
+Manually reviewing a representative sample of the generated pairs to ensure they meet your quality standards
+
+The tool is designed to accelerate benchmark creation, not to replace human expertise and judgment.
+
 
 ### To customize profiles:
 1.  Edit `qa_profiles.json` with your desired dimensions and values
