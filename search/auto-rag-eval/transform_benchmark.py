@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Copyright 2025 Google LLC
+"""Copyright 2025 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,15 +24,14 @@ The transformation follows this mapping:
 - reference (target) <-- Answer (source)
 """
 
-import json
 import argparse
+import json
 import sys
 from pathlib import Path
 
 
 def transform_benchmark_data(source_records):
-    """
-    Transforms a list of source benchmark records to the target format.
+    """Transforms a list of source benchmark records to the target format.
 
     Args:
         source_records: A list of dictionaries in the source format.
@@ -49,11 +47,13 @@ def transform_benchmark_data(source_records):
             transformed_record = {
                 "query": record["Question"],
                 "expected_tool_use": [],
-                "reference": record["Answer"]
+                "reference": record["Answer"],
             }
             transformed_data.append(transformed_record)
         else:
-            print(f"Warning: Skipping record {i+1} due to missing 'Question' or 'Answer' fields")
+            print(
+                f"Warning: Skipping record {i + 1} due to missing 'Question' or 'Answer' fields"
+            )
             skipped_count += 1
 
     if skipped_count > 0:
@@ -67,20 +67,13 @@ def main():
         description="Transform benchmark data from source format to target format"
     )
     parser.add_argument(
-        "input_file",
-        type=str,
-        help="Path to the source benchmark JSON file"
+        "input_file", type=str, help="Path to the source benchmark JSON file"
     )
     parser.add_argument(
-        "output_file",
-        type=str,
-        help="Path to save the transformed benchmark JSON file"
+        "output_file", type=str, help="Path to save the transformed benchmark JSON file"
     )
     parser.add_argument(
-        "--indent",
-        type=int,
-        default=2,
-        help="JSON indentation (default: 2)"
+        "--indent", type=int, default=2, help="JSON indentation (default: 2)"
     )
 
     args = parser.parse_args()
@@ -96,7 +89,7 @@ def main():
 
     # Load source data
     try:
-        with open(input_path, 'r', encoding='utf-8') as f:
+        with open(input_path, encoding="utf-8") as f:
             source_data = json.load(f)
         print(f"Successfully loaded {len(source_data)} records from {input_path}")
     except json.JSONDecodeError as e:
@@ -119,7 +112,7 @@ def main():
 
     # Save the transformed data
     try:
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(transformed_data, f, indent=args.indent, ensure_ascii=False)
         print(f"\nSuccessfully transformed {len(transformed_data)} records")
         print(f"Saved transformed data to '{output_path}'")

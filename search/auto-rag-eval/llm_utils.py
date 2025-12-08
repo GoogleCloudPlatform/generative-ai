@@ -1,36 +1,53 @@
-
-import time
-from typing import List, Optional
-from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
+from pydantic import BaseModel, Field
 
 # Pydantic models for Structured Output
 
+
 class QuestionClue(BaseModel):
-    chain_of_thought: str = Field(..., description="Reasoning for why this question is relevant and answerable based on the text.")
+    chain_of_thought: str = Field(
+        ...,
+        description="Reasoning for why this question is relevant and answerable based on the text.",
+    )
     question: str = Field(..., description="The question itself.")
 
+
 class ClueResponse(BaseModel):
-    questions: List[QuestionClue]
+    questions: list[QuestionClue]
+
 
 class TargetedInfo(BaseModel):
-    description: str = Field(..., description="Concise description of the type of text that would be most relevant.")
-    original_question: str = Field(..., description="Rephrased query as a clear and concise question.")
-    hypothetical_example: str = Field(..., description="Hypothetical excerpt of text that could be part of a relevant document.")
+    description: str = Field(
+        ...,
+        description="Concise description of the type of text that would be most relevant.",
+    )
+    original_question: str = Field(
+        ..., description="Rephrased query as a clear and concise question."
+    )
+    hypothetical_example: str = Field(
+        ...,
+        description="Hypothetical excerpt of text that could be part of a relevant document.",
+    )
+
 
 class QAPair(BaseModel):
     question: str
     answer: str
 
+
 class ReviewResult(BaseModel):
     decision: str = Field(..., description="APPROVED or REJECTED")
     reasoning: str = Field(..., description="Reasoning for the decision")
 
+
 def get_client(project_id: str, location: str):
     return genai.Client(vertexai=True, project=project_id, location=location)
 
-def clue_generator(text: str, client: genai.Client, model_name: str = "gemini-2.0-flash") -> ClueResponse:
+
+def clue_generator(
+    text: str, client: genai.Client, model_name: str = "gemini-2.0-flash"
+) -> ClueResponse:
     """Generate clues from text using Structured Output"""
     prompt = f"""
     Reference Text:
@@ -56,7 +73,10 @@ def clue_generator(text: str, client: genai.Client, model_name: str = "gemini-2.
     )
     return response.parsed
 
-def targeted_information_seeking(query: str, client: genai.Client, model_name: str = "gemini-2.0-flash") -> TargetedInfo:
+
+def targeted_information_seeking(
+    query: str, client: genai.Client, model_name: str = "gemini-2.0-flash"
+) -> TargetedInfo:
     """Generate targeted information for a query using Structured Output"""
     prompt = f"""
     You are a helpful information retrieval assistant.
@@ -78,7 +98,13 @@ def targeted_information_seeking(query: str, client: genai.Client, model_name: s
     )
     return response.parsed
 
-def generate_qa_pair(context: str, profile: dict, client: genai.Client, model_name: str = "gemini-2.0-flash") -> QAPair:
+
+def generate_qa_pair(
+    context: str,
+    profile: dict,
+    client: genai.Client,
+    model_name: str = "gemini-2.0-flash",
+) -> QAPair:
     """Generate a Q&A pair based on context and profile"""
     prompt = f"""
     Context:
@@ -103,7 +129,14 @@ def generate_qa_pair(context: str, profile: dict, client: genai.Client, model_na
     )
     return response.parsed
 
-def review_qa_pair(qa_pair: QAPair, context: str, critic_type: str, client: genai.Client, model_name: str = "gemini-2.0-flash") -> ReviewResult:
+
+def review_qa_pair(
+    qa_pair: QAPair,
+    context: str,
+    critic_type: str,
+    client: genai.Client,
+    model_name: str = "gemini-2.0-flash",
+) -> ReviewResult:
     """Review a Q&A pair using a specific critic persona"""
     prompt = f"""
     Context:
