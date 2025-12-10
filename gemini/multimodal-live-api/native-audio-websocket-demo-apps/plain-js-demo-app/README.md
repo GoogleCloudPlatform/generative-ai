@@ -2,6 +2,8 @@
 
 WebSocket client for Google's Gemini Live API with audio/video streaming support. No frameworks, just vanilla JavaScript.
 
+[![Plain JS Demo Video](https://img.youtube.com/vi/RLM1Qsp64WU/hqdefault.jpg)](https://www.youtube.com/watch?v=RLM1Qsp64WU)
+
 ## Quick Start
 
 ```bash
