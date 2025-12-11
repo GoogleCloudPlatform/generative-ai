@@ -2,6 +2,8 @@
 
 A React-based client for Google's Gemini Live API, featuring real-time audio/video streaming and a WebSocket proxy for secure authentication.
 
+[![React Demo Video](https://img.youtube.com/vi/wCrz8tw6xXs/hqdefault.jpg)](https://www.youtube.com/watch?v=wCrz8tw6xXs)
+
 ## Quick Start
 
 ### 1. Backend Setup
