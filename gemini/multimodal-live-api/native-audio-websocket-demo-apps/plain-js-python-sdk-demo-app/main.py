@@ -1,15 +1,14 @@
-import base64
 import asyncio
+import base64
 import json
-import os
 import logging
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
+import os
 
 from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from gemini_live import GeminiLive
 
 # Load environment variables
@@ -22,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 PROJECT_ID = os.getenv("PROJECT_ID", "your-gcp-project-id")
 LOCATION = os.getenv("LOCATION", "us-central1")
-MODEL = os.getenv("MODEL", "gemini-live-2.5-flash-preview-native-audio-09-2025")
+MODEL = os.getenv("MODEL", "gemini-live-2.5-flash-native-audio")
 
 # Initialize FastAPI
 app = FastAPI()
@@ -38,15 +37,15 @@ app.add_middleware(
 # Serve static files
 app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
+
 @app.get("/")
 async def root():
     return FileResponse("frontend/index.html")
 
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    """
-    WebSocket endpoint for Gemini Live.
-    """
+    """WebSocket endpoint for Gemini Live."""
     await websocket.accept()
 
     logger.info("WebSocket connection accepted")
@@ -63,10 +62,7 @@ async def websocket_endpoint(websocket: WebSocket):
         pass
 
     gemini_client = GeminiLive(
-        project_id=PROJECT_ID,
-        location=LOCATION,
-        model=MODEL,
-        input_sample_rate=16000
+        project_id=PROJECT_ID, location=LOCATION, model=MODEL, input_sample_rate=16000
     )
 
     async def receive_from_client():
@@ -74,9 +70,9 @@ async def websocket_endpoint(websocket: WebSocket):
             while True:
                 message = await websocket.receive()
 
-                if "bytes" in message and message["bytes"]:
+                if message.get("bytes"):
                     await audio_input_queue.put(message["bytes"])
-                elif "text" in message and message["text"]:
+                elif message.get("text"):
                     text = message["text"]
                     try:
                         payload = json.loads(text)
@@ -101,7 +97,7 @@ async def websocket_endpoint(websocket: WebSocket):
             video_input_queue=video_input_queue,
             text_input_queue=text_input_queue,
             audio_output_callback=audio_output_callback,
-            audio_interrupt_callback=audio_interrupt_callback
+            audio_interrupt_callback=audio_interrupt_callback,
         ):
             if event:
                 # Forward events (transcriptions, etc) to client
@@ -119,7 +115,9 @@ async def websocket_endpoint(websocket: WebSocket):
         except:
             pass
 
+
 if __name__ == "__main__":
     import uvicorn
+
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="localhost", port=port)
