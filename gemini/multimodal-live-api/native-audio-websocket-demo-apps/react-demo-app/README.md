@@ -89,6 +89,6 @@ The app uses AudioWorklets for low-latency audio processing:
 
 ## Configuration
 
-- **Model**: Defaults to `gemini-live-2.5-flash-preview-native-audio-09-2025`
+- **Model**: Defaults to `gemini-live-2.5-flash-native-audio`
 - **Voice**: Configurable in `LiveAPIDemo.jsx` (Puck, Charon, etc.)
 - **Proxy Port**: Default `8080` (set in `server.py`)
