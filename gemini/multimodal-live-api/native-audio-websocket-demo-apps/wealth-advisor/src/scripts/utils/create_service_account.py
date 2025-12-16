@@ -94,7 +94,7 @@ def create_service_account(project_id: str, account_id: str, display_name: str) 
             console.log(f"[green]Service account '{account_id}' created successfully.[/green]")
             return True
         else:
-            console.log(f"[red]Failoed to create service account {service_account_email}.[/red]")
+            console.log(f"[red]Failed to create service account {service_account_email}.[/red]")
             return False
 
 

@@ -270,7 +270,7 @@ def create(
     ),
     location: str = typer.Option(
         default=settings.search.datastore_settings.location,
-        help="Datastore and engine ocation.",
+        help="Datastore and engine location.",
     ),
     data_store: str = typer.Option(
         default=settings.search.datastore_settings.id,
