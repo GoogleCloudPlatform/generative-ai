@@ -11,10 +11,10 @@ graph TD
     User["User (Browser/Microphone)"] <-->|WebSocket /ws| Proxy[FastAPI Backend]
     Proxy <-->|Google ADK| Agent[AI Agent Logic]
     Agent <-->|Gemini Live API| LLM["Google Gemini 2.5 Flash"]
-    
+
     subgraph "Backend Services"
         Agent -- "Reads/Writes" --> Firestore[("Firestore User Data")]
-        Agent -- "RAG Search" --> VertexAI[Vertex AI Search]
+        Agent -- "RAG Search" --> Vertex AI [Vertex AI Search]
         Agent -- "Tools" --> PythonTools[Python Tools]
     end
 

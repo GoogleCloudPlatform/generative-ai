@@ -1164,6 +1164,7 @@ pyplot
 pysftp
 pytorch
 pytrec
+pyupgrade
 pyvis
 Pzk
 qas
@@ -1354,6 +1355,7 @@ ssn
 ssr
 SSRF
 sss
+SSZ
 Statcast
 stdcall
 stext
@@ -1564,6 +1566,7 @@ VRAM
 VREDRAW
 vrtx
 VSC
+vscode
 VSJ
 VSPM
 vtotal
@@ -1657,6 +1660,7 @@ yedoensis
 Ykb
 ylabel
 ylim
+YMid
 Yoshino
 yougov
 youtube

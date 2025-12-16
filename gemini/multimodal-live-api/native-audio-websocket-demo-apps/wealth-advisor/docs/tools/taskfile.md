@@ -3,14 +3,14 @@
 [Task](https://taskfile.dev) is a task runner/build tool that aims to be simpler and easier to use than, for example, GNU Make.
 
 ## Installation
-To install the `task` binary, follow the instructions on the [Task site](https://taskfile.dev/installation/)  
+To install the `task` binary, follow the instructions on the [Task site](https://taskfile.dev/installation/)
 
 _**Note:** If you are using the devcontainer, the `task` binary is already installed for you._
 
 
 ## Usage
 
-This repository uses Task to simplify development workflows. The main entrypoint is the `Taskfile.yaml` in the project root. This file includes other taskfiles from the `.task` directory as needed.
+This repository uses Task to simplify development workflows. The main entrypoint is the `Taskfile.yaml` in the project root. This file includes other task files from the `.task` directory as needed.
 
 To see a list of available tasks, run:
 

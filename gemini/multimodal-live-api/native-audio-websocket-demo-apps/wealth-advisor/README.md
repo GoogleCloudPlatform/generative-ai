@@ -8,7 +8,7 @@
 ![React](https://img.shields.io/badge/React-18%2B-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
 
-**An enterprise-grade, voice-first AI financial advisor built with Gemini 2.5 Flash.**
+**An enterprise-grade, voice-first AI financial advisor built with Gemini Live API + Agent Development Kit.**
 
 [Overview](#-overview) • [Features](#-key-features) • [Quick Start](#-quick-start) • [Docs](#-documentation)
 
@@ -32,13 +32,13 @@ It demonstrates how to build an agent that can:
 ```mermaid
 graph LR
     User((User)) <-->|WebSocket /ws| Backend[FastAPI + ADK]
-    
+
     subgraph "Secure Backend Zone"
         Backend <-->|State| Firestore[(Firestore)]
-        Backend <-->|RAG| Vertex[Vertex AI Search]
+        Backend <-->|RAG| Vertex AI [Vertex AI Search]
         Backend <-->|Logic| Tools[Python Tools]
     end
-    
+
     Backend <-->|Live API| Gemini[Gemini 2.5 Flash]
 ```
 

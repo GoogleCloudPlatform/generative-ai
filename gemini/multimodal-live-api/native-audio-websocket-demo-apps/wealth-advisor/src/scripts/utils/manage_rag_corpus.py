@@ -274,19 +274,19 @@ def create(
     ),
     data_store: str = typer.Option(
         default=settings.search.datastore_settings.id,
-        help="ID of the VAiS datastore.",
+        help="ID of the Vertex AI Search datastore.",
     ),
     branch: str = typer.Option(
         default=settings.search.datastore_settings.branch,
-        help="Branch of the VAiS datastore.",
+        help="Branch of the Vertex AI Search datastore.",
     ),
     collection: str = typer.Option(
         default=settings.search.engine_settings.collection_id,
-        help="ID of the VAiS collection.",
+        help="ID of the Vertex AI Search collection.",
     ),
     engine: str = typer.Option(
         default=settings.search.engine_settings.id,
-        help="ID of the VAiS engine.",
+        help="ID of the Vertex AI Search engine.",
     ),
 ):
     # Ensure global settings use the project_id provided via CLI
