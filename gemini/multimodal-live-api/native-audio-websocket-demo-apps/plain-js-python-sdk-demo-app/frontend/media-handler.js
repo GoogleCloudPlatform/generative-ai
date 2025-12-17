@@ -97,6 +97,28 @@ class MediaHandler {
     }
   }
 
+  async startScreen(videoElement, onFrame, onEnded) {
+    try {
+      this.videoStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+      });
+      videoElement.srcObject = this.videoStream;
+
+      // Handle stream ending (e.g. user clicks "Stop sharing" in browser UI)
+      this.videoStream.getVideoTracks()[0].onended = () => {
+        this.stopVideo(videoElement);
+        if (onEnded) onEnded();
+      };
+
+      this.videoInterval = setInterval(() => {
+        this.captureFrame(videoElement, onFrame);
+      }, 1000); // 1 FPS
+    } catch (e) {
+      console.error("Error starting screen share:", e);
+      throw e;
+    }
+  }
+
   stopVideo(videoElement) {
     if (this.videoStream) {
       this.videoStream.getTracks().forEach((t) => t.stop());
