@@ -330,11 +330,11 @@ def create(
     )
 
     create_vertex_ai_search_datastore(client=datastore_service_client, parent=datastore_parent)
-    console.log("Completed creating VAiS Datastore")
+    console.log("Completed creating Vertex AI Search Datastore")
     attach_gcs_source_to_datastore(client=document_service_client, parent=datastore_branch_parent)
     console.log("Completed importing GCS dataset.")
     create_vertex_ai_search_engine(client=engine_service_client, parent=engine_parent)
-    console.log("Completed creating VAiS Engine")
+    console.log("Completed creating Vertex AI Search Engine")
 
     corpus_name = create_rag_corpus()
     if corpus_name:

@@ -100,7 +100,7 @@ class VaisDatastoreSettings(BaseModel):
 
 
 class VaisEngineSettings(BaseModel):
-    """Settings for using VAiS as a Search Engine."""
+    """Settings for using Vertex AI Search as a Search Engine."""
 
     display_name: str = "financial-advisor-engine"
     id: str | None = None
@@ -117,7 +117,7 @@ class VaisEngineSettings(BaseModel):
 
 
 class SearchSettings(BaseModel):
-    """Settings for using VAiS as a RAG Backend."""
+    """Settings for using Vertex AI Search as a RAG Backend."""
 
     datastore_settings: VaisDatastoreSettings = VaisDatastoreSettings()
     engine_settings: VaisEngineSettings = VaisEngineSettings()
