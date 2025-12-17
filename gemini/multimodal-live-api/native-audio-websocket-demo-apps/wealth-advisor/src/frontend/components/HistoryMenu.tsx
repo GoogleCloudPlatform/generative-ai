@@ -43,14 +43,14 @@ export function HistoryMenu({ onRestore }: HistoryMenuProps) {
     {
       id: 1,
       name: "What is going on with the tariffs",
-      description: "Here is a comprehensive update on what’s happening with the tariffs as of Aug 12th, 2025. Looking",
+      description: "Here is a comprehensive update on what's happening with the tariffs as of Aug 12th, 2025. Looking",
       time: "2h ago",
       tag: "Markets",
       transcript: [],
     },
     {
       id: 2,
-      name: "Can you pull up Nvidia’s stock price",
+      name: "Can you pull up Nvidia's stock price",
       description: "As of this morning, Nvidia is currently at $125.76 which is around 2.5% more than yesterday. Might I suggest",
       time: "5 days ago",
       tag: "Portfolio",
