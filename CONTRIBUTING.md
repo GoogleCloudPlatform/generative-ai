@@ -82,3 +82,10 @@ Complete the following steps to register your GitHub account and be added as a c
 1. You'll receive an email to your GitHub registered email to approve the request to join. Approve it.
 
 1. Request to join this team [GoogleCloudPlatform/teams/generative-ai-samples-contributors](https://github.com/orgs/GoogleCloudPlatform/teams/generative-ai-samples-contributors/members)
+
+
+## Testing AI Models
+
+- Ensure comprehensive testing for prompt edge cases
+- Validate output quality and safety guidelines
+- Test across different model parameters and configurations
