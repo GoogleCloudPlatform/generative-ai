@@ -107,3 +107,9 @@ Please submit additional resources via a PR.
 
 - [Generative AI - Google Cloud Next 2024](https://www.youtube.com/watch?v=PyM3Vt6s1GI&list=PLIivdWyY5sqLHERDVwseyPGka96mCiwpq)
 - [AI and Machine Learning with Google Cloud](https://www.youtube.com/watch?v=V6YTS5aofqU&list=PLIivdWyY5sqJdmVMjLI8iCul14XkTRosn)
+
+
+## Latest Updates
+
+- **Gemini 3 Flash**: Latest multimodal model with enhanced performance for text, vision, and audio tasks
+- **Improved API**: Enhanced integration capabilities for enterprise applications
