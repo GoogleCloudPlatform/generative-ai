@@ -41,3 +41,12 @@ or contacting one or more of the project maintainers.
 
 This Code of Conduct is adapted from the [Contributor Covenant](http://contributor-covenant.org), version 1.2.0,
 available at [http://contributor-covenant.org/version/1/2/0/](http://contributor-covenant.org/version/1/2/0/)
+
+
+## Community Support
+
+This project thrives on community engagement. We encourage:
+- Mentoring new contributors
+- Reviewing and providing feedback on pull requests
+- Sharing knowledge and best practices
+- Celebrating diverse perspectives and backgrounds
