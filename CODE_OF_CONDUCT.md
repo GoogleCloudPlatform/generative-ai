@@ -46,7 +46,7 @@ available at [http://contributor-covenant.org/version/1/2/0/](http://contributor
 ## Community Support
 
 This project thrives on community engagement. We encourage:
-- Mentoring new contributors
+- Mentor new contributors
 - Reviewing and providing feedback on pull requests
 - Sharing knowledge and best practices
 - Celebrating diverse perspectives and backgrounds
