@@ -144,3 +144,6 @@ Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-a
 ## Disclaimer
 
 This repository itself is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
+
+
+<!-- This resource collection covers latest AI and ML tools, tutorials, and best practices -->
