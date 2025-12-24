@@ -13,6 +13,7 @@ ADAS
 adk
 ADK
 ADMA
+adr
 aexecute
 aextract
 afrom
@@ -55,6 +56,8 @@ appuser
 appyaml
 apredict
 APSTUDIO
+apy
+APY
 aquery
 arange
 Arborio
@@ -70,6 +73,7 @@ Arsan
 Artsakh
 arun
 arxiv
+asdf
 ASF
 ASGI
 Ashish
@@ -531,6 +535,7 @@ ginnala
 Gisting
 github
 gitingest
+gitlab
 gitleaks
 gke
 GKE
@@ -1159,6 +1164,7 @@ pyplot
 pysftp
 pytorch
 pytrec
+pyupgrade
 pyvis
 Pzk
 qas
@@ -1349,6 +1355,7 @@ ssn
 ssr
 SSRF
 sss
+SSZ
 Statcast
 stdcall
 stext
@@ -1387,6 +1394,8 @@ tagline
 takeaways
 Takeaways
 TARG
+Taskfile
+taskfile
 tastetest
 tavily
 Tbk
@@ -1557,6 +1566,7 @@ VRAM
 VREDRAW
 vrtx
 VSC
+vscode
 VSJ
 VSPM
 vtotal
@@ -1650,6 +1660,7 @@ yedoensis
 Ykb
 ylabel
 ylim
+YMid
 Yoshino
 yougov
 youtube
