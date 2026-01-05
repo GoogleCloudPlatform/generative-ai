@@ -1,5 +1,7 @@
 # Real-time Advisor Demo
 
+[![Advisor Demo Video](https://img.youtube.com/vi/xj0phy0d00c/hqdefault.jpg)](https://www.youtube.com/watch?v=xj0phy0d00c)
+
 | Author |
 | --- |
 | [Zack Akil](https://github.com/zackakil) |
