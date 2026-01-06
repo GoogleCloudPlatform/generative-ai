@@ -27,9 +27,10 @@ The following video demonstrating the Multimodal Live API shows an example use c
 1. [Getting Started Web App](websocket-demo-app/): A basic web application to get started with voice and camera interactions.
 2. [React Demo App](native-audio-websocket-demo-apps/react-demo-app/): A comprehensive React client featuring real-time streaming, tool use, and media handling.
 3. [Plain JS Demo App](native-audio-websocket-demo-apps/plain-js-demo-app/): A simple, dependency-free JavaScript implementation for understanding core API mechanics.
-4. [Real-time Advisor](native-audio-websocket-demo-apps/realtime-advisor-demo-app/): A specialized advisor persona that can switch between silent and outspoken modes.
-5. [Customer Support Agent](native-audio-websocket-demo-apps/customer-support-demo-app/): An advanced agent with emotion detection, multimodal input, and tool execution.
-6. [Gaming Assistant](native-audio-websocket-demo-apps/gaming-assistant-demo-app/): A gaming companion with persona switching and screen sharing capabilities.
+4. [Plain JS + Python SDK Demo App](native-audio-websocket-demo-apps/plain-js-python-sdk-demo-app/): A demo using the Google Gen AI Python SDK for the backend and vanilla JS for the frontend.
+5. [Real-time Advisor](native-audio-websocket-demo-apps/realtime-advisor-demo-app/): A specialized advisor persona that can switch between silent and outspoken modes.
+6. [Customer Support Agent](native-audio-websocket-demo-apps/customer-support-demo-app/): An advanced agent with emotion detection, multimodal input, and tool execution.
+7. [Gaming Assistant](native-audio-websocket-demo-apps/gaming-assistant-demo-app/): A gaming companion with persona switching and screen sharing capabilities.
 
 ### Tools
 

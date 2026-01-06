@@ -70,11 +70,11 @@ Once it has been completed, additionally create two buckets, for batch processin
 ```bash
 TEMP_BUCKET_URI = f"gs://documentai-temp-{PROJECT_ID}-unique"
 
-gsutil mb -l {LOCATION} -p {PROJECT_ID} {BUCKET_URI}
+gcloud storage buckets create {BUCKET_URI} --project {PROJECT_ID} --location {LOCATION}
 
 OUT_BUCKET_URI = f"gs://documentai-temp-{TEMP_BUCKET_URI}-unique"
 
-gsutil mb -l {LOCATION} -p {PROJECT_ID} {OUT_BUCKET_URI}
+gcloud storage buckets create {OUT_BUCKET_URI} --project {PROJECT_ID} --location {LOCATION}
 ```
 
 ## Diagram

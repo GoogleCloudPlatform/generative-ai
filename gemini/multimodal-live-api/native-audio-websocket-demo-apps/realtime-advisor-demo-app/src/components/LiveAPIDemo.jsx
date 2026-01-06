@@ -40,7 +40,7 @@ const LiveAPIDemo = forwardRef(
     );
     const [model, setModel] = useState(
       localStorage.getItem("model") ||
-        "gemini-live-2.5-flash-preview-native-audio-09-2025"
+        "gemini-live-2.5-flash-native-audio"
     );
 
     useEffect(() => {
@@ -57,7 +57,7 @@ const LiveAPIDemo = forwardRef(
 
     // Calculate system instructions directly from props
     const systemInstructions = `You are listening to a conversation. Your goal is to help the user by providing information from the provided knowledge base.
-    
+
 Knowledge Base:
 ${knowledge}
 

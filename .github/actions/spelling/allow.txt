@@ -343,6 +343,7 @@ DRV
 dshm
 dsl
 dsn
+DSQ
 dtype
 dtypes
 Duh
@@ -1303,6 +1304,7 @@ showland
 showor
 showtime
 showtimes
+shrt
 Shubham
 Shyamalan
 sid
@@ -1329,6 +1331,7 @@ SMSN
 SNB
 SNE
 snowboard
+socketio
 Sono
 sourced
 spamming

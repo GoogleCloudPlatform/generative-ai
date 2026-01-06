@@ -30,7 +30,7 @@ const LiveAPIDemo = forwardRef((props, ref) => {
   );
   const [model, setModel] = useState(
     localStorage.getItem("model") ||
-      "gemini-live-2.5-flash-preview-native-audio-09-2025"
+      "gemini-live-2.5-flash-native-audio"
   );
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const LiveAPIDemo = forwardRef((props, ref) => {
     localStorage.setItem("model", model);
   }, [proxyUrl, projectId, model]);
   const [systemInstructions, setSystemInstructions] = useState(
-    `You are an energetic gaming assistant. 
+    `You are an energetic gaming assistant.
 Be concise and friendly.
 Only respond to the user if they ask for help, otherwise stay silent.`
   );

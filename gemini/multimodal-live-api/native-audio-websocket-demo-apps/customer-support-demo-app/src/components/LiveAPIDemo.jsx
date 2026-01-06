@@ -37,7 +37,7 @@ const LiveAPIDemo = forwardRef(
     );
     const [model, setModel] = useState(
       localStorage.getItem("model") ||
-        "gemini-live-2.5-flash-preview-native-audio-09-2025"
+        "gemini-live-2.5-flash-native-audio"
     );
 
     useEffect(() => {
