@@ -97,9 +97,9 @@ Execute the steps below to install AlloyDB Omni on the GKE cluster. See the [All
 
     ```bash
     export GCS_BUCKET=alloydb-omni-operator
-    export HELM_PATH=$(gsutil cat gs://$GCS_BUCKET/latest)
+    export HELM_PATH=$(gcloud storage cat gs://$GCS_BUCKET/latest)
     export OPERATOR_VERSION="${HELM_PATH%%/*}"
-    gsutil cp -r gs://$GCS_BUCKET/$HELM_PATH ./
+    gcloud storage cp --recursive gs://$GCS_BUCKET/$HELM_PATH ./
     ```
 
 1. Install the AlloyDB Omni Operator
@@ -343,7 +343,7 @@ Execute the steps below to install AlloyDB Omni on the GKE cluster. See the [All
     cd || echo "Could not cd into user profile root"
     mkdir -p /tmp/demo-data
     cd /tmp/demo-data || echo "Could not cd into user profile root"
-    gsutil -m cp \
+    gcloud storage cp \
       "gs://pr-public-demo-data/genwealth-demo/investments" \
       "gs://pr-public-demo-data/genwealth-demo/user_profiles" \
       "gs://pr-public-demo-data/genwealth-demo/llm.sql" .

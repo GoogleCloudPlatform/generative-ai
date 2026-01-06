@@ -123,13 +123,13 @@ export BUCKET_NAME=<your-bucket-name>
 6. Download the Cymbal Starlight 2024 manual from the public bucket.
 
 ```bash
-gsutil cp gs://github-repo/generative-ai/sample-apps/fixmycar/cymbal-starlight-2024.pdf .
+gcloud storage cp gs://github-repo/generative-ai/sample-apps/fixmycar/cymbal-starlight-2024.pdf .
 ```
 
 7. Upload the Cymbal Starlight 2024 owner's manual to your private Cloud Storage bucket.
 
 ```bash
-gsutil -m cp -r cymbal-starlight-2024.pdf gs://$BUCKET_NAME
+gcloud storage cp --recursive cymbal-starlight-2024.pdf gs://$BUCKET_NAME
 ```
 
 _Expected output_:
