@@ -13,7 +13,7 @@
 pip install -r requirements.txt
 
 # 2. Download required files from Google Cloud Storage
-gsutil cp gs://github-repo/search/auto-rag-eval/qa_profiles.json .
+gcloud storage cp gs://github-repo/search/auto-rag-eval/qa_profiles.json .
 
 # 3. Set up environment
 # Edit .env with your values:
@@ -101,7 +101,7 @@ Upload the documents in exemplary_docs to the datastore from gs://github-repo/se
 5.  **Required Files**:
     -   `qa_profiles.json`: Q&A generation profiles. Download it from Google Cloud Storage:
         ```bash
-        gsutil cp gs://github-repo/search/auto-rag-eval/qa_profiles.json .
+        gcloud storage cp gs://github-repo/search/auto-rag-eval/qa_profiles.json .
         ```
     -   `.env`: Environment configuration (create from `env_example`)
 
