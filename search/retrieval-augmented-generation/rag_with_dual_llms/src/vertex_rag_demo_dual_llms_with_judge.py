@@ -1033,8 +1033,8 @@ def judge_responses(
 # --- Main Application ---
 def main(args: argparse.Namespace):  # <-- Pass parsed args to main
     """Runs the main Streamlit application flow."""
-    st.set_page_config("Vertex RAG Compare with Dual LLMs", layout="wide")
-    st.title("📊 Vertex RAG Compare with 2 LLM's")
+    st.set_page_config("Vertex AI RAG Compare with Dual LLMs", layout="wide")
+    st.title("📊 Vertex AI RAG Compare with 2 LLM's")
     st.caption("Compare LLM responses using Vertex AI Search RAG")
 
     # --- Initialization ---
