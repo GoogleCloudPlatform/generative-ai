@@ -806,8 +806,8 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
         try:
             llm = VertexAI(model_name=DEFAULT_VERTEX_SEARCH_MODEL, project=project_id)
         except Exception as e:
-            st.error(f"Failed to initialize VertexAI LLM for retriever: {e}")
-            logging.exception("VertexAI LLM init error:")
+            st.error(f"Failed to initialize Vertex AI LLM for retriever: {e}")
+            logging.exception("Vertex AI LLM init error:")
             return None
 
         # Create the retriever (only if a datastore is selected)
