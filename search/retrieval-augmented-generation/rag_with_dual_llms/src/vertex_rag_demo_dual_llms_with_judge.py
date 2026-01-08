@@ -41,6 +41,9 @@ import ollama  # Added missing import
 import requests
 import streamlit as st
 
+# --- Logger Setup ---
+logger = logging.getLogger(__name__)
+
 # --- Configuration Constants ---
 DEBUG = False  # Set to False in production
 PROMPT_FOLDER = "prompts"
@@ -180,7 +183,7 @@ def get_rephraser_prompt(query: str) -> Optional[str]:
 
     try:
         formatted_prompt = """Now, please rephrase the following customer query:
-   
+
 {query}
 """
         formatted_prompt = prompt_template + formatted_prompt.format(query=query)
@@ -222,19 +225,19 @@ def get_summarizer_prompt(documents: List[str], query: str) -> Optional[str]:
     formatted_prompt = """
 Now it's your turn! Here is the query and relevant documents:
     Customer Search Query: {query}
-    
+
     Document Texts:
     [Start of Document 1]
     {Text_of_Document_1}
     [End of Document 1]
-    
+
     [Start of Document 2]
     {Text_of_Document_2}
     [End of Document 2]
-    
+
     [Start of Document 3]
     {Text_of_Document_3}
-    [End of Document 3]    
+    [End of Document 3]
     """
 
     try:
@@ -844,7 +847,7 @@ def clean_json(response_text: str):
     response_text = response_text.replace("{{", "{").replace("}}", "}")
 
     pattern = r"(?:^```.*)"
-    modified_text = re.sub(pattern, "", response_text, 0, re.MULTILINE)
+    modified_text = re.sub(pattern, "", response_text, count=0, flags=re.MULTILINE)
     try:
         # print(modified_text)
         result = json.loads(modified_text)
@@ -968,23 +971,23 @@ def judge_responses(
 
         # Load the prompt for the judge model
         judge_prompt = f"""Given the following QUESTION and the CONTEXT which is the source of truth to use, judge each model's response:
-        
+
         Here are two responses from different language models:
 
         Response from model on the left:
         QUESTION:
         {left_question}
-        
+
         CONTEXT:
         {left_context}
 
         Response A (Model on the Left):
         {left_response['text']}
-        
+
         Response from model on the right:
         QUESTION:
         {right_question}
-        
+
         CONTEXT:
         {right_context}
 

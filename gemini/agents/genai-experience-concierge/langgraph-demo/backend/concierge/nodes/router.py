@@ -5,7 +5,7 @@
 
 import enum
 import logging
-from typing import Literal, TypedDict, TypeVar
+from typing import Literal, TypedDict, TypeVar, Union
 
 from concierge import schemas, utils
 from google import genai
@@ -69,8 +69,9 @@ def build_semantic_router_node(
     Builds a LangGraph node that can dynamically route between sub-agents based on user intent.
     """
 
-    # ignore typing errors, this creates a valid literal type
-    NextNodeT = Literal[*class_node_mapping.values()]  # type: ignore
+    # Python 3.10 compatible: create type annotation from mapping values
+    # Note: Using str directly as dynamic Literal construction is complex in 3.10
+    NextNodeT = str  # type: ignore[valid-type]
 
     response_schema = genai_types.Schema(
         properties={
