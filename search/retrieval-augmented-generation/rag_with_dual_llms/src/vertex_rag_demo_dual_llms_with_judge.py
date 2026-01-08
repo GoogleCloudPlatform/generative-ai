@@ -756,7 +756,7 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
     Sets up the sidebar for Vertex AI Search connection and returns the LLM.
 
     Returns:
-        An initialized VertexAI LLM object for use with the retriever,
+        An initialized Vertex AI LLM object for use with the retriever,
         or None if configuration fails.
     """
     with st.sidebar:
