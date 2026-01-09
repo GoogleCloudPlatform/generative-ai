@@ -5,7 +5,7 @@ source ./env.sh
 
 # pubsub access for Cloud Function GCS trigger
 echo "Adding function permissions"
-SERVICE_ACCOUNT="$(gsutil kms serviceaccount -p "$PROJECT_ID")"
+SERVICE_ACCOUNT="$(gcloud storage service-agent --project="$PROJECT_ID")"
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${SERVICE_ACCOUNT}" \
   --role='roles/pubsub.publisher'
