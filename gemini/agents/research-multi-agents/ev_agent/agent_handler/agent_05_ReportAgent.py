@@ -12,7 +12,7 @@ from google.genai.types import (
     GoogleSearchRetrieval,
     Tool,
 )
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from rich import print as rich_print
 from termcolor import colored
 
@@ -601,10 +601,10 @@ class ReportAgent:
 
           Section to enhance: {section.title}
           City: {city_data.summary.city}
-          
+
           Current analysis:
           {section.content}
-          
+
           Requirements:
           1. Add supporting data with citations for existing analysis
           2. Cross-check uncited claims and add citations

@@ -3,13 +3,17 @@
 # agreement with Google.
 """Common schemas for the concierge demo."""
 
-from typing import Callable, NamedTuple, Protocol, TypedDict
+from typing import Callable, NamedTuple, Protocol, TypedDict, TypeVar, Generic
+from typing_extensions import ParamSpec
 
 from google.genai import types as genai_types
 import pydantic
 
+T = TypeVar("T")
+P = ParamSpec("P")
 
-class Node[T, **P](NamedTuple):
+
+class Node(NamedTuple, Generic[T, P]): # type: ignore[name-defined]
     """
     Represents a node in a LangGraph.
 
