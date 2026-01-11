@@ -1,0 +1,5 @@
+keyring-provider = "subprocess"
+
+[[index]]
+url = "https://pypi.org/simple"
+default = true
