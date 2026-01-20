@@ -168,6 +168,7 @@ with gr.Blocks(css=css) as demo:
             outputs=[webrtc],
             time_limit=90,
             concurrency_limit=2,
+            send_input_on="submit",
         )
     submit.click(
         lambda: (gr.update(visible=False), gr.update(visible=True)),
