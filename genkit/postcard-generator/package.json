@@ -37,7 +37,7 @@
     "firebase-admin": "^12.4.0",
     "genkitx-ollama": "^0.9.0",
     "google-auth-library": "^9.14.1",
-    "next": "15.4.7",
+    "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
     "react-markdown": "^9.0.1",
