@@ -4,7 +4,7 @@ Author: [Wafae Bakkali](https://github.com/WafaeBakkali)
 
 **Real-time multimodal creation enabled by extending Gemini Live with image and video generation tools.**
 
-GenMedia Live enables multimodal AI creation by extending Gemini Live capabilities to image and video generation powered by Gemini Pro Image and Veo through function calling.
+GenMedia Live enables multimodal AI creation by extending Gemini Live capabilities to image and video generation using Gemini 3 Pro Image and Veo through function calling.
 
 You can interact with voice or text to:
 - **Generate images** from descriptions or edit existing ones
