@@ -742,8 +742,8 @@ def handle_gen_complete(data):
 
 
 # REST API routes
-@app.route('/api/vibeo-chat', methods=['POST'])
-def handle_vibeo_chat():
+@app.route('/api/genmedia-chat', methods=['POST'])
+def handle_genmedia_chat():
     try:
         data = request.json
         if not data:

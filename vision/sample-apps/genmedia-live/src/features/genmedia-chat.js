@@ -80,9 +80,9 @@ function hideSpinner() {
     if (spinner) spinner.style.display = 'none';
 }
 
-export async function getVibeoChatContent() {
+export async function getGenMediaContent() {
     try {
-        const response = await fetch('/src/features/templates/vibeo-chat.html');
+        const response = await fetch('/src/features/templates/genmedia-chat.html');
         if (!response.ok) throw new Error(`Failed to load template: ${response.status}`);
         return await response.text();
     } catch (error) {
@@ -91,7 +91,7 @@ export async function getVibeoChatContent() {
     }
 }
 
-export function initVibeoChat() {
+export function initGenMediaChat() {
     clearSessionState();
 
     setTimeout(() => {
@@ -425,7 +425,7 @@ function initSocket() {
                 }
             }
 
-            const response = await fetch('/api/vibeo-chat', {
+            const response = await fetch('/api/genmedia-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

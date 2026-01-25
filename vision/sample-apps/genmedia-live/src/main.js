@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getVibeoChatContent, initVibeoChat } from './features/vibeo-chat.js';
+import { getGenMediaContent, initGenMediaChat } from './features/genmedia-chat.js';
 import { showToast } from './ui.js';
 
 function initDarkMode() {
@@ -62,12 +62,12 @@ async function initApp() {
             throw new Error('Main content container not found');
         }
 
-        const chatContent = await getVibeoChatContent();
+        const chatContent = await getGenMediaContent();
         mainContent.innerHTML = chatContent;
         mainContent.classList.add('fade-in');
         setTimeout(() => mainContent.classList.remove('fade-in'), 500);
 
-        initVibeoChat();
+        initGenMediaChat();
 
         setTimeout(() => {
             const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
