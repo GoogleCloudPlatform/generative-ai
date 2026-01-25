@@ -40,7 +40,32 @@ app.use(express.static(staticPath));
 app.get('/api/investments/search', async (req: express.Request, res: express.Response) => {
   try 
   {
-    const terms: string[] = req.query.terms as string[];
+    const rawTerms = req.query.terms;
+
+    let terms: string[] = [];
+
+    if (typeof rawTerms === 'string') {
+      // Support comma-separated terms in a single query parameter
+      terms = rawTerms.split(',').map(t => t.trim()).filter(t => t !== '');
+    } else if (Array.isArray(rawTerms)) {
+      // Normalize each element to a string and split comma-separated entries
+      const splitTerms: string[] = [];
+      for (const item of rawTerms) {
+        if (typeof item === 'string') {
+          splitTerms.push(...item.split(','));
+        } else {
+          // Unexpected type inside the array
+          return res.status(400).send('Invalid "terms" parameter');
+        }
+      }
+      terms = splitTerms.map(t => t.trim()).filter(t => t !== '');
+    } else if (rawTerms == null) {
+      // No terms provided; use empty list
+      terms = [];
+    } else {
+      // Unexpected type (e.g., object)
+      return res.status(400).send('Invalid "terms" parameter');
+    }
 
     const response = await investments.search(terms);
     res.json(response);

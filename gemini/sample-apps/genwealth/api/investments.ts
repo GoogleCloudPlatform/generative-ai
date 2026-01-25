@@ -5,14 +5,22 @@ export class Investments {
 
     async search(searchTerms: string[]) {
         console.log('using searchTerms', searchTerms);
+
+        // If no search terms are provided, return an empty result set
+        if (!Array.isArray(searchTerms) || searchTerms.length === 0) {
+            const emptyResult = { data: [], query: '' };
+            return emptyResult;
+        }
+
         let query = `SELECT ticker, etf, rating, analysis
             FROM investments
             WHERE analysis LIKE '%${safeString(searchTerms[0]) ?? ''}%'`;
         
         for (let i = 1; i < searchTerms.length; i++) {
-            if (searchTerms[i].trim() !== '') {
+            const term = searchTerms[i];
+            if (typeof term === 'string' && term.trim() !== '') {
                 query += `
-                    AND analysis LIKE '%${safeString(searchTerms[i]).trim()}%'`;
+                    AND analysis LIKE '%${safeString(term).trim()}%'`;
             }
         }
         
