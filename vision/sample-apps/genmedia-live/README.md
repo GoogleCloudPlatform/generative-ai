@@ -2,9 +2,9 @@
 
 Author: [Wafae Bakkali](https://github.com/WafaeBakkali)
 
-**Real-time multimodal creation enabled by extending Gemini Live with image and video generation tools.**
+**Real-time multimodal creation enabled by extending the Gemini Live API with image and video generation tools.**
 
-GenMedia Live enables multimodal AI creation by extending Gemini Live capabilities to image and video generation using Gemini 3 Pro Image and Veo through function calling.
+GenMedia Live enables multimodal AI creation by extending the [Gemini Live API](https://cloud.google.com/vertex-ai/generative-ai/docs/live-api) capabilities to image and video generation using Gemini Pro Image and Veo through function calling.
 
 You can interact with voice or text to:
 - **Generate images** from descriptions or edit existing ones
@@ -17,7 +17,7 @@ Users can reference previously generated images, or use images from their camera
 
 ## Features
 
-- **Voice Interaction**: Real-time voice conversations with Gemini Live
+- **Voice Interaction**: Real-time voice conversations with the Gemini Live API
 - **Text Input**: Type messages as an alternative to voice
 - **Camera**: Share your camera for visual context
 - **Screen Share**: Share your screen for visual context
@@ -53,8 +53,8 @@ Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/WafaeBakkali/genmedia-live.git
-cd genmedia-live
+git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+cd generative-ai/vision/sample-apps/genmedia-live
 ```
 
 2. Create and activate virtual environment:
@@ -120,9 +120,9 @@ genmedia-live/
     ├── main.js            # App initialization
     ├── ui.js              # UI utilities
     └── features/
-        ├── vibeo-chat.js  # Voice chat functionality
+        ├── genmedia-chat.js       # Voice chat functionality
         └── templates/
-            └── vibeo-chat.html
+            └── genmedia-chat.html
 ```
 
 ## Deployment

@@ -24,7 +24,6 @@ from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-import vertexai
 from google import genai
 from google.genai import types
 from google.cloud import storage
@@ -73,7 +72,6 @@ VIDEO_ASPECT_RATIOS = ["16:9", "9:16"]
 
 # Initialize clients
 try:
-    vertexai.init(project=DEFAULT_PROJECT_ID, location=DEFAULT_LOCATION_ID)
     default_gemini_client = genai.Client(vertexai=True, project=DEFAULT_PROJECT_ID, location=DEFAULT_LOCATION_ID)
     default_image_client = genai.Client(vertexai=True, project=DEFAULT_PROJECT_ID, location="global")
     storage_client = storage.Client(project=DEFAULT_PROJECT_ID)
@@ -131,7 +129,6 @@ def get_active_client():
         return None
     creds_data = session_credentials['oauth']
     creds = Credentials(token=creds_data['access_token'])
-    vertexai.init(project=creds_data['project_id'], location=creds_data['location'], credentials=creds)
     return genai.Client(vertexai=True, project=creds_data['project_id'], location=creds_data['location'], credentials=creds)
 
 
@@ -992,7 +989,7 @@ def handle_video_generation(args, session_id):
                 blob = bucket.blob(blob_name)
                 blob.download_to_filename(str(video_path))
             else:
-                return jsonify({"error": f"Invalid video URI"}), 500
+                return jsonify({"error": "Invalid video URI"}), 500
         else:
             return jsonify({"error": "No video data available"}), 500
 
@@ -1126,10 +1123,8 @@ def validate_token():
         return jsonify({"valid": False, "message": "Project ID and token required"})
     
     try:
-        # Create credentials from access token
         creds = Credentials(token=access_token)
         
-        # Test the credentials by making a real API call
         test_client = genai.Client(
             vertexai=True, 
             project=project_id, 
@@ -1137,14 +1132,11 @@ def validate_token():
             credentials=creds
         )
         
-        # Actually test the credentials with a simple model list or generation
-        # This will fail fast if credentials are invalid
         test_response = test_client.models.generate_content(
             model="gemini-2.0-flash",
             contents="Say 'ok' and nothing else"
         )
         
-        # If we get here, credentials are valid
         session_credentials['oauth'] = {
             'credentials': creds,
             'project_id': project_id,
