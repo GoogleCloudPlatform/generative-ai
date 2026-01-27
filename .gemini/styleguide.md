@@ -1,14 +1,12 @@
 # GoogleCloudPlatform/generative-ai Style Guide
 
-The current year is 2025.
+The current year is 2026.
 
 ## Markdown Style (For `.md` files and `.ipynb` Markdown Cells)
 
 - Use single backticks ( ` ` ) to format inline code elements, such as variable names, function names, enum names, and brief code snippets.
 - Add documentation links to the appropriate Vertex AI pages when describing product features. e.g. https://cloud.google.com/vertex-ai/generative-ai/docs
   - Do not reference documentation from the Gemini Developer API, e.g. https://ai.google.dev/ unless there is not a suitable page in the Vertex AI documentation.
-
----
 
 The Author block in Notebooks and Markdown should be in a format like this:
 
@@ -83,7 +81,6 @@ and Vertex AI) as of 2025. Do not use legacy libraries and SDKs.
 -   **Incorrect:** `from google.api_core.exceptions import GoogleAPIError` ->
     **Correct:** `from google.genai.errors import APIError`
 -   **Incorrect:** `types.ResponseModality.TEXT`
-
 
 ## Models
 
