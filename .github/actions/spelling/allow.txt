@@ -106,6 +106,7 @@ Ayyappa
 backstory
 backticks
 bagchi
+Bakkali
 bargap
 barmode
 barpolar
@@ -511,6 +512,7 @@ geboten
 gemhall
 genai
 genkit
+genmedia
 GenTwo
 genwealth
 geocoded
@@ -776,6 +778,7 @@ labetalol
 Ladhak
 LAION
 lakecolor
+LANCZOS
 landcolor
 landuse
 langgraph
@@ -1314,6 +1317,7 @@ shrt
 Shubham
 Shyamalan
 sid
+sids
 siglap
 signings
 simage
@@ -1531,6 +1535,7 @@ Vardhan
 Vaswani
 Vayots
 VBG
+vcodec
 VCPU
 vectoral
 vectordb
@@ -1542,7 +1547,10 @@ Ves
 Vesia
 vesselin
 Vettel
+vframes
 VFT
+vibeo
+vid
 Vid
 vidgen
 VIDGEN
@@ -1572,6 +1580,7 @@ VSPM
 vtotal
 vtt
 vulnz
+Wafae
 wafaeb
 WAI
 Wakatipu
