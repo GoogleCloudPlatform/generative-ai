@@ -85,6 +85,7 @@ atms
 Atulan
 auc
 aujourd'hui
+authDomain
 authtoken
 autocal
 autoflake
@@ -458,6 +459,7 @@ flac
 Flahs
 Flatform
 Flipkart
+FlutterFire
 floormat
 FLX
 fmeasure
@@ -675,6 +677,7 @@ informati
 inpaint
 INR
 IOMGR
+iosBundleId
 Iosif
 iostream
 ipd
@@ -749,6 +752,7 @@ kfp
 Khanh
 khz
 kickstart
+kIsWeb
 Kipchoge
 Kleiser
 kmeans
@@ -872,6 +876,7 @@ MCQ
 mdc
 MDD
 Meawad
+measurementId
 mec
 MEDIANCUT
 mediapy
@@ -886,6 +891,7 @@ Merhaba
 mesop
 Mesop
 metadatas
+messagingSenderId
 metamath
 METAMATH
 metaverse
@@ -1364,6 +1370,7 @@ Statcast
 stdcall
 stext
 STIX
+storageBucket
 Storrer
 stp
 Strappy
