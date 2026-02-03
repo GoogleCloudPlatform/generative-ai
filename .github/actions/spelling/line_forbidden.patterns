@@ -211,10 +211,10 @@
 # Should be Gemini
 \sgemini\s\w
 
-# Should be `Gemini Version Size` (e.g. `Gemini 2.0 Flash`)
+# Should be `Gemini Version Size` (e.g. `Gemini 3 Flash`)
 \bGemini\s(Pro|Flash|Ultra)\s?\d\.\d\b
 
-# Gemini Size should be capitalized (e.g. `Gemini 2.0 Flash`)
+# Gemini Size should be capitalized (e.g. `Gemini 3 Flash`)
 \bGemini\s?\d\.\d\s(pro|flash|ultra)\b
 
 # Don't say "Google Gemini" or "Google Gemini"

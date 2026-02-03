@@ -39,6 +39,20 @@ PROJECT_ID = "[your-project-id]"
 PROJECT_ID = "actual-projectid-1234"
 ```
 
+- Use the `global` endpoint for all requests, unless a regional endpoint is specifically required for a model or feature.
+
+**Correct**
+
+```py
+LOCATION = "global"
+```
+
+**Incorrect**
+
+```py
+LOCATION = "us-central1"
+```
+
 ## Golden Rule: Use the Correct and Current SDK
 
 Always use the **Google GenAI SDK** (`google-genai`), which is the unified
@@ -96,11 +110,10 @@ and Vertex AI) as of 2025. Do not use legacy libraries and SDKs.
 
 -   It is also acceptable to use following models if explicitly requested by the
     user:
-    -   **Gemini 2.0 Series**: `gemini-2.0-flash`, `gemini-2.0-flash-lite`
     -   **Gemini 2.5 Series**: `gemini-2.5-flash`, `gemini-2.5-pro`
 
 -   Do not use the following deprecated models (or their variants like
     `gemini-1.5-flash-latest`):
-    -   **Prohibited:** `gemini-1.5-flash`
-    -   **Prohibited:** `gemini-1.5-pro`
+    -   **Gemini 2.0 Series**: `gemini-2.0-flash`, `gemini-2.0-flash-lite`
+    -   **Gemini 1.5 Series**: `gemini-1.5-flash`, `gemini-1.5-pro`
     -   **Prohibited:** `gemini-pro`
