@@ -144,3 +144,5 @@ Please use the [issues page](https://github.com/GoogleCloudPlatform/generative-a
 ## Disclaimer
 
 This repository itself is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
+
+- [AgentMarket](https://agentmarket.cloud) - B2A marketplace for AI agents. Enterprise-ready, 189 APIs, real energy data.
