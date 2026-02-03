@@ -101,7 +101,7 @@ Answer: {{target}}
 
 In the Model Name field enter:
 ```
-gemini-2.0-flash-001
+gemini-3-flash-preview
 ```
 
 In the System Instructions field enter:
@@ -157,7 +157,7 @@ View the Evaluation Results, and save to prompt records. This will save this ini
 
 🔧 Set-Up Prompt Optimization.
 
-- **Target Model:** 'gemini-2.0-flash-001'
+- **Target Model:** 'gemini-3-flash-preview'
 - **Existing Prompt:** 'math_prompt_test'
 - **Version:** '1'
 

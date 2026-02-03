@@ -774,7 +774,7 @@ def main() -> None:
         st.selectbox(
             "Select Evaluation Model",
             options=[
-                "gemini-2.0-flash-lite",
+                "gemini-3-flash-preview",
                 "gemini-2.5-flash",
                 "gemini-2.5-pro",
             ],

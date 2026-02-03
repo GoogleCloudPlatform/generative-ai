@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 # Initialize the LLM and set it in the Settings
-llm = Vertex(model="gemini-2.0-flash", temperature=0.0)
+llm = Vertex(model="gemini-3-flash-preview", temperature=0.0)
 Settings.llm = llm
 
 

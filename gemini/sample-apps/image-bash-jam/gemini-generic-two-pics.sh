@@ -11,7 +11,7 @@ if [ -f .envrc ]; then
 fi
 
 #PROJECT_ID='provided in .envrc'
-MODEL_ID="gemini-2.0-flash" # TODO parametrize into model :)
+MODEL_ID="gemini-3-flash-preview" # TODO parametrize into model :)
 LOCATION=us-central1
 TMP_OUTPUT_FILE=.tmp.lastresponse-generic-2pix.json
 REQUEST_FILE=.tmp.request-generic-2pix.json

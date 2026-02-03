@@ -143,7 +143,7 @@ const boneAppetitSalesDatabaseSchema = z.object({
     ),
 });
 
-// Define a GenKit flow to create Bone Appetit sales data rows using the Gemini 2.0 model.
+// Define a GenKit flow to create Bone Appetit sales data rows using the Gemini 3 model.
 const createBoneAppetitSalesRowSchema = defineFlow(
   {
     name: "createBoneAppetitSalesRowSchema",

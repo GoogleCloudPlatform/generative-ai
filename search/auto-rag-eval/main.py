@@ -42,7 +42,7 @@ def main():
         help="QA profiles JSON file path",
     )
     parser.add_argument(
-        "--llm-model", default="gemini-2.0-flash", help="LLM model to use"
+        "--llm-model", default="gemini-3-flash-preview", help="LLM model to use"
     )
     parser.add_argument(
         "--top-k-chunks", type=int, default=3, help="Top K chunks for retrieval"

@@ -92,12 +92,12 @@ st.sidebar.markdown("#### 🛠️ Batch Evaluation Configurations")
 
 st.sidebar.markdown("#### 🤖 LLM Model")
 llm_name = st.sidebar.selectbox(
-    "Select a model:", ["gemini-2.0-flash", "gemini-2.0-flash-lite"]
+    "Select a model:", ["gemini-3-flash-preview", "gemini-3-flash-preview"]
 )
 
 st.sidebar.markdown("#### 🤖 Eval LLM Model")
 eval_model_name = st.sidebar.selectbox(
-    "Select Eval model:", ["gemini-2.0-flash", "gemini-2.0-flash-lite"]
+    "Select Eval model:", ["gemini-3-flash-preview", "gemini-3-flash-preview"]
 )
 
 st.sidebar.markdown("#### 🌡️ Temperature")

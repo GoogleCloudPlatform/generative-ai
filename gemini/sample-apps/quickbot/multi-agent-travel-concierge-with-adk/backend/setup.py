@@ -43,7 +43,7 @@ try:
     DEFAULT_INTENTS = [
         Intent(
             name="Travel concierge",
-            ai_model="gemini-2.0-flash",
+            ai_model="gemini-3-flash-preview",
             ai_temperature=1,
             description="",
             prompt="",

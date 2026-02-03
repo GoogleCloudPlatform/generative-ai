@@ -22,7 +22,7 @@ fi
 set -euo pipefail
 
 #PROJECT_ID='...' # Needs to be provided from ``.envrc` or in some other way
-MODEL_ID="gemini-2.0-flash"
+MODEL_ID="gemini-3-flash-preview"
 LOCATION=us-central1
 TMP_OUTPUT_FILE=.tmp.lastresponse-generic.json
 REQUEST_FILE=.tmp.lastrequest-generic.json

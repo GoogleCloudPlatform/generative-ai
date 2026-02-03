@@ -1464,7 +1464,7 @@ def validate_token():
         )
 
         test_client.models.generate_content(
-            model="gemini-2.0-flash", contents="Say 'ok' and nothing else"
+            model="gemini-3-flash-preview", contents="Say 'ok' and nothing else"
         )
 
         session_credentials["oauth"] = {

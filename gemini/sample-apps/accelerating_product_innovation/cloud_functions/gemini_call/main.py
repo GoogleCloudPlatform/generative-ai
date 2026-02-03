@@ -25,7 +25,7 @@ def generate_text(prompt: str) -> str:
     Returns:
         The generated text.
     """
-    model = GenerativeModel("gemini-2.0-flash")
+    model = GenerativeModel("gemini-3-flash-preview")
 
     generation_config = generative_models.GenerationConfig(
         max_output_tokens=8192,

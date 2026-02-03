@@ -19,7 +19,7 @@ const datasetId = "genai_demo";
 const connectionId = "genai-connection";
 const modelId = "genai-model";
 const tableName = "genai-data";
-const modelName = "gemini-2.0-flash";
+const modelName = "gemini-3-flash-preview";
 
 function setup() {
   projectId = setProjectId();

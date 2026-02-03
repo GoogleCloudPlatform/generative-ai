@@ -103,7 +103,7 @@ export default function Home() {
             href="https://cloud.google.com/vertex-ai/generative-ai/docs/gemini-v2"
             target="_blank"
             rel="noopener noreferrer">
-            Gemini 2.0
+            Gemini 3
           </Link>{" "}
           add it to your calendar! Powered by{" "}
           <Link

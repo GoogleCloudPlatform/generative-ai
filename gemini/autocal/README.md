@@ -4,13 +4,13 @@
 | --------- | --------------------------------------------------------------------------------------------- |
 | Author(s) | [Stephanie Anani](https://github.com/stephanieanani), [Matt Day](https://github.com/mattsday) |
 
-Screenshot to Calendar Magic with Gemini 2.0 Flash
+Screenshot to Calendar Magic with Gemini 3 Flash
 
 ![Screenshot Preview](images/complete.webp)
 
-AutoCal is a web application that leverages the power of Gemini 2.0 Flash to automatically extract event information from screenshots and add them to your calendar. It simplifies the process of scheduling by eliminating the need for manual data entry.
+AutoCal is a web application that leverages the power of Gemini 3 Flash to automatically extract event information from screenshots and add them to your calendar. It simplifies the process of scheduling by eliminating the need for manual data entry.
 
-The app is event driven, using Firestore triggers to invoke Gemini 2.0 Flash in the backend, and snapshot listeners to update the frontend UI. It is designed to show the scalable combination of Python and JavaScript to build a high-scale web app.
+The app is event driven, using Firestore triggers to invoke Gemini 3 Flash in the backend, and snapshot listeners to update the frontend UI. It is designed to show the scalable combination of Python and JavaScript to build a high-scale web app.
 
 ![App Architecture](images/architecture.webp)
 

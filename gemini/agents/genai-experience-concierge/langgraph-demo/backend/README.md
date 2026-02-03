@@ -136,7 +136,7 @@ Each agent's route provides endpoints for invoking the agent, managing conversat
   chat_config = chat.ChatConfig(
       project="...",
       region="us-central1",
-      chat_model_name="gemini-2.0-flash-001",
+      chat_model_name="gemini-3-flash-preview",
   )
 
   # Run an example streamed query

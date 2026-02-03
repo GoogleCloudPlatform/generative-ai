@@ -120,7 +120,7 @@ app.post('/api/validate-token', async (req, res) => {
             });
         }
         
-        console.log('Running fast validation with gemini-2.0-flash...');
+        console.log('Running fast validation with gemini-3-flash-preview...');
         
         // Use Flash model for much faster validation
         const response = await ai.models.generateContent({
