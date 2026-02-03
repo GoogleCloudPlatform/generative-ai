@@ -33,10 +33,24 @@ For multiple authors
 PROJECT_ID = "[your-project-id]"
 ```
 
-***Incorrect**
+**Incorrect**
 
 ```py
 PROJECT_ID = "actual-projectid-1234"
+```
+
+- Use the `global` endpoint for all requests, unless a regional endpoint is specifically required for a model or feature.
+
+**Correct**
+
+```py
+LOCATION = "global"
+```
+
+**Incorrect**
+
+```py
+LOCATION = "us-central1"
 ```
 
 ## Golden Rule: Use the Correct and Current SDK
