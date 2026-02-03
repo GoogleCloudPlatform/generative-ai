@@ -458,6 +458,8 @@ flac
 Flahs
 Flatform
 Flipkart
+Flirble
+Flirbles
 floormat
 FLX
 fmeasure
@@ -1017,6 +1019,7 @@ nunique
 nvidia
 NVIDIA
 NVL
+NYT
 oai
 objc
 ODb
