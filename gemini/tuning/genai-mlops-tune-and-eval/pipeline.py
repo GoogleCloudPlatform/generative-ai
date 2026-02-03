@@ -244,11 +244,11 @@ def model_comparison_component(
 def gemini_tuning_pipeline(
     project: str = "[your-project-id]",
     location: str = "us-central1",
-    source_model_name: str = "gemini-2.0-flash",
+    source_model_name: str = "gemini-3-flash-preview",
     train_data_uri: str = "gs://github-repo/generative-ai/gemini/tuning/mlops-tune-and-eval/patient_1_glucose_examples.jsonl",
     # For first run, set `baseline_model_endpoint`` to any tunable Gemini model
     # because a tuned model endpoint doesn't exist yet
-    baseline_model_endpoint: str = "gemini-2.0-flash",
+    baseline_model_endpoint: str = "gemini-3-flash-preview",
     # For subsequent runs, set baseline_model_endpoint to a tuned model endpoint
     # baseline_model_endpoint: str = "projects/824264063118/locations/us-central1/endpoints/797393320253849600",
 ) -> None:

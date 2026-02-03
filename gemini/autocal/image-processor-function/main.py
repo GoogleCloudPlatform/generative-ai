@@ -62,7 +62,7 @@ from google.events.cloud import firestore as firestoredata
 from google.genai.types import GenerateContentConfig, Part
 
 # Initialize the Gemini model
-MODEL_ID = os.environ.get("MODEL_ID", "gemini-2.0-flash-001")
+MODEL_ID = os.environ.get("MODEL_ID", "gemini-3-flash-preview")
 LOCATION = os.environ.get("LOCATION", "europe-west1")
 
 client = genai.Client(vertexai=True, location=LOCATION)

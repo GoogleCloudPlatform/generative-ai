@@ -46,7 +46,7 @@ def get_client(project_id: str, location: str):
 
 
 def clue_generator(
-    text: str, client: genai.Client, model_name: str = "gemini-2.0-flash"
+    text: str, client: genai.Client, model_name: str = "gemini-3-flash-preview"
 ) -> ClueResponse:
     """Generate clues from text using Structured Output"""
     prompt = f"""
@@ -75,7 +75,7 @@ def clue_generator(
 
 
 def targeted_information_seeking(
-    query: str, client: genai.Client, model_name: str = "gemini-2.0-flash"
+    query: str, client: genai.Client, model_name: str = "gemini-3-flash-preview"
 ) -> TargetedInfo:
     """Generate targeted information for a query using Structured Output"""
     prompt = f"""
@@ -103,7 +103,7 @@ def generate_qa_pair(
     context: str,
     profile: dict,
     client: genai.Client,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-3-flash-preview",
 ) -> QAPair:
     """Generate a Q&A pair based on context and profile"""
     prompt = f"""
@@ -135,7 +135,7 @@ def review_qa_pair(
     context: str,
     critic_type: str,
     client: genai.Client,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-3-flash-preview",
 ) -> ReviewResult:
     """Review a Q&A pair using a specific critic persona"""
     prompt = f"""

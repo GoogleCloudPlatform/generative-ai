@@ -151,7 +151,7 @@ python main.py \
 -   `--chunks-to-merge`: Number of chunks to merge into bigger chunks (default: 3)
 -   `--output-file`: Output JSON filename (default: benchmark.json)
 -   `--qa-profiles-file`: Path to custom QA profiles JSON file (default: qa_profiles.json in script directory)
--   `--llm-model`: LLM model to use (default: gemini-2.0-flash)
+-   `--llm-model`: LLM model to use (default: gemini-3-flash-preview)
 -   `--top-k-chunks`: Number of top chunks to retrieve during context search (default: 3)
 -   `--neighbour-chunks`: Number of neighboring chunks to include for context (default: 0)
 -   `--max-retries`: Maximum retry attempts for API calls (default: 3)

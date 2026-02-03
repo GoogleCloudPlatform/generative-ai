@@ -17,7 +17,7 @@ LOCATION = os.environ.get("GOOGLE_CLOUD_REGION")
 if PROJECT_ID and not LOCATION:
     LOCATION = "us-central1"
 
-MODEL_ID = "gemini-2.0-flash-lite"
+MODEL_ID = "gemini-3-flash-preview"
 
 LANGUAGE_MAP = {
     "Spanish (Español)": {

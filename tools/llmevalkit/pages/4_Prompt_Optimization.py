@@ -47,7 +47,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TARGET_MODELS = ["gemini-2.0-flash-001", "gemini-2.0-flash-lite-001"]
+TARGET_MODELS = ["gemini-3-flash-preview", "gemini-3-flash-preview"]
 
 
 def initialize_session_state() -> None:
@@ -278,7 +278,7 @@ def get_optimization_args(
             f"{st.session_state.local_prompt.prompt_to_run.prompt_data}"
             "\n\tAnswer: {target}"
         ),
-        target_model="gemini-2.0-flash-001",
+        target_model="gemini-3-flash-preview",
         optimization_mode="instruction",
         eval_metrics_types=[
             "question_answering_correctness",

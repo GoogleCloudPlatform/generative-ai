@@ -11,7 +11,7 @@ def client():
 # Define parameter combinations for query_rag
 query_rag_params = [
     {
-        "llm_name": "gemini-2.0-flash",
+        "llm_name": "gemini-3-flash-preview",
         "temperature": 0.2,
         "similarity_top_k": 2,
         "retrieval_strategy": "auto_merging",
@@ -23,7 +23,7 @@ query_rag_params = [
         "hybrid_retrieval": True,
         "query": "What were Google's Q1 Earnings?",
         "evaluate_response": True,
-        "eval_model_name": "gemini-2.0-flash",
+        "eval_model_name": "gemini-3-flash-preview",
         "embedding_model_name": "text-embedding-005",
     }
 ]
@@ -37,7 +37,7 @@ def test_query_rag(client, payload):
 
 eval_batch_params = [
     {
-        "llm_name": "gemini-2.0-flash",
+        "llm_name": "gemini-3-flash-preview",
         "temperature": 0.2,
         "similarity_top_k": 5,
         "retrieval_strategy": "parent",
@@ -45,7 +45,7 @@ eval_batch_params = [
         "use_refine": True,
         "use_node_rerank": False,
         "use_react": False,
-        "eval_model_name": "gemini-2.0-flash",
+        "eval_model_name": "gemini-3-flash-preview",
         "embedding_model_name": "text-embedding-005",
         "input_eval_dataset_bucket_uri": "rag-llm-bucket/test_ground_truth.csv",
         "bq_eval_results_table_id": "eval_results.eval_results_table",

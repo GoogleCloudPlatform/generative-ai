@@ -36,8 +36,7 @@ def _region() -> str:
 
 
 MODELS = {
-    "gemini-2.0-flash": "Gemini 2.0 Flash",
-    "gemini-2.0-flash-lite": "Gemini 2.0 Flash-Lite",
+    "gemini-3-flash-preview": "Gemini 3 Flash",
     "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite",
     "gemini-2.5-pro": "Gemini 2.5 Pro",
     "gemini-2.5-flash": "Gemini 2.5 Flash",

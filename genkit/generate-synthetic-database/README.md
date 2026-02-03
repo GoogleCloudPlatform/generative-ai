@@ -4,7 +4,7 @@
 | --------- | ----------------------------------------- |
 | Author(s) | [Aiko Zhao](https://github.com/aikozhaoz) |
 
-This project leverages [Firebase Genkit](https://firebase.google.com/products/genkit) structured output alongside the [Gemini 2.0](https://blog.google/technology/ai/google-gemini-next-generation-model-february-2024/) model, to generate synthetic sales data for a fictional dog food company called `Bone Appetit`. The generated data is then stored in a Firestore database, row by row, for further analysis or AI/ML use in applications.
+This project leverages [Firebase Genkit](https://firebase.google.com/products/genkit) structured output alongside the [Gemini 3](https://blog.google/technology/ai/google-gemini-next-generation-model-february-2024/) model, to generate synthetic sales data for a fictional dog food company called `Bone Appetit`. The generated data is then stored in a Firestore database, row by row, for further analysis or AI/ML use in applications.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ This project leverages [Firebase Genkit](https://firebase.google.com/products/ge
 
 1. Data Generation:
 
-   - `createBoneAppetitSalesRowSchema`: This is a GenKit flow. It takes a product as input, prompts the Gemini 2.0 model, and gets back structured JSON representing one sales record.
+   - `createBoneAppetitSalesRowSchema`: This is a GenKit flow. It takes a product as input, prompts the Gemini 3 model, and gets back structured JSON representing one sales record.
      - The prompt instructs the AI to create realistic data, including reviews that align with customer ratings.
    - `rateLimitedRunFlowGenerator`: This is a special function to control the pace of data generation. We don't want to overwhelm the AI or hit API limits. It yields Promises that resolve to new sales data, but with pauses if needed.
 

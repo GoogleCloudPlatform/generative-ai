@@ -18,12 +18,12 @@
 
 _Optional:_ `context` is an optional cell range you can provide as context. For example, if the instruction is "Write copy to sell," you can provide a list of ad copies you find inspiring to specify the desired style.
 
-_Optional:_ `model` is a Gemini model version to use. The default value is `gemini-2.0-flash`. See [Google models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models) for available models.
+_Optional:_ `model` is a Gemini model version to use. The default value is `gemini-3-flash-preview`. See [Google models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models) for available models.
 
-If you don't need to specify `context` but want to specify `model`, pass an empty string to the third argument. For example, to use Gemini 2.0, the function would look like this:
+If you don't need to specify `context` but want to specify `model`, pass an empty string to the third argument. For example, to use Gemini 3, the function would look like this:
 
 ```bash
-=HEY_LLM(instruction, input, "", "gemini-2.0-flash")
+=HEY_LLM(instruction, input, "", "gemini-3-flash-preview")
 ```
 
 ### IMAGEN

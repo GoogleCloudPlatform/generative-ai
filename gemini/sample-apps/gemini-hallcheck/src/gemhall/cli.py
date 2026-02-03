@@ -21,7 +21,7 @@ def add_common_args(ap: argparse.ArgumentParser) -> None:
     ap.add_argument(
         "--model",
         default="gemini-2.5-flash",
-        choices=["gemini-2.0-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"],
+        choices=["gemini-3-flash-preview", "gemini-2.5-flash", "gemini-2.5-flash-lite"],
         help="Gemini model id",
     )
     ap.add_argument(

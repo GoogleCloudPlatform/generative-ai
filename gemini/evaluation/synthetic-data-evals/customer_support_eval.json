@@ -46,7 +46,7 @@
     ],
     "metadata": {
       "model": "WeaveVertexAIServerModel",
-      "model_id": "google/gemini-2.0-flash",
+      "model_id": "google/gemini-3-flash-preview",
       "num_steps": 1,
       "tools_used": [
         "category_browse",
@@ -111,7 +111,7 @@
     ],
     "metadata": {
       "model": "WeaveVertexAIServerModel",
-      "model_id": "google/gemini-2.0-flash",
+      "model_id": "google/gemini-3-flash-preview",
       "num_steps": 2,
       "tools_used": [
         "order_status",
@@ -167,7 +167,7 @@
     ],
     "metadata": {
       "model": "WeaveVertexAIServerModel",
-      "model_id": "google/gemini-2.0-flash",
+      "model_id": "google/gemini-3-flash-preview",
       "num_steps": 1,
       "tools_used": [
         "customer_order_history",

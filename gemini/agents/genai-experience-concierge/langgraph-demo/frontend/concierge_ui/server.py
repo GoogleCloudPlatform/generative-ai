@@ -22,7 +22,7 @@ gemini_chat_page = st.Page(
         title="Gemini Chat",
         icon="⭐",
         description="""
-This demo illustrates a simple "agent" which just consists of plain Gemini 2.0 Flash with conversation history.
+This demo illustrates a simple "agent" which just consists of plain Gemini 3 Flash with conversation history.
 Response text is streamed using a custom [langgraph.config.get_stream_writer](https://langchain-ai.github.io/langgraph/reference/config/#langgraph.config.get_stream_writer).
 """.strip(),
         chat_handler=gemini_chat.chat_handler,

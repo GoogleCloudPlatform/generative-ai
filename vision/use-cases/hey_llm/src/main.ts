@@ -26,7 +26,7 @@ const LOCATION = 'us-central1';
 /**
  * Default Gemini model to use.
  */
-const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-3-flash-preview';
 
 /**
  * Default Imagen model to use.
@@ -234,7 +234,7 @@ function setClientSecret(val: string) {
  * @param {string} input The input data to process based on the instruction.
  * @param {string[][]} context Optional context that LLM should be aware of.
  *   You can specify a cell range that includes examples, reference data, etc.
- * @param {string} model The Gemini model version to use (default: gemini-2.0-flash).
+ * @param {string} model The Gemini model version to use (default: gemini-3-flash-preview).
  *   See https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models for available models.
  * @return {string} The LLM's response, trimmed and ready for use in a spreadsheet cell.
  * @customFunction
