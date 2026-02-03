@@ -33,7 +33,7 @@ For multiple authors
 PROJECT_ID = "[your-project-id]"
 ```
 
-***Incorrect**
+**Incorrect**
 
 ```py
 PROJECT_ID = "actual-projectid-1234"
