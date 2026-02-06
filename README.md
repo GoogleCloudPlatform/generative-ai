@@ -1,12 +1,11 @@
 # Generative AI on Google Cloud
 
-> **[Gemini 2.5 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-pro) and [Gemini 2.5 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash) have been released!**
+> **[Gemini 3 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-flash) has been released!**
 >
-> Here are the latest notebooks and demos using the new models:
+> Here are the latest notebooks and demos using the new model:
 >
-> - [Intro to Gemini 2.5 Pro](gemini/getting-started/intro_gemini_2_5_pro.ipynb)
-> - [Intro to Gemini 2.5 Flash](gemini/getting-started/intro_gemini_2_5_flash.ipynb)
-
+> - [Intro to Gemini 3 Flash](gemini/getting-started/intro_gemini_3_flash.ipynb)
+>
 <!-- markdownlint-disable MD033 -->
 
 This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai) with [Vertex AI](https://cloud.google.com/vertex-ai).

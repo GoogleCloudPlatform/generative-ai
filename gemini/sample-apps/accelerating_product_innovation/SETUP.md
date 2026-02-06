@@ -53,7 +53,7 @@ Follow the below steps to deploy the solution to Cloud Run environment.
    - Run the following command in your terminal, replacing `<region>` with your desired bucket location:
 
      ```bash
-     gsutil mb -l <region> gs://product_innovation_bucket
+     gcloud storage buckets create --location <region> gs://product_innovation_bucket
      ```
 
 ### Environment Setup

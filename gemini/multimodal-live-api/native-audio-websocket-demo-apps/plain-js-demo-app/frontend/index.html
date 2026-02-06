@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini Live API - Vanilla JS Example</title>
+    <style>
+      :root {
+        /* Google Brand Colors */
+        --google-blue: #4285f4;
+        --google-red: #db4437;
+        --google-yellow: #f4b400;
+        --google-green: #0f9d58;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        transition: all 0.5s ease-in-out;
+      }
+
+      .container {
+        display: flex;
+        gap: 20px;
+      }
+      .left-column {
+        flex: 1;
+      }
+      .right-column {
+        flex: 1;
+      }
+
+      #setupJsonDisplay {
+        background-color: #f4f4f4;
+        padding: 10px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+
+      .user-transcript:before {
+        content: "USER SPEECH: ";
+        background-color: var(--google-yellow);
+        color: black;
+      }
+
+      .user::before {
+        content: "USER: ";
+        background-color: var(--google-green);
+        color: white;
+      }
+
+      .assistant:before {
+        content: "GEMINI SPEECH: ";
+        background-color: var(--google-blue);
+        color: white;
+      }
+
+      .system:before {
+        content: "SYSTEM: ";
+        background-color: var(--google-red);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gemini Live API - Vanilla JS Example</h1>
+    <p>
+      Vanilla JavaScript implementation with audio, video, and text streaming
+    </p>
+
+    <div class="container">
+      <!-- Left Column: API Configuration -->
+      <div class="left-column">
+        <!-- Connection Setup -->
+        <section>
+          <h2>API Configuration</h2>
+
+          <!-- Connection Settings -->
+          <details open>
+            <summary>Connection Settings</summary>
+            <div>
+              <label for="proxyUrl">Proxy WebSocket URL:</label><br />
+              <input
+                type="text"
+                id="proxyUrl"
+                placeholder="ws://localhost:8080"
+                value="ws://localhost:8080" />
+            </div>
+
+            <div>
+              <label for="projectId">Project ID:</label><br />
+              <input type="text" id="projectId" value="" />
+            </div>
+
+            <div>
+              <label for="model">Model ID:</label><br />
+              <input
+                type="text"
+                id="model"
+                value="gemini-live-2.5-flash-native-audio"
+                placeholder="Enter model ID" />
+            </div>
+          </details>
+
+          <!-- Gemini Behavior Settings -->
+          <br />
+          <details open>
+            <summary>Gemini Behavior</summary>
+            <div>
+              <label for="systemInstructions">System Instructions:</label><br />
+              <textarea id="systemInstructions" rows="3" cols="50">
+You are a helpful assistant. Be concise and friendly.</textarea
+              >
+            </div>
+
+            <div>
+              <label for="voiceSelect">Voice:</label><br />
+              <select id="voiceSelect">
+                <option value="Puck">Puck (Default)</option>
+                <option value="Charon">Charon</option>
+                <option value="Kore">Kore</option>
+                <option value="Fenrir">Fenrir</option>
+                <option value="Aoede">Aoede</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="temperature"
+                >Temperature: <span id="temperatureValue">1.0</span></label
+              ><br />
+              <input
+                type="range"
+                id="temperature"
+                min="0.1"
+                max="2.0"
+                step="0.1"
+                value="1.0" />
+              <br />
+              <small
+                >Controls randomness (0.0-2.0]. Higher = more creative/diverse,
+                Lower = more predictable/focused</small
+              >
+            </div>
+
+            <div>
+              <input type="checkbox" id="enableProactiveAudio" checked />
+              <label for="enableProactiveAudio"
+                >Enable proactive audio (Gemini will ignore speech based on
+                instructions)</label
+              >
+            </div>
+
+            <div>
+              <input type="checkbox" id="enableGrounding" />
+              <label for="enableGrounding"
+                >Enable Google grounding (Enabling Google grounding will disable
+                custom tools)
+              </label>
+            </div>
+
+            <div>
+              <input type="checkbox" id="enableAffectiveDialog" checked />
+              <label for="enableAffectiveDialog"
+                >Enable affective dialog (emotion detection and empathetic
+                responses)</label
+              >
+            </div>
+          </details>
+
+          <!-- Custom Tools -->
+          <br />
+          <details>
+            <summary>Custom Tools</summary>
+
+            <div>
+              <input type="checkbox" id="enableAlertTool" checked />
+              <label for="enableAlertTool">Show Alert Box</label>
+              <span> (Display browser alerts) </span>
+            </div>
+
+            <div>
+              <input type="checkbox" id="enableCssStyleTool" checked />
+              <label for="enableCssStyleTool">Add CSS Style</label>
+              <span> (Inject CSS styles into the page) </span>
+            </div>
+          </details>
+
+          <!-- Transcription Settings -->
+          <br />
+          <details>
+            <summary>Transcription Settings</summary>
+            <div>
+              <input type="checkbox" id="enableInputTranscription" checked />
+              <label for="enableInputTranscription"
+                >Enable input transcription (your speech)</label
+              >
+            </div>
+
+            <div>
+              <input type="checkbox" id="enableOutputTranscription" checked />
+              <label for="enableOutputTranscription"
+                >Enable output transcription (Gemini responses)</label
+              >
+            </div>
+          </details>
+
+          <!-- Activity Detection Settings -->
+          <br />
+          <details>
+            <summary>Activity Detection Settings</summary>
+            <div>
+              <input type="checkbox" id="disableActivityDetection" />
+              <label for="disableActivityDetection"
+                >Disable automatic activity detection</label
+              >
+            </div>
+
+            <div>
+              <label for="silenceDuration">Silence duration (ms):</label><br />
+              <input
+                type="number"
+                id="silenceDuration"
+                value="500"
+                min="500"
+                max="10000"
+                step="100" />
+            </div>
+
+            <div>
+              <label for="prefixPadding">Prefix padding (ms):</label><br />
+              <input
+                type="number"
+                id="prefixPadding"
+                value="500"
+                min="0"
+                max="2000"
+                step="100" />
+            </div>
+
+            <div>
+              <label for="endSpeechSensitivity"
+                >End of speech sensitivity:</label
+              ><br />
+              <select id="endSpeechSensitivity">
+                <option value="END_SENSITIVITY_UNSPECIFIED" selected>
+                  Default
+                </option>
+                <option value="END_SENSITIVITY_HIGH">
+                  High (quicker cutoff)
+                </option>
+                <option value="END_SENSITIVITY_LOW">Low (longer wait)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="startSpeechSensitivity"
+                >Start of speech sensitivity:</label
+              ><br />
+              <select id="startSpeechSensitivity">
+                <option value="START_SENSITIVITY_UNSPECIFIED" selected>
+                  Default
+                </option>
+                <option value="START_SENSITIVITY_HIGH">
+                  High (quicker detection)
+                </option>
+                <option value="START_SENSITIVITY_LOW">
+                  Low (more filtering)
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label for="activityHandling">Activity Handling:</label><br />
+              <select id="activityHandling">
+                <option value="ACTIVITY_HANDLING_UNSPECIFIED" selected>
+                  Default (Interrupts)
+                </option>
+                <option value="START_OF_ACTIVITY_INTERRUPTS">
+                  Interrupt (Barge-in)
+                </option>
+                <option value="NO_INTERRUPTION">No Interruption</option>
+              </select>
+            </div>
+          </details>
+
+          <br />
+
+          <div>
+            <button id="connectBtn">Connect</button>
+            <button id="disconnectBtn">Disconnect</button>
+          </div>
+
+          <br />
+
+          <div id="connectionStatus">Not connected</div>
+
+          <br />
+
+          <!-- Setup Message JSON Display -->
+          <details id="setupJsonSection" style="display: none">
+            <summary>
+              Setup Message JSON (raw config sent to Gemini API)
+            </summary>
+            <pre id="setupJsonDisplay"></pre>
+          </details>
+        </section>
+      </div>
+
+      <!-- Right Column: Media and Chat -->
+      <div class="right-column">
+        <!-- Media Controls -->
+        <section>
+          <h2>Media Streaming</h2>
+
+          <div class="container">
+            <div class="left-column">
+              <!-- Device Selectors -->
+              <div style="margin-bottom: 10px">
+                <div style="margin-bottom: 5px">
+                  <label for="micSelect">Microphone:</label><br />
+                  <select id="micSelect" style="width: 100%; max-width: 300px">
+                    <option value="">Default Microphone</option>
+                  </select>
+                </div>
+
+                <div style="margin-bottom: 10px">
+                  <label for="cameraSelect">Camera:</label><br />
+                  <select
+                    id="cameraSelect"
+                    style="width: 100%; max-width: 300px">
+                    <option value="">Default Camera</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <button id="startAudioBtn">Start Audio</button>
+                <button id="startVideoBtn">Start Video</button>
+                <button id="startScreenBtn">Share Screen</button>
+              </div>
+
+              <br />
+              <div>
+                <label for="volume">Output volume:</label>
+                <input type="range" id="volume" min="0" max="100" value="80" />
+                <span id="volumeValue">80%</span>
+              </div>
+            </div>
+
+            <div class="right-column">
+              <video
+                id="videoPreview"
+                autoplay
+                playsinline
+                muted
+                hidden
+                width="400"></video>
+            </div>
+          </div>
+        </section>
+
+        <!-- Chat Interface -->
+        <section>
+          <h2>Chat</h2>
+
+          <div
+            id="chatContainer"
+            style="
+              border: 1px solid;
+              height: 300px;
+              overflow-y: auto;
+              padding: 10px;
+            ">
+            <div>Connect to Gemini to start chatting</div>
+          </div>
+          <br />
+          <div>
+            <input
+              type="text"
+              id="chatInput"
+              placeholder="Type a message..."
+              autocomplete="off" />
+            <button id="sendBtn">Send</button>
+          </div>
+        </section>
+
+        <!-- Debug Info -->
+        <section>
+          <h2>Debug Info</h2>
+          <pre id="debugInfo">Ready to connect...</pre>
+        </section>
+      </div>
+    </div>
+
+    <!-- Load libraries -->
+    <script src="geminilive.js"></script>
+    <script src="mediaUtils.js"></script>
+    <script src="tools.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

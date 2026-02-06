@@ -1,0 +1,237 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenMedia Live</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-800 dark:to-purple-800 text-white shadow-2xl">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-black tracking-tight">GenMedia Live</h1>
+                    <p class="mt-1 text-sm text-indigo-100">Real-Time Multimodal AI Creation</p>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-lg bg-indigo-700 hover:bg-indigo-600 dark:bg-indigo-900 dark:hover:bg-indigo-800 transition-colors duration-200" title="Switch theme">
+                    <svg id="theme-toggle-light-icon" class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" style="display: none;">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg id="theme-toggle-dark-icon" class="w-5 h-5 text-indigo-200" fill="currentColor" viewBox="0 0 20 20" style="display: block;">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto flex gap-6">
+            
+            <aside class="w-80 flex-shrink-0 space-y-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                        <h3 class="text-lg font-bold">Authentication</h3>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div>
+                            <label for="project-id-input" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <span class="bg-indigo-600 text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-xs mr-1 font-bold">1</span>
+                                Google Cloud Project ID
+                            </label>
+                            <input type="text" id="project-id-input" class="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="my-project-id" autocomplete="off">
+                        </div>
+                        
+                        <div>
+                            <label for="location-input" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Region</label>
+                            <select id="location-input" class="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                <option value="us-central1" selected>us-central1</option>
+                                <option value="us-east1">us-east1</option>
+                                <option value="us-east4">us-east4</option>
+                                <option value="us-west1">us-west1</option>
+                                <option value="us-west4">us-west4</option>
+                                <option value="europe-west1">europe-west1</option>
+                                <option value="europe-west2">europe-west2</option>
+                                <option value="europe-west3">europe-west3</option>
+                                <option value="europe-west4">europe-west4</option>
+                                <option value="asia-east1">asia-east1</option>
+                                <option value="asia-northeast1">asia-northeast1</option>
+                                <option value="asia-southeast1">asia-southeast1</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <span class="bg-indigo-600 text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-xs mr-1 font-bold">2</span>
+                                Get Access Token
+                            </label>
+                            <button id="get-token-btn" class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md font-semibold mb-1 transition-colors">
+                                Open Cloud Shell
+                            </button>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 italic">
+                                Run <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded font-mono text-[10px]">gcloud auth print-access-token</code>
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <label for="access-token-input" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <span class="bg-indigo-600 text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-xs mr-1 font-bold">3</span>
+                                Paste Token
+                            </label>
+                            <input type="password" id="access-token-input" class="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="Paste token here" autocomplete="off">
+                        </div>
+
+                        <div id="validation-status" class="text-xs p-2 rounded min-h-[2rem] bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"></div>
+
+                        <button id="validate-token-btn" class="w-full py-2.5 bg-indigo-600 text-white text-sm rounded-md font-semibold hover:bg-indigo-700 transition-colors">Validate & Connect</button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                        <h3 class="text-lg font-bold">System Instructions</h3>
+                    </div>
+                    <div class="p-4">
+                        <textarea id="system-instructions-input" rows="5" class="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="Add custom instructions (e.g., voice style, behavior)"></textarea>
+                        <button id="save-instructions-btn" class="w-full mt-2 py-2 bg-purple-600 text-white text-sm rounded-md font-semibold hover:bg-purple-700">Save Instructions</button>
+                    </div>
+                </div>
+            </aside>
+
+            <div id="main-content" class="flex-1"></div>
+        </div>
+    </main>
+
+    <footer class="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-900 dark:to-purple-900 text-indigo-100 mt-12">
+        <div class="container mx-auto px-6 py-4 text-center text-sm">
+            <p>Made with ❤️ by Wafae Bakkali | wafaeb@google.com</p>
+        </div>
+    </footer>
+
+    <div id="notification-toast"></div>
+
+    <script type="module" src="/src/main.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const validateBtn = document.getElementById('validate-token-btn');
+            const getTokenBtn = document.getElementById('get-token-btn');
+            const saveInstructionsBtn = document.getElementById('save-instructions-btn');
+            const statusElement = document.getElementById('validation-status');
+            const projectIdInput = document.getElementById('project-id-input');
+
+            getTokenBtn?.addEventListener('click', () => {
+                const projectId = projectIdInput.value.trim();
+                if (!projectId) {
+                    statusElement.innerHTML = '<span class="text-orange-600 dark:text-orange-400 font-bold">Enter Project ID first</span>';
+                    projectIdInput.focus();
+                    return;
+                }
+                const cloudShellUrl = `https://console.cloud.google.com/cloudshell/editor?project=${projectId}&shellonly=true&show=terminal`;
+                statusElement.innerHTML = '<span class="text-green-600 dark:text-green-400 font-bold">Cloud Shell opening...</span>';
+                window.open(cloudShellUrl, '_blank', 'noopener,noreferrer');
+            });
+
+            validateBtn?.addEventListener('click', async () => {
+                const projectId = projectIdInput.value.trim();
+                const location = document.getElementById('location-input').value.trim();
+                const accessToken = document.getElementById('access-token-input').value.trim();
+                
+                if (!projectId) {
+                    statusElement.innerHTML = '<span class="text-red-600 dark:text-red-400 font-bold">Project ID required</span>';
+                    projectIdInput.focus();
+                    return;
+                }
+                
+                if (!accessToken) {
+                    statusElement.innerHTML = '<span class="text-red-600 dark:text-red-400 font-bold">Access token required</span>';
+                    document.getElementById('access-token-input').focus();
+                    return;
+                }
+                
+                validateBtn.disabled = true;
+                validateBtn.textContent = 'Validating...';
+                statusElement.innerHTML = '<span class="text-blue-600 dark:text-blue-400 font-bold">Testing credentials...</span>';
+                
+                try {
+                    const response = await fetch('/api/validate-token', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ projectId, location, accessToken })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.valid) {
+                        statusElement.innerHTML = '<span class="text-green-600 dark:text-green-400 font-bold">Connected!</span>';
+                        validateBtn.textContent = 'Connected';
+                        validateBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                        validateBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                        
+                        setTimeout(() => {
+                            validateBtn.textContent = 'Validate & Connect';
+                            validateBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                            validateBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                        }, 5000);
+                    } else {
+                        statusElement.innerHTML = `<span class="text-red-600 dark:text-red-400 font-bold">${result.message || 'Invalid credentials'}</span>`;
+                        validateBtn.textContent = 'Retry Validation';
+                    }
+                } catch (error) {
+                    console.error('Validation error:', error);
+                    statusElement.innerHTML = '<span class="text-red-600 dark:text-red-400 font-bold">Connection failed</span>';
+                    validateBtn.textContent = 'Retry Validation';
+                } finally {
+                    validateBtn.disabled = false;
+                }
+            });
+
+            saveInstructionsBtn?.addEventListener('click', async () => {
+                const instructions = document.getElementById('system-instructions-input').value;
+                try {
+                    const response = await fetch('/api/set-system-instructions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ instructions })
+                    });
+                    if (response.ok) {
+                        saveInstructionsBtn.textContent = 'Saved!';
+                        setTimeout(() => { saveInstructionsBtn.textContent = 'Save Instructions'; }, 2000);
+                    }
+                } catch (error) {
+                    console.error('Save error:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
