@@ -41,6 +41,9 @@ import ollama  # Added missing import
 import requests
 import streamlit as st
 
+# --- Logger Setup ---
+logger = logging.getLogger(__name__)
+
 # --- Configuration Constants ---
 DEBUG = False  # Set to False in production
 PROMPT_FOLDER = "prompts"
@@ -180,7 +183,7 @@ def get_rephraser_prompt(query: str) -> Optional[str]:
 
     try:
         formatted_prompt = """Now, please rephrase the following customer query:
-   
+
 {query}
 """
         formatted_prompt = prompt_template + formatted_prompt.format(query=query)
@@ -222,19 +225,19 @@ def get_summarizer_prompt(documents: List[str], query: str) -> Optional[str]:
     formatted_prompt = """
 Now it's your turn! Here is the query and relevant documents:
     Customer Search Query: {query}
-    
+
     Document Texts:
     [Start of Document 1]
     {Text_of_Document_1}
     [End of Document 1]
-    
+
     [Start of Document 2]
     {Text_of_Document_2}
     [End of Document 2]
-    
+
     [Start of Document 3]
     {Text_of_Document_3}
-    [End of Document 3]    
+    [End of Document 3]
     """
 
     try:
@@ -753,7 +756,7 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
     Sets up the sidebar for Vertex AI Search connection and returns the LLM.
 
     Returns:
-        An initialized VertexAI LLM object for use with the retriever,
+        An initialized Vertex AI LLM object for use with the retriever,
         or None if configuration fails.
     """
     with st.sidebar:
@@ -803,8 +806,8 @@ def setup_retriever_sidebar() -> Optional[VertexAI]:
         try:
             llm = VertexAI(model_name=DEFAULT_VERTEX_SEARCH_MODEL, project=project_id)
         except Exception as e:
-            st.error(f"Failed to initialize VertexAI LLM for retriever: {e}")
-            logging.exception("VertexAI LLM init error:")
+            st.error(f"Failed to initialize Vertex AI LLM for retriever: {e}")
+            logging.exception("Vertex AI LLM init error:")
             return None
 
         # Create the retriever (only if a datastore is selected)
@@ -844,7 +847,7 @@ def clean_json(response_text: str):
     response_text = response_text.replace("{{", "{").replace("}}", "}")
 
     pattern = r"(?:^```.*)"
-    modified_text = re.sub(pattern, "", response_text, 0, re.MULTILINE)
+    modified_text = re.sub(pattern, "", response_text, count=0, flags=re.MULTILINE)
     try:
         # print(modified_text)
         result = json.loads(modified_text)
@@ -968,23 +971,23 @@ def judge_responses(
 
         # Load the prompt for the judge model
         judge_prompt = f"""Given the following QUESTION and the CONTEXT which is the source of truth to use, judge each model's response:
-        
+
         Here are two responses from different language models:
 
         Response from model on the left:
         QUESTION:
         {left_question}
-        
+
         CONTEXT:
         {left_context}
 
         Response A (Model on the Left):
         {left_response['text']}
-        
+
         Response from model on the right:
         QUESTION:
         {right_question}
-        
+
         CONTEXT:
         {right_context}
 
@@ -1030,8 +1033,8 @@ def judge_responses(
 # --- Main Application ---
 def main(args: argparse.Namespace):  # <-- Pass parsed args to main
     """Runs the main Streamlit application flow."""
-    st.set_page_config("Vertex RAG Compare with Dual LLMs", layout="wide")
-    st.title("📊 Vertex RAG Compare with 2 LLM's")
+    st.set_page_config("Vertex AI RAG Compare with Dual LLMs", layout="wide")
+    st.title("📊 Vertex AI RAG Compare with 2 LLM's")
     st.caption("Compare LLM responses using Vertex AI Search RAG")
 
     # --- Initialization ---
