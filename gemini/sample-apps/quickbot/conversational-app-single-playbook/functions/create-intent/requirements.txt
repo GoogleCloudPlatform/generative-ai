@@ -6,8 +6,8 @@ google-cloud-aiplatform==1.69.0
 google-cloud-logging==3.11.2
 
 langchain==0.3.2
-langchain_community==0.3.27
-langchain-core==0.3.9
+langchain_community==0.4.1
+langchain-core==0.3.81
 langchain-google-vertexai==2.0.4
 langchain-google-community==2.0.1
 pdfminer.six==20240706
