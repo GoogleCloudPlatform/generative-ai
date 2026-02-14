@@ -33,6 +33,8 @@ For a detailed understanding of the system's architecture, including component b
       gcloud auth login
       gcloud auth application-default login # for providing credentials to applications and code
       ```
+3.  **Set environment variables:**
+    Set your environment variables by creating a **.env file** in the project directory by utilizing the **.env.example file**
 
 ## Quickstart (For local testing)
 
@@ -49,11 +51,7 @@ This project is implemented using Python 3.12.
     pip install -r requirements.txt
     ```
 
-3.  **Set environment variables:**
-    Set your environment variables by creating a **.env file** in the project directory by utilizing the **.env.example file**
-
-
-4.  **Install the ngrok:**
+3.  **Install the ngrok:**
     To install ngrok on Linux, you can follow these steps:
 
    - ***Download ngrok:***
@@ -75,7 +73,7 @@ This project is implemented using Python 3.12.
    - Verify by running the **ngrok --version**
 
 
-5. **Expose Your Local Server with ngrok:**
+4. **Expose Your Local Server with ngrok:**
     open another terminal and run ngrok to create a public URL that tunnels to your local port 8000.
 
     ```bash
@@ -84,24 +82,24 @@ This project is implemented using Python 3.12.
     ngrok will give you a public **Forwarding URL**, which will look something like **https://<random-string>.ngrok-free.dev**
 
 
-6. **Update Environment Variable:**
+5. **Update Environment Variable:**
       You need to set the SERVICE_URL as an environment variable to the ngrok forwarding URL. Update your SERVICE_URL in your .env file
   This is critical because your application uses this URL to tell Twilio where to connect the WebSocket.
     ```bash
         SERVICE_URL=https://<random-string>.ngrok-free.dev
     ```
 
-7.  **Run the FastAPI App Locally:**
+6.  **Run the FastAPI App Locally:**
       Start the application on your another terminal in your local machine after updating .env file with SERVICE_URL.
       ```bash
         uvicorn main:app --host 0.0.0.0 --port 8000
       ```
 
-8.  **Set up a Twilio Trial Account:**
+7.  **Set up a Twilio Trial Account:**
     - Create a free trial account at [Twilio](https://www.twilio.com/try-twilio).
     - Once your account is created, you will get a trial phone number and free credits to get started.
 
-9. **Configure Twilio Webhook:**
+8. **Configure Twilio Webhook:**
     - Go to your Twilio phone number's configuration in the Twilio console.
     - Update the "A CALL COMES IN" webhook URL to point to your ngrok URL, followed by the /twiml endpoint (e.g., https://<random-string>.ngrok-free.dev/twiml).
 
