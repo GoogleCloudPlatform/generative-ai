@@ -77,30 +77,31 @@ A critical part of the application is the real-time audio transcoding pipeline:
 
 ### **D. Component 3: Google Gemini Live API**
 
-The application uses the `google-generativeai` library to interact with the Google Gemini Live API.
+The application uses the `google-genai` library to interact with the Google Gemini Live API via the Vertex AI platform.
 
-#### **Conversation Loop**
+#### **Session Management**
 
-The `conversation_loop` function in `main.py` manages the interaction with the Gemini Live API. It:
-1.  Reads the previous conversation history from `transcription.txt` to provide context to the model.
-2.  Constructs a `LiveConnectConfig` with a system instruction, and configures the model for audio input and output.
-3.  Creates a new Gemini session for each turn of the conversation.
-4.  Uses two concurrent tasks (`sender` and `receiver`) to send audio to Gemini and receive audio and transcription from it.
+The `run_gemini_session` function in `utils/live_api.py` manages the persistent connection with the Gemini Live API. It:
+1.  Utilizes `session_handle` for seamless session resumption, ensuring conversational context is maintained across potential connection drops.
+2.  Constructs a `LiveConnectConfig` using `utils/live_api_config.py`, which includes system instructions, audio configuration, and real-time input settings (VAD).
+3.  Establishes a single, persistent session for the duration of the call, with automatic reconnection logic if the stream is interrupted.
+4.  Orchestrates two concurrent tasks (`sender_loop` and `heartbeat_loop`) and a primary message receiver to manage bidirectional audio and control signals.
 
-### **E. Component 4: Utility Functions (`utils.py`)**
+### **E. Component 4: The `utils/` Package**
 
-The `utils.py` file contains helper functions for the application.
+The logic is modularized into a `utils/` package containing specialized modules:
 
-#### **`save_transcription`**
-
-This function appends the user's and Gemini's transcribed text to a file named `transcription.txt`. This file is used to maintain the conversation history for the duration of a single call.
+*   **`live_api.py`**: Contains `run_gemini_session`, the core orchestrator for Gemini Live interactions, supporting sender/receiver loops and session resumption.
+*   **`live_api_config.py`**: Defines the `LiveConnectConfig`, centralizing API settings, system instructions, and Voice Activity Detection (VAD) parameters.
+*   **`audio_transcoding.py`**: Implements the real-time audio pipeline, handling conversions between Twilio's 8kHz µ-law and Gemini's 16kHz/24kHz PCM formats.
+*   **`prompt.py`**: Stores the `BASE_SYSTEM_INSTRUCTION` and other persona-related configurations.
 
 ### **F. State Management**
 
-For this sample application, state management is handled simply:
+For this sample application, state management is handled using an in-memory and handle-based approach:
 
-*   **In-memory state:** The `call_state` dictionary holds the status of the call.
-*   **File-based conversation history:** The `transcription.txt` file stores the conversation history for a single call. It is created at the start of the call and deleted at the end.
+*   **In-memory state**: The `call_state` dictionary maintains the real-time status of the call, including activity flags and stream SIDs.
+*   **Session Resumption Handle**: Instead of file-based history, the system leverages Gemini's `session_handle` property. This token is captured from session updates and used during reconnection to restore the full conversational context within the API itself.
 
 For a production system, a more robust solution like **Google Memorystore (Redis)** would be recommended to externalize the conversational state, allowing for horizontal scaling and better resilience.
 
@@ -134,9 +135,9 @@ A step-by-step process to create the Gemini Live Telephony application, a real-t
   - It will use `asyncio.create_task` to run three concurrent tasks:
     1. `handle_twilio_to_gemini`: Processes audio from Twilio to Gemini.
     2. `handle_gemini_to_twilio`: Processes audio from Gemini to Twilio.
-    3. `conversation_loop`: Manages the conversation logic with the Gemini API.
+    3. `run_gemini_session`: Manages the high-level Gemini session logic from `utils/live_api.py`.
 
-## 3. Audio Transcoding Pipeline (`main.py`)
+## 3. Audio Transcoding Pipeline (`utils/audio_transcoding.py`)
 
 - **Inbound (Twilio to Gemini):**
   - **Base64 Decoding:** Decode the Base64 payload from Twilio media messages.
@@ -147,30 +148,29 @@ A step-by-step process to create the Gemini Live Telephony application, a real-t
   - **PCM to µ-law:** Convert the 8kHz linear PCM to µ-law using `audioop.lin2ulaw`.
   - **Base64 Encoding:** Encode the µ-law audio to Base64 to be sent back to Twilio.
 
-## 4. Gemini Live Integration (`main.py`)
+## 4. Gemini Live Integration (`utils/live_api.py`)
 
-- **Initialize Gemini Client:** Set up the Gemini client with the API key from environment variables.
-- **`conversation_loop` Function:**
-  - **System Instruction:** Define a detailed system instruction for the Gemini model, including persona, context, and constraints.
-  - **Conversation History:** Read the `transcription.txt` file to provide the previous conversation history to the model for context.
-  - **`LiveConnectConfig`:** Configure the Gemini session with the system instruction, audio settings, and real-time input configuration.
-  - **Session Management:** Create a new Gemini Live session for each turn of the conversation.
-  - **Sender/Receiver Tasks:** Use `asyncio` tasks to concurrently send audio to and receive audio/transcription from the Gemini session.
+- **Initialize Gemini Client**: Set up the Gemini client with Vertex AI and project/location settings.
+- **`run_gemini_session` Function**:
+  - **`LiveConnectConfig`**: Configure the session via `utils/live_api_config.py`.
+  - **Session Management**: Establish a persistent connection that stays active throughout the call.
+  - **Sender/Heartbeat/Receiver Loops**: Use concurrent tasks to stream audio and monitor for session updates.
+  - **Resumption Logic**: Utilize `session_handle` to restore state during reconnection.
 
-## 5. Utility Functions (`utils.py`)
+## 5. Utility Package (`utils/`)
 
-- **`save_transcription` Function:**
-  - Create a function to append the user and Gemini transcriptions to a file named `transcription.txt`.
-  - This file will serve as a simple, file-based method for maintaining conversation history during a single call.
+- **Modular Organization**: The code is separated into multiple files within the `utils/` directory.
+- **`live_api_config.py`**: Manages all connection parameters, including VAD sensitivity and system instructions.
+- **`prompt.py`**: Centralizes the `BASE_SYSTEM_INSTRUCTION` for the AI persona.
+- **`audio_transcoding.py`**: Contains the resampling and transcoding logic previously in `main.py`.
 
 ## 6. State Management
 
-- **In-memory State:** Use a Python dictionary (`call_state`) to manage the active state of the call within a single Cloud Run instance.
-- **File-based Conversation History:**
-  - At the start of a call, create a `transcription.txt` file.
-  - Throughout the call, append transcriptions to this file.
-  - At the end of the call, delete the `transcription.txt` file to clear the history for the next call.
-- **Note on Production Systems:** For a production-grade application, this file-based approach should be replaced with a more robust solution like Google Memorystore (Redis) to handle horizontal scaling and state persistence.
+- **In-memory State**: Use a Python dictionary (`call_state`) to manage the active state of the call within a single Cloud Run instance.
+- **Session Resumption Logic**:
+  - Instead of file-based history, captures `session_resumption_update` messages.
+  - Saves the `new_handle` to be reused in subsequent `connect` calls.
+- **Note on Production Systems**: For a production-grade application, externalize state to a robust solution like Google Memorystore (Redis).
 
 ## 7. Containerization and Deployment
 
