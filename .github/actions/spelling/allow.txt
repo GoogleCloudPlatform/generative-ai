@@ -39,6 +39,7 @@ ALDS
 Alibaba
 alisal
 alloydb
+Alok
 ALPHAFOLD
 AMNOSH
 amurensis
@@ -106,6 +107,7 @@ Ayyappa
 backstory
 backticks
 bagchi
+Bakkali
 bargap
 barmode
 barpolar
@@ -457,6 +459,8 @@ flac
 Flahs
 Flatform
 Flipkart
+Flirble
+Flirbles
 floormat
 FLX
 fmeasure
@@ -511,6 +515,7 @@ geboten
 gemhall
 genai
 genkit
+genmedia
 GenTwo
 genwealth
 geocoded
@@ -776,6 +781,7 @@ labetalol
 Ladhak
 LAION
 lakecolor
+LANCZOS
 landcolor
 landuse
 langgraph
@@ -1014,6 +1020,7 @@ nunique
 nvidia
 NVIDIA
 NVL
+NYT
 oai
 objc
 ODb
@@ -1314,6 +1321,7 @@ shrt
 Shubham
 Shyamalan
 sid
+sids
 siglap
 signings
 simage
@@ -1531,6 +1539,7 @@ Vardhan
 Vaswani
 Vayots
 VBG
+vcodec
 VCPU
 vectoral
 vectordb
@@ -1542,7 +1551,10 @@ Ves
 Vesia
 vesselin
 Vettel
+vframes
 VFT
+vibeo
+vid
 Vid
 vidgen
 VIDGEN
@@ -1572,6 +1584,7 @@ VSPM
 vtotal
 vtt
 vulnz
+Wafae
 wafaeb
 WAI
 Wakatipu

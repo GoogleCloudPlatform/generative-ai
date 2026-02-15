@@ -1,0 +1,8 @@
+flask>=3.0.0
+flask-cors>=4.0.0
+flask-socketio>=5.3.5
+python-socketio>=5.10.0
+google-cloud-aiplatform>=1.71.1
+google-genai>=1.0.0
+google-cloud-storage>=2.14.0
+pillow>=10.4.0

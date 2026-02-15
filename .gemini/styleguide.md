@@ -1,14 +1,12 @@
 # GoogleCloudPlatform/generative-ai Style Guide
 
-The current year is 2025.
+The current year is 2026.
 
 ## Markdown Style (For `.md` files and `.ipynb` Markdown Cells)
 
 - Use single backticks ( ` ` ) to format inline code elements, such as variable names, function names, enum names, and brief code snippets.
 - Add documentation links to the appropriate Vertex AI pages when describing product features. e.g. https://cloud.google.com/vertex-ai/generative-ai/docs
   - Do not reference documentation from the Gemini Developer API, e.g. https://ai.google.dev/ unless there is not a suitable page in the Vertex AI documentation.
-
----
 
 The Author block in Notebooks and Markdown should be in a format like this:
 
@@ -35,19 +33,56 @@ For multiple authors
 PROJECT_ID = "[your-project-id]"
 ```
 
-***Incorrect**
+**Incorrect**
 
 ```py
 PROJECT_ID = "actual-projectid-1234"
 ```
 
+- Use the `global` endpoint for all requests, unless a regional endpoint is specifically required for a model or feature.
+
+**Correct**
+
+```py
+LOCATION = "global"
+```
+
+**Incorrect**
+
+```py
+LOCATION = "us-central1"
+```
+
+- Don't restart the kernel or use `!pip`, use `%pip` when installing
+
+**Correct**
+
+```sh
+%pip install
+```
+
+**Incorrect**
+
+```sh
+!pip install
+```
+
+```sh
+!pip3 install
+```
+
+```py
+app = IPython.Application.instance()
+app.kernel.do_shutdown(True)
+```
+
 ## Golden Rule: Use the Correct and Current SDK
 
-Always use the **Google GenAI SDK** (`google-genai`), which is the unified
+Always use the **Google Gen AI SDK** (`google-genai`), which is the unified
 standard library for all Gemini API requests (AI Studio/Gemini Developer API
-and Vertex AI) as of 2025. Do not use legacy libraries and SDKs.
+and Vertex AI) as of 2026. Do not use legacy libraries and SDKs.
 
--   **Library Name:** Google GenAI SDK
+-   **Library Name:** Google Gen AI SDK
 -   **Python Package:** `google-genai`
 -   **Legacy Library**: (`google-generativeai`) is deprecated.
 
@@ -83,7 +118,6 @@ and Vertex AI) as of 2025. Do not use legacy libraries and SDKs.
 -   **Incorrect:** `from google.api_core.exceptions import GoogleAPIError` ->
     **Correct:** `from google.genai.errors import APIError`
 -   **Incorrect:** `types.ResponseModality.TEXT`
-
 
 ## Models
 
