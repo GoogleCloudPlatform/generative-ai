@@ -21,15 +21,20 @@ total_count=0
 successful_notebooks=()
 successful_count=0
 
+# Array to store "OPERATION_ID:NOTEBOOK_PATH" for polling
+launched_operation_details=()
+
+echo "Starting to launch notebook executions..."
+
 for x in $TARGET; do
   total_count=$((total_count + 1))
   # Use the full path from the repository for display name
   DISPLAY_NAME="${x##generative-ai/}"
   DISPLAY_NAME="${DISPLAY_NAME%.ipynb}-$current_date-$current_time"
-  echo "Starting execution for ${x}"
+  echo "Launching execution for ${x}"
 
-  # Execute and get the operation ID
-  OPERATION_ID=$(gcloud colab executions create \
+  # Execute asynchronously and get the full operation name
+  OPERATION_ID_FULL=$(gcloud colab executions create \
     --display-name="$DISPLAY_NAME" \
     --notebook-runtime-template="$NOTEBOOK_RUNTIME_TEMPLATE" \
     --direct-content="$x" \
@@ -39,36 +44,81 @@ for x in $TARGET; do
     --service-account="$SA" \
     --verbosity=debug \
     --execution-timeout="1h30m" \
+    --async \
     --format="value(name)")
 
-  echo "Operation ID: $OPERATION_ID"
-  TRUNCATED_OPERATION_ID=$(echo "$OPERATION_ID" | cut -c 67-85)
-
-  # check job status
-  echo "Waiting for execution to complete..."
-  if ! EXECUTION_DETAILS=$(gcloud colab executions describe "$TRUNCATED_OPERATION_ID" --region="$REGION"); then
-    echo "Error describing execution for ${x}. See logs for details."
+  if [[ -z "$OPERATION_ID_FULL" ]]; then
+    echo "Error: Failed to create execution for ${x}. No operation ID returned."
     failed_count=$((failed_count + 1))
-    failed_notebooks+=("${x}")
-    continue
-  else
-    echo "Execution completed for ${x}"
-  fi
-
-  # Check the jobState
-  JOB_STATE=$(echo "$EXECUTION_DETAILS" | grep "jobState:" | awk '{print $2}')
-  if [[ "$JOB_STATE" == "JOB_STATE_SUCCEEDED" ]]; then
-    echo "Notebook execution succeeded."
-    successful_count=$((successful_count + 1))
-    successful_notebooks+=("${x}")
-  else
-    echo "Notebook execution failed. Job state: $JOB_STATE. Please use id $TRUNCATED_OPERATION_ID to troubleshoot notebook ${x}. See log for details."
-    failed_count=$((failed_count + 1))
-    failed_notebooks+=("${x}")
+    failed_notebooks+=("${x} (failed to launch)")
     continue
   fi
 
+  TRUNCATED_OPERATION_ID=$(echo "$OPERATION_ID_FULL" | cut -c 67-85)
+
+  echo "Launched execution for ${x}, Operation ID: $TRUNCATED_OPERATION_ID (Full Name: $OPERATION_ID_FULL)"
+  launched_operation_details+=("$TRUNCATED_OPERATION_ID:${x}")
 done
+
+echo "All notebook executions launched. Now waiting for completion..."
+
+pending_operations=("${launched_operation_details[@]}")
+
+while [[ ${#pending_operations[@]} -gt 0 ]]; do
+  echo "Number of pending operations: ${#pending_operations[@]}"
+  still_pending_next_round=() # Operations that are still PENDING/RUNNING for the next iteration
+
+  for op_info in "${pending_operations[@]}"; do
+    TRUNCATED_OPERATION_ID="${op_info%%:*}"
+    NOTEBOOK_PATH="${op_info#*:}"
+
+    echo "Checking status for operation: $TRUNCATED_OPERATION_ID (Notebook: $NOTEBOOK_PATH)"
+
+    EXECUTION_DETAILS=""
+    # Describe the execution. Added --project for explicitness.
+    if ! EXECUTION_DETAILS=$(gcloud colab executions describe "$TRUNCATED_OPERATION_ID" --project="$PROJECT_ID" --region="$REGION" 2>&1); then
+      echo "Error describing execution for $TRUNCATED_OPERATION_ID (Notebook: $NOTEBOOK_PATH). Marking as failed."
+      echo "Describe error details: $EXECUTION_DETAILS"
+      failed_count=$((failed_count + 1))
+      failed_notebooks+=("${NOTEBOOK_PATH} (describe error)")
+      continue # Handled (as failed), move to the next operation in this polling round
+    fi
+
+    # Parse the top-level 'state:' field from the describe output
+    EXECUTION_STATE=$(echo "$EXECUTION_DETAILS" | grep -E "^state:" | awk '{print $2}')
+
+    echo "Notebook: $NOTEBOOK_PATH, Operation: $TRUNCATED_OPERATION_ID, Execution State: $EXECUTION_STATE"
+
+    if [[ "$EXECUTION_STATE" == "SUCCEEDED" ]]; then
+      echo "Notebook execution succeeded for $NOTEBOOK_PATH."
+      successful_count=$((successful_count + 1))
+      successful_notebooks+=("${NOTEBOOK_PATH}")
+    elif [[ "$EXECUTION_STATE" == "FAILED" || "$EXECUTION_STATE" == "CANCELLED" || "$EXECUTION_STATE" == "EXPIRED" ]]; then
+      echo "Notebook execution failed, was cancelled, or expired for $NOTEBOOK_PATH. State: $EXECUTION_STATE. Please use id $TRUNCATED_OPERATION_ID to troubleshoot."
+      failed_count=$((failed_count + 1))
+      failed_notebooks+=("${NOTEBOOK_PATH}")
+    elif [[ "$EXECUTION_STATE" == "PENDING" || "$EXECUTION_STATE" == "RUNNING" || "$EXECUTION_STATE" == "INITIALIZING" ]]; then
+      echo "Notebook execution for $NOTEBOOK_PATH is still in progress (State: $EXECUTION_STATE). Will check again."
+      still_pending_next_round+=("$op_info")
+    else
+      # Handle unknown or unexpected states
+      echo "Unknown execution state '$EXECUTION_STATE' for $NOTEBOOK_PATH (Operation: $TRUNCATED_OPERATION_ID). Marking as failed."
+      echo "Full describe output for unknown state: $EXECUTION_DETAILS"
+      failed_count=$((failed_count + 1))
+      failed_notebooks+=("${NOTEBOOK_PATH} (unknown state: $EXECUTION_STATE)")
+    fi
+  done
+
+  pending_operations=("${still_pending_next_round[@]}")
+
+  if [[ ${#pending_operations[@]} -gt 0 ]]; then
+    SLEEP_DURATION=30 # seconds
+    echo "Waiting for $SLEEP_DURATION seconds before next check for ${#pending_operations[@]} pending operations..."
+    sleep $SLEEP_DURATION
+  fi
+done
+
+echo "All executions have completed processing."
 
 # Print the final list of failed notebooks
 if [[ ${#failed_notebooks[@]} -gt 0 ]]; then
@@ -87,12 +137,6 @@ if [[ $successful_count -gt 0 ]]; then
 fi
 
 # Prep pub/sub message
-failed_notebooks_str=$(
-  IFS=', '
-  echo "${failed_notebooks[*]}"
-)
-
-# prep notebook name for pub/sub message
 failed_notebooks_str=$(
   IFS=', '
   echo "${failed_notebooks[*]}"
@@ -138,7 +182,6 @@ message_data="{\"total_count\":$((total_count + 0)),\"failed_count\":$((failed_c
 echo "$(date) - INFO - Publishing to Pub/Sub topic: $PUBSUB_TOPIC"
 if ! gcloud pubsub topics publish "$PUBSUB_TOPIC" --message="$message_data" --project="$PROJECT_ID"; then
   echo "$(date) - ERROR - Failed to publish to Pub/Sub topic $PUBSUB_TOPIC. Check permissions and topic configuration."
-  #exit 1
 fi
 
-echo "All notebook executions completed."
+echo "All notebook test processing and reporting completed."
