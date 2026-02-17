@@ -31,6 +31,7 @@ The following video demonstrating the Multimodal Live API shows an example use c
 5. [Real-time Advisor](native-audio-websocket-demo-apps/realtime-advisor-demo-app/): A specialized advisor persona that can switch between silent and outspoken modes.
 6. [Customer Support Agent](native-audio-websocket-demo-apps/customer-support-demo-app/): An advanced agent with emotion detection, multimodal input, and tool execution.
 7. [Gaming Assistant](native-audio-websocket-demo-apps/gaming-assistant-demo-app/): A gaming companion with persona switching and screen sharing capabilities.
+8. [Wealth Advisor](native-audio-websocket-demo-apps/wealth-advisor/): A finantial advisor which uses a RAG system to help you take the most informed decision
 
 ### Tools
 

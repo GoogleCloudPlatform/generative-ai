@@ -1,0 +1,201 @@
+{
+  "clientId": "CLIENT-001",
+  "clientDetails": {
+    "name": {
+      "firstName": "Josh",
+      "lastName": "User",
+      "salutation": "",
+      "nickname": "Josh"
+    },
+    "address": {
+      "street": "456 Innovation Drive",
+      "city": "Austin",
+      "stateProvince": "TX",
+      "postalCode": "78701",
+      "country": "USA"
+    },
+    "contact": {
+      "phoneNumbers": ["987-654-3210"],
+      "emails": ["josh.user@demo.com"]
+    },
+    "education": "State University",
+    "dateOfBirth": "1985-03-22",
+    "maritalStatus": "Married",
+    "nationality": ""
+  },
+  "relatedParties": [
+    {
+      "name": {
+        "firstName": "Sarah",
+        "lastName": "User"
+      },
+      "relationship": "Spouse",
+      "dateOfBirth": "",
+      "contact": {
+        "phoneNumbers": [],
+        "emails": []
+      }
+    },
+    {
+      "name": {
+        "firstName": "Emma",
+        "lastName": ""
+      },
+      "relationship": "Daughter",
+      "dateOfBirth": "",
+      "contact": {
+        "phoneNumbers": [],
+        "emails": []
+      }
+    },
+    {
+      "name": {
+        "firstName": "Noah",
+        "lastName": ""
+      },
+      "relationship": "Son",
+      "dateOfBirth": "",
+      "contact": {
+        "phoneNumbers": [],
+        "emails": []
+      }
+    }
+  ],
+  "financialSummary": {
+    "totalBalance": {
+      "currency": "USD",
+      "amount": 480000
+    },
+    "annualIncome": {
+      "currency": "USD",
+      "amount": 520000
+    },
+    "householdIncome": {
+      "currency": "USD",
+      "amount": 980000
+    },
+    "annualBonus": {
+        "currency": "USD",
+        "amount": 110000
+    },
+    "InvestmentAccountDetails": [
+      {
+        "accountId": "BROKERAGE-ACCT-001",
+        "accountType": "Brokerage Account",
+        "currency": "USD",
+        "balance": 160000,
+        "isManagedProduct": false,
+        "feesInBasisPoints": 0
+      }
+    ],
+    "BankingAccountDetails": [
+      {
+        "accountId": "PREMIUM-CHK-001",
+        "accountType": "Premium Checking",
+        "bankName": "Financial Institution",
+        "currency": "USD",
+        "currentBalance": 520000,
+        "availableBalance": 520000
+      }
+    ],
+    "LoanAccountDetails": []
+  },
+  "InvestmentPortfolio": {
+    "ytd_return": 0.52,
+    "positions": [
+      {
+        "accountId": "BROKERAGE-ACCT-001",
+        "assetId": "ACME-001",
+        "assetType": "Stock",
+        "symbol": "ACME",
+        "quantity": 10500,
+        "currentPrice": {
+          "currency": "USD",
+          "amount": 155
+        },
+        "purchasePrice": {
+          "currency": "USD",
+          "amount": 145
+        },        
+        "marketValue": {
+          "currency": "USD",
+          "amount": 1627500
+        }
+      },
+      {
+        "accountId": "BROKERAGE-ACCT-001",
+        "assetId": "NVDA-001",
+        "assetType": "Stock",
+        "class": "Common",
+        "symbol": "NVDA",
+        "quantity": 5000,
+        "currentPrice": {
+          "currency": "USD",
+          "amount": 120
+        },
+        "purchasePrice": {
+          "currency": "USD",
+          "amount": 90
+        },
+        "marketValue": {
+          "currency": "USD",
+          "amount": 600000
+        }
+      }
+    ],
+    "cashHoldings": []
+  },
+  "transactionsLast30Days": [
+    {
+      "transactionId": "TXN-001",
+      "accountId": "PREMIUM-CHK-001",
+      "accountCategory": "Cash & Equivalents",
+      "date": "2025-09-01T00:00:00Z",
+      "type": "Deposit",
+      "description": "Significant transfer from external savings.",
+      "amount": {
+        "currency": "USD",
+        "amount": 750000
+      },
+      "status": "Completed",
+      "relatedAssetId": ""
+    }
+  ],
+  "interactions": {
+    "loginDetails": [],
+    "calls": [],
+    "emails": []
+  },
+  "CommunicationPreferences": {
+    "email": true,
+    "phone": true,
+    "mail": false,
+    "sms": false,
+    "AITonePreference": "Casual",
+    "AgentAvatarPreference": null,
+    "newsletterSubscription": true
+  },
+  "investmentProfile": {
+    "riskTolerance": "Balanced Growth",
+    "timeHorizon": "Long-term",
+    "financialGoals": [
+      "Retirement Planning",
+      "Education Funding for children",
+      "New Home Purchase"
+    ],
+    "liquidityNeeds": "Low",
+    "investmentObjectives": [
+      "Growth"
+    ],
+    "yearsOfExperience": {
+      "equities": 10,
+      "fixedIncome": 5,
+      "options": 2,
+      "margin": 0,
+      "alts": 1,
+      "mutualFunds": 8
+    }
+  },
+  "pastAIAdvisorInteractions": [],
+  "pipelineOpportunities": []
+}
