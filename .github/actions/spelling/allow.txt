@@ -723,6 +723,8 @@ jiwer
 Joji
 Jolyon
 Jostar
+jpm
+JPM
 JPY
 jsemer
 jsonify
