@@ -1,6 +1,6 @@
 # Setup & Development Guide
 
-This guide covers how to set up the Google Cloud Wealth Advisor project locally for development.
+This guide covers how to set up the Google Cloud Financial Advisor project locally for development.
 
 ## 📋 Prerequisites
 

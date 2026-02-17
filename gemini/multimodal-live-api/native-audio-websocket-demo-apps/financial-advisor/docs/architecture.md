@@ -1,8 +1,8 @@
-# Google Cloud Wealth Advisor - Architecture & Design
+# Google Cloud Financial Advisor - Architecture & Design
 
 ## 🏛 System Overview
 
-The Google Cloud Wealth Advisor is an advanced, voice-first conversational AI application designed to provide personalized financial guidance. It leverages a **"Thick Server"** architecture powered by the **Google Agent Development Kit (ADK)** to ensure secure, stateful, and enterprise-grade interactions.
+The Google Cloud Financial Advisor is an advanced, voice-first conversational AI application designed to provide personalized financial guidance. It leverages a **"Thick Server"** architecture powered by the **Google Agent Development Kit (ADK)** to ensure secure, stateful, and enterprise-grade interactions.
 
 ### High-Level Architecture
 

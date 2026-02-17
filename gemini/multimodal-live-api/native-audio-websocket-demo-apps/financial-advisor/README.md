@@ -1,4 +1,4 @@
-# Google Cloud Wealth Advisor
+# Google Cloud Financial Advisor
 
 <div align="center">
 
@@ -18,7 +18,7 @@
 
 ## 🔭 Overview
 
-The **Google Cloud Wealth Advisor** is a reference implementation for building secure, stateful, and multimodal conversational agents. This project uses a **Server-Centric** (or "Thick Server") architecture, which is crucial for enterprise-grade financial applications requiring robust controls over data flow, security, and state management. For a detailed architectural deep dive, including a comparison with direct-to-LLM patterns, please refer to the [Architecture Deep Dive](docs/architecture.md).
+The **Google Cloud Financial Advisor** is a reference implementation for building secure, stateful, and multimodal conversational agents. This project uses a **Server-Centric** (or "Thick Server") architecture, which is crucial for enterprise-grade financial applications requiring robust controls over data flow, security, and state management. For a detailed architectural deep dive, including a comparison with direct-to-LLM patterns, please refer to the [Architecture Deep Dive](docs/architecture.md).
 
 It demonstrates how to build an agent that can:
 1.  **Speak** naturally with users in real-time (using Gemini Live API).

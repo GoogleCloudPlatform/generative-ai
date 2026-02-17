@@ -41,7 +41,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-2xl mb-6 shadow-lg flex items-center justify-center">
           <span className="text-4xl font-bold text-white">W</span>
         </div>
-        <h1 className="text-4xl font-bold text-white mb-2">Wealth Advisor</h1>
+        <h1 className="text-4xl font-bold text-white mb-2">Financial Advisor</h1>
         <p className="text-zinc-400 text-lg">Your financial future, reimagined.</p>
       </div>
 
