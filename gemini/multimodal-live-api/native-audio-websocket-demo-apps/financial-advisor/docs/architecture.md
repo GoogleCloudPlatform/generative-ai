@@ -14,7 +14,7 @@ graph TD
 
     subgraph "Backend Services"
         Agent -- "Reads/Writes" --> Firestore[("Firestore User Data")]
-        Agent -- "RAG Search" --> Vertex AI [Vertex AI Search]
+        Agent -- "RAG Search" --> Vertex_AI[Vertex AI Search]
         Agent -- "Tools" --> PythonTools[Python Tools]
     end
 

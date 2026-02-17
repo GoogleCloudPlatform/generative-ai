@@ -35,7 +35,7 @@ graph LR
 
     subgraph "Secure Backend Zone"
         Backend <-->|State| Firestore[(Firestore)]
-        Backend <-->|RAG| Vertex AI [Vertex AI Search]
+        Backend <-->|RAG| Vertex_AI[Vertex AI Search]
         Backend <-->|Logic| Tools[Python Tools]
     end
 
