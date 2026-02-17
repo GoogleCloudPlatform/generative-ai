@@ -17,9 +17,11 @@ import audioop
 import base64
 import json
 import logging
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
+
 
 async def handle_twilio_to_gemini(
     websocket, audio_queue: asyncio.Queue, resampler, call_state
@@ -63,6 +65,7 @@ async def handle_twilio_to_gemini(
         except Exception as e:
             logger.error(f"Inbound error: {e}")
             break
+
 
 async def handle_gemini_to_twilio(
     websocket, audio_queue: asyncio.Queue, resampler, call_state
