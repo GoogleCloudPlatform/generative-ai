@@ -1,209 +1,207 @@
 {
-  "clientId": "string",
-  "clientDetails": {
+  "account_id": "string",
+  "personal_profile": {
     "name": {
-      "firstName": "string",
-      "lastName": "string",
-      "salutation": "string",
-      "nickname": "string"
+      "first_name": "string",
+      "last_name": "string",
+      "prefix": "string",
+      "alias": "string"
     },
-    "address": {
-      "street": "string",
-      "city": "string",
-      "stateProvince": "string",
-      "postalCode": "string",
-      "country": "string"
+    "residence": {
+      "street_address": "string",
+      "city_name": "string",
+      "region": "string",
+      "zip_code": "string",
+      "country_code": "string"
     },
-    "contact": {
-      "phoneNumbers": [
-        {
-          "type": "string",
-          "number": "string"
-        }
-      ],
-      "emails": [
-        {
-          "type": "string",
-          "address": "string"
-        }
-      ]
+    "contact_info": {
+      "phones": ["string"],
+      "email_addresses": ["string"]
     },
-    "dateOfBirth": "YYYY-MM-DD",
-    "maritalStatus": "string",
-    "nationality": "string"
+    "alma_mater": "string",
+    "birth_date": "YYYY-MM-DD",
+    "marital_status": "string",
+    "citizenship": "string"
   },
-  "relatedParties": [
+  "household_members": [
     {
-      "name": {
-        "firstName": "string",
-        "lastName": "string"
+      "identity": {
+        "first_name": "string",
+        "last_name": "string"
       },
-      "relationship": "string",
-      "dateOfBirth": "YYYY-MM-DD",
-      "contact": {
-        "phoneNumbers": [
-          {
-            "type": "string",
-            "number": "string"
-          }
-        ],
-        "emails": [
-          {
-            "type": "string",
-            "address": "string"
-          }
-        ]
+      "relation": "string",
+      "dob": "YYYY-MM-DD",
+      "comms": {
+        "phones": ["string"],
+        "emails": ["string"]
       }
     }
   ],
-  "financialSummary": {
-    "totalBalance": {
+  "financial_overview": {
+    "net_worth": {
       "currency": "string",
       "amount": "number"
     },
-    "InvestmentAccountDetails": [
+    "yearly_earnings": {
+      "currency": "string",
+      "amount": "number"
+    },
+    "household_earnings": {
+      "currency": "string",
+      "amount": "number"
+    },
+    "performance_bonus": {
+      "currency": "string",
+      "amount": "number"
+    },
+    "investment_accounts": [
       {
-        "accountId": "string",
-        "accountType": "string",
+        "id": "string",
+        "category": "string",
         "currency": "string",
+        "balance_amt": "number",
+        "managed_by_bank": "boolean",
+        "bps_fee": "number"
+      }
+    ],
+    "cash_accounts": [
+      {
+        "id": "string",
+        "category": "string",
+        "institution": "string",
+        "currency": "string",
+        "current_val": "number",
+        "available_val": "number"
+      }
+    ],
+    "loan_accounts": [
+      {
+        "id": "string",
+        "category": "string",
+        "creditor": "string",
+        "principal": "number",
         "balance": "number",
-        "isManagedProduct": "boolean",
-        "feesInBasisPoints": "number"
-      }
-    ],
-    "BankingAccountDetails": [
-      {
-        "accountId": "string",
-        "accountType": "string",
-        "bankName": "string",
-        "currency": "string",
-        "currentBalance": "number",
-        "availableBalance": "number"
-      }
-    ],
-    "LoanAccountDetails": [
-      {
-        "loanId": "string",
-        "loanType": "string",
-        "lender": "string",
-        "originalAmount": "number",
-        "outstandingBalance": "number",
-        "interestRate": "number",
-        "nextPaymentDate": "YYYY-MM-DD",
-        "minimumPaymentAmount": "number"
+        "apr": "number",
+        "next_due": "YYYY-MM-DD",
+        "min_payment": "number"
       }
     ]
   },
-  "InvestmentPortfolio": {
-    "positions": [
+  "asset_allocation": {
+    "ytd_growth": "number",
+    "holdings": [
       {
-        "accountId": "string",
-        "assetId": "string",
-        "assetType": "string",
-        "symbol": "string",
-        "quantity": "number",
-        "currentPrice": {
+        "acct_id": "string",
+        "asset_uid": "string",
+        "type": "string",
+        "ticker": "string",
+        "units": "number",
+        "valuation": {
           "currency": "string",
           "amount": "number"
         },
-        "marketValue": {
+        "cost_basis": {
+          "currency": "string",
+          "amount": "number"
+        },
+        "market_valuation": {
           "currency": "string",
           "amount": "number"
         }
       }
     ],
-    "cashHoldings": [
+    "liquid_cash": [
       {
         "currency": "string",
         "amount": "number",
-        "accountId": "string"
+        "acct_id": "string"
       }
     ]
   },
-  "transactionsLast30Days": [
+  "recent_activity": [
     {
-      "transactionId": "string",
-      "accountId": "string",
-      "accountCategory": "string",
-      "date": "YYYY-MM-DDTHH:MM:SSZ",
-      "type": "string",
-      "description": "string",
-      "amount": {
+      "txn_id": "string",
+      "acct_id": "string",
+      "acct_type": "string",
+      "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
+      "action": "string",
+      "memo": "string",
+      "total": {
         "currency": "string",
         "amount": "number"
       },
-      "status": "string",
-      "relatedAssetId": "string"
+      "state": "string",
+      "linked_asset": "string"
     }
   ],
-  "interactions": {
-    "loginDetails": [
+  "engagement_history": {
+    "access_logs": [
       {
-        "loginTimestamp": "YYYY-MM-DDTHH:MM:SSZ",
-        "ipAddress": "string",
+        "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
+        "ip": "string",
         "device": "string",
-        "successful": "boolean",
-        "durationMinutes": "number"
+        "success": "boolean",
+        "session_len_min": "number"
       }
     ],
-    "calls": [
+    "call_logs": [
       {
-        "callId": "string",
-        "callTimestamp": "YYYY-MM-DDTHH:MM:SSZ",
-        "durationMinutes": "number",
-        "topic": "string",
-        "agentName": "string",
-        "summary": "string"
+        "id": "string",
+        "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
+        "len_min": "number",
+        "subject": "string",
+        "staff_name": "string",
+        "brief": "string"
       }
     ],
-    "emails": [
+    "email_logs": [
       {
-        "emailId": "string",
+        "id": "string",
         "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
         "subject": "string",
-        "senderRecipient": "string",
-        "type": "string"
+        "counterparty": "string",
+        "category": "string"
       }
     ]
   },
-  "CommunicationPreferences": {
-    "email": "boolean",
-    "phone": "boolean",
-    "mail": "boolean",
-    "sms": "boolean",
-    "AITonePreference": "string",
-    "AgentAvatarPreference": "string",
-    "newsletterSubscription": "boolean"
+  "client_preferences": {
+    "opt_in_email": "boolean",
+    "opt_in_phone": "boolean",
+    "opt_in_mail": "boolean",
+    "opt_in_sms": "boolean",
+    "ai_personality": "string",
+    "avatar_config": "string",
+    "newsletter": "boolean"
   },
-  "investmentProfile": {
-    "riskTolerance": "string",
-    "timeHorizon": "string",
-    "financialGoals": ["string"],
-    "liquidityNeeds": "string",
-    "investmentObjectives": ["string"],
-    "yearsOfExperience": {
-      "equities": "number",
-      "fixedIncome": "number",
-      "options": "number",
+  "investment_strategy": {
+    "risk_profile": "string",
+    "horizon": "string",
+    "objectives": ["string"],
+    "liquidity_requirement": "string",
+    "targets": ["string"],
+    "experience_years": {
+      "stocks": "number",
+      "bonds": "number",
+      "derivatives": "number",
       "margin": "number",
-      "alts": "number",
-      "mutualFunds": "number"
+      "alternatives": "number",
+      "funds": "number"
     }
   },
-  "pastAIAdvisorInteractions": [
+  "ai_interaction_history": [
     {
-      "topic": "string",
-      "lastEngaged": "YYYY-MM-DD",
-      "engagementScore": "number",
-      "source": "string"
+      "subject": "string",
+      "last_activity": "YYYY-MM-DD",
+      "score": "number",
+      "channel": "string"
     }
   ],
-  "pipelineOpportunities": [
+  "suggested_products": [
     {
-      "product": "string",
-      "lastEngaged": "YYYY-MM-DD",
-      "probabilityToCloseScore": "number",
-      "source": "string"
+      "item": "string",
+      "last_activity": "YYYY-MM-DD",
+      "confidence_score": "number",
+      "channel": "string"
     }
   ]
 }

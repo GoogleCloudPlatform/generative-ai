@@ -1,201 +1,201 @@
 {
-  "clientId": "CLIENT-001",
-  "clientDetails": {
+  "account_id": "CLIENT-001",
+  "personal_profile": {
     "name": {
-      "firstName": "Josh",
-      "lastName": "User",
-      "salutation": "",
-      "nickname": "Josh"
+      "first_name": "Josh",
+      "last_name": "User",
+      "prefix": "",
+      "alias": "Josh"
     },
-    "address": {
-      "street": "456 Innovation Drive",
-      "city": "Austin",
-      "stateProvince": "TX",
-      "postalCode": "78701",
-      "country": "USA"
+    "residence": {
+      "street_address": "456 Innovation Drive",
+      "city_name": "Austin",
+      "region": "TX",
+      "zip_code": "78701",
+      "country_code": "USA"
     },
-    "contact": {
-      "phoneNumbers": ["987-654-3210"],
-      "emails": ["josh.user@demo.com"]
+    "contact_info": {
+      "phones": ["987-654-3210"],
+      "email_addresses": ["josh.user@demo.com"]
     },
-    "education": "State University",
-    "dateOfBirth": "1985-03-22",
-    "maritalStatus": "Married",
-    "nationality": ""
+    "alma_mater": "State University",
+    "birth_date": "1985-03-22",
+    "marital_status": "Married",
+    "citizenship": ""
   },
-  "relatedParties": [
+  "household_members": [
     {
-      "name": {
-        "firstName": "Sarah",
-        "lastName": "User"
+      "identity": {
+        "first_name": "Sarah",
+        "last_name": "User"
       },
-      "relationship": "Spouse",
-      "dateOfBirth": "",
-      "contact": {
-        "phoneNumbers": [],
+      "relation": "Spouse",
+      "dob": "",
+      "comms": {
+        "phones": [],
         "emails": []
       }
     },
     {
-      "name": {
-        "firstName": "Emma",
-        "lastName": ""
+      "identity": {
+        "first_name": "Emma",
+        "last_name": ""
       },
-      "relationship": "Daughter",
-      "dateOfBirth": "",
-      "contact": {
-        "phoneNumbers": [],
+      "relation": "Daughter",
+      "dob": "",
+      "comms": {
+        "phones": [],
         "emails": []
       }
     },
     {
-      "name": {
-        "firstName": "Noah",
-        "lastName": ""
+      "identity": {
+        "first_name": "Noah",
+        "last_name": ""
       },
-      "relationship": "Son",
-      "dateOfBirth": "",
-      "contact": {
-        "phoneNumbers": [],
+      "relation": "Son",
+      "dob": "",
+      "comms": {
+        "phones": [],
         "emails": []
       }
     }
   ],
-  "financialSummary": {
-    "totalBalance": {
+  "financial_overview": {
+    "net_worth": {
       "currency": "USD",
       "amount": 480000
     },
-    "annualIncome": {
+    "yearly_earnings": {
       "currency": "USD",
       "amount": 520000
     },
-    "householdIncome": {
+    "household_earnings": {
       "currency": "USD",
       "amount": 980000
     },
-    "annualBonus": {
+    "performance_bonus": {
         "currency": "USD",
         "amount": 110000
     },
-    "InvestmentAccountDetails": [
+    "investment_accounts": [
       {
-        "accountId": "BROKERAGE-ACCT-001",
-        "accountType": "Brokerage Account",
+        "id": "BROKERAGE-ACCT-001",
+        "category": "Brokerage Account",
         "currency": "USD",
-        "balance": 160000,
-        "isManagedProduct": false,
-        "feesInBasisPoints": 0
+        "balance_amt": 160000,
+        "managed_by_bank": false,
+        "bps_fee": 0
       }
     ],
-    "BankingAccountDetails": [
+    "cash_accounts": [
       {
-        "accountId": "PREMIUM-CHK-001",
-        "accountType": "Premium Checking",
-        "bankName": "Financial Institution",
+        "id": "PREMIUM-CHK-001",
+        "category": "Premium Checking",
+        "institution": "Financial Institution",
         "currency": "USD",
-        "currentBalance": 520000,
-        "availableBalance": 520000
+        "current_val": 520000,
+        "available_val": 520000
       }
     ],
-    "LoanAccountDetails": []
+    "loan_accounts": []
   },
-  "InvestmentPortfolio": {
-    "ytd_return": 0.52,
-    "positions": [
+  "asset_allocation": {
+    "ytd_growth": 0.52,
+    "holdings": [
       {
-        "accountId": "BROKERAGE-ACCT-001",
-        "assetId": "ACME-001",
-        "assetType": "Stock",
-        "symbol": "ACME",
-        "quantity": 10500,
-        "currentPrice": {
+        "acct_id": "BROKERAGE-ACCT-001",
+        "asset_uid": "ACME-001",
+        "type": "Stock",
+        "ticker": "ACME",
+        "units": 10500,
+        "valuation": {
           "currency": "USD",
           "amount": 155
         },
-        "purchasePrice": {
+        "cost_basis": {
           "currency": "USD",
           "amount": 145
         },        
-        "marketValue": {
+        "market_valuation": {
           "currency": "USD",
           "amount": 1627500
         }
       },
       {
-        "accountId": "BROKERAGE-ACCT-001",
-        "assetId": "NVDA-001",
-        "assetType": "Stock",
-        "class": "Common",
-        "symbol": "NVDA",
-        "quantity": 5000,
-        "currentPrice": {
+        "acct_id": "BROKERAGE-ACCT-001",
+        "asset_uid": "NVDA-001",
+        "type": "Stock",
+        "equity_class": "Common",
+        "ticker": "NVDA",
+        "units": 5000,
+        "valuation": {
           "currency": "USD",
           "amount": 120
         },
-        "purchasePrice": {
+        "cost_basis": {
           "currency": "USD",
           "amount": 90
         },
-        "marketValue": {
+        "market_valuation": {
           "currency": "USD",
           "amount": 600000
         }
       }
     ],
-    "cashHoldings": []
+    "liquid_cash": []
   },
-  "transactionsLast30Days": [
+  "recent_activity": [
     {
-      "transactionId": "TXN-001",
-      "accountId": "PREMIUM-CHK-001",
-      "accountCategory": "Cash & Equivalents",
-      "date": "2025-09-01T00:00:00Z",
-      "type": "Deposit",
-      "description": "Significant transfer from external savings.",
-      "amount": {
+      "txn_id": "TXN-001",
+      "acct_id": "PREMIUM-CHK-001",
+      "acct_type": "Cash & Equivalents",
+      "timestamp": "2025-09-01T00:00:00Z",
+      "action": "Deposit",
+      "memo": "Significant transfer from external savings.",
+      "total": {
         "currency": "USD",
         "amount": 750000
       },
-      "status": "Completed",
-      "relatedAssetId": ""
+      "state": "Completed",
+      "linked_asset": ""
     }
   ],
-  "interactions": {
-    "loginDetails": [],
-    "calls": [],
-    "emails": []
+  "engagement_history": {
+    "access_logs": [],
+    "call_logs": [],
+    "email_logs": []
   },
-  "CommunicationPreferences": {
-    "email": true,
-    "phone": true,
-    "mail": false,
-    "sms": false,
-    "AITonePreference": "Casual",
-    "AgentAvatarPreference": null,
-    "newsletterSubscription": true
+  "client_preferences": {
+    "opt_in_email": true,
+    "opt_in_phone": true,
+    "opt_in_mail": false,
+    "opt_in_sms": false,
+    "ai_personality": "Casual",
+    "avatar_config": null,
+    "newsletter": true
   },
-  "investmentProfile": {
-    "riskTolerance": "Balanced Growth",
-    "timeHorizon": "Long-term",
-    "financialGoals": [
+  "investment_strategy": {
+    "risk_profile": "Balanced Growth",
+    "horizon": "Long-term",
+    "objectives": [
       "Retirement Planning",
       "Education Funding for children",
       "New Home Purchase"
     ],
-    "liquidityNeeds": "Low",
-    "investmentObjectives": [
+    "liquidity_requirement": "Low",
+    "targets": [
       "Growth"
     ],
-    "yearsOfExperience": {
-      "equities": 10,
-      "fixedIncome": 5,
-      "options": 2,
+    "experience_years": {
+      "stocks": 10,
+      "bonds": 5,
+      "derivatives": 2,
       "margin": 0,
-      "alts": 1,
-      "mutualFunds": 8
+      "alternatives": 1,
+      "funds": 8
     }
   },
-  "pastAIAdvisorInteractions": [],
-  "pipelineOpportunities": []
+  "ai_interaction_history": [],
+  "suggested_products": []
 }

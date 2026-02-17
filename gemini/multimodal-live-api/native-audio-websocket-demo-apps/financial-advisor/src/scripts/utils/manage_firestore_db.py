@@ -162,7 +162,7 @@ def update_db(
 @app.command()
 def update_field(
     field_path: str = typer.Argument(
-        ..., help="Dot-separated path to the field to update (e.g., 'clientDetails.name.firstName')."
+        ..., help="Dot-separated path to the field to update (e.g., 'personal_profile.name.first_name')."
     ),
     new_value: str = typer.Argument(..., help="The new value for the field."),
     project_id: str = typer.Option("my-project-id", help="ID of the Google Cloud project"),

@@ -174,8 +174,8 @@ async def websocket_endpoint(
 
         # Determine User Name safely
         user_name = "User"
-        if "clientDetails" in client_data and "name" in client_data["clientDetails"]:
-            user_name = client_data["clientDetails"]["name"].get("firstName", "User")
+        if "personal_profile" in client_data and "name" in client_data["personal_profile"]:
+            user_name = client_data["personal_profile"]["name"].get("first_name", "User")
 
         # Mock CD Information (Genericized)
         cd_info_text = ""
