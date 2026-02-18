@@ -10,9 +10,9 @@ Key design decisions include the use of `python-samplerate` for high-quality str
   <b></b> Click the image below to watch the video! </b>
 </p>
 <a href="https://www.youtube.com/watch?v=sboxrNY57uA">
-  <img 
-    src="https://img.youtube.com/vi/sboxrNY57uA/maxresdefault.jpg" 
-    alt="Demo Video" 
+  <img
+    src="https://img.youtube.com/vi/sboxrNY57uA/maxresdefault.jpg"
+    alt="Demo Video"
     style="width:50%; margin: 0 auto; display: block;"
   >
 </a>
@@ -78,7 +78,7 @@ This project is implemented using Python 3.12.
 
     ```bash
         ngrok http 8000
-    ```   
+    ```
     ngrok will give you a public **Forwarding URL**, which will look something like **https://<random-string>.ngrok-free.dev**
 
 

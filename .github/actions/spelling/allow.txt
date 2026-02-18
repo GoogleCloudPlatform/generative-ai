@@ -282,6 +282,7 @@ cycleways
 cygpath
 CZE
 czf
+D'orsay
 Daniil
 Darabont
 darkgrid
@@ -332,7 +333,6 @@ docstores
 doi
 Donen
 Doogler
-D'orsay
 dotprompt
 Downscale
 dpi
@@ -793,7 +793,6 @@ landuse
 langgraph
 Laomedeia
 latte
-L'avenir
 LCEL
 LEBRON
 lecie
@@ -804,7 +803,6 @@ levelname
 Leventer
 lexer
 lexers
-l'harmonie
 liberties
 linalg
 linecolor
