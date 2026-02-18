@@ -366,6 +366,7 @@ DWMWA
 Dzor
 ecommerce
 EDB
+edgecolor
 Edunov
 eee
 EHR
@@ -423,6 +424,7 @@ evse
 evt
 expl
 faa
+facecolor
 faiss
 FAISS
 Fangming
@@ -569,6 +571,7 @@ Graterol
 gridcolor
 gridless
 gridpoint
+gridspec
 groupadd
 groupchat
 grpcio
@@ -614,6 +617,7 @@ HIGHCPU
 Hikaru
 Hiromasa
 Hisaki
+historien
 Hlc
 Hmmm
 HMO
@@ -676,6 +680,7 @@ inermis
 INFOPLIST
 informati
 inpaint
+inpainted
 INR
 IOMGR
 Iosif
@@ -777,6 +782,7 @@ KYC
 Kylian
 L'avenir
 l'harmonie
+labelleft
 labetalol
 Ladhak
 LAION
@@ -857,6 +863,7 @@ makeover
 Malware
 Mamah
 Mandiri
+Manh
 manquez
 Manyata
 mapbox
@@ -1203,6 +1210,7 @@ rai
 Raikkonen
 Rajpurkar
 ramen
+Ranurte
 rapideval
 rarian
 rarians
@@ -1348,6 +1356,7 @@ snowboard
 socketio
 Sono
 sourced
+sourcing
 spamming
 spearmanr
 SPII
@@ -1473,6 +1482,7 @@ tritan
 TRK
 trl
 truncatum
+Trung
 tscore
 tseslint
 TSLA
@@ -1658,6 +1668,7 @@ xmltodict
 xsi
 xsum
 XSum
+xtick
 xticks
 XXE
 xxxxxxxx
@@ -1680,6 +1691,7 @@ youtube
 Youxi
 yref
 ytd
+ytick
 yticks
 Yuxuan
 Yuzuru
