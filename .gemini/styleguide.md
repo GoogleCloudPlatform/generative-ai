@@ -53,13 +53,36 @@ LOCATION = "global"
 LOCATION = "us-central1"
 ```
 
+- Don't restart the kernel or use `!pip`, use `%pip` when installing
+
+**Correct**
+
+```sh
+%pip install
+```
+
+**Incorrect**
+
+```sh
+!pip install
+```
+
+```sh
+!pip3 install
+```
+
+```py
+app = IPython.Application.instance()
+app.kernel.do_shutdown(True)
+```
+
 ## Golden Rule: Use the Correct and Current SDK
 
-Always use the **Google GenAI SDK** (`google-genai`), which is the unified
+Always use the **Google Gen AI SDK** (`google-genai`), which is the unified
 standard library for all Gemini API requests (AI Studio/Gemini Developer API
-and Vertex AI) as of 2025. Do not use legacy libraries and SDKs.
+and Vertex AI) as of 2026. Do not use legacy libraries and SDKs.
 
--   **Library Name:** Google GenAI SDK
+-   **Library Name:** Google Gen AI SDK
 -   **Python Package:** `google-genai`
 -   **Legacy Library**: (`google-generativeai`) is deprecated.
 
@@ -100,7 +123,7 @@ and Vertex AI) as of 2025. Do not use legacy libraries and SDKs.
 
 -   By default, use the following models when using `google-genai`:
     -   **General Text & Multimodal Tasks:** `gemini-3-flash-preview`
-    -   **Coding and Complex Reasoning Tasks:** `gemini-3-pro-preview`
+    -   **Coding and Complex Reasoning Tasks:** `gemini-3.1-pro-preview`
     -   **Low Latency & High Volume Tasks:** `gemini-2.5-flash-lite`
     -   **Fast Image Generation and Editing:** `gemini-2.5-flash-image` (aka Nano Banana)
     -   **High-Quality Image Generation and Editing:** `gemini-3-pro-image-preview` (aka Nano Banana Pro)
