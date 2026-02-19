@@ -1,10 +1,10 @@
 # Generative AI on Google Cloud
 
-> **[Gemini 3 Flash](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-flash) has been released!**
+> **[Gemini 3.1 Pro](https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-1-pro) has been released!**
 >
 > Here are the latest notebooks and demos using the new model:
 >
-> - [Intro to Gemini 3 Flash](gemini/getting-started/intro_gemini_3_flash.ipynb)
+> - [Intro to Gemini 3.1 Pro](gemini/getting-started/intro_gemini_3_1_pro.ipynb)
 >
 <!-- markdownlint-disable MD033 -->
 
