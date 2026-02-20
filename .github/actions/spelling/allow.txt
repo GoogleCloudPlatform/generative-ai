@@ -1378,6 +1378,7 @@ stdcall
 stext
 STIX
 Storrer
+Stoynov
 stp
 Strappy
 strdupv
