@@ -1,0 +1,14 @@
+# Core dependencies for local audiobook generation
+pydub>=0.25.1
+
+# Optional: For MLX backend (Apple Silicon native)
+# mlx-lm>=0.0.1
+
+# Optional: For llama.cpp backend
+# llama-cpp-python>=0.2.0
+
+# Optional: For Piper TTS
+# piper-tts>=1.2.0
+
+# Note: Ollama should be installed separately from https://ollama.com
+# Note: ffmpeg is recommended for audio processing (install via: brew install ffmpeg)
