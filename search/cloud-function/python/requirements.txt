@@ -2,6 +2,6 @@ Flask==3.1.1
 functions_framework==3.8.2
 google-cloud-discoveryengine>=0.11
 mypy==1.15.0
-protobuf==5.29.5
+protobuf==5.29.6
 pytest==8.3.5
 python-dotenv==1.1.0
