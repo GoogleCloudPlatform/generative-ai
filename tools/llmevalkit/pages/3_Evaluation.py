@@ -30,12 +30,8 @@ from vertexai.evaluation import (
     PairwiseMetricPromptTemplate,
     PointwiseMetricPromptTemplate,
 )
-from vertexai.generative_models import (
-    GenerationConfig,
-    GenerativeModel,
-    HarmBlockThreshold,
-    HarmCategory,
-)
+from google import genai
+from pydantic import BaseModel
 from vertexai.preview import prompts
 
 load_dotenv("src/.env")
@@ -89,45 +85,39 @@ def get_autorater_pairwise_response(metric_prompt: str, model: str) -> dict:
     Returns:
         A dictionary containing the autorater's response.
     """
-    metric_response_schema = {
-        "type": "OBJECT",
-        "properties": {
-            "pairwise_choice": {"type": "STRING"},
-            "explanation": {"type": "STRING"},
-        },
-        "required": ["pairwise_choice", "explanation"],
-    }
+    class AutoraterResponse(BaseModel):
+        pairwise_choice: str
+        explanation: str
 
-    autorater = GenerativeModel(
-        model,
-        generation_config=GenerationConfig(
-            response_mime_type="application/json",
-            response_schema=metric_response_schema,
-        ),
-        safety_settings={
-            HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+    client = genai.Client(
+        vertexai=True,
+        project=os.getenv("PROJECT_ID"),
+        location=os.getenv("LOCATION"),
+    )
+
+    response = client.models.generate_content(
+        model=model,
+        contents=metric_prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": AutoraterResponse,
+            "safety_settings": [
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            ],
         },
     )
 
-    response = autorater.generate_content(metric_prompt)
-    response_json = {}
+    if response.parsed:
+        return response.parsed.model_dump()
 
-    if response.candidates and len(response.candidates) > 0:
-        candidate = response.candidates[0]
-        if (
-            candidate.content
-            and candidate.content.parts
-            and len(candidate.content.parts) > 0
-        ):
-            part = candidate.content.parts[0]
-            if part.text:
-                response_json = json.loads(part.text)
-
-    return response_json
+    try:
+        return json.loads(response.text)
+    except Exception as e:
+        logger.warning(f"Failed to parse response: {e}")
+        return {}
 
 
 def main() -> None:
@@ -328,43 +318,46 @@ def main() -> None:
 
     st.button("Load Prompt", key="load_prompt_button")
     if st.session_state.load_prompt_button:
-        logger.info(
-            f"Selected Prompt ID: {st.session_state.local_prompt.existing_prompts[st.session_state.selected_prompt]}"
-        )
-        logger.info(f"Version: {st.session_state.selected_version}")
-        st.session_state.local_prompt.load_prompt(
-            st.session_state.local_prompt.existing_prompts[
-                st.session_state.selected_prompt
-            ],
-            st.session_state.selected_prompt,
-            st.session_state.selected_version,
-        )
-        logger.info(f"Local Prompt Meta: {st.session_state.local_prompt.prompt_meta}")
-        logger.info(
-            f"Local Prompt Meta Dict Keys: {st.session_state.local_prompt.prompt_meta.keys()}"
-        )
+        if not st.session_state.get("selected_prompt"):
+            st.warning("Please select a prompt before loading.")
+        else:
+            logger.info(
+                f"Selected Prompt ID: {st.session_state.local_prompt.existing_prompts[st.session_state.selected_prompt]}"
+            )
+            logger.info(f"Version: {st.session_state.selected_version}")
+            st.session_state.local_prompt.load_prompt(
+                st.session_state.local_prompt.existing_prompts[
+                    st.session_state.selected_prompt
+                ],
+                st.session_state.selected_prompt,
+                st.session_state.selected_version,
+            )
+            logger.info(f"Local Prompt Meta: {st.session_state.local_prompt.prompt_meta}")
+            logger.info(
+                f"Local Prompt Meta Dict Keys: {st.session_state.local_prompt.prompt_meta.keys()}"
+            )
 
-        st.session_state.prompt_name = (
-            st.session_state.local_prompt.prompt_to_run.prompt_name
-        )
-        st.session_state.prompt_data = (
-            st.session_state.local_prompt.prompt_to_run.prompt_data
-        )
-        st.session_state.model_name = (
-            st.session_state.local_prompt.prompt_to_run.model_name.split("/")[-1]
-        )
-        st.session_state.system_instructions = (
-            st.session_state.local_prompt.prompt_to_run.system_instruction
-        )
-        st.session_state.response_schema = json.dumps(
-            st.session_state.local_prompt.prompt_meta.get("response_schema", {})
-        )
-        st.session_state.generation_config = json.dumps(
-            st.session_state.local_prompt.prompt_meta.get("generation_config", {})
-        )
-        st.session_state.meta_tags = st.session_state.local_prompt.prompt_meta[
-            "meta_tags"
-        ]
+            st.session_state.prompt_name = (
+                st.session_state.local_prompt.prompt_to_run.prompt_name
+            )
+            st.session_state.prompt_data = (
+                st.session_state.local_prompt.prompt_to_run.prompt_data
+            )
+            st.session_state.model_name = (
+                st.session_state.local_prompt.prompt_to_run.model_name.split("/")[-1]
+            )
+            st.session_state.system_instructions = (
+                st.session_state.local_prompt.prompt_to_run.system_instruction
+            )
+            st.session_state.response_schema = json.dumps(
+                st.session_state.local_prompt.prompt_meta.get("response_schema", {})
+            )
+            st.session_state.generation_config = json.dumps(
+                st.session_state.local_prompt.prompt_meta.get("generation_config", {})
+            )
+            st.session_state.meta_tags = st.session_state.local_prompt.prompt_meta[
+                "meta_tags"
+            ]
 
     st.button("Upload Data and Get Responses", key="upload_data_get_responses_button")
 

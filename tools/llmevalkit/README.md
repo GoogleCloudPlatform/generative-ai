@@ -61,27 +61,21 @@ This section walks you through using the app.
 
 First, clone the repository and set up the environment:
 
-```bash
 # Clone the repository
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 
 # Navigate to the project directory
 cd generative-ai/tools/llmevalkit
 
-# Create a Python virtual environment
-python -m venv venv
 
-# Activate the virtual environment
-source venv/bin/activate
-
-# Install the required packages
-pip install -r requirements.txt
-
-# Run the Streamlit application
-streamlit run index.py
-```
 
 Next, `cp src/.env.example src/.env` open the file and set `BUCKET_NAME` and `PROJECT_ID`
+
+# Authorize gcloud
+`gcloud auth application-default login`
+
+# Run the Streamlit application
+`uv run streamlit run index.py`
 
 ### 1. Prompt Management
 
@@ -101,7 +95,7 @@ Answer: {{target}}
 
 In the Model Name field enter:
 ```
-gemini-2.0-flash-001
+gemini-2.0-flash
 ```
 
 In the System Instructions field enter:
@@ -134,6 +128,8 @@ gsutil cp gs://github-repo/prompts/prompt_optimizer/mathvista_dataset/mathvista_
 
 ### 3. Evaluation
 
+*Note: Ensure you have completed Step 2 to create a dataset before proceeding here.*
+
 We will now run an evaluation, prior to doing any tweaking to get a baseline.
 
 - **Existing Dataset:** 'mathvista'
@@ -157,7 +153,7 @@ View the Evaluation Results, and save to prompt records. This will save this ini
 
 🔧 Set-Up Prompt Optimization.
 
-- **Target Model:** 'gemini-2.0-flash-001'
+- **Target Model:** 'gemini-2.0-flash'
 - **Existing Prompt:** 'math_prompt_test'
 - **Version:** '1'
 
