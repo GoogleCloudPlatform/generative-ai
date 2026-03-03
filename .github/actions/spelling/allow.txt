@@ -844,6 +844,7 @@ LSTM
 LSum
 LTRB
 Lumet
+Lumi
 LUVBPTK
 lxml
 lycra
@@ -1146,6 +1147,7 @@ Porat
 postictal
 powerups
 PPO
+prag
 Pranav
 praw
 prcntg
@@ -1252,6 +1254,7 @@ RNNs
 Robeco
 Robo
 Robotica
+rooney
 ROOTSPAN
 Rosberg
 rpet
@@ -1355,6 +1358,7 @@ SNE
 snowboard
 socketio
 Sono
+sortant
 sourced
 sourcing
 spamming
