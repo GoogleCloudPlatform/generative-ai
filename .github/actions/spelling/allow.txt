@@ -39,6 +39,7 @@ ALDS
 Alibaba
 alisal
 alloydb
+Alok
 ALPHAFOLD
 AMNOSH
 amurensis
@@ -106,6 +107,7 @@ Ayyappa
 backstory
 backticks
 bagchi
+Bakkali
 bargap
 barmode
 barpolar
@@ -364,6 +366,7 @@ DWMWA
 Dzor
 ecommerce
 EDB
+edgecolor
 Edunov
 eee
 EHR
@@ -421,6 +424,7 @@ evse
 evt
 expl
 faa
+facecolor
 faiss
 FAISS
 Fangming
@@ -457,6 +461,8 @@ flac
 Flahs
 Flatform
 Flipkart
+Flirble
+Flirbles
 floormat
 FLX
 fmeasure
@@ -511,6 +517,7 @@ geboten
 gemhall
 genai
 genkit
+genmedia
 GenTwo
 genwealth
 geocoded
@@ -564,6 +571,7 @@ Graterol
 gridcolor
 gridless
 gridpoint
+gridspec
 groupadd
 groupchat
 grpcio
@@ -609,6 +617,7 @@ HIGHCPU
 Hikaru
 Hiromasa
 Hisaki
+historien
 Hlc
 Hmmm
 HMO
@@ -671,6 +680,7 @@ inermis
 INFOPLIST
 informati
 inpaint
+inpainted
 INR
 IOMGR
 Iosif
@@ -772,10 +782,12 @@ KYC
 Kylian
 L'avenir
 l'harmonie
+labelleft
 labetalol
 Ladhak
 LAION
 lakecolor
+LANCZOS
 landcolor
 landuse
 langgraph
@@ -832,6 +844,7 @@ LSTM
 LSum
 LTRB
 Lumet
+Lumi
 LUVBPTK
 lxml
 lycra
@@ -851,6 +864,7 @@ makeover
 Malware
 Mamah
 Mandiri
+Manh
 manquez
 Manyata
 mapbox
@@ -1014,6 +1028,7 @@ nunique
 nvidia
 NVIDIA
 NVL
+NYT
 oai
 objc
 ODb
@@ -1132,6 +1147,7 @@ Porat
 postictal
 powerups
 PPO
+prag
 Pranav
 praw
 prcntg
@@ -1196,6 +1212,7 @@ rai
 Raikkonen
 Rajpurkar
 ramen
+Ranurte
 rapideval
 rarian
 rarians
@@ -1237,6 +1254,7 @@ RNNs
 Robeco
 Robo
 Robotica
+rooney
 ROOTSPAN
 Rosberg
 rpet
@@ -1314,6 +1332,7 @@ shrt
 Shubham
 Shyamalan
 sid
+sids
 siglap
 signings
 simage
@@ -1339,7 +1358,9 @@ SNE
 snowboard
 socketio
 Sono
+sortant
 sourced
+sourcing
 spamming
 spearmanr
 SPII
@@ -1361,6 +1382,7 @@ stdcall
 stext
 STIX
 Storrer
+Stoynov
 stp
 Strappy
 strdupv
@@ -1465,6 +1487,7 @@ tritan
 TRK
 trl
 truncatum
+Trung
 tscore
 tseslint
 TSLA
@@ -1531,6 +1554,7 @@ Vardhan
 Vaswani
 Vayots
 VBG
+vcodec
 VCPU
 vectoral
 vectordb
@@ -1542,7 +1566,10 @@ Ves
 Vesia
 vesselin
 Vettel
+vframes
 VFT
+vibeo
+vid
 Vid
 vidgen
 VIDGEN
@@ -1572,6 +1599,7 @@ VSPM
 vtotal
 vtt
 vulnz
+Wafae
 wafaeb
 WAI
 Wakatipu
@@ -1645,6 +1673,7 @@ xmltodict
 xsi
 xsum
 XSum
+xtick
 xticks
 XXE
 xxxxxxxx
@@ -1667,6 +1696,7 @@ youtube
 Youxi
 yref
 ytd
+ytick
 yticks
 Yuxuan
 Yuzuru
