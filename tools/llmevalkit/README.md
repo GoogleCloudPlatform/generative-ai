@@ -95,7 +95,7 @@ Answer: {{target}}
 
 In the Model Name field enter:
 ```
-gemini-2.0-flash
+gemini-2.5-flash
 ```
 
 In the System Instructions field enter:
