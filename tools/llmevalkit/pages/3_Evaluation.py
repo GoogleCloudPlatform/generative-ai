@@ -503,50 +503,60 @@ def main() -> None:
                 st.session_state.current_index = 0
                 return
 
-            if len(df) > 0:
-                st.session_state.generation_progress_bar = st.progress(
-                    0, text="Starting response generation..."
-                )
+            import concurrent.futures
 
             template_vars = re.findall(r"{(\w+)}", st.session_state.prompt_data)
             required_cols_for_generating_new = list(set(template_vars))
+
+            tasks = []
             for idx, r in df.iterrows():
                 current_user_input_item = {
                     col: r[col] for col in required_cols_for_generating_new
                 }
+                expected_res = r[st.session_state.ground_truth_column_name]
+                tasks.append((idx, current_user_input_item, expected_res))
+
+            # Bind the function reference to avoid accessing st.session_state directly in threads
+            generate_function = st.session_state.local_prompt.generate_response
+
+            def process_task(task_args):
+                t_idx, item, expected = task_args
                 try:
-                    generated_text = st.session_state.local_prompt.generate_response(
-                        current_user_input_item
-                    )
-                    user_input_list.append(current_user_input_item)
-                    expected_result_list.append(
-                        r[st.session_state.ground_truth_column_name]
-                    )
-                    assistant_response_list.append(generated_text)
-                    if "generation_progress_bar" in st.session_state:
-                        progress_text = f"Generating response {idx + 1} of {len(df)}..."
-                        st.session_state.generation_progress_bar.progress(
-                            (idx + 1) / len(df), text=progress_text
-                        )
+                    res = generate_function(item)
+                    return t_idx, item, expected, res, None
                 except Exception as e:
-                    logger.exception(
-                        "Error generating response for row index %s (data: %s): %s",
-                        idx,
-                        current_user_input_item,
-                        e,
-                    )
-                    st.warning(
-                        f"Skipped generating response for one item (row index {idx}) due to error: {e}"
-                    )
-                    if "generation_progress_bar" in st.session_state:
-                        progress_text = f"Generating response {idx + 1} of {len(df)}... (Error, skipped)"
-                        st.session_state.generation_progress_bar.progress(
-                            (idx + 1) / len(df), text=progress_text
-                        )
-                    continue
-            if "generation_progress_bar" in st.session_state:
-                st.session_state.generation_progress_bar.empty()
-                del st.session_state.generation_progress_bar
+                    return t_idx, item, expected, None, e
+
+            completed = 0
+            total = len(tasks)
+            results = []
+
+            if total > 0:
+                progress_bar = st.progress(0, text="Generating responses in parallel...")
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                    future_to_idx = {executor.submit(process_task, t): t[0] for t in tasks}
+                    for future in concurrent.futures.as_completed(future_to_idx):
+                        t_idx, item, expected, res, error = future.result()
+                        completed += 1
+
+                        progress_text = f"Generating response {completed} of {total}..."
+                        progress_bar.progress(completed / total, text=progress_text)
+
+                        if error:
+                            logger.error("Error generating response for row index %s: %s", t_idx, error)
+                        else:
+                            results.append((t_idx, item, expected, res))
+
+                progress_bar.empty()
+                if len(results) < total:
+                    st.warning(f"Generated {len(results)} responses. {total - len(results)} failed.")
+
+            results.sort(key=lambda x: x[0])
+            for t_idx, item, expected, res in results:
+                user_input_list.append(item)
+                expected_result_list.append(expected)
+                assistant_response_list.append(res)
 
             if len(user_input_list) < len(df):
                 st.info(

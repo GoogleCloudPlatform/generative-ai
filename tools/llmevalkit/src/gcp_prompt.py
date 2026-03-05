@@ -229,7 +229,7 @@ class GcpPrompt:
                 try:
                     # Create Image Part from URI
                     updated_contents.append(
-                        genai.Part.from_uri(mime_type=mime_type, uri=value)
+                        genai.types.Part.from_uri(mime_type=mime_type, file_uri=value)
                     )
                 except Exception as e:
                     logger.error(
