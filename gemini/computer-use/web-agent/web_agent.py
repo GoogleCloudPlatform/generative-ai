@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 import asyncio
+import logging
 import os
 
 from google import genai
@@ -24,15 +25,18 @@ from google.genai.types import (
     FunctionResponseBlob,
     GenerateContentConfig,
     Part,
+    ThinkingConfig,
     Tool,
 )
 from playwright.async_api import Page, async_playwright
 
+logging.getLogger("google_genai._common").setLevel(logging.ERROR)
+
 # --- CONFIGURATION ---
 # Load configuration from environment variables for best practice.
-PROJECT_ID = os.environ.get("GOOGLE_PROJECT_ID")
+PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.environ.get("GOOGLE_LOCATION", "global")
-MODEL_ID = os.environ.get("MODEL_ID", "gemini-2.5-computer-use-preview-10-2025")
+MODEL_ID = os.environ.get("MODEL_ID", "gemini-3-flash-preview")
 
 
 # --- HELPER FUNCTIONS  ---
@@ -110,7 +114,7 @@ async def execute_function_calls(
 # --- THE AGENT LOOP ---
 
 
-async def agent_loop(initial_prompt: str, max_turns: int = 10) -> None:
+async def agent_loop(initial_prompt: str, max_turns: int = 20) -> None:
     """Main agent loop for local execution with a browser."""
     if not PROJECT_ID:
         raise ValueError("GOOGLE_PROJECT_ID environment variable not set.")
@@ -128,16 +132,28 @@ async def agent_loop(initial_prompt: str, max_turns: int = 10) -> None:
             await page.goto("https://www.google.com")
 
             print(f"🎬 Starting Agent Loop with prompt: '{initial_prompt}'")
-            # ... (rest of the loop is fine and remains the same) ...
-            config = GenerateContentConfig(
-                tools=[
+
+            # Configure Computer Use tool with browser environment
+            # Base configuration for the Computer Use tool
+            config_kwargs = {
+                "tools": [
                     Tool(
                         computer_use=ComputerUse(
                             environment=Environment.ENVIRONMENT_BROWSER,
+                            # Optional: Exclude specific predefined functions
+                            excluded_predefined_functions=["drag_and_drop"],
                         )
                     )
-                ],
-            )
+                ]
+            }
+
+            # Conditionally add thinking_config only for the Gemini 3 models
+            model_version = float(MODEL_ID.split("-")[1])
+            if model_version >= 3:
+                config_kwargs["thinking_config"] = ThinkingConfig(include_thoughts=True)
+
+            config = GenerateContentConfig(**config_kwargs)
+
             screenshot = await page.screenshot()
             contents = [
                 Content(
@@ -167,10 +183,14 @@ async def agent_loop(initial_prompt: str, max_turns: int = 10) -> None:
                 contents.append(response.candidates[0].content)
                 print("[DEBUG] Appended model response to history.")
 
-                if not any(
-                    hasattr(part, "function_call")
+                # Check if the attribute exists AND is not None
+                active_function_calls = [
+                    part.function_call
                     for part in response.candidates[0].content.parts
-                ):
+                    if hasattr(part, "function_call") and part.function_call
+                ]
+
+                if not active_function_calls:
                     final_text = "".join(
                         part.text
                         for part in response.candidates[0].content.parts
@@ -195,16 +215,18 @@ async def agent_loop(initial_prompt: str, max_turns: int = 10) -> None:
                     screenshot = await page.screenshot()
                     current_url = page.url
                     function_response_parts.append(
-                        FunctionResponse(
-                            name=name,
-                            response={"url": current_url},
-                            parts=[
-                                Part(
-                                    inline_data=FunctionResponseBlob(
-                                        mime_type="image/png", data=screenshot
+                        Part(
+                            function_response=FunctionResponse(
+                                name=name,
+                                response={"url": current_url},
+                                parts=[
+                                    Part(
+                                        inline_data=FunctionResponseBlob(
+                                            mime_type="image/png", data=screenshot
+                                        )
                                     )
-                                )
-                            ],
+                                ],
+                            )
                         )
                     )
                 contents.append(Content(role="user", parts=function_response_parts))
