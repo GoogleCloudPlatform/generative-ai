@@ -1,4 +1,4 @@
-gunicorn==22.0.0; python_version > '3.0'
+gunicorn==25.1.0; python_version > '3.0'
 gunicorn==19.10.0; python_version < '3.0'
 uvicorn~=0.17.0
 fastapi~=0.111.1
@@ -9,14 +9,14 @@ urllib3==2.6.3
 typing-inspect==0.9.0
 typing_extensions==4.12.2
 pydantic==2.9.2
-requests==2.32.4
+requests==2.32.5
 
 langchain==0.3.2
-langchain-community==0.3.27
-langchain-core==1.2.11
+langchain-community==0.4.1
+langchain-core==1.2.17
 langchain-google-vertexai==2.0.4
 
-google-cloud-aiplatform==1.133.0
+google-cloud-aiplatform==1.140.0
 google-cloud-bigquery==3.26.0
 google-cloud-tasks==2.16.5
 google-cloud-logging==3.11.2
