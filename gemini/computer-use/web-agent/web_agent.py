@@ -27,6 +27,7 @@ from google.genai.types import (
     Part,
     ThinkingConfig,
     Tool,
+    FinishReason,
 )
 from playwright.async_api import Page, async_playwright
 
@@ -175,6 +176,13 @@ async def agent_loop(initial_prompt: str, max_turns: int = 20) -> None:
                 if not response.candidates:
                     print("❗️ Model returned no candidates. Terminating loop.")
                     print("Full Response:", response)
+                    break
+
+                if response.candidates[0].finish_reason == FinishReason.SAFETY:
+                    print(
+                        f"🛑 SAFETY TRIGGERED: The model halted execution due to safety policies."
+                    )
+                    print(f"Details: {response.candidates[0].safety_ratings}")
                     break
 
                 print(
