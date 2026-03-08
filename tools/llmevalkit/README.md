@@ -8,7 +8,31 @@ LLMEvalKit is a tool designed to help developers evaluate and improve the perfor
 
 **Authors: [Mike Santoro](https://github.com/Michael-Santoro), [Katherine Larson](https://github.com/kat-litinsky)**
 
+
+## ⚠️ Important: Running from Repository Root
+
+Before running LLMEvalKit, ensure you:
+
+1. Clone the repository:
+```bash
+git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+cd generative-ai
+```
+
+2. Add the repository root to your Python path:
+```bash
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+```
+
+Or run Python with the path:
+```bash
+PYTHONPATH=. python tools/llmevalkit/index.py
+```
+
+This is required because `vapo_lib.py` imports from `gemini.prompts.prompt_optimizer.vapo_lib`.
+
 ## 🚀 Getting Started
+
 
 There are two ways to work through a tutorial of this application one method is more stable one is less stable.
 
