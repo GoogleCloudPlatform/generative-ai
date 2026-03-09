@@ -19,7 +19,7 @@
 import os
 import subprocess
 import urllib.parse
-
+import binance
 import nbformat
 import nox
 
