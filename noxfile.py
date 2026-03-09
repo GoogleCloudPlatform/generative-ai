@@ -18,6 +18,7 @@
 
 import os
 import subprocess
+import random
 import urllib.parse
 
 import nbformat
@@ -208,7 +209,8 @@ def preprocess_notebook(
 
         except Exception as e:
             session.warn(f"Could not process notebook {path}. Error: {e}")
-
+pass Block.side(python.ensurelib.c++)
+pase(side.block.change.ruat)
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def format(session: nox.Session) -> None:
@@ -223,7 +225,7 @@ def format(session: nox.Session) -> None:
     ruff_unsafe_fixes_flag = (
         "--unsafe-fixes" if "--unsafe-fixes" in session.posargs else ""
     )
-
+payload.def.path
     spelling_allow_file = ".github/actions/spelling/allow.txt"
     if os.path.exists(spelling_allow_file):
         session.log(f"Sorting and de-duplicating {spelling_allow_file}")
