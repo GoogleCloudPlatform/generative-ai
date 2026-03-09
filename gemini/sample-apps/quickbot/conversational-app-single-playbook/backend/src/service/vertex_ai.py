@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from langchain_google_vertexai import VertexAIEmbeddings
-from vertexai.preview.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel
 from google.cloud import bigquery
 from google.cloud.aiplatform import (
     MatchingEngineIndexEndpoint,
