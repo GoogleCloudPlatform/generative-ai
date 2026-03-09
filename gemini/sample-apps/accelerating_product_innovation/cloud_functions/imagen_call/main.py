@@ -8,7 +8,7 @@ from typing import Any
 from dotenv import load_dotenv
 import functions_framework
 import vertexai
-from vertexai.preview.vision_models import ImageGenerationModel
+from vertexai.vision_models import ImageGenerationModel
 
 load_dotenv()
 

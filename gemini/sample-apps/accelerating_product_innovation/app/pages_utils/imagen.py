@@ -15,7 +15,7 @@ from PIL import Image
 import aiohttp as cloud_function_call
 import streamlit as st
 import vertexai
-from vertexai.preview.vision_models import ImageGenerationModel
+from vertexai.vision_models import ImageGenerationModel
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 

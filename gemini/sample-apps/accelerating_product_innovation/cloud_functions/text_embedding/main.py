@@ -8,7 +8,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 import functions_framework
-from vertexai.preview.language_models import TextEmbeddingModel
+from vertexai.language_models import TextEmbeddingModel
 
 load_dotenv()
 

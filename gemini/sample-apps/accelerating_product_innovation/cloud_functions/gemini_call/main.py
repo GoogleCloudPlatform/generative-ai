@@ -7,8 +7,8 @@ from typing import Any
 
 from dotenv import load_dotenv
 import functions_framework
-from vertexai.preview import generative_models
-from vertexai.preview.generative_models import GenerativeModel
+from vertexai import generative_models
+from vertexai.generative_models import GenerativeModel
 
 load_dotenv()
 

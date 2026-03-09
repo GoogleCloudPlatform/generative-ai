@@ -7,7 +7,7 @@ import backoff
 from google.api_core.exceptions import ResourceExhausted
 import numpy as np
 import streamlit as st
-from vertexai.preview.language_models import TextEmbeddingModel
+from vertexai.language_models import TextEmbeddingModel
 
 
 @st.cache_resource

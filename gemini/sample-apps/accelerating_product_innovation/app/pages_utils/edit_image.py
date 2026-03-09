@@ -29,7 +29,7 @@ import PIL
 import streamlit as st
 from PIL import Image
 from app.pages_utils.imagen import predict_edit_image
-from vertexai.preview.vision_models import Image as vertex_image
+from vertexai.vision_models import Image as vertex_image
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
 
