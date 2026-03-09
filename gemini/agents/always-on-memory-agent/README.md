@@ -114,8 +114,8 @@ A: "Based on your memories, prioritize:
 ### 1. Install
 
 ```bash
-git clone https://github.com/Shubhamsaboo/always-on-memory-agent.git
-cd always-on-memory-agent
+git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+cd generative-ai/gemini/agents/always-on-memory-agent
 pip install -r requirements.txt
 ```
 
