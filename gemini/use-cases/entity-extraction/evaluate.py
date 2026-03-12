@@ -1,4 +1,6 @@
+import dotenv
 import json
+import os
 import pandas as pd
 
 from google.genai import types
@@ -7,16 +9,22 @@ import vertexai
 import document_processing
 
 
-PROJECT_ID = "arielj-argolis-1"
-LOCATION = "us-central1"
-IMAGE_PATHS = "images.csv"
-IMAGE_PREFIX = "gs://arielj-argolis-1-images/dataset"
+# Load environment variables.
+dotenv.load_dotenv()
+PROJECT_ID = os.environ.get("GEMINI_PROJECT_ID")
+if not PROJECT_ID:
+    raise ValueError("GEMINI_PROJECT_ID environment variable must be set.")
+LOCATION = os.environ.get("GEMINI_LOCATION", "global")
+IMAGE_PATHS = os.environ.get("IMAGE_PATHS", "")
+IMAGE_PREFIX = os.environ.get("IMAGE_PREFIX", "")
+
+# Other constants.
 EVAL_MODEL = "gemini-2.5-flash"
 SAMPLE_SIZE = 10
 
 
 def load_eval_data(csv_path: str, image_prefix: str) -> pd.DataFrame:
-    """Reads eval data from CSV, formats paths, and prepares reference labels."""
+    """Reads eval data from CSV, formats paths, and prepares labels."""
     df = pd.read_csv(csv_path)
     df = df[["img_path", "label"]]
     df["img_path"] = f"{image_prefix}/" + df["img_path"]
@@ -26,17 +34,35 @@ def load_eval_data(csv_path: str, image_prefix: str) -> pd.DataFrame:
 def prepare_eval_df(
     csv_path: str, 
     image_prefix: str, 
-    sample_size: int = None
+    sample_size: int = None,
+    random_state: int = None,
+    stratify: bool = False,
+    classes: list[str] = None
 ) -> pd.DataFrame:
     """Prepares the eval_df based on the data from csv file with image paths."""  
-    classification_classes = (
+    config_classes = (
         document_processing.CONFIGS["classification_config"]["classes"]
     )
+
+    if classes is None:
+        prompt_classes = config_classes
+        filter_classes = list(config_classes.keys())
+    else:
+        prompt_classes = {
+            k: v for k, v in config_classes.items() if k in classes
+        }
+        filter_classes = classes
+
     prompt = document_processing.CLASSIFY_PROMPT_TEMPLATE.format(
-        classes=json.dumps(classification_classes, indent=4)
+        classes=json.dumps(prompt_classes, indent=4)
     )
+    print(prompt)
 
     df = load_eval_data(csv_path, image_prefix)
+
+    # Filter the dataframe to only include the requested classes
+    df = df[df["reference"].isin(filter_classes)].reset_index(drop=True)
+
     requests = []
     for uri in df["img_path"]:
         image_part = types.Part.from_uri(
@@ -48,7 +74,24 @@ def prepare_eval_df(
     df["request"] = requests
     
     if sample_size and sample_size < len(df):
-        df = df.sample(n=sample_size).reset_index(drop=True)
+        if stratify:
+            # Proportional stratified sampling per class
+            fraction = sample_size / len(df)
+            df = df.groupby("reference", group_keys=False).apply(
+                lambda x: x.sample(
+                    n=max(1, int(round(len(x) * fraction))), 
+                    random_state=random_state
+                )
+            )
+            # Correct any slight oversampling due to rounding
+            if len(df) > sample_size:
+                df = df.sample(n=sample_size, random_state=random_state)
+            df = df.reset_index(drop=True)
+        else:
+            df = df.sample(
+                n=sample_size, 
+                random_state=random_state
+            ).reset_index(drop=True)
     
     return df
 
@@ -59,17 +102,30 @@ def extract_class(response_str):
     except (json.JSONDecodeError, AttributeError):
         return response_str
 
-def run_evaluation():
-    client = vertexai.Client(project=PROJECT_ID, location=LOCATION)
+def run_evaluation(
+    project_id: str = PROJECT_ID,
+    location: str = LOCATION,
+    csv_path: str = IMAGE_PATHS,
+    image_prefix: str = IMAGE_PREFIX,
+    eval_model: str = EVAL_MODEL,
+    sample_size: int = SAMPLE_SIZE,
+    random_state: int = 42,
+    stratify: bool = False,
+    classes: list[str] = None
+):
+    client = vertexai.Client(project=project_id, location=location)
 
     eval_df = prepare_eval_df(
-        csv_path=IMAGE_PATHS, 
-        image_prefix=IMAGE_PREFIX, 
-        sample_size=SAMPLE_SIZE
+        csv_path=csv_path, 
+        image_prefix=image_prefix, 
+        sample_size=sample_size,
+        random_state=random_state,
+        stratify=stratify,
+        classes=classes
     )
 
     eval_dataset = client.evals.run_inference(
-        model=EVAL_MODEL,
+        model=eval_model,
         src=eval_df,
         config={
             "generate_content_config": {
@@ -82,10 +138,13 @@ def run_evaluation():
     if hasattr(eval_dataset, "eval_dataset_df"):
         eval_dataset = eval_dataset.eval_dataset_df
 
-    eval_dataset["predicted_class"] = eval_dataset["response"].apply(extract_class)
+    eval_dataset["predicted_class"] = (
+        eval_dataset["response"].apply(extract_class)
+    )
 
     # The evaluate function expects 'prompt', 'response', and 'reference'
-    # columns.
+    # columns, even though the comparison is done between 'response' and 
+    # 'reference' only.
     eval_input_df = eval_dataset.copy()
     eval_input_df["response"] = eval_input_df["predicted_class"]
     eval_input_df["prompt"] = "Multimodal classification prompt"
@@ -110,12 +169,12 @@ def run_evaluation():
     eval_input_df["exact_match"] = exact_match_scores
     eval_input_df["request"] = eval_dataset["request"]
 
-    pd.set_option('display.max_colwidth', None)
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', 80)
+    # Select and reorder columns for the final results table
+    results_df = eval_input_df[
+        ["img_path", "response", "reference", "exact_match"]
+    ]
 
-    print(eval_input_df[["img_path", "response", "reference", "exact_match"]])
+    return eval_result, results_df
 
-if __name__ == "__main__":
-    run_evaluation()
+# if __name__ == "__main__":
+#     run_evaluation()
