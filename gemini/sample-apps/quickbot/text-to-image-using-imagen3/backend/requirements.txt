@@ -5,13 +5,13 @@ fastapi~=0.111.1
 fastapi-utilities==0.2.0
 cloudpickle==2.2.1
 grpcio==1.66.2
-urllib3==1.26.16
+urllib3==2.6.3
 typing-inspect==0.9.0
 typing_extensions==4.12.2
 pydantic==2.9.2
-requests==2.31.0
+requests==2.32.4
 
-google-cloud-aiplatform==1.69.0
+google-cloud-aiplatform==1.133.0
 google-cloud-bigquery==3.26.0
 google-cloud-tasks==2.16.5
 google-cloud-logging==3.11.2
