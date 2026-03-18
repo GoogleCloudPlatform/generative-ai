@@ -37,6 +37,7 @@ response from the generative model.
 import json
 import logging
 import os
+import warnings
 from typing import Any
 
 from dotenv import load_dotenv
@@ -45,7 +46,6 @@ from google.cloud import aiplatform, storage
 from vertexai.generative_models import GenerationConfig
 from vertexai.preview import prompts
 from vertexai.preview.prompts import Prompt
-import warnings
 
 # Suppress the UserWarning from vertexai.generative_models as we need to use it
 # for Prompt Management until google-genai SDK supports it.

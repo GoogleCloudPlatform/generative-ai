@@ -47,7 +47,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TARGET_MODELS = ["gemini-2.0-flash-001", "gemini-2.0-flash-lite-001"]
+TARGET_MODELS = [
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash-001",
+    "gemini-2.0-flash-lite-001",
+    "gemini-1.5-pro-002",
+    "gemini-1.5-flash-002",
+]
 
 
 def initialize_session_state() -> None:
@@ -243,7 +250,7 @@ def dataset_selection() -> None:
 
 
 def get_optimization_args(
-    input_optimization_data_file_uri, output_optimization_run_uri
+    input_optimization_data_file_uri, output_optimization_run_uri, target_model
 ):
     """Gets the arguments for the optimization job."""
     response_schema_str = st.session_state.local_prompt.prompt_meta.get(
@@ -278,7 +285,7 @@ def get_optimization_args(
             f"{st.session_state.local_prompt.prompt_to_run.prompt_data}"
             "\n\tAnswer: {target}"
         ),
-        target_model="gemini-2.0-flash-001",
+        target_model=target_model,
         optimization_mode="instruction",
         eval_metrics_types=[
             "question_answering_correctness",
@@ -354,7 +361,9 @@ def start_optimization() -> None:
             return
 
         args = get_optimization_args(
-            input_optimization_data_file_uri, output_optimization_run_uri
+            input_optimization_data_file_uri,
+            output_optimization_run_uri,
+            st.session_state.target_model_optimization
         )
 
         with st.expander("Prompt Optimization Config"):

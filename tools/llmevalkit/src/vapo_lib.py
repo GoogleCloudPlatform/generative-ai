@@ -17,4 +17,11 @@
 This file imports all the functions and classes from the original vapo_lib.py file.
 """
 
+import os
+import sys
+
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+if repo_root not in sys.path:
+    sys.path.append(repo_root)
+
 from gemini.prompts.prompt_optimizer.vapo_lib import *  # noqa: F403

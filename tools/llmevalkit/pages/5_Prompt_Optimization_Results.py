@@ -33,7 +33,6 @@ OPTIMIZATION_JOBS_SUBDIR = "optimization_jobs/"
 
 from google.cloud import aiplatform
 
-
 def list_custom_training_jobs(project_id: str, location: str):
     """Lists all custom training jobs and their statuses in a given project and location.
 

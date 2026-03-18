@@ -22,7 +22,9 @@ import pandas as pd
 import streamlit as st
 import vertexai
 from dotenv import load_dotenv
+from google import genai
 from google.cloud import storage
+from pydantic import BaseModel
 from src.gcp_prompt import GcpPrompt as gcp_prompt
 from vertexai.evaluation import (
     EvalTask,
@@ -30,8 +32,6 @@ from vertexai.evaluation import (
     PairwiseMetricPromptTemplate,
     PointwiseMetricPromptTemplate,
 )
-from google import genai
-from pydantic import BaseModel
 from vertexai.preview import prompts
 
 load_dotenv("src/.env")
@@ -393,7 +393,7 @@ def main() -> None:
             elif gcs_path.endswith(".jsonl"):
                 df_full = pd.read_json(gcs_path, lines=True)
             else:
-                st.error(f"Unsupported file type: {gcs_path.split('.')[-1]}")
+                st.error(f"Unsupported file type: {gcs_path.rsplit('.', maxsplit=1)[-1]}")
                 return
         except Exception as e:
             st.error(f"Error reading data from {gcs_path}: {e}")
