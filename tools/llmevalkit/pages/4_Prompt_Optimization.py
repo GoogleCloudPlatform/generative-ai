@@ -250,7 +250,8 @@ def dataset_selection() -> None:
 
 
 def get_optimization_args(
-    input_optimization_data_file_uri, output_optimization_run_uri, target_model
+    input_optimization_data_file_uri, output_optimization_run_uri, target_model,
+    target_qps=1.0, optimizer_qps=1.0, eval_qps=1.0, data_limit=10
 ):
     """Gets the arguments for the optimization job."""
     response_schema_str = st.session_state.local_prompt.prompt_meta.get(
@@ -303,15 +304,15 @@ def get_optimization_args(
         target_model_location="us-central1",
         source_model="",
         source_model_location="",
-        target_model_qps=1,
-        optimizer_model_qps=1,
-        eval_qps=1,
+        target_model_qps=target_qps,
+        optimizer_model_qps=optimizer_qps,
+        eval_qps=eval_qps,
         source_model_qps="",
         response_mime_type=response_mime_type,
         response_schema=response_schema_arg,
         language="English",
         placeholder_to_content=json.loads("{}"),
-        data_limit=10,
+        data_limit=data_limit,
         translation_source_field_name="",
         has_multimodal_inputs=has_multimodal,
     )
@@ -363,7 +364,11 @@ def start_optimization() -> None:
         args = get_optimization_args(
             input_optimization_data_file_uri,
             output_optimization_run_uri,
-            st.session_state.target_model_optimization
+            st.session_state.target_model_optimization,
+            st.session_state.target_qps,
+            st.session_state.optimizer_qps,
+            st.session_state.eval_qps,
+            st.session_state.data_limit
         )
 
         with st.expander("Prompt Optimization Config"):
@@ -417,6 +422,12 @@ def main() -> None:
         options=TARGET_MODELS,
         key="target_model_optimization",
     )
+
+    with st.expander("Advanced Settings"):
+        st.session_state.target_qps = st.number_input("Target Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
+        st.session_state.optimizer_qps = st.number_input("Optimizer Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
+        st.session_state.eval_qps = st.number_input("Evaluation QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
+        st.session_state.data_limit = st.number_input("Data Limit (Sample Size)", min_value=1, max_value=1000, value=10, step=1)
 
     prompt_selection()
     dataset_selection()

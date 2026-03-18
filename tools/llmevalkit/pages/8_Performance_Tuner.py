@@ -100,7 +100,8 @@ def refresh_bucket() -> list[str]:
 
 
 def get_optimization_args(
-    input_optimization_data_file_uri, output_optimization_run_uri, target_model, selected_metrics
+    input_optimization_data_file_uri, output_optimization_run_uri, target_model, selected_metrics,
+    target_qps=1.0, optimizer_qps=1.0, eval_qps=1.0, data_limit=10
 ):
     response_schema_str = st.session_state.local_prompt.prompt_meta.get(
         "response_schema", "{}"
@@ -147,15 +148,15 @@ def get_optimization_args(
         target_model_location="us-central1",
         source_model="",
         source_model_location="",
-        target_model_qps=1,
-        optimizer_model_qps=1,
-        eval_qps=1,
+        target_model_qps=target_qps,
+        optimizer_model_qps=optimizer_qps,
+        eval_qps=eval_qps,
         source_model_qps="",
         response_mime_type=response_mime_type,
         response_schema=response_schema_arg,
         language="English",
         placeholder_to_content=json.loads("{}"),
-        data_limit=10,
+        data_limit=data_limit,
         translation_source_field_name="",
         has_multimodal_inputs=has_multimodal,
     )
@@ -274,6 +275,12 @@ def main() -> None:
     selected_metrics = st.multiselect("Select Evaluation Metrics for Optimization", options=all_metrics, default=["question_answering_correctness"], key="tuner_metrics")
     target_model = st.selectbox("Select Target Model", options=TARGET_MODELS, key="tuner_target_model")
 
+    with st.expander("Advanced Settings"):
+        st.session_state.tuner_target_qps = st.number_input("Target Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1, key="tuner_target_qps_input")
+        st.session_state.tuner_optimizer_qps = st.number_input("Optimizer Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1, key="tuner_optimizer_qps_input")
+        st.session_state.tuner_eval_qps = st.number_input("Evaluation QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1, key="tuner_eval_qps_input")
+        st.session_state.tuner_data_limit = st.number_input("Data Limit (Sample Size)", min_value=1, max_value=1000, value=10, step=1, key="tuner_data_limit_input")
+
     st.divider()
 
     # 4. Execution
@@ -302,7 +309,10 @@ def main() -> None:
 
             st.session_state.dataset.to_json(str(input_optimization_data_file_uri), orient="records", lines=True)
 
-            args = get_optimization_args(input_optimization_data_file_uri, output_optimization_run_uri, target_model, selected_metrics)
+            args = get_optimization_args(
+                input_optimization_data_file_uri, output_optimization_run_uri, target_model, selected_metrics,
+                st.session_state.tuner_target_qps, st.session_state.tuner_optimizer_qps, st.session_state.tuner_eval_qps, st.session_state.tuner_data_limit
+            )
             args_dict = vars(args)
 
             config_file_uri = "gs://" + str(workspace_uri / "config" / "config.json")
