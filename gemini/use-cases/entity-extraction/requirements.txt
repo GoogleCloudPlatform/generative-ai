@@ -1,5 +1,6 @@
 dotenv
 flask
+google-cloud-aiplatform
 google-cloud-storage
 google-genai
 gunicorn

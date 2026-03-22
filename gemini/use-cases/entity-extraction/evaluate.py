@@ -1,3 +1,25 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Evaluation code for document classification use case. This code reads in a 
+CSV file with image paths and labels, prepares the data for evaluation, runs 
+inference using a specified Gemini model, and then evaluates the predictions 
+against the reference labels using the exact match metric in the Generative AI 
+Evaluation framework.
+"""
+
 import dotenv
 import json
 import os
@@ -17,8 +39,9 @@ if not PROJECT_ID:
 LOCATION = os.environ.get("GEMINI_LOCATION", "global")
 IMAGE_PATHS = os.environ.get("IMAGE_PATHS", "")
 IMAGE_PREFIX = os.environ.get("IMAGE_PREFIX", "")
+EVAL_DEST = os.environ.get("EVAL_DEST")
 
-# Other constants.
+# Other default constants.
 EVAL_MODEL = "gemini-2.5-flash"
 SAMPLE_SIZE = 10
 
@@ -111,7 +134,8 @@ def run_evaluation(
     sample_size: int = SAMPLE_SIZE,
     random_state: int = 42,
     stratify: bool = False,
-    classes: list[str] = None
+    classes: list[str] = None,
+    eval_dest: str = EVAL_DEST
 ):
     client = vertexai.Client(project=project_id, location=location)
 
@@ -131,7 +155,8 @@ def run_evaluation(
             "generate_content_config": {
                 "response_mime_type": "application/json",
                 "temperature": 0
-            }
+            },
+            "dest": eval_dest if eval_dest else None
         }
     )
 
@@ -156,6 +181,7 @@ def run_evaluation(
         client.evals.evaluate(
             dataset=eval_input_df,
             metrics=[vertexai.types.Metric(name='exact_match')],
+            config={"dest": eval_dest} if eval_dest else None
         )
     )
 
