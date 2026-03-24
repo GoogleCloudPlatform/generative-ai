@@ -83,7 +83,7 @@ def prepare_eval_df(
 
     df = load_eval_data(csv_path, image_prefix)
 
-    # Filter the dataframe to only include the requested classes
+    # Filter the DataFrame to only include the requested classes
     df = df[df["reference"].isin(filter_classes)].reset_index(drop=True)
 
     requests = []
@@ -190,8 +190,9 @@ def run_evaluation(
         for case in eval_result.eval_case_results
     ]
 
-    # Include the original request and the exact match score back into the 
-    # input dataframe.
+    # Include the original request and the exact match score back into the
+    # input DataFrame.
+
     eval_input_df["exact_match"] = exact_match_scores
     eval_input_df["request"] = eval_dataset["request"]
 
