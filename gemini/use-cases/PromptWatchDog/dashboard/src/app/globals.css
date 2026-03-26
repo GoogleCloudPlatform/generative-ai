@@ -1,0 +1,219 @@
+:root {
+  /* Google Material-ish Light Theme */
+  --bg-app: #f8f9fa;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f1f3f4;
+  --border-color: #dadce0;
+
+  /* Brand Colors - Indigo/Violet */
+  --primary-color: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --primary-glow: rgba(99, 102, 241, 0.3);
+
+  /* Status Colors (Google) */
+  --success: #34a853;
+  --success-bg: rgba(52, 168, 83, 0.1);
+  --warning: #fbbc04;
+  --warning-bg: rgba(251, 188, 4, 0.1);
+  --error: #ea4335;
+  --error-bg: rgba(234, 67, 53, 0.1);
+  --neutral: #5f6368;
+  --neutral-bg: rgba(95, 99, 104, 0.1);
+
+  /* Text */
+  --text-main: #202124;
+  --text-muted: #5f6368;
+  --text-light: #80868b;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  --transition-medium: 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  --shadow-md: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-geist-sans), Roboto, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* Utilities */
+.glass-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+}
+
+.glass-panel:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-sm);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  font-size: 0.875rem;
+  letter-spacing: 0.25px;
+  height: 36px;
+  /* Google standard button height */
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-surface-hover);
+  color: var(--primary-color);
+  border-color: var(--border-color);
+}
+
+.input-field {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  color: var(--text-main);
+  transition: var(--transition-fast);
+  font-size: 1rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--text-main);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  gap: 0.35rem;
+}
+
+.badge-success {
+  background-color: var(--success-bg);
+  color: var(--success);
+}
+
+.badge-warning {
+  background-color: var(--warning-bg);
+  color: #b06000;
+  /* Darker yellow/orange for text readability */
+}
+
+.badge-error {
+  background-color: var(--error-bg);
+  color: var(--error);
+}
+
+.badge-neutral {
+  background-color: var(--neutral-bg);
+  color: var(--neutral);
+}
+
+/* Code Block */
+.code-preview {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-main);
+  font-family: 'Roboto Mono', monospace;
+  line-height: 1.6;
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
