@@ -24,6 +24,7 @@ This directory contains notebooks and resources that demonstrate how to use Gemi
 - [Multimodal Data Curation](multimodal-data-curation/): A comprehensive solution for curating pre-training data for text-to-video models on Google Cloud.
 - [Multimodal Sentiment Analysis](multimodal-sentiment-analysis/): Learn how to perform multimodal sentiment analysis with Gemini.
 - [Productivity](productivity/): Learn how to use Gemini to boost your productivity.
+- [Prompt Watchdog](prompt-watchdog/): Real-time event-driven data monitoring using natural language prompts and Gemini.
 - [Retail](retail/): Explore retail use cases for Gemini.
 - [Retrieval-Augmented Generation](retrieval-augmented-generation/): Learn about Retrieval-Augmented Generation (RAG) with Gemini.
 - [Sheets Integration](sheets-integration/): Learn how to integrate Gemini with Google Sheets.
