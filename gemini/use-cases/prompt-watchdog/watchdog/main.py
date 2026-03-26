@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
 
 # {'message_id': '008', 'timestamp': '2023-12-23T10:12:00Z',
-#  'sender': 'buyer456', 'text': 'GOALLL'}
+#  'sender': 'buyer456', 'text': 'GOAL'}
 
 db = firestore.Client(
     database=os.getenv("FIRESTORE_DATABASE"),
@@ -118,7 +118,7 @@ def subscribe(cloud_event: CloudEvent) -> None:
             # Evaluate
             result = chain.invoke({"text": message_text})
 
-            # Structured JSON Log for GCP Metrics
+            # Structured JSON Log for Google Cloud Metrics
             matched = False
             reasoning = ""
             if isinstance(result, WatchdogResult):

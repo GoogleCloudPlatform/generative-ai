@@ -52,7 +52,7 @@ export function Hero() {
                     maxWidth: '600px',
                     margin: 0
                 }}>
-                    Real-time Insights metric powered by Gemini
+                    Real-time Insights metric with Gemini
                 </p>
             </div>
         </div>

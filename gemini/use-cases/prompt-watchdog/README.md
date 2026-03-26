@@ -8,7 +8,7 @@
   [![GCP](https://img.shields.io/badge/Google_Cloud-4285F4?logo=google-cloud&logoColor=white)](https://cloud.google.com/)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-  **Real-time Insights metric powered by Gemini**
+  **Real-time Insights metric with Gemini**
 
   </div>
 

@@ -89,11 +89,11 @@ graph TD
 ## 🛠️ The Tech Stack Detail
 
 ### 🧠 The Intelligence Layer
-*   **Gemini 3.5 Flash Lite**: The core brain. It’s fast enough for real-time streaming and smart enough to handle complex reasoning.
+*   **Gemini 3.5 Flash Lite**: The core brain. It's fast enough for real-time streaming and smart enough to handle complex reasoning.
 *   **LangChain**: The orchestrator. We use `PromptTemplate` to inject variables and `with_structured_output` to force Gemini to return strict Pydantic models.
 
 ### 🔍 Tracing and Observability (The Secret Sauce!)
-*   **LangSmith for Tracing**: Operating LLMs in production can be opaque. By integrating **LangChain + LangSmith**, we get deep visibility. We can trace exactly how prompts are interpreted, monitor latency, track token usage, and identify where the chain might be failing or slow. It’s essential for debugging fine-grained prompt logic without guessing!
+*   **LangSmith for Tracing**: Operating LLMs in production can be opaque. By integrating **LangChain + LangSmith**, we get deep visibility. We can trace exactly how prompts are interpreted, monitor latency, track token usage, and identify where the chain might be failing or slow. It's essential for debugging fine-grained prompt logic without guessing!
 
 ### 🏗️ The Infrastructure (Google Cloud)
 *   **Pub/Sub**: The event bus.

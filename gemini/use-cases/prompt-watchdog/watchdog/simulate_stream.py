@@ -23,7 +23,7 @@ conversation = [
         "sender": "Bob",
         "text": "Yes! Real Madrid is playing really well, that attack was fast.",
     },
-    {"sender": "Alice", "text": "That pass by Vinicius was incredible. Pure class."},
+    {"sender": "Alice", "text": "That pass by Ronaldo was incredible. Pure class."},
     {"sender": "Bob", "text": "Agreed. I think they might win the cup this year."},
     {
         "sender": "Alice",
