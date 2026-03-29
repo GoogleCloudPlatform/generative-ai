@@ -1,0 +1,338 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Technical Guide — Generative AI Video Evaluator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --code-bg: #000000;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+        }
+        aside {
+            width: 300px;
+            height: 100vh;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            position: fixed;
+            overflow-y: auto;
+        }
+        aside h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+        }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 0.75rem; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: var(--text); }
+        main {
+            margin-left: 300px;
+            padding: 4rem 6rem;
+            max-width: 1100px;
+        }
+        section { margin-bottom: 5rem; }
+        h1, h2, h3, h4 { margin-top: 2rem; margin-bottom: 1rem; color: #fff; }
+        h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.05em; }
+        h2 { font-size: 1.75rem; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; color: var(--primary); }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; }
+        p { margin-bottom: 1rem; color: var(--text-muted); }
+        
+        .folder-tree {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #34d399;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        
+        pre {
+            background: var(--code-bg);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            color: #e879f9;
+        }
+        pre code { color: #e4e4e7; }
+
+        .mermaid {
+            background: #ffffff05;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background: #3b82f610;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step-card {
+            border-left: 2px solid var(--primary);
+            padding-left: 1.5rem;
+            margin-left: 0.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .step-card::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <h1>Generative AI Dev Guide</h1>
+        <nav>
+            <ul>
+                <li><a href="#intro">1. Developer Onboarding</a></li>
+                <li><a href="#structure">2. Project Structure</a></li>
+                <li><a href="#component-tree">3. Component Hierarchy</a></li>
+                <li><a href="#pipeline">4. The Analysis Pipeline</a></li>
+                <li><a href="#under-the-hood">5. Under the Hood: Key Drivers</a></li>
+                <li><a href="#extensions">6. Extending the Core</a></li>
+                <li><a href="#api-contracts">7. API Data Structures</a></li>
+                <li><a href="#faq">8. FAQ & Troubleshooting</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <section id="intro">
+            <h1>Developer Onboarding</h1>
+            <p>Welcome to the <strong>Generative AI Video Evaluator</strong> codebase. This project is built as a High-Fidelity Analyzer capable of detecting subtle anomalies in AI-generated videos. It bridges the gap between generation models and production standards.</p>
+            <div class="alert">
+                <strong>Primary Engine</strong>: The core logic runs client-side via React, orchestrating parallel streams to the <strong>Gemini 1.5 Pro</strong> endpoint for visual auditing.
+            </div>
+        </section>
+
+        <section id="structure">
+            <h2>2. Project Structure</h2>
+            <p>The project is structured as a standard Vite-React application with a heavy emphasis on isolated <code>lib/</code> services.</p>
+            
+            <div class="folder-tree">
+src/<br>
+├── components/          <span style="color:#71717a">// UI Components (Shadcn, Index subviews)</span><br>
+│   ├── ui/              <span style="color:#71717a">// Low-level Atomic components (buttons, dialogs)</span><br>
+│   ├── Timeline.tsx     <span style="color:#71717a">// Interactive scrubbable flagged events</span><br>
+│   └── IssueCard.tsx    <span style="color:#71717a">// Renders single flag details (severity, category)</span><br>
+├── hooks/               <span style="color:#71717a">// Custom React Hooks</span><br>
+│   └── useVideoAnalysis.ts <span style="color:#71717a">// State machine controlling the entire pipeline</span><br>
+├── lib/                 <span style="color:#71717a">// Core Logic & APIs</span><br>
+│   ├── agents.ts        <span style="color:#71717a">// System Prompts & Tool Schemas for Gemini</span><br>
+│   ├── gemini.ts        <span style="color:#71717a">// Gemini API Client & Rate-Limit Backoff</span><br>
+│   ├── remediation.ts   <span style="color:#71717a">// Prompt-to-Prompt Generator</span><br>
+│   ├── veo.ts           <span style="color:#71717a">// Vertex AI Veo long-running task handler</span><br>
+│   └── video-utils.ts   <span style="color:#71717a">// Canvas-based frame extraction</span><br>
+└── pages/<br>
+    └── Index.tsx        <span style="color:#71717a">// Main Dashboard View containing all modular wrappers</span>
+            </div>
+        </section>
+
+        <section id="component-tree">
+            <h2>3. Component Hierarchy</h2>
+            <p>The Dashboard in <code>Index.tsx</code> aggregates states from multiple visual nodes. Here is the logical rendering tree:</p>
+            <div class="mermaid">
+                graph TD
+                    Index[Index.tsx] --> Top[Top Bar]
+                    Index --> Drop[VideoDropzone.tsx]
+                    Index --> MainGrid[Grid Layout]
+                    
+                    MainGrid --> Sub1[VideoPlayer.tsx]
+                    MainGrid --> Sub2[Timeline.tsx]
+                    MainGrid --> Sub3[IssueList.tsx]
+                    
+                    Sub3 --> IssueCard[IssueCard.tsx]
+                    Index --> Rem[RemediationOptions.tsx]
+                    Index --> Score[CoherenceScore.tsx]
+            </div>
+            <p><strong>State management</strong>: <code>Index.tsx</code> listens to state changes from the <code>useVideoAnalysis</code> hook and conditionally renders the grid once `analysisResult` is populated.</p>
+        </section>
+
+        <section id="pipeline">
+            <h2>4. The Analysis Pipeline</h2>
+            <p>Understanding how a video flows from user upload to structured critique is essential for working on the core.</p>
+
+            <div class="mermaid">
+                graph TD
+                    Start[User Upload] --> Extract[video-utils.ts]
+                    Extract -->|12 JPEG Frames| Orch[useVideoAnalysis.ts]
+                    Orch -->|Fork Async| A1[Object Agent]
+                    Orch -->|Fork Async| A2[Physics Agent]
+                    Orch -->|Fork Async| A3[Temporal Agent]
+                    
+                    subgraph "gemini.ts"
+                        A1 -->|POST request| Gem[Gemini 1.5 Pro]
+                        A2 -->|POST request| Gem
+                        A3 -->|POST request| Gem
+                        Gem -->|Tool Call| Resp[JSON Structure]
+                    end
+                    
+                    Resp --> Merge[Assemble & Score]
+                    Merge --> Render[Timeline Render]
+            </div>
+        </section>
+
+        <section id="under-the-hood">
+            <h2>5. Under the Hood: Key Drivers</h2>
+            <p>Below are detailed explanations of the critical codebases running the analyzer.</p>
+
+            <h3>A. useVideoAnalysis.ts (The Orchestrator)</h3>
+            <p>This hook manages the <code>isAnalyzing</code> and <code>progress</code> states. It ensures all async agent pipelines are execute in parallel to reduce wait times.</p>
+            <pre><code>// Simplified Pipeline in useVideoAnalysis.ts
+const analyzeVideo = async (file: File) => {
+  // 1. Frame Extraction
+  const { frames, duration } = await extractFrames(file, 12);
+
+  // 2. Parallel Execution
+  const agentPromises = enabledAgents.map(async (config) => {
+    const flags = await runAgent(config, frames, duration);
+    return { agent: config.type, flags, status: 'complete' };
+  });
+
+  // 3. Merge Results
+  const results = await Promise.all(agentPromises);
+}</code></pre>
+
+            <h3>B. video-utils.ts (Frame Extraction)</h3>
+            <p>To feed frames into Gemini, we use a client-side <code>HTML5 Canvas</code> approach. For performance & size limit reasons, we cap the dimensions.</p>
+            <pre><code>// Capping Resolution in video-utils.ts
+const maxDim = 800; // Max dimension for performance
+const scale = Math.min(maxDim / video.videoWidth, maxDim / video.videoHeight, 1);
+canvas.width = Math.round(video.videoWidth * scale);
+canvas.height = Math.round(video.videoHeight * scale);
+ctx.drawImage(video, 0, 0, canvas.width, canvas.height);</code></pre>
+            <div class="alert">
+                <strong>Performance Tip:</strong> Capping at 800px maintains sufficient quality for Gemini's vision sensors to track object details, without hitting token/size bandwidth limits.
+            </div>
+        </section>
+
+        <section id="extensions">
+            <h2>6. Extending the Core</h2>
+            <p>To add a new critique agent (e.g., <em>Audio Consistency Agent</em>), follow these 3 steps:</p>
+
+            <div class="step-card">
+                <h4>Step 1: Register Agent Type</h4>
+                <p>In <code>src/lib/types.ts</code>, append your type to <code>DefaultAgentType</code>:</p>
+                <pre><code>export type DefaultAgentType = 'object_permanence' | 'physics_motion' | 'temporal_consistency' | 'audio_sync';</code></pre>
+            </div>
+
+            <div class="step-card">
+                <h4>Step 2: Configure the Prompt</h4>
+                <p>In <code>src/lib/agents.ts</code>, create a new entry in <code>DEFAULT_AGENT_CONFIGS</code> with your system prompt instructions. Ensure you instruct the model to use the <code>FLAG_TOOL_SCHEMA</code>.</p>
+            </div>
+
+            <div class="step-card">
+                <h4>Step 3: Connect to Orchestrator</h4>
+                <p>In <code>src/hooks/useVideoAnalysis.ts</code>, ensure the batch execution maps over all `enabled` agents dynamically from your configuration.</p>
+            </div>
+        </section>
+
+        <section id="api-contracts">
+            <h2>7. API Data Structures</h2>
+            <p>The system relies on highly-predictable interfaces located in <code>src/lib/types.ts</code>.</p>
+            
+            <h3>The Flag Interface</h3>
+            <p>Captures a specific anomaly on the timeline.</p>
+            <pre><code>export interface Flag {
+  id: string;
+  timestamp: string;      // MM:SS format for UI Display
+  timestampSeconds: number; // For accurate timeline scrub position
+  severity: 'critical' | 'warning' | 'info';
+  category: AgentType;
+  description: string;
+  confidence: number;
+}</code></pre>
+
+            <h3>The AnalysisResult Interface</h3>
+            <pre><code>export interface AnalysisResult {
+  id: string;
+  videoName: string;
+  videoDuration: number;
+  coherenceScore: number;
+  flags: Flag[];
+  originPrompt?: string;  // Passed forward for the Regeneration Loop
+}</code></pre>
+        </section>
+
+        <section id="faq">
+            <h2>8. FAQ & Troubleshooting</h2>
+            <p>Common engineering issues found during integration:</p>
+            <ul>
+                <li><strong>Q: Why is "No frames could be extracted" showing up?</strong><br>
+                A: The video codec might be unsupported by the browser's <code>&lt;video&gt;</code> element. Ensure files are in standard H.264 MP4.</li>
+                <li><strong>Q: I got a 429 Error from Gemini when running batch.</strong><br>
+                A: The parallel execution triggers multiple requests at once. The <code>gemini.ts</code> handler includes a retry mechanism, but repeated 429's might mean you need to increase the delay threshold or lower the number of parallel agents for large batches.</li>
+                <li><strong>Q: How is the score calculated?</strong><br>
+                A: Total score starts at 100 and applies weighted deductions: Critical is -15, Warning is -7.</li>
+            </ul>
+        </section>
+
+    </main>
+
+</body>
+</html>

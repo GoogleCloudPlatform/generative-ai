@@ -1,0 +1,362 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative AI Video Evaluator — Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --primary: #3b82f6;
+            --primary-foreground: #ffffff;
+            --text: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --code-bg: #000000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 280px;
+            height: 100vh;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        aside h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+        }
+
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 0.75rem; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: var(--text); }
+
+        /* Main Content */
+        main {
+            margin-left: 280px;
+            padding: 4rem 6rem;
+            max-width: 1200px;
+        }
+
+        section { margin-bottom: 6rem; }
+
+        h1, h2, h3, h4 { margin-top: 2rem; margin-bottom: 1rem; color: #fff; }
+        h1 { font-size: 3rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+        h2 { font-size: 2rem; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; font-weight: 600; color: var(--primary); }
+
+        p { margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.05rem; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .card h4 { margin-top: 0; color: var(--primary); }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        pre code { background: none; padding: 0; }
+
+        .mermaid {
+            background: #ffffff05;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background: #3b82f610;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 100px;
+            background: var(--primary);
+            color: #fff;
+            margin-right: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        th { color: var(--primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        @media print {
+            aside { display: none; }
+            main { margin-left: 0; padding: 2rem; }
+            body { background: #fff; color: #000; }
+            h1, h2, h3, h4, p, th, td { color: #000 !important; }
+            .card { border: 1px solid #ddd; }
+        }
+    </style>
+</head>
+<body>
+    <aside>
+        <h1>Generative AI</h1>
+        <nav>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#architecture">2. Architecture</a></li>
+                <li><a href="#core-features">3. Core Features</a></li>
+                <li><a href="#agents">4. Evaluation Agents</a></li>
+                <li><a href="#remediation">5. Remediation & Fixes</a></li>
+                <li><a href="#technical">6. Technical Reference</a></li>
+                <li><a href="#deployment">7. Deployment Guide</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <section id="overview">
+            <h1>Reality Check Engine</h1>
+            <p>Reality Check Engine Project Documentation</p>
+            <div class="alert">
+                The Generative AI Video Evaluator is a high-fidelity quality assurance engine for AI-generated video. It uses a multi-agent critique model (ADK Agents) to detect physical impossibilities, object permanence violations, and environmental drift.
+            </div>
+            <h2>Introduction</h2>
+            <p>
+                As AI video generation (Sora, Veo, Kling) becomes more prevalent, the bottleneck has shifted from "creation" to "evaluation." Current AI models frequently suffer from "hallucinations"—subtle errors in physics, anatomy, and temporal continuity that the human eye often misses at first glance.
+            </p>
+            <p>
+                The Generative AI Video Evaluator automates this inspection process. It doesn't just "watch" a video; it breaks it into constituent frames, analyzes them semantically using distributed ADK agents, and benchmarks the results against ground truth data to ensure maximum reliability.
+            </p>
+        </section>
+
+        <section id="architecture">
+            <h2>System Architecture</h2>
+            <p>The system follows a modern decoupled architecture designed for high throughput and modularity.</p>
+            
+            <div class="mermaid">
+                graph TD
+                    A[Browser Frontend / Vite] --> B[Frame Extraction Engine]
+                    B --> C[Orchestrator Hook / useVideoAnalysis]
+                    C --> D[Multi-Agent ADK Pipeline]
+                    D --> E1[Object Permanence Agent]
+                    D --> E2[Physics & Motion Agent]
+                    D --> E3[Temporal Consistency Agent]
+                    E1 & E2 & E3 --> F[Score Computation & Flagging]
+                    F --> G[Prompt-to-Prompt Remediation]
+                    G --> H[Google Veo Regeneration]
+            </div>
+
+            <div class="feature-grid">
+                <div class="card">
+                    <h4>Frontend Stack</h4>
+                    <ul>
+                        <li>React 18 (TypeScript)</li>
+                        <li>Vite for fast hotswap</li>
+                        <li>Tailwind + Shadcn/UI</li>
+                        <li>Framer Motion</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Intelligence APIs</h4>
+                    <ul>
+                        <li>Gemini 1.5 Pro (Primary AI)</li>
+                        <li>Gemini 2.5 Flash (Fast Eval)</li>
+                        <li>Vertex AI (Google Veo)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="core-features">
+            <h2>Core Features</h2>
+            
+            <h3>1. Single Video Analysis</h3>
+            <p>Users can upload a single MP4/WebM file. The engine uses <code>canvas</code> to extract high-resolution frames (defaulting to 12 keyframes across the duration). These frames are sent to the ADK agents for multi-dimensional critique.</p>
+
+            <h3>2. Batch Evaluation & Coverage</h3>
+            <p>Crucial for enterprise workflows, the Batch mode allows uploading 20+ videos at once. It supports <strong>Ground Truth Benchmarking</strong>, where human-labeled issues are compared against AI detections to compute a "Recall Coverage" score.</p>
+
+            <h3>3. Real-time Flagging & Timelines</h3>
+            <p>Issues are plotted on an interactive timeline. Users can jump directly to the timestamp of an issue, confirm it, or dismiss it (updating the feedback loop).</p>
+
+            <div class="alert">
+                <strong>Ground Truth Benchmarking</strong> is the project's unique competitive advantage. It ensures that the AI evaluation remains honest and aligned with human standards.
+            </div>
+        </section>
+
+        <section id="agents">
+            <h2>Evaluation Agents</h2>
+            <p>Evaluation is split into specialized domains to prevent prompt fatigue and increase accuracy.</p>
+
+            <div class="card" style="margin-bottom: 1rem;">
+                <span class="tag">OBJ</span> <strong>Object Permanence Agent</strong>
+                <p>Tracks identity drift via <strong>Negative Bias</strong> prompting. Powered by <strong>Gemini 1.5 Pro</strong>, it identifies the exact <strong>start and end times</strong> of facial morphing or cloth pattern changes.</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1rem;">
+                <span class="tag">PHY</span> <strong>Physics & Motion Agent</strong>
+                <p>Audits gravity, biomechanics, and collision. Detects if a person's legs bend impossibly or if objects clip through walls.</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1rem;">
+                <span class="tag">TMP</span> <strong>Temporal Consistency Agent</strong>
+                <p>Focuses on environment. Detects background warping, texture crawling, and abrupt lighting/hue shifts between frames.</p>
+            </div>
+        </section>
+
+        <section id="remediation">
+            <h2>Remediation & Regeneration</h2>
+            <p>Detecting issues is only half the battle. The Generative AI Video Evaluator helps users *fix* the videos automatically through <strong>Closed-Loop Prompt Remediation</strong>.</p>
+
+            <h3>Strategy Recommendation</h3>
+            <p>Based on problem "density," the system suggests a strategy:</p>
+            <ul>
+                <li><strong>Cut & Download:</strong> For videos with 1-2 minor issues at specific timestamps.</li>
+                <li><strong>Advanced Regeneration:</strong> For videos where problems are systemic (density > 30%).</li>
+            </ul>
+
+            <h3>Google Veo Integration</h3>
+            <p>When "Regenerate" is chosen, the engine performs the following:</p>
+            <ol>
+                <li><strong>Prompt Analysis:</strong> Gemini analyzes the failed original prompt + the detected flags.</li>
+                <li><strong>Prompt-to-Prompt Optimization:</strong> <strong>Gemini 1.5 Pro</strong> analyzes the original failure + the flags to generate a "Corrective Prompt" that explicitly instructs the model to avoid past failures.</li>
+                <li><strong>Generation:</strong> The new prompt is sent to Google's Veo model via Vertex AI.</li>
+                <li><strong>Verification:</strong> The new video is automatically re-evaluated by the same agents to ensure a "Clean Pass."</li>
+            </ol>
+        </section>
+
+        <section id="technical">
+            <h2>Technical Reference</h2>
+            
+            <h3>Key State Hooks</h3>
+            <pre><code>// useVideoAnalysis.ts
+// Portrayed as a state machine:
+status: 'idle' | 'extracting' | 'analyzing' | 'complete' | 'error'
+
+// Frame Extraction Pipeline:
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+// Extracts 10 JPG base64 strings sequentially.</code></pre>
+
+            <h3>The Veo API Protocol (Regeneration)</h3>
+            <p>The system submits a long-running operation to Vertex AI. Below is the structure of the <code>POST</code> payload:</p>
+            <pre><code>{
+  "instances": [{
+    "prompt": "Corrected scene description...",
+    "referenceImages": [{
+      "image": { "bytesBase64Encoded": "..." },
+      "referenceType": "STYLE"
+    }]
+  }],
+  "parameters": {
+    "aspectRatio": "16:9",
+    "durationSeconds": 5
+  }
+}</code></pre>
+            <p>The system identifies exact <strong>start/end</strong> times for issues, which are summarized in the <code>prompt</code> to guide the model.</p>
+        </section>
+
+        <section id="deployment">
+            <h2>Deployment Guide</h2>
+            <p>The project is containerized for Google Cloud Run deployment.</p>
+            
+            <h4>Manual Deployment</h4>
+            <pre><code># Deployment trigger
+./deploy_gcp.sh
+
+# This runs the following:
+gcloud run deploy genai-video-eval \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8080</code></pre>
+
+            <h4>Nginx Configuration</h4>
+            <p>Since this is a Single Page Application (SPA), the <code>nginx.conf</code> is configured to handle the <code>try_files $uri $uri/ /index.html</code> pattern and proxy API requests.</p>
+        </section>
+    </main>
+
+    <footer style="margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem;">
+        &copy; 2026 Generative AI Video Evaluator
+    </footer>
+</body>
+</html>

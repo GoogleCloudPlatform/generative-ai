@@ -1,0 +1,287 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Engineering Guide — Generative AI Video Evaluator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --card: #141417;
+            --primary: #60a5fa;
+            --secondary: #c084fc;
+            --text-primary: #f4f4f5;
+            --text-muted: #9ca3af;
+            --border: #27272a;
+            --code-bg: #000000;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+        }
+        aside {
+            width: 320px;
+            height: 100vh;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            position: fixed;
+            overflow-y: auto;
+        }
+        aside h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 0.75rem; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: var(--text-primary); }
+        main {
+            margin-left: 320px;
+            padding: 4rem 5rem;
+            max-width: 1000px;
+            flex: 1;
+        }
+        section { margin-bottom: 5rem; }
+        h2 { font-size: 1.75rem; margin-bottom: 1.25rem; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.3rem; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--secondary); }
+        p { margin-bottom: 1.2rem; color: var(--text-muted); }
+        
+        pre {
+            background: var(--code-bg);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88em;
+            color: #e879f9;
+        }
+        pre code { color: #e4e4e7; }
+        
+        .badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background: #3b82f620;
+            color: var(--primary);
+            border: 1px solid #3b82f640;
+            font-family: monospace;
+            margin-bottom: 1rem;
+        }
+        
+        .table-container {
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(255,255,255,0.02); font-weight: 600; color: #fff; font-size: 0.9rem; }
+        td { font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <h1>🤖 AI Engineering Guide</h1>
+        <nav>
+            <ul>
+                <li><a href="#problem">1. The AI Video Problem</a></li>
+                <li><a href="#paradigm">2. The Multi-Agent Paradigm</a></li>
+                <li><a href="#tokens">3. Multimodal Token Budgeting</a></li>
+                <li><a href="#bias">4. Negative Bias Prompting</a></li>
+                <li><a href="#inference">5. Forced Structured Inference</a></li>
+                <li><a href="#remediation">6. Prompt-to-Prompt Vector</a></li>
+                <li><a href="#ops">7. LLM Ops & Resiliency</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <section id="problem">
+            <h2>1. The AI Video Consistency Problem</h2>
+            <p>Generative video models (e.g., Veo, Sora) face a fundamental <strong>continuity gap</strong>. While they can render photorealistic pixels, they struggle with temporal logic—leading to "melting" hands, objects vanishing behind trees, and gravity defying movements.</p>
+            <p>To build industrial-grade video workflows, we need a smart **Auditor**. The Generative AI Video Evaluator leverages specialized multi-agent critique systems to review these videos, identify timestamp-exact failures, and automatically <strong>recalculate corrected input prompts</strong> to fix the video in a closed-loop cycle.</p>
+        </section>
+
+        <section id="paradigm">
+            <h2>2. The Multi-Agent Paradigm</h2>
+            <span class="badge">Architectural Decision</span>
+            <p>Evaluating generative video is a high-density cognitive task. When a single foundation model (even with 1M+ context) is tasked with "finding all bugs," it suffers from **Attention Dilution**—focusing on stylistic flair instead of physical anomalies.</p>
+            
+            <div class="mermaid">
+                graph TD
+                    A[Video Input] --> B[Frame Extractor]
+                    B --> C[ADK Agent Mesh]
+                    subgraph "ADK Agents (Gemini 1.5 Pro)"
+                        C1[Physics Auditor]
+                        C2[Object Permanence Indexer]
+                        C3[Temporal Consistency Tracker]
+                        C --> C1
+                        C --> C2
+                        C --> C3
+                    end
+                    C1 --> D[Issue Aggregator]
+                    C2 --> D
+                    C3 --> D
+                    D -- "Flags detected" --> G[Remediation Engine]
+                    G --> H[Prompt Vector Transformation]
+                    H --> I[Veo Regeneration]
+                    I --> A
+                    D -- "No issues" --> F[Final Render Verified]
+            </div>
+
+            <p>Our architecture isolates reasoning into parallel, specialized micro-models:</p>
+            <ul>
+                <li><strong>Object Permanence Indexer</strong>: Anchors bounding-box consistency in the model weights.</li>
+                <li><strong>Physics & Motion Auditor</strong>: Audits trajectory vector plausibility.</li>
+                <li><strong>Temporal Consistency Tracker</strong>: Benchmarks background noise and frequency crawl.</li>
+            </ul>
+        </section>
+
+        <section id="tokens">
+            <h2>3. Multimodal Token Budgeting</h2>
+            <p>Connecting frames to **Gemini 1.5 Pro** requires balancing context size and inference latency. We use client-side downscaling: </p>
+            <pre><code>// src/lib/video-utils.ts
+const maxDim = 800; // Cap to 800px for optimal token weight
+const scale = Math.min(maxDim / videoWidth, maxDim / videoHeight, 1);</code></pre>
+            <p><strong>Token Impact</strong>: Scaling to 800px caps the image token weight to roughly **258 tokens per frame**. For a 12-frame sweep, the total payload is ~3,100 tokens—ideal for fast parallel REST execution without choking the concurrency buffers.</p>
+        </section>
+
+        <section id="bias">
+            <h2>4. The "Negative Bias" Prompting Strategy</h2>
+            <p>Foundation models are trained to be helpful, chatty, and polite. In a QA environment, this leads to **Agreeable Response Syndrome** where the model overlooks subtle deformities.</p>
+            <p>We inject a "Professional Suspicion" weight into the pre-prompt payload to override this behavior:</p>
+            <pre><code>// Implicit instruction weights
+`You are a CRITICAL auditor. 
+AI-videos FREQUENTLY violate basic laws of nature. 
+Your role is to FLAG anything that looks digital, impossible, or glitched.`</code></pre>
+            <p><strong>Sensitivity Multiplier</strong>: The frontend sensitivity slider (0-100) is injected directly into the system prompt config for the agent, acting as an attention-temperature dial.</p>
+        </pre>
+        </section>
+
+        <section id="inference">
+            <h2>5. Forced Structured Inference (Tooling)</h2>
+            <p>To feed the timeline graph, the responses *must* be deterministic. Instead of relying on raw text parsing or `json` output modes, we enforce structured inference via the **`functionCallingConfig`** setup.</p>
+            <pre><code>// src/lib/gemini.ts
+toolConfig: {
+  functionCallingConfig: {
+    mode: 'ANY', // FORCES the model to output a tool call
+    allowedFunctionNames: [toolName] 
+  }
+}</code></pre>
+            <p>By enforcing <code>mode: 'ANY'</code>, we guarantee that the response payload will conform perfectly to the exact `FLAG_TOOL_SCHEMA` provided, completely bypassing hallucinated or wordy markdown wrappers.</p>
+        </section>
+
+        <section id="remediation">
+            <h2>6. Prompt-to-Prompt Remediation Vector</h2>
+            <p>Continuous loop optimization works by converting **Qualitative Flags** back into **Quantitative Prompt Constraints**.</p>
+            
+            <p><strong>The Loop Mechanics</strong>:</p>
+            <ol>
+                <li><strong>Audit</strong>: Physics Agent returns `At 00:03, hand clips table`.</li>
+                <li><strong>Stitch</strong>: The remediation pipeline maps this flag to the initial prompt.</li>
+                <li><strong>Rewrite</strong>: An optimizer agent in <code>remediation.ts</code> injects a negative constraint in the prompt structure: <code>"Ensure hand preserves depth layering and does not intersect the table geometry."</code></li>
+                <li><strong>Re-verify</strong>: The new output is rendered by <strong>Google Veo</strong> with a <code>STYLE</code> reference to the original, locking down aesthetic drift while correcting geometry.</li>
+            </ol>
+
+            <h3>Code-Level Prompt Stitching</h3>
+            <p>The system aggregates the initial context and the structural audit before passing to the Optimizer model:</p>
+            <pre><code>// src/lib/remediation.ts
+export async function generateRegenerationPrompt(
+  videoName: string, flags: Flag[], originPrompt?: string
+) {
+  const prompt = `
+    Original prompt used: "${originPrompt}"
+    Detected issues by AI Evaluation Agents:
+    ${flags.map(f => `- [${f.category}]: ${f.description}`)}
+
+    Analyze the original prompt. Suggest an improved prompt for Google Veo that:
+    1. Retains the original concept.
+    2. Incorporates specific technical constraints to resolve the issues.
+    3. Explicitly instructs the model to avoid the failed behaviors.
+  `;
+  
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+}</code></pre>
+
+            <h3>Example Transformation</h3>
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Context</th>
+                        <th>State</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Original Prompt</strong></td>
+                        <td><code>"A robot chef flipping a hamburger in a futuristic kitchen, photorealistic."</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Detected Flag</strong></td>
+                        <td>⚠️ At 00:02, spatula clips through the burger patty, breaking collision physics.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Revised Output Prompt</strong></td>
+                        <td><code>"A robot chef flipping a hamburger in a futuristic kitchen, photorealistic. <strong>Ensure strict physical collision between the spatula and the meat patty. The spatula must slide under the patty without intersecting its volume.</strong>"</code></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section id="ops">
+            <h2>7. LLM Ops & Resiliency</h2>
+            <p>Parallelizing 3 agents per video naturally stresses rate limits (HTTP 429). The system uses a **nested backoff algorithm** for reliable scaling.</p>
+            <pre><code>// Exponential backoff in gemini.ts
+if (isRateLimit) {
+   const baseDelay = 3000; // Wait longer if rate limited
+   await new Promise(r => setTimeout(r, baseDelay * Math.pow(2, i)));
+}</code></pre>
+            <p><strong>Concurrency Management</strong>: State operations map over a standard <code>Promise.all()</code> allowing fast resolution times of under 12 seconds per video analysis pipeline.</p>
+        </section>
+
+    </main>
+
+</body>
+</html>

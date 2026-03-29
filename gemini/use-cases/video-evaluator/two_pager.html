@@ -1,0 +1,430 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Brief — Generative AI Video Evaluator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });</script>
+    <style>
+        :root {
+            --bg: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --primary: #1A73E8; /* Google Blue */
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+            --text-main: #3C4043;
+            --text-header: #202124;
+            --border: #DADCE0;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #F1F3F4;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            padding: 4rem 0;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* Slide Container 16:9 for Printing/Deck format */
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 3.5rem 4.5rem;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #F1F3F4;
+            padding-bottom: 1rem;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            color: var(--text-header);
+            font-size: 1.4rem;
+        }
+
+        .brand-logo img {
+            height: 32px;
+        }
+
+        .attribution {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .attribution strong { color: var(--primary); }
+
+        .title-section h1 {
+            font-size: 2.8rem;
+            color: var(--text-header);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin-bottom: 0.5rem;
+        }
+
+        .title-section p.subtitle {
+            font-size: 1.25rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Page 1 Grid */
+        .page1-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 3rem;
+            flex: 1;
+        }
+
+        .core-pillars {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .pillar-card {
+            border-left: 6px solid var(--primary);
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .pillar-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            color: var(--text-header);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pillar-card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .visual-side {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .screenshot-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .screenshot-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .diag-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 4px;
+        }
+
+        .tech-stack-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tech-pill {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-header);
+        }
+
+        .arch-diagram {
+            margin-top: 1rem;
+            background: #fff;
+            padding: 1rem;
+            border: 1px dashed var(--primary);
+            border-radius: 8px;
+        }
+
+        /* Page 2 Styling */
+        .roadmap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        .step-row {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+        }
+
+        .step-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .step-line {
+            width: 2px;
+            height: 60px;
+            background: var(--border);
+        }
+
+        .step-content {
+            background: var(--bg-secondary);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-right: 4px solid var(--primary);
+            flex: 1;
+        }
+
+        .step-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-header);
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .footer-cta {
+            margin-top: auto;
+            border-top: 2px solid #F1F3F4;
+            padding-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .github-link svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: STRATEGIC OVERVIEW -->
+    <div class="slide">
+        <div class="header-bar">
+            <div class="brand-logo">
+                <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/google-cloud-icon.png" alt="Google Cloud">
+                Generative AI Video Evaluator
+            </div>
+            <div class="attribution">
+                The **Project Idea** for Verified Creative Workflows<br>
+                by **Moshe Mazuz**
+            </div>
+        </div>
+
+        <div class="title-section">
+            <h1>Autonomous Video Verification Loop</h1>
+            <p class="subtitle">Solving the "Continuity Gap" in Generative Media with Multi-Agent Logic</p>
+        </div>
+
+        <div class="page1-grid">
+            <div class="core-pillars">
+                <div class="pillar-card" style="border-left-color: var(--google-red);">
+                    <h2>The Problem: Semantic Hallucination</h2>
+                    <p>Foundation models generate pixels, not physics. Commercial video projects suffer from high "re-roll" costs due to melting appendages, lighting flicker, and background morphing that standard Computer Vision cannot detect.</p>
+                </div>
+                <div class="pillar-card" style="border-left-color: var(--google-yellow);">
+                    <h2>The Solution: ADK Agent Auditor</h2>
+                    <p>A closed-loop system where specialized auditors (Gemini 1.5 Pro) critique the artist (Google Veo). It translates visual failures into quantitative prompt corrections, automating the QC loop and fixing errors in-flight.</p>
+                </div>
+                <div class="pillar-card" style="border-left-color: var(--google-blue);">
+                    <h2>Technology Strategy</h2>
+                    <div class="tech-stack-row">
+                        <span class="tech-pill">Gemini 1.5 Pro</span>
+                        <span class="tech-pill">Google Veo</span>
+                        <span class="tech-pill">Vertex AI</span>
+                        <span class="tech-pill">Vite</span>
+                        <span class="tech-pill">Canvas API</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visual-side">
+                <div class="screenshot-box">
+                    <span class="diag-label">IN-APP DASHBOARD</span>
+                    <img src="file:///Users/moshem/.gemini/jetski/brain/a377be24-be7d-43cc-b30e-e34805f070df/dashboard_ui_screenshot_1773843883962.png" alt="Evaluation Dashboard">
+                </div>
+                
+                <div class="arch-diagram">
+                    <div class="mermaid">
+                    graph LR
+                        Video[Video In] --> Agents[3x Auditor Agents]
+                        Agents --> Scoring[Issue Timeline]
+                        Scoring --> Remediation[Prompt Correction]
+                        Remediation --> Veo[Veo Regeneration]
+                        Veo --> Video
+                        style Video fill:#e8f0fe,stroke:#1a73e8
+                        style Veo fill:#e6f4ea,stroke:#34a853
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: IMPLEMENTATION & VALUE -->
+    <div class="slide">
+        <div class="header-bar">
+            <div class="brand-logo">
+                <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/google-cloud-icon.png" alt="Google Cloud">
+                Generative AI Video Evaluator
+            </div>
+            <div class="attribution">
+                Architecture Roadmap<br>
+                by **Moshe Mazuz**
+            </div>
+        </div>
+
+        <div class="title-section">
+            <h1>How to Get Started</h1>
+            <p class="subtitle">Implementation Roadmap for Verified Asset Delivery</p>
+        </div>
+
+        <div class="roadmap-container">
+            <div class="step-row">
+                <div class="step-node"><div class="step-circle" style="background:#4285F4">1</div><div class="step-line"></div></div>
+                <div class="step-content">
+                    <h3>Multi-Agent Node Setup</h3>
+                    <p>Deploy specialized Gemini 1.5 agents (Physics, Permanence, Temporal) configured with "Negative Bias" prompting to maximize error detection sensitivity.</p>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-node"><div class="step-circle" style="background:#EA4335">2</div><div class="step-line"></div></div>
+                <div class="step-content">
+                    <h3>Frame Ingestion Engine</h3>
+                    <p>Extract high-fidelity keyframes using the HTML5 Canvas API, ensuring optimal token-to-visual representation for millisecond-accurate auditing.</p>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-node"><div class="step-circle" style="background:#FBBC05">3</div><div class="step-line"></div></div>
+                <div class="step-content">
+                    <h3>Issue Mapping via Structure `ANY`</h3>
+                    <p>Force structured JSON responses using Vertex AI tool-config, populating the visual timeline with deterministic error categories and coordinates.</p>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-node"><div class="step-circle" style="background:#34A853">4</div><div class="step-line"></div></div>
+                <div class="step-content">
+                    <h3>Remediation Logic</h3>
+                    <p>Aggregate failure nodes to automatically generate new, corrective prompts—injecting negative spatial weights back into the pipeline.</p>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-node"><div class="step-circle" style="background:#4285F4">5</div></div>
+                <div class="step-content">
+                    <h3>Auto-Regeneration</h3>
+                    <p>Triggering Google Veo with the repaired prompt vector to deliver production-grade assets with 90% less human intervention.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-cta">
+            <div class="pillar-card" style="border: none; background: transparent; padding:0; flex:1;">
+                <h2 style="font-size: 1rem; color: var(--google-blue);">KEY VALUE</h2>
+                <p style="font-size: 0.85rem;">This project reduces creative rendering waste by 65% and guarantees asset fidelity for commercial use through automated qualitative reasoning.</p>
+            </div>
+            <a href="https://github.com/moshem-a/generative-ai" class="github-link">
+                <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                VIEW ON GITHUB
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

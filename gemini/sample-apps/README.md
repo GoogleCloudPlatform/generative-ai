@@ -18,4 +18,5 @@ This directory contains sample applications that demonstrate how to use the Gemi
 - [LlamaIndex RAG](llamaindex-rag/): An advanced Retrieval-Augmented Generation (RAG) system using LlamaIndex and Google Cloud Vertex AI for rapid prototyping and experimentation.
 - [Photo Discovery](photo-discovery/): A demo that integrates a Vertex AI Agent with a multi-platform Flutter app to identify landmarks and merchandise from photos.
 - [Quickbot](quickbot/): An innovative, out-of-the-box solution enabling users to deploy sophisticated AI Agents as full-stack cloud applications on their own Google Cloud Platform (GCP) accounts, entirely without requiring any coding expertise.
+- [Reality Check Engine](reality-check-engine/): An autonomous video verification loop that critiques and regenerates AI-generated video to fix temporal hallucinations and maintain physical consistency.
 - [SWOT Agent](swot-agent/): A web application that performs automated SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) using the Gemini 2.0 Flash model and the Pydantic AI agent framework.
