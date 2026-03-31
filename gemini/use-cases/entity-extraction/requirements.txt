@@ -1,5 +1,6 @@
 dotenv
 flask
+gcsfs
 google-cloud-aiplatform
 google-cloud-storage
 google-genai
