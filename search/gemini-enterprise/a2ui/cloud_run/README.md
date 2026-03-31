@@ -26,7 +26,7 @@ Before you begin, ensure you have the following installed and configured:
 *   **Authentication:** Log in to your Google Cloud account and set up
     application default credentials:
     ```bash
-    gcloud config set project <YOUR_RPOJECT_ID>
+    gcloud config set project <YOUR_PROJECT_ID>
     gcloud auth login
     gcloud auth application-default login
     ```
