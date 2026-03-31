@@ -1,13 +1,14 @@
 """Main entry point for the A2A A2UI sample agent."""
 
 import os
+
+import dotenv
+import uvicorn
 from a2a.server import tasks
 from a2a.server.apps.jsonrpc import starlette_app
 from a2a.server.request_handlers import default_request_handler
 from agent_executor import AdkAgentToA2AExecutor
-import dotenv
 from gemini_agent import GeminiAgent
-import uvicorn
 
 dotenv.load_dotenv()
 
@@ -31,4 +32,4 @@ app = starlette_app.A2AStarletteApplication(
 ).build()
 
 if __name__ == "__main__":
-  uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))

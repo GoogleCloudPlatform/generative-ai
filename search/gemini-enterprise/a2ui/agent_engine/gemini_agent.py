@@ -2,26 +2,26 @@
 
 import os
 
-from a2a import types
 import a2ui_examples
 import a2ui_schema
+from a2a import types
 from google.adk import agents
 
 
 # --- DEFINE YOUR TOOLS HERE ---
 def get_contact_info(name: str = None) -> str:
-  """Gets contact information for a person.
+    """Gets contact information for a person.
 
-  Args:
-      name: The name of the person to look up. If None, returns a list of
-        suggested contacts.
+    Args:
+        name: The name of the person to look up. If None, returns a list of
+          suggested contacts.
 
-  Returns:
-      JSON string containing contact details.
-  """
-  # Mock data
-  if name and "alex" in name.lower():
-    return """
+    Returns:
+        JSON string containing contact details.
+    """
+    # Mock data
+    if name and "alex" in name.lower():
+        return """
         {
             "name": "Alex Jordan",
             "title": "Software Engineer",
@@ -33,10 +33,10 @@ def get_contact_info(name: str = None) -> str:
             "imageUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
         }
         """
-  elif (
-      name and "sarah" in name.lower()
-  ):  # Match "sarah" to Sarah Chen as well for robustness
-    return """
+    if (
+        name and "sarah" in name.lower()
+    ):  # Match "sarah" to Sarah Chen as well for robustness
+        return """
         {
             "name": "Sarah Chen",
             "title": "Product Manager",
@@ -49,8 +49,8 @@ def get_contact_info(name: str = None) -> str:
         }
         """
 
-  # Default list if no specific name match or no name provided
-  return """
+    # Default list if no specific name match or no name provided
+    return """
     [
         {
             "name": "Alex Jordan",
@@ -77,11 +77,10 @@ def get_contact_info(name: str = None) -> str:
 
 
 def get_ui_prompt(examples: str) -> str:
-  """Constructs the full prompt with UI instructions, rules, examples, and schema."""
+    """Constructs the full prompt with UI instructions, rules, examples, and schema."""
+    formatted_examples = examples
 
-  formatted_examples = examples
-
-  return f"""
+    return f"""
     You are a helpful contact lookup assistant. Your final output MUST be a a2ui UI JSON response.
 
     To generate the response, you MUST follow these rules:
@@ -116,44 +115,44 @@ def get_ui_prompt(examples: str) -> str:
 
 
 class GeminiAgent(agents.LlmAgent):
-  """An agent powered by the Gemini model via Vertex AI."""
+    """An agent powered by the Gemini model via Vertex AI."""
 
-  # --- AGENT IDENTITY ---
-  name: str = "a2ui_contact_agent"
-  description: str = "A contact lookup assistant with rich UI."
+    # --- AGENT IDENTITY ---
+    name: str = "a2ui_contact_agent"
+    description: str = "A contact lookup assistant with rich UI."
 
-  def __init__(self, **kwargs):
-    print("Initializing A2UI GeminiAgent...")
+    def __init__(self, **kwargs):
+        print("Initializing A2UI GeminiAgent...")
 
-    # In a real deployment, base_url might come from env or config
-    instructions = get_ui_prompt(a2ui_examples.CONTACT_UI_EXAMPLES)
+        # In a real deployment, base_url might come from env or config
+        instructions = get_ui_prompt(a2ui_examples.CONTACT_UI_EXAMPLES)
 
-    # --- REGISTER YOUR TOOLS HERE ---
-    tools = [get_contact_info]
+        # --- REGISTER YOUR TOOLS HERE ---
+        tools = [get_contact_info]
 
-    super().__init__(
-        model=os.environ.get("MODEL", "gemini-2.5-flash"),
-        instruction=instructions,
-        tools=tools,
-        **kwargs,
-    )
+        super().__init__(
+            model=os.environ.get("MODEL", "gemini-3-flash-preview"),
+            instruction=instructions,
+            tools=tools,
+            **kwargs,
+        )
 
-  def create_agent_card(self, agent_url: str) -> "AgentCard":
-    return types.AgentCard(
-        name=self.name,
-        description=self.description,
-        url=agent_url,
-        version="1.0.0",
-        default_input_modes=["text/plain"],
-        default_output_modes=["text/plain"],
-        capabilities=types.AgentCapabilities(streaming=True),
-        skills=[
-            types.AgentSkill(
-                id="contact_lookup",
-                name="Contact Lookup",
-                description="Find contacts and view their details.",
-                tags=["contact", "directory"],
-                examples=["Who is Alex Jordan?", "Find software engineers"],
-            )
-        ],
-    )
+    def create_agent_card(self, agent_url: str) -> "AgentCard":
+        return types.AgentCard(
+            name=self.name,
+            description=self.description,
+            url=agent_url,
+            version="1.0.0",
+            default_input_modes=["text/plain"],
+            default_output_modes=["text/plain"],
+            capabilities=types.AgentCapabilities(streaming=True),
+            skills=[
+                types.AgentSkill(
+                    id="contact_lookup",
+                    name="Contact Lookup",
+                    description="Find contacts and view their details.",
+                    tags=["contact", "directory"],
+                    examples=["Who is Alex Jordan?", "Find software engineers"],
+                )
+            ],
+        )

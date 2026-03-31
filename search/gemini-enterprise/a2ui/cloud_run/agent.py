@@ -1,7 +1,7 @@
 """Agent entry point for ADK web."""
 
-from a2a_a2ui_sample import gemini_agent
 import dotenv
+from a2a_a2ui_sample import gemini_agent
 
 dotenv.load_dotenv()
 

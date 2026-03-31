@@ -24,7 +24,7 @@ Download JSON that looks like:
 {
     "web": {
         "client_id": "<client id>",
-        "project_id": "<gcp project id>",
+        "project_id": "<Google Cloud project id>",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://oauth2.googleapis.com/token",
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
@@ -107,14 +107,14 @@ NOTE: if you already have an agent that is deployed to Agent Engine, skip to
     -   `cp .env.example .env`
 2.  **Fill `.env`:** Update the `.env` file with your specific Google Cloud
     project details:
-    *   `PROJECT_ID`: Your GCP Project ID.
-    *   `LOCATION`: The GCP region you want to deploy the agent in (e.g.,
+    *   `PROJECT_ID`: Your Google Cloud Project ID.
+    *   `LOCATION`: The Google Cloud region you want to deploy the agent in (e.g.,
         `us-central1`). This location is **not** the same as the *location* used
         in the command above.
     *   `STORAGE_BUCKET`: A Google Cloud Storage bucket name for staging. It
         starts with **"gs://"**.
     *   `GEMINI_ENTERPRISE_APP_ID`: Your Gemini Enterprise Application ID. You
-        can create a new App or use an existing one on GCP Gemini Enterprise.
+        can create a new App or use an existing one on Google Cloud Gemini Enterprise.
     *   `AGENT_AUTHORIZATION`: the value **AGENT_AUTHORIZATION** obtained above.
 
 ## Running the Script
@@ -156,7 +156,7 @@ If you have an Agent that is already deployed to Agent Engine, you can manually
 register it on Gemini Enterprise without running "main.py" script.
 
 1.  Complete **Config Authorization** section above.
-2.  Open GCP **Gemini Enterprise**.
+2.  Open Google Cloud **Gemini Enterprise**.
 3.  Click on the **App** you want to register your agent.
     -   If you don't see the app being listed, click **Edit** to switch location
 4.  Select **Agents** from the left nav bar.
@@ -213,7 +213,7 @@ register it on Gemini Enterprise without running "main.py" script.
     Replace **LOCATION** and **RESOURCE_NAME**.
 
     -   LOCATION is where you deploy your agent. For example; us-central1.
-    -   RESOURCE_NAME can be found on GCP **Agent Engine**: click the agent;
+    -   RESOURCE_NAME can be found on Google Cloud **Agent Engine**: click the agent;
         click **Service Configuration**; select **Deployment details**; copy
         **Resource name**.
 
@@ -233,7 +233,7 @@ register it on Gemini Enterprise without running "main.py" script.
 
 ## Test Your Agent
 
-1.  Open GCP Console and search for **"Gemini Enterprise"** and click on it.
+1.  Open Google Cloud Console and search for **"Gemini Enterprise"** and click on it.
 2.  Open the project you used in the above setting.
 3.  Click on the **App** you used to register your agent.
     -   If you don't see your app being listed, click **"Edit"** to switch
