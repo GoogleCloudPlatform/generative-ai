@@ -14,6 +14,7 @@ when it is unknown. For more structured documents like complex forms, we recomme
 taking a look into [Document AI](https://cloud.google.com/document-ai/docs/overview),
 that provides powerful mechanisms for entity extraction and layout parsing.
 
+
 ## Overview
 
 The core of this project is a Python script that takes a document and a configuration
@@ -81,6 +82,10 @@ the Gemini API (online).
     details:
     ```bash
     GEMINI_PROJECT_ID="project-id-for-gemini-api"
+    ```
+    To store evaluation results in Vertex AI Experiments, you can also define an evaluation destination bucket:
+    ```bash
+    EVAL_DEST="gs://your-bucket-name/evaluations"
     ```
     You can also update the other constants if needed.
 
@@ -259,6 +264,20 @@ EXTRACT_PROMPT_TEMPLATE = """\
 """
 ```
 
+## Evaluation
+
+You can assess the quality and accuracy of the document classification model using the Vertex AI Evaluation Service. The `evaluate.py` script computes the `exact_match` metric comparing the model's prediction against a ground-truth dataset. The evaluation dataset is a subset of images from the RVL-CDIP dataset converted to png.
+
+We also provide a Python notebook `evaluate.ipynb` for interactive experimentation and visualization of the evaluation process.
+
+To run the evaluation script:
+
+```bash
+python evaluate.py
+```
+
+If you configured `EVAL_DEST` in your `.env` file, the evaluation results and metrics will be persisted to your GCS bucket and viewable in the Google Cloud Console under the Vertex AI Experiments page.
+
 ## Further development
 
 We are planning to add the following functionalities to this project:
@@ -268,19 +287,37 @@ We are planning to add the following functionalities to this project:
   receive the results when they are ready, which is ideal for high-volume, offline
   workflows.
 
-- Integration with the Evaluation Service to assess the quality and accuracy
-  of an evaluation dataset. This feature will provide a robust method for evaluating
-  model performance and fine-tuning prompts to achieve better results.
-
 Future architecture:
 ![Future Architecture](./images/future_architecture.png)
 
+## Dataset Attribution
+
+This project utilizes the **RVL-CDIP** (Ryerson Vision Lab Complex Document Information Processing) dataset. 
+
+If you use this project or build upon it, please ensure you appropriately credit the dataset creators and the original document sources:
+
+*   **RVL-CDIP Dataset:** Created by Adam W. Harley, Alex Ufkes, and Konstantinos G. Derpanis.
+*   **Parent Collection:** The dataset is a subset of the IIT-CDIP Test Collection 1.0.
+*   **Original Source:** The documents were originally collected and are maintained by the [UCSF Industry Documents Library](https://www.industrydocuments.ucsf.edu/) (formerly the Legacy Tobacco Document Library).
+
+### Citation
+
+If you are using this code for academic or research purposes, please cite the original RVL-CDIP paper:
+
+```bibtex
+ @inproceedings{harley2015icdar,
+    title = {Evaluation of Deep Convolutional Nets for Document Image Classification and Retrieval},
+    author = {Adam W. Harley and Alex Ufkes and Konstantinos G. Derpanis},
+    booktitle = {International Conference on Document Analysis and Recognition (ICDAR)},
+    year = {2015},
+    pages = {991--995}
+}
+```
+
 ## Authors
 
-| Authors                                        |
-| ---------------------------------------------- |
-| [Ariel Jassan](https://github.com/arieljassan) |
-| [Ben Mizrahi](https://github.com/benmizrahi)   |
+- **Author:** [Ariel Jassan](https://github.com/arieljassan)
+- **Contributor:** [Ben Mizrahi](https://github.com/benmizrahi)
 
 ## Disclaimer
 
