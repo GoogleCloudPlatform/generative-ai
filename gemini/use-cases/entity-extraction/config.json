@@ -1,5 +1,201 @@
 {
     "extraction_configs": {
+        "scientific_report": {
+            "document_name": "Research findings document",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "title": "Title of the report",
+                "authors": "List of authors",
+                "publication_date": "Date of publication",
+                "abstract_summary": "Summary of the abstract or executive summary",
+                "keywords": "Key topics or keywords mentioned"
+            }
+        },
+        "resume": {
+            "document_name": "CV or work history",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "candidate_name": "Full name of the candidate",
+                "email": "Email address",
+                "phone": "Phone number",
+                "education": "Highest degree and university",
+                "skills": "List of technical or professional skills",
+                "last_job_title": "Most recent job title"
+            }
+        },
+        "memo": {
+            "document_name": "Internal office brief",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "sender": "Name or department sending the memo",
+                "recipient": "Name or department receiving the memo",
+                "date": "Date of the memo",
+                "subject": "Subject line",
+                "action_items": "List of required actions or requests"
+            }
+        },
+        "file_folder": {
+            "document_name": "Folder cover or label",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "label_text": "Text written on the folder tab or cover",
+                "department": "Department or category associated with the folder",
+                "year": "Year associated with the folder contents",
+                "color": "Visual color of the folder if distinguishable"
+            }
+        },
+        "specification": {
+            "document_name": "Design requirements",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "project_name": "Name of the project or product",
+                "spec_id": "Specification ID or document number",
+                "version": "Version number",
+                "requirements_summary": "Summary of main technical requirements",
+                "status": "Status (e.g., Draft, Approved, Deprecated)"
+            }
+        },
+        "news_article": {
+            "document_name": "News report",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "headline": "Main headline of the article",
+                "publication_source": "Name of the newspaper or website",
+                "date": "Date of publication",
+                "author": "Name of the journalist or author",
+                "topic": "Main topic or category (e.g., Politics, Sports, Tech)"
+            }
+        },
+        "letter": {
+            "document_name": "Written correspondence",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "sender_name": "Name of the sender",
+                "sender_address": "Address of the sender",
+                "recipient_name": "Name of the recipient",
+                "recipient_address": "Address of the recipient",
+                "date": "Date of the letter",
+                "subject": "Subject or reference line"
+            }
+        },
+        "form": {
+            "document_name": "Fill-in-the-blank document",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "form_title": "Title or header of the form",
+                "form_id": "Form ID number",
+                "person_name": "Name of the person filling the form",
+                "submission_date": "Date the form was filled or signed",
+                "is_signed": "Boolean indicating if a signature is present"
+            }
+        },
+        "budget": {
+            "document_name": "Financial plan",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "period_start": "Start date of the budget period",
+                "period_end": "End date of the budget period",
+                "total_revenue": "Total projected revenue",
+                "total_expenses": "Total projected expenses",
+                "department": "Department or project the budget belongs to"
+            }
+        },
+        "handwritten": {
+            "document_name": "Non-typed text",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "transcription": "Full text transcription of the handwriting",
+                "language": "Language of the text",
+                "sentiment": "Sentiment of the content (Positive, Negative, Neutral)",
+                "writer_name": "Name of the writer if identifiable"
+            }
+        },
+        "email": {
+            "document_name": "Digital message",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "from": "Sender email address",
+                "to": "Recipient email address",
+                "cc": "CC email addresses",
+                "date": "Date and time sent",
+                "subject": "Subject line",
+                "body_summary": "Summary of the email body content"
+            }
+        },
+        "invoice": {
+            "document_name": "Request for payment",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "invoice_number": "Unique invoice identifier",
+                "vendor_name": "Name of the vendor or seller",
+                "invoice_date": "Date of issue",
+                "total_amount": "Total amount due",
+                "currency": "Currency code (e.g., USD, EUR)",
+                "due_date": "Payment due date"
+            }
+        },
+        "presentation": {
+            "document_name": "Slide deck",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "title": "Title of the presentation",
+                "presenter": "Name of the presenter or author",
+                "slide_count": "Total number of slides",
+                "event_name": "Name of the event or meeting context",
+                "key_takeaways": "List of key points or summary"
+            }
+        },
+        "scientific_publication": {
+            "document_name": "Scholarly article",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "article_title": "Title of the article",
+                "journal_name": "Name of the academic journal",
+                "volume_issue": "Volume and issue number",
+                "authors": "List of authors",
+                "doi": "Digital Object Identifier (DOI)",
+                "abstract": "Full text of the abstract"
+            }
+        },
+        "questionnaire": {
+            "document_name": "Survey instrument",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "survey_title": "Title of the questionnaire",
+                "target_audience": "Intended audience description",
+                "number_of_questions": "Count of questions",
+                "response_type": "Type of responses (e.g., Multiple Choice, Open text)",
+                "instructions": "Instructions for the respondent"
+            }
+        },
+        "advertisement": {
+            "document_name": "Promotional content",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "brand_name": "Name of the brand",
+                "product_name": "Name of the product or service",
+                "headline": "Main promotional headline",
+                "offer_details": "Details of any discount or offer",
+                "call_to_action": "The primary action requested (e.g., Buy Now, Visit Website)",
+                "contact_info": "Phone number or website listed"
+            }
+        },
         "form_10_k": {
             "document_name": "Annual report of a company",
             "document_mime_type": "application/pdf",
@@ -11,7 +207,6 @@
                 "net_income_millions": "Net income in million dollars"
             }
         },
-
         "form_10_q": {
             "document_name": "Quarter report of a company",
             "document_mime_type": "application/pdf",
@@ -21,7 +216,19 @@
                 "quarter": "Quarter of the report (Q1, Q2, Q3, Q4)",
                 "company_name": "Name of the company",
                 "ceo": "Name of the CEO of the company",
-                "net_income_millions": "Net income in million dollars"
+                "net_income_millions": "Net income in million dollars",
+                "net_income_previous_year_millions": "Net income of previous year in million dollars"
+            }
+        },
+        "other": {
+            "document_name": "Unclassified Document",
+            "document_mime_type": "application/pdf",
+            "model": "gemini-2.5-flash",
+            "fields": {
+                "summary": "Brief summary of the document content",
+                "suggested_category": "A suggested category if none of the above fit",
+                "language": "Dominant language of the document",
+                "entity_names": "List of major entities (people, orgs) found"
             }
         }
     },
@@ -30,6 +237,22 @@
         "document_mime_type": "application/pdf",
         "model": "gemini-2.5-flash",
         "classes": {
+            "scientific_report": "Research findings document", 
+            "resume": "CV or work history", 
+            "memo": "Internal office brief", 
+            "file_folder": "Folder cover or label", 
+            "specification": "Design requirements", 
+            "news_article": "Clipping from a newspaper, magazine, or journal",
+            "handwritten": "Document entirely handwritten. Process this before other classes", 
+            "letter": "Typed correspondence with a clear sender, recipient, or salutation", 
+            "form": "Fill-in-the-blank document", 
+            "budget": "Financial plan", 
+            "email": "Digital message", 
+            "invoice": "Request for payment", 
+            "presentation": "Official corporate communications or media press releases", 
+            "scientific_publication": "Scholarly article", 
+            "questionnaire": "Survey instrument", 
+            "advertisement": "Promotional content",
             "form_10_k": "Annual report of a company",
             "form_10_q": "Quarter report of a company",
             "other": "None of the above"

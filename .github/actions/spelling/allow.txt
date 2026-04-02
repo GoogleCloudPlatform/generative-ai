@@ -19,6 +19,7 @@ aextract
 afrom
 Afshaan
 AFX
+agains
 agentic
 agg
 AGG
@@ -236,6 +237,7 @@ Codicote
 COINIT
 colab
 coldline
+Coleoidea
 Colm
 coloraxis
 colorbar
@@ -426,6 +428,7 @@ evt
 expl
 faa
 facecolor
+Fairall
 faiss
 FAISS
 Fangming
@@ -566,6 +569,7 @@ gpg
 gpp
 gpt
 gpu
+Grachev
 gradio
 gradlew
 graphrag
@@ -751,6 +755,7 @@ Kawagoe
 Keanu
 kendall
 kenleejr
+kephal
 keras
 Ketamine
 keychain
@@ -873,6 +878,7 @@ mapbox
 marp
 Masaru
 maskmode
+mathbf
 mathvista
 mavenrc
 maxcold
@@ -1136,6 +1142,7 @@ plt
 pmb
 podcast
 podcasts
+podes
 podfile
 podhelper
 podman
@@ -1229,6 +1236,7 @@ recrawl
 reddit
 redef
 reidx
+remai
 rembg
 reoffice
 rephraser
@@ -1259,6 +1267,7 @@ Robotica
 rooney
 ROOTSPAN
 Rosberg
+ROUVs
 rpet
 rrf
 RRF
@@ -1294,6 +1303,7 @@ scikit
 Scorsese
 SDKROOT
 seabut
+sealife
 seatback
 SEK
 Selam
@@ -1315,10 +1325,13 @@ Sha'carri
 shalas
 Shankman
 Shaoxiong
+Shar
 sharegpt
 Sharmila
 Shawshank
 Shazeer
+SHEBA
+shedd
 Shenzhou
 Shibuya
 Shklovsky
@@ -1401,6 +1414,7 @@ sunner
 supima
 suptitle
 Surampudi
+survei
 Suzaka
 svh
 svm
@@ -1450,6 +1464,7 @@ Thallam
 thelook
 THH
 THHH
+thi
 throug
 THT
 THTH
@@ -1542,6 +1557,7 @@ USK
 Uszkoreit
 Utik
 uuids
+UUV
 uvb
 uvicorn
 uvx
