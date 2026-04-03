@@ -137,7 +137,7 @@ class GeminiAgent(agents.LlmAgent):
             **kwargs,
         )
 
-    def create_agent_card(self, agent_url: str) -> "AgentCard":
+    def create_agent_card(self, agent_url: str) -> types.AgentCard:
         return types.AgentCard(
             name=self.name,
             description=self.description,
@@ -145,7 +145,21 @@ class GeminiAgent(agents.LlmAgent):
             version="1.0.0",
             default_input_modes=["text/plain"],
             default_output_modes=["text/plain"],
-            capabilities=types.AgentCapabilities(streaming=True),
+            capabilities=types.AgentCapabilities(
+                streaming=True,
+                extensions=[
+                    types.AgentExtension(
+                        uri="https://a2ui.org/a2a-extension/a2ui/v0.8",
+                        description="Ability to render A2UI",
+                        required=False,
+                        params={
+                            "supportedCatalogIds": [
+                                "https://a2ui.org/specification/v0_8/standard_catalog_definition.json"
+                            ]
+                        },
+                    )
+                ],
+            ),
             skills=[
                 types.AgentSkill(
                     id="contact_lookup",

@@ -1,7 +1,7 @@
 # User Guide: Deploying an A2UI Agent to Cloud Run, Registering with Gemini Enterprise and Interacting with the Agent using A2UI components
 
 This guide provides a comprehensive walkthrough of deploying an A2A
-(Agent-to-Agent) enabled agent with **A2UI** extension, built with the Google
+(Agent2Agent) enabled agent with **A2UI** extension, built with Google
 **Agent Development Kit (ADK)**, to Google **Cloud Run**. You can interact with
 the agent by rich content A2UI components. You will also learn how to register
 your deployed agent with Gemini Enterprise to make it discoverable and usable by
@@ -13,7 +13,7 @@ This project provides a template for creating and deploying a powerful,
 Gemini-based agent that can communicate with other agents using the A2A protocol
 and can display A2UI components. By the end of this guide, you will have a
 publicly accessible agent running on Cloud Run and can display A2UI components
-on Gemini Enterprise UI.
+on Gemini Enterprise.
 
 ## Prerequisites
 
@@ -182,40 +182,15 @@ You can find your Engine ID in the Google Cloud Console.
 
 **2. Register the agent:**
 
-Execute the following `curl` command, replacing the placeholders with your own
+Execute the following script, replacing the placeholders with your own
 values:
 
 ```bash
-curl -X POST -H "Authorization: Bearer $(gcloud auth print-access-token)" -H "Content-Type: application/json" https://discoveryengine.googleapis.com/v1alpha/projects/PROJECT_NUMBER/locations/LOCATION/collections/default_collection/engines/ENGINE_ID/assistants/default_assistant/agents -d '{
-  "name": "AGENT_NAME",
-  "displayName": "AGENT_DISPLAY_NAME",
-  "description": "AGENT_DESCRIPTION",
-  "a2aAgentDefinition": {
-     "jsonAgentCard": "{\"protocolVersion\": \"v1.0\", \"name\": \"AGENT_NAME\", \"description\": \"AGENT_DESCRIPTION\", \"url\": \"AGENT_URL\", \"version\": \"1.0.0\", \"capabilities\": {\"streaming\": true, \"extensions\": [{\"uri\": \"https://a2ui.org/a2a-extension/a2ui/v0.8\", \"description\": \"Ability to render A2UI\", \"required\": false, \"params\": {\"supportedCatalogIds\": [\"https://a2ui.org/specification/v0_8/standard_catalog_definition.json\"]}}]}, \"skills\": [], \"defaultInputModes\": [\"text/plain\"], \"defaultOutputModes\": [\"text/plain\"], \"authentication\": {\"type\": \"http\", \"scheme\": \"bearer\", \"tokenFromEnv\": \"MY_AGENT_TOKEN\"}}"
-  }
-}'
+chmod +x register.sh
+./register.sh <CLOUD_RUN_URL>
 ```
 
-**Placeholder Descriptions:**
-
-*   `PROJECT_NUMBER`: Your Google Cloud project number.
-*   `LOCATION`: The location of your Discovery Engine instance (e.g., `global`).
-*   `ENGINE_ID`: The ID of your Gemini Enterprise engine.
-*   `AGENT_NAME`: A unique name for your agent.
-*   `AGENT_DISPLAY_NAME`: The name that will be displayed in the Gemini
-    Enterprise UI.
-*   `AGENT_DESCRIPTION`: A brief description of your agent's capabilities.
-*   `AGENT_URL`: The public URL of your deployed agent.
-*   `CREDENTIAL_KEY`: The key for your authentication credentials (e.g.,
-*   `MY_AGENT_TOKEN`: The name of an environment variable that Gemini Enterprise
-    will read to get the bearer token for authentication. **Note on
-    Credentials:** At execution time, when Gemini Enterprise talks to the agent,
-    **Note on Authentication:** This example uses bearer token authentication.
-    Gemini Enterprise will read the environment variable specified in
-    `tokenFromEnv` (e.g., `MY_AGENT_TOKEN`) to get the token. It will then send
-    an HTTP `Authorization` header to your agent with the value `Bearer
-    <token_from_env_variable>`. **3. Locate the agent on the Gemini Enterprise
-    UI:**
+**3. Locate the agent on the Gemini Enterprise UI:**
 
 Your agent can be found in the Gemini Enterprise UI. Once you click it, you can
 interact with the agent. Send queries like "Find Alex contact card", or "List

@@ -1,5 +1,5 @@
 a2a-sdk
-google-generativeai
+google-genai
 uvicorn
 python-dotenv
 asyncclick
