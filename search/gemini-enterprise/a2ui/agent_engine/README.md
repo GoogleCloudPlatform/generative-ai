@@ -240,7 +240,7 @@ register it on Gemini Enterprise without running "main.py" script.
         location
 4.  Select **"Agents"** from the left nav bar.
 5.  Click the three-dot button on the **"Actions"** column and select
-    **"Previwe"** menu.
+    **"Preview"** menu.
 6.  It will open Gemini Enterprise Agent page.
 7.  Try queries like *"Find contact card of Sarah"*.
     -   If this is the first time you start a chat with the agent, it will ask

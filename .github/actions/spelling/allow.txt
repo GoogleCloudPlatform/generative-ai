@@ -37,6 +37,7 @@ akka
 Aktu
 ALCS
 ALDS
+alexj
 Alibaba
 alisal
 alloydb
@@ -184,6 +185,7 @@ cardio
 Cardio
 Cardizem
 Casagrand
+caseys
 cashify
 CASP
 catus
@@ -285,6 +287,7 @@ cycleways
 cygpath
 CZE
 czf
+D'orsay
 Daniil
 Darabont
 darkgrid
@@ -335,7 +338,6 @@ docstores
 doi
 Donen
 Doogler
-D'orsay
 dotprompt
 Downscale
 dpi
@@ -471,6 +473,7 @@ floormat
 FLX
 fmeasure
 FMWK
+Foauth
 Folmer
 fontdict
 footwell
@@ -487,6 +490,7 @@ fromarray
 frombytes
 fromiter
 fsspec
+Fstatic
 FTPS
 fts
 Fudd
@@ -787,6 +791,8 @@ Kwanzan
 kyc
 KYC
 Kylian
+L'avenir
+l'harmonie
 labelleft
 labetalol
 Ladhak
@@ -798,7 +804,6 @@ landuse
 langgraph
 Laomedeia
 latte
-L'avenir
 LCEL
 LEBRON
 lecie
@@ -809,7 +814,6 @@ levelname
 Leventer
 lexer
 lexers
-l'harmonie
 liberties
 linalg
 linecolor
@@ -1163,6 +1167,7 @@ prcntg
 Pré
 preds
 pregel
+Procfile
 produc
 programar
 projectid
