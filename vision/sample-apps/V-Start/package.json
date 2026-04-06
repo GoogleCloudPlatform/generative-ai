@@ -9,7 +9,7 @@
   "dependencies": {
     "@google/genai": "^1.17.0",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "express": "^4.22.1",
     "node-fetch": "^3.3.2"
   },
   "keywords": [
