@@ -1,0 +1,11 @@
+[project]
+name = "llama4-adk-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-adk>=1.28.1",
+    "litellm>=1.83.1",
+    "requests>=2.33.1",
+]
