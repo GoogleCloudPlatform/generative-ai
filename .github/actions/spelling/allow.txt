@@ -37,6 +37,7 @@ akka
 Aktu
 ALCS
 ALDS
+Alessia
 Alibaba
 alisal
 alloydb
@@ -177,6 +178,7 @@ cais
 CALIPSO
 campestre
 CAMQAA
+Canlaws
 Caprese
 carbonara
 Carcante
@@ -196,6 +198,8 @@ cctv
 cdiv
 CDNs
 ceb
+Ceccotti
+Centros
 ceo
 cer
 cfbundle
@@ -402,6 +406,7 @@ ENU
 Envane
 envrc
 envsubst
+Enzo
 epath
 epoc
 Eragon
@@ -718,6 +723,7 @@ JAVACMD
 Jax
 JDK
 Jedi
+Jeeg
 jegadesh
 jesieni
 Jestem
@@ -895,6 +901,7 @@ mec
 MEDIANCUT
 mediapy
 Mega
+Megarobot
 Meinl
 Meirelles
 Meltem
