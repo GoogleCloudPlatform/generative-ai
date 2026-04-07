@@ -1,0 +1,9 @@
+a2a-sdk
+google-genai
+uvicorn
+python-dotenv
+asyncclick
+
+gunicorn
+google-cloud-aiplatform
+google-adk
