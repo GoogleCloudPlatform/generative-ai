@@ -1,3 +1,19 @@
+/*
+Copyright © 2026 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package models
 
 // SKU represents a Gemini Enterprise subscription tier identifier as returned
@@ -5,20 +21,20 @@ package models
 type SKU string
 
 const (
-	SKUSearchAndAssistant  SKU = "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT"  // Gemini Enterprise Plus tier.
-	SKUEnterprise          SKU = "SUBSCRIPTION_TIER_ENTERPRISE"             // Gemini Enterprise Standard tier.
-	SKUSearch              SKU = "SUBSCRIPTION_TIER_SEARCH"                 // Search + NotebookLM tier.
-	SKUNotebookLM          SKU = "SUBSCRIPTION_TIER_NOTEBOOK_LM"            // NotebookLM-only tier.
-	SKUAgentspaceBusiness  SKU = "SUBSCRIPTION_TIER_AGENTSPACE_BUSINESS"    // Gemini Business tier.
-	SKUAgentspaceStarter   SKU = "SUBSCRIPTION_TIER_AGENTSPACE_STARTER"     // Gemini Business Starter tier.
-	SKUFrontlineWorker     SKU = "SUBSCRIPTION_TIER_FRONTLINE_WORKER"       // Gemini Frontline Worker tier.
-	SKUFrontlineStarter    SKU = "SUBSCRIPTION_TIER_FRONTLINE_STARTER"      // Gemini Frontline Starter tier.
-	SKUEnterpriseEmerging  SKU = "SUBSCRIPTION_TIER_ENTERPRISE_EMERGING"    // Gemini Enterprise Standard — emerging markets.
-	SKUEduPro              SKU = "SUBSCRIPTION_TIER_EDU_PRO"                // Gemini Enterprise EDU Pro tier.
-	SKUEdu                 SKU = "SUBSCRIPTION_TIER_EDU"                    // Gemini Enterprise EDU tier.
-	SKUEduProEmerging      SKU = "SUBSCRIPTION_TIER_EDU_PRO_EMERGING"       // Gemini Enterprise EDU Pro — emerging markets.
-	SKUEduEmerging         SKU = "SUBSCRIPTION_TIER_EDU_EMERGING"           // Gemini Enterprise EDU — emerging markets.
-	SKUUnspecified         SKU = "SUBSCRIPTION_TIER_UNSPECIFIED"            // Default/unset value.
+	SKUSearchAndAssistant SKU = "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT" // Gemini Enterprise Plus tier.
+	SKUEnterprise         SKU = "SUBSCRIPTION_TIER_ENTERPRISE"           // Gemini Enterprise Standard tier.
+	SKUSearch             SKU = "SUBSCRIPTION_TIER_SEARCH"               // Search + NotebookLM tier.
+	SKUNotebookLM         SKU = "SUBSCRIPTION_TIER_NOTEBOOK_LM"          // NotebookLM-only tier.
+	SKUAgentspaceBusiness SKU = "SUBSCRIPTION_TIER_AGENTSPACE_BUSINESS"  // Gemini Business tier.
+	SKUAgentspaceStarter  SKU = "SUBSCRIPTION_TIER_AGENTSPACE_STARTER"   // Gemini Business Starter tier.
+	SKUFrontlineWorker    SKU = "SUBSCRIPTION_TIER_FRONTLINE_WORKER"     // Gemini Frontline Worker tier.
+	SKUFrontlineStarter   SKU = "SUBSCRIPTION_TIER_FRONTLINE_STARTER"    // Gemini Frontline Starter tier.
+	SKUEnterpriseEmerging SKU = "SUBSCRIPTION_TIER_ENTERPRISE_EMERGING"  // Gemini Enterprise Standard — emerging markets.
+	SKUEduPro             SKU = "SUBSCRIPTION_TIER_EDU_PRO"              // Gemini Enterprise EDU Pro tier.
+	SKUEdu                SKU = "SUBSCRIPTION_TIER_EDU"                  // Gemini Enterprise EDU tier.
+	SKUEduProEmerging     SKU = "SUBSCRIPTION_TIER_EDU_PRO_EMERGING"     // Gemini Enterprise EDU Pro — emerging markets.
+	SKUEduEmerging        SKU = "SUBSCRIPTION_TIER_EDU_EMERGING"         // Gemini Enterprise EDU — emerging markets.
+	SKUUnspecified        SKU = "SUBSCRIPTION_TIER_UNSPECIFIED"          // Default/unset value.
 )
 
 // skuPrecedence maps each SKU to its precedence rank. Higher value = higher
