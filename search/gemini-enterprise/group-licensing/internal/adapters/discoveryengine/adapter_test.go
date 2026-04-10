@@ -120,6 +120,7 @@ func makeGRPCError(code codes.Code) error {
 
 func TestListUserLicenses_HappyPath(t *testing.T) {
 	loginTime := time.Date(2025, 1, 15, 10, 0, 0, 0, time.UTC)
+	assignTime := time.Date(2025, 1, 1, 8, 0, 0, 0, time.UTC)
 
 	page := []*discoveryenginepb.UserLicense{
 		{
@@ -127,6 +128,7 @@ func TestListUserLicenses_HappyPath(t *testing.T) {
 			LicenseConfig:          "SUBSCRIPTION_TIER_ENTERPRISE",
 			LicenseAssignmentState: discoveryenginepb.UserLicense_ASSIGNED,
 			LastLoginTime:          timestamppb.New(loginTime),
+			CreateTime:             timestamppb.New(assignTime),
 		},
 	}
 	fakeIt := newFakeIterator([][]*discoveryenginepb.UserLicense{page}, nil)
@@ -147,17 +149,21 @@ func TestListUserLicenses_HappyPath(t *testing.T) {
 	assert.Equal(t, "SUBSCRIPTION_TIER_ENTERPRISE", lic.LicenseConfigPath)
 	assert.Equal(t, models.LicenseStateAssigned, lic.State)
 	assert.True(t, lic.LastLoginTime.Equal(loginTime))
+	assert.True(t, lic.AssignmentTime.Equal(assignTime))
 
 	mockClient.AssertExpectations(t)
 }
 
 func TestListUserLicenses_NilLastLoginTime(t *testing.T) {
+	// When both LastLoginTime and CreateTime are nil, both domain fields must
+	// be zero so that the GC service's staleness fallback can handle them.
 	page := []*discoveryenginepb.UserLicense{
 		{
 			UserPrincipal:          "bob@example.com",
 			LicenseConfig:          "SUBSCRIPTION_TIER_AGENTSPACE_BUSINESS",
 			LicenseAssignmentState: discoveryenginepb.UserLicense_ASSIGNED,
 			LastLoginTime:          nil,
+			CreateTime:             nil,
 		},
 	}
 	fakeIt := newFakeIterator([][]*discoveryenginepb.UserLicense{page}, nil)
@@ -172,6 +178,39 @@ func TestListUserLicenses_NilLastLoginTime(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, got, 1)
 	assert.True(t, got[0].LastLoginTime.IsZero())
+	assert.True(t, got[0].AssignmentTime.IsZero())
+
+	mockClient.AssertExpectations(t)
+}
+
+func TestListUserLicenses_CreateTimeMappedToAssignmentTime(t *testing.T) {
+	// When LastLoginTime is nil but CreateTime is set, AssignmentTime must
+	// be populated from CreateTime so the GC service can apply the
+	// assignment-date staleness fallback.
+	assignTime := time.Date(2026, 3, 1, 9, 0, 0, 0, time.UTC)
+
+	page := []*discoveryenginepb.UserLicense{
+		{
+			UserPrincipal:          "new-user@example.com",
+			LicenseConfig:          "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseAssignmentState: discoveryenginepb.UserLicense_ASSIGNED,
+			LastLoginTime:          nil,
+			CreateTime:             timestamppb.New(assignTime),
+		},
+	}
+	fakeIt := newFakeIterator([][]*discoveryenginepb.UserLicense{page}, nil)
+
+	mockClient := new(fakeUserLicenseClient)
+	mockClient.On("ListUserLicenses", mock.Anything, mock.AnythingOfType("*discoveryenginepb.ListUserLicensesRequest")).
+		Return(fakeIt)
+
+	adapter := newWithClient(mockClient)
+	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+
+	require.NoError(t, err)
+	require.Len(t, got, 1)
+	assert.True(t, got[0].LastLoginTime.IsZero(), "LastLoginTime must be zero when proto field is nil")
+	assert.True(t, got[0].AssignmentTime.Equal(assignTime), "AssignmentTime must be populated from CreateTime")
 
 	mockClient.AssertExpectations(t)
 }

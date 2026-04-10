@@ -63,6 +63,7 @@ Enterprise customers managing Gemini Enterprise licenses face significant fricti
 * **FR-04 (Garbage Collection Logic):**
 
   * If a user HAS a license but HAS NOT logged in for `X` days (Staleness): **Revoke License.** Staleness checking is optional and disabled when `staleness_threshold_days` is `0` or omitted from configuration.
+  * If a user has **never** logged in, the staleness reference date falls back to the license assignment date. This prevents a recently provisioned account from being immediately revoked before the user has had a chance to sign in. If the user still has not logged in after `X` days from assignment, the license is revoked.
 
 * **FR-05 (Self-Healing Logic):**
 

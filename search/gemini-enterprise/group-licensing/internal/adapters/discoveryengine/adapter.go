@@ -242,11 +242,17 @@ func protoToUserLicense(p *discoveryenginepb.UserLicense) (models.UserLicense, e
 		lastLogin = p.LastLoginTime.AsTime()
 	}
 
+	var assignmentTime time.Time
+	if p.CreateTime != nil {
+		assignmentTime = p.CreateTime.AsTime()
+	}
+
 	return models.UserLicense{
 		UserEmail:         p.UserPrincipal,
 		LicenseConfigPath: p.LicenseConfig,
 		State:             state,
 		LastLoginTime:     lastLogin,
+		AssignmentTime:    assignmentTime,
 	}, nil
 }
 

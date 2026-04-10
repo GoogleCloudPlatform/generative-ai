@@ -135,7 +135,7 @@ The utility's logic is divided into two primary reconciliation workflows.
 * **Flow:**  
   1. Iterates through all licensed users via the **Discovery Engine API** (`listUserLicenses`).  
   2. For each user, the job evaluates two deprovisioning conditions:
-      - **Staleness**: If `staleness_threshold_days` is greater than `0`, checks if the user's last login was more than `X` days ago (or never logged in). This timestamp is retrieved directly from the `lastLoginTime` field of the `UserLicense` object provided by the **Discovery Engine API**. Setting `staleness_threshold_days` to `0` (or omitting it) disables this check entirely — only entitlement is evaluated.
+      - **Staleness**: If `staleness_threshold_days` is greater than `0`, checks whether the user's staleness reference date is more than `X` days ago. The reference date is chosen as follows: if `lastLoginTime` is set, it is used; if `lastLoginTime` is absent (the user has never logged in), `createTime` (the license assignment timestamp) is used instead, so that a recently provisioned account is not immediately revoked before the user has had a chance to sign in. If both timestamps are absent, the user is treated as immediately stale. Both timestamps are retrieved from the `UserLicense` object provided by the **Discovery Engine API**. Setting `staleness_threshold_days` to `0` (or omitting it) disables this check entirely — only entitlement is evaluated.
       - **Entitlement**: Calls the **Cloud Identity Admin API's** `members.hasMember` method to confirm if the user is still a member of any entitled group.
   3. If **either** condition is met (the user is stale OR no longer entitled), the utility calls the **Discovery Engine API** (`batchUpdateUserLicenses`) to revoke the license.
 

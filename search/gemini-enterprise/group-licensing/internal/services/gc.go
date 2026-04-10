@@ -176,15 +176,30 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 }
 
 // shouldRevoke returns true when the user holding license should have it
-// revoked. A user is revocable when they are stale (last login is zero or
-// older than thresholdDays) OR when they are not a member of any configured
-// group. When thresholdDays is 0 the staleness check is disabled and only
-// the entitlement check runs. When thresholdDays > 0 the staleness check
-// short-circuits the more expensive membership check.
+// revoked. A user is revocable when they are stale OR when they are not a
+// member of any configured group. When thresholdDays is 0 the staleness check
+// is disabled and only the entitlement check runs. When thresholdDays > 0 the
+// staleness check short-circuits the more expensive membership check.
+//
+// Staleness reference time:
+//   - When LastLoginTime is set, it is used as the reference.
+//   - When LastLoginTime is zero (the user has never logged in), AssignmentTime
+//     is used instead, so that a recently provisioned account is not revoked
+//     before the user has had a chance to sign in.
+//   - When both are zero (pathological; should not occur in practice), the user
+//     is treated as immediately stale and the license is revoked.
 func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense, projectCfg config.ProjectConfig, thresholdDays int) (bool, error) {
 	// Staleness check: only performed when thresholdDays > 0.
-	if thresholdDays > 0 && (license.LastLoginTime.IsZero() || license.LastLoginTime.Before(time.Now().AddDate(0, 0, -thresholdDays))) {
-		return true, nil
+	if thresholdDays > 0 {
+		ref := license.LastLoginTime
+		if ref.IsZero() {
+			// Never logged in: fall back to the assignment date so a recently
+			// provisioned user is not immediately revoked.
+			ref = license.AssignmentTime
+		}
+		if ref.IsZero() || ref.Before(time.Now().AddDate(0, 0, -thresholdDays)) {
+			return true, nil
+		}
 	}
 
 	// Entitlement check: the user must be a member of at least one group

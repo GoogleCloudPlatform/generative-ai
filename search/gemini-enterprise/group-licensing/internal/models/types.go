@@ -30,12 +30,17 @@ type Member struct {
 // UserLicense represents a single record returned by the Discovery
 // Engine listUserLicenses API. LastLoginTime is zero when the API
 // returns no last-login value (the user has never logged in or the
-// field was omitted).
+// field was omitted). AssignmentTime reflects when the license record
+// was first created (the proto create_time field); it is used as a
+// fallback reference for staleness checks when LastLoginTime is zero,
+// so that a recently provisioned user who has not yet signed in is not
+// immediately revoked.
 type UserLicense struct {
 	UserEmail         string
 	LicenseConfigPath string // full resource path: projects/{p}/locations/{l}/licenseConfigs/{id}
 	State             LicenseState
 	LastLoginTime     time.Time
+	AssignmentTime    time.Time // zero when the API omits create_time
 }
 
 // LicenseUpdate is the unit of work passed to BatchUpdateUserLicenses.

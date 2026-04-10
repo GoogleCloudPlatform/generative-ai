@@ -91,26 +91,125 @@ func TestGCService_Run_StaleUser_LicenseRevoked(t *testing.T) {
 	idp.AssertNotCalled(t, "HasMember")
 }
 
-func TestGCService_Run_NeverLoggedInUser_LicenseRevoked(t *testing.T) {
-	// A user with a zero LastLoginTime (never logged in) must be treated as
-	// stale and have their license revoked.
+func TestGCService_Run_NeverLoggedIn_RecentAssignment_LicenseKept(t *testing.T) {
+	// A user who has never logged in but was assigned a license recently (within
+	// the staleness threshold) must NOT be revoked. AssignmentTime is used as the
+	// staleness reference when LastLoginTime is zero.
 	ctx := context.Background()
 
 	idp := new(MockIdpClient)
 	gemini := new(MockGeminiClient)
 
 	const (
-		projectID = "proj-never"
+		projectID = "proj-never-recent"
 		group     = "grp@example.com"
-		userEmail = "never@example.com"
+		userEmail = "new-user@example.com"
+	)
+
+	recentAssignment := time.Now().AddDate(0, 0, -5) // assigned 5 days ago — within 30-day threshold
+
+	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:      userEmail,
+				State:          models.LicenseStateAssigned,
+				LastLoginTime:  time.Time{},      // never logged in
+				AssignmentTime: recentAssignment, // but recently provisioned
+			},
+		}, "", nil)
+
+	// Still entitled — must be checked because staleness does not short-circuit.
+	idp.On("HasMember", mock.Anything, group, userEmail).Return(true, nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, gemini)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{})
+
+	require.NoError(t, err)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	idp.AssertExpectations(t)
+	gemini.AssertNotCalled(t, "BatchUpdateUserLicenses")
+}
+
+func TestGCService_Run_NeverLoggedIn_StaleAssignment_LicenseRevoked(t *testing.T) {
+	// A user who has never logged in and whose assignment date is beyond the
+	// staleness threshold must have their license revoked. AssignmentTime is
+	// used as the staleness reference when LastLoginTime is zero.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	gemini := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-never-stale"
+		group     = "grp@example.com"
+		userEmail = "ghost@example.com"
+	)
+
+	staleAssignment := time.Now().AddDate(0, 0, -60) // assigned 60 days ago — beyond 30-day threshold
+
+	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:      userEmail,
+				State:          models.LicenseStateAssigned,
+				LastLoginTime:  time.Time{},     // never logged in
+				AssignmentTime: staleAssignment, // and assigned long ago
+			},
+		}, "", nil)
+
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+		return len(updates) == 1 &&
+			updates[0].UserEmail == userEmail &&
+			updates[0].Action == models.LicenseActionRevoke
+	})).Return(nil)
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, gemini)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{})
+
+	require.NoError(t, err)
+	assert.Equal(t, 1, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
+	gemini.AssertExpectations(t)
+	// Staleness short-circuits via AssignmentTime; HasMember must NOT be called.
+	idp.AssertNotCalled(t, "HasMember")
+}
+
+func TestGCService_Run_NeverLoggedIn_NoAssignmentTime_LicenseRevoked(t *testing.T) {
+	// When both LastLoginTime and AssignmentTime are zero (pathological case),
+	// the user is treated as immediately stale and the license is revoked.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	gemini := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-never-no-assign"
+		group     = "grp@example.com"
+		userEmail = "no-timestamps@example.com"
 	)
 
 	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
 		Return([]models.UserLicense{
 			{
-				UserEmail:     userEmail,
-				State:         models.LicenseStateAssigned,
-				LastLoginTime: time.Time{}, // zero value — never logged in
+				UserEmail:      userEmail,
+				State:          models.LicenseStateAssigned,
+				LastLoginTime:  time.Time{}, // never logged in
+				AssignmentTime: time.Time{}, // no assignment time available
 			},
 		}, "", nil)
 
