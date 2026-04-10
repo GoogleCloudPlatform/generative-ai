@@ -57,6 +57,7 @@
 /generative-ai/open-models/serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb                                   @GoogleCloudPlatform/generative-ai-devrel @rsamborski
 /generative-ai/open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @eliasecchig
 /generative-ai/search                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @holtskinner
+/generative-ai/search/gemini-enterprise/group-licensing                                                                          @GoogleCloudPlatform/generative-ai-devrel @williamsmt @googlecharles
 /generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb                                            @GoogleCloudPlatform/generative-ai-devrel @guruvittal
 /generative-ai/speech/getting-started                                                                                            @GoogleCloudPlatform/generative-ai-devrel @inardini
 /generative-ai/speech/use-cases/storytelling                                                                                     @GoogleCloudPlatform/generative-ai-devrel @holtskinner
