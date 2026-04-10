@@ -2,6 +2,8 @@
 
 A Cloud Run Job that automates Gemini Enterprise license lifecycle management through scheduled batch reconciliation. It bridges the gap between Google Cloud Identity group membership and Discovery Engine license assignment, providing group-based SKU mapping, automatic provisioning, and stale-license cleanup.
 
+**Authors: [Matt Williams](https://github.com/williamsmt), [Charles He](https://github.com/googlecharles)**
+
 ## How it works
 
 Two Cloud Run Job definitions are deployed from a single container image, each triggered by Cloud Scheduler on its own schedule:
