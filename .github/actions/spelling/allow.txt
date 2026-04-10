@@ -13,6 +13,7 @@ ADAS
 adk
 ADK
 ADMA
+admins
 adr
 aexecute
 aextract
@@ -49,6 +50,7 @@ Anant
 antiword
 ANZ
 AOT
+apac
 APAC
 Aphone
 APIENTRY
@@ -268,6 +270,7 @@ cpb
 cpet
 crewai
 CRF
+crm
 CRM
 Crossbody
 crosstab
@@ -317,6 +320,7 @@ Depatmint
 descgen
 deskmates
 Dexin
+dflags
 dfs
 DHH
 diltiazem
@@ -357,6 +361,8 @@ dshm
 dsl
 dsn
 DSQ
+dto
+DTOs
 dtype
 dtypes
 Duh
@@ -374,6 +380,9 @@ Dzor
 ecommerce
 EDB
 edgecolor
+edu
+Edu
+EDU
 Edunov
 eee
 EHR
@@ -491,6 +500,9 @@ Frodo
 fromarray
 frombytes
 fromiter
+frontline
+Frontline
+FRONTLINE
 fsspec
 FTPS
 fts
@@ -566,6 +578,7 @@ Godzilla
 goldmine
 Gombe
 GOODALL
+googleapi
 googlecar
 googler
 goooooood
@@ -817,6 +830,7 @@ Leventer
 lexer
 lexers
 liberties
+lic
 linalg
 linecolor
 linestyle
@@ -1027,6 +1041,7 @@ nokey
 Nominatim
 NOMINATIM
 NOMINMAX
+nonroot
 norigin
 notetaker
 novnc
@@ -1085,6 +1100,7 @@ overwiew
 owlbot
 oxml
 padus
+Pageable
 pagemap
 Pakeman
 paleo
@@ -1167,6 +1183,7 @@ prag
 Pranav
 praw
 prcntg
+PRD
 Pré
 preds
 pregel
@@ -1507,6 +1524,7 @@ Traceloop
 treeah
 Tribbiani
 Tricyle
+trimpath
 tritan
 TRK
 trl
@@ -1655,6 +1673,7 @@ WFH
 wght
 whitegrid
 wiersz
+WIF
 wiffle
 wikipedia
 wil
