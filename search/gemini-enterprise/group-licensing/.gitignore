@@ -1,0 +1,50 @@
+# Binaries
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go build cache and test artifacts
+*.test
+*.out
+coverage.html
+coverage.txt
+
+# Go workspace (local only)
+go.work
+go.work.sum
+
+# Secrets and credentials — NEVER commit these
+*.json.key
+service-account*.json
+*-credentials.json
+*-keyfile.json
+.env
+.env.*
+/run/
+secrets/
+
+# GCP CLI artifacts
+.gcloudignore
+gcloud-service-key.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Test and coverage output
+*.coverprofile
+
+# Local deployment scripts with sensitive values
+deploy-local.sh
+
+# AI stuff
+.claude
