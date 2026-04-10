@@ -1,6 +1,6 @@
 ## **1. Executive Summary** {#1.-executive-summary}
 
-Gemini Enterprise licensing operates on a per-user model that currently lacks the granularity required for large-scale enterprise deployment. The native "Auto-assign license” feature in the Google Cloud Console for Gemini Enterprise is binary (on/off) and cannot distinguish between license SKUs (e.g., Standard, Enterprise, Enterprise Plus, vs. Frontline) nor does it respect user group membership.
+Gemini Enterprise licensing operates on a per-user model that currently lacks the granularity required for large-scale enterprise deployment. The native "Auto-assign license" feature in the Google Cloud Console for Gemini Enterprise is binary (on/off) and cannot distinguish between license SKUs (e.g., Standard, Enterprise, Enterprise Plus, vs. Frontline) nor does it respect user group membership.
 
 This document outlines the requirements for an automated solution to manage license lifecycles. This solution will bridge the gap between Billing Account subscriptions and Project-level enforcement, utilizing a **Scheduled Batch Reconciliation** approach for robust state management, eventual consistency, and cleanup.
 
@@ -16,7 +16,7 @@ Enterprise customers managing Gemini Enterprise licenses face significant fricti
 
 4. **No Bulk Management:** The Google Cloud Console manage user license assignment page currently does not afford Admins the ability to assign licenses in bulk using a CSV or other structured file. The only option available to Admins is to manually enter multiple email addresses on the UI text box directly.
 
-5. **Manual Toil:** The only viable workaround currently is manual assignment per user, which is operationally unscalable for organizations with thousands of seats. 
+5. **Manual Toil:** The only viable workaround currently is manual assignment per user, which is operationally unscalable for organizations with thousands of seats.
 
 ## **3. Goals & Non-Goals** {#3.-goals-&-non-goals}
 
@@ -87,4 +87,4 @@ Enterprise customers managing Gemini Enterprise licenses face significant fricti
 
 * **Security Compliance:** Time-to-revocation for terminated employees \< 24 hours (or the configured batch frequency).
 
-* **Accuracy:** \< 1% of active users reporting "License Not Found" errors (indicating aggressive Garbage Collection).  
+* **Accuracy:** \< 1% of active users reporting "License Not Found" errors (indicating aggressive Garbage Collection).
