@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/discoveryengine v1.23.0
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/api v0.269.0
-	google.golang.org/grpc v1.79.1
+	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.11
 )
 
