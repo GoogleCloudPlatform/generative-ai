@@ -5,7 +5,7 @@ description = "Frontend streamlit application for the Gen AI Experience Concierg
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "langgraph>=0.3.21",
+    "langgraph>=1.0.10rc1",
     "streamlit>=1.42.2",
     "google-auth>=2.38.0",
     "pydantic-settings>=2.6.1",
