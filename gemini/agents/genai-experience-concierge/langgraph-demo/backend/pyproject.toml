@@ -18,7 +18,7 @@ dependencies = [
     "db-dtypes>=1.4.2",
     "thefuzz>=0.22.1",
     "tenacity>=9.0.0",
-    "langgraph>=0.3.21",
+    "langgraph>=1.1.6",
 ]
 
 [build-system]
