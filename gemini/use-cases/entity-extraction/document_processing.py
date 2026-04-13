@@ -34,10 +34,13 @@ EXTRACT_PROMPT_TEMPLATE = """\
 """
 
 CLASSIFY_PROMPT_TEMPLATE = """\
-    Based on the content of the document, classify it as one of the following classes.
+    Analyze the intent, visual layout, text content, and structural elements of the document.
+    Classify it into exactly one of the following classes based on its distinguishing features.
     Output as JSON in the following format:
+    
+    "reasoning": "Brief explanation of the key visual cues and keywords found that justify the class",
     "class": "class_name"
-
+    
 
     Classes:\n
     {classes}
