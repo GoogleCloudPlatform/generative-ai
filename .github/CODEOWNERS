@@ -27,6 +27,7 @@
 /generative-ai/gemini/multimodal-dataset                                                                                         @GoogleCloudPlatform/generative-ai-devrel @fthoele @cleop-google @diskontinuum
 /generative-ai/gemini/multimodal-live-api/websocket-demo-app/                                                                    @GoogleCloudPlatform/generative-ai-devrel @ZackAkil
 /generative-ai/gemini/rag-engine                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @edtsoi430
+/generative-ai/gemini/rag-engine/rag_engine_cross_corpus_retrieval.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @tiger-w-jin
 /generative-ai/gemini/responsible-ai                                                                                             @GoogleCloudPlatform/generative-ai-devrel @iamthuya
 /generative-ai/gemini/responsible-ai/gemini_safety_ratings.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @ghchinoy
 /generative-ai/gemini/sample-apps/finance-advisor-spanner/                                                                       @GoogleCloudPlatform/generative-ai-devrel @anirbanbagchi1979
