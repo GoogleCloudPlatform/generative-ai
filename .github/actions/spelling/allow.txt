@@ -251,6 +251,7 @@ colorway
 colurna
 colvis
 colwidth
+Cómo
 Connectez
 CONOUT
 constexpr
