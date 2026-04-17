@@ -132,6 +132,7 @@ bgr
 BGR
 bgswap
 Bhagwat
+Bharath
 Biden
 bigframes
 bigquery
@@ -350,6 +351,7 @@ Downscale
 dpi
 dpo
 DPO
+DQN
 draig
 Dreesen
 drilldown
@@ -620,6 +622,7 @@ Hannaneh
 Harvick
 hashtag
 hashtags
+Haumea
 Hawkins'll
 Hayao
 Hbf
@@ -681,6 +684,7 @@ idcg
 idk
 idks
 idxs
+IEA
 ience
 ifconfig
 IFI
@@ -826,6 +830,7 @@ lecie
 lego
 lenzing
 Levaquin
+levelized
 levelname
 Leventer
 lexer
@@ -888,6 +893,7 @@ magika
 Mahindra
 mahut
 mai
+Makemake
 makeover
 Malware
 Mamah
@@ -954,6 +960,7 @@ MMLU
 MMO
 mmol
 mmr
+Mnih
 modelfile
 Molaison
 monty
@@ -981,6 +988,7 @@ Mvar
 mvn
 mvnw
 mvp
+MWh
 mwouts
 myaccount
 mydb
@@ -1629,6 +1637,7 @@ VMAF
 VMs
 vnc
 voiceover
+Volodymyr
 vos
 VOS
 votre
@@ -1743,6 +1752,7 @@ yref
 ytd
 ytick
 yticks
+Yuxi
 Yuxuan
 Yuzuru
 zakarid
