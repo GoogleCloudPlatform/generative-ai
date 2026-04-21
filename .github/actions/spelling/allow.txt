@@ -1227,6 +1227,7 @@ pyupgrade
 pyvis
 Pzk
 qas
+Qantas
 QEDC
 QLo
 qna
@@ -1254,6 +1255,7 @@ rahhhrr
 rai
 Raikkonen
 Rajpurkar
+Ramblas
 ramen
 Ranurte
 rapideval
@@ -1378,6 +1380,7 @@ showor
 showtime
 showtimes
 shrt
+Shinjuku
 Shubham
 Shyamalan
 sid
