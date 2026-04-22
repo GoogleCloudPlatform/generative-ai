@@ -7,10 +7,10 @@ Abhishek
 acall
 achat
 Achird
+AClient
 acomplete
 adamw
 ADAS
-AClient
 adk
 ADK
 ADMA
@@ -1228,8 +1228,8 @@ pytrec
 pyupgrade
 pyvis
 Pzk
-qas
 Qantas
+qas
 QEDC
 QLo
 qna
@@ -1372,6 +1372,7 @@ SHEBA
 shedd
 Shenzhou
 Shibuya
+Shinjuku
 Shklovsky
 Shohei
 shortdesc
@@ -1382,7 +1383,6 @@ showor
 showtime
 showtimes
 shrt
-Shinjuku
 Shubham
 Shyamalan
 sid
