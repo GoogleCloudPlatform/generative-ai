@@ -146,7 +146,6 @@ jobs:
             cspell:latex/dict/latex.txt
             cspell:public-licenses/src/additional-licenses.txt
             cspell:public-licenses/src/generated/public-licenses.txt
-            cspell:scientific_terms_US/custom_scientific_US.trie
           ignore-pattern: "[^'a-záéíóúñçüA-ZÁÉÍÓÚÑÇÜ]"
           upper-pattern: "[A-ZÁÉÍÓÚÑÇÜ]"
           lower-pattern: "[a-záéíóúñçü]"
