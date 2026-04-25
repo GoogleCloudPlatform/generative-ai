@@ -107,6 +107,7 @@ avec
 Avenir
 aworkflow
 axs
+axvline
 Ayra
 Ayyappa
 backstory
@@ -199,6 +200,7 @@ cbp
 ccc
 cce
 cctv
+CDIP
 cdiv
 CDNs
 ceb
@@ -320,6 +322,7 @@ Demme
 demouser
 dente
 Depatmint
+Derpanis
 descgen
 deskmates
 Dexin
@@ -648,6 +651,7 @@ Hikaru
 Hiromasa
 Hisaki
 historien
+histplot
 Hlc
 Hmmm
 HMO
@@ -679,6 +683,7 @@ HZN
 iap
 iban
 icd
+ICDAR
 ICICI
 ICML
 icudtl
@@ -692,6 +697,7 @@ ifconfig
 IFI
 ifidx
 iinfo
+IIT
 ILB
 Ilkay
 iloc
@@ -778,6 +784,7 @@ Kanagawa
 Katsura
 Kaufmanns
 Kawagoe
+kde
 Keanu
 kendall
 kenleejr
@@ -1093,6 +1100,7 @@ OMR
 onesie
 onesies
 Onone
+OOD
 OOM
 Oort
 OOTB
@@ -1321,6 +1329,7 @@ Ruchika
 runjdwp
 RUNPATH
 Rupjit
+RVL
 RVR
 RYDE
 saaagesh
@@ -1567,6 +1576,7 @@ ubuntu
 udf
 UDF
 UDFs
+Ufkes
 uids
 UIs
 Ukiyo
@@ -1614,6 +1624,7 @@ Vayots
 VBG
 vcodec
 VCPU
+vdb
 vectoral
 vectordb
 veo
@@ -1779,14 +1790,3 @@ Zom
 Zosyn
 Zscaler
 Zuv
-axvline
-CDIP
-Derpanis
-histplot
-ICDAR
-IIT
-kde
-OOD
-RVL
-Ufkes
-vdb
