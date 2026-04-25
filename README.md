@@ -6,7 +6,7 @@
 
 <!-- markdownlint-disable MD033 -->
 
-This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai) with [Vertex AI](https://cloud.google.com/vertex-ai).
+This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage generative AI workflows using [Generative AI](https://cloud.google.com/ai/generative-ai) with [Agent Platform](https://docs.cloud.google.com/gemini-enterprise-agent-platform).
 
 ## Using this repository
 
@@ -33,7 +33,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
       <br>
       <a href="search/"><code>search/</code></a>
     </td>
-    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/enterprise-search">Vertex AI Search</a>, a Google-managed solution to help you rapidly build search engines for websites and across enterprise data. (Formerly known as Enterprise Search on Generative AI App Builder).</td>
+    <td>Use this folder if you're interested in using <a href="https://cloud.google.com/enterprise-search">Agent Search</a>, a Google-managed solution to help you rapidly build search engines for websites and across enterprise data. (Formerly known as Enterprise Search on Generative AI App Builder).</td>
   </tr>
   <tr>
     <td>
@@ -41,7 +41,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
       <br>
       <a href="rag-grounding/"><code>rag-grounding/</code></a>
     </td>
-    <td>Use this folder for information on Retrieval Augmented Generation (RAG) and Grounding with Vertex AI. This is an index of notebooks and samples across other directories focused on this topic.</td>
+    <td>Use this folder for information on Retrieval Augmented Generation (RAG) and Grounding. This is an index of notebooks and samples across other directories focused on this topic.</td>
   </tr>
   <tr>
     <td>
@@ -50,14 +50,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
       <a href="vision/"><code>vision/</code></a>
     </td>
     <td>
-      Use this folder if you're interested in building your own solutions from scratch using features from Imagen on Vertex AI (Vertex AI Imagen API).
-      These are the features that Imagen on Vertex AI offers:
-      <ul>
-        <li>Image generation</li>
-        <li>Image editing</li>
-        <li>Visual captioning</li>
-        <li>Visual question answering</li>
-      </ul>
+      Use this folder if you're interested in building your own solutions from scratch using features from Imagen and Veo.
     </td>
   </tr>
   <tr>
@@ -67,7 +60,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
       <a href="audio/"><code>audio/</code></a>
     </td>
     <td>
-      Use this folder if you're interested in building your own solutions from scratch using features from Chirp, a version of Google's Universal Speech Model (USM) on Vertex AI (Vertex AI Chirp API).
+      Use this folder if you're interested in building your own solutions from scratch using features from Chirp, a version of Google's Universal Speech Model (USM).
     </td>
   </tr>
   <tr>
@@ -76,7 +69,7 @@ This repository contains notebooks, code samples, sample apps, and other resourc
       <br>
       <a href="setup-env/"><code>setup-env/</code></a>
     </td>
-    <td>Instructions on how to set up Google Cloud, the Vertex AI Python SDK, and notebook environments on Google Colab and Vertex AI Workbench.</td>
+    <td>Instructions on how to set up Google Cloud, the Gen AI Python SDK, and notebook environments on Google Colab and Workbench.</td>
   </tr>
   <tr>
     <td>

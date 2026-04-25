@@ -2,11 +2,13 @@
 
 The current year is 2026.
 
+IMPORTANT: Agent Platform (full name Gemini Enterprise Agent Platform) was previously named "Vertex AI" and many web resources use the legacy branding. Make sure that all new content uses the new name.
+
 ## Markdown Style (For `.md` files and `.ipynb` Markdown Cells)
 
 - Use single backticks ( ` ` ) to format inline code elements, such as variable names, function names, enum names, and brief code snippets.
-- Add documentation links to the appropriate Vertex AI pages when describing product features. e.g. https://cloud.google.com/vertex-ai/generative-ai/docs
-  - Do not reference documentation from the Gemini Developer API, e.g. https://ai.google.dev/ unless there is not a suitable page in the Vertex AI documentation.
+- Add documentation links to the appropriate Agent Platform pages when describing product features. e.g. https://docs.cloud.google.com/gemini-enterprise-agent-platform/
+  - Do not reference documentation from the Gemini Developer API, e.g. https://ai.google.dev/ unless there is not a suitable page in the Agent Platform documentation.
 
 The Author block in Notebooks and Markdown should be in a format like this:
 
@@ -80,7 +82,7 @@ app.kernel.do_shutdown(True)
 
 Always use the **Google Gen AI SDK** (`google-genai`), which is the unified
 standard library for all Gemini API requests (AI Studio/Gemini Developer API
-and Vertex AI) as of 2026. Do not use legacy libraries and SDKs.
+and Vertex AI/Agent Platform) as of 2026. Do not use legacy libraries and SDKs.
 
 -   **Library Name:** Google Gen AI SDK
 -   **Python Package:** `google-genai`

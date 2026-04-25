@@ -25,7 +25,7 @@ All notebooks in this project are checked for formatting and style, to ensure a
 consistent experience. To test notebooks prior to submitting a pull request,
 you can follow these steps.
 
-From a command-line terminal (e.g. from Vertex AI Workbench or locally),
+From a command-line terminal (e.g. from Workbench or locally),
 run this code block to format your code.
 If the fixes can't be performed automatically,
 then you will need to manually address them before submitting your PR.
