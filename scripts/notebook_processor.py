@@ -2,7 +2,7 @@
 # type: ignore
 # -*- coding: utf-8 -*-
 #
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 # limitations under the License.
 
 import os
-import subprocess
+import sys
 import urllib.parse
 
 import nbformat
-import nox
 
-DEFAULT_PYTHON_VERSION = "3.11"
 DEFAULT_RUFF_LINE_LENGTH = 88
 
 # --- Notebook Link Constants ---
@@ -44,11 +42,6 @@ GITHUB_URL_PREFIX = LINK_PREFIXES["github_link"]
 RAW_URL_PREFIX = (
     "https://raw.githubusercontent.com/GoogleCloudPlatform/generative-ai/main/"
 )
-
-nox.options.sessions = [
-    "format",
-]
-nox.options.reuse_existing_virtualenvs = True
 
 
 def fix_markdown_links(
@@ -98,9 +91,9 @@ def fix_markdown_links(
     return "\n".join(new_lines), changes_made
 
 
-def update_notebook_links(session: nox.Session, notebook_paths: list[str]) -> None:
+def update_notebook_links(notebook_paths: list[str]) -> None:
     """Checks and fixes specific types of links in the provided list of notebooks."""
-    session.log("Checking notebook links...")
+    print("Checking notebook links...")
     links_updated_count = 0
 
     for notebook_path in notebook_paths:
@@ -133,27 +126,21 @@ def update_notebook_links(session: nox.Session, notebook_paths: list[str]) -> No
                 links_updated_count += 1
                 with open(notebook_path, "w", encoding="utf-8") as f:
                     nbformat.write(notebook, f)
-                session.log(f"  -> Fixed links in {notebook_path}")
+                print(f"  -> Fixed links in {notebook_path}")
 
         except Exception as e:
-            session.warn(f"Could not check links in {notebook_path}. Error: {e}")
+            print(f"Could not check links in {notebook_path}. Error: {e}")
 
     if links_updated_count > 0:
-        session.log(f"Fixed links in {links_updated_count} notebooks.")
+        print(f"Fixed links in {links_updated_count} notebooks.")
 
 
 def preprocess_notebook(
-    session: nox.Session,
     notebook_paths: list[str],
     max_line_length: int = DEFAULT_RUFF_LINE_LENGTH,
 ) -> None:
-    """Parses notebooks and wraps '@param' blocks with '# fmt: off/on'.
-
-    This prevents ruff from formatting Google Colab form fields. The function
-    finds the first and last lines containing '@param' in a cell and inserts
-    the directives around that block. It modifies files in-place.
-    """
-    session.log("Checking for '@param' blocks to wrap with '# fmt: off/on'...")
+    """Parses notebooks and wraps '@param' blocks with '# fmt: off/on'."""
+    print("Checking for '@param' blocks to wrap with '# fmt: off/on'...")
     for path in notebook_paths:
         try:
             with open(path, encoding="utf-8") as f:
@@ -200,156 +187,21 @@ def preprocess_notebook(
                     notebook_modified = True
 
             if notebook_modified:
-                session.log(
-                    f"  -> Wrapped '@param' blocks with '# fmt: off/on' in {path}"
-                )
+                print(f"  -> Wrapped '@param' blocks with '# fmt: off/on' in {path}")
                 with open(path, "w", encoding="utf-8") as f:
                     nbformat.write(notebook, f)
 
         except Exception as e:
-            session.warn(f"Could not process notebook {path}. Error: {e}")
+            print(f"Could not process notebook {path}. Error: {e}")
 
 
-@nox.session(python=DEFAULT_PYTHON_VERSION)
-def format(session: nox.Session) -> None:
-    """Formats Python files and Jupyter Notebooks.
-
-    Pass '--all' to format all tracked files in the repository.
-    Pass '--unsafe-fixes' to enable unsafe fixes with Ruff.
-    Example: nox -s format -- --all --unsafe-fixes
-    """
-    # --- Argument Parsing ---
-    format_all = "--all" in session.posargs
-    ruff_unsafe_fixes_flag = (
-        "--unsafe-fixes" if "--unsafe-fixes" in session.posargs else ""
-    )
-
-    spelling_allow_file = ".github/actions/spelling/allow.txt"
-    if os.path.exists(spelling_allow_file):
-        session.log(f"Sorting and de-duplicating {spelling_allow_file}")
-        session.run(
-            "sort",
-            "-u",
-            spelling_allow_file,
-            "-o",
-            spelling_allow_file,
-            external=True,
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print(
+            "Usage: python notebook_processor.py <notebook_path1> <notebook_path2> ..."
         )
+        sys.exit(1)
 
-    if format_all:
-        lint_paths_py = ["."]
-        lint_paths_nb = ["."]
-    else:
-        target_branch = "main"
-
-        unstaged_files = subprocess.run(
-            ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB", target_branch],
-            stdout=subprocess.PIPE,
-            text=True,
-            check=False,
-        ).stdout.splitlines()
-
-        staged_files = subprocess.run(
-            [
-                "git",
-                "diff",
-                "--cached",
-                "--name-only",
-                "--diff-filter=ACMRTUXB",
-                target_branch,
-            ],
-            stdout=subprocess.PIPE,
-            text=True,
-            check=False,
-        ).stdout.splitlines()
-
-        committed_files = subprocess.run(
-            [
-                "git",
-                "diff",
-                "HEAD",
-                target_branch,
-                "--name-only",
-                "--diff-filter=ACMRTUXB",
-            ],
-            stdout=subprocess.PIPE,
-            text=True,
-            check=False,
-        ).stdout.splitlines()
-
-        changed_files = sorted(
-            {
-                file
-                for file in (unstaged_files + staged_files + committed_files)
-                if os.path.isfile(file)
-            }
-        )
-
-        lint_paths_py = [
-            f for f in changed_files if f.endswith(".py") and f != "noxfile.py"
-        ]
-
-        lint_paths_nb = [f for f in changed_files if f.endswith(".ipynb")]
-
-        if not lint_paths_py and not lint_paths_nb:
-            session.log("No changed Python or notebook files to lint.")
-            return
-
-    session.install(
-        "autoflake",
-        "ruff",
-    )
-
-    if lint_paths_py:
-        session.run(
-            "autoflake",
-            "-i",
-            "-r",
-            "--remove-all-unused-imports",
-            *lint_paths_py,
-        )
-
-        ruff_check_command = ["ruff", "check", "--fix-only"]
-        if "--unsafe-fixes" in session.posargs:
-            ruff_check_command.append("--unsafe-fixes")
-        ruff_check_command.extend(lint_paths_py)
-        session.run(*ruff_check_command)
-
-        session.run(
-            "ruff",
-            "format",
-            *lint_paths_py,
-        )
-
-    if lint_paths_nb:
-        session.install(
-            "git+https://github.com/tensorflow/docs",
-            "ipython",
-            "jupyter",
-            "nbconvert",
-            "nbqa>=1.9.1",
-            "nbformat>=5.10.4",
-        )
-
-        preprocess_notebook(session, lint_paths_nb)
-        update_notebook_links(session, lint_paths_nb)
-
-        session.run(
-            "nbqa",
-            "autoflake",
-            "-i",
-            "-r",
-            "--remove-all-unused-imports",
-            *lint_paths_nb,
-        )
-        session.run(
-            "nbqa",
-            f"ruff check --fix-only {ruff_unsafe_fixes_flag}",
-            *lint_paths_nb,
-        )
-        session.run(
-            "nbqa",
-            "ruff format",
-            *lint_paths_nb,
-        )
-        session.run("python3", "-m", "tensorflow_docs.tools.nbfmt", *lint_paths_nb)
+    notebook_paths = sys.argv[1:]
+    preprocess_notebook(notebook_paths)
+    update_notebook_links(notebook_paths)
