@@ -29,9 +29,9 @@ DEFAULT_RUFF_LINE_LENGTH = 88
 # --- Notebook Link Constants ---
 LINK_PREFIXES = {
     "colab_link": "https://colab.research.google.com/github/GoogleCloudPlatform/generative-ai/blob/main/",
-    "colab_enterprise_link": "https://console.cloud.google.com/vertex-ai/colab/import/",
+    "colab_enterprise_link": "https://console.cloud.google.com/agent-platform/colab/import/",
     "github_link": "https://github.com/GoogleCloudPlatform/generative-ai/blob/main/",
-    "workbench_link": "https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=",
+    "workbench_link": "https://console.cloud.google.com/agent-platform/workbench/instances?download_url=",
     "bigquery_studio_link": "https://console.cloud.google.com/bigquery/import?url=",
     "linkedin_link": "https://www.linkedin.com/sharing/share-offsite/?url=",
     "bluesky_link": "https://bsky.app/intent/compose?text=",
