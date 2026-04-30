@@ -166,6 +166,7 @@ bqdf
 bqds
 bqml
 breakroom
+briest
 Broadoak
 Brusdar
 Brynner
@@ -275,6 +276,7 @@ cpb
 cpet
 crewai
 CRF
+cristo
 crm
 CRM
 Crossbody
@@ -387,11 +389,13 @@ Dzor
 ecommerce
 EDB
 edgecolor
+edgelist
 edu
 Edu
 EDU
 Edunov
 eee
+effi
 EHR
 EHsc
 EIC
@@ -473,6 +477,7 @@ figsize
 figwidth
 FILEFLAGS
 FILEOS
+filestem
 fillmode
 fillna
 Finvest
@@ -493,6 +498,7 @@ FLX
 fmeasure
 FMWK
 Folmer
+fontane
 fontdict
 footwell
 forbes
@@ -615,6 +621,7 @@ gtk
 guanciale
 Gundogan
 gunicorn
+gutenberg
 Guterres
 GWLP
 hadolint
@@ -875,6 +882,7 @@ lookml
 Lopyrev
 loras
 Lottry
+louvain
 lparam
 LRESULT
 lro
@@ -1162,6 +1170,7 @@ PGUSER
 pgvector
 Phaidon
 Phanfone
+pharma
 Pharma
 phellos
 Photoshop
@@ -1269,6 +1278,7 @@ Ramblas
 ramen
 Ranurte
 rapideval
+raquin
 rarian
 rarians
 ratelimit
@@ -1510,6 +1520,7 @@ TGI
 tgz
 Thallam
 thelook
+thér
 THH
 THHH
 thi
@@ -1696,6 +1707,7 @@ welcom
 Welwyn
 werden
 wereld
+werther
 WFH
 wght
 whitegrid
@@ -1786,6 +1798,7 @@ zimie
 Zinnemann
 Zizu
 zmin
+zola
 Zom
 Zosyn
 Zscaler
