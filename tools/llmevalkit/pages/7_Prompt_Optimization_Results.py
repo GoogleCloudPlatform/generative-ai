@@ -163,6 +163,7 @@ def _display_interactive_results(results_ui: vapo_lib.ResultsUI) -> None:
             logger.info(
                 "ResultsUI object does not have 'templates' or 'eval_results', or templates list is empty. Falling back."
             )
+            st.info("No completed runs found yet in this directory. The evaluation might still be running or failed to produce results.")
         else:
             processed_results_for_tabs = []
             for i, template_summary_df in enumerate(results_ui.templates):

@@ -112,11 +112,8 @@ def main() -> None:
             st.info("No records found for the selected prompt.")
             return
 
-        # Extract scores into separate columns for easier analysis
-        scores_df = pd.json_normalize(prompt_df["scores"])
-        scores_df.columns = [f"score.{col}" for col in scores_df.columns]
-
-        comparison_df = pd.concat([prompt_df.reset_index(drop=True), scores_df], axis=1)
+        # Use prompt_df directly as it already contains flattened mean_scores columns
+        comparison_df = prompt_df.reset_index(drop=True)
 
         # Clean up the view
         display_columns = [

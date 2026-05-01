@@ -238,12 +238,15 @@ def dataset_selection() -> None:
 
     st.button("Load Dataset", key="load_existing_dataset_button")
     if st.session_state.load_existing_dataset_button:
-        gcs_uri = f"gs://{os.getenv('BUCKET')}/datasets/{st.session_state.selected_dataset}/{st.session_state.selected_file_from_dataset}"
-        logger.info("Loading file: %s", gcs_uri)
-        if st.session_state.selected_file_from_dataset.endswith(".jsonl"):
-            st.session_state.dataset = pd.read_json(gcs_uri, lines=True)
+        if not st.session_state.get("selected_dataset") or not st.session_state.get("selected_file_from_dataset"):
+            st.warning("Please select a dataset and a file first.")
         else:
-            st.session_state.dataset = pd.read_csv(gcs_uri)
+            gcs_uri = f"gs://{os.getenv('BUCKET')}/datasets/{st.session_state.selected_dataset}/{st.session_state.selected_file_from_dataset}"
+            logger.info("Loading file: %s", gcs_uri)
+            if st.session_state.selected_file_from_dataset.endswith(".jsonl"):
+                st.session_state.dataset = pd.read_json(gcs_uri, lines=True)
+            else:
+                st.session_state.dataset = pd.read_csv(gcs_uri)
 
     if st.session_state.dataset is not None:
         st.dataframe(st.session_state.dataset)

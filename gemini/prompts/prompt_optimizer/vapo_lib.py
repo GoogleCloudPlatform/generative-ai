@@ -585,6 +585,27 @@ class ResultsUI:
         runs = find_directories_with_files(path, required_files)
 
         self.run_label = widgets.Label("Select Run:")
+        
+        if not runs:
+            self.run_dropdown = widgets.Dropdown(
+                options=[], value=None, layout=widgets.Layout(width="200px"), disabled=True
+            )
+            self.dropdown_description = widgets.Label("Select Template:")
+            self.template_dropdown = widgets.Dropdown(
+                options=[],
+                value=None,
+                layout=widgets.Layout(width="400px"),
+                disabled=True,
+            )
+            self.results_output = widgets.Output(
+                layout=widgets.Layout(
+                    height="600px", overflow="auto", margin="20px 0px 0px 0px"
+                )
+            )
+            self.templates = []
+            self.eval_results = []
+            return
+
         self.run_dropdown = widgets.Dropdown(
             options=runs, value=runs[0], layout=widgets.Layout(width="200px")
         )

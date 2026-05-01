@@ -437,9 +437,9 @@ def main() -> None:
 
                 # Save as new version
                 with st.spinner("Saving optimized prompt to registry..."):
-                    prompt_meta_info = prompt_obj.save_prompt(check_existing=False)
+                    prompt_obj.save_prompt(check_existing=False)
 
-                new_version = prompt_meta_info.get("version_id", "latest")
+                new_version = prompt_obj.prompt_to_run._version_id or "latest"
                 st.success(f"Successfully exported as version: {new_version}")
 
                 # Save evaluation records

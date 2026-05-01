@@ -120,6 +120,16 @@ def get_autorater_pairwise_response(metric_prompt: str, model: str) -> dict:
         return {}
 
 
+def format_display_text(text):
+    """Formats text for display in st.text_area, handling dicts/lists as JSON."""
+    if isinstance(text, (dict, list)):
+        try:
+            return json.dumps(text, indent=2)
+        except (TypeError, ValueError):
+            return str(text)
+    return str(text)
+
+
 def main() -> None:
     """Initializes and runs the Streamlit evaluation application.
 
@@ -560,9 +570,7 @@ def main() -> None:
 
             if len(user_input_list) < len(df):
                 st.info(
-                    "Successfully generated responses for %s out of %s requested samples due to errors during generation.",
-                    len(user_input_list),
-                    len(df),
+                    f"Successfully generated responses for {len(user_input_list)} out of {len(df)} requested samples due to errors during generation."
                 )
         else:
             logger.info(
@@ -621,11 +629,12 @@ def main() -> None:
             st.subheader("User Input")
             st.text_area(
                 label="User's original query/text",
-                value=st.session_state.human_rated_dict["user_input"][
-                    st.session_state.current_index
-                ],
+                value=format_display_text(
+                    st.session_state.human_rated_dict["user_input"][
+                        st.session_state.current_index
+                    ]
+                ),
                 height=200,
-                key="user_input_text",
                 disabled=True,
             )
 
@@ -633,11 +642,12 @@ def main() -> None:
             st.subheader("Ground Truth")
             st.text_area(
                 label="The ideal/target response",
-                value=st.session_state.human_rated_dict["ground_truth"][
-                    st.session_state.current_index
-                ],
+                value=format_display_text(
+                    st.session_state.human_rated_dict["ground_truth"][
+                        st.session_state.current_index
+                    ]
+                ),
                 height=200,
-                key="ground_truth_text",
                 disabled=True,
             )
 
@@ -645,11 +655,12 @@ def main() -> None:
             st.subheader("Assistant Response")
             st.text_area(
                 label="The assistant's generated response",
-                value=st.session_state.human_rated_dict["assistant_response"][
-                    st.session_state.current_index
-                ],
+                value=format_display_text(
+                    st.session_state.human_rated_dict["assistant_response"][
+                        st.session_state.current_index
+                    ]
+                ),
                 height=200,
-                key="assistant_response_text",
                 disabled=True,
             )
 
@@ -658,7 +669,6 @@ def main() -> None:
             value=st.session_state.include_in_evaluations[
                 st.session_state.current_index
             ],
-            key="evaluation_checkbox",
         )
 
         if (
@@ -836,11 +846,25 @@ def main() -> None:
                     else:
                         final_reference_str = str(reference_val)
 
-                    instruction = (
-                        prompt_template.format(**user_input_values)
-                        if isinstance(user_input_values, dict)
-                        else prompt_template
-                    )
+                    # Extract all variables from the template
+                    template_vars = re.findall(r"\{(\w+)\}", prompt_template)
+
+                    if template_vars:
+                        # Template expects variables
+                        if isinstance(user_input_values, dict):
+                            # Ensure all expected vars are present, default to empty string if missing
+                            formatted_input = {v: user_input_values.get(v, "") for v in template_vars}
+                            instruction = prompt_template.format(**formatted_input)
+                        else:
+                            # Input is not a dict but template expects vars
+                            # Try to use the input as the first variable if there's only one, otherwise empty
+                            if len(template_vars) == 1:
+                                instruction = prompt_template.format(**{template_vars[0]: user_input_values})
+                            else:
+                                instruction = prompt_template # Fallback
+                    else:
+                        # No variables in template
+                        instruction = prompt_template
                     context = system_instruction if system_instruction else ""
                     prompt_str = (
                         json.dumps(user_input_values)
