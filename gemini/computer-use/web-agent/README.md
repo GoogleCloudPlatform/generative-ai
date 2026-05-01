@@ -2,7 +2,7 @@
 
 Authors: [Eric Dong](https://github.com/gericdong)
 
-This repository contains a Python script (`web_agent.py`) that demonstrates a web automation agent powered by the Gemini Computer Use model. The agent uses Playwright to control a browser and can perform multi-step tasks based on a natural language prompt.
+This repository contains a Python script (`web_agent.py`) that demonstrates a web automation agent powered by the Gemini Computer Use tool. The agent uses Playwright to control a browser and can perform multi-step tasks based on a natural language prompt.
 
 ![Web Agent Demo](https://storage.googleapis.com/cloud-samples-data/generative-ai/video/web-agent.gif)
 

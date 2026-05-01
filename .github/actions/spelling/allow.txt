@@ -7,18 +7,21 @@ Abhishek
 acall
 achat
 Achird
+AClient
 acomplete
 adamw
 ADAS
 adk
 ADK
 ADMA
+admins
 adr
 aexecute
 aextract
 afrom
 Afshaan
 AFX
+agains
 agentic
 agg
 AGG
@@ -36,6 +39,7 @@ akka
 Aktu
 ALCS
 ALDS
+Alessia
 Alibaba
 alisal
 alloydb
@@ -47,6 +51,7 @@ Anant
 antiword
 ANZ
 AOT
+apac
 APAC
 Aphone
 APIENTRY
@@ -102,6 +107,7 @@ avec
 Avenir
 aworkflow
 axs
+axvline
 Ayra
 Ayyappa
 backstory
@@ -121,12 +127,14 @@ Benno
 bert
 Bettes
 betulus
+Beyonce
 bff
 BFirst
 bgr
 BGR
 bgswap
 Bhagwat
+Bharath
 Biden
 bigframes
 bigquery
@@ -158,6 +166,7 @@ bqdf
 bqds
 bqml
 breakroom
+briest
 Broadoak
 Brusdar
 Brynner
@@ -175,6 +184,7 @@ cais
 CALIPSO
 campestre
 CAMQAA
+Canlaws
 Caprese
 carbonara
 Carcante
@@ -191,9 +201,12 @@ cbp
 ccc
 cce
 cctv
+CDIP
 cdiv
 CDNs
 ceb
+Ceccotti
+Centros
 ceo
 cer
 cfbundle
@@ -235,6 +248,7 @@ Codicote
 COINIT
 colab
 coldline
+Coleoidea
 Colm
 coloraxis
 colorbar
@@ -242,6 +256,7 @@ colorway
 colurna
 colvis
 colwidth
+Cómo
 Connectez
 CONOUT
 constexpr
@@ -261,6 +276,8 @@ cpb
 cpet
 crewai
 CRF
+cristo
+crm
 CRM
 Crossbody
 crosstab
@@ -307,9 +324,11 @@ Demme
 demouser
 dente
 Depatmint
+Derpanis
 descgen
 deskmates
 Dexin
+dflags
 dfs
 DHH
 diltiazem
@@ -338,6 +357,7 @@ Downscale
 dpi
 dpo
 DPO
+DQN
 draig
 Dreesen
 drilldown
@@ -350,6 +370,8 @@ dshm
 dsl
 dsn
 DSQ
+dto
+DTOs
 dtype
 dtypes
 Duh
@@ -367,8 +389,13 @@ Dzor
 ecommerce
 EDB
 edgecolor
+edgelist
+edu
+Edu
+EDU
 Edunov
 eee
+effi
 EHR
 EHsc
 EIC
@@ -399,6 +426,7 @@ ENU
 Envane
 envrc
 envsubst
+Enzo
 epath
 epoc
 Eragon
@@ -425,6 +453,7 @@ evt
 expl
 faa
 facecolor
+Fairall
 faiss
 FAISS
 Fangming
@@ -448,6 +477,7 @@ figsize
 figwidth
 FILEFLAGS
 FILEOS
+filestem
 fillmode
 fillna
 Finvest
@@ -468,6 +498,7 @@ FLX
 fmeasure
 FMWK
 Folmer
+fontane
 fontdict
 footwell
 forbes
@@ -482,6 +513,9 @@ Frodo
 fromarray
 frombytes
 fromiter
+frontline
+Frontline
+FRONTLINE
 fsspec
 FTPS
 fts
@@ -557,6 +591,8 @@ Godzilla
 goldmine
 Gombe
 GOODALL
+googleapi
+googlecar
 googler
 goooooood
 gozo
@@ -564,6 +600,7 @@ gpg
 gpp
 gpt
 gpu
+Grachev
 gradio
 gradlew
 graphrag
@@ -584,6 +621,8 @@ gtk
 guanciale
 Gundogan
 gunicorn
+gutenberg
+Guterres
 GWLP
 hadolint
 hahaha
@@ -595,6 +634,7 @@ Hannaneh
 Harvick
 hashtag
 hashtags
+Haumea
 Hawkins'll
 Hayao
 Hbf
@@ -618,6 +658,7 @@ Hikaru
 Hiromasa
 Hisaki
 historien
+histplot
 Hlc
 Hmmm
 HMO
@@ -649,6 +690,7 @@ HZN
 iap
 iban
 icd
+ICDAR
 ICICI
 ICML
 icudtl
@@ -656,11 +698,13 @@ idcg
 idk
 idks
 idxs
+IEA
 ience
 ifconfig
 IFI
 ifidx
 iinfo
+IIT
 ILB
 Ilkay
 iloc
@@ -712,6 +756,7 @@ JAVACMD
 Jax
 JDK
 Jedi
+Jeeg
 jegadesh
 jesieni
 Jestem
@@ -746,9 +791,11 @@ Kanagawa
 Katsura
 Kaufmanns
 Kawagoe
+kde
 Keanu
 kendall
 kenleejr
+kephal
 keras
 Ketamine
 keychain
@@ -799,11 +846,13 @@ lecie
 lego
 lenzing
 Levaquin
+levelized
 levelname
 Leventer
 lexer
 lexers
 liberties
+lic
 linalg
 linecolor
 linestyle
@@ -833,6 +882,7 @@ lookml
 Lopyrev
 loras
 Lottry
+louvain
 lparam
 LRESULT
 lro
@@ -860,6 +910,7 @@ magika
 Mahindra
 mahut
 mai
+Makemake
 makeover
 Malware
 Mamah
@@ -871,6 +922,7 @@ mapbox
 marp
 Masaru
 maskmode
+mathbf
 mathvista
 mavenrc
 maxcold
@@ -887,6 +939,7 @@ mec
 MEDIANCUT
 mediapy
 Mega
+Megarobot
 Meinl
 Meirelles
 Meltem
@@ -924,6 +977,7 @@ MMLU
 MMO
 mmol
 mmr
+Mnih
 modelfile
 Molaison
 monty
@@ -951,6 +1005,7 @@ Mvar
 mvn
 mvnw
 mvp
+MWh
 mwouts
 myaccount
 mydb
@@ -1012,6 +1067,7 @@ nokey
 Nominatim
 NOMINATIM
 NOMINMAX
+nonroot
 norigin
 notetaker
 novnc
@@ -1052,6 +1108,7 @@ OMR
 onesie
 onesies
 Onone
+OOD
 OOM
 Oort
 OOTB
@@ -1070,6 +1127,7 @@ overwiew
 owlbot
 oxml
 padus
+Pageable
 pagemap
 Pakeman
 paleo
@@ -1112,6 +1170,7 @@ PGUSER
 pgvector
 Phaidon
 Phanfone
+pharma
 Pharma
 phellos
 Photoshop
@@ -1134,6 +1193,7 @@ plt
 pmb
 podcast
 podcasts
+podes
 podfile
 podhelper
 podman
@@ -1151,6 +1211,7 @@ prag
 Pranav
 praw
 prcntg
+PRD
 Pré
 preds
 pregel
@@ -1172,6 +1233,7 @@ pyautogen
 pyav
 pybind
 pydantic
+pydrive
 pydub
 PYINK
 pymupdf
@@ -1183,6 +1245,7 @@ pytrec
 pyupgrade
 pyvis
 Pzk
+Qantas
 qas
 QEDC
 QLo
@@ -1211,9 +1274,11 @@ rahhhrr
 rai
 Raikkonen
 Rajpurkar
+Ramblas
 ramen
 Ranurte
 rapideval
+raquin
 rarian
 rarians
 ratelimit
@@ -1227,6 +1292,7 @@ recrawl
 reddit
 redef
 reidx
+remai
 rembg
 reoffice
 rephraser
@@ -1257,6 +1323,7 @@ Robotica
 rooney
 ROOTSPAN
 Rosberg
+ROUVs
 rpet
 rrf
 RRF
@@ -1272,6 +1339,7 @@ Ruchika
 runjdwp
 RUNPATH
 Rupjit
+RVL
 RVR
 RYDE
 saaagesh
@@ -1292,6 +1360,7 @@ scikit
 Scorsese
 SDKROOT
 seabut
+sealife
 seatback
 SEK
 Selam
@@ -1313,12 +1382,16 @@ Sha'carri
 shalas
 Shankman
 Shaoxiong
+Shar
 sharegpt
 Sharmila
 Shawshank
 Shazeer
+SHEBA
+shedd
 Shenzhou
 Shibuya
+Shinjuku
 Shklovsky
 Shohei
 shortdesc
@@ -1399,6 +1472,7 @@ sunner
 supima
 suptitle
 Surampudi
+survei
 Suzaka
 svh
 svm
@@ -1446,8 +1520,10 @@ TGI
 tgz
 Thallam
 thelook
+thér
 THH
 THHH
+thi
 throug
 THT
 THTH
@@ -1483,6 +1559,7 @@ Traceloop
 treeah
 Tribbiani
 Tricyle
+trimpath
 tritan
 TRK
 trl
@@ -1510,6 +1587,7 @@ ubuntu
 udf
 UDF
 UDFs
+Ufkes
 uids
 UIs
 Ukiyo
@@ -1540,6 +1618,7 @@ USK
 Uszkoreit
 Utik
 uuids
+UUV
 uvb
 uvicorn
 uvx
@@ -1556,6 +1635,7 @@ Vayots
 VBG
 vcodec
 VCPU
+vdb
 vectoral
 vectordb
 veo
@@ -1585,6 +1665,7 @@ VMAF
 VMs
 vnc
 voiceover
+Volodymyr
 vos
 VOS
 votre
@@ -1626,10 +1707,12 @@ welcom
 Welwyn
 werden
 wereld
+werther
 WFH
 wght
 whitegrid
 wiersz
+WIF
 wiffle
 wikipedia
 wil
@@ -1685,6 +1768,7 @@ yanchor
 yaxes
 yaxis
 ycol
+ydf
 yedoensis
 Ykb
 ylabel
@@ -1698,6 +1782,7 @@ yref
 ytd
 ytick
 yticks
+Yuxi
 Yuxuan
 Yuzuru
 zakarid
@@ -1713,6 +1798,7 @@ zimie
 Zinnemann
 Zizu
 zmin
+zola
 Zom
 Zosyn
 Zscaler

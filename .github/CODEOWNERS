@@ -27,6 +27,7 @@
 /generative-ai/gemini/multimodal-dataset                                                                                         @GoogleCloudPlatform/generative-ai-devrel @fthoele @cleop-google @diskontinuum
 /generative-ai/gemini/multimodal-live-api/websocket-demo-app/                                                                    @GoogleCloudPlatform/generative-ai-devrel @ZackAkil
 /generative-ai/gemini/rag-engine                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @edtsoi430
+/generative-ai/gemini/rag-engine/rag_engine_cross_corpus_retrieval.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @tiger-w-jin
 /generative-ai/gemini/responsible-ai                                                                                             @GoogleCloudPlatform/generative-ai-devrel @iamthuya
 /generative-ai/gemini/responsible-ai/gemini_safety_ratings.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @ghchinoy
 /generative-ai/gemini/sample-apps/finance-advisor-spanner/                                                                       @GoogleCloudPlatform/generative-ai-devrel @anirbanbagchi1979
@@ -57,6 +58,7 @@
 /generative-ai/open-models/serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb                                   @GoogleCloudPlatform/generative-ai-devrel @rsamborski
 /generative-ai/open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @eliasecchig
 /generative-ai/search                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @holtskinner
+/generative-ai/search/gemini-enterprise/group-licensing                                                                          @GoogleCloudPlatform/generative-ai-devrel @williamsmt @googlecharles
 /generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb                                            @GoogleCloudPlatform/generative-ai-devrel @guruvittal
 /generative-ai/speech/getting-started                                                                                            @GoogleCloudPlatform/generative-ai-devrel @inardini
 /generative-ai/speech/use-cases/storytelling                                                                                     @GoogleCloudPlatform/generative-ai-devrel @holtskinner

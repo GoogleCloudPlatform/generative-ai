@@ -202,11 +202,14 @@
 # Should be DeepSeek
 \b(?!DeepSeek\b)(?!deepseek\b)[Dd]eep\s?[Ss]eek?\b
 
-# Should be Vertex AI
+# Should be Agent Platform
 \b(?!Vertex AI\b)(?!.*[\(\)\{\},])(?<!import\s)(?<!\.)(?<!,\s)Vertex\s?[Aa]?[Ii]?\b
 
-# Should be Vertex AI
+# Should be Agent Platform
 \b[Vv]ertext\b
+
+# Should be Agent Platform
+\b[Vv]ertex [Aa][Ii]\b
 
 # Should be Gemini
 \sgemini\s\w
@@ -223,7 +226,7 @@
 # Don't say "Powered by Gemini", instead say "with Gemini"
 \b[Pp]owered\s[Bb]y\s[Gg]emini\b
 
-# Should be Gemini API in Vertex AI
+# Should be Gemini API on Agent Platform
 \b[Vv]ertex\s[Aa][Ii]\s[Gg]emini\s[Aa][Pp][Ii]\b
 
 # Should be Gemini Enterprise
@@ -274,10 +277,10 @@
 # Should be Document AI
 \bDoc\s?AI\b
 
-# Should be Vertex AI Search
+# Should be Agent Search
 \bVertex\s?Search\b
 
-# Should be Vertex AI Vector Search
+# Should be Vector Search
 \bVertex\sVector\sSearch\b
 
 # Should be Colab
