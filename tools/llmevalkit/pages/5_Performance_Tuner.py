@@ -45,13 +45,6 @@ TARGET_MODELS = [
     "gemini-2.0-flash-001",
     "gemini-2.0-flash-lite",
     "gemini-2.0-flash-lite-001",
-    "gemini-1.5-pro-002",
-    "gemini-1.5-pro-001",
-    "gemini-1.5-flash-002",
-    "gemini-1.5-flash-001",
-    "gemini-1.0-pro-002",
-    "gemini-1.0-pro-001",
-    "gemini-1.0-pro-vision-001",
 ]
 
 
@@ -355,7 +348,7 @@ def main() -> None:
                 if status in ["JOB_STATE_PENDING", "JOB_STATE_RUNNING"]:
                     st.info(f"Job is still {status.replace('JOB_STATE_', '')}. Please check back later. (Hill-climbing algorithms may take a while).")
                 elif status == "JOB_STATE_FAILED":
-                    st.error("The optimization job failed. Check Vertex AI console logs.")
+                    st.error("The optimization job failed. Check Agent Platform console logs.")
                 elif status == "JOB_STATE_SUCCEEDED":
                     st.success("Job Complete! Processing results...")
 

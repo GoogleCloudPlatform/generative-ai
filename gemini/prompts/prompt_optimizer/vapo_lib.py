@@ -845,7 +845,7 @@ def evaluate_task(
     eval_metrics: list[str],
     eval_sample_n: int,
 ) -> dict[str, float]:
-    """Evaluate task using Vertex AI Evaluation."""
+    """Evaluate task using Agent Platform Evaluation."""
 
     # Generate a unique id for the experiment run
     idx = get_id()

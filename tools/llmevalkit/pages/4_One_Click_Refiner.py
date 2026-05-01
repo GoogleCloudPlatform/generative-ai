@@ -98,7 +98,7 @@ def _handle_load_prompt():
 
 
 def _handle_auto_suggest():
-    """Calls Vertex AI to automatically suggest prompt engineering directives."""
+    """Calls Agent Platform to automatically suggest prompt engineering directives."""
     sys_inst = st.session_state.local_prompt.prompt_to_run.system_instruction or "None"
     prompt_data = st.session_state.local_prompt.prompt_to_run.prompt_data or "None"
 
