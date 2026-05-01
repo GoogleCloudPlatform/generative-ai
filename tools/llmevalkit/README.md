@@ -41,7 +41,7 @@ This tutorial provides a comprehensive guide to prompt engineering, covering the
 
 5.  **Performance Tuner:** Optimize your prompt's System Instructions using data-driven iteration to maximize metric performance. This tool uses hill-climbing algorithms to automatically refine prompts based on your evaluation metrics.
 
-6.  **Prompt Optimization:** This section helps you automatically improve your prompts using Vertex AI's prompt optimization capabilities. It provides a structured way to:
+6.  **Prompt Optimization:** This section helps you automatically improve your prompts using Agent Platform's prompt optimization capabilities. It provides a structured way to:
 
     -   **Configure and launch optimization jobs:** You can set up and run a job that will take your prompt and a dataset and try to find a better-performing version of the prompt.
 
@@ -206,7 +206,7 @@ Navigate back to **Evaluation** and run an evaluation similar to step 3, but loa
 
 ### 6. Prompt Optimization
 
-🔧 Set-Up Prompt Optimization using Vertex AI's batch optimization service.
+🔧 Set-Up Prompt Optimization using Agent Platform's batch optimization service.
 
 - **Target Model:** 'gemini-2.5-flash'
 - **Existing Prompt:** 'math_prompt_test'
