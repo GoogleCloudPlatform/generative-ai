@@ -85,6 +85,7 @@ def get_autorater_pairwise_response(metric_prompt: str, model: str) -> dict:
     Returns:
         A dictionary containing the autorater's response.
     """
+
     class AutoraterResponse(BaseModel):
         pairwise_choice: str
         explanation: str
@@ -103,8 +104,14 @@ def get_autorater_pairwise_response(metric_prompt: str, model: str) -> dict:
             "response_schema": AutoraterResponse,
             "safety_settings": [
                 {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "threshold": "BLOCK_NONE",
+                },
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "threshold": "BLOCK_NONE",
+                },
                 {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
             ],
         },
@@ -342,7 +349,9 @@ def main() -> None:
                 st.session_state.selected_prompt,
                 st.session_state.selected_version,
             )
-            logger.info(f"Local Prompt Meta: {st.session_state.local_prompt.prompt_meta}")
+            logger.info(
+                f"Local Prompt Meta: {st.session_state.local_prompt.prompt_meta}"
+            )
             logger.info(
                 f"Local Prompt Meta Dict Keys: {st.session_state.local_prompt.prompt_meta.keys()}"
             )
@@ -403,7 +412,9 @@ def main() -> None:
             elif gcs_path.endswith(".jsonl"):
                 df_full = pd.read_json(gcs_path, lines=True)
             else:
-                st.error(f"Unsupported file type: {gcs_path.rsplit('.', maxsplit=1)[-1]}")
+                st.error(
+                    f"Unsupported file type: {gcs_path.rsplit('.', maxsplit=1)[-1]}"
+                )
                 return
         except Exception as e:
             st.error(f"Error reading data from {gcs_path}: {e}")
@@ -542,10 +553,14 @@ def main() -> None:
             results = []
 
             if total > 0:
-                progress_bar = st.progress(0, text="Generating responses in parallel...")
+                progress_bar = st.progress(
+                    0, text="Generating responses in parallel..."
+                )
 
                 with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-                    future_to_idx = {executor.submit(process_task, t): t[0] for t in tasks}
+                    future_to_idx = {
+                        executor.submit(process_task, t): t[0] for t in tasks
+                    }
                     for future in concurrent.futures.as_completed(future_to_idx):
                         t_idx, item, expected, res, error = future.result()
                         completed += 1
@@ -554,13 +569,19 @@ def main() -> None:
                         progress_bar.progress(completed / total, text=progress_text)
 
                         if error:
-                            logger.error("Error generating response for row index %s: %s", t_idx, error)
+                            logger.error(
+                                "Error generating response for row index %s: %s",
+                                t_idx,
+                                error,
+                            )
                         else:
                             results.append((t_idx, item, expected, res))
 
                 progress_bar.empty()
                 if len(results) < total:
-                    st.warning(f"Generated {len(results)} responses. {total - len(results)} failed.")
+                    st.warning(
+                        f"Generated {len(results)} responses. {total - len(results)} failed."
+                    )
 
             results.sort(key=lambda x: x[0])
             for t_idx, item, expected, res in results:
@@ -853,15 +874,18 @@ def main() -> None:
                         # Template expects variables
                         if isinstance(user_input_values, dict):
                             # Ensure all expected vars are present, default to empty string if missing
-                            formatted_input = {v: user_input_values.get(v, "") for v in template_vars}
+                            formatted_input = {
+                                v: user_input_values.get(v, "") for v in template_vars
+                            }
                             instruction = prompt_template.format(**formatted_input)
+                        # Input is not a dict but template expects vars
+                        # Try to use the input as the first variable if there's only one, otherwise empty
+                        elif len(template_vars) == 1:
+                            instruction = prompt_template.format(
+                                **{template_vars[0]: user_input_values}
+                            )
                         else:
-                            # Input is not a dict but template expects vars
-                            # Try to use the input as the first variable if there's only one, otherwise empty
-                            if len(template_vars) == 1:
-                                instruction = prompt_template.format(**{template_vars[0]: user_input_values})
-                            else:
-                                instruction = prompt_template # Fallback
+                            instruction = prompt_template  # Fallback
                     else:
                         # No variables in template
                         instruction = prompt_template

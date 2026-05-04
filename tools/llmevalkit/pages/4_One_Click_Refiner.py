@@ -10,7 +10,7 @@
 
 """Streamlit user interface for the One-Click Refiner.
 
-This page provides an interface to instantly upgrade a draft prompt into a 
+This page provides an interface to instantly upgrade a draft prompt into a
 structured, production-ready instruction without managing any datasets.
 """
 
@@ -24,7 +24,9 @@ from vertexai.generative_models import GenerationConfig, GenerativeModel
 from vertexai.preview import prompts
 
 load_dotenv("src/.env")
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # --- Prompt Templates ---
@@ -61,6 +63,7 @@ Draft Prompt:
 {draft_prompt}
 """
 
+
 def initialize_session_state() -> None:
     """Initializes needed session state variables."""
     if "local_prompt" not in st.session_state:
@@ -77,7 +80,9 @@ def initialize_session_state() -> None:
 
 def _handle_load_prompt():
     """Loads the selected prompt and version into the gcp_prompt object."""
-    if not st.session_state.get("selected_prompt") or not st.session_state.get("selected_version"):
+    if not st.session_state.get("selected_prompt") or not st.session_state.get(
+        "selected_version"
+    ):
         st.warning("Please select both a prompt and a version to load.")
         return
     prompt_name = st.session_state.selected_prompt
@@ -85,7 +90,9 @@ def _handle_load_prompt():
     version_id = st.session_state.selected_version
     try:
         with st.spinner(f"Loading version '{version_id}' of prompt '{prompt_name}'..."):
-            st.session_state.local_prompt.load_prompt(prompt_id, prompt_name, version_id)
+            st.session_state.local_prompt.load_prompt(
+                prompt_id, prompt_name, version_id
+            )
         st.success(f"Loaded prompt '{prompt_name}' (Version: {version_id}).")
 
         # Clear previous optimizations
@@ -109,8 +116,7 @@ def _handle_auto_suggest():
     try:
         model = GenerativeModel(model_name)
         prompt_text = SUGGEST_DIRECTIVES_PROMPT.format(
-            draft_system_instructions=sys_inst,
-            draft_prompt=prompt_data
+            draft_system_instructions=sys_inst, draft_prompt=prompt_data
         )
         with st.spinner("Analyzing prompt and generating suggestions..."):
             response = model.generate_content(prompt_text)
@@ -137,20 +143,21 @@ def _handle_optimize():
             custom_directives=directives,
             tone=tone,
             draft_system_instructions=sys_inst,
-            draft_prompt=prompt_data
+            draft_prompt=prompt_data,
         )
         with st.spinner("Optimizing..."):
             response = model.generate_content(
                 prompt_text,
                 generation_config=GenerationConfig(
-                    temperature=0.4,
-                    response_mime_type="application/json"
-                )
+                    temperature=0.4, response_mime_type="application/json"
+                ),
             )
             # Parse response
             try:
                 res_obj = json.loads(response.text)
-                st.session_state.opt_sys = res_obj.get("optimized_system_instruction", "")
+                st.session_state.opt_sys = res_obj.get(
+                    "optimized_system_instruction", ""
+                )
                 st.session_state.opt_prompt = res_obj.get("optimized_prompt", "")
                 st.session_state.ocr_insights = res_obj.get("insights", [])
                 st.success("Optimization Complete!")
@@ -184,11 +191,15 @@ def _handle_save_new_version():
 
 def main():
     """Renders the One-Click Refiner page layout."""
-    st.set_page_config(layout="wide", page_title="One-Click Refiner", page_icon="assets/favicon.ico")
+    st.set_page_config(
+        layout="wide", page_title="One-Click Refiner", page_icon="assets/favicon.ico"
+    )
     initialize_session_state()
 
     st.title("One-Click Refiner")
-    st.markdown("Instantly upgrade a draft prompt into a structured, production-ready instruction without managing any datasets.")
+    st.markdown(
+        "Instantly upgrade a draft prompt into a structured, production-ready instruction without managing any datasets."
+    )
     st.divider()
 
     # SECTION 1: Load Existing Prompt
@@ -211,7 +222,9 @@ def main():
         versions = []
         if selected_prompt_name:
             try:
-                prompt_id = st.session_state.local_prompt.existing_prompts[selected_prompt_name]
+                prompt_id = st.session_state.local_prompt.existing_prompts[
+                    selected_prompt_name
+                ]
                 versions = [v.version_id for v in prompts.list_versions(prompt_id)]
             except Exception as e:
                 st.error(f"Could not fetch versions: {e}")
@@ -234,15 +247,30 @@ def main():
             current_model = st.session_state.local_prompt.prompt_to_run.model_name
             if current_model and "/" in current_model:
                 current_model = current_model.split("/")[-1]
-            st.text_input("Target Model", value=current_model if current_model else "gemini-2.0-flash-001", key="ocr_target_model")
+            st.text_input(
+                "Target Model",
+                value=current_model if current_model else "gemini-2.0-flash-001",
+                key="ocr_target_model",
+            )
         with c2:
-            st.selectbox("Tone", options=["Professional", "Creative", "Concise", "Assertive", "Friendly", "None"], key="ocr_tone")
+            st.selectbox(
+                "Tone",
+                options=[
+                    "Professional",
+                    "Creative",
+                    "Concise",
+                    "Assertive",
+                    "Friendly",
+                    "None",
+                ],
+                key="ocr_tone",
+            )
 
         st.markdown("**Optimization Directives**")
         st.text_area(
             "Modify the guidelines the optimizer should follow:",
             key="ocr_directives",
-            height=120
+            height=120,
         )
         st.button("✨ Auto-Suggest Directives", on_click=_handle_auto_suggest)
 
@@ -256,8 +284,21 @@ def main():
         rev_c1, rev_c2 = st.columns(2)
         with rev_c1:
             st.markdown("### Original Draft")
-            st.text_area("System Instructions", value=st.session_state.local_prompt.prompt_to_run.system_instruction or "", disabled=True, height=200, key="org_sys")
-            st.text_area("Prompt Data", value=p_data or "", disabled=True, height=200, key="org_prompt")
+            st.text_area(
+                "System Instructions",
+                value=st.session_state.local_prompt.prompt_to_run.system_instruction
+                or "",
+                disabled=True,
+                height=200,
+                key="org_sys",
+            )
+            st.text_area(
+                "Prompt Data",
+                value=p_data or "",
+                disabled=True,
+                height=200,
+                key="org_prompt",
+            )
 
         with rev_c2:
             st.markdown("### Optimized Result")
@@ -271,7 +312,10 @@ def main():
 
         st.divider()
         st.subheader("4. Action")
-        st.button("Save as New Version", on_click=_handle_save_new_version, type="primary")
+        st.button(
+            "Save as New Version", on_click=_handle_save_new_version, type="primary"
+        )
+
 
 if __name__ == "__main__":
     main()

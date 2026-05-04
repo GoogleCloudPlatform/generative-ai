@@ -93,8 +93,14 @@ def refresh_bucket() -> list[str]:
 
 
 def get_optimization_args(
-    input_optimization_data_file_uri, output_optimization_run_uri, target_model, selected_metrics,
-    target_qps=1.0, optimizer_qps=1.0, eval_qps=1.0, data_limit=10
+    input_optimization_data_file_uri,
+    output_optimization_run_uri,
+    target_model,
+    selected_metrics,
+    target_qps=1.0,
+    optimizer_qps=1.0,
+    eval_qps=1.0,
+    data_limit=10,
 ):
     response_schema_str = st.session_state.local_prompt.prompt_meta.get(
         "response_schema", "{}"
@@ -118,7 +124,9 @@ def get_optimization_args(
     ):
         has_multimodal = True
 
-    metrics = selected_metrics if selected_metrics else ["question_answering_correctness"]
+    metrics = (
+        selected_metrics if selected_metrics else ["question_answering_correctness"]
+    )
     weights = [1.0 for _ in metrics]
 
     return Namespace(
@@ -193,7 +201,9 @@ def main() -> None:
     initialize_session_state()
 
     st.title("Performance Tuner")
-    st.markdown("Optimize your prompt's System Instructions using data-driven iteration to maximize metric performance.")
+    st.markdown(
+        "Optimize your prompt's System Instructions using data-driven iteration to maximize metric performance."
+    )
 
     # 1. & 2. Data Setup & Template Definition
     st.header("1. Data & Prompt Setup")
@@ -206,21 +216,33 @@ def main() -> None:
 
         if st.session_state.tuner_dataset:
             if (
-                st.session_state.tuner_dataset != st.session_state.last_selected_dataset_for_cache
-                or st.session_state.tuner_dataset not in st.session_state.cached_data_files
+                st.session_state.tuner_dataset
+                != st.session_state.last_selected_dataset_for_cache
+                or st.session_state.tuner_dataset
+                not in st.session_state.cached_data_files
             ):
                 bucket = st.session_state.storage_client.bucket(os.getenv("BUCKET"))
                 prefix = f"datasets/{st.session_state.tuner_dataset}/"
                 blobs_iterator = bucket.list_blobs(prefix=prefix)
                 current_dataset_files = [
-                    blob.name[len(prefix):] for blob in blobs_iterator
-                    if (blob.name.endswith(".csv") or blob.name.endswith(".jsonl")) and not blob.name.endswith("/")
+                    blob.name[len(prefix) :]
+                    for blob in blobs_iterator
+                    if (blob.name.endswith(".csv") or blob.name.endswith(".jsonl"))
+                    and not blob.name.endswith("/")
                 ]
-                st.session_state.cached_data_files[st.session_state.tuner_dataset] = sorted(set(current_dataset_files))
-                st.session_state.last_selected_dataset_for_cache = st.session_state.tuner_dataset
+                st.session_state.cached_data_files[st.session_state.tuner_dataset] = (
+                    sorted(set(current_dataset_files))
+                )
+                st.session_state.last_selected_dataset_for_cache = (
+                    st.session_state.tuner_dataset
+                )
 
-            files = st.session_state.cached_data_files.get(st.session_state.tuner_dataset, [])
-            st.selectbox("Select File (.csv or .jsonl)", options=[None, *files], key="tuner_file")
+            files = st.session_state.cached_data_files.get(
+                st.session_state.tuner_dataset, []
+            )
+            st.selectbox(
+                "Select File (.csv or .jsonl)", options=[None, *files], key="tuner_file"
+            )
 
             if st.button("Load Dataset", key="tuner_load_data"):
                 if st.session_state.tuner_file:
@@ -233,20 +255,38 @@ def main() -> None:
 
     with col2:
         st.subheader("Template Definition")
-        st.selectbox("Select Prompt", options=st.session_state.local_prompt.existing_prompts.keys(), placeholder="Select Prompt...", key="tuner_prompt")
+        st.selectbox(
+            "Select Prompt",
+            options=st.session_state.local_prompt.existing_prompts.keys(),
+            placeholder="Select Prompt...",
+            key="tuner_prompt",
+        )
 
         if st.session_state.tuner_prompt:
-            st.session_state.local_prompt.prompt_meta["name"] = st.session_state.tuner_prompt
+            st.session_state.local_prompt.prompt_meta["name"] = (
+                st.session_state.tuner_prompt
+            )
             versions = [
                 i.version_id
-                for i in prompts.list_versions(st.session_state.local_prompt.existing_prompts[st.session_state.tuner_prompt])
+                for i in prompts.list_versions(
+                    st.session_state.local_prompt.existing_prompts[
+                        st.session_state.tuner_prompt
+                    ]
+                )
             ]
-            st.selectbox("Select Version", options=versions, placeholder="Select Version...", key="tuner_version")
+            st.selectbox(
+                "Select Version",
+                options=versions,
+                placeholder="Select Version...",
+                key="tuner_version",
+            )
 
         if st.button("Load Prompt", key="tuner_load_prompt"):
             if st.session_state.tuner_prompt and st.session_state.tuner_version:
                 st.session_state.local_prompt.load_prompt(
-                    st.session_state.local_prompt.existing_prompts[st.session_state.tuner_prompt],
+                    st.session_state.local_prompt.existing_prompts[
+                        st.session_state.tuner_prompt
+                    ],
                     st.session_state.tuner_prompt,
                     st.session_state.tuner_version,
                 )
@@ -254,25 +294,78 @@ def main() -> None:
 
     if st.session_state.local_prompt.prompt_to_run.system_instruction:
         with st.expander("View Loaded Prompt Details", expanded=False):
-            st.text_area("System Instruction", st.session_state.local_prompt.prompt_to_run.system_instruction, disabled=True, height=100)
-            st.text_area("Prompt Template", st.session_state.local_prompt.prompt_to_run.prompt_data, disabled=True, height=100)
+            st.text_area(
+                "System Instruction",
+                st.session_state.local_prompt.prompt_to_run.system_instruction,
+                disabled=True,
+                height=100,
+            )
+            st.text_area(
+                "Prompt Template",
+                st.session_state.local_prompt.prompt_to_run.prompt_data,
+                disabled=True,
+                height=100,
+            )
 
     st.divider()
 
     # 3. Metric Selection
     st.header("2. Metric Selection")
     metric_names = MetricPromptTemplateExamples.list_example_metric_names()
-    computation_metrics = ["bleu", "rouge_1", "rouge_2", "rouge_l", "rouge_l_sum", "exact_match", "question_answering_correctness"]
+    computation_metrics = [
+        "bleu",
+        "rouge_1",
+        "rouge_2",
+        "rouge_l",
+        "rouge_l_sum",
+        "exact_match",
+        "question_answering_correctness",
+    ]
     all_metrics = list(set(metric_names + computation_metrics))
 
-    selected_metrics = st.multiselect("Select Evaluation Metrics for Optimization", options=all_metrics, default=["question_answering_correctness"], key="tuner_metrics")
-    target_model = st.selectbox("Select Target Model", options=TARGET_MODELS, key="tuner_target_model")
+    selected_metrics = st.multiselect(
+        "Select Evaluation Metrics for Optimization",
+        options=all_metrics,
+        default=["question_answering_correctness"],
+        key="tuner_metrics",
+    )
+    target_model = st.selectbox(
+        "Select Target Model", options=TARGET_MODELS, key="tuner_target_model"
+    )
 
     with st.expander("Advanced Settings"):
-        st.session_state.tuner_target_qps = st.number_input("Target Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1, key="tuner_target_qps_input")
-        st.session_state.tuner_optimizer_qps = st.number_input("Optimizer Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1, key="tuner_optimizer_qps_input")
-        st.session_state.tuner_eval_qps = st.number_input("Evaluation QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1, key="tuner_eval_qps_input")
-        st.session_state.tuner_data_limit = st.number_input("Data Limit (Sample Size)", min_value=1, max_value=1000, value=10, step=1, key="tuner_data_limit_input")
+        st.session_state.tuner_target_qps = st.number_input(
+            "Target Model QPS",
+            min_value=0.1,
+            max_value=10.0,
+            value=1.0,
+            step=0.1,
+            key="tuner_target_qps_input",
+        )
+        st.session_state.tuner_optimizer_qps = st.number_input(
+            "Optimizer Model QPS",
+            min_value=0.1,
+            max_value=10.0,
+            value=1.0,
+            step=0.1,
+            key="tuner_optimizer_qps_input",
+        )
+        st.session_state.tuner_eval_qps = st.number_input(
+            "Evaluation QPS",
+            min_value=0.1,
+            max_value=10.0,
+            value=1.0,
+            step=0.1,
+            key="tuner_eval_qps_input",
+        )
+        st.session_state.tuner_data_limit = st.number_input(
+            "Data Limit (Sample Size)",
+            min_value=1,
+            max_value=1000,
+            value=10,
+            step=1,
+            key="tuner_data_limit_input",
+        )
 
     st.divider()
 
@@ -290,7 +383,11 @@ def main() -> None:
             return
 
         with st.spinner("Initializing Job..."):
-            workspace_uri = epath.Path(os.getenv("BUCKET")) / "optimization" / st.session_state.op_id
+            workspace_uri = (
+                epath.Path(os.getenv("BUCKET"))
+                / "optimization"
+                / st.session_state.op_id
+            )
             input_data_uri = workspace_uri / "data"
             workspace_uri.mkdir(parents=True, exist_ok=True)
             input_data_uri.mkdir(parents=True, exist_ok=True)
@@ -300,11 +397,19 @@ def main() -> None:
             output_optimization_run_uri = str(output_optimization_data_uri / job_name)
             input_optimization_data_file_uri = f"gs://{input_data_uri}/{job_name}.jsonl"
 
-            st.session_state.dataset.to_json(str(input_optimization_data_file_uri), orient="records", lines=True)
+            st.session_state.dataset.to_json(
+                str(input_optimization_data_file_uri), orient="records", lines=True
+            )
 
             args = get_optimization_args(
-                input_optimization_data_file_uri, output_optimization_run_uri, target_model, selected_metrics,
-                st.session_state.tuner_target_qps, st.session_state.tuner_optimizer_qps, st.session_state.tuner_eval_qps, st.session_state.tuner_data_limit
+                input_optimization_data_file_uri,
+                output_optimization_run_uri,
+                target_model,
+                selected_metrics,
+                st.session_state.tuner_target_qps,
+                st.session_state.tuner_optimizer_qps,
+                st.session_state.tuner_eval_qps,
+                st.session_state.tuner_data_limit,
             )
             args_dict = vars(args)
 
@@ -312,14 +417,16 @@ def main() -> None:
             with epath.Path(config_file_uri).open("w") as config_file:
                 json.dump(args_dict, config_file)
 
-            worker_pool_specs = [{
-                "machine_spec": {"machine_type": "n1-standard-4"},
-                "replica_count": 1,
-                "container_spec": {
-                    "image_uri": os.getenv("APD_CONTAINER_URI"),
-                    "args": ["--config=" + config_file_uri],
-                },
-            }]
+            worker_pool_specs = [
+                {
+                    "machine_spec": {"machine_type": "n1-standard-4"},
+                    "replica_count": 1,
+                    "container_spec": {
+                        "image_uri": os.getenv("APD_CONTAINER_URI"),
+                        "args": ["--config=" + config_file_uri],
+                    },
+                }
+            ]
 
             custom_job = aiplatform.CustomJob(
                 display_name=job_name,
@@ -344,41 +451,77 @@ def main() -> None:
             st.warning("No optimization job has been launched in this session.")
         else:
             with st.spinner("Checking job status..."):
-                status = check_job_status(st.session_state.tuner_launched_job, os.getenv("PROJECT_ID"), os.getenv("LOCATION"))
+                status = check_job_status(
+                    st.session_state.tuner_launched_job,
+                    os.getenv("PROJECT_ID"),
+                    os.getenv("LOCATION"),
+                )
                 if status in ["JOB_STATE_PENDING", "JOB_STATE_RUNNING"]:
-                    st.info(f"Job is still {status.replace('JOB_STATE_', '')}. Please check back later. (Hill-climbing algorithms may take a while).")
+                    st.info(
+                        f"Job is still {status.replace('JOB_STATE_', '')}. Please check back later. (Hill-climbing algorithms may take a while)."
+                    )
                 elif status == "JOB_STATE_FAILED":
-                    st.error("The optimization job failed. Check Agent Platform console logs.")
+                    st.error(
+                        "The optimization job failed. Check Agent Platform console logs."
+                    )
                 elif status == "JOB_STATE_SUCCEEDED":
                     st.success("Job Complete! Processing results...")
 
                     try:
                         results_ui = vapo_lib.ResultsUI(st.session_state.tuner_run_uri)
-                        if getattr(results_ui, "templates", None) and getattr(results_ui, "eval_results", None):
+                        if getattr(results_ui, "templates", None) and getattr(
+                            results_ui, "eval_results", None
+                        ):
                             baseline = results_ui.templates[0]
                             winner = results_ui.templates[-1]
 
                             st.subheader("Score Jump")
-                            mean_cols = [c for c in baseline.columns if c.startswith("metrics.") and "/mean" in c]
+                            mean_cols = [
+                                c
+                                for c in baseline.columns
+                                if c.startswith("metrics.") and "/mean" in c
+                            ]
 
                             col_metrics = st.columns(min(len(mean_cols), 4) or 1)
                             final_scores = {}
                             for idx, m_col in enumerate(mean_cols):
-                                b_val = float(baseline[m_col].iloc[0]) if m_col in baseline else 0.0
-                                w_val = float(winner[m_col].iloc[0]) if m_col in winner else 0.0
+                                b_val = (
+                                    float(baseline[m_col].iloc[0])
+                                    if m_col in baseline
+                                    else 0.0
+                                )
+                                w_val = (
+                                    float(winner[m_col].iloc[0])
+                                    if m_col in winner
+                                    else 0.0
+                                )
                                 diff = w_val - b_val
-                                label = m_col.replace("metrics.","").replace("/mean","").title()
+                                label = (
+                                    m_col.replace("metrics.", "")
+                                    .replace("/mean", "")
+                                    .title()
+                                )
                                 final_scores[label] = w_val
 
                                 with col_metrics[idx % len(col_metrics)]:
-                                    st.metric(label, f"{w_val:.3f}", delta=f"{diff:.3f}")
+                                    st.metric(
+                                        label, f"{w_val:.3f}", delta=f"{diff:.3f}"
+                                    )
 
                             st.subheader("Winner System Instruction")
-                            winning_system_text = winner["prompt"].iloc[0] if "prompt" in winner else "Unable to parse winning prompt."
+                            winning_system_text = (
+                                winner["prompt"].iloc[0]
+                                if "prompt" in winner
+                                else "Unable to parse winning prompt."
+                            )
                             # Usually the optimizer alters the instruction which is the "prompt" field in vapo_lib output.
-                            st.text_area("Optimized Instruction", winning_system_text, height=150)
+                            st.text_area(
+                                "Optimized Instruction", winning_system_text, height=150
+                            )
 
-                            st.session_state.tuner_winning_template = winning_system_text
+                            st.session_state.tuner_winning_template = (
+                                winning_system_text
+                            )
                             st.session_state.tuner_final_scores = final_scores
                         else:
                             st.warning("Results found but could not be parsed.")
@@ -392,7 +535,11 @@ def main() -> None:
     # 6. Validation
     st.header("5. Validation")
     st.markdown("Test the best performing prompt on a blind test case.")
-    blind_test_json = st.text_area("Blind Test Case Input (JSON)", placeholder='{"ticket_text": "I lost my password..."}', height=100)
+    blind_test_json = st.text_area(
+        "Blind Test Case Input (JSON)",
+        placeholder='{"ticket_text": "I lost my password..."}',
+        height=100,
+    )
 
     if st.button("Test Best Prompt"):
         if not st.session_state.tuner_winning_template:
@@ -405,7 +552,9 @@ def main() -> None:
 
                 # Setup temporary prompt object to run test
                 prompt_obj = st.session_state.local_prompt
-                prompt_obj.prompt_to_run.system_instruction = st.session_state.tuner_winning_template
+                prompt_obj.prompt_to_run.system_instruction = (
+                    st.session_state.tuner_winning_template
+                )
                 # Keep original generation config/schema
 
                 with st.spinner("Generating Response..."):
@@ -426,7 +575,9 @@ def main() -> None:
         else:
             try:
                 prompt_obj = st.session_state.local_prompt
-                prompt_obj.prompt_to_run.system_instruction = st.session_state.tuner_winning_template
+                prompt_obj.prompt_to_run.system_instruction = (
+                    st.session_state.tuner_winning_template
+                )
 
                 # Save as new version
                 with st.spinner("Saving optimized prompt to registry..."):
@@ -442,7 +593,7 @@ def main() -> None:
                             st.session_state.tuner_final_scores,
                             st.session_state.tuner_prompt,
                             new_version,
-                            st.session_state.tuner_winning_template
+                            st.session_state.tuner_winning_template,
                         )
                     st.success("Performance report saved to GCS.")
             except Exception as e:

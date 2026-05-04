@@ -238,7 +238,9 @@ def dataset_selection() -> None:
 
     st.button("Load Dataset", key="load_existing_dataset_button")
     if st.session_state.load_existing_dataset_button:
-        if not st.session_state.get("selected_dataset") or not st.session_state.get("selected_file_from_dataset"):
+        if not st.session_state.get("selected_dataset") or not st.session_state.get(
+            "selected_file_from_dataset"
+        ):
             st.warning("Please select a dataset and a file first.")
         else:
             gcs_uri = f"gs://{os.getenv('BUCKET')}/datasets/{st.session_state.selected_dataset}/{st.session_state.selected_file_from_dataset}"
@@ -253,8 +255,13 @@ def dataset_selection() -> None:
 
 
 def get_optimization_args(
-    input_optimization_data_file_uri, output_optimization_run_uri, target_model,
-    target_qps=1.0, optimizer_qps=1.0, eval_qps=1.0, data_limit=10
+    input_optimization_data_file_uri,
+    output_optimization_run_uri,
+    target_model,
+    target_qps=1.0,
+    optimizer_qps=1.0,
+    eval_qps=1.0,
+    data_limit=10,
 ):
     """Gets the arguments for the optimization job."""
     response_schema_str = st.session_state.local_prompt.prompt_meta.get(
@@ -371,7 +378,7 @@ def start_optimization() -> None:
             st.session_state.target_qps,
             st.session_state.optimizer_qps,
             st.session_state.eval_qps,
-            st.session_state.data_limit
+            st.session_state.data_limit,
         )
 
         with st.expander("Prompt Optimization Config"):
@@ -427,10 +434,18 @@ def main() -> None:
     )
 
     with st.expander("Advanced Settings"):
-        st.session_state.target_qps = st.number_input("Target Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
-        st.session_state.optimizer_qps = st.number_input("Optimizer Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
-        st.session_state.eval_qps = st.number_input("Evaluation QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
-        st.session_state.data_limit = st.number_input("Data Limit (Sample Size)", min_value=1, max_value=1000, value=10, step=1)
+        st.session_state.target_qps = st.number_input(
+            "Target Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1
+        )
+        st.session_state.optimizer_qps = st.number_input(
+            "Optimizer Model QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1
+        )
+        st.session_state.eval_qps = st.number_input(
+            "Evaluation QPS", min_value=0.1, max_value=10.0, value=1.0, step=0.1
+        )
+        st.session_state.data_limit = st.number_input(
+            "Data Limit (Sample Size)", min_value=1, max_value=1000, value=10, step=1
+        )
 
     prompt_selection()
     dataset_selection()

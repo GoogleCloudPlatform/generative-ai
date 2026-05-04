@@ -49,7 +49,9 @@ from vertexai.preview.prompts import Prompt
 
 # Suppress the UserWarning from vertexai.generative_models as we need to use it
 # for Prompt Management until google-genai SDK supports it.
-warnings.filterwarnings("ignore", category=UserWarning, module="vertexai.generative_models")
+warnings.filterwarnings(
+    "ignore", category=UserWarning, module="vertexai.generative_models"
+)
 
 load_dotenv("src/.env")
 
