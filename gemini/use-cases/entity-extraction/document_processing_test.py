@@ -20,7 +20,7 @@ import document_processing
 
 FORM_10_Q_URI = "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs/2021Q1_alphabet_earnings_release.pdf"
 FORM_10_K_URI = "gs://cloud-samples-data/gen-app-builder/search/alphabet-investor-pdfs/2021_alphabet_annual_report.pdf"
-
+FORM_10_Q_DIRTY_URI = "gs://arielj-argolis-1-docs/alphabet/augmented_output_3.pdf"
 
 def test_extract_from_document_10_q() -> None:
     extract_config_id = "form_10_q"
@@ -31,7 +31,8 @@ def test_extract_from_document_10_q() -> None:
             "quarter": "Q1",
             "company_name": "Alphabet Inc.",
             "ceo": "Sundar Pichai",
-            "net_income_millions": "17930"
+            "net_income_millions": "17930",
+            "net_income_previous_year_millions": "6836"
         }
     """
 
@@ -40,7 +41,6 @@ def test_extract_from_document_10_q() -> None:
     )
     print(response)
     assert json.loads(response) == json.loads(expected_response)
-
 
 def test_extract_from_document_10_k() -> None:
     extract_config_id = "form_10_k"
@@ -80,7 +80,8 @@ def test_classify_and_extract_document() -> None:
             "quarter": "Q1",
             "company_name": "Alphabet Inc.",
             "ceo": "Sundar Pichai",
-            "net_income_millions": "17930"
+            "net_income_millions": "17930",
+            "net_income_previous_year_millions": "6836"
         }
     """
 
@@ -90,9 +91,56 @@ def test_classify_and_extract_document() -> None:
     print(response)
     assert json.loads(response) == json.loads(expected_response)
 
+def test_evaluate_quality_and_extract_high_quality_document() -> None:
+    document_uri = FORM_10_Q_URI
+    extract_config_id = "form_10_q"
+    expected_response = """\
+        {
+            "year": "2021",
+            "quarter": "Q1",
+            "company_name": "Alphabet Inc.",
+            "ceo": "Sundar Pichai",
+            "net_income_millions": "17930",
+            "net_income_previous_year_millions": "6836"
+        }
+    """
+    response = (
+        document_processing.evaluate_quality_and_extract(
+            extract_config_id=extract_config_id,
+            document_uri=document_uri
+        )
+    )
+    print(response)
+    assert json.loads(response) == json.loads(expected_response)
+
+def test_evaluate_quality_and_extract_low_quality_document() -> None:
+    document_uri = FORM_10_Q_DIRTY_URI
+    extract_config_id = "form_10_q"
+    expected_response = """\
+        {
+            "year": "2021",
+            "quarter": "Q1",
+            "company_name": "Alphabet Inc.",
+            "ceo": "Sundar Pichai",
+            "net_income_millions": 17930,
+            "net_income_previous_year_millions": 6836
+        }
+    """
+    response = (
+        document_processing.evaluate_quality_and_extract(
+            extract_config_id=extract_config_id,
+            document_uri=document_uri
+        )
+    )
+    print("response from model")
+    print(response)
+    assert json.loads(response) == json.loads(expected_response)
+
 if __name__ == "__main__":
     test_extract_from_document_10_q()
     test_extract_from_document_10_k()
     test_classify_document()
     test_classify_and_extract_document()
+    test_evaluate_quality_and_extract_high_quality_document()
+    test_evaluate_quality_and_extract_low_quality_document()
     print("All tests passed!")

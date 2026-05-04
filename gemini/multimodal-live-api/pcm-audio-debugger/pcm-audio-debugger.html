@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PCM Debugging Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      /* Lucide Icons SVG styling */
+      .lucide {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      /* Simple loading spinner */
+      .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border-left-color: #4f46e5;
+        /* Indigo */
+        animation: spin 1s ease infinite;
+        display: inline-block;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      textarea {
+        word-break: break-all;
+      }
+
+      /* Tab active state */
+      .tab-active {
+        border-bottom: 2px solid #4f46e5;
+        color: #4f46e5;
+      }
+
+      .tab-inactive {
+        border-bottom: 2px solid transparent;
+        color: #6b7280;
+      }
+
+      .tab-inactive:hover {
+        color: #374151;
+        border-bottom: 2px solid #d1d5db;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body
+    class="bg-gray-100 font-sans min-h-screen p-4 flex flex-col items-center"
+  >
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-hidden">
+      <!-- Header -->
+      <div class="bg-gray-50 border-b border-gray-200 px-8 py-6">
+        <h1 class="text-3xl font-bold text-gray-800 text-center">
+          PCM Debugging Suite
+        </h1>
+        <p class="text-center text-gray-500 mt-2">
+          Generate and Playback Base64 PCM Audio
+        </p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-200">
+        <button
+          id="tab-generator"
+          class="flex-1 py-4 px-6 text-center font-medium text-lg focus:outline-none transition-colors duration-200 tab-active flex items-center justify-center"
+          onclick="switchTab('generator')"
+        >
+          <i data-lucide="mic" class="mr-2"></i> PCM Generator
+        </button>
+        <button
+          id="tab-player"
+          class="flex-1 py-4 px-6 text-center font-medium text-lg focus:outline-none transition-colors duration-200 tab-inactive flex items-center justify-center"
+          onclick="switchTab('player')"
+        >
+          <i data-lucide="play" class="mr-2"></i> Packet Player
+        </button>
+      </div>
+
+      <!-- Content Area -->
+      <div class="p-8">
+        <!-- GENERATOR SECTION -->
+        <div id="view-generator" class="block">
+          <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+              Audio Recorder to Base64 PCM
+            </h2>
+            <div class="mb-4">
+              <label
+                for="gen_audioDeviceSelect"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Select Microphone:</label
+              >
+              <select
+                id="gen_audioDeviceSelect"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white disabled:opacity-50 disabled:bg-gray-200"
+              >
+                <option value="">Waiting for permissions...</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label
+                  for="gen_sampleRate"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Target Sample Rate (Hz):</label
+                >
+                <select
+                  id="gen_sampleRate"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white disabled:opacity-50 disabled:bg-gray-200"
+                >
+                  <option value="8000">8000</option>
+                  <option value="16000" selected>16000</option>
+                  <option value="22050">22050</option>
+                  <option value="24000">24000</option>
+                  <option value="32000">32000</option>
+                  <option value="44100">44100</option>
+                  <option value="48000">48000</option>
+                </select>
+                <p
+                  id="gen_actualRateInfo"
+                  class="text-xs text-gray-500 mt-1"
+                ></p>
+              </div>
+              <div>
+                <label
+                  for="gen_channels"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Target Channels:</label
+                >
+                <select
+                  id="gen_channels"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white disabled:opacity-50 disabled:bg-gray-200"
+                >
+                  <option value="1" selected>1 (Mono)</option>
+                  <option value="2">2 (Stereo)</option>
+                </select>
+                <p
+                  id="gen_actualChannelInfo"
+                  class="text-xs text-gray-500 mt-1"
+                ></p>
+              </div>
+              <div>
+                <label
+                  for="gen_bitDepth"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Target Bit Depth / Format:</label
+                >
+                <select
+                  id="gen_bitDepth"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white disabled:opacity-50 disabled:bg-gray-200"
+                >
+                  <option value="8u">8-bit Unsigned Int</option>
+                  <option value="16s" selected>16-bit Signed Int (LE)</option>
+                  <option value="32f">32-bit Float (LE)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="text-center mb-4 space-x-4">
+              <button
+                id="gen_recordButton"
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md shadow-md transition duration-150 ease-in-out inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i data-lucide="mic" class="mr-2"></i> Record
+              </button>
+              <button
+                id="gen_stopButton"
+                class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-md shadow-md transition duration-150 ease-in-out inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                <i data-lucide="square" class="mr-2"></i> Stop
+              </button>
+            </div>
+
+            <div
+              id="gen_statusArea"
+              class="mt-4 p-3 text-center text-sm rounded-md min-h-[40px]"
+              role="alert"
+            >
+              Select microphone and click Record.
+            </div>
+
+            <div class="mt-6">
+              <label
+                for="gen_base64Output"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Base64 PCM Output:</label
+              >
+              <textarea
+                id="gen_base64Output"
+                rows="6"
+                class="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-gray-50 readonly"
+                readonly
+                placeholder="Base64 encoded audio will appear here..."
+              ></textarea>
+              <div class="flex items-center mt-2">
+                <button
+                  id="gen_copyButton"
+                  class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-4 rounded-md shadow-md transition duration-150 ease-in-out inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled
+                >
+                  <i data-lucide="copy" class="mr-2"></i> Copy to Clipboard
+                </button>
+                <span
+                  id="gen_copyStatus"
+                  class="ml-2 text-sm text-green-600"
+                ></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLAYER SECTION -->
+        <div id="view-player" class="hidden">
+          <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+              Multi-Packet Base64 PCM Decoder
+            </h2>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Paste Sequential Base64 Audio Packets:</label
+              >
+              <div id="play_packetContainer" class="space-y-3">
+                <div class="packet-entry flex items-center space-x-2">
+                  <textarea
+                    rows="3"
+                    class="packet-input w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                    placeholder="Paste Base64 packet 1 here..."
+                  ></textarea>
+                </div>
+              </div>
+              <button
+                id="play_addPacketButton"
+                type="button"
+                class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center px-3 py-1 border border-indigo-200 rounded-md hover:bg-indigo-50 transition duration-150"
+              >
+                <i data-lucide="plus" class="mr-1"></i> Add Packet
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label
+                  for="play_sampleRate"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Sample Rate (Hz):</label
+                >
+                <input
+                  type="number"
+                  id="play_sampleRate"
+                  value="24000"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                  placeholder="e.g., 44100"
+                />
+              </div>
+              <div>
+                <label
+                  for="play_channels"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Channels:</label
+                >
+                <select
+                  id="play_channels"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white"
+                >
+                  <option value="1" selected>1 (Mono)</option>
+                  <option value="2">2 (Stereo)</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="play_bitDepth"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Bit Depth / Format:</label
+                >
+                <select
+                  id="play_bitDepth"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white"
+                >
+                  <option value="8u">8-bit Unsigned Int</option>
+                  <option value="16s" selected>16-bit Signed Int (LE)</option>
+                  <option value="32f">32-bit Float (LE)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="text-center mb-4">
+              <button
+                id="play_playButton"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md shadow-md transition duration-150 ease-in-out inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i data-lucide="play" class="mr-2"></i> Decode & Play All
+                Packets
+              </button>
+            </div>
+
+            <div
+              id="play_statusArea"
+              class="mt-4 p-3 text-center text-sm rounded-md min-h-[40px]"
+              role="alert"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- Tab Switching Logic ---
+      function switchTab(tabName) {
+        const genView = document.getElementById("view-generator");
+        const playView = document.getElementById("view-player");
+        const genTab = document.getElementById("tab-generator");
+        const playTab = document.getElementById("tab-player");
+
+        if (tabName === "generator") {
+          genView.classList.remove("hidden");
+          genView.classList.add("block");
+          playView.classList.remove("block");
+          playView.classList.add("hidden");
+
+          genTab.classList.add("tab-active");
+          genTab.classList.remove("tab-inactive");
+          playTab.classList.add("tab-inactive");
+          playTab.classList.remove("tab-active");
+        } else {
+          genView.classList.remove("block");
+          genView.classList.add("hidden");
+          playView.classList.remove("hidden");
+          playView.classList.add("block");
+
+          genTab.classList.add("tab-inactive");
+          genTab.classList.remove("tab-active");
+          playTab.classList.add("tab-active");
+          playTab.classList.remove("tab-inactive");
+        }
+      }
+
+      // ==========================================
+      // GENERATOR LOGIC
+      // ==========================================
+      (function () {
+        const audioDeviceSelect = document.getElementById(
+          "gen_audioDeviceSelect"
+        );
+        const targetSampleRateSelect =
+          document.getElementById("gen_sampleRate");
+        const targetChannelsSelect = document.getElementById("gen_channels");
+        const targetBitDepthSelect = document.getElementById("gen_bitDepth");
+        const recordButton = document.getElementById("gen_recordButton");
+        const stopButton = document.getElementById("gen_stopButton");
+        const statusArea = document.getElementById("gen_statusArea");
+        const base64Output = document.getElementById("gen_base64Output");
+        const copyButton = document.getElementById("gen_copyButton");
+        const copyStatus = document.getElementById("gen_copyStatus");
+        const actualRateInfo = document.getElementById("gen_actualRateInfo");
+        const actualChannelInfo = document.getElementById(
+          "gen_actualChannelInfo"
+        );
+
+        let audioContext = null;
+        let mediaStream = null;
+        let mediaStreamSource = null;
+        let scriptProcessorNode = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        const bufferSize = 4096;
+        let actualSampleRate = 0;
+        let actualNumChannels = 0;
+
+        async function init() {
+          recordButton.disabled = true;
+          stopButton.disabled = true;
+          copyButton.disabled = true;
+          setInputsDisabled(true);
+
+          try {
+            await navigator.mediaDevices.getUserMedia({
+              audio: true,
+              video: false,
+            });
+            console.log("Generator: Microphone permission granted.");
+            await listAudioDevices();
+            recordButton.disabled = false;
+            setInputsDisabled(false);
+            displayMessage(
+              "info",
+              "Ready. Select device and format, then press Record."
+            );
+          } catch (err) {
+            console.error("Generator: Error getting permissions:", err);
+            displayMessage(
+              "error",
+              `Could not get microphone permissions: ${err.message}`
+            );
+            audioDeviceSelect.innerHTML =
+              '<option value="">Permission Denied</option>';
+          }
+        }
+
+        async function listAudioDevices() {
+          try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const audioInputDevices = devices.filter(
+              (d) => d.kind === "audioinput"
+            );
+            audioDeviceSelect.innerHTML = "";
+
+            if (audioInputDevices.length === 0) {
+              audioDeviceSelect.innerHTML =
+                '<option value="">No microphone devices found</option>';
+              recordButton.disabled = true;
+              displayMessage("error", "No microphone devices found.");
+              return;
+            }
+
+            audioInputDevices.forEach((device, index) => {
+              const option = document.createElement("option");
+              option.value = device.deviceId;
+              option.textContent = device.label || `Microphone ${index + 1}`;
+              audioDeviceSelect.appendChild(option);
+            });
+          } catch (err) {
+            console.error("Generator: Error listing devices:", err);
+            displayMessage("error", `Error listing devices: ${err.message}`);
+          }
+        }
+
+        async function startRecording() {
+          if (isRecording) return;
+          const selectedDeviceId = audioDeviceSelect.value;
+          if (!selectedDeviceId) {
+            displayMessage("error", "Please select a microphone device.");
+            return;
+          }
+
+          base64Output.value = "";
+          copyButton.disabled = true;
+          copyStatus.textContent = "";
+          actualRateInfo.textContent = "";
+          actualChannelInfo.textContent = "";
+
+          const targetSampleRate = parseInt(targetSampleRateSelect.value, 10);
+
+          isRecording = true;
+          recordButton.disabled = true;
+          stopButton.disabled = false;
+          setInputsDisabled(true);
+          recordedChunks = [];
+
+          displayMessage("info", "Starting recording...");
+
+          try {
+            window.AudioContext =
+              window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioContext({ sampleRate: targetSampleRate });
+            actualSampleRate = audioContext.sampleRate;
+            actualRateInfo.textContent = `(Recording at ${actualSampleRate} Hz)`;
+
+            const constraints = {
+              audio: {
+                deviceId: { exact: selectedDeviceId },
+              },
+              video: false,
+            };
+            mediaStream = await navigator.mediaDevices.getUserMedia(
+              constraints
+            );
+            mediaStreamSource =
+              audioContext.createMediaStreamSource(mediaStream);
+
+            const audioTrack = mediaStream.getAudioTracks()[0];
+            const trackSettings = audioTrack.getSettings();
+            actualNumChannels =
+              trackSettings.channelCount || mediaStreamSource.channelCount || 1;
+            actualChannelInfo.textContent = `(${actualNumChannels} channel${
+              actualNumChannels > 1 ? "s" : ""
+            })`;
+
+            scriptProcessorNode = audioContext.createScriptProcessor(
+              bufferSize,
+              actualNumChannels,
+              actualNumChannels
+            );
+
+            scriptProcessorNode.onaudioprocess = (event) => {
+              if (!isRecording) return;
+              const inputBuffer = event.inputBuffer;
+              const bufferChannels = [];
+              for (let i = 0; i < actualNumChannels; i++) {
+                bufferChannels.push(
+                  new Float32Array(inputBuffer.getChannelData(i))
+                );
+              }
+              recordedChunks.push(bufferChannels);
+            };
+
+            mediaStreamSource.connect(scriptProcessorNode);
+            scriptProcessorNode.connect(audioContext.destination);
+
+            displayMessage(
+              "success",
+              `Recording started at ${actualSampleRate} Hz, ${actualNumChannels} channels...`
+            );
+          } catch (err) {
+            console.error("Generator: Error starting recording:", err);
+            displayMessage("error", `Error starting recording: ${err.message}`);
+            stopRecording(true);
+          }
+        }
+
+        function stopRecording(errorOccurred = false) {
+          if (!isRecording && !errorOccurred) return;
+          isRecording = false;
+          recordButton.disabled = false;
+          stopButton.disabled = true;
+          setInputsDisabled(false);
+
+          if (scriptProcessorNode) {
+            scriptProcessorNode.disconnect();
+            scriptProcessorNode.onaudioprocess = null;
+            scriptProcessorNode = null;
+          }
+          if (mediaStreamSource) {
+            mediaStreamSource.disconnect();
+            mediaStreamSource = null;
+          }
+          if (mediaStream) {
+            mediaStream.getTracks().forEach((track) => track.stop());
+            mediaStream = null;
+          }
+
+          if (audioContext) {
+            audioContext
+              .close()
+              .then(() => {
+                audioContext = null;
+                if (!errorOccurred && recordedChunks.length > 0) {
+                  processAndEncode();
+                } else if (errorOccurred) {
+                  displayMessage("error", "Recording stopped due to an error.");
+                } else {
+                  displayMessage(
+                    "info",
+                    "Recording stopped. No audio data captured."
+                  );
+                }
+              })
+              .catch((err) => {
+                console.error("Generator: Error closing context:", err);
+                if (!errorOccurred && recordedChunks.length > 0)
+                  processAndEncode();
+              });
+          } else if (!errorOccurred && recordedChunks.length > 0) {
+            processAndEncode();
+          }
+        }
+
+        function processAndEncode() {
+          if (recordedChunks.length === 0) return;
+          displayMessage("loading", "Processing recorded audio...");
+
+          setTimeout(() => {
+            try {
+              const numberOfChannels = recordedChunks[0].length;
+              const totalLength = recordedChunks.reduce(
+                (sum, chunks) => sum + chunks[0].length,
+                0
+              );
+              const combinedChannels = [];
+
+              for (let i = 0; i < numberOfChannels; i++) {
+                const channelData = new Float32Array(totalLength);
+                let offset = 0;
+                recordedChunks.forEach((buffer) => {
+                  channelData.set(buffer[i], offset);
+                  offset += buffer[i].length;
+                });
+                combinedChannels.push(channelData);
+              }
+              recordedChunks = [];
+
+              const targetSampleRate = parseInt(
+                targetSampleRateSelect.value,
+                10
+              );
+              const targetNumChannels = parseInt(
+                targetChannelsSelect.value,
+                10
+              );
+              const targetFormat = targetBitDepthSelect.value;
+
+              if (actualSampleRate !== targetSampleRate) {
+                displayMessage(
+                  "warning",
+                  `Processing... (Note: Output sample rate is ${actualSampleRate} Hz, not ${targetSampleRate} Hz as resampling is not implemented)`
+                );
+              }
+
+              let finalChannelData = [];
+              if (numberOfChannels === 1 && targetNumChannels === 2) {
+                finalChannelData.push(combinedChannels[0]);
+                finalChannelData.push(new Float32Array(combinedChannels[0]));
+              } else if (numberOfChannels === 2 && targetNumChannels === 1) {
+                const monoData = new Float32Array(totalLength);
+                for (let i = 0; i < totalLength; i++) {
+                  monoData[i] =
+                    (combinedChannels[0][i] + combinedChannels[1][i]) / 2;
+                }
+                finalChannelData.push(monoData);
+              } else {
+                finalChannelData = combinedChannels;
+              }
+              const outputNumChannels = finalChannelData.length;
+
+              let interleavedData;
+              if (outputNumChannels === 1) {
+                interleavedData = finalChannelData[0];
+              } else {
+                interleavedData = new Float32Array(totalLength * 2);
+                for (let i = 0; i < totalLength; i++) {
+                  interleavedData[i * 2] = finalChannelData[0][i];
+                  interleavedData[i * 2 + 1] = finalChannelData[1][i];
+                }
+              }
+
+              let outputBuffer;
+              const numSamples = interleavedData.length;
+
+              if (targetFormat === "8u") {
+                outputBuffer = new Uint8Array(numSamples);
+                for (let i = 0; i < numSamples; i++) {
+                  const sample = Math.max(-1, Math.min(1, interleavedData[i]));
+                  outputBuffer[i] = Math.round((sample + 1) * 127.5);
+                }
+              } else if (targetFormat === "16s") {
+                outputBuffer = new Int16Array(numSamples);
+                for (let i = 0; i < numSamples; i++) {
+                  const sample = Math.max(-1, Math.min(1, interleavedData[i]));
+                  outputBuffer[i] = Math.round(sample * 32767);
+                }
+              } else {
+                outputBuffer = new Float32Array(interleavedData);
+              }
+
+              const base64String = arrayBufferToBase64(outputBuffer.buffer);
+              base64Output.value = base64String;
+              copyButton.disabled = false;
+              displayMessage(
+                "success",
+                `Processing complete. Base64 generated for ${actualSampleRate} Hz, ${outputNumChannels}-channel, ${targetFormat} audio.`
+              );
+            } catch (err) {
+              console.error("Generator: Error processing:", err);
+              displayMessage("error", `Error processing audio: ${err.message}`);
+            }
+          }, 50);
+        }
+
+        function arrayBufferToBase64(buffer) {
+          let binary = "";
+          const bytes = new Uint8Array(buffer);
+          const len = bytes.byteLength;
+          for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          return window.btoa(binary);
+        }
+
+        function displayMessage(type, message) {
+          statusArea.innerHTML = "";
+          statusArea.className =
+            "mt-4 p-3 text-center text-sm rounded-md min-h-[40px]";
+          if (type === "error")
+            statusArea.classList.add("bg-red-100", "text-red-700");
+          else if (type === "success")
+            statusArea.classList.add("bg-green-100", "text-green-700");
+          else if (type === "info")
+            statusArea.classList.add("bg-blue-100", "text-blue-700");
+          else if (type === "warning")
+            statusArea.classList.add("bg-yellow-100", "text-yellow-700");
+          else if (type === "loading") {
+            statusArea.classList.add("bg-yellow-100", "text-yellow-700");
+            statusArea.innerHTML = `<span class="spinner"></span> ${message}`;
+          }
+          if (type !== "loading") statusArea.textContent = message;
+        }
+
+        function setInputsDisabled(disabled) {
+          audioDeviceSelect.disabled = disabled;
+          targetSampleRateSelect.disabled = disabled;
+          targetChannelsSelect.disabled = disabled;
+          targetBitDepthSelect.disabled = disabled;
+        }
+
+        async function copyToClipboard() {
+          if (!base64Output.value) return;
+          try {
+            await navigator.clipboard.writeText(base64Output.value);
+            copyStatus.textContent = "Copied!";
+            setTimeout(() => {
+              copyStatus.textContent = "";
+            }, 2000);
+          } catch (err) {
+            copyStatus.textContent = "Copy failed!";
+            setTimeout(() => {
+              copyStatus.textContent = "";
+            }, 2000);
+          }
+        }
+
+        recordButton.addEventListener("click", startRecording);
+        stopButton.addEventListener("click", () => stopRecording(false));
+        copyButton.addEventListener("click", copyToClipboard);
+        navigator.mediaDevices.addEventListener(
+          "devicechange",
+          listAudioDevices
+        );
+        window.addEventListener("load", init);
+      })();
+
+      // ==========================================
+      // PLAYER LOGIC
+      // ==========================================
+      (function () {
+        const packetContainer = document.getElementById("play_packetContainer");
+        const addPacketButton = document.getElementById("play_addPacketButton");
+        const sampleRateInput = document.getElementById("play_sampleRate");
+        const channelsInput = document.getElementById("play_channels");
+        const bitDepthInput = document.getElementById("play_bitDepth");
+        const playButton = document.getElementById("play_playButton");
+        const statusArea = document.getElementById("play_statusArea");
+
+        let audioContext;
+        let currentSource = null;
+
+        function initAudioContext() {
+          if (!audioContext) {
+            try {
+              window.AudioContext =
+                window.AudioContext || window.webkitAudioContext;
+              audioContext = new AudioContext();
+            } catch (e) {
+              displayMessage("error", "Web Audio API is not supported.");
+              playButton.disabled = true;
+              addPacketButton.disabled = true;
+            }
+          }
+          if (audioContext && audioContext.state === "suspended") {
+            audioContext.resume().catch(console.error);
+          }
+        }
+
+        function displayMessage(type, message) {
+          statusArea.innerHTML = "";
+          statusArea.className =
+            "mt-4 p-3 text-center text-sm rounded-md min-h-[40px]";
+          if (type === "error")
+            statusArea.classList.add("bg-red-100", "text-red-700");
+          else if (type === "success")
+            statusArea.classList.add("bg-green-100", "text-green-700");
+          else if (type === "info")
+            statusArea.classList.add("bg-blue-100", "text-blue-700");
+          else if (type === "loading") {
+            statusArea.classList.add("bg-yellow-100", "text-yellow-700");
+            statusArea.innerHTML = `<span class="spinner"></span> ${message}`;
+          }
+          if (type !== "loading") statusArea.textContent = message;
+        }
+
+        function addPacketInput() {
+          const packetCount =
+            packetContainer.querySelectorAll(".packet-entry").length + 1;
+          const entryDiv = document.createElement("div");
+          entryDiv.className = "packet-entry flex items-center space-x-2";
+
+          const textarea = document.createElement("textarea");
+          textarea.rows = 3;
+          textarea.className =
+            "packet-input w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm";
+          textarea.placeholder = `Paste Base64 packet ${packetCount} here...`;
+
+          const removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.className =
+            "remove-packet-btn text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-100 transition duration-150 flex-shrink-0";
+          removeButton.innerHTML = '<i data-lucide="trash-2"></i>';
+          removeButton.onclick = () => {
+            entryDiv.remove();
+            updatePlaceholders();
+          };
+
+          entryDiv.appendChild(textarea);
+          entryDiv.appendChild(removeButton);
+          packetContainer.appendChild(entryDiv);
+          lucide.createIcons(); // Render the new icon
+        }
+
+        function updatePlaceholders() {
+          const textareas = packetContainer.querySelectorAll(".packet-input");
+          textareas.forEach((ta, index) => {
+            ta.placeholder = `Paste Base64 packet ${index + 1} here...`;
+          });
+        }
+
+        function decodeAndPrepareAudio() {
+          initAudioContext();
+          if (!audioContext) return;
+
+          const sampleRate = parseInt(sampleRateInput.value, 10);
+          const numChannels = parseInt(channelsInput.value, 10);
+          const format = bitDepthInput.value;
+
+          if (isNaN(sampleRate) || sampleRate <= 0) {
+            displayMessage("error", "Invalid Sample Rate.");
+            return;
+          }
+
+          const packetTextareas =
+            packetContainer.querySelectorAll(".packet-input");
+          const decodedByteArrays = [];
+          let totalByteLength = 0;
+          let hasValidPackets = false;
+
+          displayMessage("loading", "Decoding Base64 packets...");
+          playButton.disabled = true;
+
+          setTimeout(() => {
+            try {
+              for (let i = 0; i < packetTextareas.length; i++) {
+                const base64Data = packetTextareas[i].value.trim();
+                if (!base64Data) continue;
+
+                try {
+                  const binaryString = atob(base64Data);
+                  const len = binaryString.length;
+                  const bytes = new Uint8Array(len);
+                  for (let j = 0; j < len; j++)
+                    bytes[j] = binaryString.charCodeAt(j);
+                  decodedByteArrays.push(bytes);
+                  totalByteLength += bytes.length;
+                  hasValidPackets = true;
+                } catch (e) {
+                  throw new Error(`Invalid Base64 in packet ${i + 1}`);
+                }
+              }
+
+              if (!hasValidPackets)
+                throw new Error("No valid Base64 data found.");
+
+              const combinedBytes = new Uint8Array(totalByteLength);
+              let offset = 0;
+              for (const byteArray of decodedByteArrays) {
+                combinedBytes.set(byteArray, offset);
+                offset += byteArray.length;
+              }
+              const audioDataBuffer = combinedBytes.buffer;
+
+              let bytesPerSample = 0;
+              if (format === "8u") bytesPerSample = 1;
+              else if (format === "16s") bytesPerSample = 2;
+              else if (format === "32f") bytesPerSample = 4;
+
+              const totalSamples = totalByteLength / bytesPerSample;
+              const frameCount = totalSamples / numChannels;
+
+              const audioBuffer = audioContext.createBuffer(
+                numChannels,
+                Math.floor(frameCount),
+                sampleRate
+              );
+              const dataView = new DataView(audioDataBuffer);
+              const littleEndian = true;
+
+              for (let channel = 0; channel < numChannels; channel++) {
+                const channelData = audioBuffer.getChannelData(channel);
+                let currentReadOffset;
+
+                for (let i = 0; i < audioBuffer.length; i++) {
+                  let sampleValue = 0;
+                  currentReadOffset =
+                    (i * numChannels + channel) * bytesPerSample;
+
+                  if (
+                    currentReadOffset + bytesPerSample <=
+                    audioDataBuffer.byteLength
+                  ) {
+                    if (format === "8u") {
+                      sampleValue =
+                        (dataView.getUint8(currentReadOffset) - 128) / 128.0;
+                    } else if (format === "16s") {
+                      sampleValue =
+                        dataView.getInt16(currentReadOffset, littleEndian) /
+                        32768.0;
+                    } else if (format === "32f") {
+                      sampleValue = dataView.getFloat32(
+                        currentReadOffset,
+                        littleEndian
+                      );
+                    }
+                  }
+                  channelData[i] = Math.max(-1.0, Math.min(1.0, sampleValue));
+                }
+              }
+
+              playAudioBuffer(audioBuffer);
+            } catch (error) {
+              console.error("Player: Error decoding:", error);
+              displayMessage("error", `Error: ${error.message}`);
+              playButton.disabled = false;
+            }
+          }, 50);
+        }
+
+        function playAudioBuffer(audioBuffer) {
+          if (!audioContext || !audioBuffer) return;
+
+          if (currentSource) {
+            try {
+              currentSource.stop();
+              currentSource.disconnect();
+            } catch (e) {}
+            currentSource = null;
+          }
+
+          const source = audioContext.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(audioContext.destination);
+
+          source.onended = () => {
+            displayMessage(
+              "success",
+              `Playback finished. Duration: ${audioBuffer.duration.toFixed(2)}s`
+            );
+            playButton.disabled = false;
+            currentSource = null;
+          };
+
+          try {
+            source.start(0);
+            currentSource = source;
+            displayMessage(
+              "info",
+              `Playing... (${audioBuffer.duration.toFixed(2)}s)`
+            );
+          } catch (error) {
+            displayMessage(
+              "error",
+              `Error starting playback: ${error.message}`
+            );
+            playButton.disabled = false;
+            currentSource = null;
+          }
+        }
+
+        addPacketButton.addEventListener("click", addPacketInput);
+        playButton.addEventListener("click", decodeAndPrepareAudio);
+        window.addEventListener("load", () => {
+          initAudioContext();
+          lucide.createIcons();
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -7,7 +7,7 @@ Please submit additional resources via a PR.
 ## Generative AI on Google Cloud
 
 - [Generative AI on Google Cloud](https://cloud.google.com/ai/generative-ai)
-- [Overview of Generative AI on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/overview)
+- [Overview of Generative AI](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/overview)
 - [Certifications and security controls](https://cloud.google.com/vertex-ai/generative-ai/docs/security-controls)
 - [Responsible AI best practices](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/responsible-ai)
 - [Quotas and Limits](https://cloud.google.com/vertex-ai/generative-ai/docs/quotas)
@@ -15,12 +15,12 @@ Please submit additional resources via a PR.
 
 ## Products
 
-### Vertex AI
+### Agent Platform
 
-- Use [Vertex AI](https://cloud.google.com/vertex-ai) to interact with, customize, and embed foundation models into your applications
+- Use [Agent Platform](https://cloud.google.com/vertex-ai) to interact with, customize, and embed foundation models into your applications
 - Access foundation models on [Model Garden](https://cloud.google.com/model-garden)
-- Tune models via a simple UI on [Vertex AI Studio](https://cloud.google.com/generative-ai-studio)
-- Use [Vertex AI Search](https://cloud.google.com/products/agent-builder), to build and deploy AI agents grounded in their data
+- Tune models via a simple UI on [Agent Studio](https://cloud.google.com/generative-ai-studio)
+- Use [Agent Search](https://cloud.google.com/products/agent-builder), to build and deploy AI agents grounded in their data
 - Google foundation models
   - [Gemini API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#gemini-models)
   - [Imagen API models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#imagen-models)
@@ -29,7 +29,7 @@ Please submit additional resources via a PR.
 ### Gemini Models
 
 - [Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/overview), a multimodal model from Google DeepMind, is capable of understanding virtually any input, combining different types of information, and generating almost any output.
-- Prompt and test Gemini in [Vertex AI](https://console.cloud.google.com/freetrial/?redirectPath=%2Fvertex-ai%2Fgenerative%2Fmultimodal%2Fcreate%2Ftext) using text, images, video, or code.
+- Prompt and test Gemini in [Agent Platform](https://console.cloud.google.com/freetrial/?redirectPath=%2Fvertex-ai%2Fgenerative%2Fmultimodal%2Fcreate%2Ftext) using text, images, video, or code.
 
 ### Gemini for Google Cloud
 
@@ -38,7 +38,7 @@ Please submit additional resources via a PR.
 
 ## Get Started
 
-- Quickstart tutorial using [Vertex AI Studio](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart) or the [Vertex AI API](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart-multimodal)
+- Quickstart tutorial using [Agent Studio](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart) or the [Agent Platform API](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart-multimodal)
 - Explore pretrained models in [Model Garden](https://cloud.google.com/vertex-ai/docs/start/explore-models)
 - [Tune a Foundation model](https://cloud.google.com/vertex-ai/generative-ai/docs/models/tune-models)
 
@@ -57,7 +57,7 @@ Please submit additional resources via a PR.
   - [Encoder-Decoder Architecture: Overview](https://www.youtube.com/watch?v=671xny8iows&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=3&pp=iAQB)
   - [Transformer Models and BERT Model: Overview](https://www.youtube.com/watch?v=hsp1OAcoLBY&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=4&pp=iAQB)
   - [Create Image Captioning Models: Overview](https://www.youtube.com/watch?v=0BaIeMoFEoE&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=5&pp=iAQB)
-  - [Introduction to Vertex AI Studio](https://www.youtube.com/watch?v=KWarqNq195M&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=6&pp=iAQB)
+  - [Introduction to Agent Studio](https://www.youtube.com/watch?v=KWarqNq195M&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=6&pp=iAQB)
   - [Vector Search and Embeddings](https://www.youtube.com/watch?v=YlAWtEAJl9g&list=PLBgogxgQVM9s0i9oloJwjIG-zj6Svsm20&index=7&pp=iAQB)
 - [Gemini for Google Cloud - Playlist](https://www.youtube.com/playlist?list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F)
   - [Gemini for Application Developers](https://www.youtube.com/watch?v=WsXVGr0Q3C4&list=PLBgogxgQVM9vMyRWTvDqxc-N5pYp-a98F&index=1&pp=iAQB)
@@ -76,7 +76,7 @@ Please submit additional resources via a PR.
   - [Introduction to Generative AI](https://www.cloudskillsboost.google/course_templates/536)
   - [Introduction to Large Language Models](https://www.cloudskillsboost.google/course_templates/539)
   - [Introduction to Responsible AI](https://www.cloudskillsboost.google/course_templates/554)
-  - [Prompt Design in Vertex AI](https://www.cloudskillsboost.google/paths/118/course_templates/976)
+  - [Prompt Design](https://www.cloudskillsboost.google/paths/118/course_templates/976)
   - [Responsible AI: Applying AI Principles with Google Cloud](https://www.cloudskillsboost.google/paths/118/course_templates/388)
 
 - [Intermediate: Gemini for Google Cloud Learning Path](https://www.cloudskillsboost.google/paths/236): The Gemini for Google Cloud learning path provides examples of how Gemini can help make engineers of all types more efficient in their daily activities.
@@ -96,7 +96,7 @@ Please submit additional resources via a PR.
   - [Encoder-Decoder Architecture](https://www.cloudskillsboost.google/paths/183/course_templates/543)
   - [Transformer Models and BERT Model](https://www.cloudskillsboost.google/paths/183/course_templates/538)
   - [Create Image Captioning Models](https://www.cloudskillsboost.google/paths/183/course_templates/542)
-  - [Introduction to Vertex AI Studio](https://www.cloudskillsboost.google/paths/183/course_templates/552)
+  - [Introduction to Agent Studio](https://www.cloudskillsboost.google/paths/183/course_templates/552)
   - [Vector Search and Embeddings](https://www.cloudskillsboost.google/paths/183/course_templates/939)
   - [Inspect Rich Documents with Gemini Multimodality and Multimodal RAG](https://www.cloudskillsboost.google/paths/183/course_templates/981)
   - [Responsible AI for Developers: Fairness and Bias](https://www.cloudskillsboost.google/paths/183/course_templates/985)

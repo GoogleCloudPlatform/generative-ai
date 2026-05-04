@@ -1,7 +1,7 @@
 """Extensions to Llamaindex Base classes to allow for asynchronous execution"""
 
-from collections.abc import Sequence
 import logging
+from collections.abc import Sequence
 
 from llama_index.core.base.response.schema import RESPONSE_TYPE
 from llama_index.core.callbacks import CallbackManager
@@ -196,8 +196,9 @@ class AsyncHyDEQueryTransform(BaseQueryTransform):
 
 
 class AsyncRetrieverQueryEngine(RetrieverQueryEngine):
-    """Async Extension of the ReterieverQueryEngine
-    to allow for asynchronous post-processing"""
+    """Async Extension of the RetrieverQueryEngine
+    to allow for asynchronous post-processing
+    """
 
     async def _apply_node_postprocessors(
         self, nodes: list[NodeWithScore], query_bundle: QueryBundle

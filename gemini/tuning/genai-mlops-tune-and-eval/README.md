@@ -51,7 +51,7 @@ This step is optional because I've already prepared the data in `gs://github-rep
 - Create the pipeline root bucket
 
   ```sh
-  gsutil mb gs://vertex-ai-pipeline-root-$(date +%Y%m%d)
+  gcloud storage buckets create gs://vertex-ai-pipeline-root-$(date +%Y%m%d)
   ```
 
 ## Run Vertex AI Pipelines

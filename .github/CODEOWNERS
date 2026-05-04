@@ -9,6 +9,7 @@
 
 *                                                                                                                                @GoogleCloudPlatform/generative-ai-devrel
 /generative-ai/embeddings                                                                                                        @GoogleCloudPlatform/generative-ai-devrel @kazunori279
+/generative-ai/embeddings/vector-search-2-quickstart.ipynb                                                                       @GoogleCloudPlatform/generative-ai-devrel @ericgribkoff
 /generative-ai/gemini                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @polong-lin
 /generative-ai/gemini/agent-engine                                                                                               @GoogleCloudPlatform/generative-ai-devrel @koverholt
 /generative-ai/gemini/agent-engine/tutorial_ag2_on_agent_engine.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @awaemmanuel
@@ -26,6 +27,7 @@
 /generative-ai/gemini/multimodal-dataset                                                                                         @GoogleCloudPlatform/generative-ai-devrel @fthoele @cleop-google @diskontinuum
 /generative-ai/gemini/multimodal-live-api/websocket-demo-app/                                                                    @GoogleCloudPlatform/generative-ai-devrel @ZackAkil
 /generative-ai/gemini/rag-engine                                                                                                 @GoogleCloudPlatform/generative-ai-devrel @edtsoi430
+/generative-ai/gemini/rag-engine/rag_engine_cross_corpus_retrieval.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @tiger-w-jin
 /generative-ai/gemini/responsible-ai                                                                                             @GoogleCloudPlatform/generative-ai-devrel @iamthuya
 /generative-ai/gemini/responsible-ai/gemini_safety_ratings.ipynb                                                                 @GoogleCloudPlatform/generative-ai-devrel @ghchinoy
 /generative-ai/gemini/sample-apps/finance-advisor-spanner/                                                                       @GoogleCloudPlatform/generative-ai-devrel @anirbanbagchi1979
@@ -49,12 +51,14 @@
 /generative-ai/gemini/use-cases/retrieval-augmented-generation/retail_warranty_claim_chatbot.ipynb                               @GoogleCloudPlatform/generative-ai-devrel @zthor5
 /generative-ai/genkit/generate-synthetic-database                                                                                @GoogleCloudPlatform/generative-ai-devrel @aikozhaoz
 /generative-ai/genkit/postcard-generator                                                                                         @GoogleCloudPlatform/generative-ai-devrel @mattsday
+/generative-ai/open-models/fine-tuning                                                                                           @GoogleCloudPlatform/generative-ai-devrel @goudtho
 /generative-ai/open-models/serving                                                                                               @GoogleCloudPlatform/generative-ai-devrel @polong-lin
 /generative-ai/open-models/serving/cloud_run_ollama_gemma3_inference.ipynb                                                       @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/open-models/serving/cloud_run_vllm_gemma3_inference.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/open-models/serving/vertex_ai_pytorch_inference_pllum_with_custom_handler.ipynb                                   @GoogleCloudPlatform/generative-ai-devrel @rsamborski
 /generative-ai/open-models/use-cases/cloud_run_ollama_gemma2_rag_qa.ipynb                                                        @GoogleCloudPlatform/generative-ai-devrel @eliasecchig
 /generative-ai/search                                                                                                            @GoogleCloudPlatform/generative-ai-devrel @holtskinner
+/generative-ai/search/gemini-enterprise/group-licensing                                                                          @GoogleCloudPlatform/generative-ai-devrel @williamsmt @googlecharles
 /generative-ai/search/retrieval-augmented-generation/examples/contract_analysis.ipynb                                            @GoogleCloudPlatform/generative-ai-devrel @guruvittal
 /generative-ai/speech/getting-started                                                                                            @GoogleCloudPlatform/generative-ai-devrel @inardini
 /generative-ai/speech/use-cases/storytelling                                                                                     @GoogleCloudPlatform/generative-ai-devrel @holtskinner
@@ -70,3 +74,5 @@
 /generative-ai/gemini/evaluation/evaluate_gemini_structured_output.ipynb                                                         @GoogleCloudPlatform/generative-ai-devrel @stevie-p
 /generative-ai/agents/gke/agents_with_memory/get_started_with_memory_for_adk_in_gke.ipynb                                        @GoogleCloudPlatform/generative-ai-devrel @vladkol
 /generative-ai/agents/cloud_run/agents_with_memory/get_started_with_memory_for_adk_in_cloud_run.ipynb                            @GoogleCloudPlatform/generative-ai-devrel @vladkol
+/generative-ai/gemini/sample-apps/gemini-live-telephony-app                                                                      @GoogleCloudPlatform/generative-ai-devrel @KVishnuVardhanR
+/generative-ai/search/auto-rag-eval                                                                                              @tanyagoogle

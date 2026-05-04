@@ -130,7 +130,7 @@ def extract_top_titles_and_content(response, num_chunks=3):
 
 st.set_page_config(
     layout="wide",
-    page_title="LlamaIndex Advanced Agentic RAG Implenentation Chatbot",
+    page_title="LlamaIndex Advanced Agentic RAG Implementation Chatbot",
     page_icon=":speech_balloon:",
 )
 

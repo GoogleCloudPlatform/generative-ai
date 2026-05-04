@@ -47,7 +47,7 @@ We will be using The Great Gatsby text by F. Scott Fitzgerald for this example.
 - **Workflow Logic:**
   - Contains the `RAGWorkflow` class, which defines the steps in the workflow.
   - This workflow architects complex Retrieval Augmented Generation (RAG) workflow using Gemini models and Firestore databases.
-  - The steps of the workflow are as follow:
+  - The steps of the workflow are as follows:
     - Start Event triggered by providing a query to the workflow
     - The QueryMultiStep Event that breaks down a complex query into sequential sub-questions using Gemini. Then proceeds to answer the sub-questions.
     - The sub-questions results are passed to the RerankEvent where given the initial user query, Gemini reranks the returned answers to the sub-questions.

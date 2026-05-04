@@ -15,6 +15,7 @@
 # pylint: disable=too-many-lines
 
 """Utility functions and classes for the VAPO notebook."""
+
 import csv
 import io
 import json
@@ -22,17 +23,18 @@ import random
 import re
 import string
 import subprocess
-from typing import Any, Callable, Union
+from collections.abc import Callable
+from typing import Any, Union
 
-from IPython.core.display import DisplayHandle
-from IPython.display import HTML, display
-from google.cloud import aiplatform, storage
 import ipywidgets as widgets
 import jinja2
 import jinja2.meta
-from jsonschema import ValidationError, validate
 import pandas as pd
 import plotly.graph_objects as go
+from IPython.core.display import DisplayHandle
+from IPython.display import HTML, display
+from google.cloud import aiplatform, storage
+from jsonschema import ValidationError, validate
 from tenacity import retry, wait_random_exponential
 from tensorflow.io import gfile
 from vertexai import generative_models
@@ -250,7 +252,6 @@ def update_best_display(
     eval_metric: str,
 ) -> None:
     """Update the best prompt display."""
-
     df["score"] = df[f"metrics.{eval_metric}/mean"]
 
     best_template = df.loc[df["score"].argmax(), "prompt"]
@@ -268,7 +269,7 @@ def update_best_display(
     improvement = best_score - original_score
     no_improvement_str = "\nNo better template is found yet." if not improvement else ""
     best_score_label.value = (
-        f"Score: {best_score}" f" Improvement: {improvement: .3f} {no_improvement_str}"
+        f"Score: {best_score} Improvement: {improvement: .3f} {no_improvement_str}"
     )
 
 
@@ -287,7 +288,6 @@ def generate_dataframe(filename: str) -> pd.DataFrame:
 
 def left_aligned_df_html(df: pd.DataFrame) -> HTML:
     """Displays a Pandas DataFrame in Colab with left-aligned values."""
-
     # Convert to HTML table, but keep the HTML in a variable
     html_table = df.to_html(index=False, classes="left-aligned")
 
@@ -585,6 +585,30 @@ class ResultsUI:
         runs = find_directories_with_files(path, required_files)
 
         self.run_label = widgets.Label("Select Run:")
+
+        if not runs:
+            self.run_dropdown = widgets.Dropdown(
+                options=[],
+                value=None,
+                layout=widgets.Layout(width="200px"),
+                disabled=True,
+            )
+            self.dropdown_description = widgets.Label("Select Template:")
+            self.template_dropdown = widgets.Dropdown(
+                options=[],
+                value=None,
+                layout=widgets.Layout(width="400px"),
+                disabled=True,
+            )
+            self.results_output = widgets.Output(
+                layout=widgets.Layout(
+                    height="600px", overflow="auto", margin="20px 0px 0px 0px"
+                )
+            )
+            self.templates = []
+            self.eval_results = []
+            return
+
         self.run_dropdown = widgets.Dropdown(
             options=runs, value=runs[0], layout=widgets.Layout(width="200px")
         )
@@ -708,7 +732,6 @@ def init_new_model(
     **kwargs: Any,
 ) -> GenerativeModel:
     """Initialize a new model with configurable generation and safety settings."""
-
     if generation_config is None:
         generation_config = GenerationConfig(
             candidate_count=1, max_output_tokens=2048, temperature=0
@@ -756,7 +779,6 @@ async def async_generate(
     **kwargs: Any,
 ) -> Union[str, None]:
     """Generates a response from the model, optionally handling function calls."""
-
     user_prompt_content = Content(role="user", parts=[Part.from_text(prompt)])
 
     try:
@@ -824,8 +846,7 @@ def evaluate_task(
     eval_metrics: list[str],
     eval_sample_n: int,
 ) -> dict[str, float]:
-    """Evaluate task using Vertex AI Evaluation."""
-
+    """Evaluate task using Agent Platform Evaluation."""
     # Generate a unique id for the experiment run
     idx = get_id()
 
@@ -864,7 +885,6 @@ def print_df_rows(
     df: pd.DataFrame, columns: list[str] | None = None, n: int = 3
 ) -> None:
     """Print a subset of rows from a DataFrame."""
-
     # Apply column filtering if specified
     if columns:
         df = df[columns]
@@ -898,14 +918,13 @@ def plot_eval_metrics(
     metrics: list[str] | None = None,
 ) -> None:
     """Plot a bar plot for the evaluation results."""
-
     # Create data for the bar plot
     data = []
     for eval_result in eval_results:
         title, summary_metrics = eval_result
         if metrics:
             summary_metrics = {
-                k: summary_metrics[k]
+                k: v
                 for k, v in summary_metrics.items()
                 if any(selected_metric in k for selected_metric in metrics)
             }
@@ -938,7 +957,6 @@ def plot_eval_metrics(
 
 def create_target_column(row: dict[str, Any]) -> str:
     """Creates a JSON string representing tool calls from input row."""
-
     tool_calls = (
         [{"name": row["tool_names"], "arguments": row["tool_arguments"]}]
         if row.get("tool_names")
@@ -950,7 +968,6 @@ def create_target_column(row: dict[str, Any]) -> str:
 
 def tool_config_to_dict(tool_config: ToolConfig | None) -> dict[str, Any] | None:
     """Converts a ToolConfig object to a dictionary."""
-
     if tool_config is None:
         return None
 
@@ -973,10 +990,9 @@ def replace_type_key(data: dict[str, Any]) -> dict[str, Any]:
                 ("type" if k == "type_" else k): _recursive_replace(v)
                 for k, v in item.items()
             }
-        elif isinstance(item, list):
+        if isinstance(item, list):
             return [_recursive_replace(elem) for elem in item]
-        else:
-            return item
+        return item
 
     new_data = {}
     for key, value in data.items():
@@ -1043,7 +1059,6 @@ def validate_tools(spec: str) -> None:
 
 def validate_tool_config(tool_config: str) -> None:
     """Validates the format of the tool_config."""
-
     schema = {
         "type": "object",
         "properties": {

@@ -13,7 +13,7 @@ consider playing with this code on [Cloud Shell](https://cloud.google.com/shell/
 
 ## Setup
 
-1. First lets download the repo and position ourself in the right directory:
+1. First lets download the repo and position ourselves in the right directory:
 
 ```bash
 cd
@@ -24,7 +24,7 @@ cd generative-ai/gemini/sample-apps/image-bash-jam/
 gem install lolcat
 ```
 
-1. First check authentication. Make sure you login with gcloud (or whatever login you want to do) and set up the project_id correctly.
+1. First check authentication. Make sure you log in with gcloud (or whatever login you want to do) and set up the project_id correctly.
 
 ```bash
 # If you're on Cloud Shell, you can skip this. You will authenticate with just a click.

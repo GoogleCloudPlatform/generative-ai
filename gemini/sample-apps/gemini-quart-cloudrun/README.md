@@ -152,7 +152,7 @@ To run the app on Cloud Shell locally, follow these steps:
 
    If you like to run the app with Gemini API key instead of Vertex AI, edit `run.sh` to specify your [Gemini API Key](https://aistudio.google.com/apikey).
 
-The application will startup. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) button at top right to launch the preview page. You may also visit that in the browser to view the application.
+The application will start up. Use Cloud Shell's [web preview](https://cloud.google.com/shell/docs/using-web-preview) button at top right to launch the preview page. You may also visit that in the browser to view the application.
 
 ## Build and Deploy the Application to Cloud Run
 

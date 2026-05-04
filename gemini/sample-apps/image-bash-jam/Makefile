@@ -1,4 +1,3 @@
-
 # auth:
 # 	gcloud config set account ricc@google.com
 # 	gcloud auth login
@@ -39,8 +38,8 @@ clean-all:
 	make clean
 
 vertexai-images/sky.jpg:
-	gsutil ls "gs://cloud-samples-data/generative-ai/image/"
-	gsutil -m cp -r gs://cloud-samples-data/generative-ai/image/* ./vertexai-images/
+	gcloud storage ls "gs://cloud-samples-data/generative-ai/image/"
+	gcloud storage cp --recursive gs://cloud-samples-data/generative-ai/image/* ./vertexai-images/
 
 # Test without Carlessian scripts
 test-ricc-mac:
@@ -50,9 +49,9 @@ test-ricc-mac:
 images:
 #	echo "target is $@"
 	mkdir -p "$@"
-	gsutil -m rsync -r gs://github-repo/use-cases/image-bash-jam/ $@/
+	gcloud storage rsync --recursive gs://github-repo/use-cases/image-bash-jam/ $@/
 # moves images to above dir:
 	mv $@/img/* $@/
 
 # images-upload:
-# 	gsutil rsync -r images gs://github-repo/use-cases/image-bash-jam/
+# 	gcloud storage rsync --recursive images gs://github-repo/use-cases/image-bash-jam/

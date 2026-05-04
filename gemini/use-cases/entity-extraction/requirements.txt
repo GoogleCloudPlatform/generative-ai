@@ -1,5 +1,10 @@
 dotenv
 flask
+gcsfs
+google-cloud-aiplatform
 google-cloud-storage
 google-genai
 gunicorn
+pymupdf
+opencv-python
+numpy

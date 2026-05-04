@@ -1,0 +1,331 @@
+<!--
+ Copyright 2026 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ https://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<style>
+    .control-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+    
+    .control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    
+    .control-btn svg {
+        width: 20px;
+        height: 20px;
+        stroke: white;
+        fill: none;
+    }
+    
+    .btn-voice { background: linear-gradient(135deg, #5a4fcf 0%, #6b3fa0 100%); }
+    .btn-voice:hover { background: linear-gradient(135deg, #4a3fbf 0%, #5b2f90 100%); }
+    .btn-voice.active {
+        background: linear-gradient(135deg, #e63946 0%, #d62839 100%);
+        animation: pulse-voice 1.5s infinite;
+    }
+    
+    .btn-camera { background: linear-gradient(135deg, #0d8a7c 0%, #28a745 100%); }
+    .btn-camera:hover { background: linear-gradient(135deg, #0a7a6c 0%, #209538 100%); }
+    .btn-camera.active { background: linear-gradient(135deg, #e63946 0%, #d62839 100%); }
+    
+    .btn-screen { background: linear-gradient(135deg, #2980b9 0%, #0097a7 100%); }
+    .btn-screen:hover { background: linear-gradient(135deg, #1a6090 0%, #007a87 100%); }
+    .btn-screen.active { background: linear-gradient(135deg, #e63946 0%, #d62839 100%); }
+    
+    .btn-upload { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); }
+    .btn-upload:hover { background: linear-gradient(135deg, #d56e12 0%, #c34400 100%); }
+    
+    .btn-clear { background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
+    .btn-clear:hover { background: linear-gradient(135deg, #a02920 0%, #8a2218 100%); }
+    
+    .btn-send {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .btn-send:hover {
+        background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+        transform: translateY(-2px);
+    }
+    
+    .btn-set-name {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+    
+    @keyframes pulse-voice {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(240, 147, 251, 0.7); }
+        50% { box-shadow: 0 0 0 15px rgba(240, 147, 251, 0); }
+    }
+    
+    #generation-spinner {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .spinner-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 12px 18px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .spinner-small {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    
+    .spinner-text { color: white; font-size: 13px; font-weight: 600; }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+    }
+    .status-ready { background: #38ef7d; }
+    .status-connecting { background: #fee140; animation: blink 1s infinite; }
+    .status-active { background: #38ef7d; animation: pulse-status 1.5s infinite; }
+    .status-error { background: #ff4b2b; }
+    
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes pulse-status {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(56, 239, 125, 0.7); }
+        50% { box-shadow: 0 0 0 8px rgba(56, 239, 125, 0); }
+    }
+    
+    .messages-container {
+        min-height: 400px;
+        max-height: 500px;
+        overflow-y: auto;
+        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+    }
+    .dark .messages-container {
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        border-color: #334155;
+    }
+    
+    .generated-content {
+        background: white;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .dark .generated-content { background: #1e293b; }
+    
+    .generated-image, .generated-video {
+        max-width: 400px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .generated-image:hover { transform: scale(1.02); }
+    
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        cursor: pointer;
+    }
+    .image-modal img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+    }
+    
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .content-label { font-weight: 600; color: #667eea; }
+    
+    .download-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    
+    .camera-container {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        width: 240px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        background: #000;
+        z-index: 1000;
+    }
+    .camera-container video { width: 100%; height: auto; object-fit: cover; }
+    
+    #upload-preview-grid { max-height: 200px; overflow-y: auto; }
+    #upload-preview-grid img { transition: transform 0.2s; }
+    #upload-preview-grid img:hover { transform: scale(1.05); }
+</style>
+
+<div class="space-y-6">
+    <div class="text-center mb-8">
+        <p class="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-2">
+            Voice, camera, and text-driven AI creation
+        </p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 max-w-2xl mx-auto">
+            Gemini Live • Gemini 3 Pro Image • Veo
+        </p>
+    </div>
+
+    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl shadow-md border border-indigo-200 dark:border-gray-600">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    Your Name:
+                </label>
+                <input type="text" id="user-name-input" placeholder="Enter your name..." 
+                    class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500" />
+                <button id="set-name-btn" class="btn-set-name">Set Name</button>
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <span>Current:</span>
+                <strong id="current-user-name" class="text-indigo-600 dark:text-indigo-400 text-lg">User</strong>
+            </div>
+        </div>
+    </div>
+
+    <div id="camera-container" class="camera-container" style="display: none;">
+        <video id="camera-video" autoplay playsinline></video>
+    </div>
+
+    <div id="messages-container" class="messages-container">
+        <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+            <p class="text-lg mb-2">Welcome to GenMedia Live</p>
+            <p class="text-sm italic">Set your name above, then start talking or typing</p>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+        
+        <div id="upload-preview-container" style="display: none;" class="mb-4 bg-gray-100 dark:bg-gray-700 p-3 rounded-xl border border-indigo-200 dark:border-gray-600">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <span id="upload-count">0</span> Image(s) Attached (Max 14)
+                </span>
+                <button id="remove-upload-btn" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase">Remove All</button>
+            </div>
+            <div id="upload-preview-grid" class="grid grid-cols-4 gap-2 bg-gray-200 dark:bg-gray-800 rounded-lg p-2"></div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+            <button id="voice-button" class="control-btn btn-voice" title="Start voice">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+                <span>Voice</span>
+            </button>
+
+            <button id="camera-button" class="control-btn btn-camera" title="Enable camera">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span>Camera</span>
+            </button>
+
+            <button id="screen-share-button" class="control-btn btn-screen" title="Share screen">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span>Screen</span>
+            </button>
+
+            <button id="upload-button" class="control-btn btn-upload" title="Upload image">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Upload</span>
+            </button>
+            <input type="file" id="image-upload-input" accept="image/*" multiple class="hidden" />
+
+            <button id="clear-all-button" class="control-btn btn-clear" title="Clear all">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Clear</span>
+            </button>
+
+            <div id="connection-status" class="ml-auto flex items-center text-sm font-semibold">
+                <span class="status-dot status-ready"></span>
+                <span>Ready</span>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <input type="text" id="user-input" placeholder="Type a message or use voice..." 
+                class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+            <button id="send-button" class="btn-send">Send</button>
+        </div>
+    </div>
+</div>

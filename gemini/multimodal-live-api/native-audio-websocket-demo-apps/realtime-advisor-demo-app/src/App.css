@@ -1,0 +1,296 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Main Content Styles */
+.main-content {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  background-color: #f8f9fa;
+  padding: 20px;
+  text-align: center;
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.left-column {
+  flex: 0 0 400px;
+}
+
+.center-column {
+  flex: 1;
+}
+
+.right-column {
+  flex: 0 0 300px;
+}
+
+.onboarding-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.onboarding-step {
+  background-color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  width: auto;
+  text-align: left;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.onboarding-step h3 {
+  margin-top: 0;
+  color: #202124;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.onboarding-step p {
+  color: #5f6368;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+.onboarding-step code {
+  background-color: #f1f3f4;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.onboarding-step .info-section {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f1f3f4;
+  padding-bottom: 20px;
+}
+
+.onboarding-step .info-section:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Advisor Panel Styles */
+.advisor-panel {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
+.advisor-panel h2 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #202124;
+  text-align: left;
+  font-weight: 500;
+}
+
+.column-header {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #202124;
+  text-align: left;
+  font-weight: 500;
+  padding-left: 5px;
+}
+
+.knowledge-input {
+  height: 300px;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #dadce0;
+  border-radius: 12px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro",
+    monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  box-sizing: border-box;
+  background-color: white;
+  color: #202124;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.knowledge-input:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 20px;
+  font-size: 1.2rem;
+  border: 2px solid #dadce0;
+  border-radius: 12px;
+  background-color: white;
+  color: #5f6368;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.mode-btn:hover {
+  border-color: #4285f4;
+  color: #4285f4;
+  background-color: #f8f9fa;
+}
+
+.mode-btn.active {
+  background-color: #e8f0fe;
+  color: #1967d2;
+  border-color: #1967d2;
+  box-shadow: 0 2px 6px rgba(25, 103, 210, 0.2);
+}
+
+.mode-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.mode-desc {
+  font-size: 0.9rem;
+  font-weight: 400;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.control-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.control-buttons .mode-btn {
+  text-align: left;
+  padding: 15px 20px;
+}
+
+.section-description {
+  color: #5f6368;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    position: relative;
+    top: 0;
+    height: auto;
+    flex-direction: column;
+    overflow-y: visible;
+    padding-bottom: 40px;
+    margin-top: 60px;
+  }
+
+  .column {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    margin-bottom: 20px;
+  }
+
+  .left-column,
+  .right-column {
+    flex: none;
+  }
+
+  /* Reorder for mobile: Setup (Left) -> Knowledge (Center) -> Controls (Right) */
+  .left-column {
+    order: 1;
+  }
+
+  .center-column {
+    order: 2;
+  }
+
+  .right-column {
+    order: 3;
+  }
+
+  .knowledge-input {
+    height: 400px; /* Taller input on mobile since we have vertical space */
+  }
+}
