@@ -3,12 +3,12 @@
 This directory contains examples and guides for using Google Cloud's models for image and video generation, including [Imagen](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images) for image generation and [Veo](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/video/overview) for video generation.
 
 If you're interested in using the Nano Banana models for image generation, check out these notebooks:
-- [Nano Banana](../gemini/getting-started/intro_gemini_2_5_image_gen.ipynb): Learn how to generate and edit images with Gemini 2.5 Flash Image.
+- [Nano Banana 2](../gemini/getting-started/intro_gemini_3_1_flash_image_gen.ipynb): Learn how to generate and edit images with Gemini 3.1 Flash Image.
 - [Nano Banana Pro](../gemini/getting-started/intro_gemini_3_image_gen.ipynb): Generate and edit images with Gemini 3 Pro Image.
 
 ## Getting Started
 
-- [Image Segmentation on Vertex AI](getting-started/image_segmentation.ipynb): Segment images using various modes like foreground/background, semantic, and prompt-based segmentation.
+- [Image Segmentation](getting-started/image_segmentation.ipynb): Segment images using various modes like foreground/background, semantic, and prompt-based segmentation.
 - [Imagen 3 Editing](getting-started/imagen3_editing.ipynb): Edit images with Imagen 3 using mask-based editing.
 - [Imagen 4 Upscaling](getting-started/imagen4_upscale.ipynb): Upscale images with Imagen 4 by a factor of 2x, 3x, or 4x.
 - [Veo 3 Advanced Controls](getting-started/veo3_advanced_controls.ipynb): Explore advanced controls for Veo 3, like frame interpolation and video extension.
@@ -26,15 +26,15 @@ If you're interested in using the Nano Banana models for image generation, check
 
 ## Video Overviews
 
-**YouTube Video: Introduction to Image Editing on Vertex AI**
+**YouTube Video: Introduction to Image Editing**
 
 <!-- markdownlint-disable MD033 -->
 <a href="https://www.youtube.com/watch?v=E_7P2SIdkIg" target="_blank">
-  <img src="https://img.youtube.com/vi/E_7P2SIdkIg/maxresdefault.jpg" alt="Introduction to Image Editing on Vertex AI" width="500">
+  <img src="https://img.youtube.com/vi/E_7P2SIdkIg/maxresdefault.jpg" alt="Introduction to Image Editing" width="500">
 </a>
 <!-- markdownlint-enable MD033 -->
 
-**YouTube Video: Introduction to Video Editing on Vertex AI**
+**YouTube Video: Introduction to Video Editing**
 
 <!-- markdownlint-disable MD033 -->
 <a href="https://www.youtube.com/watch?v=5_zahcDOohY" target="_blank">
