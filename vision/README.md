@@ -1,6 +1,6 @@
 # Vision
 
-This directory contains examples and guides for using Google Cloud's models for image and video generation, including [Imagen](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images) for image generation and [Veo](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/video/overview) for video generation.
+This directory contains examples and guides for using Google Cloud's models for image and video generation, including Imagen for image generation and [Veo](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/overview) for video generation.
 
 If you're interested in using the Nano Banana models for image generation, check out these notebooks:
 - [Nano Banana 2](../gemini/getting-started/intro_gemini_3_1_flash_image_gen.ipynb): Learn how to generate and edit images with Gemini 3.1 Flash Image.
@@ -38,6 +38,6 @@ If you're interested in using the Nano Banana models for image generation, check
 
 <!-- markdownlint-disable MD033 -->
 <a href="https://www.youtube.com/watch?v=5_zahcDOohY" target="_blank">
-  <img src="https://img.youtube.com/vi/5_zahcDOohY/maxresdefault.jpg" alt="Introduction to Video Editing on Vertex AI" width="500">
+  <img src="https://img.youtube.com/vi/5_zahcDOohY/maxresdefault.jpg" alt="Introduction to Video Editing" width="500">
 </a>
 <!-- markdownlint-enable MD033 -->
