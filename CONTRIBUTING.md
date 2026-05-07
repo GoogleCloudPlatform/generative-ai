@@ -31,8 +31,8 @@ If the fixes can't be performed automatically,
 then you will need to manually address them before submitting your PR.
 
 ```shell
-python3 -m pip install --upgrade nox
-nox -s format
+uv pip install autoflake ruff nbqa "nbformat>=5.10.4" "git+https://github.com/tensorflow/docs"
+./scripts/format.sh
 ```
 
 ## Code Reviews

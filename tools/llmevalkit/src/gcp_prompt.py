@@ -37,6 +37,7 @@ response from the generative model.
 import json
 import logging
 import os
+import warnings
 from typing import Any
 
 from dotenv import load_dotenv
@@ -45,6 +46,12 @@ from google.cloud import aiplatform, storage
 from vertexai.generative_models import GenerationConfig
 from vertexai.preview import prompts
 from vertexai.preview.prompts import Prompt
+
+# Suppress the UserWarning from vertexai.generative_models as we need to use it
+# for Prompt Management until google-genai SDK supports it.
+warnings.filterwarnings(
+    "ignore", category=UserWarning, module="vertexai.generative_models"
+)
 
 load_dotenv("src/.env")
 
@@ -224,7 +231,7 @@ class GcpPrompt:
                 try:
                     # Create Image Part from URI
                     updated_contents.append(
-                        genai.Part.from_uri(mime_type=mime_type, uri=value)
+                        genai.types.Part.from_uri(mime_type=mime_type, file_uri=value)
                     )
                 except Exception as e:
                     logger.error(

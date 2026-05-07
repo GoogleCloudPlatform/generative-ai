@@ -226,8 +226,7 @@ themes\.googleusercontent\.com/static/fonts/[^/\s"]+/v\d+/[^.]+.
 \bgit\.io/[0-9a-zA-Z]+
 # GitHub JSON
 "node_id": "[-a-zA-Z=;:/0-9+_]*"
-# Contributor
-\[[^\]]+\]\(https://github\.com/[^/\s"]+/?\)
+
 # GHSA
 GHSA(?:-[0-9a-z]{4}){3}
 

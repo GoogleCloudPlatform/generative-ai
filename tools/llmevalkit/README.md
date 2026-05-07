@@ -37,16 +37,20 @@ This tutorial provides a comprehensive guide to prompt engineering, covering the
     -   **Human-in-the-loop rating:** For a more nuanced evaluation, you can manually review the model's responses and rate them.
     -   **Automated metrics:** The tutorial also supports automated evaluation metrics to get a quantitative measure of your prompt's performance.
 
-4.  **Prompt Optimization:** This section helps you automatically improve your prompts. It uses Vertex AI's prompt optimization capabilities to:
+4.  **One-Click Refiner:** Instantly upgrade a draft prompt into a structured, production-ready instruction without managing any datasets. This is a quick way to apply prompt engineering best practices to your initial drafts.
+
+5.  **Performance Tuner:** Optimize your prompt's System Instructions using data-driven iteration to maximize metric performance. This tool uses hill-climbing algorithms to automatically refine prompts based on your evaluation metrics.
+
+6.  **Prompt Optimization:** This section helps you automatically improve your prompts using Agent Platform's prompt optimization capabilities. It provides a structured way to:
 
     -   **Configure and launch optimization jobs:** You can set up and run a job that will take your prompt and a dataset and try to find a better-performing version of the prompt.
 
-5.  **Prompt Optimization Results:** After an optimization job has run, this section allows you to:
+7.  **Prompt Optimization Results:** After an optimization job has run, this section allows you to:
 
     -   **View the results:** You can see the different prompt versions that the optimizer came up with and how they performed.
     -   **Compare versions:** The results are presented in a way that makes it easy to compare the different optimized prompts and choose the best one.
 
-6.  **Prompt Records:** This is a leaderboard that shows you the evaluation results of all your different prompt versions. It helps you to:
+8.  **Prompt Records:** This is a leaderboard that shows you the evaluation results of all your different prompt versions. It helps you to:
 
     -   **Track performance over time:** See how your prompts have improved with each new version.
     -   **Compare different prompts:** You can compare the performance of different prompts for the same task.
@@ -61,27 +65,21 @@ This section walks you through using the app.
 
 First, clone the repository and set up the environment:
 
-```bash
 # Clone the repository
 git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 
 # Navigate to the project directory
 cd generative-ai/tools/llmevalkit
 
-# Create a Python virtual environment
-python -m venv venv
 
-# Activate the virtual environment
-source venv/bin/activate
-
-# Install the required packages
-pip install -r requirements.txt
-
-# Run the Streamlit application
-streamlit run index.py
-```
 
 Next, `cp src/.env.example src/.env` open the file and set `BUCKET_NAME` and `PROJECT_ID`
+
+# Authorize gcloud
+`gcloud auth application-default login`
+
+# Run the Streamlit application
+`uv run streamlit run index.py`
 
 ### 1. Prompt Management
 
@@ -91,7 +89,7 @@ In the Prompt Name field enter:
 math_prompt_test
 ```
 
-In the Prompt Data field enter:
+In the Prompt Text field enter:
 
 ```
 Problem: {{query}}
@@ -101,7 +99,7 @@ Answer: {{target}}
 
 In the Model Name field enter:
 ```
-gemini-2.0-flash-001
+gemini-2.5-flash
 ```
 
 In the System Instructions field enter:
@@ -109,7 +107,7 @@ In the System Instructions field enter:
 Solve the problem given the image.
 ```
 
-Click `Save`
+Click `Save Prompt`
 
 Copy this text for testing:
 
@@ -134,6 +132,8 @@ gsutil cp gs://github-repo/prompts/prompt_optimizer/mathvista_dataset/mathvista_
 
 ### 3. Evaluation
 
+*Note: Ensure you have completed Step 2 to create a dataset before proceeding here.*
+
 We will now run an evaluation, prior to doing any tweaking to get a baseline.
 
 - **Existing Dataset:** 'mathvista'
@@ -143,21 +143,72 @@ We will now run an evaluation, prior to doing any tweaking to get a baseline.
 - **Existing Prompt:** 'math_prompt_test'
 - **Version:** '1'
 
+**Note:** if the prompt is not in the list refresh the page.
+
 Click Load Prompt, and Upload and Get Response... ⏰ Wait!!
 
 Review the responses.
 
 - **Model-Based:** 'question-answering-quality'
+- **Model:** 'gemini-2.5-pro'
 
 Launch the Eval... ⏰ Wait!!
 
 View the Evaluation Results, and save to prompt records. This will save this initial version to the prompt records for the baseline.
 
-### 4. Prompt Optimization
+### 4. One-Click Refiner
 
-🔧 Set-Up Prompt Optimization.
+Use this for a quick, zero-data upgrade to your prompt.
 
-- **Target Model:** 'gemini-2.0-flash-001'
+- **Select Existing Prompt:** 'math_prompt_test'
+- **Select Version:** '1'
+
+🖱️ Click **Load Prompt**.
+
+- **Target Model:** 'gemini-2.0-flash-001' (or your preferred model)
+- **Tone:** 'Professional'
+
+🖱️ Click **Auto-Suggest Directives**.
+🖱️ Click **Optimize Now**.
+
+Review the **Optimized Result** and the **Insights** (why it changed). If satisfied, click **Save as New Version**.
+
+### (Optional) Run new Evaluation
+
+Navigate back to **Evaluation** and run an evaluation similar to step 3, but load **Version 2** of the prompt.
+
+### 5. Performance Tuner
+
+Use this for data-driven optimization using a hill-climbing algorithm.
+
+- **Select Dataset:** 'mathvista'
+- **Select File:** 'mathvista_input.jsonl'
+
+🖱️ Click **Load Dataset**.
+
+- **Select Prompt:** 'math_prompt_test'
+- **Select Version:** '1'
+
+🖱️ Click **Load Prompt**.
+
+- **Evaluation Metrics:** 'question_answering_correctness' (default)
+- **Target Model:** 'gemini-2.5-flash'
+
+🖱️ Click **Start Optimization Job**.
+
+⏰ Wait!! This may take some time as it runs multiple iterations.
+
+Once complete, click **Load Results** to see the **Score Jump** and the **Winner System Instruction**. You can test the winner on a blind case before clicking **Export Final Prompt** to save it as a new version.
+
+### (Optional) Run new Evaluation
+
+Navigate back to **Evaluation** and run an evaluation similar to step 3, but load **Version 2** of the prompt.
+
+### 6. Prompt Optimization
+
+🔧 Set-Up Prompt Optimization using Agent Platform's batch optimization service.
+
+- **Target Model:** 'gemini-2.5-flash'
 - **Existing Prompt:** 'math_prompt_test'
 - **Version:** '1'
 
@@ -176,7 +227,7 @@ Preview the dataset.
 
 ⏰ Wait!! This step will take about 20-min to run.
 
-### 5. Prompt Optimization Results
+### 7. Prompt Optimization Results
 
 View the Optimization Results.
 
@@ -186,17 +237,17 @@ The last run will be shown at the top of the screen. Pick this from the dropdown
 
 Review the results and select the highest scoring version and copy the instruction.
 
-### 6. Navigate Back to Prompt for New Version
+### 8. Navigate Back to Prompt for New Version
 
 Load your existing prompt from before.
 
 📋 Paste your new instructions from the prompt optimizer, and save new version.
 
-### 7. Run new Evaluation
+### 9. Run new Evaluation
 
 Repeat step 3 with your new version.
 
-### 8. View the Records
+### 10. View the Records
 
 Navigate to the leaderboard and load the results.
 
