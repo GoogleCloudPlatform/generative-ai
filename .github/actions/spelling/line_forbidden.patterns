@@ -209,7 +209,7 @@
 \b[Vv]ertext\b
 
 # Should be Agent Platform
-\b[Vv]ertex [Aa][Ii]\b
+\b[Vv]ertex[-\s][Aa][Ii]\b
 
 # Should be Gemini
 \sgemini\s\w
