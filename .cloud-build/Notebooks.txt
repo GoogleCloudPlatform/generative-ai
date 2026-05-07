@@ -1,6 +1,0 @@
-generative-ai/gemini/getting-started/intro_gemini_2_5_flash.ipynb
-generative-ai/gemini/getting-started/intro_gemini_3_pro.ipynb
-generative-ai/gemini/getting-started/intro_gemini_3_image_gen.ipynb
-generative-ai/gemini/getting-started/intro_gemini_chat.ipynb
-generative-ai/gemini/getting-started/intro_gemini_curl.ipynb
-generative-ai/gemini/chat-completions/intro_chat_completions_api.ipynb

@@ -22,19 +22,15 @@ import pandas as pd
 import streamlit as st
 import vertexai
 from dotenv import load_dotenv
+from google import genai
 from google.cloud import storage
+from pydantic import BaseModel
 from src.gcp_prompt import GcpPrompt as gcp_prompt
 from vertexai.evaluation import (
     EvalTask,
     MetricPromptTemplateExamples,
     PairwiseMetricPromptTemplate,
     PointwiseMetricPromptTemplate,
-)
-from vertexai.generative_models import (
-    GenerationConfig,
-    GenerativeModel,
-    HarmBlockThreshold,
-    HarmCategory,
 )
 from vertexai.preview import prompts
 
@@ -89,45 +85,56 @@ def get_autorater_pairwise_response(metric_prompt: str, model: str) -> dict:
     Returns:
         A dictionary containing the autorater's response.
     """
-    metric_response_schema = {
-        "type": "OBJECT",
-        "properties": {
-            "pairwise_choice": {"type": "STRING"},
-            "explanation": {"type": "STRING"},
-        },
-        "required": ["pairwise_choice", "explanation"],
-    }
 
-    autorater = GenerativeModel(
-        model,
-        generation_config=GenerationConfig(
-            response_mime_type="application/json",
-            response_schema=metric_response_schema,
-        ),
-        safety_settings={
-            HarmCategory.HARM_CATEGORY_UNSPECIFIED: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+    class AutoraterResponse(BaseModel):
+        pairwise_choice: str
+        explanation: str
+
+    client = genai.Client(
+        vertexai=True,
+        project=os.getenv("PROJECT_ID"),
+        location=os.getenv("LOCATION"),
+    )
+
+    response = client.models.generate_content(
+        model=model,
+        contents=metric_prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": AutoraterResponse,
+            "safety_settings": [
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "threshold": "BLOCK_NONE",
+                },
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "threshold": "BLOCK_NONE",
+                },
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            ],
         },
     )
 
-    response = autorater.generate_content(metric_prompt)
-    response_json = {}
+    if response.parsed:
+        return response.parsed.model_dump()
 
-    if response.candidates and len(response.candidates) > 0:
-        candidate = response.candidates[0]
-        if (
-            candidate.content
-            and candidate.content.parts
-            and len(candidate.content.parts) > 0
-        ):
-            part = candidate.content.parts[0]
-            if part.text:
-                response_json = json.loads(part.text)
+    try:
+        return json.loads(response.text)
+    except Exception as e:
+        logger.warning(f"Failed to parse response: {e}")
+        return {}
 
-    return response_json
+
+def format_display_text(text):
+    """Formats text for display in st.text_area, handling dicts/lists as JSON."""
+    if isinstance(text, (dict, list)):
+        try:
+            return json.dumps(text, indent=2)
+        except (TypeError, ValueError):
+            return str(text)
+    return str(text)
 
 
 def main() -> None:
@@ -328,43 +335,48 @@ def main() -> None:
 
     st.button("Load Prompt", key="load_prompt_button")
     if st.session_state.load_prompt_button:
-        logger.info(
-            f"Selected Prompt ID: {st.session_state.local_prompt.existing_prompts[st.session_state.selected_prompt]}"
-        )
-        logger.info(f"Version: {st.session_state.selected_version}")
-        st.session_state.local_prompt.load_prompt(
-            st.session_state.local_prompt.existing_prompts[
-                st.session_state.selected_prompt
-            ],
-            st.session_state.selected_prompt,
-            st.session_state.selected_version,
-        )
-        logger.info(f"Local Prompt Meta: {st.session_state.local_prompt.prompt_meta}")
-        logger.info(
-            f"Local Prompt Meta Dict Keys: {st.session_state.local_prompt.prompt_meta.keys()}"
-        )
+        if not st.session_state.get("selected_prompt"):
+            st.warning("Please select a prompt before loading.")
+        else:
+            logger.info(
+                f"Selected Prompt ID: {st.session_state.local_prompt.existing_prompts[st.session_state.selected_prompt]}"
+            )
+            logger.info(f"Version: {st.session_state.selected_version}")
+            st.session_state.local_prompt.load_prompt(
+                st.session_state.local_prompt.existing_prompts[
+                    st.session_state.selected_prompt
+                ],
+                st.session_state.selected_prompt,
+                st.session_state.selected_version,
+            )
+            logger.info(
+                f"Local Prompt Meta: {st.session_state.local_prompt.prompt_meta}"
+            )
+            logger.info(
+                f"Local Prompt Meta Dict Keys: {st.session_state.local_prompt.prompt_meta.keys()}"
+            )
 
-        st.session_state.prompt_name = (
-            st.session_state.local_prompt.prompt_to_run.prompt_name
-        )
-        st.session_state.prompt_data = (
-            st.session_state.local_prompt.prompt_to_run.prompt_data
-        )
-        st.session_state.model_name = (
-            st.session_state.local_prompt.prompt_to_run.model_name.split("/")[-1]
-        )
-        st.session_state.system_instructions = (
-            st.session_state.local_prompt.prompt_to_run.system_instruction
-        )
-        st.session_state.response_schema = json.dumps(
-            st.session_state.local_prompt.prompt_meta.get("response_schema", {})
-        )
-        st.session_state.generation_config = json.dumps(
-            st.session_state.local_prompt.prompt_meta.get("generation_config", {})
-        )
-        st.session_state.meta_tags = st.session_state.local_prompt.prompt_meta[
-            "meta_tags"
-        ]
+            st.session_state.prompt_name = (
+                st.session_state.local_prompt.prompt_to_run.prompt_name
+            )
+            st.session_state.prompt_data = (
+                st.session_state.local_prompt.prompt_to_run.prompt_data
+            )
+            st.session_state.model_name = (
+                st.session_state.local_prompt.prompt_to_run.model_name.split("/")[-1]
+            )
+            st.session_state.system_instructions = (
+                st.session_state.local_prompt.prompt_to_run.system_instruction
+            )
+            st.session_state.response_schema = json.dumps(
+                st.session_state.local_prompt.prompt_meta.get("response_schema", {})
+            )
+            st.session_state.generation_config = json.dumps(
+                st.session_state.local_prompt.prompt_meta.get("generation_config", {})
+            )
+            st.session_state.meta_tags = st.session_state.local_prompt.prompt_meta[
+                "meta_tags"
+            ]
 
     st.button("Upload Data and Get Responses", key="upload_data_get_responses_button")
 
@@ -400,7 +412,9 @@ def main() -> None:
             elif gcs_path.endswith(".jsonl"):
                 df_full = pd.read_json(gcs_path, lines=True)
             else:
-                st.error(f"Unsupported file type: {gcs_path.split('.')[-1]}")
+                st.error(
+                    f"Unsupported file type: {gcs_path.rsplit('.', maxsplit=1)[-1]}"
+                )
                 return
         except Exception as e:
             st.error(f"Error reading data from {gcs_path}: {e}")
@@ -510,56 +524,74 @@ def main() -> None:
                 st.session_state.current_index = 0
                 return
 
-            if len(df) > 0:
-                st.session_state.generation_progress_bar = st.progress(
-                    0, text="Starting response generation..."
-                )
+            import concurrent.futures
 
             template_vars = re.findall(r"{(\w+)}", st.session_state.prompt_data)
             required_cols_for_generating_new = list(set(template_vars))
+
+            tasks = []
             for idx, r in df.iterrows():
                 current_user_input_item = {
                     col: r[col] for col in required_cols_for_generating_new
                 }
+                expected_res = r[st.session_state.ground_truth_column_name]
+                tasks.append((idx, current_user_input_item, expected_res))
+
+            # Bind the function reference to avoid accessing st.session_state directly in threads
+            generate_function = st.session_state.local_prompt.generate_response
+
+            def process_task(task_args):
+                t_idx, item, expected = task_args
                 try:
-                    generated_text = st.session_state.local_prompt.generate_response(
-                        current_user_input_item
-                    )
-                    user_input_list.append(current_user_input_item)
-                    expected_result_list.append(
-                        r[st.session_state.ground_truth_column_name]
-                    )
-                    assistant_response_list.append(generated_text)
-                    if "generation_progress_bar" in st.session_state:
-                        progress_text = f"Generating response {idx + 1} of {len(df)}..."
-                        st.session_state.generation_progress_bar.progress(
-                            (idx + 1) / len(df), text=progress_text
-                        )
+                    res = generate_function(item)
+                    return t_idx, item, expected, res, None
                 except Exception as e:
-                    logger.exception(
-                        "Error generating response for row index %s (data: %s): %s",
-                        idx,
-                        current_user_input_item,
-                        e,
-                    )
+                    return t_idx, item, expected, None, e
+
+            completed = 0
+            total = len(tasks)
+            results = []
+
+            if total > 0:
+                progress_bar = st.progress(
+                    0, text="Generating responses in parallel..."
+                )
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                    future_to_idx = {
+                        executor.submit(process_task, t): t[0] for t in tasks
+                    }
+                    for future in concurrent.futures.as_completed(future_to_idx):
+                        t_idx, item, expected, res, error = future.result()
+                        completed += 1
+
+                        progress_text = f"Generating response {completed} of {total}..."
+                        progress_bar.progress(completed / total, text=progress_text)
+
+                        if error:
+                            logger.error(
+                                "Error generating response for row index %s: %s",
+                                t_idx,
+                                error,
+                            )
+                        else:
+                            results.append((t_idx, item, expected, res))
+
+                progress_bar.empty()
+                if len(results) < total:
                     st.warning(
-                        f"Skipped generating response for one item (row index {idx}) due to error: {e}"
+                        f"Generated {len(results)} responses. {total - len(results)} failed."
                     )
-                    if "generation_progress_bar" in st.session_state:
-                        progress_text = f"Generating response {idx + 1} of {len(df)}... (Error, skipped)"
-                        st.session_state.generation_progress_bar.progress(
-                            (idx + 1) / len(df), text=progress_text
-                        )
-                    continue
-            if "generation_progress_bar" in st.session_state:
-                st.session_state.generation_progress_bar.empty()
-                del st.session_state.generation_progress_bar
+
+            results.sort(key=lambda x: x[0])
+            for t_idx, item, expected, res in results:
+                user_input_list.append(item)
+                expected_result_list.append(expected)
+                assistant_response_list.append(res)
 
             if len(user_input_list) < len(df):
                 st.info(
-                    "Successfully generated responses for %s out of %s requested samples due to errors during generation.",
-                    len(user_input_list),
-                    len(df),
+                    f"Successfully generated responses for {len(user_input_list)} out of {len(df)} requested samples due to errors during generation."
                 )
         else:
             logger.info(
@@ -618,11 +650,12 @@ def main() -> None:
             st.subheader("User Input")
             st.text_area(
                 label="User's original query/text",
-                value=st.session_state.human_rated_dict["user_input"][
-                    st.session_state.current_index
-                ],
+                value=format_display_text(
+                    st.session_state.human_rated_dict["user_input"][
+                        st.session_state.current_index
+                    ]
+                ),
                 height=200,
-                key="user_input_text",
                 disabled=True,
             )
 
@@ -630,11 +663,12 @@ def main() -> None:
             st.subheader("Ground Truth")
             st.text_area(
                 label="The ideal/target response",
-                value=st.session_state.human_rated_dict["ground_truth"][
-                    st.session_state.current_index
-                ],
+                value=format_display_text(
+                    st.session_state.human_rated_dict["ground_truth"][
+                        st.session_state.current_index
+                    ]
+                ),
                 height=200,
-                key="ground_truth_text",
                 disabled=True,
             )
 
@@ -642,11 +676,12 @@ def main() -> None:
             st.subheader("Assistant Response")
             st.text_area(
                 label="The assistant's generated response",
-                value=st.session_state.human_rated_dict["assistant_response"][
-                    st.session_state.current_index
-                ],
+                value=format_display_text(
+                    st.session_state.human_rated_dict["assistant_response"][
+                        st.session_state.current_index
+                    ]
+                ),
                 height=200,
-                key="assistant_response_text",
                 disabled=True,
             )
 
@@ -655,7 +690,6 @@ def main() -> None:
             value=st.session_state.include_in_evaluations[
                 st.session_state.current_index
             ],
-            key="evaluation_checkbox",
         )
 
         if (
@@ -833,11 +867,28 @@ def main() -> None:
                     else:
                         final_reference_str = str(reference_val)
 
-                    instruction = (
-                        prompt_template.format(**user_input_values)
-                        if isinstance(user_input_values, dict)
-                        else prompt_template
-                    )
+                    # Extract all variables from the template
+                    template_vars = re.findall(r"\{(\w+)\}", prompt_template)
+
+                    if template_vars:
+                        # Template expects variables
+                        if isinstance(user_input_values, dict):
+                            # Ensure all expected vars are present, default to empty string if missing
+                            formatted_input = {
+                                v: user_input_values.get(v, "") for v in template_vars
+                            }
+                            instruction = prompt_template.format(**formatted_input)
+                        # Input is not a dict but template expects vars
+                        # Try to use the input as the first variable if there's only one, otherwise empty
+                        elif len(template_vars) == 1:
+                            instruction = prompt_template.format(
+                                **{template_vars[0]: user_input_values}
+                            )
+                        else:
+                            instruction = prompt_template  # Fallback
+                    else:
+                        # No variables in template
+                        instruction = prompt_template
                     context = system_instruction if system_instruction else ""
                     prompt_str = (
                         json.dumps(user_input_values)
