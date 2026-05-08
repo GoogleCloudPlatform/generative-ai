@@ -40,6 +40,7 @@ Aktu
 ALCS
 ALDS
 Alessia
+algo
 Alibaba
 alisal
 alloydb
@@ -624,6 +625,7 @@ gunicorn
 gutenberg
 Guterres
 GWLP
+hacer
 hadolint
 hahaha
 Haichao
@@ -1261,6 +1263,7 @@ qubits
 quickbot
 Quickbot
 quicktime
+quieres
 quippy
 qwen
 Qwen
