@@ -11,7 +11,7 @@ typing_extensions==4.12.2
 pydantic==2.9.2
 requests==2.31.0
 opencv-python
-pillow==11.1.0
+pillow==12.2.0
 numpy==2.2.4
 
 google-cloud-aiplatform==1.69.0
