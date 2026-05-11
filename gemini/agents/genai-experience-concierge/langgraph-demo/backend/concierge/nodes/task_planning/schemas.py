@@ -7,8 +7,9 @@
 
 from typing import TypedDict
 
-from concierge import schemas
 import pydantic
+
+from concierge import schemas
 
 
 class Task(pydantic.BaseModel):
