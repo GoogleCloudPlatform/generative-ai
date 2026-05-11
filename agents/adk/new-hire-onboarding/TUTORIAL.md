@@ -2,7 +2,7 @@
 
 This tutorial details a profound paradigm shift in generative AI application development: **moving away from stateless chatbots toward building reliable, time-agnostic background processes that can run for weeks.**
 
-Stateless chat applications are excellent for short, immediate Q&A turns. However, real-world enterprise workflows (like HR onboarding, supply chain tracking, or procurement) are dominated by **"dead time"**—periods where the agent must pause execution for days or weeks, waiting for external human actions (like signing a contract) or real-world events (like hardware package deliveries).
+Stateless chat applications are excellent for short, immediate Q&A turns. However, real-world enterprise workflows (like HR onboarding, supply chain tracking, or procurement) are dominated by **"idle time"**—periods where the agent must pause execution for days or weeks, waiting for external human actions (like signing a contract) or real-world events (like hardware package deliveries).
 
 This tutorial is styled as an **Iterative Coding Agent Playbook**. You will build a **New Hire Onboarding Coordinator Agent** by feeding high-level, intent-driven prompts incrementally to a coding agent.
 
@@ -126,7 +126,7 @@ app: FastAPI = get_fast_api_app(
 
 ### Phase 5: Event-Driven Resumption & Structured JSON Logging
 
-The most challenging aspect of long-running workflows is managing **"dead time"**—the long gaps when the agent goes dormant to wait for human approvals or slow physical actions (like document signatures or shipping packages).
+The most challenging aspect of long-running workflows is managing **"idle time"**—the long gaps when the agent goes dormant to wait for human approvals or slow physical actions (like document signatures or shipping packages).
 
 We handle this by **serializing the agent's working memory** at the moment of the pause, storing both the full conversation thread and our custom step variables in SQLite. When the external signature event triggers the webhook, the resume handler **hydrates the working memory** seamlessly. This ensures the LLM restores its complete context and picks up the logical reasoning chain *exactly* where it left off, without any memory dropouts or hallucinated deviations.
 
@@ -165,18 +165,18 @@ async for event in self.runner.run_async(
 
 ---
 
-### Phase 6: Simulating week-long "Dead Time" delays (Evals)
+### Phase 6: Simulating week-long "Idle Time" delays (Evals)
 
 How do we test an onboarding flow that spans days? We write multi-turn Golden simulation tests that mock delays and webhook triggers.
 
 > ### 🤖 Coding Agent Prompt 6: Golden Case Delay Simulation
 >
-> "Use the agents-cli evaluation skills to generate an eval set for our onboarding workflow. Create test trajectories that specifically simulate 'dead time'. I need a test case that mocks a 48-hour delay for IT hardware provisioning, and verifies that the agent resumes and successfully routes the final schedule without dropping the new hire's original context."
+> "Use the agents-cli evaluation skills to generate an eval set for our onboarding workflow. Create test trajectories that specifically simulate 'idle time'. I need a test case that mocks a 48-hour delay for IT hardware provisioning, and verifies that the agent resumes and successfully routes the final schedule without dropping the new hire's original context."
 
 #### Verifying Evaluations:
 Execute the direct ADK virtualenv script to run your delay simulations locally bypassing transient packaging registry issues:
 ```bash
-.venv/bin/adk eval ./app tests/eval/evalsets/dead_time_delay_eval.json --config_file_path tests/eval/eval_config.json
+.venv/bin/adk eval ./app tests/eval/evalsets/idle_time_delay_eval.json --config_file_path tests/eval/eval_config.json
 ```
 
 ---

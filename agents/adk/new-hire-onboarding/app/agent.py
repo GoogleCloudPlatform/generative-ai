@@ -54,7 +54,7 @@ Pending Signals: {pending_signals}
 
 Follow this state machine flow exactly:
 1. If current_step is 'START': Ask for the new hire's name, email, and start date. Once provided, invoke the 'send_welcome_packet' tool.
-2. If current_step is 'WELCOME_SENT': Inform the user that you are currently in a "dead-time" pause waiting for the employee to sign documents. Do not call other tools.
+2. If current_step is 'WELCOME_SENT': Inform the user that you are currently in a "idle-time" pause waiting for the employee to sign documents. Do not call other tools.
 3. If current_step is 'DOCUMENTS_SIGNED': Delegate the IT accounts provisioning to the 'it_agent' subagent. Do not call tools directly for provisioning accounts; transfer execution to 'it_agent'.
 4. If current_step is 'IT_PROVISIONED': Ask for the hardware tracking ID (e.g. HW-12345) to check laptop shipping status. Once provided, invoke 'check_hardware_delivery'.
 5. If current_step is 'HARDWARE_DELIVERED': Invoke the 'send_day_one_schedule' tool using the new hire's corporate email.

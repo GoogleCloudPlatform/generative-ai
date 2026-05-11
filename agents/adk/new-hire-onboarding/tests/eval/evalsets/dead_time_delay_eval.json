@@ -1,10 +1,10 @@
 {
-  "eval_set_id": "dead_time_delay_eval",
-  "name": "HR Onboarding Dead-Time & Delay Evaluation Set",
-  "description": "Validates durable state machine robustness, dead-time state gates, and correct hydration of original new hire context after long delays.",
+  "eval_set_id": "idle_time_delay_eval",
+  "name": "HR Onboarding Idle-Time & Delay Evaluation Set",
+  "description": "Validates durable state machine robustness, idle-time state gates, and correct hydration of original new hire context after long delays.",
   "eval_cases": [
     {
-      "eval_id": "dead_time_pause_safety_gate",
+      "eval_id": "idle_time_pause_safety_gate",
       "conversation": [
         {
           "invocation_id": "inv_1",
