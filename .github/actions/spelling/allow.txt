@@ -47,6 +47,7 @@ alloydb
 Alok
 ALPHAFOLD
 AMNOSH
+ambiently
 amurensis
 Anant
 antiword
@@ -127,6 +128,7 @@ beir
 Benno
 bert
 Bettes
+bennett
 betulus
 Beyonce
 bff
@@ -451,6 +453,10 @@ Eventarc
 EVs
 evse
 evt
+Evalset
+evalset
+Evalsets
+evalsets
 expl
 faa
 facecolor
@@ -757,6 +763,7 @@ javac
 JAVACMD
 Jax
 JDK
+jdoe
 Jedi
 Jeeg
 jegadesh
@@ -1374,6 +1381,7 @@ selftext
 selkirk
 seo
 SEO
+SEMCONV
 serde
 serper
 SERPER
@@ -1551,6 +1559,7 @@ Tongsheng
 toolcall
 toolsets
 toolu
+topbar
 Topolino
 toself
 toset

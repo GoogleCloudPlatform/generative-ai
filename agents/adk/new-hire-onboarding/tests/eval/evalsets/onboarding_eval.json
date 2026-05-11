@@ -1,0 +1,240 @@
+{
+  "eval_set_id": "onboarding_eval",
+  "name": "HR New Hire Onboarding Evaluation Set",
+  "description": "Validates checkpoint state transitions, tool executions, and grounding in the HR onboarding agent.",
+  "eval_cases": [
+    {
+      "eval_id": "step_1_start_welcome",
+      "conversation": [
+        {
+          "invocation_id": "inv_1",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Start onboarding for Jane Doe, email: jane@example.com, starting on 2026-06-01."
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "Welcome packet sent to Jane Doe (jane@example.com). Documents pending signature."
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "send_welcome_packet",
+                "args": {
+                  "name": "Jane Doe",
+                  "email": "jane@example.com",
+                  "start_date": "2026-06-01"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {
+          "current_step": "START",
+          "new_hire_details": {},
+          "pending_signals": []
+        }
+      }
+    },
+    {
+      "eval_id": "step_2_wait_for_signature",
+      "conversation": [
+        {
+          "invocation_id": "inv_2",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Can we provision IT accounts now?"
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "waiting for the employee to sign"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {
+          "current_step": "WELCOME_SENT",
+          "new_hire_details": {
+            "name": "Jane Doe",
+            "email": "jane@example.com",
+            "start_date": "2026-06-01"
+          },
+          "pending_signals": [
+            "document_signed"
+          ]
+        }
+      }
+    },
+    {
+      "eval_id": "step_3_provision_it",
+      "conversation": [
+        {
+          "invocation_id": "inv_3",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Documents are signed. Please provision corporate accounts for username jdoe."
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "corporate email jdoe@example.com has been provisioned"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "transfer_to_agent",
+                "args": {
+                  "agent_name": "it_agent"
+                }
+              },
+              {
+                "name": "provision_software_accounts",
+                "args": {
+                  "username": "jdoe"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {
+          "current_step": "DOCUMENTS_SIGNED",
+          "new_hire_details": {
+            "name": "Jane Doe",
+            "email": "jane@example.com",
+            "start_date": "2026-06-01"
+          },
+          "pending_signals": []
+        }
+      }
+    },
+    {
+      "eval_id": "step_4_check_hardware",
+      "conversation": [
+        {
+          "invocation_id": "inv_4",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Let's check the delivery status of our new hardware with tracking ID HW-55443."
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "delivered"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "check_hardware_delivery",
+                "args": {
+                  "tracking_id": "HW-55443"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {
+          "current_step": "IT_PROVISIONED",
+          "new_hire_details": {
+            "name": "Jane Doe",
+            "email": "jane@example.com",
+            "start_date": "2026-06-01",
+            "corporate_email": "jdoe@example.com"
+          },
+          "pending_signals": [
+            "hardware_delivered"
+          ]
+        }
+      }
+    },
+    {
+      "eval_id": "step_5_finalize_schedule",
+      "conversation": [
+        {
+          "invocation_id": "inv_5",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Hardware is confirmed. Send out the first-day itinerary schedule."
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "Day One schedule sent"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "send_day_one_schedule",
+                "args": {
+                  "email": "jdoe@example.com"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {
+          "current_step": "HARDWARE_DELIVERED",
+          "new_hire_details": {
+            "name": "Jane Doe",
+            "email": "jane@example.com",
+            "start_date": "2026-06-01",
+            "corporate_email": "jdoe@example.com"
+          },
+          "pending_signals": []
+        }
+      }
+    }
+  ]
+}
