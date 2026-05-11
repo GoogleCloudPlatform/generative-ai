@@ -94,9 +94,9 @@ To transition from building stateless chatbots to reliable background agents, th
 
 ---
 
-### 🔄 Onboarding State Machine & Dead Time Pause Gates
+### 🔄 Onboarding State Machine & Idle Time Pause Gates
 
-This coordinator does not run in a single thread or block execution. It employs **durable dormancy gates** during long periods of **"Dead Time"**—specifically when waiting for signatures or shipping delivery carrier callbacks.
+This coordinator does not run in a single thread or block execution. It employs **durable dormancy gates** during long periods of **"Idle Time"**—specifically when waiting for signatures or shipping delivery carrier callbacks.
 
 ```mermaid
 stateDiagram-v2
@@ -105,7 +105,7 @@ stateDiagram-v2
 
     state "WELCOME_SENT" as WELCOME_SENT
     note right of WELCOME_SENT
-        ⏳ DEAD TIME PAUSE (Days)
+        ⏳ IDLE TIME PAUSE (Days)
         Waiting for local signature webhook callback.
         Container scales down; state persisted.
     end note
@@ -115,7 +115,7 @@ stateDiagram-v2
 
     state "IT_PROVISIONED" as IT_PROVISIONED
     note right of IT_PROVISIONED
-        ⏳ DEAD TIME PAUSE (Days)
+        ⏳ IDLE TIME PAUSE (Days)
         Waiting for carrier package delivery webhook.
         Container scales down; state persisted.
     end note
@@ -216,11 +216,11 @@ The agent's state machine transitions are validated using formal golden evaluati
 
 - **Evaluation Set Config:** [eval_config.json](tests/eval/eval_config.json)
 - **Golden Standard Cases:** [onboarding_eval.json](tests/eval/evalsets/onboarding_eval.json)
-- **Golden Dead-Time Delay Cases:** [dead_time_delay_eval.json](tests/eval/evalsets/dead_time_delay_eval.json)
+- **Golden Idle-Time Delay Cases:** [idle_time_delay_eval.json](tests/eval/evalsets/idle_time_delay_eval.json)
 
 Run evaluation metrics locally (using the direct virtualenv runner to avoid credential/conflict overrides):
 ```bash
-.venv/bin/adk eval ./app tests/eval/evalsets/dead_time_delay_eval.json --config_file_path tests/eval/eval_config.json
+.venv/bin/adk eval ./app tests/eval/evalsets/idle_time_delay_eval.json --config_file_path tests/eval/eval_config.json
 ```
 
 ---
