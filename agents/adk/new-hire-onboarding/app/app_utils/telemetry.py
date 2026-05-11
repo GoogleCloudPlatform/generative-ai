@@ -17,7 +17,7 @@ import os
 
 
 def setup_telemetry() -> str | None:
-    """Configure OpenTelemetry and GenAI telemetry with GCS upload."""
+    """Configure OpenTelemetry and Gen AI telemetry with GCS upload."""
     os.environ.setdefault("GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY", "true")
 
     bucket = os.environ.get("LOGS_BUCKET_NAME")

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 export type Artifact = {
   id: string;
   title: string;
@@ -44,10 +50,10 @@ export type LiveCase = {
 
 export type CaseResponse =
   | {
-      active: true;
-      case: LiveCase;
-    }
+    active: true;
+    case: LiveCase;
+  }
   | {
-      active: false;
-      message: string;
-    };
+    active: false;
+    message: string;
+  };

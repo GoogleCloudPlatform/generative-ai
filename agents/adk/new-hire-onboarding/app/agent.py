@@ -32,7 +32,7 @@ from app.tools import (
 _, project_id = google.auth.default()
 os.environ["GOOGLE_CLOUD_PROJECT"] = project_id
 os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
-os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "True"
+os.environ["GOOGLE_GENAI_USE_ENTERPRISE"] = "True"
 
 
 async def initialize_onboarding_state(callback_context: CallbackContext) -> None:

@@ -102,24 +102,24 @@ This coordinator does not run in a single thread or block execution. It employs 
 stateDiagram-v2
     [*] --> START : Initialize details
     START --> WELCOME_SENT : send_welcome_packet()
-    
+
     state "WELCOME_SENT" as WELCOME_SENT
     note right of WELCOME_SENT
         ⏳ DEAD TIME PAUSE (Days)
         Waiting for local signature webhook callback.
         Container scales down; state persisted.
     end note
-    
+
     WELCOME_SENT --> DOCUMENTS_SIGNED : Webhook Resume Callback
     DOCUMENTS_SIGNED --> IT_PROVISIONED : provision_software_accounts()
-    
+
     state "IT_PROVISIONED" as IT_PROVISIONED
     note right of IT_PROVISIONED
         ⏳ DEAD TIME PAUSE (Days)
         Waiting for carrier package delivery webhook.
         Container scales down; state persisted.
     end note
-    
+
     IT_PROVISIONED --> HARDWARE_DELIVERED : Webhook Resume Callback
     HARDWARE_DELIVERED --> COMPLETED : send_day_one_schedule()
     COMPLETED --> [*] : Onboarding Completed
@@ -140,7 +140,7 @@ new-hire-onboarding/
 │   ├── resume_handler.py                     # Callback webhooks to transition states (signatures, delivery)
 │   ├── live_onboarding.py                    # Live demo case state, local artifact generation, and API helpers
 │   ├── fast_api_app.py                       # FastAPI server exposing agent and custom endpoints
-│   ├── agent_runtime_app.py                  # Dedicated Reasoning Engine App wrapper for GCP Agent Runtime
+│   ├── agent_runtime_app.py                  # Dedicated Reasoning Engine App wrapper for Agent Runtime
 │   ├── static/live-onboarding/               # Built React app served by FastAPI
 │   └── app_utils/                            # Shared utilities (telemetry, feedback typing)
 ├── frontend/live-onboarding/                 # React + Vite source for the live onboarding UI
@@ -191,7 +191,7 @@ Ensure you have the following installed:
   ```bash
   uv tool install google-agents-cli
   ```
-- **Google Cloud SDK**: Authenticated to GCP — [Install Gcloud](https://cloud.google.com/sdk/docs/install)
+- **Google Cloud SDK**: Authenticated to Google Cloud — [Install Gcloud](https://cloud.google.com/sdk/docs/install)
 
 ---
 
@@ -227,12 +227,12 @@ Run evaluation metrics locally (using the direct virtualenv runner to avoid cred
 
 ## ☁️ Infrastructure & Deployment
 
-1.  **Setup GCP Project Config:**
+1.  **Setup Google Cloud Project Config:**
     ```bash
     gcloud config set project <your-project-id>
     ```
 2.  **Deploy to Agent Runtime:**
-    This project's deployment target is scaffolded and pre-configured for **GCP Agent Runtime** (Agent Engines):
+    This project's deployment target is scaffolded and pre-configured for **Agent Runtime** (Agent Engines):
     ```bash
     agents-cli deploy
     ```

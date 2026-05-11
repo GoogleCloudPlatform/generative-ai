@@ -190,7 +190,7 @@ When evaluations are green, elevate your project target to **Gemini Enterprise A
 > "We are ready to deploy. Use `agents-cli scaffold enhance` to target Gemini Enterprise Agent Runtime (Agent Engine). Scaffold the Reasoning Engine app wrapper, and ensure Cloud Trace integration is wired up so we can monitor our pause-and-resume latencies in production."
 
 This command:
-- Prepares the project to run on GCP serverless reasoning engines.
+- Prepares the project to run on Google Cloud Agent Runtime.
 - Natively handles session persistence directly in the cloud.
 - Enables **Cloud Trace** out-of-the-box by default.
 
