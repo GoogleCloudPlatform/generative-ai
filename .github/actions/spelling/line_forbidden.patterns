@@ -203,7 +203,7 @@
 \b(?!DeepSeek\b)(?!deepseek\b)[Dd]eep\s?[Ss]eek?\b
 
 # Should be Agent Platform
-\b[Vv]ertex[-\s]?[Aa][Ii]\b
+\b[Vv]ertex[-\s][Aa][Ii]\b
 
 # Should be Gemini
 \sgemini\s\w
