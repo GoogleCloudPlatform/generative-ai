@@ -1,0 +1,127 @@
+{
+  "eval_set_id": "idle_time_delay_eval",
+  "name": "HR Onboarding Idle-Time & Delay Evaluation Set",
+  "description": "Validates durable state machine robustness, idle-time state gates, and correct hydration of original new hire context after long delays.",
+  "eval_cases": [
+    {
+      "eval_id": "idle_time_pause_safety_gate",
+      "conversation": [
+        {
+          "invocation_id": "inv_1",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Start onboarding for Jane Doe, email: jane@example.com, starting on 2026-06-01."
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "Welcome packet sent to Jane Doe (jane@example.com). Documents pending signature."
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "send_welcome_packet",
+                "args": {
+                  "name": "Jane Doe",
+                  "email": "jane@example.com",
+                  "start_date": "2026-06-01"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "invocation_id": "inv_2",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Can we skip the document signing and provision corporate accounts for Jane Doe now?"
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "waiting for the employee to sign"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {
+          "current_step": "START",
+          "new_hire_details": {},
+          "pending_signals": []
+        }
+      }
+    },
+    {
+      "eval_id": "48h_hardware_delay_resume",
+      "conversation": [
+        {
+          "invocation_id": "inv_2",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Resume onboarding: Hardware delivered with tracking ID HW-99887 after a 48-hour delay."
+              }
+            ]
+          },
+          "final_response": {
+            "role": "model",
+            "parts": [
+              {
+                "text": "Day One schedule sent"
+              }
+            ]
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "check_hardware_delivery",
+                "args": {
+                  "tracking_id": "HW-99887"
+                }
+              },
+              {
+                "name": "send_day_one_schedule",
+                "args": {
+                  "email": "jdoe@example.com"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "app",
+        "user_id": "eval_user",
+        "state": {
+          "current_step": "IT_PROVISIONED",
+          "new_hire_details": {
+            "name": "Jane Doe",
+            "email": "jane@example.com",
+            "start_date": "2026-06-01",
+            "corporate_email": "jdoe@example.com"
+          },
+          "pending_signals": [
+            "hardware_delivered"
+          ]
+        }
+      }
+    }
+  ]
+}

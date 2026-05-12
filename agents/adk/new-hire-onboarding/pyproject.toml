@@ -1,0 +1,112 @@
+[project]
+name = "new-hire-onboarding"
+version = "0.1.0"
+description = "Long Running AI Agent Team for New Hire Onboarding"
+dependencies = [
+    "google-adk>=1.15.0,<2.0.0",
+    "opentelemetry-instrumentation-google-genai>=0.1.0,<1.0.0",
+    "gcsfs>=2024.11.0",
+    "google-cloud-logging>=3.12.0,<4.0.0",
+    "google-cloud-aiplatform[agent-engines,evaluation]>=1.130.0",
+    "protobuf>=6.31.1,<7.0.0",
+    "greenlet>=3.0.0,<4.0.0",
+]
+requires-python = ">=3.11,<3.14"
+
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4,<9.0.0",
+    "pytest-asyncio>=0.23.8,<1.0.0",
+    "nest-asyncio>=1.6.0,<2.0.0",
+]
+
+[project.optional-dependencies]
+eval = [
+    "google-adk[eval]>=1.15.0,<2.0.0",
+]
+lint = [
+    "ruff>=0.4.6,<1.0.0",
+    "ty>=0.0.1a0",
+    "codespell>=2.2.0,<3.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "C",  # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP", # pyupgrade
+    "RUF", # ruff specific rules
+]
+ignore = ["E501", "C901", "B006"] # ignore line too long, too complex
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "frontend"]
+
+[tool.ty]
+# ty is Astral's Rust-based type checker (same team as ruff/uv)
+# See: https://docs.astral.sh/ty/
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.ty.src]
+exclude = [".venv/**"]
+
+[tool.ty.rules]
+# Ignore common issues with third-party libraries and dynamic code patterns
+unresolved-import = "ignore"
+unresolved-attribute = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+possibly-missing-attribute = "ignore"
+not-subscriptable = "ignore"
+deprecated = "ignore"
+
+[tool.codespell]
+ignore-words-list = "rouge"
+skip = "./locust_env/*,uv.lock,.venv,./frontend,**/package-lock.json"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.pytest.ini_options]
+pythonpath = "."
+asyncio_default_fixture_loop_scope = "function"
+[tool.hatch.build.targets.wheel]
+packages = ["app","frontend"]
+
+[tool.uv]
+environments = ["sys_platform == 'darwin'"]
+
+[tool.agents-cli]
+# Generation metadata - enables CLI commands to understand project context
+# These fields allow any generated project to work as a remote template
+name = "new-hire-onboarding"
+description = "Long Running AI Agent Team for New Hire Onboarding"
+base_template = "adk"
+agent_directory = "app"
+
+# Generation context
+generated_at = "2026-05-05T13:53:50.489860+00:00"
+acli_version = "0.1.2"
+
+[tool.agents-cli.create_params]
+# Parameters used during project creation
+deployment_target = "agent_runtime"
+cicd_runner = "skip"
+include_data_ingestion = false
+
+datastore = "none"

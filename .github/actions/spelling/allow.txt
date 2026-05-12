@@ -46,6 +46,7 @@ alisal
 alloydb
 Alok
 ALPHAFOLD
+ambiently
 AMNOSH
 amurensis
 Anant
@@ -124,6 +125,7 @@ bayes
 bbc
 bbq
 beir
+bennett
 Benno
 bert
 Bettes
@@ -446,6 +448,10 @@ euchlora
 eula
 eur
 evals
+evalset
+Evalset
+evalsets
+Evalsets
 eventarc
 Eventarc
 EVs
@@ -757,6 +763,7 @@ javac
 JAVACMD
 Jax
 JDK
+jdoe
 Jedi
 Jeeg
 jegadesh
@@ -1372,6 +1379,7 @@ selectbox
 selfie
 selftext
 selkirk
+SEMCONV
 seo
 SEO
 serde
@@ -1551,6 +1559,7 @@ Tongsheng
 toolcall
 toolsets
 toolu
+topbar
 Topolino
 toself
 toset
