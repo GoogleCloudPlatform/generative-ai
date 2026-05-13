@@ -126,20 +126,25 @@ and Vertex AI/Agent Platform) as of 2026. Do not use legacy libraries and SDKs.
 -   By default, use the following models when using `google-genai`:
     -   **General Text & Multimodal Tasks:** `gemini-3-flash-preview`
     -   **Coding and Complex Reasoning Tasks:** `gemini-3.1-pro-preview`
-    -   **Low Latency & High Volume Tasks:** `gemini-2.5-flash-lite`
-    -   **Fast Image Generation and Editing:** `gemini-2.5-flash-image` (aka Nano Banana)
+    -   **Low Latency & High Volume Tasks:** `gemini-3.1-flash-lite`
+    -   **Fast Image Generation and Editing:** `gemini-3.1-flash-image-preview` (aka Nano Banana 2)
     -   **High-Quality Image Generation and Editing:** `gemini-3-pro-image-preview` (aka Nano Banana Pro)
-    -   **High-Fidelity Video Generation:** `veo-3.0-generate-001` or `veo-3.1-generate-preview`
-    -   **Fast Video Generation:** `veo-3.0-fast-generate-001` or `veo-3.1-fast-generate-preview`
-    -   **Advanced Video Editing Tasks:** `veo-3.1-generate-preview`
+    -   **High-Fidelity Video Generation:**  or `veo-3.1-generate-001`
+    -   **Advanced Video Editing Tasks:** `veo-3.1-generate-001`
+    -   **Video Generation, Balance of speed and quality:**  `veo-3.1-fast-generate-001`
+    -   **Fast Video Generation:** `veo-3.1-lite-generate-001`
 
 -   It is also acceptable to use following models if explicitly requested by the
     user:
-    -   **Gemini 2.0 Series**: `gemini-2.0-flash`, `gemini-2.0-flash-lite`
-    -   **Gemini 2.5 Series**: `gemini-2.5-flash`, `gemini-2.5-pro`
+    -   **Gemini 2.5 Series**: `gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.5-flash-lite`
+    -   **Nano Banana:** `gemini-2.5-flash-image`
 
 -   Do not use the following deprecated models (or their variants like
     `gemini-1.5-flash-latest`):
-    -   **Prohibited:** `gemini-1.5-flash`
-    -   **Prohibited:** `gemini-1.5-pro`
+    -   **Gemini 3 Pro**: `gemini-3-pro-preview` (Replaced by `gemini-3.1-pro-preview`)
+    -   **Gemini 2.0 Series**: `gemini-2.0-flash`, `gemini-2.0-flash-lite`
+    -   **Gemini 1.5 Series**: `gemini-1.5-flash`, `gemini-1.5-pro`
     -   **Prohibited:** `gemini-pro`
+    -   **Veo 3:** `veo-3.0-generate-001`, `veo-3.0-fast-generate-001`
+    -   **Veo 2:** `veo-2.0-generate-001`
+    -   **Imagen:** `imagegeneration@00*`, `imagetext@001` `imagen-3.0-*`, `imagen-4.0-*`
