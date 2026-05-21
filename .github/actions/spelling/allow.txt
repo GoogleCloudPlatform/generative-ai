@@ -1535,8 +1535,6 @@ TGI
 tgz
 Thallam
 thelook
-Thér
-thér
 THH
 THHH
 thi
