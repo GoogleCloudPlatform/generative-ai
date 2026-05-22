@@ -230,3 +230,10 @@ The script will automatically:
 3. Build and tag the application image securely on Google Cloud Build.
 4. Deploy the image to a managed Google Cloud Run service, setting the necessary environment variables (`GOOGLE_API_KEY`, `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`).
 
+---
+
+## 5. Authors
+
+- **Kishore Jagannath (kishorerj)**
+
+

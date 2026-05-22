@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
@@ -10,7 +9,7 @@ os.environ["LIVEKIT_API_SECRET"] = "test-secret"
 os.environ["DEMO_AGENT_MODEL"] = "gemini-2.0-flash-exp"
 
 # Import FastAPI app after setting environment variables
-from app.main import app, session_service, APP_NAME, SessionResumptionIsolationPlugin
+from app.main import app, session_service
 from travel_booking.agent import root_agent, flight_booking_agent, hotel_booking_agent
 
 

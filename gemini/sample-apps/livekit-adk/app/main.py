@@ -1,8 +1,6 @@
 """FastAPI application demonstrating ADK Gemini Live API Toolkit with WebSocket."""
 
 import asyncio
-import base64
-import json
 import logging
 import warnings
 import os
@@ -14,12 +12,10 @@ load_dotenv(Path(__file__).parent / ".env")
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from google.adk.agents.live_request_queue import LiveRequestQueue
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.plugins.base_plugin import BasePlugin
-from google.genai import types
 from livekit_bridge import LiveKitSessionManager, LiveKitGeminiBridge
 
 USE_DATABASE_SESSION = os.getenv("USE_DATABASE_SESSION", "false").lower() == "true"
