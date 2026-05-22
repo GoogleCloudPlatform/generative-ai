@@ -31,13 +31,13 @@ class RuntimeSettings(pydantic_settings.BaseSettings):
 
     # sane default values, only configure as needed
     region: str = "us-central1"
-    chat_model_name: str = "gemini-3-flash-preview"
-    function_calling_model_name: str = "gemini-3-flash-preview"
-    router_model_name: str = "gemini-3-flash-preview"
-    guardrail_model_name: str = "gemini-3-flash-preview"
-    planner_model_name: str = "gemini-3-flash-preview"
-    executor_model_name: str = "gemini-3-flash-preview"
-    reflector_model_name: str = "gemini-3-flash-preview"
+    chat_model_name: str = "gemini-3.5-flash"
+    function_calling_model_name: str = "gemini-3.5-flash"
+    router_model_name: str = "gemini-3.5-flash"
+    guardrail_model_name: str = "gemini-3.5-flash"
+    planner_model_name: str = "gemini-3.5-flash"
+    executor_model_name: str = "gemini-3.5-flash"
+    reflector_model_name: str = "gemini-3.5-flash"
     max_router_turn_history: int = 3
 
     model_config = pydantic_settings.SettingsConfigDict(
