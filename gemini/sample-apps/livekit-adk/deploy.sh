@@ -77,27 +77,52 @@ fi
 echo -e "${YELLOW}Compiling and uploading container using Google Cloud Build...${NC}"
 gcloud builds submit --tag "$IMAGE_URI" .
 
-# 7. Prompt for API secrets / credentials
-echo -e "\n${YELLOW}LiveKit & Google Gemini Key Configuration:${NC}"
-echo -e "To operate, your deployed Cloud Run agent requires external keys."
-echo -e "Please choose one of the options below:"
-echo -e " 1) Pass variables directly (e.g. as plain text values in Cloud Run)"
-echo -e " 2) Setup later (deploy with dummy environment variable placeholders)"
-read -p "Select option (1/2) [default: 1]: " CONFIG_OPTION
-CONFIG_OPTION=${CONFIG_OPTION:-1}
+# 7. Load and Prompt for environment variables from app/.env
+echo -e "\n${YELLOW}Configuration & Environment Setup:${NC}"
+echo -e "Loading default values from 'app/.env' if available..."
 
-ENV_VARS=""
-if [ "$CONFIG_OPTION" = "1" ]; then
-    read -p "Enter GOOGLE_API_KEY: " GOOGLE_API_KEY
-    read -p "Enter LIVEKIT_URL [e.g., wss://<host>]: " LK_URL
-    read -p "Enter LIVEKIT_API_KEY: " LK_KEY
-    read -p "Enter LIVEKIT_API_SECRET: " LK_SECRET
+# Initialize variables with defaults
+GOOGLE_GENAI_USE_VERTEXAI="TRUE"
+GOOGLE_CLOUD_PROJECT="$GCP_PROJECT"
+GOOGLE_CLOUD_LOCATION="us-central1"
+DEMO_AGENT_MODEL="gemini-2.0-flash-exp"
+LIVEKIT_URL=""
+LIVEKIT_API_KEY=""
+LIVEKIT_API_SECRET=""
 
-    ENV_VARS="GOOGLE_API_KEY=${GOOGLE_API_KEY},GEMINI_API_KEY=${GOOGLE_API_KEY},USE_LIVEKIT=true,LIVEKIT_URL=${LK_URL},LIVEKIT_API_KEY=${LK_KEY},LIVEKIT_API_SECRET=${LK_SECRET}"
-else
-    echo -e "${YELLOW}Deploying with dummy placeholders. You must update them in Cloud Run Console later.${NC}"
-    ENV_VARS="GOOGLE_API_KEY=PLACEHOLDER,USE_LIVEKIT=true,LIVEKIT_URL=PLACEHOLDER,LIVEKIT_API_KEY=PLACEHOLDER,LIVEKIT_API_SECRET=PLACEHOLDER"
+ENV_FILE="app/.env"
+if [ -f "$ENV_FILE" ]; then
+    echo -e "${GREEN}Found existing environment configuration in ${ENV_FILE}.${NC}"
+    # Extract values safely from the .env file
+    GOOGLE_GENAI_USE_VERTEXAI=$(grep -E "^GOOGLE_GENAI_USE_VERTEXAI=" "$ENV_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" || echo "TRUE")
+    GOOGLE_CLOUD_PROJECT_ENV=$(grep -E "^GOOGLE_CLOUD_PROJECT=" "$ENV_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" || echo "")
+    GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT_ENV:-$GOOGLE_CLOUD_PROJECT}
+    GOOGLE_CLOUD_LOCATION=$(grep -E "^GOOGLE_CLOUD_LOCATION=" "$ENV_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" || echo "us-central1")
+    DEMO_AGENT_MODEL=$(grep -E "^DEMO_AGENT_MODEL=" "$ENV_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" || echo "gemini-2.0-flash-exp")
+    LIVEKIT_URL=$(grep -E "^LIVEKIT_URL=" "$ENV_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" || echo "")
+    LIVEKIT_API_KEY=$(grep -E "^LIVEKIT_API_KEY=" "$ENV_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" || echo "")
+    LIVEKIT_API_SECRET=$(grep -E "^LIVEKIT_API_SECRET=" "$ENV_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d "'" || echo "")
 fi
+
+read -p "Enter GOOGLE_CLOUD_PROJECT [default: ${GOOGLE_CLOUD_PROJECT}]: " INPUT_PROJECT
+GOOGLE_CLOUD_PROJECT=${INPUT_PROJECT:-$GOOGLE_CLOUD_PROJECT}
+
+read -p "Enter GOOGLE_CLOUD_LOCATION [default: ${GOOGLE_CLOUD_LOCATION}]: " INPUT_LOCATION
+GOOGLE_CLOUD_LOCATION=${INPUT_LOCATION:-$GOOGLE_CLOUD_LOCATION}
+
+read -p "Enter DEMO_AGENT_MODEL [default: ${DEMO_AGENT_MODEL}]: " INPUT_MODEL
+DEMO_AGENT_MODEL=${INPUT_MODEL:-$DEMO_AGENT_MODEL}
+
+read -p "Enter LIVEKIT_URL [e.g. ws://<ip>:7880] [default: ${LIVEKIT_URL}]: " INPUT_LK_URL
+LIVEKIT_URL=${INPUT_LK_URL:-$LIVEKIT_URL}
+
+read -p "Enter LIVEKIT_API_KEY [default: ${LIVEKIT_API_KEY}]: " INPUT_LK_KEY
+LIVEKIT_API_KEY=${INPUT_LK_KEY:-$LIVEKIT_API_KEY}
+
+read -p "Enter LIVEKIT_API_SECRET [default: ${LIVEKIT_API_SECRET}]: " INPUT_LK_SECRET
+LIVEKIT_API_SECRET=${INPUT_LK_SECRET:-$LIVEKIT_API_SECRET}
+
+ENV_VARS="GOOGLE_GENAI_USE_VERTEXAI=${GOOGLE_GENAI_USE_VERTEXAI},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION},DEMO_AGENT_MODEL=${DEMO_AGENT_MODEL},LIVEKIT_URL=${LIVEKIT_URL},LIVEKIT_API_KEY=${LIVEKIT_API_KEY},LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}"
 
 # 8. Deploy to Cloud Run
 echo -e "${YELLOW}Deploying container image to Google Cloud Run...${NC}"

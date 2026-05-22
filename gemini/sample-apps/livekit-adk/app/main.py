@@ -22,7 +22,6 @@ from google.adk.plugins.base_plugin import BasePlugin
 from google.genai import types
 from livekit_bridge import LiveKitSessionManager, LiveKitGeminiBridge
 
-USE_LIVEKIT = os.getenv("USE_LIVEKIT", "false").lower() == "true"
 USE_DATABASE_SESSION = os.getenv("USE_DATABASE_SESSION", "false").lower() == "true"
 
 # Import agent after loading environment variables
@@ -145,16 +144,14 @@ async def start_livekit_bridge_task(user_id: str, session_id: str):
 
 @app.get("/")
 async def root():
-    """Serve the index.html page."""
-    return FileResponse(Path(__file__).parent / "static" / "index.html")
+    """Serve the livekit.html page."""
+    return FileResponse(Path(__file__).parent / "static" / "livekit.html")
+
 
 
 @app.get("/token")
 async def get_token(user_id: str, session_id: str):
     """Generate LiveKit token for client."""
-    if not USE_LIVEKIT:
-        return {"error": "LiveKit is not enabled"}
-
     try:
         from livekit import api
     except ImportError:
