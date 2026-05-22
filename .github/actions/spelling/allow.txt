@@ -795,11 +795,13 @@ Kaelen
 kaggle
 Kalai
 Kalamang
+kamada
 Kamradt
 Kanagawa
 Katsura
 Kaufmanns
 Kawagoe
+kawai
 kde
 Keanu
 kendall
@@ -1533,7 +1535,6 @@ TGI
 tgz
 Thallam
 thelook
-thér
 THH
 THHH
 thi
