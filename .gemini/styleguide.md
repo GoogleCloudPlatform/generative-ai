@@ -124,7 +124,7 @@ and Vertex AI/Agent Platform) as of 2026. Do not use legacy libraries and SDKs.
 ## Models
 
 -   By default, use the following models when using `google-genai`:
-    -   **General Text & Multimodal Tasks:** `gemini-3-flash-preview`
+    -   **General Text & Multimodal Tasks:** `gemini-3.5-flash`
     -   **Coding and Complex Reasoning Tasks:** `gemini-3.1-pro-preview`
     -   **Low Latency & High Volume Tasks:** `gemini-3.1-flash-lite`
     -   **Fast Image Generation and Editing:** `gemini-3.1-flash-image-preview` (aka Nano Banana 2)
@@ -136,6 +136,7 @@ and Vertex AI/Agent Platform) as of 2026. Do not use legacy libraries and SDKs.
 
 -   It is also acceptable to use following models if explicitly requested by the
     user:
+    -   **Gemini 3 Flash Preview**: `gemini-3-flash-preview`
     -   **Gemini 2.5 Series**: `gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.5-flash-lite`
     -   **Nano Banana:** `gemini-2.5-flash-image`
 

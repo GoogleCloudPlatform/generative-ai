@@ -21,13 +21,13 @@ from google.genai.types import (
     ComputerUse,
     Content,
     Environment,
+    FinishReason,
     FunctionResponse,
     FunctionResponseBlob,
     GenerateContentConfig,
     Part,
     ThinkingConfig,
     Tool,
-    FinishReason,
 )
 from playwright.async_api import Page, async_playwright
 
@@ -37,7 +37,7 @@ logging.getLogger("google_genai._common").setLevel(logging.ERROR)
 # Load configuration from environment variables for best practice.
 PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.environ.get("GOOGLE_LOCATION", "global")
-MODEL_ID = os.environ.get("MODEL_ID", "gemini-3-flash-preview")
+MODEL_ID = os.environ.get("MODEL_ID", "gemini-3.5-flash")
 
 
 # --- HELPER FUNCTIONS  ---
@@ -204,7 +204,7 @@ async def agent_loop(initial_prompt: str, max_turns: int = 20) -> None:
 
                 if response.candidates[0].finish_reason == FinishReason.SAFETY:
                     print(
-                        f"🛑 SAFETY TRIGGERED: The model halted execution due to safety policies."
+                        "🛑 SAFETY TRIGGERED: The model halted execution due to safety policies."
                     )
                     print(f"Details: {response.candidates[0].safety_ratings}")
                     break

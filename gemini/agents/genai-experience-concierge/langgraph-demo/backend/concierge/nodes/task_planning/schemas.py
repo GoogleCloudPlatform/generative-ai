@@ -85,6 +85,6 @@ class TaskPlannerConfig(pydantic.BaseModel):
 
     project: str
     region: str = "us-central1"
-    planner_model_name: str = "gemini-3-flash-preview"
-    executor_model_name: str = "gemini-3-flash-preview"
-    reflector_model_name: str = "gemini-3-flash-preview"
+    planner_model_name: str = "gemini-3.5-flash"
+    executor_model_name: str = "gemini-3.5-flash"
+    reflector_model_name: str = "gemini-3.5-flash"
