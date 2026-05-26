@@ -27,6 +27,13 @@ UV_RUN="uv run --with autoflake --with ruff --with nbqa --with nbformat>=5.10.4 
 
 # Sorting and de-duplicating spelling allow file
 SPELLING_ALLOW_FILE=".github/actions/spelling/allow.txt"
+SPELLING_EXPECT_FILE=".github/actions/spelling/expect.txt"
+if [ -f "$SPELLING_EXPECT_FILE" ]; then
+    echo "Combining $SPELLING_EXPECT_FILE into $SPELLING_ALLOW_FILE"
+    cat "$SPELLING_EXPECT_FILE" >> "$SPELLING_ALLOW_FILE"
+    rm "$SPELLING_EXPECT_FILE"
+fi
+
 if [ -f "$SPELLING_ALLOW_FILE" ]; then
     echo "Sorting and de-duplicating $SPELLING_ALLOW_FILE"
     sort -u "$SPELLING_ALLOW_FILE" -o "$SPELLING_ALLOW_FILE"
