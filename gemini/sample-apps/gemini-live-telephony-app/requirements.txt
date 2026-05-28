@@ -1,7 +1,7 @@
 fastapi==0.111.0
 uvicorn[standard]==0.30.1
 gunicorn==23.0.0
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 google-genai==1.28.0
 twilio==9.8.6
 websockets==15.0.1
