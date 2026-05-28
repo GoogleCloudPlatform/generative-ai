@@ -74,7 +74,7 @@ if not DEFAULT_PROJECT_ID:
         pass
 
 VEO_MODEL_ID = "veo-3.1-generate-001"
-GEMINI_IMAGE_MODEL = "gemini-3-pro-image-preview"
+GEMINI_IMAGE_MODEL = "gemini-3-pro-image"
 GEMINI_LIVE_MODEL = "gemini-live-2.5-flash-native-audio"
 
 IMAGE_ASPECT_RATIOS = [
