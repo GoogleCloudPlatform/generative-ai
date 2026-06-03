@@ -124,11 +124,11 @@ and Vertex AI/Agent Platform) as of 2026. Do not use legacy libraries and SDKs.
 ## Models
 
 -   By default, use the following models when using `google-genai`:
-    -   **General Text & Multimodal Tasks:** `gemini-3-flash-preview`
+    -   **General Text & Multimodal Tasks:** `gemini-3.5-flash`
     -   **Coding and Complex Reasoning Tasks:** `gemini-3.1-pro-preview`
     -   **Low Latency & High Volume Tasks:** `gemini-3.1-flash-lite`
-    -   **Fast Image Generation and Editing:** `gemini-3.1-flash-image-preview` (aka Nano Banana 2)
-    -   **High-Quality Image Generation and Editing:** `gemini-3-pro-image-preview` (aka Nano Banana Pro)
+    -   **Fast Image Generation and Editing:** `gemini-3.1-flash-image` (aka Nano Banana 2)
+    -   **High-Quality Image Generation and Editing:** `gemini-3-pro-image` (aka Nano Banana Pro)
     -   **High-Fidelity Video Generation:**  or `veo-3.1-generate-001`
     -   **Advanced Video Editing Tasks:** `veo-3.1-generate-001`
     -   **Video Generation, Balance of speed and quality:**  `veo-3.1-fast-generate-001`
@@ -141,7 +141,10 @@ and Vertex AI/Agent Platform) as of 2026. Do not use legacy libraries and SDKs.
 
 -   Do not use the following deprecated models (or their variants like
     `gemini-1.5-flash-latest`):
-    -   **Gemini 3 Pro**: `gemini-3-pro-preview` (Replaced by `gemini-3.1-pro-preview`)
+    -   **Gemini 3 Pro Preview**: `gemini-3-pro-preview` (Replaced by `gemini-3.1-pro-preview`)
+    -   **Gemini 3 Flash Preview**: `gemini-3-flash-preview`
+    -   **Gemini 3.1 Flash Image Preview**: `gemini-3.1-flash-image-preview`
+    -   **Gemini 3 Pro Image Preview**: `gemini-3-pro-image-preview`
     -   **Gemini 2.0 Series**: `gemini-2.0-flash`, `gemini-2.0-flash-lite`
     -   **Gemini 1.5 Series**: `gemini-1.5-flash`, `gemini-1.5-pro`
     -   **Prohibited:** `gemini-pro`

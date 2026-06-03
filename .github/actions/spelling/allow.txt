@@ -784,6 +784,7 @@ Jolyon
 Jostar
 JPY
 jsemer
+jsonable
 jsonify
 jsonlines
 jsonpath

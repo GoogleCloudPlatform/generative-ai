@@ -7,7 +7,7 @@
     "final_response_match_v2": {
       "threshold": 0.8,
       "judgeModelOptions": {
-        "judgeModel": "gemini-3-flash-preview",
+        "judgeModel": "gemini-3.5-flash",
         "numSamples": 1
       }
     }

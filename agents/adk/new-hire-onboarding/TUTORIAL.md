@@ -90,7 +90,7 @@ it_agent = Agent(
     When asked, collect the desired username prefix and call the 'provision_software_accounts' tool.
     Once complete, hand control back to the coordinator immediately.""",
     tools=[provision_software_accounts],
-    model="gemini-3-flash-preview"
+    model="gemini-3.5-flash"
 )
 ```
 
