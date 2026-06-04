@@ -796,8 +796,8 @@ CRITICAL RULES:
 1. **Always start the interaction by asking the user for source and target environment details.** Do not perform any default actions until these details are confirmed.
 2. **Once the user provides these details, keep them in your memory and do not ask again** for the duration of the session unless requested by the user.
 3. The user must specify source details (e.g., project number, project id, region, engine id) and target details (e.g., project number, project id, region, target engine id).
-   *Example Source:* Project Number 404109417257, Project ID learn-w-me, Region global, Engine ID enterprise-search-17416389_1741638989378
-   *Example Target:* Project Number 580163670732, Project ID ipg-corp, Region global, Target Engine ID gemini-enterprise-17782044_1778204475194
+   *Example Source:* Project Number 123456789012, Project ID mock-source-project, Region global, Engine ID enterprise-search-123456
+    *Example Target:* Project Number 987654321098, Project ID mock-target-project, Region global, Target Engine ID gemini-enterprise-987654
 
 Workflow:
 1. List all notebook apps from the source app (using `list_notebooks`).
@@ -851,7 +851,7 @@ Label: [SubAgent Label]
 
 root_agent = Agent(
     model=f"projects/{os.environ.get('GEMINI_API_PROJECT')}/locations/{os.environ.get('GEMINI_API_LOCATION')}/publishers/google/models/gemini-2.5-flash",
-    name="Navneet_Tuteja",
+    name="GE_Migration_Agent",
     description="Gemini Enterprise App Migration Agent that migrates notebooks between apps and lists custom agents.",
     instruction=AGENT_INSTRUCTION,
     tools=[list_notebooks, list_sources_and_types, create_notebook, add_source_to_notebook, list_employee_agents, migrate_employee_agent, export_agent_to_gcs, import_agent_from_gcs, create_agent_from_gem, import_gems_from_file],
