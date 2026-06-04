@@ -38,12 +38,26 @@ The following diagram illustrates the high-level architecture of the migration a
 
 ### 🛠️ Setup & Run
 
-1. **Configure Environment**: Ensure your Google Cloud project is set up and ADC is configured.
-2. **Launch the Playground**:
+1. **Configure Environment**: Ensure your GCP project is set up and Application Default Credentials (ADC) are configured. Make sure your `.env` file matches the format in `ge_migration_agent/.env.sample`.
+2. **Option A: Run the Deterministic CLI (Highly Recommended)**:
+   For 100% reliable, fast, and deterministic execution of migrations without any AI dependencies, use the newly added root entrypoint script:
+   ```bash
+   # Show help and all available commands
+   ./migrate.py --help
+
+   # List notebooks in the source project
+   ./migrate.py list-notebooks
+
+   # Migrate an entire notebook and all of its sources atomically
+   ./migrate.py migrate-notebook "my-notebook-title" --source-project 12345 --target-project 67890
+   ```
+3. **Option B: Run the Conversational AI Agent**:
+   For natural language guidance and conversational interactions, launch the ADK playground:
    ```bash
    ./ge_migration_agent/run_web_playground.sh
    ```
-3. **Access the UI**: Open `http://localhost:8001` in your browser.
+   Open `http://localhost:8001` in your browser to chat with the agent. The agent is now powered by the exact same underlying deterministic core.
+
 
 ## 💡 Example Usage
 
@@ -101,7 +115,7 @@ Importing multiple Gems from a file
 | Summarize Daily Emails | Retrieves and summarizes emails received within the last 24 hours. |
 | Daily Email Summarizer | Retrieves and summarizes emails from the past 24 hours. |
 | Schedule Meeting | Schedules a meeting on the calendar based on user input. |
-| Quarterly Business Review Generator | A central orchestration agent designed to generate comprehensive Quarterly Business Reviews (`QBRs`) by coordinating specialized data retrieval from sub-agents. It analyzes user requests, delegates to finance and sentiment experts, and synthesizes final reports. |
+| `QBR` Generator | A central orchestration agent designed to generate comprehensive Quarterly Business Reviews (`QBRs`) by coordinating specialized data retrieval from sub-agents. It analyzes user requests, delegates to finance and sentiment experts, and synthesizes final reports. |
 | AI Informant Orchestrator | Orchestrates information gathering from various specialized agents and synthesizes the results into a comprehensive report. |
 | Google Stock Price Finder | Searches for and displays today's Google stock price. |
 
@@ -110,10 +124,10 @@ Importing multiple Gems from a file
 ....
 
 **User**:
-> Migrate Quarterly Business Review Generator from source to target
+> Migrate `QBR` Generator from source to target
 
 **Agent**:
-> The agent 'Quarterly Business Review Generator' has been successfully migrated to your target environment.
+> The agent '`QBR` Generator' has been successfully migrated to your target environment.
 > WARNING: Some connectors were ignored: ['Monday Mcp', 'Ge Gmail', ...]
 
 **User**:
