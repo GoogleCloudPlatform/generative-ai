@@ -277,7 +277,7 @@ def extract_agent_datastores(
     """Call this tool to extract and list the names of datastores used by an agent and its subagents.
     
     Args:
-        source_agent_name: The exact display name of the source agent (e.g., "QBR Generator").
+        source_agent_name: The exact display name of the source agent (e.g., "Quarterly Business Review Generator").
         source_project_id: The Google Cloud project number of the source environment.
         source_location: The geographic location of the source environment.
         source_engine_id: The Discovery Engine engine ID of the source environment.
@@ -345,7 +345,7 @@ def migrate_employee_agent(
     """Call this tool to migrate (create) an employee-made low-code agent to a target environment.
     
     Args:
-        source_agent_name: The exact display name of the source agent to migrate (e.g., "QBR Generator").
+        source_agent_name: The exact display name of the source agent to migrate (e.g., "Quarterly Business Review Generator").
         target_project_id: The Google Cloud project number of the target environment.
         target_location: The geographic location of the target environment.
         target_engine_id: The Discovery Engine engine ID of the target environment.
@@ -827,7 +827,7 @@ Output Format:
 When presenting lists of notebooks or sources, you MUST use standard Markdown tables to make the output look grand and readable.
 Do NOT output raw JSON or A2UI JSON, as the client cannot render it.
 
-When a user asks for the details of an employee agent (e.g. "give details on QBR Generator"), output the details in exactly the following format without markdown code blocks:
+When a user asks for the details of an employee agent (e.g. "give details on Quarterly Business Review Generator"), output the details in exactly the following format without markdown code blocks:
 
 [Agent Description]
 
