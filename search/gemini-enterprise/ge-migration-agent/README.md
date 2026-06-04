@@ -38,7 +38,7 @@ The following diagram illustrates the high-level architecture of the migration a
 
 ### 🛠️ Setup & Run
 
-1. **Configure Environment**: Ensure your GCP project is set up and ADC is configured.
+1. **Configure Environment**: Ensure your Google Cloud project is set up and ADC is configured.
 2. **Launch the Playground**:
    ```bash
    ./ge_migration_agent/run_web_playground.sh
@@ -117,7 +117,7 @@ Importing multiple Gems from a file
 > WARNING: Some connectors were ignored: ['Monday Mcp', 'Ge Gmail', ...]
 
 **User**:
-> List all the notebooks alongwith name, source type, source, url.
+> List all the notebooks along with name, source type, source, url.
 > 
 **Agent**:
 > I have retrieved the following notebooks and their sources:
