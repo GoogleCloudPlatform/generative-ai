@@ -1,0 +1,68 @@
+[project]
+name = "contract-compliance-pipeline"
+version = "0.1.0"
+description = "Cross-language multi-agent system for contract compliance using ADK and A2A"
+dependencies = [
+    "google-adk>=1.15.0,<2.0.0",
+    "opentelemetry-instrumentation-google-genai>=0.1.0,<1.0.0",
+    "google-cloud-logging>=3.12.0,<4.0.0",
+    "google-cloud-aiplatform[agent-engines,evaluation]>=1.130.0",
+    "protobuf>=6.31.1,<7.0.0",
+    "greenlet>=3.0.0,<4.0.0",
+    "a2a-sdk>=0.3.4,<0.4",
+]
+requires-python = ">=3.11,<3.14"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4,<9.0.0",
+    "pytest-asyncio>=0.23.8,<1.0.0",
+    "nest-asyncio>=1.6.0,<2.0.0",
+]
+
+[project.optional-dependencies]
+eval = [
+    "google-adk[eval]>=1.15.0,<2.0.0",
+]
+lint = [
+    "ruff>=0.4.6,<1.0.0",
+    "ty>=0.0.1a0",
+    "codespell>=2.2.0,<3.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "C",  # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP", # pyupgrade
+    "RUF", # ruff specific rules
+]
+ignore = ["E501", "C901", "B006"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = "."
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.agents-cli]
+name = "contract-compliance-pipeline"
+description = "Cross-language multi-agent system for contract compliance using ADK and A2A"
+base_template = "adk"
+agent_directory = "app"
