@@ -75,7 +75,7 @@ def handle_list_notebooks(args):
     location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
     
     if not project:
-        print_color("Error: GCP project number must be provided via --project or environment variables.", COLOR_RED)
+        print_color("Error: Google Cloud project number must be provided via --project or environment variables.", COLOR_RED)
         sys.exit(1)
         
     print_color(f"Listing recently viewed notebooks in project {project} ({location})...", COLOR_BLUE)
@@ -104,7 +104,7 @@ def handle_list_sources(args):
     location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
     
     if not project:
-        print_color("Error: GCP project number must be provided via --project or environment variables.", COLOR_RED)
+        print_color("Error: Google Cloud project number must be provided via --project or environment variables.", COLOR_RED)
         sys.exit(1)
         
     print_color(f"Listing sources for notebook '{args.notebook_id}' in project {project}...", COLOR_BLUE)
@@ -176,7 +176,7 @@ def handle_list_agents(args):
     location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
     
     if not project:
-        print_color("Error: GCP project number must be specified.", COLOR_RED)
+        print_color("Error: Google Cloud project number must be specified.", COLOR_RED)
         sys.exit(1)
         
     print_color(f"Listing employee-made agents in project {project} (Engine: {args.engine_id})...", COLOR_BLUE)
@@ -444,14 +444,14 @@ def main():
     
     # List notebooks
     p_list_nb = subparsers.add_parser("list-notebooks", help="List recently viewed notebooks in source project")
-    p_list_nb.add_argument("--project", help="GCP project number (defaults to GEMINI_API_PROJECT env)")
+    p_list_nb.add_argument("--project", help="Google Cloud project number (defaults to GEMINI_API_PROJECT env)")
     p_list_nb.add_argument("--location", help="Geographic location (defaults to GEMINI_API_LOCATION env or 'global')")
     p_list_nb.set_defaults(func=handle_list_notebooks)
     
     # List sources
     p_list_src = subparsers.add_parser("list-sources", help="List sources and their types in a specific notebook")
     p_list_src.add_argument("notebook_id", help="The source notebook ID")
-    p_list_src.add_argument("--project", help="GCP project number (defaults to GEMINI_API_PROJECT env)")
+    p_list_src.add_argument("--project", help="Google Cloud project number (defaults to GEMINI_API_PROJECT env)")
     p_list_src.add_argument("--location", help="Geographic location (defaults to GEMINI_API_LOCATION env or 'global')")
     p_list_src.add_argument("--include-raw", action="store_true", help="Include raw source metadata in JSON output")
     p_list_src.set_defaults(func=handle_list_sources)
