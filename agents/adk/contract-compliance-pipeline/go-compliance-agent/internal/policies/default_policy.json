@@ -1,0 +1,10 @@
+{
+  "max_contract_value": 500000.0,
+  "prohibited_clauses": [
+    "unlimited liability",
+    "auto-renewal > 3yr"
+  ],
+  "required_insurance_minimum": 1000000.0,
+  "max_term_years": 5,
+  "required_termination_clause": true
+}

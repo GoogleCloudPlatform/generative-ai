@@ -26,6 +26,7 @@ agentic
 agg
 AGG
 aggfunc
+agentcard
 ainit
 ainvoke
 aio
@@ -573,6 +574,7 @@ getpid
 gfile
 GFile
 Gfm
+GFD
 gguf
 giallo
 Giallo
@@ -593,6 +595,7 @@ gmaps
 Gmb
 GmbH
 gms
+gmtime
 GObject
 Godzilla
 goldmine
@@ -784,6 +787,7 @@ Jolyon
 Jostar
 JPY
 jsemer
+jsonable
 jsonify
 jsonlines
 jsonpath
@@ -795,6 +799,7 @@ Kaelen
 kaggle
 Kalai
 Kalamang
+Kaku
 kamada
 Kamradt
 Kanagawa
@@ -851,6 +856,7 @@ landuse
 langgraph
 Laomedeia
 latte
+lbl
 LCEL
 LEBRON
 lecie
@@ -1351,6 +1357,7 @@ rubrum
 Ruchika
 runjdwp
 RUNPATH
+RUnlock
 Rupjit
 RVL
 RVR
@@ -1613,6 +1620,7 @@ und
 undst
 unigram
 Unimicron
+unmarshal
 unrtf
 unsloth
 Unsloth
