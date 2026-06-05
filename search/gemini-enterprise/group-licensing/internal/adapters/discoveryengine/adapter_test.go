@@ -138,7 +138,7 @@ func TestListUserLicenses_HappyPath(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	assert.Equal(t, "", tok)
@@ -173,7 +173,7 @@ func TestListUserLicenses_NilLastLoginTime(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got, 1)
@@ -205,7 +205,7 @@ func TestListUserLicenses_CreateTimeMappedToAssignmentTime(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got, 1)
@@ -224,7 +224,7 @@ func TestListUserLicenses_EmptyPage(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	assert.Equal(t, "", tok)
@@ -269,7 +269,7 @@ func TestListUserLicenses_NextPageTokenPropagation(t *testing.T) {
 		Return(fakeIt1).Once()
 
 	adapter := newWithClient(mockClient)
-	got1, nextTok, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got1, nextTok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got1, licenseListPageSize)
@@ -281,7 +281,7 @@ func TestListUserLicenses_NextPageTokenPropagation(t *testing.T) {
 	mockClient.On("ListUserLicenses", mock.Anything, mock.AnythingOfType("*discoveryenginepb.ListUserLicensesRequest")).
 		Return(fakeIt2).Once()
 
-	got2, finalTok, err := adapter.ListUserLicenses(context.Background(), "my-project", nextTok)
+	got2, finalTok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, nextTok)
 
 	require.NoError(t, err)
 	require.Len(t, got2, 1)
@@ -299,7 +299,7 @@ func TestListUserLicenses_ResourceExhausted(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrAPIRateLimited),
@@ -318,7 +318,7 @@ func TestListUserLicenses_Unavailable(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrAPIUnavailable),
@@ -337,7 +337,7 @@ func TestListUserLicenses_Unauthorized(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrLicenseListFailed),
@@ -363,7 +363,7 @@ func TestListUserLicenses_RevokedState(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got, 1)
@@ -391,7 +391,7 @@ func TestListUserLicenses_UnknownState(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrLicenseListFailed),
@@ -418,7 +418,7 @@ func TestBatchUpdateUserLicenses_ExceedsMaxBatchSize(t *testing.T) {
 	mockClient := new(fakeUserLicenseClient)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),
@@ -443,7 +443,7 @@ func TestBatchUpdateUserLicenses_Grant_SetsLicenseConfigAndMask(t *testing.T) {
 		Return(nil)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.NoError(t, err)
 
@@ -470,7 +470,7 @@ func TestBatchUpdateUserLicenses_Revoke_OmitsLicenseConfigAndMask(t *testing.T) 
 		Return(nil)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.NoError(t, err)
 
@@ -493,7 +493,7 @@ func TestBatchUpdateUserLicenses_APIError(t *testing.T) {
 		Return(makeGRPCError(codes.Unavailable))
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),
@@ -520,7 +520,7 @@ func TestBatchUpdateUserLicenses_LicensesExhausted(t *testing.T) {
 		Return(exhaustionErr)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),
@@ -547,7 +547,7 @@ func TestBatchUpdateUserLicenses_InvalidArgument_NonExhaustion_NotMapped(t *test
 		Return(otherPrecondErr)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),

@@ -147,12 +147,12 @@ func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID 
 	return index, nil
 }
 
-// ListUserLicenses returns one page of user licenses for the given projectID.
-// Pass an empty pageToken to start from the beginning. It uses iterator.NewPager
-// to correctly honour the caller-supplied pageToken, fixing the pagination bug
-// that existed when InternalFetch was called directly.
-func (a *Adapter) ListUserLicenses(ctx context.Context, projectID, pageToken string) ([]models.UserLicense, string, error) {
-	parent := fmt.Sprintf("projects/%s/locations/global/userStores/default_user_store", projectID)
+// ListUserLicenses returns one page of user licenses for the given projectID at
+// the given location. Pass an empty pageToken to start from the beginning. It
+// uses iterator.NewPager to correctly honour the caller-supplied pageToken,
+// fixing the pagination bug that existed when InternalFetch was called directly.
+func (a *Adapter) ListUserLicenses(ctx context.Context, projectID string, location models.Location, pageToken string) ([]models.UserLicense, string, error) {
+	parent := fmt.Sprintf("projects/%s/locations/%s/userStores/default_user_store", projectID, location)
 
 	req := &discoveryenginepb.ListUserLicensesRequest{
 		Parent:    parent,
@@ -190,12 +190,12 @@ func (a *Adapter) ListUserLicenses(ctx context.Context, projectID, pageToken str
 // revokes it is not sent to the API — only license_assignment_state is masked —
 // to avoid the "subscription reaches the limit" error that occurs when the API
 // processes a license_config field alongside a NO_LICENSE state.
-func (a *Adapter) BatchUpdateUserLicenses(ctx context.Context, projectID string, updates []models.LicenseUpdate) error {
+func (a *Adapter) BatchUpdateUserLicenses(ctx context.Context, projectID string, location models.Location, updates []models.LicenseUpdate) error {
 	if len(updates) > models.MaxBatchSize {
 		return fmt.Errorf("%w: batch size %d exceeds maximum %d", models.ErrBatchUpdateFailed, len(updates), models.MaxBatchSize)
 	}
 
-	parent := fmt.Sprintf("projects/%s/locations/global/userStores/default_user_store", projectID)
+	parent := fmt.Sprintf("projects/%s/locations/%s/userStores/default_user_store", projectID, location)
 
 	isRevoke := len(updates) > 0 && updates[0].Action == models.LicenseActionRevoke
 
@@ -294,13 +294,13 @@ func licenseUpdateToProto(u models.LicenseUpdate) *discoveryenginepb.UserLicense
 // number of licenses currently assigned (usedLicenseCount) for all licenseConfigs
 // under the given project's default user store. The projectID must be the numeric
 // project number that appears in licenseConfig resource paths.
-func (a *Adapter) FetchLicenseUsageStats(ctx context.Context, projectID string) (map[string]int64, error) {
+func (a *Adapter) FetchLicenseUsageStats(ctx context.Context, projectID string, location models.Location) (map[string]int64, error) {
 	svc, err := discoveryengineapi.NewService(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("creating discoveryengine REST client: %w", err)
 	}
 
-	parent := fmt.Sprintf("projects/%s/locations/global/userStores/default_user_store", projectID)
+	parent := fmt.Sprintf("projects/%s/locations/%s/userStores/default_user_store", projectID, location)
 
 	resp, err := svc.Projects.Locations.UserStores.LicenseConfigsUsageStats.List(parent).Context(ctx).Do()
 	if err != nil {
