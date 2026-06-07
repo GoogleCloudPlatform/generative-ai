@@ -59,16 +59,16 @@ uv run ./migrate.py migrate-notebook "my-notebook-title" --source-project 12345 
 uv run ./migrate.py list-agents --engine-id <SOURCE_ENGINE_ID>
 
 # Migrate a low-code agent directly from source to target
-uv run ./migrate.py migrate-agent "QBR Generator" --force
+uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --force
 
 # Batch Import Gems from an offline Takeout HTML dump
 uv run ./migrate.py import-gems sample_data/gemini_gems_data.html --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID>
 
 # Export an agent definition to a Google Cloud Storage staging backup
-uv run ./migrate.py export-agent-gcs "QBR Generator" --engine-id <SOURCE_ENGINE_ID> --bucket <GCS_BUCKET_NAME>
+uv run ./migrate.py export-agent-gcs "Quarterly Business Review Generator" --engine-id <SOURCE_ENGINE_ID> --bucket <GCS_BUCKET_NAME>
 
 # Import an agent definition from GCS into your target environment
-uv run ./migrate.py import-agent-gcs qbr_export.json --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py import-agent-gcs Quarterly Business Review_export.json --target-engine <TARGET_ENGINE_ID>
 ```
 
 ---
@@ -106,10 +106,10 @@ Here is a sample session showing autonomous administrative greeting and low-code
 > I found the following employee-made agents in your source environment: ... (Lists agents)
 
 **User**:
-> Migrate QBR Generator from source to target
+> Migrate Quarterly Business Review Generator from source to target
 
 **Agent**:
-> The agent 'QBR Generator' has been successfully migrated to your target environment.
+> The agent 'Quarterly Business Review Generator' has been successfully migrated to your target environment.
 
 **User**:
 > Please import the Gems from the file ./sample_data/gemini_gems_data.html in Target
