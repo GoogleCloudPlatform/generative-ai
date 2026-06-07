@@ -14,8 +14,8 @@ metadata:
       region: global
       engine_id: "<TARGET_ENGINE_ID>"
   datastores_mapping:
-    snowflake-mcp-may29_1780067471814_mcp_data: snowflake-mcp-may29_1780829795319_mcp_data
-    ge-drive-all_1776953145638_google_drive: ge-drive-all_1780835769760_google_drive
+    <id>_mcp_data: <id>_mcp_data
+    <id>_google_drive: <id>_google_drive
   connectors_mapping:
     Snowflake Mcp May29: custom_mcp
     ge-drive-all: Drive
@@ -64,8 +64,8 @@ Once configured, run live migrations or offline GCS imports directly:
 
 ```bash
 # 1. Execute live cross-environment migration
-uv run ./migrate.py migrate-agent "QBR Generator" --force
+uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --force
 
 # 2. Import agent definition from GCS offline backup
-uv run ./migrate.py import-agent-gcs qbr_export.json --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py import-agent-gcs Quarterly_Business_Review_export.json --target-engine <TARGET_ENGINE_ID>
 ```
