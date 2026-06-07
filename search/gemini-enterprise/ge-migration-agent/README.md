@@ -92,7 +92,7 @@ Here is a sample session showing autonomous administrative greeting and low-code
 > Hi / Help
 
 **Agent**:
-> I can assist you with migrating your Gemini Enterprise and Vertex AI low-code agents, NotebookLM notebooks, and Workspace Gems.
+> I can assist you with migrating your Gemini Enterprise app low-code agents, NotebookLM notebooks, and Workspace Gems.
 > 
 > **Active Migration Configuration**:
 > - Source Environment: Project <SOURCE_PROJECT_NUMBER> (`<SOURCE_PROJECT_ID>`), Engine `<SOURCE_ENGINE_ID>`
