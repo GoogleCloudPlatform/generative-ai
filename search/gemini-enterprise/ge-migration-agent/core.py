@@ -940,9 +940,9 @@ def import_agent_from_gcs(
             
         if "selectedTools" in llm_node:
             for t in llm_node["selectedTools"].get("tool", []):
-                tname = t.get("name")
-                if tname in mapping_dict:
-                    t["name"] = mapping_dict[tname]
+                tool_name = t.get("name")
+                if tool_name in mapping_dict:
+                    t["name"] = mapping_dict[tool_name]
                     
         if "dataStoreSpecs" in llm_node:
             for s in llm_node["dataStoreSpecs"].get("specs", []):
