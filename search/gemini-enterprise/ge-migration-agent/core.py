@@ -3,6 +3,13 @@ import os
 import logging
 import time
 import re
+import urllib.parse
+try:
+    from dotenv import load_dotenv
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    load_dotenv(env_path)
+except ImportError:
+    pass
 import google.auth
 from google.auth.transport.requests import AuthorizedSession
 
@@ -120,7 +127,7 @@ def migrate_notebook_pipeline(
         raise ValueError(f"Source notebook '{notebook_id_or_title}' not found.")
         
     source_nb_id = source_notebook.get("name", "").split("/")[-1]
-    source_nb_title = source_notebook.get("title", "Migrated Notebook")
+    source_nb_title = source_notebook.get("title", "Untitled Notebook")
     
     # 2. Get all sources
     sources = list_sources_and_types(source_nb_id, source_project_number, source_location)
@@ -161,10 +168,6 @@ def migrate_notebook_pipeline(
             elif "textContent" in metadata:
                 payload["textContent"] = metadata["textContent"]
                 
-        # Ensure displayName is set
-        if "displayName" not in payload:
-            payload["displayName"] = title
-            
         # Strip readonly fields
         if "sourceName" in payload:
             payload.pop("sourceName")
@@ -215,12 +218,13 @@ def list_employee_agents(
     
     employee_agents = []
     for agent in agents:
-        displayName = agent.get("displayName")
+        displayName = (agent.get("displayName") or "").replace("\r\n", " ").replace("\n", " ")
         name = agent.get("name")
-        description = agent.get("description")
+        description = (agent.get("description") or "").replace("\r\n", " ").replace("\n", " ")
         
         root_instructions = "No instructions found."
         root_tools = []
+        root_knowledge = []
         sub_agents = []
         
         if "lowCodeAgentDefinition" in agent:
@@ -242,17 +246,32 @@ def list_employee_agents(
                     if ds:
                         ds_name = ds.split("/")[-1]
                         node_tools.append(f"DataStore: {ds_name}")
+                node_knowledge = []
+                for k_field in ["groundingSources", "userContents", "files", "knowledge"]:
+                    for item in llm_node.get(k_field, []):
+                        title = item.get("displayName") or item.get("googleDriveContent", {}).get("documentId")
+                        if title and title not in node_knowledge:
+                            node_knowledge.append(title)
+                for match in re.findall(r'\[([^\]]+)\]\(https://drive\.google\.com/[^\)]+\)', node_instruction):
+                    if match and match not in node_knowledge:
+                        node_knowledge.append(match)
                     
                 if node_id == root_id:
                     root_instructions = node_instruction
-                    root_tools = node_tools
+                for nt in node_tools:
+                    if nt not in root_tools:
+                        root_tools.append(nt)
+                for nk in node_knowledge:
+                    if nk not in root_knowledge:
+                        root_knowledge.append(nk)
                 else:
                     sub_agents.append({
                         "displayName": node.get("displayName", "Sub-Agent"),
                         "description": llm_node.get("description", ""),
                         "model": llm_node.get("model", "Unknown Model"),
                         "instructions": node_instruction,
-                        "tools": node_tools
+                        "tools": node_tools,
+                        "knowledge": node_knowledge
                     })
         elif "skillAgentDefinition" in agent:
             definition = agent.get("skillAgentDefinition", {})
@@ -264,6 +283,7 @@ def list_employee_agents(
             "description": description,
             "instructions": root_instructions,
             "connectors_and_tools": root_tools,
+            "knowledge": root_knowledge,
             "sub_agents": sub_agents,
             "raw_agent": agent
         })
@@ -287,13 +307,7 @@ def extract_connectors(agent_def: dict) -> list:
             ds = spec.get("dataStore", "")
             if ds:
                 ds_name = ds.split("/")[-1]
-                parts = ds_name.split("_")
-                if parts:
-                    prefix = parts[0]
-                    friendly_name = " ".join([w.capitalize() for w in prefix.split("-")])
-                    connectors.add(friendly_name)
-                else:
-                    connectors.add(ds_name)
+                connectors.add(ds_name)
                 
     return list(connectors)
 
@@ -364,6 +378,92 @@ def extract_agent_datastores(
         "datastores": datastore_report
     }
 
+def clean_connector_name(name: str) -> str:
+    """Strips common suffixes like May29, dates, punctuation for robust fuzzy matching."""
+    clean = re.sub(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\d*', '', name, flags=re.IGNORECASE)
+    return re.sub(r'[^a-zA-Z0-9]', '', clean).lower()
+
+def lookup_and_map_connectors(
+    source_agent_name: str,
+    target_project_id: str,
+    target_location: str,
+    target_engine_id: str,
+    source_project_id: str,
+    source_location: str = "global",
+    source_engine_id: str = "enterprise-search-17416389_1741638989378"
+) -> dict:
+    """Intelligently matches source agent connectors against target environment connectors."""
+    session = get_session()
+    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    source_parent = f"projects/{source_project_id}/locations/{source_location}/collections/default_collection/engines/{source_engine_id}/assistants/default_assistant"
+    source_url = f"{base_url}/{source_parent}/agents"
+    
+    resp = session.get(source_url)
+    if resp.status_code == 200:
+        agents = resp.json().get("agents", [])
+    else:
+        agents = []
+        
+    src_connectors = set()
+    for ag in agents:
+        if source_agent_name.upper() == "ALL" or ag.get("displayName", "").lower() == source_agent_name.lower():
+            for c in extract_connectors(ag.get("lowCodeAgentDefinition", {})):
+                src_connectors.add(c)
+    src_connectors = list(src_connectors)
+            
+    target_parent = f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/engines/{target_engine_id}/assistants/default_assistant"
+    target_connectors = list_target_connectors(session, base_url, target_parent)
+    try:
+        source_ds_objs = list_datastores(source_project_id, source_location)
+    except Exception:
+        source_ds_objs = []
+    try:
+        target_ds_objs = list_datastores(target_project_id, target_location)
+    except Exception:
+        target_ds_objs = []
+        
+    canonical_tools = ["googleSearch", "urlContext", "geGmail", "snowflakeMcp"]
+    verified_target_ids = [ds["id"] for ds in target_ds_objs]
+    all_targets = canonical_tools + verified_target_ids
+    
+    mapping = {}
+    missing = []
+    for sc in src_connectors:
+        sc_clean = clean_connector_name(sc)
+        matched = None
+        for s_ds in source_ds_objs:
+            if s_ds["id"] == sc or s_ds["displayName"].lower() == sc.lower():
+                for t_ds in target_ds_objs:
+                    if t_ds["displayName"].lower() == s_ds["displayName"].lower():
+                        if s_ds["displayName"].lower() == "mcp_data":
+                            s_pref = s_ds["id"].split("_")[0].split("-")[0].lower()
+                            t_pref = t_ds["id"].split("_")[0].split("-")[0].lower()
+                            if s_pref != t_pref:
+                                continue
+                        matched = t_ds["id"]
+                        break
+                break
+                
+        if not matched:
+            for tc in all_targets:
+                if clean_connector_name(tc) == sc_clean:
+                    matched = tc
+                    break
+                    
+        if matched:
+            mapping[sc] = matched
+        else:
+            mapping[sc] = "❌ Missing (Not Ingested in Target)"
+            missing.append(sc)
+            
+    return {
+        "source_agent": source_agent_name,
+        "source_connectors": src_connectors,
+        "target_available": all_targets,
+        "proposed_mapping": mapping,
+        "missing_connectors": missing
+    }
+
 def migrate_employee_agent(
     source_agent_name: str,
     target_project_id: str,
@@ -373,7 +473,8 @@ def migrate_employee_agent(
     source_location: str = "global",
     source_engine_id: str = "enterprise-search-17416389_1741638989378",
     force: bool = False,
-    backup_bucket: str = ""
+    backup_bucket: str = "",
+    connector_mapping: str = ""
 ) -> dict:
     """Migrates an employee-made low-code agent to a target environment."""
     session = get_session()
@@ -426,20 +527,17 @@ def migrate_employee_agent(
     bucket_name = backup_bucket if backup_bucket else os.environ.get("GCS_BUCKET_NAME")
     if bucket_name:
         try:
-            from google.cloud import storage
-            client = storage.Client()
-            bucket = client.bucket(bucket_name)
             timestamp = int(time.time())
             object_name = f"exports/{source_agent_name}_{timestamp}.json"
-            blob = bucket.blob(object_name)
-            blob.upload_from_string(json.dumps(agent_to_migrate, indent=2))
+            encoded_obj = urllib.parse.quote(object_name, safe="")
+            upload_url = f"https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={encoded_obj}"
+            up_resp = session.post(
+                upload_url,
+                data=json.dumps(agent_to_migrate, indent=2),
+                headers={"Content-Type": "application/json"}
+            )
+            up_resp.raise_for_status()
             logging.info(f"Implicitly backed up agent '{source_agent_name}' to gs://{bucket_name}/{object_name}")
-            
-            # Read content back from GCS to use instead of memory
-            logging.info("Reading back agent definition from GCS for migration.")
-            gcs_content = blob.download_as_string()
-            agent_to_migrate = json.loads(gcs_content)
-            logging.info("Successfully read agent definition from GCS.")
         except Exception as e:
             logging.error(f"Failed to implicitly backup agent to GCS: {e}")
     
@@ -448,25 +546,64 @@ def migrate_employee_agent(
     if "session" in definition:
         del definition["session"]
         
-    # Strip datastores and add googleSearch
-    nodes = definition.get("nodes", [])
-    for node in nodes:
+    mapping_dict = {}
+    if connector_mapping:
+        try:
+            mapping_dict = json.loads(connector_mapping)
+        except Exception:
+            for pair in connector_mapping.split(","):
+                if ":" in pair:
+                    k, v = pair.split(":", 1)
+                    mapping_dict[k.strip()] = v.strip()
+                    
+    # Apply tool mapping and ensure googleSearch
+    all_nodes = definition.get("nodes", []) + definition.get("deployedNodes", [])
+    for node in all_nodes:
         llm_node = node.get("llmAgentNode", {})
         if "selectedTools" not in llm_node:
             llm_node["selectedTools"] = {"tool": []}
         selected_tools = llm_node["selectedTools"]
-        if "tool" not in selected_tools:
-            selected_tools["tool"] = []
+        tools_list = selected_tools.get("tool", [])
         
-        tools_list = selected_tools["tool"]
+        new_tools = []
         has_google_search = False
         for t in tools_list:
-            if t.get("name") == "googleSearch":
+            t_name = t.get("name", "")
+            if t_name in mapping_dict:
+                t_name = mapping_dict[t_name]
+            elif clean_connector_name(t_name) == clean_connector_name("snowflakeMcp"):
+                t_name = mapping_dict.get("Snowflake Mcp May29", "snowflakeMcp")
+                
+            if t_name == "googleSearch":
                 has_google_search = True
-                break
+            if t_name:
+                new_tools.append({"name": t_name})
+                
         if not has_google_search:
-            logging.info(f"DEBUG: Adding googleSearch to node {node.get('displayName')}")
-            tools_list.append({"name": "googleSearch"})
+            new_tools.append({"name": "googleSearch"})
+        selected_tools["tool"] = new_tools
+        
+        new_specs = []
+        for spec in llm_node.get("dataStoreSpecs", {}).get("specs", []):
+            ds = spec.get("dataStore", "")
+            if ds:
+                ds_id = ds.split("/")[-1]
+                if ds_id in mapping_dict:
+                    ds_id = mapping_dict[ds_id]
+                new_ds = f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{ds_id}"
+                new_specs.append({"dataStore": new_ds})
+        if new_specs:
+            llm_node["dataStoreSpecs"] = {"specs": new_specs}
+            if any("snowflake" in s.get("dataStore", "").lower() for s in new_specs):
+                sf_conn = mapping_dict.get("Snowflake Mcp May29", "custom_mcp")
+                if not any(t.get("name") == sf_conn for t in new_tools):
+                    new_tools.append({"name": sf_conn})
+                selected_tools["tool"] = new_tools
+            if any("drive" in s.get("dataStore", "").lower() for s in new_specs):
+                dr_conn = mapping_dict.get("ge-drive-all", "Drive")
+                if not any(t.get("name") == dr_conn for t in new_tools):
+                    new_tools.append({"name": dr_conn})
+                selected_tools["tool"] = new_tools
             
     payload_str = json.dumps({
         "displayName": agent_to_migrate.get("displayName"),
@@ -481,14 +618,17 @@ def migrate_employee_agent(
     create_resp = session.post(target_url, json=payload)
     create_resp.raise_for_status()
     
-    message = f"Successfully migrated agent '{source_agent_name}' to target environment. Reminder: This migration assumes all required datastores are available in the target environment with the exact same names as in source."
-    if missing_connectors:
-         message += f" WARNING: Missing connectors were ignored: {missing_connectors}"
+    created_agent = create_resp.json()
+    tgt_extracted = extract_connectors(created_agent.get("lowCodeAgentDefinition", {}))
+    message = f"Successfully migrated agent '{source_agent_name}' to target environment.\nConnectors in Source Agent: {src_connectors}\nConnectors in Target Agent: {tgt_extracted}"
+    truly_missing = [c for c in missing_connectors if c not in mapping_dict]
+    if truly_missing:
+         message += f"\nWARNING: Missing connectors were ignored: {truly_missing}"
          
     return {
         "success": True,
         "message": message,
-        "target_agent": create_resp.json()
+        "target_agent": created_agent
     }
 
 def create_agent_from_gem(
@@ -497,22 +637,58 @@ def create_agent_from_gem(
     target_project_id: str,
     target_engine_id: str,
     description: str = "",
-    target_location: str = "global"
+    target_location: str = "global",
+    files: list = None
 ) -> dict:
     """Creates a new Gemini Enterprise agent from Gem definition (name and instructions)."""
     session = get_session()
     base_url = "https://discoveryengine.googleapis.com/v1alpha"
     target_url = f"{base_url}/projects/{target_project_id}/locations/{target_location}/collections/default_collection/engines/{target_engine_id}/assistants/default_assistant/agents"
     
+    llm_node = {
+        "description": f"Migrated from Gem: {name}",
+        "model": "gemini-2.5-flash",
+        "instruction": instructions,
+        "selectedTools": {"tool": [{"name": "googleSearch"}]}
+    }
+    
+    grounding_specs = []
+    if files:
+        specs = []
+        tools = [{"name": "googleSearch"}]
+        for file_obj in files:
+            doc_id = file_obj.get("documentId")
+            if doc_id:
+                dr_ds = "ge-drive-all_1780835769760_google_drive"
+                d_name = file_obj.get("displayName", "Standard_Vendor_Template_2026")
+                specs.append({
+                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{dr_ds}",
+                    "filter": d_name
+                })
+                specs.append({
+                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}_google_docs",
+                    "filter": d_name
+                })
+                specs.append({
+                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}_google_drive",
+                    "filter": d_name
+                })
+                specs.append({
+                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}_document",
+                    "filter": d_name
+                })
+                specs.append({
+                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}",
+                    "filter": d_name
+                })
+        if specs:
+            llm_node["dataStoreSpecs"] = {"specs": specs}
+            llm_node["selectedTools"] = {"tool": tools}
+            
     definition = {
         "nodes": [
             {
-                "llmAgentNode": {
-                    "description": f"Migrated from Gem: {name}",
-                    "model": "gemini-2.5-flash",
-                    "instruction": instructions,
-                    "selectedTools": {"tool": [{"name": "googleSearch"}]}
-                },
+                "llmAgentNode": llm_node,
                 "id": "root_agent",
                 "displayName": name
             }
@@ -526,6 +702,17 @@ def create_agent_from_gem(
         "lowCodeAgentDefinition": definition
     }
     
+    
+    try:
+        list_resp = session.get(target_url)
+        if list_resp.status_code == 200:
+            for ex_ag in list_resp.json().get("agents", []):
+                if ex_ag.get("displayName") == name and "name" in ex_ag:
+                    logging.info(f"Deleting existing target agent '{name}' ({ex_ag['name']}) to overwrite.")
+                    session.delete(f"{base_url}/{ex_ag['name']}")
+    except Exception as e:
+        logging.warning(f"Failed to check/delete existing target agent '{name}': {e}")
+        
     logging.info(f"Creating new agent from Gem at target {target_url}")
     create_resp = session.post(target_url, json=payload)
     create_resp.raise_for_status()
@@ -543,10 +730,24 @@ def import_gems_from_file(
     target_location: str = "global"
 ) -> dict:
     """Imports multiple Gems from a local HTML file dump."""
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File not found at {file_path}")
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        file_path,
+        os.path.join(root_dir, file_path),
+        os.path.join(root_dir, file_path.lstrip("./")),
+        os.path.join(root_dir, file_path.lstrip("./").replace("ge-migration-agent/", "", 1)),
+        os.path.join(root_dir, "sample_data", os.path.basename(file_path))
+    ]
+    resolved_path = None
+    for cand in candidates:
+        if os.path.exists(cand):
+            resolved_path = cand
+            break
+            
+    if not resolved_path:
+        raise FileNotFoundError(f"File not found at '{file_path}' (checked root {root_dir}).")
         
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(resolved_path, "r", encoding="utf-8") as f:
         content = f.read()
         
     gems_raw = content.split("<b>Name:</b>")
@@ -580,10 +781,17 @@ def import_gems_from_file(
             files_part = inst_parts[1].strip()
             
         attached_files = []
+        parsed_files = []
         if files_part:
             matches = re.findall(r'<a\s+href="([^"]+)">([^<]+)</a>', files_part)
             for href, text in matches:
                 attached_files.append(f"- [{text}]({href})")
+                doc_id_match = re.search(r'[?&]id=([^&]+)', href) or re.search(r'/d/([^/]+)', href)
+                if doc_id_match:
+                    parsed_files.append({
+                        "displayName": text.strip(),
+                        "documentId": doc_id_match.group(1).strip()
+                    })
                 
         instructions = instructions.replace("<br>", "\n")
         instructions = instructions.replace("&#39;", "'")
@@ -592,7 +800,7 @@ def import_gems_from_file(
         if attached_files:
             instructions += "\n\n## Attached Files\n" + "\n".join(attached_files)
             
-        logging.info(f"Importing Gem: {name}")
+        logging.info(f"Importing Gem: {name} with {len(parsed_files)} attached files")
         try:
             resp = create_agent_from_gem(
                 name=name,
@@ -600,7 +808,8 @@ def import_gems_from_file(
                 target_project_id=target_project_id,
                 target_engine_id=target_engine_id,
                 description=description,
-                target_location=target_location
+                target_location=target_location,
+                files=parsed_files
             )
             if resp.get("success"):
                 success_count += 1
@@ -650,11 +859,14 @@ def export_agent_to_gcs(
     if not agent_to_export:
         raise ValueError(f"Source agent '{source_agent_name}' not found or is not a low-code agent.")
         
-    from google.cloud import storage
-    client = storage.Client()
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(object_name)
-    blob.upload_from_string(json.dumps(agent_to_export, indent=2))
+    encoded_obj = urllib.parse.quote(object_name, safe="")
+    upload_url = f"https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={encoded_obj}"
+    up_resp = session.post(
+        upload_url,
+        data=json.dumps(agent_to_export, indent=2),
+        headers={"Content-Type": "application/json"}
+    )
+    up_resp.raise_for_status()
     
     return {
         "success": True,
@@ -666,7 +878,8 @@ def import_agent_from_gcs(
     target_project_id: str,
     target_location: str,
     target_engine_id: str,
-    bucket_name: str = ""
+    bucket_name: str = "",
+    connector_mapping: str = ""
 ) -> dict:
     """Imports an agent definition from GCS and creates it in a target environment."""
     if not bucket_name:
@@ -677,12 +890,22 @@ def import_agent_from_gcs(
     session = get_session()
     base_url = "https://discoveryengine.googleapis.com/v1alpha"
     
-    from google.cloud import storage
-    client = storage.Client()
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(object_name)
-    agent_data = json.loads(blob.download_as_string())
+    encoded_object = urllib.parse.quote(object_name, safe="")
+    gcs_url = f"https://storage.googleapis.com/storage/v1/b/{bucket_name}/o/{encoded_object}?alt=media"
+    dl_resp = session.get(gcs_url)
+    dl_resp.raise_for_status()
+    agent_data = dl_resp.json()
     
+    mapping_dict = {}
+    if connector_mapping:
+        try:
+            mapping_dict = json.loads(connector_mapping)
+        except Exception:
+            for pair in connector_mapping.split(","):
+                if ":" in pair:
+                    k, v = pair.split(":", 1)
+                    mapping_dict[k.strip()] = v.strip()
+
     definition = agent_data.get("lowCodeAgentDefinition", {})
     if "session" in definition:
         del definition["session"]
@@ -705,9 +928,33 @@ def import_agent_from_gcs(
         if not has_google_search:
             tools_list.append({"name": "googleSearch"})
             
+        new_specs = llm_node.get("dataStoreSpecs", {}).get("specs", [])
+        if any("snowflake" in s.get("dataStore", "").lower() for s in new_specs):
+            sf_conn = mapping_dict.get("Snowflake Mcp May29", "custom_mcp")
+            if not any(t.get("name") == sf_conn for t in tools_list):
+                tools_list.append({"name": sf_conn})
+        if any("drive" in s.get("dataStore", "").lower() for s in new_specs):
+            dr_conn = mapping_dict.get("ge-drive-all", "Drive")
+            if not any(t.get("name") == dr_conn for t in tools_list):
+                tools_list.append({"name": dr_conn})
+            
+        if "selectedTools" in llm_node:
+            for t in llm_node["selectedTools"].get("tool", []):
+                tname = t.get("name")
+                if tname in mapping_dict:
+                    t["name"] = mapping_dict[tname]
+                    
+        if "dataStoreSpecs" in llm_node:
+            for s in llm_node["dataStoreSpecs"].get("specs", []):
+                ds = s.get("dataStore", "")
+                for src_id, tgt_id in mapping_dict.items():
+                    if src_id in ds:
+                        s["dataStore"] = ds.replace(src_id, tgt_id)
+                        ds = s["dataStore"]
+
     source_name = agent_data.get("name", "")
     match = re.search(r"projects/([^/]+)/locations/([^/]+)/collections/default_collection/engines/([^/]+)", source_name)
-    
+
     payload_str = json.dumps({
         "displayName": agent_data.get("displayName"),
         "description": agent_data.get("description", ""),
@@ -733,3 +980,25 @@ def import_agent_from_gcs(
         "message": f"Successfully imported agent from gs://{bucket_name}/{object_name} to target environment.",
         "target_agent": create_resp.json()
     }
+
+def list_datastores(project_id: str, location: str = "global", collection: str = "default_collection") -> list:
+    """Lists all available datastores and their IDs in a target project/location."""
+    session = get_session()
+    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    url = f"{base_url}/projects/{project_id}/locations/{location}/collections/{collection}/dataStores"
+    
+    logging.info(f"Fetching datastores from {url}")
+    resp = session.get(url)
+    resp.raise_for_status()
+    
+    datastores = resp.json().get("dataStores", [])
+    results = []
+    for ds in datastores:
+        ds_name = ds.get("name", "")
+        ds_id = ds_name.split("/")[-1] if ds_name else "Unknown ID"
+        results.append({
+            "id": ds_id,
+            "displayName": ds.get("displayName", ""),
+            "name": ds_name
+        })
+    return results

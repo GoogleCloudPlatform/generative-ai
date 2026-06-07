@@ -1,0 +1,16 @@
+[project]
+name = "ge-migration-agent"
+version = "0.1.0"
+description = "Seamlessly migrate your low-code agents and Custom Instructions (Gems) to Gemini Enterprise."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-adk",
+    "google-auth>=2.20.0",
+    "google-cloud-storage>=2.10.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+]
+
+[tool.uv]
+package = false

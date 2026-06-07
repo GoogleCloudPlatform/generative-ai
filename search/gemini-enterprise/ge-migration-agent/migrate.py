@@ -70,9 +70,21 @@ def get_env_default(var_names, default=None):
             return val
     return default
 
+try:
+    from skills import MigrationConfigSkill
+    SKILL_CFG = MigrationConfigSkill()
+except Exception:
+    SKILL_CFG = None
+
+def get_skill_env(env_type: str, key: str, default=None):
+    if SKILL_CFG:
+        cfg = SKILL_CFG.get_source_env() if env_type == "source" else SKILL_CFG.get_target_env()
+        return cfg.get(key, default)
+    return default
+
 def handle_list_notebooks(args):
     project = args.project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
-    location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    location = args.location or "global"
     
     if not project:
         print_color("Error: Google Cloud project number must be provided via --project or environment variables.", COLOR_RED)
@@ -101,7 +113,7 @@ def handle_list_notebooks(args):
 
 def handle_list_sources(args):
     project = args.project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
-    location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    location = args.location or "global"
     
     if not project:
         print_color("Error: Google Cloud project number must be provided via --project or environment variables.", COLOR_RED)
@@ -134,8 +146,8 @@ def handle_list_sources(args):
 def handle_migrate_notebook(args):
     source_project = args.source_project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
     target_project = args.target_project or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
-    source_location = args.source_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
-    target_location = args.target_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    source_location = args.source_location or "global"
+    target_location = args.target_location or "global"
     
     if not source_project:
         print_color("Error: Source project must be specified via --source-project or environment.", COLOR_RED)
@@ -173,7 +185,7 @@ def handle_migrate_notebook(args):
 
 def handle_list_agents(args):
     project = args.project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
-    location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    location = args.location or "global"
     
     if not project:
         print_color("Error: Google Cloud project number must be specified.", COLOR_RED)
@@ -206,7 +218,7 @@ def handle_list_agents(args):
 
 def handle_extract_datastores(args):
     project = args.project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
-    location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    location = args.location or "global"
     
     if not project:
         print_color("Error: Source project must be specified.", COLOR_RED)
@@ -236,12 +248,21 @@ def handle_extract_datastores(args):
         sys.exit(1)
 
 def handle_migrate_agent(args):
-    source_project = args.source_project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
-    target_project = args.target_project or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
-    source_location = args.source_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
-    target_location = args.target_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    source_project = args.source_project or get_skill_env("source", "project_number") or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
+    target_project = args.target_project or get_skill_env("target", "project_number") or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
+    source_location = args.source_location or get_skill_env("source", "region", "global")
+    target_location = args.target_location or get_skill_env("target", "region", "global")
+    source_engine = args.source_engine or get_skill_env("source", "engine_id")
+    target_engine = args.target_engine or get_skill_env("target", "engine_id")
     bucket = args.backup_bucket or get_env_default(["GCS_BUCKET_NAME"])
     
+    mapping_str = args.connector_mapping
+    if not mapping_str and SKILL_CFG:
+        mapping = SKILL_CFG.get_connectors_mapping()
+        mapping.update(SKILL_CFG.get_datastores_mapping())
+        if mapping:
+            mapping_str = json.dumps(mapping)
+            
     if not source_project or not target_project:
         print_color("Error: Source and Target projects must be specified.", COLOR_RED)
         sys.exit(1)
@@ -252,12 +273,13 @@ def handle_migrate_agent(args):
             args.agent_name,
             target_project,
             target_location,
-            args.target_engine,
+            target_engine,
             source_project,
             source_location,
-            args.source_engine,
+            source_engine,
             args.force,
-            bucket
+            bucket,
+            mapping_str
         )
         if args.json:
             print(json.dumps(res, indent=2))
@@ -279,9 +301,44 @@ def handle_migrate_agent(args):
         print_color(f"Error: {e}", COLOR_RED)
         sys.exit(1)
 
+def handle_lookup_and_map_connectors(args):
+    source_project = args.source_project or get_skill_env("source", "project_number") or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
+    target_project = args.target_project or get_skill_env("target", "project_number") or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
+    source_location = args.source_location or get_skill_env("source", "region", "global")
+    target_location = args.target_location or get_skill_env("target", "region", "global")
+    source_engine = args.source_engine or get_skill_env("source", "engine_id")
+    target_engine = args.target_engine or get_skill_env("target", "engine_id")
+    
+    try:
+        res = core.lookup_and_map_connectors(
+            args.agent_name,
+            target_project,
+            target_location,
+            target_engine,
+            source_project,
+            source_location,
+            source_engine
+        )
+        if args.json:
+            print(json.dumps(res, indent=2))
+        else:
+            headers = ["Source Connector / DataStore", "Target Mapping", "Status"]
+            mapping = res.get("proposed_mapping", {})
+            missing = res.get("missing_connectors", [])
+            rows = []
+            for k, v in mapping.items():
+                status = "❌ Missing" if k in missing else "✅ Mapped"
+                rows.append([k, v, status])
+            format_table(headers, rows)
+            if missing:
+                print_color(f"\n⚠️ Missing Connectors/DataStores in Target: {missing}", COLOR_YELLOW)
+    except Exception as e:
+        print_color(f"Error: {e}", COLOR_RED)
+        sys.exit(1)
+
 def handle_import_gems(args):
     target_project = args.target_project or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
-    target_location = args.target_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    target_location = args.target_location or "global"
     
     if not target_project:
         print_color("Error: Target project must be specified.", COLOR_RED)
@@ -309,9 +366,30 @@ def handle_import_gems(args):
         print_color(f"Error importing Gems: {e}", COLOR_RED)
         sys.exit(1)
 
+def handle_list_datastores(args):
+    project = args.project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
+    location = args.location or "global"
+    
+    if not project:
+        print_color("Error: Google Cloud project number must be specified.", COLOR_RED)
+        sys.exit(1)
+        
+    print_color(f"Listing DataStores in project {project} ({location})...", COLOR_BLUE)
+    try:
+        datastores = core.list_datastores(project, location)
+        if args.json:
+            print(json.dumps(datastores, indent=2))
+        else:
+            headers = ["DataStore ID", "Display Name", "Full Resource Name"]
+            rows = [[ds["id"], ds["displayName"], ds["name"]] for ds in datastores]
+            format_table(headers, rows)
+    except Exception as e:
+        print_color(f"Error: {e}", COLOR_RED)
+        sys.exit(1)
+
 def handle_export_agent_gcs(args):
     project = args.project or get_env_default(["GEMINI_API_PROJECT", "GOOGLE_CLOUD_PROJECT"])
-    location = args.location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    location = args.location or "global"
     bucket = args.bucket or get_env_default(["GCS_BUCKET_NAME"])
     
     if not project:
@@ -341,9 +419,16 @@ def handle_export_agent_gcs(args):
 
 def handle_import_agent_gcs(args):
     project = args.target_project or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
-    location = args.target_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    location = args.target_location or "global"
     bucket = args.bucket or get_env_default(["GCS_BUCKET_NAME"])
     
+    mapping_str = ""
+    if SKILL_CFG:
+        mapping = SKILL_CFG.get_connectors_mapping()
+        mapping.update(SKILL_CFG.get_datastores_mapping())
+        if mapping:
+            mapping_str = json.dumps(mapping)
+            
     if not project:
         print_color("Error: Target project must be specified.", COLOR_RED)
         sys.exit(1)
@@ -358,7 +443,8 @@ def handle_import_agent_gcs(args):
             project,
             location,
             args.target_engine,
-            bucket
+            bucket,
+            mapping_str
         )
         if args.json:
             print(json.dumps(res, indent=2))
@@ -370,7 +456,7 @@ def handle_import_agent_gcs(args):
 
 def handle_create_notebook(args):
     target_project = args.target_project or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
-    target_location = args.target_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    target_location = args.target_location or "global"
     
     if not target_project:
         print_color("Error: Target project must be specified.", COLOR_RED)
@@ -390,7 +476,7 @@ def handle_create_notebook(args):
 
 def handle_add_source_to_notebook(args):
     target_project = args.target_project or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
-    target_location = args.target_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    target_location = args.target_location or "global"
     
     if not target_project:
         print_color("Error: Target project must be specified.", COLOR_RED)
@@ -410,7 +496,7 @@ def handle_add_source_to_notebook(args):
 
 def handle_create_agent_from_gem(args):
     target_project = args.target_project or get_env_default(["GOOGLE_CLOUD_PROJECT", "GEMINI_API_PROJECT"])
-    target_location = args.target_location or get_env_default(["GEMINI_API_LOCATION", "GOOGLE_CLOUD_LOCATION"], "global")
+    target_location = args.target_location or "global"
     
     if not target_project:
         print_color("Error: Target project must be specified.", COLOR_RED)
@@ -485,13 +571,25 @@ def main():
     p_mig_ag.add_argument("agent_name", help="Exact display name of source low-code agent to migrate")
     p_mig_ag.add_argument("--source-project", help="Source project number (defaults to GEMINI_API_PROJECT env)")
     p_mig_ag.add_argument("--target-project", help="Target project number (defaults to GOOGLE_CLOUD_PROJECT env)")
-    p_mig_ag.add_argument("--source-engine", required=True, help="Source Discovery Engine engine ID")
-    p_mig_ag.add_argument("--target-engine", required=True, help="Target Discovery Engine engine ID")
+    p_mig_ag.add_argument("--source-engine", help="Source Discovery Engine engine ID")
+    p_mig_ag.add_argument("--target-engine", help="Target Discovery Engine engine ID")
     p_mig_ag.add_argument("--source-location", help="Source geographic location (defaults to 'global')")
     p_mig_ag.add_argument("--target-location", help="Target geographic location (defaults to 'global')")
     p_mig_ag.add_argument("--force", action="store_true", help="Bypass connector pre-flight validation check")
     p_mig_ag.add_argument("--backup-bucket", help="GCS bucket name for implicit backup (defaults to GCS_BUCKET_NAME env)")
+    p_mig_ag.add_argument("--connector-mapping", help="Optional JSON dict or comma-separated k:v mapping string", default="")
     p_mig_ag.set_defaults(func=handle_migrate_agent)
+    
+    # Lookup and Map Connectors
+    p_lookup_map = subparsers.add_parser("lookup-map-connectors", help="Lookup and intelligently map source connectors to target connectors")
+    p_lookup_map.add_argument("agent_name", help="Exact display name of source agent")
+    p_lookup_map.add_argument("--source-project", help="Source project number")
+    p_lookup_map.add_argument("--target-project", help="Target project number")
+    p_lookup_map.add_argument("--source-engine", help="Source engine ID")
+    p_lookup_map.add_argument("--target-engine", help="Target engine ID")
+    p_lookup_map.add_argument("--source-location", help="Source location", default="global")
+    p_lookup_map.add_argument("--target-location", help="Target location", default="global")
+    p_lookup_map.set_defaults(func=handle_lookup_and_map_connectors)
     
     # Import Gems
     p_imp_gems = subparsers.add_parser("import-gems", help="Batch import custom instructions (Gems) from an HTML dump file")
@@ -500,7 +598,11 @@ def main():
     p_imp_gems.add_argument("--target-engine", required=True, help="Target Discovery Engine engine ID")
     p_imp_gems.add_argument("--target-location", help="Target geographic location (defaults to 'global')")
     p_imp_gems.set_defaults(func=handle_import_gems)
-    
+    # List DataStores
+    p_list_ds = subparsers.add_parser("list-datastores", help="List available DataStores in a project")
+    p_list_ds.add_argument("--project", help="Google Cloud project number")
+    p_list_ds.add_argument("--location", help="Location (defaults to 'global')", default="global")
+    p_list_ds.set_defaults(func=handle_list_datastores)
     # Export Agent GCS
     p_exp_gcs = subparsers.add_parser("export-agent-gcs", help="Export an employee-made low-code agent to GCS")
     p_exp_gcs.add_argument("agent_name", help="Exact display name of source low-code agent")
