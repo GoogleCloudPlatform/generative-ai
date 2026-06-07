@@ -1,0 +1,73 @@
+{
+  "description": "Golden evaluation tests for contract field extraction accuracy",
+  "test_cases": [
+    {
+      "name": "standard_vendor_agreement_extraction",
+      "input": {
+        "filename": "standard-vendor-agreement.pdf",
+        "user_message": "Audit contract file: 'standard-vendor-agreement.pdf'."
+      },
+      "expected_fields": {
+        "contract_value": 250000.0,
+        "contractor_name": "ACME CLOUD SOLUTIONS",
+        "client_name": "GFD PLATFORM SYSTEMS",
+        "start_date": "2026-06-01",
+        "end_date": "2028-06-01",
+        "liability_limit": "$1,000,000",
+        "insurance_coverage": 2000000.0,
+        "auto_renewal": false,
+        "has_termination_clause": true,
+        "term_length_years": 2
+      },
+      "expected_risk_tier": "LOW",
+      "expected_risk_factors": []
+    },
+    {
+      "name": "high_risk_liability_extraction",
+      "input": {
+        "filename": "high-risk-liability-contract.pdf",
+        "user_message": "Audit contract file: 'high-risk-liability-contract.pdf'."
+      },
+      "expected_fields": {
+        "contract_value": 450000.0,
+        "contractor_name": "APEX DATA SYSTEMS",
+        "client_name": "GFD PLATFORM SYSTEMS",
+        "start_date": "2026-06-01",
+        "end_date": "2027-06-01",
+        "liability_limit": "unlimited",
+        "insurance_coverage": 1500000.0,
+        "auto_renewal": false,
+        "has_termination_clause": true,
+        "term_length_years": 1
+      },
+      "expected_risk_tier": "HIGH",
+      "expected_risk_factors": ["Unlimited contractor liability"]
+    },
+    {
+      "name": "non_compliant_contract_extraction",
+      "input": {
+        "filename": "non-compliant-contract.pdf",
+        "user_message": "Audit contract file: 'non-compliant-contract.pdf'."
+      },
+      "expected_fields": {
+        "contract_value": 850000.0,
+        "contractor_name": "LEGACY NETWORKS CORP",
+        "client_name": "GFD PLATFORM SYSTEMS",
+        "start_date": "2026-06-01",
+        "end_date": "2032-06-01",
+        "liability_limit": "unlimited",
+        "insurance_coverage": 500000.0,
+        "auto_renewal": true,
+        "has_termination_clause": false,
+        "term_length_years": 6
+      },
+      "expected_risk_tier": "HIGH",
+      "expected_risk_factors": [
+        "Unlimited contractor liability",
+        "High financial obligation value (> $500k)",
+        "Extended engagement lifecycle duration (> 5 years)",
+        "Missing exit notice termination safety clauses"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "description": "Mocked A2A response tests — validates Python agent handles every compliance outcome correctly",
+  "test_cases": [
+    {
+      "name": "compliance_pass",
+      "description": "All contract terms are within policy limits. Agent should mark as APPROVED.",
+      "mocked_a2a_response": {
+        "jsonrpc": "2.0",
+        "id": "test-pass-001",
+        "result": {
+          "id": "task-pass-001",
+          "status": {
+            "state": "completed",
+            "message": {
+              "role": "agent",
+              "parts": [
+                {
+                  "type": "data",
+                  "data": {
+                    "passed": true,
+                    "violations": [],
+                    "verdict_timestamp": "2026-06-01T12:00:00Z"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected_pipeline_state": {
+        "current_step": "APPROVED",
+        "compliance_verdict": {
+          "passed": true,
+          "violations": []
+        }
+      }
+    },
+    {
+      "name": "compliance_fail_single_violation",
+      "description": "Contract has unlimited liability — should flag for review with violation details.",
+      "mocked_a2a_response": {
+        "jsonrpc": "2.0",
+        "id": "test-fail-001",
+        "result": {
+          "id": "task-fail-001",
+          "status": {
+            "state": "completed",
+            "message": {
+              "role": "agent",
+              "parts": [
+                {
+                  "type": "data",
+                  "data": {
+                    "passed": false,
+                    "violations": [
+                      "Unlimited contractor liability clauses are strictly prohibited by company policy"
+                    ],
+                    "verdict_timestamp": "2026-06-01T12:01:00Z"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected_pipeline_state": {
+        "current_step": "REVIEW_READY",
+        "compliance_verdict": {
+          "passed": false,
+          "violations": [
+            "Unlimited contractor liability clauses are strictly prohibited by company policy"
+          ]
+        }
+      }
+    },
+    {
+      "name": "compliance_fail_multiple_violations",
+      "description": "Contract has 6 policy violations — should flag with full violation list.",
+      "mocked_a2a_response": {
+        "jsonrpc": "2.0",
+        "id": "test-fail-002",
+        "result": {
+          "id": "task-fail-002",
+          "status": {
+            "state": "completed",
+            "message": {
+              "role": "agent",
+              "parts": [
+                {
+                  "type": "data",
+                  "data": {
+                    "passed": false,
+                    "violations": [
+                      "Contract value $850000.00 exceeds company framework limit of $500000.00",
+                      "Unlimited contractor liability clauses are strictly prohibited by company policy",
+                      "Auto-renewal spans extending beyond 3 years are unauthorized",
+                      "Insurance coverage $500000.00 is under the security minimum threshold of $1000000.00",
+                      "Engagement length of 6 years exceeds framework limit bounds of 5 years",
+                      "Missing required written exit termination safety clauses"
+                    ],
+                    "verdict_timestamp": "2026-06-01T12:02:00Z"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected_pipeline_state": {
+        "current_step": "REVIEW_READY",
+        "compliance_verdict": {
+          "passed": false
+        }
+      }
+    },
+    {
+      "name": "compliance_timeout",
+      "description": "Go compliance agent does not respond within 30 seconds — should fall back to MANUAL_REVIEW.",
+      "mocked_a2a_response": null,
+      "timeout_seconds": 30,
+      "expected_pipeline_state": {
+        "current_step": "MANUAL_REVIEW",
+        "compliance_verdict": {
+          "passed": false,
+          "violations": [
+            "SYSTEM TIMEOUT: External compliance service failed to respond within 30-second threshold."
+          ]
+        }
+      }
+    }
+  ]
+}
