@@ -26,7 +26,7 @@ metadata:
 
 # ADK Administration Setup & Migration Instructions
 
-This file serves as the single source of truth for cross-environment Gemini Enterprise / Vertex AI agent migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
+This file serves as the single source of truth for cross-environment Gemini Enterprise app agent migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
 
 ---
 
@@ -34,7 +34,7 @@ This file serves as the single source of truth for cross-environment Gemini Ente
 
 ### 1. Environments Configuration
 Set your official canonical source and target project definitions under `environments`:
-- **`project_number`**: The numeric GCP Project Number (e.g., `123456789012`).
+- **`project_number`**: The numeric Google Cloud Project Number (e.g., `123456789012`).
 - **`engine_id`**: The fully qualified Discovery Engine app/engine ID.
 
 ### 2. DataStore Grounding Mappings (`datastores_mapping`)
