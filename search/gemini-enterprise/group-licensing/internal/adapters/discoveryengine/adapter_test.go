@@ -557,3 +557,95 @@ func TestBatchUpdateUserLicenses_InvalidArgument_NonExhaustion_NotMapped(t *test
 
 	mockClient.AssertExpectations(t)
 }
+
+// --- Endpoint helper tests ---
+
+func TestGRPCEndpointForLocation(t *testing.T) {
+	tests := []struct {
+		location models.Location
+		want     string
+	}{
+		{models.LocationGlobal, ""},
+		{models.LocationUS, usHost + ":443"},
+		{models.LocationEU, euHost + ":443"},
+	}
+	for _, tc := range tests {
+		t.Run(string(tc.location), func(t *testing.T) {
+			got := grpcEndpointForLocation(tc.location)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestRESTEndpointForLocation(t *testing.T) {
+	tests := []struct {
+		location models.Location
+		want     string
+	}{
+		{models.LocationGlobal, ""},
+		{models.LocationUS, "https://" + usHost + "/"},
+		{models.LocationEU, "https://" + euHost + "/"},
+	}
+	for _, tc := range tests {
+		t.Run(string(tc.location), func(t *testing.T) {
+			got := restEndpointForLocation(tc.location)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+// --- Client caching / factory tests ---
+
+// countingClient is a minimal userLicenseClient used to distinguish instances
+// by identity pointer in caching tests.
+type countingClient struct{ id int }
+
+func (c *countingClient) ListUserLicenses(_ context.Context, _ *discoveryenginepb.ListUserLicensesRequest) userLicenseIterator {
+	return newFakeIterator(nil, nil)
+}
+func (c *countingClient) BatchUpdateUserLicenses(_ context.Context, _ *discoveryenginepb.BatchUpdateUserLicensesRequest) error {
+	return nil
+}
+
+func TestClientFor_SameLocationReturnsCachedClient(t *testing.T) {
+	callCount := 0
+	clientA := &countingClient{id: 1}
+
+	adapter := newWithFactory(func(_ context.Context, _ models.Location) (userLicenseClient, error) {
+		callCount++
+		return clientA, nil
+	})
+
+	c1, err := adapter.clientFor(context.Background(), models.LocationUS)
+	require.NoError(t, err)
+
+	c2, err := adapter.clientFor(context.Background(), models.LocationUS)
+	require.NoError(t, err)
+
+	assert.Equal(t, 1, callCount, "factory must be called exactly once for the same location")
+	assert.Same(t, c1.(*countingClient), c2.(*countingClient), "same client instance must be returned on repeat call")
+}
+
+func TestClientFor_DifferentLocationsGetDistinctClients(t *testing.T) {
+	callCount := 0
+	factory := func(_ context.Context, _ models.Location) (userLicenseClient, error) {
+		callCount++
+		return &countingClient{id: callCount}, nil
+	}
+
+	adapter := newWithFactory(factory)
+
+	cGlobal, err := adapter.clientFor(context.Background(), models.LocationGlobal)
+	require.NoError(t, err)
+
+	cUS, err := adapter.clientFor(context.Background(), models.LocationUS)
+	require.NoError(t, err)
+
+	cEU, err := adapter.clientFor(context.Background(), models.LocationEU)
+	require.NoError(t, err)
+
+	assert.Equal(t, 3, callCount, "factory must be called once per distinct location")
+	assert.NotSame(t, cGlobal.(*countingClient), cUS.(*countingClient), "global and us clients must be distinct")
+	assert.NotSame(t, cUS.(*countingClient), cEU.(*countingClient), "us and eu clients must be distinct")
+	assert.NotSame(t, cGlobal.(*countingClient), cEU.(*countingClient), "global and eu clients must be distinct")
+}

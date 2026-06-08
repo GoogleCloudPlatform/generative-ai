@@ -22,12 +22,14 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	discoveryenginesdk "cloud.google.com/go/discoveryengine/apiv1"
 	"cloud.google.com/go/discoveryengine/apiv1/discoveryenginepb"
 	discoveryengineapi "google.golang.org/api/discoveryengine/v1alpha"
 	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -77,27 +79,125 @@ func (r *realClient) BatchUpdateUserLicenses(ctx context.Context, req *discovery
 	return err
 }
 
+// Endpoint hostname constants for location-prefixed Discovery Engine backends.
+// The helpers below compose these into the full gRPC and REST endpoint strings.
+const (
+	usHost = "us-discoveryengine.googleapis.com"
+	euHost = "eu-discoveryengine.googleapis.com"
+)
+
+// grpcEndpointForLocation returns the gRPC endpoint host:port for the given
+// location. For non-global locations (us, eu) it returns the location-prefixed
+// endpoint. For global it returns an empty string, meaning the SDK default
+// (discoveryengine.googleapis.com:443) is used.
+func grpcEndpointForLocation(loc models.Location) string {
+	switch loc {
+	case models.LocationUS:
+		return usHost + ":443"
+	case models.LocationEU:
+		return euHost + ":443"
+	default:
+		return ""
+	}
+}
+
+// restEndpointForLocation returns the REST base URL for the given location.
+// For non-global locations (us, eu) it returns the location-prefixed URL.
+// For global it returns an empty string, meaning the SDK default is used.
+func restEndpointForLocation(loc models.Location) string {
+	switch loc {
+	case models.LocationUS:
+		return "https://" + usHost + "/"
+	case models.LocationEU:
+		return "https://" + euHost + "/"
+	default:
+		return ""
+	}
+}
+
 // Adapter implements ports.GeminiClient using the Discovery Engine API.
+// It lazily creates and caches one gRPC client per location.
 type Adapter struct {
-	client userLicenseClient
+	factory func(ctx context.Context, loc models.Location) (userLicenseClient, error)
+	mu      sync.Mutex
+	clients map[models.Location]userLicenseClient
 }
 
-// New constructs an Adapter from an already-authenticated
-// *discoveryenginesdk.UserLicenseClient. The caller is responsible for
-// configuring Application Default Credentials before calling New.
-func New(client *discoveryenginesdk.UserLicenseClient) *Adapter {
-	return &Adapter{client: &realClient{c: client}}
+// New constructs an Adapter whose gRPC clients are created on demand, one per
+// location, using Application Default Credentials. For non-global locations the
+// correct location-prefixed endpoint is selected automatically.
+func New() *Adapter {
+	a := &Adapter{
+		clients: make(map[models.Location]userLicenseClient),
+	}
+	a.factory = func(ctx context.Context, loc models.Location) (userLicenseClient, error) {
+		opts := []option.ClientOption{}
+		if ep := grpcEndpointForLocation(loc); ep != "" {
+			opts = append(opts, option.WithEndpoint(ep))
+		}
+		c, err := discoveryenginesdk.NewUserLicenseClient(ctx, opts...)
+		if err != nil {
+			return nil, err
+		}
+		return &realClient{c: c}, nil
+	}
+	return a
 }
 
-// newWithClient is used by tests to inject a fake userLicenseClient.
+// newWithClient is used by tests to inject a single fake userLicenseClient that
+// is returned for every location.
 func newWithClient(c userLicenseClient) *Adapter {
-	return &Adapter{client: c}
+	a := &Adapter{
+		clients: make(map[models.Location]userLicenseClient),
+	}
+	a.factory = func(_ context.Context, _ models.Location) (userLicenseClient, error) {
+		return c, nil
+	}
+	return a
+}
+
+// newWithFactory is used by tests to inject a custom factory function, enabling
+// verification of per-location client creation and caching behaviour.
+func newWithFactory(factory func(ctx context.Context, loc models.Location) (userLicenseClient, error)) *Adapter {
+	return &Adapter{
+		factory: factory,
+		clients: make(map[models.Location]userLicenseClient),
+	}
+}
+
+// clientFor returns the cached client for the given location, creating it via
+// the factory if it has not been initialised yet. It uses double-checked locking
+// so that the (potentially blocking) factory dial does not hold the mutex.
+// It is safe for concurrent use.
+func (a *Adapter) clientFor(ctx context.Context, location models.Location) (userLicenseClient, error) {
+	a.mu.Lock()
+	if c, ok := a.clients[location]; ok {
+		a.mu.Unlock()
+		return c, nil
+	}
+	a.mu.Unlock()
+
+	c, err := a.factory(ctx, location)
+	if err != nil {
+		return nil, fmt.Errorf("creating discovery engine client for location %s: %w", location, err)
+	}
+
+	a.mu.Lock()
+	if existing, ok := a.clients[location]; ok {
+		// Another goroutine populated the cache while we were dialling; discard ours.
+		a.mu.Unlock()
+		return existing, nil
+	}
+	a.clients[location] = c
+	a.mu.Unlock()
+	return c, nil
 }
 
 // FetchLicenseConfigIndex retrieves all billing account license configurations
 // and returns an index mapping (SKU, ProjectID, Location) to the full
 // per-project licenseConfig resource path. The service layer calls this once
 // at the start of each run and resolves paths before issuing grant operations.
+// This endpoint is always global; no location-specific override is applied.
 func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error) {
 	svc, err := discoveryengineapi.NewService(ctx)
 	if err != nil {
@@ -152,6 +252,11 @@ func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID 
 // uses iterator.NewPager to correctly honour the caller-supplied pageToken,
 // fixing the pagination bug that existed when InternalFetch was called directly.
 func (a *Adapter) ListUserLicenses(ctx context.Context, projectID string, location models.Location, pageToken string) ([]models.UserLicense, string, error) {
+	client, err := a.clientFor(ctx, location)
+	if err != nil {
+		return nil, "", fmt.Errorf("%w: %w", models.ErrLicenseListFailed, err)
+	}
+
 	parent := fmt.Sprintf("projects/%s/locations/%s/userStores/default_user_store", projectID, location)
 
 	req := &discoveryenginepb.ListUserLicensesRequest{
@@ -159,7 +264,7 @@ func (a *Adapter) ListUserLicenses(ctx context.Context, projectID string, locati
 		PageToken: pageToken,
 	}
 
-	it := a.client.ListUserLicenses(ctx, req)
+	it := client.ListUserLicenses(ctx, req)
 
 	pager := iterator.NewPager(it, licenseListPageSize, pageToken)
 
@@ -195,6 +300,11 @@ func (a *Adapter) BatchUpdateUserLicenses(ctx context.Context, projectID string,
 		return fmt.Errorf("%w: batch size %d exceeds maximum %d", models.ErrBatchUpdateFailed, len(updates), models.MaxBatchSize)
 	}
 
+	client, err := a.clientFor(ctx, location)
+	if err != nil {
+		return fmt.Errorf("%w: %w", models.ErrBatchUpdateFailed, err)
+	}
+
 	parent := fmt.Sprintf("projects/%s/locations/%s/userStores/default_user_store", projectID, location)
 
 	isRevoke := len(updates) > 0 && updates[0].Action == models.LicenseActionRevoke
@@ -221,7 +331,7 @@ func (a *Adapter) BatchUpdateUserLicenses(ctx context.Context, projectID string,
 		},
 	}
 
-	if err := a.client.BatchUpdateUserLicenses(ctx, req); err != nil {
+	if err := client.BatchUpdateUserLicenses(ctx, req); err != nil {
 		return fmt.Errorf("%w: %w", models.ErrBatchUpdateFailed, mapGRPCError(err))
 	}
 
@@ -294,8 +404,15 @@ func licenseUpdateToProto(u models.LicenseUpdate) *discoveryenginepb.UserLicense
 // number of licenses currently assigned (usedLicenseCount) for all licenseConfigs
 // under the given project's default user store. The projectID must be the numeric
 // project number that appears in licenseConfig resource paths.
+// For non-global locations the location-prefixed REST endpoint is used so that
+// the request reaches the correct regional backend.
 func (a *Adapter) FetchLicenseUsageStats(ctx context.Context, projectID string, location models.Location) (map[string]int64, error) {
-	svc, err := discoveryengineapi.NewService(ctx)
+	opts := []option.ClientOption{}
+	if ep := restEndpointForLocation(location); ep != "" {
+		opts = append(opts, option.WithEndpoint(ep))
+	}
+
+	svc, err := discoveryengineapi.NewService(ctx, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("creating discoveryengine REST client: %w", err)
 	}
