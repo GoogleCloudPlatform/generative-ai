@@ -97,13 +97,13 @@ func TestJoinerService_Run_HappyPath_SKUPrecedence(t *testing.T) {
 	// Updates are now grouped by licenseConfigPath, so we expect two separate
 	// BatchUpdateUserLicenses calls: one for ent-config (bothUser) and one for
 	// biz-config (bizOnlyUser). The calls may arrive in either order.
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 1 &&
 			updates[0].UserEmail == userBoth &&
 			updates[0].LicenseConfigPath == "projects/"+projectNumber+"/locations/global/licenseConfigs/ent-config" &&
 			updates[0].Action == models.LicenseActionGrant
 	})).Return(nil)
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 1 &&
 			updates[0].UserEmail == userBizOnly &&
 			updates[0].LicenseConfigPath == "projects/"+projectNumber+"/locations/global/licenseConfigs/biz-config" &&
@@ -278,7 +278,7 @@ func TestJoinerService_Run_BatchUpdateError_ReturnsError(t *testing.T) {
 			{Email: "user@example.com", Type: models.MemberTypeUser},
 		}, "", nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.Anything).
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.Anything).
 		Return(models.ErrBatchUpdateFailed)
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
@@ -326,7 +326,7 @@ func TestJoinerService_Run_MultiPagePagination_AllMembersCollected(t *testing.T)
 			{Email: "user-b@example.com", Type: models.MemberTypeUser},
 		}, "", nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 2
 	})).Return(nil)
 
@@ -432,7 +432,7 @@ func TestJoinerService_Run_GroupTypeMembersIgnored(t *testing.T) {
 			{Email: "user@example.com", Type: models.MemberTypeUser},
 		}, "", nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 1 && updates[0].UserEmail == "user@example.com"
 	})).Return(nil)
 
@@ -485,16 +485,16 @@ func TestJoinerService_Run_LicensePoolExhausted_TrimsAndSoftFails(t *testing.T) 
 		}, "", nil)
 
 	// First call (all 5) → exhaustion.
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 5
 	})).Return(models.ErrLicensesExhausted).Once()
 
 	// Usage stats: 48 used, allocated 50 → 2 available.
-	gemini.On("FetchLicenseUsageStats", mock.Anything, projectNumber).
+	gemini.On("FetchLicenseUsageStats", mock.Anything, projectNumber, models.LocationGlobal).
 		Return(map[string]int64{configPath: 48}, nil)
 
 	// Trimmed retry with exactly 2 users.
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 2
 	})).Return(nil).Once()
 
@@ -543,12 +543,12 @@ func TestJoinerService_Run_LicensePoolFullyExhausted_AllSoftFailed(t *testing.T)
 		}, "", nil)
 
 	// First call → exhaustion.
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 2
 	})).Return(models.ErrLicensesExhausted).Once()
 
 	// AllocatedCount for ent-config is 50; report 50 used → 0 available.
-	gemini.On("FetchLicenseUsageStats", mock.Anything, projectNumber).
+	gemini.On("FetchLicenseUsageStats", mock.Anything, projectNumber, models.LocationGlobal).
 		Return(map[string]int64{configPath: 50}, nil)
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
@@ -594,10 +594,10 @@ func TestJoinerService_Run_LicensePoolExhausted_UsageStatsFails_ReturnsError(t *
 			{Email: "user@example.com", Type: models.MemberTypeUser},
 		}, "", nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.Anything).
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.Anything).
 		Return(models.ErrLicensesExhausted)
 
-	gemini.On("FetchLicenseUsageStats", mock.Anything, projectNumber).
+	gemini.On("FetchLicenseUsageStats", mock.Anything, projectNumber, models.LocationGlobal).
 		Return(nil, errors.New("usage stats api unavailable"))
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{

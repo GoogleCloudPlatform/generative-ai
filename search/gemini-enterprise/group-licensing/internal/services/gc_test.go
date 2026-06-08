@@ -58,7 +58,7 @@ func TestGCService_Run_StaleUser_LicenseRevoked(t *testing.T) {
 
 	staleLogin := time.Now().AddDate(0, 0, -60) // 60 days ago — beyond 30-day threshold.
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:     userEmail,
@@ -67,7 +67,7 @@ func TestGCService_Run_StaleUser_LicenseRevoked(t *testing.T) {
 			},
 		}, "", nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 1 &&
 			updates[0].UserEmail == userEmail &&
 			updates[0].Action == models.LicenseActionRevoke
@@ -108,7 +108,7 @@ func TestGCService_Run_NeverLoggedIn_RecentAssignment_LicenseKept(t *testing.T) 
 
 	recentAssignment := time.Now().AddDate(0, 0, -5) // assigned 5 days ago — within 30-day threshold
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:      userEmail,
@@ -155,7 +155,7 @@ func TestGCService_Run_NeverLoggedIn_StaleAssignment_LicenseRevoked(t *testing.T
 
 	staleAssignment := time.Now().AddDate(0, 0, -60) // assigned 60 days ago — beyond 30-day threshold
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:      userEmail,
@@ -165,7 +165,7 @@ func TestGCService_Run_NeverLoggedIn_StaleAssignment_LicenseRevoked(t *testing.T
 			},
 		}, "", nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 1 &&
 			updates[0].UserEmail == userEmail &&
 			updates[0].Action == models.LicenseActionRevoke
@@ -203,7 +203,7 @@ func TestGCService_Run_NeverLoggedIn_NoAssignmentTime_LicenseRevoked(t *testing.
 		userEmail = "no-timestamps@example.com"
 	)
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:      userEmail,
@@ -213,7 +213,7 @@ func TestGCService_Run_NeverLoggedIn_NoAssignmentTime_LicenseRevoked(t *testing.
 			},
 		}, "", nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 1 &&
 			updates[0].UserEmail == userEmail &&
 			updates[0].Action == models.LicenseActionRevoke
@@ -252,7 +252,7 @@ func TestGCService_Run_EntitledActiveUser_NotRevoked(t *testing.T) {
 
 	recentLogin := time.Now().AddDate(0, 0, -5) // 5 days ago — within threshold.
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:     userEmail,
@@ -297,7 +297,7 @@ func TestGCService_Run_UnentitledUser_LicenseRevoked(t *testing.T) {
 
 	recentLogin := time.Now().AddDate(0, 0, -5)
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:     userEmail,
@@ -309,7 +309,7 @@ func TestGCService_Run_UnentitledUser_LicenseRevoked(t *testing.T) {
 	// The user is no longer in the group.
 	idp.On("HasMember", mock.Anything, group, userEmail).Return(false, nil)
 
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
 		return len(updates) == 1 &&
 			updates[0].UserEmail == userEmail &&
 			updates[0].Action == models.LicenseActionRevoke
@@ -348,7 +348,7 @@ func TestGCService_Run_DryRun_NoAPIWrite(t *testing.T) {
 
 	staleLogin := time.Now().AddDate(0, 0, -90)
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:     userEmail,
@@ -382,7 +382,7 @@ func TestGCService_Run_ListUserLicensesError_ReturnsError(t *testing.T) {
 
 	const projectID = "proj-list-err"
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return(nil, "", models.ErrLicenseListFailed)
 
 	cfg := newGCConfig(30, map[string]config.ProjectConfig{
@@ -416,7 +416,7 @@ func TestGCService_Run_MultiPagePagination_AllUsersEvaluated(t *testing.T) {
 	recentLogin := time.Now().AddDate(0, 0, -1)
 
 	// Page 1.
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:     "user-a@example.com",
@@ -426,7 +426,7 @@ func TestGCService_Run_MultiPagePagination_AllUsersEvaluated(t *testing.T) {
 		}, tokenP1, nil)
 
 	// Page 2.
-	gemini.On("ListUserLicenses", mock.Anything, projectID, tokenP1).
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, tokenP1).
 		Return([]models.UserLicense{
 			{
 				UserEmail:     "user-b@example.com",
@@ -472,7 +472,7 @@ func TestGCService_Run_HasMemberError_ReturnsError(t *testing.T) {
 
 	recentLogin := time.Now().AddDate(0, 0, -1)
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:     userEmail,
@@ -509,7 +509,7 @@ func TestGCService_Run_AlreadyRevokedLicense_Skipped(t *testing.T) {
 
 	const projectID = "proj-already-revoked"
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail: "revoked@example.com",
@@ -573,7 +573,7 @@ func TestGCService_Run_StalenessDisabled_NeverLoggedInUserNotRevoked(t *testing.
 		userEmail = "new-user@example.com"
 	)
 
-	gemini.On("ListUserLicenses", mock.Anything, projectID, "").
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
 		Return([]models.UserLicense{
 			{
 				UserEmail:     userEmail,
@@ -618,7 +618,7 @@ func TestGCService_processProject_PageLimitReached(t *testing.T) {
 
 	// The mock returns a stale user and a non-empty next-page token on every
 	// call regardless of the token supplied.
-	gemini.On("ListUserLicenses", mock.Anything, projectID, mock.Anything).
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.Anything).
 		Return([]models.UserLicense{
 			{
 				UserEmail:     "stale@example.com",
@@ -628,7 +628,7 @@ func TestGCService_processProject_PageLimitReached(t *testing.T) {
 		}, "next-token", nil)
 
 	// Each page produces one stale user who triggers a revocation batch.
-	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, mock.Anything).
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.Anything).
 		Return(nil)
 
 	projectCfg := config.ProjectConfig{

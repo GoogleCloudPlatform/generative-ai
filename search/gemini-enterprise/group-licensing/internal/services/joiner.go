@@ -203,14 +203,16 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber string, entry models.LicenseConfigEntry, batch []models.LicenseUpdate) (granted, softFailed int, err error) {
 	logger := middleware.LoggerFromContext(ctx)
 
-	if batchErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, batch); batchErr == nil {
+	location := batch[0].Location
+
+	if batchErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, batch); batchErr == nil {
 		return len(batch), 0, nil
 	} else if !errors.Is(batchErr, models.ErrLicensesExhausted) {
 		return 0, 0, batchErr
 	}
 
 	// License pool exhausted. Look up how many seats are still available.
-	usageStats, statsErr := s.gemini.FetchLicenseUsageStats(ctx, projectNumber)
+	usageStats, statsErr := s.gemini.FetchLicenseUsageStats(ctx, projectNumber, location)
 	if statsErr != nil {
 		return 0, 0, fmt.Errorf("fetching license usage stats after exhaustion: %w", statsErr)
 	}
@@ -234,7 +236,7 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 
 	// Retry with only the available seats. Any error here is a hard failure.
 	trimmed := batch[:available]
-	if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, trimmed); retryErr != nil {
+	if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, trimmed); retryErr != nil {
 		return 0, 0, retryErr
 	}
 	return int(available), len(batch) - int(available), nil
