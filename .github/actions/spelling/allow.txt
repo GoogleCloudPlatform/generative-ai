@@ -128,6 +128,8 @@ bbq
 beir
 bennett
 Benno
+BENGALURU
+Bengaluru
 bert
 Bettes
 betulus
@@ -151,6 +153,7 @@ BITCODE
 bitcoin
 Bitcoin
 blogs
+BLR
 bluesky
 bml
 bnb
@@ -216,6 +219,7 @@ cer
 cfbundle
 chatbots
 CHECKOV
+CHENNAI
 chipset
 chipsets
 Chocolat
@@ -532,6 +536,7 @@ fulltext
 fullurl
 functiona
 futur
+Fushimi
 Gabeira
 Gacrux
 gaeta
@@ -571,6 +576,7 @@ getdata
 getexif
 getparent
 getpid
+geval
 gfile
 GFile
 Gfm
@@ -737,6 +743,7 @@ informati
 inpaint
 inpainted
 INR
+inr
 IOMGR
 Iosif
 iostream
@@ -1495,6 +1502,8 @@ suptitle
 Surampudi
 survei
 Suzaka
+SVA
+sva
 svh
 svm
 Sweetgum
