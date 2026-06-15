@@ -119,12 +119,16 @@ The utility's logic is divided into two primary reconciliation workflows.
   3. For each member that is a `User`, it calls the **Discovery Engine API** (`batchUpdateUserLicenses`) to assign the license. This operation is idempotent.
 
 * **License Pool Exhaustion Handling:**
-  If a `batchUpdateUserLicenses` call fails because the license pool for a SKU is exhausted, the job does **not** treat this as a fatal error. Instead it:
+  A billing account may have multiple active subscriptions for the same SKU. At startup, the joiner fetches all `BillingAccountLicenseConfig` records and builds an index keyed by `(SKU, ProjectNumber, Location)`. Each key maps to an ordered slice of `LicenseConfigEntry` values — one per distinct subscription pool — so that all seat capacity is visible and no pool is silently discarded.
+
+  If a `batchUpdateUserLicenses` call fails because a pool is exhausted, the job does **not** treat this as a fatal error. Instead it:
   1. Calls `licenseConfigsUsageStats.list` for the affected project to retrieve the current `usedLicenseCount` for the relevant `licenseConfig`.
-  2. Computes `available = allocatedCount - usedLicenseCount` (the allocated count is derived from the billing account `licenseConfigDistributions` map fetched at startup).
+  2. Computes `available = allocatedCount - usedLicenseCount` (the allocated count is from the `licenseConfigDistributions` map fetched at startup).
   3. Retries the batch trimmed to `available` items, granting as many licenses as possible.
-  4. Soft-fails the remaining users: logs a `WARN` entry with the count of users who could not be assigned a license, then continues to the next batch or project. The job exits `0`.
-  The `licenses_soft_failed` count is included in the final summary log and in the `SyncAddResponse`.
+  4. Carries the remaining (ungranted) users forward to the next subscription pool for the same SKU, if one exists, and repeats steps 1–3.
+  5. After all pools for a SKU are exhausted, soft-fails any users still unseated: logs a `WARN` entry per exhausted pool and continues to the next batch or project. The job exits `0`.
+
+  Each user appears in at most one successful `batchUpdateUserLicenses` call — users do not advance to the next pool if they were already granted a seat. The `licenses_soft_failed` count in the final summary reflects only users who could not be seated across all pools for their SKU.
 
 ### **5.2. Workflow 2: Bulk "Garbage Collection" Job (Scheduled: 6hr)**
 
