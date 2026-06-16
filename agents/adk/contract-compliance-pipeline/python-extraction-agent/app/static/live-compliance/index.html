@@ -2196,7 +2196,7 @@
                 <strong id="handoff-source">python-extraction-agent</strong>
                 <small id="handoff-source-detail">Waiting for contract extraction.</small>
               </div>
-              <div class="handoff-arrow" id="handoff-method">message/send</div>
+              <div class="handoff-arrow" id="handoff-method">SendMessage</div>
               <div class="handoff-agent">
                 <span>Target</span>
                 <strong id="handoff-target">go-compliance-agent</strong>
@@ -2221,7 +2221,7 @@
               <i data-lucide="braces" style="width: 14px; height: 14px; color: var(--color-primary);"></i>
               <h3 style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-muted);">A2A Payload & Verdict</h3>
             </div>
-            <pre class="payload-preview" id="handoff-payload-preview">Run an audit to see the structured A2A message/send payload that ADK sends to the Go agent.</pre>
+            <pre class="payload-preview" id="handoff-payload-preview">Run an audit to see the structured A2A SendMessage payload that ADK sends to the Go agent.</pre>
             <div class="handoff-verdict" id="handoff-verdict">No verdict returned yet.</div>
           </div>
           </div>
@@ -2273,7 +2273,7 @@
 
                 <div class="trace-row" id="span-tasks">
                   <div class="trace-label">
-                    <span class="trace-name">ADK RemoteA2aAgent message/send</span>
+                    <span class="trace-name">ADK RemoteA2aAgent SendMessage</span>
                     <span class="trace-duration">0ms</span>
                   </div>
                   <div class="trace-bar-track"><div class="trace-bar-fill" style="width: 0%;"></div></div>
@@ -2598,10 +2598,10 @@
         document.getElementById("handoff-source-detail").textContent = "Waiting for contract extraction.";
         document.getElementById("handoff-target").textContent = "go-compliance-agent";
         document.getElementById("handoff-target-detail").textContent = "Waiting for agent card discovery.";
-        document.getElementById("handoff-method").textContent = "message/send";
+        document.getElementById("handoff-method").textContent = "SendMessage";
         document.getElementById("handoff-card-url").textContent = "GET localhost:8888/.well-known/agent.json";
         document.getElementById("handoff-task-id").textContent = "not dispatched";
-        document.getElementById("handoff-payload-preview").textContent = "Run an audit to see the structured A2A message/send payload that ADK sends to the Go agent.";
+        document.getElementById("handoff-payload-preview").textContent = "Run an audit to see the structured A2A SendMessage payload that ADK sends to the Go agent.";
         const verdict = document.getElementById("handoff-verdict");
         verdict.className = "handoff-verdict";
         verdict.textContent = "No verdict returned yet.";
@@ -2671,7 +2671,7 @@
               messageId: message.messageId,
               taskId: message.taskId,
               role: message.role,
-              parts: [{ kind: "data", data }]
+              parts: [{ data, mediaType: "application/json" }]
             }
           }
         };
@@ -2691,7 +2691,7 @@
 
         document.getElementById("handoff-source").textContent = handoff.source_agent || "python-extraction-agent";
         document.getElementById("handoff-target").textContent = agentCard.name || handoff.target_agent || "go-compliance-agent";
-        document.getElementById("handoff-method").textContent = handoff.method || "message/send";
+        document.getElementById("handoff-method").textContent = handoff.method || "SendMessage";
         document.getElementById("handoff-card-url").textContent = "GET " + (handoff.agent_card_url || "http://localhost:8888/.well-known/agent.json");
         document.getElementById("handoff-task-id").textContent = handoff.task_id.substring(0, 8) + "...";
 
@@ -2827,7 +2827,7 @@
           document.getElementById("node-pending").className = "step-node active";
           document.getElementById("div-pending").className = "step-divider active";
           
-          tickerLog("Python ran RemoteA2aAgent and dispatched A2A message/send to the Go agent.", "amber");
+          tickerLog("Python ran RemoteA2aAgent and dispatched A2A SendMessage to the Go agent.", "amber");
           animateSpanTrack("span-discover", true, 100, "success");
           animateSpanTrack("span-tasks", true, 50, "warning");
         }

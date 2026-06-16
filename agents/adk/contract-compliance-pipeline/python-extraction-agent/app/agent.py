@@ -131,7 +131,7 @@ extractor_agent = Agent(
 # This is the key pattern: ADK's RemoteA2aAgent wraps a remote A2A-compliant service
 # as a local sub-agent. ADK handles:
 #   - Agent Card discovery at the well-known URL
-#   - JSON-RPC 2.0 message submission (message/send)
+#   - JSON-RPC 2.0 message submission (SendMessage)
 #   - Task response conversion back into ADK events
 #   - Message/Part serialization
 #
