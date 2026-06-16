@@ -57,15 +57,17 @@ type TaskGetParams struct {
 
 // Task represents an A2A task with its current status and any produced artifacts.
 type Task struct {
-	ContextID string                 `json:"contextId"`
-	ID        string                 `json:"id"`
-	Kind      string                 `json:"kind,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    TaskStatus             `json:"status"`
-	Artifacts []Artifact             `json:"artifacts,omitempty"`
+	ContextID    string                 `json:"contextId"`
+	ID           string                 `json:"id"`
+	Kind         string                 `json:"kind,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       TaskStatus             `json:"status"`
+	Artifacts    []Artifact             `json:"artifacts,omitempty"`
+	CreatedAt    string                 `json:"createdAt,omitempty"`
+	LastModified string                 `json:"lastModified,omitempty"`
 }
 
-// TaskStatus tracks the lifecycle state of a task (submitted → working → completed/failed).
+// TaskStatus tracks the lifecycle state of a task.
 type TaskStatus struct {
 	State   string   `json:"state"`
 	Message *Message `json:"message,omitempty"`
@@ -82,12 +84,16 @@ type Message struct {
 	Parts     []Part                 `json:"parts"`
 }
 
-// Part is a polymorphic content unit — either text or structured data.
+// Part is a polymorphic content unit — either text, raw bytes, URL, or structured data.
 type Part struct {
-	Kind string                 `json:"kind,omitempty"`
-	Type string                 `json:"type,omitempty"`
-	Text string                 `json:"text,omitempty"`
-	Data map[string]interface{} `json:"data,omitempty"`
+	Kind      string                 `json:"kind,omitempty"`      // legacy v0.3
+	Type      string                 `json:"type,omitempty"`      // legacy v0.3
+	Text      string                 `json:"text,omitempty"`      // v1.0 & v0.3
+	URL       string                 `json:"url,omitempty"`       // v1.0
+	Filename  string                 `json:"filename,omitempty"`  // v1.0
+	MediaType string                 `json:"mediaType,omitempty"` // v1.0
+	Raw       string                 `json:"raw,omitempty"`       // v1.0
+	Data      map[string]interface{} `json:"data,omitempty"`      // v1.0 & v0.3
 }
 
 // Artifact is a named output produced by the agent during task execution.
@@ -145,7 +151,7 @@ func HandleJSONRPC(w http.ResponseWriter, r *http.Request) {
 
 	// Dispatch to the appropriate handler based on the A2A method name
 	switch req.Method {
-	case "message/send":
+	case "message/send", "SendMessage":
 		result, rpcErr := handleMessageSend(req.Params)
 		if rpcErr != nil {
 			writeJSONRPCError(w, req.ID, rpcErr.Code, rpcErr.Message)
@@ -161,7 +167,7 @@ func HandleJSONRPC(w http.ResponseWriter, r *http.Request) {
 		}
 		writeJSONRPCResult(w, req.ID, result)
 
-	case "tasks/get":
+	case "tasks/get", "GetTask":
 		result, rpcErr := handleTasksGet(req.Params)
 		if rpcErr != nil {
 			writeJSONRPCError(w, req.ID, rpcErr.Code, rpcErr.Message)
@@ -329,8 +335,12 @@ func complianceResultMap(result compliance.ComplianceResult) map[string]interfac
 }
 
 func completedTask(taskID string, contextID string, resultMap map[string]interface{}, includeLegacyType bool) *Task {
-	resultPart := Part{Kind: "data", Data: resultMap}
+	resultPart := Part{
+		Data:      resultMap,
+		MediaType: "application/json",
+	}
 	if includeLegacyType {
+		resultPart.Kind = "data"
 		resultPart.Type = "data"
 	}
 
@@ -338,19 +348,22 @@ func completedTask(taskID string, contextID string, resultMap map[string]interfa
 		ContextID: contextID,
 		Kind:      "message",
 		MessageID: fmt.Sprintf("msg-%s", taskID),
-		Role:      "agent",
+		Role:      "ROLE_AGENT", // "agent" -> "ROLE_AGENT"
 		TaskID:    taskID,
 		Parts:     []Part{resultPart},
 	}
 
+	now := time.Now().Format("2006-01-02T15:04:05.000Z")
 	return &Task{
 		ContextID: contextID,
 		ID:        taskID,
 		Kind:      "task",
 		Status: TaskStatus{
-			State:   "completed",
+			State:   "TASK_STATE_COMPLETED", // "completed" -> "TASK_STATE_COMPLETED"
 			Message: &agentMessage,
 		},
+		CreatedAt:    now,
+		LastModified: now,
 	}
 }
 

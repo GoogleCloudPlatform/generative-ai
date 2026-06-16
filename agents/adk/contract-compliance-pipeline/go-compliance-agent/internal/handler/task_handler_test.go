@@ -15,16 +15,15 @@ func TestHandleJSONRPCMessageSend(t *testing.T) {
 	payload := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "rpc-1",
-		"method":  "message/send",
+		"method":  "SendMessage",
 		"params": map[string]interface{}{
 			"metadata": map[string]interface{}{"task_id": "case-123"},
 			"message": map[string]interface{}{
 				"kind":      "message",
 				"messageId": "msg-1",
-				"role":      "user",
+				"role":      "ROLE_USER",
 				"parts": []map[string]interface{}{
 					{
-						"kind": "data",
 						"data": map[string]interface{}{
 							"schema_version": "contract-compliance.a2a.v1",
 							"case_id":        "case-123",
@@ -41,6 +40,7 @@ func TestHandleJSONRPCMessageSend(t *testing.T) {
 								"term_length_years":      2,
 							},
 						},
+						"mediaType": "application/json",
 					},
 				},
 			},
@@ -58,19 +58,19 @@ func TestHandleJSONRPCMessageSend(t *testing.T) {
 	if response.Result.ID != "case-123" {
 		t.Fatalf("expected task id case-123, got %q", response.Result.ID)
 	}
-	if response.Result.Status.State != "completed" {
-		t.Fatalf("expected completed task, got %q", response.Result.Status.State)
+	if response.Result.Status.State != "TASK_STATE_COMPLETED" {
+		t.Fatalf("expected completed task state TASK_STATE_COMPLETED, got %q", response.Result.Status.State)
 	}
 
 	message := response.Result.Status.Message
 	if message == nil {
 		t.Fatal("expected status message")
 	}
-	if message.Kind != "message" {
-		t.Fatalf("expected A2A message, got %q", message.Kind)
+	if message.Role != "ROLE_AGENT" {
+		t.Fatalf("expected message role ROLE_AGENT, got %q", message.Role)
 	}
-	if len(message.Parts) != 1 || message.Parts[0].Kind != "data" {
-		t.Fatalf("expected one A2A data part, got %+v", message.Parts)
+	if len(message.Parts) != 1 || message.Parts[0].MediaType != "application/json" {
+		t.Fatalf("expected one A2A data part with mediaType application/json, got %+v", message.Parts)
 	}
 	if passed, ok := message.Parts[0].Data["passed"].(bool); !ok || !passed {
 		t.Fatalf("expected passed verdict, got %+v", message.Parts[0].Data["passed"])

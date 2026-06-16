@@ -17,7 +17,7 @@
 Provides REST API endpoints for contract upload, status checking, and
 result retrieval. The live cockpit uses deterministic extraction and a real
 ADK RemoteA2aAgent handoff to the Go compliance service so the demo remains
-stable while still exercising the current A2A message/send protocol.
+stable while still exercising the current A2A SendMessage protocol.
 """
 
 import json
@@ -103,15 +103,17 @@ def build_go_message_payload(case_id: str, details: dict, policy: dict | None) -
     return {
         "jsonrpc": "2.0",
         "id": f"case-{case_id}",
-        "method": "message/send",
+        "method": "SendMessage",
         "params": {
             "metadata": {"task_id": case_id},
             "message": {
-                "kind": "message",
                 "messageId": f"case-{case_id}-request",
                 "taskId": case_id,
-                "role": "user",
-                "parts": [{"kind": "data", "data": build_contract_handoff_data(case_id, details, policy)}],
+                "role": "ROLE_USER",
+                "parts": [{
+                    "data": build_contract_handoff_data(case_id, details, policy),
+                    "mediaType": "application/json"
+                }],
             },
         },
     }
@@ -126,6 +128,8 @@ def extract_verdict_from_go_response(response: dict) -> dict:
         .get("parts", [])
     )
     for part in parts:
+        if "data" in part:
+            return part["data"]
         if part.get("kind") == "data" or part.get("type") == "data":
             return part.get("data", {})
     raise RuntimeError("Go compliance service returned no verdict data")
@@ -460,7 +464,7 @@ async def upload_contract_file(
         "remote_agent": "google.adk.agents.RemoteA2aAgent(compliance_agent)",
         "agent_card_url": GO_AGENT_CARD_URL,
         "jsonrpc_url": _go_jsonrpc_url(),
-        "method": "message/send",
+        "method": "SendMessage",
         "task_id": case.id,
         "contract_details": details,
         "risk_assessment": risk,
@@ -507,7 +511,7 @@ async def upload_contract_file(
                     "status": "agent_card_discovered",
                 },
                 {
-                    "span": "ADK RemoteA2aAgent message/send",
+                    "span": "ADK RemoteA2aAgent SendMessage",
                     "service": "go-compliance-agent",
                     "duration_ms": 120,
                     "status": "completed",
