@@ -1,8 +1,8 @@
 # 🚀 Gemini Enterprise Migration Agent
 
-> Seamlessly migrate your low-code agents, Notebooklms and Custom Instructions (Gems) to Gemini Enterprise.
+> Seamlessly migrate your low-code agents and Notebooklms to Gemini Enterprise.
 
-Built with the **Agent Development Kit (ADK)**, this specialized AI agent facilitates the migration of low code agents and notebooklm from one Gemini Enterprise App to another and from Google Workspace Gems to Gemini Enterprise app. It can be further extended to support migration of 3rd Party agents to Gemini Enterprise App via adapters(mappings between 3rd party agent and import format required by Gemini Enterprise App)
+Built with the **Agent Development Kit (ADK)**, this specialized AI agent facilitates the migration of low code agents and notebooklm from one Gemini Enterprise App to another. It can be further extended to support migration of 3rd Party agents to Gemini Enterprise App via adapters(mappings between 3rd party agent and import format required by Gemini Enterprise App)
 
 ## Architecture
 
@@ -17,12 +17,10 @@ The following diagram illustrates the high-level architecture of the migration a
 - **Direct Migration**: Seamlessly transfer agent definitions to target Gemini Enterprise engines.
 - **GCS Staging**: Export definitions to Google Cloud Storage for isolated or staged migrations.
 
-### 💎 Gem Migration
-- **Gem Processing**: Extract Custom Instructions (Gems) from HTML dumps(takeout), mapping descriptions and grounding DataStore knowledge filters.
-
 ### 📚 Notebooklm migration
 - **Instant Notebooks**: Create NotebookLM-style knowledge bases in the target project preserving source titles exactly.
 - **Batch Ingestion**: Rapidly populate notebooks with sources from web URLs.
+- **GCS Staging**: Export notebook definitions (metadata and source references) to Google Cloud Storage for backup or staged imports.
 
 ### 🛡️ Validation & Safety
 - **Enterprise Separation of Concerns (`SKILL.md`)**: Fully decouple operational administrative configuration (Source/Target Project IDs, Engine IDs, DataStore Grounding Mappings) from agent execution logic.
@@ -43,6 +41,11 @@ The following diagram illustrates the high-level architecture of the migration a
 ---
 
 #### Option A: Run the Deterministic CLI via uv (Highly Recommended)
+Before running the commands, ensure your Application Default Credentials (ADC) are authenticated:
+```bash
+gcloud auth application-default login
+```
+
 For 100% reliable, fast, and deterministic execution of migrations without any AI dependencies, use the newly added root entrypoint script:
 
 ```bash
@@ -50,25 +53,31 @@ For 100% reliable, fast, and deterministic execution of migrations without any A
 uv run ./migrate.py --help
 
 # List recently viewed NotebookLM notebooks in the source project
-uv run ./migrate.py list-notebooks
+uv run ./migrate.py list-notebooks --project <SOURCE_PROJECT_NUMBER>
 
 # Migrate an entire notebook and all of its sources atomically preserving the exact title
-uv run ./migrate.py migrate-notebook "my-notebook-title" --source-project 12345 --target-project 67890
+uv run ./migrate.py migrate-notebook "my-notebook-title" --source-project <SOURCE_PROJECT_NUMBER> --target-project <TARGET_PROJECT_NUMBER>
+
+# Export a notebook definition to a Google Cloud Storage backup
+uv run ./migrate.py export-notebook-gcs "my-notebook-title" "exports/my_notebook.json" --project <SOURCE_PROJECT_NUMBER> --bucket <GCS_BUCKET_NAME>
+
+# Import a notebook definition from GCS into your target project
+uv run ./migrate.py import-notebook-gcs "exports/my_notebook.json" --target-project <TARGET_PROJECT_NUMBER> --bucket <GCS_BUCKET_NAME>
 
 # List all employee-made low-code agents in the source engine
-uv run ./migrate.py list-agents --engine-id <SOURCE_ENGINE_ID>
+uv run ./migrate.py list-agents --project <SOURCE_PROJECT_NUMBER> --engine-id <SOURCE_ENGINE_ID>
+
+# Introspect and map connectors (Dry Run)
+uv run ./migrate.py lookup-map-connectors "Quarterly Business Review Generator" --source-project <SOURCE_PROJECT_NUMBER> --source-engine <SOURCE_ENGINE_ID> --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID>
 
 # Migrate a low-code agent directly from source to target
-uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --force
-
-# Batch Import Gems from an offline Takeout HTML dump
-uv run ./migrate.py import-gems sample_data/gemini_gems_data.html --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --source-project <SOURCE_PROJECT_NUMBER> --source-engine <SOURCE_ENGINE_ID> --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID> --force
 
 # Export an agent definition to a Google Cloud Storage staging backup
-uv run ./migrate.py export-agent-gcs "Quarterly Business Review Generator" --engine-id <SOURCE_ENGINE_ID> --bucket <GCS_BUCKET_NAME>
+uv run ./migrate.py export-agent-gcs "Quarterly Business Review Generator" "exports/qbr_generator.json" --project <SOURCE_PROJECT_NUMBER> --engine-id <SOURCE_ENGINE_ID> --bucket <GCS_BUCKET_NAME>
 
 # Import an agent definition from GCS into your target environment
-uv run ./migrate.py import-agent-gcs Quarterly Business Review_export.json --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py import-agent-gcs "exports/qbr_generator.json" --bucket <GCS_BUCKET_NAME> --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID>
 ```
 
 ---
@@ -92,7 +101,7 @@ Here is a sample session showing autonomous administrative greeting and low-code
 > Hi / Help
 
 **Agent**:
-> I can assist you with migrating your Gemini Enterprise app low-code agents, NotebookLM notebooks, and Workspace Gems.
+> I can assist you with migrating your Gemini Enterprise app low-code agents and NotebookLM notebooks.
 > 
 > **Active Migration Configuration**:
 > - Source Environment: Project <SOURCE_PROJECT_NUMBER> (`<SOURCE_PROJECT_ID>`), Engine `<SOURCE_ENGINE_ID>`
@@ -111,16 +120,13 @@ Here is a sample session showing autonomous administrative greeting and low-code
 **Agent**:
 > The agent 'Quarterly Business Review Generator' has been successfully migrated to your target environment.
 
-**User**:
-> Please import the Gems from the file ./sample_data/gemini_gems_data.html in Target
-
-**Agent**:
-> The Gems from the file ./sample_data/gemini_gems_data.html have been successfully imported to your target environment.
-
 ## Project Structure
 - `ge_migration_agent/`: Contains the core agent definition, tools, and execution scripts.
   - `agent.py`: Core ADK agent definition and tool implementations.
   - `run_web_playground.sh`: Script to start the persistent ADK web server.
 - `skills/`: Holds enterprise migration configuration skills.
   - `SKILL.md`: Single source of truth for cross-environment migration parameters and administrative setup guide.
-- `sample_data/`: Contains sample data files such as `gemini_gems_data.html` for batch Gems import.
+
+## Author
+- **Navneet Tuteja** - [LinkedIn Profile](https://www.linkedin.com/in/navneettuteja/)
+

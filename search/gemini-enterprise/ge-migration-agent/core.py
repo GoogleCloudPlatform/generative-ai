@@ -7,13 +7,17 @@ import urllib.parse
 try:
     from dotenv import load_dotenv
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-    load_dotenv(env_path)
+    load_dotenv(env_path, override=True)
 except ImportError:
     pass
 import google.auth
 from google.auth.transport.requests import AuthorizedSession
 
-ENDPOINT_LOCATION = "global"
+def get_endpoint_host(location: str) -> str:
+    """Returns the host domain based on the geographic location."""
+    if location == "global":
+        return "discoveryengine.googleapis.com"
+    return f"{location}-discoveryengine.googleapis.com"
 
 def get_session():
     """Returns an authorized Google API requests session."""
@@ -25,7 +29,8 @@ def get_session():
 def list_notebooks(project_number: str, location: str = "global") -> list:
     """Lists recently viewed notebooks in the specified project."""
     session = get_session()
-    url = f"https://{ENDPOINT_LOCATION}-discoveryengine.googleapis.com/v1alpha/projects/{project_number}/locations/{location}/notebooks:listRecentlyViewed"
+    host = get_endpoint_host(location)
+    url = f"https://{host}/v1alpha/projects/{project_number}/locations/{location}/notebooks:listRecentlyViewed"
 
     resp = session.get(url)
     resp.raise_for_status()
@@ -35,7 +40,8 @@ def list_notebooks(project_number: str, location: str = "global") -> list:
 def list_sources_and_types(notebook_id: str, project_number: str, location: str = "global") -> list:
     """Lists sources and maps their types for a given notebook."""
     session = get_session()
-    base_url = f"https://{ENDPOINT_LOCATION}-discoveryengine.googleapis.com/v1alpha/projects/{project_number}/locations/{location}/notebooks/{notebook_id}"
+    host = get_endpoint_host(location)
+    base_url = f"https://{host}/v1alpha/projects/{project_number}/locations/{location}/notebooks/{notebook_id}"
 
     get_resp = session.get(base_url)
     get_resp.raise_for_status()
@@ -79,7 +85,8 @@ def create_notebook(target_project_number: str, target_location: str, title: str
     """Creates a new empty notebook in the target project."""
     logging.info(f"DEBUG: create_notebook called with title='{title}', project='{target_project_number}', location='{target_location}'")
     session = get_session()
-    url = f"https://{ENDPOINT_LOCATION}-discoveryengine.googleapis.com/v1alpha/projects/{target_project_number}/locations/{target_location}/notebooks"
+    host = get_endpoint_host(target_location)
+    url = f"https://{host}/v1alpha/projects/{target_project_number}/locations/{target_location}/notebooks"
 
     resp = session.post(url, json={"title": title})
     resp.raise_for_status()
@@ -89,7 +96,8 @@ def add_source_to_notebook(target_project_number: str, target_location: str, not
     """Adds a single source (userContent payload) to the specified notebook."""
     logging.info(f"DEBUG: add_source_to_notebook called with notebook_id='{notebook_id}', project='{target_project_number}'")
     session = get_session()
-    url = f"https://{ENDPOINT_LOCATION}-discoveryengine.googleapis.com/v1alpha/projects/{target_project_number}/locations/{target_location}/notebooks/{notebook_id}/sources:batchCreate"
+    host = get_endpoint_host(target_location)
+    url = f"https://{host}/v1alpha/projects/{target_project_number}/locations/{target_location}/notebooks/{notebook_id}/sources:batchCreate"
 
     # Make a copy to avoid mutating inputs
     content_obj = json.loads(json.dumps(source_content))
@@ -103,12 +111,39 @@ def add_source_to_notebook(target_project_number: str, target_location: str, not
     resp.raise_for_status()
     return resp.json()
 
+def extract_notebook_source_payload(src_raw_data: dict) -> dict:
+    """Intelligently extracts the userContent payload from a raw source data dict, reconstructs it if needed, and removes read-only fields."""
+    user_content = src_raw_data.get("userContent")
+    if user_content:
+        payload = json.loads(json.dumps(user_content))
+    else:
+        payload = {}
+        metadata = src_raw_data.get("metadata", {})
+        if "webpageMetadata" in metadata:
+            payload["webContent"] = {
+                "url": metadata["webpageMetadata"].get("webpageUrl")
+            }
+        elif "googleDocsMetadata" in metadata:
+            payload["googleDriveContent"] = {
+                "documentId": metadata["googleDocsMetadata"].get("documentId"),
+                "mimeType": "application/vnd.google-apps.document"
+            }
+        elif "textContent" in src_raw_data:
+            payload["textContent"] = src_raw_data["textContent"]
+        elif "textContent" in metadata:
+            payload["textContent"] = metadata["textContent"]
+            
+    if "sourceName" in payload:
+        payload.pop("sourceName")
+    return payload
+
 def migrate_notebook_pipeline(
     notebook_id_or_title: str,
     target_project_number: str,
     target_location: str,
     source_project_number: str,
-    source_location: str = "global"
+    source_location: str = "global",
+    backup_bucket: str = ""
 ) -> dict:
     """Migrates an entire notebook and all its sources deterministically in a python loop."""
     logging.info(f"Starting deterministic notebook migration for '{notebook_id_or_title}'")
@@ -133,6 +168,36 @@ def migrate_notebook_pipeline(
     sources = list_sources_and_types(source_nb_id, source_project_number, source_location)
     logging.info(f"Found {len(sources)} sources to migrate for notebook '{source_nb_title}'")
     
+    # 2.5 Upload to GCS (Backup) implicitly
+    bucket_name = backup_bucket if backup_bucket else os.environ.get("GCS_BUCKET_NAME")
+    if bucket_name:
+        try:
+            timestamp = int(time.time())
+            object_name = f"exports/{source_nb_title}_{timestamp}.json"
+            exported_sources = []
+            for src in sources:
+                payload = extract_notebook_source_payload(src.get("raw_data", {}))
+                exported_sources.append({
+                    "title": src["title"],
+                    "userContent": payload
+                })
+            notebook_def = {
+                "title": source_nb_title,
+                "sources": exported_sources
+            }
+            session = get_session()
+            encoded_obj = urllib.parse.quote(object_name, safe="")
+            upload_url = f"https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={encoded_obj}"
+            up_resp = session.post(
+                upload_url,
+                data=json.dumps(notebook_def, indent=2),
+                headers={"Content-Type": "application/json"}
+            )
+            up_resp.raise_for_status()
+            logging.info(f"Implicitly backed up notebook '{source_nb_title}' to gs://{bucket_name}/{object_name}")
+        except Exception as e:
+            logging.error(f"Failed to implicitly backup notebook to GCS: {e}")
+            
     # 3. Create target notebook
     target_nb = create_notebook(target_project_number, target_location, source_nb_title)
     target_nb_id = target_nb.get("name", "").split("/")[-1]
@@ -145,32 +210,7 @@ def migrate_notebook_pipeline(
     for src in sources:
         title = src.get("title", "Untitled Source")
         raw_data = src.get("raw_data", {})
-        
-        # Determine userContent payload
-        user_content = raw_data.get("userContent")
-        if user_content:
-            payload = json.loads(json.dumps(user_content))
-        else:
-            # Reconstruct payload as fallback
-            payload = {}
-            metadata = raw_data.get("metadata", {})
-            if "webpageMetadata" in metadata:
-                payload["webContent"] = {
-                    "url": metadata["webpageMetadata"].get("webpageUrl")
-                }
-            elif "googleDocsMetadata" in metadata:
-                payload["googleDriveContent"] = {
-                    "documentId": metadata["googleDocsMetadata"].get("documentId"),
-                    "mimeType": "application/vnd.google-apps.document"
-                }
-            elif "textContent" in raw_data:
-                payload["textContent"] = raw_data["textContent"]
-            elif "textContent" in metadata:
-                payload["textContent"] = metadata["textContent"]
-                
-        # Strip readonly fields
-        if "sourceName" in payload:
-            payload.pop("sourceName")
+        payload = extract_notebook_source_payload(raw_data)
             
         logging.info(f"Adding source '{title}' to target notebook '{target_nb_id}'")
         try:
@@ -202,11 +242,13 @@ def migrate_notebook_pipeline(
 def list_employee_agents(
     project_id: str,
     location: str = "global",
-    engine_id: str = "enterprise-search-17416389_1741638989378"
+    engine_id: str = "enterprise-search-17416389_1741638989378",
+    basic: bool = False
 ) -> list:
     """Lists employee-made low-code agents."""
     session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    host = get_endpoint_host(location)
+    base_url = f"https://{host}/v1alpha"
     parent = f"projects/{project_id}/locations/{location}/collections/default_collection/engines/{engine_id}/assistants/default_assistant"
     url = f"{base_url}/{parent}/agents"
 
@@ -277,16 +319,24 @@ def list_employee_agents(
             definition = agent.get("skillAgentDefinition", {})
             root_instructions = definition.get("instruction", "No instructions found.")
             
-        employee_agents.append({
-            "displayName": displayName,
-            "name": name,
-            "description": description,
-            "instructions": root_instructions,
-            "connectors_and_tools": root_tools,
-            "knowledge": root_knowledge,
-            "sub_agents": sub_agents,
-            "raw_agent": agent
-        })
+        if basic:
+            employee_agents.append({
+                "displayName": displayName,
+                "name": name,
+                "description": description,
+                "connectors_and_tools": root_tools,
+            })
+        else:
+            employee_agents.append({
+                "displayName": displayName,
+                "name": name,
+                "description": description,
+                "instructions": root_instructions,
+                "connectors_and_tools": root_tools,
+                "knowledge": root_knowledge,
+                "sub_agents": sub_agents,
+                "raw_agent": agent
+            })
     return employee_agents
 
 def extract_connectors(agent_def: dict) -> list:
@@ -340,7 +390,8 @@ def extract_agent_datastores(
 ) -> dict:
     """Extracts and lists the names of datastores used by an agent and its subagents."""
     session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    host = get_endpoint_host(source_location)
+    base_url = f"https://{host}/v1alpha"
     source_parent = f"projects/{source_project_id}/locations/{source_location}/collections/default_collection/engines/{source_engine_id}/assistants/default_assistant"
     source_url = f"{base_url}/{source_parent}/agents"
     
@@ -394,9 +445,10 @@ def lookup_and_map_connectors(
 ) -> dict:
     """Intelligently matches source agent connectors against target environment connectors."""
     session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    source_host = get_endpoint_host(source_location)
+    source_base_url = f"https://{source_host}/v1alpha"
     source_parent = f"projects/{source_project_id}/locations/{source_location}/collections/default_collection/engines/{source_engine_id}/assistants/default_assistant"
-    source_url = f"{base_url}/{source_parent}/agents"
+    source_url = f"{source_base_url}/{source_parent}/agents"
     
     resp = session.get(source_url)
     if resp.status_code == 200:
@@ -411,8 +463,10 @@ def lookup_and_map_connectors(
                 src_connectors.add(c)
     src_connectors = list(src_connectors)
             
+    target_host = get_endpoint_host(target_location)
+    target_base_url = f"https://{target_host}/v1alpha"
     target_parent = f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/engines/{target_engine_id}/assistants/default_assistant"
-    target_connectors = list_target_connectors(session, base_url, target_parent)
+    target_connectors = list_target_connectors(session, target_base_url, target_parent)
     try:
         source_ds_objs = list_datastores(source_project_id, source_location)
     except Exception:
@@ -478,14 +532,17 @@ def migrate_employee_agent(
 ) -> dict:
     """Migrates an employee-made low-code agent to a target environment."""
     session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
     
+    target_host = get_endpoint_host(target_location)
+    target_base_url = f"https://{target_host}/v1alpha"
     target_parent = f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/engines/{target_engine_id}/assistants/default_assistant"
-    target_url = f"{base_url}/{target_parent}/agents"
+    target_url = f"{target_base_url}/{target_parent}/agents"
     
     # 1. Fetch the source agent definition
+    source_host = get_endpoint_host(source_location)
+    source_base_url = f"https://{source_host}/v1alpha"
     source_parent = f"projects/{source_project_id}/locations/{source_location}/collections/default_collection/engines/{source_engine_id}/assistants/default_assistant"
-    source_url = f"{base_url}/{source_parent}/agents"
+    source_url = f"{source_base_url}/{source_parent}/agents"
     
     logging.info(f"Fetching source agent from {source_url}")
     resp = session.get(source_url)
@@ -503,7 +560,7 @@ def migrate_employee_agent(
         
     # 1.4 Validation and Reporting
     src_connectors = extract_connectors(agent_to_migrate.get("lowCodeAgentDefinition", {}))
-    target_connectors = list_target_connectors(session, base_url, target_parent)
+    target_connectors = list_target_connectors(session, target_base_url, target_parent)
     
     missing_connectors = [c for c in src_connectors if c not in target_connectors]
     
@@ -631,201 +688,7 @@ def migrate_employee_agent(
         "target_agent": created_agent
     }
 
-def create_agent_from_gem(
-    name: str,
-    instructions: str,
-    target_project_id: str,
-    target_engine_id: str,
-    description: str = "",
-    target_location: str = "global",
-    files: list = None
-) -> dict:
-    """Creates a new Gemini Enterprise agent from Gem definition (name and instructions)."""
-    session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
-    target_url = f"{base_url}/projects/{target_project_id}/locations/{target_location}/collections/default_collection/engines/{target_engine_id}/assistants/default_assistant/agents"
-    
-    llm_node = {
-        "description": f"Migrated from Gem: {name}",
-        "model": "gemini-2.5-flash",
-        "instruction": instructions,
-        "selectedTools": {"tool": [{"name": "googleSearch"}]}
-    }
-    
-    grounding_specs = []
-    if files:
-        specs = []
-        tools = [{"name": "googleSearch"}]
-        for file_obj in files:
-            doc_id = file_obj.get("documentId")
-            if doc_id:
-                dr_ds = "ge-drive-all_1780835769760_google_drive"
-                d_name = file_obj.get("displayName", "Standard_Vendor_Template_2026")
-                specs.append({
-                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{dr_ds}",
-                    "filter": d_name
-                })
-                specs.append({
-                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}_google_docs",
-                    "filter": d_name
-                })
-                specs.append({
-                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}_google_drive",
-                    "filter": d_name
-                })
-                specs.append({
-                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}_document",
-                    "filter": d_name
-                })
-                specs.append({
-                    "dataStore": f"projects/{target_project_id}/locations/{target_location}/collections/default_collection/dataStores/{doc_id}",
-                    "filter": d_name
-                })
-        if specs:
-            llm_node["dataStoreSpecs"] = {"specs": specs}
-            llm_node["selectedTools"] = {"tool": tools}
-            
-    definition = {
-        "nodes": [
-            {
-                "llmAgentNode": llm_node,
-                "id": "root_agent",
-                "displayName": name
-            }
-        ],
-        "rootAgentId": "root_agent"
-    }
-    
-    payload = {
-        "displayName": name,
-        "description": description if description else f"Migrated from Gem: {name}",
-        "lowCodeAgentDefinition": definition
-    }
-    
-    
-    try:
-        list_resp = session.get(target_url)
-        if list_resp.status_code == 200:
-            for ex_ag in list_resp.json().get("agents", []):
-                if ex_ag.get("displayName") == name and "name" in ex_ag:
-                    logging.info(f"Deleting existing target agent '{name}' ({ex_ag['name']}) to overwrite.")
-                    session.delete(f"{base_url}/{ex_ag['name']}")
-    except Exception as e:
-        logging.warning(f"Failed to check/delete existing target agent '{name}': {e}")
-        
-    logging.info(f"Creating new agent from Gem at target {target_url}")
-    create_resp = session.post(target_url, json=payload)
-    create_resp.raise_for_status()
-    
-    return {
-        "success": True,
-        "message": f"Successfully created agent '{name}' from Gem in target environment.",
-        "target_agent": create_resp.json()
-    }
 
-def import_gems_from_file(
-    file_path: str,
-    target_project_id: str,
-    target_engine_id: str,
-    target_location: str = "global"
-) -> dict:
-    """Imports multiple Gems from a local HTML file dump."""
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    candidates = [
-        file_path,
-        os.path.join(root_dir, file_path),
-        os.path.join(root_dir, file_path.lstrip("./")),
-        os.path.join(root_dir, file_path.lstrip("./").replace("ge-migration-agent/", "", 1)),
-        os.path.join(root_dir, "sample_data", os.path.basename(file_path))
-    ]
-    resolved_path = None
-    for cand in candidates:
-        if os.path.exists(cand):
-            resolved_path = cand
-            break
-            
-    if not resolved_path:
-        raise FileNotFoundError(f"File not found at '{file_path}' (checked root {root_dir}).")
-        
-    with open(resolved_path, "r", encoding="utf-8") as f:
-        content = f.read()
-        
-    gems_raw = content.split("<b>Name:</b>")
-    
-    success_count = 0
-    fail_count = 0
-    results = []
-    
-    for gem_str in gems_raw[1:]:
-        if not gem_str.strip():
-            continue
-            
-        parts = gem_str.split("<b>Instructions:</b>")
-        if len(parts) < 2:
-            logging.warning(f"Could not parse Gem entry: {gem_str[:50]}...")
-            continue
-            
-        name_and_desc = parts[0]
-        name_parts = name_and_desc.split("<b>Description:</b>")
-        name = name_parts[0].replace("<br>", "").strip()
-        description = ""
-        if len(name_parts) > 1:
-            description = name_parts[1].replace("<br>", "").strip()
-        
-        instructions_part = parts[1]
-        inst_parts = instructions_part.split("<b>Files:</b>")
-        instructions = inst_parts[0].strip()
-        
-        files_part = ""
-        if len(inst_parts) > 1:
-            files_part = inst_parts[1].strip()
-            
-        attached_files = []
-        parsed_files = []
-        if files_part:
-            matches = re.findall(r'<a\s+href="([^"]+)">([^<]+)</a>', files_part)
-            for href, text in matches:
-                attached_files.append(f"- [{text}]({href})")
-                doc_id_match = re.search(r'[?&]id=([^&]+)', href) or re.search(r'/d/([^/]+)', href)
-                if doc_id_match:
-                    parsed_files.append({
-                        "displayName": text.strip(),
-                        "documentId": doc_id_match.group(1).strip()
-                    })
-                
-        instructions = instructions.replace("<br>", "\n")
-        instructions = instructions.replace("&#39;", "'")
-        instructions = instructions.replace("&amp;", "&")
-        
-        if attached_files:
-            instructions += "\n\n## Attached Files\n" + "\n".join(attached_files)
-            
-        logging.info(f"Importing Gem: {name} with {len(parsed_files)} attached files")
-        try:
-            resp = create_agent_from_gem(
-                name=name,
-                instructions=instructions,
-                target_project_id=target_project_id,
-                target_engine_id=target_engine_id,
-                description=description,
-                target_location=target_location,
-                files=parsed_files
-            )
-            if resp.get("success"):
-                success_count += 1
-                results.append(f"Success: {name}")
-            else:
-                fail_count += 1
-                results.append(f"Failed: {name} - {resp.get('error')}")
-        except Exception as e:
-            fail_count += 1
-            results.append(f"Failed: {name} - {e}")
-            
-    return {
-        "success": True,
-        "message": f"Processed file. Successfully imported {success_count} agents, failed {fail_count}.",
-        "details": results
-    }
 
 def export_agent_to_gcs(
     source_agent_name: str,
@@ -842,7 +705,8 @@ def export_agent_to_gcs(
         raise ValueError("bucket_name not provided and GCS_BUCKET_NAME not found in environment.")
 
     session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    host = get_endpoint_host(source_location)
+    base_url = f"https://{host}/v1alpha"
     source_parent = f"projects/{source_project_id}/locations/{source_location}/collections/default_collection/engines/{source_engine_id}/assistants/default_assistant"
     source_url = f"{base_url}/{source_parent}/agents"
     
@@ -888,7 +752,8 @@ def import_agent_from_gcs(
         raise ValueError("bucket_name not provided and GCS_BUCKET_NAME not found in environment.")
 
     session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    host = get_endpoint_host(target_location)
+    base_url = f"https://{host}/v1alpha"
     
     encoded_object = urllib.parse.quote(object_name, safe="")
     gcs_url = f"https://storage.googleapis.com/storage/v1/b/{bucket_name}/o/{encoded_object}?alt=media"
@@ -984,7 +849,8 @@ def import_agent_from_gcs(
 def list_datastores(project_id: str, location: str = "global", collection: str = "default_collection") -> list:
     """Lists all available datastores and their IDs in a target project/location."""
     session = get_session()
-    base_url = "https://discoveryengine.googleapis.com/v1alpha"
+    host = get_endpoint_host(location)
+    base_url = f"https://{host}/v1alpha"
     url = f"{base_url}/projects/{project_id}/locations/{location}/collections/{collection}/dataStores"
     
     logging.info(f"Fetching datastores from {url}")
@@ -1002,3 +868,124 @@ def list_datastores(project_id: str, location: str = "global", collection: str =
             "name": ds_name
         })
     return results
+
+def export_notebook_to_gcs(
+    notebook_id_or_title: str,
+    object_name: str,
+    bucket_name: str = "",
+    source_project_number: str = "",
+    source_location: str = "global"
+) -> dict:
+    """Exports a notebook definition (including metadata and sources) to GCS."""
+    if not bucket_name:
+        bucket_name = os.environ.get("GCS_BUCKET_NAME")
+    if not bucket_name:
+        raise ValueError("bucket_name not provided and GCS_BUCKET_NAME not found in environment.")
+
+    notebooks = list_notebooks(source_project_number, source_location)
+    source_notebook = None
+    for nb in notebooks:
+        nb_id = nb.get("name", "").split("/")[-1]
+        nb_title = nb.get("title", "")
+        if nb_id == notebook_id_or_title or nb_title == notebook_id_or_title:
+            source_notebook = nb
+            break
+            
+    if not source_notebook:
+        raise ValueError(f"Source notebook '{notebook_id_or_title}' not found.")
+        
+    source_nb_id = source_notebook.get("name", "").split("/")[-1]
+    source_nb_title = source_notebook.get("title", "Untitled Notebook")
+    
+    sources = list_sources_and_types(source_nb_id, source_project_number, source_location)
+    
+    exported_sources = []
+    for src in sources:
+        title = src.get("title", "Untitled Source")
+        raw_data = src.get("raw_data", {})
+        payload = extract_notebook_source_payload(raw_data)
+            
+        exported_sources.append({
+            "title": title,
+            "userContent": payload
+        })
+        
+    notebook_def = {
+        "title": source_nb_title,
+        "sources": exported_sources
+    }
+    
+    session = get_session()
+    encoded_obj = urllib.parse.quote(object_name, safe="")
+    upload_url = f"https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={encoded_obj}"
+    up_resp = session.post(
+        upload_url,
+        data=json.dumps(notebook_def, indent=2),
+        headers={"Content-Type": "application/json"}
+    )
+    up_resp.raise_for_status()
+    
+    return {
+        "success": True,
+        "message": f"Successfully exported notebook '{source_nb_title}' to gs://{bucket_name}/{object_name}",
+        "notebook_def": notebook_def
+    }
+
+def import_notebook_from_gcs(
+    object_name: str,
+    target_project_number: str,
+    target_location: str,
+    bucket_name: str = ""
+) -> dict:
+    """Imports a notebook definition from GCS and creates it in the target project."""
+    if not bucket_name:
+        bucket_name = os.environ.get("GCS_BUCKET_NAME")
+    if not bucket_name:
+        raise ValueError("bucket_name not provided and GCS_BUCKET_NAME not found in environment.")
+
+    session = get_session()
+    encoded_object = urllib.parse.quote(object_name, safe="")
+    gcs_url = f"https://storage.googleapis.com/storage/v1/b/{bucket_name}/o/{encoded_object}?alt=media"
+    dl_resp = session.get(gcs_url)
+    dl_resp.raise_for_status()
+    nb_data = dl_resp.json()
+    
+    title = nb_data.get("title", "Untitled Notebook")
+    sources = nb_data.get("sources", [])
+    
+    target_nb = create_notebook(target_project_number, target_location, title)
+    target_nb_id = target_nb.get("name", "").split("/")[-1]
+    logging.info(f"Created target notebook '{title}' from GCS with ID: {target_nb_id}")
+    
+    migrated_sources = []
+    failed_sources = []
+    
+    for src in sources:
+        src_title = src.get("title", "Untitled Source")
+        payload = src.get("userContent", {})
+        
+        logging.info(f"Adding source '{src_title}' to target notebook '{target_nb_id}'")
+        try:
+            add_resp = add_source_to_notebook(target_project_number, target_location, target_nb_id, payload)
+            migrated_sources.append({
+                "title": src_title,
+                "status": "success",
+                "response": add_resp
+            })
+        except Exception as e:
+            logging.error(f"Failed to add source '{src_title}': {e}")
+            failed_sources.append({
+                "title": src_title,
+                "status": "failed",
+                "error": str(e)
+            })
+            
+    return {
+        "success": len(failed_sources) == 0,
+        "target_notebook_id": target_nb_id,
+        "target_notebook_title": title,
+        "migrated_sources_count": len(migrated_sources),
+        "failed_sources_count": len(failed_sources),
+        "migrated": migrated_sources,
+        "failed": failed_sources
+    }

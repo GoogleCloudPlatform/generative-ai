@@ -1,7 +1,7 @@
 [project]
 name = "ge-migration-agent"
 version = "0.1.0"
-description = "Seamlessly migrate your low-code agents and Custom Instructions (Gems) to Gemini Enterprise."
+description = "Seamlessly migrate your low-code agents and NotebookLM notebooks to Gemini Enterprise."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

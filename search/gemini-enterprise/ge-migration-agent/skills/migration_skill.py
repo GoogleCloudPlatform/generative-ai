@@ -60,6 +60,23 @@ class MigrationConfigSkill:
         self._load_config()
 
     def _load_config(self):
+        skill_md_path = os.path.join(os.path.dirname(__file__), "SKILL.md")
+        if os.path.exists(skill_md_path):
+            try:
+                import yaml
+                with open(skill_md_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                parts = content.split("---")
+                if len(parts) >= 3:
+                    frontmatter_str = parts[1]
+                    data = yaml.safe_load(frontmatter_str)
+                    if data and "metadata" in data:
+                        self.config = data["metadata"]
+                        return
+            except Exception as e:
+                import logging
+                logging.warning(f"Failed to parse SKILL.md frontmatter: {e}")
+
         if os.path.exists(self.config_path):
             with open(self.config_path, "r") as f:
                 self.config = json.load(f)
