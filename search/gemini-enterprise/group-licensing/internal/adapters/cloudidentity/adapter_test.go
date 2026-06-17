@@ -357,3 +357,23 @@ func TestHasMember_ServerError(t *testing.T) {
 	mockSvc.AssertExpectations(t)
 	hasMemberCall.AssertExpectations(t)
 }
+
+func TestHasMember_InvalidMemberKey(t *testing.T) {
+	hasMemberCall := new(MockMemberHasMemberCall)
+	hasMemberCall.On("Do").Return((*admin.MembersHasMember)(nil), makeAPIError(400))
+
+	mockSvc := new(MockMembersService)
+	mockSvc.On("HasMember", "group@example.com", "bad@@example.com").Return(hasMemberCall)
+
+	adapter := newWithMembers(mockSvc)
+	_, err := adapter.HasMember(context.Background(), "group@example.com", "bad@@example.com")
+
+	require.Error(t, err)
+	assert.True(t, errors.Is(err, models.ErrInvalidMemberKey),
+		"error chain missing ErrInvalidMemberKey; err = %v", err)
+	assert.True(t, errors.Is(err, models.ErrMembershipCheckFailed),
+		"error chain missing ErrMembershipCheckFailed; err = %v", err)
+
+	mockSvc.AssertExpectations(t)
+	hasMemberCall.AssertExpectations(t)
+}
