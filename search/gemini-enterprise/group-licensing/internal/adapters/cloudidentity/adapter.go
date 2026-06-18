@@ -164,6 +164,8 @@ func mapHTTPError(err error) error {
 	}
 
 	switch {
+	case apiErr.Code == 400:
+		return fmt.Errorf("%w: %w", models.ErrInvalidMemberKey, apiErr)
 	case apiErr.Code == 429:
 		return fmt.Errorf("%w: %w", models.ErrAPIRateLimited, apiErr)
 	case apiErr.Code == 404:
