@@ -225,6 +225,7 @@ func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense
 				if errors.Is(err, models.ErrInvalidMemberKey) {
 					middleware.LoggerFromContext(ctx).WarnContext(ctx,
 						"skipping licensed user with invalid member key",
+						slog.String("problematic_username", license.UserEmail),
 						slog.String("group_email", groupEmail),
 					)
 					return false, nil
