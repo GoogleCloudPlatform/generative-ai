@@ -1273,8 +1273,6 @@ pyvis
 Pzk
 Qantas
 qas
-qbr
-QBR
 QEDC
 QLo
 qna

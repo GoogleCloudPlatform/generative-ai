@@ -74,10 +74,10 @@ uv run ./migrate.py lookup-map-connectors "Quarterly Business Review Generator" 
 uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --source-project <SOURCE_PROJECT_NUMBER> --source-engine <SOURCE_ENGINE_ID> --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID> --force
 
 # Export an agent definition to a Google Cloud Storage staging backup
-uv run ./migrate.py export-agent-gcs "Quarterly Business Review Generator" "exports/qbr_generator.json" --project <SOURCE_PROJECT_NUMBER> --engine-id <SOURCE_ENGINE_ID> --bucket <GCS_BUCKET_NAME>
+uv run ./migrate.py export-agent-gcs "Quarterly Business Review Generator" "exports/quarterly_business_review_generator.json" --project <SOURCE_PROJECT_NUMBER> --engine-id <SOURCE_ENGINE_ID> --bucket <GCS_BUCKET_NAME>
 
 # Import an agent definition from GCS into your target environment
-uv run ./migrate.py import-agent-gcs "exports/qbr_generator.json" --bucket <GCS_BUCKET_NAME> --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py import-agent-gcs "exports/quarterly_business_review_generator.json" --bucket <GCS_BUCKET_NAME> --target-project <TARGET_PROJECT_NUMBER> --target-engine <TARGET_ENGINE_ID>
 ```
 
 ---

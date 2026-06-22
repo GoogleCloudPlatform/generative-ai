@@ -63,8 +63,8 @@ Once configured, run live migrations or offline GCS imports directly:
 
 ```bash
 # 1. Execute live cross-environment migration
-uv run ./migrate.py migrate-agent "QBR Generator" --force
+uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --force
 
 # 2. Import agent definition from GCS offline backup
-uv run ./migrate.py import-agent-gcs qbr_export.json --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py import-agent-gcs quarterly_business_review_export.json --target-engine <TARGET_ENGINE_ID>
 ```
