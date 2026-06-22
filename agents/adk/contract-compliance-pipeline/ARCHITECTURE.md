@@ -5,7 +5,7 @@ This document describes the executable architecture in the repo today. The live 
 - Browser cockpit served by Python at `/live-compliance/`
 - Python FastAPI service on `127.0.0.1:8000`
 - Go A2A compliance service on `:8888`
-- ADK `RemoteA2aAgent` handoff through the Go Agent Card and A2A JSON-RPC `message/send`
+- ADK `RemoteA2aAgent` handoff through the Go Agent Card and A2A JSON-RPC `SendMessage`
 
 The Go service is deterministic by design. It is not an LLM agent; it enforces policy thresholds that need repeatable audit behavior.
 
@@ -18,7 +18,7 @@ flowchart LR
     EXTRACT["Deterministic Extraction<br/>tools.py"]
     ADK["ADK RemoteA2aAgent<br/>fast_api_app.py"]
     CARD["Go Agent Card<br/>/.well-known/agent.json"]
-    RPC["Go JSON-RPC<br/>message/send"]
+    RPC["Go JSON-RPC<br/>SendMessage"]
     CHECK["Policy Checker<br/>checker.go"]
     ART["Case + HTML Artifacts<br/>live_compliance.py"]
 
@@ -26,7 +26,7 @@ flowchart LR
     API --> EXTRACT
     EXTRACT --> ADK
     ADK -->|"GET Agent Card"| CARD
-    ADK -->|"POST JSON-RPC message/send"| RPC
+    ADK -->|"POST JSON-RPC SendMessage"| RPC
     RPC --> CHECK
     CHECK -->|"passed / violations / timestamp"| RPC
     RPC --> ADK
@@ -44,7 +44,7 @@ flowchart LR
 5. Python classifies risk and builds an A2A data payload.
 6. Python creates a focused `RemoteA2aAgent` in `fast_api_app.py`.
 7. ADK resolves the Go Agent Card from `GO_AGENT_CARD_URL`.
-8. ADK sends A2A JSON-RPC `message/send` to the Go service.
+8. ADK sends A2A JSON-RPC `SendMessage` to the Go service.
 9. Go decodes the data part, applies deterministic policy checks, and returns a completed A2A task.
 10. Python stores the case state, generates HTML artifacts, and returns the UI-visible payload.
 
@@ -56,19 +56,17 @@ Python builds the UI-visible request envelope in `build_go_message_payload(...)`
 {
   "jsonrpc": "2.0",
   "id": "case-{case_id}",
-  "method": "message/send",
+  "method": "SendMessage",
   "params": {
     "metadata": {
       "task_id": "{case_id}"
     },
     "message": {
-      "kind": "message",
       "messageId": "case-{case_id}-request",
       "taskId": "{case_id}",
-      "role": "user",
+      "role": "ROLE_USER",
       "parts": [
         {
-          "kind": "data",
           "data": {
             "schema_version": "contract-compliance.a2a.v1",
             "case_id": "{case_id}",
@@ -88,7 +86,8 @@ Python builds the UI-visible request envelope in `build_go_message_payload(...)`
               "required_termination_clause": true,
               "prohibited_clauses": ["unlimited liability", "auto-renewal > 3yr"]
             }
-          }
+          },
+          "mediaType": "application/json"
         }
       ]
     }
@@ -140,7 +139,7 @@ Go service:
 
 - Serves an Agent Card at `/.well-known/agent.json`.
 - Accepts JSON-RPC POST requests.
-- Handles current `message/send` plus legacy `tasks/send` and `tasks/get`.
+- Handles current `SendMessage` plus legacy `tasks/send` and `tasks/get`.
 - Applies deterministic policy rules from `default_policy.json` or request policy overrides.
 
 ## Key Files

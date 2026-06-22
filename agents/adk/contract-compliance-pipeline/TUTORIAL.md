@@ -1,6 +1,6 @@
 # Tutorial: Run the Contract Compliance Multi-Agent Demo
 
-This tutorial walks through the executable demo in this repository. A Python FastAPI service handles contract intake, deterministic extraction, ADK `RemoteA2aAgent` handoff, case state, and artifacts. A Go A2A service enforces deterministic compliance rules and returns a JSON-RPC `message/send` task verdict.
+This tutorial walks through the executable demo in this repository. A Python FastAPI service handles contract intake, deterministic extraction, ADK `RemoteA2aAgent` handoff, case state, and artifacts. A Go A2A service enforces deterministic compliance rules and returns a JSON-RPC `SendMessage` task verdict.
 
 The live cockpit path does not require a Gemini API key.
 
@@ -42,7 +42,7 @@ http://127.0.0.1:8000/live-compliance/
 4. Confirm the Agent Exchange panel shows:
    - source: `python-extraction-agent`
    - target: `Security Compliance Validator`
-   - method: `message/send`
+   - method: `SendMessage`
    - a task ID
    - a JSON-RPC payload
    - a passed Go verdict
@@ -104,7 +104,7 @@ The browser does not call the Go service directly.
 The live method is:
 
 ```text
-message/send
+SendMessage
 ```
 
 The payload contains:
@@ -142,7 +142,7 @@ go-compliance-agent/internal/policies/default_policy.json
 | `python-extraction-agent/app/live_compliance.py` | Case state and generated HTML artifacts. |
 | `python-extraction-agent/app/static/live-compliance/index.html` | Live cockpit UI and A2A payload display. |
 | `go-compliance-agent/internal/agentcard/card.go` | Agent Card discovery response. |
-| `go-compliance-agent/internal/handler/task_handler.go` | JSON-RPC `message/send` and legacy task handlers. |
+| `go-compliance-agent/internal/handler/task_handler.go` | JSON-RPC `SendMessage` and legacy task handlers. |
 | `go-compliance-agent/internal/compliance/checker.go` | Deterministic policy verdict. |
 
 ## 9. Test the Demo

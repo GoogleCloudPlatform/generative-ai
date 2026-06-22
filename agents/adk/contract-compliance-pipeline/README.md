@@ -18,7 +18,7 @@ Most agent demos overuse LLMs for every step, including places where determinist
 This repository demonstrates that split of responsibility:
 
 - **Python FastAPI + ADK** handles intake, deterministic extraction, risk classification, session state, artifacts, and the focused `RemoteA2aAgent` handoff.
-- **Go A2A compliance agent** exposes an Agent Card and validates extracted contract fields through JSON-RPC `message/send`.
+- **Go A2A compliance agent** exposes an Agent Card and validates extracted contract fields through JSON-RPC `SendMessage`.
 - **Contract Compliance Engine UI** shows the full pipeline: contract selection, generated artifacts, live A2A payload, Go verdict, trace spans, simulator controls, and the active compliance policy summary.
 
 The core lesson:
@@ -68,7 +68,7 @@ flowchart TD
   * **SQLite / aiosqlite**: Stores session logs, execution traces, and agent-state checkpoints.
 * **Compliance Validator Service (Go / JSON-RPC 2.0)**:
   * **Go Standard Library (`net/http`)**: High-performance HTTP server that exposes the A2A Agent Card config (`/.well-known/agent.json`).
-  * **JSON-RPC 2.0**: The protocol layer used for agent-to-agent communication (supporting `message/send`, `tasks/send`, and `tasks/get`).
+  * **JSON-RPC 2.0**: The protocol layer used for agent-to-agent communication (supporting `SendMessage`, `tasks/send`, and `tasks/get`).
   * **Go Policy Checker**: Performs synchronous, auditable compliance validation against company thresholds.
 
 ## Quick Start
@@ -108,7 +108,7 @@ docker-compose up --build
 2. Select one of the bundled vendor contracts.
 3. Keep **A2A Simulator Mode** on `Healthy` for the normal path.
 4. Click **Run Pipeline Audit**.
-5. Watch **Agent Exchange** populate with the Python-to-Go `message/send` handoff.
+5. Watch **Agent Exchange** populate with the Python-to-Go `SendMessage` handoff.
 6. Open the generated artifacts:
    - legal parameters sheet
    - Go compliance certificate
@@ -131,13 +131,13 @@ The files in `sample-contracts/` are plain-text fixtures with `.pdf` names. That
 flowchart LR
     USER["End User<br/>Contract Compliance Engine UI"]
     PY["Python FastAPI (:8000)<br/>intake, extraction, risk"]
-    ADK["ADK RemoteA2aAgent<br/>Agent Card + message/send"]
+    ADK["ADK RemoteA2aAgent<br/>Agent Card + SendMessage"]
     GO["Go A2A Compliance Agent (:8888)<br/>deterministic policy checks"]
     OUT["Returned Case<br/>verdict, trace, artifacts"]
 
     USER -->|"Select contract + run audit"| PY
     PY -->|"Extract facts + attach active policy"| ADK
-    ADK -->|"GET /.well-known/agent.json<br/>POST JSON-RPC message/send"| GO
+    ADK -->|"GET /.well-known/agent.json<br/>POST JSON-RPC SendMessage"| GO
     GO -->|"Completed A2A Task<br/>pass/review + violations"| ADK
     ADK -->|"Go verdict"| PY
     PY -->|"Case payload + artifact links"| OUT
@@ -170,7 +170,7 @@ Those values are not decorative. The UI sends them as `custom_policies`; FastAPI
 | `python-extraction-agent/app/tools.py` | Deterministic extraction and risk classification. |
 | `python-extraction-agent/app/live_compliance.py` | Case state, event stream, and generated HTML artifacts. |
 | `go-compliance-agent/internal/agentcard/card.go` | Go Agent Card at `/.well-known/agent.json`. |
-| `go-compliance-agent/internal/handler/task_handler.go` | JSON-RPC `message/send`, `tasks/send`, and `tasks/get` handlers. |
+| `go-compliance-agent/internal/handler/task_handler.go` | JSON-RPC `SendMessage`, `tasks/send`, and `tasks/get` handlers. |
 | `go-compliance-agent/internal/compliance/checker.go` | Deterministic policy checker. |
 | `go-compliance-agent/internal/policies/default_policy.json` | Default compliance policy. |
 
@@ -198,7 +198,7 @@ curl http://127.0.0.1:8888/.well-known/agent.json
 
 Then run the live cockpit and confirm:
 
-- the Agent Exchange panel shows `message/send`
+- the Agent Exchange panel shows `SendMessage`
 - the A2A payload includes `jsonrpc: "2.0"`
 - the Go verdict appears in the UI
 - the generated compliance certificate artifact renders

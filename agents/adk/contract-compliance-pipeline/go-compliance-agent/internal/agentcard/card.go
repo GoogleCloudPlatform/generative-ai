@@ -9,22 +9,26 @@ import (
 // AgentCard describes the agent's capabilities following the A2A protocol specification.
 // Served at /.well-known/agent.json for discovery by other agents.
 type AgentCard struct {
-	Name               string       `json:"name"`
-	Description        string       `json:"description"`
-	URL                string       `json:"url"`
-	Version            string       `json:"version"`
-	ProtocolVersion    string       `json:"protocolVersion"`
-	PreferredTransport string       `json:"preferredTransport"`
-	Capabilities       Capabilities `json:"capabilities"`
-	DefaultInputModes  []string     `json:"defaultInputModes"`
-	DefaultOutputModes []string     `json:"defaultOutputModes"`
-	Skills             []Skill      `json:"skills"`
+	Name               string             `json:"name"`
+	Description        string             `json:"description"`
+	Version            string             `json:"version"`
+	SupportedInterfaces []AgentInterface  `json:"supportedInterfaces"`
+	Capabilities       Capabilities       `json:"capabilities"`
+	DefaultInputModes  []string           `json:"defaultInputModes"`
+	DefaultOutputModes []string           `json:"defaultOutputModes"`
+	Skills             []Skill            `json:"skills"`
+}
+
+// AgentInterface specifies a transport mechanism and protocol version for agent communication.
+type AgentInterface struct {
+	URL             string `json:"url"`
+	ProtocolBinding string `json:"protocolBinding"`
+	ProtocolVersion string `json:"protocolVersion"`
 }
 
 // Capabilities declares which optional A2A features the agent supports.
 type Capabilities struct {
-	Streaming         bool `json:"streaming"`
-	PushNotifications bool `json:"pushNotifications"`
+	ExtendedAgentCard bool `json:"extendedAgentCard"`
 }
 
 // Skill describes a specific capability the agent can perform.
@@ -45,15 +49,18 @@ func GetCard() AgentCard {
 	}
 
 	return AgentCard{
-		Name:               "Security Compliance Validator",
-		Description:        "Go-based validation engine that checks vendor contracts against corporate compliance policy rules. Accepts extracted contract fields and returns pass/fail verdict with specific violations.",
-		URL:                agentURL,
-		Version:            "1.0.0",
-		ProtocolVersion:    "0.3.0",
-		PreferredTransport: "JSONRPC",
+		Name:        "Security Compliance Validator",
+		Description: "Go-based validation engine that checks vendor contracts against corporate compliance policy rules. Accepts extracted contract fields and returns pass/fail verdict with specific violations.",
+		Version:     "1.0.0",
+		SupportedInterfaces: []AgentInterface{
+			{
+				URL:             agentURL,
+				ProtocolBinding: "JSONRPC",
+				ProtocolVersion: "1.0",
+			},
+		},
 		Capabilities: Capabilities{
-			Streaming:         false,
-			PushNotifications: false,
+			ExtendedAgentCard: false,
 		},
 		DefaultInputModes:  []string{"application/json"},
 		DefaultOutputModes: []string{"application/json"},
