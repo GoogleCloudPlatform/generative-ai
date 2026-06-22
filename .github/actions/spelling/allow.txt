@@ -868,6 +868,7 @@ LCEL
 LEBRON
 lecie
 lego
+lenght
 lenzing
 Levaquin
 levelized
