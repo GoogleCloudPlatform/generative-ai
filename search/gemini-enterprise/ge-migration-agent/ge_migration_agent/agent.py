@@ -13,8 +13,8 @@ from google.adk.tools.skill_toolset import SkillToolset
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from skills import migration_skill
 
-PROJECT_NUMBER = os.environ.get("GEMINI_API_PROJECT")
-LOCATION = os.environ.get("GEMINI_API_LOCATION", "global")
+PROJECT_NUMBER = os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GEMINI_API_PROJECT")
+LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION") or os.environ.get("GEMINI_API_LOCATION", "global")
 MODEL_NAME = os.environ.get("GEMINI_API_MODEL") or os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 if "/" not in MODEL_NAME:
     MODEL_PATH = f"projects/{PROJECT_NUMBER}/locations/{LOCATION}/publishers/google/models/{MODEL_NAME}"

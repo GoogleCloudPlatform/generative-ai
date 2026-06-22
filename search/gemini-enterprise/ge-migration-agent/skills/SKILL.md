@@ -4,29 +4,28 @@ description: Holds canonical source and target environment parameters and verifi
 metadata:
   environments:
     source:
-      project_number: "<SOURCE_PROJECT_NUMBER>"
-      project_id: "<SOURCE_PROJECT_ID>"
+      project_number: "404109417257"
+      project_id: learn-w-me
       region: global
-      engine_id: "<SOURCE_ENGINE_ID>"
+      engine_id: enterprise-search-17416389_1741638989378
     target:
-      project_number: "<TARGET_PROJECT_NUMBER>"
-      project_id: "<TARGET_PROJECT_ID>"
+      project_number: "1087766539550"
+      project_id: "acxiom-425322"
       region: global
-      engine_id: "<TARGET_ENGINE_ID>"
+      engine_id: gemini-enterprise-17811872_1781187299515
   datastores_mapping:
-    <id>_mcp_data: <id>_mcp_data
-    <id>_google_drive: <id>_google_drive
+    ge-drive-all_1776953145638_google_drive: ge-drive-all_1781187446457_google_drive
+    
   connectors_mapping:
-    Snowflake Mcp May29: custom_mcp
     ge-drive-all: Drive
-    Ge Gmail: geGmail
+    GeGmail: geGmail
     googleSearch: googleSearch
     urlContext: urlContext
 ---
 
 # ADK Administration Setup & Migration Instructions
 
-This file serves as the single source of truth for cross-environment Gemini Enterprise app agent migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
+This file serves as the single source of truth for cross-environment Gemini Enterprise / Vertex AI agent migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
 
 ---
 
@@ -34,7 +33,7 @@ This file serves as the single source of truth for cross-environment Gemini Ente
 
 ### 1. Environments Configuration
 Set your official canonical source and target project definitions under `environments`:
-- **`project_number`**: The numeric Google Cloud Project Number (e.g., `123456789012`).
+- **`project_number`**: The numeric GCP Project Number (e.g., `404109417257`).
 - **`engine_id`**: The fully qualified Discovery Engine app/engine ID.
 
 ### 2. DataStore Grounding Mappings (`datastores_mapping`)
@@ -64,8 +63,8 @@ Once configured, run live migrations or offline GCS imports directly:
 
 ```bash
 # 1. Execute live cross-environment migration
-uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --force
+uv run ./migrate.py migrate-agent "QBR Generator" --force
 
 # 2. Import agent definition from GCS offline backup
-uv run ./migrate.py import-agent-gcs Quarterly_Business_Review_export.json --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py import-agent-gcs qbr_export.json --target-engine <TARGET_ENGINE_ID>
 ```
