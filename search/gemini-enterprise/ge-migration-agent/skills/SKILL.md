@@ -25,7 +25,7 @@ metadata:
 
 # ADK Administration Setup & Migration Instructions
 
-This file serves as the single source of truth for Gemini Enterprise app migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
+This file serves as the single source of truth for Gemini Enterprise migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
 
 ---
 
