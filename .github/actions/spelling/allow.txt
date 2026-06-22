@@ -1044,6 +1044,7 @@ Napisz
 NARI
 Narnia
 nas
+Navneet
 nbconvert
 nbfmt
 nbformat
@@ -1272,6 +1273,8 @@ pyvis
 Pzk
 Qantas
 qas
+qbr
+QBR
 QEDC
 QLo
 qna
@@ -1611,6 +1614,7 @@ TTH
 tts
 TTT
 tures
+Tuteja
 tval
 twiml
 typehints

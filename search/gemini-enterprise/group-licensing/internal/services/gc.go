@@ -34,16 +34,16 @@ import (
 // no longer entitled to any configured group, and revokes their licenses in
 // batches.
 type GCService struct {
-	idp    ports.IdpClient
-	gemini ports.GeminiClient
+	idp          ports.IdpClient
+	geminiClient ports.GeminiClient
 }
 
 // NewGCService constructs a GCService wired to the supplied port
 // implementations. Logging is provided per-request via middleware.LoggerFromContext.
-func NewGCService(idp ports.IdpClient, gemini ports.GeminiClient) *GCService {
+func NewGCService(idp ports.IdpClient, geminiClient ports.GeminiClient) *GCService {
 	return &GCService{
-		idp:    idp,
-		gemini: gemini,
+		idp:          idp,
+		geminiClient: geminiClient,
 	}
 }
 
@@ -101,7 +101,7 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 	}, nil
 }
 
-// processProject pages through all licensed users for a single GCP project and
+// processProject pages through all licensed users for a single Google Cloud project and
 // revokes licences from users who are stale or no longer entitled. It returns
 // the number of licenses revoked and users evaluated.
 //
@@ -137,7 +137,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 				break
 			}
 			pageCount++
-			licenses, next, err := s.gemini.ListUserLicenses(ctx, projectID, location, pageToken)
+			licenses, next, err := s.geminiClient.ListUserLicenses(ctx, projectID, location, pageToken)
 			if err != nil {
 				return 0, 0, fmt.Errorf("project %q listing licenses: %w", projectID, err)
 			}
@@ -170,7 +170,7 @@ func (s *GCService) processProject(ctx context.Context, projectID string, projec
 			if len(pageRevocations) > 0 {
 				if !dryRun {
 					for _, chunk := range chunkLicenseUpdates(pageRevocations, models.MaxBatchSize) {
-						if err := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, chunk); err != nil {
+						if err := s.geminiClient.BatchUpdateUserLicenses(ctx, projectID, location, chunk); err != nil {
 							return 0, 0, fmt.Errorf("project %q batch revoke: %w", projectID, err)
 						}
 					}

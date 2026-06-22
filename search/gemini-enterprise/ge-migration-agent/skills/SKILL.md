@@ -33,7 +33,7 @@ This file serves as the single source of truth for cross-environment Gemini Ente
 
 ### 1. Environments Configuration
 Set your official canonical source and target project definitions under `environments`:
-- **`project_number`**: The numeric GCP Project Number (e.g., `404109417257`).
+- **`project_number`**: The numeric Google Cloud Project Number (e.g., `404109417257`).
 - **`engine_id`**: The fully qualified Discovery Engine app/engine ID.
 
 ### 2. DataStore Grounding Mappings (`datastores_mapping`)
