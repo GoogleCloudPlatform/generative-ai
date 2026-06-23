@@ -140,7 +140,7 @@ The utility's logic is divided into two primary reconciliation workflows.
   1. Iterates through all licensed users via the **Discovery Engine API** (`listUserLicenses`).  
   2. For each user, the job evaluates two deprovisioning conditions:
       - **Staleness**: If `staleness_threshold_days` is greater than `0`, checks whether the user's staleness reference date is more than `X` days ago. The reference date is chosen as follows: if `lastLoginTime` is set, it is used; if `lastLoginTime` is absent (the user has never logged in), `createTime` (the license assignment timestamp) is used instead, so that a recently provisioned account is not immediately revoked before the user has had a chance to sign in. If both timestamps are absent, the user is treated as immediately stale. Both timestamps are retrieved from the `UserLicense` object provided by the **Discovery Engine API**. Setting `staleness_threshold_days` to `0` (or omitting it) disables this check entirely — only entitlement is evaluated.
-      - **Entitlement**: Calls the **Cloud Identity Admin API's** `members.hasMember` method to confirm if the user is still a member of any entitled group.
+      - **Entitlement**: Calls the **Cloud Identity Admin API's** `members.hasMember` method to confirm if the user is still a member of any entitled group. If the API returns HTTP 400 (invalid member key — e.g. a typo'd email entered manually via the Discovery Engine UI), the user is skipped with a structured `WARN` log entry and the job continues; no revocation is performed for that user.
   3. If **either** condition is met (the user is stale OR no longer entitled), the utility calls the **Discovery Engine API** (`batchUpdateUserLicenses`) to revoke the license.
 
 ### **5.3. License Precedence Logic**
@@ -189,6 +189,7 @@ Two distinct layers of security must be implemented:
     *   **Request Batching:** The utility MUST utilize the `batchUpdateUserLicenses` endpoint to consolidate up to 100 license modifications (assignments or revocations) per API request, minimizing round-trip latency and quota consumption.
     *   **Backoff:** Exponential backoff will be applied to all 429 and 5xx errors using a standard retry library.
     *   **License Pool Exhaustion:** License pool exhaustion (`ErrLicensesExhausted`) is treated as a soft failure distinct from rate limiting (`ErrAPIRateLimited`). Exhaustion triggers a `licenseConfigsUsageStats.list` lookup, a trimmed retry for remaining available seats, and a structured warning log — it does not abort the job.
+    *   **Invalid Member Key (GC only):** If `members.hasMember` returns HTTP 400 (`ErrInvalidMemberKey`) for a licensed user — indicating the stored email is malformed or otherwise unresolvable by the Admin API — the user is skipped with a `WARN` log entry. No revocation is issued and the job continues. This guards against typo'd emails entered via the Discovery Engine UI, which lacks input validation.
 * **Structured Logging:**
     *   **Format:** All logs MUST be emitted in JSON format to stdout for automatic ingestion by Cloud Logging.
     *   **Library:** Use Go's standard `log/slog` library.

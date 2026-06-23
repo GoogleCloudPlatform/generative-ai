@@ -19,6 +19,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -599,6 +600,51 @@ func TestGCService_Run_StalenessDisabled_NeverLoggedInUserNotRevoked(t *testing.
 	assert.Equal(t, 1, resp.UsersEvaluated)
 
 	// Entitlement check must still run even when staleness is disabled.
+	idp.AssertExpectations(t)
+	gemini.AssertNotCalled(t, "BatchUpdateUserLicenses")
+}
+
+func TestGCService_Run_InvalidUserEmail_NotRevoked(t *testing.T) {
+	// When HasMember returns ErrInvalidMemberKey the GC job must log a warning,
+	// skip the user (no revocation), and continue without returning an error.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	gemini := new(MockGeminiClient)
+
+	const (
+		projectID = "proj-invalid-key"
+		group     = "grp@example.com"
+		userEmail = "bad@@example.com"
+	)
+
+	recentLogin := time.Now().AddDate(0, 0, -1)
+
+	gemini.On("ListUserLicenses", mock.Anything, projectID, models.LocationGlobal, "").
+		Return([]models.UserLicense{
+			{
+				UserEmail:     userEmail,
+				State:         models.LicenseStateAssigned,
+				LastLoginTime: recentLogin,
+			},
+		}, "", nil)
+
+	idp.On("HasMember", mock.Anything, group, userEmail).
+		Return(false, fmt.Errorf("%w: %w", models.ErrMembershipCheckFailed, models.ErrInvalidMemberKey))
+
+	cfg := newGCConfig(30, map[string]config.ProjectConfig{
+		projectID: {
+			{SubscriptionTier: models.SKUAgentspaceBusiness, Location: models.LocationGlobal, Groups: []string{group}},
+		},
+	})
+
+	svc := NewGCService(idp, gemini)
+	resp, err := svc.Run(ctx, cfg, dto.SyncRemoveRequest{})
+
+	require.NoError(t, err)
+	assert.Equal(t, 0, resp.LicensesRevoked)
+	assert.Equal(t, 1, resp.UsersEvaluated)
+
 	idp.AssertExpectations(t)
 	gemini.AssertNotCalled(t, "BatchUpdateUserLicenses")
 }
