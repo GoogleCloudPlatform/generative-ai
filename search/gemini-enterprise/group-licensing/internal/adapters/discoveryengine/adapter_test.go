@@ -665,7 +665,7 @@ func TestAccumulateLicenseConfigs_SingleActiveEntry(t *testing.T) {
 		},
 	}
 
-	accumulateLicenseConfigs(index, configs)
+	accumulateLicenseConfigs(index, configs, false)
 
 	key := models.LicenseConfigKey{SKU: models.SKUEnterprise, ProjectNumber: "123", Location: models.LocationGlobal}
 	require.Len(t, index[key], 1)
@@ -695,7 +695,7 @@ func TestAccumulateLicenseConfigs_TwoSubscriptionsSameSKUProjectLocation_BothAcc
 		},
 	}
 
-	accumulateLicenseConfigs(index, configs)
+	accumulateLicenseConfigs(index, configs, false)
 
 	key := models.LicenseConfigKey{SKU: models.SKUEnterprise, ProjectNumber: "123", Location: models.LocationGlobal}
 	require.Len(t, index[key], 2, "both subscription pools must appear in the slice")
@@ -717,7 +717,7 @@ func TestAccumulateLicenseConfigs_InactiveSubscription_Excluded(t *testing.T) {
 		},
 	}
 
-	accumulateLicenseConfigs(index, configs)
+	accumulateLicenseConfigs(index, configs, false)
 
 	assert.Empty(t, index, "inactive subscription must not appear in the index")
 }
@@ -734,7 +734,7 @@ func TestAccumulateLicenseConfigs_UnspecifiedTier_Excluded(t *testing.T) {
 		},
 	}
 
-	accumulateLicenseConfigs(index, configs)
+	accumulateLicenseConfigs(index, configs, false)
 
 	assert.Empty(t, index, "unspecified subscription tier must not appear in the index")
 }
@@ -751,7 +751,7 @@ func TestAccumulateLicenseConfigs_MalformedPath_Skipped(t *testing.T) {
 		},
 	}
 
-	accumulateLicenseConfigs(index, configs)
+	accumulateLicenseConfigs(index, configs, false)
 
 	assert.Empty(t, index, "malformed licenseConfig path must be skipped")
 }
@@ -768,7 +768,7 @@ func TestAccumulateLicenseConfigs_InvalidAllocatedCount_Skipped(t *testing.T) {
 		},
 	}
 
-	accumulateLicenseConfigs(index, configs)
+	accumulateLicenseConfigs(index, configs, false)
 
 	assert.Empty(t, index, "non-integer allocated count must be skipped")
 }

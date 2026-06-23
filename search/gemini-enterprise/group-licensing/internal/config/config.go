@@ -39,6 +39,7 @@ var validEmail = regexp.MustCompile(`^[^@\s]+@[^@\s]+\.[^@\s]+$`)
 // a given GCP project.
 type ProjectEntry struct {
 	SubscriptionTier models.SKU      `json:"subscription_tier"`
+	SubscriptionID   *string         `json:"subscription_id"`
 	Location         models.Location `json:"location"`
 	Groups           []string        `json:"groups"`
 }

@@ -68,8 +68,12 @@ func (s *JoinerService) Run(ctx context.Context, cfg *config.EntitlementConfig, 
 	if req.DryRun != nil {
 		dryRun = *req.DryRun
 	}
+	directLaw := false
+	if req.DirectLaw != nil {
+		directLaw = *req.DirectLaw
+	}
 
-	licenseIndex, err := s.gemini.FetchLicenseConfigIndex(ctx, cfg.BillingAccountID)
+	licenseIndex, err := s.gemini.FetchLicenseConfigIndex(ctx, cfg.BillingAccountID, directLaw)
 	if err != nil {
 		return dto.SyncAddResponse{}, fmt.Errorf("fetching license config index: %w", err)
 	}
@@ -90,12 +94,13 @@ func (s *JoinerService) Run(ctx context.Context, cfg *config.EntitlementConfig, 
 	logger.InfoContext(ctx, "joiner workflow starting",
 		slog.Int("project_count", len(cfg.Projects)),
 		slog.Bool("dry_run", dryRun),
+		slog.Bool("direct_law_mode", directLaw),
 	)
 
 	var totalGranted, totalSoftFailed, totalGroups int
 
 	for projectID, projectCfg := range cfg.Projects {
-		granted, softFailed, groups, err := s.processProject(ctx, projectID, projectNumbers[projectID], projectCfg, licenseIndex, dryRun)
+		granted, softFailed, groups, err := s.processProject(ctx, projectID, projectNumbers[projectID], projectCfg, licenseIndex, dryRun, directLaw)
 		if err != nil {
 			logger.ErrorContext(ctx, "joiner workflow failed",
 				slog.String("project_id", projectID),
@@ -117,6 +122,7 @@ func (s *JoinerService) Run(ctx context.Context, cfg *config.EntitlementConfig, 
 		slog.Int("licenses_soft_failed", totalSoftFailed),
 		slog.Int("groups_processed", totalGroups),
 		slog.Bool("dry_run", dryRun),
+		slog.Bool("direct_law_mode", directLaw),
 	)
 
 	return dto.SyncAddResponse{
@@ -124,14 +130,17 @@ func (s *JoinerService) Run(ctx context.Context, cfg *config.EntitlementConfig, 
 		LicensesSoftFailed: totalSoftFailed,
 		GroupsProcessed:    totalGroups,
 		DryRun:             dryRun,
+		DirectLaw:          directLaw,
 	}, nil
 }
 
 // userEntitlement pairs the highest-precedence SKU a user is entitled to with
-// the location of the group entry that granted it.
+// the location of the group entry that granted it. Alternatively, if admin-specified,
+// it pairs the SubscriptionID a user is entitled to with the location of the group entry.
 type userEntitlement struct {
-	SKU      models.SKU
-	Location models.Location
+	SKU            models.SKU
+	Location       models.Location
+	SubscriptionID string // only used in direct_law join mode, admin-specifies the {uuid} in licenseConfigs/{uuid}
 }
 
 // processProject enumerates all configured groups for a single GCP project,
@@ -142,14 +151,18 @@ type userEntitlement struct {
 // users from an exhausted pool into the next pool's batch.
 // It returns the number of licenses granted, the number of users soft-failed
 // due to license pool exhaustion, and the number of groups processed.
-func (s *JoinerService) processProject(ctx context.Context, projectID, projectNumber string, projectCfg config.ProjectConfig, index models.LicenseConfigIndex, dryRun bool) (licensesGranted, licensesSoftFailed, groupsProcessed int, err error) {
+func (s *JoinerService) processProject(ctx context.Context, projectID, projectNumber string, projectCfg config.ProjectConfig, index models.LicenseConfigIndex, dryRun bool, directLaw bool) (licensesGranted, licensesSoftFailed, groupsProcessed int, err error) {
 	// userBestEntitlement maps each user email to the highest-ranked entitlement
 	// (SKU + location) across all groups in this project.
 	userBestEntitlement := make(map[string]userEntitlement)
 
 	for _, cfgEntry := range projectCfg {
 		for _, groupEmail := range cfgEntry.Groups {
-			if err := s.collectGroupMembers(ctx, groupEmail, cfgEntry.SubscriptionTier, cfgEntry.Location, userBestEntitlement); err != nil {
+			subID := ""
+			if directLaw {
+				subID = *cfgEntry.SubscriptionID
+			}
+			if err := s.collectGroupMembers(ctx, groupEmail, cfgEntry.SubscriptionTier, subID, cfgEntry.Location, userBestEntitlement, directLaw); err != nil {
 				return 0, 0, 0, fmt.Errorf("project %q group %q: %w", projectID, groupEmail, err)
 			}
 			groupsProcessed++
@@ -161,18 +174,50 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 	pendingByKey := make(map[models.LicenseConfigKey][]models.LicenseUpdate)
 
 	for email, ent := range userBestEntitlement {
-		key := models.LicenseConfigKey{SKU: ent.SKU, ProjectNumber: projectNumber, Location: ent.Location}
+		// Default behavior is to index by SKU (automatic mode)
+		key := models.LicenseConfigKey{
+			SKU:           ent.SKU,
+			ProjectNumber: projectNumber,
+			Location:      ent.Location,
+		}
+		// If in direct_law mode, change to index by admin-specified SubscriptionID
+		if directLaw {
+			key = models.LicenseConfigKey{
+				SubscriptionID: ent.SubscriptionID,
+				ProjectNumber:  projectNumber,
+				Location:       ent.Location,
+			}
+		}
 		entries, ok := index[key]
 		if !ok || len(entries) == 0 {
+			if directLaw {
+				return 0, 0, 0, fmt.Errorf("project %q: no licenseConfig found for SKU %q Subscription %q location %q", projectID, ent.SKU, ent.SubscriptionID, ent.Location)
+			}
 			return 0, 0, 0, fmt.Errorf("project %q: no licenseConfig found for SKU %q location %q", projectID, ent.SKU, ent.Location)
 		}
-		// LicenseConfigPath will be resolved per-entry when building each chunk.
-		pendingByKey[key] = append(pendingByKey[key], models.LicenseUpdate{
-			UserEmail: email,
-			SKU:       ent.SKU,
-			Location:  ent.Location,
-			Action:    models.LicenseActionGrant,
-		})
+		// If in direct_law mode, for each user include LicenseConfigPath in the key because {uuid} is unambiguous and should be unique; assume {uuid} unique and defined once in config.json and only create slice of just one LicenseUpdate entry
+		if directLaw {
+			for _, entry := range entries {
+				pendingUpdate := models.LicenseUpdate{
+					UserEmail:         email,
+					SKU:               ent.SKU,
+					Location:          ent.Location,
+					LicenseConfigPath: entry.Path,
+					Action:            models.LicenseActionGrant,
+				}
+				pendingByKey[key] = append(pendingByKey[key], pendingUpdate)
+			}
+
+		} else {
+			// Default behavior for each user is to index by SKU which holds a slice of one or many LicenseUpdates
+			// LicenseConfigPath will be resolved per-entry when building each chunk.
+			pendingByKey[key] = append(pendingByKey[key], models.LicenseUpdate{
+				UserEmail: email,
+				SKU:       ent.SKU,
+				Location:  ent.Location,
+				Action:    models.LicenseActionGrant,
+			})
+		}
 	}
 
 	for key, updates := range pendingByKey {
@@ -263,7 +308,7 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 // collectGroupMembers pages through all members of groupEmail and updates
 // userBestEntitlement with the supplied (sku, location) when sku is higher
 // than any previously recorded SKU for that user.
-func (s *JoinerService) collectGroupMembers(ctx context.Context, groupEmail string, sku models.SKU, location models.Location, userBestEntitlement map[string]userEntitlement) error {
+func (s *JoinerService) collectGroupMembers(ctx context.Context, groupEmail string, sku models.SKU, subID string, location models.Location, userBestEntitlement map[string]userEntitlement, directLaw bool) error {
 	var pageToken string
 	var pageCount int
 
@@ -289,7 +334,10 @@ func (s *JoinerService) collectGroupMembers(ctx context.Context, groupEmail stri
 			if m.Type != models.MemberTypeUser {
 				continue
 			}
-
+			if directLaw {
+				userBestEntitlement[m.Email] = userEntitlement{SKU: sku, SubscriptionID: subID, Location: location}
+				continue
+			}
 			existing, seen := userBestEntitlement[m.Email]
 			if !seen || sku.HasHigherPrecedenceThan(existing.SKU) {
 				userBestEntitlement[m.Email] = userEntitlement{SKU: sku, Location: location}

@@ -107,14 +107,14 @@ func main() {
 	// Step 7: run the workflow determined by JobType.
 	switch settings.JobType {
 	case models.WorkflowJoiner:
-		req := dto.SyncAddRequest{DryRun: &settings.DryRun}
+		req := dto.SyncAddRequest{DryRun: &settings.DryRun, DirectLaw: &settings.DirectLaw}
 		if _, err := services.NewJoinerService(idpAdapter, geminiAdapter, rmAdapter).Run(ctx, cfg, req); err != nil {
 			slog.Error("joiner workflow failed", slog.Any("error", err))
 			os.Exit(1)
 		}
 
 	case models.WorkflowGarbageCollection:
-		req := dto.SyncRemoveRequest{DryRun: &settings.DryRun}
+		req := dto.SyncRemoveRequest{DryRun: &settings.DryRun, DirectLaw: &settings.DirectLaw}
 		if _, err := services.NewGCService(idpAdapter, geminiAdapter).Run(ctx, cfg, req); err != nil {
 			slog.Error("garbage collection workflow failed", slog.Any("error", err))
 			os.Exit(1)

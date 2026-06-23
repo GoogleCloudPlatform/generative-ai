@@ -78,7 +78,7 @@ func TestJoinerService_Run_HappyPath_SKUPrecedence(t *testing.T) {
 		userBoth    = "both@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -145,7 +145,7 @@ func TestJoinerService_Run_DryRun_NoAPIWrite(t *testing.T) {
 		group     = "grp@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -180,7 +180,7 @@ func TestJoinerService_Run_FetchLicenseConfigIndexError_ReturnsError(t *testing.
 	gemini := new(MockGeminiClient)
 	rm := new(MockResourceManagerClient)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(models.LicenseConfigIndex(nil), errors.New("billing api unavailable"))
 
 	cfg := newJoinerConfig(map[string]config.ProjectConfig{
@@ -205,7 +205,7 @@ func TestJoinerService_Run_ResolveProjectNumberError_ReturnsError(t *testing.T) 
 	gemini := new(MockGeminiClient)
 	rm := new(MockResourceManagerClient)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, "proj-x").
 		Return("", errors.New("project not found"))
@@ -236,7 +236,7 @@ func TestJoinerService_Run_ListMembersError_ReturnsWrappedError(t *testing.T) {
 		group     = "grp@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -270,7 +270,7 @@ func TestJoinerService_Run_BatchUpdateError_ReturnsError(t *testing.T) {
 		group     = "grp@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -313,7 +313,7 @@ func TestJoinerService_Run_MultiPagePagination_AllMembersCollected(t *testing.T)
 		tokenP1   = "page-token-1"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -361,7 +361,7 @@ func TestJoinerService_Run_EmptyGroup_NoBatchCall(t *testing.T) {
 		group     = "empty@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(models.LicenseConfigIndex{}, nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -423,7 +423,7 @@ func TestJoinerService_Run_GroupTypeMembersIgnored(t *testing.T) {
 		group     = "parent@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -471,7 +471,7 @@ func TestJoinerService_Run_LicensePoolExhausted_TrimsAndSoftFails(t *testing.T) 
 		allocatedStr = "50"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -533,7 +533,7 @@ func TestJoinerService_Run_LicensePoolFullyExhausted_AllSoftFailed(t *testing.T)
 		configPath = "projects/" + projectNumber + "/locations/global/licenseConfigs/ent-config"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -586,7 +586,7 @@ func TestJoinerService_Run_LicensePoolExhausted_UsageStatsFails_ReturnsError(t *
 		group     = "grp@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -632,7 +632,7 @@ func TestJoinerService_Run_LicensePoolExhausted_DryRun_NoFetchOrRetry(t *testing
 		group     = "grp@example.com"
 	)
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(licenseIndexForProject(projectNumber), nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -674,10 +674,10 @@ func TestJoinerService_Run_TwoPools_FirstExhausted_SpillsToSecond(t *testing.T) 
 	rm := new(MockResourceManagerClient)
 
 	const (
-		projectID  = "proj-two-pools"
-		group      = "grp@example.com"
-		pathPoolA  = "projects/" + projectNumber + "/locations/global/licenseConfigs/ent-pool-a"
-		pathPoolB  = "projects/" + projectNumber + "/locations/global/licenseConfigs/ent-pool-b"
+		projectID = "proj-two-pools"
+		group     = "grp@example.com"
+		pathPoolA = "projects/" + projectNumber + "/locations/global/licenseConfigs/ent-pool-a"
+		pathPoolB = "projects/" + projectNumber + "/locations/global/licenseConfigs/ent-pool-b"
 	)
 
 	twoPoolIndex := models.LicenseConfigIndex{
@@ -687,7 +687,7 @@ func TestJoinerService_Run_TwoPools_FirstExhausted_SpillsToSecond(t *testing.T) 
 		},
 	}
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(twoPoolIndex, nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -759,7 +759,7 @@ func TestJoinerService_Run_TwoPools_BothExhausted_AllSoftFailed(t *testing.T) {
 		},
 	}
 
-	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ").
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", false).
 		Return(twoPoolIndex, nil)
 	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
 
@@ -830,7 +830,7 @@ func TestJoinerService_collectGroupMembers_PageLimitReached(t *testing.T) {
 	svc := NewJoinerService(idp, gemini, new(MockResourceManagerClient))
 	userBestEntitlement := make(map[string]userEntitlement)
 
-	err := svc.collectGroupMembers(ctx, groupEmail, models.SKUAgentspaceBusiness, models.LocationGlobal, userBestEntitlement)
+	err := svc.collectGroupMembers(ctx, groupEmail, models.SKUAgentspaceBusiness, "", models.LocationGlobal, userBestEntitlement, false)
 
 	require.NoError(t, err)
 	idp.AssertNumberOfCalls(t, "ListMembers", models.MaxPagesPerGroup)

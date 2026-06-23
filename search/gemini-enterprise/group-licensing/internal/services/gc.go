@@ -62,12 +62,17 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 	if req.DryRun != nil {
 		dryRun = *req.DryRun
 	}
+	directLaw := false
+	if req.DirectLaw != nil {
+		directLaw = *req.DirectLaw
+	}
 
 	start := time.Now()
 	logger.InfoContext(ctx, "garbage collection workflow starting",
 		slog.Int("project_count", len(cfg.Projects)),
 		slog.Int("staleness_threshold_days", cfg.Settings.StalenessThresholdDays),
 		slog.Bool("dry_run", dryRun),
+		slog.Bool("direct_law_mode", directLaw),
 	)
 
 	var totalRevoked, totalEvaluated int
@@ -93,12 +98,14 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 		slog.Int("licenses_revoked", totalRevoked),
 		slog.Int("users_evaluated", totalEvaluated),
 		slog.Bool("dry_run", dryRun),
+		slog.Bool("direct_law_mode", directLaw),
 	)
 
 	return dto.SyncRemoveResponse{
 		LicensesRevoked: totalRevoked,
 		UsersEvaluated:  totalEvaluated,
 		DryRun:          dryRun,
+		DirectLaw:       directLaw,
 	}, nil
 }
 

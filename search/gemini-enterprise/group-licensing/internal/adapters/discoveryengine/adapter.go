@@ -198,7 +198,7 @@ func (a *Adapter) clientFor(ctx context.Context, location models.Location) (user
 // per-project licenseConfig resource path. The service layer calls this once
 // at the start of each run and resolves paths before issuing grant operations.
 // This endpoint is always global; no location-specific override is applied.
-func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error) {
+func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID string, directLaw bool) (models.LicenseConfigIndex, error) {
 	svc, err := discoveryengineapi.NewService(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("creating discoveryengine REST client: %w", err)
@@ -209,7 +209,7 @@ func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID 
 
 	err = svc.BillingAccounts.BillingAccountLicenseConfigs.List(parent).Context(ctx).Pages(ctx,
 		func(resp *discoveryengineapi.GoogleCloudDiscoveryengineV1alphaListBillingAccountLicenseConfigsResponse) error {
-			accumulateLicenseConfigs(index, resp.BillingAccountLicenseConfigs)
+			accumulateLicenseConfigs(index, resp.BillingAccountLicenseConfigs, directLaw)
 			return nil
 		},
 	)
@@ -223,7 +223,7 @@ func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID 
 // accumulateLicenseConfigs appends active, valid billing account license config
 // entries into index. It is extracted from the pagination callback so that the
 // index-building logic can be tested without a live REST client.
-func accumulateLicenseConfigs(index models.LicenseConfigIndex, configs []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig) {
+func accumulateLicenseConfigs(index models.LicenseConfigIndex, configs []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig, directLaw bool) {
 	for _, c := range configs {
 		if c.State != "ACTIVE" {
 			continue
@@ -241,10 +241,19 @@ func accumulateLicenseConfigs(index models.LicenseConfigIndex, configs []*discov
 			if err != nil {
 				continue
 			}
+			// Default behavior is to index by SKU (automatic mode)
 			key := models.LicenseConfigKey{
 				SKU:           models.SKU(c.SubscriptionTier),
 				ProjectNumber: parts[1],
 				Location:      models.Location(parts[3]),
+			}
+			// If in direct_law mode, change to index by admin-specified SubscriptionID
+			if directLaw {
+				key = models.LicenseConfigKey{
+					SubscriptionID: parts[5],
+					ProjectNumber:  parts[1],
+					Location:       models.Location(parts[3]),
+				}
 			}
 			index[key] = append(index[key], models.LicenseConfigEntry{
 				Path:           licenseConfigPath,
