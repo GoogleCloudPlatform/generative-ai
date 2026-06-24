@@ -66,7 +66,7 @@ type EntitlementConfig struct {
 //
 // A StalenessThresholdDays of 0 means the staleness check is disabled entirely;
 // only the entitlement check will run during garbage collection.
-func Load(path string) (*EntitlementConfig, error) {
+func Load(path string, directLaw bool) (*EntitlementConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -80,7 +80,7 @@ func Load(path string) (*EntitlementConfig, error) {
 		return nil, fmt.Errorf("parsing config: %w", models.ErrConfigInvalid)
 	}
 
-	if err := validate(&cfg); err != nil {
+	if err := validate(&cfg, directLaw); err != nil {
 		return nil, err
 	}
 
@@ -89,7 +89,7 @@ func Load(path string) (*EntitlementConfig, error) {
 
 // validate enforces all structural and semantic constraints on the config.
 // It is read-only and does not mutate cfg.
-func validate(cfg *EntitlementConfig) error {
+func validate(cfg *EntitlementConfig, directLaw bool) error {
 	if cfg.BillingAccountID == "" {
 		return fmt.Errorf("config validation: billing_account_id is required: %w", models.ErrConfigInvalid)
 	}
@@ -108,6 +108,11 @@ func validate(cfg *EntitlementConfig) error {
 		}
 
 		for i, entry := range projectCfg {
+			if directLaw {
+				if entry.SubscriptionID == nil || *entry.SubscriptionID == "" {
+					return fmt.Errorf("project %q entry %d: subscription_id is required when direct_law is enabled: %w", projectID, i, models.ErrConfigInvalid)
+				}
+			}
 			if !entry.SubscriptionTier.IsValid() {
 				return fmt.Errorf("project %q entry %d contains unrecognized SKU %q: %w", projectID, i, entry.SubscriptionTier, models.ErrInvalidSKU)
 			}

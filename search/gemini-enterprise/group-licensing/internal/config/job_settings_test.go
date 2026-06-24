@@ -44,6 +44,42 @@ func TestLoadJobSettings(t *testing.T) {
 			},
 		},
 		{
+			name: "happy path: DIRECT_LAW explicitly set to true",
+			env: map[string]string{
+				"JOB_TYPE":   "joiner",
+				"DIRECT_LAW": "true",
+			},
+			want: &JobSettings{
+				JobType:   models.WorkflowJoiner,
+				DryRun:    false,
+				DirectLaw: true,
+				TaskIndex: 0,
+				TaskCount: 1,
+			},
+		},
+		{
+			name: "happy path: DIRECT_LAW explicitly set to false",
+			env: map[string]string{
+				"JOB_TYPE":   "joiner",
+				"DIRECT_LAW": "false",
+			},
+			want: &JobSettings{
+				JobType:   models.WorkflowJoiner,
+				DryRun:    false,
+				DirectLaw: false,
+				TaskIndex: 0,
+				TaskCount: 1,
+			},
+		},
+		{
+			name: "invalid DIRECT_LAW value returns ErrConfigInvalid",
+			env: map[string]string{
+				"JOB_TYPE":   "joiner",
+				"DIRECT_LAW": "not-a-bool",
+			},
+			wantErr: models.ErrConfigInvalid,
+		},
+		{
 			name:    "missing JOB_TYPE",
 			env:     map[string]string{},
 			wantErr: models.ErrConfigInvalid,

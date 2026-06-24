@@ -772,3 +772,31 @@ func TestAccumulateLicenseConfigs_InvalidAllocatedCount_Skipped(t *testing.T) {
 
 	assert.Empty(t, index, "non-integer allocated count must be skipped")
 }
+
+func TestAccumulateLicenseConfigs_DirectLaw(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/sub-uuid-abc-123": "100",
+			},
+		},
+	}
+
+	// Call accumulateLicenseConfigs with directLaw = true
+	accumulateLicenseConfigs(index, configs, true)
+
+	// The key MUST contain SubscriptionID = "sub-uuid-abc-123" and empty SKU
+	key := models.LicenseConfigKey{
+		SubscriptionID: "sub-uuid-abc-123",
+		ProjectNumber:  "123",
+		Location:       models.LocationGlobal,
+	}
+
+	require.Contains(t, index, key, "expected index key to map via subscription ID under direct_law mode")
+	require.Len(t, index[key], 1)
+	assert.Equal(t, "projects/123/locations/global/licenseConfigs/sub-uuid-abc-123", index[key][0].Path)
+	assert.Equal(t, int64(100), index[key][0].AllocatedCount)
+}

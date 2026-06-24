@@ -41,17 +41,17 @@ func main() {
 	// Step 1: plain JSON logger for startup errors, before settings are loaded.
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 
-	// Step 2: load entitlement config.
-	cfg, err := config.Load(models.ConfigFilePath)
-	if err != nil {
-		slog.Error("failed to load entitlement config", slog.Any("error", err))
-		os.Exit(1)
-	}
-
-	// Step 3: load job settings from Cloud Run Job environment variables.
+	// Step 2: load job settings from Cloud Run Job environment variables.
 	settings, err := config.LoadJobSettings()
 	if err != nil {
 		slog.Error("failed to load job settings", slog.Any("error", err))
+		os.Exit(1)
+	}
+
+	// Step 3: load entitlement config.
+	cfg, err := config.Load(models.ConfigFilePath, settings.DirectLaw)
+	if err != nil {
+		slog.Error("failed to load entitlement config", slog.Any("error", err))
 		os.Exit(1)
 	}
 

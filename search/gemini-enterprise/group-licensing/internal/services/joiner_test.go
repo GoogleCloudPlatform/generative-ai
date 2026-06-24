@@ -836,3 +836,107 @@ func TestJoinerService_collectGroupMembers_PageLimitReached(t *testing.T) {
 	idp.AssertNumberOfCalls(t, "ListMembers", models.MaxPagesPerGroup)
 	gemini.AssertNotCalled(t, "BatchUpdateUserLicenses")
 }
+
+func TestJoinerService_Run_DirectLaw_HappyPath(t *testing.T) {
+	// Under direct_law mode, the service must resolve licenses using the
+	// admin-specified SubscriptionID rather than matching by SKU, resolving the
+	// correct path from the index and calling BatchUpdateUserLicenses.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	gemini := new(MockGeminiClient)
+	rm := new(MockResourceManagerClient)
+
+	const (
+		projectID = "proj-direct-law"
+		group     = "direct-grp@example.com"
+		userEmail = "user-dl@example.com"
+		subID     = "sub-uuid-dl-99"
+	)
+
+	// Mocking index returned from Gemini API
+	index := models.LicenseConfigIndex{
+		{SubscriptionID: subID, ProjectNumber: projectNumber, Location: models.LocationGlobal}: {
+			{Path: "projects/" + projectNumber + "/locations/global/licenseConfigs/" + subID, AllocatedCount: 10},
+		},
+	}
+
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", true).Return(index, nil)
+	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
+
+	idp.On("ListMembers", mock.Anything, group, "").
+		Return([]models.Member{{Email: userEmail, Type: models.MemberTypeUser}}, "", nil)
+
+	// Assert BatchUpdateUserLicenses matches the resolved Subscription ID path
+	gemini.On("BatchUpdateUserLicenses", mock.Anything, projectID, models.LocationGlobal, mock.MatchedBy(func(updates []models.LicenseUpdate) bool {
+		return len(updates) == 1 &&
+			updates[0].UserEmail == userEmail &&
+			updates[0].LicenseConfigPath == "projects/"+projectNumber+"/locations/global/licenseConfigs/"+subID &&
+			updates[0].Action == models.LicenseActionGrant
+	})).Return(nil)
+
+	cfg := newJoinerConfig(map[string]config.ProjectConfig{
+		projectID: {
+			{
+				SubscriptionTier: models.SKUEnterprise, // Not used for lookup under directLaw
+				SubscriptionID:   func(s string) *string { return &s }(subID),
+				Location:         models.LocationGlobal,
+				Groups:           []string{group},
+			},
+		},
+	})
+
+	svc := NewJoinerService(idp, gemini, rm)
+	resp, err := svc.Run(ctx, cfg, dto.SyncAddRequest{DirectLaw: boolPtr(true)})
+
+	require.NoError(t, err)
+	assert.Equal(t, 1, resp.LicensesGranted)
+	assert.True(t, resp.DirectLaw)
+
+	idp.AssertExpectations(t)
+	gemini.AssertExpectations(t)
+	rm.AssertExpectations(t)
+}
+
+func TestJoinerService_Run_DirectLaw_MissingSubscriptionInIndex(t *testing.T) {
+	// Under direct_law mode, if the admin-specified SubscriptionID does not
+	// exist in the billing config index returned by the API, the service must
+	// fail and return a descriptive error.
+	ctx := context.Background()
+
+	idp := new(MockIdpClient)
+	gemini := new(MockGeminiClient)
+	rm := new(MockResourceManagerClient)
+
+	const (
+		projectID = "proj-missing-dl"
+		group     = "direct-grp@example.com"
+		userEmail = "user-dl@example.com"
+		subID     = "non-existent-sub-id"
+	)
+
+	// Empty index - no matching subscriptions
+	index := models.LicenseConfigIndex{}
+
+	gemini.On("FetchLicenseConfigIndex", mock.Anything, "ABCDE-12345-FGHIJ", true).Return(index, nil)
+	rm.On("ResolveProjectNumber", mock.Anything, projectID).Return(projectNumber, nil)
+
+	idp.On("ListMembers", mock.Anything, group, "").
+		Return([]models.Member{{Email: userEmail, Type: models.MemberTypeUser}}, "", nil)
+
+	cfg := newJoinerConfig(map[string]config.ProjectConfig{
+		projectID: {
+			{
+				SubscriptionTier: models.SKUEnterprise,
+				SubscriptionID:   func(s string) *string { return &s }(subID),
+				Location:         models.LocationGlobal,
+				Groups:           []string{group},
+			},
+		},
+	})
+
+	svc := NewJoinerService(idp, gemini, rm)
+	_, err := svc.Run(ctx, cfg, dto.SyncAddRequest{DirectLaw: boolPtr(true)})
+
+	require.Error(t, err)
+}
