@@ -209,34 +209,7 @@ func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID 
 
 	err = svc.BillingAccounts.BillingAccountLicenseConfigs.List(parent).Context(ctx).Pages(ctx,
 		func(resp *discoveryengineapi.GoogleCloudDiscoveryengineV1alphaListBillingAccountLicenseConfigsResponse) error {
-			for _, c := range resp.BillingAccountLicenseConfigs {
-				if c.State != "ACTIVE" {
-					continue
-				}
-				if c.SubscriptionTier == "" || c.SubscriptionTier == "SUBSCRIPTION_TIER_UNSPECIFIED" {
-					continue
-				}
-				for licenseConfigPath, allocatedStr := range c.LicenseConfigDistributions {
-					// Path format: projects/{project}/locations/{location}/licenseConfigs/{id}
-					parts := strings.Split(licenseConfigPath, "/")
-					if len(parts) != 6 {
-						continue
-					}
-					allocated, err := strconv.ParseInt(allocatedStr, 10, 64)
-					if err != nil {
-						continue
-					}
-					key := models.LicenseConfigKey{
-						SKU:           models.SKU(c.SubscriptionTier),
-						ProjectNumber: parts[1],
-						Location:      models.Location(parts[3]),
-					}
-					index[key] = models.LicenseConfigEntry{
-						Path:           licenseConfigPath,
-						AllocatedCount: allocated,
-					}
-				}
-			}
+			accumulateLicenseConfigs(index, resp.BillingAccountLicenseConfigs)
 			return nil
 		},
 	)
@@ -245,6 +218,40 @@ func (a *Adapter) FetchLicenseConfigIndex(ctx context.Context, billingAccountID 
 	}
 
 	return index, nil
+}
+
+// accumulateLicenseConfigs appends active, valid billing account license config
+// entries into index. It is extracted from the pagination callback so that the
+// index-building logic can be tested without a live REST client.
+func accumulateLicenseConfigs(index models.LicenseConfigIndex, configs []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig) {
+	for _, c := range configs {
+		if c.State != "ACTIVE" {
+			continue
+		}
+		if c.SubscriptionTier == "" || c.SubscriptionTier == "SUBSCRIPTION_TIER_UNSPECIFIED" {
+			continue
+		}
+		for licenseConfigPath, allocatedStr := range c.LicenseConfigDistributions {
+			// Path format: projects/{project}/locations/{location}/licenseConfigs/{id}
+			parts := strings.Split(licenseConfigPath, "/")
+			if len(parts) != 6 {
+				continue
+			}
+			allocated, err := strconv.ParseInt(allocatedStr, 10, 64)
+			if err != nil {
+				continue
+			}
+			key := models.LicenseConfigKey{
+				SKU:           models.SKU(c.SubscriptionTier),
+				ProjectNumber: parts[1],
+				Location:      models.Location(parts[3]),
+			}
+			index[key] = append(index[key], models.LicenseConfigEntry{
+				Path:           licenseConfigPath,
+				AllocatedCount: allocated,
+			})
+		}
+	}
 }
 
 // ListUserLicenses returns one page of user licenses for the given projectID at

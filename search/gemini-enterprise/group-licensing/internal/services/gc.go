@@ -18,6 +18,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -221,6 +222,14 @@ func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense
 		for _, groupEmail := range entry.Groups {
 			isMember, err := s.idp.HasMember(ctx, groupEmail, license.UserEmail)
 			if err != nil {
+				if errors.Is(err, models.ErrInvalidMemberKey) {
+					middleware.LoggerFromContext(ctx).WarnContext(ctx,
+						"skipping licensed user with invalid member key",
+						slog.String("problematic_username", license.UserEmail),
+						slog.String("group_email", groupEmail),
+					)
+					return false, nil
+				}
 				return false, fmt.Errorf("checking membership: %w", err)
 			}
 			if isMember {

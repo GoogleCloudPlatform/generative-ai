@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	discoveryengineapi "google.golang.org/api/discoveryengine/v1alpha"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -648,4 +649,126 @@ func TestClientFor_DifferentLocationsGetDistinctClients(t *testing.T) {
 	assert.NotSame(t, cGlobal.(*countingClient), cUS.(*countingClient), "global and us clients must be distinct")
 	assert.NotSame(t, cUS.(*countingClient), cEU.(*countingClient), "us and eu clients must be distinct")
 	assert.NotSame(t, cGlobal.(*countingClient), cEU.(*countingClient), "global and eu clients must be distinct")
+}
+
+// --- accumulateLicenseConfigs / FetchLicenseConfigIndex index-building tests ---
+
+func TestAccumulateLicenseConfigs_SingleActiveEntry(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	key := models.LicenseConfigKey{SKU: models.SKUEnterprise, ProjectNumber: "123", Location: models.LocationGlobal}
+	require.Len(t, index[key], 1)
+	assert.Equal(t, "projects/123/locations/global/licenseConfigs/ent-1", index[key][0].Path)
+	assert.Equal(t, int64(50), index[key][0].AllocatedCount)
+}
+
+func TestAccumulateLicenseConfigs_TwoSubscriptionsSameSKUProjectLocation_BothAccumulated(t *testing.T) {
+	// Two active subscriptions with the same SKU+project+location must each
+	// produce a distinct entry in the slice rather than one silently overwriting
+	// the other.
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-pool-a": "30",
+			},
+		},
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-pool-b": "20",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	key := models.LicenseConfigKey{SKU: models.SKUEnterprise, ProjectNumber: "123", Location: models.LocationGlobal}
+	require.Len(t, index[key], 2, "both subscription pools must appear in the slice")
+
+	paths := map[string]int64{index[key][0].Path: index[key][0].AllocatedCount, index[key][1].Path: index[key][1].AllocatedCount}
+	assert.Equal(t, int64(30), paths["projects/123/locations/global/licenseConfigs/ent-pool-a"])
+	assert.Equal(t, int64(20), paths["projects/123/locations/global/licenseConfigs/ent-pool-b"])
+}
+
+func TestAccumulateLicenseConfigs_InactiveSubscription_Excluded(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "INACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "inactive subscription must not appear in the index")
+}
+
+func TestAccumulateLicenseConfigs_UnspecifiedTier_Excluded(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_UNSPECIFIED",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "unspecified subscription tier must not appear in the index")
+}
+
+func TestAccumulateLicenseConfigs_MalformedPath_Skipped(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"bad/path": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "malformed licenseConfig path must be skipped")
+}
+
+func TestAccumulateLicenseConfigs_InvalidAllocatedCount_Skipped(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "not-a-number",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "non-integer allocated count must be skipped")
 }

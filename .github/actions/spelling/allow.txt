@@ -22,11 +22,11 @@ afrom
 Afshaan
 AFX
 agains
+agentcard
 agentic
 agg
 AGG
 aggfunc
-agentcard
 ainit
 ainvoke
 aio
@@ -126,6 +126,8 @@ bayes
 bbc
 bbq
 beir
+Bengaluru
+BENGALURU
 bennett
 Benno
 bert
@@ -151,6 +153,7 @@ BITCODE
 bitcoin
 Bitcoin
 blogs
+BLR
 bluesky
 bml
 bnb
@@ -216,6 +219,7 @@ cer
 cfbundle
 chatbots
 CHECKOV
+CHENNAI
 chipset
 chipsets
 Chocolat
@@ -531,6 +535,7 @@ Fudd
 fulltext
 fullurl
 functiona
+Fushimi
 futur
 Gabeira
 Gacrux
@@ -571,10 +576,11 @@ getdata
 getexif
 getparent
 getpid
+geval
+GFD
 gfile
 GFile
 Gfm
-GFD
 gguf
 giallo
 Giallo
@@ -736,8 +742,10 @@ INFOPLIST
 informati
 inpaint
 inpainted
+inr
 INR
 IOMGR
+ionate
 Iosif
 iostream
 ipd
@@ -797,9 +805,9 @@ jupyter
 jvm
 Kaelen
 kaggle
+Kaku
 Kalai
 Kalamang
-Kaku
 kamada
 Kamradt
 Kanagawa
@@ -861,6 +869,7 @@ LCEL
 LEBRON
 lecie
 lego
+lenght
 lenzing
 Levaquin
 levelized
@@ -1356,8 +1365,8 @@ rubra
 rubrum
 Ruchika
 runjdwp
-RUNPATH
 RUnlock
+RUNPATH
 Rupjit
 RVL
 RVR
@@ -1495,6 +1504,8 @@ suptitle
 Surampudi
 survei
 Suzaka
+sva
+SVA
 svh
 svm
 Sweetgum
