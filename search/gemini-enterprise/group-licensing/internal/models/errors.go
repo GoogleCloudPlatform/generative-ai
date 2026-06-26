@@ -53,9 +53,8 @@ var (
 
 // API transport errors.
 var (
-	ErrAPIRateLimited   = errors.New("api request was rate limited (429)")
-	ErrAPINotFound      = errors.New("api resource not found (404)")
-	ErrAPIUnavailable   = errors.New("api service temporarily unavailable (5xx)")
-	ErrAPIUnauthorized  = errors.New("api request unauthorized (401/403)")
-	ErrInvalidMemberKey = errors.New("api rejected member key as invalid (400)")
+	ErrAPIRateLimited  = errors.New("api request was rate limited (429)")
+	ErrAPINotFound     = errors.New("api resource not found (404)")
+	ErrAPIUnavailable  = errors.New("api service temporarily unavailable (5xx)")
+	ErrAPIUnauthorized = errors.New("api request unauthorized (401/403)")
 )

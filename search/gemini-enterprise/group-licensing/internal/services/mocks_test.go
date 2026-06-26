@@ -68,21 +68,21 @@ func (m *MockGeminiClient) FetchLicenseConfigIndex(ctx context.Context, billingA
 }
 
 // ListUserLicenses satisfies ports.GeminiClient.
-func (m *MockGeminiClient) ListUserLicenses(ctx context.Context, projectID string, location models.Location, pageToken string) ([]models.UserLicense, string, error) {
-	args := m.Called(ctx, projectID, location, pageToken)
+func (m *MockGeminiClient) ListUserLicenses(ctx context.Context, projectID, pageToken string) ([]models.UserLicense, string, error) {
+	args := m.Called(ctx, projectID, pageToken)
 	licenses, _ := args.Get(0).([]models.UserLicense)
 	return licenses, args.String(1), args.Error(2)
 }
 
 // BatchUpdateUserLicenses satisfies ports.GeminiClient.
-func (m *MockGeminiClient) BatchUpdateUserLicenses(ctx context.Context, projectID string, location models.Location, updates []models.LicenseUpdate) error {
-	args := m.Called(ctx, projectID, location, updates)
+func (m *MockGeminiClient) BatchUpdateUserLicenses(ctx context.Context, projectID string, updates []models.LicenseUpdate) error {
+	args := m.Called(ctx, projectID, updates)
 	return args.Error(0)
 }
 
 // FetchLicenseUsageStats satisfies ports.GeminiClient.
-func (m *MockGeminiClient) FetchLicenseUsageStats(ctx context.Context, projectID string, location models.Location) (map[string]int64, error) {
-	args := m.Called(ctx, projectID, location)
+func (m *MockGeminiClient) FetchLicenseUsageStats(ctx context.Context, projectID string) (map[string]int64, error) {
+	args := m.Called(ctx, projectID)
 	stats, _ := args.Get(0).(map[string]int64)
 	return stats, args.Error(1)
 }

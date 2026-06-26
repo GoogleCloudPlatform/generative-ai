@@ -95,8 +95,6 @@ The job's service account requires the following:
 - `roles/cloudidentity.groups.viewer` — list group members and verify membership
 - `roles/secretmanager.secretAccessor` — read the mounted configuration secret
 - `roles/billing.viewer` — read the purchased Gemini Enterprise subscription configurations
-- `roles/run.builder` - (Optional) When using Cloud Build to build the artifacts
-- `roles/storage.objectUser` - (Optional) When using Cloud Build, to store the built artifact
 
 **OAuth scopes:**
 - `https://www.googleapis.com/auth/cloud-platform`
@@ -106,11 +104,6 @@ The job's service account requires the following:
 - Discovery Engine API (GCP)
 - Resource Manager API (GCP)
 - Admin SDK API (Cloud Identity / Workspace)
-- Cloud Run Admin API (Optional)
-- Cloud Build API (Optional)
-- Compute Engine API (Optional)
-- Secret Manager API (Optional)
-- Cloud Scheduler API (Optional)
 
 The job uses **Application Default Credentials**. No service account key files are required.
 
@@ -157,8 +150,7 @@ gcloud run jobs deploy [name_of_job] \
   --source . \
   --region [desired_cloud_run_region] \
   --update-secrets=/run/secrets/entitlements.json=[name_of_secret_in_secret_manager]:latest \
-  --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false \
-  --service-account [desired_service_account_email_address]
+  --set-env-vars JOB_TYPE=[joiner_or_garbage_collection],DRY_RUN=false
 ```
 
 ## Job output
@@ -169,13 +161,11 @@ On completion the job exits `0` (success) or `1` (failure). Results are emitted 
 {"time":"...","level":"INFO","workflow":"joiner","task_index":0,"msg":"joiner workflow complete","duration_ms":4821,"licenses_granted":42,"licenses_soft_failed":0,"groups_processed":5,"dry_run":false}
 ```
 
-If the license pool for a SKU is exhausted mid-run, a warning is emitted per exhausted pool and the job continues:
+If the license pool for a SKU is exhausted mid-run, a warning is emitted and the job continues:
 
 ```json
 {"time":"...","level":"WARN","workflow":"joiner","task_index":0,"msg":"license pool exhausted, soft-failing remaining users","project_id":"customer-project-alpha","license_config_path":"projects/123/locations/global/licenseConfigs/ent-config","available":3,"soft_failed":17}
 ```
-
-If the billing account has multiple active subscriptions for the same SKU, users who could not be seated in one pool are automatically carried forward to the next. A warning fires for each exhausted pool, but the `licenses_soft_failed` count in the final summary reflects only users who remained unseated after all pools for that SKU were tried.
 
 ```json
 {"time":"...","level":"INFO","workflow":"garbage_collection","task_index":0,"msg":"garbage collection workflow complete","duration_ms":9134,"licenses_revoked":12,"users_evaluated":500,"dry_run":false}
