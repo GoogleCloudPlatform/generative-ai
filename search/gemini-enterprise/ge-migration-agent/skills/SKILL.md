@@ -4,18 +4,18 @@ description: Holds canonical source and target environment parameters and verifi
 metadata:
   environments:
     source:
-      project_number: "404109417257"
-      project_id: learn-w-me
+      project_number: "<SOURCE_PROJECT_NUMBER>"
+      project_id: "<SOURCE_PROJECT_ID>"
       region: global
-      engine_id: enterprise-search-17416389_1741638989378
+      engine_id: "<SOURCE_ENGINE_ID>"
     target:
-      project_number: "1087766539550"
-      project_id: "acxiom-425322"
+      project_number: "<TARGET_PROJECT_NUMBER>"
+      project_id: "<TARGET_PROJECT_ID>"
       region: global
-      engine_id: gemini-enterprise-17811872_1781187299515
+      engine_id: "<TARGET_ENGINE_ID>"
   datastores_mapping:
-    ge-drive-all_1776953145638_google_drive: ge-drive-all_1781187446457_google_drive
-    
+    # Format: source-datastore-id-suffix: target-datastore-id-suffix
+    "<SOURCE_DATASTORE_ID_SUFFIX>": "<TARGET_DATASTORE_ID_SUFFIX>"
   connectors_mapping:
     ge-drive-all: Drive
     GeGmail: geGmail
@@ -41,8 +41,8 @@ Map underlying knowledge search collections and grounding data stores (assigned 
 ```yaml
 datastores_mapping:
   # Source ID -> Target ID
-  snowflake-mcp-may29_1780067471814_mcp_data: snowflake-mcp-may29_1780829795319_mcp_data
-  ge-drive-all_1776953145638_google_drive: ge-drive-all_1780835769760_google_drive
+  example-mcp-source_12345_mcp_data: example-mcp-target_67890_mcp_data
+  example-drive-source_12345_google_drive: example-drive-target_67890_google_drive
 ```
 *Note: Always use the fully qualified ID suffix (e.g., `_google_drive`, `_mcp_data`) to prevent substring truncation.*
 
@@ -51,8 +51,8 @@ Map display aliases and frontend extension tool chips (assigned under `selectedT
 ```yaml
 connectors_mapping:
   # Source UI Badge -> Canonical Target UI Token
-  Snowflake Mcp May29: custom_mcp
-  ge-drive-all: Drive
+  "Example Source Connector": custom_mcp
+  "example-drive": Drive
 ```
 
 ---
