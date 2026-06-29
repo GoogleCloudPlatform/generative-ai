@@ -141,9 +141,6 @@ run_config = RunConfig(
 Create a file named `app/.env` inside the project. Configure the variables:
 
 ```bash
-# Backend selection (Set to TRUE to use Vertex AI API)
-GOOGLE_GENAI_USE_VERTEXAI=TRUE
-
 
 # Model selection
 DEMO_AGENT_MODEL="gemini-live-2.5-flash-native-audio"
