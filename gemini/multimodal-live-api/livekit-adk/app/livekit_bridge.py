@@ -3,7 +3,6 @@ import logging
 import os
 from typing import Optional
 import json
-import base64
 
 from google.adk.runners import Runner
 from google.adk.agents.live_request_queue import LiveRequestQueue

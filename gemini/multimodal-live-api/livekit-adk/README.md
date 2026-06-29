@@ -17,7 +17,7 @@ The system coordinates high-performance WebRTC audio streams, translates them in
           DataChannel  │  Data Transcription)            │  WebRTC Media)
                        │                                 ▼
 ┌──────────────────────┼───────────────────────────────────────────────────────┐
-│                      │             LiveKit SFU Server                        │
+│                      │             LiveKit Server                        │
 │                      │                                                       │
 │                      └──────────────┬───────────────▲────────────────────────┘
 │                                     │               │
@@ -56,11 +56,11 @@ The system coordinates high-performance WebRTC audio streams, translates them in
 ### Protocol Lifecycle:
 1. **Session Establishment**: Client requests a token from `/token`, triggering the background instantiation of the `LiveKitGeminiBridge`.
 2. **WebRTC Join**: The client browser joins the LiveKit room. The `LiveKitGeminiBridge` also connects a virtual audio participant into the room.
-3. **Upstream Pipeline (User $\rightarrow$ Gemini)**:
+3. **Upstream Pipeline (User -> gemini)**:
    - Client streams user audio to the LiveKit Room using **WebRTC**.
    - `LiveKitGeminiBridge` subscribes to the track, extracts the 48kHz frames, downsamples to **16kHz mono PCM**, and pushes them to the ADK `LiveRequestQueue`.
    - The ADK `Runner` streams the queue content to Gemini Live API via an underlying **secure WebSocket connection (`bidiGenerateContent` protocol)**.
-4. **Downstream Pipeline (Gemini $\rightarrow$ User)**:
+4. **Downstream Pipeline (Gemini -> User)**:
    - Gemini responds in real-time with audio buffers and textual transcriptions via the secure WebSocket.
    - ADK `Runner` intercepts the events and passes them to the bridge.
    - The bridge pushes the audio (resampled to 24kHz) back into LiveKit via the LocalAudioTrack, and publishes transcription text through WebRTC **DataChannels**.
