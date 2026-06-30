@@ -6,38 +6,33 @@ as well as hardcoded/verified DataStore and Connector mappings using ADK models.
 """
 import os
 import json
+import logging
+
 try:
     from google.adk.skills import models
 except ImportError:
     models = None
 
-SKILL_METADATA = {
-    "environments": {
-        "source": {
-            "project_number": "<SOURCE_PROJECT_NUMBER>",
-            "project_id": "<SOURCE_PROJECT_ID>",
-            "region": "global",
-            "engine_id": "<SOURCE_ENGINE_ID>"
-        },
-        "target": {
-            "project_number": "<TARGET_PROJECT_NUMBER>",
-            "project_id": "<TARGET_PROJECT_ID>",
-            "region": "global",
-            "engine_id": "<TARGET_ENGINE_ID>"
-        }
-    },
-    "datastores_mapping": {
-        "snowflake-mcp-may29_1780067471814_mcp_data": "snowflake-mcp-may29_1780829795319_mcp_data",
-        "ge-drive-all_1776953145638_google_drive": "ge-drive-all_1780835769760_google_drive"
-    },
-    "connectors_mapping": {
-        "Snowflake Mcp May29": "custom_mcp",
-        "ge-drive-all": "Drive",
-        "Ge Gmail": "geGmail",
-        "googleSearch": "googleSearch",
-        "urlContext": "urlContext"
-    }
-}
+def load_metadata_from_skill_md() -> dict:
+    """Dynamically parses and extracts metadata from the SKILL.md YAML frontmatter."""
+    skill_md_path = os.path.join(os.path.dirname(__file__), "SKILL.md")
+    if os.path.exists(skill_md_path):
+        try:
+            import yaml
+            with open(skill_md_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            parts = content.split("---")
+            if len(parts) >= 3:
+                frontmatter_str = parts[1]
+                data = yaml.safe_load(frontmatter_str)
+                if data and "metadata" in data:
+                    return data["metadata"]
+        except Exception as e:
+            logging.warning(f"Failed to parse SKILL.md frontmatter at import: {e}")
+    return {}
+
+# Single source of truth dynamically loaded from SKILL.md
+SKILL_METADATA = load_metadata_from_skill_md()
 
 if models:
     migration_config_skill = models.Skill(
@@ -57,14 +52,16 @@ class MigrationConfigSkill:
     
     def __init__(self, config_path: str = "migration_skill.json"):
         self.config_path = os.path.join(os.path.dirname(__file__), config_path)
-        self._load_config()
+        self.config = SKILL_METADATA or self._load_fallback_config()
 
-    def _load_config(self):
+    def _load_fallback_config(self) -> dict:
         if os.path.exists(self.config_path):
-            with open(self.config_path, "r") as f:
-                self.config = json.load(f)
-        else:
-            self.config = SKILL_METADATA
+            try:
+                with open(self.config_path, "r") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
 
     def get_source_env(self) -> dict:
         """Returns source environment configuration."""
