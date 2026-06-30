@@ -1131,6 +1131,7 @@ Ollama
 olleh
 omn
 Omnibox
+Omnicase
 OMR
 onesie
 onesies
@@ -1375,6 +1376,7 @@ saaagesh
 Sahel
 SAOT
 sargentii
+Sasquatch
 Sauron
 saveddir
 Sca
