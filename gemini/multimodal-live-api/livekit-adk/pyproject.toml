@@ -1,0 +1,69 @@
+[project]
+name = "livekit-adk"
+version = "0.1.0"
+description = "Voice Application Handler with LiveKit and ADK"
+authors = [
+    { name = "Google LLC" }
+]
+license = {text = "Apache License 2.0"}
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "google-adk>=1.20.0",
+    "fastapi>=0.115.0",
+    "python-dotenv>=1.0.0",
+    "uvicorn[standard]>=0.32.0",
+    "livekit",
+    "livekit-agents",
+    "livekit-plugins-google",
+    "livekit-plugins-silero",
+    "opentelemetry-api",
+    "opentelemetry-sdk",
+    "opentelemetry-exporter-gcp-trace",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
+    "google-adk[eval]>=1.0.0",
+    "agent-starter-pack>=0.32.0",
+]
+
+[tool.ruff]
+extend = "../../../pyproject.toml"
+
+[tool.ruff.lint]
+ignore = ["C901", "PLR0915"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "voice_stt_tts"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"app/static" = "share/livekit-adk/static"
+"app/.env" = "share/livekit-adk/.env.template"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["app", "."]
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.agent-starter-pack]
+example_question = "Search the web for the latest news about Google ADK."
+
+[tool.agent-starter-pack.settings]
+agent_directory = "app"
+deployment_targets = ["agent_engine", "cloud_run"]
+
+[tool.uv.sources]
+google-adk = { git = "https://github.com/google/adk-python.git" }
