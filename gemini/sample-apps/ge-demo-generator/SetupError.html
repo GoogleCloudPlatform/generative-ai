@@ -1,0 +1,77 @@
+<!--
+Copyright 2026 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #0f172a; color: #f1f5f9; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 font-sans">
+  <div class="glass max-w-2xl w-full rounded-3xl p-10 shadow-2xl text-center">
+    <div class="w-20 h-20 bg-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-8">
+      <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.268 17c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    
+    <h1 class="text-3xl font-bold mb-4 tracking-tight">Configuration Required</h1>
+    <p class="text-slate-400 mb-8 leading-relaxed">
+      This application is not yet configured. To protect your security, sensitive project properties must be set manually in your Google Apps Script project settings.
+    </p>
+
+    <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 mb-8 text-left">
+      <h2 class="text-red-400 text-sm font-bold uppercase tracking-widest mb-3">Error Details</h2>
+      <p class="text-red-300/80 text-sm font-mono whitespace-pre-wrap"><?= errorMessage ?></p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+      <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+        <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+          <span class="w-5 h-5 bg-sky-500 rounded-full text-[10px] flex items-center justify-center">1</span>
+          Via Script Editor (easiest)
+        </h3>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Open the Apps Script editor, find the <code class="text-sky-400">initializeProject</code> function, 
+          update the parameters in the code editor (without saving if you prefer), and click <span class="font-bold text-white">Run</span>.
+        </p>
+      </div>
+      <div class="p-6 bg-white/5 rounded-2xl border border-white/10">
+        <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+          <span class="w-5 h-5 bg-sky-500 rounded-full text-[10px] flex items-center justify-center">2</span>
+          Via Project Settings
+        </h3>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Go to <span class="text-sky-400 font-bold">Project Settings (Gear Icon)</span> > <span class="text-sky-400 font-bold">Script Properties</span> 
+          and add manually: <code class="text-slate-200">PROJECT_ID</code>, <code class="text-slate-200">LOG_SHEET_URL</code>, etc.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-10 pt-8 border-t border-white/5">
+      <p class="text-slate-500 text-[10px] uppercase tracking-widest mb-4 italic">
+        Once configured, refresh this page to continue.
+      </p>
+      <button onclick="window.location.reload()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg active:scale-95">
+        Refresh Page
+      </button>
+    </div>
+  </div>
+</body>
+</html>

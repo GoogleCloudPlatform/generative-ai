@@ -1,0 +1,859 @@
+<!--
+Copyright 2026 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {
+        fontFamily: { inter: ['Inter', 'sans-serif'], grotesk: ['"Space Grotesk"', 'sans-serif'] },
+        colors: { primary: { 50:'#f0f9ff',100:'#e0f2fe',200:'#bae6fd',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',800:'#075985',900:'#0c4a6e' } }
+      } }
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+    .font-inter { font-family: 'Inter', sans-serif; }
+    .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+    .gradient-bg { background: radial-gradient(circle at top right, #0c4a6e, #0f172a 60%); }
+    .glass { background: rgba(15,23,42,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); }
+    ::-webkit-scrollbar { width: 0; display: none; }
+    .thin-scroll::-webkit-scrollbar { width: 6px; display: block; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.4); border-radius: 4px; }
+    .fade-in { animation: fadeIn 0.5s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+    .nav-item { display:block; padding:0.6rem 0.85rem; margin-bottom:0.25rem; border-radius:0.75rem; font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#94a3b8; cursor:pointer; transition:all .2s; }
+    .nav-item:hover { color:#fff; background:rgba(255,255,255,0.05); }
+    .nav-item.active { color:#7dd3fc; background:rgba(14,165,233,0.12); box-shadow: inset 0 0 0 1px rgba(14,165,233,0.3); }
+    .nav-head { font-size:0.62rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#475569; margin:1.25rem 0 0.5rem; }
+    .tab-btn { padding:0.4rem 0.6rem; font-size:0.8rem; font-weight:600; color:#94a3b8; border-bottom:2px solid transparent; cursor:pointer; }
+    .tab-btn.is-active { color:#38bdf8; border-color:#0ea5e9; }
+    .demo-card { transition: all .2s; }
+    .demo-card:hover { transform: translateY(-1px); border-color: rgba(14,165,233,0.4); }
+    .heart-btn { transition: transform .25s cubic-bezier(0.175,0.885,0.32,1.275); color:#64748b; }
+    .heart-btn:active { transform: scale(1.4); }
+    .heart-btn.is-favorite { color:#ef4444; }
+    .stat-highlight { font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:1.1rem; background:linear-gradient(135deg,#6ee7b7,#2dd4bf,#34d399); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .activity-banner { padding:1px; border-radius:1rem; background:linear-gradient(135deg,#10b981,#06b6d4,#0ea5e9,#10b981); background-size:300% 300%; animation: bannerGlow 6s ease infinite; }
+    @keyframes bannerGlow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .activity-banner-inner { background:#0f172a; border-radius:0.95rem; padding:0.75rem 1.25rem; }
+    .step-icon { width:2rem; height:2rem; border-radius:0.6rem; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; background:#1e293b; color:#64748b; transition:all .4s; flex-shrink:0; }
+    .step-icon.active { background:rgba(14,165,233,0.15); color:#38bdf8; animation: nodePulse 2s infinite alternate ease-in-out; }
+    .step-icon.done { background:rgba(16,185,129,0.15); color:#34d399; }
+    @keyframes nodePulse { from { box-shadow:0 0 8px rgba(14,165,233,0.3); transform:scale(1);} to { box-shadow:0 0 24px rgba(14,165,233,0.6); transform:scale(1.02);} }
+    .log-line { font-family: 'Courier New', monospace; font-size:0.7rem; line-height:1.5; word-break:break-word; overflow-wrap:anywhere; animation: logIn .25s ease both; }
+    @keyframes logIn { from { opacity:0; transform: translateX(-6px);} to { opacity:1; transform:none;} }
+    .highlight-glow { box-shadow: 0 0 0 2px rgba(14,165,233,0.5), 0 0 18px rgba(14,165,233,0.4); }
+    .switch-anim { transition: all .4s ease; }
+    .ft-pill { display:inline-flex; align-items:center; gap:0.45rem; padding:0.5rem 1rem; border-radius:9999px; font-size:0.8rem; font-weight:600; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:#94a3b8; cursor:pointer; transition:all .2s; }
+    .ft-pill:hover { border-color:rgba(255,255,255,0.25); color:#cbd5e1; }
+    .ft-pill::before { content:''; width:0.85rem; height:0.85rem; border-radius:9999px; border:1.5px solid #475569; flex-shrink:0; transition:all .2s; }
+    .ft-pill[data-active="true"] { background:rgba(14,165,233,0.15); border-color:rgba(14,165,233,0.7); color:#7dd3fc; }
+    .ft-pill[data-active="true"]::before { background:#0ea5e9; border-color:#0ea5e9; box-shadow: inset 0 0 0 2px #0f172a; }
+    #toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(150%); background:#0ea5e9; color:#fff; padding:0.6rem 1.2rem; border-radius:0.75rem; font-size:0.85rem; font-weight:600; transition:transform .3s, opacity .3s, visibility .3s; z-index:300; box-shadow:0 8px 24px rgba(0,0,0,0.4); max-width:90vw; opacity:0; visibility:hidden; pointer-events:none; }
+    #toast.show { transform:translateX(-50%) translateY(0); opacity:1; visibility:visible; }
+    .modal-bg { background: rgba(2,6,23,0.7); backdrop-filter: blur(4px); }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-100 font-inter">
+
+  <div class="flex min-h-screen max-w-[1680px] mx-auto w-full">
+
+    <!-- LEFT NAV -->
+    <aside class="w-60 ml-5 my-5 hidden lg:flex flex-col glass rounded-3xl p-5 sticky top-5 self-start" style="height: calc(100vh - 2.5rem);">
+      <div class="nav-head" style="margin-top:0;">Workflow</div>
+      <div class="nav-item active" id="nav-define" onclick="gotoStep('define')">Step 1: Define Goal</div>
+      <div class="nav-item" id="nav-run" onclick="gotoStep('run')">Step 2: Run Demo</div>
+      <div class="nav-head">Explore</div>
+      <div class="nav-item" onclick="openOnboarding(true)">About this toolkit</div>
+      <div class="mt-auto pt-4 border-t border-white/5 text-[10px] text-slate-500">
+        <p>Files land in <span class="text-slate-300">My Drive / My Demos</span></p>
+        <p class="mt-1">Version <span id="appVer"><?= appVersion ?></span></p>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 min-w-0 px-5 lg:px-8 py-6 overflow-y-auto">
+      <div class="max-w-4xl mx-auto">
+
+        <!-- Header -->
+        <header class="mb-6">
+          <h1 class="text-3xl lg:text-4xl font-bold tracking-tight">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">GE</span><span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-emerald-300" title="Business Edition">BE</span><span class="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400"> Demo Generator</span>
+            <a href="https://goo.gle/gebe-demo-gen" target="_blank" class="align-middle ml-2 text-sm font-mono font-normal text-sky-400 hover:text-sky-300 no-underline">goo.gle/gebe-demo-gen &#8599;</a>
+          </h1>
+          <p class="text-slate-400 mt-2">Instantly generate <b class="text-slate-200">Google Workspace demo data</b> &mdash; Docs, Sheets, Slides &amp; more &mdash; straight into your Drive, with an Agent Designer prompt to match. Built to run demos on <b class="text-slate-200">Gemini Enterprise Business Edition (GEBE)</b>.</p>
+        </header>
+
+        <!-- STEP 1: Define -->
+        <section id="section-step1" class="scroll-mt-5 glass rounded-3xl p-6 lg:p-8 mb-8 fade-in ring-1 ring-sky-500/20">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="step-icon done">1</span>
+            <h2 class="text-lg font-semibold text-white">Define Your Demo Goal</h2>
+          </div>
+
+          <!-- Domain research (violet) -->
+          <div class="mb-6 p-5 bg-gradient-to-br from-violet-900/20 to-purple-900/10 rounded-2xl border border-violet-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-violet-300 text-xs font-bold uppercase tracking-widest">Customer Domain Research</label>
+              <span class="text-[10px] text-slate-500 uppercase">Optional</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-3">Enter a company domain to auto-research its business, then pick the workflows to turn into an agent demo (Google Search grounded).</p>
+            <div class="flex gap-2">
+              <input id="customerDomain" type="text" placeholder="example.co.jp" class="flex-1 bg-slate-900/60 border border-white/10 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" onkeydown="if(event.key==='Enter'){event.preventDefault();researchDomain();}">
+              <button id="researchBtn" onclick="researchDomain()" class="bg-violet-600 hover:bg-violet-500 text-white font-semibold px-4 rounded-xl text-sm flex items-center gap-2">
+                <span id="researchSpinner" class="hidden inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full spin"></span>
+                <span id="researchBtnText">Research</span>
+              </button>
+            </div>
+            <div id="researchError" class="hidden mt-3 text-xs text-red-300 bg-red-500/10 rounded-lg p-2"></div>
+            <div id="researchResult" class="hidden mt-4 bg-black/30 border border-violet-500/25 rounded-2xl overflow-hidden">
+              <div class="p-4 border-b border-white/5">
+                <div class="flex items-center gap-2"><h4 id="researchCompanyName" class="text-base font-bold text-white"></h4><span id="researchIndustry" class="text-[10px] font-bold text-violet-300 bg-violet-500/10 rounded px-1.5 py-0.5"></span></div>
+                <p id="researchSummary" class="text-xs text-slate-400 leading-relaxed mt-2"></p>
+              </div>
+              <div class="p-4 border-b border-white/5">
+                <h5 class="text-[10px] font-bold text-amber-300 uppercase tracking-widest mb-2">Business Challenges</h5>
+                <ul id="researchChallenges" class="space-y-1.5"></ul>
+              </div>
+              <div class="p-4 border-b border-white/5">
+                <h5 class="text-[10px] font-bold text-emerald-300 uppercase tracking-widest mb-1">Agent-Automatable Workflows</h5>
+                <p class="text-[10px] text-slate-500 mb-3">Click to select up to 3 workflows to turn into the agent demo.</p>
+                <div id="researchWorkflows" class="space-y-2"></div>
+              </div>
+              <div class="p-4 flex gap-2">
+                <button onclick="applySelectedWorkflows()" class="flex-1 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl uppercase tracking-wider">Apply selected workflows</button>
+                <button onclick="clearResearch()" class="px-4 py-2.5 bg-white/5 hover:bg-red-500/10 text-slate-400 hover:text-red-400 text-xs rounded-xl">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Method selection -->
+          <div id="methodSelection" class="grid grid-cols-1 md:grid-cols-2 gap-4 switch-anim">
+            <button onclick="selectMethod('template')" class="glass rounded-3xl border-2 border-sky-500/20 hover:border-sky-500/60 hover:bg-sky-500/10 p-6 text-left transition-all">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-300 mb-3 text-lg">&#9783;</div>
+              <h3 class="text-base font-bold text-white mb-1">Pick from Gallery</h3>
+              <p class="text-xs text-slate-400">Pre-built scenarios across 12 industries and job functions.</p>
+            </button>
+            <button onclick="selectMethod('manual')" class="glass rounded-3xl border-2 border-emerald-500/20 hover:border-emerald-500/60 hover:bg-emerald-500/10 p-6 text-left transition-all">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-300 mb-3 text-lg">&#9998;</div>
+              <h3 class="text-base font-bold text-white mb-1">Start from Scratch</h3>
+              <p class="text-xs text-slate-400">Write your own business goal in any language.</p>
+            </button>
+          </div>
+
+          <!-- Template gallery -->
+          <div id="templateContainer" class="hidden switch-anim">
+            <button onclick="switchMethod()" class="mb-4 inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-white">&larr; Back to selection</button>
+            <div class="p-5 bg-white/5 rounded-2xl border border-white/10">
+              <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <span class="text-xs font-bold text-slate-300 uppercase tracking-widest">Template Hub</span>
+                <div id="templateLangBtns" class="flex flex-wrap gap-1.5"></div>
+              </div>
+              <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-2">1. Select industry</p>
+              <div id="industryFilters" class="flex flex-wrap gap-2 mb-4"></div>
+              <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-2">2. Filter by job function</p>
+              <div id="jobFunctionFilters" class="flex flex-wrap gap-2 mb-4"></div>
+              <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-2">3. Select a template</p>
+              <div id="templateGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+          </div>
+
+          <!-- Manual editor + options + generate -->
+          <div id="manualContainer" class="hidden switch-anim">
+            <button onclick="switchMethod()" class="mb-4 inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-white">&larr; Back to selection</button>
+
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-semibold text-slate-200">Business goal</label>
+              <div class="flex items-center gap-2">
+                <div class="flex bg-slate-800/60 rounded-lg p-0.5 border border-white/5">
+                  <button id="tabEdit" onclick="setGoalTab('edit')" class="px-3 py-1 text-[10px] font-bold rounded-md bg-sky-500/20 text-sky-400">Edit</button>
+                  <button id="tabPreview" onclick="setGoalTab('preview')" class="px-3 py-1 text-[10px] font-bold rounded-md text-slate-500 hover:text-slate-300">Preview</button>
+                </div>
+                <button id="magicWandBtn" onclick="optimizeGoal()" class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 text-[10px] font-bold" title="Structure and optimize this goal with Gemini">Optimize Prompt</button>
+              </div>
+            </div>
+
+            <div class="relative mb-4">
+              <textarea id="userGoal" rows="6" oninput="localStorage.setItem('gebe_generator_input', this.value)" class="w-full bg-slate-900/60 border border-white/10 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono leading-relaxed" placeholder="e.g. Retail store inventory management demo for a regional supermarket chain"></textarea>
+              <div id="goalPreview" class="hidden w-full bg-slate-900/60 border border-white/10 rounded-xl p-4 text-slate-100 min-h-[160px] max-h-[420px] overflow-y-auto thin-scroll"></div>
+              <div id="magicWandOverlay" class="hidden absolute inset-x-0 bottom-0 top-0 flex-col items-center justify-center bg-slate-950/85 rounded-xl border border-white/5 z-20" style="display:none;">
+                <div class="w-10 h-10 border-2 border-indigo-400 border-t-transparent rounded-full spin mb-3"></div>
+                <p id="magicWandStatus" class="text-xs font-semibold text-slate-200">Analyzing business goal...</p>
+                <p class="text-[10px] text-slate-500 mt-1">Optimizing with Gemini Flash Lite</p>
+              </div>
+            </div>
+
+            <div class="mt-2">
+              <label class="block text-xs font-semibold text-slate-400 mb-2">File types to generate</label>
+              <div id="fileTypePills" class="flex flex-wrap gap-2">
+                <button type="button" data-ft="docs" data-active="true" onclick="toggleFT(this)" class="ft-pill">Docs</button>
+                <button type="button" data-ft="sheets" data-active="true" onclick="toggleFT(this)" class="ft-pill">Sheets</button>
+                <button type="button" data-ft="slides" data-active="true" onclick="toggleFT(this)" class="ft-pill">Slides</button>
+                <button type="button" data-ft="images" data-active="true" onclick="toggleFT(this)" class="ft-pill">Images</button>
+                <button type="button" data-ft="pdf" data-active="true" onclick="toggleFT(this)" class="ft-pill" title="A standalone external whitepaper / analyst report (not a copy of the other files)">Research PDF</button>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Industry / business domain (optional)</label>
+              <input id="domain" type="text" class="w-full md:w-1/2 bg-slate-900/60 border border-white/10 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. Retail, Healthcare (auto-detected if empty)">
+            </div>
+
+            <div class="mt-6 flex gap-3">
+              <button id="genBtn" onclick="startGeneration()" class="flex-1 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-all active:scale-[.99] shadow-lg shadow-sky-500/30">Generate Demo</button>
+              <button onclick="clearForNewDemo()" class="px-5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 rounded-xl text-sm transition-all">Clear</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: Progress dashboard (no diagram) -->
+        <section id="stepsSection" class="scroll-mt-5 hidden glass rounded-2xl p-6 mb-8 fade-in border border-sky-500/30">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-grotesk text-sm uppercase tracking-widest text-sky-300">Live synthesis &amp; assembly</h3>
+            <span class="text-xs text-slate-400">Elapsed <span id="elapsed" class="font-mono text-slate-200">00:00</span></span>
+          </div>
+          <div class="w-full bg-slate-900/60 rounded-full h-2 mb-5 overflow-hidden">
+            <div id="progressBar" class="bg-gradient-to-r from-sky-500 to-emerald-500 h-2 rounded-full transition-all duration-700" style="width:0%"></div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-6 items-start">
+            <div>
+              <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Steps</p>
+              <div id="pstep-plan" class="flex items-center gap-3 mb-3"><span class="step-icon">1</span><div><p class="text-sm font-semibold text-slate-200">Plan with Gemini</p><p class="text-xs text-slate-500" id="pmsg-plan">Waiting...</p></div></div>
+              <div id="pstep-files" class="flex items-center gap-3 mb-3"><span class="step-icon">2</span><div><p class="text-sm font-semibold text-slate-200">Generate Workspace files</p><p class="text-xs text-slate-500" id="pmsg-files">Waiting...</p></div></div>
+              <div id="pstep-final" class="flex items-center gap-3 mb-3"><span class="step-icon">3</span><div><p class="text-sm font-semibold text-slate-200">Guide Doc &amp; save</p><p class="text-xs text-slate-500" id="pmsg-final">Waiting...</p></div></div>
+              <div class="bg-slate-900/40 rounded-xl p-3 border border-white/5">
+                <h4 id="tipHeading" class="text-xs font-bold text-sky-300 mb-1">Tip</h4>
+                <p id="tipBody" class="text-xs text-slate-400 leading-relaxed">&nbsp;</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Activity log</p>
+              <div id="logs" class="h-72 overflow-y-auto overflow-x-hidden thin-scroll bg-slate-950/50 rounded-xl p-3 space-y-1 border border-white/5"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: Run Demo on GEBE -->
+        <section id="resultSection" class="scroll-mt-5 hidden glass rounded-3xl p-6 lg:p-8 mb-10 fade-in ring-1 ring-sky-500/20">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="step-icon done">2</span>
+            <h2 class="text-lg font-semibold text-white">Run Demo on GEBE</h2>
+          </div>
+          <div class="space-y-6">
+          <div class="bg-slate-900/40 border border-white/5 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl">&#10003;</div>
+              <div><h2 class="font-semibold text-white">Your demo is ready!</h2><p id="resultSummary" class="text-slate-400 text-sm"></p></div>
+            </div>
+            <p id="resultIntro" class="text-xs text-slate-400 mb-3">Open Gemini Enterprise, build the agent with the prompt below, and drive the demo against the files in your Drive folder.</p>
+            <div class="flex flex-wrap gap-2">
+              <a href="https://business.gemini.google/" target="_blank" class="bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-500 hover:to-fuchsia-500 text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-lg shadow-fuchsia-500/20">Open Gemini Enterprise (GEBE) &rarr;</a>
+              <span id="ownActions" class="contents">
+                <a id="folderLink" href="#" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-5 rounded-xl text-sm">Open Drive folder</a>
+                <a id="guideLink" href="#" target="_blank" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-5 rounded-xl text-sm">Open Demo Guide</a>
+              </span>
+            </div>
+          </div>
+
+          <div id="filesCard" class="hidden bg-slate-900/40 border border-white/5 rounded-2xl p-6">
+            <h3 class="font-semibold text-white mb-3">Generated files</h3>
+            <div id="filesList" class="space-y-2"></div>
+          </div>
+
+          <div id="agentCard" class="hidden bg-slate-900/40 rounded-2xl p-6 border border-fuchsia-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-fuchsia-500/20 flex items-center justify-center text-fuchsia-300">&#10022;</div>
+                <h3 class="font-semibold text-white">Agent Designer prompt</h3>
+              </div>
+              <button onclick="copyText(window._agentPrompt, this)" class="text-xs bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-semibold px-3 py-1.5 rounded-lg">Copy</button>
+            </div>
+            <p class="text-xs text-slate-400 mb-3">Paste this into Gemini Enterprise &rarr; <b>Agent Designer</b> ("What do you want your agent to do?") to build the agent for this demo.</p>
+            <div id="agentPrompt" class="text-sm text-slate-200 bg-slate-950/50 rounded-xl p-4 font-inter leading-relaxed thin-scroll max-h-[420px] overflow-y-auto"></div>
+          </div>
+
+          <div id="promptsCard" class="hidden bg-slate-900/40 border border-white/5 rounded-2xl p-6">
+            <h3 class="font-semibold text-white mb-1">Demo flow</h3>
+            <p class="text-xs text-slate-400 mb-4">Follow these steps top-to-bottom in Gemini Enterprise to run the demo.</p>
+            <div id="promptsList" class="space-y-4"></div>
+          </div>
+
+          <div id="previewCard" class="hidden bg-slate-900/40 border border-white/5 rounded-2xl p-6">
+            <h3 class="font-semibold text-white mb-4">Data preview</h3>
+            <div id="dataPreview" class="space-y-5"></div>
+          </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ONBOARDING MODAL -->
+  <div id="onboardingModal" class="fixed inset-0 modal-bg hidden items-center justify-center p-6 z-[60]">
+    <div class="glass rounded-3xl w-full max-w-lg p-8">
+      <h2 class="text-2xl font-bold text-white mb-1">Welcome to GEBE Demo Generator</h2>
+      <p class="text-slate-400 text-sm mb-6">Generate demo content for Gemini Enterprise in seconds.</p>
+      <div class="space-y-4 mb-8">
+        <div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-300">1</div><div><p class="text-slate-200 font-semibold text-sm">Describe a business goal</p><p class="text-slate-500 text-xs">Any industry, any language. Optionally research a customer domain.</p></div></div>
+        <div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-300">2</div><div><p class="text-slate-200 font-semibold text-sm">Get Workspace files in your Drive</p><p class="text-slate-500 text-xs">Docs, Sheets, Slides, optional Office/PDF and images under My Demos.</p></div></div>
+        <div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-fuchsia-500/20 flex items-center justify-center text-fuchsia-300">3</div><div><p class="text-slate-200 font-semibold text-sm">Build the agent</p><p class="text-slate-500 text-xs">Copy the generated Agent Designer prompt into Gemini Enterprise.</p></div></div>
+      </div>
+      <button onclick="closeOnboarding()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 rounded-xl">Start building</button>
+    </div>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay" class="fixed inset-0 modal-bg hidden items-center justify-center z-[80]">
+    <div class="glass rounded-2xl px-6 py-5 flex items-center gap-3">
+      <div class="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full spin"></div>
+      <span id="loadingText" class="text-sm text-slate-200 font-semibold">Loading...</span>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    var MODEL = '<?= generatorModel ?>';
+    var USER_EMAIL = '<?= userEmail ?>';
+    var tipTimer = null, elapsedTimer = null, tipIndex = 0, startedAt = 0;
+    var selectedIndustry = 'retail', selectedFunction = 'all';
+    var cachedResearchData = null;
+    window._agentPrompt = '';
+    window.currentMethod = null;
+
+    var TIPS = [
+      { h: 'Multi-language', b: 'Generated content matches your input language automatically.' },
+      { h: 'My Demos folder', b: 'Every demo is saved as its own subfolder in your Drive under My Demos.' },
+      { h: 'Agent Designer', b: 'A ready-to-paste agent prompt is generated and saved into the Demo Guide.' },
+      { h: 'Charts included', b: 'Documents and slides can include real charts built from the demo data.' },
+      { h: 'Fresh dates', b: 'All records are anchored to today, so the data always looks current.' }
+    ];
+
+    var TEMPLATE_DATA = {
+      industries: { en: [
+        { id:'retail', label:'Retail' }, { id:'finance', label:'Finance' }, { id:'manufacturing', label:'Manufacturing' },
+        { id:'healthcare', label:'Healthcare' }, { id:'logistics', label:'Logistics' }, { id:'tech', label:'Tech & SaaS' },
+        { id:'energy', label:'Energy & Utilities' }, { id:'telecom', label:'Telecommunications' }, { id:'media', label:'Media & Entertainment' },
+        { id:'gov', label:'Gov & Public Sector' }, { id:'education', label:'Education' }, { id:'auto', label:'Automotive' }
+      ] },
+      jobFunctions: { en: [
+        { id:'all', label:'All Functions' }, { id:'sales', label:'Sales & Revenue' }, { id:'marketing', label:'Marketing' },
+        { id:'ops', label:'Operations' }, { id:'it_eng', label:'IT & Engineering' }, { id:'rnd', label:'R&D' },
+        { id:'customer_service', label:'Customer Service' }, { id:'product_mgmt', label:'Product Mgmt' },
+        { id:'supply_chain', label:'Supply Chain' }, { id:'finance_dept', label:'Finance' },
+        { id:'legal', label:'Legal & Compliance' }, { id:'hr', label:'HR & People' }
+      ] },
+      templates: { en: [
+        { industry:'retail', function:'sales', label:'Manhattan Store Optimization', text:'Retail optimization for Manhattan stores by correlating foot traffic, sales, and local weather patterns to optimize staffing and inventory levels.' },
+        { industry:'retail', function:'marketing', label:'Customer Loyalty Analysis', text:'Analyze customer purchase history and demographic data to identify high-value segments and design targeted loyalty campaigns for regional malls.' },
+        { industry:'retail', function:'ops', label:'Shelf Availability Tracking', text:'Real-time shelf inventory monitoring using computer vision and IoT weight sensors to automate restock triggers and minimize lost sales.' },
+        { industry:'retail', function:'supply_chain', label:'Fresh Food Inventory', text:'Optimize fresh food inventory in grocery stores by analyzing historical spoilage rates, peak shopping hours, and delivery schedules.' },
+        { industry:'retail', function:'finance_dept', label:'Dynamic Pricing Analysis', text:'Competitor price monitoring and elastic demand modeling to automate real-time price adjustments for high-volume consumer electronics.' },
+        { industry:'retail', function:'hr', label:'Staffing Demand Prediction', text:'Forecast seasonal staffing requirements by analyzing historical store traffic peaks, local holidays, and workforce availability data.' },
+        { industry:'retail', function:'customer_service', label:'Omnichannel Support Agent', text:'Provide seamless customer support across web, mobile, and in-store channels by integrating real-time order tracking and inventory data.' },
+        { industry:'finance', function:'sales', label:'Wealth Management Growth', text:'Identify cross-selling opportunities for premium wealth management services based on transaction patterns and market volatility sensitivity.' },
+        { industry:'finance', function:'marketing', label:'Next Best Offer Engine', text:'Predict the most relevant financial product for individual banking customers using behavioral data and spending life-cycle analysis.' },
+        { industry:'finance', function:'ops', label:'Fraud Detection Patterns', text:'Analyze credit card transaction streams to identify emerging fraud patterns and optimize detection rules for high-risk regions.' },
+        { industry:'finance', function:'supply_chain', label:'Cash Logistics Optimization', text:'Optimize ATM cash replenishment schedules and secure transport routes based on historical withdrawal trends and operational costs.' },
+        { industry:'finance', function:'finance_dept', label:'ALM Sensitivity Testing', text:'Asset-Liability Management modeling to simulate balance sheet impact from interest rate shocks and liquidity stress scenarios.' },
+        { industry:'manufacturing', function:'ops', label:'Factory Downtime Zero', text:'Predictive maintenance for production lines by correlating sensor telemetry, maintenance logs, and shift schedules to eliminate unplanned downtime.' },
+        { industry:'manufacturing', function:'supply_chain', label:'Global Parts Logistics', text:'Optimize multi-tier parts procurement and inventory buffers across global plants using lead-time variability and demand forecasts.' },
+        { industry:'healthcare', function:'customer_service', label:'Patient Service Growth', text:'Improve patient engagement by analyzing appointment history and feedback to reduce no-shows and personalize follow-up care.' },
+        { industry:'healthcare', function:'ops', label:'ER Wait Time Management', text:'Reduce emergency room wait times by forecasting arrivals from historical patterns and dynamically reallocating staff and beds.' },
+        { industry:'logistics', function:'ops', label:'Last-Mile Efficiency', text:'Optimize last-mile delivery routes using historical traffic, delivery windows, and vehicle capacity to cut fuel costs and improve on-time rate.' },
+        { industry:'tech', function:'product_mgmt', label:'SaaS Churn Prediction', text:'Predict SaaS customer churn from product usage signals and support tickets, and recommend targeted retention plays.' },
+        { industry:'energy', function:'ops', label:'Predictive Grid Maintenance', text:'Forecast grid asset failures from sensor data and weather to schedule proactive maintenance and reduce outages.' },
+        { industry:'telecom', function:'customer_service', label:'Customer Churn Reduction', text:'Reduce telecom churn by analyzing call drop rates, billing disputes, and plan usage to trigger proactive retention offers.' },
+        { industry:'media', function:'marketing', label:'Content Personalization Engine', text:'Personalize streaming recommendations from viewing history and engagement to increase watch time and reduce churn.' },
+        { industry:'gov', function:'customer_service', label:'Digital Citizen Service Portal', text:'Streamline citizen service requests by triaging inquiries, routing to departments, and tracking resolution SLAs.' },
+        { industry:'education', function:'ops', label:'Campus Resource Optimization', text:'Optimize classroom and lab scheduling using enrollment trends and facility usage to maximize utilization.' },
+        { industry:'auto', function:'sales', label:'Dealership Network Optimization', text:'Optimize dealership inventory and incentives by analyzing regional demand, trade-ins, and seasonal sales patterns.' }
+      ] }
+    };
+
+    function el(id) { return document.getElementById(id); }
+    function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function toast(msg) { var t = el('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2400); }
+    var showToast = toast;
+    function copyText(text, btn) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(function(){ toast('Copied to clipboard'); if(btn){ var o=btn.textContent; btn.textContent='Copied'; setTimeout(function(){btn.textContent=o;},1500);} });
+    }
+    function run(fn, args) {
+      return new Promise(function (resolve, reject) {
+        var r = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject);
+        r[fn].apply(r, args || []);
+      });
+    }
+    function showLoading(text) { el('loadingText').textContent = text || 'Loading...'; el('loadingOverlay').classList.remove('hidden'); el('loadingOverlay').classList.add('flex'); }
+    function hideLoading() { el('loadingOverlay').classList.add('hidden'); el('loadingOverlay').classList.remove('flex'); }
+
+    function gotoStep(which) {
+      var map = { define: 'section-step1', run: 'resultSection' };
+      var t = el(map[which]);
+      if (!t || t.classList.contains('hidden')) { which = 'define'; t = el('section-step1'); }
+      t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      ['define','run'].forEach(function (k) { el('nav-' + k).classList.toggle('active', k === which); });
+    }
+    function setNavActive(which) { ['define','run'].forEach(function (k) { el('nav-' + k).classList.toggle('active', k === which); }); }
+    function toggleFT(btn) { btn.dataset.active = btn.dataset.active === 'true' ? 'false' : 'true'; }
+    function ftActive(name) { var b = document.querySelector('#fileTypePills [data-ft="' + name + '"]'); return !!(b && b.dataset.active === 'true'); }
+    function openFolder(url) { if (url) window.open(url, '_blank'); }
+
+    // ---- Template languages ----
+    var LANG_LIST = [
+      { id: 'en', label: 'English' }, { id: 'ja', label: 'Japanese' }, { id: 'es', label: 'Spanish' },
+      { id: 'fr', label: 'French' }, { id: 'pt', label: 'Portuguese' }, { id: 'de', label: 'German' }, { id: 'it', label: 'Italian' }
+    ];
+    var currentLang = 'en';
+    var templateCache = { en: TEMPLATE_DATA.templates.en };
+    function buildLangButtons() {
+      el('templateLangBtns').innerHTML = LANG_LIST.map(function (l) {
+        var active = l.id === currentLang;
+        return '<button onclick="setTemplateLang(\'' + l.id + '\')" class="px-2.5 py-1 rounded-lg text-[10px] font-semibold border transition-all ' +
+          (active ? 'bg-sky-500/20 border-sky-500 text-sky-300' : 'bg-white/5 border-white/10 text-slate-400 hover:text-slate-200') + '">' + esc(l.label) + '</button>';
+      }).join('');
+    }
+    function setTemplateLang(lang) {
+      currentLang = lang; buildLangButtons();
+      if (templateCache[lang]) { updateSamples(); return; }
+      el('templateGrid').innerHTML = '<div class="col-span-full flex items-center justify-center gap-2 py-8 text-slate-400 text-xs"><div class="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full spin"></div> Translating templates...</div>';
+      var base = TEMPLATE_DATA.templates.en.map(function (t) { return { label: t.label, text: t.text }; });
+      run('translateTemplates', [lang, base]).then(function (res) {
+        if (res && res.success && res.items && res.items.length === TEMPLATE_DATA.templates.en.length) {
+          templateCache[lang] = TEMPLATE_DATA.templates.en.map(function (t, i) {
+            return { industry: t.industry, function: t.function, label: res.items[i].label || t.label, text: res.items[i].text || t.text };
+          });
+        } else { templateCache[lang] = TEMPLATE_DATA.templates.en; toast('Translation unavailable; showing English.'); }
+        updateSamples();
+      }).catch(function () { templateCache[lang] = TEMPLATE_DATA.templates.en; toast('Translation failed; showing English.'); updateSamples(); });
+    }
+
+    // ---- Method selection ----
+    function selectMethod(method) {
+      window.currentMethod = method;
+      el('methodSelection').classList.add('hidden');
+      if (method === 'template') { el('templateContainer').classList.remove('hidden'); el('manualContainer').classList.add('hidden'); buildLangButtons(); updateSamples(); }
+      else { el('manualContainer').classList.remove('hidden'); el('templateContainer').classList.add('hidden'); el('userGoal').focus(); }
+    }
+    function switchMethod() {
+      el('templateContainer').classList.add('hidden');
+      el('manualContainer').classList.add('hidden');
+      el('methodSelection').classList.remove('hidden');
+      window.currentMethod = null;
+    }
+
+    // ---- Template gallery ----
+    function updateSamples() {
+      var inds = TEMPLATE_DATA.industries.en, funcs = TEMPLATE_DATA.jobFunctions.en;
+      var temps = templateCache[currentLang] || TEMPLATE_DATA.templates.en;
+      var ic = el('industryFilters'); ic.innerHTML = '';
+      inds.forEach(function (ind) {
+        var b = document.createElement('button');
+        b.onclick = function () { selectedIndustry = ind.id; updateSamples(); };
+        var active = selectedIndustry === ind.id;
+        b.className = 'px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-all ' + (active ? 'bg-sky-500/20 border-sky-500 text-sky-300' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10');
+        b.textContent = ind.label; ic.appendChild(b);
+      });
+      var fc = el('jobFunctionFilters'); fc.innerHTML = '';
+      funcs.forEach(function (fn) {
+        var b = document.createElement('button');
+        b.onclick = function () { selectedFunction = fn.id; updateSamples(); };
+        var active = selectedFunction === fn.id;
+        b.className = 'px-2.5 py-1 rounded-lg text-[10px] font-medium border transition-all ' + (active ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-white/5 border-white/10 text-slate-500 hover:text-slate-300');
+        b.textContent = fn.label; fc.appendChild(b);
+      });
+      var grid = el('templateGrid'); grid.innerHTML = '';
+      var filtered = temps.filter(function (t) { return t.industry === selectedIndustry && (selectedFunction === 'all' || t.function === selectedFunction); });
+      if (!filtered.length) { grid.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-[11px] italic">No matching templates. Try another job function.</div>'; return; }
+      filtered.forEach(function (t) {
+        var card = document.createElement('div');
+        card.onclick = function () { setIdea(t.text); };
+        card.className = 'demo-card glass p-4 rounded-2xl border border-white/5 hover:border-sky-500/50 cursor-pointer';
+        card.innerHTML = '<span class="text-[9px] font-bold text-slate-500 uppercase tracking-tight bg-white/5 px-1.5 py-0.5 rounded border border-white/10">' + esc(t.function) + '</span>' +
+          '<h4 class="text-[12px] font-bold text-slate-200 mt-2 mb-1 leading-tight">' + esc(t.label) + '</h4>' +
+          '<p class="text-[11px] text-slate-500 leading-relaxed">' + esc(t.text) + '</p>';
+        grid.appendChild(card);
+      });
+    }
+
+    function setIdea(text) {
+      var finalText = text;
+      if (cachedResearchData) {
+        finalText = composeResearchGoal(cachedResearchData, getSelectedWorkflows(), text);
+        toast('Template merged with ' + cachedResearchData.companyName + ' research');
+      } else { toast('Template applied'); }
+      goManual(finalText, !!cachedResearchData);
+    }
+
+    function goManual(text, asPreview) {
+      el('templateContainer').classList.add('hidden');
+      el('methodSelection').classList.add('hidden');
+      el('manualContainer').classList.remove('hidden');
+      window.currentMethod = 'manual';
+      var ta = el('userGoal');
+      ta.value = text;
+      localStorage.setItem('gebe_generator_input', text);
+      ta.classList.add('highlight-glow');
+      setTimeout(function(){ ta.classList.remove('highlight-glow'); }, 2000);
+      setGoalTab(asPreview ? 'preview' : 'edit');
+      el('manualContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ---- Goal Edit/Preview (markdown) ----
+    function setGoalTab(tab) {
+      var ta = el('userGoal'), pv = el('goalPreview');
+      if (tab === 'preview') {
+        pv.innerHTML = simpleMarkdownToHtml(ta.value) || '<span class="text-slate-500 italic">No content to preview.</span>';
+        ta.classList.add('hidden'); pv.classList.remove('hidden');
+        el('tabEdit').className = 'px-3 py-1 text-[10px] font-bold rounded-md text-slate-500 hover:text-slate-300';
+        el('tabPreview').className = 'px-3 py-1 text-[10px] font-bold rounded-md bg-sky-500/20 text-sky-400';
+      } else {
+        ta.classList.remove('hidden'); pv.classList.add('hidden');
+        el('tabEdit').className = 'px-3 py-1 text-[10px] font-bold rounded-md bg-sky-500/20 text-sky-400';
+        el('tabPreview').className = 'px-3 py-1 text-[10px] font-bold rounded-md text-slate-500 hover:text-slate-300';
+      }
+    }
+    function simpleMarkdownToHtml(md) {
+      if (!md || !md.trim()) return '';
+      var lines = md.split('\n'), html = '', inList = false;
+      lines.forEach(function (line) {
+        var t = line.trim();
+        if (t.indexOf('# ') === 0) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += '<h2 class="text-lg font-bold text-white mt-4 mb-2 pb-1 border-b border-violet-500/20">' + esc(t.substring(2)) + '</h2>';
+        } else if (t.indexOf('## ') === 0) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += '<h3 class="text-sm font-bold text-violet-300 mt-4 mb-2">' + esc(t.substring(3)) + '</h3>';
+        } else if (t.indexOf('- ') === 0) {
+          if (!inList) { html += '<ul class="space-y-1.5 mb-3">'; inList = true; }
+          var c = esc(t.substring(2)).replace(/\*\*(.+?)\*\*/g, '<strong class="text-emerald-300">$1</strong>');
+          html += '<li class="flex items-start gap-2 text-xs text-slate-300"><span class="text-violet-400 mt-0.5">&bull;</span><span>' + c + '</span></li>';
+        } else if (t === '') {
+          if (inList) { html += '</ul>'; inList = false; }
+        } else {
+          if (inList) { html += '</ul>'; inList = false; }
+          var p = esc(t).replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>');
+          html += '<p class="text-xs text-slate-400 leading-relaxed mb-2">' + p + '</p>';
+        }
+      });
+      if (inList) html += '</ul>';
+      return html;
+    }
+
+    // ---- Goal optimize (magic wand) ----
+    var MW_STATUSES = ['Analyzing business goal...', 'Scaffolding target role...', 'Structuring business scenario...', 'Applying business rules...', 'Polishing markdown...'];
+    var mwInterval = null;
+    function optimizeGoal() {
+      var ta = el('userGoal'), raw = ta.value.trim();
+      if (!raw) { toast('Please type a goal first.'); return; }
+      var btn = el('magicWandBtn'); btn.disabled = true; var orig = btn.textContent; btn.textContent = 'Optimizing...';
+      var ov = el('magicWandOverlay'); ov.style.display = 'flex';
+      var i = 0; el('magicWandStatus').textContent = MW_STATUSES[0];
+      mwInterval = setInterval(function(){ i = (i + 1) % MW_STATUSES.length; el('magicWandStatus').textContent = MW_STATUSES[i]; }, 1500);
+      run('optimizeGoalWithMagicWand', [raw]).then(function (res) {
+        if (res && res.success) {
+          ta.value = res.optimizedGoal; localStorage.setItem('gebe_generator_input', res.optimizedGoal);
+          setGoalTab('preview'); toast('Prompt optimized');
+        } else { toast('Optimization failed: ' + ((res && res.error) || 'unknown')); }
+      }).catch(function (e) { toast('Optimization failed: ' + (e && e.message ? e.message : e)); })
+      .then(function () { btn.disabled = false; btn.textContent = orig; ov.style.display = 'none'; if (mwInterval) clearInterval(mwInterval); });
+    }
+
+    // ---- Domain research ----
+    function researchDomain() {
+      var d = el('customerDomain').value.trim();
+      if (!d) { toast('Enter a domain first.'); return; }
+      el('researchSpinner').classList.remove('hidden'); el('researchBtnText').textContent = 'Researching...';
+      el('researchError').classList.add('hidden'); el('researchResult').classList.add('hidden');
+      run('researchCompanyByDomain', [d]).then(function (r) {
+        if (!r || !r.success) { el('researchError').textContent = (r && r.error) || 'Research failed.'; el('researchError').classList.remove('hidden'); return; }
+        cachedResearchData = r; renderResearch(r);
+      }).catch(function (e) { el('researchError').textContent = e && e.message ? e.message : 'Research failed.'; el('researchError').classList.remove('hidden'); })
+      .then(function () { el('researchSpinner').classList.add('hidden'); el('researchBtnText').textContent = 'Research'; });
+    }
+    function renderResearch(r) {
+      el('researchCompanyName').textContent = r.companyName;
+      el('researchIndustry').textContent = r.industry || '';
+      el('researchSummary').textContent = r.companySummary || '';
+      el('researchChallenges').innerHTML = (r.businessChallenges || []).map(function (c) {
+        return '<li class="flex items-start gap-2 text-xs text-slate-300"><span class="text-amber-400 mt-0.5">&bull;</span><span>' + esc(c) + '</span></li>';
+      }).join('');
+      var wc = el('researchWorkflows'); wc.innerHTML = '';
+      var auto = 0;
+      (r.workflows || []).forEach(function (w, idx) {
+        var isAuto = w.automatable && auto < 3; if (isAuto) auto++;
+        var div = document.createElement('div');
+        div.className = 'flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer select-none border ' + (isAuto ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-slate-800/30 border-white/5 hover:border-white/15');
+        div.dataset.selected = isAuto ? 'true' : 'false';
+        div.dataset.workflowName = w.name; div.dataset.workflowReason = w.reason || '';
+        div.innerHTML = '<span class="wf-box mt-0.5 w-4 h-4 rounded border flex items-center justify-center text-[10px] ' + (isAuto ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-500 text-transparent') + '">&#10003;</span>' +
+          '<div class="flex-1"><span class="text-xs font-bold ' + (isAuto ? 'text-emerald-300' : 'text-slate-400') + '">' + esc(w.name) + '</span>' +
+          '<p class="text-[10px] ' + (isAuto ? 'text-emerald-400/70' : 'text-slate-500') + ' mt-0.5">' + esc(w.reason || '') + '</p></div>';
+        div.addEventListener('click', function () { toggleWorkflow(div); });
+        wc.appendChild(div);
+      });
+      el('researchResult').classList.remove('hidden');
+    }
+    function toggleWorkflow(div) {
+      var sel = div.dataset.selected === 'true';
+      if (!sel) {
+        if (getSelectedWorkflows().length >= 3) { toast('Select at most 3 workflows.'); return; }
+        div.dataset.selected = 'true';
+        div.className = 'flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer select-none border bg-emerald-500/10 border-emerald-500/20';
+        div.querySelector('.wf-box').className = 'wf-box mt-0.5 w-4 h-4 rounded border flex items-center justify-center text-[10px] bg-emerald-500 border-emerald-500 text-white';
+      } else {
+        div.dataset.selected = 'false';
+        div.className = 'flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer select-none border bg-slate-800/30 border-white/5 hover:border-white/15';
+        div.querySelector('.wf-box').className = 'wf-box mt-0.5 w-4 h-4 rounded border flex items-center justify-center text-[10px] border-slate-500 text-transparent';
+      }
+    }
+    function getSelectedWorkflows() {
+      return Array.from(document.querySelectorAll('#researchWorkflows > div[data-selected="true"]')).map(function (d) {
+        return { name: d.dataset.workflowName, reason: d.dataset.workflowReason };
+      });
+    }
+    function composeResearchGoal(d, workflows, scenario) {
+      var lines = [];
+      lines.push('# ' + d.companyName + ' (' + (d.industry || '') + ')');
+      lines.push(''); lines.push(d.companySummary || ''); lines.push('');
+      lines.push('## Business Challenges');
+      (d.businessChallenges || []).forEach(function (c) { lines.push('- ' + c); });
+      lines.push('');
+      if (workflows && workflows.length) {
+        lines.push('## Target Workflows for AI Agent Automation');
+        workflows.forEach(function (w) { lines.push('- **' + w.name + '**: ' + w.reason); });
+        lines.push('');
+      }
+      lines.push('## Business Scenario');
+      lines.push(scenario || d.suggestedGoal || '');
+      return lines.join('\n');
+    }
+    function applySelectedWorkflows() {
+      if (!cachedResearchData) return;
+      var wf = getSelectedWorkflows();
+      if (!wf.length) { toast('Select at least one workflow.'); return; }
+      goManual(composeResearchGoal(cachedResearchData, wf, cachedResearchData.suggestedGoal), true);
+    }
+    function clearResearch() { cachedResearchData = null; el('researchResult').classList.add('hidden'); el('customerDomain').value = ''; }
+
+    // ---- Progress dashboard ----
+    function setBar(pct) { el('progressBar').style.width = pct + '%'; }
+    function setStep(name, state, msg) {
+      var icon = el('pstep-' + name).querySelector('.step-icon');
+      icon.classList.remove('active','done'); if (state) icon.classList.add(state);
+      if (state === 'done') icon.innerHTML = '&#10003;';
+      if (msg) el('pmsg-' + name).textContent = msg;
+    }
+    function addLog(text, color) {
+      var d = document.createElement('div'); d.className = 'log-line ' + (color || 'text-slate-400');
+      var ts = new Date(); var hh = String(ts.getHours()).padStart(2,'0'), mm = String(ts.getMinutes()).padStart(2,'0'), ss = String(ts.getSeconds()).padStart(2,'0');
+      d.innerHTML = '<span class="text-slate-600">' + hh + ':' + mm + ':' + ss + '</span> ' + esc(text);
+      el('logs').appendChild(d); el('logs').scrollTop = el('logs').scrollHeight;
+    }
+    function startTips() { tipIndex = 0; showTip(); tipTimer = setInterval(function(){ tipIndex = (tipIndex + 1) % TIPS.length; showTip(); }, 12000); }
+    function showTip() { el('tipHeading').textContent = TIPS[tipIndex].h; el('tipBody').textContent = TIPS[tipIndex].b; }
+    function stopTips() { if (tipTimer) clearInterval(tipTimer); }
+    function startElapsed() { startedAt = new Date().getTime(); elapsedTimer = setInterval(function(){ var s = Math.floor((new Date().getTime() - startedAt)/1000); el('elapsed').textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }, 1000); }
+    function stopElapsed() { if (elapsedTimer) clearInterval(elapsedTimer); }
+
+    function startGeneration() {
+      var goal = el('userGoal').value.trim();
+      if (!goal) { toast('Please enter a business goal.'); return; }
+      var options = {
+        userGoal: goal, domain: el('domain').value.trim(),
+        includeDocs: ftActive('docs'), includeSheets: ftActive('sheets'),
+        includeSlides: ftActive('slides'), includeImages: ftActive('images'),
+        includePdf: ftActive('pdf')
+      };
+      el('genBtn').disabled = true; el('genBtn').textContent = 'Generating...';
+      el('resultSection').classList.add('hidden'); el('stepsSection').classList.remove('hidden');
+      el('logs').innerHTML = '';
+      setBar(5); setStep('plan','active','Planning...'); setStep('files',null,'Waiting...'); setStep('final',null,'Waiting...');
+      startTips(); startElapsed();
+      addLog('Planning demo with Gemini...', 'text-sky-300');
+      el('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      var plan, folderInfo, fileResults = [];
+      run('planGEBEDemo', [goal, options]).then(function (p) {
+        plan = p; setStep('plan','done','Planned ' + plan.files.length + ' file(s) for ' + (plan.customerName || plan.domainName || ''));
+        setBar(20); setStep('files','active','Creating folder...');
+        addLog('Plan ready: ' + (plan.customerName || plan.domainName || '') + ' (' + plan.files.length + ' files)', 'text-emerald-300');
+        return run('createDemoFolder', [plan]);
+      }).then(function (info) {
+        folderInfo = info; addLog('Created folder: ' + (info.folderName || 'demo subfolder'), 'text-emerald-300');
+        var total = plan.files.length, idx = 0;
+        function next() {
+          if (idx >= total) return Promise.resolve();
+          var spec = plan.files[idx];
+          addLog('Generating ' + (spec.fileName || spec.type) + '...', 'text-slate-300');
+          return run('generateOneFile', [folderInfo.folderId, spec]).then(function (res) {
+            fileResults.push(res);
+            if (res.error) addLog('FAILED ' + spec.fileName + ': ' + res.error, 'text-red-300');
+            else addLog('Created ' + res.fileName + (res.formats && res.formats.length>1 ? ' (' + res.formats.join(', ') + ')' : ''), 'text-emerald-300');
+            idx++; setBar(20 + Math.round((idx/total)*60)); setStep('files','active', idx + '/' + total + ' files');
+            return next();
+          });
+        }
+        return next();
+      }).then(function () {
+        setStep('files','done', fileResults.filter(function(r){return r && !r.error;}).length + ' files created');
+        setStep('final','active','Writing Demo Guide...'); setBar(85);
+        addLog('Writing Demo Guide...', 'text-sky-300');
+        var timings = { generationTimeSec: ((new Date().getTime() - startedAt)/1000).toFixed(1) };
+        return run('finalizeDemo', [folderInfo.demoId, folderInfo, plan, options, timings, fileResults]);
+      }).then(function (fin) {
+        setStep('final','done','Done'); setBar(100); addLog('Demo complete.', 'text-emerald-300');
+        showResult(plan, folderInfo, fin, fileResults);
+        setTimeout(function(){ el('stepsSection').classList.add('hidden'); }, 800);
+      }).catch(function (err) {
+        addLog('Error: ' + (err && err.message ? err.message : err), 'text-red-400'); toast('Generation failed.');
+      }).then(function () {
+        stopTips(); stopElapsed();
+        el('genBtn').disabled = false; el('genBtn').textContent = 'Generate Demo';
+        setNavActive('run');
+      });
+    }
+
+    function showResult(plan, folderInfo, fin, fileResults) {
+      el('resultSection').classList.remove('hidden');
+      el('resultSummary').textContent = plan.oneSentenceSummary || plan.customerName || plan.domainName || 'Demo generated';
+      el('folderLink').href = (folderInfo && folderInfo.url) || '#';
+      if (fin && fin.guideDoc && fin.guideDoc.url) { el('guideLink').href = fin.guideDoc.url; el('guideLink').classList.remove('hidden'); }
+      else el('guideLink').classList.add('hidden');
+      renderFilesList(fileResults, plan);
+      if (plan.agentDesignerPrompt) {
+        window._agentPrompt = plan.agentDesignerPrompt;
+        el('agentPrompt').innerHTML = simpleMarkdownToHtml(plan.agentDesignerPrompt) || esc(plan.agentDesignerPrompt);
+        el('agentCard').classList.remove('hidden');
+      } else el('agentCard').classList.add('hidden');
+      renderDemoPrompts(plan.demoGuide);
+      renderPreview(plan);
+      el('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    var TYPE_LABEL = { document: 'Doc', spreadsheet: 'Sheet', presentation: 'Slides', pdf: 'PDF', image: 'Image' };
+    function renderFilesList(fileResults, plan, readOnly) {
+      // Prefer actual created-file results; fall back to the plan's file list.
+      var items = (fileResults && fileResults.length)
+        ? fileResults
+        : (plan.files || []).map(function (f) { return { fileName: f.fileName, type: f.type }; });
+      if (!items.length) { el('filesCard').classList.add('hidden'); return; }
+      el('filesList').innerHTML = items.map(function (r) {
+        var label = TYPE_LABEL[r.type] || 'File';
+        var badge = '<span class="text-[10px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-300 rounded px-1.5 py-0.5 shrink-0">' + esc(label) + '</span>';
+        var extra = '';
+        if (r.error) extra = '<span class="text-[11px] text-red-400 shrink-0">failed</span>';
+        else if (r.formats && r.formats.length > 1) extra = '<span class="text-[10px] text-slate-500 shrink-0">' + esc(r.formats.join(', ')) + '</span>';
+        // Suppress Open links for another user's demo (no access to their Drive files).
+        var action = (!readOnly && r.url) ? '<a href="' + esc(r.url) + '" target="_blank" class="text-[11px] text-sky-300 hover:text-sky-200 shrink-0">Open</a>' : '';
+        return '<div class="flex items-center gap-3 bg-slate-900/40 rounded-lg p-2.5 border border-white/5">' +
+          badge + '<span class="text-sm text-slate-200 flex-1 truncate">' + esc(r.fileName || 'file') + '</span>' + extra + action + '</div>';
+      }).join('');
+      el('filesCard').classList.remove('hidden');
+    }
+    function promptRow_(labelHtml, text, accentClass, valueClass) {
+      return '<div class="bg-slate-950/40 rounded-lg p-3 border border-white/5">' +
+        '<div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold uppercase tracking-wider ' + (accentClass || 'text-sky-300') + '">' + labelHtml + '</span>' +
+        '<button onclick="copyText(this.parentElement.nextElementSibling.textContent, this)" class="text-[10px] text-slate-400 hover:text-sky-200">Copy</button></div>' +
+        '<p class="text-[13px] leading-relaxed whitespace-pre-wrap ' + (valueClass || 'text-slate-200') + '">' + esc(text) + '</p></div>';
+    }
+    function renderDemoPrompts(guide) {
+      if (!guide || !guide.length) { el('promptsCard').classList.add('hidden'); return; }
+      el('promptsList').innerHTML = guide.map(function (s, i) {
+        // Backward-compat: plain string.
+        if (typeof s === 'string') {
+          return '<div class="bg-slate-900/40 rounded-xl p-4 border border-white/5">' + promptRow_('Prompt', s) + '</div>';
+        }
+        // Backward-compat: old persona object with prompts[].
+        if (s.prompts && !s.prompt) {
+          var ps = (s.prompts || []).map(function (q) { return promptRow_('Prompt', q); }).join('');
+          return '<div class="bg-slate-900/40 rounded-xl p-4 border border-white/5">' +
+            '<h4 class="font-semibold text-white text-sm mb-1">' + esc(s.persona || ('Step ' + (i + 1))) + '</h4>' +
+            (s.role ? '<p class="text-[11px] text-violet-300 mb-0.5"><span class="uppercase tracking-wider text-slate-500">Role:</span> ' + esc(s.role) + '</p>' : '') +
+            (s.objective ? '<p class="text-[11px] text-slate-400 mb-3"><span class="uppercase tracking-wider text-slate-500">Objective:</span> ' + esc(s.objective) + '</p>' : '') +
+            '<div class="space-y-2">' + ps + '</div></div>';
+        }
+        // New demo-flow step.
+        var sources = (s.expectedSources || []).map(function (f) {
+          return '<span class="text-[10px] font-mono bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-slate-300">' + esc(f) + '</span>';
+        }).join(' ');
+        return '<div class="bg-slate-900/40 rounded-xl p-4 border border-white/5">' +
+          '<div class="flex items-start justify-between gap-2 mb-1">' +
+          '<h4 class="font-semibold text-white text-sm">' + esc(s.title || ('Step ' + (i + 1))) + '</h4>' +
+          (s.role ? '<span class="shrink-0 text-[10px] bg-violet-500/15 text-violet-200 rounded-full px-2 py-0.5">' + esc(s.role) + '</span>' : '') +
+          '</div>' +
+          (s.context ? '<p class="text-xs text-slate-400 mb-3">' + esc(s.context) + '</p>' : '') +
+          '<div class="space-y-2">' +
+          (s.prompt ? promptRow_('Prompt', s.prompt, 'text-sky-300', 'text-sky-300 font-medium') : '') +
+          '</div>' +
+          (sources ? '<div class="mt-3"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Expected sources</p><div class="flex flex-wrap gap-1.5">' + sources + '</div></div>' : '') +
+          (s.expectedAnswer ? '<div class="mt-3"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Expected answer</p><p class="text-[13px] text-slate-300 leading-relaxed whitespace-pre-wrap">' + esc(s.expectedAnswer) + '</p></div>' : '') +
+          (function () {
+            var diffs = (s.differentiators || []).map(function (d) {
+              if (typeof d === 'string') return '<li class="flex items-start gap-2 text-[12px] text-slate-300"><span class="text-emerald-400 mt-0.5">&#9656;</span><span>' + esc(d) + '</span></li>';
+              return '<li class="flex items-start gap-2 text-[12px] text-slate-300"><span class="text-emerald-400 mt-0.5">&#9656;</span><span><b class="text-emerald-300">' + esc(d.title || '') + (d.title ? ': ' : '') + '</b>' + esc(d.detail || '') + '</span></li>';
+            }).join('');
+            return diffs ? '<div class="mt-3"><p class="text-[10px] font-bold uppercase tracking-wider text-emerald-400/80 mb-1">Differentiation Highlights</p><ul class="space-y-1">' + diffs + '</ul></div>' : '';
+          })() +
+          '</div>';
+      }).join('');
+      el('promptsCard').classList.remove('hidden');
+    }
+    function renderPreview(plan) {
+      var blocks = [];
+      (plan.files || []).forEach(function (f) {
+        if (f.type === 'spreadsheet' && f.sheets) {
+          f.sheets.forEach(function (sh) {
+            var data = sh.data || []; if (!data.length) return;
+            var head = data[0] || [], rows = data.slice(1, 9);
+            var thead = '<tr>' + head.map(function (h){ return '<th class="text-left px-2 py-1 text-[11px] font-semibold text-slate-300 border-b border-white/10">' + esc(h) + '</th>'; }).join('') + '</tr>';
+            var tbody = rows.map(function (r){ return '<tr>' + (r||[]).map(function (c){ return '<td class="px-2 py-1 text-xs text-slate-400 border-b border-white/5">' + esc(c) + '</td>'; }).join('') + '</tr>'; }).join('');
+            blocks.push('<div><div class="flex items-center gap-2 mb-2"><span class="text-xs font-semibold text-sky-300">' + esc(sh.sheetName || f.fileName) + '</span><span class="text-[10px] text-slate-500">' + (data.length-1) + ' rows</span></div><div class="overflow-x-auto rounded-lg border border-white/5"><table class="min-w-full"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table></div></div>');
+          });
+        }
+      });
+      if (blocks.length) { el('dataPreview').innerHTML = blocks.join(''); el('previewCard').classList.remove('hidden'); }
+      else el('previewCard').classList.add('hidden');
+    }
+    function clearForNewDemo() {
+      el('userGoal').value = '';
+      localStorage.removeItem('gebe_generator_input');
+      el('domain').value = '';
+      el('resultSection').classList.add('hidden'); el('stepsSection').classList.add('hidden');
+      switchMethod(); setNavActive('define');
+      el('section-step1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ---- Onboarding ----
+    function openOnboarding(force) { if (force || !localStorage.getItem('gebe_onboarding_seen')) { el('onboardingModal').classList.remove('hidden'); el('onboardingModal').classList.add('flex'); } }
+    function closeOnboarding() { el('onboardingModal').classList.add('hidden'); el('onboardingModal').classList.remove('flex'); localStorage.setItem('gebe_onboarding_seen','1'); }
+
+    // init
+    (function () {
+      var saved = localStorage.getItem('gebe_generator_input');
+      if (saved) el('userGoal').value = saved;
+    })();
+    openOnboarding(false);
+  </script>
+</body>
+</html>
