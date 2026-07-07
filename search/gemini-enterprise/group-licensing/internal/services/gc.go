@@ -18,7 +18,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -106,84 +105,71 @@ func (s *GCService) Run(ctx context.Context, cfg *config.EntitlementConfig, req 
 // revokes licences from users who are stale or no longer entitled. It returns
 // the number of licenses revoked and users evaluated.
 //
-// Each distinct location in projectCfg gets its own pagination loop so that
-// ListUserLicenses and BatchUpdateUserLicenses are always called with the
-// correct location. Revocation candidates are chunked and flushed per page so
-// that memory usage is bounded to one page of candidates at any point rather
-// than accumulating the full result set before issuing any writes.
+// Revocation candidates are chunked and flushed per page so that memory usage
+// is bounded to one page of candidates at any point rather than accumulating
+// the full result set before issuing any writes.
 func (s *GCService) processProject(ctx context.Context, projectID string, projectCfg config.ProjectConfig, thresholdDays int, dryRun bool) (licensesRevoked, usersEvaluated int, err error) {
-	seen := make(map[models.Location]bool)
-	var locations []models.Location
-	for _, entry := range projectCfg {
-		if !seen[entry.Location] {
-			seen[entry.Location] = true
-			locations = append(locations, entry.Location)
+	var pageToken string
+	var pageCount int
+
+	for {
+		if err := ctx.Err(); err != nil {
+			return 0, 0, fmt.Errorf("context cancelled: %w", err)
 		}
-	}
+		if pageCount >= models.MaxPagesPerGroup {
+			middleware.LoggerFromContext(ctx).WarnContext(ctx,
+				"license listing exceeded page limit, truncating",
+				slog.String("project_id", projectID),
+				slog.Int("max_pages", models.MaxPagesPerGroup),
+			)
+			break
+		}
+		pageCount++
+		licenses, next, err := s.gemini.ListUserLicenses(ctx, projectID, pageToken)
+		if err != nil {
+			return 0, 0, fmt.Errorf("project %q listing licenses: %w", projectID, err)
+		}
 
-	for _, location := range locations {
-		var pageToken string
-		var pageCount int
+		var pageRevocations []models.LicenseUpdate
 
-		for {
+		for _, license := range licenses {
 			if err := ctx.Err(); err != nil {
 				return 0, 0, fmt.Errorf("context cancelled: %w", err)
 			}
-			if pageCount >= models.MaxPagesPerGroup {
-				middleware.LoggerFromContext(ctx).WarnContext(ctx,
-					"license listing exceeded page limit, truncating",
-					slog.String("project_id", projectID),
-					slog.Int("max_pages", models.MaxPagesPerGroup),
-				)
-				break
+			if license.State == models.LicenseStateRevoked {
+				continue
 			}
-			pageCount++
-			licenses, next, err := s.gemini.ListUserLicenses(ctx, projectID, location, pageToken)
+			usersEvaluated++
+
+			shouldRevoke, err := s.shouldRevoke(ctx, license, projectCfg, thresholdDays)
 			if err != nil {
-				return 0, 0, fmt.Errorf("project %q listing licenses: %w", projectID, err)
+				return 0, 0, fmt.Errorf("project %q evaluating license: %w", projectID, err)
 			}
 
-			var pageRevocations []models.LicenseUpdate
-
-			for _, license := range licenses {
-				if err := ctx.Err(); err != nil {
-					return 0, 0, fmt.Errorf("context cancelled: %w", err)
-				}
-				if license.State == models.LicenseStateRevoked {
-					continue
-				}
-				usersEvaluated++
-
-				shouldRevoke, err := s.shouldRevoke(ctx, license, projectCfg, thresholdDays)
-				if err != nil {
-					return 0, 0, fmt.Errorf("project %q evaluating license: %w", projectID, err)
-				}
-
-				if shouldRevoke {
-					pageRevocations = append(pageRevocations, models.LicenseUpdate{
-						UserEmail:         license.UserEmail,
-						LicenseConfigPath: license.LicenseConfigPath,
-						Action:            models.LicenseActionRevoke,
-					})
-				}
+			if shouldRevoke {
+				pageRevocations = append(pageRevocations, models.LicenseUpdate{
+					UserEmail:         license.UserEmail,
+					LicenseConfigPath: license.LicenseConfigPath,
+					Action:            models.LicenseActionRevoke,
+				})
 			}
+		}
 
-			if len(pageRevocations) > 0 {
-				if !dryRun {
-					for _, chunk := range chunkLicenseUpdates(pageRevocations, models.MaxBatchSize) {
-						if err := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, chunk); err != nil {
-							return 0, 0, fmt.Errorf("project %q batch revoke: %w", projectID, err)
-						}
+		if len(pageRevocations) > 0 {
+			if !dryRun {
+				for _, chunk := range chunkLicenseUpdates(pageRevocations, models.MaxBatchSize) {
+					if err := s.gemini.BatchUpdateUserLicenses(ctx, projectID, chunk); err != nil {
+						return 0, 0, fmt.Errorf("project %q batch revoke: %w", projectID, err)
 					}
 				}
-				licensesRevoked += len(pageRevocations)
 			}
-
-			if next == "" {
-				break
-			}
-			pageToken = next
+			licensesRevoked += len(pageRevocations)
 		}
+
+		if next == "" {
+			break
+		}
+		pageToken = next
 	}
 
 	return licensesRevoked, usersEvaluated, nil
@@ -222,14 +208,6 @@ func (s *GCService) shouldRevoke(ctx context.Context, license models.UserLicense
 		for _, groupEmail := range entry.Groups {
 			isMember, err := s.idp.HasMember(ctx, groupEmail, license.UserEmail)
 			if err != nil {
-				if errors.Is(err, models.ErrInvalidMemberKey) {
-					middleware.LoggerFromContext(ctx).WarnContext(ctx,
-						"skipping licensed user with invalid member key",
-						slog.String("problematic_username", license.UserEmail),
-						slog.String("group_email", groupEmail),
-					)
-					return false, nil
-				}
 				return false, fmt.Errorf("checking membership: %w", err)
 			}
 			if isMember {

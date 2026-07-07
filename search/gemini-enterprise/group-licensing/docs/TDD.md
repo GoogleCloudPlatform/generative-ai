@@ -119,16 +119,12 @@ The utility's logic is divided into two primary reconciliation workflows.
   3. For each member that is a `User`, it calls the **Discovery Engine API** (`batchUpdateUserLicenses`) to assign the license. This operation is idempotent.
 
 * **License Pool Exhaustion Handling:**
-  A billing account may have multiple active subscriptions for the same SKU. At startup, the joiner fetches all `BillingAccountLicenseConfig` records and builds an index keyed by `(SKU, ProjectNumber, Location)`. Each key maps to an ordered slice of `LicenseConfigEntry` values — one per distinct subscription pool — so that all seat capacity is visible and no pool is silently discarded.
-
-  If a `batchUpdateUserLicenses` call fails because a pool is exhausted, the job does **not** treat this as a fatal error. Instead it:
+  If a `batchUpdateUserLicenses` call fails because the license pool for a SKU is exhausted, the job does **not** treat this as a fatal error. Instead it:
   1. Calls `licenseConfigsUsageStats.list` for the affected project to retrieve the current `usedLicenseCount` for the relevant `licenseConfig`.
-  2. Computes `available = allocatedCount - usedLicenseCount` (the allocated count is from the `licenseConfigDistributions` map fetched at startup).
+  2. Computes `available = allocatedCount - usedLicenseCount` (the allocated count is derived from the billing account `licenseConfigDistributions` map fetched at startup).
   3. Retries the batch trimmed to `available` items, granting as many licenses as possible.
-  4. Carries the remaining (ungranted) users forward to the next subscription pool for the same SKU, if one exists, and repeats steps 1–3.
-  5. After all pools for a SKU are exhausted, soft-fails any users still unseated: logs a `WARN` entry per exhausted pool and continues to the next batch or project. The job exits `0`.
-
-  Each user appears in at most one successful `batchUpdateUserLicenses` call — users do not advance to the next pool if they were already granted a seat. The `licenses_soft_failed` count in the final summary reflects only users who could not be seated across all pools for their SKU.
+  4. Soft-fails the remaining users: logs a `WARN` entry with the count of users who could not be assigned a license, then continues to the next batch or project. The job exits `0`.
+  The `licenses_soft_failed` count is included in the final summary log and in the `SyncAddResponse`.
 
 ### **5.2. Workflow 2: Bulk "Garbage Collection" Job (Scheduled: 6hr)**
 
@@ -140,7 +136,7 @@ The utility's logic is divided into two primary reconciliation workflows.
   1. Iterates through all licensed users via the **Discovery Engine API** (`listUserLicenses`).  
   2. For each user, the job evaluates two deprovisioning conditions:
       - **Staleness**: If `staleness_threshold_days` is greater than `0`, checks whether the user's staleness reference date is more than `X` days ago. The reference date is chosen as follows: if `lastLoginTime` is set, it is used; if `lastLoginTime` is absent (the user has never logged in), `createTime` (the license assignment timestamp) is used instead, so that a recently provisioned account is not immediately revoked before the user has had a chance to sign in. If both timestamps are absent, the user is treated as immediately stale. Both timestamps are retrieved from the `UserLicense` object provided by the **Discovery Engine API**. Setting `staleness_threshold_days` to `0` (or omitting it) disables this check entirely — only entitlement is evaluated.
-      - **Entitlement**: Calls the **Cloud Identity Admin API's** `members.hasMember` method to confirm if the user is still a member of any entitled group. If the API returns HTTP 400 (invalid member key — e.g. a typo'd email entered manually via the Discovery Engine UI), the user is skipped with a structured `WARN` log entry and the job continues; no revocation is performed for that user.
+      - **Entitlement**: Calls the **Cloud Identity Admin API's** `members.hasMember` method to confirm if the user is still a member of any entitled group.
   3. If **either** condition is met (the user is stale OR no longer entitled), the utility calls the **Discovery Engine API** (`batchUpdateUserLicenses`) to revoke the license.
 
 ### **5.3. License Precedence Logic**
@@ -189,7 +185,6 @@ Two distinct layers of security must be implemented:
     *   **Request Batching:** The utility MUST utilize the `batchUpdateUserLicenses` endpoint to consolidate up to 100 license modifications (assignments or revocations) per API request, minimizing round-trip latency and quota consumption.
     *   **Backoff:** Exponential backoff will be applied to all 429 and 5xx errors using a standard retry library.
     *   **License Pool Exhaustion:** License pool exhaustion (`ErrLicensesExhausted`) is treated as a soft failure distinct from rate limiting (`ErrAPIRateLimited`). Exhaustion triggers a `licenseConfigsUsageStats.list` lookup, a trimmed retry for remaining available seats, and a structured warning log — it does not abort the job.
-    *   **Invalid Member Key (GC only):** If `members.hasMember` returns HTTP 400 (`ErrInvalidMemberKey`) for a licensed user — indicating the stored email is malformed or otherwise unresolvable by the Admin API — the user is skipped with a `WARN` log entry. No revocation is issued and the job continues. This guards against typo'd emails entered via the Discovery Engine UI, which lacks input validation.
 * **Structured Logging:**
     *   **Format:** All logs MUST be emitted in JSON format to stdout for automatic ingestion by Cloud Logging.
     *   **Library:** Use Go's standard `log/slog` library.
