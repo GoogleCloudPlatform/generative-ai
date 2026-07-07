@@ -335,6 +335,7 @@ Depatmint
 Derpanis
 descgen
 deskmates
+devkey
 Dexin
 dflags
 dfs
@@ -773,6 +774,7 @@ japonicum
 javac
 JAVACMD
 Jax
+jdbc
 JDK
 jdoe
 Jedi
@@ -886,6 +888,8 @@ linkedin
 linted
 linting
 litellm
+livekit
+LIVEKIT
 Livewire
 LLa
 Llion
@@ -1608,6 +1612,7 @@ tsne
 TSNE
 tsv
 ttext
+ttfb
 TTFB
 ttft
 TTFT
