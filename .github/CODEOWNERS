@@ -34,6 +34,7 @@
 /generative-ai/gemini/sample-apps/genai-mlops-tune-and-eval                                                                      @GoogleCloudPlatform/generative-ai-devrel @willisc7
 /generative-ai/gemini/sample-apps/genwealth/                                                                                     @GoogleCloudPlatform/generative-ai-devrel @paulramsey
 /generative-ai/gemini/sample-apps/photo-discovery                                                                                @GoogleCloudPlatform/generative-ai-devrel @KhanhNwin @kazunori279
+/generative-ai/gemini/sample-apps/ge-demo-generator/                                                                             @GoogleCloudPlatform/generative-ai-devrel @ryotat7
 /generative-ai/gemini/tuning/gemini_supervised_finetuning_text_classification.ipynb                                              @GoogleCloudPlatform/generative-ai-devrel @eliasecchig @gabrielahrlr
 /generative-ai/gemini/tuning/supervised_finetuning_using_gemini.ipynb                                                            @GoogleCloudPlatform/generative-ai-devrel @dmoonat
 /generative-ai/gemini/use-cases/applying-llms-to-data/analyze-poster-images-in-bigquery/poster_image_analysis.ipynb              @GoogleCloudPlatform/generative-ai-devrel @aliciawilliams
