@@ -1,5 +1,0 @@
-devkey
-jdbc
-LIVEKIT
-livekit
-ttfb

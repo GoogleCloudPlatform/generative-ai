@@ -24,6 +24,7 @@ import (
 	"os"
 	"slices"
 
+	discoveryenginesdk "cloud.google.com/go/discoveryengine/apiv1"
 	admin "google.golang.org/api/admin/directory/v1"
 	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v3"
 	"google.golang.org/api/option"
@@ -94,6 +95,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	deClient, err := discoveryenginesdk.NewUserLicenseClient(ctx)
+	if err != nil {
+		slog.Error("failed to create discovery engine client", slog.Any("error", err))
+		os.Exit(1)
+	}
+
 	crmSvc, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))
 	if err != nil {
 		slog.Error("failed to create resource manager client", slog.Any("error", err))
@@ -101,7 +108,7 @@ func main() {
 	}
 
 	idpAdapter := cloudidentity.New(adminSvc)
-	geminiAdapter := discoveryengine.New()
+	geminiAdapter := discoveryengine.New(deClient)
 	rmAdapter := resourcemanager.New(crmSvc)
 
 	// Step 7: run the workflow determined by JobType.

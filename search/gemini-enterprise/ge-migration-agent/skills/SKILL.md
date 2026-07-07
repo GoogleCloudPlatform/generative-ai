@@ -14,19 +14,18 @@ metadata:
       region: global
       engine_id: "<TARGET_ENGINE_ID>"
   datastores_mapping:
-    <id>_mcp_data: <id>_mcp_data
-    <id>_google_drive: <id>_google_drive
+    # Format: source-datastore-id-suffix: target-datastore-id-suffix
+    "<SOURCE_DATASTORE_ID_SUFFIX>": "<TARGET_DATASTORE_ID_SUFFIX>"
   connectors_mapping:
-    Snowflake Mcp May29: custom_mcp
     ge-drive-all: Drive
-    Ge Gmail: geGmail
+    GeGmail: geGmail
     googleSearch: googleSearch
     urlContext: urlContext
 ---
 
 # ADK Administration Setup & Migration Instructions
 
-This file serves as the single source of truth for cross-environment Gemini Enterprise app agent migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
+This file serves as the single source of truth for Gemini Enterprise migrations. Administrators can fully configure source-to-target resource pairings by updating the YAML metadata frontmatter above.
 
 ---
 
@@ -34,7 +33,7 @@ This file serves as the single source of truth for cross-environment Gemini Ente
 
 ### 1. Environments Configuration
 Set your official canonical source and target project definitions under `environments`:
-- **`project_number`**: The numeric Google Cloud Project Number (e.g., `123456789012`).
+- **`project_number`**: The numeric Google Cloud Project Number (e.g., `404109417257`).
 - **`engine_id`**: The fully qualified Discovery Engine app/engine ID.
 
 ### 2. DataStore Grounding Mappings (`datastores_mapping`)
@@ -42,8 +41,8 @@ Map underlying knowledge search collections and grounding data stores (assigned 
 ```yaml
 datastores_mapping:
   # Source ID -> Target ID
-  snowflake-mcp-may29_1780067471814_mcp_data: snowflake-mcp-may29_1780829795319_mcp_data
-  ge-drive-all_1776953145638_google_drive: ge-drive-all_1780835769760_google_drive
+  example-mcp-source_12345_mcp_data: example-mcp-target_67890_mcp_data
+  example-drive-source_12345_google_drive: example-drive-target_67890_google_drive
 ```
 *Note: Always use the fully qualified ID suffix (e.g., `_google_drive`, `_mcp_data`) to prevent substring truncation.*
 
@@ -52,8 +51,8 @@ Map display aliases and frontend extension tool chips (assigned under `selectedT
 ```yaml
 connectors_mapping:
   # Source UI Badge -> Canonical Target UI Token
-  Snowflake Mcp May29: custom_mcp
-  ge-drive-all: Drive
+  "Example Source Connector": custom_mcp
+  "example-drive": Drive
 ```
 
 ---
@@ -67,5 +66,5 @@ Once configured, run live migrations or offline GCS imports directly:
 uv run ./migrate.py migrate-agent "Quarterly Business Review Generator" --force
 
 # 2. Import agent definition from GCS offline backup
-uv run ./migrate.py import-agent-gcs Quarterly_Business_Review_export.json --target-engine <TARGET_ENGINE_ID>
+uv run ./migrate.py import-agent-gcs quarterly_business_review_export.json --target-engine <TARGET_ENGINE_ID>
 ```
