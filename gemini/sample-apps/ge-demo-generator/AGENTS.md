@@ -56,7 +56,7 @@ Layer 4: Browser JavaScript execution
 | `.env` | `__ENV_EOF__` | Unquoted | ~L3095 | Runtime environment variables |
 | `tools.py` | `__TOOLS_EOF__` | Quoted (`'...'`) | ~L3134-3864 | MCP toolset factories |
 | `agent.py` | `__AGENT_EOF__` | Quoted (`'...'`) | ~L5236-5755 | Agent definitions |
-| `part_converters.py` | `__PART_CONVERTERS_EOF__` | Quoted | ~L5755-6095 | A2A↔GenAI converters |
+| `part_converters.py` | `__PART_CONVERTERS_EOF__` | Quoted | ~L5755-6095 | A2A↔Gen AI converters |
 | `fast_api_app.py` | `__FAST_API_EOF__` | Quoted (`'...'`) | ~L6107-6993 | A2A server + event loop |
 | `viewer_app/main.py` | `__VIEWER_MAIN__` | Quoted (`'...'`) | ~L1841-2420 | Data Viewer Flask app (HTML + JS) |
 

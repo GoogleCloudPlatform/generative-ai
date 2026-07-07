@@ -1839,3 +1839,11 @@ Zom
 Zosyn
 Zscaler
 Zuv
+Redmine
+AServer
+MLIT
+gsod
+noaa
+xxd
+Heredocs
+heredocs
