@@ -4871,7 +4871,7 @@ warnings.filterwarnings('ignore', message='STATE_RUNNING is not a valid', catego
 
 _MAX_RETRIES = 5
 
-print('  📦 Step 1/3: Initializing Vertex AI client (us-central1)...')
+print('  📦 Step 1/3: Initializing Vertex AI Agent Platform client (us-central1)...')
 sys.stdout.flush()
 client = vertexai.Client(project=os.environ.get('PROJECT_ID', ''), location='us-central1')
 
@@ -8883,7 +8883,7 @@ dotenv.load_dotenv(override=True)
 
 # =============================================================================
 # ADK Runtime Cycle-Breaking Monkey-Patch for the Deployed Container
-# Prevents RecursionError when parsing complex Firestore schemas in Vertex AI
+# Prevents RecursionError when parsing complex Firestore schemas in Vertex AI Agent Platform
 # =============================================================================
 import google.adk.tools._gemini_schema_util
 
@@ -11305,10 +11305,10 @@ __all__ = ["root_agent", "app", "background_agent"]
 __AGENT_EOF__
 
 cat <<'__PART_CONVERTERS_EOF__' > adk_agent/app/part_converters.py
-"""Conversion utilities for bridging Google GenAI and A2UI/ADK types.
+"""Conversion utilities for bridging Google Gen AI and A2UI/ADK types.
 
 This module provides stable, non-experimental implementations of part and event converters
-to handle the translation between Google GenAI SDK types and A2UI/ADK messaging types.
+to handle the translation between Google Gen AI SDK types and A2UI/ADK messaging types.
 It specifically addresses A2UI JSON payload extraction and tool call metadata handling.
 """
 
@@ -11368,13 +11368,13 @@ def is_a2ui_part(a2a_part: a2a_types.Part) -> bool:
 def convert_a2a_part_to_genai_part(
     a2a_part: a2a_types.Part,
 ) -> Optional[genai_types.Part]:
-    """Converts an A2A Part to a GenAI Part, serializing A2UI parts as JSON.
+    """Converts an A2A Part to a Gen AI Part, serializing A2UI parts as JSON.
 
     Args:
         a2a_part: The A2A part to convert.
 
     Returns:
-        The corresponding GenAI part, or None if conversion fails.
+        The corresponding Gen AI part, or None if conversion fails.
     """
     if is_a2ui_part(a2a_part):
         return genai_types.Part(text=a2a_part.model_dump_json())
@@ -11409,14 +11409,14 @@ def convert_a2a_part_to_genai_part(
 def convert_genai_part_to_a2a_parts(
     part: genai_types.Part,
 ) -> List[a2a_types.Part]:
-    """Converts a GenAI Part to a LIST of A2A Parts.
+    """Converts a Gen AI Part to a LIST of A2A Parts.
 
     NOTE: Text parts with A2UI are now handled upstream by A2uiStreamParser
     in fast_api_app.py. This function only handles non-text parts
     (images, function calls, function responses, code execution).
 
     Args:
-        part: The GenAI part to convert.
+        part: The Gen AI part to convert.
 
     Returns:
         A list of A2A parts.
@@ -11474,7 +11474,7 @@ def convert_event_to_a2a_message(
     invocation_context: Any,
     role: a2a_types.Role = a2a_types.Role.agent
 ) -> Optional[a2a_types.Message]:
-    """Extracts and converts GenAI parts from an ADK event into an A2A message.
+    """Extracts and converts Gen AI parts from an ADK event into an A2A message.
 
     Args:
         event: The ADK event containing model content.
@@ -16613,7 +16613,7 @@ Output ONLY the scenario text. No JSON, no code blocks, no explanations.`;
 }
 
 // ===========================================
-// Vertex AI & Utilities
+// Vertex AI Agent Platform & Utilities
 // ===========================================
 
 function callVertexAIWithRetry(prompt) { return executeWithRetry(() => callVertexAI(prompt)); }
@@ -16630,7 +16630,7 @@ function callVertexAI(prompt) {
 }
 
 /**
- * Calls Vertex AI with Google Search grounding enabled.
+ * Calls Vertex AI Agent Platform with Google Search grounding enabled.
  * Used for discovering real BigQuery public dataset IDs.
  */
 function callVertexAIWithSearch(prompt) {
@@ -16657,7 +16657,7 @@ function callVertexAIWithSearch(prompt) {
 
 
 /**
- * Calls Vertex AI gemini-3-pro-image-preview model in global region to generate an image.
+ * Calls Vertex AI Agent Platform gemini-3-pro-image-preview model in global region to generate an image.
  * Returns an object containing base64Data and mimeType.
  * @param {string} prompt Highly detailed image generation prompt in English.
  * @returns {object} { base64Data: string, mimeType: string }

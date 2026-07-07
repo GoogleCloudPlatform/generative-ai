@@ -34,7 +34,7 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - [Clasp](https://github.com/google/clasp) installed globally (`npm install -g @google/clasp`)
 - A Google Cloud Project with **Billing enabled**
 - The following **Google Cloud APIs** enabled on your project:
-  - Vertex AI API (`aiplatform.googleapis.com`)
+  - Vertex AI Agent Platform API (`aiplatform.googleapis.com`)
   - BigQuery API (`bigquery.googleapis.com`)
   - Google Drive API (`drive.googleapis.com`)
   - Sheets API (`sheets.googleapis.com`)
@@ -148,7 +148,7 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 
 | Property | Default | Description |
 |---|---|---|
-| `LOCATION` | `global` | Vertex AI API location (e.g., `us-central1`, `global`) |
+| `LOCATION` | `global` | Vertex AI Agent Platform API location (e.g., `us-central1`, `global`) |
 | `MODEL` | `gemini-3.5-flash` | Gemini model name for data generation |
 
 ### 6.3 Setting Properties

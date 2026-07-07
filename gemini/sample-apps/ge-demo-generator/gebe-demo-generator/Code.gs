@@ -24,7 +24,7 @@
  * in the accessing user's own Drive with their own authorization.
  *
  * Many helpers here are reused verbatim from the GE Demo Generator (Code.gs):
- * Vertex AI calls, image generation, JSON repair, and retry.
+ * Vertex AI Agent Platform calls, image generation, JSON repair, and retry.
  */
 
 // ===========================================
@@ -101,7 +101,7 @@ function checkConfiguration() {
 
 /**
  * One-time initialization to set up Script Properties. Run from the editor.
- * @param {string} projectId - Google Cloud project hosting Vertex AI.
+ * @param {string} projectId - Google Cloud project hosting Vertex AI Agent Platform.
  */
 function initializeProject(projectId) {
   const scriptProps = PropertiesService.getScriptProperties();
@@ -123,7 +123,7 @@ function initializeProject(projectId) {
 }
 
 // ===========================================
-// Vertex AI utilities (reused from GE Demo Generator)
+// Vertex AI Agent Platform utilities (reused from GE Demo Generator)
 // ===========================================
 
 function callVertexAIWithRetry(prompt) { return executeWithRetry(function () { return callVertexAI(prompt); }); }
@@ -145,7 +145,7 @@ function callVertexAI(prompt) {
 }
 
 /**
- * Calls Vertex AI gemini-3-pro-image in the global region to generate an image.
+ * Calls Vertex AI Agent Platform gemini-3-pro-image in the global region to generate an image.
  * Returns { base64Data, mimeType }.
  */
 function generateImageBase64WithRetry(prompt) { return executeWithRetry(function () { return generateImageBase64(prompt); }); }

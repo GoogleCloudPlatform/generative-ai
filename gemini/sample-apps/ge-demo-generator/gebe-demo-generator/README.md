@@ -23,7 +23,7 @@ deployment; the root project's `clasp push` does not include it.
 
 ## Setup
 
-1. Create the GCP-backed Apps Script project and set `scriptId` in `.clasp.json`
+1. Create the Google Cloud-backed Apps Script project and set `scriptId` in `.clasp.json`
    (or run `clasp create` from inside this directory).
 2. From inside `gebe-demo-generator/`, run `clasp push` (uses the local `.clasp.json`,
    not the repo root one).
@@ -32,7 +32,7 @@ deployment; the root project's `clasp push` does not include it.
    (default `gemini-3.5-flash`).
 4. Deploy as a Web App with **Execute as: User accessing the web app** and **Access: anyone
    in your domain** (matches `appsscript.json`).
-5. Each user grants Drive/Docs/Sheets/Slides + Vertex AI consent on first open, and needs
+5. Each user grants Drive/Docs/Sheets/Slides + Vertex AI Agent Platform consent on first open, and needs
    `roles/aiplatform.user` on `PROJECT_ID`.
 
 ## Files

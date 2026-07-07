@@ -20,7 +20,7 @@ gcloud config set project {{project-id}}
 
 ## Step 1: Provision Demo Environment in Your Project
 
-The Demo Generator has synthesized a custom setup script for you. This script is responsible for provisioning the BigQuery dataset and setting up the agent code within YOUR GCP environment.
+The Demo Generator has synthesized a custom setup script for you. This script is responsible for provisioning the BigQuery dataset and setting up the agent code within YOUR Google Cloud environment.
 
 1. Go back to the **ADK Agent Demo Generator** Web UI.
 2. Under **Step 3: Deploy**, click the **Copy** button next to the **Setup Script**.
@@ -171,7 +171,7 @@ If you see "Request had insufficient authentication scopes" in the logs:
 
 ### 5. Cloud Run Deployment Failures (Org Policies)
 If the setup fails to provision the Data Viewer application or the main Agent service:
-- **Cause**: Many enterprise GCP Projects restrict unauthenticated endpoints via organization policies (like `constraints/iam.allowedPolicyMemberDomains`).
+- **Cause**: Many enterprise Google Cloud Projects restrict unauthenticated endpoints via organization policies (like `constraints/iam.allowedPolicyMemberDomains`).
 - **Mitigation**: The setup script is designed to print a warning and proceed even if the **Data Viewer** deployment fails due to ingress policies. You can still preview the multi-agent setup locally using `adk web` (Step 3).
 
 ### 6. 403 Permission Denied on Tool Invocation
