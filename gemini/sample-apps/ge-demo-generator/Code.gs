@@ -1961,7 +1961,7 @@ function generateSetupScript(params) {
     genai: 'google-genai>=1.27.0',
     a2a: 'a2a-sdk>=0.2.0,<1.0.0',
 
-    // GCP SDKs -- stable, floor-only
+    // Google Cloud SDKs -- stable, floor-only
     aiplatform: 'google-cloud-aiplatform[agent_engines]>=1.112.0',
     storage: 'google-cloud-storage>=2.14.0',
     scheduler: 'google-cloud-scheduler>=2.0.0',
