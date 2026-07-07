@@ -46,6 +46,7 @@ adr
 advancedChevron
 advancedSettingsContent
 advErr
+AEvent
 aexecute
 aextract
 afrom
@@ -131,6 +132,7 @@ anyio
 anyOf
 AnyUrl
 ANZ
+aoa
 AOT
 APAC
 apac
@@ -220,6 +222,7 @@ asynccontextmanager
 AsyncExitStack
 asyncio
 AsyncIterator
+ATitle
 atleast
 atms
 atob
@@ -345,6 +348,7 @@ bInlineL
 BITCODE
 Bitcoin
 bitcoin
+bjerr
 bjson
 BlinkMacSystemFont
 blogs
@@ -387,6 +391,8 @@ briest
 Broadoak
 Brusdar
 Brynner
+bshot
+BTitle
 Btn
 btn
 btnAddText
@@ -742,6 +748,7 @@ ctd
 CTEs
 ctext
 CTHH
+CTitle
 ctx
 CUAD
 cubicBezier
@@ -1006,12 +1013,14 @@ easeInOutQuad
 easingFunction
 EBITDA
 ecommerce
+edata
 EDB
 edgecolor
 edgeExists
 edgeLabel
 edgelist
 editAsText
+edoc
 EDU
 Edu
 edu
@@ -1932,6 +1941,7 @@ Keanu
 kendall
 kenleejr
 Kenta
+kenta
 kentaroajisaka
 kephal
 keras
@@ -2001,6 +2011,7 @@ langTag
 Laomedeia
 larr
 lastAnalyzedMcp
+lastb
 lastError
 lastFetchedData
 lastIndexOf
@@ -2243,6 +2254,7 @@ mec
 MEDIANCUT
 mediapy
 Meetup
+MEGA
 Mega
 Megarobot
 Meinl
@@ -3497,6 +3509,7 @@ Tafel
 tagline
 tailwindcss
 Takahashi
+takahashi
 Takeaways
 takeaways
 Takeden
@@ -3908,6 +3921,7 @@ VSPM
 vtotal
 vtt
 vulnz
+vurl
 Wafae
 wafaeb
 WAI
@@ -3965,6 +3979,7 @@ Witaj
 withFailureHandler
 withSuccessHandler
 wlog
+wlogger
 Wnd
 WNDCLASS
 Womens
