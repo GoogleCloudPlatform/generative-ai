@@ -824,7 +824,7 @@ function planAndGenerateData(userGoal, options) {
       }
     }
   }
-  // Generate in-memory simulated images using Vertex AI gemini-3-pro-image
+  // Generate in-memory simulated images using Vertex AI Agent Platform gemini-3-pro-image
   if (parsed.externalFiles && parsed.externalFiles.length > 0) {
     console.log('[ImageGen-Pipeline] Scanning externalFiles for dynamic images...');
     for (let i = 0; i < parsed.externalFiles.length; i++) {

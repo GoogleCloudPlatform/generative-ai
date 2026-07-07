@@ -1847,3 +1847,11 @@ noaa
 xxd
 Heredocs
 heredocs
+Camry
+sqm
+headcount
+digikey
+mcmaster
+acs
+ALLOWALL
+JSONs

@@ -349,7 +349,7 @@ After running the setup script, the following directory structure is created:
 │       ├── tools.py                   # MCP toolset factories + generate_image
 │       │                              # + Workspace MCP + Slack MCP
 │       ├── fast_api_app.py            # A2A server, background task runner, streaming, middleware
-│       ├── part_converters.py         # A2A↔GenAI type conversion utilities
+│       ├── part_converters.py         # A2A↔Gen AI type conversion utilities
 │       ├── examples/0.8/             # A2UI BasicCatalog example JSONs
 │       └── app_utils/
 │           ├── telemetry.py           # Cloud Trace setup
