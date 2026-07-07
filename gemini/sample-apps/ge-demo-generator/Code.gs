@@ -1987,7 +1987,7 @@ function generateSetupScript(params) {
 
     // Computer Use (browser agent) -- only added when enableComputerUse is set.
     // playwright pin matches the official reference impl
-    // (github.com/google-gemini/computer-use-preview). The genai floor is bumped
+    // (github.com/google-gemini/computer-use-preview). The gen ai floor is bumped
     // to the version exposing types.ComputerUse/types.Environment for the
     // generate_content computer_use tool config.
     playwright: 'playwright==1.55.0',
@@ -9719,7 +9719,7 @@ async def _enforce_task_result_text(callback_context: adk_callback_context.Callb
     return None
 
 # --- Before-Model Callback: strip unsupported part_metadata ---
-# Files uploaded via the Gemini Enterprise frontend arrive as genai Parts that
+# Files uploaded via the Gemini Enterprise frontend arrive as gen ai Parts that
 # carry a part_metadata field (original_filename, sheet_name, etc.). When the
 # agent calls Gemini in Vertex / GE Agent Platform mode (GOOGLE_GENAI_USE_VERTEXAI=1),
 # the google-genai SDK rejects this field in _Part_to_vertex with:
