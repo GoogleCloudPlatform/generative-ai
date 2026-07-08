@@ -5910,7 +5910,7 @@ limitations under the License.
           <span class="feature-badge">🚀 Major Update</span>
         </div>
         <h2 class="text-xl font-bold text-white mb-1">What's New</h2>
-        <p class="text-gray-400 text-xs">4 powerful capabilities to elevate your demos</p>
+        <p class="text-gray-400 text-xs">5 powerful capabilities to elevate your demos</p>
       </div>
 
       <!-- Scrollable Content Wrapper -->
@@ -5918,6 +5918,19 @@ limitations under the License.
         <!-- Scrollable Content -->
         <div class="flex-1 overflow-y-auto pr-1 modal-scrollable-content pt-3 premium-mask-fade">
           <div class="modal-scrollable-inner">
+
+      <!-- Feature: Interactive Dashboards (publish_dashboard) -->
+      <div class="feature-card mb-4">
+        <div class="flex gap-3">
+          <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/15 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-bold text-white mb-0.5">Interactive Dashboards - One-Click Executive Views</h4>
+            <p class="text-[11px] text-gray-200 leading-relaxed">Your agent can now build a full <span class="font-bold text-emerald-400">interactive HTML dashboard</span> from the demo's live BigQuery data and share it as a secure link. Just ask for "an interactive executive dashboard I can open in the browser" and the agent authors a self-contained page - KPI tiles, charts, sortable &amp; searchable tables, filters, and light/dark mode - uploads it to a <span class="font-bold text-emerald-400">non-public Cloud Storage bucket</span>, and returns a time-limited <span class="font-bold text-emerald-400">signed URL</span>. <span class="text-emerald-400/80">Deliver the polished, clickable analytics experience customers now expect from Gemini canvas - right inside your demo.</span></p>
+          </div>
+        </div>
+      </div>
 
       <!-- Feature 1: Computer Use (Browser Agent) -->
       <div class="feature-card mb-4">
@@ -6220,7 +6233,7 @@ limitations under the License.
   </div>
 
   <script>
-    const FEATURE_NOTIFY_KEY = 'feature_v6_whats_new_dismissed';
+    const FEATURE_NOTIFY_KEY = 'feature_v7_whats_new_dismissed';
 
     function maybeShowFeatureNotify() {
       if (localStorage.getItem(FEATURE_NOTIFY_KEY)) return;

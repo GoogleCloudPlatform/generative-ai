@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v10.112-public',
+  APP_VERSION: 'v10.113-public',
   LOG_SHEET_URL: SCRIPT_PROPS.getProperty('LOG_SHEET_URL')
 };
 
@@ -890,6 +890,7 @@ function getTechnicalInstruction_() {
     "This visual MUST be in the style of a professional business document or slide (e.g., an Executive Summary card, a high-level business infographic) " +
     "that summarizes the insights. " +
     "**NO IMAGE TOOL RAW RESPONSE OUTFALL (CRITICAL)**: When you call 'generate_image', the system automatically handles the image rendering. You MUST NEVER copy, reference, or output the tool's JSON return payload (e.g., `{'status': 'success', 'detail': '...'}`) in your conversational text response. Do NOT write statements like 'Image generated successfully' or repeat the status dictionary. Keep your text focused purely on business insights.\n" +
+    "4b. **INTERACTIVE DASHBOARD**: Instruct the agent that it can publish a full interactive HTML dashboard (opened in a browser tab) via the 'publish_dashboard' tool whenever the user asks for a dashboard, an executive dashboard, or an interactive/clickable report. The agent first gathers aggregated numbers (e.g. via execute_sql), then authors ONE complete self-contained HTML document (inline CSS/JS, charts from a CDN, data embedded as a JSON snapshot, interactive tabs/filters/dark mode, all labels in the user's language), calls 'publish_dashboard', and presents the returned dashboard_url as a Markdown link like [Open Executive Dashboard](URL) — never a bare URL, never an A2UI/openUrl button. The dashboard is a point-in-time snapshot. As with images, NEVER output the tool's raw JSON return payload.\n" +
     "5. Instruct to wait for user input before acting, but be persistent in error recovery.\n" +
     "6. **TRANSPARENCY & GROUNDING (CRITICAL)**: Instruct the agent to be highly transparent about its reasoning, " +
     "explicitly mentioning which tables and files it is consulting and what specific values it found, " +
@@ -1454,6 +1455,7 @@ Output in the following JSON format. Output **pure JSON only without code blocks
         - **Prompt 6 (SCHEDULED WORKFLOW - Automated Monitoring)**: A prompt that explicitly asks for a RECURRING scheduled workflow. The agent must propose using scheduled task registration with a cron expression and explain the monitoring logic. Example style: 'Set up an automated daily check at 9am - scan for new threshold breaches since yesterday, auto-escalate critical ones, and send me a summary report each morning.' The agent should demonstrate register_scheduled_task and explain what the background agent will do autonomously on each scheduled run.
         - **Prompt 7 (End-to-End Strategic Automation)**: A complex prompt combining cross-source data analysis + conditional workflow execution + notification drafting + audit logging. This MUST require the agent to: (1) analyze data from multiple sources (BigQuery + Firestore + external file), (2) propose a multi-step workflow based on its findings, (3) execute with the appropriate execution mode, (4) draft a notification summary, and (5) create audit entries. This showcases the full spectrum of the agent's capabilities as an autonomous operator.
         - **NO EXPLICIT HITL IN PROMPTS (CRITICAL)**: The generated prompt text MUST NOT contain explicit instructions like 'Please wait for my approval' or 'Propose first'. Present the request as a straightforward business instruction (e.g., 'Register these anomalies as new compliance alerts in the database'). The agent will naturally implement the confirmation step autonomously based on its core system instructions!
+        - **INTERACTIVE DASHBOARD (MANDATORY)**: Exactly ONE of the 7 prompts MUST ask the agent to build an interactive dashboard the user can OPEN AND EXPLORE IN A BROWSER. The prompt text MUST contain an explicit open-in-browser / interactive signal (e.g. 'that I can open and explore in my browser', 'an interactive dashboard I can click into') - this is what makes the agent publish a hosted interactive page instead of a static summary slide. Do NOT phrase it as a pure 'summarize / analyze' request (e.g. avoid 'Generate a dashboard that summarizes ...'), because that reads as an analysis and yields a slide, not an interactive dashboard. Good example: 'Build me an interactive executive dashboard I can open in my browser and explore - key metrics, top segments, trends, and risk items.' Fold this into a natural overview or strategic prompt so the total stays EXACTLY 7. Phrase it generically (no product names).
     2. **PERSONA ROTATION (CRITICAL)**: Vary the tone and perspective by rotating personas for each prompt (e.g., CFO, Ops Manager, Regional Director, Front-line Lead).
     3. **EXTERNAL DATA NECESSITY & LOGICAL CONSISTENCY (CRITICAL)**: You MUST generate exactly one PDF file AND exactly one Excel file (.xlsx) unless it is completely impossible for the business context. The files generated MUST be external data (not inside the current system) and MUST be unstructured or semi-structured in format.
         - **LOGICAL LINKAGE**: ALL discrepancies or specific transaction IDs (e.g., "INV-7829") mentioned in the external file content MUST correspond to standard records that ACTUALLY EXIST inside the generated BigQuery CSV tables. Do NOT make up transaction IDs in the external file that do not exist in the database tables. This allows the user to find the anomaly by comparing the external file against the database.
@@ -4061,6 +4063,15 @@ if [ -z "$PROJECT_NUMBER" ]; then
   exit 1
 fi
 
+# --- Runtime SA + dashboards bucket (defined early so --cleanup can reference them) ---
+# COMPUTE_SA is the default Cloud Run runtime identity; DASH_BUCKET holds the
+# interactive HTML dashboards the agent publishes (non-public, served via V4 signed URLs).
+# Bucket name includes the demo name + suffix (like other resources); prefixed with the
+# globally-unique PROJECT_ID for global bucket-name uniqueness, and the redundant leading
+# "demo-" is stripped from dirName to stay within the 63-char GCS bucket-name limit.
+COMPUTE_SA="\${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+DASH_BUCKET="\${PROJECT_ID}-${dirName.replace(/^demo-/, '')}-dash"
+
 # --- Disk Space Check (Skip if in cleanup mode) ---
 if [ "$CLEANUP_MODE" != "true" ]; then
   echo "💾 Checking disk space..."
@@ -4094,6 +4105,7 @@ fi
     echo "  • Custom MCP Secrets in Secret Manager (if exist)"
     echo "  • Maps API Key Secret: ${dirName}-maps-key"
     echo "  • Agent Engine (Sandbox): ${dirName}-sandbox"
+    echo "  • Dashboards GCS Bucket: \$DASH_BUCKET (+ signBlob self-binding)"
     echo "  • Pub/Sub Topics: ${dirName}-sched-tasks, ${dirName}-task-results"
     echo "  • Pub/Sub Subscriptions: ${dirName}-sched-tasks-push, ${dirName}-task-results-push"
     echo "  • Cloud Scheduler Jobs: ${dirName}-sched-* (if any)"
@@ -4156,7 +4168,21 @@ fi
     else
       echo "   ⚠️  Live Viewer Function not found or already deleted."
     fi
-    
+
+    # --- Dashboards bucket + signBlob self-binding ---
+    echo "🪣 Deleting dashboards bucket: \$DASH_BUCKET ..."
+    if gcloud storage buckets describe "gs://\$DASH_BUCKET" >/dev/null 2>&1; then
+      gcloud storage rm --recursive "gs://\$DASH_BUCKET" --quiet 2>/dev/null && echo "   ✅ Dashboards bucket and objects deleted." || echo "   ⚠️  Failed to delete dashboards bucket."
+    else
+      echo "   ⚠️  Dashboards bucket not found or already deleted."
+    fi
+
+    echo "🔐 Removing signBlob (token-creator) self-binding on the runtime SA..."
+    gcloud iam service-accounts remove-iam-policy-binding "\$COMPUTE_SA" \
+      --member="serviceAccount:\$COMPUTE_SA" \
+      --role="roles/iam.serviceAccountTokenCreator" \
+      --project="$PROJECT_ID" --quiet >/dev/null 2>&1 && echo "   ✅ signBlob self-binding removed." || echo "   ⚠️  Self-binding not present or removal failed."
+
 
 
 
@@ -4547,7 +4573,7 @@ COMPUTE_SA="\${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 grant_roles_fast "$PROJECT_ID" "serviceAccount" "\$COMPUTE_SA" \
   "roles/mcp.toolUser" "roles/bigquery.jobUser" "roles/bigquery.dataEditor" \
   "roles/serviceusage.serviceUsageConsumer" "roles/aiplatform.user" "roles/logging.logWriter" \
-  "roles/datastore.user" "roles/storage.objectViewer" "roles/artifactregistry.admin" "roles/run.invoker" \
+  "roles/datastore.user" "roles/storage.objectViewer" "roles/storage.objectAdmin" "roles/artifactregistry.admin" "roles/run.invoker" \
   "roles/pubsub.publisher" "roles/cloudscheduler.admin" "roles/dataplex.catalogViewer"
 
 # Background task infra: Cloud Scheduler SA needs pubsub.publisher
@@ -4558,6 +4584,42 @@ grant_roles_fast "$PROJECT_ID" "serviceAccount" "\$SCHED_SA" "roles/pubsub.publi
 echo "🔐 Configuring IAM permissions for Discovery Engine Service Agent..."
 DISCOVERY_ENGINE_SA="service-\${PROJECT_NUMBER}@gcp-sa-discoveryengine.iam.gserviceaccount.com"
 grant_roles_fast "$PROJECT_ID" "serviceAccount" "\$DISCOVERY_ENGINE_SA" "roles/run.invoker"
+
+# --- Dashboards: signBlob self-binding + non-public bucket for interactive HTML dashboards ---
+# The runtime SA has no key file, so V4 signed URLs are minted via the IAM signBlob API.
+# That requires the SA to hold token-creator on ITSELF (a resource-level binding on the
+# SA, not a project-level role -- so it cannot go through grant_roles_fast).
+echo "🔐 Granting signBlob (token-creator) on the runtime SA to itself..."
+if gcloud iam service-accounts add-iam-policy-binding "\$COMPUTE_SA" \
+    --member="serviceAccount:\$COMPUTE_SA" \
+    --role="roles/iam.serviceAccountTokenCreator" \
+    --project="$PROJECT_ID" --quiet >/dev/null 2>&1; then
+  echo "  ✅ signBlob self-binding granted."
+else
+  echo "  ⚠️  Failed to grant signBlob self-binding (V4 signed URLs may fail)."
+fi
+
+echo "🪣 Creating non-public dashboards bucket: \$DASH_BUCKET ..."
+if gcloud storage buckets describe "gs://\$DASH_BUCKET" >/dev/null 2>&1; then
+  echo "  ⏭ Bucket already exists."
+else
+  if _DASH_CREATE_ERR=\$(gcloud storage buckets create "gs://\$DASH_BUCKET" \
+      --project="$PROJECT_ID" \
+      --location=us-central1 \
+      --uniform-bucket-level-access \
+      --public-access-prevention 2>&1); then
+    echo "  ✅ Bucket created (uniform access; public access prevention enforced)."
+  else
+    echo "  ⚠️  Bucket create failed. gcloud reported:"
+    echo "\$_DASH_CREATE_ERR" | sed 's/^/       /'
+    echo "       (Dashboards will not work until this bucket exists. Re-run after resolving,"
+    echo "        or create it manually with the same name: \$DASH_BUCKET)"
+  fi
+fi
+
+# No object lifecycle rule: published dashboards persist so they stay viewable from the
+# Cloud Console (and re-signable) after the signed URL expires. The whole bucket is
+# removed on --cleanup.
 
 # Enable MCP services (parallel for speed)
 echo "🔧 Enabling MCP services (parallel)..."
@@ -4951,6 +5013,8 @@ ADK_ENABLE_MCP_GRACEFUL_ERROR_HANDLING=1
 ADK_DISABLE_JSON_SCHEMA_FOR_FUNC_DECL=1
 AGENT_MODEL="$AGENT_MODEL"
 AGENT_MODEL_LITE="$AGENT_MODEL_LITE"
+DASHBOARDS_BUCKET="$DASH_BUCKET"
+RUNTIME_SA_EMAIL="$COMPUTE_SA"
 __ENV_EOF__
 
 # Conditionally add Data Viewer URL if deployed
@@ -5786,6 +5850,152 @@ async def generate_image(prompt: str, tool_context: ToolContext) -> dict:
         'status': 'success',
         'detail': 'Image generated successfully. It will be attached to your final response automatically.',
     }
+
+
+# =====================================================================
+# Interactive HTML Dashboard publisher.
+# The model authors a complete, self-contained interactive HTML dashboard
+# (inline CSS/JS, chart lib from CDN, data embedded as a JSON literal) built
+# from the demo's data. This tool uploads it to a NON-PUBLIC GCS bucket and
+# returns a time-limited V4 signed URL that the agent surfaces as a Markdown
+# link. The dashboard is a point-in-time snapshot (a signed static object
+# cannot run server-side queries).
+# =====================================================================
+def _get_runtime_sa_email():
+    """Resolve the runtime service account email (env first, metadata fallback)."""
+    email = os.environ.get("RUNTIME_SA_EMAIL", "").strip()
+    if email:
+        return email
+    try:
+        import requests
+        resp = requests.get(
+            "http://metadata.google.internal/computeMetadata/v1/"
+            "instance/service-accounts/default/email",
+            headers={"Metadata-Flavor": "Google"},
+            timeout=5.0,
+        )
+        if resp.status_code == 200:
+            return resp.text.strip()
+    except Exception:
+        pass
+    return ""
+
+
+def _generate_v4_signed_url(bucket_name, object_name, content_type, expiration_days=7):
+    """Mint a V4 signed GET URL using ADC + IAM signBlob (no key file on Cloud Run).
+
+    Passing service_account_email + access_token makes the storage client sign
+    remotely via the IAM signBlob API, which requires the runtime SA to hold
+    roles/iam.serviceAccountTokenCreator on itself.
+    """
+    from google.cloud import storage
+    from datetime import timedelta
+    import google.auth
+    import google.auth.transport.requests
+    import requests as _requests
+
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    creds, _ = google.auth.default(scopes=scopes)
+
+    # Refresh with a bounded-timeout session so a slow metadata endpoint cannot
+    # deadlock the event loop on a Cloud Run cold start.
+    class _TimeoutSession(_requests.Session):
+        def request(self, *a, **k):
+            k.setdefault("timeout", 10.0)
+            return super().request(*a, **k)
+
+    creds.refresh(google.auth.transport.requests.Request(session=_TimeoutSession()))
+
+    sa_email = _get_runtime_sa_email()
+    if not sa_email:
+        raise RuntimeError("Could not resolve the runtime service account email for signing")
+
+    client = storage.Client(credentials=creds)
+    blob = client.bucket(bucket_name).blob(object_name)
+    return blob.generate_signed_url(
+        version="v4",
+        expiration=timedelta(days=min(expiration_days, 7)),  # V4 hard max is 7 days
+        method="GET",
+        service_account_email=sa_email,
+        access_token=creds.token,
+        response_type=content_type,
+    )
+
+
+async def publish_dashboard(html: str, title: str, tool_context: ToolContext) -> dict:
+    """Publishes a complete, interactive HTML dashboard and returns a shareable link.
+
+    Use this when the user asks for an interactive dashboard, an executive
+    dashboard, a clickable/visual report, or "something I can open in the browser".
+    You author the ENTIRE dashboard yourself and pass it as one self-contained HTML
+    document. The dashboard is a point-in-time SNAPSHOT of the data you embed -- it
+    is NOT live -- so fetch the numbers first (e.g. via execute_sql) and embed them.
+
+    Requirements for the html argument:
+      - A single, self-contained HTML document (<!DOCTYPE html> ... </html>).
+      - Inline ALL CSS and JavaScript. Do NOT reference local files.
+      - Load chart libraries from a CDN (e.g. https://cdn.jsdelivr.net/npm/chart.js).
+      - Embed the data directly in the page as a JSON literal (const DATA = {...};).
+      - Make it interactive. The page MUST include ALL of:
+          * a data table with click-to-sort columns (asc/desc toggle),
+          * a free-text search box that live-filters the table rows,
+          * category filter controls (dropdowns / toggle chips) for key dimensions,
+          * tabbed sections (e.g. Overview / Details) via pure-JS show/hide,
+          * charts with hover tooltips,
+          * a light/dark mode toggle.
+      - Chart sizing: wrap every <canvas> in a fixed-height container (e.g.
+        height:320px) and set Chart.js maintainAspectRatio:false + responsive:true,
+        so charts never grow to fill the page. Constrain overall page width with a
+        centered max-width wrapper and responsive grids so the layout fits the screen.
+      - Theming: drive ALL colors from CSS variables (light on :root, dark under
+        html[data-theme='dark']); every surface reads bg+text from them. Do NOT
+        hardcode colors on individual elements, or the other theme becomes unreadable.
+        Ensure strong contrast in BOTH modes.
+      - Write ALL visible text in the SAME language the user is using in the chat.
+      - State on the page that the data is a point-in-time snapshot, not live.
+
+    Args:
+        html: The full self-contained HTML document for the dashboard.
+        title: A short human-readable dashboard title (used for logging/labels).
+
+    Returns:
+        A dictionary with keys: status, detail, dashboard_url.
+    """
+    import uuid as _uuid
+    import logging as _logging
+    bucket = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+    if not bucket:
+        return {'status': 'error',
+                'detail': 'Dashboard hosting is not configured (DASHBOARDS_BUCKET missing).',
+                'dashboard_url': ''}
+    if not html or "<" not in html:
+        return {'status': 'error',
+                'detail': 'The html argument must be a complete, self-contained HTML document.',
+                'dashboard_url': ''}
+    object_name = f"dashboards/dash_{_uuid.uuid4().hex}.html"
+    _ct = "text/html; charset=utf-8"
+
+    def _upload_and_sign():
+        from google.cloud import storage
+        client = storage.Client()
+        blob = client.bucket(bucket).blob(object_name)
+        blob.upload_from_string(html, content_type=_ct)
+        return _generate_v4_signed_url(bucket, object_name, _ct)
+
+    try:
+        url = await asyncio.to_thread(_upload_and_sign)
+        # Never log the full signed URL: the query-string token grants read access.
+        _logging.info("publish_dashboard: uploaded %s and minted a signed URL.", object_name)
+        return {
+            'status': 'success',
+            'detail': 'Dashboard published. Present dashboard_url to the user as a Markdown '
+                      'link like [Open Executive Dashboard](URL). Do not print the raw URL.',
+            'dashboard_url': url,
+        }
+    except Exception as e:
+        _logging.error(f"publish_dashboard failed: {e}", exc_info=True)
+        return {'status': 'error', 'detail': f'Failed to publish dashboard: {str(e)}',
+                'dashboard_url': ''}
 
 ${ enableComputerUse ? `
 # =====================================================================
@@ -9384,7 +9594,7 @@ CRITICAL OPERATIONAL RULES:
         1. In the first turn, you MUST provide the full, comprehensive text analysis in your response *along with* the tool call to \\\`generate_image\\\`. Do NOT wait for the tool to complete to provide the main analysis text.
         2. After the tool returns success, let the system automatically attach the image. Your FINAL response for the turn MUST still contain the complete deliverable — the analysis report text and/or its A2UI cards, PLUS the suggestion chips — so the auto-attached image appears together with the report (a brief confirmation alone is only acceptable if the full analysis was already delivered in step 1). You MUST NEVER end the turn with only a progress/working note (e.g. "executing...", "analyzing...", or its localized equivalent); such filler is NOT a valid final response and causes the report to be dropped. If you have generated an image, you MUST go on to produce the full report, A2UI cards, and suggestion chips in the same turn — never stop immediately after the image.
     * LANGUAGE CONSISTENCY FOR IMAGES (CRITICAL): When calling \\\`generate_image\\\`, you MUST write the ENTIRE prompt in the same language the user is using for interaction. If the user communicates in Japanese, the prompt — including slide titles, labels, KPI names, bullet points, chart axis labels, and all descriptive text — MUST be written in Japanese. Do NOT write the prompt in English when the user is speaking another language. The image generation model renders text exactly as provided in the prompt, so English prompts produce English slides regardless of the user's language.
-    * PROACTIVE VISUALIZATION (WOW MOMENT — CRITICAL): The FIRST time in a session you complete a flagship analysis (a predictive, diagnostic, or audit finding that cross-references multiple data sources), you MUST call \\\`generate_image\\\` to produce an executive-summary slide of the findings WITHOUT waiting for the user to ask, following the TURN SPLITTING rule (full text analysis + cards are delivered alongside, so the user never waits on the image alone). Do this at most ONCE per session proactively; for subsequent major analyses, offer it via a suggestion chip instead.
+    * PROACTIVE VISUALIZATION (WOW MOMENT — CRITICAL): The FIRST time in a session you complete a flagship analysis (a predictive, diagnostic, or audit finding that cross-references multiple data sources), you MUST call \\\`generate_image\\\` to produce an executive-summary slide of the findings WITHOUT waiting for the user to ask, following the TURN SPLITTING rule (full text analysis + cards are delivered alongside, so the user never waits on the image alone). Do this at most ONCE per session proactively; for subsequent major analyses, offer it via a suggestion chip instead. EXCEPTION (TOOL CHOICE): if the user asked for an INTERACTIVE / clickable / open-in-browser dashboard, that is a \\\`publish_dashboard\\\` request - a static \\\`generate_image\\\` slide MUST NOT be used as a substitute for it. Fulfil it with \\\`publish_dashboard\\\` (a slide may accompany but never replaces the interactive dashboard link).
     * VISUALIZATION CHIP (MANDATORY): After every major analysis result card (when you did not just generate an image for it), the suggestion chips MUST include one chip offering to visualize THIS result as an executive summary slide, with the chip's sendText context carrying a specific request referencing the analysis just delivered.
     * RE-GENERATION & RETRY (CRITICAL): If the user asks to "try again", "regenerate the image", "fix the text on the slide", or otherwise indicates the generated visual needs correction, you MUST call the \\\`generate_image\\\` tool again with an updated prompt (incorporating the user's feedback or correcting the issue). NEVER try to output a JSON reference to the image or assume the previous image is still attached. You MUST trigger a new \\\`generate_image\\\` tool call.
     * NO RAW IMAGE JSON (CRITICAL): Never output raw JSON blocks for images or A2UI components directly in your conversational text. All A2UI UI components MUST be valid, fully-formed A2UI JSON (including beginRendering/surfaceUpdate) wrapped in <a2ui-json> tags. NEVER write partial or loose JSON objects like \\\`{"image": ...}\\\` or \\\`{"Image": ...}\\\` in your text response.
@@ -9491,6 +9701,77 @@ if _viewer_url:
         "When you create a background task, mention that the user can monitor it in the Data Viewer Tasks tab: "
         "[View Task Status](" + _viewer_url + ")\\n\\n"
         "--- END DATA VIEWER INTEGRATION ---\\n"
+    )
+
+# --- Interactive dashboard publishing (publish_dashboard) ---
+if os.environ.get("DASHBOARDS_BUCKET", ""):
+    instruction += (
+        "\\n\\n--- INTERACTIVE DASHBOARD (MANDATORY) ---\\n"
+        "You can publish a full interactive HTML dashboard that the user opens in a browser "
+        "tab, using the publish_dashboard tool. Use it whenever the user asks for an "
+        "INTERACTIVE dashboard, a clickable/explorable dashboard or report, an 'interactive "
+        "executive dashboard', or 'something I can open in the browser'. The word "
+        "'interactive' (or 'clickable' / 'open in the browser' / 'explore') is the signal - "
+        "act on it even if the same request also says 'summarize' or 'analyze'.\\n\\n"
+        "TOOL CHOICE (CRITICAL - do NOT substitute a slide): For an interactive dashboard "
+        "request, publish_dashboard TAKES PRECEDENCE over generate_image. generate_image "
+        "produces a STATIC image slide and MUST NOT be used as a replacement for an "
+        "interactive dashboard. You may optionally add a generate_image summary slide "
+        "ALONGSIDE, but you MUST still call publish_dashboard and deliver the link.\\n\\n"
+        "(A plain 'overview / snapshot / current numbers' request WITHOUT an interactive/"
+        "open-in-browser signal is still a fast inline card - do not publish a page for it.)\\n\\n"
+        "EXECUTION DISCIPLINE (CRITICAL - PREVENTS DEAD-END TURNS):\\n"
+        "- Your VERY FIRST action for a dashboard request MUST be an actual tool call "
+        "(execute_sql / execute_sql_readonly to gather the numbers). Do NOT reply with only a "
+        "progress/status line, and do NOT emit a bare 'I am gathering data...' message with no "
+        "accompanying tool call - that ends the turn with nothing.\\n"
+        "- Do NOT finish the turn (no final summary, no suggestion chips) until publish_dashboard "
+        "has returned a dashboard_url. Gathering data then stopping is a FAILURE.\\n\\n"
+        "HOW TO USE:\\n"
+        "1. First gather the numbers you need (call execute_sql / execute_sql_readonly with "
+        "server-side aggregations - do NOT dump raw rows).\\n"
+        "2. Author ONE complete, self-contained HTML document: inline ALL CSS and JavaScript, "
+        "load charts from a CDN (e.g. https://cdn.jsdelivr.net/npm/chart.js), embed the data as "
+        "a JSON literal, and write every visible label in the user's language.\\n"
+        "3. Call publish_dashboard(html=..., title=...). It returns a dashboard_url.\\n\\n"
+        "REQUIRED INTERACTIVE FEATURES (the HTML MUST include ALL of these):\\n"
+        "- A data table with CLICK-TO-SORT columns (ascending/descending toggle).\\n"
+        "- A free-text SEARCH box that filters the table rows live.\\n"
+        "- Category FILTER controls (e.g. dropdowns / toggle chips) for the key dimensions.\\n"
+        "- TABBED sections (e.g. Overview / Details) with pure-JS show/hide.\\n"
+        "- Charts with hover TOOLTIPS.\\n"
+        "- A light/DARK MODE toggle.\\n"
+        "Implement all of the above as inline client-side JavaScript in the single HTML file.\\n\\n"
+        "THEMING (BOTH light AND dark MUST be fully legible - CRITICAL):\\n"
+        "- Drive EVERY color from CSS custom properties: define the light palette on :root and "
+        "the dark overrides under a single selector html[data-theme='dark']; the toggle only "
+        "sets/removes that attribute on <html>.\\n"
+        "- EVERY surface (body, KPI cards, tables, header row, chips/badges, inputs, dropdowns, "
+        "tabs) MUST read its background AND text color from those variables. Do NOT hardcode a "
+        "dark background or light text on any individual element - a hardcoded color is exactly "
+        "what stays wrong (unreadable) in the OTHER theme.\\n"
+        "- Guarantee strong text-on-background contrast in BOTH modes, and set the initial theme "
+        "explicitly on <html> when the page loads.\\n\\n"
+        "LAYOUT & CHART SIZING (CRITICAL - prevents charts blowing up the page):\\n"
+        "- Wrap EVERY chart <canvas> in a container div with a FIXED height, e.g. "
+        "<div style='position:relative;height:320px'><canvas ...></canvas></div>.\\n"
+        "- In Chart.js options ALWAYS set maintainAspectRatio:false together with responsive:true. "
+        "Never leave a canvas to size itself - otherwise it grows to the column width and can "
+        "render thousands of pixels tall.\\n"
+        "- Constrain the overall page width with a centered max-width wrapper (e.g. ~1280px) and "
+        "use responsive CSS grids so the whole layout fits the viewport on laptop and wide screens.\\n\\n"
+        "LINK FORMAT RULE (CRITICAL - MUST FOLLOW EXACTLY):\\n"
+        "Present the returned dashboard_url using Markdown link syntax ONLY:\\n"
+        "  RIGHT: [Open Executive Dashboard](DASHBOARD_URL)\\n"
+        "  WRONG (plain URL): DASHBOARD_URL\\n"
+        "  WRONG (button): an A2UI/openUrl button (openUrl is NOT supported in A2UI v0.8)\\n"
+        "Always use [link text](URL) format. NEVER output a bare URL.\\n\\n"
+        "CRITICAL RULES:\\n"
+        "- Use the dashboard_url returned by the tool VERBATIM. NEVER invent or modify it.\\n"
+        "- NEVER paste the tool's raw JSON return payload into your reply.\\n"
+        "- Tell the user the dashboard is a point-in-time snapshot (not live) and the link is "
+        "time-limited (valid up to 7 days).\\n"
+        "--- END INTERACTIVE DASHBOARD ---\\n"
     )
 ${ enableComputerUse ? `
 # --- Computer Use (browser agent) routing ---
@@ -9753,6 +10034,7 @@ _all_tools = [t for t in ${ enableWorkspaceMcp ? `[maps_toolset, bigquery_toolse
 
 _all_tools.append(tools.write_operational_alert)
 _all_tools.append(tools.save_document_to_db)
+_all_tools.append(tools.publish_dashboard)
 
 # --- Background task management tools ---
 _all_tools.append(tools.background_task_tool)
@@ -9857,7 +10139,7 @@ INLINE_TOOL_DEADLINE = _itb_contextvars.ContextVar('inline_tool_deadline', defau
 # inline result (confirmed: image at +74s -> overran 115s). Blocking it after
 # this earlier cutoff reserves time for the headline compute + report synthesis.
 INLINE_IMAGE_DEADLINE = _itb_contextvars.ContextVar('inline_image_deadline', default=None)
-_INLINE_GATE_EXEMPT_TOOLS = frozenset(('transfer_to_agent', 'register_background_task', 'computer_use_browse', 'start_browser_session'))
+_INLINE_GATE_EXEMPT_TOOLS = frozenset(('transfer_to_agent', 'register_background_task', 'computer_use_browse', 'start_browser_session', 'publish_dashboard'))
 
 def _inline_tool_budget_gate(tool, args, tool_context):
     """Skip the tool call once the inline wall-clock budget is exhausted."""
@@ -10559,6 +10841,20 @@ Transfer to deep_analysis_agent when the request requires BOTH:
    identify patterns/trends, draw conclusions, or produce strategic recommendations
    (e.g. identifying discrepancies, mismatches, or reconciliation anomalies).
 
+INTERACTIVE DASHBOARD REQUESTS (ALWAYS DELEGATE — regardless of the two conditions
+above): When the user asks for an INTERACTIVE dashboard — signalled by the word
+"interactive" (or "clickable" / "explorable" / "open in the browser" / "a page I can
+open") applied to a dashboard/report — make transfer_to_agent('deep_analysis_agent')
+your VERY FIRST action. This holds even if the SAME request also says "summarize" or
+"analyze" (e.g. "an interactive executive dashboard that summarizes ..." IS an
+interactive-dashboard request — delegate it; do NOT treat it as an analysis-plus-slide
+job). Do NOT author the HTML yourself and do NOT run the queries in root. Building that
+dashboard means writing a complete self-contained interactive HTML document, which the
+specialist model does far more reliably; the specialist gathers the data, calls
+publish_dashboard, and returns the Markdown link. (A plain "overview / snapshot"
+WITHOUT an interactive/openable signal is still a quick-look you answer inline
+yourself — see OVERVIEW / QUICK-LOOK below.)
+
 OVERVIEW / QUICK-LOOK (ANSWER CONCISELY YOURSELF — DO NOT DELEGATE):
 A large share of requests ask for a high-level SNAPSHOT, not a deep analysis.
 These you handle YOURSELF and complete in seconds — never transfer them to
@@ -10570,6 +10866,12 @@ deep_analysis_agent. Signals (in ANY language):
   button that sends "Show me the current onboarding funnel performance").
 The defining trait: the user wants the HEADLINE numbers / current state, NOT a
 multi-step investigation, root-cause, forecast, or strategic recommendation.
+EXCEPTION: if the request carries an INTERACTIVE signal (the word "interactive" /
+"clickable" / "explorable" / "open in the browser" applied to the dashboard), that is
+NOT a quick-look — delegate it to deep_analysis_agent to build via publish_dashboard
+(see INTERACTIVE DASHBOARD REQUESTS above), even if it also says "summarize". The
+plain-word "dashboard" alone (no interactive signal) still means a quick-look card
+here; only an interactive/openable one is delegated.
 
 HOW TO ANSWER AN OVERVIEW (root, inline, fast):
 1. Run AT MOST 1-2 bounded aggregate queries (each a single GROUP BY / COUNT /
@@ -11672,7 +11974,7 @@ from fastapi import FastAPI
 from google.adk.a2a.executor.a2a_agent_executor import A2aAgentExecutor
 from google.adk.a2a.converters.utils import _get_adk_metadata_key
 from google.adk.a2a.utils.agent_card_builder import AgentCardBuilder
-from google.adk.artifacts import GcsArtifactService, InMemoryArtifactService
+from google.adk.artifacts import InMemoryArtifactService
 from google.adk.apps.app import App, EventsCompactionConfig
 from google.adk.plugins import ReflectAndRetryToolPlugin, LoggingPlugin
 from google.adk.runners import Runner
@@ -12684,12 +12986,7 @@ def _build_preflight_card_parts(plan, scope_text):
         logger.log_text("[preflight_gate] card build failed (fail-open): " + str(_e)[:200])
         return None
 
-logs_bucket_name = os.environ.get("LOGS_BUCKET_NAME")
-artifact_service = (
-    GcsArtifactService(bucket_name=logs_bucket_name)
-    if logs_bucket_name
-    else InMemoryArtifactService()
-)
+artifact_service = InMemoryArtifactService()
 
 runner = Runner(
     app=adk_app,
@@ -15991,7 +16288,9 @@ gcloud services enable secretmanager.googleapis.com
       "GEMINI_AUTHORIZATION_ID=\$AUTH_ID",
       "ADK_ENABLE_MCP_GRACEFUL_ERROR_HANDLING=1",
       "ADK_DISABLE_JSON_SCHEMA_FOR_FUNC_DECL=1",
-      `DEMO_ID=${dirName}`
+      `DEMO_ID=${dirName}`,
+      "DASHBOARDS_BUCKET=\$DASH_BUCKET",
+      "RUNTIME_SA_EMAIL=\$COMPUTE_SA"
     ];
     let secrets = [];
     let optionalSecrets = [];
