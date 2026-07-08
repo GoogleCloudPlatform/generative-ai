@@ -455,7 +455,7 @@ The system is divided into two main parts: the **Generator Dashboard** (the Apps
 
 #### Frontend (`index.html`)
 
-A Tailwind-based Single Page Application (~328 KB, ~5,700 lines) that provides:
+A Tailwind-based Single Page Application (~388 KB, ~7,000 lines) that provides:
 
 - **Demo Wizard**: Step-by-step UI to input business requirements, configure options (row count, table count, public dataset enrichment), and generate the demo.
 - **Customer Domain Research**: Gemini-powered company research via Google Search grounding — automatically identifies business challenges and agent-automatable workflows from a customer's domain.
@@ -472,7 +472,7 @@ A Tailwind-based Single Page Application (~328 KB, ~5,700 lines) that provides:
 
 #### Backend (`Code.gs`)
 
-A monolithic Google Apps Script file (~8,100 lines, ~389 KB) that contains:
+A monolithic Google Apps Script file (~17.7k lines, ~952 KB) that contains:
 
 | Module | Key Functions | Description |
 |---|---|---|
@@ -642,6 +642,7 @@ The A2UI integration provides rich interactive UI components in Gemini Enterpris
 | **BigQuery MCP** | StreamableHTTP | SQL execution (SELECT + full DML), schema exploration |
 | **Google Maps MCP** | StreamableHTTP | Places, routes, geocoding |
 | **Firestore MCP** | StreamableHTTP | Document CRUD, collection management |
+| **Dataplex (Knowledge Catalog) MCP** | StreamableHTTP | Semantic asset discovery, entry lookup, and relationship context mapping |
 
 #### MCP Server Catalog
 
@@ -692,6 +693,7 @@ graph TD
         RootAgent --> BQToolset[BigQuery MCP]
         RootAgent --> MapsToolset[Maps MCP]
         RootAgent --> FSToolset[Firestore MCP]
+        RootAgent --> DPToolset[Dataplex MCP]
         RootAgent --> SlackMCP[Slack MCP - optional]
         RootAgent --> CustomMCP[Custom MCP - optional]
         RootAgent --> WorkspaceMCP[Workspace MCP - optional]
@@ -699,10 +701,12 @@ graph TD
         DeepAgent --> BQToolset
         DeepAgent --> MapsToolset
         DeepAgent --> FSToolset
+        DeepAgent --> DPToolset
         
         BackgroundAgent --> BQToolset
         BackgroundAgent --> MapsToolset
         BackgroundAgent --> FSToolset
+        BackgroundAgent --> DPToolset
         BackgroundAgent --> CustomMCP
     end
 
@@ -710,6 +714,7 @@ graph TD
         BQToolset --> BigQuery[(BigQuery Dataset)]
         MapsToolset --> GoogleMaps[Google Maps API]
         FSToolset --> FirestoreDB
+        DPToolset --> Dataplex[(Dataplex Catalog)]
         SlackMCP --> SlackAPI[Slack API]
         CustomMCP --> ExternalSystem[External System e.g. Redmine]
         WorkspaceMCP --> Workspace[Gmail / Drive / Calendar / People]
@@ -725,6 +730,11 @@ graph TD
     BackgroundAgent -- "generate_image" --> GeminiImage
     GeminiImage --> GCSArtifact[(GCS Artifact Bucket)]
     GCSArtifact --> GE
+
+    RootAgent -- "publish_dashboard" --> GCSDash[(GCS Dashboards Bucket)]
+    DeepAgent -- "publish_dashboard" --> GCSDash
+    BackgroundAgent -- "publish_dashboard" --> GCSDash
+    GCSDash --> GE
 
     GE -- "User Action / Approval" --> A2AServer
 ```
@@ -759,8 +769,12 @@ graph LR
         CR -- "StreamableHTTP" --> BQ_MCP[BigQuery MCP Server]
         CR -- "StreamableHTTP" --> Maps_MCP[Maps MCP Server]
         CR -- "StreamableHTTP" --> FS_MCP[Firestore MCP Server]
+        CR -- "StreamableHTTP" --> DP_MCP[Dataplex MCP Server]
         CR -- "StreamableHTTP" --> Slack_MCP[Slack MCP Server<br/>optional managed]
-        CR -- "Gemini Flash Image" --> GeminiImg[Gemini Image Gen]
+        CR -- "GCS Upload & Sign" --> GCSArtifact[(GCS Artifact Bucket<br/>images)]
+        CR -- "GCS Upload & Sign" --> GCSDash[(GCS Dashboards Bucket<br/>interactive HTML)]
+        GCSArtifact -. "Render URL" .-> GE
+        GCSDash -. "Open Link" .-> GE
         Viewer[Data Viewer<br/>Cloud Run Functions Gen2]
         Viewer -. "Firestore Client" .-> FS[(Firestore)]
     end
@@ -775,7 +789,7 @@ After running the setup script, the following directory structure is created:
 ```
 ~/demo-<domain>-<suffix>/
 ├── setup-demo-<domain>-<suffix>.sh   # The setup script itself
-├── .venv/                             # Python virtual environment
+├── .venv/                             # (Optional) Python virtual environment (for local autocomplete)
 ├── .env                               # Runtime environment variables
 │                                      # (AGENT_MODEL, AGENT_MODEL_LITE, etc.)
 ├── .python-version                    # Python 3.11
