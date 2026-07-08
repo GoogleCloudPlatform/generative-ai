@@ -228,7 +228,7 @@ When a user generates a demo through the web UI, the tool:
      - **[2] Cloud Run**: Builds a Docker image and deploys to Cloud Run with `--min-instances 1`
      - **[3] Gemini Enterprise**: Deploys to Cloud Run + registers the agent in Gemini Enterprise via the Discovery Engine API
 
-For a detailed walkthrough, see [tutorial.md](tutorial.md).
+For a detailed walkthrough, see [Section 7: Guided Walkthrough & Tutorial](#7-guided-walkthrough--tutorial).
 
 ---
 
@@ -236,17 +236,22 @@ For a detailed walkthrough, see [tutorial.md](tutorial.md).
 
 ```
 ge-demo-generator/
-├── appsscript.json          # Apps Script manifest (scopes, services, webapp)
-├── Code.gs                  # Backend: data generation, setup script synthesis
-├── index.html               # Frontend: SPA with demo wizard UI + MCP catalog
-├── SetupError.html          # Error page shown when Script Properties are missing
-├── package.json             # NPM scripts for clasp push/pull
+├── app/
+│   ├── appsscript.json      # Apps Script manifest (scopes, services, webapp)
+│   ├── Code.gs              # Backend: data generation, setup script synthesis
+│   ├── index.html           # Frontend: SPA with demo wizard UI + MCP catalog
+│   ├── SetupError.html      # Error page shown when Script Properties are missing
+│   └── package.json         # NPM script hooks
 ├── .clasp.json              # (git-ignored) Your Script ID config
-├── .claspignore             # Controls which files are pushed to Apps Script
-├── tutorial.md              # Cloud Shell interactive tutorial
-├── ARCHITECTURE.md          # System architecture documentation
-├── AGENTS.md                # AI agent development guide
-└── README.md                # This file
+├── deploy.sh                # Clasp deployment orchestrator script
+├── validate_examples.py     # Checks syntax of embedded examples in Code.gs
+├── gebe-demo-generator/     # (Subproject) Drive/Docs provisioning engine
+│   ├── appsscript.json
+│   ├── Code.gs
+│   ├── index.html
+│   ├── SetupError.html
+│   └── README.md
+└── README.md                # This file (contains all documentation)
 ```
 
 ---
