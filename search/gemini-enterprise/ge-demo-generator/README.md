@@ -740,7 +740,7 @@ bash setup-demo-xxx.sh --cleanup
 
 The script automates the full deployment flow:
 1. **Cloud Run Deployment**: The FastAPI Agent is containerized and deployed to Cloud Run with `--min-instances 0` to avoid continuous running costs while ensuring availability.
-2. **Gemini Enterprise Registration**: The script scans for existing Gemini Enterprise apps in your GCP project (regions: `global`, `us`, `eu`) and automatically registers the Cloud Run agent service URL.
+2. **Gemini Enterprise Registration**: The script scans for existing Gemini Enterprise apps in your Google Cloud project (regions: `global`, `us`, `eu`) and automatically registers the Cloud Run agent service URL.
 
 ### Deployment Architecture
 
