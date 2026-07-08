@@ -477,7 +477,7 @@ This will remove:
 ---
 
 ### Need Help?
-Refer to the [GitHub Repository](https://github.com/ryotat7/ge-demo-generator) for documentation and architecture details.
+Refer to the sections above for comprehensive documentation, system architecture, and the developer guide.
 
 ---
 

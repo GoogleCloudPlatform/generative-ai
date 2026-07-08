@@ -27,7 +27,12 @@
 
 set -euo pipefail
 
-DEPLOYMENT_ID="${DEPLOYMENT_ID:-AKfycbxL84crJM36plCKcHsz5d0sp_h4Sk21lgTD6chIFk9t42ABggzodjaTIrV5ovWOlpMShA}"
+DEPLOYMENT_ID="${DEPLOYMENT_ID:-}"
+if [ -z "${DEPLOYMENT_ID}" ]; then
+  echo "❌ Error: DEPLOYMENT_ID environment variable is required."
+  echo "   Usage: DEPLOYMENT_ID=YOUR_DEPLOYMENT_ID bash deploy.sh"
+  exit 1
+fi
 CLASP="npx --registry https://registry.npmjs.org @google/clasp@latest"
 
 # 1. Extract APP_VERSION from Code.gs
