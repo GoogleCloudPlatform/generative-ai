@@ -44,10 +44,10 @@ def main():
 
     # Read Code.gs
     try:
-        with open('Code.gs', 'r', encoding='utf-8') as f:
+        with open('app/Code.gs', 'r', encoding='utf-8') as f:
             content = f.read()
     except FileNotFoundError:
-        print("❌ Error: Code.gs not found in the current working directory.")
+        print("❌ Error: app/Code.gs not found in the current working directory.")
         sys.exit(1)
 
     # Regex to extract embedded example JSON heredocs inside Code.gs

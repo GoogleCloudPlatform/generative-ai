@@ -31,9 +31,9 @@ DEPLOYMENT_ID="AKfycbxL84crJM36plCKcHsz5d0sp_h4Sk21lgTD6chIFk9t42ABggzodjaTIrV5o
 CLASP="npx --registry https://registry.npmjs.org @google/clasp@latest"
 
 # 1. Extract APP_VERSION from Code.gs
-APP_VERSION=$(grep "APP_VERSION:" Code.gs | head -1 | sed "s/.*'\(.*\)'.*/\1/")
+APP_VERSION=$(grep "APP_VERSION:" app/Code.gs | head -1 | sed "s/.*'\(.*\)'.*/\1/")
 if [ -z "$APP_VERSION" ]; then
-  echo "❌ Could not extract APP_VERSION from Code.gs"
+  echo "❌ Could not extract APP_VERSION from app/Code.gs"
   exit 1
 fi
 echo "📦 Version: $APP_VERSION"

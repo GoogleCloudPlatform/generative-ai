@@ -44,10 +44,10 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 
 ## 2. Repository Setup
 
-1. Clone the repository:
+1. Clone the repository and navigate to the project directory:
    ```bash
-   git clone https://github.com/ryotat7/ge-demo-generator.git
-   cd ge-demo-generator
+   git clone https://github.com/GoogleCloudPlatform/generative-ai.git
+   cd generative-ai/search/gemini-enterprise/ge-demo-generator
    ```
 
 2. Install dependencies:
@@ -67,9 +67,9 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 1. Create a new Google Apps Script project at [script.google.com](https://script.google.com).
 2. Find the **Script ID**:
    - Open the Apps Script editor → **Project Settings** (Gear Icon) → **IDs** → copy the **Script ID**.
-3. Create a **`.clasp.json`** file in the project root (this file is Git-ignored):
+3. Create a **`.clasp.json`** file in the project root (`search/gemini-enterprise/ge-demo-generator/`) to point to your script and declare the `app` subdirectory (this file is Git-ignored):
    ```json
-   {"scriptId": "YOUR_SCRIPT_ID"}
+   {"scriptId": "YOUR_SCRIPT_ID", "rootDir": "app"}
    ```
 
 ---
