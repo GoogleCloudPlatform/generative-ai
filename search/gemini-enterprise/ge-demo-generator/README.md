@@ -17,7 +17,7 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - **A2UI (Agent-to-UI) Compliant**: Streams interactive Bento Grid layouts, Analytics Charts, and interactive confirmation cards using the A2UI SDK (`a2ui-agent-sdk`) via `<a2ui-json>` tags embedded in model responses. Integrates rich Welcome Card onboarding and step-by-step Workflow Execution Plan patterns.
 - **A2A Protocol Server**: The synthesized agent runs as a FastAPI-based A2A server on Cloud Run, compatible with Gemini Enterprise agent registration, and features a standalone `/execute_task` worker for background processing.
 - **Real-Time Persistence Layer**: The agent modifies Firestore via MCP, and a synthesized **Data Viewer** dashboard (Flask on Cloud Run Functions Gen2) watches Firestore collections and updates in real-time.
-- **Three Deployment Targets**: Local (Cloud Shell `adk web`), Cloud Run (public URL with `--min-instances 1`), and Gemini Enterprise (automated Cloud Run + Discovery Engine registration).
+- **Automated Cloud Run Deployment**: Containerized deployment to Cloud Run (with `--min-instances 0` to control standby costs) and automated Discovery Engine registration for Gemini Enterprise compatibility.
 - **Custom & Managed MCP Import**: Import third-party MCP servers from GitHub (bridged via `supergateway` stdio→StreamableHTTP) or integrate managed remote MCP servers (e.g., Slack with automated OAuth2 flow).
 - **Image Generation**: Built-in `generate_image` tool produces professional infographics and business summary visuals via `gemini-3.1-flash-image-preview`.
 - **Context Caching**: `ContextCacheConfig` aggressively caches system instructions and A2UI schemas to reduce time-to-first-token.
@@ -257,12 +257,11 @@ When a user generates a demo through the web UI, the tool:
    - Deploys a **Data Viewer** web app (Flask on Cloud Run Functions Gen2)
    - Scaffolds an ADK agent project with MCP toolsets, A2UI support, and an A2A FastAPI server exposing a chat agent (`root_agent` and `deep_analysis_agent` sub-agent) and a background worker (`background_agent` via `/execute_task` runner)
    - Defaults to **Gemini 3.5 Flash** for all three agents, with support for model override via `--model-analysis-agent` and `--model-root-agent` CLI flags
-   - Offers three deployment targets:
-     - **[1] Local**: Launches `adk web` on a local port
-     - **[2] Cloud Run**: Builds a Docker image and deploys to Cloud Run with `--min-instances 1`
-     - **[3] Gemini Enterprise**: Deploys to Cloud Run + registers the agent in Gemini Enterprise via the Discovery Engine API
+   - Automatically builds a container image and deploys the Agent FastAPI server to **Cloud Run** (with `--min-instances 0` to control standby costs).
+   - Provisions IAM bindings and environment configurations automatically.
+   - Discovers any existing Gemini Enterprise Apps in your project and registers the newly deployed Cloud Run agent automatically.
 
-For a detailed walkthrough, see [Section 7: Guided Walkthrough & Tutorial](#7-guided-walkthrough--tutorial).
+For a detailed walkthrough, see [Section 13: Guided Walkthrough & Tutorial](#13-guided-walkthrough--tutorial).
 
 ---
 
@@ -312,197 +311,125 @@ This removes:
 ---
 
 ## 13. Guided Walkthrough & Tutorial
-
-Welcome! This tutorial will guide you through the setup and execution of your synthesized BigQuery MCP Agent demo.
-
+ 
+Welcome! This tutorial will guide you through the setup and execution of your synthesized Gemini Enterprise agent demo.
+ 
 ### 13.1 Prerequisites
-
-Before we begin, ensure you have the necessary APIs enabled and the correct project selected.
-
-<walkthrough-project-setup>
-</walkthrough-project-setup>
-
-#### Set Your Project
-Ensure your Cloud Shell is targeting the correct project:
-
+ 
+Before we begin, ensure your Cloud Shell is targeting the correct project:
+ 
 <walkthrough-test-code-block>
 gcloud config set project {{project-id}}
 </walkthrough-test-code-block>
-
+ 
 ---
-
-### Step 1: Provision Demo Environment in Your Project
-
-The Demo Generator has synthesized a custom setup script for you. This script is responsible for provisioning the BigQuery dataset and setting up the agent code within YOUR Google Cloud environment.
-
+ 
+### Step 1: Provision & Deploy the Demo Environment
+ 
+The Demo Generator has synthesized a fully automated setup script for you. This script is responsible for:
+- Provisioning the BigQuery dataset and loading synthetic data.
+- Initializing the Firestore database with operational configurations.
+- Creating the necessary IAM policies and service account roles.
+- Building the container image and deploying the FastAPI Agent to **Cloud Run** in your project.
+- Deploying the real-time **Data Viewer** dashboard to **Cloud Run Functions (Gen2)**.
+- Attempting automatic registration of your agent inside **Gemini Enterprise**.
+ 
+To run it:
 1. Go back to the **ADK Agent Demo Generator** Web UI.
 2. Under **Step 3: Deploy**, click the **Copy** button next to the **Setup Script**.
-3. **Paste the command** into the Cloud Shell terminal window (at the bottom of your screen) and press **Enter**.
-
-> [!IMPORTANT]
-> This app does not provision resources directly. Running this script is the required step to create the demo environment in your own project.
-
-> **Note:** The script is uniquely named (e.g., `setup-demo-retail-inventory-831afa90.sh`) and creates a matching directory.
-
-```bash
-# Paste your setup command here in the terminal window below
-```
-
+3. **Paste the command** into your Cloud Shell terminal window (at the bottom of your screen) and press **Enter**.
+4. Confirm when prompted to verify the target Google Cloud project and proceed.
+ 
+The deployment process will output status messages and logs. Once done, it will print **Quick Access Links** to your terminal.
+ 
 ---
-
-### Step 2: Launch the Agent
-
-Once the setup script from Step 1 finishes, it will display the exact command to launch your agent. **Please follow the instructions shown in your terminal.**
-
-### 📎 Reference: How to launch manually
-
-If you need to restart the agent or navigate manually, use these commands:
-
-#### 1. Enter the Agent Directory
-You must be in the `adk_agent` folder inside your new demo directory. Replace `[YOUR_DEMO_DIR]` with the folder name created in Step 1 (e.g., `my-ge-demo-831afa90`).
-
-```bash
-# General pattern:
-cd [YOUR_DEMO_DIR]/adk_agent
-
-# Tip: You can use this to find and enter the latest demo folder automatically:
-cd $(ls -d demo-*/ | head -n 1)adk_agent
-```
-
-#### 2. Start the Server
-Run the agent using the virtual environment installed by the script:
-
-```bash
-../.venv/bin/adk web --allow_origins="*"
-```
-
+ 
+### Step 2: Access the Chat Agent in Gemini Enterprise
+ 
+If the setup script successfully registered the agent to an existing Gemini Enterprise App, it will print a direct console link:
+ 
+1. Click the **Start Chatting in Gemini Enterprise** link printed at the end of the script output.
+2. If manual registration is needed (because no Gemini Enterprise app was pre-configured), see [Step 5: Manual Agent Registration (If Needed)](#step-5-manual-agent-registration-if-needed).
+3. Open the **Preview** panel in the Gemini Enterprise console and start interacting with your custom agent!
+ 
 ---
-
-### Step 3: Access the UI & Preview
-
-Once you see `Uvicorn running on http://127.0.0.1:8000`:
-
-1. Click the **Web Preview** button at the top right of the Cloud Shell window.
-2. Select **Preview on port 8000**.
-3. In the new tab, select the **app** and start a new session.
-
-#### 💡 Real-Time Data Viewer Application
-If your setup included the Bento Grid operations console, you can inspect Firestore updates in real time:
-1. Open a new Cloud Shell terminal.
-2. Run the following inside the synthesized directory:
-   ```bash
-   cd viewer_app
-   # Start on alternative port, e.g., 8080
-   python3 -m http.server 8080
-   ```
-3. Use the Web Preview button to check **port 8080** to launch the dashboard console.
-
-
+ 
+### Step 3: Access the Real-Time Data Viewer
+ 
+If your demo setup includes database operations (like approving incidents or editing records), you can monitor updates in real time using the Data Viewer:
+ 
+1. Locate the **Firestore Data Viewer** link printed in your terminal (under **Quick Access Links**).
+2. Open this link in your browser. It points to a live Flask dashboard running as a Cloud Run Function.
+3. Keep this tab open alongside your Gemini Enterprise chat window to witness the agent modifying database states in real time!
+ 
 ---
-
+ 
 ### Step 4: Try the Scenarios
-
-Use the **Step 4: Run Live Demo** section in your Demo Generator for tailored prompts.
-
-**Example Prompts:**
-- "Analyze sales trends using the BigQuery tool."
-- "Correlate demographic data with real-world locations via Google Maps."
-- "Update maintenance status on item #104 and post verification logs into Firestore."
-- "Approve the flagged safety incident and update the operations grid instantly."
-
-
+ 
+Use the **Step 4: Run Live Demo** section in your Demo Generator Web UI for tailored prompts matching your business domain.
+ 
+**Common Scenarios to Try:**
+- **Analytical queries**: "Find all pending safety issues from last week using the BigQuery tool."
+- **Maps grounding**: "Show where the incidents occurred on a map and estimate travel times."
+- **State modification**: "Change the status of incident ID 104 to 'Under Investigation' and log our inspection notes." (Observe the Data Viewer update immediately!)
+- **Complex workflows**: "Assign a nearby inspector to incident 104 and notify them."
+ 
 ---
-
-### Step 5: (Optional) Deploy to Gemini Enterprise
-
-Ready to take your demo further? Deploy it to **Cloud Run** and register it as an official agent within **Gemini Enterprise**.
-
-### 1. Enhance Your Project
-Run this in your agent root directory (`adk_agent`):
-
-```bash
-uvx agent-starter-pack enhance
-```
-
-**Expected Interaction (Accept all defaults):**
-> Continue with enhancement? [Y/n]: **Y**  
-> Select base template (1): **[Enter]**  
-> Select agent directory (1): **[Enter]**  
-> select a deployment target: **1 (cloud_run)**  
-> select a CI/CD runner: **1 (simple)**  
-
-### 2. Deploy to Cloud Run
-Once configured, copy and run the generated command. Use the **Update Existing** toggle if you wish to overwrite an existing agent resource, or **Create New** for a fresh deployment.
-
-```bash
-# Example command generated by Step 5:
-# rm -f .resource_name && sed -i 's/name = "adk-agent"/name = "my-custom-agent"/' pyproject.toml && make deploy
-```
-
-### 3. Grant Execution Permissions
-If your agent encounters a 403 error when calling BigQuery, run these commands to grant the necessary roles to the Cloud Run service account:
-
-```bash
-PI=$(gcloud config get-value project)
-PN=$(gcloud projects list --filter="projectId:$PI" --format="value(projectNumber)")
-SA="$PN-compute@developer.gserviceaccount.com"
-# Grant roles to Cloud Run Service Agent
-for ROLE in "roles/mcp.toolUser" "roles/bigquery.jobUser" "roles/bigquery.dataViewer" "roles/serviceusage.serviceUsageConsumer"; do
-  gcloud projects add-iam-policy-binding $PI --member="serviceAccount:$SA" --role="$ROLE" --condition=None
-done
-```
-
-### 4. Register to Gemini Enterprise
-```bash
-make register-gemini-enterprise
-```
-
+ 
+### Step 5: Manual Agent Registration (If Needed)
+ 
+If the setup script could not find an existing Gemini Enterprise App in your project, it will skip automatic registration. You can register the agent manually in the Google Cloud Console:
+ 
+1. Go to the [Gemini Enterprise Console](https://console.cloud.google.com/gemini-enterprise/overview?project={{project-id}}).
+2. Create or select an **App** (e.g., an Agent Engine/Discovery Engine app).
+3. In the left-hand navigation pane, select **Agents**.
+4. Click **Create Agent** / **Register Agent**.
+5. Set the **Target URL** to your Cloud Run FastAPI app endpoint:
+   `https://[YOUR_MAIN_AGENT_SERVICE_URL]/a2a/app`
+   *(This URL is listed under **Quick Access Links** in your terminal).*
+6. Fill in the agent name and description, select standard OAuth credentials if needed, and save.
+7. Once saved, you can chat with the agent in the Preview panel.
+ 
 ---
-
+ 
 ### 13.2 Troubleshooting: Cloud Run Reliability
-
+ 
 If your agent occasionally stops responding or feels slow in Cloud Run:
-
-### 1. Handling "Cold Starts"
+ 
+#### 1. Handling "Cold Starts"
 Cloud Run may spin down instances after inactivity (cold starts). The first request after a break might take longer as it loads heavy libraries (like `pandas` or `scikit-learn`). 
 - **Tip**: Sending the same prompt again usually works as the container is then "warm."
 - **Solution**: For scaled usage, consider using a warmer service or reducing the number of heavy dependencies in your `requirements.txt`.
-
-### 2. BigQuery Token Lags
+ 
+#### 2. BigQuery Token Lags
 Retrieving fresh auth tokens for BigQuery can sometimes add latency.
 - **Fix Applied**: Our generated `tools.py` now includes stability patches that cache tokens for 30 minutes to ensure smooth tool execution.
-
-### 3. Execution Timeouts
+ 
+#### 3. Execution Timeouts
 The default timeout for Cloud Run is 60 seconds. If your agent performs many sequential tool calls, it might hit this limit.
 - **Optimization**: Use `gemini-3.1-pro-preview` for high-speed reasoning, and try to keep tool queries efficient.
-
-### 4. 403 Insufficient Scope Errors
-If you see "Request had insufficient authentication scopes" in the logs:
-- **Solution**: Refresh your local credentials in Cloud Shell with mandatory scopes (Note: `maps-platform` is NOT a valid standalone scope; use `cloud-platform` instead):
-  `gcloud auth application-default login --scopes="https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/bigquery,openid,https://www.googleapis.com/auth/userinfo.email"`
-- **Required Action**: After running the command, you MUST **restart the agent** (Ctrl+C and run the launch command again) to clear the cached tokens.
-
-### 5. Cloud Run Deployment Failures (Org Policies)
+ 
+#### 4. Cloud Run Deployment Failures (Org Policies)
 If the setup fails to provision the Data Viewer application or the main Agent service:
 - **Cause**: Many enterprise Google Cloud Projects restrict unauthenticated endpoints via organization policies (like `constraints/iam.allowedPolicyMemberDomains`).
-- **Mitigation**: The setup script is designed to print a warning and proceed even if the **Data Viewer** deployment fails due to ingress policies. You can still preview the multi-agent setup locally using `adk web` (Step 3).
-
-### 6. 403 Permission Denied on Tool Invocation
+- **Mitigation**: The setup script is designed to print a warning and proceed even if the **Data Viewer** deployment fails due to ingress policies. The main agent will still be deployed; you can access its logs in the Google Cloud Run console.
+ 
+#### 5. 403 Permission Denied on Tool Invocation
 If sub-agents fail to modify Firestore or pull from BigQuery:
 - **Action**: Ensure the default Cloud Run Compute Service Account (`[PROJECT_NUMBER]-compute@developer.gserviceaccount.com`) has been successfully provisioned with the following roles:
   - `roles/mcp.toolUser`
   - `roles/datastore.user` (For Firestore)
   - `roles/bigquery.dataViewer` & `roles/bigquery.jobUser`
   - `roles/aiplatform.user`
-
-
+ 
 ---
-
+ 
 ### 13.3 Cleanup
-
+ 
 When you are done with the demo, see [Section 12: Cleanup](#12-cleanup) for instructions on removing all provisioned resources.
+ 
 ---
-
+ 
 ### Need Help?
 Refer to the sections above for comprehensive documentation, system architecture, and the developer guide.
 
@@ -796,12 +723,12 @@ graph TD
 
 ---
 
-### 14.6 Deployment Targets
+### 14.6 Deployment Configuration
 
-The setup script offers three deployment options and supports model override via CLI flags:
+The setup script deploys the agent directly to Google Cloud Run and supports model overrides and automated cleanup via CLI flags:
 
 ```bash
-# Default models
+# Default models (gemini-3.5-flash)
 bash setup-demo-xxx.sh
 
 # Override models
@@ -811,13 +738,11 @@ bash setup-demo-xxx.sh --model-analysis-agent gemini-3.1-pro-preview --model-roo
 bash setup-demo-xxx.sh --cleanup
 ```
 
-| Option | Description | Use Case |
-|---|---|---|
-| **[1] Local** | Launches `adk web` on a local port (8000 or 8080 in Cloud Shell) | Quick testing and iteration |
-| **[2] Cloud Run** | Builds Docker image, deploys to Cloud Run with `--min-instances 1` | Shareable demo with a permanent URL, no cold start |
-| **[3] Gemini Enterprise** | Cloud Run deployment + Discovery Engine agent registration | Production-grade agent accessible in Gemini Enterprise UI |
+The script automates the full deployment flow:
+1. **Cloud Run Deployment**: The FastAPI Agent is containerized and deployed to Cloud Run with `--min-instances 0` to avoid continuous running costs while ensuring availability.
+2. **Gemini Enterprise Registration**: The script scans for existing Gemini Enterprise apps in your GCP project (regions: `global`, `us`, `eu`) and automatically registers the Cloud Run agent service URL.
 
-### Deployment Architecture (Option 3 — Gemini Enterprise)
+### Deployment Architecture
 
 ```mermaid
 graph LR
@@ -905,7 +830,7 @@ After running the setup script, the following directory structure is created:
 - **Ingress Org-Policy Graceful Failure**: Setup scripts detect and gracefully handle organization policies that block unauthenticated Cloud Run endpoints (e.g., `constraints/iam.allowedPolicyMemberDomains`).
 - **Static Agent Card**: The A2A server builds an `AgentCard` without connecting to MCP servers at startup, preventing hangs from slow/broken MCP connections. MCP tool connections happen lazily on first user request.
 - **Parallel BQ Loading**: BigQuery table loading uses `xargs -P 5` for parallel CSV uploads.
-- **Min Instances**: Cloud Run deployments use `--min-instances 1` to eliminate cold-start latency for demo presentations.
+- **Min Instances**: Cloud Run deployments use `--min-instances 0` to minimize standby costs for demo environments (users should expect occasional cold-start latency on the first request).
 - **Supergateway Stateless Sessions**: Custom MCP sidecars use `supergateway --sessionStateless` to prevent process accumulation from multiple client connections.
 
 ### Token Management
