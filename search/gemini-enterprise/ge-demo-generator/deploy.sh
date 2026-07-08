@@ -27,7 +27,7 @@
 
 set -euo pipefail
 
-DEPLOYMENT_ID="AKfycbxL84crJM36plCKcHsz5d0sp_h4Sk21lgTD6chIFk9t42ABggzodjaTIrV5ovWOlpMShA"
+DEPLOYMENT_ID="${DEPLOYMENT_ID:-AKfycbxL84crJM36plCKcHsz5d0sp_h4Sk21lgTD6chIFk9t42ABggzodjaTIrV5ovWOlpMShA}"
 CLASP="npx --registry https://registry.npmjs.org @google/clasp@latest"
 
 # 1. Extract APP_VERSION from Code.gs
