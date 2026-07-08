@@ -28,6 +28,27 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 
 ---
 
+## Table of Contents
+
+- [What is the GE Demo Generator?](#what-is-the-ge-demo-generator)
+- [1. Prerequisites](#1-prerequisites)
+- [2. Repository Setup](#2-repository-setup)
+- [3. Apps Script Project Setup](#3-apps-script-project-setup)
+- [4. Deploying Code to Apps Script](#4-deploying-code-to-apps-script)
+- [5. Google Cloud Project Setup](#5-google-cloud-project-setup)
+- [6. Script Properties (Zero Hardcoding)](#6-script-properties-zero-hardcoding)
+- [7. Manual API Authorization (Required Once)](#7-manual-api-authorization-required-once)
+- [8. Prepare the Usage Log Spreadsheet](#8-prepare-the-usage-log-spreadsheet)
+- [9. Web App Deployment](#9-web-app-deployment)
+- [10. How the Generated Demo Works](#10-how-the-generated-demo-works)
+- [11. Project Structure](#11-project-structure)
+- [12. Cleanup](#12-cleanup)
+- [13. Guided Walkthrough & Tutorial](#13-guided-walkthrough--tutorial)
+- [14. System Architecture](#14-system-architecture)
+- [15. AI Agent Development Guide (AGENTS.md)](#15-ai-agent-development-guide-agentsmd)
+
+---
+
 ## 1. Prerequisites
 
 - [Node.js](https://nodejs.org/) installed
@@ -102,11 +123,25 @@ clasp open
 
 ### Files Deployed to Apps Script
 
-The `.claspignore` file controls which files are pushed. Only these files are deployed:
+Since we declared `"rootDir": "app"` in `.clasp.json`, only files inside the `app/` directory are pushed. The deployed files are:
 - `appsscript.json` — Manifest (scopes, services, webapp config)
 - `Code.gs` — Backend logic
 - `index.html` — Frontend SPA
 - `SetupError.html` — Configuration error page
+
+### Automating Deployments (deploy.sh)
+
+If you have already created a web app deployment in Apps Script, you can bypass the manual versioning UI steps and automate pushing code and updating your active deployment in one step using the `deploy.sh` script:
+
+```bash
+DEPLOYMENT_ID="YOUR_WEB_APP_DEPLOYMENT_ID" bash deploy.sh
+```
+
+This script will:
+1. Extract the `APP_VERSION` from `app/Code.gs`.
+2. Push your latest local code via Clasp.
+3. Create a new version in Apps Script described by the version string.
+4. Update your active web app deployment to point directly to this newly created version.
 
 ---
 
@@ -276,18 +311,18 @@ This removes:
 
 ---
 
-## 7. Guided Walkthrough & Tutorial
+## 13. Guided Walkthrough & Tutorial
 
 Welcome! This tutorial will guide you through the setup and execution of your synthesized BigQuery MCP Agent demo.
 
-## Prerequisites
+### 13.1 Prerequisites
 
 Before we begin, ensure you have the necessary APIs enabled and the correct project selected.
 
 <walkthrough-project-setup>
 </walkthrough-project-setup>
 
-### 🛠️ Set Your Project
+#### Set Your Project
 Ensure your Cloud Shell is targeting the correct project:
 
 <walkthrough-test-code-block>
@@ -296,7 +331,7 @@ gcloud config set project {{project-id}}
 
 ---
 
-## Step 1: Provision Demo Environment in Your Project
+### Step 1: Provision Demo Environment in Your Project
 
 The Demo Generator has synthesized a custom setup script for you. This script is responsible for provisioning the BigQuery dataset and setting up the agent code within YOUR Google Cloud environment.
 
@@ -315,7 +350,7 @@ The Demo Generator has synthesized a custom setup script for you. This script is
 
 ---
 
-## Step 2: Launch the Agent
+### Step 2: Launch the Agent
 
 Once the setup script from Step 1 finishes, it will display the exact command to launch your agent. **Please follow the instructions shown in your terminal.**
 
@@ -343,7 +378,7 @@ Run the agent using the virtual environment installed by the script:
 
 ---
 
-## Step 3: Access the UI & Preview
+### Step 3: Access the UI & Preview
 
 Once you see `Uvicorn running on http://127.0.0.1:8000`:
 
@@ -365,7 +400,7 @@ If your setup included the Bento Grid operations console, you can inspect Firest
 
 ---
 
-## Step 4: Try the Scenarios
+### Step 4: Try the Scenarios
 
 Use the **Step 4: Run Live Demo** section in your Demo Generator for tailored prompts.
 
@@ -378,7 +413,7 @@ Use the **Step 4: Run Live Demo** section in your Demo Generator for tailored pr
 
 ---
 
-## Step 5: (Optional) Deploy to Gemini Enterprise
+### Step 5: (Optional) Deploy to Gemini Enterprise
 
 Ready to take your demo further? Deploy it to **Cloud Run** and register it as an official agent within **Gemini Enterprise**.
 
@@ -424,7 +459,7 @@ make register-gemini-enterprise
 
 ---
 
-## 🛠️ Troubleshooting: Reliability in Cloud Run
+### 13.2 Troubleshooting: Cloud Run Reliability
 
 If your agent occasionally stops responding or feels slow in Cloud Run:
 
@@ -463,22 +498,9 @@ If sub-agents fail to modify Firestore or pull from BigQuery:
 
 ---
 
-## 🧹 Cleanup: Removing Demo Resources
+### 13.3 Cleanup
 
-When you're done with your demo, you can easily clean up all created resources by running the setup script with the `--cleanup` flag:
-
-```bash
-# Replace with your actual script name
-bash setup-demo-xxx.sh --cleanup
-```
-
-This will remove:
-- **BigQuery Dataset**: The demo dataset and all its tables
-- **Maps API Key**: The auto-generated API key for Google Maps
-- **Local Directory**: The demo folder in your Cloud Shell home
-
-> **Note:** You'll be prompted for confirmation before any resources are deleted.
-
+When you are done with the demo, see [Section 12: Cleanup](#12-cleanup) for instructions on removing all provisioned resources.
 ---
 
 ### Need Help?
@@ -486,13 +508,13 @@ Refer to the sections above for comprehensive documentation, system architecture
 
 ---
 
-## 8. System Architecture
+## 14. System Architecture
 
 This document describes the system architecture of the GE Demo Generator and the synthesized demo environments it produces.
 
 ---
 
-## 1. Overview
+### 14.1 Overview
 
 The GE Demo Generator is a low-code accelerator built on Google Apps Script that allows Customer Engineers to instantly synthesize fully functional AI agent demo environments for any business domain. It generates domain-specific datasets, an ADK-based agent with MCP toolsets, and a real-time operations dashboard — all provisioned into the user's own Google Cloud project.
 
@@ -500,9 +522,9 @@ The system is divided into two main parts: the **Generator Dashboard** (the Apps
 
 ---
 
-## 2. Generator Dashboard (Google Apps Script Web App)
+### 14.2 Generator Dashboard (Apps Script)
 
-### 2.1 Frontend (`index.html`)
+#### Frontend (`index.html`)
 
 A Tailwind-based Single Page Application (~328 KB, ~5,700 lines) that provides:
 
@@ -519,7 +541,7 @@ A Tailwind-based Single Page Application (~328 KB, ~5,700 lines) that provides:
 - **Onboarding & Feature Notifications**: First-run onboarding modal and feature notification system for new capabilities.
 - **Social Proof & Engagement**: Weekly activity badge in the header, all-time usage statistics inline, Community Activity Feed in the right sidebar, and post-generation share link CTA.
 
-### 2.2 Backend (`Code.gs`)
+#### Backend (`Code.gs`)
 
 A monolithic Google Apps Script file (~8,100 lines, ~389 KB) that contains:
 
@@ -538,17 +560,17 @@ A monolithic Google Apps Script file (~8,100 lines, ~389 KB) that contains:
 | **Customer Domain Research** | `researchCompanyByDomain`, `mergeTemplateWithCompanyInfo` | Google Search-grounded company research, challenge identification, and workflow discovery |
 | **MCP Import & Analysis** | `analyzeMcpRepository` | Analyzes GitHub repos via `gemini-3.1-flash-lite` and integrates custom MCP servers as co-located sidecars in the agent container |
 
-### 2.3 Error Handling (`SetupError.html`)
+#### Error Handling (`SetupError.html`)
 
 A standalone HTML page displayed when mandatory Script Properties (`PROJECT_ID`, `LOG_SHEET_URL`, `BACKUP_FOLDER_ID`) are missing. Provides instructions for both the `initializeProject()` function and manual Script Properties setup.
 
 ---
 
-## 3. Synthesized Demo Environment (Google Cloud)
+### 14.3 Synthesized Demo Environment (Google Cloud)
 
 When the user runs the generated setup script in Cloud Shell, the following architecture is provisioned:
 
-### 3.1 Data Layer
+#### Data Layer
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -568,7 +590,7 @@ When the user runs the generated setup script in Cloud Shell, the following arch
 └─────────────────────────────────────────────────┘
 ```
 
-### 3.2 Agent Architecture
+#### Agent Architecture
 
 The synthesized agent uses a **triple-agent/multi-agent autonomous execution** architecture to achieve high-depth operational execution alongside optimal latency and cost. The architecture features three specialized agent instances, all utilizing **Gemini 3.5 Flash** by default for rapid response and high token efficiency:
 
@@ -633,11 +655,11 @@ The `background_agent` operates in one of two highly structured pipelines based 
 
 **Model transparency**: The FastAPI A2A server injects a `🧠 Model: <name>` status event into the streaming response the first time each agent processes a request, providing real-time visibility into which model is handling the interaction.
 
-### 3.3 Image Generation
+#### Image Generation
 
 The `generate_image` tool uses `gemini-3.1-flash-image-preview` to generate professional infographics and business summary visuals. Generated images are stored in the session state and automatically injected into the LLM response via the `inject_image_callback`. In Cloud Run deployments, images are uploaded to a GCS artifact bucket for rendering in Gemini Enterprise.
 
-### 3.4 A2A Server (FastAPI)
+#### A2A Server (FastAPI)
 
 The agent is served via a **FastAPI application** (`fast_api_app.py`) that implements the A2A (Agent-to-Agent) protocol:
 
@@ -649,7 +671,7 @@ The agent is served via a **FastAPI application** (`fast_api_app.py`) that imple
 - **Model Announcement**: Emits model name in the streaming accordion header once per agent per request for runtime transparency.
 - **Background Runner & `/execute_task` Endpoint**: Houses a secondary async runner (`background_app`) utilizing the `background_agent` that listens on `/execute_task` to process background operational pipeline workflows and scheduled cron task jobs.
 
-### 3.5 Data Viewer Dashboard
+#### Data Viewer Dashboard
 
 A lightweight Flask application deployed as a **Cloud Run Function (Gen2)** that provides:
 
@@ -660,7 +682,7 @@ A lightweight Flask application deployed as a **Cloud Run Function (Gen2)** that
 - Interactive audit trail / activity log
 - Add, Update Status, and Delete operations
 
-### 3.6 A2UI (Agent-to-UI) Protocol
+#### A2UI (Agent-to-UI) Protocol
 
 The A2UI integration provides rich interactive UI components in Gemini Enterprise:
 
@@ -676,9 +698,9 @@ The A2UI integration provides rich interactive UI components in Gemini Enterpris
 
 ---
 
-## 4. MCP Server Integration
+### 14.4 MCP Server Integration
 
-### 4.1 Built-in MCP Servers
+#### Built-in MCP Servers
 
 | Server | Transport | Description |
 |---|---|---|
@@ -686,7 +708,7 @@ The A2UI integration provides rich interactive UI components in Gemini Enterpris
 | **Google Maps MCP** | StreamableHTTP | Places, routes, geocoding |
 | **Firestore MCP** | StreamableHTTP | Document CRUD, collection management |
 
-### 4.2 MCP Server Catalog
+#### MCP Server Catalog
 
 The frontend includes a curated MCP catalog with servers organized into categories:
 
@@ -701,7 +723,7 @@ The frontend includes a curated MCP catalog with servers organized into categori
 
 The catalog also includes **recipe bundles** — pre-configured combinations of MCP servers for common demo scenarios (e.g., Public Data & Climate Analyst, Regulatory & Legislative Monitor, Japan Business Intelligence, Japan Climate & Logistics).
 
-### 4.3 MCP Server Types
+#### MCP Server Types
 
 | Type | Transport | Provisioning |
 |---|---|---|
@@ -709,7 +731,7 @@ The catalog also includes **recipe bundles** — pre-configured combinations of 
 | **Remote Managed (Slack)** | StreamableHTTP direct | OAuth2 flow during setup; token stored in Secret Manager |
 | **Google Workspace** | StreamableHTTP direct | MCP OAuth with token passthrough from Gemini Enterprise |
 
-### 4.4 Custom MCP Import (URL)
+#### Custom MCP Import (URL)
 
 Users can import any GitHub-hosted MCP server by providing the repository URL. The system:
 1. Fetches repository contents via Gemini-powered analysis (`gemini-3.1-flash-lite`)
@@ -719,7 +741,7 @@ Users can import any GitHub-hosted MCP server by providing the repository URL. T
 
 ---
 
-## 5. Data Flow Architecture
+### 14.5 Data Flow Architecture
 
 ```mermaid
 graph TD
@@ -774,7 +796,7 @@ graph TD
 
 ---
 
-## 6. Deployment Targets
+### 14.6 Deployment Targets
 
 The setup script offers three deployment options and supports model override via CLI flags:
 
@@ -813,7 +835,7 @@ graph LR
 
 ---
 
-## 7. Synthesized Project Structure
+### 14.7 Synthesized Project Structure
 
 After running the setup script, the following directory structure is created:
 
@@ -838,17 +860,14 @@ After running the setup script, the following directory structure is created:
 │       │                              # + Workspace MCP + Slack MCP
 │       ├── fast_api_app.py            # A2A server, background task runner, streaming, middleware
 │       ├── part_converters.py         # A2A↔Gen AI type conversion utilities
-│       ├── examples/0.8/             # A2UI BasicCatalog example JSONs
-│       └── app_utils/
-│           ├── telemetry.py           # Cloud Trace setup
-│           └── typing.py             # Pydantic models
+│       └── examples/0.8/              # A2UI BasicCatalog example JSONs
 └── viewer_app/
     └── main.py                        # Flask Data Viewer (deployed to Cloud Run Functions)
 ```
 
 ---
 
-## 8. Execution Sequence
+### 14.8 Execution Sequence
 
 ### Example: User updates a database record via the agent
 
@@ -864,7 +883,7 @@ After running the setup script, the following directory structure is created:
 
 ---
 
-## 9. Design Patterns & Stability Patches
+### 14.9 Design Patterns & Stability Patches
 
 ### Schema Compatibility
 - **`_safe_dereference_schema`**: Patches ADK's internal `_dereference_schema` function to handle complex nested JSON schemas with `$ref` and `$defs` — prevents validation errors when registering MCP tools with deeply nested schemas (e.g., Firestore). Includes JSON Pointer resolution for arbitrary `$ref` paths.
@@ -902,7 +921,7 @@ After running the setup script, the following directory structure is created:
 
 ---
 
-## 9. AI Agent Development Guide (AGENTS.md)
+## 15. AI Agent Development Guide (AGENTS.md)
 
 > **Purpose**: Project-specific knowledge for AI coding agents (Antigravity, Cursor, Copilot, etc.)
 > working on `Code.gs`. This document captures hard-won lessons from production escaping bugs,
@@ -910,7 +929,7 @@ After running the setup script, the following directory structure is created:
 
 ---
 
-## 1. Architecture: Multi-Layer Code Generation
+### 15.1 Architecture: Multi-Layer Code Generation
 
 `Code.gs` is a Google Apps Script (JavaScript) file that **generates bash setup scripts**,
 which in turn **generate Python source files** via heredocs. This creates a multi-layer
@@ -926,7 +945,7 @@ Layer 3: Python source files (agent.py, fast_api_app.py, tools.py, etc.)
 Layer 4: LLM system instruction (consumed by Gemini models)
 ```
 
-### Viewer Escaping Chain (DIFFERENT from above!)
+#### Viewer Escaping Chain
 
 The Data Viewer template (`viewer_app/main.py`) has a **distinct 4-layer chain**
 where Layer 3 is a Python triple-quoted string (`"""`) serving HTML, and Layer 4
@@ -953,7 +972,7 @@ Layer 4: Browser JavaScript execution
 > This means you need **4 backslashes** in Code.gs for the Viewer, vs **2**
 > for agent heredocs.
 
-### Key File Locations in Code.gs
+#### Key File Locations in Code.gs
 
 | Heredoc | Delimiter | Type | Line Range (approx) | Generates |
 |---------|-----------|------|---------------------|-----------|
@@ -970,9 +989,9 @@ Layer 4: Browser JavaScript execution
 
 ---
 
-## 2. Escaping Rules — MANDATORY Reading Before Any Edit
+### 15.2 Escaping Rules & Verification
 
-### 2.1 The Golden Rules
+#### The Golden Rules
 
 1. **NEVER use `\n` in a Python string literal inside a quoted heredoc.** Even though
    `cat <<'EOF'` suppresses shell expansion, the backslash-n sequence (`0x5c 0x6e`)
@@ -1044,7 +1063,7 @@ Layer 4: Browser JavaScript execution
     `Code.gs` contains huge JS template literals that act as code generators (e.g., `getTechnicalInstruction_()`). Using raw backticks inside these blocks (for example, to highlight a word in a text description like `` `context` ``) will prematurely close the template literal, leading to compilation/clasp push failure: `SyntaxError: Unexpected identifier`.
     **Use plain text, quotes, or explicitly escape the backtick (`` \` ``) instead.**
 
-### 2.2 Escaping by Heredoc Type
+#### Escaping by Heredoc Type
 
 #### Quoted Heredoc (`cat <<'EOF'`)
 - Shell does NOT expand `$`, `\`, or backticks
@@ -1056,7 +1075,7 @@ Layer 4: Browser JavaScript execution
 - `\n` becomes an actual newline, `\t` becomes a tab
 - Use `\$` to write a literal `$` to the target file
 
-### 2.3 Escaping Chain Examples
+#### Escaping Chain Examples
 
 #### Example A: Newline character in Python string (inside quoted heredoc)
 
@@ -1264,7 +1283,7 @@ if (chr(96) * 3 + "python") in part.text:
 ```
 
 
-### 2.4 ADK Instruction Template Engine Hazard
+#### ADK Instruction Template Engine Hazard
 
 ADK's `instructions_utils.inject_session_state()` (called automatically before every
 LLM request) scans the agent's `instruction` text with regex `r'{+[^{}]*}+'` and tries
@@ -1309,7 +1328,7 @@ to substitute matches from session state. If the variable is not found, it raise
 # "...bound to /form/item_i_name"
 ```
 
-### 2.5 Verification Checklist
+#### Verification Checklist
 
 Before submitting any change that touches Python code inside heredocs:
 
@@ -1349,7 +1368,7 @@ for i, line in enumerate(lines):
 
 ---
 
-## 3. Dockerfile Code Generation Patterns
+### 15.3 Dockerfile Code Generation Patterns
 
 ### 3.1 File Generation Inside Docker Images
 
@@ -1393,7 +1412,7 @@ When generating files that will end up inside Docker images:
 
 ---
 
-## 4. Conditional Environment Variable Injection
+### 15.4 Conditional Environment Variable Injection
 
 When adding environment variables that depend on deployment success (e.g., `DATA_VIEWER_URL`):
 
@@ -1415,7 +1434,7 @@ it in the `gcloud` command. This avoids trying to conditionally modify a static
 
 ---
 
-## 5. Dynamic System Instruction Injection (agent.py)
+### 15.5 Dynamic System Instruction Injection
 
 When adding context-aware agent behavior that depends on environment variables:
 
@@ -1441,7 +1460,7 @@ if _viewer_url:
 
 ---
 
-## 6. Common Pitfalls & Anti-Patterns
+### 15.6 Common Pitfalls & Anti-Patterns
 
 ### ❌ Anti-Pattern: Background Process for Sequential Dependencies
 
@@ -1501,7 +1520,7 @@ content = content.replace(old, new)
 
 ---
 
-## 7. Testing & Verification
+### 15.7 Testing & Verification
 
 ### 7.1 Pre-Deploy Checks
 
@@ -1518,7 +1537,7 @@ content = content.replace(old, new)
 
 ---
 
-## 8. Reference: Heredoc Boundary Discovery
+### 15.8 Reference: Heredoc Boundary Discovery
 
 To find all heredoc boundaries in Code.gs:
 
@@ -1535,7 +1554,7 @@ awk 'NR<=N && /<<.*EOF/' Code.gs | tail -1
 
 ---
 
-## 9. Changelog of Escaping Incidents
+### 15.9 Changelog of Escaping Incidents
 
 | Date | Issue | Root Cause | Fix |
 |------|-------|------------|-----|
@@ -1557,7 +1576,7 @@ awk 'NR<=N && /<<.*EOF/' Code.gs | tail -1
 
 ---
 
-## 10. JS Template Conditional Block Boundaries
+### 15.10 JS Template Conditional Block Boundaries
 
 ### The Problem
 
@@ -1566,13 +1585,13 @@ conditionally include large sections of generated Python/Bash code. These blocks
 span **hundreds of lines**, making it easy to accidentally insert feature-independent
 code inside a conditional block.
 
-### 10.1 Golden Rule (also listed as Rule #10 in Section 2.1)
+#### Golden Rule #10
 
 **ALWAYS verify which conditional block you are inside before inserting code.**
 Feature-independent code (e.g., Firestore init, common imports, shared utilities)
 must NEVER be placed inside a feature-flag conditional block.
 
-### 10.2 How to Check Your Location
+#### How to Check Your Location
 
 Before inserting code at line N, run:
 
@@ -1587,7 +1606,7 @@ awk 'NR>=N && /` : .*\}/' Code.gs | head -3
 If the nearest block start has no matching block end before your insertion point,
 **you are inside a conditional block**.
 
-### 10.3 Known Long Conditional Blocks
+#### Known Long Conditional Blocks
 
 | Flag | Block Start (approx) | Block End (approx) | Span |
 |------|---------------------|-------------------|------|
@@ -1597,7 +1616,7 @@ If the nearest block start has no matching block end before your insertion point
 > [!IMPORTANT]
 > Line numbers shift frequently. Always use `grep` to find actual boundaries.
 
-### 10.4 Incident History
+#### Incident History
 
 | Date | What Happened | Lines Affected |
 |------|---------------|----------------|
