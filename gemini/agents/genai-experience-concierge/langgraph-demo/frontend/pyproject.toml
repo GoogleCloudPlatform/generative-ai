@@ -8,7 +8,7 @@ dependencies = [
     "langgraph>=0.3.21",
     "streamlit>=1.42.2",
     "google-auth>=2.38.0",
-    "pydantic-settings>=2.6.1",
+    "pydantic-settings>=2.14.2",
 ]
 
 [tool.ruff]
