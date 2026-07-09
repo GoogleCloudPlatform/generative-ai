@@ -32,7 +32,7 @@ dev = [
 ]
 
 [tool.ruff]
-extend = "../../../pyproject.toml"
+extend = "../../../.ruff.toml"
 
 [tool.ruff.lint]
 ignore = ["C901", "PLR0915"]
