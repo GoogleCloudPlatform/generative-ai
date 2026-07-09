@@ -20,23 +20,26 @@ literal evaluation, and validates them against the official A2UI schema
 before deployment.
 """
 
-import re
-import json
-import sys
 import codecs
+import json
+import re
+import sys
 
 try:
-    from a2ui.schema.manager import A2uiSchemaManager
     from a2ui.basic_catalog.provider import BasicCatalog
+    from a2ui.schema.manager import A2uiSchemaManager
 except ImportError:
-    print("❌ Error: 'a2ui' package is not installed. Please run inside your '.venv' virtual environment.")
+    print(
+        "❌ Error: 'a2ui' package is not installed. Please run inside your '.venv' virtual environment."
+    )
     sys.exit(1)
+
 
 def main():
     # Initialize official A2UI 0.8 Schema Manager
     try:
-        catalog_config = BasicCatalog.get_config(version='0.8', examples_path='.')
-        manager = A2uiSchemaManager(version='0.8', catalogs=[catalog_config])
+        catalog_config = BasicCatalog.get_config(version="0.8", examples_path=".")
+        manager = A2uiSchemaManager(version="0.8", catalogs=[catalog_config])
         catalog = manager.get_selected_catalog()
     except Exception as e:
         print(f"❌ Failed to initialize A2UI Schema Manager: {e}")
@@ -44,7 +47,7 @@ def main():
 
     # Read Code.gs
     try:
-        with open('app/Code.gs', 'r', encoding='utf-8') as f:
+        with open("app/Code.gs", encoding="utf-8") as f:
             content = f.read()
     except FileNotFoundError:
         print("❌ Error: app/Code.gs not found in the current working directory.")
@@ -53,7 +56,7 @@ def main():
     # Regex to extract embedded example JSON heredocs inside Code.gs
     heredoc_re = re.compile(
         r"cat\s+<<'(__[A-Z0-9_]+__)'\s+>\s+adk_agent/app/examples/0\.8/(.*?\.json)\n(.*?)\n\1",
-        re.DOTALL
+        re.DOTALL,
     )
     matches = heredoc_re.findall(content)
 
@@ -65,8 +68,10 @@ def main():
         try:
             # Simulate JS template literal evaluation by escaping backslash sequences.
             # This correctly converts double '\\n' to '\n' characters and parses correctly.
-            simulated_js_text = codecs.escape_decode(bytes(json_text, "utf-8"))[0].decode("utf-8")
-            
+            simulated_js_text = codecs.escape_decode(bytes(json_text, "utf-8"))[
+                0
+            ].decode("utf-8")
+
             # Validate example against strict A2UI JSON schema
             catalog._validate_example(filename, simulated_js_text)
             print(f"  ✅ {filename} is VALID!")
@@ -85,11 +90,14 @@ def main():
 
     print("=" * 60)
     if failed:
-        print("❌ Validation FAILED! Please fix the syntax/schema issues in Code.gs before deploying.")
+        print(
+            "❌ Validation FAILED! Please fix the syntax/schema issues in Code.gs before deploying."
+        )
         sys.exit(1)
     else:
         print("🎉 All embedded A2UI examples validated successfully! Safe to deploy.")
         sys.exit(0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
