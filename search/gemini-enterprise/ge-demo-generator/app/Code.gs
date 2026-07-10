@@ -3404,7 +3404,7 @@ cp "$GE_TPL/pyproject.toml" pyproject.toml
 cp "$GE_TPL/.dockerignore" .dockerignore
 
 # Generate .python-version for Buildpacks
-cp "$GE_TPL/.python-version" .python-version
+cp "$GE_TPL/python-version.txt" .python-version
 
 # Generate Dockerfile using uv for performance (PoC v9 style)
 cat <<'__DOCKER_EOF__' > Dockerfile
