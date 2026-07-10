@@ -1,0 +1,20 @@
+[
+  { "beginRendering": { "surfaceId": "action-plan", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "action-plan", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "subtitle", "div1", "step1", "step2", "step3", "step4", "div2", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "🎯 Recommended Action Plan" }, "usageHint": "h2" } } },
+    { "id": "subtitle", "component": { "Text": { "text": { "literalString": "Economics Engagement Improvement — 4-Step Strategy" }, "usageHint": "h3" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "step1", "component": { "Text": { "text": { "literalString": "1️⃣ [Immediate] Personal outreach email from the Dean to Takahashi (CFO) — Expected: Engagement Score +15pt" }, "usageHint": "body" } } },
+    { "id": "step2", "component": { "Text": { "text": { "literalString": "2️⃣ [Within 1 month] Plan & invite to VIP dinner event — Target: 5 mid-tier alumni (Score 40-60)" }, "usageHint": "body" } } },
+    { "id": "step3", "component": { "Text": { "text": { "literalString": "3️⃣ [Within 3 months] Launch Economics-exclusive mentoring program — Goal: Faculty avg Score 67→75" }, "usageHint": "body" } } },
+    { "id": "step4", "component": { "Text": { "text": { "literalString": "4️⃣ [At 6 months] Impact assessment & next strategy — KPI: Donations +20% YoY, Avg Score ≥75" }, "usageHint": "body" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnStep1", "btnSchedule"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnStep1", "component": { "Button": { "child": "lblStep1", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Draft the outreach email for Step 1" } }] } } } },
+    { "id": "lblStep1", "component": { "Text": { "text": { "literalString": "✉️ Draft Email" }, "usageHint": "body" } } },
+    { "id": "btnSchedule", "component": { "Button": { "child": "lblSchedule", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Create a detailed schedule for this plan" } }] } } } },
+    { "id": "lblSchedule", "component": { "Text": { "text": { "literalString": "📅 Create Schedule" }, "usageHint": "body" } } }
+  ] } }
+]

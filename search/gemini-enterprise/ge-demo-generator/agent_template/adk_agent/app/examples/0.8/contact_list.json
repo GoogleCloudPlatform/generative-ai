@@ -1,0 +1,14 @@
+[
+  { "beginRendering": { "surfaceId": "contacts", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "contacts", "components": [
+    { "id": "root", "component": { "Card": { "child": "col" } } },
+    { "id": "col", "component": { "Column": { "children": { "explicitList": ["title", "div1", "c1n", "c1e", "div2", "c2n", "c2e"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "👤 Contacts" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "c1n", "component": { "Text": { "text": { "literalString": "Kenta Takahashi - Operations" }, "usageHint": "body" } } },
+    { "id": "c1e", "component": { "Text": { "text": { "literalString": "kenta@example.com" }, "usageHint": "body" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "c2n", "component": { "Text": { "text": { "literalString": "Aiko Sato - Store Manager" }, "usageHint": "body" } } },
+    { "id": "c2e", "component": { "Text": { "text": { "literalString": "aiko@example.com" }, "usageHint": "body" } } }
+  ] } }
+]

@@ -1,0 +1,18 @@
+[
+  { "beginRendering": { "surfaceId": "chat-compose", "root": "root" } },
+  { "dataModelUpdate": { "surfaceId": "chat-compose", "path": "/form", "contents": [{ "key": "space", "valueMap": [{ "key": "0", "valueString": "Engineering" }] }, { "key": "message", "valueString": "Heads up: shelf alert #4821 has been resolved." }] } },
+  { "surfaceUpdate": { "surfaceId": "chat-compose", "components": [
+    { "id": "root", "component": { "Card": { "child": "col" } } },
+    { "id": "col", "component": { "Column": { "children": { "explicitList": ["title", "div1", "choiceSpace", "fieldMsg", "div2", "actions"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "💬 Send Chat Message" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "choiceSpace", "component": { "MultipleChoice": { "selections": { "path": "/form/space" }, "options": [{ "label": { "literalString": "Engineering" }, "value": "Engineering" }, { "label": { "literalString": "Operations" }, "value": "Operations" }, { "label": { "literalString": "Store Managers" }, "value": "Store Managers" }], "maxAllowedSelections": 1, "variant": "chips" } } },
+    { "id": "fieldMsg", "component": { "TextField": { "label": { "literalString": "Message" }, "text": { "path": "/form/message" }, "textFieldType": "longText" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actions", "component": { "Row": { "children": { "explicitList": ["btnSend", "btnCancel"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnSend", "component": { "Button": { "child": "lblSend", "primary": true, "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Send this chat message to the selected space:" } }, { "key": "space", "value": { "path": "/form/space" } }, { "key": "message", "value": { "path": "/form/message" } }] } } } },
+    { "id": "lblSend", "component": { "Text": { "text": { "literalString": "📤 Send" }, "usageHint": "body" } } },
+    { "id": "btnCancel", "component": { "Button": { "child": "lblCancel", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Cancel sending the chat message" } }] } } } },
+    { "id": "lblCancel", "component": { "Text": { "text": { "literalString": "🚫 Cancel" }, "usageHint": "body" } } }
+  ] } }
+]

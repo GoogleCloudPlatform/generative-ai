@@ -1,0 +1,29 @@
+[
+  { "beginRendering": { "surfaceId": "tabbed-view", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "tabbed-view", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "div1", "tabs", "div2", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📋 Data Update Preview" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "tabs", "component": { "Tabs": { "tabItems": [
+      { "title": { "literalString": "Before" }, "child": "beforeContent" },
+      { "title": { "literalString": "After" }, "child": "afterContent" }
+    ] } } },
+    { "id": "beforeContent", "component": { "Column": { "children": { "explicitList": ["beforeSpacer", "beforeTitle", "beforeRole", "beforeScore"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "beforeSpacer", "component": { "Text": { "text": { "literalString": " " }, "usageHint": "body" } } },
+    { "id": "beforeTitle", "component": { "Text": { "text": { "literalString": "Name: Kenta Takahashi" }, "usageHint": "body" } } },
+    { "id": "beforeRole", "component": { "Text": { "text": { "literalString": "Title: Head of Corporate Planning" }, "usageHint": "body" } } },
+    { "id": "beforeScore", "component": { "Text": { "text": { "literalString": "Score: 45" }, "usageHint": "body" } } },
+    { "id": "afterContent", "component": { "Column": { "children": { "explicitList": ["afterSpacer", "afterTitle", "afterRole", "afterScore"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "afterSpacer", "component": { "Text": { "text": { "literalString": " " }, "usageHint": "body" } } },
+    { "id": "afterTitle", "component": { "Text": { "text": { "literalString": "Name: Kenta Takahashi" }, "usageHint": "body" } } },
+    { "id": "afterRole", "component": { "Text": { "text": { "literalString": "Title: CFO ✏️" }, "usageHint": "body" } } },
+    { "id": "afterScore", "component": { "Text": { "text": { "literalString": "Score: 60 ✏️" }, "usageHint": "body" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnApprove", "btnReject"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnApprove", "component": { "Button": { "child": "lblApprove", "primary": true, "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Approved" } }] } } } },
+    { "id": "lblApprove", "component": { "Text": { "text": { "literalString": "✅ Approve & Execute" }, "usageHint": "body" } } },
+    { "id": "btnReject", "component": { "Button": { "child": "lblReject", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Rejected" } }] } } } },
+    { "id": "lblReject", "component": { "Text": { "text": { "literalString": "❌ Cancel" }, "usageHint": "body" } } }
+  ] } }
+]

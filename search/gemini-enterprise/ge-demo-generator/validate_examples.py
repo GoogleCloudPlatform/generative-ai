@@ -13,91 +13,62 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Local A2UI Examples Schema Validator for GE Demo Generator.
+"""Agent-template validator for the GE Demo Generator.
 
-Extracts all embedded A2UI examples from Code.gs, simulates GAS template
-literal evaluation, and validates them against the official A2UI schema
-before deployment.
+The A2UI example JSONs and the agent runtime Python live as real files under
+agent_template/ (the generated setup script fetches them at run time), so
+validation is now direct: parse every example JSON and byte-compile every
+Python file. Run from this directory:
+
+    python3 validate_examples.py
 """
 
-import codecs
+import glob
 import json
-import re
+import os
+import py_compile
 import sys
 
-try:
-    from a2ui.basic_catalog.provider import BasicCatalog
-    from a2ui.schema.manager import A2uiSchemaManager
-except ImportError:
-    print(
-        "❌ Error: 'a2ui' package is not installed. Please run inside your '.venv' virtual environment."
-    )
-    sys.exit(1)
+ROOT = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE = os.path.join(ROOT, "agent_template")
+# Placeholder substituted by the setup script with the per-demo currency symbol.
+CURRENCY_PLACEHOLDER = "[CURRENCY]"
 
 
-def main():
-    # Initialize official A2UI 0.8 Schema Manager
-    try:
-        catalog_config = BasicCatalog.get_config(version="0.8", examples_path=".")
-        manager = A2uiSchemaManager(version="0.8", catalogs=[catalog_config])
-        catalog = manager.get_selected_catalog()
-    except Exception as e:
-        print(f"❌ Failed to initialize A2UI Schema Manager: {e}")
-        sys.exit(1)
+def main() -> int:
+    failures = 0
 
-    # Read Code.gs
-    try:
-        with open("app/Code.gs", encoding="utf-8") as f:
-            content = f.read()
-    except FileNotFoundError:
-        print("❌ Error: app/Code.gs not found in the current working directory.")
-        sys.exit(1)
-
-    # Regex to extract embedded example JSON heredocs inside Code.gs
-    heredoc_re = re.compile(
-        r"cat\s+<<'(__[A-Z0-9_]+__)'\s+>\s+adk_agent/app/examples/0\.8/(.*?\.json)\n(.*?)\n\1",
-        re.DOTALL,
-    )
-    matches = heredoc_re.findall(content)
-
-    print(f"Found {len(matches)} A2UI examples embedded in Code.gs\n")
-    failed = False
-
-    for delim, filename, json_text in matches:
-        print(f"Validating {filename} (Delimiter: {delim})...")
+    examples = sorted(glob.glob(os.path.join(TEMPLATE, "adk_agent", "app", "examples", "*", "*.json")))
+    if not examples:
+        print("❌ No example JSONs found under agent_template/")
+        return 1
+    for path in examples:
+        rel = os.path.relpath(path, ROOT)
         try:
-            # Simulate JS template literal evaluation by escaping backslash sequences.
-            # This correctly converts double '\\n' to '\n' characters and parses correctly.
-            simulated_js_text = codecs.escape_decode(bytes(json_text, "utf-8"))[
-                0
-            ].decode("utf-8")
+            with open(path, encoding="utf-8") as f:
+                json.loads(f.read().replace(CURRENCY_PLACEHOLDER, "$"))
+            print(f"  ✅ {rel}")
+        except json.JSONDecodeError as exc:
+            failures += 1
+            print(f"  ❌ {rel}: {exc}")
 
-            # Validate example against strict A2UI JSON schema
-            catalog._validate_example(filename, simulated_js_text)
-            print(f"  ✅ {filename} is VALID!")
-        except json.JSONDecodeError as jde:
-            print(f"  ❌ {filename} failed JSON parse: {jde}")
-            print("  --- Raw Text snippet (around error) ---")
-            print(json_text[:500])
-            print("  ---------------------------------------")
-            failed = True
-        except ValueError as ve:
-            print(f"  ❌ {filename} failed A2UI schema validation:\n     {ve}")
-            failed = True
-        except Exception as e:
-            print(f"  ❌ {filename} failed with unexpected validation error: {e}")
-            failed = True
+    pyfiles = sorted(glob.glob(os.path.join(TEMPLATE, "**", "*.py"), recursive=True))
+    for path in pyfiles:
+        rel = os.path.relpath(path, ROOT)
+        try:
+            py_compile.compile(path, doraise=True)
+            print(f"  ✅ {rel}")
+        except py_compile.PyCompileError as exc:
+            failures += 1
+            print(f"  ❌ {rel}: {exc}")
 
-    print("=" * 60)
-    if failed:
-        print(
-            "❌ Validation FAILED! Please fix the syntax/schema issues in Code.gs before deploying."
-        )
-        sys.exit(1)
-    else:
-        print("🎉 All embedded A2UI examples validated successfully! Safe to deploy.")
-        sys.exit(0)
+    total = len(examples) + len(pyfiles)
+    if failures:
+        print(f"\n❌ {failures}/{total} file(s) failed validation.")
+        return 1
+    print(f"\n✅ All {total} template files validated ({len(examples)} JSON, {len(pyfiles)} Python).")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

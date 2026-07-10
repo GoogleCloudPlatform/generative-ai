@@ -1,0 +1,21 @@
+[
+  { "beginRendering": { "surfaceId": "event-compose", "root": "root" } },
+  { "dataModelUpdate": { "surfaceId": "event-compose", "path": "/form", "contents": [{ "key": "title", "valueString": "Inventory Review" }, { "key": "start", "valueString": "2024-09-17T14:00:00" }, { "key": "end", "valueString": "2024-09-17T15:00:00" }, { "key": "location", "valueString": "Main Office" }, { "key": "attendees", "valueString": "team@example.com" }] } },
+  { "surfaceUpdate": { "surfaceId": "event-compose", "components": [
+    { "id": "root", "component": { "Card": { "child": "col" } } },
+    { "id": "col", "component": { "Column": { "children": { "explicitList": ["title", "div1", "fTitle", "dStart", "dEnd", "fLoc", "fAtt", "div2", "actions"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📅 Create Calendar Event" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "fTitle", "component": { "TextField": { "label": { "literalString": "Title" }, "text": { "path": "/form/title" }, "textFieldType": "shortText" } } },
+    { "id": "dStart", "component": { "DateTimeInput": { "value": { "path": "/form/start" }, "enableDate": true, "enableTime": true } } },
+    { "id": "dEnd", "component": { "DateTimeInput": { "value": { "path": "/form/end" }, "enableDate": true, "enableTime": true } } },
+    { "id": "fLoc", "component": { "TextField": { "label": { "literalString": "Location" }, "text": { "path": "/form/location" }, "textFieldType": "shortText" } } },
+    { "id": "fAtt", "component": { "TextField": { "label": { "literalString": "Attendees (comma-separated)" }, "text": { "path": "/form/attendees" }, "textFieldType": "shortText" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actions", "component": { "Row": { "children": { "explicitList": ["btnCreate", "btnCancel"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnCreate", "component": { "Button": { "child": "lblCreate", "primary": true, "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Create this calendar event:" } }, { "key": "title", "value": { "path": "/form/title" } }, { "key": "start", "value": { "path": "/form/start" } }, { "key": "end", "value": { "path": "/form/end" } }, { "key": "location", "value": { "path": "/form/location" } }, { "key": "attendees", "value": { "path": "/form/attendees" } }] } } } },
+    { "id": "lblCreate", "component": { "Text": { "text": { "literalString": "✅ Create" }, "usageHint": "body" } } },
+    { "id": "btnCancel", "component": { "Button": { "child": "lblCancel", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Cancel creating the event" } }] } } } },
+    { "id": "lblCancel", "component": { "Text": { "text": { "literalString": "🚫 Cancel" }, "usageHint": "body" } } }
+  ] } }
+]
