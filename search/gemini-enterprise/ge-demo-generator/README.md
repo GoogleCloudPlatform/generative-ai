@@ -276,10 +276,15 @@ ge-demo-generator/
 │   ├── index.html           # Frontend: SPA with demo wizard UI + MCP catalog
 │   ├── SetupError.html      # Error page shown when Script Properties are missing
 │   └── package.json         # NPM script hooks
+├── agent_template/          # Static agent runtime files (fetched by the setup
+│   ├── adk_agent/           #  script at run time from a pinned repo ref):
+│   │   └── app/             #  agent.py, tools.py, fast_api_app.py,
+│   │       └── examples/    #  part_converters.py, A2UI example JSONs
+│   └── viewer_app/          #  Data viewer (main.py + requirements.txt)
 ├── .clasp.json              # (git-ignored) Your Script ID config
 ├── AGENTS.md                # AI agent development guide
 ├── deploy.sh                # Clasp deployment orchestrator script
-├── validate_examples.py     # Checks syntax of embedded examples in Code.gs
+├── validate_examples.py     # Validates agent_template JSON + Python files
 ├── gebe-demo-generator/     # (Subproject) Drive/Docs provisioning engine
 │   ├── appsscript.json
 │   ├── Code.gs
@@ -481,7 +486,7 @@ A monolithic Google Apps Script file (~17.7k lines, ~952 KB) that contains:
 | **Data Generation** | `generateDemo`, `planAndGenerateData`, `buildPlanningPrompt` | Orchestrates the full generation pipeline using Gemini |
 | **Public Dataset Discovery** | `discoverPublicDataset`, `verifyAndResolveTable` | Uses Google Search grounding to find and verify real BigQuery public datasets |
 | **Data Validation** | `validateGeneratedData`, `validateAndRepairValue` | Schema-aware validation and auto-repair of generated CSV data |
-| **Setup Script Synthesis** | `generateSetupScript` | Generates a comprehensive bash script including all Cloud resources, agent code, Dockerfile, and deployment logic |
+| **Setup Script Synthesis** | `generateSetupScript` | Generates the bash setup script: Cloud resource provisioning, a pinned fetch of `agent_template/` (static agent code), per-demo config emission (`.env`, `generated_instruction.md`, `mcp_config.json`), Dockerfile assembly, and deployment logic. The template source is pinned via `TEMPLATE_REPO` / `TEMPLATE_REF` / `TEMPLATE_SUBDIR` in `CONFIG` (Script-Properties overridable); update `TEMPLATE_REF` to the release commit SHA whenever `agent_template/` changes |
 | **History & Persistence** | `logUsageToSheet`, `saveToDrive`, `restoreDemo`, `getPersonalHistory`, `getGlobalHistory` | Usage logging (Sheets), backup (Drive), and restore |
 | **Usage Statistics** | `getUsageStats` | Aggregated usage data (total/weekly demos, unique users, locations, recent activity feed) from the `Usage_Logs` sheet |
 | **Favorites & Deletion** | `toggleFavorite`, `deleteHistoryItem` | Per-user favorites and owner-only history deletion |
