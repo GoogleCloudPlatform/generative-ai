@@ -2173,16 +2173,22 @@ Requirements:
     const lblChart = "📊 Status Distribution Summary";
 
     firestoreCommands += `cp "$GE_TPL/viewer_app/main.py" ${dirName}/viewer_app/main.py\n`;
-    // Per-demo values are substituted into the copied template (placeholders
-    // __GE_FS_COLLECTION__ / __GE_DASH_TITLE__ / __GE_DASH_DESC__).
+    firestoreCommands += `mkdir -p ${dirName}/viewer_app/templates\n`;
+    firestoreCommands += `cp "$GE_TPL"/viewer_app/templates/*.html ${dirName}/viewer_app/templates/\n`;
+    // Per-demo values are substituted into the copied template files:
+    // __GE_FS_COLLECTION__ lives in main.py; __GE_DASH_TITLE__ and
+    // __GE_DASH_DESC__ live in templates/viewer.html.
     firestoreCommands += `GE_FS_COLLECTION='${fsCollection}' GE_DASH_TITLE='${bashEscape(dashboardTitle)}' GE_DASH_DESC='${bashEscape(userGoal)}' python3 - <<'__GE_VIEWER_SUB_EOF__'\n`;
     firestoreCommands += `import os\n`;
     firestoreCommands += `p = "${dirName}/viewer_app/main.py"\n`;
     firestoreCommands += `s = open(p, encoding="utf-8").read()\n`;
     firestoreCommands += `s = s.replace("__GE_FS_COLLECTION__", os.environ.get("GE_FS_COLLECTION", ""))\n`;
+    firestoreCommands += `open(p, "w", encoding="utf-8").write(s)\n`;
+    firestoreCommands += `h = "${dirName}/viewer_app/templates/viewer.html"\n`;
+    firestoreCommands += `s = open(h, encoding="utf-8").read()\n`;
     firestoreCommands += `s = s.replace("__GE_DASH_TITLE__", os.environ.get("GE_DASH_TITLE", "Enterprise Operations Console"))\n`;
     firestoreCommands += `s = s.replace("__GE_DASH_DESC__", os.environ.get("GE_DASH_DESC", ""))\n`;
-    firestoreCommands += `open(p, "w", encoding="utf-8").write(s)\n`;
+    firestoreCommands += `open(h, "w", encoding="utf-8").write(s)\n`;
     firestoreCommands += `__GE_VIEWER_SUB_EOF__\n`;
 
     firestoreCommands += `cp "$GE_TPL/viewer_app/requirements.txt" ${dirName}/viewer_app/requirements.txt\n`;
