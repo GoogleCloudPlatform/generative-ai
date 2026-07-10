@@ -52,8 +52,8 @@ def main() -> int:
             failures += 1
             print(f"  ❌ {rel}: {exc}")
 
-    pyfiles = sorted(glob.glob(os.path.join(TEMPLATE, "**", "*.py"), recursive=True))
-    for path in pyfiles:
+    py_files = sorted(glob.glob(os.path.join(TEMPLATE, "**", "*.py"), recursive=True))
+    for path in py_files:
         rel = os.path.relpath(path, ROOT)
         try:
             py_compile.compile(path, doraise=True)
@@ -62,11 +62,11 @@ def main() -> int:
             failures += 1
             print(f"  ❌ {rel}: {exc}")
 
-    total = len(examples) + len(pyfiles)
+    total = len(examples) + len(py_files)
     if failures:
         print(f"\n❌ {failures}/{total} file(s) failed validation.")
         return 1
-    print(f"\n✅ All {total} template files validated ({len(examples)} JSON, {len(pyfiles)} Python).")
+    print(f"\n✅ All {total} template files validated ({len(examples)} JSON, {len(py_files)} Python).")
     return 0
 
 

@@ -425,7 +425,7 @@ import re as _a2ui_debris_re_mod
 # the opening <a2ui-json> tag is split across stream chunks and the parser consumes
 # only the leading "<". The leading "<" and trailing ">" are both optional so a
 # fragment like "a2ui-json>" or "<a2ui-json" is still removed (v10.100).
-_A2UI_TAG_DEBRIS_RE = _a2ui_debris_re_mod.compile(r'<s*/?s*a2ui[-_]jsons*>?|a2ui[-_]jsons*>', _a2ui_debris_re_mod.IGNORECASE)
+_A2UI_TAG_DEBRIS_RE = _a2ui_debris_re_mod.compile(r'<\s*/?\s*a2ui[-_]json\s*>?|a2ui[-_]json\s*>', _a2ui_debris_re_mod.IGNORECASE)
 
 def _sanitize_a2ui_text_icons(text):
     import re as _re
