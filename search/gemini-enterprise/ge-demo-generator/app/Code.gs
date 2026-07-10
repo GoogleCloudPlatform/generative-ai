@@ -89,7 +89,7 @@ const CONFIG = {
   // generated script keeps fetching exactly the files it was built for.
   // Override via Script Properties (TEMPLATE_REPO / TEMPLATE_REF) for testing.
   TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/ryotat7/generative-ai.git',
-  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || '92dbb3da0f7f1807e80e62004d6cef71ab07f3ce',
+  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || '3b670102d7f05444bf36323b5030d8e95ec67bc0',
   TEMPLATE_SUBDIR: SCRIPT_PROPS.getProperty('TEMPLATE_SUBDIR') || 'search/gemini-enterprise/ge-demo-generator/agent_template',
   LOG_SHEET_URL: SCRIPT_PROPS.getProperty('LOG_SHEET_URL')
 };
