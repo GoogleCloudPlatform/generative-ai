@@ -185,6 +185,14 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 |---|---|---|
 | `LOCATION` | `global` | Vertex AI Agent Platform API location (e.g., `us-central1`, `global`) |
 | `MODEL` | `gemini-3.5-flash` | Gemini model name for data generation |
+| `TEMPLATE_REPO` | this repository | Git URL the generated setup script fetches `agent_template/` from at run time |
+| `TEMPLATE_REF` | pinned commit SHA in `Code.gs` | Commit SHA (or tag) of the agent template to fetch. Update whenever `agent_template/` changes so generated scripts keep fetching the files they were built for |
+| `TEMPLATE_SUBDIR` | `search/gemini-enterprise/ge-demo-generator/agent_template` | Repo path of the template directory |
+
+> **Note**: The three `TEMPLATE_*` properties override the defaults baked into
+> `Code.gs`. Setting them lets a deployed app switch template sources (for
+> example to a fork during development, or to this repository's latest release
+> commit) without redeploying the Apps Script code.
 
 ### 6.3 Setting Properties
 
