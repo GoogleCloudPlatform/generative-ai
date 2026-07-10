@@ -996,8 +996,9 @@ async def publish_dashboard(html: str, title: str, tool_context: ToolContext) ->
 # --- Computer Use browser agent (enabled per demo via ENABLE_COMPUTER_USE) ---
 if os.environ.get("ENABLE_COMPUTER_USE") == "1":
     # =====================================================================
-    # Computer Use (browser agent) -- Gemini 3.5 Flash built-in computer_use
-    # tool driven over a self-hosted headless Chromium (Playwright). Adapted
+    # Computer Use (browser agent) -- Gemini built-in computer_use tool
+    # (dedicated computer-use model) driven over a self-hosted headless
+    # Chromium (Playwright). Adapted
     # from the official reference impl (github.com/google-gemini/
     # computer-use-preview, Apache-2.0): same generate_content loop, action
     # dispatch, coordinate denormalization and keep-last-N screenshot trim.
@@ -1321,7 +1322,11 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             return {"status": "error", "detail": "Playwright is not installed in this environment: " + str(_imp)}
 
         client = genai_client.Client(vertexai=True, location=location, project=project)
-        model = os.environ.get("AGENT_MODEL", "gemini-3.5-flash")
+        # Computer Use requires the dedicated computer-use model unless the
+        # project is allowlisted for the tool on general models; reusing
+        # AGENT_MODEL fails with 400 "computer use is not supported for this
+        # model in this region" in non-allowlisted projects.
+        model = os.environ.get("COMPUTER_USE_MODEL", "gemini-2.5-computer-use-preview-10-2025")
         cfg = types.GenerateContentConfig(
             temperature=1.0, top_p=0.95, top_k=40, max_output_tokens=8192,
             tools=[types.Tool(computer_use=types.ComputerUse(environment=types.Environment.ENVIRONMENT_BROWSER))],
