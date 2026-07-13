@@ -136,9 +136,10 @@ type userEntitlement struct {
 
 // processProject enumerates all configured groups for a single GCP project,
 // resolves the highest-precedence (SKU, location) per user, looks up the
-// licenseConfig resource path from index, and issues the grant batches.
-// Updates are grouped by licenseConfigPath so each batch is homogeneous,
-// which allows per-SKU exhaustion handling without ambiguity.
+// licenseConfig entries from index, and issues the grant batches. Updates are
+// grouped by LicenseConfigKey (SKU + location) and then processed
+// sequentially across the slice of entries for that key, spilling soft-failed
+// users from an exhausted pool into the next pool's batch.
 // It returns the number of licenses granted, the number of users soft-failed
 // due to license pool exhaustion, and the number of groups processed.
 func (s *JoinerService) processProject(ctx context.Context, projectID, projectNumber string, projectCfg config.ProjectConfig, index models.LicenseConfigIndex, dryRun bool) (licensesGranted, licensesSoftFailed, groupsProcessed int, err error) {
@@ -155,41 +156,57 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 		}
 	}
 
-	// Group updates by licenseConfigPath so each batch is homogeneous.
-	// This allows exhaustion handling to target the correct SKU pool.
-	pendingByConfig := make(map[string][]models.LicenseUpdate)
-	entryByConfigPath := make(map[string]models.LicenseConfigEntry)
+	// Group updates by LicenseConfigKey so the multi-pool spill logic below
+	// can iterate the ordered slice of entries for each key.
+	pendingByKey := make(map[models.LicenseConfigKey][]models.LicenseUpdate)
 
 	for email, ent := range userBestEntitlement {
 		key := models.LicenseConfigKey{SKU: ent.SKU, ProjectNumber: projectNumber, Location: ent.Location}
-		idxEntry, ok := index[key]
-		if !ok {
+		entries, ok := index[key]
+		if !ok || len(entries) == 0 {
 			return 0, 0, 0, fmt.Errorf("project %q: no licenseConfig found for SKU %q location %q", projectID, ent.SKU, ent.Location)
 		}
-		pendingByConfig[idxEntry.Path] = append(pendingByConfig[idxEntry.Path], models.LicenseUpdate{
-			UserEmail:         email,
-			SKU:               ent.SKU,
-			Location:          ent.Location,
-			LicenseConfigPath: idxEntry.Path,
-			Action:            models.LicenseActionGrant,
+		// LicenseConfigPath will be resolved per-entry when building each chunk.
+		pendingByKey[key] = append(pendingByKey[key], models.LicenseUpdate{
+			UserEmail: email,
+			SKU:       ent.SKU,
+			Location:  ent.Location,
+			Action:    models.LicenseActionGrant,
 		})
-		entryByConfigPath[idxEntry.Path] = idxEntry
 	}
 
-	for configPath, updates := range pendingByConfig {
-		idxEntry := entryByConfigPath[configPath]
-		for _, chunk := range chunkLicenseUpdates(updates, models.MaxBatchSize) {
-			if dryRun {
-				licensesGranted += len(chunk)
-				continue
+	for key, updates := range pendingByKey {
+		entries := index[key]
+		remaining := updates
+		for _, entry := range entries {
+			if len(remaining) == 0 {
+				break
 			}
-			granted, softFailed, err := s.grantBatch(ctx, projectID, projectNumber, idxEntry, chunk)
-			if err != nil {
-				return 0, 0, 0, fmt.Errorf("project %q batch grant: %w", projectID, err)
+			// Stamp the resolved path onto every update before chunking so each
+			// batch carry the correct licenseConfigPath for this pool.
+			resolved := make([]models.LicenseUpdate, len(remaining))
+			for i, u := range remaining {
+				u.LicenseConfigPath = entry.Path
+				resolved[i] = u
 			}
-			licensesGranted += granted
-			licensesSoftFailed += softFailed
+			var totalGranted int
+			var nextRemaining []models.LicenseUpdate
+			for _, chunk := range chunkLicenseUpdates(resolved, models.MaxBatchSize) {
+				if dryRun {
+					totalGranted += len(chunk)
+					continue
+				}
+				granted, softFailed, err := s.grantBatch(ctx, projectID, projectNumber, entry, chunk)
+				if err != nil {
+					return 0, 0, 0, fmt.Errorf("project %q batch grant: %w", projectID, err)
+				}
+				totalGranted += granted
+				nextRemaining = append(nextRemaining, softFailed...)
+			}
+			licensesGranted += totalGranted
+			remaining = nextRemaining
 		}
+		licensesSoftFailed += len(remaining)
 	}
 
 	return licensesGranted, licensesSoftFailed, groupsProcessed, nil
@@ -198,21 +215,24 @@ func (s *JoinerService) processProject(ctx context.Context, projectID, projectNu
 // grantBatch issues a BatchUpdateUserLicenses call for a homogeneous batch
 // (all updates share the same licenseConfigPath). On license pool exhaustion
 // it fetches the current usage stats, retries with however many seats remain,
-// and soft-fails the rest. Non-exhaustion errors are returned as hard failures.
-// It returns the number of licenses granted and the number soft-failed.
-func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber string, entry models.LicenseConfigEntry, batch []models.LicenseUpdate) (granted, softFailed int, err error) {
+// and returns the remainder as soft-failed updates so the caller can forward
+// them to the next pool. Non-exhaustion errors are returned as hard failures.
+// It returns the number of licenses granted and the soft-failed update slice.
+func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber string, entry models.LicenseConfigEntry, batch []models.LicenseUpdate) (granted int, softFailedUpdates []models.LicenseUpdate, err error) {
 	logger := middleware.LoggerFromContext(ctx)
 
-	if batchErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, batch); batchErr == nil {
-		return len(batch), 0, nil
+	location := batch[0].Location
+
+	if batchErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, batch); batchErr == nil {
+		return len(batch), nil, nil
 	} else if !errors.Is(batchErr, models.ErrLicensesExhausted) {
-		return 0, 0, batchErr
+		return 0, nil, batchErr
 	}
 
 	// License pool exhausted. Look up how many seats are still available.
-	usageStats, statsErr := s.gemini.FetchLicenseUsageStats(ctx, projectNumber)
+	usageStats, statsErr := s.gemini.FetchLicenseUsageStats(ctx, projectNumber, location)
 	if statsErr != nil {
-		return 0, 0, fmt.Errorf("fetching license usage stats after exhaustion: %w", statsErr)
+		return 0, nil, fmt.Errorf("fetching license usage stats after exhaustion: %w", statsErr)
 	}
 
 	used := usageStats[entry.Path]
@@ -229,15 +249,15 @@ func (s *JoinerService) grantBatch(ctx context.Context, projectID, projectNumber
 	)
 
 	if available == 0 {
-		return 0, len(batch), nil
+		return 0, batch, nil
 	}
 
 	// Retry with only the available seats. Any error here is a hard failure.
 	trimmed := batch[:available]
-	if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, trimmed); retryErr != nil {
-		return 0, 0, retryErr
+	if retryErr := s.gemini.BatchUpdateUserLicenses(ctx, projectID, location, trimmed); retryErr != nil {
+		return 0, nil, retryErr
 	}
-	return int(available), len(batch) - int(available), nil
+	return int(available), batch[available:], nil
 }
 
 // collectGroupMembers pages through all members of groupEmail and updates

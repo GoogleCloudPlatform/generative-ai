@@ -79,7 +79,8 @@ type LicenseConfigEntry struct {
 }
 
 // LicenseConfigIndex maps (SKU, ProjectNumber, Location) to the resolved
-// LicenseConfigEntry. It is built once at startup from the
-// billingAccountLicenseConfigs API and used by the service layer to resolve
-// grant operations and look up available seat capacity.
-type LicenseConfigIndex map[LicenseConfigKey]LicenseConfigEntry
+// LicenseConfigEntry slice. Multiple active subscriptions with the same
+// SKU+project+location each contribute a distinct entry; the slice preserves
+// all of them so the service layer can spill users across pools when one is
+// exhausted.
+type LicenseConfigIndex map[LicenseConfigKey][]LicenseConfigEntry
