@@ -1,0 +1,13 @@
+[
+  { "beginRendering": { "surfaceId": "drive-files", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "drive-files", "components": [
+    { "id": "root", "component": { "Card": { "child": "col" } } },
+    { "id": "col", "component": { "Column": { "children": { "explicitList": ["title", "div1", "f1", "f1m", "f2", "f2m"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📁 Drive Files" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "f1", "component": { "Text": { "text": { "literalString": "[Weekly Inventory Report](https://drive.google.com/file/d/EXAMPLE1)" }, "usageHint": "body" } } },
+    { "id": "f1m", "component": { "Text": { "text": { "literalString": "Document - modified 2024-09-15" }, "usageHint": "body" } } },
+    { "id": "f2", "component": { "Text": { "text": { "literalString": "[Q3 Sales Data](https://drive.google.com/file/d/EXAMPLE2)" }, "usageHint": "body" } } },
+    { "id": "f2m", "component": { "Text": { "text": { "literalString": "Spreadsheet - modified 2024-09-10" }, "usageHint": "body" } } }
+  ] } }
+]

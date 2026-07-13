@@ -1,0 +1,19 @@
+[
+  { "beginRendering": { "surfaceId": "file-compose", "root": "root" } },
+  { "dataModelUpdate": { "surfaceId": "file-compose", "path": "/form", "contents": [{ "key": "name", "valueString": "Weekly Inventory Report" }, { "key": "type", "valueMap": [{ "key": "0", "valueString": "Document" }] }, { "key": "content", "valueString": "Summary of this week's inventory reconciliation." }] } },
+  { "surfaceUpdate": { "surfaceId": "file-compose", "components": [
+    { "id": "root", "component": { "Card": { "child": "col" } } },
+    { "id": "col", "component": { "Column": { "children": { "explicitList": ["title", "div1", "fName", "choiceType", "fContent", "div2", "actions"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📄 Create Drive File" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "fName", "component": { "TextField": { "label": { "literalString": "File name" }, "text": { "path": "/form/name" }, "textFieldType": "shortText" } } },
+    { "id": "choiceType", "component": { "MultipleChoice": { "selections": { "path": "/form/type" }, "options": [{ "label": { "literalString": "Document" }, "value": "Document" }, { "label": { "literalString": "Spreadsheet" }, "value": "Spreadsheet" }, { "label": { "literalString": "Presentation" }, "value": "Presentation" }, { "label": { "literalString": "Folder" }, "value": "Folder" }], "maxAllowedSelections": 1, "variant": "chips" } } },
+    { "id": "fContent", "component": { "TextField": { "label": { "literalString": "Content" }, "text": { "path": "/form/content" }, "textFieldType": "longText" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actions", "component": { "Row": { "children": { "explicitList": ["btnCreate", "btnCancel"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnCreate", "component": { "Button": { "child": "lblCreate", "primary": true, "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Create this Drive file:" } }, { "key": "name", "value": { "path": "/form/name" } }, { "key": "type", "value": { "path": "/form/type" } }, { "key": "content", "value": { "path": "/form/content" } }] } } } },
+    { "id": "lblCreate", "component": { "Text": { "text": { "literalString": "✅ Create" }, "usageHint": "body" } } },
+    { "id": "btnCancel", "component": { "Button": { "child": "lblCancel", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Cancel creating the file" } }] } } } },
+    { "id": "lblCancel", "component": { "Text": { "text": { "literalString": "🚫 Cancel" }, "usageHint": "body" } } }
+  ] } }
+]

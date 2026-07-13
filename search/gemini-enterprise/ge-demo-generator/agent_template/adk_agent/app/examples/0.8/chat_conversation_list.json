@@ -1,0 +1,21 @@
+[
+  { "beginRendering": { "surfaceId": "chat-conversations", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "chat-conversations", "components": [
+    { "id": "root", "component": { "Card": { "child": "col" } } },
+    { "id": "col", "component": { "Column": { "children": { "explicitList": ["title", "div1", "row1", "row2", "row3"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "💬 Your Chat Conversations" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "row1", "component": { "Row": { "children": { "explicitList": ["t1", "b1"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "t1", "component": { "Text": { "text": { "literalString": "Engineering (Space)" }, "usageHint": "body" } } },
+    { "id": "b1", "component": { "Button": { "child": "b1l", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Send a message to the Engineering space" } }] } } } },
+    { "id": "b1l", "component": { "Text": { "text": { "literalString": "📤 Send here" }, "usageHint": "body" } } },
+    { "id": "row2", "component": { "Row": { "children": { "explicitList": ["t2", "b2"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "t2", "component": { "Text": { "text": { "literalString": "Operations (Space)" }, "usageHint": "body" } } },
+    { "id": "b2", "component": { "Button": { "child": "b2l", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Send a message to the Operations space" } }] } } } },
+    { "id": "b2l", "component": { "Text": { "text": { "literalString": "📤 Send here" }, "usageHint": "body" } } },
+    { "id": "row3", "component": { "Row": { "children": { "explicitList": ["t3", "b3"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "t3", "component": { "Text": { "text": { "literalString": "Store Managers (Space)" }, "usageHint": "body" } } },
+    { "id": "b3", "component": { "Button": { "child": "b3l", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Send a message to the Store Managers space" } }] } } } },
+    { "id": "b3l", "component": { "Text": { "text": { "literalString": "📤 Send here" }, "usageHint": "body" } } }
+  ] } }
+]

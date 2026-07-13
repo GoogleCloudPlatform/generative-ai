@@ -1,0 +1,33 @@
+[
+  { "beginRendering": { "surfaceId": "comparison-matrix", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "comparison-matrix", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "div1", "compareRow", "div2", "summaryText", "div3", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📊 Faculty Performance Comparison" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "compareRow", "component": { "Row": { "children": { "explicitList": ["colA", "colB", "colC"] }, "distribution": "spaceEvenly", "alignment": "start" } } },
+    { "id": "colA", "component": { "Column": { "children": { "explicitList": ["colATitle", "colAK1", "colAK2", "colAK3"] }, "distribution": "start", "alignment": "center" } } },
+    { "id": "colATitle", "component": { "Text": { "text": { "literalString": "🏗️ Engineering" }, "usageHint": "h3" } } },
+    { "id": "colAK1", "component": { "Text": { "text": { "literalString": "Donations: [CURRENCY]1.97M" }, "usageHint": "body" } } },
+    { "id": "colAK2", "component": { "Text": { "text": { "literalString": "Score: 79.0" }, "usageHint": "body" } } },
+    { "id": "colAK3", "component": { "Text": { "text": { "literalString": "6 members" }, "usageHint": "caption" } } },
+    { "id": "colB", "component": { "Column": { "children": { "explicitList": ["colBTitle", "colBK1", "colBK2", "colBK3"] }, "distribution": "start", "alignment": "center" } } },
+    { "id": "colBTitle", "component": { "Text": { "text": { "literalString": "⚖️ Law" }, "usageHint": "h3" } } },
+    { "id": "colBK1", "component": { "Text": { "text": { "literalString": "Donations: [CURRENCY]1.77M" }, "usageHint": "body" } } },
+    { "id": "colBK2", "component": { "Text": { "text": { "literalString": "Score: 75.5" }, "usageHint": "body" } } },
+    { "id": "colBK3", "component": { "Text": { "text": { "literalString": "8 members" }, "usageHint": "caption" } } },
+    { "id": "colC", "component": { "Column": { "children": { "explicitList": ["colCTitle", "colCK1", "colCK2", "colCK3"] }, "distribution": "start", "alignment": "center" } } },
+    { "id": "colCTitle", "component": { "Text": { "text": { "literalString": "💰 Economics" }, "usageHint": "h3" } } },
+    { "id": "colCK1", "component": { "Text": { "text": { "literalString": "Donations: [CURRENCY]1.20M" }, "usageHint": "body" } } },
+    { "id": "colCK2", "component": { "Text": { "text": { "literalString": "Score: 67.0" }, "usageHint": "body" } } },
+    { "id": "colCK3", "component": { "Text": { "text": { "literalString": "8 members" }, "usageHint": "caption" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "summaryText", "component": { "Text": { "text": { "literalString": "💡 Engineering leads in both donations and score. Economics has more members but lower scores — engagement strategy reinforcement recommended" }, "usageHint": "body" } } },
+    { "id": "div3", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnEcon", "btnReport"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnEcon", "component": { "Button": { "child": "lblEcon", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Analyze the root cause of low engagement in Economics" } }] } } } },
+    { "id": "lblEcon", "component": { "Text": { "text": { "literalString": "📉 Deep-Dive Economics" }, "usageHint": "body" } } },
+    { "id": "btnReport", "component": { "Button": { "child": "lblReport", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Generate a detailed report for all faculties" } }] } } } },
+    { "id": "lblReport", "component": { "Text": { "text": { "literalString": "📋 All Faculties Report" }, "usageHint": "body" } } }
+  ] } }
+]

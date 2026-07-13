@@ -1,0 +1,17 @@
+[
+  { "beginRendering": { "surfaceId": "image-report", "root": "root" } },
+  { "surfaceUpdate": { "surfaceId": "image-report", "components": [
+    { "id": "root", "component": { "Card": { "child": "mainCol" } } },
+    { "id": "mainCol", "component": { "Column": { "children": { "explicitList": ["title", "div1", "chartImage", "insight", "div2", "actionRow"] }, "distribution": "start", "alignment": "stretch" } } },
+    { "id": "title", "component": { "Text": { "text": { "literalString": "📊 Donation Trend Analysis Report" }, "usageHint": "h2" } } },
+    { "id": "div1", "component": { "Divider": {} } },
+    { "id": "chartImage", "component": { "Image": { "url": { "literalString": "https://example.com/chart.png" }, "altText": { "literalString": "2020-2024 Donation Trends by Faculty" }, "fit": "contain" } } },
+    { "id": "insight", "component": { "Text": { "text": { "literalString": "💡 Engineering donations up +23% YoY. Economics down -8%. Engagement strategy review recommended." }, "usageHint": "body" } } },
+    { "id": "div2", "component": { "Divider": {} } },
+    { "id": "actionRow", "component": { "Row": { "children": { "explicitList": ["btnDetail", "btnExport"] }, "distribution": "spaceEvenly", "alignment": "center" } } },
+    { "id": "btnDetail", "component": { "Button": { "child": "lblDetail", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Analyze the root cause of declining donations in the Economics faculty" } }] } } } },
+    { "id": "lblDetail", "component": { "Text": { "text": { "literalString": "📉 Root Cause" }, "usageHint": "body" } } },
+    { "id": "btnExport", "component": { "Button": { "child": "lblExport", "action": { "name": "sendText", "context": [{ "key": "text", "value": { "literalString": "Summarize this analysis report in PDF format" } }] } } } },
+    { "id": "lblExport", "component": { "Text": { "text": { "literalString": "📄 Export Report" }, "usageHint": "body" } } }
+  ] } }
+]
