@@ -26,6 +26,10 @@ agent_template/ (real, testable files — fetched at setup run time)
   ├─ adk_agent/app/fast_api_app.py     A2A/FastAPI runtime
   ├─ adk_agent/app/part_converters.py  A2UI part conversion
   ├─ adk_agent/app/examples/0.8/*.json A2UI few-shot examples
+  ├─ managed_agent/                    Managed Agent provisioning helpers
+  │                                    (create_managed_agent.py, warmup_managed_agent.py)
+  ├─ demo_skills/                      Deliverable craft skills mounted into the
+  │                                    Managed Agent sandbox (SKILL.md packs)
   └─ viewer_app/                       Firestore data viewer (Cloud Run Functions)
 ```
 
@@ -33,7 +37,7 @@ Per-demo variation is passed at run time, never baked into the Python:
 
 | Mechanism | Contents |
 |---|---|
-| Environment variables | `DEMO_DATASET`, `FS_COLLECTION`, `REFERENCE_DATE`, `PUBLIC_DATASET_ID`, `ENABLE_WORKSPACE_MCP`, `ENABLE_COMPUTER_USE` (plus the pre-existing `DEMO_ID`, `DATA_VIEWER_URL`, …) |
+| Environment variables | `DEMO_DATASET`, `FS_COLLECTION`, `REFERENCE_DATE`, `PUBLIC_DATASET_ID`, `ENABLE_WORKSPACE_MCP`, `ENABLE_COMPUTER_USE`, `ENABLE_MANAGED_AGENT`, `ENABLE_WORKSPACE_AUTH`, `MANAGED_AGENT_ID`, `MANAGED_AGENT_SKILLS_SOURCE` (plus the pre-existing `DEMO_ID`, `DATA_VIEWER_URL`, …) |
 | `generated_instruction.md` | The Gemini-generated system instruction for the demo |
 | `mcp_config.json` | Imported MCP servers (name, entrypoint, port, auth type) |
 | Placeholders substituted by the setup script | `[CURRENCY]` in the example JSONs; `__GE_FS_COLLECTION__` / `__GE_DASH_TITLE__` / `__GE_DASH_DESC__` in `viewer_app/main.py` |
@@ -82,7 +86,51 @@ does NOT escape.
 `[BRACKET]` and `<angle_bracket>` notations are safe. This is why the
 instruction pipeline uses `[PROJECT_ID]`-style tokens with `str.replace`.
 
-## 3. Template fetch pinning (TEMPLATE_REF)
+## 3. Managed Autonomous Agent (`enableManagedAgent`)
+
+Optional feature (default ON in the UI) that provisions a Pre-GA **Managed
+Agents API** agent (Antigravity harness, location `global` only) the ADK agent
+can delegate long-running autonomous work to over the **Interactions API**
+(REST + SSE via httpx — intentionally no new pinned dependency).
+
+- **Flag thread**: `index.html` toggle → `generateSetupScript` → PHASE A
+  (right after the dashboards bucket exists: skills upload to
+  `gs://<dash-bucket>/skills`, `managed_agent_instruction.txt` heredoc,
+  `create_managed_agent.py start`) → `.env` + Cloud Run env
+  (`ENABLE_MANAGED_AGENT`, `MANAGED_AGENT_ID`, `MANAGED_AGENT_SKILLS_SOURCE`)
+  → env-gated blocks in `tools.py` / `agent.py` / `fast_api_app.py` → PHASE B
+  (after Cloud Run deploy + GE registration: `create_managed_agent.py wait`
+  polls readiness, `warmup_managed_agent.py` stores the environment id in
+  Firestore `<demo>_managed_agent_state/current`). The A/B split hides the
+  ~8-10 min agent creation behind the rest of the setup.
+- **`enableWorkspaceAuth` (auth-only mode)**: sets up the GE OAuth
+  authorization WITHOUT the Developer-Preview Workspace MCP servers (no
+  allowlist needed). Derived gates: `workspaceAuthEnabled = enableWorkspaceMcp
+  || enableWorkspaceAuth` (auth infra) and `driveHandoffEnabled =
+  enableManagedAgent && workspaceAuthEnabled` (Drive save tool, gws skills,
+  Workspace handoff instructions). The same derivation exists in the Python
+  templates as `ENABLE_WORKSPACE_MCP`/`ENABLE_WORKSPACE_AUTH` env guards.
+- **Pins**: `Api-Revision` is pinned in TWO places — `tools.py`
+  (`_INTERACTIONS_API_REVISION`) and `warmup_managed_agent.py`. Update both.
+  The base agent version pin lives in `create_managed_agent.py`
+  (`BASE_AGENT`, env-overridable via `MA_BASE_AGENT`) and self-heals from the
+  API's 400 error listing when rejected.
+- **API quirks (verified live)**: the agent-create LRO never reports
+  `done: true` — readiness is polled with GET on the agent itself; the
+  completion SSE event carries no output text — reports are concatenated
+  `step.delta` text chunks; a fresh interaction `environment` does NOT
+  inherit the agent's `base_environment` — every sandbox spec must restate
+  network + skills sources.
+- **Skills**: deliverable craft skills are real files under
+  `agent_template/demo_skills/` (professional-document,
+  professional-presentation, web-report). The setup script copies them from
+  the fetched template into `skills/`, uploads them to the dashboards bucket,
+  and mounts them into the sandbox. The Google Chrome
+  `modern-web-guidance` skill is cloned fresh from GitHub at setup time.
+- **Tunables** (env): `MANAGED_AGENT_SYNC_WAIT_S` (30),
+  `MANAGED_AGENT_MAX_RUNTIME_S` (1800), `MANAGED_AGENT_POLL_EXTRA_S` (3600).
+
+## 4. Template fetch pinning (TEMPLATE_REF)
 
 The generated setup script fetches `agent_template/` at the commit pinned in
 `CONFIG.TEMPLATE_REF` (Script-Properties overridable, together with
@@ -96,7 +144,7 @@ Two safety nets exist — keep both working:
 - Run time: the fetch step exits with a clear message if the ref cannot be
   fetched.
 
-## 4. Release checklist
+## 5. Release checklist
 
 1. Edit `agent_template/` and/or `app/` files; run `python3 validate_examples.py`.
 2. Bump `APP_VERSION` in `app/Code.gs`.
@@ -106,7 +154,7 @@ Two safety nets exist — keep both working:
    and push that change too.
 5. `clasp push` the `app/` files; deploy a test demo end to end.
 
-## 5. Deployment anti-patterns (learned the hard way)
+## 6. Deployment anti-patterns (learned the hard way)
 
 - **No background processes for sequential dependencies** in the setup script:
   `docker build &` followed by a dependent step races; keep dependent steps
@@ -121,7 +169,7 @@ Two safety nets exist — keep both working:
   the templates, operate on raw bytes/strings, not on regex replacements with
   `\n` in the replacement text (Python `re` interprets them).
 
-## 6. Verification
+## 7. Verification
 
 - `python3 validate_examples.py` — template JSON + Python compile checks.
 - `bash -n` any generated setup script before running it.
