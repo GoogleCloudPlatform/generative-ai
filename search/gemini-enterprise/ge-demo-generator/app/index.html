@@ -1917,7 +1917,7 @@ limitations under the License.
             </div>
 
             <!-- Advanced Settings Content (Moved to bottom under links) -->
-            <div id="advancedSettingsContent" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-end bg-black/20 px-6 py-5 rounded-2xl border border-white/5 font-inter">
+            <div id="advancedSettingsContent" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-start bg-black/20 px-6 py-5 rounded-2xl border border-white/5 font-inter">
               <div>
                 <label class="block text-[10px] text-gray-500 mb-2 font-bold uppercase tracking-widest">Data Profile</label>
                 <select id="dataProfile" class="w-full bg-gray-800/50 border border-gray-600 rounded-xl p-2 text-xs text-gray-200">
@@ -1943,6 +1943,32 @@ limitations under the License.
               </div>
 
               <div>
+                <label class="block text-[10px] text-gray-500 mb-2 font-bold uppercase tracking-widest">Google Workspace Authorization (No MCP)</label>
+                <div class="flex items-center gap-3">
+                  <label class="flex items-center gap-2 cursor-pointer group shrink-0">
+                    <div class="relative">
+                      <input id="enableWorkspaceAuth" type="checkbox" class="sr-only peer">
+                      <div class="w-8 h-4 bg-gray-700 rounded-full peer peer-checked:bg-sky-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
+                  </label>
+                  <p class="text-[10px] text-gray-500 leading-snug flex-1">Adds Google sign-in for the demo user WITHOUT the Developer-Preview Workspace MCP servers (no allowlist needed). With the Managed Agent enabled, deliverables can be saved to the user's Drive as native Google Slides / Docs / Sheets, and the autonomous agent acts on Gmail / Chat / Calendar by running the open-source <a href="https://github.com/googleworkspace/cli" target="_blank" rel="noopener" class="text-sky-400 hover:underline">Workspace CLI (gws)</a> inside its sandbox — the CLI is pre-installed into the sandbox during setup warm-up, and its usage skills are mounted at /.agent/skills. Note: posting to Google Chat additionally needs a one-time Google Chat API app configuration in the demo project — the setup script tutorial (step 4) walks through it. Redundant when Workspace MCP is already enabled.</p>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] text-gray-500 mb-2 font-bold uppercase tracking-widest">Managed Autonomous Agent (Antigravity, Preview)</label>
+                <div class="flex items-center gap-3">
+                  <label class="flex items-center gap-2 cursor-pointer group shrink-0">
+                    <div class="relative">
+                      <input id="enableManagedAgent" type="checkbox" class="sr-only peer" checked>
+                      <div class="w-8 h-4 bg-gray-700 rounded-full peer peer-checked:bg-sky-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                    </div>
+                  </label>
+                  <p class="text-[10px] text-gray-500 leading-snug flex-1">Deploy a fully autonomous <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/managed-agents" target="_blank" rel="noopener" class="text-sky-400 hover:underline">Managed Agent</a> (Antigravity harness) the demo agent can delegate long-running tasks to: web research, code execution, and professional deliverables (slides, documents, PDFs, web pages). Pre-GA Preview — works in any project with the Vertex AI API enabled (no allowlist required); agent provisioning adds ~10 min to setup. Combine with Workspace MCP or the Workspace Authorization toggle to unlock Google Drive / Workspace handoff. <span class="text-emerald-400/80 font-bold">Enabled by default</span> — switch it off for quick lightweight demos.</p>
+                </div>
+              </div>
+
+              <div>
                 <label class="block text-[10px] text-gray-500 mb-2 font-bold uppercase tracking-widest">Computer Use (Browser Agent)</label>
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 cursor-pointer group shrink-0">
@@ -1951,7 +1977,7 @@ limitations under the License.
                       <div class="w-8 h-4 bg-gray-700 rounded-full peer peer-checked:bg-sky-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4"></div>
                     </div>
                   </label>
-                  <p class="text-[10px] text-gray-500 leading-snug flex-1">Let the agent operate a real Chromium browser (Gemini 3.5 Flash Computer Use) to run no-API websites. Watchable via a live-view link + in-chat screenshots.</p>
+                  <p class="text-[10px] text-gray-500 leading-snug flex-1">Let the agent operate a real Chromium browser (<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/computer-use" target="_blank" rel="noopener" class="text-sky-400 hover:underline">Gemini 3.5 Flash Computer Use</a>) to run no-API websites. Watchable via a live-view link + in-chat screenshots.</p>
                 </div>
               </div>
             </div>
@@ -2924,7 +2950,11 @@ limitations under the License.
           stopMagicWandAnimation();
           showToast('❌ Optimization failed: ' + err.message);
         })
-        .optimizeGoalWithMagicWand(rawGoal);
+        .optimizeGoalWithMagicWand(rawGoal, {
+          enableManagedAgent: document.getElementById('enableManagedAgent') ? document.getElementById('enableManagedAgent').checked : true,
+          enableWorkspaceMcp: window.workspaceMcpIncluded || false,
+          enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false
+        });
     }
 
     function applySelectedWorkflows() {
@@ -4077,7 +4107,9 @@ limitations under the License.
         usePublicDataset: document.getElementById('usePublicDataset').checked,
         importedMcpList: cachedImportedMcpList.length > 0 ? cachedImportedMcpList : null,
         enableWorkspaceMcp: window.workspaceMcpIncluded || false,
-        enableComputerUse: document.getElementById('enableComputerUse') ? document.getElementById('enableComputerUse').checked : false
+        enableComputerUse: document.getElementById('enableComputerUse') ? document.getElementById('enableComputerUse').checked : false,
+        enableManagedAgent: document.getElementById('enableManagedAgent') ? document.getElementById('enableManagedAgent').checked : false,
+        enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false
       };
 
       generationRetryCount = 0; // Reset retry count for a fresh generation
@@ -5910,7 +5942,7 @@ limitations under the License.
           <span class="feature-badge">🚀 Major Update</span>
         </div>
         <h2 class="text-xl font-bold text-white mb-1">What's New</h2>
-        <p class="text-gray-400 text-xs">5 powerful capabilities to elevate your demos</p>
+        <p class="text-gray-400 text-xs">3 new capabilities to elevate your demos</p>
       </div>
 
       <!-- Scrollable Content Wrapper -->
@@ -5919,272 +5951,20 @@ limitations under the License.
         <div class="flex-1 overflow-y-auto pr-1 modal-scrollable-content pt-3 premium-mask-fade">
           <div class="modal-scrollable-inner">
 
-      <!-- Feature: Interactive Dashboards (publish_dashboard) -->
+      <!-- Feature 1: Managed Agents API (Antigravity) - Autonomous Long-Horizon Agent -->
       <div class="feature-card mb-4">
         <div class="flex gap-3">
-          <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/15 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500/15 to-violet-500/15 flex items-center justify-center text-fuchsia-400 border border-fuchsia-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.95-6.95l-1.414 1.414M7.464 16.536L6.05 17.95m11.9 0l-1.414-1.414M7.464 7.464L6.05 6.05M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
           </div>
           <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-bold text-white mb-0.5">Interactive Dashboards - One-Click Executive Views</h4>
-            <p class="text-[11px] text-gray-200 leading-relaxed">Your agent can now build a full <span class="font-bold text-emerald-400">interactive HTML dashboard</span> from the demo's live BigQuery data and share it as a secure link. Just ask for "an interactive executive dashboard I can open in the browser" and the agent authors a self-contained page - KPI tiles, charts, sortable &amp; searchable tables, filters, and light/dark mode - uploads it to a <span class="font-bold text-emerald-400">non-public Cloud Storage bucket</span>, and returns a time-limited <span class="font-bold text-emerald-400">signed URL</span>. <span class="text-emerald-400/80">Deliver the polished, clickable analytics experience customers now expect from Gemini canvas - right inside your demo.</span></p>
+            <h4 class="text-sm font-bold text-white mb-0.5">Autonomous Long-Horizon Agents - Managed Agents API (Antigravity)</h4>
+            <p class="text-[11px] text-gray-200 leading-relaxed">Your demo agent can now delegate <span class="font-bold text-fuchsia-400">long-horizon agentic tasks</span> to a fully autonomous <span class="font-bold text-fuchsia-400">Managed Agent</span> built on the <span class="font-bold text-fuchsia-400">Antigravity harness</span> (Managed Agents API, Pre-GA). Working for minutes at a time in its own cloud sandbox, it researches the live web, queries the demo's BigQuery &amp; Firestore data, writes and runs code, and crafts professional deliverables - presentation decks, documents, PDFs, and web reports - with live progress streamed into the chat and results announced automatically. Pair it with <span class="font-bold text-fuchsia-400">Google Workspace</span> (via Workspace MCP or the new lightweight Workspace Authorization toggle) and the agent saves files into the user's Drive as native Slides / Docs / Sheets, drafts Gmail messages, posts to Chat, and books Calendar events with the user's own sign-in. <span class="text-fuchsia-400/80">Show truly realistic autonomous agentic work, end to end: research, build, deliver, and act across Workspace - all from one prompt.</span> <span class="font-bold text-emerald-400">Now enabled by default for every new demo.</span></p>
           </div>
         </div>
       </div>
 
-      <!-- Feature 1: Computer Use (Browser Agent) -->
-      <div class="feature-card mb-4">
-        <div class="flex gap-3">
-          <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/15 to-pink-500/15 flex items-center justify-center text-rose-400 border border-rose-500/20">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-bold text-white mb-0.5">Computer Use - Autonomous Browser Agent</h4>
-            <p class="text-[11px] text-gray-200 leading-relaxed">Powered by <span class="font-bold text-rose-400">Gemini 3.5 Flash Computer Use</span>, your agent can now operate a real web browser - navigating, clicking, typing, and extracting data from sites that have <span class="font-bold text-rose-400">no API at all</span>: competitor pages, supplier &amp; regulatory portals, public data sources, and internal web apps. Watch it run live via a "Watch Browser Session" link, with step-by-step screenshots streamed straight into the chat. <span class="text-rose-400/80">Automate the ~80% of enterprise systems that have no API - and let customers watch the agent work the same way a person would.</span></p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature 2: Agentic Workflow -->
-      <div class="feature-card mb-4">
-        <div class="flex gap-3 mb-3">
-          <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/15 to-orange-500/15 flex items-center justify-center text-amber-400 border border-amber-500/20">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-bold text-white mb-0.5">Agentic Workflow with Interactive A2UI</h4>
-            <p class="text-[11px] text-gray-200 leading-relaxed">Instantly generate highly tailored <span class="font-bold text-amber-400">agentic workflows</span> that seamlessly integrate autonomous execution with rich, interactive user interfaces (A2UI). Your agent can now process unstructured documents, auto-correct data against enterprise databases, and present dynamic UI components (cards, forms, approval flows) for real-time human-in-the-loop decisions. <span class="text-amber-400/80">Accelerate sales cycles and spark immediate "I want this" moments by showcasing complete, visually compelling business operations built instantly with zero coding.</span></p>
-          </div>
-        </div>
-        <!-- Agentic Workflow Inline Dynamic SVG Animation (ULTRA ENLARGED VERTICAL STACK - width 100% to fill 672px modal) -->
-        <div class="mt-3 rounded-xl overflow-hidden relative group">
-          <svg viewBox="0 0 600 260" class="w-full h-auto bg-slate-950/70 rounded-xl border border-amber-500/20 p-4" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <!-- Colors and Gradients -->
-              <linearGradient id="sparkleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#f59e0b" />
-                <stop offset="100%" stop-color="#d97706" />
-              </linearGradient>
-              <linearGradient id="dbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#38bdf8" />
-                <stop offset="100%" stop-color="#0284c7" />
-              </linearGradient>
-              <linearGradient id="activeHeaderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.02"/>
-                <stop offset="50%" stop-color="#fbbf24" stop-opacity="0.15"/>
-                <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.02"/>
-              </linearGradient>
-              
-              <!-- CSS Animation -->
-              <style>
-                @keyframes flowDot {
-                  0% { stroke-dashoffset: 40; }
-                  100% { stroke-dashoffset: 0; }
-                }
-                @keyframes dbPulse {
-                  0%, 76%, 91%, 100% { fill-opacity: 0.15; stroke: #475569; filter: none; }
-                  77%, 90% { fill-opacity: 0.4; stroke: #38bdf8; filter: drop-shadow(0 0 6px #38bdf8); }
-                }
-                @keyframes highlightFocus {
-                  0%, 100% { stroke: #334155; }
-                  50% { stroke: #fbbf24; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.35)); }
-                }
-                
-                /* Mega Timeline: Cursor path movement & clicking (10s loop) */
-                @keyframes cursorMove {
-                  0%, 10%, 100% { transform: translate(300px, 170px) scale(1); }
-                  18% { transform: translate(90px, 100px) scale(1); }
-                  20% { transform: translate(90px, 100px) scale(0.82); } /* Click Chip A */
-                  22%, 28% { transform: translate(90px, 100px) scale(1); }
-                  35% { transform: translate(165px, 144px) scale(1); }
-                  37% { transform: translate(165px, 144px) scale(0.82); } /* Click Qty TextField */
-                  40%, 48% { transform: translate(165px, 144px) scale(1); }
-                  56% { transform: translate(240px, 100px) scale(1); }
-                  58% { transform: translate(240px, 100px) scale(0.82); } /* Click Chip B */
-                  60%, 68% { transform: translate(240px, 100px) scale(1); }
-                  76% { transform: translate(170px, 184px) scale(1); }
-                  78% { transform: translate(170px, 184px) scale(0.82); } /* Click Approve Button */
-                  82%, 90% { transform: translate(170px, 184px) scale(1); }
-                }
-
-                /* Button A (Standard SKU) States */
-                @keyframes buttonAState {
-                  0%, 19%, 58%, 100% { fill: #1e293b; stroke: #475569; stroke-width: 1; filter: none; }
-                  20%, 57% { fill: rgba(251, 191, 36, 0.12); stroke: #fbbf24; stroke-width: 1.5; filter: drop-shadow(0 2px 6px rgba(251,191,36,0.15)); }
-                }
-                @keyframes textAState {
-                  0%, 19%, 58%, 100% { fill: #64748b; font-weight: normal; }
-                  20%, 57% { fill: #fbbf24; font-weight: bold; }
-                }
-                @keyframes checkAState {
-                  0%, 19%, 58%, 100% { opacity: 0; }
-                  20%, 57% { opacity: 1; }
-                }
-
-                /* Button B (Premium SKU) States */
-                @keyframes buttonBState {
-                  0%, 19%, 58%, 100% { fill: rgba(251, 191, 36, 0.12); stroke: #fbbf24; stroke-width: 1.5; filter: drop-shadow(0 2px 6px rgba(251,191,36,0.15)); }
-                  20%, 57% { fill: #1e293b; stroke: #475569; stroke-width: 1; filter: none; }
-                }
-                @keyframes textBState {
-                  0%, 19%, 58%, 100% { fill: #fbbf24; font-weight: bold; }
-                  20%, 57% { fill: #64748b; font-weight: normal; }
-                }
-                @keyframes checkBState {
-                  0%, 19%, 58%, 100% { opacity: 1; }
-                  20%, 57% { opacity: 0; }
-                }
-
-                /* Qty Value Text States: AI Mismatched Qty (720) vs Human Corrected Qty (120) */
-                @keyframes qtyErrState {
-                  0%, 36% { opacity: 1; }
-                  37%, 100% { opacity: 0; }
-                }
-                @keyframes qtyOkState {
-                  0%, 36% { opacity: 0; }
-                  37%, 100% { opacity: 1; }
-                }
-
-                /* Approve Button Clicking State */
-                @keyframes approveBtnState {
-                  0%, 77%, 82%, 100% { fill: #1e3a8a; stroke: #3b82f6; }
-                  78%, 81% { fill: #1d4ed8; stroke: #60a5fa; filter: drop-shadow(0 0 4px #3b82f6); }
-                }
-
-                .anim-cursor {
-                  animation: cursorMove 8s infinite ease-in-out;
-                  transform-origin: 0 0;
-                }
-                .anim-btn-a { animation: buttonAState 8s infinite ease-in-out; }
-                .anim-txt-a { animation: textAState 8s infinite ease-in-out; }
-                .anim-chk-a { animation: checkAState 8s infinite ease-in-out; }
-                
-                .anim-btn-b { animation: buttonBState 8s infinite ease-in-out; }
-                .anim-txt-b { animation: textBState 8s infinite ease-in-out; }
-                .anim-chk-b { animation: checkBState 8s infinite ease-in-out; }
-
-                .anim-qty-err { animation: qtyErrState 8s infinite ease-in-out; }
-                .anim-qty-ok { animation: qtyOkState 8s infinite ease-in-out; }
-                .anim-btn-approve { animation: approveBtnState 8s infinite ease-in-out; }
-
-                .anim-flow {
-                  stroke-dasharray: 8, 8;
-                  animation: flowDot 2s infinite linear;
-                }
-                .anim-db {
-                  animation: dbPulse 8s infinite ease-in-out;
-                }
-                .anim-card-focus {
-                  animation: highlightFocus 4s infinite ease-in-out;
-                }
-              </style>
-            </defs>
-
-            <!-- Background Grid Patterns (Tech Vibe) -->
-            <g opacity="0.02">
-              <path d="M0 40 H600 M0 80 H600 M0 120 H600 M0 160 H600 M0 200 H600 M0 240 H600" stroke="#fff" stroke-width="1"/>
-              <path d="M100 0 V280 M200 0 V280 M300 0 V280 M400 0 V280 M500 0 V280" stroke="#fff" stroke-width="1"/>
-            </g>
-
-            <!-- ================= LEFT: UNSTRUCTURED INPUT (Highly Minimized - Centered on Y=125) ================= -->
-            <g transform="translate(15, 65)" opacity="0.35">
-              <rect x="0" y="0" width="70" height="110" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
-              <path d="M12 20 H58 M12 35 H45 M12 50 H52" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
-              <!-- handwritten qty in document -->
-              <path d="M12 70 Q25 65, 35 72 T58 68" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
-              <!-- Original Quantity Label -->
-              <text x="35" y="92" text-anchor="middle" fill="#f59e0b" font-size="9" font-family="monospace" font-weight="bold">"Qty: 120"</text>
-              <rect x="40" y="98" width="20" height="20" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1"/>
-              <path d="M45 108 L48 112 L54 104" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              <text x="35" y="123" text-anchor="middle" fill="#64748b" font-size="9" font-weight="bold" font-family="sans-serif">RAW DOC</text>
-            </g>
-
-            <!-- ================= MIDDLE: AGENTIC INTERACTION (MEGA ENLARGED CARD & CENTER-ALIGNED) ================= -->
-            <g transform="translate(130, 20)">
-              <!-- Card Container with breathing focus border -->
-              <rect class="anim-card-focus" x="0" y="0" width="340" height="215" rx="16" fill="#0f172a" stroke="#334155" stroke-width="2"/>
-              
-              <!-- Center-Aligned Header -->
-              <rect x="1" y="1" width="338" height="30" rx="15" fill="url(#activeHeaderGrad)"/>
-              <text x="170" y="19" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="bold" font-family="sans-serif" letter-spacing="0.8">AI PROPOSED SKU (A2UI)</text>
-              <line x1="0" y1="31" x2="340" y2="31" stroke="#334155" stroke-width="1"/>
-              
-              <!-- 1. Raw Text Box (Centered) -->
-              <text x="170" y="48" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="sans-serif">Original Handwritten Value</text>
-              <text x="170" y="61" text-anchor="middle" fill="#cbd5e1" font-size="11" font-weight="bold" font-family="monospace">"Prod-B / Qty: 120"</text>
-              
-              <!-- Process Flow Downward Arrow (Perfect Center Align) -->
-              <path d="M170 68 V78" stroke="#475569" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M166 74 L170 78 L174 74" stroke="#475569" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-
-              <!-- 2. Single-Select Multi-Button Chips (AI Proposals - Large & Center-Aligned) -->
-              <g transform="translate(0, 84)">
-                <!-- Unselected Option (Standard SKU) -->
-                <g transform="translate(25, 0)">
-                  <rect class="anim-btn-a" x="0" y="0" width="140" height="32" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
-                  <text class="anim-txt-a" x="70" y="19" text-anchor="middle" fill="#64748b" font-size="8.5" font-family="sans-serif"><tspan class="anim-chk-a" fill="#fbbf24" font-weight="bold">✓ </tspan>PRD-A: Standard (350ml)</text>
-                </g>
-                
-                <!-- Selected Active Option (AI Recommended Premium SKU - Highlighted & Checked) -->
-                <g transform="translate(175, 0)">
-                  <rect class="anim-btn-b" x="0" y="0" width="140" height="32" rx="8" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="1.5" filter="drop-shadow(0 2px 6px rgba(251,191,36,0.15))"/>
-                  <text class="anim-txt-b" x="70" y="19" text-anchor="middle" fill="#fbbf24" font-size="8.5" font-weight="bold" font-family="sans-serif"><tspan class="anim-chk-b" fill="#fbbf24" font-weight="bold">✓ </tspan>PRD-B: Premium (500ml)</text>
-                </g>
-              </g>
-
-              <!-- 3. Editable Qty Field (Centered with AI Mismatch [720] ➔ Human Corrected [120] Story) -->
-              <g transform="translate(0, 128)">
-                <!-- Label & Input Box centered together -->
-                <text x="115" y="18" text-anchor="end" fill="#94a3b8" font-size="9" font-family="sans-serif">AI Recognized Qty:</text>
-                <rect x="125" y="4" width="50" height="20" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1"/>
-                
-                <!-- Dynamic Qty value switching (720 in Red ➔ 120 in Blue) -->
-                <text class="anim-qty-err" x="150" y="18" text-anchor="middle" fill="#f87171" font-size="11" font-weight="bold" font-family="monospace">720</text>
-                <text class="anim-qty-ok" x="150" y="18" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="bold" font-family="monospace">120</text>
-                
-                <text x="182" y="18" fill="#64748b" font-size="8" font-family="sans-serif">(AI Mismatch ➔ Click to Edit)</text>
-              </g>
-
-              <!-- 4. Giant Approve Button (Centered) -->
-              <g transform="translate(20, 168)">
-                <rect class="anim-btn-approve" x="0" y="0" width="300" height="32" rx="8" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.2))"/>
-                <text x="150" y="20" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold" font-family="sans-serif" letter-spacing="0.5">⚡ APPROVE & EXECUTE ACTION</text>
-              </g>
-              
-              <!-- Dynamic Mouse Cursor Overlay (カチカチ切り替えアニメーション) -->
-              <g class="anim-cursor">
-                <path d="M0 0 L0 16 L4.5 12 L8.5 19 L10 18 L6.5 11.5 L11 11 Z" fill="white" stroke="#0f172a" stroke-width="1.5" stroke-linejoin="round"/>
-              </g>
-            </g>
-
-            <!-- ================= RIGHT: ENTERPRISE DATABASE (Minimized - Centered on Y=125) ================= -->
-            <g transform="translate(515, 65)" opacity="0.35">
-              <g class="anim-db">
-                <ellipse cx="30" cy="20" rx="18" ry="6" fill="#0284c7" stroke="#38bdf8" stroke-width="1"/>
-                <path d="M12 20 V65 A 18 6 0 0 0 48 65 V20" fill="#0284c7" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1"/>
-                <ellipse cx="30" cy="38" rx="18" ry="6" stroke="#38bdf8" stroke-dasharray="2,2" stroke-width="0.8"/>
-                <ellipse cx="30" cy="52" rx="18" ry="6" stroke="#38bdf8" stroke-dasharray="2,2" stroke-width="0.8"/>
-                <text x="30" y="95" text-anchor="middle" fill="#38bdf8" font-size="9" font-family="monospace" font-weight="bold">Enterprise DB</text>
-              </g>
-            </g>
-
-            <!-- ================= COMPACT FLOW CONNECTORS (Aligned on Y=120) ================= -->
-            <path d="M90 120 H120" stroke="#475569" stroke-dasharray="3,3" stroke-width="1.2"/>
-            <path class="anim-flow" d="M90 120 H120" stroke="#f59e0b" stroke-width="2" opacity="0.8"/>
-
-            <path d="M480 120 H510" stroke="#475569" stroke-dasharray="3,3" stroke-width="1.2"/>
-            <path class="anim-flow" d="M480 120 H510" stroke="#38bdf8" stroke-width="2" opacity="0.8"/>
-
-            <rect x="88" y="98" width="36" height="13" rx="3" fill="#1e293b" stroke="#f59e0b" stroke-opacity="0.3" stroke-width="1"/>
-            <text x="106" y="107" text-anchor="middle" fill="#f59e0b" font-size="7" font-weight="bold" font-family="sans-serif">1. Input</text>
-
-            <rect x="476" y="98" width="36" height="13" rx="3" fill="#1e293b" stroke="#38bdf8" stroke-opacity="0.3" stroke-width="1"/>
-            <text x="494" y="107" text-anchor="middle" fill="#38bdf8" font-size="7" font-weight="bold" font-family="sans-serif">2. Commit</text>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Feature 3: Knowledge Catalog (Dataplex) -->
+      <!-- Feature 2: Knowledge Catalog (Dataplex) -->
       <div class="feature-card mb-4">
         <div class="flex gap-3">
           <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/15 to-purple-500/15 flex items-center justify-center text-violet-400 border border-violet-500/20">
@@ -6320,7 +6100,7 @@ limitations under the License.
         {
           id: 'google-official', name: 'Google Official', icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>',
           servers: [
-            { id: 'google-workspace-mcp', name: 'Google Workspace MCP', type: 'workspace', dev_preview: true, github_url: null, docs_url: 'https://developers.google.com/workspace/guides/configure-mcp-servers', description: 'Official Google Workspace MCP servers: Gmail, Google Drive, Calendar, Chat, and People. Access emails, files, events, and contacts.', language: 'managed', tags: ['google','workspace','gmail','drive','calendar','chat'], requires_api_key: 'oauth', demo_tip: 'Powerful for enterprise demos needing email, calendar, and document integration.' }
+            { id: 'google-workspace-mcp', name: 'Google Workspace MCP', type: 'workspace', dev_preview: true, github_url: null, docs_url: 'https://developers.google.com/workspace/guides/configure-mcp-servers', description: 'Official Google Workspace MCP servers: Gmail, Google Drive, Calendar, Chat, and People. Access emails, files, events, and contacts.', language: 'managed', tags: ['google','workspace','gmail','drive','calendar','chat'], requires_api_key: 'oauth', demo_tip: 'Powerful for enterprise demos needing email, calendar, and document integration. Requires a project where Workspace-API OAuth clients are allowed by org policy.' }
           ]
         }
       ],

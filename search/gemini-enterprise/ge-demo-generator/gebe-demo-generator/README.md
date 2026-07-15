@@ -1,10 +1,11 @@
-# GEBE Demo Generator
+# GE Demo Generator Lite
 
 A standalone Google Apps Script web app that generates Google Workspace demo data
 (Docs, Sheets, Slides, optional Office/PDF exports, and AI-generated images) directly
 into the **accessing user's own My Drive**, organized under a single `My Demos` folder
 with a per-demo Guide Doc. Built for Gemini Enterprise Business Edition (GEBE), which
-does not support custom ADK agents.
+does not support custom ADK agents — and works seamlessly with Gemini Enterprise
+Standard and Plus editions as well.
 
 This is a **separate GAS project** that lives as a subdirectory of the GE Demo Generator
 repo (same pattern as `experimental/mcp-importer/`). It has its own `scriptId` and

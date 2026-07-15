@@ -23,6 +23,8 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - **Interactive Dashboards**: The agent can dynamically author and publish complete, interactive HTML dashboards (featuring responsive sorting tables, search filtering, Chart.js graphs, light/dark themes, and pure-JS tabs) via the `publish_dashboard` tool, hosted securely on Cloud Storage via signed URLs.
 - **Context Caching**: `ContextCacheConfig` aggressively caches system instructions and A2UI schemas to reduce time-to-first-token.
 - **Google Workspace MCP**: Optional integration with Gmail, Drive, Calendar, and People MCP servers via OAuth token passthrough.
+- **Managed Autonomous Agent (Antigravity)**: Optionally provisions a Pre-GA **Managed Agents API** agent (Antigravity harness) the demo agent can delegate long-horizon autonomous tasks to — live web research, code execution in a cloud sandbox, and professional deliverables (presentation decks, documents, PDFs, and web reports) crafted with mounted **SKILL.md** packs, with live progress streamed into the chat. Enabled by default; provisioning adds ~10 minutes (hidden behind the rest of the setup) and requires only the Vertex AI API — no allowlist.
+- **Workspace Authorization (No MCP)**: A lightweight alternative to Workspace MCP that adds Google sign-in for the demo user without any Developer-Preview allowlist. Combined with the Managed Agent, deliverables are saved to the user's Drive as native Google Slides / Docs / Sheets, and the autonomous agent acts on Gmail / Chat / Calendar via the open-source [Workspace CLI (gws)](https://github.com/googleworkspace/cli) inside its sandbox.
 - **Customer Domain Research**: Gemini-powered company research via Google Search grounding — automatically identifies business challenges and agent-automatable workflows from a customer's domain.
 - **Model Transparency**: Real-time model name announcement in the streaming response accordion for runtime visibility.
 - **Premium Live Architecture Dashboard**: Displays a high-fidelity interactive target architecture diagram SVG during the synthesis step with active pulsing and success glowing states across BigQuery, Gemini Agent, and Cloud Run nodes. Features an animated Dynamic Tips Carousel rotating every 12 seconds, a real-time Elapsed Timer, and an Automatic Retry Mechanism (up to 2 retries) for Apps Script generation robustness.
@@ -269,6 +271,7 @@ When a user generates a demo through the web UI, the tool:
    - Automatically builds a container image and deploys the Agent FastAPI server to **Cloud Run** (with `--min-instances 0` to control standby costs).
    - Provisions IAM bindings and environment configurations automatically.
    - Discovers any existing Gemini Enterprise Apps in your project and registers the newly deployed Cloud Run agent automatically.
+   - When the **Managed Agent** option is enabled (default), provisions a Managed Agents API agent in two phases (creation is started early and awaited after deployment, hiding the ~8–10 min wait), uploads the deliverable craft skills from the fetched template to the dashboards bucket, and warms up the sandbox environment (pre-installing the deliverable toolchain and the Workspace CLI). The sandbox environment auto-expires after ~7 idle days; the agent re-provisions a fresh one on the next delegation.
 
 For a detailed walkthrough, see [Section 13: Guided Walkthrough & Tutorial](#13-guided-walkthrough--tutorial).
 
@@ -288,6 +291,8 @@ ge-demo-generator/
 │   ├── adk_agent/           #  script at run time from a pinned repo ref):
 │   │   └── app/             #  agent.py, tools.py, fast_api_app.py,
 │   │       └── examples/    #  part_converters.py, A2UI example JSONs
+│   ├── managed_agent/       #  Managed Agent provisioning helpers
+│   ├── demo_skills/         #  Deliverable craft skills (SKILL.md packs)
 │   └── viewer_app/          #  Data viewer (main.py + requirements.txt)
 ├── .clasp.json              # (git-ignored) Your Script ID config
 ├── AGENTS.md                # AI agent development guide
