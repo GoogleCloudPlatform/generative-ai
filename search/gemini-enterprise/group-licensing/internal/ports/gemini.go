@@ -35,10 +35,10 @@ type GeminiClient interface {
 	// result to SetLicenseConfigIndex before issuing any grant operations.
 	FetchLicenseConfigIndex(ctx context.Context, billingAccountID string) (models.LicenseConfigIndex, error)
 
-	// ListUserLicenses returns one page of licensed users for projectID. Pass
-	// an empty pageToken to start from the beginning. A non-empty nextPageToken
-	// in the response means more pages are available.
-	ListUserLicenses(ctx context.Context, projectID, pageToken string) (licenses []models.UserLicense, nextPageToken string, err error)
+	// ListUserLicenses returns one page of licensed users for projectID at the
+	// given location. Pass an empty pageToken to start from the beginning. A
+	// non-empty nextPageToken in the response means more pages are available.
+	ListUserLicenses(ctx context.Context, projectID string, location models.Location, pageToken string) (licenses []models.UserLicense, nextPageToken string, err error)
 
 	// BatchUpdateUserLicenses applies up to models.MaxBatchSize grant or revoke
 	// operations in a single API call. The adapter returns models.ErrBatchUpdateFailed
@@ -46,11 +46,11 @@ type GeminiClient interface {
 	// When the license pool for a SKU is exhausted, the error chain contains
 	// models.ErrLicensesExhausted. Callers are responsible for splitting slices
 	// longer than models.MaxBatchSize into multiple calls.
-	BatchUpdateUserLicenses(ctx context.Context, projectID string, updates []models.LicenseUpdate) error
+	BatchUpdateUserLicenses(ctx context.Context, projectID string, location models.Location, updates []models.LicenseUpdate) error
 
 	// FetchLicenseUsageStats returns a map of licenseConfig resource path to
 	// the number of licenses currently assigned (usedLicenseCount) for all
 	// licenseConfigs under the given project's default user store. Callers use
 	// this to compute available seats after a license pool exhaustion error.
-	FetchLicenseUsageStats(ctx context.Context, projectID string) (map[string]int64, error)
+	FetchLicenseUsageStats(ctx context.Context, projectID string, location models.Location) (map[string]int64, error)
 }
