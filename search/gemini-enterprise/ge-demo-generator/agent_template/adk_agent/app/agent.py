@@ -33,7 +33,8 @@ dotenv.load_dotenv(override=True)
 
 # =============================================================================
 # ADK Runtime Cycle-Breaking Monkey-Patch for the Deployed Container
-# Prevents RecursionError when parsing complex Firestore schemas in Vertex AI
+# Prevents RecursionError when parsing complex Firestore schemas in the
+# Vertex AI Agent Platform API
 # =============================================================================
 import google.adk.tools._gemini_schema_util
 

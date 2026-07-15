@@ -634,7 +634,7 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
             self._client_info = client_info
 
     def _create_workspace_httpx_client_factory(mcp_server_url, scopes):
-        """Returns an httpx_client_factory that injects OAuthClientProvider.
+        """Returns the httpx_client_factory that injects OAuthClientProvider.
     
         On Cloud Run:
         - Creates OAuthClientProvider with the Google OAuth token from header_provider
