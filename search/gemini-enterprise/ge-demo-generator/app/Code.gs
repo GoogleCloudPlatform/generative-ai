@@ -3177,7 +3177,7 @@ ${ enableManagedAgent ? `
         echo "   ✅ Agent Engine cleanup verified (none remaining)."
       else
         echo "   ⚠️  \$_AE_LEFT Agent Engine(s) still listed (async deletion may be in progress)."
-        echo "       Re-run cleanup or check the Vertex AI console if they persist."
+        echo "       Re-run cleanup or check the Vertex AI Agent Platform console if they persist."
       fi
     fi
 
@@ -3549,7 +3549,7 @@ ${ enableManagedAgent ? `
 # Creation takes ~8-10 min, so it is STARTED here (right after the dashboards
 # bucket exists) and awaited in PHASE B after the Cloud Run deployment +
 # Gemini Enterprise registration, hiding most of the wait behind the rest of
-# the setup. No allowlist is needed - just the Vertex AI API + standard IAM.
+# the setup. No allowlist is needed - just the Vertex AI Agent Platform API + standard IAM.
 # VERIFIED live (2026-07-12): the create LRO never reports done:true, so
 # readiness is detected in PHASE B by polling GET on the agent itself.
 echo "🤖 Starting Managed Autonomous Agent provisioning (Antigravity, Preview)..."

@@ -264,6 +264,7 @@ clf
 clickable
 CLIs
 cloudrun
+CLOUDSDK
 cloudveil
 clsx
 cmap
