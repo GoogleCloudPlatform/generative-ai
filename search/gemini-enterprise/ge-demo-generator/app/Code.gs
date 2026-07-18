@@ -82,14 +82,14 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v10.114-public',
+  APP_VERSION: 'v11.5-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) from this
   // repo at this pinned ref at run time. Pin to a commit SHA so every
   // generated script keeps fetching exactly the files it was built for.
   // Override via Script Properties (TEMPLATE_REPO / TEMPLATE_REF) for testing.
   TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/GoogleCloudPlatform/generative-ai.git',
-  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || '8ae1538c9bd2b20104f7949f0f1e6457bbd87b4c',
+  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || '49f0bddb7c1e2b0b90cee7643c5eb961d33adf92',
   TEMPLATE_SUBDIR: SCRIPT_PROPS.getProperty('TEMPLATE_SUBDIR') || 'search/gemini-enterprise/ge-demo-generator/agent_template',
   LOG_SHEET_URL: SCRIPT_PROPS.getProperty('LOG_SHEET_URL')
 };
@@ -514,7 +514,12 @@ function generateDemo(userGoal, options = {}) {
     publicDatasetId: null,
     usePublicDataset: false,
     enableWorkspaceMcp: false,
-    enableComputerUse: false
+    enableComputerUse: false,
+    // Default ON since v11.1: the autonomous agent is the flagship demo
+    // experience, provisioning is parallelized and fail-soft, and no
+    // allowlist is required. The UI toggle allows opting out per demo.
+    enableManagedAgent: true,
+    enableWorkspaceAuth: false
   };
   options = { ...defaultOptions, ...options };
   
@@ -576,10 +581,17 @@ function generateDemo(userGoal, options = {}) {
     result.firestore = planResult.firestore || null;
     result.importedMcpList = options.importedMcpList || null;
     result.metadata = planResult.metadata || null;
+    // Persist feature flags so the Drive-backup restore path (see the
+    // generateSetupScript regeneration block) can rebuild the same script.
+    result.enableWorkspaceMcp = options.enableWorkspaceMcp || false;
+    result.enableComputerUse = options.enableComputerUse || false;
+    result.enableManagedAgent = options.enableManagedAgent || false;
+    result.enableWorkspaceAuth = options.enableWorkspaceAuth || false;
 
     result.setupScript = generateSetupScript({
       datasetId: datasetId,
       systemInstruction: planResult.systemInstruction,
+      businessInstruction: planResult.businessInstruction || '',
       referenceDate: planResult.referenceDate,
       publicDatasetId: planResult.publicDatasetId,
       suffix: suffix,
@@ -592,6 +604,8 @@ function generateDemo(userGoal, options = {}) {
       importedMcpList: options.importedMcpList,
       enableWorkspaceMcp: options.enableWorkspaceMcp,
       enableComputerUse: options.enableComputerUse,
+      enableManagedAgent: options.enableManagedAgent,
+      enableWorkspaceAuth: options.enableWorkspaceAuth,
       metadata: planResult.metadata
     });
     result.steps.push({ step: 4, status: 'completed', message: 'Generation complete' });
@@ -797,6 +811,20 @@ function planAndGenerateData(userGoal, options) {
       - Re-frame "supplier/partner portal" scenarios so they hit a REAL public target: instead of "check stock on our supplier's portal (parts.example-supplier.co.jp)", write "look up the current price and availability of part <X> on <a real distributor's public catalog, e.g. mcmaster.com / digikey.com / the manufacturer's public product page>". Keep the business framing, but point at a site the browser can actually open.
       - If you cannot name a specific real URL for a scenario, use a web-search framing instead (e.g. "search the web for the current market price of <X> and report the top source") rather than fabricating a domain.
     - When synthesizing sample data, if you include an external URL field (e.g. source_url, product_page_url, reference_url), it MUST also be a real, currently-reachable public URL under the same rules above - never a fabricated domain. Prefer omitting the field over inventing a fake URL.
+\n`;
+  }
+  if (options.enableManagedAgent) {
+    prompt += `\n- **🤖 MANAGED AUTONOMOUS AGENT (ANTIGRAVITY) AVAILABLE**:
+    - The demo agent can delegate long-running, multi-step work to a fully autonomous cloud agent running in an isolated sandbox with: a bash terminal, a persistent filesystem, code execution, a preinstalled data-science stack (pandas, numpy, web-page parsing) plus persistent pip/npm installs, Google Search + web page reading, direct BigQuery/Firestore access to the demo data, and professional deliverable skills (presentation decks, business documents, PDFs, and self-contained web pages). It works autonomously for tens of minutes: it plans in phases, checkpoints intermediate results to its filesystem, verifies each deliverable against a quality checklist, and iterates until the bar is met. Finished files are returned to the user as downloadable links. Long tasks run in the background and the agent announces completion.
+    - You MUST leverage this capability when generating the 'businessInstruction' and 'demoGuide' (prompts).
+    - In 'businessInstruction', mention that the agent can hand off deep autonomous work (research, building deliverables, iterative code work) to a managed autonomous agent and deliver finished files back to the user.
+    - You MUST design at least TWO prompts (out of the 7 required) in the 'demoGuide' that showcase the autonomous agent, following BOTH patterns below:
+      - **Pattern A (WEB RESEARCH + INTERNAL DATA SYNTHESIS)**: one prompt MUST require researching CURRENT external information on the public web (industry trends, competitor moves, market prices, regulations) AND combining it with the demo's own BigQuery data into a substantial written analysis. Phrase it so the answer is impossible without live web research (e.g. "Research the latest <industry> trends online and produce a competitive analysis against our own sales data").
+      - **Pattern B (COMPLEX LONG-HORIZON DELIVERABLE)**: one prompt MUST ask for finished, downloadable business output whose production requires SEQUENTIALLY DEPENDENT phases (real quantitative analysis of the internal data -> charts built from that analysis -> professional assembly), so the request genuinely deserves tens of minutes of autonomous work. Make it one of these two shapes, whichever fits the scenario better: (1) TWO complementary formats built from the same analysis - e.g. a board presentation deck PLUS a 2-page summary PDF for the field team, or a formal proposal document PLUS a one-page web briefing; or (2) a WORKING INTERACTIVE TOOL - a self-contained web app the user opens in a browser (e.g. a pricing / capacity / what-if simulator) whose coefficients come from the actual data analysis, plus a short document explaining the model. The prompt should sound like a real executive request and SHOULD state 1-2 explicit quality conditions in natural business language (e.g. "lead with the conclusion on the first page", "every number must be sourced from our data or a cited reference") - these conditions make the agent's self-review-and-rebuild loop visible in the demo. Patterns A and B MUST use DIFFERENT deliverable formats so the demo shows variety.${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? `
+      - **MANDATORY WORKSPACE COMBINATION**: Google Workspace access is ALSO enabled for this demo, and the autonomous agent can act on the user's Workspace (save files to Drive as native Google Slides/Docs/Sheets, draft Gmail messages, post to named Google Chat spaces, create Calendar events). At least ONE of the two autonomous prompts MUST chain a Workspace action onto the deliverable so the demo showcases BOTH capabilities together, e.g.: "Research the latest industry trends, build the executive deck, save it to my Drive as Google Slides, and draft an email to the leadership team summarizing it" or "...and post the summary with the document link to the <team> Chat space, then set up a 30-minute review meeting on my calendar". Keep the Workspace actions realistic for the persona, and prefer DRAFT email wording (the agent creates drafts, it does not send unless explicitly told).` : ''}
+    - 🎯 SLOT ASSIGNMENT (overrides the base 7-prompt distribution): put Pattern B in the Prompt 5 slot, REPLACING the large-scope background workflow prompt (the autonomous delegation itself runs in the background and demonstrates background execution plus completion announcements, so that story is preserved). Weave Pattern A into the Prompt 7 slot (End-to-End Strategic Automation): its web research + internal data synthesis IS the end-to-end showcase${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? ', and the MANDATORY WORKSPACE COMBINATION chain belongs there' : ''}. Do NOT merge Patterns A and B into a single prompt - the demo needs TWO distinct autonomous moments. Because slots 5 and 7 are now autonomous, fold the MANDATORY INTERACTIVE DASHBOARD prompt into slot 1 or 2 (make one of the foundation prompts ask for the browser-openable interactive overview dashboard, keeping its explicit open-in-browser signal) - the dashboard prompt must NOT displace slot 5 or 7 and must NOT be dropped.
+    - Write both prompts as natural business-user requests, in the same language as the 'userGoal', woven into the demo storyline with the KPIs, entities, and business terms you generated (NEVER raw table or column names - the base NO TABLES/COLUMNS rule still applies to these prompts).
+    - 🎯 CRITICAL - AVOID OVERLAP WITH LIGHTER TOOLS: the agent ALSO has fast inline tools (SQL queries, quick analysis, in-chat dashboards). If a prompt can be fully answered by querying the demo database and summarizing, the model will answer it inline and the autonomous agent will NOT be demonstrated. Therefore the TWO autonomous prompts MUST require at least one of: live web research, producing a downloadable file, or building-and-running code - things the inline tools cannot do.
 \n`;
   }
   const response = callVertexAIWithRetry(prompt);
@@ -1054,7 +1082,7 @@ function getTechnicalInstruction_() {
     "]\n\n" +
     
     "11. **SUGGESTION CHIPS (CRITICAL)**: At the END of EVERY response, you MUST append a lightweight A2UI suggestion chip bar using surfaceId 'suggestions' and root='root' containing a Row of 3-4 Buttons with sendText actions. The chip block MUST be COMPLETE: a single <a2ui-json> block containing BOTH the beginRendering message AND the surfaceUpdate message with all Button components — never emit beginRendering alone. NEVER write any plain text or markdown headers (like \"Next Actions\", \"💡 Next Actions\", or other localized header equivalent) before the suggestions block; the system will automatically render the appropriate header. " +
-    "**BUTTON SCHEMA CONFORMANCE (CRITICAL)**: NEVER nest components inside a Button's 'child' property. 'child' MUST always be a flat string pointing to the ID of a separately defined Text component.\n" +
+    "**BUTTON SCHEMA CONFORMANCE (CRITICAL)**: NEVER nest components inside a Button's 'child' property. 'child' MUST always be a flat string pointing to the ID of a separately defined Text component, and that Text component MUST be included in the SAME surfaceUpdate components array as its Button — a Button whose label Text component is missing renders as a BLANK button in the UI. Before finishing any A2UI block, verify every Button's child id has a matching Text component in the same block.\n" +
     "**A2UI CARD INTERACTION EXCEPTION (STRICT RULE)**: When your response already contains a major interactive A2UI card featuring its own control buttons " +
     "(such as the Welcome Card onboarding buttons, the Analysis Plan pre-flight card buttons like Run inline / Run in background / Adjust, or the Workflow Execution Plan mode selection buttons like Immediate/Background/Scheduled), " +
     "you **MUST NOT** output any suggestion chip bar at the bottom of your response. The card's own control buttons are sufficient. " +
@@ -1915,8 +1943,74 @@ Return ONLY the name, nothing else.`;
   }
 }
 
+// Builds the Managed Agent (Antigravity) system instruction at generation time.
+// The returned string is emitted through a quoted heredoc into
+// managed_agent_instruction.txt, so it passes verbatim (runtime value, never
+// re-parsed as a JS template literal). English harness text only - the agent
+// is instructed to match the language of each delegated task.
+function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollection, hasSkills, workspaceActions) {
+  const nl = '\n';
+  const text =
+    'You are an autonomous specialist agent working inside a secure cloud sandbox with a bash terminal, a persistent filesystem, code execution, pip/npm installs, Google Search, and web page reading.' + nl +
+    'You receive delegated tasks from a front-line business assistant and must complete them END TO END without asking questions: make reasonable assumptions and state them in your final report.' + nl + nl +
+    '--- BUSINESS CONTEXT ---' + nl +
+    (businessInstruction || 'No additional business context provided.') + nl +
+    '--- END BUSINESS CONTEXT ---' + nl + nl +
+    'SANDBOX SOFTWARE (use it - do not rediscover it)' + nl +
+    '- Preinstalled Python 3.11 packages: pandas, numpy, beautifulsoup4, requests, pyyaml. Preinstalled Node.js 20: typescript, create-vite, create-next-app. Preinstalled UNIX tools: git, ripgrep (rg), fd, jq, curl, wget, rsync, tree, bc, unzip.' + nl +
+    '- Additional pip/npm installs are allowed and PERSIST in this environment snapshot across tasks - try the import first (a warm-up usually preinstalled python-pptx, python-docx, reportlab, matplotlib, japanize-matplotlib, pypdf); install only what is actually missing, never reinstall.' + nl +
+    '- You run as a NON-ROOT user: global npm installs need a user prefix (mkdir -p $HOME/.npm-global && npm config set prefix $HOME/.npm-global before npm install -g), and the resulting binaries live at $HOME/.npm-global/bin/<name> - invoke them by absolute path because PATH exports do not persist between commands. Plain npm install -g fails with EACCES; that is a permissions matter, not a system incompatibility.' + nl +
+    '- Work data-first: load query results and CSV/TSV files into pandas for aggregation, joins, and statistics instead of hand-parsing text. Parse fetched web pages with beautifulsoup4. Use git to version multi-step work you may need to roll back.' + nl + nl +
+    'LONG-HORIZON WORKING PRACTICES' + nl +
+    '- For any multi-step task, FIRST write plan.md breaking the work into phases (research, data analysis, visuals, assembly, verification), then execute phase by phase and append progress notes to plan.md as you go - the filesystem is your checkpoint across the whole run.' + nl +
+    '- Save every intermediate product to a file before moving on (query results as CSV, computed tables, chart PNGs, drafts): later phases and repeat runs must be able to reuse them without redoing the work.' + nl +
+    '- When the task asks for MULTIPLE deliverables, gather data and build charts ONCE, then assemble each deliverable from the shared assets - never re-research per deliverable.' + nl + nl +
+    'DATA ACCESS' + nl +
+    '- BigQuery MCP tools give you direct read access to the demo dataset: ' + datasetId + '. Firestore MCP tools expose the operational collection: ' + fsCollection + '. Dataplex Knowledge Catalog MCP tools let you discover and understand these data assets semantically (treat the catalog as read-only).' + nl +
+    '- Query internal data EARLY in the task: the data-tool credentials attached to each delegation expire after about an hour.' + nl + nl +
+    (hasSkills ? (
+    'SKILLS' + nl +
+    '- Skill packs are mounted at /.agent/skills. BEFORE building any deliverable (presentation deck, document, PDF, web page), list that directory, READ the matching SKILL.md, and follow its process, design system, and verification steps exactly.' + nl +
+    '- If the modern-web-guidance skill is present and you are building web content, consult it for modern web-platform best practices. Export DISABLE_TELEMETRY=1 before using its CLI.' + nl + nl) : '') +
+    (workspaceActions ? (
+    'WORKSPACE ACTIONS' + nl +
+    '- When the task message contains a WORKSPACE ACCESS section, you can act on the requesting user\'s Google Workspace via the gws CLI (Gmail drafts, Chat messages, Calendar events, Drive). Export the provided token as instructed, and consult the gws-* skills under /.agent/skills first.' + nl +
+    '- INSTALLING gws: the warm-up usually pre-installs it at $HOME/bin/gws (invoke it by that absolute path - PATH exports do not persist between commands). If it is missing, install the static musl binary: mkdir -p $HOME/bin && curl -sL https://github.com/googleworkspace/cli/releases/latest/download/google-workspace-cli-x86_64-unknown-linux-musl.tar.gz | tar xz -C $HOME/bin ./gws && chmod +x $HOME/bin/gws. Do NOT install via npm: the npm-delivered Linux binary requires GLIBC 2.39, which this sandbox does not have, and plain npm -g also fails with EACCES (no root).' + nl +
+    '- CHAT POSTING FAILURES: if a Chat post fails with a 403 / PERMISSION_DENIED / configuration error, the cause is almost always that the demo project has not completed the ONE-TIME Google Chat API app configuration (a console step in the setup tutorial). State EXACTLY that in your report, include this link for the admin: https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat - and include the full message text you intended to post so the assistant can relay it. NEVER invent explanations like security restrictions or tenant policy.' + nl +
+    '- DRIVE SAVES: when the task asks for a file saved to the user\'s Google Drive as Google Slides / Docs / Sheets, upload it with the gws CLI using Drive import-conversion (office file uploaded with the target Google mime type). Do it as soon as the file is ready, verify by reading the file metadata back, and put the returned webViewLink in your report. If the Drive upload fails, still deliver the file through the upload URLs and say the Drive save failed so the assistant can retry it.' + nl +
+    '- DRIVE SAVES: when the task asks for a file in the user\'s Google Drive (or as Google Slides / Docs / Sheets), upload it yourself with the gws CLI using an import-conversion to the native Google format (pptx to Google Slides, docx to Google Docs, xlsx to Google Sheets), then include the returned Drive webViewLink in your report. ALSO upload the original office file to the matching deliverable upload URL as a backup.' + nl +
+    '- Do Workspace operations EARLY in the task: the token expires after about an hour.' + nl +
+    '- HARD GUARDRAILS: never SEND email (drafts only, unless the task explicitly says to send); never delete anything in Workspace; post Chat messages only to spaces the task explicitly names; never write the token into your report, logs, code, or files.' + nl +
+    '- CHAT SPACES: when the task names a Chat space, search for it first; if no space with that name exists, CREATE the space with that exact name via the gws CLI and then post there (demo environments often lack the space - creating it is expected, not an error). State in your report that you created it. If creation fails (e.g. missing permission), report the failure instead of posting elsewhere.' + nl +
+    '- EMAIL ENCODING: non-ASCII email headers (Subject, display names) MUST be RFC 2047 MIME-encoded (for example =?UTF-8?B?...?=). After creating a draft, read it back and verify the subject decodes correctly; delete and recreate it if it is garbled.' + nl +
+    '- REPORTING DRAFTS: when you create a Gmail draft, your report must state it ALREADY EXISTS in the user Gmail Drafts folder, with the draft subject and this link: https://mail.google.com/mail/u/0/#drafts - never paste the full email body into the report for manual copying.' + nl +
+    '- If no WORKSPACE ACCESS section is present, you have no Workspace access for this task - say so in the report instead of guessing.' + nl + nl) : '') +
+    'QUALITY GATE (before ANY upload)' + nl +
+    '- Run the Verification checklist of the SKILL.md you followed against the finished file. If any check fails, fix and REBUILD - at least one review-and-revise pass is mandatory even when everything looks fine.' + nl +
+    '- The bar is board-ready: real numbers from the actual data, sources with URLs for every external claim, assertion-style headings that state the finding, zero placeholder text or lorem ipsum, consistent fonts and colors, and no garbled non-ASCII text (open the built file and check rendered strings, not just your source).' + nl + nl +
+    'DELIVERABLES' + nl +
+    '- If the task message contains an upload URL, upload every deliverable file with: curl -sS -X PUT --upload-file <file> "<upload url>" (retry once on failure).' + nl +
+    '- UPLOADING IS PART OF THE TASK, NOT OPTIONAL: a file that exists only in your workspace has NOT been delivered - the requester can only receive files through the upload URLs. Verify every upload succeeded by checking the HTTP status (append -w "%{http_code}" to the curl call and expect 200), and list each uploaded filename WITH its HTTP status in your final report. If an upload still fails after the retry, say so explicitly. NEVER report a file as delivered (in any language) unless its upload returned 200. A task that produced files but did not upload them is INCOMPLETE.' + nl +
+    '- If the task text references tool names you do not have (for example publish_dashboard or save_deliverables_to_drive), IGNORE the tool reference and achieve the intended OUTCOME with your own tools: build the file yourself and deliver it through the provided upload URLs. Never stall or give up because a named tool does not exist here.' + nl +
+    '- ALWAYS end with a complete, self-contained markdown report of everything you did, found, and produced: key numbers, sources with URLs for any web research, and the exact filenames you uploaded. This report is the only channel back to the requester besides uploaded files.' + nl + nl +
+    'LANGUAGE' + nl +
+    '- Write the final report and ALL deliverable content (slide text, document body, page copy) in the SAME language as the delegated task description. Code, filenames, and logs stay in English.' + nl + nl +
+    'SAFETY' + nl +
+    '- Operate only inside this sandbox and the provided data tools. Never attempt to reach systems or credentials beyond what the task provides.';
+  // Defence: the text is emitted through a quoted heredoc in the setup script.
+  return text.split('__MA_SYSINSTR_EOF__').join('MA_SYSINSTR_EOF');
+}
+
 function generateSetupScript(params) {
-  const { datasetId, systemInstruction, referenceDate, publicDatasetId, suffix, tables, firestore, userGoal, dirName, agentShortName, oneSentenceSummary, enableWorkspaceMcp, enableComputerUse, metadata } = params;
+  const { datasetId, systemInstruction, businessInstruction, referenceDate, publicDatasetId, suffix, tables, firestore, userGoal, dirName, agentShortName, oneSentenceSummary, enableWorkspaceMcp, enableComputerUse, enableManagedAgent, enableWorkspaceAuth, metadata } = params;
+
+  // Derived feature gates (see AGENTS.md section 14):
+  // - workspaceAuthEnabled: the GE OAuth authorization (user token) exists.
+  //   True for full Workspace MCP OR the lightweight auth-only toggle.
+  // - driveHandoffEnabled: the Managed Agent can hand results into the user's
+  //   Workspace (Drive save + gws CLI actions) - needs BOTH capabilities.
+  const workspaceAuthEnabled = !!(enableWorkspaceMcp || enableWorkspaceAuth);
+  const driveHandoffEnabled = !!(enableManagedAgent && workspaceAuthEnabled);
 
   // ── Deduplicate importedMcpList by github_url ──
   // When the same MCP repo appears multiple times (e.g. from catalog + URL import),
@@ -2034,6 +2128,21 @@ function generateSetupScript(params) {
     .replace(/\{/g, '{{')
     .replace(/\}/g, '}}')
     .replace(/\n/g, '\\n');
+
+  // == Managed Autonomous Agent (Antigravity) generation-time assets ==
+  // Craft skills come from this repo's demo-skills/ dir (main branch, fetched
+  // at generation time; fail-soft) and are emitted as quoted heredocs. The
+  // agent id must be 1-63 chars, lowercase letters/digits/hyphens, starting
+  // with a letter and ending with a letter or digit (Agents API constraint).
+  // Deliverable skills are real files in the fetched agent template
+  // (agent_template/demo_skills/); the setup script copies them into skills/.
+  const managedSkillsBash = enableManagedAgent
+    ? 'mkdir -p skills\ncp -r "$GE_TPL"/demo_skills/professional-document "$GE_TPL"/demo_skills/professional-presentation "$GE_TPL"/demo_skills/web-report skills/\n'
+    : '';
+  const managedAgentId = (dirName + '-auto').toLowerCase().replace(/[^a-z0-9-]/g, '-').substring(0, 63).replace(/-+$/, '');
+  const managedAgentInstruction = enableManagedAgent
+    ? buildManagedAgentInstruction_(businessInstruction || '', datasetId, fsCollection, true, workspaceAuthEnabled)
+    : '';
 
   // Build local BQ creation commands
   let bqCommands = `echo "🗄 Creating BigQuery Dataset: ${datasetId}..."\n`;
@@ -2504,7 +2613,10 @@ echo ""
     "cloudfunctions.googleapis.com",
     "dataplex.googleapis.com"
   ];
-  if (enableWorkspaceMcp) {
+  if (workspaceAuthEnabled) {
+    // Needed for full Workspace MCP AND for the auth-only mode: the gws CLI /
+    // Drive REST calls run with the user's OAuth token but bill their quota
+    // to this project, so the plain Workspace APIs must be enabled here too.
     apisToEnable.push(
       "gmail.googleapis.com",
       "drive.googleapis.com",
@@ -2540,11 +2652,11 @@ gcloud services enable people.googleapis.com --project="$PROJECT_ID"
   }
 
   let wsmcpInstructions = "";
-  if (enableWorkspaceMcp) {
+  if (workspaceAuthEnabled) {
     wsmcpInstructions = `
 echo ""
 echo "========================================================="
-echo "🛠️  GOOGLE WORKSPACE MCP SETUP REQUIRED"
+echo "🛠️  ${enableWorkspaceMcp ? 'GOOGLE WORKSPACE MCP SETUP REQUIRED' : 'GOOGLE WORKSPACE AUTHORIZATION SETUP (no MCP servers)'}"
 echo "========================================================="
 
 
@@ -2575,10 +2687,21 @@ if [ -z "\$OAUTH_CLIENT_ID" ] || [ -z "\$OAUTH_CLIENT_SECRET" ]; then
 echo "The following steps require manual interaction in the Google Cloud Console."
   echo "Please complete them before continuing."
   echo ""
-  echo "1. Set up the OAuth consent screen:"
+  echo "1. Set up the OAuth consent screen (Branding):"
   echo "   URL: https://console.cloud.google.com/auth/branding?project=\$PROJECT_ID"
-  echo "   Instructions: Set App name to 'Workspace MCP Servers', select Audience, add scopes."
-  echo "   Copy and paste the following scopes all at once:"
+  echo "   - App name: 'GE Demo Agent' (any name works - end users see it on the consent screen)"
+  echo "   - Support email: your own email address"
+  echo "   - Audience: choose 'Internal' (recommended - only users in your org, no verification needed)."
+  echo "     If 'Internal' is not available (no Workspace org), choose 'External' and then add your"
+  echo "     demo user account(s) under 'Audience' -> 'Test users'."
+  echo "   - Save."
+  echo ""
+  echo "2. Add the OAuth scopes (Data Access):"
+  echo "   URL: https://console.cloud.google.com/auth/scopes?project=\$PROJECT_ID"
+  echo "   - Click 'Add or remove scopes'. In the panel that opens, scroll down to the"
+  echo "     'Manually add scopes' text box, PASTE ALL the scope lines below at once,"
+  echo "     then click 'Add to table' -> 'Update' -> 'Save'."
+  echo "   Scopes to paste:"
   echo "https://www.googleapis.com/auth/gmail.readonly"
   echo "https://www.googleapis.com/auth/gmail.compose"
   echo "https://www.googleapis.com/auth/gmail.modify"
@@ -2597,15 +2720,16 @@ echo "The following steps require manual interaction in the Google Cloud Console
   echo "https://www.googleapis.com/auth/userinfo.profile"
   echo "https://www.googleapis.com/auth/contacts.readonly"
   echo ""
-  echo "2. Create an OAuth 2.0 Client ID (Web application):"
+  echo "3. Create an OAuth 2.0 Client ID (Web application):"
   echo "   URL: https://console.cloud.google.com/auth/clients/create?project=\$PROJECT_ID"
-  echo "   Select 'Web application'."
-  echo "   Add the following Authorized Redirect URIs:"
+  echo "   - Application type: 'Web application'"
+  echo "   - Name: 'GE Demo Generator' (any name works - it is only shown in the console)"
+  echo "   - Add the following Authorized Redirect URIs:"
   echo "     - https://vertexaisearch.cloud.google.com/oauth-redirect"
   echo "     - https://vertexaisearch.cloud.google.com/static/oauth/oauth.html"
-  echo "   Enter a name, and copy the Client ID and Client Secret."
+  echo "   - Click 'Create', then copy the Client ID and Client Secret."
   echo ""
-  echo "3. Configure the Chat app (required for Chat MCP):"
+${ enableWorkspaceMcp ? `  echo "4. Configure the Chat app (required for Chat MCP):"
   echo "   Reference: https://developers.google.com/workspace/guides/configure-mcp-servers#configure-chat-app"
   echo "   URL: https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project=\$PROJECT_ID"
   echo "   In 'Google Chat API' -> 'Manage' -> 'Configuration', set:"
@@ -2617,7 +2741,19 @@ echo "The following steps require manual interaction in the Google Cloud Console
   echo "     - Under 'Logs', select 'Log errors to Logging'."
   echo "     - Click 'Save'."
   echo ""
-  read -p "Press [Enter] after you have completed these steps and copied your Client ID/Secret..."
+` : `  echo "4. Configure the Google Chat API app (one-time; required for the agent to post to Chat with your authorization):"
+  echo "   URL: https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project=\$PROJECT_ID"
+  echo "   In 'Google Chat API' -> 'Manage' -> 'Configuration', set:"
+  echo "     - App name: 'GE Demo Agent'"
+  echo "     - Avatar URL: https://developers.google.com/chat/images/quickstart-app-avatar.png"
+  echo "     - Description: 'GE Demo Agent Workspace actions'"
+  echo "     - Disable 'Enable interactive features'."
+  echo "     - Under 'Visibility', make the app available to yourself (enter your email or your domain)."
+  echo "     - Under 'Logs', select 'Log errors to Logging'."
+  echo "     - Click 'Save'."
+  echo "   Without this one-time configuration, Chat API rejects message posting even with valid user authorization."
+  echo ""
+` }  read -p "Press [Enter] after you have completed these steps and copied your Client ID/Secret..."
   echo ""
   read -p "Enter your OAuth Client ID: " OAUTH_CLIENT_ID
   read -s -p "Enter your OAuth Client Secret: " OAUTH_CLIENT_SECRET
@@ -2629,6 +2765,11 @@ echo "The following steps require manual interaction in the Google Cloud Console
   
   echo -n "\$OAUTH_CLIENT_ID" | gcloud secrets versions add \$CLIENT_ID_SECRET --data-file=- --project="\$PROJECT_ID"
   echo -n "\$OAUTH_CLIENT_SECRET" | gcloud secrets versions add \$CLIENT_SECRET_SECRET --data-file=- --project="\$PROJECT_ID"
+else
+  echo "✅ Stored OAuth credentials found - skipping the console tutorial."
+  echo "   Reminder: posting to Google Chat needs a ONE-TIME Google Chat API app configuration:"
+  echo "   https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project=\$PROJECT_ID"
+  echo "   If Chat posts fail with a permission/configuration error, open 'Configuration' there and set it up (App name: '${enableWorkspaceMcp ? 'Chat MCP' : 'GE Demo Agent'}')."
 fi
 
 # Create authorization resource in Gemini Enterprise
@@ -2664,6 +2805,7 @@ show_usage() {
   echo "  --model-root-agent <MODEL>          Set the root orchestration agent model"
   echo "                                      (default: gemini-3.5-flash)"
   echo "  --cleanup, -c                       Delete all provisioned demo resources"
+  echo "  --yes, -y                           Skip confirmation prompts (non-interactive use)"
   echo "  --help, -h                          Show this help message and exit"
   echo ""
   echo "Examples:"
@@ -2671,6 +2813,7 @@ show_usage() {
   echo "  bash $0 --model-analysis-agent gemini-3.1-pro-preview       # Use a different analysis model"
   echo "  bash $0 --model-root-agent gemini-3.1-flash-lite            # Use a different root model"
   echo "  bash $0 --cleanup                         # Remove all demo resources"
+  echo "  bash $0 --cleanup --yes                   # Remove all demo resources without prompting"
   echo ""
 }
 
@@ -2680,6 +2823,7 @@ AGENT_MODEL="gemini-3.5-flash"
 AGENT_MODEL_LITE="gemini-3.5-flash"
 ROOT_MODEL_CLI_OVERRIDE=false
 CLEANUP_MODE=false
+AUTO_CONFIRM=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --help|-h)
@@ -2709,6 +2853,10 @@ while [[ $# -gt 0 ]]; do
       CLEANUP_MODE=true
       shift
       ;;
+    --yes|-y)
+      AUTO_CONFIRM=true
+      shift
+      ;;
     *)
       echo "⚠️  Unknown option: $1 (ignored)"
       shift
@@ -2716,12 +2864,13 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Disable gcloud prompts for full automation
-gcloud config set core/disable_prompts True
+# Disable gcloud prompts for full automation (env var only; does not mutate the
+# user's persistent gcloud config like "gcloud config set" would)
+export CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 # --- Check for required tools ---
 echo "⚙️  Checking for required tools..."
-for tool in jq curl gcloud make uv git python3; do
+for tool in jq curl gcloud bq make uv git python3; do
   if ! command -v \$tool >/dev/null 2>&1; then
     echo "❌ Error: \$tool is not installed. Please install it and try again."
     exit 1
@@ -2777,9 +2926,13 @@ if [ "$CLEANUP_MODE" != "true" ]; then
     echo "    Use the cleanup command to free up space:"
     echo "    cd ~ && bash \$0 --cleanup"
     echo ""
-    read -p "Attempt to continue anyway? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then exit 1; fi
+    if [ "\$AUTO_CONFIRM" = "true" ]; then
+      echo "Proceeding despite low disk space (--yes)."
+    else
+      read -p "Attempt to continue anyway? (y/n) " -n 1 -r
+      echo
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then exit 1; fi
+    fi
   fi
 fi
 
@@ -2800,7 +2953,8 @@ fi
     echo "  • Custom MCP Secrets in Secret Manager (if exist)"
     echo "  • Maps API Key Secret: ${dirName}-maps-key"
     echo "  • Agent Engine (Sandbox): ${dirName}-sandbox"
-    echo "  • Dashboards GCS Bucket: \$DASH_BUCKET (+ signBlob self-binding)"
+${ enableManagedAgent ? `    echo "  • Managed Agent (Antigravity): ${managedAgentId} (location: global; its sandbox environments expire automatically after 7 idle days)"
+` : ''}    echo "  • Dashboards GCS Bucket: \$DASH_BUCKET (+ signBlob self-binding)"
     echo "  • Pub/Sub Topics: ${dirName}-sched-tasks, ${dirName}-task-results"
     echo "  • Pub/Sub Subscriptions: ${dirName}-sched-tasks-push, ${dirName}-task-results-push"
     echo "  • Cloud Scheduler Jobs: ${dirName}-sched-* (if any)"
@@ -2815,15 +2969,30 @@ fi
       echo ""
     fi
 
-    read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
-    echo
-    if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
-      echo "Cleanup cancelled."
-      exit 0
+    if [ "\$AUTO_CONFIRM" = "true" ]; then
+      echo "Proceeding without confirmation (--yes)."
+    else
+      read -p "Are you sure you want to proceed? (y/n) " -n 1 -r
+      echo
+      if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
+        echo "Cleanup cancelled."
+        exit 0
+      fi
     fi
     
     TOKEN=$(gcloud auth print-access-token 2>/dev/null)
-    
+${ enableManagedAgent ? `
+    echo ""
+    echo "🤖 Deleting Managed Agent (Antigravity): ${managedAgentId}..."
+    _MA_DEL_CODE=\$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \\
+      -H "Authorization: Bearer \$TOKEN" \\
+      "https://aiplatform.googleapis.com/v1beta1/projects/\$PROJECT_ID/locations/global/agents/${managedAgentId}" 2>/dev/null)
+    if [ "\$_MA_DEL_CODE" = "200" ]; then
+      echo "   ✅ Managed Agent delete requested (long-running operation; sandbox environments also expire on their own after 7 idle days)."
+    else
+      echo "   ⚠️  Managed Agent not found or delete failed (HTTP \$_MA_DEL_CODE)."
+    fi
+` : ''}
     echo ""
     echo "🗑️  Deleting BigQuery Dataset: ${datasetId}..."
     bq rm -r -f -d \$PROJECT_ID:${datasetId} 2>/dev/null && echo "   ✅ Dataset deleted." || echo "   ⚠️  Dataset not found or already deleted."
@@ -2891,38 +3060,48 @@ fi
 
     echo ""
     echo "🌍 Deleting Gemini Enterprise registration (App/Agent)..."
-    UNREGISTERED=false
-    # Search all common locations
+    # Phase 1: scan all common locations and collect EVERY matching agent
+    # (setup re-runs can leave duplicate registrations; delete them all).
+    _GE_TARGETS=""
     for LOC in "global" "us" "eu"; do
       if [ "\$LOC" = "global" ]; then
         ENDPOINT="discoveryengine.googleapis.com"
       else
         ENDPOINT="\${LOC}-discoveryengine.googleapis.com"
       fi
-      
+
       ENGINES_JSON=$(curl -s -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" \
-        "https://\$ENDPOINT/v1alpha/projects/\$PROJECT_ID/locations/\$LOC/collections/default_collection/engines")
-      
+        "https://\$ENDPOINT/v1alpha/projects/\$PROJECT_ID/locations/\$LOC/collections/default_collection/engines" || true)
+
       # 2. If no engine match, scan for individual agents within EXISTING engines in this location
       for E_NAME in $(echo "\$ENGINES_JSON" | jq -r '.engines[]? | .name'); do
-        ASSISTANTS=$(curl -s -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" "https://\$ENDPOINT/v1alpha/\${E_NAME}/assistants")
+        ASSISTANTS=$(curl -s -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" "https://\$ENDPOINT/v1alpha/\${E_NAME}/assistants" || true)
         for A_NAME in $(echo "\$ASSISTANTS" | jq -r '.assistants[]? | .name'); do
-          AGENTS_JSON=$(curl -s -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" "https://\$ENDPOINT/v1alpha/\${A_NAME}/agents?pageSize=100")
-          TARGET_AGENT_NAME=$(echo "\$AGENTS_JSON" | jq -r --arg dir "${dirName}" '.agents[]? | select(.a2aAgentDefinition.jsonAgentCard != null) | select((.a2aAgentDefinition.jsonAgentCard | fromjson | .name) == $dir) | .name' 2>/dev/null | head -n 1)
-          
-          if [ ! -z "\$TARGET_AGENT_NAME" ] && [ "\$TARGET_AGENT_NAME" != "null" ]; then
-            echo "   🗑 Unregistering Gemini Enterprise Agent: \${TARGET_AGENT_NAME} (Location: \$LOC)..."
-            curl -s --fail -X DELETE -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" \
-              "https://\$ENDPOINT/v1alpha/\$TARGET_AGENT_NAME" > /dev/null && echo "   ✅ Gemini Enterprise Agent unlisted." || echo "   ⚠️  Failed to unlist Gemini Enterprise Agent."
-            UNREGISTERED=true
-            break 3
-          fi
+          AGENTS_JSON=$(curl -s -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" "https://\$ENDPOINT/v1alpha/\${A_NAME}/agents?pageSize=100" || true)
+          _GE_MATCHES=$(echo "\$AGENTS_JSON" | jq -r --arg dir "${dirName}" '.agents[]? | select(.a2aAgentDefinition.jsonAgentCard != null) | select((.a2aAgentDefinition.jsonAgentCard | try (fromjson | .name)) == $dir) | .name' 2>/dev/null || true)
+          for _GE_N in \$_GE_MATCHES; do
+            if [ "\$_GE_N" != "null" ]; then
+              _GE_TARGETS="\$_GE_TARGETS https://\$ENDPOINT/v1alpha/\$_GE_N"
+            fi
+          done
         done
       done
     done
-    
-    if [ "\$UNREGISTERED" = "false" ]; then
+
+    # Phase 2: delete every collected registration (404 = already gone = OK).
+    _GE_TARGETS=$(echo "\$_GE_TARGETS" | xargs -n1 2>/dev/null | sort -u || true)
+    if [ -z "\$_GE_TARGETS" ]; then
       echo "   ⚠️  Gemini Enterprise Agent not found or already unlisted."
+    else
+      for _GE_URL in \$_GE_TARGETS; do
+        echo "   🗑 Unregistering Gemini Enterprise Agent: \$_GE_URL..."
+        _GE_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE -H "Authorization: Bearer \$TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" "\$_GE_URL" 2>/dev/null || true)
+        if [ "\$_GE_CODE" = "200" ] || [ "\$_GE_CODE" = "404" ]; then
+          echo "   ✅ Gemini Enterprise Agent unlisted (HTTP \$_GE_CODE)."
+        else
+          echo "   ⚠️  Failed to unlist Gemini Enterprise Agent (HTTP \$_GE_CODE)."
+        fi
+      done
     fi
     
 
@@ -2957,25 +3136,49 @@ fi
 
 
     echo ""
-    echo "🧪 Deleting Agent Engine (Sandbox)..."
-    _AE_NAME=""
-    if [ -f ~/${dirName}/.env ]; then
-      _AE_NAME=\$(grep '^AGENT_ENGINE_NAME=' ~/${dirName}/.env | sed 's/^AGENT_ENGINE_NAME=//' | sed 's/^"//;s/"$//')
-    fi
-    if [ -n "\$_AE_NAME" ]; then
-      echo "   🔍 Found Agent Engine: \$_AE_NAME"
-      GOOGLE_API_USE_CLIENT_CERTIFICATE=false uv run --no-project --with "google-cloud-aiplatform[agent_engines]>=1.112.0" python3 -c "
-import vertexai, sys
-try:
-    client = vertexai.Client(project='\$PROJECT_ID', location='us-central1')
-    op = client.agent_engines.delete(name='\$_AE_NAME', force=True)
-    print('   ✅ Agent Engine and sandboxes deleted.')
-except Exception as e:
-    print('   ⚠️  Failed to delete Agent Engine: ' + str(e), file=sys.stderr)
-    sys.exit(1)
-" || echo "   ⚠️  Agent Engine deletion failed. You may need to delete it manually from the console."
+    echo "🧪 Deleting Agent Engine (Sandbox) instances..."
+    # Find ALL engines whose display name matches this demo, not just the one in
+    # .env: setup re-runs can leave orphaned engines behind, and this also works
+    # when the local demo directory (and its .env) was already deleted manually.
+    # Pure REST (curl): no uv/SDK download needed just to issue a DELETE.
+    _AE_API="https://us-central1-aiplatform.googleapis.com/v1beta1"
+    _AE_PARENT="projects/\$PROJECT_ID/locations/us-central1"
+    _AE_LIST=""
+    _AE_PAGE=""
+    while :; do
+      _AE_URL="\$_AE_API/\$_AE_PARENT/reasoningEngines?pageSize=100"
+      if [ -n "\$_AE_PAGE" ]; then _AE_URL="\$_AE_URL&pageToken=\$_AE_PAGE"; fi
+      _AE_JSON=$(curl -s -H "Authorization: Bearer \$TOKEN" "\$_AE_URL" 2>/dev/null || true)
+      _AE_MATCHES=$(echo "\$_AE_JSON" | jq -r --arg dn "${dirName}-sandbox" '.reasoningEngines[]? | select(.displayName == $dn) | .name' 2>/dev/null || true)
+      _AE_LIST="\$_AE_LIST \$_AE_MATCHES"
+      _AE_PAGE=$(echo "\$_AE_JSON" | jq -r '.nextPageToken // empty' 2>/dev/null || true)
+      if [ -z "\$_AE_PAGE" ]; then break; fi
+    done
+    _AE_LIST=$(echo "\$_AE_LIST" | xargs -n1 2>/dev/null | sort -u || true)
+    if [ -z "\$_AE_LIST" ]; then
+      echo "   ⚠️  No Agent Engine named '${dirName}-sandbox' found (already deleted?)."
     else
-      echo "   ⚠️  Agent Engine name not found in .env, skipping."
+      for _AE in \$_AE_LIST; do
+        _AE_CODE=""
+        for _AE_TRY in 1 2 3; do
+          _AE_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE -H "Authorization: Bearer \$TOKEN" "\$_AE_API/\$_AE?force=true" 2>/dev/null || true)
+          if [ "\$_AE_CODE" = "429" ]; then sleep $((_AE_TRY * 10)); else break; fi
+        done
+        if [ "\$_AE_CODE" = "200" ] || [ "\$_AE_CODE" = "404" ]; then
+          echo "   ✅ Delete requested: \$_AE (HTTP \$_AE_CODE)"
+        else
+          echo "   ⚠️  Failed to delete \$_AE (HTTP \$_AE_CODE). Delete it manually from the console."
+        fi
+      done
+      # Deletion is async (long-running operation); verify with a re-list.
+      sleep 5
+      _AE_LEFT=$(curl -s -H "Authorization: Bearer \$TOKEN" "\$_AE_API/\$_AE_PARENT/reasoningEngines?pageSize=200" 2>/dev/null | jq -r --arg dn "${dirName}-sandbox" '[.reasoningEngines[]? | select(.displayName == $dn)] | length' 2>/dev/null || true)
+      if [ -z "\$_AE_LEFT" ] || [ "\$_AE_LEFT" = "0" ]; then
+        echo "   ✅ Agent Engine cleanup verified (none remaining)."
+      else
+        echo "   ⚠️  \$_AE_LEFT Agent Engine(s) still listed (async deletion may be in progress)."
+        echo "       Re-run cleanup or check the Vertex AI Agent Platform console if they persist."
+      fi
     fi
 
     echo ""
@@ -3022,7 +3225,9 @@ for coll_name in ['${dirName}_task_definitions', '${dirName}_task_executions', '
     echo "📂 Deleting local directories and caches..."
     cd ~
     rm -rf ~/${dirName}
-    rm -rf ~/.cache/uv
+    # The uv cache is shared machine-wide and may be in use by other processes;
+    # best-effort removal must never abort cleanup (set -e) before the banner.
+    rm -rf ~/.cache/uv 2>/dev/null || true
     echo "   ✅ Local workspace directory, viewer code, and caches deleted."
 
     # Only show Slack cleanup if the Slack MCP server was configured
@@ -3060,7 +3265,7 @@ while true; do
   echo "📂 Demo Asset Directory: ~/${dirName}"
   echo "🧠 Agent Models:   root_agent: \$AGENT_MODEL_LITE / deep_analysis_agent: \$AGENT_MODEL"
   echo "🧪 Code Sandbox:   ✅ Enabled (Agent Runtime)"
-  ${ enableComputerUse ? `echo "🖥️ Computer Use:   ✅ Enabled (Browser Agent)"\n` : ''}${ enableWorkspaceMcp ? `echo "🔌 Google Workspace MCP: Enabled"\n` : ''}${mcpBanner}echo "========================================================="
+  ${ enableComputerUse ? `echo "🖥️ Computer Use:   ✅ Enabled (Browser Agent)"\n` : ''}${ enableManagedAgent ? `echo "🤖 Managed Agent:  ✅ Enabled (Antigravity autonomous sandbox - provisioned in parallel with setup)"\n` : ''}${ enableWorkspaceMcp ? `echo "🔌 Google Workspace MCP: Enabled"\n` : ''}${ (enableWorkspaceAuth && !enableWorkspaceMcp) ? `echo "🔐 Workspace Auth: ✅ Enabled (user OAuth, no MCP servers)"\n` : ''}${mcpBanner}echo "========================================================="
   
   echo "Choose an option:"
   echo "  [Y] Yes, proceed with this project (Default)"
@@ -3316,6 +3521,143 @@ fi
 # Cloud Console (and re-signable) after the signed URL expires. The whole bucket is
 # removed on --cleanup.
 
+# --- Agent Template Fetch (pinned) ---
+# Static Python/JSON files (ADK agent runtime, A2UI examples, data viewer) are
+# fetched from the repo at a pinned ref instead of being embedded here.
+echo "📥 Fetching agent template (ref ${CONFIG.TEMPLATE_REF})..."
+GE_TPL_ROOT="$(pwd)/_ge_template"
+rm -rf "$GE_TPL_ROOT"
+git init -q "$GE_TPL_ROOT"
+git -C "$GE_TPL_ROOT" remote add origin "${CONFIG.TEMPLATE_REPO}"
+git -C "$GE_TPL_ROOT" sparse-checkout set --cone "${CONFIG.TEMPLATE_SUBDIR}" 2>/dev/null || true
+if ! git -C "$GE_TPL_ROOT" fetch -q --depth 1 --filter=blob:none origin "${CONFIG.TEMPLATE_REF}"; then
+  echo "❌ Could not fetch agent template ref '${CONFIG.TEMPLATE_REF}'"
+  echo "   from ${CONFIG.TEMPLATE_REPO}."
+  echo "   The pinned template version is unreachable. Ask the demo creator to"
+  echo "   regenerate this script (the app's TEMPLATE_REF may need updating)."
+  exit 1
+fi
+git -C "$GE_TPL_ROOT" -c advice.detachedHead=false checkout -q FETCH_HEAD
+GE_TPL="$GE_TPL_ROOT/${CONFIG.TEMPLATE_SUBDIR}"
+if [ ! -f "$GE_TPL/adk_agent/app/fast_api_app.py" ]; then
+  echo "❌ Agent template incomplete under $GE_TPL"
+  exit 1
+fi
+echo "    ✅ Agent template ready."
+${ enableManagedAgent ? `
+# --- Managed Autonomous Agent (Antigravity, Pre-GA Preview) - PHASE A: start ---
+# Creation takes ~8-10 min, so it is STARTED here (right after the dashboards
+# bucket exists) and awaited in PHASE B after the Cloud Run deployment +
+# Gemini Enterprise registration, hiding most of the wait behind the rest of
+# the setup. No allowlist is needed - just the Vertex AI Agent Platform API + standard IAM.
+# VERIFIED live (2026-07-12): the create LRO never reports done:true, so
+# readiness is detected in PHASE B by polling GET on the agent itself.
+echo "🤖 Starting Managed Autonomous Agent provisioning (Antigravity, Preview)..."
+MANAGED_AGENT_ID=""
+# PHASE A runs BEFORE the demo asset directory is created/entered, while
+# PHASE B runs inside it - so all helper files are addressed absolutely.
+MA_TOOLS_DIR="$(pwd)"
+
+# 1) Craft skills: self-authored packs (embedded at generation time from the
+#    generator repo) + the Google Chrome modern-web-guidance skill (public,
+#    Apache-2.0/CC-BY, cloned fresh at setup time).
+rm -rf skills _mwg_tmp && mkdir -p skills
+${managedSkillsBash}if git clone --depth 1 --quiet https://github.com/GoogleChrome/modern-web-guidance.git _mwg_tmp >/dev/null 2>&1; then
+  rm -rf _mwg_tmp/.git
+  # Publish-repo layout (verified 2026-07-12): skill packs live under skills/
+  # (skills/modern-web-guidance/SKILL.md). Fallbacks cover a root-level
+  # SKILL.md or first-level skill dirs in case the layout changes.
+  MA_MWG_COPIED=""
+  if [ -f _mwg_tmp/skills/modern-web-guidance/SKILL.md ]; then
+    cp -r _mwg_tmp/skills/modern-web-guidance skills/
+    MA_MWG_COPIED="yes"
+  elif [ -f _mwg_tmp/SKILL.md ]; then
+    mkdir -p skills/modern-web-guidance
+    cp -r _mwg_tmp/. skills/modern-web-guidance/
+    MA_MWG_COPIED="yes"
+  else
+    for d in _mwg_tmp/*/ _mwg_tmp/skills/*/; do
+      if [ -f "\${d}SKILL.md" ]; then cp -r "$d" skills/; MA_MWG_COPIED="yes"; fi
+    done
+  fi
+  rm -rf _mwg_tmp
+  if [ -n "$MA_MWG_COPIED" ]; then
+    echo "  ✅ modern-web-guidance skill added (GoogleChrome, latest)."
+  else
+    echo "  ⚠️  modern-web-guidance layout not recognized (continuing without it)."
+  fi
+else
+  echo "  ⚠️  Could not clone modern-web-guidance (continuing without it)."
+fi
+${ workspaceAuthEnabled ? `
+# gws (Google Workspace CLI, Apache-2.0) skills: let the sandbox act on the
+# user's Workspace via direct REST with the user OAuth token (no MCP servers).
+# Curated subset only - the full 100+ skill set would drown skill discovery.
+rm -rf _gws_tmp
+if git clone --depth 1 --quiet https://github.com/googleworkspace/cli.git _gws_tmp >/dev/null 2>&1; then
+  MA_GWS_COPIED=""
+  for s in gws-shared gws-drive gws-gmail gws-calendar gws-chat gws-docs gws-sheets; do
+    if [ -f "_gws_tmp/skills/\$s/SKILL.md" ]; then
+      cp -r "_gws_tmp/skills/\$s" skills/
+      MA_GWS_COPIED="yes"
+    fi
+  done
+  rm -rf _gws_tmp
+  if [ -n "$MA_GWS_COPIED" ]; then
+    echo "  ✅ gws Workspace CLI skills added (googleworkspace/cli, latest)."
+  else
+    echo "  ⚠️  gws skills layout not recognized (continuing without Workspace actions)."
+  fi
+else
+  echo "  ⚠️  Could not clone googleworkspace/cli (continuing without Workspace actions)."
+fi
+` : ''}
+
+MA_SKILLS_SOURCE=""
+if [ -n "$(ls -A skills 2>/dev/null)" ]; then
+  echo "  📤 Uploading skill packs to gs://$DASH_BUCKET/skills/ ..."
+  if gcloud storage cp -r skills/* "gs://$DASH_BUCKET/skills/" >/dev/null 2>&1; then
+    MA_SKILLS_SOURCE="gs://$DASH_BUCKET/skills"
+    echo "  ✅ Skills uploaded ($(find skills -name 'SKILL.md' | wc -l) skill packs)."
+  else
+    echo "  ⚠️  Skill upload failed (agent will run without mounted skills)."
+  fi
+else
+  echo "  ⚠️  No skill packs available (agent will run without mounted skills)."
+fi
+rm -rf skills
+
+# 2) System instruction (quoted heredoc -> file; avoids argv-length limits).
+cat <<'__MA_SYSINSTR_EOF__' > managed_agent_instruction.txt
+${managedAgentInstruction}
+__MA_SYSINSTR_EOF__
+
+# 3) Provisioning helper (raw REST via stdlib urllib). Two modes:
+#    start = fire the create (or update an existing agent in place) and
+#            return immediately; wait = poll GET until the agent is ready.
+cp "$GE_TPL/managed_agent/create_managed_agent.py" create_managed_agent.py
+
+# 4) Warm-up helper (used in PHASE B): one trivial interaction pre-provisions
+#    the sandbox container; the resulting environment id is stored in the
+#    demo's Firestore state doc, where the runtime reads it (so it does not
+#    need to exist before the Cloud Run deployment).
+cp "$GE_TPL/managed_agent/warmup_managed_agent.py" warmup_managed_agent.py
+
+MA_TOKEN=$(gcloud auth print-access-token)
+export MA_OUT="/tmp/ma_start_$$.txt"
+PROJECT_ID="$PROJECT_ID" python3 "$MA_TOOLS_DIR/create_managed_agent.py" start "${managedAgentId}" "$MA_TOKEN" "$MA_SKILLS_SOURCE" 2>&1 | sed 's/^/  /'
+MA_START_STATE=$(cat "$MA_OUT" 2>/dev/null)
+rm -f "$MA_OUT"
+unset MA_OUT
+if [ -n "$MA_START_STATE" ]; then
+  # Optimistic: the id is deterministic and the Cloud Run env var is set now;
+  # PHASE B verifies readiness and clears the env var if provisioning failed.
+  MANAGED_AGENT_ID="${managedAgentId}"
+  echo "  ✅ Provisioning started ($MA_START_STATE) - continuing setup in parallel."
+else
+  echo "  ⚠️  Managed Agent could not be started - the demo deploys WITHOUT autonomous delegation."
+fi
+` : ''}
 # Enable MCP services (parallel for speed)
 echo "🔧 Enabling MCP services (parallel)..."
 gcloud beta services mcp enable bigquery.googleapis.com --project="$PROJECT_ID" 2>/dev/null &
@@ -3351,31 +3693,6 @@ if [ -d "${dirName}" ]; then
   echo "📂 Removing existing directory ${dirName} for a clean setup..."
   rm -rf "${dirName}"
 fi
-
-# --- Agent Template Fetch (pinned) ---
-# Static Python/JSON files (ADK agent runtime, A2UI examples, data viewer) are
-# fetched from the repo at a pinned ref instead of being embedded here.
-echo "📥 Fetching agent template (ref ${CONFIG.TEMPLATE_REF})..."
-GE_TPL_ROOT="$(pwd)/_ge_template"
-rm -rf "$GE_TPL_ROOT"
-git init -q "$GE_TPL_ROOT"
-git -C "$GE_TPL_ROOT" remote add origin "${CONFIG.TEMPLATE_REPO}"
-git -C "$GE_TPL_ROOT" sparse-checkout set --cone "${CONFIG.TEMPLATE_SUBDIR}" 2>/dev/null || true
-if ! git -C "$GE_TPL_ROOT" fetch -q --depth 1 --filter=blob:none origin "${CONFIG.TEMPLATE_REF}"; then
-  echo "❌ Could not fetch agent template ref '${CONFIG.TEMPLATE_REF}'"
-  echo "   from ${CONFIG.TEMPLATE_REPO}."
-  echo "   The pinned template version is unreachable. Ask the demo creator to"
-  echo "   regenerate this script (the app's TEMPLATE_REF may need updating)."
-  exit 1
-fi
-git -C "$GE_TPL_ROOT" -c advice.detachedHead=false checkout -q FETCH_HEAD
-GE_TPL="$GE_TPL_ROOT/${CONFIG.TEMPLATE_SUBDIR}"
-if [ ! -f "$GE_TPL/adk_agent/app/fast_api_app.py" ]; then
-  echo "❌ Agent template incomplete under $GE_TPL"
-  exit 1
-fi
-echo "    ✅ Agent template ready."
-
 # --- 3. Data Provisioning ---
 ${bqCommands}
 ${firestoreCommands}
@@ -3705,7 +4022,6 @@ else
     echo "     Ensure aiplatform.googleapis.com is enabled and roles/aiplatform.user is granted."
     exit 1
 fi
-
 # Create .env in the root
 cat <<__ENV_EOF__ > .env
 GOOGLE_GENAI_USE_VERTEXAI=1
@@ -3718,6 +4034,8 @@ REFERENCE_DATE="${referenceDate}"
 PUBLIC_DATASET_ID="${publicDatasetId || ''}"
 ENABLE_WORKSPACE_MCP=${enableWorkspaceMcp ? '1' : '0'}
 ENABLE_COMPUTER_USE=${enableComputerUse ? '1' : '0'}
+ENABLE_MANAGED_AGENT=${enableManagedAgent ? '1' : '0'}
+ENABLE_WORKSPACE_AUTH=${enableWorkspaceAuth ? '1' : '0'}
 MAPS_API_KEY="$API_KEY"
 PYTHONUNBUFFERED=1
 GRPC_ENABLE_FORK_SUPPORT=1
@@ -3737,6 +4055,15 @@ fi
 # Add Sandbox resource name for code execution (always present at this point)
 echo "SANDBOX_RESOURCE_NAME=\"$SANDBOX_RESOURCE_NAME\"" >> .env
 echo "AGENT_ENGINE_NAME=\"$AGENT_ENGINE_NAME\"" >> .env
+${ enableManagedAgent ? `
+# Managed Autonomous Agent id (optimistic - creation started in PHASE A and
+# is verified in PHASE B after deployment; empty when the start was rejected).
+# The skills source is needed at RUNTIME because the Interactions API does not
+# inherit the agent's base_environment: every fresh sandbox spec must restate
+# network + sources (verified live 2026-07-12).
+echo "MANAGED_AGENT_ID=\"$MANAGED_AGENT_ID\"" >> .env
+echo "MANAGED_AGENT_SKILLS_SOURCE=\"$MA_SKILLS_SOURCE\"" >> .env
+` : ''}
 
 # Symlink .env to packages for visibility
 ln -sf ../.env adk_agent/.env
@@ -3902,6 +4229,8 @@ gcloud services enable secretmanager.googleapis.com
       `PUBLIC_DATASET_ID=${publicDatasetId || ''}`,
       `ENABLE_WORKSPACE_MCP=${enableWorkspaceMcp ? '1' : '0'}`,
       `ENABLE_COMPUTER_USE=${enableComputerUse ? '1' : '0'}`,
+      `ENABLE_MANAGED_AGENT=${enableManagedAgent ? '1' : '0'}`,
+      `ENABLE_WORKSPACE_AUTH=${enableWorkspaceAuth ? '1' : '0'}`,
       "DASHBOARDS_BUCKET=\$DASH_BUCKET",
       "RUNTIME_SA_EMAIL=\$COMPUTE_SA"
     ];
@@ -3980,7 +4309,7 @@ gcloud services enable secretmanager.googleapis.com
         deployCmd += `ALL_SECRETS="\$OPTIONAL_SECRETS"\n`;
       }
       deployCmd += `\nSECRETS_FLAG=""\nif [ -n "\$ALL_SECRETS" ]; then\n  SECRETS_FLAG="--update-secrets=\$ALL_SECRETS"\nfi\n`;
-      deployCmd += `\nCR_ENV_VARS="${envVars.join(",")}"\nif [ "\$VIEWER_DEPLOYED" = "true" ]; then\n  CR_ENV_VARS="\$CR_ENV_VARS,DATA_VIEWER_URL=\$VIEWER_URL"\nfi\nCR_ENV_VARS="\$CR_ENV_VARS,SANDBOX_RESOURCE_NAME=\$SANDBOX_RESOURCE_NAME"\n`;
+      deployCmd += `\nCR_ENV_VARS="${envVars.join(",")}"\nif [ "\$VIEWER_DEPLOYED" = "true" ]; then\n  CR_ENV_VARS="\$CR_ENV_VARS,DATA_VIEWER_URL=\$VIEWER_URL"\nfi\nCR_ENV_VARS="\$CR_ENV_VARS,SANDBOX_RESOURCE_NAME=\$SANDBOX_RESOURCE_NAME"\n${enableManagedAgent ? `CR_ENV_VARS="\$CR_ENV_VARS,MANAGED_AGENT_ID=\$MANAGED_AGENT_ID,MANAGED_AGENT_SKILLS_SOURCE=\$MA_SKILLS_SOURCE"\n` : ''}`;
       deployCmd += `\ngcloud run deploy "\$SERVICE_NAME" \
     --source .. \
     --memory "8Gi" \
@@ -3997,7 +4326,7 @@ gcloud services enable secretmanager.googleapis.com
     --region us-central1 \
     --quiet > "\$DEPLOY_LOG" 2>&1 &`;
     } else {
-      deployCmd = `CR_ENV_VARS="${envVars.join(",")}"\nif [ "\$VIEWER_DEPLOYED" = "true" ]; then\n  CR_ENV_VARS="\$CR_ENV_VARS,DATA_VIEWER_URL=\$VIEWER_URL"\nfi\nCR_ENV_VARS="\$CR_ENV_VARS,SANDBOX_RESOURCE_NAME=\$SANDBOX_RESOURCE_NAME"\ngcloud run deploy "\$SERVICE_NAME" \
+      deployCmd = `CR_ENV_VARS="${envVars.join(",")}"\nif [ "\$VIEWER_DEPLOYED" = "true" ]; then\n  CR_ENV_VARS="\$CR_ENV_VARS,DATA_VIEWER_URL=\$VIEWER_URL"\nfi\nCR_ENV_VARS="\$CR_ENV_VARS,SANDBOX_RESOURCE_NAME=\$SANDBOX_RESOURCE_NAME"\n${enableManagedAgent ? `CR_ENV_VARS="\$CR_ENV_VARS,MANAGED_AGENT_ID=\$MANAGED_AGENT_ID,MANAGED_AGENT_SKILLS_SOURCE=\$MA_SKILLS_SOURCE"\n` : ''}gcloud run deploy "\$SERVICE_NAME" \
     --source .. \
     --memory "8Gi" \
     --cpu 2 \
@@ -4241,7 +4570,41 @@ EOF
 
   
   cd ..
-  
+${ enableManagedAgent ? `
+  # --- Managed Autonomous Agent - PHASE B: await readiness + warm-up ---
+  # Creation was started in PHASE A (before data load / sandbox / deploy), so
+  # by now most or all of its ~8-10 min has elapsed in parallel.
+  if [ -n "$MANAGED_AGENT_ID" ]; then
+    echo ""
+    echo "🤖 Finalizing Managed Autonomous Agent (started earlier in parallel)..."
+    MA_TOKEN=$(gcloud auth print-access-token)
+    export MA_OUT="/tmp/ma_ready_$$.txt"
+    PROJECT_ID="$PROJECT_ID" python3 "$MA_TOOLS_DIR/create_managed_agent.py" wait "$MANAGED_AGENT_ID" "$MA_TOKEN" 2>&1 | sed 's/^/  /'
+    MA_READY=$(cat "$MA_OUT" 2>/dev/null)
+    rm -f "$MA_OUT"
+    if [ -n "$MA_READY" ]; then
+      echo "  ✅ Managed Agent ready: $MANAGED_AGENT_ID (location: global)"
+      echo "  🔥 Warming up the autonomous sandbox (pre-provisioning the environment${ workspaceAuthEnabled ? ` + pre-installing the Workspace CLI, typically 1-3 min` : ``})..."
+      export MA_OUT="/tmp/ma_env_$$.txt"
+      PROJECT_ID="$PROJECT_ID" MA_STATE_COLL="${dirName}_managed_agent_state" python3 "$MA_TOOLS_DIR/warmup_managed_agent.py" "$MANAGED_AGENT_ID" "$MA_TOKEN" "$MA_SKILLS_SOURCE" 2>&1 | sed 's/^/  /' || true
+      MANAGED_AGENT_ENV_ID=$(cat "$MA_OUT" 2>/dev/null)
+      rm -f "$MA_OUT"
+      if [ -n "$MANAGED_AGENT_ENV_ID" ]; then
+        echo "  ✅ Sandbox environment pre-provisioned: $MANAGED_AGENT_ENV_ID (runtime reads it from Firestore)"
+      else
+        echo "  ⚠️  Warm-up returned no environment id (first delegation will provision on demand)."
+      fi
+    else
+      echo "  ⚠️  Managed Agent is not ready - disabling autonomous delegation on the deployed service."
+      MANAGED_AGENT_ID=""
+      gcloud run services update "\$SERVICE_NAME" --region us-central1 --remove-env-vars MANAGED_AGENT_ID --quiet >/dev/null 2>&1 \\
+        && echo "  ✅ MANAGED_AGENT_ID removed from the Cloud Run service (re-run this script later to retry)." \\
+        || echo "  ⚠️  Could not update the Cloud Run service env vars - delegation may fail at runtime."
+    fi
+    unset MA_OUT
+    rm -f "$MA_TOOLS_DIR/create_managed_agent.py" "$MA_TOOLS_DIR/warmup_managed_agent.py" "$MA_TOOLS_DIR/managed_agent_instruction.txt"
+  fi
+` : ''}
   echo "========================================================="
   if [ ! -z "\$AGENT_ID" ]; then
     echo "🎉 Gemini Enterprise Deployment & Registration Complete!"
@@ -5107,7 +5470,7 @@ function fetchFileFromGithub(owner, repo, defaultBranch, path) {
   for (const branch of branches) {
     const apiUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
     try {
-      const response = UrlFetchApp.fetch(apiUrl, { 
+      const response = UrlFetchApp.fetch(apiUrl, {
         muteHttpExceptions: true,
         headers: getGithubHeaders()
       });
@@ -5120,6 +5483,14 @@ function fetchFileFromGithub(owner, repo, defaultBranch, path) {
   }
   return null;
 }
+
+// == Managed Agent craft skills (demo-skills/) ==
+// Skills are authored as plain files in the repo's demo-skills/ directory and
+// compiled into DemoSkills.gs (the DEMO_SKILLS_FILES constant) by
+// build_skills.js at clasp-push time. This repo is PRIVATE, so no GitHub /
+// network access is involved at generation time - the data ships inside the
+// Apps Script project itself. Fail-soft: any problem returns null and the
+// demo is generated without craft skills.
 
 function callGeminiApi(contextContent, url) {
   const token = ScriptApp.getOAuthToken(); 
@@ -5263,13 +5634,24 @@ ${contextContent}
  * @param {string} rawGoal - The user's current scenario text.
  * @returns {Object} Optimized result containing the structured Markdown.
  */
-function optimizeGoalWithMagicWand(rawGoal) {
+function optimizeGoalWithMagicWand(rawGoal, capabilityOpts) {
   let location = CONFIG.LOCATION || 'global';
   const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
   const model = 'gemini-3.1-flash-lite';
   const url = `https://${host}/v1/projects/${CONFIG.PROJECT_ID}/locations/${location}/publishers/google/models/${model}:generateContent`;
 
-  const prompt = `You are an expert prompt engineer and business analyst. 
+  // Capability-aware optimization: when the Managed Agent toggle is on, the
+  // optimized scenario must also seed an autonomous long-horizon mission so
+  // the downstream planning call has material to build delegation-class demo
+  // prompts from. Older callers pass no opts - default to managed ON (the
+  // generator default since v11.2).
+  const _caps = capabilityOpts || {};
+  const _capManaged = _caps.enableManagedAgent !== false;
+  const _capWorkspace = !!(_caps.enableWorkspaceMcp || _caps.enableWorkspaceAuth);
+  const managedAgentRequirement = _capManaged ? `
+4.  **Autonomous Strategic Initiative (MANDATORY)**: The Operational Challenge MUST additionally define ONE standing long-horizon mission suited to a fully autonomous agent working for tens of minutes: live external research (industry trends, competitor moves, market prices, regulations) combined with the company's own data through real quantitative analysis, culminating in an executive-grade deliverable (a board presentation, a formal proposal document, a PDF report, or an interactive briefing page${ _capWorkspace ? ', delivered into the team workspace - saved to shared drives, summarized in a draft email, or posted to the team chat' : ''}). State the business question it answers, the expected deliverable and its audience, and the quality bar (real numbers, cited sources, decision-ready structure). Keep it in business language - no tool or product names.` : '';
+
+  const prompt = `You are an expert prompt engineer and business analyst.
 Your task is to take a raw, simple, or loosely defined business scenario, OR a partially structured business scenario (which might contain company details and selected target workflows from prior research), and optimize/expand it into a **perfectly structured, high-density professional Business Scenario prompt** in Markdown format.
 
 Input to Optimize:
@@ -5299,7 +5681,7 @@ Requirements for the Structured Output:
             3. **Executive Reports & Interactive Cards**: Design the workflow to output professional, structured reports (saved to the operational database/Firestore) and rich interactive UI cards (using A2UI) as the final outcome or human review package.
         *NOTE*: If the input already lists target workflows or specific steps, respect them and build the operational challenge specifically around those workflows.
 2.  **Operational/Database Focus**: ALWAYS frame the scenario as a database-driven workflow where the agent reads from analytical sources (BigQuery/external files) and **writes back status updates, high-risk alerts, or proposed changes to the operational database (Firestore)** to keep the real-time console updated.
-3.  **No Fictional Placeholders**: Use realistic brand names, locations, and values appropriate to the language context. Do NOT use generic placeholders like \"Product A\", \"Company XYZ\", etc.
+3.  **No Fictional Placeholders**: Use realistic brand names, locations, and values appropriate to the language context. Do NOT use generic placeholders like \"Product A\", \"Company XYZ\", etc.${managedAgentRequirement}
 
 Return ONLY the raw Markdown text in the detected language. Do not include any code block wrappers (triple backticks), code fences, or preamble.`;
 

@@ -22,6 +22,20 @@
 # mypy: ignore-errors
 # ruff: noqa
 
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import logging
 import asyncio
@@ -281,6 +295,98 @@ def _heal_buttons_in_a2ui(msg):
                                     }
                                     new_comps.append(new_text)
             comps.extend(new_comps)
+
+            # --- Dangling-label pass (v11.4) ---
+            # A Button whose 'child' is a string id with NO matching component in
+            # this surfaceUpdate renders as an EMPTY pill in GE (confirmed live
+            # 2026-07-15: Next Actions chips showed as blank blue ovals because
+            # the model emitted the Buttons but omitted their label Text
+            # components). Synthesize the missing Text from the button's own
+            # label/text property, a literalString nested in an inline child
+            # object, or its sendText context text (every chip carries one),
+            # truncated to a chip-sized label.
+            _defined_ids = set()
+            for _dc in comps:
+                if isinstance(_dc, dict) and isinstance(_dc.get('id'), str):
+                    _defined_ids.add(_dc['id'])
+            def _find_literal(_n):
+                if isinstance(_n, dict):
+                    _ls = _n.get('literalString')
+                    if isinstance(_ls, str) and _ls.strip():
+                        return _ls
+                    for _v in _n.values():
+                        _r = _find_literal(_v)
+                        if _r:
+                            return _r
+                elif isinstance(_n, list):
+                    for _v in _n:
+                        _r = _find_literal(_v)
+                        if _r:
+                            return _r
+                return ''
+            _extra_labels = []
+            for comp in comps:
+                if not isinstance(comp, dict):
+                    continue
+                _cd = comp.get('component')
+                if not (isinstance(_cd, dict) and isinstance(_cd.get('Button'), dict)):
+                    continue
+                btn = _cd['Button']
+                _child = btn.get('child')
+                if isinstance(_child, str) and _child in _defined_ids:
+                    continue  # healthy: the label Text exists in this surfaceUpdate
+                # Label source 1: leftover label/text property on the Button
+                _label = ''
+                _lv = btn.get('label') or btn.get('text')
+                if isinstance(_lv, dict):
+                    _label = str(_lv.get('literalString') or '')
+                elif _lv:
+                    _label = str(_lv)
+                # Label source 2: literalString nested inside an inline child object
+                if (not _label) and isinstance(_child, dict):
+                    _label = _find_literal(_child)
+                # Label source 3: the button's own sendText context text
+                if not _label:
+                    _act = btn.get('action')
+                    _ctx = _act.get('context') if isinstance(_act, dict) else None
+                    for _ce in (_ctx or []):
+                        if isinstance(_ce, dict) and _ce.get('key') == 'text':
+                            _cv = _ce.get('value')
+                            if isinstance(_cv, dict) and isinstance(_cv.get('literalString'), str):
+                                _label = _cv['literalString']
+                            elif isinstance(_cv, str):
+                                _label = _cv
+                            break
+                _label = ' '.join(str(_label).split())
+                if len(_label) > 48:
+                    _label = _label[:47] + '...'
+                if not _label:
+                    continue  # nothing usable - leave the button untouched
+                _cid = _child if (isinstance(_child, str) and _child) else (str(comp.get('id') or 'btn') + '_lbl')
+                if _cid in _defined_ids:
+                    _cid = _cid + '_x'
+                btn.pop('label', None)
+                btn.pop('text', None)
+                btn['child'] = _cid
+                _extra_labels.append({'id': _cid, 'component': {'Text': {'text': {'literalString': _label}, 'usageHint': 'body'}}})
+                _defined_ids.add(_cid)
+            if _extra_labels:
+                comps.extend(_extra_labels)
+                try:
+                    logger.log_text('[button_heal] synthesized ' + str(len(_extra_labels)) + ' missing button label Text component(s)')
+                except Exception:
+                    pass
+
+            # Normalize Text.text given as a bare string: GE requires the
+            # {'literalString': ...} shape; a bare string renders as empty.
+            for _tc in comps:
+                if not isinstance(_tc, dict):
+                    continue
+                _tcd = _tc.get('component')
+                if isinstance(_tcd, dict) and isinstance(_tcd.get('Text'), dict):
+                    _tv = _tcd['Text'].get('text')
+                    if isinstance(_tv, str):
+                        _tcd['Text']['text'] = {'literalString': _tv}
     return msg
 
 # --- A2UI Icon Normalization ---
@@ -628,10 +734,9 @@ def _scope_suggestions_surface(msg):
 #     N, deleteSurface turn N+1) keeps working even after a rename, and a
 #     patch-only turn that intentionally updates an old card still can.
 #   - 'suggestions*' ids are skipped (already per-turn scoped above).
-# State is in-memory per session (same instance-lifetime scope as the Y1/G1/H1
-# caches; min-instances=0 means it is best-effort and lost if the service
-# scales to zero after idle); the rename is idempotent because already-renamed
-# ids are first normalized back to their logical id.
+# State is in-memory per session (same minScale=1 scope as the Y1/G1/H1
+# caches); the rename is idempotent because already-renamed ids are first
+# normalized back to their logical id.
 _current_surface_guard = contextvars.ContextVar('surface_guard', default=None)
 _session_surface_registry = {}
 
@@ -722,8 +827,96 @@ def _rescope_reused_surfaces(msg):
     return _rescope_one(msg, _allow_promote=False)[0]
 
 
+# --- A2UI shape normalization (v11.4) ---
+# The model emits three recurring SHAPE malformations that the A2UI schema
+# rejects and the GE client cannot render (confirmed live 2026-07-15,
+# demo-tech-distributi: the stream parser refused the card, the regex
+# fallback then shipped it UNVALIDATED, and GE hung the whole turn on
+# permanent "thinking"):
+#   (a) stray scalar keys at the component-dict level, sibling of the type
+#       key (e.g. {"component": {"Text": {...}, "usageHint": "h2"}});
+#   (b) Text missing the text wrapper ({"Text": {"literalString": "X"}})
+#       or text given as a bare string;
+#   (c) layout props nested INSIDE the children object
+#       ({"children": {"explicitList": [...], "distribution": ..., "alignment": ...}}).
+# This normalizer repairs all three in place. Verified against the live
+# failing card: raw -> schema INVALID, normalized -> schema VALID.
+_A2UI_CHILD_PROP_LIFT = {
+    'Row': ('distribution', 'alignment'),
+    'Column': ('distribution', 'alignment'),
+    'List': ('direction', 'alignment'),
+}
+
+def _normalize_a2ui_shapes(msg):
+    if not isinstance(msg, dict):
+        return msg
+    _su = msg.get('surfaceUpdate')
+    if not isinstance(_su, dict):
+        return msg
+    for _comp in _su.get('components') or []:
+        if not isinstance(_comp, dict):
+            continue
+        _cd = _comp.get('component')
+        if not isinstance(_cd, dict):
+            continue
+        # (a) stray scalar keys beside the component-type key
+        _stray = [_k for _k, _v in list(_cd.items()) if not isinstance(_v, dict)]
+        for _k in _stray:
+            _v = _cd.pop(_k)
+            if _k == 'usageHint' and isinstance(_cd.get('Text'), dict):
+                _cd['Text'].setdefault('usageHint', _v)
+        for _cname, _spec in _cd.items():
+            if not isinstance(_spec, dict):
+                continue
+            # (b) Text shape repairs
+            if _cname == 'Text':
+                _tv = _spec.get('text')
+                if isinstance(_tv, str):
+                    _spec['text'] = {'literalString': _tv}
+                if 'literalString' in _spec:
+                    if not isinstance(_spec.get('text'), dict):
+                        _spec['text'] = {'literalString': str(_spec['literalString'])}
+                    _spec.pop('literalString', None)
+            # (c) lift layout props out of the children object
+            _ch = _spec.get('children')
+            if isinstance(_ch, dict):
+                _allowed = _A2UI_CHILD_PROP_LIFT.get(_cname, ())
+                for _k in [_k for _k in _ch.keys() if _k != 'explicitList']:
+                    _v = _ch.pop(_k)
+                    if _k in _allowed and _k not in _spec:
+                        _spec[_k] = _v
+    return msg
+
+def _a2ui_msg_schema_ok(msg):
+    """Schema gate for MODEL-authored A2UI (used by create_a2ui_parts).
+
+    The stream parser validates the happy path, but every RECOVERY path
+    (regex fallback, untagged safety nets) used to ship whatever it
+    extracted, unvalidated - and one schema-invalid card is enough to hang
+    the GE client's rendering of the entire turn. After healing, anything
+    that STILL fails validation is dropped (the turn keeps its text and
+    other surfaces). Only surfaceUpdate carries components; other message
+    kinds pass through. Fail-open: if the validation machinery itself
+    errors, deliver as before."""
+    try:
+        if not (isinstance(msg, dict) and isinstance(msg.get('surfaceUpdate'), dict)):
+            return True
+        _vp = A2uiStreamParser(catalog=a2ui_selected_catalog)
+        _vp.process_chunk('<a2ui-json>' + json.dumps([msg]) + '</a2ui-json>')
+        return True
+    except ValueError as _ve:
+        try:
+            _sid = str((msg.get('surfaceUpdate') or {}).get('surfaceId', '?'))
+            logger.log_text('[a2ui_gate] dropped schema-invalid surfaceUpdate (surface=' + _sid + '): ' + str(_ve)[:200])
+        except Exception:
+            pass
+        return False
+    except Exception:
+        return True
+
 def _prep_a2ui_msg(msg):
-    _healed = _heal_buttons_in_a2ui(msg)
+    _shaped = _normalize_a2ui_shapes(msg)
+    _healed = _heal_buttons_in_a2ui(_shaped)
     _rewritten = _rewrite_suggestions_a2ui(_healed)
     _rewritten = _scope_suggestions_surface(_rewritten)
     return _rewritten
@@ -813,7 +1006,13 @@ def create_a2ui_parts(msg):
     # paths. Server-authored begin+update pairs are unaffected (the begin marks
     # the surface begun, so its update never promotes).
     _diag_a2ui(msg, "list")
-    return [_build_a2ui_part(_m) for _m in _rescope_one(_prep_a2ui_msg(msg), _allow_promote=True)]
+    _prepped = _prep_a2ui_msg(msg)
+    # v11.4: never ship a schema-invalid card - one poison surfaceUpdate hangs
+    # the GE client's rendering of the whole turn. Empty list is safe for every
+    # caller (they all .extend()).
+    if not _a2ui_msg_schema_ok(_prepped):
+        return []
+    return [_build_a2ui_part(_m) for _m in _rescope_one(_prepped, _allow_promote=True)]
 
 from adk_agent.app.agent import app as adk_app, background_agent, INLINE_TOOL_DEADLINE, INLINE_IMAGE_DEADLINE
 import adk_agent.app.tools as _agent_tools
@@ -848,6 +1047,56 @@ logger = logging_client.logger(__name__)
 # BEFORE the agent runs. The user then picks inline / background / adjust.
 # Fail-open everywhere: any error => no card => the agent runs normally.
 # =============================================================================
+_MA_PLANNER_OVERRIDE = (
+    "OVERRIDE - AUTONOMOUS CATEGORY (checked BEFORE the ANALYSIS rule): set category "
+    "to 'AUTONOMOUS' when the message requires ANY of the following, regardless of how "
+    "much data analysis it also contains: (a) researching CURRENT or EXTERNAL information "
+    "from the live web / internet (news, trends, competitors, market prices, regulations, "
+    "reading external reports); "
+    "(b) producing a downloadable FILE deliverable - a presentation / slide deck / pptx / "
+    "Google Slides, a document / docx / Google Docs, a PDF, a spreadsheet file, or a "
+    "standalone web page file; "
+    "(c) writing and executing custom code, building a prototype, or iterative file "
+    "processing; "
+    "(d) acting on the user's Google Workspace - saving a file to Google Drive, creating "
+    "a Gmail draft or email, posting to a Google Chat space, or creating Calendar events. "
+    "IMPORTANT: even ONE of these signals makes the message AUTONOMOUS, no matter how "
+    "analytical the rest is. Example: 'read the latest market trend report, combine it "
+    "with our data, create a strategy deck as Google Slides in my Drive, draft a summary "
+    "email, and post the link to our Chat space' is AUTONOMOUS (web research + file + "
+    "Drive + Gmail + Chat), NOT ANALYSIS. Such requests are handled by a dedicated "
+    "autonomous agent and must NOT get the ANALYSIS card. "
+    "EXCLUSION - INTERACTIVE DASHBOARDS ARE NOT AUTONOMOUS: a request for an interactive "
+    "dashboard / explorable page over the internal data that the user opens in the browser "
+    "(KPI cards, trends, drill-down views, risk lists) is handled NATIVELY by the assistant, "
+    "which builds and hosts it itself. Such a request is NOT signal (b) or (c) - classify it "
+    "by the remaining rules (usually ANALYSIS or QUICK) unless the message ALSO contains a "
+    "genuine autonomous signal (live web research, a downloadable office/PDF file, a Workspace "
+    "action, or a computed what-if SIMULATOR whose model coefficients must be derived by code). "
+    "FOR AUTONOMOUS, return these ADDITIONAL keys instead of the analysis fields: "
+    "card_title (a SHORT card heading of 3 to 6 words, e.g. the localized form of "
+    "'Autonomous task - quick check'. This is a HEADING, NOT a restatement of the "
+    "request - never put a full sentence here); "
+    "goal (ONE sentence restating what the user wants achieved); "
+    "deliverable (one line describing what will be produced, e.g. a slide deck saved to Drive plus a draft email); "
+    "missing (an array of 0 to 3 objects {question, suggestion, options} listing ONLY information gaps that "
+    "would MATERIALLY change the autonomous run's output - e.g. deliverable format unclear, target "
+    "audience unknown, time range / scope unspecified, or a Workspace action without a named recipient "
+    "or Chat space. Questions MUST stay at the BUSINESS level (audience, scope, emphasis, time range, "
+    "recipients). NEVER ask technical or implementation questions - which platform, BI product, tool, "
+    "library, tech stack, hosting, or data-connection method to use, or which internal system holds the "
+    "data. The agent decides all implementation details itself; a question naming products like "
+    "'Tableau or Power BI?' would ruin the business demo. "
+    "question is short; suggestion is your best concrete default answer the user can keep "
+    "or edit; options is OPTIONAL - include it ONLY when the answer naturally reduces to a few clear "
+    "mutually exclusive choices, as an array of 2 to 4 SHORT choice strings (one of them should match "
+    "the suggestion); omit options when free text is more appropriate. If the "
+    "request is already specific enough, return an EMPTY missing array - do not invent questions); "
+    "briefing_intro (one sentence like: before I start working autonomously, please confirm a few details); "
+    "label_start (button label meaning: confirm and start the autonomous task); "
+    "label_asis (button label meaning: start as-is without these details). "
+) if os.environ.get("ENABLE_MANAGED_AGENT") == "1" else ""
+
 PREFLIGHT_CLASSIFIER_PROMPT = (
     "You are a fast routing classifier for a data-analytics assistant. "
     "Work in two steps. "
@@ -881,6 +1130,7 @@ PREFLIGHT_CLASSIFIER_PROMPT = (
     "for the editable request box (e.g. the localized form of 'Adjust the request'). "
     "Each label may start with a fitting emoji. "
     "Set category to 'ANALYSIS' ONLY for the heavy multi-step case; otherwise 'QUICK' or 'OTHER'. "
+    + _MA_PLANNER_OVERRIDE +
     "ABSOLUTE LANGUAGE RULE: EVERY human-readable string (title, intro, data, method, "
     "output, estimate, every step title and detail, and every label) MUST be written in EXACTLY the language from "
     "STEP 1. If the user wrote in English, write every string in English; never answer "
@@ -1061,6 +1311,177 @@ def _build_preflight_card_parts(plan, scope_text):
     except Exception as _e:
         logger.log_text("[preflight_gate] card build failed (fail-open): " + str(_e)[:200])
         return None
+if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+
+    def _is_autonomous_confirmed_press(run_args):
+        # True when the press came from the Autonomous Briefing card's buttons,
+        # which carry context {"ra": "1"} - same mechanism as the Analysis
+        # card's pf marker.
+        try:
+            _nm = run_args.get("new_message") if isinstance(run_args, dict) else None
+            if _nm is None:
+                return False
+            for _p in (getattr(_nm, "parts", None) or []):
+                _t = getattr(_p, "text", None)
+                if _t and "userAction" in _t:
+                    try:
+                        _ua = json.loads(_t).get("userAction", {}) or {}
+                        if str((_ua.get("context", {}) or {}).get("ra", "")) == "1":
+                            return True
+                    except Exception:
+                        pass
+        except Exception:
+            return False
+        return False
+
+    def _build_autonomous_briefing_card_parts(plan, scope_text):
+        """Autonomous Task Briefing card v2: shown BEFORE delegation when the
+        classifier found material information gaps (plan['missing']). Each gap
+        gets its OWN input - a one-line TextField pre-filled with the suggested
+        default, or chips when the classifier supplied discrete options. A2UI
+        buttons cannot concatenate strings, but a press delivers EVERY context
+        key server-side with path references already resolved to data-model
+        values, so Start sends the original scope (literal) plus q<i>/a<i>/s<i>
+        keys and the server composes the final brief deterministically in the
+        ra-press SYSTEM NOTE."""
+        try:
+            def _g(_k, _d):
+                _v = plan.get(_k)
+                return _v if (isinstance(_v, str) and _v.strip()) else _d
+            _missing = plan.get("missing")
+            if not isinstance(_missing, list):
+                return None
+            _qs = []
+            for _mq in _missing[:3]:
+                if isinstance(_mq, dict):
+                    _q = _mq.get("question")
+                    if isinstance(_q, str) and _q.strip():
+                        _s = _mq.get("suggestion")
+                        _s = _s.strip() if isinstance(_s, str) and _s.strip() else ""
+                        _opts = []
+                        _oraw = _mq.get("options")
+                        if isinstance(_oraw, list):
+                            for _o in _oraw:
+                                if isinstance(_o, str) and _o.strip():
+                                    _opts.append(_o.strip())
+                        _opts = _opts[:4] if len(_opts) >= 2 else []
+                        _qs.append((_q.strip(), _s, _opts))
+            if not _qs:
+                return None
+            # card_title is a SHORT heading; goal (a full sentence) is demoted to a
+            # body line. Truncate defensively in case the classifier omitted
+            # card_title and the goal fallback is long - a sentence rendered as h2
+            # dominated the whole card in live tests.
+            _title = _g("card_title", _g("goal", scope_text))
+            if len(_title) > 80:
+                _title = _title[:79] + chr(0x2026)
+            _goal = _g("goal", "")
+            _deliv = _g("deliverable", "")
+            _intro = _g("briefing_intro", "Before the autonomous run starts, please confirm a few details.")
+            _intro_line = (chr(0x1F4E6) + " " + _deliv + " - " + _intro) if _deliv else _intro
+            _comps = []
+            _children = ["title"]
+            _comps.append({"id": "root", "component": {"Card": {"child": "col"}}})
+            _comps.append({"id": "title", "component": {"Text": {"text": {"literalString": chr(0x1F6F0) + chr(0xFE0F) + " " + _title}, "usageHint": "h2"}}})
+            if _goal and _goal != _title:
+                _children.append("goal")
+                _comps.append({"id": "goal", "component": {"Text": {"text": {"literalString": _goal}, "usageHint": "body"}}})
+            _children.append("intro")
+            _comps.append({"id": "intro", "component": {"Text": {"text": {"literalString": _intro_line}, "usageHint": "caption"}}})
+            _dm = []
+            _start_ctx = [{"key": "text", "value": {"literalString": scope_text}}, {"key": "ra", "value": {"literalString": "1"}}]
+            for _qi in range(len(_qs)):
+                _q, _s, _opts = _qs[_qi]
+                _ak = "a" + str(_qi)
+                _fid = "f" + str(_qi)
+                if _opts:
+                    # Chips answer: question as a body line, choices as single-select
+                    # chips bound to /form/a<i>. No pre-selection (the chip data-model
+                    # shape is client-managed); an untouched question falls back to
+                    # its suggestion server-side via the s<i> context key.
+                    _qid = "q" + str(_qi)
+                    _children.append(_qid)
+                    _comps.append({"id": _qid, "component": {"Text": {"text": {"literalString": _q}, "usageHint": "body"}}})
+                    _oitems = []
+                    for _o in _opts:
+                        _oitems.append({"label": {"literalString": _o}, "value": _o})
+                    _children.append(_fid)
+                    _comps.append({"id": _fid, "component": {"MultipleChoice": {"selections": {"path": "/form/" + _ak}, "options": _oitems, "maxAllowedSelections": 1, "variant": "chips"}}})
+                else:
+                    # Free-text answer: the question itself is the field label, the
+                    # suggestion is pre-filled so the user only edits what differs.
+                    _children.append(_fid)
+                    _comps.append({"id": _fid, "component": {"TextField": {"label": {"literalString": _q}, "text": {"path": "/form/" + _ak}}}})
+                    if _s:
+                        _dm.append({"key": _ak, "valueString": _s})
+                _start_ctx.append({"key": "q" + str(_qi), "value": {"literalString": _q}})
+                _start_ctx.append({"key": _ak, "value": {"path": "/form/" + _ak}})
+                if _s:
+                    _start_ctx.append({"key": "s" + str(_qi), "value": {"literalString": _s}})
+            _children.extend(["sep", "actions"])
+            _comps.append({"id": "sep", "component": {"Divider": {}}})
+            _comps.append({"id": "col", "component": {"Column": {"children": {"explicitList": _children}, "distribution": "start", "alignment": "stretch"}}})
+            _comps.append({"id": "actions", "component": {"Row": {"children": {"explicitList": ["bStart", "bAsis"]}, "distribution": "spaceEvenly", "alignment": "center"}}})
+            _comps.append({"id": "bStart", "component": {"Button": {"child": "bStartL", "primary": True, "action": {"name": "sendText", "context": _start_ctx}}}})
+            _comps.append({"id": "bStartL", "component": {"Text": {"text": {"literalString": chr(0x1F680) + " " + _g("label_start", "Confirm & start autonomous task")}, "usageHint": "body"}}})
+            _comps.append({"id": "bAsis", "component": {"Button": {"child": "bAsisL", "action": {"name": "sendText", "context": [{"key": "text", "value": {"literalString": scope_text}}, {"key": "ra", "value": {"literalString": "1"}}]}}}})
+            _comps.append({"id": "bAsisL", "component": {"Text": {"text": {"literalString": _g("label_asis", "Start as-is")}, "usageHint": "body"}}})
+            _card = [{"beginRendering": {"surfaceId": "autonomous-briefing", "root": "root"}}]
+            if _dm:
+                _card.append({"dataModelUpdate": {"surfaceId": "autonomous-briefing", "path": "/form", "contents": _dm}})
+            _card.append({"surfaceUpdate": {"surfaceId": "autonomous-briefing", "components": _comps}})
+            _parts = []
+            for _m in _card:
+                _parts.extend(create_a2ui_parts(_m))
+            return _parts
+        except Exception as _e:
+            logger.log_text("[autonomous_briefing] card build failed (fail-open): " + str(_e)[:200])
+            return None
+
+    def _extract_briefing_answers(run_args):
+        # Harvests the q<i>/a<i>/s<i> keys a Start press carried in its userAction
+        # context: q<i> is the question (literal), a<i> the user's answer (path
+        # reference, resolved client-side at press time), s<i> the classifier's
+        # suggested default. Empty answers fall back to the suggestion; chips may
+        # deliver the selection as a JSON array string, which is normalized here.
+        _pairs = []
+        try:
+            _nm = run_args.get("new_message") if isinstance(run_args, dict) else None
+            if _nm is None:
+                return _pairs
+            for _p in (getattr(_nm, "parts", None) or []):
+                _t = getattr(_p, "text", None)
+                if not (_t and "userAction" in _t):
+                    continue
+                try:
+                    _ctx = (json.loads(_t).get("userAction", {}) or {}).get("context", {}) or {}
+                except Exception:
+                    continue
+                for _i in range(3):
+                    _q = _ctx.get("q" + str(_i))
+                    if not (isinstance(_q, str) and _q.strip()):
+                        continue
+                    _a = _ctx.get("a" + str(_i))
+                    if isinstance(_a, list):
+                        _a = ", ".join(str(_x) for _x in _a)
+                    if isinstance(_a, str) and _a.strip().startswith("["):
+                        try:
+                            _al = json.loads(_a)
+                            if isinstance(_al, list):
+                                _a = ", ".join(str(_x) for _x in _al)
+                        except Exception:
+                            pass
+                    _a = _a.strip() if isinstance(_a, str) else ""
+                    if not _a:
+                        _s = _ctx.get("s" + str(_i))
+                        _a = _s.strip() if isinstance(_s, str) else ""
+                    if _a:
+                        _pairs.append((_q.strip(), _a))
+                if _pairs:
+                    break
+        except Exception:
+            return _pairs
+        return _pairs
 
 artifact_service = InMemoryArtifactService()
 
@@ -1250,9 +1671,8 @@ def _heal_session_events(session, force_aggressive=False):
 # invocations per session_id with an asyncio.Lock so a later request WAITS for
 # the in-flight one to finish (and runs on the healed session) instead of
 # racing it. Single event loop -> the dict access needs no extra locking.
-# Demo services run min-instances=0 / concurrency>1: while warm, same-session
-# requests land on the same instance, making an in-process lock sufficient; an
-# idle service may scale to zero (cold start), which is acceptable here.
+# Demo services run minScale=1 / concurrency>1, so same-session requests land
+# on the same instance, making an in-process lock sufficient.
 # =============================================================================
 _session_locks = {}
 def _get_session_lock(_sid):
@@ -1535,6 +1955,149 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         session_id = run_args['session_id']
         user_id = run_args['user_id']
 
+        if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+            # Deterministic completion delivery (v11.0): the state-based
+            # {_bg_task_results} injection proved too weak on busy turns - a
+            # "Run Inline" press transfers to deep_analysis (whose instruction has
+            # no notification block) and a fresh-delegation turn ignores it, while
+            # reported_to_user was already flipped, losing the announcement
+            # forever (observed live 2026-07-13). So finished tasks are APPENDED
+            # to the user's message itself as a system note: maximum salience for
+            # whichever agent ends up answering the turn.
+            try:
+                import builtins as _ma_note_b
+                _ma_fs = getattr(_ma_note_b, '_firestore_client', None)
+                _ma_demo = os.environ.get('DEMO_ID', '')
+                _ma_nm = run_args.get('new_message')
+                if _ma_fs and _ma_demo and _ma_nm is not None and getattr(_ma_nm, 'parts', None) is not None:
+                    _ma_ndocs = _ma_fs.collection(_ma_demo + '_task_executions').where(
+                        'reported_to_user', '==', False).where(
+                        'status', 'in', ['completed', 'failed']).limit(3).stream()
+                    _ma_notes = []
+                    for _ma_nd in _ma_ndocs:
+                        _ma_ndd = _ma_nd.to_dict()
+                        _ma_full = _ma_ndd.get('result_summary', '') or ''
+                        _ma_note = ('Task ticket ' + _ma_ndd.get('task_id', '') + ' status: ' + _ma_ndd.get('status', '')
+                                    + '. Result summary (first 400 chars): ' + _ma_full[:400])
+                        # The 400-char cut can drop the Drive webViewLink the sandbox put
+                        # further down the report, which made the root call the fallback
+                        # Drive tool and then claim no file existed (observed 2026-07-14).
+                        # Surface every Workspace link from the FULL report deterministically.
+                        _ma_links = re.findall(r'https://(?:docs|drive|sheets|slides)[.]google[.]com/[A-Za-z0-9./?=&#%_+:~@-]+', _ma_full)
+                        if _ma_links:
+                            _ma_note = _ma_note + ' Workspace links found in the full report: ' + ' '.join(_ma_links[:5])
+                        # Same salience treatment for GCS deliverable downloads: the signed-URL
+                        # markdown links live at the END of the report, far past the 400-char cut.
+                        if 'DELIVERABLE DOWNLOADS' in _ma_full:
+                            _ma_dl = [_l for _l in _ma_full.split(chr(10)) if _l.strip().startswith('- [')][:5]
+                            if _ma_dl:
+                                _ma_note = (_ma_note + ' Deliverable download links (present these to the user as '
+                                            'markdown links in the announcement; an .html link opens as an interactive '
+                                            'page in the browser): ' + ' '.join(_ma_dl))
+                        if 'SYSTEM CHECK (auto-generated): no deliverable files' in _ma_full:
+                            _ma_note = (_ma_note + ' WARNING: the task uploaded NO deliverable files - any files the '
+                                        'summary mentions exist only in the sandbox and were NOT delivered. Tell the '
+                                        'user honestly and offer a follow-up autonomous task to upload them.')
+                        _ma_notes.append(_ma_note)
+                        _ma_nd.reference.update({'reported_to_user': True})
+                    if _ma_notes:
+                        _ma_note_text = ('SYSTEM NOTE (auto-generated; the user did NOT type this): a background task just finished. '
+                                         'BEFORE addressing the user message above, announce this result briefly in the user language, '
+                                         'and include a suggestion chip labelled with the localized equivalent of View Full Report whose '
+                                         'sendText is: Show the full detailed report for task <ticket-id>. Details: ' + ' | '.join(_ma_notes))
+                        if (os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1"):
+                            _ma_note_text = (_ma_note_text
+                                             + ' DRIVE HANDLING: if the summary or the Workspace links above show the autonomous '
+                                               'agent ALREADY saved the output to Google Drive / Docs / Slides / Sheets, that save '
+                                               'is DONE - present it as fact with those links as markdown links and do NOT call '
+                                               'save_deliverables_to_drive. Only when the original request asked for Drive but the '
+                                               'report confirms no completed Drive save (no Workspace links, or it says the save '
+                                               'failed), call save_deliverables_to_drive in this turn. If that tool returns '
+                                               'not_found, it only means no staged copies exist - NEVER tell the user the task '
+                                               'produced no files; check get_autonomous_task_status for the full report instead. '
+                                               'For deliverables NOT yet in Drive, offer a chip labelled with the localized '
+                                               'equivalent of Save to Google Drive, whose sendText is: '
+                                               'Save the deliverables of task <ticket-id> to Google Drive.')
+                        _ma_nm.parts.append(genai_types.Part(text=_ma_note_text))
+                        logger.log_text('[managed_agent] appended completion note for ' + str(len(_ma_notes)) + ' task(s) to the user message')
+
+                if (os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1"):
+                    # Rotating Workspace-token objects (best-effort, throttled to one
+                    # refresh per 120s): every user turn carries a FRESH user token,
+                    # so we mirror it into autonomous/<task>/.wstoken for each ACTIVE
+                    # autonomous task. The sandbox re-fetches it via a pre-signed URL
+                    # when its token snapshot expires mid-run. Limit: if the user
+                    # never interacts, no fresh token exists anywhere (GE only mints
+                    # tokens per request).
+                    try:
+                        import time as _ma_tt
+                        _ma_tok = getattr(_ma_note_b, '_workspace_oauth_token', '')
+                        _ma_last_rot = getattr(_ma_note_b, '_ma_token_obj_ts', 0)
+                        if _ma_tok and (_ma_tt.time() - _ma_last_rot) > 120:
+                            _ma_note_b._ma_token_obj_ts = _ma_tt.time()
+                            def _ma_rotate_token_objects(_tok=_ma_tok, _fsc=_ma_fs, _demo=_ma_demo):
+                                try:
+                                    _bkt = os.environ.get('DASHBOARDS_BUCKET', '').strip()
+                                    if not _bkt:
+                                        return
+                                    from google.cloud import storage as _st
+                                    _cl = _st.Client()
+                                    _actives = _fsc.collection(_demo + '_task_executions').where(
+                                        'status', 'in', ['submitted', 'working']).limit(5).stream()
+                                    for _rd in _actives:
+                                        _tid = _rd.to_dict().get('task_id', '')
+                                        if not _tid:
+                                            continue
+                                        _dsnap = _fsc.collection(_demo + '_task_definitions').document(_tid).get()
+                                        if _dsnap.exists and _dsnap.to_dict().get('task_type') == 'autonomous':
+                                            _cl.bucket(_bkt).blob('autonomous/' + _tid + '/.wstoken').upload_from_string(_tok, content_type='text/plain')
+                                except Exception:
+                                    pass
+                            import asyncio as _ma_aio2
+                            _ma_aio2.get_running_loop().run_in_executor(None, _ma_rotate_token_objects)
+                    except Exception:
+                        pass
+
+            except Exception as _ma_note_err:
+                logger.log_text('[managed_agent] completion-note injection failed: ' + str(_ma_note_err)[:200])
+            if (os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1"):
+
+                # Rotating Workspace-token objects for ACTIVE autonomous tasks: the
+                # sandbox re-fetches the current user token via a pre-signed URL when
+                # its snapshot expires. Refreshed on user turns, throttled to 120s,
+                # written off-loop (best-effort).
+                try:
+                    import time as _ma_tt
+                    import builtins as _ma_tb
+                    _ma_tok = getattr(_ma_tb, '_workspace_oauth_token', '')
+                    _ma_fs2 = getattr(_ma_tb, '_firestore_client', None)
+                    _ma_demo2 = os.environ.get('DEMO_ID', '')
+                    if _ma_tok and _ma_fs2 and _ma_demo2 and _ma_tt.time() - getattr(_ma_tb, '_ma_token_obj_ts', 0) > 120:
+                        _ma_tb._ma_token_obj_ts = _ma_tt.time()
+                        def _ma_rotate_token_objects():
+                            try:
+                                from google.cloud import storage as _st
+                                _bkt = os.environ.get('DASHBOARDS_BUCKET', '').strip()
+                                if not _bkt:
+                                    return
+                                _cl = _st.Client()
+                                _run = _ma_fs2.collection(_ma_demo2 + '_task_executions').where(
+                                    'status', 'in', ['submitted', 'working']).limit(5).stream()
+                                for _rd in _run:
+                                    _tid = _rd.to_dict().get('task_id', '')
+                                    if not _tid:
+                                        continue
+                                    _dsnap = _ma_fs2.collection(_ma_demo2 + '_task_definitions').document(_tid).get()
+                                    if _dsnap.exists and _dsnap.to_dict().get('task_type') == 'autonomous':
+                                        _cl.bucket(_bkt).blob('autonomous/' + _tid + '/.wstoken').upload_from_string(_ma_tok, content_type='text/plain')
+                            except Exception:
+                                pass
+                        import asyncio as _ma_aio3
+                        _ma_aio3.get_running_loop().run_in_executor(None, _ma_rotate_token_objects)
+                except Exception:
+                    pass
+
+
         # v10.73: arm the cross-turn surfaceId reuse guard for THIS invocation
         # (consumed by _rescope_reused_surfaces() via create_a2ui_part()). The
         # suffix is strictly [0-9a-f] so renamed ids stay normalizable.
@@ -1745,6 +2308,37 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             _gate_is_inline = _gate_l.startswith("run inline:")
             _gate_is_bg = _gate_l.startswith("run in background:")
             _gate_skip = _gate_is_bg or _is_preflight_confirmed_press(run_args)
+            if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+                # Autonomous Briefing card press (context ra=1): skip re-carding
+                # and pin the delegation deterministically via a system note.
+                if _is_autonomous_confirmed_press(run_args):
+                    _gate_skip = True
+                    try:
+                        _ra_nm = run_args.get('new_message')
+                        if _ra_nm is not None and getattr(_ra_nm, 'parts', None) is not None:
+                            _ra_pairs = _extract_briefing_answers(run_args)
+                            _ra_note = (
+                                'SYSTEM NOTE (auto-generated; the user did NOT type this): the task brief in the user '
+                                'message above was CONFIRMED via the Autonomous Task Briefing card. ')
+                            if _ra_pairs:
+                                _ra_note = _ra_note + 'CONFIRMED BRIEFING DETAILS (per-question answers the user confirmed on the card):' + chr(10)
+                                for _ra_q, _ra_a in _ra_pairs:
+                                    _ra_note = _ra_note + '- ' + _ra_q + ' ' + _ra_a + chr(10)
+                                _ra_note = _ra_note + (
+                                    'Compose the task_description from the user request above PLUS these confirmed '
+                                    'details, then call delegate_autonomous_task as your VERY FIRST action ')
+                            else:
+                                _ra_note = _ra_note + (
+                                    'Call delegate_autonomous_task as your VERY FIRST action with that brief as the '
+                                    'task_description ')
+                            _ra_note = _ra_note + (
+                                '(rewrite it into outcome-only wording if it references internal tool names). '
+                                'Do NOT ask any further clarifying questions and do NOT run the analysis inline.')
+                            _ra_nm.parts.append(genai_types.Part(text=_ra_note))
+                            logger.log_text('[autonomous_briefing] confirmed press - pinned delegation note (' + str(len(_ra_pairs)) + ' answers)')
+                    except Exception:
+                        pass
+
             _gate_scope = _gate_text.split(":", 1)[1].strip() if _gate_is_inline else _gate_text
 
             # v10.97: deterministic short-circuit for an explicit "Run in
@@ -1845,6 +2439,46 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                         if idem_key:
                             _store_idem_result(idem_key, _pf_parts)
                         logger.log_text("[preflight_gate] rendered analysis-plan card and short-circuited (" + str(len(_pf_parts)) + " parts)")
+                        if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+                            return
+                    elif isinstance(_plan, dict) and _plan.get("category") == "AUTONOMOUS":
+                        # Interactive briefing BEFORE delegation - only when the
+                        # classifier found material gaps; otherwise fall through
+                        # (zero friction) and the root agent delegates directly.
+                        _ab_parts = _build_autonomous_briefing_card_parts(_plan, _gate_scope)
+                        if _ab_parts:
+                            await event_queue.enqueue_event(
+                                TaskStatusUpdateEvent(
+                                    task_id=context.task_id,
+                                    status=TaskStatus(state=TaskState.working, timestamp=datetime.now(timezone.utc).isoformat()),
+                                    context_id=context.context_id,
+                                    final=False,
+                                    metadata={
+                                        _get_adk_metadata_key('app_name'): runner.app_name,
+                                        _get_adk_metadata_key('user_id'): run_args['user_id'],
+                                        _get_adk_metadata_key('session_id'): run_args['session_id'],
+                                    },
+                                )
+                            )
+                            await event_queue.enqueue_event(
+                                TaskArtifactUpdateEvent(
+                                    task_id=context.task_id,
+                                    last_chunk=True,
+                                    context_id=context.context_id,
+                                    artifact=Artifact(artifact_id=str(uuid.uuid4()), parts=_ab_parts),
+                                )
+                            )
+                            await event_queue.enqueue_event(
+                                TaskStatusUpdateEvent(
+                                    task_id=context.task_id,
+                                    status=TaskStatus(state=TaskState.completed, timestamp=datetime.now(timezone.utc).isoformat()),
+                                    context_id=context.context_id,
+                                    final=True,
+                                )
+                            )
+                            if idem_key:
+                                _store_idem_result(idem_key, _ab_parts)
+                            logger.log_text("[autonomous_briefing] rendered briefing card and short-circuited (" + str(len(_ab_parts)) + " parts)")
                         return
         except Exception as _pf_err:
             logger.log_text("[preflight_gate] gate error (fail-open, running agent): " + str(_pf_err)[:200])
@@ -1906,6 +2540,12 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         # =============================================================================
         artifact_text_parts = []
         artifact_media_parts = []
+        # v11.5: True once ANY real tool result arrived this turn. The stub guard
+        # uses this to pick its recovery mode: a stub emitted BEFORE any tool ran
+        # (model announced a tool and stalled - confirmed live 2026-07-15, Output=12
+        # tokens right after transfer) has NO data to synthesize from, so recovery
+        # must RE-EXECUTE with tools allowed instead of forcing a toolless synthesis.
+        _turn_had_tool_results = False
         # Running capture of SHORT conversational text the model emitted this turn
         # (incl. text later cleared by a trailing tool call). Used only by the
         # UI-only render guard below to promote a real prior utterance into an
@@ -2203,6 +2843,71 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     stream_parser = A2uiStreamParser(catalog=a2ui_selected_catalog)
                     continue  # re-run on the healed session
                 return
+        if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+
+            # --- Managed Agent live progress -> Thinking accordion (v11.0) ---
+            # A per-turn poller drains the progress queue that the delegation
+            # tool's SSE thread fills (tools.py publishes it on builtins) and
+            # re-emits each snippet as a working-state status event - the same
+            # shape as the tool-call statuses below, so it renders inside the
+            # Thinking accordion in real time while delegate_autonomous_task is
+            # still blocking. A generation token retires stale pollers from
+            # earlier turns within one poll interval; the poller also exits when
+            # the event queue is closed or after a 900s safety cap.
+            import builtins as _ma_b
+            import asyncio as _ma_aio
+            import queue as _ma_q
+            _ma_b._ma_poller_gen = getattr(_ma_b, '_ma_poller_gen', 0) + 1
+            _ma_my_gen = _ma_b._ma_poller_gen
+
+            async def _ma_progress_poller():
+                _pq = getattr(_ma_b, '_ma_progress_queue', None)
+                if _pq is None:
+                    return
+                import time as _ma_t
+                _t0 = _ma_t.monotonic()
+                while _ma_t.monotonic() - _t0 < 900:
+                    if getattr(_ma_b, '_ma_poller_gen', 0) != _ma_my_gen:
+                        return
+                    _drained = []
+                    try:
+                        while True:
+                            _drained.append(_pq.get_nowait())
+                    except _ma_q.Empty:
+                        pass
+                    except Exception:
+                        return
+                    # Burst guard: never enqueue more than 3 status events per
+                    # tick - back-to-back TaskStatusUpdateEvents have crashed the
+                    # GE client's rendering of otherwise-successful turns.
+                    if len(_drained) > 3:
+                        _drained = [_drained[0], '... (' + str(len(_drained) - 2) + ' more sandbox steps) ...', _drained[-1]]
+                    for _pmsg in _drained:
+                        try:
+                            _pevt = TaskStatusUpdateEvent(
+                                task_id=context.task_id,
+                                context_id=context.context_id,
+                                status=TaskStatus(
+                                    state=TaskState.working,
+                                    message=Message(
+                                        message_id=str(uuid.uuid4()),
+                                        role=Role.agent,
+                                        parts=[a2a_types.Part(root=a2a_types.TextPart(text='🛰️ Autonomous agent: ' + _pmsg))],
+                                    ),
+                                    timestamp=datetime.now(timezone.utc).isoformat(),
+                                ),
+                                final=False,
+                            )
+                            task_result_aggregator.process_event(_pevt)
+                            await event_queue.enqueue_event(_pevt)
+                        except Exception:
+                            return
+                    await _ma_aio.sleep(2)
+
+            try:
+                _ma_aio.create_task(_ma_progress_poller())
+            except Exception:
+                pass
 
         _events_gen = _all_events()
         async for adk_event in _events_gen:
@@ -2895,6 +3600,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                               _fr_name = getattr(part.function_response, 'name', None) or 'tool'
                               _is_transfer = _fr_name.startswith('transfer_to_') or _fr_name == 'transfer_to_agent'
                               if not _is_transfer and _fr_name != 'adk_request_credential':
+                                  _turn_had_tool_results = True
                                   _fr_text_evt = TaskStatusUpdateEvent(
                                       task_id=context.task_id,
                                       context_id=context.context_id,
@@ -2957,6 +3663,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                               await event_queue.enqueue_event(_ce_text_evt)
                               artifact_text_parts.clear()
                           elif part.code_execution_result:
+                              _turn_had_tool_results = True
                               # --- Code execution result: show output ---
                               _ce_outcome = getattr(part.code_execution_result, 'outcome', '') or ''
                               _ce_output = getattr(part.code_execution_result, 'output', '') or ''
@@ -3215,6 +3922,21 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             "SAME language you have been using with the user in this conversation; "
             "do not switch languages."
         )
+        # v11.5: recovery prompt for a stub emitted BEFORE any tool ran. The
+        # toolless synthesis prompts are useless there (no data was gathered -
+        # they either stall again or hallucinate), so this one explicitly
+        # re-authorizes tool execution and demands the finished deliverable.
+        _STUB_EXECUTE_MSG = (
+            "Your previous reply was an unfinished status line and you have NOT "
+            "yet gathered any data for the user's request. Resume executing the "
+            "request now: call the tools you need (catalog/metadata lookups, SQL "
+            "queries), keep the tool calls to the minimum necessary, and then "
+            "deliver the COMPLETE final answer in the same turn - the findings as "
+            "text, an A2UI card where appropriate, and suggestion chips at the "
+            "end. Do NOT stop after a progress line. Write everything in the SAME "
+            "language you have been using with the user in this conversation; do "
+            "not switch languages."
+        )
         # v10.70: chip-only re-prompt for the missing-chips recovery below.
         _SYNTH_CHIPS_MSG = (
             "Your previous response was delivered to the user, but its suggestion "
@@ -3253,7 +3975,12 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             stream_parser = A2uiStreamParser(catalog=a2ui_selected_catalog)
             artifact_text_parts.clear()
             artifact_media_parts.clear()
-            if _stub_guard_fired and _synth_try == 1:
+            if _stub_guard_fired and not _turn_had_tool_results and _synth_try < _MAX_SYNTH_RETRIES:
+                # No data was gathered before the stall: re-execute WITH tools
+                # (a toolless synthesis has nothing to synthesize from). Last
+                # retry still falls through to plain-text mode as a final resort.
+                _synth_msg = _STUB_EXECUTE_MSG
+            elif _stub_guard_fired and _synth_try == 1:
                 _synth_msg = _STUB_COMPLETE_MSG
             else:
                 _synth_msg = _SYNTH_TEXT_MSG if _synth_try >= _MAX_SYNTH_RETRIES else _SYNTH_FULL_MSG
@@ -3267,6 +3994,10 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     if not (_sr_content and hasattr(_sr_content, 'parts')):
                         continue
                     for _sr_part in _sr_content.parts:
+                        if getattr(_sr_part, 'function_response', None) or getattr(_sr_part, 'code_execution_result', None):
+                            # A tool ran during this recovery attempt: later
+                            # retries may switch to the toolless synthesis mode.
+                            _turn_had_tool_results = True
                         if getattr(_sr_part, 'text', None):
                             _t_parts, _m_parts = _extract_report_parts(_sr_part.text)
                             artifact_text_parts.extend(_t_parts)
@@ -3301,6 +4032,28 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     _normal_media.append(_mp2)
             artifact_parts = artifact_text_parts + _normal_media + _suggestion_media
             if artifact_parts:
+                # v11.5: a recovery attempt that returned ANOTHER stub (short
+                # text, no card, no chips) has not recovered anything - the live
+                # 2026-07-15 stall produced a second 13-token progress line that
+                # the old any-text acceptance shipped as the final answer.
+                # Reject it and keep retrying; if every retry stays a stub, the
+                # B-1 fallback below gives an honest failure + retry chip
+                # instead of a dangling progress line. Clarifying questions
+                # (ending in a question mark) are accepted verbatim, mirroring
+                # the stub guard itself.
+                _rec_text = ""
+                for _rp2 in artifact_text_parts:
+                    _rec_text = _rec_text + (getattr(getattr(_rp2, 'root', None), 'text', '') or '').strip()
+                _rec_tail = _rec_text[-1] if _rec_text else ''
+                if ((not _normal_media) and (not _suggestion_media)
+                        and len(_rec_text) <= 120 and _rec_tail not in ('?', chr(0xFF1F))):
+                    logger.log_text("[synth_retry] retry " + str(_synth_try) + " returned another stub (" + str(len(_rec_text)) + " chars) - rejected, retrying")
+                    artifact_text_parts.clear()
+                    artifact_media_parts.clear()
+                    _normal_media = []
+                    _suggestion_media = []
+                    artifact_parts = []
+                    continue
                 logger.log_text("[synth_retry] recovered deliverable on retry " + str(_synth_try) + " (text=" + str(len(artifact_text_parts)) + ", media=" + str(len(artifact_media_parts)) + ")")
                 break
 

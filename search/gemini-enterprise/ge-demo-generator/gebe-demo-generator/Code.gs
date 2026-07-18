@@ -1,16 +1,16 @@
-# Copyright 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+// Copyright 2026 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 /**
  * GEBE Demo Generator - Backend (Code.gs)
  *
@@ -38,7 +38,7 @@ const CONFIG = {
   MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.5-flash',
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v1.1-public',
+  APP_VERSION: 'v1.2-public',
   MY_DEMOS_FOLDER: 'My Demos'
 };
 
@@ -60,7 +60,7 @@ function doGet(e) {
     const template = HtmlService.createTemplateFromFile('SetupError');
     template.errorMessage = configError;
     return template.evaluate()
-      .setTitle('Setup Required - GEBE Demo Generator')
+      .setTitle('Setup Required - GE Demo Generator Lite')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
   }
 
@@ -79,7 +79,7 @@ function doGet(e) {
   template.webAppUrl = webAppUrl;
 
   return template.evaluate()
-    .setTitle('GEBE Demo Generator')
+    .setTitle('GE Demo Generator Lite')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
@@ -252,6 +252,42 @@ function repairTruncatedJson(jsonStr) {
   return fixed;
 }
 
+/**
+ * Detects the language a business goal is WRITTEN in (not the language of the
+ * countries/companies it mentions) with a fast gemini-3.1-flash-lite call, so the
+ * planning prompt can enforce it as a hard constant instead of asking the planning
+ * model to detect-and-follow (which drifts toward locale-associated languages on
+ * long outputs). Returns an English language name (e.g. "English", "Indonesian")
+ * or '' on failure, in which case the caller falls back to inline detection.
+ */
+function detectGoalLanguage_(userGoal) {
+  const prompt =
+    'Identify the language the following text is WRITTEN in, based ONLY on its actual words and script. ' +
+    'Ignore the language of any countries, companies, places, or people it mentions (e.g. text written in ' +
+    'English ABOUT an Indonesian company is English). If several languages are mixed, pick the dominant one. ' +
+    'Respond with ONLY the English name of the language (e.g. "English", "Japanese", "Indonesian"), nothing else.\n\n' +
+    'TEXT:\n"""\n' + String(userGoal).substring(0, 2000) + '\n"""';
+  try {
+    const location = CONFIG.LOCATION || 'global';
+    const host = location === 'global' ? 'aiplatform.googleapis.com' : location + '-aiplatform.googleapis.com';
+    const url = 'https://' + host + '/v1/projects/' + CONFIG.PROJECT_ID + '/locations/' + location + '/publishers/google/models/gemini-3.1-flash-lite:generateContent';
+    const payload = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0, maxOutputTokens: 512 } };
+    const response = UrlFetchApp.fetch(url, {
+      method: 'POST', contentType: 'application/json',
+      headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() },
+      payload: JSON.stringify(payload), muteHttpExceptions: true
+    });
+    if (response.getResponseCode() !== 200) throw new Error('HTTP ' + response.getResponseCode());
+    const text = String(JSON.parse(response.getContentText()).candidates[0].content.parts[0].text).trim();
+    // Accept only a plausible bare language name; anything chatty falls back.
+    if (/^[A-Za-z][A-Za-z ()'\-]{1,40}$/.test(text)) return text;
+    throw new Error('Unexpected detector output: ' + text.substring(0, 80));
+  } catch (e) {
+    console.warn('[LANG-DETECT] ' + e.message);
+    return '';
+  }
+}
+
 // ===========================================
 // Phase A: Planning (planGEBEDemo)
 // ===========================================
@@ -292,6 +328,11 @@ function planGEBEDemo(userGoal, options) {
 
   const domainHint = options.domain ? ('Target domain/industry: ' + options.domain + '.') : 'Auto-detect the domain from the goal.';
 
+  // Pin the output language up front (fast flash-lite call) so the planning model
+  // follows a stated constant instead of detect-and-follow, which drifts toward
+  // languages associated with the countries/companies the goal mentions.
+  const detectedLang = detectGoalLanguage_(userGoal);
+
   const prompt =
     'You are a senior demo data architect. Design a realistic, RICH, self-consistent set of Google ' +
     'Workspace demo files for the business goal below, to be showcased in Gemini Enterprise. The output ' +
@@ -312,10 +353,15 @@ function planGEBEDemo(userGoal, options) {
     'customer retrieve THIS demo\'s files and not another company\'s. Return the name as "customerName".\n' +
     '2. TEMPORAL ANCHOR: Use the reference date as "today". Historical records span backward (e.g. last 90 ' +
     'days) and future records (forecasts, schedules) span forward from it. Never use stale years.\n' +
-    '3. LANGUAGE: Detect the language ONLY from the actual script/characters of the BUSINESS GOAL, and write ' +
-    'ALL human-readable content in that EXACT SAME language. Do NOT switch to a language merely associated with ' +
-    'the companies, brands, or locations mentioned (e.g. keep English output even when a Japanese or German ' +
-    'company is named). Do NOT mix languages. File names may be ASCII.\n' +
+    '3. LANGUAGE (TARGET LANGUAGE): ' +
+    (detectedLang
+      ? 'The BUSINESS GOAL is written in ' + detectedLang + ', so the target language of this demo is ' +
+        detectedLang + '. '
+      : 'The target language is the language the BUSINESS GOAL text itself is written in - detect it ONLY ' +
+        'from its actual script/characters. ') +
+    'Write ALL human-readable content in the target language. Do NOT switch to a language merely associated ' +
+    'with the companies, brands, or locations mentioned (e.g. an English goal about an Indonesian or Japanese ' +
+    'company still produces English content). Do NOT mix languages. File names may be ASCII.\n' +
     '4. DOMAIN ADAPTATION: Tailor every schema, field, and value to the specific industry and operational ' +
     'context. Use realistic names, numbers, currencies, and terminology. No generic placeholders like ' +
     '"Product A" or "Company XYZ".\n' +
@@ -361,7 +407,7 @@ function planGEBEDemo(userGoal, options) {
     '["<exact fileName(s) from the generated files this step relies on>"], "expectedAnswer": "<concise but ' +
     'concrete description of the answer the agent should produce - name the actual tables/fields/numbers from ' +
     'the demo data, e.g. a ranked table or specific values>", "differentiators": [ { "title": "<short ' +
-    'capability name>", "detail": "<one sentence on what makes Gemini in GEBE impressive for THIS step>" } ] }. ' +
+    'capability name>", "detail": "<one sentence on what makes Gemini Enterprise impressive for THIS step>" } ] }. ' +
     'Provide 2-3 differentiators per step a presenter can call out - draw from capabilities like: zero-setup ' +
     'search (Gemini finds and parses the right file from the connected Drive folder without manual targeting), ' +
     'domain-noise resilience (ignores irrelevant files in the folder), multi-turn context (remembers the entity ' +
@@ -371,6 +417,11 @@ function planGEBEDemo(userGoal, options) {
     'the files you generate. All human-readable text in the target language.\n\n' +
     'FILE TYPES TO INCLUDE (only these): ' + wanted.join(', ') + '.\n' +
     pdfNote + '\n\n' +
+    'FINAL LANGUAGE CHECK: every human-readable string value in the JSON below - titles, section headings, ' +
+    'paragraphs, spreadsheet cells, slide bullets, chart titles/headers/labels, demoGuide fields, ' +
+    'agentDesignerPrompt, oneSentenceSummary - MUST be in the target language' +
+    (detectedLang ? ' (' + detectedLang + ')' : '') + '. Only "imagePrompt" is written in English; file ' +
+    'names may be ASCII.\n\n' +
     'Return ONLY valid JSON (no markdown fences) with this exact shape:\n' +
     '{\n' +
     '  "folderName": "Demo - <customer name> - <short domain>",\n' +
@@ -956,7 +1007,7 @@ function createDemoGuideDoc(folderId, plan, fileResults) {
   body.appendParagraph('Generated: ' + Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd HH:mm'));
 
   body.appendParagraph('Prerequisite: Google Drive Setup & Connection').setHeading(DocumentApp.ParagraphHeading.HEADING1);
-  body.appendParagraph('In the GEBE interface, navigate to the Connectors settings page and ensure the Google Drive connector is toggled ON and authorized.');
+  body.appendParagraph('In the Gemini Enterprise interface (Business, Standard, or Plus edition), navigate to the Connectors settings page and ensure the Google Drive connector is toggled ON and authorized.');
   body.appendListItem('This lets the agent read the files in this demo folder as grounding sources.');
   body.appendListItem('Use the same Google account that owns this "My Demos" folder.');
   body.appendListItem('For the cleanest results, scope or limit the Drive connector to THIS demo folder when possible, so the agent grounds only on this demo and not on other demos stored in the same Drive.');
@@ -1012,7 +1063,7 @@ function createDemoGuideDoc(folderId, plan, fileResults) {
   }
 
   body.appendParagraph('How to delete this demo').setHeading(DocumentApp.ParagraphHeading.HEADING1);
-  body.appendListItem('Open GEBE Demo Generator and click the trash icon on this demo in My Demos. This removes it from your history AND moves this entire demo folder (with all generated files) to your Google Drive Trash.');
+  body.appendListItem('Open GE Demo Generator Lite and click the trash icon on this demo in My Demos. This removes it from your history AND moves this entire demo folder (with all generated files) to your Google Drive Trash.');
   body.appendListItem('Trashed items are recoverable from Google Drive Trash for about 30 days, or empty the Trash to delete them permanently.');
   body.appendListItem('You can also delete it manually: move this folder to the Trash in Google Drive.');
 

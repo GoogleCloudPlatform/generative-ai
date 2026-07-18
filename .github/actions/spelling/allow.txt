@@ -12,6 +12,7 @@ acomplete
 acs
 adamw
 ADAS
+addfont
 adk
 ADK
 ADMA
@@ -95,6 +96,8 @@ AServer
 ASF
 ASGI
 Ashish
+Asis
+asis
 ASML
 Aspeed
 astype
@@ -169,6 +172,7 @@ blogs
 BLR
 bluesky
 bml
+bname
 bnb
 booktitle
 boop
@@ -210,6 +214,7 @@ CALIPSO
 campestre
 CAMQAA
 Camry
+cands
 Canlaws
 Caprese
 carbonara
@@ -248,6 +253,7 @@ chromadb
 Chrono
 Chunyuan
 cicd
+cidfonts
 cimg
 ckpts
 CLA
@@ -258,6 +264,7 @@ clf
 clickable
 CLIs
 cloudrun
+CLOUDSDK
 cloudveil
 clsx
 cmap
@@ -350,6 +357,7 @@ dbln
 dcg
 dcl
 DCR
+ddata
 ddbb
 ddl
 decord
@@ -359,6 +367,7 @@ deepeval
 DeepEval
 deepseek
 defn
+deliv
 Demis
 Demme
 demouser
@@ -417,6 +426,7 @@ DRV
 dshm
 dsl
 dsn
+dsnap
 DSQ
 dtm
 dto
@@ -495,6 +505,7 @@ ESRB
 etf
 ETFs
 etils
+etype
 euchlora
 eula
 eur
@@ -552,8 +563,10 @@ Flipkart
 Flirble
 Flirbles
 floormat
+flowables
 FLX
 fmeasure
+fmeta
 FMWK
 Folmer
 fontane
@@ -574,6 +587,8 @@ fromiter
 frontline
 Frontline
 FRONTLINE
+fsc
+fsreq
 fsspec
 FTPS
 fts
@@ -674,6 +689,7 @@ graphrag
 Graterol
 gridcolor
 gridless
+gridline
 gridpoint
 gridspec
 groupadd
@@ -692,6 +708,7 @@ gunicorn
 gutenberg
 Guterres
 GWLP
+gws
 hacer
 hadolint
 hahaha
@@ -710,12 +727,14 @@ Hawkins'll
 Hayao
 Hbf
 HBox
+hclient
 HDFC
 hdfs
 HDFS
 hdlr
 hdone
 hdr
+hdrs
 hdtv
 headcount
 heatmap
@@ -780,6 +799,7 @@ ience
 ifconfig
 IFI
 ifidx
+iid
 iinfo
 IIT
 ILB
@@ -1067,6 +1087,7 @@ Mhatre
 MHLW
 mic
 MICOA
+microsite
 mics
 Milito
 millis
@@ -1116,6 +1137,8 @@ Mvar
 mvn
 mvnw
 mvp
+MWG
+mwg
 MWh
 mwouts
 myaccount
@@ -1144,7 +1167,9 @@ nconst
 ndarray
 ndcg
 NDCG
+ndd
 NDEBUG
+ndocs
 nec
 neering
 nemri
@@ -1210,6 +1235,7 @@ Ohashi
 ohlcv
 OHLCV
 Ohtani
+oitems
 Okame
 Olá
 OLAP
@@ -1234,6 +1260,7 @@ openai
 openfda
 Oppo
 opsz
+oraw
 Orbelians
 Orus
 osm
@@ -1275,6 +1302,7 @@ pbar
 pbxproj
 pcs
 PDEs
+pdfbase
 pdflatef
 pdfminer
 pdfs
@@ -1284,6 +1312,7 @@ PEGI
 Pengyu
 Persero
 petabytes
+pevt
 pfas
 pgadmin
 PGHOST
@@ -1314,6 +1343,7 @@ PLOTLYENV
 plpgsql
 plt
 pmb
+PNGs
 podcast
 podcasts
 podes
@@ -1413,6 +1443,7 @@ rawbytes
 rbc
 rbf
 rbm
+rdoc
 recontext
 Recontext
 recrawl
@@ -1443,12 +1474,15 @@ retryable
 ribeye
 ricc
 ringspun
+ripgrep
 Rivertown
 Rivia
 Rizzoli
 RLHF
+rlines
 rlog
 RMSE
+rmsg
 RNN
 RNNs
 Robeco
@@ -1632,6 +1666,7 @@ SWP
 sxs
 sylvatica
 SYMED
+SYSINSTR
 SYSROOT
 Syunik
 SZRC
@@ -1654,6 +1689,7 @@ Tbl
 tbtn
 TBY
 tcard
+tcd
 TCEHY
 telework
 tema
@@ -1742,6 +1778,7 @@ TTFT
 TTH
 tts
 TTT
+Tunables
 tures
 Tuteja
 tval
@@ -1903,6 +1940,7 @@ WRatio
 wscat
 wscore
 wscores
+wstoken
 wstring
 wurden
 WXGA

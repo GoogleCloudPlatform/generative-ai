@@ -381,7 +381,6 @@ if not hasattr(builtins, '_firestore_client'):
         print("[tools.py] FAILED to initialize Firestore client: " + type(_fs_init_err).__name__ + ": " + str(_fs_init_err), flush=True)
 
 
-
 # --- Per-demo MCP server configuration (mcp_config.json) ---
 # Written by the setup script next to this module: the list of imported MCP
 # servers (local + remote) with precomputed ports and safe names, so this
@@ -399,19 +398,204 @@ def get_mcp_config():
     """Returns the per-demo imported MCP server list (empty when none)."""
     return _load_mcp_config()
 
+# --- Workspace auth plumbing (user OAuth; MCP mode or auth-only mode) ---
+if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
+
+    # =============================================================================
+    # Workspace USER-OAUTH plumbing (auth-only OR full Workspace MCP).
+    # Present whenever the GE authorization exists - independent of the
+    # Developer-Preview Workspace MCP servers. Consumed by the MCP toolsets
+    # (when enabled), the Drive handoff tool, and the gws token pass-through.
+    # =============================================================================
+    # Thread-safe token holder for Workspace user authentication.
+    # Uses builtins to share state across module boundaries (tools.py <-> fast_api_app.py).
+    # Updated by TokenExtractionMiddleware (primary) and _handle_request (fallback)
+    # with the OAuth token from each A2A request.
+    if not hasattr(builtins, '_workspace_oauth_token'):
+        builtins._workspace_oauth_token = ""
+
+    def _workspace_header_provider(context) -> dict:
+        """Returns Authorization headers carrying the USER's Workspace OAuth token.
+
+        Used as the McpToolset header_provider (full Workspace MCP mode) and
+        called directly by the Drive handoff / gws token pass-through.
+        Tries multiple strategies to find the OAuth token:
+          1. context.state[auth_id] (ADK ReadonlyContext/CallbackContext)
+          2. context.session.state[auth_id] (session-level state)
+          3. builtins._workspace_oauth_token (cross-module fallback)
+        """
+        import logging as _log
+        _logger = _log.getLogger('workspace_mcp')
+        token = None
+
+        auth_id = os.environ.get("GEMINI_AUTHORIZATION_ID", "")
+        _logger.warning(f"header_provider: CALLED. auth_id='{auth_id}', context_type={type(context).__name__}")
+
+        # Strategy 1: Direct access to context.state (no isinstance check)
+        if not token and context and auth_id:
+            try:
+                state = getattr(context, 'state', None)
+                if state is not None:
+                    # Try dict-like access directly (works with proxy objects too)
+                    t = state.get(auth_id) if hasattr(state, 'get') else None
+                    if not t:
+                        t = state[auth_id] if auth_id in state else None
+                    if t:
+                        token = t
+                        _logger.warning(f"header_provider: ✅ Strategy1 OK - token from context.state (prefix={token[:30]}..., len={len(token)})")
+                    else:
+                        _logger.warning(f"header_provider: Strategy1 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
+            except Exception as ex:
+                _logger.warning(f"header_provider: Strategy1 ERROR - context.state access failed: {type(ex).__name__}: {ex}")
+
+        # Strategy 2: Try context.session.state
+        if not token and context and auth_id:
+            try:
+                session = getattr(context, 'session', None)
+                if session:
+                    session_state = getattr(session, 'state', None)
+                    if session_state is not None:
+                        t = session_state.get(auth_id) if hasattr(session_state, 'get') else None
+                        if not t:
+                            t = session_state[auth_id] if auth_id in session_state else None
+                        if t:
+                            token = t
+                            _logger.warning(f"header_provider: ✅ Strategy2 OK - token from context.session.state (prefix={token[:30]}..., len={len(token)})")
+            except Exception as ex:
+                _logger.warning(f"header_provider: Strategy2 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
+
+        # Strategy 3: Fallback to builtins
+        if not token:
+            import builtins
+            token = getattr(builtins, '_workspace_oauth_token', '')
+            if token:
+                _logger.warning(f"header_provider: ✅ Strategy3 OK - token from builtins (prefix={token[:30]}..., len={len(token)})")
+
+        if not token:
+            _logger.warning("header_provider: ❌ NO TOKEN AVAILABLE - Workspace calls will fail with permission denied")
+
+        # Token scope verification for debugging - check on first 3 calls per instance
+        call_count = getattr(_workspace_header_provider, '_call_count', 0) + 1
+        _workspace_header_provider._call_count = call_count
+        if token and call_count <= 3:
+            try:
+                import httpx
+                resp = httpx.get(f"https://oauth2.googleapis.com/tokeninfo?access_token={token}", timeout=5)
+                if resp.status_code == 200:
+                    info = resp.json()
+                    _logger.warning(f"header_provider: 🔍 TOKEN SCOPES: {info.get('scope', 'N/A')}")
+                    _logger.warning(f"header_provider: 🔍 TOKEN EMAIL: {info.get('email', 'N/A')}, EXPIRES_IN: {info.get('expires_in', 'N/A')}")
+                else:
+                    _logger.warning(f"header_provider: 🔍 TOKEN INFO FAILED: status={resp.status_code}, body={resp.text[:200]}")
+            except Exception as ex:
+                _logger.warning(f"header_provider: 🔍 TOKEN INFO ERROR: {type(ex).__name__}: {ex}")
+
+        if token:
+            return {"Authorization": f"Bearer {token}"}
+        return {}
+else:
+    def _workspace_header_provider(context):
+        return {}
+
 # --- Workspace MCP toolsets (enabled per demo via ENABLE_WORKSPACE_MCP) ---
 if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
+    # =============================================================================
+    # Workspace USER-OAUTH plumbing (auth-only OR full Workspace MCP).
+    # Present whenever the GE authorization exists - independent of the
+    # Developer-Preview Workspace MCP servers. Consumed by the MCP toolsets
+    # (when enabled), the Drive handoff tool, and the gws token pass-through.
+    # =============================================================================
+    # Thread-safe token holder for Workspace user authentication.
+    # Uses builtins to share state across module boundaries (tools.py <-> fast_api_app.py).
+    # Updated by TokenExtractionMiddleware (primary) and _handle_request (fallback)
+    # with the OAuth token from each A2A request.
+    if not hasattr(builtins, '_workspace_oauth_token'):
+        builtins._workspace_oauth_token = ""
+
+    def _workspace_header_provider(context) -> dict:
+        """Returns Authorization headers carrying the USER's Workspace OAuth token.
+
+        Used as the McpToolset header_provider (full Workspace MCP mode) and
+        called directly by the Drive handoff / gws token pass-through.
+        Tries multiple strategies to find the OAuth token:
+          1. context.state[auth_id] (ADK ReadonlyContext/CallbackContext)
+          2. context.session.state[auth_id] (session-level state)
+          3. builtins._workspace_oauth_token (cross-module fallback)
+        """
+        import logging as _log
+        _logger = _log.getLogger('workspace_mcp')
+        token = None
+
+        auth_id = os.environ.get("GEMINI_AUTHORIZATION_ID", "")
+        _logger.warning(f"header_provider: CALLED. auth_id='{auth_id}', context_type={type(context).__name__}")
+
+        # Strategy 1: Direct access to context.state (no isinstance check)
+        if not token and context and auth_id:
+            try:
+                state = getattr(context, 'state', None)
+                if state is not None:
+                    # Try dict-like access directly (works with proxy objects too)
+                    t = state.get(auth_id) if hasattr(state, 'get') else None
+                    if not t:
+                        t = state[auth_id] if auth_id in state else None
+                    if t:
+                        token = t
+                        _logger.warning(f"header_provider: ✅ Strategy1 OK - token from context.state (prefix={token[:30]}..., len={len(token)})")
+                    else:
+                        _logger.warning(f"header_provider: Strategy1 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
+            except Exception as ex:
+                _logger.warning(f"header_provider: Strategy1 ERROR - context.state access failed: {type(ex).__name__}: {ex}")
+
+        # Strategy 2: Try context.session.state
+        if not token and context and auth_id:
+            try:
+                session = getattr(context, 'session', None)
+                if session:
+                    session_state = getattr(session, 'state', None)
+                    if session_state is not None:
+                        t = session_state.get(auth_id) if hasattr(session_state, 'get') else None
+                        if not t:
+                            t = session_state[auth_id] if auth_id in session_state else None
+                        if t:
+                            token = t
+                            _logger.warning(f"header_provider: ✅ Strategy2 OK - token from context.session.state (prefix={token[:30]}..., len={len(token)})")
+            except Exception as ex:
+                _logger.warning(f"header_provider: Strategy2 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
+
+        # Strategy 3: Fallback to builtins
+        if not token:
+            import builtins
+            token = getattr(builtins, '_workspace_oauth_token', '')
+            if token:
+                _logger.warning(f"header_provider: ✅ Strategy3 OK - token from builtins (prefix={token[:30]}..., len={len(token)})")
+
+        if not token:
+            _logger.warning("header_provider: ❌ NO TOKEN AVAILABLE - Workspace calls will fail with permission denied")
+
+        # Token scope verification for debugging - check on first 3 calls per instance
+        call_count = getattr(_workspace_header_provider, '_call_count', 0) + 1
+        _workspace_header_provider._call_count = call_count
+        if token and call_count <= 3:
+            try:
+                import httpx
+                resp = httpx.get(f"https://oauth2.googleapis.com/tokeninfo?access_token={token}", timeout=5)
+                if resp.status_code == 200:
+                    info = resp.json()
+                    _logger.warning(f"header_provider: 🔍 TOKEN SCOPES: {info.get('scope', 'N/A')}")
+                    _logger.warning(f"header_provider: 🔍 TOKEN EMAIL: {info.get('email', 'N/A')}, EXPIRES_IN: {info.get('expires_in', 'N/A')}")
+                else:
+                    _logger.warning(f"header_provider: 🔍 TOKEN INFO FAILED: status={resp.status_code}, body={resp.text[:200]}")
+            except Exception as ex:
+                _logger.warning(f"header_provider: 🔍 TOKEN INFO ERROR: {type(ex).__name__}: {ex}")
+
+        if token:
+            return {"Authorization": f"Bearer {token}"}
+        return {}
+
+
     import re
     import httpx
     from pydantic import AnyUrl
-
-    # Thread-safe token holder for Workspace MCP authentication.
-    # Uses builtins to share state across module boundaries (tools.py ↔ fast_api_app.py).
-    # Updated by TokenExtractionMiddleware (primary) and _handle_request (fallback)
-    # with the OAuth token from each A2A request.
-    # The header_provider callback reads from this on each MCP HTTP call.
-    if not hasattr(builtins, '_workspace_oauth_token'):
-        builtins._workspace_oauth_token = ""
 
     # Try to import MCP OAuth components (available in mcp>=1.24.0)
     try:
@@ -516,86 +700,9 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
     
         return factory
 
-    def _workspace_header_provider(context) -> dict:
-        """header_provider callback for McpToolset.
-    
-        Called by ADK on every MCP HTTP request to supply dynamic auth headers.
-        Tries multiple strategies to find the OAuth token:
-          1. context.state[auth_id] (ADK ReadonlyContext/CallbackContext)
-          2. context.session.state[auth_id] (session-level state)
-          3. builtins._workspace_oauth_token (cross-module fallback)
-        """
-        import logging as _log
-        _logger = _log.getLogger('workspace_mcp')
-        token = None
-    
-        auth_id = os.environ.get("GEMINI_AUTHORIZATION_ID", "")
-        _logger.warning(f"header_provider: CALLED. auth_id='{auth_id}', context_type={type(context).__name__}")
-    
-        # Strategy 1: Direct access to context.state (no isinstance check)
-        if not token and context and auth_id:
-            try:
-                state = getattr(context, 'state', None)
-                if state is not None:
-                    # Try dict-like access directly (works with proxy objects too)
-                    t = state.get(auth_id) if hasattr(state, 'get') else None
-                    if not t:
-                        t = state[auth_id] if auth_id in state else None
-                    if t:
-                        token = t
-                        _logger.warning(f"header_provider: ✅ Strategy1 OK - token from context.state (prefix={token[:30]}..., len={len(token)})")
-                    else:
-                        _logger.warning(f"header_provider: Strategy1 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
-            except Exception as ex:
-                _logger.warning(f"header_provider: Strategy1 ERROR - context.state access failed: {type(ex).__name__}: {ex}")
-    
-        # Strategy 2: Try context.session.state
-        if not token and context and auth_id:
-            try:
-                session = getattr(context, 'session', None)
-                if session:
-                    session_state = getattr(session, 'state', None)
-                    if session_state is not None:
-                        t = session_state.get(auth_id) if hasattr(session_state, 'get') else None
-                        if not t:
-                            t = session_state[auth_id] if auth_id in session_state else None
-                        if t:
-                            token = t
-                            _logger.warning(f"header_provider: ✅ Strategy2 OK - token from context.session.state (prefix={token[:30]}..., len={len(token)})")
-            except Exception as ex:
-                _logger.warning(f"header_provider: Strategy2 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
-    
-        # Strategy 3: Fallback to builtins
-        if not token:
-            import builtins
-            token = getattr(builtins, '_workspace_oauth_token', '')
-            if token:
-                _logger.warning(f"header_provider: ✅ Strategy3 OK - token from builtins (prefix={token[:30]}..., len={len(token)})")
-    
-        if not token:
-            _logger.warning("header_provider: ❌ NO TOKEN AVAILABLE - MCP calls will fail with permission denied")
-    
-        # Token scope verification for debugging - check on first 3 calls per instance
-        call_count = getattr(_workspace_header_provider, '_call_count', 0) + 1
-        _workspace_header_provider._call_count = call_count
-        if token and call_count <= 3:
-            try:
-                import httpx
-                resp = httpx.get(f"https://oauth2.googleapis.com/tokeninfo?access_token={token}", timeout=5)
-                if resp.status_code == 200:
-                    info = resp.json()
-                    _logger.warning(f"header_provider: 🔍 TOKEN SCOPES: {info.get('scope', 'N/A')}")
-                    _logger.warning(f"header_provider: 🔍 TOKEN EMAIL: {info.get('email', 'N/A')}, EXPIRES_IN: {info.get('expires_in', 'N/A')}")
-                else:
-                    _logger.warning(f"header_provider: 🔍 TOKEN INFO FAILED: status={resp.status_code}, body={resp.text[:200]}")
-            except Exception as ex:
-                _logger.warning(f"header_provider: 🔍 TOKEN INFO ERROR: {type(ex).__name__}: {ex}")
-    
-        if token:
-            return {"Authorization": f"Bearer {token}"}
-        return {}
-
     # Workspace MCP scope definitions (shared between factory and auth_kwargs)
+    # NOTE: _workspace_header_provider itself lives in the workspaceAuthEnabled
+    # block above (it is shared with the auth-only mode).
     _GMAIL_SCOPES = [
         "https://www.googleapis.com/auth/gmail.readonly",
         "https://www.googleapis.com/auth/gmail.compose",
@@ -732,13 +839,13 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
             tool_filter=['search_directory_people', 'search_contacts', 'get_user_profile'],
             **_get_workspace_auth_kwargs()
         )
-
 else:
     def get_gmail_mcp_toolset(): return None
     def get_drive_mcp_toolset(): return None
     def get_calendar_mcp_toolset(): return None
     def get_chat_mcp_toolset(): return None
     def get_people_mcp_toolset(): return None
+
 
 async def generate_image(prompt: str, tool_context: ToolContext) -> dict:
     """Generates a professional business image or presentation slide based on the given prompt.
@@ -876,12 +983,16 @@ def _get_runtime_sa_email():
     return ""
 
 
-def _generate_v4_signed_url(bucket_name, object_name, content_type, expiration_days=7):
-    """Mint a V4 signed GET URL using ADC + IAM signBlob (no key file on Cloud Run).
+def _generate_v4_signed_url(bucket_name, object_name, content_type, expiration_days=7, method="GET"):
+    """Mint a V4 signed URL using ADC + IAM signBlob (no key file on Cloud Run).
 
     Passing service_account_email + access_token makes the storage client sign
     remotely via the IAM signBlob API, which requires the runtime SA to hold
     roles/iam.serviceAccountTokenCreator on itself.
+
+    method="GET" (default) signs a download URL with a response content type.
+    method="PUT" signs an upload URL; the uploader MUST send exactly the same
+    Content-Type header that was signed here.
     """
     from google.cloud import storage
     from datetime import timedelta
@@ -907,13 +1018,18 @@ def _generate_v4_signed_url(bucket_name, object_name, content_type, expiration_d
 
     client = storage.Client(credentials=creds)
     blob = client.bucket(bucket_name).blob(object_name)
+    _sign_kwargs = {}
+    if method == "PUT":
+        _sign_kwargs["content_type"] = content_type
+    else:
+        _sign_kwargs["response_type"] = content_type
     return blob.generate_signed_url(
         version="v4",
         expiration=timedelta(days=min(expiration_days, 7)),  # V4 hard max is 7 days
-        method="GET",
+        method=method,
         service_account_email=sa_email,
         access_token=creds.token,
-        response_type=content_type,
+        **_sign_kwargs
     )
 
 
@@ -992,9 +1108,9 @@ async def publish_dashboard(html: str, title: str, tool_context: ToolContext) ->
         return {'status': 'error', 'detail': f'Failed to publish dashboard: {str(e)}',
                 'dashboard_url': ''}
 
-
 # --- Computer Use browser agent (enabled per demo via ENABLE_COMPUTER_USE) ---
 if os.environ.get("ENABLE_COMPUTER_USE") == "1":
+
     # =====================================================================
     # Computer Use (browser agent) -- Gemini 3.5 Flash built-in computer_use
     # tool driven over a self-hosted headless Chromium (Playwright). Adapted
@@ -1469,12 +1585,12 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             "result_summary": _final,
             "detail": "Browser automation finished (status: " + _status + "). Screenshots are attached; the full session can be watched at live_view_url.",
         }
-
 else:
     async def start_browser_session() -> dict:
         return {"status": "error", "detail": "Computer Use is not enabled for this demo.", "live_view_url": ""}
     async def computer_use_browse(goal: str, start_url: str, tool_context: ToolContext = None, session_id: str = "") -> dict:
         return {"status": "error", "detail": "Computer Use is not enabled for this demo."}
+
 
 def get_custom_mcp_toolsets():
 
@@ -1522,6 +1638,9 @@ def get_custom_mcp_toolsets():
         except Exception as e:
             logging.error(f"❌ [CUSTOM_MCP] {label}: Failed: {e}", exc_info=True)
     return toolsets if toolsets else []
+
+
+
 
 
 
@@ -2340,3 +2459,1033 @@ def save_document_to_db(
         return {"status": "success", "document_id": document_id, "message": f"Document saved successfully in {full_coll}."}
     except Exception as e:
         return {"status": "error", "message": f"Failed to save document: {str(e)}"}
+
+
+# --- Managed Agent (Antigravity) autonomous delegation (ENABLE_MANAGED_AGENT) ---
+if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+    # =============================================================================
+    # Managed Autonomous Agent (Antigravity) delegation - v11.0
+    # The setup script provisions a managed agent (Agents API, Pre-GA) that runs in
+    # an isolated sandbox (bash, filesystem, code exec, web search). This section
+    # talks to it over the Interactions API via plain REST + SSE (httpx, already a
+    # transitive dependency) so no extra pinned package is needed.
+    # Hybrid execution: stream synchronously for up to MANAGED_AGENT_SYNC_WAIT_S,
+    # then hand off to the existing background-task infrastructure (Firestore
+    # task_executions doc + _inject_completed_tasks announcement) while a daemon
+    # thread keeps consuming the SSE stream. Cloud Run runs with min-instances=1
+    # and no CPU throttling, so the thread survives after the turn returns.
+    # =============================================================================
+    _MANAGED_AGENT_ID = os.environ.get("MANAGED_AGENT_ID", "").strip()
+    _MANAGED_AGENT_LOCATION = "global"  # the Managed Agents API is global-only
+    _INTERACTIONS_API_REVISION = "2026-05-20"  # single pin point for header drift
+    # 30s (not longer): real autonomous tasks essentially never finish inside the
+    # sync window, so its job is just to show the delegation starting live in the
+    # Thinking accordion (a handful of tool events) before handing off to the
+    # background flow. Tunable per demo via the Cloud Run env var.
+    _MA_SYNC_WAIT_S = int(os.environ.get("MANAGED_AGENT_SYNC_WAIT_S", "30"))
+    _MA_MAX_RUNTIME_S = int(os.environ.get("MANAGED_AGENT_MAX_RUNTIME_S", "1800"))
+    # After the SSE stream window closes, the interaction keeps running
+    # server-side (background=true); we keep polling GET for this much longer.
+    _MA_POLL_EXTRA_S = int(os.environ.get("MANAGED_AGENT_POLL_EXTRA_S", "3600"))
+
+    _ma_creds = None
+
+    # Cross-module progress channel: the SSE thread pushes short status snippets
+    # here and the A2A executor (fast_api_app) drains them into Thinking-accordion
+    # status events while the delegation tool is blocking. Published on builtins
+    # (same pattern as _firestore_client) because tools.py and fast_api_app run in
+    # the same process.
+    import queue as _ma_queue_mod
+    import builtins as _ma_builtins_mod
+    _ma_progress_queue = _ma_queue_mod.Queue(maxsize=50)
+    _ma_builtins_mod._ma_progress_queue = _ma_progress_queue
+
+    def _ma_push_progress(text):
+        if not text:
+            return
+        try:
+            _ma_progress_queue.put_nowait(str(text).replace(chr(10), " ").strip()[:200])
+        except Exception:
+            pass  # queue full or closed - progress display is best-effort
+
+    def _ma_drain_progress_queue():
+        try:
+            while True:
+                _ma_progress_queue.get_nowait()
+        except Exception:
+            pass
+
+    def _ma_get_access_token():
+        """Returns an access token from module-cached ADC credentials.
+
+        google-auth refreshes only when the cached token is expired, so this is
+        cheap to call per delegation (tokens live about an hour)."""
+        global _ma_creds
+        import google.auth
+        import google.auth.transport.requests
+        if _ma_creds is None:
+            _ma_creds, _unused = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        if not _ma_creds.valid:
+            _ma_creds.refresh(google.auth.transport.requests.Request())
+        return _ma_creds.token
+
+    def _ma_interactions_url():
+        return ("https://aiplatform.googleapis.com/v1beta1/projects/" + get_project_id()
+                + "/locations/" + _MANAGED_AGENT_LOCATION + "/interactions")
+
+    def _ma_override_tools(include_mcp=True):
+        """Per-turn tools override for the Interactions API.
+
+        The override COMPLETELY replaces the agent's preconfigured tools for the
+        turn, so the first-party tools must always be re-listed. Google-hosted MCP
+        servers (BigQuery / Firestore / Knowledge Catalog) are attached with a
+        fresh bearer token because tokens cannot live in the static agent config.
+
+        NOTE (verified live 2026-07-12, HTTP 400): unlike the AGENT config, the
+        interactions tools override does NOT accept type 'filesystem' (supported:
+        google_maps, mcp_server, code_execution, computer_use, function,
+        url_context, google_search). The sandbox keeps its built-in bash +
+        file_system abilities regardless, so filesystem is simply omitted here."""
+        tools = [
+            {"type": "code_execution"},
+            {"type": "google_search"},
+            {"type": "url_context"},
+        ]
+        if not include_mcp:
+            return tools
+        try:
+            _headers = {
+                "Authorization": "Bearer " + _ma_get_access_token(),
+                "x-goog-user-project": get_project_id(),
+            }
+            tools.append({"type": "mcp_server", "name": "bigquery", "url": get_bigquery_mcp_url(), "headers": _headers})
+            tools.append({"type": "mcp_server", "name": "firestore", "url": get_firestore_mcp_url(), "headers": _headers})
+            tools.append({"type": "mcp_server", "name": "knowledge_catalog", "url": get_knowledge_catalog_mcp_url(), "headers": _headers})
+        except Exception as _mcp_err:
+            import logging as _l
+            _l.getLogger("managed_agent").warning("MCP tool override skipped: %s", str(_mcp_err)[:200])
+        return tools
+
+    def _ma_fresh_environment():
+        """Full sandbox spec for a NEW environment.
+
+        The interaction-level environment does NOT inherit the agent's
+        base_environment (verified live 2026-07-12): a bare remote spec yields a
+        standard sandbox WITHOUT skills, and listing sources without network is
+        rejected. So every fresh environment restates network + skills sources."""
+        _env = {"type": "remote", "network": {"allowlist": [{"domain": "*"}]}}
+        _src = os.environ.get("MANAGED_AGENT_SKILLS_SOURCE", "").strip()
+        if _src:
+            _env["sources"] = [{"type": "gcs", "source": _src, "target": "/.agent/skills"}]
+        return _env
+
+    def _ma_read_session_state():
+        """Demo-wide sandbox continuity (environment + previous interaction ids).
+
+        Stored in Firestore (not ADK session state) so background completions and
+        later GE sessions reuse the same persistent sandbox filesystem."""
+        import builtins
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+        if not _fs or not _demo_id:
+            return {}
+        try:
+            _snap = _fs.collection(_demo_id + "_managed_agent_state").document("current").get()
+            return _snap.to_dict() if _snap.exists else {}
+        except Exception:
+            return {}
+
+    def _ma_finalize_interaction_record(shared):
+        """Post-completion hygiene for one interaction.
+
+        Persists sandbox continuity, then - when the task message carried the
+        user's Workspace token - DELETEs the stored interaction so the token
+        does not linger in the interaction history (verified live: DELETE
+        returns 200 and removes the stored record; the sandbox environment
+        itself lives on independently via its env id). Token-bearing tasks
+        therefore keep ENVIRONMENT continuity but give up conversational
+        previous_interaction_id continuity.
+        """
+        _iid = shared.get("interaction_id", "")
+        if shared.get("token_embedded"):
+            _ma_write_session_state(shared.get("environment_id", ""), "")
+            if _iid:
+                try:
+                    import httpx
+                    _headers = {
+                        "Authorization": "Bearer " + _ma_get_access_token(),
+                        "Api-Revision": _INTERACTIONS_API_REVISION,
+                    }
+                    httpx.delete(_ma_interactions_url() + "/" + _iid, headers=_headers, timeout=30.0)
+                except Exception:
+                    import logging as _l
+                    _l.getLogger("managed_agent").warning("token-bearing interaction cleanup failed for %s", _iid[:24])
+            # Remove the rotating token object as well.
+            _tid = shared.get("task_id", "")
+            _bkt = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+            if _tid and _bkt:
+                try:
+                    from google.cloud import storage as _st
+                    _st.Client().bucket(_bkt).blob("autonomous/" + _tid + "/.wstoken").delete()
+                except Exception:
+                    pass
+        else:
+            _ma_write_session_state(shared.get("environment_id", ""), _iid)
+
+    def _ma_write_session_state(environment_id, interaction_id):
+        import builtins
+        import datetime as _dt
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+        if not _fs or not _demo_id:
+            return
+        try:
+            _data = {"updated_at": _dt.datetime.now(_dt.timezone.utc).isoformat()}
+            if environment_id:
+                _data["environment_id"] = environment_id
+            if interaction_id:
+                _data["previous_interaction_id"] = interaction_id
+            _fs.collection(_demo_id + "_managed_agent_state").document("current").set(_data, merge=True)
+        except Exception:
+            pass
+
+    _MA_DELIVERABLE_SPECS = [
+        ("deliverable.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "presentation deck"),
+        ("deliverable.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "Word document"),
+        ("deliverable.pdf", "application/pdf", "PDF report"),
+        ("deliverable.html", "text/html; charset=utf-8", "web page"),
+        ("deliverable.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "spreadsheet"),
+    ]
+
+    def _ma_mint_upload_urls(task_id):
+        """Signed PUT URLs (7 days) for the fixed deliverable filenames.
+
+        The sandbox holds no credentials by design; pre-signed URLs are the only
+        write path back to the project. Never log the returned URLs."""
+        _bucket = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+        if not _bucket:
+            return []
+        _urls = []
+        for _name, _mime, _label in _MA_DELIVERABLE_SPECS:
+            try:
+                _url = _generate_v4_signed_url(_bucket, "autonomous/" + task_id + "/" + _name, _mime, 7, "PUT")
+                _urls.append((_name, _mime, _label, _url))
+            except Exception as _sign_err:
+                import logging as _l
+                _l.getLogger("managed_agent").warning("upload URL signing failed for %s: %s", _name, str(_sign_err)[:200])
+        return _urls
+
+    def _ma_collect_deliverables(task_id):
+        """Markdown download links for whatever the sandbox actually uploaded."""
+        _bucket = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+        if not _bucket:
+            return []
+        try:
+            from google.cloud import storage
+            _client = storage.Client()
+            _links = []
+            for _blob in _client.list_blobs(_bucket, prefix="autonomous/" + task_id + "/"):
+                _bname = _blob.name.split("/")[-1]
+                if _bname.startswith("."):
+                    continue  # internal objects (e.g. the rotating .wstoken)
+                _mime = _blob.content_type or "application/octet-stream"
+                _url = _generate_v4_signed_url(_bucket, _blob.name, _mime)
+                _links.append("- [" + _bname + "](" + _url + ")")
+            return _links
+        except Exception as _list_err:
+            import logging as _l
+            _l.getLogger("managed_agent").warning("deliverable listing failed: %s", str(_list_err)[:200])
+            return []
+
+    _MA_NO_UPLOAD_NOTE = (
+        "SYSTEM CHECK (auto-generated): no deliverable files were uploaded to cloud storage for this task. "
+        "If the report above says files were produced or delivered, they exist ONLY inside the sandbox "
+        "workspace and were NOT delivered to the user. Be honest about this - never present workspace-only "
+        "files as delivered - and offer to run a short follow-up autonomous task that uploads the existing "
+        "files (the sandbox filesystem persists between tasks, so re-delegating an upload-only task works).")
+
+    def _ma_run_interaction(payload, shared):
+        """Thread target: POSTs one interaction and consumes its SSE stream.
+
+        Event shapes verified live (2026-07-12): 'interaction.created' (carries
+        interaction.id), 'step.start' (step.type: model_output / function_call /
+        function_result), 'step.delta' (delta.type 'text' carries incremental
+        model text), 'step.stop', and 'interaction.completed' (carries
+        environment_id + usage but NO output text - the report is the
+        concatenation of the text deltas).
+
+        Mutates shared in place: events, report_buf, last_text, environment_id,
+        interaction_id, completed, error. Sets shared['_event'] when the stream
+        ends (success or failure)."""
+        import httpx
+        import json as _json
+        import time as _t
+        try:
+            _headers = {
+                "Authorization": "Bearer " + _ma_get_access_token(),
+                "Content-Type": "application/json",
+                "Api-Revision": _INTERACTIONS_API_REVISION,
+            }
+            _deadline = _t.monotonic() + _MA_MAX_RUNTIME_S
+            _timeout = httpx.Timeout(connect=30.0, read=600.0, write=60.0, pool=30.0)
+            with httpx.Client(timeout=_timeout) as _client:
+                with _client.stream("POST", _ma_interactions_url(), json=payload, headers=_headers) as _resp:
+                    if _resp.status_code != 200:
+                        _body = _resp.read().decode("utf-8", "replace")[:400]
+                        shared["error"] = "HTTP " + str(_resp.status_code) + ": " + _body
+                        return
+                    if not shared.get("handoff"):
+                        _ma_push_progress("Sandbox session opened - the autonomous agent is picking up the task...")
+                    for _line in _resp.iter_lines():
+                        if shared.get("cancelled"):
+                            # User pressed Cancel (Data Viewer / cancel tool): the
+                            # monitor flagged it; stop consuming immediately. The
+                            # server-side interaction itself cannot be killed
+                            # (no cancel API), it just runs out unobserved.
+                            shared["stream_abandoned"] = True
+                            break
+                        if _t.monotonic() > _deadline:
+                            # The interaction keeps running server-side
+                            # (background=true): stop streaming, poll below.
+                            shared["stream_abandoned"] = True
+                            break
+                        if not _line or not _line.startswith("data:"):
+                            continue
+                        try:
+                            _event = _json.loads(_line[5:].strip())
+                        except Exception:
+                            continue
+                        shared["events"] = shared.get("events", 0) + 1
+                        _etype = _event.get("event_type", "") or _event.get("type", "")
+                        _interaction = _event.get("interaction") if isinstance(_event.get("interaction"), dict) else {}
+                        if _interaction.get("id"):
+                            shared["interaction_id"] = _interaction["id"]
+                        if _interaction.get("environment_id"):
+                            shared["environment_id"] = _interaction["environment_id"]
+                        if _etype == "step.delta":
+                            _delta = _event.get("delta") if isinstance(_event.get("delta"), dict) else {}
+                            if _delta.get("type") == "text" and isinstance(_delta.get("text"), str):
+                                shared["report_buf"] = shared.get("report_buf", "") + _delta["text"]
+                                shared["last_text"] = shared["report_buf"][-400:]
+                                # Live progress into the Thinking accordion (inline
+                                # phase only; rate-limited).
+                                if not shared.get("handoff") and _t.monotonic() - shared.get("_last_push_t", 0) > 3:
+                                    shared["_last_push_t"] = _t.monotonic()
+                                    _ma_push_progress(shared["report_buf"][-200:])
+                        elif _etype == "step.start":
+                            _step = _event.get("step") if isinstance(_event.get("step"), dict) else {}
+                            if _step.get("type") == "function_call":
+                                _tool_name = _step.get("name", "") or "a sandbox tool"
+                                # Long tool phases produce no text deltas, so this
+                                # is what keeps the Data Viewer log (and the
+                                # accordion) showing real activity, not just
+                                # "working...".
+                                shared["last_text"] = "Using tool: " + _tool_name
+                                # Accordion pushes are throttled and deduplicated:
+                                # rapid bursts of the same tool (e.g. 20x
+                                # view_file while reading skills) flooded the GE
+                                # stream with back-to-back status events, which
+                                # the GE client handles poorly. One push per
+                                # tool-name change, min 2.5s apart.
+                                if (not shared.get("handoff")
+                                        and _tool_name != shared.get("_last_tool_pushed")
+                                        and _t.monotonic() - shared.get("_last_push_t", 0) > 2.5):
+                                    shared["_last_tool_pushed"] = _tool_name
+                                    shared["_last_push_t"] = _t.monotonic()
+                                    _ma_push_progress("Using tool: " + _tool_name)
+                        elif _etype == "interaction.completed":
+                            shared["completed"] = True
+            # Stream ended. If we never saw interaction.completed, treat a clean
+            # close with accumulated output as complete anyway (defensive) -
+            # unless we abandoned the stream on the deadline, in which case the
+            # polling fallback below decides.
+            if not shared.get("completed") and shared.get("report_buf") and not shared.get("stream_abandoned"):
+                shared["completed"] = True
+        except Exception as _run_err:
+            shared["stream_error"] = str(_run_err)[:400]
+        # Polling fallback: with background=true the interaction keeps running
+        # server-side after the stream window closes (deadline, read timeout,
+        # network drop). Poll GET on the interaction and harvest the final report
+        # from its persisted steps (verified live 2026-07-12).
+        try:
+            if not shared.get("completed") and not shared.get("error") and not shared.get("cancelled"):
+                _ma_poll_interaction(shared)
+        except Exception as _poll_err:
+            if not shared.get("error"):
+                shared["error"] = str(_poll_err)[:400]
+        if shared.get("cancelled"):
+            shared["error"] = shared.get("error") or "Cancelled by the user."
+            # Token hygiene on cancel: best-effort delete of the token-bearing
+            # interaction record (may fail while it is still in_progress
+            # server-side; the embedded token expires within the hour anyway).
+            if shared.get("token_embedded") and shared.get("interaction_id"):
+                try:
+                    import httpx as _hx
+                    _hx.delete(_ma_interactions_url() + "/" + shared["interaction_id"],
+                               headers={"Authorization": "Bearer " + _ma_get_access_token(),
+                                        "Api-Revision": _INTERACTIONS_API_REVISION},
+                               timeout=30.0)
+                except Exception:
+                    pass
+            if shared.get("token_embedded") and shared.get("task_id"):
+                try:
+                    from google.cloud import storage as _st
+                    _bkt = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+                    if _bkt:
+                        _st.Client().bucket(_bkt).blob("autonomous/" + shared["task_id"] + "/.wstoken").delete()
+                except Exception:
+                    pass
+        elif not shared.get("completed") and not shared.get("error"):
+            shared["error"] = (shared.get("stream_error")
+                               or "The autonomous task was still running when the monitoring window ("
+                                  + str(_MA_MAX_RUNTIME_S + _MA_POLL_EXTRA_S) + "s) closed. It may still finish; "
+                                  "check again later with get_autonomous_task_status.")
+        shared["done"] = True
+        _evt = shared.get("_event")
+        if _evt is not None:
+            _evt.set()
+
+    def _ma_poll_interaction(shared):
+        """Polls GET .../interactions/<id> after the SSE stream is gone.
+
+        On completion, harvests environment_id and rebuilds the final report from
+        the persisted model_output steps (the GET body of a completed interaction
+        contains the full step history - verified live)."""
+        import httpx
+        import time as _t
+        _iid = shared.get("interaction_id", "")
+        if not _iid:
+            return
+        if not shared.get("handoff"):
+            _ma_push_progress("Live stream closed - switching to status polling (the sandbox keeps working)...")
+        shared["last_text"] = "Live stream closed; polling interaction status (the sandbox keeps working)..."
+        _url = _ma_interactions_url() + "/" + _iid
+        _deadline = _t.monotonic() + _MA_POLL_EXTRA_S
+        with httpx.Client(timeout=30.0) as _client:
+            while _t.monotonic() < _deadline:
+                _t.sleep(30)
+                try:
+                    _headers = {
+                        "Authorization": "Bearer " + _ma_get_access_token(),
+                        "Api-Revision": _INTERACTIONS_API_REVISION,
+                    }
+                    _resp = _client.get(_url, headers=_headers)
+                    if _resp.status_code != 200:
+                        continue
+                    _data = _resp.json()
+                except Exception:
+                    continue
+                shared["events"] = shared.get("events", 0) + 1
+                if _data.get("environment_id"):
+                    shared["environment_id"] = _data["environment_id"]
+                _status = _data.get("status", "")
+                if _status == "completed":
+                    # Harvest report text from ALL non-input steps (not just
+                    # type model_output - long agentic runs have surfaced text
+                    # under other step shapes). user_input steps are EXCLUDED:
+                    # they contain the task message (and possibly the Workspace
+                    # token).
+                    _texts = []
+                    def _collect_step_texts(node):
+                        if isinstance(node, dict):
+                            for _k, _v in node.items():
+                                if _k == "text" and isinstance(_v, str) and _v.strip():
+                                    _texts.append(_v)
+                                else:
+                                    _collect_step_texts(_v)
+                        elif isinstance(node, list):
+                            for _item in node:
+                                _collect_step_texts(_item)
+                    for _step in (_data.get("steps") or []):
+                        if isinstance(_step, dict) and _step.get("type") != "user_input":
+                            _collect_step_texts(_step)
+                    if _texts:
+                        shared["report_buf"] = (chr(10) + chr(10)).join(_texts)
+                    else:
+                        # Diagnostic: log the STRUCTURE only (never content - it
+                        # could include the task message / token).
+                        try:
+                            import logging as _l
+                            _shape = []
+                            for _step in (_data.get("steps") or []):
+                                if isinstance(_step, dict):
+                                    _ctypes = [(_c.get("type", "?") if isinstance(_c, dict) else "?") for _c in (_step.get("content") or [])]
+                                    _shape.append(str(_step.get("type", "?")) + ":" + ",".join(_ctypes))
+                            _l.getLogger("managed_agent").warning(
+                                "poll harvest found NO text; interaction step shapes: %s", "; ".join(_shape)[:800])
+                        except Exception:
+                            pass
+                    shared["completed"] = True
+                    return
+                if _status in ("failed", "cancelled"):
+                    shared["error"] = "The autonomous interaction ended server-side with status: " + _status
+                    return
+
+    def _ma_final_report(shared):
+        _report = (shared.get("report_buf") or "").strip()
+        if not _report:
+            _report = ("The autonomous agent finished but returned no text report. Its step-by-step "
+                       "activity log is available in the Data Viewer Tasks tab; any uploaded deliverables "
+                       "are linked below. Consider re-running the task with a simpler, outcome-focused brief.")
+        return _report
+
+    def _ma_monitor_task(task_id, shared):
+        """Daemon monitor after a background handoff: mirrors SSE progress into the
+        existing task_executions doc so _inject_completed_tasks and the View Full
+        Report flow work unchanged."""
+        import builtins
+        import time as _t
+        import datetime as _dt
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+        if not _fs or not _demo_id:
+            return
+        _ref = _fs.collection(_demo_id + "_task_executions").document(task_id)
+        _log = ""
+        while not shared.get("done"):
+            _t.sleep(12)
+            try:
+                _snap = _ref.get()
+                if _snap.exists and _snap.to_dict().get("status") == "cancelled":
+                    shared["cancelled"] = True
+                    return
+                _now = _dt.datetime.now(_dt.timezone.utc).strftime("%H:%M:%S")
+                _snippet = (shared.get("last_text", "") or "working...").replace(chr(10), " ")[:180]
+                _log = _log + "[" + _now + "] SANDBOX: " + _snippet + chr(10)
+                if len(_log) > 1500:
+                    _log = _log[-1500:]
+                _pct = max(10, min(90, 10 + int(shared.get("events", 0) / 3)))
+                # interaction_id is mirrored for diagnosability: it lets operators
+                # inspect the live interaction via GET .../interactions/<id>.
+                _ref.update({"progress_pct": _pct, "log_tail": _log, "interaction_id": shared.get("interaction_id", "")})
+            except Exception:
+                pass
+        try:
+            if shared.get("inline_reported"):
+                # The delegation tool already presented the result inline and
+                # finalizes the doc itself (reported_to_user=True) so the
+                # completion is not announced a second time.
+                return
+            _now_iso = _dt.datetime.now(_dt.timezone.utc).isoformat()
+            if shared.get("error"):
+                _ref.update({
+                    "status": "failed",
+                    "result_summary": "Autonomous task failed: " + shared.get("error", "unknown error"),
+                    "completed_at": _now_iso,
+                })
+                return
+            _report = _ma_final_report(shared)
+            _links = _ma_collect_deliverables(task_id)
+            if _links:
+                _report = _report + chr(10) + chr(10) + "DELIVERABLE DOWNLOADS (links valid for 7 days):" + chr(10) + chr(10).join(_links)
+            else:
+                _report = _report + chr(10) + chr(10) + _MA_NO_UPLOAD_NOTE
+            _ref.update({
+                "status": "completed",
+                "result_summary": _report,
+                "progress_pct": 100,
+                "completed_at": _now_iso,
+            })
+            _ma_finalize_interaction_record(shared)
+        except Exception:
+            pass
+
+    def _ma_build_task_message(task_description, input_data, upload_urls):
+        _msg = task_description.strip()
+        if input_data and input_data.strip():
+            _msg = _msg + chr(10) + chr(10) + "INPUT DATA (provided by the requesting assistant):" + chr(10) + input_data.strip()
+        if upload_urls:
+            _lines = []
+            for _name, _mime, _label, _url in upload_urls:
+                _lines.append("- " + _label + " (" + _name + "): upload with curl -sS -X PUT --upload-file <file> -H " + chr(34) + "Content-Type: " + _mime + chr(34) + " " + chr(34) + _url + chr(34))
+            _msg = (_msg + chr(10) + chr(10)
+                    + "DELIVERABLE UPLOAD URLS (only if you produce a file of that type; send EXACTLY the Content-Type shown, retry once on failure):"
+                    + chr(10) + chr(10).join(_lines))
+        return _msg
+
+    async def delegate_autonomous_task(
+        task_name: str,
+        task_description: str,
+        input_data: str = "",
+        tool_context: ToolContext = None,
+    ) -> dict:
+        """Delegates a long-running, multi-step task to the fully autonomous cloud
+        agent (isolated sandbox with bash, filesystem, code execution, pip/npm,
+        Google Search, web page reading, direct BigQuery/Firestore access, and
+        professional deliverable skills for decks / documents / PDFs / web pages).
+
+        USE FOR: live web research combined with internal data, building and
+        running code, producing downloadable business files (pptx/docx/pdf/html),
+        and any autonomous work expected to take more than a minute.
+        DO NOT USE FOR: quick lookups or analysis that inline tools (execute_sql,
+        code execution, publish_dashboard) can finish in this turn, or demo-DB
+        batch workflows (use register_background_task for those).
+
+        Behavior: waits briefly for fast tasks and returns the finished report
+        inline; longer tasks continue in the background and completion is
+        announced automatically in a later turn (like background tasks).
+
+        Args:
+            task_name: Short identifier for the task (e.g. 'competitor_deck').
+            task_description: COMPLETE, self-contained instruction in the USER'S
+                language: goal, deliverable type, audience, and success criteria.
+                The autonomous agent sees ONLY this text (plus input_data).
+                Describe OUTCOMES only - NEVER reference this agent's own tool
+                names (publish_dashboard, save_deliverables_to_drive, ...): the
+                autonomous agent cannot call them and gets derailed trying.
+            input_data: Optional data to embed verbatim (query results, lists,
+                constraints) so the agent does not have to re-derive them.
+
+        Returns:
+            dict with either the finished report (status 'completed') or a
+            background ticket (status 'working_in_background').
+        """
+        import asyncio as _asyncio
+        import threading as _threading
+        import builtins
+        import datetime as _dt
+        import uuid as _uuid
+
+        if not _MANAGED_AGENT_ID:
+            return {
+                "status": "unavailable",
+                "message": "The autonomous agent was not provisioned in this project (its Pre-GA creation "
+                           "failed or timed out during setup; re-running the setup script retries it). "
+                           "Complete the task with inline tools instead, and tell the user the "
+                           "autonomous-delegation feature is not enabled.",
+            }
+
+        if tool_context is not None and getattr(tool_context, "user_id", "") == "background-worker":
+            return {
+                "status": "blocked",
+                "message": "Background workers must not re-delegate work to the autonomous agent. "
+                           "Execute the task directly with data tools.",
+            }
+        # NOTE (v11.2): deep_analysis_agent IS allowed to delegate. The original
+        # F1-style block created a dead end: a mis-routed "Run Inline" press
+        # landed a web/file/Workspace task on deep_analysis, the block forced it
+        # inline, and the model rationalized the failure to the user as a
+        # "security restriction" (observed live 2026-07-14). Unlike
+        # register_background_task+polling (the F1 hang), this tool ALWAYS
+        # returns within the sync window, so the hang risk that motivated F1
+        # does not apply here.
+
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+
+        # Duplicate guard (button spam): block a second delegation while an
+        # autonomous task with the same normalized name is still active.
+        def _norm(_s):
+            return "".join(_c for _c in str(_s).lower() if _c.isalnum())
+        if _fs and _demo_id:
+            try:
+                _actives = _fs.collection(_demo_id + "_task_executions").where(
+                    "status", "in", ["submitted", "working"]).stream()
+                for _edoc in _actives:
+                    _edata = _edoc.to_dict()
+                    _def_snap = _fs.collection(_demo_id + "_task_definitions").document(
+                        _edata.get("definition_id", "")).get()
+                    if _def_snap.exists:
+                        _ddata = _def_snap.to_dict()
+                        if _ddata.get("task_type") == "autonomous" and _norm(_ddata.get("task_name")) == _norm(task_name):
+                            return {
+                                "status": "already_active",
+                                "ticket-id": _edata.get("task_id", ""),
+                                "message": "An autonomous task with the same name is already running. "
+                                           "Use get_autonomous_task_status to check its progress.",
+                            }
+            except Exception:
+                pass
+
+        _task_id = str(_uuid.uuid4())[:8]
+        _upload_urls = _ma_mint_upload_urls(_task_id)
+        _message = _ma_build_task_message(task_description, input_data, _upload_urls)
+
+        # Workspace pass-through (auth-only or full MCP mode): hand the USER's
+        # OAuth token to the sandbox so the gws CLI can act on their Workspace.
+        # Accepted trade-off for demos: the token lands in the stored interaction
+        # (it expires in about an hour); token-bearing interactions are DELETED
+        # from the store right after their result is harvested.
+        _ws_token_embedded = False
+        if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
+            def _ma_refresh_token_object(_tid, _tok):
+                # Rotating token object: the sandbox re-fetches the CURRENT user
+                # token from a pre-signed URL when its snapshot expires. Kept fresh
+                # by fast_api_app on every user turn (best-effort).
+                _bkt = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+                if not _bkt or not _tok:
+                    return
+                try:
+                    from google.cloud import storage as _st
+                    _st.Client().bucket(_bkt).blob("autonomous/" + _tid + "/.wstoken").upload_from_string(_tok, content_type="text/plain")
+                except Exception:
+                    pass
+            try:
+                _ws_auth = (_workspace_header_provider(tool_context) or {}).get("Authorization", "")
+            except Exception:
+                _ws_auth = ""
+            if _ws_auth.startswith("Bearer "):
+                _message = (_message + chr(10) + chr(10)
+                            + "WORKSPACE ACCESS (handle with care):" + chr(10)
+                            + "- Before any Google Workspace operation, run: export GOOGLE_WORKSPACE_CLI_TOKEN=" + _ws_auth[7:] + chr(10)
+                            + "- This user access token expires in about an hour: do Workspace operations EARLY in the task." + chr(10)
+                            + "- Use the gws CLI for ALL Workspace reads/writes (see the gws-* skills under /.agent/skills). It is usually pre-installed at $HOME/bin/gws - call it by that absolute path. If missing: mkdir -p $HOME/bin && curl -sL https://github.com/googleworkspace/cli/releases/latest/download/google-workspace-cli-x86_64-unknown-linux-musl.tar.gz | tar xz -C $HOME/bin ./gws && chmod +x $HOME/bin/gws (do NOT use npm - its Linux binary needs GLIBC 2.39 which this sandbox lacks)." + chr(10)
+                            + "- GUARDRAILS: NEVER send email - create Gmail drafts only, unless the task explicitly says to send. NEVER delete anything in Workspace. Post Chat messages ONLY to spaces the task explicitly names - and if the named space does not exist yet, CREATE it with that exact name first, then post (expected in demo environments; mention the creation in your report). Create Calendar events only when the task asks for them." + chr(10)
+                            + "- Non-ASCII email headers (Subject etc.) MUST be RFC 2047 MIME-encoded; read the draft back to verify the subject is not garbled, and recreate it if needed." + chr(10)
+                            + "- Report created drafts as ALREADY EXISTING in Gmail (subject + link https://mail.google.com/mail/u/0/#drafts), never as text to copy manually." + chr(10)
+                            + "- NEVER write this token into your report, logs, code, or any file.")
+                _ws_token_embedded = True
+                _ma_refresh_token_object(_task_id, _ws_auth[7:])
+                try:
+                    _ws_refresh_url = _generate_v4_signed_url(
+                        os.environ.get("DASHBOARDS_BUCKET", "").strip(),
+                        "autonomous/" + _task_id + "/.wstoken", "text/plain", 7)
+                    _message = (_message + chr(10)
+                                + "- TOKEN REFRESH: if a Workspace call fails with 401 / invalid credentials, fetch the CURRENT token with: curl -s " + chr(34) + _ws_refresh_url + chr(34)
+                                + " then re-export GOOGLE_WORKSPACE_CLI_TOKEN with the response body and retry. A fresh token appears there whenever the user talks to the assistant; if it is still expired, note that in your report and continue with the non-Workspace parts of the task.")
+                except Exception:
+                    pass
+
+
+        # Task docs are created UP FRONT (not only on background handoff) so the
+        # Data Viewer Tasks tab shows the sandbox working live from second zero.
+        _docs_created = False
+        if _fs and _demo_id:
+            try:
+                _now_iso = _dt.datetime.now(_dt.timezone.utc).isoformat()
+                _fs.collection(_demo_id + "_task_definitions").document(_task_id).set({
+                    "task_id": _task_id,
+                    "task_name": task_name,
+                    "task_description": task_description,
+                    "task_prompt": _message,
+                    "task_type": "autonomous",
+                    "created_at": _now_iso,
+                })
+                _fs.collection(_demo_id + "_task_executions").document(_task_id).set({
+                    "task_id": _task_id,
+                    "definition_id": _task_id,
+                    "status": "working",
+                    "progress_pct": 10,
+                    "log_tail": "Delegated to the autonomous sandbox agent." + chr(10),
+                    "result_summary": "",
+                    "started_at": _now_iso,
+                    "completed_at": "",
+                    "reported_to_user": False,
+                })
+                _docs_created = True
+            except Exception:
+                pass
+
+        _session = _ma_read_session_state()
+        _env_value = _session.get("environment_id") or os.environ.get("MANAGED_AGENT_ENV_ID", "").strip() or _ma_fresh_environment()
+        _payload = {
+            "agent": _MANAGED_AGENT_ID,
+            "stream": True,
+            "background": True,
+            "store": True,
+            "environment": _env_value,
+            "input": [{"type": "user_input", "content": [{"type": "text", "text": _message}]}],
+            "tools": _ma_override_tools(True),
+        }
+        if _session.get("previous_interaction_id"):
+            _payload["previous_interaction_id"] = _session["previous_interaction_id"]
+
+        _ma_drain_progress_queue()
+        _ma_push_progress("Delegating to the autonomous agent: " + task_name)
+        _evt = _threading.Event()
+        _shared = {"_event": _evt, "token_embedded": _ws_token_embedded, "task_id": _task_id}
+        if _docs_created:
+            _threading.Thread(target=_ma_monitor_task, args=(_task_id, _shared), daemon=True).start()
+        _threading.Thread(target=_ma_run_interaction, args=(_payload, _shared), daemon=True).start()
+        _finished = await _asyncio.to_thread(_evt.wait, _MA_SYNC_WAIT_S)
+
+        # Fast-failure fallback: if the interaction failed almost immediately (for
+        # example an MCP attachment problem), retry ONCE without the MCP override.
+        if _finished and _shared.get("error") and not _shared.get("completed"):
+            import logging as _l
+            _l.getLogger("managed_agent").warning("delegation failed fast (%s) - retrying without MCP tools", _shared.get("error", "")[:200])
+            _shared["inline_reported"] = True  # detach the old monitor from doc finalization
+            _payload["tools"] = _ma_override_tools(False)
+            _ma_push_progress("First attempt failed - retrying without data-tool attachments...")
+            _evt = _threading.Event()
+            _shared = {"_event": _evt, "token_embedded": _ws_token_embedded, "task_id": _task_id}
+            if _docs_created:
+                _threading.Thread(target=_ma_monitor_task, args=(_task_id, _shared), daemon=True).start()
+            _threading.Thread(target=_ma_run_interaction, args=(_payload, _shared), daemon=True).start()
+            _finished = await _asyncio.to_thread(_evt.wait, _MA_SYNC_WAIT_S)
+
+        if _finished:
+            _shared["inline_reported"] = True  # this turn presents the result; monitor must not finalize
+            _now_iso = _dt.datetime.now(_dt.timezone.utc).isoformat()
+            if _shared.get("error"):
+                if _docs_created:
+                    try:
+                        _fs.collection(_demo_id + "_task_executions").document(_task_id).update({
+                            "status": "failed",
+                            "result_summary": "Autonomous task failed: " + _shared.get("error", ""),
+                            "completed_at": _now_iso,
+                            "reported_to_user": True,
+                        })
+                    except Exception:
+                        pass
+                return {
+                    "status": "error",
+                    "message": "The autonomous agent could not run this task: " + _shared.get("error", "unknown error")
+                               + " - Complete what you can with inline tools and tell the user what happened.",
+                }
+            _report = _ma_final_report(_shared)
+            _links = _ma_collect_deliverables(_task_id)
+            if _links:
+                _report = _report + chr(10) + chr(10) + "DELIVERABLE DOWNLOADS (links valid for 7 days):" + chr(10) + chr(10).join(_links)
+            else:
+                _report = _report + chr(10) + chr(10) + _MA_NO_UPLOAD_NOTE
+            _ma_finalize_interaction_record(_shared)
+            if _docs_created:
+                try:
+                    _fs.collection(_demo_id + "_task_executions").document(_task_id).update({
+                        "status": "completed",
+                        "result_summary": _report,
+                        "progress_pct": 100,
+                        "completed_at": _now_iso,
+                        "reported_to_user": True,
+                    })
+                except Exception:
+                    pass
+            return {
+                "status": "completed",
+                "report": _report,
+                "_MANDATORY_ACTION": "Present the report below to the user as formatted markdown text. It is "
+                                     "already written in the task language - do NOT translate, truncate, or "
+                                     "convert it into A2UI cards. If deliverable download links are present, "
+                                     "show them as markdown links.",
+            }
+
+        # Not finished inside the sync window: hand off to the background-task
+        # infrastructure. The SSE thread keeps running; the monitor (started at
+        # delegation time) mirrors its progress into Firestore and the completion
+        # is auto-announced next turn.
+        _shared["handoff"] = True  # stop Thinking-accordion pushes; the turn is ending
+        _ma_drain_progress_queue()
+        if not _docs_created:
+            return {
+                "status": "working_unmonitored",
+                "message": "The autonomous task is running but the task backend is unavailable, so its "
+                           "completion cannot be announced automatically. Tell the user the task was started "
+                           "and results will be available in the sandbox session.",
+            }
+        _viewer_url = os.environ.get("DATA_VIEWER_URL", "").strip()
+        _live_hint = ""
+        if _viewer_url:
+            _live_hint = (" Share this live-progress link with the user (opens the Data Viewer; the Tasks tab "
+                          "streams the sandbox activity log): " + _viewer_url)
+        return {
+            "status": "working_in_background",
+            "ticket-id": _task_id,
+            "task_name": task_name,
+            "message": "The autonomous agent accepted the task and keeps working in its sandbox. "
+                       "Tell the user the work continues in the background and the finished result "
+                       "(including any deliverable download links) will be announced automatically. "
+                       "Progress can be checked anytime with get_autonomous_task_status." + _live_hint,
+        }
+
+    def get_autonomous_task_status(task_id: str, tool_context: ToolContext = None) -> dict:
+        """Checks the live progress of a delegated autonomous task.
+
+        Args:
+            task_id: The ticket-id returned by delegate_autonomous_task.
+
+        Returns:
+            dict with status, progress_pct, recent activity log, and - once the
+            task is finished - the full report with deliverable links.
+        """
+        import builtins
+        _fs = getattr(builtins, "_firestore_client", None)
+        _demo_id = os.environ.get("DEMO_ID", "")
+        if not _fs or not _demo_id:
+            return {"status": "error", "message": "Task backend unavailable."}
+        try:
+            _snap = _fs.collection(_demo_id + "_task_executions").document(task_id).get()
+            if not _snap.exists:
+                return {"status": "not_found", "message": "No autonomous task with ticket-id " + task_id}
+            _d = _snap.to_dict()
+            _out = {
+                "status": _d.get("status", ""),
+                "progress_pct": _d.get("progress_pct", 0),
+                "recent_activity": _d.get("log_tail", ""),
+                "interaction_id": _d.get("interaction_id", ""),
+            }
+            if _d.get("status") in ("completed", "failed"):
+                _out["report"] = _d.get("result_summary", "")
+                _out["_MANDATORY_ACTION"] = ("Present the report as formatted markdown text, verbatim, "
+                                             "including any deliverable download links.")
+            return _out
+        except Exception as _err:
+            return {"status": "error", "message": "Status lookup failed: " + str(_err)[:200]}
+
+
+    # Drive handoff requires BOTH the Managed Agent and Workspace auth
+    # (inside the Managed Agent guard, so this equals the drive-handoff condition).
+    if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKSPACE_AUTH") == "1":
+        # =============================================================================
+        # Google Drive handoff for Managed Agent deliverables (v11.0)
+        # Requires BOTH Workspace MCP (user OAuth with drive.file scope via the GE
+        # authorization) AND the Managed Agent (deliverables in GCS). Office files
+        # are import-CONVERTED by Drive v3 into native Google formats; PDFs are
+        # stored as-is; HTML deliverables intentionally STAY in GCS (their signed
+        # URL previews in one click). Runs only in a LIVE user turn - the user OAuth
+        # token is captured per-request and has no refresh path.
+        # =============================================================================
+        _MA_DRIVE_CONVERT = {
+            ".pptx": ("application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.google-apps.presentation", "Google Slides"),
+            ".docx": ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.google-apps.document", "Google Docs"),
+            ".xlsx": ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.google-apps.spreadsheet", "Google Sheets"),
+            ".pdf": ("application/pdf", "", "PDF"),
+        }
+        _MA_DRIVE_MAX_BYTES = 50 * 1024 * 1024
+
+        def _ma_drive_multipart(meta, media_mime, media_bytes):
+            import json as _json
+            _b = "ma-drive-b0undary-7f3k9q"
+            _crlf = chr(13) + chr(10)
+            _head = ("--" + _b + _crlf
+                     + "Content-Type: application/json; charset=UTF-8" + _crlf + _crlf
+                     + _json.dumps(meta) + _crlf
+                     + "--" + _b + _crlf
+                     + "Content-Type: " + media_mime + _crlf + _crlf)
+            _tail = _crlf + "--" + _b + "--"
+            _body = _head.encode("utf-8") + media_bytes + _tail.encode("utf-8")
+            return _body, "multipart/related; boundary=" + _b
+
+        def save_deliverables_to_drive(ticket_id: str, tool_context: ToolContext = None) -> dict:
+            """Saves the deliverable files of a completed autonomous task into the
+            USER'S Google Drive. Office files become NATIVE Google files: pptx ->
+            Google Slides, docx -> Google Docs, xlsx -> Google Sheets; PDFs are
+            stored as-is. Web-page (html) deliverables keep their existing preview
+            link and are not copied to Drive.
+
+            USE WHEN: the user asks to save deliverables to Drive, or asked for the
+            output as Google Slides / Docs / Sheets (call it right after announcing
+            the completed task in the same turn).
+
+            Args:
+                ticket_id: The ticket-id of the delegated task whose files to save.
+
+            Returns:
+                dict with the saved files and their webViewLink URLs.
+            """
+            import builtins
+            import httpx
+
+            if tool_context is not None and getattr(tool_context, "user_id", "") == "background-worker":
+                return {"status": "blocked",
+                        "message": "Drive saving needs the live user's authorization and cannot run from a background worker."}
+
+            _hdrs = None
+            try:
+                _hdrs = _workspace_header_provider(tool_context)
+            except Exception:
+                _hdrs = None
+            _auth = (_hdrs or {}).get("Authorization", "")
+            if not _auth:
+                return {"status": "auth_required",
+                        "message": "No Workspace authorization token is available for this user. Ask the user to "
+                                   "re-authorize the agent in Gemini Enterprise (the consent prompt appears when a "
+                                   "Workspace tool is used), then press the save button again."}
+
+            _bucket = os.environ.get("DASHBOARDS_BUCKET", "").strip()
+            if not _bucket:
+                return {"status": "error", "message": "Deliverable storage is not configured (DASHBOARDS_BUCKET missing)."}
+
+            _task_name = ""
+            _fs = getattr(builtins, "_firestore_client", None)
+            _demo_id = os.environ.get("DEMO_ID", "")
+            if _fs and _demo_id:
+                try:
+                    _def_snap = _fs.collection(_demo_id + "_task_definitions").document(ticket_id).get()
+                    if _def_snap.exists:
+                        _task_name = (_def_snap.to_dict().get("task_name") or "").strip()
+                except Exception:
+                    pass
+            _base_name = _task_name or ("autonomous-deliverable-" + ticket_id)
+
+            try:
+                from google.cloud import storage
+                _client = storage.Client()
+                _blobs = list(_client.list_blobs(_bucket, prefix="autonomous/" + ticket_id + "/"))
+            except Exception as _ls_err:
+                return {"status": "error", "message": "Could not list deliverables: " + str(_ls_err)[:200]}
+            if not _blobs:
+                return {"status": "not_found",
+                        "message": "No STAGED deliverable files for ticket " + ticket_id + " in cloud storage. This does NOT "
+                                   "mean the task produced nothing: when the autonomous agent saved its output directly to "
+                                   "Google Drive / Docs / Slides / Sheets, nothing is left to stage here and that save already "
+                                   "succeeded. Check the task report (get_autonomous_task_status) for Drive links before "
+                                   "concluding anything; NEVER tell the user no file was generated based on this status alone."}
+
+            _saved = []
+            _kept_links = []
+            _errors = []
+            with httpx.Client(timeout=120.0) as _hclient:
+                for _blob in _blobs:
+                    _fname = _blob.name.split("/")[-1]
+                    if _fname.startswith("."):
+                        continue  # internal objects (e.g. the rotating .wstoken)
+                    _ext = "." + _fname.split(".")[-1].lower() if "." in _fname else ""
+                    if _ext == ".html":
+                        # Stays in GCS by design: the signed URL previews in one click.
+                        try:
+                            _url = _generate_v4_signed_url(_bucket, _blob.name, _blob.content_type or "text/html; charset=utf-8")
+                            _kept_links.append({"name": _fname, "type": "web page (opens directly via its preview link)", "webViewLink": _url})
+                        except Exception:
+                            pass
+                        continue
+                    if (_blob.size or 0) > _MA_DRIVE_MAX_BYTES:
+                        _errors.append(_fname + " skipped (larger than 50MB)")
+                        continue
+                    try:
+                        _data = _blob.download_as_bytes()
+                    except Exception as _dl_err:
+                        _errors.append(_fname + " download failed: " + str(_dl_err)[:120])
+                        continue
+                    _src_mime, _target_mime, _label = _MA_DRIVE_CONVERT.get(
+                        _ext, (_blob.content_type or "application/octet-stream", "", "file"))
+                    _stem = _fname.rsplit(".", 1)[0] if "." in _fname else _fname
+                    if _target_mime:
+                        _meta = {"name": _base_name + " - " + _stem, "mimeType": _target_mime}
+                    else:
+                        _meta = {"name": _base_name + " - " + _fname}
+                    _body, _ctype = _ma_drive_multipart(_meta, _src_mime, _data)
+                    try:
+                        _resp = _hclient.post(
+                            "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType,webViewLink",
+                            content=_body,
+                            headers={"Authorization": _auth, "Content-Type": _ctype},
+                        )
+                        if _resp.status_code in (401, 403):
+                            return {"status": "auth_required",
+                                    "message": "Google Drive rejected the user's authorization (HTTP " + str(_resp.status_code)
+                                               + "). Ask the user to re-authorize the agent in Gemini Enterprise and try again."}
+                        if _resp.status_code != 200:
+                            _errors.append(_fname + " upload failed (HTTP " + str(_resp.status_code) + "): " + _resp.text[:150])
+                            continue
+                        _fmeta = _resp.json()
+                        _saved.append({"name": _fmeta.get("name", _fname),
+                                       "type": _label,
+                                       "webViewLink": _fmeta.get("webViewLink", "")})
+                    except Exception as _up_err:
+                        _errors.append(_fname + " upload error: " + str(_up_err)[:150])
+
+            if not _saved and not _kept_links:
+                return {"status": "error",
+                        "message": "No files could be saved to Drive. " + ("; ".join(_errors))[:400]}
+            _out = {
+                "status": "success" if not _errors else "partial",
+                "files": _saved + _kept_links,
+                "_MANDATORY_ACTION": "Present each file to the user as a markdown link (name -> webViewLink), stating its "
+                                     "type (Google Slides / Google Docs / Google Sheets / PDF / web page) in the user's "
+                                     "language. Converted files are native Google files in the user's My Drive.",
+            }
+            if _errors:
+                _out["problems"] = _errors
+            return _out
+

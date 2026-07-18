@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	discoveryengineapi "google.golang.org/api/discoveryengine/v1alpha"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -138,7 +139,7 @@ func TestListUserLicenses_HappyPath(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	assert.Equal(t, "", tok)
@@ -173,7 +174,7 @@ func TestListUserLicenses_NilLastLoginTime(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got, 1)
@@ -205,7 +206,7 @@ func TestListUserLicenses_CreateTimeMappedToAssignmentTime(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got, 1)
@@ -224,7 +225,7 @@ func TestListUserLicenses_EmptyPage(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, tok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	assert.Equal(t, "", tok)
@@ -269,7 +270,7 @@ func TestListUserLicenses_NextPageTokenPropagation(t *testing.T) {
 		Return(fakeIt1).Once()
 
 	adapter := newWithClient(mockClient)
-	got1, nextTok, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got1, nextTok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got1, licenseListPageSize)
@@ -281,7 +282,7 @@ func TestListUserLicenses_NextPageTokenPropagation(t *testing.T) {
 	mockClient.On("ListUserLicenses", mock.Anything, mock.AnythingOfType("*discoveryenginepb.ListUserLicensesRequest")).
 		Return(fakeIt2).Once()
 
-	got2, finalTok, err := adapter.ListUserLicenses(context.Background(), "my-project", nextTok)
+	got2, finalTok, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, nextTok)
 
 	require.NoError(t, err)
 	require.Len(t, got2, 1)
@@ -299,7 +300,7 @@ func TestListUserLicenses_ResourceExhausted(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrAPIRateLimited),
@@ -318,7 +319,7 @@ func TestListUserLicenses_Unavailable(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrAPIUnavailable),
@@ -337,7 +338,7 @@ func TestListUserLicenses_Unauthorized(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrLicenseListFailed),
@@ -363,7 +364,7 @@ func TestListUserLicenses_RevokedState(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	got, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.NoError(t, err)
 	require.Len(t, got, 1)
@@ -391,7 +392,7 @@ func TestListUserLicenses_UnknownState(t *testing.T) {
 		Return(fakeIt)
 
 	adapter := newWithClient(mockClient)
-	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", "")
+	_, _, err := adapter.ListUserLicenses(context.Background(), "my-project", models.LocationGlobal, "")
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrLicenseListFailed),
@@ -418,7 +419,7 @@ func TestBatchUpdateUserLicenses_ExceedsMaxBatchSize(t *testing.T) {
 	mockClient := new(fakeUserLicenseClient)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),
@@ -443,7 +444,7 @@ func TestBatchUpdateUserLicenses_Grant_SetsLicenseConfigAndMask(t *testing.T) {
 		Return(nil)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.NoError(t, err)
 
@@ -470,7 +471,7 @@ func TestBatchUpdateUserLicenses_Revoke_OmitsLicenseConfigAndMask(t *testing.T) 
 		Return(nil)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.NoError(t, err)
 
@@ -493,7 +494,7 @@ func TestBatchUpdateUserLicenses_APIError(t *testing.T) {
 		Return(makeGRPCError(codes.Unavailable))
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),
@@ -520,7 +521,7 @@ func TestBatchUpdateUserLicenses_LicensesExhausted(t *testing.T) {
 		Return(exhaustionErr)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),
@@ -547,7 +548,7 @@ func TestBatchUpdateUserLicenses_InvalidArgument_NonExhaustion_NotMapped(t *test
 		Return(otherPrecondErr)
 
 	adapter := newWithClient(mockClient)
-	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", updates)
+	err := adapter.BatchUpdateUserLicenses(context.Background(), "my-project", models.LocationGlobal, updates)
 
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, models.ErrBatchUpdateFailed),
@@ -556,4 +557,218 @@ func TestBatchUpdateUserLicenses_InvalidArgument_NonExhaustion_NotMapped(t *test
 		"ErrLicensesExhausted must not appear for non-exhaustion FailedPrecondition; err = %v", err)
 
 	mockClient.AssertExpectations(t)
+}
+
+// --- Endpoint helper tests ---
+
+func TestGRPCEndpointForLocation(t *testing.T) {
+	tests := []struct {
+		location models.Location
+		want     string
+	}{
+		{models.LocationGlobal, ""},
+		{models.LocationUS, usHost + ":443"},
+		{models.LocationEU, euHost + ":443"},
+	}
+	for _, tc := range tests {
+		t.Run(string(tc.location), func(t *testing.T) {
+			got := grpcEndpointForLocation(tc.location)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestRESTEndpointForLocation(t *testing.T) {
+	tests := []struct {
+		location models.Location
+		want     string
+	}{
+		{models.LocationGlobal, ""},
+		{models.LocationUS, "https://" + usHost + "/"},
+		{models.LocationEU, "https://" + euHost + "/"},
+	}
+	for _, tc := range tests {
+		t.Run(string(tc.location), func(t *testing.T) {
+			got := restEndpointForLocation(tc.location)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+// --- Client caching / factory tests ---
+
+// countingClient is a minimal userLicenseClient used to distinguish instances
+// by identity pointer in caching tests.
+type countingClient struct{ id int }
+
+func (c *countingClient) ListUserLicenses(_ context.Context, _ *discoveryenginepb.ListUserLicensesRequest) userLicenseIterator {
+	return newFakeIterator(nil, nil)
+}
+func (c *countingClient) BatchUpdateUserLicenses(_ context.Context, _ *discoveryenginepb.BatchUpdateUserLicensesRequest) error {
+	return nil
+}
+
+func TestClientFor_SameLocationReturnsCachedClient(t *testing.T) {
+	callCount := 0
+	clientA := &countingClient{id: 1}
+
+	adapter := newWithFactory(func(_ context.Context, _ models.Location) (userLicenseClient, error) {
+		callCount++
+		return clientA, nil
+	})
+
+	c1, err := adapter.clientFor(context.Background(), models.LocationUS)
+	require.NoError(t, err)
+
+	c2, err := adapter.clientFor(context.Background(), models.LocationUS)
+	require.NoError(t, err)
+
+	assert.Equal(t, 1, callCount, "factory must be called exactly once for the same location")
+	assert.Same(t, c1.(*countingClient), c2.(*countingClient), "same client instance must be returned on repeat call")
+}
+
+func TestClientFor_DifferentLocationsGetDistinctClients(t *testing.T) {
+	callCount := 0
+	factory := func(_ context.Context, _ models.Location) (userLicenseClient, error) {
+		callCount++
+		return &countingClient{id: callCount}, nil
+	}
+
+	adapter := newWithFactory(factory)
+
+	cGlobal, err := adapter.clientFor(context.Background(), models.LocationGlobal)
+	require.NoError(t, err)
+
+	cUS, err := adapter.clientFor(context.Background(), models.LocationUS)
+	require.NoError(t, err)
+
+	cEU, err := adapter.clientFor(context.Background(), models.LocationEU)
+	require.NoError(t, err)
+
+	assert.Equal(t, 3, callCount, "factory must be called once per distinct location")
+	assert.NotSame(t, cGlobal.(*countingClient), cUS.(*countingClient), "global and us clients must be distinct")
+	assert.NotSame(t, cUS.(*countingClient), cEU.(*countingClient), "us and eu clients must be distinct")
+	assert.NotSame(t, cGlobal.(*countingClient), cEU.(*countingClient), "global and eu clients must be distinct")
+}
+
+// --- accumulateLicenseConfigs / FetchLicenseConfigIndex index-building tests ---
+
+func TestAccumulateLicenseConfigs_SingleActiveEntry(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	key := models.LicenseConfigKey{SKU: models.SKUEnterprise, ProjectNumber: "123", Location: models.LocationGlobal}
+	require.Len(t, index[key], 1)
+	assert.Equal(t, "projects/123/locations/global/licenseConfigs/ent-1", index[key][0].Path)
+	assert.Equal(t, int64(50), index[key][0].AllocatedCount)
+}
+
+func TestAccumulateLicenseConfigs_TwoSubscriptionsSameSKUProjectLocation_BothAccumulated(t *testing.T) {
+	// Two active subscriptions with the same SKU+project+location must each
+	// produce a distinct entry in the slice rather than one silently overwriting
+	// the other.
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-pool-a": "30",
+			},
+		},
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-pool-b": "20",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	key := models.LicenseConfigKey{SKU: models.SKUEnterprise, ProjectNumber: "123", Location: models.LocationGlobal}
+	require.Len(t, index[key], 2, "both subscription pools must appear in the slice")
+
+	paths := map[string]int64{index[key][0].Path: index[key][0].AllocatedCount, index[key][1].Path: index[key][1].AllocatedCount}
+	assert.Equal(t, int64(30), paths["projects/123/locations/global/licenseConfigs/ent-pool-a"])
+	assert.Equal(t, int64(20), paths["projects/123/locations/global/licenseConfigs/ent-pool-b"])
+}
+
+func TestAccumulateLicenseConfigs_InactiveSubscription_Excluded(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "INACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "inactive subscription must not appear in the index")
+}
+
+func TestAccumulateLicenseConfigs_UnspecifiedTier_Excluded(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_UNSPECIFIED",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "unspecified subscription tier must not appear in the index")
+}
+
+func TestAccumulateLicenseConfigs_MalformedPath_Skipped(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"bad/path": "50",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "malformed licenseConfig path must be skipped")
+}
+
+func TestAccumulateLicenseConfigs_InvalidAllocatedCount_Skipped(t *testing.T) {
+	index := make(models.LicenseConfigIndex)
+	configs := []*discoveryengineapi.GoogleCloudDiscoveryengineV1alphaBillingAccountLicenseConfig{
+		{
+			State:            "ACTIVE",
+			SubscriptionTier: "SUBSCRIPTION_TIER_ENTERPRISE",
+			LicenseConfigDistributions: map[string]string{
+				"projects/123/locations/global/licenseConfigs/ent-1": "not-a-number",
+			},
+		},
+	}
+
+	accumulateLicenseConfigs(index, configs)
+
+	assert.Empty(t, index, "non-integer allocated count must be skipped")
 }
