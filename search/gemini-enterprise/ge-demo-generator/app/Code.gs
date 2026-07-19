@@ -88,8 +88,8 @@ const CONFIG = {
   // repo at this pinned ref at run time. Pin to a commit SHA so every
   // generated script keeps fetching exactly the files it was built for.
   // Override via Script Properties (TEMPLATE_REPO / TEMPLATE_REF) for testing.
-  TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/GoogleCloudPlatform/generative-ai.git',
-  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || '49f0bddb7c1e2b0b90cee7643c5eb961d33adf92',
+  TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/ryotat7/generative-ai.git',
+  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || 'd9441f4b5ed242e0581e5a7f548c2da4ae1f046e',
   TEMPLATE_SUBDIR: SCRIPT_PROPS.getProperty('TEMPLATE_SUBDIR') || 'search/gemini-enterprise/ge-demo-generator/agent_template',
   LOG_SHEET_URL: SCRIPT_PROPS.getProperty('LOG_SHEET_URL')
 };
