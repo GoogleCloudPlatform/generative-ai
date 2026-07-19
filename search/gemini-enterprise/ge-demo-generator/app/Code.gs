@@ -84,12 +84,15 @@ const CONFIG = {
   RETRY_DELAY_MS: 1000,
   APP_VERSION: 'v11.25-public',
   // Agent-template source: the generated setup script fetches the static
-  // Python/JSON template files (agent_template/ in the repo) from this
-  // repo at this pinned ref at run time. Pin to a commit SHA so every
-  // generated script keeps fetching exactly the files it was built for.
-  // Override via Script Properties (TEMPLATE_REPO / TEMPLATE_REF) for testing.
-  TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/ryotat7/generative-ai.git',
-  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || 'd9441f4b5ed242e0581e5a7f548c2da4ae1f046e',
+  // Python/JSON template files (agent_template/ in the repo) at run time.
+  // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
+  // concrete commit SHA at script-GENERATION time and that SHA is baked into
+  // each generated script, so scripts stay reproducible without this file
+  // ever committing its own merge SHA. Set the TEMPLATE_REF Script Property
+  // to a 40-hex SHA to hard-pin, or point TEMPLATE_REPO/TEMPLATE_REF at a
+  // fork/branch for pre-merge testing.
+  TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/GoogleCloudPlatform/generative-ai.git',
+  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || 'main',
   TEMPLATE_SUBDIR: SCRIPT_PROPS.getProperty('TEMPLATE_SUBDIR') || 'search/gemini-enterprise/ge-demo-generator/agent_template',
   LOG_SHEET_URL: SCRIPT_PROPS.getProperty('LOG_SHEET_URL')
 };
@@ -2274,23 +2277,45 @@ function generateSetupScript(params) {
   const safeShortName = bashEscape(agentShortName) || 'Agent';
   const safeSummary = bashEscape(oneSentenceSummary) || 'A2A Agent';
 
-  // Generation-time reachability check for the pinned agent-template ref.
-  // Surfaces a banner in the generated script (visible in the UI preview)
-  // instead of letting the customer's Cloud Shell discover a dead ref later.
+  // Agent-template ref: generation-time resolution + reachability check.
+  // A branch-name TEMPLATE_REF (the committed default is 'main') is resolved
+  // HERE to a concrete commit SHA and that SHA is baked into the generated
+  // script, keeping every script reproducible while the repo never has to
+  // commit its own merge SHA. A 40-hex TEMPLATE_REF (Script Property)
+  // hard-pins and skips resolution. On API failure the script falls back to
+  // fetching the ref as written (a branch fetch still works - it just tracks
+  // the tip), and a banner in the script preview explains what happened.
+  let templateRef = CONFIG.TEMPLATE_REF;
   let templateRefBanner = '';
   try {
     const repoMatch = CONFIG.TEMPLATE_REPO.match(/github\.com[:\/]([^\/]+\/[^\/.]+)/);
     if (repoMatch) {
+      const refIsSha = /^[0-9a-f]{40}$/i.test(templateRef);
       const refResp = UrlFetchApp.fetch(
-        'https://api.github.com/repos/' + repoMatch[1] + '/commits/' + encodeURIComponent(CONFIG.TEMPLATE_REF),
-        { muteHttpExceptions: true });
-      if (refResp.getResponseCode() !== 200) {
+        'https://api.github.com/repos/' + repoMatch[1] + '/commits/' + encodeURIComponent(templateRef),
+        { muteHttpExceptions: true, headers: getGithubHeaders() });
+      if (refResp.getResponseCode() === 200) {
+        if (!refIsSha) {
+          const resolvedSha = (JSON.parse(refResp.getContentText()) || {}).sha;
+          if (/^[0-9a-f]{40}$/i.test(resolvedSha || '')) {
+            templateRef = resolvedSha;
+          }
+        }
+      } else if (refIsSha) {
         templateRefBanner = '# =========================================================\n' +
           '# WARNING (generation-time check): agent-template ref\n' +
-          '#   ' + CONFIG.TEMPLATE_REF + '\n' +
+          '#   ' + templateRef + '\n' +
           '# was NOT reachable in ' + CONFIG.TEMPLATE_REPO + '\n' +
           '# when this script was generated. The template fetch below will\n' +
           '# likely fail. Update the TEMPLATE_REF Script Property and regenerate.\n' +
+          '# =========================================================\n\n';
+      } else {
+        templateRefBanner = '# =========================================================\n' +
+          '# NOTE (generation-time check): the agent-template ref \'' + templateRef + '\'\n' +
+          '# could not be resolved to a commit SHA when this script was\n' +
+          '# generated (GitHub API unreachable or rate-limited). The fetch\n' +
+          '# below will track the CURRENT TIP of that ref instead of a fixed\n' +
+          '# commit. Regenerate later for a fully pinned script.\n' +
           '# =========================================================\n\n';
       }
     }
@@ -3802,14 +3827,14 @@ fi
 # --- Agent Template Fetch (pinned) ---
 # Static Python/JSON files (ADK agent runtime, A2UI examples, data viewer) are
 # fetched from the repo at a pinned ref instead of being embedded here.
-echo "📥 Fetching agent template (ref ${CONFIG.TEMPLATE_REF})..."
+echo "📥 Fetching agent template (ref ${templateRef})..."
 GE_TPL_ROOT="$(pwd)/_ge_template"
 rm -rf "$GE_TPL_ROOT"
 git init -q "$GE_TPL_ROOT"
 git -C "$GE_TPL_ROOT" remote add origin "${CONFIG.TEMPLATE_REPO}"
 git -C "$GE_TPL_ROOT" sparse-checkout set --cone "${CONFIG.TEMPLATE_SUBDIR}" 2>/dev/null || true
-if ! git -C "$GE_TPL_ROOT" fetch -q --depth 1 --filter=blob:none origin "${CONFIG.TEMPLATE_REF}"; then
-  echo "❌ Could not fetch agent template ref '${CONFIG.TEMPLATE_REF}'"
+if ! git -C "$GE_TPL_ROOT" fetch -q --depth 1 --filter=blob:none origin "${templateRef}"; then
+  echo "❌ Could not fetch agent template ref '${templateRef}'"
   echo "   from ${CONFIG.TEMPLATE_REPO}."
   echo "   The pinned template version is unreachable. Ask the demo creator to"
   echo "   regenerate this script (the app's TEMPLATE_REF may need updating)."
