@@ -26,6 +26,8 @@ The **GE Demo Generator** is a low-code web application built on Google Apps Scr
 - **Managed Autonomous Agent (Antigravity)**: Optionally provisions a Pre-GA **Managed Agents API** agent (Antigravity harness) the demo agent can delegate long-horizon autonomous tasks to — live web research, code execution in a cloud sandbox, and professional deliverables (presentation decks, documents, PDFs, and web reports) crafted with mounted **SKILL.md** packs, with live progress streamed into the chat. Enabled by default; provisioning adds ~10 minutes (hidden behind the rest of the setup) and requires only the Vertex AI Agent Platform API — no allowlist.
 - **Workspace Authorization (No MCP)**: A lightweight alternative to Workspace MCP that adds Google sign-in for the demo user without any Developer-Preview allowlist. Combined with the Managed Agent, deliverables are saved to the user's Drive as native Google Slides / Docs / Sheets, and the autonomous agent acts on Gmail / Chat / Calendar via the open-source [Workspace CLI (gws)](https://github.com/googleworkspace/cli) inside its sandbox.
 - **Customer Domain Research**: Gemini-powered company research via Google Search grounding — automatically identifies business challenges and agent-automatable workflows from a customer's domain.
+- **Target Persona Selector**: Pick the demo's primary user (or describe a custom role) in the wizard — the selected persona becomes the protagonist of the generated scenario, demo guide, and agent instruction, keeping every step framed around that role's real workflow.
+- **Cross-Department Scenario Fabric**: Generated demos model realistic organizational hand-offs — records carry `current_department` / `next_department` fields plus an append-only audit-trail history, the agent narrates department-boundary transitions, and the Data Viewer surfaces the process stage as a badge. Quantitative grounding derived from domain research keeps the synthetic numbers business-plausible, and a coverage self-check warns when the demo guide fails to showcase a requested capability. Disable everything at once with the `DISABLE_CROSSORG_PACK` Script Property.
 - **Model Transparency**: Real-time model name announcement in the streaming response accordion for runtime visibility.
 - **Premium Live Architecture Dashboard**: Displays a high-fidelity interactive target architecture diagram SVG during the synthesis step with active pulsing and success glowing states across BigQuery, Gemini Agent, and Cloud Run nodes. Features an animated Dynamic Tips Carousel rotating every 12 seconds, a real-time Elapsed Timer, and an Automatic Retry Mechanism (up to 2 retries) for Apps Script generation robustness.
 
@@ -190,6 +192,8 @@ This codebase contains **no hardcoded parameters**. All configuration is managed
 | `TEMPLATE_REPO` | this repository | Git URL the generated setup script fetches `agent_template/` from at run time |
 | `TEMPLATE_REF` | pinned commit SHA in `Code.gs` | Commit SHA (or tag) of the agent template to fetch. Update whenever `agent_template/` changes so generated scripts keep fetching the files they were built for |
 | `TEMPLATE_SUBDIR` | `search/gemini-enterprise/ge-demo-generator/agent_template` | Repo path of the template directory |
+| `GITHUB_TOKEN` | (unset) | GitHub personal access token used for GitHub API calls when importing custom MCP servers from a repository URL. Only needed for private repos or to avoid unauthenticated rate limits |
+| `DISABLE_CROSSORG_PACK` | (unset) | Set to `1` to disable every cross-departmental prompt insertion (persona anchor, cross-department scenario fabric, process-state rules) at once — an admin rollback lever, not a user-facing option |
 
 > **Note**: The three `TEMPLATE_*` properties override the defaults baked into
 > `Code.gs`. Setting them lets a deployed app switch template sources (for
@@ -298,7 +302,9 @@ ge-demo-generator/
 ├── AGENTS.md                # AI agent development guide
 ├── deploy.sh                # Clasp deployment orchestrator script
 ├── validate_examples.py     # Validates agent_template JSON + Python files
-├── gebe-demo-generator/     # (Subproject) Drive/Docs provisioning engine
+├── ge-demo-generator-lite/  # (Subproject) GE Demo Generator Lite — Workspace
+│                            #  demo-data generator for Gemini Enterprise
+│                            #  editions without custom-agent support
 │   ├── appsscript.json
 │   ├── Code.gs
 │   ├── index.html

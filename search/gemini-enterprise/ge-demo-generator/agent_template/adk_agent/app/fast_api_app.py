@@ -1047,6 +1047,26 @@ logger = logging_client.logger(__name__)
 # BEFORE the agent runs. The user then picks inline / background / adjust.
 # Fail-open everywhere: any error => no card => the agent runs normally.
 # =============================================================================
+# Pre-browse delegation-note fragment (used inside the Managed-Agent-guarded
+# briefing-press handler; empty when Computer Use is off).
+_MA_PREBROWSE_EXCEPTION = (
+    'EXCEPTION - PRE-BROWSE: if the brief needs data that only interactive browsing '
+    'can obtain, run the COMPUTER USE browse sequence first and delegate immediately '
+    'after, in this same turn. '
+) if os.environ.get("ENABLE_COMPUTER_USE") == "1" else ""
+
+# Pre-browse planner override fragment: only meaningful when BOTH the Managed
+# Agent and Computer Use are enabled (spliced inside _MA_PLANNER_OVERRIDE).
+_MA_CU_BROWSER_EXCLUSION = (
+    "EXCLUSION - INTERACTIVE BROWSER OPERATION IS NOT AUTONOMOUS: when the PRIMARY goal is "
+    "to OPERATE a website interactively - go to a specific site and click / type / fill "
+    "forms / work a portal, or a live look-up the user wants to WATCH in the browser - the "
+    "assistant handles it NATIVELY with its own real browser (Computer Use); the autonomous "
+    "agent has NO interactive browser. Such a request is NOT signal (a) - classify it by the "
+    "remaining rules (usually QUICK or OTHER). It becomes AUTONOMOUS only when the browsing "
+    "is merely one input to a bigger job that ALSO carries signal (b), (c), or (d). "
+) if os.environ.get("ENABLE_COMPUTER_USE") == "1" else ""
+
 _MA_PLANNER_OVERRIDE = (
     "OVERRIDE - AUTONOMOUS CATEGORY (checked BEFORE the ANALYSIS rule): set category "
     "to 'AUTONOMOUS' when the message requires ANY of the following, regardless of how "
@@ -1073,6 +1093,7 @@ _MA_PLANNER_OVERRIDE = (
     "by the remaining rules (usually ANALYSIS or QUICK) unless the message ALSO contains a "
     "genuine autonomous signal (live web research, a downloadable office/PDF file, a Workspace "
     "action, or a computed what-if SIMULATOR whose model coefficients must be derived by code). "
+    + _MA_CU_BROWSER_EXCLUSION +
     "FOR AUTONOMOUS, return these ADDITIONAL keys instead of the analysis fields: "
     "card_title (a SHORT card heading of 3 to 6 words, e.g. the localized form of "
     "'Autonomous task - quick check'. This is a HEADING, NOT a restatement of the "
@@ -1105,6 +1126,12 @@ PREFLIGHT_CLASSIFIER_PROMPT = (
     "English name in the 'language' field. This is the ONLY language signal - ignore "
     "the business domain, place names, and any other text; judge solely by the words "
     "the user actually typed. "
+    "EXCEPTION: when a PREVIOUS USER MESSAGE block is provided below AND the USER "
+    "MESSAGE looks like a machine-generated command rather than natural human text "
+    "(a fixed template phrase, e.g. an imperative English one-liner referencing a "
+    "task/ticket id or tool-like action), use the language of the PREVIOUS USER "
+    "MESSAGE for STEP 1 instead - the human is conversing in THAT language and the "
+    "command text came from a button, not from their keyboard. "
     "STEP 2 (CLASSIFY): decide whether the message is a request for a HEAVY MULTI-STEP "
     "DATA ANALYSIS - several database queries plus synthesis such as correlation, "
     "sensitivity, forecasting, anomaly investigation, cross-source comparison, "
@@ -1182,6 +1209,29 @@ def _is_preflight_passthrough(text):
     _l = (text or "").lstrip().lower()
     return _l.startswith("run inline:") or _l.startswith("run in background:")
 
+def _last_typed_user_text(session):
+    # v11.6: latest HUMAN-TYPED user text from session history, used as a
+    # language reference for the pre-flight classifier. Skips chip presses
+    # (userAction JSON + their "User action triggered." filler) and the
+    # auto-generated SYSTEM NOTE parts appended to user messages.
+    try:
+        for _ev in reversed(getattr(session, "events", None) or []):
+            if getattr(_ev, "author", "") != "user":
+                continue
+            _content = getattr(_ev, "content", None)
+            for _p in (getattr(_content, "parts", None) or []):
+                _t = getattr(_p, "text", None)
+                if not _t or not _t.strip():
+                    continue
+                if "userAction" in _t or _t.strip() == "User action triggered.":
+                    continue
+                if _t.lstrip().startswith("SYSTEM NOTE"):
+                    continue
+                return _t.strip()[:200]
+    except Exception:
+        pass
+    return ""
+
 def _is_preflight_confirmed_press(run_args):
     # True only when the press came from the Analysis Plan card's OWN inline
     # button, which carries context {"pf": "1"}. Such a press is the user's
@@ -1205,7 +1255,10 @@ def _is_preflight_confirmed_press(run_args):
         return False
     return False
 
-async def _classify_for_preflight(text):
+async def _classify_for_preflight(text, prev_user_text=""):
+    # v11.6: prev_user_text is a short sample of the last HUMAN-TYPED message,
+    # passed as a language reference so fixed-English chip sendTexts do not
+    # flip the card language mid-conversation (see STEP 1 EXCEPTION).
     try:
         from google.genai import client as _genai_client
         _loc = os.environ.get("GOOGLE_CLOUD_LOCATION", "global")
@@ -1214,7 +1267,11 @@ async def _classify_for_preflight(text):
             http_options={"api_version": "v1"},
         )
         _model = os.environ.get("AGENT_MODEL_LITE", "gemini-3.5-flash")
-        _prompt = PREFLIGHT_CLASSIFIER_PROMPT + chr(10) + chr(10) + "USER MESSAGE:" + chr(10) + text
+        _prompt = PREFLIGHT_CLASSIFIER_PROMPT + chr(10) + chr(10)
+        if prev_user_text:
+            _prompt = (_prompt + "PREVIOUS USER MESSAGE (language reference only - NOT the request):"
+                       + chr(10) + prev_user_text[:200] + chr(10) + chr(10))
+        _prompt = _prompt + "USER MESSAGE:" + chr(10) + text
         _res = await asyncio.wait_for(
             asyncio.to_thread(
                 _client.models.generate_content,
@@ -2262,7 +2319,20 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             import builtins
             builtins._workspace_oauth_token = token
             logger.log_text(f"TOKEN SET via builtins._workspace_oauth_token (prefix: {token[:20]}..., len: {len(token)})")
-            
+            # v11.6: per-session registry read by header_provider Strategy0.
+            # This is the ONLY per-session store that stays fresh: mutating
+            # session.state below does NOT persist (see comment there).
+            try:
+                if not hasattr(builtins, '_ws_session_tokens'):
+                    builtins._ws_session_tokens = {}
+                _wst = builtins._ws_session_tokens
+                _wst.pop(session_id, None)
+                _wst[session_id] = token
+                while len(_wst) > 50:
+                    _wst.pop(next(iter(_wst)))
+            except Exception:
+                pass
+
         if token and auth_id:
             initial_state[auth_id] = token
             
@@ -2274,8 +2344,14 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
               session_id=session_id,
           )
         else:
-          # Update state if token is present in the new request
-          # InMemorySessionService stores references, so direct mutation is sufficient
+          # Update state if token is present in the new request.
+          # v11.6 NOTE: this mutation does NOT persist - InMemorySessionService.
+          # get_session returns a COPY, so the stored session keeps the
+          # CREATE-time token forever (confirmed live 2026-07-16: it went stale
+          # after the ~1h rotation and broke Drive saves). Kept only so code
+          # reading THIS in-memory copy within the turn sees the fresh value;
+          # the durable fresh sources are builtins._workspace_oauth_token and
+          # builtins._ws_session_tokens (header_provider Strategies 0/1).
           if token and auth_id:
               session.state[auth_id] = token
           # Clear stale tool results from previous turns to prevent accidental force-injection
@@ -2308,6 +2384,22 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
             _gate_is_inline = _gate_l.startswith("run inline:")
             _gate_is_bg = _gate_l.startswith("run in background:")
             _gate_skip = _gate_is_bg or _is_preflight_confirmed_press(run_args)
+            # v11.6: fixed-English COMMAND chips (mandated verbatim sendTexts)
+            # must go straight to the agent, never to the classifier. Confirmed
+            # live 2026-07-16: "Save the deliverables..." was classified as
+            # AUTONOMOUS, hijacking the inline save_deliverables_to_drive flow
+            # into a sandbox delegation AND rendering the briefing card in
+            # English mid-Japanese conversation (the fixed English sendText is
+            # the only language signal the classifier sees). The other two
+            # command chips waste a classifier LLM call per press the same way.
+            _CMD_CHIP_PREFIXES = (
+                "save the deliverables of task",
+                "show the full detailed report for task",
+                "check progress of task",
+            )
+            if not _gate_skip and any(_gate_l.startswith(_p) for _p in _CMD_CHIP_PREFIXES):
+                _gate_skip = True
+                logger.log_text("[preflight_gate] command-chip passthrough: " + _gate_l[:80])
             if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
                 # Autonomous Briefing card press (context ra=1): skip re-carding
                 # and pin the delegation deterministically via a system note.
@@ -2333,6 +2425,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                                     'task_description ')
                             _ra_note = _ra_note + (
                                 '(rewrite it into outcome-only wording if it references internal tool names). '
+                                + _MA_PREBROWSE_EXCEPTION +
                                 'Do NOT ask any further clarifying questions and do NOT run the analysis inline.')
                             _ra_nm.parts.append(genai_types.Part(text=_ra_note))
                             logger.log_text('[autonomous_briefing] confirmed press - pinned delegation note (' + str(len(_ra_pairs)) + ' answers)')
@@ -2403,7 +2496,10 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                     return
 
             if _gate_scope and not _gate_skip:
-                _plan = await _classify_for_preflight(_gate_scope)
+                # v11.6: pass the last human-typed message as a language
+                # reference so an English chip sendText cannot flip the
+                # card language (STEP 1 EXCEPTION in the classifier prompt).
+                _plan = await _classify_for_preflight(_gate_scope, _last_typed_user_text(session))
                 if isinstance(_plan, dict) and _plan.get("category") == "ANALYSIS":
                     _pf_parts = _build_preflight_card_parts(_plan, _gate_scope)
                     if _pf_parts:
@@ -2975,11 +3071,20 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                   artifact_text_parts.append(_schema_err_part)
                   _fatal_config_error = True
                   break
-              # --- MALFORMED_FUNCTION_CALL recovery ---
+              # --- MALFORMED_FUNCTION_CALL / MODEL_RETURNED_NO_CONTENT recovery ---
               # The model sometimes generates invalid tool calls (bad schema,
               # mixed text + function_call). Instead of failing hard, provide
               # a user-friendly retry message so the conversation can continue.
-              if 'MALFORMED_FUNCTION_CALL' in _err_code_str:
+              # v11.15: MODEL_RETURNED_NO_CONTENT (an empty candidate, observed
+              # right after large inline code-execution results) is transient in
+              # the same way MALFORMED is: the session already holds every tool
+              # result, and a healed re-run recovers it. Route both through the
+              # SAME retry budget and, when exhausted, the same tool-forbidden
+              # synthesis salvage below (previously it fell through the ladder
+              # and surfaced as a bare "Error: MODEL_RETURNED_NO_CONTENT").
+              if ('MALFORMED_FUNCTION_CALL' in _err_code_str
+                      or 'MODEL_RETURNED_NO_CONTENT' in _err_full_str
+                      or 'returned no content' in _err_full_str.lower()):
                   # --- Auto-retry: flag for re-run; _all_events() heals + restarts ---
                   # Session healing, parser reset, and the fresh run are handled by
                   # the _all_events() wrapper so the retry's events flow back through
@@ -2988,7 +3093,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                   # post-retry report (incl. A2UI JSON) as raw text.
                   if _malformed_retries < _max_malformed_retries:
                       _malformed_retries += 1
-                      logger.log_text("MALFORMED_FUNCTION_CALL detected - auto-retrying (" + str(_malformed_retries) + "/" + str(_max_malformed_retries) + ")")
+                      logger.log_text("Transient model error (" + _err_code_str[:60] + ") - auto-retrying (" + str(_malformed_retries) + "/" + str(_max_malformed_retries) + ")")
                       _malformed_should_retry = True
                       continue  # _all_events() heals the session and re-runs
 
@@ -3000,7 +3105,7 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
                   # the report in the same turn the vast majority of the time. The B-1
                   # guaranteed fallback (further below) remains the true last resort, so
                   # the user is no longer forced to click "Try Again" repeatedly.
-                  logger.log_text("MALFORMED_FUNCTION_CALL detected - retries exhausted - routing to tool-forbidden synthesis salvage")
+                  logger.log_text("Transient model error (" + _err_code_str[:60] + ") - retries exhausted - routing to tool-forbidden synthesis salvage")
                   break
               # --- X-C (v10.62): input-token overflow / client-error salvage ---
               # A 1M-token context overflow surfaces as a ClientError /

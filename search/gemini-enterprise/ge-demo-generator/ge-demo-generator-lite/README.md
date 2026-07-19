@@ -13,8 +13,13 @@ deployment; the root project's `clasp push` does not include it.
 
 ## How it works
 
-1. **Plan** (`planGEBEDemo`) — one Gemini call returns the folder name, demo prompts, and
+1. **Plan** (`planDemo`) — one Gemini call returns the folder name, demo prompts, and
    the file list with content, in the user's language, anchored to today's date.
+   A **Target Persona** selector in the wizard (or a custom role description) anchors
+   the whole demo — documents, prompts, and the guide — around that persona's own
+   business process, with realistic cross-department hand-offs and research-grounded
+   numbers. The goal optimizer (`optimizeGoalWithMagicWand`) and company research
+   (`researchCompanyByDomain`) also take the selected persona into account.
 2. **Folder** (`createDemoFolder`) — find-or-create `My Demos`, then a per-demo subfolder.
 3. **Generate** (`generateOneFile`, called once per file from the frontend) — creates each
    Doc/Sheet/Slide/image in the subfolder; attaches Office/PDF exports when requested.
@@ -26,7 +31,7 @@ deployment; the root project's `clasp push` does not include it.
 
 1. Create the Google Cloud-backed Apps Script project and set `scriptId` in `.clasp.json`
    (or run `clasp create` from inside this directory).
-2. From inside `gebe-demo-generator/`, run `clasp push` (uses the local `.clasp.json`,
+2. From inside `ge-demo-generator-lite/`, run `clasp push` (uses the local `.clasp.json`,
    not the repo root one).
 3. Set Script Properties via the editor: run `initializeProject(projectId)` — or set
    `PROJECT_ID` manually. Optional: `LOCATION` (default `global`), `MODEL`

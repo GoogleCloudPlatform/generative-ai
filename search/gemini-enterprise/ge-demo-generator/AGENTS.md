@@ -129,6 +129,20 @@ can delegate long-running autonomous work to over the **Interactions API**
   `modern-web-guidance` skill is cloned fresh from GitHub at setup time.
 - **Tunables** (env): `MANAGED_AGENT_SYNC_WAIT_S` (30),
   `MANAGED_AGENT_MAX_RUNTIME_S` (1800), `MANAGED_AGENT_POLL_EXTRA_S` (3600).
+- **Pre-browse (v11.22+)**: a third derived gate, `preBrowseEnabled =
+  enableManagedAgent && enableComputerUse`, threads Computer-Use browser
+  findings into delegations: interactive site operation always stays with the
+  root agent's real browser; for composite jobs the browse runs FIRST and its
+  result_summary is passed via `input_data`. In the templates this appears as
+  `ENABLE_COMPUTER_USE`-guarded splice fragments inside the Managed-Agent
+  blocks (`_MA_CU_BROWSER_EXCLUSION`, `_MA_PREBROWSE_EXCEPTION` in
+  fast_api_app.py and the CU-conditional fragments in agent.py).
+- **Workspace token freshness (v11.6+)**: `session.state` only ever holds the
+  CREATE-time OAuth token (ADK's InMemorySessionService returns copies), so
+  the runtime keeps two always-fresh sources — the process-global
+  `builtins._workspace_oauth_token` and the per-session
+  `builtins._ws_session_tokens` registry — and `_workspace_header_provider`
+  tries them freshest-first. Do not "simplify" back to state-based lookup.
 
 ## 4. Template fetch pinning (TEMPLATE_REF)
 

@@ -1592,6 +1592,25 @@ limitations under the License.
               <p class="text-[11px] text-gray-500">Select a template or describe your customer's problem</p>
             </div>
           </div>
+          <!-- Target Persona (Optional) — placed BEFORE domain research so the
+               persona is chosen first and shapes the research results. -->
+          <div id="personaSection" class="mb-8 p-5 bg-gradient-to-br from-indigo-900/15 to-blue-900/10 rounded-2xl border border-indigo-500/20 backdrop-blur-sm">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-7 h-7 bg-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              </div>
+              <label class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Target Persona</label>
+              <span class="text-[8px] font-normal lowercase text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">Optional</span>
+            </div>
+            <p class="text-[11px] text-gray-400 mb-4 leading-relaxed">Choose who the demo agent is for. Domain research below and Optimize Prompt will frame the business scenario around this role's own business process. Leave on Auto to let the AI pick the best-fit role.</p>
+            <div id="personaFilters" class="flex flex-wrap gap-2"><!-- injected by renderPersonaSelector() --></div>
+            <div id="personaCustomWrap" class="hidden mt-3">
+              <input id="personaCustomInput" type="text" maxlength="120" oninput="updatePersonaRerunHint()"
+                class="w-full bg-gray-900/60 border border-indigo-500/30 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                placeholder="e.g. Plant Quality Assurance Manager, Hospital Bed Coordinator...">
+            </div>
+          </div>
+
           <!-- Customer Domain Research (Optional) -->
           <div id="domainResearchSection" class="mb-8 p-5 bg-gradient-to-br from-violet-900/15 to-purple-900/10 rounded-2xl border border-violet-500/20 backdrop-blur-sm">
             <div class="flex items-center gap-2 mb-4">
@@ -1628,6 +1647,11 @@ limitations under the License.
 
             <!-- Research Result Card -->
             <div id="researchResult" class="hidden mt-5 bg-black/30 border border-violet-500/25 rounded-2xl overflow-hidden animate-slide-down">
+              <!-- Persona changed after research: offer a re-run so the results reflect the new persona -->
+              <div id="personaRerunHint" class="hidden p-3 bg-indigo-500/10 border-b border-indigo-500/30 flex flex-col sm:flex-row sm:items-center gap-2">
+                <p class="flex-1 text-[11px] text-indigo-300 leading-relaxed">⚠️ The Target Persona changed after this research ran. Re-run it so challenges, workflows, and the suggested scenario reflect the new persona.</p>
+                <button onclick="researchDomain()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider transition-all active:scale-[0.97] whitespace-nowrap">↻ Re-run Research</button>
+              </div>
               <!-- Company Header -->
               <div class="p-5 border-b border-white/5">
                 <div class="flex items-center gap-3 mb-2">
@@ -2758,7 +2782,9 @@ limitations under the License.
           }
 
           cachedResearchData = res;
+          cachedResearchData._personaKey = currentPersonaKey();
           renderResearchResult(res);
+          updatePersonaRerunHint();
         })
         .withFailureHandler(err => {
           btn.disabled = false;
@@ -2769,7 +2795,7 @@ limitations under the License.
           document.getElementById('researchError').classList.remove('hidden');
           document.getElementById('researchErrorText').textContent = '⚠️ ' + (err.message || 'An unexpected error occurred.');
         })
-        .researchCompanyByDomain(domain);
+        .researchCompanyByDomain(domain, getSelectedPersona());
     }
 
     function renderResearchResult(data) {
@@ -2933,7 +2959,7 @@ limitations under the License.
           if (res && res.success) {
             el.value = res.optimizedGoal;
             localStorage.setItem('ge_generator_input', res.optimizedGoal);
-            setGoalTab('edit'); // Switch to edit tab
+            setGoalTab('preview'); // Show the optimized markdown rendered
             showToast('✨ Prompt optimized successfully!');
           } else {
             showToast('❌ Optimization failed: ' + (res.error || 'Unknown error'));
@@ -2953,7 +2979,8 @@ limitations under the License.
         .optimizeGoalWithMagicWand(rawGoal, {
           enableManagedAgent: document.getElementById('enableManagedAgent') ? document.getElementById('enableManagedAgent').checked : true,
           enableWorkspaceMcp: window.workspaceMcpIncluded || false,
-          enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false
+          enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false,
+          persona: getSelectedPersona()
         });
     }
 
@@ -2978,7 +3005,10 @@ limitations under the License.
         .map(w => w.name)
         .sort();
       const selectedNames = selectedWorkflows.map(w => w.name).sort();
-      const isUnchanged = JSON.stringify(originalAutoNames) === JSON.stringify(selectedNames);
+      // Persona changes after research invalidate the cached suggestedGoal too:
+      // force a regeneration so the scenario reflects the newly chosen persona.
+      const personaUnchanged = currentPersonaKey() === (cachedResearchData._personaKey || 'auto');
+      const isUnchanged = JSON.stringify(originalAutoNames) === JSON.stringify(selectedNames) && personaUnchanged;
 
       if (isUnchanged) {
         // No change — use original suggestedGoal directly
@@ -3003,7 +3033,8 @@ limitations under the License.
           })
           .regenerateGoalForWorkflows(
             { companyName: cachedResearchData.companyName, industry: cachedResearchData.industry, companySummary: cachedResearchData.companySummary },
-            selectedWorkflows
+            selectedWorkflows,
+            getSelectedPersona()
           );
       }
     }
@@ -3952,6 +3983,85 @@ limitations under the License.
     let selectedIndustry = 'retail';
     let selectedFunction = 'all';
 
+    // ---- Target Persona selector ----
+    // The persona shapes the generated goal in all three shaping paths
+    // (domain research, workflow re-apply, magic wand). 'auto' = current
+    // behavior (the LLM invents the role). Descriptions are sent to the
+    // backend prompts in English; the output language adapts to the input.
+    const PERSONA_PRESETS = [
+      { id: 'auto',             label: 'Auto',                   description: '' },
+      { id: 'ceo_exec',         label: 'CEO / Executive',        description: 'a CEO or executive leader responsible for company-wide strategy, cross-functional alignment, portfolio decisions, and top-line and bottom-line performance' },
+      { id: 'cfo_finance',      label: 'CFO / Corp Planning',    description: 'a CFO or corporate planning / FP&A leader responsible for budgeting, forecasting, financial close, and management reporting' },
+      { id: 'sales_director',   label: 'Sales Director',         description: 'a sales director responsible for pipeline management, revenue forecasting, account strategy, and quota attainment' },
+      { id: 'marketing_lead',   label: 'Marketing Lead',         description: 'a marketing lead responsible for campaign planning, lead generation, budget allocation (ROAS/CPA), and brand performance' },
+      { id: 'scm_manager',      label: 'SCM Manager',            description: 'a supply chain manager responsible for demand forecasting, inventory optimization, procurement, and logistics coordination' },
+      { id: 'procurement',      label: 'Procurement Manager',    description: 'a procurement manager responsible for supplier selection, purchase orders, contract compliance, and cost reduction' },
+      { id: 'plant_manager',    label: 'Plant / Production',     description: 'a plant or production manager responsible for production scheduling, equipment utilization, quality control, and safety compliance' },
+      { id: 'qa_manager',       label: 'Quality Assurance',      description: 'a quality assurance manager responsible for inspection workflows, defect tracking, root-cause analysis, and regulatory quality standards' },
+      { id: 'field_operator',   label: 'Field Operator',         description: 'a frontline field operations supervisor responsible for work orders, equipment inspection, maintenance, and safety reporting' },
+      { id: 'store_manager',    label: 'Store / Branch Manager', description: 'a store or branch manager responsible for daily sales operations, staffing, local inventory, and customer experience' },
+      { id: 'cs_lead',          label: 'Customer Support Lead',  description: 'a customer support lead responsible for ticket triage, SLA compliance, escalation handling, and customer satisfaction' },
+      { id: 'hr_lead',          label: 'HR Lead',                description: 'an HR leader responsible for recruiting, onboarding, workforce planning, and employee engagement' },
+      { id: 'it_infosys',       label: 'IT / Info Systems',      description: 'an IT / information systems manager responsible for core system operations, integrations, service requests, and security compliance' },
+      { id: 'legal_compliance', label: 'Legal & Compliance',     description: 'a legal and compliance officer responsible for contract review, regulatory reporting, audit readiness, and risk mitigation' },
+      { id: 'product_rnd',      label: 'Product / R&D Lead',     description: 'a product or R&D lead responsible for roadmap planning, feature prioritization, experiment analysis, and time-to-market' },
+      { id: 'custom',           label: 'Custom...',              description: '' }
+    ];
+    let selectedPersonaId = 'auto';
+
+    // Stable key for change detection: distinguishes custom-text edits too.
+    function currentPersonaKey() {
+      const p = getSelectedPersona();
+      return p ? (p.id + '|' + p.label) : 'auto';
+    }
+
+    // Shows a banner inside the research result card when the persona was
+    // changed AFTER research ran, so the user knows to re-run it.
+    function updatePersonaRerunHint() {
+      const hint = document.getElementById('personaRerunHint');
+      if (!hint) return;
+      const stale = !!(cachedResearchData &&
+        !document.getElementById('researchResult').classList.contains('hidden') &&
+        currentPersonaKey() !== (cachedResearchData._personaKey || 'auto'));
+      hint.classList.toggle('hidden', !stale);
+    }
+
+    function renderPersonaSelector() {
+      const container = document.getElementById('personaFilters');
+      if (!container) return;
+      container.innerHTML = '';
+      PERSONA_PRESETS.forEach(p => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => {
+          selectedPersonaId = p.id;
+          document.getElementById('personaCustomWrap').classList.toggle('hidden', p.id !== 'custom');
+          if (p.id === 'custom') document.getElementById('personaCustomInput').focus();
+          renderPersonaSelector();
+          updatePersonaRerunHint();
+        };
+        const isActive = selectedPersonaId === p.id;
+        btn.className = `px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all border ${isActive
+          ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-lg shadow-indigo-500/20'
+          : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'}`;
+        btn.innerText = p.label;
+        container.appendChild(btn);
+      });
+    }
+
+    // Returns null when no persona is selected (Auto, or Custom left empty),
+    // which keeps every server prompt identical to the pre-persona behavior.
+    function getSelectedPersona() {
+      if (selectedPersonaId === 'custom') {
+        const text = document.getElementById('personaCustomInput').value.trim();
+        if (!text) return null;
+        return { id: 'custom', label: text.substring(0, 120), description: text.substring(0, 300), custom: true };
+      }
+      if (!selectedPersonaId || selectedPersonaId === 'auto') return null;
+      const preset = PERSONA_PRESETS.find(p => p.id === selectedPersonaId);
+      return preset ? { id: preset.id, label: preset.label, description: preset.description } : null;
+    }
+
     function updateSamples() {
       const langSelector = document.getElementById('langSelector');
       const lang = (langSelector && langSelector.value) || 'en';
@@ -4109,7 +4219,17 @@ limitations under the License.
         enableWorkspaceMcp: window.workspaceMcpIncluded || false,
         enableComputerUse: document.getElementById('enableComputerUse') ? document.getElementById('enableComputerUse').checked : false,
         enableManagedAgent: document.getElementById('enableManagedAgent') ? document.getElementById('enableManagedAgent').checked : false,
-        enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false
+        enableWorkspaceAuth: document.getElementById('enableWorkspaceAuth') ? document.getElementById('enableWorkspaceAuth').checked : false,
+        targetPersona: (getSelectedPersona() || {}).label || null,
+        targetPersonaDesc: (getSelectedPersona() || {}).description || null,
+        // M4 (P17-lite): pass researched real-world scale facts, but only when
+        // the goal is still about the researched company (guards against
+        // researching company A then hand-writing a goal about company B).
+        quantFacts: (cachedResearchData && cachedResearchData.quantFacts &&
+                     Object.keys(cachedResearchData.quantFacts).length &&
+                     userGoal.includes(cachedResearchData.companyName))
+          ? { companyName: cachedResearchData.companyName, facts: cachedResearchData.quantFacts }
+          : null
       };
 
       generationRetryCount = 0; // Reset retry count for a fresh generation
@@ -4179,6 +4299,9 @@ limitations under the License.
                 
                 // Handle persistence feedback
                 showToast('✅ Demo generated successfully!');
+                if (res.coverageWarnings && res.coverageWarnings.length) {
+                  showToast('⚠️ Demo guide may not showcase: ' + res.coverageWarnings.join(', ') + ' — review the guide before the demo.', 9000);
+                }
               } catch (uiErr) {
                 console.error('UI Rendering Error:', uiErr);
               }
@@ -4373,7 +4496,8 @@ limitations under the License.
                     <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 w-6 h-6 rounded-lg flex items-center justify-center shadow-inner tracking-tighter">${i + 1}</span>
                     <p class="text-[11px] font-bold text-gray-300 uppercase tracking-widest">${title}</p>
                     ${isAWT ? `<span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">AWT</span>` : ''}
-                    ${tags.map(tag => `<span class="text-[9px] font-medium text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20">${tag}</span>`).join('')}
+                    ${tags.includes('encore') ? `<span class="text-[10px] font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/30" title="Optional overflow showcase - run if time allows">ENCORE · OPTIONAL</span>` : ''}
+                    ${tags.filter(t => t !== 'encore').map(tag => `<span class="text-[9px] font-medium text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20">${tag}</span>`).join('')}
                   </div>
                   <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/5 border border-emerald-500/10">
                     <span class="relative flex h-1.5 w-1.5">
@@ -4384,8 +4508,9 @@ limitations under the License.
                   </div>
                </div>
                 <div class="relative bg-black/60 rounded-xl p-4 border border-white/5 hover:border-emerald-500/30 transition-all min-w-0 group/copy">
-                  <p class="text-[13px] text-sky-200 select-text leading-relaxed font-mono">${prompt}</p>
-                  <button onclick="copyToClipboard(this.previousElementSibling.innerText)" class="absolute top-3 right-3 p-2 rounded-lg bg-emerald-500/10 backdrop-blur-md text-emerald-400/70 opacity-0 group-hover/copy:opacity-100 transition-all border border-emerald-500/20 shadow-lg hover:text-emerald-300 hover:bg-emerald-500/30 hover:border-emerald-500/50 active:bg-emerald-500 active:text-white active:border-emerald-400 active:scale-95 flex items-center gap-1.5 cursor-pointer duration-200" title="Copy prompt">
+                  <p class="guide-prompt-text text-[13px] text-sky-200 select-text leading-relaxed font-mono">${prompt}</p>
+                  ${typeof step === 'object' && step.watchPoint ? `<p class="text-[10px] text-purple-300/90 mt-2 pt-2 border-t border-white/5">👀 <span class="font-bold uppercase tracking-wider text-purple-400/80 mr-1">Watch</span>${step.watchPoint}</p>` : ''}
+                  <button onclick="copyToClipboard(this.parentElement.querySelector('.guide-prompt-text').innerText)" class="absolute top-3 right-3 p-2 rounded-lg bg-emerald-500/10 backdrop-blur-md text-emerald-400/70 opacity-0 group-hover/copy:opacity-100 transition-all border border-emerald-500/20 shadow-lg hover:text-emerald-300 hover:bg-emerald-500/30 hover:border-emerald-500/50 active:bg-emerald-500 active:text-white active:border-emerald-400 active:scale-95 flex items-center gap-1.5 cursor-pointer duration-200" title="Copy prompt">
                     <span class="text-[10px] font-bold tracking-wide">COPY</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                   </button>
@@ -5618,6 +5743,7 @@ limitations under the License.
 
       // Deep Link Auto-Load: restore demo if demoId is in URL
       updateSamples();
+      renderPersonaSelector();
       updateProjectSetCmd();
 
       // Onboarding check
