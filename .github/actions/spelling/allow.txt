@@ -96,8 +96,8 @@ AServer
 ASF
 ASGI
 Ashish
-Asis
 asis
+Asis
 ASML
 Aspeed
 astype
@@ -626,6 +626,7 @@ gdkx
 GDM
 gdp
 geboten
+gecos
 gemhall
 genai
 genkit
@@ -687,6 +688,7 @@ gradio
 gradlew
 graphrag
 Graterol
+Gribkoff
 gridcolor
 gridless
 gridline
@@ -1137,13 +1139,14 @@ Mvar
 mvn
 mvnw
 mvp
-MWG
 mwg
+MWG
 MWh
 mwouts
 myaccount
 mydb
 mydomain
+myuser
 NADPH
 Nagar
 Nagasu
@@ -1513,6 +1516,7 @@ RVR
 RYDE
 saaagesh
 Sahel
+sampwidth
 SAOT
 sargentii
 Sasquatch
