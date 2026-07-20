@@ -96,8 +96,8 @@ AServer
 ASF
 ASGI
 Ashish
-Asis
 asis
+Asis
 ASML
 Aspeed
 astype
@@ -1137,8 +1137,8 @@ Mvar
 mvn
 mvnw
 mvp
-MWG
 mwg
+MWG
 MWh
 mwouts
 myaccount
