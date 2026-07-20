@@ -629,6 +629,7 @@ gdkx
 GDM
 gdp
 geboten
+gecos
 gemhall
 genai
 genkit
@@ -690,6 +691,7 @@ gradio
 gradlew
 graphrag
 Graterol
+Gribkoff
 gridcolor
 gridless
 gridline
@@ -1150,6 +1152,7 @@ mwouts
 myaccount
 mydb
 mydomain
+myuser
 NADPH
 Nagar
 Nagasu
@@ -1371,8 +1374,8 @@ Pranav
 praw
 prcntg
 PRD
-PREBROWSE
 Pré
+PREBROWSE
 preds
 pregel
 produc
@@ -1521,6 +1524,7 @@ RVR
 RYDE
 saaagesh
 Sahel
+sampwidth
 SAOT
 sargentii
 Sasquatch
