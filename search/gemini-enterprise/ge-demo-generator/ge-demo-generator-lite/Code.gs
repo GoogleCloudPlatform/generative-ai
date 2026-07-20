@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * GEBE Demo Generator - Backend (Code.gs)
+ * GE Demo Generator Lite - Backend (Code.gs)
  *
  * Gemini Enterprise Business Edition (GEBE) does not support custom ADK agents.
  * Instead of generating a Cloud setup script, this app synthesizes demo content
@@ -38,7 +38,7 @@ const CONFIG = {
   MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.5-flash',
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v1.2-public',
+  APP_VERSION: 'v1.6-public',
   MY_DEMOS_FOLDER: 'My Demos'
 };
 
@@ -161,7 +161,7 @@ function buildImagePromptWithRows_(spec) {
     ? spec.imageRows.map(function (r) { return String(r).trim(); }).filter(function (r) { return r.length > 0; })
     : [];
   if (rows.length < 2) {
-    console.warn('[GEBE-ImageGen] ' + (spec.fileName || 'image') + ' has fewer than 2 imageRows; using raw imagePrompt.');
+    console.warn('[GEDemoLite-ImageGen] ' + (spec.fileName || 'image') + ' has fewer than 2 imageRows; using raw imagePrompt.');
     return spec.imagePrompt;
   }
   var columns = Array.isArray(spec.imageColumns)
@@ -289,7 +289,7 @@ function detectGoalLanguage_(userGoal) {
 }
 
 // ===========================================
-// Phase A: Planning (planGEBEDemo)
+// Phase A: Planning (planDemo)
 // ===========================================
 
 /**
@@ -300,7 +300,7 @@ function detectGoalLanguage_(userGoal) {
  * @param {object} options - { domain, includeDocs, includeSheets, includeSlides,
  *                             includeImages, includePdf }
  */
-function planGEBEDemo(userGoal, options) {
+function planDemo(userGoal, options) {
   options = options || {};
   if (!userGoal || !String(userGoal).trim()) throw new Error('A business goal is required.');
 
@@ -333,6 +333,39 @@ function planGEBEDemo(userGoal, options) {
   // languages associated with the countries/companies the goal mentions.
   const detectedLang = detectGoalLanguage_(userGoal);
 
+  // v1.6: anchor persona - the wizard's Target Persona becomes the demo's
+  // protagonist across files, agent prompt, and demo guide. Empty = unchanged.
+  const personaDesc = sanitizePersonaText_(options.persona);
+  const personaRule = personaDesc
+    ? '11. ANCHOR PERSONA (MANDATORY): the demo creator selected the primary user of this demo: ' + personaDesc + '. ' +
+      'This persona is the PROTAGONIST: frame the main document and the first demoGuide step around this ' +
+      'persona\'s own business process; in agentDesignerPrompt, state that the agent primarily serves this ' +
+      'role; keep the persona as the recurring protagonist across demoGuide steps and cast other roles as ' +
+      'hand-off counterparts (the departments the process flows to or from), never replacing the protagonist. ' +
+      'Even when the scenario suggests a different natural protagonist, the selected persona wins.\n'
+    : '';
+  // v1.6: cross-departmental fabric (light port of the internal cross-org pack).
+  const crossDeptRule =
+    '12. CROSS-DEPARTMENTAL FABRIC: design the demo as a slice of ONE company\'s shared operations, not a ' +
+    'single team\'s folder. At least one spreadsheet must be shared operational data that TWO OR MORE ' +
+    'departments use for different purposes (e.g. orders created by sales, fulfilled by logistics, invoiced ' +
+    'by finance), and the demoGuide story must include at least one HAND-OFF between departments (one step\'s ' +
+    'output becomes the input another department\'s role acts on in a later step). ESCAPE HATCH: where the ' +
+    'goal plausibly involves only one department, use an adjacent supporting function instead and never force ' +
+    'unnatural departments - the goal always wins.\n';
+  // v1.6: quantitative grounding from domain research (port of P17-lite).
+  let groundingBlock = '';
+  if (options.quantFacts && options.quantFacts.facts && Object.keys(options.quantFacts.facts).length) {
+    const bt = String.fromCharCode(96);
+    const factsText = JSON.stringify(options.quantFacts.facts).split(bt).join('');
+    const qfName = String(options.quantFacts.companyName || 'the company').split(bt).join('');
+    groundingBlock = 'DATA GROUNDING (verified real-world scale): the following facts about ' + qfName +
+      ' were gathered from public sources during domain research. Reflect them so the demo feels like THIS ' +
+      'organization: spreadsheet scale, regional mixes, product categories, and document narratives should be ' +
+      'plausible for an organization of this size (scaled down to the row ceilings). Apply ONLY if the ' +
+      'BUSINESS GOAL is about this company.\n' + factsText + '\n\n';
+  }
+
   const prompt =
     'You are a senior demo data architect. Design a realistic, RICH, self-consistent set of Google ' +
     'Workspace demo files for the business goal below, to be showcased in Gemini Enterprise. The output ' +
@@ -340,6 +373,7 @@ function planGEBEDemo(userGoal, options) {
     'BUSINESS GOAL:\n' + userGoal + '\n\n' +
     domainHint + '\n' +
     'REFERENCE DATE (today): ' + todayStr + '\n\n' +
+    groundingBlock +
     'HARD RULES:\n' +
     '1. CUSTOMER IDENTITY (ISOLATION ANCHOR): Identify a single specific customer/company name. If the ' +
     'BUSINESS GOAL already names a company, use it verbatim. Otherwise INVENT a DISTINCTIVE, brandable, ' +
@@ -414,7 +448,9 @@ function planGEBEDemo(userGoal, options) {
     'across follow-ups), causal reasoning (connects drivers to outcomes), semantic mapping (understands ' +
     'differently-named or inverse fields), and dynamic synthesis (instant tables/charts from raw data). Tailor ' +
     'each differentiator to what the step actually does. expectedSources MUST use the real fileName values from ' +
-    'the files you generate. All human-readable text in the target language.\n\n' +
+    'the files you generate. All human-readable text in the target language.\n' +
+    personaRule +
+    crossDeptRule + '\n' +
     'FILE TYPES TO INCLUDE (only these): ' + wanted.join(', ') + '.\n' +
     pdfNote + '\n\n' +
     'FINAL LANGUAGE CHECK: every human-readable string value in the JSON below - titles, section headings, ' +
@@ -462,7 +498,7 @@ function planGEBEDemo(userGoal, options) {
   // Normalize / clamp.
   plan.referenceDate = plan.referenceDate || todayStr;
   plan.customerName = plan.customerName ? String(plan.customerName) : '';
-  plan.folderName = sanitizeFolderName_(plan.folderName || ('Demo - ' + (plan.customerName || plan.domainName || 'GEBE')));
+  plan.folderName = sanitizeFolderName_(plan.folderName || ('Demo - ' + (plan.customerName || plan.domainName || 'GE Demo')));
   plan.agentDesignerPrompt = plan.agentDesignerPrompt ? String(plan.agentDesignerPrompt) : '';
   plan.demoGuide = Array.isArray(plan.demoGuide) ? plan.demoGuide.slice(0, 5) : [];
   plan.files = plan.files.slice(0, 6).filter(function (f) { return wanted.indexOf(f.type) !== -1; });
@@ -476,12 +512,25 @@ function sanitizeFolderName_(name) {
 }
 
 /**
+ * Normalizes a target-persona object sent from the client into a plain text
+ * description safe for LLM prompt interpolation. Strips backticks, curly
+ * braces, and backslashes, and caps the length. Returns '' when no persona
+ * is selected, keeping every prompt identical to the pre-persona behavior.
+ */
+function sanitizePersonaText_(persona) {
+  if (!persona || typeof persona !== 'object') return '';
+  const raw = String(persona.description || persona.label || '');
+  const stripRe = new RegExp('[' + String.fromCharCode(96) + '{}\\\\]', 'g');
+  return raw.replace(stripRe, '').replace(/\s+/g, ' ').trim().substring(0, 300);
+}
+
+/**
  * Magic-wand goal optimizer. Expands a raw/loose business scenario (optionally
  * carrying selected research workflows) into a structured Markdown business
  * scenario in the SAME language. Reused from the GE Demo Generator, retargeted
  * for Workspace-file demos. Returns { success, optimizedGoal } or { success:false, error }.
  */
-function optimizeGoalWithMagicWand(rawGoal) {
+function optimizeGoalWithMagicWand(rawGoal, persona) {
   if (!rawGoal || !String(rawGoal).trim()) return { success: false, error: 'Nothing to optimize.' };
   const location = CONFIG.LOCATION || 'global';
   const host = location === 'global' ? 'aiplatform.googleapis.com' : location + '-aiplatform.googleapis.com';
@@ -507,8 +556,17 @@ function optimizeGoalWithMagicWand(rawGoal) {
     '3. Business Scenario: rich, realistic context with KPIs and background.\n' +
     '4. Operational Challenge: a clear, high-value workflow for an AI agent, with a trigger event, explicit ' +
     'business rules and numeric thresholds, what is automatic vs. what needs human approval, and the ' +
-    'Workspace data sources involved (Docs, Sheets, Slides). If the input lists target workflows, build the ' +
-    'challenge specifically around them.\n\n' +
+    'Workspace data sources involved (Docs, Sheets, Slides). The challenge MUST span at least two departments ' +
+    'that share the same operational data, describing the hand-off between them that the agent supports ' +
+    '(single-department problems get an adjacent supporting function instead). If the input lists target ' +
+    'workflows, build the challenge specifically around them.\n\n' +
+    (sanitizePersonaText_(persona)
+      ? 'TARGET PERSONA OVERRIDE (MANDATORY): This demo targets a specific user: ' + sanitizePersonaText_(persona) + '. ' +
+        'The Target Role section MUST be a single specific, professional job title matching this persona, translated ' +
+        'naturally into the detected output language. The Business Scenario and Operational Challenge MUST be framed ' +
+        'around this persona\'s own business process, daily decisions, and KPIs. If the input text implies a different ' +
+        'role, the persona specified here takes precedence.\n\n'
+      : '') +
     'Use realistic brand names and values, never generic placeholders. Return ONLY the raw Markdown (no code fences, no preamble).';
 
   const payload = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 8192 } };
@@ -582,8 +640,10 @@ function translateTemplates(lang, items) {
  * Researches the company behind a domain via Google Search grounding and proposes
  * a demo goal. Reused from the GE Demo Generator. Returns a structured object the
  * frontend uses to pre-fill the goal + show challenges and automatable workflows.
+ * Optional persona ({ id, label, description }) frames the suggested goal around
+ * that target user's business process.
  */
-function researchCompanyByDomain(domain) {
+function researchCompanyByDomain(domain, persona) {
   if (!domain || typeof domain !== 'string') return { success: false, error: 'Domain is required.' };
 
   domain = domain.trim().toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/.*$/, '');
@@ -602,6 +662,13 @@ function researchCompanyByDomain(domain) {
     'You are a business analyst researching a company for an AI agent demo.\n' +
     'Research the company behind the domain "' + domain + '" using the latest information from the internet.\n\n' +
     'RESPONSE LANGUAGE: Respond entirely in ' + responseLang + '.\n\n' +
+    (sanitizePersonaText_(persona)
+      ? 'TARGET PERSONA (MANDATORY): This demo is being prepared for a specific target user: ' + sanitizePersonaText_(persona) + '. ' +
+        'Apply this throughout: when listing "workflows", prioritize workflows that this persona owns or directly depends on. ' +
+        'The "suggestedGoal" MUST be written around this persona\'s own business process: name this role explicitly as the ' +
+        'primary user of the AI agent, and frame the business problem, stakeholders, and KPIs from this persona\'s point of ' +
+        'view. Render the role title naturally in the RESPONSE LANGUAGE.\n\n'
+      : '') +
     'Provide a structured JSON object:\n' +
     '1. companyName: Official company name\n' +
     '2. companySummary: 2-3 sentence overview (industry, scale, main business, HQ)\n' +
@@ -610,13 +677,20 @@ function researchCompanyByDomain(domain) {
     '5. workflows: array of 5-8 business workflows, each { "name", "automatable" (boolean), "reason" }\n' +
     '6. suggestedGoal: a detailed 3-5 sentence business scenario suitable as input for a Workspace demo ' +
     'generator. Reference the real company and industry, focus on the most automatable workflow(s), and ' +
-    'describe a specific, actionable problem an AI agent could solve with realistic operational context.\n\n' +
+    'describe a specific, actionable problem an AI agent could solve with realistic operational context. ' +
+    'The scenario MUST span at least two departments that share the same operational data, describing the ' +
+    'hand-off between them (if only one department plausibly applies, use an adjacent supporting function ' +
+    'such as support-to-billing).\n' +
+    '7. quantFacts: an object of verifiable QUANTITATIVE facts about the company (include ONLY facts clearly ' +
+    'supported by search results - omit uncertain keys entirely; never estimate). String values with unit and ' +
+    'as-of year. Optional keys: storeCount, siteCount, employeeCount, annualRevenue, mainRegions (array), ' +
+    'productCategories (array), notableScale.\n\n' +
     'IMPORTANT: Use REAL, factual information. Do NOT invent details. If you cannot find enough information, ' +
     'set success to false with an error message.\n\n' +
     'Output pure JSON only (no code blocks):\n' +
     '{ "companyName": "...", "companySummary": "...", "industry": "...", ' +
     '"businessChallenges": ["..."], "workflows": [ {"name":"...","automatable":true,"reason":"..."} ], ' +
-    '"suggestedGoal": "..." }';
+    '"suggestedGoal": "...", "quantFacts": { "storeCount": "...", "mainRegions": ["..."] } }';
 
   try {
     const location = CONFIG.LOCATION || 'global';
@@ -659,7 +733,8 @@ function researchCompanyByDomain(domain) {
       industry: parsed.industry || '',
       businessChallenges: parsed.businessChallenges || [],
       workflows: parsed.workflows || [],
-      suggestedGoal: parsed.suggestedGoal
+      suggestedGoal: parsed.suggestedGoal,
+      quantFacts: parsed.quantFacts || null
     };
   } catch (e) {
     console.error('[RESEARCH] Error for domain ' + domain + ':', e.message);
@@ -909,7 +984,7 @@ function buildChartImage_(chartSpec) {
 
   let ss = null;
   try {
-    ss = SpreadsheetApp.create('__gebe_chart_' + Utilities.getUuid().substring(0, 8));
+    ss = SpreadsheetApp.create('__gedemo_chart_' + Utilities.getUuid().substring(0, 8));
     const sheet = ss.getSheets()[0];
     sheet.getRange(1, 1, grid.length, grid[0].length).setValues(grid);
     const builder = sheet.newChart()

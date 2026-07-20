@@ -413,16 +413,31 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
     # with the OAuth token from each A2A request.
     if not hasattr(builtins, '_workspace_oauth_token'):
         builtins._workspace_oauth_token = ""
+    # v11.6: per-session token registry, refreshed on EVERY user request by
+    # _process_request_body. Needed because session.state[auth_id] only ever
+    # holds the CREATE-time token: ADK's InMemorySessionService.get_session
+    # returns a COPY, so per-turn state mutation never persists, and ~1h after
+    # the session started the state token is expired even while GE keeps
+    # sending fresh ones (confirmed live 2026-07-16: Drive save failed with an
+    # expired token while the current token sat unused in builtins).
+    if not hasattr(builtins, '_ws_session_tokens'):
+        builtins._ws_session_tokens = {}
 
     def _workspace_header_provider(context) -> dict:
         """Returns Authorization headers carrying the USER's Workspace OAuth token.
 
         Used as the McpToolset header_provider (full Workspace MCP mode) and
         called directly by the Drive handoff / gws token pass-through.
-        Tries multiple strategies to find the OAuth token:
-          1. context.state[auth_id] (ADK ReadonlyContext/CallbackContext)
-          2. context.session.state[auth_id] (session-level state)
-          3. builtins._workspace_oauth_token (cross-module fallback)
+        Tries multiple strategies, FRESHEST FIRST (v11.6 reorder):
+          0. builtins._ws_session_tokens[session_id] (per-session, per-request fresh)
+          1. builtins._workspace_oauth_token (process-global, per-request fresh)
+          2. context.state[auth_id] (ADK context state - CREATE-time snapshot)
+          3. context.session.state[auth_id] (session state - CREATE-time snapshot)
+        State-based lookups (2/3) hold the token stored at session CREATION and
+        go stale after ~1h, so they are last-resort fallbacks only. The global
+        holder (1) can in principle serve another session's token when several
+        users share one instance - same accepted demo trade-off as the .wstoken
+        rotation - but it is always CURRENT, which is what Workspace calls need.
         """
         import logging as _log
         _logger = _log.getLogger('workspace_mcp')
@@ -431,7 +446,37 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
         auth_id = os.environ.get("GEMINI_AUTHORIZATION_ID", "")
         _logger.warning(f"header_provider: CALLED. auth_id='{auth_id}', context_type={type(context).__name__}")
 
-        # Strategy 1: Direct access to context.state (no isinstance check)
+        # Strategy 0 (v11.6): per-session registry - correct per-user AND fresh.
+        # Session id discovery is best-effort across ADK context flavors.
+        if not token:
+            try:
+                _sid = None
+                _sess = getattr(context, 'session', None)
+                if _sess is not None:
+                    _sid = getattr(_sess, 'id', None)
+                if not _sid:
+                    _ictx = getattr(context, '_invocation_context', None)
+                    if _ictx is not None:
+                        _isess = getattr(_ictx, 'session', None)
+                        if _isess is not None:
+                            _sid = getattr(_isess, 'id', None)
+                if _sid:
+                    t = getattr(builtins, '_ws_session_tokens', {}).get(_sid)
+                    if t:
+                        token = t
+                        _logger.warning(f"header_provider: OK Strategy0 - per-session registry (session={_sid}, prefix={token[:30]}..., len={len(token)})")
+            except Exception as ex:
+                _logger.warning(f"header_provider: Strategy0 ERROR - registry lookup failed: {type(ex).__name__}: {ex}")
+
+        # Strategy 1 (v11.6, was Strategy 3): process-global holder, refreshed on
+        # every request by TokenExtractionMiddleware / _process_request_body.
+        if not token:
+            t = getattr(builtins, '_workspace_oauth_token', '')
+            if t:
+                token = t
+                _logger.warning(f"header_provider: OK Strategy1 - token from builtins (prefix={token[:30]}..., len={len(token)})")
+
+        # Strategy 2 (was 1): context.state - CREATE-time snapshot, may be stale.
         if not token and context and auth_id:
             try:
                 state = getattr(context, 'state', None)
@@ -442,13 +487,13 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
                         t = state[auth_id] if auth_id in state else None
                     if t:
                         token = t
-                        _logger.warning(f"header_provider: ✅ Strategy1 OK - token from context.state (prefix={token[:30]}..., len={len(token)})")
+                        _logger.warning(f"header_provider: OK Strategy2 - token from context.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
                     else:
-                        _logger.warning(f"header_provider: Strategy1 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
+                        _logger.warning(f"header_provider: Strategy2 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
             except Exception as ex:
-                _logger.warning(f"header_provider: Strategy1 ERROR - context.state access failed: {type(ex).__name__}: {ex}")
+                _logger.warning(f"header_provider: Strategy2 ERROR - context.state access failed: {type(ex).__name__}: {ex}")
 
-        # Strategy 2: Try context.session.state
+        # Strategy 3 (was 2): context.session.state - CREATE-time snapshot too.
         if not token and context and auth_id:
             try:
                 session = getattr(context, 'session', None)
@@ -460,16 +505,9 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1" or os.environ.get("ENABLE_WORKS
                             t = session_state[auth_id] if auth_id in session_state else None
                         if t:
                             token = t
-                            _logger.warning(f"header_provider: ✅ Strategy2 OK - token from context.session.state (prefix={token[:30]}..., len={len(token)})")
+                            _logger.warning(f"header_provider: OK Strategy3 - token from context.session.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
             except Exception as ex:
-                _logger.warning(f"header_provider: Strategy2 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
-
-        # Strategy 3: Fallback to builtins
-        if not token:
-            import builtins
-            token = getattr(builtins, '_workspace_oauth_token', '')
-            if token:
-                _logger.warning(f"header_provider: ✅ Strategy3 OK - token from builtins (prefix={token[:30]}..., len={len(token)})")
+                _logger.warning(f"header_provider: Strategy3 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
 
         if not token:
             _logger.warning("header_provider: ❌ NO TOKEN AVAILABLE - Workspace calls will fail with permission denied")
@@ -511,16 +549,31 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
     # with the OAuth token from each A2A request.
     if not hasattr(builtins, '_workspace_oauth_token'):
         builtins._workspace_oauth_token = ""
+    # v11.6: per-session token registry, refreshed on EVERY user request by
+    # _process_request_body. Needed because session.state[auth_id] only ever
+    # holds the CREATE-time token: ADK's InMemorySessionService.get_session
+    # returns a COPY, so per-turn state mutation never persists, and ~1h after
+    # the session started the state token is expired even while GE keeps
+    # sending fresh ones (confirmed live 2026-07-16: Drive save failed with an
+    # expired token while the current token sat unused in builtins).
+    if not hasattr(builtins, '_ws_session_tokens'):
+        builtins._ws_session_tokens = {}
 
     def _workspace_header_provider(context) -> dict:
         """Returns Authorization headers carrying the USER's Workspace OAuth token.
 
         Used as the McpToolset header_provider (full Workspace MCP mode) and
         called directly by the Drive handoff / gws token pass-through.
-        Tries multiple strategies to find the OAuth token:
-          1. context.state[auth_id] (ADK ReadonlyContext/CallbackContext)
-          2. context.session.state[auth_id] (session-level state)
-          3. builtins._workspace_oauth_token (cross-module fallback)
+        Tries multiple strategies, FRESHEST FIRST (v11.6 reorder):
+          0. builtins._ws_session_tokens[session_id] (per-session, per-request fresh)
+          1. builtins._workspace_oauth_token (process-global, per-request fresh)
+          2. context.state[auth_id] (ADK context state - CREATE-time snapshot)
+          3. context.session.state[auth_id] (session state - CREATE-time snapshot)
+        State-based lookups (2/3) hold the token stored at session CREATION and
+        go stale after ~1h, so they are last-resort fallbacks only. The global
+        holder (1) can in principle serve another session's token when several
+        users share one instance - same accepted demo trade-off as the .wstoken
+        rotation - but it is always CURRENT, which is what Workspace calls need.
         """
         import logging as _log
         _logger = _log.getLogger('workspace_mcp')
@@ -529,7 +582,37 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
         auth_id = os.environ.get("GEMINI_AUTHORIZATION_ID", "")
         _logger.warning(f"header_provider: CALLED. auth_id='{auth_id}', context_type={type(context).__name__}")
 
-        # Strategy 1: Direct access to context.state (no isinstance check)
+        # Strategy 0 (v11.6): per-session registry - correct per-user AND fresh.
+        # Session id discovery is best-effort across ADK context flavors.
+        if not token:
+            try:
+                _sid = None
+                _sess = getattr(context, 'session', None)
+                if _sess is not None:
+                    _sid = getattr(_sess, 'id', None)
+                if not _sid:
+                    _ictx = getattr(context, '_invocation_context', None)
+                    if _ictx is not None:
+                        _isess = getattr(_ictx, 'session', None)
+                        if _isess is not None:
+                            _sid = getattr(_isess, 'id', None)
+                if _sid:
+                    t = getattr(builtins, '_ws_session_tokens', {}).get(_sid)
+                    if t:
+                        token = t
+                        _logger.warning(f"header_provider: OK Strategy0 - per-session registry (session={_sid}, prefix={token[:30]}..., len={len(token)})")
+            except Exception as ex:
+                _logger.warning(f"header_provider: Strategy0 ERROR - registry lookup failed: {type(ex).__name__}: {ex}")
+
+        # Strategy 1 (v11.6, was Strategy 3): process-global holder, refreshed on
+        # every request by TokenExtractionMiddleware / _process_request_body.
+        if not token:
+            t = getattr(builtins, '_workspace_oauth_token', '')
+            if t:
+                token = t
+                _logger.warning(f"header_provider: OK Strategy1 - token from builtins (prefix={token[:30]}..., len={len(token)})")
+
+        # Strategy 2 (was 1): context.state - CREATE-time snapshot, may be stale.
         if not token and context and auth_id:
             try:
                 state = getattr(context, 'state', None)
@@ -540,13 +623,13 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
                         t = state[auth_id] if auth_id in state else None
                     if t:
                         token = t
-                        _logger.warning(f"header_provider: ✅ Strategy1 OK - token from context.state (prefix={token[:30]}..., len={len(token)})")
+                        _logger.warning(f"header_provider: OK Strategy2 - token from context.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
                     else:
-                        _logger.warning(f"header_provider: Strategy1 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
+                        _logger.warning(f"header_provider: Strategy2 MISS - context.state exists (type={type(state).__name__}) but auth_id '{auth_id}' not found. keys={list(state.keys()) if hasattr(state, 'keys') else 'N/A'}")
             except Exception as ex:
-                _logger.warning(f"header_provider: Strategy1 ERROR - context.state access failed: {type(ex).__name__}: {ex}")
+                _logger.warning(f"header_provider: Strategy2 ERROR - context.state access failed: {type(ex).__name__}: {ex}")
 
-        # Strategy 2: Try context.session.state
+        # Strategy 3 (was 2): context.session.state - CREATE-time snapshot too.
         if not token and context and auth_id:
             try:
                 session = getattr(context, 'session', None)
@@ -558,16 +641,9 @@ if os.environ.get("ENABLE_WORKSPACE_MCP") == "1":
                             t = session_state[auth_id] if auth_id in session_state else None
                         if t:
                             token = t
-                            _logger.warning(f"header_provider: ✅ Strategy2 OK - token from context.session.state (prefix={token[:30]}..., len={len(token)})")
+                            _logger.warning(f"header_provider: OK Strategy3 - token from context.session.state (prefix={token[:30]}..., len={len(token)}) - CREATE-time snapshot, may be stale")
             except Exception as ex:
-                _logger.warning(f"header_provider: Strategy2 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
-
-        # Strategy 3: Fallback to builtins
-        if not token:
-            import builtins
-            token = getattr(builtins, '_workspace_oauth_token', '')
-            if token:
-                _logger.warning(f"header_provider: ✅ Strategy3 OK - token from builtins (prefix={token[:30]}..., len={len(token)})")
+                _logger.warning(f"header_provider: Strategy3 ERROR - context.session.state access failed: {type(ex).__name__}: {ex}")
 
         if not token:
             _logger.warning("header_provider: ❌ NO TOKEN AVAILABLE - Workspace calls will fail with permission denied")

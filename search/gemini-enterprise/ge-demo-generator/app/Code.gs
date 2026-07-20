@@ -82,14 +82,17 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.5-public',
+  APP_VERSION: 'v11.25-public',
   // Agent-template source: the generated setup script fetches the static
-  // Python/JSON template files (agent_template/ in the repo) from this
-  // repo at this pinned ref at run time. Pin to a commit SHA so every
-  // generated script keeps fetching exactly the files it was built for.
-  // Override via Script Properties (TEMPLATE_REPO / TEMPLATE_REF) for testing.
+  // Python/JSON template files (agent_template/ in the repo) at run time.
+  // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
+  // concrete commit SHA at script-GENERATION time and that SHA is baked into
+  // each generated script, so scripts stay reproducible without this file
+  // ever committing its own merge SHA. Set the TEMPLATE_REF Script Property
+  // to a 40-hex SHA to hard-pin, or point TEMPLATE_REPO/TEMPLATE_REF at a
+  // fork/branch for pre-merge testing.
   TEMPLATE_REPO: SCRIPT_PROPS.getProperty('TEMPLATE_REPO') || 'https://github.com/GoogleCloudPlatform/generative-ai.git',
-  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || '49f0bddb7c1e2b0b90cee7643c5eb961d33adf92',
+  TEMPLATE_REF: SCRIPT_PROPS.getProperty('TEMPLATE_REF') || 'main',
   TEMPLATE_SUBDIR: SCRIPT_PROPS.getProperty('TEMPLATE_SUBDIR') || 'search/gemini-enterprise/ge-demo-generator/agent_template',
   LOG_SHEET_URL: SCRIPT_PROPS.getProperty('LOG_SHEET_URL')
 };
@@ -563,6 +566,11 @@ function generateDemo(userGoal, options = {}) {
     
     result.datasetId = datasetId;
     result.userGoal = userGoal;
+    // Persisted into the Drive backup so eval tooling and restores can see the
+    // selected Target Persona (the history entry alone is not backed up).
+    result.targetPersona = options.targetPersona || null;
+    result.targetPersonaDesc = options.targetPersonaDesc || null;
+    result.quantFacts = options.quantFacts || null;
     result.dataPreview = planResult.dataPreview;
     result.rawTables = planResult.tables;
     result.suffix = suffix;
@@ -578,9 +586,26 @@ function generateDemo(userGoal, options = {}) {
     result.appliedFactors = planResult.appliedFactors || {};
     result.agentShortName = planResult.agentShortName || '';
     result.oneSentenceSummary = planResult.oneSentenceSummary || '';
+    result.operatingModel = planResult.operatingModel || null;
     result.firestore = planResult.firestore || null;
     result.importedMcpList = options.importedMcpList || null;
     result.metadata = planResult.metadata || null;
+    // M2 (v11.16): capability-coverage check (warns only, never blocks).
+    // Detects a capability mandate that the demo guide silently dropped.
+    try {
+      const _guideStr = JSON.stringify(planResult.demoGuide || []).toLowerCase();
+      const _covWarnings = [];
+      if (options.enableWorkspaceMcp && !/(mail|メール|drive|ドライブ|calendar|カレンダー|chat|チャット)/.test(_guideStr)) _covWarnings.push('Workspace MCP');
+      if (options.enableComputerUse && !/(http|browser|ブラウザ|website|サイト|web)/.test(_guideStr)) _covWarnings.push('Computer Use');
+      if (options.enableManagedAgent && !/(資料|デッキ|deck|report|レポート|presentation|プレゼン|調査|research)/.test(_guideStr)) _covWarnings.push('Managed Agent');
+      const _files = planResult.externalFiles || [];
+      if (!_files.some(f => /\.pdf$/i.test(f.fileName || ''))) _covWarnings.push('PDF asset (planning mandates exactly one)');
+      if (!_files.some(f => /\.xlsx$/i.test(f.fileName || ''))) _covWarnings.push('Excel asset (planning mandates exactly one)');
+      if (_covWarnings.length) {
+        console.warn('[COVERAGE] demoGuide may not showcase: ' + _covWarnings.join(', '));
+        result.coverageWarnings = _covWarnings;
+      }
+    } catch (covErr) { /* best-effort only */ }
     // Persist feature flags so the Drive-backup restore path (see the
     // generateSetupScript regeneration block) can rebuild the same script.
     result.enableWorkspaceMcp = options.enableWorkspaceMcp || false;
@@ -601,6 +626,7 @@ function generateDemo(userGoal, options = {}) {
       userGoal: userGoal,
       agentShortName: planResult.agentShortName,
       oneSentenceSummary: planResult.oneSentenceSummary,
+      operatingModel: planResult.operatingModel,
       importedMcpList: options.importedMcpList,
       enableWorkspaceMcp: options.enableWorkspaceMcp,
       enableComputerUse: options.enableComputerUse,
@@ -643,6 +669,8 @@ function generateDemo(userGoal, options = {}) {
       industry: taxonomy.industry,
       persona: taxonomy.persona,
       useCase: taxonomy.useCase,
+      targetPersona: options.targetPersona || null,
+      result: result
     };
 
     try {
@@ -819,13 +847,29 @@ function planAndGenerateData(userGoal, options) {
     - You MUST leverage this capability when generating the 'businessInstruction' and 'demoGuide' (prompts).
     - In 'businessInstruction', mention that the agent can hand off deep autonomous work (research, building deliverables, iterative code work) to a managed autonomous agent and deliver finished files back to the user.
     - You MUST design at least TWO prompts (out of the 7 required) in the 'demoGuide' that showcase the autonomous agent, following BOTH patterns below:
-      - **Pattern A (WEB RESEARCH + INTERNAL DATA SYNTHESIS)**: one prompt MUST require researching CURRENT external information on the public web (industry trends, competitor moves, market prices, regulations) AND combining it with the demo's own BigQuery data into a substantial written analysis. Phrase it so the answer is impossible without live web research (e.g. "Research the latest <industry> trends online and produce a competitive analysis against our own sales data").
-      - **Pattern B (COMPLEX LONG-HORIZON DELIVERABLE)**: one prompt MUST ask for finished, downloadable business output whose production requires SEQUENTIALLY DEPENDENT phases (real quantitative analysis of the internal data -> charts built from that analysis -> professional assembly), so the request genuinely deserves tens of minutes of autonomous work. Make it one of these two shapes, whichever fits the scenario better: (1) TWO complementary formats built from the same analysis - e.g. a board presentation deck PLUS a 2-page summary PDF for the field team, or a formal proposal document PLUS a one-page web briefing; or (2) a WORKING INTERACTIVE TOOL - a self-contained web app the user opens in a browser (e.g. a pricing / capacity / what-if simulator) whose coefficients come from the actual data analysis, plus a short document explaining the model. The prompt should sound like a real executive request and SHOULD state 1-2 explicit quality conditions in natural business language (e.g. "lead with the conclusion on the first page", "every number must be sourced from our data or a cited reference") - these conditions make the agent's self-review-and-rebuild loop visible in the demo. Patterns A and B MUST use DIFFERENT deliverable formats so the demo shows variety.${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? `
+      - **Pattern A (WEB RESEARCH + INTERNAL DATA SYNTHESIS)**: one prompt MUST require researching CURRENT external information on the public web (industry trends, competitor moves, market prices, regulations) AND combining it with the demo's own BigQuery data into a substantial written analysis. Phrase it so the answer is impossible without live web research (e.g. "Research the latest <industry> trends online and produce a competitive analysis against our own sales data").${ options.enableComputerUse ? ` Because the browser agent is ALSO enabled, Pattern A MAY additionally name ONE specific external page or portal to check interactively (e.g. a competitor's public pricing page) - the assistant will then operate its real browser live in the chat BEFORE handing off to the autonomous agent, which makes a strong combined showcase. Keep it to a single, quickly checkable page; the deep multi-source research still belongs to the autonomous agent.` : ''}
+      - **Pattern B (COMPLEX LONG-HORIZON DELIVERABLE)**: one prompt MUST ask for finished, downloadable business output whose production requires SEQUENTIALLY DEPENDENT phases (real quantitative analysis of the internal data -> charts built from that analysis -> professional assembly), so the request genuinely deserves tens of minutes of autonomous work. Make it one of these two shapes, whichever fits the scenario better: (1) TWO complementary formats built from the same analysis - e.g. a board presentation deck PLUS a 2-page summary PDF for the field team, or a formal proposal document PLUS a one-page web briefing; or (2) a WORKING INTERACTIVE TOOL - a self-contained web app the user opens in a browser (e.g. a pricing / capacity / what-if simulator) whose coefficients come from the actual data analysis, plus a short document explaining the model. The prompt should sound like a real executive request and SHOULD state 1-2 explicit quality conditions in natural business language (e.g. "lead with the conclusion on the first page", "every number must be sourced from our data or a cited reference") - these conditions make the agent's self-review-and-rebuild loop visible in the demo. Patterns A and B MUST use DIFFERENT deliverable formats so the demo shows variety.${ crossOrgEnabled_() ? '\n      - **CROSS-DEPARTMENTAL DELIVERABLE (MANDATORY)**: the delegated mission MUST synthesize data owned by at least two departments and address its deliverable to the department (or executive) that owns the decision - framed as the journey summary of the demo narrative: what happened in each department, where the process stalled, and what was resolved. Because the Pattern A prompt occupies the final core slot, ITS deliverable also carries the NARRATIVE ARC finale duty: it MUST close with the quantified process outcomes of the demo narrative (before/after cycle time or lead time, items resolved, hand-offs completed).' : '' }${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? `
       - **MANDATORY WORKSPACE COMBINATION**: Google Workspace access is ALSO enabled for this demo, and the autonomous agent can act on the user's Workspace (save files to Drive as native Google Slides/Docs/Sheets, draft Gmail messages, post to named Google Chat spaces, create Calendar events). At least ONE of the two autonomous prompts MUST chain a Workspace action onto the deliverable so the demo showcases BOTH capabilities together, e.g.: "Research the latest industry trends, build the executive deck, save it to my Drive as Google Slides, and draft an email to the leadership team summarizing it" or "...and post the summary with the document link to the <team> Chat space, then set up a 30-minute review meeting on my calendar". Keep the Workspace actions realistic for the persona, and prefer DRAFT email wording (the agent creates drafts, it does not send unless explicitly told).` : ''}
     - 🎯 SLOT ASSIGNMENT (overrides the base 7-prompt distribution): put Pattern B in the Prompt 5 slot, REPLACING the large-scope background workflow prompt (the autonomous delegation itself runs in the background and demonstrates background execution plus completion announcements, so that story is preserved). Weave Pattern A into the Prompt 7 slot (End-to-End Strategic Automation): its web research + internal data synthesis IS the end-to-end showcase${ (options.enableWorkspaceMcp || options.enableWorkspaceAuth) ? ', and the MANDATORY WORKSPACE COMBINATION chain belongs there' : ''}. Do NOT merge Patterns A and B into a single prompt - the demo needs TWO distinct autonomous moments. Because slots 5 and 7 are now autonomous, fold the MANDATORY INTERACTIVE DASHBOARD prompt into slot 1 or 2 (make one of the foundation prompts ask for the browser-openable interactive overview dashboard, keeping its explicit open-in-browser signal) - the dashboard prompt must NOT displace slot 5 or 7 and must NOT be dropped.
     - Write both prompts as natural business-user requests, in the same language as the 'userGoal', woven into the demo storyline with the KPIs, entities, and business terms you generated (NEVER raw table or column names - the base NO TABLES/COLUMNS rule still applies to these prompts).
     - 🎯 CRITICAL - AVOID OVERLAP WITH LIGHTER TOOLS: the agent ALSO has fast inline tools (SQL queries, quick analysis, in-chat dashboards). If a prompt can be fully answered by querying the demo database and summarizing, the model will answer it inline and the autonomous agent will NOT be demonstrated. Therefore the TWO autonomous prompts MUST require at least one of: live web research, producing a downloadable file, or building-and-running code - things the inline tools cannot do.
 \n`;
+  }
+  // M2 (v11.16): slot-budget arbitration. Only appended when 2-prompt
+  // capability mandates exist that could overflow the 7 core slots; encore
+  // items are the explicit overflow destination so no capability gets
+  // crammed into a shared prompt or silently dropped (analysis gap 8.5).
+  if (crossOrgEnabled_()) {
+    const _mandateSources = (options.enableWorkspaceMcp ? 1 : 0)
+      + (options.enableComputerUse ? 1 : 0)
+      + ((options.importedMcpList && options.importedMcpList.length) ? options.importedMcpList.length : 0);
+    if (_mandateSources >= 1) {
+      prompt += `\n- **🎛 SLOT BUDGET & ENCORE PROMPTS (MANDATORY ARBITRATION)**: The 7 core prompts keep the base distribution (and any SLOT ASSIGNMENT overrides above). If the capability mandates above cannot ALL fit into the 7 core slots without cramming multiple showcase missions into a single prompt, do NOT dilute or silently drop any of them - generate up to THREE additional ENCORE prompts (positions 8-10) instead:
+    - Each encore prompt showcases exactly ONE overflow capability as an epilogue or alternate-angle scene of the SAME business narrative (an encore may build on the core story's state; the core story must NEVER depend on an encore).
+    - Tag every encore prompt by including the string "encore" in its "tags" array. Core prompts must NOT carry that tag.
+    - Total demoGuide length: exactly 7 core items plus 0 to 3 encore items.
+\n`;
+    }
   }
   const response = callVertexAIWithRetry(prompt);
   
@@ -883,6 +927,10 @@ function planAndGenerateData(userGoal, options) {
     }
   }
 
+  // Density repair BEFORE validation: cheaply top up an under-dense
+  // transaction table instead of failing the whole run (v11.25).
+  expandThinTables_(parsed, options);
+
   // Validation and Clean-up
   validateGeneratedData(parsed, options.rowCount, options.dataProfile);
 
@@ -895,6 +943,7 @@ function planAndGenerateData(userGoal, options) {
     publicDatasetId: resolvePlannedPublicDatasetId_(parsed.publicDatasetId, options),
     agentShortName: parsed.agentShortName || null,
     oneSentenceSummary: parsed.oneSentenceSummary || null,
+    operatingModel: parsed.operatingModel || null,
     demoGuide: parsed.demoGuide,
     externalFiles: parsed.externalFiles || [],
     appliedFactors: parsed.appliedFactors || null,
@@ -1138,6 +1187,15 @@ function getTechnicalInstruction_() {
   return inst;
 }
 
+/**
+ * M2 cross-org pack kill switch. Setting Script Property
+ * DISABLE_CROSSORG_PACK=1 blanks every cross-departmental prompt insertion at
+ * once - an admin rollback lever (no redeploy), NOT a user-facing option.
+ */
+function crossOrgEnabled_() {
+  return !SCRIPT_PROPS.getProperty('DISABLE_CROSSORG_PACK');
+}
+
 function buildPlanningPrompt(userGoal, options) {
   const profile = getDataProfile_(options.dataProfile || 'standard');
   const maxRows = Math.min(options.rowCount || profile.defaultRowCount, 150);
@@ -1150,7 +1208,68 @@ function buildPlanningPrompt(userGoal, options) {
        * OUTPUT FIELD (MANDATORY): In your JSON response, set "publicDatasetId" to EXACTLY this ID. Do NOT invent or substitute a different dataset.
        * DEMO GUIDE REQUIREMENT (MANDATORY): At least ONE prompt in 'demoGuide' MUST explicitly ask the agent to enrich the analysis by combining the synthetic tables with this external public dataset (e.g., correlate internal metrics with the external context it provides). Design the JOIN keys in the synthetic tables so this prompt produces meaningful results.`
     : `- IMPORTANT: NO public dataset should be used for this demo. Focus ONLY on synthetic tables below. Do NOT attempt to JOIN with external public-data. In your JSON response, set "publicDatasetId" to null.`;
-  
+
+  // v11.12 (P10): the Target Persona selected in the wizard becomes the demo's
+  // protagonist across every generated artifact. Empty string = no persona
+  // selected = the prompt is unchanged from pre-persona behavior.
+  const anchorPersonaText = sanitizePersonaText_({
+    label: options.targetPersona || '',
+    description: options.targetPersonaDesc || ''
+  });
+  const anchorPersonaBlock = anchorPersonaText
+    ? '\n## Anchor Persona (MANDATORY)\nThe demo creator selected the primary user of this agent: ' + anchorPersonaText + '. This persona is the PROTAGONIST of the demo: (a) the businessInstruction MUST define the agent as this persona\'s process operator; (b) demoGuide Prompt 1 MUST open from this persona\'s daily situation; (c) any autonomous delegation deliverable MUST be addressed to this persona\'s decision chain; (d) human-approval gates SHOULD be decisions this persona (or their direct manager) owns.\nPRECEDENCE: even when the scenario suggests a different natural protagonist (e.g., the manager or supervisor of the function), the SELECTED persona still wins - keep the selected persona as the protagonist and cast other roles as hand-off counterparts. Do NOT substitute a similar-but-different job title for the selected persona.\n'
+    : '';
+  const anchorRotationNote = anchorPersonaText
+    ? ' If an Anchor Persona is defined above, keep that persona as the protagonist of ALL prompts and rotate other personas ONLY as hand-off counterparts (the roles the process flows to or from), never replacing the protagonist\'s thread.'
+    : '';
+
+  // M4 (P17-lite): ground synthetic data in the researched company's real
+  // scale. Backticks stripped so runtime facts can never break the template
+  // pipeline downstream. Absent facts = prompt unchanged.
+  let quantFactsBlock = '';
+  if (options.quantFacts && options.quantFacts.facts && Object.keys(options.quantFacts.facts).length) {
+    const bt = String.fromCharCode(96);
+    const factsText = JSON.stringify(options.quantFacts.facts, null, 1).split(bt).join('');
+    const qfName = String(options.quantFacts.companyName || 'the company').split(bt).join('');
+    quantFactsBlock = '\n## Data Grounding (verified real-world scale)\nThe following quantitative facts about ' + qfName + ' were gathered from public sources during domain research. Reflect them in the generated data so the demo feels like THIS organization: master-table sizes, regional distribution, product-category mix, and transaction volumes should be plausible for an organization of this scale, scaled down proportionally to the row-count budget (note the scaling ratio in table descriptions where helpful, e.g. "representative sample of ~1,050 stores"). Apply ONLY if the Business Problem is about this company; ignore otherwise.\n' + factsText + '\n';
+  }
+
+  // ---- M2 cross-org pack (v11.16) ----
+  // Every block below is blanked by the DISABLE_CROSSORG_PACK kill switch.
+  const CROSSORG = crossOrgEnabled_();
+  const encoreNote = CROSSORG
+    ? ' (7 CORE prompts; up to 3 additional prompts tagged "encore" are allowed ONLY under the SLOT BUDGET arbitration rule when capability mandates cannot fit the core slots)'
+    : '';
+  // P5: one process instance woven through the existing slot structure, with
+  // a quantified-outcome finale (analysis issues 7 and critique 4).
+  const narrativeArc = CROSSORG ? `
+    0. **NARRATIVE ARC (MANDATORY)**: All 7 core prompts MUST follow ONE end-to-end business process instance (e.g., one problematic order, one flagged application) across the organization - each prompt builds on the state changes made by the previous one, while still fulfilling its slot's functional requirement below. The slot structure (including any SLOT ASSIGNMENT overrides) stays unchanged; the arc is WOVEN THROUGH the slots, never replaces them. The final core prompt MUST make the agent present the full journey with QUANTIFIED process outcomes (before/after cycle time, items resolved, hand-offs completed).` : '';
+  // P9: autonomy backstage, decisions onstage (analysis critique 2).
+  // v11.17: reworded - the first cut collided with the NO-EXPLICIT-HITL rule
+  // (prompts may not contain approval wording), so the planner ignored it.
+  // Decision beats must come from TASK DESIGN, not prompt wording.
+  const hitlChoreo = CROSSORG ? `
+    2c. **FOREGROUND/BACKGROUND CHOREOGRAPHY (MANDATORY)**: At least TWO core prompts must be DESIGNED so the agent's own confirmation flow fires on stage: give those prompts tasks whose data contains threshold-crossing or exception items (per the workflow's DECISION POINTS), so the agent - following its own rules - must present an approval card with options and evidence, wait for the one-click human decision, and visibly change the operational-database state. The NO-EXPLICIT-HITL rule above still applies: do NOT write approval requests into the prompt text; the decision beat comes from the agent's behavior on that data, never from the wording. Reserve background execution for (a) long autonomous delegations, (b) large batch runs, (c) scheduled jobs; everything else runs in the foreground showing reasoning and intermediate results.` : '';
+  // P3: cross-departmental mandate for BOTH archetypes, with industry pattern
+  // variety (critique 5) and a single-department escape hatch.
+  const crossOrgMandate = CROSSORG ? `
+- **🏢 CROSS-DEPARTMENTAL MANDATE (applies to BOTH archetypes)**: The agent is not a single team's assistant - frame it as the company's process operator working across departments on shared core-system data.
+    - Type A queues MUST contain tasks whose resolution requires touching data owned by at least TWO different departments, with each hand-off represented as a state transition the agent performs on behalf of the sending department and visible to the receiving one.
+    - Type B insights MUST quantify impact across at least TWO departments and route each proposal to the department that owns the decision.
+    - Vary the organizational shape by industry instead of repeating one template - examples: manufacturing procurement -> production -> quality; banking sales-branch -> underwriting -> compliance; retail store -> supply chain -> finance; **approval pre-review** (the agent reviews a submission against the RECEIVING department's own rules BEFORE it is submitted); **multi-department plan refinement** (a draft plan is validated against other departments' actual data and thresholds, then routed to each owner for approval).
+    - ESCAPE HATCH: where the business problem plausibly involves only ONE department, do NOT force departments into it - model the hand-off with an adjacent supporting function (e.g., support -> billing, support -> product quality), or keep it single-team if even that feels unnatural. The user's goal always wins.` : '';
+  // P1: shared core-system data model + department-owned rules as data
+  // (analysis issues 2/8; rules-as-data underpins the pre-review pattern).
+  const crossOrgDataModel = CROSSORG ? `
+- **SHARED CORE-SYSTEM DATA MODEL (MANDATORY)**: Model the tables as a slice of the company's core system of record (ERP/CRM/WMS-like), NOT as one team's private dataset.
+    1. At least ONE transactional table MUST be read and written by two or more distinct departments for different purposes (e.g., orders: created by Sales, fulfilled by Logistics, invoiced by Finance). Add an "owning_department" or equivalent dimension where natural.
+    2. **Department-owned rules as data**: generate at least ONE table (or clearly described catalog entry) holding rules/thresholds/checklists OWNED by one department that ANOTHER department's workflow must consult (e.g., procurement approval rules that sales submissions are pre-checked against; credit limits owned by Finance that order intake must respect). The rules table MUST still connect to the rest of the schema: include the key column(s) its rules apply to (e.g., category_id, product_id, customer_rank, department) named EXACTLY as in the tables they reference - the NO ISOLATED TABLES rule applies to rules tables too.
+    3. At least ONE Audit Seed MUST be a **cross-departmental discrepancy**: a mismatch invisible inside any single department's view, detectable only by joining data across departmental usage contexts.
+    (ESCAPE HATCH: for a genuinely single-department goal, scope all three to the department and its closest supporting function instead.)` : '';
+  // P2: organizational actors inside the workflow definition (issue 4).
+  const crossOrgWorkflow = CROSSORG ? `
+- **ORGANIZATIONAL ACTORS (MANDATORY)**: Each STEP must name the department or role responsible in the real-world process (e.g., Procurement -> Warehouse -> Accounts Payable -> Treasury), and each DECISION POINT must state WHICH department's rule it enforces. The workflow MUST cross at least TWO departments, with each hand-off represented as a state transition performed on behalf of the sending department and visible to the receiving one. Align HITL GATES with these department boundaries (threshold breaches and exceptions are approved by the receiving department's owner). ESCAPE HATCH: for a genuinely single-department goal, use the adjacent supporting function instead.` : '';
+
   return `You are a versatile data analyst and BigQuery expert capable of generating realistic datasets for ANY industry or business function.
 Design and generate a demo dataset based on the following business problem.
 
@@ -1204,8 +1323,8 @@ You MUST classify the demo scenario into one of the following two agent archetyp
 - **When to choose**: The workflow is consultative, strategic, or diagnostic (e.g., analyzing ad spend to optimize ROI, predicting customer churn trends, advising on portfolio risk).
 - **Firestore Strategy**: Define the collection as an **Insights Feed / Alert Log / Proposal Console** (collection name like 'marketing_proposals', 'strategic_alerts'). Documents should represent automated recommendations, high-risk anomalies, or budget proposals requiring review (document status can be 'PROPOSAL_PENDING', 'APPROVED', 'ALERT_ACTIVE', 'ARCHIVED'). This allows the Data Viewer to act as a real-time strategic insight feed!
 - **Instruction Strategy**: Define the agent as an expert advisor. Instruct it to perform deep SQL queries, cross-source reasoning, and visual reporting. Instruct it to write back strategic proposals or alerts to Firestore to keep the real-time console updated.
-
-- **🚀 THEME: Autonomous Workflow Execution (Agent as an Operator who ACTS)**: 
+${crossOrgMandate}
+- **🚀 THEME: Autonomous Workflow Execution (Agent as an Operator who ACTS)**:
 
     - **Focus**: End-to-end business workflows where the agent autonomously DETECTS triggers, PLANS execution steps, EXECUTES actions (DB writes, status updates, escalations), VALIDATES outcomes, and REPORTS completion — not just passive analysis.
     - **Workflow Execution Pattern (MANDATORY for Type A)**:
@@ -1218,7 +1337,7 @@ You MUST classify the demo scenario into one of the following two agent archetyp
 
 ## Business Problem
 ${userGoal}
-
+${anchorPersonaBlock}${quantFactsBlock}
 ## Requirements
 - Data Profile: **${profile.label}** (${profile.tableCount} tables)
 - Table Design & Row Counts (Star Schema Strategy — ${profile.label} Profile):
@@ -1293,6 +1412,7 @@ If the business problem mentions a **specific company, organization, or brand**,
 **If you are unsure whether a specific entity belongs to the mentioned company, DO NOT include it. It is better to use fewer but accurate data points than to include factually incorrect associations.**
 
 **If NO specific company/organization is mentioned in the business problem**: Create a COHERENT fictional business context. Choose ONE realistic company profile (industry vertical, size, geography) and generate ALL data as if it belongs to this single hypothetical entity. Ensure internal consistency - all facilities, products, and personnel should belong to the same fictional organization. Do NOT mix data from multiple unrelated real-world companies.
+${crossOrgDataModel}
 
 ### 5.5 Image File Generation (CRITICAL for Non-structured input goals)
 If the Business Problem naturally involves processing non-structured inputs like hand-written papers, faxes, or photos of physical assets:
@@ -1379,7 +1499,7 @@ Each workflow MUST define:
 - **DECISION POINTS**: Conditional branches based on data values or business rules (e.g., 'if discrepancy < 5%, auto-approve; if >= 5%, escalate')
 - **HITL GATES**: Which steps require human approval - mark as [APPROVAL_REQUIRED]. Low-risk actions (status updates, log entries) should be AUTO-EXECUTED without asking.
 - **COMPLETION CRITERIA**: How the agent knows the workflow is done
-- **ERROR HANDLING**: What to do when a step fails
+- **ERROR HANDLING**: What to do when a step fails${crossOrgWorkflow}
 
 Example workflow structure (adapt to the specific business domain):
 "WORKFLOW: 'Invoice Discrepancy Resolution'
@@ -1440,7 +1560,8 @@ Output in the following JSON format. Output **pure JSON only without code blocks
     "documents": [
       "MANDATORY: Generate at least 8 documents representing items at different stages of processing.",
       "- If Type A (Operational): Use status 'PENDING', 'IN_PROGRESS', 'RESOLVED', 'ESCALATED' representing a workflow task queue.",
-      "- If Type B (Advisory): Use status 'PROPOSAL_PENDING', 'APPROVED', 'ALERT_ACTIVE', 'ARCHIVED' representing an insights feed or strategic proposal board.",
+      "- If Type B (Advisory): Use status 'PROPOSAL_PENDING', 'APPROVED', 'ALERT_ACTIVE', 'ARCHIVED' representing an insights feed or strategic proposal board.",${CROSSORG ? `
+      "- PROCESS STATE & AUDIT TRAIL (MANDATORY): every document's data MUST also include: current_department (the department currently holding the item), next_department (where it goes after the current step; empty string when terminal), and history - an array of audit entries, each an object with keys timestamp, actor (agent name or person), action, approver (person name when a human approved; empty otherwise), evidence_ids (array of record IDs consulted). Seed 1-3 realistic history entries per document so the operations console shows processes already in motion across departments.",` : ''}
       {
         "id": "Unique ID matching BigQuery data for correlation",
         "data": {
@@ -1459,7 +1580,8 @@ Output in the following JSON format. Output **pure JSON only without code blocks
   "referenceDate": "MUST be exactly today's date, ${todayStr} (see TEMPORAL ANCHOR).",
   "publicDatasetId": "Echo the RELATED PUBLIC DATASET id exactly as provided above, or null if no public dataset was provided.",
   "agentShortName": "A concise 2-3 word role-based name for the agent (e.g., 'Supply Chain Analyst', 'Fraud Investigator').",
-  "oneSentenceSummary": "A concise, professional one-sentence summary of the business challenge and the generated solution.",
+  "oneSentenceSummary": "A concise, professional one-sentence summary of the business challenge and the generated solution.",${CROSSORG ? `
+  "operatingModel": "2-4 sentences in ENGLISH describing this demo's organizational operating model: the departments involved, which data and rules each department owns, and the hand-off/approval boundaries between them. This briefs downstream autonomous workers; keep it in English regardless of the demo language.",` : ''}
   "appliedFactors": {
     "temporalPatterns": ["List of 2-3 specific temporal patterns applied"],
     "correlations": ["List of 2-3 specific data correlations applied"],
@@ -1474,17 +1596,19 @@ Output in the following JSON format. Output **pure JSON only without code blocks
     {
       "title": "...",
       "prompt": "...",
-      "requiredFileId": "file1 or empty",
+      "requiredFileId": "file1 or empty",${CROSSORG ? `
+      "watchPoint": "One short sentence for the demo OPERATOR (not the agent): what to watch on screen when this prompt runs (e.g., after the approval click, the item moves to the next department on the operations console). Same language as the prompts.",` : ''}
       "tags": [...]
     }
   ]
 }
 
 ## Critical Notes
-- **DEMO PROMPTS (CRITICAL)**: Generate EXACTLY 7 structured demo prompts that showcase the agent's "reasoning" and "operational action" capabilities.
+- **DEMO PROMPTS (CRITICAL)**: Generate EXACTLY 7 structured demo prompts${encoreNote} that showcase the agent's "reasoning" and "operational action" capabilities.
     - **NO PRODUCT NAMES (CRITICAL)**: DO NOT include specific product names like 'Firestore', 'BigQuery', or 'Google Cloud' in the prompt text. Use completely generic business terminology like 'our operational database', 'internal records', or 'the compliance tracker'.
     - **NO FILENAMES (CRITICAL)**: DO NOT include specific file names or extensions (e.g., 'market_report_2024', 'data.tsv') in the prompt text. Use generic phrasing.
-    1. **DISTRIBUTION & ADVANCED PROGRESSION (CRITICAL)**: Generate exactly 7 prompts tailored completely to the specific business challenge and industry context:
+${narrativeArc}
+    1. **DISTRIBUTION & ADVANCED PROGRESSION (CRITICAL)**: Generate exactly 7 core prompts${CROSSORG ? ' (encore overflow items only per the SLOT BUDGET rule, when present)' : ''} tailored completely to the specific business challenge and industry context:
         - **Prompts 1-2 (Foundation & Discovery)**: Data overview, schema exploration, and initial audit scan. Establish familiarity with the data landscape. At least ONE of these MUST be a metadata-driven discovery question that pushes the agent to consult the data catalog metadata first (column meanings, units, allowed values, table relationships) before querying — phrase it generically (e.g. 'What data do we have available and what kinds of analysis can it support?') without naming any product.
         - **Prompt 3 (CROSS-SOURCE DISCOVERY - WOW MOMENT, MANDATORY)**: This prompt MUST be designed so that the answer REQUIRES the agent to discover a hidden connection between the external file data and BigQuery data that is NOT obvious from either source alone. Phrase it as a high-level strategic question (e.g., 'What is the biggest untracked financial risk across our operations?') so the agent must autonomously decide to cross-reference the uploaded file against internal records. The Audit Seed from Section 6a provides the discrepancy the agent should discover. This prompt creates the most impressive demo moment.
         - **Prompts 4-5 (MULTI-STEP DEPENDENT WORKFLOW - WOW MOMENT)**: These prompts MUST trigger FULL multi-step workflow execution demonstrating INTERDEPENDENT step chains where each step depends on the previous step's output. Prompt 4 MUST be a workflow with 10 items or fewer designed for IMMEDIATE synchronous execution. Each step must depend on the previous step's output (e.g., 'Scan all pending items, classify by severity, auto-process anything within tolerance, and generate an exception report for the remaining items'). The agent should demonstrate the full SCAN-CLASSIFY-PROCESS-ESCALATE-NOTIFY-AUDIT dependency chain in real-time. Prompt 5 MUST be a LARGE-SCOPE workflow implying more than 10 items or long-running processing, where the agent should propose BACKGROUND execution mode. Phrase it as a comprehensive batch operation (e.g., 'Run a full reconciliation across all records from the past quarter - identify discrepancies, auto-correct minor variances, flag major issues, and generate a compliance report'). The agent MUST demonstrate the execution mode selection dialog (immediate vs. background vs. scheduled).
@@ -1492,10 +1616,15 @@ Output in the following JSON format. Output **pure JSON only without code blocks
         - **Prompt 7 (End-to-End Strategic Automation)**: A complex prompt combining cross-source data analysis + conditional workflow execution + notification drafting + audit logging. This MUST require the agent to: (1) analyze data from multiple sources (BigQuery + Firestore + external file), (2) propose a multi-step workflow based on its findings, (3) execute with the appropriate execution mode, (4) draft a notification summary, and (5) create audit entries. This showcases the full spectrum of the agent's capabilities as an autonomous operator.
         - **NO EXPLICIT HITL IN PROMPTS (CRITICAL)**: The generated prompt text MUST NOT contain explicit instructions like 'Please wait for my approval' or 'Propose first'. Present the request as a straightforward business instruction (e.g., 'Register these anomalies as new compliance alerts in the database'). The agent will naturally implement the confirmation step autonomously based on its core system instructions!
         - **INTERACTIVE DASHBOARD (MANDATORY)**: Exactly ONE of the 7 prompts MUST ask the agent to build an interactive dashboard the user can OPEN AND EXPLORE IN A BROWSER. The prompt text MUST contain an explicit open-in-browser / interactive signal (e.g. 'that I can open and explore in my browser', 'an interactive dashboard I can click into') - this is what makes the agent publish a hosted interactive page instead of a static summary slide. Do NOT phrase it as a pure 'summarize / analyze' request (e.g. avoid 'Generate a dashboard that summarizes ...'), because that reads as an analysis and yields a slide, not an interactive dashboard. Good example: 'Build me an interactive executive dashboard I can open in my browser and explore - key metrics, top segments, trends, and risk items.' Fold this into a natural overview or strategic prompt so the total stays EXACTLY 7. Phrase it generically (no product names).
-    2. **PERSONA ROTATION (CRITICAL)**: Vary the tone and perspective by rotating personas for each prompt (e.g., CFO, Ops Manager, Regional Director, Front-line Lead).
+    2. **PERSONA ROTATION (CRITICAL)**: Vary the tone and perspective by rotating personas for each prompt (e.g., CFO, Ops Manager, Regional Director, Front-line Lead).${anchorRotationNote}
+    2b. **FILE BINDING - requiredFileId (MANDATORY)**: Set "requiredFileId" ONLY on prompts that cannot succeed without that uploaded file. Never leave requiredFileId empty on ALL 7 prompts.
+        - The CROSS-SOURCE DISCOVERY prompt (Prompt 3) MUST set requiredFileId to the id of the Excel or PDF file it reconciles against the database.
+        - **VISION SHOWCASE (when 'externalFiles' contains image files)**: Either Prompt 3 or Prompt 4 MUST be a workflow that STARTS from reading the photographed/handwritten document image (read the document -> decompose it into individual line items -> reconcile each item against the database -> flag discrepancies -> route exceptions to human approval), and that prompt MUST set requiredFileId to the image file id. This is the multimodal vision showcase - do NOT leave the generated images unused by the demo script.
+        - Prompts that need no uploaded file MUST set requiredFileId to an empty string.${hitlChoreo}
     3. **EXTERNAL DATA NECESSITY & LOGICAL CONSISTENCY (CRITICAL)**: You MUST generate exactly one PDF file AND exactly one Excel file (.xlsx) unless it is completely impossible for the business context. The files generated MUST be external data (not inside the current system) and MUST be unstructured or semi-structured in format.
         - **LOGICAL LINKAGE**: ALL discrepancies or specific transaction IDs (e.g., "INV-7829") mentioned in the external file content MUST correspond to standard records that ACTUALLY EXIST inside the generated BigQuery CSV tables. Do NOT make up transaction IDs in the external file that do not exist in the database tables. This allows the user to find the anomaly by comparing the external file against the database.
         - **CROSS-SOURCE BINDING (MANDATORY)**: The Excel file MUST contain a column whose values are a SUBSET of a BigQuery table's primary key or unique identifier (e.g., order_id, invoice_number). At least 70% of the Excel rows MUST have matching records in the BigQuery tables to enable reliable JOIN-based cross-referencing. The PDF file MUST reference at least 3 specific record identifiers (IDs, invoice numbers, etc.) that exist in the BigQuery tables, enabling the agent to look up those exact records via SQL. This structural binding GUARANTEES that cross-source analysis will succeed during the demo.
+        - **PDF ID SELF-CHECK (MANDATORY)**: After writing the PDF fileContent, VERIFY it quotes at least 3 record identifiers copied VERBATIM from the generated CSV key columns (order/application/invoice IDs etc.). Aggregate figures and entity names are NOT sufficient - the demo's cross-source lookup depends on these exact IDs being queryable via SQL. If fewer than 3 verbatim IDs are present, ADD a "specific flagged cases" section to the PDF that lists the affected records BY ID before finalizing your response.
     3. **FILE FORMAT & REALISM (CRITICAL)**: 
         - For PDF files, generate **substantial, realistic, and highly structured business document content (at least 1,500 characters)** with clear titles, multiple sections using Markdown headings (e.g., '# Summary', '## Background', '### Details'), and bullet points ('- '). It MUST be unstructured text in a rich report format. 
             - **CHART TRANSLATION**: When including data chart placeholders '[CHART: Title, ... ]', you **MUST translate the Title and Metric Labels into the language of the business problem** (e.g., if the problem is in Japanese, translate 'Metrics' to Japanese).
@@ -1530,7 +1659,7 @@ Output in the following JSON format. Output **pure JSON only without code blocks
     - STRING values in the CSV data (e.g., product names, categories, person names, names of things)
     - systemInstruction
     - appliedFactors descriptions
-    - demoGuide titles and prompts
+    - demoGuide titles and prompts${CROSSORG ? ' and watchPoint' : ''}
     - externalFiles: fileName, fileContent, and the specific text strings specified for rendering inside 'imagePrompt' (e.g. Title, Recipient, Sender, Table Columns, and handwritten text values must be translated into the target language, while keeping the overall prompt description in English)
 - **TECHNICAL NAMES (CRITICAL)**: Table names, column names, and ALL ID fields (primary/foreign keys) MUST use English (snake_case) for technical compatibility and data integrity. Do NOT translate technical identifiers.
 - **ABSTRACT INSTRUCTIONS**: Do NOT mention column names in prompts.
@@ -1538,6 +1667,11 @@ Output in the following JSON format. Output **pure JSON only without code blocks
     1. **ALWAYS wrap text-based values** (STRING) in double quotes.
     2. **DO NOT wrap numeric values** (INTEGER, FLOAT) in quotes.
     3. **ALWAYS include the header row (column names) as the very first line of the CSV data. Skipping the header row is strictly forbidden.**
+
+## FINAL SELF-CHECK BEFORE EMITTING (MANDATORY — do this LAST, right before you output the JSON)
+1. **COUNT the data rows in every csvData.** At least one transaction/log table MUST contain ${profile.txnRowTarget}+ rows (hard floor: ${profile.txnMinRows} — responses under the floor are automatically REJECTED and the entire generation is retried, wasting the whole run). Master tables need ${profile.masterRows} rows. If any table is short, ADD realistic rows NOW — never summarize, sample, or truncate.
+2. **VERIFY externalFiles**: exactly one PDF (citing 3+ verbatim record IDs) and one Excel (40-80 detail rows), plus the two images when the scenario is paper-based. A missing file breaks a mandatory demo moment.
+3. Only after both checks pass, emit the JSON.
 `;
 }
 
@@ -1545,10 +1679,91 @@ Output in the following JSON format. Output **pure JSON only without code blocks
 // Step 2: Validation
 // ===========================================
 
+/**
+ * v11.25: targeted density repair. When the planner under-generates rows
+ * (mandate adherence dilutes as the planning prompt grows), regenerating the
+ * WHOLE demo via the client retry loop is expensive and tends to re-fail the
+ * same way for the same scenario. Instead, expand ONLY the largest
+ * (transaction) table with a small follow-up LLM call that appends schema-
+ * and FK-consistent CSV rows. Best-effort: on any failure the table is left
+ * as-is and the hard floor in validateGeneratedData still decides.
+ */
+function expandThinTables_(parsed, options) {
+  try {
+    const profile = getDataProfile_(options.dataProfile || 'standard');
+    if (!parsed.tables || !parsed.tables.length) return;
+    const counts = parsed.tables.map(t => ({ t: t, rows: Math.max(0, String(t.csvData || '').trim().split('\n').length - 1) }));
+    const maxEntry = counts.reduce((a, b) => (b.rows > a.rows ? b : a), counts[0]);
+    if (maxEntry.rows >= profile.txnRowTarget) return; // dense enough
+    const need = Math.min(profile.txnRowTarget, 120) - maxEntry.rows;
+    if (need <= 0) return;
+    const table = maxEntry.t;
+    const lines = String(table.csvData).trim().split('\n');
+    const header = parseCSVLine(lines[0]);
+    // FK domains: appended rows must reuse key values that already exist in
+    // the owning tables, so every JOIN keeps working.
+    const fkDomains = [];
+    for (const col of header) {
+      if (!col.endsWith('_id')) continue;
+      for (const other of parsed.tables) {
+        if (other === table) continue;
+        const oLines = String(other.csvData || '').trim().split('\n');
+        const oHeader = parseCSVLine(oLines[0] || '');
+        const idx = oHeader.indexOf(col);
+        if (idx === -1) continue;
+        const vals = [];
+        for (let i = 1; i < oLines.length && vals.length < 40; i++) {
+          const v = parseCSVLine(oLines[i])[idx];
+          if (v && vals.indexOf(v) === -1) vals.push(v);
+        }
+        if (vals.length) fkDomains.push('- ' + col + ' MUST be one of: ' + vals.join(', '));
+        break;
+      }
+    }
+    const sampleRows = lines.slice(0, 6).join('\n');
+    const prompt = 'You are extending a synthetic demo dataset. Append EXACTLY ' + need +
+      ' additional CSV data rows to the table "' + table.tableName + '".\n\n' +
+      'Schema (name:type): ' + (table.schema || []).map(function(c){ return c.name + ':' + c.type; }).join(', ') + '\n' +
+      'Existing rows (header + first samples - match their style, language, value ranges, and temporal window):\n' + sampleRows + '\n\n' +
+      (fkDomains.length ? 'FOREIGN KEY CONSTRAINTS (STRICT):\n' + fkDomains.join('\n') + '\n\n' : '') +
+      'Rules: unique new primary-key values continuing the existing numbering pattern; realistic variety (no copy-paste repetition); keep the same language as the existing string values; wrap STRING values in double quotes, never numbers; NO header row; NO code fences; NO commentary. Output ONLY the ' + need + ' CSV lines.';
+    const resp = callVertexAIWithRetry(prompt);
+    const fenceRe = new RegExp(String.fromCharCode(96, 96, 96) + '[a-z]*\\n?', 'g');
+    const newLines = String(resp).replace(fenceRe, '').split('\n')
+      .map(function(s){ return s.trim(); })
+      .filter(function(s){ return s && parseCSVLine(s).length >= Math.max(2, header.length - 2); });
+    if (newLines.length >= Math.min(10, need)) {
+      table.csvData = String(table.csvData).trim() + '\n' + newLines.join('\n');
+      console.log('[DENSITY REPAIR] ' + table.tableName + ': +' + newLines.length + ' rows (was ' + maxEntry.rows + ')');
+    } else {
+      console.warn('[DENSITY REPAIR] insufficient rows returned (' + newLines.length + ') for ' + table.tableName);
+    }
+  } catch (e) {
+    console.warn('[DENSITY REPAIR] skipped: ' + e.message);
+  }
+}
+
 function validateGeneratedData(planResult, targetRows, dataProfileId) {
   const profile = getDataProfile_(dataProfileId || 'standard');
   if (!planResult.tables || planResult.tables.length === 0) {
     throw new Error('No table definitions generated');
+  }
+
+  // v11.24: hard row-count floor. Observed live (v11.23 pharma demo): the
+  // planner emitted 8-row transaction tables (standard floor is 30) while
+  // using only a fraction of the output token budget - row-mandate adherence
+  // dilutes as the planning prompt grows. Throwing here routes the run into
+  // the client's existing auto-retry, so an under-dense response is
+  // regenerated instead of shipping a hollow demo.
+  const _rowCounts = planResult.tables.map(t => ({
+    name: t.tableName,
+    rows: Math.max(0, String(t.csvData || '').trim().split('\n').length - 1)
+  }));
+  const _maxRows = Math.max.apply(null, _rowCounts.map(r => r.rows));
+  if (_maxRows < profile.txnMinRows) {
+    throw new Error('Data density below profile floor: largest table has ' + _maxRows +
+      ' rows (< ' + profile.txnMinRows + ' required for the ' + profile.label + ' profile). Row counts: ' +
+      _rowCounts.map(r => r.name + '=' + r.rows).join(', '));
   }
   
   for (const table of planResult.tables) {
@@ -1948,7 +2163,7 @@ Return ONLY the name, nothing else.`;
 // managed_agent_instruction.txt, so it passes verbatim (runtime value, never
 // re-parsed as a JS template literal). English harness text only - the agent
 // is instructed to match the language of each delegated task.
-function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollection, hasSkills, workspaceActions) {
+function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollection, hasSkills, workspaceActions, browserFindings, operatingModel) {
   const nl = '\n';
   const text =
     'You are an autonomous specialist agent working inside a secure cloud sandbox with a bash terminal, a persistent filesystem, code execution, pip/npm installs, Google Search, and web page reading.' + nl +
@@ -1956,6 +2171,11 @@ function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollect
     '--- BUSINESS CONTEXT ---' + nl +
     (businessInstruction || 'No additional business context provided.') + nl +
     '--- END BUSINESS CONTEXT ---' + nl + nl +
+    (operatingModel ? (
+    '--- OPERATING MODEL (organizational context) ---' + nl +
+    operatingModel + nl +
+    'Frame your deliverables within this operating model: attribute findings to the departments that own the data, address recommendations to the department that owns the decision, and describe hand-offs between departments explicitly.' + nl +
+    '--- END OPERATING MODEL ---' + nl + nl) : '') +
     'SANDBOX SOFTWARE (use it - do not rediscover it)' + nl +
     '- Preinstalled Python 3.11 packages: pandas, numpy, beautifulsoup4, requests, pyyaml. Preinstalled Node.js 20: typescript, create-vite, create-next-app. Preinstalled UNIX tools: git, ripgrep (rg), fd, jq, curl, wget, rsync, tree, bc, unzip.' + nl +
     '- Additional pip/npm installs are allowed and PERSIST in this environment snapshot across tasks - try the import first (a warm-up usually preinstalled python-pptx, python-docx, reportlab, matplotlib, japanize-matplotlib, pypdf); install only what is actually missing, never reinstall.' + nl +
@@ -1968,6 +2188,10 @@ function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollect
     'DATA ACCESS' + nl +
     '- BigQuery MCP tools give you direct read access to the demo dataset: ' + datasetId + '. Firestore MCP tools expose the operational collection: ' + fsCollection + '. Dataplex Knowledge Catalog MCP tools let you discover and understand these data assets semantically (treat the catalog as read-only).' + nl +
     '- Query internal data EARLY in the task: the data-tool credentials attached to each delegation expire after about an hour.' + nl + nl +
+    (browserFindings ? (
+    'BROWSER FINDINGS' + nl +
+    '- When the task message contains a "BROWSER FINDINGS" block inside INPUT DATA, it is live web data gathered moments before delegation by the requesting assistant using its real interactive browser. Treat it as fresh and authoritative: build on it, cite its source URLs in your deliverables, and do NOT spend steps re-fetching the same pages.' + nl +
+    '- You have NO interactive browser yourself. If additional web information is needed beyond the findings, use your read-only tools (Google Search, web page reading). If a page truly requires interaction (login, form entry, clicking through an app), state that limitation in your report instead of attempting it, and never claim you operated a browser.' + nl + nl) : '') +
     (hasSkills ? (
     'SKILLS' + nl +
     '- Skill packs are mounted at /.agent/skills. BEFORE building any deliverable (presentation deck, document, PDF, web page), list that directory, READ the matching SKILL.md, and follow its process, design system, and verification steps exactly.' + nl +
@@ -2002,7 +2226,7 @@ function buildManagedAgentInstruction_(businessInstruction, datasetId, fsCollect
 }
 
 function generateSetupScript(params) {
-  const { datasetId, systemInstruction, businessInstruction, referenceDate, publicDatasetId, suffix, tables, firestore, userGoal, dirName, agentShortName, oneSentenceSummary, enableWorkspaceMcp, enableComputerUse, enableManagedAgent, enableWorkspaceAuth, metadata } = params;
+  const { datasetId, systemInstruction, businessInstruction, referenceDate, publicDatasetId, suffix, tables, firestore, userGoal, dirName, agentShortName, oneSentenceSummary, operatingModel, enableWorkspaceMcp, enableComputerUse, enableManagedAgent, enableWorkspaceAuth, metadata } = params;
 
   // Derived feature gates (see AGENTS.md section 14):
   // - workspaceAuthEnabled: the GE OAuth authorization (user token) exists.
@@ -2011,6 +2235,10 @@ function generateSetupScript(params) {
   //   Workspace (Drive save + gws CLI actions) - needs BOTH capabilities.
   const workspaceAuthEnabled = !!(enableWorkspaceMcp || enableWorkspaceAuth);
   const driveHandoffEnabled = !!(enableManagedAgent && workspaceAuthEnabled);
+  // - preBrowseEnabled: composite tasks can be delegated with live browser
+  //   findings gathered by the root agent BEFORE delegation (pre-browse) -
+  //   needs BOTH the browser tooling and the autonomous agent.
+  const preBrowseEnabled = !!(enableManagedAgent && enableComputerUse);
 
   // ── Deduplicate importedMcpList by github_url ──
   // When the same MCP repo appears multiple times (e.g. from catalog + URL import),
@@ -2049,23 +2277,45 @@ function generateSetupScript(params) {
   const safeShortName = bashEscape(agentShortName) || 'Agent';
   const safeSummary = bashEscape(oneSentenceSummary) || 'A2A Agent';
 
-  // Generation-time reachability check for the pinned agent-template ref.
-  // Surfaces a banner in the generated script (visible in the UI preview)
-  // instead of letting the customer's Cloud Shell discover a dead ref later.
+  // Agent-template ref: generation-time resolution + reachability check.
+  // A branch-name TEMPLATE_REF (the committed default is 'main') is resolved
+  // HERE to a concrete commit SHA and that SHA is baked into the generated
+  // script, keeping every script reproducible while the repo never has to
+  // commit its own merge SHA. A 40-hex TEMPLATE_REF (Script Property)
+  // hard-pins and skips resolution. On API failure the script falls back to
+  // fetching the ref as written (a branch fetch still works - it just tracks
+  // the tip), and a banner in the script preview explains what happened.
+  let templateRef = CONFIG.TEMPLATE_REF;
   let templateRefBanner = '';
   try {
     const repoMatch = CONFIG.TEMPLATE_REPO.match(/github\.com[:\/]([^\/]+\/[^\/.]+)/);
     if (repoMatch) {
+      const refIsSha = /^[0-9a-f]{40}$/i.test(templateRef);
       const refResp = UrlFetchApp.fetch(
-        'https://api.github.com/repos/' + repoMatch[1] + '/commits/' + encodeURIComponent(CONFIG.TEMPLATE_REF),
-        { muteHttpExceptions: true });
-      if (refResp.getResponseCode() !== 200) {
+        'https://api.github.com/repos/' + repoMatch[1] + '/commits/' + encodeURIComponent(templateRef),
+        { muteHttpExceptions: true, headers: getGithubHeaders() });
+      if (refResp.getResponseCode() === 200) {
+        if (!refIsSha) {
+          const resolvedSha = (JSON.parse(refResp.getContentText()) || {}).sha;
+          if (/^[0-9a-f]{40}$/i.test(resolvedSha || '')) {
+            templateRef = resolvedSha;
+          }
+        }
+      } else if (refIsSha) {
         templateRefBanner = '# =========================================================\n' +
           '# WARNING (generation-time check): agent-template ref\n' +
-          '#   ' + CONFIG.TEMPLATE_REF + '\n' +
+          '#   ' + templateRef + '\n' +
           '# was NOT reachable in ' + CONFIG.TEMPLATE_REPO + '\n' +
           '# when this script was generated. The template fetch below will\n' +
           '# likely fail. Update the TEMPLATE_REF Script Property and regenerate.\n' +
+          '# =========================================================\n\n';
+      } else {
+        templateRefBanner = '# =========================================================\n' +
+          '# NOTE (generation-time check): the agent-template ref \'' + templateRef + '\'\n' +
+          '# could not be resolved to a commit SHA when this script was\n' +
+          '# generated (GitHub API unreachable or rate-limited). The fetch\n' +
+          '# below will track the CURRENT TIP of that ref instead of a fixed\n' +
+          '# commit. Regenerate later for a fully pinned script.\n' +
           '# =========================================================\n\n';
       }
     }
@@ -2141,7 +2391,7 @@ function generateSetupScript(params) {
     : '';
   const managedAgentId = (dirName + '-auto').toLowerCase().replace(/[^a-z0-9-]/g, '-').substring(0, 63).replace(/-+$/, '');
   const managedAgentInstruction = enableManagedAgent
-    ? buildManagedAgentInstruction_(businessInstruction || '', datasetId, fsCollection, true, workspaceAuthEnabled)
+    ? buildManagedAgentInstruction_(businessInstruction || '', datasetId, fsCollection, true, workspaceAuthEnabled, preBrowseEnabled, operatingModel || '')
     : '';
 
   // Build local BQ creation commands
@@ -2307,7 +2557,10 @@ Requirements:
     firestoreCommands += `  echo "    ✅ Cloud Run Function already exists."\n`;
     firestoreCommands += `else\n`;
     firestoreCommands += `  VIEWER_LOG=\$(mktemp /tmp/viewer-deploy-XXXXXX.log)\n`;
-    firestoreCommands += `  gcloud functions deploy ${dirName}-viewer --gen2 --runtime=python311 --region=us-central1 --source=${dirName}/viewer_app --entry-point=main --trigger-http --allow-unauthenticated --set-env-vars=DEMO_ID=${dirName} --project="$PROJECT_ID" > "\$VIEWER_LOG" 2>&1 &\n`;
+    // v11.12: --no-allow-unauthenticated + IAP (see the IAP block below). Never
+    // grants allUsers, so the deploy works under Domain Restricted Sharing org
+    // policies and demo data is never exposed on a public URL.
+    firestoreCommands += `  gcloud functions deploy ${dirName}-viewer --gen2 --runtime=python311 --region=us-central1 --source=${dirName}/viewer_app --entry-point=main --trigger-http --no-allow-unauthenticated --set-env-vars=DEMO_ID=${dirName} --project="$PROJECT_ID" > "\$VIEWER_LOG" 2>&1 &\n`;
     firestoreCommands += `  VIEWER_PID=\$!\n`;
     firestoreCommands += `  printf "    ⏳ Deploying Data Viewer"\n`;
     firestoreCommands += `  while kill -0 \$VIEWER_PID 2>/dev/null; do\n`;
@@ -2324,6 +2577,20 @@ Requirements:
     firestoreCommands += `  else\n`;
     firestoreCommands += `    echo "    ⚠️ WARNING: Failed to deploy Firestore Data Viewer. Build log:"\n`;
     firestoreCommands += `    cat "\$VIEWER_LOG"\n`;
+    // v11.14: orgs commonly restrict constraints/run.allowedIngress to
+    // internal(-and-gclb), which rejects the CreateService call before IAP is
+    // even relevant. NON-INTERACTIVE by design: most operators cannot change
+    // org policies, and a mid-script prompt would stall unattended runs. We
+    // only explain the cause and print the manual remedy for operators who
+    // DO hold org-policy admin, then continue without the viewer.
+    firestoreCommands += `    if grep -q "run.allowedIngress" "\$VIEWER_LOG"; then\n`;
+    firestoreCommands += `      echo ""\n`;
+    firestoreCommands += `      echo "    🚧 Cause: org policy 'constraints/run.allowedIngress' does not allow public ingress, which the browser-based Data Viewer needs."\n`;
+    firestoreCommands += `      echo "       The Data Viewer is skipped in this environment. If you hold Organization Policy Administrator on this project"\n`;
+    firestoreCommands += `      echo "       you can allow it and re-run this script:"\n`;
+    firestoreCommands += `      echo "         gcloud resource-manager org-policies allow constraints/run.allowedIngress all --project=$PROJECT_ID"\n`;
+    firestoreCommands += `      echo "       (Viewer access itself stays IAP-protected - it is never public even with ingress allowed.)"\n`;
+    firestoreCommands += `    fi\n`;
     firestoreCommands += `    echo "    ℹ️  This is an optional component and does NOT affect the agent's functionality."\n`;
     firestoreCommands += `    echo "    ℹ️  The agent will work normally without the Data Viewer."\n`;
     firestoreCommands += `  fi\n`;
@@ -2335,6 +2602,42 @@ Requirements:
     firestoreCommands += `  VIEWER_URL=$(gcloud functions describe ${dirName}-viewer --gen2 --region=us-central1 --format="value(serviceConfig.uri)" --project="$PROJECT_ID")\n`;
     firestoreCommands += `else\n`;
     firestoreCommands += `  VIEWER_DEPLOYED=false\n`;
+    firestoreCommands += `fi\n`;
+    // Always-on IAP (v11.12): the viewer is deployed WITHOUT public access, so
+    // enable Cloud Run IAP and grant the deploying user. Runs for both fresh and
+    // pre-existing deployments (idempotent). Fail-soft: if IAP cannot be enabled
+    // the viewer stays unreachable, so we drop it (agent works without it).
+    firestoreCommands += `if [ "$VIEWER_DEPLOYED" = "true" ]; then\n`;
+    firestoreCommands += `  echo "    🔐 Enabling IAP on the Data Viewer (no public access)..."\n`;
+    firestoreCommands += `  PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")\n`;
+    firestoreCommands += `  gcloud beta services identity create --service=iap.googleapis.com --project="$PROJECT_ID" >/dev/null 2>&1 || true\n`;
+    firestoreCommands += `  IAP_SA="service-$PROJECT_NUMBER@gcp-sa-iap.iam.gserviceaccount.com"\n`;
+    firestoreCommands += `  gcloud run services add-iam-policy-binding ${dirName}-viewer --region=us-central1 --member="serviceAccount:$IAP_SA" --role="roles/run.invoker" --project="$PROJECT_ID" >/dev/null 2>&1 || true\n`;
+    firestoreCommands += `  VIEWER_IAP_OK=false\n`;
+    firestoreCommands += `  _IAP_ERR=""\n`;
+    firestoreCommands += `  for _IAP_TRY in 1 2 3; do\n`;
+    firestoreCommands += `    if _IAP_ERR=$(gcloud beta run services update ${dirName}-viewer --region=us-central1 --iap --project="$PROJECT_ID" 2>&1); then\n`;
+    firestoreCommands += `      VIEWER_IAP_OK=true\n`;
+    firestoreCommands += `      break\n`;
+    firestoreCommands += `    fi\n`;
+    firestoreCommands += `    sleep 10\n`;
+    firestoreCommands += `  done\n`;
+    firestoreCommands += `  DEPLOYER_EMAIL=$(gcloud config get-value account 2>/dev/null)\n`;
+    firestoreCommands += `  if [ "$VIEWER_IAP_OK" = "true" ]; then\n`;
+    firestoreCommands += `    if [ -n "$DEPLOYER_EMAIL" ]; then\n`;
+    firestoreCommands += `      gcloud beta iap web add-iam-policy-binding --project="$PROJECT_ID" --resource-type=cloud-run --region=us-central1 --service=${dirName}-viewer --member="user:$DEPLOYER_EMAIL" --role="roles/iap.httpsResourceAccessor" >/dev/null 2>&1 || true\n`;
+    firestoreCommands += `    fi\n`;
+    firestoreCommands += `    echo "    ✅ IAP enabled. Viewer access granted to: $DEPLOYER_EMAIL"\n`;
+    firestoreCommands += `    echo "    ℹ️  Open the viewer once in your browser before the demo to complete sign-in."\n`;
+    firestoreCommands += `    echo "    ℹ️  Grant more viewers with:"\n`;
+    firestoreCommands += `    echo "        gcloud beta iap web add-iam-policy-binding --project=$PROJECT_ID --resource-type=cloud-run --region=us-central1 --service=${dirName}-viewer --member=user:EMAIL --role=roles/iap.httpsResourceAccessor"\n`;
+    firestoreCommands += `  else\n`;
+    firestoreCommands += `    echo "    ⚠️ WARNING: Could not enable IAP on the Data Viewer; it would be unreachable, so it is disabled."\n`;
+    firestoreCommands += `    echo "    ℹ️  Last gcloud error was:"\n`;
+    firestoreCommands += `    echo "\$_IAP_ERR" | tail -n 3 | sed 's/^/       /'\n`;
+    firestoreCommands += `    echo "    ℹ️  The agent works normally without the Data Viewer."\n`;
+    firestoreCommands += `    VIEWER_DEPLOYED=false\n`;
+    firestoreCommands += `  fi\n`;
     firestoreCommands += `fi\n\n`;
   }
 
@@ -3524,14 +3827,14 @@ fi
 # --- Agent Template Fetch (pinned) ---
 # Static Python/JSON files (ADK agent runtime, A2UI examples, data viewer) are
 # fetched from the repo at a pinned ref instead of being embedded here.
-echo "📥 Fetching agent template (ref ${CONFIG.TEMPLATE_REF})..."
+echo "📥 Fetching agent template (ref ${templateRef})..."
 GE_TPL_ROOT="$(pwd)/_ge_template"
 rm -rf "$GE_TPL_ROOT"
 git init -q "$GE_TPL_ROOT"
 git -C "$GE_TPL_ROOT" remote add origin "${CONFIG.TEMPLATE_REPO}"
 git -C "$GE_TPL_ROOT" sparse-checkout set --cone "${CONFIG.TEMPLATE_SUBDIR}" 2>/dev/null || true
-if ! git -C "$GE_TPL_ROOT" fetch -q --depth 1 --filter=blob:none origin "${CONFIG.TEMPLATE_REF}"; then
-  echo "❌ Could not fetch agent template ref '${CONFIG.TEMPLATE_REF}'"
+if ! git -C "$GE_TPL_ROOT" fetch -q --depth 1 --filter=blob:none origin "${templateRef}"; then
+  echo "❌ Could not fetch agent template ref '${templateRef}'"
   echo "   from ${CONFIG.TEMPLATE_REPO}."
   echo "   The pinned template version is unreachable. Ask the demo creator to"
   echo "   regenerate this script (the app's TEMPLATE_REF may need updating)."
@@ -4680,12 +4983,29 @@ ${params.importedMcpList.map((mcp, idx) => {
 // ===========================================
 
 /**
+ * Normalizes a target-persona object sent from the client into a plain text
+ * description safe for interpolation into LLM prompt template literals.
+ * Strips backticks, curly braces, and backslashes (see AGENTS.md rules 7/13)
+ * and caps the length. Returns '' when no persona is selected, which keeps
+ * every prompt byte-identical to the pre-persona behavior.
+ * @param {Object|null} persona - { id, label, description, custom? } or null
+ * @returns {string} Sanitized description text, or '' when absent
+ */
+function sanitizePersonaText_(persona) {
+  if (!persona || typeof persona !== 'object') return '';
+  const raw = String(persona.description || persona.label || '');
+  const stripRe = new RegExp('[' + String.fromCharCode(96) + '{}\\\\]', 'g');
+  return raw.replace(stripRe, '').replace(/\s+/g, ' ').trim().substring(0, 300);
+}
+
+/**
  * Researches a company by its domain name using Gemini + Google Search grounding.
  * Returns company info, business challenges, workflows, and a suggested agent goal.
  * @param {string} domain - Customer domain (e.g., "toyota.co.jp")
+ * @param {Object|null} persona - Optional target persona { id, label, description }
  * @returns {Object} Structured company research results
  */
-function researchCompanyByDomain(domain) {
+function researchCompanyByDomain(domain, persona) {
   if (!domain || typeof domain !== 'string') {
     return { success: false, error: 'Domain is required.' };
   }
@@ -4713,11 +5033,16 @@ function researchCompanyByDomain(domain) {
     }
   }
 
+  const personaDesc = sanitizePersonaText_(persona);
+  const personaBlock = personaDesc
+    ? '\n**TARGET PERSONA (MANDATORY)**: This demo is being prepared for a specific target user: ' + personaDesc + '. Apply this throughout: when listing "workflows", prioritize workflows that this persona owns or directly depends on. The "suggestedGoal" MUST be written around this persona\'s own business process: name this role explicitly as the primary user of the AI agent, and frame the business problem, stakeholders, and KPIs from this persona\'s point of view. Render the role title naturally in the RESPONSE LANGUAGE.\n'
+    : '';
+
   const prompt = `You are a business analyst researching a company for an AI agent demo preparation.
 Research the company behind the domain "${domain}" using the latest available information from the internet.
 
 **RESPONSE LANGUAGE**: Respond entirely in ${responseLang}.
-
+${personaBlock}
 Provide the following information in a structured JSON format:
 1. **companyName**: Official company name
 2. **companySummary**: Brief company overview (industry, scale, main business areas, headquarters location) in 2-3 sentences
@@ -4733,6 +5058,8 @@ Provide the following information in a structured JSON format:
    - Describe a specific, actionable business problem that an AI agent could solve
    - Include realistic operational context (data sources, stakeholders, KPIs)
    - Follow the theme of "Autonomous Action and Core System Optimization" — the agent should detect events, analyze data, and actively update core systems
+   - Span at least two departments that share the same core-system data, and describe the hand-off between them that the agent automates. Where the business problem plausibly involves only one department, model the hand-off with an adjacent supporting function (e.g., support -> billing, support -> product quality)
+7. **quantFacts**: An object of verifiable QUANTITATIVE facts about the company for grounding synthetic demo data in real-world scale. Include ONLY facts clearly supported by your search results - omit any key you are not confident about (an empty object is fine; NEVER estimate or invent numbers). All values are strings that include the unit and, when known, the as-of year. Possible keys (all optional): "storeCount", "siteCount", "employeeCount", "annualRevenue", "mainRegions" (array of region/prefecture names ordered by weight), "productCategories" (array of the main product/service categories), "notableScale" (one free-form fact like daily shipments or member count).
 
 **IMPORTANT**:
 - Use REAL, factual information about this company. Do NOT hallucinate or invent details.
@@ -4749,7 +5076,8 @@ Output pure JSON only (no code blocks, no markdown):
     {"name": "...", "automatable": true, "reason": "..."},
     {"name": "...", "automatable": false, "reason": "..."}
   ],
-  "suggestedGoal": "..."
+  "suggestedGoal": "...",
+  "quantFacts": { "storeCount": "...", "mainRegions": ["..."] }
 }`;
 
   try {
@@ -4812,7 +5140,8 @@ Output pure JSON only (no code blocks, no markdown):
       industry: parsed.industry || '',
       businessChallenges: parsed.businessChallenges || [],
       workflows: parsed.workflows || [],
-      suggestedGoal: parsed.suggestedGoal
+      suggestedGoal: parsed.suggestedGoal,
+      quantFacts: parsed.quantFacts || null
     };
   } catch (e) {
     console.error('[RESEARCH] Error for domain ' + domain + ':', e.message);
@@ -4826,14 +5155,23 @@ Output pure JSON only (no code blocks, no markdown):
  * ensuring the Business Scenario section stays consistent with the selected workflows.
  * @param {Object} companyInfo - { companyName, industry, companySummary }
  * @param {Array} selectedWorkflows - [{ name, reason }, ...]
+ * @param {Object|null} persona - Optional target persona { id, label, description }
  * @returns {Object} { success: boolean, goal: string, error?: string }
  */
-function regenerateGoalForWorkflows(companyInfo, selectedWorkflows) {
+function regenerateGoalForWorkflows(companyInfo, selectedWorkflows, persona) {
   if (!companyInfo || !selectedWorkflows || selectedWorkflows.length === 0) {
     return { success: false, error: 'Company info and at least one workflow are required.' };
   }
 
   const responseLang = /[\u3000-\u9fff\uff00-\uffef]/.test(companyInfo.companySummary) ? '日本語' : 'English';
+
+  const personaDesc = sanitizePersonaText_(persona);
+  const personaSection = personaDesc
+    ? '\n## Target Persona\nThe demo user is ' + personaDesc + '.\n'
+    : '';
+  const personaRule = personaDesc
+    ? '\n- Write the scenario from the Target Persona\'s point of view: the business problem, stakeholders, and KPIs must belong to this persona\'s own business process, and this persona must be the primary user of the AI agent. Render the role title naturally in the output language.'
+    : '';
 
   const prompt = `You are a business analyst creating an AI agent demo scenario.
 
@@ -4843,7 +5181,7 @@ Given the company and selected workflows below, write a detailed business scenar
 - Name: ${companyInfo.companyName}
 - Industry: ${companyInfo.industry}
 - Overview: ${companyInfo.companySummary}
-
+${personaSection}
 ## Selected Workflows for AI Agent Automation
 ${selectedWorkflows.map(w => `- ${w.name}: ${w.reason}`).join('\n')}
 
@@ -4853,7 +5191,8 @@ ${selectedWorkflows.map(w => `- ${w.name}: ${w.reason}`).join('\n')}
 - Describe a specific, actionable business problem that an AI agent could solve
 - Include realistic operational context (data sources, stakeholders, KPIs)
 - Theme: "Autonomous Action and Core System Optimization" — the agent should detect events, analyze data, and actively update core systems
-- Write entirely in ${responseLang}
+- Span at least two departments that share the same core-system data, and describe the hand-off between them that the agent automates (if only one department plausibly applies, use an adjacent supporting function such as support -> billing)
+- Write entirely in ${responseLang}${personaRule}
 
 Output ONLY the scenario text. No JSON, no code blocks, no explanations.`;
 
@@ -5651,6 +5990,14 @@ function optimizeGoalWithMagicWand(rawGoal, capabilityOpts) {
   const managedAgentRequirement = _capManaged ? `
 4.  **Autonomous Strategic Initiative (MANDATORY)**: The Operational Challenge MUST additionally define ONE standing long-horizon mission suited to a fully autonomous agent working for tens of minutes: live external research (industry trends, competitor moves, market prices, regulations) combined with the company's own data through real quantitative analysis, culminating in an executive-grade deliverable (a board presentation, a formal proposal document, a PDF report, or an interactive briefing page${ _capWorkspace ? ', delivered into the team workspace - saved to shared drives, summarized in a draft email, or posted to the team chat' : ''}). State the business question it answers, the expected deliverable and its audience, and the quality bar (real numbers, cited sources, decision-ready structure). Keep it in business language - no tool or product names.` : '';
 
+  // Optional target-persona override: when the demo creator picked a persona in
+  // the UI, the optimized scenario must be framed around that role instead of
+  // letting the model invent one. Empty string = prompt unchanged.
+  const _personaDesc = sanitizePersonaText_(_caps.persona);
+  const personaRequirement = _personaDesc
+    ? '\n' + (_capManaged ? '5' : '4') + '.  **Target Persona Override (MANDATORY)**: This demo targets a specific user: ' + _personaDesc + '. Header 2 (Target Role) MUST be a single specific, professional job title matching this persona, translated naturally into the detected output language. The Business Scenario (Header 3) and the Operational Challenge (Header 4) MUST be framed around this persona\'s own business process, daily decisions, and KPIs. If the input text implies a different role, the persona specified here takes precedence.'
+    : '';
+
   const prompt = `You are an expert prompt engineer and business analyst.
 Your task is to take a raw, simple, or loosely defined business scenario, OR a partially structured business scenario (which might contain company details and selected target workflows from prior research), and optimize/expand it into a **perfectly structured, high-density professional Business Scenario prompt** in Markdown format.
 
@@ -5675,13 +6022,14 @@ Requirements for the Structured Output:
         - Explicit business rules and numeric thresholds appropriate to the domain (e.g., CPA limit, price discrepancy threshold).
         - Clear conditional paths (what is auto-process vs. what requires human approval).
         - Data systems involved (BigQuery/external files, Firestore operational database, Google Sheets).
+        - **Cross-Departmental Span (MANDATORY)**: The operational challenge MUST span at least two departments that share the same core-system data, and describe the hand-off between them that the agent automates. Where the business problem plausibly involves only one department, model the hand-off with an adjacent supporting function (e.g., support -> billing, support -> product quality).
         - **High-fidelity Assets & Multi-modal Integration**: Intelligently design the challenge to utilize the platform's asset generation capabilities:
             1. **Visual/HITL Triggers**: If the workflow involves any paper forms, manual applications, receipts, shipping box damages, visual inspection anomalies, or legacy physical processes, explicitly mandate a **JPEG image asset** (e.g. handwritten fax order, scanned invoice, damaged package photograph) as the primary trigger, requiring the agent to use multimodal vision before routing to Firestore for Human-in-the-Loop (HITL) manager approval.
             2. **Structured Ledgers**: Integrate transactional logs, excel data dumps, or raw CSV exports as **Excel/CSV/TSV files** that the agent must parse (using TSV/CSV delimiter logic) and reconcile against the DB.
             3. **Executive Reports & Interactive Cards**: Design the workflow to output professional, structured reports (saved to the operational database/Firestore) and rich interactive UI cards (using A2UI) as the final outcome or human review package.
         *NOTE*: If the input already lists target workflows or specific steps, respect them and build the operational challenge specifically around those workflows.
 2.  **Operational/Database Focus**: ALWAYS frame the scenario as a database-driven workflow where the agent reads from analytical sources (BigQuery/external files) and **writes back status updates, high-risk alerts, or proposed changes to the operational database (Firestore)** to keep the real-time console updated.
-3.  **No Fictional Placeholders**: Use realistic brand names, locations, and values appropriate to the language context. Do NOT use generic placeholders like \"Product A\", \"Company XYZ\", etc.${managedAgentRequirement}
+3.  **No Fictional Placeholders**: Use realistic brand names, locations, and values appropriate to the language context. Do NOT use generic placeholders like \"Product A\", \"Company XYZ\", etc.${managedAgentRequirement}${personaRequirement}
 
 Return ONLY the raw Markdown text in the detected language. Do not include any code block wrappers (triple backticks), code fences, or preamble.`;
 
