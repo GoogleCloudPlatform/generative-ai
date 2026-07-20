@@ -241,6 +241,7 @@ Centros
 ceo
 cer
 cfbundle
+cfo
 chatbots
 CHECKOV
 CHENNAI
@@ -320,6 +321,7 @@ cristo
 crm
 CRM
 Crossbody
+CROSSORG
 crosstab
 csa
 cse
@@ -616,6 +618,7 @@ gbq
 gca
 gce
 gchar
+gclb
 gcloud
 gcp
 gcs
@@ -791,6 +794,7 @@ ICDAR
 Ichiro
 ICICI
 ICML
+ictx
 icudtl
 idcg
 idk
@@ -823,6 +827,7 @@ inds
 inermis
 INFOPLIST
 informati
+infosys
 inpaint
 inpainted
 inr
@@ -839,6 +844,7 @@ ipynb
 ipywebrtc
 IRAs
 isa
+isess
 itable
 itables
 itb
@@ -1368,6 +1374,7 @@ Pranav
 praw
 prcntg
 PRD
+PREBROWSE
 Pré
 preds
 pregel
@@ -1488,6 +1495,7 @@ RMSE
 rmsg
 RNN
 RNNs
+ROAS
 Robeco
 Robo
 Robotica
@@ -1532,6 +1540,7 @@ scidocs
 scifact
 scifi
 scikit
+scm
 Scorsese
 sdec
 sdetail
@@ -1944,6 +1953,7 @@ WRatio
 wscat
 wscore
 wscores
+wst
 wstoken
 wstring
 wurden

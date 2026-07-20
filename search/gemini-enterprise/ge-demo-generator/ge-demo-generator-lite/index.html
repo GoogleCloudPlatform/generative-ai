@@ -111,6 +111,20 @@ limitations under the License.
             <h2 class="text-lg font-semibold text-white">Define Your Demo Goal</h2>
           </div>
 
+          <!-- Target persona (indigo) - placed BEFORE domain research so the
+               persona is chosen first and shapes the research results. -->
+          <div class="mb-6 p-5 bg-gradient-to-br from-indigo-900/20 to-blue-900/10 rounded-2xl border border-indigo-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Target Persona</label>
+              <span class="text-[10px] text-slate-500 uppercase">Optional</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-3">Choose who the demo agent is for. Domain research below and Optimize Prompt will frame the scenario around this role. Leave on Auto to let the AI pick the best-fit role.</p>
+            <div id="personaFilters" class="flex flex-wrap gap-2"></div>
+            <div id="personaCustomWrap" class="hidden mt-3">
+              <input id="personaCustomInput" type="text" maxlength="120" oninput="updatePersonaRerunHint()" placeholder="e.g. Plant Quality Assurance Manager, Hospital Bed Coordinator..." class="w-full bg-slate-900/60 border border-indigo-500/30 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+
           <!-- Domain research (violet) -->
           <div class="mb-6 p-5 bg-gradient-to-br from-violet-900/20 to-purple-900/10 rounded-2xl border border-violet-500/20">
             <div class="flex items-center justify-between mb-2">
@@ -127,6 +141,10 @@ limitations under the License.
             </div>
             <div id="researchError" class="hidden mt-3 text-xs text-red-300 bg-red-500/10 rounded-lg p-2"></div>
             <div id="researchResult" class="hidden mt-4 bg-black/30 border border-violet-500/25 rounded-2xl overflow-hidden">
+              <div id="personaRerunHint" class="hidden p-3 bg-indigo-500/10 border-b border-indigo-500/30 flex flex-col sm:flex-row sm:items-center gap-2">
+                <p class="flex-1 text-[11px] text-indigo-300 leading-relaxed">The Target Persona changed after this research ran. Re-run it so challenges, workflows, and the suggested scenario reflect the new persona.</p>
+                <button onclick="researchDomain()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider whitespace-nowrap">Re-run Research</button>
+              </div>
               <div class="p-4 border-b border-white/5">
                 <div class="flex items-center gap-2"><h4 id="researchCompanyName" class="text-base font-bold text-white"></h4><span id="researchIndustry" class="text-[10px] font-bold text-violet-300 bg-violet-500/10 rounded px-1.5 py-0.5"></span></div>
                 <p id="researchSummary" class="text-xs text-slate-400 leading-relaxed mt-2"></p>
@@ -194,7 +212,7 @@ limitations under the License.
             </div>
 
             <div class="relative mb-4">
-              <textarea id="userGoal" rows="6" oninput="localStorage.setItem('gebe_generator_input', this.value)" class="w-full bg-slate-900/60 border border-white/10 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono leading-relaxed" placeholder="e.g. Retail store inventory management demo for a regional supermarket chain"></textarea>
+              <textarea id="userGoal" rows="6" oninput="localStorage.setItem('gedemo_generator_input', this.value)" class="w-full bg-slate-900/60 border border-white/10 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono leading-relaxed" placeholder="e.g. Retail store inventory management demo for a regional supermarket chain"></textarea>
               <div id="goalPreview" class="hidden w-full bg-slate-900/60 border border-white/10 rounded-xl p-4 text-slate-100 min-h-[160px] max-h-[420px] overflow-y-auto thin-scroll"></div>
               <div id="magicWandOverlay" class="hidden absolute inset-x-0 bottom-0 top-0 flex-col items-center justify-center bg-slate-950/85 rounded-xl border border-white/5 z-20" style="display:none;">
                 <div class="w-10 h-10 border-2 border-indigo-400 border-t-transparent rounded-full spin mb-3"></div>
@@ -513,7 +531,7 @@ limitations under the License.
       window.currentMethod = 'manual';
       var ta = el('userGoal');
       ta.value = text;
-      localStorage.setItem('gebe_generator_input', text);
+      localStorage.setItem('gedemo_generator_input', text);
       ta.classList.add('highlight-glow');
       setTimeout(function(){ ta.classList.remove('highlight-glow'); }, 2000);
       setGoalTab(asPreview ? 'preview' : 'edit');
@@ -571,13 +589,86 @@ limitations under the License.
       var ov = el('magicWandOverlay'); ov.style.display = 'flex';
       var i = 0; el('magicWandStatus').textContent = MW_STATUSES[0];
       mwInterval = setInterval(function(){ i = (i + 1) % MW_STATUSES.length; el('magicWandStatus').textContent = MW_STATUSES[i]; }, 1500);
-      run('optimizeGoalWithMagicWand', [raw]).then(function (res) {
+      run('optimizeGoalWithMagicWand', [raw, getSelectedPersona()]).then(function (res) {
         if (res && res.success) {
-          ta.value = res.optimizedGoal; localStorage.setItem('gebe_generator_input', res.optimizedGoal);
+          ta.value = res.optimizedGoal; localStorage.setItem('gedemo_generator_input', res.optimizedGoal);
           setGoalTab('preview'); toast('Prompt optimized');
         } else { toast('Optimization failed: ' + ((res && res.error) || 'unknown')); }
       }).catch(function (e) { toast('Optimization failed: ' + (e && e.message ? e.message : e)); })
       .then(function () { btn.disabled = false; btn.textContent = orig; ov.style.display = 'none'; if (mwInterval) clearInterval(mwInterval); });
+    }
+
+    // ---- Target persona selector ----
+    // Persona shapes the generated goal in both shaping paths (domain research
+    // and magic wand). 'auto' = current behavior (the LLM invents the role).
+    var PERSONA_PRESETS = [
+      { id: 'auto', label: 'Auto', description: '' },
+      { id: 'ceo_exec', label: 'CEO / Executive', description: 'a CEO or executive leader responsible for company-wide strategy, cross-functional alignment, portfolio decisions, and top-line and bottom-line performance' },
+      { id: 'cfo_finance', label: 'CFO / Corp Planning', description: 'a CFO or corporate planning / FP&A leader responsible for budgeting, forecasting, financial close, and management reporting' },
+      { id: 'sales_director', label: 'Sales Director', description: 'a sales director responsible for pipeline management, revenue forecasting, account strategy, and quota attainment' },
+      { id: 'marketing_lead', label: 'Marketing Lead', description: 'a marketing lead responsible for campaign planning, lead generation, budget allocation (ROAS/CPA), and brand performance' },
+      { id: 'scm_manager', label: 'SCM Manager', description: 'a supply chain manager responsible for demand forecasting, inventory optimization, procurement, and logistics coordination' },
+      { id: 'procurement', label: 'Procurement Manager', description: 'a procurement manager responsible for supplier selection, purchase orders, contract compliance, and cost reduction' },
+      { id: 'plant_manager', label: 'Plant / Production', description: 'a plant or production manager responsible for production scheduling, equipment utilization, quality control, and safety compliance' },
+      { id: 'qa_manager', label: 'Quality Assurance', description: 'a quality assurance manager responsible for inspection workflows, defect tracking, root-cause analysis, and regulatory quality standards' },
+      { id: 'field_operator', label: 'Field Operator', description: 'a frontline field operations supervisor responsible for work orders, equipment inspection, maintenance, and safety reporting' },
+      { id: 'store_manager', label: 'Store / Branch Manager', description: 'a store or branch manager responsible for daily sales operations, staffing, local inventory, and customer experience' },
+      { id: 'cs_lead', label: 'Customer Support Lead', description: 'a customer support lead responsible for ticket triage, SLA compliance, escalation handling, and customer satisfaction' },
+      { id: 'hr_lead', label: 'HR Lead', description: 'an HR leader responsible for recruiting, onboarding, workforce planning, and employee engagement' },
+      { id: 'it_infosys', label: 'IT / Info Systems', description: 'an IT / information systems manager responsible for core system operations, integrations, service requests, and security compliance' },
+      { id: 'legal_compliance', label: 'Legal & Compliance', description: 'a legal and compliance officer responsible for contract review, regulatory reporting, audit readiness, and risk mitigation' },
+      { id: 'product_rnd', label: 'Product / R&D Lead', description: 'a product or R&D lead responsible for roadmap planning, feature prioritization, experiment analysis, and time-to-market' },
+      { id: 'custom', label: 'Custom...', description: '' }
+    ];
+    var selectedPersonaId = 'auto';
+    function currentPersonaKey() {
+      var p = getSelectedPersona();
+      return p ? (p.id + '|' + p.label) : 'auto';
+    }
+    // Shows a banner inside the research result card when the persona was
+    // changed AFTER research ran, so the user knows to re-run it.
+    function updatePersonaRerunHint() {
+      var hint = el('personaRerunHint');
+      if (!hint) return;
+      var stale = !!(cachedResearchData &&
+        !el('researchResult').classList.contains('hidden') &&
+        currentPersonaKey() !== (cachedResearchData._personaKey || 'auto'));
+      hint.classList.toggle('hidden', !stale);
+    }
+    function renderPersonaSelector() {
+      var c = el('personaFilters');
+      if (!c) return;
+      c.innerHTML = '';
+      PERSONA_PRESETS.forEach(function (p) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = function () {
+          selectedPersonaId = p.id;
+          el('personaCustomWrap').classList.toggle('hidden', p.id !== 'custom');
+          if (p.id === 'custom') el('personaCustomInput').focus();
+          renderPersonaSelector();
+          updatePersonaRerunHint();
+        };
+        var active = selectedPersonaId === p.id;
+        btn.className = 'px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ' + (active
+          ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300'
+          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:border-white/20');
+        btn.textContent = p.label;
+        c.appendChild(btn);
+      });
+    }
+    // Returns null when no persona is selected (Auto, or Custom left empty),
+    // which keeps every server prompt identical to the pre-persona behavior.
+    function getSelectedPersona() {
+      if (selectedPersonaId === 'custom') {
+        var t = el('personaCustomInput').value.trim();
+        if (!t) return null;
+        return { id: 'custom', label: t.substring(0, 120), description: t.substring(0, 300), custom: true };
+      }
+      if (!selectedPersonaId || selectedPersonaId === 'auto') return null;
+      var found = null;
+      PERSONA_PRESETS.forEach(function (p) { if (p.id === selectedPersonaId) found = p; });
+      return found ? { id: found.id, label: found.label, description: found.description } : null;
     }
 
     // ---- Domain research ----
@@ -586,9 +677,9 @@ limitations under the License.
       if (!d) { toast('Enter a domain first.'); return; }
       el('researchSpinner').classList.remove('hidden'); el('researchBtnText').textContent = 'Researching...';
       el('researchError').classList.add('hidden'); el('researchResult').classList.add('hidden');
-      run('researchCompanyByDomain', [d]).then(function (r) {
+      run('researchCompanyByDomain', [d, getSelectedPersona()]).then(function (r) {
         if (!r || !r.success) { el('researchError').textContent = (r && r.error) || 'Research failed.'; el('researchError').classList.remove('hidden'); return; }
-        cachedResearchData = r; renderResearch(r);
+        cachedResearchData = r; cachedResearchData._personaKey = currentPersonaKey(); renderResearch(r); updatePersonaRerunHint();
       }).catch(function (e) { el('researchError').textContent = e && e.message ? e.message : 'Research failed.'; el('researchError').classList.remove('hidden'); })
       .then(function () { el('researchSpinner').classList.add('hidden'); el('researchBtnText').textContent = 'Research'; });
     }
@@ -637,6 +728,12 @@ limitations under the License.
       var lines = [];
       lines.push('# ' + d.companyName + ' (' + (d.industry || '') + ')');
       lines.push(''); lines.push(d.companySummary || ''); lines.push('');
+      var persona = getSelectedPersona();
+      if (persona) {
+        lines.push('## Target Persona');
+        lines.push(persona.label + (persona.description && persona.description !== persona.label ? ' - ' + persona.description : ''));
+        lines.push('');
+      }
       lines.push('## Business Challenges');
       (d.businessChallenges || []).forEach(function (c) { lines.push('- ' + c); });
       lines.push('');
@@ -684,7 +781,13 @@ limitations under the License.
         userGoal: goal, domain: el('domain').value.trim(),
         includeDocs: ftActive('docs'), includeSheets: ftActive('sheets'),
         includeSlides: ftActive('slides'), includeImages: ftActive('images'),
-        includePdf: ftActive('pdf')
+        includePdf: ftActive('pdf'),
+        persona: getSelectedPersona(),
+        quantFacts: (cachedResearchData && cachedResearchData.quantFacts &&
+                     Object.keys(cachedResearchData.quantFacts).length &&
+                     goal.indexOf(cachedResearchData.companyName) !== -1)
+          ? { companyName: cachedResearchData.companyName, facts: cachedResearchData.quantFacts }
+          : null
       };
       el('genBtn').disabled = true; el('genBtn').textContent = 'Generating...';
       el('resultSection').classList.add('hidden'); el('stepsSection').classList.remove('hidden');
@@ -695,7 +798,7 @@ limitations under the License.
       el('stepsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       var plan, folderInfo, fileResults = [];
-      run('planGEBEDemo', [goal, options]).then(function (p) {
+      run('planDemo', [goal, options]).then(function (p) {
         plan = p; setStep('plan','done','Planned ' + plan.files.length + ' file(s) for ' + (plan.customerName || plan.domainName || ''));
         setBar(20); setStep('files','active','Creating folder...');
         addLog('Plan ready: ' + (plan.customerName || plan.domainName || '') + ' (' + plan.files.length + ' files)', 'text-emerald-300');
@@ -837,7 +940,7 @@ limitations under the License.
     }
     function clearForNewDemo() {
       el('userGoal').value = '';
-      localStorage.removeItem('gebe_generator_input');
+      localStorage.removeItem('gedemo_generator_input');
       el('domain').value = '';
       el('resultSection').classList.add('hidden'); el('stepsSection').classList.add('hidden');
       switchMethod(); setNavActive('define');
@@ -845,14 +948,15 @@ limitations under the License.
     }
 
     // ---- Onboarding ----
-    function openOnboarding(force) { if (force || !localStorage.getItem('gebe_onboarding_seen')) { el('onboardingModal').classList.remove('hidden'); el('onboardingModal').classList.add('flex'); } }
-    function closeOnboarding() { el('onboardingModal').classList.add('hidden'); el('onboardingModal').classList.remove('flex'); localStorage.setItem('gebe_onboarding_seen','1'); }
+    function openOnboarding(force) { if (force || !localStorage.getItem('gedemo_onboarding_seen')) { el('onboardingModal').classList.remove('hidden'); el('onboardingModal').classList.add('flex'); } }
+    function closeOnboarding() { el('onboardingModal').classList.add('hidden'); el('onboardingModal').classList.remove('flex'); localStorage.setItem('gedemo_onboarding_seen','1'); }
 
     // init
     (function () {
-      var saved = localStorage.getItem('gebe_generator_input');
+      var saved = localStorage.getItem('gedemo_generator_input');
       if (saved) el('userGoal').value = saved;
     })();
+    renderPersonaSelector();
     openOnboarding(false);
   </script>
 </body>

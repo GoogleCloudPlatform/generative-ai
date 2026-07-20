@@ -559,6 +559,8 @@ limitations under the License.
                     });
 
                     const assignedTo = fields.assigned_to || fields.AssignedTo || 'Unassigned';
+                    const curDept = fields.current_department || fields.CurrentDepartment || '';
+                    const nextDept = fields.next_department || fields.NextDepartment || '';
                     const customerName = fields.customer_name || fields.CustomerName || '';
                     const productName = fields.product_name || fields.ProductName || '';
                     const qty = fields.requested_qty || fields.RequestedQty || fields.qty || fields.Quantity || '';
@@ -572,6 +574,7 @@ limitations under the License.
                     colMeta += '  </div>';
                     colMeta += '  <div style="font-size:11px;color:var(--text-3);display:flex;flex-direction:column;gap:2px;">';
                     colMeta += '    <span>👤 ' + assignedTo + '</span>';
+                    if (curDept) colMeta += '    <span style="display:inline-block;font-weight:700;color:var(--primary);background:var(--primary-light);border:1px solid #C7D2FE;border-radius:6px;padding:1px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;" title="Process stage: current department' + (nextDept ? ' and next department' : '') + '">🏬 ' + curDept + (nextDept ? ' ➜ ' + nextDept : '') + '</span>';
                     if (customerName) colMeta += '    <span style="font-weight:600;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="' + customerName.replace(/"/g, '&quot;') + '">🏢 ' + customerName + '</span>';
                     colMeta += '  </div>';
                     colMeta += '</div>';
@@ -584,7 +587,7 @@ limitations under the License.
                     if (notes) {
                         colMain += '  <div style="font-size:12.5px;color:var(--text-2);line-height:1.5;background:var(--bg-2);padding:10px 14px;border-radius:8px;border-left:4px solid var(--primary-light);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;" title="' + notes.replace(/"/g, '&quot;') + '">📝 ' + notes + '</div>';
                     } else {
-                        var previewSkip = { status: 1, assigned_to: 1, assignedto: 1, customer_name: 1, customername: 1, product_name: 1, productname: 1, requested_qty: 1, requestedqty: 1, qty: 1, quantity: 1, notes: 1, message: 1, workflow_state: 1, updated_at: 1 };
+                        var previewSkip = { status: 1, assigned_to: 1, assignedto: 1, customer_name: 1, customername: 1, product_name: 1, productname: 1, requested_qty: 1, requestedqty: 1, qty: 1, quantity: 1, notes: 1, message: 1, workflow_state: 1, updated_at: 1, current_department: 1, currentdepartment: 1, next_department: 1, nextdepartment: 1, history: 1 };
                         var previewParts = [];
                         Object.keys(fields).forEach(function(fk) {
                             if (previewParts.length >= 3 || previewSkip[fk.toLowerCase()]) return;

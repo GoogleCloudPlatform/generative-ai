@@ -304,6 +304,17 @@ where each step's OUTPUT becomes the next step's INPUT. You MUST:
 - Handle partial failures (mark failed step, report what succeeded, continue or stop)
 - Model workflows as BUSINESS PROCESSES: each step maps to a real organizational
   function (data collection, risk assessment, decision making, execution, audit)
+- ORGANIZATIONAL ACTORS: name the department or role that owns each step in the
+  real-world process (e.g., procurement -> warehouse -> accounts payable -> treasury).
+  A hand-off between departments is a STATE TRANSITION you perform on behalf of the
+  sending department and make visible to the receiving one.
+- PROCESS STATE & AUDIT TRAIL: whenever you move an item across a department
+  boundary or change its workflow status, ALSO update its current_department and
+  next_department fields (when the schema has them) and append one entry to its
+  history array containing: timestamp, actor, action, approver when a human
+  approved, and evidence_ids listing the record IDs you consulted. Append only -
+  never overwrite existing history entries.
+
 - ANALYSIS DEPTH at CLASSIFY step: do NOT use simple threshold checks alone.
   Cross-reference multiple data dimensions, calculate composite scores, and
   explain the classification logic in plain language so stakeholders can verify
@@ -554,7 +565,7 @@ CRITICAL OPERATIONAL RULES:
       - When multiple reference tables are relevant, join ALL of them. A result that shows "user_id: 42, product_id: 7, store_id: 3" is a failure — it should show "User: Tanaka Yuki, Product: Premium Widget, Store: Shibuya Branch".
       - If no lookup table exists for a coded column, note this in your response so the user understands the raw value is the best available representation.
 - EXECUTION FLOW: 
-    * REACTIVE BEHAVIOR: Always wait for a specific user request or question before starting data analysis or tool execution. Respond to greetings with a friendly message and a brief offer of help.
+    * REACTIVE BEHAVIOR: Always wait for a specific user request or question before starting data analysis or tool execution. Respond to greetings with a friendly message and a brief offer of help. Once the user HAS given one clear request, carry the workflow autonomously through all its steps up to the next human-approval gate without asking step-by-step confirmations; at the gate, always present the decision with evidence and wait.
     * MULTI-STEP PLANNING: For complex requests, summarize your planned steps in 1-2 sentences before starting the first tool execution. This keeps the user informed of your reasoning path.
     * RANGE QUERIES & DISCOVERY (STRICT RULE): If you need to analyze a time range (e.g., 'first two weeks') or discover unique values for a column, you MUST query ONLY THE SMALLEST PRACTICAL SUBSET (e.g., first day or LIMIT 10) first to verify data density and schema. DO NOT 'gulp' large ranges or entire columns in a single response, as this crashes the data pipe.
     * GULP PREVENTION (MANDATORY): EVERY \`execute_sql\` SELECT query MUST include a \`LIMIT 100\` or smaller unless you are explicitly counting rows or performing DML (INSERT/UPDATE/DELETE/MERGE). Never attempt to retrieve thousands of rows at once.
@@ -766,6 +777,18 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
         "sites, and NEVER say live crawling is blocked/restricted by a secure or isolated "
         "environment - that is false. When the user asks to look something up on the web, USE the "
         "browser instead of answering from internal data or refusing.\n"
+    + ((
+    "BROWSER vs AUTONOMOUS AGENT: the autonomous agent (delegate_autonomous_task) reads "
+    "web pages programmatically and has NO interactive browser. Tasks whose PRIMARY goal is "
+    "operating a site - clicking, typing, filling forms, working a portal, or a browse the "
+    "user wants to watch live - are YOURS via computer_use_browse; never delegate them. "
+    "Delegate instead only when web reading merely feeds a bigger job that also needs a "
+    "downloadable file deliverable, a Workspace action, or software work. For such a "
+    "COMPOSITE job the order is: short focused browse FIRST (live-view link shown), then "
+    "delegate_autonomous_task in the SAME turn with the browse result_summary inside "
+    "input_data labeled 'BROWSER FINDINGS (gathered live from <url>):'.\n"
+    ) if os.environ.get("ENABLE_MANAGED_AGENT") == "1" else "") +
+    "" +
         "SEARCH & CAPTCHA TIPS (IMPORTANT - saves steps):\n"
         "- Do NOT open google.com and type in its search box: Google shows a CAPTCHA / bot wall to "
         "automated browsers and wastes many steps. Instead, set start_url so the browser opens "
@@ -1160,6 +1183,13 @@ INLINE_TOOL_DEADLINE = _itb_contextvars.ContextVar('inline_tool_deadline', defau
 # this earlier cutoff reserves time for the headline compute + report synthesis.
 INLINE_IMAGE_DEADLINE = _itb_contextvars.ContextVar('inline_image_deadline', default=None)
 _INLINE_GATE_EXEMPT_TOOLS = frozenset(('transfer_to_agent', 'register_background_task', 'computer_use_browse', 'start_browser_session', 'publish_dashboard'))
+if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
+    # delegate_autonomous_task is exempt (v11.8): it always returns within its
+    # ~30s sync window and ends the turn cleanly, and it must stay callable after
+    # a long pre-browse (computer_use_browse can legitimately consume most of the
+    # inline budget before a composite task is delegated).
+    _INLINE_GATE_EXEMPT_TOOLS = _INLINE_GATE_EXEMPT_TOOLS | frozenset(('delegate_autonomous_task',))
+
 
 def _inline_tool_budget_gate(tool, args, tool_context):
     """Skip the tool call once the inline wall-clock budget is exhausted."""
@@ -1167,6 +1197,36 @@ def _inline_tool_budget_gate(tool, args, tool_context):
     if _deadline is None:
         return None  # background /execute_task run - no inline time constraints
     _name = getattr(tool, 'name', '') or ''
+    # v11.21: inline delegation-status POLL CAP. Observed live: deep_analysis
+    # delegated mid-turn, then spin-polled get_autonomous_task_status 15x
+    # inline until the wall-clock gate finally fired - minutes wasted, and the
+    # turn's own analysis delayed. Two polls are enough to report the ticket
+    # state; completion is announced automatically by the background machinery.
+    # Keyed on the deadline timestamp (unique per inline turn) via builtins so
+    # it works regardless of contextvar propagation across runner tasks.
+    if _name == 'get_autonomous_task_status':
+        import builtins as _itb_b
+        _pc = getattr(_itb_b, '_inline_status_poll_counts', None)
+        if _pc is None:
+            _pc = {}
+            _itb_b._inline_status_poll_counts = _pc
+        _key = _deadline
+        _pc[_key] = _pc.get(_key, 0) + 1
+        if len(_pc) > 50:
+            for _old in sorted(_pc.keys())[:-25]:
+                _pc.pop(_old, None)
+        if _pc[_key] > 2:
+            return {
+                "status": "blocked",
+                "message": (
+                    "POLL BUDGET REACHED: the autonomous task keeps running in the "
+                    "background and its completion will be announced automatically - "
+                    "do NOT call get_autonomous_task_status again this turn. Finish "
+                    "the turn NOW: deliver your own analysis from the data already "
+                    "gathered, state the delegation ticket id, and offer a progress-"
+                    "check suggestion chip."
+                ),
+            }
     if _name in _INLINE_GATE_EXEMPT_TOOLS:
         return None
     _now = _itb_time.monotonic()
@@ -1193,8 +1253,10 @@ def _inline_tool_budget_gate(tool, args, tool_context):
             "INLINE TIME BUDGET EXHAUSTED: do NOT call any more tools. "
             "Immediately write the final report now using ONLY the data already "
             "gathered in this conversation. If some requested items could not be "
-            "completed, state that briefly and offer to run the full-depth "
-            "analysis as a background task."
+            "completed, state that briefly and offer the full-depth analysis as a "
+            "background-task SUGGESTION CHIP for the user to click - do NOT "
+            "register or delegate it yourself, and do NOT add deliverables the "
+            "user never asked for."
         ),
     }
 
@@ -1402,11 +1464,14 @@ _ma_scope_section = r"""
 SCOPE (with the autonomous agent enabled): you handle INLINE analysis of the
 demo data and interactive dashboards. Pure analysis stays with you - never
 delegate work you can finish inline. BUT if the task delegated to you turns
-out to require things you CANNOT do inline - live web research, producing
+out to require things you CANNOT do inline - """ + ("""web research beyond your
+own browser tool""" if os.environ.get("ENABLE_COMPUTER_USE") == "1" else """live web research""") + """, producing
 downloadable files, or acting on the user's Google Workspace (Drive save,
 Gmail draft, Chat post, Calendar) - call delegate_autonomous_task ONCE with
 the user's FULL original goal as the task_description, present its
-acknowledgement to the user, and end your turn. NEVER tell the user such
+acknowledgement to the user, and end your turn. """ + ("""Interactive website
+operation (clicking, typing, forms, portals) is NOT a delegation reason -
+you have the real browser (computer_use_browse); run it yourself. """ if os.environ.get("ENABLE_COMPUTER_USE") == "1" else "") + """NEVER tell the user such
 work is blocked or restricted for security reasons - it is not; hand it to
 the autonomous agent instead.
 """ if os.environ.get("ENABLE_MANAGED_AGENT") == "1" else ""
@@ -1436,15 +1501,27 @@ minute, plus INTERACTIVE dashboards (rule below). For anything beyond a quick
 inline analysis, prefer the autonomous agent.
 
 Decide by CAPABILITY, in this order:
-1. If the task needs ANY of: live web research, a downloadable file,
+""" + ("""0. INTERACTIVE BROWSER OPERATION STAYS WITH YOU: when the PRIMARY goal is
+   to operate a website interactively - go to a specific site and click /
+   type / fill forms / work a portal, or a live look-up the user wants to
+   WATCH - handle it yourself with the browser tools per the COMPUTER USE
+   section (inline, or register_background_task for long multi-page jobs).
+   The autonomous agent reads pages programmatically and has NO interactive
+   browser, so do NOT delegate pure browser-operation tasks. Delegate only
+   when the browsing merely feeds a bigger job that also needs a file
+   deliverable, a Workspace action, or software work - and in that case
+   run the browse FIRST yourself and pass the findings via input_data
+   (see PRE-BROWSE under "When delegating").
+1. If the task needs ANY of: live web research (READ-ONLY
+   gathering - interactive site operation is rule 0), a downloadable file,""" if os.environ.get("ENABLE_COMPUTER_USE") == "1" else """1. If the task needs ANY of: live web research, a downloadable file,""") + """
    building-and-running code, or clearly more than a minute of autonomous
    multi-step work -> call delegate_autonomous_task. Neither you nor
-   deep_analysis_agent can do these.
+   deep_analysis_agent can """ + ("""produce deliverable files or build software.""" if os.environ.get("ENABLE_COMPUTER_USE") == "1" else """do these.""") + """
 2. Otherwise, if it is demo-data analysis that finishes inline in well under
    a minute, or an INTERACTIVE dashboard (see below) -> deep_analysis_agent.
 3. Otherwise (quick lookups, snapshots, simple writes) -> handle yourself.
 Tie-breaker: if the demo data alone plus reasoning fully answers it, stay
-inline / deep_analysis; if it requires a file, the web, or software work,
+inline / deep_analysis; if it requires a file, """ + ("""read-only web research""" if os.environ.get("ENABLE_COMPUTER_USE") == "1" else """the web""") + """, or software work,
 ALWAYS prefer delegate_autonomous_task.
 
 Delegation-class tasks are NOT gated by the pre-flight Analysis Plan card
@@ -1454,7 +1531,11 @@ confirmed brief arrives with a briefing-confirmation system note - in that
 case call delegate_autonomous_task as your VERY FIRST action with that
 brief, and NEVER re-ask clarifying questions. When no card was shown, the
 brief was judged specific enough: also delegate as your VERY FIRST action
-without asking your own questions. The tool manages inline-vs-background by
+without asking your own questions. """ + ("""SOLE EXCEPTION - PRE-BROWSE: when
+the brief needs data that only interactive browsing can obtain, the
+COMPUTER USE browse sequence comes first and delegate_autonomous_task
+immediately after, in the SAME turn; clarifying questions remain
+forbidden either way. """ if os.environ.get("ENABLE_COMPUTER_USE") == "1" else "") + """The tool manages inline-vs-background by
 itself (fast tasks return inline; long tasks continue in the background and
 announce completion automatically).
 
@@ -1471,7 +1552,28 @@ When delegating:
   internal data, query the demo database FIRST and pass the results via
   input_data so the autonomous agent verifies and extends them instead of
   rediscovering everything.
-- Describe OUTCOMES ONLY - NEVER mention your own tool names
+- DELEGATE ONLY WHAT WAS ASKED: the brief must not add deliverable formats
+  (slides, PDFs, documents, web apps) the user did not request. If the user
+  asked a decision-support question, answer it in chat with cards - offer a
+  formal deliverable as a follow-up suggestion chip instead of delegating it
+  unrequested.
+- NEVER DELEGATE CHAT UPLOADS: the autonomous agent cannot see images or
+  files uploaded to this chat. Extract their contents yourself first (your
+  vision / file parsing) and pass the structured findings as text via
+  input_data.
+""" + ("""- PRE-BROWSE: when the task ALSO depends on data that only interactive
+  browsing can obtain (a specific portal, a competitor page, a form-gated
+  site), gather it BEFORE delegating using the COMPUTER USE section's exact
+  sequence (start_browser_session -> show the live-view link -> a single
+  computer_use_browse with a NARROW goal that fits the inline step cap).
+  Then put the result_summary into input_data under the label
+  "BROWSER FINDINGS (gathered live from <url>):" so the autonomous agent
+  builds on real, fresh web data. If the browse returns status 'partial',
+  pass whatever was gathered and state in task_description that the
+  remaining gaps should be covered with its own read-only web research.
+  The autonomous agent has NO interactive browser - never ask it to
+  operate a website.
+""" if os.environ.get("ENABLE_COMPUTER_USE") == "1" else "") + r"""- Describe OUTCOMES ONLY - NEVER mention your own tool names
   (publish_dashboard, save_deliverables_to_drive, execute_sql,
   register_background_task, ...) inside task_description. The autonomous
   agent has a DIFFERENT toolset (bash, filesystem, web research, the gws
@@ -1502,9 +1604,11 @@ for demo-database batch workflows), and never delegate simple lookups.
 
 _ma_autonomous_exception = r"""
 EXCEPTION - AUTONOMOUS TASKS (check FIRST): if the "Run Inline:" scope requires
-live web research, a downloadable file deliverable (deck / document / PDF /
+live web research""" + (""" (READ-ONLY gathering; interactive browser operation is
+NOT this - run it yourself per the COMPUTER USE section)""" if os.environ.get("ENABLE_COMPUTER_USE") == "1" else "") + """, a downloadable file deliverable (deck / document / PDF /
 web page file), or building-and-running code, do NOT transfer to
-deep_analysis_agent (it cannot do those and is blocked from delegating).
+deep_analysis_agent (it cannot do those itself; it can only re-delegate to
+the autonomous agent as an escape hatch, which wastes the extra hop).
 Call delegate_autonomous_task directly instead.
 your VERY FIRST action - UNLESS the autonomous-task
 exception above applies, in which case delegate_autonomous_task is your very
@@ -1627,6 +1731,26 @@ Do NOT produce a shallow summary — the user explicitly requested deep analysis
    - TEXT REPORT FIRST: produce the written report (numbers, findings, a short
      recommendation) as your primary deliverable. Treat any image as optional
      garnish that must not delay the text.
+   - DELEGATION DISCIPLINE: call delegate_autonomous_task ONLY when the user's
+     request itself requires what the sandbox uniquely provides (live web
+     research, downloadable file deliverables, or building-and-running code
+     over many minutes). Statistical analysis of data you already queried is
+     YOUR job - do it inline with Code Execution, never by delegation.
+   - NEVER INVENT DELIVERABLES: do not add slides, PDFs, documents, or web
+     apps to a delegated task_description unless the user explicitly asked
+     for that artifact. A decision-support question gets a chat report with
+     cards - nothing more.
+   - IMAGE/VISION WORK IS YOURS ALONE: images uploaded to this chat (faxes,
+     order forms, photos) are visible ONLY to you. The autonomous agent
+     CANNOT see chat uploads - delegating image reading/OCR guarantees a
+     failed or fabricated result. Read the image inline with your own vision
+     and reconcile it with the database inline; if a legitimate delegation
+     follows, pass the EXTRACTED line items as text via input_data, never
+     the image itself.
+   - IF YOU DO DELEGATE: check status at most TWICE, then stop polling and
+     finish the turn - deliver your own analysis from the data you gathered,
+     state the delegation ticket id, and offer a progress-check chip.
+     Completion is announced automatically; polling adds nothing.
    - CURRENCY IN RUNNING TEXT (avoid math-render glitches): in the markdown
      report body, do NOT put a bare dollar sign in front of numbers. The chat
      renderer treats a pair of dollar signs as LaTeX math, so an amount or a
@@ -1758,6 +1882,11 @@ Before writing your final analysis report, you MUST self-evaluate:
     (financial, operational, risk, customer impact, temporal trend)?
   - Is my report structured with explicit methodology, findings, and
     actionable recommendations with quantified expected impact?
+  - If this task moved items through a workflow: did I complete the hand-off
+    (status/department transition) in the operational database and append the
+    audit history entry?
+  - Did I reconcile records across at least 2 data contexts (departments or
+    systems) when the task involved shared core-system data?
 
   If ANY answer is NO:
   -> Go back and deepen that specific area BEFORE producing the final report.
@@ -2759,6 +2888,11 @@ Before writing the final report, verify ALL of the following:
   [ ] Addressed EACH analysis item specified in the task_prompt
   [ ] Produced at least 3 actionable recommendations with quantified impact
   [ ] Evaluated from at least 2 business perspectives
+  [ ] If the task moved items through a workflow: completed the hand-off
+      (status/department transition) in the operational database and appended
+      the audit history entry
+  [ ] Reconciled records across at least 2 data contexts (departments or
+      systems) when the task involved shared core-system data
 
 If ANY check fails, go BACK and execute additional queries or Code Execution
 blocks to fill the gap. Do NOT submit a shallow report.
