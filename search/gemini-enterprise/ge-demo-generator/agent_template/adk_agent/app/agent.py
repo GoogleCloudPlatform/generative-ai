@@ -886,13 +886,13 @@ _RETRY_OPTIONS = types.HttpRetryOptions(
 
 # Pro model — used by deep_analysis_agent for complex multi-step reasoning
 gemini_pro_model = Gemini(
-    model=os.environ.get("AGENT_MODEL", "gemini-3.5-flash"),
+    model=os.environ.get("AGENT_MODEL", "gemini-3.6-flash"),
     retry_options=_RETRY_OPTIONS
 )
 
 # Flash-Lite model — used by root_agent (coordinator) for most interactions
 gemini_lite_model = Gemini(
-    model=os.environ.get("AGENT_MODEL_LITE", "gemini-3.5-flash"),
+    model=os.environ.get("AGENT_MODEL_LITE", "gemini-3.6-flash"),
     retry_options=_RETRY_OPTIONS
 )
 

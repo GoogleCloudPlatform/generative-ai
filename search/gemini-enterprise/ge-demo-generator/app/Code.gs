@@ -21,7 +21,7 @@
  *
  * ── What Gets Generated ──────────────────────────────────────────────
  *   • Synthetic business data (BigQuery tables + optional Firestore docs)
- *   • Dual-model ADK agent (Gemini 3.1 Flash-Lite root → Pro analysis)
+ *   • Dual-model ADK agent (Gemini 3.5 Flash-Lite root → Pro analysis)
  *   • MCP toolsets — BigQuery, Maps, Firestore, Google Workspace (Gmail,
  *     Drive, Calendar, Chat, People), plus arbitrary GitHub MCP servers
  *   • A2A (Agent-to-Agent) server with A2UI interactive components
@@ -78,11 +78,11 @@ const SCRIPT_PROPS = PropertiesService.getScriptProperties();
 const CONFIG = {
   PROJECT_ID: SCRIPT_PROPS.getProperty('PROJECT_ID'),
   LOCATION: SCRIPT_PROPS.getProperty('LOCATION') || 'global',
-  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.5-flash',
+  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.6-flash',
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.30-public',
+  APP_VERSION: 'v11.31-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -156,7 +156,7 @@ function doGet() {
 
   template.projectId = CONFIG.PROJECT_ID;
   template.userEmail = Session.getActiveUser().getEmail();
-  template.generatorModel = CONFIG.MODEL || 'gemini-3.5-flash';
+  template.generatorModel = CONFIG.MODEL || 'gemini-3.6-flash';
   
   return template.evaluate()
     .setTitle('GE Demo Generator')
@@ -338,7 +338,7 @@ function initializeProject(projectId, logSheetUrl) {
   const newProps = {
     PROJECT_ID: projectId, 
     LOCATION: currentProps.LOCATION || 'global',
-    MODEL: currentProps.MODEL || 'gemini-3.5-flash',
+    MODEL: currentProps.MODEL || 'gemini-3.6-flash',
     LOG_SHEET_URL: logSheetUrl || currentProps.LOG_SHEET_URL || ''
   };
   
@@ -3104,9 +3104,9 @@ show_usage() {
   echo ""
   echo "Options:"
   echo "  --model-analysis-agent, -m <MODEL>  Set the deep analysis agent model"
-  echo "                                      (default: gemini-3.5-flash)"
+  echo "                                      (default: gemini-3.6-flash)"
   echo "  --model-root-agent <MODEL>          Set the root orchestration agent model"
-  echo "                                      (default: gemini-3.5-flash)"
+  echo "                                      (default: gemini-3.6-flash)"
   echo "  --cleanup, -c                       Delete all provisioned demo resources"
   echo "  --yes, -y                           Skip confirmation prompts (non-interactive use)"
   echo "  --help, -h                          Show this help message and exit"
@@ -3114,7 +3114,7 @@ show_usage() {
   echo "Examples:"
   echo "  bash $0                                  # Deploy with default models"
   echo "  bash $0 --model-analysis-agent gemini-3.1-pro-preview       # Use a different analysis model"
-  echo "  bash $0 --model-root-agent gemini-3.1-flash-lite            # Use a different root model"
+  echo "  bash $0 --model-root-agent gemini-3.5-flash-lite            # Use a different root model"
   echo "  bash $0 --cleanup                         # Remove all demo resources"
   echo "  bash $0 --cleanup --yes                   # Remove all demo resources without prompting"
   echo ""
@@ -3122,8 +3122,8 @@ show_usage() {
 
 
 # --- Argument Parsing ---
-AGENT_MODEL="gemini-3.5-flash"
-AGENT_MODEL_LITE="gemini-3.5-flash"
+AGENT_MODEL="gemini-3.6-flash"
+AGENT_MODEL_LITE="gemini-3.6-flash"
 ROOT_MODEL_CLI_OVERRIDE=false
 CLEANUP_MODE=false
 AUTO_CONFIRM=false
@@ -3573,7 +3573,7 @@ while true; do
   echo "Choose an option:"
   echo "  [Y] Yes, proceed with this project (Default)"
   echo "  [N] No, cancel deployment"
-  echo "  [M] Modify the root agent model (Change to gemini-3.1-flash-lite)"
+  echo "  [M] Modify the root agent model (Change to gemini-3.5-flash-lite)"
   echo ""
   read -p "▶ Enter choice [Y/n/m]: " REPLY
   echo
@@ -3595,16 +3595,16 @@ while true; do
     # --- Model Selection Flow ---
     echo ""
     echo "🧠 Configure Chat & Orchestration Model (root_agent):"
-    echo "   - root_agent (Chat/UI): Uses 'gemini-3.5-flash' by default."
-    echo "   - deep_analysis_agent (Reasoning): Uses 'gemini-3.5-flash'."
+    echo "   - root_agent (Chat/UI): Uses 'gemini-3.6-flash' by default."
+    echo "   - deep_analysis_agent (Reasoning): Uses 'gemini-3.6-flash'."
     echo ""
-    echo "   You can choose 'gemini-3.1-flash-lite' for the root_agent."
+    echo "   You can choose 'gemini-3.5-flash-lite' for the root_agent."
     echo "   While it yields simpler and more concise responses, it provides"
     echo "   much faster and snappier interactions for routine chat."
     echo "   For complex tasks requiring deep analysis, the root_agent can"
-    echo "   still delegate the work to the deep_analysis_agent (3.5-flash)."
+    echo "   still delegate the work to the deep_analysis_agent (3.6-flash)."
     echo ""
-    read -p "▶ Use lightweight gemini-3.1-flash-lite for root_agent? (Y/n): " CHOOSE_LITE
+    read -p "▶ Use lightweight gemini-3.5-flash-lite for root_agent? (Y/n): " CHOOSE_LITE
     CHOOSE_LITE=\$(echo "\$CHOOSE_LITE" | tr -d '\\r\\n\\t ')
     
     # Default to 'y' since they specifically selected 'M' to configure
@@ -3613,11 +3613,11 @@ while true; do
     fi
     
     if [[ "\$CHOOSE_LITE" =~ ^[Yy]$ ]]; then
-      AGENT_MODEL_LITE="gemini-3.1-flash-lite"
-      echo "   ✅ Configured root_agent to use: gemini-3.1-flash-lite"
+      AGENT_MODEL_LITE="gemini-3.5-flash-lite"
+      echo "   ✅ Configured root_agent to use: gemini-3.5-flash-lite"
     else
-      AGENT_MODEL_LITE="gemini-3.5-flash"
-      echo "   ℹ️  Keeping default root_agent: gemini-3.5-flash"
+      AGENT_MODEL_LITE="gemini-3.6-flash"
+      echo "   ℹ️  Keeping default root_agent: gemini-3.6-flash"
     fi
     echo ""
     # Directly proceed to deployment steps after configuration is complete
@@ -5299,7 +5299,7 @@ Output pure JSON only (no code blocks, no markdown):
     // Direct API call with flash-lite model for speed + higher token limit
     let location = CONFIG.LOCATION || 'global';
     const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
-    const researchModel = 'gemini-3.1-flash-lite';
+    const researchModel = 'gemini-3.5-flash-lite';
     const url = `https://${host}/v1/projects/${CONFIG.PROJECT_ID}/locations/${location}/publishers/google/models/${researchModel}:generateContent`;
     
     const payload = {
@@ -5414,7 +5414,7 @@ Output ONLY the scenario text. No JSON, no code blocks, no explanations.`;
   try {
     let location = CONFIG.LOCATION || 'global';
     const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
-    const model = 'gemini-3.1-flash-lite';
+    const model = 'gemini-3.5-flash-lite';
     const url = `https://${host}/v1/projects/${CONFIG.PROJECT_ID}/locations/${location}/publishers/google/models/${model}:generateContent`;
 
     const payload = {
@@ -5465,7 +5465,7 @@ function callVertexAI(prompt) {
 function callVertexAIWithSearch(prompt) {
   let location = CONFIG.LOCATION || 'global';
   const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
-  const searchModel = 'gemini-3.1-flash-lite';
+  const searchModel = 'gemini-3.5-flash-lite';
   const url = `https://${host}/v1/projects/${CONFIG.PROJECT_ID}/locations/${location}/publishers/google/models/${searchModel}:generateContent`;
   
   const payload = {
@@ -5676,7 +5676,7 @@ function classifyDemoTaxonomy_(userGoal, aiSummary, businessInstruction) {
 function callTaxonomyModel_(userGoal, aiSummary, businessInstruction, allowed) {
   const location = CONFIG.LOCATION || 'global';
   const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
-  const model = 'gemini-3.1-flash-lite';
+  const model = 'gemini-3.5-flash-lite';
   const url = `https://${host}/v1/projects/${CONFIG.PROJECT_ID}/locations/${location}/publishers/google/models/${model}:generateContent`;
 
   const fields = Object.keys(allowed); // subset of ['industry','persona','useCase']
@@ -6052,7 +6052,7 @@ function callGeminiApi(contextContent, url) {
   const region = CONFIG.LOCATION || 'global';
 
   const host = region === 'global' ? 'aiplatform.googleapis.com' : `${region}-aiplatform.googleapis.com`;
-  const endpoint = `https://${host}/v1/projects/${projectId}/locations/${region}/publishers/google/models/gemini-3.1-flash-lite:generateContent`;
+  const endpoint = `https://${host}/v1/projects/${projectId}/locations/${region}/publishers/google/models/gemini-3.5-flash-lite:generateContent`;
 
   const prompt = `You are an AI expert determining if custom MCP Servers can be safely provisioned on standard Cloud Run.
 Review the collected files enclosed in the <REPOSITORY_CONTEXT> tag below.
@@ -6182,7 +6182,7 @@ ${contextContent}
 }
 
 /**
- * Service endpoint for Magic Wand. Expands and refines scenario statement using gemini-3.1-flash-lite.
+ * Service endpoint for Magic Wand. Expands and refines scenario statement using gemini-3.5-flash-lite.
  * Robustly handles raw inputs, templates, and edited Markdown scenarios from domain research.
  * Features 3-retry loop with exponential backoff to handle transient rate limits (429) and server errors (5xx).
  * @param {string} rawGoal - The user's current scenario text.
@@ -6191,7 +6191,7 @@ ${contextContent}
 function optimizeGoalWithMagicWand(rawGoal, capabilityOpts) {
   let location = CONFIG.LOCATION || 'global';
   const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
-  const model = 'gemini-3.1-flash-lite';
+  const model = 'gemini-3.5-flash-lite';
   const url = `https://${host}/v1/projects/${CONFIG.PROJECT_ID}/locations/${location}/publishers/google/models/${model}:generateContent`;
 
   // Capability-aware optimization: when the Managed Agent toggle is on, the
