@@ -35,7 +35,7 @@ deployment; the root project's `clasp push` does not include it.
    not the repo root one).
 3. Set Script Properties via the editor: run `initializeProject(projectId)` — or set
    `PROJECT_ID` manually. Optional: `LOCATION` (default `global`), `MODEL`
-   (default `gemini-3.5-flash`).
+   (default `gemini-3.6-flash`).
 4. Deploy as a Web App with **Execute as: User accessing the web app** and **Access: anyone
    in your domain** (matches `appsscript.json`).
 5. Each user grants Drive/Docs/Sheets/Slides + Vertex AI Agent Platform consent on first open, and needs

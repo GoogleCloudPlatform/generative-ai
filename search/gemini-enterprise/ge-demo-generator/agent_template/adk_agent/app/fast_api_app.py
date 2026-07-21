@@ -1266,7 +1266,7 @@ async def _classify_for_preflight(text, prev_user_text=""):
             vertexai=True, location=_loc, project=project_id,
             http_options={"api_version": "v1"},
         )
-        _model = os.environ.get("AGENT_MODEL_LITE", "gemini-3.5-flash")
+        _model = os.environ.get("AGENT_MODEL_LITE", "gemini-3.6-flash")
         _prompt = PREFLIGHT_CLASSIFIER_PROMPT + chr(10) + chr(10)
         if prev_user_text:
             _prompt = (_prompt + "PREVIOUS USER MESSAGE (language reference only - NOT the request):"
@@ -1639,13 +1639,13 @@ def _heal_session_events(session, force_aggressive=False):
     #   - force_aggressive=True (emergency, after a token-overflow ClientError)
     #   - the root model is a lightweight model (flash-lite) — always compact
     #   - the measured context size exceeds the char budget. Heavier models
-    #     (3.5-flash / pro) keep FULL context UNTIL near the limit, so normal
+    #     (3.6-flash / pro) keep FULL context UNTIL near the limit, so normal
     #     large reports are never trimmed — only runaway contexts are.
     # Char-based by design: generated-image bytes are NOT stored in history
     # (generate_image stashes them in session.state), so the real bloat is
     # text — SQL result sets, MCP payloads, multi-turn accumulation.
     # =========================================================================
-    _root_model = os.environ.get("AGENT_MODEL_LITE", "gemini-3.5-flash").lower()
+    _root_model = os.environ.get("AGENT_MODEL_LITE", "gemini-3.6-flash").lower()
     _is_lite = "lite" in _root_model
 
     def _event_char_size(_ev):
@@ -2663,8 +2663,8 @@ class AdkAgentToA2AExecutor(A2aAgentExecutor):
         # Maps agent name → model string for the thinking accordion header.
         # =============================================================================
         _agent_model_map = {
-            'root_agent': os.environ.get("AGENT_MODEL_LITE", "gemini-3.5-flash"),
-            'deep_analysis_agent': os.environ.get("AGENT_MODEL", "gemini-3.5-flash"),
+            'root_agent': os.environ.get("AGENT_MODEL_LITE", "gemini-3.6-flash"),
+            'deep_analysis_agent': os.environ.get("AGENT_MODEL", "gemini-3.6-flash"),
         }
         _model_announced = set()  # Track which agents have been announced
 

@@ -35,10 +35,10 @@ const SCRIPT_PROPS = PropertiesService.getScriptProperties();
 const CONFIG = {
   PROJECT_ID: SCRIPT_PROPS.getProperty('PROJECT_ID'),
   LOCATION: SCRIPT_PROPS.getProperty('LOCATION') || 'global',
-  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.5-flash',
+  MODEL: SCRIPT_PROPS.getProperty('MODEL') || 'gemini-3.6-flash',
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v1.6-public',
+  APP_VERSION: 'v1.7-public',
   MY_DEMOS_FOLDER: 'My Demos'
 };
 
@@ -68,7 +68,7 @@ function doGet(e) {
   template.appVersion = CONFIG.APP_VERSION;
   template.projectId = CONFIG.PROJECT_ID;
   template.userEmail = Session.getActiveUser().getEmail();
-  template.generatorModel = CONFIG.MODEL || 'gemini-3.5-flash';
+  template.generatorModel = CONFIG.MODEL || 'gemini-3.6-flash';
 
   let webAppUrl = '';
   try {
@@ -115,7 +115,7 @@ function initializeProject(projectId) {
   const newProps = {
     PROJECT_ID: projectId,
     LOCATION: currentProps.LOCATION || 'global',
-    MODEL: currentProps.MODEL || 'gemini-3.5-flash'
+    MODEL: currentProps.MODEL || 'gemini-3.6-flash'
   };
 
   scriptProps.setProperties(newProps);
@@ -254,7 +254,7 @@ function repairTruncatedJson(jsonStr) {
 
 /**
  * Detects the language a business goal is WRITTEN in (not the language of the
- * countries/companies it mentions) with a fast gemini-3.1-flash-lite call, so the
+ * countries/companies it mentions) with a fast gemini-3.5-flash-lite call, so the
  * planning prompt can enforce it as a hard constant instead of asking the planning
  * model to detect-and-follow (which drifts toward locale-associated languages on
  * long outputs). Returns an English language name (e.g. "English", "Indonesian")
@@ -270,7 +270,7 @@ function detectGoalLanguage_(userGoal) {
   try {
     const location = CONFIG.LOCATION || 'global';
     const host = location === 'global' ? 'aiplatform.googleapis.com' : location + '-aiplatform.googleapis.com';
-    const url = 'https://' + host + '/v1/projects/' + CONFIG.PROJECT_ID + '/locations/' + location + '/publishers/google/models/gemini-3.1-flash-lite:generateContent';
+    const url = 'https://' + host + '/v1/projects/' + CONFIG.PROJECT_ID + '/locations/' + location + '/publishers/google/models/gemini-3.5-flash-lite:generateContent';
     const payload = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0, maxOutputTokens: 512 } };
     const response = UrlFetchApp.fetch(url, {
       method: 'POST', contentType: 'application/json',
@@ -534,7 +534,7 @@ function optimizeGoalWithMagicWand(rawGoal, persona) {
   if (!rawGoal || !String(rawGoal).trim()) return { success: false, error: 'Nothing to optimize.' };
   const location = CONFIG.LOCATION || 'global';
   const host = location === 'global' ? 'aiplatform.googleapis.com' : location + '-aiplatform.googleapis.com';
-  const model = 'gemini-3.1-flash-lite';
+  const model = 'gemini-3.5-flash-lite';
   const url = 'https://' + host + '/v1/projects/' + CONFIG.PROJECT_ID + '/locations/' + location + '/publishers/google/models/' + model + ':generateContent';
 
   const prompt =
@@ -613,7 +613,7 @@ function translateTemplates(lang, items) {
   try {
     const location = CONFIG.LOCATION || 'global';
     const host = location === 'global' ? 'aiplatform.googleapis.com' : location + '-aiplatform.googleapis.com';
-    const model = 'gemini-3.1-flash-lite';
+    const model = 'gemini-3.5-flash-lite';
     const url = 'https://' + host + '/v1/projects/' + CONFIG.PROJECT_ID + '/locations/' + location + '/publishers/google/models/' + model + ':generateContent';
     const payload = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 8192 } };
     const response = UrlFetchApp.fetch(url, {
@@ -695,7 +695,7 @@ function researchCompanyByDomain(domain, persona) {
   try {
     const location = CONFIG.LOCATION || 'global';
     const host = location === 'global' ? 'aiplatform.googleapis.com' : location + '-aiplatform.googleapis.com';
-    const researchModel = 'gemini-3.1-flash-lite';
+    const researchModel = 'gemini-3.5-flash-lite';
     const url = 'https://' + host + '/v1/projects/' + CONFIG.PROJECT_ID + '/locations/' + location +
       '/publishers/google/models/' + researchModel + ':generateContent';
 

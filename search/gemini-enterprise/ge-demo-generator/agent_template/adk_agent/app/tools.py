@@ -1513,7 +1513,9 @@ if os.environ.get("ENABLE_COMPUTER_USE") == "1":
             return {"status": "error", "detail": "Playwright is not installed in this environment: " + str(_imp)}
 
         client = genai_client.Client(vertexai=True, location=location, project=project)
-        model = os.environ.get("AGENT_MODEL", "gemini-3.5-flash")
+        # Pinned to gemini-3.5-flash: gemini-3.6-flash does not support the
+        # Computer Use tool, so this must NOT follow AGENT_MODEL.
+        model = os.environ.get("COMPUTER_USE_MODEL", "gemini-3.5-flash")
         cfg = types.GenerateContentConfig(
             temperature=1.0, top_p=0.95, top_k=40, max_output_tokens=8192,
             tools=[types.Tool(computer_use=types.ComputerUse(environment=types.Environment.ENVIRONMENT_BROWSER))],
