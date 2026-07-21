@@ -82,7 +82,7 @@ const CONFIG = {
   GITHUB_TOKEN: SCRIPT_PROPS.getProperty('GITHUB_TOKEN'),
   MAX_RETRIES: 3,
   RETRY_DELAY_MS: 1000,
-  APP_VERSION: 'v11.25-public',
+  APP_VERSION: 'v11.30-public',
   // Agent-template source: the generated setup script fetches the static
   // Python/JSON template files (agent_template/ in the repo) at run time.
   // TEMPLATE_REF may be a branch name (default 'main'): it is resolved to a
@@ -3692,15 +3692,215 @@ else
   echo "    your account lacks permission to list apps — in which case detection may be"
   echo "    a false negative.)"
   echo ""
-  echo "   You MUST have a Gemini Enterprise instance already created in this project."
-  echo "   If you haven't, please create one here first:"
-  echo "   https://console.cloud.google.com/gemini-enterprise/products?project=$PROJECT_ID"
-  echo ""
-  read -p "Have you confirmed the instance exists? (y/n) " -n 1 -r
-  echo
-  if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
-      echo "Exiting. Please create the instance and run the script again."
-      exit 1
+
+  GE_APP_CREATED=""
+  if [ ! -z "\$GE_TOKEN" ]; then
+    # The bulk API-enable step runs later in this script, so make sure the
+    # Discovery Engine API is on before probing subscriptions (fresh projects).
+    gcloud services enable discoveryengine.googleapis.com --project "\$PROJECT_ID" >/dev/null 2>&1 || true
+    # Check for an active Gemini Enterprise subscription (license config).
+    GE_LICENSE_STATE=$(curl -s -H "Authorization: Bearer \$GE_TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" \
+      "https://discoveryengine.googleapis.com/v1alpha/projects/\$PROJECT_ID/locations/global/licenseConfigs" \
+      | python3 -c '
+import sys, json
+try:
+    configs = json.load(sys.stdin).get("licenseConfigs", [])
+    active = any(c.get("state") == "ACTIVE" and c.get("subscriptionTier") == "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT" for c in configs)
+    print("ACTIVE" if active else "INACTIVE")
+except Exception:
+    print("UNKNOWN")
+' 2>/dev/null)
+
+    # No active subscription: offer to start a free trial automatically.
+    # Safety: the request always pins freeTrial=true and the result is only
+    # accepted if the server confirms an ACTIVE free trial. A paid
+    # subscription is NEVER purchased automatically.
+    if [ "\$GE_LICENSE_STATE" != "ACTIVE" ]; then
+      echo "ℹ️  No active Gemini Enterprise subscription was found in this project."
+      echo "   The script can provision this project for Gemini Enterprise and start a"
+      echo "   free trial subscription. Proceeding means you accept:"
+      echo "   - the Terms for data use (https://cloud.google.com/retail/data-use-terms)"
+      echo "   - the Gemini Enterprise (Agentspace) quality-of-service terms"
+      read -p "   Start a free trial subscription automatically? (y/n) " -n 1 -r
+      echo
+      if [[ \$REPLY =~ ^[Yy]$ ]]; then
+        TRIAL_OUT=$(python3 - "\$PROJECT_ID" "\$GE_TOKEN" << 'PYEOF'
+import sys, json, time, datetime, urllib.request, urllib.error
+project_id, token = sys.argv[1], sys.argv[2]
+headers = {
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json",
+    "X-Goog-User-Project": project_id,
+}
+api = "https://discoveryengine.googleapis.com/v1alpha/"
+
+# Step 1: provision the project for Discovery Engine / Gemini Enterprise.
+# This creates the default user store required by license configs. Idempotent
+# on already-provisioned projects. The user consented to the terms above.
+prov_body = {
+    "acceptDataUseTerms": True,
+    "dataUseTermsVersion": "2022-11-23",
+    "saasParams": {"acceptBizQos": True},
+}
+req = urllib.request.Request(api + "projects/" + project_id + ":provision",
+                             data=json.dumps(prov_body).encode("utf-8"), headers=headers)
+try:
+    with urllib.request.urlopen(req) as resp:
+        op = json.loads(resp.read().decode("utf-8"))
+except urllib.error.HTTPError as e:
+    print("TRIAL_FAIL: provisioning failed: HTTP " + str(e.code) + " " + e.read().decode("utf-8")[:300])
+    sys.exit(1)
+except Exception as e:
+    print("TRIAL_FAIL: provisioning failed: " + str(e))
+    sys.exit(1)
+deadline = time.time() + 120
+while not op.get("done") and op.get("name") and time.time() < deadline:
+    time.sleep(5)
+    try:
+        with urllib.request.urlopen(urllib.request.Request(api + op["name"], headers=headers)) as resp:
+            op = json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        pass
+if not op.get("done") or op.get("error"):
+    print("TRIAL_FAIL: provisioning did not complete: " + json.dumps(op.get("error") or {})[:300])
+    sys.exit(1)
+
+# Step 2: create the free trial license config. freeTrial is pinned to True
+# and the result is only accepted if the server confirms an ACTIVE free
+# trial - a paid subscription is NEVER purchased automatically.
+today = datetime.date.today()
+end = today + datetime.timedelta(days=30)
+body = {
+    "subscriptionTier": "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT",
+    "licenseCount": "50",
+    "subscriptionTerm": "SUBSCRIPTION_TERM_CUSTOM",
+    "startDate": {"year": today.year, "month": today.month, "day": today.day},
+    "endDate": {"year": end.year, "month": end.month, "day": end.day},
+    "freeTrial": True,
+}
+url = (api + "projects/" + project_id
+       + "/locations/global/licenseConfigs?licenseConfigId=free_trial_agent_space")
+req = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers=headers)
+try:
+    with urllib.request.urlopen(req) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+except urllib.error.HTTPError as e:
+    print("TRIAL_FAIL: HTTP " + str(e.code) + " " + e.read().decode("utf-8")[:300])
+    sys.exit(1)
+except Exception as e:
+    print("TRIAL_FAIL: " + str(e))
+    sys.exit(1)
+if data.get("freeTrial") is True and data.get("state") == "ACTIVE":
+    print("TRIAL_OK")
+else:
+    print("TRIAL_FAIL: the created config is not a confirmed active free trial"
+          + " (state=" + str(data.get("state")) + ", freeTrial=" + str(data.get("freeTrial"))
+          + "). Please check the Gemini Enterprise console.")
+    sys.exit(1)
+PYEOF
+) || true
+        if echo "\$TRIAL_OUT" | grep -q "^TRIAL_OK"; then
+          echo "   ✅ Free trial subscription activated."
+          GE_LICENSE_STATE="ACTIVE"
+        else
+          echo "   ⚠️  Could not start a free trial automatically:"
+          echo "\$TRIAL_OUT" | sed 's/^/      /'
+        fi
+      fi
+    fi
+
+    # Active subscription: offer to create the Gemini Enterprise app automatically.
+    if [ "\$GE_LICENSE_STATE" = "ACTIVE" ]; then
+      read -p "   Create a Gemini Enterprise app in this project automatically now? (y/n) " -n 1 -r
+      echo
+      if [[ \$REPLY =~ ^[Yy]$ ]]; then
+        echo "   ⏳ Creating Gemini Enterprise app (this can take a minute or two)..."
+        CREATE_OUT=$(python3 - "\$PROJECT_ID" "\$GE_TOKEN" << 'PYEOF'
+import sys, json, time, urllib.request, urllib.error
+project_id, token = sys.argv[1], sys.argv[2]
+headers = {
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json",
+    "X-Goog-User-Project": project_id,
+}
+engine_id = "gemini-enterprise-" + str(int(time.time()))
+base = ("https://discoveryengine.googleapis.com/v1alpha/projects/" + project_id
+        + "/locations/global/collections/default_collection/engines")
+body = {
+    "displayName": "Gemini Enterprise",
+    "solutionType": "SOLUTION_TYPE_SEARCH",
+    "appType": "APP_TYPE_INTRANET",
+    "industryVertical": "GENERIC",
+    "searchEngineConfig": {
+        "searchTier": "SEARCH_TIER_ENTERPRISE",
+        "searchAddOns": ["SEARCH_ADD_ON_LLM"],
+        "requiredSubscriptionTier": "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT",
+    },
+}
+req = urllib.request.Request(base + "?engineId=" + engine_id,
+                             data=json.dumps(body).encode("utf-8"), headers=headers)
+try:
+    with urllib.request.urlopen(req) as resp:
+        op = json.loads(resp.read().decode("utf-8"))
+except urllib.error.HTTPError as e:
+    print("CREATE_FAIL: HTTP " + str(e.code) + " " + e.read().decode("utf-8")[:300])
+    sys.exit(1)
+except Exception as e:
+    print("CREATE_FAIL: " + str(e))
+    sys.exit(1)
+op_name = op.get("name", "")
+deadline = time.time() + 180
+while op_name and not op.get("done") and time.time() < deadline:
+    time.sleep(5)
+    try:
+        poll = urllib.request.Request("https://discoveryengine.googleapis.com/v1alpha/" + op_name, headers=headers)
+        with urllib.request.urlopen(poll) as resp:
+            op = json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        pass
+if op.get("error"):
+    print("CREATE_FAIL: " + json.dumps(op["error"])[:300])
+    sys.exit(1)
+# Wait until the new app is visible in the engines list (later steps re-list it).
+while time.time() < deadline:
+    try:
+        lst = urllib.request.Request(base, headers=headers)
+        with urllib.request.urlopen(lst) as resp:
+            engines = json.loads(resp.read().decode("utf-8")).get("engines", [])
+        if any(e.get("name", "").endswith("/" + engine_id) for e in engines):
+            print("GE_APP_CREATED:" + engine_id)
+            sys.exit(0)
+    except Exception:
+        pass
+    time.sleep(5)
+print("CREATE_FAIL: the app did not appear in the engines list within the timeout")
+sys.exit(1)
+PYEOF
+) || true
+        GE_APP_CREATED=$(echo "\$CREATE_OUT" | grep "^GE_APP_CREATED:" | cut -d':' -f2)
+        if [ ! -z "\$GE_APP_CREATED" ]; then
+          echo "   ✅ Created Gemini Enterprise app: \$GE_APP_CREATED (location: global)"
+          echo "Proceeding automatically."
+        else
+          echo "   ⚠️  Automatic app creation failed:"
+          echo "\$CREATE_OUT" | sed 's/^/      /'
+        fi
+      fi
+    fi
+  fi
+
+  if [ -z "\$GE_APP_CREATED" ]; then
+    echo ""
+    echo "   You MUST have a Gemini Enterprise instance already created in this project."
+    echo "   If you haven't, please create one here first:"
+    echo "   https://console.cloud.google.com/gemini-enterprise/products?project=$PROJECT_ID"
+    echo ""
+    read -p "Have you confirmed the instance exists? (y/n) " -n 1 -r
+    echo
+    if [[ ! \$REPLY =~ ^[Yy]$ ]]; then
+        echo "Exiting. Please create the instance and run the script again."
+        exit 1
+    fi
   fi
 fi
 
@@ -4941,13 +5141,28 @@ ${params.importedMcpList.map((mcp, idx) => {
   echo "🔗 Quick Access Links"
   echo "---------------------------------------------------------"
   if [ ! -z "\$AGENT_ID" ]; then
-    echo "💬 Start Chatting in Gemini Enterprise:"
-    echo "   👉 https://console.cloud.google.com/gemini-enterprise/locations/\$SELECTED_LOC/engines/\$SELECTED_APP_ID/overview/dashboard?&project=\$PROJECT_ID"
-    echo "   💡 Click the 'Preview' button at the top to launch Gemini Enterprise, then select 'Agents' from the left menu to start chatting with your deployed agent."
+    # Resolve the web app config id (cid) so the link opens the agent directly.
+    LINK_TOKEN=$(gcloud auth application-default print-access-token 2>/dev/null || gcloud auth print-access-token)
+    if [ "\$SELECTED_LOC" = "global" ]; then
+      WC_ENDPOINT="discoveryengine.googleapis.com"
+    else
+      WC_ENDPOINT="\${SELECTED_LOC}-discoveryengine.googleapis.com"
+    fi
+    CONFIG_ID=$(curl -s -H "Authorization: Bearer \$LINK_TOKEN" -H "X-Goog-User-Project: \$PROJECT_ID" \
+      "https://\$WC_ENDPOINT/v1alpha/projects/\$PROJECT_ID/locations/\$SELECTED_LOC/collections/default_collection/engines/\$SELECTED_APP_ID/widgetConfigs/default_search_widget_config" \
+      | python3 -c 'import sys, json; print(json.load(sys.stdin).get("configId", ""))' 2>/dev/null) || true
+    if [ ! -z "\$CONFIG_ID" ]; then
+      echo "💬 Start Chatting with Your Agent:"
+      echo "   👉 https://vertexaisearch.cloud.google.com/home/cid/\$CONFIG_ID/r/agent/\$AGENT_ID/session/-"
+    else
+      echo "💬 Start Chatting in Gemini Enterprise:"
+      echo "   👉 https://console.cloud.google.com/gemini-enterprise/locations/\$SELECTED_LOC/engines/\$SELECTED_APP_ID/overview/dashboard?project=\$PROJECT_ID"
+      echo "   💡 Click the 'Preview' button at the top to launch Gemini Enterprise, then select 'Agents' from the left menu to start chatting with your deployed agent."
+    fi
     echo ""
   else
     echo "💻 Gemini Enterprise Console:"
-    echo "   👉 https://console.cloud.google.com/gemini-enterprise/overview?&project=\$PROJECT_ID"
+    echo "   👉 https://console.cloud.google.com/gemini-enterprise/overview?project=\$PROJECT_ID"
     echo ""
   fi
   

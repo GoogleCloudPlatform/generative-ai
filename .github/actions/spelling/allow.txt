@@ -1400,6 +1400,7 @@ pyc
 pydantic
 pydrive
 pydub
+PYEOF
 PYINK
 pymupdf
 pyo
