@@ -2984,9 +2984,22 @@ if os.environ.get("ENABLE_MANAGED_AGENT") == "1":
         shared["last_text"] = "Live stream closed; polling interaction status (the sandbox keeps working)..."
         _url = _ma_interactions_url() + "/" + _iid
         _deadline = _t.monotonic() + _MA_POLL_EXTRA_S
+        _poll_start = _t.monotonic()
+        _polls = 0
         with httpx.Client(timeout=30.0) as _client:
             while _t.monotonic() < _deadline:
                 _t.sleep(30)
+                if shared.get("cancelled"):
+                    # Cancel pressed during the poll phase: the SSE loop's cancel
+                    # check can no longer fire once the stream is gone; without
+                    # this the thread keeps polling for up to _MA_POLL_EXTRA_S.
+                    return
+                _polls += 1
+                # Vary the liveness line per poll: a verbatim-repeating log_tail
+                # is indistinguishable from a hung monitor in the Data Viewer.
+                shared["last_text"] = ("Sandbox still working server-side - status poll #" + str(_polls)
+                                       + ", " + str(int((_t.monotonic() - _poll_start) / 60))
+                                       + " min since the live stream closed...")
                 try:
                     _headers = {
                         "Authorization": "Bearer " + _ma_get_access_token(),
